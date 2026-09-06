@@ -257,6 +257,21 @@ func AStaffShortfall(r Roots, cfg Config, actor, tool, command, id, disposition 
 	if tool == "Bash" && aSubmitAtTheShell(command) {
 		return "", false
 	}
+	// A PULL TYPED FOR ANOTHER HAND IS THE ESCAPE, NOT THE OFFENCE. This
+	// refusal's own last line hands the agent "pull --actor <a name> --role
+	// worker", and on a box with no lane that line is a Bash call. The guard
+	// read the caller, saw main, and held the one move it had just asked for,
+	// so nothing could answer the shortfall and it stood for ever.
+	//
+	// THE COMMAND ALREADY SAYS WHOSE PULL IT IS, so no guessing is wanted: a
+	// name other than the caller's is a hand arriving, and that is the thing
+	// the shortfall is waiting for.
+	//
+	// THE CALLER'S OWN NAME STAYS HELD, and so does a pull naming nobody, since
+	// either is the main agent taking from the queue for itself.
+	if tool == "Bash" && aPullForAnotherHand(command, actor) {
+		return "", false
+	}
 	// A PERSON WHO PUT THE WORK DOWN IS NOT ASKED FOR MORE HANDS.
 	//
 	// While finishing, a spawned hand may take nothing up, so the demand would
@@ -327,6 +342,33 @@ func aSubmitAtTheShell(command string) bool {
 		}
 	}
 	return names && ended
+}
+
+// aPullForAnotherHand answers whether a shell pull names a hand other than the
+// one making the call. A spawned worker's pull typed at a shell is the answer
+// to a shortfall, and the main agent asking for its own next token is not.
+//
+// A FLAG WITH NO VALUE NAMES NOBODY. "--actor --role worker" would otherwise
+// read "--role" as a name, and every such pull would walk through the guard.
+func aPullForAnotherHand(command, actor string) bool {
+	separators, _ := theQuotings(command)
+	words := strings.Fields(separators)
+	for i, w := range words {
+		var named string
+		switch {
+		case w == "--actor" && i+1 < len(words):
+			named = words[i+1]
+		case strings.HasPrefix(w, "--actor="):
+			named = strings.TrimPrefix(w, "--actor=")
+		default:
+			continue
+		}
+		if named == "" || strings.HasPrefix(named, "-") {
+			return false
+		}
+		return named != actor
+	}
+	return false
 }
 
 // aPull answers whether an engine command is the pull. That is the one verb a

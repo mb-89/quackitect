@@ -71,15 +71,24 @@ func TestTheCageHasNoStateWithNoLegalMove(t *testing.T) {
 		}
 	}
 
-	// A SHELL PULL IS HELD, INCLUDING ONE NAMING ANOTHER HAND, and that last
-	// case is a hole rather than a rule. On a box with no lane the main agent
-	// types the spawned worker's pull, and the guard reads the caller and holds
-	// it. wk-725b3914e7 carries the fix, and this line goes back to the
-	// going-through case when it lands.
+	// A SHELL PULL FOR THE CALLER ITSELF IS HELD. With no lane the pull is a
+	// shell command, and the main agent asking the queue for its own next token
+	// is the one move this guard exists to stop, however it is spelled.
 	for _, command := range []string{"./.bin/se pull --role worker",
-		"./.bin/se pull --actor worker-one --role worker"} {
+		"./.bin/se pull --actor main --role worker"} {
 		if _, refused := AStaffShortfall(r, cfg, "main", "Bash", command, "", ""); !refused {
 			t.Errorf("%q went through a shortfall, so the shell is a way round the guard", command)
+		}
+	}
+
+	// AND A SHELL PULL NAMING ANOTHER HAND GOES THROUGH, because it is the very
+	// move the refusal asks for. On a box with no lane the main agent types the
+	// spawned worker's pull, so a guard reading only the caller refuses the
+	// escape its own last line names, and the shortfall never ends.
+	for _, command := range []string{"./.bin/se pull --actor worker-one --role worker",
+		"./RUNME.sh pull --actor=reviewer-two --role reviewer"} {
+		if why, refused := AStaffShortfall(r, cfg, "main", "Bash", command, "", ""); refused {
+			t.Errorf("the shortfall refused %q, which is the hand it is asking for: %s", command, why)
 		}
 	}
 

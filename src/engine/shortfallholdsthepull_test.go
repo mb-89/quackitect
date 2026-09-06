@@ -61,7 +61,10 @@ func TestOnlyAShellPullIsHeld(t *testing.T) {
 		mintStandard(t, r, "queue work")
 	}
 
-	if _, refuse := AStaffShortfall(r, cfg, "main", "Bash", "./RUNME.sh pull --actor a --role worker", "", ""); !refuse {
+	// THE HELD ONE IS THE CALLER'S OWN PULL. A shell pull naming another hand
+	// is that hand arriving, which is what the shortfall is waiting for, so the
+	// command here names main.
+	if _, refuse := AStaffShortfall(r, cfg, "main", "Bash", "./RUNME.sh pull --actor main --role worker", "", ""); !refuse {
 		t.Error("a shell pull went through, so the shell is a way round the guard")
 	}
 	for _, command := range []string{
