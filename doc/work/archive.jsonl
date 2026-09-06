@@ -31,6 +31,7 @@
 {"id":"wk-6a09907c72","title":"shortfall tests contradict source","process":"trivial","disposition":"done","blob":"11d2412be82e704057819f604507b877616a327f","on_branch":"d9c1674243ea690dce1dfa3d8cf95d5e3e42268c"}
 {"id":"wk-70384c47cd","title":"archived without evidence","process":"trivial","disposition":"done","blob":"d09773bb5a476e84cbb3beb8e47040482590808e","on_branch":"218a5f0259f3fed5cb64dff2d7d306bbca57e99a"}
 {"id":"wk-72377955ca","title":"deleted argument still described","process":"trivial","disposition":"done","blob":"78783cbc5ce7b337a9c305c3df086463fef9fae9","on_branch":"65b39fbec3e636051a7e26cf2bb3805ee501fc89"}
+{"id":"wk-725b3914e7","title":"shell pull held","process":"trivial","disposition":"done","blob":"bc00a8272648c0a78c0d66bda51019caff226967"}
 {"id":"wk-72855641bd","title":"util/setup tests are tables","process":"standard","disposition":"done","blob":"72fe1df7e9ba2817b89edbdfa7760cd7bbf7f6fe","on_branch":"b299e258b32f8e082b43096c01c4991acaaaeb71"}
 {"id":"wk-75c9fd102b","title":"Queue offers held work","process":"standard","disposition":"done","blob":"8218ae811297b76a941420571f355f65d1976209","on_branch":"68608ae0e6e90516502127924e931ac8cc28bdcc"}
 {"id":"wk-786972f189","title":"the mint takes bucket","process":"trivial","disposition":"done","blob":"36f3e8b577c872606e887a96d72a4cef92d6472b"}
@@ -72,6 +73,7 @@
 {"id":"wk-dffbf05720","title":"relenting needs a claim","process":"standard","disposition":"done","blob":"3478519f38961b0fdb7c4c5a13081e5977bf5ca1","on_branch":"3d4584314eae5e2eedd364295f94681e0d533298"}
 {"id":"wk-e99d60617c","title":"cloud answers reach chat","process":"trivial","disposition":"done","blob":"e28c4d124c2a724be5d130540b52bdf5dabf518a","on_branch":"6568d02617c7d60f2c6757273cfff40abf27a700"}
 {"id":"wk-e9b6021cc2","title":"starting is not passing","process":"trivial","disposition":"done","blob":"021476504a694cf4e9289981496bcce27e24e8e6","on_branch":"6cdfec19b13d21d708dcc02bb7cb42dc2863145c"}
+{"id":"wk-ea4718cc4c","title":"Cloud boxes publish nothing","process":"standard","disposition":"done","blob":"42cf81f85213166a1d2c216e05f621ce05de4852","on_branch":"b3e697044e62072a00ff079ee6033d68a693d68a"}
 {"id":"wk-f353de1280","title":"twenty-two tokens lack approach","process":"trivial","disposition":"became","blob":"1b7df18f28006beab7eb557d4845a105a2850626","on_branch":"1fe0cc849a7c8f29c2e65de883e0844a8e6f1c81"}
 {"id":"wk-f5f03b0482","title":"claim fixture is lapsed","process":"trivial","disposition":"done","blob":"76b4eadbcd716a78452c6530eb25b1c5c398dcc9","on_branch":"536f81aedc372d378abf09998d8ab787129f3c45"}
 {"id":"wk-f921c702c9","title":"claim publish stages ignored","process":"trivial","disposition":"done","blob":"cc1c0237b17189e44fac099923f9deaeffe8311e","on_branch":"3259afe784a481a402d6648d81f5e17c6a1223ef"}
