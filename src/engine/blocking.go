@@ -26,7 +26,14 @@ import (
 // aCheckAnswer reads one line of a battery's output: the name, then ok or FAIL,
 // then the seconds it took. A finding's own lines are indented under it, so a
 // line that starts with a space is not a check's.
-var aCheckAnswer = regexp.MustCompile(`^(\S.*?)\s{2,}(ok|FAIL)\s+\d+s`)
+//
+// ONE SPACE IS ENOUGH BETWEEN THE TWO. battery.sh pads the name into a column
+// sixteen wide, so a longer name is followed by the separator and nothing else.
+// Wanting two spaces read only the short lane names: over one run of the
+// battery here it saw twenty-five of fifty-three checks and four of the nine
+// red ones, and the-branch-head-builds, which is the case this rank was
+// written for, was among the ones it could not see.
+var aCheckAnswer = regexp.MustCompile(`^(\S.*?)\s+(ok|FAIL)\s+\d+s`)
 
 // TheRedChecks answers the checks the last battery said were red.
 //
