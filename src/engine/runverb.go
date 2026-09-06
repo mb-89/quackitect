@@ -133,6 +133,14 @@ func runRun(c *call) int {
 		return 1
 	}
 
+	// AND A STAGE CARRIES ONLY WHAT THIS TOKEN WROTE. The verb is told which
+	// token the command is on, so the record can be asked what that token
+	// wrote. See stagestrangers.go.
+	if why, refuse := AStageCarriesStrangers(roots, *on, said); refuse {
+		c.answerJSON(map[string]any{"error": why, "on": *on})
+		return 1
+	}
+
 	// NAMING IT IS TAKING IT UP, the same as on a write. Whatever this actor
 	// held goes back, so changing what you work on is one word on the next
 	// command.
