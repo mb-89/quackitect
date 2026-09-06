@@ -7,13 +7,13 @@ process: [[trivial]]
 guidance: [[work-token]]
 # the name this token is known by, in references and in links
 title: fed git honours context
-# the work this one stands on, and cannot be taken up before
-depends_on:
-  - "[[wk-697f9876cf]]"
 # where the token stands. The process owns these values.
 status: open
-claimed_by: aeaf7bd9/worker-nancarrow
-claimed_at: "2026-09-05T14:21:16Z"
+# the person's own name for a group. It does not move the work
+bucket: claims
+# tokens that have to close before this can start
+depends_on:
+  - "[[wk-697f9876cf]]"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 143237f6d3ebddf4497298c098cfb5c00d4160b4

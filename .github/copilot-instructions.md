@@ -15,7 +15,7 @@
 9. Do not kill yourself because you are afraid of dying. Build against a failure seen, not one feared. *
 10. Mark an estimate as an estimate. Say "I do not know" when you do not know.
 11. Read a file before you change it. Change one thing at a time, and leave every other file as it was.
-12. Stage the paths you edited, by name. Never stage everything, and never merge in the shared tree: push through the cherry-pick door at `util/git/cherrypush.sh`, or land named files with `util/git/land.sh`. *
+12. Stage the paths you edited, by name. Never stage everything, and never merge in the shared tree: push through the cherry-pick door. *
 13. Private data: names, datetimes and unfiltered notes. They do not go into git.
 
 # Driving the engine
@@ -24,17 +24,19 @@
 
 1. On errors, the engine provides remedies. Incorporate them in your way of working.
 2. Answer prompts before anything else with `se --answer "..."`. Copy the prompt verbatim. *
-3. Stop only with a reason named to the engine. On an interrupt, claim `asked`. *
-4. Use the tool the engine gives you. *
-5. Change files with `se_apply`, naming the token on every write. *
-6. Run every shell command with `se_run`, naming the token. It could write. *
-7. A helper script goes in `.se/scratchpad/`. A standing check goes in `util/checks/`. *
-8. Search the tree through the index: `se_find` for words, a regex or a path glob, `se_ask` for SQL. *
-9. Test through the engine: `se_test` runs what your delta reaches. A test you name runs, a pattern narrows. *
-10. Break work into sub-tokens with `se_work`, naming the parent. Your own todo list is refused. *
-11. Replace the engine with `se --swap`. A build aimed at `.bin` is refused. *
-12. Bound to the queue, claim a block with `se claim --next <n>` or `--these`, sized to what you finish before the claim lapses.
-13. Inside a box, take up what it holds rather than claiming again: a claim is between boxes, a hold within one.
+3. Stopping is claim then stop, in that order. Every call between them clears the claim, an answer included. *
+4. A standing claim is granted at once, so a refusal means a call cleared it rather than that it was refused. *
+5. `asked` outranks every other reason when their word is what stopped you. On an interrupt, claim it. *
+6. Use the tool the engine gives you. *
+7. Change files with `se_apply`, naming the token on every write. *
+8. Run every shell command with `se_run`, naming the token. It could write. *
+9. A helper script goes in `.se/scratchpad/`. A standing check goes in `util/checks/`. *
+10. Search the tree through the index: `se_find` for words, a regex or a path glob, `se_ask` for SQL. *
+11. Test through the engine: `se_test` runs what your delta reaches. A test you name runs, a pattern narrows. *
+12. Break work into sub-tokens with `se_work`, naming the parent. Your own todo list is refused. *
+13. Replace the engine with `se --swap`. A build aimed at `.bin` is refused. *
+14. Bound to the queue, claim a block with `se claim --next <n>` or `--these`, sized to what you finish before the claim lapses.
+15. Inside a box, take up what it holds rather than claiming again: a claim is between boxes, a hold within one.
 
 # Voice
 

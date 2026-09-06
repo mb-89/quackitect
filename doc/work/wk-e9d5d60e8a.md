@@ -9,8 +9,8 @@ guidance: [[work-token]]
 title: render check reads data
 # where the token stands. The process owns these values.
 status: open
-claimed_by: 547b9365/worker-hawthorn
-claimed_at: "2026-09-05T16:18:31Z"
+# the person's own name for a group. It does not move the work
+bucket: checks
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - b00750e165cacb79c6a9cb2132d2b6d59f470cd4

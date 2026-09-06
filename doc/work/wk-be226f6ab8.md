@@ -9,10 +9,10 @@ guidance: [[work-token]]
 title: An absent run passes
 # where the token stands. The process owns these values.
 status: open
-# what has to be true before this can start, which a person judges
+# the person's own name for a group. It does not move the work
+bucket: tests
+# what has to be true before this is worth reading again
 ready_when: every open token has been through one run under the store
-claimed_by: f5927132/main
-claimed_at: "2026-09-06T11:48:27Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - a46d151d592b29e8a069edfb3cd32aac9f8e7da6

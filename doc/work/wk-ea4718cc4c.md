@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: Cloud boxes publish nothing
 # where the token stands. The process owns these values.
 status: open
+# the person's own name for a group. It does not move the work
+bucket: claims
 # true when this waits for a person rather than an agent
 needs_human: true
 # the tree each time the work was taken up, snapshots the engine wrote
@@ -23,6 +25,20 @@ A cloud box writes refs/heads and no other ref namespace. Measured 2026-09-06, o
 ## proposed action
 
 Move the claim relay onto refs/heads/se-queue, the one namespace a cloud box can write. The mechanism is unchanged: a commit built with a bare index, pushed, the working tree never touched. Only the ref name moves.
+
+## approach
+
+Written by main on 2026-09-06, while working wk-8797959d3c, which does not name this token. It is also STALE: the red team found claim.go already publishes on refs/heads/se/claims, so the move this describes has shipped. Do not build from it.
+
+The owner's design, 2026-09-06. Nothing is cut until they give the go.
+
+The split is by path rather than by branch. doc/work goes straight to trunk, always. src goes on a worker's own branch and lands after review. Two things at two speeds, and no second branch is built.
+
+The claim relay keeps its mechanism and changes its target. A commit is built with a bare index, as claim.go does now, and pushed to trunk instead of refs/se/claims. The working tree is never touched.
+
+refs/heads is the one namespace a cloud box can write. That was measured rather than assumed, so trunk is not a preference here.
+
+The archive stays one file. That is the owner's ruling, twice. Every push merges anyway, so an archive conflict is part of a merge already happening. A union merge driver on doc/work/archive.jsonl resolves it without a person, because both sides' lines belong.
 
 ## done when
 
@@ -66,18 +82,4 @@ Move the claim relay onto refs/heads/se-queue, the one namespace a cloud box can
 | [ ] | every criterion's command was run again, and what it said is named |  |  |
 | [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
 | [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
-
-## approach
-
-Written by main on 2026-09-06, while working wk-8797959d3c, which does not name this token. It is also STALE: the red team found claim.go already publishes on refs/heads/se/claims, so the move this describes has shipped. Do not build from it.
-
-The owner's design, 2026-09-06. Nothing is cut until they give the go.
-
-The split is by path rather than by branch. doc/work goes straight to trunk, always. src goes on a worker's own branch and lands after review. Two things at two speeds, and no second branch is built.
-
-The claim relay keeps its mechanism and changes its target. A commit is built with a bare index, as claim.go does now, and pushed to trunk instead of refs/se/claims. The working tree is never touched.
-
-refs/heads is the one namespace a cloud box can write. That was measured rather than assumed, so trunk is not a preference here.
-
-The archive stays one file. That is the owner's ruling, twice. Every push merges anyway, so an archive conflict is part of a merge already happening. A union merge driver on doc/work/archive.jsonl resolves it without a person, because both sides' lines belong.
 

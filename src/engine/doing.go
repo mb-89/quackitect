@@ -114,6 +114,13 @@ type Happening struct {
 	// act on and it is drawn in the header; this is the register, and it
 	// holds an agent that has arrived and pulled nothing yet.
 	Present []Doing `json:"present"`
+
+	// HOW MUCH THE QUEUE WOULD HAND OUT, under the filter in force.
+	//
+	// It rides here because the panel already reads this answer on the beat, and
+	// a number that changes as fast as the queue does needs no door of its own.
+	// A person filing tokens into a bucket watches this empty.
+	Queue int `json:"queue"`
 }
 
 // WhatIsHappening answers one row per actor that is working or stopped.
@@ -122,7 +129,8 @@ type Happening struct {
 // once pulled, and the owner read four of those in the header as nonsense.
 // The header is for what a person can act on: a hold, a stop, a token in hand.
 func WhatIsHappening(r Roots) Happening {
-	out := Happening{Actors: []Doing{}, Hold: LoadHold(r), Present: AgentsPresent(r)}
+	out := Happening{Actors: []Doing{}, Hold: LoadHold(r), Present: AgentsPresent(r),
+		Queue: QueueDepth(r)}
 	all := Tokens(r)
 	for _, actor := range ActorsThatPulled(r) {
 		d := doingOf(r, all, actor)

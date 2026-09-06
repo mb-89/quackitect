@@ -11,8 +11,6 @@ title: battery names absent check
 status: closed
 # who did the work step, so the verdict is never theirs
 author: worker-birch
-claimed_by: 547b9365/worker-birch
-claimed_at: "2026-09-05T15:44:44Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 2d5cbce39fc027d99566d1228a82658b93a86a2e

@@ -11,8 +11,6 @@ title: unbound still names tokens
 status: closed
 # who did the work step, so the verdict is never theirs
 author: worker-ada
-claimed_by: 542bcda8/reviewer-sibelius
-claimed_at: "2026-09-04T18:48:25Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - c5b2d2b30c6e8d5d4204358d6d391c8d26dac436

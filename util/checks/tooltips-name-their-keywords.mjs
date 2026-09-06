@@ -39,6 +39,12 @@ const refuse = (why) => { console.error(why); process.exit(1); };
 
 // THE TREE COMES FROM THE ENGINE, because the line is the engine's answer and
 // not a thing this file works out for itself.
+//
+// AND THE EXTENSION HAS TO ASK THE SAME WAY. Measured on 2026-09-06: this check
+// asked the engine while the extension read util/parameters.json off disk. The
+// lines were derived, drawn in a test, and absent from the window a person was
+// looking at. A member below holds the two together, so a panel fed the raw
+// declaration fails here rather than in front of somebody.
 let tree;
 try {
   tree = JSON.parse(execFileSync(se, ["--tree", "--method", root], { encoding: "utf8" }));
@@ -98,9 +104,27 @@ await build({
 });
 const { panelHtml } = await import("file://" + join(out, "panel.mjs"));
 
-const shown = (tree.children ?? []).map((c) => c.name);
 const nothing = { actors: [], hold: { on: false }, present: [] };
-const page = panelHtml(tree, shown, {}, nothing);
+const panelHtmlOf = (t) => panelHtml(t, (t.children ?? []).map((c) => c.name), {}, nothing);
+const page = panelHtmlOf(tree);
+
+// A PANEL FED THE RAW DECLARATION DRAWS NOTHING, and that is the failure this
+// check could not see. The lines are derived, so the file carries none of them.
+// Building the panel from the file is a panel with no lines in it, and the only
+// way to tell that apart from a broken derivation is to build both.
+const fromTheFile = panelHtmlOf(JSON.parse(declared));
+if (!fromTheFile.includes("KEYWORD:")) {
+  ok("a panel built from the file alone draws no line, which is why the engine is asked");
+} else {
+  no("the file carries keyword lines, so deriving them is not the only place they live");
+}
+
+// SO THE EXTENSION ASKS THE ENGINE FOR ITS TREE. It read the file for a while,
+// and the panel drew nothing in the window while every member here was green.
+const ext = readFileSync(join(here, "extension.ts"), "utf8");
+if (/treeArgs\(/.test(ext)) ok("the extension asks the engine for the tree the panel is built from");
+else no("src/extension/extension.ts builds the panel without calling treeArgs, so it draws the "
+  + "declaration and no derived line can reach the window");
 
 // THE PAGE IS READ AS A PERSON SEES IT, not as the markup spells it. A line
 // carrying angle brackets is escaped into the title attribute and the browser

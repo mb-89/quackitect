@@ -11,8 +11,6 @@ title: pull hands unclaimed token
 status: closed
 # who did the work step, so the verdict is never theirs
 author: worker-linden
-claimed_by: 547b9365/worker-linden
-claimed_at: "2026-09-05T20:54:41Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 624f3933075e3b14fb9eaeffc464e96b20bda453

@@ -12,7 +12,7 @@ import { startLanguageServer, stopLanguageServer } from "./lsp";
 import { sayWindowIsHere, forgetWindow, windowsThere, windowAnswers, sweepWindowsGone } from "./windows";
 import {
   mintArgs, editCellArgs, fileArgs, groupArgs, renameGroupArgs, holdArgs,
-  bindArgs, bindingArgs, askArgs, askedArgs, askIsOwed, ideationArgs, ideatingArgs, isIdeating,
+  bindArgs, bindingArgs, askArgs, askedArgs, askIsOwed, ideationArgs, ideatingArgs, isIdeating, treeArgs,
   viewArgs, paneArgs, panesArgs, viewsArgs, pinArgs, unpinArgs, widthArgs,
   burndownArgs,
   orderArgs, levelArgs, dropLevelArgs, filterArgs,
@@ -39,7 +39,7 @@ export function activate(context: vscode.ExtensionContext) {
   rotateLogOnStartup(context);
   reattach(context);
   void showHold(context);
-  void showBinding(context);
+  void bindOnANewWindow(context);
   void showAsked(context);
   watchTheAsk(context);
   projectOnStartup(context);
@@ -63,7 +63,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("quackitect.showLog", () => showLog(context)),
     vscode.commands.registerCommand("quackitect.showWork", () => toggleWork(context)),
     vscode.commands.registerCommand("quackitect.hold", () => toggleHold(context)),
-    vscode.commands.registerCommand("quackitect.held", () => holdEverything(context)),
+    vscode.commands.registerCommand("quackitect.stop_everything", () => holdEverything(context)),
     vscode.commands.registerCommand("quackitect.ask", () => toggleAsk(context)),
     vscode.commands.registerCommand("quackitect.ideation", () => toggleIdeation(context)),
     vscode.commands.registerCommand("quackitect.unbind", () => pressBinding(context)),
@@ -443,7 +443,8 @@ async function refreshLive(context: vscode.ExtensionContext) {
 function postDoing(context: vscode.ExtensionContext) {
   if (!view) return;
   const pieces = livePieces(loadTree(context), shownGroups(context), lastDoing);
-  void view.webview.postMessage({ type: "doing", head: pieces.head, tables: pieces.tables });
+  void view.webview.postMessage({ type: "doing", head: pieces.head, tables: pieces.tables,
+    counts: pieces.counts });
 }
 
 // THE OTHER HALF OF THE PARAMETER TREE.
@@ -590,7 +591,41 @@ function theIcons(context: vscode.ExtensionContext): Record<string, { glyph?: st
   }
 }
 
+// THE TREE THE ENGINE ANSWERED, held the way the values are held.
+//
+// It is read asynchronously and the panel is built synchronously, so the first
+// build falls back to the file and the answer rebuilds it. That is the same
+// beat readValues runs on, for the same reason.
+let lastTree: Node | undefined;
+
+function readTree(context: vscode.ExtensionContext): Promise<void> {
+  return new Promise((resolve) => {
+    const work = workRoot();
+    const exe = binary(context, "se");
+    // Reading is quiet, the way the values read is.
+    if (!work || !fs.existsSync(exe)) return resolve();
+    const done = spawn(exe, [...treeArgs(methodRoot(context)), "--work", work], { cwd: work });
+    let out = "";
+    done.stdout?.on("data", (b: Buffer) => (out += b.toString()));
+    done.on("error", () => resolve());
+    // close, not exit: on exit the pipe can still hold the answer.
+    done.on("close", () => {
+      try {
+        const answered = JSON.parse(out) as Node;
+        if (answered?.name) lastTree = answered;
+      } catch {
+        /* nothing to show. The panel keeps the tree it had. */
+      }
+      resolve();
+    });
+  });
+}
+
+// loadTree answers the engine's tree, and the file only until the engine has
+// spoken. The file is what somebody declared; the engine's answer is that plus
+// what it derives, which is where the keyword lines live.
 function loadTree(context: vscode.ExtensionContext): Node {
+  if (lastTree) return lastTree;
   try {
     const root = methodRoot(context);
     const file = path.join(root, "util", "parameters.json");
@@ -628,7 +663,10 @@ function postValues(context: vscode.ExtensionContext) {
   // actor is doing changes as often as anything else on this panel and a
   // header that is right only when the panel is rebuilt is a header that lies
   // most of the time.
-  void readDoing(context).then(() => render(context));
+  // THE TREE COMES FIRST AND THE STATE AFTER IT, so one draw has both. The
+  // tree is what the panel is built from and the state is what fills it, and
+  // drawing twice would show a panel with no buttons for a beat.
+  void readTree(context).then(() => readDoing(context).then(() => render(context)));
   void readValues(context).then(() => {
     // The panel is rebuilt when the groups it holds are not the groups it was
     // built with. One comparison, against what is on screen.
@@ -1481,7 +1519,7 @@ async function showIdeation(context: vscode.ExtensionContext) {
 // THE WORD THE ENGINE ANSWERS IS THE WORD THE PANEL DRAWS, so the label and
 // the title are looked up under it and the two cannot disagree.
 function showTheHold(at: string) {
-  view?.webview.postMessage({ type: "state", id: "hold", state: at, detail: "" });
+  view?.webview.postMessage({ type: "state", id: "finish_up", state: at, detail: "" });
 }
 
 // THE PERSON ASKS WHAT IS HAPPENING. The engine owes them an update and refuses
@@ -1565,6 +1603,31 @@ async function armGod(context: vscode.ExtensionContext) {
 async function showBinding(context: vscode.ExtensionContext) {
   const now = await askEngine(context, bindingArgs(), { quiet: true });
   showTheBinding(typeof now?.at === "string" ? now.at : "bound");
+}
+
+// A NEW WINDOW STARTS BOUND, whatever the last one left behind.
+//
+// THE OWNER'S WORDS: the unbinding survives the reload and it shouldn't.
+//
+// The rung is stamped with the person's session, and the person's session is
+// the harness's, so a conversation that outlives a reload carries the rung with
+// it. That stamp is right for what it was written for: an engine restarted for
+// its own reasons must not put the guards back on somebody who took them off,
+// and that was measured. A window opening is a different event, and it is the
+// one a person means when they say they started again.
+//
+// SO THE WINDOW PUTS IT BACK AND THE ENGINE NEVER DOES. Both rules hold, and
+// neither is the other's exception.
+//
+// TWO WINDOWS ON ONE TREE: the second to open binds the first. That is the safe
+// way round. A rung left on by accident is the failure this exists to stop, and
+// a rung put back too eagerly costs one press.
+async function bindOnANewWindow(context: vscode.ExtensionContext) {
+  const now = await askEngine(context, bindingArgs(), { quiet: true });
+  if (typeof now?.at === "string" && now.at !== "bound") {
+    await askEngine(context, bindArgs("bound"), { quiet: true });
+  }
+  await showBinding(context);
 }
 
 // THE BLOCK IN THE STATUS BAR, WHICH IS THE WHOLE MITIGATION.

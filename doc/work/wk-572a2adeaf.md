@@ -11,8 +11,6 @@ title: stop claim, current name
 status: closed
 # who did the work step, so the verdict is never theirs
 author: worker-fir
-claimed_by: 547b9365/worker-fir
-claimed_at: "2026-09-05T15:20:33Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - ecc717debb5ea597eba9346bf49102d7638467c0

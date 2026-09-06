@@ -283,7 +283,8 @@ func TheList(reason string) string {
 		"Saying it in chat is not enough. Nothing can read chat.\n" +
 		"\nMAKE THE CLAIM YOUR LAST CALL. Every call after it clears the claim, and a\n" +
 		"status, a search or an answer to the person is a call.\n" +
-		"SO A SECOND REFUSAL MEANS THE CLAIM WAS CLEARED, never that it was refused.\n" +
-		"Claim again, and this time stop on it.")
+		"SO THIS NOTICE COMING BACK MEANS THE CLAIM WAS CLEARED BY A CALL.\n" +
+		"Claim again, and this time stop on it. A claim that is standing is granted,\n" +
+		"whatever is still open, so this is the only reason you can be seeing this.")
 	return b.String()
 }

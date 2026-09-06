@@ -11,8 +11,6 @@ title: commit only its paths
 status: closed
 # who did the work step, so the verdict is never theirs
 author: worker-birch
-claimed_by: 547b9365/worker-birch
-claimed_at: "2026-09-05T14:21:01Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - f8e4a8bef240f4109896b09a67579c6cbb53310e

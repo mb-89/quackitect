@@ -11,8 +11,6 @@ title: v4 engine cannot build
 status: closed
 # who did the work step, so the verdict is never theirs
 author: worker-relay-trial
-claimed_by: 547b9365/worker-relay-trial
-claimed_at: "2026-09-05T16:08:03Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - aa02cdd363acb47e54b96b5059f9b8af7953cabe

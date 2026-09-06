@@ -9,8 +9,8 @@ guidance: [[work-token]]
 title: the editor shows claims
 # where the token stands. The process owns these values.
 status: open
-claimed_by: aeaf7bd9/worker-alvar
-claimed_at: "2026-09-06T10:09:13Z"
+# the person's own name for a group. It does not move the work
+bucket: surface
 # what has to be true before this is worth reading again
 ready_when: "ready when se test can tell this token's change from the tree around it. Measured in September 2026. The plan for this token answered that nothing in the record says what it wrote, so the delta is the whole diff. That diff is two hundred and eighty-six files from other hands, and the Go package among them does not build in this clone. The step asks for se test on this token to answer ok, and here it cannot."
 # the tree each time the work was taken up, snapshots the engine wrote
@@ -36,6 +36,18 @@ The view already answers its columns, their names, their widths and which cell o
 ## proposed action
 
 Give the view a claim column, and let the heading-line filter narrow on it.
+
+## approach
+
+claimed_by joins the columns the view already answers, beside title, status, process and holder. The view file says whether it is drawn, so a person who does not want it can take it out.
+
+The panel draws it the way it draws the others, from what the view answers rather than from a list of its own.
+
+A claim from another box is drawn as that box. Blank means unclaimed, and those are two different facts that must not look the same.
+
+SO THE CELL IS NOT THE TOKEN'S OWN FIELD. A claim made elsewhere reaches this box through git and sits in the sync's store, with nothing on the note. The row in src/engine/query.go asks ClaimedNow, the way it already asks Blocked, or every far claim draws blank.
+
+The filter narrows on it through whatever reads the filter, which is wk-aae03d4767 and is not decided here.
 
 ## done when
 
@@ -80,16 +92,4 @@ Give the view a claim column, and let the heading-line filter narrow on it.
 | [ ] | every criterion's command was run again, and what it said is named |  |  |
 | [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
 | [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
-
-## approach
-
-claimed_by joins the columns the view already answers, beside title, status, process and holder. The view file says whether it is drawn, so a person who does not want it can take it out.
-
-The panel draws it the way it draws the others, from what the view answers rather than from a list of its own.
-
-A claim from another box is drawn as that box. Blank means unclaimed, and those are two different facts that must not look the same.
-
-SO THE CELL IS NOT THE TOKEN'S OWN FIELD. A claim made elsewhere reaches this box through git and sits in the sync's store, with nothing on the note. The row in src/engine/query.go asks ClaimedNow, the way it already asks Blocked, or every far claim draws blank.
-
-The filter narrows on it through whatever reads the filter, which is wk-aae03d4767 and is not decided here.
 

@@ -67,12 +67,12 @@
           "title": "init / make this folder a project, or a vehicle that carries the method"
         },
         {
-          "name": "hold",
+          "name": "finish_up",
           "type": "toggle",
           "console": true,
           "command": "quackitect.hold",
           "gesture": 5,
-          "gestureCommand": "quackitect.held",
+          "gestureCommand": "quackitect.stop_everything",
           "labels": {
             "off": "hand",
             "finishing": "hand",
@@ -174,6 +174,22 @@
           "command": "quackitect.mintWork",
           "placeholder": "title / the note body",
           "title": "This writes a note. Four words name it. After the slash goes everything the next hand needs. Enter mints it."
+        },
+        {
+          "name": "depth",
+          "type": "count",
+          "source": "queue",
+          "title": "how many tokens the queue would hand out. With a filter set it counts what matches, so a bucket can be watched empty"
+        },
+        {
+          "name": "queue_filter",
+          "type": "text",
+          "span": 4,
+          "console": true,
+          "stored": true,
+          "placeholder": "hover for filter syntax",
+          "syntax": "filter",
+          "title": "Narrow the queue to what you want worked. Enter sets it. An expression that will not read filters nothing, so the queue is only ever narrowed on purpose."
         }
       ]
     },

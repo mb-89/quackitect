@@ -1,9 +1,16 @@
 ---
+# which schema reads this note
 kind: [[work-token]]
+# which process shapes this token and says how it moves
 process: [[standard]]
+# the rules for filling this token
 guidance: [[work-token]]
+# the name this token is known by, in references and in links
 title: commits stage by name
+# where the token stands. The process owns these values.
 status: open
+# the person's own name for a group. It does not move the work
+bucket: tests
 ---
 
 ## detail

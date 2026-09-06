@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: relenting needs a claim
 # where the token stands. The process owns these values.
 status: open
+# the person's own name for a group. It does not move the work
+bucket: claims
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 3be6c3a66743b88ea32c93d07506eb425472f3fb
@@ -32,6 +34,16 @@ Measured here: .se/stops.json holds an empty count after relenting, and the hook
 ## proposed action
 
 Relent only on a deliberate claim. Take the count out and require both halves, the harness flag and a standing se_stop claim since the last pull.
+
+## approach
+
+The count comes out. countRefusedStop and stopRefusalsBeforeRelenting go, with the file they wrote.
+
+The valve becomes two conditions read together. The harness says this stop was already refused, and an se_stop claim stands on the record since the last pull. Either alone refuses.
+
+The claim is spent by the next pull, so one claim releases one stop.
+
+v3 is the worked example, and its comment is the reason. Read it before writing this.
 
 ## done when
 
@@ -76,14 +88,4 @@ Relent only on a deliberate claim. Take the count out and require both halves, t
 | [ ] | every criterion's command was run again, and what it said is named |  |  |
 | [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
 | [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
-
-## approach
-
-The count comes out. countRefusedStop and stopRefusalsBeforeRelenting go, with the file they wrote.
-
-The valve becomes two conditions read together. The harness says this stop was already refused, and an se_stop claim stands on the record since the last pull. Either alone refuses.
-
-The claim is spent by the next pull, so one claim releases one stop.
-
-v3 is the worked example, and its comment is the reason. Read it before writing this.
 

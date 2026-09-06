@@ -9,10 +9,10 @@ guidance: [[work-token]]
 title: Many agents one box
 # where the token stands. The process owns these values.
 status: open
-# the answer is not the agent's: the owner picks which fix, and how far to go
+# the person's own name for a group. It does not move the work
+bucket: claims
+# true when this waits for a person rather than an agent
 needs_human: true
-claimed_by: 547b9365/worker-relay-trial
-claimed_at: "2026-09-05T15:41:21Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - ada49a6390cc27edf296a371f3cee61341360c98

@@ -63,6 +63,16 @@ func (o Option) MarshalJSON() ([]byte, error) {
 	return json.Marshal(plain(o))
 }
 
+// Column is one field of a row, drawn. The engine does not read these either:
+// which fields are worth a column is the declaration's to say.
+type Column struct {
+	Field string `json:"field"`
+	Title string `json:"title,omitempty"`
+	Link  string `json:"link,omitempty"`
+	Empty string `json:"empty,omitempty"`
+	Width string `json:"width,omitempty"`
+}
+
 type Node struct {
 	Name    string   `json:"name"`
 	Title   string   `json:"title,omitempty"`
@@ -88,6 +98,31 @@ type Node struct {
 	// drop them: --tree prints the tree AS DECLARED, and a field this program
 	// happens not to use is still part of what somebody wrote.
 	Placeholder string `json:"placeholder,omitempty"`
+
+	// A TEXT BOX THAT KEEPS WHAT IS TYPED, rather than handing it to a command
+	// and forgetting it. The mint box forgets. The queue filter is a setting
+	// and has to still be there when the panel is drawn again, so it is stored
+	// and holdsValue answers for it.
+	Stored bool `json:"stored,omitempty"`
+
+	// WHICH LANGUAGE A BOX TAKES, so its tooltip can say. The engine does not
+	// read it: the panel appends the one description that language has, rather
+	// than each box carrying its own copy to keep in step.
+	Syntax string `json:"syntax,omitempty"`
+
+	// WHICH LIST A CONTROL DRAWS, and which of each row's fields get a column.
+	//
+	// The engine does not read these. They are here for the same reason the
+	// gesture is: --tree prints the tree AS DECLARED, and a field this program
+	// happens not to use is still part of what somebody wrote.
+	//
+	// LEAVING THEM OUT WAS SILENT AND COST TWO CONTROLS. The panel read the
+	// declaration off disk until the tree came from the engine instead, and
+	// then the agents table drew no list called present and the queue count
+	// drew nothing. Neither errored. Both had simply lost the name of what they
+	// were pointed at.
+	Source  string   `json:"source,omitempty"`
+	Columns []Column `json:"columns,omitempty"`
 
 	// WHAT THE NUMBER IS COUNTED IN. The engine does not read it: the panel
 	// draws it beside the box. It is declared here because --tree prints the
@@ -131,6 +166,11 @@ func (n Node) holdsValue() bool {
 	switch n.Type {
 	case "bool", "int", "float", "str", "list", "strlist":
 		return true
+	case "text":
+		// A TEXT BOX USUALLY HANDS WHAT IS TYPED TO A COMMAND AND FORGETS IT,
+		// which is what the mint box does. One marked stored is a setting drawn
+		// as a box rather than a row, and a setting has a value.
+		return n.Stored
 	}
 	return false
 }
@@ -306,7 +346,10 @@ func narrow(n Node, floor, want any) (any, string) {
 		// A list of plain words. It arrives as an array from a file, or as a
 		// comma separated line from a command.
 		return toStrings(want), ""
-	case "str", "list":
+	// A STORED BOX TAKES WHATEVER IS TYPED. There is nothing to narrow: a
+	// filter expression is not a value on a scale, and an expression that will
+	// not read is handled where it is read rather than refused here.
+	case "str", "list", "text":
 		w := fmt.Sprint(want)
 		if len(n.Options) > 0 {
 			var names []string

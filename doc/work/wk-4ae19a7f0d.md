@@ -9,8 +9,8 @@ guidance: [[work-token]]
 title: same session gives verdict
 # where the token stands. The process owns these values.
 status: open
-claimed_by: f5927132/reviewer-tallis-two
-claimed_at: "2026-09-06T11:47:10Z"
+# the person's own name for a group. It does not move the work
+bucket: claims
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - b2d97a9c16e0d9b800325402a97ddc83f685e3ba

@@ -11,8 +11,6 @@ title: unmeasured is drawn silent
 status: closed
 # who did the work step, so the verdict is never theirs
 author: worker-linden
-claimed_by: 547b9365/worker-linden
-claimed_at: "2026-09-05T18:56:30Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - bfa862cdaa7d0ae2c6a1ebc9db5965742a246a39

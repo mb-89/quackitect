@@ -11,8 +11,6 @@ title: cover misses internal packages
 status: closed
 # who did the work step, so the verdict is never theirs
 author: worker-ash
-claimed_by: 547b9365/worker-ash
-claimed_at: "2026-09-05T14:58:42Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - c2dca5d635b91c35f9c7fe27729125fbf21f45aa

@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: end a long session
 # where the token stands. The process owns these values.
 status: open
+# the person's own name for a group. It does not move the work
+bucket: surface
 # tokens that have to close before this can start
 depends_on:
   - "[[wk-6d74c93848]]"

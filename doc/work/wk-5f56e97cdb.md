@@ -11,8 +11,6 @@ title: main is never swept
 status: closed
 # who did the work step, so the verdict is never theirs
 author: worker-fir
-claimed_by: 547b9365/worker-fir
-claimed_at: "2026-09-05T15:37:54Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 9db8f4b89320e6b5e9c0aac1ce58664a04b0899c

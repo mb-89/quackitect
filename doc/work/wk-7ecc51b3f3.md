@@ -9,8 +9,8 @@ guidance: [[work-token]]
 title: four tests pass eight
 # where the token stands. The process owns these values.
 status: open
-claimed_by: aeaf7bd9/worker-webern-two
-claimed_at: "2026-09-05T20:34:09Z"
+# the person's own name for a group. It does not move the work
+bucket: tests
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - a9fd0bfc8389eb0b6c1196a85999c706eba3768c
@@ -69,5 +69,4 @@ Feed three of the four so the mapper times them under eight seconds. Leave the o
 WHICH ONE STAYS REAL. TestANameAnotherSessionHoldsIsRefused drives answerHook end to end, and it is the only one of the four that names the engine record at all. A suite where every test is fed has stopped checking the cold path.
 
 WHAT THE WAIT WAS. loadRunning reads engine.json twenty times, twenty five milliseconds apart, before believing there is none. TheRunNow asks on every NoteAgent and NoteSession, and StaffingOf asks twice. The seconds were the engine's own retry, not work the tests were doing.
-
 

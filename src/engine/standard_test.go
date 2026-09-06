@@ -285,8 +285,8 @@ func TestTheQueueIsStaffed(t *testing.T) {
 		t.Fatalf("five open tokens want %d workers", s.WorkersWanted)
 	}
 
-	// THE MAIN AGENT IS REFUSED A SEARCH, and told to spawn; it is allowed
-	// the tool that spawns and the one that answers the person.
+	// THE MAIN AGENT IS REFUSED THE QUEUE, and told to spawn. Everything else
+	// goes through, including the tools it needs to answer the person.
 	decide := func(tool string) string {
 		t.Helper()
 		body, _ := json.Marshal(map[string]any{"hook_event_name": "PreToolUse", "cwd": r.Work, "session_id": "s-1",
@@ -295,10 +295,10 @@ func TestTheQueueIsStaffed(t *testing.T) {
 		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 		return out.String()
 	}
-	// BASH, BECAUSE WHAT IS HELD IS THE WORK. A read is not held any more: the
-	// list of what was allowed refused Read, se_pull and se_stop, which left an
-	// agent no legal move at all. See heldDuringShortfall.
-	if said := decide("Bash"); !strings.Contains(said, "spawn 2 subagents") {
+	// THE PULL, BECAUSE WHAT IS HELD IS THE QUEUE. It was the work that was
+	// held, and that reached past the rule: the owner asked a question and the
+	// answer came back as a demand to spawn. See heldDuringShortfall.
+	if said := decide("mcp__quackitect__se_pull"); !strings.Contains(said, "spawn 2 subagents") {
 		t.Fatalf("the main agent was not held for two workers: %s", said)
 	}
 	// AND ITS OWN CALL PUT IT IN THE REGISTER, WHERE IT COUNTS AS A WORKER.
@@ -310,8 +310,11 @@ func TestTheQueueIsStaffed(t *testing.T) {
 	if said := decide("Read"); strings.Contains(said, "deny") {
 		t.Fatalf("a read was refused, so the agent cannot read the guard refusing it: %s", said)
 	}
-	if said := decide("mcp__quackitect__se_pull"); strings.Contains(said, "deny") {
-		t.Fatalf("the pull was refused, and a pull is what the refusal asks for: %s", said)
+	// AND A PERSON CAN STILL BE TALKED TO. WebSearch stands for every tool that
+	// is not the queue: a shortfall is answered by spawning, and refusing these
+	// never made a hand appear.
+	if said := decide("WebSearch"); strings.Contains(said, "spawn") {
+		t.Fatalf("a search was held for a shortfall, so a person cannot ask a question: %s", said)
 	}
 	if said := decide("mcp__quackitect__se_stop"); strings.Contains(said, "deny") {
 		t.Fatalf("the stop was refused, so an agent that cannot work cannot stop either: %s", said)
@@ -339,7 +342,7 @@ func TestTheQueueIsStaffed(t *testing.T) {
 		t.Fatalf("after one helper pulled: %+v", s)
 	}
 	// TWO OF THE THREE ARE HERE, so the main agent is still held for the third.
-	if said := decide("Bash"); !strings.Contains(said, "spawn 1 subagent") {
+	if said := decide("mcp__quackitect__se_pull"); !strings.Contains(said, "spawn 1 subagent") {
 		t.Fatalf("with one of two here, the main agent was not held for the second: %s", said)
 	}
 	tellHelper("a2", "worker-b")
@@ -350,7 +353,7 @@ func TestTheQueueIsStaffed(t *testing.T) {
 	}
 	// THE SHORTFALL IS WHAT LIFTS, and not every refusal. A bare Bash is still
 	// refused by the command gate, which is a different rule and stays.
-	if said := decide("Bash"); strings.Contains(said, "THE QUEUE WANTS MORE HANDS") {
+	if said := decide("mcp__quackitect__se_pull"); strings.Contains(said, "THE QUEUE WANTS MORE HANDS") {
 		t.Fatalf("with both workers here, the main agent is still held: %s", said)
 	}
 
@@ -369,7 +372,7 @@ func TestTheQueueIsStaffed(t *testing.T) {
 	if s.AwaitingVerdict != 1 || s.ReviewersWanted != 1 || s.ReviewersHere != 0 {
 		t.Fatalf("a verdict owed: %+v", s)
 	}
-	if said := decide("Bash"); !strings.Contains(said, "reviewing.md") {
+	if said := decide("mcp__quackitect__se_pull"); !strings.Contains(said, "reviewing.md") {
 		t.Fatalf("the main agent was not told to spawn a reviewer: %s", said)
 	}
 }

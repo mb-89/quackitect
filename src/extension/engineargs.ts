@@ -89,6 +89,20 @@ export function askedArgs(): string[] {
   return ["--ask", "status"];
 }
 
+// THE TREE AS THE ENGINE ANSWERS IT, AND NOT AS THE FILE DECLARES IT.
+//
+// util/parameters.json is what somebody wrote. The engine's answer is that plus
+// what it derives: the icons it resolves, the pickers it fills from the tree,
+// and the keyword lines a chat reaches a control by. None of those are in the
+// file, because deriving them is what stops anybody keeping a second copy.
+//
+// A PANEL BUILT FROM THE FILE DRAWS NONE OF THEM. Measured on 2026-09-06: the
+// engine answered thirty-two keyword lines, the panel knew how to draw them,
+// and the extension handed it the file. Every part worked and none of them met.
+export function treeArgs(method: string): string[] {
+  return ["--tree", "--method", method];
+}
+
 // THE AGENT MAY PUT ITS OWN IDEAS IN. Nothing reads the flag yet, and it is the
 // engine's rather than this window's so a chat can reach it and a reload cannot
 // lose it. See src/engine/ideation.go.

@@ -13,12 +13,12 @@
 // The view keeps no value of its own. Every change goes to the engine, which
 // validates it, and comes back. What is on screen is what is stored.
 
-import { controlCss } from "./controls";
+import { controlCss, filterSyntax } from "./controls";
 
 export type Node = {
   name: string;
   title?: string;
-  type: "group" | "bool" | "int" | "float" | "str" | "list" | "strlist" | "action" | "status" | "gap" | "text" | "toggle" | "table";
+  type: "group" | "bool" | "int" | "float" | "str" | "list" | "strlist" | "action" | "status" | "gap" | "text" | "toggle" | "table" | "count";
   help?: string;
   default?: unknown;
   min?: number;
@@ -33,6 +33,13 @@ export type Node = {
   // declared nowhere. The tooltip draws them verbatim, so what a person reads is
   // the exact string the matcher takes.
   keywords?: string[];
+  // A TEXT BOX THAT KEEPS WHAT IS TYPED, rather than handing it to a command
+  // and forgetting it. The mint box forgets; the queue filter is a setting and
+  // has to still be there when the panel is drawn again.
+  stored?: boolean;
+  // WHICH LANGUAGE THIS BOX TAKES. The tooltip appends the one description
+  // that language has, so no box carries its own copy.
+  syntax?: string;
   span?: number;
   narrow?: string;
   shown?: boolean;
@@ -93,6 +100,10 @@ export interface Doing {
 export interface Happening {
   actors: Doing[];
   hold: { on: boolean; by?: string; says?: string };
+  // HOW MUCH THE QUEUE WOULD HAND OUT, under the filter in force. It rides on
+  // this answer because the panel already reads it on the beat, so the number
+  // needs no door of its own.
+  queue?: number;
   // WHO IS HERE, AND WHAT EACH ONE HOLDS. The table draws this and it is the
   // only place an actor is drawn. The header drew them too, so every agent
   // appeared twice and the first one spilled into the view's title.
@@ -150,11 +161,14 @@ function section(path: string, g: Node, doing: Happening): string {
   // it runs, and nothing here keeps it afterwards.
   const inRow = (k: Node) =>
     k.type === "action" || k.type === "status" || k.type === "gap" ||
-    k.type === "text" || k.type === "toggle";
+    k.type === "text" || k.type === "toggle" || k.type === "count";
   const drawn = kids.filter(inRow);
   const held = kids.filter((k) => !inRow(k) && k.type !== "group" && k.type !== "strlist" && k.type !== "table");
+  // A ROW IS FIVE COLUMNS, AND A GROUP MAY WANT TWO OF THEM. buttonRow pads to
+  // five and wraps past it, so a second row of drawn controls falls out of the
+  // same call rather than needing a rule of its own.
   const rows: string[] = [];
-  if (drawn.length) rows.push(buttonRow(drawn));
+  if (drawn.length) rows.push(buttonRow(drawn, path, doing));
   for (const k of held) rows.push(field(key(path, k), k));
   // A TABLE IS ITS OWN BLOCK AND TAKES THE WHOLE ROW. It holds no value, so
   // it comes after the controls that do.
@@ -175,12 +189,12 @@ function key(path: string, n: Node): string {
 
 // The row is five wide and a control keeps its place. Where a slot is empty
 // the DECLARATION says so, with a gap. Nothing here guesses at an arrangement.
-function buttonRow(items: Node[]): string {
+function buttonRow(items: Node[], path: string, doing: Happening): string {
   // Columns do not collapse: a control keeps its place as the panel grows,
   // because a control that moves has to be found again. The empty ones are
   // EMPTY, not disabled buttons. A box that cannot be pressed still asks to
   // be read, every time.
-  const drawn = items.map(button);
+  const drawn = items.map((k) => button(k, key(path, k), doing));
   // Short of five, the rest of the row is empty. Past five, the grid wraps and
   // the next row starts, which is what a grid does.
   //
@@ -192,16 +206,39 @@ function buttonRow(items: Node[]): string {
   return [...drawn, ...rest].join("\n");
 }
 
-function button(n: Node): string {
+function button(n: Node, stored: string, doing: Happening): string {
   if (n.type === "gap") {
     return `<span></span>`;
   }
   const wide = n.span && n.span > 1 ? ` style="grid-column: span ${n.span}"` : "";
+  // A COUNT IS A NUMBER THE ENGINE ANSWERS, and nothing a person may type.
+  // It is drawn beside the box that changes it, so a filter and what it leaves
+  // are read together.
+  if (n.type === "count") {
+    // THE NUMBER IS REPLACED ON THE BEAT AND NEVER REDRAWN WITH THE PAGE.
+    //
+    // It was written into the html once, from whatever answer the panel held
+    // when it was built, which on a fresh panel is nothing. So it read zero
+    // with two hundred and fourteen tokens open, and stayed there.
+    //
+    // data-count is what the live message fills, the way data-table is for a
+    // table. See livePieces.
+    return `<span class="count"${wide} data-count="${esc(n.source ?? n.name)}"
+      title="${esc(tipFor(n))}">${esc(theCount(n, doing))}</span>`;
+  }
   if (n.type === "text") {
+    const says = withKeywords(n.title ?? n.name, n);
+    // A STORED BOX KEEPS WHAT IS TYPED, and goes through the same door every
+    // other setting does. An unstored one hands the text to a command and
+    // forgets it, which is what the mint box wants.
+    if (n.stored) {
+      return `<input class="line" type="text"${wide} data-key="${esc(stored)}" data-type="text"
+      placeholder="${esc(n.placeholder ?? "")}" title="${esc(says)}">`;
+    }
     // Enter is what a person presses, so Enter is what mints. The value goes
     // to the command and is not stored: nothing here holds a draft.
     return `<input class="line" type="text"${wide} data-run="${esc(n.command ?? "")}"
-      placeholder="${esc(n.placeholder ?? "")}" title="${esc(n.title ?? n.name)}">`;
+      placeholder="${esc(n.placeholder ?? "")}" title="${esc(says)}">`;
   }
   if (n.type === "toggle") {
     // A TOGGLE IS DOWN OR IT IS UP. There is nothing to report about it, so
@@ -246,6 +283,11 @@ function button(n: Node): string {
 // title as a toggle moves, so lines put on the resting state alone vanish the
 // moment somebody presses it, which is exactly when a person is looking.
 function withKeywords(says: string, n: Node): string {
+  // A BOX THAT TAKES A LANGUAGE SAYS WHICH, from the one place that describes
+  // it. The work editor's filter reads the same sentence.
+  if (n.syntax === "filter") {
+    says += "\n\n" + filterSyntax;
+  }
   if (!n.keywords?.length) {
     return says;
   }
@@ -362,6 +404,16 @@ function css(): string {
   h3 { font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.06em;
        color: var(--vscode-descriptionForeground); margin: 0 0 6px 0; font-weight: 600; }
   .control .unit { margin-left: 6px; opacity: 0.7; }
+  /* A COUNT IS A NUMBER AND NOTHING ELSE. No label: it sits beside the box that
+     changes it, and what it counts is what that box says. It is right-aligned
+     against its own column so a number that grows does not move the box. */
+  /* A THREE DIGIT DISPLAY. Zero padded, so the width never changes and the box
+     beside it never moves. Tabular figures keep every digit the same width. */
+  .count { display: flex; align-items: center; justify-content: flex-end;
+           height: var(--control-height); padding-right: 6px;
+           font-family: var(--vscode-editor-font-family, monospace);
+           font-variant-numeric: tabular-nums; letter-spacing: 0.08em;
+           min-width: 3ch; color: var(--vscode-foreground); opacity: 0.85; }
   .control input[type="number"] { width: auto; max-width: 6em; }
   h3 + .grid { margin-bottom: 12px; }
   button { width: 100%; }
@@ -544,6 +596,13 @@ function script(): string {
         const t = document.querySelector('[data-table="' + name + '"]');
         if (t) t.innerHTML = m.tables[name];
       }
+      // A COUNT IS TEXT AND NOT MARKUP, so it is set as text. It follows the
+      // engine on the same beat the tables do.
+      for (const name of Object.keys(m.counts || {})) {
+        for (const c of document.querySelectorAll('[data-count="' + name + '"]')) {
+          c.textContent = m.counts[name];
+        }
+      }
       // THE LINKS ARE WIRED AGAIN, because the rows that carried them are gone.
       for (const a of document.querySelectorAll('a.open')) {
         a.onclick = (ev) => { ev.preventDefault(); send({ type: 'open', id: a.dataset.id }); };
@@ -654,14 +713,35 @@ function tableBody(n: Node, doing: Happening): string {
 // the beat. Everything else is the SHAPE of the page, and the shape changes only
 // when util/parameters.json does.
 export function livePieces(root: Node, shown: string[], doing: Happening):
-    { head: string; tables: Record<string, string> } {
+    { head: string; tables: Record<string, string>; counts: Record<string, string> } {
   const tables: Record<string, string> = {};
+  // A COUNT FOLLOWS THE ENGINE THE WAY A TABLE DOES, so it rides the same
+  // message. Keyed by what it counts rather than where it is drawn, because
+  // two counts of one thing are one number.
+  const counts: Record<string, string> = {};
   for (const [path, g] of groupsNamed(root, "", shown)) {
     for (const k of (g.children ?? []).filter((c) => c.type === "table")) {
       tables[key(path, k)] = tableBody(k, doing);
     }
+    for (const k of (g.children ?? []).filter((c) => c.type === "count")) {
+      counts[k.source ?? k.name] = theCount(k, doing);
+    }
   }
-  return { head: doingRows(doing), tables };
+  return { head: doingRows(doing), tables, counts };
+}
+
+// theCount is the number a count draws, from the engine's own answer.
+//
+// A SOURCE NOBODY ANSWERS DRAWS NOTHING, not a zero. Zero is a fact about an
+// empty queue and a person acts on it, so a missing answer must not look like
+// one. That is the defect this had: it drew zero while the engine said two
+// hundred and fourteen.
+function theCount(n: Node, doing: Happening): string {
+  const got = n.source === "queue" ? doing.queue : undefined;
+  // THREE DIGITS, ZERO PADDED, on the owner's word. A number that keeps its
+  // width does not move the box beside it, and a padded zero reads as a
+  // reading rather than as a blank. Past a thousand it grows rather than lies.
+  return typeof got === "number" ? String(got).padStart(3, "0") : "";
 }
 
 // THE HEAD SAYS WHAT IS TRUE OF THE WHOLE SYSTEM, AND NAMES NO ACTOR.

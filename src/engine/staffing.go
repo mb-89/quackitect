@@ -188,8 +188,23 @@ func wanted(n, most int) int {
 	return n
 }
 
-// A STAFF SHORTFALL IS ANSWERED BY SPAWNING, so what is held back meanwhile is
-// the work itself. Everything else passes.
+// A STAFF SHORTFALL IS ANSWERED BY SPAWNING, AND WHAT IS HELD MEANWHILE IS THE
+// QUEUE. Everything else passes, at every rung.
+//
+// IT HELD THE WORK, AND THAT REACHED PAST ITS OWN RULE. The rule is that the
+// main agent must not take more from the queue while the hands the queue wants
+// are missing. Holding every write, every run and every test held a
+// conversation too: the owner asked a question and the answer came back as a
+// demand to spawn subagents nobody had asked for. Twice in one session,
+// measured on 2026-09-06.
+//
+// THE OWNER'S WORDS: even if you are bound, I do not want the agent to have to
+// spawn subagents just because I want to talk to him.
+//
+// SO IT HOLDS THE PULL AND NOTHING ELSE. A write, a run, a test and a read are
+// not the queue, and refusing them never made a hand appear. The binding is not
+// the answer either: this holds at every rung, so unbinding was the only way to
+// have a conversation, and climbing a rung to ask a question is the wrong shape.
 //
 // IT WAS A LIST OF WHAT IS ALLOWED, AND THAT COMPOSED INTO A DEADLOCK.
 // Anything nobody thought to name was refused, and three of those mattered.
@@ -204,10 +219,11 @@ func wanted(n, most int) int {
 // through, because the cost of missing one is a main agent doing one call of a
 // worker's job, and the cost of refusing one is a session with no move.
 var heldDuringShortfall = map[string]bool{
-	"Bash": true, "Write": true, "Edit": true, "MultiEdit": true, "NotebookEdit": true,
-	"mcp__quackitect__se_apply": true, "mcp__quackitect__se_run": true,
-	"mcp__quackitect__se_test": true,
-	"se_apply":                 true, "se_run": true, "se_test": true,
+	"mcp__quackitect__se_pull": true, "se_pull": true,
+	// A BOX WITH NO LANE PULLS THROUGH THE SHELL, so Bash is named here and
+	// then narrowed below to the one command that is a pull. Naming it without
+	// that narrowing would hold every shell call again, which is the defect.
+	"Bash": true,
 }
 
 // AStaffShortfall answers whether this call by the main agent is refused
@@ -216,10 +232,11 @@ func AStaffShortfall(r Roots, cfg Config, actor, tool, command string) (string, 
 	if actor != "main" || !heldDuringShortfall[tool] {
 		return "", false
 	}
-	// A SHELL COMMAND THAT IS ONLY THE ENGINE IS NOT WORK, whatever verb it
-	// carries. On a box with no lane, the pull and the stop this guard tells
-	// the agent to make are Bash calls, and holding Bash held those too.
-	if runsTheEngine(command) && !engineWork(command) {
+	// A SHELL CALL IS HELD ONLY WHEN IT IS THE PULL ITSELF. On a box with no
+	// lane the pull is a Bash call, and that is the one shell command this
+	// guard has any business stopping. Every other Bash call goes through,
+	// including the spawn and the stop the refusal below tells the agent to make.
+	if tool == "Bash" && !(runsTheEngine(command) && aPull(command)) {
 		return "", false
 	}
 	// A PERSON WHO PUT THE WORK DOWN IS NOT ASKED FOR MORE HANDS.
@@ -263,6 +280,19 @@ func engineWork(command string) bool {
 	for _, w := range strings.Fields(separators) {
 		switch w {
 		case "apply", "run", "test":
+			return true
+		}
+	}
+	return false
+}
+
+// aPull answers whether an engine command is the pull. That is the one verb a
+// shortfall holds: everything else the engine does is work, or a question, and
+// neither takes anything from the queue.
+func aPull(command string) bool {
+	separators, _ := theQuotings(command)
+	for _, w := range strings.Fields(separators) {
+		if w == "pull" {
 			return true
 		}
 	}

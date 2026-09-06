@@ -22,17 +22,19 @@ For what the engine offers, run `se --help`.
 
 1. On errors, the engine provides remedies. Incorporate them in your way of working.
 2. Answer prompts before anything else with `se --answer "..."`. Copy the prompt verbatim. *
-3. Stop only with a reason named to the engine. On an interrupt, claim `asked`. *
-4. Use the tool the engine gives you. *
-5. Change files with `se_apply`, naming the token on every write. *
-6. Run every shell command with `se_run`, naming the token. It could write. *
-7. A helper script goes in `.se/scratchpad/`. A standing check goes in `util/checks/`. *
-8. Search the tree through the index: `se_find` for words, a regex or a path glob, `se_ask` for SQL. *
-9. Test through the engine: `se_test` runs what your delta reaches. A test you name runs, a pattern narrows. *
-10. Break work into sub-tokens with `se_work`, naming the parent. Your own todo list is refused. *
-11. Replace the engine with `se --swap`. A build aimed at `.bin` is refused. *
-12. Bound to the queue, claim a block with `se claim --next <n>` or `--these`, sized to what you finish before the claim lapses.
-13. Inside a box, take up what it holds rather than claiming again: a claim is between boxes, a hold within one.
+3. Stopping is claim then stop, in that order. Every call between them clears the claim, an answer included. *
+4. A standing claim is granted at once, so a refusal means a call cleared it rather than that it was refused. *
+5. `asked` outranks every other reason when their word is what stopped you. On an interrupt, claim it. *
+6. Use the tool the engine gives you. *
+7. Change files with `se_apply`, naming the token on every write. *
+8. Run every shell command with `se_run`, naming the token. It could write. *
+9. A helper script goes in `.se/scratchpad/`. A standing check goes in `util/checks/`. *
+10. Search the tree through the index: `se_find` for words, a regex or a path glob, `se_ask` for SQL. *
+11. Test through the engine: `se_test` runs what your delta reaches. A test you name runs, a pattern narrows. *
+12. Break work into sub-tokens with `se_work`, naming the parent. Your own todo list is refused. *
+13. Replace the engine with `se --swap`. A build aimed at `.bin` is refused. *
+14. Bound to the queue, claim a block with `se claim --next <n>` or `--these`, sized to what you finish before the claim lapses.
+15. Inside a box, take up what it holds rather than claiming again: a claim is between boxes, a hold within one.
 
 # Discussion
 
@@ -53,7 +55,10 @@ Stopping is two calls in this order: claim, then stop.
 No stop is granted without a claim standing, and `asked` is no exception.
 Every call after the claim clears it, and a status, a search and an answer are all calls.
 Answer them first, then claim, then stop.
-A second refusal says the claim was cleared, never that it was refused.
+
+A claim that is standing is granted, whatever is still open.
+So a second refusal has one cause: a call cleared the claim between the claim and the stop.
+Claim again, and make it your last call.
 
 Which stops are sanctioned is the engine's, and a refusal is not permission to carry on.
 `asked` is granted on the claim that names it, whatever is in your hands, because their word is not yours to weigh.

@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: src/engine tests are tables
 # where the token stands. The process owns these values.
 status: open
+# the person's own name for a group. It does not move the work
+bucket: tests
 # tokens that have to close before this can start
 depends_on:
   - "[[wk-1c77b9a6fb]]"

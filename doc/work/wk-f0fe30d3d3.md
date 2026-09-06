@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: verdict leaves status done
 # where the token stands. The process owns these values.
 status: open
+# the person's own name for a group. It does not move the work
+bucket: checks
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 75e56084321d35b4582d0d349e619411e6ca0703

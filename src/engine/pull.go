@@ -233,7 +233,16 @@ func ownVerdictOffTheHand(r Roots, actor, role string) (string, *Answer) {
 }
 
 // theNotesLeft hands this actor a note, one at a time, and says so when none
-// is left. It is the whole of what the queue gives out while finishing.
+// is left. It is what the queue gives out when it has nothing else.
+//
+// AN EMPTY QUEUE DRAINS THE NOTES, ALWAYS. It used to ride on finishing alone,
+// so a person who narrowed the queue to one bucket and watched it empty was
+// answered with wait, and the notes on the box sat unworked until they pressed
+// something. Now the two are separate: finishing means finish what is in hand
+// and stop, and running out means work your notes and then you are done.
+//
+// THE OWNER'S WORDS: I give the cloud a certain bucket, and when it is done
+// with that, it finishes up the notes.
 //
 // A NOTE IS PRIVATE AND LIVES OUTSIDE GIT, so one left on a cloud box dies
 // with it. The queue hands a note out at no other time, so no ordering change
@@ -277,9 +286,12 @@ func whatComesNext(r Roots, actor, role string) Answer {
 			"Take up the token you mean by naming it, with se work --on <id>. " +
 			"Put the tree back with se --bind bound and the queue answers again."}
 	}
-	// FINISHING UP DRAINS THE NOTES AND HANDS OUT NOTHING ELSE.
+	// FINISHING UP HANDS OUT NOTHING AT ALL, notes included. It means finish the
+	// token in your hand and stop, on the owner's word, so picking anything up is
+	// the opposite of what was pressed.
 	if LoadHold(r).Finishing() {
-		return theNotesLeft(r, actor)
+		return Answer{Pull: AnswerWait, Notice: "A person is finishing up. Nothing goes out, " +
+			"notes included. Finish the token in your hand, say what you did, and stop."}
 	}
 	// A HOLD NOBODY IS BEHIND SENDS SOMEBODY TO LOOK, before new work is handed
 	// out. A walker given another token goes on working while the stuck one
@@ -306,7 +318,18 @@ func whatComesNext(r Roots, actor, role string) Answer {
 			return a
 		}
 	}
-	return next(r, actor, role)
+	// AND A QUEUE WITH NOTHING LEFT DRAINS THE NOTES.
+	//
+	// Nothing left means nothing left for you. The filter may have narrowed the
+	// queue to one bucket, and that bucket is now empty. Either way the next
+	// thing worth doing is the notes on this box, and after those it is done.
+	//
+	// THIS USED TO RIDE ON FINISHING ALONE, so an agent that ran out was told to
+	// wait while its own notes sat unworked.
+	if a := next(r, actor, role); a.Token != nil || a.Pull != AnswerWait {
+		return a
+	}
+	return theNotesLeft(r, actor)
 }
 
 func currentSession(r Roots) string {
@@ -819,10 +842,35 @@ func firstLines(s string, n int) string {
 // of the note says. It comes out of the list before any walk, and the answer
 // names it. See pullbehind.go.
 func next(r Roots, actor, role string) Answer {
-	all, behind, branch := offTheFetchedBranch(r, actor, urgentFirst(blockingFirst(r, Tokens(r))))
+	// AND AN AGENT MEETS ITS OWN BUCKET FIRST. The sort is last, so it orders
+	// what everything above it has already decided is workable, and takes
+	// nothing away. See [[bucketaffinity]].
+	all, behind, branch := offTheFetchedBranch(r, actor,
+		byBucketAffinity(r, actor, urgentFirst(blockingFirst(r, theQueueOffers(r, actor, Tokens(r))))))
 	a := nextAmong(r, actor, role, all)
 	a.Notice += behindNotice(branch, behind)
 	return a
+}
+
+// theQueueOffers narrows the queue to the filter a person set. The language and
+// why a broken expression filters nothing are in queuefilter.go.
+//
+// WHAT THIS ACTOR ALREADY HOLDS IS KEPT, whatever the filter says. A person who
+// narrows the queue while an agent is mid-token would otherwise strand it: the
+// token would leave the queue and the agent would be handed something else
+// while still holding the first.
+func theQueueOffers(r Roots, actor string, all []Token) []Token {
+	f := theQueueFilter(r)
+	if f.Empty() {
+		return all
+	}
+	out := make([]Token, 0, len(all))
+	for _, t := range all {
+		if t.Holder == actor || TheQueueTakes(f, t) {
+			out = append(out, t)
+		}
+	}
+	return out
 }
 
 // nextAmong is next over the tokens the fetched branch has not already closed.

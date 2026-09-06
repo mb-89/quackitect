@@ -8,83 +8,20 @@ import (
 	"testing"
 )
 
-// A CLAIM IS ARGUED WITH, AND THE THIRD ONE GOES.
+// ONE CLAIM IS THE STOP.
 //
-// THE OWNER'S WORDS: the agent says I'm blocked, and the engine says, well, but
-// I still have work to do. Then the agent can say again, yeah, but I'm blocked.
-// If he has a reason three times, then it stops.
+// THE OWNER'S WORDS: I do not want you to have to stop two times. If you claim,
+// you can stop next. If the reason is valid, you stop.
 //
-// NAMING A REASON WAS STOPPING. The claim was read and the stop granted in the
-// same breath, so the reason cost nothing and any of the five words did.
+// THE ENGINE USED TO ARGUE. Over work in hand it pushed back twice and granted
+// the third claim, on the owner's earlier word that a reason given three times
+// is a position somebody is holding. Weighed against what it cost in turns,
+// they decided the other way, and the argument was deleted with its file.
 //
-// THE REASON HERE IS NOT asked, AND THAT IS THE POINT OF THE CHOICE. The
-// person's word is granted on the claim that names it, whatever is in the
-// agent's hands, so an argument test claiming asked argues with nothing and
-// asserts that it did. These three did, and went on passing until the carve-out
-// landed and then failed together for a rule they were never about.
-// TestThePersonsWordIsNotArguedWith holds that rule, so it is tested where it
-// lives rather than by accident here.
-func TestAClaimIsArguedWithAndTheThirdIsGranted(t *testing.T) {
-	r := aTreeWithTheProcesses(t)
-	log, err := sessionlog.Open(r.Private("log"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
-
-	tok := mintStandard(t, r, "work still standing")
-	if _, err := TakeUp(r, tok.ID, "main"); err != nil {
-		t.Fatal(err)
-	}
-	stop := func() string {
-		t.Helper()
-		body, _ := json.Marshal(map[string]any{"hook_event_name": "Stop", "cwd": r.Work,
-			"session_id": "s-1", "stop_hook_active": true})
-		var out bytes.Buffer
-		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
-		return out.String()
-	}
-	claim := func() {
-		t.Helper()
-		if err := ClaimStop(r, "main", "broken", "the toolchain will not build and no remedy gets past it"); err != nil {
-			t.Fatal(err)
-		}
-	}
-	stop() // the first of the session, granted on its own rule
-
-	// THE FIRST TWO CLAIMS ARE ARGUED WITH, and the argument names the work.
-	for i := 1; i <= claimsBeforeAStopIsGranted-1; i++ {
-		claim()
-		said := stop()
-		if !strings.Contains(said, "block") {
-			t.Fatalf("claim %d was taken at face value: %s", i, said)
-		}
-		for _, asks := range []string{"only they can", "carry on", tok.ID} {
-			if !strings.Contains(said, asks) {
-				t.Errorf("the argument does not name %q: %s", asks, said)
-			}
-		}
-	}
-
-	// AND THE THIRD IS GRANTED, whatever is still open.
-	claim()
-	if said := stop(); strings.Contains(said, "block") {
-		t.Fatalf("the third claim was refused: %s", said)
-	}
-}
-
-// AND WITH NOTHING TO PUSH BACK WITH, ONE CLAIM IS THE STOP.
-//
-// THE OWNER'S RULE, IN FULL: the agent stops with no reason and is refused, it
-// claims one of the five, and if the reason is good AND NOTHING ELSE IS
-// BLOCKING the claim just goes. The argument above is for when the engine has
-// something to argue with, which is work still in the agent's hands.
-//
-// ARGUING WITH EVERY CLAIM was the mistake. It made the count the rule and the
-// state of the tree irrelevant, so an agent with empty hands was refused twice
-// for nothing. Persistence is the price of leaving work behind, not the price
-// of stopping.
+// WHAT IT PROTECTED IS NOT LOST. A stop still needs a claim, the claim still
+// names one of five sanctioned reasons, and a false blocked is still refused
+// where it is typed. TestAValidClaimStopsAtOnce holds the rule over open work,
+// and this holds it with nothing in hand.
 func TestAClaimWithEmptyHandsIsGrantedAtOnce(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
 	log, err := sessionlog.Open(r.Private("log"))
@@ -111,57 +48,6 @@ func TestAClaimWithEmptyHandsIsGrantedAtOnce(t *testing.T) {
 	}
 	if said := stop(); strings.Contains(said, "block") {
 		t.Fatalf("a claim with nothing in hand was argued with: %s", said)
-	}
-}
-
-// AND CARRYING ON PUTS THE COUNT BACK. Two claims and then a tool call is
-// changing your mind, so the next stop is claim one again.
-func TestCarryingOnStartsTheArgumentAgain(t *testing.T) {
-	r := aTreeWithTheProcesses(t)
-	log, err := sessionlog.Open(r.Private("log"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
-
-	// THE ARGUMENT ONLY HAPPENS OVER WORK IN HAND, so the token is taken up. With
-	// empty hands the first claim would be granted and there would be no count to
-	// put back.
-	tok := mintStandard(t, r, "work to return to")
-	if _, err := TakeUp(r, tok.ID, "main"); err != nil {
-		t.Fatal(err)
-	}
-
-	tell := func(event string, more map[string]any) string {
-		t.Helper()
-		body := map[string]any{"hook_event_name": event, "cwd": r.Work, "session_id": "s-1"}
-		for k, v := range more {
-			body[k] = v
-		}
-		raw, _ := json.Marshal(body)
-		var out bytes.Buffer
-		answerHook(t.Context(), raw, []string{"--method", r.Method}, &out, log)
-		return out.String()
-	}
-	tell("Stop", nil) // the first of the session
-
-	for i := 0; i < claimsBeforeAStopIsGranted-1; i++ {
-		if err := ClaimStop(r, "main", "broken", "the toolchain will not build and no remedy gets past it"); err != nil {
-			t.Fatal(err)
-		}
-		tell("Stop", nil)
-	}
-	// CARRYING ON.
-	tell("PreToolUse", map[string]any{"tool_name": "Read",
-		"tool_input": map[string]any{"file_path": "notes.md"}})
-
-	// THE NEXT CLAIM IS CLAIM ONE, so it is argued with rather than granted.
-	if err := ClaimStop(r, "main", "broken", "the toolchain will not build and no remedy gets past it"); err != nil {
-		t.Fatal(err)
-	}
-	if said := tell("Stop", nil); !strings.Contains(said, "block") {
-		t.Fatalf("the count survived an action, so a stop was bought before it was argued: %s", said)
 	}
 }
 

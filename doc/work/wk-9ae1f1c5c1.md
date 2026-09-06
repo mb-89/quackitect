@@ -11,8 +11,6 @@ title: se_work cannot say successors
 status: closed
 # who did the work step, so the verdict is never theirs
 author: worker-linden
-claimed_by: 547b9365/worker-linden
-claimed_at: "2026-09-05T20:41:52Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - ae053aef8609d66c9d249bd0e88ce2f9a8931179

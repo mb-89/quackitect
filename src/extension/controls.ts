@@ -16,6 +16,18 @@
 // EVERY COLOUR IS A THEME VARIABLE. A value written in would look right in one
 // theme and wrong in every other, and the point of taking the editor's look
 // from the sidebar is that both take theirs from VS Code.
+// THE FILTER LANGUAGE, IN ONE SENTENCE, FOR EVERY BOX THAT TAKES IT.
+//
+// The work editor's filter and the queue filter read the same language, which
+// is src/filter, which is KQL. Two boxes describing it in their own words is
+// two descriptions to keep in step, and the one that goes stale is the one
+// nobody is looking at.
+//
+// It is not invented here: bare words over the whole row, name: value for one
+// column, quotes for a phrase, and or not, brackets, a trailing star, and a
+// pattern between slashes.
+export const filterSyntax = "word, name: value, and or not, ( ), val*, /pattern/";
+
 export function controlCss(): string {
   return `
   :root { --control-h: 28px; }

@@ -9,8 +9,8 @@ guidance: [[work-token]]
 title: a pull payload needs
 # where the token stands. The process owns these values.
 status: open
-claimed_by: aeaf7bd9/worker-nono-two
-claimed_at: "2026-09-05T20:10:31Z"
+# the person's own name for a group. It does not move the work
+bucket: queue
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 9066be8d227912c441ff775a693abf37f11c240a

@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: the retro reads ready_when
 # where the token stands. The process owns these values.
 status: open
+# the person's own name for a group. It does not move the work
+bucket: archive
 # tokens that have to close before this can start
 depends_on:
   - "[[wk-5bba8e497a]]"
@@ -31,6 +33,14 @@ The retro is the one moment a person reads the tree rather than a token. So it i
 ## proposed action
 
 The retro reads every token carrying a ready_when and puts each condition to the person, so it is cleared or kept in one pass.
+
+## approach
+
+The retro walks the tokens, collects every non-empty ready_when, and puts each one to the person with its id and its condition.
+
+It reads the tokens rather than a list of its own, so there is nothing to keep in step. A cleared condition comes off the token through the ordinary door, and the queue hands that token out on the next pull.
+
+The retro is src/engine/retro.go, and this rides on the pass it already makes over the tree.
 
 ## done when
 
@@ -75,12 +85,4 @@ The retro reads every token carrying a ready_when and puts each condition to the
 | [ ] | every criterion's command was run again, and what it said is named |  |  |
 | [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
 | [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
-
-## approach
-
-The retro walks the tokens, collects every non-empty ready_when, and puts each one to the person with its id and its condition.
-
-It reads the tokens rather than a list of its own, so there is nothing to keep in step. A cleared condition comes off the token through the ordinary door, and the queue hands that token out on the next pull.
-
-The retro is src/engine/retro.go, and this rides on the pass it already makes over the tree.
 

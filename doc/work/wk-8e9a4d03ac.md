@@ -9,8 +9,8 @@ guidance: [[work-token]]
 title: declared group vanishes empty
 # where the token stands. The process owns these values.
 status: open
-claimed_by: aeaf7bd9/worker-nono-two
-claimed_at: "2026-09-05T20:44:12Z"
+# the person's own name for a group. It does not move the work
+bucket: checks
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 6fa55218fa90154309cb38bf6a6e71ffd44131c0

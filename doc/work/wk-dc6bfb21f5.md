@@ -9,8 +9,8 @@ guidance: [[work-token]]
 title: roots cannot be named
 # where the token stands. The process owns these values.
 status: open
-# what has to be true before this can be taken again
-ready_when: ""
+# the person's own name for a group. It does not move the work
+bucket: lifecycle
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 468000144b7f531c56500a524ee2d7938849e5e4
@@ -25,16 +25,6 @@ FindRoots takes the work root as an argument and derives the method root as `fil
 - Every verb takes --work and --method, defaulting to today's behaviour.
 - Run outside .bin walks up to the marker. None found: report and stop, no findings.
 - Engine tests pass.
-
-## evidence: where this stands
-
-THE CHANGE IS WRITTEN AND THE PROGRAM BUILDS. THE RED IS OWED.
-
-roots.go gains methodRootFrom, walking up for a folder carrying src/processes and answering empty rather than guessing. It also gains argValue, reading a flag off a verb's arguments in both spellings, and MethodFound and TheMethodIsLost. FindRoots takes the method root as its second argument. client.go reads both flags off the verb's arguments and stops when no method is found. main.go passes the flag in and reads its error before using the roots.
-
-go build -C src/engine ./... answered BUILD_EXIT=0. go vet reports one error, arrival_test.go, an untracked file from another lane calling a helper nothing defines, so every other call site compiles.
-
-Owed: rootsmethod_test.go is written and never watched. The wall is down now. workableprocess_test.go defines writeWorkableProcess and arrival_test.go is tracked, so the red can be watched.
 
 ## evidence: step 1. ask
 
@@ -59,4 +49,14 @@ Owed: rootsmethod_test.go is written and never watched. The wall is down now. wo
 | [ ] | the same test was seen green after the change, and named |  |  |
 | [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
 | [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+
+## evidence: where this stands
+
+THE CHANGE IS WRITTEN AND THE PROGRAM BUILDS. THE RED IS OWED.
+
+roots.go gains methodRootFrom, walking up for a folder carrying src/processes and answering empty rather than guessing. It also gains argValue, reading a flag off a verb's arguments in both spellings, and MethodFound and TheMethodIsLost. FindRoots takes the method root as its second argument. client.go reads both flags off the verb's arguments and stops when no method is found. main.go passes the flag in and reads its error before using the roots.
+
+go build -C src/engine ./... answered BUILD_EXIT=0. go vet reports one error, arrival_test.go, an untracked file from another lane calling a helper nothing defines, so every other call site compiles.
+
+Owed: rootsmethod_test.go is written and never watched. The wall is down now. workableprocess_test.go defines writeWorkableProcess and arrival_test.go is tracked, so the red can be watched.
 

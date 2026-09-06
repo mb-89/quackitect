@@ -61,8 +61,8 @@ const html = editorHtml(panes, views, "work");
 
 const wantPanel = [
   ["the work group", /<summary>work<\/summary>/],
-  ["the hold is a button", /<button class="toggle" id="hold"/],
-  ["the hold is not a field", (h) => !/data-key="control.hold"/.test(h)],
+  ["the hold is a button", /<button class="toggle" id="finish_up"/],
+  ["the hold is not a field", (h) => !/data-key="control.finish_up"/.test(h)],
   ["the toggle button", /data-command="quackitect.showWork"/],
   ["the line edit", /class="line"[\s\S]*?data-run="quackitect.mintWork"/],
   ["the line edit spanning four", /grid-column: span 4/],

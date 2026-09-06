@@ -1396,6 +1396,47 @@ func isProse(path string) bool {
 // agent decided. v3 measured that: block, pass, block, pass, and the tooth
 // never bit.
 func decideStop(g *guard, roots Roots, cfg Config, log *sessionlog.Log, in hookIn, actor string) {
+	// GOD IS THE ENGINE OUT OF THE WAY, AND THE STOP HOOK IS THE ENGINE.
+	//
+	// THE OWNER'S WORDS: in god mode the stop hook doesn't fire. You are not
+	// supposed to keep running in the loop unsupervised. It is only to fix stuff.
+	//
+	// God is turned on when something in this engine is in the way and a person
+	// is watching while it is fixed. An engine that argues with that person's
+	// agent about whether it may stop is the thing god exists to switch off.
+	// Every other refusal was already gone: decidePreToolUse returns at its own
+	// god check before a single guard is reached. This was the one left.
+	//
+	// THE PERSON'S OWN CONTROLS ARE NOT THIS. The hold and the ask are theirs
+	// rather than the engine's, and they are enforced above that other check for
+	// exactly that reason. The stop hook is the engine's own rule, so it goes.
+	//
+	// UNBOUND IS UNTOUCHED. It keeps the claim and the argument, and only the
+	// queue stops being a reason to refuse a stop.
+	if NoGuardsAtAll(roots) {
+		record(log, "agent", "stop", actor, "stopped: god is on, and the engine argues with nobody",
+			sessionlog.Yes(), map[string]any{"at": string(God)})
+		return
+	}
+	// THE CLAIM IS THE QUEUE'S TO ASK FOR, SO IT GOES WHEN THE QUEUE DOES.
+	//
+	// THE OWNER'S WORDS: a bound agent needs a good reason to stop and an unbound
+	// agent not.
+	//
+	// Bound, the queue chose this work and will choose the next, so putting it
+	// down is a decision the queue is owed a reason for. Unbound, the queue chose
+	// nothing and hands out nothing, so it has no standing to ask a person's agent
+	// why it is stopping. That is the same reasoning AskToStop was written on and
+	// never wired to.
+	//
+	// THIS IS NOT GOD. God skips the whole hook above. Here the record still says
+	// the agent stopped, because an unbound stop is ordinary rather than an
+	// override.
+	if LoadBinding(roots).At == Unbound {
+		record(log, "agent", "stop", actor, "stopped: the queue is off, so it asks for no reason",
+			sessionlog.Yes(), map[string]any{"at": string(Unbound)})
+		return
+	}
 	if !cfg.StopNeedsClaim {
 		record(log, "agent", "stop", actor, "stopped", sessionlog.Yes(), nil)
 		return
@@ -1428,31 +1469,26 @@ func decideStop(g *guard, roots Roots, cfg Config, log *sessionlog.Log, in hookI
 		// THE OWNER'S WORDS: if the user tells you that you stop, I don't give a
 		// shit about your sub tokens. You stop.
 		//
-		// The list already said their word is the reason and you need no other,
-		// and this code did not honour it. An agent told to stop claimed asked,
-		// the engine asked whether asked was the nearest of five words, and the
-		// person watched it take another turn to say yes. The argument exists to
-		// test the agent's own judgement. It has no business testing theirs.
-		if held := TheyHold(roots, actor); len(held) > 0 && c.Because != "asked" {
-			// THE ENGINE PUSHES BACK TWICE AND GRANTS THE THIRD. What earns a stop
-			// over open work is a reason given and held to. See challenge.go.
-			if sofar := countRefusedStop(roots, "claimed:"+actor); sofar < claimsBeforeAStopIsGranted {
-				record(log, "agent", "stop", actor, "stop refused: the claim is argued with", sessionlog.No(),
-					map[string]any{"because": c.Because, "why": c.Why, "claim": sofar})
-				g.blockStop(TheChallenge(c, sofar, held))
-				return
-			}
-		}
-		// THE COUNT IS CLEARED ON THE GRANT, because the argument is over. It is
-		// cleared again the moment the agent goes back to work, in decidePreToolUse,
-		// which is where the run of claims is kept unbroken.
+		// AND THE SAME NOW GOES FOR EVERY OTHER REASON. The engine used to push
+		// back twice over open work and grant the third claim, on the owner's
+		// earlier word that a reason given three times is a position somebody is
+		// holding. Weighed against what it cost them in turns, they decided the
+		// other way: if you claim, you can stop next, and a valid reason stops.
+		//
+		// WHAT THE ARGUMENT PROTECTED IS NOT LOST. A stop still needs a claim,
+		// the claim still names one of five sanctioned reasons, and a false
+		// blocked is still refused where it is typed rather than here.
+		//
+		// THE COUNT IS CLEARED ON THE GRANT, because nothing counts any more. It
+		// is cleared again the moment the agent goes back to work, in
+		// decidePreToolUse, and the helper relenting keeps its own count.
 		forgetRefusedStops(roots, "claimed:"+actor)
 		// THE WORD STANDS AS LONG AS THE CLAIM DOES. A harness sends turns nobody
 		// asked for and every one ends in a stop, so an agent that has stopped and
 		// done nothing since meets this again and is let through on the same claim.
 		forgetRefusedStops(roots, actor)
 		record(log, "agent", "stop", actor, "stopped: "+c.Because+" — "+c.Why, sessionlog.Yes(),
-			map[string]any{"because": c.Because, "why": c.Why, "claims": claimsBeforeAStopIsGranted})
+			map[string]any{"because": c.Because, "why": c.Why})
 		return
 	}
 	// THE FIRST STOP OF THE SESSION IS GRANTED. The kickoff says be ready and

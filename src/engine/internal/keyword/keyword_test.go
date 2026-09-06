@@ -17,7 +17,7 @@ func TestAGesturesWordIsItsCommandsLastSegment(t *testing.T) {
 	t.Parallel()
 	for command, want := range map[string]string{
 		"quackitect.god":  "GOD",
-		"quackitect.held": "HELD",
+		"quackitect.stop_everything": "STOP_EVERYTHING",
 		"god":             "GOD",
 	} {
 		if got := FromCommand(command); got != want {

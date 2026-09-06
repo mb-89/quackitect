@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: git failure reads empty
 # where the token stands. The process owns these values.
 status: open
+# the person's own name for a group. It does not move the work
+bucket: archive
 ---
 
 ## detail

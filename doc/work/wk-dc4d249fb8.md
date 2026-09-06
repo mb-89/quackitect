@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: lane answers before building
 # where the token stands. The process owns these values.
 status: open
+# the person's own name for a group. It does not move the work
+bucket: cage
 ---
 
 ## detail
@@ -75,3 +77,4 @@ The red is a tree with .bin renamed away. A standing check drives that case, so 
 | [ ] | every criterion's command was run again, and what it said is named |  |  |
 | [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
 | [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
+

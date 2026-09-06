@@ -51,8 +51,10 @@ func TestEveryCommandARefusalOffersIsAdmitted(t *testing.T) {
 	// picks the engine's line out of the three. See stagestrangers.go.
 	refusals["a stage of a stranger's path"] = aStageOfAStrangersPath("wk-1111111111",
 		[]string{"src/engine/lint.go"}, []string{"src/engine/gate.go"})
-	refusals["the stop challenge"] = TheChallenge(StopClaim{Because: "blocked", Why: "it waits"}, 1,
-		[]Token{{ID: "wk-1111111111", Title: "held"}})
+	// THE STOP CHALLENGE WAS HERE, and it is gone with the argument it belonged
+	// to. The refusal a stop can still meet is the one with nothing claimed, and
+	// TheList is that one.
+	refusals["a stop with nothing claimed"] = TheList("")
 
 	found := 0
 	for from, said := range refusals {

@@ -123,6 +123,7 @@ ask("bind again", A.bindArgs("bound"));
 ask("what is asked", A.askedArgs());
 ask("ask the agent", A.askArgs(true));
 ask("stop asking", A.askArgs(false));
+ask("the tree the panel is built from", A.treeArgs(root));
 ask("whether ideation is on", A.ideatingArgs());
 ask("let the agent ideate", A.ideationArgs(true));
 ask("stop ideating", A.ideationArgs(false));

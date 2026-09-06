@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: Find sh beside git
 # where the token stands. The process owns these values.
 status: open
+# the person's own name for a group. It does not move the work
+bucket: tests
 # tokens that have to close before this can start
 depends_on:
   - "[[wk-212909368a]]"
@@ -41,16 +43,6 @@ Land it only after wk-212909368a, so the battery it enables runs outside the eng
 - Neither src/engine/tests.go nor src/engine/run.go calls LookPath for sh directly: se_find regex LookPath..sh.. over path src/**/*.go returns count 0
 - wk-212909368a is closed before this one lands
 
-## evidence: the finding
-
-WRITTEN, NOT RELEASED. Do not close this while wk-212909368a is open.
-
-The code is done and green. posixShell in run.go is now the one lookup, used by TheShell and by shellCommand. It defers to batteryShell, which asks the probe where git is and looks in the sibling bin and usr/bin. No file under src holds LookPath("sh") any more: se_find answers count 0. Names are a list now, sh then bash, so a machine with only bash is not called shell-less.
-
-WHY IT MUST NOT BE RELEASED YET. Today the lookup fails, the battery cannot start, and that failure is harmless. The moment sh is findable, se test with a whole ruling launches the battery, and the battery stops the engine hosting it. That is wk-212909368a, one build door, still open and in another actor's hands. Landing this first turns a harmless refusal into the engine storm that cost the owner an afternoon.
-
-Also note the running engine is a stale build, so none of this takes effect until somebody rebuilds.
-
 ## evidence: step 1. ask
 
 <!-- write what is asked and what done means, one criterion per line -->
@@ -74,4 +66,14 @@ Also note the running engine is a stale build, so none of this takes effect unti
 | [x] | the same test was seen green after the change, and named | se_test on this token, six named tests | all ok: the three new ones and the three battery-shell ones, so nothing of that worker's broke |
 | [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | — | run.go, one lookup and two call sites, and tests.go, the last literal gone |
 | [x] | the cleanup the change revealed is in the change, or is a token of its own | — | nothing further revealed |
+
+## evidence: the finding
+
+WRITTEN, NOT RELEASED. Do not close this while wk-212909368a is open.
+
+The code is done and green. posixShell in run.go is now the one lookup, used by TheShell and by shellCommand. It defers to batteryShell, which asks the probe where git is and looks in the sibling bin and usr/bin. No file under src holds LookPath("sh") any more: se_find answers count 0. Names are a list now, sh then bash, so a machine with only bash is not called shell-less.
+
+WHY IT MUST NOT BE RELEASED YET. Today the lookup fails, the battery cannot start, and that failure is harmless. The moment sh is findable, se test with a whole ruling launches the battery, and the battery stops the engine hosting it. That is wk-212909368a, one build door, still open and in another actor's hands. Landing this first turns a harmless refusal into the engine storm that cost the owner an afternoon.
+
+Also note the running engine is a stale build, so none of this takes effect until somebody rebuilds.
 

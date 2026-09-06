@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: the retro reads broken
 # where the token stands. The process owns these values.
 status: open
+# the person's own name for a group. It does not move the work
+bucket: archive
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - d23edd4d39efed5fc12ca857f2bf35a7076b2c71
@@ -34,6 +36,16 @@ failures.json is the wrong source. It holds the current consecutive run of one c
 ## proposed action
 
 Stamp a broken claim with what the engine already knows, and have the retro read every broken claim against the session log and say what happened. Refuse nothing.
+
+## approach
+
+StopClaim in src/engine/stop.go gains two fields the engine fills at the claim. The token the actor held, read from the hold store. The last call it refused this session, read from the log. The agent is asked for nothing new.
+
+The retro joins on session and actor. A claim names both, and the log rows carry both, so the join needs no index and no new file.
+
+The answer says one of two things per claim. Either the log holds failed calls, and they are listed. Or it holds none, and the claim is named as one the record cannot corroborate. Both are reported and neither is refused.
+
+failures.json is not read.
 
 ## done when
 
@@ -79,14 +91,4 @@ Stamp a broken claim with what the engine already knows, and have the retro read
 | [ ] | every criterion's command was run again, and what it said is named |  |  |
 | [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
 | [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
-
-## approach
-
-StopClaim in src/engine/stop.go gains two fields the engine fills at the claim. The token the actor held, read from the hold store. The last call it refused this session, read from the log. The agent is asked for nothing new.
-
-The retro joins on session and actor. A claim names both, and the log rows carry both, so the join needs no index and no new file.
-
-The answer says one of two things per claim. Either the log holds failed calls, and they are listed. Or it holds none, and the claim is named as one the record cannot corroborate. Both are reported and neither is refused.
-
-failures.json is not read.
 

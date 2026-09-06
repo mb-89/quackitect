@@ -11,8 +11,6 @@ title: hook wake takes context
 status: closed
 # who did the work step, so the verdict is never theirs
 author: worker-birch
-claimed_by: 547b9365/worker-birch
-claimed_at: "2026-09-05T19:13:03Z"
 # the token this is a part of. It cannot close while this is open
 parent: [[wk-697f9876cf]]
 # the tree each time the work was taken up, snapshots the engine wrote

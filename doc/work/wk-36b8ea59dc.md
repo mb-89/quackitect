@@ -9,8 +9,8 @@ guidance: [[work-token]]
 title: the sweep fails soft
 # where the token stands. The process owns these values.
 status: open
-claimed_by: aeaf7bd9/main
-claimed_at: "2026-09-05T15:41:02Z"
+# the person's own name for a group. It does not move the work
+bucket: archive
 # tokens that have to close before this can start
 depends_on:
   - "[[wk-808abd40a4]]"
@@ -79,16 +79,6 @@ runRetro calls it and carries the parts.
 | [x] | the note says what changed and why, for a reader who was not here | The note is below. | note written |
 | [x] | the cleanup the change revealed is in the change, or is a token of its own | wk-e9df6b4eaa carries began and ended onto the archived row, which makes the refs sweep decidable. | wk-e9df6b4eaa |
 
-## note
-
-se tidy is one verb with three parts, in src/engine/tidy.go. Each answers a name, a count, whether this box could do it, and why it did no more. No part answers an error or sets an exit code, so one that cannot run leaves the rest running. runRetro calls it on the way in.
-
-archive is SweepClosed, the right job behind the wrong door. It counts rows the archive gained, not tokens SweepClosed walked. A closed local token stays on the disk until a retro reads it, so SweepClosed reports it swept every run.
-
-claims drops a lapsed claim from the frontmatter. Readers only asked lapsed again, so a stale holder sat in every list.
-
-refs counts and deletes nothing, departing from the approach. Only began or ended names a snapshot ref, and an archived row carries neither. A sweep would take what a reviewer reads. wk-e9df6b4eaa makes it decidable.
-
 ## evidence: step 3. verdict
 
 <!-- read every hunk, run every criterion, and say whether each part improves the product. How a reviewer works is [[reviewing]]. Your verdict blocks nothing. You give it once and the token closes on it. Every finding you have is a trivial token you mint naming this one. -->
@@ -100,4 +90,14 @@ refs counts and deletes nothing, departing from the approach. Only began or ende
 | [ ] | every criterion's command was run again, and what it said is named |  |  |
 | [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
 | [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
+
+## note
+
+se tidy is one verb with three parts, in src/engine/tidy.go. Each answers a name, a count, whether this box could do it, and why it did no more. No part answers an error or sets an exit code, so one that cannot run leaves the rest running. runRetro calls it on the way in.
+
+archive is SweepClosed, the right job behind the wrong door. It counts rows the archive gained, not tokens SweepClosed walked. A closed local token stays on the disk until a retro reads it, so SweepClosed reports it swept every run.
+
+claims drops a lapsed claim from the frontmatter. Readers only asked lapsed again, so a stale holder sat in every list.
+
+refs counts and deletes nothing, departing from the approach. Only began or ended names a snapshot ref, and an archived row carries neither. A sweep would take what a reviewer reads. wk-e9df6b4eaa makes it decidable.
 

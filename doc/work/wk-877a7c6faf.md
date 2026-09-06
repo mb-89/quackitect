@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: a knob nothing reads
 # where the token stands. The process owns these values.
 status: open
+# the person's own name for a group. It does not move the work
+bucket: surface
 # true when this waits for a person rather than an agent
 needs_human: true
 ---

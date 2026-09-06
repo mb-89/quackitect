@@ -44,18 +44,17 @@ func TestAskedIsGrantedOnTheFirstClaim(t *testing.T) {
 	aStopIsGranted(t, r, log, actor, "broken")
 	forgetRefusedStops(r, "claimed:"+actor)
 
-	// EVERY OTHER REASON IS STILL ARGUED WITH, so the guard is not simply off.
+	// EVERY OTHER REASON WAS ARGUED WITH HERE, and that half is gone. The engine
+	// used to push back twice over open work, so this test proved asked was
+	// carved out of something. Nothing is argued with now, on the owner's word
+	// that a valid claim stops, so there is no carve-out left to prove.
 	//
-	// blocked is not among them, because it is refused at the claim itself when
-	// the work waits on nobody. It never reaches the argument.
-	for _, because := range []string{"broken", "decision", "plan"} {
-		if granted := aStopIsGranted(t, r, log, actor, because); granted {
-			t.Errorf("%s was granted on the first claim over open work, so the argument is gone", because)
-		}
-		forgetRefusedStops(r, "claimed:"+actor)
-	}
+	// WHAT SURVIVES IS THE RULE ITSELF. asked is granted whatever is in hand, and
+	// it stays asserted because the person's word outranking everything is not a
+	// consequence of the argument going. TestAValidClaimStopsAtOnce holds the
+	// wider rule for every reason.
 
-	// AND asked IS GRANTED AT ONCE, whatever is in hand.
+	// asked IS GRANTED AT ONCE, whatever is in hand.
 	if granted := aStopIsGranted(t, r, log, actor, "asked"); !granted {
 		t.Error("the person said stop and the engine argued, which is the engine testing their judgement")
 	}
@@ -74,18 +73,21 @@ func aStopIsGranted(t *testing.T, r Roots, log *sessionlog.Log, actor, because s
 	return !strings.Contains(said.String(), `"decision":"block"`)
 }
 
-// THE NOTICE SAYS WHICH CLAIM THIS IS, so a repeat is not read as a refusal.
+// THE REFUSAL SAYS WHY IT CAME BACK, so a repeat is not read as a mystery.
 //
 // "Do anything and it is gone" was read as "do work and it is gone". An agent
 // claimed, asked the engine for its status, and the status cleared the claim.
 // The notice came back unchanged, so the agent read a cleared claim as a
 // refused one and went round forty times.
-func TestTheChallengeSaysWhichClaimThisIs(t *testing.T) {
-	said := TheChallenge(StopClaim{Because: "blocked", Why: "it waits on somebody else"}, 1,
-		[]Token{{ID: "wk-1", Title: "held"}})
-	for _, want := range []string{"claim 1 of 3", "wk-1"} {
+//
+// THERE IS ONE CAUSE NOW, because the argument is gone. A claim that stands is
+// granted, so this notice coming back can only mean a call cleared the claim,
+// and it says so.
+func TestTheRefusalSaysTheClaimWasCleared(t *testing.T) {
+	said := TheList("")
+	for _, want := range []string{"CLEARED BY A CALL", "Claim again"} {
 		if !strings.Contains(said, want) {
-			t.Errorf("the challenge does not say %q:\n%s", want, said)
+			t.Errorf("the refusal does not say %q:\n%s", want, said)
 		}
 	}
 }

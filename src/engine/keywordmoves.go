@@ -42,7 +42,7 @@ var moves = map[string]aMove{
 	"quackitect.hold": func(r Roots, by string, on bool) (string, error) {
 		return holdMove(r, by, on, HoldFinishing)
 	},
-	"quackitect.held": func(r Roots, by string, on bool) (string, error) {
+	"quackitect.stop_everything": func(r Roots, by string, on bool) (string, error) {
 		return holdMove(r, by, on, HoldHeld)
 	},
 	// THE ASK IS ALREADY THE ENGINE'S, and this is a second adapter onto it
@@ -93,8 +93,22 @@ func keywordsFor(n Node) []string {
 		out = append(out, rung(keyword.For(n.Name))...)
 	case "int", "float":
 		out = append(out, keyword.Line(keyword.For(n.Name), boundsSay(n)))
+	case "text", "str":
+		// A BOX TAKES WHATEVER A PERSON TYPES, so the placeholder is what the
+		// line shows. It is what the panel already draws inside the box, so a
+		// person reads the same example in both places.
+		out = append(out, keyword.Line(keyword.For(n.Name), "<"+theExample(n)+">"))
 	}
 	return out
+}
+
+// theExample is what a box shows when it is empty, and what its keyword line
+// shows in place of a value.
+func theExample(n Node) string {
+	if n.Placeholder != "" {
+		return n.Placeholder
+	}
+	return "what to set it to"
 }
 
 func rung(word string) []string {
@@ -142,7 +156,7 @@ func theReachable(root Node) map[string]reach {
 			if m, ok := moves[n.GestureCommand]; ok {
 				out[keyword.FromCommand(n.GestureCommand)] = reach{Node: n, Move: m}
 			}
-		case "bool", "int", "float":
+		case "bool", "int", "float", "text", "str":
 			out[keyword.For(n.Name)] = reach{Node: n, Key: key}
 		}
 	})
@@ -171,6 +185,10 @@ func valueFor(n Node, value string) (any, error) {
 			return nil, fmt.Errorf("%s takes a number, and %q is not one", word, value)
 		}
 		return f, nil
+	case "text", "str":
+		// A BOX TAKES THE TEXT AS TYPED, spaces and all. Emptying it is sending
+		// the word with nothing after the equals sign.
+		return value, nil
 	}
 	return nil, fmt.Errorf("%s cannot be set from a chat", word)
 }

@@ -20,7 +20,7 @@
 // carries no palette of its own and adds no frame around a window VS Code has
 // already framed.
 
-import { controlCss } from "./controls";
+import { controlCss, filterSyntax } from "./controls";
 
 export type Cell = { value: string; list?: boolean };
 export type Line = {
@@ -182,7 +182,7 @@ function toolbar(t: Table): string {
     <span class="bs-gap"></span>
     <input class="bs-sift" type="text" spellcheck="false"
       placeholder="filter, the log's syntax"
-      title="narrows what the panes draw and writes nothing: word, name: value, and or not, ( ), val*, /pattern/">
+      title="narrows what the panes draw and writes nothing: ${filterSyntax}">
     <button type="button" class="bs-tool" data-pop="filter" data-help="filter"
       title="filter">${icon("filter")}</button>
     <button type="button" class="bs-tool" data-pop="sort" data-help="sort"

@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: comments in plain register
 # where the token stands. The process owns these values.
 status: open
+# the person's own name for a group. It does not move the work
+bucket: cage
 # what has to be true before this is worth reading again
 ready_when: "the owner says the capitals headline goes. The tree must be quiet enough that 122 files can be rewritten without colliding with work in flight. Split first: this is not one trivial token."
 # the tree each time the work was taken up, snapshots the engine wrote
