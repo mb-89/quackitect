@@ -682,9 +682,24 @@ func countingTree(t *testing.T) Roots {
 // ---- from retro_test.go ----
 
 // A tree with a log, a scratchpad and one token, the way a session leaves one.
+//
+// ITS METHOD ROOT IS ITS WORK ROOT, AND IT CARRIES THE MARKER THAT SAYS SO.
+//
+// Five of these tests spawn the built engine as a client. That binary is built
+// into a temporary folder, so a lookup from where it stands finds no
+// src/processes, and it then looks up from the folder --work names. This
+// fixture took its roots from lane, which puts the method in a third folder
+// that no spawned call can name, so the lookup found nothing either way and
+// all five were refused before the verb ran. See methodRootFrom in roots.go.
+//
+// Nothing here reads the two roots apart, and the marker is what every other
+// fixture that spawns this binary carries.
 func aWorkedTree(t *testing.T) Roots {
 	t.Helper()
-	r := lane(t)
+	r := aTree(t).Roots
+	if err := os.MkdirAll(ProcessesDir(r.Method), 0o755); err != nil {
+		t.Fatal(err)
+	}
 	logs := r.Private("log")
 	if err := os.MkdirAll(logs, 0o755); err != nil {
 		t.Fatal(err)
