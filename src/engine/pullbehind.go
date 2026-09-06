@@ -92,6 +92,24 @@ func archivedOn(r Roots, commit string) map[string]bool {
 	return ids
 }
 
+// ArchivedOnTheBranch answers the ids the fetched branch has already archived.
+// It changes nothing, and it is empty where the tree tracks no branch or has
+// never fetched.
+//
+// THE PULL AND THE COUNT READ ONE RULE. The queue hands out what is left after
+// this, and the staffing count counts what the queue would hand out. Two
+// readings of one rule drift, and this drift deadlocked a session: the count
+// knew nothing of the branch and demanded reviewers for forty-one tokens no
+// pull would ever produce. Each spawned reviewer was told wait and left, so
+// the demand came back for ever.
+func ArchivedOnTheBranch(r Roots) map[string]bool {
+	commit, _ := fetchedBranch(r)
+	if commit == "" {
+		return nil
+	}
+	return archivedOn(r, commit)
+}
+
 // offTheFetchedBranch takes out of the queue every open token the fetched
 // branch has archived, and answers what it took and the branch's name.
 //
@@ -99,11 +117,8 @@ func archivedOn(r Roots, commit string) map[string]bool {
 // so it stops counting as theirs on every pull that follows. The note stays on
 // the disk: the tree is the person's to bring into step.
 func offTheFetchedBranch(r Roots, actor string, all []Token) (kept []Token, behind []string, branch string) {
-	commit, branch := fetchedBranch(r)
-	if commit == "" {
-		return all, nil, ""
-	}
-	archived := archivedOn(r, commit)
+	_, branch = fetchedBranch(r)
+	archived := ArchivedOnTheBranch(r)
 	if len(archived) == 0 {
 		return all, nil, branch
 	}

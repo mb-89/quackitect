@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strings"
+	"time"
 )
 
 // THE QUEUE SAYS HOW MANY HANDS IT WANTS, AND THE ENGINE HOLDS THE MAIN AGENT
@@ -41,16 +42,21 @@ type Staffing struct {
 // StaffingOf counts the queue and the hands on it.
 func StaffingOf(r Roots, cfg Config) Staffing {
 	var s Staffing
+	// THE COUNT IS WHAT THE QUEUE WOULD HAND OUT, never how many rows exist.
+	//
+	// It walked the tokens itself and applied its own reading of what is
+	// workable. That reading knew nothing of what the branch had archived, nor
+	// of the caps the record puts on a note, so it counted work the pull would
+	// pass over. The guard then held the main agent until hands arrived for
+	// work no hand could be given, and each one spawned was told wait and
+	// left. WouldHandOut is the pull's own question, asked here.
+	archived := ArchivedOnTheBranch(r)
+	now := time.Now().UTC()
 	for _, t := range Tokens(r) {
-		// A PARKED TOKEN WANTS NO HANDS. It waits on a person, so counting it
-		// as open work spawns workers for something no worker may be handed.
-		if t.Ended() || t.Holder != "" || Blocked(r, t) != "" || WaitsForAPerson(t) != "" {
-			continue
-		}
 		switch {
-		case WorkableBy(r, t, RoleWorker):
+		case WouldHandOut(r, t, "", RoleWorker, archived, now):
 			s.OpenWork++
-		case WorkableBy(r, t, RoleReviewer):
+		case WouldHandOut(r, t, "", RoleReviewer, archived, now):
 			s.AwaitingVerdict++
 		}
 	}
@@ -214,6 +220,14 @@ func AStaffShortfall(r Roots, cfg Config, actor, tool, command string) (string, 
 	// carries. On a box with no lane, the pull and the stop this guard tells
 	// the agent to make are Bash calls, and holding Bash held those too.
 	if runsTheEngine(command) && !engineWork(command) {
+		return "", false
+	}
+	// A PERSON WHO PUT THE WORK DOWN IS NOT ASKED FOR MORE HANDS.
+	//
+	// While finishing, a spawned hand may take nothing up, so the demand would
+	// send the main agent to spawn agents with no legal move. Held is quiet for
+	// the same reason: nothing it spawned could act either.
+	if h := LoadHold(r); h.Held() || h.Finishing() {
 		return "", false
 	}
 	s := StaffingOf(r, cfg)

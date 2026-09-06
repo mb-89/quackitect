@@ -139,6 +139,12 @@ func discoverTests(r Roots, db *sql.DB) ([]aTest, error) {
 	}
 	rows.Close()
 	seen := map[string]bool{}
+	// A NOTE ABOUT A TEST IS NOT THE TEST. The walk found these on the disk,
+	// which is the truth, and these rows only remember it. Returning a write's
+	// error refused the whole run, so a busy index stopped every test on the
+	// box rather than costing one rediscovery. The index is shared with a
+	// language server that holds it while a person types, so busy is ordinary.
+	var unwritten []string
 	for i, t := range found {
 		seen[t.ID] = true
 		was, ok := known[t.ID]
@@ -152,18 +158,22 @@ func discoverTests(r Roots, db *sql.DB) ([]aTest, error) {
 			"ON CONFLICT(id) DO UPDATE SET name = excluded.name, kind = excluded.kind, path = excluded.path, "+
 			"line = excluded.line, hash = excluded.hash, reads = excluded.reads",
 			t.ID, t.Name, t.Kind, t.Path, t.Line, t.Hash, t.Reads, found[i].Mapped); err != nil {
-			return nil, err
+			unwritten = append(unwritten, t.ID)
 		}
 	}
 	for id := range known {
 		if !seen[id] {
 			if _, err := db.Exec("DELETE FROM test WHERE id = ?", id); err != nil {
-				return nil, err
+				unwritten = append(unwritten, id)
 			}
 			if _, err := db.Exec("DELETE FROM test_region WHERE test = ?", id); err != nil {
-				return nil, err
+				unwritten = append(unwritten, id)
 			}
 		}
+	}
+	if len(unwritten) > 0 {
+		inSession(r, "test", "engine", fmt.Sprintf("the index would not take %d test row(s), so they are rediscovered next run", len(unwritten)),
+			sessionlog.No(), map[string]any{"tests": unwritten})
 	}
 	sort.Slice(found, func(i, j int) bool { return found[i].ID < found[j].ID })
 	return found, nil
@@ -306,7 +316,20 @@ func coverBinary(r Roots, db *sql.DB, dir string) (string, error) {
 	if out, err := cmd.CombinedOutput(); err != nil {
 		return "", fmt.Errorf("the cover binary for %s will not build: %v\n%s", dir, err, out)
 	}
-	return bin, setMeta(db, "coverbin:"+dir, want)
+	// A NOTE ABOUT A BUILD IS NOT THE BUILD.
+	//
+	// This returned the note's error as its own, and the caller reads any error
+	// here as a build failure. So a busy index made a binary that is on disk
+	// and correct report that it will not build, and a hand went looking for a
+	// compile error in a healthy package.
+	//
+	// Losing the note costs the next run a rebuild. The record says it was
+	// lost, so a tree that rebuilds every time has somewhere to look.
+	if err := setMeta(db, "coverbin:"+dir, want); err != nil {
+		inSession(r, "test", "engine", "the cover binary for "+dir+" built, and the note about it did not: "+
+			err.Error(), sessionlog.No(), map[string]any{"package": dir})
+	}
+	return bin, nil
 }
 
 // goTool is the go on this machine: the probe's when it found one, PATH's

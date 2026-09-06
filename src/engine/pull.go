@@ -226,8 +226,40 @@ func ownVerdictOffTheHand(r Roots, actor, role string) (string, *Answer) {
 		strings.Join(down, ", ") + ".", nil
 }
 
+// theNotesLeft hands this actor a note, one at a time, and says so when none
+// is left. It is the whole of what the queue gives out while finishing.
+//
+// A NOTE IS PRIVATE AND LIVES OUTSIDE GIT, so one left on a cloud box dies
+// with it. The queue hands a note out at no other time, so no ordering change
+// reaches one: there is nothing in the queue to move up. That is why the drain
+// rides on finishing rather than on a rank.
+//
+// A NOTE ANOTHER HAND HOLDS IS LEFT ALONE, because that hand is finishing too.
+// One nobody holds is taken, whoever wrote it, since it dies with this box
+// either way.
+func theNotesLeft(r Roots, actor string) Answer {
+	for _, t := range Tokens(r) {
+		if t.Process != PrivateProcess || t.Ended() {
+			continue
+		}
+		if t.Holder != "" && t.Holder != actor {
+			continue
+		}
+		if a, ok := take(r, actor, t); ok {
+			return a
+		}
+	}
+	return Answer{Pull: AnswerWait, Notice: "Nothing is left to finish. " +
+		"Every note you hold is worked, and no new work goes out while a person " +
+		"has the work on finishing. Say what you did and stop."}
+}
+
 // whatComesNext is the queue's answer to an actor with nothing in hand.
 func whatComesNext(r Roots, actor, role string) Answer {
+	// FINISHING UP DRAINS THE NOTES AND HANDS OUT NOTHING ELSE.
+	if LoadHold(r).Finishing() {
+		return theNotesLeft(r, actor)
+	}
 	// A HOLD NOBODY IS BEHIND SENDS SOMEBODY TO LOOK, before new work is handed
 	// out. A walker given another token goes on working while the stuck one
 	// stays stuck, which is what happened.
@@ -809,16 +841,7 @@ func nextAmong(r Roots, actor, role string, all []Token) Answer {
 	for _, scope := range scopes {
 		for i := range all {
 			t := all[i]
-			if t.Parent != scope.ID || t.Ended() || t.Holder != "" || !WorkableBy(r, t, role) {
-				continue
-			}
-			if role == RoleReviewer && t.Author == actor {
-				continue // never the author
-			}
-			if why := Blocked(r, t); why != "" {
-				continue
-			}
-			if why := WaitsForAPerson(t); why != "" {
+			if t.Parent != scope.ID || !WouldHandOut(r, t, actor, role, nil, now) {
 				continue
 			}
 			a, ok := take(r, actor, t)
@@ -833,27 +856,10 @@ func nextAmong(r Roots, actor, role string, all []Token) Answer {
 	for _, wantMine := range []bool{true, false} {
 		for i := range all {
 			t := all[i]
-			if t.Ended() || t.Holder != "" {
-				continue
-			}
-			if !WorkableBy(r, t, role) {
-				continue
-			}
-			if role == RoleReviewer && t.Author == actor {
-				continue // never the author
-			}
-			if why := Blocked(r, t); why != "" {
-				continue
-			}
-			// A PARKED TOKEN IS NOT HANDED OUT. It waits on a person, and an agent
-			// that takes one cannot put it down: the queue would answer it again.
-			if why := WaitsForAPerson(t); why != "" {
-				continue
-			}
-			// A CLAIM SOMEBODY ELSE HOLDS IS NOT WORK YOU CAN START. It reads as
-			// blocked because that is what it is: nothing you do releases it, and
-			// it releases itself when it lapses. See claim.go.
-			if by := ClaimedNow(r, t, now); by != "" && !ClaimedHere(r, by) {
+			// WHAT THE QUEUE WOULD HAND OUT, asked once and asked the same way
+			// the staffing count asks it. A parked token, a claim another box
+			// holds, and a note the record refuses are all its business.
+			if !WouldHandOut(r, t, actor, role, nil, now) {
 				continue
 			}
 			// WHAT YOU CLAIMED COMES BEFORE WHAT NOBODY HAS. A claim is an agent
@@ -908,6 +914,38 @@ func unwritableNotice(said []string) string {
 	return fmt.Sprintf("\n\nPassed over, because the record will not write them:\n  %s\n\n"+
 		"Shorten what each refusal names. Until then nobody can be handed these.",
 		strings.Join(said, "\n  "))
+}
+
+// WouldHandOut answers whether the queue would hand this token to an agent in
+// this role, right now. It changes nothing.
+//
+// THE PULL WALKS IT AND THE STAFFING COUNT WALKS IT. The guard's question is
+// how many the queue would produce, never how many rows exist, so the two
+// cannot disagree about what work there is.
+//
+// THEY DID DISAGREE, AND IT DEADLOCKED A SESSION. The count walked the tokens
+// itself and knew nothing of the branch or of the record's own caps, so it
+// demanded three reviewers for tokens no pull would ever produce. Each spawned
+// reviewer pulled, was told wait, and left, and the demand came back for ever.
+func WouldHandOut(r Roots, t Token, actor, role string, archived map[string]bool, now time.Time) bool {
+	if t.Ended() || t.Holder != "" || archived[t.ID] {
+		return false
+	}
+	if !WorkableBy(r, t, role) {
+		return false
+	}
+	// NEVER THE AUTHOR. A verdict on your own work is not a verdict.
+	if role == RoleReviewer && t.Author == actor {
+		return false
+	}
+	if Blocked(r, t) != "" || WaitsForAPerson(t) != "" {
+		return false
+	}
+	// A CLAIM ANOTHER BOX HOLDS IS NOT WORK THIS ONE CAN START.
+	if by := ClaimedNow(r, t, now); by != "" && !ClaimedHere(r, by) {
+		return false
+	}
+	return TheRecordRefuses(r, t) == nil
 }
 
 // take puts a token in the actor's hands and answers it. It answers false when

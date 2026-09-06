@@ -85,7 +85,12 @@ func runRun(c *call) int {
 		c.answerJSON(got)
 		return 0
 	}
-	if *on == "" {
+	// UNBOUND MEANS NO TOKEN ON A COMMAND, which is what the button has always
+	// said it means: take the queue off, no token on a write, no token on a
+	// command, nobody made to spawn. The engine went on asking for one anyway,
+	// so a person who took the queue off still had to name work they were no
+	// longer being handed. God is unbound with the rest of the rules off too.
+	if *on == "" && !Unleashed(c.roots) {
 		c.answerJSON(map[string]any{"error": "say which token this command is, with --on <id>. " +
 			"A shell command names its work because the engine cannot read one and know " +
 			"whether it writes"})
