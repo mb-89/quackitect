@@ -215,18 +215,24 @@ build() {
     mv .bin/se.exe .bin/was/se.exe || return 1
   fi
   mv .bin/se.next.exe .bin/se.exe || return 1
+  # AND THE TOOL LANE, because mcp-tools drives it and a check that reads a
+  # stale binary reports on the tree as it was rather than as it is. It is the
+  # door an agent uses, and it drifted from the engine for want of a build here
+  # and a check after it.
+  go build -C src/mcp -gcflags=-e -o ../../.bin/se-mcp.exe . || return 1
   # The suffixed name is the build. The plain one is the same file.
   #
   # THE LINK IS MADE BY THE ENGINE AND NOT BY THE SHELL. This shell's ln moved
   # the file rather than linking it, which left se.exe gone and the tree with no
   # engine at all. The engine already knows how to give itself both names, and
   # asking it is one behaviour rather than two.
+  #
+  # AND IT RUNS LAST, so it names what was just built. Run before the lane, it
+  # handed the plain name whatever the previous battery wrote: measured on this
+  # box with .bin/se-mcp.exe two hours newer than .bin/se-mcp, and mcp-tools,
+  # which reads the plain name everywhere but Windows, calling util/cage/tools
+  # .json wrong when the file was right and the binary was old.
   .bin/se.exe --link --work . >/dev/null 2>&1 || return 1
-  # AND THE TOOL LANE, because mcp-tools drives it and a check that reads a
-  # stale binary reports on the tree as it was rather than as it is. It is the
-  # door an agent uses, and it drifted from the engine for want of a build here
-  # and a check after it.
-  go build -C src/mcp -gcflags=-e -o ../../.bin/se-mcp.exe . || return 1
   # AND THE ENGINE'S TEST BINARY, ONCE. Linking a cgo binary is the slow part
   # of the suite, so it is a fixture made here and run below in two halves
   # at once, each half over trees of its own.
