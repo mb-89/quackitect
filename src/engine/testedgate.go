@@ -29,6 +29,11 @@ type TheLastRun struct {
 	Pending bool   `json:"pending,omitempty"` // a battery that had not finished when this was written
 	At      string `json:"at"`
 	Said    string `json:"said,omitempty"` // the first failing test, so a refusal can name it
+	// Failed names every test this run left red. The refusal tells the agent to
+	// read the whole page, and the page is gone by then: a lane call cut at
+	// sixty seconds takes the answer with it, and the next run is refused for
+	// not having answered a page nobody could read. So the page is kept here.
+	Failed []string `json:"failed,omitempty"`
 	// Reds is how many of that run's failures were this token's to answer. A
 	// package that did not compile counts one, whatever it listed, because the
 	// compiler stopped at the first wall and every test behind it is unrun.
@@ -76,6 +81,7 @@ func RecordTheRun(r Roots, id string, out Tested) {
 	}
 	all := loadLastRuns(r)
 	said, pending, mine := "", false, false
+	var failed []string
 	for _, x := range out.Ran {
 		if x.Pending {
 			pending = true
@@ -85,6 +91,7 @@ func RecordTheRun(r Roots, id string, out Tested) {
 			continue
 		}
 		mine = true
+		failed = append(failed, x.ID)
 		if said == "" {
 			said = x.ID
 		}
@@ -95,7 +102,7 @@ func RecordTheRun(r Roots, id string, out Tested) {
 	// says nothing about whose failure it was.
 	ok := out.OK || (!mine && len(out.Ran) > 0)
 	all.Runs[id] = TheLastRun{OK: ok, Pending: pending,
-		At: time.Now().UTC().Format(time.RFC3339), Said: said,
+		At: time.Now().UTC().Format(time.RFC3339), Said: said, Failed: failed,
 		Reds: theRedsToAnswer(out), Delta: out.Delta}
 	if b, err := json.MarshalIndent(all, "", "  "); err == nil {
 		_ = writeAtomic(lastRunsPath(r), b, 0o644) // a run it cannot write is a run nothing gates on
@@ -203,12 +210,20 @@ func ARunThatAnswersTooLittle(r Roots, id string, now []change) string {
 	if moved >= was.Reds {
 		return ""
 	}
-	return fmt.Sprintf("THE LAST RUN LEFT %d RED AND THE TREE HAS MOVED IN %d PLACE(S) SINCE.\n\n"+
+	// THE PAGE IS IN THE REFUSAL, because by now it is nowhere else. A lane call
+	// is cut at sixty seconds and the answer goes with it, so an agent was told
+	// to read a page it had never been shown, and asking again was refused for
+	// the same reason.
+	page := ""
+	if len(was.Failed) > 0 {
+		page = "\n\nWHAT WENT RED:\n  " + strings.Join(was.Failed, "\n  ")
+	}
+	return fmt.Sprintf("THE LAST RUN LEFT %d RED AND THE TREE HAS MOVED IN %d PLACE(S) SINCE.%s\n\n"+
 		"A page of failures answered by one edit is a guess with a test run attached, and the "+
 		"run costs a rebuild. Read the whole page first: every one of the %d says what it wanted "+
 		"and what it got.\n\n"+
 		"Fix what you can see, all of it, then ask again. A change touching as many places as "+
-		"there were reds goes through, whatever it did in them.", was.Reds, moved, was.Reds)
+		"there were reds goes through, whatever it did in them.", was.Reds, moved, page, was.Reds)
 }
 
 // amongTheChanges answers whether this place was already in that delta.

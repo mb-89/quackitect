@@ -79,6 +79,10 @@ type Tested struct {
 	Chosen     []chosen `json:"chosen"`
 	Whole      bool     `json:"whole"`
 	WhyWhole   string   `json:"why_whole,omitempty"`
+	// Owes is a battery this change has earned and this run did not spend: a
+	// trigger changed, and the narrow selection ran instead. It is run once
+	// before the branch merges.
+	Owes string `json:"owes,omitempty"`
 	Proposed   []string `json:"proposed,omitempty"`
 	Unreached  []string `json:"unreached,omitempty"`  // proposed patterns the delta does not reach
 	Uncovered  []string `json:"uncovered,omitempty"`  // changed files no test reaches
@@ -219,7 +223,7 @@ func TestTheDelta(ctx context.Context, r Roots, db *sql.DB, on string, proposed 
 		// THE BATTERY IS STARTED, NOT AWAITED. It builds the engine and puts a
 		// new one over this tree, so waiting for it here is waiting inside the
 		// process it replaces. See battery.go.
-		out.Ran = append(out.Ran, startBattery(ctx, r, actor, on))
+		out.Ran = append(out.Ran, theBatteryAnswers(ctx, r, actor, on)...)
 	} else if err := runOrLand(r, tests, &out, start); err != nil {
 		return out, err
 	}
@@ -298,17 +302,31 @@ func choose(db *sql.DB, tests []aTest, out *Tested) error {
 		changedPaths[ch.Path] = true
 	}
 
-	// THE WHOLE BATTERY, BY THE ENGINE'S RULES.
+	// A TRIGGER OWES A BATTERY, IT DOES NOT FORCE ONE.
+	//
+	// THE OWNER'S RULING, September 2026, in their words: the smaller scope
+	// wins. If the agent wants only a few files and you want the whole battery,
+	// then the few files win.
+	//
+	// MEASURED that month. One number added to util/parameters.json ran 228
+	// seconds of battery and handed the token eight reds, six of them no hand
+	// on that box had caused. The checks that declare they read the file are
+	// picked below, and that answer is both the conservative one and the small
+	// one.
+	//
+	// WHAT IS OWED IS SAID INSTEAD, so the battery runs once before the branch
+	// merges rather than on every token that touches one parameter.
 	for _, ch := range out.Delta {
 		for _, g := range wholeTriggers {
 			// THE FIRST REASON STANDS. A ruling made before the triggers were read,
 			// because the record cannot say what this token wrote, is the answer to
 			// a different question and is not overwritten by a path.
-			if out.Whole {
+			if out.Whole || out.Owes != "" {
 				continue
 			}
 			if re, _ := globRegexp(g); re != nil && re.MatchString(ch.Path) {
-				out.Whole, out.WhyWhole = true, ch.Path+" changed, and it is "+g
+				out.Owes = ch.Path + " changed, and it is " + g +
+					". The battery is owed before this branch merges"
 			}
 		}
 	}
@@ -442,6 +460,12 @@ func choose(db *sql.DB, tests []aTest, out *Tested) error {
 		}
 	}
 
+	// A TRIGGER WITH NOTHING SELECTED STILL RUNS THE BATTERY. A change that no
+	// test reaches and no check declares has no smaller honest answer than all
+	// of them, and answering green over nothing run is the worse failure.
+	if out.Owes != "" && !out.Whole && len(pick) == 0 {
+		out.Whole, out.WhyWhole = true, out.Owes+", and nothing else was selected"
+	}
 	if !out.Whole && len(tests) >= wholeAtLeast && float64(len(pick)) > wholeAbove*float64(len(tests)) {
 		out.Whole, out.WhyWhole = true, fmt.Sprintf("%d of %d tests selected, and the battery is cheaper", len(pick), len(tests))
 	}
@@ -941,6 +965,39 @@ func namesAFile(word string) bool {
 	return strings.Contains(filepath.ToSlash(strings.Trim(word, "'\"")), checksDir+"/")
 }
 
+// theFileAnInterpreterRuns answers the check this interpreter is about to run,
+// or nothing.
+//
+// AN INTERPRETER RUNS THE FIRST FILE IT IS HANDED. This read every word after
+// the program instead, so a check anywhere in the line was a check about to
+// run, and that caught the one door a change leaves a box by: util/git/land.sh
+// copies the files it is named onto the branch tip and pushes them, it runs
+// nothing at all, and it is run with sh. So a change to a check was made, was
+// right, and was refused a way out, and a cloud box is reclaimed when its
+// session ends.
+//
+// A FLAG IS NOT THE FILE, and the flags come first, so they are read past.
+//
+// AND AN INTERPRETER HANDED AN INTERPRETER IS STILL ONE COMMAND. sh -c "node
+// util/checks/one.mjs" runs that check as surely as node does, so the reading
+// carries on into it rather than stopping at the first word that is a program.
+func theFileAnInterpreterRuns(words []string) string {
+	for _, w := range words[1:] {
+		w = strings.Trim(w, "'\"")
+		if w == "" || strings.HasPrefix(w, "-") {
+			continue // a flag to the interpreter, and not the file it runs
+		}
+		if strings.Contains(filepath.ToSlash(w), checksDir+"/") {
+			return w
+		}
+		if interprets(strings.ToLower(strings.TrimSuffix(filepath.Base(w), ".exe"))) {
+			continue
+		}
+		return "" // some other program, and what follows is its arguments
+	}
+	return ""
+}
+
 // ATestRunByHand answers whether this command runs the tests itself, inside
 // the tree, and says where to run them instead.
 func ATestRunByHand(command, work string) (string, bool) {
@@ -983,14 +1040,12 @@ func ATestRunByHand(command, work string) (string, bool) {
 			runs = true
 			where = strings.Trim(words[0], "'\"")
 		case interprets(head):
-			// AN INTERPRETER RUNS WHAT IT IS HANDED, so a check among its
-			// arguments is a check about to run.
-			for _, w := range words[1:] {
-				w = strings.Trim(w, "'\"")
-				if strings.Contains(filepath.ToSlash(w), checksDir+"/") {
-					runs = true
-					where = w
-				}
+			// AN INTERPRETER RUNS THE FIRST FILE IT IS HANDED, and a check
+			// after that one is that program's argument rather than a check
+			// about to run.
+			if p := theFileAnInterpreterRuns(words); p != "" {
+				runs = true
+				where = p
 			}
 			// AND EVERY OTHER PROGRAM RUNS NOTHING, whatever it is handed.
 			//
