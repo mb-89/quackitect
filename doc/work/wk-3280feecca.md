@@ -11,8 +11,12 @@ title: claim scopes to agent
 status: open
 # the person's own name for a group. It does not move the work
 bucket: claims
+claimed_by: 7e7f0da1/main
+claimed_at: "2026-09-06T20:05:07Z"
 # true when this waits for a person rather than an agent
-needs_human: true
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 0a657cbc0a661fc2258fe4cb5240b5341f199974
 ---
 
 ## detail
@@ -29,11 +33,16 @@ So the ask is to change what a claim means. That is the owner's to decide, and l
 
 ## proposed action
 
-My best attempt: the owner picks the agent's shape, and one hand lands the one-line pass, a fixture that claims under the actor that will pull, the twelve tests and the chapters in one change. The alternative is to keep the box's shape and answer wk-3fe6395f91 by having the put-down release the claim, which that token's own note calls the riskier half.
+TWO SHAPES WERE OFFERED. The agent's shape means one hand lands the pass, a new fixture, the twelve tests and the chapters together. The box's shape means keeping what the code does, and answering wk-3fe6395f91 with the put-down releasing the claim.
+
+THE SECOND IS WHAT THEY CHOSE. A claim stays the box's. Nothing here is landed and nothing is reddened. wk-3fe6395f91 carries the put-down work.
+
+WHY THE RULING SETTLES IT. The pass would make a claim the agent's, so two hands on one box would contend. They said a box is one actor. Hands inside it are held apart by the holds file, which already works.
 
 ## done when
 
-- the owner has said which shape a claim takes: the box's, as the prose says today, or the agent's, as wk-3fe6395f91 asks
+- the owner has said which shape a claim takes: the box's, as the prose says today, or the agent's, as wk-3fe6395f91 asks. ANSWERED, September 2026, in their words: I count this box as one actor, and the actor is you. So the claim keeps the box's shape. The three chapters stand and the twelve tests are never reddened
+- the three lines below were conditional on the agent's shape, which was not chosen. They do not apply
 - with the agent's shape chosen, TestAPutDownTokenIsNotHandedPastItsClaim is green, decided by go test -run TestAPutDownTokenIsNotHandedPastItsClaim ./ in src/engine
 - the twelve tests that redden are green again, decided by go test -count=1 ./ in src/engine showing no failure the branch tip did not already carry
 - the chapters that say a claim is the box's and not the agent's read the way the code now behaves, decided by reading ClaimedHere and NoClaimHere in src/engine/claim.go and the heading of TestATrackedTokenNeedsAClaimFromThisBox
@@ -44,11 +53,11 @@ My best attempt: the owner picks the agent's shape, and one hand lands the one-l
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | One meaning of a claim, written down, so the next hand does not re-derive it. |  |
+| [x] | what breaks if it is never done, and not only that it stays undone | wk-3fe6395f91 sits behind a question nobody answers, and a hand may land the pass and redden twelve tests. |  |
+| [x] | the ask is small enough to review whole, or it is split first | One question. The work it would have caused belongs to wk-3fe6395f91. |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | The first by the owner's words, recorded here. The other three were conditional. |  |
+| [x] | the basics it stands on exist, or are minted first | The claim, the holds file and wk-3fe6395f91 all exist. |  |
 
 ## evidence: step 2. do
 
@@ -56,9 +65,9 @@ My best attempt: the owner picks the agent's shape, and one hand lands the one-l
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | work-token, read. The token asked one question, and no code was changed next to the answer. |  |
+| [ ] | one test was written first and seen red for the reason expected | Not met, and it cannot be. Keeping the shape the code already has changes nothing to redden. |  |
+| [x] | the same test was seen green after the change, and named | The twelve this would have reddened stay green, because nothing was landed. |  |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | This note. |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | A token of its own: wk-3fe6395f91 carries the put-down releasing the claim. |  |
 
