@@ -23,9 +23,12 @@ import (
 func TestTheBatteryRunsOutsideTheEngine(t *testing.T) {
 	r := aTreeWithABattery(t)
 
+	// STARTING IS NOT PASSING. The run has not happened, so the answer is
+	// pending: neither a pass nor a failure. A caller gating on ok gates on
+	// the outcome, and so does this test.
 	got := startBattery(t.Context(), r, "worker-one", "wk-1")
-	if !got.OK {
-		t.Fatalf("the battery did not start: %s", got.Said)
+	if !got.Pending {
+		t.Fatalf("a started battery did not answer pending: %s", got.Said)
 	}
 	// IT ANSWERED WITHOUT WAITING. The battery this tree carries writes a
 	// verdict and exits; what matters here is that the answer names where the

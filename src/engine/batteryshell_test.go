@@ -73,7 +73,7 @@ func TestTheBatteryRunsOnTheShellGitBrought(t *testing.T) {
 	// THE RUN IS STARTED AND NOT AWAITED, so what is watched here is the run
 	// itself reaching the file the engine pointed at. See battery.go.
 	got := startBattery(t.Context(), r, "worker-one", "")
-	if !got.OK {
+	if !got.Pending {
 		t.Fatalf("the battery did not start: said=%q", got.Said)
 	}
 	going, ok := batteryGoing(r)
