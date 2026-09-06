@@ -168,6 +168,7 @@
 {"id":"wk-aae03d4767","title":"the bar filters rows","process":"","disposition":"","on_branch":"6f811c940dacb3b4e61f05f8f4cd30e74855ae6f"}
 {"id":"wk-ac18ea020a","title":"verdict for wk-fc6b6c5aa7","process":"note","disposition":"dropped","blob":"f8ad478df11ea8d985826a01be0cb3af54d98702","on_branch":"f694302353888200f2589d4ddd413f6e55cc1c4d","tag":"refs/tags/archive/wk-ac18ea020a"}
 {"id":"wk-b13ade88e2","title":"a commit stages itself","process":"","disposition":"","on_branch":"d0077cbe6c521a460740b9f105f6f13f5aaeb8d0"}
+{"id":"wk-b1d1bdcee7","title":"seven rows reach nothing","process":"trivial","disposition":"done","blob":"1218dbcdb509695b9c2655a7dc93ad0adfcad24f","on_branch":"1456dc14f92ed98195ae1ea38c3ae918fa17618a"}
 {"id":"wk-b42c0e9a53","title":"the retro writes checks","process":"","disposition":"","on_branch":"0866281a6587ef85a38a5cbeea969e333699c9f1"}
 {"id":"wk-b42f08ff8d","title":"references carry rights","process":"","disposition":"","on_branch":"90bfa3672232729a52d4f8e8885337e9999106d6"}
 {"id":"wk-b75b6ebff3","title":"notes become tracked tokens","process":"standard","disposition":"done","blob":"7a13301f52722ea638c44c3764985ce0525c9068","on_branch":"e9b95bdc75c9ee693b9193d948622122a0b0b832","tag":"refs/tags/archive/wk-b75b6ebff3"}
