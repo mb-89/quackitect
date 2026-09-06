@@ -643,6 +643,11 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, strin
 	}
 	var out []ran
 	bins := map[string]string{}
+	// WHAT THE BUILD SAID, KEPT BESIDE THE BINARY IT COULD NOT MAKE. The build
+	// runs once a folder, and the second test chosen there was answered from an
+	// empty binary and nothing else. So it named no file and no hand, and which
+	// answer carried the break depended on which test came first.
+	broke := map[string]string{}
 	engine, engineSaid, engineStale, engineKnown := "", "", "", false
 	for _, p := range picks {
 		t := byID[p.ID]
@@ -654,14 +659,15 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, strin
 				b, err := coverBinary(r, db, dir)
 				if err != nil {
 					// A PACKAGE THAT WILL NOT COMPILE IS NO RED. See nored.go.
-					out = append(out, aBuildFailure(r, t.ID, dir, err.Error()))
+					broke[dir] = err.Error()
+					out = append(out, aBuildFailure(r, t.ID, dir, broke[dir]))
 					bins[dir] = ""
 					continue
 				}
 				bin, bins[dir] = b, b
 			}
 			if bin == "" {
-				out = append(out, aBuildFailure(r, t.ID, dir, ""))
+				out = append(out, aBuildFailure(r, t.ID, dir, broke[dir]))
 				continue
 			}
 			if !engineKnown {
@@ -692,9 +698,14 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, strin
 			}
 			cmd := quiet.Quietly(exec.Command(nodeTool(), filepath.Join(r.Work, filepath.FromSlash(t.Path)), r.Method))
 			cmd.Dir = r.Work
-			if engine != "" {
-				cmd.Env = append(os.Environ(), "SE_ENGINE="+engine)
-			}
+			// THE VARIABLE IS SET WHETHER OR NOT ONE WAS NAMED. Set only where
+			// one was, a tree with no engine to hand left the environment alone,
+			// and the child inherited the parent's whole one, SE_ENGINE included.
+			// So a check drove whatever binary an outer run or a person's shell
+			// had left there, while its run said nothing was handed. Cleared, it
+			// drives .bin/se, which is what engine.mjs promises a check with
+			// nothing handed.
+			cmd.Env = append(os.Environ(), "SE_ENGINE="+engine)
 			start := time.Now()
 			said, err := cmd.CombinedOutput()
 			x := ran{ID: t.ID, Kind: t.Kind, OK: err == nil, Seconds: time.Since(start).Seconds(),

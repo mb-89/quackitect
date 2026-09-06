@@ -12,6 +12,14 @@
 // clean copy of the head when the working tree is mid-edit, and reads a
 // package-wide setup failure instead of the token's own answer.
 //
+// AND go build NEVER COMPILES A FILE ENDING IN _test.go, so half the source
+// went unread. sessiontakesmainback_test.go landed calling OpenLog and Yes
+// after both left package main, this check was green over that head, and a
+// clean copy of it answered two undefined errors for every test in the engine.
+// The same cost, in the same place, for the same reason. So go vet runs beside
+// go build: it compiles the test files and reports what the compiler says, and
+// it starts no test binary, so the engine TestMain builds is not built here.
+//
 // So this takes the head as git carries it, into a folder with nothing else in
 // it, and builds the engine there.
 //
@@ -71,6 +79,14 @@ if (read) {
   const said = ((built.stdout ?? "") + (built.stderr ?? "")).trim();
   say("go build ./... in src/engine, over a clean copy of the head", built.status === 0,
     said || "go build could not be run at all: " + String(built.error));
+
+  // THE TEST FILES, WHICH go build LEAVES ALONE. A failure here is a compile
+  // error in a _test.go file, and it is read the same way as the one above.
+  const vetted = spawnSync("go", ["vet", "./..."],
+    { cwd: join(at, "src", "engine"), env, encoding: "utf8" });
+  const vetSaid = ((vetted.stdout ?? "") + (vetted.stderr ?? "")).trim();
+  say("go vet ./... in src/engine, so the test files compile too", vetted.status === 0,
+    vetSaid || "go vet could not be run at all: " + String(vetted.error));
 }
 
 rmSync(at, { recursive: true, force: true });

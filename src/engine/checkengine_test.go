@@ -85,3 +85,38 @@ func TestACheckOverAStaleEngineSaysSo(t *testing.T) {
 		t.Errorf("the advice carries --built, which hands over to the stale build it warns about: %q", runs[0].Engine)
 	}
 }
+
+// A TREE WITH NO ENGINE TO HAND HANDS NONE, AND NOT WHATEVER WAS LYING ABOUT.
+//
+// The check case set the child's environment only where an engine was named.
+// Named none, it left the environment nil, so the child inherited the parent's
+// whole environment, SE_ENGINE included. lib/engine.mjs prefers that variable
+// over .bin/se, so a check drove whatever binary an outer run or a person's
+// shell had left there, while the run's own note said nothing was handed.
+func TestACheckWithNoEngineIsHandedNoStrayOne(t *testing.T) {
+	r, seen := aTreeWithAnEchoingCheck(t)
+	// NO ENGINE SOURCE, SO suiteEngine NAMES NONE. That is the one path where
+	// the check case used to leave the environment alone.
+	if err := os.RemoveAll(filepath.Join(r.Method, "src")); err != nil {
+		t.Fatal(err)
+	}
+	stray := filepath.Join(t.TempDir(), exeName("se.stray"))
+	t.Setenv("SE_ENGINE", stray)
+	tests, picks := echoingCheck()
+
+	runs, _ := runChosen(r, nil, tests, picks)
+	if len(runs) != 1 || !runs[0].OK {
+		t.Fatalf("the check did not run clean: %+v", runs)
+	}
+	handed, err := os.ReadFile(seen)
+	if err != nil {
+		t.Fatalf("the check wrote nothing about its engine: %v", err)
+	}
+	if string(handed) != "" {
+		t.Fatalf("the check was handed %q, and this tree has no engine to hand", handed)
+	}
+	// AND THE NOTE SAYS SO OUTRIGHT, rather than trailing off after handed.
+	if !strings.Contains(runs[0].Engine, "no engine") {
+		t.Fatalf("the run does not say this tree carries no engine: %q", runs[0].Engine)
+	}
+}

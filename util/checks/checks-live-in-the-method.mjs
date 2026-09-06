@@ -107,12 +107,39 @@ if (top === "" || !sameFolder(top, root)) {
 // THE SET IS THE FOLDER, so the folder is what is walked. battery.sh is not a
 // check and names itself nowhere in its own list.
 const named = new Set(listed);
+
+// A CHECK CAN BE OUT ON PURPOSE, AND THE BATTERY NAMES IT WITH ITS TOKEN.
+//
+// One of them lands red over this branch for a reason a person has to settle,
+// and a red check in the battery is a wall every agent waits behind. Left
+// simply unlisted it reads like one somebody forgot to write in, which is what
+// this file reported and what nobody could act on. So the battery declares it
+// out beside the token that holds it out, and a declaration with no token, or
+// one naming a check the folder does not hold, is itself a failure.
+const held = new Map(
+  [...text.matchAll(/^out="([^"]*)"$/gm)]
+    .flatMap((m) => m[1].trim().split(/\s+/))
+    .filter(Boolean)
+    .map((one) => one.split(":")),
+);
+for (const [name, token] of held) {
+  say("the battery says which token holds " + name + " out",
+    /^wk-[0-9a-f]{10}$/.test(token ?? ""),
+    "it is declared out as \"" + name + ":" + (token ?? "") + "\", and an entry names "
+    + "the check and the token that holds it out, as name:wk-0123456789");
+  say(name + " is in util/checks", existsSync(join(root, "util", "checks", name + ".mjs")),
+    "the battery holds it out and util/checks does not hold it, so the "
+    + "declaration outlived the check");
+  say(name + " is out or run, never both", !named.has(name),
+    "the battery both lists it and declares it out, so what it means to do "
+    + "with it is decided by whichever half a reader reaches first");
+}
 const onDisk = readdirSync(join(root, "util", "checks"))
   .filter((f) => f.endsWith(".mjs"))
   .map((f) => f.slice(0, -".mjs".length));
 say("util/checks holds checks to run (" + onDisk.length + ")", onDisk.length > 0,
   "the folder holds no .mjs at all, so this half has nothing to judge");
-const unlisted = onDisk.filter((c) => !named.has(c));
+const unlisted = onDisk.filter((c) => !named.has(c) && !held.has(c));
 say("the battery runs every check in util/checks", unlisted.length === 0,
   unlisted.join(", ") + " sits in util/checks and the battery never names it, "
   + "so it is a check nobody runs");
