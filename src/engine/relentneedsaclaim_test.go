@@ -78,8 +78,9 @@ func TestAClaimGrantsOneStopAndThePullSpendsIt(t *testing.T) {
 	}
 	stop() // the first of the session, granted on its own rule
 
-	// A CLAIM GRANTS THE STOP. The token above was minted and never taken up, so
-	// nothing is in this agent's hands and the engine has nothing to argue with.
+	// A CLAIM GRANTS THE STOP, and a standing claim naming one of the five
+	// reasons is the whole of it. decideStop grants it outright; the only claim
+	// it judges again at the stop is blocked, against the record.
 	if err := ClaimStop(r, "main", "asked", "they told me to"); err != nil {
 		t.Fatal(err)
 	}

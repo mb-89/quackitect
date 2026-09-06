@@ -154,8 +154,9 @@ func TestABlockedClaimStandsWhenTheQueueIsEmpty(t *testing.T) {
 	if err := ClaimStop(r, "main", "blocked", "the queue is dry"); err != nil {
 		t.Fatal(err)
 	}
-	// NOTHING IS HELD AND NOTHING IS OFFERED, so the engine has nothing to argue
-	// with and the claim that names the reason is the stop.
+	// NOTHING IS HELD AND NOTHING IS OFFERED, which is both halves of the
+	// evidence blocked is judged on, so the claim is still true at the stop and
+	// BlockedIsFalse has nothing to refuse it with.
 	if out := hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work}); out != "" {
 		t.Fatalf("a true blocked claim with a dry queue was refused: %s", out)
 	}
