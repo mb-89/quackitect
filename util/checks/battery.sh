@@ -377,11 +377,9 @@ start "go test engine" engine_tests '.*'
 start "go test mcp" go test -C src/mcp -count=1 ./...
 start "go test viewer" go test -C src/viewer -count=1 ./...
 start "go test setup" go test -C util/setup -count=1 ./...
-# THE TOOLS THE GO GUIDANCE NAMES, RUN HERE RATHER THAN REMEMBERED. gofmt is
-# no longer among them. se lint reads the shape of every folder carrying a
-# go.mod, which is the same five this passed by name, so a file the formatter
-# would rewrite is a finding there and running it here asked twice.
-# AND go vet IS NOT RUN HERE, BECAUSE se lint RUNS IT.
+# THE TOOLS THE GO GUIDANCE NAMES, RUN HERE RATHER THAN REMEMBERED.
+#
+# go vet IS NOT RUN HERE, BECAUSE se lint RUNS IT.
 #
 # The Go tools went behind the verb and these lines stayed where they were, so
 # go vet ran over four modules and then se lint ran it over every module
@@ -389,11 +387,14 @@ start "go test setup" go test -C util/setup -count=1 ./...
 # own default rules. Nothing was learned on the second pass, and the battery is
 # a wall agents wait behind.
 #
-# gofmt STAYS, AND THAT IS MEASURED. se lint runs go vet and golangci-lint, and
-# neither formats. golangci-lint enables errcheck, govet, ineffassign,
-# staticcheck and unused by default, with no formatter among them. So gofmt
-# runs once here and nowhere else, and taking this line out would lose the only
-# formatting guard rather than stop a second pass.
+# AND gofmt IS NOT RUN HERE EITHER, ONCE se lint LEARNED TO READ IT. It stayed
+# behind when the vet lines went, and the reason was measured: se lint ran go
+# vet and golangci-lint and neither formats, golangci-lint enabling errcheck,
+# govet, ineffassign, staticcheck and unused by default with no formatter among
+# them. So gofmt was the only formatting guard and this was the only place it
+# ran. se lint now reads the shape of every folder carrying a go.mod, which is
+# the same five this line passed by name, so the guard is behind the verb and
+# this line would be the second pass.
 start "se lint" .bin/se.exe lint
 # A CHECK THAT IS NOT THERE IS A FAILURE, NOT A SKIP.
 #
