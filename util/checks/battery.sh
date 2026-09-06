@@ -297,41 +297,6 @@ else
   exit 1
 fi
 
-# gofmt_clean fails when gofmt would change anything, and says what.
-#
-# THE LINE ENDING IS NOT A FORMATTING FINDING. This checkout converts line
-# endings on the way out, so a file can carry a carriage return that the
-# index does not, and gofmt reports every such file as one it would change.
-# Each file is read with the carriage returns taken off, so what is judged is
-# what git holds and what the formatter cares about.
-gofmt_clean() {
-  # ONE PROCESS OVER THE TREE FIRST. A pass per file cost forty seconds
-  # under the battery's load, for a question gofmt answers in one.
-  #
-  # THE LIST IS NOT CALLED bad, BECAUSE THE BATTERY'S COUNTER IS. A shell
-  # function shares the script's variables, so while this held its findings in
-  # a name the counter already had, the only thing keeping the count safe was
-  # that gofmt runs through start, in a background subshell, where an
-  # assignment cannot reach the parent. Move this to the run lane, where the
-  # build and engine-up lanes already sit, and the battery's tally of failures
-  # is quietly set to the empty string on every run.
-  unformatted=""
-  for f in $(gofmt -l "$@"); do
-    # A file gofmt names may be one that only carries carriage returns, so
-    # it is asked again with them taken off, and only that answer counts.
-    if [ -n "$(tr -d '\r' <"$f" | gofmt -l)" ]; then
-      unformatted="$unformatted$f
-"
-    fi
-  done
-  if [ -n "$unformatted" ]; then
-    printf '%s' "$unformatted"
-    echo "gofmt would change the files above"
-    return 1
-  fi
-  echo "gofmt has nothing to change"
-}
-
 # THE BUILD GOES FIRST AND ALONE. Every check after it reads .bin/se.exe or the
 # sources it just compiled, so this is the one that cannot overlap.
 run "go build" build
@@ -412,10 +377,10 @@ start "go test engine" engine_tests '.*'
 start "go test mcp" go test -C src/mcp -count=1 ./...
 start "go test viewer" go test -C src/viewer -count=1 ./...
 start "go test setup" go test -C util/setup -count=1 ./...
-# THE TOOLS THE GO GUIDANCE NAMES, RUN HERE RATHER THAN REMEMBERED. gofmt
-# prints the files it would change and exits zero either way, so the check is
-# that it printed nothing.
-start "gofmt" gofmt_clean src/engine src/mcp src/viewer util/setup util/checks/trycmd
+# THE TOOLS THE GO GUIDANCE NAMES, RUN HERE RATHER THAN REMEMBERED. gofmt is
+# no longer among them. se lint reads the shape of every folder carrying a
+# go.mod, which is the same five this passed by name, so a file the formatter
+# would rewrite is a finding there and running it here asked twice.
 # AND go vet IS NOT RUN HERE, BECAUSE se lint RUNS IT.
 #
 # The Go tools went behind the verb and these lines stayed where they were, so

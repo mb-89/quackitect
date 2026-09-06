@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"flag"
 	"fmt"
 	"io/fs"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"quackitect/engine/internal/quiet"
@@ -94,6 +96,22 @@ func theProgramSaid(ctx context.Context, dir, program string, args ...string) (s
 	return string(said), err == nil
 }
 
+// theProgramSaidAbout is theProgramSaid with something on standard input,
+// which is how one file is asked about without the file being touched.
+func theProgramSaidAbout(ctx context.Context, dir string, in []byte, program string, args ...string) (string, bool) {
+	if ctx == nil {
+		ctx = context.Background()
+	}
+	ctx, stop := context.WithTimeout(ctx, theToolCeiling)
+	defer stop()
+	cmd := quiet.Quietly(exec.CommandContext(ctx, program, args...))
+	cmd.Dir = dir
+	cmd.Env = buildEnv()
+	cmd.Stdin = bytes.NewReader(in)
+	said, err := cmd.CombinedOutput()
+	return string(said), err == nil
+}
+
 // FormatGo formats every Go module under the method root, and answers what
 // each run changed or why it could not.
 func FormatGo(ctx context.Context, method string) []Formatted {
@@ -177,6 +195,76 @@ func aToolFinding(dir, line string) (Finding, bool) {
 	return Finding{ID: at, Title: dir, Says: strings.TrimSpace(says), File: at, Line: n}, true
 }
 
+// theFormatterWouldChange names every file gofmt would rewrite, and writes
+// nothing.
+//
+// gofmt WAS THE LAST GO TOOL THE LINT DID NOT COVER. The four go vet lines
+// came out of the battery because LintGo already runs vet over every module,
+// so the second pass learned nothing. This is not that case. golangci-lint
+// answered version two point five point zero here, its default set is
+// errcheck, govet, ineffassign, staticcheck and unused, and no formatter is
+// among them. The tree carries no golangci config adding one. So a crooked
+// file was reported by the battery and by nothing else.
+//
+// THE READING HALF ONLY. se format writes such a file, and a check does not
+// change the tree it judges, so this runs gofmt with -l and never -w.
+//
+// THE LINE ENDING IS NOT A FORMATTING FINDING. A checkout that converts line
+// endings leaves a carriage return the index does not carry, and gofmt names
+// every such file. Each name is asked again with the carriage returns taken
+// off, and only that answer counts. That is the rule the battery kept, moved
+// here with the line it replaces.
+func theFormatterWouldChange(ctx context.Context, r Roots) ([]Finding, []string) {
+	modules := TheGoModules(r.Method)
+	if len(modules) == 0 {
+		return nil, nil
+	}
+	if _, err := exec.LookPath("gofmt"); err != nil {
+		return nil, []string{theProgramIsMissing("gofmt",
+			"It comes with the Go toolchain, so a box that can build this tree has it: install Go.")}
+	}
+	var found []Finding
+	var refused []string
+	for _, dir := range modules {
+		over := shortened(r.Method, dir)
+		said, ok := theProgramSaid(ctx, dir, "gofmt", "-l", ".")
+		if !ok {
+			refused = append(refused, "gofmt would not read "+over+
+				", so nothing there was judged for its shape: "+theFirstLine(said))
+			continue
+		}
+		for _, line := range strings.Split(said, "\n") {
+			name := strings.TrimPrefix(strings.TrimSpace(line), "./")
+			if name == "" {
+				continue
+			}
+			if !stillCrookedWithoutReturns(ctx, dir, filepath.Join(dir, filepath.FromSlash(name))) {
+				continue
+			}
+			at := filepath.ToSlash(filepath.Join(over, name))
+			found = append(found, Finding{ID: at, Title: over, File: at,
+				Says: "gofmt would rewrite this file, so its shape is not the one " +
+					"the tools agree on. Run se format"})
+		}
+	}
+	return found, refused
+}
+
+// stillCrookedWithoutReturns asks gofmt about one file with its carriage
+// returns taken off, which is what git holds and what the formatter cares
+// about. A file that cannot be read stands as gofmt named it.
+func stillCrookedWithoutReturns(ctx context.Context, dir, path string) bool {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return true
+	}
+	said, ok := theProgramSaidAbout(ctx, dir, bytes.ReplaceAll(b, []byte("\r"), nil), "gofmt", "-l")
+	if !ok {
+		return true
+	}
+	return strings.TrimSpace(said) != ""
+}
+
 // LintGo names what the Go tools find, and says which of them did not run.
 //
 // A TOOL THAT ENDED BADLY AND NAMED NOTHING IS A REFUSAL. golangci-lint built
@@ -214,6 +302,11 @@ func LintGo(ctx context.Context, r Roots) ([]Finding, []string) {
 			}
 		}
 	}
+	// AND THE SHAPE, WHICH NO LINTER HERE READS. gofmt is the last Go tool
+	// the verb did not cover, and the battery ran it for want of this.
+	shape, shapeRefused := theFormatterWouldChange(ctx, r)
+	found = append(found, shape...)
+	refused = append(refused, shapeRefused...)
 	return found, refused
 }
 
