@@ -29,7 +29,7 @@ reason: "Pass. The comparison was the fault and the change fixes the comparison.
 
 The panel draws the main session twice: orchestrator-mb and main, both holding wk-e51c579664. One process, two rows.
 
-THE LINK IS WRITTEN AND THE RECONCILIATION IGNORES IT. actors.json carries main to orchestrator-mb, and the register holds one session row named main. AgentsPresent in src/engine/doing.go:251 draws that row under the last alias, orchestrator-mb. The token is held under main. WhatIsHappening then walks the actors at work and compares p.Actor to d.Actor. That is one drawn name against one holding name. They differ, so it appends a second row for main.
+THE LINK IS WRITTEN AND THE RECONCILIATION IGNORES IT. actors.json carries main to orchestrator-mb, and the register holds one session row named main. AgentsPresent in src/engine/doing.go:251 draws that row under the last alias, orchestrator-mb. The record files the hold under main. WhatIsHappening then walks the actors at work and compares p.Actor to d.Actor. That is one drawn name against one holding name. They differ, so it appends a second row for main.
 
 The comparison is the fault, not the link. A row answers to every name in its alias list, and the loop asks about one. Anything counting rows counts a hand that is not there.
 
