@@ -354,3 +354,4 @@
 {"id":"wk-03303bac3f","title":"door does not travel","process":"trivial","disposition":"done","blob":"54a18e8f4c3273818cb4a1993bace563f1b94257"}
 {"id":"wk-e921b763af","title":"door name spans packages","process":"trivial","disposition":"dropped","blob":"b583c3944852c1a7db40cb2e431d203e92e9b7ca"}
 {"id":"wk-a51e43a0a9","title":"twin bash is unguarded","process":"trivial","disposition":"done","blob":"506437b56b14bfabdaa65aa74e181ef855d1c1b7","on_branch":"482876efaa1f889282ca609e673aa5fb78530ec7"}
+{"id":"wk-a70741151a","title":"criteria name untouched files","process":"trivial","disposition":"done","blob":"43b004ef9c0c2b0b3cc22cc25b805606729f6db6","on_branch":"c1a8e84080de0dc0ae2bd3a3112f382087cedc81"}
