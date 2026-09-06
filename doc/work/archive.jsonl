@@ -14,7 +14,6 @@
 {"id":"wk-5c682f1a25","title":"A close gates nothing","process":"standard","disposition":"done","blob":"1ca5288b5294617cbdd932628dc00016c582d755","on_branch":"58b6045a3e0d343363bc23d73bada644feb5ad5f"}
 {"id":"wk-5d144a5ec0","title":"mapped tests run plain","process":"standard","disposition":"done","blob":"9a8e316c8a58bf4e829c498fe2359d81affa54c6","on_branch":"5ec2f86cd40a26d344248b9f838dc71ba8bf1ab5"}
 {"id":"wk-5d6703a050","title":"filter landing says depth","process":"trivial","disposition":"done","blob":"1cf5a0e7df4f70782ff6222e844893203c08abc7"}
-{"id":"wk-6741a3e30a","title":"two hold shapes left","process":"trivial","disposition":"done","blob":"de66940b2fd9551be451668a0db104384d2e184f","on_branch":"e69e7d3b0272ba38870e28d77330ced7d3153336"}
 {"id":"wk-72855641bd","title":"util/setup tests are tables","process":"standard","disposition":"done","blob":"72fe1df7e9ba2817b89edbdfa7760cd7bbf7f6fe","on_branch":"b299e258b32f8e082b43096c01c4991acaaaeb71"}
 {"id":"wk-75c9fd102b","title":"Queue offers held work","process":"standard","disposition":"done","blob":"8218ae811297b76a941420571f355f65d1976209","on_branch":"68608ae0e6e90516502127924e931ac8cc28bdcc"}
 {"id":"wk-7d2d36115f","title":"stranded ids in notes","process":"trivial","disposition":"became","blob":"8e918b46e74f628b81fab6055bd493854e49aa56","on_branch":"96b243f707da9bba821494cd2eb696c819e25b30"}
