@@ -22,7 +22,7 @@ How a test is built is [[testing]].
 
 ## Writing one
 
-1. Write the problem in detail and the answer in proposed action, reduced to the smallest case that still shows it. The detail answers what is gained by doing it, and what breaks if it is never done. *
+1. Write the problem in detail and the answer in proposed action, reduced to the smallest case that still shows it. *
 2. Write acceptance criteria first. A criterion is decidable, names the input, the answer and what survives, and is not a plan. *
 3. Where a command decides a criterion, write the command and run it from the root before submitting. Otherwise name who looks at what. *
 4. Match on what the check holds at run time: a whole identifier written once into both halves, or a length as a number. *
@@ -47,16 +47,13 @@ How a test is built is [[testing]].
 
 The sections are separate so a reader can disagree with the answer while still believing the problem.
 Keep the argument out of it: no history, no measurement of the record, no account of who said what.
-Write the smallest case that still shows the problem.
 
 A detail says what has to become true and names the constraint.
 Where the write goes is the worker's decision.
 Before a detail names a file and a line, run the tree's checks against it on a copy.
 
-A tracked token spends real work, so the ask answers why the work is worth it.
-What is gained by doing it, and what breaks if it is never done.
+A tracked token spends real work, so the ask says what is gained and what breaks if nobody does it.
 Both fail the same way, by restating the ask, so each carries evidence beside it.
-The note process has asked this from the beginning, and the tracked ask asks it now.
 
 ## 2. A criterion that cannot fail
 
@@ -66,8 +63,6 @@ Shapes seen here:
 - a class name nothing writes
 - a rule enforced in one language and checked in another
 - a word list built from cases already found
-
-So criteria are written first, each naming the input, the answer, and what has to survive.
 
 A criterion answering with a system verb states the effect as field and value, because a branch can perform it inline and stay green.
 A detail borrowing another component's syntax borrows its rulings on wrong input too.
@@ -83,13 +78,12 @@ A draft obeys the class it commits, and names a walk the tree already has rather
 ## 4. What a check may match on
 
 A two-part guard pairing a search for a definition with a run of the test, naming different symbols, fails shut.
-So the identifier is written once into both halves, and the guard is run against the artefact before submitting.
+So the guard is run against the artefact before submitting.
 A boundary in what the check cannot hold falls to a prefix that never fails, so a length is a number.
 Rendered text is no handle: a template holds no text to match, so the durable handle is the producer's name.
 
 ## 5. Every item the detail names
 
-Number what the change does and put a criterion against each.
 On a rewrite, add a delete criterion for every sentence the detail calls the problem.
 A scope decision once moved work away in prose while three criteria still asked for it.
 Move the criteria first, then write the sentence saying where they went.
@@ -98,12 +92,11 @@ A spike closes on its own numbered questions, including those it declines, and a
 ## 9. Basics first
 
 The basics look self-evident, so nobody writes them down, and the gap is found after the feature.
-Before a feature is worked, its detail names what it stands on, and each missing basic is minted first.
 
 ## 10. Tracked is claimable
 
 A note is private, because nobody has decided what it is yet.
-Everything else is tracked or local, and the minter says which: there is no default.
+The minter says which, and there is no default.
 Tracked is doc/work, which git carries, so another box can claim it.
 Local is .se/work, which nothing else reaches.
 The question is who can pick it up, not how big it is.
@@ -123,15 +116,12 @@ A question costs a turn, and a guess at an ambiguous ask costs the work and the 
 A check that arrives green has proved nothing about the defect.
 Watched going red for the reason expected, it proves the defect was there and the check can see it.
 One that cannot be made red is a finding about the criterion, and it goes on the token first.
-So the red is recorded per criterion.
-Each names the test its criterion runs, its message matches an assertion in the tree, and a split-out criterion earns a fresh red.
+So each criterion's red names the test it runs, its message matches an assertion in the tree, and a split-out criterion earns a fresh red.
 
 A build failure is not that red.
-The package is Go's compilation unit, and many hands share this tree.
-An identifier a half-finished change has not defined yet fails every test file beside it.
-So a failing check lands with the identifiers it names, as stubs, and the package still builds while the assertion fails.
-The engine holds the same line.
-A package that will not compile answers as a build, and it names the hand whose file the error names.
+The package is Go's compilation unit and many hands share this tree, so one half-finished change reddens every test file at once.
+So a failing check lands with the identifiers it names, as stubs.
+Why the engine answers such a package as a build, and names the hand that wrote it, is [[workers-share-one-tree]].
 
 ## 13. Half a mechanism ships
 
@@ -139,13 +129,11 @@ A detail names two parts and says neither is enough alone.
 The producing half is built and evidenced, the checking half is not, and nothing looks wrong until it is.
 Ask which half has no output: that is the one that will be missing.
 A rule taught to one half of a mirrored pair is the same defect.
-So the halves are written down where the system declares them, and the rule is driven through each.
 A field the second half ignores is refused rather than accepted.
 
 ## 14. Evidence
 
 An observation names the check and what it said, never a line number, because a line moves and a check can be run again.
-Work reported done without its evidence is a claim the record cannot check.
 A number carries the command that produced it, written beside it as it is taken.
 Both halves of a ratio come from the one instrument the code reads, and a half that cannot says so beside the number.
 A reading pins to a commit, never to the word today.
