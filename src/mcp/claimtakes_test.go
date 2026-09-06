@@ -18,18 +18,26 @@ import (
 // changes when the engine warms up.
 func TestTheLaneOffersTheTakeTheRefusalNames(t *testing.T) {
 	t.Parallel()
-	if !offersTake(t, schemaOf(claimArgs{})) {
-		t.Error("se_claim does not offer take, and the refusal an agent reads names it")
-	}
-
 	claim, offered := byName(coldDoor(t))["se_claim"]
 	if !offered {
 		t.Fatal("the cold door offers no se_claim at all")
 	}
 	cold, _ := claim["inputSchema"].(map[string]any)
-	if !offersTake(t, cold) {
-		t.Error("the cold door does not offer take. Rewrite it: " +
-			".bin/se-mcp --tools > util/cage/tools.json")
+
+	for _, c := range []struct {
+		name   string
+		schema map[string]any
+		fix    string
+	}{
+		{"the lane builds its schema off the request struct", schemaOf(claimArgs{}), ""},
+		{"the cold door is shown before the lane is built", cold,
+			" Rewrite it: .bin/se-mcp --tools > util/cage/tools.json"},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			if !offersTake(t, c.schema) {
+				t.Errorf("se_claim does not offer take here, and the refusal an agent reads names it.%s", c.fix)
+			}
+		})
 	}
 }
 
@@ -39,30 +47,54 @@ func TestTheLaneOffersTheTakeTheRefusalNames(t *testing.T) {
 // which is the half that has no output of its own and would have been missed.
 func TestTheLaneCallCarriesTake(t *testing.T) {
 	t.Parallel()
-	argv, refusal := claimArgv(claimArgs{Actor: "worker-one", These: []string{"wk-aa"}, Take: true})
-	if refusal != "" {
-		t.Fatalf("claiming one token with take was refused: %s", refusal)
-	}
-	if !carries(argv, "--take") {
-		t.Errorf("the call drops the take the door offers: %v", argv)
-	}
-	if !carries(argv, "--these") || !carries(argv, "wk-aa") {
-		t.Errorf("the call does not name the token to claim: %v", argv)
-	}
+	for _, c := range []struct {
+		name  string
+		args  claimArgs
+		takes bool
+		names []string
+	}{
+		{
+			"claiming one token and taking it up",
+			claimArgs{Actor: "worker-one", These: []string{"wk-aa"}, Take: true},
+			true,
+			[]string{"--these", "wk-aa"},
+		},
 
-	// AND NOTHING ELSE GAINS IT. A claim that was not asked to take up must not
-	// start work the caller did not ask for.
-	plain, _ := claimArgv(claimArgs{Actor: "worker-one", These: []string{"wk-aa"}})
-	if carries(plain, "--take") {
-		t.Errorf("a claim that asked for no take-up takes one up: %v", plain)
-	}
-	listed, _ := claimArgv(claimArgs{Actor: "worker-one", List: true, Take: true})
-	if carries(listed, "--take") {
-		t.Errorf("listing what is claimed takes a token up: %v", listed)
-	}
-	givenBack, _ := claimArgv(claimArgs{Actor: "worker-one", These: []string{"wk-aa"}, Release: true, Take: true})
-	if carries(givenBack, "--take") {
-		t.Errorf("giving work back takes it up again: %v", givenBack)
+		// AND NOTHING ELSE GAINS IT. A claim that was not asked to take up must
+		// not start work the caller did not ask for.
+		{
+			"a claim that asked for no take-up",
+			claimArgs{Actor: "worker-one", These: []string{"wk-aa"}},
+			false,
+			nil,
+		},
+		{
+			"listing what is claimed",
+			claimArgs{Actor: "worker-one", List: true, Take: true},
+			false,
+			nil,
+		},
+		{
+			"giving work back",
+			claimArgs{Actor: "worker-one", These: []string{"wk-aa"}, Release: true, Take: true},
+			false,
+			nil,
+		},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			argv, refusal := claimArgv(c.args)
+			if refusal != "" {
+				t.Fatalf("the call was refused: %s", refusal)
+			}
+			if carries(argv, "--take") != c.takes {
+				t.Errorf("the call carries --take against the %v this case asks for: %v", c.takes, argv)
+			}
+			for _, want := range c.names {
+				if !carries(argv, want) {
+					t.Errorf("the call does not name %q, so it does not say what to claim: %v", want, argv)
+				}
+			}
+		})
 	}
 }
 

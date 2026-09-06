@@ -12,18 +12,25 @@ import "testing"
 // nothing read this call at all.
 func TestTheLaneCallCarriesNeedsHuman(t *testing.T) {
 	t.Parallel()
-	flagged := workArgv(workArgs{Title: "one a person reads", Actor: "worker-one", NeedsHuman: true})
-	if !carries(flagged, "--needs-human") {
-		t.Errorf("the call drops the needs_human the door offers: %v", flagged)
-	}
-	if !carries(flagged, "--title") || !carries(flagged, "one a person reads") {
-		t.Errorf("the call does not say what the token is: %v", flagged)
-	}
+	for _, c := range []struct {
+		name  string
+		args  workArgs
+		flags bool
+	}{
+		{"a token a person reads first", workArgs{Title: "one a person reads", Actor: "worker-one", NeedsHuman: true}, true},
 
-	// AND NOTHING ELSE GAINS IT. A token nobody flagged must not land where a
-	// person is asked to read it first, or the flag says nothing.
-	plain := workArgv(workArgs{Title: "an ordinary token", Actor: "worker-one"})
-	if carries(plain, "--needs-human") {
-		t.Errorf("a mint that asked for no flag flags the token anyway: %v", plain)
+		// AND NOTHING ELSE GAINS IT. A token nobody flagged must not land where
+		// a person is asked to read it first, or the flag says nothing.
+		{"an ordinary token", workArgs{Title: "an ordinary token", Actor: "worker-one"}, false},
+	} {
+		t.Run(c.name, func(t *testing.T) {
+			argv := workArgv(c.args)
+			if carries(argv, "--needs-human") != c.flags {
+				t.Errorf("the call carries --needs-human against the %v the door asked: %v", c.flags, argv)
+			}
+			if !carries(argv, "--title") || !carries(argv, c.args.Title) {
+				t.Errorf("the call does not say what the token is: %v", argv)
+			}
+		})
 	}
 }
