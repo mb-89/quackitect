@@ -11,13 +11,16 @@ title: clone lags archived tokens
 status: open
 # the person's own name for a group. It does not move the work
 bucket: claims
-# true when this waits for a person rather than an agent
-needs_human: true
 claimed_by: 7e7f0da1/main
 claimed_at: "2026-09-06T16:40:35Z"
+# true when this waits for a person rather than an agent
+needs_human: true
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - fb425564bd8fc188a9d66ed0f425232bb908706b
+# the tree each time the work was put down or closed, snapshots the engine wrote
+ended:
+  - 61e49b3014fae35a3cf515f0a51aeaeff568404a
 ---
 
 ## detail
