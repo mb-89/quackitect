@@ -22,6 +22,7 @@
 {"id":"wk-4a202976eb","title":"bugs stay in bucket","process":"trivial","disposition":"done","blob":"7472a55154c90389f945d926df7561b716bf9a1a","on_branch":"0b9c975cf3b62712d56705adce2b5d865a1eec83"}
 {"id":"wk-4ae19a7f0d","title":"same session gives verdict","process":"trivial","disposition":"done","blob":"c3dc8711f725c028fb1edb29e51eb158822ced23","on_branch":"25d909d4a7ea3829da2e963dbab545bbd2e1e7b1"}
 {"id":"wk-4fbce27e2e","title":"lint reads prose held","process":"trivial","disposition":"done","blob":"0242ac2c355e0dff52464125085fecf9097be307","on_branch":"c2be7bab70f8e6c24f0256bee55a0d06768b6dea"}
+{"id":"wk-515db08221","title":"stop and pull disagree","process":"trivial","disposition":"done","blob":"4993bdbcf29231c6e71669627ddbcb7fe9815712"}
 {"id":"wk-5bba8e497a","title":"ready_when leaves the queue","process":"standard","disposition":"done","blob":"55a406445cbdeeb64a190a3babb95da7a79b710d","on_branch":"732b7300e6b8273ea97f98c0886b360056174af8"}
 {"id":"wk-5c682f1a25","title":"A close gates nothing","process":"standard","disposition":"done","blob":"1ca5288b5294617cbdd932628dc00016c582d755","on_branch":"58b6045a3e0d343363bc23d73bada644feb5ad5f"}
 {"id":"wk-5d144a5ec0","title":"mapped tests run plain","process":"standard","disposition":"done","blob":"9a8e316c8a58bf4e829c498fe2359d81affa54c6","on_branch":"5ec2f86cd40a26d344248b9f838dc71ba8bf1ab5"}
