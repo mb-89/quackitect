@@ -739,6 +739,17 @@ func main() {
 			here.Beat = time.Now().UTC().Format(time.RFC3339)
 			SayRunning(roots, here)
 
+			// AND A HAND THAT ENDED WHILE THIS ENGINE WAS UP. The sweep above
+			// runs on a start, and an engine that stays up all day never
+			// reaches another one. So a hold behind an agent that ended sat
+			// there until somebody pulled and was sent to look, and answering
+			// that look cost the walker its pull. See goneputsdown.go.
+			if back := SweepOnTheBeat(roots, beats); len(back) > 0 {
+				log.Write("engine", "work", "engine",
+					"work held by agents that are gone went back to the queue", sessionlog.Yes(),
+					map[string]any{"put_down": back})
+			}
+
 			// AN ENGINE OUTLIVES THE BUILD IT CAME FROM. Installing replaces
 			// the program on disk and leaves this process running the code it
 			// started with, and this process is the one writing the
