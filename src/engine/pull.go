@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"quackitect/engine/internal/quiet"
+	"quackitect/engine/internal/sessionlog"
 	"runtime"
 	"sort"
 	"strings"
@@ -205,7 +206,7 @@ func ownVerdictOffTheHand(r Roots, actor, role string) (string, *Answer) {
 			continue
 		}
 		inSession(r, "work", actor, t.ID+" put back: its next step is a verdict, and the verdict is never the author's",
-			Yes(), map[string]any{"id": t.ID})
+			sessionlog.Yes(), map[string]any{"id": t.ID})
 		down = append(down, t.ID)
 		if own == nil {
 			first := t
@@ -256,7 +257,7 @@ func whatComesNext(r Roots, actor, role string) Answer {
 }
 
 func currentSession(r Roots) string {
-	return sessionOf(filepath.Join(r.Private("log"), Current))
+	return sessionlog.SessionOf(filepath.Join(r.Private("log"), sessionlog.Current))
 }
 
 // settle applies a payload. It returns done=false when the payload was
@@ -1150,6 +1151,6 @@ func PutDown(r Roots, id, actor string) (Token, error) {
 	if err := SaveToken(r, t); err != nil {
 		return t, err
 	}
-	inSession(r, "work", actor, t.ID+" put down", Yes(), map[string]any{"id": t.ID})
+	inSession(r, "work", actor, t.ID+" put down", sessionlog.Yes(), map[string]any{"id": t.ID})
 	return t, nil
 }

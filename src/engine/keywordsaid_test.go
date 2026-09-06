@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -32,7 +33,7 @@ func valueOf(t *testing.T, r Roots, key string) any {
 
 // heardHere plays one message through the route the harness uses for a message
 // written into a running turn. Nothing is relayed by the agent.
-func heardHere(t *testing.T, r Roots, l *Log, said string) {
+func heardHere(t *testing.T, r Roots, l *sessionlog.Log, said string) {
 	t.Helper()
 	path := filepath.Join(t.TempDir(), "session.jsonl")
 	os.WriteFile(path, nil, 0o644)
@@ -49,7 +50,7 @@ func heardHere(t *testing.T, r Roots, l *Log, said string) {
 func TestAMessageThatIsOnlyTheKeywordMovesTheControl(t *testing.T) {
 	t.Parallel()
 	r := aConsoleTree(t)
-	l, _ := OpenLog(r.Private("log"))
+	l, _ := sessionlog.Open(r.Private("log"))
 	defer l.Close()
 
 	if valueOf(t, r, "guards.search_via_index") != true {
@@ -66,7 +67,7 @@ func TestAMessageThatIsOnlyTheKeywordMovesTheControl(t *testing.T) {
 func TestTheKeywordInsideASentenceMovesNothing(t *testing.T) {
 	t.Parallel()
 	r := aConsoleTree(t)
-	l, _ := OpenLog(r.Private("log"))
+	l, _ := sessionlog.Open(r.Private("log"))
 	defer l.Close()
 
 	heardHere(t, r, l, "please turn search via index off for me")
@@ -79,7 +80,7 @@ func TestTheKeywordInsideASentenceMovesNothing(t *testing.T) {
 func TestAnUnflaggedControlHasNoKeyword(t *testing.T) {
 	t.Parallel()
 	r := aConsoleTree(t)
-	l, _ := OpenLog(r.Private("log"))
+	l, _ := sessionlog.Open(r.Private("log"))
 	defer l.Close()
 
 	heardHere(t, r, l, "stop needs claim")
@@ -93,11 +94,11 @@ func TestAnUnflaggedControlHasNoKeyword(t *testing.T) {
 func TestTheChangeNamesTheKeywordAndWhatItMoved(t *testing.T) {
 	t.Parallel()
 	r := aConsoleTree(t)
-	l, _ := OpenLog(r.Private("log"))
+	l, _ := sessionlog.Open(r.Private("log"))
 	heardHere(t, r, l, "search via index")
 	l.Close()
 
-	b, err := os.ReadFile(filepath.Join(r.Private("log"), Current))
+	b, err := os.ReadFile(filepath.Join(r.Private("log"), sessionlog.Current))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -130,7 +131,7 @@ func TestTheChangeNamesTheKeywordAndWhatItMoved(t *testing.T) {
 func TestAKeywordAnAgentWritesMovesNothing(t *testing.T) {
 	t.Parallel()
 	r := aConsoleTree(t)
-	l, _ := OpenLog(r.Private("log"))
+	l, _ := sessionlog.Open(r.Private("log"))
 	defer l.Close()
 
 	var out, errs strings.Builder

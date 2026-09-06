@@ -11,6 +11,7 @@ import (
 	"path/filepath"
 	"quackitect/engine/internal/replaced"
 	saidbefore "quackitect/engine/internal/said"
+	"quackitect/engine/internal/sessionlog"
 	"quackitect/engine/internal/version"
 	"strings"
 	"sync"
@@ -134,7 +135,7 @@ func main() {
 	// The current log has one name, so a window can be opened on it before
 	// the engine has written anything.
 	if *where {
-		fmt.Println(filepath.Join(dir, Current))
+		fmt.Println(filepath.Join(dir, sessionlog.Current))
 		return
 	}
 
@@ -182,7 +183,7 @@ func main() {
 			fail(err)
 		}
 		noteInLog(dir, "engine", "binding", "the engine is now "+string(now.At)+
-			", and was "+string(was.At), Yes(), map[string]any{"at": now.At, "was": was.At})
+			", and was "+string(was.At), sessionlog.Yes(), map[string]any{"at": now.At, "was": was.At})
 		answerJSON(now)
 		return
 	}
@@ -239,10 +240,10 @@ func main() {
 	}
 
 	if *rotate {
-		if err := RetireCurrent(dir); err != nil {
+		if err := sessionlog.RetireCurrent(dir); err != nil {
 			fail(err)
 		}
-		fmt.Println(filepath.Join(dir, Current))
+		fmt.Println(filepath.Join(dir, sessionlog.Current))
 		return
 	}
 
@@ -471,11 +472,11 @@ func main() {
 		}
 		got, err := SetValue(roots, key, want)
 		if err != nil {
-			noteInLog(dir, "engine", "refusal", err.Error(), No(), map[string]any{"parameter": key})
+			noteInLog(dir, "engine", "refusal", err.Error(), sessionlog.No(), map[string]any{"parameter": key})
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
-		noteInLog(dir, "engine", "config", fmt.Sprintf("%s is now %v", key, got), Yes(),
+		noteInLog(dir, "engine", "config", fmt.Sprintf("%s is now %v", key, got), sessionlog.Yes(),
 			map[string]any{"parameter": key, "value": got})
 		out, _ := json.Marshal(map[string]any{key: got})
 		fmt.Println(string(out))
@@ -495,14 +496,14 @@ func main() {
 			if err != nil {
 				fail(err)
 			}
-			noteInLog(dir, "engine", "emergency", "emergency mode armed: "+e.Describe(), No(),
+			noteInLog(dir, "engine", "emergency", "emergency mode armed: "+e.Describe(), sessionlog.No(),
 				map[string]any{"by": e.By, "reason": e.Reason, "until": e.Until})
 			fmt.Println(e.Describe())
 		case "off":
 			if err := DisarmEmergency(roots); err != nil {
 				fail(err)
 			}
-			noteInLog(dir, "engine", "emergency", "emergency mode disarmed", Yes(), nil)
+			noteInLog(dir, "engine", "emergency", "emergency mode disarmed", sessionlog.Yes(), nil)
 			fmt.Println("emergency mode is off")
 		case "status":
 			e := LoadEmergency(roots)
@@ -539,7 +540,7 @@ func main() {
 	}
 	defer LetGoOfTheTree()
 
-	log, err := OpenLog(dir)
+	log, err := sessionlog.Open(dir)
 	if err != nil {
 		fail(err)
 	}
@@ -549,16 +550,16 @@ func main() {
 	// be declared: the marker is written, and it says which copy did it.
 	if _, ok := LoadDriven(roots); !ok {
 		if p, err := Attach(roots); err == nil {
-			log.Write("engine", "attach", "engine", "this folder is now driven by this copy", Yes(),
+			log.Write("engine", "attach", "engine", "this folder is now driven by this copy", sessionlog.Yes(),
 				map[string]any{"driver": p.Driver})
 		}
 	}
 
 	if written, err := Project(roots); err != nil {
-		log.Write("engine", "error", "engine", "the projections could not be written", No(),
+		log.Write("engine", "error", "engine", "the projections could not be written", sessionlog.No(),
 			map[string]any{"reason": err.Error()})
 	} else if len(written) > 0 {
-		log.Write("engine", "project", "engine", "projections written from guidance", Yes(),
+		log.Write("engine", "project", "engine", "projections written from guidance", sessionlog.Yes(),
 			map[string]any{"files": written})
 	}
 
@@ -578,7 +579,7 @@ func main() {
 	if version.Build != "unstamped" {
 		startRecord["build"] = version.Build
 	}
-	log.Write("engine", "start", "engine", "engine started", Yes(), startRecord)
+	log.Write("engine", "start", "engine", "engine started", sessionlog.Yes(), startRecord)
 
 	// A BATTERY THAT RAN OUTSIDE THE ENGINE IS REPORTED HERE. It is started
 	// detached, because it replaces the engine that started it, so the process
@@ -592,7 +593,7 @@ func main() {
 	// goneputsdown.go.
 	if back := SweepWorkHeldByTheGone(roots); len(back) > 0 {
 		log.Write("engine", "start", "engine",
-			"work held by agents that are gone went back to the queue", Yes(),
+			"work held by agents that are gone went back to the queue", sessionlog.Yes(),
 			map[string]any{"put_down": back})
 	}
 
@@ -600,14 +601,14 @@ func main() {
 	// heartbeat's write is in flight, so a temp file is orphaned under .se with
 	// nothing owning it.
 	if swept := SweepOrphanedWrites(roots, time.Minute); swept > 0 {
-		log.Write("engine", "start", "engine", "temporary files no write finished were swept", Yes(),
+		log.Write("engine", "start", "engine", "temporary files no write finished were swept", sessionlog.Yes(),
 			map[string]any{"swept": swept})
 	}
 
 	// AND THE PROGRAMS THIS TREE USED TO SHIP. One that will not delete is one
 	// a process is still running from, and it stays until that process ends.
 	if swept := replaced.SweepWhatWasReplaced(roots.Method); swept > 0 {
-		log.Write("engine", "start", "engine", "programs nothing is running any more were swept", Yes(),
+		log.Write("engine", "start", "engine", "programs nothing is running any more were swept", sessionlog.Yes(),
 			map[string]any{"swept": swept, "from": replaced.WasDir(roots.Method)})
 	}
 
@@ -621,7 +622,7 @@ func main() {
 	for _, name := range theProgramNames(roots.Method) {
 		if a, b, split := twoNames(roots.Method, name); split {
 			log.Write("engine", "error", "engine",
-				name+" is two different files, so the cage and RUNME run different builds", No(),
+				name+" is two different files, so the cage and RUNME run different builds", sessionlog.No(),
 				map[string]any{"one": a, "other": b, "fix": "install again"})
 		}
 	}
@@ -718,16 +719,16 @@ func main() {
 			// be declared: the marker is written, and it says which copy did it.
 			if _, ok := LoadDriven(roots); !ok {
 				if p, err := Attach(roots); err == nil {
-					log.Write("engine", "attach", "engine", "this folder is now driven by this copy", Yes(),
+					log.Write("engine", "attach", "engine", "this folder is now driven by this copy", sessionlog.Yes(),
 						map[string]any{"driver": p.Driver})
 				}
 			}
 
 			if written, err := Project(roots); err != nil {
-				log.Write("engine", "error", "engine", "the projections could not be written", No(),
+				log.Write("engine", "error", "engine", "the projections could not be written", sessionlog.No(),
 					map[string]any{"reason": err.Error()})
 			} else if len(written) > 0 {
-				log.Write("engine", "project", "engine", "guidance changed, projections written again", Yes(),
+				log.Write("engine", "project", "engine", "guidance changed, projections written again", sessionlog.Yes(),
 					map[string]any{"files": written})
 			}
 		case <-ticker.C:
@@ -750,7 +751,7 @@ func main() {
 			if !saidStale && rebuiltSince(roots.Method, started) {
 				saidStale = true
 				log.Write("engine", "error", "engine",
-					"this engine is older than the program on disk, so it writes what its own build knew", No(),
+					"this engine is older than the program on disk, so it writes what its own build knew", sessionlog.No(),
 					map[string]any{"build": version.Build, "fix": "stop it and start it again"})
 			}
 			beat, _ := json.Marshal(map[string]any{
@@ -758,13 +759,13 @@ func main() {
 			})
 			fmt.Println(string(beat))
 		case <-stop:
-			log.Write("engine", "stop", "engine", "engine stopped, asked to", Yes(),
+			log.Write("engine", "stop", "engine", "engine stopped, asked to", sessionlog.Yes(),
 				map[string]any{"uptime_s": int(time.Since(started).Seconds())})
 			return
 		case <-asked.Stop:
 			// A CLIENT ASKED IT TO STOP, over the socket. A person does, when
 			// they are done with the tree for the day.
-			log.Write("engine", "stop", "engine", "engine stopped, asked to over the socket", Yes(),
+			log.Write("engine", "stop", "engine", "engine stopped, asked to over the socket", sessionlog.Yes(),
 				map[string]any{"uptime_s": int(time.Since(started).Seconds())})
 			return
 		case plan := <-asked.Swap:
@@ -773,14 +774,14 @@ func main() {
 			// let the calls in flight finish, put the new one in place, and
 			// start it on the session this one has been writing.
 			left := drainCalls(swapDrainBudget)
-			log.Write("engine", "swap", "engine", "engine swapped, and the successor continues this session", Yes(),
+			log.Write("engine", "swap", "engine", "engine swapped, and the successor continues this session", sessionlog.Yes(),
 				map[string]any{"from": version.Build, "to": plan.Build, "why": plan.Why,
 					"cut": left, "uptime_s": int(time.Since(started).Seconds())})
 			if err := putInPlace(roots, plan.Next); err != nil {
 				// A SWAP THAT CANNOT LAND LEAVES THE ENGINE RUNNING. Nothing
 				// has been replaced at this point, so carrying on is the whole
 				// of the recovery.
-				log.Write("engine", "error", "engine", "the swap did not land, so this engine carries on", No(),
+				log.Write("engine", "error", "engine", "the swap did not land, so this engine carries on", sessionlog.No(),
 					map[string]any{"reason": err.Error(), "build": version.Build})
 				continue
 			}
@@ -795,7 +796,7 @@ func main() {
 			SweepOrphanedWrites(roots, 0)
 			if err := handOver(ctx, roots, log.Session()); err != nil {
 				log.Write("engine", "error", "engine",
-					"the next engine is in place and did not start, so this tree has no engine", No(),
+					"the next engine is in place and did not start, so this tree has no engine", sessionlog.No(),
 					map[string]any{"reason": err.Error(), "fix": "start it: se --work " + roots.Work})
 			}
 			return
@@ -814,9 +815,9 @@ func main() {
 // So a note joins the session that is running, and starts one when there is
 // none. A line written into a fresh file is a line somebody can read.
 func noteInLog(dir, src, kind, msg string, ok *bool, data map[string]any) {
-	l, err := OpenExistingLog(dir)
+	l, err := sessionlog.OpenExisting(dir)
 	if err != nil {
-		if l, err = OpenLog(dir); err != nil {
+		if l, err = sessionlog.Open(dir); err != nil {
 			return
 		}
 	}

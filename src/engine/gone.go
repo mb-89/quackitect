@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"sort"
 	"strings"
 	"time"
@@ -101,7 +102,7 @@ func HasGone(r Roots, actor string) (silent time.Duration, gone bool) {
 func lastHeard(r Roots) (map[string]time.Time, time.Time) {
 	dir := r.Private("log")
 	heard := map[string]time.Time{}
-	began := readHeard(filepath.Join(dir, Current), heard)
+	began := readHeard(filepath.Join(dir, sessionlog.Current), heard)
 	if began.IsZero() || time.Since(began) >= SilenceBeforeGone(r) {
 		return heard, began
 	}

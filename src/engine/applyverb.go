@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"quackitect/engine/internal/sessionlog"
 )
 
 // se apply - change files, naming the token the change belongs to.
@@ -125,7 +126,7 @@ func runApply(c *call) int {
 	// EVERY FILE THIS CHANGED IS SAID OUT LOUD, in the record, under the token
 	// it was named against. That is the whole point of naming it.
 	for _, path := range got.Files {
-		inSession(roots, "call", orElse(*by, "main"), *on+" wrote "+path, Yes(),
+		inSession(roots, "call", orElse(*by, "main"), *on+" wrote "+path, sessionlog.Yes(),
 			map[string]any{"id": *on, "path": path})
 	}
 	c.answerJSON(got)

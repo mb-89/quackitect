@@ -1,6 +1,7 @@
 package main
 
 import (
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -17,12 +18,12 @@ import (
 func TestAHandThatWentHomeIsNotAHand(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
 	noEngineHere(t, r)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	cfg := TheFloor()
 	cfg.ParallelAgents = 3

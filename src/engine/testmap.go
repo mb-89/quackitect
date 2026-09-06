@@ -13,6 +13,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"quackitect/engine/internal/quiet"
+	"quackitect/engine/internal/sessionlog"
 	"sort"
 	"strconv"
 	"strings"
@@ -484,20 +485,20 @@ func mergeRegions(in []region) []region {
 // background: every Go test with no regions, or whose file changed since it
 // was mapped. It stops when told, and it runs once per signal so an engine
 // idling over a mapped tree runs nothing.
-func mapTests(r Roots, log *Log, done <-chan struct{}, again <-chan struct{}) {
+func mapTests(r Roots, log *sessionlog.Log, done <-chan struct{}, again <-chan struct{}) {
 	db, err := openIndex(r)
 	if err != nil {
-		log.Write("engine", "error", "engine", "the mapper cannot open the index", No(), map[string]any{"reason": err.Error()})
+		log.Write("engine", "error", "engine", "the mapper cannot open the index", sessionlog.No(), map[string]any{"reason": err.Error()})
 		return
 	}
 	defer db.Close()
 	for {
 		mapped, failed, err := mapMissing(r, db, done)
 		if err != nil {
-			log.Write("engine", "error", "engine", "the tests could not be mapped", No(), map[string]any{"reason": err.Error()})
+			log.Write("engine", "error", "engine", "the tests could not be mapped", sessionlog.No(), map[string]any{"reason": err.Error()})
 		}
 		if mapped > 0 || failed > 0 {
-			log.Write("engine", "tests", "engine", "the map from tests to source was brought up to date", Yes(),
+			log.Write("engine", "tests", "engine", "the map from tests to source was brought up to date", sessionlog.Yes(),
 				map[string]any{"mapped": mapped, "failed": failed})
 		}
 		select {

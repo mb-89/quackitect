@@ -1,6 +1,7 @@
 package main
 
 import (
+	"quackitect/engine/internal/sessionlog"
 	"testing"
 	"time"
 )
@@ -103,7 +104,7 @@ func TestABurndownSaysWhatItCovers(t *testing.T) {
 // openSession starts the log a move writes into, the way a running editor does.
 func openSession(t *testing.T, r Roots) {
 	t.Helper()
-	l, err := OpenLog(r.Private("log"))
+	l, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatalf("opening the log: %v", err)
 	}

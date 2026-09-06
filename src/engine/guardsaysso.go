@@ -2,6 +2,7 @@ package main
 
 import (
 	"net"
+	"quackitect/engine/internal/sessionlog"
 )
 
 // THE ENGINE SAYS WHETHER THE GUARD IS LIVE, AND IT SAYS IT AT THE START.
@@ -38,10 +39,10 @@ func holdTheDoor(r Roots) (net.Listener, string, bool) {
 //
 // THE FLAG IS BESIDE THE SENTENCE because a check asks a field and a person
 // reads a line, and the two must not be able to disagree.
-func SayTheDoor(log *Log, live bool, line string) {
-	ok := Yes()
+func SayTheDoor(log *sessionlog.Log, live bool, line string) {
+	ok := sessionlog.Yes()
 	if !live {
-		ok = No()
+		ok = sessionlog.No()
 	}
 	log.Write("engine", "guard", "engine", line, ok, map[string]any{"guarded": live})
 }

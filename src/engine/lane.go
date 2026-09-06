@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strconv"
 	"strings"
 )
@@ -52,7 +53,7 @@ func runHold(c *call) int {
 	if !h.On {
 		what = "the hold is lifted"
 	}
-	inSession(roots, "hold", *by, what, Yes(), map[string]any{"on": h.On})
+	inSession(roots, "hold", *by, what, sessionlog.Yes(), map[string]any{"on": h.On})
 	c.answerJSON(h)
 	return 0
 }
@@ -161,7 +162,7 @@ func runView(c *call) int {
 		c.answerJSON(map[string]any{"error": wrote.Error()})
 		return 1
 	}
-	inSession(roots, "view", "person", *file+"/"+*pane+" changed", Yes(),
+	inSession(roots, "view", "person", *file+"/"+*pane+" changed", sessionlog.Yes(),
 		map[string]any{"file": *file, "pane": *pane})
 	c.answerJSON(map[string]any{"file": *file, "pane": *pane, "ok": true})
 	return 0
@@ -285,7 +286,7 @@ func runQuery(c *call) int {
 // record has to name them. A lane event outside a session is not lost: the
 // token is its own file, and the file is the durable record.
 func inSession(r Roots, kind, actor, msg string, ok *bool, data map[string]any) {
-	l, err := OpenExistingLog(r.Private("log"))
+	l, err := sessionlog.OpenExisting(r.Private("log"))
 	if err != nil {
 		return
 	}
@@ -325,7 +326,7 @@ func runStop(c *call) int {
 		c.answerJSON(map[string]any{"error": err.Error(), "sanctioned": Sanctioned()})
 		return 1
 	}
-	inSession(roots, "stop", *actor, "claimed a stop: "+*because+" — "+*why, Yes(),
+	inSession(roots, "stop", *actor, "claimed a stop: "+*because+" — "+*why, sessionlog.Yes(),
 		map[string]any{"because": *because})
 	c.answerJSON(map[string]any{"claimed": *because,
 		"notice": "Recorded. Ask to stop again and it is granted. Do anything else first and this is gone."})
@@ -395,7 +396,7 @@ func runMove(c *call) int {
 		c.answerJSON(map[string]any{"error": err.Error()})
 		return 1
 	}
-	inSession(roots, "move", "main", out.Moved.From+" moved to "+out.Moved.To, Yes(),
+	inSession(roots, "move", "main", out.Moved.From+" moved to "+out.Moved.To, sessionlog.Yes(),
 		map[string]any{"from": out.Moved.From, "to": out.Moved.To,
 			"rewritten": len(out.Rewritten), "unrewritten": out.UnrewritN})
 	c.answerJSON(out)

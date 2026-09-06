@@ -8,6 +8,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -114,7 +115,7 @@ func listenHooks(r Roots) (net.Listener, error) {
 // folder with a lock beside each, and the record is one file, so events are
 // serialised here rather than raced. A decision takes milliseconds, and the
 // harness sends few at once.
-func serveHooks(ctx context.Context, ln net.Listener, r Roots, log *Log) {
+func serveHooks(ctx context.Context, ln net.Listener, r Roots, log *sessionlog.Log) {
 	var one sync.Mutex
 	srv := &http.Server{
 		ReadHeaderTimeout: 2 * time.Second,
@@ -191,7 +192,7 @@ const (
 // MEASURED. The line said bottleneck on all three, and the owner read "the
 // guard is the bottleneck: 1 queued, waited 0 ms" and asked how that was one.
 // The numbers beside the headline already said it was not.
-func (l *engineLoad) noteHook(log *Log, queued int, waited, took time.Duration) {
+func (l *engineLoad) noteHook(log *sessionlog.Log, queued int, waited, took time.Duration) {
 	behind := queued >= hookQueueBound || waited >= hookWaitBound
 	if !behind && took < hookTookBound {
 		return
@@ -207,7 +208,7 @@ func (l *engineLoad) noteHook(log *Log, queued int, waited, took time.Duration) 
 	}
 	log.Write("engine", "load", "engine",
 		fmt.Sprintf("%s: %d queued, waited %d ms, answered in %d ms",
-			says, queued, waited.Milliseconds(), took.Milliseconds()), No(),
+			says, queued, waited.Milliseconds(), took.Milliseconds()), sessionlog.No(),
 		map[string]any{"queued": queued, "waited_ms": waited.Milliseconds(), "took_ms": took.Milliseconds(),
 			"behind": behind, "verbs_in_flight": l.verbsInFlight.Load()})
 }

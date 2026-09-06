@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 )
 
@@ -71,7 +72,7 @@ func ArrivalSession(r Roots) string {
 // from "the log cannot say", because an engine start retires the log and the
 // fallback then answers a fresh engine run, which reads as a person leaving.
 func TheHarnessSession(r Roots) string {
-	f, err := os.Open(filepath.Join(r.Private("log"), Current))
+	f, err := os.Open(filepath.Join(r.Private("log"), sessionlog.Current))
 	if err != nil {
 		return ""
 	}
@@ -192,7 +193,7 @@ func Reclaim(r Roots, actor string) []string {
 			continue
 		}
 		back = append(back, t.ID)
-		inSession(r, "work", actor, t.ID+" reclaimed: whoever held it is gone", Yes(),
+		inSession(r, "work", actor, t.ID+" reclaimed: whoever held it is gone", sessionlog.Yes(),
 			map[string]any{"id": t.ID})
 	}
 	return back

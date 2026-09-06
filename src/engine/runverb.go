@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"quackitect/engine/internal/sessionlog"
 	"strconv"
 )
 
@@ -140,7 +141,7 @@ func runRun(c *call) int {
 		return 1
 	}
 	got.On = *on
-	inSession(roots, "call", orElse(*by, "main"), *on+" ran "+firstLine(got.Command), Yes(),
+	inSession(roots, "call", orElse(*by, "main"), *on+" ran "+firstLine(got.Command), sessionlog.Yes(),
 		map[string]any{"id": *on, "exit": got.Exit})
 	c.answerJSON(got)
 	return 0

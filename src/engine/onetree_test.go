@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 	"time"
@@ -87,19 +88,19 @@ func TestASecondStartAttachesToTheFirst(t *testing.T) {
 			logs = append(logs, e.Name())
 		}
 	}
-	if len(logs) != 1 || logs[0] != Current {
+	if len(logs) != 1 || logs[0] != sessionlog.Current {
 		t.Fatalf("two starts left %v under %s, and one engine writes one record", logs, dir)
 	}
-	if got := sessionOf(filepath.Join(dir, Current)); got != running.Session {
+	if got := sessionlog.SessionOf(filepath.Join(dir, sessionlog.Current)); got != running.Session {
 		t.Fatalf("the record is session %s and engine.json names %s", got, running.Session)
 	}
-	b, err := os.ReadFile(filepath.Join(dir, Current))
+	b, err := os.ReadFile(filepath.Join(dir, sessionlog.Current))
 	if err != nil {
 		t.Fatal(err)
 	}
 	var starts []int
 	for _, line := range strings.Split(string(b), "\n") {
-		var rec Record
+		var rec sessionlog.Record
 		if json.Unmarshal([]byte(line), &rec) != nil || rec.Kind != "start" || rec.Msg != "engine started" {
 			continue
 		}

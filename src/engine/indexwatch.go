@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/fsnotify/fsnotify"
+	"quackitect/engine/internal/sessionlog"
 )
 
 // THE INDEXER. The resident engine watches the tree and keeps the index in
@@ -105,7 +106,7 @@ const watchBuffer = 1 << 20
 // how a caller waits for that shutdown to finish. A test that hands t.Context
 // and never calls stop gets the shutdown begun at its end, and a test that
 // wants it finished calls stop.
-func StartIndexer(ctx context.Context, r Roots, log *Log, beat time.Duration) (stop func(), socket string, asked Asks) {
+func StartIndexer(ctx context.Context, r Roots, log *sessionlog.Log, beat time.Duration) (stop func(), socket string, asked Asks) {
 	stop, socket, asked, _ = startIndexer(ctx, r, log, beat, openFSWatcher)
 	return stop, socket, asked
 }
@@ -121,10 +122,10 @@ type Asks struct {
 
 // startIndexer is StartIndexer with the watcher chosen by the caller. It also
 // answers the index handles the shutdown closes, so a test can ask them.
-func startIndexer(ctx context.Context, r Roots, log *Log, beat time.Duration, open func() (watcher, error)) (stop func(), socket string, asked Asks, handles []*sql.DB) {
+func startIndexer(ctx context.Context, r Roots, log *sessionlog.Log, beat time.Duration, open func() (watcher, error)) (stop func(), socket string, asked Asks, handles []*sql.DB) {
 	db, err := openIndex(r)
 	if err != nil {
-		log.Write("engine", "error", "engine", "the index could not be opened, so the engine reads the files", No(),
+		log.Write("engine", "error", "engine", "the index could not be opened, so the engine reads the files", sessionlog.No(),
 			map[string]any{"reason": err.Error()})
 		return func() {}, "", Asks{}, nil
 	}
@@ -133,7 +134,7 @@ func startIndexer(ctx context.Context, r Roots, log *Log, beat time.Duration, op
 	ro, err := sql.Open("sqlite3", indexDSN(indexPath(r), true))
 	if err != nil {
 		db.Close()
-		log.Write("engine", "error", "engine", "the index could not be opened read-only", No(),
+		log.Write("engine", "error", "engine", "the index could not be opened read-only", sessionlog.No(),
 			map[string]any{"reason": err.Error()})
 		return func() {}, "", Asks{}, nil
 	}
@@ -142,7 +143,7 @@ func startIndexer(ctx context.Context, r Roots, log *Log, beat time.Duration, op
 	m := &model{ctx: ctx, db: ro, roots: r, askedToStop: toStop, askedToSwap: toSwap}
 	ln, addr, err := listenModel(r)
 	if err != nil {
-		log.Write("engine", "error", "engine", "the model cannot listen, so every reader reads the index file", No(),
+		log.Write("engine", "error", "engine", "the model cannot listen, so every reader reads the index file", sessionlog.No(),
 			map[string]any{"reason": err.Error()})
 		addr = ""
 	} else {
@@ -181,10 +182,10 @@ func startIndexer(ctx context.Context, r Roots, log *Log, beat time.Duration, op
 	}, addr, Asks{Stop: toStop, Swap: toSwap}, []*sql.DB{db, ro}
 }
 
-func runIndexer(r Roots, log *Log, beat time.Duration, done <-chan struct{}, db *sql.DB, m *model, open func() (watcher, error)) {
+func runIndexer(r Roots, log *sessionlog.Log, beat time.Duration, done <-chan struct{}, db *sql.DB, m *model, open func() (watcher, error)) {
 	w, err := open()
 	if err != nil {
-		log.Write("engine", "error", "engine", "the tree cannot be watched, so the index is not kept", No(),
+		log.Write("engine", "error", "engine", "the tree cannot be watched, so the index is not kept", sessionlog.No(),
 			map[string]any{"reason": err.Error()})
 		return
 	}
@@ -192,13 +193,13 @@ func runIndexer(r Roots, log *Log, beat time.Duration, done <-chan struct{}, db 
 
 	got, err := Reindex(r, db)
 	if err != nil {
-		log.Write("engine", "error", "engine", "the index could not be built", No(),
+		log.Write("engine", "error", "engine", "the index could not be built", sessionlog.No(),
 			map[string]any{"reason": err.Error()})
 		return
 	}
 	m.moved()
 	if err := watchTree(w, r); err != nil {
-		log.Write("engine", "error", "engine", "the tree cannot be watched, so the index is not kept", No(),
+		log.Write("engine", "error", "engine", "the tree cannot be watched, so the index is not kept", sessionlog.No(),
 			map[string]any{"reason": err.Error()})
 		return
 	}
@@ -215,7 +216,7 @@ func runIndexer(r Roots, log *Log, beat time.Duration, done <-chan struct{}, db 
 		map[string]any{"seen": got.Seen, "written": got.Written, "dropped": got.Dropped, "watching": watching})
 	if !watching {
 		log.Write("engine", "error", "engine",
-			"the watcher reported nothing for a file the engine wrote, so the index is not trusted", No(),
+			"the watcher reported nothing for a file the engine wrote, so the index is not trusted", sessionlog.No(),
 			map[string]any{"fix": "a tree on a mount that delivers no events is read cold"})
 	}
 
@@ -245,13 +246,13 @@ func runIndexer(r Roots, log *Log, beat time.Duration, done <-chan struct{}, db 
 			// AN OVERFLOW IS A SIGNAL, and the answer to it is one full scan.
 			if errors.Is(err, fsnotify.ErrEventOverflow) {
 				if _, err := Reindex(r, db); err != nil {
-					log.Write("engine", "error", "engine", "the index could not be rebuilt after an overflow", No(),
+					log.Write("engine", "error", "engine", "the index could not be rebuilt after an overflow", sessionlog.No(),
 						map[string]any{"reason": err.Error()})
 				}
 				m.moved()
 				continue
 			}
-			log.Write("engine", "error", "engine", "the watcher reported an error", No(),
+			log.Write("engine", "error", "engine", "the watcher reported an error", sessionlog.No(),
 				map[string]any{"reason": err.Error()})
 		}
 	}

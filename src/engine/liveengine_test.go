@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"quackitect/engine/internal/version"
 	"strings"
 	"testing"
@@ -29,7 +30,7 @@ func aLiveEngine(t *testing.T, r Roots) {
 	if _, up := LoadRunning(r); up {
 		return
 	}
-	log, err := OpenLog(filepath.Join(t.TempDir(), "log"))
+	log, err := sessionlog.Open(filepath.Join(t.TempDir(), "log"))
 	if err != nil {
 		t.Fatal(err)
 	}

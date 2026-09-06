@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"quackitect/engine/internal/sessionlog"
 )
 
 // se pull: the agent's one verb for receiving work.
@@ -102,9 +103,9 @@ func runPull(c *call) int {
 			a.Notice += "\n\n" + a.Token.ID + " is claimed here, and " + put.Says
 		}
 	}
-	ok := Yes()
+	ok := sessionlog.Yes()
 	if a.Pull == AnswerRefused {
-		ok = No()
+		ok = sessionlog.No()
 		c.refused = true // the answer is a result with exit 0, and it is still a refusal
 	}
 	inSession(roots, "pull", *actor, "pull answered "+a.Pull, ok,

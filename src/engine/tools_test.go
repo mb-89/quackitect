@@ -1,6 +1,7 @@
 package main
 
 import (
+	"quackitect/engine/internal/sessionlog"
 	"testing"
 )
 
@@ -71,11 +72,11 @@ func TestAProbeFromAnEarlierSessionIsIgnored(t *testing.T) {
 func TestTheFirstPullCarriesTheToolsAndTheSecondDoesNot(t *testing.T) {
 	t.Parallel()
 	r := probeTree(t)
-	l, err := OpenLog(r.Private("log"))
+	l, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	l.Write("engine", "start", "engine", "for the session name", Yes(), nil)
+	l.Write("engine", "start", "engine", "for the session name", sessionlog.Yes(), nil)
 	ProbeTools(t.Context(), r, l.Session())
 	l.Close()
 

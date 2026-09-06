@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	saidbefore "quackitect/engine/internal/said"
+	"quackitect/engine/internal/sessionlog"
 )
 
 // THE ENGINE COPIES WHAT THE PERSON SAID, RATHER THAN ASKING THE AGENT TO.
@@ -75,7 +76,7 @@ type heardLine struct {
 // call and a person is waiting for it, so a harness that names no transcript,
 // or names one this process cannot open, means nothing is copied and the call
 // goes through.
-func CopyWhatWasHeard(r Roots, transcript string, log *Log, actor string) int {
+func CopyWhatWasHeard(r Roots, transcript string, log *sessionlog.Log, actor string) int {
 	if transcript == "" {
 		return 0
 	}

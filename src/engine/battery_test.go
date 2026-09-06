@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 	"time"
@@ -46,7 +47,7 @@ func TestTheBatteryRunsOutsideTheEngine(t *testing.T) {
 	waitForTheBattery(t, going)
 
 	dir := r.Private("log")
-	log, err := OpenLog(dir)
+	log, err := sessionlog.Open(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -54,7 +55,7 @@ func TestTheBatteryRunsOutsideTheEngine(t *testing.T) {
 	if err := log.Close(); err != nil {
 		t.Fatal(err)
 	}
-	said, err := os.ReadFile(filepath.Join(dir, Current))
+	said, err := os.ReadFile(filepath.Join(dir, sessionlog.Current))
 	if err != nil {
 		t.Fatal(err)
 	}

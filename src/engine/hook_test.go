@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -39,8 +40,8 @@ func TestTheGuardAppendsToTheRunningSession(t *testing.T) {
 	exe := buildEngine(t)
 	r := guidanceTree(t)
 	Project(r)
-	l, _ := OpenLog(r.Private("log"))
-	l.Write("engine", "start", "engine", "engine started", Yes(), nil)
+	l, _ := sessionlog.Open(r.Private("log"))
+	l.Write("engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 	l.Close()
 
 	// ONE LINE PER CALL, and it is written when the call comes back. A call and
@@ -59,7 +60,7 @@ func TestTheGuardAppendsToTheRunningSession(t *testing.T) {
 	if len(lines) != 2 {
 		t.Fatalf("expected one record for the call, got %d", len(lines)-1)
 	}
-	var rec Record
+	var rec sessionlog.Record
 	json.Unmarshal([]byte(lines[1]), &rec)
 	if rec.Actor != "helper-1" {
 		t.Fatalf("the record does not name who acted: %+v", rec)
@@ -78,7 +79,7 @@ func TestTheGuardAppendsToTheRunningSession(t *testing.T) {
 
 func logLines(t *testing.T, r Roots) []string {
 	t.Helper()
-	b, err := os.ReadFile(filepath.Join(r.Private("log"), Current))
+	b, err := os.ReadFile(filepath.Join(r.Private("log"), sessionlog.Current))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -92,7 +93,7 @@ func TestReadEvidenceIsResetByCompaction(t *testing.T) {
 	exe := buildEngine(t)
 	r := guidanceTree(t)
 	Project(r)
-	l, _ := OpenLog(r.Private("log"))
+	l, _ := sessionlog.Open(r.Private("log"))
 	l.Close()
 
 	file := filepath.Join(r.Work, "notes.md")
@@ -124,7 +125,7 @@ func TestAnAgentIdentityIsRecordedWhenTheHarnessStartsIt(t *testing.T) {
 	exe := buildEngine(t)
 	r := guidanceTree(t)
 	Project(r)
-	l, _ := OpenLog(r.Private("log"))
+	l, _ := sessionlog.Open(r.Private("log"))
 	l.Close()
 
 	if KnownAgent(r, "helper-9") {
@@ -218,7 +219,7 @@ func TestAConfigurationChangeResetsTheReadEvidence(t *testing.T) {
 	exe := buildEngine(t)
 	r := guidanceTree(t)
 	Project(r)
-	l, _ := OpenLog(r.Private("log"))
+	l, _ := sessionlog.Open(r.Private("log"))
 	l.Close()
 	file := filepath.Join(r.Work, "notes.md")
 	os.WriteFile(file, []byte("x"), 0o644)

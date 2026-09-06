@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"sort"
 	"strings"
 	"testing"
@@ -310,11 +311,11 @@ func aGuardedTree(t *testing.T) (string, Roots) {
 	exe := buildEngine(t)
 	r := guidanceTree(t)
 	Project(r)
-	l, err := OpenLog(r.Private("log"))
+	l, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	l.Write("engine", "start", "engine", "engine started", Yes(), nil)
+	l.Write("engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 	l.Close()
 	return exe, r
 }
@@ -328,12 +329,12 @@ func heldTokenRoots(t *testing.T) Roots {
 	f := aTree(t)
 	r, root := f.Roots, f.Work
 	writeProcess(t, root, "queued")
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { log.Close() })
-	log.Write("engine", "start", "engine", "for the session name", Yes(), nil)
+	log.Write("engine", "start", "engine", "for the session name", sessionlog.Yes(), nil)
 	return r
 }
 
@@ -365,12 +366,12 @@ func aHeldTokenInASession(t *testing.T, holder string) (Roots, Token) {
 	f := aTree(t)
 	r, root := f.Roots, f.Work
 	writeWorkableProcess(t, root, "queued")
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	t.Cleanup(func() { log.Close() })
-	log.Write("engine", "start", "engine", "for the session name", Yes(), nil)
+	log.Write("engine", "start", "engine", "for the session name", sessionlog.Yes(), nil)
 	tok, err := Mint(r, Token{Tracked: local(), Process: "queued", Title: "a long token", Status: "first"})
 	if err != nil {
 		t.Fatal(err)
@@ -639,7 +640,7 @@ func aCloneBehindTheClose(t *testing.T) (Roots, Token) {
 func removalTree(t *testing.T) (Roots, func(command string) string, func(path string)) {
 	t.Helper()
 	r := guidanceTree(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -669,11 +670,11 @@ func removalTree(t *testing.T) (Roots, func(command string) string, func(path st
 func countingTree(t *testing.T) Roots {
 	t.Helper()
 	r := guidanceTree(t)
-	l, err := OpenLog(r.Private("log"))
+	l, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	l.Write("engine", "start", "engine", "for the session name", Yes(), nil)
+	l.Write("engine", "start", "engine", "for the session name", sessionlog.Yes(), nil)
 	t.Cleanup(func() { l.Close() })
 	return r
 }
@@ -695,7 +696,7 @@ func aWorkedTree(t *testing.T) Roots {
 	}
 	// The one that is running, which the retro rotates before it drains.
 	running := `{"running":true}` + nl
-	if err := os.WriteFile(filepath.Join(logs, Current), []byte(running), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(logs, sessionlog.Current), []byte(running), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	// THE FOLDER BELONGS TO THE ACTOR THAT RUNS THE RETRO, so these fixtures
@@ -743,7 +744,7 @@ func aSessionWithVoiceBreaks(t *testing.T) Roots {
 	if err := os.MkdirAll(logs, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	records := []Record{
+	records := []sessionlog.Record{
 		// The agent, breaking one rule each, and once breaking none.
 		{Seq: 1, Src: "agent", Kind: "answer", Actor: "main", Msg: "I looked; it was there."},
 		{Seq: 2, Src: "agent", Kind: "answer", Actor: "main", Msg: "It doesn't build yet."},
@@ -908,11 +909,11 @@ func aTreeWithGuidance(t *testing.T) Roots {
 func aLaneWithASession(t *testing.T) Roots {
 	t.Helper()
 	r := guidanceTree(t)
-	l, err := OpenLog(r.Private("log"))
+	l, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	l.Write("engine", "start", "engine", "started", Yes(), nil)
+	l.Write("engine", "start", "engine", "started", sessionlog.Yes(), nil)
 	l.Close()
 	if !Named(currentSession(r)) {
 		t.Fatal("the fixture has no session, so nothing here can ask whether a reviewer is gone")

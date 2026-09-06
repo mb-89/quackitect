@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -22,12 +23,12 @@ import (
 // is something to push back with. asked is a fact about what the person said.
 func TestAskedIsGrantedOnTheFirstClaim(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	const actor = "main"
 	tok := mintStandard(t, r, "work still in hand")
@@ -62,7 +63,7 @@ func TestAskedIsGrantedOnTheFirstClaim(t *testing.T) {
 
 // aStopIsGranted drives one claim through the stop decision and answers whether
 // the engine let it go.
-func aStopIsGranted(t *testing.T, r Roots, log *Log, actor, because string) bool {
+func aStopIsGranted(t *testing.T, r Roots, log *sessionlog.Log, actor, because string) bool {
 	t.Helper()
 	if err := ClaimStop(r, actor, because, "the person said so"); err != nil {
 		t.Fatal(err)

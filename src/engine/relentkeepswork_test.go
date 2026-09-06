@@ -1,6 +1,7 @@
 package main
 
 import (
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -24,11 +25,11 @@ func TestAnOverBudgetRelentDoesNotWalkOffWithTheWork(t *testing.T) {
 	exe := buildEngine(t)
 	r := aTreeWithTheProcesses(t)
 	Project(r)
-	l, err := OpenLog(r.Private("log"))
+	l, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	l.Write("engine", "start", "engine", "engine started", Yes(), nil)
+	l.Write("engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 	l.Close()
 
 	tok := mintStandard(t, r, "held over budget")

@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"quackitect/engine/internal/sessionlog"
 	"testing"
 )
 
@@ -24,12 +25,12 @@ import (
 // rather than on the word block, and an empty answer is the grant.
 func TestEmptyHandsAreNotArguedWith(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	const actor = "worker-empty"
 	// THE SESSION'S FIRST STOP IS GRANTED WHATEVER IT SAYS, so it is spent here
@@ -55,7 +56,7 @@ func TestEmptyHandsAreNotArguedWith(t *testing.T) {
 
 // whatTheStopSaid drives one claim through the stop decision and answers
 // everything the guard wrote, which is nothing when the stop was granted.
-func whatTheStopSaid(t *testing.T, r Roots, log *Log, actor, because string) string {
+func whatTheStopSaid(t *testing.T, r Roots, log *sessionlog.Log, actor, because string) string {
 	t.Helper()
 	if err := ClaimStop(r, actor, because, "the work is done and nothing is in hand"); err != nil {
 		t.Fatal(err)

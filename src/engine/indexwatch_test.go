@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"quackitect/engine/internal/version"
 	"testing"
 	"time"
@@ -57,7 +58,7 @@ func aFedDaemon(t *testing.T, r Roots, hears bool) (*fedWatcher, func()) {
 	if err := os.MkdirAll(r.Private("log"), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}

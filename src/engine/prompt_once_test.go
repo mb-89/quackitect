@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	saidbefore "quackitect/engine/internal/said"
+	"quackitect/engine/internal/sessionlog"
 )
 
 // ONE PROMPT, ONE RECORD, WHOEVER WRITES IT. The engine copies the transcript
@@ -17,8 +18,8 @@ func TestOnePromptOneRecord(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
 	dir := r.Private("log")
-	l, _ := OpenLog(dir)
-	l.Write("engine", "start", "engine", "started", Yes(), nil)
+	l, _ := sessionlog.Open(dir)
+	l.Write("engine", "start", "engine", "started", sessionlog.Yes(), nil)
 	l.Close()
 
 	said := "the editor is still not right"
@@ -46,8 +47,8 @@ func TestTheSameWordsAfterAnAnswerAreANewMessage(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
 	dir := r.Private("log")
-	l, _ := OpenLog(dir)
-	l.Write("engine", "start", "engine", "started", Yes(), nil)
+	l, _ := sessionlog.Open(dir)
+	l.Write("engine", "start", "engine", "started", sessionlog.Yes(), nil)
 	l.Close()
 
 	noteInLog(dir, "user", "prompt", "keep going", nil, nil)
@@ -66,8 +67,8 @@ func TestTheSaidVerbRefusesARepeat(t *testing.T) {
 	t.Parallel()
 	exe := buildEngine(t)
 	r := guidanceTree(t)
-	l, _ := OpenLog(r.Private("log"))
-	l.Write("engine", "start", "engine", "started", Yes(), nil)
+	l, _ := sessionlog.Open(r.Private("log"))
+	l.Write("engine", "start", "engine", "started", sessionlog.Yes(), nil)
 	l.Close()
 
 	say := func() string {
@@ -84,7 +85,7 @@ func TestTheSaidVerbRefusesARepeat(t *testing.T) {
 	if out := say(); !strings.Contains(out, "already recorded") {
 		t.Fatalf("the second say answered %q", out)
 	}
-	b, err := os.ReadFile(filepath.Join(r.Private("log"), Current))
+	b, err := os.ReadFile(filepath.Join(r.Private("log"), sessionlog.Current))
 	if err != nil {
 		t.Fatal(err)
 	}

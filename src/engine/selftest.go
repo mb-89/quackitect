@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"quackitect/engine/internal/quiet"
+	"quackitect/engine/internal/sessionlog"
 	"runtime"
 	"strings"
 )
@@ -97,15 +98,15 @@ func SelfTest(roots Roots, keep bool) int {
 	say("the copy does not write into itself", apart, says)
 
 	// 7. The record is written where the project keeps private material.
-	log, err := OpenLog(driven.Private("log"))
+	log, err := sessionlog.Open(driven.Private("log"))
 	if err == nil {
-		log.Write("engine", "start", "engine", "selftest", Yes(), nil)
+		log.Write("engine", "start", "engine", "selftest", sessionlog.Yes(), nil)
 		log.Close()
 	}
-	b, readErr := os.ReadFile(filepath.Join(driven.Private("log"), Current))
+	b, readErr := os.ReadFile(filepath.Join(driven.Private("log"), sessionlog.Current))
 	say("the record is in the project, not in the copy",
 		err == nil && readErr == nil && strings.Contains(string(b), "selftest"),
-		filepath.Join(".se", "log", Current))
+		filepath.Join(".se", "log", sessionlog.Current))
 
 	// 8. The guard in the copy refuses a write to the project's projection.
 	// The projection asked about is one this run wrote, so the step follows

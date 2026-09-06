@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"testing"
 )
 
@@ -35,19 +36,19 @@ func theSessionNowIs(t *testing.T, r Roots, name string) {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	start, err := json.Marshal(Record{Session: name, Src: "engine", Kind: "start",
+	start, err := json.Marshal(sessionlog.Record{Session: name, Src: "engine", Kind: "start",
 		Actor: "engine", Msg: "engine started"})
 	if err != nil {
 		t.Fatal(err)
 	}
-	arrived, err := json.Marshal(Record{Session: name, Src: "agent", Kind: "session",
+	arrived, err := json.Marshal(sessionlog.Record{Session: name, Src: "agent", Kind: "session",
 		Actor: "main", Msg: "session started, startup",
 		Data: map[string]any{"source": "startup", "session": name}})
 	if err != nil {
 		t.Fatal(err)
 	}
 	both := append(append(start, '\n'), append(arrived, '\n')...)
-	if err := os.WriteFile(filepath.Join(dir, Current), both, 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, sessionlog.Current), both, 0o644); err != nil {
 		t.Fatal(err)
 	}
 	if got := currentSession(r); got != name {
@@ -206,7 +207,7 @@ func TestASessionThatCannotBeReadDecidesNothing(t *testing.T) {
 // set aside and a fresh current opened, holding nothing until the next record.
 func theRotationWindow(t *testing.T, r Roots) {
 	t.Helper()
-	if err := os.WriteFile(filepath.Join(r.Private("log"), Current), nil, 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(r.Private("log"), sessionlog.Current), nil, 0o644); err != nil {
 		t.Fatal(err)
 	}
 }

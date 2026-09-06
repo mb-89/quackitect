@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"sync"
 )
@@ -119,7 +120,7 @@ func offTheFetchedBranch(r Roots, actor string, all []Token) (kept []Token, behi
 	}
 	if len(behind) > 0 {
 		inSession(r, "work", actor, "passed over, archived on "+branch+" while this clone is behind it",
-			Yes(), map[string]any{"ids": behind, "branch": branch})
+			sessionlog.Yes(), map[string]any{"ids": behind, "branch": branch})
 	}
 	return kept, behind, branch
 }
