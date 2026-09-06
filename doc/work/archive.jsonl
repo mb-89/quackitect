@@ -369,3 +369,5 @@
 {"id":"wk-abed8c4980","title":"restore wiped evidence kest","process":"trivial","disposition":"dropped","blob":"5bc00407a3a230d983b2793048dc2b6a5819725f","on_branch":"51e13efe3357979c6f23a0a091c3490ab175749b"}
 {"id":"wk-e8d13100cc","title":"gone hands loop pulls","process":"trivial","disposition":"done","blob":"2b66d3badb7505238d88dcb8324d90f32b1377ab"}
 {"id":"wk-b344fb4fb4","title":"commit carried another token","process":"trivial","disposition":"done","blob":"71f3843227ccc112c890e361a53ee778804b8949","on_branch":"e863ef2930f1bfbc2946ba339ba3b55fddc7cf71"}
+{"id":"wk-b5c68d2bbf","title":"desk token never pushed","process":"trivial","disposition":"done","blob":"2be221c7ccb32e2a7cb82d9bf82f6412fd9da5dd","on_branch":"2bfffc752ace0573aea4e7af4a43478b6daf7446"}
+{"id":"wk-ba5b3feb23","title":"branch head misses fixtures","process":"trivial","disposition":"done","blob":"afe14c8e2bc09375a491385a58b8d73021365478","on_branch":"6a2818f9e848ca02c6ebf765c3329c811859e373"}
