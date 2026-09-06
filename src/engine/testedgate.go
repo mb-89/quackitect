@@ -38,6 +38,11 @@ type TheLastRun struct {
 	// package that did not compile counts one, whatever it listed, because the
 	// compiler stopped at the first wall and every test behind it is unrun.
 	Reds int `json:"reds,omitempty"`
+	// Causes is how many distinct things those reds were waiting on, which is
+	// what a change has to be as wide as. It is Reds wherever the engine cannot
+	// tell, so a record written before this field existed reads as no opinion
+	// and the count falls back to Reds.
+	Causes int `json:"causes,omitempty"`
 	// Delta is the delta as it stood at that run, so the next one can say how
 	// many places moved since. The engine keeps no snapshot per run, and this
 	// is the shape it already had.
@@ -103,7 +108,7 @@ func RecordTheRun(r Roots, id string, out Tested) {
 	ok := out.OK || (!mine && len(out.Ran) > 0)
 	all.Runs[id] = TheLastRun{OK: ok, Pending: pending,
 		At: time.Now().UTC().Format(time.RFC3339), Said: said, Failed: failed,
-		Reds: theRedsToAnswer(out), Delta: out.Delta}
+		Reds: theRedsToAnswer(out), Causes: theCausesToAnswer(out), Delta: out.Delta}
 	if b, err := json.MarshalIndent(all, "", "  "); err == nil {
 		_ = writeAtomic(lastRunsPath(r), b, 0o644) // a run it cannot write is a run nothing gates on
 	}
@@ -171,6 +176,97 @@ func theRedsToAnswer(out Tested) int {
 	return reds
 }
 
+// aWordInARed is a word long enough to be a name, taken out of what a failing
+// test printed.
+var aWordInARed = regexp.MustCompile(`[A-Za-z_][A-Za-z0-9_]{3,}`)
+
+// mixedCase answers whether a word carries both cases, which is what a Go name
+// looks like and what a shouted heading does not.
+func mixedCase(w string) bool {
+	upper, lower := false, false
+	for _, c := range w {
+		switch {
+		case c >= 'A' && c <= 'Z':
+			upper = true
+		case c >= 'a' && c <= 'z':
+			lower = true
+		}
+	}
+	return upper && lower
+}
+
+// theNamesInARed answers the names one failure printed, which is the engine's
+// only handle on what a page of reds has in common.
+//
+// ALL CAPS IS NOT A NAME. FAIL sits in every Go failure, and the engine's own
+// headings are shouted, so counting those as a shared cause would collapse
+// every page to one and take the gate off altogether.
+//
+// A TEST'S OWN NAME IS NOT A CAUSE EITHER. Every red names itself, and that is
+// what tells them apart rather than what they share.
+func theNamesInARed(x ran) map[string]bool {
+	out := map[string]bool{}
+	mine := x.ID
+	if i := strings.LastIndex(mine, "/"); i >= 0 {
+		mine = mine[i+1:]
+	}
+	for _, w := range aWordInARed.FindAllString(x.Said, -1) {
+		if !mixedCase(w) || w == mine {
+			continue
+		}
+		out[w] = true
+	}
+	return out
+}
+
+// theCausesToAnswer counts the distinct things a run left to fix.
+//
+// A PAGE OF FAILURES WITH ONE CAUSE IS ONE THING TO FIX. Three tests waiting on
+// one function that answers nothing are one edit, the way a package that did
+// not compile is one edit whatever it listed.
+//
+// MEASURED, September 2026. Four tests were written against one function and a
+// stub was added so they would redden on their assertions. Three went red, all
+// saying the same thing, and the gate demanded three edits. Two more were made
+// to reach the count, both real and neither what the reds asked for, which is
+// the gate teaching padding.
+//
+// WHERE THE ENGINE CANNOT TELL, IT KEEPS COUNTING REDS. One red that printed
+// nothing, or a page with no name running through all of it, leaves the count
+// where it was. The rule only loosens where the answer is on the page.
+func theCausesToAnswer(out Tested) int {
+	reds := theRedsToAnswer(out)
+	if reds < 2 {
+		return reds
+	}
+	var shared map[string]bool
+	for _, x := range out.Ran {
+		if x.OK || x.Pending || x.Kind == "build" || !thisTokensFailure(x, out.Delta) {
+			continue
+		}
+		named := theNamesInARed(x)
+		if len(named) == 0 {
+			return reds // it printed no name, so nothing says it shares a cause
+		}
+		if shared == nil {
+			shared = named
+			continue
+		}
+		for name := range shared {
+			if !named[name] {
+				delete(shared, name)
+			}
+		}
+		if len(shared) == 0 {
+			return reds
+		}
+	}
+	if len(shared) == 0 {
+		return reds
+	}
+	return 1
+}
+
 // ARunThatAnswersTooLittle answers why this run is refused, and nothing where
 // it goes through.
 //
@@ -207,7 +303,13 @@ func ARunThatAnswersTooLittle(r Roots, id string, now []change) string {
 			moved++
 		}
 	}
-	if moved >= was.Reds {
+	// WHAT THE CHANGE HAS TO BE AS WIDE AS IS THE CAUSES. A record written
+	// before that was counted carries none, and then the reds are the reading.
+	need := was.Reds
+	if was.Causes > 0 && was.Causes < need {
+		need = was.Causes
+	}
+	if moved >= need {
 		return ""
 	}
 	// THE PAGE IS IN THE REFUSAL, because by now it is nowhere else. A lane call
