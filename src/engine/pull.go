@@ -560,6 +560,21 @@ func checkEvidence(r Roots, t Token, p Payload) *Rejection {
 			// so a criterion renamed since can never match any row, and no
 			// amount of ticking will move the token.
 			if !found {
+				// A STEP BEHIND THE ONE BEING SUBMITTED ANSWERS FOR THE ROWS IT
+				// HAD. The process gains a criterion, and every note minted
+				// before that carries a table without it, so this refused the
+				// whole submission for a row nobody at this step was ever asked
+				// for. On a verdict it told the reviewer to write a row into the
+				// author's own step, which is not the reviewer's to give, and the
+				// word cap made it worse: both notes it was seen on were at the
+				// bound already, so the row went in only after the author's
+				// evidence had been cut down to fit.
+				//
+				// The step being submitted still answers for every row the
+				// process names now, because those are the answers being given.
+				if i+1 < through {
+					continue
+				}
 				return &Rejection{Clause: "the checklist", Wrong: fmt.Sprintf(
 					"step %d, %s: the checklist on this note has no row for this: %s",
 					i+1, a.Name, c.Says),
