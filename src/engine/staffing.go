@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"strings"
+	"time"
 )
 
 // THE QUEUE SAYS HOW MANY HANDS IT WANTS, AND THE ENGINE HOLDS THE MAIN AGENT
@@ -41,22 +42,34 @@ type Staffing struct {
 // StaffingOf counts the queue and the hands on it.
 func StaffingOf(r Roots, cfg Config) Staffing {
 	var s Staffing
+	// THE COUNT IS WHAT THE QUEUE WOULD HAND OUT, never how many rows exist.
+	//
+	// It walked the tokens itself and applied its own reading of what is
+	// workable. That reading knew nothing of what the branch had archived, nor
+	// of the caps the record puts on a note, so it counted work the pull would
+	// pass over. The guard then held the main agent until hands arrived for
+	// work no hand could be given, and each one spawned was told wait and
+	// left. WouldHandOut is the pull's own question, asked here.
+	archived := ArchivedOnTheBranch(r)
+	now := time.Now().UTC()
 	for _, t := range Tokens(r) {
-		// A PARKED TOKEN WANTS NO HANDS. It waits on a person, so counting it
-		// as open work spawns workers for something no worker may be handed.
-		if t.Ended() || t.Holder != "" || Blocked(r, t) != "" || WaitsForAPerson(t) != "" {
-			continue
-		}
 		switch {
-		case WorkableBy(r, t, RoleWorker):
+		case WouldHandOut(r, t, "", RoleWorker, archived, now):
 			s.OpenWork++
-		case WorkableBy(r, t, RoleReviewer):
+		case WouldHandOut(r, t, "", RoleReviewer, archived, now):
 			s.AwaitingVerdict++
 		}
 	}
 	roles := loadArrivals(r).Roles
 	present := AgentsPresent(r)
+	left := namesThatLeft(r)
 	for _, a := range present {
+		// AN AGENT THAT HAS CLAIMED A STOP IS NOT A HAND. It is here in the
+		// register until the harness says otherwise, and it is doing nothing.
+		// Counting it is how a queue of a hundred looked fully staffed.
+		if a.State == Stopped {
+			continue
+		}
 		// THE MAIN AGENT IS ONE OF THE HANDS. The owner's ruling: the number is
 		// how many workers there are, counting it. At three that is the session
 		// and two spawned. It was skipped here as the one being asked to spawn
@@ -103,6 +116,23 @@ func StaffingOf(r Roots, cfg Config) Staffing {
 		if registered {
 			continue
 		}
+		// AND A HAND THAT HAS GONE HOME IS NOT ONE EITHER.
+		//
+		// This list is every actor that has pulled in the session, and nothing
+		// took one out of it again. Thirteen actors had pulled on this tree
+		// and three were here, so the count answered eight workers, wanted
+		// three, and the guard never fired while one session worked a hundred
+		// open tokens.
+		//
+		// TWO WAYS TO LEAVE, AND BOTH ARE READ. A stop claim is the sanctioned
+		// one, which the stop hook makes every agent give. The register's gone
+		// is the other, written when the harness says a subagent has ended.
+		if left[actor] {
+			continue
+		}
+		if _, stopped := StandingClaim(r, actor); stopped {
+			continue
+		}
 		switch roles[actor] {
 		case RoleWorker:
 			s.WorkersHere++
@@ -113,6 +143,34 @@ func StaffingOf(r Roots, cfg Config) Staffing {
 	s.WorkersWanted = wanted(s.OpenWork, cfg.ParallelAgents)
 	s.ReviewersWanted = wanted(s.AwaitingVerdict, cfg.ParallelAgents)
 	return s
+}
+
+// namesThatLeft is every name an agent of this run has gone under: the one the
+// register knows it by, and each name it pulled with.
+//
+// A ROW FROM ANOTHER RUN SAYS NOTHING. The register outlives the run that
+// filled it, and an agent of an earlier run is neither here nor a hand that
+// left this queue short.
+func namesThatLeft(r Roots) map[string]bool {
+	out := map[string]bool{}
+	run := TheRunNow(r)
+	if !Named(run) {
+		return out
+	}
+	aliases := TheNamesItPullsWith(r)
+	for id, a := range LoadEvidence(r).Agents {
+		if a.Run != run || a.Gone.IsZero() {
+			continue
+		}
+		out[a.Name] = true
+		for _, n := range aliases[a.Name] {
+			out[n] = true
+		}
+		for _, n := range aliases[id] {
+			out[n] = true
+		}
+	}
+	return out
 }
 
 // wanted is how many hands there is work for, and never more than the number.
@@ -162,6 +220,14 @@ func AStaffShortfall(r Roots, cfg Config, actor, tool, command string) (string, 
 	// carries. On a box with no lane, the pull and the stop this guard tells
 	// the agent to make are Bash calls, and holding Bash held those too.
 	if runsTheEngine(command) && !engineWork(command) {
+		return "", false
+	}
+	// A PERSON WHO PUT THE WORK DOWN IS NOT ASKED FOR MORE HANDS.
+	//
+	// While finishing, a spawned hand may take nothing up, so the demand would
+	// send the main agent to spawn agents with no legal move. Held is quiet for
+	// the same reason: nothing it spawned could act either.
+	if h := LoadHold(r); h.Held() || h.Finishing() {
 		return "", false
 	}
 	s := StaffingOf(r, cfg)

@@ -31,14 +31,42 @@ var (
 	aClock = regexp.MustCompile(`\b([01]?\d|2[0-3]):[0-5]\d:[0-5]\d\b`)
 
 	// A DAY BESIDE A MONTH NAME, in either order, is the same day in words.
-	aWrittenDay = regexp.MustCompile(`(?i)\b(\d{1,2}(st|nd|rd|th)?\s+(` + theMonths + `)|(` +
-		theMonths + `)\s+\d{1,2}(st|nd|rd|th)?\b(?:\s*,?\s*\d{4})?)`)
+	//
+	// SEVERAL MONTH NAMES ARE ORDINARY ENGLISH WORDS. A day-first branch that
+	// ended at the month refused "The queue held 12 may be more than the box can
+	// run." on "12 may", and "It found 3 march past the gate" on "3 march", then
+	// advised writing a month and a year to a sentence that carried no date at
+	// all. A guard that refuses ordinary prose is one somebody turns off.
+	//
+	// SO THE DAY-FIRST BRANCH HOLDS OUT FOR A SHAPE A DATE HAS AND A SENTENCE
+	// DOES NOT: an ordinal on the day, a year beside it, or the month's own
+	// capital, which is a boundary a verb cannot be read across, because English
+	// does not capitalise one in the middle of a sentence.
+	//
+	// THE MONTH-FIRST BRANCH NEEDS NONE OF THAT, and keeps its optional year: no
+	// English sentence puts a bare number after one of these words.
+	aWrittenDay = regexp.MustCompile(`\b(?:` +
+		`\d{1,2}(?:st|nd|rd|th)\s+(?i:` + theMonths + `)\b|` +
+		`\d{1,2}\s+(?i:` + theMonths + `)\b\s*,?\s*\d{4}\b|` +
+		`\d{1,2}\s+(?:` + asADateWritesThem(theMonths) + `)\b|` +
+		`(?i:` + theMonths + `)\s+\d{1,2}(?:st|nd|rd|th)?\b(?:\s*,?\s*\d{4})?` +
+		`)`)
 
 	// A YAML KEY LINE IS A MACHINE FIELD, and a machine field keeps its stamp.
 	aKeyLine = regexp.MustCompile(`^\s*[a-z][a-z0-9_]*:\s`)
 )
 
 const theMonths = `january|february|march|april|may|june|july|august|september|october|november|december`
+
+// asADateWritesThem answers the same alternation with every name's first letter
+// raised, so the one list stays the one list and the two forms cannot drift.
+func asADateWritesThem(months string) string {
+	names := strings.Split(months, "|")
+	for i, one := range names {
+		names[i] = strings.ToUpper(one[:1]) + one[1:]
+	}
+	return strings.Join(names, "|")
+}
 
 // identityMaterial answers the first rule a piece of prose breaks, the text it
 // matched, and whether it broke one at all.
@@ -59,16 +87,33 @@ func identityMaterial(content, user string) (rule, matched string, found bool) {
 			return one.says, m, true
 		}
 	}
-	// A SHORT NAME IS NOT MATCHED AT ALL. An empty one sits in every gap between
-	// words, and a two-letter one matches MB, so a guard built on it would refuse
-	// a size in megabytes. A name that short cannot be told from ordinary prose.
+	// A NAME LONG ENOUGH TO BE A WORD IS MATCHED AS ONE.
+	//
+	// CASE MATTERS, because a name is written the way its owner writes it and
+	// the shouted form is usually a word.
 	if len(user) >= 3 {
-		// CASE MATTERS, because a name is written the way its owner writes it and
-		// the shouted form is usually a word.
 		name := regexp.MustCompile(`(^|[^A-Za-z0-9])` + regexp.QuoteMeta(user) + `([^A-Za-z0-9]|$)`)
 		if m := name.FindString(prose); m != "" {
 			return "a username", strings.TrimSpace(m), true
 		}
+		return "", "", false
+	}
+	// A SHORTER NAME IS MATCHED ONLY WHERE A PATH HOLDS IT. Matched as a bare
+	// word it would refuse a size in megabytes, and a guard that does that is one
+	// somebody turns off. A separator or a tilde in front of it, and something
+	// that is not a letter or a digit behind, is a shape a home folder carries
+	// and a sentence does not, so the megabytes go through and the folder does
+	// not. An empty name has no shape at all and is matched nowhere.
+	//
+	// THE MACHINE THE GUARD RUNS ON IS WHY THIS IS HERE. Its own name is two
+	// characters, so the branch above never ran on it, and the rule was proved
+	// against a name the box does not have.
+	if user == "" {
+		return "", "", false
+	}
+	inAPath := regexp.MustCompile(`[/\\~]` + regexp.QuoteMeta(user) + `([^A-Za-z0-9]|$)`)
+	if m := inAPath.FindString(prose); m != "" {
+		return "a username", strings.TrimSpace(m), true
 	}
 	return "", "", false
 }

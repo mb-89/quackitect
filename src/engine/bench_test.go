@@ -3,6 +3,8 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
+	"quackitect/engine/internal/version"
 	"testing"
 	"time"
 
@@ -37,17 +39,17 @@ func BenchmarkReindex(b *testing.B) {
 // client verb pays before its own work.
 func BenchmarkPingOverTheSocket(b *testing.B) {
 	r := aTreeToIndexB(b)
-	log, err := OpenLog(filepath.Join(b.TempDir(), "log"))
+	log, err := sessionlog.Open(filepath.Join(b.TempDir(), "log"))
 	if err != nil {
 		b.Fatal(err)
 	}
 	defer log.Close()
-	stop, socket, _ := StartIndexer(r, log, time.Hour)
+	stop, socket, _ := StartIndexer(b.Context(), r, log, time.Hour)
 	if socket == "" {
 		b.Fatal("the model did not listen")
 	}
 	defer stop()
-	SayRunning(r, Running{PID: os.Getpid(), Socket: socket, Build: Build})
+	SayRunning(r, Running{PID: os.Getpid(), Socket: socket, Build: version.Build})
 	defer StopSaying(r)
 	b.ResetTimer()
 	for b.Loop() {
@@ -84,22 +86,4 @@ func BenchmarkWatcherDelivery(b *testing.B) {
 			}
 		}
 	}
-}
-
-// aTreeToIndexB is aTreeToIndex for a benchmark.
-func aTreeToIndexB(b *testing.B) Roots {
-	b.Helper()
-	root := b.TempDir()
-	r := Roots{Method: root, Work: root}
-	work := filepath.Join(root, ".se", "work")
-	if err := os.MkdirAll(work, 0o755); err != nil {
-		b.Fatal(err)
-	}
-	for _, name := range []string{"wk-one", "wk-two", "wk-three"} {
-		text := "---\nkind: [[work-token]]\ntitle: " + name + "\n---\n\n## detail\n\nA note the benchmark wrote, long enough to be a passage of its own.\n"
-		if err := os.WriteFile(filepath.Join(work, name+".md"), []byte(text), 0o644); err != nil {
-			b.Fatal(err)
-		}
-	}
-	return r
 }

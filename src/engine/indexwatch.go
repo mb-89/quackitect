@@ -1,14 +1,17 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
+	"quackitect/engine/internal/sessionlog"
 )
 
 // THE INDEXER. The resident engine watches the tree and keeps the index in
@@ -98,8 +101,14 @@ const watchBuffer = 1 << 20
 // THE SOCKET IS OPEN BEFORE THE SCAN. A client that connects during the
 // first scan is answered from what is indexed so far, with the revision
 // saying so, rather than refused for the length of the scan.
-func StartIndexer(r Roots, log *Log, beat time.Duration) (stop func(), socket string, asked Asks) {
-	return startIndexer(r, log, beat, openFSWatcher)
+//
+// THE CONTEXT IS THE OWNER. Its end begins the shutdown, once, and stop is
+// how a caller waits for that shutdown to finish. A test that hands t.Context
+// and never calls stop gets the shutdown begun at its end, and a test that
+// wants it finished calls stop.
+func StartIndexer(ctx context.Context, r Roots, log *sessionlog.Log, beat time.Duration) (stop func(), socket string, asked Asks) {
+	stop, socket, asked, _ = startIndexer(ctx, r, log, beat, openFSWatcher)
+	return stop, socket, asked
 }
 
 // Asks are what a client can set going over the socket that the engine's own
@@ -111,33 +120,34 @@ type Asks struct {
 	Swap <-chan swapPlan
 }
 
-// startIndexer is StartIndexer with the watcher chosen by the caller.
-func startIndexer(r Roots, log *Log, beat time.Duration, open func() (watcher, error)) (stop func(), socket string, asked Asks) {
+// startIndexer is StartIndexer with the watcher chosen by the caller. It also
+// answers the index handles the shutdown closes, so a test can ask them.
+func startIndexer(ctx context.Context, r Roots, log *sessionlog.Log, beat time.Duration, open func() (watcher, error)) (stop func(), socket string, asked Asks, handles []*sql.DB) {
 	db, err := openIndex(r)
 	if err != nil {
-		log.Write("engine", "error", "engine", "the index could not be opened, so the engine reads the files", No(),
+		log.Write("engine", "error", "engine", "the index could not be opened, so the engine reads the files", sessionlog.No(),
 			map[string]any{"reason": err.Error()})
-		return func() {}, "", Asks{}
+		return func() {}, "", Asks{}, nil
 	}
 	// THE MODEL ANSWERS ON A READ-ONLY CONNECTION, so a question that arrives
 	// on the socket cannot write, whatever it says.
 	ro, err := sql.Open("sqlite3", indexDSN(indexPath(r), true))
 	if err != nil {
 		db.Close()
-		log.Write("engine", "error", "engine", "the index could not be opened read-only", No(),
+		log.Write("engine", "error", "engine", "the index could not be opened read-only", sessionlog.No(),
 			map[string]any{"reason": err.Error()})
-		return func() {}, "", Asks{}
+		return func() {}, "", Asks{}, nil
 	}
 	toStop := make(chan struct{}, 1)
 	toSwap := make(chan swapPlan, 1)
-	m := &model{db: ro, roots: r, askedToStop: toStop, askedToSwap: toSwap}
+	m := &model{ctx: ctx, db: ro, roots: r, askedToStop: toStop, askedToSwap: toSwap}
 	ln, addr, err := listenModel(r)
 	if err != nil {
-		log.Write("engine", "error", "engine", "the model cannot listen, so every reader reads the index file", No(),
+		log.Write("engine", "error", "engine", "the model cannot listen, so every reader reads the index file", sessionlog.No(),
 			map[string]any{"reason": err.Error()})
 		addr = ""
 	} else {
-		go serveModel(ln, m)
+		go serveModel(ctx, ln, m)
 	}
 
 	done := make(chan struct{})
@@ -148,20 +158,34 @@ func startIndexer(r Roots, log *Log, beat time.Duration, open func() (watcher, e
 		defer ro.Close()
 		runIndexer(r, log, beat, done, db, m, open)
 	}()
+	// ONE SHUTDOWN, FROM WHICHEVER COMES FIRST: the context ending or the
+	// caller's stop. Closing the listener ends serveModel, so the socket
+	// server has the same owner as the loop.
+	var once sync.Once
+	shutdown := func() {
+		once.Do(func() {
+			close(done)
+			if ln != nil {
+				ln.Close()
+				_ = os.Remove(addr) // the socket file is the engine's, and it is gone with it
+			}
+		})
+	}
+	// The context runs the shutdown whenever it ends, and it does so even
+	// after the loop has returned of its own accord, which it does on every
+	// degraded run above. A goroutine that watched the loop as well would
+	// have left with it, and the socket would then outlive its owner.
+	context.AfterFunc(ctx, shutdown)
 	return func() {
-		close(done)
-		if ln != nil {
-			ln.Close()
-			_ = os.Remove(addr) // the socket file is the engine's, and it is gone with it
-		}
+		shutdown()
 		<-stopped
-	}, addr, Asks{Stop: toStop, Swap: toSwap}
+	}, addr, Asks{Stop: toStop, Swap: toSwap}, []*sql.DB{db, ro}
 }
 
-func runIndexer(r Roots, log *Log, beat time.Duration, done <-chan struct{}, db *sql.DB, m *model, open func() (watcher, error)) {
+func runIndexer(r Roots, log *sessionlog.Log, beat time.Duration, done <-chan struct{}, db *sql.DB, m *model, open func() (watcher, error)) {
 	w, err := open()
 	if err != nil {
-		log.Write("engine", "error", "engine", "the tree cannot be watched, so the index is not kept", No(),
+		log.Write("engine", "error", "engine", "the tree cannot be watched, so the index is not kept", sessionlog.No(),
 			map[string]any{"reason": err.Error()})
 		return
 	}
@@ -169,13 +193,13 @@ func runIndexer(r Roots, log *Log, beat time.Duration, done <-chan struct{}, db 
 
 	got, err := Reindex(r, db)
 	if err != nil {
-		log.Write("engine", "error", "engine", "the index could not be built", No(),
+		log.Write("engine", "error", "engine", "the index could not be built", sessionlog.No(),
 			map[string]any{"reason": err.Error()})
 		return
 	}
 	m.moved()
 	if err := watchTree(w, r); err != nil {
-		log.Write("engine", "error", "engine", "the tree cannot be watched, so the index is not kept", No(),
+		log.Write("engine", "error", "engine", "the tree cannot be watched, so the index is not kept", sessionlog.No(),
 			map[string]any{"reason": err.Error()})
 		return
 	}
@@ -192,7 +216,7 @@ func runIndexer(r Roots, log *Log, beat time.Duration, done <-chan struct{}, db 
 		map[string]any{"seen": got.Seen, "written": got.Written, "dropped": got.Dropped, "watching": watching})
 	if !watching {
 		log.Write("engine", "error", "engine",
-			"the watcher reported nothing for a file the engine wrote, so the index is not trusted", No(),
+			"the watcher reported nothing for a file the engine wrote, so the index is not trusted", sessionlog.No(),
 			map[string]any{"fix": "a tree on a mount that delivers no events is read cold"})
 	}
 
@@ -222,13 +246,13 @@ func runIndexer(r Roots, log *Log, beat time.Duration, done <-chan struct{}, db 
 			// AN OVERFLOW IS A SIGNAL, and the answer to it is one full scan.
 			if errors.Is(err, fsnotify.ErrEventOverflow) {
 				if _, err := Reindex(r, db); err != nil {
-					log.Write("engine", "error", "engine", "the index could not be rebuilt after an overflow", No(),
+					log.Write("engine", "error", "engine", "the index could not be rebuilt after an overflow", sessionlog.No(),
 						map[string]any{"reason": err.Error()})
 				}
 				m.moved()
 				continue
 			}
-			log.Write("engine", "error", "engine", "the watcher reported an error", No(),
+			log.Write("engine", "error", "engine", "the watcher reported an error", sessionlog.No(),
 				map[string]any{"reason": err.Error()})
 		}
 	}

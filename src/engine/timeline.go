@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"quackitect/engine/internal/sessionlog"
 	"quackitect/engine/internal/voice"
 )
 
@@ -195,11 +196,11 @@ func firstStamped(read []timed) (time.Time, bool) {
 	return time.Time{}, false
 }
 
-// logEntries reads the engine's own record, the shape Log.Write writes.
+// logEntries reads the engine's own record, the shape sessionlog.Log.Write writes.
 func logEntries(path, name string) []timed {
 	var out []timed
 	for _, line := range jsonRecordLines(path) {
-		var rec Record
+		var rec sessionlog.Record
 		if err := json.Unmarshal([]byte(line), &rec); err != nil {
 			continue
 		}

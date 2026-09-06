@@ -6,6 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	saidbefore "quackitect/engine/internal/said"
+	"quackitect/engine/internal/sessionlog"
 )
 
 // ONE PROMPT, ONE RECORD, WHOEVER WRITES IT. The engine copies the transcript
@@ -15,24 +18,24 @@ func TestOnePromptOneRecord(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
 	dir := r.Private("log")
-	l, _ := OpenLog(dir)
-	l.Write("engine", "start", "engine", "started", Yes(), nil)
+	l, _ := sessionlog.Open(dir)
+	l.Write("engine", "start", "engine", "started", sessionlog.Yes(), nil)
 	l.Close()
 
 	said := "the editor is still not right"
-	if AlreadySaid(r, said) {
+	if saidbefore.Already(SessionLog(r), said) {
 		t.Fatal("it was already said before anybody said it")
 	}
 	noteInLog(dir, "user", "prompt", said, nil, nil)
-	if !AlreadySaid(r, said) {
+	if !saidbefore.Already(SessionLog(r), said) {
 		t.Fatal("a message written once does not read back as said")
 	}
 	// Whitespace is not a second message.
-	if !AlreadySaid(r, "  "+said+"\n") {
+	if !saidbefore.Already(SessionLog(r), "  "+said+"\n") {
 		t.Fatal("the same words with different spacing read as a new message")
 	}
 	// A different message is a different message.
-	if AlreadySaid(r, "something else") {
+	if saidbefore.Already(SessionLog(r), "something else") {
 		t.Fatal("a message nobody said reads as said")
 	}
 }
@@ -44,16 +47,16 @@ func TestTheSameWordsAfterAnAnswerAreANewMessage(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
 	dir := r.Private("log")
-	l, _ := OpenLog(dir)
-	l.Write("engine", "start", "engine", "started", Yes(), nil)
+	l, _ := sessionlog.Open(dir)
+	l.Write("engine", "start", "engine", "started", sessionlog.Yes(), nil)
 	l.Close()
 
 	noteInLog(dir, "user", "prompt", "keep going", nil, nil)
-	if !AlreadySaid(r, "keep going") {
+	if !saidbefore.Already(SessionLog(r), "keep going") {
 		t.Fatal("it does not read back")
 	}
 	noteInLog(dir, "agent", "answer", "on it", nil, nil)
-	if AlreadySaid(r, "keep going") {
+	if saidbefore.Already(SessionLog(r), "keep going") {
 		t.Fatal("a message said again after an answer was refused as a repeat")
 	}
 }
@@ -64,8 +67,8 @@ func TestTheSaidVerbRefusesARepeat(t *testing.T) {
 	t.Parallel()
 	exe := buildEngine(t)
 	r := guidanceTree(t)
-	l, _ := OpenLog(r.Private("log"))
-	l.Write("engine", "start", "engine", "started", Yes(), nil)
+	l, _ := sessionlog.Open(r.Private("log"))
+	l.Write("engine", "start", "engine", "started", sessionlog.Yes(), nil)
 	l.Close()
 
 	say := func() string {
@@ -82,7 +85,7 @@ func TestTheSaidVerbRefusesARepeat(t *testing.T) {
 	if out := say(); !strings.Contains(out, "already recorded") {
 		t.Fatalf("the second say answered %q", out)
 	}
-	b, err := os.ReadFile(filepath.Join(r.Private("log"), Current))
+	b, err := os.ReadFile(filepath.Join(r.Private("log"), sessionlog.Current))
 	if err != nil {
 		t.Fatal(err)
 	}

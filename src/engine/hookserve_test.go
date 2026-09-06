@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -18,7 +19,7 @@ func TestTheGuardAnswersTheSameOverHTTP(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
 	Project(r)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -28,7 +29,7 @@ func TestTheGuardAnswersTheSameOverHTTP(t *testing.T) {
 		t.Skipf("the derived port is taken on this machine: %v", err)
 	}
 	defer ln.Close()
-	go serveHooks(ln, r, log)
+	go serveHooks(t.Context(), ln, r, log)
 
 	// A write to a projection is the one refusal with no override, so it is
 	// the decision that proves the door.
@@ -44,7 +45,7 @@ func TestTheGuardAnswersTheSameOverHTTP(t *testing.T) {
 	defer resp.Body.Close()
 	said, _ := io.ReadAll(resp.Body)
 	var out bytes.Buffer
-	answerHook(body, []string{"--method", r.Method}, &out, log)
+	answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 	if strings.TrimSpace(string(said)) != strings.TrimSpace(out.String()) {
 		t.Fatalf("the door answered\n%s\nand the guard answered\n%s", said, out.String())
 	}

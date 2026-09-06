@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // WRITING ONE FIELD, AND WHAT MAY NOT BE WRITTEN.
 //
@@ -23,7 +26,71 @@ func WriteFieldBy(t *Token, field, to, by string) error {
 	return writeField(t, field, to, by)
 }
 
+// refusedByHand answers why a field is not the caller's to type over, and
+// nothing when it is.
+//
+// ONE PLACE RULES ON AN EDIT. The editor carried a list of its own naming the
+// same properties and the same reasons, so the refusal was decided twice, and a
+// property renamed here left the editor offering an edit this refused. The pane
+// answer now carries this ruling per column, and the editor draws it.
+func refusedByHand(field, by string) string {
+	if strings.HasPrefix(field, "file.") {
+		return "renaming is a move, not an edit"
+	}
+	switch field {
+	case "title", "detail", "proposed_action", "ready_when", "reason", "needs_human":
+		return ""
+	case "urgent":
+		// ONLY A PERSON SAYS WHAT COMES FIRST. The queue hands an urgent token
+		// out before everything else, so an agent that could set it would put
+		// its own work at the front of every other agent's queue. What an agent
+		// can say about what it found is a token, and a person reads it.
+		if by != "person" {
+			return fmt.Sprintf("urgent is a person saying what comes first, and %s is not a person. "+
+				"Say what is wrong in a token, and a person decides where it goes", by)
+		}
+		return ""
+	case "bucket":
+		// ONLY A PERSON MAKES A GROUP. What an agent can say about where work
+		// sits is the state, which the process owns and the pull moves. A name
+		// nobody asked for is a grouping nobody meant, and it spreads: two
+		// agents inventing two names for one idea is how a list stops being
+		// readable.
+		if by != "person" {
+			return fmt.Sprintf("a bucket is a person's own name for a group, and %s is not a person. "+
+				"Say what you mean about where the work stands, and the process moves it", by)
+		}
+		return ""
+	// seq AND type ARE HERE FOR THE PERSON, NOT FOR THE CALLER. They fell
+	// through to the default below, so a person hovering a locked cell read the
+	// sentence written for whoever calls WriteFieldBy: this program does not
+	// write "seq". The editor's own list, deleted when this ruling moved here,
+	// said the engine decides these, which is what the line below says.
+	case "kind", "id", "guidance", "began", "ended", "seq", "type":
+		return field + " is the engine's, and it is not written by hand"
+	case "process":
+		return "a process is chosen at minting, and it decides the token's shape"
+	case "status":
+		return field + " is moved by a pull, not by a keystroke"
+	case "holder":
+		// NOT A FIELD ANY MORE, and the refusal says so rather than repeating
+		// the one above it. A caller reaching for this is working from a note
+		// written before the hold moved into the engine, and telling them it
+		// is moved by a pull would leave them looking for it on the page.
+		return "a holder is not on the token. The engine keeps who holds what, " +
+			"and se --doing answers it"
+	// subs IS ONE OF THESE. It is the list of sub-tokens, which is the same
+	// kind of thing as depends_on and parent and is edited where they are.
+	case "depends_on", "successors", "parent", "subs":
+		return field + " is a relation, and it is edited in the note"
+	}
+	return fmt.Sprintf("this program does not write %q", field)
+}
+
 func writeField(t *Token, field, to, by string) error {
+	if why := refusedByHand(field, by); why != "" {
+		return fmt.Errorf("%s", why)
+	}
 	switch field {
 	case "title":
 		if err := checkTitle(to); err != nil {
@@ -40,34 +107,10 @@ func writeField(t *Token, field, to, by string) error {
 		t.Reason = to
 	case "needs_human":
 		t.NeedsHuman = to == "true"
+	case "urgent":
+		t.Urgent = to == "true"
 	case "bucket":
-		// ONLY A PERSON MAKES A GROUP. What an agent can say about where work
-		// sits is the state, which the process owns and the pull moves. A name
-		// nobody asked for is a grouping nobody meant, and it spreads: two
-		// agents inventing two names for one idea is how a list stops being
-		// readable.
-		if by != "person" {
-			return fmt.Errorf("a bucket is a person's own name for a group, and %s is not a person. "+
-				"Say what you mean about where the work stands, and the process moves it", by)
-		}
 		t.Bucket = to
-	case "kind", "id", "guidance", "began", "ended":
-		return fmt.Errorf("%s is the engine's, and it is not written by hand", field)
-	case "process":
-		return fmt.Errorf("a process is chosen at minting, and it decides the token's shape")
-	case "status":
-		return fmt.Errorf("%s is moved by a pull, not by a keystroke", field)
-	case "holder":
-		// NOT A FIELD ANY MORE, and the refusal says so rather than repeating
-		// the one above it. A caller reaching for this is working from a note
-		// written before the hold moved into the engine, and telling them it
-		// is moved by a pull would leave them looking for it on the page.
-		return fmt.Errorf("a holder is not on the token. The engine keeps who holds what, " +
-			"and se --doing answers it")
-	case "depends_on", "successors", "parent":
-		return fmt.Errorf("%s is a relation, and it is edited in the note", field)
-	default:
-		return fmt.Errorf("this program does not write %q", field)
 	}
 	return nil
 }

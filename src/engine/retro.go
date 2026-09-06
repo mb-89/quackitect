@@ -2,12 +2,14 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"quackitect/engine/internal/quiet"
+	"quackitect/engine/internal/sessionlog"
 	"reflect"
 	"runtime"
 	"sort"
@@ -123,6 +125,12 @@ type Collected struct {
 	// reading that says how much it could not take.
 	Timeline         string `json:"timeline"`
 	TimelineUnplaced int    `json:"timeline_unplaced,omitempty"`
+
+	// WHAT THE TIDY PUT RIGHT ON THE WAY IN, part by part. A retro is the cycle
+	// boundary, so it is where a tree that has drifted is put back. Each part
+	// says what it did and what this box could not do, which is how a desk
+	// learns the work a cloud box had to leave.
+	Tidy []TidyPart `json:"tidy"`
 }
 
 // VoiceTally is one rule the agent broke while the period ran: which rule, how
@@ -228,7 +236,7 @@ type Transcript struct {
 }
 
 // Retro collects and drains, and answers what it took.
-func Retro(r Roots, actor string, transcripts []Transcript) (Collected, error) {
+func Retro(ctx context.Context, r Roots, actor string, transcripts []Transcript) (Collected, error) {
 	var got Collected
 	var manifest []manifestLine
 	if busy := WhoIsStillWorking(r, actor); len(busy) > 0 {
@@ -237,10 +245,16 @@ func Retro(r Roots, actor string, transcripts []Transcript) (Collected, error) {
 			strings.Join(busy, "\n  "))
 	}
 
+	// THE TIDY RUNS FIRST, AND NEVER STOPS THE RETRO. Every part of it fails
+	// soft, so the worst it can do is say what this box could not put right.
+	// A retro is where the tidying belongs because it is the cycle boundary,
+	// and one verb called from here beats a list somebody has to remember.
+	got.Tidy = Tidy(ctx, r)
+
 	// THE LOG IS ROTATED FIRST, so the session that is running becomes an old
 	// file and this retro sees it rather than the next one.
 	logs := r.Private("log")
-	if err := RetireCurrent(logs); err != nil {
+	if err := sessionlog.RetireCurrent(logs); err != nil {
 		return got, fmt.Errorf("the running log will not set aside: %w", err)
 	}
 
@@ -402,7 +416,7 @@ func Retro(r Roots, actor string, transcripts []Transcript) (Collected, error) {
 		return got, err
 	}
 
-	inSession(r, "retro", actor, "a retro collected "+folder, Yes(),
+	inSession(r, "retro", actor, "a retro collected "+folder, sessionlog.Yes(),
 		map[string]any{"folder": folder, "logs": got.Logs, "scripts": got.Scripts,
 			"outputs": got.Outputs, "undos": got.Undos, "counts": got.Counts,
 			"earlier": len(got.Earlier)})
@@ -441,7 +455,7 @@ func theVoiceOf(r Roots, logDir string, sessions []string) VoiceReading {
 		// looking like a measurement.
 		scan.Buffer(make([]byte, 0, 64<<10), 8<<20)
 		for n := 1; scan.Scan(); n++ {
-			var rec Record
+			var rec sessionlog.Record
 			if json.Unmarshal(scan.Bytes(), &rec) != nil || rec.Src != "agent" || rec.Msg == "" {
 				continue
 			}

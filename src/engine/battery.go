@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"quackitect/engine/internal/alive"
 	"quackitect/engine/internal/quiet"
+	"quackitect/engine/internal/sessionlog"
+	"quackitect/engine/internal/version"
 	"strings"
 	"time"
 )
@@ -48,7 +51,18 @@ type aBatteryRunning struct {
 
 // startBattery starts the whole battery detached and answers where its output
 // will be. It waits for nothing.
-func startBattery(r Roots, actor, token string) ran {
+//
+// THE CONTEXT SAYS WHETHER TO START ONE AT ALL, and it does not follow the
+// battery. The battery builds the engine and puts a new one over this tree, so
+// a context that killed the child would undo the reason it is detached. What
+// the context ends is the deciding: a call already over starts nothing and says
+// so, rather than putting a battery over the tree on nobody's behalf and
+// leaving a marker the next engine reports as somebody's run.
+func startBattery(ctx context.Context, r Roots, actor, token string) ran {
+	if err := ctx.Err(); err != nil {
+		return ran{ID: "battery", Kind: "battery",
+			Said: "the call that would have started the battery is over, so none was started: " + err.Error()}
+	}
 	sh, looked := batteryShell(r)
 	if sh == "" {
 		return ran{ID: "battery", Kind: "battery", Said: "no sh on this machine, so the battery cannot run. Looked at: " +
@@ -78,11 +92,17 @@ func startBattery(r Roots, actor, token string) ran {
 		return ran{ID: "battery", Kind: "battery", Said: "the battery would not start: " + err.Error()}
 	}
 	going := aBatteryRunning{Started: time.Now().UTC().Format(time.RFC3339), Out: outPath,
-		PID: cmd.Process.Pid, Build: Build, Actor: actor, Token: token}
+		PID: cmd.Process.Pid, Build: version.Build, Actor: actor, Token: token}
 	if b, err := json.MarshalIndent(going, "", "  "); err == nil {
 		_ = writeAtomic(batteryMarker(r), b, 0o644) // a marker it cannot write is a run the next engine does not report
 	}
-	_ = cmd.Process.Release() // it is its own process now, and it outlives this one
+	// THE ENGINE WAITS ON WHAT IT STARTED, so the shell is reaped when it
+	// ends. Released and never waited on, it stayed a zombie for as long as
+	// this engine lived, the marker named it, and every later se_test that
+	// owed a battery answered still going and ran nothing. The wait is on a
+	// goroutine because the answer here does not wait: the run may replace
+	// this engine, and then the next one reaps and reports it.
+	go func() { _ = cmd.Wait() }()
 	return ran{ID: "battery", Kind: "battery", OK: true,
 		Said: "the battery is running outside this engine, because it replaces it. " +
 			"Its answer lands in " + outPath + ", and the next engine puts the outcome in the record."}
@@ -109,7 +129,7 @@ func stillRunning(pid int) bool { return pid > 0 && alive.Is(pid) }
 // engine into the record, and clears the marker. It is called at every start,
 // because the run it reports on is usually the one that replaced the engine
 // that started it.
-func RecordFinishedBattery(r Roots, log *Log) {
+func RecordFinishedBattery(r Roots, log *sessionlog.Log) {
 	was, ok := batteryGoing(r)
 	if !ok {
 		return
@@ -119,7 +139,7 @@ func RecordFinishedBattery(r Roots, log *Log) {
 	}
 	said, err := os.ReadFile(was.Out)
 	if err != nil {
-		log.Write("engine", "test", "engine", "a battery ran and its output cannot be read", No(),
+		log.Write("engine", "test", "engine", "a battery ran and its output cannot be read", sessionlog.No(),
 			map[string]any{"out": was.Out, "reason": err.Error()})
 		_ = os.Remove(batteryMarker(r))
 		return

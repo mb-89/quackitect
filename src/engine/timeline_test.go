@@ -13,43 +13,11 @@ import (
 // own clock, so reading what happened means reading two files and holding the
 // order in your head. The collect weaves one file where they are interleaved.
 
-// aTreeToWeave is a tree carrying two log files and one transcript, timed so
-// that the right answer alternates between the two sources. A reader can tell a
-// merge from a concatenation only when the sources interleave.
-func aTreeToWeave(t *testing.T) (Roots, string, []byte) {
-	t.Helper()
-	r := lane(t)
-	logs := r.Private("log")
-	if err := os.MkdirAll(logs, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	write := func(name, body string) {
-		if err := os.WriteFile(filepath.Join(logs, name), []byte(body), 0o644); err != nil {
-			t.Fatal(err)
-		}
-	}
-	write("session-20260101-000000.jsonl",
-		`{"t":"2026-01-01T00:00:01Z","seq":1,"src":"engine","kind":"pull","actor":"main","msg":"one"}`+nl)
-	write("session-20260101-000100.jsonl",
-		`{"t":"2026-01-01T00:00:03Z","seq":1,"src":"engine","kind":"pull","actor":"worker-two","msg":"three"}`+nl)
-
-	// The middle turn carries no timestamp, which is the case the transcripts
-	// actually show, and it sits between two that do.
-	turns := `{"timestamp":"2026-01-01T00:00:00Z","type":"user"}` + nl +
-		`{"type":"assistant"}` + nl +
-		`{"timestamp":"2026-01-01T00:00:04Z","type":"assistant"}` + nl
-	path := filepath.Join(t.TempDir(), "claude.jsonl")
-	if err := os.WriteFile(path, []byte(turns), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	return r, path, []byte(turns)
-}
-
 func TestTheRetroWeavesOneTimeline(t *testing.T) {
 	t.Parallel()
 	r, transcript, original := aTreeToWeave(t)
 
-	got, err := Retro(r, "main", []Transcript{{Name: "claude", Path: transcript, Who: "main"}})
+	got, err := Retro(t.Context(), r, "main", []Transcript{{Name: "claude", Path: transcript, Who: "main"}})
 	if err != nil {
 		t.Fatalf("the retro did not collect: %v", err)
 	}

@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -28,40 +29,6 @@ func runRetroExe(t *testing.T, exe string, r Roots, args ...string) (Collected, 
 	var got Collected
 	json.Unmarshal(out, &got)
 	return got, string(out), err
-}
-
-// A tree with a log, a scratchpad and one token, the way a session leaves one.
-func aWorkedTree(t *testing.T) Roots {
-	t.Helper()
-	r := lane(t)
-	logs := r.Private("log")
-	if err := os.MkdirAll(logs, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	for _, name := range []string{"session-20260101-000000.jsonl", "session-20260102-000000.jsonl"} {
-		if err := os.WriteFile(filepath.Join(logs, name), []byte("{}"+nl), 0o644); err != nil {
-			t.Fatal(err)
-		}
-	}
-	// The one that is running, which the retro rotates before it drains.
-	running := `{"running":true}` + nl
-	if err := os.WriteFile(filepath.Join(logs, Current), []byte(running), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	// THE FOLDER BELONGS TO THE ACTOR THAT RUNS THE RETRO, so these fixtures
-	// are about a folder moving whole. Another actor's folder is left where
-	// it is now, and the test that decides that makes its own.
-	pad := r.Private("scratchpad")
-	if err := os.MkdirAll(filepath.Join(pad, "main"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(pad, "one-off.py"), []byte("print(1)"+nl), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(pad, "main", "probe.sh"), []byte("echo"+nl), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	return r
 }
 
 func TestRetroIsAVerbOfTheProgram(t *testing.T) {
@@ -134,7 +101,7 @@ func TestARetroTakesTheRunningSessionToo(t *testing.T) {
 	if !found {
 		t.Fatal("the session that was running was left behind")
 	}
-	if _, err := os.Stat(filepath.Join(r.Private("log"), Current)); err == nil {
+	if _, err := os.Stat(filepath.Join(r.Private("log"), sessionlog.Current)); err == nil {
 		t.Fatal("the running log is still where it was")
 	}
 }
@@ -172,7 +139,7 @@ func TestARetroSaysWhichTranscriptsItFound(t *testing.T) {
 	if err := os.WriteFile(here, []byte(`{"said":"hello"}`+nl), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	got, err := Retro(r, "main", []Transcript{
+	got, err := Retro(t.Context(), r, "main", []Transcript{
 		{Name: "claude", Path: here, Who: "the session the guard was last handed"},
 		{Name: "copilot", Who: "this machine says nothing about where it keeps one"},
 	})
@@ -206,7 +173,7 @@ func TestARetroWritesAManifest(t *testing.T) {
 	if err := os.WriteFile(here, []byte(`{"said":"hello"}`+nl), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	got, err := Retro(r, "main", []Transcript{
+	got, err := Retro(t.Context(), r, "main", []Transcript{
 		{Name: "claude", Path: here, Who: "the session the guard was last handed"},
 		{Name: "copilot", Who: "this machine says nothing about where it keeps one"},
 	})
@@ -268,7 +235,7 @@ func TestARetroStaysInsideTheWorkFolder(t *testing.T) {
 		t.Fatal(err)
 	}
 	before := treeOf(t, outside)
-	if _, err := Retro(r, "main", []Transcript{{Name: "claude", Path: witness}}); err != nil {
+	if _, err := Retro(t.Context(), r, "main", []Transcript{{Name: "claude", Path: witness}}); err != nil {
 		t.Fatal(err)
 	}
 	if after := treeOf(t, outside); after != before {
@@ -338,7 +305,7 @@ func TestARetroLeavesTheChecksAlone(t *testing.T) {
 	if err := os.WriteFile(kept, []byte("go test"+nl), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := Retro(lab, "main", nil); err != nil {
+	if _, err := Retro(t.Context(), lab, "main", nil); err != nil {
 		t.Fatal(err)
 	}
 	b, err := os.ReadFile(kept)
@@ -386,7 +353,7 @@ func TestTheBatteryIsWholeAfterARetro(t *testing.T) {
 	if err := os.WriteFile(filepath.Join(mine, "battery.sh"), b, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := Retro(lab, "main", nil); err != nil {
+	if _, err := Retro(t.Context(), lab, "main", nil); err != nil {
 		t.Fatal(err)
 	}
 	after, err := os.ReadFile(filepath.Join(mine, "battery.sh"))
@@ -437,7 +404,7 @@ func TestARetroCopiesTheTranscriptsAndLeavesThem(t *testing.T) {
 	if err := os.WriteFile(here, []byte(`{"said":"hello"}`+nl), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	got, err := Retro(r, "main", []Transcript{{Name: "claude", Path: here}})
+	got, err := Retro(t.Context(), r, "main", []Transcript{{Name: "claude", Path: here}})
 	if err != nil {
 		t.Fatal(err)
 	}

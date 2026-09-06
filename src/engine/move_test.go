@@ -40,23 +40,26 @@ func readBack(t *testing.T, root, rel string) string {
 // A REWRITE THAT CANNOT SAVE IS REPORTED, NOT SWALLOWED. The verb's header
 // promises that what it could not rewrite is reported, and a clean answer
 // over a half-repaired tree is the silence this pins.
+//
+// THE FIXTURE IS A NAME NOTHING CAN BE WRITTEN BESIDE, NOT A READ-ONLY FILE.
+// It was two chmods, 0444 on the file and 0555 on its folder, and root ignores
+// both. The battery runs as root on the cloud boxes: the save went through,
+// nothing came back unwritten, and this failed saying the verb had swallowed a
+// failure nobody ever handed it. A fixture only some users can build is a test
+// that reads the uid, and it read a green desk and a red box off one commit.
+//
+// SO THE SAVE IS MADE IMPOSSIBLE RATHER THAN FORBIDDEN. writeAtomic puts its
+// temp file beside the target and names it after the target, adding a dot, a
+// random number and .tmp. A target already 250 characters long leaves no room
+// for that under the 255 a name may hold, so the create fails with a name too
+// long. Nobody is privileged enough to be handed a longer name.
 func TestAMoveReportsTheFileItCouldNotRewrite(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
 	put(t, r.Work, "doc/old.md", "the thing itself\n")
-	stuck := put(t, r.Work, "notes/stuck.md", "see doc/old.md for more\n")
-	// Read-only file for the rename on Windows, read-only folder for the
-	// temp file on everything else. Either way the save fails.
-	if err := os.Chmod(stuck, 0o444); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.Chmod(filepath.Dir(stuck), 0o555); err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() {
-		os.Chmod(filepath.Dir(stuck), 0o755)
-		os.Chmod(stuck, 0o644)
-	})
+	// 247 letters and .md is 250 of the 255, and the suffix needs 6 at least.
+	stuck := "notes/" + strings.Repeat("s", 247) + ".md"
+	put(t, r.Work, stuck, "see doc/old.md for more\n")
 
 	out, err := MoveFile(r, "doc/old.md", "doc/new.md")
 	if err != nil {
@@ -64,7 +67,7 @@ func TestAMoveReportsTheFileItCouldNotRewrite(t *testing.T) {
 	}
 	found := ""
 	for _, u := range out.Unwritten {
-		if u.Path == "notes/stuck.md" {
+		if u.Path == stuck {
 			found = u.Text
 		}
 	}
@@ -72,11 +75,11 @@ func TestAMoveReportsTheFileItCouldNotRewrite(t *testing.T) {
 		t.Fatalf("the file that could not be saved is not reported: %+v", out.Unwritten)
 	}
 	// And nothing claims it was rewritten: the old reference still stands.
-	if !strings.Contains(readBack(t, r.Work, "notes/stuck.md"), "doc/old.md") {
+	if !strings.Contains(readBack(t, r.Work, stuck), "doc/old.md") {
 		t.Fatal("the stuck file was rewritten after all, so the fixture proves nothing")
 	}
 	for _, w := range out.Rewritten {
-		if w.Path == "notes/stuck.md" {
+		if w.Path == stuck {
 			t.Fatal("the stuck file is reported rewritten and was not")
 		}
 	}
@@ -415,8 +418,8 @@ func TestTheReportNamesWhatWasNotRewritten(t *testing.T) {
 // naming paths was the one file a rename could not repair.
 func TestAMoveRepairsAFileNamedRatherThanExtended(t *testing.T) {
 	t.Parallel()
-	dir := t.TempDir()
-	r := Roots{Method: dir, Work: dir}
+	r := aTree(t).Roots
+	dir := r.Work
 	os.MkdirAll(filepath.Join(dir, "source", "engine"), 0o755)
 	os.WriteFile(filepath.Join(dir, "source", "engine", "main.go"), []byte("package main\n"), 0o644)
 	const ignore = "src/engine/engine.exe\nsource/extension/out/\n*.tgz\n"
@@ -450,8 +453,8 @@ func TestAMoveRepairsAFileNamedRatherThanExtended(t *testing.T) {
 // full, and a test fixture naming one was left pointing at nothing.
 func TestAMoveRepairsAPathWrittenInFull(t *testing.T) {
 	t.Parallel()
-	dir := t.TempDir()
-	r := Roots{Method: dir, Work: dir}
+	r := aTree(t).Roots
+	dir := r.Work
 	os.MkdirAll(filepath.Join(dir, "source", "engine"), 0o755)
 	os.WriteFile(filepath.Join(dir, "source", "engine", "main.go"), []byte("package main\n"), 0o644)
 
@@ -482,8 +485,8 @@ func TestAMoveRepairsAPathWrittenInFull(t *testing.T) {
 // they are told apart.
 func TestALineThatSaysItIsNotAPathIsLeftAlone(t *testing.T) {
 	t.Parallel()
-	dir := t.TempDir()
-	r := Roots{Method: dir, Work: dir}
+	r := aTree(t).Roots
+	dir := r.Work
 	os.MkdirAll(filepath.Join(dir, "source", "engine"), 0o755)
 	os.WriteFile(filepath.Join(dir, "source", "engine", "main.go"), []byte("package main\n"), 0o644)
 
@@ -522,8 +525,8 @@ func TestALineThatSaysItIsNotAPathIsLeftAlone(t *testing.T) {
 // SOMETHING HERE. They are different questions.
 func TestATopLevelMoveReportsWhatItDeclinedToRewrite(t *testing.T) {
 	t.Parallel()
-	dir := t.TempDir()
-	r := Roots{Method: dir, Work: dir}
+	r := aTree(t).Roots
+	dir := r.Work
 	put(t, dir, "source/engine/main.go", "package main\n")
 	put(t, dir, "run.sh", "go build -C source/engine\n")
 	put(t, dir, "check.mjs", `const here = join(root, "source", "engine");`+"\n")
@@ -562,8 +565,8 @@ func TestATopLevelMoveReportsWhatItDeclinedToRewrite(t *testing.T) {
 // side of the same branch. The check pins the difference between the two.
 func TestANestedMoveRewritesTheSameSegments(t *testing.T) {
 	t.Parallel()
-	dir := t.TempDir()
-	r := Roots{Method: dir, Work: dir}
+	r := aTree(t).Roots
+	dir := r.Work
 	put(t, dir, "source/engine/main.go", "package main\n")
 	put(t, dir, "check.mjs", `const here = join(root, "source/engine");`+"\n")
 	put(t, dir, "check.py", `here = join(root, "source/engine")`+"\n")

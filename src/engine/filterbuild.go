@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"quackitect/engine/internal/yaml"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -209,7 +211,7 @@ func readGroups(raw any) []FilterGroup {
 	case map[string]any:
 		if and, ok := t["and"]; ok && len(t) == 1 {
 			var out []FilterGroup
-			for _, k := range ylist(and) {
+			for _, k := range yaml.List(and) {
 				out = append(out, groupOf(k))
 			}
 			return out
@@ -231,7 +233,7 @@ func groupOf(node any) FilterGroup {
 	case map[string]any:
 		if or, ok := t["or"]; ok && len(t) == 1 {
 			var rows []FilterRow
-			for _, k := range ylist(or) {
+			for _, k := range yaml.List(or) {
 				s, isText := k.(string)
 				if !isText {
 					return FilterGroup{Raw: fmt.Sprint(node)}
@@ -259,7 +261,7 @@ func OperatorsFor(kind, keep string) []Operator {
 	var out []Operator
 	held := false
 	for _, o := range Operators {
-		if len(o.Types) == 0 || (kind != "" && contains(o.Types, kind)) {
+		if len(o.Types) == 0 || (kind != "" && slices.Contains(o.Types, kind)) {
 			out = append(out, o)
 			held = held || o.ID == keep
 		}

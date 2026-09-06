@@ -5,6 +5,9 @@
 # the command line interface. What that interface is written in is not this
 # script's business: .se/runme.json says what to run.
 #
+# Installing may use the network, and nothing after it does:
+# [[the-installer-needs-the-network-and-nothing-else-does]].
+#
 #   ./RUNME.sh --version
 set -eu
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)

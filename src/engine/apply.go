@@ -300,9 +300,21 @@ func shortPath(r Roots, path string) string {
 // old bytes over it would throw that away silently. So the undo compares what
 // is there now against what this apply wrote, refuses the whole entry if any
 // file has moved, and restores nothing.
+//
+// AND THE TEXT IT WROTE, NOT ONLY THE HASH OF IT. The hash is what the drift
+// check reads, and nobody can read a file back out of one. The private folder
+// is not in git, so a file the engine overwrote was gone for good unless some
+// later apply happened to journal that text as its own before. Two tokens were
+// lost that way, one entry holding a blank template and one holding a state an
+// apply short of what the token said.
+//
+// SO THE ENTRY IS THE WHOLE OF BOTH SIDES, and the state between two applies is
+// rebuilt from the older entry alone. It costs the size of the file again,
+// which is what a journal of an edit is for.
 type wasFile struct {
 	File    string `json:"file"`
 	Was     string `json:"was,omitempty"`
+	Made    string `json:"made,omitempty"`
 	Applied string `json:"applied"`
 	Blank   bool   `json:"did_not_exist,omitempty"`
 }
@@ -334,7 +346,7 @@ type journal struct {
 func journalUndo(r Roots, on, by string, files []string, before map[string][]byte, born map[string]bool, after map[string][]byte) (string, error) {
 	var was []wasFile
 	for _, path := range files {
-		e := wasFile{File: shortPath(r, path), Applied: hashOf(after[path])}
+		e := wasFile{File: shortPath(r, path), Made: string(after[path]), Applied: hashOf(after[path])}
 		if born[path] {
 			e.Blank = true
 		} else {
@@ -481,12 +493,27 @@ func Undo(r Roots, on, by string) ([]string, error) {
 //
 // A CHECKER THAT CANNOT RUN LETS THE WRITE THROUGH. It is a check on form, and
 // a broken one must not stop somebody working.
+//
+// AND IDENTITY MATERIAL IS ASKED HERE TOO. The guard hook asks identityMaterial
+// of the harness's write tools, and this door is the mirror of that one: it is
+// the door agents are told to use, and the only one open while the hook is
+// down. So a datetime went through here into a tracked file with no refusal,
+// while the same sentence through Write was refused. A write under .se is left
+// alone, the way the guard leaves it: that is where what does not travel lives.
 func proseThatReads(r Roots, edits []Edit) error {
 	var written []string
 	for _, e := range edits {
-		if e.New != "" && isProse(e.File) {
-			written = append(written, e.New)
+		if e.New == "" || !isProse(e.File) {
+			continue
 		}
+		if path, err := inTheTree(r, e.File); err == nil && !underPrivate(r, path) {
+			if rule, matched, yes := identityMaterial(e.New, TheUsername()); yes {
+				return fmt.Errorf("this text carries %s, %q, and identity material does not travel, so nothing was written. "+
+					"Where a time is needed, write a month and a year. "+
+					"A machine field keeps its stamp, and .se keeps what does not travel.", rule, matched)
+			}
+		}
+		written = append(written, e.New)
 	}
 	if len(written) == 0 {
 		return nil

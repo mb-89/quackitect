@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -19,40 +17,6 @@ const (
 	saidUnread = "NOTHING IS DELETED THAT NOBODY LOOKED AT"
 	saidLoop   = "A LOOP THAT DELETES IS REFUSED"
 )
-
-// removalTree answers a tree and the two doors this guard is asked through:
-// one that registers a read the way the harness does, and one that puts a
-// shell command to the engine before it runs.
-//
-// BOTH HALVES GO THROUGH answerHook. The read is registered by the same
-// PostToolUse the harness fires rather than by calling NoteReadPage here, so
-// the test cannot pass on evidence the running engine would never have.
-func removalTree(t *testing.T) (Roots, func(command string) string, func(path string)) {
-	t.Helper()
-	r := guidanceTree(t)
-	log, err := OpenLog(r.Private("log"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { log.Close() })
-
-	say := func(event, tool string, input map[string]any) string {
-		t.Helper()
-		body, _ := json.Marshal(map[string]any{"hook_event_name": event, "cwd": r.Work,
-			"tool_name": tool, "tool_input": input, "agent_id": "helper-1"})
-		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
-		return out.String()
-	}
-	run := func(command string) string {
-		return say("PreToolUse", "Bash", map[string]any{"command": command})
-	}
-	readIt := func(path string) {
-		t.Helper()
-		say("PostToolUse", "Read", map[string]any{"file_path": path})
-	}
-	return r, run, readIt
-}
 
 // A REMOVAL OF A FILE THE TURN HAS NOT READ IS REFUSED, AND IT NAMES THE FILE.
 //
@@ -121,15 +85,32 @@ func TestARemovalNeedsARead(t *testing.T) {
 	// AND THE PROGRAM IS STILL FOUND WHERE SOMETHING ELSE RUNS IT, which is
 	// the half the fix above must not have cost. git rm is here because the
 	// approach on the token names it, and it deletes the file the same way.
-	for _, command := range []string{"sudo rm " + unseen, "xargs rm " + unseen, "git rm " + unseen} {
-		if said := run(command); !strings.Contains(said, saidUnread) {
+	//
+	// AND A FLAG BETWEEN THE RUNNER AND THE PROGRAM DOES NOT TURN THE GUARD OFF.
+	// The walk stopped at the first word that was neither, and every flag is
+	// such a word, so xargs -n1 rm ran where xargs rm was refused. A flag
+	// whose value is the next word, sudo -u me or git -C dir, is stepped over
+	// with its value. A shell's -c carries a command, and the program in it is
+	// read the way any program is.
+	for _, command := range []string{
+		"sudo rm " + unseen, "xargs rm " + unseen, "git rm " + unseen,
+		"xargs -n1 rm " + unseen, "xargs -I{} rm " + unseen, "xargs -I {} rm " + unseen,
+		"sudo -u someone rm " + unseen, "git -C " + r.Work + " rm " + unseen,
+		`sh -c "rm ` + unseen + `"`, "bash -c 'rm -f " + unseen + "'",
+	} {
+		said := run(command)
+		if !strings.Contains(said, saidUnread) {
 			t.Fatalf("a removal run through another program was allowed: %s\n%s", command, said)
+		}
+		if !strings.Contains(said, "unseen.go") {
+			t.Fatalf("the refusal does not name the file it is about: %s\n%s", command, said)
 		}
 	}
 
 	// AND git IS NOT A REMOVER ON ITS OWN. The word after it decides, so the
 	// rest of git goes through untouched.
-	for _, command := range []string{"git status", "git add " + unseen, "git log --oneline"} {
+	for _, command := range []string{"git status", "git add " + unseen, "git log --oneline",
+		"git -C " + r.Work + " status", "xargs -n1 echo " + unseen, `sh -c "echo rm is a word here"`} {
 		if said := run(command); strings.Contains(said, saidUnread) {
 			t.Fatalf("a git subcommand that deletes nothing was refused: %s\n%s", command, said)
 		}
@@ -151,6 +132,10 @@ func TestALoopThatDeletesIsRefused(t *testing.T) {
 		t.Fatal(err)
 	}
 	readIt(seen)
+	// A FOLDER OF THIS BOX'S OWN, outside the tree being worked on. A second
+	// temp folder is outside r.Work wherever the suite runs, which a literal
+	// path under /tmp is not.
+	outside := filepath.Join(t.TempDir(), "wt-berg2")
 
 	cases := []struct {
 		name    string
@@ -174,6 +159,24 @@ func TestALoopThatDeletesIsRefused(t *testing.T) {
 		// A REMOVAL THAT IS NOT IN A LOOP is the other test's question, and
 		// this file was read, so nothing here refuses it.
 		{"a removal of a file read this turn", "rm " + seen, false},
+		// A REMOVAL OUTSIDE THE TREE IS NOT THIS RULE'S BUSINESS, and a loop
+		// beside it does not make it one. This is the command that was refused:
+		// a worktree under the system temp folder, cleaned up before a loop that
+		// deletes nothing.
+		{"a loop beside a removal outside the tree",
+			"rm -rf " + outside + "; git worktree prune; for f in doc/work/a.md doc/work/b.md; do git cat-file -e FETCH_HEAD:$f; done", false},
+		// AND A LOOP WHOSE REMOVAL NAMES NOTHING STAYS REFUSED, because the
+		// files it takes are the ones its own output names.
+		{"a loop whose removal names no file", "for f in src/*.go; do echo $f | xargs rm; done", true},
+		// A REMOVAL AFTER THE LOOP IS NOT IN IT. This rule is about the files a
+		// loop names a round at a time, and a command written after done names
+		// its own. Refusing it said something untrue about the command it
+		// stopped, and offered a remedy that command had already followed.
+		{"a loop followed by a named removal",
+			"for f in src/*.go; do echo $f; done; rm " + seen, false},
+		// AND ONE WRITTEN BEFORE THE LOOP IS NOT IN IT EITHER.
+		{"a named removal before a loop",
+			"rm " + seen + "; for f in src/*.go; do echo $f; done", false},
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {

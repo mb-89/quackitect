@@ -107,6 +107,12 @@ func status(r roots) string {
 	b.WriteString("\n")
 	b.WriteString(strings.TrimSpace(engineCall(r, []string{"config"}, nil)))
 	b.WriteString("\n")
+	// AND THE STATE OF PLAY, which carries what the engine returned this
+	// session and how much of it was wrong. A reader gets the count here
+	// without knowing a second command.
+	b.WriteString("\n")
+	b.WriteString(strings.TrimSpace(engineCall(r, []string{"state"}, nil)))
+	b.WriteString("\n")
 	return b.String()
 }
 

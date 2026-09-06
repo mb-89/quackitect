@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -26,9 +27,68 @@ type Finding struct {
 	Line  int    `json:"line,omitempty"`
 }
 
+// LintWork reads every work token against the schema its kind names.
+//
+// THE ONE CORPUS THE SCHEMA LINT NEVER SAW. Guidance and rationales went
+// through LintNotes from the start. The token lint read a title and looked for
+// times, so a token whose chapters broke its schema was clean to se lint and
+// red only in the editor.
+//
+// A FOLDER THAT IS NOT THERE IS NOT A FINDING. A tree with no private work
+// folder has nothing to read there, which is every clone that never made one.
+func LintWork(r Roots) []Finding {
+	var out []Finding
+	for _, dir := range workDirs(r) {
+		if _, err := os.Stat(dir); os.IsNotExist(err) {
+			continue
+		}
+		out = append(out, LintNotes(r, dir)...)
+	}
+	return out
+}
+
+// aLint is one corpus se lint reads, and the name a reader is given for it.
+type aLint struct {
+	Name string
+	Read func(Roots) []Finding
+}
+
+// theLints are the corpora the verb reads, named once.
+var theLints = []aLint{
+	{"tokens", LintTokens},
+	{"work tokens against their schema", LintWork},
+	{"icons", LintIcons},
+	{"limits", LintLimits},
+	{"guidance", LintGuidance},
+	{"rationales", LintRationales},
+	{"processes", LintProcesses},
+}
+
+// whatTheLintReads is the list, as the help line says it.
+//
+// THE HELP AND THE VERB WERE TWO LISTS AND THEY DRIFTED. The line said tokens,
+// guidance and Go while the verb also read icons, limits, rationales and
+// processes, and read no work token against its schema at all. One list is one
+// answer. Go is named after it, because it is the one lint that takes a
+// context and answers what it could not run.
+func whatTheLintReads() string {
+	names := make([]string, 0, len(theLints))
+	for _, one := range theLints {
+		names = append(names, one.Name)
+	}
+	return strings.Join(names, ", ") + " and Go"
+}
+
 // LintTokens names what breaks a rule. An empty answer is a clean ledger.
 func LintTokens(r Roots) []Finding {
 	var out []Finding
+	known, err := theIDsThatOpen(r)
+	if err != nil {
+		// A CHECK THAT CANNOT READ WHAT IT GUARDS SAYS SO, rather than
+		// answering clean at the moment the archive is the thing that is broken.
+		out = append(out, Finding{ID: "doc/work/archive.jsonl", Title: "the archive",
+			Says: "cannot be read, so no id written into a note was checked: " + err.Error()})
+	}
 	for _, t := range Tokens(r) {
 		if err := checkTitle(t.Title); err != nil {
 			out = append(out, Finding{ID: t.ID, Title: t.Title, Says: err.Error()})
@@ -45,6 +105,10 @@ func LintTokens(r Roots) []Finding {
 			for _, line := range holdersIn(string(b)) {
 				out = append(out, Finding{ID: t.ID, Title: t.Title,
 					Says: "a hold ends with the session, so the record goes stale: " + line})
+			}
+			for _, id := range idsNamingNothing(string(b), t.ID, known) {
+				out = append(out, Finding{ID: t.ID, Title: t.Title,
+					Says: "names " + id + ", and no token and no archive row answers to it"})
 			}
 		}
 	}
@@ -160,9 +224,10 @@ func runLint(c *call) int {
 	fs := flag.NewFlagSet("lint", flag.ContinueOnError)
 	fs.SetOutput(c.err)
 	fs.Usage = func() {
-		fmt.Fprintln(c.err, "se lint - read every work token and name what breaks a rule.")
+		fmt.Fprintln(c.err, "se lint - read the tree and name what breaks a rule: "+whatTheLintReads()+".")
 		fmt.Fprintln(c.err, "")
 		fmt.Fprintln(c.err, "  se lint          say what is wrong, and exit non-zero if anything is")
+		fmt.Fprintln(c.err, "  se format        run this first: a formatter settles what a lint reports")
 		fmt.Fprintln(c.err, "")
 		fs.PrintDefaults()
 	}
@@ -172,16 +237,78 @@ func runLint(c *call) int {
 	}
 
 	roots := c.roots
-	found := append(LintTokens(roots), LintIcons(roots)...)
-	found = append(found, LintLimits(roots)...)
-	found = append(found, LintGuidance(roots)...)
-	found = append(found, LintRationales(roots)...)
-	found = append(found, LintProcesses(roots)...)
-	c.answerJSON(map[string]any{"findings": found, "clean": len(found) == 0})
+	var found []Finding
+	for _, one := range theLints {
+		found = append(found, one.Read(roots)...)
+	}
+	// THE GO IS PART OF THE TREE THIS READS. It was checked by four programs
+	// the guidance named and the agent was told to remember, so it was read
+	// when the battery ran and at no other time.
+	inGo, refused := LintGo(c.ctx, roots)
+	found = append(found, inGo...)
+	// CLEAN IS NOT THE SAME AS NOTHING FOUND. A box where golangci-lint will
+	// not start finds nothing through it, and clean read as findings alone
+	// answered that the tree was fine while half the tools never ran. Only the
+	// refused list said otherwise, and a caller that reads clean does not read
+	// it. A tree judged by some of its tools is not a tree that came back
+	// clean.
+	c.answerJSON(map[string]any{"findings": found,
+		"clean": len(found) == 0 && len(refused) == 0, "refused": refused})
 	if len(found) > 0 {
 		return 1
 	}
 	return 0
+}
+
+// namesAToken is how a work token id is written wherever one is written.
+var namesAToken = regexp.MustCompile(`wk-[0-9a-f]{10}`)
+
+// theIDsThatOpen answers every id this tree can still be asked about: a token
+// on the disk, or a row in the archive. An error means the archive could not be
+// read, and the answer is nil rather than partial, so nothing is judged against
+// half a ledger.
+func theIDsThatOpen(r Roots) (map[string]bool, error) {
+	rows, err := TheArchive(r)
+	if err != nil {
+		return nil, err
+	}
+	known := map[string]bool{}
+	for _, t := range Tokens(r) {
+		known[t.ID] = true
+	}
+	for _, row := range rows {
+		known[row.ID] = true
+	}
+	return known, nil
+}
+
+// AN ID WRITTEN INTO A NOTE REACHES SOMETHING, OR IT IS A FINDING.
+//
+// A closed token's evidence said one token each had been minted for three
+// files. Two landed and archived. The third was reported missing, and nothing
+// in the tree could tell the reader whether that sentence was true. The lint
+// read the tokens that exist and never asked whether an id inside one opens.
+//
+// A CLOSED TOKEN COUNTS, because that is how finished work is traced. A nil
+// known is the archive saying it could not be read, and nothing is reported
+// against it.
+//
+// IT SKIPS THE NOTE'S OWN ID, which a note names about itself rather than as a
+// reference, and it says each missing id once however often it is written.
+func idsNamingNothing(text, self string, known map[string]bool) []string {
+	if known == nil {
+		return nil
+	}
+	var found []string
+	seen := map[string]bool{}
+	for _, id := range namesAToken.FindAllString(text, -1) {
+		if id == self || known[id] || seen[id] {
+			continue
+		}
+		seen[id] = true
+		found = append(found, id)
+	}
+	return found
 }
 
 // A TOKEN CARRIES NO TIME. It travels, and a time on it says when somebody was
@@ -268,24 +395,107 @@ func claimsAHold(low, says string, at int) bool {
 			strings.HasSuffix(low[:at], "are ") || strings.HasSuffix(low[:at], "were ") ||
 			strings.HasPrefix(strings.TrimSpace(rest), "token")
 	}
-	// "the holder is" ALREADY NAMES THE HOLDER, so whatever follows is the who,
-	// and "the holder is the reviewer who asked" is a claim like any other. Only
-	// the two phrases where a generic word can stand in for a person are
-	// narrowed below.
+	next := strings.Fields(rest)
+	word := func(i int) string {
+		if i >= len(next) {
+			return ""
+		}
+		return strings.Trim(next[i], ".,:;\"'`)")
+	}
+
+	// "the holder is" ALREADY NAMES THE HOLDER, so whatever follows is the who.
+	// A word that is a state rather than a person is the engine being described:
+	// "the holder is engine state", "the holder is alive", "the holder is not
+	// called stale". None of those goes stale when a session ends.
 	if says == "the holder is" {
+		switch word(0) {
+		case "not", "neither", "never", "still", "alive", "gone", "engine", "":
+			return false
+		}
 		return true
 	}
-	// THE WHO COMES NEXT, and a word that names no one particular is the rule
-	// being described rather than this token being claimed. "held by that agent"
-	// and "held by agents that are gone" are sentences about how the engine
-	// behaves, and they were the bulk of what this rule reported.
-	next := strings.Fields(rest)
-	if len(next) == 0 {
+
+	// "is held TO" IS A STANDARD, NOT A HOLD. An agent is held to the voice
+	// rules, and nobody is holding it. The two senses are one word apart.
+	if says == "is held" {
+		switch word(0) {
+		case "to":
+			return false
+		case "by":
+			// "is held by X" IS THE SAME SENTENCE AS "held by X", and both
+			// spellings match here, so the who is read past the by rather than
+			// judged as if it were the who.
+			return namesSomebody(word(1))
+		}
+		// A TOKEN SAID TO BE HELD CLAIMS A HOLD WITHOUT NAMING ANYBODY, and it
+		// goes stale exactly as fast. That is the rule's other half, and it is
+		// about THIS TOKEN, said outright.
+		return theTokenIsTheSubject(low[:at])
+	}
+
+	// THE WHO COMES NEXT, and a word naming no one particular is the rule being
+	// described rather than this token being claimed. "held by that agent" and
+	// "held by agents that are gone" are sentences about how the engine behaves,
+	// and they were the bulk of what this rule reported.
+	return namesSomebody(word(0))
+}
+
+// theTokenIsTheSubject answers whether what stands before "is held" is this
+// token, claimed outright.
+//
+// THE OTHER HALF OF THE RULE READ EVERY SENTENCE CARRYING THE WORDS. A note is
+// where an engineer writes about the engine, and "the class is held rather than
+// the instance", "a cloud box is held until its notes are in git" and "name the
+// test as where it is held" were each reported as a stale claim on the token
+// they happen to sit on. The lint stood at five findings with no hold among
+// them, which is the state the first narrowing was written to end.
+//
+// SO THE SUBJECT HAS TO BE THE TOKEN. Saying a token is held goes stale with
+// the session; a class, a box or a ruling being held is prose about the engine
+// and it stays true.
+//
+// AND THE CLAIM IS MADE OUTRIGHT. "where it is held" names the place a thing
+// lives rather than saying anything is held now, so a relative word in front of
+// the subject takes the sentence back out of the rule.
+func theTokenIsTheSubject(before string) bool {
+	words := strings.Fields(before)
+	if len(words) == 0 {
+		return false // nothing said what is held, so nothing claimed a hold
+	}
+	switch strings.Trim(words[len(words)-1], ".,:;\"'`(") {
+	case "it", "this", "that", "token":
+	default:
+		return false
+	}
+	if len(words) < 2 {
+		return true
+	}
+	switch strings.Trim(words[len(words)-2], ".,:;\"'`(") {
+	case "where", "when", "why", "how", "whether", "which", "what":
+		return false
+	}
+	return true
+}
+
+// namesSomebody says whether this word stands for a person rather than for
+// anybody at all.
+func namesSomebody(w string) bool {
+	if w == "" {
 		return false // the line stops before it says who, so it names nobody
 	}
-	switch strings.Trim(next[0], ".,:;\"'`)") {
-	case "a", "an", "that", "this", "any", "some", "no", "another",
-		"agents", "agent", "somebody", "anybody", "nobody", "whoever", "them", "it":
+	// "other" AND "others" NAME NOBODY, the way "agents" and "actors" do. A
+	// test holding tokens held by other actors is describing its fixture.
+	//
+	// AND "nothing" IS THE ABSENCE OF A HOLDER RATHER THAN ONE. A note wrote
+	// "the ordering half is held and this half is held by nothing", which says
+	// of a rule that nobody has half of it. It is the same sentence as "held by
+	// nobody" and "held by no one", both of which this already reads as prose,
+	// and the third spelling was the one missing. Nothing about it goes stale
+	// when the session ends, because it never named a session's holder.
+	switch w {
+	case "a", "an", "the", "that", "this", "any", "some", "no", "another",
+		"agents", "agent", "actors", "actor", "somebody", "anybody", "nobody",
+		"nothing", "other", "others", "whoever", "them", "it", "one":
 		return false
 	}
 	return true

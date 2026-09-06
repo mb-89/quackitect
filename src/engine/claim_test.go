@@ -99,8 +99,8 @@ func TestAReleaseTakesBackOnlyItsOwn(t *testing.T) {
 // own. From inside either box the ledger looks right, so nothing would say so.
 func TestTwoTreesAreTwoClaimants(t *testing.T) {
 	t.Parallel()
-	one := Roots{Method: t.TempDir(), Work: t.TempDir()}
-	two := Roots{Method: t.TempDir(), Work: t.TempDir()}
+	one := aTree(t).apart().Roots
+	two := aTree(t).apart().Roots
 	if Box(one) == Box(two) {
 		t.Fatal("two folders on one machine answered one box, so each would read the other's claims as its own")
 	}
@@ -171,7 +171,7 @@ func TestASyncWithNoRemoteIsNotFatal(t *testing.T) {
 	if err := os.MkdirAll(r.Private(), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	got := SyncClaims(r)
+	got := SyncClaims(t.Context(), r)
 	if got.Says == "" {
 		t.Fatal("a sync that found nothing said nothing about why")
 	}

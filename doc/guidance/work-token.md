@@ -36,7 +36,7 @@ How a test is built is [[testing]].
 ## Using one
 
 11. Do what the token asks and nothing next to it. If the ask is ambiguous, ask one question and wait. *
-12. Write each criterion's check before the work and watch that one go red. A check that will not go red is the finding. *
+12. Write each criterion's check first and watch it redden on an assertion, never on a build failure. One that cannot redden is the finding. *
 13. Put both halves of a mechanism in the evidence. Where the system mirrors halves, table them and drive the rule through each. *
 14. Report work as done only with the evidence that it is. An observation names the check and what it said. *
 15. A checklist carries institutional knowledge. Answer each line rather than ticking it. *
@@ -47,11 +47,12 @@ How a test is built is [[testing]].
 
 The sections are separate so a reader can disagree with the answer while still believing the problem.
 Keep the argument out of it: no history, no measurement of the record, no account of who said what.
-Write the smallest case that still shows the problem.
 
 A detail says what has to become true and names the constraint.
 Where the write goes is the worker's decision.
-Before a detail names a file and a line, run the tree's checks against it on a copy.
+
+A tracked token spends real work, so the ask answers what is gained by doing it, and what breaks if it is never done.
+Both fail by restating the ask, so each carries evidence.
 
 ## 2. A criterion that cannot fail
 
@@ -62,8 +63,6 @@ Shapes seen here:
 - a rule enforced in one language and checked in another
 - a word list built from cases already found
 
-So criteria are written first, each naming the input, the answer, and what has to survive.
-
 A criterion answering with a system verb states the effect as field and value, because a branch can perform it inline and stay green.
 A detail borrowing another component's syntax borrows its rulings on wrong input too.
 Where the answer touches another token, name its status and holder.
@@ -73,18 +72,30 @@ Where the answer touches another token, name its status and holder.
 Two criteria once carried identical commands, so whatever made the first green made the second green.
 Pull the commands and their run patterns out of a draft and compare them for repeats.
 So every command runs from the root before submitting, exit zero or a stated reason, pointing at the instrument held until its owner replaces it.
-A draft obeys the class it commits, and names a walk the tree already has rather than retyping it.
+
+### Naming a go test
+
+go test -run over a pattern answers ok and exits zero when the pattern matches nothing.
+Measured: on a tree carrying neither test, `go test -C src/engine -run 'ACancelledContextEndsAGitCall|ACancelledContextEndsTheProbe' ./...` answered `ok quackitect/engine 3.551s [no tests to run]`, exit 0.
+So a criterion written that way stays green after either test is renamed or deleted.
+
+se test names every proposal it could not reach under unreached, and ok stays true when it does.
+So the criterion reads unreached rather than ok alone:
+
+```
+./RUNME.sh test --on <id> --propose TestTheThingItDecides | jq -e '.ok and ((.unreached // []) | length == 0)'
+```
+
+Run it as written, then with a letter added to the name, and the second run is its red.
 
 ## 4. What a check may match on
 
 A two-part guard pairing a search for a definition with a run of the test, naming different symbols, fails shut.
-So the identifier is written once into both halves, and the guard is run against the artefact before submitting.
 A boundary in what the check cannot hold falls to a prefix that never fails, so a length is a number.
 Rendered text is no handle: a template holds no text to match, so the durable handle is the producer's name.
 
 ## 5. Every item the detail names
 
-Number what the change does and put a criterion against each.
 On a rewrite, add a delete criterion for every sentence the detail calls the problem.
 A scope decision once moved work away in prose while three criteria still asked for it.
 Move the criteria first, then write the sentence saying where they went.
@@ -93,17 +104,15 @@ A spike closes on its own numbered questions, including those it declines, and a
 ## 9. Basics first
 
 The basics look self-evident, so nobody writes them down, and the gap is found after the feature.
-Before a feature is worked, its detail names what it stands on, and each missing basic is minted first.
 
 ## 10. Tracked is claimable
 
 A note is private, because nobody has decided what it is yet.
-Everything else is tracked or local, and the minter says which: there is no default.
+The minter says which, and there is no default.
 Tracked is doc/work, which git carries, so another box can claim it.
 Local is .se/work, which nothing else reaches.
 The question is who can pick it up, not how big it is.
 
-The reference runs one way.
 A cloud box reads the tree out of git, where .se/work is not, so a local id there is a broken link.
 A local token naming a tracked one is fine.
 
@@ -118,26 +127,25 @@ A question costs a turn, and a guess at an ambiguous ask costs the work and the 
 A check that arrives green has proved nothing about the defect.
 Watched going red for the reason expected, it proves the defect was there and the check can see it.
 One that cannot be made red is a finding about the criterion, and it goes on the token first.
-So the red is recorded per criterion.
-Each names the test its criterion runs, its message matches an assertion in the tree, and a split-out criterion earns a fresh red.
+A split-out criterion earns a red of its own.
+
+A build failure is not that red.
+So a failing check lands with the identifiers it names, as stubs.
+Why the engine answers such a package as a build, and names the hand that wrote it, is [[workers-share-one-tree]].
 
 ## 13. Half a mechanism ships
 
 A detail names two parts and says neither is enough alone.
 The producing half is built and evidenced, the checking half is not, and nothing looks wrong until it is.
 Ask which half has no output: that is the one that will be missing.
-A rule taught to one half of a mirrored pair is the same defect.
-So the halves are written down where the system declares them, and the rule is driven through each.
 A field the second half ignores is refused rather than accepted.
 
 ## 14. Evidence
 
 An observation names the check and what it said, never a line number, because a line moves and a check can be run again.
-Work reported done without its evidence is a claim the record cannot check.
 A number carries the command that produced it, written beside it as it is taken.
 Both halves of a ratio come from the one instrument the code reads, and a half that cannot says so beside the number.
 A reading pins to a commit, never to the word today.
-Before submitting, every command runs again with its fresh answer beside what was written.
 
 ## 15. A checklist is not a formality
 

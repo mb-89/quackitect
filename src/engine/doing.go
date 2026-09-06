@@ -197,7 +197,11 @@ func doingOf(r Roots, all []Token, actor string) Doing {
 // rather than none.
 func ActorsThatPulled(r Roots) []string {
 	a := loadArrivals(r)
-	if session := currentSession(r); Named(session) && a.Session != session {
+	// THE KEY IS THE ONE THE ARRIVAL WAS WRITTEN UNDER. pull.go records it
+	// under ArrivalSession, the harness session, and reading it back under
+	// the engine run answered nobody on every session whose log carries a
+	// startup record. The two agree only where there is no such record.
+	if session := ArrivalSession(r); Named(session) && a.Session != session {
 		return nil
 	}
 	if len(a.Order) > 0 {

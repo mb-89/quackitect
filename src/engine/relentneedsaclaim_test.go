@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -23,12 +24,12 @@ import (
 // retry. The code below that comment relented on a count anyway.
 func TestAStopWithNoClaimIsRefusedHoweverOftenItIsAsked(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	tok := mintStandard(t, r, "work left standing")
 	if _, err := TakeUp(r, tok.ID, "main"); err != nil {
@@ -40,7 +41,7 @@ func TestAStopWithNoClaimIsRefusedHoweverOftenItIsAsked(t *testing.T) {
 		body, _ := json.Marshal(map[string]any{"hook_event_name": "Stop", "cwd": r.Work,
 			"session_id": "s-1", "stop_hook_active": active})
 		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 		return out.String()
 	}
 
@@ -59,12 +60,12 @@ func TestAStopWithNoClaimIsRefusedHoweverOftenItIsAsked(t *testing.T) {
 // AND A CLAIM GRANTS ONE STOP, WHICH THE NEXT PULL SPENDS.
 func TestAClaimGrantsOneStopAndThePullSpendsIt(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	mintStandard(t, r, "work to return to")
 	stop := func() string {
@@ -72,7 +73,7 @@ func TestAClaimGrantsOneStopAndThePullSpendsIt(t *testing.T) {
 		body, _ := json.Marshal(map[string]any{"hook_event_name": "Stop", "cwd": r.Work,
 			"session_id": "s-1", "stop_hook_active": true})
 		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 		return out.String()
 	}
 	stop() // the first of the session, granted on its own rule
@@ -95,7 +96,7 @@ func TestAClaimGrantsOneStopAndThePullSpendsIt(t *testing.T) {
 	body, _ := json.Marshal(map[string]any{"hook_event_name": "PreToolUse", "cwd": r.Work,
 		"session_id": "s-1", "tool_name": "Read", "tool_input": map[string]any{"file_path": "x.md"}})
 	var spent bytes.Buffer
-	answerHook(body, []string{"--method", r.Method}, &spent, log)
+	answerHook(t.Context(), body, []string{"--method", r.Method}, &spent, log)
 
 	if said := stop(); !strings.Contains(said, "block") {
 		t.Fatalf("the same claim granted a second stop after a call: %s", said)

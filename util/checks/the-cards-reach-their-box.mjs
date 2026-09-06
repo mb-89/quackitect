@@ -18,7 +18,7 @@
 // whether the delivery works and whether the calls named in it are legal.
 //
 //   node util/checks/the-cards-reach-their-box.mjs <root>
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.argv[2] ?? ".";
@@ -100,6 +100,70 @@ say("the preamble tells every session there are two kinds of box",
   preamble.includes(cloudCard) && /host\.mjs --say/.test(preamble),
   "util/cage/first-turn.md does not name the cloud card and the door that answers "
   + "which box this is, so a session meeting that file has no way to place it");
+
+// AND A CARD'S DISCUSSION COUNTS UP THE WAY ITS ACTIONABLES DO.
+//
+// A card is read by number. The actionables are numbered so that the section
+// discussing one can be found, and the two halves only work while they agree.
+// cloud-runner.md gained a tenth actionable and its section went in above the
+// ninth, leaving a discussion that ran 1, 2, 3, 10, 9, 5, 4, 7 under a list that
+// counted up. A reader following 9 walks past 10 to reach it, and the next hand
+// adding a section copies the placement it finds.
+//
+// THE SET IS THE FOLDER, so a second card written tomorrow is asked the same
+// question on the same day. A card with no numbered sections is not a card this
+// judges, and it refuses when no card in the folder has any.
+const cards = readdirSync(join(root, "util", "cage")).filter((f) => f.endsWith(".md"));
+say("there are cards in util/cage to read (" + cards.length + ")", cards.length > 0,
+  "util/cage holds no card at all, so this half has nothing to judge");
+let numbered = 0;
+for (const file of cards) {
+  const numbers = [...read(join("util", "cage", file)).matchAll(/^###\s+(\d+)\./gm)]
+    .map((m) => Number(m[1]));
+  if (numbers.length < 2) {
+    continue;
+  }
+  numbered++;
+  const backwards = numbers
+    .map((n, i) => (i > 0 && n < numbers[i - 1] ? numbers[i - 1] + " then " + n : ""))
+    .filter(Boolean);
+  say("util/cage/" + file + " discusses its points in the order it lists them ("
+    + numbers.join(", ") + ")", backwards.length === 0,
+    "the discussion goes " + backwards.join(", ") + ", so a reader following a number "
+    + "walks past a later one to reach it");
+}
+say("a card in util/cage numbers its discussion (" + numbered + ")", numbered > 0,
+  "no card carries two numbered sections, so the half above passed by having "
+  + "nothing to ask rather than by the cards being in order");
+
+// AND EVERY ACTIONABLE IT LISTS HAS A SECTION DISCUSSING IT.
+//
+// A session is told to follow the numbered lines. Where one has no section, it
+// gets the line and none of the case a person built out of the sessions that
+// went wrong, and it is the line it will shave first.
+//
+// THE HALF ABOVE CANNOT SEE THIS. wk-954d674f30 asked only that the discussion
+// ascend, so a number listed and never discussed was nobody's to catch, and two
+// of cloud-runner.md's ten sat that way.
+//
+// THE LIST IS READ FROM THE ACTIONABLES HEADING ONLY, because a numbered line
+// anywhere else in a card is prose rather than a point to discuss.
+for (const file of cards) {
+  const text = read(join("util", "cage", file));
+  const block = /^##\s+Actionables\s*$([\s\S]*?)(?=^##\s|\Z)/m.exec(text);
+  const discussed = new Set([...text.matchAll(/^###\s+(\d+)\./gm)].map((m) => Number(m[1])));
+  if (block === null || discussed.size === 0) {
+    continue;
+  }
+  const listed = [...new Set([...block[1].matchAll(/^(\d+)\.\s+\S/gm)].map((m) => Number(m[1])))];
+  const quiet = listed.filter((n) => !discussed.has(n));
+  say("util/cage/" + file + " discusses every actionable it lists (" + listed.length + ")",
+    listed.length > 0 && quiet.length === 0,
+    listed.length === 0
+      ? "its Actionables heading lists no numbered line, so this counted nothing"
+      : "these are listed and nothing discusses them: " + quiet.join(", ")
+        + ", so a session follows a line with none of the case behind it");
+}
 
 console.log("\n" + bad + " failed.");
 process.exit(bad ? 1 : 0);

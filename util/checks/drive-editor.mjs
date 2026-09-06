@@ -147,6 +147,37 @@ for (const name of ["filter", "sort", "props"]) {
 const change = (el) => el.dispatchEvent(new window.Event("change", { bubbles: true }));
 const lastOf = (kind) => [...sent].reverse().find((m) => m.type === kind);
 
+// THE URGENT FLAG IS SET FROM THE PAGE, AND THIS IS THE CONTROL THAT SETS IT.
+//
+// The queue hands an urgent token out before everything else workable, and a
+// person decides which one that is. So the column has to be drawn, it has to
+// take a keystroke, and the keystroke has to reach the engine: a flag the page
+// cannot set is a flag only an agent could set, which is what field.go refuses.
+//
+// IT IS DRIVEN HERE, ON THE PAGE AS IT WAS BUILT, because the presses below
+// redraw a pane with the columns their own case wants.
+{
+  const cell = doc.querySelector('td[data-col="urgent"]');
+  say("the work editor draws a cell for the urgent flag", !!cell,
+    "no urgent column is drawn, so the flag cannot be set from the page");
+  if (cell) {
+    say("and a person is not locked out of it", cell.classList.contains("edits"),
+      "it is drawn as " + cell.className + ", so a person cannot type in it");
+    cell.dispatchEvent(new window.MouseEvent("dblclick", { bubbles: true }));
+    const box = cell.querySelector("input");
+    say("a double-click opens a box to type in", !!box,
+      "the cell holds " + cell.innerHTML);
+    if (box) {
+      box.value = "true";
+      box.dispatchEvent(new window.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+      const m = lastOf("edit");
+      say("and the keystroke sends the flag for that row",
+        !!m && m.col === "urgent" && m.text === "true" && !!m.id,
+        "what it sent: " + JSON.stringify(m));
+    }
+  }
+}
+
 press(tool("sort"));
 const level = wrap.querySelector('.bs-level[data-kind="sort"] .bs-level-prop');
 say("the sort popover has a level to set", !!level);
@@ -216,6 +247,18 @@ if (cond) {
   const m = lastOf("filter");
   say("filling a condition sends it", !!m && JSON.stringify(m).includes("status"),
     "what it sent: " + JSON.stringify(m));
+
+  // AND THE CLAIM IS ONE OF THE PROPERTIES TO NARROW ON. It is what keeps two
+  // boxes off one token, and a person asking which of these this box has taken
+  // asks it here. The property list is the view's columns, so setting a value
+  // the list does not carry leaves the box empty and this goes red.
+  const prop = cond.querySelector(".bs-prop");
+  prop.value = "claimed_by";
+  change(prop);
+  const claim = lastOf("filter");
+  say("a condition on the claim narrows on it",
+    prop.value === "claimed_by" && !!claim && JSON.stringify(claim).includes("claimed_by"),
+    "the property reads " + JSON.stringify(prop.value) + " and it sent: " + JSON.stringify(claim));
 }
 
 press(tool("props"));
@@ -513,6 +556,11 @@ say("the headings are on the page", /<th/.test(heads().innerHTML),
 say("they name the columns the view declares",
   panes[0].table.columns.every((c) => heads().textContent.includes(c)),
   "columns " + panes[0].table.columns.join(" ") + ", headings " + heads().textContent);
+// AND THE CLAIM IS DRAWN. A claim is the only thing standing between two boxes
+// and the same token, and it was the one field the surface did not show: a
+// person had to run se claim --list at a prompt to see what had been taken.
+say("the headings carry the claim", heads().textContent.includes("claimed_by"),
+  "headings " + heads().textContent);
 
 // THEY STAY PUT WHILE THE ROWS GO PAST. The headings sit in their own block
 // outside the scrolling area, so scrolling the rows cannot move them. A DOM

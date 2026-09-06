@@ -9,6 +9,8 @@ import (
 	"os"
 	"path/filepath"
 	"quackitect/engine/internal/console"
+	"quackitect/engine/internal/frontmatter"
+	"quackitect/engine/internal/version"
 	"strconv"
 	"strings"
 )
@@ -98,7 +100,7 @@ func runLSP(args []string) {
 	s := &server{roots: roots, docs: map[string]string{}, notes: map[string]string{}, out: os.Stdout}
 	// Standard error is the editor's output channel, so it is where a person
 	// looks when nothing appears.
-	s.log("serving %s, method root %s", Build, roots.Method)
+	s.log("serving %s, method root %s", version.Build, roots.Method)
 	if err := s.serve(os.Stdin); err != nil && err != io.EOF {
 		s.log("stopped: %v", err)
 		fail(err)
@@ -191,7 +193,7 @@ func (s *server) handle(m rpcMessage) bool {
 				},
 				"documentLinkProvider": map[string]any{"resolveProvider": false},
 			},
-			"serverInfo": map[string]any{"name": "quackitect", "version": Build},
+			"serverInfo": map[string]any{"name": "quackitect", "version": version.Build},
 		})
 	case "initialized":
 		s.scanWorkspace()
@@ -467,11 +469,11 @@ func kindOf(text string) string {
 	if strings.TrimSpace(front) == "" {
 		return ""
 	}
-	f, err := ParseFront(front)
+	f, err := frontmatter.Parse(front)
 	if err != nil {
 		return ""
 	}
-	return unlink(frontStr(f, "kind"))
+	return unlink(frontmatter.Str(f, "kind"))
 }
 
 // AvailableKinds answers every kind this copy has a schema for.
@@ -570,11 +572,11 @@ func kindItems(kinds []string) []completionItem {
 
 // inFrontmatter says whether a row sits inside the opening yaml block.
 func inFrontmatter(lines []string, at int) bool {
-	if len(lines) == 0 || lines[0] != noteFence {
+	if len(lines) == 0 || lines[0] != frontmatter.Fence {
 		return false
 	}
 	for i := 1; i < len(lines); i++ {
-		if lines[i] == noteFence {
+		if lines[i] == frontmatter.Fence {
 			return at > 0 && at < i
 		}
 	}
@@ -586,7 +588,7 @@ func hasKey(lines []string, name string) bool {
 		if i == 0 {
 			continue
 		}
-		if line == noteFence {
+		if line == frontmatter.Fence {
 			return false
 		}
 		if strings.HasPrefix(strings.TrimSpace(line), name+":") {

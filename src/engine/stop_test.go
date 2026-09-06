@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -16,7 +17,7 @@ func TestAStopIsRefusedUntilAReasonIsClaimed(t *testing.T) {
 	exe := buildEngine(t)
 	r := guidanceTree(t)
 	Project(r)
-	l, _ := OpenLog(r.Private("log"))
+	l, _ := sessionlog.Open(r.Private("log"))
 	l.Close()
 
 	// THE FIRST STOP OF THE SESSION IS GRANTED, so it is spent before the rule
@@ -77,7 +78,7 @@ func TestTheFirstStopOfASessionIsGranted(t *testing.T) {
 	exe := buildEngine(t)
 	r := guidanceTree(t)
 	Project(r)
-	l, _ := OpenLog(r.Private("log"))
+	l, _ := sessionlog.Open(r.Private("log"))
 	l.Close()
 
 	if out := hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work}); out != "" {
@@ -96,7 +97,7 @@ func TestABlockedClaimIsRefusedWhileTheQueueWouldHandWork(t *testing.T) {
 	exe := buildEngine(t)
 	r := guidanceTree(t)
 	Project(r)
-	l, _ := OpenLog(r.Private("log"))
+	l, _ := sessionlog.Open(r.Private("log"))
 	l.Close()
 
 	// The first stop of the session is granted; spend the grace first.
@@ -146,7 +147,7 @@ func TestABlockedClaimStandsWhenTheQueueIsEmpty(t *testing.T) {
 	exe := buildEngine(t)
 	r := guidanceTree(t)
 	Project(r)
-	l, _ := OpenLog(r.Private("log"))
+	l, _ := sessionlog.Open(r.Private("log"))
 	l.Close()
 
 	hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work})
@@ -167,7 +168,7 @@ func TestAnyActionSpendsTheClaim(t *testing.T) {
 	exe := buildEngine(t)
 	r := guidanceTree(t)
 	Project(r)
-	l, _ := OpenLog(r.Private("log"))
+	l, _ := sessionlog.Open(r.Private("log"))
 	l.Close()
 
 	// The first stop of the session is granted, and the claim rule is what is

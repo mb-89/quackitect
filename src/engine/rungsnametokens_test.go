@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -31,19 +32,19 @@ const (
 func TestEveryRungButGodNamesItsToken(t *testing.T) {
 	t.Parallel()
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 
 	say := func(tool string, input map[string]any) string {
 		t.Helper()
 		body, _ := json.Marshal(map[string]any{"hook_event_name": "PreToolUse", "cwd": r.Work,
 			"session_id": "s-1", "tool_name": tool, "tool_input": input})
 		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 		return out.String()
 	}
 

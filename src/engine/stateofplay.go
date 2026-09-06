@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"quackitect/engine/internal/quiet"
+	"quackitect/engine/internal/sessionlog"
 	"sort"
 	"strconv"
 	"strings"
@@ -36,9 +37,15 @@ type Play struct {
 	Holds     []HoldLine     `json:"holds"`
 	Depths    map[string]int `json:"depths"`
 	OnAPerson []string       `json:"on_a_person,omitempty"`
-	Parked    int            `json:"parked"`
-	Minted    int            `json:"minted_last_hour"`
-	Closed    int            `json:"closed_last_hour"`
+	// WHAT WAITS BEHIND A ready_when, NAMED WITH ITS CONDITION. The queue hands
+	// none of these out, so this screen is where the person who parked one
+	// finds it again. A count alone said how many and not which.
+	Parked []string `json:"parked,omitempty"`
+	Minted int      `json:"minted_last_hour"`
+	Closed int      `json:"closed_last_hour"`
+	// Results is what the engine returned this session and how much of it
+	// was wrong, counted by the engine itself. See results.go.
+	Results Results `json:"results"`
 }
 
 // TheStateOfPlay reads the ledger the way a view does, and the current
@@ -54,8 +61,8 @@ func TheStateOfPlay(r Roots, now time.Time) Play {
 		if t.NeedsHuman {
 			p.OnAPerson = append(p.OnAPerson, t.ID+"  "+t.Title)
 		}
-		if strings.TrimSpace(t.ReadyWhen) != "" {
-			p.Parked++
+		if w := strings.TrimSpace(t.ReadyWhen); w != "" {
+			p.Parked = append(p.Parked, t.ID+"  "+t.Title+"  ready when "+w)
 		}
 		if t.Holder != "" {
 			p.Holds = append(p.Holds, HoldLine{Actor: t.Holder, ID: t.ID, Title: t.Title,
@@ -64,7 +71,9 @@ func TheStateOfPlay(r Roots, now time.Time) Play {
 	}
 	sort.Slice(p.Holds, func(i, j int) bool { return p.Holds[i].Actor < p.Holds[j].Actor })
 	sort.Strings(p.OnAPerson)
+	sort.Strings(p.Parked)
 	p.Minted, p.Closed = movedWithin(r, now, time.Hour)
+	p.Results = ResultsSoFar(r)
 	return p
 }
 
@@ -109,7 +118,7 @@ func gitShowsWhen(r Roots, hash string) (time.Time, error) {
 // the window. The record is the source, so nothing here derives a move from
 // what a token happens to look like now.
 func movedWithin(r Roots, now time.Time, window time.Duration) (minted, closed int) {
-	b, err := os.ReadFile(filepath.Join(r.Private("log"), Current))
+	b, err := os.ReadFile(filepath.Join(r.Private("log"), sessionlog.Current))
 	if err != nil {
 		return 0, 0
 	}
@@ -151,8 +160,11 @@ func (p Play) Screen() string {
 	if len(depths) > 0 {
 		fmt.Fprintf(&b, ": %s", strings.Join(depths, ", "))
 	}
-	fmt.Fprintf(&b, "\n%d on a person, %d parked\n", len(p.OnAPerson), p.Parked)
+	fmt.Fprintf(&b, "\n%d on a person, %d parked\n", len(p.OnAPerson), len(p.Parked))
 	for _, line := range p.OnAPerson {
+		fmt.Fprintf(&b, "  %s\n", line)
+	}
+	for _, line := range p.Parked {
 		fmt.Fprintf(&b, "  %s\n", line)
 	}
 	if len(p.Holds) > 0 {
@@ -165,6 +177,7 @@ func (p Play) Screen() string {
 			b.WriteString("\n")
 		}
 	}
+	fmt.Fprintf(&b, "results %d, %d wrong\n", p.Results.Returned, p.Results.Wrong)
 	fmt.Fprintf(&b, "last hour: minted %d, closed %d\n", p.Minted, p.Closed)
 	return b.String()
 }

@@ -3,9 +3,11 @@ package main
 import (
 	"os"
 	"path/filepath"
-	"reflect"
+	"quackitect/engine/internal/frontmatter"
 	"strings"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 // THE HOLD IS ENGINE STATE, NOT TOKEN CONTENT.
@@ -18,14 +20,14 @@ import (
 // noteParts answers a token file's frontmatter and its body as they are on
 // disk. The file is read rather than the token, because what is written on the
 // page is the thing under discussion.
-func noteParts(t *testing.T, r Roots, id string) (Front, string) {
+func noteParts(t *testing.T, r Roots, id string) (frontmatter.Front, string) {
 	t.Helper()
 	b, err := os.ReadFile(noteAt(r, id))
 	if err != nil {
 		t.Fatal(err)
 	}
-	front, body := SplitNote(string(b))
-	f, err := ParseFront(front)
+	front, body := frontmatter.Split(string(b))
+	f, err := frontmatter.Parse(front)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -34,8 +36,8 @@ func noteParts(t *testing.T, r Roots, id string) (Front, string) {
 
 // exceptTheStretch drops the two fields a take-up and a put-down are expected
 // to move: began and ended are the snapshots the engine writes at each end.
-func exceptTheStretch(f Front) Front {
-	out := Front{}
+func exceptTheStretch(f frontmatter.Front) frontmatter.Front {
+	out := frontmatter.Front{}
 	for k, v := range f {
 		if k == "began" || k == "ended" {
 			continue
@@ -43,22 +45,6 @@ func exceptTheStretch(f Front) Front {
 		out[k] = v
 	}
 	return out
-}
-
-// heldTokenRoots is the setup the hold tests share: a tree, a workable process
-// and an open log, so the session has a name to write arrivals against.
-func heldTokenRoots(t *testing.T) Roots {
-	t.Helper()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
-	writeProcess(t, root, "queued")
-	log, err := OpenLog(r.Private("log"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { log.Close() })
-	log.Write("engine", "start", "engine", "for the session name", Yes(), nil)
-	return r
 }
 
 // A TAKE-UP AND A PUT-DOWN LEAVE THE FILE ALONE, apart from the stretch.
@@ -78,8 +64,8 @@ func TestTakeUpAndPutDownWriteNoHolderIntoTheFile(t *testing.T) {
 	if v, ok := upFront["holder"]; ok {
 		t.Fatalf("take-up wrote holder %v into the token file; the hold is the engine's", v)
 	}
-	if !reflect.DeepEqual(exceptTheStretch(upFront), exceptTheStretch(wasFront)) || upBody != wasBody {
-		t.Fatalf("take-up changed the file beyond began and ended:\n%v\nwas\n%v", upFront, wasFront)
+	if d := cmp.Diff(exceptTheStretch(wasFront), exceptTheStretch(upFront)) + cmp.Diff(wasBody, upBody); d != "" {
+		t.Fatalf("take-up changed the file beyond began and ended (-was +now):\n%s", d)
 	}
 
 	if _, err := PutDown(r, tok.ID, "worker-1"); err != nil {
@@ -89,8 +75,8 @@ func TestTakeUpAndPutDownWriteNoHolderIntoTheFile(t *testing.T) {
 	if v, ok := downFront["holder"]; ok {
 		t.Fatalf("put-down wrote holder %v into the token file", v)
 	}
-	if !reflect.DeepEqual(exceptTheStretch(downFront), exceptTheStretch(wasFront)) || downBody != wasBody {
-		t.Fatalf("put-down changed the file beyond began and ended:\n%v\nwas\n%v", downFront, wasFront)
+	if d := cmp.Diff(exceptTheStretch(wasFront), exceptTheStretch(downFront)) + cmp.Diff(wasBody, downBody); d != "" {
+		t.Fatalf("put-down changed the file beyond began and ended (-was +now):\n%s", d)
 	}
 }
 
@@ -167,6 +153,11 @@ func TestAHoldFromAnEndedSessionIsNotBelieved(t *testing.T) {
 	if err := os.MkdirAll(r.Private(), 0o755); err != nil {
 		t.Fatal(err)
 	}
+	// AND A SESSION HAS TO BE READABLE FOR ANOTHER ONE TO HAVE ENDED. The store
+	// now decides through ofThisSession, so a log naming nobody decides nothing
+	// and what was written stands. This test is about a session that ended, so
+	// the tree is put in a later one and the window is its own test.
+	theSessionNowIs(t, r, "20260905-100000")
 	// What the night before left behind, under its own session. The id is made
 	// up: a test naming a token in the record goes stale when that one retires.
 	was := []byte(`{"session":"20260903-193501","held":{"wk-fromlastnight":"worker-heron"}}`)

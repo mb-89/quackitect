@@ -2,11 +2,13 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"hash/fnv"
 	"io"
 	"net"
 	"net/http"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -78,18 +80,20 @@ func hooksPort(r Roots) int {
 // A canonical form that reads the disk would also fail before the folder is
 // made, which is exactly when the cage needs the number.
 //
-// CASE IS FOLDED ONLY FOR A WINDOWS PATH, which a colon in the second place
-// tells. A POSIX path is left alone, because two folders there really can
-// differ by case alone.
+// CASE AND THE BACKSLASH ARE FOLDED ONLY FOR A WINDOWS PATH, which a colon in
+// the second place tells. A POSIX path is left alone, because two folders there
+// really can differ by case alone, and a backslash there is a character in a
+// name rather than a separator: /home/u/a\b and /home/u/a/b are two trees, and
+// folding them to one string would hand them one door.
 func theSameFolderEveryTime(path string) string {
-	path = strings.ReplaceAll(path, `\`, "/")
+	if len(path) >= 2 && path[1] == ':' {
+		path = strings.ReplaceAll(path, `\`, "/")
+		path = strings.ToLower(path)
+	}
 	for strings.Contains(path, "//") {
 		path = strings.ReplaceAll(path, "//", "/")
 	}
 	path = strings.TrimRight(path, "/")
-	if len(path) >= 2 && path[1] == ':' {
-		path = strings.ToLower(path)
-	}
 	return path
 }
 
@@ -111,7 +115,7 @@ func listenHooks(r Roots) (net.Listener, error) {
 // folder with a lock beside each, and the record is one file, so events are
 // serialised here rather than raced. A decision takes milliseconds, and the
 // harness sends few at once.
-func serveHooks(ln net.Listener, r Roots, log *Log) {
+func serveHooks(ctx context.Context, ln net.Listener, r Roots, log *sessionlog.Log) {
 	var one sync.Mutex
 	srv := &http.Server{
 		ReadHeaderTimeout: 2 * time.Second,
@@ -135,7 +139,7 @@ func serveHooks(ln net.Listener, r Roots, log *Log) {
 			theLoad.hooksWaiting.Add(-1)
 			waited := time.Since(arrived)
 			began := time.Now()
-			answerHook(raw, []string{"--method", r.Method}, &out, log)
+			answerHook(ctx, raw, []string{"--method", r.Method}, &out, log)
 			took := time.Since(began)
 			one.Unlock()
 			theLoad.hooksAnswered.Add(1)
@@ -188,7 +192,7 @@ const (
 // MEASURED. The line said bottleneck on all three, and the owner read "the
 // guard is the bottleneck: 1 queued, waited 0 ms" and asked how that was one.
 // The numbers beside the headline already said it was not.
-func (l *engineLoad) noteHook(log *Log, queued int, waited, took time.Duration) {
+func (l *engineLoad) noteHook(log *sessionlog.Log, queued int, waited, took time.Duration) {
 	behind := queued >= hookQueueBound || waited >= hookWaitBound
 	if !behind && took < hookTookBound {
 		return
@@ -204,7 +208,7 @@ func (l *engineLoad) noteHook(log *Log, queued int, waited, took time.Duration) 
 	}
 	log.Write("engine", "load", "engine",
 		fmt.Sprintf("%s: %d queued, waited %d ms, answered in %d ms",
-			says, queued, waited.Milliseconds(), took.Milliseconds()), No(),
+			says, queued, waited.Milliseconds(), took.Milliseconds()), sessionlog.No(),
 		map[string]any{"queued": queued, "waited_ms": waited.Milliseconds(), "took_ms": took.Milliseconds(),
 			"behind": behind, "verbs_in_flight": l.verbsInFlight.Load()})
 }

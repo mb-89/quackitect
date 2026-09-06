@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -9,6 +10,8 @@ import (
 	"path/filepath"
 	"quackitect/engine/internal/quiet"
 	"quackitect/engine/internal/replaced"
+	"quackitect/engine/internal/sessionlog"
+	"quackitect/engine/internal/version"
 	"strings"
 	"time"
 )
@@ -182,7 +185,7 @@ func goBuild(r Roots, one manifestBuild, next, stamp string) error {
 	// -gcflags=-e LIFTS THE ERROR CAP, so a sweep of undefined symbols comes
 	// back in one round rather than a batch at a time.
 	cmd := quiet.Quietly(exec.Command("go", "build", "-C", filepath.Join(r.Method, one.Source),
-		"-gcflags=-e", "-ldflags", "-X main.Build="+stamp, "-o", next, "."))
+		"-gcflags=-e", "-ldflags", "-X quackitect/engine/internal/version.Build="+stamp, "-o", next, "."))
 	cmd.Dir = r.Method
 	cmd.Env = buildEnv()
 	if said, err := cmd.CombinedOutput(); err != nil {
@@ -240,9 +243,9 @@ func planSwap(r Roots, why string, built bool) (swapPlan, error) {
 		if err != nil {
 			return swapPlan{}, fmt.Errorf("the program in .bin is not one to hand over to: %w", err)
 		}
-		if stamp == Build {
+		if stamp == version.Build {
 			return swapPlan{}, fmt.Errorf("the program on disk is this same build, %s, "+
-				"so there is nothing to hand over to", Build)
+				"so there is nothing to hand over to", version.Build)
 		}
 		return swapPlan{Build: stamp, Why: why}, nil
 	}
@@ -317,7 +320,15 @@ func putInPlace(r Roots, next string) error {
 
 // handOver starts the successor over the same tree and tells it which log
 // session it is continuing.
-func handOver(r Roots, session string) error {
+//
+// THE CONTEXT GOVERNS THE START AND NEVER THE CHILD. The successor is meant
+// to outlive this engine, so it is not run under the context, which would
+// kill it when this engine let go. An engine already ending starts no
+// successor, and that is the whole of what the context decides here.
+func handOver(ctx context.Context, r Roots, session string) error {
+	if err := ctx.Err(); err != nil {
+		return fmt.Errorf("this engine is ending, so it starts no successor: %w", err)
+	}
 	exe := engineAt(r)
 	out, err := os.OpenFile(r.Private("engine.out"), os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0o644)
 	if err != nil {
@@ -328,9 +339,15 @@ func handOver(r Roots, session string) error {
 	// THE SESSION RIDES OUT OF BAND. A swap is one session with two processes
 	// in it, and retiring the log at the handover would split the record of one
 	// stretch of work in half at a moment nobody chose.
-	cmd.Env = append(os.Environ(), sessionVar+"="+session)
+	cmd.Env = append(os.Environ(), sessionlog.SessionVar+"="+session)
 	cmd.Stdout, cmd.Stderr = out, out
+	// THE TREE IS LET GO OF FIRST, on purpose. A starting engine takes the
+	// tree before anything else, and this one still holds it, so a successor
+	// started while it is held would say already up and leave. A start that
+	// fails takes the tree back, because then this engine goes on being it.
+	LetGoOfTheTree()
 	if err := cmd.Start(); err != nil {
+		_, _ = HoldTheTree(r)
 		return err
 	}
 	return cmd.Process.Release() // it is its own process now
@@ -389,6 +406,63 @@ type swapAnswer struct {
 	Build    string `json:"build,omitempty"`
 	From     string `json:"from,omitempty"`
 	Says     string `json:"says,omitempty"`
+	// Waited is how long the caller watched for the successor to take over.
+	// The engine answers before the handover, so this is the field that says
+	// somebody looked afterwards, and for how long.
+	Waited string `json:"waited,omitempty"`
+}
+
+// swapLandsBudget is how long the caller watches for the successor to take
+// over. The engine answers before it drains, so the whole of the drain and a
+// verify can pass before the new build writes engine.json.
+const swapLandsBudget = swapDrainBudget + swapVerifyBudget
+
+// swapLandsTick is how often the caller looks while it waits.
+const swapLandsTick = 500 * time.Millisecond
+
+// afterTheAnswer is what the caller is told, once somebody has looked.
+//
+// THE ENGINE'S ANSWER IS A PROMISE AND NOT A REPORT. It answers as soon as the
+// next program is built and has answered for itself, and the handover is the
+// loop's to do afterwards. So swapping true meant the swap had been arranged,
+// never that it happened.
+//
+// MEASURED, TWICE IN ONE DAY. The door answered swapping true and named the
+// build. Three quarters of a minute later engine.json still named the old one
+// and the old code went on answering. Nothing said so, and an agent that had
+// just fixed a guard read a success while the old guard went on refusing it.
+//
+// SO THE CALLER WATCHES FOR THE BUILD IT WAS PROMISED, and says how long it
+// watched either way. A swap that was never arranged names no build, and there
+// is nothing to watch for.
+func afterTheAnswer(r Roots, a swapAnswer, within, tick time.Duration) swapAnswer {
+	if !a.Swapping || a.Build == "" {
+		return a
+	}
+	started := time.Now()
+	for {
+		v, up := LoadRunning(r)
+		if up && v.Build == a.Build {
+			a.Waited = time.Since(started).Round(time.Millisecond).String()
+			return a
+		}
+		if waited := time.Since(started); waited >= within {
+			// THE BUILD THAT IS STILL THERE IS HALF THE ANSWER. Naming only
+			// the one that did not arrive leaves the reader unable to say
+			// whether anything moved at all.
+			standing := v.Build
+			if !up || standing == "" {
+				standing = "nothing"
+			}
+			a.Swapping = false
+			a.Waited = waited.Round(time.Millisecond).String()
+			a.Says = "the engine said it was handing over to " + a.Build + " and did not. " +
+				"After " + a.Waited + " engine.json still names " + standing + ", so the old code " +
+				"is still answering. Stop the engine and start it again: se --stop, then se --work " + r.Work
+			return a
+		}
+		time.Sleep(tick)
+	}
 }
 
 // askForASwap asks the engine over this folder to replace itself, and answers
@@ -410,5 +484,7 @@ func askForASwap(r Roots, why string, built bool) (swapAnswer, error) {
 	if err := json.Unmarshal(raw, &a); err != nil {
 		return swapAnswer{}, err
 	}
-	return a, nil
+	// AND THEN SOMEBODY LOOKS. What came back is what the engine arranged, and
+	// the caller is the party that can see whether it happened.
+	return afterTheAnswer(r, a, swapLandsBudget, swapLandsTick), nil
 }

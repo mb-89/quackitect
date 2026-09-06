@@ -4,6 +4,9 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/expr"
+	"quackitect/engine/internal/yaml"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -28,11 +31,11 @@ import (
 
 type Pin struct {
 	Name   string
-	Filter *Expr
+	Filter *expr.Expr
 }
 
 type Level struct {
-	By         *Expr
+	By         *expr.Expr
 	Text       string
 	Descending bool
 
@@ -53,11 +56,11 @@ type Level struct {
 // open and what is backlogged. A view that counts nothing shows nothing.
 type Count struct {
 	Name   string
-	Filter *Expr
+	Filter *expr.Expr
 	// WHAT THE COUNT IS OUT OF. The person reads a bare number as a fraction
 	// with a missing half: two in work, out of how much that could be? The
 	// second filter names the whole, and the bar draws n over it.
-	OutOf *Expr
+	OutOf *expr.Expr
 }
 
 type Sort struct {
@@ -99,7 +102,7 @@ type View struct {
 	Collapsed []string
 	Sort      []Sort
 	Counts    []Count
-	Filter    *Expr
+	Filter    *expr.Expr
 	Limit     int
 }
 
@@ -107,7 +110,7 @@ type Base struct {
 	Path    string
 	Display map[string]string // property to column heading
 	Opens   map[string]bool   // a click on this column opens the note
-	Filter  *Expr
+	Filter  *expr.Expr
 	Views   []View
 }
 
@@ -120,11 +123,11 @@ func LoadBase(path string) (Base, error) {
 	if err != nil {
 		return b, err
 	}
-	tree, err := ParseYAML(string(text))
+	tree, err := yaml.Parse(string(text))
 	if err != nil {
 		return b, fmt.Errorf("%s: %w", filepath.Base(path), err)
 	}
-	top := ymap(tree)
+	top := yaml.Map(tree)
 	for key := range top {
 		switch key {
 		case "properties", "views", "filters", "groups", "pinned":
@@ -134,12 +137,12 @@ func LoadBase(path string) (Base, error) {
 				filepath.Base(path), key)
 		}
 	}
-	for name, cfg := range ymap(top["properties"]) {
-		m := ymap(cfg)
-		if d := ystr(m["displayName"]); d != "" {
+	for name, cfg := range yaml.Map(top["properties"]) {
+		m := yaml.Map(cfg)
+		if d := yaml.Str(m["displayName"]); d != "" {
 			b.Display[name] = d
 		}
-		b.Opens[name] = ystr(m["opensNote"]) == "true"
+		b.Opens[name] = yaml.Str(m["opensNote"]) == "true"
 	}
 	if b.Filter, err = filterOf(top["filters"]); err != nil {
 		return b, fmt.Errorf("%s: %w", filepath.Base(path), err)
@@ -157,8 +160,8 @@ func LoadBase(path string) (Base, error) {
 		"groups": top["groups"], "pinned": top["pinned"]}); err != nil {
 		return b, fmt.Errorf("%s: %w", filepath.Base(path), err)
 	}
-	for _, raw := range ylist(top["views"]) {
-		m := ymap(raw)
+	for _, raw := range yaml.List(top["views"]) {
+		m := yaml.Map(raw)
 		// A VIEW INHERITS EACH LIST ON ITS OWN. Taking both together wiped a
 		// view's own pins when it declared pins and no groups, which is what an
 		// ad-hoc pin on a group the data made looks like.
@@ -187,20 +190,20 @@ func LoadBase(path string) (Base, error) {
 var InheritedKeys = []string{"groups", "pinned"}
 
 func readView(m map[string]any) (View, error) {
-	v := View{Name: ystr(m["name"]), Type: ystr(m["type"]), Widths: map[string]int{}}
+	v := View{Name: yaml.Str(m["name"]), Type: yaml.Str(m["type"]), Widths: map[string]int{}}
 	if v.Type == "" {
 		v.Type = "table"
 	}
 	if v.Type != "table" {
 		return v, fmt.Errorf("view %q is a %s. This program draws a table", v.Name, v.Type)
 	}
-	v.Order = ystrs(m["order"])
-	v.Collapsed = ystrs(m["collapsed"])
-	if s := ystr(m["limit"]); s != "" {
+	v.Order = yaml.Strs(m["order"])
+	v.Collapsed = yaml.Strs(m["collapsed"])
+	if s := yaml.Str(m["limit"]); s != "" {
 		v.Limit, _ = strconv.Atoi(s)
 	}
-	for name, w := range ymap(m["columnSize"]) {
-		n, _ := strconv.Atoi(ystr(w))
+	for name, w := range yaml.Map(m["columnSize"]) {
+		n, _ := strconv.Atoi(yaml.Str(w))
 		v.Widths[name] = n
 	}
 	var err error
@@ -210,30 +213,30 @@ func readView(m map[string]any) (View, error) {
 	}
 	// groupBy takes a list, and each level subdivides the one above it. A
 	// single object parses too, because that is what Obsidian writes.
-	for _, raw := range ylist(m["groupBy"]) {
-		g := ymap(raw)
-		text := ystr(g["property"])
-		e, err := Parse(text)
+	for _, raw := range yaml.List(m["groupBy"]) {
+		g := yaml.Map(raw)
+		text := yaml.Str(g["property"])
+		e, err := expr.Parse(text)
 		if err != nil {
 			return v, fmt.Errorf("groupBy: %w", err)
 		}
-		v.Group = append(v.Group, Level{By: e, Text: text, Sets: ystr(g["sets"]),
-			Descending: strings.EqualFold(ystr(g["direction"]), "DESC")})
+		v.Group = append(v.Group, Level{By: e, Text: text, Sets: yaml.Str(g["sets"]),
+			Descending: strings.EqualFold(yaml.Str(g["direction"]), "DESC")})
 	}
-	for _, raw := range ylist(m["sort"]) {
-		s := ymap(raw)
-		v.Sort = append(v.Sort, Sort{Property: ystr(s["property"]),
-			Descending: strings.EqualFold(ystr(s["direction"]), "DESC")})
+	for _, raw := range yaml.List(m["sort"]) {
+		s := yaml.Map(raw)
+		v.Sort = append(v.Sort, Sort{Property: yaml.Str(s["property"]),
+			Descending: strings.EqualFold(yaml.Str(s["direction"]), "DESC")})
 	}
-	for _, raw := range ylist(m["counts"]) {
-		c := ymap(raw)
-		e, err := Parse(ystr(c["filter"]))
+	for _, raw := range yaml.List(m["counts"]) {
+		c := yaml.Map(raw)
+		e, err := expr.Parse(yaml.Str(c["filter"]))
 		if err != nil {
-			return v, fmt.Errorf("count %q: %w", ystr(c["name"]), err)
+			return v, fmt.Errorf("count %q: %w", yaml.Str(c["name"]), err)
 		}
-		count := Count{Name: ystr(c["name"]), Filter: e}
-		if of := ystr(c["outOf"]); of != "" {
-			whole, err := Parse(of)
+		count := Count{Name: yaml.Str(c["name"]), Filter: e}
+		if of := yaml.Str(c["outOf"]); of != "" {
+			whole, err := expr.Parse(of)
 			if err != nil {
 				return v, fmt.Errorf("count %q outOf: %w", count.Name, err)
 			}
@@ -241,16 +244,16 @@ func readView(m map[string]any) (View, error) {
 		}
 		v.Counts = append(v.Counts, count)
 	}
-	for _, raw := range ylist(m["groups"]) {
-		p := ymap(raw)
-		e, err := Parse(ystr(p["filter"]))
+	for _, raw := range yaml.List(m["groups"]) {
+		p := yaml.Map(raw)
+		e, err := expr.Parse(yaml.Str(p["filter"]))
 		if err != nil {
-			return v, fmt.Errorf("group %q: %w", ystr(p["name"]), err)
+			return v, fmt.Errorf("group %q: %w", yaml.Str(p["name"]), err)
 		}
-		v.Groups = append(v.Groups, Pin{Name: ystr(p["name"]), Filter: e})
+		v.Groups = append(v.Groups, Pin{Name: yaml.Str(p["name"]), Filter: e})
 	}
-	for _, raw := range ylist(m["pinned"]) {
-		if name := ystr(raw); name != "" {
+	for _, raw := range yaml.List(m["pinned"]) {
+		if name := yaml.Str(raw); name != "" {
 			// A NAME PINS A DECLARED GROUP. Naming one that is not declared
 			// would pin something with no filter, which draws nothing forever.
 			found := false
@@ -263,12 +266,12 @@ func readView(m map[string]any) (View, error) {
 			v.Pinned = append(v.Pinned, Pin{Name: name})
 			continue
 		}
-		p := ymap(raw)
-		e, err := Parse(ystr(p["filter"]))
+		p := yaml.Map(raw)
+		e, err := expr.Parse(yaml.Str(p["filter"]))
 		if err != nil {
-			return v, fmt.Errorf("pinned %q: %w", ystr(p["name"]), err)
+			return v, fmt.Errorf("pinned %q: %w", yaml.Str(p["name"]), err)
 		}
-		v.Pinned = append(v.Pinned, Pin{Name: ystr(p["name"]), Filter: e})
+		v.Pinned = append(v.Pinned, Pin{Name: yaml.Str(p["name"]), Filter: e})
 	}
 	for key := range m {
 		switch key {
@@ -283,7 +286,7 @@ func readView(m map[string]any) (View, error) {
 
 // A filter is a statement, or an object carrying and, or, not. Both shapes
 // come back as one expression, so nothing downstream knows which was written.
-func filterOf(raw any) (*Expr, error) {
+func filterOf(raw any) (*expr.Expr, error) {
 	switch t := raw.(type) {
 	case nil:
 		return nil, nil
@@ -291,22 +294,22 @@ func filterOf(raw any) (*Expr, error) {
 		if strings.TrimSpace(t) == "" {
 			return nil, nil
 		}
-		return Parse(t)
+		return expr.Parse(t)
 	case []any:
 		return joined("&&", t)
 	case map[string]any:
-		var parts []*Expr
+		var parts []*expr.Expr
 		for key, v := range t {
-			var e *Expr
+			var e *expr.Expr
 			var err error
 			switch key {
 			case "and":
-				e, err = joined("&&", ylist(v))
+				e, err = joined("&&", yaml.List(v))
 			case "or":
-				e, err = joined("||", ylist(v))
+				e, err = joined("||", yaml.List(v))
 			case "not":
-				inner, ierr := joined("&&", ylist(v))
-				e, err = &Expr{op: "!", args: []*Expr{inner}}, ierr
+				inner, ierr := joined("&&", yaml.List(v))
+				e, err = expr.Op("!", inner), ierr
 			default:
 				return nil, fmt.Errorf("a filter group is and, or, or not. It is not %q", key)
 			}
@@ -320,8 +323,8 @@ func filterOf(raw any) (*Expr, error) {
 	return nil, fmt.Errorf("a filter is a statement or a group")
 }
 
-func joined(op string, list []any) (*Expr, error) {
-	var parts []*Expr
+func joined(op string, list []any) (*expr.Expr, error) {
+	var parts []*expr.Expr
 	for _, raw := range list {
 		e, err := filterOf(raw)
 		if err != nil {
@@ -334,14 +337,14 @@ func joined(op string, list []any) (*Expr, error) {
 	return fold(op, parts), nil
 }
 
-func fold(op string, parts []*Expr) *Expr {
+func fold(op string, parts []*expr.Expr) *expr.Expr {
 	if len(parts) == 0 {
 		return nil
 	}
 	// A stable order, so a filter reads the same way twice. A map's is not one.
 	out := parts[0]
 	for _, e := range parts[1:] {
-		out = &Expr{op: op, args: []*Expr{out, e}}
+		out = expr.Op(op, out, e)
 	}
 	return out
 }
@@ -439,7 +442,7 @@ type PropertyInfo struct {
 	On   bool   `json:"on"`
 }
 
-func propertyInventory(rows []Row, order []string) []PropertyInfo {
+func propertyInventory(rows []expr.Row, order []string) []PropertyInfo {
 	seen := map[string]string{}
 	var names []string
 	for _, r := range rows {
@@ -456,7 +459,7 @@ func propertyInventory(rows []Row, order []string) []PropertyInfo {
 	sort.Strings(names)
 	var out []PropertyInfo
 	for _, n := range names {
-		out = append(out, PropertyInfo{Name: n, Type: orElse(seen[n], "string"), On: contains(order, n)})
+		out = append(out, PropertyInfo{Name: n, Type: orElse(seen[n], "string"), On: slices.Contains(order, n)})
 	}
 	return out
 }
@@ -479,10 +482,15 @@ type Table struct {
 	Heads   map[string]string `json:"heads"`
 	Widths  map[string]int    `json:"widths,omitempty"`
 	Opens   map[string]bool   `json:"opens,omitempty"`
-	Pinned  []Group           `json:"pinned,omitempty"`
-	Groups  []Group           `json:"groups"`
-	Counts  []Tally           `json:"counts,omitempty"`
-	Total   int               `json:"total"`
+	// A CELL THE ENGINE WILL NOT LET A PERSON TYPE OVER SAYS SO, AND WHY. The
+	// mirror of opens: opens says a cell is a door, locked says a cell is not an
+	// edit. The editor kept a list of its own that copied these refusals, so a
+	// property renamed here left it offering an edit the engine refused.
+	Locked map[string]string `json:"locked,omitempty"`
+	Pinned []Group           `json:"pinned,omitempty"`
+	Groups []Group           `json:"groups"`
+	Counts []Tally           `json:"counts,omitempty"`
+	Total  int               `json:"total"`
 
 	// WHAT THE TOOLBAR OPERATES ON. The properties a column list ticks, the
 	// levels a sort list shows, and the file itself, because the query is the
@@ -516,7 +524,7 @@ type LevelSaid struct {
 
 // Render selects, pins, groups and sorts. Rows arrive as flat maps and nothing
 // here knows where they came from.
-func Render(b Base, v View, rows []Row) (Table, error) {
+func Render(b Base, v View, rows []expr.Row) (Table, error) {
 	kept, err := keep(rows, b.Filter, v.Filter)
 	if err != nil {
 		return Table{}, err
@@ -599,8 +607,8 @@ func Render(b Base, v View, rows []Row) (Table, error) {
 	// rows first, so a group for that state below it could never draw anything:
 	// three rows under here, no group for the state, and no way to have both.
 	// The rows a query matches are still grouped below by their bucket.
-	ask := func(e *Expr) ([]Row, error) {
-		var mine []Row
+	ask := func(e *expr.Expr) ([]expr.Row, error) {
+		var mine []expr.Row
 		for _, r := range kept {
 			ok, err := truthy(e, r)
 			if err != nil {
@@ -639,9 +647,11 @@ func Render(b Base, v View, rows []Row) (Table, error) {
 			pinned[p.Name] = g
 			continue
 		}
-		if len(mine) == 0 {
-			continue
-		}
+		// A DECLARED GROUP IS DRAWN WITH NOTHING IN IT, which the .base file
+		// rules in its opening lines. Only the pinned ones survived at zero, so
+		// a heading vanished the moment its last row left, which is when a
+		// person most wants somewhere to drop onto. What a declaration names
+		// goes on existing whether or not a row is in that state today.
 		declared = append(declared, g)
 	}
 
@@ -682,6 +692,16 @@ func Render(b Base, v View, rows []Row) (Table, error) {
 		t.Sorted = append(t.Sorted, LevelSaid{Property: sr.Property, Direction: dirOf(sr.Descending)})
 	}
 	t.Props = propertyInventory(kept, t.Columns)
+	// THE RULING ON AN EDIT IS MADE ONCE, in refusedByHand, and the answer
+	// carries it per column. A person is who types in the editor.
+	for _, c := range t.Columns {
+		if why := refusedByHand(c, "person"); why != "" {
+			if t.Locked == nil {
+				t.Locked = map[string]string{}
+			}
+			t.Locked[c] = why
+		}
+	}
 	t.Filters = FilterGroups(v.RawFilter)
 	t.Operators = Operators
 
@@ -800,8 +820,8 @@ func dirOf(desc bool) string {
 	return "ASC"
 }
 
-func keep(rows []Row, global, own *Expr) ([]Row, error) {
-	var out []Row
+func keep(rows []expr.Row, global, own *expr.Expr) ([]expr.Row, error) {
+	var out []expr.Row
 	for _, r := range rows {
 		ok, err := truthy(global, r)
 		if err != nil {
@@ -822,7 +842,7 @@ func keep(rows []Row, global, own *Expr) ([]Row, error) {
 
 // A filter that was not written keeps everything, which is what having no
 // filter means.
-func truthy(e *Expr, r Row) (bool, error) {
+func truthy(e *expr.Expr, r expr.Row) (bool, error) {
 	if e == nil {
 		return true, nil
 	}
@@ -833,7 +853,7 @@ func truthy(e *Expr, r Row) (bool, error) {
 	return v.Truthy(), nil
 }
 
-func group(rows []Row, v View, cols []string, depth int) ([]Group, error) {
+func group(rows []expr.Row, v View, cols []string, depth int) ([]Group, error) {
 	if depth >= len(v.Group) {
 		if len(rows) == 0 {
 			return nil, nil
@@ -841,7 +861,7 @@ func group(rows []Row, v View, cols []string, depth int) ([]Group, error) {
 		return []Group{{Depth: depth, Count: len(rows), Lines: lines(rows, cols)}}, nil
 	}
 	level := v.Group[depth]
-	byKey := map[string][]Row{}
+	byKey := map[string][]expr.Row{}
 	var order []string
 	for _, r := range rows {
 		val, err := level.By.Eval(r)
@@ -873,7 +893,7 @@ func group(rows []Row, v View, cols []string, depth int) ([]Group, error) {
 			return nil, err
 		}
 		g := Group{Name: key, By: level.Text, Sets: level.Sets, Depth: depth,
-			Count: len(byKey[key]), Shut: contains(v.Collapsed, key)}
+			Count: len(byKey[key]), Shut: slices.Contains(v.Collapsed, key)}
 		// AN EMPTY KEY PINS LIKE ANY OTHER. It is usually the biggest group on
 		// the page, and it was the one group a person could not pin. The
 		// expression is the same one, and the engine reads holder == "" back.
@@ -888,7 +908,7 @@ func group(rows []Row, v View, cols []string, depth int) ([]Group, error) {
 	return out, nil
 }
 
-func lines(rows []Row, cols []string) []Line {
+func lines(rows []expr.Row, cols []string) []Line {
 	var out []Line
 	for _, r := range rows {
 		l := Line{ID: r["id"].Text(), Parent: r["parent"].Text(), Cells: map[string]Cell{}}
@@ -901,7 +921,7 @@ func lines(rows []Row, cols []string) []Line {
 	return out
 }
 
-func sortRows(rows []Row, by []Sort) {
+func sortRows(rows []expr.Row, by []Sort) {
 	if len(by) == 0 {
 		return
 	}
@@ -922,7 +942,7 @@ func sortRows(rows []Row, by []Sort) {
 
 // Every property any row carries, so a view that names no columns still draws
 // something rather than nothing.
-func columnsOf(rows []Row) []string {
+func columnsOf(rows []expr.Row) []string {
 	seen := map[string]bool{}
 	var out []string
 	for _, r := range rows {

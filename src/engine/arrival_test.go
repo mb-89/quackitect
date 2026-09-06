@@ -1,6 +1,7 @@
 package main
 
 import (
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -13,17 +14,17 @@ import (
 // harness session id, and that is the boundary an agent's life actually has.
 func TestASecondHarnessSessionReclaims(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	writeWorkableProcess(t, root, "queued")
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
 
 	// ONE ENGINE SESSION, AND THE FIRST HARNESS SESSION STARTS IN IT.
-	log.Write("agent", "session", "main", "session started, startup", Yes(),
+	log.Write("agent", "session", "main", "session started, startup", sessionlog.Yes(),
 		map[string]any{"source": "startup", "session": "harness-a"})
 
 	tok, err := Mint(r, Token{Tracked: local(), Process: "queued", Title: "work in hand", Status: "first"})
@@ -36,7 +37,7 @@ func TestASecondHarnessSessionReclaims(t *testing.T) {
 	}
 
 	// THE HARNESS RESTARTS: a new session id, same engine run.
-	log.Write("agent", "session", "main", "session started, startup", Yes(),
+	log.Write("agent", "session", "main", "session started, startup", sessionlog.Yes(),
 		map[string]any{"source": "startup", "session": "harness-b"})
 
 	a := Pull(r, "main", RoleWorker, Payload{})
@@ -49,16 +50,16 @@ func TestASecondHarnessSessionReclaims(t *testing.T) {
 // reclaims nothing: the holder is mid-work, not dead.
 func TestACompactionReclaimsNothing(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	writeWorkableProcess(t, root, "queued")
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
 
-	log.Write("agent", "session", "main", "session started, startup", Yes(),
+	log.Write("agent", "session", "main", "session started, startup", sessionlog.Yes(),
 		map[string]any{"source": "startup", "session": "harness-a"})
 
 	tok, err := Mint(r, Token{Tracked: local(), Process: "queued", Title: "work in hand", Status: "first"})
@@ -72,7 +73,7 @@ func TestACompactionReclaimsNothing(t *testing.T) {
 
 	// THE CONTEXT COMPACTS. The harness starts the session again with source
 	// compact, and whatever id it says, this is not a new agent.
-	log.Write("agent", "session", "main", "session started, compact", Yes(),
+	log.Write("agent", "session", "main", "session started, compact", sessionlog.Yes(),
 		map[string]any{"source": "compact", "session": "harness-a2"})
 
 	a := Pull(r, "main", RoleWorker, Payload{})

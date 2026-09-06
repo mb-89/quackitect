@@ -7,7 +7,9 @@ import (
 	"strconv"
 	"strings"
 
+	"quackitect/engine/internal/frontmatter"
 	"quackitect/engine/internal/voice"
+	"quackitect/engine/internal/yaml"
 )
 
 // Reads a note kind's shape from src/schemas and validates a note against it.
@@ -103,7 +105,7 @@ func listValue(v any) ([]string, bool) {
 		var out []string
 		for _, part := range splitOutsideQuotes(inner) {
 			if part = strings.TrimSpace(part); part != "" {
-				out = append(out, unquote(part))
+				out = append(out, frontmatter.Unquote(part))
 			}
 		}
 		return out, true
@@ -177,58 +179,58 @@ func LoadSchema(methodRoot, kind string) (Schema, error) {
 	if err != nil {
 		return Schema{}, fmt.Errorf("no schema for kind %q: %w", kind, err)
 	}
-	tree, err := ParseYAML(string(b))
+	tree, err := yaml.Parse(string(b))
 	if err != nil {
 		return Schema{}, fmt.Errorf("%s does not parse: %w", path, err)
 	}
-	top := ymap(tree)
-	s := Schema{Kind: ystr(top["kind"]), Guidance: ystr(top["guidance"])}
+	top := yaml.Map(tree)
+	s := Schema{Kind: yaml.Str(top["kind"]), Guidance: yaml.Str(top["guidance"])}
 	if s.Kind != kind {
 		return Schema{}, fmt.Errorf("%s declares kind %q and is named for %q", path, s.Kind, kind)
 	}
 
-	front := ymap(top["frontmatter"])
-	s.Frontmatter.AdditionalProperties = ystr(front["additionalProperties"]) == "true"
-	s.Frontmatter.Required = ystrs(front["required"])
+	front := yaml.Map(top["frontmatter"])
+	s.Frontmatter.AdditionalProperties = yaml.Str(front["additionalProperties"]) == "true"
+	s.Frontmatter.Required = yaml.Strs(front["required"])
 	s.Frontmatter.Properties = map[string]PropSpec{}
-	for name, raw := range ymap(front["properties"]) {
-		p := ymap(raw)
+	for name, raw := range yaml.Map(front["properties"]) {
+		p := yaml.Map(raw)
 		s.Frontmatter.Properties[name] = PropSpec{
-			Const:       ystr(p["const"]),
-			Type:        ystr(p["type"]),
-			Link:        ystr(p["x-link"]) == "true",
-			Enum:        ystrs(p["enum"]),
-			EnumFrom:    ystr(p["x-enum-from"]),
+			Const:       yaml.Str(p["const"]),
+			Type:        yaml.Str(p["type"]),
+			Link:        yaml.Str(p["x-link"]) == "true",
+			Enum:        yaml.Strs(p["enum"]),
+			EnumFrom:    yaml.Str(p["x-enum-from"]),
 			MaxWords:    schemaInt(p["x-max-words"]),
-			WholeWords:  ystr(p["x-whole-words"]) == "true",
-			Description: ystr(p["description"]),
+			WholeWords:  yaml.Str(p["x-whole-words"]) == "true",
+			Description: yaml.Str(p["description"]),
 		}
 	}
 
-	body := ymap(top["body"])
+	body := yaml.Map(top["body"])
 	s.Body.HeadingLevel = schemaInt(body["headingLevel"])
 	if s.Body.HeadingLevel == 0 {
 		s.Body.HeadingLevel = 1
 	}
-	s.Body.StrictOrder = ystr(body["order"]) == "strict"
-	s.Body.ExtraSections = ystr(body["extraSections"]) == "true"
-	for _, raw := range ylist(body["sections"]) {
-		m := ymap(raw)
+	s.Body.StrictOrder = yaml.Str(body["order"]) == "strict"
+	s.Body.ExtraSections = yaml.Str(body["extraSections"]) == "true"
+	for _, raw := range yaml.List(body["sections"]) {
+		m := yaml.Map(raw)
 		s.Body.Sections = append(s.Body.Sections, SectionSpec{
-			Header:              ystr(m["header"]),
-			HeaderPrefix:        ystr(m["headerPrefix"]),
-			Required:            ystr(m["required"]) == "true",
-			List:                ystr(m["list"]) == "true",
-			Ordered:             ystr(m["ordered"]) == "true",
-			DetailMarker:        ystr(m["detailMarker"]),
-			Explains:            ystr(m["explains"]),
-			Tense:               ystr(m["tense"]),
+			Header:              yaml.Str(m["header"]),
+			HeaderPrefix:        yaml.Str(m["headerPrefix"]),
+			Required:            yaml.Str(m["required"]) == "true",
+			List:                yaml.Str(m["list"]) == "true",
+			Ordered:             yaml.Str(m["ordered"]) == "true",
+			DetailMarker:        yaml.Str(m["detailMarker"]),
+			Explains:            yaml.Str(m["explains"]),
+			Tense:               yaml.Str(m["tense"]),
 			MaxItems:            schemaInt(m["maxItems"]),
 			MaxWordsPerItem:     schemaInt(m["maxWordsPerItem"]),
 			MaxSentences:        schemaInt(m["maxSentences"]),
 			MaxWordsPerSentence: schemaInt(m["maxWordsPerSentence"]),
 			MaxWords:            schemaInt(m["maxWords"]),
-			Description:         ystr(m["description"]),
+			Description:         yaml.Str(m["description"]),
 		})
 	}
 	if len(s.Body.Sections) == 0 {
@@ -239,22 +241,22 @@ func LoadSchema(methodRoot, kind string) (Schema, error) {
 
 // Every scalar arrives as a string, so a number is read where it is used.
 func schemaInt(v any) int {
-	n, err := strconv.Atoi(strings.TrimSpace(ystr(v)))
+	n, err := strconv.Atoi(strings.TrimSpace(yaml.Str(v)))
 	if err != nil {
 		return 0
 	}
 	return n
 }
 
-// splitNoteLines is SplitNote with the body's first line number, which an
+// splitNoteLines is frontmatter.Split with the body's first line number, which an
 // editor needs to put a mark on the right row.
 func splitNoteLines(text string) (front, body string, bodyLine int) {
 	lines := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
-	if len(lines) == 0 || lines[0] != noteFence {
+	if len(lines) == 0 || lines[0] != frontmatter.Fence {
 		return "", text, 1
 	}
 	for i := 1; i < len(lines); i++ {
-		if lines[i] != noteFence {
+		if lines[i] != frontmatter.Fence {
 			continue
 		}
 		j := i + 1
@@ -295,7 +297,7 @@ func ValidateNote(s Schema, text, methodRoot string) []Departure {
 		out = append(out, Departure{Line: 1,
 			Says: "it has no frontmatter, so nothing says which schema reads it"})
 	} else {
-		f, err := ParseFront(front)
+		f, err := frontmatter.Parse(front)
 		if err != nil {
 			out = append(out, Departure{Line: 1, Says: "the frontmatter does not parse: " + err.Error()})
 		} else {
@@ -311,7 +313,7 @@ func ValidateNote(s Schema, text, methodRoot string) []Departure {
 func frontValue(front, key string) string {
 	for _, line := range strings.Split(front, "\n") {
 		if rest, found := strings.CutPrefix(strings.TrimSpace(line), key+":"); found {
-			return unquote(strings.TrimSpace(rest))
+			return frontmatter.Unquote(strings.TrimSpace(rest))
 		}
 	}
 	return ""
@@ -328,14 +330,13 @@ func frontLine(front, key string) int {
 	return 1
 }
 
-func checkFront(spec FrontSpec, f Front, front string) []Departure {
+func checkFront(spec FrontSpec, f frontmatter.Front, front string) []Departure {
 	var out []Departure
 	for _, key := range spec.Required {
-		// A REQUIRED FIELD MAY BE A LIST, and asking a list for its string
-		// answers nothing. Every rationale in this tree was reported as having
-		// no explains while carrying one, because explains is an array and this
-		// read it as text: a required array could not be satisfied at all.
-		if !given(f, key) {
+		// A required field is asked for by presence, never by its string, so
+		// a required list is satisfied by the list it carries. Why is
+		// [[a-required-field-is-checked-by-presence]].
+		if !frontmatter.Given(f, key) {
 			out = append(out, Departure{Line: 1,
 				Says: fmt.Sprintf("the frontmatter has no %s", key)})
 		}
@@ -348,11 +349,11 @@ func checkFront(spec FrontSpec, f Front, front string) []Departure {
 		if p.Type == "array" {
 			if _, isList := listValue(raw); !isList {
 				out = append(out, Departure{Line: frontLine(front, name),
-					Says: fmt.Sprintf("%s is a list in the schema, and it is written %q", name, frontStr(f, name))})
+					Says: fmt.Sprintf("%s is a list in the schema, and it is written %q", name, frontmatter.Str(f, name))})
 			}
 			continue
 		}
-		got := unlink(frontStr(f, name))
+		got := unlink(frontmatter.Str(f, name))
 		if p.Const != "" && got != "" && got != p.Const {
 			out = append(out, Departure{Line: frontLine(front, name),
 				Says: fmt.Sprintf("%s reads %q and the schema allows only %q", name, got, p.Const)})
@@ -366,13 +367,29 @@ func checkFront(spec FrontSpec, f Front, front string) []Departure {
 	}
 	if !spec.AdditionalProperties {
 		for name := range f {
-			if _, declared := spec.Properties[name]; !declared {
+			if _, declared := spec.Properties[name]; !declared && !theEnginesOwnFields[name] {
 				out = append(out, Departure{Line: frontLine(front, name),
 					Says: fmt.Sprintf("the frontmatter carries %s, which the schema does not declare", name)})
 			}
 		}
 	}
 	return out
+}
+
+// theEnginesOwnFields are written by the engine and never by an author.
+//
+// A claim is bookkeeping. The engine writes it when an agent takes a token up.
+// It removes it when the token goes back.
+//
+// Declaring the pair as schema properties works, and says the wrong thing.
+// A declared property is what an author writes.
+// It reaches completion and the field descriptions.
+// Nobody fills these in.
+// So they are exempt here, beside the check that would otherwise refuse them.
+// See wk-4e643716ec.
+var theEnginesOwnFields = map[string]bool{
+	"claimed_by": true,
+	"claimed_at": true,
 }
 
 // checkWords holds a scalar field to its word count.
@@ -404,20 +421,9 @@ func checkWords(p PropSpec, name, got string, line int) []Departure {
 }
 
 // overWords answers a section's length when it runs past the bound the schema
-// puts on it, and the length is words.
-//
-// ONE SECTION, ONE BOUND, MEASURED IN ONE PLACE. The size was written twice:
-// maxWords for the editor and maxBytes for the save. Two numbers for one fact
-// drift, and these had, at six bytes to a word against the five this corpus
-// actually runs at. The two doors then disagreed about the same chapter, and a
-// writer was marked by one and refused by the other for the same prose.
-//
-// WORDS RATHER THAN BYTES, because a person writing a ticket counts words. A
-// byte count is the machine's unit, it says nothing a writer can act on, and
-// it moves when the text is not English.
-//
-// THE COMMENTS COME OUT FIRST. A comment is the template talking to the
-// writer, not prose the reader was handed, so it is not part of the size.
+// puts on it. The length is words, with the template's own comments dropped
+// first, and one bound is written once. What that settled, and why the unit is
+// words, is [[a-section-is-measured-in-words]].
 func overWords(max int, text string) (int, bool) {
 	if max <= 0 {
 		return 0, false
@@ -433,16 +439,23 @@ func checkBody(spec BodySpec, body string, bodyLine int) []Departure {
 	at := map[string]bodyChapter{}
 	var order []string
 	for _, c := range found {
+		// A heading opened twice is a departure, reported at the second, and
+		// the second is left out of what the rest of this check reads. Why it
+		// is not a replacement is [[a-chapter-opened-twice-is-a-departure]].
+		if _, again := at[c.Header]; again {
+			out = append(out, Departure{Line: bodyLine + c.Line,
+				Says: fmt.Sprintf("it opens the %s chapter twice, and a reader cannot tell which one the work was written against", c.Header)})
+			continue
+		}
 		at[c.Header] = c
 		order = append(order, c.Header)
 	}
 
 	var wanted []string
 	for _, sec := range spec.Sections {
-		// A SECTION MAY NAME A PREFIX RATHER THAN A HEADING. "evidence: write"
-		// and "evidence: decide" are one section of the schema and as many
-		// chapters as the process has activities, so the schema names the part
-		// that does not vary.
+		// A section naming a prefix matches every chapter whose heading starts
+		// with it, and each one is held to that section's bounds. Why the
+		// schema names a prefix is [[a-section-may-name-a-prefix]].
 		if sec.HeaderPrefix != "" {
 			for _, c := range found {
 				if strings.HasPrefix(c.Header, sec.HeaderPrefix) {
@@ -525,9 +538,8 @@ func checkExplains(spec BodySpec, at map[string]bodyChapter, bodyLine int) []Dep
 					Says: fmt.Sprintf("%q explains rule %d, and that rule carries no %q",
 						sub.Header, n, listSpec.DetailMarker)})
 			}
-			// ONE RULE, ONE CHAPTER. Two chapters numbered the same both found
-			// their star and both passed, so a rule could be argued twice and
-			// a reader had no way to know which chapter was the one.
+			// One rule, one chapter: a second chapter carrying a number already
+			// taken is a departure. See [[a-chapter-opened-twice-is-a-departure]].
 			if got[n] {
 				out = append(out, Departure{Line: line,
 					Says: fmt.Sprintf("%q explains rule %d, and another chapter already does",
@@ -771,25 +783,11 @@ func firstWords(s string, n int) string {
 	return strings.Join(f[:n], " ") + " ..."
 }
 
-// LintNotes reads every note under a folder against the schema its kind names.
-// A note naming no kind is a finding, not a skip.
-//
-// IT GOES ALL THE WAY DOWN, and it did not.
-//
-// MEASURED. It read one level and skipped every directory, so doc/guidance was
-// checked and doc/guidance/software-development was not. Three lane files and a
-// fourth in engine_design_principles had never been read by anything: the
-// schema they name applied to them exactly as much as to any other file, and
-// nothing had ever asked. A check that reads the top of a tree reports on the
-// tree, which is how a folder becomes the place unchecked things go.
-//
-// os.DirEntry AND filepath.SkipDir RATHER THAN THE io/fs SPELLING, because this
-// package already has a function called fs: the one that reads a frontmatter
-// field. One name, one thing.
-//
-// A PARKED FOLDER IS SKIPPED WHOLE. Parking is how a file is taken out of the
-// engine's way, and a folder named with a leading underscore takes everything
-// under it out too, which is what makes parking a thing you can do to a lane.
+// LintNotes reads every note under a folder against the schema its kind names,
+// walking all the way down. A note naming no kind is a finding rather than a
+// skip, and a folder parked with a leading underscore drops out with everything
+// beneath it. What the walk cost and what it caught is
+// [[a-lint-reads-the-whole-tree]].
 func LintNotes(r Roots, dir string) []Finding {
 	var out []Finding
 	err := filepath.WalkDir(dir, func(path string, e os.DirEntry, err error) error {
@@ -806,9 +804,8 @@ func LintNotes(r Roots, dir string) []Finding {
 		if !strings.HasSuffix(e.Name(), ".md") || Parked(e.Name()) {
 			return nil
 		}
-		// THE NAME SAYS WHERE IT IS. Two files called guidance.md, one at the
-		// top and one in a lane's folder, are two findings a reader has to be
-		// able to tell apart.
+		// The finding is named by the file's path from the folder walked, so
+		// two files with one name stay apart. See [[a-finding-is-named-by-its-path]].
 		id := e.Name()
 		if rel, err := filepath.Rel(dir, path); err == nil {
 			id = filepath.ToSlash(rel)
@@ -848,12 +845,10 @@ func LintGuidance(r Roots) []Finding {
 	return LintNotes(r, GuidanceDir(r.Method))
 }
 
-// LintRationales reads the arguments against the schema they name.
-//
-// A COPY WITH NO RATIONALE FOLDER IS NOT A FINDING. A working copy may carry
-// no argument yet, and an empty shelf is not a fault. A folder that is there
-// and will not read still is, because that is the case where this would
-// otherwise answer clean about notes it never opened.
+// LintRationales reads the arguments against the schema they name. Where the
+// folder is absent there is nothing to read and nothing to report, and where it
+// is present and unreadable there is. Both halves are
+// [[a-lint-reads-the-whole-tree]].
 func LintRationales(r Roots) []Finding {
 	dir := RationaleDir(r.Method)
 	if _, err := os.Stat(dir); os.IsNotExist(err) {

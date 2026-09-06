@@ -137,7 +137,9 @@ func loadOwed(r Roots) Owed {
 	if err != nil || json.Unmarshal(b, &f) != nil || f.Owed == nil {
 		return Owed{}
 	}
-	if f.Session != currentSession(r) {
+	// Through ofThisSession, so a rotation -- a fresh log naming nobody -- does
+	// not hand back nothing owed with nobody having answered.
+	if !ofThisSession(r, f.Session) {
 		return Owed{}
 	}
 	return f.Owed
@@ -274,7 +276,7 @@ func loadGrace(r Roots) graced {
 	if b, err := os.ReadFile(gracePath(r)); err == nil {
 		_ = json.Unmarshal(b, &g) // a file that will not read is a zero count
 	}
-	if g.Seen == nil || g.Session != currentSession(r) {
+	if g.Seen == nil || !ofThisSession(r, g.Session) { // a session that cannot be read decides nothing
 		g = graced{Session: currentSession(r), Seen: map[string]int{}}
 	}
 	return g

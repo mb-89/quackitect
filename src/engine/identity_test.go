@@ -45,6 +45,24 @@ func TestIdentityMaterialIsRefused(t *testing.T) {
 			refused: true, rule: "a datetime",
 		},
 		{
+			what:    "a lower-case month beside a day, carrying a year",
+			writes:  "Counted on 2 september 2026 by hand.",
+			refused: true, rule: "a datetime",
+		},
+		{
+			what:    "a lower-case month beside an ordinal day",
+			writes:  "Counted on 2nd september by hand.",
+			refused: true, rule: "a datetime",
+		},
+		{
+			what:   "a month name that is an ordinary word, read as one",
+			writes: "The queue held 12 may be more than the box can run.",
+		},
+		{
+			what:   "another month name read as a verb",
+			writes: "It found 3 march past the gate and counted none.",
+		},
+		{
 			what:   "a month and a year, which is the ruling's own answer",
 			writes: "The rewrite landed in September 2026 and holds.",
 		},
@@ -111,6 +129,67 @@ func TestAShortUsernameRefusesNothing(t *testing.T) {
 	for _, user := range []string{"", "mb"} {
 		if rule, matched, found := identityMaterial("the log grew by 20 MB, so mb", user); found {
 			t.Errorf("the username %q matched %q as %q", user, matched, rule)
+		}
+	}
+}
+
+// A SHORT NAME IS CAUGHT WHERE A PATH HOLDS IT, and nowhere else.
+//
+// THE FLOOR LEFT THE MACHINE THE GUARD RUNS ON UNGUARDED. A name under three
+// characters was matched nowhere, and this box's own name is two, so the branch
+// never ran here and the rule was proved against a name the box does not have.
+//
+// A PATH IS THE HANDLE A SHORT NAME HAS AND ORDINARY PROSE HAS NOT. A separator
+// or a tilde in front of it, and something that is not a letter or a digit
+// after, is a shape a home folder carries and a sentence does not. So a size in
+// megabytes beside the name is still taken, which is what the floor was for.
+func TestAShortUsernameIsCaughtInAPath(t *testing.T) {
+	const user = "mb"
+	for _, one := range []struct {
+		what    string
+		writes  string
+		refused bool
+	}{
+		{
+			what:    "a home folder built from the name",
+			writes:  "It wrote the report to /home/mb/notes and stopped.",
+			refused: true,
+		},
+		{
+			what:    "a windows home folder",
+			writes:  `LookPath answered C:\Users\mb\AppData\bash.exe`,
+			refused: true,
+		},
+		{
+			what:    "the name behind a tilde",
+			writes:  "The scratchpad sits under ~mb and travels nowhere.",
+			refused: true,
+		},
+		{
+			// THE ROW THE FLOOR WAS FOR, and it is still taken.
+			what:   "a size in megabytes beside the name",
+			writes: "the log grew by 20 MB, so mb",
+		},
+		{
+			what:   "a longer path element the name sits inside",
+			writes: "It read /var/mbox and answered nothing.",
+		},
+		{
+			what:   "another box's home folder, which is not this name",
+			writes: "It read /home/somebody/notes and answered nothing.",
+		},
+	} {
+		rule, matched, found := identityMaterial(one.writes, user)
+		if found != one.refused {
+			t.Errorf("%s: refused is %v and should be %v, matching %q as %q",
+				one.what, found, one.refused, matched, rule)
+			continue
+		}
+		if found && rule != "a username" {
+			t.Errorf("%s: the rule is %q and should be a username", one.what, rule)
+		}
+		if found && matched == "" {
+			t.Errorf("%s: refused and named nothing it matched", one.what)
 		}
 	}
 }

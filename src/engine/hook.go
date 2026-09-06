@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"quackitect/engine/internal/sessionlog"
 	"quackitect/engine/internal/voice"
 )
 
@@ -23,11 +25,42 @@ import (
 // LEVEL 0 DECIDES ALMOST NOTHING. It records everything, and it enforces the
 // short list that files and identities state fully. Everything about the work
 // is asked of an authority, and with no authority present the answer is yes.
+//
+// Why an event is taken only where this layer owns the decision is
+// [[a-hook-is-taken-only-when-level-0-owns-the-decision]]. What a write is
+// held to, and why place is never the reason, is
+// [[the-guard-scrutinises-rather-than-forbids]].
+
+// THE HARNESS NAMES ITS EVENT, AND THE SET OF NAMES IS CLOSED. Every event
+// this engine handles is a constant of one type, so a case or a comparison
+// naming one is a name the compiler resolves rather than a string nobody
+// checks. A typo in a bare literal was silent: the case never fired, and the
+// event fell through to the default.
+//
+// The decode is the one edge where an unchecked string arrives, and an event
+// this engine does not handle is what the default case is for.
+type HookEvent string
+
+const (
+	EventPreToolUse         HookEvent = "PreToolUse"
+	EventPostToolUse        HookEvent = "PostToolUse"
+	EventPostToolUseFailure HookEvent = "PostToolUseFailure"
+	EventStop               HookEvent = "Stop"
+	EventStopFailure        HookEvent = "StopFailure"
+	EventUserPromptSubmit   HookEvent = "UserPromptSubmit"
+	EventSessionStart       HookEvent = "SessionStart"
+	EventSessionEnd         HookEvent = "SessionEnd"
+	EventSubagentStart      HookEvent = "SubagentStart"
+	EventSubagentStop       HookEvent = "SubagentStop"
+	EventPreCompact         HookEvent = "PreCompact"
+	EventConfigChange       HookEvent = "ConfigChange"
+	EventNotification       HookEvent = "Notification"
+)
 
 type hookIn struct {
 	SessionID      string          `json:"session_id"`
 	Cwd            string          `json:"cwd"`
-	Event          string          `json:"hook_event_name"`
+	Event          HookEvent       `json:"hook_event_name"`
 	ToolName       string          `json:"tool_name"`
 	ToolInput      json.RawMessage `json:"tool_input"`
 	ToolUseID      string          `json:"tool_use_id"`
@@ -97,7 +130,7 @@ func (ti toolInput) writtenText() string {
 func (g *guard) deny(reason string) {
 	out, _ := json.Marshal(map[string]any{
 		"hookSpecificOutput": map[string]any{
-			"hookEventName":            "PreToolUse",
+			"hookEventName":            string(EventPreToolUse),
 			"permissionDecision":       "deny",
 			"permissionDecisionReason": reason,
 		},
@@ -248,18 +281,43 @@ func runsTheEngine(command string) bool {
 func theQuotings(command string) (separators, substitutions string) {
 	var sep, sub strings.Builder
 	quote := rune(0)
+	escaped := false
 	for _, r := range command {
+		// A BACKSLASH HANDS THE CHARACTER AFTER IT THROUGH AS TEXT, and both
+		// scans read a space in its place. A space starts no substitution and
+		// separates no command, which is what the escaped character now is.
+		if escaped {
+			escaped = false
+			sep.WriteRune(' ')
+			sub.WriteRune(' ')
+			continue
+		}
 		switch {
 		case quote == '\'':
+			// A BACKSLASH IS AN ORDINARY CHARACTER IN SINGLE QUOTES, so this
+			// branch never escapes and the span ends on the next quote.
 			if r == '\'' {
 				quote = 0
 			}
 		case quote == '"':
+			// MEASURED. Every double quote ended the span, so an escaped one
+			// closed it here while bash keeps it open. se apply carrying a
+			// JSON payload was then refused for a redirection, for a second
+			// command and for a newline, none of which it held.
+			if r == '\\' {
+				escaped = true
+				sub.WriteRune(' ')
+				continue
+			}
 			if r == '"' {
 				quote = 0
 				continue
 			}
 			sub.WriteRune(r)
+		case r == '\\':
+			escaped = true
+			sep.WriteRune(' ')
+			sub.WriteRune(' ')
 		case r == '\'' || r == '"':
 			quote = r
 			sep.WriteRune(' ')
@@ -345,7 +403,7 @@ func (g *guard) blockStop(reason string) {
 
 // runHook is the command form: the event on standard input, the decision on
 // standard output. The engine that lives serves the same function over HTTP.
-func runHook(args []string) {
+func runHook(ctx context.Context, args []string) {
 	raw, err := io.ReadAll(os.Stdin)
 	if err != nil {
 		// A guard that cannot read its input must not pass silently. It says
@@ -354,13 +412,15 @@ func runHook(args []string) {
 		fmt.Fprintln(os.Stderr, "hook: cannot read the event:", err)
 		return
 	}
-	answerHook(raw, args, os.Stdout, nil)
+	answerHook(ctx, raw, args, os.Stdout, nil)
 }
 
 // answerHook is the guard: one event in, one decision out. held is the
 // record when the engine that lives is answering, and nil when a process
 // per event is, which then opens the record for the length of the event.
-func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
+// The context is the caller's, and the one spawn here, ensureEngine, waits
+// on it and no longer than it.
+func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, held *sessionlog.Log) {
 	g := &guard{out: out}
 	var in hookIn
 	if err := json.Unmarshal(raw, &in); err != nil {
@@ -379,7 +439,7 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 			wake = true
 		default:
 			if in.Event == "" {
-				in.Event = args[i] // a harness that names the event on the line
+				in.Event = HookEvent(args[i]) // a harness that names the event on the line
 			}
 		}
 	}
@@ -408,13 +468,13 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 	// costs at most the rest of one turn, and every per-call event goes to
 	// the engine over HTTP with no process at all.
 	if wake {
-		ensureEngine(roots)
+		ensureEngine(ctx, roots)
 		return
 	}
 
 	log := held
 	if log == nil {
-		opened, err := OpenExistingLog(roots.Private("log"))
+		opened, err := sessionlog.OpenExisting(roots.Private("log"))
 		if err != nil {
 			// No log means no engine. The guard still answers, because the
 			// answer is about a file and not about a session.
@@ -430,13 +490,14 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 	//
 	// The identity is still the harness's, and it is what everything is keyed
 	// by. The name is what the record shows.
-	if in.Event == "SubagentStart" {
+	// Why every call carries one is [[every-call-carries-an-identity]].
+	if in.Event == EventSubagentStart {
 		NoteAgent(roots, in.AgentID, in.AgentType, in.SessionID)
 	}
 	// WHOEVER IS CALLING IS HERE, whether or not this run saw them arrive.
 	// An end event is the one call that says the opposite, and it is
 	// handled below rather than registered here.
-	if in.Event != "SessionEnd" && in.Event != "SubagentStop" {
+	if in.Event != EventSessionEnd && in.Event != EventSubagentStop {
 		AgentSeen(roots, in.SessionID, in.AgentID, in.AgentType)
 	}
 	// WHOEVER IS CALLING, UNDER THE NAME THE RECORD USES FOR IT. A helper is
@@ -453,13 +514,13 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 	// wanted: the button is the grant.
 	if h := LoadHold(roots); h.On {
 		switch in.Event {
-		case "PreToolUse":
-			record(log, "engine", "hold", actor, "refused: everything is on hold", No(),
+		case EventPreToolUse:
+			record(log, "engine", "hold", actor, "refused: everything is on hold", sessionlog.No(),
 				map[string]any{"tool": in.ToolName})
 			g.deny(h.Says)
 			return
-		case "Stop":
-			record(log, "agent", "stop", actor, "stopped: everything is on hold", Yes(), nil)
+		case EventStop:
+			record(log, "agent", "stop", actor, "stopped: everything is on hold", sessionlog.Yes(), nil)
 			return
 		}
 	}
@@ -474,8 +535,8 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 	// not reach up here: what god mode removes is the ENGINE'S judgement, never
 	// the person's own controls. An override that could also silence the person
 	// holding it is not an override, it is a runaway.
-	if asked := LoadAsked(roots); asked.Owed() && in.Event == "PreToolUse" && !isAnswering(in) {
-		record(log, "engine", "asked", actor, "refused: the person asked what is happening", No(),
+	if asked := LoadAsked(roots); asked.Owed() && in.Event == EventPreToolUse && !isAnswering(in) {
+		record(log, "engine", "asked", actor, "refused: the person asked what is happening", sessionlog.No(),
 			map[string]any{"tool": in.ToolName, "asked": asked.On})
 		g.deny(asked.Says)
 		return
@@ -494,10 +555,10 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 	//
 	// THE GUARD CLEARS IT, BECAUSE ONLY THE GUARD KNOWS WHO ANSWERED. The
 	// answer verb runs as a program with no idea which agent called it.
-	if in.Event == "PostToolUse" && isAnswering(in) {
+	if in.Event == EventPostToolUse && isAnswering(in) {
 		_ = TheyWereAnswered(roots, actor) // an answer it cannot clear is cleared on the next call
 	}
-	if in.Event == "PreToolUse" || in.Event == "PostToolUse" || in.Event == "Stop" {
+	if in.Event == EventPreToolUse || in.Event == EventPostToolUse || in.Event == EventStop {
 		CopyWhatWasHeard(roots, in.Transcript, log, actor)
 	}
 
@@ -509,10 +570,10 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 	// a tool call is on its way, so refusing that call kills work the agent
 	// began before it could have known. The first few calls are warned and the
 	// rest are refused, and the warning says how many are left.
-	if in.Event == "PreToolUse" && cfg.AnswerFirst && !isAnswering(in) {
+	if in.Event == EventPreToolUse && cfg.AnswerFirst && !isAnswering(in) {
 		if said, refuse := AnswerOwedNow(roots, actor); said != "" {
 			if refuse {
-				record(log, "engine", "owed", actor, "refused: they are waiting for an answer", No(),
+				record(log, "engine", "owed", actor, "refused: they are waiting for an answer", sessionlog.No(),
 					map[string]any{"tool": in.ToolName})
 				// A REFUSAL THAT NAMES ONLY A LANE TOOL IS A DOOR THAT MAY NOT BE
 				// THERE. A cloud box whose tool lane never came up read "answer with
@@ -525,7 +586,7 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 					"You do not have to stop the turn to be heard.\n\n" + theShellDoor("--answer \"...\""))
 				return
 			}
-			record(log, "engine", "owed", actor, "warned: they are waiting for an answer", Yes(),
+			record(log, "engine", "owed", actor, "warned: they are waiting for an answer", sessionlog.Yes(),
 				map[string]any{"tool": in.ToolName})
 			g.warn(firstLines(said, 12) +
 				"\n\nAnswer them with se_answer. You do not have to stop the turn to be heard.")
@@ -533,15 +594,15 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 	}
 
 	switch in.Event {
-	case "PreToolUse":
+	case EventPreToolUse:
 		decidePreToolUse(g, roots, cfg, emergency, log, in, actor)
-	case "Stop":
+	case EventStop:
 		// THE TURN ENDED, and its foreground helpers with it.
 		if in.AgentID == "" {
 			HelpersGoneWith(roots, in.SessionID)
 		}
 		decideStop(g, roots, cfg, log, in, actor)
-	case "UserPromptSubmit":
+	case EventUserPromptSubmit:
 		// A NEW PROMPT IS A NEW TURN, and the last turn's helpers are gone
 		// with it, interrupted or finished. One still calling comes back.
 		if in.AgentID == "" {
@@ -560,34 +621,39 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 		// A PROMPT GOING IN FLIPS THE FLAG, here for a prompt that starts a
 		// turn and in the said verb for one written into a running turn.
 		_ = TheyAsked(roots, actor, in.Prompt+in.UserPrompt) // the guard answers whether or not it can note the question
-	case "SessionStart":
+		// A PERSON WITH NO PANEL REACHES A CONTROL BY WRITING ITS KEYWORD.
+		KeywordSaid(roots, log, actor, in.Prompt+in.UserPrompt)
+	case EventSessionStart:
 		// A session that resumes after a compaction starts with nothing read.
 		if in.Source == "compact" || in.Source == "clear" {
 			ForgetReads(roots, in.Source)
 		}
-		record(log, "agent", "session", actor, "session started, "+in.Source, Yes(),
-			map[string]any{"source": in.Source, "session": in.SessionID})
+		// THE SURFACE IS WRITTEN WHERE THE SESSION BEGINS, because this process
+		// is the one the harness spawned for this event, and its environment is
+		// the only place that says what drove it.
+		record(log, "agent", "session", actor, "session started, "+in.Source, sessionlog.Yes(),
+			map[string]any{"source": in.Source, "session": in.SessionID, "surface": TheSurface()})
 		// THE SESSION IS AN AGENT AND IT HAS ARRIVED. What is present is
 		// answered off this register, so a panel says who is here rather
 		// than who has pulled.
 		NoteSession(roots, in.SessionID)
 		// THE ENGINE IS UP BEFORE THE FIRST CALL, because every call from
 		// here on is answered by it.
-		ensureEngine(roots)
-	case "StopFailure":
+		ensureEngine(ctx, roots)
+	case EventStopFailure:
 		// A TURN ENDED BY THE API, WITH THE KIND OF ENDING. Without the type
 		// every such ending read as unknown, and the one class the agent can
 		// fix itself, running out of output, looked like the ones it cannot.
-		record(log, "agent", "stop", actor, "turn ended by the API: "+orElse(in.ErrorType, "unknown"), No(),
+		record(log, "agent", "stop", actor, "turn ended by the API: "+orElse(in.ErrorType, "unknown"), sessionlog.No(),
 			map[string]any{"error_type": orElse(in.ErrorType, "unknown")})
-	case "SessionEnd":
-		record(log, "agent", "session", actor, "session ended", Yes(), nil)
+	case EventSessionEnd:
+		record(log, "agent", "session", actor, "session ended", sessionlog.Yes(), nil)
 		AgentsGoneWith(roots, in.SessionID)
-	case "SubagentStart":
+	case EventSubagentStart:
 		// Every agent has an identity, and the record says which one acted.
-		record(log, "agent", "helper", actor, "helper started: "+in.AgentType, Yes(),
+		record(log, "agent", "helper", actor, "helper started: "+in.AgentType, sessionlog.Yes(),
 			map[string]any{"agent_type": in.AgentType})
-	case "SubagentStop":
+	case EventSubagentStop:
 		// A HELPER'S ANSWER IS A DIGEST, OR IT GOES BACK TO BE ONE. A helper
 		// that returns what it read moves the tokens into the parent's context
 		// with extra steps, and today that looks like a slow turn. The budget
@@ -595,15 +661,20 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 		// job, and the refusal is bounded so the harness never overrides it
 		// silently.
 		if why, refuse := aHelperReturningTooMuch(roots, cfg, in); refuse {
-			if countRefusedStop(roots, "helper:"+in.AgentID) >= helperRefusalsBeforeRelenting {
-				record(log, "agent", "helper", actor, "helper stopped, its answer over budget and the guard relenting", No(),
-					map[string]any{"relented": true})
+			if AHelperAnswerStillRefused(roots, in.AgentID) {
+				record(log, "agent", "helper", actor, "helper stop refused: its answer is over budget", sessionlog.No(),
+					map[string]any{"returned": len(in.LastAssistantMessage), "read": bytesReadByAnyNameOf(roots, in.AgentID)})
+				g.blockStop(why)
 				break
 			}
-			record(log, "agent", "helper", actor, "helper stop refused: its answer is over budget", No(),
-				map[string]any{"returned": len(in.LastAssistantMessage), "read": BytesReadBy(roots, in.AgentID)})
-			g.blockStop(why)
-			break
+			// RELENTING LETS THE HELPER GO, AND LETTING GO IS EVERYTHING BELOW.
+			// This broke out of the case instead, so the holding-work door, the
+			// forgetting of the counts, the release of what it held and AgentGone
+			// were all skipped. A helper over budget and holding an open token
+			// walked off with the token, and the row sat in the panel until the
+			// sweep at the next engine start.
+			record(log, "agent", "helper", actor, "helper stopped, its answer over budget and the guard relenting", sessionlog.No(),
+				map[string]any{"relented": true})
 		}
 		// A HELPER DOES NOT WALK AWAY FROM WORK IN HAND.
 		//
@@ -615,28 +686,28 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 		// that dies anyway. See goneputsdown.go.
 		if why, refuse := AHelperStopHoldingWork(roots, in.AgentID); refuse {
 			if AHelperStopStillRefused(roots, in.AgentID) {
-				record(log, "agent", "helper", actor, "helper stop refused: it is holding open work", No(),
+				record(log, "agent", "helper", actor, "helper stop refused: it is holding open work", sessionlog.No(),
 					map[string]any{"held": len(TheyHold(roots, in.AgentID))})
 				g.blockStop(why)
 				break
 			}
-			record(log, "agent", "helper", actor, "helper stopped holding work, and the guard relented", No(),
+			record(log, "agent", "helper", actor, "helper stopped holding work, and the guard relented", sessionlog.No(),
 				map[string]any{"relented": true, "held": len(TheyHold(roots, in.AgentID))})
 		}
 		forgetRefusedStops(roots, "helper:"+in.AgentID)
 		forgetRefusedStops(roots, "holding:"+in.AgentID)
 		if back := PutDownWhatTheyHeld(roots, in.AgentID); len(back) > 0 {
-			record(log, "agent", "helper", actor, "work a helper left behind went back to the queue", Yes(),
+			record(log, "agent", "helper", actor, "work a helper left behind went back to the queue", sessionlog.Yes(),
 				map[string]any{"put_down": back})
 		}
 		AgentGone(roots, in.AgentID)
-		record(log, "agent", "helper", actor, "helper stopped", Yes(), nil)
-	case "PreCompact":
+		record(log, "agent", "helper", actor, "helper stopped", sessionlog.Yes(), nil)
+	case EventPreCompact:
 		// What was read is no longer held, so it is no longer claimed as read.
 		n := ForgetReads(roots, "compaction")
-		record(log, "engine", "compact", actor, "context compacted, read evidence reset", Yes(),
+		record(log, "engine", "compact", actor, "context compacted, read evidence reset", sessionlog.Yes(),
 			map[string]any{"forgotten": n})
-	case "PostToolUse":
+	case EventPostToolUse:
 		// The obligation was already cleared above, before this event's new
 		// messages were copied.
 		//
@@ -651,13 +722,13 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 		if said == "" {
 			said = describe(in.ToolName, pathOf(in), "")
 		}
-		record(log, "agent", "call", actor, said, Yes(),
+		record(log, "agent", "call", actor, said, sessionlog.Yes(),
 			map[string]any{"tool": in.ToolName, "path": pathOf(in)})
-	case "ConfigChange":
+	case EventConfigChange:
 		// The files that changed were read under rules that no longer hold.
 		ForgetReads(roots, "configuration changed")
-		record(log, "engine", "config", actor, "configuration changed, read evidence reset", Yes(), nil)
-	case "PostToolUseFailure":
+		record(log, "engine", "config", actor, "configuration changed, read evidence reset", sessionlog.Yes(), nil)
+	case EventPostToolUseFailure:
 		// THE FAILURE IS COUNTED, so the same call failing the same way over
 		// and over is refused before the turn dies of it.
 		noteFailure(roots, actor, in)
@@ -666,12 +737,13 @@ func answerHook(raw []byte, args []string, out io.Writer, held *Log) {
 		if said == "" {
 			said = describe(in.ToolName, pathOf(in), "")
 		}
-		record(log, "agent", "call", actor, said, No(),
+		record(log, "agent", "call", actor, said, sessionlog.No(),
 			map[string]any{"tool": in.ToolName})
-	case "Notification":
+	case EventNotification:
 		record(log, "engine", "note", actor, firstLine(string(raw)), nil, nil)
 	default:
-		record(log, "engine", "hook", actor, in.Event, nil, map[string]any{"event": in.Event})
+		record(log, "engine", "hook", actor, string(in.Event), nil,
+			map[string]any{"event": string(in.Event)})
 	}
 }
 
@@ -723,7 +795,7 @@ func isTheStopVerb(in hookIn) bool {
 	return false
 }
 
-func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, log *Log, in hookIn, actor string) {
+func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, log *sessionlog.Log, in hookIn, actor string) {
 	// ANYTHING YOU DO AFTER CLAIMING A STOP ERASES THE CLAIM. A claim says the
 	// next thing is stopping. An agent that claims and then carries on has
 	// changed its mind, whether or not it noticed.
@@ -782,7 +854,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 		named = theNameACommandActsUnder(ti.Command)
 	}
 	if why, refuse := ANameAnotherSessionHolds(roots, in.SessionID, named); refuse {
-		record(log, "engine", "gate", actor, "refused: that name is another session's", No(),
+		record(log, "engine", "gate", actor, "refused: that name is another session's", sessionlog.No(),
 			map[string]any{"tool": in.ToolName, "named": named})
 		g.deny(why)
 		return
@@ -796,8 +868,19 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// not short-handed, and being told to spawn five workers for a backlog they
 	// are deliberately ignoring is the engine arguing with them.
 	if why, refuse := AStaffShortfall(roots, cfg, actor, in.ToolName, ti.Command); refuse && !Unleashed(roots) {
-		record(log, "engine", "staffing", actor, "refused: the queue wants more hands than are here", No(),
+		record(log, "engine", "staffing", actor, "refused: the queue wants more hands than are here", sessionlog.No(),
 			map[string]any{"tool": in.ToolName})
+		g.deny(why)
+		return
+	}
+
+	// A CLOUD BOX'S NOTES GO INTO GIT BEFORE THEY GO DOWN WITH IT. Nothing
+	// pushes a note, and a cloud box is reclaimed when the session ends, so at
+	// the ceiling the work is held until each note is a tracked token or gone.
+	// Unbound turns it off, the way it turns the staffing guard off.
+	if why, refuse := TooManyNotes(roots, actor, in.ToolName, ti.Command); refuse && !Unleashed(roots) {
+		record(log, "engine", "notes", actor, "refused: the notes on this box are not in git", sessionlog.No(),
+			map[string]any{"tool": in.ToolName, "notes": len(NotesInHand(roots))})
 		g.deny(why)
 		return
 	}
@@ -805,7 +888,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// THE SAME CALL FAILING THE SAME WAY AGAIN IS STOPPED HERE, before the
 	// tokens are spent on it once more.
 	if why, refuse := aRepeatedFailure(roots, actor, in); refuse {
-		record(log, "engine", "loop", actor, "refused: the same call failed again and again", No(),
+		record(log, "engine", "loop", actor, "refused: the same call failed again and again", sessionlog.No(),
 			map[string]any{"tool": in.ToolName})
 		g.deny(why)
 		return
@@ -818,14 +901,28 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// THE LOOP IS ASKED FIRST. A loop names no files, so the read question has
 	// nothing to work on, and the refusal that fits is the one about the shape.
 	if ti.Command != "" {
-		if why, refuse := ALoopThatRemoves(ti.Command); refuse {
-			record(log, "engine", "removal", actor, "refused: a loop that deletes", No(),
+		if why, refuse := ALoopThatRemoves(ti.Command, roots.Work); refuse {
+			record(log, "engine", "removal", actor, "refused: a loop that deletes", sessionlog.No(),
+				map[string]any{"tool": in.ToolName})
+			g.deny(why)
+			return
+		}
+		if why, refuse := AGitCleanIsARemoval(roots, actor, ti.Command, roots.Work); refuse {
+			record(log, "engine", "removal", actor, "refused: a git clean", sessionlog.No(),
 				map[string]any{"tool": in.ToolName})
 			g.deny(why)
 			return
 		}
 		if why, refuse := ARemovalWithoutARead(roots, actor, ti.Command, roots.Work); refuse {
-			record(log, "engine", "removal", actor, "refused: a removal of a file nobody read", No(),
+			record(log, "engine", "removal", actor, "refused: a removal of a file nobody read", sessionlog.No(),
+				map[string]any{"tool": in.ToolName})
+			g.deny(why)
+			return
+		}
+		// A COMMIT CARRIES ONLY THE PATHS IT NAMES, because the index is every
+		// agent's at once. See commitpaths.go.
+		if why, refuse := ACommitCarriesStrangers(ti.Command); refuse {
+			record(log, "engine", "commit", actor, "refused: a commit of the index rather than of named paths", sessionlog.No(),
 				map[string]any{"tool": in.ToolName})
 			g.deny(why)
 			return
@@ -851,7 +948,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// second read of the same unchanged range puts the same tokens in twice.
 	if in.ToolName == "Read" && path != "" {
 		if why, refuse := aReadAlreadyHeld(roots, actor, path, pageOf(ti)); refuse {
-			record(log, "engine", "dedup", actor, "refused: a read already held, unchanged", No(),
+			record(log, "engine", "dedup", actor, "refused: a read already held, unchanged", sessionlog.No(),
 				map[string]any{"path": path})
 			g.deny(why)
 			return
@@ -862,7 +959,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// corrected, because nobody knows what was meant against it.
 	if writesTools[in.ToolName] && path != "" {
 		if why, refuse := aStaleWrite(roots, path); refuse {
-			record(log, "engine", "stale", actor, "refused: the file changed since it was read", No(),
+			record(log, "engine", "stale", actor, "refused: the file changed since it was read", sessionlog.No(),
 				map[string]any{"path": path})
 			g.deny(why)
 			return
@@ -875,14 +972,14 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// line and text. Outside the tree the disk is the agent's own.
 	if cfg.SearchViaIndex {
 		if why, refuse := AToolSearchOverTheTree(in.ToolName, path, roots.Work); refuse {
-			record(log, "engine", "search", actor, "refused: a search over the tree, which the index answers", No(),
+			record(log, "engine", "search", actor, "refused: a search over the tree, which the index answers", sessionlog.No(),
 				map[string]any{"tool": in.ToolName, "path": path})
 			g.deny(why)
 			return
 		}
 		if ti.Command != "" {
 			if why, refuse := ASearchOverTheTree(ti.Command, roots.Work); refuse {
-				record(log, "engine", "search", actor, "refused: a search over the tree, which the index answers", No(),
+				record(log, "engine", "search", actor, "refused: a search over the tree, which the index answers", sessionlog.No(),
 					map[string]any{"tool": in.ToolName})
 				g.deny(why)
 				return
@@ -894,7 +991,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// refused and told to hand the engine its delta instead.
 	if cfg.TestsViaEngine && ti.Command != "" {
 		if why, refuse := ATestRunByHand(ti.Command, roots.Work); refuse {
-			record(log, "engine", "tests", actor, "refused: a test run by hand, which the engine decides", No(),
+			record(log, "engine", "tests", actor, "refused: a test run by hand, which the engine decides", sessionlog.No(),
 				map[string]any{"tool": in.ToolName})
 			g.deny(why)
 			return
@@ -906,7 +1003,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// and the swap door is what does it without severing anything.
 	if cfg.BuildViaEngine && ti.Command != "" {
 		if why, refuse := ABuildRunByHand(ti.Command, roots.Method); refuse {
-			record(log, "engine", "build", actor, "refused: a build aimed at .bin, which the engine does", No(),
+			record(log, "engine", "build", actor, "refused: a build aimed at .bin, which the engine does", sessionlog.No(),
 				map[string]any{"tool": in.ToolName})
 			g.deny(why)
 			return
@@ -918,9 +1015,9 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// knew. Every rule an agent is asked to remember is one it forgets, so this
 	// is a refusal, and it names what the probe found rather than a tool.
 	if ti.Command != "" {
-		if better, found := TheSearcher(roots, sessionOf(filepath.Join(roots.Private("log"), Current))); found {
+		if better, found := TheSearcher(roots, sessionlog.SessionOf(filepath.Join(roots.Private("log"), sessionlog.Current))); found {
 			if why, refuse := ARecursiveSearch(ti.Command, better); refuse {
-				record(log, "engine", "search", actor, "refused: a recursive search over the tree", No(),
+				record(log, "engine", "search", actor, "refused: a recursive search over the tree", sessionlog.No(),
 					map[string]any{"tool": in.ToolName, "better": better.Name})
 				g.deny(why)
 				return
@@ -935,7 +1032,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 			// the floor deliberately lacks. It is loud in the record.
 			if emergency.Armed {
 				record(log, "engine", "emergency", actor,
-					"projection written under "+emergency.Describe(), Yes(),
+					"projection written under "+emergency.Describe(), sessionlog.Yes(),
 					map[string]any{"path": path, "armed_by": emergency.By, "reason": emergency.Reason})
 				return
 			}
@@ -944,7 +1041,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 			reason := fmt.Sprintf(
 				"%s is a projection. It is written from %s and an edit here is lost on the next write. Write the source instead.",
 				filepath.Base(path), instead)
-			record(log, "engine", "refusal", actor, "write refused: "+filepath.Base(path)+" is a projection", No(),
+			record(log, "engine", "refusal", actor, "write refused: "+filepath.Base(path)+" is a projection", sessionlog.No(),
 				map[string]any{"rule": "projection-is-output", "path": path, "write_instead": instead})
 			g.deny(reason)
 			return
@@ -962,7 +1059,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 		if err != nil {
 			// The checker cannot run. That is said, loudly, and the write is
 			// allowed: a broken checker must not stop a person from working.
-			record(log, "engine", "error", actor, "the voice rules could not be read", No(),
+			record(log, "engine", "error", actor, "the voice rules could not be read", sessionlog.No(),
 				map[string]any{"reason": err.Error()})
 		} else if found := rules.Check(written); len(found) > 0 {
 			lines := make([]string, 0, len(found))
@@ -970,7 +1067,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 				lines = append(lines, "  "+f.String())
 			}
 			record(log, "engine", "refusal", actor,
-				fmt.Sprintf("write refused: %d voice findings in %s", len(found), filepath.Base(path)), No(),
+				fmt.Sprintf("write refused: %d voice findings in %s", len(found), filepath.Base(path)), sessionlog.No(),
 				map[string]any{"rule": "voice", "path": path, "findings": lines})
 			// This refuses a FORM, never a place. The same file, written
 			// properly, goes through. Say so, so the refusal is not read as
@@ -997,7 +1094,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	if writes[in.ToolName] && isProse(path) && written != "" {
 		if kind := kindOf(written); kind != "" {
 			if schema, err := LoadSchema(roots.Method, kind); err != nil {
-				record(log, "engine", "error", actor, "the schema could not be read", No(),
+				record(log, "engine", "error", actor, "the schema could not be read", sessionlog.No(),
 					map[string]any{"reason": err.Error(), "kind": kind})
 			} else if found := ValidateNote(schema, written, roots.Method); len(found) > 0 {
 				lines := make([]string, 0, len(found))
@@ -1005,7 +1102,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 					lines = append(lines, fmt.Sprintf("  line %d: %s", d.Line, d.Says))
 				}
 				record(log, "engine", "refusal", actor,
-					fmt.Sprintf("write refused: %d schema findings in %s", len(found), filepath.Base(path)), No(),
+					fmt.Sprintf("write refused: %d schema findings in %s", len(found), filepath.Base(path)), sessionlog.No(),
 					map[string]any{"rule": "schema", "path": path, "kind": kind, "findings": lines})
 				g.deny("This note does not match the schema its kind names. " +
 					"Every departure is below, so fix them together and write it again.\n" +
@@ -1020,7 +1117,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	if writes[in.ToolName] && path != "" && written != "" && !underPrivate(roots, path) {
 		if from, yes := copyOfAPrivateOriginal(roots, written); yes {
 			record(log, "engine", "refusal", actor,
-				"write refused: this is a copy of a private original", No(),
+				"write refused: this is a copy of a private original", sessionlog.No(),
 				map[string]any{"rule": "private-originals-do-not-travel", "path": path, "copy_of": from})
 			g.deny(fmt.Sprintf(
 				"This is the content of %s, which is private and does not travel. "+
@@ -1031,7 +1128,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 		// of lines pasted whole is the original leaving in pieces.
 		if from, line, yes := copiedPassageOf(roots, written); yes {
 			record(log, "engine", "refusal", actor,
-				"write refused: a passage of a private original", No(),
+				"write refused: a passage of a private original", sessionlog.No(),
 				map[string]any{"rule": "private-originals-do-not-travel", "path": path, "copy_of": from, "line": line})
 			g.deny(fmt.Sprintf(
 				"This carries a passage copied whole from %s, from line %d. A private note does not travel "+
@@ -1047,7 +1144,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 		if isProse(path) {
 			if rule, matched, yes := identityMaterial(written, TheUsername()); yes {
 				record(log, "engine", "refusal", actor,
-					"write refused: identity material does not travel", No(),
+					"write refused: identity material does not travel", sessionlog.No(),
 					map[string]any{"rule": "identity-does-not-travel", "path": path, "matched": rule})
 				g.deny(fmt.Sprintf(
 					"This carries %s, %q, and identity material does not travel. "+
@@ -1105,7 +1202,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// GOD IS THE ONE RUNG THAT DROPS IT, along with every other refusal, because
 	// god is for a broken engine.
 	if why, refuse := WriteNeedsAToken(roots, actor, in.ToolName, pathOf(in), ti.Command); refuse && binding.At != God {
-		record(log, "engine", "gate", actor, "refused: it cannot name its token", No(),
+		record(log, "engine", "gate", actor, "refused: it cannot name its token", sessionlog.No(),
 			map[string]any{"tool": in.ToolName})
 		g.deny(why)
 		return
@@ -1115,7 +1212,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// rather than in the write gate above, because it writes nothing in the tree
 	// and the refusal has a different thing to say.
 	if why, refuse := TodoIsASubToken(roots, actor, in.ToolName); refuse {
-		record(log, "engine", "gate", actor, "refused: a todo is a sub-token", No(),
+		record(log, "engine", "gate", actor, "refused: a todo is a sub-token", sessionlog.No(),
 			map[string]any{"tool": in.ToolName})
 		g.deny(why)
 		return
@@ -1286,9 +1383,9 @@ func isProse(path string) bool {
 // flag, so asking twice proves the harness retried and nothing about what the
 // agent decided. v3 measured that: block, pass, block, pass, and the tooth
 // never bit.
-func decideStop(g *guard, roots Roots, cfg Config, log *Log, in hookIn, actor string) {
+func decideStop(g *guard, roots Roots, cfg Config, log *sessionlog.Log, in hookIn, actor string) {
 	if !cfg.StopNeedsClaim {
-		record(log, "agent", "stop", actor, "stopped", Yes(), nil)
+		record(log, "agent", "stop", actor, "stopped", sessionlog.Yes(), nil)
 		return
 	}
 	first := firstStopOfSession(roots, actor)
@@ -1297,7 +1394,7 @@ func decideStop(g *guard, roots Roots, cfg Config, log *Log, in hookIn, actor st
 		// between the claim and the stop it covers.
 		if c.Because == "blocked" {
 			if refusal, lied := BlockedIsFalse(roots, actor); lied {
-				record(log, "agent", "stop", actor, "stop refused: blocked is not true", No(),
+				record(log, "agent", "stop", actor, "stop refused: blocked is not true", sessionlog.No(),
 					map[string]any{"because": c.Because})
 				g.blockStop("You claimed blocked, and " + refusal)
 				return
@@ -1328,7 +1425,7 @@ func decideStop(g *guard, roots Roots, cfg Config, log *Log, in hookIn, actor st
 			// THE ENGINE PUSHES BACK TWICE AND GRANTS THE THIRD. What earns a stop
 			// over open work is a reason given and held to. See challenge.go.
 			if sofar := countRefusedStop(roots, "claimed:"+actor); sofar < claimsBeforeAStopIsGranted {
-				record(log, "agent", "stop", actor, "stop refused: the claim is argued with", No(),
+				record(log, "agent", "stop", actor, "stop refused: the claim is argued with", sessionlog.No(),
 					map[string]any{"because": c.Because, "why": c.Why, "claim": sofar})
 				g.blockStop(TheChallenge(c, sofar, held))
 				return
@@ -1342,7 +1439,7 @@ func decideStop(g *guard, roots Roots, cfg Config, log *Log, in hookIn, actor st
 		// asked for and every one ends in a stop, so an agent that has stopped and
 		// done nothing since meets this again and is let through on the same claim.
 		forgetRefusedStops(roots, actor)
-		record(log, "agent", "stop", actor, "stopped: "+c.Because+" — "+c.Why, Yes(),
+		record(log, "agent", "stop", actor, "stopped: "+c.Because+" — "+c.Why, sessionlog.Yes(),
 			map[string]any{"because": c.Because, "why": c.Why, "claims": claimsBeforeAStopIsGranted})
 		return
 	}
@@ -1351,7 +1448,7 @@ func decideStop(g *guard, roots Roots, cfg Config, log *Log, in hookIn, actor st
 	// nothing. One per actor per session, and the record says it was the first.
 	if first {
 		forgetRefusedStops(roots, actor)
-		record(log, "agent", "stop", actor, "stopped: the first stop of the session, granted", Yes(),
+		record(log, "agent", "stop", actor, "stopped: the first stop of the session, granted", sessionlog.Yes(),
 			map[string]any{"first": true})
 		return
 	}
@@ -1372,7 +1469,7 @@ func decideStop(g *guard, roots Roots, cfg Config, log *Log, in hookIn, actor st
 	// AN AUTHORITY MAY EXIST, AND THIS ASKS IT. It does not decide whether the
 	// stop is refused. It says what else the agent is holding, so the refusal
 	// names the work rather than only the rule.
-	record(log, "agent", "stop", actor, "stop refused, no reason claimed", No(),
+	record(log, "agent", "stop", actor, "stop refused, no reason claimed", sessionlog.No(),
 		map[string]any{"in_a_row": times})
 	g.blockStop(TheList(askTheAuthority(roots, actor).Reason))
 }
@@ -1414,7 +1511,7 @@ func firstLine(s string) string {
 	return s
 }
 
-func record(log *Log, src, kind, actor, msg string, ok *bool, data map[string]any) {
+func record(log *sessionlog.Log, src, kind, actor, msg string, ok *bool, data map[string]any) {
 	if log == nil {
 		return
 	}
@@ -1430,7 +1527,7 @@ func record(log *Log, src, kind, actor, msg string, ok *bool, data map[string]an
 func (g *guard) warn(said string) {
 	out, _ := json.Marshal(map[string]any{
 		"hookSpecificOutput": map[string]any{
-			"hookEventName":     "PreToolUse",
+			"hookEventName":     string(EventPreToolUse),
 			"additionalContext": said,
 		},
 	})

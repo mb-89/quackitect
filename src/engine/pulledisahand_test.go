@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"quackitect/engine/internal/sessionlog"
+	"testing"
+)
 
 // AN AGENT THAT PULLED IS A HAND, WHETHER OR NOT THE REGISTER HEARD OF IT.
 //
@@ -19,6 +22,7 @@ func TestAPulledAgentIsAHand(t *testing.T) {
 	t.Parallel()
 	for _, c := range []struct {
 		says    string
+		startup string
 		hands   func(r Roots, session string)
 		here    int
 		refused bool
@@ -44,6 +48,31 @@ func TestAPulledAgentIsAHand(t *testing.T) {
 			},
 			here: 1, refused: true,
 		},
+		// AND THE SAME TWO WITH THE STARTUP RECORD PRESENT.
+		//
+		// SessionStart writes a session record carrying the HARNESS session
+		// id, and the arrival is keyed on that. With no such record the two
+		// keys agree by accident, because ArrivalSession falls back to the
+		// engine run. With one they differ, and a count that reads arrivals
+		// under the engine run answers nobody on every real session.
+		{
+			says:    "a startup record, and a puller the register never heard of",
+			startup: "harness-a",
+			hands: func(r Roots, session string) {
+				NoteSession(r, session)
+				ArrivedAs(r, ArrivalSession(r), "worker-faure", RoleWorker)
+			},
+			here: 2, refused: false,
+		},
+		{
+			says:    "a startup record, and a puller from an earlier run",
+			startup: "harness-a",
+			hands: func(r Roots, session string) {
+				NoteSession(r, session)
+				ArrivedAs(r, "20260101-000000", "worker-faure", RoleWorker)
+			},
+			here: 1, refused: true,
+		},
 	} {
 		c := c
 		t.Run(c.says, func(t *testing.T) {
@@ -51,12 +80,18 @@ func TestAPulledAgentIsAHand(t *testing.T) {
 			r := aTreeWithTheProcesses(t)
 			// THE RUN IS NAMED BY THE FIRST LINE OF ITS LOG, and the
 			// register holds only this run's agents.
-			log, err := OpenLog(r.Private("log"))
+			log, err := sessionlog.Open(r.Private("log"))
 			if err != nil {
 				t.Fatal(err)
 			}
 			defer log.Close()
-			record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+			record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
+			// WHAT SessionStart WRITES, hook.go's session case. The id on
+			// it is the harness's, and it is not the engine run.
+			if c.startup != "" {
+				record(log, "agent", "session", "main", "session started, startup", sessionlog.Yes(),
+					map[string]any{"source": "startup", "session": c.startup})
+			}
 
 			cfg := TheFloor()
 			cfg.ParallelAgents = 2

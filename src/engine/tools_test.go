@@ -1,38 +1,16 @@
 package main
 
 import (
-	"encoding/json"
-	"os"
-	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"testing"
 )
-
-// The candidates are data, so the fixture declares its own. One that is
-// certainly here, the engine this suite built and holds as a fixture, named
-// by its path so nothing on the machine's PATH decides the answer, and one
-// that is certainly not.
-//
-// IT WAS go, BY NAME. Under the battery's load go version took longer than
-// the probe's bound and the test read a machine's busy afternoon as a defect.
-// A fixture answers the same on every machine and under any load.
-func probeTree(t *testing.T) Roots {
-	t.Helper()
-	r := Roots{Method: t.TempDir(), Work: t.TempDir()}
-	os.MkdirAll(filepath.Join(r.Method, "util"), 0o755)
-	engine, _ := json.Marshal(theEngine(t))
-	os.WriteFile(filepath.Join(r.Method, "util", "tools.json"), []byte(`{"tools":[
-	  {"name":`+string(engine)+`,"args":["--version"],"for":"the engine itself"},
-	  {"name":"nothing-is-called-this","args":["--version"],"for":"nothing"}
-	]}`), 0o644)
-	return r
-}
 
 // The engine asks the machine rather than assuming. A name that resolves and
 // answers is kept, and a name that does not is dropped without a word.
 func TestTheProbeKeepsOnlyWhatAnswers(t *testing.T) {
 	t.Parallel()
 	r := probeTree(t)
-	p := ProbeTools(r, "20260831-000000")
+	p := ProbeTools(t.Context(), r, "20260831-000000")
 	if len(p.Found) != 1 || p.Found[0].Name != theEngine(t) {
 		t.Fatalf("the probe found %+v", p.Found)
 	}
@@ -50,8 +28,8 @@ func TestTheProbeKeepsOnlyWhatAnswers(t *testing.T) {
 // and better than no engine.
 func TestAMissingCandidateListDoesNotStopTheProbe(t *testing.T) {
 	t.Parallel()
-	r := Roots{Method: t.TempDir(), Work: t.TempDir()}
-	if p := ProbeTools(r, "20260831-000000"); len(p.Found) != 0 {
+	r := aTree(t).apart().Roots
+	if p := ProbeTools(t.Context(), r, "20260831-000000"); len(p.Found) != 0 {
 		t.Fatalf("it found %d tools with no list", len(p.Found))
 	}
 }
@@ -83,7 +61,7 @@ func TestAnActorArrivesOnceAndThenDoesNot(t *testing.T) {
 func TestAProbeFromAnEarlierSessionIsIgnored(t *testing.T) {
 	t.Parallel()
 	r := probeTree(t)
-	ProbeTools(r, "20260831-000000")
+	ProbeTools(t.Context(), r, "20260831-000000")
 	if got := KnownTools(r, "20260831-111111"); got != nil {
 		t.Fatalf("a stale probe was handed over: %+v", got)
 	}
@@ -94,12 +72,12 @@ func TestAProbeFromAnEarlierSessionIsIgnored(t *testing.T) {
 func TestTheFirstPullCarriesTheToolsAndTheSecondDoesNot(t *testing.T) {
 	t.Parallel()
 	r := probeTree(t)
-	l, err := OpenLog(r.Private("log"))
+	l, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	l.Write("engine", "start", "engine", "for the session name", Yes(), nil)
-	ProbeTools(r, l.Session())
+	l.Write("engine", "start", "engine", "for the session name", sessionlog.Yes(), nil)
+	ProbeTools(t.Context(), r, l.Session())
 	l.Close()
 
 	first := Pull(r, "main", RoleWorker, Payload{})

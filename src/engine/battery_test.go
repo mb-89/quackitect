@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 	"time"
@@ -22,7 +23,7 @@ import (
 func TestTheBatteryRunsOutsideTheEngine(t *testing.T) {
 	r := aTreeWithABattery(t)
 
-	got := startBattery(r, "worker-one", "wk-1")
+	got := startBattery(t.Context(), r, "worker-one", "wk-1")
 	if !got.OK {
 		t.Fatalf("the battery did not start: %s", got.Said)
 	}
@@ -46,7 +47,7 @@ func TestTheBatteryRunsOutsideTheEngine(t *testing.T) {
 	waitForTheBattery(t, going)
 
 	dir := r.Private("log")
-	log, err := OpenLog(dir)
+	log, err := sessionlog.Open(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -54,7 +55,7 @@ func TestTheBatteryRunsOutsideTheEngine(t *testing.T) {
 	if err := log.Close(); err != nil {
 		t.Fatal(err)
 	}
-	said, err := os.ReadFile(filepath.Join(dir, Current))
+	said, err := os.ReadFile(filepath.Join(dir, sessionlog.Current))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -65,25 +66,6 @@ func TestTheBatteryRunsOutsideTheEngine(t *testing.T) {
 	if _, still := batteryGoing(r); still {
 		t.Fatal("the marker survived being reported, so every start would report the same run again")
 	}
-}
-
-// A battery that answers the way the real one does: a verdict on its last line.
-func aTreeWithABattery(t *testing.T) Roots {
-	t.Helper()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
-	checks := filepath.Join(root, "util", "checks")
-	if err := os.MkdirAll(checks, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	script := "#!/bin/sh\necho 'go build         ok    1s'\necho '0 failed, 1s wall clock'\n"
-	if err := os.WriteFile(filepath.Join(checks, "battery.sh"), []byte(script), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if sh, _ := batteryShell(r); sh == "" {
-		t.Skip("no shell on this machine, so the battery cannot be started here")
-	}
-	return r
 }
 
 // waitForTheBattery waits for the started run to finish. It is the one wait in

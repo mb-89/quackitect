@@ -11,6 +11,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"quackitect/engine/internal/frontmatter"
 	"regexp"
 	"slices"
 	"strconv"
@@ -469,16 +470,16 @@ func dropOne(db *sql.DB, rel string) error {
 // with no frontmatter is prose and gets none: it is indexed for the copy
 // check and nothing else.
 func indexNote(tx *sql.Tx, rel, text string) error {
-	front, body := SplitNote(text)
+	front, body := frontmatter.Split(text)
 	if front == "" {
 		return nil
 	}
-	f, err := ParseFront(front)
+	f, err := frontmatter.Parse(front)
 	if err != nil {
 		return nil // a note that will not read is said out loud where it is read, and has no rows here
 	}
 	id := strings.TrimSuffix(path.Base(rel), ".md")
-	kind := unlink(frontStr(f, "kind"))
+	kind := unlink(frontmatter.Str(f, "kind"))
 	if _, err := tx.Exec("INSERT INTO note (path, id, kind, front, body) VALUES (?, ?, ?, ?, ?)",
 		rel, id, kind, frontJSON(f), body); err != nil {
 		return err
@@ -498,7 +499,7 @@ func indexNote(tx *sql.Tx, rel, text string) error {
 // frontJSON writes the frontmatter as JSON with the brackets taken off every
 // link, so a query reads a field with json_extract rather than parsing YAML,
 // and reads a linked value as the name inside it.
-func frontJSON(f Front) string {
+func frontJSON(f frontmatter.Front) string {
 	plain := map[string]any{}
 	for k, v := range f {
 		switch v := v.(type) {
@@ -519,7 +520,7 @@ func frontJSON(f Front) string {
 	return string(b)
 }
 
-func sortedFront(f Front) []string { return slices.Sorted(maps.Keys(f)) }
+func sortedFront(f frontmatter.Front) []string { return slices.Sorted(maps.Keys(f)) }
 
 // linkAt is one link in a note: the field it sits under, or no field for a
 // link in the body, and the line it is on.
@@ -538,7 +539,7 @@ var linkPattern = regexp.MustCompile(`\[\[([^\]\n]+)\]\]`)
 // written in the block form by this program and in the flow form by a
 // person, and a flow list reads as one string. The brackets are the link
 // either way, so they are what is looked for.
-func linksIn(f Front, body string) []linkAt {
+func linksIn(f frontmatter.Front, body string) []linkAt {
 	var out []linkAt
 	for _, k := range sortedFront(f) {
 		var values []string

@@ -52,7 +52,10 @@ func loadHolds(r Roots) theHolds {
 	if json.Unmarshal(b, &was) != nil || was.Held == nil {
 		return out // a store that will not read is nobody holding anything
 	}
-	if was.Session != out.Session {
+	// THROUGH THE ONE FUNCTION. A rotation opens a fresh log that names nobody
+	// until the next record lands, and comparing against the placeholder read
+	// every hold as another session's in that window.
+	if !ofThisSession(r, was.Session) {
 		return out // it belongs to a session that has ended
 	}
 	return was

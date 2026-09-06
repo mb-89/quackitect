@@ -13,6 +13,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"quackitect/engine/internal/quiet"
+	"quackitect/engine/internal/sessionlog"
 	"sort"
 	"strconv"
 	"strings"
@@ -138,6 +139,12 @@ func discoverTests(r Roots, db *sql.DB) ([]aTest, error) {
 	}
 	rows.Close()
 	seen := map[string]bool{}
+	// A NOTE ABOUT A TEST IS NOT THE TEST. The walk found these on the disk,
+	// which is the truth, and these rows only remember it. Returning a write's
+	// error refused the whole run, so a busy index stopped every test on the
+	// box rather than costing one rediscovery. The index is shared with a
+	// language server that holds it while a person types, so busy is ordinary.
+	var unwritten []string
 	for i, t := range found {
 		seen[t.ID] = true
 		was, ok := known[t.ID]
@@ -151,18 +158,22 @@ func discoverTests(r Roots, db *sql.DB) ([]aTest, error) {
 			"ON CONFLICT(id) DO UPDATE SET name = excluded.name, kind = excluded.kind, path = excluded.path, "+
 			"line = excluded.line, hash = excluded.hash, reads = excluded.reads",
 			t.ID, t.Name, t.Kind, t.Path, t.Line, t.Hash, t.Reads, found[i].Mapped); err != nil {
-			return nil, err
+			unwritten = append(unwritten, t.ID)
 		}
 	}
 	for id := range known {
 		if !seen[id] {
 			if _, err := db.Exec("DELETE FROM test WHERE id = ?", id); err != nil {
-				return nil, err
+				unwritten = append(unwritten, id)
 			}
 			if _, err := db.Exec("DELETE FROM test_region WHERE test = ?", id); err != nil {
-				return nil, err
+				unwritten = append(unwritten, id)
 			}
 		}
+	}
+	if len(unwritten) > 0 {
+		inSession(r, "test", "engine", fmt.Sprintf("the index would not take %d test row(s), so they are rediscovered next run", len(unwritten)),
+			sessionlog.No(), map[string]any{"tests": unwritten})
 	}
 	sort.Slice(found, func(i, j int) bool { return found[i].ID < found[j].ID })
 	return found, nil
@@ -305,7 +316,20 @@ func coverBinary(r Roots, db *sql.DB, dir string) (string, error) {
 	if out, err := cmd.CombinedOutput(); err != nil {
 		return "", fmt.Errorf("the cover binary for %s will not build: %v\n%s", dir, err, out)
 	}
-	return bin, setMeta(db, "coverbin:"+dir, want)
+	// A NOTE ABOUT A BUILD IS NOT THE BUILD.
+	//
+	// This returned the note's error as its own, and the caller reads any error
+	// here as a build failure. So a busy index made a binary that is on disk
+	// and correct report that it will not build, and a hand went looking for a
+	// compile error in a healthy package.
+	//
+	// Losing the note costs the next run a rebuild. The record says it was
+	// lost, so a tree that rebuilds every time has somewhere to look.
+	if err := setMeta(db, "coverbin:"+dir, want); err != nil {
+		inSession(r, "test", "engine", "the cover binary for "+dir+" built, and the note about it did not: "+
+			err.Error(), sessionlog.No(), map[string]any{"package": dir})
+	}
+	return bin, nil
 }
 
 // goTool is the go on this machine: the probe's when it found one, PATH's
@@ -346,30 +370,50 @@ func buildEnv() []string {
 // whether it passed, what it said, and the regions it executed.
 //
 // THE ENGINE FIXTURE IS NAMED, so a suite whose TestMain builds an engine
-// uses the one this engine is, and a per-test run costs the test and not a
-// link.
-func runOneGoTest(r Roots, bin string, t aTest) (ok bool, said string, took time.Duration, regions []region, err error) {
-	// IT ENDS .tmp SO THE SWEEP KNOWS IT. The remove below is deferred, and a
-	// run that is killed left a zero-byte profile in .se/tests for ever.
-	profile, err := os.CreateTemp(r.Private("tests"), "profile.*.out.tmp")
-	if err != nil {
-		return false, "", 0, nil, err
+// uses the one it is handed, and a per-test run costs the test and not a
+// link. Which one that is, suiteEngine decides: the resident engine while it
+// is newer than the tree, and one built from the tree otherwise.
+// THE MAP IS BUILT WHEN THE ANSWER DEPENDS ON IT, and never otherwise.
+//
+// The owner's rule. The map exists to select tests, so the question decides
+// whether it is needed. An agent naming one test made the selection itself, so
+// no profile is written, nothing parses one, and no map row is rewritten. An
+// agent asking what its change reaches is asking the map, and there it is
+// built, free, as the test runs.
+//
+// It was written on every run. A test already mapped at its own hash still
+// wrote a profile, had it parsed, and had its regions deleted and rewritten in
+// a transaction on an index one writer at a time, for a map that did not
+// change. That transaction is what met the lock.
+func runOneGoTest(r Roots, bin, engine string, t aTest, wantMap bool) (ok bool, said string, took time.Duration, regions []region, err error) {
+	name := ""
+	if wantMap {
+		// IT ENDS .tmp SO THE SWEEP KNOWS IT. The remove below is deferred, and
+		// a run that is killed left a zero-byte profile in .se/tests for ever.
+		profile, err := os.CreateTemp(r.Private("tests"), "profile.*.out.tmp")
+		if err != nil {
+			return false, "", 0, nil, err
+		}
+		profile.Close()
+		name = profile.Name()
+		defer os.Remove(name)
 	}
-	profile.Close()
-	defer os.Remove(profile.Name())
 	dir := filepath.Join(r.Work, filepath.FromSlash(filepath.Dir(t.Path)))
 	env := buildEnv()
-	if engine := filepath.Join(r.Method, ".bin", exeName("se")); fileExists(engine) {
+	if engine != "" {
 		env = append(env, "SE_ENGINE="+engine)
 	}
 	start := time.Now()
-	out, runErr := theToolchain.runOne(bin, dir, t.Name, profile.Name(), env)
+	out, runErr := theToolchain.runOne(bin, dir, t.Name, name, env)
 	took = time.Since(start)
 	said = string(out)
 	ok = runErr == nil
+	if !wantMap {
+		return ok, said, took, nil, nil
+	}
 	module, moduleRoot := moduleOf(dir)
 	rootRel, _ := filepath.Rel(r.Work, moduleRoot)
-	regions, perr := regionsFromProfile(profile.Name(), module, filepath.ToSlash(rootRel))
+	regions, perr := regionsFromProfile(name, module, filepath.ToSlash(rootRel))
 	if perr != nil {
 		return ok, said, took, nil, perr
 	}
@@ -483,20 +527,20 @@ func mergeRegions(in []region) []region {
 // background: every Go test with no regions, or whose file changed since it
 // was mapped. It stops when told, and it runs once per signal so an engine
 // idling over a mapped tree runs nothing.
-func mapTests(r Roots, log *Log, done <-chan struct{}, again <-chan struct{}) {
+func mapTests(r Roots, log *sessionlog.Log, done <-chan struct{}, again <-chan struct{}) {
 	db, err := openIndex(r)
 	if err != nil {
-		log.Write("engine", "error", "engine", "the mapper cannot open the index", No(), map[string]any{"reason": err.Error()})
+		log.Write("engine", "error", "engine", "the mapper cannot open the index", sessionlog.No(), map[string]any{"reason": err.Error()})
 		return
 	}
 	defer db.Close()
 	for {
 		mapped, failed, err := mapMissing(r, db, done)
 		if err != nil {
-			log.Write("engine", "error", "engine", "the tests could not be mapped", No(), map[string]any{"reason": err.Error()})
+			log.Write("engine", "error", "engine", "the tests could not be mapped", sessionlog.No(), map[string]any{"reason": err.Error()})
 		}
 		if mapped > 0 || failed > 0 {
-			log.Write("engine", "tests", "engine", "the map from tests to source was brought up to date", Yes(),
+			log.Write("engine", "tests", "engine", "the map from tests to source was brought up to date", sessionlog.Yes(),
 				map[string]any{"mapped": mapped, "failed": failed})
 		}
 		select {
@@ -517,6 +561,7 @@ func mapMissing(r Roots, db *sql.DB, done <-chan struct{}) (mapped, failed int, 
 		return 0, 0, err
 	}
 	bins := map[string]string{}
+	engine, engineKnown := "", false
 	var first error
 	for _, t := range tests {
 		if done != nil {
@@ -545,7 +590,12 @@ func mapMissing(r Roots, db *sql.DB, done <-chan struct{}) (mapped, failed int, 
 		if bin == "" {
 			continue
 		}
-		_, _, took, regions, err := runOneGoTest(r, bin, t)
+		if !engineKnown {
+			engine, _ = suiteEngine(r)
+			engineKnown = true
+		}
+		// THE MAPPER ALWAYS WANTS THE MAP. That is the whole of its job.
+		_, _, took, regions, err := runOneGoTest(r, bin, engine, t, true)
 		if err != nil {
 			failed++
 			continue
@@ -571,8 +621,9 @@ func mapMissing(r Roots, db *sql.DB, done <-chan struct{}) (mapped, failed int, 
 // ONE TEST DRIVES THE REAL COMPILER and holds this contract; the rest feed one
 // and decide what it answers.
 type toolchain struct {
-	buildCover func(dir, bin string) ([]byte, error)
-	runOne     func(bin, dir, test, profile string, env []string) ([]byte, error)
+	buildCover  func(dir, bin string) ([]byte, error)
+	buildEngine func(dir, bin string) ([]byte, error) // the engine a subprocess test drives, from the tree
+	runOne      func(bin, dir, test, profile string, env []string) ([]byte, error)
 }
 
 var theToolchain = realToolchain()
@@ -585,9 +636,20 @@ func realToolchain() toolchain {
 			cmd.Env = buildEnv()
 			return cmd.CombinedOutput()
 		},
+		buildEngine: func(dir, bin string) ([]byte, error) {
+			cmd := quiet.Quietly(exec.Command(goTool(), "build", "-o", bin, "."))
+			cmd.Dir = dir
+			cmd.Env = buildEnv()
+			return cmd.CombinedOutput()
+		},
+		// NO PROFILE, NO COVERAGE WRITTEN. A run that answers no map question
+		// asks for none, so the binary writes nothing and nothing parses it.
 		runOne: func(bin, dir, test, profile string, env []string) ([]byte, error) {
-			cmd := quiet.Quietly(exec.Command(bin, "-test.run", "^"+test+"$",
-				"-test.count", "1", "-test.coverprofile", profile))
+			args := []string{"-test.run", "^" + test + "$", "-test.count", "1"}
+			if profile != "" {
+				args = append(args, "-test.coverprofile", profile)
+			}
+			cmd := quiet.Quietly(exec.Command(bin, args...))
 			cmd.Dir = dir
 			cmd.Env = env
 			return cmd.CombinedOutput()

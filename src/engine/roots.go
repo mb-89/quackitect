@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 )
 
@@ -140,6 +141,19 @@ func FindRoots(workArg, methodArg string) (Roots, error) {
 	if err != nil {
 		return Roots{}, err
 	}
+	// AND WHERE THE PROGRAM STANDS OUTSIDE EVERY METHOD, THE FOLDER IT WAS GIVEN
+	// IS ASKED. The lookup above starts at the executable, which answers whenever
+	// the engine is run out of a method's own .bin and never when it is installed
+	// anywhere else: a binary under the temporary folder, or on a person's PATH,
+	// found no method however plainly the folder it was handed carried one, and
+	// every verb was refused before it reached the socket.
+	//
+	// THE EXECUTABLE STILL ANSWERS FIRST, so nothing that resolves today resolves
+	// differently. This reaches only the case that was a refusal, and it is the
+	// same walk for the same marker, started where the caller pointed.
+	if method == "" {
+		method = methodRootFrom(work)
+	}
 	return Roots{Method: method, Work: projectRoot(work)}.ReadOnce(), nil
 }
 
@@ -248,3 +262,6 @@ func sameDir(a, b string) bool {
 func (r Roots) Private(parts ...string) string {
 	return filepath.Join(append([]string{r.Work, ".se"}, parts...)...)
 }
+
+// SessionLog is the file the record is being written to.
+func SessionLog(r Roots) string { return filepath.Join(r.Private("log"), sessionlog.Current) }

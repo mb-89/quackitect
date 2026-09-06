@@ -40,10 +40,13 @@ func runWork(c *call) int {
 	fs.Var(&doneWhen, "done-when", "one done-when criterion. Repeat the flag for more")
 	dependsOn := fs.String("depends-on", "", "ids that must close first, comma separated")
 	parent := fs.String("parent", "", "the id this is a part of. That token cannot close while this is open")
+	needsHuman := fs.Bool("needs-human", false, "the answer is not yours, and this is your best attempt: a person reads it first")
 	by := fs.String("by", "", "who is minting it")
 	on := fs.String("on", "", "instead of minting: say which token you are working on, by id")
 	abort := fs.String("abort", "", "instead of minting: end a token from wherever it stands, by id")
 	why := fs.String("why", "", "with abort: why it is ending. An abort with no reason is refused")
+	as := fs.String("disposition", "", "with abort: how it ends, one the process declares (default: dropped)")
+	successors := fs.String("successors", "", "with abort and became: the ids it became, comma separated")
 	putDown := fs.String("put-down", "", "instead of minting: set a token you are holding back, by id")
 	set := fs.String("set", "", "instead of minting: change one thing about a token, by id")
 	field := fs.String("field", "", "with set: which field to write")
@@ -76,7 +79,8 @@ func runWork(c *call) int {
 		t, err := TakeUp(roots, *on, orElse(*by, "main"))
 		return c.answerOrFail(t, err)
 	case *abort != "":
-		t, err := Abort(roots, Aborting{ID: *abort, By: orElse(*by, "main"), Why: *why})
+		t, err := Abort(roots, Aborting{ID: *abort, By: orElse(*by, "main"), Why: *why,
+			As: Disposition(*as), Successors: splitComma(*successors)})
 		return c.answerOrFail(t, err)
 	// TWO KINDS OF GROUP, AND THIS VERB MAKES THE OTHER ONE. A query is a
 	// filter in the view file. A bucket is a name a person gave a handful of
@@ -119,7 +123,7 @@ func runWork(c *call) int {
 		}
 	} else {
 		t = Token{Title: *title, Detail: *detail, ProposedAction: *action,
-			Process: *process, DependsOn: splitComma(*dependsOn), Parent: *parent}
+			Process: *process, DependsOn: splitComma(*dependsOn), Parent: *parent, NeedsHuman: *needsHuman}
 		// UNSAID IS A THIRD ANSWER, so the flag is a string. A bool flag has
 		// two values and the mint has to tell them from the question nobody
 		// answered.

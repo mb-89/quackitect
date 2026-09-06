@@ -115,6 +115,18 @@ type Token struct {
 	// does the work was never a thing anybody read.
 	NeedsHuman bool `json:"needs_human,omitempty"`
 
+	// WHAT MATTERS MOST, SAID BY THE PERSON WATCHING THE QUEUE. Every pull
+	// hands an urgent token out before anything else workable.
+	//
+	// IT IS A FLAG AND NOT A RANK. Two urgent tokens are both urgent, and
+	// whoever pulls takes one of them. A number would put somebody in charge of
+	// keeping the numbers apart.
+	//
+	// NOTHING CLEARS IT. A put-down leaves it set, so an agent that hands
+	// urgent work back is handed it again. A person takes it off, the way a
+	// person put it on. See field.go.
+	Urgent bool `json:"urgent,omitempty"`
+
 	// What you think should happen about it, beside what is wrong.
 	ProposedAction string `json:"proposed_action,omitempty"`
 
@@ -145,6 +157,7 @@ type Token struct {
 	// refused every ending until its sub-tokens have ended, and the queue
 	// hands the sub-tokens out first. The sub-token carries the link, so a
 	// parent holds no list that can go stale.
+	// Why a scope is a barrier is [[a-scope-cannot-be-left-while-its-tokens-are-open]].
 	Parent string `json:"parent,omitempty"`
 
 	// The other blocker, and the one only a person can judge: a date, or a

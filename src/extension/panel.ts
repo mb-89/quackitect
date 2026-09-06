@@ -29,6 +29,10 @@ export type Node = {
   // WHAT THE NUMBER IS COUNTED IN, beside the box. "a claim lasts: 3" says
   // nothing on its own, and the unit is the one word that makes it a fact.
   unit?: string;
+  // THE WORD THAT REACHES THIS CONTROL FROM A CHAT, filled by the engine and
+  // declared nowhere. The tooltip draws it verbatim, so what a person reads is
+  // the exact string the matcher takes.
+  keyword?: string;
   span?: number;
   narrow?: string;
   shown?: boolean;
@@ -54,7 +58,10 @@ export type Node = {
   // A column shows a field. With link it is a link that opens the token the
   // row's link field names, and with empty it shows that field instead when
   // its own is blank, so a row holding nothing still says so.
-  columns?: Array<{ field: string; title: string; link?: string; empty?: string }>;
+  // With width it is as wide as the declaration says, in the units it says,
+  // and the last column takes what is left. A width is the declaration's to
+  // decide, the way the columns are, so none is written into this file.
+  columns?: Array<{ field: string; title: string; link?: string; empty?: string; width?: string }>;
 };
 
 const COLUMNS = 5;
@@ -229,9 +236,20 @@ function button(n: Node): string {
   </button>`;
 }
 
+// A CONTROL A CHAT CAN REACH SAYS SO IN ITS TOOLTIP. The cloud has no panel,
+// so this line is the only place a person learns the word. It is copied from
+// the engine rather than composed, so it cannot drift from what works.
+function tipFor(n: Node): string {
+  const help = n.help ?? n.title ?? n.name;
+  if (!n.keyword) {
+    return help;
+  }
+  return help + "\n\nReach it from a chat by writing " + n.keyword + " on its own.";
+}
+
 function field(k: string, n: Node): string {
   const span = COLUMNS - 1;
-  const help = n.help ?? n.title ?? n.name;
+  const help = tipFor(n);
   const common = `data-key="${esc(k)}" data-type="${n.type}" title="${esc(help)}"`;
   let control: string;
   if (n.type === "bool") {
@@ -361,15 +379,24 @@ function css(): string {
                white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .control input[type=number], .control input[type=text], .control select { width: 100%; }
   /* A TABLE TAKES THE WHOLE ROW, and a narrow sidebar is what it has to fit
-     in: the holding column is the long one and it is the one that ellipses. */
+     in: the holding column is the long one and it is the one that ellipses.
+     A column that declares a width carries it inline and wins over the sheet.
+     What the two declared columns get when it does not is named below. */
   .table { grid-column: 1 / -1; overflow: hidden; }
   .table table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-  .table th.actor, .table td.actor { width: 34%; }
   .table th { text-align: left; font-weight: normal; padding: 2px 4px 2px 0;
               color: var(--vscode-descriptionForeground); font-size: .9em;
               border-bottom: 1px solid var(--vscode-panel-border); }
   .table td { padding: 2px 4px 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .table td.holding { color: var(--vscode-descriptionForeground); }
+  /* THE COLUMNS, NAMED. A cell's class is its column's field name, so these two
+     are the agent and what it is working on. The layout is fixed, so with a
+     width on neither the sidebar split the row evenly and the long column
+     ellipsed a title away while the short one sat half empty. The agent column
+     is as wide as a worker name needs and no wider, and the rest is the
+     title's, which is the column the comment above says should ellipse. */
+  .table th.actor, .table td.actor { width: 8.5em; }
+  .table th.title, .table td.title { width: auto; }
   /* NO COLOUR PER STATE. A rule naming one would put that word on every page
      this file draws, and panel-says-holding holds the page to the answer it
      was handed: a page carrying a state nobody gave it is the defect that
@@ -563,14 +590,26 @@ function liveTable(id: string, n: Node, doing: Happening): string {
 
 function tableBody(n: Node, doing: Happening): string {
   const lists: Record<string, Doing[] | undefined> = { present: doing.present, actors: doing.actors };
-  const rows = lists[n.source ?? ""];
+  const all = lists[n.source ?? ""];
+  // AN EMPTY HAND DRAWS NO ROW. A row saying only that somebody once pulled is
+  // a row a person cannot act on, and the header is for what they can act on.
+  //
+  // A STOPPED AGENT KEEPS ITS ROW, whether or not it holds anything, because a
+  // stop is the thing a person most needs to see and hiding it would be the
+  // opposite of the rule.
+  //
+  // IT IS DROPPED HERE AND NOT IN THE LIST. The staffing count reads the length
+  // of that list, so an agent taken out of it is one the guard cannot count,
+  // and a worker that has spawned and not pulled yet would go missing.
+  const rows = all?.filter((r) => r.id || r.state !== "waiting");
   if (!rows) {
     // A SOURCE NOTHING ANSWERS IS A FAULT IN THE DECLARATION, and it says so
     // rather than drawing an empty table, which would read as nobody here.
     return `<div class="empty">no list called ${esc(n.source ?? "")}</div>`;
   }
   const cols = n.columns ?? [];
-  const head = cols.map((c) => `<th class="${esc(c.field)}">${esc(c.title)}</th>`).join("");
+  const wide = (c: { width?: string }) => (c.width ? ` style="width:${esc(c.width)}"` : "");
+  const head = cols.map((c) => `<th class="${esc(c.field)}"${wide(c)}>${esc(c.title)}</th>`).join("");
   const body = rows.map((r) => {
     const cells = cols.map((c) => {
       const row = r as unknown as Record<string, unknown>;
@@ -581,7 +620,7 @@ function tableBody(n: Node, doing: Happening): string {
       const shown = id && text(row[c.field])
         ? `<a href="#" class="open" data-id="${esc(id)}" title="${esc(id)}">${esc(value)}</a>`
         : esc(value);
-      return `<td class="${esc(c.field)}">${shown}</td>`;
+      return `<td class="${esc(c.field)}"${wide(c)}>${shown}</td>`;
     }).join("");
     return `<tr data-state="${esc(r.state ?? "")}" data-actor="${esc(r.actor ?? "")}">${cells}</tr>`;
   }).join("");

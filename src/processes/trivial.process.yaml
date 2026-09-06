@@ -14,6 +14,7 @@ fields:
     - bucket
     - holder
     - author
+    - urgent
     - needs_human
     - depends_on
     - parent
@@ -40,6 +41,10 @@ activities:
     by: anyone
     to: open
     criteria:
+      - says: what is gained by doing it, and not only what it does
+        evidence: required
+      - says: what breaks if it is never done, and not only that it stays undone
+        evidence: required
       - says: the ask is small enough to review whole, or it is split first
       - says: every done-when line is decidable, and names the command where one decides it
         evidence: required

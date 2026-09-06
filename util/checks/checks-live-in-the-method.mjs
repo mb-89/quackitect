@@ -11,8 +11,9 @@
 // command exited zero over it.
 //
 //   node util/checks/checks-live-in-the-method.mjs <root>
-import { readFileSync, existsSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { spawnSync } from "node:child_process";
+import { readFileSync, existsSync, readdirSync, realpathSync } from "node:fs";
+import { join, resolve } from "node:path";
 
 const root = process.argv[2] ?? ".";
 
@@ -52,6 +53,49 @@ for (const c of listed) {
     "the battery names it and util/checks does not hold it");
 }
 
+// AND GIT CARRIES EVERY ONE OF THEM.
+//
+// existsSync answers yes on the box that wrote the file. A check written into
+// the list and never committed is therefore green on that box and missing on
+// every other one, where the battery prints two failures off the one gap: the
+// loop's own "it is not there, so it did not run" and this file's "<name> is in
+// util/checks". That is what happened at dd2fed69, which listed
+// a-refusal-names-a-legal-move while the file stayed out of git, and it stopped
+// only because another token's commit swept the file in. The tree is green by
+// accident until something asks git.
+//
+// WHERE THERE IS NO REPOSITORY THIS ASKS NOTHING. The battery also runs over a
+// clean archive of a commit, which holds no .git, and git can answer nothing
+// there. A check that failed for want of a repository would go red on every
+// archive run and say nothing about any check.
+//
+// AND THE FOLDER HAS TO BE THE REPOSITORY'S OWN ROOT. An archive unpacked
+// inside some other checkout is still inside a work tree, and asking that
+// checkout about util/checks answers nothing, which would read as every check
+// being uncommitted. So the toplevel git names is compared with the root.
+const git = (...args) => spawnSync("git", ["-C", root, ...args], { encoding: "utf8" });
+const sameFolder = (a, b) => {
+  const one = (p) => { try { return realpathSync(resolve(p)); } catch { return resolve(p); } };
+  const [x, y] = [one(a), one(b)];
+  return process.platform === "win32" ? x.toLowerCase() === y.toLowerCase() : x === y;
+};
+const top = (git("rev-parse", "--show-toplevel").stdout ?? "").trim();
+if (top === "" || !sameFolder(top, root)) {
+  console.log("  ok   git carries every check: there is no repository over " + root
+    + " to ask, so this says nothing rather than failing an archive run");
+} else {
+  const tracked = new Set(
+    (git("ls-files", "--", "util/checks").stdout ?? "").split("\n").map((s) => s.trim()).filter(Boolean),
+  );
+  say("git holds checks under util/checks (" + tracked.size + ")", tracked.size > 0,
+    "git names no file under util/checks, so this half would call every listed "
+    + "check uncommitted and is judging the question rather than the tree");
+  const loose = listed.filter((c) => !tracked.has("util/checks/" + c + ".mjs"));
+  say("git carries every check the battery lists", loose.length === 0,
+    loose.join(", ") + " is in util/checks on this box and in no commit, so it "
+    + "reads green here and red on every other box");
+}
+
 // AND THE LIST IS THE WHOLE FOLDER, ASKED FOR RATHER THAN DESCRIBED.
 //
 // The half above walks the battery's list and asks the folder about each name,
@@ -63,12 +107,39 @@ for (const c of listed) {
 // THE SET IS THE FOLDER, so the folder is what is walked. battery.sh is not a
 // check and names itself nowhere in its own list.
 const named = new Set(listed);
+
+// A CHECK CAN BE OUT ON PURPOSE, AND THE BATTERY NAMES IT WITH ITS TOKEN.
+//
+// One of them lands red over this branch for a reason a person has to settle,
+// and a red check in the battery is a wall every agent waits behind. Left
+// simply unlisted it reads like one somebody forgot to write in, which is what
+// this file reported and what nobody could act on. So the battery declares it
+// out beside the token that holds it out, and a declaration with no token, or
+// one naming a check the folder does not hold, is itself a failure.
+const held = new Map(
+  [...text.matchAll(/^out="([^"]*)"$/gm)]
+    .flatMap((m) => m[1].trim().split(/\s+/))
+    .filter(Boolean)
+    .map((one) => one.split(":")),
+);
+for (const [name, token] of held) {
+  say("the battery says which token holds " + name + " out",
+    /^wk-[0-9a-f]{10}$/.test(token ?? ""),
+    "it is declared out as \"" + name + ":" + (token ?? "") + "\", and an entry names "
+    + "the check and the token that holds it out, as name:wk-0123456789");
+  say(name + " is in util/checks", existsSync(join(root, "util", "checks", name + ".mjs")),
+    "the battery holds it out and util/checks does not hold it, so the "
+    + "declaration outlived the check");
+  say(name + " is out or run, never both", !named.has(name),
+    "the battery both lists it and declares it out, so what it means to do "
+    + "with it is decided by whichever half a reader reaches first");
+}
 const onDisk = readdirSync(join(root, "util", "checks"))
   .filter((f) => f.endsWith(".mjs"))
   .map((f) => f.slice(0, -".mjs".length));
 say("util/checks holds checks to run (" + onDisk.length + ")", onDisk.length > 0,
   "the folder holds no .mjs at all, so this half has nothing to judge");
-const unlisted = onDisk.filter((c) => !named.has(c));
+const unlisted = onDisk.filter((c) => !named.has(c) && !held.has(c));
 say("the battery runs every check in util/checks", unlisted.length === 0,
   unlisted.join(", ") + " sits in util/checks and the battery never names it, "
   + "so it is a check nobody runs");

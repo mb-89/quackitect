@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"testing"
 )
 
@@ -59,6 +61,27 @@ func TestOneFolderAnswersOneDoor(t *testing.T) {
 	if hooksPort(Roots{Work: `C:\Users\mb\one`}) == hooksPort(Roots{Work: `C:\Users\mb\two`}) {
 		t.Error("two folders answer one door, so the port says nothing about which tree it is")
 	}
+
+	// AND THE SPELLING RULE IS WINDOWS'S, SO IT IS NOT APPLIED TO A POSIX PATH.
+	// A backslash is an ordinary character in a POSIX name, and folding it on
+	// every platform merged two real trees onto one door: the second engine
+	// cannot bind that port, runs with no door, and every guard over that tree is
+	// absent with nothing saying so. That is the class this test exists to shut,
+	// arriving from the other side.
+	for _, two := range []struct {
+		what  string
+		paths [2]string
+	}{
+		{
+			what:  "a backslash in a POSIX name is a character, not a separator",
+			paths: [2]string{`/home/u/a\b`, "/home/u/a/b"},
+		},
+	} {
+		if got, other := hooksPort(Roots{Work: two.paths[0]}), hooksPort(Roots{Work: two.paths[1]}); got == other {
+			t.Errorf("%s: %q and %q both answer %d, so two folders grew one door",
+				two.what, two.paths[0], two.paths[1], got)
+		}
+	}
 }
 
 // A START WRITES NOTHING NEW INTO THE SETTINGS FILE.
@@ -96,5 +119,19 @@ func TestAStartLeavesTheSettingsAsTheyWere(t *testing.T) {
 	}
 	if !bytes.Equal(before, after) {
 		t.Error("a second start changed the settings file, so the harness that read the first one is now wrong")
+	}
+
+	// AND THE DOOR IS NOT IN IT AT ALL.
+	//
+	// Two starts in one process over one Roots project the same bytes whatever
+	// the cage names, because every variable is a function of the roots. So the
+	// comparison above holds while the door sits in the travelling file, which
+	// is the defect this test was written against. The value itself is what has
+	// to be absent, and it is a port and the address it is on.
+	door := strconv.Itoa(hooksPort(r))
+	for _, gone := range []string{"127.0.0.1", door} {
+		if strings.Contains(string(before), gone) {
+			t.Errorf("the settings file that travels carries this box's door, %q:\n%s", gone, before)
+		}
 	}
 }

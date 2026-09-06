@@ -35,11 +35,12 @@ const { build } = await import(
   pathToFileURL(join(here, "node_modules", "esbuild", "lib", "main.js")).href
 );
 await build({
-  entryPoints: [join(here, "editor.ts")],
+  entryPoints: [join(here, "editor.ts"), join(here, "panel.ts")],
   bundle: true, format: "esm", outdir: out, logLevel: "silent",
   outExtension: { ".js": ".mjs" },
 });
 const { editorHtml } = await import(pathToFileURL(join(out, "editor.mjs")).href);
+const { panelHtml, everyGroup } = await import(pathToFileURL(join(out, "panel.mjs")).href);
 
 const exe = join(root, ".bin", process.env.SE_EXE || (process.platform === "win32" ? "se.exe" : "se"));
 const ask = (...a) => JSON.parse(execFileSync(exe, [...a, "--work", work], { encoding: "utf8" }));
@@ -103,6 +104,59 @@ say("every inline element drawn with a size on it has a rule (" + [...sized.keys
   [...sized.keys()].every(ruled),
   [...sized.keys()].filter((c) => !ruled(c))
     .map((c) => c + " is a <" + sized.get(c) + "> given a width the stylesheet never lets it take")
+    .join(", "));
+
+// THREE: EVERY CLASS THE PANEL PAGE PUTS ON THE SCREEN.
+//
+// The two halves above ask about classes the script toggles and about inline
+// elements given a size, which is a narrow slice of what a page emits. A class
+// written once into the markup and never toggled is never asked about at all,
+// and four of the panel's were drawn by whatever the surrounding cascade
+// happened to do.
+//
+// SO THE QUESTION IS ASKED OF THE WHOLE EMITTED PAGE. The set is every class
+// attribute in the markup the panel ships, with the real declaration behind it,
+// so a class added tomorrow is asked the same question on the same day.
+//
+// A CELL'S CLASS IS ITS COLUMN'S FIELD NAME, so the declaration decides these
+// as much as the source does. That is why the tree comes from
+// util/parameters.json rather than from a shape written here.
+const tree = JSON.parse(readFileSync(join(root, "util", "parameters.json"), "utf8"));
+const shown = everyGroup(tree).map((g) => g.key);
+
+// AN ANSWER WITH SOMETHING IN IT. An empty table draws no cell, and a hold that
+// is off draws no strip, so a page rendered from nothing emits fewer classes
+// than the one a person sees.
+const anActor = (actor, state, id, title) =>
+  ({ actor, state, id, title, holding: id ? id + " " + title : "" });
+const busy = {
+  actors: [anActor("walker", "working", "wk-1111111111", "the first thing")],
+  present: [anActor("walker", "working", "wk-1111111111", "the first thing"),
+            anActor("idler", "stopped", "", "")],
+  hold: { on: true, by: "the person" },
+};
+const page = panelHtml(tree, shown, {}, busy);
+const pcss = [...page.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)].map((m) => m[1]).join("\n");
+// The script is dropped as well as the sheet: a class named in a querySelector
+// is not a class the page is wearing.
+const pmarkup = page
+  .replace(/<style[^>]*>[\s\S]*?<\/style>/g, "")
+  .replace(/<script[^>]*>[\s\S]*?<\/script>/g, "");
+const pruled = (name) => new RegExp("\\." + name + "(?![\\w-])").test(pcss);
+
+if (pcss.trim() === "") refuse("the panel page carries no stylesheet, so this half guards nothing");
+
+const worn = new Map();
+for (const tag of pmarkup.matchAll(/<(\w+)\b[^>]*\bclass="([^"]*)"/g)) {
+  for (const c of tag[2].split(/\s+/).filter(Boolean)) {
+    if (!worn.has(c)) worn.set(c, tag[1]);
+  }
+}
+if (worn.size === 0) refuse("the panel page emits no class at all, so this half guards nothing");
+say("every class the panel page emits has a rule (" + [...worn.keys()].sort().join(", ") + ")",
+  [...worn.keys()].every(pruled),
+  [...worn.keys()].filter((c) => !pruled(c))
+    .map((c) => c + " is worn by a <" + worn.get(c) + "> the stylesheet never names")
     .join(", "));
 
 process.exit(bad === 0 ? 0 : 1);

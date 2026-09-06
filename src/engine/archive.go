@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"flag"
@@ -26,7 +27,7 @@ import (
 //	.se/work   it does not travel, so it stays until a retro takes it
 //
 // A local token is in a folder git ignores. There is no commit holding it and
-// no tag to read it back from, so removing it is final.
+// nothing in git naming it, so removing it is final.
 //
 // SO THE CLOSE DOES NOT REMOVE IT. It closed deleting them at once, and the
 // next retro then had nothing to read about what happened. A retro that cannot
@@ -36,28 +37,58 @@ import (
 // THE AGENT CALLS NOTHING. This hangs off the save that ends a token, so every
 // door reaches it and none has to remember to.
 
-// archiveRefs is where an archived token lives. Under tags, so the tag list is
-// the archive, and under a prefix of its own so nothing collides with a
-// release tag somebody made.
+// archiveRefs is where an older archive kept a token: one tag per token,
+// written locally and pushed on the close.
+//
+// NOTHING WRITES ONE ANY MORE. A ref has to be pushed to leave the box, and
+// refs/tags answers HTTP 403 from the git proxy a cloud box runs behind. The
+// push result was discarded, so the tag stood on one machine, the note was
+// deleted from doc/work, and the next branch commit took the content off the
+// branch: the only copy left was a local tag on a box about to be destroyed.
+//
+// THE PREFIX STAYS BECAUSE THE TAGS ALREADY WRITTEN ARE STILL READ. It is read
+// from here and never written to, and the blob each tag holds is folded into
+// the list the first time the list is written.
 const archiveRefs = "refs/tags/archive/"
 
-// ArchiveList is the list a person opens. It travels, because a box that reads
-// the tree out of git should see what has been archived without asking git.
+// keptRefs is where the close anchors the object it wrote, one ref per object.
+// It is written here, read by nothing, and pushed by nothing: it exists so that
+// a garbage collection on this box spares an archived note the branch never
+// carried. See keepInGit.
+const keptRefs = "refs/se/archive/"
+
+// ArchiveList is the archive: one line per closed token, naming the git object
+// that holds it.
+//
+// IT TRAVELS, AND THAT IS THE WHOLE POINT. It is a file on the branch, so every
+// box that has the branch has the archive, and archiving needs no ref and no
+// push that a box might be refused.
 func ArchiveList(r Roots) string {
 	return filepath.Join(TrackedDir(r), "archive.jsonl")
 }
 
 // Archived is one line of that list.
-//
-// It is what the commit message carries, so the list is derived from the tags
-// rather than kept beside them. Level 2 ruled against an index to keep in
-// step, and a list that rebuilds from git is not one.
 type Archived struct {
 	ID          string `json:"id"`
 	Title       string `json:"title"`
 	Process     string `json:"process"`
 	Disposition string `json:"disposition"`
-	Tag         string `json:"tag"`
+	// Blob is the note as it stood at the close, written into git by the close.
+	// It is exact, and it is what a reader on the box that closed the token gets.
+	Blob string `json:"blob,omitempty"`
+	// OnBranch is the note as the branch last committed it, and it is the copy
+	// that travels.
+	//
+	// A BLOB WRITTEN AT THE CLOSE GOES NOWHERE. git hash-object -w puts the
+	// object in the store and no tree reaches it, so a clone is never sent it.
+	// The close anchors it under keptRefs so a gc on this box spares it, and that
+	// ref is never pushed either. What the branch committed is in every clone of
+	// the branch: the same note without the lines the close wrote, and this row
+	// carries what those said.
+	OnBranch string `json:"on_branch,omitempty"`
+	// Tag is what an older archive wrote, and nothing writes one now. It stays on
+	// the rows that already carry one so they go on reading.
+	Tag string `json:"tag,omitempty"`
 }
 
 // gitHere runs git over the work tree without touching the branch, the index
@@ -95,15 +126,19 @@ func Archive(r Roots, t Token) error {
 	if _, err := os.Stat(filepath.Join(r.Work, ".git")); err != nil {
 		return nil // no history to archive into, so it stays where a reader can find it
 	}
+	blob, err := keepInGit(r, at)
+	if err != nil {
+		return err
+	}
 	row := Archived{ID: t.ID, Title: t.Title, Process: t.Process,
-		Disposition: string(t.Disposition), Tag: archiveRefs + t.ID}
-	if err := keepInGit(r, at, row); err != nil {
+		Disposition: string(t.Disposition), Blob: blob, OnBranch: onBranch(r, at)}
+	// THE LIST IS WRITTEN BEFORE THE NOTE COMES OFF THE DISK. The list is the
+	// only thing naming the objects, so a write that failed after the delete
+	// would leave the content in git with nothing pointing at it.
+	if err := keepInList(r, row); err != nil {
 		return err
 	}
-	if err := forget(r, at); err != nil {
-		return err
-	}
-	return WriteArchiveList(r)
+	return forget(r, at)
 }
 
 // NotArchived says a token closed and its archive could not be written.
@@ -117,8 +152,8 @@ func Archive(r Roots, t Token) error {
 // it again except a sweep nobody knew to run.
 //
 // So the close stands and this says what is left over. It is the shape
-// snapshotFor already uses for a tree it cannot snapshot, and keepInGit for a
-// push it cannot make: said out loud, and the work goes on.
+// snapshotFor already uses for a tree it cannot snapshot: said out loud, and
+// the work goes on.
 type NotArchived struct {
 	ID  string
 	Err error
@@ -153,67 +188,135 @@ func forget(r Roots, at string) error {
 	return nil
 }
 
-// keepInGit writes one file into history under a tag of its own.
+// keepInGit writes the note into git as a blob and answers its name.
 //
-// IT NEVER TOUCHES THE BRANCH. A commit on the working branch would put the
-// engine in the person's history, and a stage would move what they had staged.
-// The blob, the tree and the commit are made by hand, the way a snapshot is,
-// and only the tag ref is written.
-func keepInGit(r Roots, at string, row Archived) error {
+// IT PUSHES NOTHING, AND THE REF IT WRITES IS NOT HOW THE ARCHIVE TRAVELS. A
+// ref has to be pushed to leave the box, and the archive namespace is refused
+// there, so an archive hanging off one is an archive a single machine holds.
+// The row names this blob, and the row is a line in a file the branch carries.
+//
+// WHAT IT WRITES REACHES NO FURTHER THAN THIS BOX, and that is why the row
+// names onBranch beside it: an object no clone was sent is no use to a clone.
+// This one is exact, and it is the better answer wherever it is there.
+//
+// IT NEVER TOUCHES THE BRANCH EITHER. A commit on the working branch would put
+// the engine in the person's history, and a stage would move what they staged.
+func keepInGit(r Roots, at string) (string, error) {
 	blob, err := gitHere(r, "hash-object", "-w", "--", at)
 	if err != nil {
-		return err
+		return "", err
 	}
-	tree, err := treeOfOne(r, filepath.Base(at), blob)
-	if err != nil {
-		return err
+	// AND SOMETHING POINTS AT IT, or a gc takes it. hash-object puts the object
+	// in the store and leaves it reachable from nothing, so git gc --prune=now,
+	// git prune and git repack -ad are all free to sweep it. Where the branch
+	// committed the note as well the row names that copy too and the loss is
+	// invisible. Where it did not, this object is the only copy there is, and
+	// the close has already taken the file off the disk.
+	//
+	// A REF IS THE ONLY THING THAT MAKES AN OBJECT REACHABLE, and this is not
+	// the tag that came out. That one was the archive's way of travelling and it
+	// had to be pushed, which is where the proxy refused it. This is an anchor on
+	// the box that wrote the object, in the namespace this program already keeps
+	// its own state in beside refs/se/steps, and nothing pushes it. What travels
+	// is still the row's on_branch.
+	//
+	// IT IS NAMED BY THE OBJECT, so a close that runs twice writes one ref and
+	// two notes with the same bytes share it.
+	if _, err := gitHere(r, "update-ref", keptRefs+blob, blob); err != nil {
+		return "", err
 	}
-	said, err := json.Marshal(row)
-	if err != nil {
-		return err
-	}
-	// THE MESSAGE CARRIES THE ROW, which is what lets the list be rebuilt from
-	// the tags alone. Nothing else has to be kept in step with anything.
-	commit, err := gitHere(r, "commit-tree", tree, "-m", string(said))
-	if err != nil {
-		return err
-	}
-	if _, err := gitHere(r, "update-ref", row.Tag, commit); err != nil {
-		return err
-	}
-	// A REMOTE GETS IT WHERE THERE IS ONE, and a box with none still closes its
-	// work. Level 2 asks the engine to push on closing, and a close that fails
-	// for want of a network would be worse than an archive one box behind.
-	if remote, err := gitHere(r, "remote"); err == nil && remote != "" {
-		first := strings.Fields(remote)[0]
-		_, _ = gitHere(r, "push", "--quiet", first, row.Tag+":"+row.Tag)
-	}
-	return nil
+	return blob, nil
 }
 
-// treeOfOne writes a tree holding one file, by handing mktree its line.
-func treeOfOne(r Roots, name, blob string) (string, error) {
-	cmd := quiet.Quietly(exec.Command("git", "mktree"))
-	cmd.Dir = r.Work
-	cmd.Stdin = strings.NewReader("100644 blob " + blob + "\t" + name + "\n")
-	out, err := cmd.Output()
-	if err != nil {
-		if ee, ok := err.(*exec.ExitError); ok {
-			return "", fmt.Errorf("git mktree: %s", strings.TrimSpace(string(ee.Stderr)))
-		}
-		return "", fmt.Errorf("git mktree: %w", err)
-	}
-	return strings.TrimSpace(string(out)), nil
-}
-
-// TheArchive answers every archived token, read from the tags.
+// onBranch answers the blob the branch's own history holds for a path, and
+// nothing where it holds none.
 //
-// The tags are the archive. This reads them rather than the list, so the list
-// can be wrong or missing and the answer is still right.
-func TheArchive(r Roots) ([]Archived, error) {
+// THIS IS THE COPY THAT TRAVELS, and it is why the archive needs no ref. The
+// note was a file somebody committed, so the branch carries its bytes in every
+// clone; the blob the close writes is reachable from nothing and goes nowhere.
+// A note nobody committed has no such copy, and the row then names only what
+// the close wrote.
+func onBranch(r Roots, at string) string {
+	rel, err := filepath.Rel(r.Work, at)
+	if err != nil {
+		return ""
+	}
+	blob, err := gitHere(r, "rev-parse", "HEAD:"+filepath.ToSlash(rel))
+	if err != nil {
+		return ""
+	}
+	return blob
+}
+
+// onBranchEver answers the note as the branch last committed it, for a note the
+// branch no longer carries, and nothing where it never carried one.
+//
+// onBranch above asks HEAD, which is the answer while the note is still on the
+// disk. By the time a row is folded the close has removed the file and the
+// branch has been told, so HEAD holds no such path and the copy that travels is
+// in the commit that carried it last. Every clone of the branch has that commit,
+// so the blob in it is in every clone.
+//
+// A NOTE THE BRANCH NEVER CARRIED HAS NO SUCH COPY, and this answers nothing for
+// it rather than an object no clone was sent.
+func onBranchEver(r Roots, id string) string {
+	rel := "doc/work/" + id + ".md"
+	if blob, err := gitHere(r, "rev-parse", "HEAD:"+rel); err == nil {
+		return blob
+	}
+	// FULL HISTORY, because the simplified walk drops the commit that carried a
+	// file through a merge, and the archive is written on a branch that takes
+	// other boxes' work in by merge.
+	said, err := gitHere(r, "rev-list", "--full-history", "HEAD", "--", rel)
+	if err != nil {
+		return ""
+	}
+	for _, commit := range strings.Fields(said) {
+		if blob, err := gitHere(r, "rev-parse", "--verify", "-q", commit+":"+rel); err == nil && blob != "" {
+			return blob
+		}
+	}
+	return ""
+}
+
+// archiveListRows reads the list, which is the archive.
+//
+// A LINE IT CANNOT READ IS A REFUSAL AND NEVER A SKIP. The list is the record
+// now, so dropping a line it cannot parse would take a closed token out of the
+// archive in silence, and the next write would make that permanent.
+func archiveListRows(r Roots) ([]Archived, error) {
+	path := ArchiveList(r)
+	said, err := os.ReadFile(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	var out []Archived
+	for n, line := range strings.Split(string(said), "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		var row Archived
+		if err := json.Unmarshal([]byte(line), &row); err != nil || row.ID == "" {
+			return nil, fmt.Errorf("%s:%d does not read as an archived token: %s", path, n+1, line)
+		}
+		out = append(out, row)
+	}
+	return out, nil
+}
+
+// archiveTagRows reads the tags an older archive wrote.
+//
+// A BOX WITH NO GIT, OR NO SUCH TAGS, HAS NONE, AND THAT IS NOT A FAILURE. The
+// list is the archive; these are read so that a tree holding tags and no list
+// still answers, and so their blobs can be folded into the list.
+func archiveTagRows(r Roots) []Archived {
 	said, err := gitHere(r, "for-each-ref", "--format=%(contents)", archiveRefs)
 	if err != nil {
-		return nil, err
+		return nil
 	}
 	var out []Archived
 	for _, line := range strings.Split(said, "\n") {
@@ -227,23 +330,82 @@ func TheArchive(r Roots) ([]Archived, error) {
 		}
 		out = append(out, row)
 	}
-	sort.Slice(out, func(i, j int) bool { return out[i].ID < out[j].ID })
-	return out, nil
+	return out
 }
 
-// WriteArchiveList writes the list from the tags.
+// TheArchive answers every archived token.
 //
-// IT IS A RENDERING AND NEVER A SOURCE. Delete it and this puts it back, byte
-// for byte, which is the whole reason it is allowed to exist beside a ruling
-// that refused an index to keep in step.
-func WriteArchiveList(r Roots) error {
+// THE LIST IS THE ARCHIVE, because the list is what travels. The tags an older
+// archive wrote are read for the ids the list does not carry, so nothing that
+// was archived before this stops answering.
+func TheArchive(r Roots) ([]Archived, error) {
+	rows, err := archiveListRows(r)
+	if err != nil {
+		return nil, err
+	}
+	listed := make(map[string]bool, len(rows))
+	for _, row := range rows {
+		listed[row.ID] = true
+	}
+	for _, row := range archiveTagRows(r) {
+		if !listed[row.ID] {
+			rows = append(rows, row)
+		}
+	}
+	sort.Slice(rows, func(i, j int) bool { return rows[i].ID < rows[j].ID })
+	return rows, nil
+}
+
+// keepInList puts a row in the archive list and writes the list out. A row
+// already there is replaced, so archiving twice archives once.
+func keepInList(r Roots, add Archived) error {
 	rows, err := TheArchive(r)
 	if err != nil {
 		return err
 	}
+	if add.ID != "" {
+		kept := make([]Archived, 0, len(rows)+1)
+		for _, row := range rows {
+			if row.ID != add.ID {
+				kept = append(kept, row)
+			}
+		}
+		rows = append(kept, add)
+		sort.Slice(rows, func(i, j int) bool { return rows[i].ID < rows[j].ID })
+	}
+	return writeArchiveRows(r, rows)
+}
+
+// WriteArchiveList writes the list out as it stands, folding in the tags an
+// older archive left. A sweep calls this where the list is there, which is how
+// the fold happens on a tree nobody is closing anything on.
+func WriteArchiveList(r Roots) error {
+	return keepInList(r, Archived{})
+}
+
+// writeArchiveRows writes the rows, giving each one the blob it is missing.
+func writeArchiveRows(r Roots, rows []Archived) error {
 	var b strings.Builder
-	for _, row := range rows {
-		line, err := json.Marshal(row)
+	for i := range rows {
+		// A ROW THE OLDER ARCHIVE WROTE IS GIVEN ITS BLOB, and then the tag it
+		// names is no longer the only way to the content: a reader with the object
+		// and no ref still answers. Where the tag has gone the row keeps what it
+		// had, because a row that cannot be resolved on this box today is not a
+		// row to drop.
+		if rows[i].Blob == "" && rows[i].Tag != "" {
+			if blob, err := gitHere(r, "rev-parse", rows[i].Tag+":"+rows[i].ID+".md"); err == nil {
+				rows[i].Blob = blob
+			}
+		}
+		// AND IT IS GIVEN THE COPY THAT TRAVELS, which naming an object is not.
+		// The blob a close wrote is reachable from nothing and a tag has to be
+		// pushed, so a clone made with --no-tags reads neither. What every clone
+		// has is what the branch committed, and a row closed before this looked
+		// for it carries none.
+		if rows[i].OnBranch == "" {
+			rows[i].OnBranch = onBranchEver(r, rows[i].ID)
+		}
+		line, err := json.Marshal(rows[i])
 		if err != nil {
 			return err
 		}
@@ -264,39 +426,119 @@ func WriteArchiveList(r Roots) error {
 }
 
 // ClosingState says whether a token stands where its process can move it no
-// further.
+// further. It is Process.Ends asked of the token's own process, and not a
+// second loop that could answer differently.
 //
 // A token that has ended still has a step to take where its process declares
-// one from where it stands. The standard process is the case: a done token is
-// waiting for a verdict, and taking it off the disk would strand the reviewer.
+// one from where it stands. The pull never writes that shape, because it sets
+// a disposition only on a step into an ending state, but a hand edit or an
+// older engine did, and taking such a token off the disk strands it.
 func ClosingState(r Roots, t Token) bool {
 	p, err := LoadProcess(r.Method, t.Process)
 	if err != nil {
 		return true // a process nobody can read says nothing about what is left
 	}
-	for _, a := range p.Activities {
-		if a.From != "" && a.From == string(t.Status) {
-			return false
+	return p.Ends(string(t.Status))
+}
+
+// Archivable is the one rule for whether a token may come off the disk: it has
+// ended, and it stands where its process can move it no further. The save and
+// the sweep both ask it, so the two doors cannot disagree about a token.
+func Archivable(r Roots, t Token) bool {
+	return t.Ended() && ClosingState(r, t)
+}
+
+// findArchivedWords answers FTS5 words over the archive the way findDB answers
+// them over the tree: the archived lines are read into an index of their own,
+// held in memory for the length of the call, and findDB runs the same MATCH
+// over it. The archive is not in the tree's index, because it is not in the
+// tree, and a second matcher beside findDB is how the two doors drifted apart.
+func findArchivedWords(r Roots, rows []Archived, p FindParams) (Found, error) {
+	db, err := sql.Open("sqlite3", ":memory:")
+	if err != nil {
+		return Found{}, err
+	}
+	defer db.Close()
+	// ONE CONNECTION, because every connection to :memory: is a database of
+	// its own, and a second one would answer over an empty table.
+	db.SetMaxOpenConns(1)
+	if _, err := db.Exec(`CREATE VIRTUAL TABLE line_text USING fts5 (path UNINDEXED, n UNINDEXED, text)`); err != nil {
+		return Found{}, err
+	}
+	tx, err := db.Begin()
+	if err != nil {
+		return Found{}, err
+	}
+	put, err := tx.Prepare(`INSERT INTO line_text (path, n, text) VALUES (?, ?, ?)`)
+	if err != nil {
+		_ = tx.Rollback()
+		return Found{}, err
+	}
+	for _, row := range rows {
+		said, from, err := readArchived(r, row)
+		if err != nil {
+			continue // a row whose object has gone proves nothing about the rest
+		}
+		for n, line := range strings.Split(said, "\n") {
+			// THE PATH IS THE OBJECT THAT ANSWERED, so a reader can open it.
+			if _, err := put.Exec(from, n+1, strings.TrimRight(line, "\r")); err != nil {
+				put.Close()
+				_ = tx.Rollback()
+				return Found{}, err
+			}
 		}
 	}
-	return true
+	put.Close()
+	if err := tx.Commit(); err != nil {
+		return Found{}, err
+	}
+	got, err := findDB(db, FindParams{Words: p.Words, Limit: p.Limit})
+	if err != nil {
+		return Found{}, err
+	}
+	got.Fresh = true // the archive is read out of git, and no watcher can be behind it
+	return got, nil
 }
 
 // readArchivedNote answers a token out of history, so a reader naming a closed
 // id is answered rather than told it never existed.
+//
+// THE COPY THAT TRAVELS IS ONE CLOSE SHORT, AND THE ROW SAYS WHAT IT MISSES.
+// The close writes the disposition and the closing state into the frontmatter
+// and only then archives the note, so the blob the branch already carried is
+// the note as it stood open. A reader on a box with the branch and not the
+// loose blob was handed a token whose Ended() said the closed work was not
+// closed. The row carries the disposition, and the process says which state a
+// close ends at, so both are put back over what the older bytes said.
 func readArchivedNote(r Roots, id string) (Token, bool) {
 	if _, err := os.Stat(filepath.Join(r.Work, ".git")); err != nil {
 		return Token{}, false
 	}
-	said, err := ReadArchived(r, id)
-	if err != nil || said == "" {
-		return Token{}, false
-	}
-	t, err := noteToken(said, id)
+	rows, err := TheArchive(r)
 	if err != nil {
 		return Token{}, false
 	}
-	return t, true
+	for _, row := range rows {
+		if row.ID != id {
+			continue
+		}
+		said, at, err := readArchived(r, row)
+		if err != nil || said == "" {
+			return Token{}, false
+		}
+		t, err := noteToken(said, id)
+		if err != nil {
+			return Token{}, false
+		}
+		if at != row.Blob {
+			t.Disposition = Disposition(row.Disposition)
+			if p, err := LoadProcess(r.Method, t.Process); err == nil {
+				t.Status = Status(p.EndsAt())
+			}
+		}
+		return t, true
+	}
+	return Token{}, false
 }
 
 // runArchive sweeps what is already closed, and lists what the archive holds.
@@ -356,7 +598,7 @@ func runArchive(c *call) int {
 // deleted, so a person reads what happened rather than trusting it.
 func SweepClosed(r Roots) (kept, gone int, err error) {
 	for _, t := range Tokens(r) {
-		if !t.Ended() {
+		if !Archivable(r, t) {
 			continue
 		}
 		tracked := filepath.Dir(noteAt(r, t.ID)) == TrackedDir(r)
@@ -369,9 +611,25 @@ func SweepClosed(r Roots) (kept, gone int, err error) {
 			gone++
 		}
 	}
-	// THE LIST IS LEFT RIGHT WHETHER OR NOT ANYTHING MOVED. A sweep with
-	// nothing to sweep is how the list is put back after it is deleted, and
-	// that is the whole claim that it is a rendering.
+	// THE FOLD HAPPENS ON A LIST THAT IS THERE, AND NOTHING IS PUT BACK.
+	//
+	// The list is the record rather than a rendering of the tags: a row naming a
+	// blob is in no tag, and no box can write that row again. This ended by
+	// writing the list whatever it had found, and said that was how a list
+	// somebody lost came back. Over a tree whose list has gone it writes one
+	// holding what the tags carry and nothing else, so the rows naming a blob go
+	// for good at the moment a person sweeps to get them back. What git holds of
+	// the file is the way back, and it is only there while nothing has been
+	// written over it.
+	//
+	// A LIST THAT IS THERE LOSES NOTHING BY BEING WRITTEN WHOLE, and that write
+	// is where the tags an older archive left are folded in.
+	if _, err := os.Stat(ArchiveList(r)); err != nil {
+		if os.IsNotExist(err) {
+			return kept, gone, nil
+		}
+		return kept, gone, err
+	}
 	return kept, gone, WriteArchiveList(r)
 }
 
@@ -381,8 +639,8 @@ func SweepClosed(r Roots) (kept, gone int, err error) {
 // comes off the disk and out of the index, and every search stops seeing it.
 // Level 2 says search takes a ref, and these are the refs.
 //
-// It reads the tags rather than the list, because the list carries a title and
-// the body is what somebody is looking for.
+// It reads the objects the list names rather than the list's own lines, because
+// a line carries a title and the body is what somebody is looking for.
 func FindArchived(r Roots, p FindParams) (Found, error) {
 	rows, err := TheArchive(r)
 	if err != nil {
@@ -390,9 +648,10 @@ func FindArchived(r Roots, p FindParams) (Found, error) {
 	}
 	// A GLOB OVER PATHS HAS NOTHING TO NARROW HERE, SO IT IS REFUSED.
 	//
-	// An archived token is a tag rather than a file, and a hit names the tag it
-	// came from. There is no path for a glob to read, and the flag was taken and
-	// ignored: a search asking for one folder answered the whole archive.
+	// An archived token is a git object rather than a file, and a hit names the
+	// object it came from. There is no path for a glob to read, and the flag was
+	// taken and ignored: a search asking for one folder answered the whole
+	// archive.
 	//
 	// THE DAMAGE IS THE READING RATHER THAN THE MISSING FILTER. A reader handed
 	// the whole archive after asking for one folder believes the hits came from
@@ -401,17 +660,23 @@ func FindArchived(r Roots, p FindParams) (Found, error) {
 	// half that reads it ignores is refused for every caller and not just one.
 	if p.Path != "" {
 		return Found{}, fmt.Errorf("the archive reads no path, so --path %s has nothing to narrow: "+
-			"an archived token is a tag rather than a file. Search the archive without it, "+
+			"an archived token is a git object rather than a file. Search the archive without it, "+
 			"or search the tree, which does read paths", p.Path)
 	}
-	want := p.Regex
-	if want == "" {
-		want = regexp.QuoteMeta(p.Words)
-	}
-	if want == "" {
+	if p.Words == "" && p.Regex == "" {
 		return Found{}, fmt.Errorf("say what to look for: --words or --regex")
 	}
-	re, err := regexp.Compile(want)
+	// WORDS MEAN OVER THE ARCHIVE WHAT THEY MEAN OVER THE TREE. This quoted
+	// the words into a regular expression and matched them as one literal
+	// string, so se find --words 'undo AND pops' answered two hits and the
+	// same words over the archive answered none: no archived line carries
+	// the characters "undo AND pops". A searcher reads zero over closed work
+	// as work that never was. So the words go to FTS5 here too, through the
+	// one function the tree door uses.
+	if p.Words != "" {
+		return findArchivedWords(r, rows, p)
+	}
+	re, err := regexp.Compile(p.Regex)
 	if err != nil {
 		return Found{}, fmt.Errorf("that regular expression will not read: %w", err)
 	}
@@ -421,9 +686,9 @@ func FindArchived(r Roots, p FindParams) (Found, error) {
 	}
 	out := Found{Fresh: true}
 	for _, row := range rows {
-		said, err := ReadArchived(r, row.ID)
+		said, from, err := readArchived(r, row)
 		if err != nil {
-			continue // a tag whose blob has gone proves nothing about the rest
+			continue // a row whose object has gone proves nothing about the rest
 		}
 		for n, line := range strings.Split(said, "\n") {
 			if !re.MatchString(line) {
@@ -431,8 +696,9 @@ func FindArchived(r Roots, p FindParams) (Found, error) {
 			}
 			out.Count++
 			if len(out.Hits) < limit {
-				// THE PATH IS THE TAG, so a reader can open what answered.
-				out.Hits = append(out.Hits, Hit{Path: row.Tag, Line: n + 1,
+				// THE PATH IS THE OBJECT THAT ANSWERED, so a reader opens what the
+				// hit came from rather than what the row happens to name first.
+				out.Hits = append(out.Hits, Hit{Path: from, Line: n + 1,
 					Text: strings.TrimRight(line, "\r")})
 			}
 		}
@@ -441,7 +707,50 @@ func FindArchived(r Roots, p FindParams) (Found, error) {
 	return out, nil
 }
 
-// ReadArchived answers the text of an archived token, from its tag.
+// ReadArchived answers the text of an archived token.
 func ReadArchived(r Roots, id string) (string, error) {
-	return gitHere(r, "show", archiveRefs+id+":"+id+".md")
+	rows, err := TheArchive(r)
+	if err != nil {
+		return "", err
+	}
+	for _, row := range rows {
+		if row.ID == id {
+			said, _, err := readArchived(r, row)
+			return said, err
+		}
+	}
+	return "", fmt.Errorf("%s is not in the archive", id)
+}
+
+// readArchived answers the text one row names, and the object it came from.
+//
+// A ROW MAY NAME MORE THAN ONE COPY, AND THEY ARE TRIED IN ORDER. The blob the
+// close wrote is exact and reaches only as far as the box that wrote it. What
+// the branch committed is one close behind and is in every clone of the branch.
+// A tag is what an older archive left, and its objects travel with the tag
+// where the tag was pushed. A box holding one of the three answers rather than
+// refusing.
+func readArchived(r Roots, row Archived) (string, string, error) {
+	var last error
+	for _, at := range []string{row.Blob, row.OnBranch} {
+		if at == "" {
+			continue
+		}
+		said, err := gitHere(r, "cat-file", "-p", at)
+		if err == nil {
+			return said, at, nil
+		}
+		last = err
+	}
+	if row.Tag != "" {
+		said, err := gitHere(r, "show", row.Tag+":"+row.ID+".md")
+		if err == nil {
+			return said, row.Tag, nil
+		}
+		last = err
+	}
+	if last != nil {
+		return "", "", last
+	}
+	return "", "", fmt.Errorf("%s is in the archive and names no object to read it from", row.ID)
 }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"quackitect/engine/internal/expr"
 	"strings"
 	"testing"
 )
@@ -562,7 +563,7 @@ views:
 	if err != nil {
 		t.Fatal(err)
 	}
-	tab, err := Render(b, b.Views[0], []Row{row("id", "1", "assignee", "main", "title", "a")})
+	tab, err := Render(b, b.Views[0], []expr.Row{row("id", "1", "assignee", "main", "title", "a")})
 	if err != nil {
 		t.Fatal(err)
 	}

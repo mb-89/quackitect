@@ -1,6 +1,7 @@
 package main
 
 import (
+	"quackitect/engine/internal/expr"
 	"testing"
 )
 
@@ -37,7 +38,7 @@ views:
 func TestAGroupCountsANestedChild(t *testing.T) {
 	t.Parallel()
 	b := aNestingBase(t)
-	rows := []Row{
+	rows := []expr.Row{
 		row("id", "wk-parent", "assignee", "main", "status", "open", "title", "a parent"),
 		row("id", "wk-child", "parent", "wk-parent", "assignee", "main", "status", "open", "title", "a child"),
 	}
@@ -66,7 +67,7 @@ func TestAGroupCountsANestedChild(t *testing.T) {
 func TestTheBucketsAddUpToTheTotal(t *testing.T) {
 	t.Parallel()
 	b := aNestingBase(t)
-	rows := []Row{
+	rows := []expr.Row{
 		row("id", "wk-parent", "assignee", "main", "status", "open", "title", "a parent"),
 		row("id", "wk-child", "parent", "wk-parent", "assignee", "main", "status", "open", "title", "a child"),
 		row("id", "wk-alone", "assignee", "main", "status", "open", "title", "an unrelated one"),

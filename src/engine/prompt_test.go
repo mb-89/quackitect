@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -14,7 +15,7 @@ func TestAPromptIsRecordedWhole(t *testing.T) {
 	exe := buildEngine(t)
 	r := guidanceTree(t)
 	Project(r)
-	l, _ := OpenLog(r.Private("log"))
+	l, _ := sessionlog.Open(r.Private("log"))
 	l.Close()
 
 	// Two lines, and longer than any truncation that was in the way.
@@ -22,7 +23,7 @@ func TestAPromptIsRecordedWhole(t *testing.T) {
 	hookSays(t, exe, r.Method, "UserPromptSubmit", map[string]any{"cwd": r.Work, "prompt": long})
 
 	lines := logLines(t, r)
-	var rec Record
+	var rec sessionlog.Record
 	json.Unmarshal([]byte(lines[len(lines)-1]), &rec)
 	if rec.Src != "user" || rec.Kind != "prompt" {
 		t.Fatalf("it was recorded as %s/%s", rec.Src, rec.Kind)

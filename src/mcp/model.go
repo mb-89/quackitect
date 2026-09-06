@@ -2,6 +2,8 @@ package main
 
 import (
 	"bufio"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net"
@@ -39,16 +41,26 @@ func askModelWithin(r roots, method string, params any, within time.Duration) (j
 		}
 		time.Sleep(25 * time.Millisecond)
 	}
-	if err != nil {
-		return nil, fmt.Errorf("no engine is running over %s, so there is nothing to ask. Start it: se --work %s", r.work, r.work)
-	}
+	// THE SOCKET IS THE TRUTH, NOT THE RECORD. A record naming no socket was
+	// answered "start it again" while an engine answered on its own path the
+	// whole time: a second engine that could not bind had written the record
+	// without one, and beat beside the first. So the engine's own path is
+	// dialled whenever the record names none, or there is none, and only a
+	// refusal there is no engine. The path mirrors socketPath in the engine.
 	var v running
-	if json.Unmarshal(b, &v) != nil || v.Socket == "" {
-		return nil, fmt.Errorf("the engine over %s answers no questions yet. Start it again: se --work %s", r.work, r.work)
+	if err == nil {
+		_ = json.Unmarshal(b, &v) // a record that will not read names no socket, and the path stands in
 	}
-	conn, err := net.DialTimeout("unix", v.Socket, 200*time.Millisecond)
-	if err != nil {
-		return nil, fmt.Errorf("the engine over %s is not answering on %s. Start it again: se --work %s", r.work, v.Socket, r.work)
+	socket := v.Socket
+	if socket == "" {
+		socket = theEngineSocket(r)
+	}
+	conn, dialErr := net.DialTimeout("unix", socket, 200*time.Millisecond)
+	if dialErr != nil {
+		if err != nil {
+			return nil, fmt.Errorf("no engine is running over %s, so there is nothing to ask. Start it: se --work %s", r.work, r.work)
+		}
+		return nil, fmt.Errorf("the engine over %s is not answering on %s. Start it again: se --work %s", r.work, socket, r.work)
 	}
 	defer conn.Close()
 	_ = conn.SetDeadline(time.Now().Add(within)) // a deadline it cannot set is a wait the read below still ends
@@ -73,4 +85,17 @@ func askModelWithin(r roots, method string, params any, within time.Duration) (j
 		return nil, fmt.Errorf("%s", a.Error)
 	}
 	return a.Result, nil
+}
+
+// theEngineSocket is where the engine listens, decided from the work folder
+// alone, the way the engine's socketPath decides it: under .se, unless that
+// path is too long for a socket, and then under the temporary folder with
+// the work folder hashed into the name.
+func theEngineSocket(r roots) string {
+	p := filepath.Join(r.work, ".se", "engine.sock")
+	if len(p) < 100 {
+		return p
+	}
+	sum := sha256.Sum256([]byte(r.work))
+	return filepath.Join(os.TempDir(), "quackitect-"+hex.EncodeToString(sum[:6])+".sock")
 }

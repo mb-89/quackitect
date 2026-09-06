@@ -70,7 +70,7 @@ func TestAClaimCanTakeTheTokenUp(t *testing.T) {
 	tok := mintUnclaimed(t, r, "claimed and taken once")
 
 	var out, errs bytes.Buffer
-	code := run["claim"](&call{roots: r,
+	code := run["claim"](&call{ctx: t.Context(), roots: r,
 		args: []string{"--these", tok.ID, "--actor", "worker-one", "--take", "--no-publish"},
 		in:   strings.NewReader(""), out: &out, err: &errs})
 	said := out.String() + errs.String()
@@ -85,8 +85,49 @@ func TestAClaimCanTakeTheTokenUp(t *testing.T) {
 	if back.ClaimedBy == "" {
 		t.Fatalf("the claim was not written: %s", said)
 	}
-	held := InWorkFor(r, "worker-one")
-	if len(held) != 1 || held[0].ID != tok.ID {
-		t.Fatalf("worker-one holds %d tokens after a claim that takes up: %s", len(held), said)
+	inHand := InWorkFor(r, "worker-one")
+	if len(inHand) != 1 || inHand[0].ID != tok.ID {
+		t.Fatalf("worker-one holds %d tokens after a claim that takes up: %s", len(inHand), said)
+	}
+
+	// AND A REFUSED TAKE-UP IS NOT A CLAIM THAT WORKED. The reason went into the
+	// notice and the verb answered zero anyway, so a caller reading the code was
+	// told the work was in its hands, and its next write was refused for holding
+	// no token.
+	elsewhere := mintUnclaimed(t, r, "claimed, another hand holds")
+	if _, err := Claim(r, Claimant(r, "worker-one"), []string{elsewhere.ID}, time.Now().UTC()); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := TakeUp(r, elsewhere.ID, "worker-two"); err != nil {
+		t.Fatal(err)
+	}
+	out.Reset()
+	errs.Reset()
+	code = run["claim"](&call{ctx: t.Context(), roots: r,
+		args: []string{"--these", elsewhere.ID, "--actor", "worker-one", "--take", "--no-publish"},
+		in:   strings.NewReader(""), out: &out, err: &errs})
+	said = out.String() + errs.String()
+	if code == 0 {
+		t.Errorf("a refused take-up answered 0, so the caller is told it holds %s: %s", elsewhere.ID, said)
+	}
+	if !strings.Contains(said, "refused") {
+		t.Errorf("the answer does not say the take-up was refused: %s", said)
+	}
+
+	// AND TAKE WITH TWO IDS SAYS THE FLAG DID NOTHING. A take-up is one token at
+	// a time, so the block was skipped, and skipped in silence: the flag was
+	// accepted and ignored.
+	one, two := mintUnclaimed(t, r, "one of a pair"), mintUnclaimed(t, r, "two of a pair")
+	out.Reset()
+	errs.Reset()
+	code = run["claim"](&call{ctx: t.Context(), roots: r,
+		args: []string{"--these", one.ID + "," + two.ID, "--actor", "worker-three", "--take", "--no-publish"},
+		in:   strings.NewReader(""), out: &out, err: &errs})
+	said = out.String() + errs.String()
+	if !strings.Contains(said, "take was not applied") {
+		t.Errorf("two ids with take said nothing about the flag: %s", said)
+	}
+	if took := InWorkFor(r, "worker-three"); len(took) != 0 {
+		t.Errorf("take with two ids put %d token(s) in worker-three's hands", len(took))
 	}
 }

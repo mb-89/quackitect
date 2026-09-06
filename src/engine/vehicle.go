@@ -340,10 +340,13 @@ func LinkBothNames(methodRoot string, names []string) ([]string, error) {
 	var done []string
 	for _, name := range names {
 		bin := filepath.Join(methodRoot, ".bin")
-		plain, suffixed := filepath.Join(bin, name), filepath.Join(bin, exeName(name))
-		if plain == suffixed {
-			continue
-		}
+		// THE SUFFIXED NAME IS .exe ON EVERY PLATFORM, because the battery builds
+		// .bin/se.exe everywhere and the cage names ./.bin/se everywhere. This
+		// asked exeName, which adds .exe on Windows alone, so on Linux the two
+		// names were one string and nothing was linked: an installed tree kept
+		// .bin/se on the build the installer made, and a fresh worktree had no
+		// .bin/se at all, so its battery answered "no engine at .bin/se".
+		plain, suffixed := filepath.Join(bin, name), filepath.Join(bin, name+".exe")
 		if _, err := os.Stat(suffixed); err != nil {
 			continue // that program is not built here, which is not a fault
 		}
@@ -369,8 +372,8 @@ func LinkBothNames(methodRoot string, names []string) ([]string, error) {
 		// and the processes holding it go on running from the moved file.
 		//
 		// IT GOES IN .bin/was, NOT BESIDE THE PROGRAMS IT IS NO LONGER ONE OF.
-		// See wasbin.go: .bin holds what this tree ships, .bin/was holds what
-		// it used to, and the engine sweeps that folder at every start.
+		// See internal/replaced: .bin holds what this tree ships, .bin/was holds
+		// what it used to, and the engine sweeps that folder at every start.
 		if err := os.Remove(plain); err != nil && !os.IsNotExist(err) {
 			_, _ = replaced.PutAside(methodRoot, plain) // a name it cannot free is one the link below reports
 		}
@@ -391,4 +394,28 @@ func LinkBothNames(methodRoot string, names []string) ([]string, error) {
 		done = append(done, name)
 	}
 	return done, nil
+}
+
+// theProgramNames answers every program this tree ships, by name, for the
+// doors that want the names and not where each is built from. theBuilds is the
+// one list, read from util/setup/manifest.json, and the swap door reads the
+// same call.
+//
+// MEASURED on startup. It named se, se-mcp and logview in a literal of its
+// own, which was a second copy of the manifest in code. Nothing was wrong
+// while the two agreed, and nothing held them together. A program added to the
+// manifest is built by the installer and put in place by a swap, and was then
+// left with only its suffixed name by the engine that starts.
+func theProgramNames(methodRoot string) []string {
+	var names []string
+	for _, one := range theBuilds(methodRoot) {
+		names = append(names, one.Name)
+	}
+	return names
+}
+
+// LinkEveryProgram is the link step: every program this tree ships is given its
+// plain name and its suffixed one as the same file.
+func LinkEveryProgram(methodRoot string) ([]string, error) {
+	return LinkBothNames(methodRoot, theProgramNames(methodRoot))
 }

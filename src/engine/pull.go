@@ -6,7 +6,9 @@ import (
 	"os/exec"
 	"path/filepath"
 	"quackitect/engine/internal/quiet"
+	"quackitect/engine/internal/sessionlog"
 	"runtime"
+	"sort"
 	"strings"
 	"time"
 )
@@ -27,12 +29,15 @@ import (
 // program can check, and a reviewer settles it. The one exception is a token in
 // its own scope that is local, which is an agent's breakdown of work it
 // already holds — four eyes belong at the boundary of delegated work.
+// Who closes what, and why the reviewer is the default, is
+// [[every-token-names-its-closer]].
 
 // The answers. The pull field names which one came back, so an agent branches
 // on one field and never has to infer.
 const (
 	AnswerWork    = "work"    // here is a token: do it
 	AnswerRefused = "refused" // the submission failed a check a program could make
+	AnswerSettled = "settled" // the submission was taken and no work was handed on
 	AnswerWait    = "wait"    // nothing to do, and the notice says why
 	// The fifth. A hold nobody is behind is worth more than the next token.
 )
@@ -54,6 +59,14 @@ type Payload struct {
 	Disposition string   `json:"disposition,omitempty"`
 	Successors  []string `json:"successors,omitempty"`
 	Reason      string   `json:"reason,omitempty"`
+
+	// settleOnly says this submission wants no token back, which is a person at
+	// a shell rather than an agent in a lane.
+	//
+	// IT IS UNEXPORTED BECAUSE IT IS NOT THE PAYLOAD'S TO SAY. Which door an ask
+	// came through is the engine's own reading, and a field the JSON could set
+	// would let a lane opt out of being handed work.
+	settleOnly bool
 }
 
 type Answer struct {
@@ -81,6 +94,16 @@ type Answer struct {
 	// that produces no id is one the engine did not accept, and the reviewer
 	// is not asked to remember to mint anything.
 	Learned string `json:"learned,omitempty"`
+
+	// claimed says the queue wrote the claim on the token it is handing over,
+	// so the verb that answered can put it on the claims branch.
+	//
+	// IT IS UNEXPORTED BECAUSE IT IS NOT THE AGENT'S TO READ, the way the
+	// payload's settleOnly is not the caller's to set. The claim is on the token
+	// in the answer, and this says only whether this call is the one that wrote
+	// it, which is the difference between publishing once and publishing on
+	// every pull for ever.
+	claimed bool
 }
 
 // Pull is the whole protocol. One function, because the order of its parts is
@@ -138,15 +161,105 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 			return a
 		}
 		learned, over = a.Learned, a.Notice
+		// A SUBMISSION AT A SHELL IS ONE THING ASKED FOR, AND ONE THING ANSWERED,
+		// AND THE QUEUE IS NOT READ AT ALL.
+		//
+		// It used to be read and the token it handed out put back a moment later.
+		// Handing out opens a stretch and a put-down closes one, so every shell
+		// submission wrote a began and an ended onto whatever token the queue
+		// would have handed on, with two snapshot commits behind them. That
+		// token's record then said it had been in a hand it was never in.
+		if p.settleOnly {
+			return Answer{Pull: AnswerSettled, Notice: p.ID + " is settled. The next token goes to a " +
+				"lane, because an agent that submits is asking for more. Ask for work again when " +
+				"you want it."}
+		}
+	}
+	// A HOLD ON YOUR OWN VERDICT IS NOT WORK IN HAND. The submission put the
+	// token down, and naming it again through se run or se apply took it back
+	// up, so the queue handed the author its own done token with the verdict's
+	// checklist. It comes off here, before the queue reads what is held, and a
+	// reviewer pull by the author is refused the way its submission is.
+	down, refused := ownVerdictOffTheHand(r, actor, role)
+	if refused != nil {
+		return *refused
 	}
 	a := whatComesNext(r, actor, role)
 	a.Learned = learned
-	a.Notice += over
+	a.Notice += over + down
 	return a
+}
+
+// ownVerdictOffTheHand puts down every token this actor holds whose next step
+// is a verdict on its own work. It answers what it said about that, and the
+// refusal when the pull was for a verdict, since the verdict is never the
+// author's.
+func ownVerdictOffTheHand(r Roots, actor, role string) (string, *Answer) {
+	var down []string
+	var own *Token
+	for _, t := range Tokens(r) {
+		if t.Holder != actor || t.Ended() || t.Author != actor || roleAt(r, t) != RoleReviewer {
+			continue
+		}
+		t.Holder = ""
+		if err := SaveToken(r, t); err != nil {
+			continue
+		}
+		inSession(r, "work", actor, t.ID+" put back: its next step is a verdict, and the verdict is never the author's",
+			sessionlog.Yes(), map[string]any{"id": t.ID})
+		down = append(down, t.ID)
+		if own == nil {
+			first := t
+			own = &first
+		}
+	}
+	if len(down) == 0 {
+		return "", nil
+	}
+	if role == RoleReviewer {
+		a := refuse(own, Rejection{Clause: "author",
+			Wrong:     "you did the work on " + own.ID + ", so the verdict is not yours. It is put back for a reviewer",
+			Satisfies: "a verdict from another actor. Pull with role worker for work of your own"})
+		return "", &a
+	}
+	return " Put back, because its next step is a verdict and the verdict is never the author's: " +
+		strings.Join(down, ", ") + ".", nil
+}
+
+// theNotesLeft hands this actor a note, one at a time, and says so when none
+// is left. It is the whole of what the queue gives out while finishing.
+//
+// A NOTE IS PRIVATE AND LIVES OUTSIDE GIT, so one left on a cloud box dies
+// with it. The queue hands a note out at no other time, so no ordering change
+// reaches one: there is nothing in the queue to move up. That is why the drain
+// rides on finishing rather than on a rank.
+//
+// A NOTE ANOTHER HAND HOLDS IS LEFT ALONE, because that hand is finishing too.
+// One nobody holds is taken, whoever wrote it, since it dies with this box
+// either way.
+func theNotesLeft(r Roots, actor string) Answer {
+	for _, t := range Tokens(r) {
+		if t.Process != PrivateProcess || t.Ended() {
+			continue
+		}
+		if t.Holder != "" && t.Holder != actor {
+			continue
+		}
+		if a, ok := take(r, actor, t); ok {
+			return a
+		}
+	}
+	return Answer{Pull: AnswerWait, Notice: "Nothing is left to finish. " +
+		"Every note you hold is worked, and no new work goes out while a person " +
+		"has the work on finishing. Say what you did and stop."}
 }
 
 // whatComesNext is the queue's answer to an actor with nothing in hand.
 func whatComesNext(r Roots, actor, role string) Answer {
+	// FINISHING UP DRAINS THE NOTES AND HANDS OUT NOTHING ELSE.
+	if LoadHold(r).Finishing() {
+		return theNotesLeft(r, actor)
+	}
 	// A HOLD NOBODY IS BEHIND SENDS SOMEBODY TO LOOK, before new work is handed
 	// out. A walker given another token goes on working while the stuck one
 	// stays stuck, which is what happened.
@@ -176,7 +289,7 @@ func whatComesNext(r Roots, actor, role string) Answer {
 }
 
 func currentSession(r Roots) string {
-	return sessionOf(filepath.Join(r.Private("log"), Current))
+	return sessionlog.SessionOf(filepath.Join(r.Private("log"), sessionlog.Current))
 }
 
 // settle applies a payload. It returns done=false when the payload was
@@ -211,12 +324,20 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 	if f := checkDisposition(r, t, p); f != nil {
 		return refuse(&t, *f), true
 	}
+	// A SUBMISSION SAYS WHAT IT BRINGS. IT DOES NOT SAY WHAT THE NOTE NO LONGER
+	// HOLDS.
+	//
+	// AND THE GATE READS WHAT IT BRINGS. This merge sat after checkEvidence,
+	// which reads the tables on the token, so a first submission whose answers
+	// were in the payload alone was refused naming a blank line, and the
+	// refusal returned before the merge, dropping the answers it carried. The
+	// only way in was to write the note first, and the evidence argument on
+	// the door was decoration. A refusal saves nothing, so a merge that is
+	// then refused leaves the note as it was.
+	t.Submission = keepingWhatWasNotSent(t.Submission, p.Evidence)
 	if f := checkEvidence(r, t, p); f != nil {
 		return refuse(&t, *f), true
 	}
-	// A SUBMISSION SAYS WHAT IT BRINGS. IT DOES NOT SAY WHAT THE NOTE NO LONGER
-	// HOLDS.
-	t.Submission = keepingWhatWasNotSent(t.Submission, p.Evidence)
 
 	// A WORKER CLOSES ITS OWN WORK, and a standard token's verdict is the one
 	// step a second actor takes. Whoever did the work step is written down as
@@ -252,6 +373,24 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 		t.Reason = p.Reason
 	}
 	t.Holder = ""
+	// AND THE CLAIM GOES BACK WITH THE HOLD.
+	//
+	// A SUBMISSION HANDS THE TOKEN ON, SO IT HANDS THE CLAIM BACK. The next step
+	// is worked by somebody else, and on the standard process it must be: the
+	// author is refused its own verdict a few lines above. The hold was released
+	// here and the claim was not, so a token at done stayed claimed by the actor
+	// who had finished with it, for the whole three hours a claim stands.
+	//
+	// MEASURED on 2026-09-05, working the verdict queue. Four tokens stood at
+	// done and every one was refused to the reviewer, each naming its own
+	// worker. Three were claimed on this box, so it is not the cloud push. The
+	// queue read empty while it was full, and two reviewers spent a session
+	// polling it.
+	//
+	// IT IS THE NOTE'S CLAIM THAT IS DROPPED, not a release published to git.
+	// The next actor's claim publishes in the ordinary way, and a submission
+	// that had to reach the network to finish would fail where the network does.
+	DropClaim(&t)
 	// CLOSING ENDS THE STRETCH, so the change is the diffs between began and
 	// ended, pair by pair.
 	t = closeStretch(r, t)
@@ -304,6 +443,18 @@ func checkDisposition(r Roots, t Token, p Payload) *Rejection {
 		}
 		return nil
 	}
+	return theEnding(r, proc, said, p.Reason, p.Successors)
+}
+
+// theEnding says whether an ending a caller names is one this token can carry.
+//
+// EVERY DOOR THAT ENDS A TOKEN ASKS THIS ONE. The submission asks it and so
+// does the abort, which is the door that ends a token from wherever it stands.
+// The abort wrote dropped whatever had happened, so a token that turned out
+// larger and was split could only be recorded as one nobody wanted, and a
+// second copy of these rules beside it would be a second answer to the same
+// question.
+func theEnding(r Roots, proc Process, said, reason string, successors []string) *Rejection {
 	var spec *DispositionSpec
 	for i, d := range proc.Dispositions {
 		if d.Name == said {
@@ -316,7 +467,7 @@ func checkDisposition(r Roots, t Token, p Payload) *Rejection {
 			Wrong:     "a token cannot close without one, and " + proc.Name + " does not end " + quoted(said),
 			Satisfies: "one of: " + strings.Join(proc.DispositionNames(), ", ")}
 	}
-	if spec.NeedsReason && strings.TrimSpace(p.Reason) == "" {
+	if spec.NeedsReason && strings.TrimSpace(reason) == "" {
 		return &Rejection{Clause: "disposition", Wrong: said + " carries no reason",
 			Satisfies: "why the work stopped"}
 	}
@@ -324,11 +475,11 @@ func checkDisposition(r Roots, t Token, p Payload) *Rejection {
 	// does not exist is not a thing a process can declare: it is a claim about
 	// the record, and the record is what this reads.
 	if Disposition(said) == Became {
-		if len(p.Successors) == 0 {
+		if len(successors) == 0 {
 			return &Rejection{Clause: "disposition", Wrong: "became names no successor",
 				Satisfies: "the ids of the tokens this became"}
 		}
-		for _, id := range p.Successors {
+		for _, id := range successors {
 			if _, err := LoadToken(r, id); err != nil {
 				return &Rejection{Clause: "disposition", Wrong: "no such successor: " + id,
 					Satisfies: "successors that exist"}
@@ -441,6 +592,21 @@ func checkEvidence(r Roots, t Token, p Payload) *Rejection {
 			// so a criterion renamed since can never match any row, and no
 			// amount of ticking will move the token.
 			if !found {
+				// A STEP BEHIND THE ONE BEING SUBMITTED ANSWERS FOR THE ROWS IT
+				// HAD. The process gains a criterion, and every note minted
+				// before that carries a table without it, so this refused the
+				// whole submission for a row nobody at this step was ever asked
+				// for. On a verdict it told the reviewer to write a row into the
+				// author's own step, which is not the reviewer's to give, and the
+				// word cap made it worse: both notes it was seen on were at the
+				// bound already, so the row went in only after the author's
+				// evidence had been cut down to fit.
+				//
+				// The step being submitted still answers for every row the
+				// process names now, because those are the answers being given.
+				if i+1 < through {
+					continue
+				}
 				return &Rejection{Clause: "the checklist", Wrong: fmt.Sprintf(
 					"step %d, %s: the checklist on this note has no row for this: %s",
 					i+1, a.Name, c.Says),
@@ -613,8 +779,20 @@ func firstLines(s string, n int) string {
 // it, with the scope staying held. A parent with open sub-tokens is blocked
 // for everybody, so the general queue hands sub-tokens out before their
 // parents without a rule of its own.
+// Why a scope cannot be left is [[a-scope-cannot-be-left-while-its-tokens-are-open]].
+//
+// WHAT THE FETCHED BRANCH HAS ARCHIVED IS NOT WORK, whatever this tree's copy
+// of the note says. It comes out of the list before any walk, and the answer
+// names it. See pullbehind.go.
 func next(r Roots, actor, role string) Answer {
-	all := Tokens(r)
+	all, behind, branch := offTheFetchedBranch(r, actor, urgentFirst(blockingFirst(r, Tokens(r))))
+	a := nextAmong(r, actor, role, all)
+	a.Notice += behindNotice(branch, behind)
+	return a
+}
+
+// nextAmong is next over the tokens the fetched branch has not already closed.
+func nextAmong(r Roots, actor, role string, all []Token) Answer {
 	// WHO IS ASKING, AND ON WHICH BOX. Two questions and two answers. Whether
 	// this box may touch the token at all is the box's, and ClaimedHere answers
 	// it. Who is handed it first is the agent's, because a claim is an agent
@@ -631,6 +809,7 @@ func next(r Roots, actor, role string) Answer {
 	var unwritable []string
 
 	var scopes []Token
+	var setBack []string
 	for i := range all {
 		if all[i].Holder != actor || all[i].Ended() {
 			continue
@@ -639,22 +818,30 @@ func next(r Roots, actor, role string) Answer {
 			scopes = append(scopes, all[i])
 			continue
 		}
+		// WHAT IS ALREADY IN A HAND IS STILL ASKED WHETHER IT MAY GO BACK.
+		//
+		// MEASURED. A token carrying needs_human was released, and the next
+		// pull handed it straight back within the minute. This walk asked one
+		// door and not the other, while every other path in this function asks
+		// both, and staffing and the stop judge ask them too.
+		//
+		// THE HOLD COMES OFF AND THE TOKEN STAYS OPEN, so a person can still
+		// close it and the queue can offer it once it is free. The holder is
+		// cleared in this copy as well, so everything read from it below agrees
+		// with the disk rather than calling a token yours after it left.
+		if why := whyNotNow(r, all[i]); why != "" {
+			_, _ = PutDown(r, all[i].ID, actor)
+			setBack = append(setBack, all[i].ID+": "+why)
+			all[i].Holder = ""
+			continue
+		}
 		return handed(r, actor, all[i])
 	}
 
 	for _, scope := range scopes {
 		for i := range all {
 			t := all[i]
-			if t.Parent != scope.ID || t.Ended() || t.Holder != "" || !WorkableBy(r, t, role) {
-				continue
-			}
-			if role == RoleReviewer && t.Author == actor {
-				continue // never the author
-			}
-			if why := Blocked(r, t); why != "" {
-				continue
-			}
-			if why := WaitsForAPerson(t); why != "" {
+			if t.Parent != scope.ID || !WouldHandOut(r, t, actor, role, nil, now) {
 				continue
 			}
 			a, ok := take(r, actor, t)
@@ -665,34 +852,14 @@ func next(r Roots, actor, role string) Answer {
 		}
 	}
 
-	var held []string
+	held := theirOwnHeld(all, actor)
 	for _, wantMine := range []bool{true, false} {
 		for i := range all {
 			t := all[i]
-			if t.Ended() || t.Holder != "" {
-				if t.Holder != "" {
-					held = append(held, t.ID)
-				}
-				continue
-			}
-			if !WorkableBy(r, t, role) {
-				continue
-			}
-			if role == RoleReviewer && t.Author == actor {
-				continue // never the author
-			}
-			if why := Blocked(r, t); why != "" {
-				continue
-			}
-			// A PARKED TOKEN IS NOT HANDED OUT. It waits on a person, and an agent
-			// that takes one cannot put it down: the queue would answer it again.
-			if why := WaitsForAPerson(t); why != "" {
-				continue
-			}
-			// A CLAIM SOMEBODY ELSE HOLDS IS NOT WORK YOU CAN START. It reads as
-			// blocked because that is what it is: nothing you do releases it, and
-			// it releases itself when it lapses. See claim.go.
-			if by := ClaimedNow(r, t, now); by != "" && !ClaimedHere(r, by) {
+			// WHAT THE QUEUE WOULD HAND OUT, asked once and asked the same way
+			// the staffing count asks it. A parked token, a claim another box
+			// holds, and a note the record refuses are all its business.
+			if !WouldHandOut(r, t, actor, role, nil, now) {
 				continue
 			}
 			// WHAT YOU CLAIMED COMES BEFORE WHAT NOBODY HAS. A claim is an agent
@@ -709,9 +876,31 @@ func next(r Roots, actor, role string) Answer {
 		}
 	}
 	if len(scopes) > 0 {
-		return Answer{Pull: AnswerWait, Notice: scopeNotice(r, scopes) + unwritableNotice(unwritable)}
+		return Answer{Pull: AnswerWait,
+			Notice: scopeNotice(r, scopes) + setBackNotice(setBack) + unwritableNotice(unwritable)}
 	}
-	return Answer{Pull: AnswerWait, Notice: waitNotice(r, actor, held) + unwritableNotice(unwritable)}
+	return Answer{Pull: AnswerWait,
+		Notice: waitNotice(r, actor, held) + setBackNotice(setBack) + unwritableNotice(unwritable)}
+}
+
+// urgentFirst puts what a person marked urgent at the head of the list, and
+// leaves everything else in the order it came in.
+//
+// ONE SORT SERVES EVERY PASS. The queue walks this list four times over: what
+// is held, what is inside a held scope, what this box claimed, and what nobody
+// has. A rule written into each of those walks is the same rule written four
+// times, and the fourth copy is the one somebody forgets.
+//
+// IT IS STABLE, so among the urgent and among the rest the order is still
+// oldest first. Urgent is a flag rather than a rank: it says before the others,
+// and it says nothing about which of two urgent tokens comes first.
+//
+// IT DOES NOT REACH PAST THE OTHER RULES. A parked token, a blocked one and a
+// claim another box holds are each passed over further down, whatever this
+// says: the flag moves a token up the queue and takes nothing out of its way.
+func urgentFirst(all []Token) []Token {
+	sort.SliceStable(all, func(i, j int) bool { return all[i].Urgent && !all[j].Urgent })
+	return all
 }
 
 // unwritableNotice names every token the queue passed over because the record
@@ -727,6 +916,38 @@ func unwritableNotice(said []string) string {
 		strings.Join(said, "\n  "))
 }
 
+// WouldHandOut answers whether the queue would hand this token to an agent in
+// this role, right now. It changes nothing.
+//
+// THE PULL WALKS IT AND THE STAFFING COUNT WALKS IT. The guard's question is
+// how many the queue would produce, never how many rows exist, so the two
+// cannot disagree about what work there is.
+//
+// THEY DID DISAGREE, AND IT DEADLOCKED A SESSION. The count walked the tokens
+// itself and knew nothing of the branch or of the record's own caps, so it
+// demanded three reviewers for tokens no pull would ever produce. Each spawned
+// reviewer pulled, was told wait, and left, and the demand came back for ever.
+func WouldHandOut(r Roots, t Token, actor, role string, archived map[string]bool, now time.Time) bool {
+	if t.Ended() || t.Holder != "" || archived[t.ID] {
+		return false
+	}
+	if !WorkableBy(r, t, role) {
+		return false
+	}
+	// NEVER THE AUTHOR. A verdict on your own work is not a verdict.
+	if role == RoleReviewer && t.Author == actor {
+		return false
+	}
+	if Blocked(r, t) != "" || WaitsForAPerson(t) != "" {
+		return false
+	}
+	// A CLAIM ANOTHER BOX HOLDS IS NOT WORK THIS ONE CAN START.
+	if by := ClaimedNow(r, t, now); by != "" && !ClaimedHere(r, by) {
+		return false
+	}
+	return TheRecordRefuses(r, t) == nil
+}
+
 // take puts a token in the actor's hands and answers it. It answers false when
 // the record will not write the token, and the notice then says which token and
 // why, for the queue to carry to whoever gets the wait.
@@ -738,20 +959,44 @@ func unwritableNotice(said []string) string {
 // caps stay where they are.
 func take(r Roots, actor string, t Token) (Answer, bool) {
 	t.Holder = actor
+	// THE QUEUE CLAIMS WHAT IT HANDS OVER.
+	//
+	// A tracked token is not worked without a claim, and the queue handed one
+	// out carrying none, so the agent's first run or apply on it was refused for
+	// want of a claim on the work it had been handed a moment before. It
+	// happened to two tokens in one session. Claiming it here is one more field
+	// on the save the handout already makes.
+	//
+	// A LOCAL TOKEN TAKES NONE, and one another box has claimed is not taken
+	// from it. Both are the gate's own rules, asked here rather than repeated:
+	// NoClaimHere says this box may not work it, and ClaimedNow says whether
+	// anybody has it.
+	claimed := false
+	if now := time.Now().UTC(); NoClaimHere(r, t, now) != "" && ClaimedNow(r, t, now) == "" {
+		t.ClaimedBy, t.ClaimedAt = Claimant(r, actor), now.Format(ClaimStamp)
+		claimed = true
+	}
 	// HANDING OUT OPENS A STRETCH, with the tree as it stands as its before.
 	t = openStretch(r, t)
 	if err := SaveToken(r, t); err != nil {
 		return Answer{Pull: AnswerWait,
 			Notice: t.ID + ": the record will not take a write: " + err.Error()}, false
 	}
-	return handed(r, actor, t), true
+	a := handed(r, actor, t)
+	a.claimed = claimed
+	return a, true
 }
 
 // handed answers a token the actor holds, with the guidance for it.
+//
+// AND WITH WHAT THIS BOX CANNOT SHOW IT. A travelled token names snapshots
+// taken somewhere else, and the reviewer's own step asks for every hunk of
+// git diff began..ended. That diff answers bad object here and says nothing
+// about why, so the hand-over says it instead. See travelNotice.
 func handed(r Roots, actor string, t Token) Answer {
 	text, says := TheGuidanceFor(r, actor, t.Guidance)
 	return Answer{Pull: AnswerWork, Token: &t,
-		Notice: workNotice(t), Guidance: text, GuidanceAt: says}
+		Notice: workNotice(t) + travelNotice(r, t), Guidance: text, GuidanceAt: says}
 }
 
 // scopeNotice says why nothing was handed out inside a scope the actor holds:
@@ -818,6 +1063,55 @@ func headingDepth(line string) int {
 		return 0
 	}
 	return n
+}
+
+// whyNotNow answers why a token cannot be worked now, or nothing.
+//
+// IT IS THE TWO DOORS IN ONE PLACE. Both were written out at every path that
+// hands work out, five times over, and the copy that mattered most is the one
+// that forgot half of them.
+func whyNotNow(r Roots, t Token) string {
+	if why := Blocked(r, t); why != "" {
+		return why
+	}
+	return WaitsForAPerson(t)
+}
+
+// setBackNotice says what the queue took out of this actor's hands, and why.
+// Work that leaves a hand without a word leaves the agent wondering where it
+// went, and looking for it is how a session is spent.
+func setBackNotice(setBack []string) string {
+	if len(setBack) == 0 {
+		return ""
+	}
+	return "\n\nSet back out of your hands, each waiting on something:\n  " +
+		strings.Join(setBack, "\n  ")
+}
+
+// theirOwnHeld answers the open tokens this actor holds, for the notice that
+// calls them theirs.
+//
+// IT IS BUILT ONCE, AND IT IS THE ACTOR'S OWN.
+//
+// MEASURED, PULLING AS reviewer-poplar ON 2026-09-05. The notice read "12
+// piece(s) are yours and every one is blocked", listed six ids, then listed the
+// same six again. There were six, and not one of them was the puller's.
+//
+// The list was gathered inside the pass that runs once for what this actor
+// claimed and once for what nobody has, and what it appended did not depend on
+// which pass it was in, so every held token landed twice. And it took a token
+// whenever anybody held it, while the notice calls the list yours.
+//
+// A TOKEN THAT HAS ENDED IS NOBODY'S WORK. One that closed still carrying a
+// holder was named as a piece somebody still had to answer for.
+func theirOwnHeld(all []Token, actor string) []string {
+	var held []string
+	for i := range all {
+		if all[i].Holder == actor && !all[i].Ended() {
+			held = append(held, all[i].ID)
+		}
+	}
+	return held
 }
 
 // WHY THERE IS NOTHING TO DO, and it is never only "nothing".
@@ -910,6 +1204,6 @@ func PutDown(r Roots, id, actor string) (Token, error) {
 	if err := SaveToken(r, t); err != nil {
 		return t, err
 	}
-	inSession(r, "work", actor, t.ID+" put down", Yes(), map[string]any{"id": t.ID})
+	inSession(r, "work", actor, t.ID+" put down", sessionlog.Yes(), map[string]any{"id": t.ID})
 	return t, nil
 }

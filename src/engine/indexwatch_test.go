@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
+	"quackitect/engine/internal/version"
 	"testing"
 	"time"
 
@@ -56,16 +58,16 @@ func aFedDaemon(t *testing.T, r Roots, hears bool) (*fedWatcher, func()) {
 	if err := os.MkdirAll(r.Private("log"), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	fed := feedWatcher(r, hears)
-	stop, socket, _ := startIndexer(r, log, time.Hour, fed.open)
+	stop, socket, _, _ := startIndexer(t.Context(), r, log, time.Hour, fed.open)
 	if socket == "" {
 		t.Fatal("the model did not listen")
 	}
-	SayRunning(r, Running{PID: os.Getpid(), Socket: socket, Build: Build})
+	SayRunning(r, Running{PID: os.Getpid(), Socket: socket, Build: version.Build})
 	stopped := false
 	stopAll := func() {
 		if !stopped {

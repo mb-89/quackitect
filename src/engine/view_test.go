@@ -3,14 +3,16 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/expr"
+	"slices"
 	"strings"
 	"testing"
 )
 
-func row(pairs ...string) Row {
-	r := Row{}
+func row(pairs ...string) expr.Row {
+	r := expr.Row{}
 	for i := 0; i+1 < len(pairs); i += 2 {
-		r[pairs[i]] = vs(pairs[i+1])
+		r[pairs[i]] = expr.Str(pairs[i+1])
 	}
 	return r
 }
@@ -19,8 +21,8 @@ func row(pairs ...string) Row {
 func TestWhatAFilterCanSay(t *testing.T) {
 	t.Parallel()
 	r := row("status", "open", "assignee", "main", "bucket", "", "title", "write the thing")
-	r["rounds"] = vn(2)
-	r["subs"] = vl([]string{"wk-1", "wk-2"})
+	r["rounds"] = expr.Num(2)
+	r["subs"] = expr.List([]string{"wk-1", "wk-2"})
 
 	yes := []string{
 		`status == "open"`,
@@ -38,7 +40,7 @@ func TestWhatAFilterCanSay(t *testing.T) {
 		`(status == "open" || status == "closed") && assignee == "main"`,
 	}
 	for _, src := range yes {
-		e, err := Parse(src)
+		e, err := expr.Parse(src)
 		if err != nil {
 			t.Fatalf("%s: %v", src, err)
 		}
@@ -52,20 +54,20 @@ func TestWhatAFilterCanSay(t *testing.T) {
 	}
 
 	// A dotted name is one property, not a method call on the name to its left.
-	e, _ := Parse(`state.current`)
+	e, _ := expr.Parse(`state.current`)
 	if v, err := e.Eval(r); err != nil || v.Truthy() {
 		t.Fatalf("an absent dotted property answered %v %v", v, err)
 	}
 
 	// if() is what makes a group level computed.
-	e, err := Parse(`if(bucket, bucket, status)`)
+	e, err := expr.Parse(`if(bucket, bucket, status)`)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if v, _ := e.Eval(r); v.Text() != "open" {
 		t.Fatalf("with no bucket it fell back to %q", v.Text())
 	}
-	r["bucket"] = vs("later")
+	r["bucket"] = expr.Str("later")
 	if v, _ := e.Eval(r); v.Text() != "later" {
 		t.Fatalf("with a bucket it answered %q", v.Text())
 	}
@@ -83,9 +85,9 @@ func TestAnUnknownConstructRefusesByName(t *testing.T) {
 		{`(status == "open"`, "never closes"},
 		{`status $ "open"`, `"$"`},
 	} {
-		e, err := Parse(c.src)
+		e, err := expr.Parse(c.src)
 		if err == nil {
-			_, err = e.Eval(Row{"status": vs("open")})
+			_, err = e.Eval(expr.Row{"status": expr.Str("open")})
 		}
 		if err == nil {
 			t.Errorf("%s was accepted", c.src)
@@ -218,7 +220,7 @@ views:
 	if err != nil {
 		t.Fatal(err)
 	}
-	rows := []Row{
+	rows := []expr.Row{
 		row("id", "1", "assignee", "human", "status", "open", "title", "theirs"),
 		row("id", "2", "assignee", "main", "status", "open", "title", "mine"),
 		row("id", "3", "assignee", "main", "status", "open", "bucket", "later", "title", "filed"),
@@ -273,7 +275,7 @@ views:
       - property: status
 `)
 	b, _ := LoadBase(p)
-	tab, err := Render(b, b.Views[0], []Row{
+	tab, err := Render(b, b.Views[0], []expr.Row{
 		row("id", "1", "status", "backlogged", "title", "a"),
 		row("id", "2", "status", "open", "title", "b"),
 	})
@@ -309,7 +311,7 @@ views:
 	if err != nil {
 		t.Fatal(err)
 	}
-	tab, err := Render(b, b.Views[0], []Row{
+	tab, err := Render(b, b.Views[0], []expr.Row{
 		row("id", "1", "holder", "main", "title", "held"),
 		row("id", "2", "title", "nobody holds this"),
 		row("id", "3", "title", "nor this"),
@@ -337,12 +339,12 @@ views:
 	}
 	// AND THE EXPRESSION HAS TO WORK. A pin nobody can evaluate is a pin that
 	// empties the pane the moment it is clicked.
-	e, err := Parse(empty.Pins)
+	e, err := expr.Parse(empty.Pins)
 	if err != nil {
 		t.Fatalf("the engine cannot read its own pin %q: %v", empty.Pins, err)
 	}
 	kept := 0
-	for _, r := range []Row{
+	for _, r := range []expr.Row{
 		row("id", "1", "holder", "main"),
 		row("id", "2"),
 		row("id", "3"),
@@ -375,7 +377,7 @@ views:
 	if err != nil {
 		t.Fatal(err)
 	}
-	tab, err := Render(b, b.Views[0], []Row{
+	tab, err := Render(b, b.Views[0], []expr.Row{
 		row("id", "1", "status", "open", "title", "a"),
 		row("id", "2", "status", "submitted", "title", "b"),
 		row("id", "3", "title", "c"),
@@ -393,11 +395,13 @@ views:
 	}
 }
 
-// A PINNED FUNCTIONAL GROUP IS DRAWN WITH NOTHING IN IT, and an unpinned one
-// hides at zero and comes back when its filter returns a row.
+// A PINNED FUNCTIONAL GROUP IS DRAWN WITH NOTHING IN IT, and so is an unpinned
+// one, because both were declared.
 //
-// Pinning is the person saying they want to see it. One they did not pin is an
-// empty heading they did not ask for.
+// This read the other way, that pinning was the person asking to see it and an
+// unpinned empty heading was noise. The .base file rules the opposite in its
+// opening lines, and the file is where the decision is written down. See
+// TestADeclaredGroupIsDrawnWithNothingInIt.
 func TestAPinnedFunctionalGroupIsDrawnEvenWithNoRows(t *testing.T) {
 	t.Parallel()
 	p := writeBase(t, t.TempDir(), "z.base", `
@@ -419,7 +423,7 @@ views:
 	if err != nil {
 		t.Fatal(err)
 	}
-	tab, err := Render(b, b.Views[0], []Row{
+	tab, err := Render(b, b.Views[0], []expr.Row{
 		row("id", "1", "assignee", "main", "title", "a"),
 		row("id", "2", "assignee", "main", "bucket", "later", "title", "b"),
 	})
@@ -457,10 +461,10 @@ func names(gs []Group) []string {
 	return out
 }
 
-// AN UNPINNED FUNCTIONAL GROUP HIDES AT ZERO AND COMES BACK. It has not been
-// asked for, so an empty heading is noise, and the declaration is what brings
-// it back the moment the filter returns a row.
-func TestAnUnpinnedFunctionalGroupHidesAtZeroAndComesBack(t *testing.T) {
+// AN UNPINNED FUNCTIONAL GROUP STANDS AT ZERO, and holds its row when the
+// filter returns one. The declaration is what keeps it there, and a pin only
+// moves it to the top of the drawing.
+func TestAnUnpinnedFunctionalGroupStandsAtZero(t *testing.T) {
 	t.Parallel()
 	p := writeBase(t, t.TempDir(), "z.base", `
 views:
@@ -481,7 +485,7 @@ views:
 	if err != nil {
 		t.Fatal(err)
 	}
-	draw := func(rows ...Row) ([]string, []string) {
+	draw := func(rows ...expr.Row) ([]string, []string) {
 		tab, err := Render(b, b.Views[0], rows)
 		if err != nil {
 			t.Fatal(err)
@@ -489,21 +493,21 @@ views:
 		return names(tab.Pinned), names(tab.Groups)
 	}
 
-	// Nothing at all. The pinned one is there, the unpinned one is not.
+	// Nothing at all. Both declared groups are drawn, one pinned, one not.
 	pinned, groups := draw()
 	if len(pinned) != 1 || pinned[0] != "yours" {
 		t.Fatalf("the pinned groups are %v", pinned)
 	}
-	if len(groups) != 0 {
-		t.Fatalf("an unpinned functional group drew at zero: %v", groups)
+	if !slices.Contains(groups, "mine") {
+		t.Fatalf("an unpinned declared group went at zero: %v", groups)
 	}
 
-	// One row for it, and it is back. THE GROUPING DRAWS THAT ROW AS WELL,
-	// because a query takes nothing away, so this asks whether mine is among
-	// the groups rather than whether it is the only one.
+	// One row for it, and it holds the row. THE GROUPING DRAWS THAT ROW AS
+	// WELL, because a query takes nothing away, so this asks whether mine is
+	// among the groups rather than whether it is the only one.
 	pinned, groups = draw(row("id", "1", "assignee", "main", "title", "a"))
-	if !contains(groups, "mine") {
-		t.Fatalf("it did not come back: %v", groups)
+	if !slices.Contains(groups, "mine") {
+		t.Fatalf("it did not hold the row: %v", groups)
 	}
 	if len(pinned) != 1 || pinned[0] != "yours" {
 		t.Fatalf("the pinned groups are %v", pinned)
@@ -537,7 +541,7 @@ views:
 	if err != nil {
 		t.Fatal(err)
 	}
-	tab, err := Render(b, b.Views[0], []Row{row("id", "1", "bucket", "later", "title", "a")})
+	tab, err := Render(b, b.Views[0], []expr.Row{row("id", "1", "bucket", "later", "title", "a")})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -546,7 +550,7 @@ views:
 	}
 
 	// Empty it, and it is gone even though the pin is still in the file.
-	tab, err = Render(b, b.Views[0], []Row{row("id", "1", "title", "a")})
+	tab, err = Render(b, b.Views[0], []expr.Row{row("id", "1", "title", "a")})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -600,7 +604,7 @@ views:
 		return b
 	}
 	// A row that both filters keep. yours is the narrower of the two.
-	rows := []Row{
+	rows := []expr.Row{
 		row("id", "1", "assignee", "human", "status", "open", "title", "a"),
 		row("id", "2", "assignee", "main", "status", "open", "title", "b"),
 	}
@@ -688,7 +692,7 @@ views:
 			t.Fatalf("%s got %d groups and %d pins", v.Name, len(v.Groups), len(v.Pinned))
 		}
 	}
-	rows := []Row{row("id", "1", "assignee", "main", "title", "a")}
+	rows := []expr.Row{row("id", "1", "assignee", "main", "title", "a")}
 	var drew [][]string
 	for _, v := range b.Views {
 		tab, err := Render(b, v, rows)
@@ -773,7 +777,7 @@ views:
 		t.Fatal(err)
 	}
 	// ONE ROW THAT BOTH QUERIES MATCH, AND IT SITS IN A BUCKET.
-	rows := []Row{
+	rows := []expr.Row{
 		row("id", "1", "assignee", "human", "status", "open", "bucket", "later", "title", "a"),
 	}
 	tab, err := Render(b, b.Views[0], rows)
@@ -845,7 +849,7 @@ views:
 	if err != nil {
 		t.Fatal(err)
 	}
-	rows := []Row{
+	rows := []expr.Row{
 		row("id", "1", "status", "backlogged", "title", "a"),
 		row("id", "2", "status", "backlogged", "bucket", "later", "title", "b"),
 	}
@@ -893,7 +897,7 @@ views:
 	if err != nil {
 		t.Fatal(err)
 	}
-	rows := []Row{
+	rows := []expr.Row{
 		row("id", "1", "assignee", "human", "status", "open", "title", "a"),
 		row("id", "2", "assignee", "main", "status", "open", "title", "b"),
 	}

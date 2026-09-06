@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -9,6 +10,9 @@ import (
 	"os/signal"
 	"path/filepath"
 	"quackitect/engine/internal/replaced"
+	saidbefore "quackitect/engine/internal/said"
+	"quackitect/engine/internal/sessionlog"
+	"quackitect/engine/internal/version"
 	"strings"
 	"sync"
 	"syscall"
@@ -19,10 +23,16 @@ import (
 // exists yet, so there is no authority to ask and every permission question
 // answers permitted.
 func main() {
+	// THE ENGINE'S CONTEXT ENDS WITH THE ENGINE, and everything long-lived
+	// takes it, so letting go once lets go of all of it. This is the one place
+	// a context begins, which is why it is the one place context.Background is,
+	// and it is made first so the client, the probe and the loop all take it.
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 	// The guard runs as its own process, started by the harness. It reads one
 	// event and answers, so it is handled before any flag is parsed.
 	if len(os.Args) > 1 && os.Args[1] == "hook" {
-		runHook(os.Args[2:])
+		runHook(ctx, os.Args[2:])
 		return
 	}
 	// THE LANGUAGE SERVER IS A PROCESS THE EDITOR STARTS, and it speaks to the
@@ -35,7 +45,7 @@ func main() {
 	// its client: it sends the verb and prints what came back.
 	if len(os.Args) > 1 {
 		if _, ok := run[os.Args[1]]; ok {
-			os.Exit(callTheEngine(os.Args[1], os.Args[2:]))
+			os.Exit(callTheEngine(ctx, os.Args[1], os.Args[2:]))
 		}
 	}
 	flag.Usage = func() {
@@ -90,7 +100,7 @@ func main() {
 	// every other agent's answer discharged that one's obligation, and every
 	// other agent's message landed on it.
 	actor := flag.String("actor", "", "with said or answer: who is speaking")
-	version := flag.Bool("version", false, "print which build this is and exit")
+	showVersion := flag.Bool("version", false, "print which build this is and exit")
 	selftest := flag.Bool("selftest", false, "produce a copy, drive a project with it, and check what came out")
 	keep := flag.Bool("keep", false, "with selftest: leave the temporary trees behind")
 	produce := flag.String("produce", "", "make a copy of the method in this folder")
@@ -108,9 +118,9 @@ func main() {
 		return
 	}
 
-	if *version {
+	if *showVersion {
 		// Every project answers this, whatever it is written in.
-		fmt.Printf("quackitect engine %s\n", Build)
+		fmt.Printf("quackitect engine %s\n", version.Build)
 		return
 	}
 
@@ -125,7 +135,7 @@ func main() {
 	// The current log has one name, so a window can be opened on it before
 	// the engine has written anything.
 	if *where {
-		fmt.Println(filepath.Join(dir, Current))
+		fmt.Println(filepath.Join(dir, sessionlog.Current))
 		return
 	}
 
@@ -135,7 +145,7 @@ func main() {
 	// ONE FILE UNDER BOTH NAMES, ASKED FOR BY THE BUILD. Installing does this
 	// too, and a build by hand is the thing that took it away.
 	if *link {
-		done, err := LinkBothNames(roots.Method, []string{"se", "se-mcp", "logview"})
+		done, err := LinkEveryProgram(roots.Method)
 		if err != nil {
 			fail(err)
 		}
@@ -173,7 +183,7 @@ func main() {
 			fail(err)
 		}
 		noteInLog(dir, "engine", "binding", "the engine is now "+string(now.At)+
-			", and was "+string(was.At), Yes(), map[string]any{"at": now.At, "was": was.At})
+			", and was "+string(was.At), sessionlog.Yes(), map[string]any{"at": now.At, "was": was.At})
 		answerJSON(now)
 		return
 	}
@@ -230,10 +240,10 @@ func main() {
 	}
 
 	if *rotate {
-		if err := RetireCurrent(dir); err != nil {
+		if err := sessionlog.RetireCurrent(dir); err != nil {
 			fail(err)
 		}
-		fmt.Println(filepath.Join(dir, Current))
+		fmt.Println(filepath.Join(dir, sessionlog.Current))
 		return
 	}
 
@@ -268,7 +278,7 @@ func main() {
 		// ONE PROMPT, ONE RECORD. The engine copies the same messages off the
 		// transcript, so this refuses a repeat rather than asking the caller to
 		// check. Then always record is a rule with no condition on it.
-		if AlreadySaid(roots, *said) {
+		if saidbefore.Already(SessionLog(roots), *said) {
 			fmt.Println("already recorded")
 			return
 		}
@@ -462,11 +472,11 @@ func main() {
 		}
 		got, err := SetValue(roots, key, want)
 		if err != nil {
-			noteInLog(dir, "engine", "refusal", err.Error(), No(), map[string]any{"parameter": key})
+			noteInLog(dir, "engine", "refusal", err.Error(), sessionlog.No(), map[string]any{"parameter": key})
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
 		}
-		noteInLog(dir, "engine", "config", fmt.Sprintf("%s is now %v", key, got), Yes(),
+		noteInLog(dir, "engine", "config", fmt.Sprintf("%s is now %v", key, got), sessionlog.Yes(),
 			map[string]any{"parameter": key, "value": got})
 		out, _ := json.Marshal(map[string]any{key: got})
 		fmt.Println(string(out))
@@ -486,14 +496,14 @@ func main() {
 			if err != nil {
 				fail(err)
 			}
-			noteInLog(dir, "engine", "emergency", "emergency mode armed: "+e.Describe(), No(),
+			noteInLog(dir, "engine", "emergency", "emergency mode armed: "+e.Describe(), sessionlog.No(),
 				map[string]any{"by": e.By, "reason": e.Reason, "until": e.Until})
 			fmt.Println(e.Describe())
 		case "off":
 			if err := DisarmEmergency(roots); err != nil {
 				fail(err)
 			}
-			noteInLog(dir, "engine", "emergency", "emergency mode disarmed", Yes(), nil)
+			noteInLog(dir, "engine", "emergency", "emergency mode disarmed", sessionlog.Yes(), nil)
 			fmt.Println("emergency mode is off")
 		case "status":
 			e := LoadEmergency(roots)
@@ -513,8 +523,24 @@ func main() {
 		fmt.Println(line)
 		return
 	}
+	// AND THE TREE IS TAKEN BEFORE ANYTHING ELSE IS. engine.json is written
+	// late, after the log, the projections and the tool probe, so two starts a
+	// second apart both passed the line above and both ran. The lock is the
+	// kernel's and lives as long as this process does. See onetree.go.
+	if held, err := HoldTheTree(roots); err != nil {
+		fail(err)
+	} else if !held {
+		line, _ := json.Marshal(map[string]any{
+			"ready": false, "already_up": true,
+			"method_root": roots.Method, "work_root": roots.Work,
+			"says": "an engine is already up over this tree, so this one leaves it alone",
+		})
+		fmt.Println(string(line))
+		return
+	}
+	defer LetGoOfTheTree()
 
-	log, err := OpenLog(dir)
+	log, err := sessionlog.Open(dir)
 	if err != nil {
 		fail(err)
 	}
@@ -524,23 +550,23 @@ func main() {
 	// be declared: the marker is written, and it says which copy did it.
 	if _, ok := LoadDriven(roots); !ok {
 		if p, err := Attach(roots); err == nil {
-			log.Write("engine", "attach", "engine", "this folder is now driven by this copy", Yes(),
+			log.Write("engine", "attach", "engine", "this folder is now driven by this copy", sessionlog.Yes(),
 				map[string]any{"driver": p.Driver})
 		}
 	}
 
 	if written, err := Project(roots); err != nil {
-		log.Write("engine", "error", "engine", "the projections could not be written", No(),
+		log.Write("engine", "error", "engine", "the projections could not be written", sessionlog.No(),
 			map[string]any{"reason": err.Error()})
 	} else if len(written) > 0 {
-		log.Write("engine", "project", "engine", "projections written from guidance", Yes(),
+		log.Write("engine", "project", "engine", "projections written from guidance", sessionlog.Yes(),
 			map[string]any{"files": written})
 	}
 
 	// What the machine has, asked once per boot. It goes in a file the pull
 	// reads, and not in the record: a person watching the log did not ask what
 	// this machine has, and a line they did not ask for is a line in the way.
-	ProbeTools(roots, log.Session())
+	ProbeTools(ctx, roots, log.Session())
 
 	startRecord := map[string]any{
 		"method_root": roots.Method,
@@ -550,21 +576,10 @@ func main() {
 	}
 	// A build that was never stamped says nothing, so it is left out rather
 	// than written as the word a variable holds when nobody set it.
-	if Build != "unstamped" {
-		startRecord["build"] = Build
+	if version.Build != "unstamped" {
+		startRecord["build"] = version.Build
 	}
-	log.Write("engine", "start", "engine", "engine started", Yes(), startRecord)
-
-	// AND THE BINDING GOES BACK TO BOUND, because a session starting is nobody
-	// having asked for the rules to be off. A handover is not a start, so the
-	// successor of a swap leaves the rung where the person put it. See unbound.go.
-	if !log.Continued() {
-		if was, put := PutTheBindingBack(roots); put {
-			log.Write("engine", "start", "engine",
-				"this tree was "+string(was)+" and a new session is bound", Yes(),
-				map[string]any{"was": string(was), "now": string(Bound)})
-		}
-	}
+	log.Write("engine", "start", "engine", "engine started", sessionlog.Yes(), startRecord)
 
 	// A BATTERY THAT RAN OUTSIDE THE ENGINE IS REPORTED HERE. It is started
 	// detached, because it replaces the engine that started it, so the process
@@ -578,7 +593,7 @@ func main() {
 	// goneputsdown.go.
 	if back := SweepWorkHeldByTheGone(roots); len(back) > 0 {
 		log.Write("engine", "start", "engine",
-			"work held by agents that are gone went back to the queue", Yes(),
+			"work held by agents that are gone went back to the queue", sessionlog.Yes(),
 			map[string]any{"put_down": back})
 	}
 
@@ -586,14 +601,14 @@ func main() {
 	// heartbeat's write is in flight, so a temp file is orphaned under .se with
 	// nothing owning it.
 	if swept := SweepOrphanedWrites(roots, time.Minute); swept > 0 {
-		log.Write("engine", "start", "engine", "temporary files no write finished were swept", Yes(),
+		log.Write("engine", "start", "engine", "temporary files no write finished were swept", sessionlog.Yes(),
 			map[string]any{"swept": swept})
 	}
 
 	// AND THE PROGRAMS THIS TREE USED TO SHIP. One that will not delete is one
 	// a process is still running from, and it stays until that process ends.
 	if swept := replaced.SweepWhatWasReplaced(roots.Method); swept > 0 {
-		log.Write("engine", "start", "engine", "programs nothing is running any more were swept", Yes(),
+		log.Write("engine", "start", "engine", "programs nothing is running any more were swept", sessionlog.Yes(),
 			map[string]any{"swept": swept, "from": replaced.WasDir(roots.Method)})
 	}
 
@@ -604,10 +619,10 @@ func main() {
 	//
 	// It cannot be fixed from here, because the fix is to install. Saying so
 	// in the record is what turns a silent difference into a visible one.
-	for _, name := range []string{"se", "se-mcp"} {
+	for _, name := range theProgramNames(roots.Method) {
 		if a, b, split := twoNames(roots.Method, name); split {
 			log.Write("engine", "error", "engine",
-				name+" is two different files, so the cage and RUNME run different builds", No(),
+				name+" is two different files, so the cage and RUNME run different builds", sessionlog.No(),
 				map[string]any{"one": a, "other": b, "fix": "install again"})
 		}
 	}
@@ -625,7 +640,7 @@ func main() {
 	// reloads has no parent any more, and without this it cannot tell a live
 	// engine from none.
 	here := Running{PID: os.Getpid(), Log: log.Path(), Session: log.Session(),
-		Started: time.Now().UTC().Format(time.RFC3339), Build: Build, Run: runIdentity()}
+		Started: time.Now().UTC().Format(time.RFC3339), Build: version.Build, Run: runIdentity()}
 	SayRunning(roots, here)
 	defer StopSaying(roots)
 
@@ -643,8 +658,9 @@ func main() {
 		*beat = time.Duration(cfg.HeartbeatSeconds) * time.Second
 	}
 	// THE RESIDENT ENGINE KEEPS THE INDEX. It is the one process that lives
-	// as long as the session, so it is the one that can watch the tree.
-	stopIndexer, socket, asked := StartIndexer(roots, log, *beat)
+	// as long as the session, so it is the one that can watch the tree, and
+	// it takes the context main made at the top.
+	stopIndexer, socket, asked := StartIndexer(ctx, roots, log, *beat)
 	// LETTING GO HAPPENS ONCE, whether the engine is ending or handing over.
 	// A swap has to release the socket and the port before the successor
 	// looks at them, and the deferred call still runs on the way out.
@@ -661,15 +677,19 @@ func main() {
 	defer release()
 	// THE GUARD'S DOOR. Every per-call event the cage names comes here over
 	// HTTP, and the port is the one the cage was projected with.
-	if ln, err := listenHooks(roots); err != nil {
-		log.Write("engine", "error", "engine",
-			"the guard's port is taken, so the cage's HTTP hooks reach nothing until this engine restarts", No(),
-			map[string]any{"url": hooksURL(roots), "reason": err.Error()})
-	} else {
-		go serveHooks(ln, roots, log)
+	//
+	// AND THE START SAYS WHICH IT IS, in one line, on the record and on the way
+	// out. A session with no guard on it looks exactly like a session nothing
+	// refused, and one of those ran for a whole day. See guardsaysso.go.
+	ln, saying, live := holdTheDoor(roots)
+	if live {
+		go serveHooks(ctx, ln, roots, log)
 		hooks = ln
 		here.Hooks = hooksURL(roots)
 	}
+	SayTheDoor(log, live, saying)
+	guarded, _ := json.Marshal(map[string]any{"guarded": live, "hooks": hooksURL(roots), "says": saying})
+	fmt.Println(string(guarded))
 	// THE ADDRESSES ARE PUBLISHED WHERE A CLIENT ALREADY LOOKS, beside the
 	// pid and the beat, so finding the model is reading one file.
 	here.Socket = socket
@@ -681,9 +701,9 @@ func main() {
 	// the ENGINE'S and not the indexer's: started from there it ran in every
 	// test tree that opens an index, spawning git processes under a parallel
 	// suite, and three index tests went red under the load while passing alone.
-	claimsDone := make(chan struct{})
-	defer close(claimsDone)
-	go WatchForClaims(roots, log, claimsDone)
+	// THE WATCHER STOPS WITH THE CONTEXT. The claim layer reads one, so it is
+	// handed this one directly and the engine still owns the goroutine.
+	go WatchForClaims(ctx, roots, log)
 
 	ticker := time.NewTicker(*beat)
 	defer ticker.Stop()
@@ -699,16 +719,16 @@ func main() {
 			// be declared: the marker is written, and it says which copy did it.
 			if _, ok := LoadDriven(roots); !ok {
 				if p, err := Attach(roots); err == nil {
-					log.Write("engine", "attach", "engine", "this folder is now driven by this copy", Yes(),
+					log.Write("engine", "attach", "engine", "this folder is now driven by this copy", sessionlog.Yes(),
 						map[string]any{"driver": p.Driver})
 				}
 			}
 
 			if written, err := Project(roots); err != nil {
-				log.Write("engine", "error", "engine", "the projections could not be written", No(),
+				log.Write("engine", "error", "engine", "the projections could not be written", sessionlog.No(),
 					map[string]any{"reason": err.Error()})
 			} else if len(written) > 0 {
-				log.Write("engine", "project", "engine", "guidance changed, projections written again", Yes(),
+				log.Write("engine", "project", "engine", "guidance changed, projections written again", sessionlog.Yes(),
 					map[string]any{"files": written})
 			}
 		case <-ticker.C:
@@ -731,21 +751,21 @@ func main() {
 			if !saidStale && rebuiltSince(roots.Method, started) {
 				saidStale = true
 				log.Write("engine", "error", "engine",
-					"this engine is older than the program on disk, so it writes what its own build knew", No(),
-					map[string]any{"build": Build, "fix": "stop it and start it again"})
+					"this engine is older than the program on disk, so it writes what its own build knew", sessionlog.No(),
+					map[string]any{"build": version.Build, "fix": "stop it and start it again"})
 			}
 			beat, _ := json.Marshal(map[string]any{
 				"beat": beats, "uptime_s": int(time.Since(started).Seconds()),
 			})
 			fmt.Println(string(beat))
 		case <-stop:
-			log.Write("engine", "stop", "engine", "engine stopped, asked to", Yes(),
+			log.Write("engine", "stop", "engine", "engine stopped, asked to", sessionlog.Yes(),
 				map[string]any{"uptime_s": int(time.Since(started).Seconds())})
 			return
 		case <-asked.Stop:
 			// A CLIENT ASKED IT TO STOP, over the socket. A person does, when
 			// they are done with the tree for the day.
-			log.Write("engine", "stop", "engine", "engine stopped, asked to over the socket", Yes(),
+			log.Write("engine", "stop", "engine", "engine stopped, asked to over the socket", sessionlog.Yes(),
 				map[string]any{"uptime_s": int(time.Since(started).Seconds())})
 			return
 		case plan := <-asked.Swap:
@@ -754,15 +774,15 @@ func main() {
 			// let the calls in flight finish, put the new one in place, and
 			// start it on the session this one has been writing.
 			left := drainCalls(swapDrainBudget)
-			log.Write("engine", "swap", "engine", "engine swapped, and the successor continues this session", Yes(),
-				map[string]any{"from": Build, "to": plan.Build, "why": plan.Why,
+			log.Write("engine", "swap", "engine", "engine swapped, and the successor continues this session", sessionlog.Yes(),
+				map[string]any{"from": version.Build, "to": plan.Build, "why": plan.Why,
 					"cut": left, "uptime_s": int(time.Since(started).Seconds())})
 			if err := putInPlace(roots, plan.Next); err != nil {
 				// A SWAP THAT CANNOT LAND LEAVES THE ENGINE RUNNING. Nothing
 				// has been replaced at this point, so carrying on is the whole
 				// of the recovery.
-				log.Write("engine", "error", "engine", "the swap did not land, so this engine carries on", No(),
-					map[string]any{"reason": err.Error(), "build": Build})
+				log.Write("engine", "error", "engine", "the swap did not land, so this engine carries on", sessionlog.No(),
+					map[string]any{"reason": err.Error(), "build": version.Build})
 				continue
 			}
 			// THE LISTENERS GO BEFORE THE SUCCESSOR STARTS. It binds the same
@@ -774,9 +794,9 @@ func main() {
 			// flight when the process ends leaves a temp file nothing owns, and
 			// the engine handing over is the one party that knows it is ending.
 			SweepOrphanedWrites(roots, 0)
-			if err := handOver(roots, log.Session()); err != nil {
+			if err := handOver(ctx, roots, log.Session()); err != nil {
 				log.Write("engine", "error", "engine",
-					"the next engine is in place and did not start, so this tree has no engine", No(),
+					"the next engine is in place and did not start, so this tree has no engine", sessionlog.No(),
 					map[string]any{"reason": err.Error(), "fix": "start it: se --work " + roots.Work})
 			}
 			return
@@ -795,9 +815,9 @@ func main() {
 // So a note joins the session that is running, and starts one when there is
 // none. A line written into a fresh file is a line somebody can read.
 func noteInLog(dir, src, kind, msg string, ok *bool, data map[string]any) {
-	l, err := OpenExistingLog(dir)
+	l, err := sessionlog.OpenExisting(dir)
 	if err != nil {
-		if l, err = OpenLog(dir); err != nil {
+		if l, err = sessionlog.Open(dir); err != nil {
 			return
 		}
 	}

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 	"time"
@@ -12,7 +13,7 @@ import (
 // loadLinesIn answers what the record holds about the engine's load.
 func loadLinesIn(t *testing.T, r Roots) []string {
 	t.Helper()
-	b, err := os.ReadFile(filepath.Join(r.Private("log"), Current))
+	b, err := os.ReadFile(filepath.Join(r.Private("log"), sessionlog.Current))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -41,9 +42,8 @@ func loadLinesIn(t *testing.T, r Roots) []string {
 // headline said so while the headline said otherwise.
 func TestTheLoadLineSaysWhichBoundTripped(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
-	log, err := OpenLog(r.Private("log"))
+	r := aTree(t).Roots
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}

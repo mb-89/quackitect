@@ -1,5 +1,5 @@
 {
-  "$comment": "ONE TREE. Everything that changes how the system runs is declared here. A group marked shown becomes a section in the sidebar. Types are pyqtgraph's and JSON Schema's: group, bool, int, float, str, list, action, status.",
+  "$comment": "ONE TREE. Everything that changes how the system runs is declared here. A group marked shown becomes a section in the sidebar. Types are pyqtgraph's and JSON Schema's: group, bool, int, float, str, list, action, status. Why one tree is [[one-tree-holds-every-parameter]].",
   "name": "quackitect",
   "type": "group",
   "children": [
@@ -93,11 +93,20 @@
           }
         },
         {
-          "name": "gap-1",
-          "type": "gap"
+          "name": "ideation",
+          "type": "toggle",
+          "command": "quackitect.ideation",
+          "labels": {
+            "off": "ideation",
+            "on": "ideation"
+          },
+          "titles": {
+            "off": "ideation / let the agent put its own ideas in, rather than only working the tokens it is handed",
+            "on": "ideation / the agent may put its own ideas in. Press to have it work only what it is handed"
+          }
         },
         {
-          "name": "gap-2",
+          "name": "gap-1",
           "type": "gap"
         },
         {
@@ -125,7 +134,8 @@
           "columns": [
             {
               "field": "actor",
-              "title": "agent"
+              "title": "agent",
+              "width": "34%"
             },
             {
               "field": "title",
@@ -259,6 +269,7 @@
       "children": [
         {
           "name": "answer_first",
+          "console": true,
           "title": "answer them first",
           "type": "bool",
           "default": true,
@@ -267,6 +278,7 @@
         },
         {
           "name": "guard_projections",
+          "console": true,
           "title": "projections",
           "type": "bool",
           "default": true,
@@ -275,6 +287,7 @@
         },
         {
           "name": "stop_needs_claim",
+          "console": true,
           "title": "stop needs a claim",
           "type": "bool",
           "default": true,
@@ -283,6 +296,7 @@
         },
         {
           "name": "search_via_index",
+          "console": true,
           "title": "search via index",
           "type": "bool",
           "default": true,
@@ -290,6 +304,7 @@
         },
         {
           "name": "tests_via_engine",
+          "console": true,
           "title": "tests via engine",
           "type": "bool",
           "default": true,
@@ -297,6 +312,7 @@
         },
         {
           "name": "build_via_engine",
+          "console": true,
           "title": "build via engine",
           "type": "bool",
           "default": true,

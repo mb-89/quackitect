@@ -117,16 +117,55 @@ func readsATree(args []string) bool {
 // semicolon, a newline, and the carriage return that comes with one here.
 var separators = []string{"\r\n", "\n", "\r", "&&", "||", "|", ";", "&"}
 
+// A SEPARATOR INSIDE QUOTES IS PART OF ONE PROGRAM'S ARGUMENT. The split ran
+// before anything read quotes, so a pipe or a semicolon inside a quoted pattern
+// cut the command in two and each half was judged as its own program. The half
+// before the cut kept the searcher and lost the path, and a searcher with no
+// path reads the tree, so a search whose every path was outside it was refused
+// by the message promising it would not be. This is the scan shellWords already
+// walks, applied one level up. See wk-7bab432426, which taught the words.
 func pipeline(command string) []string {
-	parts := []string{withoutHereDocs(command)}
-	for _, sep := range separators {
-		var next []string
-		for _, p := range parts {
-			next = append(next, strings.Split(p, sep)...)
+	text := withoutHereDocs(command)
+	var parts []string
+	var part strings.Builder
+	quote := byte(0)
+	for i := 0; i < len(text); i++ {
+		c := text[i]
+		if quote == 0 {
+			if n := separatorAt(text[i:]); n > 0 {
+				parts = append(parts, part.String())
+				part.Reset()
+				i += n - 1
+				continue
+			}
 		}
-		parts = next
+		switch {
+		case quote != 0 && c == quote:
+			quote = 0
+		case quote == 0 && (c == '\'' || c == '"'):
+			quote = c
+		case quote != '\'' && c == '\\' && i+1 < len(text):
+			// A BACKSLASH HANDS THE NEXT CHARACTER THROUGH AS TEXT, so an
+			// escaped separator cuts nothing and an escaped quote opens
+			// nothing. Inside single quotes it is an ordinary character.
+			part.WriteByte(c)
+			i++
+			c = text[i]
+		}
+		part.WriteByte(c)
 	}
-	return parts
+	return append(parts, part.String())
+}
+
+// separatorAt answers the length of the separator this text begins with, or
+// nought. The list is longest first, so && is never read as two ands.
+func separatorAt(text string) int {
+	for _, sep := range separators {
+		if strings.HasPrefix(text, sep) {
+			return len(sep)
+		}
+	}
+	return 0
 }
 
 // withoutHereDocs answers the command with every here-doc body taken out.
@@ -191,7 +230,12 @@ func hereDocEnd(after string) string {
 // door. One that names a path outside is left alone.
 
 // searchers are the programs this is about, by the name they are run as.
-func searcher(word string) bool {
+func searcher(word string) bool { return searcherName(word) != "" }
+
+// searcherName answers which searcher this word runs, by the name it is known
+// by, or nothing. It is the one place a program word is normalised, so the
+// flag list and the question of whether to look are asked about one name.
+func searcherName(word string) string {
 	name := word
 	if i := strings.LastIndexAny(name, "/"+string(os.PathSeparator)); i >= 0 {
 		name = name[i+1:]
@@ -199,9 +243,9 @@ func searcher(word string) bool {
 	name = strings.ToLower(strings.TrimSuffix(name, ".exe"))
 	switch name {
 	case "rg", "grep", "egrep", "fgrep", "findstr", "ag", "ack":
-		return true
+		return name
 	}
-	return false
+	return ""
 }
 
 // ASearchOverTheTree answers whether this command searches inside the tree
@@ -210,11 +254,11 @@ func searcher(word string) bool {
 func ASearchOverTheTree(command, work string) (string, bool) {
 	parts := pipeline(command)
 	for i, part := range parts {
-		words := strings.Fields(part)
+		words := shellWords(part)
 		if len(words) == 0 || !searcher(words[0]) {
 			continue
 		}
-		paths := pathsAmong(words[1:])
+		paths := pathsAmong(searcherName(words[0]), words[1:])
 		// grep WITH NO PATH READS ITS INPUT, and behind a pipe that input is
 		// another program's output rather than the tree. rg with no path
 		// searches where it stands, which is the tree.
@@ -262,9 +306,54 @@ func theIndexDoor(what string) string {
 		"OUTSIDE THIS TREE THE DISK IS YOURS: a search naming a path outside it is not refused."
 }
 
+// shellWords splits one program's words the way the shell that runs it would,
+// so a quoted pattern stays one word.
+//
+// SPLITTING ON SPACES TURNS A PATTERN INTO PATHS. This is the redirection
+// defect again by another road. rg -n "agent proxy" /root/.ccr/README.md handed
+// the guard proxy" as a bare word, a bare word that is not a flag is a path, a
+// relative path is inside the tree, and the search was refused by the message
+// whose last line promises a path outside is not. So the words the guard weighs
+// are the words the shell would run. See wk-7bab432426.
+//
+// A BACKSLASH ESCAPES INSIDE DOUBLE QUOTES AND OUTSIDE THEM, AND NOWHERE INSIDE
+// SINGLE ONES, which is the one place here the two quotes differ.
+func shellWords(part string) []string {
+	var out []string
+	var word strings.Builder
+	open := false // a word has begun, and the empty string is a word
+	quote := byte(0)
+	for i := 0; i < len(part); i++ {
+		c := part[i]
+		switch {
+		case quote != 0 && c == quote:
+			quote = 0
+		case quote == 0 && (c == '\'' || c == '"'):
+			quote, open = c, true
+		case quote != '\'' && c == '\\' && i+1 < len(part):
+			i++
+			word.WriteByte(part[i])
+			open = true
+		case quote == 0 && (c == ' ' || c == '\t'):
+			if open {
+				out = append(out, word.String())
+				word.Reset()
+				open = false
+			}
+		default:
+			word.WriteByte(c)
+			open = true
+		}
+	}
+	if open {
+		out = append(out, word.String())
+	}
+	return out
+}
+
 // pathsAmong answers the words that name a path: everything that is not a
 // flag and not the pattern, which is the first bare word.
-func pathsAmong(args []string) []string {
+func pathsAmong(runner string, args []string) []string {
 	var out []string
 	pattern := false
 	for i := 0; i < len(args); i++ {
@@ -273,10 +362,26 @@ func pathsAmong(args []string) []string {
 			out = append(out, args[i+1:]...)
 			break
 		}
+		// A REDIRECTION IS NOT A PATH TO SEARCH. It names a file the shell writes
+		// or reads, and the program never sees it. Reading one as a path was the
+		// whole of a live defect: 2>/dev/null is relative, a relative path counts
+		// as inside the tree, so one word of plumbing turned a search of /root
+		// into a search of the tree. The refusal then promised, in its own last
+		// line, that it would not have refused. See wk-7bab432426.
+		if aRedirection(a) {
+			if theArrowStandsAlone(a) {
+				i++ // its target is the next word, and that is not a path either
+			}
+			continue
+		}
 		if strings.HasPrefix(a, "-") {
-			// A FLAG THAT TAKES A VALUE TAKES THE NEXT WORD, and the ones that
-			// matter here are the pattern and the type: -e p, -g glob, -t go.
-			if a == "-e" || a == "-g" || a == "-t" || a == "-T" || a == "--regexp" || a == "--glob" || a == "--type" {
+			// A FLAG THAT TAKES A VALUE TAKES THE NEXT WORD, and that word is
+			// not a path. Six flags were named here and every other value was
+			// left on the list, where a bare word is read as a path and a
+			// relative path counts as inside the tree. rg -A 12 over a file
+			// under /tmp was refused by the message whose last line promises
+			// that a search outside is not: the 12 decided it. See wk-9875cf128f.
+			if takesAValue(runner, a) {
 				i++
 				if a == "-e" || a == "--regexp" {
 					pattern = true
@@ -291,6 +396,24 @@ func pathsAmong(args []string) []string {
 		out = append(out, a)
 	}
 	return out
+}
+
+// aRedirection says whether this word is the shell redirecting, rather than a
+// path handed to the program. A file descriptor may lead it and an ampersand
+// may join it: 2>, &>, >>, < are all the shell's.
+//
+// A FILENAME MAY BEGIN WITH A DIGIT, so the digits come off only where an arrow
+// follows them. 2026-report.txt keeps its name and stays a path.
+func aRedirection(word string) bool {
+	w := strings.TrimLeft(word, "0123456789&")
+	return strings.HasPrefix(w, ">") || strings.HasPrefix(w, "<")
+}
+
+// theArrowStandsAlone answers whether a redirection names its file as the next
+// word, as in `2> out.txt`, rather than joined to it as in `2>out.txt`.
+func theArrowStandsAlone(word string) bool {
+	w := strings.TrimLeft(word, "0123456789&")
+	return strings.Trim(w, "><") == ""
 }
 
 // anyInside says whether any of these paths is inside the tree at work. A

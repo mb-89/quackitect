@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"quackitect/engine/internal/frontmatter"
 	"sort"
 	"strings"
 )
@@ -17,11 +18,12 @@ import (
 // manual nobody opens. The writer replaces the comment with the answer.
 
 // Template answers the note a person starts from for one kind and process.
-// The frontmatter half goes through writeFront, the same writer the saved
-// token goes through, so the template and the mint cannot drift.
+// The frontmatter half goes through frontmatter.WriteWithBlanks, the same
+// writer the saved token goes through, so the template and the mint cannot
+// drift.
 func Template(s Schema, p Process) string {
 	narrowed := p.Narrow(s)
-	f := Front{}
+	f := frontmatter.Front{}
 	describe := map[string]string{}
 	for name, spec := range narrowed.Frontmatter.Properties {
 		describe[name] = spec.Description
@@ -32,7 +34,7 @@ func Template(s Schema, p Process) string {
 		f[name] = templateValue(name, narrowed.Guidance, spec, p)
 	}
 	var b strings.Builder
-	b.WriteString(writeFront(f, templateOrder(narrowed), describe, true))
+	b.WriteString(frontmatter.WriteWithBlanks(f, templateOrder(narrowed), describe))
 
 	head := strings.Repeat("#", narrowed.Body.HeadingLevel) + " "
 	for _, sec := range narrowed.Body.Sections {

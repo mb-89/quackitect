@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"quackitect/engine/internal/replaced"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 	"time"
@@ -24,26 +25,26 @@ func TestASwapKeepsTheSessionAndTheCalls(t *testing.T) {
 	dir := t.TempDir()
 
 	// A session with something written in it, the way a live engine leaves one.
-	first, err := OpenLog(dir)
+	first, err := sessionlog.Open(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	first.Write("engine", "start", "engine", "the engine that hands over", Yes(), nil)
+	first.Write("engine", "start", "engine", "the engine that hands over", sessionlog.Yes(), nil)
 	was := first.Session()
 	if err := first.Close(); err != nil {
 		t.Fatal(err)
 	}
 
 	// THE SUCCESSOR IS TOLD WHICH SESSION IT IS IN, the way handOver tells it.
-	t.Setenv(sessionVar, was)
-	next, err := OpenLog(dir)
+	t.Setenv(sessionlog.SessionVar, was)
+	next, err := sessionlog.Open(dir)
 	if err != nil {
 		t.Fatal(err)
 	}
 	if next.Session() != was {
 		t.Fatalf("the successor opened session %q where the engine it replaced was in %q", next.Session(), was)
 	}
-	next.Write("engine", "start", "engine", "the engine that took over", Yes(), nil)
+	next.Write("engine", "start", "engine", "the engine that took over", sessionlog.Yes(), nil)
 	if err := next.Close(); err != nil {
 		t.Fatal(err)
 	}
@@ -59,7 +60,7 @@ func TestASwapKeepsTheSessionAndTheCalls(t *testing.T) {
 			t.Fatalf("the handover retired the log to %s, so one session became two", e.Name())
 		}
 	}
-	said, err := os.ReadFile(filepath.Join(dir, Current))
+	said, err := os.ReadFile(filepath.Join(dir, sessionlog.Current))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -140,8 +141,8 @@ func TestTheBuildDoorIsTheEngines(t *testing.T) {
 // swaps on every run.
 func TestASwapBuildsEveryProgramTheManifestNames(t *testing.T) {
 	t.Parallel()
-	method := t.TempDir()
-	r := Roots{Method: method, Work: method}
+	r := aTree(t).Roots
+	method := r.Work
 	if err := os.MkdirAll(filepath.Join(method, "util", "setup"), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -340,8 +341,8 @@ func aTreeShippingThree(t *testing.T) string {
 // built. Where nothing was built, the program on disk is the running build, and
 // handing over to it would rotate the process for no reason at all.
 func TestASwapToTheSameBuildIsRefused(t *testing.T) {
-	method := t.TempDir()
-	r := Roots{Method: method, Work: method}
+	r := aTree(t).Roots
+	method := r.Work
 	if err := os.MkdirAll(filepath.Join(method, ".bin"), 0o755); err != nil {
 		t.Fatal(err)
 	}

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strconv"
 	"strings"
 )
@@ -43,7 +44,11 @@ func runHold(c *call) int {
 		c.answerJSON(LoadHold(roots))
 		return 0
 	}
-	h, err := SetHold(roots, *on, *by)
+	want := HoldOff
+	if *on {
+		want = HoldHeld
+	}
+	h, err := SetHold(roots, want, *by)
 	if err != nil {
 		c.answerJSON(map[string]any{"error": err.Error()})
 		return 1
@@ -52,7 +57,7 @@ func runHold(c *call) int {
 	if !h.On {
 		what = "the hold is lifted"
 	}
-	inSession(roots, "hold", *by, what, Yes(), map[string]any{"on": h.On})
+	inSession(roots, "hold", *by, what, sessionlog.Yes(), map[string]any{"on": h.On})
 	c.answerJSON(h)
 	return 0
 }
@@ -161,7 +166,7 @@ func runView(c *call) int {
 		c.answerJSON(map[string]any{"error": wrote.Error()})
 		return 1
 	}
-	inSession(roots, "view", "person", *file+"/"+*pane+" changed", Yes(),
+	inSession(roots, "view", "person", *file+"/"+*pane+" changed", sessionlog.Yes(),
 		map[string]any{"file": *file, "pane": *pane})
 	c.answerJSON(map[string]any{"file": *file, "pane": *pane, "ok": true})
 	return 0
@@ -188,6 +193,7 @@ func runQuery(c *call) int {
 		fmt.Fprintln(c.err, "")
 		fmt.Fprintln(c.err, "  se query --list          which views exist")
 		fmt.Fprintln(c.err, "  se query --view work     draw the first view in work.base")
+		fmt.Fprintln(c.err, "  se query --calls         every call a caller makes, as JSON")
 		fmt.Fprintln(c.err, "")
 		fs.PrintDefaults()
 	}
@@ -196,8 +202,25 @@ func runQuery(c *call) int {
 	which := fs.String("pane", "", "which view inside the file (default: the first)")
 	list := fs.Bool("list", false, "print the views that exist and exit")
 	panes := fs.Bool("panes", false, "print the views this file declares, in order, and exit")
+	calls := fs.Bool("calls", false, "print every call a caller makes, as JSON, and exit")
 	if code, stop := c.parse(fs, "query"); stop {
 		return code
+	}
+
+	// THE CALLS COME BEFORE ANY VIEW IS RESOLVED, because the catalog is about
+	// this program rather than about the tree, and a caller asking what to send
+	// has nothing to send yet.
+	//
+	// IT IS ONE LINE, where every other answer here is indented. A caller reads
+	// it whole either way, and a person greps the call that fetched it out of
+	// what came back, which indented JSON puts on four lines.
+	if *calls {
+		b, err := json.Marshal(TheCatalog())
+		if err != nil {
+			return c.fail(err)
+		}
+		fmt.Fprintln(c.out, string(b))
+		return 0
 	}
 
 	roots := c.roots
@@ -267,7 +290,7 @@ func runQuery(c *call) int {
 // record has to name them. A lane event outside a session is not lost: the
 // token is its own file, and the file is the durable record.
 func inSession(r Roots, kind, actor, msg string, ok *bool, data map[string]any) {
-	l, err := OpenExistingLog(r.Private("log"))
+	l, err := sessionlog.OpenExisting(r.Private("log"))
 	if err != nil {
 		return
 	}
@@ -307,7 +330,7 @@ func runStop(c *call) int {
 		c.answerJSON(map[string]any{"error": err.Error(), "sanctioned": Sanctioned()})
 		return 1
 	}
-	inSession(roots, "stop", *actor, "claimed a stop: "+*because+" — "+*why, Yes(),
+	inSession(roots, "stop", *actor, "claimed a stop: "+*because+" — "+*why, sessionlog.Yes(),
 		map[string]any{"because": *because})
 	c.answerJSON(map[string]any{"claimed": *because,
 		"notice": "Recorded. Ask to stop again and it is granted. Do anything else first and this is gone."})
@@ -377,7 +400,7 @@ func runMove(c *call) int {
 		c.answerJSON(map[string]any{"error": err.Error()})
 		return 1
 	}
-	inSession(roots, "move", "main", out.Moved.From+" moved to "+out.Moved.To, Yes(),
+	inSession(roots, "move", "main", out.Moved.From+" moved to "+out.Moved.To, sessionlog.Yes(),
 		map[string]any{"from": out.Moved.From, "to": out.Moved.To,
 			"rewritten": len(out.Rewritten), "unrewritten": out.UnrewritN})
 	c.answerJSON(out)
@@ -405,7 +428,7 @@ func runRetro(c *call) int {
 	}
 
 	roots := c.roots
-	got, err := Retro(roots, *by, Transcripts(roots))
+	got, err := Retro(c.ctx, roots, *by, Transcripts(roots))
 	if err != nil {
 		c.answerJSON(map[string]any{"error": err.Error()})
 		return 1

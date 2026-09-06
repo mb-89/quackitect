@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
@@ -17,6 +18,9 @@ import (
 // Each one is stated fully by files, identities and this layer's own state,
 // so none needs a word from the levels above. Each names the failure it
 // prevents, which is the admission test: a guard that cannot is not here.
+//
+// What a write is held to, and the one place forbidden, is
+// [[the-guard-scrutinises-rather-than-forbids]].
 
 // A WRITE TO A FILE THAT CHANGED SINCE IT WAS READ IS REFUSED, NEVER FIXED.
 //
@@ -68,7 +72,7 @@ func aReadAlreadyHeld(r Roots, actor, path, page string) (string, bool) {
 func (g *guard) correct(updated map[string]any, reason string) {
 	out, _ := json.Marshal(map[string]any{
 		"hookSpecificOutput": map[string]any{
-			"hookEventName":            "PreToolUse",
+			"hookEventName":            string(EventPreToolUse),
 			"permissionDecision":       "allow",
 			"permissionDecisionReason": reason,
 			"updatedInput":             updated,
@@ -198,7 +202,10 @@ type refusedStops struct {
 func loadStops(r Roots) refusedStops {
 	var s refusedStops
 	b, err := os.ReadFile(stopsPath(r))
-	if err != nil || json.Unmarshal(b, &s) != nil || s.Session != currentSession(r) || s.Count == nil {
+	// A SESSION THAT CANNOT BE READ DECIDES NOTHING, which ofThisSession is
+	// where that is said: a rotation opens a fresh log that names nobody, and a
+	// bare comparison against the placeholder emptied the counts in that window.
+	if err != nil || json.Unmarshal(b, &s) != nil || !ofThisSession(r, s.Session) || s.Count == nil {
 		return refusedStops{Session: currentSession(r), Count: map[string]int{}}
 	}
 	return s
@@ -269,12 +276,44 @@ func forgetRefusedStops(r Roots, actor string) {
 // floor so a helper given a small job is not held to a ratio of nothing. A
 // helper that read nothing and reasoned gets the floor, which is the design's
 // absolute floor for that case.
+// bytesReadByAnyNameOf sums what one helper read under every name the record
+// files it by.
+//
+// THE TWO HALVES KEYED ON DIFFERENT NAMES. notePostTool files a read under
+// TheActorOf, which answers the register's name for a helper, and a helper that
+// has pulled answers to the name it pulled with as well. The budget asked under
+// the harness id, got nothing back, and fell to the floor. So the ratio never
+// bit on a helper the queue had handed work to, which is every helper that
+// reads anything worth a budget.
+//
+// IT SUMS RATHER THAN PICKING ONE, because a read made before the first pull is
+// filed under the name in force then, and choosing one name would drop it.
+func bytesReadByAnyNameOf(r Roots, agent string) int64 {
+	if agent == "" {
+		return 0
+	}
+	names := everyNameOf(r, agent)
+	if named := TheActorOf(r, "", agent); named != "" {
+		names = append(names, everyNameOf(r, named)...)
+	}
+	var n int64
+	seen := map[string]bool{}
+	for _, name := range names {
+		if name == "" || seen[name] {
+			continue
+		}
+		seen[name] = true
+		n += BytesReadBy(r, name)
+	}
+	return n
+}
+
 func aHelperReturningTooMuch(r Roots, cfg Config, in hookIn) (string, bool) {
 	if in.AgentID == "" || cfg.HelperRatio <= 0 {
 		return "", false
 	}
 	returned := int64(len(in.LastAssistantMessage))
-	read := BytesReadBy(r, in.AgentID)
+	read := bytesReadByAnyNameOf(r, in.AgentID)
 	allowed := max(int64(cfg.HelperFloorBytes), read/int64(cfg.HelperRatio))
 	if returned <= allowed {
 		return "", false
@@ -288,7 +327,15 @@ func aHelperReturningTooMuch(r Roots, cfg Config, in hookIn) (string, bool) {
 // ensureEngine brings the engine over these roots up when none is running,
 // and waits for it to say so. It is what the wake hook and session start do,
 // and what makes a crashed engine cost at most the rest of one turn.
-func ensureEngine(r Roots) {
+//
+// THE CONTEXT GOVERNS THE START AND THE WAIT, AND NEVER THE CHILD. The engine
+// is meant to outlive the hook that started it, so it is not run under the
+// context, which would kill it when the hook returned. A caller already ended
+// starts nothing, and a caller that ends while waiting stops waiting.
+func ensureEngine(ctx context.Context, r Roots) {
+	if ctx.Err() != nil {
+		return
+	}
 	if _, up := LoadRunning(r); up {
 		return
 	}
@@ -320,7 +367,11 @@ func ensureEngine(r Roots) {
 		if v, up := LoadRunning(r); up && v.Socket != "" {
 			return
 		}
-		time.Sleep(50 * time.Millisecond)
+		select {
+		case <-ctx.Done():
+			return // the caller is gone, and the engine goes on coming up without it
+		case <-time.After(50 * time.Millisecond):
+		}
 	}
 	fmt.Fprintln(os.Stderr, "quackitect: the engine was started and has not reported ready")
 }

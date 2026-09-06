@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 )
@@ -26,7 +27,7 @@ func queued(text string) string {
 
 func promptsIn(t *testing.T, r Roots) []string {
 	t.Helper()
-	b, err := os.ReadFile(filepath.Join(r.Private("log"), Current))
+	b, err := os.ReadFile(filepath.Join(r.Private("log"), sessionlog.Current))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -49,8 +50,8 @@ func promptsIn(t *testing.T, r Roots) []string {
 func TestTheEngineCopiesWhatWasSaidMidTurn(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
-	l, _ := OpenLog(r.Private("log"))
-	l.Write("engine", "start", "engine", "started", Yes(), nil)
+	l, _ := sessionlog.Open(r.Private("log"))
+	l.Write("engine", "start", "engine", "started", sessionlog.Yes(), nil)
 
 	path := filepath.Join(t.TempDir(), "session.jsonl")
 	first := "the details in the log need to wrap"
@@ -99,8 +100,8 @@ func TestTheEngineCopiesWhatWasSaidMidTurn(t *testing.T) {
 func TestOnlyWhatAPersonTypedIsCopied(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
-	l, _ := OpenLog(r.Private("log"))
-	l.Write("engine", "start", "engine", "started", Yes(), nil)
+	l, _ := sessionlog.Open(r.Private("log"))
+	l.Write("engine", "start", "engine", "started", sessionlog.Yes(), nil)
 
 	notHuman := strings.Replace(queued("a hook wrote this"), `"kind":"human"`, `"kind":"hook"`, 1)
 	notQueued := strings.Replace(queued("a different attachment"), `"type":"queued_command"`, `"type":"file"`, 1)
@@ -129,8 +130,8 @@ func TestOnlyWhatAPersonTypedIsCopied(t *testing.T) {
 func TestAMissingTranscriptCopiesNothingAndSaysNothing(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
-	l, _ := OpenLog(r.Private("log"))
-	l.Write("engine", "start", "engine", "started", Yes(), nil)
+	l, _ := sessionlog.Open(r.Private("log"))
+	l.Write("engine", "start", "engine", "started", sessionlog.Yes(), nil)
 	defer l.Close()
 
 	if n := CopyWhatWasHeard(r, "", l, "main"); n != 0 {
@@ -147,8 +148,8 @@ func TestAMissingTranscriptCopiesNothingAndSaysNothing(t *testing.T) {
 func TestATranscriptNeverReadStartsAtItsEnd(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
-	l, _ := OpenLog(r.Private("log"))
-	l.Write("engine", "start", "engine", "started", Yes(), nil)
+	l, _ := sessionlog.Open(r.Private("log"))
+	l.Write("engine", "start", "engine", "started", sessionlog.Yes(), nil)
 
 	dir := t.TempDir()
 	one := filepath.Join(dir, "one.jsonl")
@@ -186,8 +187,8 @@ func TestATranscriptNeverReadStartsAtItsEnd(t *testing.T) {
 func TestAPromptThatStartsATurnIsNotCopiedTwice(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
-	l, _ := OpenLog(r.Private("log"))
-	l.Write("engine", "start", "engine", "started", Yes(), nil)
+	l, _ := sessionlog.Open(r.Private("log"))
+	l.Write("engine", "start", "engine", "started", sessionlog.Yes(), nil)
 
 	path := filepath.Join(t.TempDir(), "session.jsonl")
 	os.WriteFile(path, []byte(queued("everything before this turn")), 0o644)
@@ -208,8 +209,8 @@ func TestAPromptThatStartsATurnIsNotCopiedTwice(t *testing.T) {
 func TestTheEngineDoesNotCopyWhatTheAgentAlreadyWrote(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
-	l, _ := OpenLog(r.Private("log"))
-	l.Write("engine", "start", "engine", "started", Yes(), nil)
+	l, _ := sessionlog.Open(r.Private("log"))
+	l.Write("engine", "start", "engine", "started", sessionlog.Yes(), nil)
 
 	path := filepath.Join(t.TempDir(), "session.jsonl")
 	said := "the reviewer backlog is too big"
@@ -242,8 +243,8 @@ func TestTheEngineDoesNotCopyWhatTheAgentAlreadyWrote(t *testing.T) {
 func TestTwoIdenticalMessagesAreTwoRecords(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
-	l, _ := OpenLog(r.Private("log"))
-	l.Write("engine", "start", "engine", "started", Yes(), nil)
+	l, _ := sessionlog.Open(r.Private("log"))
+	l.Write("engine", "start", "engine", "started", sessionlog.Yes(), nil)
 
 	path := filepath.Join(t.TempDir(), "session.jsonl")
 	said := "go on"
@@ -274,8 +275,8 @@ func TestTwoIdenticalMessagesAreTwoRecords(t *testing.T) {
 func TestAMidTurnMessageIsOwedByTheWalker(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
-	l, _ := OpenLog(r.Private("log"))
-	l.Write("engine", "start", "engine", "started", Yes(), nil)
+	l, _ := sessionlog.Open(r.Private("log"))
+	l.Write("engine", "start", "engine", "started", sessionlog.Yes(), nil)
 
 	path := filepath.Join(t.TempDir(), "session.jsonl")
 	if err := os.WriteFile(path, nil, 0o644); err != nil {

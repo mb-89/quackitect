@@ -39,7 +39,7 @@ The toolchain is Go 1.27, and a rule that leans on a recent release says which.
 12. `context.Context` is the first parameter. A doc comment starts with the name it documents.
 13. Name for the scope: `i` in a loop, `roots` in a package, no stutter and no number suffix.
 14. A test is a table under `t.Run`, calls `t.Parallel()`, uses `t.TempDir()` and `t.Context()`, and compares with `cmp.Diff`. *
-15. Run `gofmt`, `go vet`, `go fix` and `golangci-lint` before every commit. Their home is a check in [[util/checks]]. *
+15. Run `se format` and then `se lint` before every commit. Which programs those reach is the engine's business, and you name none. *
 
 # Discussion
 
@@ -56,12 +56,13 @@ The cost of a split is an import cycle, and a cycle found is a seam drawn wrong.
 `_ = f()` compiles, and so does `x, _ := f()`.
 Some are right, a `Close` on a read-only file, a `Remove` of a temporary the next line replaces.
 The reader cannot tell those from the ones that lost a write, because the line looks the same.
-The Google guide asks for the comment, and `errcheck`, in the default set of `golangci-lint`, refuses the bare form.
+The Google guide asks for the comment, and the lint refuses the bare form.
+A write assigned away is then a finding rather than a line nobody reads.
 
 ## 4. Strings and maps
 
 A state name held as a string is compared by spelling, and a misspelling is a state that never matches.
-A `type State string` with a `const` block gives the reader a list to count from and `go vet` something to check.
+A `type State string` with a `const` block gives the reader a list to count from and the lint something to check.
 The untyped map has one job: to hold JSON that was decoded before the program knew its shape.
 Past that edge, two readers of one map disagree about what it holds, and nothing tells them.
 `encoding/json/v2` in Go 1.27 rejects duplicate keys and invalid UTF-8 by default, so decoding into a struct also gets stricter.
@@ -112,11 +113,14 @@ Time and goroutines go under `testing/synctest`, which runs them on a fake clock
 A five second wait is then a millisecond, and a flaky test is a red one.
 `TestMain` builds a binary once, because the link is the cost and every test wants the same binary.
 
-## 15. The tools
+## 15. Two verbs
 
-A rule a program can check is a check, so the tools belong in [[util/checks]] beside the suite and not in this list.
-`gofmt` settles layout, and `go vet` catches the misuse the compiler accepts.
-`go fix` since Go 1.26 rewrites old idioms to `slices`, `maps`, `strings.CutPrefix` and the atomic types.
-The tree then stays on one idiom without a person remembering each.
-`golangci-lint` runs `errcheck`, `staticcheck`, `unused` and `ineffassign` by default, and `modernize` under the same roof.
-`go test` in 1.27 runs the `stdversion` vet check, which refuses a standard library symbol newer than the module's Go version.
+A rule a program can check is a check, and which program checks it is the engine's business.
+An agent that names the program runs one the box may not have.
+What it reads back is the operating system's error rather than an answer.
+So there are two doors, and the agent names neither a program nor a folder.
+`se format` settles layout wherever it can, and it runs first.
+A formatter settles what a lint would otherwise report.
+`se lint` reads the tokens, the guidance and the Go, and names what breaks a rule in any of them.
+A program the engine wanted and this box has not got comes back as a line saying which one.
+So a box that checked everything reads differently from one that could not.

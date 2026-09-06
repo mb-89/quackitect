@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 	"time"
@@ -15,7 +16,7 @@ func TestTheStateOfPlayReadsOneScreen(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
 	Project(r)
-	l, _ := OpenLog(r.Private("log"))
+	l, _ := sessionlog.Open(r.Private("log"))
 	l.Close()
 
 	held, err := Mint(r, Token{Tracked: local(), Title: "held work", Process: "trivial", Status: "open", Holder: "worker-x"})
@@ -29,7 +30,7 @@ func TestTheStateOfPlayReadsOneScreen(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	before, _ := os.ReadFile(filepath.Join(r.Private("log"), Current))
+	before, _ := os.ReadFile(filepath.Join(r.Private("log"), sessionlog.Current))
 
 	screen := TheStateOfPlay(r, time.Now()).Screen()
 
@@ -40,7 +41,7 @@ func TestTheStateOfPlayReadsOneScreen(t *testing.T) {
 	}
 
 	// READING WRITES NOTHING. The record is byte for byte what it was.
-	after, _ := os.ReadFile(filepath.Join(r.Private("log"), Current))
+	after, _ := os.ReadFile(filepath.Join(r.Private("log"), sessionlog.Current))
 	if string(before) != string(after) {
 		t.Fatal("reading the state of play wrote to the record")
 	}

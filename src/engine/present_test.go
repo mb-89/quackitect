@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"encoding/json"
+	"quackitect/engine/internal/sessionlog"
 	"testing"
 )
 
@@ -17,7 +18,7 @@ import (
 func TestTheRegisterFollowsAgentsInAndOut(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -35,7 +36,7 @@ func TestTheRegisterFollowsAgentsInAndOut(t *testing.T) {
 		}
 		body, _ := json.Marshal(in)
 		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 	}
 	here := func() []Doing { return AgentsPresent(r) }
 	named := func(want ...string) {
@@ -96,7 +97,7 @@ func TestTheRegisterFollowsAgentsInAndOut(t *testing.T) {
 func TestAnAgentSeenAfterARestartIsHereAgain(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -109,7 +110,7 @@ func TestAnAgentSeenAfterARestartIsHereAgain(t *testing.T) {
 		}
 		body, _ := json.Marshal(in)
 		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 	}
 	tell("SessionStart", map[string]any{"source": "startup"})
 	tell("SubagentStart", map[string]any{"agent_id": "1f4c", "agent_type": "reviewer"})
@@ -171,7 +172,7 @@ func TestAnAgentSeenAfterARestartIsHereAgain(t *testing.T) {
 func TestTheRegisterHoldsThisSessionOnly(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
-	log, err := OpenLog(r.Private("log"))
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}

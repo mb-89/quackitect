@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"quackitect/engine/internal/sessionlog"
 )
 
 // A HOLD NOBODY IS BEHIND SENDS SOMEBODY TO LOOK.
@@ -18,26 +19,15 @@ import (
 // timeout guesses how long work takes and gets it wrong in both directions, and
 // a person looking is what a stuck token actually needs.
 //
-// ONE NUMBER DECIDES A QUIET HOLD, and the engine already has it:
-// limits.pulls_before_hold_is_stale. The queue is its own clock, so a holder
-// that stops falls behind while the work it is holding up goes on asking. A
-// second number in seconds would be a second answer to one question, and
-// somebody would have to reconcile them at the moment they disagreed.
-//
-// AND THE CLOCK RUNS AT THE FLEET'S RATE, which is what the number forgot. Ten
-// pulls by ANYBODY is ten pieces of work with one worker and under a minute
-// with twelve, while the thing being measured, how long a token takes, does not
-// shrink when hands are added. So every holder deep in a twenty-minute token had
+// A QUIET HOLD IS ONE NOBODY HAS BEEN HEARD FROM, and HasGone in gone.go is the
+// one function that answers it, for this notice and for the start sweep alike.
+// The pull count used to answer it here, and it is a proxy for a worker that
+// stops BETWEEN tokens: a worker on one long token pulls once and then says
+// nothing to the queue for as long as the work takes, while the room goes on
+// pulling around it. Every holder deep in a twenty-minute token had therefore
 // stopped pulling by the engine's measure, the queue answered investigate
 // instead of handing out work, and ONE ALARM STOPPED EVERY WORKER: twelve agents
 // sent to one hold, five of them parked on it in looked.json.
-//
-// THE NUMBER IS THE HOLDER'S OWN TURNS, so the window is multiplied by the
-// actors present. Ten turns is ten pulls with one actor and a hundred and twenty
-// with twelve, and the number keeps its meaning as hands are added. STILL NO
-// SECOND NUMBER IN SECONDS: the queue is still the only clock, read at the rate
-// it actually runs at. A holder that is genuinely gone still falls behind,
-// because the room goes on pulling and it does not.
 //
 // WHICH STATUSES. A token in review, a draft in review, and work held by
 // somebody other than the walker. THE DRAFT IS THE ONE THAT REALLY SITS
@@ -48,37 +38,21 @@ import (
 // hands out an instruction to go and look instead.
 const AnswerInvestigate = "investigate"
 
-// staleWindow is the one place the staleness number is read, so the quiet hold
-// and the take-back cannot disagree about how long a hold may be quiet for. It
-// answers the window in pulls, and the two numbers it was made from.
-func staleWindow(r Roots, session string) (window, per, actors int) {
-	per = LoadConfig(r).PullsBeforeHoldIsStale
-	actors = ActorsPresent(r, session)
-	// AND THE MULTIPLICATION IS DONE HERE, which the first version described and
-	// did not do. It worked the actors out and then handed the per-actor number
-	// straight back as the window, so the holder was measured against the
-	// fleet's rate again and every long token looked stale in a busy room.
-	return per * actors, per, actors
-}
-
 // quietHold answers the first hold nobody is behind, or nothing.
 //
 // THE HOLDER IS NEVER SENT TO INVESTIGATE ITSELF. That is an instruction nobody
 // can act on, and a sub-walker that has gone quiet is not going to read it.
+//
+// WITH NO RECORD NOTHING IS INVESTIGATED, which HasGone answers for: a tree the
+// engine has never run in cannot tell a live hold from a dead one, and sending
+// somebody to look at a hold it cannot check is the same mistake as refusing on
+// one.
 func quietHold(r Roots, actor string) (Token, bool) {
-	session := ArrivalSession(r) // the key the arrival record is written under
-	stale, _, _ := staleWindow(r, session)
-	// WITH NO NAMED SESSION NOTHING IS INVESTIGATED. The engine cannot tell a
-	// live hold from a dead one, and sending somebody to look at a hold it
-	// cannot check is the same mistake as refusing on one.
-	if !Named(session) || stale <= 0 {
-		return Token{}, false
-	}
 	for _, t := range Tokens(r) {
 		if !holdWorthWatching(t) || t.Holder == "" || t.Holder == actor {
 			continue
 		}
-		if StillPulling(r, session, t.Holder, stale) {
+		if _, gone := HasGone(r, t.Holder); !gone {
 			continue
 		}
 		return t, true
@@ -93,27 +67,19 @@ func holdWorthWatching(t Token) bool { return !t.Ended() }
 
 // investigate is the answer. It says what is stuck, who left it, and what to do
 // about it, so the walker does not have to look any of that up.
-// HOW FAR BEHIND IS A NUMBER THE ENGINE HAS. Saying only that a holder is
-// behind leaves the person it woke to go and find out, and the difference
-// between one pull and thirty is the difference between reading and gone.
+//
+// HOW LONG THE SILENCE IS, AND HOW LONG IT MAY BE, ARE NUMBERS THE ENGINE HAS,
+// so it says both. Saying only that a holder has gone quiet leaves the person it
+// woke to go and find out, and the difference between eleven minutes and an hour
+// is the difference between a long build and a hand that is not coming back.
 func investigate(r Roots, t Token) Answer {
-	session := ArrivalSession(r)
-	behind, everSeen := HowFarBehind(r, session, t.Holder)
-	howFar := fmt.Sprintf("%d pulls have gone past since they last pulled", behind)
-	if !everSeen {
-		howFar = fmt.Sprintf(
-			"they have not pulled at all this session, and %d pulls have gone past", behind)
-	}
-	// THE ANSWER NAMES THE NUMBER IT USED AND WHAT IT WAS NORMALISED BY. A walker
-	// woken by a count it cannot see the rate of has to go and work out whether
-	// the holder is gone or the room was merely busy, which is the whole question.
-	window, per, actors := staleWindow(r, session)
-	howFar += fmt.Sprintf(", past a window of %d: %d per actor across the %d actors present",
-		window, per, actors)
+	silent, _ := HasGone(r, t.Holder)
+	howFar := fmt.Sprintf("nothing of theirs has reached the record for %s, past a silence of %s",
+		briefSilence(silent), briefSilence(SilenceBeforeGone(r)))
 	// TWO GESTURES, because coming back to se pull used to mean both answers
 	// and the engine could not hear the difference.
 	return Answer{Pull: AnswerInvestigate, Notice: fmt.Sprintf(
-		"GO AND LOOK AT %s %s. It is %s, held by %s, who has stopped pulling: %s.\n\n"+
+		"GO AND LOOK AT %s %s. It is %s, held by %s, who has gone quiet: %s.\n\n"+
 			"Nothing has been moved. It is exactly where it was and it stays there "+
 			"until you rule on it, because a timeout guesses and a person looking "+
 			"does not.\n\n"+
@@ -233,23 +199,30 @@ func TakeBackWhatWasLookedAt(r Roots, actor string) ([]string, string) {
 		return nil, t.ID + " changed hands since you looked, from " + sent.Holder +
 			" to " + t.Holder + ", so it is somebody else's work now"
 	}
-	// AND NOT FROM A HOLDER WHO IS STILL PULLING, by the same session key and
-	// the same staleness the quiet hold was found with. The comment above
-	// promised this and the code did not do it, which is how a look stole
-	// live work twice on 2026-09-01.
-	session := ArrivalSession(r)
-	stale, _, _ := staleWindow(r, session)
-	if StillPulling(r, session, t.Holder, stale) {
-		return nil, t.Holder + " is pulling again, so " + t.ID + " is live work"
+	// AND NOT FROM A HOLDER WHO IS STILL CALLING, by the same silence the quiet
+	// hold was found with. The comment above promised this and the code did not
+	// do it, which is how a look stole live work twice on 2026-09-01.
+	if _, gone := HasGone(r, t.Holder); !gone {
+		return nil, t.Holder + " is still calling, so " + t.ID + " is live work"
 	}
 	// ONLY THE HOLD IS RELEASED. Where the token stands is the process's
 	// business, and a walker taking a hold back is not a step of anybody's
 	// process.
 	heldBefore := t.Holder
-	t.Holder = ""
-	if err := SaveToken(r, t); err != nil {
-		return nil, t.ID + " would not save, so the hold still stands"
+	// AND NOT THROUGH THE TOKEN. SaveToken weighs every bounded section before
+	// it writes, and a release writes no prose at all. wk-963dbf6898 carried an
+	// ask of 249 words and a do of 219, against a cap of 200, so every release
+	// of it was refused and the walker was told only that it would not save.
+	// Four pulls in a row answered that same notice, and a look must be ruled
+	// on before work is handed out, so the queue gave out nothing else.
+	//
+	// The hold is the engine's own store, keyed by token, so it is put down
+	// there and the file is left exactly as its holder wrote it.
+	// See wk-c2f9d39ea7.
+	if err := recordHold(r, t.ID, ""); err != nil {
+		return nil, t.ID + " would not let go of its hold: " + err.Error()
 	}
+	t.Holder = ""
 	// AND THE LOOK IS SPENT HERE, on the one path that moved something, so a
 	// second pull does not release a token somebody has since picked up.
 	_ = locked(lookedPath(r), func() error {
@@ -258,7 +231,7 @@ func TakeBackWhatWasLookedAt(r Roots, actor string) ([]string, string) {
 		return saveLooked(r, seen)
 	})
 	inSession(r, "work", actor, t.ID+" taken back from "+heldBefore+
-		", who was looked at and is gone", Yes(),
+		", who was looked at and is gone", sessionlog.Yes(),
 		map[string]any{"id": t.ID, "from": heldBefore})
 	return []string{t.ID + " from " + heldBefore}, ""
 }

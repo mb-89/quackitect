@@ -8,6 +8,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"quackitect/engine/internal/keyword"
+	"quackitect/engine/internal/sessionlog"
 )
 
 // ONE TREE.
@@ -16,6 +19,8 @@ import (
 // util/parameters.json: what it is called, what type it is, what it defaults
 // to, and which way it may be narrowed. The panel is a subtree of the same
 // tree, chosen by a flag on a group.
+//
+// Why is [[one-tree-holds-every-parameter]].
 //
 // The word "setting" is not used. A value is a PARAMETER. A parameter that
 // appears in the panel is SHOWN. v3 kept interface state in a file called
@@ -113,6 +118,15 @@ type Node struct {
 	// is the same defect the comment above this block warns about.
 	Gesture        int    `json:"gesture,omitempty"`
 	GestureCommand string `json:"gestureCommand,omitempty"`
+
+	// REACHABLE FROM A CONSOLE, where there is no panel to press.
+	//
+	// The flag is the only thing anybody writes: the engine owns the word
+	// that reaches this node, and it is the node's own name. Some controls
+	// make no sense away from a desk, and those carry no flag.
+	Console bool `json:"console,omitempty"`
+	// Keyword is that word, filled here so the panel draws what the matcher takes.
+	Keyword string `json:"keyword,omitempty"`
 }
 
 func (n Node) holdsValue() bool {
@@ -148,6 +162,10 @@ func LoadTree(methodRoot string) (Node, error) {
 // It is here because LoadTree is the one place a tree is read, which is where
 // the icons are resolved for the same reason.
 func fillOptions(n *Node, methodRoot string) {
+	// AND THE WORD A CONSOLE REACHES IT BY, derived so nobody keeps a copy.
+	if n.Console && n.Type == "bool" {
+		n.Keyword = keyword.For(n.Name)
+	}
 	if n.OptionsFrom == "processes.names" {
 		n.Options = nil
 		for _, name := range AvailableProcesses(methodRoot) {
@@ -598,4 +616,39 @@ func (e Emergency) Describe() string {
 		return ""
 	}
 	return fmt.Sprintf("emergency mode, armed by %s, until %s", e.By, e.Until.Format(time.RFC3339))
+}
+
+// KeywordSaid moves the control a person named, and answers the word it
+// matched. Its callers are the two routes the harness feeds, so an agent
+// cannot forge one. A move the floor refuses is recorded with its reason.
+func KeywordSaid(r Roots, log *sessionlog.Log, actor, said string) string {
+	root, err := LoadTree(r.Method)
+	if err != nil {
+		return ""
+	}
+	var have []keyword.Of
+	Walk(root, "", func(path string, n Node) {
+		if n.Keyword != "" {
+			have = append(have, keyword.Of{Word: n.Keyword, Key: strings.TrimPrefix(path, root.Name+"."), Says: n.Help})
+		}
+	})
+	k, ok := keyword.Match(said, have)
+	if !ok {
+		return ""
+	}
+	v, err := LoadValues(r)
+	if err != nil {
+		return ""
+	}
+	was, _ := toBool(v.Value[k.Key])
+	got, err := SetValue(r, k.Key, !was)
+	data := map[string]any{"keyword": k.Word, "parameter": k.Key, "value": got}
+	if err != nil {
+		data["refused"] = err.Error()
+		record(log, "engine", "keyword", actor, err.Error(), sessionlog.No(), data)
+		return k.Word
+	}
+	now, _ := toBool(got)
+	record(log, "engine", "keyword", actor, k.Word+" is now "+keyword.OnOrOff(now), sessionlog.Yes(), data)
+	return k.Word
 }

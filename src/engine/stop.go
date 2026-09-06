@@ -147,6 +147,13 @@ func ClaimStop(r Roots, actor, because, why string) error {
 			return fmt.Errorf("blocked is not true: %s", refusal)
 		}
 	}
+	// AND A CLOUD BOX TURNS ITS NOTES IN BEFORE IT GOES QUIET. A note is
+	// private, nothing pushes it, and this container is reclaimed when the
+	// session ends. The refusal lands where the claim was typed, the way the
+	// blocked one does. Unbound turns it off.
+	if why, refuse := NotesGoWithTheBox(r); refuse && !Unleashed(r) {
+		return fmt.Errorf("%s", why)
+	}
 	return locked(claimPath(r), func() error {
 		all := loadClaims(r)
 		all.Claims[actor] = StopClaim{Session: currentSession(r), Actor: actor,
@@ -157,12 +164,29 @@ func ClaimStop(r Roots, actor, because, why string) error {
 
 // StandingClaim reads an actor's claim, and leaves it standing. A claim from
 // another session is gone, because a session is where a decision was made.
+//
+// THROUGH ofThisSession, SO A ROTATION DOES NOT SPEND THE CLAIM. A rotation
+// sets the full log aside and opens a fresh current that holds nothing until
+// the next record lands, and the session name lives in the first record. A bare
+// comparison against currentSession read the placeholder through that window,
+// matched no stored claim, and refused an agent its stop a moment after it had
+// claimed one. A session that cannot be read decides nothing.
+//
+// IT LOOKS UNDER EVERY NAME THE ACTOR ACTS AS. The lane stores a claim under
+// the name the agent pulls with, and the stop hook asks under the name the
+// harness gives it. An agent that pulled as fable-cloud and was main to the
+// harness claimed five times in one session and was refused five times with
+// NO CLAIM IS STANDING, the claim sitting unspent under the other name the
+// whole while. The alias table already links the two, so it is read here.
 func StandingClaim(r Roots, actor string) (StopClaim, bool) {
-	c, has := loadClaims(r).Claims[actor]
-	if !has || c.Session != currentSession(r) {
-		return StopClaim{}, false
+	all := loadClaims(r)
+	for _, n := range everyNameOf(r, actor) {
+		c, has := all.Claims[n]
+		if has && ofThisSession(r, c.Session) {
+			return c, true
+		}
 	}
-	return c, true
+	return StopClaim{}, false
 }
 
 // SpendClaim is what the guard calls before every tool, and it is the only
@@ -175,12 +199,20 @@ func StandingClaim(r Roots, actor string) (StopClaim, bool) {
 func SpendClaim(r Roots, actor string) {
 	_ = locked(claimPath(r), func() error { // a claim it cannot drop is dropped when the session rotates
 		all := loadClaims(r)
-		if _, has := all.Claims[actor]; !has {
-			return nil
-		}
+		spent := false
 		// ONE ACTOR'S CLAIM IS SPENT AND THE REST STAND. Removing the file
 		// spent everybody's, so one agent carrying on ended another's stop.
-		delete(all.Claims, actor)
+		// The one actor is every name it acts as, the same names StandingClaim
+		// reads, so a claim the stop would find is a claim the next call ends.
+		for _, n := range everyNameOf(r, actor) {
+			if _, has := all.Claims[n]; has {
+				delete(all.Claims, n)
+				spent = true
+			}
+		}
+		if !spent {
+			return nil
+		}
 		return saveClaims(r, all)
 	})
 }

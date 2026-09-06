@@ -77,7 +77,9 @@ var theLane = []laneTool{
 			"and tracked, which says where it is born. tracked true puts it in doc/work, " +
 			"which git carries, so another agent on another box can claim it. tracked false " +
 			"keeps it in .se/work, for small work you do yourself next. A note takes neither " +
-			"and is always private. Or on: <id> takes that token into your hands.",
+			"and is always private. Or on: <id> takes that token into your hands. Or " +
+			"abort: <id> with why ends it where it stands, and disposition became names " +
+			"in successors what it became.",
 		takes: workArgs{},
 	},
 	{
@@ -93,8 +95,15 @@ var theLane = []laneTool{
 		takes: pullArgs{},
 	},
 	{
-		name:  "se_status",
-		says:  "What the engine knows: the two roots, the log it is writing, and the rules in force.",
+		name: "se_status",
+		// A DESCRIPTION NAMING THREE THINGS IS READ FOR THOSE THREE. This tool
+		// grew the state of play, which carries what the engine returned this
+		// session and how much of it was wrong, and went on saying it answered
+		// the roots, the log and the rules. So the numbers arrived and nobody
+		// came for them.
+		says: "What the engine knows: the two roots, the log it is writing, and " +
+			"the rules in force. It also answers the state of play: what is open, " +
+			"what is held, and what this session returned with how much of it was wrong.",
 		takes: statusArgs{},
 	},
 	{
@@ -135,6 +144,7 @@ func laneTools() []map[string]any {
 // testArgs is what se_test takes.
 type testArgs struct {
 	On      string   `json:"on"`
+	Actor   string   `json:"actor"`
 	Propose []string `json:"propose" says:"tests by name, or patterns"`
 	Plan    bool     `json:"plan" says:"say what would run, run nothing"`
 }
@@ -145,9 +155,14 @@ type claimArgs struct {
 	Next    int      `json:"next" says:"claim what the queue would hand you on this many pulls"`
 	These   []string `json:"these"`
 	As      string   `json:"as" says:"with next: worker or reviewer"`
+	Take    bool     `json:"take" says:"with these, and one id: take that token up as well, so a refused agent needs one call and not two"`
 	Release bool     `json:"release" says:"give back what you hold"`
 	List    bool     `json:"list"`
 	Whoami  bool     `json:"whoami"`
+	Sync    bool     `json:"sync" says:"look for other boxes' claims now, rather than waiting for the engine's clock"`
+	// NoPublish writes the claim here and leaves git alone, which is what an
+	// offline box wants and what a test that must not push needs.
+	NoPublish bool `json:"no_publish" says:"write the claim here and leave git alone"`
 }
 
 // findArgs is what se_find takes, and it is the question the engine is asked,
@@ -157,6 +172,10 @@ type findArgs struct {
 	Regex string `json:"regex,omitempty"`
 	Path  string `json:"path,omitempty"`
 	Limit int    `json:"limit,omitempty"`
+	// Archive searches what has been archived rather than the tree. The
+	// archive is not in the index, so this goes to the verb rather than to
+	// the running model's index.
+	Archive bool `json:"archive,omitempty" says:"search what has been archived rather than the tree"`
 }
 
 // askArgs is what se_ask takes.
@@ -218,8 +237,18 @@ type workArgs struct {
 	DoneWhen       []string `json:"done_when"`
 	DependsOn      []string `json:"depends_on"`
 	Parent         string   `json:"parent"`
+	NeedsHuman     bool     `json:"needs_human" says:"true when the answer is not yours: your best attempt, and a person reads it first"`
 	On             string   `json:"on"`
 	Actor          string   `json:"actor"`
+
+	// ENDING A TOKEN FROM WHEREVER IT STANDS, which is a door of its own and
+	// was the shell's alone. The engine grew an abort that can end a token as
+	// became, and the lane could not say what a became names, so an agent here
+	// could only record a split as work nobody wanted.
+	Abort       string   `json:"abort" says:"instead of minting: end this token, by id, with why"`
+	Why         string   `json:"why" says:"with abort: why it is ending. An abort with no reason is refused"`
+	Disposition string   `json:"disposition" says:"with abort: how it ends, one the process declares (default: dropped)"`
+	Successors  []string `json:"successors" says:"with abort and became: the ids it became"`
 }
 
 // statusArgs is what se_status takes, which is nothing.
@@ -246,6 +275,7 @@ type stopArgs struct {
 	Because string `json:"because"`
 	Why     string `json:"why"`
 	Actor   string `json:"actor"`
+	List    bool   `json:"list" says:"print what is sanctioned, and claim nothing"`
 }
 
 // pullArgs is what se_pull takes: the payload the engine reads, and the two
@@ -296,6 +326,40 @@ func mintWork(r roots, a workArgs) string {
 	if a.On != "" {
 		return engineCall(r, []string{"work", "--on", a.On, "--by", orMain(a.Actor)}, nil)
 	}
+	// AND ENDING ONE GOES THROUGH IT TOO, for the same reason.
+	if a.Abort != "" {
+		return engineCall(r, abortArgv(a), nil)
+	}
+	return engineCall(r, workArgv(a), nil)
+}
+
+// abortArgv is the verb call se_work makes to end a token.
+//
+// IT IS ITS OWN FUNCTION SO A TEST CAN READ THE CALL, the way workArgv is. A
+// door that offers a field the call behind it drops is the half with no output,
+// and successors is the field where that costs the record: an abort that
+// silently dropped them would write became with nothing to follow.
+func abortArgv(a workArgs) []string {
+	argv := []string{"work", "--abort", a.Abort, "--by", orMain(a.Actor)}
+	for _, pair := range [][2]string{{"--why", a.Why}, {"--disposition", a.Disposition}} {
+		if pair[1] != "" {
+			argv = append(argv, pair[0], pair[1])
+		}
+	}
+	if said := saidOnly(a.Successors); len(said) > 0 {
+		argv = append(argv, "--successors", strings.Join(said, ","))
+	}
+	return argv
+}
+
+// workArgv is the verb call se_work makes.
+//
+// IT IS ITS OWN FUNCTION SO A TEST CAN READ THE CALL, the shape claimArgv has
+// and for the same reason. A door that offers a field while the call behind it
+// drops it is the half with no output of its own, and needs_human is the field
+// where that costs a person: the refusal over a box full of notes singles it
+// out as the answer for a note nobody here can decide.
+func workArgv(a workArgs) []string {
 	// EVERY FLAG HERE IS ONE se work DEFINES.
 	//
 	// MEASURED, AND IT MEANT NOTHING COULD MINT THROUGH THIS DOOR. It sent
@@ -323,13 +387,20 @@ func mintWork(r roots, a workArgs) string {
 	if a.Tracked != nil {
 		argv = append(argv, "--tracked", strconv.FormatBool(*a.Tracked))
 	}
+	// THE FLAG A HELD AGENT IS TOLD TO SET. The refusal over a box full of notes
+	// names needs_human as the answer for a note nobody here can decide, and
+	// this door carried no way to say it, so the one answer it singled out was
+	// the one an agent under it could not give.
+	if a.NeedsHuman {
+		argv = append(argv, "--needs-human")
+	}
 	if said := saidOnly(a.DependsOn); len(said) > 0 {
 		argv = append(argv, "--depends-on", strings.Join(said, ","))
 	}
 	for _, says := range saidOnly(a.DoneWhen) {
 		argv = append(argv, "--done-when", says)
 	}
-	return engineCall(r, argv, nil)
+	return argv
 }
 
 // testTheDelta hands the engine a token's delta and a proposal, as the verb.
@@ -340,6 +411,9 @@ func testTheDelta(r roots, a testArgs) string {
 	}
 	for _, p := range saidOnly(a.Propose) {
 		argv = append(argv, "--propose", p)
+	}
+	if a.Actor != "" {
+		argv = append(argv, "--by", a.Actor)
 	}
 	if a.Plan {
 		argv = append(argv, "--plan")
@@ -354,6 +428,24 @@ func findInTree(r roots, a findArgs) string {
 	}
 	if a.Limit < 0 {
 		a.Limit = 0
+	}
+	// THE ARCHIVE IS NOT IN THE INDEX, so that search is the verb's and not the
+	// model's. The flags are the verb's own, which mcp-tools.mjs drives.
+	if a.Archive {
+		argv := []string{"find", "--archive"}
+		if a.Words != "" {
+			argv = append(argv, "--words", a.Words)
+		}
+		if a.Regex != "" {
+			argv = append(argv, "--regex", a.Regex)
+		}
+		if a.Path != "" {
+			argv = append(argv, "--path", a.Path)
+		}
+		if a.Limit > 0 {
+			argv = append(argv, "--limit", strconv.Itoa(a.Limit))
+		}
+		return engineCall(r, argv, nil)
 	}
 	raw, err := askModel(r, "find", a)
 	if err != nil {
@@ -387,7 +479,7 @@ func askIndex(r roots, a askArgs) string {
 }
 
 func stopClaim(r roots, a stopArgs) string {
-	if a.Because == "" {
+	if a.List || a.Because == "" {
 		return engineCall(r, []string{"stop", "--list"}, nil)
 	}
 	return engineCall(r, []string{"stop", "--actor", orMain(a.Actor),
@@ -417,6 +509,9 @@ type verbCall struct {
 	Verb  string   `json:"verb"`
 	Args  []string `json:"args"`
 	Stdin string   `json:"stdin"`
+	// Door names this client, so the engine can answer a lane and a shell
+	// differently where the two want different answers.
+	Door string `json:"door"`
 }
 
 // engineCall runs a subcommand with an optional payload on standard input. A
@@ -432,7 +527,7 @@ func engineCall(r roots, args []string, stdin []byte) string {
 	// wrote. Nothing is started for a call. With no engine over the folder
 	// the answer says so, and how to start one.
 	raw, err := askModelWithin(r, "verb",
-		verbCall{Verb: args[0], Args: args[1:], Stdin: string(stdin)}, 6*time.Minute)
+		verbCall{Verb: args[0], Args: args[1:], Stdin: string(stdin), Door: "lane"}, 6*time.Minute)
 	if err != nil {
 		return fail(err.Error())
 	}
@@ -511,19 +606,40 @@ func runCommand(r roots, a runArgs) string {
 // claimWork is se claim through the lane. Every flag here is one the verb
 // defines, which is what mcp-tools.mjs drives against the real engine.
 func claimWork(r roots, a claimArgs) string {
-	argv := []string{"claim", "--actor", orMain(a.Actor)}
+	argv, refusal := claimArgv(a)
+	if refusal != "" {
+		return refusal
+	}
+	return engineCall(r, argv, nil)
+}
+
+// claimArgv is the verb call se_claim makes, or the sentence that refuses it
+// before the engine is asked.
+//
+// IT IS ITS OWN FUNCTION SO A TEST CAN READ THE CALL. The flags here are the
+// verb's, and the one an agent is sent to by a refusal is take: the engine
+// refuses an unclaimed tracked token with "se claim --these <id> --take", and a
+// lane that cannot spell that sends the reader to a door it does not have.
+func claimArgv(a claimArgs) (argv []string, refusal string) {
+	argv = []string{"claim", "--actor", orMain(a.Actor)}
+	if a.Sync {
+		argv = append(argv, "--sync")
+	}
+	if a.NoPublish {
+		argv = append(argv, "--no-publish")
+	}
 	if a.Whoami {
-		return engineCall(r, append(argv, "--whoami"), nil)
+		return append(argv, "--whoami"), ""
 	}
 	if a.List {
-		return engineCall(r, append(argv, "--list"), nil)
+		return append(argv, "--list"), ""
 	}
 	ids := saidOnly(a.These)
 	if len(ids) > 0 {
 		argv = append(argv, "--these", strings.Join(ids, ","))
 	}
 	if a.Release {
-		return engineCall(r, append(argv, "--release"), nil)
+		return append(argv, "--release"), ""
 	}
 	if a.Next > 0 {
 		argv = append(argv, "--next", strconv.Itoa(a.Next))
@@ -532,9 +648,15 @@ func claimWork(r roots, a claimArgs) string {
 		}
 	}
 	if len(ids) == 0 && a.Next <= 0 {
-		return "Say what to claim: these, or next."
+		return nil, "Say what to claim: these, or next."
 	}
-	return engineCall(r, argv, nil)
+	// TAKE RIDES WITH THESE. The verb takes one token up at a time and says so
+	// itself when more are named, so the flag is passed on rather than judged
+	// here, and one place decides what take means.
+	if a.Take && len(ids) > 0 {
+		argv = append(argv, "--take")
+	}
+	return argv, ""
 }
 
 // showStatus is se_status through the lane. It takes no arguments and says so

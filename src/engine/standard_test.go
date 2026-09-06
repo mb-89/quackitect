@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 	"time"
@@ -14,35 +15,6 @@ import (
 // and nothing blocks. These tests drive the process file the product ships,
 // copied into a tree of their own, so a change to the file is a change to
 // what these hold.
-
-// aTreeWithTheProcesses is a tree carrying the shipped processes and schemas.
-func aTreeWithTheProcesses(t *testing.T) Roots {
-	t.Helper()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
-	withHistory(t, root)
-	for _, dir := range []string{"processes", "schemas"} {
-		from := filepath.Join("..", "..", "src", dir)
-		to := filepath.Join(root, "src", dir)
-		if err := os.MkdirAll(to, 0o755); err != nil {
-			t.Fatal(err)
-		}
-		entries, err := os.ReadDir(from)
-		if err != nil {
-			t.Fatal(err)
-		}
-		for _, e := range entries {
-			b, err := os.ReadFile(filepath.Join(from, e.Name()))
-			if err != nil {
-				t.Fatal(err)
-			}
-			if err := os.WriteFile(filepath.Join(to, e.Name()), b, 0o644); err != nil {
-				t.Fatal(err)
-			}
-		}
-	}
-	return r
-}
 
 // mintStandard hands back a tracked token this box may work, claim and all.
 //
@@ -102,7 +74,12 @@ func ticked(t *testing.T, r Roots, id string) Token {
 		}
 		rows := "| done | criterion | evidence | receipt |\n|---|---|---|---|\n"
 		for _, c := range step.Criteria {
-			rows += "| [x] | " + c.Says + " | seen: " + c.Says + " |  |\n"
+			// THE EVIDENCE IS A WORD, NOT THE CRITERION AGAIN. A section is
+			// measured in words, and repeating each criterion doubled the
+			// table: a process that gained a criterion pushed every fixture
+			// past the cap, and five tests failed about a limit none of them
+			// is about. The gate reads whether the cell says anything.
+			rows += "| [x] | " + c.Says + " | seen |  |\n"
 		}
 		tok.Submission["step "+itoa(i+1)+". "+step.Name] = rows
 	}
@@ -206,6 +183,13 @@ func TestTheWorkStepDoesNotEndTheToken(t *testing.T) {
 
 	// AND IT IS OPEN TO ITS REVIEWER: nameable, which is what se run and se
 	// apply ask for, and rulable, which is the step the process says is left.
+	//
+	// THE REVIEWER CLAIMS IT FIRST, the way any actor takes a travelling token.
+	// It used to be nameable without one, by riding the worker's claim, which
+	// still stood because a submission released the hold and not the claim.
+	if _, err := Claim(r, Claimant(r, "reviewer-1"), []string{tok.ID}, time.Now().UTC()); err != nil {
+		t.Fatalf("the reviewer claiming the token it is reviewing: %v", err)
+	}
 	if _, err := TakeUp(r, tok.ID, "reviewer-1"); err != nil {
 		t.Fatalf("a reviewer could not name the token it is reviewing: %v", err)
 	}
@@ -257,14 +241,15 @@ func TestAnEndingIsRefusedOnAStepThatDoesNotEnd(t *testing.T) {
 func TestTheQueueIsStaffed(t *testing.T) {
 	t.Parallel()
 	r := aTreeWithTheProcesses(t)
-	log, err := OpenLog(r.Private("log"))
+	noEngineHere(t, r)
+	log, err := sessionlog.Open(r.Private("log"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer log.Close()
 	// THE RUN IS NAMED BY THE FIRST LINE OF ITS LOG, which the engine writes
 	// at start. A mint writing first would name it current, which is no name.
-	record(log, "engine", "start", "engine", "engine started", Yes(), nil)
+	record(log, "engine", "start", "engine", "engine started", sessionlog.Yes(), nil)
 	// THE NUMBER IS THIS TEST'S, AND THE TREE SAYS IT.
 	//
 	// It was set on a Config value the assertions below never reach: the hook
@@ -298,7 +283,7 @@ func TestTheQueueIsStaffed(t *testing.T) {
 		body, _ := json.Marshal(map[string]any{"hook_event_name": "PreToolUse", "cwd": r.Work, "session_id": "s-1",
 			"tool_name": tool, "tool_input": map[string]any{"query": "x"}})
 		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 		return out.String()
 	}
 	// BASH, BECAUSE WHAT IS HELD IS THE WORK. A read is not held any more: the
@@ -337,7 +322,7 @@ func TestTheQueueIsStaffed(t *testing.T) {
 			"agent_id": id, "agent_type": "general-purpose", "tool_name": "mcp__quackitect__se_pull",
 			"tool_input": map[string]any{"actor": actor, "role": "worker"}})
 		var out bytes.Buffer
-		answerHook(body, []string{"--method", r.Method}, &out, log)
+		answerHook(t.Context(), body, []string{"--method", r.Method}, &out, log)
 		Pull(r, actor, RoleWorker, Payload{})
 	}
 	tellHelper("a1", "worker-a")

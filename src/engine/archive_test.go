@@ -29,18 +29,6 @@ func withHistory(t *testing.T, root string) {
 	}
 }
 
-// aTreeWithHistory is a work tree git will write into.
-func aTreeWithHistory(t *testing.T) Roots {
-	t.Helper()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
-	for _, name := range []string{"note", "standard", "trivial"} {
-		writeProcess(t, root, name)
-	}
-	withHistory(t, root)
-	return r
-}
-
 // A CLOSED TOKEN COMES OFF THE DISK, AND THE FOLDER SAYS WHERE IT GOES.
 //
 // A token is the work rather than the record of it. Kept after it closes it is
@@ -82,7 +70,7 @@ func TestAClosedTokenComesOffTheDisk(t *testing.T) {
 		t.Error("the local token was removed at the close, so a retro can never read it")
 	}
 
-	// THE TRACKED ONE IS READABLE FROM ITS TAG.
+	// THE TRACKED ONE IS READABLE FROM THE OBJECT THE LIST NAMES.
 	said, err := ReadArchived(r, tracked.ID)
 	if err != nil {
 		t.Fatalf("reading %s back: %v", tracked.ID, err)
@@ -109,8 +97,13 @@ func TestAClosedTokenComesOffTheDisk(t *testing.T) {
 		rows[0].Disposition != "done" || rows[0].Process != "standard" {
 		t.Errorf("the row does not say what it should: %+v", rows[0])
 	}
-	if rows[0].Tag != archiveRefs+tracked.ID {
-		t.Errorf("the row names tag %q", rows[0].Tag)
+	// AND IT NAMES A BLOB AND NO REF. A ref has to be pushed to leave the box,
+	// and the namespace a cloud box would push it to is refused.
+	if rows[0].Blob == "" {
+		t.Errorf("the row names no blob, so nothing on the branch points at the content: %+v", rows[0])
+	}
+	if rows[0].Tag != "" {
+		t.Errorf("the row names tag %q, and nothing writes one now", rows[0].Tag)
 	}
 }
 
@@ -145,9 +138,25 @@ func TestTheArchiveAnswersASearch(t *testing.T) {
 	if got.Count != 1 || len(got.Hits) != 1 {
 		t.Fatalf("the archive answered %d hits for a word in a token it holds", got.Count)
 	}
-	// THE HIT NAMES THE TAG, so a reader can open what answered.
-	if got.Hits[0].Path != archiveRefs+tok.ID {
-		t.Errorf("the hit names %q rather than the tag it came from", got.Hits[0].Path)
+	// THE HIT NAMES THE OBJECT, so a reader can open what answered.
+	rows, err := TheArchive(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rows) != 1 {
+		t.Fatalf("the archive holds %d rows and one token was closed", len(rows))
+	}
+	// THE PREDICTION ASKS THE READER, and it used to state the precedence over
+	// again. A row may name a blob, a copy on the branch and a tag, and which one
+	// answers is what readArchived worked out by trying them. A second statement
+	// of that order can disagree with it, and then the test passes on a
+	// prediction that is wrong.
+	_, at, err := readArchived(r, rows[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Hits[0].Path != at {
+		t.Errorf("the hit names %q and the object that answered is %q", got.Hits[0].Path, at)
 	}
 	if !strings.Contains(got.Hits[0].Text, "gooseberry") {
 		t.Errorf("the hit carries %q", got.Hits[0].Text)
@@ -191,7 +200,7 @@ func TestTheArchiveWillNotTakeAPathItCannotRead(t *testing.T) {
 	// answering it is the defect rather than an empty archive.
 	find := func(args ...string) (string, int) {
 		var out, errs bytes.Buffer
-		code := run["find"](&call{roots: r, args: args,
+		code := run["find"](&call{ctx: t.Context(), roots: r, args: args,
 			in: strings.NewReader(""), out: &out, err: &errs})
 		return out.String() + errs.String(), code
 	}
@@ -215,12 +224,14 @@ func TestTheArchiveWillNotTakeAPathItCannotRead(t *testing.T) {
 	}
 }
 
-// THE LIST IS A RENDERING AND NEVER A SOURCE.
+// THE LIST IS THE ARCHIVE, AND WRITING IT AGAIN CHANGES NOTHING.
 //
-// Level 2 ruled against an index kept in step with the thing it indexes,
-// naming a file that drifts as what breaks. A list that rebuilds from the tags
-// byte for byte is not one, and this is what says so.
-func TestTheArchiveListRebuildsFromTheTags(t *testing.T) {
+// It was a rendering of the tags, and the tags were the archive. A tag cannot
+// be pushed from a cloud box, so an archive kept in one was an archive one
+// machine held. The list travels, so the list is the record, and what has to
+// hold instead is that writing it out again is a no-op: a record that rewrites
+// itself differently every time is a record that drifts.
+func TestTheArchiveListIsWrittenTheSameTwice(t *testing.T) {
 	t.Parallel()
 	r := aTreeWithHistory(t)
 	for _, title := range []string{"the first to close", "the second to close"} {
@@ -243,18 +254,15 @@ func TestTheArchiveListRebuildsFromTheTags(t *testing.T) {
 		t.Fatalf("the list holds %d lines, want one per closed token", n)
 	}
 
-	if err := os.Remove(path); err != nil {
-		t.Fatal(err)
-	}
 	if err := WriteArchiveList(r); err != nil {
 		t.Fatal(err)
 	}
 	now, err := os.ReadFile(path)
 	if err != nil {
-		t.Fatalf("it did not come back: %v", err)
+		t.Fatalf("it did not survive being written again: %v", err)
 	}
 	if string(now) != string(was) {
-		t.Fatalf("it came back different:\nwas %q\nnow %q", was, now)
+		t.Fatalf("it was written differently the second time:\nwas %q\nnow %q", was, now)
 	}
 }
 
@@ -264,8 +272,8 @@ func TestTheArchiveListRebuildsFromTheTags(t *testing.T) {
 // a tracked token there would lose it with nowhere to read it back from.
 func TestATreeWithNoHistoryKeepsItsTokens(t *testing.T) {
 	t.Parallel()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
+	r := aTree(t).Roots
+	root := r.Work
 	writeProcess(t, root, "standard")
 	tok, err := Mint(r, Token{Process: "standard", Title: "nowhere to keep it",
 		Status: "first", Tracked: tracked()})

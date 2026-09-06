@@ -184,8 +184,9 @@ const want = [
   // red depends on the data it reads goes quiet as the data changes.
   // What this page can decide is the mapping below, which holds for any
   // count.
-  // And it pins by its name alone, because the file already holds its filter.
-  ["a declared group pins by its name", /class="pin" data-pin="noted" title=/],
+  // THAT IT PINS BY ITS NAME ALONE IS ASKED OF A FIXTURE, further down, for the
+  // same reason: an unpinned declared group is drawn only while it holds a row,
+  // so naming one here asks the data and not the renderer.
 
   // The table is three parts and they hide together for the raw query.
   ["the raw query hides the whole table", (h) => {
@@ -210,7 +211,6 @@ const want = [
   ["the counter never shrinks or is cut off", /\.bd \{[^}]*flex: 0 0 auto/],
   ["the split button keeps its size too", /\.bar \.second \{[^}]*flex: 0 0 auto/],
   ["and the tabs are what give way", /\.bar \.tab \{[^}]*min-width: 0/],
-  ["an editable cell", /class="edits"[^>]*data-was=/],
   // THE TEXT IS THE DOOR, AND ONLY THE TEXT. A cell that was a door edge to
   // edge left no way to tick a row.
   // The indent and the fold sit between the cell and the words, so the pattern
@@ -225,7 +225,9 @@ const want = [
   ["a button to group them", /class="bs-tool bs-make-bucket" hidden/],
   ["a button to rename it", /class="bs-tool bs-rename" hidden/],
   ["a field to type the name in", /class="bs-rename-field" type="text" hidden/],
-  ["a locked cell says why", /class="locked"[^>]*title="a pull moves this/],
+  // THE WORDS ARE THE ENGINE'S, off the pane answer, so the check asks for a
+  // reason and not for a sentence this file would have to keep in step.
+  ["a locked cell says why", /class="locked"[^>]*title="[^"]+"/],
   // THE RULE, NOT A COLUMN NAME. This named assignee, so it went red the day
   // the owner ticked a fourth property and assignee stopped being last. What
   // it means is that whichever column is last carries no width, so the table
@@ -390,6 +392,83 @@ if (empties.groups) {
     console.log((held ? "ok  " : "FAIL") + "  editor: " + says);
   }
 }
+// A DECLARED GROUP PINS BY ITS NAME ALONE, and a fixture is what can ask it.
+//
+// THE FILE ALREADY HOLDS THE FILTER, so the pin is a name and carries none.
+// That is the mapping, and it holds whatever is in the tree today.
+//
+// IT WAS HELD AGAINST THE LIVE PAGE as data-pin="noted", which stood only while
+// some open token carried that status. An unpinned declared group draws only
+// when it has rows, so the day the last noted token closed the check went red
+// with nothing wrong and no way to make it green but mint a token. That is the
+// hazard named above this check's neighbour, met from the other side: a check
+// whose colour depends on the data it reads goes quiet as the data changes, and
+// this one went loud.
+//
+// AND IT ASKS FOR THE ABSENCE TOO. A declared pin that also carried a filter
+// would match the old pattern and be wrong, because unpinning it would then
+// take the group away rather than move it.
+if (empties.groups) {
+  const declared = JSON.parse(JSON.stringify(empties));
+  declared.pinned = [];
+  declared.groups = [{ name: "noted", declared: true, depth: 0, count: 1, lines: [] }];
+  const page = editorHtml([{ side: "left", table: declared }], views, "work");
+  const ok = /class="pin" data-pin="noted" title=/.test(page) &&
+    !/data-pin="noted"[^>]*data-matching=/.test(page);
+  if (!ok) bad++;
+  console.log((ok ? "ok  " : "FAIL") + "  editor: a declared group pins by its name");
+}
+// AN EDITABLE CELL IS DRAWN WHERE THE ANSWER LOCKS NOTHING. The live work view
+// orders title, status, process and holder, and the engine locks the three
+// that are not the door, so the live page carries no editable cell and a check
+// reading it went quiet the day the ruling moved into the engine. The fixture
+// is the live pane with its locks taken off, so the question is put to the
+// renderer and not to the data.
+if (empties.groups) {
+  const unlocked = JSON.parse(JSON.stringify(empties));
+  delete unlocked.locked;
+  const page = editorHtml([{ side: "left", table: unlocked }], views, "work");
+  const held = /class="edits"[^>]*data-was=/.test(page);
+  if (!held) bad++;
+  console.log((held ? "ok  " : "FAIL") + "  editor: an editable cell where the answer locks nothing");
+}
+// A LOCKED CELL SAYS WHY TO A PERSON, NOT TO A CALLER.
+//
+// refusedByHand ends in a default written for whoever calls WriteFieldBy, and
+// three columns a person can put in a view fell through to it, so hovering a
+// locked cell read: this program does not write "subs". The line above asking
+// that a locked cell says why was loosened in the same commit, from naming a
+// sentence to accepting any non-empty title, so nothing was left asking what
+// the words said.
+//
+// THE LIVE VIEW DRAWS NONE OF THOSE COLUMNS, so the question is put to the
+// engine over a view of this check's own. The reasons are the engine's and the
+// page is the real one, so a column a person adds to their view tomorrow is
+// answered the same way.
+{
+  const asked = ["seq", "type", "subs"];
+  const base = join(out, "locked.base");
+  writeFileSync(base,
+    "properties:\n  title:\n    opensNote: true\n"
+    + "filters:\n  and:\n    - kind == \"work-token\"\n"
+    + "views:\n  - type: table\n    name: left\n    order:\n      - title\n"
+    + asked.map((c) => "      - " + c + "\n").join(""));
+  const table = ask("query", "--view", base, "--pane", "left");
+  const locked = table.locked ?? {};
+  say2("the engine locks the columns this asks about (" + asked.join(", ") + ")",
+    asked.every((c) => (locked[c] ?? "") !== ""),
+    "it locks " + JSON.stringify(locked) + ", so this has no locked cell to read");
+  const drawn = editorHtml([{ side: "left", table }], views, "work");
+  const reasons = [...drawn.matchAll(/class="locked"[^>]*title="([^"]*)"/g)].map((m) => m[1]);
+  const forACaller = reasons.find((t) => /does not write/.test(t));
+  say2("a locked cell says why to a person (" + reasons.length + " locked)",
+    reasons.length > 0 && forACaller === undefined,
+    reasons.length === 0
+      ? "the page drew no locked cell, so this would pass by having nothing to read"
+      : "one of them reads " + JSON.stringify(forACaller)
+        + ", which is the sentence written for whoever calls WriteFieldBy");
+}
+
 // ONE STYLESHEET FOR A CONTROL, AND THIS IS THE ONLY CHECK THAT CAN SEE IT.
 //
 // The sidebar and the editor each carried their own rules for a button, a text

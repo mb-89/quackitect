@@ -64,6 +64,17 @@ frontmatter:
     # field on the token, so a take-up that was never put down left a name in a
     # file nothing reopened, and the queue answered investigate on a hold whose
     # owner had not existed for hours.
+
+    # A CLAIM IS NOT A HOLD, and neither is a field here. A hold belongs to an
+    # agent and dies with its session. A claim belongs to a box and travels on
+    # the branch, which is why se claim writes claimed_by and claimed_at onto
+    # the token rather than under .se.
+    #
+    # THEY ARE NOT DECLARED, THEY ARE EXEMPT. A declared property is what an
+    # author writes, and it reaches completion and the field descriptions as
+    # though somebody were meant to fill it in. Nobody fills these in. See
+    # theEnginesOwnFields in src/engine/schema.go, and wk-4e643716ec.
+
     author:
       description: who did the work step, so the verdict is never theirs
 
@@ -72,6 +83,13 @@ frontmatter:
     # needed is, and it is the one thing that has to reach a screen.
     needs_human:
       description: true when this waits for a person rather than an agent
+
+    # WHAT COMES FIRST, SAID BY THE PERSON WATCHING THE QUEUE. The pull hands
+    # an urgent token out before anything else workable, and nothing clears it:
+    # a put-down leaves it set, and a person takes it off. It is a flag rather
+    # than a rank, so nobody keeps a set of numbers apart.
+    urgent:
+      description: true when this goes out before everything else workable
 
     depends_on:
       type: array
@@ -123,6 +141,40 @@ body:
       tense: present
       maxWords: 250
       description: what is asked, or what is wrong, and why it matters
+
+    # THE FUNNEL SECTIONS. An idea is held before anybody commits to it, so it
+    # carries what a work token never has to: why it would be worth doing, what
+    # it costs to skip, and how much we would be willing to spend. Only the
+    # funnel process names these, so no other token grows by a word.
+    - header: what we gain
+      tense: present
+      maxWords: 200
+      description: what the system gains by doing it, written so a reader can disagree
+
+    - header: what breaks without it
+      tense: present
+      maxWords: 150
+      description: what stays broken or unbuilt if this is never done
+
+    - header: appetite
+      tense: present
+      maxWords: 100
+      description: how much we would be willing to spend, which bounds the solution rather than predicting it
+
+    - header: not this
+      tense: present
+      maxWords: 100
+      description: what is left out on purpose, so the idea does not grow while it waits
+
+    - header: what we do not know
+      tense: present
+      maxWords: 250
+      description: the open questions and the places a reader could sink, so the idea can be taken up cold
+
+    - header: prior art
+      tense: present
+      maxWords: 250
+      description: what was read and where the thinking came from, with links a later reader can follow
 
     - header: proposed action
       tense: present

@@ -3,6 +3,11 @@
 _to_delete/
 node_modules/
 *.jsonl
+# EXCEPT THE ARCHIVE, WHICH IS THE ONE JSONL THAT HAS TO TRAVEL. A closed
+# tracked token comes off the disk and this list is what names the git objects
+# holding it. Ignored, it stayed on one machine, so the archive stayed on one
+# machine with it and every other box read a tree where the work had never been.
+!doc/work/archive.jsonl
 
 # built programs belong in .bin/, never next to their source
 src/engine/engine

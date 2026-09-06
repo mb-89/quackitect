@@ -18,7 +18,12 @@ import { join } from "node:path";
 const upBudget = 60000;
 
 export function liveEngine(root, work) {
-  const engine = join(root, ".bin", process.platform === "win32" ? "se.exe" : "se");
+  // THE ENGINE IS THE ONE HANDED IN, when one is. se test hands a check the
+  // engine the Go tests get in SE_ENGINE, built fresh from the tree when the
+  // one in .bin is older than its source, so a check over a folder of its own
+  // drives the source it was written against and answers the same before and
+  // after a swap. Run by hand, with nothing handed in, it is .bin/se as before.
+  const engine = process.env.SE_ENGINE || join(root, ".bin", process.platform === "win32" ? "se.exe" : "se");
   // What the engine says goes to a file beside its record, so a start that
   // fails can be read rather than guessed at.
   mkdirSync(join(work, ".se"), { recursive: true });

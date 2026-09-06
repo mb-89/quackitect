@@ -9,12 +9,18 @@ guidance: [[work-token]]
 title: the editor shows claims
 # where the token stands. The process owns these values.
 status: open
+claimed_by: aeaf7bd9/worker-alvar
+claimed_at: "2026-09-06T10:09:13Z"
+# what has to be true before this is worth reading again
+ready_when: "ready when se test can tell this token's change from the tree around it. Measured in September 2026. The plan for this token answered that nothing in the record says what it wrote, so the delta is the whole diff. That diff is two hundred and eighty-six files from other hands, and the Go package among them does not build in this clone. The step asks for se test on this token to answer ok, and here it cannot."
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 461d9ebec3590357b66451a89aa762c805851da6
+  - b76eb2e23751a30cdb5c2c9697806b5dca125a7e
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
   - 37de5ac7a6e2cf784c6aca0c261575fa86e5a0e8
+  - 56abcd3b89d3536204d6f8e2d2f5ddbb5d453b55
 ---
 
 ## detail
@@ -44,6 +50,8 @@ Give the view a claim column, and let the heading-line filter narrow on it.
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
+| [ ] | what is gained by doing it, and not only what it does |  |  |
+| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
 | [ ] | the approach is on the token before any work, as an interface or a shape a reader can disagree with |  |  |
 | [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
 | [ ] | the change is small enough to review whole, or it is split first | — |  |
@@ -80,6 +88,8 @@ claimed_by joins the columns the view already answers, beside title, status, pro
 The panel draws it the way it draws the others, from what the view answers rather than from a list of its own.
 
 A claim from another box is drawn as that box. Blank means unclaimed, and those are two different facts that must not look the same.
+
+SO THE CELL IS NOT THE TOKEN'S OWN FIELD. A claim made elsewhere reaches this box through git and sits in the sync's store, with nothing on the note. The row in src/engine/query.go asks ClaimedNow, the way it already asks Blocked, or every far claim draws blank.
 
 The filter narrows on it through whatever reads the filter, which is wk-aae03d4767 and is not decided here.
 
