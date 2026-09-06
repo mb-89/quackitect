@@ -416,10 +416,19 @@ start "go test setup" go test -C util/setup -count=1 ./...
 # prints the files it would change and exits zero either way, so the check is
 # that it printed nothing.
 start "gofmt" gofmt_clean src/engine src/mcp src/viewer util/setup util/checks/trycmd
-start "go vet" go vet -C src/engine ./...
-start "go vet mcp" go vet -C src/mcp ./...
-start "go vet viewer" go vet -C src/viewer ./...
-start "go vet setup" go vet -C util/setup ./...
+# AND go vet IS NOT RUN HERE, BECAUSE se lint RUNS IT.
+#
+# The Go tools went behind the verb and these lines stayed where they were, so
+# go vet ran over four modules and then se lint ran it over every module
+# carrying a go.mod, with golangci-lint reading them again and govet among its
+# own default rules. Nothing was learned on the second pass, and the battery is
+# a wall agents wait behind.
+#
+# gofmt STAYS, AND THAT IS MEASURED. se lint runs go vet and golangci-lint, and
+# neither formats. golangci-lint enables errcheck, govet, ineffassign,
+# staticcheck and unused by default, with no formatter among them. So gofmt
+# runs once here and nowhere else, and taking this line out would lose the only
+# formatting guard rather than stop a second pass.
 start "se lint" .bin/se.exe lint
 # A CHECK THAT IS NOT THERE IS A FAILURE, NOT A SKIP.
 #

@@ -195,7 +195,14 @@ func runLint(c *call) int {
 	// when the battery ran and at no other time.
 	inGo, refused := LintGo(c.ctx, roots)
 	found = append(found, inGo...)
-	c.answerJSON(map[string]any{"findings": found, "clean": len(found) == 0, "refused": refused})
+	// CLEAN IS NOT THE SAME AS NOTHING FOUND. A box where golangci-lint will
+	// not start finds nothing through it, and clean read as findings alone
+	// answered that the tree was fine while half the tools never ran. Only the
+	// refused list said otherwise, and a caller that reads clean does not read
+	// it. A tree judged by some of its tools is not a tree that came back
+	// clean.
+	c.answerJSON(map[string]any{"findings": found,
+		"clean": len(found) == 0 && len(refused) == 0, "refused": refused})
 	if len(found) > 0 {
 		return 1
 	}
