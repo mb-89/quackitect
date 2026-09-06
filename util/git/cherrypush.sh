@@ -5,12 +5,15 @@
 # rebasing the branch replays their unpushed work too and conflicts on it. One
 # cherry-pick carries only the commit named.
 #
-# IT LIVES WHERE GIT CARRIES IT. Rule 12 of behaviour tells every agent to push
-# through this door, and the door sat in .se/scratchpad, which the root
-# gitignore holds and no commit reaches. An agent on a fresh clone read a rule
-# that travels and looked for a script that does not.
+# IT LIVES IN THE METHOD, WHICH GIT CARRIES. Rule 12 of behaviour tells every
+# agent to push through this door, and the door sat in .se/scratchpad, which
+# the root gitignore holds and no commit reaches.
 #
-#   util/checks/cherrypush.sh <commit>
+# AND IT DOES NOT LIVE IN util/checks. The engine's test guard reads a path
+# under that folder in an interpreter's arguments as a check about to run, so
+# the door landed there and was refused the moment anyone opened it.
+#
+#   sh util/git/cherrypush.sh <commit>
 commit="$1"
 cd "$(git rev-parse --show-toplevel)" || exit 1
 # THE PROXY MOVES WHEN THE CONTAINER RESTARTS, so a box that keeps a helper for

@@ -7,10 +7,10 @@
 # chapter in the file twice. Copying the file and committing at the tip carries
 # what I wrote and nothing else.
 #
-# IT LIVES WHERE GIT CARRIES IT, beside cherrypush.sh, for the reason written
-# in that file.
+# IT LIVES BESIDE cherrypush.sh, out of .se and out of util/checks, for the two
+# reasons written in that file.
 #
-#   util/checks/land.sh "<commit message>" <path> [<path> ...]
+#   sh util/git/land.sh "<commit message>" <path> [<path> ...]
 # A path this tree no longer holds is removed there.
 msg="$1"; shift
 cd "$(git rev-parse --show-toplevel)" || exit 1
