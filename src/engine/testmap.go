@@ -373,28 +373,47 @@ func buildEnv() []string {
 // uses the one it is handed, and a per-test run costs the test and not a
 // link. Which one that is, suiteEngine decides: the resident engine while it
 // is newer than the tree, and one built from the tree otherwise.
-func runOneGoTest(r Roots, bin, engine string, t aTest) (ok bool, said string, took time.Duration, regions []region, err error) {
-	// IT ENDS .tmp SO THE SWEEP KNOWS IT. The remove below is deferred, and a
-	// run that is killed left a zero-byte profile in .se/tests for ever.
-	profile, err := os.CreateTemp(r.Private("tests"), "profile.*.out.tmp")
-	if err != nil {
-		return false, "", 0, nil, err
+// THE MAP IS BUILT WHEN THE ANSWER DEPENDS ON IT, and never otherwise.
+//
+// The owner's rule. The map exists to select tests, so the question decides
+// whether it is needed. An agent naming one test made the selection itself, so
+// no profile is written, nothing parses one, and no map row is rewritten. An
+// agent asking what its change reaches is asking the map, and there it is
+// built, free, as the test runs.
+//
+// It was written on every run. A test already mapped at its own hash still
+// wrote a profile, had it parsed, and had its regions deleted and rewritten in
+// a transaction on an index one writer at a time, for a map that did not
+// change. That transaction is what met the lock.
+func runOneGoTest(r Roots, bin, engine string, t aTest, wantMap bool) (ok bool, said string, took time.Duration, regions []region, err error) {
+	name := ""
+	if wantMap {
+		// IT ENDS .tmp SO THE SWEEP KNOWS IT. The remove below is deferred, and
+		// a run that is killed left a zero-byte profile in .se/tests for ever.
+		profile, err := os.CreateTemp(r.Private("tests"), "profile.*.out.tmp")
+		if err != nil {
+			return false, "", 0, nil, err
+		}
+		profile.Close()
+		name = profile.Name()
+		defer os.Remove(name)
 	}
-	profile.Close()
-	defer os.Remove(profile.Name())
 	dir := filepath.Join(r.Work, filepath.FromSlash(filepath.Dir(t.Path)))
 	env := buildEnv()
 	if engine != "" {
 		env = append(env, "SE_ENGINE="+engine)
 	}
 	start := time.Now()
-	out, runErr := theToolchain.runOne(bin, dir, t.Name, profile.Name(), env)
+	out, runErr := theToolchain.runOne(bin, dir, t.Name, name, env)
 	took = time.Since(start)
 	said = string(out)
 	ok = runErr == nil
+	if !wantMap {
+		return ok, said, took, nil, nil
+	}
 	module, moduleRoot := moduleOf(dir)
 	rootRel, _ := filepath.Rel(r.Work, moduleRoot)
-	regions, perr := regionsFromProfile(profile.Name(), module, filepath.ToSlash(rootRel))
+	regions, perr := regionsFromProfile(name, module, filepath.ToSlash(rootRel))
 	if perr != nil {
 		return ok, said, took, nil, perr
 	}
@@ -575,7 +594,8 @@ func mapMissing(r Roots, db *sql.DB, done <-chan struct{}) (mapped, failed int, 
 			engine, _ = suiteEngine(r)
 			engineKnown = true
 		}
-		_, _, took, regions, err := runOneGoTest(r, bin, engine, t)
+		// THE MAPPER ALWAYS WANTS THE MAP. That is the whole of its job.
+		_, _, took, regions, err := runOneGoTest(r, bin, engine, t, true)
 		if err != nil {
 			failed++
 			continue
@@ -622,9 +642,14 @@ func realToolchain() toolchain {
 			cmd.Env = buildEnv()
 			return cmd.CombinedOutput()
 		},
+		// NO PROFILE, NO COVERAGE WRITTEN. A run that answers no map question
+		// asks for none, so the binary writes nothing and nothing parses it.
 		runOne: func(bin, dir, test, profile string, env []string) ([]byte, error) {
-			cmd := quiet.Quietly(exec.Command(bin, "-test.run", "^"+test+"$",
-				"-test.count", "1", "-test.coverprofile", profile))
+			args := []string{"-test.run", "^" + test + "$", "-test.count", "1"}
+			if profile != "" {
+				args = append(args, "-test.coverprofile", profile)
+			}
+			cmd := quiet.Quietly(exec.Command(bin, args...))
 			cmd.Dir = dir
 			cmd.Env = env
 			return cmd.CombinedOutput()
