@@ -1,6 +1,7 @@
 package main
 
 import (
+	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"testing"
 
