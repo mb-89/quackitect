@@ -9,6 +9,8 @@ guidance: [[work-token]]
 title: two actionables lack sections
 # where the token stands. The process owns these values.
 status: open
+claimed_by: ae61c33c/main
+claimed_at: "2026-09-06T06:55:49Z"
 ---
 
 ## detail

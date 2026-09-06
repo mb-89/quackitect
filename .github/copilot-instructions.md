@@ -59,9 +59,9 @@
 
 ### Writing one
 
-1. Write the problem in detail and the answer in proposed action, reduced to the smallest case that still shows it. *
+1. Write the problem in detail and the answer in proposed action, reduced to the smallest case that still shows it. The detail answers what is gained by doing it, and what breaks if it is never done. *
 2. Write acceptance criteria first. A criterion is decidable, names the input, the answer and what survives, and is not a plan. *
-3. Where a command decides a criterion, write the command and run it from the root before submitting. Otherwise name who looks at what. *
+3. Where a command decides a criterion, write the command and run it from the root before submitting. Otherwise name who looks at what. A criterion naming a go test names it through se test and reads unreached, because go test -run over a missing name answers ok. *
 4. Match on what the check holds at run time: a whole identifier written once into both halves, or a length as a number. *
 5. Number what the detail says the change does and put a criterion against each. Work that moves off takes its criteria with it. *
 6. A detail names the constraint, never the assignment. A criterion answering with a verb states the effect as field and value.
@@ -73,7 +73,7 @@
 ### Using one
 
 11. Do what the token asks and nothing next to it. If the ask is ambiguous, ask one question and wait. *
-12. Write each criterion's check before the work and watch that one go red. A check that will not go red is the finding. *
+12. Write each criterion's check first and watch it redden on an assertion, never on a build failure. One that cannot redden is the finding. *
 13. Put both halves of a mechanism in the evidence. Where the system mirrors halves, table them and drive the rule through each. *
 14. Report work as done only with the evidence that it is. An observation names the check and what it said. *
 15. A checklist carries institutional knowledge. Answer each line rather than ticking it. *
