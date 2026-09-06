@@ -223,6 +223,7 @@
 {"id":"wk-918812a5e6","title":"orphan test breaks build","process":"trivial","disposition":"done","blob":"e3d1c8517aaa5fdbb287d70f5a2f9ff19ede5b00","on_branch":"36bfd79ba5947a3833df98b61d2661b1e5744ebf","tag":"refs/tags/archive/wk-918812a5e6"}
 {"id":"wk-92e9b13a45","title":"the harness has tools","process":"trivial","disposition":"done","blob":"8fb7ed313c4555bc0603b18286536cef28f15cbe","on_branch":"8fb7ed313c4555bc0603b18286536cef28f15cbe","tag":"refs/tags/archive/wk-92e9b13a45"}
 {"id":"wk-935453023f","title":"loop refusal overreaches","process":"trivial","disposition":"done","blob":"84af95749be366df147de93f441fb7118162634f","on_branch":"84af95749be366df147de93f441fb7118162634f","tag":"refs/tags/archive/wk-935453023f"}
+{"id":"wk-943a5f4afa","title":"event guard reads two","process":"trivial","disposition":"done","blob":"84fba01a3e4e42172569c96a6bcb2715ef686fe4","on_branch":"84fba01a3e4e42172569c96a6bcb2715ef686fe4"}
 {"id":"wk-954d674f30","title":"cloud card section misordered","process":"trivial","disposition":"done","blob":"cf653f09cda0c967401ef41a0e3ea3c28f47ed6f","on_branch":"15afb4e0fb72152ee51e5114077136196bb97782"}
 {"id":"wk-963dbf6898","title":"shell submits without pulling","process":"standard","disposition":"done","blob":"a4f5dfe62187a2517fcfb2d628a981c4a6d8083a","on_branch":"3c98e965c999540d1bbc68bf3f5fb05560852b98"}
 {"id":"wk-9753f669de","title":"engine note repeats itself","process":"trivial","disposition":"done","blob":"601aa8ddfa3a2a00f344e57225450c53e5d5015f","on_branch":"a8d8760c098206989c1d02a66657019b244bf85b"}
