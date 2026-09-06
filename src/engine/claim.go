@@ -321,7 +321,32 @@ func Release(r Roots, claimant string, ids []string, now time.Time) (ClaimResult
 		res.Freed = append(res.Freed, t.ID)
 		res.Files = append(res.Files, filepath.Join(dirFor(r, t), t.ID+".md"))
 	}
+	// A RELEASE FREES A CLAIM AND NOT A HOLD, AND NOW SAYS SO.
+	//
+	// freed reads as the token being back. It is not. The hold is a different
+	// field answering a different question, and it outlives this.
+	//
+	// MEASURED THREE TIMES, IN SEPTEMBER 2026. An agent told to put work down
+	// released, read freed, and stopped. The stop judge went on naming the same
+	// token as work in hand, and the agent read that as the engine not listening.
+	if held := stillHeld(r, res.Freed); len(held) > 0 {
+		res.Notice = "the claim is off " + strings.Join(held, ", ") +
+			" and the hold is not. Set it back with se work --put-down <id>, " +
+			"or put_down: <id> in a lane"
+	}
 	return res, nil
+}
+
+// stillHeld answers which of these are in somebody's hand, so a release can say
+// what it did not free.
+func stillHeld(r Roots, ids []string) []string {
+	var out []string
+	for _, id := range ids {
+		if HeldBy(r, id) != "" {
+			out = append(out, id)
+		}
+	}
+	return out
 }
 
 // Claimed is one row of what --list answers.
