@@ -815,14 +815,6 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// runs, so a claim never spends itself.
 	SpendClaim(roots, actor)
 
-	// AND IT PUTS THE ARGUMENT BACK TO ITS START. Three claims earn a stop over
-	// open work, and going back to work between two of them is changing your
-	// mind, so the run has to be unbroken. Claiming again is the argument itself
-	// and never breaks it.
-	if !isTheStopVerb(in) {
-		forgetRefusedStops(roots, "claimed:"+actor)
-	}
-
 	var ti toolInput
 	_ = json.Unmarshal(in.ToolInput, &ti) // a call whose input will not read names no file, and the caller checks that
 	path := ti.FilePath
@@ -1489,10 +1481,6 @@ func decideStop(g *guard, roots Roots, cfg Config, log *sessionlog.Log, in hookI
 		// the claim still names one of five sanctioned reasons, and a false
 		// blocked is still refused where it is typed rather than here.
 		//
-		// THE COUNT IS CLEARED ON THE GRANT, because nothing counts any more. It
-		// is cleared again the moment the agent goes back to work, in
-		// decidePreToolUse, and the helper relenting keeps its own count.
-		forgetRefusedStops(roots, "claimed:"+actor)
 		// THE WORD STANDS AS LONG AS THE CLAIM DOES. A harness sends turns nobody
 		// asked for and every one ends in a stop, so an agent that has stopped and
 		// done nothing since meets this again and is let through on the same claim.

@@ -39,7 +39,6 @@ func TestAValidClaimStopsAtOnce(t *testing.T) {
 	// THE SESSION'S FIRST STOP IS GRANTED WHATEVER IT SAYS, so it is spent here
 	// rather than mistaken for the rule under test.
 	aStopIsGranted(t, r, log, actor, "broken")
-	forgetRefusedStops(r, "claimed:"+actor)
 
 	// EVERY REASON IS GRANTED ON THE CLAIM THAT NAMES IT, with work in hand.
 	//
@@ -49,7 +48,6 @@ func TestAValidClaimStopsAtOnce(t *testing.T) {
 		if !aStopIsGranted(t, r, log, actor, because) {
 			t.Errorf("%s was argued with, and a valid claim is meant to stop at once", because)
 		}
-		forgetRefusedStops(r, "claimed:"+actor)
 	}
 
 	// AND NOTHING CLAIMED IS STILL REFUSED. Deleting the argument does not

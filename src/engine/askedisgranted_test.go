@@ -42,7 +42,6 @@ func TestAskedIsGrantedOnTheFirstClaim(t *testing.T) {
 	// THE SESSION'S FIRST STOP IS GRANTED WHATEVER IT SAYS, so it is spent here
 	// rather than mistaken for the rule under test.
 	aStopIsGranted(t, r, log, actor, "broken")
-	forgetRefusedStops(r, "claimed:"+actor)
 
 	// EVERY OTHER REASON WAS ARGUED WITH HERE, and that half is gone. The engine
 	// used to push back twice over open work, so this test proved asked was

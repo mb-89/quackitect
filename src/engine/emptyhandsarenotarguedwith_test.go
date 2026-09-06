@@ -36,7 +36,6 @@ func TestEmptyHandsAreNotArguedWith(t *testing.T) {
 	// THE SESSION'S FIRST STOP IS GRANTED WHATEVER IT SAYS, so it is spent here
 	// rather than mistaken for the rule under test.
 	whatTheStopSaid(t, r, log, actor, "broken")
-	forgetRefusedStops(r, "claimed:"+actor)
 	if held := TheyHold(r, actor); len(held) != 0 {
 		t.Fatalf("this proves nothing: the actor holds %d token(s)", len(held))
 	}
@@ -50,7 +49,6 @@ func TestEmptyHandsAreNotArguedWith(t *testing.T) {
 		if said := whatTheStopSaid(t, r, log, actor, because); said != "" {
 			t.Errorf("%s was argued with by an actor holding nothing:\n%s", because, said)
 		}
-		forgetRefusedStops(r, "claimed:"+actor)
 	}
 }
 
