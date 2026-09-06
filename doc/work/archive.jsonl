@@ -21,6 +21,7 @@
 {"id":"wk-191014c633","title":"types at decode edge","process":"standard","disposition":"","on_branch":"7e8b2c054f5de5849b1aba5f7b6c7f47496279f4"}
 {"id":"wk-1a33c35541","title":"HEAD does not build","process":"trivial","disposition":"done","blob":"1a215451dcb6bd6ffdfb553678dde730979843bb","on_branch":"a3f42786ab8a2e002f6b179c73da4cd87cec3ae1","tag":"refs/tags/archive/wk-1a33c35541"}
 {"id":"wk-1c9dc4ef28","title":"stops hand work back","process":"standard","disposition":"done","blob":"4613fe3a0c85afafeea8c176304b745ab8a423ac","on_branch":"eb7c6223ed689bf7bf2c6f82a97216715efeba04","tag":"refs/tags/archive/wk-1c9dc4ef28"}
+{"id":"wk-1da1791ba0","title":"guidance runs past bounds","process":"trivial","disposition":"done","blob":"de8a3302428985fd97b23349ab60dea96df44d6f","on_branch":"d97f20ae072245d3fb1bf2ffd430a17d8a4605dd"}
 {"id":"wk-2083d0e131","title":"context loses the socket","process":"trivial","disposition":"done","blob":"6c5070c9c93467cf304fbac3d13f8c2146826650","on_branch":"7c5ed3d0663fd1a1e9a9328a9865acee41bf27b6","tag":"refs/tags/archive/wk-2083d0e131"}
 {"id":"wk-212909368a","title":"one build door","process":"standard","disposition":"","on_branch":"6701f87a039961f5dfd5881370599862c7289560"}
 {"id":"wk-213e782f8b","title":"refusal names absent flag","process":"trivial","disposition":"done","blob":"1eaaeec65c726b95f51ab45f60dcf9a3e009c737","on_branch":"e56052bddc56736cf72617dced209ad040bcacc2","tag":"refs/tags/archive/wk-213e782f8b"}
@@ -152,6 +153,7 @@
 {"id":"wk-9c1f02027b","title":"battery takes a context","process":"trivial","disposition":"done","blob":"257c9ac60e2fd6f4b62a2abcd5ec21aa37bfd10f","on_branch":"257c9ac60e2fd6f4b62a2abcd5ec21aa37bfd10f","tag":"refs/tags/archive/wk-9c1f02027b"}
 {"id":"wk-97ec0d1542","title":"relay needs the engine","process":"trivial","disposition":"done","blob":"fcc55ba88d27229737ff1618ac866c75466aaef1","on_branch":"c5b093083b0ff664f8a8ef0f96e86984ff48d905"}
 {"id":"wk-98739fa19c","title":"publish keeps earlier claims","process":"trivial","disposition":"done","blob":"ccbfc96557fba805922d84578d5aa1f5699d16f9","on_branch":"d356140f08baa4f46d9e33ed1f4fce6e880e0378"}
+{"id":"wk-9875cf128f","title":"context count reads path","process":"trivial","disposition":"done","blob":"794c00e9a7e513bb7ee10a02f6bcd57d3b3d9c4d","on_branch":"cd6234b31a2614084c34f87c6a45baeb3a000b9a"}
 {"id":"wk-98c9dcc9df","title":"session end keeps holds","process":"trivial","disposition":"done","blob":"b316e684fe4e73dca482bb80b29111c4d86a2754","on_branch":"d7829d391b395be571b5593688599a96c061ce03"}
 {"id":"wk-98df32b772","title":"cold read waits","process":"trivial","disposition":"done","blob":"99bf207787565457f81d97eacc6c5deafbe255ca","on_branch":"14c6ca2d61e485912a8ed08f3310f21cba9bf5f1"}
 {"id":"wk-99a064bae7","title":"claim gate reddens ghosts","process":"trivial","disposition":"done","blob":"554bc80449d1bb6221a8b5658efb5321c2faa6df","on_branch":"5e44d7ed60059b4d023a0e098bb02735bf68d0e8"}
