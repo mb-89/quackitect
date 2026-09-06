@@ -77,9 +77,10 @@ var theLane = []laneTool{
 			"and tracked, which says where it is born. tracked true puts it in doc/work, " +
 			"which git carries, so another agent on another box can claim it. tracked false " +
 			"keeps it in .se/work, for small work you do yourself next. A note takes neither " +
-			"and is always private. Or on: <id> takes that token into your hands. Or " +
-			"abort: <id> with why ends it where it stands, and disposition became names " +
-			"in successors what it became.",
+			"and is always private. Or on: <id> takes that token into your hands, and " +
+			"put_down: <id> sets it back without closing it. Or abort: <id> with why " +
+			"ends it where it stands, and disposition became names in successors what " +
+			"it became.",
 		takes: workArgs{},
 	},
 	{
@@ -245,6 +246,16 @@ type workArgs struct {
 	// was the shell's alone. The engine grew an abort that can end a token as
 	// became, and the lane could not say what a became names, so an agent here
 	// could only record a split as work nobody wanted.
+	// AND SETTING ONE DOWN, which the shell has had and the lane has not. se
+	// work takes --put-down, so an agent at a prompt could set work back and an
+	// agent in a lane could not. The lane is where every cloud agent lives.
+	//
+	// MEASURED THREE TIMES, IN SEPTEMBER 2026. Told to put work down, a session
+	// reached for se claim --release, which frees the claim and leaves the hold.
+	// A reviewer that finished and left kept its hold, and the next hand was
+	// refused with one token has one holder while nobody held it.
+	PutDown string `json:"put_down" says:"instead of minting: set a token you hold back, by id, without closing it"`
+
 	Abort       string   `json:"abort" says:"instead of minting: end this token, by id, with why"`
 	Why         string   `json:"why" says:"with abort: why it is ending. An abort with no reason is refused"`
 	Disposition string   `json:"disposition" says:"with abort: how it ends, one the process declares (default: dropped)"`
@@ -326,11 +337,23 @@ func mintWork(r roots, a workArgs) string {
 	if a.On != "" {
 		return engineCall(r, []string{"work", "--on", a.On, "--by", orMain(a.Actor)}, nil)
 	}
+	// AND SETTING ONE DOWN GOES THROUGH IT TOO, for the same reason.
+	if a.PutDown != "" {
+		return engineCall(r, putDownArgv(a), nil)
+	}
 	// AND ENDING ONE GOES THROUGH IT TOO, for the same reason.
 	if a.Abort != "" {
 		return engineCall(r, abortArgv(a), nil)
 	}
 	return engineCall(r, workArgv(a), nil)
+}
+
+// putDownArgv is the verb call se_work makes to set a token back.
+//
+// IT IS ITS OWN FUNCTION SO A TEST CAN READ THE CALL, the way abortArgv is. A
+// door that offers a field the call behind it drops is the half with no output.
+func putDownArgv(a workArgs) []string {
+	return []string{"work", "--put-down", a.PutDown, "--by", orMain(a.Actor)}
 }
 
 // abortArgv is the verb call se_work makes to end a token.
