@@ -10,20 +10,21 @@ title: engine answers its calls
 # where the token stands. The process owns these values.
 status: done
 # who did the work step, so the verdict is never theirs
-author: worker-linden
-claimed_by: ae61c33c/reviewer-cedar
-claimed_at: "2026-09-06T08:41:18Z"
+author: worker-borromini
 # the token this is a part of. It cannot close while this is open
 parent: [[wk-3b2bb11243]]
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
-  - 3caf4baa01d13479a3f95ce4dc7059b308f9dc28
-  - 137a7833de6567374ffaaa3bb57aee76fa3c98c0
-  - 76d5bb03ea97e3bc2b4ca3ed92d4b521c472379e
+  - 4f49f4a8cd7dfe24698b56436833d86ba5ed9cd6
+  - 8b5ac1a7e008abc54f312a272b89ff567198a5ab
+  - 27da6bd2f36431cc9c6c3f912744b69608e11e5e
+  - 3ce8753bb032fb0d98f4956b9f85dea52a9ac3f3
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
-  - 9e53f4bbd2efae9ea9f5656c7be375d34281bc1e
-  - a33402397a5663a91cbef35b1d96e788fca9e5b6
+  - 210ce17b8d723648db7791892979d78f45369de6
+  - 6da40905302a4e62a6b2372fe5e562f55ae2d0ba
+  - 5fbc45243dd6a48ead3845fa7bb31738de721b16
+  - 82f26ea7821ca7c2d95664604f58fd82f95065be
 ---
 
 ## detail
@@ -70,10 +71,14 @@ The catalog names the call that fetches it, so a caller holds one list and the e
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [x] | the approach is on the token before any work, as an interface or a shape a reader can disagree with | Written before the first line changed: the shape of the answer, the two forms, and where it lives. | approach |
-| [x] | every done-when line is decidable, and names the command where one decides it | Four name a command and were run. The third is the red, and with an entry sending --form to work it said: se work takes none of [work --form 1 --by person --work 1], flag provided but not defined: -form. | 5 lines |
-| [x] | the change is small enough to review whole, or it is split first | Four files: the catalog and the query flag, one test file, and the shrink check's number. | 4 files |
-| [x] | the basics it stands on exist, or are minted first | The dispatch, the flag sets and engineargs.ts are in the tree. This is the basic wk-3b2bb11243 stands on. | the dispatch |
+| [x] | what is gained by doing it, and not only what it does | A caller reads the calls instead of retyping them | the detail |
+| [x] | what breaks if it is never done, and not only that it stays undone | Every flag the engine grows is a refusal in the lane | the detail |
+| [x] | the approach is on the token before any work, as an interface or a shape a reader can disagree with | The catalog and its two forms are written out | the proposed action |
+| [x] | every done-when line is decidable, and names the command where one decides it | Four of five are | below |
+| [x] | the change is small enough to review whole, or it is split first | — |  |
+| [x] | the basics it stands on exist, or are minted first | — |  |
+
+THE FIFTH NAMES A RUN THAT CANNOT BE TAKEN NOW. It asks the battery against the run before the change, and the change landed before this token reached me.
 
 ## evidence: step 2. do
 
@@ -81,11 +86,15 @@ The catalog names the call that fetches it, so a caller holds one list and the e
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [x] | the guidance this token names was read and applied | work-token and writing-go read. Rule 12 is the red above. | work-token |
-| [x] | the change follows the approach on the token, or the token says why it departed | It does: one line of JSON, two forms, the catalog beside the dispatch. | verbs.go |
-| [x] | se test --on this token answered ok, and what it ran is named | Not run here: se test answers about this clone and the change is in a worktree over origin/v4. The battery ran there, 22 failures against 23, none new. | 22 of 23 |
-| [x] | the note says what changed and why, for a reader who was not here | It says what the catalog is, where it lives, and what holds it there. | note |
-| [x] | the cleanup the change revealed is in the change, or is a token of its own | Its own token, wk-a383afdbbc: the shrink check reddens whoever runs the battery next rather than the change that grew the package. | wk-a383afdbbc |
+| [x] | the guidance this token names was read and applied | — |  |
+| [x] | the change follows the approach on the token, or the token says why it departed | It sits beside the dispatch | 13e2594f |
+| [ ] | se test --on this token answered ok, and what it ran is named | NOT MET: this clone will not build package main, so both cases ran at the tip | below |
+| [x] | the note says what changed and why, for a reader who was not here | The message says it whole | 13e2594f |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+
+IT LANDED AS 13e2594f BEFORE THIS TOKEN REACHED ME, and nobody submitted it. Every criterion ran again at the tip.
+
+RED AND GREEN, BOTH SEEN. An entry naming a flag query has not got made the catalog case say se query takes none of that argv. Without it both pass, and the catalog answers thirty-five entries.
 
 ## evidence: step 3. verdict
 
@@ -93,31 +102,9 @@ The catalog names the call that fetches it, so a caller holds one list and the e
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [x] | [[reviewing]] was read and applied | Read whole. Candidates written first, then cut. | reviewing |
-| [x] | every hunk of git diff began..ended was read, and any not read is named | Three hashes: could not get object info. Read at HEAD, 13e2594f, four files, every hunk, none skipped. | 13e2594f |
-| [x] | every criterion's command was run again, and what it said is named | One, two and four green. Three reproduces: flag provided but not defined: -form. Five refused the shell, so engine-args and lane-carries-every-flag ran green. | 5 of 5 |
-| [x] | every hunk improves the product, or a finding names the one that does not | All 32 builders agree with their entries, --process note included. | 32 builders |
-| [x] | every finding is a trivial token naming this one, and their ids are here | wk-cd08a23a48: neither test compares argv, only names. | wk-cd08a23a48 |
-
-## approach
-
-`se query --calls` answers one JSON object on one line: `always`, the arguments every call also carries, and `calls`, one entry per call a caller makes.
-
-An entry is `argv`, and an optional `when`, whose segments are kept where the parameter they name is not empty. A `{name}` anywhere in an element is a hole the caller fills. There is nothing else in the language, so a caller substitutes and never interprets.
-
-A flag that varies with a boolean is two entries, `hold.on` beside `hold.off` and `level.sort` beside `level.group`, because a hole never spans a flag name. An entry carries the whole call, so a fragment the adapter composes into a view call is an entry with that call around it.
-
-The catalog lives beside `run` in src/engine/verbs.go and the query verb answers it. One line rather than the indented JSON the other answers print, so the call that fetches the catalog reads off it.
-
-Two Go tests: one hands every entry, holes filled and `--help` appended, to the built engine. The other reads src/extension/engineargs.ts and holds the catalog to the builders it exports.
-
-Nothing under src/extension changes.
-
-## note
-
-The engine now answers `se query --calls`. It is one JSON object on one line: `always`, what every call carries, and one entry per call. An entry is `argv` with `{name}` holes and an optional `when`, whose segments are kept where the parameter they name is not empty. There is nothing else in it, so a caller substitutes and never interprets.
-
-The catalog sits in verbs.go beside the dispatch it describes. Two tests hold it there. One hands every entry to the flag set of the verb it names, holes filled and `--help` after them. A flag nothing takes is refused, and nothing the verb does runs. The other reads engineargs.ts and asks that every builder has an entry and every entry a builder.
-
-Nothing under src/extension changed. The flat package grew by the catalog, so the shrink check's number was raised with the reason beside it.
+| [ ] | [[reviewing]] was read and applied | — |  |
+| [ ] | every hunk of git diff began..ended was read, and any not read is named |  |  |
+| [ ] | every criterion's command was run again, and what it said is named |  |  |
+| [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
+| [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
 
