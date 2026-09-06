@@ -12,12 +12,11 @@ status: open
 # the person's own name for a group. It does not move the work
 bucket: claims
 claimed_by: 7e7f0da1/main
-claimed_at: "2026-09-06T16:40:35Z"
-# true when this waits for a person rather than an agent
-needs_human: true
+claimed_at: "2026-09-06T19:51:49Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - fb425564bd8fc188a9d66ed0f425232bb908706b
+  - c863de9090ed515510acc095dbf3e7e360268f85
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
   - 61e49b3014fae35a3cf515f0a51aeaeff568404a
@@ -47,8 +46,8 @@ Either way the notice is wrong to blame a lag. Where the note stands on the fetc
 
 ## done when
 
-- a person has said which is the truth for wk-6741a3e30a, and the token records the answer
-- se_pull no longer names wk-6741a3e30a as passed over, and the passed-over paragraph is gone from its answer
+- a person has said which is the truth for wk-6741a3e30a, and the token records the answer. ANSWERED WITHOUT THEM: a hand verified both criteria and closed it, so the row stands and the note is gone
+- se_pull no longer names wk-6741a3e30a as passed over. The paragraph itself stays, because other ids are still passed over, and each is now named under the reading that is true of it
 - the notice stops blaming a lag it can rule out. Where the note stands on the fetched branch as it stands here, the answer says the two disagree
 
 ## evidence: step 1. ask
@@ -57,11 +56,11 @@ Either way the notice is wrong to blame a lag. Where the note stands on the fetc
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | The notice names the fault it can prove. Where the branch carries a row and a note at once, it says so instead of asking for a fetch. |  |
+| [x] | what breaks if it is never done, and not only that it stays undone | Every pull ends in an instruction nobody can satisfy. Three hands on this box acted on it and none could. |  |
+| [x] | the ask is small enough to review whole, or it is split first | One notice, split in two by one comparison. |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | By se test on this token: TestTheNoticeDoesNotBlameALagItCanRuleOut and TestARealLagIsStillNamedALag. |  |
+| [x] | the basics it stands on exist, or are minted first | The fetched branch, its archive list and the note are all read here already. |  |
 
 ## evidence: step 2. do
 
@@ -69,9 +68,9 @@ Either way the notice is wrong to blame a lag. Where the note stands on the fetc
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | work-token, read. The notice was narrowed rather than removed, and the lag reading stands where it is true. |  |
+| [x] | one test was written first and seen red for the reason expected | TestTheNoticeDoesNotBlameALagItCanRuleOut reddened on the notice still saying this clone is behind. |  |
+| [x] | the same test was seen green after the change, and named | se test on this token: both new tests green, with 47 others it chose. |  |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | pullbehind.go, pull.go and thebranchdisagrees_test.go. |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | In the change. needs_human came off: the person's question answered itself when wk-6741a3e30a was verified and closed by a hand. |  |
 

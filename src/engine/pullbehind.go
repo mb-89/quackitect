@@ -140,14 +140,72 @@ func offTheFetchedBranch(r Roots, actor string, all []Token) (kept []Token, behi
 	return kept, behind, branch
 }
 
+// theNoteStandsOnTheBranch answers the ids whose note is on the fetched branch
+// exactly as it is here.
+//
+// FOR THOSE, THIS CLONE IS NOT BEHIND. The branch carries an archive row and an
+// open note for one token at once, so bringing doc/work into step changes
+// nothing and the two halves of the record disagree with each other.
+//
+// MEASURED, September 2026. Three ids were named on every pull of a session,
+// with an instruction to bring the tree into step. Two of them stood on the
+// branch byte for byte as they stood here. Three hands acted on that notice and
+// none of them could have satisfied it.
+func theNoteStandsOnTheBranch(r Roots, commit string, behind []string) map[string]bool {
+	same := map[string]bool{}
+	if commit == "" {
+		return same
+	}
+	for _, id := range behind {
+		path := "doc/work/" + id + ".md"
+		there, err := gitHere(r, "rev-parse", "--verify", "--quiet", commit+":"+path)
+		if err != nil || strings.TrimSpace(there) == "" {
+			continue // the branch dropped the note, so this clone really is behind
+		}
+		here, err := gitHere(r, "hash-object", path)
+		if err != nil || strings.TrimSpace(here) == "" {
+			continue // no note here to compare, so the lag reading stands
+		}
+		if strings.TrimSpace(here) == strings.TrimSpace(there) {
+			same[id] = true
+		}
+	}
+	return same
+}
+
 // behindNotice names what the queue passed over because the fetched branch has
-// archived it, and says what brings the tree into step. It rides on every
-// answer, work or wait, because the queue is shorter either way.
-func behindNotice(branch string, behind []string) string {
+// archived it. It rides on every answer, work or wait, because the queue is
+// shorter either way.
+//
+// IT ONLY BLAMES A LAG IT CANNOT RULE OUT. Where the note here is the branch's
+// own note, there is no lag to close, and the answer says the branch disagrees
+// with itself instead of asking for a fetch that changes nothing.
+func behindNotice(r Roots, branch string, behind []string) string {
 	if len(behind) == 0 {
 		return ""
 	}
-	return fmt.Sprintf("\n\nPassed over, because %s has archived them and this clone is behind it:\n  %s\n\n"+
-		"They are not open work. Bring doc/work into step with %s, and pull again.",
-		branch, strings.Join(behind, "\n  "), branch)
+	commit, _ := fetchedBranch(r)
+	same := theNoteStandsOnTheBranch(r, commit, behind)
+	var lagging, disagreeing []string
+	for _, id := range behind {
+		if same[id] {
+			disagreeing = append(disagreeing, id)
+			continue
+		}
+		lagging = append(lagging, id)
+	}
+	said := ""
+	if len(lagging) > 0 {
+		said += fmt.Sprintf("\n\nPassed over, because %s has archived them and this clone is behind it:\n  %s\n\n"+
+			"They are not open work. Bring doc/work into step with %s, and pull again.",
+			branch, strings.Join(lagging, "\n  "), branch)
+	}
+	if len(disagreeing) > 0 {
+		said += fmt.Sprintf("\n\nPassed over, and this clone is not behind on them:\n  %s\n\n"+
+			"%s carries an archive row and an open note for each, byte for byte as this tree "+
+			"holds it. So the record disagrees with itself and a fetch changes nothing. "+
+			"A person says which half is the truth: the row, or the note.",
+			strings.Join(disagreeing, "\n  "), branch)
+	}
+	return said
 }

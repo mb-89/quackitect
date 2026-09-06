@@ -972,7 +972,7 @@ func next(r Roots, actor, role string) Answer {
 	all, behind, branch := offTheFetchedBranch(r, actor,
 		byBucketAffinity(r, actor, urgentFirst(blockingFirst(r, theQueueOffers(r, actor, Tokens(r))))))
 	a := nextAmong(r, actor, role, all)
-	a.Notice += behindNotice(branch, behind)
+	a.Notice += behindNotice(r, branch, behind)
 	return a
 }
 
