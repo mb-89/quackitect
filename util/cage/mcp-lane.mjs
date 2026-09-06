@@ -88,36 +88,62 @@ const say = (line) => {
 };
 process.stdout.on("error", () => {}); // a shut pipe has nobody left to tell
 
-if (existsSync(laneExe) && existsSync(engineExe)) {
-  handOver(laneExe);
-} else {
-  answerWhileItBuilds();
-}
+superviseTheLane();
 
-// handOver is the whole program on a tree that is built: stdio is inherited, so
-// the lane speaks to the harness directly and nothing here sits between them.
-function handOver(exe) {
-  say("built already, handing over to " + exe);
-  const lane = spawn(exe, process.argv.slice(2), { stdio: "inherit" });
-  lane.on("error", (err) => {
-    say("the tool lane would not start: " + err.message);
-    process.exit(1);
-  });
-  lane.on("exit", (code, signal) => process.exit(signal ? 1 : code ?? 0));
-}
-
-// answerWhileItBuilds is the cold clone: a door that answers now, and a lane
-// that arrives behind it.
-function answerWhileItBuilds() {
-  say("nothing is built here yet. The door answers now and the build runs behind it.");
+// superviseTheLane is the whole program, on a cold clone and on a built tree
+// alike.
+//
+// IT USED TO BE TWO PROGRAMS. A built tree handed stdio straight to the lane and
+// this script stepped out of the message path, and only a cold clone was
+// supervised. So the box that could not be repaired was the ordinary one: a
+// session that pulled a commit and rebuilt kept the tool list its lane was
+// compiled with, because nothing was left in the path to notice it had moved.
+//
+// tools() IS COMPILED INTO THE LANE, so a lane that is running cannot serve a
+// list it does not carry. Refreshing the tools is restarting the lane, and
+// restarting it without losing the session means holding the handshake here and
+// replaying it. The cold path already did exactly that, to buy the build its
+// thirty seconds, so there is one path now and it does both.
+function superviseTheLane() {
+  // A BUILT TREE HAS NOTHING TO WAIT FOR, and a cold one answers while it
+  // builds. Everything below that difference is the same either way.
+  const built = existsSync(laneExe) && existsSync(engineExe);
+  say(built
+    ? "built already. The door answers here and the lane runs behind it."
+    : "nothing is built here yet. The door answers now and the build runs behind it.");
 
   const held = []; // client messages waiting for a lane, in the order they came
   let lane = null; // the built lane, once it is up
   let open = false; // true once the held messages are through and lines go straight on
   let broken = ""; // why the lane will never come up, once that is known
   let clientInit = null; // what the harness asked for, to ask the lane the same
-  let engineHere = false;
+  let engineHere = built;
   const ourID = "quackitect-lane-initialize";
+
+  // WHAT A RESTART NEEDS. The program on disk is watched, and when a build
+  // replaces it the lane is started again and the client is told its list moved.
+  let restarting = false; // true between putting a lane down and its successor's handshake
+  let watching = false; // one watcher, however many times a lane comes up
+  let runningFrom = ""; // the program the lane was started from
+  let runningStamp = ""; // what that program looked like when it was started
+  let traffic = Date.now(); // when a message last crossed, so a restart lands in a lull
+  // THE WAIT FOR A BUILD, or null on a tree that had nothing to wait for. A
+  // built tree starts its lane before the cold path's declarations are reached,
+  // so this is declared up here with the rest and start() asks whether it is
+  // there rather than assuming a build ran.
+  let waitingForABuild = null;
+  const lull = 1500; // nothing either way for this long before a restart
+
+  // A PROGRAM IS ITS SIZE AND ITS TIME. Nothing here reads the file, because it
+  // is looked at twice a second and it is megabytes.
+  const stampOf = (path) => {
+    try {
+      const s = statSync(path);
+      return s.size + "@" + s.mtimeMs;
+    } catch {
+      return "";
+    }
+  };
 
   const send = (msg) => process.stdout.write(JSON.stringify(msg) + "\n");
   const answer = (id, result) => send({ jsonrpc: "2.0", id, result });
@@ -153,6 +179,7 @@ function answerWhileItBuilds() {
 
   createInterface({ input: process.stdin })
     .on("line", (line) => {
+      traffic = Date.now();
       if (open) {
         // A CALL NEEDS THE ENGINE AND A LIST NEEDS ONLY THE LANE. The lane comes
         // up first, so tools/list is answered while the engine is still
@@ -175,6 +202,14 @@ function answerWhileItBuilds() {
       if (raw === "") return;
       const msg = read(raw);
       if (msg === null) return;
+
+      // A RESTART IS A LULL AND NOT A COLD START. The lane is coming back with a
+      // new list, so what arrives meanwhile is held for it, rather than answered
+      // from here out of a snapshot the same build has just moved.
+      if (restarting) {
+        held.push(raw);
+        return;
+      }
 
       // INITIALIZE IS ANSWERED FROM HERE, AT ONCE. This is the handshake the
       // thirty seconds are for, and answering it is what buys the build its
@@ -250,6 +285,14 @@ function answerWhileItBuilds() {
       lane.stdin.end();
     });
 
+  // A BUILT TREE SKIPS ALL OF IT: no installer, no build of the lane, and no
+  // waiting for a file that is already there. It is still supervised, because
+  // that is what notices the day the file changes under it.
+  if (built) {
+    start(laneExe);
+    return;
+  }
+
   // THE INSTALLER IS THE BUILD. Asking go build directly for the engine would be
   // a second place that knows how this tree compiles, and it would miss the C
   // compiler the installer pins for the engine's SQLite.
@@ -318,7 +361,7 @@ function answerWhileItBuilds() {
   };
 
   let waited = 0;
-  const watch = setInterval(() => {
+  waitingForABuild = setInterval(() => {
     waited += 1;
     if (ready(ownExe)) return start(ownExe);
     if (ready(laneExe)) return start(laneExe);
@@ -334,7 +377,7 @@ function answerWhileItBuilds() {
     // the lane lands, and reading "not settled yet" as "never coming" threw the
     // built lane away on the tick after the build that made it.
     if (!installing && quick === null && !existsSync(ownExe) && !existsSync(laneExe)) {
-      clearInterval(watch);
+      clearInterval(waitingForABuild);
       broken = "the build finished and left no tool lane at " + laneExe + ".";
       say(broken);
       for (const raw of held.splice(0)) refuse(read(raw));
@@ -343,7 +386,10 @@ function answerWhileItBuilds() {
 
   // start hands the held messages to the lane and then gets out of the way.
   function start(exe) {
-    clearInterval(watch);
+    if (waitingForABuild !== null) {
+      clearInterval(waitingForABuild);
+      waitingForABuild = null;
+    }
     lane = spawn(exe, process.argv.slice(2), { stdio: ["pipe", "pipe", "inherit"] });
     lane.on("error", (err) => {
       lane = null;
@@ -359,6 +405,7 @@ function answerWhileItBuilds() {
     // the day it remembers.
     let handshake = true;
     createInterface({ input: lane.stdout }).on("line", (line) => {
+      traffic = Date.now();
       if (handshake) {
         const msg = read(line);
         if (msg !== null && msg.id === ourID) {
@@ -366,9 +413,15 @@ function answerWhileItBuilds() {
           lane.stdin.write(JSON.stringify({ jsonrpc: "2.0", method: "notifications/initialized" }) + "\n");
           for (const raw of held.splice(0)) lane.stdin.write(raw + "\n");
           open = true;
-          say("the tool lane is up.");
-          // The list was answered by nothing a moment ago, so say that it moved.
+          restarting = false;
+          runningFrom = exe;
+          runningStamp = stampOf(exe);
+          say("the tool lane is up, from " + exe + ".");
+          // THE LIST MOVED. Cold, it was answered by a snapshot or by nothing.
+          // On a restart the lane has been rebuilt and carries a different one.
+          // Either way the client holds a list this lane did not write.
           send({ jsonrpc: "2.0", method: "notifications/tools/list_changed" });
+          watchForANewLane();
           return;
         }
       }
@@ -377,5 +430,75 @@ function answerWhileItBuilds() {
     lane.stdin.write(JSON.stringify({
       jsonrpc: "2.0", id: ourID, method: "initialize", params: clientInit ?? {},
     }) + "\n");
+  }
+
+  // A NEW LANE ON DISK IS A NEW TOOL LIST.
+  //
+  // The lane's tools are compiled into it, so the only thing that moves them is
+  // a build. This watches the program the lane is running and starts it again
+  // when a build replaces it, which is what turns "pull the commit and
+  // reinstall" into tools the session can see. Without it, the list a session
+  // opens with is the list it dies with, and an agent that has just built the
+  // tool it needs is told there is no such tool.
+  //
+  // IT WAITS FOR A LULL. A restart puts the lane down, and an answer in flight
+  // goes down with it. Rather than track every call by its id, it restarts only
+  // when nothing has crossed in either direction for a moment, so it lands
+  // between calls instead of through one.
+  //
+  // ON WINDOWS IT RARELY FIRES, because a running program cannot be overwritten
+  // there: the build that would move the file fails against the lock instead.
+  // That is the desk, where a person can reload the window. The box this is for
+  // is Linux, where the build replaces the file under the process.
+  function watchForANewLane() {
+    if (watching) return;
+    watching = true;
+    let settling = "";
+    const looking = setInterval(() => {
+      if (!open || restarting) return;
+      // THE INSTALLER'S LANE WINS over the one this script built for itself, so
+      // a cold clone moves onto it when it lands.
+      const next = existsSync(laneExe) ? laneExe : runningFrom;
+      const stamp = stampOf(next);
+      if (stamp === "" || (next === runningFrom && stamp === runningStamp)) {
+        settling = "";
+        return;
+      }
+      // A BUILD IN PROGRESS IS A FILE THAT EXISTS. Waiting for the stamp to
+      // repeat is how a half-written program is not started.
+      if (stamp !== settling) {
+        settling = stamp;
+        return;
+      }
+      if (Date.now() - traffic < lull) return;
+      settling = "";
+      restart(next);
+    }, 500);
+    looking.unref?.(); // the lane holds this process open, and this must not
+  }
+
+  // restart puts the lane down and brings it back. start does the rest: the
+  // handshake is replayed out of what the harness asked for, anything held
+  // meanwhile is handed over, and the client is told the list moved.
+  function restart(exe) {
+    say("the lane on disk has changed. Restarting from " + exe + ".");
+    restarting = true;
+    open = false;
+    const old = lane;
+    lane = null;
+    if (old !== null) {
+      // ITS EXIT IS NO LONGER THE PROGRAM'S EXIT. Leaving that listener on would
+      // make a deliberate restart look like the lane dying, and take the
+      // session's door down with the lane it is replacing.
+      old.removeAllListeners("exit");
+      old.removeAllListeners("error");
+      try {
+        old.stdin.end();
+      } catch {
+        // a lane already gone needs no goodbye
+      }
+      old.kill();
+    }
+    start(exe);
   }
 }

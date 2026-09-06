@@ -80,6 +80,12 @@ func main() {
 		var id any
 		_ = json.Unmarshal(req.ID, &id) // an id that will not read is a notification, which has none
 
+		// THE LIST CHANGES WHEN THIS PROGRAM IS REBUILT. tools() is compiled in,
+		// so a lane that is running cannot serve a list it does not carry.
+		// util/cage/mcp-lane.mjs supervises this process, watches the binary and
+		// restarts it when a build replaces it, and tells the client the list
+		// moved. Declaring listChanged at the handshake is what lets a client ask
+		// again, rather than hold the list it took at the start for the session.
 		switch req.Method {
 		case "initialize":
 			// The client's version is echoed back. Choosing one here is how a
@@ -93,7 +99,7 @@ func main() {
 			}
 			reply(out, id, map[string]any{
 				"protocolVersion": p.ProtocolVersion,
-				"capabilities":    map[string]any{"tools": map[string]any{}},
+				"capabilities":    map[string]any{"tools": map[string]any{"listChanged": true}},
 				"serverInfo":      map[string]any{"name": "quackitect", "version": "0.1.0"},
 			})
 		case "tools/list":

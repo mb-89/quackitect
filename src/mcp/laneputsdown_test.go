@@ -35,11 +35,11 @@ func TestTheLaneOffersPutDown(t *testing.T) {
 // half with no output of its own, which is the shape se_claim was in over take.
 func TestThePutDownCallNamesTheToken(t *testing.T) {
 	t.Parallel()
-	argv := putDownArgv(workArgs{PutDown: "wk-1234567890", Actor: "worker-one"})
+	argv := putDownArgv(workArgs{PutDown: "wk-1111111111", Actor: "worker-one"})
 	if !carries(argv, "--put-down") {
 		t.Errorf("the call does not name the verb's flag: %v", argv)
 	}
-	if !carries(argv, "wk-1234567890") {
+	if !carries(argv, "wk-1111111111") {
 		t.Errorf("the call does not say which token: %v", argv)
 	}
 	if !carries(argv, "worker-one") {
