@@ -64,6 +64,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("quackitect.showWork", () => toggleWork(context)),
     vscode.commands.registerCommand("quackitect.hold", () => toggleHold(context)),
     vscode.commands.registerCommand("quackitect.ask", () => toggleAsk(context)),
+    vscode.commands.registerCommand("quackitect.ideation", () => toggleIdeation()),
     vscode.commands.registerCommand("quackitect.unbind", () => pressBinding(context)),
     vscode.commands.registerCommand("quackitect.god", () => armGod(context)),
     vscode.commands.registerCommand("quackitect.mintWork", (arg?: { text: string }) =>
@@ -1427,6 +1428,22 @@ async function toggleHold(context: vscode.ExtensionContext) {
 async function showHold(context: vscode.ExtensionContext) {
   const now = await askEngine(context, ["hold"], { quiet: true });
   setHoldState(now?.on === true);
+}
+
+// THE SURFACE EXISTS BEFORE THE BEHAVIOUR. Ideation is where an agent will put
+// its own ideas in, rather than only working the tokens it is handed. What that
+// comes to mean is not designed, so this toggles a value nothing reads and the
+// behaviour arrives later without a panel change.
+//
+// IT REACHES NO ENGINE. The state is this window's, so turning it on changes
+// nothing about how the machine runs, which is what the token asks for.
+let ideationOn = false;
+
+function toggleIdeation() {
+  ideationOn = !ideationOn;
+  view?.webview.postMessage({
+    type: "state", id: "ideation", state: ideationOn ? "good" : "idle", detail: "",
+  });
 }
 
 function setHoldState(on: boolean) {

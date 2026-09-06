@@ -93,11 +93,20 @@
           }
         },
         {
-          "name": "gap-1",
-          "type": "gap"
+          "name": "ideation",
+          "type": "toggle",
+          "command": "quackitect.ideation",
+          "labels": {
+            "off": "ideation",
+            "on": "ideation"
+          },
+          "titles": {
+            "off": "ideation / let the agent put its own ideas in, rather than only working the tokens it is handed",
+            "on": "ideation / the agent may put its own ideas in. Press to have it work only what it is handed"
+          }
         },
         {
-          "name": "gap-2",
+          "name": "gap-1",
           "type": "gap"
         },
         {
