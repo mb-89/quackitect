@@ -618,11 +618,14 @@ func settleEnding(r Roots, t Token) Token {
 	return t
 }
 
-func SaveToken(r Roots, t Token) error {
-	// The two fields agree before anything is written, here, because every
-	// write goes through here. See [[the-disposition-says-it-stopped]] and
-	// [[the-save-is-the-one-door]].
-	t = settleEnding(r, t)
+// TheRecordRefuses answers why the record would not write this token, and
+// nothing where it would. It reads and changes nothing.
+//
+// THE QUEUE ASKS IT BEFORE IT HANDS OUT, AND THE STAFFING COUNT ASKS IT TOO.
+// A token the save refuses cannot be handed to anybody, so counting it as work
+// asks for a hand that will be told wait. See [[the-count-is-what-the-queue-
+// would-hand-out]].
+func TheRecordRefuses(r Roots, t Token) error {
 	// The record refuses what it cannot read back, and here is where a value
 	// becomes a line. See [[the-record-refuses-what-it-cannot-read-back]].
 	if err := linesThatFit(t); err != nil {
@@ -634,10 +637,18 @@ func SaveToken(r Roots, t Token) error {
 	if err := headingsSaidOnce(t); err != nil {
 		return err
 	}
-	schema := narrowedSchema(r, t)
-	if err := proseThatFits(schema, t); err != nil {
+	return proseThatFits(narrowedSchema(r, t), t)
+}
+
+func SaveToken(r Roots, t Token) error {
+	// The two fields agree before anything is written, here, because every
+	// write goes through here. See [[the-disposition-says-it-stopped]] and
+	// [[the-save-is-the-one-door]].
+	t = settleEnding(r, t)
+	if err := TheRecordRefuses(r, t); err != nil {
 		return err
 	}
+	schema := narrowedSchema(r, t)
 	// The token as it was, so the record line can say which move this is.
 	// See [[the-save-is-the-one-door]], and [[the-token-carries-no-time]] for
 	// why the time goes in the record and not on the note.

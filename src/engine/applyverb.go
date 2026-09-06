@@ -90,7 +90,8 @@ func runApply(c *call) int {
 		c.answerJSON(map[string]any{"undone": done, "on": *on})
 		return 0
 	}
-	if *on == "" {
+	// UNBOUND MEANS NO TOKEN ON A WRITE. See the same rule in runverb.go.
+	if *on == "" && !Unleashed(c.roots) {
 		c.answerJSON(map[string]any{"error": "say which token this change is, with --on <id>. " +
 			"Every write names its work, so there is nothing to remember and nothing to arm"})
 		return 1
