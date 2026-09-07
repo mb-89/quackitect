@@ -29,6 +29,10 @@ func TestABuildFailureIsNoRedAndNamesTheHand(t *testing.T) {
 	// THE OTHER HAND PLANTS AN IDENTIFIER NOTHING DEFINES, in the package the
 	// test this one proposes is compiled with.
 	wrote(t, r, theirs, "half.go", "package lib\n\nfunc C() int {\n\treturn halfWritten()\n}\n")
+	// AND THE BUILD ANSWERS WHAT A COMPILER ANSWERS TO THAT FILE. The toolchain
+	// is fed here, the way it is everywhere but the one test that drives the
+	// real compiler, so the refusal is fed with it.
+	aBuildThatRefuses(t, "./half.go:4:9: undefined: halfWritten\n")
 
 	got, err := TestTheDelta(t.Context(), r, db, mine, []string{"TestA"}, true, "worker-mine")
 	if err != nil {
@@ -83,6 +87,7 @@ func TestEveryTestOverABrokenPackageNamesTheHand(t *testing.T) {
 	// THE OTHER HAND PLANTS AN IDENTIFIER NOTHING DEFINES, in the package both
 	// proposed tests are compiled with.
 	wrote(t, r, theirs, "half.go", "package lib\n\nfunc C() int {\n\treturn halfWritten()\n}\n")
+	aBuildThatRefuses(t, "./half.go:4:9: undefined: halfWritten\n")
 
 	got, err := TestTheDelta(t.Context(), r, db, mine, []string{"TestA", "TestB"}, true, "worker-mine")
 	if err != nil {

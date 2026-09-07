@@ -310,10 +310,10 @@ func coverBinary(r Roots, db *sql.DB, dir string) (string, error) {
 	if err := os.MkdirAll(filepath.Dir(bin), 0o755); err != nil {
 		return "", err
 	}
-	cmd := quiet.Quietly(exec.Command(goTool(), "test", "-c", "-cover", "-o", bin, "."))
-	cmd.Dir = abs
-	cmd.Env = buildEnv()
-	if out, err := cmd.CombinedOutput(); err != nil {
+	// THE BUILD GOES THROUGH THE SEAM. It was run here directly while the
+	// toolchain declared a buildCover nobody called, so a fed toolchain fed the
+	// run alone and every test taking the fixture compiled a module for real.
+	if out, err := theToolchain.buildCover(abs, bin); err != nil {
 		return "", fmt.Errorf("the cover binary for %s will not build: %v\n%s", dir, err, out)
 	}
 	// A NOTE ABOUT A BUILD IS NOT THE BUILD.

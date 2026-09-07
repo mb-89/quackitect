@@ -28,6 +28,9 @@ type fedToolchain struct {
 	sync.Mutex
 	// reaches says which lines of which file a test covered.
 	reaches map[string][]string
+	// refuses is what the build answers where the package will not compile.
+	// Empty is a package that builds.
+	refuses string
 	builds  int
 	runs    int
 }
@@ -44,6 +47,11 @@ type fedToolchain struct {
 // after another while the rest of the suite runs alongside them.
 var feeding sync.Mutex
 
+// theFed is the toolchain the running test fed. A fixture feeds one and hands
+// the tree back, so a test that needs to say what the build answers reads it
+// here. One is live at a time, which the lock above is what makes true.
+var theFed *fedToolchain
+
 // aFedToolchain feeds the engine a toolchain that compiles nothing. reaches
 // maps a test name to the profile lines it should answer with.
 func aFedToolchain(t *testing.T, module string, reaches map[string][]string) *fedToolchain {
@@ -55,7 +63,15 @@ func aFedToolchain(t *testing.T, module string, reaches map[string][]string) *fe
 		buildCover: func(dir, bin string) ([]byte, error) {
 			fed.Lock()
 			fed.builds++
+			refuses := fed.refuses
 			fed.Unlock()
+			// A PACKAGE THAT WILL NOT COMPILE IS FED TOO, because a test about
+			// what a build failure says is not a test of the compiler either.
+			// What it answers is a compiler's own shape: the file, the line and
+			// the identifier nothing defines.
+			if refuses != "" {
+				return []byte(refuses), fmt.Errorf("exit status 1")
+			}
 			// THE BINARY HAS TO BE THERE, because the caller stats it and
 			// reuses it. What is in it is never run: runOne is fed too.
 			if err := os.WriteFile(bin, []byte("a binary nothing runs"), 0o755); err != nil {
@@ -92,11 +108,26 @@ func aFedToolchain(t *testing.T, module string, reaches map[string][]string) *fe
 			return []byte("ok"), nil
 		},
 	}
+	theFed = fed
 	t.Cleanup(func() {
 		theToolchain = was
+		theFed = nil
 		feeding.Unlock()
 	})
 	return fed
+}
+
+// aBuildThatRefuses makes the fed build answer this output and fail, for a test
+// about a package that will not compile. It is set after the fixture has built,
+// because the fixture's own build has to succeed.
+func aBuildThatRefuses(t *testing.T, said string) {
+	t.Helper()
+	if theFed == nil {
+		t.Fatal("no toolchain is fed here, so nothing can say what the build answers")
+	}
+	theFed.Lock()
+	theFed.refuses = said
+	theFed.Unlock()
 }
 
 // THE ONE TEST THAT DRIVES THE REAL GO TOOLCHAIN.
@@ -118,6 +149,13 @@ func TestTheMapIsBuiltByTheRealGo(t *testing.T) {
 	// THE REAL ONE, put back over the fed one the fixture installs. The
 	// fixture's own Cleanup restores whatever was there before it.
 	theToolchain = realToolchain()
+	// AND WHAT THE FED ONE BUILT GOES WITH IT. The fixture's toolchain writes a
+	// stub where the cover binary belongs, and the index's note says that
+	// binary is current, so the real toolchain would run bytes no compiler
+	// made. The folder is remade by the build below.
+	if err := os.RemoveAll(r.Private("tests")); err != nil {
+		t.Fatal(err)
+	}
 	db := openTheIndex(t, r)
 
 	var regions int
