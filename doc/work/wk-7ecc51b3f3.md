@@ -11,6 +11,8 @@ title: four tests pass eight
 status: open
 # the person's own name for a group. It does not move the work
 bucket: tests
+claimed_by: 7a7c633a/main
+claimed_at: "2026-09-07T14:53:42Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - a9fd0bfc8389eb0b6c1196a85999c706eba3768c
