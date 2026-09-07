@@ -9,13 +9,13 @@ import (
 
 // A REMEDY NAMING A FOLDER THE STALE COPY IS NOT IN CANNOT BE FOLLOWED.
 //
-// The pass-over tells the reader to bring doc/work into step with the branch.
-// That is the right remedy for a note under doc/work and no remedy at all for
+// The pass-over tells the reader to bring spec/work into step with the branch.
+// That is the right remedy for a note under spec/work and no remedy at all for
 // one under .se/work, which git carries nowhere. No fetch, no merge and no
 // reset moves it.
 //
 // MEASURED, September 2026. Three ids were named on every pull of a session
-// under that instruction, and doc/work held none of the three. All three sat
+// under that instruction, and spec/work held none of the three. All three sat
 // under .se/work. The queue stayed blocked and each hand was sent to a folder
 // with nothing in it.
 //
@@ -26,7 +26,7 @@ func TestThePassOverNamesTheFileItMeans(t *testing.T) {
 
 	got := Pull(behind, "worker-1", RoleWorker, Payload{})
 
-	trackedAt := "doc/work/" + onTheBranch.ID + ".md"
+	trackedAt := "spec/work/" + onTheBranch.ID + ".md"
 	privateAt := ".se/work/" + private.ID + ".md"
 	if !strings.Contains(got.Notice, trackedAt) {
 		t.Errorf("the notice does not name %s, so the reader is told a folder and not a file:\n%s", trackedAt, got.Notice)
@@ -52,13 +52,13 @@ func TestThePassOverNamesTheFileItMeans(t *testing.T) {
 	if strings.Contains(said, "fetch") {
 		t.Errorf("the private copy is told to fetch, and no fetch reaches .se/work:\n%s", said)
 	}
-	if strings.Contains(said, "Bring doc/work into step") {
-		t.Errorf("the private copy is sent to doc/work, which does not hold it:\n%s", said)
+	if strings.Contains(said, "Bring spec/work into step") {
+		t.Errorf("the private copy is sent to spec/work, which does not hold it:\n%s", said)
 	}
 }
 
 // aCloneWithBothKindsOfPassOver hands back a clone carrying two tokens the
-// branch has archived. One is a note under doc/work that the branch has moved
+// branch has archived. One is a note under spec/work that the branch has moved
 // on from, so a fetch really would bring it into step. The other is a private
 // note under .se/work, which no fetch reaches at all.
 func aCloneWithBothKindsOfPassOver(t *testing.T) (Roots, Token, Token) {
@@ -85,7 +85,7 @@ func aCloneWithBothKindsOfPassOver(t *testing.T) (Roots, Token, Token) {
 	if err := SaveToken(r, tok); err != nil {
 		t.Fatalf("closing %s: %v", tok.ID, err)
 	}
-	list := filepath.Join(r.Work, "doc", "work", "archive.jsonl")
+	list := filepath.Join(r.Work, "spec", "work", "archive.jsonl")
 	was, _ := os.ReadFile(list)
 	rows := string(was) +
 		`{"id":"` + tok.ID + `","title":"behind the branch","disposition":"done"}` + "\n" +
@@ -93,7 +93,7 @@ func aCloneWithBothKindsOfPassOver(t *testing.T) (Roots, Token, Token) {
 	if err := os.WriteFile(list, []byte(rows), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	gitAt(t, r.Work, "add", "--all", "--", "doc/work")
+	gitAt(t, r.Work, "add", "--all", "--", "spec/work")
 	gitAt(t, r.Work, "commit", "--quiet", "-m", "the close and the rows")
 
 	gitAt(t, clone, "fetch", "--quiet", "origin")

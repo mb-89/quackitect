@@ -10,7 +10,7 @@ import (
 // A NOTICE THAT BLAMES A LAG THERE IS NONE OF IS AN INSTRUCTION NOBODY CAN ACT ON.
 //
 // The queue declines to hand out what the fetched branch has archived, and says
-// the clone is behind and to bring doc/work into step. That reading is right
+// the clone is behind and to bring spec/work into step. That reading is right
 // when the branch dropped the note. It is wrong when the branch carries the
 // note and an archive row for it at once.
 //
@@ -33,7 +33,7 @@ func TestTheNoticeDoesNotBlameALagItCanRuleOut(t *testing.T) {
 	if strings.Contains(got.Notice, "this clone is behind it") {
 		t.Errorf("the notice blames a lag over a note the branch carries unchanged: %s", got.Notice)
 	}
-	if strings.Contains(got.Notice, "Bring doc/work into step") {
+	if strings.Contains(got.Notice, "Bring spec/work into step") {
 		t.Errorf("the notice asks for a fetch that would change nothing: %s", got.Notice)
 	}
 	if !strings.Contains(got.Notice, "disagrees with itself") {
@@ -72,13 +72,13 @@ func aCloneWhoseBranchDisagrees(t *testing.T) (Roots, Token) {
 	gitAt(t, r.Work, "clone", "--quiet", "--no-tags", "file://"+filepath.ToSlash(r.Work), clone)
 
 	// THE BRANCH ARCHIVES THE ID AND LEAVES THE NOTE ALONE.
-	list := filepath.Join(r.Work, "doc", "work", "archive.jsonl")
+	list := filepath.Join(r.Work, "spec", "work", "archive.jsonl")
 	was, _ := os.ReadFile(list)
 	row := string(was) + `{"id":"` + tok.ID + `","title":"` + tok.Title + `","disposition":"done"}` + "\n"
 	if err := os.WriteFile(list, []byte(row), 0o644); err != nil {
 		t.Fatal(err)
 	}
-	gitAt(t, r.Work, "add", "--all", "--", "doc/work")
+	gitAt(t, r.Work, "add", "--all", "--", "spec/work")
 	gitAt(t, r.Work, "commit", "--quiet", "-m", "the row and not the note")
 
 	gitAt(t, clone, "fetch", "--quiet", "origin")

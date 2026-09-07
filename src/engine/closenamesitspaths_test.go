@@ -16,7 +16,7 @@ import (
 // MEASURED, 2026-09-07, three times in one session, and caught by the stop
 // hook rather than by the engine. wk-aa9c98250a and wk-0200291ebb both closed
 // here, both had their note landed with the evidence, and neither row reached
-// doc/work/archive.jsonl on the branch. The record there read them as open.
+// spec/work/archive.jsonl on the branch. The record there read them as open.
 //
 // wk-bf10a262a0 carries the other half in its own words: the hand landing a
 // close names the archive and forgets the note it just deleted, because the
@@ -26,14 +26,14 @@ func TestACloseNamesThePathsItWrote(t *testing.T) {
 	t.Parallel()
 	r := aTreeWithOneStep(t)
 	tok := mintTask(t, r, "a hand lands this", "")
-	at := filepath.Join(r.Work, "doc", "work", tok.ID+".md")
+	at := filepath.Join(r.Work, "spec", "work", tok.ID+".md")
 
 	got := Pull(r, "worker-a", RoleWorker, Payload{ID: tok.ID, Disposition: "done"})
 
 	if got.Pull == AnswerRefused {
 		t.Fatalf("the close was refused: %+v", got.Findings)
 	}
-	for _, want := range []string{"doc/work/" + tok.ID + ".md", "doc/work/archive.jsonl"} {
+	for _, want := range []string{"spec/work/" + tok.ID + ".md", "spec/work/archive.jsonl"} {
 		if !slices.Contains(got.Paths, want) {
 			t.Errorf("the close wrote %s and the answer names %v", want, got.Paths)
 		}
@@ -48,7 +48,7 @@ func TestACloseNamesThePathsItWrote(t *testing.T) {
 	// takes it off the disk, asking afterwards answers nothing, and land.sh
 	// removes a path the tree no longer holds, which is what the branch needs.
 	if _, err := os.Stat(at); os.IsNotExist(err) &&
-		!slices.Contains(got.Paths, "doc/work/"+tok.ID+".md") {
+		!slices.Contains(got.Paths, "spec/work/"+tok.ID+".md") {
 		t.Errorf("the close deleted the note and did not name it: %v", got.Paths)
 	}
 }

@@ -10,7 +10,7 @@ import (
 // THE NOTE IS THE AUTHOR'S ANSWER SHEET, AND A SUBMISSION MUST NOT EAT IT.
 //
 // MEASURED on a live token. The author wrote three evidence tables into
-// its note under doc/work, the gate read them off it and let the move
+// its note under spec/work, the gate read them off it and let the move
 // through, and then submit assigned t.Submission = p.Evidence over the top.
 // That payload carried no evidence, so the map went nil and SaveToken rebuilt
 // the file from the struct with every table gone, while the frontmatter came

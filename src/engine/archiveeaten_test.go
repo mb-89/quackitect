@@ -7,7 +7,7 @@ import (
 
 // A CLOSE DOES NOT WRITE AN ARCHIVE IT DID NOT READ.
 //
-// MEASURED, ON 2026-09-06. doc/work/archive.jsonl went from 377 rows to 1 after
+// MEASURED, ON 2026-09-06. spec/work/archive.jsonl went from 377 rows to 1 after
 // one close on a cloud box. It was caught before it was pushed.
 //
 // THE PATH. archiveListRows reads a missing file as zero rows and no error.

@@ -53,7 +53,7 @@ func TestAClaimsWriteOverAnUnreadableParentIsRefused(t *testing.T) {
 	fed.fails["ls-tree"] = "fatal: not a tree object"
 
 	index := filepath.Join(t.TempDir(), "claims.index")
-	_, err := writeTheClaims(t.Context(), r, index, []string{"doc/work/wk-1.md"}, "a claim")
+	_, err := writeTheClaims(t.Context(), r, index, []string{"spec/work/wk-1.md"}, "a claim")
 	if err == nil {
 		t.Fatal("the claims were written over a parent whose own claims could not be read")
 	}

@@ -164,7 +164,7 @@ func TestALoopThatDeletesIsRefused(t *testing.T) {
 		// a worktree under the system temp folder, cleaned up before a loop that
 		// deletes nothing.
 		{"a loop beside a removal outside the tree",
-			"rm -rf " + outside + "; git worktree prune; for f in doc/work/a.md doc/work/b.md; do git cat-file -e FETCH_HEAD:$f; done", false},
+			"rm -rf " + outside + "; git worktree prune; for f in spec/work/a.md spec/work/b.md; do git cat-file -e FETCH_HEAD:$f; done", false},
 		// AND A LOOP WHOSE REMOVAL NAMES NOTHING STAYS REFUSED, because the
 		// files it takes are the ones its own output names.
 		{"a loop whose removal names no file", "for f in src/*.go; do echo $f | xargs rm; done", true},

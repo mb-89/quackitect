@@ -16,7 +16,7 @@ import (
 // A token is a markdown note. Two folders hold them, and the minter picks one:
 //
 //	.se/work/   local. Private material, and it never travels with a copy.
-//	doc/work/   tracked. The record of what was done, in version control.
+//	spec/work/   tracked. The record of what was done, in version control.
 //
 // A note is a token when its frontmatter says `type: work`, so a folder may
 // hold other notes beside them.
@@ -25,7 +25,20 @@ import (
 
 // LocalDir is private and never travels. TrackedDir is the record.
 func LocalDir(r Roots) string   { return r.Private("work") }
-func TrackedDir(r Roots) string { return filepath.Join(r.Work, "doc", "work") }
+func TrackedDir(r Roots) string { return filepath.Join(r.Work, TheTrackedFolder) }
+
+// TheTrackedFolder is where tracked tokens live, under the work root.
+//
+// IT IS A CONSTANT BECAUSE TWO KINDS OF CALLER NEED IT. TrackedDir answers an
+// absolute path, which is what a reader of the disk wants. A refusal that tells
+// a person which path to land wants the relative one, and anemptygroupcloses
+// built that by joining the two segments itself. A move then changes one and not
+// the other, which is the shape that has cost this tree four readers today.
+//
+// IT MOVED FROM doc TO spec. doc said what kind of file it was. spec says what
+// the tree is: guidance, rationale, work and the design input are all the
+// specification, and the folder that holds them should say so.
+const TheTrackedFolder = "spec/work"
 
 func workDirs(r Roots) []string { return []string{TrackedDir(r), LocalDir(r)} }
 

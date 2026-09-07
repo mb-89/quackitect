@@ -1408,7 +1408,7 @@ async function editCell(context: vscode.ExtensionContext, id: string, col: strin
 async function openNote(context: vscode.ExtensionContext, id: string) {
   const work = workRoot();
   if (!work) return;
-  for (const rel of [path.join("doc", "work", id + ".md"), path.join(".se", "work", id + ".md")]) {
+  for (const rel of [path.join("spec", "work", id + ".md"), path.join(".se", "work", id + ".md")]) {
     const full = path.join(work, rel);
     if (fs.existsSync(full)) {
       await vscode.window.showTextDocument(vscode.Uri.file(full), { preview: true });

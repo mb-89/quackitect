@@ -8,7 +8,7 @@
 // from one they simply have not found.
 //
 // A token this names has to be openable from the tree the comment ships in:
-// a note under doc/work or .se/work, or a row in the archive.
+// a note under spec/work or .se/work, or a row in the archive.
 //
 // A PATH IS A CITATION TOO. The comment names files as well as tokens, and a
 // path into the method that no clone carries is the same shut door as a lost
@@ -39,10 +39,10 @@ function notesIn(dir) {
 }
 
 // WHAT A READER CAN OPEN, in the three places a token can be.
-const here = new Set([...notesIn(join(root, "doc", "work")), ...notesIn(join(root, ".se", "work"))]);
+const here = new Set([...notesIn(join(root, "spec", "work")), ...notesIn(join(root, ".se", "work"))]);
 let archived = 0;
 try {
-  for (const line of readFileSync(join(root, "doc", "work", "archive.jsonl"), "utf8").split("\n")) {
+  for (const line of readFileSync(join(root, "spec", "work", "archive.jsonl"), "utf8").split("\n")) {
     if (!line.trim()) continue;
     let row;
     try {
@@ -60,7 +60,7 @@ try {
 }
 
 say("there are tokens to resolve against (" + here.size + ")", here.size > 0,
-  "no note under doc/work or .se/work and no archive row, so every citation "
+  "no note under spec/work or .se/work and no archive row, so every citation "
   + "would look broken and this check would fail for the wrong reason");
 
 // THE FILES THAT CARRY THE CAGE. The tracked one is what every clone gets and
@@ -91,7 +91,7 @@ for (const path of cages) {
   const lost = [...cited].filter((id) => !here.has(id)).sort();
   say(path + " cites only tokens this tree carries", lost.length === 0,
     path + " names " + lost.join(", ") + ", which "
-    + (lost.length === 1 ? "is" : "are") + " in no note under doc/work or "
+    + (lost.length === 1 ? "is" : "are") + " in no note under spec/work or "
     + ".se/work and in no archive row. A reader of this comment cannot open "
     + "it. Name a source the tree carries, or say in words what the source held");
 

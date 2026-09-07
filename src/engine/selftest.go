@@ -61,7 +61,7 @@ func SelfTest(roots Roots, keep bool) int {
 	}
 
 	// 2. It carries the method and not the tree it came from.
-	_, hasGuidance := os.Stat(filepath.Join(copyRoot, "doc", "guidance", "voice.md"))
+	_, hasGuidance := os.Stat(filepath.Join(GuidanceDir(copyRoot), "voice.md"))
 	_, hasGit := os.Stat(filepath.Join(copyRoot, ".git"))
 	_, hasPrivate := os.Stat(filepath.Join(copyRoot, ".se"))
 	say("the copy carries the method", hasGuidance == nil, "guidance/voice.md")

@@ -6,7 +6,7 @@
       "target": ".github/copilot-instructions.md",
       "wrap": "markdown",
       "section": "Actionables",
-      "sources_from": "doc/guidance"
+      "sources_from": "spec/guidance"
     },
     {
       "name": "claude output style",
@@ -16,7 +16,7 @@
         "name": "quackitect"
       },
       "section": "Actionables",
-      "sources_from": "doc/guidance",
+      "sources_from": "spec/guidance",
       "preamble": "src/cage/first-turn.md"
     },
     {

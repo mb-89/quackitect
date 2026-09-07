@@ -296,7 +296,7 @@ func AStaffShortfall(r Roots, cfg Config, actor, tool, command, id, disposition 
 	}
 	if moreReviewers > 0 {
 		fmt.Fprintf(&b, "%d standard tokens await a verdict, %d reviewers are here, and the engine wants %d: "+
-			"spawn %d subagent. Tell it: read doc/guidance/methods/reviewing.md, then pull with se_pull, "+
+			"spawn %d subagent. Tell it: read spec/guidance/methods/reviewing.md, then pull with se_pull, "+
 			"actor reviewer-<a name>, role reviewer, and give one verdict per token until the queue answers wait.\n\n",
 			s.AwaitingVerdict, s.ReviewersHere, s.ReviewersWanted, moreReviewers)
 	}

@@ -28,7 +28,7 @@ func TestAChangedOriginalIsProjectedAgain(t *testing.T) {
 		t.Fatalf("nothing changed and it wrote %v", written)
 	}
 
-	os.WriteFile(filepath.Join(r.Method, "doc", "guidance", "voice.md"), []byte("# Voice\n\nAnswer last.\n"), 0o644)
+	os.WriteFile(filepath.Join(r.Method, "spec", "guidance", "voice.md"), []byte("# Voice\n\nAnswer last.\n"), 0o644)
 	written, _ = Project(r)
 	if len(written) != 3 {
 		t.Fatalf("a changed original should write every projection, got %v", written)
@@ -89,12 +89,12 @@ func TestTheDigestFollowsContentNotTime(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	os.WriteFile(filepath.Join(r.Method, "doc", "guidance", "voice.md"), []byte("# Voice\n\nAnswer first.\n"), 0o644)
+	os.WriteFile(filepath.Join(r.Method, "spec", "guidance", "voice.md"), []byte("# Voice\n\nAnswer first.\n"), 0o644)
 	same, _ := GuidanceDigest(r.Method)
 	if same != first {
 		t.Fatal("rewriting the same content changed the digest")
 	}
-	os.WriteFile(filepath.Join(r.Method, "doc", "guidance", "voice.md"), []byte("# Voice\n\nsomething else\n"), 0o644)
+	os.WriteFile(filepath.Join(r.Method, "spec", "guidance", "voice.md"), []byte("# Voice\n\nsomething else\n"), 0o644)
 	other, _ := GuidanceDigest(r.Method)
 	if other == first {
 		t.Fatal("changed content did not change the digest")
@@ -113,7 +113,7 @@ func TestTheDigestFollowsContentNotTime(t *testing.T) {
 func TestEveryProjectionOfAGuidanceCarriesIt(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
-	source := filepath.Join("doc", "guidance", "behaviour.md")
+	source := filepath.Join("spec", "guidance", "behaviour.md")
 
 	// A rule the fixture's own guidance carries, so this tests the mechanism
 	// rather than the product's wording.
@@ -172,13 +172,13 @@ func projectionsFrom(t *testing.T, r Roots, source string) []string {
 func TestAProjectionWithASectionCarriesOnlyThatChapter(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
-	guidance := filepath.Join(r.Method, "doc", "guidance")
+	guidance := filepath.Join(r.Method, "spec", "guidance")
 	os.WriteFile(filepath.Join(guidance, "voice.md"),
 		[]byte("# Voice\n\n## Motivation\n\nWhy.\n\n## Actionables\n\n- Answer first.\n\n## Discussion\n\nAt length.\n"), 0o644)
 	os.WriteFile(filepath.Join(guidance, "behaviour.md"),
 		[]byte("# Behaviour\n\n## Motivation\n\nWhy.\n\n## Actionables\n\n- Do what was asked.\n\n## Discussion\n\nAt length.\n"), 0o644)
 	os.WriteFile(filepath.Join(r.Method, "src", "config", "projections.json"), []byte(`{"projections":[
-	  {"name":"protocol","target":"AGENTS.md","sources":["doc/guidance/voice.md","doc/guidance/behaviour.md"],"wrap":"markdown","section":"Actionables"}
+	  {"name":"protocol","target":"AGENTS.md","sources":["spec/guidance/voice.md","spec/guidance/behaviour.md"],"wrap":"markdown","section":"Actionables"}
 	]}`), 0o644)
 	if _, err := Project(r); err != nil {
 		t.Fatal(err)

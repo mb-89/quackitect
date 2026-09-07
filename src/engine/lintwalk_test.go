@@ -7,8 +7,8 @@ import (
 
 // THE LINT GOES ALL THE WAY DOWN.
 //
-// MEASURED. It read one level and skipped every directory, so doc/guidance was
-// checked and doc/guidance/software-development was not. Four files had never
+// MEASURED. It read one level and skipped every directory, so spec/guidance was
+// checked and spec/guidance/software-development was not. Four files had never
 // been read by anything, and the schema they name applied to them exactly as
 // much as to any other file. Nothing had ever asked.
 //

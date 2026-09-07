@@ -9,7 +9,7 @@ import (
 
 // THE SCHEMA IS DRIVEN OVER FIXTURES, NOT OVER THE CORPUS.
 //
-// A test reading doc/guidance would go red whenever anybody edited a guidance
+// A test reading spec/guidance would go red whenever anybody edited a guidance
 // file, which is a defect in nobody's program. The one test below that reads a
 // real file reads src/schemas, which is source rather than record: a schema
 // that does not load is a defect, and this is the check that says so.

@@ -100,7 +100,7 @@ func tidyWhatTravels(r Roots) TidyPart {
 	}
 	part.Why = "this tree is on a group branch, so nothing under .se travels. " +
 		"The retro collects into .se/retro, and that folder goes when the box does. " +
-		"A tracked token under doc/work, pushed, is the only output that survives."
+		"A tracked token under spec/work, pushed, is the only output that survives."
 	return part
 }
 

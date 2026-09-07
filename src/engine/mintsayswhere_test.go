@@ -9,7 +9,7 @@ import (
 
 // WHERE A TOKEN IS BORN IS SAID AT THE MINT.
 //
-// A tracked token is in doc/work, which git carries, so another agent on
+// A tracked token is in spec/work, which git carries, so another agent on
 // another box can claim it. A local one is in .se/work, which nothing else
 // reaches. That is the choice, and there is no default to fall back on.
 //

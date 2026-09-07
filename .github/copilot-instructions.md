@@ -1,4 +1,4 @@
-<!-- GENERATED. Edit the source named below, not this file. Source: doc/guidance/backlog.md, doc/guidance/behaviour.md, doc/guidance/driving-the-engine.md, doc/guidance/voice.md, doc/guidance/work-token.md -->
+<!-- GENERATED. Edit the source named below, not this file. Source: spec/guidance/backlog.md, spec/guidance/behaviour.md, spec/guidance/driving-the-engine.md, spec/guidance/voice.md, spec/guidance/work-token.md -->
 
 # Backlog
 
@@ -57,11 +57,11 @@
 3. Three or more parallel things are a list, each with its status, in a chat answer as in a file. *
 4. BLUF: bottom line upfront, progressive disclosure: details come later, at the discretion of the reader.
 5. Active voice. Name who acts. Present tense for everything except discussions. Past tense is allowed there.
-6. Stakeholder-specific communication: do not leak internals, write what is relevant to the audience. For details, see [[doc/guidance/stakeholders]].
+6. Stakeholder-specific communication: do not leak internals, write what is relevant to the audience. For details, see [[spec/guidance/stakeholders]].
 7. Use the same word for the same thing every time. For details, see [[doc/glossary]].
 8. In general, with few exceptions: say what is. Do not say what is not, the list is endless. *
 9. State a fact only if you own it. Otherwise name where it lives, via "For details, see [[link]]". *
-10. Follow the technical English rules. For details, see [[doc/guidance/ASD-STE-100]].
+10. Follow the technical English rules. For details, see [[spec/guidance/ASD-STE-100]].
 11. DRY: do not repeat yourself. SPOT: single point of truth for every datum. A repetition in a spec, finding or answer is a defect. *
 12. Do not put history in the current surface. It goes into git commit messages.
 13. A number something else answers is never written down. The tree's count is the command that answers it. A list's count is the list. *

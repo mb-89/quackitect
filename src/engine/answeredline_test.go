@@ -12,7 +12,7 @@ import (
 // criterion does not hold could not close the token at all: se_pull refused,
 // naming that line, and went on refusing one line per pull until every box was
 // ticked. The only way out was to tick a line the worker had just written was
-// false, which is the outcome doc/guidance/work-token.md rule 15 exists to
+// false, which is the outcome spec/guidance/work-token.md rule 15 exists to
 // prevent.
 //
 // MEASURED on a live token. Two do-checklist lines were answered with

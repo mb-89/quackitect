@@ -13,10 +13,10 @@
 // MEASURED, September 2026, over a detached worktree of origin/v4. Of the 32
 // notes there carrying bucket claims, 25 already had an archive row saying
 // done. Seven were genuinely open. The queue, the burndown and every count
-// taken off doc/work read 32.
+// taken off spec/work read 32.
 //
 // THE QUEUE ITSELF CANNOT FIX IT. Its pull answers that the clone is behind and
-// asks a person to bring doc/work into step. The clone is not behind. It
+// asks a person to bring spec/work into step. The clone is not behind. It
 // deleted the notes when it closed them, and the deletion never travelled.
 //
 // THE INSTRUMENT IS PROVED BEFORE IT RULES. Two fixtures run under this same
@@ -29,7 +29,7 @@
 // --plain rules on the root and skips the fixtures, which is how the fixtures
 // run this file without it running them again.
 //
-// reads: doc/work/*.md, doc/work/archive.jsonl
+// reads: spec/work/*.md, spec/work/archive.jsonl
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
@@ -49,11 +49,11 @@ function fail(said) {
 // rule reads one tree and names every note the archive has already closed.
 // It answers how many notes it read, and raises failed for each one named.
 function rule(at) {
-  const here = join(at, "doc", "work");
+  const here = join(at, "spec", "work");
   // A ROOT THAT IS NOT THERE IS A FAILURE AND NOT A SKIP. A check guarding
   // nothing says so rather than answering green.
   if (!existsSync(here)) {
-    fail("doc/work is not there, so this guards nothing");
+    fail("spec/work is not there, so this guards nothing");
     return 0;
   }
 
@@ -68,7 +68,7 @@ function rule(at) {
         const row = JSON.parse(line);
         if (typeof row.id === "string") rows.set(row.id, row.disposition ?? row.status ?? "archived");
       } catch (e) {
-        fail(`line ${i + 1} of doc/work/archive.jsonl will not parse, and the list is the record: ${e.message}`);
+        fail(`line ${i + 1} of spec/work/archive.jsonl will not parse, and the list is the record: ${e.message}`);
       }
     }
   }
@@ -82,10 +82,10 @@ function rule(at) {
   for (const id of onDisk) {
     if (!rows.has(id)) continue;
     fail(
-      `doc/work/${id}.md is on the disk and doc/work/archive.jsonl already carries it as ` +
-        `${rows.get(id)}. A reader of doc/work counts finished work as open. The close deleted ` +
+      `spec/work/${id}.md is on the disk and spec/work/archive.jsonl already carries it as ` +
+        `${rows.get(id)}. A reader of spec/work counts finished work as open. The close deleted ` +
         `this note and the deletion never travelled, so land the deletion: ` +
-        `sh util/git/land.sh "<message>" doc/work/${id}.md doc/work/archive.jsonl`,
+        `sh util/git/land.sh "<message>" spec/work/${id}.md spec/work/archive.jsonl`,
     );
   }
   return onDisk.length;
@@ -95,7 +95,7 @@ function rule(at) {
 // notes named.
 function aTree(rows, notes) {
   const at = mkdtempSync(join(tmpdir(), "archived-notes-"));
-  const here = join(at, "doc", "work");
+  const here = join(at, "spec", "work");
   mkdirSync(here, { recursive: true });
   writeFileSync(join(here, "archive.jsonl"), rows.map((r) => JSON.stringify(r)).join("\n") + "\n");
   for (const id of notes) writeFileSync(join(here, id + ".md"), `---\nstatus: open\n---\n\n## detail\n\na note\n`);

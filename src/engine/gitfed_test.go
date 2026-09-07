@@ -121,7 +121,7 @@ func TestAClaimTouchesNoBranchAndNoWorkingTree(t *testing.T) {
 	fed.says["write-tree"] = "aaaa"
 	fed.says["commit-tree"] = "bbbb"
 
-	got := Publish(t.Context(), r, []string{"doc/work/wk-1.md"}, "a claim")
+	got := Publish(t.Context(), r, []string{"spec/work/wk-1.md"}, "a claim")
 	if !got.Committed || !got.Pushed {
 		t.Fatalf("the claim did not publish: %+v", got)
 	}
@@ -142,7 +142,7 @@ func TestAClaimTouchesNoBranchAndNoWorkingTree(t *testing.T) {
 	// AND NO NOTE WAS ADDED. The ref carries one file of claim lines, written
 	// as a blob into a fresh index, so nothing from the tree is staged and a
 	// sweep has nothing to sweep.
-	if fed.carried("-A") || fed.carried(".") || fed.asked("add", "doc/work") {
+	if fed.carried("-A") || fed.carried(".") || fed.asked("add", "spec/work") {
 		t.Error("the claim staged the tree's notes into the commit")
 	}
 	if !fed.asked("update-index", "--cacheinfo", claimsFile) {
@@ -158,7 +158,7 @@ func TestALostRaceReadsTheOtherBoxRatherThanRebasing(t *testing.T) {
 	fed.says["commit-tree"] = "bbbb"
 	fed.fails["push"] = "rejected: the ref moved"
 
-	got := Publish(t.Context(), r, []string{"doc/work/wk-1.md"}, "a claim")
+	got := Publish(t.Context(), r, []string{"spec/work/wk-1.md"}, "a claim")
 	if got.Pushed {
 		t.Fatal("a push that was refused twice reported as pushed")
 	}
@@ -181,7 +181,7 @@ func TestTheSyncFetchesOnlyTheClaimsRef(t *testing.T) {
 	// says which of the two shapes this commit is rather than leaving it to
 	// whether a note happens to parse as claim lines.
 	fed.fails["cafe1234:"+claimsFile] = "fatal: path 'claims' does not exist in 'cafe1234'"
-	fed.says["ls-tree"] = "doc/work/wk-far.md"
+	fed.says["ls-tree"] = "spec/work/wk-far.md"
 	fed.says["show"] = "---\nkind: [[work-token]]\nclaimed_by: 0badc0de/worker-far\n" +
 		"claimed_at: 2026-09-04T06:00:00Z\n---\n\n## detail\n\nsomething\n"
 
@@ -285,7 +285,7 @@ func TestPublishReachesItsSecondPushWhenThisBoxIsAhead(t *testing.T) {
 	}
 	t.Cleanup(func() { gitRuns = was })
 
-	got := Publish(t.Context(), r, []string{"doc/work/wk-1.md"}, "a claim")
+	got := Publish(t.Context(), r, []string{"spec/work/wk-1.md"}, "a claim")
 	if !fed.asked("fetch", "+"+claimsBranch+":"+remoteClaimsRef) {
 		t.Error("the loser fetched over its own ref, which git refuses while this box is ahead")
 	}
@@ -318,7 +318,7 @@ func TestSyncClaimsReadsFarClaimsWhenThisBoxIsAhead(t *testing.T) {
 	fed.says["rev-parse --verify --quiet "+remoteClaimsRef] = "cafe1234"
 	// AND THIS COMMIT CARRIES NO CLAIMS FILE EITHER, so it is read the old way.
 	fed.fails["cafe1234:"+claimsFile] = "fatal: path 'claims' does not exist in 'cafe1234'"
-	fed.says["ls-tree"] = "doc/work/wk-far.md"
+	fed.says["ls-tree"] = "spec/work/wk-far.md"
 	fed.says["show"] = "---\nkind: [[work-token]]\nclaimed_by: 0badc0de/worker-far\n" +
 		"claimed_at: 2026-09-04T06:00:00Z\n---\n\n## detail\n\nsomething\n"
 
@@ -446,13 +446,13 @@ func TestAPushThatNeverLandsKeepsEveryClaimThisBoxWrote(t *testing.T) {
 		}
 	}
 
-	if got := Publish(t.Context(), r, []string{"doc/work/" + first.ID + ".md"}, "the first"); got.Pushed {
+	if got := Publish(t.Context(), r, []string{"spec/work/" + first.ID + ".md"}, "the first"); got.Pushed {
 		t.Fatal("the push was meant to be refused, and this test is about what happens then")
 	}
 	if !strings.Contains(fed.last, first.ID) {
 		t.Fatalf("the first claim never reached the ref: %q", fed.last)
 	}
-	Publish(t.Context(), r, []string{"doc/work/" + second.ID + ".md"}, "the second")
+	Publish(t.Context(), r, []string{"spec/work/" + second.ID + ".md"}, "the second")
 
 	for _, id := range []string{first.ID, second.ID} {
 		if !strings.Contains(fed.last, id) {

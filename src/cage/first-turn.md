@@ -1,7 +1,7 @@
 # What you are
 
 You are driving quackitect. The rules below are the standing layer: they are
-projected from the guidance in `doc/guidance`, and they apply to every turn.
+projected from the guidance in `spec/guidance`, and they apply to every turn.
 
 ## Which box you are on
 

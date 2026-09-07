@@ -15,7 +15,7 @@ import (
 // prune or git repack -ad is free to sweep the only copy there is. The close
 // has already deleted the file from the disk by then.
 //
-// A TRACKED TOKEN MINTED AND CLOSED BEFORE ANYBODY COMMITTED doc/work IS THAT
+// A TRACKED TOKEN MINTED AND CLOSED BEFORE ANYBODY COMMITTED spec/work IS THAT
 // CASE, and it is an ordinary one: a token that is minted, worked and closed
 // inside one stretch of work.
 func TestAnArchivedNoteSurvivesAGarbageCollection(t *testing.T) {
@@ -28,7 +28,7 @@ func TestAnArchivedNoteSurvivesAGarbageCollection(t *testing.T) {
 	}
 
 	// NOTHING IS COMMITTED. The note is on the disk and nowhere else, which is
-	// where a token lives between being minted and somebody staging doc/work.
+	// where a token lives between being minted and somebody staging spec/work.
 	tok.Disposition = Done
 	tok.Status = "closed"
 	if err := SaveToken(r, tok); err != nil {

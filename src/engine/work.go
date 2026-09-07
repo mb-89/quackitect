@@ -32,7 +32,7 @@ func runWork(c *call) int {
 	process := fs.String("process", "", "which process shapes this token (default: note)")
 	stdin := fs.Bool("stdin", false, "read the token as JSON on standard input")
 	title := fs.String("title", "", "what the work is, in four words at most")
-	tracked := fs.String("tracked", "", "true: born in doc/work, where another box can claim it. "+
+	tracked := fs.String("tracked", "", "true: born in spec/work, where another box can claim it. "+
 		"false: born in .se/work, for what you do yourself next. A note takes neither")
 	detail := fs.String("detail", "", "what is asked, or what is wrong")
 	action := fs.String("proposed-action", "", "what you think should happen about it")

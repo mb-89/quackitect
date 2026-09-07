@@ -508,7 +508,7 @@ func TestARetroLeavesAnotherActorsFolder(t *testing.T) {
 // THE POSITIVE CONTROL, AND IT COMES BEFORE THE SWEEP RATHER THAN AFTER IT.
 //
 // A sweep that has never found anything has never been tested, which is the rule
-// in doc/guidance/behaviour.md. So this drives the keep's own rule over the one
+// in spec/guidance/behaviour.md. So this drives the keep's own rule over the one
 // citation the record already holds in the spelling that defeated it, taken out
 // of this token's own note rather than invented: observed-red-criteria.txt, at
 // the end of a sentence.

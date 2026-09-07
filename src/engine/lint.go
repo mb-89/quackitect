@@ -87,7 +87,7 @@ func LintTokens(r Roots) []Finding {
 	if err != nil {
 		// A CHECK THAT CANNOT READ WHAT IT GUARDS SAYS SO, rather than
 		// answering clean at the moment the archive is the thing that is broken.
-		out = append(out, Finding{ID: "doc/work/archive.jsonl", Title: "the archive",
+		out = append(out, Finding{ID: "spec/work/archive.jsonl", Title: "the archive",
 			Says: "cannot be read, so no id written into a note was checked: " + err.Error()})
 	}
 	for _, t := range Tokens(r) {

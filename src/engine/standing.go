@@ -50,10 +50,10 @@ func TheStandingLayer(methodRoot string) map[string]bool {
 			continue
 		}
 		for _, s := range srcs {
-			// KEYED ON THE PATH UNDER doc/guidance, not on the file name. Two
+			// KEYED ON THE PATH UNDER spec/guidance, not on the file name. Two
 			// files called guidance.md, one at the top and one in a lane's
 			// folder, are two different files and only one is standing.
-			out[strings.TrimPrefix(filepath.ToSlash(s), "doc/guidance/")] = true
+			out[strings.TrimPrefix(filepath.ToSlash(s), "spec/guidance/")] = true
 		}
 	}
 	return out
@@ -71,13 +71,13 @@ func TheGuidanceFor(r Roots, actor, name string) (text, says string) {
 	if !strings.HasSuffix(name, ".md") {
 		name += ".md"
 	}
-	// A NAME MAY CARRY A FOLDER. A lane's rules live under doc/guidance/<lane>/,
+	// A NAME MAY CARRY A FOLDER. A lane's rules live under spec/guidance/<lane>/,
 	// and a token names them the way a link does: software-development/writing-go.
 	name = filepath.ToSlash(filepath.Clean(filepath.FromSlash(name)))
 	if strings.HasPrefix(name, "..") || filepath.IsAbs(name) {
 		return "", ""
 	}
-	where := "doc/guidance/" + name
+	where := "spec/guidance/" + name
 	if TheStandingLayer(r.Method)[name] {
 		return "", where + " is in your prompt already"
 	}

@@ -1,6 +1,6 @@
 // EVERY ROW OF THE ARCHIVE NAMES AN OBJECT THE BRANCH CARRIES.
 //
-// The archive is doc/work/archive.jsonl, one line per closed token, and the
+// The archive is spec/work/archive.jsonl, one line per closed token, and the
 // list is what travels: a file on the branch, so every box that has the branch
 // has the archive. A row names where the note is. blob is what the close wrote
 // into the object store, on_branch is what the branch's own history holds, and
@@ -29,7 +29,7 @@ function say(what, ok, why) {
   console.log((ok ? "  ok   " : "  FAIL ") + what + (ok ? "" : "\n         " + why));
 }
 
-const list = join(root, "doc", "work", "archive.jsonl");
+const list = join(root, "spec", "work", "archive.jsonl");
 
 // A TREE WITH NO ARCHIVE YET IS NOT A FAILURE. Nothing has closed in it, and a
 // check that refused an empty tree would refuse a fresh clone of the method.

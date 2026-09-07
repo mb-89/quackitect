@@ -22,13 +22,13 @@
 //
 //   node util/checks/notes-say-each-heading-once.mjs <root>
 //
-// reads: doc/work/*.md
+// reads: spec/work/*.md
 import { readFileSync, readdirSync, existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.argv[2] ?? ".";
-const where = "doc/work";
-const here = join(root, "doc", "work");
+const where = "spec/work";
+const here = join(root, "spec", "work");
 
 // A ROOT THAT IS NOT THERE IS A FAILURE AND NOT A SKIP, and so is an empty
 // one. A check guarding nothing says so rather than answering green.

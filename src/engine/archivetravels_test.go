@@ -13,7 +13,7 @@ import (
 // AN ARCHIVE THAT ONLY A TAG CARRIES IS AN ARCHIVE ONE BOX HOLDS.
 //
 // Archiving wrote refs/tags/archive/<id>, pushed it, and then deleted the note
-// from doc/work. A cloud box cannot push that namespace: refs/tags answers HTTP
+// from spec/work. A cloud box cannot push that namespace: refs/tags answers HTTP
 // 403 from the session's git proxy. The push result was discarded with a bare
 // assignment, so the tag was written locally, the push was refused in silence,
 // the file left the tree, and the next branch commit took it off the branch.
@@ -58,7 +58,7 @@ func TestAnArchivedTokenTravelsOnTheBranch(t *testing.T) {
 	}
 	// THE NOTE IS ON THE BRANCH BEFORE IT CLOSES, which is what a tracked token
 	// is: a file somebody committed.
-	gitAt(t, r.Work, "add", "--", "doc/work")
+	gitAt(t, r.Work, "add", "--", "spec/work")
 	gitAt(t, r.Work, "commit", "--quiet", "-m", "the token")
 
 	tok.Disposition = Done
@@ -75,7 +75,7 @@ func TestAnArchivedTokenTravelsOnTheBranch(t *testing.T) {
 
 	// THE CLOSE IS COMMITTED: the note has left the branch and the list naming
 	// its blob is on it.
-	gitAt(t, r.Work, "add", "--all", "--", "doc/work")
+	gitAt(t, r.Work, "add", "--all", "--", "spec/work")
 	gitAt(t, r.Work, "commit", "--quiet", "-m", "the close")
 
 	clone := filepath.Join(t.TempDir(), "clone")
@@ -120,7 +120,7 @@ func TestATaggedArchiveIsFoldedIntoTheList(t *testing.T) {
 	if at == "" {
 		t.Fatal("the token was minted onto no disk")
 	}
-	gitAt(t, r.Work, "add", "--", "doc/work")
+	gitAt(t, r.Work, "add", "--", "spec/work")
 	gitAt(t, r.Work, "commit", "--quiet", "-m", "the token")
 	note, err := os.ReadFile(at)
 	if err != nil {
@@ -162,7 +162,7 @@ func TestATaggedArchiveIsFoldedIntoTheList(t *testing.T) {
 	if len(rows) != 1 || rows[0].ID != tok.ID {
 		t.Fatalf("the list does not hold the one tagged token: %+v", rows)
 	}
-	onTheBranch := gitAt(t, r.Work, "rev-parse", "HEAD:doc/work/"+tok.ID+".md")
+	onTheBranch := gitAt(t, r.Work, "rev-parse", "HEAD:spec/work/"+tok.ID+".md")
 	if rows[0].Blob != onTheBranch {
 		t.Fatalf("the row names blob %q and the branch carries %q", rows[0].Blob, onTheBranch)
 	}

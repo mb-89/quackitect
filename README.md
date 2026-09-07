@@ -2,7 +2,7 @@
 
 An engine that records and guards an agent's session, and the work tokens the
 agent pulls. Everything that was planned around it, and may or may not have
-happened, is in `dev_guide/`.
+happened, is in `.se/dev_guide/`.
 
 ## Install
 
@@ -22,17 +22,15 @@ it takes.
 
 | Entry | What it is for |
 |---|---|
-| `doc/` | The guidance the agent is told. Start with `guidance/voice.md`. |
-| `src/` | Everything that is written. `engine`, `viewer`, `extension`, `mcp`, and the schemas and processes the engine reads. |
-| `util/` | Everything that is run rather than shipped. `setup`, `cage` and `checks`. |
-| `dev_guide/` | Design notes, plans and drafts. Not the product, and not kept current. |
+| `spec/` | The specification. `guidance` is what the agent is told, start with `guidance/voice.md`. `work` is the record, `rationale` the arguments, `design_input` the briefs, and `processes`, `schemas`, `views` and `config` the declarations. |
+| `src/` | Everything written or run: `engine`, `viewer`, `extension`, `mcp`, `cage`, and `scripts` for the installer and the push door. |
 | `.bin/` | Built programs. Rebuilt from source, and not in version control. |
 
 `.se/` holds private material, and it never travels. Dated reports, measured
 evidence, the record, the index, ephemeral work, and `scratchpad/` for anything
 throwaway.
 
-`sh util/checks/battery.sh` runs every check, and says whether the tree is
+`sh src/scripts/battery.sh` runs every check, and says whether the tree is
 sound. What is not done yet is work, so it is a token. Ask the engine.
 
 ## Which folder do I open

@@ -564,18 +564,18 @@ dispositions:
 func guidanceTree(t *testing.T) Roots {
 	t.Helper()
 	f := aTree(t).apart()
-	f.writeMethod("doc/guidance/voice.md", "# Voice\n\nAnswer first.\n")
-	f.writeMethod("doc/guidance/behaviour.md", "# Behaviour\n\nDo what was asked.\n")
+	f.writeMethod("spec/guidance/voice.md", "# Voice\n\nAnswer first.\n")
+	f.writeMethod("spec/guidance/behaviour.md", "# Behaviour\n\nDo what was asked.\n")
 	// The methods that ride on an answer. The fixture declares its own, so a
 	// test reads the mechanism rather than the product's wording.
-	f.writeMethod("doc/guidance/reviewing.md", "# Reviewing\n\nVerify, do not read.\n")
-	f.writeMethod("doc/guidance/work-token.md", "# Work token\n\nA criterion that can be a command is one.\n")
+	f.writeMethod("spec/guidance/reviewing.md", "# Reviewing\n\nVerify, do not read.\n")
+	f.writeMethod("spec/guidance/work-token.md", "# Work token\n\nA criterion that can be a command is one.\n")
 	// What is projected where is data. The test declares its own, so it tests
 	// the mechanism rather than the product's list.
 	f.writeMethod("src/config/projections.json", `{"projections":[
-	  {"name":"protocol","target":"AGENTS.md","sources":["doc/guidance/voice.md","doc/guidance/behaviour.md"],"wrap":"markdown"},
-	  {"name":"copilot","target":".github/copilot-instructions.md","sources":["doc/guidance/voice.md","doc/guidance/behaviour.md"],"wrap":"markdown"},
-	  {"name":"style","target":".claude/output-styles/quackitect.md","sources":["doc/guidance/voice.md","doc/guidance/behaviour.md"],"wrap":"frontmatter","frontmatter":{"name":"quackitect"}}
+	  {"name":"protocol","target":"AGENTS.md","sources":["spec/guidance/voice.md","spec/guidance/behaviour.md"],"wrap":"markdown"},
+	  {"name":"copilot","target":".github/copilot-instructions.md","sources":["spec/guidance/voice.md","spec/guidance/behaviour.md"],"wrap":"markdown"},
+	  {"name":"style","target":".claude/output-styles/quackitect.md","sources":["spec/guidance/voice.md","spec/guidance/behaviour.md"],"wrap":"frontmatter","frontmatter":{"name":"quackitect"}}
 	]}`)
 	// The icon table. The fixture declares its own for the same reason it
 	// declares its own tree: the mechanism is the thing under test.
@@ -630,7 +630,7 @@ func aCloneBehindTheClose(t *testing.T) (Roots, Token) {
 	if err := SaveToken(r, tok); err != nil {
 		t.Fatalf("closing %s: %v", tok.ID, err)
 	}
-	gitAt(t, r.Work, "add", "--all", "--", "doc/work")
+	gitAt(t, r.Work, "add", "--all", "--", "spec/work")
 	gitAt(t, r.Work, "commit", "--quiet", "-m", "the close")
 
 	// THE CLONE FETCHES, WHICH IS WHAT EVERY BOX DOES BEFORE IT WORKS, and its
@@ -923,7 +923,7 @@ func aTreeWithGuidance(t *testing.T) Roots {
 	}
 	const projections = `{"projections":[
 	  {"name":"prompt","target":"prompt.md","wrap":"markdown",
-	   "section":"Actionables","sources_from":"doc/guidance"}]}`
+	   "section":"Actionables","sources_from":"spec/guidance"}]}`
 	if err := os.WriteFile(filepath.Join(root, "src", "config", "projections.json"),
 		[]byte(projections), 0o644); err != nil {
 		t.Fatal(err)

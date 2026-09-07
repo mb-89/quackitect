@@ -7,7 +7,7 @@ import (
 
 // A CLONE BEHIND THE BRANCH HANDED OUT WORK THE BRANCH HAD CLOSED.
 //
-// The queue reads doc/work in the tree it runs over. A box three hours behind
+// The queue reads spec/work in the tree it runs over. A box three hours behind
 // origin carried a note as it stood before its close, so the token read open
 // there whatever the branch said, and the pull handed it out to be done again.
 // The claim on refs/heads/se/claims says who holds a token and nothing about

@@ -20,7 +20,7 @@ func TestAFailureOutsideTheDeltaDoesNotRefuseTheClose(t *testing.T) {
 	mine := []change{{Path: "src/engine/mine.go"}}
 
 	elsewhere := ran{ID: "util/checks/open-tokens-carry-their-sections", Kind: "check",
-		Said: "FAIL doc/work/wk-older.md is open under the standard process and " +
+		Said: "FAIL spec/work/wk-older.md is open under the standard process and " +
 			"carries no \"## approach\", which that process requires\n" +
 			"217 open token(s) read. 1 failed.\n"}
 	RecordTheRun(r, tok.ID, Tested{Delta: mine, Ran: []ran{elsewhere}})
@@ -47,7 +47,7 @@ func TestAFailureOutsideTheDeltaDoesNotRefuseTheClose(t *testing.T) {
 
 	// AND A GO TEST IS NEVER EXCUSED, whatever it printed.
 	gone := ran{ID: "src/engine/TestSomethingElse", Kind: "go",
-		Said: "--- FAIL: TestSomethingElse\n    doc/work/wk-older.md:1: nothing here is the delta\n"}
+		Said: "--- FAIL: TestSomethingElse\n    spec/work/wk-older.md:1: nothing here is the delta\n"}
 	RecordTheRun(r, tok.ID, Tested{Delta: mine, Ran: []ran{gone}})
 	if TestsRefuseTheClose(r, tok) == "" {
 		t.Error("a failing go test was excused for naming a file outside the delta")

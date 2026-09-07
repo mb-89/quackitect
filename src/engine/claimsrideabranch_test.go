@@ -53,7 +53,7 @@ func aBareOrigin(t *testing.T, r Roots) string {
 
 func aClaimNote(t *testing.T, r Roots, id, by string) string {
 	t.Helper()
-	rel := filepath.Join("doc", "work", id+".md")
+	rel := filepath.Join("spec", "work", id+".md")
 	at := filepath.Join(r.Work, rel)
 	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
 		t.Fatal(err)
@@ -82,7 +82,7 @@ func TestClaimsRideABranch(t *testing.T) {
 	fed.says["write-tree"] = "aaaa"
 	fed.says["commit-tree"] = "bbbb"
 
-	Publish(context.Background(), r, []string{"doc/work/wk-1.md"}, "a claim")
+	Publish(context.Background(), r, []string{"spec/work/wk-1.md"}, "a claim")
 	SyncClaims(context.Background(), r)
 
 	if !fed.asked("push", "origin", claimsRef+":"+claimsBranch) {

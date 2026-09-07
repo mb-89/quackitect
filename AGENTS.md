@@ -3,7 +3,7 @@
 This file is yours. The engine does not write it and does not read it.
 
 The standing layer — the rules every agent gets on every turn — is projected
-from `doc/guidance` into the harness's own system prompt:
+from `spec/guidance` into the harness's own system prompt:
 `.claude/output-styles/quackitect.md` for Claude Code, and
 `.github/copilot-instructions.md` for Copilot. `se --project` writes both, and
 `src/config/projections.json` says which files they come from.
