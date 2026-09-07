@@ -89,6 +89,39 @@ func TestATreeWithItsOwnWorkIsNotForced(t *testing.T) {
 	}
 }
 
+// AND THE DISTANCE IS COUNTED, NOT NOTICED.
+//
+// Every other test here puts the box one commit behind, and one is the number a
+// boolean answers too: a mechanism that only knew behind or not behind would
+// pass all of them. The shared tree this token is about stood 134 commits
+// behind, and an agent reading it needs the distance rather than the fact.
+//
+// So this one moves origin on twice and asks for two. Measured by inverting
+// aheadBehind to answer a flat 1: this test failed on the number and the
+// one-behind tests above stayed green, which is what makes it worth having.
+func TestTheDistanceBehindIsCounted(t *testing.T) {
+	box := aBoxBehindItsOrigin(t, "group/archive")
+	said, err := gitHere(box, "remote", "get-url", "origin")
+	if err != nil {
+		t.Fatalf("the box does not name its origin: %v", err)
+	}
+	origin := Roots{Method: box.Method, Work: strings.TrimSpace(said)}
+	if _, err := gitHere(origin, "commit", "--allow-empty", "-m", "three"); err != nil {
+		t.Fatalf("origin could not move on a second time: %v", err)
+	}
+	if _, err := gitHere(box, "fetch", "--quiet"); err != nil {
+		t.Fatalf("the box could not fetch: %v", err)
+	}
+
+	stood := LandOnTheTip(box)
+	if stood.Behind != 2 {
+		t.Fatalf("it read %d behind, and origin moved on by two", stood.Behind)
+	}
+	if !stood.Moved {
+		t.Errorf("a clean tree two behind was not landed: %s", stood.Says)
+	}
+}
+
 // A COMMIT AHEAD IS WORK NOTHING ELSE CARRIES, and a reset would drop it.
 func TestATreeAheadOfOriginIsNotForced(t *testing.T) {
 	box := aBoxBehindItsOrigin(t, "group/archive")
