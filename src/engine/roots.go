@@ -291,9 +291,18 @@ var theRuntimeRegisters = []string{
 	"claims.json", "emergency.json", "engine.json", "evidence.json",
 	"failures.json", "grace.json", "heard.json", "hold.json", "holds.json",
 	"ideation.json", "looked.json", "owed.json", "parameters.json", "project.json",
-	"results.json", "runme.json", "stop-claim.json", "stops.json", "tested.json",
+	"results.json", "stop-claim.json", "stops.json", "tested.json",
 	"tools.json",
 }
+
+// RUNME.JSON IS NOT ONE OF THESE EITHER, and for a sharper reason than
+// copy.json. RUNME.sh and RUNME.ps1 read it to find out what to run, and they
+// read it BEFORE there is an engine: on a cloud box that is the first thing
+// that happens after the clone. Those two scripts are generated from
+// internal/runme, so moving the file means changing a template, regenerating
+// both scripts, and every clone that already carries the old pair looking in a
+// place nothing writes. It is a bootstrap marker rather than a register of what
+// this box is doing, so it stays at .se/runme.json.
 
 // COPY.JSON IS NOT ONE OF THESE, and it is the only .se json left outside. It
 // is this installation's identity, it lives in the METHOD root rather than the

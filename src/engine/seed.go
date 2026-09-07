@@ -79,7 +79,7 @@ func Seed(roots Roots, kind Kind) ([]string, error) {
 		// them, so a write to any one makes every binary in .bin stale together.
 		r.Sources = "src/engine src/viewer src/mcp"
 	}
-	if err := writeNew(roots.Runtime("runme.json"), mustIndent(r), &made); err != nil {
+	if err := writeNew(filepath.Join(roots.Work, ".se", "runme.json"), mustIndent(r), &made); err != nil {
 		return made, err
 	}
 	// THE SCRIPT FOR THIS HOST, and only this one. A project that moves gets

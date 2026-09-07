@@ -208,8 +208,8 @@ out("- .se/runme.json: " + (existsSync(join(work, ".se", "runme.json"))
   ? "present, so RUNME can run" : "missing, so RUNME refuses until the installer seeds it"));
 
 head("The engine");
-const engineJSON = join(work, ".se", "engine.json");
-out("- .se/engine.json: " + (existsSync(engineJSON)
+const engineJSON = join(work, ".se", "runtime", "engine.json");
+out("- .se/runtime/engine.json: " + (existsSync(engineJSON)
   ? readFileSync(engineJSON, "utf8").replace(/\s+/g, " ").slice(0, 220) : "missing"));
 let engineUp = false;
 const se = join(bin, exe("se"));

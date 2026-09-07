@@ -117,7 +117,7 @@ nohup "$here/.bin/se" --work "$here" >> "$here/.se/engine.out" 2>&1 < /dev/null 
 # whatever the last machine committed.
 i=0
 while [ $i -lt 50 ]; do
-  [ -f "$here/.se/engine.json" ] && exit 0
+  [ -f "$here/.se/runtime/engine.json" ] && exit 0
   i=$((i + 1))
   sleep 0.2
 done

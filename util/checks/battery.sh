@@ -319,7 +319,7 @@ run "go build" build
 # calls in flight, and hands over keeping the log session, so a battery started
 # by an engine can replace that engine without severing itself.
 engine_up() {
-  running=$(grep -o '"build": *"[^"]*"' .se/engine.json 2>/dev/null | sed 's/.*"\([^"]*\)"$/\1/')
+  running=$(grep -o '"build": *"[^"]*"' .se/runtime/engine.json 2>/dev/null | sed 's/.*"\([^"]*\)"$/\1/')
   if [ -n "$running" ] && [ "$running" != "$stamp" ]; then
     echo "an engine on $running is running and the build is $stamp, so it is asked to hand over"
     # --built, BECAUSE THE BUILD ABOVE IS THE NEW ENGINE. Asking the engine to
@@ -330,13 +330,13 @@ engine_up() {
     # change rather than for the file to go.
     i=0
     while [ $i -lt 300 ]; do
-      now=$(grep -o '"build": *"[^"]*"' .se/engine.json 2>/dev/null | sed 's/.*"\([^"]*\)"$/\1/')
+      now=$(grep -o '"build": *"[^"]*"' .se/runtime/engine.json 2>/dev/null | sed 's/.*"\([^"]*\)"$/\1/')
       [ -n "$now" ] && [ "$now" != "$running" ] && break
       i=$((i + 1)); sleep 0.1
     done
   fi
   printf '{"hook_event_name":"UserPromptSubmit","cwd":"%s"}' "$root" | .bin/se.exe hook --method . --wake
-  grep -q '"socket"' .se/engine.json 2>/dev/null || return 1
+  grep -q '"socket"' .se/runtime/engine.json 2>/dev/null || return 1
   # THE START IS THE ONE WAIT: the first scan and the watcher's self-check
   # run once per start, and what they found is read below as a check.
   i=0

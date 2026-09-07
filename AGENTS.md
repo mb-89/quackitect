@@ -51,7 +51,18 @@ merges on this branch differed from both their parents.
 
 - `sh util/checks/battery.sh` runs every check. It is the one command that says
   whether the tree is sound.
-- `go build -C src/engine -o ../../.bin/se.exe .` rebuilds the engine.
+- `se --swap` rebuilds the engine and hands over to it. **This is the only way
+  to rebuild it.** A plain `go build` on this box produces a 15 MB binary with
+  `CGO_ENABLED=0`, and go-sqlite3 is then a stub: the indexer cannot open the
+  index, the model socket never opens, and the engine comes up looking healthy —
+  ready, guarded, beating — while `--ping` says nothing is running and the
+  battery's `engine up` step fails. The real build is 21 MB. This line used to
+  read `go build -C src/engine -o ../../.bin/se.exe .`, which is that stub, and
+  it cost an hour.
+- With no engine running there is nothing to swap, and then it is the
+  installer's build: `CC="<the zig in AppData/Local/quackitect/tools>/zig.exe cc"
+  CGO_ENABLED=1 GOFLAGS=-tags=sqlite_fts5 go build -C src/engine -o
+  ../../.bin/se.exe .`. `util/setup/archive.go` is where those three come from.
 - `se --project` rewrites the projections after a guidance edit.
 - `.bin/se-mcp --tools > util/cage/tools.json` rewrites the tool list the cold
   door answers from, after a change to `src/mcp/lane.go`. `mcp-tools` says
