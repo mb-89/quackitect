@@ -421,13 +421,32 @@ func GuidanceDigest(methodRoot string) (string, error) {
 	}
 	seen := map[string]bool{}
 	var names []string
-	for _, p := range list {
-		for _, s := range p.Sources {
-			if !seen[s] {
-				seen[s] = true
-				names = append(names, s)
-			}
+	add := func(s string) {
+		if !seen[s] {
+			seen[s] = true
+			names = append(names, s)
 		}
+	}
+	// IT ASKS sourcesOf RATHER THAN READING Sources, because a projection that
+	// names a folder carries no list. Reading the field left every folder-sourced
+	// projection out of the digest, which is all of the guidance, so the one
+	// change this watch exists for could not move it.
+	for _, p := range list {
+		srcs, err := sourcesOf(methodRoot, p)
+		if err != nil {
+			return "", err
+		}
+		for _, s := range srcs {
+			add(s)
+		}
+	}
+	// AND THE PARAMETER TREE, WHICH IS NOBODY'S SOURCE. The commands under
+	// .claude/commands are projected from it and from nothing else, so a control
+	// renamed or added moved no source and the commands were never written again.
+	// They were right at a start and stale ever after.
+	if tree := path.Join("util", "parameters.json"); exists(filepath.Join(methodRoot,
+		filepath.FromSlash(tree))) {
+		add(tree)
 	}
 	sort.Strings(names)
 	h := sha256.New()
