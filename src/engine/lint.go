@@ -296,20 +296,54 @@ func theIDsThatOpen(r Roots) (map[string]bool, error) {
 //
 // IT SKIPS THE NOTE'S OWN ID, which a note names about itself rather than as a
 // reference, and it says each missing id once however often it is written.
+//
+// AND IT SKIPS AN ID THE NOTE MARKS AS ANOTHER BOX'S WORK, which no ref this
+// remote carries can resolve. Why that is a mark rather than a rule the lint
+// works out for itself: [[an-id-from-another-box-is-marked]].
 func idsNamingNothing(text, self string, known map[string]bool) []string {
 	if known == nil {
 		return nil
 	}
 	var found []string
+	elsewhere := theIDsFromAnotherBox(text)
 	seen := map[string]bool{}
 	for _, id := range namesAToken.FindAllString(text, -1) {
-		if id == self || known[id] || seen[id] {
+		if id == self || known[id] || seen[id] || elsewhere[id] {
 			continue
 		}
 		seen[id] = true
 		found = append(found, id)
 	}
 	return found
+}
+
+// fromAnotherBox is the mark a note writes beside an id whose token never
+// reached this branch.
+const fromAnotherBox = "(another box)"
+
+// AN ID FROM ANOTHER BOX IS MARKED, ONCE, IN THE NOTE THAT NAMES IT.
+//
+// Many boxes mint tokens and only what lands travels, so a true sentence here
+// names work no ref this remote carries. Measured at the tip: 306 mentions of
+// 200 ids across 166 notes, and not one of the 200 reachable from any branch
+// or archive tag on the remote. The rule had no way to tell that from the case
+// it was built for, an id nobody ever minted, so it called both broken.
+//
+// THE WRITER SAYS WHICH ONE IT IS, because the branch cannot. The mark reads
+// as English, so the sentence still says where the work came from, and an
+// unmarked id answers to the rule exactly as it did.
+//
+// IT IS MARKED ONCE PER NOTE rather than once per sentence. The note is what a
+// reader reads, one mark in it settles the id for that reader, and the rule
+// already says each missing id once however often it is written.
+func theIDsFromAnotherBox(text string) map[string]bool {
+	marked := map[string]bool{}
+	for _, at := range namesAToken.FindAllStringIndex(text, -1) {
+		if rest := strings.TrimLeft(text[at[1]:], " \t"); strings.HasPrefix(rest, fromAnotherBox) {
+			marked[text[at[0]:at[1]]] = true
+		}
+	}
+	return marked
 }
 
 // A TOKEN CARRIES NO TIME. It travels, and a time on it says when somebody was
