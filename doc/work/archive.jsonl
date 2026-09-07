@@ -146,6 +146,7 @@
 {"id":"wk-a38b6c8d88","title":"the general case unreached","process":"trivial","disposition":"done","blob":"f5b06c11414c4df83015578f9c129a47b0d9beae","on_branch":"f5b06c11414c4df83015578f9c129a47b0d9beae"}
 {"id":"wk-a53a299607","title":"note cites unminted token","process":"trivial","disposition":"done","blob":"9b03c066db5ca2fcfef98254c5f77fa486bf5090","on_branch":"26ce90db6fa50cf36a2ec717b367cbd23cd2cf2f"}
 {"id":"wk-a5fd348bde","title":"grace is unlocked","process":"trivial","disposition":"done","blob":"a323bfc09876e728e9c250c5e70153a744b128d7","on_branch":"a323bfc09876e728e9c250c5e70153a744b128d7"}
+{"id":"wk-a837ae4877","title":"a closed dependency blocks","process":"trivial","disposition":"done","blob":"1533ffb6deca78534093f62774bea4e70f20899b","on_branch":"dd25f4e6005bda80db5e3e14ce7ded851792a41b"}
 {"id":"wk-aa0e2ea529","title":"restore wiped evidence tables","process":"trivial","disposition":"dropped","blob":"4ce104e45f086d1546a1dd01b3c7dad8835504f3","on_branch":"4ce104e45f086d1546a1dd01b3c7dad8835504f3"}
 {"id":"wk-aab607e783","title":"land ignores the branch","process":"trivial","disposition":"done","blob":"9785817b648c03c5415ec817974a32abae29c70b","on_branch":"5673b905e33a045d565ceeabb365e6a2c6000e65"}
 {"id":"wk-ab9b2b6b1e","title":"a guessed parser","process":"trivial","disposition":"dropped","blob":"9464354017cb1d5b139b1cf845df715851f11f4b","on_branch":"9464354017cb1d5b139b1cf845df715851f11f4b"}
