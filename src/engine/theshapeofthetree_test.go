@@ -151,6 +151,19 @@ func TestTheShapeOfTheTreeIsDecidedAtTheDoor(t *testing.T) {
 			clean:   "import { spawn } from \"node:child_process\";\n\nspawn(e, a, { windowsHide: true });\n",
 			says:    "windowsHide",
 		},
+		{
+			// A refusal is a menu, and one whose every line the same gate
+			// refuses is a wall. This is judged under internal too, which is
+			// the folder the check it replaces never opened.
+			rule: "a refusal names a door beside the tool",
+			file: "src/engine/internal/thing/refuse.go",
+			planted: "package thing\n\nfunc refuse() string {\n\t" +
+				"return \"take a token with se_pull before you write anything here\"\n}\n",
+			clean: "package thing\n\nfunc refuse() string {\n\t" +
+				"return \"take a token with se_pull before you write anything here. \" +\n\t\t" +
+				"\"With no lane: ./RUNME.sh pull\"\n}\n",
+			says: "names no shell command",
+		},
 	} {
 		t.Run(c.rule, func(t *testing.T) {
 			t.Parallel()

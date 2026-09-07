@@ -1027,6 +1027,15 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 			g.deny(why)
 			return
 		}
+		// AND A BUILD SAYS WHERE ITS PROGRAM GOES. A bare go build drops a
+		// program beside its source, where nothing sweeps it and the shorter
+		// path wins.
+		if why, refuse := ABuildThatDropsAProgram(ti.Command); refuse {
+			record(log, "engine", "build", actor, "refused: a build that names no place for its program", sessionlog.No(),
+				map[string]any{"tool": in.ToolName})
+			g.deny(why)
+			return
+		}
 	}
 
 	// SEARCH WITH THE TOOL THE PROBE FOUND. It is on this machine, the engine

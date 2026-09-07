@@ -582,6 +582,7 @@ func theShapeOfTheTree(r Roots, files []string, content map[string][]byte, born 
 			aNoteLinkingWhatNoCloneCarries,
 			aParallelTestSwappingASeam,
 			aSecondReachForTheChildProcess,
+			aRefusalNamingNoDoor,
 		} {
 			if err := refuse(r, born[at], rel, text); err != nil {
 				return err
@@ -981,6 +982,68 @@ func theExtensionFilesNaming(r Roots, word string) []string {
 		return nil
 	})
 	sort.Strings(out)
+	return out
+}
+
+// A REFUSAL THAT NAMES A LANE TOOL NAMES A SHELL DOOR BESIDE IT.
+//
+// A cloud session cloned this tree and its tool lane never came up. Every guard
+// then refused every call and named an se_ tool that was not there, so each
+// guard's only door was held shut by the other and the session had no legal
+// move at all. The refusals were correct and the session was dead.
+//
+// WHAT COUNTS AS AN INSTRUCTION. A literal naming a lane tool is either a
+// sentence to the agent or an identifier the engine compares against, and
+// length tells them apart: se_answer is nine characters and a name.
+//
+// IT READS EVERY .go AND NOT ONE FOLDER. The check this replaces listed the top
+// of src/engine, so every refusal written under internal was judged by nobody.
+var aLaneTool = regexp.MustCompile(`\bse_(pull|stop|answer|work|apply|run|test|find|ask|claim|said|status)\b`)
+var aTopLevelFunc = regexp.MustCompile(`(?m)^func (?:\([^)]*\) )?(\w+)`)
+var aStringLiteral = regexp.MustCompile(`"((?:[^"\\]|\\.)*)"`)
+
+// aSentenceIsThisLong is where a name stops and an instruction starts.
+const aSentenceIsThisLong = 30
+
+func aRefusalNamingNoDoor(_ Roots, _ bool, rel, text string) error {
+	if !strings.HasSuffix(rel, ".go") || strings.HasSuffix(rel, "_test.go") {
+		return nil
+	}
+	for name, block := range theTopLevelBlocks(text) {
+		var told string
+		for _, line := range strings.Split(block, "\n") {
+			if strings.HasPrefix(strings.TrimSpace(line), "//") {
+				continue // prose is not a literal, and this file's own explains the rule
+			}
+			for _, m := range aStringLiteral.FindAllStringSubmatch(line, -1) {
+				if len(m[1]) >= aSentenceIsThisLong && aLaneTool.MatchString(m[1]) {
+					told = m[1]
+				}
+			}
+		}
+		if told == "" || strings.Contains(block, "RUNME.sh") || strings.Contains(block, "theShellDoor(") {
+			continue
+		}
+		return fmt.Errorf("%s %s tells the agent to use %s and names no shell command that does "+
+			"the same job. A session whose lane never came up cannot follow it, and every other "+
+			"guard is refusing it at the same time. Name theShellDoor(...) beside it.\n  %q",
+			rel, name, aLaneTool.FindString(told), told[:min(len(told), 120)])
+	}
+	return nil
+}
+
+// theTopLevelBlocks cuts a file at its func lines, so a refusal is judged beside
+// the door its own function names.
+func theTopLevelBlocks(text string) map[string]string {
+	out := map[string]string{}
+	starts := aTopLevelFunc.FindAllStringSubmatchIndex(text, -1)
+	for i, at := range starts {
+		end := len(text)
+		if i+1 < len(starts) {
+			end = starts[i+1][0]
+		}
+		out[text[at[2]:at[3]]] = text[at[0]:end]
+	}
 	return out
 }
 

@@ -220,6 +220,20 @@ build() {
   # door an agent uses, and it drifted from the engine for want of a build here
   # and a check after it.
   go build -C src/mcp -gcflags=-e -o ../../.bin/se-mcp.exe . || return 1
+  # AND THE EXTENSION BUNDLE, WHICH IS WHAT THE EDITOR ACTUALLY RUNS.
+  #
+  # The editor runs src/extension/out/extension.js, built from the TypeScript
+  # beside it. That file is gitignored, so a fix committed on one box arrives
+  # on the next as source and nothing there rebuilds it. Measured in September
+  # 2026: a bundle two days behind its sources drew a control the source had
+  # already fixed, and the owner met the same fault twice on two machines.
+  #
+  # A CHECK USED TO REPORT THE DRIFT. Building it here means there is no drift
+  # to report: a stale bundle cannot survive a battery run, which is better
+  # than being told about one.
+  if [ -f src/extension/build.mjs ]; then
+    (cd src/extension && node build.mjs) || return 1
+  fi
   # The suffixed name is the build. The plain one is the same file.
   #
   # THE LINK IS MADE BY THE ENGINE AND NOT BY THE SHELL. This shell's ln moved
@@ -440,7 +454,7 @@ start "se lint" .bin/se.exe lint
 #
 # So the list is the whole of it. A check that is not on the line does not run,
 # and checks-live-in-the-method is what says a folder holds one that nothing runs.
-for c in the-branch-head-builds render-check drive-editor drawn-classes-have-rules panel-draws-the-register adapter-decides-no-column engine-args engine-args-lifecycle engine-spawns liveness one-look panel-icons checks-live-in-the-method engine-spawns-catches panel-says-holding drive-panel burndown burndown-derives-nothing mcp-tools lane-answers-cold the-cards-reach-their-box the-travelling-cage-cannot-block binaries-live-in-bin refusals-name-a-door a-refusal-names-a-legal-move engine-stops-by-pid windows-say-they-are-here projections-carry-chapters deleted-notes-have-a-row open-tokens-carry-their-sections commits-carry-one-token lane-carries-every-flag the-cage-cites-what-is-here tooltips-name-their-keywords the-tree-drops-nothing a-count-follows-the-engine archive-rows-travel commands-mirror-the-keywords criteria-name-a-runnable-command the-bundle-is-not-stale archived-notes-are-gone pushes-name-a-branch; do
+for c in the-branch-head-builds render-check drive-editor drawn-classes-have-rules panel-draws-the-register adapter-decides-no-column engine-args engine-args-lifecycle engine-spawns liveness one-look panel-icons checks-live-in-the-method engine-spawns-catches panel-says-holding drive-panel burndown burndown-derives-nothing mcp-tools lane-answers-cold the-cards-reach-their-box the-travelling-cage-cannot-block windows-say-they-are-here projections-carry-chapters deleted-notes-have-a-row open-tokens-carry-their-sections commits-carry-one-token lane-carries-every-flag the-cage-cites-what-is-here tooltips-name-their-keywords the-tree-drops-nothing a-count-follows-the-engine archive-rows-travel commands-mirror-the-keywords criteria-name-a-runnable-command archived-notes-are-gone pushes-name-a-branch; do
   if [ -f "util/checks/$c.mjs" ]; then
     start "$c" node "util/checks/$c.mjs" "$root"
   else

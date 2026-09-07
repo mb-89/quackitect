@@ -396,6 +396,69 @@ func ABuildRunByHand(command, method string) (string, bool) {
 	return "", false
 }
 
+// ABuildThatDropsAProgram answers why a build that leaves a program beside its
+// source is refused, and whether it is.
+//
+// FIVE BUILT PROGRAMS SAT IN THE SOURCE FOLDERS, dropped there by bare go
+// builds. A binary beside its source is stale the moment the code moves, it is
+// picked up by whatever resolves the shorter path first, and nothing sweeps it.
+// A check used to walk the whole tree reading the first four bytes of every
+// file to find them, after the fact.
+//
+// SO THE BUILD SAYS WHERE ITS PROGRAM GOES, or it is not a build that keeps
+// one. -o /dev/null is the compile check and leaves nothing behind, which is
+// what the refusal offers, beside go vet.
+func ABuildThatDropsAProgram(command string) (string, bool) {
+	for _, part := range pipeline(command) {
+		// THE VERB LEADS ITS COMMAND. Reading go build anywhere in the words
+		// makes a sentence about a build into a build: echo go build is refused
+		// without -o was refused, by its own clean case, on the first run.
+		words := strings.Fields(part)
+		at := 0
+		for at < len(words) && strings.Contains(words[at], "=") && !strings.HasPrefix(words[at], "-") {
+			at++ // a leading NAME=value is the environment, not the command
+		}
+		if at+1 >= len(words) {
+			continue
+		}
+		head := strings.ToLower(strings.TrimSuffix(filepath.Base(strings.Trim(words[at], `"'`)), ".exe"))
+		if head != "go" || words[at+1] != "build" {
+			continue
+		}
+		// go install has no -o and puts its program in GOBIN, which is not this
+		// tree, so it is not this rule's business.
+		named := ""
+		for i := at; i < len(words); i++ {
+			if words[i] == "-o" && i+1 < len(words) {
+				named = filepath.ToSlash(strings.Trim(words[i+1], `"'`))
+			}
+			if rest, ok := strings.CutPrefix(words[i], "-o="); ok {
+				named = filepath.ToSlash(strings.Trim(rest, `"'`))
+			}
+		}
+		switch {
+		case named == "":
+			return "A BUILD SAYS WHERE ITS PROGRAM GOES. Without -o, go build drops the program in " +
+				"the folder you are standing in, beside its own source, where nothing sweeps it and " +
+				"whatever resolves the shorter path first picks it up. Five of them collected that way.\n\n" +
+				"To check that it compiles: go build -o /dev/null ./... or go vet ./..., both of which " +
+				"leave nothing behind.\n\nTo build the programs this tree ships: " + TheBuildDoor + ".\n\n" +
+				"What was run: " + strings.TrimSpace(part), true
+		case theVoid[named] || strings.Contains(named, "/.bin/") || strings.HasPrefix(named, ".bin/"):
+		default:
+			return "A BUILT PROGRAM LIVES UNDER .bin. This one is aimed at " + named + ", beside source, " +
+				"where it is stale the moment the code moves and nothing sweeps it away.\n\n" +
+				"To check that it compiles: go build -o /dev/null ./... or go vet ./....\n\n" +
+				"To build the programs this tree ships: " + TheBuildDoor + ".\n\n" +
+				"What was run: " + strings.TrimSpace(part), true
+		}
+	}
+	return "", false
+}
+
+// theVoid is the places a build may aim a program it does not keep.
+var theVoid = map[string]bool{"/dev/null": true, "NUL": true, "nul": true}
+
 // TheBuildDoor is what a refused build is told to use.
 const TheBuildDoor = "se --swap"
 
