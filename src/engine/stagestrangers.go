@@ -92,23 +92,30 @@ func AStageCarriesStrangers(r Roots, on, actor, command string) (string, bool) {
 			paths, _ := commitPaths(words[at+1:])
 			named = append(named, paths...)
 		}
+		var here []string
 		for _, p := range named {
 			p = asTheRecordSpellsIt(p)
 			if p == "" || wrote[p] || seen[p] {
 				continue
 			}
 			seen[p] = true
-			strangers = append(strangers, p)
+			here = append(here, p)
 		}
+		if len(here) == 0 {
+			continue
+		}
+		// AND A HAND THAT MEANS IT SAYS SO ON THE COMMAND THAT STAGES, ONCE, IN
+		// THE RECORD. It is asked of this part's own words, so a reason typed in
+		// another part opens nothing here.
+		if why, meant := theStagingEscape(words); meant {
+			inSession(r, "stage", actor,
+				on+" staged "+strings.Join(here, ", ")+" past the guard, because "+why,
+				sessionlog.Yes(), map[string]any{"id": on, "paths": here, "why": why})
+			continue
+		}
+		strangers = append(strangers, here...)
 	}
 	if len(strangers) == 0 {
-		return "", false
-	}
-	// AND A HAND THAT MEANS IT SAYS SO, ONCE, IN THE RECORD.
-	if why, meant := theStagingEscape(command); meant {
-		inSession(r, "stage", actor,
-			on+" staged "+strings.Join(strangers, ", ")+" past the guard, because "+why,
-			sessionlog.Yes(), map[string]any{"id": on, "paths": strangers, "why": why})
 		return "", false
 	}
 	var mine []string
@@ -152,19 +159,30 @@ func aStageOfAStrangersPath(on string, strangers, mine []string) string {
 // not know and the shell hands an assignment through untouched.
 const theEscapeWord = "SE_STAGE_ANYWAY"
 
-// theStagingEscape answers the reason typed on this command, and whether one
-// was typed at all. An escape carrying no reason is no escape: the line it
+// theStagingEscape answers the reason typed on this one command, and whether
+// one was typed at all. An escape carrying no reason is no escape: the line it
 // leaves in the record is the whole of what it buys.
-func theStagingEscape(command string) (string, bool) {
-	for _, part := range pipeline(command) {
-		for _, w := range shellWords(part) {
-			if !strings.HasPrefix(w, theEscapeWord+"=") {
-				continue
-			}
+//
+// IT IS A LEADING ASSIGNMENT AND NOTHING ELSE, which is what an assignment is.
+// It was any word of any part, so echo SE_STAGE_ANYWAY=x && git add theirs.md
+// opened the stage from a part that stages nothing, and the same spelling as a
+// pathspec opened it after the program. The reason then went into the record
+// against a command that never carried it.
+//
+// THE WALK IS gitVerbAt'S, so a runner may lead and the words stop where the
+// program's own do.
+func theStagingEscape(words []string) (string, bool) {
+	for _, w := range words {
+		if strings.HasPrefix(w, theEscapeWord+"=") {
 			if why := strings.TrimSpace(w[len(theEscapeWord)+1:]); why != "" {
 				return why, true
 			}
+			return "", false
 		}
+		if anAssignment(w) || runner(w) {
+			continue
+		}
+		return "", false // the program has begun, and what follows is its own
 	}
 	return "", false
 }

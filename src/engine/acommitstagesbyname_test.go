@@ -150,6 +150,20 @@ func TestTheStagingEscapeIsRecorded(t *testing.T) {
 	if _, refused := AStageCarriesStrangers(r, tok.ID, "worker-escape", "git add theirs.md"); !refused {
 		t.Error("the escape stood after the command that carried it")
 	}
+
+	// AND IT IS A LEADING ASSIGNMENT ON THE COMMAND THAT STAGES, NOT A WORD
+	// ANYWHERE. A word in another part of the pipeline belongs to that part, and
+	// a word after the program is a pathspec. Either would put a reason in the
+	// record against a command that never carried it.
+	for _, one := range []struct{ what, command string }{
+		{"a word in another part", `echo SE_STAGE_ANYWAY=x && git add theirs.md`},
+		{"a word after the program", `git add theirs.md SE_STAGE_ANYWAY=x`},
+		{"a word behind a pipe", `git add theirs.md | grep SE_STAGE_ANYWAY=x`},
+	} {
+		if _, refused := AStageCarriesStrangers(r, tok.ID, "worker-escape", one.command); !refused {
+			t.Errorf("%s opened the stage: %s", one.what, one.command)
+		}
+	}
 }
 
 // theEscapeRecorded answers the one session line the escape wrote.
