@@ -76,7 +76,7 @@ func TestTheShellPassesOverTheWSLLauncher(t *testing.T) {
 			want:   theGitShell,
 		},
 	} {
-		got, looked := theShellAmong(lookingIn(one.onPath), one.beside, isOneOf(one.files))
+		got, looked := theShellAmong(lookingIn(one.onPath), one.beside, isOneOf(one.files), anythingRuns)
 		if got != one.want {
 			t.Errorf("%s: the shell was %q and should be %q, having looked in %v",
 				one.what, got, one.want, looked)
@@ -89,10 +89,30 @@ func TestTheShellPassesOverTheWSLLauncher(t *testing.T) {
 // apart. A hit it passed over silently is the same lie in a new place.
 func TestTheShellSaysWhatItPassedOver(t *testing.T) {
 	for _, launcher := range []string{theLauncher, theAlias} {
-		_, looked := theShellAmong(lookingIn(map[string]string{"bash": launcher}), nil, isOneOf(nil))
+		_, looked := theShellAmong(lookingIn(map[string]string{"bash": launcher}), nil, isOneOf(nil), anythingRuns)
 		if !strings.Contains(strings.Join(looked, "\n"), launcher) {
 			t.Errorf("%s was passed over and the places it looked do not name it: %v", launcher, looked)
 		}
+	}
+}
+
+// A NAME THAT RESOLVES IS NOT A SHELL THAT RUNS, AND RUNNING IT IS THE ONLY WAY
+// TO KNOW.
+//
+// The launchers above are passed over by the folder they live in, which is a
+// list of the stubs somebody has already met. A stub living anywhere else is
+// the same defect with no folder to name it by. So a candidate is handed a
+// script that does nothing, and one that will not answer is passed over.
+func TestAShellThatWillNotRunIsPassedOver(t *testing.T) {
+	const stub = `C:\Tools\bin\sh.exe`
+	got, looked := theShellAmong(lookingIn(map[string]string{"sh": stub}),
+		[]string{theGitShell}, isOneOf(map[string]bool{theGitShell: true}),
+		func(p string) bool { return p != stub })
+	if got != theGitShell {
+		t.Fatalf("a candidate that runs nothing was answered as %q, having looked in %v", got, looked)
+	}
+	if !strings.Contains(strings.Join(looked, "\n"), stub) {
+		t.Errorf("the stub was passed over and the places it looked do not name it: %v", looked)
 	}
 }
 
@@ -110,3 +130,7 @@ func lookingIn(on map[string]string) func(string) (string, error) {
 func isOneOf(files map[string]bool) func(string) bool {
 	return func(p string) bool { return files[p] }
 }
+
+// anythingRuns is a machine where every candidate is a working shell, which is
+// what the table above is about: the lookup, and not the probe.
+func anythingRuns(string) bool { return true }

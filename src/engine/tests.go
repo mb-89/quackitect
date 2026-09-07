@@ -808,8 +808,30 @@ func batteryShell(r Roots) (string, []string) {
 	return theShellAmong(exec.LookPath, shellsBesideGit(r), func(p string) bool {
 		info, err := os.Stat(p)
 		return err == nil && !info.IsDir()
-	})
+	}, theShellRuns)
 }
+
+// theShellRuns says whether a candidate is a shell that runs a script, by
+// handing it one and reading what it answers.
+//
+// A NAME THAT RESOLVES IS NOT A SHELL THAT RUNS. The launchers below are passed
+// over by the folder they live in, which is a list, and a list only names the
+// stubs somebody has already met. This asks the candidate instead, so a stub
+// nobody has met yet is passed over for what it does.
+//
+// IT COSTS ONE PROCESS, and only for a candidate found on PATH. The caller is
+// about to start a shell anyway, and a lookup that answers a program which
+// cannot run one costs the whole command.
+func theShellRuns(p string) bool {
+	ctx, cancel := context.WithTimeout(context.Background(), theShellProbeBudget)
+	defer cancel()
+	return quiet.Quietly(exec.CommandContext(ctx, p, "-c", "exit 0")).Run() == nil
+}
+
+// theShellProbeBudget is as long as a shell is given to answer a script that
+// does nothing. A shell answers in milliseconds, and a launcher that is waiting
+// on something else is not one.
+var theShellProbeBudget = 5 * time.Second
 
 // theShellAmong is that answer with both lookups handed in, so a check can put
 // this machine's shells wherever it needs them and drive the walk over a box
@@ -821,7 +843,8 @@ func batteryShell(r Roots) (string, []string) {
 // which no caller here reads as a shell that is missing. LookPath answers it
 // ahead of the sh Git brought, because Git leaves that one off PATH, so the
 // walk below never ran and every command on such a machine died at the shell.
-func theShellAmong(look func(string) (string, error), beside []string, isFile func(string) bool) (string, []string) {
+func theShellAmong(look func(string) (string, error), beside []string, isFile func(string) bool,
+	runs func(string) bool) (string, []string) {
 	// THE NAMES ARE A LIST, so a machine with bash and no sh is not called
 	// shell-less, and so the one lookup is not spelled out twice in the tree.
 	looked := []string{"sh or bash on PATH"}
@@ -834,6 +857,14 @@ func theShellAmong(look func(string) (string, error), beside []string, isFile fu
 			// IT SAYS WHAT IT PASSED OVER. A lookup that skips a hit and
 			// then answers nothing is a lookup nobody can argue with.
 			looked = append(looked, sh+", passed over: the WSL launcher is not a shell")
+			continue
+		}
+		// AND A NAME THAT RESOLVES IS STILL NOT A SHELL THAT RUNS. The line
+		// above knows the stubs somebody has already met, by the folder they
+		// live in. This one hands the candidate a script that does nothing,
+		// so a stub nobody has met is passed over for what it does.
+		if !runs(sh) {
+			looked = append(looked, sh+", passed over: it would not run a script that does nothing")
 			continue
 		}
 		return sh, looked
