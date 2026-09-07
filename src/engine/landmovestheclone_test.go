@@ -52,6 +52,14 @@ func readIn(t *testing.T, dir, rel string) string {
 // clone, and answers what it printed.
 func runLand(t *testing.T, clone, msg string, paths ...string) string {
 	t.Helper()
+	return runLandWith(t, clone, nil, msg, paths...)
+}
+
+// runLandWith is the same run with more of the environment named. What a land
+// reads out of the environment is the proxy it pushes through, so a test about
+// that has to be able to set one.
+func runLandWith(t *testing.T, clone string, env []string, msg string, paths ...string) string {
+	t.Helper()
 	script, err := filepath.Abs(filepath.Join("..", "..", "util", "git", "land.sh"))
 	if err != nil {
 		t.Fatal(err)
@@ -62,6 +70,7 @@ func runLand(t *testing.T, clone, msg string, paths ...string) string {
 		"GIT_AUTHOR_NAME=t", "GIT_AUTHOR_EMAIL=t@t",
 		"GIT_COMMITTER_NAME=t", "GIT_COMMITTER_EMAIL=t@t",
 		"GIT_TERMINAL_PROMPT=0")
+	cmd.Env = append(cmd.Env, env...)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("land.sh %s: %v\n%s", msg, err, out)
@@ -71,13 +80,19 @@ func runLand(t *testing.T, clone, msg string, paths ...string) string {
 
 // theCommitItReported reads the hash off the line land.sh prints under PUSHED,
 // which is the log --oneline of what went to origin.
+//
+// IT IS THE LINE AFTER PUSHED, wherever PUSHED falls. It read the first line
+// holding two fields and asked separately whether the whole output started with
+// PUSHED, so any line land printed before it took the test down. A land that
+// corrects a moved proxy prints one.
 func theCommitItReported(t *testing.T, out string) string {
 	t.Helper()
-	for _, line := range strings.Split(out, "\n") {
-		if strings.TrimSpace(line) == "PUSHED" {
+	lines := strings.Split(out, "\n")
+	for i, line := range lines {
+		if strings.TrimSpace(line) != "PUSHED" || i+1 >= len(lines) {
 			continue
 		}
-		if fields := strings.Fields(line); len(fields) > 1 && strings.HasPrefix(out, "PUSHED") {
+		if fields := strings.Fields(lines[i+1]); len(fields) > 1 {
 			return fields[0]
 		}
 	}

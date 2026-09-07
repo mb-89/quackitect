@@ -14,11 +14,41 @@
 # A path this tree no longer holds is removed there.
 msg="$1"; shift
 cd "$(git rev-parse --show-toplevel)" || exit 1
-# THE PROXY MOVES WHEN THE CONTAINER RESTARTS, so a box that keeps a helper for
-# it is asked which port is live. A box with none goes on with what is set.
-P=""
-[ -f .se/scratchpad/proxy.sh ] && P=$(sh .se/scratchpad/proxy.sh)
-[ -n "$P" ] && export HTTPS_PROXY="$P" https_proxy="$P"
+# THE PROXY MOVES WHEN THE CONTAINER RESTARTS, and HTTPS_PROXY goes on naming
+# the port it had before. Every push then fails to connect, and a box that keeps
+# working loses everything it has not pushed. Six archived notes went that way.
+#
+# MEASURED, 2026-09-07. HTTPS_PROXY named port 43603 and nothing listened there.
+# The live proxy was at 32897, and the same fetch answered at once against it.
+#
+# IT WAS A HELPER UNDER .se/scratchpad, which git carries nowhere, so the
+# mechanism was absent on every fresh box and on this one after the restart.
+# The proxy is asked where it is instead: it answers on its own port and
+# nowhere else, so a candidate is tested rather than believed.
+proxyAnswers() {
+  [ -n "$1" ] || return 1
+  curl -s -o /dev/null --max-time 2 --noproxy '*' \
+    "http://127.0.0.1:$1/__agentproxy/status" 2>/dev/null
+}
+thePortIn() { echo "$1" | sed -n 's|.*:\([0-9][0-9]*\)/*$|\1|p'; }
+
+# A DESK NAMES NO PROXY, and asks nothing. A variable that already names the
+# live one is left alone and says nothing, because a line on every land is noise
+# and noise is what teaches an agent to stop reading.
+was=$(thePortIn "$HTTPS_PROXY")
+if [ -n "$was" ] && ! proxyAnswers "$was"; then
+  # THE CA BUNDLE SAYS WHERE THE PROXY KEEPS ITS OWN NOTES, so that folder is
+  # followed rather than written down here. Its README names the live port.
+  ccr=/root/.ccr
+  [ -n "$CURL_CA_BUNDLE" ] && ccr=$(dirname "$CURL_CA_BUNDLE")
+  now=$(sed -n 's|.*127\.0\.0\.1:\([0-9][0-9]*\).*|\1|p' "$ccr/README.md" 2>/dev/null | head -1)
+  # NOTHING ANSWERING ANYWHERE STILL PUSHES, with what it was given. A land that
+  # stopped here would break every box to fix one.
+  if [ "$now" != "$was" ] && proxyAnswers "$now"; then
+    echo "PROXY MOVED TO $now, AND HTTPS_PROXY STILL NAMED $was"
+    export HTTPS_PROXY="http://127.0.0.1:$now" https_proxy="http://127.0.0.1:$now"
+  fi
+fi
 # THE CLONE FOLLOWS WHAT IT PUSHED. Left where the box woke, its HEAD is the
 # wrong baseline for every count taken against it, and git status reads dirty
 # whatever has landed, so the stop hook's uncommitted-changes line is red on
