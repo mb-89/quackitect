@@ -16,9 +16,9 @@ func TestTheWordIsTheControlsOwnName(t *testing.T) {
 func TestAGesturesWordIsItsCommandsLastSegment(t *testing.T) {
 	t.Parallel()
 	for command, want := range map[string]string{
-		"quackitect.god":  "GOD",
+		"quackitect.god":             "GOD",
 		"quackitect.stop_everything": "STOP_EVERYTHING",
-		"god":             "GOD",
+		"god":                        "GOD",
 	} {
 		if got := FromCommand(command); got != want {
 			t.Errorf("%s gave the word %q, not %q", command, got, want)

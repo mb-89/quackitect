@@ -56,9 +56,9 @@ const whyNamed = "named outright"
 
 // A ran test and how it went.
 type ran struct {
-	ID      string  `json:"id"`
-	Kind    string  `json:"kind"`
-	OK      bool    `json:"ok"`
+	ID   string `json:"id"`
+	Kind string `json:"kind"`
+	OK   bool   `json:"ok"`
 	// Pending is a run that has neither passed nor failed because it has not
 	// finished. A battery replaces the engine that started it, so it cannot be
 	// awaited, and calling a run that has not happened a pass is the defect
@@ -74,15 +74,15 @@ type ran struct {
 
 // Tested is the whole answer.
 type Tested struct {
-	Since      string   `json:"since"` // the snapshot the delta is read against, or HEAD
-	Delta      []change `json:"delta"`
-	Chosen     []chosen `json:"chosen"`
-	Whole      bool     `json:"whole"`
-	WhyWhole   string   `json:"why_whole,omitempty"`
+	Since    string   `json:"since"` // the snapshot the delta is read against, or HEAD
+	Delta    []change `json:"delta"`
+	Chosen   []chosen `json:"chosen"`
+	Whole    bool     `json:"whole"`
+	WhyWhole string   `json:"why_whole,omitempty"`
 	// Owes is a battery this change has earned and this run did not spend: a
 	// trigger changed, and the narrow selection ran instead. It is run once
 	// before the branch merges.
-	Owes string `json:"owes,omitempty"`
+	Owes       string   `json:"owes,omitempty"`
 	Proposed   []string `json:"proposed,omitempty"`
 	Unreached  []string `json:"unreached,omitempty"`  // proposed patterns the delta does not reach
 	Uncovered  []string `json:"uncovered,omitempty"`  // changed files no test reaches
