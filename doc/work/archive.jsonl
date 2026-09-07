@@ -132,6 +132,7 @@
 {"id":"wk-cdb6961359","title":"mcp exe outside bin","process":"trivial","disposition":"done","on_branch":"cdf6f3d6a39ad2d24b36c7598abccfb38a099116","tag":"refs/tags/archive/wk-cdb6961359"}
 {"id":"wk-d02ce59455","title":"every kind schemad","process":"trivial","disposition":"done","on_branch":"aaf7cc738a623dd81e54c0eab5f3b3b5629e8ce4","tag":"refs/tags/archive/wk-d02ce59455"}
 {"id":"wk-d09e45a317","title":"stale window ignores actors","process":"standard","disposition":"dropped","blob":"fdb23ae5d5310a87a7173f33a1feafcab3ff1cd2","on_branch":"76aaa0bc6cb8434c0d0020114e3844349e316209"}
+{"id":"wk-d28e0b1b31","title":"walk guard reads names","process":"trivial","disposition":"done","blob":"d0aeae9ac1cf18d02331dc903d65d85d6bfd36fd","on_branch":"5cc1347982bbec2297d9adaad7171d9751b84dd3"}
 {"id":"wk-d3d9d7030d","title":"go fix went missing","process":"trivial","disposition":"done","blob":"86ad800b515b3a012fc6924b707593a3571e6439","on_branch":"095a2a81161ae87a828091faeb56bcfa564d0943"}
 {"id":"wk-d4654c06d4","title":"a value read halfway","process":"trivial","disposition":"done","on_branch":"d83595f971d494604e3ab8cbc53b30618a10b848","tag":"refs/tags/archive/wk-d4654c06d4"}
 {"id":"wk-d595014c4e","title":"gate assertion matches prose","process":"trivial","disposition":"done","blob":"f19d5e1113cce9e10cb0b5e8dfb3b8a7d64903d7","on_branch":"0dc2252fe1c6c997c9f1358240c266e217214b92"}
