@@ -233,10 +233,15 @@ func TestTheDelta(ctx context.Context, r Roots, db *sql.DB, on string, proposed 
 	return out, nil
 }
 
-// okOf is whether every run went well.
+// okOf is whether every run went well and finished.
+//
+// A RUN THAT HAS NOT FINISHED IS NOT A PASS. The battery answers the moment it
+// starts and a long run answers where it will land, and both are pending. An
+// answer built from them said ok with nothing run, and the work step of the
+// standard process is graded on exactly that ok.
 func okOf(runs []ran) bool {
 	for _, x := range runs {
-		if !x.OK {
+		if !x.OK || x.Pending {
 			return false
 		}
 	}
@@ -271,7 +276,10 @@ func runOrLand(r Roots, tests []aTest, out *Tested, start time.Time) error {
 	}
 	lands := filepath.Join(r.Private("tests"), "test-"+time.Now().UTC().Format("20060102-150405.000")+".json")
 	out.Lands = lands
-	out.Ran = append(out.Ran, ran{ID: "the run", Kind: "landing", OK: true,
+	// A RUN STILL GOING IS NEITHER A PASS NOR A FAILURE, the way the battery's
+	// is. This said ok, so the answer read green before one test had finished,
+	// and the standard process grades its work step on that ok.
+	out.Ran = append(out.Ran, ran{ID: "the run", Kind: "landing", Pending: true,
 		Said: fmt.Sprintf("still running after %s, which is as long as the lane waits. Its answer lands in %s", theTestBudget, lands)})
 	// WHAT LANDS IS THE ANSWER THIS CALL WOULD HAVE GIVEN, whole, taken as it
 	// stands before the caller moves on with its own copy.
