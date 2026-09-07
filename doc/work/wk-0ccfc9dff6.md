@@ -9,6 +9,11 @@ guidance: [[work-token]]
 title: the editor cuts branches
 # where the token stands. The process owns these values.
 status: open
+claimed_by: 542bcda8/main
+claimed_at: "2026-09-07T12:34:22Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 1b2928e8b5e0b76853a9d51d66768d6622b0271d
 ---
 
 ## detail
@@ -23,15 +28,18 @@ The name comes from the one place that already derives it, so a branch cut here 
 
 The editor draws the button beside rename, on the same selection, and calls the verb.
 
-Two things it answers rather than fails on. A branch that already exists is said so and pushed, rather than treated as an error. A group with no open tokens is refused, because a branch cut for an empty bucket is a box that lands, finds nothing and closes.
+A branch that already exists is taken and pushed, and the answer says so rather than failing.
+
+AN EMPTY GROUP DRAWS NO BUTTON, the way rename draws none with nothing selected. The refusal stays in the verb too, because a shell and a cloud box reach the verb where no button exists to hide.
 
 ## done when
 
 - the verb makes the group branch off trunk and this tree stays where it stood, decided by: a Go test in src/engine
 - the branch it made is on the remote, decided by: the same Go test against a local bare origin
 - a branch that already exists is said so and pushed rather than failing, decided by: the same Go test
-- a group with no open tokens is refused, and the refusal says why, decided by: the same Go test
-- marking a group in the editor draws the button beside rename, decided by: the drive-editor check
+- the verb refuses a group with no open tokens, and says why, decided by: the same Go test
+- marking a group with open tokens draws the button beside rename, decided by: the drive-editor check
+- marking an empty group draws no button, decided by: the same check
 
 ## evidence: step 1. ask
 

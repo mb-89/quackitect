@@ -180,11 +180,20 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 		// submission wrote a began and an ended onto whatever token the queue
 		// would have handed on, with two snapshot commits behind them. That
 		// token's record then said it had been in a hand it was never in.
-		if p.settleOnly {
+		//
+		// AND AN UNBOUND TREE IS NOT ASKING FOR MORE EITHER. The queue chose it
+		// nothing, and handing out the next token on the way past a submission is
+		// the queue choosing after all, which is the one thing unbinding switches
+		// off. A person working one specific thing hands it in and goes back to
+		// what they were doing.
+		//
+		// IT ASKS UNBOUND AND NOT Unleashed, which is unbound or god. The comment
+		// below records what happened the last time a guard here asked the wider
+		// question: a god tree was handed nothing and told it was unbound.
+		if p.settleOnly || LoadBinding(r).At == Unbound {
 			return Answer{Pull: AnswerSettled, Paths: wrote,
-				Notice: p.ID + " is settled. The next token goes to a " +
-					"lane, because an agent that submits is asking for more. Ask for work again when " +
-					"you want it." + over}
+				Notice: p.ID + " is settled. Nothing is handed out with it, because a " +
+					"submission is not a request. Ask for work again when you want it." + over}
 		}
 	}
 	// A HOLD ON YOUR OWN VERDICT IS NOT WORK IN HAND. The submission put the

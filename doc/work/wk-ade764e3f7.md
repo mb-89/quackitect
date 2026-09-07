@@ -41,12 +41,12 @@ The engine reaches it by a flag naming the bucket. The branch is the instruction
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the approach is on the token before any work, as an interface or a shape a reader can disagree with |  |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the change is small enough to review whole, or it is split first | — |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | A bucket goes on its branch with no checkout typed by hand. |  |
+| [x] | what breaks if it is never done, and not only that it stays undone | The reading half is unreachable unless somebody remembers a command. |  |
+| [x] | the approach is on the token before any work, as an interface or a shape a reader can disagree with | TakeTheBoxBranch is the shape, named first. |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | Four name a Go test in src/engine. |  |
+| [x] | the change is small enough to review whole, or it is split first | One function and one flag. |  |
+| [x] | the basics it stands on exist, or are minted first | boxbranch.go and the branch reading existed. |  |
 
 ## evidence: step 2. do
 
