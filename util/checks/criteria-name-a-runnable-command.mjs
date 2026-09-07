@@ -83,10 +83,51 @@ const checksDir = "util/checks";
 
 // pipeline cuts a command into the programs it runs, on the shell's separators,
 // so a search behind a pipe is judged the way the guard judges it.
+//
+// A SEPARATOR INSIDE QUOTES IS PART OF ONE PROGRAM'S ARGUMENT. This split ran
+// before anything read quotes, so a pipe inside a quoted regex cut the command
+// in two and each half was judged as its own program. The half after the cut
+// carried a quote that never opened, the word splitter below swallowed the rest
+// of it into one word, and that word held util/checks/, so a se find nobody
+// refuses was reported as a check being run.
+//
+// MEASURED on doc/work/wk-0bed3ea63b.md:40, whose criterion names se find with a
+// four-way alternation in its pattern.
+//
+// THE ENGINE ALREADY WALKS IT THIS WAY. src/engine/search.go's own pipeline
+// tracks the open quote and cuts only outside one, which wk-8c76f768c1 taught
+// it. This is that walk in this language, for the same reason the program names
+// above are read off the guard rather than kept here.
 const separators = ["\r\n", "\n", "\r", "&&", "||", "|", ";", "&"];
+
+// separatorAt answers the length of the separator at the head of this text, or
+// zero. The list is longest first, so && is not read as two of &.
+const separatorAt = (text) => {
+  for (const sep of separators) if (text.startsWith(sep)) return sep.length;
+  return 0;
+};
+
 const pipeline = (command) => {
-  let parts = [command];
-  for (const sep of separators) parts = parts.flatMap((p) => p.split(sep));
+  const parts = [];
+  let part = "";
+  let quote = "";
+  for (let i = 0; i < command.length; i++) {
+    const c = command[i];
+    if (quote === "") {
+      const n = separatorAt(command.slice(i));
+      if (n > 0) {
+        parts.push(part);
+        part = "";
+        i += n - 1;
+        continue;
+      }
+      if (c === "'" || c === '"') quote = c;
+    } else if (c === quote) {
+      quote = "";
+    }
+    part += c;
+  }
+  parts.push(part);
   return parts;
 };
 
