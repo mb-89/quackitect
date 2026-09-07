@@ -16,9 +16,21 @@
 // asked for a command beside any number against a countable noun, and flagged
 // 1643 sentences over 361 notes: two applies from two tokens is prose, and
 // three findings followed by the three is a list answering its own count, which
-// rule 13 allows outright. Digits alone still flagged 165. What is left is a
-// digit, a noun this tree can be asked to count, and a verb that claims a
-// measurement, in prose rather than a table cell or a fence.
+// rule 13 allows outright. Digits alone still flagged 165.
+//
+// AND THE NARROW ONE MISSED THE SENTENCE IT WAS WRITTEN FOR. Asking for a digit
+// with the noun next to it flagged fourteen and let "TempDir lines in engine
+// test files fall from 201 to 126" through, because that puts its numbers after
+// the noun. A rule that cannot catch its own worked example is not a narrow
+// rule, it is the wrong one.
+//
+// SO THE THREE PARTS ARE ASKED FOR ANYWHERE IN THE SENTENCE: a noun this tree
+// can be asked to count, a number, and a verb claiming a measurement, in prose
+// rather than a table cell or a fence.
+//
+// A NUMBER THAT IS AN ADDRESS IS NOT A COUNT. step 3, chapter 12, a line
+// number, a token id, a date and a commit hash all name a place rather than
+// answer how many, so they come out before the sentence is asked.
 //
 // A CLOSED NOTE IS HISTORY, so only open ones are read. Its criteria and its
 // numbers were written under the tree as it stood, and rewriting them rewrites
@@ -49,7 +61,12 @@ const die = (why) => {
 // would answer it.
 const nouns = "lines?|files?|tests?|tokens?|notes?|commits?|checks?|hits?"
   + "|matches|rows?|functions?|builders?|words?|sentences?|packages?|modules?";
-const aCount = new RegExp("\\b\\d+\\s+(?:" + nouns + ")\\b", "i");
+const aNoun = new RegExp("\\b(?:" + nouns + ")\\b", "i");
+
+// anAddress is every shape of number that names a place rather than a quantity.
+const anAddress = /\b(step|chapter|rule|section|level|round|part|version|go|line|item)\s+\d+|\bwk-[0-9a-f]+|\b\d{4}-\d{2}-\d{2}|\b[0-9a-f]{7,}\b|:\d+/gi;
+const aNumber = /\b\d+\b/;
+const aCount = { test: (said) => aNoun.test(said) && aNumber.test(said.replace(anAddress, " ")) };
 
 // AND THE VERB IS WHAT MAKES IT A CLAIM. Without one the number is usually an
 // address or a bound rather than a measurement taken.
