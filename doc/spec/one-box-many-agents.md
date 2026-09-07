@@ -167,3 +167,24 @@ Do not raise the agent count per box to get throughput. Sixteen on one tree
 spent their time waiting for each other to finish an edit, and the failures
 above all scale with the number of agents on a tree rather than with the amount
 of work. Two or three per tree is about what one tree and one engine carry.
+
+## The ruling
+
+The owner read this and chose the shape rather than the machinery. The default
+for parallel agents is one, meaning one of each role, and separate instances are
+preferred to more agents on one tree. That is `wk-c753cf8fb3`, and the parameter
+itself now carries the warning and the measurement.
+
+So the working tree per agent is **declined**, and so are the small fixes for
+conflicts one to four. Each of those four only bites where several agents share
+a tree, and at one agent per tree none of them can happen.
+
+Two survive the ruling, because one agent alone still meets them:
+
+- **Five, the staffing gate.** It counts hands present rather than hands the
+  queue can use, so it asks one session to spawn for nothing. `wk-fe1436eb1b`.
+- **Six, the two records.** One agent putting work down and taking it up again
+  writes both `.se/holds.json` and the frontmatter. `wk-b58281b602`.
+
+The rest of this page stays as the measurement it is. Raising the agent count
+per tree is the thing it was written to answer, and the answer is no.

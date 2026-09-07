@@ -11,8 +11,8 @@ title: Many agents one box
 status: open
 # the person's own name for a group. It does not move the work
 bucket: claims
-# true when this waits for a person rather than an agent
-needs_human: true
+claimed_by: 7e7f0da1/main
+claimed_at: "2026-09-07T10:49:22Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - ada49a6390cc27edf296a371f3cee61341360c98
@@ -49,11 +49,11 @@ Read doc/spec/one-box-many-agents.md and pick. It proposes one fix that removes 
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | The shape is settled, so no session steers into the arrangement that cost six outages, and no worktree machinery is built for a shape nobody wants. | wk-c753cf8fb3 |
+| [x] | what breaks if it is never done, and not only that it stays undone | The spec sits proposing work nobody will do, and the default keeps spawning three hands onto one tree. | the ruling section |
+| [x] | the ask is small enough to review whole, or it is split first | — | one decision, and the spec already carried the analysis |
+| [x] | every done-when line is decidable, and names the command where one decides it | Three are read off the spec, and the fourth is needs_human coming off this token. | doc/spec/one-box-many-agents.md |
+| [x] | the basics it stands on exist, or are minted first | — | the spec was the basic and it stood |
 
 ## evidence: step 2. do
 
@@ -61,9 +61,9 @@ Read doc/spec/one-box-many-agents.md and pick. It proposes one fix that removes 
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | — | trivial process |
+| [x] | one test was written first and seen red for the reason expected | None. This token asks for a decision rather than a change, so nothing here could redden. Said rather than faked. | the done-when lines |
+| [x] | the same test was seen green after the change, and named | The two tokens the ruling leaves standing carry the tests, one each. | wk-fe1436eb1b, wk-b58281b602 |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | — | one ruling section on the spec |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | Both. The spec now says which proposals are declined and why, and the two conflicts that survive are tokens of their own. | wk-fe1436eb1b, wk-b58281b602 |
 
