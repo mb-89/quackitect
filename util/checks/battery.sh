@@ -431,8 +431,16 @@ start "se lint" .bin/se.exe lint
 # THE ALTERNATIVE WAS SILENCE. Left unlisted and undeclared it reads exactly
 # like a check somebody forgot to write in, which is what
 # checks-live-in-the-method reported and what nobody could act on.
-out="archive-rows-travel:wk-17f90ad848"
-for c in the-branch-head-builds render-check drive-editor drawn-classes-have-rules panel-draws-the-register adapter-decides-no-column engine-args engine-args-lifecycle engine-spawns liveness one-look panel-icons no-loose-glyphs no-loose-spawns no-lone-escape checks-live-in-the-method engine-spawns-catches panel-is-handed-the-state panel-says-holding drive-panel burndown burndown-derives-nothing tests-name-no-token tests-are-not-hotspots mcp-tools lane-answers-cold the-cards-reach-their-box the-travelling-cage-cannot-block scripts-are-lf build-reports-every-error binaries-live-in-bin private-files-have-writers no-private-links refusals-name-a-door a-refusal-names-a-legal-move engine-stops-by-pid windows-say-they-are-here projections-carry-chapters archive-rows-name-an-object notes-say-each-heading-once deleted-notes-have-a-row open-tokens-carry-their-sections no-parallel-seam-swap a-merge-reverts-nothing commits-carry-one-token lane-carries-every-flag no-flat-twins the-cage-cites-what-is-here the-flat-engine-only-shrinks tooltips-name-their-keywords the-tree-drops-nothing a-count-follows-the-engine pushes-name-a-branch; do
+# THE EXCLUSION IS THE LIST, AND out= WAS READ BY NOBODY.
+#
+# This line set out to the excluded name and nothing ever read out again: start,
+# run and engine_race each assign it as their own output variable a few lines
+# later. The exclusion worked only by the name's absence from the list below,
+# which is exactly the silence the comment above claims to have ended.
+#
+# So the list is the whole of it. A check that is not on the line does not run,
+# and checks-live-in-the-method is what says a folder holds one that nothing runs.
+for c in the-branch-head-builds render-check drive-editor drawn-classes-have-rules panel-draws-the-register adapter-decides-no-column engine-args engine-args-lifecycle engine-spawns liveness one-look panel-icons no-loose-glyphs no-loose-spawns no-lone-escape checks-live-in-the-method engine-spawns-catches panel-says-holding drive-panel burndown burndown-derives-nothing tests-name-no-token mcp-tools lane-answers-cold the-cards-reach-their-box the-travelling-cage-cannot-block scripts-are-lf binaries-live-in-bin no-private-links refusals-name-a-door a-refusal-names-a-legal-move engine-stops-by-pid windows-say-they-are-here projections-carry-chapters notes-say-each-heading-once deleted-notes-have-a-row open-tokens-carry-their-sections no-parallel-seam-swap commits-carry-one-token lane-carries-every-flag no-flat-twins the-cage-cites-what-is-here the-flat-engine-only-shrinks tooltips-name-their-keywords the-tree-drops-nothing a-count-follows-the-engine archive-rows-travel commands-mirror-the-keywords criteria-name-a-runnable-command the-bundle-is-not-stale archived-notes-are-gone pushes-name-a-branch; do
   if [ -f "util/checks/$c.mjs" ]; then
     start "$c" node "util/checks/$c.mjs" "$root"
   else
