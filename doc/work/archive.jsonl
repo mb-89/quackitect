@@ -100,3 +100,4 @@
 {"id":"wk-fcdadf13cb","title":"the clone never moves","process":"trivial","disposition":"done","blob":"0f3f4d80b0543ec9d638656838b00279b817b894"}
 {"id":"wk-ff08c56e56","title":"Release frees no hold","process":"trivial","disposition":"done","blob":"acde15ad24d2d27a8b3e51ca1ca70d69088eb099","on_branch":"df6b1d24f8e93e84a27bad1e9d7299f3a122a1ac"}
 {"id":"wk-ffe97cf071","title":"stop flag reads nowhere","process":"trivial","disposition":"done","blob":"9bd89fe08f2f1e7400d73b3680ad2f3aaec82068","on_branch":"ce2aa3bee2031d2d34dd4966d1eeb0a20d7549fa"}
+{"id":"wk-4759d90994","title":"claims ride a branch","process":"standard","disposition":"done","blob":"67c978d7481bf5e2a03df51679dce567cf63d75d","on_branch":"9b193e1e0a27fced21dae95936d2d80d649fe311"}
