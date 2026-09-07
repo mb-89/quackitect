@@ -154,7 +154,8 @@ func TestTheGuardAgreesWithBash(t *testing.T) {
 		{"after the escape character", ` \`, ""},
 	}
 	payloads := []string{"$(touch M)", "`touch M`", "; touch M", "&& touch M", "| touch M", "> M", "\n touch M"}
-	driven, unparsed := 0, 0
+	driven := 0
+	var unparsed []string
 	for _, w := range wrappers {
 		for _, payload := range payloads {
 			command := "./se pull --actor x" + w.before + payload + w.after
@@ -163,7 +164,7 @@ func TestTheGuardAgreesWithBash(t *testing.T) {
 			// closes, and bash answers a syntax error and runs nothing. There
 			// is nothing for the guard to be right or wrong about there.
 			if !bashParses(t, bash, command) {
-				unparsed++
+				unparsed = append(unparsed, w.what+", "+payload)
 				continue
 			}
 			exempt := runsTheEngine(command)
@@ -175,11 +176,41 @@ func TestTheGuardAgreesWithBash(t *testing.T) {
 			}
 		}
 	}
-	if driven < len(wrappers)*len(payloads)-unparsed || driven < 30 {
-		t.Fatalf("%d commands were driven and %d would not parse, so the alphabet is not being read",
-			driven, unparsed)
+	// EVERY ROW IS ACCOUNTED FOR: driven, or refused by bash before it ran.
+	//
+	// THE CLAUSE HERE BEFORE COULD NOT FIRE. It read driven < wrappers*payloads
+	// - unparsed, and every turn of the loop adds one to exactly one of the two,
+	// so the two sides were the same number by construction. It read as a
+	// coverage guard and only the literal beside it did any work.
+	rows := len(wrappers) * len(payloads)
+	if driven+len(unparsed) != rows {
+		t.Fatalf("%d driven and %d unparsed of %d rows, so a row went nowhere",
+			driven, len(unparsed), rows)
+	}
+	// AND THE ALPHABET IS THE SIZE IT WAS MEASURED AT. A wrapper or a payload
+	// taken out shrinks the product with it, so the row count cannot notice one
+	// going missing. These two floors are what notices.
+	if len(wrappers) < theWrappersMeasured || len(payloads) < thePayloadsMeasured {
+		t.Fatalf("the alphabet is %d wrappers by %d payloads, and it was measured at %d by %d",
+			len(wrappers), len(payloads), theWrappersMeasured, thePayloadsMeasured)
+	}
+	// AND BASH REFUSES EXACTLY THE SHAPES THAT CANNOT PARSE. Two can, both
+	// after the escape character: a backslashed backtick leaves the next one
+	// opening a substitution that never closes, and a backslashed dollar leaves
+	// a bare bracket where bash wants a word. A third refusal is a row nobody
+	// meant to write, and a second driven row here is bash reading it anew.
+	if len(unparsed) != theUnparsableRows {
+		t.Fatalf("bash would not parse %d rows, and %d shapes here cannot parse: %v",
+			len(unparsed), theUnparsableRows, unparsed)
 	}
 }
+
+// The alphabet as it was measured, so a row quietly leaving it is caught.
+const (
+	theWrappersMeasured = 6
+	thePayloadsMeasured = 7
+	theUnparsableRows   = 2
+)
 
 // bashParses says whether bash reads this command as a command at all, without
 // running it. That is bash's own -n.
