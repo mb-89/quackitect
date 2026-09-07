@@ -139,6 +139,7 @@
 {"id":"wk-d924167a0a","title":"landing answers ok early","process":"trivial","disposition":"done","blob":"a1d73f2d23f66ef627aff9814685a4151b626d1a","on_branch":"03ef2ad777f8523ffdbc98d16af7514af0c59c9e"}
 {"id":"wk-d9ab624c3c","title":"shell test assumes windows","process":"trivial","disposition":"done","blob":"6fcb482301ce9a2c12fe69f1819eb01b12f7e3e2","on_branch":"22052579d6b12de9b2b0f9750d48a71487baa276"}
 {"id":"wk-da958ceb87","title":"blocked meets the queue","process":"trivial","disposition":"done","on_branch":"70225cde3c0774ac65a7c2ba9bc07c2a9c0278a9","tag":"refs/tags/archive/wk-da958ceb87"}
+{"id":"wk-dadb530b3d","title":"shell lookup picks wsl","process":"trivial","disposition":"done","blob":"77545437b0ddd2cf129c34a3ca6489b6f81c0d43","on_branch":"d02024ac55b44bfbed2a9eafc495de80f0b59576"}
 {"id":"wk-de2256d35c","title":"a note not consumed","process":"trivial","disposition":"done","on_branch":"faa62a76e12fd43817d116ff7193617b71467601","tag":"refs/tags/archive/wk-de2256d35c"}
 {"id":"wk-e2809c026c","title":"take-back keeps its look","process":"trivial","disposition":"done","on_branch":"02825aba0c7fcfc302cecd19ac21fc50391fb955","tag":"refs/tags/archive/wk-e2809c026c"}
 {"id":"wk-e51c579664","title":"shell lookup finds WSL","process":"standard","disposition":"done","on_branch":"0c829ff8a41844238466b1fe651281bd07a49841","tag":"refs/tags/archive/wk-e51c579664"}
