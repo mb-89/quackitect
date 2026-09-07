@@ -16,6 +16,7 @@ author: main
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 7b85042fb562cc320f19352c380f15c4868f33cd
+  - 07cb4edb0c6ed7ad211707516a0b51f39a1cce53
 # the tree each time the work was put down or closed, snapshots the engine wrote
 ended:
   - 7ffca29b7454afc006c39566a7b6b67ae228e0e8
@@ -108,11 +109,25 @@ the inversion was backed out and git status showed only the test file before the
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | [[reviewing]] was read and applied | — |  |
-| [ ] | every hunk of git diff began..ended was read, and any not read is named |  |  |
-| [ ] | every criterion's command was run again, and what it said is named |  |  |
-| [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
-| [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
+| [x] | [[reviewing]] was read and applied | read whole, then two passes over the candidates | reviewing.md |
+| [x] | every hunk of git diff began..ended was read, and any not read is named | 7b85042f..7ffca29b reads clean here, against the note. Two files, both read whole, none skipped | 7b85042f..7ffca29b |
+| [x] | every criterion's command was run again, and what it said is named | 1 and 2: TestTheTestVerbWritesTheRunItRan green. 3: TestASubmissionIsRefusedWhenTheRunWasRed green. TestACloseAsksWhatTheEngineRan green. No non-test src file in the span | se test |
+| [x] | every hunk improves the product, or a finding names the one that does not | the test reaches a seam neither older test could. The findings are the note's snapshot claim and one brittle assertion | the two below |
+| [x] | every finding is a trivial token naming this one, and their ids are here | wk-20f5fba187, wk-d595014c4e | bucket tests |
+
+## evidence: the span is readable after all
+
+The note says 7b85042f is no object here. It is one. git cat-file -t answers commit, refs/se/steps/7b85042fb562 holds it, and its parent e7ba69b9 is on group/tests. So the engine wrote it on this box and nothing fetched it in.
+
+That span is the clean one. git diff 7b85042f 7ffca29b is this token's change and nothing else: the note and src/engine/testedgate_test.go. The later began, 07cb4edb, is the unusable one, because its span to ended sweeps in other hands' work. I read the good span. wk-20f5fba187 carries it.
+
+## evidence: what the verdict checked
+
+The test drives runTest through a call and reads LastRunOn back, which neither older test does. Wiring the record out was the worker's own red, and I take that as reported rather than repeating it.
+
+I checked the span touches no file under src outside a _test.go, which is what the note claims. It does not.
+
+The gate's whole refusal surface is two sentences in TestsRefuseTheClose. The test's last assertion matches both as literal substrings, so it is correct today and disarmed by any rewording. That is wk-d595014c4e.
 
 ## evidence: the began snapshot
 
