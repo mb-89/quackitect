@@ -689,16 +689,15 @@ func everyFileWhole(db *sql.DB) ([]change, error) {
 // process it is. It answers what ran, and which engine the Go tests were
 // handed, in a sentence with its age, so a stale one reads as stale.
 func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, string) {
-	// DOES THIS RUN ASK THE MAP ANYTHING? The owner's rule: build it when the
-	// answer depends on it. Every pick named outright was selected by whoever
-	// asked, so nothing here consults the map and nothing writes one.
-	wantMap := false
-	for _, p := range picks {
-		if p.Why != whyNamed {
-			wantMap = true
-			break
-		}
-	}
+	// DOES THIS PICK ASK THE MAP ANYTHING? The owner's rule: build it when the
+	// answer depends on it. A pick named outright was selected by whoever
+	// asked, so it consults no map and writes none.
+	//
+	// IT IS ASKED OF EACH PICK, NOT OF THE RUN. Folded into one flag over every
+	// pick, one delta pick put the instrumented binary and the index write back
+	// on every named test beside it. Measured: a named test alone ran in 0.0126
+	// seconds with its row untouched, and the same test beside a pattern ran in
+	// 0.0404 seconds with its row rewritten. p.Why is in hand at the call.
 	byID := map[string]aTest{}
 	for _, t := range tests {
 		byID[t.ID] = t
@@ -736,6 +735,7 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, strin
 				engine, engineSaid = suiteEngine(r)
 				engineKnown = true
 			}
+			wantMap := p.Why != whyNamed
 			ok, said, took, regions, err := runOneGoTest(r, bin, engine, t, wantMap)
 			x := ran{ID: t.ID, Kind: t.Kind, OK: ok, Seconds: took.Seconds()}
 			if !ok {
