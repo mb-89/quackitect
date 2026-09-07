@@ -632,7 +632,11 @@ func answerHook(ctx context.Context, raw []byte, args []string, out io.Writer, h
 		// now be handed, and how much of it there is. A desk reads that off the
 		// panel. This hook's own words reach the turn, which is the surface a
 		// cloud box has instead.
-		if word := KeywordSaid(roots, log, actor, in.Prompt+in.UserPrompt); word != "" {
+		// A SLASH COMMAND IS THE KEYWORD WITH A HANDLE ON IT, AND THE HANDLE IS
+		// WHAT ARRIVES. The harness submits the name it was typed as, so the body
+		// is read back before the matcher can see a word in it. What the log
+		// records above is what the person wrote, which is the slash text.
+		if word := KeywordSaid(roots, log, actor, TheWordsBehind(roots, in.Prompt+in.UserPrompt)); word != "" {
 			if said := TheDepthAfter(roots, word); said != "" {
 				fmt.Fprintln(g.out, "quackitect: "+said)
 			}

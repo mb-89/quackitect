@@ -8,12 +8,15 @@ guidance: [[work-token]]
 # the name this token is known by, in references and in links
 title: the editor cuts branches
 # where the token stands. The process owns these values.
-status: open
-claimed_by: 542bcda8/main
-claimed_at: "2026-09-07T12:50:07Z"
+status: done
+# who did the work step, so the verdict is never theirs
+author: main
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 1b2928e8b5e0b76853a9d51d66768d6622b0271d
+# the tree each time the work was put down or closed, snapshots the engine wrote
+ended:
+  - 771af4b6e7d5aa997ba43206886dd32afb67fc48
 ---
 
 ## detail
@@ -47,12 +50,12 @@ AN EMPTY GROUP DRAWS NO BUTTON, the way rename draws none with nothing selected.
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the approach is on the token before any work, as an interface or a shape a reader can disagree with |  |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the change is small enough to review whole, or it is split first | — |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | The surface a person uses can start a group, rather than a shell somebody remembers. |  |
+| [x] | what breaks if it is never done, and not only that it stays undone | The group design has no way in from the editor, so nobody uses it. |  |
+| [x] | the approach is on the token before any work, as an interface or a shape a reader can disagree with | A second verb beside the first: cut off trunk and push, and do not move this tree. |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | Four name a Go test, one names the drive-editor check. |  |
+| [x] | the change is small enough to review whole, or it is split first | One verb, one flag, one button and its wiring. |  |
+| [x] | the basics it stands on exist, or are minted first | The branch reading and TakeTheGroupBranch landed first. |  |
 
 ## evidence: step 2. do
 

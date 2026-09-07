@@ -530,6 +530,56 @@ if (tick) {
   press(row.querySelector("td"));
 }
 
+// PRESSING THE BRANCH BUTTON SENDS THE PRESS.
+//
+// MEASURED. The owner ticked a group, saw the button, read the hover naming
+// that group correctly, pressed it, and nothing happened at all: no branch, no
+// message, and no line in the log.
+//
+// NOTHING IN THIS PROJECT PRESSED THIS BUTTON. The render check reads markup.
+// The Go test drove the verb, and it drove the refusal path, so it returned
+// before git was touched and could not fail when the button did nothing. The
+// one control that was broken was the one control nothing drove.
+// THE ROW IS PICKED FROM A BUCKET, WHICH IS THE ONLY CASE THAT CAN CUT.
+//
+// The first row on the page is in a declared query group, where the button is
+// disabled and correctly so. Ticking that one and reading a dead button proves
+// nothing about the press the owner made. A bucket is a group the person named,
+// so it carries no "q/" and is not pinned.
+{
+  const bucket = [...wrap.querySelectorAll("section.group")].find((s) => {
+    if (s.classList.contains("pinned")) return false;
+    const name = (s.querySelector("h2 .name")?.textContent ?? "").trim();
+    if (name === "" || name === "no group" || name.startsWith("q/")) return false;
+    return !!s.querySelector("tr[data-id]");
+  });
+  say("the page draws a bucket with rows in it", !!bucket,
+    "the groups drawn are " +
+      JSON.stringify([...wrap.querySelectorAll("section.group h2 .name")]
+        .map((n) => n.textContent.trim())));
+  const row = bucket?.querySelector("tr[data-id]") ?? wrap.querySelector(".pane tr[data-id]");
+  press(row.querySelector("td"));
+  const cut = wrap.querySelector(".bs-cut-branch");
+  say("the branch button is on the page", !!cut);
+  say("a ticked row shows the branch button", !!cut && !cut.hidden,
+    "hidden=" + cut?.hidden);
+  say("a bucket row leaves the branch button pressable", !!cut && !cut.disabled,
+    "the hover says " + JSON.stringify(cut?.title));
+  const before = sent.filter((m) => m.type === "branch").length;
+  press(cut);
+  const now = sent.filter((m) => m.type === "branch");
+  say("pressing the branch button sends the press", now.length === before + 1,
+    "disabled=" + cut?.disabled + ", title=" + JSON.stringify(cut?.title) +
+      ", the last three messages were " + JSON.stringify(sent.slice(-3)));
+  if (now.length > before) {
+    const last = now[now.length - 1];
+    say("and the press names the group it is drawn for",
+      typeof last.group === "string" && last.group !== "",
+      "it named " + JSON.stringify(last.group));
+  }
+  press(row.querySelector("td"));
+}
+
 // A HIDDEN CONTROL IS HIDDEN. The group and rename buttons ship hidden and the
 // page showed them anyway, because an author's display rule beats the browser's
 // own [hidden]. They drew in a bar with no room for them, clipped and out of

@@ -11,7 +11,7 @@ import { nextEngineState, whyNot, HEARTBEAT_MS, endsTheEngine } from "./liveness
 import { startLanguageServer, stopLanguageServer } from "./lsp";
 import { sayWindowIsHere, forgetWindow, windowsThere, windowAnswers, sweepWindowsGone } from "./windows";
 import {
-  mintArgs, editCellArgs, fileArgs, groupArgs, renameGroupArgs, cutBranchArgs, holdArgs,
+  mintArgs, editCellArgs, fileArgs, groupArgs, renameGroupArgs, branchForGroupArgs, holdArgs,
   bindArgs, bindingArgs, askArgs, askedArgs, askIsOwed, ideationArgs, ideatingArgs, isIdeating, treeArgs,
   viewArgs, paneArgs, panesArgs, viewsArgs, pinArgs, unpinArgs, widthArgs,
   burndownArgs,
@@ -348,6 +348,7 @@ let beatTimer: NodeJS.Timeout | undefined;
 let lastBeat = 0;
 
 const READY_MS = 15000; // the budget, and missing it is a fault, not a wait
+const ENDS_MS = 5000; // how long an engine gets to go before the button gives up on it
 
 function setState(next: EngineState, why = "") {
   engineState = next;
@@ -814,7 +815,36 @@ function asText(v: unknown): string {
   return String(v);
 }
 
-function startEngine(context: vscode.ExtensionContext) {
+// ENDING WHAT HOLDS THE FOLDER, so the button can take it.
+//
+// The engine writes its pid to .se/engine.json, and killing is not instant.
+// Spawning the successor while the old one still holds the folder is the
+// collision this exists to stop, so it waits for the process to go rather than
+// killing and hoping.
+//
+// IT ANSWERS WHETHER THE FOLDER IS FREE. Nothing to kill is free. Something
+// still there after the budget is not, and the caller says so rather than
+// starting a second engine on one folder.
+async function endWhatHoldsTheFolder(context: vscode.ExtensionContext): Promise<boolean> {
+  if (!whatIsRunning(context)) return true;
+  stopWatching(); // the liveness watch is armed on an engine that is about to go
+  const running = whatIsRunning(context);
+  if (running) {
+    try {
+      process.kill(running.pid);
+    } catch {
+      // It went while we were looking at it, which is the outcome anyway.
+    }
+  }
+  const until = Date.now() + ENDS_MS;
+  while (Date.now() < until) {
+    if (!whatIsRunning(context)) return true;
+    await new Promise((wake) => setTimeout(wake, 60));
+  }
+  return false;
+}
+
+async function startEngine(context: vscode.ExtensionContext) {
   if (engineState === "busy") return;
   // THE ENGINE ON DISK, NOT THE HANDLE. A swap leaves the handle naming a
   // process that has gone, so stopping by handle alone ends nothing and sets
@@ -847,10 +877,24 @@ function startEngine(context: vscode.ExtensionContext) {
     return;
   }
 
-  // ALREADY RUNNING IS NOT A REASON TO START A SECOND. A second engine
-  // rotates the first one's log away and the record splits in half.
-  if (reattach(context)) {
-    vscode.window.showInformationMessage("The engine is already running. This window is watching it.");
+  // THE BUTTON TAKES THE FOLDER, AND WHATEVER HOLDS IT IS ENDED FIRST.
+  //
+  // A second engine on one folder rotates the first one's log away and splits
+  // the record in half, so two must never run. That was answered by refusing to
+  // start, and the refusal is the wrong half to keep: an engine is bound to this
+  // folder, so anything holding it is this folder's own, and a person pressing
+  // start is saying take it.
+  //
+  // THE OWNER'S ASK: I am not going to open the same folder in a second window,
+  // so a leftover engine is never somebody else's work. Kill it and start.
+  //
+  // A WINDOW RELOAD STILL REATTACHES rather than killing. That path is
+  // activate(), where nobody pressed anything. This is the button.
+  if (!(await endWhatHoldsTheFolder(context))) {
+    setState("bad", "an engine is holding this folder and would not end");
+    vscode.window.showErrorMessage(
+      "An engine is holding this folder and did not end. Close whatever is running it, then press start again.",
+    );
     return;
   }
 
@@ -962,7 +1006,7 @@ async function startAgent(context: vscode.ExtensionContext) {
   }
   const engineWasUp = engineState === "good";
   if (!engineWasUp) {
-    startEngine(context);
+    await startEngine(context);
     if (!(await waitForState("good", READY_MS))) return; // startEngine has said why
   }
   showLog(context);
@@ -1152,7 +1196,7 @@ function toggleWork(context: vscode.ExtensionContext) {
     if (m.type === "file") void fileWork(context, m.id, m.sets, m.into);
     if (m.type === "group") void groupWork(context, m.ids);
     if (m.type === "rename") void renameGroup(context, m.from, m.to);
-    if (m.type === "branch") void cutBranch(context, m.group);
+    if (m.type === "branch") void makeGroupBranch(context, m.group);
     if (m.type === "edit") void editCell(context, m.id, m.col, m.text);
     if (m.type === "column") void showColumn(context, m.side, m.property, m.show);
     if (m.type === "columns") void setColumns(context, m.side, m.only);
@@ -1377,22 +1421,37 @@ async function renameGroup(context: vscode.ExtensionContext, from: string, to: s
 }
 
 // THE ANSWER IS SHOWN, BECAUSE THIS ONE CHANGES NOTHING A PERSON CAN SEE. A
-// rename redraws the board and a cut branch does not, so a silent success and a
+// rename redraws the board and a new branch does not, so a silent success and a
 // silent refusal would look alike. The engine says which, in a sentence.
-async function cutBranch(context: vscode.ExtensionContext, group: string) {
-  const args = cutBranchArgs(group);
-  if (!args) {
+//
+// AND A PRESS THAT THROWS SAYS SO. The caller runs this as void, so anything
+// thrown here vanished and the press did nothing, invisibly, which is the one
+// outcome the owner cannot tell from a dead button.
+async function makeGroupBranch(context: vscode.ExtensionContext, group: string) {
+  try {
+    const args = branchForGroupArgs(group ?? "");
+    if (!args) {
+      vscode.window.showErrorMessage(
+        "These rows are in no group, so there is no branch to make.");
+      return;
+    }
+    const out = await askEngine(context, args);
+    if (out?.error) {
+      vscode.window.showErrorMessage(out.error);
+      return;
+    }
+    if (out === undefined) return; // askEngine has already said which way it went
+    // THE FIELD IS says, WHICH IS WHAT BranchTaken CARRIES. This read out.said,
+    // which is on nothing the engine answers, so every press that got this far
+    // fell to the fallback and told the person it was made and pushed whether
+    // or not it was. The engine's own sentence says which, and it is the only
+    // half that knows.
+    vscode.window.showInformationMessage(
+      String(out.says ?? `group/${group} is made and pushed`));
+  } catch (err) {
     vscode.window.showErrorMessage(
-      "These rows are in no group, so there is no branch to cut.");
-    return;
+      `The branch for ${group} was not made: ${String((err as Error)?.message ?? err)}`);
   }
-  const out = await askEngine(context, args);
-  if (out?.error) {
-    vscode.window.showErrorMessage(out.error);
-    return;
-  }
-  if (out === undefined) return; // askEngine has already said which way it went
-  vscode.window.showInformationMessage(String(out.said ?? `group/${group} is cut and pushed`));
 }
 
 async function mintWork(context: vscode.ExtensionContext, arg?: { text: string }) {

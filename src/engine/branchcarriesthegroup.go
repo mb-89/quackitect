@@ -127,25 +127,31 @@ func theBucketHolds(r Roots, bucket string) int {
 	return n
 }
 
-// CutTheGroupBranch makes the branch a bucket is worked on, pushes it, and
+// MakeTheGroupBranch makes the branch a bucket is worked on, pushes it, and
 // leaves this tree exactly where it stands.
+//
+// THE GROUP IS NOT CUT, AND SAYING SO WAS WRONG. This was named for cutting a
+// group, and every sentence it answered said cut. The owner read that as the
+// group being taken away, pressed, and found the group still there with every
+// token in it. Nothing about a group changes here. A branch is MADE for it, and
+// the group goes when its last token is done and not before.
 //
 // IT IS NOT TakeTheGroupBranch, AND THE DIFFERENCE IS WHO IS CALLING. That one
 // puts a box on the branch, which is right for a box about to work the group. A
-// person cutting a branch from the work editor did not ask to be moved
-// somewhere else, and a desk whose checkout moves under it loses what it held.
+// person making a branch from the work editor did not ask to be moved somewhere
+// else, and a desk whose checkout moves under it loses what it held.
 //
 // IT PUSHES, BECAUSE A BRANCH NO REMOTE CARRIES IS ONE NO CLOUD BOX CAN
-// SELECT. Cutting without pushing would look exactly like the button doing
+// SELECT. Making one without pushing would look exactly like the button doing
 // nothing, which is the failure a person cannot tell from a bug.
 //
 // A BRANCH THAT IS ALREADY THERE IS SAID SO AND PUSHED, rather than failed on.
 // Pressing twice is a person checking, and the second press should answer the
 // same thing as the first.
-func CutTheGroupBranch(r Roots, bucket string) BranchTaken {
+func MakeTheGroupBranch(r Roots, bucket string) BranchTaken {
 	bucket = strings.TrimSpace(bucket)
 	if bucket == "" {
-		return BranchTaken{Says: "no bucket was named, so no group branch was cut"}
+		return BranchTaken{Says: "no bucket was named, so no group branch was made"}
 	}
 	want := aGroupBranch + bucket
 	// A BRANCH FOR AN EMPTY BUCKET IS A BOX THAT LANDS, FINDS NOTHING AND
@@ -153,18 +159,18 @@ func CutTheGroupBranch(r Roots, bucket string) BranchTaken {
 	// discovered there, where nobody is watching.
 	if theBucketHolds(r, bucket) == 0 {
 		return BranchTaken{Says: bucket + " holds no open token, so a box on " + want +
-			" would land, find nothing and close. Nothing was cut."}
+			" would land, find nothing and close. No branch was made."}
 	}
 	says := want + " is already here"
 	if _, err := gitHere(r, "rev-parse", "--verify", "--quiet", "refs/heads/"+want); err != nil {
 		off, from := fetchedBranch(r)
 		if off == "" {
-			return BranchTaken{Says: want + " was not cut: this tree tracks no branch to cut it off"}
+			return BranchTaken{Says: want + " was not made: this tree tracks no branch to make it off"}
 		}
 		if _, err := gitHere(r, "branch", want, off); err != nil {
-			return BranchTaken{Says: want + " was not cut: " + err.Error()}
+			return BranchTaken{Says: want + " was not made: " + err.Error()}
 		}
-		says = want + " is cut off " + from
+		says = want + " is made off " + from + ", and " + bucket + " keeps every token it holds"
 	}
 	if _, err := gitHere(r, "push", "--set-upstream", "origin", want); err != nil {
 		return BranchTaken{On: want, Says: says + ", and it was not pushed, so no cloud box can " +

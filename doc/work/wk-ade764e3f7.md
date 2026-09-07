@@ -9,8 +9,6 @@ guidance: [[work-token]]
 title: take the group branch
 # where the token stands. The process owns these values.
 status: open
-claimed_by: 542bcda8/main
-claimed_at: "2026-09-07T11:50:46Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 749ad30324d47de9ba179e35df536d6c12a1c13b

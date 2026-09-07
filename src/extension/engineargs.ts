@@ -65,10 +65,11 @@ export function renameGroupArgs(from: string, to: string): string[] {
 
 // A GROUP IS WORKED ON A BRANCH OF ITS OWN, and the branch name is the whole
 // instruction: a box on group/<name> is handed bucket: <name> and nothing else.
-// The engine cuts it and pushes it, and this tree stays where it stands.
-export function cutBranchArgs(group: string): string[] | undefined {
+// The engine makes it and pushes it. This tree stays where it stands, and so
+// does the bucket, with every token still in it.
+export function branchForGroupArgs(group: string): string[] | undefined {
   if (group.trim() === "") return undefined;
-  return ["--cut-group", group];
+  return ["--branch-group", group];
 }
 
 // THE HOLD IS A WORD WITH THREE VALUES. One press finishes up, five presses

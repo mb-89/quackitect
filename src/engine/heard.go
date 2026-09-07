@@ -180,7 +180,10 @@ func CopyWhatWasHeard(r Roots, transcript string, log *sessionlog.Log, actor str
 		// A PERSON WITH NO PANEL REACHES A CONTROL BY WRITING ITS KEYWORD.
 		// It sits here rather than in the agent, so the text comes from the
 		// harness and an agent cannot forge one.
-		KeywordSaid(r, log, Walker, said)
+		// A SLASH COMMAND IS THE KEYWORD WITH A HANDLE ON IT, AND THE HANDLE IS
+		// WHAT ARRIVES. The harness writes the name it was typed as, so the body
+		// is read back before the matcher can see a word in it.
+		KeywordSaid(r, log, Walker, TheWordsBehind(r, said))
 		copied++
 	}
 	// The offset is kept even when nothing was copied, so the next pass does

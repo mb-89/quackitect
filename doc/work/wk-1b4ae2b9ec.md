@@ -9,8 +9,6 @@ guidance: [[work-token]]
 title: engine tests cannot build
 # where the token stands. The process owns these values.
 status: open
-claimed_by: 542bcda8/main
-claimed_at: "2026-09-07T11:38:32Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 9b71c49fce067333e16ea4d77d4aa522a6503ecf

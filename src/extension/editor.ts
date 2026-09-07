@@ -178,7 +178,7 @@ function toolbar(t: Table): string {
     <button type="button" class="bs-tool bs-rename" hidden
       title="rename the group these rows are in">Rename</button>
     <button type="button" class="bs-tool bs-cut-branch" hidden
-      title="cut the branch this group is worked on">Branch</button>
+      title="make the branch this group is worked on">Branch</button>
     <input class="bs-rename-field" type="text" hidden placeholder="a name for it">
     <span class="bs-tallies">${tallyPills(t)}</span>
     <span class="bs-gap"></span>
@@ -852,7 +852,11 @@ function script(): string {
         : 'rename ' + first.name;
       cut.title = cut.disabled
         ? 'these rows are grouped by their status, and a status is not a group to work'
-        : 'cut group/' + first.name + ', push it, and leave this tree where it is';
+        // IT NAMES THE BRANCH, BECAUSE THAT IS WHAT IT MAKES. "cut group/x"
+        // read as cutting the group, and the group is left exactly as it was:
+        // the press makes a branch for it and pushes that. The owner read the
+        // hover, pressed, and found the group untouched.
+        : 'make the branch group/' + first.name + ', push it, and leave this tree where it is';
       if (rows.length === 0) {
         for (const box of w.querySelectorAll('.bs-rename-field')) box.hidden = true;
       }

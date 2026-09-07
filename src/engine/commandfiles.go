@@ -48,6 +48,82 @@ const commandPrefix = "se-ctrl-"
 // arguments is what the harness puts what a person typed in place of.
 const arguments = "$ARGUMENTS"
 
+// TheWordsBehind is what a message means to the keyword matcher: the body of a
+// slash command where it is one, and what was written otherwise.
+//
+// BOTH ROUTES A PERSON'S WORDS TAKE ASK THIS. A prompt that starts a turn
+// reaches the hook, and a message written into a running turn is copied out of
+// the transcript. A command that moved a control on one route and nothing on
+// the other is the shape this is placed to stop.
+func TheWordsBehind(roots Roots, said string) string {
+	if body := TheCommandTyped(roots, said); body != "" {
+		return body
+	}
+	return said
+}
+
+// TheCommandTyped answers the message a slash command sends, for a prompt that
+// is one of this engine's commands and nothing else.
+//
+// THE HARNESS SUBMITS THE NAME AND NOT THE BODY. A command file holds
+// KEYWORD:GOD=OFF, and what reaches the engine is the literal
+// "/se-ctrl-control-god-off". The matcher takes a message only when the whole
+// message is a keyword, so it saw a slash, found no word, and moved nothing.
+// Every control stayed reachable from the panel alone, and the panel is what a
+// cloud box does not have, which is the whole reason these files are written.
+//
+// MEASURED. A tree was put in god mode from the button.
+// /se-ctrl-control-god-off was typed, then /se-ctrl-control-god-on. The session
+// log holds both prompts as their slash text with no binding record between
+// them, and .se/binding.json still read god. The person was told the command
+// and the panel disagreed. They did not. The command did nothing at all, and
+// the panel was right throughout.
+//
+// IT READS BACK THE FILE THE HARNESS RAN, rather than composing the word again.
+// That file is written from the one answer keywordsFor gives, so this is a
+// fourth reader of that answer and cannot drift from the other three.
+//
+// ANYTHING ELSE ANSWERS EMPTY and the caller keeps what the person wrote. The
+// prefix is what holds this off every other command in a shared menu, and the
+// name is one file in one folder rather than a path, so nothing outside that
+// folder is ever read.
+func TheCommandTyped(roots Roots, prompt string) string {
+	line := strings.TrimSpace(prompt)
+	if !strings.HasPrefix(line, "/"+commandPrefix) {
+		return ""
+	}
+	name, rest, _ := strings.Cut(strings.TrimPrefix(line, "/"), " ")
+	if name == "" || strings.ContainsAny(name, `/\.`) {
+		return ""
+	}
+	raw, err := os.ReadFile(filepath.Join(roots.Work, filepath.FromSlash(commandsFolder), name+".md"))
+	if err != nil {
+		return ""
+	}
+	body := theBodyUnder(string(raw))
+	if body == "" {
+		return ""
+	}
+	// WHAT WAS TYPED AFTER THE NAME GOES WHERE THE HARNESS WOULD PUT IT. A
+	// command whose line is sendable whole carries no placeholder, and such a
+	// command is unchanged by this.
+	return strings.TrimSpace(strings.ReplaceAll(body, arguments, strings.TrimSpace(rest)))
+}
+
+// theBodyUnder is the message a command file sends, which is everything under
+// the frontmatter. A file that opens no frontmatter is all body, and one that
+// opens frontmatter and never closes it is not a command file.
+func theBodyUnder(file string) string {
+	s := strings.ReplaceAll(file, "\r\n", "\n")
+	if !strings.HasPrefix(s, "---\n") {
+		return strings.TrimSpace(s)
+	}
+	if _, after, ok := strings.Cut(s[len("---\n"):], "\n---\n"); ok {
+		return strings.TrimSpace(after)
+	}
+	return ""
+}
+
 // aCommand is one file: the message it sends, and what it asks to be typed.
 type aCommand struct {
 	Name string // the file, without its suffix

@@ -588,9 +588,20 @@ func applyEdits(r roots, a applyArgs) string {
 		return engineCall(r, []string{"apply", "--undo", "--on", a.On,
 			"--by", orMain(a.Actor)}, nil)
 	}
-	if a.On == "" {
-		return fail("say which token this change is, with on: <id>")
-	}
+	// THE RUNG IS THE ENGINE'S TO READ, AND THIS LANE READ NOTHING.
+	//
+	// The engine already holds this rule, in applyverb.go and runverb.go, and it
+	// holds it against the rung: unbound and god both mean no token on a write
+	// and none on a run. This stub kept a second copy, and that copy never asked
+	// what rung the tree was on.
+	//
+	// MEASURED. A tree was put in god mode from the button. se --bind status
+	// answered god, and every se_apply through this lane was still refused for
+	// want of a token. The person pressed the control, the engine agreed the
+	// control was pressed, and the lane in front of it had never heard.
+	//
+	// SO IT DECIDES NOTHING AND PASSES THE TOKEN THROUGH, empty or not. One rule
+	// in one place, and a second copy of it cannot disagree with the first.
 	if len(a.Edits) == 0 {
 		return fail("an apply with no edits: say what to change")
 	}
@@ -619,9 +630,8 @@ func runCommand(r roots, a runArgs) string {
 		}
 		return engineCall(r, argv, nil)
 	}
-	if a.On == "" {
-		return fail("say which token this command is, with on: <id>")
-	}
+	// THE RUNG IS THE ENGINE'S TO READ. See applyEdits above: runverb.go holds
+	// this rule against the rung, and a second copy here answered without it.
 	if strings.TrimSpace(a.Command) == "" {
 		return fail("say what to run")
 	}

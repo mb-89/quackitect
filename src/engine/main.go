@@ -82,7 +82,7 @@ func main() {
 	pingFlag := flag.Bool("ping", false, "print what the engine running over this folder says about itself, and exit")
 	project := flag.Bool("project", false, "write the projections from guidance and exit")
 	group := flag.String("group", "", "put this tree on the branch for a bucket, and exit")
-	cutGroup := flag.String("cut-group", "", "cut the branch for a bucket and push it, without moving this tree")
+	branchGroup := flag.String("branch-group", "", "make the branch a bucket is worked on and push it, without moving this tree or the bucket")
 	land := flag.Bool("land", false, "put this tree on the tip origin holds, and exit")
 	emergency := flag.String("emergency", "", "arm or disarm emergency mode: on, off, or status")
 	bind := flag.String("bind", "", "how much of the engine speaks to the agent: bound, unbound, god, or status")
@@ -290,9 +290,27 @@ func main() {
 
 	// AND A DESK CUTS ONE WITHOUT MOVING. The person pressing a button in the
 	// work editor is not the box that will work the group.
-	if *cutGroup != "" {
-		cut := CutTheGroupBranch(roots, *cutGroup)
-		fmt.Println(cut.Says)
+	if *branchGroup != "" {
+		cut := MakeTheGroupBranch(roots, *branchGroup)
+		// THE PERSON PRESSED A BUTTON, AND BOTH SURFACES SAY SO.
+		//
+		// This printed one line of prose and wrote nothing else. The editor
+		// parses what a verb answers as JSON, so the sentence never reached the
+		// person who pressed, and the log it reads as prose never held it.
+		//
+		// MEASURED. The owner pressed the branch button and read nothing: no
+		// toast, and no line in the log naming the branch.
+		//
+		// IT IS THE SHAPE --bind ALREADY HAS, above: note it in the log, then
+		// answer JSON. A refusal is a record too, because a button that refused
+		// and a button that did nothing look the same to whoever pressed it.
+		ok := sessionlog.Yes()
+		if cut.On == "" {
+			ok = sessionlog.No()
+		}
+		noteInLog(dir, "engine", "branch", cut.Says, ok,
+			map[string]any{"on": cut.On, "bucket": *branchGroup})
+		answerJSON(cut)
 		return
 	}
 

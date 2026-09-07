@@ -12,6 +12,41 @@ So put here what is about THIS project and is not a rule: how to build it, where
 the odd thing lives, what a newcomer keeps getting wrong. Editing it changes
 nothing about how the engine behaves.
 
+## Which box you are on
+
+`node util/cage/host.mjs --say` answers it.
+
+A cloud box is handed `util/cage/cloud-runner.md` by the wake at session start,
+and that card is the instruction. Read it. A desk is told in one line and never
+receives the card, so a desk following it goes looking for a lane that was never
+missing.
+
+## The branch you are on is your instruction
+
+A branch named `group/<name>` narrows the queue to `bucket: <name>`. It is
+derived every time the filter is read and never stored, so nothing is typed and
+nothing is configured: a box cloned onto `group/tests` is handed the tests
+bucket and nothing else, and every pull says which branch narrowed it. A filter
+a person set outranks the branch. An ordinary branch narrows nothing.
+
+- `se_start` first. Nothing refuses you until an engine is up, so use the
+  harness's own Write, Edit and Bash until one answers.
+- `se --land` before you work. A group box is refused work until it has landed.
+- `se --group <name>` puts this tree on that branch. `se --branch-group <name>`
+  makes the branch for a bucket and pushes it without moving this tree, which is
+  what the Branch button in the work editor presses.
+- Push each time you finish something. Nothing you write survives except what
+  you push.
+
+## Committing
+
+`sh util/git/land.sh "<message>" <path> ...` is the push door. It copies the
+named files onto a fresh worktree at the tip and commits them there, so a clone
+that is behind does not re-add what the tip already carries. A path this tree no
+longer holds is removed there. `util/git/cherrypush.sh` does the same for a
+commit. Never merge in the shared tree: seventeen of a hundred and fifty-nine
+merges on this branch differed from both their parents.
+
 ## Building and running
 
 - `sh util/checks/battery.sh` runs every check. It is the one command that says
