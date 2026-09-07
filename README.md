@@ -6,8 +6,8 @@ happened, is in `dev_guide/`.
 
 ## Install
 
-    util\setup\install.ps1        Windows
-    util/setup/install.sh         Linux
+    src\scripts\setup\install.ps1        Windows
+    src/scripts/setup/install.sh         Linux
 
 Run it once. After that, everything goes through RUNME:
 

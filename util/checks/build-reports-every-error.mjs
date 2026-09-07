@@ -35,12 +35,12 @@ for (const line of compiles) {
 }
 
 // AND THE INSTALLER'S, which is the build a fresh machine gets.
-const setup = readFileSync(join(root, "util", "setup", "main.go"), "utf8");
+const setup = readFileSync(join(root, "src", "scripts", "setup", "main.go"), "utf8");
 const cmds = [...setup.matchAll(/exec\.Command\("go", "build"[^)]*\)/g)].map((m) => m[0]);
 say("the installer builds Go somewhere (" + cmds.length + ")", cmds.length > 0,
-  "no go build was found in util/setup/main.go, so half of what this guards is gone");
+  "no go build was found in src/scripts/setup/main.go, so half of what this guards is gone");
 for (const cmd of cmds) {
-  say("util/setup/main.go carries -gcflags=-e on its go build", cmd.includes("-gcflags=-e"),
+  say("src/scripts/setup/main.go carries -gcflags=-e on its go build", cmd.includes("-gcflags=-e"),
     "without the flag the type checker stops after a batch, and a sweep of "
     + "errors comes back one round at a time");
 }

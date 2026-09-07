@@ -165,7 +165,7 @@ function superviseTheLane() {
       "THIS SESSION HAS NO TOOL LANE. " + broken +
       "\n\nThe engine is still a door. At a shell, ./RUNME.sh <verb> is the same " +
       "call and the guards let it through. To build by hand, run " +
-      "util/setup/install.sh and start a new session. To see why this one has no " +
+      "src/scripts/setup/install.sh and start a new session. To see why this one has no " +
       "lane, node src/cage/diagnose.mjs writes a diagnosis under .se/scratchpad, " +
       "and it goes in your answer whole.";
     if (msg.method === "tools/call") answer(msg.id, told(text));
@@ -299,9 +299,9 @@ function superviseTheLane() {
   let installing = true;
   const install = windows
     ? spawn("powershell", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
-      join(root, "util", "setup", "install.ps1"), "--profile", "headless"],
+      join(root, "src", "scripts", "setup", "install.ps1"), "--profile", "headless"],
       { stdio: ["ignore", log, log] })
-    : spawn("sh", [join(root, "util", "setup", "install.sh"), "--profile", "headless"],
+    : spawn("sh", [join(root, "src", "scripts", "setup", "install.sh"), "--profile", "headless"],
       { stdio: ["ignore", log, log] });
   install.on("error", (err) => {
     installing = false;

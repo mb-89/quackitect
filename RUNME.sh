@@ -96,7 +96,7 @@ fi
 engine="$root/.bin/se"
 if [ ! -x "$engine" ]; then
   echo "the driver is not built yet - installing"
-  "$root/util/setup/install.sh" --profile headless
+  "$root/src/scripts/setup/install.sh" --profile headless
 fi
 # The work root rides out of band: an argument added here would sit where
 # the verb belongs, and the engine reads the verb as its first argument.

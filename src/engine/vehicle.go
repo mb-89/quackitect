@@ -398,7 +398,7 @@ func LinkBothNames(methodRoot string, names []string) ([]string, error) {
 
 // theProgramNames answers every program this tree ships, by name, for the
 // doors that want the names and not where each is built from. theBuilds is the
-// one list, read from util/setup/manifest.json, and the swap door reads the
+// one list, read from src/scripts/setup/manifest.json, and the swap door reads the
 // same call.
 //
 // MEASURED on startup. It named se, se-mcp and logview in a literal of its

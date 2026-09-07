@@ -1,7 +1,7 @@
 // THE FILES THE SYSTEM EXECUTES CARRY NO CARRIAGE RETURN.
 //
 // sh reads a CRLF script and hands the shell options with a \r stuck to them:
-// util/setup/install.sh died on Linux with "set: Illegal option -" because
+// src/scripts/setup/install.sh died on Linux with "set: Illegal option -" because
 // this checkout converted its line endings on the way out. .gitattributes now
 // pins every .sh to LF; this fails the battery the moment one carries a CR
 // anyway, however it got there.

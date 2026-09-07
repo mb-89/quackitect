@@ -37,7 +37,7 @@ func TestANewLaneOnDiskRefreshesTheToolList(t *testing.T) {
 	}
 	root := t.TempDir()
 	bin := filepath.Join(root, ".bin")
-	for _, dir := range []string{"src/cage", "util/setup", ".bin"} {
+	for _, dir := range []string{"src/cage", "src/scripts/setup", ".bin"} {
 		if err := os.MkdirAll(filepath.Join(root, filepath.FromSlash(dir)), 0o755); err != nil {
 			t.Fatal(err)
 		}

@@ -9,7 +9,7 @@ import (
 // THE LINK STEP TAKES ITS LIST FROM THE MANIFEST, NEVER FROM A LITERAL.
 //
 // Startup called LinkBothNames with se, se-mcp and logview written out in
-// code. util/setup/manifest.json is the tree's list of what it ships, so that
+// code. src/scripts/setup/manifest.json is the tree's list of what it ships, so that
 // was a second copy of it. Nothing was wrong while the two agreed, and nothing
 // held them together.
 //
@@ -22,7 +22,7 @@ func TestTheLinkStepNamesWhatTheManifestNames(t *testing.T) {
 	t.Parallel()
 	method := t.TempDir()
 	bin := filepath.Join(method, ".bin")
-	setup := filepath.Join(method, "util", "setup")
+	setup := filepath.Join(method, "src", "scripts", "setup")
 	for _, dir := range []string{bin, setup} {
 		if err := os.MkdirAll(dir, 0o755); err != nil {
 			t.Fatal(err)

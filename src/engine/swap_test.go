@@ -143,10 +143,10 @@ func TestASwapBuildsEveryProgramTheManifestNames(t *testing.T) {
 	t.Parallel()
 	r := aTree(t).Roots
 	method := r.Work
-	if err := os.MkdirAll(filepath.Join(method, "util", "setup"), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Join(method, "src", "scripts", "setup"), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(method, "util", "setup", "manifest.json"), []byte(`{
+	if err := os.WriteFile(filepath.Join(method, "src", "scripts", "setup", "manifest.json"), []byte(`{
 	  "builds": [
 	    {"name": "se", "source": "src/engine"},
 	    {"name": "logview", "source": "src/viewer"},
@@ -317,10 +317,10 @@ func TestASwapBuildsTheLaneAndHandsOverTheEngineAlone(t *testing.T) {
 func aTreeShippingThree(t *testing.T) string {
 	t.Helper()
 	method := t.TempDir()
-	if err := os.MkdirAll(filepath.Join(method, "util", "setup"), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Join(method, "src", "scripts", "setup"), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(method, "util", "setup", "manifest.json"), []byte(`{
+	if err := os.WriteFile(filepath.Join(method, "src", "scripts", "setup", "manifest.json"), []byte(`{
 	  "builds": [
 	    {"name": "se", "source": "src/engine"},
 	    {"name": "logview", "source": "src/viewer"},

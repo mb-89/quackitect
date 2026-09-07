@@ -113,7 +113,7 @@ if (-not $driver) {
 $engine = Join-Path $root ".bin\se.exe"
 if (-not (Test-Path $engine)) {
   Write-Host "the driver is not built yet - installing" -ForegroundColor Cyan
-  & (Join-Path $root "util\setup\install.ps1") --no-open
+  & (Join-Path $root "src\scripts\setup\install.ps1") --no-open
 }
 # The work root rides out of band: an argument added here would sit where
 # the verb belongs, and the engine reads the verb as its first argument.

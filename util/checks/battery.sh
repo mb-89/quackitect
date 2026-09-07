@@ -299,7 +299,7 @@ if [ -f "$cgo_env" ]; then
     esac
   done <"$cgo_env"
 else
-  echo "no cgo.env at $cgo_env: run util/setup/install first, so the builds have the compiler the installer pins"
+  echo "no cgo.env at $cgo_env: run src/scripts/setup/install first, so the builds have the compiler the installer pins"
   exit 1
 fi
 
@@ -382,7 +382,7 @@ start "race detector" engine_race
 start "go test engine" engine_tests '.*'
 start "go test mcp" go test -C src/mcp -count=1 ./...
 start "go test viewer" go test -C src/viewer -count=1 ./...
-start "go test setup" go test -C util/setup -count=1 ./...
+start "go test setup" go test -C src/scripts/setup -count=1 ./...
 # THE TOOLS THE GO GUIDANCE NAMES, RUN HERE RATHER THAN REMEMBERED.
 #
 # go vet IS NOT RUN HERE, BECAUSE se lint RUNS IT.

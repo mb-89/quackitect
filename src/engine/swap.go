@@ -101,7 +101,7 @@ type manifestBuild struct {
 // no way to replace it.
 func theBuilds(method string) []manifestBuild {
 	only := []manifestBuild{{Name: "se", Source: engineSource}}
-	b, err := os.ReadFile(filepath.Join(method, "util", "setup", "manifest.json"))
+	b, err := os.ReadFile(filepath.Join(method, "src", "scripts", "setup", "manifest.json"))
 	if err != nil {
 		return only
 	}
@@ -472,7 +472,7 @@ func askForASwap(r Roots, why string, built bool) (swapAnswer, error) {
 		swapDrainBudget+swapVerifyBudget)
 	if errors.Is(err, ErrNoEngine) {
 		return swapAnswer{}, fmt.Errorf("no engine is running over %s, so there is nothing to swap. "+
-			"Build it the way the installer does: util/setup", r.Work)
+			"Build it the way the installer does: src/scripts/setup", r.Work)
 	}
 	if err != nil {
 		// THE ENGINE'S OWN WORDS. It said what was wrong with the program it

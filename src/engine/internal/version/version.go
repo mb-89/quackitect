@@ -3,6 +3,6 @@
 package version
 
 // Build is stamped at build time with -X on this symbol. The stampers are
-// swap.go in the engine, util/setup/main.go and util/checks/battery.sh, and
+// swap.go in the engine, src/scripts/setup/main.go and util/checks/battery.sh, and
 // all three name this package's path.
 var Build = "unstamped"

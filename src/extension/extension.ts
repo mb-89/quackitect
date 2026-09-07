@@ -793,7 +793,7 @@ function setValue(context: vscode.ExtensionContext, key: string, value: unknown)
     const exe = binary(context, "se");
     if (!fs.existsSync(exe)) {
       vscode.window.showWarningMessage(
-        `The engine is not built, so nothing can be changed. Run util/setup/install.ps1. Looked at ${exe}`,
+        `The engine is not built, so nothing can be changed. Run src/scripts/setup/install.ps1. Looked at ${exe}`,
       );
       return resolve(false);
     }

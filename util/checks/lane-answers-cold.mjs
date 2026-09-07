@@ -49,8 +49,8 @@ say("the tree was copied cold, " + listed.length + " paths", listed.length > 0 &
 // THE INSTALLER FAILS AT ONCE, so the build is a thing that has happened
 // rather than one this waits for. AND go IS OFF PATH, the way a cloud box
 // begins, so the stub's own build of the lane fails the same way.
-writeFileSync(join(tree, "util", "setup", "install.sh"), "#!/bin/sh\nexit 1\n");
-writeFileSync(join(tree, "util", "setup", "install.ps1"), "exit 1\n");
+writeFileSync(join(tree, "src", "scripts", "setup", "install.sh"), "#!/bin/sh\nexit 1\n");
+writeFileSync(join(tree, "src", "scripts", "setup", "install.ps1"), "exit 1\n");
 const path = (process.env.PATH ?? "").split(delimiter)
   .filter((d) => !existsSync(join(d, "go")) && !existsSync(join(d, "go.exe"))).join(delimiter);
 

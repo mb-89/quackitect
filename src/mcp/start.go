@@ -66,9 +66,9 @@ func engineAnswers(r roots) bool {
 func theBuildScript(r roots) (string, []string) {
 	if isWindows() {
 		return "powershell", []string{"-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
-			filepath.Join(r.method, "util", "setup", "install.ps1"), "--profile", "headless"}
+			filepath.Join(r.method, "src", "scripts", "setup", "install.ps1"), "--profile", "headless"}
 	}
-	return "sh", []string{filepath.Join(r.method, "util", "setup", "install.sh"), "--profile", "headless"}
+	return "sh", []string{filepath.Join(r.method, "src", "scripts", "setup", "install.sh"), "--profile", "headless"}
 }
 
 // buildIsRunning says whether a build is already writing into .bin. The lane's
@@ -150,7 +150,7 @@ func startTheEngine(r roots, a startArgs) string {
 			return say(map[string]any{
 				"running": false, "building": false,
 				"says": "The build would not start: " + err.Error() + ". At a shell, " +
-					"util/setup/install.sh --profile headless is the same call.",
+					"src/scripts/setup/install.sh --profile headless is the same call.",
 			})
 		}
 		_ = cmd.Process.Release()

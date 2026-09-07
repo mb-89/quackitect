@@ -72,9 +72,9 @@ func Seed(roots Roots, kind Kind) ([]string, error) {
 	r := Runme{Kind: kind, Version: "0.1.0"}
 	if kind == AVehicle {
 		r.Command = ".bin/se"
-		r.Install = "util/setup/install.sh"
+		r.Install = "src/scripts/setup/install.sh"
 		r.CommandWindows = `.bin\se.exe`
-		r.InstallWindows = `util\setup\install.ps1`
+		r.InstallWindows = `src\scripts\setup\install.ps1`
 		// The three folders manifest.json builds from. Installing builds all of
 		// them, so a write to any one makes every binary in .bin stale together.
 		r.Sources = "src/engine src/viewer src/mcp"
@@ -150,8 +150,8 @@ func readmeFor(kind Kind, name string) string {
 	if kind == AVehicle {
 		what = "A vehicle: it carries the method, and it is a project as well."
 		extra = "\n## The method\n\n" +
-			"guidance/ is authored. util/ holds what is run. src/ holds what is\n" +
-			"written. .bin/ holds what was built.\n"
+			"src/ holds everything that is written or run: the engine, the cage,\n" +
+			"the scripts, the declarations. .bin/ holds what was built.\n"
 	}
 	return fmt.Sprintf("# %s\n\n%s\n\n## Run it\n\n    %s --help\n\n"+
 		"RUNME is the one command that always works. It installs what has to be\n"+

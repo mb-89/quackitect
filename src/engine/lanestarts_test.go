@@ -118,7 +118,7 @@ func aLaneOverATreeWithNothingBuilt(t *testing.T, seconds int) (time.Time, <-cha
 // path to the script.
 func aTreeWithNothingBuilt(t *testing.T, root string, seconds int) string {
 	t.Helper()
-	for _, dir := range []string{"src/cage", "util/setup", ".bin"} {
+	for _, dir := range []string{"src/cage", "src/scripts/setup", ".bin"} {
 		if err := os.MkdirAll(filepath.Join(root, filepath.FromSlash(dir)), 0o755); err != nil {
 			t.Fatal(err)
 		}
@@ -142,7 +142,7 @@ func aTreeWithNothingBuilt(t *testing.T, root string, seconds int) string {
 	if runtime.GOOS == "windows" {
 		name = "install.ps1"
 	}
-	if err := os.WriteFile(filepath.Join(root, "util", "setup", name),
+	if err := os.WriteFile(filepath.Join(root, "src", "scripts", "setup", name),
 		[]byte(theStubInstaller(root, held, seconds)), 0o755); err != nil {
 		t.Fatal(err)
 	}

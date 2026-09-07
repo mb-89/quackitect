@@ -2,7 +2,7 @@
 kind: [[rationale]]
 title: the installer needs the network and nothing else does
 explains:
-  - util/setup/main.go
+  - src/scripts/setup/main.go
   - RUNME.sh
 ---
 

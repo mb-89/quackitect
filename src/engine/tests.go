@@ -99,7 +99,7 @@ type Tested struct {
 // honest answer: the checks themselves, the schemas everything is read by,
 // the toolchain, and the files the projections come from.
 var wholeTriggers = []string{"util/checks/**", "src/schemas/**", "**/go.mod", "**/go.sum", "src/config/tools.json",
-	"util/setup/**", "src/cage/**", "src/config/projections.json", "src/config/parameters.json"}
+	"src/scripts/setup/**", "src/cage/**", "src/config/projections.json", "src/config/parameters.json"}
 
 // wholeAbove is the share of the suite past which the battery is cheaper
 // than the selection, and wholeAtLeast how many tests a suite has before

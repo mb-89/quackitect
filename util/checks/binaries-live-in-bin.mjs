@@ -3,7 +3,7 @@
 // Five built programs sat in the source folders, dropped there by bare go
 // builds: a binary beside its source is stale the moment the code moves, gets
 // picked up by whatever resolves the shorter path first, and bloats the tree.
-// The one way to build is the installer, util/setup, which puts every program
+// The one way to build is the installer, src/scripts/setup, which puts every program
 // under .bin from its manifest. For a compile check, go build -o /dev/null and
 // go vet leave nothing behind.
 //
@@ -68,7 +68,7 @@ const strays = found.filter((f) => !(f in notAStray));
 for (const f of strays) {
   say(f + " stays out of the source folders", false,
     "a built program sits beside source. It belongs under .bin, and the "
-    + "installer, util/setup, is the one way to build");
+    + "installer, src/scripts/setup, is the one way to build");
 }
 if (strays.length === 0) {
   say("no executable sits outside .bin", true);

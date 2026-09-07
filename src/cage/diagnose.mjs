@@ -186,7 +186,7 @@ const walk = (dir) => {
     }
   }
 };
-for (const dir of ["src/engine", "src/mcp", "util/setup"]) walk(join(method, dir));
+for (const dir of ["src/engine", "src/mcp", "src/scripts/setup"]) walk(join(method, dir));
 let built = false;
 let stale = false;
 for (const name of ["se", "se-mcp", "se-mcp.lane", "logview"]) {

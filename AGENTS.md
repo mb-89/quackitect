@@ -62,7 +62,7 @@ merges on this branch differed from both their parents.
 - With no engine running there is nothing to swap, and then it is the
   installer's build: `CC="<the zig in AppData/Local/quackitect/tools>/zig.exe cc"
   CGO_ENABLED=1 GOFLAGS=-tags=sqlite_fts5 go build -C src/engine -o
-  ../../.bin/se.exe .`. `util/setup/archive.go` is where those three come from.
+  ../../.bin/se.exe .`. `src/scripts/setup/archive.go` is where those three come from.
 - `se --project` rewrites the projections after a guidance edit.
 - `.bin/se-mcp --tools > src/cage/tools.json` rewrites the tool list the cold
   door answers from, after a change to `src/mcp/lane.go`. `mcp-tools` says
