@@ -50,11 +50,11 @@ Fix: either state the count the tree actually holds and name the search that pro
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | A number in a note can be checked and refreshed. One with no command beside it is cited by the next reader as though it had been. |  |
+| [x] | what breaks if it is never done, and not only that it stays undone | A wrong measurement stands as a note's headline claim. This one was wrong in both endpoints and in its direction. |  |
+| [x] | the ask is small enough to review whole, or it is split first | — |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | All three, and all three were run. The third does not ask the check to pass, only to refuse. |  |
+| [x] | the basics it stands on exist, or are minted first | — |  |
 
 ## evidence: step 2. do
 
@@ -62,9 +62,9 @@ Fix: either state the count the tree actually holds and name the search that pro
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | — |  |
+| [x] | one test was written first and seen red for the reason expected | The check, driven over the note as it stood before the fix with its status put back to open. It refuses the TempDir sentence and names the file, the line and the sentence. |  |
+| [x] | the same test was seen green after the change, and named | The rewritten paragraph is not refused. checks-live-in-the-method reports the same one failure as before, on four checks that predate this, and says which token holds this one out. |  |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | 5071a251 is no object here, so the change reads against HEAD: commits c3455935 and 55c87f14. |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | wk-6ba37430f2 carries the sentences the check refuses. Two of them were its own, found by the check and gone. |  |
 
