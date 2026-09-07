@@ -53,6 +53,26 @@ func TestNamingACheckIsNotRunningIt(t *testing.T) {
 		{"reading a check", "cat util/checks/battery.sh", false},
 		{"copying a check out of the tree", "cp util/checks/battery.sh /tmp/x.sh", false},
 		{"a diff naming a check", "git diff HEAD -- util/checks/battery.sh", false},
+
+		// AND NEITHER IS THE DOOR A CHANGE LEAVES THE BOX BY.
+		//
+		// util/git/land.sh copies the files it is named onto the branch tip and
+		// pushes them. It runs nothing. But it is run with sh, and this arm read
+		// every word after an interpreter, so naming a check as the file to land
+		// was refused as a test run. A cloud box is reclaimed when its session
+		// ends, so the one change nobody could land was again a change to the
+		// checks: made, right, and with no door out.
+		//
+		// AN INTERPRETER RUNS THE FIRST FILE IT IS HANDED, and everything after
+		// that belongs to that program. The last two hold the other half, because
+		// a rule that read the first word alone would let a check run behind any
+		// interpreter that takes a command.
+		{"landing a change to a check",
+			`sh util/git/land.sh "the battery gains a lane" util/checks/battery.sh`, false},
+		{"landing several at once",
+			`sh util/git/land.sh "two checks" util/checks/liveness.mjs util/checks/burndown`, false},
+		{"a shell told to run the check", `sh -c "util/checks/battery.sh"`, true},
+		{"a shell told to run node over it", `sh -c "node util/checks/liveness.mjs"`, true},
 	} {
 		t.Run(c.name, func(t *testing.T) {
 			why, refused := ATestRunByHand(c.command, method)

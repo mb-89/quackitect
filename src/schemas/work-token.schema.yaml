@@ -75,6 +75,12 @@ frontmatter:
     # though somebody were meant to fill it in. Nobody fills these in. See
     # theEnginesOwnFields in src/engine/schema.go, and wk-4e643716ec.
 
+    # AND NEITHER IS THE LANE THE WORK STEP WAS DONE IN. worked_in is the box
+    # and the session on it, written when a work step is submitted and filled
+    # in by nobody, so it is exempt beside the claim. A second name in one
+    # session is one evaluator, and the verdict is refused to the lane rather
+    # than to the name alone. See laneverdict.go.
+
     author:
       description: who did the work step, so the verdict is never theirs
 

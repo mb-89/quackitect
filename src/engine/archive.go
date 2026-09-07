@@ -612,6 +612,10 @@ func runArchive(c *call) int {
 		return 0
 	}
 	if *sweep {
+		if why, refused := theSweepIsNotForACloudBox(c.roots.Method); refused {
+			c.answerJSON(map[string]any{"error": why})
+			return 1
+		}
 		kept, gone, err := SweepClosed(c.roots)
 		if err != nil {
 			c.answerJSON(map[string]any{"error": err.Error()})
@@ -627,6 +631,29 @@ func runArchive(c *call) int {
 	}
 	c.answerJSON(rows)
 	return 0
+}
+
+// theSweepIsNotForACloudBox refuses the sweep where nobody sits beside the box.
+//
+// THE SWEEP IS THE RETRO'S WORK, and the retro belongs where the disk outlives
+// the session. A cloud box clones behind the branch, so a sweep here decides
+// what is finished by reading a record this box does not hold, and it deletes
+// notes to match that reading.
+//
+// MEASURED, September 2026. A sweep on a cloud box took 153 notes off the disk
+// and wrote their rows. A hand judged the rewrite too broad and reverted the
+// rows, and nothing said there were deletions to revert beside them. The tokens
+// were left off the disk, on the branch, and named by no row.
+func theSweepIsNotForACloudBox(method string) (string, bool) {
+	h := TheHost(method)
+	if !h.Cloud {
+		return "", false
+	}
+	return "A CLOUD BOX DOES NOT SWEEP. The sweep gathers what has closed for the " +
+		"retro, and the retro belongs on a desk, where a person sits and the disk " +
+		"outlives the session.\n\nThis box is a cloud box, because " + h.Because +
+		".\n\nRun it on a desk. To archive one token here, close it: the close writes " +
+		"its row and names the paths to land.", true
 }
 
 // SweepClosed puts what has already closed where it belongs.

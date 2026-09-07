@@ -234,6 +234,7 @@ type workArgs struct {
 	Detail         string   `json:"detail"`
 	Process        string   `json:"process"`
 	Tracked        *bool    `json:"tracked"`
+	Bucket         string   `json:"bucket" says:"the person's name for a group, which the queue can be narrowed to. Unsaid takes the bucket of the token in your hands"`
 	ProposedAction string   `json:"proposed_action"`
 	Approach       string   `json:"approach" says:"the shape the work will take, written before the work. A process that requires one refuses a mint without it"`
 	DoneWhen       []string `json:"done_when"`
@@ -400,7 +401,7 @@ func workArgv(a workArgs) []string {
 	// look the same every time.
 	for _, pair := range [][2]string{
 		{"--detail", a.Detail}, {"--process", a.Process},
-		{"--proposed-action", a.ProposedAction}, {"--approach", a.Approach},
+		{"--proposed-action", a.ProposedAction}, {"--approach", a.Approach}, {"--bucket", a.Bucket},
 		{"--parent", a.Parent},
 	} {
 		if pair[1] != "" {

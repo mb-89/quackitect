@@ -203,10 +203,20 @@
           "console": true,
           "title": "parallel agents",
           "type": "int",
-          "default": 3,
+          "default": 1,
           "min": 0,
           "max": 20,
-          "help": "How many workers there are, counting the main agent, and how many reviewers beside them. At three the main agent spawns two workers and three reviewers. More finishes more at a time and costs more. Zero means the main agent works alone."
+          "help": "How many of each role work at once, counting the main agent. At one that is one worker, one reviewer and one scribe. Zero means the main agent works alone. PREFER SEPARATE INSTANCES TO MORE AGENTS HERE. Agents on one instance contend for one working tree, one git index, one engine and one archive file, and the battery replaces the running engine, so one hand runs it at a time. MEASURED at ten agents on one box: the branch head did not compile for an hour, and six tokens were parked as unworkable while the tree stayed busy. Separate instances share nothing but the branch, and the claims branch already keeps them off each other's tokens."
+        },
+        {
+          "name": "reds_before_a_change_is_needed",
+          "console": true,
+          "title": "reds a run may leave",
+          "type": "int",
+          "default": 2,
+          "min": 0,
+          "max": 20,
+          "help": "How many failures a test run may leave before the next run has to answer them. Under this many, one edit is the right size for the page. The next run is refused where fewer places moved than there were failures. Zero turns the rule off."
         },
         {
           "name": "claim_hours",

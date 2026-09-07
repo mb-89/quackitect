@@ -176,6 +176,11 @@ func TestTheSyncFetchesOnlyTheClaimsRef(t *testing.T) {
 	r := aTreeWithTheProcesses(t)
 	fed := aFedGit(t)
 	fed.says["rev-parse"] = "cafe1234"
+	// THE COMMIT CARRIES NO CLAIMS FILE, WHICH IS WHAT MAKES IT THE OLD SHAPE.
+	// A file that is there is the file, whatever its lines say, so the fixture
+	// says which of the two shapes this commit is rather than leaving it to
+	// whether a note happens to parse as claim lines.
+	fed.fails["cafe1234:"+claimsFile] = "fatal: path 'claims' does not exist in 'cafe1234'"
 	fed.says["ls-tree"] = "doc/work/wk-far.md"
 	fed.says["show"] = "---\nkind: [[work-token]]\nclaimed_by: 0badc0de/worker-far\n" +
 		"claimed_at: 2026-09-04T06:00:00Z\n---\n\n## detail\n\nsomething\n"
@@ -311,6 +316,8 @@ func TestSyncClaimsReadsFarClaimsWhenThisBoxIsAhead(t *testing.T) {
 	// into the remote's own ref answers here, and the head below is read off
 	// that ref rather than off this box's.
 	fed.says["rev-parse --verify --quiet "+remoteClaimsRef] = "cafe1234"
+	// AND THIS COMMIT CARRIES NO CLAIMS FILE EITHER, so it is read the old way.
+	fed.fails["cafe1234:"+claimsFile] = "fatal: path 'claims' does not exist in 'cafe1234'"
 	fed.says["ls-tree"] = "doc/work/wk-far.md"
 	fed.says["show"] = "---\nkind: [[work-token]]\nclaimed_by: 0badc0de/worker-far\n" +
 		"claimed_at: 2026-09-04T06:00:00Z\n---\n\n## detail\n\nsomething\n"

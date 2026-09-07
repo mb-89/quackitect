@@ -73,13 +73,18 @@ func aFedToolchain(t *testing.T, module string, reaches map[string][]string) *fe
 			fed.runs++
 			lines := fed.reaches[test]
 			fed.Unlock()
-			// The profile the mapper reads: mode, then one region per line.
-			out := "mode: set\n"
-			for _, l := range lines {
-				out += module + "/" + l + "\n"
-			}
-			if err := os.WriteFile(profile, []byte(out), 0o644); err != nil {
-				return nil, err
+			// THE PROFILE IS WRITTEN ONLY WHERE ONE WAS ASKED FOR. A run that
+			// wants no map hands an empty path, the way the real toolchain is
+			// given no -coverprofile. Writing it regardless failed on the empty
+			// name, so a named proposal came back red with nothing said.
+			if profile != "" {
+				out := "mode: set\n"
+				for _, l := range lines {
+					out += module + "/" + l + "\n"
+				}
+				if err := os.WriteFile(profile, []byte(out), 0o644); err != nil {
+					return nil, err
+				}
 			}
 			if strings.HasPrefix(test, "TestFails") {
 				return []byte("--- FAIL: " + test), fmt.Errorf("it failed")

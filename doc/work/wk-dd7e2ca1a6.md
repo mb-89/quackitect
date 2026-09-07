@@ -17,7 +17,7 @@ bucket: cage
 
 Four incidents that wk-526ac833fb and wk-c93aac62be landed in the guidance are gone from the working tree. Each was present at that token's ended commit, and a later compression removed it.
 
-testing.md chapter 4 lost the sentence naming a dispatcher that says which token it hands back and never what the record holds for the rest. That is the lesson of wk-4243c04e79.
+testing.md chapter 4 lost the sentence naming a dispatcher that says which token it hands back and never what the record holds for the rest. That is the lesson of wk-4243c04e79 (another box).
 
 work-token.md lost three. Chapter 3 lost the criterion naming a check no file declared. Chapter 5 lost the detail enumerating a question, three rules and two old sentences while the criteria pinned only two. Chapter 12 lost the blanket sentence claiming every check was watched failing.
 

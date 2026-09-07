@@ -50,7 +50,7 @@ func dirFor(r Roots, t Token) string {
 // what holds it back, then how it ended.
 var frontOrder = []string{
 	"kind", "process", "guidance", "title", "status", "bucket",
-	"author", "claimed_by", "claimed_at", "urgent", "needs_human", "depends_on", "parent", "ready_when",
+	"author", "worked_in", "claimed_by", "claimed_at", "urgent", "needs_human", "depends_on", "parent", "ready_when",
 	"began", "ended", "disposition", "reason", "successors",
 }
 
@@ -124,6 +124,10 @@ func (t Token) front() frontmatter.Front {
 		// The holder is not written: holdstore.go keeps it under .se. Why is
 		// [[the-hold-is-engine-state]].
 		"author": t.Author,
+		// The lane is written for the same reason the claim is: the box that
+		// gives the verdict may not be the box that did the work, and it has
+		// to know which lane did. See laneverdict.go.
+		"worked_in": t.WorkedIn,
 		// The claim is written, where the holder is not, because it is for
 		// the other boxes. See [[the-hold-is-engine-state]].
 		"claimed_by": t.ClaimedBy,
@@ -163,6 +167,7 @@ func tokenFromFront(f frontmatter.Front) Token {
 		// A holder in the file is not read, and there is no field to read it
 		// into: the hold comes from holdstore.go. See [[the-hold-is-engine-state]].
 		Author:      frontmatter.Str(f, "author"),
+		WorkedIn:    frontmatter.Str(f, "worked_in"),
 		ClaimedBy:   frontmatter.Str(f, "claimed_by"),
 		ClaimedAt:   frontmatter.Str(f, "claimed_at"),
 		NeedsHuman:  frontmatter.Bool(f, "needs_human"),

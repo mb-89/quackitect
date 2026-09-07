@@ -39,7 +39,7 @@ A finding is work, minted as a trivial token, and the reviewer may take it and f
 11. The approach was decided when the token was written. Disagree with it in a note, never in a finding. *
 12. Style, naming and formatting belong to the checks. Raise them only where the checks cannot see.
 13. Give one verdict and stop. Pull the next standard token, and go when there is none. *
-14. You are never the author. The engine refuses you a token you worked, and you decline one it missed. *
+14. You are never the author. The engine refuses you a token your lane worked, and you decline one it missed. *
 
 # Discussion
 
@@ -128,5 +128,8 @@ The engine asks for another when the next standard token wants one.
 ## 14. Never the author
 
 An evaluator recognises its own output and favours it, and the preference grows with the recognition.
-The engine writes down who did the work step and refuses that actor the verdict.
+The engine writes down who did the work step, and which lane did it: the box, and the session on it.
+Both are refused the verdict, because a name is not what tells two evaluators apart.
+A session that spawns a reviewer of its own is one evaluator under two names.
+Two sessions are two evaluators, on one box or on two, so a verdict has somewhere to go.
 A reviewer handed its own work by mistake declines it and says so.

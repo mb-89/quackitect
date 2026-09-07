@@ -100,6 +100,22 @@ func TakeTheGroupBranch(r Roots, bucket string) BranchTaken {
 			", so the queue is now narrowed to " + theGroupFilter(bucket)}
 }
 
+// aPullCall answers whether this call asks the queue for work, at either door.
+//
+// IT READS THE SAME MAP AND THE SAME COMMAND READER THE SHORTFALL READS, so a
+// demand that holds the pull and a demand that holds the landing agree on what
+// a pull is. It lives here rather than beside the shortfall, because the
+// shortfall is somebody else's file and this is the only caller.
+func aPullCall(tool, command string) bool {
+	if !heldDuringShortfall[tool] {
+		return false
+	}
+	if tool == "Bash" {
+		return runsTheEngine(command) && aPull(command)
+	}
+	return true
+}
+
 // theFilterNotice says what the queue is narrowed by, on every pull that is
 // narrowed by anything.
 //
@@ -122,11 +138,17 @@ func theFilterNotice(r Roots) string {
 // to say why its queue is small, and a person who set nothing has to be able to
 // see that the branch did.
 func theFilterInForce(r Roots) (said, from string) {
-	if v, err := LoadValues(r); err == nil {
-		typed, _ := v.Value["work.queue_filter"].(string)
-		if strings.TrimSpace(typed) != "" {
-			return typed, "a person set it"
-		}
+	// A TREE WHOSE PARAMETERS WILL NOT READ IS NARROWED BY NOTHING, AND SAYS SO.
+	// Going quiet here would hand out the whole queue and look deliberate.
+	v, err := LoadValues(r)
+	if err != nil {
+		sayTheFilterIsLost(r, "the parameters will not read, so the queue filter is unknown "+
+			"and the queue is narrowed by nothing", map[string]any{"reason": err.Error()})
+		return "", ""
+	}
+	typed, _ := v.Value["work.queue_filter"].(string)
+	if strings.TrimSpace(typed) != "" {
+		return typed, "a person set it"
 	}
 	if group := theGroupOnTheBranch(r); group != "" {
 		return theGroupFilter(group), "the branch " + aGroupBranch + group + " carries it"

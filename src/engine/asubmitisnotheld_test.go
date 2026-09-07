@@ -52,7 +52,7 @@ func TestAShortfallLetsASubmitThrough(t *testing.T) {
 		t.Error("a bare pull went through, so the guard is off rather than narrowed")
 	}
 	if _, refuse := AStaffShortfall(r, cfg, "main", "Bash",
-		"./RUNME.sh pull --actor a --role worker", "", ""); !refuse {
+		"./RUNME.sh pull --actor main --role worker", "", ""); !refuse {
 		t.Error("a bare shell pull went through, so the guard is off rather than narrowed")
 	}
 

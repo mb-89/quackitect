@@ -7,6 +7,8 @@ import (
 	"os/exec"
 	"path/filepath"
 	"quackitect/engine/internal/alive"
+	"regexp"
+	"strconv"
 	"quackitect/engine/internal/quiet"
 	"quackitect/engine/internal/sessionlog"
 	"quackitect/engine/internal/version"
@@ -175,6 +177,66 @@ func RecordFinishedBattery(r Roots, log *sessionlog.Log) {
 		map[string]any{"started": was.Started, "out": was.Out, "token": was.Token,
 			"started_by": was.Build, "says": lastLine(string(said)), "tail": tail})
 	_ = os.Remove(batteryMarker(r))
+}
+
+// aBatteryStep reads one line of a battery's page: the step's name, whether it
+// passed, how many seconds it took, and the first of what it said. A name may
+// carry spaces, as "go test engine" does, so it runs up to the verdict word.
+var aBatteryStep = regexp.MustCompile(`^(\S.*?)\s+(ok|FAIL)\s+(\d+)s(?:\s+(.*))?$`)
+
+// theBatterysSteps reads a finished battery's page into one answer per step.
+//
+// THE PAGE IS MANY ANSWERS AND IT CAME BACK AS ONE. A token whose delta reaches
+// util/parameters.json runs the whole battery, so it inherited every red the
+// project had. The close already scopes a check's failure to the delta, and a
+// battery named no file at all for that scoping to read. See testedgate.go.
+//
+// A STEP THAT BUILDS OR RUNS GO IS NEVER EXCUSED. What it prints names test
+// files rather than the change, so reading paths out of it would wave through
+// the reds that gate exists for.
+func theBatterysSteps(said string) []ran {
+	var out []ran
+	for _, line := range strings.Split(strings.ReplaceAll(said, "\r\n", "\n"), "\n") {
+		m := aBatteryStep.FindStringSubmatch(line)
+		if m == nil {
+			// WHAT A STEP SAID BELOW ITS OWN LINE IS STILL WHAT IT SAID, and
+			// some of it starts at the margin: a go test prints --- FAIL there.
+			if n := len(out); n > 0 && strings.TrimSpace(line) != "" {
+				out[n-1].Said += "\n" + line
+			}
+			continue
+		}
+		secs, _ := strconv.ParseFloat(m[3], 64)
+		out = append(out, ran{ID: strings.TrimSpace(m[1]), Kind: aStepsKind(m[1]),
+			OK: m[2] == "ok", Seconds: secs, Said: strings.TrimSpace(m[4])})
+	}
+	return out
+}
+
+// aStepsKind answers which gate a battery step is judged under.
+func aStepsKind(name string) string {
+	switch n := strings.TrimSpace(name); {
+	case strings.HasPrefix(n, "go "), n == "race detector":
+		return "go"
+	}
+	return "check"
+}
+
+// theBatteryAnswers is what a test run is told about the whole battery: the
+// steps of a run that has finished, or the one entry startBattery answers with
+// for a run that is going, refused, or newly started.
+func theBatteryAnswers(ctx context.Context, r Roots, actor, token string) []ran {
+	// A FINISHED RUN IS READ HERE THE WAY startBattery READS IT, and expanded.
+	// It reads it as well, because a caller holding one answer wants a verdict
+	// rather than a page.
+	if was, ok := batteryGoing(r); ok && !stillRunning(was.PID) {
+		if said, err := os.ReadFile(was.Out); err == nil {
+			if steps := theBatterysSteps(string(said)); len(steps) > 0 {
+				return steps
+			}
+		}
+	}
+	return []ran{startBattery(ctx, r, actor, token)}
 }
 
 // batteryPassed reads the battery's own verdict line.

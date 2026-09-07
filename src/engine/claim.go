@@ -587,7 +587,10 @@ func Publish(ctx context.Context, r Roots, files []string, message string) Publi
 	// every time that dropped every claim but the last: thirty were live here
 	// and the ref carried one. So the claims the local ref holds are named as
 	// files of this call, and the write puts them back.
-	if mine, err := readClaimsIn(ctx, r, claimsRef); err == nil {
+	// AND WHAT DID READ IS CARRIED, THOUGH A LINE BESIDE IT WOULD NOT. The read
+	// answers both, so the claims are taken when there are any rather than only
+	// when the whole file was clean.
+	if mine, _ := readClaimsIn(ctx, r, claimsRef); len(mine) > 0 {
 		files = withTheClaimsOnlyHereHolds(r, mine, files)
 	}
 	// THE REMOTE'S HEAD BECOMES THE PARENT, and the claim is written again on
@@ -707,7 +710,16 @@ func writeTheClaims(ctx context.Context, r Roots, index string, files []string, 
 	parent, _ := gitIn(ctx, r, index, "rev-parse", "--verify", "--quiet", claimsRef)
 	have := map[string]FarClaim{}
 	if parent != "" {
-		have, _ = readClaimsIn(ctx, r, parent) // a parent that will not read holds nothing this write can carry
+		// A PARENT THAT WILL NOT READ IS NOT WRITTEN OVER. The error was dropped
+		// here, so a parent that answered nothing was written over with this
+		// box's claims alone and every other box's live claim left the ref.
+		// What did read is carried; a read that answered nothing at all stops
+		// the write, and the claim stands on this box until the ref reads again.
+		got, err := readClaimsIn(ctx, r, parent)
+		if err != nil && len(got) == 0 {
+			return "", fmt.Errorf("the parent's claims would not read, so nothing was written over them: %w", err)
+		}
+		have = got
 	}
 	text := nextClaimsFile(r, have, files, time.Now().UTC())
 	tmp, err := os.CreateTemp(r.Private(), "claims.*.tmp")

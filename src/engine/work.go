@@ -54,7 +54,8 @@ func runWork(c *call) int {
 	field := fs.String("field", "", "with set: which field to write")
 	to := fs.String("to", "", "with set: what to write in it")
 	file := fs.String("file", "", "instead of minting: put these ids in one bucket, comma separated")
-	bucket := fs.String("bucket", "", "with file: the bucket's name. Empty asks the engine for a free one")
+	bucket := fs.String("bucket", "", "the bucket's name. Minting, it files the new token. "+
+		"With file, it names the bucket, and empty asks the engine for a free one")
 	rename := fs.String("rename", "", "instead of minting: rename a bucket. Say the new name with --to")
 	if code, stop := c.parse(fs, "work"); stop {
 		return code
@@ -125,7 +126,8 @@ func runWork(c *call) int {
 		}
 	} else {
 		t = Token{Title: *title, Detail: *detail, ProposedAction: *action, Approach: *approach,
-			Process: *process, DependsOn: splitComma(*dependsOn), Parent: *parent, NeedsHuman: *needsHuman}
+			Process: *process, DependsOn: splitComma(*dependsOn), Parent: *parent, NeedsHuman: *needsHuman,
+			Bucket: *bucket}
 		// UNSAID IS A THIRD ANSWER, so the flag is a string. A bool flag has
 		// two values and the mint has to tell them from the question nobody
 		// answered.
@@ -143,6 +145,23 @@ func runWork(c *call) int {
 	}
 	if t.Process == "" {
 		t.Process = orElse(*process, "note")
+	}
+	// A BUG FOUND WHILE WORKING A BUCKET BELONGS TO IT.
+	//
+	// backlog rule 5 says so, and an agent draining a narrowed queue is in a
+	// bucket already. The mint took no bucket at all until now, so filing one was
+	// a hand edit of front matter after the fact, and no hand did it unprompted.
+	//
+	// MEASURED: fifteen tokens were minted on one box in one session with the
+	// queue narrowed to a bucket, and not one carried it. The queue could offer
+	// none of them, and answered three workable while fifteen sat outside it.
+	//
+	// A MINT WITH NOTHING HELD CARRIES NONE, because there is no bucket to
+	// inherit and guessing one would file work where nobody looked for it.
+	if t.Bucket == "" {
+		if held := TheyHold(roots, orElse(*by, "main")); len(held) > 0 {
+			t.Bucket = held[0].Bucket
+		}
 	}
 	// THE PROCESS SAYS WHERE A TOKEN STARTS. It is the state its first
 	// activity moves work into, so the engine holds no opinion about it.

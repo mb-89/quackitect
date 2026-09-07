@@ -50,13 +50,20 @@ func TestANamedProposalOutrunsTheWholeBattery(t *testing.T) {
 	r, dir := aTreeWithTests(t)
 	db := openTheIndex(t, r)
 
-	// A whole trigger enters the delta: a check changes.
-	if err := os.MkdirAll(filepath.Join(dir, "util", "checks"), 0o755); err != nil {
+	// A WHOLE RULING ENTERS THE ANSWER: a Go package with no map yet, so
+	// nothing can say which tests the change reaches.
+	//
+	// IT USED TO BE A CHANGED CHECK, and a trigger owes the battery now rather
+	// than ruling it, on the owner's word that the smaller scope wins. A changed
+	// check is selected by its own name and rules nothing. See
+	// TestATriggerOwesTheBatteryRatherThanForcingIt.
+	if _, err := db.Exec("UPDATE test SET mapped = ''"); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(dir, "util", "checks", "probe.mjs"), []byte("// a check\n"), 0o644); err != nil {
+	if _, err := db.Exec("DELETE FROM test_region"); err != nil {
 		t.Fatal(err)
 	}
+	changeA(t, dir)
 
 	// Unproposed, the whole battery is the ruling.
 	got, err := TestTheDelta(t.Context(), r, db, "", nil, false, "worker-one")
@@ -64,7 +71,7 @@ func TestANamedProposalOutrunsTheWholeBattery(t *testing.T) {
 		t.Fatal(err)
 	}
 	if !got.Whole {
-		t.Fatalf("a changed check did not rule the whole battery: %+v", got)
+		t.Fatalf("an unmapped package did not rule the whole battery: %+v", got)
 	}
 
 	// Named, the name runs and the ruling is owed rather than executed.
@@ -177,7 +184,9 @@ func TestWhenTheWholeBatteryRuns(t *testing.T) {
 	r, dir := aTreeWithTests(t)
 	db := openTheIndex(t, r)
 
-	// A CHANGE TO THE CHECKS THEMSELVES.
+	// A CHANGE TO THE CHECKS THEMSELVES OWES ONE, and runs it here because
+	// nothing else was selected. A trigger no longer forces the battery on its
+	// own: see choose in tests.go, and TestATriggerOwesTheBatteryRatherThanForcingIt.
 	if err := os.MkdirAll(filepath.Join(dir, "util", "checks"), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -185,8 +194,13 @@ func TestWhenTheWholeBatteryRuns(t *testing.T) {
 		t.Fatal(err)
 	}
 	got, err := TestTheDelta(t.Context(), r, db, "", nil, false, "worker-one")
-	if err != nil || !got.Whole || !strings.Contains(got.WhyWhole, "util/checks/") {
-		t.Fatalf("a new check did not call for the whole battery: %+v %v", got, err)
+	if err != nil || !strings.Contains(got.Owes, "util/checks/") {
+		t.Fatalf("a new check owed no battery: %+v %v", got, err)
+	}
+	// AND IT RULES NOTHING, because the check is selected by its own name and
+	// that is the smaller scope.
+	if got.Whole {
+		t.Fatalf("a trigger forced the battery over a selection of %d: %+v", len(got.Chosen), got)
 	}
 	os.Remove(filepath.Join(dir, "util", "checks", "one.mjs"))
 

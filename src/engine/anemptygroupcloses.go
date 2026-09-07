@@ -71,6 +71,30 @@ func aRetroHasRun(r Roots) bool {
 	return false
 }
 
+// theTrackedWorkLeft counts what the queue would hand out that is not a note.
+//
+// A NOTE IS THE NEXT RUNG AND MUST NOT HOLD THIS ONE OPEN. The queue hands out
+// notes when it has nothing else, so a group whose only remainder is a note
+// reads as working for ever and its notes are never asked for. They are the one
+// thing that dies with the box, so they cannot be the thing that is skipped.
+//
+// IT CAN ONLY LOWER THE COUNT, which is the safe direction. An overcount would
+// move the closing to the notes rung, and the notes rung asks for exactly the
+// notes this counted.
+func theTrackedWorkLeft(r Roots) int {
+	work, _ := TheQueueWouldHandOut(r)
+	f := theQueueFilter(r)
+	for _, note := range NotesInHand(r) {
+		if TheQueueTakes(f, note) {
+			work--
+		}
+	}
+	if work < 0 {
+		return 0
+	}
+	return work
+}
+
 // TheClosing answers what a group box owes. A tree that is not on a group
 // branch owes nothing and is answered as working.
 func TheClosing(r Roots) Closing {
@@ -78,7 +102,7 @@ func TheClosing(r Roots) Closing {
 	if group == "" {
 		return Closing{Step: closingWork}
 	}
-	if work, _ := TheQueueWouldHandOut(r); work > 0 {
+	if work := theTrackedWorkLeft(r); work > 0 {
 		return Closing{Step: closingWork, Group: group, Says: fmt.Sprintf(
 			"%d token(s) are open in %s, so the group is not done.", work, group)}
 	}

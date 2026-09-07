@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"path/filepath"
 	"quackitect/engine/internal/sessionlog"
 	"strings"
 	"sync"
@@ -140,14 +141,111 @@ func offTheFetchedBranch(r Roots, actor string, all []Token) (kept []Token, behi
 	return kept, behind, branch
 }
 
+// theNoteStandsOnTheBranch answers the ids whose note is on the fetched branch
+// exactly as it is here.
+//
+// FOR THOSE, THIS CLONE IS NOT BEHIND. The branch carries an archive row and an
+// open note for one token at once, so bringing doc/work into step changes
+// nothing and the two halves of the record disagree with each other.
+//
+// MEASURED, September 2026. Three ids were named on every pull of a session,
+// with an instruction to bring the tree into step. Two of them stood on the
+// branch byte for byte as they stood here. Three hands acted on that notice and
+// none of them could have satisfied it.
+func theNoteStandsOnTheBranch(r Roots, commit string, behind []string) map[string]bool {
+	same := map[string]bool{}
+	if commit == "" {
+		return same
+	}
+	for _, id := range behind {
+		path := "doc/work/" + id + ".md"
+		there, err := gitHere(r, "rev-parse", "--verify", "--quiet", commit+":"+path)
+		if err != nil || strings.TrimSpace(there) == "" {
+			continue // the branch dropped the note, so this clone really is behind
+		}
+		here, err := gitHere(r, "hash-object", path)
+		if err != nil || strings.TrimSpace(here) == "" {
+			continue // no note here to compare, so the lag reading stands
+		}
+		if strings.TrimSpace(here) == strings.TrimSpace(there) {
+			same[id] = true
+		}
+	}
+	return same
+}
+
+// whereTheNoteIs answers the file a passed-over token was read from, written as
+// a reader would type it, and whether that file is this box's own.
+//
+// A REMEDY NAMES A FILE AND NOT A FOLDER. The stale copy is under doc/work on
+// one box and under .se/work on another, and only the first is a lag a fetch
+// closes. Where the token has no file at all, doc/work is the folder it would
+// have been in, and naming it is the closest true thing to say.
+func whereTheNoteIs(r Roots, id string) (shown string, private bool) {
+	at := noteAt(r, id)
+	if at == "" {
+		return "doc/work/" + id + ".md", false
+	}
+	shown = filepath.ToSlash(at)
+	if rel, err := filepath.Rel(r.Work, at); err == nil && !strings.HasPrefix(rel, "..") {
+		shown = filepath.ToSlash(rel)
+	}
+	return shown, strings.HasPrefix(filepath.ToSlash(at), filepath.ToSlash(LocalDir(r))+"/")
+}
+
 // behindNotice names what the queue passed over because the fetched branch has
-// archived it, and says what brings the tree into step. It rides on every
-// answer, work or wait, because the queue is shorter either way.
-func behindNotice(branch string, behind []string) string {
+// archived it. It rides on every answer, work or wait, because the queue is
+// shorter either way.
+//
+// IT ONLY BLAMES A LAG IT CANNOT RULE OUT. Where the note here is the branch's
+// own note, there is no lag to close, and the answer says the branch disagrees
+// with itself instead of asking for a fetch that changes nothing.
+//
+// AND A PRIVATE COPY IS ITS OWN CASE, WITH ITS OWN REMEDY. .se/work is this
+// box's own and git carries it nowhere, so no fetch, no merge and no reset
+// moves what is stale there. Sending that reader to doc/work sends them to a
+// folder with nothing in it.
+//
+// MEASURED, September 2026. Three ids were named on every pull of a session
+// under the fetch remedy, and doc/work held none of the three. All three sat
+// under .se/work, and deleting them drained the queue at once.
+func behindNotice(r Roots, branch string, behind []string) string {
 	if len(behind) == 0 {
 		return ""
 	}
-	return fmt.Sprintf("\n\nPassed over, because %s has archived them and this clone is behind it:\n  %s\n\n"+
-		"They are not open work. Bring doc/work into step with %s, and pull again.",
-		branch, strings.Join(behind, "\n  "), branch)
+	commit, _ := fetchedBranch(r)
+	same := theNoteStandsOnTheBranch(r, commit, behind)
+	var lagging, disagreeing, ours []string
+	for _, id := range behind {
+		at, private := whereTheNoteIs(r, id)
+		line := id + "  " + at
+		switch {
+		case private:
+			ours = append(ours, line)
+		case same[id]:
+			disagreeing = append(disagreeing, line)
+		default:
+			lagging = append(lagging, line)
+		}
+	}
+	said := ""
+	if len(lagging) > 0 {
+		said += fmt.Sprintf("\n\nPassed over, because %s has archived them and this clone is behind it:\n  %s\n\n"+
+			"They are not open work. Bring doc/work into step with %s, and pull again.",
+			branch, strings.Join(lagging, "\n  "), branch)
+	}
+	if len(disagreeing) > 0 {
+		said += fmt.Sprintf("\n\nPassed over, and this clone is not behind on them:\n  %s\n\n"+
+			"%s carries an archive row and an open note for each, byte for byte as this tree "+
+			"holds it. So the record disagrees with itself and a fetch changes nothing. "+
+			"A person says which half is the truth: the row, or the note.",
+			strings.Join(disagreeing, "\n  "), branch)
+	}
+	if len(ours) > 0 {
+		said += fmt.Sprintf("\n\nPassed over, because %s has archived them, and the copy here is this box's own:\n  %s\n\n"+
+			"They are not open work. .se/work is private and git carries it nowhere, so nothing "+
+			"the branch does reaches them. Delete the file named beside each id, and pull again.",
+			branch, strings.Join(ours, "\n  "))
+	}
+	return said
 }

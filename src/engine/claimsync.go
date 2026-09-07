@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 	"quackitect/engine/internal/frontmatter"
 	"quackitect/engine/internal/sessionlog"
@@ -100,12 +101,18 @@ func SyncClaims(ctx context.Context, r Roots) TheFarClaims {
 		return out
 	}
 	found, err := readClaimsIn(ctx, r, head)
-	if err != nil {
+	// WHAT DID READ STANDS, AND WHAT DID NOT IS SAID. A read that answers
+	// nothing at all leaves the claims from before, because a ref this box
+	// cannot read is not a ref saying nobody has claimed anything.
+	if err != nil && len(found) == 0 {
 		out.Says = "the claims could not be read: " + err.Error()
 		saveFarClaims(r, out)
 		return out
 	}
 	out.Claims, out.Ref, out.Says = found, head, ""
+	if err != nil {
+		out.Says = "some of the claims would not read, and the rest stand: " + err.Error()
+	}
 	saveFarClaims(r, out)
 	return out
 }
@@ -122,11 +129,21 @@ func SyncClaims(ctx context.Context, r Roots) TheFarClaims {
 // The next write folds what was read into the file, so a box holding claims
 // written the old way is migrated by its own first claim, and nobody types
 // anything.
+//
+// AND A FILE THAT IS THERE IS THE FILE, whatever one of its lines says. It
+// answers the claims it could read, with an error naming the lines it could
+// not, so a caller keeps what is live and can still say the file is damaged.
+// One bad line used to send the read to the old shape, which lists a tree
+// holding no notes and answers an empty set with no error: every box then read
+// the ref as nobody having claimed anything.
 func readClaimsIn(ctx context.Context, r Roots, head string) (map[string]FarClaim, error) {
 	if text, err := gitIn(ctx, r, "", "show", head+":"+claimsFile); err == nil {
-		if found, ok := parseClaimLines(text); ok {
-			return found, nil
+		found, bad := parseClaimLines(text)
+		if bad > 0 {
+			return found, fmt.Errorf("%d line(s) of %s would not read, and %d claim(s) were kept",
+				bad, claimsFile, len(found))
 		}
+		return found, nil
 	}
 	found := map[string]FarClaim{}
 	listed, err := gitIn(ctx, r, "", "ls-tree", "-r", "--name-only", head)
@@ -157,10 +174,14 @@ func readClaimsIn(ctx context.Context, r Roots, head string) (map[string]FarClai
 }
 
 // parseClaimLines reads the claims file: one claim per line, the id, the
-// claimant and the stamp. A line of any other shape means the text is not the
-// file, and the caller reads the old shape instead.
-func parseClaimLines(text string) (map[string]FarClaim, bool) {
+// claimant and the stamp. It answers the claims it could read, and how many
+// lines it could not.
+//
+// A LINE THAT WILL NOT READ TAKES ONLY ITSELF. It used to answer nothing for
+// the whole file, and one line then cost every live claim on the ref.
+func parseClaimLines(text string) (map[string]FarClaim, int) {
 	out := map[string]FarClaim{}
+	bad := 0
 	for _, line := range strings.Split(text, "\n") {
 		line = strings.TrimSpace(line)
 		if line == "" {
@@ -168,11 +189,12 @@ func parseClaimLines(text string) (map[string]FarClaim, bool) {
 		}
 		f := strings.Fields(line)
 		if len(f) != 3 {
-			return nil, false
+			bad++
+			continue
 		}
 		out[f[0]] = FarClaim{By: f[1], At: f[2]}
 	}
-	return out, true
+	return out, bad
 }
 
 func saveFarClaims(r Roots, all TheFarClaims) {

@@ -89,7 +89,7 @@ func TestEverySeWorkCommandARefusalPrintsIsParsed(t *testing.T) {
 	}
 	t.Setenv("CLAUDE_CODE_REMOTE", "true")
 
-	held, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_apply", "")
+	held, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_pull", "")
 	if !refuse {
 		t.Fatalf("%d notes on a cloud box were not held, so there is no refusal to read", TheNoteCeiling)
 	}

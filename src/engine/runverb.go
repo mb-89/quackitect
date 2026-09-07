@@ -145,8 +145,12 @@ func runRun(c *call) int {
 	// held goes back, so changing what you work on is one word on the next
 	// command.
 	if _, err := TakeUp(roots, *on, orElse(*by, "main")); err != nil {
-		c.answerJSON(map[string]any{"error": err.Error()})
-		return 1
+		// A LAND MAY NAME THE TOKEN THAT JUST CLOSED. The close asks for the
+		// land and TakeUp would shut the door to it. See aWarmLand.
+		if !aWarmLand(roots, *on, said) {
+			c.answerJSON(map[string]any{"error": err.Error()})
+			return 1
+		}
 	}
 	got, err := Run(roots, said)
 	if err != nil {
@@ -154,6 +158,15 @@ func runRun(c *call) int {
 		return 1
 	}
 	got.On = *on
+	// A FILE THIS COMMAND PRINTED IS A FILE THIS ACTOR LOOKED AT. The delete
+	// guard read the harness's evidence alone, so a cat through this door left
+	// no trace and the next rm was refused. See enginereads.go.
+	//
+	// IT IS NOTED AFTER THE RUN AND ONLY ON A CLEAN EXIT. A cat that could not
+	// open the file printed nothing, and nobody looked at anything.
+	if got.Exit == 0 {
+		AReadThroughTheEngine(roots, orElse(*by, "main"), said, roots.Work)
+	}
 	inSession(roots, "call", orElse(*by, "main"), *on+" ran "+firstLine(got.Command), sessionlog.Yes(),
 		map[string]any{"id": *on, "exit": got.Exit})
 	c.answerJSON(got)

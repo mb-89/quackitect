@@ -30,7 +30,7 @@ What is gained is that a new case becomes a row rather than a new function carry
 
 What breaks if nobody does it is that the largest package drifts further from rule 14 with every case added. The standing check that would hold the rule stays impossible to turn on.
 
-The package is the compilation unit, and every other hand builds against it. A half landed rewrite here stops all of them, which is wk-1bb23ea110. So a file is converted, built and tested before the next one starts.
+The package is the compilation unit, and every other hand builds against it. A half landed rewrite here stops all of them, which is wk-1bb23ea110 (another box). So a file is converted, built and tested before the next one starts.
 
 206 files do not review whole, so the holder splits this token by file batch at its own step 1 before converting anything. It waits on the three smaller packages, so the shape arrives settled.
 

@@ -36,10 +36,11 @@ func TestAStopIsRefusedUntilAReasonIsClaimed(t *testing.T) {
 		}
 	}
 
-	// A RETRY IS NOT A CLAIM. The harness sets that flag by itself, so asking
-	// twice proves the harness retried and nothing about what was decided.
-	again := hookSays(t, exe, r.Method, "Stop",
-		map[string]any{"cwd": r.Work, "stop_hook_active": true})
+	// A RETRY IS NOT A CLAIM. A harness retries a blocked stop by itself, so
+	// asking twice proves the harness retried and nothing about what was decided.
+	// The engine reads no flag saying a stop is a retry, so a second ask arrives
+	// as the first one did.
+	again := hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work})
 	if !strings.Contains(again, `"decision":"block"`) {
 		t.Fatalf("a bare retry granted the stop: %s", again)
 	}
@@ -154,8 +155,9 @@ func TestABlockedClaimStandsWhenTheQueueIsEmpty(t *testing.T) {
 	if err := ClaimStop(r, "main", "blocked", "the queue is dry"); err != nil {
 		t.Fatal(err)
 	}
-	// NOTHING IS HELD AND NOTHING IS OFFERED, so the engine has nothing to argue
-	// with and the claim that names the reason is the stop. See challenge.go.
+	// NOTHING IS HELD AND NOTHING IS OFFERED, which is both halves of the
+	// evidence blocked is judged on, so the claim is still true at the stop and
+	// BlockedIsFalse has nothing to refuse it with.
 	if out := hookSays(t, exe, r.Method, "Stop", map[string]any{"cwd": r.Work}); out != "" {
 		t.Fatalf("a true blocked claim with a dry queue was refused: %s", out)
 	}

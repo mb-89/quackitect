@@ -514,6 +514,11 @@ type Config struct {
 	// say what the machine would do without working it out.
 	ParallelAgents int
 
+	// HOW MANY REDS A RUN MAY LEAVE before the next one has to answer them.
+	// Under this many, one edit is the right size for the page. Zero turns the
+	// rule off, because a person may want the suite as a scratchpad.
+	RedsBeforeAChangeIsNeeded int
+
 	From map[string]string
 }
 
@@ -533,12 +538,27 @@ func TheFloor() Config {
 		PullsBeforeHoldIsStale: 10,
 		HelperRatio:            10,
 		HelperFloorBytes:       6000,
-		// THREE, COUNTING THE MAIN AGENT. The number is how many workers there
+		// ONE, COUNTING THE MAIN AGENT. The number is how many workers there
 		// are rather than how many are spawned beside the one already working,
-		// so three is the session and two spawned. Reviewers are all spawned,
+		// so one is the session and none spawned. Reviewers are all spawned,
 		// because the main agent is a worker and never a reviewer.
-		ParallelAgents: 3,
-		From:           map[string]string{}}
+		//
+		// IT WAS THREE, AND SEPARATE INSTANCES ARE THE ANSWER INSTEAD. Agents on
+		// one instance contend for one working tree, one git index, one engine
+		// and one archive file. The battery replaces the running engine, so one
+		// hand runs it at a time whatever this says.
+		//
+		// MEASURED at ten agents on one box. The branch head did not compile for
+		// an hour, because one hand landed a test without its source half. Six
+		// tokens were parked as unworkable, each naming the busy tree.
+		//
+		// Separate instances share nothing but the branch, and the claims branch
+		// already keeps them off each other's tokens.
+		ParallelAgents: 1,
+		// TWO, because one red is answered by one edit and that is the
+		// commonest turn there is.
+		RedsBeforeAChangeIsNeeded: 2,
+		From:                      map[string]string{}}
 }
 
 func LoadConfig(roots Roots) Config {
@@ -589,6 +609,10 @@ func LoadConfig(roots Roots) Config {
 	}
 	if n, ok := toNumber(v.Value["limits.pulls_before_hold_is_stale"]); ok && int(n) > 0 {
 		c.PullsBeforeHoldIsStale = int(n)
+	}
+	// ZERO IS A VALUE HERE TOO, and it turns the rule off.
+	if n, ok := toNumber(v.Value["limits.reds_before_a_change_is_needed"]); ok && int(n) >= 0 {
+		c.RedsBeforeAChangeIsNeeded = int(n)
 	}
 	// A HELPER MAY BE HELD TIGHTER, NEVER LOOSER: a larger ratio is a smaller
 	// digest, and a smaller floor is too.

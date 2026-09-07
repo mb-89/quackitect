@@ -225,14 +225,23 @@ var heldDuringShortfall = map[string]bool{
 // AStaffShortfall answers whether this call by the main agent is refused
 // until the hands the queue wants have pulled, and says how to spawn them.
 func AStaffShortfall(r Roots, cfg Config, actor, tool, command, id, disposition string) (string, bool) {
-	// HANDING WORK IN IS NOT ASKING FOR MORE. A submit gives one token back and
-	// leaves the agent emptier than it found it, so the reason to hold a pull
-	// does not reach it. It is read before anything else, because a call that
-	// takes nothing from the queue is not what the queue is waiting for.
-	if aSubmit(command, id, disposition) {
+	if actor != "main" || !heldDuringShortfall[tool] {
 		return "", false
 	}
-	if actor != "main" || !heldDuringShortfall[tool] {
+	// HANDING WORK IN IS NOT ASKING FOR MORE. A submit is an se_pull call, and
+	// the guard read only the tool name, so it refused both. An agent that had
+	// finished its work could not record it.
+	//
+	// MEASURED, September 2026. A token was finished, green and written up, and
+	// its submit answered THE QUEUE WANTS MORE HANDS with 144 tokens open and
+	// one worker here. On a cloud box that is worse than a delay: the agent is
+	// told to spawn two hands so that it may file work it has already done, and
+	// a box that cannot spawn loses the work when it is reclaimed.
+	//
+	// A SUBMIT NAMES A TOKEN AND HOW IT ENDED. Half of one is not a submit:
+	// letting a bare id or a bare disposition through would be a way round the
+	// guard rather than a narrowing of it.
+	if id != "" && disposition != "" {
 		return "", false
 	}
 	// A SHELL CALL IS HELD ONLY WHEN IT IS THE PULL ITSELF. On a box with no
@@ -240,6 +249,27 @@ func AStaffShortfall(r Roots, cfg Config, actor, tool, command, id, disposition 
 	// guard has any business stopping. Every other Bash call goes through,
 	// including the spawn and the stop the refusal below tells the agent to make.
 	if tool == "Bash" && !(runsTheEngine(command) && aPull(command)) {
+		return "", false
+	}
+	// AND THE SHELL DOOR READS THE SAME RULE, because a box with no lane files
+	// its work there and holding that one would move the deadlock rather than
+	// end it.
+	if tool == "Bash" && aSubmitAtTheShell(command) {
+		return "", false
+	}
+	// A PULL TYPED FOR ANOTHER HAND IS THE ESCAPE, NOT THE OFFENCE. This
+	// refusal's own last line hands the agent "pull --actor <a name> --role
+	// worker", and on a box with no lane that line is a Bash call. The guard
+	// read the caller, saw main, and held the one move it had just asked for,
+	// so nothing could answer the shortfall and it stood for ever.
+	//
+	// THE COMMAND ALREADY SAYS WHOSE PULL IT IS, so no guessing is wanted: a
+	// name other than the caller's is a hand arriving, and that is the thing
+	// the shortfall is waiting for.
+	//
+	// THE CALLER'S OWN NAME STAYS HELD, and so does a pull naming nobody, since
+	// either is the main agent taking from the queue for itself.
+	if tool == "Bash" && aPullForAnotherHand(command, actor) {
 		return "", false
 	}
 	// A PERSON WHO PUT THE WORK DOWN IS NOT ASKED FOR MORE HANDS.
@@ -289,34 +319,56 @@ func engineWork(command string) bool {
 	return false
 }
 
-// aSubmit answers whether this call hands a token in rather than asks for one.
+// aSubmitAtTheShell answers whether a shell pull hands work in rather than
+// asking for more.
 //
-// BOTH HALVES ARE NEEDED. A token with no disposition is not an ending, and a
-// disposition with no token names nothing. Letting half of one through would be
-// a way round the guard rather than a narrowing of it.
+// THE REAL DOOR IS --from. A submission is one JSON object, and a box with no
+// lane hands it over in a file: se pull --actor main --from .se/scratchpad/x.json.
+// Every submit this engine's own sessions make goes that way.
 //
-// BOTH DOORS READ THE SAME RULE. A lane call carries the two as fields, and a
-// box with no lane carries them as flags on the shell command. Holding one of
-// the two would move the deadlock rather than end it.
-func aSubmit(command, id, disposition string) bool {
-	if id != "" && disposition != "" {
-		return true
+// THE FLAG PAIR IS READ TOO, because the lane's fields are id and disposition
+// and a shell caller may spell them out rather than write a file.
+func aSubmitAtTheShell(command string) bool {
+	separators, _ := theQuotings(command)
+	names, ended := false, false
+	for _, w := range strings.Fields(separators) {
+		switch {
+		case w == "--from" || strings.HasPrefix(w, "--from="):
+			return true
+		case w == "--id" || w == "--on" || strings.HasPrefix(w, "--id=") || strings.HasPrefix(w, "--on="):
+			names = true
+		case w == "--disposition" || strings.HasPrefix(w, "--disposition="):
+			ended = true
+		}
 	}
-	return runsTheEngineWith(command, "--id") && runsTheEngineWith(command, "--disposition")
+	return names && ended
 }
 
-// aPullCall answers whether this call asks the queue for work, at either door.
-// It reads the same map and the same command reader the shortfall reads, so a
-// demand that holds the pull and a demand that holds the landing agree on what
-// a pull is.
-func aPullCall(tool, command string) bool {
-	if !heldDuringShortfall[tool] {
-		return false
+// aPullForAnotherHand answers whether a shell pull names a hand other than the
+// one making the call. A spawned worker's pull typed at a shell is the answer
+// to a shortfall, and the main agent asking for its own next token is not.
+//
+// A FLAG WITH NO VALUE NAMES NOBODY. "--actor --role worker" would otherwise
+// read "--role" as a name, and every such pull would walk through the guard.
+func aPullForAnotherHand(command, actor string) bool {
+	separators, _ := theQuotings(command)
+	words := strings.Fields(separators)
+	for i, w := range words {
+		var named string
+		switch {
+		case w == "--actor" && i+1 < len(words):
+			named = words[i+1]
+		case strings.HasPrefix(w, "--actor="):
+			named = strings.TrimPrefix(w, "--actor=")
+		default:
+			continue
+		}
+		if named == "" || strings.HasPrefix(named, "-") {
+			return false
+		}
+		return named != actor
 	}
-	if tool == "Bash" {
-		return runsTheEngine(command) && aPull(command)
-	}
-	return true
+	return false
 }
 
 // aPull answers whether an engine command is the pull. That is the one verb a

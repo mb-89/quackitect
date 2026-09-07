@@ -58,19 +58,18 @@ const (
 )
 
 type hookIn struct {
-	SessionID      string          `json:"session_id"`
-	Cwd            string          `json:"cwd"`
-	Event          HookEvent       `json:"hook_event_name"`
-	ToolName       string          `json:"tool_name"`
-	ToolInput      json.RawMessage `json:"tool_input"`
-	ToolUseID      string          `json:"tool_use_id"`
-	Prompt         string          `json:"prompt"`
-	UserPrompt     string          `json:"user_prompt"`
-	Source         string          `json:"source"`
-	AgentID        string          `json:"agent_id"`
-	AgentType      string          `json:"agent_type"`
-	StopHookActive bool            `json:"stop_hook_active"`
-	Transcript     string          `json:"transcript_path"`
+	SessionID  string          `json:"session_id"`
+	Cwd        string          `json:"cwd"`
+	Event      HookEvent       `json:"hook_event_name"`
+	ToolName   string          `json:"tool_name"`
+	ToolInput  json.RawMessage `json:"tool_input"`
+	ToolUseID  string          `json:"tool_use_id"`
+	Prompt     string          `json:"prompt"`
+	UserPrompt string          `json:"user_prompt"`
+	Source     string          `json:"source"`
+	AgentID    string          `json:"agent_id"`
+	AgentType  string          `json:"agent_type"`
+	Transcript string          `json:"transcript_path"`
 	// ErrorType is what ended a turn on an API error: rate_limit,
 	// max_output_tokens and the rest. It comes with StopFailure only.
 	ErrorType string `json:"error_type"`
@@ -90,9 +89,9 @@ type toolInput struct {
 	// Actor is the name a lane call acts as: se_pull, se_run and the rest
 	// carry it as a field where a shell command carries it as --actor.
 	Actor string `json:"actor"`
-	// ID and Disposition are what a submit carries: the token being handed in
-	// and how it ended. A pull naming both is a submit rather than an ask, and
-	// the staffing guard reads them to tell those two apart.
+	// ID and Disposition are what a submit carries. se_pull naming a token and
+	// how it ended is handing work in rather than asking for more, and the
+	// staffing guard reads both to tell the two apart.
 	ID          string `json:"id"`
 	Disposition string `json:"disposition"`
 	// NewSource is what a NotebookEdit puts in a cell, which is a write too.
@@ -787,29 +786,6 @@ func notePostTool(roots Roots, in hookIn, actor string) {
 	}
 }
 
-// isTheStopVerb says whether this call is the agent claiming a stop, at the
-// lane or at the shell door.
-//
-// IT IS THE ONE CALL THAT IS NOT CARRYING ON. Every other call puts the
-// argument back to its start, and counting this one as work reset it between
-// every claim and its own Stop event, so the count never reached three at all.
-func isTheStopVerb(in hookIn) bool {
-	if strings.HasSuffix(in.ToolName, "se_stop") {
-		return true
-	}
-	var ti toolInput
-	if json.Unmarshal(in.ToolInput, &ti) != nil {
-		return false
-	}
-	words := strings.Fields(ti.Command)
-	for i, w := range words {
-		if isTheEngine(filepath.Base(w)) && i+1 < len(words) && words[i+1] == "stop" {
-			return true
-		}
-	}
-	return false
-}
-
 func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, log *sessionlog.Log, in hookIn, actor string) {
 	// ANYTHING YOU DO AFTER CLAIMING A STOP ERASES THE CLAIM. A claim says the
 	// next thing is stopping. An agent that claims and then carries on has
@@ -819,14 +795,6 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// claim itself is made by a tool call, and this fires before that call
 	// runs, so a claim never spends itself.
 	SpendClaim(roots, actor)
-
-	// AND IT PUTS THE ARGUMENT BACK TO ITS START. Three claims earn a stop over
-	// open work, and going back to work between two of them is changing your
-	// mind, so the run has to be unbroken. Claiming again is the argument itself
-	// and never breaks it.
-	if !isTheStopVerb(in) {
-		forgetRefusedStops(roots, "claimed:"+actor)
-	}
 
 	var ti toolInput
 	_ = json.Unmarshal(in.ToolInput, &ti) // a call whose input will not read names no file, and the caller checks that
@@ -1445,9 +1413,6 @@ func decideStop(g *guard, roots Roots, cfg Config, log *sessionlog.Log, in hookI
 	// THE PERSON'S OWN CONTROLS ARE NOT THIS. The hold and the ask are theirs
 	// rather than the engine's, and they are enforced above that other check for
 	// exactly that reason. The stop hook is the engine's own rule, so it goes.
-	//
-	// UNBOUND IS UNTOUCHED. It keeps the claim and the argument, and only the
-	// queue stops being a reason to refuse a stop.
 	if NoGuardsAtAll(roots) {
 		record(log, "agent", "stop", actor, "stopped: god is on, and the engine argues with nobody",
 			sessionlog.Yes(), map[string]any{"at": string(God)})
@@ -1461,8 +1426,8 @@ func decideStop(g *guard, roots Roots, cfg Config, log *sessionlog.Log, in hookI
 	// Bound, the queue chose this work and will choose the next, so putting it
 	// down is a decision the queue is owed a reason for. Unbound, the queue chose
 	// nothing and hands out nothing, so it has no standing to ask a person's agent
-	// why it is stopping. That is the same reasoning AskToStop was written on and
-	// never wired to.
+	// why it is stopping. AskToStop was written on the same reasoning, and it
+	// no longer carries it: the rung is here and it is read before the checks.
 	//
 	// THIS IS NOT GOD. God skips the whole hook above. Here the record still says
 	// the agent stopped, because an unbound stop is ordinary rather than an
@@ -1488,18 +1453,11 @@ func decideStop(g *guard, roots Roots, cfg Config, log *sessionlog.Log, in hookI
 				return
 			}
 		}
-		// THE ARGUMENT NEEDS SOMETHING TO ARGUE WITH, and that is work still in
-		// the agent's hands. A good reason with nothing blocking is granted on the
-		// claim that names it, which is the whole of the rule for an agent with
-		// empty hands.
+		// A CLAIM THAT NAMES A SANCTIONED REASON IS THE STOP. Nothing weighs it
+		// against what is in the agent's hands, and nothing asks twice.
 		//
-		// ARGUING WITH EVERY CLAIM was the mistake. It made the count the rule and
-		// the state of the tree irrelevant, so an agent holding nothing was refused
-		// twice with nothing to say back to it. Persistence is the price of leaving
-		// work behind, not the price of stopping.
-		//
-		// THE PERSON'S WORD IS NOT ARGUED WITH. asked is granted on the claim
-		// that names it, whatever is in the agent's hands.
+		// THE PERSON'S WORD LEAST OF ALL. asked is granted on the claim that names
+		// it, whatever is in the agent's hands.
 		//
 		// THE OWNER'S WORDS: if the user tells you that you stop, I don't give a
 		// shit about your sub tokens. You stop.
@@ -1514,10 +1472,6 @@ func decideStop(g *guard, roots Roots, cfg Config, log *sessionlog.Log, in hookI
 		// the claim still names one of five sanctioned reasons, and a false
 		// blocked is still refused where it is typed rather than here.
 		//
-		// THE COUNT IS CLEARED ON THE GRANT, because nothing counts any more. It
-		// is cleared again the moment the agent goes back to work, in
-		// decidePreToolUse, and the helper relenting keeps its own count.
-		forgetRefusedStops(roots, "claimed:"+actor)
 		// THE WORD STANDS AS LONG AS THE CLAIM DOES. A harness sends turns nobody
 		// asked for and every one ends in a stop, so an agent that has stopped and
 		// done nothing since meets this again and is let through on the same claim.

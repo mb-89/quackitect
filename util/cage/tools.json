@@ -223,6 +223,10 @@
             "description": "the shape the work will take, written before the work. A process that requires one refuses a mint without it",
             "type": "string"
           },
+          "bucket": {
+            "description": "the person's name for a group, which the queue can be narrowed to. Unsaid takes the bucket of the token in your hands",
+            "type": "string"
+          },
           "depends_on": {
             "items": {
               "type": "string"

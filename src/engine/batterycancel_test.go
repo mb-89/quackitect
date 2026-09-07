@@ -25,7 +25,9 @@ func TestACancelledContextStartsNoBattery(t *testing.T) {
 
 	got := startBattery(ctx, r, "worker-one", "wk-1")
 
-	if got.OK {
+	// NEITHER OK NOR PENDING. A start answers pending, so ok alone would pass
+	// on a battery that did start.
+	if got.OK || got.Pending {
 		t.Errorf("a cancelled call started a battery anyway: %s", got.Said)
 	}
 	if !strings.Contains(got.Said, context.Canceled.Error()) {
@@ -45,7 +47,7 @@ func TestALiveContextStillStartsTheBattery(t *testing.T) {
 
 	got := startBattery(t.Context(), r, "worker-one", "wk-1")
 
-	if !got.OK {
+	if !got.Pending {
 		t.Fatalf("a live context started no battery: %s", got.Said)
 	}
 	going, ok := batteryGoing(r)

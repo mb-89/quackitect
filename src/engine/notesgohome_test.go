@@ -30,14 +30,17 @@ func TestACloudBoxTurnsItsNotesIn(t *testing.T) {
 
 	// NINETEEN NOTES ON A CLOUD BOX REFUSE NOTHING.
 	t.Setenv("CLAUDE_CODE_REMOTE", "true")
-	if why, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_apply", ""); refuse {
+	// THE HOLD IS ON THE PULL, which is the tool heldDuringShortfall names. It
+	// was se_apply here, from before that list was narrowed to one verb, so this
+	// drove a door the guard does not hold and could not redden.
+	if why, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_pull", ""); refuse {
 		t.Fatalf("%d notes were refused, and the ceiling is %d:\n%s", len(notes), TheNoteCeiling, why)
 	}
 
 	// THE TWENTIETH HOLDS THE WORK, AND THE REFUSAL HANDS THE NOTES OVER.
 	last := mintNote(t, r, "the note filling it")
 	notes = append(notes, last)
-	why, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_apply", "")
+	why, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_pull", "")
 	if !refuse {
 		t.Fatalf("%d notes on a cloud box were not refused", len(notes))
 	}
@@ -86,7 +89,7 @@ func TestACloudBoxTurnsItsNotesIn(t *testing.T) {
 	if err := SaveToken(r, turnedIn); err != nil {
 		t.Fatal(err)
 	}
-	if _, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_apply", ""); refuse {
+	if _, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_pull", ""); refuse {
 		t.Errorf("a note that became a token is still counted, so turning them in never clears the hold")
 	}
 }
@@ -108,7 +111,7 @@ func TestTheThreeAnswersLandThroughTheOpenDoors(t *testing.T) {
 		notes = append(notes, mintNote(t, r, "a note nobody decided"))
 	}
 	t.Setenv("CLAUDE_CODE_REMOTE", "true")
-	if _, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_apply", ""); !refuse {
+	if _, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_pull", ""); !refuse {
 		t.Fatal("this proves nothing: the hold is not standing")
 	}
 
@@ -180,7 +183,7 @@ func TestADeskKeepsItsNotes(t *testing.T) {
 	for _, v := range []string{"CLAUDE_CODE_REMOTE", "GITHUB_ACTIONS", "SE_CLOUD"} {
 		t.Setenv(v, "")
 	}
-	if why, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_apply", ""); refuse {
+	if why, refuse := TooManyNotes(r, "main", "mcp__quackitect__se_pull", ""); refuse {
 		t.Fatalf("a desk was held over its own notes:\n%s", why)
 	}
 }

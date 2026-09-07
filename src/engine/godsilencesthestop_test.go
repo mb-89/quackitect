@@ -37,7 +37,6 @@ func TestGodSilencesTheStopHook(t *testing.T) {
 	// THE SESSION'S FIRST STOP IS GRANTED WHATEVER IT SAYS, so it is spent here
 	// rather than mistaken for the rule under test.
 	aStopWithNoClaim(t, r, log, actor)
-	forgetRefusedStops(r, "claimed:"+actor)
 
 	// BOUND WANTS A CLAIM. The queue chose this work, so putting it down is a
 	// decision the queue is owed a reason for.
@@ -47,7 +46,6 @@ func TestGodSilencesTheStopHook(t *testing.T) {
 	if aStopWithNoClaim(t, r, log, actor) {
 		t.Error("a bound stop went through with no claim standing")
 	}
-	forgetRefusedStops(r, "claimed:"+actor)
 
 	// UNBOUND DOES NOT. The queue did not choose this work and will not choose
 	// the next, so it has no standing to ask why the person's agent is stopping.
@@ -60,7 +58,6 @@ func TestGodSilencesTheStopHook(t *testing.T) {
 	if !aStopWithNoClaim(t, r, log, actor) {
 		t.Error("an unbound agent was asked for a reason by a queue that chose it nothing")
 	}
-	forgetRefusedStops(r, "claimed:"+actor)
 
 	// AND GOD LETS IT GO, with work in hand and nothing claimed.
 	if _, err := SetBinding(r, God, "the owner"); err != nil {

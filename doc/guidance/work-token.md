@@ -38,6 +38,7 @@ How a test is built is [[testing]].
 9. Put both halves of a mechanism in the evidence. Where the system mirrors halves, table them and drive the rule through each. *
 10. Report work as done only with the evidence that it is. An observation names the check and what it said. *
 11. A checklist carries institutional knowledge. Answer each line rather than ticking it. *
+12. An archived token whose evidence is empty is unfinished. Take it out of the archive and finish it. *
 
 # Discussion
 
@@ -129,3 +130,16 @@ The lines come from the process, which carries what earlier work learned the har
 A line ticked without being read throws that knowledge away and keeps the tick.
 Where a line asks for evidence, the sentence is the answer and the tick counts it.
 Where it asks none, the tick is honest, because there is no artifact to name.
+
+## 12. The row is a claim and the evidence is the record
+
+An archive row says a token is finished.
+The evidence says what was done.
+Where the row stands and the evidence is empty, the row is a claim with nothing behind it.
+
+So the row loses.
+The token comes out of the archive, and the next hand finishes it.
+Nothing is decided here, because a record of work with no work in it is not a record.
+
+The other way round is a different defect.
+Evidence filled and no row wants the row written, and never the work done again.

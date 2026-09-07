@@ -19,7 +19,7 @@ Every se run on this box fails, and it is the shell lookup, not the command.
 
 src/engine/tests.go:573 batteryShell asks exec.LookPath for "sh" then "bash" and returns the first hit, before it looks beside git. Windows 10 ships C:\Windows\System32\bash.exe, the WSL launcher, on PATH whether WSL is installed or not. So LookPath("bash") succeeds, run.go:180 runs it as name -c script, and WSL answers instead of a shell: exit 1, "This application requires the Windows Subsystem for Linux Optional Component", in UTF-16, which is why the output arrives NUL-separated. Git's own sh sits unused at Git\bin\sh.exe, which shellsBesideGit already knows how to find; the loop never reaches it.
 
-MEASURED. util/checks/mcp-tools passed every tool but the four se_run cases, each on this message. Reviewing wk-3747494a3c could run no git diff, no go build and no criterion command, so a reviewer on this box cannot read a diff at all.
+MEASURED. util/checks/mcp-tools passed every tool but the four se_run cases, each on this message. Reviewing wk-3747494a3c (another box) could run no git diff, no go build and no criterion command, so a reviewer on this box cannot read a diff at all.
 
 run.go:170 already says a command that silently does nothing is worse than one refused, and tests.go:565 records the last time this lookup answered wrongly. Same class, one machine on: a name that resolves is not a shell that runs.
 

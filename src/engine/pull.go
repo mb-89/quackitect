@@ -95,6 +95,16 @@ type Answer struct {
 	// is not asked to remember to mint anything.
 	Learned string `json:"learned,omitempty"`
 
+	// THE FILES THIS SUBMISSION WROTE THAT GIT CARRIES, for the hand that has
+	// to land them.
+	//
+	// A CLOSE WRITES TWO THINGS AND A HAND LANDS ONE. The note goes one way
+	// and the archive row the other, and the answer named neither, so a hand
+	// landed what it remembered and the branch read the token as still open.
+	// The engine writes all of them, so the engine is the one thing that knows
+	// the list. See thePathsAClose.
+	Paths []string `json:"paths,omitempty"`
+
 	// claimed says the queue wrote the claim on the token it is handing over,
 	// so the verb that answered can put it on the claims branch.
 	//
@@ -155,12 +165,13 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 	// agent hears about it, so it is carried onto whatever comes back rather
 	// than dropped with the settled payload.
 	learned, over := "", ""
+	var wrote []string
 	if p.ID != "" {
 		a, done := settle(r, actor, p)
 		if done {
 			return a
 		}
-		learned, over = a.Learned, a.Notice
+		learned, over, wrote = a.Learned, a.Notice, a.Paths
 		// A SUBMISSION AT A SHELL IS ONE THING ASKED FOR, AND ONE THING ANSWERED,
 		// AND THE QUEUE IS NOT READ AT ALL.
 		//
@@ -170,9 +181,10 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 		// would have handed on, with two snapshot commits behind them. That
 		// token's record then said it had been in a hand it was never in.
 		if p.settleOnly {
-			return Answer{Pull: AnswerSettled, Notice: p.ID + " is settled. The next token goes to a " +
-				"lane, because an agent that submits is asking for more. Ask for work again when " +
-				"you want it."}
+			return Answer{Pull: AnswerSettled, Paths: wrote,
+				Notice: p.ID + " is settled. The next token goes to a " +
+					"lane, because an agent that submits is asking for more. Ask for work again when " +
+					"you want it." + over}
 		}
 	}
 	// A HOLD ON YOUR OWN VERDICT IS NOT WORK IN HAND. The submission put the
@@ -192,8 +204,93 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 	// second writer this deletion also takes out.
 	a := whatComesNext(r, actor, role)
 	a.Learned = learned
+	a.Paths = wrote
 	a.Notice += over + down
 	return a
+}
+
+// THE LANE: THE BOX, AND THE SESSION ON IT.
+//
+// A verdict is never the author's, and the engine wrote the author's name down
+// and compared the name. A session that spawns a reviewer of its own answers
+// to a second name, so one session worked a token and the same session was
+// handed the verdict on it. An evaluator recognises its own output and favours
+// it, which is what reviewing rule 14 exists to stop.
+//
+// IT IS THE SESSION AND NOT THE BOX. Two sessions over one clone are two
+// evaluators: the standard process is driven that way in this package, and the
+// staffing spawns a reviewer beside the agent that works, so a guard on the box
+// alone would refuse every verdict one machine can give. The box is written
+// beside the session, because a session id from another machine is another
+// machine's.
+//
+// A LANE NOBODY CAN NAME IS NOT COMPARED. A tree nothing has started names no
+// session, and refusing on two empty strings would refuse every verdict there
+// is.
+
+// TheLaneHere is the box and the harness session pulling on it, and nothing
+// where the log names no session.
+func TheLaneHere(r Roots) string {
+	session := TheHarnessSession(r)
+	if !Named(session) {
+		return ""
+	}
+	return Box(r) + "/" + session
+}
+
+// TheLaneWorkedIt says whether the lane asking did the work step, whatever
+// name it is asking under.
+func TheLaneWorkedIt(r Roots, t Token) bool {
+	return t.WorkedIn != "" && t.WorkedIn == TheLaneHere(r)
+}
+
+// laneInWords is which box and which session worked a token, for a refusal
+// that has to name them. A lane is written box first, the way a claim is.
+func (t Token) laneInWords() string {
+	box, session, _ := strings.Cut(t.WorkedIn, "/")
+	return "box " + box + ", session " + session
+}
+
+// theVerdictIsNotYours answers why this actor may not rule on this token, or
+// nothing. The author's own name is asked first and the lane it worked in
+// after, because the lane is what a second name in one session does not change.
+func theVerdictIsNotYours(r Roots, t Token, actor string) *Rejection {
+	if t.Author != "" && t.Author == actor {
+		return &Rejection{Clause: "author",
+			Wrong:     "you did the work on " + t.ID + ", so the verdict is not yours",
+			Satisfies: "a verdict from another actor. Pull with role worker for work of your own"}
+	}
+	if TheLaneWorkedIt(r, t) {
+		return &Rejection{Clause: "author",
+			Wrong: "the work step on " + t.ID + " was done in this lane, " + t.laneInWords() +
+				", so the verdict is not yours whatever name you pull under",
+			Satisfies: "a verdict from another session, on this box or another. " +
+				"Pull with role worker for work of your own"}
+	}
+	return nil
+}
+
+// otherLaneNotice names what the queue passed over because this lane worked
+// it, so a reviewer told there is nothing knows there is something and whose
+// it is. A pull that hands work out says nothing about them: the notice
+// belongs to the answer that has nothing better to say.
+func otherLaneNotice(r Roots, role string, all []Token) string {
+	if role != RoleReviewer {
+		return ""
+	}
+	var said []string
+	for _, t := range all {
+		if t.Ended() || t.Holder != "" || !WorkableBy(r, t, RoleReviewer) || !TheLaneWorkedIt(r, t) {
+			continue
+		}
+		said = append(said, t.ID+", worked in "+t.laneInWords())
+	}
+	if len(said) == 0 {
+		return ""
+	}
+	return "\n\nPassed over, because this lane worked them and a verdict is never the worker's own:\n  " +
+		strings.Join(said, "\n  ") +
+		"\n\nThese go to another session, on this box or another. Say so, and wait."
 }
 
 // ownVerdictOffTheHand puts down every token this actor holds whose next step
@@ -203,8 +300,16 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 func ownVerdictOffTheHand(r Roots, actor, role string) (string, *Answer) {
 	var down []string
 	var own *Token
+	var saying *Rejection
 	for _, t := range Tokens(r) {
-		if t.Holder != actor || t.Ended() || t.Author != actor || roleAt(r, t) != RoleReviewer {
+		if t.Holder != actor || t.Ended() || roleAt(r, t) != RoleReviewer {
+			continue
+		}
+		// THE NAME FIRST, AND THE LANE AFTER. A session that spawns a reviewer
+		// of its own holds its own work under a second name, and the name is
+		// all this compared. See laneverdict.go.
+		why := theVerdictIsNotYours(r, t, actor)
+		if why == nil {
 			continue
 		}
 		t.Holder = ""
@@ -216,16 +321,16 @@ func ownVerdictOffTheHand(r Roots, actor, role string) (string, *Answer) {
 		down = append(down, t.ID)
 		if own == nil {
 			first := t
-			own = &first
+			own, saying = &first, why
 		}
 	}
 	if len(down) == 0 {
 		return "", nil
 	}
 	if role == RoleReviewer {
-		a := refuse(own, Rejection{Clause: "author",
-			Wrong:     "you did the work on " + own.ID + ", so the verdict is not yours. It is put back for a reviewer",
-			Satisfies: "a verdict from another actor. Pull with role worker for work of your own"})
+		a := refuse(own, Rejection{Clause: saying.Clause,
+			Wrong:     saying.Wrong + ". It is put back for whoever the verdict is",
+			Satisfies: saying.Satisfies})
 		return "", &a
 	}
 	return " Put back, because its next step is a verdict and the verdict is never the author's: " +
@@ -429,12 +534,17 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 	ends := true
 	if proc, err := LoadProcess(r.Method, t.Process); err == nil {
 		if a, found := proc.ActivityFrom(t.Status); found {
-			if a.Role == RoleReviewer && t.Author != "" && t.Author == actor {
-				return refuse(&t, Rejection{Clause: "author", Wrong: "you did the work on this token, so the verdict is not yours",
-					Satisfies: "a verdict from another actor"}), true
+			if a.Role == RoleReviewer {
+				if why := theVerdictIsNotYours(r, t, actor); why != nil {
+					return refuse(&t, *why), true
+				}
 			}
 			if a.Role != RoleReviewer {
 				t.Author = actor
+				// AND WHICH LANE DID IT, beside which name did it. Two names in
+				// one session are one evaluator, and a name is not what tells
+				// two evaluators apart. See laneverdict.go.
+				t.WorkedIn = TheLaneHere(r)
 			}
 			t.Status = a.To
 			ends = proc.Ends(a.To)
@@ -478,6 +588,9 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 	// CLOSING ENDS THE STRETCH, so the change is the diffs between began and
 	// ended, pair by pair.
 	t = closeStretch(r, t)
+	// AND WHAT A HAND HAS TO LAND IS READ BEFORE THE WRITE, because the write
+	// takes the note off the disk. See thePathsAClose.
+	wrote := thePathsAClose(r, t, ends)
 	if err := SaveToken(r, t); err != nil {
 		if !TheCloseStood(err) {
 			return refuse(&t, Rejection{Clause: "the record", Wrong: err.Error(),
@@ -486,9 +599,68 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 		// THE CLOSE STOOD, AND THE ANSWER SAYS WHAT IS LEFT OVER. Refusing here
 		// told the worker its submission had failed, under a clause naming a
 		// folder that was written and not the archive that was not.
-		return Answer{Notice: "\n\n" + err.Error()}, false
+		return Answer{Paths: wrote, Notice: "\n\n" + err.Error() + theLanding(wrote)}, false
 	}
-	return Answer{}, false
+	return Answer{Paths: wrote, Notice: theLanding(wrote)}, false
+}
+
+// thePathsAClose answers the files a submission writes that git carries, for
+// the hand that has to land them.
+//
+// A CLOSE WRITES TWO THINGS AND A HAND LANDS ONE. The note goes one way and
+// the archive row the other, and the answer named neither, so a hand landed
+// what it remembered and the branch read the token as still open.
+//
+// MEASURED, 2026-09-07, three times in one session, each time by the stop hook
+// rather than by anything the engine said.
+//
+// IT IS ASKED BEFORE THE WRITE, because a close archives the note and takes it
+// off the disk. Asked afterwards it answers nothing, which is the half
+// wk-bf10a262a0 carries.
+//
+// A PRIVATE NOTE TRAVELS NOWHERE. A token under .se/work answers nothing at
+// all, rather than a path no push would take.
+//
+// IT LIVES HERE RATHER THAN IN A FILE OF ITS OWN, because src/engine only
+// shrinks and this is where its one caller is.
+func thePathsAClose(r Roots, t Token, ends bool) []string {
+	at := noteAt(r, t.ID)
+	if at == "" {
+		return nil
+	}
+	if !strings.HasPrefix(filepath.ToSlash(at), filepath.ToSlash(TrackedDir(r))+"/") {
+		return nil
+	}
+	out := []string{fromTheRoot(r, at)}
+	// THE ROW IS WRITTEN ONLY WHERE THE TOKEN ENDS. A step that hands the token
+	// on writes the note and nothing beside it.
+	if ends {
+		out = append(out, fromTheRoot(r, ArchiveList(r)))
+	}
+	return out
+}
+
+// fromTheRoot is a path as the branch names it, which is how a land is given
+// one.
+func fromTheRoot(r Roots, at string) string {
+	rel, err := filepath.Rel(r.Work, at)
+	if err != nil {
+		return filepath.ToSlash(at)
+	}
+	return filepath.ToSlash(rel)
+}
+
+// theLanding is the sentence a hand acts on.
+//
+// A CLOSE THAT TOUCHED NOTHING GIT CARRIES SAYS NOTHING. A line on every
+// submission is noise, and noise is what teaches an agent to stop reading.
+func theLanding(paths []string) string {
+	if len(paths) == 0 {
+		return ""
+	}
+	all := strings.Join(paths, " ")
+	return "\n\nLAND EVERY PATH THIS CLOSE WROTE, rather than the one you remember: " +
+		all + "\n  sh util/git/land.sh \"<message>\" " + all
 }
 
 // A token cannot close without saying what became of it. Three values, and
@@ -875,7 +1047,7 @@ func next(r Roots, actor, role string) Answer {
 	all, behind, branch := offTheFetchedBranch(r, actor,
 		byBucketAffinity(r, actor, urgentFirst(blockingFirst(r, theQueueOffers(r, actor, Tokens(r))))))
 	a := nextAmong(r, actor, role, all)
-	a.Notice += behindNotice(branch, behind)
+	a.Notice += behindNotice(r, branch, behind)
 	a.Notice += theFilterNotice(r)
 	return a
 }
@@ -1011,7 +1183,8 @@ func nextAmong(r Roots, actor, role string, all []Token) Answer {
 			Notice: scopeNotice(r, scopes) + setBackNotice(setBack) + unwritableNotice(unwritable)}
 	}
 	return Answer{Pull: AnswerWait,
-		Notice: waitNotice(r, actor, held) + setBackNotice(setBack) + unwritableNotice(unwritable)}
+		Notice: waitNotice(r, actor, held) + setBackNotice(setBack) + unwritableNotice(unwritable) +
+			otherLaneNotice(r, role, all)}
 }
 
 // urgentFirst puts what a person marked urgent at the head of the list, and
@@ -1067,6 +1240,13 @@ func WouldHandOut(r Roots, t Token, actor, role string, archived map[string]bool
 	}
 	// NEVER THE AUTHOR. A verdict on your own work is not a verdict.
 	if role == RoleReviewer && t.Author == actor {
+		return false
+	}
+	// NOR THE LANE THAT WORKED IT, whatever name it asks under. A reviewer
+	// this session spawns is this session, so the staffing count asks the
+	// same question with no actor at all and gets the same answer: there is
+	// nothing here to spawn a reviewer of this lane for.
+	if role == RoleReviewer && TheLaneWorkedIt(r, t) {
 		return false
 	}
 	if Blocked(r, t) != "" || WaitsForAPerson(t) != "" {
@@ -1317,14 +1497,12 @@ func workNotice(t Token) string {
 // AskToStop refuses once when the actor holds work it could still do, and
 // names it, so a stop is a decision rather than a drift.
 //
-// UNBOUND TAKES THE QUEUE OFF, AND THIS IS THE QUEUE ARGUING.
-//
-// The queue did not choose this work and will not choose the next. So it has
-// no standing to hold a session over what that session is holding.
+// IT DOES NOT READ THE BINDING. It used to return at once on Unleashed, which
+// is Unbound or God. decideStop returns at the god rung and again at the
+// unbound rung, both above the checks this one is registered with, so the
+// branch could not be reached from anywhere. Two places deciding one rule is
+// what the rung was added to end. See decideStop in hook.go.
 func AskToStop(r Roots, actor string) Ruling {
-	if Unleashed(r) {
-		return Ruling{}
-	}
 	var mine []string
 	for _, t := range Tokens(r) {
 		if t.Ended() || t.Holder != actor {
