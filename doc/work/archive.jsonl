@@ -22,6 +22,7 @@
 {"id":"wk-1c1d4de234","title":"RUNME rewrites its arguments","process":"trivial","disposition":"done","on_branch":"344dd8b4ffd982e821e5253f284fe420b5b2c259","tag":"refs/tags/archive/wk-1c1d4de234"}
 {"id":"wk-1c3f3107db","title":"chapter thirteen lost seeds","process":"trivial","disposition":"done","on_branch":"3ad51c72e5399fdb23518c6093024f82379cb7b2","tag":"refs/tags/archive/wk-1c3f3107db"}
 {"id":"wk-1e7551f377","title":"engine-args lint red","process":"trivial","disposition":"done","on_branch":"1400555448245cb95f48724f8faba4a6bd12ae90","tag":"refs/tags/archive/wk-1e7551f377"}
+{"id":"wk-20f5fba187","title":"note misreports readable snapshot","process":"trivial","disposition":"done","blob":"dd7a54cb4baf84ce9e4f9affa810d9ec128455e4","on_branch":"b6d52a4e3af1c6510ea3ce9c19f92419eaebee22"}
 {"id":"wk-212909368a","title":"one build door","process":"standard","disposition":"done","on_branch":"37645a1d33c5e7e414ca62e78d5dac6bfefbf016","tag":"refs/tags/archive/wk-212909368a"}
 {"id":"wk-218e541ec2","title":"hooks the harness fires","process":"standard","disposition":"done","on_branch":"c2c236d54097b2a23ae764634fe44cb9b131971d","tag":"refs/tags/archive/wk-218e541ec2"}
 {"id":"wk-22bdfee267","title":"the log keeps End","process":"trivial","disposition":"done","on_branch":"ab62643636bad450d26c811b1b539ae73b6fa2d5","tag":"refs/tags/archive/wk-22bdfee267"}
