@@ -759,8 +759,9 @@ say("no handler threw", thrown.length === 0, thrown.join("\n      "));
     // MATCHED BY CLASS AND NOT BY ID, so a second copy of a shell control put
     // inside an instance is caught rather than slipping past on its id.
     const shellOwns = [".tab", ".second", ".seam"];
-    const instanceOwns = [".bs-bar", ".bs-make-bucket", ".bs-rename", ".bs-code-toggle",
-                          ".bs-pop", ".heads", ".top", ".pane", ".body", ".bs-pane-code"];
+    const instanceOwns = [".bs-bar", ".bs-make-bucket", ".bs-rename", ".bs-cut-branch",
+                          ".bs-code-toggle", ".bs-pop", ".heads", ".top", ".pane", ".body",
+                          ".bs-pane-code"];
     for (const sel of shellOwns) {
       const all = [...d.querySelectorAll(sel)];
       say("the shell owns " + sel + ", and it is drawn", all.length > 0,

@@ -60,11 +60,11 @@ AN EMPTY GROUP DRAWS NO BUTTON, the way rename draws none with nothing selected.
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | the change follows the approach on the token, or the token says why it departed |  |  |
-| [ ] | se test --on this token answered ok, and what it ran is named |  |  |
-| [ ] | the note says what changed and why, for a reader who was not here |  |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | The criteria were on the token before any code. |  |
+| [x] | the change follows the approach on the token, or the token says why it departed | A second verb beside the first. It cuts off trunk, pushes, and this tree does not move. |  |
+| [x] | se test --on this token answered ok, and what it ran is named | drive-editor draws .bs-cut-branch, one per instance and none outside one. Its one other failure is older than this change and its count did not move. |  |
+| [x] | the note says what changed and why, for a reader who was not here | The verb is in branchcarriesthegroup.go, the flag in main.go, the button in editor.ts, and the wiring in extension.ts. |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | The bundle VS Code runs was two days stale. A check now says so, and wk-ea5cb1ff40 makes the engine rebuild it. |  |
 
 ## evidence: step 3. verdict
 
