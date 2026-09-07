@@ -80,6 +80,7 @@
 {"id":"wk-7de39c5751","title":"mint carries field comments","process":"trivial","disposition":"done","on_branch":"7931183c3cf783036817fe1b823c8d2edc916b76","tag":"refs/tags/archive/wk-7de39c5751"}
 {"id":"wk-7ecc51b3f3","title":"four tests pass eight","process":"trivial","disposition":"done","blob":"a91344c581aa2fd78a4ff92f0bd0d8ba817ecabb","on_branch":"4a929f36b51fac299f4f734c7b294696cb0cbb10"}
 {"id":"wk-840c81485d","title":"Battery cannot find sh","process":"trivial","disposition":"done","on_branch":"68cdd51a1ef9c734070b16429d8a9461e8675bc0","tag":"refs/tags/archive/wk-840c81485d"}
+{"id":"wk-86873d5a30","title":"battery judges the disk","process":"trivial","disposition":"done","blob":"a40e5be60810e8878d71be6b97a39bad1c3da092","on_branch":"4311f1a1a2e9b3fa9d20afbf04d47a7d62349cd6"}
 {"id":"wk-86a1c09e11","title":"guard misses field writes","process":"trivial","disposition":"done","on_branch":"1a302f1f6f1379b9e88f3e36ab6b8d115e5770dd","tag":"refs/tags/archive/wk-86a1c09e11"}
 {"id":"wk-86d96eaf0f","title":"scratch trivial probe","process":"trivial","disposition":"dropped","on_branch":"8098f32fb091e81f32cc4634059c461496f480fd","tag":"refs/tags/archive/wk-86d96eaf0f"}
 {"id":"wk-887e9a126a","title":"the engine archives","process":"standard","disposition":"done","on_branch":"77714ae645434f32af214a329595cf5f4ea79543","tag":"refs/tags/archive/wk-887e9a126a"}
