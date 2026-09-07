@@ -15,8 +15,16 @@
 // THE PROGRAM NAMES COME FROM THE GUARD RATHER THAN FROM HERE. A second list
 // kept by hand drifts from the first one, and a check reading a list that has
 // moved on reports on a rule nobody enforces. The lists are read out of
-// src/engine/search.go and src/engine/tests.go, and a list that will not read
-// is a failure rather than an empty set.
+// src/engine/search.go, src/engine/tests.go and src/engine/removal.go, and a
+// list that will not read is a failure rather than an empty set.
+//
+// THE RULE COMES FROM THE GUARD TOO, and not only the lists. Which words of a
+// search name a path was written here by hand as "everything that is not a
+// flag", where the guard's own pathsAmong drops the first bare word because
+// that word is the pattern. So grep -c engine-args behind a pipe read as a
+// search of the tree over a path called engine-args, and three criteria the
+// guards do run were reported as criteria nobody could decide. Measured: git
+// ls-files util/checks | grep -c engine-args goes through se run and answers 2.
 //
 // A CLOSED NOTE IS HISTORY. Its criteria were decided while its lane was open,
 // under whatever the guards were then, and rewriting them rewrites the record.
@@ -25,7 +33,8 @@
 //
 //   node util/checks/criteria-name-a-runnable-command.mjs <root>
 //
-// reads: doc/work/*.md, src/engine/search.go, src/engine/tests.go
+// reads: doc/work/*.md, src/engine/search.go, src/engine/tests.go,
+//        src/engine/removal.go
 import { readFileSync, readdirSync, existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
@@ -60,6 +69,7 @@ const namesIn = (text, pattern, what) => {
 
 const search = guardSource("src/engine/search.go");
 const tests = guardSource("src/engine/tests.go");
+const removal = guardSource("src/engine/removal.go");
 
 // The index guard's searchers, from searcherName's case line.
 const searchers = namesIn(search, /func searcherName[\s\S]*?case ("[^\n]*)/, "the searchers the index guard refuses");
@@ -67,6 +77,8 @@ const searchers = namesIn(search, /func searcherName[\s\S]*?case ("[^\n]*)/, "th
 const older = namesIn(search, /func olderSearcher[\s\S]*?return name ==[^\n]*/, "the searchers the recursive guard refuses");
 // The programs that run a file they are handed, from interprets's case lines.
 const interpreters = namesIn(tests, /func interprets[\s\S]*?case ("[\s\S]*?):\n/, "the programs that run a file they are handed");
+// The flags a searcher takes a value after, from searcherFlags.
+const valueFlags = namesIn(removal, /var searcherFlags = \[\]string\{[\s\S]*?\n\}/, "the searcher flags whose value is the next word");
 const checksDir = "util/checks";
 
 // pipeline cuts a command into the programs it runs, on the shell's separators,
@@ -135,7 +147,35 @@ const readsATree = (args) => {
   return saw;
 };
 
-const aPath = (w) => w !== "" && !w.startsWith("-");
+// aRedirection says whether this word is the shell redirecting rather than a
+// path handed to the program, and theArrowStandsAlone whether its file is the
+// next word. Both are the guard's, in its own words.
+const aRedirection = (w) => /^[0-9&]*[<>]/.test(w);
+const theArrowStandsAlone = (w) =>
+  w.replace(/^[0-9&]*/, "").replace(/^[<>]+/, "").replace(/[<>]+$/, "") === "";
+
+// pathsAmong answers the words that name a path, the way the guard answers it:
+// everything that is not a redirection, not a flag, not a flag's value, and not
+// the pattern, which is the first bare word.
+const pathsAmong = (args) => {
+  const out = [];
+  let pattern = false;
+  for (let i = 0; i < args.length; i++) {
+    const a = args[i];
+    if (a === "--") { out.push(...args.slice(i + 1)); break; }
+    if (aRedirection(a)) { if (theArrowStandsAlone(a)) i++; continue; }
+    if (a.startsWith("-")) {
+      if (valueFlags.has(a)) {
+        i++;
+        if (a === "-e" || a === "--regexp") pattern = true;
+      }
+      continue;
+    }
+    if (!pattern) { pattern = true; continue; }
+    out.push(a);
+  }
+  return out;
+};
 
 // whyRefused answers which guard refuses this command, or nothing.
 function whyRefused(command) {
@@ -164,7 +204,7 @@ function whyRefused(command) {
     }
 
     if (searchers.has(name)) {
-      const paths = w.slice(1).filter(aPath);
+      const paths = pathsAmong(w.slice(1));
       const grepLike = name.startsWith("grep") || older.has(name);
       const readsItsInput = paths.length === 0 && (i > 0 || grepLike);
       if (!readsItsInput && (paths.length === 0 || paths.some(inside))) {
