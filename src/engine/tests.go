@@ -1046,10 +1046,38 @@ func interprets(name string) bool {
 	return false
 }
 
-// namesAFile says whether this word is a path under the checks folder, which
-// is a check being run as the program.
+// aCheckToRun says whether this path is one the battery runs. The battery's
+// checks are the .mjs under that folder, which is the rule discoverTests
+// registers them by, and the battery and the benchmark are the .sh beside them.
+//
+// A MEASURING SCRIPT IS NOT A CHECK. count-standing.py and count-voice-breaks.py
+// sit in the same folder and the battery runs neither. checks-live-in-the-method
+// reads the battery's own list and counts only the .mjs, so a .py was already
+// outside that rule everywhere except here.
+//
+// MEASURED. Each script carries in its docstring the command that runs it, and
+// this guard refused that command: python util/checks/count-voice-breaks.py
+// doc/glossary.md answered THE ENGINE OWNS THE TESTS. The engine could not run
+// it either, because it registers only the .mjs. So a script written to be run
+// by hand could not be run from the tree at all, and the measurement it exists
+// for was taken with a copy made outside it. count-voice-breaks.py says as much
+// in its own words, where it explains why it reads the voice rules through an
+// environment variable.
+func aCheckToRun(path string) bool {
+	p := filepath.ToSlash(strings.Trim(path, "'\""))
+	if !strings.Contains(p, checksDir+"/") {
+		return false
+	}
+	switch strings.ToLower(filepath.Ext(p)) {
+	case ".mjs", ".sh":
+		return true
+	}
+	return false
+}
+
+// namesAFile says whether this word is a check being run as the program.
 func namesAFile(word string) bool {
-	return strings.Contains(filepath.ToSlash(strings.Trim(word, "'\"")), checksDir+"/")
+	return aCheckToRun(word)
 }
 
 // theFileAnInterpreterRuns answers the check this interpreter is about to run,
@@ -1074,7 +1102,7 @@ func theFileAnInterpreterRuns(words []string) string {
 		if w == "" || strings.HasPrefix(w, "-") {
 			continue // a flag to the interpreter, and not the file it runs
 		}
-		if strings.Contains(filepath.ToSlash(w), checksDir+"/") {
+		if aCheckToRun(w) {
 			return w
 		}
 		if interprets(strings.ToLower(strings.TrimSuffix(filepath.Base(w), ".exe"))) {
