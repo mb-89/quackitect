@@ -251,11 +251,11 @@ func TestADeskStopsWithNotesInHand(t *testing.T) {
 // test reads the same file the product does.
 func aHostTable(t *testing.T, r Roots) {
 	t.Helper()
-	dir := filepath.Join(r.Method, "util", "cage")
+	dir := filepath.Join(r.Method, "src", "cage")
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	b, err := os.ReadFile(filepath.Join("..", "..", "util", "cage", "hosts.json"))
+	b, err := os.ReadFile(filepath.Join("..", "..", "src", "cage", "hosts.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

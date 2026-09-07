@@ -120,8 +120,8 @@ say("every inline element drawn with a size on it has a rule (" + [...sized.keys
 //
 // A CELL'S CLASS IS ITS COLUMN'S FIELD NAME, so the declaration decides these
 // as much as the source does. That is why the tree comes from
-// util/parameters.json rather than from a shape written here.
-const tree = JSON.parse(readFileSync(join(root, "util", "parameters.json"), "utf8"));
+// src/config/parameters.json rather than from a shape written here.
+const tree = JSON.parse(readFileSync(join(root, "src", "config", "parameters.json"), "utf8"));
 const shown = everyGroup(tree).map((g) => g.key);
 
 // AN ANSWER WITH SOMETHING IN IT. An empty table draws no cell, and a hold that

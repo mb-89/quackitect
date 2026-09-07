@@ -24,7 +24,7 @@ func TestNoCagedFileNamesTheMachineItWasWrittenOn(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if _, err := os.Stat(filepath.Join(root, "util", "projections.json")); err != nil {
+	if _, err := os.Stat(filepath.Join(root, "src", "config", "projections.json")); err != nil {
 		t.Skip("this test reads the product's own list, and it is not here")
 	}
 
@@ -98,7 +98,7 @@ func TestNoCommittedProjectionNamesTheMachine(t *testing.T) {
 // it could not fail for the defect it exists to catch. On Linux the two are one
 // string, which is why it passed there.
 //
-// WATCHED: with util/cage/mcp.json holding this machine's path in full, written
+// WATCHED: with src/cage/mcp.json holding this machine's path in full, written
 // with forward slashes exactly as a projection writes one, the check was green.
 func namesTheMachine(text, root string) string {
 	for _, spelling := range []string{root, filepath.ToSlash(root)} {
@@ -120,7 +120,7 @@ func namesTheMachine(text, root string) string {
 // prompt, which no hook can repair, because the harness spawns the tool lane
 // before any hook runs.
 //
-// EVERY ONE OF THEM GOES THROUGH A FILE GIT CARRIES, under util/cage, which
+// EVERY ONE OF THEM GOES THROUGH A FILE GIT CARRIES, under src/cage, which
 // builds what is missing and hands over.
 //
 // IT IS ABOUT THE CONFIGS AND NOT ABOUT THE SCRIPTS. A JSON config cannot look

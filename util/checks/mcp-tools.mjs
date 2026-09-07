@@ -93,14 +93,14 @@ const declared = declaredTools.map((t) => t.name);
 say("the lane declares its tools", declared.length > 0,
   "tools/list answered nothing, so this check guards nothing");
 
-// AND THE SNAPSHOT THE COLD DOOR ANSWERS FROM IS THIS LIST. util/cage/mcp-lane.mjs
-// answers tools/list off util/cage/tools.json before the lane is built, so a
+// AND THE SNAPSHOT THE COLD DOOR ANSWERS FROM IS THIS LIST. src/cage/mcp-lane.mjs
+// answers tools/list off src/cage/tools.json before the lane is built, so a
 // lane whose tools moved without the file is a cold session shown the old door.
 {
   let snapshot = null;
-  try { snapshot = JSON.parse(readFileSync(join(root, "util", "cage", "tools.json"), "utf8")).tools; } catch { /* said below */ }
-  say("util/cage/tools.json is the lane's own list", JSON.stringify(snapshot) === JSON.stringify(declaredTools),
-    "it differs from what tools/list answers. Rewrite it: .bin/se-mcp --tools > util/cage/tools.json");
+  try { snapshot = JSON.parse(readFileSync(join(root, "src", "cage", "tools.json"), "utf8")).tools; } catch { /* said below */ }
+  say("src/cage/tools.json is the lane's own list", JSON.stringify(snapshot) === JSON.stringify(declaredTools),
+    "it differs from what tools/list answers. Rewrite it: .bin/se-mcp --tools > src/cage/tools.json");
 }
 
 // EVERY CALL A REAL AGENT MAKES. Each one is the shape the tool's own schema

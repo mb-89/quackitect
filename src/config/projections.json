@@ -17,13 +17,13 @@
       },
       "section": "Actionables",
       "sources_from": "doc/guidance",
-      "preamble": "util/cage/first-turn.md"
+      "preamble": "src/cage/first-turn.md"
     },
     {
       "name": "claude cage",
       "target": ".claude/settings.json",
       "sources": [
-        "util/cage/claude-settings.json"
+        "src/cage/claude-settings.json"
       ],
       "wrap": "none"
     },
@@ -31,7 +31,7 @@
       "name": "claude door",
       "target": ".claude/settings.local.json",
       "sources": [
-        "util/cage/claude-settings-local.json"
+        "src/cage/claude-settings-local.json"
       ],
       "wrap": "none",
       "local": true
@@ -40,7 +40,7 @@
       "name": "copilot cage",
       "target": ".copilot/mcp-config.json",
       "sources": [
-        "util/cage/copilot-mcp.json"
+        "src/cage/copilot-mcp.json"
       ],
       "wrap": "none"
     },
@@ -48,7 +48,7 @@
       "name": "claude tool lane",
       "target": ".mcp.json",
       "sources": [
-        "util/cage/mcp.json"
+        "src/cage/mcp.json"
       ],
       "wrap": "none"
     },
@@ -56,7 +56,7 @@
       "name": "the wake",
       "target": ".claude/hooks/session-start.sh",
       "sources": [
-        "util/cage/session-start.sh"
+        "src/cage/session-start.sh"
       ],
       "wrap": "none"
     }

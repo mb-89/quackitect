@@ -27,7 +27,7 @@ func TestTheMarksComeFromTheTable(t *testing.T) {
 	dir := t.TempDir()
 	os.MkdirAll(filepath.Join(dir, "util"), 0o755)
 	os.MkdirAll(filepath.Join(dir, ".se", "log"), 0o755)
-	os.WriteFile(filepath.Join(dir, "util", "icons.json"), []byte(
+	os.WriteFile(filepath.Join(dir, "src", "config", "icons.json"), []byte(
 		`{"$comment":"the fixture's own","ok":{"glyph":"Y"},"refused":{"glyph":"N"}}`), 0o644)
 	log := filepath.Join(dir, ".se", "log", "session.jsonl")
 	os.WriteFile(log, []byte("{}\n"), 0o644)

@@ -17,13 +17,13 @@ import (
 // This did not go through the voice.
 //
 // It had not. The voice checker runs on the files a writer writes, and
-// util/parameters.json is data, so every tooltip in the panel was written by
+// src/config/parameters.json is data, so every tooltip in the panel was written by
 // whoever added the control and read by nobody. They came out in the engine's
 // own nouns — a pull, a hold, a clamp — for a reader who has none of them, and
 // the panel is the one surface a person meets before they know any of it.
 //
 // SO THE CHECKER IS POINTED AT THEM, and it is the SAME checker: the rules are
-// data in util/voice-rules.json and this reads that file, rather than a second
+// data in src/config/voice-rules.json and this reads that file, rather than a second
 // copy of the rules written in whatever language the panel is drawn in.
 func TestEveryParameterSaysItselfInProse(t *testing.T) {
 	t.Parallel()

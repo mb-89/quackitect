@@ -13,7 +13,7 @@ import (
 // ONE TREE.
 //
 // Everything that changes how the system runs is declared in
-// util/parameters.json: what it is called, what type it is, what it defaults
+// src/config/parameters.json: what it is called, what type it is, what it defaults
 // to, and which way it may be narrowed. The panel is a subtree of the same
 // tree, chosen by a flag on a group.
 //
@@ -214,7 +214,7 @@ func LoadTree(methodRoot string) (Node, error) {
 	}
 	var root Node
 	if err := json.Unmarshal(b, &root); err != nil {
-		return Node{}, fmt.Errorf("util/parameters.json is not readable: %w", err)
+		return Node{}, fmt.Errorf("src/config/parameters.json is not readable: %w", err)
 	}
 	// A CONTROL NAMES AN ICON AND NEVER CARRIES ONE. The table decides what the
 	// name looks like, so the same mark is the same mark everywhere and one

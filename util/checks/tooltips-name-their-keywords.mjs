@@ -41,7 +41,7 @@ const refuse = (why) => { console.error(why); process.exit(1); };
 // not a thing this file works out for itself.
 //
 // AND THE EXTENSION HAS TO ASK THE SAME WAY. Measured on 2026-09-06: this check
-// asked the engine while the extension read util/parameters.json off disk. The
+// asked the engine while the extension read src/config/parameters.json off disk. The
 // lines were derived, drawn in a test, and absent from the window a person was
 // looking at. A member below holds the two together, so a panel fed the raw
 // declaration fails here rather than in front of somebody.
@@ -87,7 +87,7 @@ if (clash.length === 0) ok(`the ${claimed.size} name(s) are one control each`);
 else no("these names are claimed twice, and the later one wins in silence: " + clash.join(", "));
 
 // NOBODY WRITES A LINE INTO THE DECLARATION. One fact, one place.
-const declared = readFileSync(join(root, "util", "parameters.json"), "utf8");
+const declared = readFileSync(join(root, "src", "config", "parameters.json"), "utf8");
 const copies = [];
 if (/"keywords?"\s*:/.test(declared)) copies.push("a declared keyword field");
 if (/KEYWORD:/.test(declared)) copies.push("a title spelling out a message");

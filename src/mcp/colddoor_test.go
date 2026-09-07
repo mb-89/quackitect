@@ -12,7 +12,7 @@ import (
 
 // THE COLD DOOR IS THE LANE, TOOL FOR TOOL.
 //
-// util/cage/mcp-lane.mjs answers tools/list off util/cage/tools.json before this
+// src/cage/mcp-lane.mjs answers tools/list off src/cage/tools.json before this
 // program is built, so that file is the door a cold session is shown. It is
 // generated from the lane, and generated is another word for drifts: changing
 // the lane and rewriting the file are two acts, and only the first is compiled.
@@ -39,20 +39,20 @@ func TestTheColdDoorIsTheLane(t *testing.T) {
 		got, offered := cold[name]
 		if !offered {
 			t.Errorf("the cold door offers no %s at all. Rewrite it: "+
-				".bin/se-mcp --tools > util/cage/tools.json", name)
+				".bin/se-mcp --tools > src/cage/tools.json", name)
 			continue
 		}
 		if cmp.Diff(want, got) == "" {
 			continue
 		}
 		t.Errorf("the cold door and the lane differ on %s: %s. Rewrite it: "+
-			".bin/se-mcp --tools > util/cage/tools.json", name, howTheyDiffer(want, got))
+			".bin/se-mcp --tools > src/cage/tools.json", name, howTheyDiffer(want, got))
 	}
 	for name := range cold {
 		if _, built := warm[name]; !built {
 			t.Errorf("the cold door offers %s and the lane builds no such tool, so a cold "+
 				"session is shown a door that closes when the engine warms up. Rewrite it: "+
-				".bin/se-mcp --tools > util/cage/tools.json", name)
+				".bin/se-mcp --tools > src/cage/tools.json", name)
 		}
 	}
 
@@ -79,7 +79,7 @@ func TestTheColdDoorIsTheLane(t *testing.T) {
 // coldDoor is the tool list a cold session is shown, read off the file.
 func coldDoor(t *testing.T) []map[string]any {
 	t.Helper()
-	path := filepath.Join("..", "..", "util", "cage", "tools.json")
+	path := filepath.Join("..", "..", "src", "cage", "tools.json")
 	b, err := os.ReadFile(path)
 	if err != nil {
 		t.Fatalf("%s cannot be read, so this guards nothing: %v", path, err)

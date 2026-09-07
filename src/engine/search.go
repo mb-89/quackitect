@@ -39,7 +39,7 @@ func TheSearcher(r Roots, session string) (Tool, bool) {
 }
 
 // What the candidate list says a searching tool is for. It is the one string
-// that ties this rule to the probe, and it lives in util/tools.json.
+// that ties this rule to the probe, and it lives in src/config/tools.json.
 const searchingFor = "searching file contents"
 
 // ARecursiveSearch answers whether this command searches a tree with a tool the

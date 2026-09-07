@@ -1,6 +1,6 @@
 // NOTHING BUT THE TABLE CARRIES A GLYPH.
 //
-// A control, a heading or a button names an icon, and util/icons.json decides
+// A control, a heading or a button names an icon, and src/config/icons.json decides
 // what that name looks like. A glyph written into the source is a second copy
 // of that decision, and it goes wrong the moment somebody edits the table: the
 // table drew one arrow and a click drew the other.
@@ -24,7 +24,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.argv[2] ?? ".";
-const icons = JSON.parse(readFileSync(join(root, "util/icons.json"), "utf8"));
+const icons = JSON.parse(readFileSync(join(root, "src/config/icons.json"), "utf8"));
 
 // WHERE A MARK IS DRAWN. Anything else may hold a character above U+007F for
 // its own reasons: extension.ts splits on a middle dot as data, and refusing

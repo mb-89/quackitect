@@ -74,7 +74,7 @@ func TestABatteryAnswersStepByStep(t *testing.T) {
 // If the agent wants only a few files and you want the whole battery, then the
 // few files win.
 //
-// MEASURED that month. One number added to util/parameters.json ran 228 seconds
+// MEASURED that month. One number added to src/config/parameters.json ran 228 seconds
 // of battery over a change of five lines, and handed the token eight reds, six
 // of them no hand on that box had caused.
 func TestATriggerOwesTheBatteryRatherThanForcingIt(t *testing.T) {
@@ -83,10 +83,10 @@ func TestATriggerOwesTheBatteryRatherThanForcingIt(t *testing.T) {
 
 	// A TRIGGER BESIDE A CHANGE THE MAP CAN SEE. The parameters file is one of
 	// the triggers, and lib.go reaches TestA.
-	if err := os.MkdirAll(filepath.Join(dir, "util"), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Join(dir, "src", "config"), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.WriteFile(filepath.Join(dir, "util", "parameters.json"), []byte("{}\n"), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "src", "config", "parameters.json"), []byte("{}\n"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 	changeA(t, dir)
@@ -98,7 +98,7 @@ func TestATriggerOwesTheBatteryRatherThanForcingIt(t *testing.T) {
 	if got.Whole {
 		t.Errorf("a trigger forced the whole battery over a selection of %d: %s", len(got.Chosen), got.WhyWhole)
 	}
-	if !strings.Contains(got.Owes, "util/parameters.json") {
+	if !strings.Contains(got.Owes, "src/config/parameters.json") {
 		t.Errorf("the battery is owed and the answer does not say so: %q", got.Owes)
 	}
 	if len(got.Chosen) == 0 {

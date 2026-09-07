@@ -6,10 +6,10 @@
 // property names in editor.ts that copied the engine's refusals, and one column
 // width written into panel.ts's stylesheet by the column's name. A property the
 // engine renames leaves the copy offering an edit the engine refuses, and the
-// width is decided in a place util/parameters.json does not say.
+// width is decided in a place src/config/parameters.json does not say.
 //
 // THE SETS ARE ASKED FOR, NOT LISTED. The property names come off the engine's
-// own answer, and the declared columns off util/parameters.json, so a name
+// own answer, and the declared columns off src/config/parameters.json, so a name
 // added tomorrow is asked the same question. The two renderers are then handed
 // two answers each and held to the answer they were given, the shape
 // panel-draws-the-register.mjs already uses: what one answer locks or widens
@@ -74,12 +74,12 @@ for (const file of ["editor.ts", "extension.ts"]) {
 }
 
 // TWO: NO DECLARED COLUMN HAS A RULE OF ITS OWN IN THE PANEL'S STYLESHEET.
-const declared = JSON.parse(readFileSync(join(root, "util", "parameters.json"), "utf8"));
+const declared = JSON.parse(readFileSync(join(root, "src", "config", "parameters.json"), "utf8"));
 const tables = [];
 const walk = (n) => { if (n.type === "table") tables.push(n); (n.children ?? []).forEach(walk); };
 walk(declared);
 const fields = tables.flatMap((t) => (t.columns ?? []).map((c) => c.field));
-if (fields.length === 0) refuse("util/parameters.json declares no table column, so this check guards nothing");
+if (fields.length === 0) refuse("src/config/parameters.json declares no table column, so this check guards nothing");
 const panelSource = readFileSync(join(here, "panel.ts"), "utf8");
 const ruled = fields.filter((f) => new RegExp("\\b(?:th|td)\\." + literal(f) + "(?![\\w-])").test(panelSource));
 if (ruled.length === 0) ok("panel.ts carries no rule for a declared column");

@@ -1,6 +1,6 @@
 // THE PANEL IS A SUBTREE OF THE PARAMETER TREE.
 //
-// util/parameters.json declares everything that changes how the system runs.
+// src/config/parameters.json declares everything that changes how the system runs.
 // A group marked shown becomes a section here. This file turns that subtree
 // into the view, the same way every time. Nobody has to be told how to build
 // a panel: they mark a group.
@@ -76,7 +76,7 @@ const COLUMNS = 5;
 // THE ICONS ARE PASSED IN, LIKE EVERY OTHER MARK ON THIS PAGE.
 //
 // The gear was written into this file as &#9881;, which is a second copy of a
-// decision util/icons.json owns, and invisible twice over: not in the table, so
+// decision src/config/icons.json owns, and invisible twice over: not in the table, so
 // no check that read the table could see it, and written as a reference rather
 // than as the character.
 // WHAT EACH ACTOR IS DOING, AS THE ENGINE ANSWERED IT.
@@ -711,7 +711,7 @@ function tableBody(n: Node, doing: Happening): string {
 // The strip and the live tables are the only parts of this panel that follow the
 // engine rather than the declaration, so they are the only parts that travel on
 // the beat. Everything else is the SHAPE of the page, and the shape changes only
-// when util/parameters.json does.
+// when src/config/parameters.json does.
 export function livePieces(root: Node, shown: string[], doing: Happening):
     { head: string; tables: Record<string, string>; counts: Record<string, string> } {
   const tables: Record<string, string> = {};

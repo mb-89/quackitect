@@ -60,15 +60,15 @@ func TestTheWorkFolderOwnsItsIcons(t *testing.T) {
 	method, work := t.TempDir(), t.TempDir()
 	r := Roots{Method: method, Work: work}
 
-	os.MkdirAll(filepath.Join(method, "util"), 0o755)
-	os.WriteFile(filepath.Join(method, "util", "icons.json"),
+	os.MkdirAll(filepath.Join(method, "src", "config"), 0o755)
+	os.WriteFile(filepath.Join(method, "src", "config", "icons.json"),
 		[]byte(`{"power":{"glyph":"M"}}`), 0o644)
 	if icons, err := Icons(r); err != nil || icons["power"].Glyph != "M" {
 		t.Fatalf("with no copy it read %v %v", icons, err)
 	}
 
-	os.MkdirAll(filepath.Join(work, "util"), 0o755)
-	os.WriteFile(filepath.Join(work, "util", "icons.json"),
+	os.MkdirAll(filepath.Join(work, "src", "config"), 0o755)
+	os.WriteFile(filepath.Join(work, "src", "config", "icons.json"),
 		[]byte(`{"power":{"glyph":"W"}}`), 0o644)
 	icons, err := Icons(r)
 	if err != nil {

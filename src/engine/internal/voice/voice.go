@@ -15,7 +15,7 @@ import (
 // here, because a refusal that cannot be reproduced is an obstacle and not a
 // rule.
 //
-// THE RULES ARE DATA, in util/voice-rules.json, and they are meant to be
+// THE RULES ARE DATA, in src/config/voice-rules.json, and they are meant to be
 // swapped. A standard that restricts who may use its word list can be dropped
 // in as a rules file without touching this program, and the default that
 // ships is written here rather than copied from anywhere.
@@ -68,7 +68,7 @@ func Load(at string) (Rules, error) {
 		return v, err
 	}
 	if err := json.Unmarshal(b, &v); err != nil {
-		return v, fmt.Errorf("util/voice-rules.json is not readable: %w", err)
+		return v, fmt.Errorf("src/config/voice-rules.json is not readable: %w", err)
 	}
 	for _, r := range v.Rules {
 		re, err := regexp.Compile(r.Pattern)
@@ -81,7 +81,7 @@ func Load(at string) (Rules, error) {
 	// without a word. The unreadable case is loud already, so the empty one
 	// refuses the same way rather than passing quietly.
 	if len(v.compiled) == 0 {
-		return v, fmt.Errorf("util/voice-rules.json names no rules, so the check would pass everything. " +
+		return v, fmt.Errorf("src/config/voice-rules.json names no rules, so the check would pass everything. " +
 			"Name at least one rule, or remove the file to turn the check off loudly")
 	}
 	if v.Limits.SentenceWords <= 0 {

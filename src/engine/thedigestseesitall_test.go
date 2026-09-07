@@ -26,7 +26,7 @@ func aTreeToProject(t *testing.T) Roots {
 // from nothing else.
 func TestTheDigestSeesTheParameterTree(t *testing.T) {
 	r := aTreeToProject(t)
-	tree := filepath.Join(r.Method, "util", "parameters.json")
+	tree := filepath.Join(r.Method, "src", "config", "parameters.json")
 	before, err := GuidanceDigest(r.Method)
 	if err != nil {
 		t.Fatalf("the digest could not be read: %v", err)

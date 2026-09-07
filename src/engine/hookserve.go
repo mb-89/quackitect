@@ -55,7 +55,7 @@ const hookTimeoutSeconds = 3
 // 30268, and whichever box committed last pushed its own. A value that must
 // tell two folders apart on one machine cannot also be the same on two
 // machines, because two clones of one commit are the same tree. So the cage is
-// two files, and only the door moves. See util/cage/claude-settings.json.
+// two files, and only the door moves. See src/cage/claude-settings.json.
 //
 // v3 had no such number because every hook there was a command, computing the
 // door at runtime. The HTTP door is what removed a process per tool call, and

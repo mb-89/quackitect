@@ -254,7 +254,7 @@ func main() {
 		return
 	}
 
-	// WHERE THIS BOX IS, off util/cage/hosts.json. See host.go.
+	// WHERE THIS BOX IS, off src/cage/hosts.json. See host.go.
 	if *hostFlag {
 		answerJSON(TheHost(roots.Method))
 		return

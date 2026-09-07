@@ -10,13 +10,13 @@ import (
 // withTheParameters gives a fixture the declaration the filter is read through.
 //
 // WITHOUT IT THE QUEUE IS NARROWED BY NOTHING. theFilterInForce returns early
-// when LoadValues fails, so a tree with no util/parameters.json derives no
+// when LoadValues fails, so a tree with no src/config/parameters.json derives no
 // expression from its branch and hands out every bucket. That is the product's
 // deliberate answer and it is written down in the function, but it means a
 // fixture that forgets this file proves the opposite of what it says it proves.
 func withTheParameters(t *testing.T, r Roots) {
 	t.Helper()
-	to := filepath.Join(r.Method, "util")
+	to := filepath.Join(r.Method, "src", "config")
 	if err := os.MkdirAll(to, 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -25,7 +25,7 @@ func withTheParameters(t *testing.T, r Roots) {
 	// by nothing. The blast radius of a missing icons file is a group box handed
 	// every bucket, which is the one thing its branch says not to do.
 	for _, name := range []string{"parameters.json", "icons.json"} {
-		raw, err := os.ReadFile(filepath.Join("..", "..", "util", name))
+		raw, err := os.ReadFile(filepath.Join("..", "..", "src", "config", name))
 		if err != nil {
 			t.Fatal(err)
 		}

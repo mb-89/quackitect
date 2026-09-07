@@ -60,7 +60,7 @@ func TestTheBatteryRunsNoGoToolTheLintAlreadyRuns(t *testing.T) {
 func aTreeTheLintFindsNothingIn(t *testing.T) Roots {
 	t.Helper()
 	r := aTreeWithTheProcesses(t)
-	if err := os.MkdirAll(filepath.Join(r.Method, "util"), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Join(r.Method, "src", "config"), 0o755); err != nil {
 		t.Fatal(err)
 	}
 	for _, name := range []string{"icons.json", "parameters.json"} {
@@ -68,7 +68,7 @@ func aTreeTheLintFindsNothingIn(t *testing.T) Roots {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if err := os.WriteFile(filepath.Join(r.Method, "util", name), b, 0o644); err != nil {
+		if err := os.WriteFile(filepath.Join(r.Method, "src", "config", name), b, 0o644); err != nil {
 			t.Fatal(err)
 		}
 	}

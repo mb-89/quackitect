@@ -210,7 +210,7 @@ func (c aCommand) file() string {
 	b.WriteString("---\n")
 	b.WriteString("description: \"" + generatedMark +
 		" It is written again every time the tree is projected, so an edit here is lost." +
-		" Source: util/parameters.json\"\n")
+		" Source: src/config/parameters.json\"\n")
 	if c.Hint != "" {
 		b.WriteString("argument-hint: \"" + c.Hint + "\"\n")
 	}

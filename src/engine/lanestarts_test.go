@@ -15,7 +15,7 @@ import (
 
 // THE LANE ANSWERS BEFORE THERE IS ANYTHING BEHIND IT.
 //
-// MEASURED ON A CLOUD BOX, AND IT COST THE WHOLE SESSION. util/cage/mcp-lane.mjs
+// MEASURED ON A CLOUD BOX, AND IT COST THE WHOLE SESSION. src/cage/mcp-lane.mjs
 // ran the installer and then handed over, and a harness gives an MCP server
 // thirty seconds to answer initialize. A fresh clone spent those thirty seconds
 // compiling, the harness killed the spawn, and the session had no se_ tool at
@@ -118,13 +118,13 @@ func aLaneOverATreeWithNothingBuilt(t *testing.T, seconds int) (time.Time, <-cha
 // path to the script.
 func aTreeWithNothingBuilt(t *testing.T, root string, seconds int) string {
 	t.Helper()
-	for _, dir := range []string{"util/cage", "util/setup", ".bin"} {
+	for _, dir := range []string{"src/cage", "util/setup", ".bin"} {
 		if err := os.MkdirAll(filepath.Join(root, filepath.FromSlash(dir)), 0o755); err != nil {
 			t.Fatal(err)
 		}
 	}
-	script := filepath.Join(root, "util", "cage", "mcp-lane.mjs")
-	copyOver(t, filepath.Join("..", "..", "util", "cage", "mcp-lane.mjs"), script)
+	script := filepath.Join(root, "src", "cage", "mcp-lane.mjs")
+	copyOver(t, filepath.Join("..", "..", "src", "cage", "mcp-lane.mjs"), script)
 
 	// A REAL LANE IS WHAT THE STUB DELIVERS, because a fixture handing back a
 	// program that cannot speak the protocol is checking the wait and not the

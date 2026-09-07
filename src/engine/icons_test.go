@@ -11,7 +11,7 @@ import (
 func TestAControlNamesAnIconAndTheTableDrawsIt(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
-	os.WriteFile(filepath.Join(r.Method, "util", "parameters.json"), []byte(`{
+	os.WriteFile(filepath.Join(r.Method, "src", "config", "parameters.json"), []byte(`{
 	  "name":"quackitect","type":"group","children":[
 	    {"name":"control","type":"group","shown":true,"children":[
 	      {"name":"engine","type":"status","command":"c","labels":{"idle":"power","good":"power"}},

@@ -16,7 +16,7 @@ import (
 // In the cloud the person reads the chat, so an answer that went only to the
 // record went nowhere they look.
 //
-// THE CARD SAYS IT AND IT IS STILL MISSED. util/cage/cloud-runner.md carries it
+// THE CARD SAYS IT AND IT IS STILL MISSED. src/cage/cloud-runner.md carries it
 // as an actionable, and a card is read once, at session start. An agent forty
 // calls deep is not rereading it, so the reminder belongs at the door in use.
 func TestACloudAnswerIsSentToTheChat(t *testing.T) {

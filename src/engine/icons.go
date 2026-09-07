@@ -9,7 +9,7 @@ import (
 // EVERY ICON THE SYSTEM DRAWS, FROM ONE TABLE.
 //
 // Nothing else carries a glyph. A control, a heading or a button names an icon,
-// and util/icons.json decides what that name looks like. So the same mark is
+// and src/config/icons.json decides what that name looks like. So the same mark is
 // the same mark everywhere, and changing one is one edit in one file.
 //
 // A NAME THAT RESOLVES TO A GLYPH TODAY CAN RESOLVE TO A FILE TOMORROW, and
@@ -33,11 +33,11 @@ func Icons(r Roots) (map[string]Icon, error) {
 		}
 	}
 	if err != nil {
-		return nil, fmt.Errorf("util/icons.json is not readable: %w", err)
+		return nil, fmt.Errorf("src/config/icons.json is not readable: %w", err)
 	}
 	var raw map[string]json.RawMessage
 	if err := json.Unmarshal(b, &raw); err != nil {
-		return nil, fmt.Errorf("util/icons.json: %w", err)
+		return nil, fmt.Errorf("src/config/icons.json: %w", err)
 	}
 	out := map[string]Icon{}
 	for name, v := range raw {

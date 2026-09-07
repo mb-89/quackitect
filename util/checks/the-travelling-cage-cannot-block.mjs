@@ -54,7 +54,7 @@ say(".claude/settings.local.json is not in version control",
   + "any engine has decided anything");
 
 // AND THE CAGE THAT DOES TRAVEL NAMES NO REFUSING EVENT.
-const cages = [".claude/settings.json", "util/cage/claude-settings.json"];
+const cages = [".claude/settings.json", "src/cage/claude-settings.json"];
 for (const rel of cages) {
   const path = join(root, rel);
   if (!existsSync(path)) {
@@ -93,7 +93,7 @@ for (const rel of cages) {
       "its hooks are " + JSON.stringify(commands) + ". A clone carries this, so a box "
       + "with no engine could be refused by a rule nothing on it has read. Either it is "
       + "the wake, which is driven here and exits zero, or it belongs in "
-      + "util/cage/claude-settings-local.json, which the engine writes when it starts");
+      + "src/cage/claude-settings-local.json, which the engine writes when it starts");
   }
 }
 
@@ -107,8 +107,8 @@ for (const rel of cages) {
 // own path, so the cold case is a copy of the script in a folder with no .bin
 // rather than the real one pointed elsewhere.
 const cold = mkdtempSync(join(tmpdir(), "cage-cold-"));
-mkdirSync(join(cold, "util", "cage"), { recursive: true });
-copyFileSync(join(root, "util", "cage", "hook-lane.mjs"), join(cold, "util", "cage", "hook-lane.mjs"));
+mkdirSync(join(cold, "src", "cage"), { recursive: true });
+copyFileSync(join(root, "src", "cage", "hook-lane.mjs"), join(cold, "src", "cage", "hook-lane.mjs"));
 
 const ran = (what, argv, cwd, event) => {
   let code = 0;
@@ -126,7 +126,7 @@ const ran = (what, argv, cwd, event) => {
 // at is a folder with nothing in it, so the scripts find no engine to run.
 for (const event of ["SessionStart", "UserPromptSubmit"]) {
   ran("the wake exits zero on " + event + " with nothing built",
-    [join(cold, "util", "cage", "hook-lane.mjs"), "hook", "--method", cold, "--wake"],
+    [join(cold, "src", "cage", "hook-lane.mjs"), "hook", "--method", cold, "--wake"],
     cold, { hook_event_name: event, cwd: cold, source: "startup", prompt: "a prompt" });
 }
 
@@ -136,7 +136,7 @@ for (const event of ["SessionStart", "UserPromptSubmit"]) {
 if (existsSync(join(root, ".bin"))) {
   for (const event of ["SessionStart", "UserPromptSubmit"]) {
     ran("the wake exits zero on " + event + " against a built tree",
-      ["util/cage/hook-lane.mjs", "hook", "--method", ".", "--wake"],
+      ["src/cage/hook-lane.mjs", "hook", "--method", ".", "--wake"],
       root, { hook_event_name: event, cwd: root, source: "startup", prompt: "a prompt" });
   }
 }

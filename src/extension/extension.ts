@@ -467,7 +467,7 @@ function postDoing(context: vscode.ExtensionContext) {
 //
 // Two files, and each has one job.
 //
-//   util/parameters.json   the DECLARATION. What exists, its type, its
+//   src/config/parameters.json   the DECLARATION. What exists, its type, its
 //                          default, and which way it may be narrowed.
 //                          Authored, in the method root, and read only.
 //   .se/parameters.json    the VALUES. Only what differs from a default.
@@ -565,7 +565,7 @@ function readDoing(context: vscode.ExtensionContext): Promise<void> {
 
 // WHICH GROUPS ARE SHOWN, and the default is not written here.
 //
-// util/parameters.json declares it, so this reads the declaration rather than
+// src/config/parameters.json declares it, so this reads the declaration rather than
 // carrying a second copy. A default in two places is a default that disagrees
 // with itself the first time one of them is edited.
 function shownGroups(context?: vscode.ExtensionContext): string[] {
@@ -584,7 +584,7 @@ function declaredShown(n: Node): string[] {
   return [];
 }
 
-// A CONTROL NAMES AN ICON AND NEVER CARRIES ONE. util/icons.json decides what
+// A CONTROL NAMES AN ICON AND NEVER CARRIES ONE. src/config/icons.json decides what
 // the name looks like, so the same mark is the same mark here and in the
 // editor, and changing one is one edit in one file.
 //
@@ -662,7 +662,7 @@ function loadTree(context: vscode.ExtensionContext): Node {
       children: [
         {
           name: "control",
-          title: "util/parameters.json could not be read",
+          title: "src/config/parameters.json could not be read",
           type: "group",
           shown: true,
           children: [{ name: "home", type: "action", label: "home", command: "quackitect.welcome" }],
@@ -1245,7 +1245,7 @@ function toggleWork(context: vscode.ExtensionContext) {
 
   // THE QUERY IS A FILE ON DISK AND A PERSON EDITS IT. The code toggle names
   // the path (util/views/work.base), so saving that file redraws the panes,
-  // the way saving util/parameters.json rebuilds the panel. The page is
+  // the way saving src/config/parameters.json rebuilds the panel. The page is
   // rebuilt whole because the view file declares the page's shape.
   try {
     let due: NodeJS.Timeout | undefined;

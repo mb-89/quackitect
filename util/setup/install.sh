@@ -70,7 +70,7 @@ if ! go_ok; then
   else wget -qO "$tmp/go.tgz" "https://go.dev/dl/go$ver.linux-$arch.tar.gz"; fi
   tar -C "$prefix" -xzf "$tmp/go.tgz"
   # THE TOOL LANE LOOKS HERE TOO, because this export reaches this process and
-  # nothing else. See util/cage/mcp-lane.mjs.
+  # nothing else. See src/cage/mcp-lane.mjs.
   PATH="$prefix/go/bin:$PATH"; export PATH
 fi
 

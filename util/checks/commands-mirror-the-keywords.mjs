@@ -1,6 +1,6 @@
 // EVERY COMMAND UNDER .claude/commands IS THE ENGINE'S ANSWER, UNCHANGED.
 //
-// The files are generated from util/parameters.json, and they are in version
+// The files are generated from src/config/parameters.json, and they are in version
 // control, so a clone carries them and a cloud box has the menu without
 // starting anything. That is only true while what is committed is what the
 // tree answers. A hand-edited command would send a message that reaches no

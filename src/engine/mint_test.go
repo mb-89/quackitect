@@ -61,7 +61,7 @@ func TestAMintedTokenCarriesEachFieldsComment(t *testing.T) {
 
 // THE SIZE BOUND IS THE SCHEMA'S. The save reads the detail's byte bound
 // from the section that carries it, so the rule lives with the field it
-// holds and util/parameters.json keeps no second copy.
+// holds and src/config/parameters.json keeps no second copy.
 func TestAnOversizeDetailIsRefusedOffTheSchema(t *testing.T) {
 	t.Parallel()
 	r := aTreeDescribingFields(t)

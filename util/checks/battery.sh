@@ -230,7 +230,7 @@ build() {
   # AND IT RUNS LAST, so it names what was just built. Run before the lane, it
   # handed the plain name whatever the previous battery wrote: measured on this
   # box with .bin/se-mcp.exe two hours newer than .bin/se-mcp, and mcp-tools,
-  # which reads the plain name everywhere but Windows, calling util/cage/tools
+  # which reads the plain name everywhere but Windows, calling src/cage/tools
   # .json wrong when the file was right and the binary was old.
   .bin/se.exe --link --work . >/dev/null 2>&1 || return 1
   # AND THE ENGINE'S TEST BINARY, ONCE. Linking a cgo binary is the slow part

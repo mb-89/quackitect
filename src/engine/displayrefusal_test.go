@@ -78,7 +78,7 @@ func TestTheCheckSeesADisplayOnlyEventWhenThereIsOne(t *testing.T) {
 
 func TestTheCageSubscribesToNoEventThatCannotRefuse(t *testing.T) {
 	t.Parallel()
-	b, err := os.ReadFile(filepath.Join("..", "..", "util", "cage", "claude-settings.json"))
+	b, err := os.ReadFile(filepath.Join("..", "..", "src", "cage", "claude-settings.json"))
 	if err != nil {
 		t.Fatalf("the cage will not read: %v", err)
 	}

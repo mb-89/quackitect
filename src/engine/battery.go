@@ -187,7 +187,7 @@ var aBatteryStep = regexp.MustCompile(`^(\S.*?)\s+(ok|FAIL)\s+(\d+)s(?:\s+(.*))?
 // theBatterysSteps reads a finished battery's page into one answer per step.
 //
 // THE PAGE IS MANY ANSWERS AND IT CAME BACK AS ONE. A token whose delta reaches
-// util/parameters.json runs the whole battery, so it inherited every red the
+// src/config/parameters.json runs the whole battery, so it inherited every red the
 // project had. The close already scopes a check's failure to the delta, and a
 // battery named no file at all for that scoping to read. See testedgate.go.
 //

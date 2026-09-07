@@ -98,8 +98,8 @@ type Tested struct {
 // wholeTriggers name what a change to makes the whole battery the only
 // honest answer: the checks themselves, the schemas everything is read by,
 // the toolchain, and the files the projections come from.
-var wholeTriggers = []string{"util/checks/**", "src/schemas/**", "**/go.mod", "**/go.sum", "util/tools.json",
-	"util/setup/**", "util/cage/**", "util/projections.json", "util/parameters.json"}
+var wholeTriggers = []string{"util/checks/**", "src/schemas/**", "**/go.mod", "**/go.sum", "src/config/tools.json",
+	"util/setup/**", "src/cage/**", "src/config/projections.json", "src/config/parameters.json"}
 
 // wholeAbove is the share of the suite past which the battery is cheaper
 // than the selection, and wholeAtLeast how many tests a suite has before
@@ -308,7 +308,7 @@ func choose(db *sql.DB, tests []aTest, out *Tested) error {
 	// wins. If the agent wants only a few files and you want the whole battery,
 	// then the few files win.
 	//
-	// MEASURED that month. One number added to util/parameters.json ran 228
+	// MEASURED that month. One number added to src/config/parameters.json ran 228
 	// seconds of battery and handed the token eight reds, six of them no hand
 	// on that box had caused. The checks that declare they read the file are
 	// picked below, and that answer is both the conservative one and the small

@@ -21,7 +21,7 @@ import (
 // with was the list it died with. Restarting the whole session was the only
 // way out, which on a cloud box means losing everything the session knew.
 //
-// AND THE ORDINARY BOX WAS THE ONE THAT COULD NOT BE REPAIRED. util/cage/
+// AND THE ORDINARY BOX WAS THE ONE THAT COULD NOT BE REPAIRED. src/cage/
 // mcp-lane.mjs supervised a cold clone and handed a built tree straight over
 // with stdio inherited, so on the common path nothing was left between the
 // client and the lane to notice the program had moved.
@@ -37,13 +37,13 @@ func TestANewLaneOnDiskRefreshesTheToolList(t *testing.T) {
 	}
 	root := t.TempDir()
 	bin := filepath.Join(root, ".bin")
-	for _, dir := range []string{"util/cage", "util/setup", ".bin"} {
+	for _, dir := range []string{"src/cage", "util/setup", ".bin"} {
 		if err := os.MkdirAll(filepath.Join(root, filepath.FromSlash(dir)), 0o755); err != nil {
 			t.Fatal(err)
 		}
 	}
-	script := filepath.Join(root, "util", "cage", "mcp-lane.mjs")
-	copyOver(t, filepath.Join("..", "..", "util", "cage", "mcp-lane.mjs"), script)
+	script := filepath.Join(root, "src", "cage", "mcp-lane.mjs")
+	copyOver(t, filepath.Join("..", "..", "src", "cage", "mcp-lane.mjs"), script)
 
 	// A BUILT TREE IS A LANE AND AN ENGINE BESIDE IT. The engine is a file and
 	// not a program: the script only asks whether it is there.

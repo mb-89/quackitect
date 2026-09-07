@@ -13,8 +13,8 @@ import (
 // count. So the numbers arrived, and the only reader who would think to ask for
 // them is one who had already read the change that put them there.
 //
-// AND THE COLD DOOR IS THE OTHER HALF. util/cage/mcp-lane.mjs answers tools/list
-// off util/cage/tools.json before the lane is built, so a sentence written in the
+// AND THE COLD DOOR IS THE OTHER HALF. src/cage/mcp-lane.mjs answers tools/list
+// off src/cage/tools.json before the lane is built, so a sentence written in the
 // lane and not regenerated into that file is a cold session shown the old door.
 func TestSeStatusSaysItAnswersTheStateOfPlay(t *testing.T) {
 	t.Parallel()
@@ -33,7 +33,7 @@ func TestSeStatusSaysItAnswersTheStateOfPlay(t *testing.T) {
 	t.Run("the cold door says the same", func(t *testing.T) {
 		if cold := describes(t, coldDoor(t), "se_status"); cold != says {
 			t.Errorf("the cold door says something else. Rewrite it: "+
-				".bin/se-mcp --tools > util/cage/tools.json\n  lane: %q\n  cold: %q", says, cold)
+				".bin/se-mcp --tools > src/cage/tools.json\n  lane: %q\n  cold: %q", says, cold)
 		}
 	})
 }

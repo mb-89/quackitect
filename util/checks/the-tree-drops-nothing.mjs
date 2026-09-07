@@ -28,7 +28,7 @@ const ok = (said) => console.log("ok    " + said);
 const no = (said) => { console.log("FAIL  " + said); failed++; };
 const refuse = (why) => { console.error(why); process.exit(1); };
 
-const declared = JSON.parse(readFileSync(join(root, "util", "parameters.json"), "utf8"));
+const declared = JSON.parse(readFileSync(join(root, "src", "config", "parameters.json"), "utf8"));
 let answered;
 try {
   answered = JSON.parse(execFileSync(se, ["--tree", "--method", root], { encoding: "utf8" }));

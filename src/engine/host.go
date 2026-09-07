@@ -12,7 +12,7 @@ import (
 
 // WHERE THIS BOX IS, READ OFF ONE TABLE.
 //
-// The cage asks util/cage/hosts.json through util/cage/host.mjs, and this is
+// The cage asks src/cage/hosts.json through src/cage/host.mjs, and this is
 // the engine's reading of the same file. Two readers of one table can only
 // disagree by reading it wrong, which is a smaller thing than two tables.
 //
@@ -42,14 +42,14 @@ type hostTable struct {
 // be read answers a desk, and says why, because the worse mistake is a box
 // that believes it is in the cloud and starts fetching branches on a desk.
 func TheHost(method string) Host {
-	b, err := os.ReadFile(filepath.Join(method, "util", "cage", "hosts.json"))
+	b, err := os.ReadFile(filepath.Join(method, "src", "cage", "hosts.json"))
 	if err != nil {
-		return Host{Because: "util/cage/hosts.json could not be read: " + err.Error(),
+		return Host{Because: "src/cage/hosts.json could not be read: " + err.Error(),
 			Says: "a box with a person beside it"}
 	}
 	var t hostTable
 	if err := json.Unmarshal(b, &t); err != nil {
-		return Host{Because: "util/cage/hosts.json does not read: " + err.Error(),
+		return Host{Because: "src/cage/hosts.json does not read: " + err.Error(),
 			Says: "a box with a person beside it"}
 	}
 	named := ""
@@ -99,11 +99,11 @@ func TheSurface() string {
 // a fix was built on that reading. So the script asks the box what is there:
 // the commit against origin, the built programs against their source, the
 // engine's own answer, the lane's log under .se/lane.out, and the network. It
-// lives in util/cage/diagnose.mjs so a tree with nothing built can run it
+// lives in src/cage/diagnose.mjs so a tree with nothing built can run it
 // with node alone, and this flag is the same call through the engine, which is
 // the one program the write gate lets a shell run.
 func Diagnose(r Roots) int {
-	script := filepath.Join(r.Method, "util", "cage", "diagnose.mjs")
+	script := filepath.Join(r.Method, "src", "cage", "diagnose.mjs")
 	cmd := quiet.Quietly(exec.Command("node", script, "--method", r.Method, "--work", r.Work))
 	cmd.Dir = r.Work
 	cmd.Stdout, cmd.Stderr, cmd.Stdin = os.Stdout, os.Stderr, nil

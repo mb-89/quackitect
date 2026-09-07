@@ -1,6 +1,6 @@
 // A PROJECTION CARRIES ONE CHAPTER, NOT THE WHOLE FILE.
 //
-// util/projections.json names the one chapter a projected file takes from each
+// src/config/projections.json names the one chapter a projected file takes from each
 // of its sources, and each source arrives under its own title. An engine built
 // before that rule wrote the sources whole, so the projected file grew their
 // Motivation and Discussion chapters as well, and an agent read a standing
@@ -55,9 +55,9 @@ function chapterOf(text, name) {
 
 const line = (depth, text) => "#".repeat(depth) + " " + text;
 
-const specPath = join(root, "util", "projections.json");
+const specPath = join(root, "src", "config", "projections.json");
 if (!existsSync(specPath)) {
-  say("util/projections.json is there", false,
+  say("src/config/projections.json is there", false,
     "without it nothing says which chapter a projection carries");
   console.log("\n0 projection(s) read. " + bad + " failed.");
   process.exit(1);
@@ -74,7 +74,7 @@ for (const p of spec.projections ?? []) {
   const target = join(root, p.target);
   if (!existsSync(target)) {
     say(p.name + " is in the tree", false,
-      p.target + " is named by util/projections.json and is not there");
+      p.target + " is named by src/config/projections.json and is not there");
     continue;
   }
 
@@ -83,7 +83,7 @@ for (const p of spec.projections ?? []) {
     const pre = join(root, p.preamble);
     if (!existsSync(pre)) {
       say(p.name + " has its preamble", false,
-        p.preamble + " is named by util/projections.json and is not there");
+        p.preamble + " is named by src/config/projections.json and is not there");
       continue;
     }
     for (const h of headingsOf(readFileSync(pre, "utf8"))) want.push(line(h.depth, h.text));
@@ -122,7 +122,7 @@ for (const p of spec.projections ?? []) {
 }
 
 say("a chaptered projection was read (" + read + ")", read > 0,
-  "util/projections.json named none, so this has nothing to judge and is not doing its job");
+  "src/config/projections.json named none, so this has nothing to judge and is not doing its job");
 
 console.log("\n" + read + " projection(s) read. " + bad + " failed.");
 process.exit(bad ? 1 : 0);

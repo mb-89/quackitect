@@ -79,7 +79,7 @@ func main() {
 }
 
 func run(path string) {
-	// EVERY MARK COMES FROM util/icons.json, the same table the sidebar and the
+	// EVERY MARK COMES FROM src/config/icons.json, the same table the sidebar and the
 	// editor read. It is found by walking up from the log this window watches.
 	ReadIcons(path)
 	// The alternate screen keeps the log out of the shell's scrollback. No

@@ -24,7 +24,7 @@ import (
 // candidate and keeping the ones that answer. Probing is mechanical and needs
 // no judgement, which is why it is here and not above.
 //
-// THE CANDIDATES ARE DATA, in util/tools.json. The argument differs per tool,
+// THE CANDIDATES ARE DATA, in src/config/tools.json. The argument differs per tool,
 // because go prints its version without dashes and nothing can be inferred
 // from a name. Adding a tool is a line in a file.
 

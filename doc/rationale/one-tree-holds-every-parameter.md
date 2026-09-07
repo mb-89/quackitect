@@ -2,7 +2,7 @@
 kind: [[rationale]]
 title: one tree holds every parameter
 explains:
-  - util/parameters.json
+  - src/config/parameters.json
   - src/engine/config.go
 ---
 

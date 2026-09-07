@@ -49,7 +49,7 @@ const holdsNot = (page, what, why) => {
 
 // THE TABLE THE PRODUCT DECLARES IS THE ONE UNDER TEST. A table written here
 // would pass while the shipped panel had none.
-const declared = JSON.parse(readFileSync(join(root, "util", "parameters.json"), "utf8"));
+const declared = JSON.parse(readFileSync(join(root, "src", "config", "parameters.json"), "utf8"));
 const control = (declared.children ?? []).find((c) => c.name === "control");
 const table = (control?.children ?? []).find((c) => c.type === "table");
 if (!table) {

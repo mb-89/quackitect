@@ -30,7 +30,7 @@ export async function whichHarness(): Promise<Harness> {
 export function kickoffText(methodRoot: string): string {
   // One file, used by every launch path. Two copies fork the wording, and
   // then the agent is told two different things.
-  const file = path.join(methodRoot, "util", "cage", "kickoff.txt");
+  const file = path.join(methodRoot, "src", "cage", "kickoff.txt");
   try {
     return fs.readFileSync(file, "utf8").trim();
   } catch {

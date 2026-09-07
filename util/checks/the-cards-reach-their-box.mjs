@@ -37,19 +37,19 @@ const read = (rel) => {
   }
 };
 
-const wake = read("util/cage/session-start.sh");
-const cloudCard = "util/cage/cloud-runner.md";
+const wake = read("src/cage/session-start.sh");
+const cloudCard = "src/cage/cloud-runner.md";
 const card = read(cloudCard);
 
 say("the wake is there to hand anything over", wake !== "",
-  "util/cage/session-start.sh could not be read, so nothing is delivered at all");
+  "src/cage/session-start.sh could not be read, so nothing is delivered at all");
 say("the cloud card is there", card !== "", cloudCard + " could not be read");
 
 // THE DELIVERY. The wake prints the card, and it does it on the cloud side of
 // the branch that tells the two boxes apart.
 say("the wake prints the cloud card", wake.includes(cloudCard),
   "nothing in the wake names " + cloudCard + ", so a cloud session is handed nothing");
-say("the wake asks one door where it is", wake.includes("util/cage/host.mjs --cloud"),
+say("the wake asks one door where it is", wake.includes("src/cage/host.mjs --cloud"),
   "the wake decides which box this is by some other means, so hosts.json is not the one table");
 say("and a desk is told which it is", /--cloud; then[\s\S]*say /.test(wake) || /if ! node[\s\S]*?say /.test(wake),
   "the wake returns on a desk without saying so, and a session that is told nothing "
@@ -67,7 +67,7 @@ say("the cloud card names its box in its heading", /^#\s.*CLOUD BOX/m.test(card)
 // refusal used to do exactly that.
 const engineCalls = card.split(/\r?\n/)
   .map((l) => l.trim())
-  .filter((l) => l.startsWith("./RUNME.sh") || l.startsWith("node util/cage/"));
+  .filter((l) => l.startsWith("./RUNME.sh") || l.startsWith("node src/cage/"));
 say("the cloud card names calls to judge (" + engineCalls.length + ")", engineCalls.length > 0,
   "it prescribes no command at all, so a session with no lane is told nothing to type");
 for (const call of engineCalls) {
@@ -95,10 +95,10 @@ for (const rel of new Set(named)) {
 
 // THE STANDING LAYER SAYS THERE ARE TWO KINDS. Every session reads the preamble,
 // so it is where a reader learns that a card exists which was not handed to it.
-const preamble = read("util/cage/first-turn.md");
+const preamble = read("src/cage/first-turn.md");
 say("the preamble tells every session there are two kinds of box",
   preamble.includes(cloudCard) && /host\.mjs --say/.test(preamble),
-  "util/cage/first-turn.md does not name the cloud card and the door that answers "
+  "src/cage/first-turn.md does not name the cloud card and the door that answers "
   + "which box this is, so a session meeting that file has no way to place it");
 
 // AND A CARD'S DISCUSSION COUNTS UP THE WAY ITS ACTIONABLES DO.
@@ -113,12 +113,12 @@ say("the preamble tells every session there are two kinds of box",
 // THE SET IS THE FOLDER, so a second card written tomorrow is asked the same
 // question on the same day. A card with no numbered sections is not a card this
 // judges, and it refuses when no card in the folder has any.
-const cards = readdirSync(join(root, "util", "cage")).filter((f) => f.endsWith(".md"));
-say("there are cards in util/cage to read (" + cards.length + ")", cards.length > 0,
-  "util/cage holds no card at all, so this half has nothing to judge");
+const cards = readdirSync(join(root, "src", "cage")).filter((f) => f.endsWith(".md"));
+say("there are cards in src/cage to read (" + cards.length + ")", cards.length > 0,
+  "src/cage holds no card at all, so this half has nothing to judge");
 let numbered = 0;
 for (const file of cards) {
-  const numbers = [...read(join("util", "cage", file)).matchAll(/^###\s+(\d+)\./gm)]
+  const numbers = [...read(join("src", "cage", file)).matchAll(/^###\s+(\d+)\./gm)]
     .map((m) => Number(m[1]));
   if (numbers.length < 2) {
     continue;
@@ -127,12 +127,12 @@ for (const file of cards) {
   const backwards = numbers
     .map((n, i) => (i > 0 && n < numbers[i - 1] ? numbers[i - 1] + " then " + n : ""))
     .filter(Boolean);
-  say("util/cage/" + file + " discusses its points in the order it lists them ("
+  say("src/cage/" + file + " discusses its points in the order it lists them ("
     + numbers.join(", ") + ")", backwards.length === 0,
     "the discussion goes " + backwards.join(", ") + ", so a reader following a number "
     + "walks past a later one to reach it");
 }
-say("a card in util/cage numbers its discussion (" + numbered + ")", numbered > 0,
+say("a card in src/cage numbers its discussion (" + numbered + ")", numbered > 0,
   "no card carries two numbered sections, so the half above passed by having "
   + "nothing to ask rather than by the cards being in order");
 
@@ -149,7 +149,7 @@ say("a card in util/cage numbers its discussion (" + numbered + ")", numbered > 
 // THE LIST IS READ FROM THE ACTIONABLES HEADING ONLY, because a numbered line
 // anywhere else in a card is prose rather than a point to discuss.
 for (const file of cards) {
-  const text = read(join("util", "cage", file));
+  const text = read(join("src", "cage", file));
   const block = /^##\s+Actionables\s*$([\s\S]*?)(?=^##\s|\Z)/m.exec(text);
   const discussed = new Set([...text.matchAll(/^###\s+(\d+)\./gm)].map((m) => Number(m[1])));
   if (block === null || discussed.size === 0) {
@@ -157,7 +157,7 @@ for (const file of cards) {
   }
   const listed = [...new Set([...block[1].matchAll(/^(\d+)\.\s+\S/gm)].map((m) => Number(m[1])))];
   const quiet = listed.filter((n) => !discussed.has(n));
-  say("util/cage/" + file + " discusses every actionable it lists (" + listed.length + ")",
+  say("src/cage/" + file + " discusses every actionable it lists (" + listed.length + ")",
     listed.length > 0 && quiet.length === 0,
     listed.length === 0
       ? "its Actionables heading lists no numbered line, so this counted nothing"

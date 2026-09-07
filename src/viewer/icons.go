@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-// EVERY MARK THIS WINDOW DRAWS COMES FROM util/icons.json, the same table the
+// EVERY MARK THIS WINDOW DRAWS COMES FROM src/config/icons.json, the same table the
 // sidebar and the editor read. So the same mark is the same mark everywhere,
 // and changing one is one edit in one file.
 //

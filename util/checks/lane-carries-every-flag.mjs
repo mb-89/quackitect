@@ -12,7 +12,7 @@
 //
 // IT IS COLD. The verb's flags are read where they are declared, between
 // flag.NewFlagSet("<verb>") and the next flag set in that file. The tool's
-// fields are read off util/cage/tools.json, which the lane generates from its
+// fields are read off src/cage/tools.json, which the lane generates from its
 // structs and colddoor_test keeps in step. Nothing is built.
 //
 // WHAT IS PASSED OVER IS NAMED HERE, WITH WHY. The shell's own flags, which say
@@ -68,9 +68,9 @@ const runsNoVerb = new Set(["se_start"]);
 // there is no field for a caller to send.
 const alwaysAnswered = { se_status: new Set(["json"]) };
 
-const listPath = join(root, "util", "cage", "tools.json");
+const listPath = join(root, "src", "cage", "tools.json");
 if (!existsSync(listPath)) {
-  say("util/cage/tools.json is here to read", false,
+  say("src/cage/tools.json is here to read", false,
     "the lane's advertised tools are not in the tree, so there is nothing to hold the verbs to");
   console.log("\n" + bad + " failed.");
   process.exit(1);
@@ -138,7 +138,7 @@ for (const [verb, flags] of flagsOf) {
       "the " + verb + " verb takes --" + flag + " and " + tool + " has no " + field +
       " field, so a lane call cannot say what the shell can and the engine refuses " +
       "it for a thing the caller has no way to send. Add the field to its struct in " +
-      "src/mcp/lane.go and regenerate util/cage/tools.json with .bin/se-mcp --tools");
+      "src/mcp/lane.go and regenerate src/cage/tools.json with .bin/se-mcp --tools");
   }
 }
 say("flags were held to their tools (" + asked + ")", asked > 0,

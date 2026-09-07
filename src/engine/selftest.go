@@ -87,7 +87,7 @@ func SelfTest(roots Roots, keep bool) int {
 	//
 	// WHAT IS ASKED IS WHERE THIS RUN WROTE, and Project says that. The step
 	// named one file by hand, AGENTS.md, and that file stopped being a
-	// projection: the map in util/projections.json decides what is one, so
+	// projection: the map in src/config/projections.json decides what is one, so
 	// the step read a decision it did not own and went red on a working tree.
 	// Every path Project answers is checked instead, and the map is not named.
 	written, err := Project(driven)

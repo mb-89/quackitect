@@ -572,21 +572,21 @@ func guidanceTree(t *testing.T) Roots {
 	f.writeMethod("doc/guidance/work-token.md", "# Work token\n\nA criterion that can be a command is one.\n")
 	// What is projected where is data. The test declares its own, so it tests
 	// the mechanism rather than the product's list.
-	f.writeMethod("util/projections.json", `{"projections":[
+	f.writeMethod("src/config/projections.json", `{"projections":[
 	  {"name":"protocol","target":"AGENTS.md","sources":["doc/guidance/voice.md","doc/guidance/behaviour.md"],"wrap":"markdown"},
 	  {"name":"copilot","target":".github/copilot-instructions.md","sources":["doc/guidance/voice.md","doc/guidance/behaviour.md"],"wrap":"markdown"},
 	  {"name":"style","target":".claude/output-styles/quackitect.md","sources":["doc/guidance/voice.md","doc/guidance/behaviour.md"],"wrap":"frontmatter","frontmatter":{"name":"quackitect"}}
 	]}`)
 	// The icon table. The fixture declares its own for the same reason it
 	// declares its own tree: the mechanism is the thing under test.
-	f.writeMethod("util/icons.json", `{
+	f.writeMethod("src/config/icons.json", `{
 	  "$comment": "the fixture's own",
 	  "power": {"glyph": "⏻", "at": "U+23FB"},
 	  "hand": {"glyph": "✋", "at": "U+270B"}
 	}`)
 	// One tree. The fixture declares its own, so the tests exercise the
 	// mechanism rather than the product's list.
-	f.writeMethod("util/parameters.json", `{
+	f.writeMethod("src/config/parameters.json", `{
 	  "name":"quackitect","type":"group","children":[
 	    {"name":"limits","type":"group","shown":true,"children":[
 	      {"name":"heartbeat_seconds","type":"int","default":5,"min":1,"max":60,"narrow":"smaller"},
@@ -597,7 +597,7 @@ func guidanceTree(t *testing.T) Roots {
 	// The rules the guard checks against are data, so the fixture carries a
 	// copy of the ones the product ships.
 	if b, err := os.ReadFile(filepath.Join("..", "..", "src", "config", "voice-rules.json")); err == nil {
-		f.writeMethod("util/voice-rules.json", string(b))
+		f.writeMethod("src/config/voice-rules.json", string(b))
 	}
 	return f.Roots
 }
@@ -755,7 +755,7 @@ func aSessionWithVoiceBreaks(t *testing.T) Roots {
 
 	// THE RULES ARE DATA, and the fixture declares its own, so this test is
 	// about the counting and not about the list the product happens to ship.
-	if err := os.MkdirAll(filepath.Join(r.Method, "util"), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Join(r.Method, "src", "config"), 0o755); err != nil {
 		t.Fatal(err)
 	}
 	const rules = `{
@@ -766,7 +766,7 @@ func aSessionWithVoiceBreaks(t *testing.T) Roots {
     {"name": "no contraction", "pattern": "(?i)\\b\\w+n't\\b", "says": "write both words"}
   ]
 }`
-	if err := os.WriteFile(filepath.Join(r.Method, "util", "voice-rules.json"), []byte(rules), 0o644); err != nil {
+	if err := os.WriteFile(filepath.Join(r.Method, "src", "config", "voice-rules.json"), []byte(rules), 0o644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -918,13 +918,13 @@ func aTreeWithGuidance(t *testing.T) Roots {
 	if err := os.Rename(filepath.Join(dir, "lane.md"), filepath.Join(sub, "lane.md")); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.MkdirAll(filepath.Join(root, "util"), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Join(root, "src", "config"), 0o755); err != nil {
 		t.Fatal(err)
 	}
 	const projections = `{"projections":[
 	  {"name":"prompt","target":"prompt.md","wrap":"markdown",
 	   "section":"Actionables","sources_from":"doc/guidance"}]}`
-	if err := os.WriteFile(filepath.Join(root, "util", "projections.json"),
+	if err := os.WriteFile(filepath.Join(root, "src", "config", "projections.json"),
 		[]byte(projections), 0o644); err != nil {
 		t.Fatal(err)
 	}
@@ -1096,9 +1096,9 @@ func aTreeToWeave(t *testing.T) (Roots, string, []byte) {
 func probeTree(t *testing.T) Roots {
 	t.Helper()
 	r := aTree(t).apart().Roots
-	os.MkdirAll(filepath.Join(r.Method, "util"), 0o755)
+	os.MkdirAll(filepath.Join(r.Method, "src", "config"), 0o755)
 	engine, _ := json.Marshal(theEngine(t))
-	os.WriteFile(filepath.Join(r.Method, "util", "tools.json"), []byte(`{"tools":[
+	os.WriteFile(filepath.Join(r.Method, "src", "config", "tools.json"), []byte(`{"tools":[
 	  {"name":`+string(engine)+`,"args":["--version"],"for":"the engine itself"},
 	  {"name":"nothing-is-called-this","args":["--version"],"for":"nothing"}
 	]}`), 0o644)

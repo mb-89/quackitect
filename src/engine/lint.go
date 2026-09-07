@@ -131,12 +131,12 @@ func LintIcons(r Roots) []Finding {
 	// which is the moment it was most worth hearing from.
 	raw, err := os.ReadFile(DeclaredAt(r.Method, "parameters.json"))
 	if err != nil {
-		return []Finding{{ID: "util/parameters.json", Title: "the declaration",
+		return []Finding{{ID: "src/config/parameters.json", Title: "the declaration",
 			Says: "cannot be read, so nothing about it was checked: " + err.Error()}}
 	}
 	var root Node
 	if err := json.Unmarshal(raw, &root); err != nil {
-		return []Finding{{ID: "util/parameters.json", Title: "the declaration",
+		return []Finding{{ID: "src/config/parameters.json", Title: "the declaration",
 			Says: "cannot be read, so nothing about it was checked: " + err.Error()}}
 	}
 	var out []Finding
@@ -147,7 +147,7 @@ func LintIcons(r Roots) []Finding {
 			}
 			if _, ok := icons[want]; !ok {
 				out = append(out, Finding{ID: path, Title: n.Name,
-					Says: "names the icon " + want + ", and util/icons.json has no such name"})
+					Says: "names the icon " + want + ", and src/config/icons.json has no such name"})
 			}
 		}
 	})
@@ -186,7 +186,7 @@ func plainName(s string) bool {
 func LintLimits(r Roots) []Finding {
 	root, err := LoadTree(r.Method)
 	if err != nil {
-		return []Finding{{ID: "util/parameters.json", Title: "the declaration",
+		return []Finding{{ID: "src/config/parameters.json", Title: "the declaration",
 			Says: "cannot be read, so no limit was checked: " + err.Error()}}
 	}
 	var out []Finding

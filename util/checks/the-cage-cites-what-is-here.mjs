@@ -67,8 +67,8 @@ say("there are tokens to resolve against (" + here.size + ")", here.size > 0,
 // the two under .claude are what this box runs, and a citation in any of them
 // reaches a reader.
 const cages = [
-  join(root, "util", "cage", "claude-settings.json"),
-  join(root, "util", "cage", "claude-settings-local.json"),
+  join(root, "src", "cage", "claude-settings.json"),
+  join(root, "src", "cage", "claude-settings-local.json"),
   join(root, ".claude", "settings.json"),
 ];
 

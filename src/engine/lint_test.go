@@ -30,7 +30,7 @@ func TestALinterThatCannotReadTheDeclarationRefuses(t *testing.T) {
 	} {
 		t.Run(how.name, func(t *testing.T) {
 			r := guidanceTree(t)
-			how.write(filepath.Join(r.Method, "util", "parameters.json"))
+			how.write(filepath.Join(r.Method, "src", "config", "parameters.json"))
 
 			for what, found := range map[string][]Finding{
 				"LintLimits": LintLimits(r),

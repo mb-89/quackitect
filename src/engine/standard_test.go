@@ -382,11 +382,11 @@ func TestTheQueueIsStaffed(t *testing.T) {
 func theParametersSay(t *testing.T, r Roots, key string, value any) {
 	t.Helper()
 	for _, name := range []string{"parameters.json", "icons.json"} {
-		b, err := os.ReadFile(filepath.Join("..", "..", "util", name))
+		b, err := os.ReadFile(filepath.Join("..", "..", "src", "config", name))
 		if err != nil {
 			t.Fatal(err)
 		}
-		if err := writeAtomic(filepath.Join(r.Method, "util", name), b, 0o644); err != nil {
+		if err := writeAtomic(filepath.Join(r.Method, "src", "config", name), b, 0o644); err != nil {
 			t.Fatal(err)
 		}
 	}

@@ -14,7 +14,7 @@ Therefore, we need rules for terse prose.
 Also, the vocabulary should be well defined.
 
 This file contains rules that need judgement.
-For mechanical rules, see [[util/voice-rules.json]].
+For mechanical rules, see [[src/config/voice-rules.json]].
 
 # Actionables
 

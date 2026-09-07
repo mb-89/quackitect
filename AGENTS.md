@@ -6,7 +6,7 @@ The standing layer — the rules every agent gets on every turn — is projected
 from `doc/guidance` into the harness's own system prompt:
 `.claude/output-styles/quackitect.md` for Claude Code, and
 `.github/copilot-instructions.md` for Copilot. `se --project` writes both, and
-`util/projections.json` says which files they come from.
+`src/config/projections.json` says which files they come from.
 
 So put here what is about THIS project and is not a rule: how to build it, where
 the odd thing lives, what a newcomer keeps getting wrong. Editing it changes
@@ -14,9 +14,9 @@ nothing about how the engine behaves.
 
 ## Which box you are on
 
-`node util/cage/host.mjs --say` answers it.
+`node src/cage/host.mjs --say` answers it.
 
-A cloud box is handed `util/cage/cloud-runner.md` by the wake at session start,
+A cloud box is handed `src/cage/cloud-runner.md` by the wake at session start,
 and that card is the instruction. Read it. A desk is told in one line and never
 receives the card, so a desk following it goes looking for a lane that was never
 missing.
@@ -64,9 +64,9 @@ merges on this branch differed from both their parents.
   CGO_ENABLED=1 GOFLAGS=-tags=sqlite_fts5 go build -C src/engine -o
   ../../.bin/se.exe .`. `util/setup/archive.go` is where those three come from.
 - `se --project` rewrites the projections after a guidance edit.
-- `.bin/se-mcp --tools > util/cage/tools.json` rewrites the tool list the cold
+- `.bin/se-mcp --tools > src/cage/tools.json` rewrites the tool list the cold
   door answers from, after a change to `src/mcp/lane.go`. `mcp-tools` says
   when it is stale.
 - `./RUNME.sh --diagnose` writes a diagnosis of this box under
   `.se/scratchpad` and prints it. On a tree with nothing built,
-  `node util/cage/diagnose.mjs` is the same call.
+  `node src/cage/diagnose.mjs` is the same call.

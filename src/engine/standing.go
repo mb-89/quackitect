@@ -31,7 +31,7 @@ import (
 // front of every agent.
 //
 // IT ASKS THE PROJECTION RATHER THAN A LIST HERE. Which files are standing is
-// decided in util/projections.json, and a second list would disagree with it
+// decided in src/config/projections.json, and a second list would disagree with it
 // the first time anybody parked a file.
 func TheStandingLayer(methodRoot string) map[string]bool {
 	out := map[string]bool{}

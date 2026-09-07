@@ -26,7 +26,7 @@ func TestAnApplyIsHeldToTheVoiceRules(t *testing.T) {
 	if err != nil {
 		t.Fatalf("the tree's voice rules will not read: %v", err)
 	}
-	if err := writeAtomic(filepath.Join(r.Method, "util", "voice-rules.json"), raw, 0o644); err != nil {
+	if err := writeAtomic(filepath.Join(r.Method, "src", "config", "voice-rules.json"), raw, 0o644); err != nil {
 		t.Fatal(err)
 	}
 	rules, err := voice.Load(DeclaredAt(r.Method, "voice-rules.json"))

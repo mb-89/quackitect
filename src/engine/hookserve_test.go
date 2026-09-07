@@ -79,17 +79,17 @@ func TestTheCageSendsCallsToTheDoorAndWakesTheEngine(t *testing.T) {
 	// the two are one cage. What this holds is that the split fell where it was
 	// meant to: the door on one side, the wake on the other, and neither file
 	// carrying the other's half.
-	os.MkdirAll(filepath.Join(r.Method, "util", "cage"), 0o755)
+	os.MkdirAll(filepath.Join(r.Method, "src", "cage"), 0o755)
 	for _, name := range []string{"claude-settings.json", "claude-settings-local.json"} {
-		cage, err := os.ReadFile(filepath.Join("..", "..", "util", "cage", name))
+		cage, err := os.ReadFile(filepath.Join("..", "..", "src", "cage", name))
 		if err != nil {
 			t.Fatal(err)
 		}
-		os.WriteFile(filepath.Join(r.Method, "util", "cage", name), cage, 0o644)
+		os.WriteFile(filepath.Join(r.Method, "src", "cage", name), cage, 0o644)
 	}
-	os.WriteFile(filepath.Join(r.Method, "util", "projections.json"), []byte(`{"projections":[
-	  {"name":"claude cage","target":".claude/settings.json","sources":["util/cage/claude-settings.json"],"wrap":"none"},
-	  {"name":"claude door","target":".claude/settings.local.json","sources":["util/cage/claude-settings-local.json"],"wrap":"none","local":true}
+	os.WriteFile(filepath.Join(r.Method, "src", "config", "projections.json"), []byte(`{"projections":[
+	  {"name":"claude cage","target":".claude/settings.json","sources":["src/cage/claude-settings.json"],"wrap":"none"},
+	  {"name":"claude door","target":".claude/settings.local.json","sources":["src/cage/claude-settings-local.json"],"wrap":"none","local":true}
 	]}`), 0o644)
 	if _, err := Project(r); err != nil {
 		t.Fatal(err)

@@ -121,7 +121,7 @@ func TestTheFileSaysItIsGeneratedWithoutSpoilingTheMessage(t *testing.T) {
 		if !strings.Contains(head, generatedMark) {
 			t.Errorf("%s does not say it is generated: %q", c.Name, head)
 		}
-		if !strings.Contains(head, "util/parameters.json") {
+		if !strings.Contains(head, "src/config/parameters.json") {
 			t.Errorf("%s does not name the source to edit instead: %q", c.Name, head)
 		}
 		if c.Hint != "" && !strings.Contains(head, "argument-hint:") {

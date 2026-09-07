@@ -143,7 +143,7 @@ func TestEveryProjectionOfAGuidanceCarriesIt(t *testing.T) {
 // projectionsFrom answers every target whose sources include this file.
 func projectionsFrom(t *testing.T, r Roots, source string) []string {
 	t.Helper()
-	b, err := os.ReadFile(filepath.Join(r.Method, "util", "projections.json"))
+	b, err := os.ReadFile(filepath.Join(r.Method, "src", "config", "projections.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -177,7 +177,7 @@ func TestAProjectionWithASectionCarriesOnlyThatChapter(t *testing.T) {
 		[]byte("# Voice\n\n## Motivation\n\nWhy.\n\n## Actionables\n\n- Answer first.\n\n## Discussion\n\nAt length.\n"), 0o644)
 	os.WriteFile(filepath.Join(guidance, "behaviour.md"),
 		[]byte("# Behaviour\n\n## Motivation\n\nWhy.\n\n## Actionables\n\n- Do what was asked.\n\n## Discussion\n\nAt length.\n"), 0o644)
-	os.WriteFile(filepath.Join(r.Method, "util", "projections.json"), []byte(`{"projections":[
+	os.WriteFile(filepath.Join(r.Method, "src", "config", "projections.json"), []byte(`{"projections":[
 	  {"name":"protocol","target":"AGENTS.md","sources":["doc/guidance/voice.md","doc/guidance/behaviour.md"],"wrap":"markdown","section":"Actionables"}
 	]}`), 0o644)
 	if _, err := Project(r); err != nil {

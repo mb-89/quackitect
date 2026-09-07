@@ -54,9 +54,9 @@ writeFileSync(join(tree, "util", "setup", "install.ps1"), "exit 1\n");
 const path = (process.env.PATH ?? "").split(delimiter)
   .filter((d) => !existsSync(join(d, "go")) && !existsSync(join(d, "go.exe"))).join(delimiter);
 
-const snapshot = JSON.parse(readFileSync(join(root, "util", "cage", "tools.json"), "utf8")).tools.map((t) => t.name);
+const snapshot = JSON.parse(readFileSync(join(root, "src", "cage", "tools.json"), "utf8")).tools.map((t) => t.name);
 
-const stub = spawn("node", ["util/cage/mcp-lane.mjs", "--method", ".", "--work", "."], {
+const stub = spawn("node", ["src/cage/mcp-lane.mjs", "--method", ".", "--work", "."], {
   cwd: tree, env: { ...process.env, PATH: path, Path: path }, stdio: ["pipe", "pipe", "pipe"], windowsHide: true,
 });
 const waiters = new Map();

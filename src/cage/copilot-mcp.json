@@ -1,0 +1,11 @@
+{
+  "$comment": "GENERATED from src/cage/copilot-mcp.json. Edit the source, not this file.",
+  "mcpServers": {
+    "quackitect": {
+      "type": "local",
+      "command": "node",
+      "args": ["{{mcplane}}", "--method", "{{method}}", "--work", "{{work}}"],
+      "tools": ["*"]
+    }
+  }
+}

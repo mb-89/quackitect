@@ -73,7 +73,7 @@ export type Table = {
 
 // EVERY MARK THIS DRAWS COMES FROM THE ENGINE'S TABLE. Nothing here carries a
 // glyph, so the same mark is the same mark in the sidebar and here, and one
-// edit to util/icons.json changes both.
+// edit to src/config/icons.json changes both.
 //
 // A NAME THE TABLE DOES NOT HOLD DRAWS ITSELF. A blank leaves a button nobody
 // can see, and the name on the face says which entry is missing.

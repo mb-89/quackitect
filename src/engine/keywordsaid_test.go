@@ -13,7 +13,7 @@ import (
 func aConsoleTree(t *testing.T) Roots {
 	t.Helper()
 	r := guidanceTree(t)
-	os.WriteFile(filepath.Join(r.Method, "util", "parameters.json"), []byte(`{
+	os.WriteFile(filepath.Join(r.Method, "src", "config", "parameters.json"), []byte(`{
 	  "name":"quackitect","type":"group","children":[
 	    {"name":"guards","type":"group","shown":true,"children":[
 	      {"name":"search_via_index","type":"bool","default":true,"console":true,

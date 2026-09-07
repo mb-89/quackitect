@@ -1,5 +1,5 @@
 // THE PANEL DRAWS MARKS, NOT NAMES. A control names an icon, and the panel has
-// to resolve it before it draws. It reads util/parameters.json itself rather
+// to resolve it before it draws. It reads src/config/parameters.json itself rather
 // than asking the engine, so it needs the table itself too, and this is the
 // check that it does.
 //
@@ -21,8 +21,8 @@ await build({
 });
 const { panelHtml } = await import(pathToFileURL(join(dir, "panel.mjs")).href);
 
-const raw = readFileSync(join(root, "util/parameters.json"), "utf8");
-const icons = JSON.parse(readFileSync(join(root, "util/icons.json"), "utf8"));
+const raw = readFileSync(join(root, "src/config/parameters.json"), "utf8");
+const icons = JSON.parse(readFileSync(join(root, "src/config/icons.json"), "utf8"));
 
 // The tree the panel is handed, resolved the way the extension resolves it.
 const tree = JSON.parse(raw);
@@ -65,7 +65,7 @@ say("the table declares an icon to check it against",
 
 for (const name of [...names].sort()) {
   if (!icons[name]) {
-    say(name + " is declared in util/icons.json", false);
+    say(name + " is declared in src/config/icons.json", false);
     continue;
   }
   say(name + " draws as a mark and not as a word",

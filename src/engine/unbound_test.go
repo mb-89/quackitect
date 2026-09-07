@@ -68,11 +68,11 @@ func TestUnboundTakesTheQueueOffAndLeavesTheTreeGuarded(t *testing.T) {
 	// because they refuse the CONTENT rather than the procedure, and a mode
 	// that took them off with the queue would be the one a person reaches for
 	// whenever the engine is merely inconvenient.
-	raw, err := os.ReadFile(filepath.Join("..", "..", "util", "voice-rules.json"))
+	raw, err := os.ReadFile(filepath.Join("..", "..", "src", "config", "voice-rules.json"))
 	if err != nil {
 		t.Fatalf("the tree's voice rules will not read: %v", err)
 	}
-	if err := writeAtomic(filepath.Join(r.Method, "util", "voice-rules.json"), raw, 0o644); err != nil {
+	if err := writeAtomic(filepath.Join(r.Method, "src", "config", "voice-rules.json"), raw, 0o644); err != nil {
 		t.Fatal(err)
 	}
 	rules, err := voice.Load(r.Method)

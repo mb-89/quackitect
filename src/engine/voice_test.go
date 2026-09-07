@@ -78,8 +78,8 @@ func longWords(n int) string {
 func TestTheRulesCanBeSwapped(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	os.MkdirAll(filepath.Join(root, "util"), 0o755)
-	os.WriteFile(filepath.Join(root, "util", "voice-rules.json"), []byte(`{
+	os.MkdirAll(filepath.Join(root, "src", "config"), 0o755)
+	os.WriteFile(filepath.Join(root, "src", "config", "voice-rules.json"), []byte(`{
 	  "limits": {"sentence_words": 3},
 	  "rules": [{"name":"no shouting","pattern":"!","says":"an exclamation mark"}]
 	}`), 0o644)
@@ -108,8 +108,8 @@ func TestTheRulesCanBeSwapped(t *testing.T) {
 func TestAZeroRuleFileRefusesToLoad(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	os.MkdirAll(filepath.Join(root, "util"), 0o755)
-	os.WriteFile(filepath.Join(root, "util", "voice-rules.json"), []byte(`{"rules":[]}`), 0o644)
+	os.MkdirAll(filepath.Join(root, "src", "config"), 0o755)
+	os.WriteFile(filepath.Join(root, "src", "config", "voice-rules.json"), []byte(`{"rules":[]}`), 0o644)
 	if _, err := voice.Load(DeclaredAt(root, "voice-rules.json")); err == nil {
 		t.Fatal("a file with zero rules loaded quietly, so every write would pass unchecked")
 	}
@@ -119,8 +119,8 @@ func TestAZeroRuleFileRefusesToLoad(t *testing.T) {
 func TestARulesFileThatWillNotLoadIsReported(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	os.MkdirAll(filepath.Join(root, "util"), 0o755)
-	os.WriteFile(filepath.Join(root, "util", "voice-rules.json"),
+	os.MkdirAll(filepath.Join(root, "src", "config"), 0o755)
+	os.WriteFile(filepath.Join(root, "src", "config", "voice-rules.json"),
 		[]byte(`{"rules":[{"name":"bad","pattern":"([","says":"x"}]}`), 0o644)
 	if _, err := voice.Load(DeclaredAt(root, "voice-rules.json")); err == nil {
 		t.Fatal("a pattern that will not compile should be reported")

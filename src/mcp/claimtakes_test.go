@@ -13,7 +13,7 @@ import (
 // calls for what the sentence says is one.
 //
 // BOTH DOORS ARE HELD AGAINST EACH OTHER. The lane builds its schema from the
-// request struct, and util/cage/tools.json is what a cold session is shown
+// request struct, and src/cage/tools.json is what a cold session is shown
 // before the lane is built, so a field in one and not the other is a door that
 // changes when the engine warms up.
 func TestTheLaneOffersTheTakeTheRefusalNames(t *testing.T) {
@@ -31,7 +31,7 @@ func TestTheLaneOffersTheTakeTheRefusalNames(t *testing.T) {
 	}{
 		{"the lane builds its schema off the request struct", schemaOf(claimArgs{}), ""},
 		{"the cold door is shown before the lane is built", cold,
-			" Rewrite it: .bin/se-mcp --tools > util/cage/tools.json"},
+			" Rewrite it: .bin/se-mcp --tools > src/cage/tools.json"},
 	} {
 		t.Run(c.name, func(t *testing.T) {
 			if !offersTake(t, c.schema) {

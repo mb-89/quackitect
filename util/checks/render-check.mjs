@@ -144,7 +144,7 @@ const want = [
   ["a pin on every group heading", (h) =>
     (h.match(/class="pin/g) || []).length === (h.match(/<h2/g) || []).length],
   ["a pinned group unpins by name", /class="pin on" data-unpin=/],
-  // EVERY MARK COMES FROM util/icons.json. Nothing in the client carries a
+  // EVERY MARK COMES FROM src/config/icons.json. Nothing in the client carries a
   // glyph, so a name the table does not hold reaches the page as a bare word.
   // The name is checked where an icon is drawn, not anywhere on the page: open
   // and sort are also values a token carries, and a table cell may say either.

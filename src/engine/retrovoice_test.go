@@ -86,7 +86,7 @@ func TestTheRetroCountsTheVoiceBreaksTheAgentWrote(t *testing.T) {
 func TestAMissingRulesFileDoesNotStopTheRetro(t *testing.T) {
 	t.Parallel()
 	r := aSessionWithVoiceBreaks(t)
-	if err := os.Remove(filepath.Join(r.Method, "util", "voice-rules.json")); err != nil {
+	if err := os.Remove(filepath.Join(r.Method, "src", "config", "voice-rules.json")); err != nil {
 		t.Fatal(err)
 	}
 

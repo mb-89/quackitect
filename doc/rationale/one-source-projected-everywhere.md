@@ -3,7 +3,7 @@ kind: [[rationale]]
 title: one source projected everywhere
 explains:
   - src/engine/project.go
-  - util/projections.json
+  - src/config/projections.json
 ---
 
 ## decided

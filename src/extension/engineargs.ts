@@ -100,7 +100,7 @@ export function askedArgs(): string[] {
 
 // THE TREE AS THE ENGINE ANSWERS IT, AND NOT AS THE FILE DECLARES IT.
 //
-// util/parameters.json is what somebody wrote. The engine's answer is that plus
+// src/config/parameters.json is what somebody wrote. The engine's answer is that plus
 // what it derives: the icons it resolves, the pickers it fills from the tree,
 // and the keyword lines a chat reaches a control by. None of those are in the
 // file, because deriving them is what stops anybody keeping a second copy.

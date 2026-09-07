@@ -12,9 +12,9 @@ projected from the guidance in `doc/guidance`, and they apply to every turn.
 
 There are two kinds, and they are handed different cards. A cloud box has no
 person beside it and clones this tree cold, so the wake hands it
-`util/cage/cloud-runner.md` at session start. A desk has the extension and a
+`src/cage/cloud-runner.md` at session start. A desk has the extension and a
 person, and is told so in one line. Both are told which they are, above these
-rules. `node util/cage/host.mjs --say` answers it at any time.
+rules. `node src/cage/host.mjs --say` answers it at any time.
 
 Read the card you were handed. A card you were not handed is about the other
 kind of box, and following it is how a desk session goes looking for a lane

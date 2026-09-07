@@ -92,14 +92,14 @@ func TestOneFolderAnswersOneDoor(t *testing.T) {
 func TestAStartLeavesTheSettingsAsTheyWere(t *testing.T) {
 	t.Parallel()
 	r := guidanceTree(t)
-	cage, err := os.ReadFile(filepath.Join("..", "..", "util", "cage", "claude-settings.json"))
+	cage, err := os.ReadFile(filepath.Join("..", "..", "src", "cage", "claude-settings.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	os.MkdirAll(filepath.Join(r.Method, "util", "cage"), 0o755)
-	os.WriteFile(filepath.Join(r.Method, "util", "cage", "claude-settings.json"), cage, 0o644)
-	os.WriteFile(filepath.Join(r.Method, "util", "projections.json"), []byte(`{"projections":[
-	  {"name":"claude cage","target":".claude/settings.json","sources":["util/cage/claude-settings.json"],"wrap":"none"}
+	os.MkdirAll(filepath.Join(r.Method, "src", "cage"), 0o755)
+	os.WriteFile(filepath.Join(r.Method, "src", "cage", "claude-settings.json"), cage, 0o644)
+	os.WriteFile(filepath.Join(r.Method, "src", "config", "projections.json"), []byte(`{"projections":[
+	  {"name":"claude cage","target":".claude/settings.json","sources":["src/cage/claude-settings.json"],"wrap":"none"}
 	]}`), 0o644)
 
 	at := filepath.Join(r.Work, ".claude", "settings.json")

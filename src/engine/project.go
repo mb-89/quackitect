@@ -16,7 +16,7 @@ import (
 //
 // Some files exist because another tool insists on them, in its own place and
 // its own format. Each of those is a projection of something authored here.
-// What is projected where is DATA, in util/projections.json, so adding one is
+// What is projected where is DATA, in src/config/projections.json, so adding one is
 // an entry rather than a change to this file.
 //
 // The engine projects. Nobody copies by hand. A changed source projects again
@@ -113,7 +113,7 @@ func LoadProjections(methodRoot string) ([]Projection, error) {
 	}
 	var f projectionFile
 	if err := json.Unmarshal(b, &f); err != nil {
-		return nil, fmt.Errorf("util/projections.json is not readable: %w", err)
+		return nil, fmt.Errorf("src/config/projections.json is not readable: %w", err)
 	}
 	return f.Projections, nil
 }
@@ -199,12 +199,12 @@ func variables(roots Roots) (map[string]string, error) {
 		// THE TOOL LANE IS STARTED THROUGH A FILE GIT CARRIES, and never through
 		// .bin. The harness spawns the MCP server before any hook can install
 		// anything, so a fresh clone answered ENOENT and the session had no lane
-		// and no door. See util/cage/mcp-lane.mjs.
-		"mcplane": within(roots.Work, filepath.Join(roots.Method, "util", "cage", "mcp-lane.mjs")),
+		// and no door. See src/cage/mcp-lane.mjs.
+		"mcplane": within(roots.Work, filepath.Join(roots.Method, "src", "cage", "mcp-lane.mjs")),
 		// THE COMMAND HOOKS GO THE SAME WAY AND FOR THE SAME REASON. The cage
 		// named .bin/se for the wake and for the start, and a clone carries no
 		// .bin, so both were a path to nothing on the one box that needed them.
-		"hooklane": within(roots.Work, filepath.Join(roots.Method, "util", "cage", "hook-lane.mjs")),
+		"hooklane": within(roots.Work, filepath.Join(roots.Method, "src", "cage", "hook-lane.mjs")),
 		"method":   within(roots.Work, roots.Method),
 		"work":     within(roots.Work, roots.Work),
 		// THE GUARD'S DOOR, derived from the work root, so the cage can name it
@@ -397,7 +397,7 @@ func IsProjection(roots Roots, path string) (bool, string) {
 		if len(p.Sources) > 0 {
 			return true, filepath.Join(roots.Method, filepath.FromSlash(p.Sources[0]))
 		}
-		return true, "the map in util/projections.json, which names no source for it"
+		return true, "the map in src/config/projections.json, which names no source for it"
 	}
 	return false, ""
 }
@@ -444,7 +444,7 @@ func GuidanceDigest(methodRoot string) (string, error) {
 	// .claude/commands are projected from it and from nothing else, so a control
 	// renamed or added moved no source and the commands were never written again.
 	// They were right at a start and stale ever after.
-	if tree := path.Join("util", "parameters.json"); exists(filepath.Join(methodRoot,
+	if tree := path.Join("src", "config", "parameters.json"); exists(filepath.Join(methodRoot,
 		filepath.FromSlash(tree))) {
 		add(tree)
 	}
