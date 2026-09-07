@@ -93,6 +93,7 @@
 {"id":"wk-9753f669de","title":"engine note repeats itself","process":"trivial","disposition":"done","blob":"3d9f2c279996619a7557e7700ccb55237e89310f","on_branch":"0cac7eb858baa60850f3d19e826cdaaf03a13a34"}
 {"id":"wk-979c779751","title":"session says guard live","process":"trivial","disposition":"dropped","on_branch":"c36b41e76ce3a786cf1b7c521f8567608bc5fa7c","tag":"refs/tags/archive/wk-979c779751"}
 {"id":"wk-97f1251d43","title":"proposed action optional","process":"trivial","disposition":"done","on_branch":"1ddb166c6ab6fc8d69b4c92c6e1bfc6c3b02020d","tag":"refs/tags/archive/wk-97f1251d43"}
+{"id":"wk-98fc8ebb08","title":"note miscounts TempDir lines","process":"trivial","disposition":"done","blob":"1b534bef613b5c1655f0a59723c389415f2d2a35","on_branch":"028f5f5b7f5154dd41e2ae84f84e001ff83d80dd"}
 {"id":"wk-990c0214b6","title":"abort loses its reason","process":"trivial","disposition":"done","on_branch":"f47bf34bb4b480c2352e48779e2c18001ce06f94","tag":"refs/tags/archive/wk-990c0214b6"}
 {"id":"wk-9935549f19","title":"Apply skips schema caps","process":"trivial","disposition":"done","on_branch":"b6292bbfceb936854ce5c3748feccb4269849159","tag":"refs/tags/archive/wk-9935549f19"}
 {"id":"wk-9a53c8351d","title":"battery skips one check","process":"trivial","disposition":"done","on_branch":"fa36c8728af63353d9217b32e59575375d4f4aee","tag":"refs/tags/archive/wk-9a53c8351d"}
