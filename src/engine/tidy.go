@@ -68,6 +68,13 @@ func Tidy(ctx context.Context, r Roots) []TidyPart {
 	})
 }
 
+// TheTidyParts names every part, in the order they run.
+//
+// IT IS WRITTEN DOWN ONCE. Three tests counted the parts and each carried its
+// own number, so a fourth part was added and all three went red saying the
+// tidy has three. A count in three places is three places to forget.
+var TheTidyParts = []string{"archive", "claims", "refs", "what travels"}
+
 // tidyWith is Tidy with the clock and the git call handed in, which is how the
 // tests drive a lapse and a refusal without waiting three hours for either.
 func tidyWith(r Roots, now time.Time, git aGitCall) []TidyPart {
