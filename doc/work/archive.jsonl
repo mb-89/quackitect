@@ -122,6 +122,7 @@
 {"id":"wk-cd1d6e4684","title":"gofmt_clean shadows bad","process":"trivial","disposition":"done","on_branch":"02b7f036efe5dfab29909da4f7676a26228ae635","tag":"refs/tags/archive/wk-cd1d6e4684"}
 {"id":"wk-cdb6961359","title":"mcp exe outside bin","process":"trivial","disposition":"done","on_branch":"cdf6f3d6a39ad2d24b36c7598abccfb38a099116","tag":"refs/tags/archive/wk-cdb6961359"}
 {"id":"wk-d02ce59455","title":"every kind schemad","process":"trivial","disposition":"done","on_branch":"aaf7cc738a623dd81e54c0eab5f3b3b5629e8ce4","tag":"refs/tags/archive/wk-d02ce59455"}
+{"id":"wk-d09e45a317","title":"stale window ignores actors","process":"standard","disposition":"dropped","blob":"fdb23ae5d5310a87a7173f33a1feafcab3ff1cd2","on_branch":"76aaa0bc6cb8434c0d0020114e3844349e316209"}
 {"id":"wk-d4654c06d4","title":"a value read halfway","process":"trivial","disposition":"done","on_branch":"d83595f971d494604e3ab8cbc53b30618a10b848","tag":"refs/tags/archive/wk-d4654c06d4"}
 {"id":"wk-da958ceb87","title":"blocked meets the queue","process":"trivial","disposition":"done","on_branch":"70225cde3c0774ac65a7c2ba9bc07c2a9c0278a9","tag":"refs/tags/archive/wk-da958ceb87"}
 {"id":"wk-de2256d35c","title":"a note not consumed","process":"trivial","disposition":"done","on_branch":"faa62a76e12fd43817d116ff7193617b71467601","tag":"refs/tags/archive/wk-de2256d35c"}
