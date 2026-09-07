@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"quackitect/engine/internal/sessionlog"
 	"quackitect/engine/internal/voice"
 )
 
@@ -520,7 +521,14 @@ func proseThatReads(r Roots, edits []Edit) error {
 	}
 	rules, err := voice.Load(r.Method)
 	if err != nil {
-		return nil // said by the guard where it can be said; a write is not stopped for it
+		// A CHECKER THAT WILL NOT LOAD SAYS SO, AND LETS THE WRITE THROUGH. A
+		// broken rules file must not stop somebody working. Silence here reads
+		// exactly like a tree whose prose is clean, so every write after it goes
+		// unchecked and nothing says why.
+		inSession(r, "apply", "engine",
+			"util/voice-rules.json will not read, so the voice check saw nothing: "+err.Error(),
+			sessionlog.No(), map[string]any{"rules": "util/voice-rules.json"})
+		return nil
 	}
 	found := rules.Check(strings.Join(written, "\n"))
 	if len(found) == 0 {

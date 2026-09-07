@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"quackitect/engine/internal/sessionlog"
 	"quackitect/engine/internal/voice"
 )
 
@@ -57,6 +58,44 @@ func TestAnApplyIsHeldToTheVoiceRules(t *testing.T) {
 	if _, err := Apply(r, []Edit{{File: "src/engine/x.go", Op: "create", New: bad}},
 		false, "", "tester"); err != nil {
 		t.Fatalf("a program was held to the prose rules: %v", err)
+	}
+}
+
+// AND A CHECKER THAT WILL NOT LOAD SAYS SO, AND LETS THE WRITE THROUGH.
+//
+// A broken rules file must not stop somebody working, and it must not go by in
+// silence either. Silence there reads exactly like a tree whose prose is clean,
+// so every write after it is unchecked and nothing says why.
+func TestVoiceRulesThatWillNotLoadAreSaid(t *testing.T) {
+	t.Parallel()
+	r := aTreeToWriteIn(t)
+	// A SESSION TO SAY IT IN. The lane writes into the running session, and a
+	// tree with none keeps its record on the token instead.
+	l, err := sessionlog.Open(r.Private("log"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	l.Close()
+	if err := writeAtomic(filepath.Join(r.Method, "util", "voice-rules.json"),
+		[]byte("{ this is not the rules"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	const name = "doc/prose.md"
+	if _, err := Apply(r, []Edit{{File: name, Op: "create",
+		New: "It doesn't matter; the engine e.g. reads it.\n"}}, false, "", "tester"); err != nil {
+		t.Fatalf("a checker that will not load stopped a write: %v", err)
+	}
+	if _, err := os.Stat(filepath.Join(r.Work, filepath.FromSlash(name))); err != nil {
+		t.Fatalf("the write went through and the file is not there: %v", err)
+	}
+
+	b, err := os.ReadFile(filepath.Join(r.Private("log"), sessionlog.Current))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(b), "voice-rules.json") {
+		t.Errorf("the rules would not load and the record says nothing about it:\n%s", b)
 	}
 }
 
