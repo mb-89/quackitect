@@ -71,8 +71,14 @@ func TestStagingEverythingIsRefused(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// AN ASSIGNMENT MAY SIT AFTER A RUNNER AS WELL AS BEFORE ONE. env and sudo
+	// are both runners, so the walk had already taken one and the assignment
+	// after it read as neither a runner nor a flag. The walk then gave up and
+	// found no git at all, which is this hole one word further along.
 	for _, command := range []string{
 		"git add -A", "git add .", "git add --all", "git add -u", "git add --update",
+		`SE_STAGE_ANYWAY="the whole tree" git add -A`,
+		"env FOO=1 git add -A", "sudo FOO=1 git add .", "env FOO=1 BAR=2 git add --all",
 	} {
 		why, refused := ACommitCarriesStrangers(r, command)
 		if !refused {
@@ -84,11 +90,8 @@ func TestStagingEverythingIsRefused(t *testing.T) {
 		}
 	}
 
-	// AND THE ESCAPE DOES NOT OPEN IT. The escape says which paths a hand
-	// means; a stage of everything names none, so there is nothing to mean.
-	if _, refused := ACommitCarriesStrangers(r, `SE_STAGE_ANYWAY="the whole tree" git add -A`); !refused {
-		t.Error("the escape opened a stage of everything")
-	}
+	// THE ESCAPE IS IN THAT LIST BECAUSE IT DOES NOT OPEN THIS ONE. It says
+	// which paths a hand means, and a stage of everything names none.
 }
 
 // THE ESCAPE IS TYPED ON THE COMMAND AND IT IS RECORDED.

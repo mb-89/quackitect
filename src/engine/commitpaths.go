@@ -43,11 +43,16 @@ func gitVerbAt(words []string, verb string) int {
 		}
 		bare := strings.ToLower(strings.Trim(w, "'\""))
 		// AN ASSIGNMENT BEFORE THE PROGRAM IS THE SHELL'S, AND THE PROGRAM NEVER
-		// SEES IT. It was neither a runner nor a flag, so the walk gave up on the
-		// first word and found no git at all: FOO=1 git add -A went past every
+		// SEES IT. It was neither a runner nor a flag, so the walk gave up where
+		// it stood and found no git at all: FOO=1 git add -A went past every
 		// guard here. That is one word from open, on the rule this branch rests
-		// on. MEASURED by TestStagingEverythingIsRefused.
-		if past == "" && anAssignment(w) {
+		// on.
+		//
+		// AND IT IS SKIPPED WHEREVER A PROGRAM IS STILL PENDING, not at the first
+		// word alone. env and sudo are runners, so env FOO=1 git add -A took the
+		// same road one word further along. Past git the words are git's own, so
+		// the skip stops there. MEASURED by TestStagingEverythingIsRefused.
+		if past != "git" && anAssignment(w) {
 			continue
 		}
 		if past == "git" && bare == verb {
