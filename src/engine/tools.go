@@ -58,7 +58,7 @@ func probePath(r Roots) string { return r.Runtime("tools.json") }
 const probeWait = 10 * time.Second
 
 func LoadCandidates(methodRoot string) ([]Candidate, error) {
-	b, err := os.ReadFile(filepath.Join(methodRoot, "util", "tools.json"))
+	b, err := os.ReadFile(DeclaredAt(methodRoot, "tools.json"))
 	if err != nil {
 		return nil, err
 	}

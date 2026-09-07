@@ -1074,7 +1074,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// rules a whole write does.
 	written := ti.writtenText()
 	if writes[in.ToolName] && isProse(path) && written != "" {
-		rules, err := voice.Load(roots.Method)
+		rules, err := voice.Load(DeclaredAt(roots.Method, "voice-rules.json"))
 		if err != nil {
 			// The checker cannot run. That is said, loudly, and the write is
 			// allowed: a broken checker must not stop a person from working.

@@ -436,7 +436,7 @@ func Retro(ctx context.Context, r Roots, actor string, transcripts []Transcript)
 // different answer from a clean session and is written as one.
 func theVoiceOf(r Roots, logDir string, sessions []string) VoiceReading {
 	var out VoiceReading
-	rules, err := voice.Load(r.Method)
+	rules, err := voice.Load(DeclaredAt(r.Method, "voice-rules.json"))
 	if err != nil {
 		out.Unavailable = err.Error()
 		return out

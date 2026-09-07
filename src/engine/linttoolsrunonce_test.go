@@ -64,7 +64,7 @@ func aTreeTheLintFindsNothingIn(t *testing.T) Roots {
 		t.Fatal(err)
 	}
 	for _, name := range []string{"icons.json", "parameters.json"} {
-		b, err := os.ReadFile(filepath.Join("..", "..", "util", name))
+		b, err := os.ReadFile(filepath.Join("..", "..", "src", "config", name))
 		if err != nil {
 			t.Fatal(err)
 		}

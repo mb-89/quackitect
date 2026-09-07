@@ -193,6 +193,21 @@ function spawn(exe: string, args: string[], options: SpawnOptions = {}): ChildPr
   return spawnRaw(exe, args, { ...options, windowsHide: true });
 }
 
+// WHERE A DECLARATION LIVES, and the engine's DeclaredAt is the same sentence in
+// Go. The five declarations moved from util to src/config: util was where
+// anything landed that had nowhere else to go, so its name said nothing about
+// what was in it.
+//
+// BOTH ARE ANSWERED WHILE TREES CARRY THE OLD PLACE, new first, so a tree that
+// has moved is never read out of util. When none carries it this becomes a join
+// and the second line goes.
+function declaredAt(root: string, name: string): string {
+  const here = path.join(root, "src", "config", name);
+  if (fs.existsSync(here)) return here;
+  const was = path.join(root, "util", name);
+  return fs.existsSync(was) ? was : here;
+}
+
 function methodRoot(context: vscode.ExtensionContext): string {
   // The extension is loaded through a junction, so extensionPath is the LINK
   // and not the tree it points at. Two levels up from the link lands in
@@ -478,7 +493,7 @@ function watchParameters(context: vscode.ExtensionContext) {
   for (const w of watchers) w.close();
   watchers = [];
   const work = workRoot();
-  const declared = path.join(methodRoot(context), "util", "parameters.json");
+  const declared = declaredAt(methodRoot(context), "parameters.json");
   const stored = work ? path.join(work, ".se", "runtime", "parameters.json") : "";
 
   // A change to the declaration changes the panel itself. A change to the
@@ -586,7 +601,7 @@ function drawIcons(n: Node, icons: Record<string, { glyph: string }>): void {
 // the buttons, which still say what each one is.
 function theIcons(context: vscode.ExtensionContext): Record<string, { glyph?: string }> {
   try {
-    return JSON.parse(fs.readFileSync(path.join(methodRoot(context), "util", "icons.json"), "utf8"));
+    return JSON.parse(fs.readFileSync(declaredAt(methodRoot(context), "icons.json"), "utf8"));
   } catch {
     return {};
   }
@@ -629,10 +644,10 @@ function loadTree(context: vscode.ExtensionContext): Node {
   if (lastTree) return lastTree;
   try {
     const root = methodRoot(context);
-    const file = path.join(root, "util", "parameters.json");
+    const file = declaredAt(root, "parameters.json");
     const tree: Node = JSON.parse(fs.readFileSync(file, "utf8"));
     try {
-      drawIcons(tree, JSON.parse(fs.readFileSync(path.join(root, "util", "icons.json"), "utf8")));
+      drawIcons(tree, JSON.parse(fs.readFileSync(declaredAt(root, "icons.json"), "utf8")));
     } catch {
       // A table that will not read leaves the names on the buttons, which
       // still say what each one is.
@@ -1234,7 +1249,12 @@ function toggleWork(context: vscode.ExtensionContext) {
   // rebuilt whole because the view file declares the page's shape.
   try {
     let due: NodeJS.Timeout | undefined;
-    const views = fs.watch(path.join(methodRoot(context), "util", "views"), () => {
+    // VIEWS MOVED TO src/views. This watcher was missed when they moved, and a
+    // watch on a folder that is not there throws, so the editor quietly stopped
+    // redrawing when a view was edited. That is the same class as the four
+    // readers the register move left behind: a path built by hand, in a language
+    // the sweep did not search.
+    const views = fs.watch(path.join(methodRoot(context), "src", "views"), () => {
       clearTimeout(due);
       due = setTimeout(() => { if (workPanel) void drawWork(context, true); }, 120);
     });

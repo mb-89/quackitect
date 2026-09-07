@@ -175,8 +175,40 @@ func (n Node) holdsValue() bool {
 	return false
 }
 
+// DeclaredAt says where a declaration lives in a tree.
+//
+// THE FIVE DECLARATIONS MOVED FROM util TO src/config: parameters, icons,
+// projections, tools and voice-rules. util was where anything landed that had
+// nowhere else to go, so it came to hold the installer, the cage, the checks and
+// these five, and its name said nothing about any of them. A declaration the
+// engine reads on every start is source.
+//
+// ONE FUNCTION, BECAUSE THE JOINS ARE WHAT A MOVE MISSES. wk-345a943f66 named
+// this exact hazard before the move: se move will not find a path built by
+// joining segments, and there are more than a hundred joining "util" in this
+// package alone. Twice in one afternoon a move of mine left a reader behind, and
+// one of those took the battery red on a healthy tree.
+//
+// BOTH PLACES ARE ANSWERED WHILE TREES CARRY THE OLD ONE, new first, so a tree
+// that has moved is never read out of util. When none carries it the second
+// line goes and this becomes a join again, in one place.
+//
+// IT ANSWERS A PATH THAT MAY NOT EXIST, which is what a caller that reports its
+// own error needs: the new place is returned when neither is there, so the
+// message names where the file should have been.
+func DeclaredAt(root, name string) string {
+	here := filepath.Join(root, "src", "config", name)
+	if _, err := os.Stat(here); err == nil {
+		return here
+	}
+	if was := filepath.Join(root, "util", name); exists(was) {
+		return was
+	}
+	return here
+}
+
 func LoadTree(methodRoot string) (Node, error) {
-	b, err := os.ReadFile(filepath.Join(methodRoot, "util", "parameters.json"))
+	b, err := os.ReadFile(DeclaredAt(methodRoot, "parameters.json"))
 	if err != nil {
 		return Node{}, err
 	}

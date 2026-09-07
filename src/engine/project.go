@@ -103,7 +103,7 @@ func sourcesOf(methodRoot string, p Projection) ([]string, error) {
 }
 
 func LoadProjections(methodRoot string) ([]Projection, error) {
-	b, err := os.ReadFile(filepath.Join(methodRoot, "util", "projections.json"))
+	b, err := os.ReadFile(DeclaredAt(methodRoot, "projections.json"))
 	if err != nil {
 		// No declaration is not a failure. It means nothing is projected.
 		if os.IsNotExist(err) {

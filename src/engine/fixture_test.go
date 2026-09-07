@@ -596,7 +596,7 @@ func guidanceTree(t *testing.T) Roots {
 	      {"name":"stop_needs_claim","type":"bool","default":true,"narrow":"on"}]}]}`)
 	// The rules the guard checks against are data, so the fixture carries a
 	// copy of the ones the product ships.
-	if b, err := os.ReadFile(filepath.Join("..", "..", "util", "voice-rules.json")); err == nil {
+	if b, err := os.ReadFile(filepath.Join("..", "..", "src", "config", "voice-rules.json")); err == nil {
 		f.writeMethod("util/voice-rules.json", string(b))
 	}
 	return f.Roots

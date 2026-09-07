@@ -129,7 +129,7 @@ func LintIcons(r Roots) []Finding {
 	// A CHECK THAT CANNOT READ WHAT IT GUARDS SAYS SO. Returning nothing here
 	// made the lint answer clean precisely when the file was missing or broken,
 	// which is the moment it was most worth hearing from.
-	raw, err := os.ReadFile(filepath.Join(r.Method, "util", "parameters.json"))
+	raw, err := os.ReadFile(DeclaredAt(r.Method, "parameters.json"))
 	if err != nil {
 		return []Finding{{ID: "util/parameters.json", Title: "the declaration",
 			Says: "cannot be read, so nothing about it was checked: " + err.Error()}}

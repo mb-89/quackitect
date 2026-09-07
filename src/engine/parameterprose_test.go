@@ -28,11 +28,11 @@ import (
 func TestEveryParameterSaysItselfInProse(t *testing.T) {
 	t.Parallel()
 	root := filepath.Join("..", "..")
-	rules, err := voice.Load(root)
+	rules, err := voice.Load(DeclaredAt(root, "voice-rules.json"))
 	if err != nil {
 		t.Fatalf("the voice rules will not read: %v", err)
 	}
-	raw, err := os.ReadFile(filepath.Join(root, "util", "parameters.json"))
+	raw, err := os.ReadFile(DeclaredAt(root, "parameters.json"))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -12,7 +12,7 @@ import (
 // a change to the file changes what the tests measure.
 func theRules(t *testing.T) voice.Rules {
 	t.Helper()
-	v, err := voice.Load("../..")
+	v, err := voice.Load(DeclaredAt("../..", "voice-rules.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -84,7 +84,7 @@ func TestTheRulesCanBeSwapped(t *testing.T) {
 	  "rules": [{"name":"no shouting","pattern":"!","says":"an exclamation mark"}]
 	}`), 0o644)
 
-	v, err := voice.Load(root)
+	v, err := voice.Load(DeclaredAt(root, "voice-rules.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -110,7 +110,7 @@ func TestAZeroRuleFileRefusesToLoad(t *testing.T) {
 	root := t.TempDir()
 	os.MkdirAll(filepath.Join(root, "util"), 0o755)
 	os.WriteFile(filepath.Join(root, "util", "voice-rules.json"), []byte(`{"rules":[]}`), 0o644)
-	if _, err := voice.Load(root); err == nil {
+	if _, err := voice.Load(DeclaredAt(root, "voice-rules.json")); err == nil {
 		t.Fatal("a file with zero rules loaded quietly, so every write would pass unchecked")
 	}
 }
@@ -122,7 +122,7 @@ func TestARulesFileThatWillNotLoadIsReported(t *testing.T) {
 	os.MkdirAll(filepath.Join(root, "util"), 0o755)
 	os.WriteFile(filepath.Join(root, "util", "voice-rules.json"),
 		[]byte(`{"rules":[{"name":"bad","pattern":"([","says":"x"}]}`), 0o644)
-	if _, err := voice.Load(root); err == nil {
+	if _, err := voice.Load(DeclaredAt(root, "voice-rules.json")); err == nil {
 		t.Fatal("a pattern that will not compile should be reported")
 	}
 	if _, err := voice.Load(t.TempDir()); err == nil {

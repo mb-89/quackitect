@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path/filepath"
 )
 
 // EVERY ICON THE SYSTEM DRAWS, FROM ONE TABLE.
@@ -29,7 +28,7 @@ func Icons(r Roots) (map[string]Icon, error) {
 	var b []byte
 	var err error
 	for _, dir := range []string{r.Work, r.Method} {
-		if b, err = os.ReadFile(filepath.Join(dir, "util", "icons.json")); err == nil {
+		if b, err = os.ReadFile(DeclaredAt(dir, "icons.json")); err == nil {
 			break
 		}
 	}

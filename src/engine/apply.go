@@ -518,7 +518,7 @@ func proseThatReads(r Roots, edits []Edit) error {
 	if len(written) == 0 {
 		return nil
 	}
-	rules, err := voice.Load(r.Method)
+	rules, err := voice.Load(DeclaredAt(r.Method, "voice-rules.json"))
 	if err != nil {
 		return nil // said by the guard where it can be said; a write is not stopped for it
 	}

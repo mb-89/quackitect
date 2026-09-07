@@ -27,8 +27,20 @@ func ReadIcons(logPath string) {
 	if err != nil {
 		return
 	}
+	// THE DECLARATIONS MOVED FROM util TO src/config, and the new place is asked
+	// first so a tree that has moved is never read out of the old one.
+	//
+	// THIS IS A SECOND OWNER OF THAT FACT AND IT IS NOT FREE. The engine spells
+	// it once, in DeclaredAt. The viewer is a module of its own and imports
+	// nothing of the engine's, so it cannot ask. The two are kept honest by
+	// there being exactly one line here and one there, and by util going away:
+	// when it does, both become a join at src/config and there is nothing left
+	// to disagree about.
 	var b []byte
 	for dir := filepath.Dir(at); ; {
+		if b, err = os.ReadFile(filepath.Join(dir, "src", "config", "icons.json")); err == nil {
+			break
+		}
 		if b, err = os.ReadFile(filepath.Join(dir, "util", "icons.json")); err == nil {
 			break
 		}

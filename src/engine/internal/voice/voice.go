@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -55,9 +54,16 @@ type Rules struct {
 	compiled []*regexp.Regexp
 }
 
-func Load(methodRoot string) (Rules, error) {
+// Load reads the rules from the file it is handed.
+//
+// IT IS HANDED A PATH RATHER THAN A ROOT. It joined the path itself, and the
+// declarations then moved out of util into src/config. This package is inside
+// the engine module and cannot import the engine, so a copy of the rule about
+// where a declaration lives would have had to live here too, and two owners of
+// one fact is what the move exists to end. The caller knows, so the caller says.
+func Load(at string) (Rules, error) {
 	var v Rules
-	b, err := os.ReadFile(filepath.Join(methodRoot, "util", "voice-rules.json"))
+	b, err := os.ReadFile(at)
 	if err != nil {
 		return v, err
 	}

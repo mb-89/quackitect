@@ -227,7 +227,7 @@ func (c aCommand) file() string {
 // a message that reaches nothing.
 func WriteCommands(roots Roots) ([]string, error) {
 	// No declaration is not a failure. It means there is nothing to offer.
-	if _, err := os.Stat(filepath.Join(roots.Method, "util", "parameters.json")); os.IsNotExist(err) {
+	if _, err := os.Stat(DeclaredAt(roots.Method, "parameters.json")); os.IsNotExist(err) {
 		return nil, nil
 	}
 	root, err := LoadTree(roots.Method)

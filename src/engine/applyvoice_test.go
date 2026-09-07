@@ -22,14 +22,14 @@ func TestAnApplyIsHeldToTheVoiceRules(t *testing.T) {
 	r := aTreeToWriteIn(t)
 	// THE TREE'S OWN RULES, so this holds the door to what the product ships
 	// rather than to a fixture that agrees with it by construction.
-	raw, err := os.ReadFile(filepath.Join("..", "..", "util", "voice-rules.json"))
+	raw, err := os.ReadFile(filepath.Join("..", "..", "src", "config", "voice-rules.json"))
 	if err != nil {
 		t.Fatalf("the tree's voice rules will not read: %v", err)
 	}
 	if err := writeAtomic(filepath.Join(r.Method, "util", "voice-rules.json"), raw, 0o644); err != nil {
 		t.Fatal(err)
 	}
-	rules, err := voice.Load(r.Method)
+	rules, err := voice.Load(DeclaredAt(r.Method, "voice-rules.json"))
 	if err != nil {
 		t.Fatalf("the voice rules will not read: %v", err)
 	}
