@@ -47,6 +47,7 @@
 {"id":"wk-3c708aff10","title":"account for cut sentences","process":"trivial","disposition":"done","on_branch":"4cffbdbcf7b6b6f4806109cbe5cd3d05ae5c0bdd","tag":"refs/tags/archive/wk-3c708aff10"}
 {"id":"wk-3cdee94154","title":"anchor the named exception","process":"trivial","disposition":"dropped","on_branch":"5dfeb740de95b49cb4a3e9b4d595e1f2a6d12e69","tag":"refs/tags/archive/wk-3cdee94154"}
 {"id":"wk-3f25829fec","title":"measure one standing rule","process":"trivial","disposition":"done","on_branch":"ca3ec961d0f28035d0f9681bc15e5ad016e054ab","tag":"refs/tags/archive/wk-3f25829fec"}
+{"id":"wk-3fd684ca8a","title":"an update stages strangers","process":"trivial","disposition":"done","blob":"242db411a2ce76069c5dd6faab5409a60a667e9d","on_branch":"651c560aab528f6327248f89a3a802ce52971878"}
 {"id":"wk-437137c7a1","title":"RUNME.sh carries CR","process":"trivial","disposition":"done","on_branch":"0d65cad6e4a54531882e24690fc015a997acc44a","tag":"refs/tags/archive/wk-437137c7a1"}
 {"id":"wk-45f2de43aa","title":"Find hides existing files","process":"trivial","disposition":"done","on_branch":"ed3aea35554ae929eea91f4095dd788d1309557d","tag":"refs/tags/archive/wk-45f2de43aa"}
 {"id":"wk-4700fc5ccd","title":"the battery stops early","process":"trivial","disposition":"done","on_branch":"c2d0b8a8efc7c23450dafb06ad06edda0f6ac45a","tag":"refs/tags/archive/wk-4700fc5ccd"}
