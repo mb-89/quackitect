@@ -145,8 +145,12 @@ func runRun(c *call) int {
 	// held goes back, so changing what you work on is one word on the next
 	// command.
 	if _, err := TakeUp(roots, *on, orElse(*by, "main")); err != nil {
-		c.answerJSON(map[string]any{"error": err.Error()})
-		return 1
+		// A LAND MAY NAME THE TOKEN THAT JUST CLOSED. The close asks for the
+		// land and TakeUp would shut the door to it. See aWarmLand.
+		if !aWarmLand(roots, *on, said) {
+			c.answerJSON(map[string]any{"error": err.Error()})
+			return 1
+		}
 	}
 	got, err := Run(roots, said)
 	if err != nil {

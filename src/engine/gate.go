@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"quackitect/engine/internal/sessionlog"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -109,6 +111,68 @@ func InWorkFor(r Roots, actor string) []Token {
 		}
 	}
 	return held
+}
+
+// theLandDoor is the one script a hand pushes work through, and naming it is
+// how a command says it is landing rather than working.
+const theLandDoor = "util/git/land.sh"
+
+// theLandingWindow is how long after a close a land may still name the token.
+// A land follows its close at once. One naming a token from yesterday is
+// somebody misreading the record rather than finishing a close.
+const theLandingWindow = 10 * time.Minute
+
+// theCloseWasAt reads when a token closed, off the snapshot the close wrote.
+//
+// A SNAPSHOT IS A COMMIT AND A COMMIT CARRIES ITS OWN DATE, so the record
+// already knows the time and no field has to be added to say it. The note's own
+// mtime would not do: the close takes the note off the disk.
+//
+// IT IS A VARIABLE SO A TEST CAN ANSWER IT, the way git itself is, rather than
+// forging a commit with a date in it.
+var theCloseWasAt = func(r Roots, t Token) (time.Time, bool) {
+	if len(t.Finished) == 0 {
+		return time.Time{}, false
+	}
+	out, err := gitIn(context.Background(), r, "", "show", "-s", "--format=%ct",
+		t.Finished[len(t.Finished)-1])
+	if err != nil {
+		return time.Time{}, false
+	}
+	sec, err := strconv.ParseInt(strings.TrimSpace(out), 10, 64)
+	if err != nil {
+		return time.Time{}, false
+	}
+	return time.Unix(sec, 0), true
+}
+
+// aWarmLand says whether a command is a landing of a token that closed a
+// moment ago, which TakeUp would otherwise refuse.
+//
+// A CLOSE ASKS FOR A LAND AND SHUTS THE DOOR TO IT. The submit answers the
+// paths a hand must land, and the next call naming that token was refused
+// because the token ended. The hand minted a token nobody wanted to run one
+// command, four times in a day. See wk-5cbee46e99.
+//
+// ONLY A LAND, AND ONLY WHILE IT IS WARM. Working a closed token is refused as
+// before, so nothing is filed where nobody will look for it.
+//
+// A CLOSE NOBODY CAN TIME IS LET THROUGH. A tree with no history writes no
+// snapshot, and a land there pushes nothing anyway, so refusing would break
+// every such box to narrow one door.
+func aWarmLand(r Roots, id, command string) bool {
+	if !strings.Contains(command, theLandDoor) {
+		return false
+	}
+	t, err := LoadToken(r, id)
+	if err != nil || !t.Ended() {
+		return false
+	}
+	at, known := theCloseWasAt(r, t)
+	if !known {
+		return true
+	}
+	return time.Since(at) <= theLandingWindow
 }
 
 // TakeUp is a person or an agent saying which token it is on. It puts back
