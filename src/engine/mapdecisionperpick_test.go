@@ -70,24 +70,6 @@ func theMapRowOf(t *testing.T, db *sql.DB, id string) (int, float64) {
 	return regions, seconds
 }
 
-// aFixtureOfTwoTests answers the index, the discovered tests, and the two the
-// fixture package carries.
-func aFixtureOfTwoTests(t *testing.T) (Roots, *sql.DB, []aTest, aTest, aTest) {
-	t.Helper()
-	r := guidanceTree(t)
-	aTinyPackageOfTwo(t, r)
-	db, err := openIndex(r)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Cleanup(func() { db.Close() })
-	found, err := discoverTests(r, db)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return r, db, found, aGoTestNamed(t, found, "TestTwoIsTwo"), aGoTestNamed(t, found, "TestTwoIsStillTwo")
-}
-
 // A DELTA PICK BESIDE A NAMED ONE MAPS ITSELF AND LEAVES THE NAMED ONE ALONE.
 func TestOneNamedPickBesideADeltaPickMapsOnlyTheDelta(t *testing.T) {
 	r, db, found, named, delta := aFixtureOfTwoTests(t)

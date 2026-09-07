@@ -11,27 +11,6 @@ import (
 // order. A box told to merge before its notes are in loses them, and a box told
 // to retro after it has merged is told it too late.
 
-// aGroupBoxWithWork is a tree the queue understands, standing on a group branch.
-func aGroupBoxWithWork(t *testing.T) Roots {
-	t.Helper()
-	r := aTreeWithTheProcesses(t)
-	for _, args := range [][]string{
-		{"init", "--initial-branch", "main"},
-		{"config", "user.email", "a@b.c"},
-		{"config", "user.name", "a box"},
-		{"commit", "--allow-empty", "-m", "one"},
-		{"checkout", "-b", "group/archive"},
-	} {
-		if _, err := gitHere(r, args...); err != nil {
-			t.Fatalf("git %v: %v", args, err)
-		}
-	}
-	if got := theGroupOnTheBranch(r); got != "archive" {
-		t.Fatalf("the tree stands on group %q, and this needs archive", got)
-	}
-	return r
-}
-
 // aRetroFolder is what a retro leaves behind, which is how the closing knows
 // one has run.
 func aRetroFolder(t *testing.T, r Roots) {

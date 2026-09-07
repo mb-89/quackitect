@@ -15,16 +15,16 @@ import (
 
 func TestAGroupBranchNamesTheBucket(t *testing.T) {
 	for branch, want := range map[string]string{
-		"group/cloud":    "cloud",
-		"group/archive":  "archive",
-		"group/a-b-c":    "a-b-c",
-		"group/cloud\n":  "cloud",
-		"v4":             "",
-		"main":           "",
-		"grouped/thing":  "",
-		"group/":         "",
+		"group/cloud":     "cloud",
+		"group/archive":   "archive",
+		"group/a-b-c":     "a-b-c",
+		"group/cloud\n":   "cloud",
+		"v4":              "",
+		"main":            "",
+		"grouped/thing":   "",
+		"group/":          "",
 		"feature/group/x": "",
-		"":               "",
+		"":                "",
 	} {
 		if got := theGroupInAName(branch); got != want {
 			t.Errorf("%q names the group %q, and it should name %q", branch, got, want)
@@ -36,24 +36,6 @@ func TestTheGroupFilterIsTheBucket(t *testing.T) {
 	if got := theGroupFilter("archive"); got != "bucket: archive" {
 		t.Errorf("the group archive filters by %q", got)
 	}
-}
-
-// aBoxOnBranch is a work root that is a repository standing on one branch.
-func aBoxOnBranch(t *testing.T, branch string) Roots {
-	t.Helper()
-	r := Roots{Method: filepath.Join("..", ".."), Work: t.TempDir()}
-	for _, args := range [][]string{
-		{"init", "--initial-branch", "main"},
-		{"config", "user.email", "a@b.c"},
-		{"config", "user.name", "a box"},
-		{"commit", "--allow-empty", "-m", "one"},
-		{"checkout", "-b", branch},
-	} {
-		if _, err := gitHere(r, args...); err != nil {
-			t.Fatalf("git %v: %v", args, err)
-		}
-	}
-	return r
 }
 
 // NAMING A BUCKET IS THE WHOLE OF CUTTING A GROUP. Nobody types a checkout,

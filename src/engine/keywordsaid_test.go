@@ -9,19 +9,6 @@ import (
 	"testing"
 )
 
-// A CONTROL A CONSOLE CAN REACH, AND ONE IT CANNOT.
-func aConsoleTree(t *testing.T) Roots {
-	t.Helper()
-	r := guidanceTree(t)
-	os.WriteFile(filepath.Join(r.Method, "util", "parameters.json"), []byte(`{
-	  "name":"quackitect","type":"group","children":[
-	    {"name":"guards","type":"group","shown":true,"children":[
-	      {"name":"search_via_index","type":"bool","default":true,"console":true,
-	       "help":"Every search goes through the index."},
-	      {"name":"stop_needs_claim","type":"bool","default":true}]}]}`), 0o644)
-	return r
-}
-
 func valueOf(t *testing.T, r Roots, key string) any {
 	t.Helper()
 	v, err := LoadValues(r)

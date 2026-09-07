@@ -13,42 +13,6 @@ import (
 
 const thePull = "mcp__quackitect__se_pull"
 
-// aBoxBehindItsOrigin builds an origin, clones it, moves origin on by one
-// commit, and fetches. The clone is then one behind and knows it.
-func aBoxBehindItsOrigin(t *testing.T, branch string) Roots {
-	t.Helper()
-	origin := Roots{Method: filepath.Join("..", ".."), Work: t.TempDir()}
-	for _, args := range [][]string{
-		{"init", "--initial-branch", branch},
-		{"config", "user.email", "a@b.c"},
-		{"config", "user.name", "an origin"},
-		{"commit", "--allow-empty", "-m", "one"},
-	} {
-		if _, err := gitHere(origin, args...); err != nil {
-			t.Fatalf("origin git %v: %v", args, err)
-		}
-	}
-	box := Roots{Method: origin.Method, Work: t.TempDir()}
-	if _, err := gitHere(origin, "clone", "--quiet", origin.Work, box.Work); err != nil {
-		t.Fatalf("the clone failed: %v", err)
-	}
-	for _, args := range [][]string{
-		{"config", "user.email", "a@b.c"},
-		{"config", "user.name", "a box"},
-	} {
-		if _, err := gitHere(box, args...); err != nil {
-			t.Fatalf("the box could not be named: %v", err)
-		}
-	}
-	if _, err := gitHere(origin, "commit", "--allow-empty", "-m", "two"); err != nil {
-		t.Fatalf("origin could not move on: %v", err)
-	}
-	if _, err := gitHere(box, "fetch", "--quiet"); err != nil {
-		t.Fatalf("the box could not fetch: %v", err)
-	}
-	return box
-}
-
 // NOTHING IS HANDED OUT UNTIL THE BOX IS ON THE TIP, and the refusal names both
 // commits so a reader can check rather than believe the box.
 func TestAPullOnAStaleGroupIsRefused(t *testing.T) {

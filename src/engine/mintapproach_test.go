@@ -58,35 +58,3 @@ func TestAMintRequiringAnApproachRefusesWithoutIt(t *testing.T) {
 		}
 	}
 }
-
-// aTreeRequiringAnApproach is a tree whose one process wants a detail and an
-// approach, which is the shape the standard process has.
-func aTreeRequiringAnApproach(t *testing.T) Roots {
-	t.Helper()
-	f := aTree(t)
-	dir := ProcessesDir(f.Work)
-	if err := os.MkdirAll(dir, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	const proc = `name: shaped
-description: a change that wants a shape a reader can disagree with
-sections:
-  required:
-    - detail
-    - approach
-states:
-  - name: open
-    description: written with its approach, and waiting to be taken
-activities:
-  - name: ask
-    does: write it with its approach
-    to: open
-dispositions:
-  - name: done
-    description: it was done
-`
-	if err := os.WriteFile(filepath.Join(dir, "shaped.process.yaml"), []byte(proc), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	return f.Roots
-}
