@@ -44,11 +44,11 @@ Have the submit answer the paths that close wrote, deletions among them, in the 
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | A hand lands what it is told rather than what it remembers, and a hand that still forgets is answering a list it was given. | the settled notice |
+| [x] | what breaks if it is never done, and not only that it stays undone | The branch reads a closed token as open. It happened twice today and was caught by a hook that names no path. | 6d45903 |
+| [x] | the ask is small enough to review whole, or it is split first | — | one new file, five edits in pull.go |
+| [x] | every done-when line is decidable, and names the command where one decides it | Each is one Go test over a real close, reading the answer and the notice back. | RUNME.sh test --on wk-48eee4caa6 |
+| [x] | the basics it stands on exist, or are minted first | — | noteAt, TrackedDir and ArchiveList all stood |
 
 ## evidence: step 2. do
 
@@ -56,9 +56,9 @@ Have the submit answer the paths that close wrote, deletions among them, in the 
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | — | trivial process |
+| [x] | one test was written first and seen red for the reason expected | Red on the assertion: the close wrote doc/work/wk-9587f8c8a1.md and the answer names []. A first run was refused as no red at all, because the package did not compile. | RUNME.sh test --propose TestACloseNames |
+| [x] | the same test was seen green after the change, and named | Both green, inside 63 tests reaching pull.go with none red. Each was also driven against the wrong implementation it guards and seen red there. | TestACloseNamesThePathsItWrote, TestAPrivateNoteNamesNoPathToLand |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | — | one new file, five edits in pull.go |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | Nothing new. wk-bf10a262a0 already carries the other half of this defect and stays as it is. | wk-bf10a262a0 |
 
