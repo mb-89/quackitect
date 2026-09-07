@@ -4,6 +4,7 @@
 {"id":"wk-024bb669f0","title":"restore wiped evidence tables","process":"trivial","disposition":"dropped","blob":"10a75385af1cf826cb0b7890a64ca23b1bfd3dc0","on_branch":"10a75385af1cf826cb0b7890a64ca23b1bfd3dc0"}
 {"id":"wk-02e2f3ac8f","title":"battery verdict line disagrees","process":"trivial","disposition":"done","blob":"9a9676379aca8267573a3178ae7832057cd4dd31","on_branch":"9a9676379aca8267573a3178ae7832057cd4dd31"}
 {"id":"wk-031ca86d99","title":"a manifest, not counts","process":"trivial","disposition":"done","blob":"540739348f4d2af21213108154891deda013189b","on_branch":"540739348f4d2af21213108154891deda013189b"}
+{"id":"wk-0405d57dc5","title":"merge the tests group","process":"trivial","disposition":"dropped","blob":"0aebec38d42a56187a4569e6778d64f098d523c2","on_branch":"80fbd084a848e4f692af479542b24807128518c6"}
 {"id":"wk-050496ac34","title":"the projection reduces","process":"trivial","disposition":"done","blob":"c703dcbff49d6fef763e3d9082801f85bf5bf73b","on_branch":"c703dcbff49d6fef763e3d9082801f85bf5bf73b"}
 {"id":"wk-070dee9dd4","title":"mint honours work flag","process":"trivial","disposition":"done","blob":"d212ae9a7cc76ddc89af4396fecbbb78baadc544","on_branch":"d212ae9a7cc76ddc89af4396fecbbb78baadc544"}
 {"id":"wk-07b7f3e376","title":"oversized evidence blocks verdict","process":"trivial","disposition":"done","blob":"10435164c36366e29b230ba0ead8370225bfaaff","on_branch":"10435164c36366e29b230ba0ead8370225bfaaff"}
