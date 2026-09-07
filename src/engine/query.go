@@ -127,7 +127,7 @@ func ViewPathToWrite(r Roots, name string) (string, bool) {
 	if !ok {
 		return "", false
 	}
-	to := filepath.Join(r.Work, "util", "views", name)
+	to := filepath.Join(viewFolders(r.Work)[0], name)
 	if err := os.MkdirAll(filepath.Dir(to), 0o755); err != nil {
 		return "", false
 	}
@@ -177,11 +177,34 @@ func under(folder, path string) bool {
 // carries a copy of the method is worked on by itself, which is what --work
 // means, and the method stays the fallback for a project that ships none.
 func viewDirs(r Roots) []string {
-	dirs := []string{r.Private("views"), filepath.Join(r.Work, "util", "views")}
+	dirs := append([]string{r.Private("views")}, viewFolders(r.Work)...)
 	if r.Method != r.Work {
-		dirs = append(dirs, filepath.Join(r.Method, "util", "views"))
+		dirs = append(dirs, viewFolders(r.Method)...)
 	}
 	return dirs
+}
+
+// viewFolders is where a tree keeps its views, newest place first.
+//
+// THEY MOVED FROM util/views TO src/views. A view is source: the engine reads
+// one to answer a query, so it belongs beside the code that reads it rather than
+// in the folder that held the installer. util was the folder everything landed
+// in that had nowhere else to go, and that is why it grew to hold the checks,
+// the cage, the installer and five declarations.
+//
+// BOTH ARE SEARCHED WHILE TREES CARRY THE OLD PLACE, and the new one is asked
+// first, so a tree that has moved is never answered out of the old folder. When
+// no tree carries util/views the second entry goes.
+//
+// ONE FUNCTION, BECAUSE THE MOVE IS WHAT BROKE THINGS TWICE TODAY. wk-345a943f66
+// says it plainly: se move will not find a path built by joining segments, and
+// there were nine of those for the declarations alone. A reader that builds the
+// path itself is a reader the next move will miss.
+func viewFolders(root string) []string {
+	return []string{
+		filepath.Join(root, "src", "views"),
+		filepath.Join(root, "util", "views"),
+	}
 }
 
 // Views lists what can be asked for, so a person or a panel can offer them

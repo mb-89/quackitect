@@ -60,6 +60,17 @@ func TestALocalTokenIsTakenWithNoClaim(t *testing.T) {
 	if _, err := TakeUp(r, note.ID, "worker-one"); err != nil {
 		t.Fatalf("a local token was refused: %v", err)
 	}
+	// AND IT IS ACTUALLY HELD. A no-error assertion says the call did not
+	// refuse, and a TakeUp that did nothing at all and returned nil satisfies
+	// that as well as a working one. The token on disk is what a second box
+	// reads, so it is what decides the sentence.
+	back, err := LoadToken(r, note.ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if back.Holder != "worker-one" {
+		t.Errorf("the token was not refused and is held by %q, and worker-one took it up", back.Holder)
+	}
 }
 
 // CLAIMING AND TAKING ARE ONE CALL, because an agent refused for want of a

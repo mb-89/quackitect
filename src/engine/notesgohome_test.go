@@ -234,6 +234,17 @@ func TestADeskStopsWithNotesInHand(t *testing.T) {
 	if err := ClaimStop(r, "main", "asked", "the person said to stop"); err != nil {
 		t.Fatalf("a desk was held at its own notes: %v", err)
 	}
+	// AND THE CLAIM IS STANDING. A nil error says the call did not refuse, and a
+	// ClaimStop that wrote nothing at all returns nil just the same. What the
+	// stop gate reads afterwards is the claim on disk, so that is what decides
+	// this sentence.
+	claim, standing := StandingClaim(r, "main")
+	if !standing {
+		t.Fatal("the desk was not refused and no claim is standing, so nothing was written")
+	}
+	if claim.Because != "asked" {
+		t.Errorf("the claim stands on %q, and the desk claimed asked", claim.Because)
+	}
 }
 
 // aHostTable puts the shipped table of cloud variables in the tree, so the

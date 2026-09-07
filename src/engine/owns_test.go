@@ -19,8 +19,8 @@ func TestTheWorkFolderOwnsItsViews(t *testing.T) {
 	r := Roots{Method: method, Work: work}
 
 	// The method ships one, and nothing else exists yet.
-	os.MkdirAll(filepath.Join(method, "util", "views"), 0o755)
-	os.WriteFile(filepath.Join(method, "util", "views", "work.base"),
+	os.MkdirAll(filepath.Join(method, "src", "views"), 0o755)
+	os.WriteFile(filepath.Join(method, "src", "views", "work.base"),
 		[]byte("views:\n  - name: left\n    order:\n      - title\n"), 0o644)
 
 	// READING FALLS BACK TO THE METHOD, and that is right: a project that ships
@@ -33,8 +33,8 @@ func TestTheWorkFolderOwnsItsViews(t *testing.T) {
 	}
 
 	// The folder being worked on carries its own, and its own wins.
-	os.MkdirAll(filepath.Join(work, "util", "views"), 0o755)
-	os.WriteFile(filepath.Join(work, "util", "views", "work.base"),
+	os.MkdirAll(filepath.Join(work, "src", "views"), 0o755)
+	os.WriteFile(filepath.Join(work, "src", "views", "work.base"),
 		[]byte("views:\n  - name: left\n    order:\n      - status\n"), 0o644)
 
 	got, ok = ViewPath(r, "work")
@@ -90,7 +90,7 @@ func TestAnEditNeverWritesIntoTheMethod(t *testing.T) {
 	method, work := t.TempDir(), t.TempDir()
 	r := Roots{Method: method, Work: work}
 
-	shipped := filepath.Join(method, "util", "views", "work.base")
+	shipped := filepath.Join(method, "src", "views", "work.base")
 	os.MkdirAll(filepath.Dir(shipped), 0o755)
 	const text = `
 groups:
@@ -173,7 +173,7 @@ func TestANeighbourIsNotAChild(t *testing.T) {
 	}
 	r := Roots{Method: method, Work: work}
 
-	shipped := filepath.Join(method, "util", "views", "work.base")
+	shipped := filepath.Join(method, "src", "views", "work.base")
 	os.MkdirAll(filepath.Dir(shipped), 0o755)
 	os.MkdirAll(work, 0o755)
 	const text = `

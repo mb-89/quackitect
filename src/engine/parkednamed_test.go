@@ -41,7 +41,7 @@ func TestAParkedTokenLeavesTheQueueAndIsNamed(t *testing.T) {
 
 	// SE QUERY NAMES THEM, WITH THE CONDITION. The shipped view declares the
 	// group, so the panel shows what the queue will not hand out.
-	b, err := LoadBase(filepath.Join("..", "..", "util", "views", "work.base"))
+	b, err := LoadBase(filepath.Join("..", "..", "src", "views", "work.base"))
 	if err != nil {
 		t.Fatal(err)
 	}
