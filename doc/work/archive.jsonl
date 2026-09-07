@@ -161,5 +161,6 @@
 {"id":"wk-f902d684ab","title":"a done token reviewed","process":"trivial","disposition":"done","blob":"0a729b830675f784887a707d0d9ea5edf3806231","on_branch":"62bbff61b1f5725c137a9792a34901aa6f61f8a9"}
 {"id":"wk-f9233114b0","title":"chapters lost their practice","process":"trivial","disposition":"done","on_branch":"001caa15134c29b5b0b54e0b63e9f694ca99a6a7","tag":"refs/tags/archive/wk-f9233114b0"}
 {"id":"wk-fa4edbe5aa","title":"the retro collects voice","process":"trivial","disposition":"done","on_branch":"ec9d184e1f9a02e650ce122bf7ff0607a1c59208","tag":"refs/tags/archive/wk-fa4edbe5aa"}
+{"id":"wk-fa90ae2cdf","title":"commits stage by name","process":"standard","disposition":"done","blob":"6f2bb6da81fdfce2a8d5de1af98fec8ce11e2fcb","on_branch":"38e321ac45cd65b3e0523b514c6857e587fcf512"}
 {"id":"wk-faeaddd8a7","title":"a stale engine rebuilds","process":"trivial","disposition":"done","on_branch":"dc5581243fa95485e2d09c2c0414982341c5a52c","tag":"refs/tags/archive/wk-faeaddd8a7"}
 {"id":"wk-ff6f0d8b1e","title":"mint takes done when","process":"trivial","disposition":"done","on_branch":"71719ca63c72ecb61e30e873c615cf234451c471","tag":"refs/tags/archive/wk-ff6f0d8b1e"}
