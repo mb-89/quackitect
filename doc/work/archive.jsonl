@@ -17,6 +17,7 @@
 {"id":"wk-16761b9ac8","title":"verdict verification runs","process":"trivial","disposition":"done","on_branch":"62bd47cc051c6dbad9c5d74bb0933083a1c0c788","tag":"refs/tags/archive/wk-16761b9ac8"}
 {"id":"wk-18180e68cf","title":"an abort stays open","process":"trivial","disposition":"done","on_branch":"b18ba2efb718fe3011e3d98c17dd1d204f2b62ad","tag":"refs/tags/archive/wk-18180e68cf"}
 {"id":"wk-191014c633","title":"types at decode edge","process":"standard","disposition":"dropped","on_branch":"7bfde83cddc73803633a7bafdab4ea5ed6badb71","tag":"refs/tags/archive/wk-191014c633"}
+{"id":"wk-1a22aff298","title":"map decision per pick","process":"trivial","disposition":"done","blob":"b83256b41c9795eb2a4700aab2c52a52b78a9879","on_branch":"d04654eb30a914f6b296e6464a9cf18bb3437350"}
 {"id":"wk-1bcd327a65","title":"a move hides failure","process":"trivial","disposition":"done","on_branch":"35c5ae5f4bdb3623b2d2ed15aef2809d7a01bda5","tag":"refs/tags/archive/wk-1bcd327a65"}
 {"id":"wk-1c1d4de234","title":"RUNME rewrites its arguments","process":"trivial","disposition":"done","on_branch":"344dd8b4ffd982e821e5253f284fe420b5b2c259","tag":"refs/tags/archive/wk-1c1d4de234"}
 {"id":"wk-1c3f3107db","title":"chapter thirteen lost seeds","process":"trivial","disposition":"done","on_branch":"3ad51c72e5399fdb23518c6093024f82379cb7b2","tag":"refs/tags/archive/wk-1c3f3107db"}
