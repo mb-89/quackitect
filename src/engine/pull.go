@@ -538,7 +538,7 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 	// thing to hear than a row nobody answered, and fixing the rows first would
 	// be work done in the wrong order.
 	if why := TestsRefuseTheClose(r, t); why != "" {
-		return refuse(&t, Rejection{Clause: "the tests", Wrong: why,
+		return refuse(&t, Rejection{Clause: theTestsClause, Wrong: why,
 			Satisfies: "a run over this token's delta that passed: se test --on " + t.ID}), true
 	}
 	// A SUBMISSION SAYS WHAT IT BRINGS. IT DOES NOT SAY WHAT THE NOTE NO LONGER

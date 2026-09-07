@@ -338,6 +338,13 @@ func amongTheChanges(was []change, c change) bool {
 	return false
 }
 
+// theTestsClause names the clause a refusal from this gate carries. It is one
+// identifier, read by the gate's caller and by what tests it, so a test asking
+// whether the tests held a token asks for this rather than for the sentence the
+// gate happens to use. A test matching the sentence goes quiet the day either
+// is reworded, and stops checking anything while staying green.
+const theTestsClause = "the tests"
+
 // TestsRefuseTheClose answers why the tests will not let this token move on,
 // and nothing where they will.
 //

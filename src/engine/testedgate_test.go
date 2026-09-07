@@ -103,16 +103,38 @@ func TestTheTestVerbWritesTheRunItRan(t *testing.T) {
 	if got := Pull(r, "worker-here", RoleWorker, Payload{}); got.Pull != AnswerWork {
 		t.Fatalf("this test proves nothing: nothing was handed out: %s", got.Notice)
 	}
+	if why := TestsRefuseTheClose(r, tok); why != "" {
+		t.Fatalf("the tests hold a token whose recorded run passed: %s", why)
+	}
 	got := Pull(r, "worker-here", RoleWorker, Payload{ID: tok.ID, Disposition: "done"})
-	for _, f := range got.Findings {
-		if strings.Contains(f.Wrong, "did not pass") || strings.Contains(f.Wrong, "had not finished") {
-			t.Fatalf("the gate held a token whose recorded run passed: %+v", got.Findings)
+	if held := theRefusalFromTheTests(got.Findings); held != nil {
+		t.Fatalf("the gate held a token whose recorded run passed: %+v", *held)
+	}
+}
+
+// theRefusalFromTheTests answers the refusal this gate wrote, and nothing where
+// it wrote none.
+//
+// IT ASKS FOR THE CLAUSE, NOT FOR THE SENTENCE. Both tests here read the gate's
+// prose, and either wording is one edit from matching nothing: the loop would
+// then find no refusal, both tests would stay green, and neither criterion
+// would be checked by anything again. The clause is an identifier the gate and
+// this file both read, so a reword cannot reach it.
+func theRefusalFromTheTests(findings []Rejection) *Rejection {
+	for _, f := range findings {
+		if f.Clause == theTestsClause {
+			return &f
 		}
 	}
+	return nil
 }
 
 // AND THE SUBMISSION ASKS IT, which is the half that matters. A gate nothing
 // calls is a gate that gates nothing, which is the defect this replaces.
+//
+// IT ASKS FOR THE REFUSAL BY ITS CLAUSE, and then that the refusal carries the
+// gate's own words. Both halves are read at run time, so neither can be
+// disarmed by an edit to the sentence.
 func TestASubmissionIsRefusedWhenTheRunWasRed(t *testing.T) {
 	t.Parallel()
 	r := aTreeWithTheProcesses(t)
@@ -128,13 +150,11 @@ func TestASubmissionIsRefusedWhenTheRunWasRed(t *testing.T) {
 	if got.Pull != AnswerRefused {
 		t.Fatalf("a submission on a token whose run went red answered %s", got.Pull)
 	}
-	var named bool
-	for _, f := range got.Findings {
-		if strings.Contains(f.Wrong, "did not pass") {
-			named = true
-		}
+	held := theRefusalFromTheTests(got.Findings)
+	if held == nil {
+		t.Fatalf("the tests did not hold a token whose run went red: %+v", got.Findings)
 	}
-	if !named {
-		t.Errorf("the refusal does not name the run: %+v", got.Findings)
+	if why := TestsRefuseTheClose(r, tok); held.Wrong != why {
+		t.Errorf("the refusal reads %q and the gate answers %q", held.Wrong, why)
 	}
 }
