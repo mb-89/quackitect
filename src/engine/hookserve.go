@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"hash/fnv"
 	"io"
@@ -153,7 +154,11 @@ func serveHooks(ctx context.Context, ln net.Listener, r Roots, log *sessionlog.L
 			took := time.Since(began)
 			one.Unlock()
 			theLoad.hooksAnswered.Add(1)
-			theLoad.noteHook(log, int(waiting), waited, took)
+			var named hookIn
+			// A BODY THAT WILL NOT READ NAMES NOTHING, and the numbers still
+			// stand, so the line is written either way.
+			_ = json.Unmarshal(raw, &named)
+			theLoad.noteHook(log, int(waiting), waited, took, named.ToolName, named.Event)
 			w.Header().Set("Content-Type", "application/json")
 			if out.Len() == 0 {
 				// No decision is an empty object, which the harness reads as
@@ -202,7 +207,8 @@ const (
 // MEASURED. The line said bottleneck on all three, and the owner read "the
 // guard is the bottleneck: 1 queued, waited 0 ms" and asked how that was one.
 // The numbers beside the headline already said it was not.
-func (l *engineLoad) noteHook(log *sessionlog.Log, queued int, waited, took time.Duration) {
+func (l *engineLoad) noteHook(log *sessionlog.Log, queued int, waited, took time.Duration,
+	tool string, event HookEvent) {
 	behind := queued >= hookQueueBound || waited >= hookWaitBound
 	if !behind && took < hookTookBound {
 		return
@@ -217,10 +223,27 @@ func (l *engineLoad) noteHook(log *sessionlog.Log, queued int, waited, took time
 		says = "the guard is the bottleneck"
 	}
 	log.Write("engine", "load", "engine",
-		fmt.Sprintf("%s: %d queued, waited %d ms, answered in %d ms",
-			says, queued, waited.Milliseconds(), took.Milliseconds()), sessionlog.No(),
+		fmt.Sprintf("%s%s: %d queued, waited %d ms, answered in %d ms",
+			says, onWhat(tool, event), queued, waited.Milliseconds(), took.Milliseconds()), sessionlog.No(),
 		map[string]any{"queued": queued, "waited_ms": waited.Milliseconds(), "took_ms": took.Milliseconds(),
-			"behind": behind, "verbs_in_flight": l.verbsInFlight.Load()})
+			"behind": behind, "verbs_in_flight": l.verbsInFlight.Load(),
+			"tool": tool, "event": string(event)})
+}
+
+// onWhat names the hook the line is about, for the headline.
+//
+// A LINE WITH NOTHING TO NAME STILL SAYS THE NUMBERS. An event that will not
+// read names nothing, and a number without a lead beats no line at all.
+func onWhat(tool string, event HookEvent) string {
+	switch {
+	case tool != "" && event != "":
+		return " on " + string(event) + " " + tool
+	case event != "":
+		return " on " + string(event)
+	case tool != "":
+		return " on " + tool
+	}
+	return ""
 }
 
 // snapshot answers the counters, for a ping.
