@@ -264,7 +264,26 @@ func (t Token) laneInWords() string {
 // nothing. The author's own name is asked first and the lane it worked in
 // after, because the lane is what a second name in one session does not change.
 func theVerdictIsNotYours(r Roots, t Token, actor string) *Rejection {
-	if t.Author != "" && t.Author == actor {
+	// AN ABSENT AUTHOR IS THE CASE THIS RULE IS ABOUT, and it used to be the one
+	// case that walked past. The comparison below asks whether the author is the
+	// puller, and for a token carrying no author the answer is no, so it was
+	// handed over. A guard reading a field nobody wrote passes everything, and
+	// passes it silently, which is worse than having no guard.
+	//
+	// MEASURED, September 2026: a token was written by main, its frontmatter
+	// carried no author, and the queue offered main its own verdict. It had
+	// walked forward on its ticked checklist without a submit through the
+	// engine, and the author is written only by that submit.
+	//
+	// REFUSING IS THE SAFE DIRECTION. It can hold a verdict back and it cannot
+	// hand one to the wrong hand.
+	if t.Author == "" {
+		return &Rejection{Clause: "author",
+			Wrong: t.ID + " names no author, so nobody can be told the verdict is not theirs",
+			Satisfies: "an author on the token. The work step writes one when it is " +
+				"submitted through the engine, so submit that step rather than ticking it"}
+	}
+	if t.Author == actor {
 		return &Rejection{Clause: "author",
 			Wrong:     "you did the work on " + t.ID + ", so the verdict is not yours",
 			Satisfies: "a verdict from another actor. Pull with role worker for work of your own"}

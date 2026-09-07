@@ -739,7 +739,7 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, strin
 			ok, said, took, regions, err := runOneGoTest(r, bin, engine, t, wantMap)
 			x := ran{ID: t.ID, Kind: t.Kind, OK: ok, Seconds: took.Seconds()}
 			if !ok {
-				x.Said = tailOf(said, 2000)
+				x.Said = whatFailedIn(said, 2000)
 			}
 			if wantMap && err == nil && ok {
 				_ = writeRegions(db, t, regions, took) // a map it cannot write is written on the next run
@@ -773,7 +773,7 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, strin
 			x := ran{ID: t.ID, Kind: t.Kind, OK: err == nil, Seconds: time.Since(start).Seconds(),
 				Engine: checkEngineNote(engineSaid, engineStale)}
 			if err != nil {
-				x.Said = tailOf(string(said), 2000)
+				x.Said = whatFailedIn(string(said), 2000)
 			}
 			out = append(out, x)
 		}
@@ -949,6 +949,73 @@ func nodeTool() string {
 		return p
 	}
 	return "node"
+}
+
+// whatFailedIn keeps what a reader needs out of a long output: the lines that
+// say something failed, and then the tail.
+//
+// THE TAIL ALONE HID THE ONE LINE THAT MATTERED. A check prints a line per
+// assertion and its failures come first, so a run of three hundred oks and one
+// FAIL answered three hundred oks. The reader is told a check failed and not
+// which part of it, which is a report nobody can act on. MEASURED, September
+// 2026: drive-editor answered 1 failed three times running and the failing line
+// was never in the answer.
+func whatFailedIn(s string, n int) string {
+	if len(s) <= n {
+		return s
+	}
+	lines := strings.Split(s, "\n")
+	var kept []string
+	for i, line := range lines {
+		if !saysItFailed(line) {
+			continue
+		}
+		kept = append(kept, line)
+		// THE REASON IS THE LINE UNDER IT. Every check in this tree prints the
+		// assertion and then why it did not hold, so one without the other is
+		// half a report. A line that is itself a result is not that reason.
+		if i+1 < len(lines) {
+			next := strings.TrimSpace(lines[i+1])
+			if next != "" && !strings.HasPrefix(next, "ok") && !saysItFailed(lines[i+1]) {
+				kept = append(kept, lines[i+1])
+			}
+		}
+	}
+	// A RUN THAT NAMED NO FAILURE KEEPS ITS TAIL, which is where a Go test
+	// prints what went wrong when it never printed the word.
+	if len(kept) == 0 {
+		return lastOf(s, n)
+	}
+	head := strings.Join(kept, "\n")
+	if len(head) >= n {
+		return head[:n]
+	}
+	return head + "\n" + lastOf(s, n-len(head)-1)
+}
+
+// saysItFailed answers whether a line is a check or a test saying so. Both
+// spellings are read, because the engine runs both kinds and a reader wants
+// the same thing from each.
+func saysItFailed(line string) bool {
+	t := strings.TrimSpace(line)
+	return strings.HasPrefix(t, "FAIL") || strings.HasPrefix(t, "--- FAIL") ||
+		strings.Contains(t, "FAIL:")
+}
+
+// lastOf is the tail of a string inside the budget it is given, the mark that
+// says something was cut included. tailOf spends three characters over its
+// number, which is right where it is called and wrong inside a budget.
+func lastOf(s string, n int) string {
+	if n <= 0 {
+		return ""
+	}
+	if len(s) <= n {
+		return s
+	}
+	if n <= 3 {
+		return s[len(s)-n:]
+	}
+	return "..." + s[len(s)-(n-3):]
 }
 
 func tailOf(s string, n int) string {
