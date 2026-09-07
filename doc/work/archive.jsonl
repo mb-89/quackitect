@@ -149,6 +149,7 @@
 {"id":"wk-e523c49ae8","title":"four tests over eight","process":"trivial","disposition":"done","blob":"1293ef445e161bdeab99eb83eab98bdb3ea6488c","on_branch":"77d8dfb8eb50a49906e2188faea7da289689bbdc"}
 {"id":"wk-e6ae200e49","title":"one scrollbar no pagination","process":"trivial","disposition":"done","on_branch":"9ad9146aac8146d95b19630e71bc397f730160b8","tag":"refs/tags/archive/wk-e6ae200e49"}
 {"id":"wk-eabe5523ab","title":"todos become sub-tokens","process":"trivial","disposition":"done","on_branch":"cdc4eb09b5b8842d93c7619e21a3496be47d1bb1","tag":"refs/tags/archive/wk-eabe5523ab"}
+{"id":"wk-eb0eeb7aa2","title":"command guard reads bash","process":"standard","disposition":"done","blob":"01e28e8f13a666986aba77727f20d4541c8230e5","on_branch":"3e09c6cda8530b41ae722951a80e0b2d926130ae"}
 {"id":"wk-eb2514347a","title":"verdict reached its author","process":"trivial","disposition":"done","on_branch":"a04dd5e113f5722dc12861ffe6b3fd5798f35c95","tag":"refs/tags/archive/wk-eb2514347a"}
 {"id":"wk-f2ff29238c","title":"chapter two dropped lessons","process":"trivial","disposition":"done","on_branch":"421186de60a7d86a41b8d5a4163972c2bceafcb1","tag":"refs/tags/archive/wk-f2ff29238c"}
 {"id":"wk-f3a80af33e","title":"sh -c hides commands","process":"trivial","disposition":"done","blob":"57ec8a9ee9ccb4475489e5385893238d86ecc483","on_branch":"dd1845183bfa28968b9dc453420910b7af99960a"}
