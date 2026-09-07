@@ -76,7 +76,67 @@ func TestOneWalkAnswersEveryQuestion(t *testing.T) {
 				one.what, got, one.live, substitutions)
 		}
 	}
+
+	// AND A SECOND WALKER IS CAUGHT WHATEVER ITS RESULTS ARE CALLED.
+	//
+	// The rule above was two string results spelt separators and substitutions,
+	// so the twin below went past it: the walk it says nothing else does could
+	// come back under other spellings with this test still green.
+	for _, one := range []struct {
+		what, source string
+		pair         bool
+	}{
+		{"a twin under other names", theTwin, true},
+		{"two strings reading no quote", theHalves, false},
+		{"a quote walker answering one string", theSingle, false},
+	} {
+		file, err := parser.ParseFile(token.NewFileSet(), "twin.go", one.source, 0)
+		if err != nil {
+			t.Fatalf("%s: %v", one.what, err)
+		}
+		got := false
+		for _, d := range file.Decls {
+			if fn, ok := d.(*ast.FuncDecl); ok && answersThePair(fn) {
+				got = true
+			}
+		}
+		if got != one.pair {
+			t.Errorf("%s: the rule says it answers the pair %v, and it does %v",
+				one.what, got, one.pair)
+		}
+	}
 }
+
+// The three sources the rule is driven against. A twin is not shipped, so it is
+// parsed from here rather than added to the engine to be found.
+const (
+	theTwin = `package p
+
+func stripped(s string) (seps, subs string) {
+	for i := 0; i < len(s); i++ {
+		if s[i] == '\'' || s[i] == '"' {
+			seps += string(s[i])
+			continue
+		}
+		subs += string(s[i])
+	}
+	return seps, subs
+}
+`
+	theHalves = `package p
+
+func halves(s string) (a, b string) { return s, s }
+`
+	theSingle = `package p
+
+func one(s string) string {
+	if s[0] == '\'' || s[0] == '"' {
+		return s
+	}
+	return ""
+}
+`
+)
 
 // EVERY STATE BASH'S MANUAL NAMES HAS A ROW, THE BACKSLASH STATE INCLUDED.
 //
@@ -264,22 +324,49 @@ func theShippedSource(t *testing.T) []string {
 }
 
 // answersThePair says whether a function answers the two readings of a command,
-// which is the walk this token is about.
+// which is the walk this file is about.
+//
+// IT READS WHAT THE FUNCTION DOES RATHER THAN WHAT ITS RESULTS ARE CALLED. The
+// rule was two string results spelt separators and substitutions, so a second
+// walker answering (seps, subs string) was invisible to it. The one defect this
+// test exists for could then come back under other spellings, green.
 func answersThePair(fn *ast.FuncDecl) bool {
-	if fn.Type.Results == nil {
+	if fn.Type.Results == nil || fn.Body == nil {
 		return false
 	}
-	var named []string
+	results := 0
 	for _, res := range fn.Type.Results.List {
 		id, ok := res.Type.(*ast.Ident)
 		if !ok || id.Name != "string" {
 			return false
 		}
-		for _, n := range res.Names {
-			named = append(named, n.Name)
+		if len(res.Names) == 0 {
+			results++
+			continue
 		}
+		results += len(res.Names)
 	}
-	return len(named) == 2 && named[0] == "separators" && named[1] == "substitutions"
+	return results == 2 && readsBothQuotes(fn.Body)
+}
+
+// readsBothQuotes says whether this body reads the two quote characters, which
+// is what a quote walker does and what nothing else in the engine does.
+func readsBothQuotes(body *ast.BlockStmt) bool {
+	single, double := false, false
+	ast.Inspect(body, func(n ast.Node) bool {
+		lit, ok := n.(*ast.BasicLit)
+		if !ok || lit.Kind != token.CHAR {
+			return true
+		}
+		switch lit.Value {
+		case `'\''`:
+			single = true
+		case `'"'`:
+			double = true
+		}
+		return true
+	})
+	return single && double
 }
 
 // namesThePair says whether an assignment takes the two readings.
