@@ -144,6 +144,7 @@
 {"id":"wk-dd3561b254","title":"swap can lose engine","process":"trivial","disposition":"done","blob":"fe1ab5fde03f17ee82a54d7750ce0b9eb2c7adc4","on_branch":"65b57eea8ca663b1589b8b5713188959d071336c"}
 {"id":"wk-de2256d35c","title":"a note not consumed","process":"trivial","disposition":"done","on_branch":"faa62a76e12fd43817d116ff7193617b71467601","tag":"refs/tags/archive/wk-de2256d35c"}
 {"id":"wk-e2809c026c","title":"take-back keeps its look","process":"trivial","disposition":"done","on_branch":"02825aba0c7fcfc302cecd19ac21fc50391fb955","tag":"refs/tags/archive/wk-e2809c026c"}
+{"id":"wk-e46813bb3f","title":"cover build ignores seam","process":"trivial","disposition":"done","blob":"1028a6f76e92179d4007babc4ed56e4581fad2a6","on_branch":"9fc913d3ce39b3747d918eb32691fabd9252c3ac"}
 {"id":"wk-e51c579664","title":"shell lookup finds WSL","process":"standard","disposition":"done","on_branch":"0c829ff8a41844238466b1fe651281bd07a49841","tag":"refs/tags/archive/wk-e51c579664"}
 {"id":"wk-e6ae200e49","title":"one scrollbar no pagination","process":"trivial","disposition":"done","on_branch":"9ad9146aac8146d95b19630e71bc397f730160b8","tag":"refs/tags/archive/wk-e6ae200e49"}
 {"id":"wk-eabe5523ab","title":"todos become sub-tokens","process":"trivial","disposition":"done","on_branch":"cdc4eb09b5b8842d93c7619e21a3496be47d1bb1","tag":"refs/tags/archive/wk-eabe5523ab"}
