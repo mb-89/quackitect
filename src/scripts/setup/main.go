@@ -79,8 +79,10 @@ func main() {
 		return
 	}
 	if *root == "" {
+		// install.sh runs go run . from src/scripts/setup, which is three
+		// folders below the root, so the walk goes up three.
 		here, _ := os.Getwd()
-		*root = filepath.Clean(filepath.Join(here, "..", ".."))
+		*root = filepath.Clean(filepath.Join(here, "..", "..", ".."))
 	}
 	m, err := readManifest(filepath.Join(*root, "src", "scripts", "setup", "manifest.json"))
 	if err != nil {

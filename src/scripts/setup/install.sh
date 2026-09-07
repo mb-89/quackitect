@@ -9,7 +9,8 @@
 #   src/scripts/setup/install.sh --help
 set -eu
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-root=$(CDPATH= cd -- "$here/../.." && pwd)
+# This script sits three folders below the root, so the walk goes up three.
+root=$(CDPATH= cd -- "$here/../../.." && pwd)
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
