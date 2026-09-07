@@ -50,6 +50,17 @@ func TestNoExportedFunctionHereIsUncalled(t *testing.T) {
 		// here so a reader can tell it from an oversight, which is the
 		// answer the method allows and the one silence does not.
 		"OperatorsFor": "the filter builder's per-type offer, owed a caller by the v3 editor port",
+		// HANDED TO THE LINT'S TABLE AS A VALUE. Each sits in the list of
+		// lints in lint.go, written without a bracket, which is the shape a
+		// search for a caller cannot see. The same case as AskToStop above.
+		"LintGuidance":   "handed to the lint's table in lint.go as a value, so it is passed and never called by name",
+		"LintProcesses":  "handed to the lint's table in lint.go as a value, so it is passed and never called by name",
+		"LintRationales": "handed to the lint's table in lint.go as a value, so it is passed and never called by name",
+		// AND ONE THAT IS OWED AN ANSWER RATHER THAN A CALLER. Nothing in
+		// this tree names HoldStates, and its own comment says a check walks
+		// the list it answers. No check does. A token in the tests bucket
+		// decides between writing that check and taking the function out.
+		"HoldStates": "nothing calls it, and a token carries whether the check its comment promises is written or the function goes",
 		// CALLED THROUGH AN INTERFACE BY SOMEBODY ELSE'S CODE. The name never
 		// appears at a call site here, and it never will, because the caller is
 		// the standard library reaching the type through an interface.
@@ -69,11 +80,15 @@ func TestNoExportedFunctionHereIsUncalled(t *testing.T) {
 			t.Errorf("%s is excused here and this package declares no such function", name)
 		}
 	}
+	// THE TREE IS READ ONCE. It was walked again for every name the package
+	// declares, a few hundred names over a few hundred files, and that made
+	// this the longest test in the suite at nearly nine seconds.
+	calls := theCallsIn(t, root)
 	for name, where := range declared {
 		if _, said := reached[name]; said {
 			continue
 		}
-		if calledSomewhere(t, root, name, where) {
+		if calls[name] {
 			continue
 		}
 		t.Errorf("%s in %s is exported, nothing calls it, and it is in no exclusion. "+
@@ -114,12 +129,17 @@ func exportedFuncs(t *testing.T, dir string) map[string]string {
 // call site writes.
 var exportedHere = regexp.MustCompile(`(?m)^func (?:\([^)]*\) )?([A-Z]\w*)\(`)
 
-// calledSomewhere answers whether anything but the declaration names it.
-func calledSomewhere(t *testing.T, root, name, declaredIn string) bool {
+// theCallsIn answers every name this tree calls, over one reading of it.
+//
+// IT WAS A WALK PER NAME. Every exported name the package declares sent a walk
+// over every Go file under src, so the reading was done a few hundred times and
+// this was the longest test in the suite. The answer is the same either way,
+// and the tree is read once for it.
+func theCallsIn(t *testing.T, root string) map[string]bool {
 	t.Helper()
-	found := false
-	filepath.WalkDir(filepath.Join(root, "src"), func(p string, d os.DirEntry, err error) error {
-		if err != nil || d.IsDir() || found || !strings.HasSuffix(p, ".go") {
+	calls := map[string]bool{}
+	if err := filepath.WalkDir(filepath.Join(root, "src"), func(p string, d os.DirEntry, err error) error {
+		if err != nil || d.IsDir() || !strings.HasSuffix(p, ".go") {
 			return nil
 		}
 		b, err := os.ReadFile(p)
@@ -127,21 +147,32 @@ func calledSomewhere(t *testing.T, root, name, declaredIn string) bool {
 			return nil
 		}
 		for _, line := range strings.Split(string(b), nl) {
-			// THE DECLARATION IS NOT A CALL, and a method's declaration carries
-			// its receiver between func and the name, so a prefix match on the
-			// name alone read every method as calling itself.
-			if m := exportedHere.FindStringSubmatch(line); m != nil && m[1] == name {
-				continue
-			}
 			if strings.HasPrefix(line, "//") {
 				continue
 			}
-			if strings.Contains(line, name+"(") {
-				found = true
-				return nil
+			// THE DECLARATION IS NOT A CALL, and a method's declaration carries
+			// its receiver between func and the name, so the name is read off
+			// the line and passed over where the two are the same.
+			declares := ""
+			if m := exportedHere.FindStringSubmatch(line); m != nil {
+				declares = m[1]
+			}
+			for _, m := range aCallHere.FindAllStringSubmatch(line, -1) {
+				if m[1] != declares {
+					calls[m[1]] = true
+				}
 			}
 		}
 		return nil
-	})
-	return found
+	}); err != nil {
+		t.Fatal(err)
+	}
+	if len(calls) < 100 {
+		t.Fatalf("the walk found %d names being called, so it is not reading the tree", len(calls))
+	}
+	return calls
 }
+
+// aCallHere matches a name with a bracket after it, which is what a call looks
+// like wherever it is written, method or function.
+var aCallHere = regexp.MustCompile(`([A-Za-z_]\w*)\(`)
