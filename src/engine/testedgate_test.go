@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"context"
 	"strings"
 	"testing"
 )
@@ -46,6 +48,66 @@ func TestACloseAsksWhatTheEngineRan(t *testing.T) {
 				t.Errorf("the refusal does not say why: %s", why)
 			}
 		})
+	}
+}
+
+// AND THE VERB WRITES WHAT THE GATE READS, which is the seam the rest rests on.
+//
+// Both tests here call RecordTheRun in the same process, so they pass whether or
+// not the verb ever writes anything. A report said se test left no store at all:
+// a dozen runs through the lane and three at a prompt, and .se/tested.json was
+// not on the box. Under that, the gate is right and every close goes through it
+// untouched, which is a gate that gates nothing.
+//
+// So this drives the verb and reads the store back, which is the one thing
+// neither test above can do.
+func TestTheTestVerbWritesTheRunItRan(t *testing.T) {
+	r := aTreeWithTheProcesses(t)
+	tok := mintStandard(t, r, "work the verb runs")
+	if _, found := LastRunOn(r, tok.ID); found {
+		t.Fatal("the store already holds a run for a token nothing has tested")
+	}
+
+	// THE TOKEN HAS TO HAVE WRITTEN SOMETHING, and this is not decoration.
+	// Nothing in the record says what a token just minted wrote, so the delta is
+	// the whole diff, and a whole diff starts the battery outside this engine
+	// whatever is proposed. That run is recorded pending, which is neither a
+	// pass nor a failure, and the gate refuses a close on it. So an apply on the
+	// token gives the delta something to be, and a proposal that reaches nothing
+	// keeps the run empty and green.
+	if _, err := Apply(r, []Edit{{File: "one.txt", Op: "create", New: "one\n"}},
+		false, tok.ID, "worker-here"); err != nil {
+		t.Fatalf("the token could not write anything: %v", err)
+	}
+
+	var out, said bytes.Buffer
+	code := runTest(&call{ctx: context.Background(), roots: r,
+		args: []string{"--on", tok.ID, "--by", "worker-here", "--propose", "TestNothingInThisTreeIsCalledThis"},
+		in:   strings.NewReader(""), out: &out, err: &said})
+	if code != 0 {
+		t.Fatalf("the test verb answered %d. It said %q, and its reason stream said %q",
+			code, out.String(), said.String())
+	}
+
+	run, found := LastRunOn(r, tok.ID)
+	if !found {
+		t.Fatalf("the verb ran and wrote no record, so the gate reads nothing. It answered: %s", out.String())
+	}
+	if !run.OK || run.Pending {
+		t.Fatalf("the record does not say the run passed: %+v", run)
+	}
+
+	// AND THE SUBMISSION TAKES IT. The gate reads this same record, so a token
+	// whose recorded run passed is not held on the run. Anything else the
+	// submission wants is that process's business and not this seam's.
+	if got := Pull(r, "worker-here", RoleWorker, Payload{}); got.Pull != AnswerWork {
+		t.Fatalf("this test proves nothing: nothing was handed out: %s", got.Notice)
+	}
+	got := Pull(r, "worker-here", RoleWorker, Payload{ID: tok.ID, Disposition: "done"})
+	for _, f := range got.Findings {
+		if strings.Contains(f.Wrong, "did not pass") || strings.Contains(f.Wrong, "had not finished") {
+			t.Fatalf("the gate held a token whose recorded run passed: %+v", got.Findings)
+		}
 	}
 }
 
