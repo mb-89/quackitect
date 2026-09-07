@@ -44,11 +44,11 @@ The smallest case: with any token in hand, run git add -u and watch it go throug
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | The two guards cover the shapes a stage of everything is spelt in, rather than all but one. A rule with a known way round it is a rule nobody can rely on. |  |
+| [x] | what breaks if it is never done, and not only that it stays undone | An agent reaching for a stage of everything is refused twice and admitted on the third spelling. The commit of strangers this exists to stop lands under one letter. |  |
+| [x] | the ask is small enough to review whole, or it is split first | — |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | All three name a Go test over the guard. The first two are rows in TestACommitNamesItsPaths, and the third is the allowed half of the same table. |  |
+| [x] | the basics it stands on exist, or are minted first | — |  |
 
 ## evidence: step 2. do
 
@@ -56,9 +56,9 @@ The smallest case: with any token in hand, run git add -u and watch it go throug
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | — |  |
+| [x] | one test was written first and seen red for the reason expected | TestACommitNamesItsPaths, four rows added first. Red on the assertion: refused with "A STAGE OF EVERYTHING IS REFUSED": false, want true. The stage guard stayed silent and the outer gate answered instead. |  |
+| [x] | the same test was seen green after the change, and named | Green, with TestACommitCarriesOnlyItsOwnPaths, TestAStageOfAStrangersPathIsRefused and TestARemovalNeedsARead. refusals-name-a-door and a-refusal-names-a-legal-move pass over the new wording. |  |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | 04f43a66 is no object here, so the change reads against HEAD: commit c3b879ba. |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | The refusal named -A, --all and . and now names -u and --update too, which is in the change. |  |
 
