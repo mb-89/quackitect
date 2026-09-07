@@ -71,7 +71,7 @@ func (r Roots) forget() {
 // findings against files that have nothing to do with anything.
 func methodRootFrom(start string) string {
 	for dir := range walkUp(start) {
-		if st, err := os.Stat(filepath.Join(dir, "src", "processes")); err == nil && st.IsDir() {
+		if st, err := os.Stat(SpecAt(dir, "processes")); err == nil && st.IsDir() {
 			return dir
 		}
 	}
@@ -104,7 +104,7 @@ func (r Roots) MethodFound() bool { return r.Method != "" }
 // from, written once so every door says the same thing.
 func TheMethodIsLost() string {
 	return "engine: no method root here. This program looked up from where it " +
-		"is for a folder carrying src/processes and found none, so every path " +
+		"is for a folder carrying spec/processes and found none, so every path " +
 		"under the method would be a guess. Name it: --method <folder>"
 }
 
@@ -255,6 +255,30 @@ func sameDir(a, b string) bool {
 	fa, err1 := os.Stat(a)
 	fb, err2 := os.Stat(b)
 	return err1 == nil && err2 == nil && os.SameFile(fa, fb)
+}
+
+// SpecAt says where a specified folder lives in a tree.
+//
+// THE SPECIFICATION MOVED OUT OF src. processes, schemas, views and config are
+// not written or run: they are what the tree is declared to be, and spec is
+// where the declaration lives. src is what a person writes and a machine runs.
+//
+// ONE FUNCTION, BECAUSE FIVE READERS ASK IT. ProcessDir, SchemaDir, viewFolders,
+// DeclaredAt and the method-root probe in FindRoots all name one of these four
+// folders, and a move that changes four of them and misses the fifth is the
+// shape that has cost this tree five readers in one afternoon.
+//
+// THE OLD PLACE IS ANSWERED WHILE A TREE STILL CARRIES IT, and the new one is
+// asked first, so a tree that has moved is never read out of src. When none
+// carries the old one this becomes a join and the second line goes.
+func SpecAt(root, name string) string {
+	if at := filepath.Join(root, "spec", name); exists(at) {
+		return at
+	}
+	if was := filepath.Join(root, "src", name); exists(was) {
+		return was
+	}
+	return filepath.Join(root, "spec", name)
 }
 
 // Private is where material that must not travel is kept. The log lives here

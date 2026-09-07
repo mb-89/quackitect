@@ -202,7 +202,7 @@ func viewDirs(r Roots) []string {
 // path itself is a reader the next move will miss.
 func viewFolders(root string) []string {
 	return []string{
-		filepath.Join(root, "src", "views"),
+		SpecAt(root, "views"),
 		filepath.Join(root, "util", "views"),
 	}
 }
