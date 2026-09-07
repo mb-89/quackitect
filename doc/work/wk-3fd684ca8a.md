@@ -31,7 +31,7 @@ The smallest case: with any token in hand, run git add -u and watch it go throug
 
 - git add -u is refused, decided by: a Go test in src/engine calling ACommitCarriesStrangers with git add -u answers refused
 - git add --update is refused the same way, decided by: the same test covers the long spelling
-- a git add naming a path is still admitted, decided by: go test over the commitpaths tests in src/engine answers ok
+- a git add naming a path is still admitted, decided by: se test --propose 'TestACommit*' answers ok
 
 ## evidence: step 1. ask
 

@@ -39,7 +39,7 @@ The red is a held token's se_apply with no helpers registered. It is refused tod
 
 ## done when
 
-- a call on a token the main agent holds is not refused for want of helpers, decided by: go test -C src/engine -run 'StaffingAsksAndLetsThrough' ./... answers ok
+- a call on a token the main agent holds is not refused for want of helpers, decided by: se test --propose '*StaffingAsksAndLetsThrough*' answers ok
 - the ask for hands is on the answer once per shortfall and not on every call, decided by: the same test counting the asks over five calls
 - sh util/checks/battery.sh reports no new failure against the run before the change
 

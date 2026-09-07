@@ -23,9 +23,9 @@ The guard keeps the set of paths this turn wrote, in a file, since a hook is a f
 
 ## done when
 
-- a commit staging a path this turn did not write is refused naming it: go test -C src/engine -run TestACommitStagesOnlyWhatTheTurnWrote
-- git add -A and git add . are refused whatever the turn wrote: go test -C src/engine -run TestStagingEverythingIsRefused
-- the typed escape is allowed once and recorded: go test -C src/engine -run TestTheStagingEscapeIsRecorded
+- a commit staging a path this turn did not write is refused naming it: se test --propose TestACommitStagesOnlyWhatTheTurnWrote
+- git add -A and git add . are refused whatever the turn wrote: se test --propose TestStagingEverythingIsRefused
+- the typed escape is allowed once and recorded: se test --propose TestTheStagingEscapeIsRecorded
 
 ## evidence: step 1. ask
 

@@ -23,9 +23,9 @@ One walk of the command in a quoting state machine taken from bash's manual, wit
 
 ## done when
 
-- one walk answers both questions and the two-pass code is gone: go test -C src/engine -run TestOneWalkAnswersEveryQuestion
-- every state in bash's manual has a row, the backslash state included: go test -C src/engine -run TestTheRowsFollowTheManual
-- the generator against real bash refuses exactly what reached the filesystem: go test -C src/engine -run TestTheGuardAgreesWithBash
+- one walk answers both questions and the two-pass code is gone: se test --propose TestOneWalkAnswersEveryQuestion
+- every state in bash's manual has a row, the backslash state included: se test --propose TestTheRowsFollowTheManual
+- the generator against real bash refuses exactly what reached the filesystem: se test --propose TestTheGuardAgreesWithBash
 
 ## evidence: step 1. ask
 

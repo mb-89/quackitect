@@ -37,7 +37,7 @@ If the owner would rather an empty group were hidden, then the ruling at the top
 ## done when
 
 - a declared group with nothing matching is still in the pane answer: a Go test renders a view declaring a group no row matches and finds it, with a count of zero, seen red first
-- the check that names one by name goes green on data where nothing matches it: node util/checks/render-check.mjs from the root exits 0 on a board carrying no noted and no urgent token
+- the check that names one by name goes green on data where nothing matches it. Decided by: se test --propose render-check answers ok on a board carrying no noted and no urgent token
 - the ruling and the program agree, so the sentence at the top of util/views/work.base is true of what the engine answers
 
 ## evidence: step 1. ask

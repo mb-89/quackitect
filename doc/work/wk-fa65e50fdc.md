@@ -29,7 +29,7 @@ Have take() in pull.go claim the token for this box before handing it out, or re
 
 ## done when
 
-- a Pull of an unclaimed tracked token followed by TakeUp for the same actor succeeds, or the pull answer names se claim. A test in src/engine/claimgate_test.go drives it: cd src/engine && go test -run TestAPullLeavesNoClaimToMake -count=1 .
+- a Pull of an unclaimed tracked token followed by TakeUp for the same actor succeeds, or the pull answer names se claim. A test in src/engine/claimgate_test.go drives it: se test --propose TestAPullLeavesNoClaimToMake
 - the reviewer queue is covered by the same test, or a second one beside it
 
 ## evidence: step 1. ask

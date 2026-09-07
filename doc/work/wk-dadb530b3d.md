@@ -27,7 +27,7 @@ Prove the candidate before trusting it, rather than adding WSL to a list of name
 
 ## done when
 
-- batteryShell does not answer a candidate that will not run a trivial script, and falls through to the next: go test -C src/engine -run TestTheShell
+- batteryShell does not answer a candidate that will not run a trivial script, and falls through to the next: se test --propose TestTheShell
 - a candidate is proven before it is answered, watched red first against a stub shell that exits non-zero on every script
 - se run answers a command on this box: echo 'echo ran' | se run --on <id> says ran and exit 0
 

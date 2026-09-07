@@ -27,8 +27,8 @@ Fix: count over the same rows the panel draws, and let staffing ask a row's Name
 
 ## done when
 
-- the number and the table are one answer over one list: a table test in src/engine holds a token under an actor the harness never announced and asserts WorkersHere plus ReviewersHere equals the length of Present: go test -C src/engine -run TestOneProcessDrawsOneRow
-- an agent that arrived under one name and pulled under another counts as one hand: the same test asserts it is counted a worker rather than neither: go test -C src/engine -run TestOneProcessDrawsOneRow
+- the number and the table are one answer over one list: a table test in src/engine holds a token under an actor the harness never announced and asserts WorkersHere plus ReviewersHere equals the length of Present. Decided by: se test --propose TestOneProcessDrawsOneRow
+- an agent that arrived under one name and pulled under another counts as one hand: the same test asserts it is counted a worker rather than neither. Decided by: se test --propose TestOneProcessDrawsOneRow
 
 ## evidence: step 1. ask
 

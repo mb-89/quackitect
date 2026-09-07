@@ -30,7 +30,7 @@ The suite says it drives /tmp/se-engine<n>/se, built now from the tree. The bina
 
 ## done when
 
-- the six tests named pass over a fresh worktree of origin/v4 under /tmp, decided by: go test -C src/engine -count=1 -run 'TestARetro|TestASecondRetro|TestAVerbRunsInsideTheEngine'
+- the six tests named pass over a fresh worktree of origin/v4 under /tmp, decided by: se test --propose TestARetro --propose TestASecondRetro --propose TestAVerbRunsInsideTheEngine
 - the reason they failed is written on the token: which lookup started where, and what now names the method
 
 ## evidence: step 1. ask

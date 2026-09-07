@@ -25,7 +25,7 @@ On each box that closed one of the six, run se archive --sweep and push. Where t
 
 ## done when
 
-- archive-rows-travel answers 0 failed on a worktree of origin, decided by: node util/checks/archive-rows-travel.mjs on that worktree
+- archive-rows-travel answers 0 failed on a worktree of origin, decided by: se test --propose archive-rows-travel on that worktree
 - every row it once refused either names an object the branch reaches or carries the ruling that its note is lost
 
 ## evidence: step 1. ask

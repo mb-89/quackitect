@@ -28,7 +28,7 @@ The check the-bundle-is-not-stale stays. It is what proves the rule holds, and i
 - a tree whose source is newer than its bundle has the bundle rebuilt at start, decided by: a Go test in src/engine
 - the start says it rebuilt, decided by: the same Go test reading what it printed
 - a build that fails is said and the engine still starts, decided by: the same Go test
-- the-bundle-is-not-stale is green after a start, decided by: node util/checks/the-bundle-is-not-stale.mjs from the root
+- the-bundle-is-not-stale is green after a start, decided by: se test --propose the-bundle-is-not-stale
 
 ## evidence: step 1. ask
 

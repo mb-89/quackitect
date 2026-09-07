@@ -26,7 +26,7 @@ Land the half that is missing. AStaffShortfall takes the token id and the dispos
 
 - src/engine builds as a test package, decided by: se test naming any test in src/engine
 - TestAShortfallLetsASubmitThrough passes, decided by: se test proposing it by name
-- a check fails when the non-test sources build and the test package does not, decided by: node util/checks/the-branch-head-builds.mjs run from the root
+- a check fails when the non-test sources build and the test package does not, decided by: se test --propose the-branch-head-builds
 
 ## evidence: step 1. ask
 
