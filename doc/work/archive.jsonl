@@ -53,6 +53,7 @@
 {"id":"wk-4700fc5ccd","title":"the battery stops early","process":"trivial","disposition":"done","on_branch":"c2d0b8a8efc7c23450dafb06ad06edda0f6ac45a","tag":"refs/tags/archive/wk-4700fc5ccd"}
 {"id":"wk-4ad110f94e","title":"swap leaves lanes stale","process":"trivial","disposition":"done","on_branch":"a7fe26253cb9926c7d224ebb7b4b4c1927929861","tag":"refs/tags/archive/wk-4ad110f94e"}
 {"id":"wk-4bf60b519a","title":"flag probe","process":"trivial","disposition":"dropped","on_branch":"9d7a5bf55596b5e224b1713fcd36a6f4558ac26d","tag":"refs/tags/archive/wk-4bf60b519a"}
+{"id":"wk-4e91c7b3f8","title":"one fixture builder","process":"standard","disposition":"done","blob":"333a6284b695dc53c94d7cebb8febfc895536321","on_branch":"6baf68100b82c41f8e5e85cee9833f166ee61d57"}
 {"id":"wk-4fea8c201a","title":"Correct dev guide premise","process":"trivial","disposition":"done","on_branch":"9da161cab2d4259c8158c2a6e6c6b006a219e30c","tag":"refs/tags/archive/wk-4fea8c201a"}
 {"id":"wk-51858264b4","title":"UI panels update live","process":"trivial","disposition":"done","on_branch":"1ec3d0f391e1db0ad5adff3d10975d7d2ecbd055","tag":"refs/tags/archive/wk-51858264b4"}
 {"id":"wk-526ac833fb","title":"test lessons into testing","process":"standard","disposition":"done","on_branch":"52f6cd88bcfdda349f4bf2ae6e57a2eea3c06d20","tag":"refs/tags/archive/wk-526ac833fb"}
@@ -116,6 +117,7 @@
 {"id":"wk-c0930c300e","title":"measuring scripts cannot run","process":"trivial","disposition":"done","blob":"658b5edf34110ed58f223dfdd6f2331b29fc111e","on_branch":"c5054603da042fa1ec4db4b3cd8c1ff061faf58b"}
 {"id":"wk-c0b948b717","title":"menu knows one name","process":"trivial","disposition":"done","on_branch":"5a517f795e58d22af54e8ed75bf78fed1edec232","tag":"refs/tags/archive/wk-c0b948b717"}
 {"id":"wk-c69f2dabc7","title":"shared tree reads stale","process":"trivial","disposition":"done","blob":"60880da1dbdea7768ecc9a8b7d980545722e6487","on_branch":"bf9f5735469308aecd32f28cbbeb68f554e667a3"}
+{"id":"wk-c7d3a72daa","title":"the gate records nothing","process":"standard","disposition":"done","blob":"6a5fbb6750d2cf8af9f4fc0a408118a9aef06bd2","on_branch":"7e08f0bfbc61a4b71e51b933dc4d850470030f86"}
 {"id":"wk-c8f5c9d4fe","title":"startEngine stops without context","process":"trivial","disposition":"done","on_branch":"9118cb60e503f66426ce96c2ca9276ba25684643","tag":"refs/tags/archive/wk-c8f5c9d4fe"}
 {"id":"wk-c93aac62be","title":"criteria lessons into guidance","process":"standard","disposition":"done","on_branch":"c707ce03ffc36bf5a5064feb1b5cf39b0131d00d","tag":"refs/tags/archive/wk-c93aac62be"}
 {"id":"wk-c9c5fcf3b9","title":"trivial tokens travel","process":"trivial","disposition":"done","on_branch":"17394032fbb40297712bafaa7f35e4cdec35a7ec","tag":"refs/tags/archive/wk-c9c5fcf3b9"}
