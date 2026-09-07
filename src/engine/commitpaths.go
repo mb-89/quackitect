@@ -104,15 +104,21 @@ func commitPaths(args []string) (paths []string, index bool) {
 
 // stagesEverything answers whether a git add takes the whole tree rather than
 // paths it names.
+//
+// -u IS THE SAME STAGE WITH A NARROWER NET. It takes every tracked file any
+// hand on this box has changed, and the next commit takes them all. It got past
+// both guards: this one never listed it, and the stranger guard reads the paths
+// a command names and -u names none. So a stage of everything tracked was one
+// letter from open, by the door the other spellings are refused at.
 func stagesEverything(args []string) bool {
 	for _, w := range args {
 		a := strings.Trim(w, "'\"")
 		switch {
 		case a == "--":
 			return false
-		case a == "-A" || a == "--all" || a == ".":
+		case a == "-A" || a == "--all" || a == "-u" || a == "--update" || a == ".":
 			return true
-		case strings.HasPrefix(a, "-") && !strings.HasPrefix(a, "--") && strings.Contains(a[1:], "A"):
+		case strings.HasPrefix(a, "-") && !strings.HasPrefix(a, "--") && strings.ContainsAny(a[1:], "Au"):
 			return true
 		}
 	}
@@ -187,9 +193,9 @@ func aCommitTakesTheIndex(why string) string {
 // aStageOfEverything is the refusal for a stage that names no path.
 func aStageOfEverything() string {
 	return "A STAGE OF EVERYTHING IS REFUSED.\n\n" +
-		"git add -A, --all or . stages what every other hand on this box has touched, and the next " +
-		"commit takes it all. The index is shared, and a stage that names no path is a commit of " +
-		"strangers one step early.\n\n" +
+		"git add -A, --all, -u, --update or . stages what every other hand on this box has touched, " +
+		"and the next commit takes it all. The index is shared, and a stage that names no path is a " +
+		"commit of strangers one step early.\n\n" +
 		"Name the paths: git add <paths>, or skip the stage and commit them by name: git commit --only " +
 		"-m \"...\" <paths>."
 }

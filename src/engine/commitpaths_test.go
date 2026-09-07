@@ -111,6 +111,16 @@ func TestACommitNamesItsPaths(t *testing.T) {
 		{"a stage of everything", `git add -A`, saidStageAll},
 		{"a stage of everything, spelt out", `git add --all`, saidStageAll},
 		{"a stage of the dot", `git add .`, saidStageAll},
+		// A STAGE OF EVERY TRACKED CHANGE NAMES NO PATH EITHER. -u takes every
+		// tracked file another hand has touched, which is the same commit of
+		// strangers one step early. It got past both guards: it is not in
+		// stagesEverything, and the stranger guard has no path to judge.
+		{"a stage of the tracked", `git add -u`, saidStageAll},
+		{"a stage of the tracked, spelt out", `git add --update`, saidStageAll},
+		{"a stage of the tracked, clustered", `git add -uv`, saidStageAll},
+		// AND IT IS REFUSED WITH A PATH BESIDE IT, the way -A already is, so the
+		// two shapes are read the same way rather than one each.
+		{"a stage of the tracked, under a path", `git add -u src`, saidStageAll},
 		// THE ALLOWED SHAPES, which keep this from being a ban on git.
 		{"a commit naming its path", `git commit -m "x" a.go`, ""},
 		{"a commit naming its paths, with --only", `git commit --only -m "x" a.go b.go`, ""},
@@ -118,6 +128,7 @@ func TestACommitNamesItsPaths(t *testing.T) {
 		{"a message that could be a path", `git commit -m x -- a.go`, ""},
 		{"a stage naming its path", `git add a.go`, ""},
 		{"a stage after the dashes", `git add -- a.go`, ""},
+		{"a stage naming its path, verbosely", `git add -v a.go`, ""},
 		{"git status", `git status`, ""},
 		{"git log", `git log --oneline`, ""},
 		// A SENTENCE CARRYING THE WORDS IS NOT A COMMIT.
@@ -144,6 +155,7 @@ func TestACommitNamesItsPaths(t *testing.T) {
 	for _, c := range []struct{ command, said string }{
 		{`git commit -m "x"`, saidStrangers},
 		{`git add -A`, saidStageAll},
+		{`git add -u`, saidStageAll},
 	} {
 		got := runVerb(t, r, tok.ID, c.command)
 		why, _ := got["error"].(string)
