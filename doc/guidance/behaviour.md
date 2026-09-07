@@ -113,4 +113,4 @@ It took a token's landed commit and wrote back the common base with two half-fil
 Seventeen of a hundred and fifty-nine merges on the branch differed from both their parents that way.
 Nothing ran it but a hand-written helper, because the engine and the wake merge only where a fast-forward is possible.
 The push door that is safe cherry-picks onto a fresh worktree at the tip and never touches the checkout.
-That door is `util/git/cherrypush.sh`, and `util/git/land.sh` lands named files through the same worktree.
+That door is `src/scripts/cherrypush.sh`, and `src/scripts/land.sh` lands named files through the same worktree.

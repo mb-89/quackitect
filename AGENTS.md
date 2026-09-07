@@ -40,10 +40,10 @@ a person set outranks the branch. An ordinary branch narrows nothing.
 
 ## Committing
 
-`sh util/git/land.sh "<message>" <path> ...` is the push door. It copies the
+`sh src/scripts/land.sh "<message>" <path> ...` is the push door. It copies the
 named files onto a fresh worktree at the tip and commits them there, so a clone
 that is behind does not re-add what the tip already carries. A path this tree no
-longer holds is removed there. `util/git/cherrypush.sh` does the same for a
+longer holds is removed there. `src/scripts/cherrypush.sh` does the same for a
 commit. Never merge in the shared tree: seventeen of a hundred and fifty-nine
 merges on this branch differed from both their parents.
 

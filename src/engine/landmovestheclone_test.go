@@ -60,7 +60,7 @@ func runLand(t *testing.T, clone, msg string, paths ...string) string {
 // that has to be able to set one.
 func runLandWith(t *testing.T, clone string, env []string, msg string, paths ...string) string {
 	t.Helper()
-	script, err := filepath.Abs(filepath.Join("..", "..", "util", "git", "land.sh"))
+	script, err := filepath.Abs(filepath.Join("..", "..", "src", "scripts", "land.sh"))
 	if err != nil {
 		t.Fatal(err)
 	}

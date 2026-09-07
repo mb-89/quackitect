@@ -688,7 +688,7 @@ func theLanding(paths []string) string {
 	}
 	all := strings.Join(paths, " ")
 	return "\n\nLAND EVERY PATH THIS CLOSE WROTE, rather than the one you remember: " +
-		all + "\n  sh util/git/land.sh \"<message>\" " + all
+		all + "\n  sh " + theLandDoor + " \"<message>\" " + all
 }
 
 // A token cannot close without saying what became of it. Three values, and

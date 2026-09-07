@@ -115,7 +115,16 @@ func InWorkFor(r Roots, actor string) []Token {
 
 // theLandDoor is the one script a hand pushes work through, and naming it is
 // how a command says it is landing rather than working.
-const theLandDoor = "util/git/land.sh"
+//
+// IT MOVED OUT OF util. That folder was where anything landed that had nowhere
+// else to go, and it grew to hold the checks, the cage, the installer and five
+// declarations, so nothing in it said what it was. A script the engine runs is
+// source.
+//
+// AND IT IS SPELLED ONCE. pull.go printed the same path as a literal in the
+// sentence that tells a hand what to land, so the const and the instruction
+// could disagree and only the instruction reaches anybody.
+const theLandDoor = "src/scripts/land.sh"
 
 // theLandingWindow is how long after a close a land may still name the token.
 // A land follows its close at once. One naming a token from yesterday is
