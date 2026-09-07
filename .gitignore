@@ -28,3 +28,7 @@ dev_guide/
 # the guard's HTTP door is this machine's own, and its port is derived from
 # this folder's path. See src/cage/claude-settings.json.
 .claude/settings.local.json
+
+# the plugin API declarations, written from the harness build by /plugin-types.
+# They go stale when the harness updates, so regenerate rather than track.
+.claude/types/
