@@ -33,11 +33,11 @@ The working tree several agents share falls behind the branch and nothing brings
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | An agent reading a stale tree is told how far, so it can weigh the risk. The tree this was found on stood 134 behind, and one behind reads the same as that today. |  |
+| [x] | what breaks if it is never done, and not only that it stays undone | The distance can quietly become a flag and nothing says so. One token's work was already duplicated because the tree read was behind. |  |
+| [x] | the ask is small enough to review whole, or it is split first | — |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | Both are. The first by the pull the landing already holds, the second by a test asking for a number no boolean answers. |  |
+| [x] | the basics it stands on exist, or are minted first | — |  |
 
 ## evidence: step 2. do
 
@@ -45,9 +45,9 @@ The working tree several agents share falls behind the branch and nothing brings
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | — |  |
+| [x] | one test was written first and seen red for the reason expected | aheadBehind was inverted to answer a flat 1. TestTheDistanceBehindIsCounted failed on the number: it read 1 behind, and origin moved on by two. |  |
+| [x] | the same test was seen green after the change, and named | The inversion is backed out and all seven in landbeforeworking_test.go pass. Under it, the three one-behind tests stayed green, which is the finding. |  |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | 43a9bf8d is no object here, so the change reads against HEAD: commit 398086d6. |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | None. The counting was already right, and what was missing was a test that could tell. |  |
 
