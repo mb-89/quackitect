@@ -8,14 +8,17 @@ guidance: [[work-token]]
 # the name this token is known by, in references and in links
 title: the gate records nothing
 # where the token stands. The process owns these values.
-status: open
+status: done
 # the person's own name for a group. It does not move the work
 bucket: tests
-claimed_by: 7a7c633a/main
-claimed_at: "2026-09-07T15:14:58Z"
+# who did the work step, so the verdict is never theirs
+author: main
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 7b85042fb562cc320f19352c380f15c4868f33cd
+# the tree each time the work was put down or closed, snapshots the engine wrote
+ended:
+  - 7ffca29b7454afc006c39566a7b6b67ae228e0e8
 ---
 
 ## detail
@@ -54,6 +57,26 @@ If it is not, the seam test decides between the two places the detail names. It 
 - a submission on a token whose recorded run passed is accepted, and the test drives the submission rather than the gate alone. Decided by the same test
 - a submission on a token whose recorded run went red is still refused. Decided by: se test --propose TestASubmissionIsRefusedWhenTheRunWasRed, which must stay green
 
+## evidence: commits
+
+71cfcbe9 the test. da1bb77f the evidence. Both on group/tests.
+
+## evidence: criterion 1
+
+se test --on an id over a real tree leaves a record for that id. TestTheTestVerbWritesTheRunItRan drives runTest through a call, over a fixture tree with the processes, and reads LastRunOn back. Green.
+
+## evidence: criterion 2
+
+a submission on a token whose recorded run passed is accepted, and the test drives the submission. The same test puts a Pull through with disposition done and asserts no finding names the run: not did not pass, not had not finished. Green.
+
+## evidence: criterion 3
+
+TestASubmissionIsRefusedWhenTheRunWasRed stays green, and stayed green through every step here, including the inversion below.
+
+## evidence: nothing in src changed
+
+the inversion was backed out and git status showed only the test file before the commit.
+
 ## evidence: step 1. ask
 
 <!-- write what is asked, the approach, and what done means, one criterion per line -->
@@ -90,4 +113,20 @@ If it is not, the seam test decides between the two places the detail names. It 
 | [ ] | every criterion's command was run again, and what it said is named |  |  |
 | [ ] | every hunk improves the product, or a finding names the one that does not |  |  |
 | [ ] | every finding is a trivial token naming this one, and their ids are here |  |  |
+
+## evidence: the began snapshot
+
+7b85042f is no object in this clone, so the change reads against HEAD.
+
+## evidence: the detail's premise does not hold on this box
+
+it says .se/tested.json does not exist and find answers nothing. Here it exists and carries this session's runs, the first keyed wk-113887f540 at 2026-09-07T14:22:28Z. The report was measured on another box on 2026-09-06. The approach's own first step is what decided this: ask the engine that answers rather than the file on disk.
+
+## evidence: the red, and what it proves
+
+the record was wired out of runTest, one condition. TestTheTestVerbWritesTheRunItRan failed saying the verb ran and wrote no record, so the gate reads nothing. TestACloseAsksWhatTheEngineRan and TestASubmissionIsRefusedWhenTheRunWasRed both stayed green under that, because both call RecordTheRun in the same process. That is exactly the seam the detail says is open, and it is now closed.
+
+## evidence: two shapes the test had to work around
+
+a token with nothing in the record has the whole diff for a delta, and a whole diff starts the battery outside the engine whatever is proposed. That run is recorded pending, which is neither a pass nor a failure, and the gate refuses a close on it. So the fixture applies one file through the token first, and proposes a name that reaches nothing. Both are in the test's comments, because an agent's first se test on a fresh token meets them.
 
