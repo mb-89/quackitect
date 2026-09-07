@@ -264,15 +264,30 @@ function whyRefused(command) {
 // or, failing that, the last colon. Prose after the command is cut at the first
 // comma outside quotes, because "which answers 5 today" is a sentence rather
 // than an argument, and every bare word after a searcher reads as a path.
+//
+// AND THE LINE ITSELF, WHERE IT OPENS WITH A PROGRAM. A criterion can be a
+// command with no colon in front of it: "sh util/checks/battery.sh reports no
+// new failure against the run before the change" is the standing shape, and it
+// carries no backtick and no decided-by, so every reader of this check passed
+// over it.
+//
+// A SENTENCE ABOUT A FILE IS NOT A COMMAND. "util/checks/engine-args.mjs is
+// deleted" opens with a path under the checks folder, which the guard refuses
+// when a command names it, and states a fact when a criterion does. So the
+// whole line is judged only where its first word is a program this tree runs.
 function theCommands(line) {
   const out = [];
   for (const m of line.matchAll(/`([^`]+)`/g)) out.push(m[1]);
-  const bare = line.replace(/`[^`]*`/g, " ");
+  const bare = line.replace(/`[^`]*`/g, " ").replace(/^[ \t]*-[ \t]+/, "");
   const said = /decided by:?\s+/i.exec(bare);
   if (said !== null) out.push(bare.slice(said.index + said[0].length));
   else {
     const colon = bare.lastIndexOf(": ");
     if (colon >= 0) out.push(bare.slice(colon + 2));
+  }
+  const opens = head(words(bare)[0] ?? "");
+  if (interpreters.has(opens) || searchers.has(opens) || older.has(opens) || opens === "go") {
+    out.push(bare);
   }
   return out.map(untilTheProse).filter((c) => c.trim() !== "");
 }
