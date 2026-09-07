@@ -114,6 +114,21 @@ func theProgramSaidAbout(ctx context.Context, dir string, in []byte, program str
 
 // FormatGo formats every Go module under the method root, and answers what
 // each run changed or why it could not.
+//
+// IT RUNS gofmt AND go fix, which is two of the four programs writing-go once
+// named. The guidance names a door and never a program, which
+// TestWritingGoNamesNoProgram holds it to, so the engine is the one place a
+// program is named. Rule 15 asked for all four, an earlier change reached
+// three, and go fix was left behind in the gap between the two edits.
+//
+// gofmt STRAIGHTENS THE LAYOUT AND go fix REWRITES THE IDIOM. Since Go 1.26 it
+// moves old spellings to slices, maps, strings.CutPrefix and the atomic types,
+// so a tree stays on one idiom without anybody remembering each rewrite.
+//
+// IT IS QUIET ON AN OLDER TOOLCHAIN, and that is not a failure. Measured on
+// this box, go1.24.7, over a module written to carry an old idiom: go fix said
+// nothing and exited zero. So the run costs a moment now and keeps the rule the
+// day the toolchain moves.
 func FormatGo(ctx context.Context, method string) []Formatted {
 	modules := TheGoModules(method)
 	if len(modules) == 0 {
@@ -139,8 +154,34 @@ func FormatGo(ctx context.Context, method string) []Formatted {
 			one.Changed, one.Refused = nil, "gofmt could not read "+one.Over+": "+theFirstLine(said)
 		}
 		out = append(out, one)
+		out = append(out, theIdiomFixed(ctx, method, dir))
 	}
 	return out
+}
+
+// theIdiomFixed runs go fix over one module and says what it rewrote.
+//
+// go fix NAMES WHAT IT TOUCHED AND NOTHING ELSE, so every line it writes is a
+// file it rewrote. gofmt is asked for that with -l; this one says it without
+// being asked, and says nothing at all over a module it left alone.
+func theIdiomFixed(ctx context.Context, method, dir string) Formatted {
+	one := Formatted{Program: "go fix", Over: shortened(method, dir)}
+	if _, err := exec.LookPath("go"); err != nil {
+		one.Refused = theProgramIsMissing("go",
+			"It is the Go toolchain itself, so a box that can build this tree has it: install Go.")
+		return one
+	}
+	said, ok := theProgramSaid(ctx, dir, "go", "fix", "./...")
+	if !ok {
+		one.Refused = "go fix could not read " + one.Over + ": " + theFirstLine(said)
+		return one
+	}
+	for _, line := range strings.Split(strings.TrimSpace(said), "\n") {
+		if line = strings.TrimSpace(line); line != "" {
+			one.Changed = append(one.Changed, line)
+		}
+	}
+	return one
 }
 
 // shortened says a folder the way a reader of this tree names it.
