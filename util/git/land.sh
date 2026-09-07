@@ -25,6 +25,11 @@ cd "$(git rev-parse --show-toplevel)" || exit 1
 # mechanism was absent on every fresh box and on this one after the restart.
 # The proxy is asked where it is instead: it answers on its own port and
 # nowhere else, so a candidate is tested rather than believed.
+#
+# THE ENGINE ASKS THE SAME TWO QUESTIONS, in src/engine/proxy.go, for the git
+# calls it makes itself. This is not a second copy of the answer. Both read the
+# proxy's own note and both test a candidate against its status endpoint. This
+# one is here because a land runs on a box with nothing built.
 proxyAnswers() {
   [ -n "$1" ] || return 1
   curl -s -o /dev/null --max-time 2 --noproxy '*' \
