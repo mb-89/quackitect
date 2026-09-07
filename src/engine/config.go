@@ -538,11 +538,23 @@ func TheFloor() Config {
 		PullsBeforeHoldIsStale: 10,
 		HelperRatio:            10,
 		HelperFloorBytes:       6000,
-		// THREE, COUNTING THE MAIN AGENT. The number is how many workers there
+		// ONE, COUNTING THE MAIN AGENT. The number is how many workers there
 		// are rather than how many are spawned beside the one already working,
-		// so three is the session and two spawned. Reviewers are all spawned,
+		// so one is the session and none spawned. Reviewers are all spawned,
 		// because the main agent is a worker and never a reviewer.
-		ParallelAgents: 3,
+		//
+		// IT WAS THREE, AND SEPARATE INSTANCES ARE THE ANSWER INSTEAD. Agents on
+		// one instance contend for one working tree, one git index, one engine
+		// and one archive file. The battery replaces the running engine, so one
+		// hand runs it at a time whatever this says.
+		//
+		// MEASURED at ten agents on one box. The branch head did not compile for
+		// an hour, because one hand landed a test without its source half. Six
+		// tokens were parked as unworkable, each naming the busy tree.
+		//
+		// Separate instances share nothing but the branch, and the claims branch
+		// already keeps them off each other's tokens.
+		ParallelAgents: 1,
 		// TWO, because one red is answered by one edit and that is the
 		// commonest turn there is.
 		RedsBeforeAChangeIsNeeded: 2,
