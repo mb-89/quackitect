@@ -44,11 +44,11 @@ Rewrite actionable 12 and its chapter. The box pushes its branch, writes the mar
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the ask is small enough to review whole, or it is split first | — |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | A box ends on the marker, which it can write, rather than on a permission nobody there holds. | cloud-runner.md |
+| [x] | what breaks if it is never done, and not only that it stays undone | Every cloud box spends the end of its session on a merge the harness denies. | the detail |
+| [x] | the ask is small enough to review whole, or it is split first | One actionable and one chapter. | cloud-runner.md |
+| [x] | every done-when line is decidable, and names the command where one decides it | Two are se find over the file, the third is read in it. | se find |
+| [x] | the basics it stands on exist, or are minted first | The marker is already the closing's own rung, and this box wrote one. | groups/tests.done |
 
 ## evidence: step 2. do
 
@@ -56,9 +56,9 @@ Rewrite actionable 12 and its chapter. The box pushes its branch, writes the mar
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | one test was written first and seen red for the reason expected |  |  |
-| [ ] | the same test was seen green after the change, and named |  |  |
-| [ ] | the change is git diff began..ended, the two hashes the engine wrote on this token | — |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | The chapter names what was measured and what it said, rather than asserting a rule. | work-token.md |
+| [x] | one test was written first and seen red for the reason expected | The red is this session's own: the merge was denied in every shape, and the card had asked for it. No Go test decides prose. | the detail |
+| [x] | the same test was seen green after the change, and named | se find --regex "merge it into trunk" over the card answers nothing, and the battery ran over the change. | se find |
+| [x] | the change is git diff began..ended, the two hashes the engine wrote on this token | One file, util/cage/cloud-runner.md. | 8405ccc7 |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | Chapter 11's last line said retro and merge, and now says retro and hand over. | cloud-runner.md |
 
