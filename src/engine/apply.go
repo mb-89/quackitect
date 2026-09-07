@@ -583,6 +583,8 @@ func theShapeOfTheTree(r Roots, files []string, content map[string][]byte, born 
 			aParallelTestSwappingASeam,
 			aSecondReachForTheChildProcess,
 			aRefusalNamingNoDoor,
+			aPushLandingOffTheBranches,
+			anOpenTokenMissingASection,
 		} {
 			if err := refuse(r, born[at], rel, text); err != nil {
 				return err
@@ -1045,6 +1047,270 @@ func theTopLevelBlocks(text string) map[string]string {
 		out[text[at[2]:at[3]]] = text[at[0]:end]
 	}
 	return out
+}
+
+// A PUSH LANDS ON refs/heads AND NOWHERE ELSE.
+//
+// MEASURED, September 2026, one commit object and one session, minutes apart:
+// refs/heads created twice, refs/se 403, refs/notes 403, refs/tags 403. The git
+// proxy in front of a cloud box refuses every namespace but refs/heads.
+//
+// WHAT THAT COST. claim.go pushed refs/se/claims, put the failure in prose and
+// carried on, so a box took a claim, believed it published, and no other box
+// saw it. The archive pushed refs/tags/archive/<id> and lost the only copy of
+// six notes the same way.
+//
+// IT IS THE ONE REGRESSION A DESK CANNOT SEE. Both pushes work on every desk
+// and fail on every cloud box, so nothing on the box where the code is written
+// ever says a word.
+func aPushLandingOffTheBranches(r Roots, _ bool, rel, text string) error {
+	if !strings.HasSuffix(rel, ".go") || strings.HasSuffix(rel, "_test.go") || !strings.HasPrefix(rel, "src/") {
+		return nil // a test drives a fed git that pushes nowhere
+	}
+	if !strings.Contains(text, `"push"`) {
+		return nil
+	}
+	named := theStringConstantsOf(text)
+	for _, sent := range thePushesIn(text, named) {
+		far := theFarSideOf(sent)
+		if !strings.HasPrefix(far, "refs/") || strings.HasPrefix(far, "refs/heads/") {
+			continue
+		}
+		return fmt.Errorf("%s pushes %s, which lands on %s. A cloud box is answered 403 for "+
+			"every namespace but refs/heads, so this fails there and nowhere else: it works on "+
+			"every desk. Send it to refs/heads/... instead.", rel, sent, far)
+	}
+	return nil
+}
+
+// theStringConstantsOf collects the string constants a file declares, because a
+// push names claimsBranch rather than the text it stands for.
+var aStringConstant = regexp.MustCompile(`(?m)^\s*(?:const\s+)?(\w+)\s*=\s*"([^"]*)"`)
+
+func theStringConstantsOf(text string) map[string]string {
+	out := map[string]string{}
+	for _, m := range aStringConstant.FindAllStringSubmatch(text, -1) {
+		out[m[1]] = m[2]
+	}
+	return out
+}
+
+// thePushesIn answers every ref a file sends, spelled out as far as the
+// constants say.
+//
+// A PUSH IS AN ARGUMENT AND NOT ANY LINE HOLDING THE WORD. claim.go compares a
+// variable against push to decide whether a git call reaches the network, and
+// that line sends nothing.
+func thePushesIn(text string, named map[string]string) []string {
+	var out []string
+	const word = `"push"`
+	for at := strings.Index(text, word); at >= 0; at = indexFrom(text, word, at+1) {
+		before := at - 1
+		for before >= 0 && (text[before] == ' ' || text[before] == '\t' || text[before] == '\n' || text[before] == '\r') {
+			before--
+		}
+		if before < 0 || (text[before] != '(' && text[before] != ',') {
+			continue
+		}
+		remote := false
+		for _, arg := range theArgumentsAfter(text, at+len(word)) {
+			spec := theSpellingOf(arg, named)
+			if strings.HasPrefix(spec, "-") {
+				continue // a flag before the remote is not a ref
+			}
+			if !remote {
+				remote = true
+				continue
+			}
+			out = append(out, spec)
+		}
+	}
+	return out
+}
+
+func indexFrom(text, word string, from int) int {
+	if from >= len(text) {
+		return -1
+	}
+	at := strings.Index(text[from:], word)
+	if at < 0 {
+		return -1
+	}
+	return from + at
+}
+
+// theArgumentsAfter reads from just after one argument to the call's own
+// closing paren, and answers the arguments between.
+//
+// DEPTH IS COUNTED, so a nested call is passed over and a wrapped call is read
+// whole. Cutting at the first closing paren cut a refspec short. Reading one
+// line glued the closing brace onto the last argument. Both answered green over
+// a push that fails on every cloud box.
+func theArgumentsAfter(text string, from int) []string {
+	var out []string
+	var part strings.Builder
+	depth, quote := 0, byte(0)
+	for i := from; i < len(text); i++ {
+		c := text[i]
+		if quote != 0 {
+			part.WriteByte(c)
+			if c == '\\' && i+1 < len(text) {
+				i++
+				part.WriteByte(text[i])
+			} else if c == quote {
+				quote = 0
+			}
+			continue
+		}
+		if c == '/' && i+1 < len(text) && text[i+1] == '/' {
+			if nl := strings.IndexByte(text[i:], '\n'); nl >= 0 {
+				i += nl
+			} else {
+				i = len(text)
+			}
+			continue
+		}
+		if c == '"' || c == '`' {
+			quote = c
+			part.WriteByte(c)
+			continue
+		}
+		if c == ')' && depth == 0 {
+			break
+		}
+		if c == ',' && depth == 0 {
+			out = append(out, part.String())
+			part.Reset()
+			continue
+		}
+		switch c {
+		case '(', '[', '{':
+			depth++
+		case ')', ']', '}':
+			depth--
+		}
+		part.WriteByte(c)
+	}
+	out = append(out, part.String())
+	var kept []string
+	for _, a := range out {
+		if a = strings.TrimSpace(a); a != "" {
+			kept = append(kept, a)
+		}
+	}
+	return kept
+}
+
+// theSpellingOf turns a Go expression into the text it builds, as far as the
+// constants say. What it cannot resolve it leaves as the identifier, and an
+// unresolved word is not a refs/ prefix, so it reads as a branch name.
+func theSpellingOf(expr string, named map[string]string) string {
+	var out strings.Builder
+	for _, part := range theTermsOf(expr) {
+		bit := strings.TrimSpace(part)
+		if len(bit) >= 2 && bit[0] == '"' && bit[len(bit)-1] == '"' && !strings.Contains(bit[1:len(bit)-1], `"`) {
+			out.WriteString(bit[1 : len(bit)-1])
+			continue
+		}
+		if was, ok := named[bit]; ok {
+			out.WriteString(was)
+			continue
+		}
+		out.WriteString(bit)
+	}
+	return out.String()
+}
+
+// theTermsOf cuts a Go expression at its plus signs, outside string literals. A
+// plus inside a literal is part of the text rather than a join.
+func theTermsOf(expr string) []string {
+	var out []string
+	var part strings.Builder
+	quote := byte(0)
+	for i := 0; i < len(expr); i++ {
+		c := expr[i]
+		if quote != 0 {
+			part.WriteByte(c)
+			if c == '\\' && i+1 < len(expr) {
+				i++
+				part.WriteByte(expr[i])
+			} else if c == quote {
+				quote = 0
+			}
+			continue
+		}
+		if c == '"' || c == '`' {
+			quote = c
+			part.WriteByte(c)
+			continue
+		}
+		if c == '+' {
+			out = append(out, part.String())
+			part.Reset()
+			continue
+		}
+		part.WriteByte(c)
+	}
+	return append(out, part.String())
+}
+
+// theFarSideOf is where a refspec lands on the remote. One with a colon lands
+// where its right half names, and one without lands where it names. A leading
+// plus is the force marker rather than part of a name.
+func theFarSideOf(spec string) string {
+	far := spec
+	if at := strings.Index(spec, ":"); at >= 0 {
+		far = spec[at+1:]
+	}
+	return strings.TrimSpace(strings.TrimPrefix(far, "+"))
+}
+
+// AN OPEN TOKEN CARRIES THE SECTIONS ITS PROCESS REQUIRES.
+//
+// A standard token was split in two and the halves were written by hand. Both
+// said in their evidence that they carried the approach unchanged, and neither
+// file held an approach heading at all. So two open tokens sat in the queue
+// offering no shape a reader could have disagreed with before the work began,
+// which is the one thing the standard process asks for over the trivial one.
+//
+// THE DECLARATION IS READ AND NOT COPIED. The process says which sections it
+// requires, and a list written here would be a second copy of it. A token
+// minted from a template gets them; one written by hand, split off another, or
+// edited afterwards is read back by a parser that asks for none.
+//
+// A CLOSED TOKEN IS NOT JUDGED. What is asked is that work waiting to be taken
+// says what it is, and one that has ended is a record rather than an offer.
+func anOpenTokenMissingASection(r Roots, _ bool, rel, text string) error {
+	if !strings.HasSuffix(rel, ".md") || filepath.ToSlash(filepath.Dir(rel)) != TheTrackedFolder {
+		return nil
+	}
+	t, err := noteToken(text, strings.TrimSuffix(filepath.Base(rel), ".md"))
+	if err != nil {
+		return nil
+	}
+	p, err := LoadProcess(r.Method, unlink(t.Process))
+	if err != nil {
+		return nil // a process nothing declares is another rule's business
+	}
+	// WHERE A TOKEN ENDS IS THE PROCESS'S OWN ANSWER, not the word closed. A
+	// process may end somewhere else, and writing the word here would be a
+	// second copy of the declaration.
+	if string(t.Status) == p.EndsAt() {
+		return nil
+	}
+	has := map[string]bool{}
+	for _, c := range chaptersOf(theFencesTakenOut(text), 2) {
+		has[c.Header] = true
+	}
+	for _, want := range p.RequiredSection {
+		if has[want] {
+			continue
+		}
+		return fmt.Errorf("%s is %s under the %s process and carries no %q section, which that "+
+			"process requires. A token waiting to be taken has to say what it is, so a reader can "+
+			"disagree with it before the work begins.", rel, t.Status, unlink(t.Process), "## "+want)
+	}
+	return nil
 }
 
 // theGlyphIsData is the words a line writes to say its character is data. It is
