@@ -95,6 +95,16 @@ type Answer struct {
 	// is not asked to remember to mint anything.
 	Learned string `json:"learned,omitempty"`
 
+	// THE FILES THIS SUBMISSION WROTE THAT GIT CARRIES, for the hand that has
+	// to land them.
+	//
+	// A CLOSE WRITES TWO THINGS AND A HAND LANDS ONE. The note goes one way
+	// and the archive row the other, and the answer named neither, so a hand
+	// landed what it remembered and the branch read the token as still open.
+	// The engine writes all of them, so the engine is the one thing that knows
+	// the list. See thePathsAClose.
+	Paths []string `json:"paths,omitempty"`
+
 	// claimed says the queue wrote the claim on the token it is handing over,
 	// so the verb that answered can put it on the claims branch.
 	//
@@ -155,12 +165,13 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 	// agent hears about it, so it is carried onto whatever comes back rather
 	// than dropped with the settled payload.
 	learned, over := "", ""
+	var wrote []string
 	if p.ID != "" {
 		a, done := settle(r, actor, p)
 		if done {
 			return a
 		}
-		learned, over = a.Learned, a.Notice
+		learned, over, wrote = a.Learned, a.Notice, a.Paths
 		// A SUBMISSION AT A SHELL IS ONE THING ASKED FOR, AND ONE THING ANSWERED,
 		// AND THE QUEUE IS NOT READ AT ALL.
 		//
@@ -170,9 +181,10 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 		// would have handed on, with two snapshot commits behind them. That
 		// token's record then said it had been in a hand it was never in.
 		if p.settleOnly {
-			return Answer{Pull: AnswerSettled, Notice: p.ID + " is settled. The next token goes to a " +
-				"lane, because an agent that submits is asking for more. Ask for work again when " +
-				"you want it."}
+			return Answer{Pull: AnswerSettled, Paths: wrote,
+				Notice: p.ID + " is settled. The next token goes to a " +
+					"lane, because an agent that submits is asking for more. Ask for work again when " +
+					"you want it." + over}
 		}
 	}
 	// A HOLD ON YOUR OWN VERDICT IS NOT WORK IN HAND. The submission put the
@@ -192,6 +204,7 @@ func answerFor(r Roots, actor, role string, p Payload) Answer {
 	// second writer this deletion also takes out.
 	a := whatComesNext(r, actor, role)
 	a.Learned = learned
+	a.Paths = wrote
 	a.Notice += over + down
 	return a
 }
@@ -575,6 +588,9 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 	// CLOSING ENDS THE STRETCH, so the change is the diffs between began and
 	// ended, pair by pair.
 	t = closeStretch(r, t)
+	// AND WHAT A HAND HAS TO LAND IS READ BEFORE THE WRITE, because the write
+	// takes the note off the disk. See thePathsAClose.
+	wrote := thePathsAClose(r, t, ends)
 	if err := SaveToken(r, t); err != nil {
 		if !TheCloseStood(err) {
 			return refuse(&t, Rejection{Clause: "the record", Wrong: err.Error(),
@@ -583,9 +599,9 @@ func submit(r Roots, actor string, t Token, p Payload) (Answer, bool) {
 		// THE CLOSE STOOD, AND THE ANSWER SAYS WHAT IS LEFT OVER. Refusing here
 		// told the worker its submission had failed, under a clause naming a
 		// folder that was written and not the archive that was not.
-		return Answer{Notice: "\n\n" + err.Error()}, false
+		return Answer{Paths: wrote, Notice: "\n\n" + err.Error() + theLanding(wrote)}, false
 	}
-	return Answer{}, false
+	return Answer{Paths: wrote, Notice: theLanding(wrote)}, false
 }
 
 // A token cannot close without saying what became of it. Three values, and
