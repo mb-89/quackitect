@@ -21,19 +21,45 @@ cd "$(git rev-parse --show-toplevel)" || exit 1
 P=""
 [ -f .se/scratchpad/proxy.sh ] && P=$(sh .se/scratchpad/proxy.sh)
 [ -n "$P" ] && export HTTPS_PROXY="$P" https_proxy="$P"
+# THE BRANCH THIS TREE IS ON IS WHERE THE COMMIT GOES. This door named one
+# branch in its fetch and in its push, and read the branch nowhere, so a push
+# from a group branch put the work on trunk and answered PUSHED. Its sibling
+# land.sh did the same, and four lands went to trunk before anyone looked.
+#
+# NO BRANCH NAME IS WRITTEN HERE. This script is copied into trees whose trunk
+# is called something else, and a name written down is wrong in all of them.
+#
+# A DETACHED HEAD NAMES NO BRANCH, so there is nowhere to push and this says so.
+branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+if [ -z "$branch" ] || [ "$branch" = "HEAD" ]; then
+  echo "NO BRANCH: this tree is on a detached HEAD, so a push has nowhere to go"
+  echo "Check out the branch this commit belongs on, then push again"
+  exit 2
+fi
 wt=/tmp/cp-$(echo "$commit" | cut -c1-8)
 rm -rf "$wt"
 git worktree prune
 for i in 1 2 3 4 5 6; do
-  git fetch origin v4 >/dev/null 2>&1 || { sleep 5; continue; }
+  # ORIGIN MAY NOT HAVE SEEN THIS BRANCH YET, and this push is what creates it
+  # there. Its base is then the local tip.
+  if git fetch origin "$branch" >/dev/null 2>&1; then
+    base=FETCH_HEAD
+  elif git rev-parse --verify --quiet "refs/heads/$branch" >/dev/null 2>&1; then
+    base=$branch
+  else
+    sleep 5; continue
+  fi
   rm -rf "$wt"
-  git worktree add --detach "$wt" FETCH_HEAD >/dev/null 2>&1 || { sleep 5; continue; }
+  git worktree add --detach "$wt" "$base" >/dev/null 2>&1 || { sleep 5; continue; }
   if ! git -C "$wt" cherry-pick "$commit"; then
     git -C "$wt" cherry-pick --abort 2>/dev/null
     echo "CHERRY-PICK CONFLICT on try $i"
     exit 2
   fi
-  if git -C "$wt" push origin HEAD:v4; then
+  # THE DESTINATION IS WRITTEN OUT IN FULL, because HEAD here is detached and
+  # git refuses to guess a remote ref that does not exist yet from a bare name.
+  if git -C "$wt" push origin "HEAD:refs/heads/$branch"; then
+    echo "LANDED ON $branch"
     echo PUSHED
     git -C "$wt" log --oneline -1
     exit 0
