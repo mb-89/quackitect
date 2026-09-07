@@ -60,12 +60,12 @@ If it is not, the seam test decides between the two places the detail names. It 
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the approach is on the token before any work, as an interface or a shape a reader can disagree with |  |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the change is small enough to review whole, or it is split first | — |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | The gate is proved to have something to read. One that is right and reads nothing lets every close through. |  |
+| [x] | what breaks if it is never done, and not only that it stays undone | Both tests here pass whether or not the verb writes, so the store could stop being written unnoticed. |  |
+| [x] | the approach is on the token before any work, as an interface or a shape a reader can disagree with | It is, and it names the cheap reading first: ask the engine that answers, not the file on disk. |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | All three. Two by the new test, the third by TestASubmissionIsRefusedWhenTheRunWasRed, green throughout. |  |
+| [x] | the change is small enough to review whole, or it is split first | — |  |
+| [x] | the basics it stands on exist, or are minted first | — |  |
 
 ## evidence: step 2. do
 
@@ -73,11 +73,11 @@ If it is not, the seam test decides between the two places the detail names. It 
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | the change follows the approach on the token, or the token says why it departed |  |  |
-| [ ] | se test --on this token answered ok, and what it ran is named |  |  |
-| [ ] | the note says what changed and why, for a reader who was not here |  |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | — |  |
+| [x] | the change follows the approach on the token, or the token says why it departed | Its first step decided it. .se/tested.json is on this box and carries this session's runs, the first at 14:22:28Z, so the store is written and the reported defect is not here. The seam test is the second step, and it was written anyway. |  |
+| [x] | se test --on this token answered ok, and what it ran is named | TestTheTestVerbWritesTheRunItRan, TestASubmissionIsRefusedWhenTheRunWasRed and TestACloseAsksWhatTheEngineRan, all green. |  |
+| [x] | the note says what changed and why, for a reader who was not here | Commit 71cfcbe9 says what the test does and what it worked around. |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | None in src. A whole-diff delta starts the battery and records the run pending, and the gate refuses a close on a pending run. The test's comments carry it. |  |
 
 ## evidence: step 3. verdict
 
