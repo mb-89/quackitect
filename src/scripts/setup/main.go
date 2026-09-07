@@ -70,6 +70,29 @@ var (
 	dry       = flag.Bool("dry-run", false, "say what would happen and change nothing")
 )
 
+// theRootMarker is the file that says a folder is the top of the tree.
+const theRootMarker = "RUNME.sh"
+
+// theTreeRootAbove finds the root by asking, rather than by counting folders.
+//
+// COUNTING IS WHAT A MOVE BREAKS. This program was util/setup, where two folders
+// up was the root. It is src/scripts/setup now, where two folders up is src, and
+// the count was wrong the moment it moved. Nothing said so: the path it built
+// still existed, so the failure came out much later as a missing manifest.
+func theTreeRootAbove(from string) (string, bool) {
+	at := filepath.Clean(from)
+	for {
+		if _, err := os.Stat(filepath.Join(at, theRootMarker)); err == nil {
+			return at, true
+		}
+		up := filepath.Dir(at)
+		if up == at {
+			return "", false
+		}
+		at = up
+	}
+}
+
 func main() {
 	flag.Usage = usage
 	flag.Parse()
@@ -80,7 +103,12 @@ func main() {
 	}
 	if *root == "" {
 		here, _ := os.Getwd()
-		*root = filepath.Clean(filepath.Join(here, "..", ".."))
+		at, ok := theTreeRootAbove(here)
+		if !ok {
+			fail(fmt.Errorf("no tree root above %s: nothing on the way up holds %s. "+
+				"Say which tree with --root", here, theRootMarker))
+		}
+		*root = at
 	}
 	m, err := readManifest(filepath.Join(*root, "src", "scripts", "setup", "manifest.json"))
 	if err != nil {

@@ -8,10 +8,13 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
+	"quackitect/engine/internal/frontmatter"
 	"quackitect/engine/internal/voice"
 )
 
@@ -155,6 +158,9 @@ func Apply(r Roots, edits []Edit, dry bool, on, by string) (Applied, error) {
 	// the rules were enforced on the door nobody uses and not on the one
 	// everybody uses, and a sentence carrying a semicolon, a contraction and a
 	// Latin abbreviation went into a report through this door and was taken.
+	if err := theShapeOfTheTree(r, out.Files, content, born); err != nil {
+		return out, err
+	}
 	if err := proseThatReads(r, edits); err != nil {
 		return out, err
 	}
@@ -534,4 +540,493 @@ func proseThatReads(r Roots, edits []Edit) error {
 	// through, and the refusal says so rather than reading as a ban on the file.
 	return fmt.Errorf("this text breaks rules the voice check can see, so nothing was written. "+
 		"Nothing is wrong with the file: fix these and write it again.\n%s", strings.Join(lines, "\n"))
+}
+
+
+// SIX RULES THAT WERE SWEEPS, REFUSED AT THE WRITE INSTEAD.
+//
+// Each of these was a check walking whatever the tree happened to hold: every
+// .sh, every .mjs, every note, every .go. A sweep finds the defect after it is
+// in, on a run somebody has to remember to make, and it gets slower as the tree
+// grows. The bytes are in hand here, so the answer is known before the file
+// exists, and the refusal can say what to do instead.
+//
+// THEY REFUSE A FORM, NEVER A PLACE. The same content written properly goes
+// through, and each refusal says how, the way proseThatReads does above.
+//
+// AND EACH ONE IS TESTED ON A PLANTED CASE AND A CLEAN ONE BESIDE IT. That is
+// what the checks they replace could never do: their input was the tree, so a
+// green run meant nobody had broken it yet rather than that the rule was held.
+// IT READS THE FILE AND NOT THE EDIT. An exact edit hands over a fragment, so a
+// rule asked about the fragment answers about a few lines and calls the file
+// clean. Every one of these is a question about what the file will hold, and
+// that is in hand here: the manifest is resolved before anything is written.
+func theShapeOfTheTree(r Roots, files []string, content map[string][]byte, born map[string]bool) error {
+	for _, at := range files {
+		if underPrivate(r, at) {
+			continue // .se is where what does not travel lives
+		}
+		rel, err := filepath.Rel(r.Work, at)
+		if err != nil || strings.HasPrefix(rel, "..") {
+			continue
+		}
+		rel = filepath.ToSlash(rel)
+		text := string(content[at])
+		for _, refuse := range []func(Roots, bool, string, string) error{
+			aScriptWithoutACarriageReturn,
+			aPatternWithoutALoneEscape,
+			aTestWithoutATokenId,
+			aNameThatStandsOnce,
+			aDrawingWithoutALooseGlyph,
+			aNoteTheRecordWouldRefuse,
+			aNoteLinkingWhatNoCloneCarries,
+			aParallelTestSwappingASeam,
+			aSecondReachForTheChildProcess,
+		} {
+			if err := refuse(r, born[at], rel, text); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+// A SCRIPT CARRIES NO CARRIAGE RETURN. The interpreter reads it as part of the
+// line, so the script dies on Linux and nowhere else.
+func aScriptWithoutACarriageReturn(_ Roots, _ bool, rel, text string) error {
+	if !strings.HasSuffix(rel, ".sh") || !strings.Contains(text, "\r") {
+		return nil
+	}
+	at := strings.Index(text, "\r")
+	return fmt.Errorf("%s carries a carriage return at byte %d, and a shell reads it as part of the "+
+		"line, so the script dies on Linux and nowhere else. Write it with line feeds. "+
+		"A carriage return a checkout adds is .gitattributes' business and not this one.", rel, at)
+}
+
+// A PATTERN IS NOT BUILT FROM A LONE ESCAPE.
+//
+// The string is read before the pattern is, so a single backslash reaches the
+// matcher as a control character. The pattern then matches nothing and every
+// assertion resting on it is green. It fails silent by construction, which is
+// why finding it afterwards means every run in between was false evidence.
+// IT COUNTS THE BACKSLASHES AND DOES NOT MERELY FIND ONE. A first draft asked
+// for a backslash anywhere ahead of the class letter, so it refused the doubled
+// form as well, which is the answer it tells the writer to give. Its own clean
+// case said so on the first run.
+//
+// So the run before the letter has to be odd: the head takes backslashes two at
+// a time, and the one that reaches the letter stands alone.
+var aLoneEscape = regexp.MustCompile(`(?:RegExp|regexp\.MustCompile|regexp\.Compile)\(\s*"(?:[^"\\]|\\\\|\\")*` +
+	`\\(?:[dDwWsSbBAzZnrtfv0-9pPkQEuxc]|\.)`)
+
+func aPatternWithoutALoneEscape(_ Roots, _ bool, rel, text string) error {
+	if !strings.HasSuffix(rel, ".mjs") && !strings.HasSuffix(rel, ".ts") && !strings.HasSuffix(rel, ".go") {
+		return nil
+	}
+	m := aLoneEscape.FindString(text)
+	if m == "" {
+		return nil
+	}
+	return fmt.Errorf("%s builds a pattern from a double-quoted string holding a lone backslash: %q. "+
+		"The string is read before the pattern is, so this reaches the matcher as a control character, "+
+		"the pattern matches nothing, and everything resting on it goes green. "+
+		"Double the backslashes, or write it as a literal pattern.", rel, m)
+}
+
+// A TEST NAMES NO TOKEN. A file meant to outlive the record carrying an id from
+// the record hands a reader a link into work that has closed and gone.
+var aTokenId = regexp.MustCompile(`wk-[0-9a-f]{10}`)
+
+func aTestWithoutATokenId(_ Roots, _ bool, rel, text string) error {
+	if !strings.HasSuffix(rel, "_test.go") && !strings.HasPrefix(rel, "spec/guidance/") {
+		return nil
+	}
+	for _, id := range aTokenId.FindAllString(text, -1) {
+		// A PLACEHOLDER IS NOT AN ID. wk-1111111111 is a fixture saying "some
+		// token", and every test that needs one writes it that way.
+		if strings.Count(id, string(id[3])) == len(id)-3 {
+			continue
+		}
+		return fmt.Errorf("%s names %s, which is a token in the record. "+
+			"A test outlives the work it was written for, and the record's ids close and go, "+
+			"so a reader is left with a link into nothing. Provenance belongs on the token. "+
+			"A fixture that needs an id writes one repeated digit, like wk-1111111111.", rel, id)
+	}
+	return nil
+}
+
+// A NAME STANDS ONCE. A file moved into a package and also left behind means one
+// copy is read by everything and one by nothing, and the compiler does not mind.
+// IT LOOKS BOTH WAYS. The twin is made by whichever half arrives second, and
+// either half can be the one arriving, so asking only about a new flat file
+// would let the same pair through when the internal copy is the new one.
+func aNameThatStandsOnce(r Roots, isNew bool, rel, _ string) error {
+	dir := filepath.ToSlash(filepath.Dir(rel))
+	if !isNew || !strings.HasSuffix(rel, ".go") {
+		return nil // already there, so this write is not making a second one
+	}
+	name := filepath.Base(rel)
+	internal := filepath.Join(r.Work, "src", "engine", "internal")
+
+	if dir == "src/engine" {
+		pkgs, err := os.ReadDir(internal)
+		if err != nil {
+			return nil
+		}
+		for _, p := range pkgs {
+			if !p.IsDir() {
+				continue
+			}
+			if _, err := os.Stat(filepath.Join(internal, p.Name(), name)); err == nil {
+				return theTwin(rel, "src/engine/internal/"+p.Name()+"/"+name)
+			}
+		}
+		return nil
+	}
+
+	if pkg, ok := strings.CutPrefix(dir, "src/engine/internal/"); ok && !strings.Contains(pkg, "/") {
+		if _, err := os.Stat(filepath.Join(r.Work, "src", "engine", name)); err == nil {
+			return theTwin(rel, "src/engine/"+name)
+		}
+	}
+	return nil
+}
+
+// theTwin says the pair, because the hand that reads it is the one that has to
+// decide which of the two is the dead one.
+func theTwin(writing, standing string) error {
+	return fmt.Errorf("%s would stand twice: this name is already %s. "+
+		"One of the two would be read by everything and the other by nothing, and the "+
+		"compiler will not say which, because they are different packages. "+
+		"Read the callers and write the one they use.", writing, standing)
+}
+
+// A FILE THAT DRAWS CARRIES NO LOOSE GLYPH. The icon table decides what a name
+// looks like, and a character written into the page is a second decision that
+// can disagree with it.
+func aDrawingWithoutALooseGlyph(_ Roots, _ bool, rel, text string) error {
+	if !aFileThatDraws(rel) {
+		return nil
+	}
+	// IT ASKS FOR THE PROPERTY AND NOT FOR THE REGISTRY.
+	//
+	// A first draft refused the marks the icon table declares. That can only
+	// ever catch a mark already in the table, and a mark nowhere in it is the
+	// actual violation: five went past that way, a gear on a button among them.
+	// So every character above ASCII is refused, and the table is the exemption
+	// list rather than the search list.
+	for n, body := range strings.Split(text, "\n") {
+		body = strings.TrimRight(body, "\r")
+		trimmed := strings.TrimSpace(body)
+		if strings.Contains(body, theGlyphIsData) || strings.HasPrefix(trimmed, "//") || strings.HasPrefix(trimmed, "*") {
+			continue // the line says the character is data, or the line is prose
+		}
+		ch, line := rune(0), n+1
+		for _, c := range theEntitiesWrittenOut(body) {
+			if c > 127 {
+				ch = c
+				break
+			}
+		}
+		if ch == 0 {
+			continue
+		}
+		return fmt.Errorf("%s carries %q at line %d, and this file draws. "+
+			"The icon table decides what a name looks like, so a character written here is a "+
+			"second decision that can disagree with it. Name an entry in the table, or write "+
+			"the words `"+theGlyphIsData+"` on the line to say the character is data.", rel, ch, line)
+	}
+	return nil
+}
+
+// A NOTE PASSES WHAT THE RECORD ITSELF REFUSES.
+//
+// THE TWO DOORS DID NOT AGREE. SaveToken puts every note through
+// TheRecordRefuses, and a note written as a file through here went past it: the
+// only thing asked was whether a section had run past its word cap. A doubled
+// heading, or a heading inside a fenced block, went in through the door agents
+// are told to use and was refused only through the one they do not.
+//
+// IT ASKS THE OWNER RATHER THAN HOLDING A COPY. The rules live in store.go and
+// they move; a second reading of them here would drift, which is what the
+// scanning check that used to do this did.
+//
+// THE CAPS ARE LEFT TO tokensThatFit. A cap already past its bound refuses a
+// write that brings it down, and that trap is why the other door holds the two
+// apart. Only the absolute rules are asked here.
+func aNoteTheRecordWouldRefuse(r Roots, _ bool, rel, text string) error {
+	if !strings.HasSuffix(rel, ".md") {
+		return nil
+	}
+	id := strings.TrimSuffix(filepath.Base(rel), ".md")
+	if t, err := noteToken(text, id); err == nil {
+		if err := blocksHoldNoHeading(t); err != nil {
+			return fmt.Errorf("%s: %w. Nothing was written", rel, err)
+		}
+	}
+	// THE HEADING RULE IS ABOUT THE NOTE AND NOT ABOUT THE TOKEN. A file that
+	// does not parse as a token is still read by a person, and a chapter lost
+	// on the way in is lost either way.
+	if filepath.ToSlash(filepath.Dir(rel)) != TheTrackedFolder {
+		return nil
+	}
+	// THE QUESTION IS ABOUT THE BYTES AND NOT ABOUT THE TOKEN THEY PARSE TO.
+	//
+	// headingsSaidOnce asks a Token, whose body is rendered back out of the
+	// fields the reader filled. A section written twice is read into one field,
+	// the second overwriting the first, so by the time the rule looks there is
+	// one heading and a chapter has been lost without a word. Which is the same
+	// defect, seen from the far side.
+	//
+	// So the owner's chapter splitter is asked about the text as written.
+	//
+	// A FENCED BLOCK IS NOT THE NOTE'S OWN PROSE. A note quoting a markdown
+	// sample carries the sample's headings, and those belong to the sample.
+	_, body := frontmatter.Split(text)
+	seen := map[string]bool{}
+	for _, c := range chaptersOf(theFencesTakenOut(body), 2) {
+		if seen[c.Header] {
+			return fmt.Errorf("%s opens a %q section twice, and the reader keeps the second: "+
+				"the first is lost on the way in, without a word. "+
+				"Fold the two into one. Nothing was written", rel, c.Header)
+		}
+		seen[c.Header] = true
+	}
+	return nil
+}
+
+// theFencesTakenOut blanks the lines between fences, keeping the line count so
+// anything counting lines still answers about the file as written.
+func theFencesTakenOut(body string) string {
+	lines := strings.Split(strings.ReplaceAll(body, "\r\n", "\n"), "\n")
+	fenced := false
+	for i, line := range lines {
+		if strings.HasPrefix(strings.TrimLeft(line, " \t"), "```") {
+			fenced = !fenced
+			lines[i] = ""
+			continue
+		}
+		if fenced {
+			lines[i] = ""
+		}
+	}
+	return strings.Join(lines, "\n")
+}
+
+// A TRACKED NOTE LINKS ONLY WHAT A CLONE CAN OPEN.
+//
+// A note under the tracked folder travels. A note under .se does not, so a
+// [[link]] from the first to the second is a shut door on every box but this
+// one, and it reads as a live reference right up until somebody clicks it.
+//
+// THE QUESTION IS ABOUT WHAT TRAVELS AND NOT ABOUT WHAT IS PRIVATE. The check
+// this replaces asked whether the id was under .se, so on a fresh clone, where
+// .se holds nothing, every broken link passed: it was dead exactly on the box
+// it was written to protect. So the rule is that a link names a note the
+// tracked folder holds, and no private folder is read at all.
+var aWikiLink = regexp.MustCompile(`\[\[(wk-[0-9a-z]+)\]\]`)
+
+func aNoteLinkingWhatNoCloneCarries(r Roots, _ bool, rel, text string) error {
+	if !strings.HasSuffix(rel, ".md") || filepath.ToSlash(filepath.Dir(rel)) != TheTrackedFolder {
+		return nil
+	}
+	named := aWikiLink.FindAllStringSubmatch(text, -1)
+	if len(named) == 0 {
+		return nil
+	}
+	travels := map[string]bool{strings.TrimSuffix(filepath.Base(rel), ".md"): true}
+	entries, err := os.ReadDir(TrackedDir(r))
+	if err != nil {
+		return nil // no tracked folder to ask, so nothing is decided here
+	}
+	for _, e := range entries {
+		travels[strings.TrimSuffix(e.Name(), ".md")] = true
+	}
+	for _, m := range named {
+		if travels[m[1]] {
+			continue
+		}
+		return fmt.Errorf("%s links [[%s]], and %s holds no such note, so the link is a shut "+
+			"door on every box but this one. A note that travels links only what travels. "+
+			"Say what it said in a sentence, or move the note into %s.",
+			rel, m[1], TheTrackedFolder, TheTrackedFolder)
+	}
+	return nil
+}
+
+// A TEST THAT RUNS BESIDE OTHERS SWAPS NO SEAM.
+//
+// t.Parallel() says this test runs at the same time as its siblings. A package
+// variable assigned inside it is assigned under all of them, so the failure
+// lands in whichever test happened to be reading, and it lands differently
+// every run. It is the one defect a green run says nothing about.
+var theParallelMark = regexp.MustCompile(`\bt\.Parallel\(\)`)
+var aPlainAssignment = regexp.MustCompile(`(?m)^\s+([A-Za-z_]\w*)\s*=[^=]`)
+var aPackageVariable = regexp.MustCompile(`(?m)^var\s+([A-Za-z_]\w*)|^\t([A-Za-z_]\w*)\s+=[^=]`)
+
+func aParallelTestSwappingASeam(r Roots, _ bool, rel, text string) error {
+	if !strings.HasSuffix(rel, "_test.go") || !theParallelMark.MatchString(text) {
+		return nil
+	}
+	// A SWAP UNDER A LOCK IS DELIBERATE. A seam taken and released around the
+	// test is not a race, and refusing it would refuse the answer this refusal
+	// tells the writer to give.
+	if strings.Contains(text, ".Lock()") {
+		return nil
+	}
+	assigned := aPlainAssignment.FindAllStringSubmatch(text, -1)
+	if len(assigned) == 0 {
+		return nil
+	}
+	// THE SEAMS ARE READ OUT OF THE FILES THAT ARE NOT TESTS. A var in a test
+	// file is that test's own, and calling it a package seam refused a test for
+	// touching what it declared itself.
+	seams := theSeamsOf(r, filepath.Dir(rel))
+	for _, m := range assigned {
+		// A NAME THE FILE DECLARES IS ITS OWN. A local shadowing a package
+		// variable is not a swap, and reading one as a swap named 160 tests
+		// that swap nothing when the check this replaces first tried it.
+		if regexp.MustCompile(`(?m)\bvar\s+`+regexp.QuoteMeta(m[1])+`\b|^\s+`+regexp.QuoteMeta(m[1])+`\s*(?:,[^=\n]*)?:=`).MatchString(text) {
+			continue
+		}
+		if seams[m[1]] {
+			return fmt.Errorf("%s calls t.Parallel() and assigns %s, which the package declares. "+
+				"Every sibling running beside it reads that variable, so the failure lands in "+
+				"whichever test was looking and lands somewhere else next run. "+
+				"Drop t.Parallel(), or hand the seam in rather than swapping it.", rel, m[1])
+		}
+	}
+	return nil
+}
+
+func theSeamsOf(r Roots, dir string) map[string]bool {
+	out := map[string]bool{}
+	entries, err := os.ReadDir(filepath.Join(r.Work, filepath.FromSlash(dir)))
+	if err != nil {
+		return out
+	}
+	for _, e := range entries {
+		name := e.Name()
+		if e.IsDir() || !strings.HasSuffix(name, ".go") || strings.HasSuffix(name, "_test.go") {
+			continue
+		}
+		b, err := os.ReadFile(filepath.Join(r.Work, filepath.FromSlash(dir), name))
+		if err != nil {
+			continue
+		}
+		for _, m := range aPackageVariable.FindAllStringSubmatch(string(b), -1) {
+			for _, got := range m[1:] {
+				if got != "" {
+					out[got] = true
+				}
+			}
+		}
+	}
+	return out
+}
+
+// THE EXTENSION REACHES FOR child_process IN ONE PLACE.
+//
+// Every spawn the extension makes has to hide its window, and a second file
+// that reaches for the module is a second place that has to remember. The one
+// that forgot left a console flashing on every keystroke.
+//
+// IT WALKS TO THE BOTTOM. The check this replaces read the top folder only,
+// which is how a file in a subfolder reached the module unseen.
+func aSecondReachForTheChildProcess(r Roots, _ bool, rel, text string) error {
+	if !strings.HasSuffix(rel, ".ts") || !strings.HasPrefix(rel, "src/extension/") {
+		return nil
+	}
+	if !strings.Contains(text, "child_process") {
+		return nil
+	}
+	// AND THE ONE PLACE HIDES THE WINDOW. Node leaves windowsHide false, so a
+	// child started from a process with no console gets one, and that is a
+	// window on somebody's screen. Being the only door is the whole reason this
+	// file can be the only one that has to remember.
+	if !strings.Contains(text, "windowsHide: true") {
+		return fmt.Errorf("%s reaches for child_process and sets no windowsHide. "+
+			"Node leaves it false, so a child started from a process with no console "+
+			"opens one on somebody's screen. Write windowsHide: true on the spawn.", rel)
+	}
+	for _, other := range theExtensionFilesNaming(r, "child_process") {
+		if other == rel {
+			continue
+		}
+		return fmt.Errorf("%s reaches for child_process, and %s already does. "+
+			"Every spawn has to hide its window, and a second place that reaches for the "+
+			"module is a second place that has to remember. Call through the door in %s.",
+			rel, other, other)
+	}
+	return nil
+}
+
+func theExtensionFilesNaming(r Roots, word string) []string {
+	var out []string
+	at := filepath.Join(r.Work, "src", "extension")
+	_ = filepath.WalkDir(at, func(path string, d os.DirEntry, err error) error {
+		if err != nil || d.IsDir() || !strings.HasSuffix(path, ".ts") {
+			return nil
+		}
+		if strings.Contains(path, "node_modules") {
+			return nil
+		}
+		b, err := os.ReadFile(path)
+		if err != nil || !strings.Contains(string(b), word) {
+			return nil
+		}
+		if rel, err := filepath.Rel(r.Work, path); err == nil {
+			out = append(out, filepath.ToSlash(rel))
+		}
+		return nil
+	})
+	sort.Strings(out)
+	return out
+}
+
+// theGlyphIsData is the words a line writes to say its character is data. It is
+// a constant because the refusal quotes it, and a refusal naming an escape the
+// code does not honour sends the reader round in a circle.
+const theGlyphIsData = "not an icon"
+
+// aFileThatDraws answers whether a file puts marks in front of a person. The
+// rule is about drawing and not about a suffix, so every other .ts and .go in
+// the tree may hold whatever text it likes.
+func aFileThatDraws(rel string) bool {
+	switch rel {
+	case "src/extension/panel.ts", "src/extension/editor.ts":
+		return true
+	}
+	// The viewer prints, and so does the log syntax reader that moved out of it,
+	// so any .go in either may draw.
+	if !strings.HasSuffix(rel, ".go") {
+		return false
+	}
+	return strings.HasPrefix(rel, "src/viewer/") || strings.HasPrefix(rel, "src/filter/")
+}
+
+// theEntitiesWrittenOut answers a line with its numeric character references
+// turned back into characters.
+//
+// A GEAR WRITTEN AS &#9881; IS THE SAME DECISION AS A GEAR. A file that
+// generates a page writes the reference, so a rule reading characters alone
+// looks straight past it.
+var anEntity = regexp.MustCompile(`&#(x[0-9a-fA-F]+|[0-9]+);`)
+
+func theEntitiesWrittenOut(line string) string {
+	if !strings.Contains(line, "&#") {
+		return line
+	}
+	return anEntity.ReplaceAllStringFunc(line, func(m string) string {
+		body := m[2 : len(m)-1]
+		base, digits := 10, body
+		if body[0] == 'x' || body[0] == 'X' {
+			base, digits = 16, body[1:]
+		}
+		n, err := strconv.ParseInt(digits, base, 32)
+		if err != nil || n <= 0 || n > 0x10FFFF {
+			return m
+		}
+		return string(rune(n))
+	})
 }

@@ -9,7 +9,24 @@
 #   src/scripts/setup/install.sh --help
 set -eu
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
-root=$(CDPATH= cd -- "$here/../.." && pwd)
+# THE ROOT IS FOUND AND NOT COUNTED.
+#
+# This file was util/setup and is now src/scripts/setup. Every ../.. counting
+# two folders became wrong on the day of the move, and said nothing, because the
+# path it built still existed: it was the src folder. The installer then looked
+# for its manifest under src/src and the build died with a file that is not there.
+#
+# A marker is asked for instead, so the answer is right from wherever this file
+# is moved to next.
+root=$here
+while [ ! -f "$root/RUNME.sh" ]; do
+  up=$(dirname "$root")
+  if [ "$up" = "$root" ]; then
+    echo "no tree root above $here: nothing on the way up holds RUNME.sh" >&2
+    exit 1
+  fi
+  root=$up
+done
 
 have() { command -v "$1" >/dev/null 2>&1; }
 
