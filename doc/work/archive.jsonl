@@ -84,6 +84,7 @@
 {"id":"wk-86a1c09e11","title":"guard misses field writes","process":"trivial","disposition":"done","on_branch":"1a302f1f6f1379b9e88f3e36ab6b8d115e5770dd","tag":"refs/tags/archive/wk-86a1c09e11"}
 {"id":"wk-86d96eaf0f","title":"scratch trivial probe","process":"trivial","disposition":"dropped","on_branch":"8098f32fb091e81f32cc4634059c461496f480fd","tag":"refs/tags/archive/wk-86d96eaf0f"}
 {"id":"wk-887e9a126a","title":"the engine archives","process":"standard","disposition":"done","on_branch":"77714ae645434f32af214a329595cf5f4ea79543","tag":"refs/tags/archive/wk-887e9a126a"}
+{"id":"wk-89c10296e6","title":"the engine holds holders","process":"trivial","disposition":"done","blob":"7efaaaca6ae4d59953e9a7b1cc72275d69eb159e","on_branch":"298d16bcc0d61505983e47cfbce2d3bf24e8f9d6"}
 {"id":"wk-8fb9a97399","title":"no public link private","process":"trivial","disposition":"done","on_branch":"fba4b3346605e7766080e3670eb151056ddf469b","tag":"refs/tags/archive/wk-8fb9a97399"}
 {"id":"wk-92e9b13a45","title":"the harness has tools","process":"trivial","disposition":"done","on_branch":"8fb7ed313c4555bc0603b18286536cef28f15cbe","tag":"refs/tags/archive/wk-92e9b13a45"}
 {"id":"wk-979c779751","title":"session says guard live","process":"trivial","disposition":"dropped","on_branch":"c36b41e76ce3a786cf1b7c521f8567608bc5fa7c","tag":"refs/tags/archive/wk-979c779751"}
