@@ -263,5 +263,67 @@ func (r Roots) Private(parts ...string) string {
 	return filepath.Join(append([]string{r.Work, ".se"}, parts...)...)
 }
 
+// Runtime is where the live registers are kept: the small files that say what
+// this box is doing right now.
+//
+// THE OWNER COULD NOT TELL STATE FROM LEAVINGS. Twenty-four registers sat loose
+// in .se beside the log, the index and whatever an agent had left there, and
+// asking which of them mattered meant reading the engine. A folder answers it:
+// what is under runtime is live, and what is not is a leaving and may go.
+//
+// EVERY ONE OF THEM IS DERIVED FROM THIS BOX. None travels, none is a record,
+// and a box that lost the lot would rebuild them by running. That is the test
+// for whether a file belongs here rather than beside the log.
+//
+// LEGACY FILES ARE MOVED RATHER THAN LEFT. A tree written before this change
+// has them in .se, and a reader that found nothing would silently answer that
+// nothing is held: no rung, no hold, nobody owed an answer. TakeUpTheRuntime
+// carries them across once, at start.
+func (r Roots) Runtime(parts ...string) string {
+	return filepath.Join(append([]string{r.Work, ".se", "runtime"}, parts...)...)
+}
+
+// theRuntimeRegisters is every file the runtime folder holds. It is the list
+// the move reads, so a register added without being named here stays in .se and
+// is found by the check rather than by a person wondering where it went.
+var theRuntimeRegisters = []string{
+	"actors.json", "arrivals.json", "asked.json", "binding.json", "calls.json",
+	"claims.json", "emergency.json", "engine.json", "evidence.json",
+	"failures.json", "grace.json", "heard.json", "hold.json", "holds.json",
+	"ideation.json", "looked.json", "owed.json", "parameters.json", "project.json",
+	"results.json", "runme.json", "stop-claim.json", "stops.json", "tested.json",
+	"tools.json",
+}
+
+// COPY.JSON IS NOT ONE OF THESE, and it is the only .se json left outside. It
+// is this installation's identity, it lives in the METHOD root rather than the
+// work root, and a produced copy gets its own. So it is not state about a run
+// and moving it under runtime would put two different roots' files in one
+// folder. See CopyID in vehicle.go.
+
+// TakeUpTheRuntime moves the registers a older tree left loose in .se into the
+// runtime folder, once. A file already there wins, because it is the one this
+// engine has been writing.
+func TakeUpTheRuntime(r Roots) {
+	if err := os.MkdirAll(r.Runtime(), 0o755); err != nil {
+		return
+	}
+	for _, name := range theRuntimeRegisters {
+		was, now := r.Private(name), r.Runtime(name)
+		if _, err := os.Stat(now); err == nil {
+			continue // this engine has already written it
+		}
+		if _, err := os.Stat(was); err != nil {
+			continue // there was never one
+		}
+		if err := os.Rename(was, now); err != nil {
+			// A register that will not move is left where it is. The reader
+			// finds nothing and the box carries on, which is what it does for a
+			// register that was never written.
+			continue
+		}
+	}
+}
+
 // SessionLog is the file the record is being written to.
 func SessionLog(r Roots) string { return filepath.Join(r.Private("log"), sessionlog.Current) }

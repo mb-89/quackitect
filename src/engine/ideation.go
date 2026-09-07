@@ -35,7 +35,7 @@ type Ideating struct {
 	Session string `json:"session"`
 }
 
-func ideationPath(r Roots) string { return r.Private("ideation.json") }
+func ideationPath(r Roots) string { return r.Runtime("ideation.json") }
 
 func LoadIdeation(r Roots) Ideating {
 	var i Ideating

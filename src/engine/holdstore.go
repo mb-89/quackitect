@@ -18,7 +18,7 @@ import (
 // the thing it is about: arrivals.json, looked.json. The hold goes with them,
 // keyed by token and carrying the actor. The token file is then the ask and the
 // evidence, and says nothing about whose hands it is in.
-func holdsPath(r Roots) string { return r.Private("holds.json") }
+func holdsPath(r Roots) string { return r.Runtime("holds.json") }
 
 // A SESSION OF ITS OWN, the way arrivals and the nudge have one.
 //

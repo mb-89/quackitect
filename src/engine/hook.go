@@ -1251,7 +1251,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 
 // WHAT WAS ASKED, HELD UNTIL THE ANSWER COMES. The guard is a fresh process per
 // event and holds nothing between them, so it is a file.
-func callPath(r Roots) string { return r.Private("calls.json") }
+func callPath(r Roots) string { return r.Runtime("calls.json") }
 
 func rememberCall(r Roots, id, said string) {
 	if id == "" || said == "" {

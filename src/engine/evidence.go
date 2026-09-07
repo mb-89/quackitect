@@ -72,7 +72,7 @@ type Agent struct {
 	Gone time.Time `json:"gone,omitempty"`
 }
 
-func evidencePath(roots Roots) string { return roots.Private("evidence.json") }
+func evidencePath(roots Roots) string { return roots.Runtime("evidence.json") }
 
 func LoadEvidence(roots Roots) Evidence {
 	e := Evidence{Reads: map[string]Read{}, Agents: map[string]Agent{}}

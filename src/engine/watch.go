@@ -92,7 +92,7 @@ func runIdentity() string {
 	return hex.EncodeToString(b)
 }
 
-func runningPath(r Roots) string { return r.Private("engine.json") }
+func runningPath(r Roots) string { return r.Runtime("engine.json") }
 
 // noRecord is what a reader is told when there is no engine.json it can read,
 // said once so the two ways of not reading one answer alike.

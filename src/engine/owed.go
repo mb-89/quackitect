@@ -45,7 +45,7 @@ type Owed map[string][]string
 // message nobody attributed, not a rule that every obligation is the walker's.
 const Walker = "main"
 
-func owedPath(r Roots) string { return r.Private("owed.json") }
+func owedPath(r Roots) string { return r.Runtime("owed.json") }
 
 // TheyAsked is called where a prompt arrives, and nowhere else.
 //
@@ -218,7 +218,7 @@ type graced struct {
 	Seen    map[string]int `json:"seen"`
 }
 
-func gracePath(r Roots) string { return r.Private("grace.json") }
+func gracePath(r Roots) string { return r.Runtime("grace.json") }
 
 // AnswerOwedNow answers what to say about an owed answer, and whether to refuse.
 //

@@ -114,7 +114,7 @@ type Binding struct {
 	Session string     `json:"session"`
 }
 
-func bindingPath(r Roots) string { return r.Private("binding.json") }
+func bindingPath(r Roots) string { return r.Runtime("binding.json") }
 
 // THE RUNG IS THE ONE CONTROL ONLY A CLICK MAY END.
 //
@@ -247,7 +247,7 @@ type AskedToSay struct {
 	Session string `json:"session"`
 }
 
-func askedPath(r Roots) string { return r.Private("asked.json") }
+func askedPath(r Roots) string { return r.Runtime("asked.json") }
 
 func LoadAsked(r Roots) AskedToSay {
 	var a AskedToSay

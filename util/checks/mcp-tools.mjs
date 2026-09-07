@@ -353,7 +353,7 @@ say("se_test plans off the token's delta", Array.isArray(planned?.chosen) && Arr
     const own = join(folder, ".se", "engine.sock");
     say("the " + side + " work folder is on its side of the socket path limit (" + own.length + " bytes)",
       (own.length < limit) === under, own);
-    const record = join(folder, ".se", "engine.json");
+    const record = join(folder, ".se", "runtime", "engine.json");
     // A beat can land between the remove and the mkdir, so the two go round
     // until the folder is there.
     for (;;) {

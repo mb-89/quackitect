@@ -106,7 +106,7 @@ func investigate(r Roots, t Token) Answer {
 // is the one thing the engine cannot find out for itself, and it is exactly what
 // the notice asks the walker to do.
 
-func lookedPath(r Roots) string { return r.Private("looked.json") }
+func lookedPath(r Roots) string { return r.Runtime("looked.json") }
 
 // A look is at one token IN ONE PAIR OF HANDS. The holder is written down so
 // a token that changed hands since is recognised as somebody else's work.

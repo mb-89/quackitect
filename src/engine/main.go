@@ -136,6 +136,13 @@ func main() {
 	}
 	dir := roots.Private("log")
 
+	// THE REGISTERS ARE TAKEN UP BEFORE ANYTHING READS ONE. Every verb, every
+	// guard event and every hook comes through here, so a tree written before
+	// the runtime folder existed is carried across on the first call and not on
+	// some later one that happened to be a start. A reader that found nothing
+	// would answer that nothing is held: no rung, no hold, nobody owed a reply.
+	TakeUpTheRuntime(roots)
+
 	// The current log has one name, so a window can be opened on it before
 	// the engine has written anything.
 	if *where {

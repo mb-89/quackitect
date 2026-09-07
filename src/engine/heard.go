@@ -34,7 +34,7 @@ type heardAt struct {
 	At   int64  `json:"at"`
 }
 
-func heardPath(r Roots) string { return r.Private("heard.json") }
+func heardPath(r Roots) string { return r.Runtime("heard.json") }
 
 func loadHeard(r Roots) heardAt {
 	var h heardAt

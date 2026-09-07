@@ -238,7 +238,7 @@ func drawIcons(n *Node, icons map[string]Icon) {
 
 // Values are stored in one file, flat, keyed by the path through the tree.
 // A flat key reads the same in the store, in a command and in the record.
-func valuesPath(roots Roots) string { return roots.Private("parameters.json") }
+func valuesPath(roots Roots) string { return roots.Runtime("parameters.json") }
 
 func Walk(n Node, path string, f func(path string, n Node)) {
 	here := n.Name
@@ -638,7 +638,7 @@ type Emergency struct {
 	Reason string    `json:"reason"`
 }
 
-func emergencyPath(roots Roots) string { return roots.Private("emergency.json") }
+func emergencyPath(roots Roots) string { return roots.Runtime("emergency.json") }
 
 func LoadEmergency(roots Roots) Emergency {
 	var e Emergency

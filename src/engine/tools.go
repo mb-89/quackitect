@@ -47,7 +47,7 @@ type Probe struct {
 	Found   []Tool `json:"found"`
 }
 
-func probePath(r Roots) string { return r.Private("tools.json") }
+func probePath(r Roots) string { return r.Runtime("tools.json") }
 
 // A probe that hangs holds up the boot, and a boot that is slow is one a
 // person stops using. They run at the same time, so the boot pays for the

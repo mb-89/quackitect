@@ -56,7 +56,7 @@ type Driven struct {
 	Since  time.Time `json:"since"`
 }
 
-func projectPath(roots Roots) string { return roots.Private("project.json") }
+func projectPath(roots Roots) string { return roots.Runtime("project.json") }
 
 func LoadDriven(roots Roots) (Driven, bool) {
 	var p Driven

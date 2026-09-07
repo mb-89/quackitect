@@ -43,7 +43,7 @@ type arrivals struct {
 	Roles map[string]string `json:"roles,omitempty"`
 }
 
-func arrivalPath(r Roots) string { return r.Private("arrivals.json") }
+func arrivalPath(r Roots) string { return r.Runtime("arrivals.json") }
 
 // ArrivalSession answers the session arrivals are keyed by: the harness's.
 //

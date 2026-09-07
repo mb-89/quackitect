@@ -97,7 +97,7 @@ type failure struct {
 	Count int    `json:"count"`
 }
 
-func failuresPath(r Roots) string { return r.Private("failures.json") }
+func failuresPath(r Roots) string { return r.Runtime("failures.json") }
 
 func callHash(in hookIn) string {
 	sum := sha256.Sum256(append([]byte(in.ToolName+"\n"), in.ToolInput...))
@@ -188,7 +188,7 @@ func aRepeatedFailure(r Roots, actor string, in hookIn) (string, bool) {
 // The main agent has a claim available and is refused until it makes one.
 const helperRefusalsBeforeRelenting = 3
 
-func stopsPath(r Roots) string { return r.Private("stops.json") }
+func stopsPath(r Roots) string { return r.Runtime("stops.json") }
 
 type refusedStops struct {
 	Session string         `json:"session"`

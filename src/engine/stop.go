@@ -68,7 +68,7 @@ type StopClaim struct {
 	At      string `json:"at"`
 }
 
-func claimPath(r Roots) string { return r.Private("stop-claim.json") }
+func claimPath(r Roots) string { return r.Runtime("stop-claim.json") }
 
 // THE CLAIMS, ONE PER ACTOR, IN ONE FILE.
 //

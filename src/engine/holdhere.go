@@ -21,7 +21,7 @@ const (
 // out beside it.
 func HoldStates() []string { return theHold.States() }
 
-func holdPath(r Roots) string { return r.Private("hold.json") }
+func holdPath(r Roots) string { return r.Runtime("hold.json") }
 
 func LoadHold(r Roots) Hold {
 	h := theHold.Load(holdPath(r))

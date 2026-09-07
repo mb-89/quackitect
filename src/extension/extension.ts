@@ -101,7 +101,7 @@ function whatIsRunning(context: vscode.ExtensionContext): Running | undefined {
   const work = workRoot();
   if (!work) return undefined;
   try {
-    const v = JSON.parse(fs.readFileSync(path.join(work, ".se", "engine.json"), "utf8")) as Running;
+    const v = JSON.parse(fs.readFileSync(path.join(work, ".se", "runtime", "engine.json"), "utf8")) as Running;
     // A FILE IS NOT A PROCESS. One killed engine leaves its file behind.
     process.kill(v.pid, 0);
     return v;
@@ -479,7 +479,7 @@ function watchParameters(context: vscode.ExtensionContext) {
   watchers = [];
   const work = workRoot();
   const declared = path.join(methodRoot(context), "util", "parameters.json");
-  const stored = work ? path.join(work, ".se", "parameters.json") : "";
+  const stored = work ? path.join(work, ".se", "runtime", "parameters.json") : "";
 
   // A change to the declaration changes the panel itself. A change to the
   // values only changes what is in it.
@@ -1632,7 +1632,13 @@ function watchTheAsk(context: vscode.ExtensionContext) {
     return; // no folder yet. chooseEngine calls showAsked once there is one.
   }
   try {
-    const asked = fs.watch(path.join(work, ".se"), (_event, name) => {
+    // THE REGISTERS MOVED UNDER .se/runtime, and this watched .se itself. A
+    // watch on the parent does not see a write inside a child folder, so the
+    // button would have stopped following the file the moment the engine wrote
+    // it in its new place.
+    const where = path.join(work, ".se", "runtime");
+    fs.mkdirSync(where, { recursive: true }); // watch fails on a folder that is not there yet
+    const asked = fs.watch(where, (_event, name) => {
       if (name === null || path.basename(String(name)) === "asked.json") {
         void showAsked(context);
       }

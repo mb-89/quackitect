@@ -27,7 +27,7 @@ type Results struct {
 	Wrong    int    `json:"wrong"`
 }
 
-func resultsPath(r Roots) string { return r.Private("results.json") }
+func resultsPath(r Roots) string { return r.Runtime("results.json") }
 
 // CountResult adds one result to this session's count, and one wrong result
 // when it was an error or a refusal. The store is read, changed and written

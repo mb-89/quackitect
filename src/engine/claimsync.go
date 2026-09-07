@@ -51,7 +51,7 @@ type TheFarClaims struct {
 	Claims map[string]FarClaim `json:"claims"`
 }
 
-func farClaimsPath(r Roots) string { return r.Private("claims.json") }
+func farClaimsPath(r Roots) string { return r.Runtime("claims.json") }
 
 // ClaimFromElsewhere answers what another box published about this token.
 func ClaimFromElsewhere(r Roots, id string) (FarClaim, bool) {

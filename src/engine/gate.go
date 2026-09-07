@@ -413,7 +413,7 @@ func whatIsOpen(r Roots, actor string) string {
 // aliasPath is where the register keeps, for each harness name, the names it
 // has pulled with. Two names for one process, and why the gate has to know it,
 // is [[an-actor-is-a-session]].
-func aliasPath(r Roots) string { return r.Private("actors.json") }
+func aliasPath(r Roots) string { return r.Runtime("actors.json") }
 
 // NoteTheNameItPullsWith records that this harness name answers to the name in
 // the command, when the command is a pull. Anything else is left alone.

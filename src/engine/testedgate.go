@@ -54,7 +54,7 @@ type theLastRuns struct {
 	Runs map[string]TheLastRun `json:"runs"`
 }
 
-func lastRunsPath(r Roots) string { return r.Private("tested.json") }
+func lastRunsPath(r Roots) string { return r.Runtime("tested.json") }
 
 func loadLastRuns(r Roots) theLastRuns {
 	out := theLastRuns{Runs: map[string]TheLastRun{}}

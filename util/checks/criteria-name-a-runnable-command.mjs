@@ -52,7 +52,17 @@ const die = (why) => {
 const guardSource = (rel) => {
   const at = join(root, ...rel.split("/"));
   if (!existsSync(at)) die(rel + " is not there, so the programs the guards refuse cannot be read");
-  return readFileSync(at, "utf8");
+  // THE LINE ENDING IS NOT PART OF WHAT THE ENGINE SPELLS. The patterns below
+  // end on ":\n", and a Windows checkout hands this file ":\r\n", so every one
+  // of them missed and the check died saying the engine had changed shape.
+  //
+  // MEASURED. It answered ok on the cloud box that wrote it and died on the
+  // owner's desk the same afternoon, over the same commit. src/engine/tests.go
+  // reads "pwsh":\r\n here and "pwsh":\n there.
+  //
+  // So the text is normalised before it is matched. A check that reads source
+  // is reading what it says, not how the disk stored it.
+  return readFileSync(at, "utf8").replace(/\r\n/g, "\n");
 };
 
 // namesIn answers the quoted words in the part of a Go source a pattern names,

@@ -110,7 +110,7 @@ func TestTheRungNamesItsLastWriter(t *testing.T) {
 		t.Fatal(err)
 	}
 	var b Binding
-	raw, err := os.ReadFile(r.Private("binding.json"))
+	raw, err := os.ReadFile(r.Runtime("binding.json"))
 	if err != nil {
 		t.Fatal(err)
 	}
