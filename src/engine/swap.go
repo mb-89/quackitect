@@ -350,8 +350,31 @@ func handOver(ctx context.Context, r Roots, session string) error {
 		_, _ = HoldTheTree(r)
 		return err
 	}
+	// AND A SUCCESSOR THAT STARTS IS NOT YET A SUCCESSOR THAT TOOK THE TREE.
+	// Between the letting go above and the start, anything else may take it,
+	// and the successor then reads the tree held, says already up and leaves.
+	// This engine has let go, so the tree would be left with a holder nobody
+	// meant to be the engine, or with none at all.
+	//
+	// A SUCCESSOR TURNED AWAY ENDS AT ONCE, which is what is watched for. One
+	// that is still up when the budget is spent has the tree and is the engine.
+	ended := make(chan struct{})
+	go func() { _ = cmd.Wait(); close(ended) }()
+	select {
+	case <-ended:
+		if held, err := HoldTheTree(r); err == nil && held {
+			return fmt.Errorf("the successor ended without taking the tree, so this engine has it back and goes on")
+		}
+		return fmt.Errorf("the successor ended without taking the tree, and another process holds it")
+	case <-time.After(theHandoverBudget):
+	}
 	return cmd.Process.Release() // it is its own process now
 }
+
+// theHandoverBudget is how long a successor is given to be up. A start that
+// meets a held tree says so and ends in well under this, and one that is still
+// up when it is spent is the engine.
+var theHandoverBudget = 2 * time.Second
 
 // ABuildRunByHand answers why a command that builds into this tree's .bin is
 // refused, and whether it is.

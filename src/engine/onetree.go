@@ -58,6 +58,14 @@ func HoldTheTree(r Roots) (bool, error) {
 	return true, nil
 }
 
+// theTreeIsHeldHere says whether this process holds the tree. A handover reads
+// it to tell a successor that took the tree from one that was turned away.
+func theTreeIsHeldHere() bool {
+	theTree.Lock()
+	defer theTree.Unlock()
+	return theTree.file != nil
+}
+
 // LetGoOfTheTree gives the tree back, for a predecessor that hands over and
 // for an engine on its way out. Calling it with nothing held does nothing.
 func LetGoOfTheTree() {
