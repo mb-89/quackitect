@@ -13,20 +13,21 @@ import (
 	"path/filepath"
 	"quackitect/engine/internal/sessionlog"
 	"sort"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
+	"unicode"
 )
 
 // ONE BUILDER ANSWERS THE ROOTS, AND EVERY FIXTURE IS BUILT ON IT.
 //
-// Each test file carried a builder of its own. Thirty-two of them made a
-// temporary folder, wrote files into it and answered the roots, under thirty-two
-// names. A fixture written in that many places cannot have its backing changed,
-// so the question of whether a fixture should be rows rather than files could
-// not be asked. Two tests failed their own TempDir cleanup during earlier work,
-// because a handle was still open, and that defect had thirty-two places to
-// hide in.
+// Each test file carried a builder of its own. Each one made a temporary
+// folder, wrote files into it and answered the roots, under a name of its own.
+// A fixture written in every file cannot have its backing changed. So the
+// question of whether a fixture should be rows rather than files could not be
+// asked. Tests failed their own TempDir cleanup during earlier work, because a
+// handle was still open. That defect had a place to hide in every file.
 //
 // So the builders live here, on one root maker. The backing does not move: the
 // builder writes files exactly as the helpers did.
@@ -34,6 +35,10 @@ import (
 // THE GUARD READS THE SUITE'S OWN SOURCE, because that is where the rule can be
 // broken. A new test file declaring a fixture of its own is the shape this is
 // about, and it fails here rather than at a reader's discretion.
+//
+// IT ALSO READS THIS HEADER, because a count written here goes stale the next
+// time a builder moves in, and this one did. So the header states no number the
+// file itself answers, and the guard below refuses one that disagrees.
 func TestOneFileCarriesTheFixtureBuilders(t *testing.T) {
 	t.Parallel()
 	var stray []string
@@ -41,27 +46,114 @@ func TestOneFileCarriesTheFixtureBuilders(t *testing.T) {
 		if name == "fixture_test.go" {
 			continue
 		}
-		file, err := parser.ParseFile(token.NewFileSet(), name, nil, 0)
-		if err != nil {
-			t.Fatalf("parsing %s: %v", name, err)
-		}
-		for _, d := range file.Decls {
-			fn, ok := d.(*ast.FuncDecl)
-			if !ok || fn.Type.Results == nil {
-				continue
-			}
-			for _, res := range fn.Type.Results.List {
-				if id, ok := res.Type.(*ast.Ident); ok && id.Name == "Roots" {
-					stray = append(stray, name+": "+fn.Name.Name)
-				}
-			}
-		}
+		stray = append(stray, buildersIn(t, name)...)
 	}
 	sort.Strings(stray)
 	if len(stray) > 0 {
 		t.Fatalf("%d fixture builders live outside fixture_test.go: %s",
 			len(stray), strings.Join(stray, ", "))
 	}
+	theHeaderCountsRight(t, len(buildersIn(t, "fixture_test.go")))
+}
+
+// buildersIn answers the fixture builders one test file declares, as file and
+// function. It reads the source, because a list somebody keeps is the thing
+// that goes stale. A builder is a function answering Roots, which is what a
+// fixture hands the test that asks for it.
+func buildersIn(t *testing.T, name string) []string {
+	t.Helper()
+	file, err := parser.ParseFile(token.NewFileSet(), name, nil, 0)
+	if err != nil {
+		t.Fatalf("parsing %s: %v", name, err)
+	}
+	var found []string
+	for _, d := range file.Decls {
+		fn, ok := d.(*ast.FuncDecl)
+		if !ok || fn.Type.Results == nil {
+			continue
+		}
+		for _, res := range fn.Type.Results.List {
+			if id, ok := res.Type.(*ast.Ident); ok && id.Name == "Roots" {
+				found = append(found, name+": "+fn.Name.Name)
+			}
+		}
+	}
+	return found
+}
+
+// theHeaderCountsRight refuses a number in the header above that the file
+// itself answers. One is let through, because the header is named for the one
+// builder this guard keeps, and so is the count of builders the file holds.
+// Every other number disagrees with something, and the reader cannot tell which
+// half is stale.
+func theHeaderCountsRight(t *testing.T, builders int) {
+	t.Helper()
+	header := theHeaderOver(t, "TestOneFileCarriesTheFixtureBuilders")
+	for _, word := range strings.FieldsFunc(header, func(r rune) bool {
+		return !unicode.IsLetter(r) && !unicode.IsDigit(r) && r != '-'
+	}) {
+		n, ok := aNumber(word)
+		if !ok || n == 1 || n == builders {
+			continue
+		}
+		t.Fatalf("the header says %q and the file declares %d builders: "+
+			"write the sentence without a number, because a count kept by hand "+
+			"goes stale the next time a builder moves in", word, builders)
+	}
+}
+
+// theHeaderOver answers the doc comment over one function in fixture_test.go,
+// and refuses an empty one, because a header that is not there passes a guard
+// reading it for free.
+func theHeaderOver(t *testing.T, name string) string {
+	t.Helper()
+	file, err := parser.ParseFile(token.NewFileSet(), "fixture_test.go", nil, parser.ParseComments)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, d := range file.Decls {
+		fn, ok := d.(*ast.FuncDecl)
+		if ok && fn.Name.Name == name && fn.Doc != nil {
+			if text := fn.Doc.Text(); strings.TrimSpace(text) != "" {
+				return text
+			}
+		}
+	}
+	t.Fatalf("fixture_test.go carries no header over %s, so nothing was read", name)
+	return ""
+}
+
+// aNumber reads a word as a number, in digits or in words, and answers whether
+// it is one. A hyphenated word is read part by part, so thirty-two answers 32,
+// and every part must be a number for the word to be one.
+func aNumber(word string) (int, bool) {
+	w := strings.ToLower(strings.Trim(word, "-"))
+	if w == "" {
+		return 0, false
+	}
+	if n, err := strconv.Atoi(w); err == nil {
+		return n, true
+	}
+	total := 0
+	for _, part := range strings.Split(w, "-") {
+		n, ok := numberWords[part]
+		if !ok {
+			return 0, false
+		}
+		total += n
+	}
+	return total, true
+}
+
+// numberWords is the spelled numbers a header of prose can carry. Larger
+// numbers are written in digits, which aNumber reads without this table.
+var numberWords = map[string]int{
+	"one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+	"six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
+	"eleven": 11, "twelve": 12, "thirteen": 13, "fourteen": 14,
+	"fifteen": 15, "sixteen": 16, "seventeen": 17, "eighteen": 18,
+	"nineteen": 19, "twenty": 20, "thirty": 30, "forty": 40,
+	"fifty": 50, "sixty": 60, "seventy": 70, "eighty": 80, "ninety": 90,
 }
 
 // testFilesHere answers the package's own test files, and refuses to report on
