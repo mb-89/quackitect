@@ -11,6 +11,11 @@ title: an update stages strangers
 status: open
 # the person's own name for a group. It does not move the work
 bucket: tests
+claimed_by: 7a7c633a/main
+claimed_at: "2026-09-07T14:37:58Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 04f43a66d2ed1cbeaf224e9b32733e2227afd336
 ---
 
 ## detail

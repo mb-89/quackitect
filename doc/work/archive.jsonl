@@ -26,6 +26,7 @@
 {"id":"wk-218e541ec2","title":"hooks the harness fires","process":"standard","disposition":"done","on_branch":"c2c236d54097b2a23ae764634fe44cb9b131971d","tag":"refs/tags/archive/wk-218e541ec2"}
 {"id":"wk-22bdfee267","title":"the log keeps End","process":"trivial","disposition":"done","on_branch":"ab62643636bad450d26c811b1b539ae73b6fa2d5","tag":"refs/tags/archive/wk-22bdfee267"}
 {"id":"wk-2346d5827d","title":"lint refuses a holder","process":"trivial","disposition":"done","on_branch":"51c40dd6fdc72913d2121cf4a3b0418c4b0cdc06","tag":"refs/tags/archive/wk-2346d5827d"}
+{"id":"wk-2628c2a721","title":"rule refuses good comments","process":"trivial","disposition":"done","blob":"6da1269ce836bd4b56a9f0758c8775615cc319ea","on_branch":"e05d98323f2146ff6a9cb42be2f451334195f277"}
 {"id":"wk-2755b2a235","title":"the light goes red","process":"trivial","disposition":"done","on_branch":"582a737cc3eaad1d30493cb5ccfd0db167ed8f58","tag":"refs/tags/archive/wk-2755b2a235"}
 {"id":"wk-295e2ac556","title":"failed archive fails close","process":"trivial","disposition":"done","on_branch":"e6bf784af5081999e0af07bb4204075bb1505d21","tag":"refs/tags/archive/wk-295e2ac556"}
 {"id":"wk-2cdaae953c","title":"restore zev's wiped tables","process":"trivial","disposition":"dropped","on_branch":"b8f43d842961e9ef785c4f78b0aa8348ded258dc","tag":"refs/tags/archive/wk-2cdaae953c"}
