@@ -9,8 +9,9 @@ guidance: [[work-token]]
 title: engine tests cannot build
 # where the token stands. The process owns these values.
 status: open
-claimed_by: 542bcda8/main
-claimed_at: "2026-09-07T11:38:32Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 9b71c49fce067333e16ea4d77d4aa522a6503ecf
 ---
 
 ## detail
@@ -33,12 +34,12 @@ Land the half that is missing. AStaffShortfall takes the token id and the dispos
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the approach is on the token before any work, as an interface or a shape a reader can disagree with |  |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the change is small enough to review whole, or it is split first | — |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | Every Go test in src/engine can run again. |  |
+| [x] | what breaks if it is never done, and not only that it stays undone | The package stays unrunnable for everybody, on every box. |  |
+| [x] | the approach is on the token before any work, as an interface or a shape a reader can disagree with | The committed test was read as the specification. |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | Two name se test, one names a check. |  |
+| [x] | the change is small enough to review whole, or it is split first | One signature and its call sites. |  |
+| [x] | the basics it stands on exist, or are minted first | The test and the guard both existed. |  |
 
 ## evidence: step 2. do
 
@@ -46,11 +47,11 @@ Land the half that is missing. AStaffShortfall takes the token id and the dispos
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | the change follows the approach on the token, or the token says why it departed |  |  |
-| [ ] | se test --on this token answered ok, and what it ran is named |  |  |
-| [ ] | the note says what changed and why, for a reader who was not here |  |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | The committed test was read as the specification. |  |
+| [x] | the change follows the approach on the token, or the token says why it departed | It departed. Upstream had landed the implementation already, and theirs is wider: it reads --from, --on, and a pull typed for another hand. Theirs was taken at the merge. |  |
+| [x] | se test --on this token answered ok, and what it ran is named | TestAShortfallLetsASubmitThrough: ok, and it had never run before today. |  |
+| [x] | the note says what changed and why, for a reader who was not here | What survives here is the check fix. My aSubmit and sixteen call sites were dropped for upstream's. |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | the-branch-head-builds vetted test files and never ran here. On Windows, tar read the drive colon as a remote host. It now unpacks with a relative name and names this break. |  |
 
 ## evidence: step 3. verdict
 

@@ -9,8 +9,9 @@ guidance: [[work-token]]
 title: take the group branch
 # where the token stands. The process owns these values.
 status: open
-claimed_by: 542bcda8/main
-claimed_at: "2026-09-07T11:50:46Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 749ad30324d47de9ba179e35df536d6c12a1c13b
 ---
 
 ## detail
@@ -38,12 +39,12 @@ The engine reaches it by a flag naming the bucket. The branch is the instruction
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | what is gained by doing it, and not only what it does |  |  |
-| [ ] | what breaks if it is never done, and not only that it stays undone |  |  |
-| [ ] | the approach is on the token before any work, as an interface or a shape a reader can disagree with |  |  |
-| [ ] | every done-when line is decidable, and names the command where one decides it |  |  |
-| [ ] | the change is small enough to review whole, or it is split first | — |  |
-| [ ] | the basics it stands on exist, or are minted first | — |  |
+| [x] | what is gained by doing it, and not only what it does | A bucket goes on its branch with no checkout typed by hand. |  |
+| [x] | what breaks if it is never done, and not only that it stays undone | The reading half is unreachable unless somebody remembers a command. |  |
+| [x] | the approach is on the token before any work, as an interface or a shape a reader can disagree with | TakeTheBoxBranch is the shape, named first. |  |
+| [x] | every done-when line is decidable, and names the command where one decides it | Four name a Go test in src/engine. |  |
+| [x] | the change is small enough to review whole, or it is split first | One function and one flag. |  |
+| [x] | the basics it stands on exist, or are minted first | boxbranch.go and the branch reading existed. |  |
 
 ## evidence: step 2. do
 
@@ -51,11 +52,11 @@ The engine reaches it by a flag naming the bucket. The branch is the instruction
 
 | done | criterion | evidence | receipt |
 |---|---|---|---|
-| [ ] | the guidance this token names was read and applied | — |  |
-| [ ] | the change follows the approach on the token, or the token says why it departed |  |  |
-| [ ] | se test --on this token answered ok, and what it ran is named |  |  |
-| [ ] | the note says what changed and why, for a reader who was not here |  |  |
-| [ ] | the cleanup the change revealed is in the change, or is a token of its own | — |  |
+| [x] | the guidance this token names was read and applied | The criteria were on the token before any code. |  |
+| [x] | the change follows the approach on the token, or the token says why it departed | TakeTheGroupBranch is TakeTheBoxBranch with a different name and trigger. It makes the ref when absent, takes it when present, and is never fatal. |  |
+| [x] | se test --on this token answered ok, and what it ran is named | Five green: naming a bucket, a group already cut, the group you stand on, a detached head, and naming nothing. |  |
+| [x] | the note says what changed and why, for a reader who was not here | branchcarriesthegroup.go holds it. main.go carries the group flag. The queue narrows straight after, which the first test reads rather than assumes. |  |
+| [x] | the cleanup the change revealed is in the change, or is a token of its own | None. The six steps are still card prose rather than queue demands, and that is a build of its own. |  |
 
 ## evidence: step 3. verdict
 
