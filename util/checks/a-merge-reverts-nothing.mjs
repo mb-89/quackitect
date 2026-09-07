@@ -43,13 +43,45 @@ try {
   process.exit(0);
 }
 
-const blob = (rev, path) => {
+// EVERY BLOB IN A REV, IN ONE CALL RATHER THAN ONE PER FILE.
+//
+// This asked git for a single blob at a time, `git rev-parse <rev>:<path>`, four
+// revs deep for every file a merge touched.
+//
+// MEASURED on this tree: 176 merges and 1,324 seconds, which was 92% of the
+// whole battery. The other fifty-odd checks run seven at a time underneath it,
+// so the battery's length WAS this check. Nothing else was slow, and the machine
+// was never the problem.
+//
+// It is quadratic in the wrong two things: the history only grows, and every run
+// walks all of it from the beginning. One `ls-tree -r` answers every path in a
+// rev at once, and the four revs of a merge are shared with its neighbours, so
+// the process count falls from tens of thousands to a few hundred.
+//
+// -z, BECAUSE A PATH IS NOT A WORD. Without it git quotes any path holding a
+// space or a non-ASCII byte, and the quoted name would never match the one the
+// diff reported, so the file would read as absent on both sides and the merge
+// would look clean.
+const treeOf = new Map();
+const treeFor = (rev) => {
+  const had = treeOf.get(rev);
+  if (had) return had;
+  const t = new Map();
   try {
-    return git("rev-parse", rev + ":" + path).trim();
+    for (const entry of git("ls-tree", "-r", "-z", rev).split("\0")) {
+      const tab = entry.indexOf("\t");
+      if (tab < 0) continue;
+      t.set(entry.slice(tab + 1), entry.slice(0, tab).split(" ")[2]);
+    }
   } catch {
-    return ""; // the file is not there, which is a hash of its own
+    /* a rev whose tree will not read answers every path as absent, which is
+       what the old per-file call did when it threw */
   }
+  treeOf.set(rev, t);
+  return t;
 };
+
+const blob = (rev, path) => treeFor(rev).get(path) ?? "";
 
 for (const m of merges) {
   const parents = git("rev-list", "--parents", "-n1", m).trim().split(" ").slice(1);
