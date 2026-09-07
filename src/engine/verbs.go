@@ -38,6 +38,7 @@ var run = map[string]verb{
 	"apply":   runApply,
 	"ask":     runAsk,
 	"find":    runFind,
+	"read":    runRead,
 	"test":    runTest,
 	"run":     runRun,
 	"work":    runWork,
