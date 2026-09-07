@@ -11,6 +11,11 @@ title: the gate records nothing
 status: open
 # the person's own name for a group. It does not move the work
 bucket: tests
+claimed_by: 7a7c633a/main
+claimed_at: "2026-09-07T15:14:58Z"
+# the tree each time the work was taken up, snapshots the engine wrote
+began:
+  - 7b85042fb562cc320f19352c380f15c4868f33cd
 ---
 
 ## detail
