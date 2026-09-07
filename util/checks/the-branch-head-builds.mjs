@@ -45,7 +45,13 @@ let read = true;
 try {
   const tar = join(at, "head.tar");
   execFileSync("git", ["-C", root, "archive", "--format=tar", "-o", tar, "HEAD"], { stdio: "pipe" });
-  execFileSync("tar", ["-xf", tar, "-C", at], { stdio: "pipe" });
+  // THE ARCHIVE IS NAMED RELATIVE TO THE FOLDER IT IS UNPACKED IN, and tar is
+  // run from there. An absolute Windows path reads as a remote host to tar,
+  // because a drive letter carries a colon: "C:\\..." answered "Cannot connect
+  // to C: resolve failed". So this check failed at its first line on every
+  // Windows box, said the head could not be read, and never reached the build
+  // it exists to run. A test-package break reached the branch under that FAIL.
+  execFileSync("tar", ["-xf", "head.tar"], { cwd: at, stdio: "pipe" });
 } catch (e) {
   read = false;
   say("the branch head reads into a folder of its own", false, String(e));

@@ -20,6 +20,8 @@ Nothing you write survives except what you push.
 8. Commit and push each time you finish a thing. Unpushed work dies with this box. *
 9. Answer the person in the chat. `se_answer` is the record's copy, and they do not read the record. *
 10. Turn your notes into tracked tokens. A note is private, and private does not leave this box. *
+11. The branch you are on is the group. Work it, and never widen it. *
+12. Merge back when the group is empty, and leave the branch standing. *
 
 ## Discussion
 
@@ -119,3 +121,30 @@ Drop it where it is useless.
 Mint a tracked token from it where it is work.
 Where the answer is not yours, mint one carrying your best attempt and set `needs_human` on it.
 A note that became a token or was dropped stops counting, and the work goes through again.
+
+### 11. The branch you are on is the group
+
+A box is cut for one bucket, and nobody here is going to tell you which.
+The branch name says it: `group/archive` means the queue hands you `bucket: archive` and nothing else.
+The engine derives that at the moment it reads the filter, so no keyword is typed and no panel is pressed.
+A pull says which filter is in force and whether the branch or a person put it there.
+Read that line before you believe your queue is empty.
+
+A person who set a filter outranks the branch, so a desk that asked for something else is not overruled.
+On a branch that is not a group, nothing is narrowed and trunk is the whole queue.
+
+YOU NEVER WIDEN YOUR OWN FILTER.
+An empty group means the group is done.
+That is the signal to retro and merge, and it is never the signal to go shopping on trunk.
+A box that widens itself works tokens another branch was cut for, and two boxes then edit one file.
+
+### 12. Merge back, and leave the branch standing
+
+Merging is a write to `refs/heads`, which this box may do.
+Push the branch, merge it into trunk, and push trunk.
+
+Do not attempt the delete.
+It answers 403 and it always will.
+The branch is swept from outside, by a desk or by a workflow, and a workflow was measured deleting such a ref in 13 seconds.
+So say the branch is ready to sweep and leave it standing.
+A box that treats the 403 as a fault spends the rest of its session on it.

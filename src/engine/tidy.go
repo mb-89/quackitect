@@ -71,7 +71,37 @@ func Tidy(ctx context.Context, r Roots) []TidyPart {
 // tidyWith is Tidy with the clock and the git call handed in, which is how the
 // tests drive a lapse and a refusal without waiting three hours for either.
 func tidyWith(r Roots, now time.Time, git aGitCall) []TidyPart {
-	return []TidyPart{tidyTheArchive(r), tidyTheClaims(r, now), tidyTheRefs(r, git)}
+	return []TidyPart{tidyTheArchive(r), tidyTheClaims(r, now), tidyTheRefs(r, git),
+		tidyWhatTravels(r)}
+}
+
+// tidyWhatTravels says whether this box's own collection outlives it.
+//
+// NOTHING PUSHES .se, AND THE RETRO COLLECTS INTO IT. The retro moves the logs,
+// the scratchpad, the transcripts and the undo journal into .se/retro. On a desk
+// that is right, because the disk outlives the session and the next retro reads
+// what this one left.
+//
+// ON A GROUP BRANCH THE SAME MOVE IS THE LOSS. That branch is how a box is cut
+// for one bucket, and such a box is reclaimed when the session ends. The folder
+// goes with it, so collecting a period into it is the same as throwing the
+// period away. Six archived notes already name an object no clone can read.
+//
+// THE COLLECTION IS NOT STOPPED, AND THE BOX IS TOLD. The folder is this
+// session's own reading and it is meant to die. What must not die is the
+// learning, and the only output that survives is a tracked token and a push. So
+// this says so where a desk already reads for what a box could not finish,
+// rather than in a second place that would drift from this one.
+func tidyWhatTravels(r Roots) TidyPart {
+	part := TidyPart{Name: "what travels"}
+	if theGroupOnTheBranch(r) == "" {
+		part.Could = true
+		return part
+	}
+	part.Why = "this tree is on a group branch, so nothing under .se travels. " +
+		"The retro collects into .se/retro, and that folder goes when the box does. " +
+		"A tracked token under doc/work, pushed, is the only output that survives."
+	return part
 }
 
 // tidyTheArchive folds every closed token into git. This is SweepClosed, which

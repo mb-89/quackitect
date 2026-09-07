@@ -224,7 +224,14 @@ var heldDuringShortfall = map[string]bool{
 
 // AStaffShortfall answers whether this call by the main agent is refused
 // until the hands the queue wants have pulled, and says how to spawn them.
-func AStaffShortfall(r Roots, cfg Config, actor, tool, command string) (string, bool) {
+func AStaffShortfall(r Roots, cfg Config, actor, tool, command, id, disposition string) (string, bool) {
+	// HANDING WORK IN IS NOT ASKING FOR MORE. A submit gives one token back and
+	// leaves the agent emptier than it found it, so the reason to hold a pull
+	// does not reach it. It is read before anything else, because a call that
+	// takes nothing from the queue is not what the queue is waiting for.
+	if aSubmit(command, id, disposition) {
+		return "", false
+	}
 	if actor != "main" || !heldDuringShortfall[tool] {
 		return "", false
 	}
@@ -280,6 +287,36 @@ func engineWork(command string) bool {
 		}
 	}
 	return false
+}
+
+// aSubmit answers whether this call hands a token in rather than asks for one.
+//
+// BOTH HALVES ARE NEEDED. A token with no disposition is not an ending, and a
+// disposition with no token names nothing. Letting half of one through would be
+// a way round the guard rather than a narrowing of it.
+//
+// BOTH DOORS READ THE SAME RULE. A lane call carries the two as fields, and a
+// box with no lane carries them as flags on the shell command. Holding one of
+// the two would move the deadlock rather than end it.
+func aSubmit(command, id, disposition string) bool {
+	if id != "" && disposition != "" {
+		return true
+	}
+	return runsTheEngineWith(command, "--id") && runsTheEngineWith(command, "--disposition")
+}
+
+// aPullCall answers whether this call asks the queue for work, at either door.
+// It reads the same map and the same command reader the shortfall reads, so a
+// demand that holds the pull and a demand that holds the landing agree on what
+// a pull is.
+func aPullCall(tool, command string) bool {
+	if !heldDuringShortfall[tool] {
+		return false
+	}
+	if tool == "Bash" {
+		return runsTheEngine(command) && aPull(command)
+	}
+	return true
 }
 
 // aPull answers whether an engine command is the pull. That is the one verb a

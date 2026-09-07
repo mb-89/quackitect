@@ -3,6 +3,10 @@
   "$remoteControl": "REMOTE CONTROL IS OFF UNLESS SOMEBODY TURNS IT ON. The key below is remoteControlAtStartup, and it belongs here rather than in .claude/settings.json because this file is projected over that one: a setting typed into the target is gone the next time the engine projects, which is what happened twice. Claude Code honours a false in project settings and IGNORES a true there, so a checked-in false is a one-way off switch: it cannot turn remote control ON for anybody who opens this repo, and it outranks a managed true. Turning it on stays a per-person choice, made in the app rather than in a file that travels. Why it is here at all: the toggle in the desktop app writes to the user's own settings and Claude Code saves the choice back there, so a person who turns it off finds it on again. See https://code.claude.com/docs/en/settings-reference#remotecontrolatstartup",
   "remoteControlAtStartup": false,
   "outputStyle": "quackitect",
+  "$env": "FUNCTION HOOKS ARE BEHIND A ROLLOUT FLAG, AND THIS IS THE DOCUMENTED WAY PAST IT. Claude Code asks GrowthBook whether tengu_plugin_hooks_modules is on and defaults it to false, so a box that is not in the wave loads no hooks module and does not register the plugin-types command. The client reads CLAUDE_CODE_ENABLE_FUNCTION_HOOKS first and that answer wins, so setting it here turns the feature on for every box that clones this tree, the cloud included, rather than for whoever remembered to export it. IT BELONGS IN THE TRAVELLING CAGE AND NOT IN THE PROJECTED FILE, because this file is written over that one and a key typed into the target is gone at the next start. THE CHECK IS PRESENCE AND NOT VALUE: the client tests whether the variable is defined, so a 0 here would also turn it on and only deleting the key turns it off. A client older than 2.1.259 reads no such variable and stays on whatever the flag says.",
+  "env": {
+    "CLAUDE_CODE_ENABLE_FUNCTION_HOOKS": "1"
+  },
   "hooks": {
     "UserPromptSubmit": [
       {

@@ -876,6 +876,7 @@ func next(r Roots, actor, role string) Answer {
 		byBucketAffinity(r, actor, urgentFirst(blockingFirst(r, theQueueOffers(r, actor, Tokens(r))))))
 	a := nextAmong(r, actor, role, all)
 	a.Notice += behindNotice(branch, behind)
+	a.Notice += theFilterNotice(r)
 	return a
 }
 

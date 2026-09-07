@@ -159,7 +159,16 @@ func Project(roots Roots) ([]string, error) {
 			written = append(written, dest)
 		}
 	}
-	return written, nil
+	// THE COMMANDS ARE PROJECTED TOO, from the parameter tree rather than from a
+	// source file. They are not an entry in the map, because the map pairs one
+	// target with the files it assembles, and this is many targets from one
+	// declaration. They are written here so everything projected is written at
+	// one moment, and no caller has to remember a second call.
+	cmds, err := WriteCommands(roots)
+	if err != nil {
+		return written, err
+	}
+	return append(written, cmds...), nil
 }
 
 // A source may name the engine or the roots, because a cage has to say which

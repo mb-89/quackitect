@@ -81,6 +81,8 @@ func main() {
 	built := flag.Bool("built", false, "with swap: hand over to the program already in .bin rather than building one")
 	pingFlag := flag.Bool("ping", false, "print what the engine running over this folder says about itself, and exit")
 	project := flag.Bool("project", false, "write the projections from guidance and exit")
+	group := flag.String("group", "", "put this tree on the branch for a bucket, and exit")
+	land := flag.Bool("land", false, "put this tree on the tip origin holds, and exit")
 	emergency := flag.String("emergency", "", "arm or disarm emergency mode: on, off, or status")
 	bind := flag.String("bind", "", "how much of the engine speaks to the agent: bound, unbound, god, or status")
 	ask := flag.String("ask", "", "ask the agent what is happening, and refuse it everything until it says: on, off, or status")
@@ -273,6 +275,23 @@ func main() {
 		for _, w := range written {
 			fmt.Println(w)
 		}
+		return
+	}
+
+	// A BUCKET GOES ON A BRANCH OF ITS OWN, and the branch is then the whole
+	// instruction. Nobody types a checkout, and nobody types a queue filter
+	// afterwards: the branch is read every time the filter is read.
+	if *group != "" {
+		took := TakeTheGroupBranch(roots, *group)
+		fmt.Println(took.Says)
+		return
+	}
+
+	// A BOX LANDS BEFORE IT WORKS, and the queue refuses to hand anything out
+	// until it has. This is the verb that refusal names.
+	if *land {
+		stood := LandOnTheTip(roots)
+		fmt.Println(stood.Says)
 		return
 	}
 

@@ -90,6 +90,11 @@ type toolInput struct {
 	// Actor is the name a lane call acts as: se_pull, se_run and the rest
 	// carry it as a field where a shell command carries it as --actor.
 	Actor string `json:"actor"`
+	// ID and Disposition are what a submit carries: the token being handed in
+	// and how it ended. A pull naming both is a submit rather than an ask, and
+	// the staffing guard reads them to tell those two apart.
+	ID          string `json:"id"`
+	Disposition string `json:"disposition"`
 	// NewSource is what a NotebookEdit puts in a cell, which is a write too.
 	NewSource string `json:"new_source"`
 	// Edits is a MultiEdit's manifest, and every member of it writes.
@@ -870,6 +875,26 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 		return
 	}
 
+	// A GROUP BOX LANDS ON THE TIP BEFORE IT WORKS. It is read before the
+	// staffing demand, because spawning hands onto a stale tree multiplies the
+	// problem rather than starting on it.
+	if why, refuse := TheGroupHasNotLanded(roots, in.ToolName, ti.Command); refuse && !Unleashed(roots) {
+		record(log, "engine", "landing", actor, "refused: this tree is not on the tip", sessionlog.No(),
+			map[string]any{"tool": in.ToolName})
+		g.deny(why)
+		return
+	}
+
+	// AND AN EMPTY GROUP IS CLOSED RATHER THAN WAITED ON. It is read after the
+	// landing, because a box that is behind has not seen the work it is about to
+	// declare finished.
+	if why, refuse := TheGroupIsNotClosed(roots, in.ToolName, ti.Command); refuse && !Unleashed(roots) {
+		record(log, "engine", "closing", actor, "refused: the group is empty and not closed", sessionlog.No(),
+			map[string]any{"tool": in.ToolName})
+		g.deny(why)
+		return
+	}
+
 	// THE QUEUE WANTS MORE HANDS, and the main agent is held until it has
 	// spawned them. Every other guard waits behind this one, because a tool
 	// call that is not a spawn is not what the queue is waiting for.
@@ -877,7 +902,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 	// UNBOUND TAKES THE QUEUE OFF. A person working on one specific thing is
 	// not short-handed, and being told to spawn five workers for a backlog they
 	// are deliberately ignoring is the engine arguing with them.
-	if why, refuse := AStaffShortfall(roots, cfg, actor, in.ToolName, ti.Command); refuse && !Unleashed(roots) {
+	if why, refuse := AStaffShortfall(roots, cfg, actor, in.ToolName, ti.Command, ti.ID, ti.Disposition); refuse && !Unleashed(roots) {
 		record(log, "engine", "staffing", actor, "refused: the queue wants more hands than are here", sessionlog.No(),
 			map[string]any{"tool": in.ToolName})
 		g.deny(why)

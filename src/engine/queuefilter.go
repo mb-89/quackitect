@@ -36,11 +36,7 @@ import (
 // theQueueFilter reads the filter in force. An empty or unreadable one matches
 // everything, so the queue is only ever narrowed on purpose.
 func theQueueFilter(r Roots) filter.Filter {
-	v, err := LoadValues(r)
-	if err != nil {
-		return filter.Filter{}
-	}
-	said, _ := v.Value["work.queue_filter"].(string)
+	said, _ := theFilterInForce(r)
 	if strings.TrimSpace(said) == "" {
 		return filter.Filter{}
 	}

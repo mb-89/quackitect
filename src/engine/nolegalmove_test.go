@@ -36,7 +36,7 @@ func TestTheCageHasNoStateWithNoLegalMove(t *testing.T) {
 		"mcp__quackitect__se_pull", "mcp__quackitect__se_stop",
 		"mcp__quackitect__se_answer", "mcp__quackitect__se_said", "mcp__quackitect__se_status",
 	} {
-		if why, refused := AStaffShortfall(r, cfg, "main", tool, ""); refused {
+		if why, refused := AStaffShortfall(r, cfg, "main", tool, "", "", ""); refused {
 			t.Errorf("%s was refused during a shortfall, so the agent has one less move: %s", tool, why)
 		}
 	}
@@ -44,7 +44,7 @@ func TestTheCageHasNoStateWithNoLegalMove(t *testing.T) {
 	// WHAT IS HELD: the work itself, which is what spawning is for.
 	for _, tool := range []string{"Bash", "Write", "Edit", "mcp__quackitect__se_apply",
 		"mcp__quackitect__se_run", "mcp__quackitect__se_test"} {
-		if _, refused := AStaffShortfall(r, cfg, "main", tool, ""); !refused {
+		if _, refused := AStaffShortfall(r, cfg, "main", tool, "", "", ""); !refused {
 			t.Errorf("%s went through during a shortfall, so the main agent does the work itself", tool)
 		}
 	}
@@ -53,7 +53,7 @@ func TestTheCageHasNoStateWithNoLegalMove(t *testing.T) {
 	// shell are the same two calls, and both gates have to let them by.
 	for _, command := range []string{"./.bin/se pull --actor worker-one --role worker",
 		".bin/se.exe stop --because asked", "se --answer \"on my way\""} {
-		if why, refused := AStaffShortfall(r, cfg, "main", "Bash", command); refused {
+		if why, refused := AStaffShortfall(r, cfg, "main", "Bash", command, "", ""); refused {
 			t.Errorf("the shortfall refused %q, which is the move it is asking for: %s", command, why)
 		}
 		if why, refused := WriteNeedsAToken(r, "main", "Bash", "", command); refused {
@@ -64,7 +64,7 @@ func TestTheCageHasNoStateWithNoLegalMove(t *testing.T) {
 	// THE ENGINE'S OWN WORK VERBS STAY HELD, so a shortfall is not walked round
 	// by typing at a shell what the lane would have refused.
 	for _, command := range []string{"./.bin/se run --on wk-1 --by main", "se apply --on wk-1"} {
-		if _, refused := AStaffShortfall(r, cfg, "main", "Bash", command); !refused {
+		if _, refused := AStaffShortfall(r, cfg, "main", "Bash", command, "", ""); !refused {
 			t.Errorf("%q went through a shortfall, so the shell is a way round the guard", command)
 		}
 	}
@@ -94,7 +94,7 @@ func TestAStopClaimPassesEveryGuard(t *testing.T) {
 		{"se_stop", ""},
 		{"Bash", "./.bin/se stop --because asked --why \"the person arrived\""},
 	} {
-		if why, refused := AStaffShortfall(r, cfg, "main", c.tool, c.command); refused {
+		if why, refused := AStaffShortfall(r, cfg, "main", c.tool, c.command, "", ""); refused {
 			t.Errorf("the shortfall refused a stop (%s): %s", c.tool, why)
 		}
 		if why, refused := WriteNeedsAToken(r, "main", c.tool, "", c.command); refused {
