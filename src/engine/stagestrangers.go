@@ -4,6 +4,8 @@ import (
 	"path"
 	"sort"
 	"strings"
+
+	"quackitect/engine/internal/sessionlog"
 )
 
 // A STAGE CARRIES ONLY WHAT THIS TOKEN WROTE.
@@ -68,7 +70,7 @@ func asTheRecordSpellsIt(p string) string {
 // AStageCarriesStrangers answers whether this command stages a path the record
 // does not say this token wrote, and names every such path. It is asked at both
 // doors a shell command comes through: the harness's Bash and the run verb.
-func AStageCarriesStrangers(r Roots, on, command string) (string, bool) {
+func AStageCarriesStrangers(r Roots, on, actor, command string) (string, bool) {
 	wrote, proved := WhatThisTokenWrote(r, on)
 	if !proved {
 		return "", false
@@ -77,11 +79,20 @@ func AStageCarriesStrangers(r Roots, on, command string) (string, bool) {
 	seen := map[string]bool{}
 	for _, part := range pipeline(command) {
 		words := shellWords(part)
-		at := gitVerbAt(words, "add")
-		if at < 0 {
-			continue
+		var named []string
+		if at := gitVerbAt(words, "add"); at >= 0 {
+			named = append(named, stagedPaths(words[at+1:])...)
 		}
-		for _, p := range stagedPaths(words[at+1:]) {
+		// A COMMIT NAMES ITS PATHS AND NEEDS NO STAGE AT ALL. With a pathspec
+		// git commit is --only: it takes those paths straight out of the working
+		// tree, leaving the index where it was. commitpaths.go shuts the commit
+		// that names none, and left the one that names another hand's file wide
+		// open, by the door the stage of it is refused at.
+		if at := gitVerbAt(words, "commit"); at >= 0 {
+			paths, _ := commitPaths(words[at+1:])
+			named = append(named, paths...)
+		}
+		for _, p := range named {
 			p = asTheRecordSpellsIt(p)
 			if p == "" || wrote[p] || seen[p] {
 				continue
@@ -91,6 +102,13 @@ func AStageCarriesStrangers(r Roots, on, command string) (string, bool) {
 		}
 	}
 	if len(strangers) == 0 {
+		return "", false
+	}
+	// AND A HAND THAT MEANS IT SAYS SO, ONCE, IN THE RECORD.
+	if why, meant := theStagingEscape(command); meant {
+		inSession(r, "stage", actor,
+			on+" staged "+strings.Join(strangers, ", ")+" past the guard, because "+why,
+			sessionlog.Yes(), map[string]any{"id": on, "paths": strangers, "why": why})
 		return "", false
 	}
 	var mine []string
@@ -115,12 +133,40 @@ func aStageOfAStrangersPath(on string, strangers, mine []string) string {
 	for _, p := range mine {
 		said += "    " + p + "\n"
 	}
-	return said + "\nStage those and nothing beside them. If you wrote the file with a shell command, " +
+	return said + "\nIF YOU MEAN IT, SAY WHY ON THE COMMAND, and the record carries who staged what and " +
+		"for what reason. It is an assignment because git refuses a flag it does not know:\n\n" +
+		"    SE_STAGE_ANYWAY=\"the other half of a move\" git add <paths>\n\n" +
+		"Stage those and nothing beside them. If you wrote the file with a shell command, " +
 		"write it through the engine instead, so the record says whose it is:\n\n" +
 		"  se apply --on " + on + " --by <you> --from .se/scratchpad/manifest.json\n\n" +
 		"To put your files on the branch tip without touching the shared index at all, the door " +
 		"that copies them into a worktree of its own is:\n\n" +
 		"    sh util/git/land.sh \"<message>\" <paths>"
+}
+
+// theEscapeWord is what a hand types to mean a stage the record cannot vouch
+// for. A guard with no way past is a guard people work around, and the way
+// round this one is a shell the engine never sees.
+//
+// IT IS AN ASSIGNMENT RATHER THAN A FLAG, because git refuses a flag it does
+// not know and the shell hands an assignment through untouched.
+const theEscapeWord = "SE_STAGE_ANYWAY"
+
+// theStagingEscape answers the reason typed on this command, and whether one
+// was typed at all. An escape carrying no reason is no escape: the line it
+// leaves in the record is the whole of what it buys.
+func theStagingEscape(command string) (string, bool) {
+	for _, part := range pipeline(command) {
+		for _, w := range shellWords(part) {
+			if !strings.HasPrefix(w, theEscapeWord+"=") {
+				continue
+			}
+			if why := strings.TrimSpace(w[len(theEscapeWord)+1:]); why != "" {
+				return why, true
+			}
+		}
+	}
+	return "", false
 }
 
 // oneOrOther says the word that fits the count.

@@ -136,7 +136,7 @@ func runRun(c *call) int {
 	// AND A STAGE CARRIES ONLY WHAT THIS TOKEN WROTE. The verb is told which
 	// token the command is on, so the record can be asked what that token
 	// wrote. See stagestrangers.go.
-	if why, refuse := AStageCarriesStrangers(roots, *on, said); refuse {
+	if why, refuse := AStageCarriesStrangers(roots, *on, orElse(*by, "main"), said); refuse {
 		c.answerJSON(map[string]any{"error": why, "on": *on})
 		return 1
 	}

@@ -42,6 +42,14 @@ func gitVerbAt(words []string, verb string) int {
 			continue
 		}
 		bare := strings.ToLower(strings.Trim(w, "'\""))
+		// AN ASSIGNMENT BEFORE THE PROGRAM IS THE SHELL'S, AND THE PROGRAM NEVER
+		// SEES IT. It was neither a runner nor a flag, so the walk gave up on the
+		// first word and found no git at all: FOO=1 git add -A went past every
+		// guard here. That is one word from open, on the rule this branch rests
+		// on. MEASURED by TestStagingEverythingIsRefused.
+		if past == "" && anAssignment(w) {
+			continue
+		}
 		if past == "git" && bare == verb {
 			return i
 		}
@@ -56,6 +64,26 @@ func gitVerbAt(words []string, verb string) int {
 		return -1
 	}
 	return -1
+}
+
+// anAssignment says whether this word is a shell assignment made for one
+// command, NAME=value. The shell takes it out of the words the program is
+// handed, so a guard that reads the words has to take it out too.
+func anAssignment(word string) bool {
+	at := strings.Index(word, "=")
+	if at <= 0 {
+		return false
+	}
+	for i := 0; i < at; i++ {
+		c := word[i]
+		switch {
+		case c == '_', c >= 'a' && c <= 'z', c >= 'A' && c <= 'Z':
+		case i > 0 && c >= '0' && c <= '9':
+		default:
+			return false
+		}
+	}
+	return true
 }
 
 // commitValueFlags are the commit flags whose value is the next word, so the
