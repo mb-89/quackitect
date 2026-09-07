@@ -17,10 +17,6 @@ const (
 	HoldHeld      = theHold.Held
 )
 
-// HoldStates is the order, so a check walks this list rather than one typed
-// out beside it.
-func HoldStates() []string { return theHold.States() }
-
 func holdPath(r Roots) string { return r.Private("hold.json") }
 
 func LoadHold(r Roots) Hold {

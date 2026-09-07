@@ -56,11 +56,6 @@ func TestNoExportedFunctionHereIsUncalled(t *testing.T) {
 		"LintGuidance":   "handed to the lint's table in lint.go as a value, so it is passed and never called by name",
 		"LintProcesses":  "handed to the lint's table in lint.go as a value, so it is passed and never called by name",
 		"LintRationales": "handed to the lint's table in lint.go as a value, so it is passed and never called by name",
-		// AND ONE THAT IS OWED AN ANSWER RATHER THAN A CALLER. Nothing in
-		// this tree names HoldStates, and its own comment says a check walks
-		// the list it answers. No check does. A token in the tests bucket
-		// decides between writing that check and taking the function out.
-		"HoldStates": "nothing calls it, and a token carries whether the check its comment promises is written or the function goes",
 		// CALLED THROUGH AN INTERFACE BY SOMEBODY ELSE'S CODE. The name never
 		// appears at a call site here, and it never will, because the caller is
 		// the standard library reaching the type through an interface.
