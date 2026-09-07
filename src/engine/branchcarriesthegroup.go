@@ -170,14 +170,15 @@ func MakeTheGroupBranch(r Roots, bucket string) BranchTaken {
 		if _, err := gitHere(r, "branch", want, off); err != nil {
 			return BranchTaken{Says: want + " was not made: " + err.Error()}
 		}
-		says = want + " is made off " + from + ", and " + bucket + " keeps every token it holds"
+		says = want + " is made off " + from
 	}
 	if _, err := gitHere(r, "push", "--set-upstream", "origin", want); err != nil {
 		return BranchTaken{On: want, Says: says + ", and it was not pushed, so no cloud box can " +
 			"select it yet: " + err.Error()}
 	}
 	return BranchTaken{On: want, Says: says + " and pushed. A box on it is handed " +
-		theGroupFilter(bucket) + " and nothing else. This tree has not moved."}
+		theGroupFilter(bucket) + " and nothing else. This tree has not moved, and " +
+		bucket + " keeps every token it holds."}
 }
 
 // theFilterNotice says what the queue is narrowed by, on every pull that is
