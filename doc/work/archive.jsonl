@@ -103,6 +103,7 @@
 {"id":"wk-9f103774c2","title":"in work reads here","process":"trivial","disposition":"done","on_branch":"dcd0bef5d45a3b0fe9c792f4a7b0e7081b60361f","tag":"refs/tags/archive/wk-9f103774c2"}
 {"id":"wk-a020390ef5","title":"a name outruns whole","process":"trivial","disposition":"done","on_branch":"6b7973166cae9b4f9efe99fa910d7eee0662680f","tag":"refs/tags/archive/wk-a020390ef5"}
 {"id":"wk-a03872a145","title":"status and disposition disagree","process":"trivial","disposition":"done","on_branch":"de512c1f90aa2f37126a3f8cfc14f6ae69320605","tag":"refs/tags/archive/wk-a03872a145"}
+{"id":"wk-a15127e64a","title":"a coverage guard tautology","process":"trivial","disposition":"done","blob":"b05f3f98a28278a0e4370805fe5bd22ca24031e8","on_branch":"43f4e7a6444267e1c3f2f6ffba159e07532273b8"}
 {"id":"wk-a17e4a1967","title":"one error per round","process":"trivial","disposition":"done","on_branch":"41903812e4b14709183911108f2bcf26c4f2be16","tag":"refs/tags/archive/wk-a17e4a1967"}
 {"id":"wk-a38b6c8d88","title":"the general case unreached","process":"trivial","disposition":"done","on_branch":"f5b06c11414c4df83015578f9c129a47b0d9beae","tag":"refs/tags/archive/wk-a38b6c8d88"}
 {"id":"wk-a53a299607","title":"note cites unminted token","process":"trivial","disposition":"done","blob":"9b03c066db5ca2fcfef98254c5f77fa486bf5090","on_branch":"26ce90db6fa50cf36a2ec717b367cbd23cd2cf2f"}
