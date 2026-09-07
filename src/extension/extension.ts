@@ -11,7 +11,7 @@ import { nextEngineState, whyNot, HEARTBEAT_MS, endsTheEngine } from "./liveness
 import { startLanguageServer, stopLanguageServer } from "./lsp";
 import { sayWindowIsHere, forgetWindow, windowsThere, windowAnswers, sweepWindowsGone } from "./windows";
 import {
-  mintArgs, editCellArgs, fileArgs, groupArgs, renameGroupArgs, holdArgs,
+  mintArgs, editCellArgs, fileArgs, groupArgs, renameGroupArgs, cutBranchArgs, holdArgs,
   bindArgs, bindingArgs, askArgs, askedArgs, askIsOwed, ideationArgs, ideatingArgs, isIdeating, treeArgs,
   viewArgs, paneArgs, panesArgs, viewsArgs, pinArgs, unpinArgs, widthArgs,
   burndownArgs,
@@ -1152,6 +1152,7 @@ function toggleWork(context: vscode.ExtensionContext) {
     if (m.type === "file") void fileWork(context, m.id, m.sets, m.into);
     if (m.type === "group") void groupWork(context, m.ids);
     if (m.type === "rename") void renameGroup(context, m.from, m.to);
+    if (m.type === "branch") void cutBranch(context, m.group);
     if (m.type === "edit") void editCell(context, m.id, m.col, m.text);
     if (m.type === "column") void showColumn(context, m.side, m.property, m.show);
     if (m.type === "columns") void setColumns(context, m.side, m.only);
@@ -1213,7 +1214,8 @@ type WorkMessage =
   | { type: "edit"; id: string; col: string; text: string }
   | { type: "file"; id: string; sets: string; into: string }
   | { type: "group"; ids: string[] }
-  | { type: "rename"; from: string; to: string };
+  | { type: "rename"; from: string; to: string }
+  | { type: "branch"; group: string };
 
 // THE PAGE IS BUILT ONCE. After that the data lands inside it.
 //
@@ -1372,6 +1374,25 @@ async function groupWork(context: vscode.ExtensionContext, ids: string[]) {
 async function renameGroup(context: vscode.ExtensionContext, from: string, to: string) {
   await askEngine(context, renameGroupArgs(from, to));
   void drawWork(context);
+}
+
+// THE ANSWER IS SHOWN, BECAUSE THIS ONE CHANGES NOTHING A PERSON CAN SEE. A
+// rename redraws the board and a cut branch does not, so a silent success and a
+// silent refusal would look alike. The engine says which, in a sentence.
+async function cutBranch(context: vscode.ExtensionContext, group: string) {
+  const args = cutBranchArgs(group);
+  if (!args) {
+    vscode.window.showErrorMessage(
+      "These rows are in no group, so there is no branch to cut.");
+    return;
+  }
+  const out = await askEngine(context, args);
+  if (out?.error) {
+    vscode.window.showErrorMessage(out.error);
+    return;
+  }
+  if (out === undefined) return; // askEngine has already said which way it went
+  vscode.window.showInformationMessage(String(out.said ?? `group/${group} is cut and pushed`));
 }
 
 async function mintWork(context: vscode.ExtensionContext, arg?: { text: string }) {

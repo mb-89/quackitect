@@ -63,6 +63,14 @@ export function renameGroupArgs(from: string, to: string): string[] {
   return ["work", "--rename", from, "--to", to, "--by", "person"];
 }
 
+// A GROUP IS WORKED ON A BRANCH OF ITS OWN, and the branch name is the whole
+// instruction: a box on group/<name> is handed bucket: <name> and nothing else.
+// The engine cuts it and pushes it, and this tree stays where it stands.
+export function cutBranchArgs(group: string): string[] | undefined {
+  if (group.trim() === "") return undefined;
+  return ["--cut-group", group];
+}
+
 // THE HOLD IS A WORD WITH THREE VALUES. One press finishes up, five presses
 // hold everything, and a press from either goes back to off. See
 // src/engine/hold.go.

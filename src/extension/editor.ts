@@ -177,6 +177,8 @@ function toolbar(t: Table): string {
       title="make a group of the ticked rows">${icon("plus")} Group</button>
     <button type="button" class="bs-tool bs-rename" hidden
       title="rename the group these rows are in">Rename</button>
+    <button type="button" class="bs-tool bs-cut-branch" hidden
+      title="cut the branch this group is worked on">Branch</button>
     <input class="bs-rename-field" type="text" hidden placeholder="a name for it">
     <span class="bs-tallies">${tallyPills(t)}</span>
     <span class="bs-gap"></span>
@@ -840,11 +842,17 @@ function script(): string {
       const first = rows[0] ? groupOf(rows[0]) : { name: '', declared: true };
       const group = bar.querySelector('.bs-make-bucket');
       const rename = bar.querySelector('.bs-rename');
-      group.hidden = rename.hidden = rows.length === 0;
-      rename.disabled = first.declared || first.name === '';
+      // CUTTING A BRANCH NEEDS A BUCKET, for the reason renaming does. A row
+      // grouped by its status has no bucket, and a status is the system's word.
+      const cut = bar.querySelector('.bs-cut-branch');
+      group.hidden = rename.hidden = cut.hidden = rows.length === 0;
+      rename.disabled = cut.disabled = first.declared || first.name === '';
       rename.title = rename.disabled
         ? 'these rows are grouped by their status, and a status is not yours to rename'
         : 'rename ' + first.name;
+      cut.title = cut.disabled
+        ? 'these rows are grouped by their status, and a status is not a group to work'
+        : 'cut group/' + first.name + ', push it, and leave this tree where it is';
       if (rows.length === 0) {
         for (const box of w.querySelectorAll('.bs-rename-field')) box.hidden = true;
       }
@@ -859,6 +867,16 @@ function script(): string {
     // AN EMPTY NAME ASKS THE ENGINE FOR A FRESH ONE. It knows what is taken and
     // the client would have to guess. The bucket is made first and named after.
     send({ type: 'group', ids: rows.map((r) => r.dataset.id) });
+  });
+
+  // THE BRANCH IS CUT AND PUSHED, AND THIS TREE DOES NOT MOVE. A person who
+  // pressed a button in the editor did not ask for their checkout to change.
+  document.addEventListener('click', (ev) => {
+    const press = ev.target.closest?.('.bs-cut-branch');
+    if (!press || press.disabled) return;
+    const rows = ticked(instance(press));
+    if (rows.length === 0) return;
+    send({ type: 'branch', group: groupOf(rows[0]).name });
   });
 
   document.addEventListener('click', (ev) => {

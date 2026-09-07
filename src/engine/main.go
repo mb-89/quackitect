@@ -82,6 +82,7 @@ func main() {
 	pingFlag := flag.Bool("ping", false, "print what the engine running over this folder says about itself, and exit")
 	project := flag.Bool("project", false, "write the projections from guidance and exit")
 	group := flag.String("group", "", "put this tree on the branch for a bucket, and exit")
+	cutGroup := flag.String("cut-group", "", "cut the branch for a bucket and push it, without moving this tree")
 	land := flag.Bool("land", false, "put this tree on the tip origin holds, and exit")
 	emergency := flag.String("emergency", "", "arm or disarm emergency mode: on, off, or status")
 	bind := flag.String("bind", "", "how much of the engine speaks to the agent: bound, unbound, god, or status")
@@ -284,6 +285,14 @@ func main() {
 	if *group != "" {
 		took := TakeTheGroupBranch(roots, *group)
 		fmt.Println(took.Says)
+		return
+	}
+
+	// AND A DESK CUTS ONE WITHOUT MOVING. The person pressing a button in the
+	// work editor is not the box that will work the group.
+	if *cutGroup != "" {
+		cut := CutTheGroupBranch(roots, *cutGroup)
+		fmt.Println(cut.Says)
 		return
 	}
 

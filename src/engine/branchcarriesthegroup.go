@@ -116,6 +116,64 @@ func aPullCall(tool, command string) bool {
 	return true
 }
 
+// theBucketHolds counts the open tokens filed under a bucket.
+func theBucketHolds(r Roots, bucket string) int {
+	n := 0
+	for _, t := range Tokens(r) {
+		if t.Bucket == bucket && !t.Ended() {
+			n++
+		}
+	}
+	return n
+}
+
+// CutTheGroupBranch makes the branch a bucket is worked on, pushes it, and
+// leaves this tree exactly where it stands.
+//
+// IT IS NOT TakeTheGroupBranch, AND THE DIFFERENCE IS WHO IS CALLING. That one
+// puts a box on the branch, which is right for a box about to work the group. A
+// person cutting a branch from the work editor did not ask to be moved
+// somewhere else, and a desk whose checkout moves under it loses what it held.
+//
+// IT PUSHES, BECAUSE A BRANCH NO REMOTE CARRIES IS ONE NO CLOUD BOX CAN
+// SELECT. Cutting without pushing would look exactly like the button doing
+// nothing, which is the failure a person cannot tell from a bug.
+//
+// A BRANCH THAT IS ALREADY THERE IS SAID SO AND PUSHED, rather than failed on.
+// Pressing twice is a person checking, and the second press should answer the
+// same thing as the first.
+func CutTheGroupBranch(r Roots, bucket string) BranchTaken {
+	bucket = strings.TrimSpace(bucket)
+	if bucket == "" {
+		return BranchTaken{Says: "no bucket was named, so no group branch was cut"}
+	}
+	want := aGroupBranch + bucket
+	// A BRANCH FOR AN EMPTY BUCKET IS A BOX THAT LANDS, FINDS NOTHING AND
+	// CLOSES. It is refused here, where a person can read why, rather than
+	// discovered there, where nobody is watching.
+	if theBucketHolds(r, bucket) == 0 {
+		return BranchTaken{Says: bucket + " holds no open token, so a box on " + want +
+			" would land, find nothing and close. Nothing was cut."}
+	}
+	says := want + " is already here"
+	if _, err := gitHere(r, "rev-parse", "--verify", "--quiet", "refs/heads/"+want); err != nil {
+		off, from := fetchedBranch(r)
+		if off == "" {
+			return BranchTaken{Says: want + " was not cut: this tree tracks no branch to cut it off"}
+		}
+		if _, err := gitHere(r, "branch", want, off); err != nil {
+			return BranchTaken{Says: want + " was not cut: " + err.Error()}
+		}
+		says = want + " is cut off " + from
+	}
+	if _, err := gitHere(r, "push", "--set-upstream", "origin", want); err != nil {
+		return BranchTaken{On: want, Says: says + ", and it was not pushed, so no cloud box can " +
+			"select it yet: " + err.Error()}
+	}
+	return BranchTaken{On: want, Says: says + " and pushed. A box on it is handed " +
+		theGroupFilter(bucket) + " and nothing else. This tree has not moved."}
+}
+
 // theFilterNotice says what the queue is narrowed by, on every pull that is
 // narrowed by anything.
 //

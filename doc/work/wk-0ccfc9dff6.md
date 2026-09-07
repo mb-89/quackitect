@@ -10,7 +10,7 @@ title: the editor cuts branches
 # where the token stands. The process owns these values.
 status: open
 claimed_by: 542bcda8/main
-claimed_at: "2026-09-07T12:34:22Z"
+claimed_at: "2026-09-07T12:50:07Z"
 # the tree each time the work was taken up, snapshots the engine wrote
 began:
   - 1b2928e8b5e0b76853a9d51d66768d6622b0271d
