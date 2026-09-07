@@ -140,7 +140,7 @@ func TestAMissingProgramIsARefusal(t *testing.T) {
 // AND THE GUIDANCE NAMES THE VERBS AND NO PROGRAM.
 func TestWritingGoNamesNoProgram(t *testing.T) {
 	t.Parallel()
-	b, err := os.ReadFile(filepath.Join("..", "..", "doc", "guidance",
+	b, err := os.ReadFile(filepath.Join("..", "..", "spec", "guidance",
 		"software-development", "writing-go.md"))
 	if err != nil {
 		t.Fatal(err)

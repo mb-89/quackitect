@@ -34,7 +34,7 @@ func TestTheTidySaysTheRetroFolderDoesNotTravel(t *testing.T) {
 	if part.Could {
 		t.Fatal("it says the folder travels, and nothing pushes .se")
 	}
-	for _, want := range []string{".se", "doc/work", "push"} {
+	for _, want := range []string{".se", "spec/work", "push"} {
 		if !strings.Contains(part.Why, want) {
 			t.Errorf("it does not name %q: %s", want, part.Why)
 		}

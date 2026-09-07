@@ -105,10 +105,10 @@ func TestAPathGlobReadsAsWritten(t *testing.T) {
 		{"src/**/*.go", "src/engine/config.go", true},
 		{"src/**/*.go", "src/config.go", true},
 		{"src/*.go", "src/engine/config.go", false},
-		{"**/*.md", "doc/guidance/voice.md", true},
+		{"**/*.md", "spec/guidance/voice.md", true},
 		{"util/checks/*.mjs", "util/checks/liveness.mjs", true},
 		{"util/checks/*.mjs", "util/checks/lib/engine.mjs", false},
-		{"doc/g?idance/voice.md", "doc/guidance/voice.md", true},
+		{"doc/g?idance/voice.md", "spec/guidance/voice.md", true},
 	}
 	for _, c := range cases {
 		re, err := globRegexp(c.glob)

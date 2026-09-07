@@ -72,8 +72,8 @@ func aTreeTheLintFindsNothingIn(t *testing.T) Roots {
 			t.Fatal(err)
 		}
 	}
-	from := filepath.Join("..", "..", "doc", "guidance")
-	if err := os.CopyFS(filepath.Join(r.Method, "doc", "guidance"), os.DirFS(from)); err != nil {
+	from := filepath.Join("..", "..", "spec", "guidance")
+	if err := os.CopyFS(filepath.Join(r.Method, "spec", "guidance"), os.DirFS(from)); err != nil {
 		t.Fatal(err)
 	}
 	return r

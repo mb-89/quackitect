@@ -863,7 +863,7 @@ func whatItSends(r Roots) Sizes {
 	}
 	if biggest.ID != "" {
 		a := Answer{Pull: AnswerWork, Token: &biggest, Notice: workNotice(biggest),
-			GuidanceAt: "doc/guidance/work-token.md is in your prompt already"}
+			GuidanceAt: "spec/guidance/work-token.md is in your prompt already"}
 		out.Pull = len(asSent(a))
 	}
 

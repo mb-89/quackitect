@@ -26,7 +26,7 @@ func TestTheFoldGivesARowTheCopyThatTravels(t *testing.T) {
 		t.Fatal(err)
 	}
 	// THE BRANCH COMMITS IT, which is what makes the copy that travels.
-	gitAt(t, r.Work, "add", "doc/work")
+	gitAt(t, r.Work, "add", "spec/work")
 	gitAt(t, r.Work, "commit", "-m", "the note as the branch carried it")
 
 	tok.Disposition, tok.Status = Done, "closed"

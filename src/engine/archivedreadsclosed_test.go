@@ -38,7 +38,7 @@ func TestAnArchivedNoteReadsClosedOnTheBranchAlone(t *testing.T) {
 	if err := SaveToken(r, tok); err != nil {
 		t.Fatalf("closing %s: %v", tok.ID, err)
 	}
-	gitAt(t, r.Work, "add", "--all", "--", "doc/work")
+	gitAt(t, r.Work, "add", "--all", "--", "spec/work")
 	gitAt(t, r.Work, "commit", "--quiet", "-m", "the close")
 
 	// THE CLONE IS THE BOX THIS IS ABOUT. It takes the branch and no tags, and

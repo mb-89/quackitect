@@ -1,8 +1,8 @@
 // A NOTE TAKEN OFF THE DISK HAS AN ARCHIVE ROW, OR IT IS NAMED HERE.
 //
-// Measured at 19:10 on the box that minted this. git status over doc/work
+// Measured at 19:10 on the box that minted this. git status over spec/work
 // named 112 notes deleted from the working tree and not committed. 91 of them
-// had a row in doc/work/archive.jsonl, so those deletions were a close doing
+// had a row in spec/work/archive.jsonl, so those deletions were a close doing
 // its job. Twenty of the rest were still in HEAD, every one status open with
 // no disposition. Nothing said who took them off the disk, or why.
 //
@@ -17,20 +17,20 @@
 // and one checkout puts it back.
 //
 // HISTORY IS OUT OF SCOPE, AND THAT WAS MEASURED. 458 note names have left
-// doc/work across the whole history and 345 of them have no row, because most
+// spec/work across the whole history and 345 of them have no row, because most
 // of them predate the archive list. Judging those would hold this red forever
 // and say nothing about the deletion happening now.
 //
 //   node util/checks/deleted-notes-have-a-row.mjs <root>
 //
-// reads: doc/work/*.md, doc/work/archive.jsonl, git
+// reads: spec/work/*.md, spec/work/archive.jsonl, git
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.argv[2] ?? ".";
-const where = "doc/work";
-const here = join(root, "doc", "work");
+const where = "spec/work";
+const here = join(root, "spec", "work");
 
 let failed = 0;
 function fail(said) {
@@ -73,7 +73,7 @@ function names(args) {
       .split("\n")
       .map((line) => line.trim())
       .filter((line) => /^doc\/work\/[^/]+\.md$/.test(line))
-      .map((line) => line.slice("doc/work/".length, -".md".length)),
+      .map((line) => line.slice("spec/work/".length, -".md".length)),
   );
 }
 
@@ -81,8 +81,8 @@ function names(args) {
 // alone sits in the index. One removed with git rm is out of the index and
 // still in HEAD, and that is the shape that ends up committed.
 const tracked = new Set([
-  ...names(["ls-tree", "-r", "--name-only", "HEAD", "--", "doc/work"]),
-  ...names(["ls-files", "--", "doc/work"]),
+  ...names(["ls-tree", "-r", "--name-only", "HEAD", "--", "spec/work"]),
+  ...names(["ls-files", "--", "spec/work"]),
 ]);
 
 const onDisk = new Set(

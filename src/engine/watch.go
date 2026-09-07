@@ -40,14 +40,14 @@ func watchGuidance(methodRoot string) <-chan struct{} {
 // GuidanceDir is where the authored material lives. It is named here so that
 // nothing else has to spell it.
 func GuidanceDir(methodRoot string) string {
-	return filepath.Join(methodRoot, "doc", "guidance")
+	return filepath.Join(methodRoot, "spec", "guidance")
 }
 
 // RationaleDir is where the arguments live, one note per decision. Guidance
 // and a schema say what to do; a rationale says why it is that, and the thing
 // it explains names it by link. It is spelled here so nothing else spells it.
 func RationaleDir(methodRoot string) string {
-	return filepath.Join(methodRoot, "doc", "rationale")
+	return filepath.Join(methodRoot, "spec", "rationale")
 }
 
 func exists(p string) bool {

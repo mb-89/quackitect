@@ -56,7 +56,7 @@ func theMarker(t *testing.T, r Roots) {
 // inBucket files a token, which is what the branch narrows the queue by.
 func inBucket(t *testing.T, r Roots, id, bucket string) {
 	t.Helper()
-	for _, dir := range []string{filepath.Join(r.Work, "doc", "work"), r.Private("work")} {
+	for _, dir := range []string{filepath.Join(r.Work, "spec", "work"), r.Private("work")} {
 		path := filepath.Join(dir, id+".md")
 		b, err := os.ReadFile(path)
 		if err != nil {
@@ -135,7 +135,7 @@ func TestWithTheNotesInTheMarkerIsAskedFor(t *testing.T) {
 	if c.Step != closingMarker {
 		t.Fatalf("the closing answered %q: %s", c.Step, c.Says)
 	}
-	if !strings.Contains(c.Says, "doc/work/groups/archive.done") {
+	if !strings.Contains(c.Says, "spec/work/groups/archive.done") {
 		t.Errorf("the answer does not name the marker to write: %s", c.Says)
 	}
 }

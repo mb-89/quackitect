@@ -33,13 +33,13 @@
 //
 //   node util/checks/criteria-name-a-runnable-command.mjs <root>
 //
-// reads: doc/work/*.md, src/engine/search.go, src/engine/tests.go,
+// reads: spec/work/*.md, src/engine/search.go, src/engine/tests.go,
 //        src/engine/removal.go
 import { readFileSync, readdirSync, existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.argv[2] ?? ".";
-const where = "doc/work";
+const where = "spec/work";
 const here = join(root, where);
 
 let failed = 0;

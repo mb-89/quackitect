@@ -43,7 +43,7 @@ func aBoxHolding(t *testing.T, remote, id, by string) Roots {
 	if remote != "" {
 		gitAt(t, root, "remote", "add", "origin", remote)
 	}
-	at := filepath.Join(root, "doc", "work", id+".md")
+	at := filepath.Join(root, "spec", "work", id+".md")
 	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -64,14 +64,14 @@ func TestAClaimIsWrittenOnTheFarCommit(t *testing.T) {
 	two := aBoxHolding(t, remote, "wk-2222222222", "box-two/worker-two")
 
 	// THE FIRST BOX WINS THE RACE, and its commit is what the remote holds.
-	if got := Publish(t.Context(), one, []string{"doc/work/wk-1111111111.md"}, "one claims"); !got.Pushed {
+	if got := Publish(t.Context(), one, []string{"spec/work/wk-1111111111.md"}, "one claims"); !got.Pushed {
 		t.Fatalf("the first claim never reached the remote: %s", got.Says)
 	}
 	far := gitAt(t, one.Work, "rev-parse", claimsRef)
 
 	// THE SECOND BOX IS BEHIND THE REMOTE AND AHEAD OF ITS OWN REF, so its
 	// first push is refused and the recovery is the whole of this test.
-	got := Publish(t.Context(), two, []string{"doc/work/wk-2222222222.md"}, "two claims")
+	got := Publish(t.Context(), two, []string{"spec/work/wk-2222222222.md"}, "two claims")
 	if !got.Rebased {
 		t.Fatalf("the far claims were never read: %s", got.Says)
 	}
@@ -108,7 +108,7 @@ func TestAFetchToARemoteThatIsNotThereLeavesItsReason(t *testing.T) {
 	nowhere := filepath.Join(t.TempDir(), "no-such-remote.git")
 	r := aBoxHolding(t, nowhere, "wk-3333333333", "box-three/worker-alone")
 
-	got := Publish(t.Context(), r, []string{"doc/work/wk-3333333333.md"}, "a claim nobody receives")
+	got := Publish(t.Context(), r, []string{"spec/work/wk-3333333333.md"}, "a claim nobody receives")
 	if got.Pushed {
 		t.Fatalf("a push to a remote that is not there answered pushed: %s", got.Says)
 	}

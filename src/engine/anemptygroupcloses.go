@@ -50,10 +50,10 @@ type Closing struct {
 }
 
 // theMarkerPath is the file a box writes to say its group is finished. It is
-// under doc/work, which git carries, because the reader is a sweeper on another
+// under spec/work, which git carries, because the reader is a sweeper on another
 // box and nothing under .se reaches one.
 func theMarkerPath(r Roots, group string) string {
-	return filepath.Join(r.Work, "doc", "work", "groups", group+".done")
+	return filepath.Join(TrackedDir(r), "groups", group+".done")
 }
 
 // aRetroHasRun answers whether this tree carries a retro folder. A retro makes
@@ -129,8 +129,8 @@ func TheClosing(r Roots) Closing {
 	if _, err := os.Stat(theMarkerPath(r, group)); err != nil {
 		return Closing{Step: closingMarker, Group: group, Says: "THE WORK IS DONE AND THE " +
 			"BRANCH DOES NOT SAY SO.\n\nWrite the marker, which is what a sweeper reads:\n\n  " +
-			filepath.ToSlash(filepath.Join("doc", "work", "groups", group+".done")) +
-			"\n\nIt is under doc/work because git carries that, and the reader is on " +
+			filepath.ToSlash(filepath.Join(TheTrackedFolder, "groups", group+".done")) +
+			"\n\nIt is under spec/work because git carries that, and the reader is on " +
 			"another box.\n"}
 	}
 	return Closing{Step: closingDone, Group: group, Says: "THE GROUP IS CLOSED. Merge " +

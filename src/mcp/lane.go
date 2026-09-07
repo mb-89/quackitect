@@ -74,7 +74,7 @@ var theLane = []laneTool{
 	{
 		name: "se_work",
 		says: "MINT A WORK TOKEN: title (four words at most), detail, done_when, " +
-			"and tracked, which says where it is born. tracked true puts it in doc/work, " +
+			"and tracked, which says where it is born. tracked true puts it in spec/work, " +
 			"which git carries, so another agent on another box can claim it. tracked false " +
 			"keeps it in .se/work, for small work you do yourself next. A note takes neither " +
 			"and is always private. Or on: <id> takes that token into your hands, and " +

@@ -14,7 +14,7 @@ import (
 // index on purpose, and git offers no way to name paths on one.
 //
 // MEASURED in September 2026 on v4. A merge of origin/v4 conflicted in
-// doc/work/archive.jsonl. With the conflict resolved and staged, git commit
+// spec/work/archive.jsonl. With the conflict resolved and staged, git commit
 // --no-edit was refused. Naming the paths would have made an ordinary commit,
 // left the branch diverged, and made the next push worse.
 //

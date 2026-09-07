@@ -22,7 +22,7 @@
 // is the same reason a test may not name one.
 //
 // EVERY ROOT IT READS, named here so a criterion can trust it: src/engine,
-// src/mcp and src/viewer for *_test.go, each one folder deep; and doc/guidance
+// src/mcp and src/viewer for *_test.go, each one folder deep; and spec/guidance
 // for *.md, walked to the bottom.
 //
 //   node util/checks/tests-name-no-token.mjs <root>
@@ -43,7 +43,7 @@ const roots = [
   { dir: join("src", "engine"), ends: "_test.go", deep: false },
   { dir: join("src", "mcp"), ends: "_test.go", deep: false },
   { dir: join("src", "viewer"), ends: "_test.go", deep: false },
-  { dir: join("doc", "guidance"), ends: ".md", deep: true },
+  { dir: join("spec", "guidance"), ends: ".md", deep: true },
 ];
 
 function filesUnder(dir, ends, deep) {

@@ -28,7 +28,7 @@ function say(what, ok, why) {
   console.log((ok ? "  ok   " : "  FAIL ") + what + (ok ? "" : "\n         " + why));
 }
 
-const list = join(root, "doc", "work", "archive.jsonl");
+const list = join(root, "spec", "work", "archive.jsonl");
 if (!existsSync(list)) {
   console.log("  ok   there is no archive yet, so no row has anywhere to travel");
   console.log("\n0 row(s) read. 0 failed.");

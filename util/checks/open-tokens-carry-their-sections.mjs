@@ -14,7 +14,7 @@
 // round-trips forever and the writer is never told.
 //
 // SO THE DECLARATION IS THE CHECK. src/processes/<name>.process.yaml names the
-// sections that process requires. Every token in doc/work that has not closed
+// sections that process requires. Every token in spec/work that has not closed
 // is read for the ones its own process names, and a missing one is reported
 // with its file, its process and the heading.
 //
@@ -28,13 +28,13 @@
 //
 //   node util/checks/open-tokens-carry-their-sections.mjs <root>
 //
-// reads: src/processes/*.process.yaml, doc/work/*.md
+// reads: src/processes/*.process.yaml, spec/work/*.md
 import { readFileSync, readdirSync, existsSync, statSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.argv[2] ?? ".";
 const processes = join(root, "src", "processes");
-const work = join(root, "doc", "work");
+const work = join(root, "spec", "work");
 
 let failed = 0;
 
@@ -46,7 +46,7 @@ function missing(where, why) {
 }
 
 if (!existsSync(processes)) missing("src/processes", "is not there, so this guards nothing");
-if (!existsSync(work)) missing("doc/work", "is not there, so this guards nothing");
+if (!existsSync(work)) missing("spec/work", "is not there, so this guards nothing");
 
 // requiredOf reads one process declaration and answers the sections it
 // requires.
@@ -121,7 +121,7 @@ const tokens = readdirSync(work)
   .sort();
 
 if (tokens.length === 0) {
-  missing("doc/work", "holds no token, so this guards nothing");
+  missing("spec/work", "holds no token, so this guards nothing");
 }
 
 let read = 0;
@@ -135,7 +135,7 @@ for (const name of tokens) {
   // token owes cannot be read, so nothing here can say it carries them.
   if (want === undefined) {
     console.log(
-      `FAIL doc/work/${name} names process "${which}", which src/processes ` +
+      `FAIL spec/work/${name} names process "${which}", which src/processes ` +
         `does not declare, so what it must carry cannot be read`,
     );
     failed++;
@@ -146,7 +146,7 @@ for (const name of tokens) {
   for (const section of want) {
     if (has.has(section)) continue;
     console.log(
-      `FAIL doc/work/${name} is ${status} under the ${which} process and ` +
+      `FAIL spec/work/${name} is ${status} under the ${which} process and ` +
         `carries no "## ${section}", which that process requires`,
     );
     failed++;

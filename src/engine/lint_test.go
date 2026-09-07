@@ -15,7 +15,7 @@ import (
 // parse, so se lint answered clean precisely when the file it guards was
 // broken. That is the moment it was most worth hearing from.
 //
-// The rule is in doc/guidance/behaviour.md and in all three projections: a
+// The rule is in spec/guidance/behaviour.md and in all three projections: a
 // check that finds nothing to check refuses.
 func TestALinterThatCannotReadTheDeclarationRefuses(t *testing.T) {
 	t.Parallel()
@@ -67,7 +67,7 @@ func TestALinterThatCanReadSaysNothingAboutIt(t *testing.T) {
 // A VERB REFUSES WHAT IT WILL NOT USE.
 //
 // Every verb here parsed its flags and dropped whatever was left over. So
-// `se lint doc/guidance/reviewing.md` answered clean, and so did
+// `se lint spec/guidance/reviewing.md` answered clean, and so did
 // `se lint /nope/not-a-file.md`, because neither path was read by anything.
 // It is spelled like a check on the thing named, it exits zero, and the answer
 // is indistinguishable from one where the file was read and approved. Three

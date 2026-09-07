@@ -32,10 +32,10 @@ const TheNoteCeiling = 20
 //
 // A NOTE COUNTS BECAUSE IT DIES HERE, AND ONE ON THE BRANCH DOES NOT. The rule
 // above counts by kind, and its reason is that a note lives under .se, which
-// nothing pushes. An earlier session moved one into doc/work for exactly that
+// nothing pushes. An earlier session moved one into spec/work for exactly that
 // reason, and the count went on billing it to whoever was here.
 //
-// MEASURED, September 2026. doc/work/wk-ac18ea020a.md was claimed by a box that
+// MEASURED, September 2026. spec/work/wk-ac18ea020a.md was claimed by a box that
 // had gone. A stop was refused twice naming it, and a claim on it answered wait
 // for that claim to lapse. So the gate demanded the note be turned in and the
 // claim refused the only call that turns it in. No session could satisfy both.

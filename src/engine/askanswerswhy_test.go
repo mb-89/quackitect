@@ -138,7 +138,7 @@ func TestAMintedTokenCarriesTheWhyRows(t *testing.T) {
 // not answer, and only the guidance says what a good answer looks like.
 func TestTheWorkTokenGuidanceNamesTheTwoQuestions(t *testing.T) {
 	t.Parallel()
-	b, err := os.ReadFile(filepath.Join("..", "..", "doc", "guidance", "work-token.md"))
+	b, err := os.ReadFile(filepath.Join("..", "..", "spec", "guidance", "work-token.md"))
 	if err != nil {
 		t.Fatal(err)
 	}

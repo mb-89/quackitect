@@ -39,7 +39,7 @@ const A = await import(pathToFileURL(join(out, "engineargs.mjs")).href);
 // A FOLDER OF ITS OWN, so nothing here writes into the tree being checked.
 const work = mkdtempSync(join(tmpdir(), "engineargs-work-"));
 mkdirSync(join(work, "util", "views"), { recursive: true });
-mkdirSync(join(work, "doc", "work"), { recursive: true });
+mkdirSync(join(work, "spec", "work"), { recursive: true });
 copyFileSync(join(root, "util", "views", "work.base"), join(work, "util", "views", "work.base"));
 writeFileSync(join(work, ".gitignore"), ".se/\n");
 

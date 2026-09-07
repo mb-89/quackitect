@@ -434,7 +434,7 @@ const remoteClaimsRef = "refs/se/remote-claims"
 // and no workflow, and this is the only design that holds. The branch is swept
 // from time to time on purpose, and a claim lapses in three hours, so a stale
 // one ages out rather than needing a delete a cloud box cannot make. Measured
-// and decided on wk-4759d90994, from doc/spec/claims-relay-trial.md.
+// and decided on wk-4759d90994, from spec/design_input/claims-relay-trial.md.
 //
 // ONLY THE FAR SIDE MOVED. Locally a claim is still refs/se/claims, off every
 // branch listing, and the remote's copy still lands on refs/se/remote-claims.

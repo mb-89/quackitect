@@ -1356,7 +1356,7 @@ func scopeNotice(r Roots, scopes []Token) string {
 func method(r Roots, name string) string {
 	b, err := os.ReadFile(filepath.Join(GuidanceDir(r.Method), name))
 	if err != nil {
-		return "doc/guidance/" + name + " could not be read: " + err.Error()
+		return "spec/guidance/" + name + " could not be read: " + err.Error()
 	}
 	if only, found := chapter(string(b), "Actionables"); found {
 		return only

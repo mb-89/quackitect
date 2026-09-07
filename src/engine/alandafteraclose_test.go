@@ -34,7 +34,7 @@ func TestALandRunsOnATokenThatJustClosed(t *testing.T) {
 	t.Cleanup(func() { theCloseWasAt = was })
 	theCloseWasAt = func(Roots, Token) (time.Time, bool) { return time.Now(), true }
 
-	land := `sh util/git/land.sh "the close named these" doc/work/` + tok.ID + `.md doc/work/archive.jsonl`
+	land := `sh util/git/land.sh "the close named these" spec/work/` + tok.ID + `.md spec/work/archive.jsonl`
 	if !aWarmLand(r, tok.ID, land) {
 		t.Errorf("a land naming the token that just closed was not allowed through")
 	}
@@ -65,7 +65,7 @@ func TestALandOnALongClosedTokenIsRefused(t *testing.T) {
 		return time.Now().Add(-24 * time.Hour), true
 	}
 
-	land := `sh util/git/land.sh "late" doc/work/` + tok.ID + `.md`
+	land := `sh util/git/land.sh "late" spec/work/` + tok.ID + `.md`
 	if aWarmLand(r, tok.ID, land) {
 		t.Errorf("a land named a token closed a day ago and was allowed through")
 	}

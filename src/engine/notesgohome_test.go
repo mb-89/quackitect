@@ -129,8 +129,8 @@ func TestTheThreeAnswersLandThroughTheOpenDoors(t *testing.T) {
 	// A TRACKED TOKEN, born where git carries it.
 	minted := theNotesDoor(t, r, "mcp__quackitect__se_work", []string{"work", "--title", "token from a note",
 		"--process", "trivial", "--tracked", "true", "--done-when", "the note is a token", "--by", "main"})
-	if _, err := os.Stat(filepath.Join(r.Work, "doc", "work", minted.ID+".md")); err != nil {
-		t.Errorf("the tracked token is not in doc/work: %v", err)
+	if _, err := os.Stat(filepath.Join(r.Work, "spec", "work", minted.ID+".md")); err != nil {
+		t.Errorf("the tracked token is not in spec/work: %v", err)
 	}
 	if minted.NeedsHuman {
 		t.Errorf("a token nobody flagged reads needs_human")

@@ -13,7 +13,7 @@ import (
 // schema sets additionalProperties false and declares neither. So each claimed
 // token carries two fields its own schema refuses.
 //
-// MEASURED. LintNotes over doc/work answered 283 findings, and 208 of them were
+// MEASURED. LintNotes over spec/work answered 283 findings, and 208 of them were
 // those two lines over 104 tokens. Nothing a token author wrote caused one.
 //
 // A CLAIM IS NOT A HOLD. A hold belongs to an agent and lives under .se, which

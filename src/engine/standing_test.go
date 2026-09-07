@@ -19,7 +19,7 @@ func TestGuidanceInThePromptIsNotSentAgain(t *testing.T) {
 	if text != "" {
 		t.Errorf("it sent %d bytes of guidance the prompt already carries", len(text))
 	}
-	if !strings.Contains(says, "doc/guidance/standing.md") {
+	if !strings.Contains(says, "spec/guidance/standing.md") {
 		t.Errorf("it does not say where the rules are: %q", says)
 	}
 	// AND IT SAYS SO EVERY TIME, because an agent that has lost them has to
@@ -38,7 +38,7 @@ func TestGuidanceOutsideThePromptIsSentOnce(t *testing.T) {
 	if !strings.Contains(text, "A rule only this lane has") {
 		t.Fatalf("the first pull did not send the rules: %q", text)
 	}
-	if !strings.Contains(says, "doc/guidance/software-development/lane.md") {
+	if !strings.Contains(says, "spec/guidance/software-development/lane.md") {
 		t.Errorf("it does not name the file: %q", says)
 	}
 

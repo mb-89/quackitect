@@ -1,6 +1,6 @@
 // A token that travels names no token that does not.
 //
-// doc/work is in version control and .se/work is not. A cloud box reads the
+// spec/work is in version control and .se/work is not. A cloud box reads the
 // tree out of git, so .se/work is not there at all. A traced token naming a
 // private one hands that reader an id it cannot open, and nothing says why. It
 // reads as a broken link rather than as a door that is shut.
@@ -16,7 +16,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = process.argv[2] ?? ".";
-const traced = join(root, "doc", "work");
+const traced = join(root, "spec", "work");
 const privateWork = join(root, ".se", "work");
 
 let bad = 0;
@@ -37,7 +37,7 @@ const travels = new Set(notesIn(traced).map((n) => n.slice(0, -3)));
 const stays = new Set(notesIn(privateWork).map((n) => n.slice(0, -3)));
 
 say("there are traced tokens to read (" + travels.size + ")", travels.size > 0,
-  "no token under doc/work, so every link would look clean and this check "
+  "no token under spec/work, so every link would look clean and this check "
   + "would pass for the wrong reason");
 
 // A LINK IS THE EDITOR'S BRACKETS. The engine writes every reference that way,

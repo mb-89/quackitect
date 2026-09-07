@@ -39,7 +39,7 @@ func TestTheIdentityDoorDecidesWrites(t *testing.T) {
 	}{
 		{
 			what:     "an ISO date in prose, into a tracked file",
-			path:     filepath.Join("doc", "work", "dated.md"),
+			path:     filepath.Join("spec", "work", "dated.md"),
 			writes:   dated,
 			identity: true,
 		},
@@ -53,7 +53,7 @@ func TestTheIdentityDoorDecidesWrites(t *testing.T) {
 		},
 		{
 			what: "a write whose only stamp is a frontmatter field",
-			path: filepath.Join("doc", "work", "stamped.md"),
+			path: filepath.Join("spec", "work", "stamped.md"),
 			writes: "---\nclaimed_at: 2026-09-04T17:00:00Z\n---\n\n" +
 				"The hold stands and the walker left it where it was.\n",
 		},

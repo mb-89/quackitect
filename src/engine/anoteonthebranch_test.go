@@ -10,13 +10,13 @@ import (
 // A NOTE A DEAD BOX CLAIMED CANNOT BE TURNED IN BY ANYONE, AND THE GATE BILLED
 // IT TO WHOEVER WAS HERE.
 //
-// MEASURED, September 2026. doc/work/wk-ac18ea020a.md was a note claimed by a
+// MEASURED, September 2026. spec/work/wk-ac18ea020a.md was a note claimed by a
 // box that had gone. A stop was refused twice naming it. A claim on it answered
 // that it is held, wait for that claim to lapse. The gate demanded the note be
 // turned in and the claim refused the only call that turns it in.
 //
 // THE COUNT WAS NOT TRUE. The gate says a note dies with this box. That one did
-// not: it sat in doc/work, which git carries, and its own detail records an
+// not: it sat in spec/work, which git carries, and its own detail records an
 // earlier session moving it there for that reason. The gate counted by kind.
 //
 // SO THE NARROW HALF IS FIXED AND THE WIDE HALF IS NOT. A claim still outlives
@@ -50,6 +50,6 @@ func TestANoteOnTheBranchDoesNotRefuseTheStop(t *testing.T) {
 		t.Fatal(err)
 	}
 	if why, refuse := NotesGoWithTheBox(r); refuse {
-		t.Errorf("a note in doc/work refused the stop, and it does not die with this box: %s", why)
+		t.Errorf("a note in spec/work refused the stop, and it does not die with this box: %s", why)
 	}
 }

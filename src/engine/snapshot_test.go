@@ -113,7 +113,7 @@ func TestAChangeIsBracketedByTwoSnapshotsOutsideTheHistory(t *testing.T) {
 func workOnly(changed string) string {
 	var out []string
 	for _, name := range strings.Split(changed, "\n") {
-		if name != "" && !strings.HasPrefix(name, "doc/work/") {
+		if name != "" && !strings.HasPrefix(name, "spec/work/") {
 			out = append(out, name)
 		}
 	}

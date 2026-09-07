@@ -10,7 +10,7 @@
 //
 // STAGING BY NAME IS THE RULE ALREADY, AND NOTHING ENFORCED IT. This does, on
 // the cheap sign the class leaves: the message names one token, and the paths
-// include doc/work/<another id>.md whose note reads open in that commit. A note
+// include spec/work/<another id>.md whose note reads open in that commit. A note
 // the commit closes and archives is not another hand's work, so a note that
 // reads closed is passed over, and so is a merge, which carries everything.
 // A commit that mints a finding carries that note on purpose, and it names it.
@@ -22,7 +22,7 @@
 //   node util/checks/commits-carry-one-token.mjs <root> [rev | from..to ...]
 //   node util/checks/commits-carry-one-token.mjs . origin/v4..HEAD
 //
-// reads: git, the commit messages and doc/work/*.md at each commit
+// reads: git, the commit messages and spec/work/*.md at each commit
 import { execFileSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
@@ -37,8 +37,8 @@ function fail(said) {
 }
 
 // A ROOT THAT IS NOT THERE IS A FAILURE AND NOT A SKIP.
-if (!existsSync(join(root, "doc", "work"))) {
-  console.log("FAIL doc/work is not there, so this guards nothing");
+if (!existsSync(join(root, "spec", "work"))) {
+  console.log("FAIL spec/work is not there, so this guards nothing");
   process.exit(1);
 }
 

@@ -24,7 +24,7 @@ func TestABatteryAnswersStepByStep(t *testing.T) {
 
 	const page = "go build         ok    16s  \n" +
 		"go test engine   ok    40s  ok  \tquackitect/engine\t9.100s\n" +
-		"open-tokens-carry-their-sections FAIL   0s  FAIL doc/work/wk-older.md is open under the standard process\n" +
+		"open-tokens-carry-their-sections FAIL   0s  FAIL spec/work/wk-older.md is open under the standard process\n" +
 		"1 failed, 228s wall clock\n"
 
 	steps := theBatterysSteps(page)

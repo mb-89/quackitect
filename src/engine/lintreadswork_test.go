@@ -16,7 +16,7 @@ import (
 // red only in the editor.
 //
 // MEASURED before wiring it in, because this puts every token in the tree to a
-// schema at once. LintNotes over doc/work answered 283 findings. 208 of those
+// schema at once. LintNotes over spec/work answered 283 findings. 208 of those
 // were two fields the engine itself writes, which an earlier token declared,
 // and what is left is 75.
 func TestTheLintReadsAWorkTokenAgainstItsSchema(t *testing.T) {
@@ -26,7 +26,7 @@ func TestTheLintReadsAWorkTokenAgainstItsSchema(t *testing.T) {
 		t.Fatal(err)
 	}
 	work := t.TempDir()
-	dir := filepath.Join(work, "doc", "work")
+	dir := filepath.Join(work, "spec", "work")
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		t.Fatal(err)
 	}

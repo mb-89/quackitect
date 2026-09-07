@@ -23,7 +23,7 @@ import (
 // At the moment it closes the engine reads the folder it is in, which is the
 // same fact every other door reads.
 //
-//	doc/work   it travels, so it goes into git and comes off the disk
+//	spec/work   it travels, so it goes into git and comes off the disk
 //	.se/work   it does not travel, so it stays until a retro takes it
 //
 // A local token is in a folder git ignores. There is no commit holding it and
@@ -43,7 +43,7 @@ import (
 // NOTHING WRITES ONE ANY MORE. A ref has to be pushed to leave the box, and
 // refs/tags answers HTTP 403 from the git proxy a cloud box runs behind. The
 // push result was discarded, so the tag stood on one machine, the note was
-// deleted from doc/work, and the next branch commit took the content off the
+// deleted from spec/work, and the next branch commit took the content off the
 // branch: the only copy left was a local tag on a box about to be destroyed.
 //
 // THE PREFIX STAYS BECAUSE THE TAGS ALREADY WRITTEN ARE STILL READ. It is read
@@ -260,7 +260,7 @@ func onBranch(r Roots, at string) string {
 // A NOTE THE BRANCH NEVER CARRIED HAS NO SUCH COPY, and this answers nothing for
 // it rather than an object no clone was sent.
 func onBranchEver(r Roots, id string) string {
-	rel := "doc/work/" + id + ".md"
+	rel := "spec/work/" + id + ".md"
 	if blob, err := gitHere(r, "rev-parse", "HEAD:"+rel); err == nil {
 		return blob
 	}

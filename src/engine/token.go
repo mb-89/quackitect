@@ -97,7 +97,7 @@ type Token struct {
 
 	// WHERE THIS TOKEN IS BORN, AND ONLY THAT.
 	//
-	// True puts it in doc/work, which git carries, so another agent on another
+	// True puts it in spec/work, which git carries, so another agent on another
 	// box can claim it. False keeps it in .se/work, which nothing else reaches.
 	// Unset is a question the mint refuses to answer for you, except on a note,
 	// which is private by what it is.
@@ -299,7 +299,7 @@ func checkTracked(t Token) error {
 		return nil
 	}
 	if t.Tracked == nil {
-		return fmt.Errorf("say where this %s token is born. tracked true puts it in doc/work, "+
+		return fmt.Errorf("say where this %s token is born. tracked true puts it in spec/work, "+
 			"which git carries, so another agent on another box can claim it. tracked false keeps "+
 			"it in .se/work, for small work you do yourself next", t.Process)
 	}

@@ -13,7 +13,7 @@ import (
 // EVERY VERB THIS PROGRAM ANSWERS, AND ONE DOOR THAT PARSES ITS FLAGS.
 //
 // Every verb parsed its flags and dropped whatever was left over. So
-// `se lint doc/guidance/reviewing.md` answered clean, and so did
+// `se lint spec/guidance/reviewing.md` answered clean, and so did
 // `se lint /nope/not-a-file.md`. It is spelled like a check on the thing
 // named, it exits zero, and the answer cannot be told apart from one where the
 // file was read and approved. Three submissions in one day cited it as

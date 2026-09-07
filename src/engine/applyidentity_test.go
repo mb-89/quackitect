@@ -19,7 +19,7 @@ func TestAnApplyRefusesIdentityMaterial(t *testing.T) {
 	r := aTreeToWriteIn(t)
 	const dated = "Measured on 2026-09-04, and six failed.\n"
 
-	name := "doc/work/dated.md"
+	name := "spec/work/dated.md"
 	_, err := Apply(r, []Edit{{File: name, Op: "create", New: dated}}, false, "", "tester")
 	if err == nil {
 		t.Fatal("a date the guard refuses at the harness door was taken at the engine's")
