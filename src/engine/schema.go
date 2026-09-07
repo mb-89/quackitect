@@ -169,7 +169,7 @@ func Parked(name string) bool {
 
 // SchemasDir is where a copy keeps the shape of every kind it knows.
 func SchemasDir(methodRoot string) string {
-	return filepath.Join(methodRoot, "src", "schemas")
+	return SpecAt(methodRoot, "schemas")
 }
 
 // LoadSchema reads the schema for one kind, or says why it cannot.

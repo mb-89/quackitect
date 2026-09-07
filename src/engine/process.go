@@ -71,7 +71,7 @@ type DispositionSpec struct {
 
 // ProcessesDir is where a copy keeps the processes it knows.
 func ProcessesDir(methodRoot string) string {
-	return filepath.Join(methodRoot, "src", "processes")
+	return SpecAt(methodRoot, "processes")
 }
 
 // LoadProcess reads one process, or says why it cannot.

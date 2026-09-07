@@ -197,7 +197,7 @@ func (n Node) holdsValue() bool {
 // own error needs: the new place is returned when neither is there, so the
 // message names where the file should have been.
 func DeclaredAt(root, name string) string {
-	here := filepath.Join(root, "src", "config", name)
+	here := filepath.Join(SpecAt(root, "config"), name)
 	if _, err := os.Stat(here); err == nil {
 		return here
 	}
