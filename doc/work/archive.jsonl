@@ -88,6 +88,7 @@
 {"id":"wk-8c76f768c1","title":"separator inside quotes","process":"trivial","disposition":"done","blob":"212c8db260b73c0cb1ba5675a261d6ac1642d17f","on_branch":"cf62c876e841a7e85666cec6819fbaac03177b30"}
 {"id":"wk-8fb9a97399","title":"no public link private","process":"trivial","disposition":"done","on_branch":"fba4b3346605e7766080e3670eb151056ddf469b","tag":"refs/tags/archive/wk-8fb9a97399"}
 {"id":"wk-92e9b13a45","title":"the harness has tools","process":"trivial","disposition":"done","on_branch":"8fb7ed313c4555bc0603b18286536cef28f15cbe","tag":"refs/tags/archive/wk-92e9b13a45"}
+{"id":"wk-9753f669de","title":"engine note repeats itself","process":"trivial","disposition":"done","blob":"3d9f2c279996619a7557e7700ccb55237e89310f","on_branch":"0cac7eb858baa60850f3d19e826cdaaf03a13a34"}
 {"id":"wk-979c779751","title":"session says guard live","process":"trivial","disposition":"dropped","on_branch":"c36b41e76ce3a786cf1b7c521f8567608bc5fa7c","tag":"refs/tags/archive/wk-979c779751"}
 {"id":"wk-97f1251d43","title":"proposed action optional","process":"trivial","disposition":"done","on_branch":"1ddb166c6ab6fc8d69b4c92c6e1bfc6c3b02020d","tag":"refs/tags/archive/wk-97f1251d43"}
 {"id":"wk-990c0214b6","title":"abort loses its reason","process":"trivial","disposition":"done","on_branch":"f47bf34bb4b480c2352e48779e2c18001ce06f94","tag":"refs/tags/archive/wk-990c0214b6"}
