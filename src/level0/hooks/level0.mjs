@@ -56,27 +56,33 @@ export function register(on, options) {
   });
 
   // THE STANDING LAYER, INJECTED AND NEVER PROJECTED. Every guidance note's
-  // Actionables chapter reaches the model as a section of the system prompt,
-  // computed here at session start.
+  // Actionables chapter reaches the model inside the system prompt, computed
+  // here at session start.
   //
-  // A projection would write the same text into a file in the tree, and then a
-  // guard would be needed to keep that copy honest. A copy nobody can edit
-  // needs no guard.
-  on("prompt.section", async ($, e, next) => {
+  // A projection would write the same text into a file in the tree, and a guard
+  // would then be needed to keep that copy honest. A copy nobody can edit needs
+  // no guard.
+  //
+  // THE MATCHER IS NOT OPTIONAL. This event fires once for each of the two
+  // dozen sections the engine assembles, so a hook without one appends the
+  // rules to every section and to the empty ones as well. `output_style` is the
+  // slot that carries how the agent works, which is what these rules are.
+  on("prompt.section", { name: "output_style" }, async ($, e, next) => {
     if (!standing) return next(e);
     return next({
       ...e,
       text: [
         e.text,
-        "",
-        "## How this tree is worked",
-        "",
-        "These rules are handed to you before anything else. The mechanical ones",
-        "are refused at the write door, so a write breaking one comes back with",
-        "the reason.",
-        "",
-        standing,
-      ].join("\n"),
+        [
+          "# How this tree is worked",
+          "",
+          "These rules reach you before anything else. Vale holds the mechanical",
+          "ones at the write door, so a write breaking one comes back with the",
+          "reason and the line.",
+          "",
+          standing,
+        ].join("\n"),
+      ].filter(Boolean).join("\n\n"),
     });
   });
 }
