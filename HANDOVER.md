@@ -51,6 +51,6 @@ actions over a vocabulary and a code lens per document.
 ## When you finish
 
 1. Replace this brief with your result, keeping the frontmatter.
-2. Write a retro under `## Retro`: what surprised you, and every dead end you
+2. Write a retro under `## Retro`: what surprises you, and every dead end you
    walk into. The next session pays for a repeat.
-3. Run `./RUNME.sh work done`. It stamps the status and pushes.
+3. Run `./RUNME.sh work done`, which sets the status and pushes.
