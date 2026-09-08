@@ -10,7 +10,7 @@ import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 
 import { lintText, fromJson, unreasoned, valeBin, CONFIG } from "../level0/lib/vale.mjs";
-import { standingLayer } from "../level0/lib/guidance.mjs";
+import { standingLayer, actionables } from "../level0/lib/guidance.mjs";
 import { line as asLine } from "../level0/lib/refuse.mjs";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -137,7 +137,16 @@ function standing() {
     .filter((n) => n.endsWith(".md"))
     .map((n) => ({ name: n, text: readFileSync(join(GUIDANCE, n), "utf8") }));
   const said = standingLayer(notes);
-  console.log(said || "No guidance note carries an Actionables chapter.");
+  if (!said) {
+    console.log("No guidance note carries an Actionables chapter.");
+    return 0;
+  }
+  console.log(said);
+  // The number the agent's receipt line has to match. A reader compares the
+  // two and knows whether the rules reached the session.
+  const count = notes.reduce((n, one) => n + actionables(one.text).length, 0);
+  console.log(`
+rules: ${count}`);
   return 0;
 }
 

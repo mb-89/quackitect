@@ -3,9 +3,6 @@
 A system that shapes how an agent works, starting from the layer that holds
 before anything else does.
 
-This is v5. It is an orphan rewrite and carries nothing forward from v1 to v4,
-which stand on their own branches. It starts at level zero.
-
 ## Level zero
 
 Level zero is the rules that shape what the agent writes. It runs as a plugin
@@ -15,84 +12,8 @@ That placement is the point. The harness lists a tool registered at
 `session.start` on turn one, so nothing waits for a build and nothing arrives
 late.
 
-Six cloud sessions in earlier lines died on a spawned server that had thirty
-seconds to answer. Removing the spawn ends that class of failure.
-
-What level zero holds today:
-
-- the write door, which runs Vale over a write and refuses one that breaks a rule
-- a refusal that names the rule and asks the writer to hold it for the turn
-- the standing layer: every guidance note's Actionables chapter, appended to the
-  system prompt at session start and written to no file
-- a linter and a formatter over the same rules, for a person and for a build
-- its own install, so a first session guards a clone nobody has built
-
-There is no engine yet, no work tokens and no index. Level zero comes first
-because it holds whatever comes after it.
-
-## The rules, and where each one lives
-
-A rule a program can hold belongs to the program. Vale holds those, one file per
-rule under `spec/config/styles/VoiceQuackitect`, and the write door, the linter
-and the formatter all read that one folder.
-
-A rule needing judgement stays in `spec/guidance`, in the Actionables chapter of
-a note. Level zero appends those to the system prompt, so the agent meets them
-before it does anything.
-
-    ./RUNME.sh rules      the mechanical rules Vale holds
-    ./RUNME.sh standing   what the agent is handed every session
-
-Nothing writes either set into a file in the tree. A projection would need a
-guard to keep the copy honest, and a copy nobody can edit needs no guard.
-
 ## Running it
 
 Run RUNME. It installs what is missing, then hands every argument to the
 command line. A first run on a fresh box needs nothing typed beforehand.
-
-    ./RUNME.sh            what this tree can do
-    ./RUNME.sh check      the tests, then the rules over the tree
-    ./RUNME.sh doctor     what is installed, and what level zero found
-
-On Windows, `.\RUNME.ps1` takes the same words.
-
-RUNME holds no logic. It calls `src/scripts/install.ps1` or `install.sh`, which
-names every dependency this tree takes, and then `src/scripts/cli.mjs`, which
-holds the verbs. A new dependency is a row in the install script.
-
-`.claude/settings.json` turns the plugin on, and git tracks that file. So a
-clone guards its first session with nothing typed and nothing installed. The
-file carries no port and no path belonging to one machine, so it travels.
-
-## The shape
-
-    RUNME.sh / RUNME.ps1      install, then hand every argument through
-    .claude/settings.json     the cage: one file, and it travels
-    .claude-plugin/           this tree own marketplace, so a clone finds level 0
-    .vale.ini                 which style reads which file
-    spec/guidance/            the rules needing judgement, one note each
-    spec/config/styles/       the rules Vale holds, one file each
-    src/scripts/
-      install.ps1 / .sh       every dependency this tree takes
-      cli.mjs                 the verbs
-    src/level0/
-      hooks/level0.mjs        the module: the doors, and no rules
-      lib/                    calling Vale, reading guidance, wording a refusal
-      test/                   the tests
-
-`lib` is pure JavaScript with no `node:` import, so the module and the command
-line load one copy. Somebody writes a rule once and every door says the same
-thing about it.
-
-## What this tree does not carry
-
-No MCP server and no `.mcp.json`. Nothing spawns, so nothing can arrive late.
-
-No prose tool the agent chooses to call. A tool the agent chooses is a tool the
-agent skips, so the write door is the gate.
-
-No second settings file. The module now takes the events that needed a
-per-machine port, so the cage stays one tracked file.
-
-No Copilot.
+See RUNME -h for more.
