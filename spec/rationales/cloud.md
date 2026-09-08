@@ -40,7 +40,17 @@ person's.
 A session that widens its branch produces a change nobody asked for, sitting
 beside the one somebody did. The reviewer then reads both to find the one.
 
-## 5. Push or lose it
+## 5. Onto your own branch
+
+A box starts on trunk and moves off it, so the window where a commit lands in
+the wrong place is the first minute of the session. That window is exactly when
+an agent knows least.
+
+Level zero refuses a commit made standing on `main`, and refuses a push naming
+it, on a cloud box. A word in the guidance asks; the door decides.
+
+The box holds the only copy of anything uncommitted, and there is no second
+chance to collect it, because nothing survives the session.
 
 The box holds the only copy of anything uncommitted. There is no second chance
 to collect it, because nothing survives the session.

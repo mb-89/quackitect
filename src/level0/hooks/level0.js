@@ -21,6 +21,7 @@ const GUIDANCE = "spec/guidance";
 const CONFIG = "spec/config/level0.json";
 const HANDOVER = ".se/HANDOVER.md";
 const BRIEF = "HANDOVER.md";
+const TRUNK = "main";
 const JUDGED = "spec/config/styles/VoiceJudged";
 
 const ANSWER = "level0-answer.md";
@@ -33,6 +34,7 @@ export function register(on, _options) {
   let judge = judgeOf({});
   let handover = [];
   let waiting = false;
+  let cloud = false;
 
   on("session.start", async ($, e, next) => {
     bin = await linterHere($);
@@ -42,7 +44,8 @@ export function register(on, _options) {
     config = await readConfig($);
     judge = judgeOf(config);
     handover = await takeHandover($);
-    waiting = await onTrunkWithNothing($, handover);
+    cloud = await onACloudBox($);
+    waiting = cloud && !handover.length && (await onTrunk($));
 
     try {
       await $.fs.writeFile(
@@ -51,6 +54,32 @@ export function register(on, _options) {
       );
     } catch {}
     return next(e);
+  });
+
+  // [[spec/design_output/work#a-cloud-box-writes-to-its-own-branch]]
+  on("tool.call", { tool: "Bash" }, async ($, e, next) => {
+    if (!cloud) return next(e);
+    const said = String(e.command ?? "");
+    const commits = /\bgit\s+(?:-\S+\s+\S+\s+)*commit\b/.test(said);
+    const pushes = /\bgit\s+(?:-\S+\s+\S+\s+)*push\b/.test(said);
+    if (!commits && !pushes) return next(e);
+
+    const branch = await branchNow($);
+    const atTrunk = pushes && new RegExp(`\\bpush\\b[^&|;]*\\b${TRUNK}\\b`).test(said);
+    if (branch !== TRUNK && !atTrunk) return next(e);
+
+    return {
+      deny: [
+        `This box works a branch, and ${TRUNK} belongs to a person.`,
+        "",
+        branch === TRUNK
+          ? `You stand on ${TRUNK}, so this commit would land there.`
+          : `This pushes ${TRUNK}, which no cloud box may move.`,
+        "",
+        "Run `./RUNME.sh work take` to take a branch and move onto it. Every",
+        "commit then lands where it belongs, and the merge stays a person's.",
+      ].join("\n"),
+    };
   });
 
   on("tool.call", async ($, e, next) => {
@@ -175,6 +204,11 @@ export function register(on, _options) {
           "into it, and prints the brief. Do what the brief says, and finish the",
           "way its own last section tells you to.",
           "",
+          `EVERY COMMIT YOU MAKE BELONGS TO THAT BRANCH, AND NEVER TO ${TRUNK.toUpperCase()}.`,
+          "You start on trunk and you leave it at once. Level zero refuses a",
+          `commit standing on ${TRUNK}, and refuses a push naming it, so a mistake`,
+          "here costs you a refusal rather than the tree.",
+          "",
           "It answers that nothing stands at todo where no work waits. Say so and",
           "stop, because trunk is nobody's to work directly.",
         ].join("\n"),
@@ -250,19 +284,23 @@ async function readGuidance($) {
 }
 
 // [[spec/design_output/work#a-cloud-box-landing-on-trunk]]
-async function onTrunkWithNothing($, held) {
-  if (held.length) return false;
+async function onACloudBox($) {
   const env = await readEnv($, ["CLAUDE_CODE_REMOTE", "SE_CLOUD"]);
-  if (!bindsHere("---\nenv:\n  - CLAUDE_CODE_REMOTE\n  - SE_CLOUD\n---\n", env)) {
-    return false;
-  }
+  return bindsHere("---\nenv:\n  - CLAUDE_CODE_REMOTE\n  - SE_CLOUD\n---\n", env);
+}
+
+async function onTrunk($) {
+  return (await branchNow($)) === TRUNK;
+}
+
+async function branchNow($) {
   try {
     const ran = await $.process.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], {
       timeoutMs: 10000,
     });
-    return (ran.stdout ?? "").trim() === "main";
+    return (ran.stdout ?? "").trim();
   } catch {
-    return false;
+    return "";
   }
 }
 
