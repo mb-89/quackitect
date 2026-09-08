@@ -1,0 +1,8 @@
+{
+  "group/voice": {
+    "state": "",
+    "depends_on": [
+      "group/level0"
+    ]
+  }
+}
