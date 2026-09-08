@@ -141,10 +141,15 @@ export function register(on, _options) {
           tracked
             ? `This branch carries its work in ${BRIEF}, which git tracks.`
             : `The last session on this box left ${HANDOVER}, which git ignores.`,
-          "Level zero has read it and deleted it, so act on it now.",
+          "LEVEL ZERO HAS ALREADY DELETED THAT FILE. Its text is below and it is",
+          "the only copy, so nothing carries it forward unless you write it again.",
+          "",
           tracked
-            ? `Write what you did back to ${BRIEF}, then commit and push it.`
-            : `Leave the next session a new ${HANDOVER} before you finish.`,
+            ? `Before you finish: write your result and your retro into ${BRIEF}, at`
+            : `Before you finish: write the next session a new ${HANDOVER}, at`,
+          tracked
+            ? "that same path, then run ./RUNME.sh work done, which pushes it."
+            : "that same path. Say what stands, what is next, and what surprises you.",
           "",
           one.text.trim(),
         ].join("\n"),
