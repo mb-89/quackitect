@@ -114,8 +114,8 @@ script. Git Bash hands node a path beginning `/c/`, node reads it as a folder
 under the drive root, and it resolves to a place nobody has. Changing into the
 root first and passing a relative path holds under either shell.
 
-That fault reached this tree twice: once from a cloud box, and once from a hand
-that wrote the same shape a week earlier.
+That fault stands in this tree twice over: once from a cloud box, and once from
+a hand writing the same shape a week before.
 
 # Where a rule lives
 

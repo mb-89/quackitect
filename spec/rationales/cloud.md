@@ -59,7 +59,21 @@ session to collect it later.
 The box holds the only copy of anything uncommitted. There is no second chance
 to collect it, because nothing survives the session.
 
-## 9. Saying the commit
+## 9. One session, one branch
+
+A session reading this note from `take` to `done` finds no line saying it stops
+there. So it offers a second branch, having just closed its own, which is the
+reading the words allow.
+
+Two rules come close and both read as scope advice inside one branch. Rule 4
+draws the edge of the brief and says nothing about the session. Rule 7 says
+`work done` is last of these steps, and says nothing about the session either.
+
+A branch listing also goes stale inside a session. `work list` reads origin at
+the moment of the call, and an hour of work later another session has moved
+what it named. So run it again before naming a status out loud.
+
+## 10. Saying the commit
 
 A cloud box clones the branch tip as it stood when the session began. Somebody
 pushing a minute later leaves the box behind while it reports itself current.

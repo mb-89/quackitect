@@ -17,4 +17,5 @@ rationale: [[spec/rationales/cloud]]
 6. Write your result and your retro into `HANDOVER.md`, at the root, replacing the brief.
 7. Run `./RUNME.sh work done` last. It sets the status and pushes.
 8. Leave the merge to a person. A cloud box opens no pull request.
-9. Say in your answer which commit you are on, and whether it matches origin. *
+9. Stop after `work done`. One session works one branch, and the next branch belongs to the next session. *
+10. Say in your answer which commit you are on, and whether it matches origin. *
