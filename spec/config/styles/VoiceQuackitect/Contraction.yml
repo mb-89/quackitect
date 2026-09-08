@@ -1,0 +1,25 @@
+extends: substitution
+message: "Write both words: '%s' instead of '%s'."
+link: spec/guidance/voice.md
+level: error
+ignorecase: true
+swap:
+  "can't": cannot
+  "won't": will not
+  "don't": do not
+  "doesn't": does not
+  "didn't": did not
+  "isn't": is not
+  "aren't": are not
+  "wasn't": was not
+  "hasn't": has not
+  "haven't": have not
+  "it's": it is
+  "that's": that is
+  "there's": there is
+  "you're": you are
+  "they're": they are
+  "we've": we have
+  "I've": I have
+  "we'll": we will
+  "it'll": it will

@@ -1,0 +1,12 @@
+extends: substitution
+message: "Write it out: '%s' instead of '%s'."
+link: spec/guidance/voice.md
+level: error
+ignorecase: true
+nonword: true
+swap:
+  '\be\.g\.': for example
+  '\bi\.e\.': that is
+  '\betc\.': and so on
+  '\bviz\.': namely
+  '\bcf\.': compare

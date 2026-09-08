@@ -11,24 +11,40 @@ which stand on their own branches. It starts at level zero.
 Level zero is the rules that shape what the agent writes. It runs as a plugin
 whose hooks are a module, inside the harness process.
 
-That placement is the point. A tool registered at `session.start` is listed by
-turn one, so nothing waits for a build and nothing arrives late.
+That placement is the point. The harness lists a tool registered at
+`session.start` on turn one, so nothing waits for a build and nothing arrives
+late.
 
 Six cloud sessions in earlier lines died on a spawned server that had thirty
 seconds to answer. Removing the spawn ends that class of failure.
 
 What level zero holds today:
 
-- the voice rules, at the write door, so a write breaking one is refused
+- the write door, which runs Vale over a write and refuses one that breaks a rule
 - a refusal that names the rule and asks the writer to hold it for the turn
-- the rules as a section of the system prompt, computed here and written to no
-  file in the tree
-- three tools the model may call: `voice_check`, `voice_format` and
-  `voice_rules`
-- a linter over the same rules, for a person and for a build
+- the standing layer: every guidance note's Actionables chapter, appended to the
+  system prompt at session start and written to no file
+- a linter and a formatter over the same rules, for a person and for a build
+- its own install, so a first session guards a clone nobody has built
 
 There is no engine yet, no work tokens and no index. Level zero comes first
-because it holds whatever is built after it.
+because it holds whatever comes after it.
+
+## The rules, and where each one lives
+
+A rule a program can hold belongs to the program. Vale holds those, one file per
+rule under `spec/config/styles/VoiceQuackitect`, and the write door, the linter
+and the formatter all read that one folder.
+
+A rule needing judgement stays in `spec/guidance`, in the Actionables chapter of
+a note. Level zero appends those to the system prompt, so the agent meets them
+before it does anything.
+
+    ./RUNME.sh rules      the mechanical rules Vale holds
+    ./RUNME.sh standing   what the agent is handed every session
+
+Nothing writes either set into a file in the tree. A projection would need a
+guard to keep the copy honest, and a copy nobody can edit needs no guard.
 
 ## Running it
 
@@ -45,8 +61,8 @@ RUNME holds no logic. It calls `src/scripts/install.ps1` or `install.sh`, which
 names every dependency this tree takes, and then `src/scripts/cli.mjs`, which
 holds the verbs. A new dependency is a row in the install script.
 
-The plugin is enabled by `.claude/settings.json`, which is tracked. A clone is
-guarded on its first session with nothing typed and nothing installed. That
+`.claude/settings.json` turns the plugin on, and git tracks that file. So a
+clone guards its first session with nothing typed and nothing installed. The
 file carries no port and no path belonging to one machine, so it travels.
 
 ## The shape
@@ -54,25 +70,29 @@ file carries no port and no path belonging to one machine, so it travels.
     RUNME.sh / RUNME.ps1      install, then hand every argument through
     .claude/settings.json     the cage: one file, and it travels
     .claude-plugin/           this tree own marketplace, so a clone finds level 0
-    spec/guidance/voice.md    what each rule is for
+    .vale.ini                 which style reads which file
+    spec/guidance/            the rules needing judgement, one note each
+    spec/config/styles/       the rules Vale holds, one file each
     src/scripts/
       install.ps1 / .sh       every dependency this tree takes
       cli.mjs                 the verbs
     src/level0/
       hooks/level0.mjs        the module: the doors, and no rules
-      lib/                    the rules, in pure JavaScript
+      lib/                    calling Vale, reading guidance, wording a refusal
       test/                   the tests
 
-The rules live in `lib` and are pure JavaScript, so the module and the command
-line read one copy. A rule is written once and every door says the same thing
-about it.
+`lib` is pure JavaScript with no `node:` import, so the module and the command
+line load one copy. Somebody writes a rule once and every door says the same
+thing about it.
 
 ## What this tree does not carry
 
-No MCP server and no `.mcp.json`. The tools are registered inside the harness,
-so there is nothing to spawn and nothing to configure.
+No MCP server and no `.mcp.json`. Nothing spawns, so nothing can arrive late.
 
-No second settings file. The events that needed a per-machine port are hooks in
-the module now, so the cage is one tracked file.
+No prose tool the agent chooses to call. A tool the agent chooses is a tool the
+agent skips, so the write door is the gate.
+
+No second settings file. The module now takes the events that needed a
+per-machine port, so the cage stays one tracked file.
 
 No Copilot.

@@ -1,32 +1,43 @@
 // The command line. Everything a person or a build asks of this tree is a verb
 // here, and RUNME hands every argument through untouched.
 //
-// It is a client of the same rules level zero holds at the write door, so the
-// two never disagree about what is a breach.
+// It calls Vale through the same file level zero calls it through, so the write
+// door and this command never disagree about what is a breach.
 
-import { readFileSync, writeFileSync, readdirSync, statSync, existsSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { join, dirname, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
 
-import { check, applyFixes } from "../level0/lib/check.mjs";
-import { rules, judged } from "../level0/lib/rules.mjs";
+import { lintText, fromJson, unreasoned, valeBin, CONFIG } from "../level0/lib/vale.mjs";
+import { standingLayer } from "../level0/lib/guidance.mjs";
 import { line as asLine } from "../level0/lib/refuse.mjs";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
-const PROSE = /\.(md|markdown|txt)$/i;
-const SKIP = new Set([".git", "node_modules", ".se", ".claude", ".claude-plugin"]);
+const bin = join(root, valeBin(process.platform));
+const STYLES = join(root, "spec", "config", "styles", "VoiceQuackitect");
+const GUIDANCE = join(root, "spec", "guidance");
+
+// The shape level zero hands Vale, over spawnSync instead of $.process.run.
+const run = async (argv, init = {}) => {
+  const ran = spawnSync(argv[0], argv.slice(1), {
+    cwd: init.cwd ?? root,
+    input: init.stdin ?? "",
+    encoding: "utf8",
+    shell: false,
+  });
+  if (ran.error) throw ran.error;
+  return { exitCode: ran.status ?? 1, stdout: ran.stdout ?? "", stderr: ran.stderr ?? "" };
+};
 
 const verbs = {
-  check: {
-    says: "the tests, then the rules over the tree",
-    run: (where) => (test() || lint(where)),
-  },
-  lint: { says: "the voice rules over the tree, or over what you name", run: lint },
+  check: { says: "the tests, then the rules over the tree", run: async (w) => (test() || await lint(w)) },
+  lint: { says: "the rules over the tree, or over what you name", run: lint },
   fix: { says: "the fixes a program can make", run: fix },
-  test: { says: "the tests alone", run: test },
-  rules: { says: "the rules this tree holds, and why", run: listRules },
-  doctor: { says: "what is installed and what level zero found", run: doctor },
+  test: { says: "the tests alone", run: async () => test() },
+  rules: { says: "the mechanical rules Vale holds", run: async () => listRules() },
+  standing: { says: "what level zero hands the agent every session", run: async () => standing() },
+  doctor: { says: "what is installed, and what level zero found", run: async () => doctor() },
 };
 
 const argv = process.argv.slice(2);
@@ -41,71 +52,102 @@ if (verb === "help" || !verbs[verb]) {
   }
   process.exit(verb === "help" ? 0 : 2);
 }
-process.exit(verbs[verb].run(where.length ? where : ["."]) ?? 0);
+process.exit((await verbs[verb].run(where.length ? where : ["."])) ?? 0);
 
-function lint(where) {
-  const files = where.flatMap(walk);
-  let broken = 0;
+async function lint(where) {
+  if (!existsSync(bin)) {
+    console.error("Vale is missing. Run ./RUNME.sh once and it installs.");
+    return 2;
+  }
+
+  // Vale walks a folder itself, so the tree goes to it whole and the reading of
+  // what is prose stays Vale's.
+  const ran = await run([bin, "--config=" + CONFIG, "--output=JSON", "--no-exit", ...where]);
+  const found = fromJson(ran.stdout);
+
+  // The one rule Vale cannot hold, because it is about Vale's own marker.
+  for (const file of walk(where)) {
+    for (const one of unreasoned(readFileSync(file, "utf8"))) {
+      found.push({ ...one, file: show(file) });
+    }
+  }
+
+  if (!found.length) {
+    console.log("The rules pass.");
+    return 0;
+  }
+
   const perRule = new Map();
-
-  for (const file of files) {
-    for (const one of check(readFileSync(file, "utf8"))) {
-      broken++;
-      perRule.set(one.rule, (perRule.get(one.rule) ?? 0) + 1);
-      console.log(asLine(one, show(file)));
-    }
+  for (const one of found) {
+    perRule.set(one.rule, (perRule.get(one.rule) ?? 0) + 1);
+    console.log(asLine(one, show(one.file ?? where[0])));
   }
-
-  if (broken) {
-    console.log("");
-    for (const [rule, count] of [...perRule].sort((a, b) => b[1] - a[1])) {
-      console.log(`${String(count).padStart(6)}  ${rule}`);
-    }
-    console.log(`${String(broken).padStart(6)}  in ${files.length} file(s)`);
-    return 1;
+  console.log("");
+  for (const [rule, count] of [...perRule].sort((a, b) => b[1] - a[1])) {
+    console.log(`${String(count).padStart(6)}  ${rule}`);
   }
-  console.log(`The rules pass ${files.length} file(s).`);
-  return 0;
+  console.log(`${String(found.length).padStart(6)}  in all`);
+  return 1;
 }
 
-function fix(where) {
-  const files = where.flatMap(walk);
-  let changed = 0;
-  for (const file of files) {
-    const was = readFileSync(file, "utf8");
-    const now = applyFixes(was);
-    if (now === was) continue;
-    writeFileSync(file, now, { encoding: "utf8" });
-    changed++;
-    console.log(`fixed  ${show(file)}`);
+// Vale applies the fix a rule carries in its Action. A rule with no action is
+// left for lint, and this says nothing about it.
+async function fix(where) {
+  if (!existsSync(bin)) {
+    console.error("Vale is missing. Run ./RUNME.sh once and it installs.");
+    return 2;
   }
-  console.log(`${changed} file(s) changed, of ${files.length} read.`);
+  const ran = spawnSync(bin, ["fix", "--apply", ...where], {
+    cwd: root, encoding: "utf8", stdio: "inherit", shell: false,
+  });
+  if (ran.status !== 0) {
+    console.log("Vale applied no fix. Run ./RUNME.sh lint to see what is left.");
+  }
   return 0;
 }
 
 function test() {
   const ran = spawnSync(process.execPath, ["--test", "src/level0/test/*.test.mjs"], {
-    cwd: root,
-    stdio: "inherit",
+    cwd: root, stdio: "inherit",
   });
   return ran.status ?? 1;
 }
 
 function listRules() {
-  for (const one of [...rules, ...judged]) {
-    console.log(`${one.name}\n  why:     ${one.why}\n  instead: ${one.instead}\n`);
+  if (!existsSync(STYLES)) {
+    console.error("The style folder is missing.");
+    return 2;
+  }
+  for (const name of readdirSync(STYLES).filter((n) => n.endsWith(".yml"))) {
+    const text = readFileSync(join(STYLES, name), "utf8");
+    const message = /^message:\s*"?(.*?)"?\s*$/m.exec(text)?.[1] ?? "";
+    console.log(`${name.replace(/\.yml$/, "").padEnd(20)} ${message}`);
   }
   return 0;
 }
 
-// What is here and what is missing, so a person who runs into trouble has one
-// command that answers rather than a search.
+// What level zero appends to the system prompt: every guidance note's
+// Actionables chapter, and no other chapter.
+function standing() {
+  if (!existsSync(GUIDANCE)) {
+    console.error("There is no spec/guidance, so nothing is handed over.");
+    return 2;
+  }
+  const notes = readdirSync(GUIDANCE)
+    .filter((n) => n.endsWith(".md"))
+    .map((n) => ({ name: n, text: readFileSync(join(GUIDANCE, n), "utf8") }));
+  const said = standingLayer(notes);
+  console.log(said || "No guidance note carries an Actionables chapter.");
+  return 0;
+}
+
+// What is here and what is missing, so a person in trouble has one command that
+// answers rather than a search.
 function doctor() {
-  const bin = join(root, ".se", "bin");
   const rows = [
     ["node", process.version],
-    ["go", asked(["go", "version"])],
-    ["vale", existsSync(join(bin, valeName())) ? asked([join(bin, valeName()), "--version"]) : "missing"],
+    ["vale", existsSync(bin) ? asked([bin, "--version"]) : "missing, run ./RUNME.sh"],
+    ["rules", existsSync(STYLES) ? readdirSync(STYLES).filter((n) => n.endsWith(".yml")).length + " in the style folder" : "missing"],
     ["level zero stamp", readIf(join(root, ".se", "level0.stamp"))],
     ["cage", existsSync(join(root, ".claude", "settings.json")) ? "tracked, one file" : "missing"],
   ];
@@ -113,10 +155,6 @@ function doctor() {
     console.log(`${what.padEnd(18)} ${String(said).trim() || "missing"}`);
   }
   return 0;
-}
-
-function valeName() {
-  return process.platform === "win32" ? "vale.exe" : "vale";
 }
 
 function asked(argv) {
@@ -133,27 +171,31 @@ function readIf(path) {
   }
 }
 
-function walk(from) {
-  const path = join(root, from) === from ? from : from;
-  let how;
-  try {
-    how = statSync(path);
-  } catch {
-    console.error(`se: ${from} is not here`);
-    process.exit(2);
-  }
-  if (how.isFile()) return PROSE.test(path) ? [path] : [];
-
+function walk(where) {
   const out = [];
-  for (const entry of readdirSync(path, { withFileTypes: true })) {
-    if (SKIP.has(entry.name)) continue;
-    const under = join(path, entry.name);
-    if (entry.isDirectory()) out.push(...walk(under));
-    else if (PROSE.test(entry.name)) out.push(under);
+  const PROSE = /\.(md|markdown|txt)$/i;
+  const SKIP = new Set([".git", "node_modules", ".se", ".claude", ".claude-plugin"]);
+  const into = (path) => {
+    for (const entry of readdirSync(path, { withFileTypes: true })) {
+      if (SKIP.has(entry.name)) continue;
+      const under = join(path, entry.name);
+      if (entry.isDirectory()) into(under);
+      else if (PROSE.test(entry.name)) out.push(under);
+    }
+  };
+  for (const one of where) {
+    const path = join(root, one);
+    try {
+      if (readdirSync(path)) into(path);
+    } catch {
+      if (PROSE.test(path)) out.push(path);
+    }
   }
   return out;
 }
 
 function show(file) {
-  return relative(process.cwd(), file).split(sep).join("/");
+  const path = String(file);
+  const from = path.includes(root) ? relative(root, path) : path;
+  return from.split(sep).join("/");
 }

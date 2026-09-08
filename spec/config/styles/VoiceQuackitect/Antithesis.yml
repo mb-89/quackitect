@@ -1,0 +1,11 @@
+extends: existence
+message: "Say what is. '%s' opens a half that says what the thing is not."
+link: spec/guidance/voice.md
+level: error
+ignorecase: false
+tokens:
+  - 'rather than'
+  - 'instead of'
+  - 'and not'
+  - 'is not a'
+  - 'never'

@@ -1,58 +1,81 @@
-# The voice
+---
+kind: [[guidance]]
+scope: ["all output, agents and people"]
+out_of_scope: ["the mechanical rules, which the style folder holds"]
+depends_on: [[[spec/guidance/guidance]]]
+---
 
-The rules that shape what this project writes. Level zero holds them at the
-write door, so a write that breaks one is refused with the reason.
+# Motivation
 
-The rules themselves live in `src/level0/lib/rules.mjs`, declared once. This
-file says what each one is for. A rule and its reason are read by the write
-door, the linter and the language server, so all three say the same thing.
+Agents tend to write slop.
+The audience are non-native speakers and their patience runs short.
+So the prose stays terse and the vocabulary stays settled.
 
-## The rules a pattern holds
+This file holds the rules that need judgement.
+A rule a program can hold belongs to that program, so it leaves this file.
+For the mechanical rules, see [[spec/config/styles/VoiceQuackitect]].
 
-| rule | what it asks |
-|---|---|
-| `shouted-lead` | A paragraph opens as a sentence. A run of capitals in front of the prose shouts at a reader who has already agreed to read. |
-| `antithesis` | Say what is. A second half saying what the thing is not costs a clause and teaches nothing. |
-| `long-sentence` | A sentence holds 25 words, so a reader takes it in one pass. |
-| `long-paragraph` | A paragraph holds six sentences. A table and a list are not paragraphs and are not counted. |
-| `contraction` | Write both words. A contraction reads faster and translates worse. |
-| `latin-abbreviation` | Write the English words. A Latin short form is one more thing to decode. |
+# Actionables
 
-## The rule a model holds
+1. Three or more parallel things are a list, each with its status, in a chat answer as in a file. *
+2. Bottom line up front. The detail comes later, at the reader's discretion.
+3. State a fact only if you own it. Otherwise name where it lives: "For details, see [[link]]". *
+4. Use the same word for the same thing every time.
+5. Write what the audience needs and leak no internals.
+6. Say a thing once. A repetition in a spec, a finding or an answer is a defect. *
+7. History belongs in the commit message and stays off the current surface.
+8. A number something else answers stays out of the prose. The tree's count is the command that answers it. *
+9. A compression against a cap lists what it cut, each sentence surviving elsewhere or cut on purpose.
+10. Vale holds the mechanical rules and refuses at the write door. Read its message and hold that rule for the turn.
 
-`passive` asks for the active voice and for the actor to be named. No pattern
-separates a passive sentence from an active one, so this rule asks the model
-through `$.model.classify`, which runs on the session's own client.
+# Discussion
 
-A classifier that answers nothing writes the text. That is how this project
-treats any checker that cannot run. A check that is absent degrades the call
-and lets it through.
+## 1. Lists
 
-## Exemptions
+A paragraph naming seven things to do and two to decide is two lists wearing prose.
+The reader has to count, and cannot tell at a glance which item has which status.
+So parallel items go one to a line, with what stands against each: done, owed, or needing a decision.
+This binds a chat answer as much as a note, because the reader is the same.
 
-A rule that cannot be switched off is switched off everywhere. So a line may
-carry an exemption, and the exemption names its reason:
+## 3. Authority and provenance
 
-    <!-- voice antithesis = NO: the phrase is the thing being quoted here -->
+Every piece of knowledge has one authoritative representation.
+The thing that holds the information is the thing that states it.
+A test decides how many steps it runs, and a folder decides what is in it.
+A document repeating one of those makes a decision it does not own.
 
-The marker covers its own line and the line under it. An exemption naming no
-reason is refused the same as a breach. A rule switched off for no stated
-reason is a rule nobody trusts.
+A value in double brackets is a link.
+The brackets say how a reader sees it and how the engine walks it, and the name inside carries the value.
+A link resolves as a path first and then as a note name.
 
-## What is fixed and what is reported
+## 6. Say it once
 
-A rule carrying a fix is applied by `./RUNME.sh fix`. Three carry one today:
-`shouted-lead` sentence-cases the opening, `contraction` writes both words, and
-`latin-abbreviation` writes the English.
+A reader who meets the same sentence twice reads neither.
+So a thing is said once, where the reader needs it, and a second copy is a defect.
 
-Inside a run of capitals nothing tells an acronym from an ordinary word. So the
-fix lowers every word after the first, and a person restores an acronym.
+The copies drift.
+Somebody corrected a measurement in the copy a finding quoted, and left the other copy alone.
+The two totals then disagreed and named different worst cases.
 
-A rule with no fix is reported and left to a person.
+A constant moved into config is the same: the prose pinning the number is a second copy.
+So the paragraph states the rule and the literal appears only in the config file.
+A second mention names the first.
 
-## Where the rules do not reach
+## 8. Counts
 
-Fenced code carries none of these rules. A heading, a table, a list and a block
-quote are not paragraphs, so the two counting rules skip them.
+A count of files, tests or rules holds on the day somebody writes it and rots soon after.
+Nothing tells the reader which day that was.
+So the prose names the command and the reader runs it.
 
-The write door reads Markdown and text. Code is outside it today.
+A count of a list is the same fault and needs no time to go wrong.
+A sentence saying four regions above a list of six hands the reader two answers.
+The list cannot drift, because it is the items themselves.
+
+## 10. Why the mechanical rules left this file
+
+Fourteen rules stood here once and a program could hold half of them.
+An agent reading fourteen rules gives each less attention than it would give ten.
+A rule the write door already refuses teaches nothing by standing here too.
+
+So each rule a pattern can hold moved to the style folder, where Vale holds it.
+What remains needs a person or a model, and that is the whole of this chapter.

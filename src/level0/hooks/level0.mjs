@@ -3,133 +3,133 @@
 //
 // Nothing here waits for a build, so these rules hold on turn one of a clone
 // that has never been built. That is the whole reason this is a module: a tool
-// registered at session.start cannot arrive late, and six cloud sessions died
-// on a lane that could.
+// registered at session.start cannot arrive late, and six cloud sessions in
+// earlier lines died on a lane that could.
 //
-// The rules live in ../lib and are pure JavaScript, so the linter and the
-// language server read the same ones. This file holds the doors, no rules.
+// The rules live in spec/config/styles and Vale holds them. This file holds the
+// doors, and it holds no rule.
 
-import { check, judge, applyFixes } from "../lib/check.mjs";
-import { refusal, taught, line as asLine } from "../lib/refuse.mjs";
-import { rules, judged } from "../lib/rules.mjs";
+import { lintText, VALE } from "../lib/vale.mjs";
+import { refusal } from "../lib/refuse.mjs";
+import { standingLayer } from "../lib/guidance.mjs";
 
-// Prose the rules read. A fenced block inside one of these is left alone by
-// the checker itself.
+// The prose the write door reads. Vale itself decides what inside a file is
+// prose, so a fenced block and a table need no rule here.
 const PROSE = /\.(md|markdown|txt)$/i;
+const GUIDANCE = "spec/guidance";
 
 export function register(on, options) {
-  const held = new Set();
+  // Module state survives between hooks in one session, so the linter is found
+  // once and the door reads the answer.
+  let bin = null;
+  let standing = "";
 
   on("session.start", async ($, e, next) => {
-    await $.tool.register({
-      name: "voice_check",
-      description:
-        "Checks text against the project's voice rules and answers the breaches, "
-        + "one per line, with what to write instead. Takes the text, and the path it "
-        + "is destined for when there is one.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          text: { type: "string", description: "The text to check." },
-          path: { type: "string", description: "Where the text is destined." },
-        },
-        required: ["text"],
-      },
-    });
+    bin = await linterHere($);
+    if (!bin) bin = await install($);
+    standing = await readGuidance($);
 
-    await $.tool.register({
-      name: "voice_format",
-      description:
-        "Applies every voice fix a program can make to the text and answers the "
-        + "result. A rule with no fix is left for voice_check to report.",
-      inputSchema: {
-        type: "object",
-        properties: { text: { type: "string", description: "The text to format." } },
-        required: ["text"],
-      },
-    });
-
-    await $.tool.register({
-      name: "voice_rules",
-      description:
-        "Answers the voice rules this project holds, each with why it exists and "
-        + "what to write instead.",
-      inputSchema: { type: "object", properties: {} },
-    });
-
-    // The stamp says the module loaded, for a probe that cannot ask the session
-    // it is in. A plugin loads once per process, so a session can never see its
-    // own install.
     try {
-      await $.fs.writeFile(".se/level0.stamp", new Date().toISOString() + "\n");
+      await $.fs.writeFile(".se/level0.stamp",
+        new Date().toISOString() + " vale=" + (bin ?? "missing") + "\n");
     } catch {
-      // .se is runtime state and its absence is not a fault worth refusing a
-      // session over.
+      // .se is runtime state, and its absence is no reason to refuse a session.
     }
-
     return next(e);
   });
 
   // THE WRITE DOOR. A write carrying a breach is refused with the reason, and
-  // the reason teaches the rest of the turn rather than the one line.
+  // the reason teaches the rest of the turn.
   on("tool.call", async ($, e, next) => {
     const writing = asWrite(e);
     if (!writing) return next(e);
     if (!PROSE.test(writing.path)) return next(e);
+    // A checker that cannot run degrades the call and lets it through.
+    if (!bin) return next(e);
 
-    // The patterns run first and cost nothing. The judge spends a model call
-    // per sentence, so it runs only when the patterns pass.
-    let all = check(writing.text);
-    if (!all.length) {
-      all = await judge(writing.text, (text, labels) => $.model.classify(text, labels));
-    }
-    if (!all.length) return next(e);
-
-    for (const one of all) held.add(one.rule);
-    return { deny: refusal(shorten(writing.path), all) };
+    const said = await lintText(writing.text, shorten(writing.path), {
+      bin,
+      run: (argv, init) => $.process.run(argv, init),
+    });
+    if (!said.ran || !said.found.length) return next(e);
+    return { deny: refusal(shorten(writing.path), said.found) };
   });
 
-  on("tool.call", { tool: "mcp__level0__voice_check" }, async ($, e, next) => {
-    const text = String(e.text ?? "");
-    const where = String(e.path ?? "the text");
-    const found = check(text);
-    const said = await judge(text, (t, labels) => $.model.classify(t, labels));
-    const all = [...found, ...said].sort((a, b) => a.line - b.line);
-    if (!all.length) return { result: "The voice rules pass this text." };
-    return { result: all.map((one) => asLine(one, where)).join("\n") + "\n\n" + taught(all) };
-  });
-
-  on("tool.call", { tool: "mcp__level0__voice_format" }, async ($, e, next) => {
-    return { result: applyFixes(String(e.text ?? "")) };
-  });
-
-  on("tool.call", { tool: "mcp__level0__voice_rules" }, async ($, e, next) => {
-    const said = [...rules, ...judged].map(
-      (r) => `${r.name}\n  why:     ${r.why}\n  instead: ${r.instead}`,
-    );
-    return { result: said.join("\n\n") };
-  });
-
-  // THE STANDING LAYER, INJECTED. The rules reach the model as a section of the
-  // system prompt, computed here, so no file is projected into the tree and no
-  // guard is needed to keep one honest.
+  // THE STANDING LAYER, INJECTED AND NEVER PROJECTED. Every guidance note's
+  // Actionables chapter reaches the model as a section of the system prompt,
+  // computed here at session start.
+  //
+  // A projection would write the same text into a file in the tree, and then a
+  // guard would be needed to keep that copy honest. A copy nobody can edit
+  // needs no guard.
   on("prompt.section", async ($, e, next) => {
-    const said = [...rules, ...judged]
-      .map((r) => `- ${r.name}: ${r.why} ${r.instead}`)
-      .join("\n");
+    if (!standing) return next(e);
     return next({
       ...e,
-      text: [e.text, "", "## The voice", "", said, "",
-        "These rules are held at the write door, so a write breaking one is refused.",
-      ].filter(Boolean).join("\n"),
+      text: [
+        e.text,
+        "",
+        "## How this tree is worked",
+        "",
+        "These rules are handed to you before anything else. The mechanical ones",
+        "are refused at the write door, so a write breaking one comes back with",
+        "the reason.",
+        "",
+        standing,
+      ].join("\n"),
     });
   });
 }
 
-// A tool's arguments are spread onto the event beside `tool` and `tool_use_id`,
-// so the text is at `e.content` and never at `e.input.content`. Write, Edit and
-// the multi-edit form each carry it under a different key, so the door reads
-// all three and answers one shape.
+// The Actionables chapter of every guidance note, and no other chapter. The
+// argument behind a rule stays on disk for a reader who disagrees with it.
+async function readGuidance($) {
+  try {
+    const entries = await $.fs.listDir(GUIDANCE);
+    const notes = [];
+    for (const one of entries) {
+      if (!one.name.endsWith(".md")) continue;
+      notes.push({ name: one.name, text: await $.fs.readFile(GUIDANCE + "/" + one.name) });
+    }
+    return standingLayer(notes);
+  } catch {
+    return "";
+  }
+}
+
+async function linterHere($) {
+  for (const path of [VALE + ".exe", VALE]) {
+    try {
+      if (await $.fs.exists(path)) return path;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+// Level zero installs what it needs, so a first session on a fresh clone is
+// guarded without anybody having run RUNME first.
+async function install($) {
+  const ways = [
+    ["sh", "src/scripts/install.sh"],
+    ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "src\\scripts\\install.ps1"],
+  ];
+  for (const argv of ways) {
+    try {
+      const ran = await $.process.run(argv, { timeoutMs: 300000 });
+      if (ran.exitCode === 0) {
+        const found = await linterHere($);
+        if (found) return found;
+      }
+    } catch {
+      // A box may carry one shell and not the other. The next way answers.
+    }
+  }
+  return null;
+}
+
+
 // A refusal names the file the way a person writing it does, so the absolute
 // path the tool carries is cut to its last two parts.
 function shorten(path) {
@@ -137,6 +137,9 @@ function shorten(path) {
   return parts.slice(-2).join("/");
 }
 
+// A tool's arguments are spread onto the event beside `tool` and `tool_use_id`,
+// so the text is at `e.content` and never at `e.input.content`. Write, Edit and
+// the multi-edit form each carry it under a different key.
 function asWrite(e) {
   if (!e?.file_path) return undefined;
   if (e.tool === "Write") {

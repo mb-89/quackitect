@@ -1,0 +1,7 @@
+extends: occurrence
+message: "A sentence holds 25 words. Cut this one in two."
+link: spec/guidance/voice.md
+level: error
+scope: sentence
+max: 25
+token: '\b\w+\b'

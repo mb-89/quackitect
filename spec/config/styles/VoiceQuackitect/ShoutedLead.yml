@@ -1,0 +1,8 @@
+extends: existence
+message: "A paragraph opens plainly. Write '%s' as a sentence."
+link: spec/guidance/voice.md
+level: error
+scope: paragraph
+nonword: true
+tokens:
+  - '(?:^|(?<=[.!?]\s))[A-Z][A-Z0-9 ,''-]{9,}[.,:]'

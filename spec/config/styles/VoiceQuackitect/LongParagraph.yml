@@ -1,0 +1,7 @@
+extends: occurrence
+message: "A paragraph holds six sentences. Break this one."
+link: spec/guidance/voice.md
+level: error
+scope: paragraph
+max: 6
+token: '[.!?](?:\s|$)'

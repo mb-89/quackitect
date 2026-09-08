@@ -2,8 +2,8 @@
 // names the line, the phrase and what to write instead, and then asks the
 // writer to hold the rule for the rest of the turn.
 //
-// The last part is the one that pays. A refusal that teaches nothing about the
-// next line costs a round trip on every line, because the writer fixes the one
+// The last part is the one that pays. A refusal teaching nothing about the next
+// line costs a round trip on every line, because the writer fixes the one
 // sentence and writes the same fault again underneath it.
 
 export function refusal(where, found) {
@@ -12,10 +12,9 @@ export function refusal(where, found) {
   lines.push("");
 
   for (const one of found) {
-    lines.push(`  ${where}:${one.line}  ${one.rule}`);
-    if (one.said) lines.push(`    wrote:   ${cut(one.said)}`);
-    if (one.instead) lines.push(`    instead: ${one.instead}`);
-    lines.push(`    why:     ${one.why}`);
+    lines.push(`  ${where}:${one.line}:${one.column}  ${one.rule}`);
+    if (one.said) lines.push(`    wrote: ${cut(one.said)}`);
+    lines.push(`    ${one.message}`);
     lines.push("");
   }
 
@@ -24,7 +23,7 @@ export function refusal(where, found) {
 }
 
 // One sentence naming the rules this turn has now broken, so the writer holds
-// them for the rest of the turn rather than meeting them again line by line.
+// them for the rest of the turn.
 export function taught(found) {
   const names = [...new Set(found.map((f) => f.rule))];
   const list = names.length === 1
@@ -35,8 +34,7 @@ export function taught(found) {
 }
 
 export function line(one, where) {
-  return `${where}:${one.line}:${one.column ?? 1}: ${one.rule}: ${cut(one.said)}`
-    + (one.instead ? `  -> ${one.instead}` : "");
+  return `${where}:${one.line}:${one.column}: ${one.rule}: ${one.message}`;
 }
 
 function cut(said, at = 72) {
