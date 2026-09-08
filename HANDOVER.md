@@ -79,7 +79,10 @@ session says enough to feel it.
    zip carries a bare `lnav`. Both installers take that difference.
 5. The `file-pattern` in the brief is not valid JSON. A single backslash opens
    an escape, so the committed format doubles each one.
-6. `work` verbs return a number that tests assert on. The log line therefore
+6. One command line run is one session, so a working hour of `./RUNME.sh lint`
+   leaves a dozen small files. The caps hold the folder, and a reader opens the
+   folder with `--all` where a single file says too little.
+7. `work` verbs return a number that tests assert on. The log line therefore
    rides a promise only where a log door stands, so the fake-driven tests keep
    reading a number.
 
