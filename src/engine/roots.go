@@ -313,7 +313,7 @@ func (r Roots) Runtime(parts ...string) string {
 var theRuntimeRegisters = []string{
 	"actors.json", "arrivals.json", "asked.json", "binding.json", "calls.json",
 	"claims.json", "emergency.json", "engine.json", "evidence.json",
-	"failures.json", "grace.json", "heard.json", "hold.json", "holds.json",
+	"failures.json", "grace.json", "group.json", "heard.json", "hold.json", "holds.json",
 	"ideation.json", "looked.json", "owed.json", "parameters.json", "project.json",
 	"results.json", "stop-claim.json", "stops.json", "tested.json",
 	"tools.json",

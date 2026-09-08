@@ -49,6 +49,7 @@ var run = map[string]verb{
 	"view":    runView,
 	"move":    runMove,
 	"claim":   runClaim,
+	"group":   runGroup,
 	"lint":    runLint,
 	"format":  runFormat,
 	"hold":    runHold,

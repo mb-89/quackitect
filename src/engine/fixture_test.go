@@ -1636,6 +1636,40 @@ func aCloneWhoseBranchDisagrees(t *testing.T) (Roots, Token) {
 	return behind, tok
 }
 
+// ---- from the group tests ----
+
+// aBoxOverGroups is a work tree the group verbs can really run in: the shipped
+// processes, one commit, a bare origin of its own, and main tracking it.
+//
+// THE REMOTE IS REAL BECAUSE THE PUSH IS THE ARBITER. A group hold is settled by
+// a push winning or losing, and a fed git would answer whatever it was told.
+func aBoxOverGroups(t *testing.T) Roots {
+	t.Helper()
+	r := aTreeWithTheProcesses(t)
+	aBareOrigin(t, r)
+	if err := os.WriteFile(filepath.Join(r.Work, "README.md"), []byte("a box that works groups"+nl), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	mustGit(t, r.Work, "add", "--", "README.md")
+	mustGit(t, r.Work, "commit", "--quiet", "-m", "the tree as it stands")
+	mustGit(t, r.Work, "push", "--quiet", "--set-upstream", "origin", "main")
+	return r
+}
+
+// anotherBoxOverTheSameTree is a second box working the same repository.
+//
+// THE BOX IS DERIVED FROM THE METHOD ROOT, so a second method root over one work
+// tree is a second installation as far as claim.go is concerned. That makes a
+// race between two boxes something a test plants without a second clone.
+func anotherBoxOverTheSameTree(t *testing.T, r Roots) Roots {
+	t.Helper()
+	other := Roots{Method: t.TempDir(), Work: r.Work}
+	if Box(other) == Box(r) {
+		t.Fatal("the second method root answers the same box, so there is no race to plant")
+	}
+	return other
+}
+
 // ---- from thedigestseesitall_test.go ----
 
 func aTreeToProject(t *testing.T) Roots {

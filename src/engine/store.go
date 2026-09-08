@@ -292,13 +292,28 @@ func sections(body string) [][2]string {
 
 // noteMove writes what moved into the record. Whoever moves a token moves it
 // through SaveToken, so no caller writes these. See [[the-save-is-the-one-door]].
+// theKindOf says which kind of thing the line is about, so a reader sees a note
+// as a note.
+//
+// A NOTE IS NOT WORK AND THE LINE SAID IT WAS. Every mint wrote the kind work,
+// and a note was then told apart only by the word noted buried in the detail. A
+// person watching the log to see whether a note was written could not see one,
+// and had to ask. The kind is the column a reader scans, so it is the column
+// that has to say it.
+func theKindOf(t Token) string {
+	if unlink(t.Process) == "note" {
+		return "note"
+	}
+	return "work"
+}
+
 func noteMove(r Roots, t, was Token, existed bool) {
 	switch {
 	// The line says what happened, and it is not inferred from what is in it.
 	//
 	// Why it is this shape: [[the-line-says-what-happened]].
 	case !existed:
-		inSession(r, "work", orElse(t.Holder, "main"), t.ID+" minted "+t.Status+": "+t.Title, sessionlog.Yes(),
+		inSession(r, theKindOf(t), orElse(t.Holder, "main"), t.ID+" minted "+t.Status+": "+t.Title, sessionlog.Yes(),
 			map[string]any{"id": t.ID, "minted": true, "status": t.Status, "process": t.Process})
 	case was.Status != t.Status:
 		who := orElse(t.Holder, was.Holder)

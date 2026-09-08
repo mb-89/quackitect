@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"quackitect/engine/internal/sessionlog"
+	"strings"
 	"time"
 )
 
@@ -25,6 +26,7 @@ func runGroup(c *call) int {
 		fmt.Fprintln(c.err, "  se group --claim group/voice        take it, until it lapses")
 		fmt.Fprintln(c.err, "  se group --done group/voice         say it is finished")
 		fmt.Fprintln(c.err, "  se group --blocked group/voice --why \"a token needs a person\"")
+		fmt.Fprintln(c.err, "  se group --waits group/voice --on group/level0")
 		fmt.Fprintln(c.err, "")
 		fmt.Fprintln(c.err, "The hold lives in groups.json on "+claimsBranch+", where plain git reads")
 		fmt.Fprintln(c.err, "it cold. No entry means the group is free.")
@@ -38,6 +40,8 @@ func runGroup(c *call) int {
 	blocked := fs.String("blocked", "", "say this group is blocked, and why")
 	why := fs.String("why", "", "with blocked: what a person has to settle")
 	next := fs.Bool("next", false, "print one group nobody holds, and nothing where there is none")
+	waits := fs.String("waits", "", "say this group waits on others before it is handed out")
+	on := fs.String("on", "", "with waits: the groups it waits on, comma separated")
 	if code, stop := c.parse(fs, "group"); stop {
 		return code
 	}
@@ -55,7 +59,7 @@ func runGroup(c *call) int {
 
 	// AND A BOX THAT LOST THE GROUP DOES NOT SPEAK FOR IT. Saying done or blocked
 	// about a branch another box owns is the write the hold exists to prevent.
-	if why := WhyTheGroupIsLost(r); why != "" && (*done != "" || *blocked != "") {
+	if why := WhyTheGroupIsLost(r); why != "" && (*done != "" || *blocked != "" || *waits != "") {
 		c.refused = true
 		c.answerJSON(GroupResult{Refused: why})
 		return 1
@@ -69,9 +73,11 @@ func runGroup(c *call) int {
 		res = FinishTheGroup(c.ctx, r, *done, now)
 	case *blocked != "":
 		res = BlockTheGroup(c.ctx, r, *blocked, *why, now)
+	case *waits != "":
+		res = TheGroupWaitsOn(c.ctx, r, *waits, strings.Split(*on, ","), now)
 	default:
 		return c.fail(fmt.Errorf("say which: se group --next, --claim <name>, --done <name>, " +
-			"or --blocked <name> --why \"...\""))
+			"--blocked <name> --why \"...\", or --waits <name> --on <name>"))
 	}
 
 	if res.Refused != "" {

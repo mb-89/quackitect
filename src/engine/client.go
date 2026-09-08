@@ -176,6 +176,20 @@ func wantsCalls(verb string, args []string) bool {
 // asks and dropped by its writes, and it is this verb's alone: a snapshot
 // that outlived the verb would be a second truth in a process that lives.
 func runVerbInside(ctx context.Context, r Roots, ask verbAsk) verbAnswer {
+	// THE ENGINE HEARS THE AGENT HERE, AND NOWHERE ELSE.
+	//
+	// Every call an agent makes comes through this door, from the command line and
+	// from the lane alike. A group hold is renewed only while the engine has heard
+	// from an agent lately, so this is the moment that answers it. See group.go.
+	AnAgentSpoke(time.Now())
+	// AND A BOX THAT LOST ITS GROUP STOPS. Where the entry names another box this
+	// one carries on pushing into a branch somebody else owns, which is the state
+	// the hold exists to prevent. se group is let through, because what a box that
+	// lost one is told to do is ask for another.
+	if why := WhyTheGroupIsLost(r); why != "" && ask.Verb != "group" {
+		CountResult(r, true)
+		return verbAnswer{Err: "engine: " + why + "\n", Code: 1}
+	}
 	v, ok := run[ask.Verb]
 	if !ok {
 		return verbAnswer{Err: "engine: no such verb: " + ask.Verb + "\n", Code: Unread}

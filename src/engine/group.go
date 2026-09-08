@@ -49,6 +49,16 @@ type GroupEntry struct {
 	At     string `json:"at,omitempty"`
 	Lapses string `json:"lapses,omitempty"`
 	Why    string `json:"why,omitempty"`
+	// THE GROUPS THIS ONE WAITS ON, AND IT IS READ COLD. A scheduler with no
+	// engine has the whole answer in this file: a group waiting on one that is
+	// not done is not handed out, and the wait clears itself when the other
+	// group is finished. It is spelled as the token field is, because it is the
+	// same idea one level up.
+	//
+	// AN ENTRY MAY CARRY THIS AND NOTHING ELSE. A person declares the order
+	// before any box runs, so a group with no state, no holder and a depends_on
+	// is a group that is free but not yet workable.
+	DependsOn []string `json:"depends_on,omitempty"`
 }
 
 // TheGroups is the whole file, keyed by the branch name without refs/heads.
@@ -210,11 +220,29 @@ func whyTheGroupIsNotWorkable(r Roots, have TheGroups, name string, now time.Tim
 		return name + " is blocked: " + orElse(e.Why, "no reason was written") +
 			". A person settles that before a box takes it"
 	}
+	if waits := theGroupsItWaitsOn(have, e); len(waits) > 0 {
+		return name + " waits on " + strings.Join(waits, ", ") +
+			", which is not done. Ask for another group: se group --next"
+	}
 	if by := whoElseHolds(r, have, name, now); by != "" {
 		return name + " is held by " + by + " until " + e.Lapses +
 			". Ask for another group: se group --next"
 	}
 	return ""
+}
+
+// theGroupsItWaitsOn names the groups this entry waits on that are not finished.
+//
+// A GROUP WITH NO ENTRY IS NOT DONE. The zero value answers an empty state, so a
+// dependency nobody has ever worked reads as unfinished, which is what it is.
+func theGroupsItWaitsOn(have TheGroups, e GroupEntry) []string {
+	var out []string
+	for _, on := range e.DependsOn {
+		if have[on].State != GroupDone {
+			out = append(out, on)
+		}
+	}
+	return out
 }
 
 // GroupChange is one entry a publish writes into the file.
@@ -253,6 +281,13 @@ func applyTheGroupChange(r Roots, have TheGroups, change *GroupChange, now time.
 	}
 	if by := whoElseHolds(r, have, change.Name, now); by != "" {
 		return &groupLost{name: change.Name, by: by}
+	}
+	// THE WAIT SURVIVES EVERY OTHER WRITE, AND IN ONE PLACE. A claim, a renewal
+	// and a done each build a fresh entry, so a declared order would be dropped
+	// by whichever of them wrote next. Carrying it here means no writer has to
+	// remember it, and a writer that means to change it says so by setting it.
+	if old, ok := have[change.Name]; ok && len(change.Entry.DependsOn) == 0 {
+		change.Entry.DependsOn = old.DependsOn
 	}
 	have[change.Name] = change.Entry
 	return nil
@@ -322,6 +357,52 @@ func FinishTheGroup(ctx context.Context, r Roots, said string, now time.Time) Gr
 	}
 	entry := GroupEntry{State: GroupDone, By: Box(r), At: now.UTC().Format(ClaimStamp)}
 	return theGroupWrite(ctx, r, name, entry, "finished", now)
+}
+
+// TheGroupWaitsOn declares that a group is not handed out until others are done.
+//
+// IT IS THE ORDER SAID ONCE, WHERE THE SCHEDULER READS IT. Not cutting a branch
+// until the other group closes is the same order kept in somebody's head, and it
+// has to be remembered again every time. This is written down, it travels on the
+// claims branch, and it clears itself: the group becomes workable the moment the
+// one it waits on is done, with nobody to unblock it.
+//
+// IT IS NOT blocked. Blocked waits for a person and says why. This waits for a
+// group and says which, so an unattended loop can pass through it.
+func TheGroupWaitsOn(ctx context.Context, r Roots, said string, on []string, now time.Time) GroupResult {
+	name := aGroupName(said)
+	if name == "" {
+		return GroupResult{Refused: "name the group that waits: se group --waits group/voice --on group/level0"}
+	}
+	var deps []string
+	for _, one := range on {
+		d := aGroupName(one)
+		if d == "" || d == name {
+			continue
+		}
+		deps = append(deps, d)
+	}
+	if len(deps) == 0 {
+		return GroupResult{Group: name, Refused: "name what it waits on: se group --waits " +
+			name + " --on group/level0"}
+	}
+	_ = fetchTheRemoteClaims(ctx, r, "")
+	entry := theGroupsEverybodySees(ctx, r)[name]
+	entry.DependsOn = deps
+	res := GroupResult{Group: name, State: entry.State, By: entry.By, Lapses: entry.Lapses}
+	p := PublishTheGroup(ctx, r, &GroupChange{Name: name, Entry: entry, Now: now},
+		name+" waits on "+strings.Join(deps, ", "))
+	res.Published = &p
+	if !p.Pushed {
+		res.Refused = "the wait on " + name + " reached no other box: " + p.Says
+		if p.Lost != "" {
+			res.Refused = name + " is held by " + p.Lost + " now, so this box does not speak for it"
+		}
+		return res
+	}
+	res.Notice = name + " waits on " + strings.Join(deps, ", ") +
+		". It is handed out when they are done, and nobody has to unblock it."
+	return res
 }
 
 // BlockTheGroup writes blocked with the reason a person will read.
