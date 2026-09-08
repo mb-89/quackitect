@@ -10,7 +10,7 @@ import {
   formatText,
   lintText as lintCode,
 } from "../lib/code.js";
-import { standingLayer } from "../lib/guidance.js";
+import { onlyOf, standingLayer } from "../lib/guidance.js";
 import { judgeOf } from "../lib/judge.js";
 import { refusal, taught } from "../lib/refuse.js";
 import { readRule } from "../lib/rulefile.js";
@@ -37,7 +37,7 @@ export function register(on, _options) {
     bin = await linterHere($);
     if (!bin) bin = await install($);
     formatter = await formatterHere($);
-    standing = await readGuidance($);
+    standing = await readGuidance($, await onCloud($));
     config = await readConfig($);
     judge = judgeOf(config);
     handover = await takeHandover($);
@@ -205,20 +205,34 @@ async function erase($, path) {
   }
 }
 
-async function readGuidance($) {
+// [[spec/design_output/level0#guidance-that-binds-one-kind-of-box]]
+async function readGuidance($, cloud) {
   try {
     const entries = await $.fs.listDir(GUIDANCE);
     const notes = [];
     for (const one of entries) {
       if (!one.name.endsWith(".md")) continue;
-      notes.push({
-        name: one.name,
-        text: await $.fs.readFile(`${GUIDANCE}/${one.name}`),
-      });
+      const text = await $.fs.readFile(`${GUIDANCE}/${one.name}`);
+      const only = onlyOf(text);
+      if (only === "cloud" && !cloud) continue;
+      if (only === "desk" && cloud) continue;
+      notes.push({ name: one.name, text });
     }
     return standingLayer(notes);
   } catch {
     return "";
+  }
+}
+
+async function onCloud($) {
+  try {
+    const ran = await $.process.run(
+      ["node", "-p", "process.env.CLAUDE_CODE_REMOTE || process.env.SE_CLOUD || ''"],
+      { timeoutMs: 10000 },
+    );
+    return Boolean((ran.stdout ?? "").trim());
+  } catch {
+    return false;
   }
 }
 

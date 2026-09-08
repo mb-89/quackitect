@@ -62,6 +62,10 @@ export function actionables(text) {
   return out.map((one) => one.replace(/\s*\*$/, "").trim()).filter(Boolean);
 }
 
+export function onlyOf(text) {
+  return (parse(text).front.only ?? "").trim().toLowerCase();
+}
+
 export function standingLayer(notes) {
   const said = [];
   for (const note of notes) {

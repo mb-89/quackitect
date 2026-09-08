@@ -80,6 +80,18 @@ handover and the receipt arrive.
 The system prompt's sections stay free for guidance that depends on where the
 work stands.
 
+## Guidance that binds one kind of box
+
+A guidance note may carry `only: cloud` or `only: desk` in its frontmatter, and
+level zero hands it over on that kind of box alone.
+
+`CLAUDE_CODE_REMOTE` says which box this is, and `SE_CLOUD` says so on a harness
+the table does not know. `./RUNME.sh standing` reads the same variables, so a
+person sees what a cloud box sees by setting one.
+
+Every rule spends attention the other rules need, so a rule about pushing from
+a box that dies has no business on a desk.
+
 ## Why the rules stay out of the tree
 
 A projection writes the rules into a file, and a guard then has to keep that
