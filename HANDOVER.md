@@ -1,13 +1,16 @@
+---
+kind: [[handover]]
+status: todo
+---
+
 # Wire the language server
 
 Level zero holds its rules at the write door and on the command line. The editor
-shows none of them, so a person meets a rule after writing the line rather than
-while the cursor sits on it.
+shows none of them, so a person meets a rule one write too late.
 
 ## What is already settled
 
-Both language servers exist, so this work installs and configures rather than
-builds.
+Both language servers exist. This work installs and configures them.
 
 | server | holds | how it arrives |
 |---|---|---|
@@ -20,14 +23,13 @@ actions over a vocabulary and a code lens per document.
 
 ## Do this
 
-1. Add `vale-ls` to `src/scripts/install.sh` and `install.ps1`, pinned, one row
-   each beside Vale and Biome. Take the prebuilt binary into `.se/bin`.
+1. Add `vale-ls` to `src/scripts/install.sh` and `install.ps1`, one row each
+   beside Vale and Biome. Pin the version and take the binary into `.se/bin`.
 2. Write `.vscode/settings.json` naming both servers, so a clone opens with the
    rules live in the problems panel.
 3. Answer whether a `.claude` editor surface needs its own entry, and write what
    you find here.
-4. Add a `doctor` row for each server, so `./RUNME.sh doctor` says whether the
-   editor is wired.
+4. Add a `doctor` row for each server, so `./RUNME.sh doctor` names both.
 5. Leave the judged rules alone. They need a model per span, no language server
    speaks that, and `spec/config/styles/VoiceJudged` stays with the write door.
 
@@ -37,7 +39,7 @@ actions over a vocabulary and a code lens per document.
 - `./RUNME.sh doctor` names both servers and their versions
 - a breach opened in the editor draws a diagnostic carrying the same rule name
   the write door names
-- a cold clone reaches that state with one `./RUNME.sh` and nothing typed
+- a cold clone reaches that state with one `./RUNME.sh` and no setup
 
 ## Where to look
 
@@ -48,5 +50,7 @@ actions over a vocabulary and a code lens per document.
 
 ## When you finish
 
-Write what you did into this file, replacing this brief, then commit and push.
-Say what you tried that failed, because the next session pays for a repeat.
+1. Replace this brief with your result, keeping the frontmatter.
+2. Write a retro under `## Retro`: what surprised you, and every dead end you
+   walk into. The next session pays for a repeat.
+3. Run `./RUNME.sh work done`. It stamps the status and pushes.
