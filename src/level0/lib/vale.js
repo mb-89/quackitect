@@ -77,8 +77,6 @@ export function unreasoned(text) {
     }
     if (fenced) continue;
 
-    // A marker quoted in a code span is prose about the rule, and switches
-    // nothing off. Vale reads it the same way.
     const bare = lines[i].replace(/`[^`]*`/g, "");
     const found = MARKER.exec(bare);
     if (!found) continue;

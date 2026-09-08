@@ -10,10 +10,11 @@ import {
   formatText,
   lintText as lintCode,
 } from "../lib/code.js";
-import { standingLayer } from "../lib/guidance.js";
+import { bindsHere, envOf, standingLayer } from "../lib/guidance.js";
 import { judgeOf } from "../lib/judge.js";
 import { refusal, taught } from "../lib/refuse.js";
 import { readRule } from "../lib/rulefile.js";
+import { landsOnTrunk, touchesGit } from "../lib/trunk.js";
 import { lintText, VALE } from "../lib/vale.js";
 
 const PROSE = /\.(md|markdown|txt)$/i;
@@ -21,6 +22,7 @@ const GUIDANCE = "spec/guidance";
 const CONFIG = "spec/config/level0.json";
 const HANDOVER = ".se/HANDOVER.md";
 const BRIEF = "HANDOVER.md";
+const TRUNK = "main";
 const JUDGED = "spec/config/styles/VoiceJudged";
 
 const ANSWER = "level0-answer.md";
@@ -32,6 +34,8 @@ export function register(on, _options) {
   let config = {};
   let judge = judgeOf({});
   let handover = [];
+  let waiting = false;
+  let cloud = false;
 
   on("session.start", async ($, e, next) => {
     bin = await linterHere($);
@@ -41,6 +45,8 @@ export function register(on, _options) {
     config = await readConfig($);
     judge = judgeOf(config);
     handover = await takeHandover($);
+    cloud = await onACloudBox($);
+    waiting = cloud && !handover.length && (await onTrunk($));
 
     try {
       await $.fs.writeFile(
@@ -49,6 +55,29 @@ export function register(on, _options) {
       );
     } catch {}
     return next(e);
+  });
+
+  // [[spec/design_output/work#a-cloud-box-writes-to-its-own-branch]]
+  on("tool.call", { tool: "Bash" }, async ($, e, next) => {
+    if (!cloud) return next(e);
+    const said = String(e.command ?? "");
+    if (!touchesGit(said).commits && !touchesGit(said).pushes) return next(e);
+
+    const how = landsOnTrunk(said, await branchNow($), TRUNK);
+    if (!how) return next(e);
+
+    return {
+      deny: [
+        `This box works a branch, and ${TRUNK} belongs to a person.`,
+        "",
+        how === "commit"
+          ? `You stand on ${TRUNK}, so this commit would land there.`
+          : `This pushes ${TRUNK}, which no cloud box may move.`,
+        "",
+        "Run `./RUNME.sh work take` to take a branch and move onto it. Every",
+        "commit then lands where it belongs, and the merge stays a person's.",
+      ].join("\n"),
+    };
   });
 
   on("tool.call", async ($, e, next) => {
@@ -141,12 +170,45 @@ export function register(on, _options) {
           tracked
             ? `This branch carries its work in ${BRIEF}, which git tracks.`
             : `The last session on this box left ${HANDOVER}, which git ignores.`,
-          "Level zero has read it and deleted it, so act on it now.",
+          "LEVEL ZERO HAS ALREADY DELETED THAT FILE. Its text is below and it is",
+          "the only copy, so nothing carries it forward unless you write it again.",
+          "",
           tracked
-            ? `Write what you did back to ${BRIEF}, then commit and push it.`
-            : `Leave the next session a new ${HANDOVER} before you finish.`,
+            ? `Before you finish: write your result and your retro into ${BRIEF}, at`
+            : `Before you finish: write the next session a new ${HANDOVER}, at`,
+          tracked
+            ? "that same path, then run ./RUNME.sh work done, which pushes it."
+            : "that same path. Say what stands, what is next, and what surprises you.",
           "",
           one.text.trim(),
+        ].join("\n"),
+      });
+    }
+
+    if (waiting) {
+      blocks.push({
+        name: "level0-take-work",
+        text: [
+          "YOU ARE ON A CLOUD BOX, ON TRUNK, AND NO BRIEF REACHED YOU.",
+          "",
+          "Trunk carries no work of its own. The work waits on branches named",
+          "work/<something>, each carrying the brief that says what it is.",
+          "",
+          "Run this first:",
+          "",
+          "    ./RUNME.sh work take",
+          "",
+          "It takes the next branch nobody holds, moves you onto it, takes trunk",
+          "into it, and prints the brief. Do what the brief says, and finish the",
+          "way its own last section tells you to.",
+          "",
+          `EVERY COMMIT YOU MAKE BELONGS TO THAT BRANCH, AND NEVER TO ${TRUNK.toUpperCase()}.`,
+          "You start on trunk and you leave it at once. Level zero refuses a",
+          `commit standing on ${TRUNK}, and refuses a push naming it, so a mistake`,
+          "here costs you a refusal rather than the tree.",
+          "",
+          "It answers that nothing stands at todo where no work waits. Say so and",
+          "stop, because trunk is nobody's to work directly.",
         ].join("\n"),
       });
     }
@@ -200,20 +262,54 @@ async function erase($, path) {
   }
 }
 
+// [[spec/design_output/level0#guidance-a-variable-switches-on]]
 async function readGuidance($) {
   try {
     const entries = await $.fs.listDir(GUIDANCE);
     const notes = [];
+    const wanted = new Set();
     for (const one of entries) {
       if (!one.name.endsWith(".md")) continue;
-      notes.push({
-        name: one.name,
-        text: await $.fs.readFile(`${GUIDANCE}/${one.name}`),
-      });
+      const text = await $.fs.readFile(`${GUIDANCE}/${one.name}`);
+      notes.push({ name: one.name, text });
+      for (const name of envOf(text)) wanted.add(name);
     }
-    return standingLayer(notes);
+    const env = await readEnv($, [...wanted]);
+    return standingLayer(notes.filter((one) => bindsHere(one.text, env)));
   } catch {
     return "";
+  }
+}
+
+// [[spec/design_output/work#a-cloud-box-landing-on-trunk]]
+async function onACloudBox($) {
+  const env = await readEnv($, ["CLAUDE_CODE_REMOTE", "SE_CLOUD"]);
+  return bindsHere("---\nenv:\n  - CLAUDE_CODE_REMOTE\n  - SE_CLOUD\n---\n", env);
+}
+
+async function onTrunk($) {
+  return (await branchNow($)) === TRUNK;
+}
+
+async function branchNow($) {
+  try {
+    const ran = await $.process.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], {
+      timeoutMs: 10000,
+    });
+    return (ran.stdout ?? "").trim();
+  } catch {
+    return "";
+  }
+}
+
+async function readEnv($, names) {
+  if (!names.length) return {};
+  const script = `console.log(JSON.stringify(${JSON.stringify(names)}.reduce((o,n)=>(o[n]=process.env[n]??"",o),{})))`;
+  try {
+    const ran = await $.process.run(["node", "-e", script], { timeoutMs: 10000 });
+    return JSON.parse((ran.stdout ?? "{}").trim() || "{}");
+  } catch {
+    return {};
   }
 }
 

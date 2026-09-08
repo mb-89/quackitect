@@ -6,7 +6,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { biomeBin } from "../level0/lib/code.js";
-import { actionables, standingLayer } from "../level0/lib/guidance.js";
+import { actionables, bindsHere, standingLayer } from "../level0/lib/guidance.js";
 import { line as asLine } from "../level0/lib/refuse.js";
 import { CONFIG, fromJson, unreasoned, valeBin } from "../level0/lib/vale.js";
 import { work } from "./work.js";
@@ -184,7 +184,8 @@ function standing() {
   }
   const notes = readdirSync(GUIDANCE)
     .filter((n) => n.endsWith(".md"))
-    .map((n) => ({ name: n, text: readFileSync(join(GUIDANCE, n), "utf8") }));
+    .map((n) => ({ name: n, text: readFileSync(join(GUIDANCE, n), "utf8") }))
+    .filter(({ text }) => bindsHere(text, process.env));
   const said = standingLayer(notes);
   if (!said) {
     console.log("No guidance note carries an Actionables chapter.");
