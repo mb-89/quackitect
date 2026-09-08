@@ -1,12 +1,9 @@
 // The guidance parser, tested. Level zero hands the agent the Actionables
-// chapter of every note, so what that chapter parses to is worth a test.
+// chapter of every note, so what that chapter parses to is worth a test. The
+// cases reading the notes this tree ships stand in test/contract.
 
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
-
 import {
   actionables,
   bindsHere,
@@ -14,9 +11,6 @@ import {
   parse,
   standingLayer,
 } from "../lib/guidance.js";
-
-const root = dirname(dirname(dirname(dirname(fileURLToPath(import.meta.url)))));
-const GUIDANCE = join(root, "spec", "guidance");
 
 const note = `---
 kind: [[guidance]]
@@ -76,19 +70,6 @@ test("the standing layer carries no Discussion chapter", () => {
   assert.doesNotMatch(said, /Because of a thing that happened/);
 });
 
-test("every guidance note in this tree carries actionables", () => {
-  const notes = readdirSync(GUIDANCE).filter((n) => n.endsWith(".md"));
-  assert.ok(notes.length, "there is at least one guidance note");
-  for (const name of notes) {
-    const rules = actionables(readFileSync(join(GUIDANCE, name), "utf8"));
-    assert.ok(rules.length, `${name} carries an Actionables chapter`);
-    assert.ok(
-      rules.length <= 10,
-      `${name} holds ten rules or fewer, and holds ${rules.length}`,
-    );
-  }
-});
-
 test("a note naming no variable binds every box", () => {
   assert.equal(bindsHere(note, {}), true);
   assert.deepEqual(envOf(note), []);
@@ -116,13 +97,5 @@ test("an empty, zero or false value switches nothing on", () => {
       true,
       `${JSON.stringify(said)} is a value`,
     );
-  }
-});
-
-test("every guidance note in this tree names variables that exist or none", () => {
-  for (const name of readdirSync(GUIDANCE).filter((n) => n.endsWith(".md"))) {
-    for (const one of envOf(readFileSync(join(GUIDANCE, name), "utf8"))) {
-      assert.match(one, /^[A-Z][A-Z0-9_]*$/, `${name} names ${one} as a variable`);
-    }
   }
 });

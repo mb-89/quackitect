@@ -287,9 +287,7 @@ async function onACloudBox($) {
   return bindsHere("---\nenv:\n  - CLAUDE_CODE_REMOTE\n  - SE_CLOUD\n---\n", env);
 }
 
-// A routine runs on a branch the platform names, so asking for `main` by name
-// answers no on every routine. What matters is standing outside a work branch.
-// [[spec/design_output/work#a-cloud-box-landing-off-a-work-branch]]
+// [[spec/design_output/work#a-cloud-box-landing-off-a-work-branch]] says why.
 async function offAWorkBranch($) {
   return !(await branchNow($)).startsWith("work/");
 }
