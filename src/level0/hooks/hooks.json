@@ -1,0 +1,6 @@
+{
+  "description": "Level zero, as one module. Registers the voice tools at session.start and holds the write door.",
+  "modules": [
+    "./level0.mjs"
+  ]
+}

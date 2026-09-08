@@ -1,0 +1,8 @@
+# Runtime state. It is private to one box and never travels.
+.se/
+
+# The local cage does not exist in this tree. Level zero is enabled by the
+# tracked settings file, which carries no port and no machine-specific path.
+.claude/settings.local.json
+
+node_modules/

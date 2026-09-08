@@ -1,0 +1,13 @@
+{
+  "extraKnownMarketplaces": {
+    "quackitect": {
+      "source": {
+        "source": "directory",
+        "path": "${CLAUDE_PROJECT_DIR}"
+      }
+    }
+  },
+  "enabledPlugins": {
+    "level0@quackitect": true
+  }
+}
