@@ -55,3 +55,17 @@ that carry a fix a program can make:
 2. Write a retro under `## Retro`: what surprises you, and every dead end you
    walk into. The next session pays for a repeat.
 3. Run `./RUNME.sh work done`, which sets the status and pushes.
+
+## How this branch ends
+
+Level zero deletes this file when it reads it, so the copy in your context
+is the only one left. These steps put it back.
+
+1. Commit and push each time you finish a thing. A cloud box dies and takes
+   its working tree with it.
+2. Write your result and your retro into `HANDOVER.md`, at the root, replacing
+   this brief. Say what surprises you and every dead end you walk into.
+3. Run `./RUNME.sh work done`, which sets the status and pushes.
+4. Run `./RUNME.sh work release` instead where you stop early, so the branch
+   goes back to `todo` for somebody else.
+5. Leave the merge to a person. A cloud box opens no pull request.
