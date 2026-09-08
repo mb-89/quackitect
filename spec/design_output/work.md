@@ -75,14 +75,18 @@ Level zero notices that and hands over a block naming `./RUNME.sh work take`.
 So a box needs no prompt about work at all. Starting it on trunk is enough, and
 saying "take work" only agrees with what it already reads.
 
-Three things have to hold together for that block to appear: a cloud variable
-carries a value, the branch is `main`, and no handover reached the session. A
-desk session sees none of it.
+Three things hold together for that block to appear:
+
+- a cloud variable carries a value
+- the branch is `main`
+- no handover reaches the session
+
+A desk session sees none of it.
 
 # A cloud box writes to its own branch
 
-A box starts on trunk and moves off it in its first command, so the window for a
-commit landing in the wrong place is the minute before that.
+A box starts on trunk and leaves it in its first command. The window for a
+commit landing wrongly is the minute before that.
 
 Level zero refuses, on a cloud box:
 
@@ -90,10 +94,10 @@ Level zero refuses, on a cloud box:
 - a `git push` naming `main`, from any branch
 
 The refusal names `./RUNME.sh work take` as the way out. A desk box meets none
-of this, because a person on a desk merges deliberately.
+of it, because a person on a desk merges by choice.
 
-`work take` and `work done` reach git through the command line rather than
-through Bash, so the door sees the verb and leaves the plumbing alone.
+`work take` and `work done` reach git inside the command line, so the door sees
+the verb and leaves the plumbing alone.
 
 # Why a routine needs this
 
