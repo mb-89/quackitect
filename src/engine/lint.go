@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -57,6 +60,7 @@ type aLint struct {
 var theLints = []aLint{
 	{"tokens", LintTokens},
 	{"work tokens against their schema", LintWork},
+	{"harness files", LintNoMark},
 	{"icons", LintIcons},
 	{"limits", LintLimits},
 	{"guidance", LintGuidance},
@@ -114,6 +118,107 @@ func LintTokens(r Roots) []Finding {
 		}
 	}
 	return out
+}
+
+// theFoldersAHarnessLoads names where a harness reads files from.
+//
+// THE FOLDER IS THE UNIT AND NOT A LIST OF FILES. A plugin arrives as a folder
+// somebody drops in, and spec/config/projections.json says only what this tree
+// writes. A check over the declared names would pass exactly the file nothing
+// declared, which is the file the mark was measured on.
+var theFoldersAHarnessLoads = []string{".claude", ".copilot", ".github"}
+
+// theMark is the three bytes a file a harness loads must not begin with.
+var theMark = []byte{0xEF, 0xBB, 0xBF}
+
+// theWriterMenu names the call that writes the mark and the call that does not.
+//
+// A DIAGNOSIS LEAVES THE READER WHERE IT FOUND THEM. The mark is the default of
+// the shell a fresh Windows box has, so a reader told only that one is there
+// writes the next file the same way. The finding carries what to type instead.
+const theWriterMenu = "Windows PowerShell 5.1 writes one from Set-Content -Encoding utf8 " +
+	"and from Out-File -Encoding utf8. " +
+	"[IO.File]::WriteAllText($path, $text, [Text.UTF8Encoding]::new($false)) writes none."
+
+// LintNoMark names every file a harness loads that begins with a byte order mark.
+//
+// A MARK PRODUCES NO ERROR ON ANY PATH. Measured 2026-09-08: a plugin carrying
+// EF BB BF kept its command in autocomplete, because plugin.json and SKILL.md
+// still parsed, and its hooks module never loaded. No tool was registered, no
+// line was written, and nothing named a fault. It reads exactly like a feature
+// that is not present, and it cost a session to find.
+func LintNoMark(r Roots) []Finding {
+	var out []Finding
+	for _, at := range theFilesAHarnessLoads(r) {
+		if !beginsWithTheMark(at) {
+			continue
+		}
+		said, err := filepath.Rel(r.Work, at)
+		if err != nil {
+			said = at
+		}
+		out = append(out, Finding{ID: filepath.ToSlash(said), Title: "a file the harness loads",
+			Says: "begins with a byte order mark, so the harness reads the file and loads " +
+				"nothing from it. " + theWriterMenu})
+	}
+	return out
+}
+
+// theFilesAHarnessLoads answers every file under the harness folders, and every
+// target this tree declares beside them.
+//
+// A FOLDER THIS TREE DOES NOT HAVE HOLDS NO FILE, so a walk that cannot start
+// is not a finding. What the declaration adds is the file at the root: .mcp.json
+// carries the tool lane and no folder above it says what reads it.
+func theFilesAHarnessLoads(r Roots) []string {
+	seen := map[string]bool{}
+	var out []string
+	add := func(at string) {
+		if !seen[at] {
+			seen[at] = true
+			out = append(out, at)
+		}
+	}
+	for _, name := range theFoldersAHarnessLoads {
+		_ = filepath.WalkDir(filepath.Join(r.Work, name), func(at string, d fs.DirEntry, err error) error {
+			if err == nil && !d.IsDir() {
+				add(at)
+			}
+			return nil
+		})
+	}
+	list, err := LoadProjections(r.Method)
+	if err != nil {
+		return out
+	}
+	for _, p := range list {
+		if p.Target == "" {
+			continue
+		}
+		at := filepath.Join(r.Work, filepath.FromSlash(p.Target))
+		if info, err := os.Stat(at); err == nil && !info.IsDir() {
+			add(at)
+		}
+	}
+	return out
+}
+
+// beginsWithTheMark reads the first three bytes and says whether they are it.
+//
+// A FILE THIS CANNOT OPEN IS NOT A FINDING. The corpus is a walk of what is on
+// the disk, so a file that goes between the walk and the read is the walk being
+// a moment old rather than a mark anybody wrote.
+func beginsWithTheMark(at string) bool {
+	f, err := os.Open(at)
+	if err != nil {
+		return false
+	}
+	defer f.Close()
+	head := make([]byte, len(theMark))
+	if _, err := io.ReadFull(f, head); err != nil {
+		return false
+	}
+	return bytes.Equal(head, theMark)
 }
 
 // LintIcons names every icon a control asks for that the table does not hold.
