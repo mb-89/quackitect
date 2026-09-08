@@ -10,6 +10,9 @@ import { join } from "node:path";
 export const BRIEF = "HANDOVER.md";
 const TRUNK = "main";
 
+// [[spec/design_output/work#a-merged-branch-closes]]
+export const MINE = /^(work|claude)\//;
+
 export const TODO = "todo";
 export const HELD = "held";
 export const DONE = "done";
@@ -59,6 +62,52 @@ export function statusOf(text) {
   if (!front) return "";
   const said = /^status:\s*(\S+)\s*$/m.exec(front[1]);
   return said ? said[1].toLowerCase() : "";
+}
+
+export const URGENCY = ["now", "soon", "whenever"];
+
+// [[spec/design_output/work#urgency-and-what-a-branch-waits-for]]
+export function urgencyOf(text) {
+  const said = frontField(text, "urgency").toLowerCase();
+  return URGENCY.includes(said) ? said : "soon";
+}
+
+export function dependsOn(text) {
+  const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(String(text ?? ""));
+  if (!front) return [];
+
+  const out = [];
+  let reading = false;
+  for (const row of front[1].split(/\r?\n/)) {
+    const opens = /^depends_on:\s*(.*)$/.exec(row);
+    if (opens) {
+      reading = true;
+      for (const one of opens[1].split(",")) out.push(one);
+      continue;
+    }
+    if (!reading) continue;
+    const item = /^\s*-\s+(.*)$/.exec(row);
+    if (item) {
+      out.push(item[1]);
+      continue;
+    }
+    if (row.trim()) reading = false;
+  }
+  return out.map((one) => one.trim().replace(/^work\//, "")).filter(Boolean);
+}
+
+function frontField(text, key) {
+  const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(String(text ?? ""));
+  if (!front) return "";
+  const said = new RegExp(`^${key}:\\s*(.+?)\\s*$`, "m").exec(front[1]);
+  return said ? said[1] : "";
+}
+
+export function waitingOn(text, standing) {
+  return dependsOn(text).filter((name) => {
+    const status = standing.get(`work/${name}`);
+    return status === TODO || status === HELD;
+  });
 }
 
 export function setStatus(text, to) {
@@ -205,13 +254,32 @@ function newWork(root, name) {
 // [[spec/design_output/work#why-a-routine-needs-this]]
 function take(root) {
   if (dirty(root)) return 2;
-  const open = branches(root).filter((b) => statusOf(briefOf(root, b)) === TODO);
+
+  const briefs = new Map(branches(root).map((b) => [b, briefOf(root, b)]));
+  const standing = new Map([...briefs].map(([b, text]) => [b, statusOf(text)]));
+  const open = [...briefs].filter(([, text]) => statusOf(text) === TODO);
+
   if (!open.length) {
     console.log(`No work branch stands at ${TODO}. Nothing to take.`);
     return 0;
   }
 
-  const branch = open[0];
+  const free = open.filter(([, text]) => !waitingOn(text, standing).length);
+  if (!free.length) {
+    console.log(`Every branch at ${TODO} waits for another. Nothing to take.`);
+    for (const [b, text] of open) {
+      console.log(`  ${b} waits for ${waitingOn(text, standing).join(", ")}`);
+    }
+    return 0;
+  }
+
+  free.sort(
+    (a, b) =>
+      URGENCY.indexOf(urgencyOf(a[1])) - URGENCY.indexOf(urgencyOf(b[1])) ||
+      a[0].localeCompare(b[0]),
+  );
+
+  const branch = free[0][0];
   if (!git(root, ["switch", branch], true).ok) {
     if (!git(root, ["switch", "-c", branch, `origin/${branch}`]).ok) return 1;
   }
@@ -301,11 +369,14 @@ function list(root) {
     console.log("No work branch stands.");
     return 0;
   }
+  const briefs = new Map(all.map((b) => [b, briefOf(root, b)]));
+  const standing = new Map([...briefs].map(([b, text]) => [b, statusOf(text)]));
   for (const branch of all) {
-    const status = statusOf(briefOf(root, branch)) || "no status";
-    console.log(
-      `${branch.padEnd(34)} ${status.padEnd(10)} ${whoTouched(root, branch)}`,
-    );
+    const text = briefs.get(branch);
+    const status = statusOf(text) || "no status";
+    const waits = waitingOn(text, standing);
+    const why = waits.length ? `waits for ${waits.join(", ")}` : urgencyOf(text);
+    console.log(`${branch.padEnd(34)} ${status.padEnd(6)} ${why.padEnd(24)}`);
   }
   return 0;
 }
@@ -373,7 +444,7 @@ function close(root, name, argv) {
     git(root, ["branch", "-r", "--merged", `origin/${TRUNK}`], true)
       .out.split("\n")
       .map((row) => row.trim().replace("origin/", ""))
-      .filter((row) => row.startsWith("work/")),
+      .filter((row) => MINE.test(row)),
   );
 
   const wanted = name ? [`work/${name}`] : [...inTrunk];

@@ -99,6 +99,31 @@ of it, because a person on a desk merges by choice.
 `work take` and `work done` reach git inside the command line, so the door sees
 the verb and leaves the plumbing alone.
 
+# Urgency and what a branch waits for
+
+The frontmatter carries two more fields, and `work take` reads both:
+
+    urgency: now
+    depends_on:
+      - doors-and-fakes
+
+`take` drops every branch waiting on one still at `todo` or `held`, then sorts
+what is left by urgency: `now`, `soon`, `whenever`. A branch naming no urgency
+reads as `soon`.
+
+A dependency is met once the branch it names reaches `done`, or goes because
+somebody merged and closed it. So a chain of work runs itself in order, with
+nobody holding the order in their head.
+
+`work list` shows what each branch waits for, in place of its urgency.
+
+# A cloud box landing off a work branch
+
+A routine run starts on a branch the platform names, such as
+`claude/gracious-hawking-zepc6h`, so asking whether the branch is `main` answers
+no on every routine. What matters is standing outside a work branch, and that is
+what level zero asks.
+
 # Why a routine needs this
 
 A routine starts on `main` and takes no branch argument, so a pointed cloud
