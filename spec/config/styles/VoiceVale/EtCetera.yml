@@ -1,0 +1,12 @@
+# This rule carries no action. `etc.` ends a sentence as often as it stands
+# inside one, and its full stop belongs to the sentence in the first case and
+# to the abbreviation in the second. Vale reads one replacement per matched
+# text, so it cannot tell the two apart. A person writes this one out.
+extends: substitution
+message: "Write it out: '%s' instead of '%s', and keep the full stop the sentence needs."
+link: spec/guidance/voice.md
+level: error
+nonword: true
+swap:
+  '\betc\.': "and so on"
+  '\bEtc\.': "And so on"

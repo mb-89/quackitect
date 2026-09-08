@@ -50,6 +50,20 @@ function Get-Vale {
   Remove-Item $zip -Force
 }
 
+function Get-ValeLs {
+  $arch = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "arm64" } else { "64-bit" }
+  $servers = Join-Path $root "src\level0\lib\servers.js"
+  $from = & node --input-type=module -e "import { valeLsUrl } from 'file:///$($servers -replace '\\','/')'; process.stdout.write(valeLsUrl('Windows', '$arch'));"
+  if (-not $from) { throw "vale-ls ships no binary for Windows $arch." }
+  $zip = Join-Path $env:TEMP (Split-Path $from -Leaf)
+
+  Write-Host "  downloading vale-ls" -ForegroundColor Cyan
+  New-Item -ItemType Directory -Force $binDir | Out-Null
+  Invoke-WebRequest -Uri $from -OutFile $zip -UseBasicParsing
+  Expand-Archive -LiteralPath $zip -DestinationPath $binDir -Force
+  Remove-Item $zip -Force
+}
+
 function Get-Biome {
   $arch = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "arm64" } else { "x64" }
   $from = "https://github.com/biomejs/biome/releases/download/@biomejs/biome@$biomeVersion/biome-win32-$arch.exe"
@@ -77,6 +91,14 @@ $needed = @(
     why  = "Biome formats and lints the JavaScript in this tree"
     have = { Test-Path (Join-Path $binDir "biome.exe") }
     get  = { Get-Biome }
+  },
+  @{
+    name   = "vale-ls"
+    why    = "the Vale language server, so an editor draws the same rules"
+    have   = { Test-Path (Join-Path $binDir "vale-ls.exe") }
+    get    = { Get-ValeLs }
+    # The editor wants this one, and the doors hold without it.
+    wanted = $true
   }
 )
 
@@ -86,6 +108,13 @@ if ($missing.Count -eq 0) { exit 0 }
 Write-Host "Installing what this tree needs." -ForegroundColor Cyan
 foreach ($one in $missing) {
   Write-Host "$($one.name): $($one.why)"
+  if ($one.wanted) {
+    try { & $one.get } catch { Write-Warning $_.Exception.Message }
+    if (-not (& $one.have)) {
+      Write-Warning "  $($one.name) stays missing, so the editor manages its own copy."
+    }
+    continue
+  }
   & $one.get
   if (-not (& $one.have)) {
     Write-Error "$($one.name) is still missing after installing it. Open a new terminal and run this again."

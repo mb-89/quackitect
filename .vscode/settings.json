@@ -1,0 +1,30 @@
+{
+  "vale.valeCLI.installVale": false,
+  "vale.valeCLI.path": ".se/bin/vale",
+  "vale.valeCLI.config": ".vale.ini",
+  "vale.valeCLI.minAlertLevel": "inherited",
+  "vale.valeCLI.lintOnChange": true,
+  "vale.enableSpellcheck": false,
+  "biome.lsp.bin": {
+    "linux-x64": ".se/bin/biome",
+    "linux-arm64": ".se/bin/biome",
+    "linux-x64-musl": ".se/bin/biome",
+    "linux-arm64-musl": ".se/bin/biome",
+    "darwin-x64": ".se/bin/biome",
+    "darwin-arm64": ".se/bin/biome",
+    "win32-x64": ".se/bin/biome.exe",
+    "win32-arm64": ".se/bin/biome.exe"
+  },
+  "biome.configurationPath": "spec/config/biome.json",
+  "biome.requireConfiguration": true,
+  "editor.formatOnSave": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "biomejs.biome"
+  }
+}

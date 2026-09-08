@@ -1,4 +1,9 @@
 {
+  "$comment": "THE CAGE, AND IT TRAVELS. Every value here is the same on every box, so git tracks it and a clone is guarded on its first session with nothing typed. A port or a machine path in this file would be dirt on every clone but one, which is why neither is here.",
+  "$env": "FUNCTION HOOKS SIT BEHIND A ROLLOUT FLAG, AND THIS IS THE WAY PAST IT. The client reads CLAUDE_CODE_ENABLE_FUNCTION_HOOKS before it asks the flag, so setting it here turns level zero on for every box that clones this tree, the cloud included, rather than for whoever remembered to export it. THE CHECK IS PRESENCE AND NOT VALUE: a 0 here turns it on too, and only deleting the key turns it off. Without it a box loads no hooks module and says nothing about it, so the rules, the brief and the receipt are all absent and nothing names a fault.",
+  "env": {
+    "CLAUDE_CODE_ENABLE_FUNCTION_HOOKS": "1"
+  },
   "extraKnownMarketplaces": {
     "quackitect": {
       "source": {

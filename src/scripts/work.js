@@ -3,9 +3,11 @@
 // where that work stands.
 // [[spec/design_output/work#the-round-trip]]
 
-
 export const BRIEF = "HANDOVER.md";
 const TRUNK = "main";
+
+// [[spec/design_output/work#a-merged-branch-closes]]
+export const MINE = /^(work|claude)\//;
 
 export const TODO = "todo";
 export const HELD = "held";
@@ -21,6 +23,8 @@ export function work(root, argv, doors) {
     sync,
     done: finish,
     release,
+    merge,
+    close,
     read,
     list,
     collect,
@@ -36,10 +40,12 @@ export function work(root, argv, doors) {
     console.log("  release       put this branch, or the one you name, back to todo");
     console.log("  read <name>   print what stands on work/<name>");
     console.log("  list          every work branch and its status");
+    console.log("  merge <name>  take a done branch into main");
+    console.log("  close [name]  delete a branch already inside main, or every one");
     console.log("  collect       every branch marked done, waiting on a merge");
     return what ? 2 : 0;
   }
-  return doing[what](it, name);
+  return doing[what](it, name, argv);
 }
 
 export function statusOf(text) {
@@ -47,6 +53,52 @@ export function statusOf(text) {
   if (!front) return "";
   const said = /^status:\s*(\S+)\s*$/m.exec(front[1]);
   return said ? said[1].toLowerCase() : "";
+}
+
+export const URGENCY = ["now", "soon", "whenever"];
+
+// [[spec/design_output/work#urgency-and-what-a-branch-waits-for]]
+export function urgencyOf(text) {
+  const said = frontField(text, "urgency").toLowerCase();
+  return URGENCY.includes(said) ? said : "soon";
+}
+
+export function dependsOn(text) {
+  const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(String(text ?? ""));
+  if (!front) return [];
+
+  const out = [];
+  let reading = false;
+  for (const row of front[1].split(/\r?\n/)) {
+    const opens = /^depends_on:\s*(.*)$/.exec(row);
+    if (opens) {
+      reading = true;
+      for (const one of opens[1].split(",")) out.push(one);
+      continue;
+    }
+    if (!reading) continue;
+    const item = /^\s*-\s+(.*)$/.exec(row);
+    if (item) {
+      out.push(item[1]);
+      continue;
+    }
+    if (row.trim()) reading = false;
+  }
+  return out.map((one) => one.trim().replace(/^work\//, "")).filter(Boolean);
+}
+
+function frontField(text, key) {
+  const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(String(text ?? ""));
+  if (!front) return "";
+  const said = new RegExp(`^${key}:\\s*(.+?)\\s*$`, "m").exec(front[1]);
+  return said ? said[1] : "";
+}
+
+export function waitingOn(text, standing) {
+  return dependsOn(text).filter((name) => {
+    const status = standing.get(`work/${name}`);
+    return status === TODO || status === HELD;
+  });
 }
 
 export function setStatus(text, to) {
@@ -71,11 +123,6 @@ function branches(it) {
 
 function briefOf(it, branch) {
   const said = it.git.run(["show", `origin/${branch}:${BRIEF}`], true);
-  return said.ok ? said.out : "";
-}
-
-function whoTouched(it, branch) {
-  const said = it.git.run(["log", "-1", "--format=%an", `origin/${branch}`], true);
   return said.ok ? said.out : "";
 }
 
@@ -138,7 +185,7 @@ export function withContract(brief) {
     CONTRACT_HEADING,
     "",
     "Level zero deletes this file when it reads it, so the copy in your context",
-    "is the only one left. These steps put it back.",
+    "is the only one left. These steps write it back.",
     "",
     `1. Run \`./RUNME.sh work sync\` FIRST. It takes ${TRUNK} into this branch, so`,
     "   an old branch works against what the tree holds now. Resolve any conflict",
@@ -193,13 +240,32 @@ function newWork(it, name) {
 // [[spec/design_output/work#why-a-routine-needs-this]]
 function take(it) {
   if (dirty(it)) return 2;
-  const open = branches(it).filter((b) => statusOf(briefOf(it, b)) === TODO);
+
+  const briefs = new Map(branches(it).map((b) => [b, briefOf(it, b)]));
+  const standing = new Map([...briefs].map(([b, text]) => [b, statusOf(text)]));
+  const open = [...briefs].filter(([, text]) => statusOf(text) === TODO);
+
   if (!open.length) {
     console.log(`No work branch stands at ${TODO}. Nothing to take.`);
     return 0;
   }
 
-  const branch = open[0];
+  const free = open.filter(([, text]) => !waitingOn(text, standing).length);
+  if (!free.length) {
+    console.log(`Every branch at ${TODO} waits for another. Nothing to take.`);
+    for (const [b, text] of open) {
+      console.log(`  ${b} waits for ${waitingOn(text, standing).join(", ")}`);
+    }
+    return 0;
+  }
+
+  free.sort(
+    (a, b) =>
+      URGENCY.indexOf(urgencyOf(a[1])) - URGENCY.indexOf(urgencyOf(b[1])) ||
+      a[0].localeCompare(b[0]),
+  );
+
+  const branch = free[0][0];
   if (!it.git.run(["switch", branch], true).ok) {
     if (!it.git.run(["switch", "-c", branch, `origin/${branch}`]).ok) return 1;
   }
@@ -289,13 +355,103 @@ function list(it) {
     console.log("No work branch stands.");
     return 0;
   }
+  const briefs = new Map(all.map((b) => [b, briefOf(it, b)]));
+  const standing = new Map([...briefs].map(([b, text]) => [b, statusOf(text)]));
   for (const branch of all) {
-    const status = statusOf(briefOf(it, branch)) || "no status";
-    console.log(
-      `${branch.padEnd(34)} ${status.padEnd(10)} ${whoTouched(it, branch)}`,
-    );
+    const text = briefs.get(branch);
+    const status = statusOf(text) || "no status";
+    const waits = waitingOn(text, standing);
+    const why = waits.length ? `waits for ${waits.join(", ")}` : urgencyOf(text);
+    console.log(`${branch.padEnd(34)} ${status.padEnd(6)} ${why.padEnd(24)}`);
   }
   return 0;
+}
+
+// [[spec/design_output/work#a-merged-branch-goes]]
+function merge(it, name) {
+  if (dirty(it)) return 2;
+  const branch = name ? `work/${name}` : "";
+  if (!branch) {
+    console.error("work merge needs a name: ./RUNME.sh work merge fix-lsp");
+    return 2;
+  }
+
+  const on = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
+  if (on !== TRUNK) {
+    console.error(`work merge runs on ${TRUNK}, and this is ${on}.`);
+    return 2;
+  }
+
+  it.git.run(["fetch", "--prune", "origin"], true);
+  const status = statusOf(briefOf(it, branch));
+  if (status !== DONE) {
+    console.error(`${branch} stands at ${status || "no status"}, so it is not ready.`);
+    return 1;
+  }
+
+  if (!it.git.run(["merge", "--no-ff", "--no-edit", `origin/${branch}`]).ok) {
+    console.error(`${branch} conflicts. Resolve it, commit, then run work close.`);
+    return 1;
+  }
+
+  if (it.git.run(["rm", "--cached", "-q", BRIEF], true).ok) {
+    dropBrief(it);
+    it.git.run(["commit", "--amend", "--no-edit"], true);
+  }
+
+  console.log(`${branch} is merged. Run ./RUNME.sh check, then work sweep.`);
+  return 0;
+}
+
+function dropBrief(it) {
+  const path = it.join(it.root, BRIEF);
+  if (it.disk.exists(path)) it.disk.remove(path);
+}
+
+// [[spec/design_output/work#a-merged-branch-closes]]
+function close(it, name, argv) {
+  const forced = (argv ?? []).includes("--force");
+  it.git.run(["fetch", "--prune", "origin"], true);
+
+  // DELETING A REMOTE BRANCH WHOSE MERGE SITS ONLY HERE LOSES THE WORK. Local
+  // trunk holding commits origin has never seen is that case exactly.
+  const ahead = it.git.run(
+    ["rev-list", "--count", `origin/${TRUNK}..${TRUNK}`],
+    true,
+  ).out;
+  if (ahead !== "0" && !forced) {
+    console.error(`${TRUNK} holds ${ahead} commit(s) origin has never seen.`);
+    console.error(`Push ${TRUNK} first, so the merge outlives the branch.`);
+    return 1;
+  }
+
+  const inTrunk = new Set(
+    it.git
+      .run(["branch", "-r", "--merged", `origin/${TRUNK}`], true)
+      .out.split("\n")
+      .map((row) => row.trim().replace("origin/", ""))
+      .filter((row) => MINE.test(row)),
+  );
+
+  const wanted = name ? [`work/${name}`] : [...inTrunk];
+  if (!wanted.length) {
+    console.log(`No work branch stands inside ${TRUNK}.`);
+    return 0;
+  }
+
+  let shut = 0;
+  for (const branch of wanted) {
+    if (!inTrunk.has(branch) && !forced) {
+      console.error(`${branch} is outside ${TRUNK}, so closing it drops its work.`);
+      console.error(`Merge it first, or run close ${branch.slice(5)} --force.`);
+      continue;
+    }
+    if (!it.git.run(["push", "origin", "--delete", branch]).ok) continue;
+    it.git.run(["branch", "-D", branch], true);
+    console.log(`${branch} is closed${inTrunk.has(branch) ? "" : ", unmerged"}.`);
+    shut++;
+  }
+  return shut || !name ? 0 : 1;
 }
 
 function collect(it) {

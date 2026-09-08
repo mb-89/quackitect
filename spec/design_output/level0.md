@@ -104,6 +104,19 @@ exactly what that box reads.
 A projection writes the rules into a file, and a guard then has to keep that
 copy honest. A copy nobody can edit needs no guard.
 
+# The rules Vale cannot hold
+
+Vale reads no `.sh` and no `.ps1`, so a rule over a shell script lives in
+`src/level0/lib/scripts.js`, and the command line runs it beside Vale's own.
+
+`NoPathInScript` refuses an interpolated path on a line running an inline
+script. Git Bash hands node a path beginning `/c/`, node reads it as a folder
+under the drive root, and it resolves to a place nobody has. Changing into the
+root first and passing a relative path holds under either shell.
+
+That fault stands in this tree twice over: once from a cloud box, and once from
+a hand writing the same shape a week before.
+
 # Where a rule lives
 
 | folder | holder |
@@ -114,3 +127,40 @@ copy honest. A copy nobody can edit needs no guard.
 
 Vale errors on a file carrying no `extends` key inside a style it reads. So the
 judged rules sit in a folder of their own.
+
+# The fixer calms a shouted lead
+
+`./RUNME.sh fix` runs a round at a time until the tree stops moving. Each round
+calms every shout this tree finds, then hands the file to `vale fix --apply`.
+
+Vale carries five actions, and none of them folds case:
+
+| action | what it does |
+|---|---|
+| `suggest` | offers a spelling |
+| `replace` | writes the swap value, expanding `$1` |
+| `remove` | drops the match |
+| `edit` | trims, replaces, truncates, splits or runs a regex |
+| `convert` | lowercases and drops the punctuation |
+
+So `ShoutedLead` carries no action, and `src/level0/lib/shout.js` makes the fix
+from the line and the column Vale already reports. Vale skips a code fence and
+honours an exemption marker, so the finding it hands over carries both for free.
+
+The calming runs first because Vale writes `DON'T STOP AT ALL HERE,` into
+`Do not STOP AT ALL HERE,`, which no longer opens with a run of capitals. Round
+two then catches the contraction the calming uncovers.
+
+## Vale reads one replacement per matched text
+
+Two swap entries matching the same text collapse to one, and the first entry
+wins for both. So a fix depending on what follows the match belongs to a person.
+
+`etc.` is that case: its full stop ends the sentence as often as it ends the
+abbreviation. It sits in `EtCetera.yml`, which carries no action, and the four
+short forms that read the same everywhere keep theirs.
+
+## Vale refuses a pair of overlapping fixes
+
+Vale drops both fixes and names the overlap. A token reaching past its own word
+therefore costs the fix beside it, so every token here stops at its own edge.

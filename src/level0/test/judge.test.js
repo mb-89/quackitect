@@ -9,10 +9,15 @@ import { fileURLToPath } from "node:url";
 import {
   CONTRACT_HEADING,
   DONE,
+  dependsOn,
   HELD,
+  MINE,
   setStatus,
   statusOf,
   TODO,
+  URGENCY,
+  urgencyOf,
+  waitingOn,
   withContract,
 } from "../../scripts/work.js";
 import { judgeOf, spansIn } from "../lib/judge.js";
@@ -146,4 +151,43 @@ test("the status moves through todo, held and done", () => {
   assert.equal(statusOf(setStatus(brief, HELD)), HELD);
   assert.equal(statusOf(setStatus(setStatus(brief, HELD), DONE)), DONE);
   assert.equal(statusOf("# No frontmatter\n"), "");
+});
+
+test("urgency reads from the frontmatter, and soon is the default", () => {
+  assert.equal(urgencyOf("---\nstatus: todo\nurgency: now\n---\n"), "now");
+  assert.equal(urgencyOf("---\nstatus: todo\nurgency: whenever\n---\n"), "whenever");
+  assert.equal(urgencyOf("---\nstatus: todo\n---\n"), "soon");
+  assert.equal(urgencyOf("---\nstatus: todo\nurgency: yesterday\n---\n"), "soon");
+});
+
+test("a dependency reads as a list or on one line, with the prefix dropped", () => {
+  const block = "---\ndepends_on:\n  - one\n  - work/two\n---\n";
+  assert.deepEqual(dependsOn(block), ["one", "two"]);
+  assert.deepEqual(dependsOn("---\ndepends_on: a, work/b\n---\n"), ["a", "b"]);
+  assert.deepEqual(dependsOn("---\nstatus: todo\n---\n"), []);
+});
+
+test("a branch waits only for one still standing at todo or held", () => {
+  const brief = "---\ndepends_on:\n  - open\n  - busy\n  - ready\n  - gone\n---\n";
+  const standing = new Map([
+    ["work/open", TODO],
+    ["work/busy", HELD],
+    ["work/ready", DONE],
+  ]);
+  assert.deepEqual(waitingOn(brief, standing), ["open", "busy"]);
+});
+
+test("urgency orders now before soon before whenever", () => {
+  const order = ["whenever", "now", "soon"].sort(
+    (a, b) => URGENCY.indexOf(a) - URGENCY.indexOf(b),
+  );
+  assert.deepEqual(order, ["now", "soon", "whenever"]);
+});
+
+test("close reaches a work branch and a branch the platform cut", () => {
+  assert.ok(MINE.test("work/fix-lsp"));
+  assert.ok(MINE.test("claude/gracious-hawking-zepc6h"));
+  assert.ok(!MINE.test("main"));
+  assert.ok(!MINE.test("v4"));
+  assert.ok(!MINE.test("se/claims"));
 });
