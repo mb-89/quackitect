@@ -79,3 +79,20 @@ ifVale("a contraction and a Latin short form are refused", async () => {
   assert.ok(said.includes("Contraction"));
   assert.ok(said.includes("LatinAbbreviation"));
 });
+
+const answered = async (text) => {
+  const said = await lintText(text, "answer.md", { run, bin });
+  assert.ok(said.ran, `vale ran: ${said.why}`);
+  return said.found.map((f) => f.rule);
+};
+
+ifVale("a heading opens a fresh prose budget, and a third paragraph breaks it", async () => {
+  const two = "# One\n\nA paragraph.\n\nA second paragraph.\n";
+  assert.ok(!(await answered(two)).includes("PreferStructureAnswer"));
+
+  const across = `${two}\n# Two\n\nA paragraph.\n\nA second paragraph.\n`;
+  assert.ok(!(await answered(across)).includes("PreferStructureAnswer"));
+
+  const three = `${two}\nA third paragraph.\n`;
+  assert.ok((await answered(three)).includes("PreferStructureAnswer"));
+});
