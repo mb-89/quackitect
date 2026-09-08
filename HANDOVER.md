@@ -16,6 +16,20 @@ command to read it back.
 This brief settles the shape. Follow it, and say in your handback where it
 breaks.
 
+## Why the viewer is a download
+
+An earlier line in this project writes its own viewer: 2426 lines of Go over
+Bubble Tea, Lipgloss and fsnotify. It carries a flag called `--keys`, whose
+help reads "print every key this terminal sends, and nothing else". A flag like
+that exists where keys stop working, and the fastest answer is to ask the
+terminal.
+
+`jlv` matches the behaviour a person asks for almost exactly, and it runs on
+that same Bubble Tea stack. So it is a fair bet to fail the same way.
+
+lnav runs on C++ and ncurses, which fails differently or not at all. It offers
+more than a person asks for, which costs a little learning and no correctness.
+
 ## What one line looks like
 
 One JSON object per line, and one file per session. lnav reads a directory of
