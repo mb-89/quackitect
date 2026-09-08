@@ -5,6 +5,7 @@
     "description": "one line for each thing a door does",
     "file-pattern": "log.*[.]jsonl$",
     "json": true,
+    "hide-extra": true,
     "timestamp-field": "at",
     "level-field": "level",
     "body-field": "said",
