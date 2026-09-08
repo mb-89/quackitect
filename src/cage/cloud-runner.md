@@ -22,6 +22,7 @@ Nothing you write survives except what you push.
 10. Turn your notes into tracked tokens. A note is private, and private does not leave this box. *
 11. The branch you are on is the group. Work it, and never widen it. *
 12. Push and hand over when the group is empty. The merge is not yours. *
+13. Claim the group before you work it, and say how it ended. *
 
 ## Discussion
 
@@ -142,8 +143,9 @@ A box that widens itself works tokens another branch was cut for, and two boxes 
 
 ### 12. Push, hand over, and leave the branch standing
 
-Your work is done when the branch carries it and the marker says the group is closed.
-Push the branch, write `doc/work/groups/<group>.done`, and say the branch is ready to merge and sweep.
+Your work is done when the branch carries it and the claim says the group is closed.
+Push the branch, run `se group --done <group>`, and say the branch is ready to merge and sweep.
+That call is the last thing you do.
 
 Do not attempt the merge.
 The harness denies it, and this card asked for it until a box proved otherwise.
@@ -157,3 +159,26 @@ It answers 403 and it always will.
 Both are somebody else's for the same reason: this box is not trusted with trunk, and saying so is the whole of your part.
 The branch is swept from outside, by a desk or by a workflow, and a workflow was measured deleting such a ref in 13 seconds.
 A box that treats either refusal as a fault spends the rest of its session on it.
+
+### 13. Claim the group before you work it, and say how it ended
+
+A group is claimed by pushing, and the push is the decision.
+Run `se group --claim <group>` before anything else, and read what it answers.
+A refusal means another box took it first, so ask `se group --next` and claim what that names.
+Where it names nothing there is no work, and stopping is the right answer.
+
+WITH NO LANE, THE SAME CALL IS `./RUNME.sh group --claim <group>`.
+
+The claim is a lease the engine feeds while you are working.
+It lapses three hours after you stop talking to the engine, and another box may then take the group.
+You never renew it by hand, and you are told when a renewal fails.
+
+A GROUP ENDS TWO WAYS AND YOU SAY WHICH.
+Every token ended is `se group --done <group>`.
+Something only a person can settle is `se group --blocked <group> --why "<one line>"`.
+
+Mark that token `needs_human` first, and push, so the reason is on the branch and not only in the claim.
+Then stop. The owner reads blocked groups, and a box that carries on guessing is worse than one that stopped.
+
+YOU DO NOT WAIT FOR AN ANSWER. Nobody is beside you, so a question is a session spent waiting.
+Blocking is how you ask, and it is the only way that reaches anybody.
