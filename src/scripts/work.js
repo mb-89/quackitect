@@ -17,13 +17,23 @@ export const DONE = "done";
 export function work(root, argv) {
   const what = argv[0];
   const name = argv[1];
-  const doing = { new: newWork, take, done: finish, release, read, list, collect };
+  const doing = {
+    new: newWork,
+    take,
+    sync,
+    done: finish,
+    release,
+    read,
+    list,
+    collect,
+  };
   if (!doing[what]) {
     console.log("Usage: ./RUNME.sh work <verb>\n");
     console.log("  new <name>    cut work/<name> from main with the brief, and push");
     console.log(
       "  take          take the next branch marked todo, and print its brief",
     );
+    console.log("  sync          take main into this branch before you start");
     console.log("  done          mark this branch done, commit and push");
     console.log("  release       put this branch, or the one you name, back to todo");
     console.log("  read <name>   print what stands on work/<name>");
@@ -84,7 +94,39 @@ function push(root, branch, was, why) {
   return git(root, ["push", "origin", branch]).ok;
 }
 
-export const CONTRACT_HEADING = "## How this branch ends";
+// [[spec/design_output/work#trunk-comes-in-before-the-work-starts]]
+function sync(root) {
+  const branch = git(root, ["rev-parse", "--abbrev-ref", "HEAD"], true).out;
+  if (!branch.startsWith("work/")) {
+    console.error(`work sync runs on a work branch, and this is ${branch}.`);
+    return 2;
+  }
+
+  git(root, ["fetch", "origin", TRUNK], true);
+  const behind = git(root, ["rev-list", "--count", `HEAD..origin/${TRUNK}`], true).out;
+  if (behind === "0") {
+    console.log(`${branch} already carries every commit on ${TRUNK}.`);
+    return 0;
+  }
+
+  const merged = git(root, [
+    "merge",
+    `origin/${TRUNK}`,
+    "--no-edit",
+    "-m",
+    `${branch}: take ${TRUNK} in`,
+  ]);
+  if (!merged.ok) {
+    console.error(`${TRUNK} conflicts with ${branch}. Resolve it, commit, and go on.`);
+    console.error("git status names the files. The merge belongs to you here.");
+    return 1;
+  }
+
+  console.log(`${branch} took ${behind} commit(s) from ${TRUNK}.`);
+  return 0;
+}
+
+export const CONTRACT_HEADING = "## How this branch runs";
 
 // [[spec/design_output/work#every-brief-carries-the-contract]]
 export function withContract(brief) {
@@ -98,14 +140,19 @@ export function withContract(brief) {
     "Level zero deletes this file when it reads it, so the copy in your context",
     "is the only one left. These steps put it back.",
     "",
-    "1. Commit and push each time you finish a thing. A cloud box dies and takes",
+    `1. Run \`./RUNME.sh work sync\` FIRST. It takes ${TRUNK} into this branch, so`,
+    "   an old branch works against what the tree holds now. Resolve any conflict",
+    "   before you start, because a conflict found later costs the work already",
+    "   done.",
+    "2. Commit and push each time you finish a thing. A cloud box dies and takes",
     "   its working tree with it.",
-    `2. Write your result and your retro into \`${BRIEF}\`, at the root, replacing`,
+    `3. Write your result and your retro into \`${BRIEF}\`, at the root, replacing`,
     "   this brief. Say what surprises you and every dead end you walk into.",
-    "3. Run `./RUNME.sh work done`, which sets the status and pushes.",
-    "4. Run `./RUNME.sh work release` instead where you stop early, so the branch",
+    "4. Run `./RUNME.sh work done`, which sets the status and pushes.",
+    "5. Run `./RUNME.sh work release` instead where you stop early, so the branch",
     "   goes back to `todo` for somebody else.",
-    "5. Leave the merge to a person. A cloud box opens no pull request.",
+    `6. Leave the merge into ${TRUNK} to a person. A cloud box opens no pull`,
+    "   request, and trunk only ever comes towards you.",
     "",
   ].join("\n");
 }

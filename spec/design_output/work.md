@@ -49,13 +49,23 @@ a rejected push and takes the next.
 every branch says how it closes. The append is idempotent, and a brief already
 carrying the section stays as it stands.
 
-The contract names five things: push often, write the result and the retro back
-into `HANDOVER.md`, run `work done`, run `work release` on stopping early, and
-leave the merge to a person.
+The contract names six things:
 
-A brief depends on nothing outside itself. A cloud session pointed straight at a
-branch reads it and knows how to finish, whether or not it also reads the cloud
-guidance.
+- run `work sync` first, which takes `main` in
+- push each time a thing lands
+- write the result and the retro back into `HANDOVER.md`
+- run `work done`
+- run `work release` on stopping early
+- leave the merge to a person
+
+A brief depends on nothing outside itself, so a cloud session aiming at one
+branch reads it and knows how to finish.
+
+# Trunk comes in before the work starts
+
+`work sync` merges `origin/main` into the branch. `work take` runs it, so a
+routine pays nothing to remember it. A conflict then stops the take, while the
+work it would cost still sits ahead.
 
 # Why a routine needs this
 
