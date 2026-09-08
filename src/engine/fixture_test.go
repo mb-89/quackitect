@@ -184,6 +184,21 @@ dispositions:
 	return r
 }
 
+// ---- from g_no_parallel_seam_helper_hop_test.go ----
+
+func theRootsPlantedForTheHop(t *testing.T) Roots {
+	t.Helper()
+	work := t.TempDir()
+	at := filepath.Join(work, "pkg")
+	if err := os.MkdirAll(at, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(at, "clock.go"), []byte(thePackagePlantedForTheHop), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	return Roots{Work: work, Method: work}
+}
+
 // ---- from apply_test.go ----
 
 func aTreeToWriteIn(t *testing.T) Roots {
@@ -1396,6 +1411,21 @@ func cageCannotBlockRoots(t *testing.T) Roots {
 	t.Helper()
 	dir := t.TempDir()
 	return Roots{Work: dir, Method: dir}
+}
+
+// ---- from keywordsaid_test.go ----
+
+// A CONTROL A CONSOLE CAN REACH, AND ONE IT CANNOT.
+func aConsoleTree(t *testing.T) Roots {
+	t.Helper()
+	r := guidanceTree(t)
+	os.WriteFile(filepath.Join(r.Method, "src", "config", "parameters.json"), []byte(`{
+	  "name":"quackitect","type":"group","children":[
+	    {"name":"guards","type":"group","shown":true,"children":[
+	      {"name":"search_via_index","type":"bool","default":true,"console":true,
+	       "help":"Every search goes through the index."},
+	      {"name":"stop_needs_claim","type":"bool","default":true}]}]}`), 0o644)
+	return r
 }
 
 // ---- from landbeforeworking_test.go ----

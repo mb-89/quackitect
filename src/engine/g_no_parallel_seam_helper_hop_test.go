@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -34,18 +32,6 @@ func swapUnderALock(v int) {
 }
 `
 
-func theRootsPlantedForTheHop(t *testing.T) Roots {
-	t.Helper()
-	work := t.TempDir()
-	at := filepath.Join(work, "pkg")
-	if err := os.MkdirAll(at, 0o755); err != nil {
-		t.Fatal(err)
-	}
-	if err := os.WriteFile(filepath.Join(at, "clock.go"), []byte(thePackagePlantedForTheHop), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	return Roots{Work: work, Method: work}
-}
 
 func TestAParallelTestSwappingASeamThroughAHelperRefusesTheHop(t *testing.T) {
 	r := theRootsPlantedForTheHop(t)

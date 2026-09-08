@@ -13,15 +13,6 @@ import (
 // the parameter tree at all. So the two things most likely to move were the two
 // it could not see, and the projections were right at a start and stale after.
 
-func aTreeToProject(t *testing.T) Roots {
-	t.Helper()
-	r := aTreeWithTheProcesses(t)
-	if _, err := GuidanceDigest(r.Method); err != nil {
-		t.Skipf("this fixture carries no projections to digest: %v", err)
-	}
-	return r
-}
-
 // THE PARAMETER TREE MOVES THE DIGEST. The commands are projected from it and
 // from nothing else.
 func TestTheDigestSeesTheParameterTree(t *testing.T) {

@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -54,37 +52,4 @@ func TestARealLagIsStillNamedALag(t *testing.T) {
 	if !strings.Contains(got.Notice, "this clone is behind it") {
 		t.Errorf("a clone whose branch moved the note on is no longer told it is behind: %s", got.Notice)
 	}
-}
-
-// aCloneWhoseBranchDisagrees hands back a clone whose note is on the fetched
-// branch byte for byte as it is here, while that same branch archives the id.
-//
-// THE ARCHIVE ROW IS WRITTEN AND THE NOTE IS NOT TOUCHED, which is the shape
-// the record was actually found in: a close that wrote its row and left the
-// note standing.
-func aCloneWhoseBranchDisagrees(t *testing.T) (Roots, Token) {
-	t.Helper()
-	r := aTreeWithTheProcesses(t)
-	tok := mintUnclaimed(t, r, "the record disagrees")
-	gitAt(t, r.Work, "add", "--", "doc", "src")
-	gitAt(t, r.Work, "commit", "--quiet", "-m", "the token")
-	clone := filepath.Join(t.TempDir(), "clone")
-	gitAt(t, r.Work, "clone", "--quiet", "--no-tags", "file://"+filepath.ToSlash(r.Work), clone)
-
-	// THE BRANCH ARCHIVES THE ID AND LEAVES THE NOTE ALONE.
-	list := filepath.Join(r.Work, "spec", "work", "archive.jsonl")
-	was, _ := os.ReadFile(list)
-	row := string(was) + `{"id":"` + tok.ID + `","title":"` + tok.Title + `","disposition":"done"}` + "\n"
-	if err := os.WriteFile(list, []byte(row), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	gitAt(t, r.Work, "add", "--all", "--", "spec/work")
-	gitAt(t, r.Work, "commit", "--quiet", "-m", "the row and not the note")
-
-	gitAt(t, clone, "fetch", "--quiet", "origin")
-	behind := Roots{Method: clone, Work: clone}
-	if at := noteAt(behind, tok.ID); at == "" {
-		t.Fatalf("the clone does not carry %s, so there is nothing to disagree about", tok.ID)
-	}
-	return behind, tok
 }

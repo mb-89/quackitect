@@ -9,19 +9,6 @@ import (
 	"testing"
 )
 
-// A CONTROL A CONSOLE CAN REACH, AND ONE IT CANNOT.
-func aConsoleTree(t *testing.T) Roots {
-	t.Helper()
-	r := guidanceTree(t)
-	os.WriteFile(filepath.Join(r.Method, "src", "config", "parameters.json"), []byte(`{
-	  "name":"quackitect","type":"group","children":[
-	    {"name":"guards","type":"group","shown":true,"children":[
-	      {"name":"search_via_index","type":"bool","default":true,"console":true,
-	       "help":"Every search goes through the index."},
-	      {"name":"stop_needs_claim","type":"bool","default":true}]}]}`), 0o644)
-	return r
-}
-
 func valueOf(t *testing.T, r Roots, key string) any {
 	t.Helper()
 	v, err := LoadValues(r)
@@ -48,7 +35,6 @@ func heardHere(t *testing.T, r Roots, l *sessionlog.Log, said string) {
 // no panel, so the chat is the only surface a person has on a box they are not
 // sitting at.
 func TestAMessageThatIsOnlyTheKeywordMovesTheControl(t *testing.T) {
-	t.Parallel()
 	r := aConsoleTree(t)
 	l, _ := sessionlog.Open(r.Private("log"))
 	defer l.Close()
@@ -65,7 +51,6 @@ func TestAMessageThatIsOnlyTheKeywordMovesTheControl(t *testing.T) {
 // THE SAME KEYWORD INSIDE A SENTENCE MOVES NOTHING. This is what keeps the
 // guidance that describes these keywords from firing them.
 func TestTheKeywordInsideASentenceMovesNothing(t *testing.T) {
-	t.Parallel()
 	r := aConsoleTree(t)
 	l, _ := sessionlog.Open(r.Private("log"))
 	defer l.Close()
@@ -78,7 +63,6 @@ func TestTheKeywordInsideASentenceMovesNothing(t *testing.T) {
 
 // A CONTROL THAT CARRIES NO FLAG IS REACHED BY NOTHING.
 func TestAnUnflaggedControlHasNoKeyword(t *testing.T) {
-	t.Parallel()
 	r := aConsoleTree(t)
 	l, _ := sessionlog.Open(r.Private("log"))
 	defer l.Close()
@@ -92,7 +76,6 @@ func TestAnUnflaggedControlHasNoKeyword(t *testing.T) {
 // THE CHANGE NAMES THE KEYWORD AND WHAT IT MOVED, so a change nobody expected
 // is attributed rather than guessed at.
 func TestTheChangeNamesTheKeywordAndWhatItMoved(t *testing.T) {
-	t.Parallel()
 	r := aConsoleTree(t)
 	l, _ := sessionlog.Open(r.Private("log"))
 	heardHere(t, r, l, "KEYWORD:SEARCH_VIA_INDEX=OFF")
@@ -129,7 +112,6 @@ func TestTheChangeNamesTheKeywordAndWhatItMoved(t *testing.T) {
 // A KEYWORD AN AGENT WRITES RATHER THAN A PERSON MOVES NOTHING. The said verb
 // is the agent's own door into the record, and it is not a person talking.
 func TestAKeywordAnAgentWritesMovesNothing(t *testing.T) {
-	t.Parallel()
 	r := aConsoleTree(t)
 	l, _ := sessionlog.Open(r.Private("log"))
 	defer l.Close()

@@ -1,8 +1,6 @@
 package main
 
 import (
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -55,53 +53,4 @@ func TestThePassOverNamesTheFileItMeans(t *testing.T) {
 	if strings.Contains(said, "Bring spec/work into step") {
 		t.Errorf("the private copy is sent to spec/work, which does not hold it:\n%s", said)
 	}
-}
-
-// aCloneWithBothKindsOfPassOver hands back a clone carrying two tokens the
-// branch has archived. One is a note under spec/work that the branch has moved
-// on from, so a fetch really would bring it into step. The other is a private
-// note under .se/work, which no fetch reaches at all.
-func aCloneWithBothKindsOfPassOver(t *testing.T) (Roots, Token, Token) {
-	t.Helper()
-	r := aTreeWithTheProcesses(t)
-	tok := mintUnclaimed(t, r, "behind the branch")
-	gitAt(t, r.Work, "add", "--", "doc", "src")
-	gitAt(t, r.Work, "commit", "--quiet", "-m", "the token")
-	clone := filepath.Join(t.TempDir(), "clone")
-	gitAt(t, r.Work, "clone", "--quiet", "--no-tags", "file://"+filepath.ToSlash(r.Work), clone)
-	behind := Roots{Method: clone, Work: clone}
-
-	// THE PRIVATE COPY IS MINTED IN THE CLONE, so it is under .se/work there
-	// and the branch has never carried it.
-	private, err := Mint(behind, Token{Tracked: local(), Process: "trivial", Title: "a private copy",
-		Detail:   "a copy of work the branch has already archived",
-		Criteria: []Criterion{{Says: "the notice names the file it means"}}})
-	if err != nil {
-		t.Fatalf("minting the private copy: %v", err)
-	}
-
-	// THE BRANCH CLOSES THE TRACKED ONE AND ARCHIVES BOTH IDS.
-	tok.Disposition, tok.Status = Done, "closed"
-	if err := SaveToken(r, tok); err != nil {
-		t.Fatalf("closing %s: %v", tok.ID, err)
-	}
-	list := filepath.Join(r.Work, "spec", "work", "archive.jsonl")
-	was, _ := os.ReadFile(list)
-	rows := string(was) +
-		`{"id":"` + tok.ID + `","title":"behind the branch","disposition":"done"}` + "\n" +
-		`{"id":"` + private.ID + `","title":"a private copy","disposition":"done"}` + "\n"
-	if err := os.WriteFile(list, []byte(rows), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	gitAt(t, r.Work, "add", "--all", "--", "spec/work")
-	gitAt(t, r.Work, "commit", "--quiet", "-m", "the close and the rows")
-
-	gitAt(t, clone, "fetch", "--quiet", "origin")
-	if at := noteAt(behind, tok.ID); at == "" {
-		t.Fatalf("the clone does not carry %s, so it is not behind the branch", tok.ID)
-	}
-	if at := noteAt(behind, private.ID); at == "" {
-		t.Fatalf("the clone does not carry %s, so there is no private copy to name", private.ID)
-	}
-	return behind, tok, private
 }
