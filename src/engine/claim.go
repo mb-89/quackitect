@@ -5,6 +5,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -476,6 +477,9 @@ type Published struct {
 	Committed bool   `json:"committed"`
 	Pushed    bool   `json:"pushed"`
 	Rebased   bool   `json:"rebased,omitempty"` // it read another box's claims and wrote again
+	// Lost names the box holding the group this write was for, where another box
+	// won the race for it. It is empty for every ordinary claim.
+	Lost string `json:"lost,omitempty"`
 	Says      string `json:"says"`
 }
 
@@ -492,7 +496,7 @@ var gitRuns = realGit
 // ones that can hang, and a claim is never worth waiting on.
 func gitBudget(args []string) time.Duration {
 	for _, a := range args {
-		if a == "fetch" || a == "push" {
+		if a == "fetch" || a == "push" || a == "ls-remote" {
 			return 20 * time.Second
 		}
 	}
@@ -543,8 +547,22 @@ func realGit(ctx context.Context, r Roots, index string, args ...string) (string
 
 // Publish writes the claim notes into refs/se/claims and pushes that ref.
 func Publish(ctx context.Context, r Roots, files []string, message string) Published {
+	return publish(ctx, r, files, message, nil)
+}
+
+// PublishTheGroup writes one groups.json entry onto the same ref and pushes it.
+//
+// IT IS THE CLAIM RELAY AND NOT A SECOND PUSHER. This is already the compare and
+// swap a group hold leans on: a rejected push refetches, replays what this box
+// holds, and writes again. A second pusher beside it would be a second answer to
+// the one question of who won. See group.go.
+func PublishTheGroup(ctx context.Context, r Roots, change *GroupChange, message string) Published {
+	return publish(ctx, r, nil, message, change)
+}
+
+func publish(ctx context.Context, r Roots, files []string, message string, change *GroupChange) Published {
 	var p Published
-	if len(files) == 0 {
+	if len(files) == 0 && change == nil {
 		p.Says = "nothing changed, so nothing was published"
 		return p
 	}
@@ -564,8 +582,8 @@ func Publish(ctx context.Context, r Roots, files []string, message string) Publi
 	os.Remove(index.Name())
 	defer os.Remove(index.Name())
 
-	if _, err := writeTheClaims(ctx, r, index.Name(), files, message); err != nil {
-		p.Says = "the claim stands here. It could not be committed: " + err.Error()
+	if _, err := writeTheClaimsAnd(ctx, r, index.Name(), files, message, change); err != nil {
+		p.Says, p.Lost = whyThePublishStopped("the claim stands here. It could not be committed: ", err)
 		return p
 	}
 	p.Committed = true
@@ -602,8 +620,9 @@ func Publish(ctx context.Context, r Roots, files []string, message string) Publi
 		}
 	}
 	p.Rebased = true
-	if _, err := writeTheClaims(ctx, r, index.Name(), files, message); err != nil {
-		p.Says = "published here. Another box's claims were read and this one could not be written again: " + err.Error()
+	if _, err := writeTheClaimsAnd(ctx, r, index.Name(), files, message, change); err != nil {
+		p.Says, p.Lost = whyThePublishStopped("published here. Another box's claims were read and "+
+			"this one could not be written again: ", err)
 		return p
 	}
 	if _, err := gitIn(ctx, r, index.Name(), "push", "origin", claimsRef+":"+claimsBranch); err != nil {
@@ -699,6 +718,16 @@ func nextClaimsFile(r Roots, have map[string]FarClaim, files []string, now time.
 // is read through readClaimsIn, which reads the old shape too, so a ref written
 // the old way is folded into the file by this write.
 func writeTheClaims(ctx context.Context, r Roots, index string, files []string, message string) (string, error) {
+	return writeTheClaimsAnd(ctx, r, index, files, message, nil)
+}
+
+// writeTheClaimsAnd is that write with one group entry on it, which is what
+// se group makes.
+//
+// THE GROUPS FILE THE PARENT HELD IS CARRIED FORWARD EITHER WAY. An ordinary
+// claim that dropped it would free every group every other box holds, and the
+// next scheduler run would start a second box on each of them.
+func writeTheClaimsAnd(ctx context.Context, r Roots, index string, files []string, message string, change *GroupChange) (string, error) {
 	// THE FOLDER IT WRITES INTO IS ITS OWN TO MAKE. Publish makes it before
 	// calling this, and a caller that does not was refused with "no such file
 	// or directory" for the temporary file below: a committed test read as red
@@ -721,26 +750,29 @@ func writeTheClaims(ctx context.Context, r Roots, index string, files []string, 
 		}
 		have = got
 	}
-	text := nextClaimsFile(r, have, files, time.Now().UTC())
-	tmp, err := os.CreateTemp(r.Private(), "claims.*.tmp")
-	if err != nil {
+	now := time.Now().UTC()
+	if err := putInTheIndex(ctx, r, index, claimsFile, nextClaimsFile(r, have, files, now)); err != nil {
 		return "", err
 	}
-	name := tmp.Name()
-	defer os.Remove(name)
-	if _, err := tmp.WriteString(text); err != nil {
-		tmp.Close()
+	// AND THE GROUPS, WITH THIS CALL'S ENTRY OVER WHAT THE PARENT HELD. A write
+	// that names another box's live hold is refused here, because the loser of a
+	// race reads the winner's file before it writes again. See group.go.
+	groups := readGroupsIn(ctx, r, parent)
+	// THE CALLER'S INSTANT DECIDES THE LEASE, not this function's. The claims
+	// above are stamped with the wall clock, which is right for them. A group
+	// was read as workable against the caller's now and then refused here
+	// against another one, so the two halves of one guard disagreed.
+	at := now
+	if change != nil && !change.Now.IsZero() {
+		at = change.Now
+	}
+	if err := applyTheGroupChange(r, groups, change, at); err != nil {
 		return "", err
 	}
-	if err := tmp.Close(); err != nil {
-		return "", err
-	}
-	blob, err := gitIn(ctx, r, index, "hash-object", "-w", "--", name)
-	if err != nil {
-		return "", err
-	}
-	if _, err := gitIn(ctx, r, index, "update-index", "--add", "--cacheinfo", "100644,"+blob+","+claimsFile); err != nil {
-		return "", err
+	if len(groups) > 0 {
+		if err := putInTheIndex(ctx, r, index, groupsFile, theGroupsText(groups)); err != nil {
+			return "", err
+		}
 	}
 	tree, err := gitIn(ctx, r, index, "write-tree")
 	if err != nil {
@@ -758,6 +790,42 @@ func writeTheClaims(ctx context.Context, r Roots, index string, files []string, 
 		return "", err
 	}
 	return hash, nil
+}
+
+// putInTheIndex writes one file into the commit being built, by its hash.
+//
+// NOTHING IS STAGED FROM THE WORKING TREE. The text goes to git as a blob and
+// into a fresh index by name, so no note rides along however the tree stands.
+func putInTheIndex(ctx context.Context, r Roots, index, path, text string) error {
+	tmp, err := os.CreateTemp(r.Private(), "claims.*.tmp")
+	if err != nil {
+		return err
+	}
+	name := tmp.Name()
+	defer os.Remove(name)
+	if _, err := tmp.WriteString(text); err != nil {
+		tmp.Close()
+		return err
+	}
+	if err := tmp.Close(); err != nil {
+		return err
+	}
+	blob, err := gitIn(ctx, r, index, "hash-object", "-w", "--", name)
+	if err != nil {
+		return err
+	}
+	_, err = gitIn(ctx, r, index, "update-index", "--add", "--cacheinfo", "100644,"+blob+","+path)
+	return err
+}
+
+// whyThePublishStopped turns a failed write into what the answer says, and names
+// the box that won where one did.
+func whyThePublishStopped(said string, err error) (says, lost string) {
+	var won *groupLost
+	if errors.As(err, &won) {
+		return won.Error() + ". Ask for another group: se group --next", won.by
+	}
+	return said + err.Error(), ""
 }
 
 // The message says what a person reading the history needs: which claimant,

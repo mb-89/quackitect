@@ -1,6 +1,9 @@
 package main
 
-import "strings"
+import (
+	"sort"
+	"strings"
+)
 
 // THE BRANCH IS THE INSTRUCTION.
 //
@@ -161,6 +164,18 @@ func MakeTheGroupBranch(r Roots, bucket string) BranchTaken {
 		return BranchTaken{Says: bucket + " holds no open token, so a box on " + want +
 			" would land, find nothing and close. No branch was made."}
 	}
+	// A GROUP HOLDING A TOKEN MARKED needs_human CANNOT BECOME A CLOUD GROUP.
+	//
+	// Autonomy is the constraint, and this is that constraint said once, at the
+	// door. Nobody sits beside a cloud box, so a token that wants a person would
+	// park the box on it until the lease ran out and another box took the same
+	// branch. The mirror of this rule is se group --blocked, which is the same
+	// rule from the other end.
+	if waiting := theBucketWaitsForAPerson(r, bucket); len(waiting) > 0 {
+		return BranchTaken{Says: bucket + " holds " + strings.Join(waiting, ", ") +
+			", which need a person, so it cannot become a cloud group. No branch was " +
+			"made. Settle those tokens, or take the mark off them, and press again."}
+	}
 	says := want + " is already here"
 	if _, err := gitHere(r, "rev-parse", "--verify", "--quiet", "refs/heads/"+want); err != nil {
 		off, from := fetchedBranch(r)
@@ -179,6 +194,19 @@ func MakeTheGroupBranch(r Roots, bucket string) BranchTaken {
 	return BranchTaken{On: want, Says: says + " and pushed. A box on it is handed " +
 		theGroupFilter(bucket) + " and nothing else. This tree has not moved, and " +
 		bucket + " keeps every token it holds."}
+}
+
+// theBucketWaitsForAPerson names the open tokens in a bucket that are marked as
+// needing a person, in order, and nothing where there are none.
+func theBucketWaitsForAPerson(r Roots, bucket string) []string {
+	var out []string
+	for _, t := range Tokens(r) {
+		if t.Bucket == bucket && !t.Ended() && t.NeedsHuman {
+			out = append(out, t.ID)
+		}
+	}
+	sort.Strings(out)
+	return out
 }
 
 // theFilterNotice says what the queue is narrowed by, on every pull that is

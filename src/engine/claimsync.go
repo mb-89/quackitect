@@ -219,6 +219,11 @@ func WatchForClaims(ctx context.Context, r Roots, log *sessionlog.Log) {
 		// THE FIRST LOOK IS AT ONCE, so an engine that has just started knows
 		// what the other boxes took while it was down.
 		got := SyncClaims(ctx, r)
+		// AND THE GROUP THIS BOX IS WORKING, ON THE SAME CLOCK. The fetch has just
+		// happened, so the renewal reads what it found and pays for no second one.
+		// It is here rather than on the heartbeat because the heartbeat is a beat of
+		// seconds, and a lease of hours does not want a look that often. See group.go.
+		RenewTheGroup(ctx, r, log, time.Now().UTC())
 		if got.Ref != "" && got.Ref != was {
 			was = got.Ref
 			log.Write("engine", "claim", "engine", "the claims other boxes published were read", sessionlog.Yes(),
