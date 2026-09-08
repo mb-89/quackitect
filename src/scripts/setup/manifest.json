@@ -11,6 +11,7 @@
       "xz",
       "zig",
       "node",
+      "npm",
       "ripgrep",
       "vscode"
     ],
@@ -20,6 +21,7 @@
       "xz",
       "zig",
       "node",
+      "npm",
       "ripgrep"
     ]
   },
@@ -47,6 +49,12 @@
       "winget": "OpenJS.NodeJS.LTS",
       "apt": "nodejs",
       "why": "the editor extension is built with it"
+    },
+    "npm": {
+      "probe": "npm",
+      "winget": "OpenJS.NodeJS.LTS",
+      "apt": "npm",
+      "why": "every profile runs npm install and npm run build for the extension, and apt's nodejs package does not carry npm"
     },
     "ripgrep": {
       "probe": "rg",

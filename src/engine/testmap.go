@@ -344,9 +344,20 @@ func goTool() string {
 // buildEnv is the environment a build runs in. The engine may have been
 // started by a window that knows nothing of cgo, so the installer's file
 // is read here, the way the battery sources it.
+//
+// XDG_DATA_HOME IS ASKED FOR, BECAUSE THE INSTALLER WRITES WHERE IT SAYS.
+// src/scripts/setup/platform_unix.go honours it and this did not, so a Linux
+// box that sets it had the installer write the file one place and this look
+// another. Nothing was said: a missing file is read here as "no environment",
+// and the build then ran with no CC, no CGO_ENABLED and no sqlite_fts5 tag, so
+// the cover binaries came out with SQLite stubbed out and the failure arrived
+// as an unknown driver in a test.
 func buildEnv() []string {
 	env := os.Environ()
 	base := os.Getenv("LOCALAPPDATA")
+	if base == "" {
+		base = os.Getenv("XDG_DATA_HOME")
+	}
 	if base == "" {
 		base = filepath.Join(os.Getenv("HOME"), ".local", "share")
 	}

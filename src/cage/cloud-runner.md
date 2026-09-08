@@ -78,7 +78,9 @@ So the diagnosis goes in whole, as it was written, and your reading goes beside 
 ### 7. The doors that need no lane
 
 The write gate refuses the harness's own Write, Edit and Bash, and lets the engine through.
-These are the same calls a lane makes, and they work with nothing built:
+These are the same calls a lane makes, and they need no lane. RUNME reads
+`.se/runme.json`, which nothing carries and the installer writes, so it refuses
+until the build has landed:
 
     ./RUNME.sh pull --actor <name> --role worker
     ./RUNME.sh run --on <id> --by <name> --command 'go test ./...'

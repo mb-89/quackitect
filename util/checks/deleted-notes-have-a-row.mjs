@@ -72,7 +72,7 @@ function names(args) {
     said
       .split("\n")
       .map((line) => line.trim())
-      .filter((line) => /^doc\/work\/[^/]+\.md$/.test(line))
+      .filter((line) => /^spec\/work\/[^/]+\.md$/.test(line))
       .map((line) => line.slice("spec/work/".length, -".md".length)),
   );
 }

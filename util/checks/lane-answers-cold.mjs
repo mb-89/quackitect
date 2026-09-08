@@ -57,7 +57,13 @@ const path = (process.env.PATH ?? "").split(delimiter)
 const snapshot = JSON.parse(readFileSync(join(root, "src", "cage", "tools.json"), "utf8")).tools.map((t) => t.name);
 
 const stub = spawn("node", ["src/cage/mcp-lane.mjs", "--method", ".", "--work", "."], {
-  cwd: tree, env: { ...process.env, PATH: path, Path: path }, stdio: ["pipe", "pipe", "pipe"], windowsHide: true,
+  // AND HOME IS THE COPY TOO, because the stub also looks for the go the
+  // installer's archive leaves at $HOME/.local/go/bin. Taking go off PATH and
+  // leaving that folder reachable is a cold box that is not cold: on any
+  // machine where the archive has ever run, the stub would build its lane and
+  // this check would wait for a failure that never came.
+  cwd: tree, env: { ...process.env, PATH: path, Path: path, HOME: tree, USERPROFILE: tree },
+  stdio: ["pipe", "pipe", "pipe"], windowsHide: true,
 });
 const waiters = new Map();
 const said = [];

@@ -30,7 +30,7 @@ it takes.
 evidence, the record, the index, ephemeral work, and `scratchpad/` for anything
 throwaway.
 
-`sh src/scripts/battery.sh` runs every check, and says whether the tree is
+`sh util/checks/battery.sh` runs every check, and says whether the tree is
 sound. What is not done yet is work, so it is a token. Ask the engine.
 
 ## Which folder do I open

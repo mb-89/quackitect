@@ -585,6 +585,20 @@ func theShapeOfTheTree(r Roots, files []string, content map[string][]byte, born 
 			aRefusalNamingNoDoor,
 			aPushLandingOffTheBranches,
 			anOpenTokenMissingASection,
+			everyNewArchiveRowTravels,
+			aNoteStandingBesideItsArchiveRow,
+			theBurnDownBarDrawsWhatItWasHanded,
+			aCheckPathTheMethodDoesNotHold,
+			aDoneWhenLineNamesARunnableCommand,
+			anArchiveDroppingANoteThatIsGone,
+			theCageCitesOnlyWhatTravels,
+			aStartOfTheEngineWritingItsOwnFlags,
+			aDrawingFileSaysNoColourOutLoud,
+			everyLabelNamesADeclaredIcon,
+			aProjectionCarryingMoreThanItsChapter,
+			aCardDiscussesEveryPointItLists,
+			theTravellingCageNamesNoRefusal,
+			everyFlagAVerbDeclaresHasALaneField,
 		} {
 			if err := refuse(r, born[at], rel, text); err != nil {
 				return err

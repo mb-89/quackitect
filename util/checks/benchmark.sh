@@ -11,7 +11,10 @@
 set -e
 root=$(cd "$(dirname "$0")/../.." && pwd)
 cd "$root"
-env=${LOCALAPPDATA:-$HOME/.local/share}/quackitect/cgo.env
+# XDG_DATA_HOME FIRST ON LINUX, because src/scripts/setup/platform_unix.go
+# writes there when it is set, and reading the wrong place is a benchmark run
+# with no CC, no CGO_ENABLED and no sqlite_fts5 tag, which says nothing.
+env=${LOCALAPPDATA:-${XDG_DATA_HOME:-$HOME/.local/share}}/quackitect/cgo.env
 if [ -f "$env" ]; then
   . "$env"
   export CC CGO_ENABLED GOFLAGS

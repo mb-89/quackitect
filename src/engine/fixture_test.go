@@ -867,8 +867,12 @@ func aTreeWithTheProcesses(t *testing.T) Roots {
 	r, root := f.Roots, f.Work
 	withHistory(t, root)
 	for _, dir := range []string{"processes", "schemas"} {
+		// THE FIXTURE ASKS WHERE THE DECLARATIONS LIVE RATHER THAN WRITING IT
+		// DOWN. They moved from src to spec, and a path built by joining the old
+		// name copied nothing, so every test standing on this fixture failed
+		// with a folder that is not there. SpecAt answers the new place first.
 		from := SpecAt(filepath.Join("..", ".."), dir)
-		to := filepath.Join(root, "src", dir)
+		to := SpecAt(root, dir)
 		if err := os.MkdirAll(to, 0o755); err != nil {
 			t.Fatal(err)
 		}

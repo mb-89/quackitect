@@ -85,7 +85,11 @@ for (const call of engineCalls) {
 
 // AND EVERY FILE IT NAMES IS THERE. A card pointing at a script that moved is a
 // session told to run nothing.
-const named = [...card.matchAll(/\b(util\/[\w./-]+\.(?:mjs|json|md|sh))\b/g)].map((m) => m[1]);
+// THE FOLDERS A CARD MAY NAME ARE THE METHOD'S OWN, and this read util alone.
+// The cage moved to src and the card moved with it, so every path it names
+// stopped matching: the half below resolved nothing, and the line asserting
+// that it had something to resolve is what went red instead.
+const named = [...card.matchAll(/\b((?:util|src|spec)\/[\w./-]+\.(?:mjs|json|md|sh))\b/g)].map((m) => m[1]);
 say("the cloud card names files to resolve (" + new Set(named).size + ")", named.length > 0,
   "it names no file, so nothing in it can be checked against the tree");
 for (const rel of new Set(named)) {

@@ -114,7 +114,7 @@ for (const commit of commits) {
     .map((l) => l.trim())
     .filter(Boolean);
   for (const path of paths) {
-    const m = path.match(/^doc\/work\/(wk-[0-9a-f]{10})\.md$/);
+    const m = path.match(/^spec\/work\/(wk-[0-9a-f]{10})\.md$/);
     if (!m || invented(m[1]) || named.has(m[1])) continue;
     const status = noteStatus(commit, path);
     if (status === "" || status === "closed") continue;

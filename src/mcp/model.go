@@ -36,7 +36,7 @@ func askModelWithin(r roots, method string, params any, within time.Duration) (j
 	var b []byte
 	var err error
 	for try := 0; try < 20; try++ {
-		if b, err = os.ReadFile(filepath.Join(r.work, ".se", "engine.json")); err == nil {
+		if b, err = os.ReadFile(filepath.Join(r.work, ".se", "runtime", "engine.json")); err == nil {
 			break
 		}
 		time.Sleep(25 * time.Millisecond)

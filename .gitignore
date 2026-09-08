@@ -16,8 +16,12 @@ src/viewer/viewer
 src/viewer/viewer.exe
 src/mcp/mcp
 src/mcp/mcp.exe
-util/setup/setup
-util/setup/setup.exe
+# THE INSTALLER MOVED AND THIS LIST DID NOT. These said util/setup, which is
+# where the installer used to live, so from the day it became src/scripts/setup
+# nothing was ignoring its build output and a 10 MB Windows setup.exe went into
+# version control, where every Linux clone now pays for it.
+src/scripts/setup/setup
+src/scripts/setup/setup.exe
 src/extension/out/
 *.tgz
 *.tar.gz

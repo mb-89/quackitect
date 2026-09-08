@@ -132,6 +132,20 @@ function superviseTheLane() {
   // so this is declared up here with the rest and start() asks whether it is
   // there rather than assuming a build ran.
   let waitingForABuild = null;
+  // AND HOW LONG THAT WAIT HAS RUN, declared here for the same reason. The
+  // answers above read it, and a built tree returns before the cold path's own
+  // declaration is reached, so a call arriving before the built lane finished
+  // its handshake read a binding in its dead zone and threw. That is the door
+  // this file exists to keep open, going down on the one tree that had one.
+  let waited = 0;
+  // AND THE TWO THE COLD PATH SETS ARE DECLARED HERE TOO. A built tree returns
+  // before it reaches them, and a let that is never reached does not read
+  // undefined: every read of it throws. One tools/call arriving in the window
+  // before a built lane finishes its handshake threw out of the line handler,
+  // and an exception there takes the whole door down. Declared here, a built
+  // tree reads what it means: nothing waited for, and no installer running.
+  waited = 0; // ticks of the wait for a build, at 400ms each
+  let installing = false; // true while the cold path's installer is running
   const lull = 1500; // nothing either way for this long before a restart
 
   // A PROGRAM IS ITS SIZE AND ITS TIME. Nothing here reads the file, because it
@@ -189,7 +203,14 @@ function superviseTheLane() {
           engineHere = existsSync(engineExe);
           if (!engineHere) {
             const msg = read(line);
-            if (msg !== null && msg.method === "tools/call" && msg.id !== undefined) {
+            // AND ONCE THE BUILD IS OVER, SO IS THE WAIT. An installer that
+            // exited leaving no engine leaves nothing to wait for, and saying
+            // "ask again in a minute" to every call after that is a session
+            // that waits for ever with a door that never opens. So the call
+            // goes to the lane instead, which answers that no engine is
+            // running over this folder and how to start one, and se_start
+            // reaches the one tool that can build it again.
+            if (installing && msg !== null && msg.method === "tools/call" && msg.id !== undefined) {
               answer(msg.id, told(stillBuilding));
               return;
             }
@@ -296,7 +317,7 @@ function superviseTheLane() {
   // THE INSTALLER IS THE BUILD. Asking go build directly for the engine would be
   // a second place that knows how this tree compiles, and it would miss the C
   // compiler the installer pins for the engine's SQLite.
-  let installing = true;
+  installing = true;
   const install = windows
     ? spawn("powershell", ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
       join(root, "src", "scripts", "setup", "install.ps1"), "--profile", "headless"],
@@ -323,6 +344,21 @@ function superviseTheLane() {
   // misses, and the tools then wait out the whole cgo build after all. The
   // installer fetches go first, so the second or third attempt is the one that
   // works, and it costs a spawn every few seconds while nothing else can act.
+  // THE go THE INSTALLER FETCHED IS NOT ON THIS PROCESS'S PATH. A box with no
+  // usable go takes one from the official archive into $HOME/.local/go, and
+  // install.sh exports that onto its own PATH, which reaches the installer and
+  // nothing else: an export cannot climb into the parent that spawned it. So
+  // every attempt below looked for a go that was never going to be there, the
+  // retry loop's whole premise was false, and the lane it exists to put in
+  // front of an agent early arrived last, after the whole cgo build, on exactly
+  // the box this file is for. So the archive's own bin folder is named here as
+  // well, and in front, because the go it holds is the one go.mod asks for and
+  // a package manager's may be older than that.
+  const withGo = () => {
+    const path = join(homedir(), ".local", "go", "bin") + delimiter + (process.env.PATH ?? "");
+    return { ...process.env, PATH: path, Path: path };
+  };
+
   let quick = null;
   const buildTheLane = () => {
     if (quick !== null) {
@@ -330,6 +366,7 @@ function superviseTheLane() {
     }
     quick = spawn("go", ["build", "-o", ownExe, "."], {
       cwd: join(root, "src", "mcp"),
+      env: withGo(),
       stdio: ["ignore", log, log],
     });
     quick.on("error", () => {
@@ -360,7 +397,7 @@ function superviseTheLane() {
     return size > 0 && before === size;
   };
 
-  let waited = 0;
+  waited = 0;
   waitingForABuild = setInterval(() => {
     waited += 1;
     if (ready(ownExe)) return start(ownExe);
