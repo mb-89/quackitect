@@ -1,0 +1,41 @@
+extends: script
+message: "Only a door reaches outside. Import it from src/doors instead."
+link: spec/guidance/testing.md
+level: error
+scope: raw
+script: |
+  text := import("text")
+
+  lines := text.split(scope, "\n")
+  matches := []
+  offset := 0
+
+  for i := 0; i < len(lines); i++ {
+    line := lines[i]
+    at := offset
+    offset += len(line) + 1
+    t := text.trim_space(line)
+
+    if text.has_prefix(t, "//") { continue }
+
+    if text.re_match(`from ["']node:`, t) {
+      matches = append(matches, {begin: at, end: at + len(line)})
+      continue
+    }
+    if text.re_match(`require\(["']node:`, t) {
+      matches = append(matches, {begin: at, end: at + len(line)})
+      continue
+    }
+    if text.re_match(`\bDate\.now\(`, t) {
+      matches = append(matches, {begin: at, end: at + len(line)})
+      continue
+    }
+    if text.re_match(`\bnew Date\(\)`, t) {
+      matches = append(matches, {begin: at, end: at + len(line)})
+      continue
+    }
+    if text.re_match(`\bMath\.random\(`, t) {
+      matches = append(matches, {begin: at, end: at + len(line)})
+      continue
+    }
+  }

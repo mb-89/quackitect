@@ -9,6 +9,10 @@ import { biomeBin } from "../level0/lib/code.js";
 import { actionables, bindsHere, standingLayer } from "../level0/lib/guidance.js";
 import { line as asLine } from "../level0/lib/refuse.js";
 import { CONFIG, fromJson, unreasoned, valeBin } from "../level0/lib/vale.js";
+import { clock } from "../doors/clock.js";
+import { disk } from "../doors/disk.js";
+import { git } from "../doors/git.js";
+import { proc } from "../doors/proc.js";
 import { work } from "./work.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -19,6 +23,11 @@ const biome = join(root, biomeBin(process.platform));
 const GUIDANCE = join(root, "spec", "guidance");
 const LEVEL0 = join(root, "spec", "config", "level0.json");
 const config = existsSync(LEVEL0) ? JSON.parse(readFileSync(LEVEL0, "utf8")) : {};
+
+function doorsHere() {
+  const outside = proc();
+  return { proc: outside, disk: disk(), clock: clock(), git: git(outside, root), join };
+}
 
 const run = async (argv, init = {}) => {
   const ran = spawnSync(argv[0], argv.slice(1), {
@@ -54,7 +63,7 @@ const verbs = {
   },
   work: {
     says: "work branches: new, take, read, list",
-    run: async () => work(root, rest),
+    run: async () => work(root, rest, doorsHere()),
   },
 };
 

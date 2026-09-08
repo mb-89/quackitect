@@ -3,9 +3,6 @@
 // where that work stands.
 // [[spec/design_output/work#the-round-trip]]
 
-import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
 
 export const BRIEF = "HANDOVER.md";
 const TRUNK = "main";
@@ -14,7 +11,8 @@ export const TODO = "todo";
 export const HELD = "held";
 export const DONE = "done";
 
-export function work(root, argv) {
+export function work(root, argv, doors) {
+  const it = { root, ...doors };
   const what = argv[0];
   const name = argv[1];
   const doing = {
@@ -41,14 +39,8 @@ export function work(root, argv) {
     console.log("  collect       every branch marked done, waiting on a merge");
     return what ? 2 : 0;
   }
-  return doing[what](root, name);
+  return doing[what](it, name);
 }
-
-const git = (root, args, quiet) => {
-  const ran = spawnSync("git", args, { cwd: root, encoding: "utf8", shell: false });
-  if (!quiet && ran.status !== 0 && ran.stderr) console.error(ran.stderr.trim());
-  return { ok: ran.status === 0, out: (ran.stdout ?? "").trim() };
-};
 
 export function statusOf(text) {
   const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(String(text ?? ""));
@@ -68,56 +60,56 @@ export function setStatus(text, to) {
   return `---\nkind: [[handover]]\nstatus: ${to}\n---\n\n${said.trimStart()}`;
 }
 
-function branches(root) {
-  git(root, ["fetch", "--prune", "origin"], true);
-  const said = git(root, ["ls-remote", "--heads", "origin", "work/*"], true);
+function branches(it) {
+  it.git.run(["fetch", "--prune", "origin"], true);
+  const said = it.git.run(["ls-remote", "--heads", "origin", "work/*"], true);
   return said.out
     .split("\n")
     .filter(Boolean)
     .map((row) => row.split("\t")[1].replace("refs/heads/", ""));
 }
 
-function briefOf(root, branch) {
-  const said = git(root, ["show", `origin/${branch}:${BRIEF}`], true);
+function briefOf(it, branch) {
+  const said = it.git.run(["show", `origin/${branch}:${BRIEF}`], true);
   return said.ok ? said.out : "";
 }
 
-function whoTouched(root, branch) {
-  const said = git(root, ["log", "-1", "--format=%an", `origin/${branch}`], true);
+function whoTouched(it, branch) {
+  const said = it.git.run(["log", "-1", "--format=%an", `origin/${branch}`], true);
   return said.ok ? said.out : "";
 }
 
-function dirty(root) {
-  const said = git(root, ["status", "--porcelain"], true).out;
+function dirty(it) {
+  const said = it.git.run(["status", "--porcelain"], true).out;
   if (!said) return false;
   console.error("This tree carries uncommitted changes, so no branch may move.");
   console.error("Commit them, or stash them, and run this again.");
   return true;
 }
 
-function push(root, branch, was, why) {
-  writeFileSync(join(root, BRIEF), was, { encoding: "utf8" });
-  git(root, ["add", BRIEF], true);
-  git(root, ["commit", "-m", `${branch}: ${why}`], true);
-  return git(root, ["push", "origin", branch]).ok;
+function push(it, branch, was, why) {
+  it.disk.write(it.join(it.root, BRIEF), was);
+  it.git.run(["add", BRIEF], true);
+  it.git.run(["commit", "-m", `${branch}: ${why}`], true);
+  return it.git.run(["push", "origin", branch]).ok;
 }
 
 // [[spec/design_output/work#trunk-comes-in-before-the-work-starts]]
-function sync(root) {
-  const branch = git(root, ["rev-parse", "--abbrev-ref", "HEAD"], true).out;
+function sync(it) {
+  const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
   if (!branch.startsWith("work/")) {
     console.error(`work sync runs on a work branch, and this is ${branch}.`);
     return 2;
   }
 
-  git(root, ["fetch", "origin", TRUNK], true);
-  const behind = git(root, ["rev-list", "--count", `HEAD..origin/${TRUNK}`], true).out;
+  it.git.run(["fetch", "origin", TRUNK], true);
+  const behind = it.git.run(["rev-list", "--count", `HEAD..origin/${TRUNK}`], true).out;
   if (behind === "0") {
     console.log(`${branch} already carries every commit on ${TRUNK}.`);
     return 0;
   }
 
-  const merged = git(root, [
+  const merged = it.git.run([
     "merge",
     `origin/${TRUNK}`,
     "--no-edit",
@@ -165,15 +157,15 @@ export function withContract(brief) {
   ].join("\n");
 }
 
-function newWork(root, name) {
+function newWork(it, name) {
   if (!name) {
     console.error("work new needs a name: ./RUNME.sh work new fix-lsp");
     return 2;
   }
   const branch = `work/${name}`;
-  const path = join(root, BRIEF);
+  const path = it.join(it.root, BRIEF);
 
-  if (!existsSync(path)) {
+  if (!it.disk.exists(path)) {
     console.error(`Write the brief to ${BRIEF} first, saying what this work is.`);
     console.error(
       "Level zero reads it on the branch and hands it to whoever works it.",
@@ -181,17 +173,17 @@ function newWork(root, name) {
     return 2;
   }
 
-  const on = git(root, ["rev-parse", "--abbrev-ref", "HEAD"], true).out;
+  const on = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
   if (on !== TRUNK) {
     console.error(`work new cuts from ${TRUNK}, and this is ${on}.`);
     return 2;
   }
 
-  const brief = setStatus(withContract(readFileSync(path, "utf8")), TODO);
-  if (!git(root, ["switch", "-c", branch]).ok) return 1;
-  if (!push(root, branch, brief, "the brief")) return 1;
-  git(root, ["switch", TRUNK], true);
-  git(root, ["push", "-u", "origin", branch], true);
+  const brief = setStatus(withContract(it.disk.read(path)), TODO);
+  if (!it.git.run(["switch", "-c", branch]).ok) return 1;
+  if (!push(it, branch, brief, "the brief")) return 1;
+  it.git.run(["switch", TRUNK], true);
+  it.git.run(["push", "-u", "origin", branch], true);
 
   console.log(`${branch} is pushed as ${TODO}, and ${BRIEF} left ${TRUNK} with it.`);
   console.log("Point a cloud agent at that branch, or let a routine take it.");
@@ -199,27 +191,27 @@ function newWork(root, name) {
 }
 
 // [[spec/design_output/work#why-a-routine-needs-this]]
-function take(root) {
-  if (dirty(root)) return 2;
-  const open = branches(root).filter((b) => statusOf(briefOf(root, b)) === TODO);
+function take(it) {
+  if (dirty(it)) return 2;
+  const open = branches(it).filter((b) => statusOf(briefOf(it, b)) === TODO);
   if (!open.length) {
     console.log(`No work branch stands at ${TODO}. Nothing to take.`);
     return 0;
   }
 
   const branch = open[0];
-  if (!git(root, ["switch", branch], true).ok) {
-    if (!git(root, ["switch", "-c", branch, `origin/${branch}`]).ok) return 1;
+  if (!it.git.run(["switch", branch], true).ok) {
+    if (!it.git.run(["switch", "-c", branch, `origin/${branch}`]).ok) return 1;
   }
-  git(root, ["reset", "--hard", `origin/${branch}`], true);
+  it.git.run(["reset", "--hard", `origin/${branch}`], true);
 
-  const brief = readFileSync(join(root, BRIEF), "utf8");
-  if (!push(root, branch, setStatus(brief, HELD), HELD)) {
+  const brief = it.disk.read(it.join(it.root, BRIEF));
+  if (!push(it, branch, setStatus(brief, HELD), HELD)) {
     console.error("Somebody took this branch first. Run work take again.");
     return 1;
   }
 
-  if (sync(root) === 1) {
+  if (sync(it) === 1) {
     console.error(`Resolve the conflict on ${branch}, then read the brief again.`);
     return 1;
   }
@@ -230,33 +222,33 @@ function take(root) {
   return 0;
 }
 
-function finish(root) {
-  const branch = git(root, ["rev-parse", "--abbrev-ref", "HEAD"], true).out;
+function finish(it) {
+  const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
   if (!branch.startsWith("work/")) {
     console.error(`work done runs on a work branch, and this is ${branch}.`);
     return 2;
   }
-  const path = join(root, BRIEF);
-  if (!existsSync(path)) {
+  const path = it.join(it.root, BRIEF);
+  if (!it.disk.exists(path)) {
     console.error(`Write your result to ${BRIEF} first. It is what comes back.`);
     return 2;
   }
-  if (!push(root, branch, setStatus(readFileSync(path, "utf8"), DONE), DONE)) return 1;
+  if (!push(it, branch, setStatus(it.disk.read(path), DONE), DONE)) return 1;
   console.log(`${branch} stands at ${DONE}. The merge belongs to a person.`);
   return 0;
 }
 
-function release(root, name) {
-  const here = git(root, ["rev-parse", "--abbrev-ref", "HEAD"], true).out;
+function release(it, name) {
+  const here = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
   const branch = name ? `work/${name}` : here;
   if (!branch.startsWith("work/")) {
     console.error("work release takes a name, or runs on a work branch.");
     return 2;
   }
 
-  if (dirty(root)) return 2;
+  if (dirty(it)) return 2;
 
-  const brief = briefOf(root, branch);
+  const brief = briefOf(it, branch);
   if (!brief) {
     console.error(`${branch} carries no ${BRIEF}.`);
     return 1;
@@ -266,23 +258,23 @@ function release(root, name) {
     return 1;
   }
 
-  if (!git(root, ["switch", branch], true).ok) {
-    if (!git(root, ["switch", "-c", branch, `origin/${branch}`]).ok) return 1;
+  if (!it.git.run(["switch", branch], true).ok) {
+    if (!it.git.run(["switch", "-c", branch, `origin/${branch}`]).ok) return 1;
   }
-  git(root, ["reset", "--hard", `origin/${branch}`], true);
-  if (!push(root, branch, setStatus(brief, TODO), TODO)) return 1;
-  if (here !== branch) git(root, ["switch", here], true);
+  it.git.run(["reset", "--hard", `origin/${branch}`], true);
+  if (!push(it, branch, setStatus(brief, TODO), TODO)) return 1;
+  if (here !== branch) it.git.run(["switch", here], true);
 
   console.log(`${branch} stands at ${TODO} again, and is free for anybody.`);
   return 0;
 }
 
-function read(root, name) {
+function read(it, name) {
   if (!name) {
     console.error("work read needs a name: ./RUNME.sh work read fix-lsp");
     return 2;
   }
-  const said = briefOf(root, `work/${name}`);
+  const said = briefOf(it, `work/${name}`);
   if (!said) {
     console.error(`work/${name} carries no ${BRIEF}.`);
     return 1;
@@ -291,23 +283,23 @@ function read(root, name) {
   return 0;
 }
 
-function list(root) {
-  const all = branches(root);
+function list(it) {
+  const all = branches(it);
   if (!all.length) {
     console.log("No work branch stands.");
     return 0;
   }
   for (const branch of all) {
-    const status = statusOf(briefOf(root, branch)) || "no status";
+    const status = statusOf(briefOf(it, branch)) || "no status";
     console.log(
-      `${branch.padEnd(34)} ${status.padEnd(10)} ${whoTouched(root, branch)}`,
+      `${branch.padEnd(34)} ${status.padEnd(10)} ${whoTouched(it, branch)}`,
     );
   }
   return 0;
 }
 
-function collect(root) {
-  const ready = branches(root).filter((b) => statusOf(briefOf(root, b)) === DONE);
+function collect(it) {
+  const ready = branches(it).filter((b) => statusOf(briefOf(it, b)) === DONE);
   if (!ready.length) {
     console.log(`No branch stands at ${DONE}.`);
     return 0;

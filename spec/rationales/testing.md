@@ -1,0 +1,56 @@
+---
+kind: [[rationale]]
+explains: [[spec/guidance/testing]]
+---
+
+# Why
+
+Everybody pays for the suite on every run. What a test touches decides what it
+costs, so that is the thing to rule on.
+
+## 1. One door per outside thing
+
+Measured in this tree at 41 tests: 8 tests that spawn a binary cost 862ms, and
+33 tests running in memory cost 43ms. So a fifth of the tests take 95% of the
+time, and that ratio worsens as the suite grows.
+
+An earlier line of this project measured the same shape at its own scale. The
+suite built one binary from every test that wanted it, and building it once took
+110 seconds to 49. Running the tests beside each other took 49 to 17.
+
+A door is the one place a program reaches a binary, the disk, git or the clock.
+Everything above it takes the door as an argument, so a test hands in a fake and
+touches nothing.
+
+## 2. What the checks hold
+
+Vale refuses a `node:` import, a `Date.now`, a `new Date()` and a `Math.random`
+outside `src/doors`. It refuses a normal test importing a real door. Both read
+the whole file, because a rule over code needs `scope: raw`: on a code file Vale
+otherwise sees comments alone.
+
+The hooks module is exempt, because its environment carries no `node:` at all.
+The engine interface `$` is its door layer already, and a test drives it by
+handing in a `$` of its own.
+
+An earlier line wrote fifteen rules of testing craft as guidance and enforced
+none of them. The rules were right and the suite grew slow anyway, which is the
+whole argument for a check.
+
+## 4. A fake behaves
+
+Fowler draws the line: a fake behaves, and somebody scripts a mock. A mock
+passes when the code calls what the script expects, so a refactor turns it red
+for nothing.
+
+The fake filesystem here holds a map, and what a test writes it reads back. The
+fake process answers from a table and throws on a command nobody taught it, so a
+wrong answer stays impossible.
+
+## 3. The contract keeps a fake honest
+
+A fake with nothing behind it drifts from the thing it stands for. So one test
+per door drives the real tool and holds the contract, and everything above it
+runs on the fake.
+
+That test costs what the real thing costs, once for the suite.
