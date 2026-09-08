@@ -287,7 +287,7 @@ async function onACloudBox($) {
   return bindsHere("---\nenv:\n  - CLAUDE_CODE_REMOTE\n  - SE_CLOUD\n---\n", env);
 }
 
-// [[spec/design_output/work#a-cloud-box-landing-off-a-work-branch]]
+// [[spec/design_output/work#a-cloud-box-landing-off-a-work-branch]] says why.
 async function offAWorkBranch($) {
   return !(await branchNow($)).startsWith("work/");
 }
