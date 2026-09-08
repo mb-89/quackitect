@@ -7,12 +7,13 @@
   "extraKnownMarketplaces": {
     "quackitect": {
       "source": {
-        "source": "directory",
-        "path": "${CLAUDE_PROJECT_DIR}"
+        "source": "github",
+        "repo": "mb-89/quackitect"
       }
     }
   },
   "enabledPlugins": {
     "level0@quackitect": true
-  }
+  },
+  "$marketplace": "THE SOURCE IS THE REPOSITORY, AND NOT A PATH ON ONE BOX. A directory source names a folder that exists on whoever wrote it, and a machine cache then hides that from them. The repository is the same everywhere. Registering it is still a step a box takes once: settings alone do not register a marketplace on a fresh clone, so src/scripts/install.sh asks for it and RUNME runs that first."
 }
