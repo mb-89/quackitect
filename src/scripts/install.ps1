@@ -14,6 +14,7 @@ $binDir = Join-Path $root ".se\bin"
 # platform, so nothing here compiles and no C toolchain is needed.
 $valeVersion = "3.20.0"
 $biomeVersion = "2.5.12"
+$lnavVersion = "0.14.1"
 
 function Refresh-Path {
   # A program installed a moment ago is on the machine and not yet in this
@@ -77,6 +78,27 @@ function Get-Biome {
   Invoke-WebRequest -Uri $from -OutFile (Join-Path $binDir "biome.exe") -UseBasicParsing
 }
 
+# The log viewer, which ships a Windows zip carrying its own msys dll. The
+# format file decides what a row shows, and lnav reads that from the reader's
+# own folder, so it lands with one -i.
+function Get-Lnav {
+  $arch = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "arm64" } else { "x86_64" }
+  $name = "lnav-$lnavVersion-windows-$arch.zip"
+  $from = "https://github.com/tstack/lnav/releases/download/v$lnavVersion/$name"
+  $zip = Join-Path $env:TEMP $name
+  $out = Join-Path $env:TEMP "lnav-$lnavVersion-$arch"
+
+  Write-Host "  downloading lnav $lnavVersion" -ForegroundColor Cyan
+  New-Item -ItemType Directory -Force $binDir | Out-Null
+  Invoke-WebRequest -Uri $from -OutFile $zip -UseBasicParsing
+  Expand-Archive -LiteralPath $zip -DestinationPath $out -Force
+  foreach ($file in @("lnav.exe", "msys-2.0.dll")) {
+    Move-Item -Force (Join-Path $out "lnav-$lnavVersion\bin\$file") (Join-Path $binDir $file)
+  }
+  Remove-Item $zip, $out -Recurse -Force
+  & (Join-Path $binDir "lnav.exe") -i (Join-Path $root "spec\config\lnav\quackitect.json") | Out-Null
+}
+
 $needed = @(
   @{
     name = "node"
@@ -102,6 +124,14 @@ $needed = @(
     have   = { Test-Path (Join-Path $binDir "vale-ls.exe") }
     get    = { Get-ValeLs }
     # The editor wants this one, and the doors hold without it.
+    wanted = $true
+  },
+  @{
+    name   = "lnav"
+    why    = "the viewer ./RUNME.sh log opens the door log in"
+    have   = { Test-Path (Join-Path $binDir "lnav.exe") }
+    get    = { Get-Lnav }
+    # ./RUNME.sh log prints plain rows without it.
     wanted = $true
   }
 )

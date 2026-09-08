@@ -19,7 +19,7 @@ script: |
     if text.has_prefix(t, "//") { continue }
     if text.contains(t, "doors/fake/") { continue }
 
-    if text.re_match(`doors/(disk|proc|git|clock)\.js`, t) {
+    if text.re_match(`doors/(disk|proc|git|clock|log)\.js`, t) {
       matches = append(matches, {begin: at, end: at + len(line)})
     }
   }

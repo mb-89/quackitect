@@ -6,9 +6,11 @@ import { fileURLToPath } from "node:url";
 import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
+import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { biomeBin } from "../level0/lib/code.js";
 import { actionables, bindsHere, standingLayer } from "../level0/lib/guidance.js";
+import { asRow, lnavBin, rowsOf } from "../level0/lib/log.js";
 import { line as asLine } from "../level0/lib/refuse.js";
 import { pathInScript, SCRIPT } from "../level0/lib/scripts.js";
 import { EDITOR_SETTINGS, valeLsBin } from "../level0/lib/servers.js";
@@ -20,7 +22,16 @@ const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 
 function doorsHere() {
   const outside = proc();
-  return { proc: outside, disk: disk(), clock: clock(), git: git(outside, root), join };
+  const files = disk();
+  const time = clock();
+  return {
+    proc: outside,
+    disk: files,
+    clock: time,
+    git: git(outside, root),
+    log: log(files, time, { folder: join(root, ".se", "log") }),
+    join,
+  };
 }
 
 const it = doorsHere();
@@ -28,6 +39,8 @@ const files = it.disk;
 const outside = it.proc;
 
 const bin = join(root, valeBin(process.platform));
+const lnav = join(root, lnavBin(process.platform));
+const LOG = join(root, ".se", "log");
 const STYLES = join(root, "spec", "config", "styles", "VoiceVale");
 const JUDGED = join(root, "spec", "config", "styles", "VoiceJudged");
 const biome = join(root, biomeBin(process.platform));
@@ -70,6 +83,10 @@ const verbs = {
     says: "work branches: new, take, read, list",
     run: async () => work(root, rest, it),
   },
+  log: {
+    says: "what every door says, through lnav where it stands",
+    run: async () => readLog(rest),
+  },
 };
 
 const argv = process.argv.slice(2);
@@ -92,6 +109,7 @@ async function lint(where) {
     console.error("Vale is missing. Run ./RUNME.sh once and it installs.");
     return 2;
   }
+  const began = it.clock.now().getTime();
 
   const ran = await run([
     bin,
@@ -132,10 +150,19 @@ async function lint(where) {
     }
   }
 
+  const ms = it.clock.now().getTime() - began;
   if (!found.length) {
+    await it.log.say("info", "vale", `the rules pass over ${where.join(" ")}`, { ms });
     console.log("The rules pass.");
     return 0;
   }
+  await it.log.say("warn", "vale", `${found.length} line(s) break a rule`, {
+    ms,
+    detail: found
+      .slice(0, 3)
+      .map((one) => `${show(one.file ?? where[0])}:${one.line} ${one.rule}`)
+      .join(", "),
+  });
 
   const perRule = new Map();
   for (const one of found) {
@@ -148,6 +175,44 @@ async function lint(where) {
   }
   console.log(`${String(found.length).padStart(6)}  in all`);
   return 1;
+}
+
+// [[spec/design_output/log#lnav-and-how-it-installs]]
+function lnavHere() {
+  if (files.exists(lnav)) return lnav;
+  try {
+    return outside.run(["lnav", "-V"]).exitCode === 0 ? "lnav" : "";
+  } catch {
+    return "";
+  }
+}
+
+// [[spec/design_output/log#the-verb]]
+function readLog(argv) {
+  const names = files.exists(LOG) ? namesIn(LOG, ".jsonl").sort() : [];
+  if (!names.length) {
+    console.log("No log stands yet. A door writes one the next time it says a line.");
+    return 0;
+  }
+
+  const all = argv.includes("--all");
+  const newest = names[names.length - 1];
+  const viewer = lnavHere();
+  if (viewer) {
+    return outside.run([viewer, all ? LOG : join(LOG, newest)], {
+      cwd: root,
+      inherit: true,
+    }).exitCode;
+  }
+
+  for (const name of all ? names : [newest]) {
+    console.log(name);
+    for (const one of rowsOf(files.read(join(LOG, name)))) console.log(asRow(one));
+  }
+  console.log("");
+  console.log("lnav draws these rows, and opens the rest of a line under it.");
+  console.log("Run ./RUNME.sh once, which installs it into .se/bin.");
+  return 0;
 }
 
 async function fix(where) {

@@ -15,6 +15,7 @@ bin="$root/.se/bin"
 # platform, so nothing here compiles and no C toolchain is needed.
 vale_version=3.20.0
 biome_version=2.5.12
+lnav_version=0.14.1
 # vale-ls pins itself in src/level0/lib/servers.js, which a test drives.
 
 say() { printf '%s\n' "$*"; }
@@ -98,6 +99,48 @@ get_biome() {
   chmod +x "$bin/biome${exe}"
 }
 
+# The log viewer. Release 0.14.1 ships Linux and Windows zips, and macOS takes
+# it from brew. The format file decides what a row shows, and lnav reads that
+# from the reader's own folder, so it lands with one -i.
+get_lnav() {
+  if [ "$os" = "macOS" ]; then
+    install_with_pm lnav
+    format_lnav lnav
+    return 0
+  fi
+
+  case "$os" in
+    Windows) plat=windows ;;
+    *)       plat=linux-musl ;;
+  esac
+  cpu=$( [ "$arch" = arm64 ] && echo arm64 || echo x86_64 )
+  name="lnav-${lnav_version}-${plat}-${cpu}.zip"
+  from="https://github.com/tstack/lnav/releases/download/v${lnav_version}/${name}"
+
+  say "  downloading lnav ${lnav_version}"
+  mkdir -p "$bin"
+  tmp=$(mktemp -d)
+  if have curl; then curl -fsSL "$from" -o "$tmp/$name" || return 1
+  elif have wget; then wget -q "$from" -O "$tmp/$name" || return 1
+  else say "Neither curl nor wget downloads lnav here." >&2; return 1
+  fi
+
+  unpack "$tmp/$name" "$tmp" || return 1
+  if [ "$os" = "Windows" ]; then
+    mv "$tmp/lnav-${lnav_version}/bin/lnav.exe" "$bin/lnav.exe" || return 1
+    mv "$tmp/lnav-${lnav_version}/bin/msys-2.0.dll" "$bin/msys-2.0.dll" || return 1
+  else
+    mv "$tmp/lnav-${lnav_version}/lnav" "$bin/lnav" || return 1
+  fi
+  chmod +x "$bin/lnav${exe}"
+  rm -rf "$tmp"
+  format_lnav "$bin/lnav${exe}"
+}
+
+format_lnav() {
+  "$1" -i "$root/spec/config/lnav/quackitect.json" >/dev/null 2>&1 || true
+}
+
 unpack() {
   if have unzip; then unzip -oq "$1" -d "$2"
   elif have python3; then python3 -m zipfile -e "$1" "$2"
@@ -141,12 +184,13 @@ registered() {
 }
 
 # A want, rather than a need: the tree still lints and tests without it.
-wanted() { [ "$1" = "vale-ls" ] || [ "$1" = "level0" ]; }
+wanted() { [ "$1" = "vale-ls" ] || [ "$1" = "level0" ] || [ "$1" = "lnav" ]; }
 
 missed() {
   case $1 in
     vale-ls) say "  vale-ls stays missing, so the editor manages its own copy." >&2 ;;
     level0)  say "  level0 is unregistered, so its rules reach no session here." >&2 ;;
+    lnav)    say "  lnav stays missing, so ./RUNME.sh log prints plain rows." >&2 ;;
   esac
 }
 
@@ -156,6 +200,7 @@ here() {
     vale)    [ -x "$bin/vale${exe}" ] ;;
     biome)   [ -x "$bin/biome${exe}" ] ;;
     vale-ls) [ -x "$bin/vale-ls${exe}" ] ;;
+    lnav)    [ -x "$bin/lnav${exe}" ] || have lnav ;;
     level0)  registered ;;
   esac
 }
@@ -167,6 +212,7 @@ why() {
     vale) say "vale: Vale holds the prose rules the write door and the linter read" ;;
     biome) say "biome: Biome formats and lints the JavaScript in this tree" ;;
     vale-ls) say "vale-ls: the Vale language server, so an editor draws the same rules" ;;
+    lnav) say "lnav: the viewer ./RUNME.sh log opens the door log in" ;;
   esac
 }
 
@@ -177,11 +223,12 @@ get() {
     vale) get_vale ;;
     biome) get_biome ;;
     vale-ls) get_vale_ls ;;
+    lnav) get_lnav ;;
   esac
 }
 
 missing=""
-for one in node vale biome vale-ls level0; do
+for one in node vale biome vale-ls lnav level0; do
   here "$one" || missing="$missing $one"
 done
 [ -n "$missing" ] || exit 0
