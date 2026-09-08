@@ -87,6 +87,14 @@ function whoTouched(root, branch) {
   return said.ok ? said.out : "";
 }
 
+function dirty(root) {
+  const said = git(root, ["status", "--porcelain"], true).out;
+  if (!said) return false;
+  console.error("This tree carries uncommitted changes, so no branch may move.");
+  console.error("Commit them, or stash them, and run this again.");
+  return true;
+}
+
 function push(root, branch, was, why) {
   writeFileSync(join(root, BRIEF), was, { encoding: "utf8" });
   git(root, ["add", BRIEF], true);
@@ -192,6 +200,7 @@ function newWork(root, name) {
 
 // [[spec/design_output/work#why-a-routine-needs-this]]
 function take(root) {
+  if (dirty(root)) return 2;
   const open = branches(root).filter((b) => statusOf(briefOf(root, b)) === TODO);
   if (!open.length) {
     console.log(`No work branch stands at ${TODO}. Nothing to take.`);
@@ -244,6 +253,8 @@ function release(root, name) {
     console.error("work release takes a name, or runs on a work branch.");
     return 2;
   }
+
+  if (dirty(root)) return 2;
 
   const brief = briefOf(root, branch);
   if (!brief) {
