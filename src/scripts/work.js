@@ -17,7 +17,7 @@ export const DONE = "done";
 export function work(root, argv) {
   const what = argv[0];
   const name = argv[1];
-  const doing = { new: newWork, take, done: finish, read, list, collect };
+  const doing = { new: newWork, take, done: finish, release, read, list, collect };
   if (!doing[what]) {
     console.log("Usage: ./RUNME.sh work <verb>\n");
     console.log("  new <name>    cut work/<name> from main with the brief, and push");
@@ -25,6 +25,7 @@ export function work(root, argv) {
       "  take          take the next branch marked todo, and print its brief",
     );
     console.log("  done          mark this branch done, commit and push");
+    console.log("  release       put this branch, or the one you name, back to todo");
     console.log("  read <name>   print what stands on work/<name>");
     console.log("  list          every work branch and its status");
     console.log("  collect       every branch marked done, waiting on a merge");
@@ -83,6 +84,32 @@ function push(root, branch, was, why) {
   return git(root, ["push", "origin", branch]).ok;
 }
 
+export const CONTRACT_HEADING = "## How this branch ends";
+
+// [[spec/design_output/work#every-brief-carries-the-contract]]
+export function withContract(brief) {
+  const said = String(brief ?? "").trimEnd();
+  if (said.includes(CONTRACT_HEADING)) return `${said}\n`;
+  return [
+    said,
+    "",
+    CONTRACT_HEADING,
+    "",
+    "Level zero deletes this file when it reads it, so the copy in your context",
+    "is the only one left. These steps put it back.",
+    "",
+    "1. Commit and push each time you finish a thing. A cloud box dies and takes",
+    "   its working tree with it.",
+    `2. Write your result and your retro into \`${BRIEF}\`, at the root, replacing`,
+    "   this brief. Say what surprises you and every dead end you walk into.",
+    "3. Run `./RUNME.sh work done`, which sets the status and pushes.",
+    "4. Run `./RUNME.sh work release` instead where you stop early, so the branch",
+    "   goes back to `todo` for somebody else.",
+    "5. Leave the merge to a person. A cloud box opens no pull request.",
+    "",
+  ].join("\n");
+}
+
 function newWork(root, name) {
   if (!name) {
     console.error("work new needs a name: ./RUNME.sh work new fix-lsp");
@@ -105,7 +132,7 @@ function newWork(root, name) {
     return 2;
   }
 
-  const brief = setStatus(readFileSync(path, "utf8"), TODO);
+  const brief = setStatus(withContract(readFileSync(path, "utf8")), TODO);
   if (!git(root, ["switch", "-c", branch]).ok) return 1;
   if (!push(root, branch, brief, "the brief")) return 1;
   git(root, ["switch", TRUNK], true);
@@ -155,6 +182,35 @@ function finish(root) {
   }
   if (!push(root, branch, setStatus(readFileSync(path, "utf8"), DONE), DONE)) return 1;
   console.log(`${branch} stands at ${DONE}. The merge belongs to a person.`);
+  return 0;
+}
+
+function release(root, name) {
+  const here = git(root, ["rev-parse", "--abbrev-ref", "HEAD"], true).out;
+  const branch = name ? `work/${name}` : here;
+  if (!branch.startsWith("work/")) {
+    console.error("work release takes a name, or runs on a work branch.");
+    return 2;
+  }
+
+  const brief = briefOf(root, branch);
+  if (!brief) {
+    console.error(`${branch} carries no ${BRIEF}.`);
+    return 1;
+  }
+  if (statusOf(brief) === DONE) {
+    console.error(`${branch} stands at ${DONE}. Read it before you reopen it.`);
+    return 1;
+  }
+
+  if (!git(root, ["switch", branch], true).ok) {
+    if (!git(root, ["switch", "-c", branch, `origin/${branch}`]).ok) return 1;
+  }
+  git(root, ["reset", "--hard", `origin/${branch}`], true);
+  if (!push(root, branch, setStatus(brief, TODO), TODO)) return 1;
+  if (here !== branch) git(root, ["switch", here], true);
+
+  console.log(`${branch} stands at ${TODO} again, and is free for anybody.`);
   return 0;
 }
 

@@ -43,6 +43,20 @@ a rejected push and takes the next.
    `./RUNME.sh work done`, which stamps `status: done` and pushes.
 5. `./RUNME.sh work collect` names every branch standing at `done`.
 
+# Every brief carries the contract
+
+`work new` appends `## How this branch ends` to a brief that carries none, so
+every branch says how it closes. The append is idempotent, and a brief already
+carrying the section stays as it stands.
+
+The contract names five things: push often, write the result and the retro back
+into `HANDOVER.md`, run `work done`, run `work release` on stopping early, and
+leave the merge to a person.
+
+A brief depends on nothing outside itself. A cloud session pointed straight at a
+branch reads it and knows how to finish, whether or not it also reads the cloud
+guidance.
+
 # Why a routine needs this
 
 A routine starts on `main` and takes no branch argument, so a pointed cloud
