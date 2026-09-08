@@ -1,5 +1,5 @@
 // Git. Built on the process door, so a fake process fakes git too.
-// [[spec/design_output/doors#git-is-a-door-of-its-own]]
+// [[spec/design_output/doors#a-door-standing-on-another]]
 
 export function git(proc, root) {
   const run = (args, quiet) => {
