@@ -479,7 +479,8 @@ func aCleanTakesWhatIsNotThere(why string) string {
 		"List the files you mean and read them, then delete those by name."
 }
 
-// anEmptyFolder says whether this path is a directory holding nothing.
+// anEmptyFolder says whether this path holds nothing a delete could lose: a
+// directory with no entries, or a path that is not on the disk at all.
 //
 // A FOLDER CANNOT BE READ, so the read rule could never be satisfied for one.
 // util/checks was emptied file by file, every one read and deleted, and then the
@@ -490,7 +491,15 @@ func aCleanTakesWhatIsNotThere(why string) string {
 // written for, where what goes is named nowhere in the command.
 func anEmptyFolder(path string) bool {
 	info, err := os.Stat(path)
-	if err != nil || !info.IsDir() {
+	if err != nil {
+		// A PATH THAT IS NOT THERE CARRIES NOTHING EITHER, and cannot be read
+		// any more than a folder can. A merge left one note listed in the index
+		// under its old folder while the file itself had already moved, and
+		// taking that entry out was refused because nobody had read a file that
+		// was not on the disk to read.
+		return true
+	}
+	if !info.IsDir() {
 		return false
 	}
 	entries, err := os.ReadDir(path)

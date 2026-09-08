@@ -611,6 +611,7 @@ func theShapeOfTheTree(r Roots, files []string, content map[string][]byte, born 
 			aCountNamesTheCommandThatProducedIt,
 			aReceiptNamingATokenNobodyHas,
 			aSnapshotCalledAbsentDoesNotResolve,
+			aCommentPromisingWorkOnAnEndedToken,
 		} {
 			if err := refuse(r, born[at], rel, text); err != nil {
 				return err
