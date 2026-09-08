@@ -3,62 +3,120 @@ kind: [[handover]]
 status: held
 ---
 
-# Wire the language server
+# The editor holds the rules the write door holds
 
-Level zero holds its rules at the write door and on the command line. The editor
-shows none of them, so a person meets a rule one write too late.
+`./RUNME.sh` installs vale-ls beside Vale and Biome, `.vscode` names both
+servers, and `./RUNME.sh doctor` says their versions. The design record stands
+at [[spec/design_output/editor]].
 
-## What is already settled
+| what lands | where |
+|---|---|
+| the version pin and the asset matrix | `src/level0/lib/servers.js` |
+| the download, soft on a failure | `src/scripts/install.sh`, `src/scripts/install.ps1` |
+| the tracked settings | `.vscode/settings.json` |
+| the recommendations | `.vscode/extensions.json` |
+| the doctor rows | `src/scripts/cli.js` |
+| the tests | `src/level0/test/servers.test.js` |
+| the design record | `spec/design_output/editor.md` |
 
-Both language servers exist. This work installs and configures them.
+`./RUNME.sh check` passes: the tests, then the rules over the tree.
+`./RUNME.sh doctor` answers:
 
-| server | holds | how it arrives |
-|---|---|---|
-| `vale-ls` v0.5.1 | every Vale rule in `spec/config/styles/VoiceVale` | a prebuilt binary per platform, from `vale-cli/vale-ls` releases |
-| `biome lsp-proxy` | every Biome rule over JavaScript and JSON | already in `.se/bin/biome`, one subcommand |
+    vale-ls            vale-ls 0.5.1
+    biome lsp-proxy    biome 2.5.12
+    editor             .vscode/settings.json, both servers
 
-`vale-ls` wraps the Vale binary this tree already installs, reads the same
-`.vale.ini`, and answers diagnostics as a person types. It also serves code
-actions over a vocabulary and a code lens per document.
+# The answer the brief asks for: `.claude` takes no entry
 
-## Do this
+Level zero reads every Write and Edit at `tool.call` and runs Vale, Biome and
+the judge there. That door sits inside the harness process and speaks no
+language server protocol, so a `.claude` editor surface has nothing to hold.
 
-1. Add `vale-ls` to `src/scripts/install.sh` and `install.ps1`, one row each
-   beside Vale and Biome. Pin the version and take the binary into `.se/bin`.
-2. Write `.vscode/settings.json` naming both servers, so a clone opens with the
-   rules live in the problems panel.
-3. Answer whether a `.claude` editor surface needs its own entry, and write what
-   you find here.
-4. Add a `doctor` row for each server, so `./RUNME.sh doctor` names both.
-5. Leave the judged rules alone. They need a model per span, no language server
-   speaks that, and `spec/config/styles/VoiceJudged` stays with the write door.
+The judged rules stay with the write door, as the brief asks. A model answers
+one question per span, and no language server speaks that.
 
-## What holds
+# Retro
 
-- `./RUNME.sh check` stays green
-- `./RUNME.sh doctor` names both servers and their versions
-- a breach opened in the editor draws a diagnostic carrying the same rule name
-  the write door names
-- a cold clone reaches that state with one `./RUNME.sh` and no setup
+## The extension manages its own vale-ls
 
-## Where to look
+The Vale extension downloads vale-ls into per-extension storage and checks a
+SHA-256 against it. It reads `vale.valeCLI.path` for the Vale binary alone, so
+no setting points VS Code at `.se/bin/vale-ls`.
 
-- `src/level0/lib/vale.js` is the one caller of Vale, and the finding shape
-  every door reads
-- `spec/design_output/level0.md` says what each door does today
-- `.vale.ini` scopes rules by path, and the editor reads the same file
+The copy in `.se/bin` still earns its place. `doctor` names it, and an editor
+that starts a server binary by path runs it. A session that wants VS Code on the
+pinned copy has to ask the extension for that setting first.
 
-## When you finish
+That surprise turns the download into a want. A failure there costs one warning
+line, and `./RUNME.sh` goes on, because Vale and Biome carry the doors. Proof:
+point the pin at a tag the release skips, and the install answers 404, warns,
+and exits 0.
 
-1. Replace this brief with your result, keeping the frontmatter.
-2. Write a retro under `## Retro`: what surprises you, and every dead end you
-   walk into. The next session pays for a repeat.
-3. Run `./RUNME.sh work done`, which sets the status and pushes.
+## Windows breaks the asset pattern
+
+| platform | target |
+|---|---|
+| Windows x86 | `x86_64-pc-windows-gnu` |
+| Windows arm64 | `aarch64-pc-windows-msvc` |
+
+A guess at msvc for x86 answers 404. Every other platform follows the usual Rust
+triple. The test holds the whole matrix, so the next version bump shows a
+mismatch at once.
+
+## A relative path reaches Vale
+
+`vale.valeCLI.path` travels to vale-ls verbatim, with no `${workspaceFolder}`
+expansion. The extension spawns vale-ls with `cwd` set to the workspace folder,
+so `.se/bin/vale` resolves from there. `vale.valeCLI.config` takes a relative
+path through the extension's own join.
+
+So the settings file travels with the tree and names no machine.
+
+## Dead ends
+
+- The GitHub API answers 403 through this box, so every source read here comes from `raw.githubusercontent.com`.
+- `marketplace.visualstudio.com` and `biomejs.dev` sit behind the egress block, so the setting names come from each extension's `package.json`.
+- The old Vale extension `errata-ai.vale-server` carries different settings. The live one is `chrischinchilla.vale-vscode`.
+- The brief names `vale-cli/vale-ls`, and `errata-ai/vale-ls` serves the same release. The pin uses the name the brief gives.
+
+## What stays open
+
+| thing | why |
+|---|---|
+| Windows and macOS installs | this box runs Linux, so both stand unproven |
+| the `biome.lsp.bin` platform keys | the extension's own example names four, and the rest follow its pattern |
+| workspace trust | VS Code holds `vale.valeCLI.path` at its user value until a person trusts the folder |
+| the editor diagnostic itself | proving a rule name in the problems panel wants a person with VS Code open |
+
+## A defect this work walks past
+
+`./RUNME.sh check` runs Biome over nothing:
+
+    $ .se/bin/biome lint --config-path=spec/config .
+    × Found a nested root configuration, but there's already a root configuration.
+
+The scan of `.` meets `spec/config/biome.json` a second time, Biome lints no
+file, and it exits 0. So the check passes green with half a door.
+
+`./RUNME.sh lint src` shows what the `.` path hides: one
+`correctness/noUnusedImports` at `src/level0/hooks/level0.js:8`.
+
+That sits outside this brief, so the code stands as it is. It wants its own
+branch.
+
+## One word of the contract fails the tree's own rules
+
+`withContract` in `src/scripts/work.js` closes with a sentence whose verb Vale
+tags as a past tense. So every generated brief carries one breach, and
+`./RUNME.sh check` goes red while a handover sits in the tree.
+
+This branch changes that word to "bring". A test over the contract text still
+waits for somebody.
 
 ## How this branch ends
 
 Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps put it back.
+is the only one left. These steps bring it back.
 
 1. Commit and push each time you finish a thing. A cloud box dies and takes
    its working tree with it.

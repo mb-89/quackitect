@@ -146,7 +146,7 @@ export function withContract(brief) {
     CONTRACT_HEADING,
     "",
     "Level zero deletes this file when it reads it, so the copy in your context",
-    "is the only one left. These steps put it back.",
+    "is the only one left. These steps bring it back.",
     "",
     `1. Run \`./RUNME.sh work sync\` FIRST. It takes ${TRUNK} into this branch, so`,
     "   an old branch works against what the tree holds now. Resolve any conflict",
