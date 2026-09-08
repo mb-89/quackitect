@@ -32,6 +32,7 @@ export function register(on, _options) {
   let config = {};
   let judge = judgeOf({});
   let handover = [];
+  let waiting = false;
 
   on("session.start", async ($, e, next) => {
     bin = await linterHere($);
@@ -41,6 +42,7 @@ export function register(on, _options) {
     config = await readConfig($);
     judge = judgeOf(config);
     handover = await takeHandover($);
+    waiting = await onTrunkWithNothing($, handover);
 
     try {
       await $.fs.writeFile(
@@ -156,6 +158,29 @@ export function register(on, _options) {
       });
     }
 
+    if (waiting) {
+      blocks.push({
+        name: "level0-take-work",
+        text: [
+          "YOU ARE ON A CLOUD BOX, ON TRUNK, AND NO BRIEF REACHED YOU.",
+          "",
+          "Trunk carries no work of its own. The work waits on branches named",
+          "work/<something>, each carrying the brief that says what it is.",
+          "",
+          "Run this first:",
+          "",
+          "    ./RUNME.sh work take",
+          "",
+          "It takes the next branch nobody holds, moves you onto it, takes trunk",
+          "into it, and prints the brief. Do what the brief says, and finish the",
+          "way its own last section tells you to.",
+          "",
+          "It answers that nothing stands at todo where no work waits. Say so and",
+          "stop, because trunk is nobody's to work directly.",
+        ].join("\n"),
+      });
+    }
+
     if (standing) {
       blocks.push({
         name: "level0-receipt",
@@ -221,6 +246,23 @@ async function readGuidance($) {
     return standingLayer(notes.filter((one) => bindsHere(one.text, env)));
   } catch {
     return "";
+  }
+}
+
+// [[spec/design_output/work#a-cloud-box-landing-on-trunk]]
+async function onTrunkWithNothing($, held) {
+  if (held.length) return false;
+  const env = await readEnv($, ["CLAUDE_CODE_REMOTE", "SE_CLOUD"]);
+  if (!bindsHere("---\nenv:\n  - CLAUDE_CODE_REMOTE\n  - SE_CLOUD\n---\n", env)) {
+    return false;
+  }
+  try {
+    const ran = await $.process.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], {
+      timeoutMs: 10000,
+    });
+    return (ran.stdout ?? "").trim() === "main";
+  } catch {
+    return false;
   }
 }
 

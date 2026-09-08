@@ -67,6 +67,18 @@ branch reads it and knows how to finish.
 routine pays nothing to remember it. A conflict then stops the take, while the
 work it would cost still sits ahead.
 
+# A cloud box landing on trunk
+
+A cloud session starting on `main` gets no brief, because trunk carries none.
+Level zero notices that and hands over a block naming `./RUNME.sh work take`.
+
+So a box needs no prompt about work at all. Starting it on trunk is enough, and
+saying "take work" only agrees with what it already reads.
+
+Three things have to hold together for that block to appear: a cloud variable
+carries a value, the branch is `main`, and no handover reached the session. A
+desk session sees none of it.
+
 # Why a routine needs this
 
 A routine starts on `main` and takes no branch argument, so a pointed cloud
