@@ -224,8 +224,6 @@ async function readGuidance($) {
   }
 }
 
-// The module reads no environment of its own, so it asks the host for the
-// variables the notes name, in one call.
 async function readEnv($, names) {
   if (!names.length) return {};
   const script = `console.log(JSON.stringify(${JSON.stringify(names)}.reduce((o,n)=>(o[n]=process.env[n]??"",o),{})))`;
