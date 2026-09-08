@@ -24,10 +24,19 @@ touches nothing.
 
 ## 2. What the checks hold
 
-Vale refuses a `node:` import, a `Date.now`, a `new Date()` and a `Math.random`
-outside `src/doors`. It refuses a normal test importing a real door. Both read
-the whole file, because a rule over code needs `scope: raw`: on a code file Vale
-otherwise sees comments alone.
+Three checks hold the rules above:
+
+| check | what it refuses | where it runs |
+|---|---|---|
+| `DoorsOnly` | a `node:` import, a `Date.now`, a `new Date()`, a `Math.random` | outside `src/doors` |
+| `FakeDoorsInTest` | a real door | inside `src/level0/test` |
+| `./RUNME.sh doors` | a door standing without a contract test | over both folders |
+
+Five modules pass `DoorsOnly`, because they reach nothing outside: `node:path`,
+`node:url`, `node:test`, `node:assert` and `node:assert/strict`. Both Vale rules
+read the whole file, because a rule over code needs `scope: raw`: on a code file
+Vale otherwise sees comments alone. The third rule spans two folders, which no
+pattern holds, so the command line holds it and `check` runs it.
 
 The hooks module is exempt, because its environment carries no `node:` at all.
 The engine interface `$` is its door layer already, and a test drives it by

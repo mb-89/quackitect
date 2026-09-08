@@ -28,7 +28,8 @@ export function git(proc, root) {
       const said = run(["log", "-1", "--format=%an", ref], true);
       return said.ok ? said.out : "";
     },
-    countBetween: (from, to) => run(["rev-list", "--count", `${from}..${to}`], true).out,
+    countBetween: (from, to) =>
+      run(["rev-list", "--count", `${from}..${to}`], true).out,
     switchTo: (branch, quiet) => run(["switch", branch], quiet),
     switchNew: (branch, from) =>
       run(from ? ["switch", "-c", branch, from] : ["switch", "-c", branch]),

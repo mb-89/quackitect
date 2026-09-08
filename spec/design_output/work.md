@@ -108,14 +108,40 @@ The frontmatter carries two more fields, and `work take` reads both:
       - doors-and-fakes
 
 `take` drops every branch waiting on one still at `todo` or `held`, then sorts
-what is left by urgency: `now`, `soon`, `whenever`. A branch naming no urgency
-reads as `soon`.
+the rest by urgency: `now`, `soon`, `whenever`. A branch naming no urgency reads
+as `soon`.
 
-A dependency is met once the branch it names reaches `done`, or goes because
-somebody merged and closed it. So a chain of work runs itself in order, with
-nobody holding the order in their head.
+A branch meets its dependency once the branch it names reaches `done`, or goes
+because somebody merges and closes it. So a chain of work runs itself in order,
+with nobody holding the order in their head.
 
 `work list` shows what each branch waits for, in place of its urgency.
+
+# A merged branch goes
+
+`work merge <name>` runs on `main` and takes a branch standing at `done`. It
+merges with `--no-ff`, so the branch keeps its shape in the history, and drops
+`HANDOVER.md` inside the same commit: trunk carries no brief.
+
+A conflict stops the merge and leaves it standing, because resolving it belongs
+to the person merging.
+
+# A merged branch closes
+
+`work close [name]` deletes a branch git says is inside `main`, here and on
+origin. Naming no branch closes every one of them. It reaches two kinds:
+
+| branch | cut by | throwaway once |
+|---|---|---|
+| `work/<name>` | `work new` | trunk holds its commits |
+| `claude/<name>` | the platform, for a routine run | trunk holds its commits |
+
+Deleting a remote branch whose merge sits on this box alone loses the work. So
+`close` counts what local trunk holds beyond origin, and refuses while that
+number stands above zero. Push trunk first, and the merge outlives the branch.
+
+`close <name> --force` deletes a branch standing outside trunk, which drops the
+work on it.
 
 # A cloud box landing off a work branch
 

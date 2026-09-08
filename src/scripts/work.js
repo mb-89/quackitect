@@ -413,8 +413,7 @@ function close(it, name, argv) {
   const forced = (argv ?? []).includes("--force");
   it.git.run(["fetch", "--prune", "origin"], true);
 
-  // DELETING A REMOTE BRANCH WHOSE MERGE SITS ONLY HERE LOSES THE WORK. Local
-  // trunk holding commits origin has never seen is that case exactly.
+  // [[spec/design_output/work#a-merged-branch-closes]] holds this proof.
   const ahead = it.git.run(
     ["rev-list", "--count", `origin/${TRUNK}..${TRUNK}`],
     true,

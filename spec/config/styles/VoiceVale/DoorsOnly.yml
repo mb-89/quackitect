@@ -6,6 +6,16 @@ scope: raw
 script: |
   text := import("text")
 
+  pure := ["path", "url", "test", "assert", "assert/strict"]
+
+  isPure := func(t) {
+    for j := 0; j < len(pure); j++ {
+      if text.contains(t, `"node:` + pure[j] + `"`) { return true }
+      if text.contains(t, `'node:` + pure[j] + `'`) { return true }
+    }
+    return false
+  }
+
   lines := text.split(scope, "\n")
   matches := []
   offset := 0
@@ -19,11 +29,15 @@ script: |
     if text.has_prefix(t, "//") { continue }
 
     if text.re_match(`from ["']node:`, t) {
-      matches = append(matches, {begin: at, end: at + len(line)})
+      if !isPure(t) {
+        matches = append(matches, {begin: at, end: at + len(line)})
+      }
       continue
     }
     if text.re_match(`require\(["']node:`, t) {
-      matches = append(matches, {begin: at, end: at + len(line)})
+      if !isPure(t) {
+        matches = append(matches, {begin: at, end: at + len(line)})
+      }
       continue
     }
     if text.re_match(`\bDate\.now\(`, t) {

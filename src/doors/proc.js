@@ -8,10 +8,11 @@ export function proc() {
     run(argv, init = {}) {
       const ran = spawnSync(argv[0], argv.slice(1), {
         cwd: init.cwd,
-        input: init.stdin ?? "",
+        input: init.inherit ? undefined : (init.stdin ?? ""),
         encoding: "utf8",
         shell: false,
         timeout: init.timeoutMs,
+        stdio: init.inherit ? "inherit" : undefined,
       });
       if (ran.error) throw ran.error;
       return {

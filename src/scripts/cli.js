@@ -1,10 +1,12 @@
 // The command line. RUNME hands every argument through untouched, and every
 // verb here calls the same checkers the write door calls.
 
-import { spawnSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { clock } from "../doors/clock.js";
+import { disk } from "../doors/disk.js";
+import { git } from "../doors/git.js";
+import { proc } from "../doors/proc.js";
 import { biomeBin } from "../level0/lib/code.js";
 import { actionables, bindsHere, standingLayer } from "../level0/lib/guidance.js";
 import { line as asLine } from "../level0/lib/refuse.js";
@@ -12,48 +14,41 @@ import { pathInScript, SCRIPT } from "../level0/lib/scripts.js";
 import { EDITOR_SETTINGS, valeLsBin } from "../level0/lib/servers.js";
 import { calmed, SHOUTED } from "../level0/lib/shout.js";
 import { CONFIG, fromJson, unreasoned, valeBin } from "../level0/lib/vale.js";
-import { clock } from "../doors/clock.js";
-import { disk } from "../doors/disk.js";
-import { git } from "../doors/git.js";
-import { proc } from "../doors/proc.js";
 import { work } from "./work.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
-const bin = join(root, valeBin(process.platform));
-const STYLES = join(root, "spec", "config", "styles", "VoiceVale");
-const JUDGED = join(root, "spec", "config", "styles", "VoiceJudged");
-const biome = join(root, biomeBin(process.platform));
-const valeLs = join(root, valeLsBin(process.platform));
-const GUIDANCE = join(root, "spec", "guidance");
-const LEVEL0 = join(root, "spec", "config", "level0.json");
-const config = existsSync(LEVEL0) ? JSON.parse(readFileSync(LEVEL0, "utf8")) : {};
-const OURS = "--glob=!{.se,node_modules,.git}/**";
-const ROUNDS = 5;
 
 function doorsHere() {
   const outside = proc();
   return { proc: outside, disk: disk(), clock: clock(), git: git(outside, root), join };
 }
 
-const run = async (argv, init = {}) => {
-  const ran = spawnSync(argv[0], argv.slice(1), {
-    cwd: init.cwd ?? root,
-    input: init.stdin ?? "",
-    encoding: "utf8",
-    shell: false,
-  });
-  if (ran.error) throw ran.error;
-  return {
-    exitCode: ran.status ?? 1,
-    stdout: ran.stdout ?? "",
-    stderr: ran.stderr ?? "",
-  };
-};
+const it = doorsHere();
+const files = it.disk;
+const outside = it.proc;
+
+const bin = join(root, valeBin(process.platform));
+const STYLES = join(root, "spec", "config", "styles", "VoiceVale");
+const JUDGED = join(root, "spec", "config", "styles", "VoiceJudged");
+const biome = join(root, biomeBin(process.platform));
+const valeLs = join(root, valeLsBin(process.platform));
+const GUIDANCE = join(root, "spec", "guidance");
+const DOORS = join(root, "src", "doors");
+const CONTRACT = join(root, "test", "contract");
+const LEVEL0 = join(root, "spec", "config", "level0.json");
+const config = files.exists(LEVEL0) ? JSON.parse(files.read(LEVEL0)) : {};
+const OURS = "--glob=!{.se,node_modules,.git}/**";
+const TESTS = "src/level0/test/*.test.js";
+const CONTRACT_TESTS = "test/contract/*.test.js";
+const ROUNDS = 5;
+
+const run = async (argv, init = {}) =>
+  outside.run(argv, { ...init, cwd: init.cwd ?? root });
 
 const verbs = {
   check: {
-    says: "the tests, then the rules over the tree",
-    run: async (w) => test() || (await lint(w)),
+    says: "the tests, the doors, then the rules over the tree",
+    run: async (w) => test() || doorsHold() || (await lint(w)),
   },
   lint: { says: "the rules over the tree, or over what you name", run: lint },
   fix: { says: "the fixes a program can make", run: fix },
@@ -67,9 +62,13 @@ const verbs = {
     says: "what is installed, and what level zero found",
     run: async () => doctor(),
   },
+  doors: {
+    says: "every door, and the contract test that holds it",
+    run: async () => doorsHold(),
+  },
   work: {
     says: "work branches: new, take, read, list",
-    run: async () => work(root, rest, doorsHere()),
+    run: async () => work(root, rest, it),
   },
 };
 
@@ -89,7 +88,7 @@ if (verb === "help" || !verbs[verb]) {
 process.exit((await verbs[verb].run(where.length ? where : ["."])) ?? 0);
 
 async function lint(where) {
-  if (!existsSync(bin)) {
+  if (!files.exists(bin)) {
     console.error("Vale is missing. Run ./RUNME.sh once and it installs.");
     return 2;
   }
@@ -105,22 +104,21 @@ async function lint(where) {
   const found = fromJson(ran.stdout);
 
   for (const file of walk(where)) {
-    for (const one of unreasoned(readFileSync(file, "utf8"))) {
+    for (const one of unreasoned(files.read(file))) {
       found.push({ ...one, file: show(file) });
     }
   }
 
   for (const file of walk(where, SCRIPT)) {
-    found.push(...pathInScript(readFileSync(file, "utf8"), show(file)));
+    found.push(...pathInScript(files.read(file), show(file)));
   }
 
-  if (existsSync(biome)) {
-    const code = spawnSync(
-      biome,
-      ["lint", "--config-path=spec/config", "--reporter=github", ...where],
-      { cwd: root, encoding: "utf8", shell: false },
+  if (files.exists(biome)) {
+    const code = outside.run(
+      [biome, "lint", "--config-path=spec/config", "--reporter=github", ...where],
+      { cwd: root },
     );
-    for (const row of (code.stdout ?? "").split("\n")) {
+    for (const row of code.stdout.split("\n")) {
       const hit = /^::(\w+) title=([^,]+),file=([^,]+),line=(\d+).*?::(.*)$/.exec(row);
       if (!hit) continue;
       found.push({
@@ -153,28 +151,24 @@ async function lint(where) {
 }
 
 async function fix(where) {
-  if (!existsSync(bin)) {
+  if (!files.exists(bin)) {
     console.error("Vale is missing. Run ./RUNME.sh once and it installs.");
     return 2;
   }
   for (let round = 0; round < ROUNDS; round++) {
     const was = stamp(where);
     await calm(where);
-    spawnSync(bin, ["fix", "--apply", `--config=${CONFIG}`, OURS, ...where], {
+    outside.run([bin, "fix", "--apply", `--config=${CONFIG}`, OURS, ...where], {
       cwd: root,
-      encoding: "utf8",
-      stdio: "inherit",
-      shell: false,
+      inherit: true,
     });
     if (stamp(where) === was) break;
   }
 
-  if (existsSync(biome)) {
-    spawnSync(biome, ["check", "--write", "--config-path=spec/config", ...where], {
+  if (files.exists(biome)) {
+    outside.run([biome, "check", "--write", "--config-path=spec/config", ...where], {
       cwd: root,
-      encoding: "utf8",
-      stdio: "inherit",
-      shell: false,
+      inherit: true,
     });
   }
   console.log("Run ./RUNME.sh lint to see what is left for a person.");
@@ -199,33 +193,56 @@ async function calm(where) {
 
   for (const [file, rows] of perFile) {
     const path = resolve(root, file);
-    const was = readFileSync(path, "utf8");
+    const was = files.read(path);
     const now = calmed(was, rows);
-    if (now !== was) writeFileSync(path, now, "utf8");
+    if (now !== was) files.write(path, now);
   }
 }
 
 function stamp(where) {
   return walk(where)
-    .map((file) => `${file}\u0000${readFileSync(file, "utf8")}`)
+    .map((file) => `${file}\u0000${files.read(file)}`)
     .join("\u0000");
 }
 
 function test() {
-  const ran = spawnSync(process.execPath, ["--test", "src/level0/test/*.test.js"], {
+  const ran = outside.run([process.execPath, "--test", TESTS, CONTRACT_TESTS], {
     cwd: root,
-    stdio: "inherit",
+    inherit: true,
   });
-  return ran.status ?? 1;
+  return ran.exitCode;
+}
+
+// [[spec/guidance/testing]]
+function doorsHold() {
+  const named = (at, end) =>
+    files
+      .list(at)
+      .filter((one) => one.kind === "file" && one.name.endsWith(end))
+      .map((one) => one.name.slice(0, -end.length));
+
+  const doors = named(DOORS, ".js");
+  const held = named(CONTRACT, ".test.js");
+  const missing = doors.filter((name) => !held.includes(name));
+
+  for (const name of missing) {
+    console.error(`src/doors/${name}.js has no test/contract/${name}.test.js.`);
+  }
+  if (missing.length) {
+    console.error("A door with no contract test lets its fake drift. Write one.");
+    return 1;
+  }
+  console.log(`${doors.length} doors, and a contract test holds each one.`);
+  return 0;
 }
 
 function listRules() {
-  if (!existsSync(STYLES)) {
+  if (!files.exists(STYLES)) {
     console.error("The style folder is missing.");
     return 2;
   }
-  for (const name of readdirSync(STYLES).filter((n) => n.endsWith(".yml"))) {
-    const text = readFileSync(join(STYLES, name), "utf8");
+  for (const name of namesIn(STYLES, ".yml")) {
+    const text = files.read(join(STYLES, name));
     const message = /^message:\s*"?(.*?)"?\s*$/m.exec(text)?.[1] ?? "";
     console.log(`${name.replace(/\.yml$/, "").padEnd(20)} ${message}`);
   }
@@ -233,13 +250,12 @@ function listRules() {
 }
 
 function standing() {
-  if (!existsSync(GUIDANCE)) {
+  if (!files.exists(GUIDANCE)) {
     console.error("There is no spec/guidance, so nothing is handed over.");
     return 2;
   }
-  const notes = readdirSync(GUIDANCE)
-    .filter((n) => n.endsWith(".md"))
-    .map((n) => ({ name: n, text: readFileSync(join(GUIDANCE, n), "utf8") }))
+  const notes = namesIn(GUIDANCE, ".md")
+    .map((n) => ({ name: n, text: files.read(join(GUIDANCE, n)) }))
     .filter(({ text }) => bindsHere(text, process.env));
   const said = standingLayer(notes);
   if (!said) {
@@ -256,33 +272,32 @@ rules: ${count}`);
 function doctor() {
   const rows = [
     ["node", process.version],
-    ["vale", existsSync(bin) ? asked([bin, "--version"]) : "missing, run ./RUNME.sh"],
+    ["vale", files.exists(bin) ? asked([bin, "--version"]) : "missing, run ./RUNME.sh"],
     [
       "biome",
-      existsSync(biome) ? asked([biome, "--version"]) : "missing, run ./RUNME.sh",
+      files.exists(biome) ? asked([biome, "--version"]) : "missing, run ./RUNME.sh",
     ],
     [
       "vale-ls",
-      existsSync(valeLs) ? asked([valeLs, "--version"]) : "missing, run ./RUNME.sh",
+      files.exists(valeLs) ? asked([valeLs, "--version"]) : "missing, run ./RUNME.sh",
     ],
-    ["biome lsp-proxy", existsSync(biome) ? lspProxy() : "missing, run ./RUNME.sh"],
+    ["biome lsp-proxy", files.exists(biome) ? lspProxy() : "missing, run ./RUNME.sh"],
     [
       "editor",
-      existsSync(join(root, EDITOR_SETTINGS))
+      files.exists(join(root, EDITOR_SETTINGS))
         ? `${EDITOR_SETTINGS}, both servers`
         : "missing",
     ],
     [
       "vale rules",
-      existsSync(STYLES)
-        ? `${readdirSync(STYLES).filter((n) => n.endsWith(".yml")).length} in VoiceVale`
+      files.exists(STYLES)
+        ? `${namesIn(STYLES, ".yml").length} in VoiceVale`
         : "missing",
     ],
     [
       "judged rules",
-      existsSync(JUDGED)
-        ? readdirSync(JUDGED).filter((n) => n.endsWith(".yml")).length +
-          " in VoiceJudged"
+      files.exists(JUDGED)
+        ? `${namesIn(JUDGED, ".yml").length} in VoiceJudged`
         : "none",
     ],
     [
@@ -294,7 +309,7 @@ function doctor() {
     ["level zero stamp", readIf(join(root, ".se", "level0.stamp"))],
     [
       "cage",
-      existsSync(join(root, ".claude", "settings.json"))
+      files.exists(join(root, ".claude", "settings.json"))
         ? "tracked, one file"
         : "missing",
     ],
@@ -306,23 +321,31 @@ function doctor() {
 }
 
 function lspProxy() {
-  const ran = spawnSync(biome, ["lsp-proxy", "--help"], {
-    encoding: "utf8",
-    shell: false,
-  });
-  if (ran.error || ran.status !== 0) return "this biome carries no lsp-proxy";
+  const ran = outside.run([biome, "lsp-proxy", "--help"]);
+  if (ran.exitCode !== 0) return "this biome carries no lsp-proxy";
   return asked([biome, "--version"]).replace(/^Version:\s*/, "biome ");
 }
 
 function asked(argv) {
-  const ran = spawnSync(argv[0], argv.slice(1), { encoding: "utf8", shell: false });
-  if (ran.error) return "missing";
+  let ran;
+  try {
+    ran = outside.run(argv);
+  } catch {
+    return "missing";
+  }
   return (ran.stdout || ran.stderr || "").split("\n")[0];
+}
+
+function namesIn(at, end) {
+  return files
+    .list(at)
+    .filter((one) => one.kind === "file" && one.name.endsWith(end))
+    .map((one) => one.name);
 }
 
 function readIf(path) {
   try {
-    return readFileSync(path, "utf8");
+    return files.read(path);
   } catch {
     return "never loaded here";
   }
@@ -332,17 +355,17 @@ function walk(where, wanted = /\.(md|markdown|txt)$/i) {
   const out = [];
   const SKIP = new Set([".git", "node_modules", ".se", ".claude", ".claude-plugin"]);
   const into = (path) => {
-    for (const entry of readdirSync(path, { withFileTypes: true })) {
+    for (const entry of files.list(path)) {
       if (SKIP.has(entry.name)) continue;
       const under = join(path, entry.name);
-      if (entry.isDirectory()) into(under);
+      if (entry.kind === "dir") into(under);
       else if (wanted.test(entry.name)) out.push(under);
     }
   };
   for (const one of where) {
     const path = join(root, one);
     try {
-      if (readdirSync(path)) into(path);
+      into(path);
     } catch {
       if (wanted.test(path)) out.push(path);
     }

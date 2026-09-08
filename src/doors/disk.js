@@ -4,11 +4,14 @@
 import {
   existsSync,
   mkdirSync,
+  mkdtempSync,
   readdirSync,
   readFileSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 
 export function disk() {
   return {
@@ -18,6 +21,7 @@ export function disk() {
     list: (path) => readdirSync(path, { withFileTypes: true }).map(named),
     makeDir: (path) => mkdirSync(path, { recursive: true }),
     remove: (path) => rmSync(path, { force: true, recursive: true }),
+    tempDir: (prefix) => mkdtempSync(join(tmpdir(), prefix)),
   };
 }
 
