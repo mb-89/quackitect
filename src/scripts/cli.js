@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import { biomeBin } from "../level0/lib/code.js";
 import { actionables, bindsHere, standingLayer } from "../level0/lib/guidance.js";
 import { line as asLine } from "../level0/lib/refuse.js";
+import { pathInScript, SCRIPT } from "../level0/lib/scripts.js";
 import { EDITOR_SETTINGS, valeLsBin } from "../level0/lib/servers.js";
 import { calmed, SHOUTED } from "../level0/lib/shout.js";
 import { CONFIG, fromJson, unreasoned, valeBin } from "../level0/lib/vale.js";
@@ -98,6 +99,10 @@ async function lint(where) {
     for (const one of unreasoned(readFileSync(file, "utf8"))) {
       found.push({ ...one, file: show(file) });
     }
+  }
+
+  for (const file of walk(where, SCRIPT)) {
+    found.push(...pathInScript(readFileSync(file, "utf8"), show(file)));
   }
 
   if (existsSync(biome)) {
@@ -314,16 +319,15 @@ function readIf(path) {
   }
 }
 
-function walk(where) {
+function walk(where, wanted = /\.(md|markdown|txt)$/i) {
   const out = [];
-  const PROSE = /\.(md|markdown|txt)$/i;
   const SKIP = new Set([".git", "node_modules", ".se", ".claude", ".claude-plugin"]);
   const into = (path) => {
     for (const entry of readdirSync(path, { withFileTypes: true })) {
       if (SKIP.has(entry.name)) continue;
       const under = join(path, entry.name);
       if (entry.isDirectory()) into(under);
-      else if (PROSE.test(entry.name)) out.push(under);
+      else if (wanted.test(entry.name)) out.push(under);
     }
   };
   for (const one of where) {
@@ -331,7 +335,7 @@ function walk(where) {
     try {
       if (readdirSync(path)) into(path);
     } catch {
-      if (PROSE.test(path)) out.push(path);
+      if (wanted.test(path)) out.push(path);
     }
   }
   return out;

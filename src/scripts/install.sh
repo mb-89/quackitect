@@ -71,9 +71,7 @@ get_vale() {
   fi
 
   if [ "$os" = "Windows" ]; then
-    if have unzip; then unzip -oq "$tmp/$name" -d "$tmp"
-    else powershell -NoProfile -Command "Expand-Archive -LiteralPath '$tmp/$name' -DestinationPath '$tmp' -Force"
-    fi
+    unpack "$tmp/$name" "$tmp" || exit 1
   else
     tar -xzf "$tmp/$name" -C "$tmp" vale
   fi
@@ -110,8 +108,8 @@ unpack() {
 # The editor wants this one, and the doors hold without it, so a failure here
 # costs a line and the tree goes on.
 get_vale_ls() {
-  from=$(node --input-type=module -e \
-    "import { valeLsUrl } from '$root/src/level0/lib/servers.js';
+  from=$(cd "$root" && node --input-type=module -e \
+    "import { valeLsUrl } from './src/level0/lib/servers.js';
      process.stdout.write(valeLsUrl('$os', '$arch'));") || return 1
   [ -n "$from" ] || return 1
 

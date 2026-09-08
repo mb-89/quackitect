@@ -37,10 +37,7 @@ test("every platform the installer knows names an asset", () => {
 
 test("Windows on x86 takes the gnu asset, and on arm64 the msvc one", () => {
   assert.equal(valeLsAsset("Windows", "64-bit"), "vale-ls-x86_64-pc-windows-gnu.zip");
-  assert.equal(
-    valeLsAsset("Windows", "arm64"),
-    "vale-ls-aarch64-pc-windows-msvc.zip",
-  );
+  assert.equal(valeLsAsset("Windows", "arm64"), "vale-ls-aarch64-pc-windows-msvc.zip");
 });
 
 test("a platform the release skips answers an empty string", () => {

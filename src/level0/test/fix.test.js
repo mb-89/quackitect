@@ -11,7 +11,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { calmed, sentenceCase, SHOUTED } from "../lib/shout.js";
+import { calmed, SHOUTED, sentenceCase } from "../lib/shout.js";
 import { CONFIG, fromJson, valeBin } from "../lib/vale.js";
 
 const root = dirname(dirname(dirname(dirname(fileURLToPath(import.meta.url)))));
@@ -37,12 +37,19 @@ function found(text) {
   return fromJson(ran.stdout ?? "");
 }
 
-test("a contraction is written out, and the line keeps its case", { skip: !haveVale }, () => {
+test("a contraction is written out, and the line keeps its case", {
+  skip: !haveVale,
+}, () => {
   const said = fixed("# Notes\n\nIt's here. don't go. WON'T stop. We've seen it.\n");
-  assert.equal(said, "# Notes\n\nIt is here. do not go. Will not stop. We have seen it.\n");
+  assert.equal(
+    said,
+    "# Notes\n\nIt is here. do not go. Will not stop. We have seen it.\n",
+  );
 });
 
-test("every contraction in the swap map has a written form", { skip: !haveVale }, () => {
+test("every contraction in the swap map has a written form", {
+  skip: !haveVale,
+}, () => {
   const was =
     "# Notes\n\ncan't won't don't doesn't didn't isn't aren't wasn't hasn't\n" +
     "haven't it's that's there's you're they're we've I've we'll it'll\n";
@@ -53,20 +60,26 @@ test("every contraction in the swap map has a written form", { skip: !haveVale }
 });
 
 test("a Latin short form is written out in English", { skip: !haveVale }, () => {
-  const said = fixed("# Notes\n\nA duck, e.g. a mallard, i.e. loud. Viz. this. Cf. that.\n");
+  const said = fixed(
+    "# Notes\n\nA duck, e.g. a mallard, i.e. loud. Viz. this. Cf. that.\n",
+  );
   assert.equal(
     said,
     "# Notes\n\nA duck, for example a mallard, that is loud. Namely this. Compare that.\n",
   );
 });
 
-test("etc. is reported and left standing, because its full stop needs a person", { skip: !haveVale }, () => {
+test("etc. is reported and left standing, because its full stop needs a person", {
+  skip: !haveVale,
+}, () => {
   const was = "# Notes\n\nDucks, geese, etc. We saw them.\n";
   assert.equal(fixed(was), was);
   assert.ok(found(was).some((one) => one.rule === "EtCetera"));
 });
 
-test("a shouted lead is reported with no action, and the tree calms it", { skip: !haveVale }, () => {
+test("a shouted lead is reported with no action, and the tree calms it", {
+  skip: !haveVale,
+}, () => {
   const was = "# Notes\n\nNOTHING AT ALL WORKS HERE, and then calm.\n";
   const shouts = found(was).filter((one) => one.rule === SHOUTED);
   assert.equal(shouts.length, 1);
@@ -84,7 +97,8 @@ test("calming a shout uncovers the contraction inside it", { skip: !haveVale }, 
 });
 
 test("a second run leaves the file byte for byte the same", { skip: !haveVale }, () => {
-  const was = "# Notes\n\nIt's a duck, e.g. a mallard. They're loud, i.e. they quack.\n";
+  const was =
+    "# Notes\n\nIt's a duck, e.g. a mallard. They're loud, i.e. they quack.\n";
   assert.equal(fixed(was, 1), fixed(was, 4));
 });
 
