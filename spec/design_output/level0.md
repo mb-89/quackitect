@@ -104,6 +104,19 @@ exactly what that box reads.
 A projection writes the rules into a file, and a guard then has to keep that
 copy honest. A copy nobody can edit needs no guard.
 
+# The rules Vale cannot hold
+
+Vale reads no `.sh` and no `.ps1`, so a rule over a shell script lives in
+`src/level0/lib/scripts.js`, and the command line runs it beside Vale's own.
+
+`NoPathInScript` refuses an interpolated path on a line running an inline
+script. Git Bash hands node a path beginning `/c/`, node reads it as a folder
+under the drive root, and it resolves to a place nobody has. Changing into the
+root first and passing a relative path holds under either shell.
+
+That fault reached this tree twice: once from a cloud box, and once from a hand
+that wrote the same shape a week earlier.
+
 # Where a rule lives
 
 | folder | holder |
