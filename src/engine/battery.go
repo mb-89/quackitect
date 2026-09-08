@@ -7,11 +7,11 @@ import (
 	"os/exec"
 	"path/filepath"
 	"quackitect/engine/internal/alive"
-	"regexp"
-	"strconv"
 	"quackitect/engine/internal/quiet"
 	"quackitect/engine/internal/sessionlog"
 	"quackitect/engine/internal/version"
+	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )

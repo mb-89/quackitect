@@ -94,6 +94,13 @@ func TestALongTestAnswersWhereItLands(t *testing.T) {
 	if len(got.Ran) != 1 || got.Ran[0].Kind != "landing" || !strings.Contains(got.Ran[0].Said, got.Lands) {
 		t.Fatalf("the answer's ran is %+v, and a run still going is one landing entry naming %s", got.Ran, got.Lands)
 	}
+	// AND AN ANSWER THAT HAS FINISHED NOTHING IS NOT OK. The standard process
+	// grades the work step on se test answering ok, and this answer is given
+	// before one test has finished. Ok here is a row a worker can tick over a
+	// run that ran nothing, and whose landed answer may be red.
+	if got.OK {
+		t.Fatalf("a run still landing in %s answered ok, before anything it ran had finished", got.Lands)
+	}
 	// THEN THE ANSWER LANDS, WHOLE.
 	var final Tested
 	deadline := time.Now().Add(5 * time.Second)

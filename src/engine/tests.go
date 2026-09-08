@@ -56,9 +56,9 @@ const whyNamed = "named outright"
 
 // A ran test and how it went.
 type ran struct {
-	ID      string  `json:"id"`
-	Kind    string  `json:"kind"`
-	OK      bool    `json:"ok"`
+	ID   string `json:"id"`
+	Kind string `json:"kind"`
+	OK   bool   `json:"ok"`
 	// Pending is a run that has neither passed nor failed because it has not
 	// finished. A battery replaces the engine that started it, so it cannot be
 	// awaited, and calling a run that has not happened a pass is the defect
@@ -74,15 +74,15 @@ type ran struct {
 
 // Tested is the whole answer.
 type Tested struct {
-	Since      string   `json:"since"` // the snapshot the delta is read against, or HEAD
-	Delta      []change `json:"delta"`
-	Chosen     []chosen `json:"chosen"`
-	Whole      bool     `json:"whole"`
-	WhyWhole   string   `json:"why_whole,omitempty"`
+	Since    string   `json:"since"` // the snapshot the delta is read against, or HEAD
+	Delta    []change `json:"delta"`
+	Chosen   []chosen `json:"chosen"`
+	Whole    bool     `json:"whole"`
+	WhyWhole string   `json:"why_whole,omitempty"`
 	// Owes is a battery this change has earned and this run did not spend: a
 	// trigger changed, and the narrow selection ran instead. It is run once
 	// before the branch merges.
-	Owes string `json:"owes,omitempty"`
+	Owes       string   `json:"owes,omitempty"`
 	Proposed   []string `json:"proposed,omitempty"`
 	Unreached  []string `json:"unreached,omitempty"`  // proposed patterns the delta does not reach
 	Uncovered  []string `json:"uncovered,omitempty"`  // changed files no test reaches
@@ -233,10 +233,15 @@ func TestTheDelta(ctx context.Context, r Roots, db *sql.DB, on string, proposed 
 	return out, nil
 }
 
-// okOf is whether every run went well.
+// okOf is whether every run went well and finished.
+//
+// A RUN THAT HAS NOT FINISHED IS NOT A PASS. The battery answers the moment it
+// starts and a long run answers where it will land, and both are pending. An
+// answer built from them said ok with nothing run, and the work step of the
+// standard process is graded on exactly that ok.
 func okOf(runs []ran) bool {
 	for _, x := range runs {
-		if !x.OK {
+		if !x.OK || x.Pending {
 			return false
 		}
 	}
@@ -271,7 +276,10 @@ func runOrLand(r Roots, tests []aTest, out *Tested, start time.Time) error {
 	}
 	lands := filepath.Join(r.Private("tests"), "test-"+time.Now().UTC().Format("20060102-150405.000")+".json")
 	out.Lands = lands
-	out.Ran = append(out.Ran, ran{ID: "the run", Kind: "landing", OK: true,
+	// A RUN STILL GOING IS NEITHER A PASS NOR A FAILURE, the way the battery's
+	// is. This said ok, so the answer read green before one test had finished,
+	// and the standard process grades its work step on that ok.
+	out.Ran = append(out.Ran, ran{ID: "the run", Kind: "landing", Pending: true,
 		Said: fmt.Sprintf("still running after %s, which is as long as the lane waits. Its answer lands in %s", theTestBudget, lands)})
 	// WHAT LANDS IS THE ANSWER THIS CALL WOULD HAVE GIVEN, whole, taken as it
 	// stands before the caller moves on with its own copy.
@@ -689,16 +697,15 @@ func everyFileWhole(db *sql.DB) ([]change, error) {
 // process it is. It answers what ran, and which engine the Go tests were
 // handed, in a sentence with its age, so a stale one reads as stale.
 func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, string) {
-	// DOES THIS RUN ASK THE MAP ANYTHING? The owner's rule: build it when the
-	// answer depends on it. Every pick named outright was selected by whoever
-	// asked, so nothing here consults the map and nothing writes one.
-	wantMap := false
-	for _, p := range picks {
-		if p.Why != whyNamed {
-			wantMap = true
-			break
-		}
-	}
+	// DOES THIS PICK ASK THE MAP ANYTHING? The owner's rule: build it when the
+	// answer depends on it. A pick named outright was selected by whoever
+	// asked, so it consults no map and writes none.
+	//
+	// IT IS ASKED OF EACH PICK, NOT OF THE RUN. Folded into one flag over every
+	// pick, one delta pick put the instrumented binary and the index write back
+	// on every named test beside it. Measured: a named test alone ran in 0.0126
+	// seconds with its row untouched, and the same test beside a pattern ran in
+	// 0.0404 seconds with its row rewritten. p.Why is in hand at the call.
 	byID := map[string]aTest{}
 	for _, t := range tests {
 		byID[t.ID] = t
@@ -736,6 +743,7 @@ func runChosen(r Roots, db *sql.DB, tests []aTest, picks []chosen) ([]ran, strin
 				engine, engineSaid = suiteEngine(r)
 				engineKnown = true
 			}
+			wantMap := p.Why != whyNamed
 			ok, said, took, regions, err := runOneGoTest(r, bin, engine, t, wantMap)
 			x := ran{ID: t.ID, Kind: t.Kind, OK: ok, Seconds: took.Seconds()}
 			if !ok {
@@ -800,8 +808,30 @@ func batteryShell(r Roots) (string, []string) {
 	return theShellAmong(exec.LookPath, shellsBesideGit(r), func(p string) bool {
 		info, err := os.Stat(p)
 		return err == nil && !info.IsDir()
-	})
+	}, theShellRuns)
 }
+
+// theShellRuns says whether a candidate is a shell that runs a script, by
+// handing it one and reading what it answers.
+//
+// A NAME THAT RESOLVES IS NOT A SHELL THAT RUNS. The launchers below are passed
+// over by the folder they live in, which is a list, and a list only names the
+// stubs somebody has already met. This asks the candidate instead, so a stub
+// nobody has met yet is passed over for what it does.
+//
+// IT COSTS ONE PROCESS, and only for a candidate found on PATH. The caller is
+// about to start a shell anyway, and a lookup that answers a program which
+// cannot run one costs the whole command.
+func theShellRuns(p string) bool {
+	ctx, cancel := context.WithTimeout(context.Background(), theShellProbeBudget)
+	defer cancel()
+	return quiet.Quietly(exec.CommandContext(ctx, p, "-c", "exit 0")).Run() == nil
+}
+
+// theShellProbeBudget is as long as a shell is given to answer a script that
+// does nothing. A shell answers in milliseconds, and a launcher that is waiting
+// on something else is not one.
+var theShellProbeBudget = 5 * time.Second
 
 // theShellAmong is that answer with both lookups handed in, so a check can put
 // this machine's shells wherever it needs them and drive the walk over a box
@@ -813,7 +843,8 @@ func batteryShell(r Roots) (string, []string) {
 // which no caller here reads as a shell that is missing. LookPath answers it
 // ahead of the sh Git brought, because Git leaves that one off PATH, so the
 // walk below never ran and every command on such a machine died at the shell.
-func theShellAmong(look func(string) (string, error), beside []string, isFile func(string) bool) (string, []string) {
+func theShellAmong(look func(string) (string, error), beside []string, isFile func(string) bool,
+	runs func(string) bool) (string, []string) {
 	// THE NAMES ARE A LIST, so a machine with bash and no sh is not called
 	// shell-less, and so the one lookup is not spelled out twice in the tree.
 	looked := []string{"sh or bash on PATH"}
@@ -826,6 +857,14 @@ func theShellAmong(look func(string) (string, error), beside []string, isFile fu
 			// IT SAYS WHAT IT PASSED OVER. A lookup that skips a hit and
 			// then answers nothing is a lookup nobody can argue with.
 			looked = append(looked, sh+", passed over: the WSL launcher is not a shell")
+			continue
+		}
+		// AND A NAME THAT RESOLVES IS STILL NOT A SHELL THAT RUNS. The line
+		// above knows the stubs somebody has already met, by the folder they
+		// live in. This one hands the candidate a script that does nothing,
+		// so a stub nobody has met is passed over for what it does.
+		if !runs(sh) {
+			looked = append(looked, sh+", passed over: it would not run a script that does nothing")
 			continue
 		}
 		return sh, looked
@@ -1046,10 +1085,38 @@ func interprets(name string) bool {
 	return false
 }
 
-// namesAFile says whether this word is a path under the checks folder, which
-// is a check being run as the program.
+// aCheckToRun says whether this path is one the battery runs. The battery's
+// checks are the .mjs under that folder, which is the rule discoverTests
+// registers them by, and the battery and the benchmark are the .sh beside them.
+//
+// A MEASURING SCRIPT IS NOT A CHECK. count-standing.py and count-voice-breaks.py
+// sit in the same folder and the battery runs neither. checks-live-in-the-method
+// reads the battery's own list and counts only the .mjs, so a .py was already
+// outside that rule everywhere except here.
+//
+// MEASURED. Each script carries in its docstring the command that runs it, and
+// this guard refused that command: python util/checks/count-voice-breaks.py
+// doc/glossary.md answered THE ENGINE OWNS THE TESTS. The engine could not run
+// it either, because it registers only the .mjs. So a script written to be run
+// by hand could not be run from the tree at all, and the measurement it exists
+// for was taken with a copy made outside it. count-voice-breaks.py says as much
+// in its own words, where it explains why it reads the voice rules through an
+// environment variable.
+func aCheckToRun(path string) bool {
+	p := filepath.ToSlash(strings.Trim(path, "'\""))
+	if !strings.Contains(p, checksDir+"/") {
+		return false
+	}
+	switch strings.ToLower(filepath.Ext(p)) {
+	case ".mjs", ".sh":
+		return true
+	}
+	return false
+}
+
+// namesAFile says whether this word is a check being run as the program.
 func namesAFile(word string) bool {
-	return strings.Contains(filepath.ToSlash(strings.Trim(word, "'\"")), checksDir+"/")
+	return aCheckToRun(word)
 }
 
 // theFileAnInterpreterRuns answers the check this interpreter is about to run,
@@ -1074,7 +1141,7 @@ func theFileAnInterpreterRuns(words []string) string {
 		if w == "" || strings.HasPrefix(w, "-") {
 			continue // a flag to the interpreter, and not the file it runs
 		}
-		if strings.Contains(filepath.ToSlash(w), checksDir+"/") {
+		if aCheckToRun(w) {
 			return w
 		}
 		if interprets(strings.ToLower(strings.TrimSuffix(filepath.Base(w), ".exe"))) {

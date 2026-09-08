@@ -124,7 +124,65 @@ var separators = []string{"\r\n", "\n", "\r", "&&", "||", "|", ";", "&"}
 // path reads the tree, so a search whose every path was outside it was refused
 // by the message promising it would not be. This is the scan shellWords already
 // walks, applied one level up. See wk-7bab432426, which taught the words.
+// A SHELL WITH -c CARRIES A COMMAND INSIDE ONE WORD, and every guard here
+// judges a part by its first word. So sh -c "cd src; go test ./..." was judged
+// as the word sh, and what it runs was read by nobody.
+//
+// IT WAS CAUGHT BY ACCIDENT AND LOST. The cut ran before anything read quotes,
+// so that semicolon split the string and go test became a part's first word.
+// Teaching the cut to read quotes was right, and it took the catch with it.
+//
+// THE ARGUMENT REPLACES THE SHELL, rather than standing beside it. What -c
+// carries is a pipeline of its own, and its first program is not behind a pipe.
+// Appended after the shell it would read as piped, and a searcher behind a pipe
+// reads another program's output rather than the tree.
+//
+// ONE UNWRAPPING IS ENOUGH, and a shell with no -c is left alone.
 func pipeline(command string) []string {
+	var out []string
+	for _, part := range theParts(command) {
+		if inner := theShellsCommand(part); inner != "" {
+			out = append(out, theParts(inner)...)
+			continue
+		}
+		out = append(out, part)
+	}
+	return out
+}
+
+// theShellsCommand answers what a part hands a shell with -c, and nothing where
+// the part runs no shell or hands it no -c.
+func theShellsCommand(part string) string {
+	words := shellWords(part)
+	if len(words) == 0 || !aShell(words[0]) {
+		return ""
+	}
+	for i := 1; i+1 < len(words); i++ {
+		if words[i] == "-c" {
+			return words[i+1]
+		}
+	}
+	return ""
+}
+
+// aShell says whether this word runs a shell that reads -c. The name is read
+// the way every other guard here reads a program's name: the last segment,
+// without its extension, in lower case.
+func aShell(word string) bool {
+	name := strings.ReplaceAll(word, `\`, "/")
+	if i := strings.LastIndex(name, "/"); i >= 0 {
+		name = name[i+1:]
+	}
+	switch strings.ToLower(strings.TrimSuffix(name, ".exe")) {
+	case "sh", "bash", "dash", "ash", "ksh", "zsh":
+		return true
+	}
+	return false
+}
+
+// theParts is the split itself: one program a part, cut at the shell's own
+// separators, with a separator inside quotes left where it stands.
+func theParts(command string) []string {
 	text := withoutHereDocs(command)
 	var parts []string
 	var part strings.Builder

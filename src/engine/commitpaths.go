@@ -42,6 +42,19 @@ func gitVerbAt(words []string, verb string) int {
 			continue
 		}
 		bare := strings.ToLower(strings.Trim(w, "'\""))
+		// AN ASSIGNMENT BEFORE THE PROGRAM IS THE SHELL'S, AND THE PROGRAM NEVER
+		// SEES IT. It was neither a runner nor a flag, so the walk gave up where
+		// it stood and found no git at all: FOO=1 git add -A went past every
+		// guard here. That is one word from open, on the rule this branch rests
+		// on.
+		//
+		// AND IT IS SKIPPED WHEREVER A PROGRAM IS STILL PENDING, not at the first
+		// word alone. env and sudo are runners, so env FOO=1 git add -A took the
+		// same road one word further along. Past git the words are git's own, so
+		// the skip stops there. MEASURED by TestStagingEverythingIsRefused.
+		if past != "git" && anAssignment(w) {
+			continue
+		}
 		if past == "git" && bare == verb {
 			return i
 		}
@@ -56,6 +69,26 @@ func gitVerbAt(words []string, verb string) int {
 		return -1
 	}
 	return -1
+}
+
+// anAssignment says whether this word is a shell assignment made for one
+// command, NAME=value. The shell takes it out of the words the program is
+// handed, so a guard that reads the words has to take it out too.
+func anAssignment(word string) bool {
+	at := strings.Index(word, "=")
+	if at <= 0 {
+		return false
+	}
+	for i := 0; i < at; i++ {
+		c := word[i]
+		switch {
+		case c == '_', c >= 'a' && c <= 'z', c >= 'A' && c <= 'Z':
+		case i > 0 && c >= '0' && c <= '9':
+		default:
+			return false
+		}
+	}
+	return true
 }
 
 // commitValueFlags are the commit flags whose value is the next word, so the
@@ -104,15 +137,21 @@ func commitPaths(args []string) (paths []string, index bool) {
 
 // stagesEverything answers whether a git add takes the whole tree rather than
 // paths it names.
+//
+// -u IS THE SAME STAGE WITH A NARROWER NET. It takes every tracked file any
+// hand on this box has changed, and the next commit takes them all. It got past
+// both guards: this one never listed it, and the stranger guard reads the paths
+// a command names and -u names none. So a stage of everything tracked was one
+// letter from open, by the door the other spellings are refused at.
 func stagesEverything(args []string) bool {
 	for _, w := range args {
 		a := strings.Trim(w, "'\"")
 		switch {
 		case a == "--":
 			return false
-		case a == "-A" || a == "--all" || a == ".":
+		case a == "-A" || a == "--all" || a == "-u" || a == "--update" || a == ".":
 			return true
-		case strings.HasPrefix(a, "-") && !strings.HasPrefix(a, "--") && strings.Contains(a[1:], "A"):
+		case strings.HasPrefix(a, "-") && !strings.HasPrefix(a, "--") && strings.ContainsAny(a[1:], "Au"):
 			return true
 		}
 	}
@@ -187,9 +226,9 @@ func aCommitTakesTheIndex(why string) string {
 // aStageOfEverything is the refusal for a stage that names no path.
 func aStageOfEverything() string {
 	return "A STAGE OF EVERYTHING IS REFUSED.\n\n" +
-		"git add -A, --all or . stages what every other hand on this box has touched, and the next " +
-		"commit takes it all. The index is shared, and a stage that names no path is a commit of " +
-		"strangers one step early.\n\n" +
+		"git add -A, --all, -u, --update or . stages what every other hand on this box has touched, " +
+		"and the next commit takes it all. The index is shared, and a stage that names no path is a " +
+		"commit of strangers one step early.\n\n" +
 		"Name the paths: git add <paths>, or skip the stage and commit them by name: git commit --only " +
 		"-m \"...\" <paths>."
 }

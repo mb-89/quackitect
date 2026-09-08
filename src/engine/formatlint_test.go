@@ -138,6 +138,51 @@ func TestAMissingProgramIsARefusal(t *testing.T) {
 }
 
 // AND THE GUIDANCE NAMES THE VERBS AND NO PROGRAM.
+// AND THE ENGINE NAMES EVERY ONE OF THEM, which is the other half of the rule
+// below.
+//
+// writing-go names a door and never a program, and the test below holds it to
+// that. So if the engine names no program either, the rule is not enforced
+// anywhere: it is simply gone, and nobody reading either file can tell it ever
+// existed.
+//
+// RULE 15 NAMED FOUR: gofmt, go vet, go fix and golangci-lint. An earlier
+// change put the programs behind the two verbs and reached three of them, and
+// go fix fell into the gap between that change and the chapter's deletion.
+func TestTheVerbsNameEveryProgramTheRuleNamed(t *testing.T) {
+	t.Parallel()
+	b, err := os.ReadFile(filepath.Join("..", "..", "src", "engine", "format.go"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	said := string(b)
+	for _, program := range []string{"gofmt", "go vet", "go fix", "golangci-lint"} {
+		if !strings.Contains(said, program) {
+			t.Errorf("neither verb names %q, so a rule the project wrote down is kept by nothing", program)
+		}
+	}
+}
+
+// AND se format RUNS go fix, rather than only naming it. A name in a comment is
+// what the deletion left behind, and it is what this is guarding against.
+func TestFormatRunsGoFixOverEveryModule(t *testing.T) {
+	r := guidanceTree(t)
+	aTinyPackage(t, r)
+
+	ran := map[string]bool{}
+	for _, one := range FormatGo(t.Context(), r.Work) {
+		ran[one.Program] = true
+		if one.Refused != "" {
+			t.Errorf("%s refused over %s: %s", one.Program, one.Over, one.Refused)
+		}
+	}
+	for _, want := range []string{"gofmt", "go fix"} {
+		if !ran[want] {
+			t.Errorf("se format ran no %s over a tree holding one module, and it answered for %v", want, ran)
+		}
+	}
+}
+
 func TestWritingGoNamesNoProgram(t *testing.T) {
 	t.Parallel()
 	b, err := os.ReadFile(filepath.Join("..", "..", "spec", "guidance",

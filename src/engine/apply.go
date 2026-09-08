@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"quackitect/engine/internal/frontmatter"
+	"quackitect/engine/internal/sessionlog"
 	"quackitect/engine/internal/voice"
 )
 
@@ -526,7 +527,14 @@ func proseThatReads(r Roots, edits []Edit) error {
 	}
 	rules, err := voice.Load(DeclaredAt(r.Method, "voice-rules.json"))
 	if err != nil {
-		return nil // said by the guard where it can be said; a write is not stopped for it
+		// A CHECKER THAT WILL NOT LOAD SAYS SO, AND LETS THE WRITE THROUGH. A
+		// broken rules file must not stop somebody working. Silence here reads
+		// exactly like a tree whose prose is clean, so every write after it goes
+		// unchecked and nothing says why.
+		inSession(r, "apply", "engine",
+			"util/voice-rules.json will not read, so the voice check saw nothing: "+err.Error(),
+			sessionlog.No(), map[string]any{"rules": "util/voice-rules.json"})
+		return nil
 	}
 	found := rules.Check(strings.Join(written, "\n"))
 	if len(found) == 0 {
@@ -600,6 +608,9 @@ func theShapeOfTheTree(r Roots, files []string, content map[string][]byte, born 
 			theTravellingCageNamesNoRefusal,
 			everyFlagAVerbDeclaresHasALaneField,
 			aParallelTestSwappingASeamThroughAHelper,
+			aCountNamesTheCommandThatProducedIt,
+			aReceiptNamingATokenNobodyHas,
+			aSnapshotCalledAbsentDoesNotResolve,
 		} {
 			if err := refuse(r, born[at], rel, text); err != nil {
 				return err
@@ -696,7 +707,7 @@ func aNameThatStandsOnce(r Roots, isNew bool, rel, _ string) error {
 				continue
 			}
 			if _, err := os.Stat(filepath.Join(internal, p.Name(), name)); err == nil {
-				return theTwin(rel, "src/engine/internal/"+p.Name()+"/"+name)
+				return theTwinRefusal(rel, "src/engine/internal/"+p.Name()+"/"+name)
 			}
 		}
 		return nil
@@ -704,7 +715,7 @@ func aNameThatStandsOnce(r Roots, isNew bool, rel, _ string) error {
 
 	if pkg, ok := strings.CutPrefix(dir, "src/engine/internal/"); ok && !strings.Contains(pkg, "/") {
 		if _, err := os.Stat(filepath.Join(r.Work, "src", "engine", name)); err == nil {
-			return theTwin(rel, "src/engine/"+name)
+			return theTwinRefusal(rel, "src/engine/"+name)
 		}
 	}
 	return nil
@@ -712,7 +723,7 @@ func aNameThatStandsOnce(r Roots, isNew bool, rel, _ string) error {
 
 // theTwin says the pair, because the hand that reads it is the one that has to
 // decide which of the two is the dead one.
-func theTwin(writing, standing string) error {
+func theTwinRefusal(writing, standing string) error {
 	return fmt.Errorf("%s would stand twice: this name is already %s. "+
 		"One of the two would be read by everything and the other by nothing, and the "+
 		"compiler will not say which, because they are different packages. "+

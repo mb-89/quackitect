@@ -29,7 +29,7 @@ The retro is two halves: `se retro` collects and drains, and this file judges wh
 4. Score the last retro's improvements against this period's numbers, handed to you under `earlier`. Promote what worked, drop what did not. *
 5. Hunt waste in the log and the transcripts, a reader on every slice. Rank what repeats. *
 6. Count every shell command and say what each was standing in for. One is a tool you do not have. *
-7. Read what one turn costs, run `src/scripts/checks/benchmark.sh`, and rank the battery's lanes. Name what grew, then [[refactoring]]. *
+7. Read what one turn costs and the battery's lanes: `src/scripts/checks/benchmark.sh` runs both and ranks the lanes against the last run. Name what grew, then [[refactoring]]. *
 8. For each pattern name its mechanization: a check, a refusal, a gate, a prefill, then a clearer sentence. *
 9. Judge every script in the drained scratchpad. Make it a rule in the engine, or delete it, and repair what the move breaks. *
 10. Merge what repeats into one class, then mint one note per improvement and nothing larger. *

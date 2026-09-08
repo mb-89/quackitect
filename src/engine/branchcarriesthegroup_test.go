@@ -15,16 +15,16 @@ import (
 
 func TestAGroupBranchNamesTheBucket(t *testing.T) {
 	for branch, want := range map[string]string{
-		"group/cloud":    "cloud",
-		"group/archive":  "archive",
-		"group/a-b-c":    "a-b-c",
-		"group/cloud\n":  "cloud",
-		"v4":             "",
-		"main":           "",
-		"grouped/thing":  "",
-		"group/":         "",
+		"group/cloud":     "cloud",
+		"group/archive":   "archive",
+		"group/a-b-c":     "a-b-c",
+		"group/cloud\n":   "cloud",
+		"v4":              "",
+		"main":            "",
+		"grouped/thing":   "",
+		"group/":          "",
 		"feature/group/x": "",
-		"":               "",
+		"":                "",
 	} {
 		if got := theGroupInAName(branch); got != want {
 			t.Errorf("%q names the group %q, and it should name %q", branch, got, want)

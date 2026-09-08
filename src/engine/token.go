@@ -326,15 +326,30 @@ func now() string { return time.Now().UTC().Format(time.RFC3339Nano) }
 // the submission ask one question and get one answer.
 func Blocked(r Roots, t Token) string {
 	var waiting []string
+	var ended map[string]bool
 	for _, id := range t.DependsOn {
 		d, err := LoadToken(r, id)
-		if err != nil {
-			waiting = append(waiting, id+" (which does not exist)")
+		if err == nil {
+			if !d.Ended() {
+				waiting = append(waiting, id)
+			}
 			continue
 		}
-		if !d.Ended() {
-			waiting = append(waiting, id)
+		// A NOTE THAT IS GONE ENDED, OR IT NEVER WAS. A close archives the
+		// note and takes it off the disk, so this load fails for the ordinary
+		// finish as surely as for a mistyped id. Reading the first as absent
+		// blocked a token whose dependency was done, for ever, and the queue
+		// passed over it in silence.
+		//
+		// THE ARCHIVE IS ASKED ONLY WHEN THE LOAD FAILS, which is rare, and
+		// once for the whole list rather than once per dependency.
+		if ended == nil {
+			ended = theEndedIDs(r)
 		}
+		if ended[id] {
+			continue
+		}
+		waiting = append(waiting, id+" (which does not exist)")
 	}
 	var says []string
 	if len(waiting) > 0 {
@@ -345,6 +360,24 @@ func Blocked(r Roots, t Token) string {
 			len(open), strings.Join(open, ", ")))
 	}
 	return strings.Join(says, ", and ")
+}
+
+// theEndedIDs answers every id the archive carries, which is every token that
+// has ended and had its note taken off the disk.
+//
+// AN ARCHIVE THAT WILL NOT READ IS EMPTY HERE, and the caller then says the
+// dependency does not exist. That is the wording this had before the archive
+// was read at all, so a broken list costs nothing that was not already lost.
+func theEndedIDs(r Roots) map[string]bool {
+	out := map[string]bool{}
+	rows, err := TheArchive(r)
+	if err != nil {
+		return out
+	}
+	for _, row := range rows {
+		out[row.ID] = true
+	}
+	return out
 }
 
 // OpenSubTokens names the tokens that are part of this one and have not

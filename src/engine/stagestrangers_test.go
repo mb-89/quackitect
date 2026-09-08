@@ -32,12 +32,12 @@ func TestAStageOfAStrangersPathIsRefused(t *testing.T) {
 	}
 
 	// THE PATH THE RECORD SAYS THIS TOKEN WROTE GOES THROUGH.
-	if why, refused := AStageCarriesStrangers(r, tok.ID, "git add mine.md"); refused {
+	if why, refused := AStageCarriesStrangers(r, tok.ID, "worker-stage", "git add mine.md"); refused {
 		t.Errorf("a stage of the file this token wrote was refused:\n%s", why)
 	}
 
 	// AND THE PATH IT NEVER WROTE IS REFUSED, BY NAME.
-	why, refused := AStageCarriesStrangers(r, tok.ID, "git add theirs.md")
+	why, refused := AStageCarriesStrangers(r, tok.ID, "worker-stage", "git add theirs.md")
 	if !refused {
 		t.Fatal("a stage of a file this token never wrote was not refused")
 	}
@@ -56,7 +56,7 @@ func TestAStageOfAStrangersPathIsRefused(t *testing.T) {
 	// AND A TOKEN WITH NOTHING ON RECORD IS NOT JUDGED, because an empty
 	// journal proves no write rather than proving there was none.
 	empty := aLocalToken(t, r, "a token writing nothing")
-	if why, refused := AStageCarriesStrangers(r, empty.ID, "git add anything.md"); refused {
+	if why, refused := AStageCarriesStrangers(r, empty.ID, "worker-stage", "git add anything.md"); refused {
 		t.Errorf("a token with nothing on record was judged anyway:\n%s", why)
 	}
 }

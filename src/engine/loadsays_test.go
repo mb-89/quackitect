@@ -53,9 +53,10 @@ func TestTheLoadLineSaysWhichBoundTripped(t *testing.T) {
 	// A slow answer with nobody queued. The rate limit is reset between the
 	// two, because it allows one line a minute and this wants both.
 	load.lastSaid.Store(0)
-	load.noteHook(log, 1, 0, hookTookBound+100*time.Millisecond)
+	load.noteHook(log, 1, 0, hookTookBound+100*time.Millisecond, "Bash", EventPreToolUse)
 	load.lastSaid.Store(0)
-	load.noteHook(log, hookQueueBound+1, hookWaitBound+50*time.Millisecond, time.Millisecond)
+	load.noteHook(log, hookQueueBound+1, hookWaitBound+50*time.Millisecond, time.Millisecond,
+		"Bash", EventPreToolUse)
 
 	said := loadLinesIn(t, r)
 	if len(said) != 2 {

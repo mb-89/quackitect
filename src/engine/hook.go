@@ -939,7 +939,7 @@ func decidePreToolUse(g *guard, roots Roots, cfg Config, emergency Emergency, lo
 		// whole call a few lines further down, so there is nothing to judge.
 		// See stagestrangers.go.
 		for _, held := range InWorkFor(roots, actor) {
-			if why, refuse := AStageCarriesStrangers(roots, held.ID, ti.Command); refuse {
+			if why, refuse := AStageCarriesStrangers(roots, held.ID, actor, ti.Command); refuse {
 				record(log, "engine", "commit", actor, "refused: a stage of a path this token never wrote", sessionlog.No(),
 					map[string]any{"tool": in.ToolName})
 				g.deny(why)

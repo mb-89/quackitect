@@ -1,0 +1,7 @@
+The tests group is done. Every token the queue would hand out is closed, and
+what is left in the bucket waits on a person.
+
+The retro for the cycle is .se/retro/20260907-175537, which does not travel.
+
+The branch group/tests is merged into trunk and is ready to sweep. The delete
+is somebody else's: this box is answered 403 on it, and always will be.

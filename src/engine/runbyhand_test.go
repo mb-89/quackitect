@@ -73,6 +73,31 @@ func TestNamingACheckIsNotRunningIt(t *testing.T) {
 			`sh util/git/land.sh "two checks" util/checks/liveness.mjs util/checks/burndown`, false},
 		{"a shell told to run the check", `sh -c "util/checks/battery.sh"`, true},
 		{"a shell told to run node over it", `sh -c "node util/checks/liveness.mjs"`, true},
+
+		// AND A MEASURING SCRIPT BESIDE THE CHECKS IS NOT A CHECK.
+		//
+		// count-standing.py and count-voice-breaks.py sit in that folder and the
+		// battery runs neither. checks-live-in-the-method reads the battery's
+		// list and counts only the .mjs, so a .py was already outside that rule.
+		//
+		// Each carries in its own docstring the command that runs it, and the
+		// guard refused that command. So a script written to be run by hand
+		// could not be run from the tree at all, and the measurement it exists
+		// for was taken with a copy made outside. count-voice-breaks.py says as
+		// much in its own words: VOICE_RULES names that file for a copy running
+		// outside the tree, which is how the guard lets a check be run at all.
+		{"the command count-voice-breaks names",
+			"python util/checks/count-voice-breaks.py doc/glossary.md", false},
+		{"a measuring script under python3",
+			"python3 util/checks/count-standing.py .", false},
+		{"the command count-standing names",
+			"uvx --from tiktoken python util/checks/count-standing.py .", false},
+
+		// AND WHAT THE BATTERY DOES RUN IS STILL REFUSED, whatever runs it, so
+		// this is a narrowing by what the file is and not by which program was
+		// reached for.
+		{"python told to run a check", "python util/checks/liveness.mjs", true},
+		{"python told to run the battery", "python util/checks/battery.sh", true},
 	} {
 		t.Run(c.name, func(t *testing.T) {
 			why, refused := ATestRunByHand(c.command, method)

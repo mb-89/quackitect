@@ -83,11 +83,43 @@ catchup() {
   echo "CLONE LEFT AT $(git rev-parse --short HEAD), holding changes this fast-forward would overwrite"
 }
 
+# THE BRANCH THIS TREE IS ON IS WHERE THE WORK GOES. This door named one branch
+# in its fetch and in its push, and read the branch nowhere. So a land from a
+# group branch put the work on trunk, answered PUSHED, and the group branch
+# never moved.
+#
+# MEASURED, 2026-09-07. Four lands from a box cut for group/tests moved trunk to
+# f7aa7d7e and left origin/group/tests where the box woke. Nothing said the
+# branch had been passed by, and a stop hook found the tree dirty.
+#
+# NO BRANCH NAME IS WRITTEN HERE. This script is copied into trees whose trunk
+# is called something else, and a name written down is wrong in all of them.
+#
+# A DETACHED HEAD NAMES NO BRANCH, so a land has nowhere to go and says so. A
+# default guessed here is the same defect under another name: it puts the work
+# somewhere nobody asked for and answers as though it worked.
+branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+if [ -z "$branch" ] || [ "$branch" = "HEAD" ]; then
+  echo "NO BRANCH: this tree is on a detached HEAD, so a land has nowhere to go"
+  echo "Check out the branch this work belongs on, then land again"
+  exit 2
+fi
+
 wt=/tmp/land-$$
 for i in 1 2 3 4 5; do
-  git fetch origin v4 >/dev/null 2>&1 || { sleep 5; continue; }
+  # ORIGIN MAY NOT HAVE SEEN THIS BRANCH YET, and the first land is what creates
+  # it there. Its base is then the local tip. A fetch that failed for the
+  # network rather than for a missing branch is caught by the push below, which
+  # fails too and brings this round again.
+  if git fetch origin "$branch" >/dev/null 2>&1; then
+    base=FETCH_HEAD
+  elif git rev-parse --verify --quiet "refs/heads/$branch" >/dev/null 2>&1; then
+    base=$branch
+  else
+    sleep 5; continue
+  fi
   rm -rf "$wt"; git worktree prune
-  git worktree add --detach "$wt" FETCH_HEAD >/dev/null 2>&1 || { sleep 5; continue; }
+  git worktree add --detach "$wt" "$base" >/dev/null 2>&1 || { sleep 5; continue; }
   for p in "$@"; do
     if [ -f "$p" ]; then
       mkdir -p "$wt/$(dirname "$p")"
@@ -101,8 +133,15 @@ for i in 1 2 3 4 5; do
     echo "NOTHING TO LAND"; rm -rf "$wt"; git worktree prune; exit 0
   fi
   git -C "$wt" commit -q -m "$msg" || { echo "COMMIT REFUSED"; exit 2; }
-  if git -C "$wt" push origin HEAD:v4 >/dev/null 2>&1; then
+  # THE DESTINATION IS WRITTEN OUT IN FULL. HEAD here is detached, and git
+  # refuses to guess a remote ref that does not exist yet from a bare name, so
+  # the first land onto a new branch fails on nothing else.
+  if git -C "$wt" push origin "HEAD:refs/heads/$branch" >/dev/null 2>&1; then
     landed=$(git -C "$wt" rev-parse HEAD)
+    # THE BRANCH IS SAID BEFORE THE COMMIT, so a land that went somewhere
+    # unexpected says so on the line above the hash. PUSHED stays a line of its
+    # own, because what reads this output takes the line under it as the commit.
+    echo "LANDED ON $branch"
     echo PUSHED
     git -C "$wt" log --oneline -1
     rm -rf "$wt"; git worktree prune

@@ -24,16 +24,22 @@ func TestATidyPartThatCannotRunDoesNotStopTheRest(t *testing.T) {
 	}
 	parts := tidyWith(r, time.Now().UTC(), refuses)
 
-	if len(parts) != 3 {
-		t.Fatalf("the tidy answered %d part(s), and there are three jobs", len(parts))
+	// THE LIST IS THE COUNT, so a part added or dropped reddens here and in no
+	// other test. See TheTidyParts.
+	if len(parts) != len(TheTidyParts) {
+		t.Fatalf("the tidy answered %d part(s), and TheTidyParts names %d",
+			len(parts), len(TheTidyParts))
 	}
 	by := map[string]TidyPart{}
 	for _, p := range parts {
 		by[p.Name] = p
 	}
-	for _, name := range []string{"archive", "claims", "refs"} {
+	for i, name := range TheTidyParts {
 		if _, ok := by[name]; !ok {
 			t.Fatalf("no part is named %s: %+v", name, parts)
+		}
+		if parts[i].Name != name {
+			t.Errorf("part %d is named %q, and TheTidyParts says %q", i, parts[i].Name, name)
 		}
 	}
 
@@ -82,8 +88,8 @@ func TestASecondTidyChangesNothing(t *testing.T) {
 	}
 }
 
-// THE VERB ANSWERS THE THREE PARTS, each with a name, a count and whether this
-// box could do it.
+// THE VERB ANSWERS EVERY PART, each with a name, a count and whether this box
+// could do it.
 //
 // IT GOES THROUGH runVerbInside, WHICH IS THE DISPATCHER ITSELF. Running the
 // program at a shell proves nothing here: the client relays a verb to whatever
@@ -102,14 +108,13 @@ func TestTheTidyVerbAnswersItsParts(t *testing.T) {
 	if err := json.Unmarshal([]byte(said.Out), &got); err != nil {
 		t.Fatalf("se tidy did not answer JSON: %v\n%s", err, said.Out)
 	}
-	want := []string{"archive", "claims", "refs"}
-	if len(got.Parts) != len(want) {
+	if len(got.Parts) != len(TheTidyParts) {
 		t.Fatalf("se tidy answered %d part(s): %s", len(got.Parts), said.Out)
 	}
-	for i, name := range want {
+	for i, name := range TheTidyParts {
 		if got.Parts[i].Name != name {
-			t.Errorf("part %d is named %q, and the parts run in the order archive, claims, refs",
-				i, got.Parts[i].Name)
+			t.Errorf("part %d is named %q, and TheTidyParts says the order is %v",
+				i, got.Parts[i].Name, TheTidyParts)
 		}
 	}
 	if got.Parts[1].Did != 1 {
@@ -126,8 +131,9 @@ func TestARetroTidiesOnStart(t *testing.T) {
 	if err != nil {
 		t.Fatalf("the retro would not run: %v", err)
 	}
-	if len(got.Tidy) != 3 {
-		t.Fatalf("the retro carries %d tidy part(s), and the tidy has three", len(got.Tidy))
+	if len(got.Tidy) != len(TheTidyParts) {
+		t.Fatalf("the retro carries %d tidy part(s), and TheTidyParts names %d",
+			len(got.Tidy), len(TheTidyParts))
 	}
 	for _, p := range got.Tidy {
 		if p.Name == "" {
