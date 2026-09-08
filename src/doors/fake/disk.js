@@ -2,7 +2,7 @@
 // [[spec/design_output/doors#a-fake-behaves]]
 
 export function fakeDisk(seed = {}) {
-  const files = new Map(Object.entries(seed));
+  const files = new Map(Object.entries(seed).map(([at, said]) => [norm(at), said]));
   const folders = new Set();
   let made = 0;
 
