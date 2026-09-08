@@ -1,12 +1,15 @@
-#!/bin/sh
-# The tree's one entry. Level zero needs no build, so this runs its checks.
-set -e
-here=$(cd "$(dirname "$0")" && pwd)
-cd "$here"
-case "${1:-check}" in
-  check) node --test "src/level0/test/*.test.mjs" && node src/level0/bin/lint.mjs . ;;
-  lint)  shift; node src/level0/bin/lint.mjs "$@" ;;
-  fix)   shift; node src/level0/bin/lint.mjs --fix "$@" ;;
-  test)  node --test "src/level0/test/*.test.mjs" ;;
-  *) echo "usage: ./RUNME.sh [check|lint|fix|test]"; exit 2 ;;
-esac
+#!/usr/bin/env sh
+# RUNME. The one command that always works.
+#
+# It does two things: it installs what this tree needs, then it hands every
+# argument to the command line. No logic lives here. What the command line
+# does is the command line's business, and what has to be installed is the
+# install script's.
+#
+#   ./RUNME.sh            what this tree can do
+#   ./RUNME.sh check      the tests, then the rules over the tree
+set -eu
+here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+
+sh "$here/src/scripts/install.sh"
+exec node "$here/src/scripts/cli.mjs" "$@"

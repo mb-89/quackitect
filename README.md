@@ -32,14 +32,18 @@ because it holds whatever is built after it.
 
 ## Running it
 
-Nothing is built, so nothing has to be.
+Run RUNME. It installs what is missing, then hands every argument to the
+command line. A first run on a fresh box needs nothing typed beforehand.
 
-    ./RUNME.sh check      the tests, then the linter over the tree
-    ./RUNME.sh lint       the voice rules over the tree
-    ./RUNME.sh fix        the fixes a program can make
-    ./RUNME.sh test       the tests alone
+    ./RUNME.sh            what this tree can do
+    ./RUNME.sh check      the tests, then the rules over the tree
+    ./RUNME.sh doctor     what is installed, and what level zero found
 
 On Windows, `.\RUNME.ps1` takes the same words.
+
+RUNME holds no logic. It calls `src/scripts/install.ps1` or `install.sh`, which
+names every dependency this tree takes, and then `src/scripts/cli.mjs`, which
+holds the verbs. A new dependency is a row in the install script.
 
 The plugin is enabled by `.claude/settings.json`, which is tracked. A clone is
 guarded on its first session with nothing typed and nothing installed. That
@@ -47,13 +51,16 @@ file carries no port and no path belonging to one machine, so it travels.
 
 ## The shape
 
+    RUNME.sh / RUNME.ps1      install, then hand every argument through
     .claude/settings.json     the cage: one file, and it travels
     .claude-plugin/           this tree own marketplace, so a clone finds level 0
     spec/guidance/voice.md    what each rule is for
+    src/scripts/
+      install.ps1 / .sh       every dependency this tree takes
+      cli.mjs                 the verbs
     src/level0/
       hooks/level0.mjs        the module: the doors, and no rules
       lib/                    the rules, in pure JavaScript
-      bin/lint.mjs            the command line, a client of the same rules
       test/                   the tests
 
 The rules live in `lib` and are pure JavaScript, so the module and the command

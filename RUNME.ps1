@@ -1,12 +1,17 @@
-# The tree's one entry. Level zero needs no build, so this runs its checks.
-param([string]$What = "check", [Parameter(ValueFromRemainingArguments)][string[]]$Rest)
+# RUNME. The one command that always works.
+#
+# It does two things: it installs what this tree needs, then it hands every
+# argument to the command line. No logic lives here. What the command line
+# does is the command line's business, and what has to be installed is the
+# install script's.
+#
+#   .\RUNME.ps1           what this tree can do
+#   .\RUNME.ps1 check     the tests, then the rules over the tree
 $ErrorActionPreference = "Stop"
-Set-Location $PSScriptRoot
-switch ($What) {
-  "check" { node --test "src/level0/test/*.test.mjs"; if ($LASTEXITCODE -ne 0) { exit 1 }; node src/level0/bin/lint.mjs . }
-  "lint"  { node src/level0/bin/lint.mjs @Rest }
-  "fix"   { node src/level0/bin/lint.mjs --fix @Rest }
-  "test"  { node --test "src/level0/test/*.test.mjs" }
-  default { Write-Host "usage: .\RUNME.ps1 [check|lint|fix|test]"; exit 2 }
-}
+$here = $PSScriptRoot
+
+& powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $here "src\scripts\install.ps1")
+if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+& node (Join-Path $here "src\scripts\cli.mjs") @args
 exit $LASTEXITCODE
