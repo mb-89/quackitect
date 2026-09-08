@@ -1,19 +1,8 @@
 {
   "$comment": "THE CAGE, AND IT TRAVELS. Every value here is the same on every box, so git tracks it and a clone is guarded on its first session with nothing typed. A port or a machine path in this file would be dirt on every clone but one, which is why neither is here.",
   "$env": "FUNCTION HOOKS SIT BEHIND A ROLLOUT FLAG, AND THIS IS THE WAY PAST IT. The client reads CLAUDE_CODE_ENABLE_FUNCTION_HOOKS before it asks the flag, so setting it here turns level zero on for every box that clones this tree, the cloud included, rather than for whoever remembered to export it. THE CHECK IS PRESENCE AND NOT VALUE: a 0 here turns it on too, and only deleting the key turns it off. Without it a box loads no hooks module and says nothing about it, so the rules, the brief and the receipt are all absent and nothing names a fault.",
+  "$level0": "LEVEL ZERO NAMES ITSELF NOWHERE IN THIS FILE, AND THAT IS THE POINT. A plugin folder under .claude/skills is adopted by the folder it stands in: the client finds .claude/skills/level0/.claude-plugin/plugin.json, loads it as level0@skills-dir, and enables it by default. No marketplace, no registration, and no trust dialog. A marketplace declared here reaches the client only on a workspace whose trust a person has already accepted, which a fresh cloud clone never has, so nothing declared here would load there. See spec/design_output/level0.",
   "env": {
     "CLAUDE_CODE_ENABLE_FUNCTION_HOOKS": "1"
-  },
-  "extraKnownMarketplaces": {
-    "quackitect": {
-      "source": {
-        "source": "github",
-        "repo": "mb-89/quackitect"
-      }
-    }
-  },
-  "enabledPlugins": {
-    "level0@quackitect": true
-  },
-  "$marketplace": "THE SOURCE IS THE REPOSITORY, AND NOT A PATH ON ONE BOX. A directory source names a folder that exists on whoever wrote it, and a machine cache then hides that from them. The repository is the same everywhere. Registering it is still a step a box takes once: settings alone do not register a marketplace on a fresh clone, so src/scripts/install.sh asks for it and RUNME runs that first."
+  }
 }

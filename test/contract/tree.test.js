@@ -8,15 +8,15 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
-import { actionables, envOf } from "../../src/level0/lib/guidance.js";
-import { readRule } from "../../src/level0/lib/rulefile.js";
-import { pathInScript, SCRIPT } from "../../src/level0/lib/scripts.js";
+import { actionables, envOf } from "../../.claude/skills/level0/lib/guidance.js";
+import { readRule } from "../../.claude/skills/level0/lib/rulefile.js";
+import { pathInScript, SCRIPT } from "../../.claude/skills/level0/lib/scripts.js";
 import {
   EDITOR_EXTENSIONS,
   EDITOR_SETTINGS,
   EXTENSIONS,
   namesTheBinaries,
-} from "../../src/level0/lib/servers.js";
+} from "../../.claude/skills/level0/lib/servers.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();

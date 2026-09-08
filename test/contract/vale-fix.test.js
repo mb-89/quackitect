@@ -8,8 +8,8 @@ import { skip, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
-import { calmed, SHOUTED } from "../../src/level0/lib/shout.js";
-import { CONFIG, fromJson, valeBin } from "../../src/level0/lib/vale.js";
+import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
+import { CONFIG, fromJson, valeBin } from "../../.claude/skills/level0/lib/vale.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();

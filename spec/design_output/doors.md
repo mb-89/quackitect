@@ -44,10 +44,10 @@ reads the time replays.
 
 | folder | what stands there | what it touches |
 |---|---|---|
-| `src/level0/test` | every normal test | memory |
+| `test/level0` | every normal test | memory |
 | `test/contract` | the tests driving the real thing | a binary, the disk, git |
 
-`FakeDoorsInTest` refuses a real door inside `src/level0/test`, so a test
+`FakeDoorsInTest` refuses a real door inside `test/level0`, so a test
 landing in the wrong folder says so at once.
 
 # Every door has exactly one contract test

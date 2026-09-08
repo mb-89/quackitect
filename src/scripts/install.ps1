@@ -54,7 +54,7 @@ function Get-ValeLs {
   $arch = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "arm64" } else { "64-bit" }
   Push-Location $root
   try {
-    $from = & node --input-type=module -e "import { valeLsUrl } from './src/level0/lib/servers.js'; process.stdout.write(valeLsUrl('Windows', '$arch'));"
+    $from = & node --input-type=module -e "import { valeLsUrl } from './.claude/skills/level0/lib/servers.js'; process.stdout.write(valeLsUrl('Windows', '$arch'));"
   } finally {
     Pop-Location
   }

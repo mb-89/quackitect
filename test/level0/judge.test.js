@@ -4,8 +4,8 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { judgeOf, spansIn } from "../lib/judge.js";
-import { readRule } from "../lib/rulefile.js";
+import { judgeOf, spansIn } from "../../.claude/skills/level0/lib/judge.js";
+import { readRule } from "../../.claude/skills/level0/lib/rulefile.js";
 
 const config = {
   judge: {

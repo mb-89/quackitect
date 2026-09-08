@@ -5,8 +5,8 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { refusal, taught } from "../lib/refuse.js";
-import { fromJson, lintText, unreasoned } from "../lib/vale.js";
+import { refusal, taught } from "../../.claude/skills/level0/lib/refuse.js";
+import { fromJson, lintText, unreasoned } from "../../.claude/skills/level0/lib/vale.js";
 
 test("a finding is read out of Vale's JSON", () => {
   const found = fromJson(

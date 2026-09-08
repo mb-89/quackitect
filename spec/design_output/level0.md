@@ -1,6 +1,6 @@
 ---
 kind: [[design_output]]
-describes: [[src/level0]]
+describes: [[.claude/skills/level0]]
 ---
 
 # What level zero is
@@ -35,6 +35,13 @@ So the rules live in `lib` as one copy that the module and the command line both
 load. Keep `lib` free of `node:` imports, because the module's environment
 carries none.
 
+## A module imports nothing outside its plugin folder
+
+`claude plugin validate` refuses a relative import that climbs past the plugin
+root, and it names the file. So the whole of level zero stands inside one
+folder. A shape holding `lib` under `src` and the hooks module elsewhere fails
+before a session starts.
+
 ## The filesystem noun writes and reads
 
 `$.fs` offers `readFile`, `writeFile`, `listDir`, `exists`, `stat` and
@@ -45,6 +52,26 @@ carries none.
 A plugin loads once per process at session start, so the session that changes
 the module runs the old one. `claude --init-only` fires no `session.start`, so a
 probe costs one `-p` turn and one model call.
+
+# Where the plugin stands, and why
+
+Level zero lives at `.claude/skills/level0`, holding its manifest, its hooks
+module and its rules. The client finds
+`.claude/skills/<name>/.claude-plugin/plugin.json`, adopts the folder as a
+plugin under the id `level0@skills-dir`, and enables it by default. Nothing
+registers it, and `.claude/settings.json` names it nowhere.
+
+A marketplace reaches no cloud box, which is why this shape stands:
+
+| way in | what it asks for | a fresh cloud clone |
+|---|---|---|
+| `extraKnownMarketplaces` in settings | the workspace carries accepted trust | no trust, so the key stays unread |
+| a routine's `extra_marketplaces` | the API stores it | the API answers 200 and drops the value |
+| `.claude/skills/<name>` | the settings source is on | it loads |
+
+The trust gate reads a flag a person accepts once per folder on one box. A
+cloud clone is a new folder every run, so it carries none, and every
+marketplace declared in the tree stays invisible there.
 
 # The write door
 
@@ -107,7 +134,7 @@ copy honest. A copy nobody can edit needs no guard.
 # The rules Vale cannot hold
 
 Vale reads no `.sh` and no `.ps1`, so a rule over a shell script lives in
-`src/level0/lib/scripts.js`, and the command line runs it beside Vale's own.
+`.claude/skills/level0/lib/scripts.js`, and the command line runs it beside Vale's own.
 
 `NoPathInScript` refuses an interpolated path on a line running an inline
 script. Git Bash hands node a path beginning `/c/`, node reads it as a folder
@@ -143,7 +170,7 @@ Vale carries five actions, and none of them folds case:
 | `edit` | trims, replaces, truncates, splits or runs a regex |
 | `convert` | lowercases and drops the punctuation |
 
-So `ShoutedLead` carries no action, and `src/level0/lib/shout.js` makes the fix
+So `ShoutedLead` carries no action, and `.claude/skills/level0/lib/shout.js` makes the fix
 from the line and the column Vale already reports. Vale skips a code fence and
 honours an exemption marker, so the finding it hands over carries both for free.
 

@@ -29,7 +29,7 @@ Three checks hold the rules above:
 | check | what it refuses | where it runs |
 |---|---|---|
 | `DoorsOnly` | a `node:` import, a `Date.now`, a `new Date()`, a `Math.random` | outside `src/doors` |
-| `FakeDoorsInTest` | a real door | inside `src/level0/test` |
+| `FakeDoorsInTest` | a real door | inside `test/level0` |
 | `./RUNME.sh doors` | a door standing without a contract test | over both folders |
 
 Five modules pass `DoorsOnly`, because they reach nothing outside: `node:path`,

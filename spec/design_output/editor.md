@@ -48,7 +48,7 @@ and the tracked values apply.
 
 # The asset matrix
 
-`src/level0/lib/servers.js` pins the version and names one release asset per
+`.claude/skills/level0/lib/servers.js` pins the version and names one release asset per
 platform. The install scripts ask node for the URL, so the matrix lives in one
 place and a test drives it.
 

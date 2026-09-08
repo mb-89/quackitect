@@ -5,7 +5,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { calmed, SHOUTED, sentenceCase } from "../lib/shout.js";
+import { calmed, SHOUTED, sentenceCase } from "../../.claude/skills/level0/lib/shout.js";
 
 test("sentence case keeps what stands before the first letter", () => {
   assert.equal(sentenceCase("NOTHING AT ALL, yes"), "Nothing at all, yes");

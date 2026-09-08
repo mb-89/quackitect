@@ -15,7 +15,7 @@ bin="$root/.se/bin"
 # platform, so nothing here compiles and no C toolchain is needed.
 vale_version=3.20.0
 biome_version=2.5.12
-# vale-ls pins itself in src/level0/lib/servers.js, which a test drives.
+# vale-ls pins itself in .claude/skills/level0/lib/servers.js, which a test drives.
 
 say() { printf '%s\n' "$*"; }
 have() { command -v "$1" >/dev/null 2>&1; }
@@ -109,7 +109,7 @@ unpack() {
 # costs a line and the tree goes on.
 get_vale_ls() {
   from=$(cd "$root" && node --input-type=module -e \
-    "import { valeLsUrl } from './src/level0/lib/servers.js';
+    "import { valeLsUrl } from './.claude/skills/level0/lib/servers.js';
      process.stdout.write(valeLsUrl('$os', '$arch'));") || return 1
   [ -n "$from" ] || return 1
 
@@ -128,25 +128,12 @@ get_vale_ls() {
   rm -rf "$tmp"
 }
 
-# Settings alone register no marketplace on a fresh clone, so a box asks for it
-# once. Level zero reaches no session until it does.
-register_level0() {
-  have claude || return 1
-  claude plugin marketplace add mb-89/quackitect --scope user >/dev/null 2>&1
-}
-
-registered() {
-  have claude || return 1
-  claude plugin marketplace list 2>/dev/null | grep -q quackitect
-}
-
 # A want, rather than a need: the tree still lints and tests without it.
-wanted() { [ "$1" = "vale-ls" ] || [ "$1" = "level0" ]; }
+wanted() { [ "$1" = "vale-ls" ]; }
 
 missed() {
   case $1 in
     vale-ls) say "  vale-ls stays missing, so the editor manages its own copy." >&2 ;;
-    level0)  say "  level0 is unregistered, so its rules reach no session here." >&2 ;;
   esac
 }
 
@@ -156,14 +143,12 @@ here() {
     vale)    [ -x "$bin/vale${exe}" ] ;;
     biome)   [ -x "$bin/biome${exe}" ] ;;
     vale-ls) [ -x "$bin/vale-ls${exe}" ] ;;
-    level0)  registered ;;
   esac
 }
 
 why() {
   case $1 in
     node) say "node: the command line and the level zero rules are JavaScript" ;;
-    level0) say "level0: the rules reach a session through a marketplace a box registers once" ;;
     vale) say "vale: Vale holds the prose rules the write door and the linter read" ;;
     biome) say "biome: Biome formats and lints the JavaScript in this tree" ;;
     vale-ls) say "vale-ls: the Vale language server, so an editor draws the same rules" ;;
@@ -173,7 +158,6 @@ why() {
 get() {
   case $1 in
     node) if [ "$pm" = "brew" ]; then install_with_pm node; else install_with_pm nodejs; fi ;;
-    level0) register_level0 ;;
     vale) get_vale ;;
     biome) get_biome ;;
     vale-ls) get_vale_ls ;;
@@ -181,7 +165,7 @@ get() {
 }
 
 missing=""
-for one in node vale biome vale-ls level0; do
+for one in node vale biome vale-ls; do
   here "$one" || missing="$missing $one"
 done
 [ -n "$missing" ] || exit 0

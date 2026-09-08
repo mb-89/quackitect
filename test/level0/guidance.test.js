@@ -10,7 +10,7 @@ import {
   envOf,
   parse,
   standingLayer,
-} from "../lib/guidance.js";
+} from "../../.claude/skills/level0/lib/guidance.js";
 
 const note = `---
 kind: [[guidance]]

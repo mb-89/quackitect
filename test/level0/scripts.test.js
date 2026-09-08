@@ -2,7 +2,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { pathInScript } from "../lib/scripts.js";
+import { pathInScript } from "../../.claude/skills/level0/lib/scripts.js";
 
 test("an interpolated path inside an inline script is refused", () => {
   const said = `from=$(node -e "import { x } from '$root/src/a.js';")`;

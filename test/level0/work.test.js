@@ -6,8 +6,8 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { fakeDisk } from "../../doors/fake/disk.js";
-import { fakeGit } from "../../doors/fake/git.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeGit } from "../../src/doors/fake/git.js";
 import {
   BRIEF,
   CONTRACT_HEADING,
@@ -23,7 +23,7 @@ import {
   waitingOn,
   withContract,
   work,
-} from "../../scripts/work.js";
+} from "../../src/scripts/work.js";
 
 const ROOT = "/tree";
 const HERE = join(ROOT, BRIEF);
