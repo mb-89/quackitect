@@ -47,6 +47,7 @@ const biome = join(root, biomeBin(process.platform));
 const valeLs = join(root, valeLsBin(process.platform));
 const GUIDANCE = join(root, "spec", "guidance");
 const DOORS = join(root, "src", "doors");
+const PLUGIN = join(".claude", "skills", "level0");
 const CONTRACT = join(root, "test", "contract");
 const LEVEL0 = join(root, "spec", "config", "level0.json");
 const config = files.exists(LEVEL0) ? JSON.parse(files.read(LEVEL0)) : {};
@@ -61,7 +62,7 @@ const run = async (argv, init = {}) =>
 const verbs = {
   check: {
     says: "the tests, the doors, then the rules over the tree",
-    run: async (w) => test() || doorsHold() || (await lint(w)),
+    run: async (w) => test() || doorsHold() || pluginHolds() || (await lint(w)),
   },
   lint: { says: "the rules over the tree, or over what you name", run: lint },
   fix: { says: "the fixes a program can make", run: fix },
@@ -276,6 +277,19 @@ function test() {
     inherit: true,
   });
   return ran.exitCode;
+}
+
+// [[spec/design_output/level0#the-engine-interface-takes-no-computed-access]]
+function pluginHolds() {
+  const ran = outside.run(["claude", "plugin", "validate", PLUGIN], { cwd: root });
+  if (ran.exitCode === 0) return 0;
+  if (!ran.stdout && !ran.stderr) {
+    console.log("claude stands nowhere, so the plugin goes unvalidated here.");
+    return 0;
+  }
+  console.error(`${ran.stdout}${ran.stderr}`.trim());
+  console.error("The engine reads this module's source, and it refuses the above.");
+  return 1;
 }
 
 // [[spec/guidance/testing]]

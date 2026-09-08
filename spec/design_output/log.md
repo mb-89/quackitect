@@ -62,7 +62,12 @@ A session file closes when its session ends, so nothing rotates it.
 
 - Keep 14 days.
 - Keep at most 200 files.
-- Drop the oldest first when either cap breaks.
+- Keep the newest 20 whatever their age.
+- Drop the oldest first when a cap breaks.
+
+The third line is a floor under the first. A fortnight away puts every file
+past the age cap, and a folder swept empty leaves a person diagnosing yesterday
+with nothing. So the age cap reaches a file only where more than 20 stand.
 
 `dropping` decides, and it reads the time out of each name. The door removes
 what it names, and a file outside that naming stays where it is.

@@ -7,6 +7,7 @@ export const FOLDER = ".se/log";
 export const LNAV = ".se/bin/lnav";
 export const DAYS = 14;
 export const FILES = 200;
+export const LEAST = 20;
 
 const LEVELS = ["info", "warn", "error"];
 const SAID = 80;
@@ -59,14 +60,17 @@ export function timeOf(name) {
 export function dropping(names, now, caps = {}) {
   const days = caps.days ?? DAYS;
   const keep = caps.files ?? FILES;
+  const least = caps.least ?? LEAST;
   const mine = names
     .map((name) => ({ name, at: timeOf(name) }))
     .filter((one) => one.at > 0)
     .sort((a, b) => a.at - b.at || a.name.localeCompare(b.name));
 
   const oldest = now - days * DAY;
-  const stale = mine.filter((one) => one.at < oldest);
-  const left = mine.filter((one) => one.at >= oldest);
+  const floor = mine.slice(Math.max(0, mine.length - least));
+  const young = (one) => one.at >= oldest || floor.includes(one);
+  const stale = mine.filter((one) => !young(one));
+  const left = mine.filter(young);
   const over = left.slice(0, Math.max(0, left.length - keep));
   return [...stale, ...over].map((one) => one.name);
 }

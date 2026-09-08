@@ -57,7 +57,7 @@ export function register(on, _options) {
       );
     } catch {}
 
-    logbook = logHere($);
+    logbook = logHere((at, text) => $.fs.writeFile(at, text));
     await logbook.say("info", "level0", `session start, ${await pruned($)}`, {
       branch: await branchNow($),
       vale: bin ?? "missing",
@@ -90,6 +90,25 @@ export function register(on, _options) {
         "commit then lands where it belongs, and the merge stays a person's.",
       ].join("\n"),
     };
+  });
+
+  // [[spec/design_output/log#the-search-writes-itself-down]]
+  on("tool.call", { tool: "WebSearch" }, async ($, e, next) => {
+    const said = await next(e);
+    await logbook.say("info", "search", String(e.query ?? "").slice(0, 120), {
+      tool: "WebSearch",
+      detail: [e.allowed_domains, e.blocked_domains].flat().filter(Boolean).join(" "),
+    });
+    return said;
+  });
+
+  on("tool.call", { tool: "WebFetch" }, async ($, e, next) => {
+    const said = await next(e);
+    await logbook.say("info", "search", String(e.url ?? "").slice(0, 120), {
+      tool: "WebFetch",
+      detail: String(e.prompt ?? "").slice(0, 200),
+    });
+    return said;
   });
 
   on("tool.call", async ($, e, next) => {
@@ -252,7 +271,7 @@ export function register(on, _options) {
 }
 
 // [[spec/design_output/log#where-the-writer-stands]]
-function logHere($) {
+function logHere(writeFile) {
   const rows = [];
   const stamp = () => new Date().toISOString();
   const id = Math.random().toString(16).slice(2).padEnd(8, "0").slice(0, 8);
@@ -263,9 +282,9 @@ function logHere($) {
     lines: () => rows.map((one) => ({ ...one })),
     async say(level, door, said, more) {
       rows.push(rowOf(stamp(), level, door, said, more));
-      if (!$) return rows[rows.length - 1];
+      if (!writeFile) return rows[rows.length - 1];
       try {
-        await $.fs.writeFile(path, asLines(rows));
+        await writeFile(path, asLines(rows));
       } catch {}
       return rows[rows.length - 1];
     },

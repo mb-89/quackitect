@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
-import { asRow, dropping, nameOf, rowsOf, timeOf } from "../../.claude/skills/level0/lib/log.js";
+import { asRow, dropping, LEAST, nameOf, rowsOf, timeOf } from "../../.claude/skills/level0/lib/log.js";
 
 const AT = "2026-09-08T14:22:51.000Z";
 const ID = "a6f8c43b";
@@ -87,7 +87,7 @@ test("the prune drops a file older than the day cap", async () => {
   await it.say("info", "write", "a line, so the folder stands");
   it.files.write(`${FOLDER}/${named("2026-08-01T00-00-00")}`, "{}\n");
 
-  const went = it.prune({ days: 14, files: 200 });
+  const went = it.prune({ days: 14, files: 200, least: 0 });
   assert.deepEqual(went, [named("2026-08-01T00-00-00")]);
   assert.equal(it.files.exists(`${FOLDER}/${named("2026-08-01T00-00-00")}`), false);
   assert.equal(it.files.exists(it.path), true);
@@ -127,7 +127,8 @@ test("the prune answers nothing where no folder stands", () => {
 
 test("the prune reads a file this tree never named", () => {
   const now = Date.parse("2026-09-08T14:00:00.000Z");
-  assert.deepEqual(dropping(["notes.md", named("2026-01-01T00-00-00")], now), [
+  const caps = { least: 0 };
+  assert.deepEqual(dropping(["notes.md", named("2026-01-01T00-00-00")], now, caps), [
     named("2026-01-01T00-00-00"),
   ]);
 });
@@ -136,4 +137,15 @@ test("a row without lnav shows the four fields, and the rest beneath", () => {
   const one = { at: AT, level: "warn", door: "write", said: "refused" };
   assert.equal(asRow(one), "14:22:51.000 warn  write  refused");
   assert.match(asRow({ ...one, rule: "Passive" }), /\n\s+rule=Passive$/);
+});
+
+test("a fortnight away leaves the newest files standing", () => {
+  const now = Date.parse("2026-09-08T12:00:00.000Z");
+  const old = (n) => nameOf(new Date(now - (60 + n) * 86400000).toISOString(), "aaaaaaaa");
+  const names = Array.from({ length: 30 }, (_, i) => old(i));
+
+  const went = dropping(names, now);
+
+  assert.equal(names.length - went.length, LEAST, "the floor holds the newest");
+  assert.ok(!went.includes(old(0)), "the newest of the old stands");
 });
