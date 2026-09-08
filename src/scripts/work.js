@@ -4,7 +4,7 @@
 // [[spec/design_output/work#the-round-trip]]
 
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 export const BRIEF = "HANDOVER.md";
@@ -23,6 +23,8 @@ export function work(root, argv) {
     sync,
     done: finish,
     release,
+    merge,
+    close,
     read,
     list,
     collect,
@@ -38,10 +40,12 @@ export function work(root, argv) {
     console.log("  release       put this branch, or the one you name, back to todo");
     console.log("  read <name>   print what stands on work/<name>");
     console.log("  list          every work branch and its status");
+    console.log("  merge <name>  take a done branch into main");
+    console.log("  close [name]  delete a branch already inside main, or every one");
     console.log("  collect       every branch marked done, waiting on a merge");
     return what ? 2 : 0;
   }
-  return doing[what](root, name);
+  return doing[what](root, name, argv);
 }
 
 const git = (root, args, quiet) => {
@@ -304,6 +308,93 @@ function list(root) {
     );
   }
   return 0;
+}
+
+// [[spec/design_output/work#a-merged-branch-goes]]
+function merge(root, name) {
+  if (dirty(root)) return 2;
+  const branch = name ? `work/${name}` : "";
+  if (!branch) {
+    console.error("work merge needs a name: ./RUNME.sh work merge fix-lsp");
+    return 2;
+  }
+
+  const on = git(root, ["rev-parse", "--abbrev-ref", "HEAD"], true).out;
+  if (on !== TRUNK) {
+    console.error(`work merge runs on ${TRUNK}, and this is ${on}.`);
+    return 2;
+  }
+
+  git(root, ["fetch", "--prune", "origin"], true);
+  const status = statusOf(briefOf(root, branch));
+  if (status !== DONE) {
+    console.error(`${branch} stands at ${status || "no status"}, so it is not ready.`);
+    return 1;
+  }
+
+  if (!git(root, ["merge", "--no-ff", "--no-edit", `origin/${branch}`]).ok) {
+    console.error(`${branch} conflicts. Resolve it, commit, then run work close.`);
+    return 1;
+  }
+
+  if (git(root, ["rm", "--cached", "-q", BRIEF], true).ok) {
+    dropBrief(root);
+    git(root, ["commit", "--amend", "--no-edit"], true);
+  }
+
+  console.log(`${branch} is merged. Run ./RUNME.sh check, then work sweep.`);
+  return 0;
+}
+
+function dropBrief(root) {
+  const path = join(root, BRIEF);
+  if (existsSync(path)) unlinkSync(path);
+}
+
+// [[spec/design_output/work#a-merged-branch-closes]]
+function close(root, name, argv) {
+  const forced = (argv ?? []).includes("--force");
+  git(root, ["fetch", "--prune", "origin"], true);
+
+  // DELETING A REMOTE BRANCH WHOSE MERGE SITS ONLY HERE LOSES THE WORK. Local
+  // trunk holding commits origin has never seen is that case exactly.
+  const ahead = git(
+    root,
+    ["rev-list", "--count", `origin/${TRUNK}..${TRUNK}`],
+    true,
+  ).out;
+  if (ahead !== "0" && !forced) {
+    console.error(`${TRUNK} holds ${ahead} commit(s) origin has never seen.`);
+    console.error(`Push ${TRUNK} first, so the merge outlives the branch.`);
+    return 1;
+  }
+
+  const inTrunk = new Set(
+    git(root, ["branch", "-r", "--merged", `origin/${TRUNK}`], true)
+      .out.split("\n")
+      .map((row) => row.trim().replace("origin/", ""))
+      .filter((row) => row.startsWith("work/")),
+  );
+
+  const wanted = name ? [`work/${name}`] : [...inTrunk];
+  if (!wanted.length) {
+    console.log(`No work branch stands inside ${TRUNK}.`);
+    return 0;
+  }
+
+  let shut = 0;
+  for (const branch of wanted) {
+    if (!inTrunk.has(branch) && !forced) {
+      console.error(`${branch} is outside ${TRUNK}, so closing it drops its work.`);
+      console.error(`Merge it first, or run close ${branch.slice(5)} --force.`);
+      continue;
+    }
+    if (!git(root, ["push", "origin", "--delete", branch]).ok) continue;
+    git(root, ["branch", "-D", branch], true);
+    console.log(`${branch} is closed${inTrunk.has(branch) ? "" : ", unmerged"}.`);
+    shut++;
+  }
+  return shut || !name ? 0 : 1;
 }
 
 function collect(root) {
