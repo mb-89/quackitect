@@ -210,6 +210,11 @@ function take(root) {
     return 1;
   }
 
+  if (sync(root) === 1) {
+    console.error(`Resolve the conflict on ${branch}, then read the brief again.`);
+    return 1;
+  }
+
   console.log(`You are on ${branch}, and it now stands at ${HELD}.`);
   console.log(`Write your result into ${BRIEF}, then run ./RUNME.sh work done.\n`);
   console.log(brief.trim());
