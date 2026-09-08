@@ -46,7 +46,7 @@ export function register(on, _options) {
     judge = judgeOf(config);
     handover = await takeHandover($);
     cloud = await onACloudBox($);
-    waiting = cloud && !handover.length && (await onTrunk($));
+    waiting = cloud && !handover.length && (await offAWorkBranch($));
 
     try {
       await $.fs.writeFile(
@@ -189,9 +189,9 @@ export function register(on, _options) {
       blocks.push({
         name: "level0-take-work",
         text: [
-          "YOU ARE ON A CLOUD BOX, ON TRUNK, AND NO BRIEF REACHED YOU.",
+          "YOU ARE ON A CLOUD BOX, OFF A WORK BRANCH, AND NO BRIEF REACHED YOU.",
           "",
-          "Trunk carries no work of its own. The work waits on branches named",
+          "This branch carries no work of its own. The work waits on branches named",
           "work/<something>, each carrying the brief that says what it is.",
           "",
           "Run this first:",
@@ -287,8 +287,11 @@ async function onACloudBox($) {
   return bindsHere("---\nenv:\n  - CLAUDE_CODE_REMOTE\n  - SE_CLOUD\n---\n", env);
 }
 
-async function onTrunk($) {
-  return (await branchNow($)) === TRUNK;
+// A routine runs on a branch the platform names, so asking for `main` by name
+// answers no on every routine. What matters is standing outside a work branch.
+// [[spec/design_output/work#a-cloud-box-landing-off-a-work-branch]]
+async function offAWorkBranch($) {
+  return !(await branchNow($)).startsWith("work/");
 }
 
 async function branchNow($) {
