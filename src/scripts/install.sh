@@ -15,6 +15,7 @@ bin="$root/.se/bin"
 # platform, so nothing here compiles and no C toolchain is needed.
 vale_version=3.20.0
 biome_version=2.5.12
+# vale-ls pins itself in src/level0/lib/servers.js, which a test drives.
 
 say() { printf '%s\n' "$*"; }
 have() { command -v "$1" >/dev/null 2>&1; }
@@ -99,11 +100,44 @@ get_biome() {
   chmod +x "$bin/biome${exe}"
 }
 
+unpack() {
+  if have unzip; then unzip -oq "$1" -d "$2"
+  elif have python3; then python3 -m zipfile -e "$1" "$2"
+  else say "Neither unzip nor python3 opens a zip here." >&2; return 1
+  fi
+}
+
+# The editor wants this one, and the doors hold without it, so a failure here
+# costs a line and the tree goes on.
+get_vale_ls() {
+  from=$(node --input-type=module -e \
+    "import { valeLsUrl } from '$root/src/level0/lib/servers.js';
+     process.stdout.write(valeLsUrl('$os', '$arch'));") || return 1
+  [ -n "$from" ] || return 1
+
+  say "  downloading vale-ls"
+  mkdir -p "$bin"
+  tmp=$(mktemp -d)
+  name=${from##*/}
+  if have curl; then curl -fsSL "$from" -o "$tmp/$name" || return 1
+  elif have wget; then wget -q "$from" -O "$tmp/$name" || return 1
+  else say "Neither curl nor wget downloads vale-ls here." >&2; return 1
+  fi
+
+  unpack "$tmp/$name" "$tmp" || return 1
+  mv "$tmp/vale-ls${exe}" "$bin/vale-ls${exe}" || return 1
+  chmod +x "$bin/vale-ls${exe}"
+  rm -rf "$tmp"
+}
+
+wanted() { [ "$1" = "vale-ls" ]; }
+
 here() {
   case $1 in
-    node)  have node ;;
-    vale)  [ -x "$bin/vale${exe}" ] ;;
-    biome) [ -x "$bin/biome${exe}" ] ;;
+    node)    have node ;;
+    vale)    [ -x "$bin/vale${exe}" ] ;;
+    biome)   [ -x "$bin/biome${exe}" ] ;;
+    vale-ls) [ -x "$bin/vale-ls${exe}" ] ;;
   esac
 }
 
@@ -112,6 +146,7 @@ why() {
     node) say "node: the command line and the level zero rules are JavaScript" ;;
     vale) say "vale: Vale holds the prose rules the write door and the linter read" ;;
     biome) say "biome: Biome formats and lints the JavaScript in this tree" ;;
+    vale-ls) say "vale-ls: the Vale language server, so an editor draws the same rules" ;;
   esac
 }
 
@@ -120,11 +155,12 @@ get() {
     node) if [ "$pm" = "brew" ]; then install_with_pm node; else install_with_pm nodejs; fi ;;
     vale) get_vale ;;
     biome) get_biome ;;
+    vale-ls) get_vale_ls ;;
   esac
 }
 
 missing=""
-for one in node vale biome; do
+for one in node vale biome vale-ls; do
   here "$one" || missing="$missing $one"
 done
 [ -n "$missing" ] || exit 0
@@ -132,6 +168,11 @@ done
 say "Installing what this tree needs."
 for one in $missing; do
   why "$one"
+  if wanted "$one"; then
+    get "$one" || true
+    here "$one" || say "  vale-ls stays missing, so the editor manages its own copy." >&2
+    continue
+  fi
   get "$one"
   if ! here "$one"; then
     say "$one is still missing after installing it. Open a new terminal and run this again." >&2
