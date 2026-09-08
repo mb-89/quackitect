@@ -207,7 +207,7 @@ func whoElseHolds(r Roots, have TheGroups, name string, now time.Time) string {
 //
 // A GROUP IS WORKABLE WHEN ITS ENTRY IS ABSENT OR LAPSED. That is a date
 // comparison, and it is the whole of what a scheduler has to understand.
-func whyTheGroupIsNotWorkable(r Roots, have TheGroups, name string, now time.Time) string {
+func whyTheGroupIsNotWorkable(ctx context.Context, r Roots, have TheGroups, name string, now time.Time) string {
 	e, ok := have[name]
 	if !ok {
 		return ""
@@ -220,7 +220,7 @@ func whyTheGroupIsNotWorkable(r Roots, have TheGroups, name string, now time.Tim
 		return name + " is blocked: " + orElse(e.Why, "no reason was written") +
 			". A person settles that before a box takes it"
 	}
-	if waits := theGroupsItWaitsOn(have, e); len(waits) > 0 {
+	if waits := theGroupsItWaitsOn(ctx, r, have, e); len(waits) > 0 {
 		return name + " waits on " + strings.Join(waits, ", ") +
 			", which is not done. Ask for another group: se group --next"
 	}
@@ -231,14 +231,31 @@ func whyTheGroupIsNotWorkable(r Roots, have TheGroups, name string, now time.Tim
 	return ""
 }
 
-// theGroupsItWaitsOn names the groups this entry waits on that are not finished.
+// theGroupsItWaitsOn names the groups this entry waits on that are still open.
 //
-// A GROUP WITH NO ENTRY IS NOT DONE. The zero value answers an empty state, so a
-// dependency nobody has ever worked reads as unfinished, which is what it is.
-func theGroupsItWaitsOn(have TheGroups, e GroupEntry) []string {
+// A NAME WITH NO BRANCH IS DONE. The retro merges a finished group and prunes
+// its entry, so a dependency that answers neither branch nor entry is a group
+// that is over. Reading it as unfinished would park this group behind a name
+// nobody can find, and nothing would ever clear it.
+//
+// A BRANCH WITH NO ENTRY IS NOT DONE. That is a group nobody has started, which
+// is the state a wait is written for: the branch is cut, the order is declared,
+// and neither has been worked yet.
+//
+// THE BRANCHES ARE LISTED ONLY FOR A GROUP THAT WAITS. A group with nothing
+// declared pays no git call, which is every group until somebody writes an
+// order down.
+func theGroupsItWaitsOn(ctx context.Context, r Roots, have TheGroups, e GroupEntry) []string {
+	if len(e.DependsOn) == 0 {
+		return nil
+	}
+	here := map[string]bool{}
+	for _, name := range theGroupBranches(ctx, r) {
+		here[name] = true
+	}
 	var out []string
 	for _, on := range e.DependsOn {
-		if have[on].State != GroupDone {
+		if here[on] && have[on].State != GroupDone {
 			out = append(out, on)
 		}
 	}
@@ -317,7 +334,7 @@ func ClaimTheGroup(ctx context.Context, r Roots, said string, now time.Time) Gro
 	}
 	// ONE FETCH OF ONE REF, so a box that has just started can ask at once.
 	_ = fetchTheRemoteClaims(ctx, r, "") // a box with no network still writes here, and the answer says the push did not run
-	if why := whyTheGroupIsNotWorkable(r, theGroupsEverybodySees(ctx, r), name, now); why != "" {
+	if why := whyTheGroupIsNotWorkable(ctx, r, theGroupsEverybodySees(ctx, r), name, now); why != "" {
 		return GroupResult{Group: name, Refused: why}
 	}
 	entry := GroupEntry{State: GroupHeld, By: Box(r),
@@ -369,6 +386,9 @@ func FinishTheGroup(ctx context.Context, r Roots, said string, now time.Time) Gr
 //
 // IT IS NOT blocked. Blocked waits for a person and says why. This waits for a
 // group and says which, so an unattended loop can pass through it.
+//
+// A WAIT ON A GROUP THAT IS GONE IS ALREADY CLEAR, so an order written once
+// outlives the groups in it. See theGroupsItWaitsOn.
 func TheGroupWaitsOn(ctx context.Context, r Roots, said string, on []string, now time.Time) GroupResult {
 	name := aGroupName(said)
 	if name == "" {
@@ -465,7 +485,7 @@ func TheNextGroup(ctx context.Context, r Roots, now time.Time) (string, string) 
 	_ = fetchTheRemoteClaims(ctx, r, "") // a box with no network answers off what it last saw
 	have := theGroupsEverybodySees(ctx, r)
 	for _, name := range branches {
-		if whyTheGroupIsNotWorkable(r, have, name, now) == "" {
+		if whyTheGroupIsNotWorkable(ctx, r, have, name, now) == "" {
 			return name, ""
 		}
 	}

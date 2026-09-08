@@ -23,6 +23,7 @@ Nothing you write survives except what you push.
 11. The branch you are on is the group. Work it, and never widen it. *
 12. Push and hand over when the group is empty. The merge is not yours. *
 13. Claim the group before you work it, and say how it ended. *
+14. Take trunk into your branch before you start, and never the other way. *
 
 ## Discussion
 
@@ -182,3 +183,16 @@ Then stop. The owner reads blocked groups, and a box that carries on guessing is
 
 YOU DO NOT WAIT FOR AN ANSWER. Nobody is beside you, so a question is a session spent waiting.
 Blocking is how you ask, and it is the only way that reaches anybody.
+
+### 14. Take trunk into your branch before you start
+
+Your branch was cut when the group was made, and trunk has moved since.
+Work off it and you land a group written against an older tree, and the merge that follows is somebody else's to repair.
+
+    git fetch origin
+    git merge --no-edit origin/v4
+
+Trunk is `v4`. Do this once, after the claim and before the first token.
+A conflict here means another group already landed over the same files: mark the token `needs_human`, block the group, say which files, and stop.
+
+YOU NEVER PUSH TO TRUNK. Taking trunk in is yours. Putting your branch into trunk is the retro's, and chapter 12 says why.

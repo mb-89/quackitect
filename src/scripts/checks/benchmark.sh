@@ -22,7 +22,8 @@
 #   sh src/scripts/checks/benchmark.sh -count 3   fewer runs of the Go benchmarks
 #   sh src/scripts/checks/benchmark.sh --rank <page>   rank a battery page already written
 set -e
-root=$(cd "$(dirname "$0")/../.." && pwd)
+# THE ROOT IS THREE UP, NOT TWO, for the reason battery.sh gives at its own cd.
+root=$(cd "$(dirname "$0")/../../.." && pwd)
 cd "$root"
 env=${LOCALAPPDATA:-$HOME/.local/share}/quackitect/cgo.env
 if [ -f "$env" ]; then

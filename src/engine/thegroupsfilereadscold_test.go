@@ -23,13 +23,13 @@ func TestNoEntryMeansAGroupIsFree(t *testing.T) {
 	// THE CLEAN CASE: a file naming another group and saying nothing about this
 	// one. Absence is the default, so this group is workable.
 	have := TheGroups{"group/tests": {State: GroupHeld, By: "another-box", Lapses: live}}
-	if why := whyTheGroupIsNotWorkable(r, have, "group/voice", now); why != "" {
+	if why := whyTheGroupIsNotWorkable(t.Context(), r, have, "group/voice", now); why != "" {
 		t.Errorf("a group with no entry was refused: %s", why)
 	}
 
 	// THE PLANTED CASE: the same file with an entry for this group, held now.
 	have["group/voice"] = GroupEntry{State: GroupHeld, By: "another-box", Lapses: live}
-	why := whyTheGroupIsNotWorkable(r, have, "group/voice", now)
+	why := whyTheGroupIsNotWorkable(t.Context(), r, have, "group/voice", now)
 	if why == "" {
 		t.Fatal("a group another box holds was offered as workable")
 	}
@@ -48,14 +48,14 @@ func TestALapsedEntryIsAsGoodAsNone(t *testing.T) {
 	// THE PLANTED CASE: a lease that ran out a minute ago.
 	over := TheGroups{"group/voice": {State: GroupHeld, By: "another-box",
 		Lapses: now.Add(-time.Minute).UTC().Format(ClaimStamp)}}
-	if why := whyTheGroupIsNotWorkable(r, over, "group/voice", now); why != "" {
+	if why := whyTheGroupIsNotWorkable(t.Context(), r, over, "group/voice", now); why != "" {
 		t.Errorf("a lapsed hold still keeps a box off the group: %s", why)
 	}
 
 	// THE CLEAN CASE: the same entry with a minute left on it.
 	standing := TheGroups{"group/voice": {State: GroupHeld, By: "another-box",
 		Lapses: now.Add(time.Minute).UTC().Format(ClaimStamp)}}
-	if why := whyTheGroupIsNotWorkable(r, standing, "group/voice", now); why == "" {
+	if why := whyTheGroupIsNotWorkable(t.Context(), r, standing, "group/voice", now); why == "" {
 		t.Error("a hold with a minute left on it was read as free")
 	}
 
@@ -63,7 +63,7 @@ func TestALapsedEntryIsAsGoodAsNone(t *testing.T) {
 	// later read would clamp it again and the group would never come back.
 	fast := TheGroups{"group/voice": {State: GroupHeld, By: "another-box",
 		Lapses: now.Add(48 * time.Hour).UTC().Format(ClaimStamp)}}
-	if why := whyTheGroupIsNotWorkable(r, fast, "group/voice", now); why != "" {
+	if why := whyTheGroupIsNotWorkable(t.Context(), r, fast, "group/voice", now); why != "" {
 		t.Errorf("a hold stamped two days out held the group: %s", why)
 	}
 }

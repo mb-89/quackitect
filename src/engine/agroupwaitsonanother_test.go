@@ -31,7 +31,7 @@ func TestAGroupWaitingOnAnUnfinishedGroupIsNotOffered(t *testing.T) {
 	if got := TheGroupWaitsOn(t.Context(), r, "voice", []string{"level0"}, now); got.Refused != "" {
 		t.Fatalf("the wait could not be written: %s", got.Refused)
 	}
-	why := whyTheGroupIsNotWorkable(r, theGroupsEverybodySees(t.Context(), r), "group/voice", now)
+	why := whyTheGroupIsNotWorkable(t.Context(), r, theGroupsEverybodySees(t.Context(), r), "group/voice", now)
 	if why == "" {
 		t.Fatal("a group waiting on an unfinished one was offered as workable")
 	}
@@ -65,7 +65,7 @@ func TestAWaitClearsWhenTheGroupItWaitsOnIsDone(t *testing.T) {
 	}
 
 	// NOBODY UNBLOCKED ANYTHING. The other group being done is the whole of it.
-	if why := whyTheGroupIsNotWorkable(r, theGroupsEverybodySees(t.Context(), r), "group/voice", now); why != "" {
+	if why := whyTheGroupIsNotWorkable(t.Context(), r, theGroupsEverybodySees(t.Context(), r), "group/voice", now); why != "" {
 		t.Fatalf("the wait outlived the group it waited on: %s", why)
 	}
 }
@@ -89,5 +89,28 @@ func TestAClaimKeepsTheWaitOnTheEntry(t *testing.T) {
 	have := theGroupsEverybodySees(t.Context(), r)
 	if got := have["group/voice"].DependsOn; len(got) != 1 || got[0] != "group/level0" {
 		t.Fatalf("the wait was dropped by a write beside it: %v", got)
+	}
+}
+
+// A WAIT ON A GROUP THAT IS GONE IS ALREADY CLEAR.
+//
+// The retro merges a finished group and prunes its entry, and its branch goes
+// with it. Reading that name as unfinished would park this group behind
+// something nobody can find, and no box could ever clear it.
+func TestAWaitOnAGroupThatIsGoneIsClear(t *testing.T) {
+	r := aBoxOverGroups(t)
+	now := time.Now().UTC()
+	aGroupBranchOnOrigin(t, r, "voice")
+
+	// NOTHING NAMED retired IS HERE: no branch, no entry, which is what a group
+	// looks like after the retro takes it in.
+	if got := TheGroupWaitsOn(t.Context(), r, "voice", []string{"retired"}, now); got.Refused != "" {
+		t.Fatalf("the wait could not be written: %s", got.Refused)
+	}
+	if why := whyTheGroupIsNotWorkable(t.Context(), r, theGroupsEverybodySees(t.Context(), r), "group/voice", now); why != "" {
+		t.Fatalf("a wait on a group with no branch held: %s", why)
+	}
+	if name, says := TheNextGroup(t.Context(), r, now); name != "group/voice" {
+		t.Errorf("the pick answered %q, and group/voice waits only on a group that is gone: %s", name, says)
 	}
 }

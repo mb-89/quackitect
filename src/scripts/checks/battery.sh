@@ -16,7 +16,11 @@
 # file failed here once for no defect of the program's. Everything about
 # time is a benchmark, src/scripts/checks/benchmark.sh, run at the retro. The one
 # wait left is for the engine this battery starts to finish its start.
-cd "$(dirname "$0")/../.." || exit 1
+# THE ROOT IS THREE UP, NOT TWO. This file sits at src/scripts/checks, and the
+# two-step walk landed in src/, where no check can find src/engine or .bin. All
+# twelve then failed on the path rather than on the program, which reads as a
+# red tree and is a red harness.
+cd "$(dirname "$0")/../../.." || exit 1
 battery_began=$(date +%s)
 # The node checks take a root and join paths onto it, so they need the one
 # this machine's node understands rather than the shell's.
