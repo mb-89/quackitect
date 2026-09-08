@@ -121,6 +121,32 @@ The line comes from `withContract` in `src/scripts/work.js`, and it reads
 through no fault of its own. One word closes it, and the fix belongs to whoever owns
 `work.js`.
 
+### The guidance stops short of saying the session ends
+
+`spec/guidance/cloud.md` walks a session from `work take` through `work done`,
+and then says nothing. So this session closes its branch and offers to take a
+second one, which is the whole failure in one sentence.
+
+Two rules come close, and both read as scope advice inside one branch:
+
+| rule | what it says | what it leaves open |
+|---|---|---|
+| 4 | work the branch you hold and stop at its edge | the edge of the brief, and no word on the session |
+| 7 | run `./RUNME.sh work done` last | last of these steps, and no word on the session |
+
+One rule closes it, and the note holds nine of a cap of ten:
+
+    Stop after `work done`. One session works one branch, and the next branch
+    belongs to the next session.
+
+### A branch listing goes stale inside a session
+
+`./RUNME.sh work list` reads origin at the moment you call it. This session
+reads it once at the start, works for an hour, and then names `work/wire-the-lsp`
+as `todo` in its answer. Another session carries that branch to `done` meanwhile.
+
+Run `work list` again before you name a status out loud.
+
 ## What the next session inherits
 
 - `spec/design_output/level0#the-fixer-calms-a-shouted-lead` holds the design
