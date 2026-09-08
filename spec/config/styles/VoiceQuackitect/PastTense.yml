@@ -1,0 +1,7 @@
+extends: sequence
+message: "Write the present tense: '%s'. The past belongs in spec/rationales."
+link: spec/guidance/guidance.md
+level: error
+ignorecase: true
+tokens:
+  - tag: VBD

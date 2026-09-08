@@ -11,12 +11,15 @@ import { spawnSync } from "node:child_process";
 
 import { lintText, fromJson, unreasoned, valeBin, CONFIG } from "../level0/lib/vale.mjs";
 import { standingLayer, actionables } from "../level0/lib/guidance.mjs";
+import { tooMuchProse, IN_A_DOCUMENT } from "../level0/lib/shape.mjs";
 import { line as asLine } from "../level0/lib/refuse.mjs";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const bin = join(root, valeBin(process.platform));
 const STYLES = join(root, "spec", "config", "styles", "VoiceQuackitect");
 const GUIDANCE = join(root, "spec", "guidance");
+const LEVEL0 = join(root, "spec", "config", "level0.json");
+const config = existsSync(LEVEL0) ? JSON.parse(readFileSync(LEVEL0, "utf8")) : {};
 
 // The shape level zero hands Vale, over spawnSync instead of $.process.run.
 const run = async (argv, init = {}) => {
@@ -65,9 +68,12 @@ async function lint(where) {
   const ran = await run([bin, "--config=" + CONFIG, "--output=JSON", "--no-exit", ...where]);
   const found = fromJson(ran.stdout);
 
-  // The one rule Vale cannot hold, because it is about Vale's own marker.
+  // The rules Vale does not hold: its own exemption marker, and the runs of
+  // prose that want a list, a table or a diagram.
+  const max = config.shape?.inADocument ?? IN_A_DOCUMENT;
   for (const file of walk(where)) {
-    for (const one of unreasoned(readFileSync(file, "utf8"))) {
+    const text = readFileSync(file, "utf8");
+    for (const one of [...unreasoned(text), ...tooMuchProse(text, max)]) {
       found.push({ ...one, file: show(file) });
     }
   }
@@ -157,6 +163,9 @@ function doctor() {
     ["node", process.version],
     ["vale", existsSync(bin) ? asked([bin, "--version"]) : "missing, run ./RUNME.sh"],
     ["rules", existsSync(STYLES) ? readdirSync(STYLES).filter((n) => n.endsWith(".yml")).length + " in the style folder" : "missing"],
+    ["judge", config.judge?.enabled === false ? "off in spec/config/level0.json"
+      : `on, ${config.judge?.rules?.length ?? 0} rule(s), model ${config.judge?.model ?? "default"}`],
+    ["prose limits", `answer ${config.shape?.inAnAnswer ?? 1}, document ${config.shape?.inADocument ?? 3}`],
     ["level zero stamp", readIf(join(root, ".se", "level0.stamp"))],
     ["cage", existsSync(join(root, ".claude", "settings.json")) ? "tracked, one file" : "missing"],
   ];

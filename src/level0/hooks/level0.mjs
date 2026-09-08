@@ -10,24 +10,31 @@
 // doors, and it holds no rule.
 
 import { lintText, VALE } from "../lib/vale.mjs";
-import { refusal } from "../lib/refuse.mjs";
+import { refusal, taught } from "../lib/refuse.mjs";
 import { standingLayer } from "../lib/guidance.mjs";
+import { tooMuchProse, IN_AN_ANSWER, IN_A_DOCUMENT } from "../lib/shape.mjs";
+import { judgeOf } from "../lib/judge.mjs";
 
 // The prose the write door reads. Vale itself decides what inside a file is
 // prose, so a fenced block and a table need no rule here.
 const PROSE = /\.(md|markdown|txt)$/i;
 const GUIDANCE = "spec/guidance";
+const CONFIG = "spec/config/level0.json";
 
 export function register(on, options) {
   // Module state survives between hooks in one session, so the linter is found
   // once and the door reads the answer.
   let bin = null;
   let standing = "";
+  let config = {};
+  let judge = judgeOf({});
 
   on("session.start", async ($, e, next) => {
     bin = await linterHere($);
     if (!bin) bin = await install($);
     standing = await readGuidance($);
+    config = await readConfig($);
+    judge = judgeOf(config);
 
     try {
       await $.fs.writeFile(".se/level0.stamp",
@@ -44,15 +51,51 @@ export function register(on, options) {
     const writing = asWrite(e);
     if (!writing) return next(e);
     if (!PROSE.test(writing.path)) return next(e);
-    // A checker that cannot run degrades the call and lets it through.
-    if (!bin) return next(e);
 
-    const said = await lintText(writing.text, shorten(writing.path), {
-      bin,
-      run: (argv, init) => $.process.run(argv, init),
-    });
-    if (!said.ran || !said.found.length) return next(e);
-    return { deny: refusal(shorten(writing.path), said.found) };
+    const where = shorten(writing.path);
+    const found = [];
+
+    // The mechanical rules first, because they cost nothing. A checker that
+    // cannot run degrades the call and lets it through.
+    if (bin) {
+      const said = await lintText(writing.text, where, {
+        bin,
+        run: (argv, init) => $.process.run(argv, init),
+      });
+      if (said.ran) found.push(...said.found);
+    }
+    found.push(...tooMuchProse(writing.text, config.shape?.inADocument ?? IN_A_DOCUMENT));
+
+    // The model last, and only when it earns the call. It spends one call per
+    // span, so it runs where the patterns already passed.
+    if (!found.length && judge.reads()) {
+      found.push(...await judge.run(writing.text,
+        (text, labels, opts) => $.model.classify(text, labels, opts)));
+    }
+
+    if (!found.length) {
+      judge.sawClean();
+      return next(e);
+    }
+    judge.sawBreach();
+    return { deny: refusal(where, found) };
+  });
+
+  // THE ANSWER IS READ TOO. A wall of prose in a chat answer costs the reader
+  // the same as one in a file, and the reader is the same person. This event
+  // cannot refuse a turn, so the note is drawn beneath the answer.
+  on("turn.complete", async ($, e, next) => {
+    const said = await next(e);
+    if (!e.answer || e.reason !== "answer") return said;
+
+    const found = tooMuchProse(e.answer, config.shape?.inAnAnswer ?? IN_AN_ANSWER);
+    if (!found.length) return said;
+
+    return {
+      ...said,
+      text: [said.text, "", found.map((one) => "  " + one.message).join("\n"), "",
+        "  " + taught(found)].filter(Boolean).join("\n"),
+    };
   });
 
   // THE STANDING LAYER, INJECTED AND NEVER PROJECTED. Every guidance note's
@@ -81,20 +124,39 @@ export function register(on, options) {
           "reason and the line.",
           "",
           standing,
-          "",
-          "## The receipt",
-          "",
-          "End every answer with one last line, on its own:",
-          "",
-          "    rules: <n>",
-          "",
-          "where <n> is how many numbered rules stand above, counted across every",
-          "heading. Count them yourself and write the number you counted. The line",
-          "is how a reader knows the rules reached you, so a guessed number is",
-          "worse than none.",
         ].join("\n"),
       ].filter(Boolean).join("\n\n"),
     });
+  });
+
+  // THE RECEIPT, ASKED ONCE. This event computes the blocks the first user
+  // message carries, so it fires once per conversation. The ask rides here
+  // rather than in the system prompt, where it would ask on every answer.
+  //
+  // The agent counts the rules itself. A number handed to it proves nothing,
+  // because repeating a constant is not reading.
+  on("prompt.context", async ($, e, next) => {
+    if (!standing) return next(e);
+    const said = await next(e);
+    return {
+      ...said,
+      blocks: [
+        ...said.blocks,
+        {
+          name: "level0",
+          text: [
+            "End your FIRST answer of this conversation with one last line, on its own:",
+            "",
+            "    rules: <n>",
+            "",
+            "where <n> is how many numbered rules stand in the section naming how this",
+            "tree is worked, counted across every heading there. Count them and write",
+            "what you counted. Write this line once and never again in this",
+            "conversation.",
+          ].join("\n"),
+        },
+      ],
+    };
   });
 }
 
@@ -111,6 +173,16 @@ async function readGuidance($) {
     return standingLayer(notes);
   } catch {
     return "";
+  }
+}
+
+// The switches a person owns. A missing file leaves every default standing, so
+// a clone works before anybody configures it.
+async function readConfig($) {
+  try {
+    return JSON.parse(await $.fs.readFile(CONFIG));
+  } catch {
+    return {};
   }
 }
 

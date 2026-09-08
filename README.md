@@ -1,19 +1,11 @@
 # quackitect v5
 
-A system that shapes how an agent works, starting from the layer that holds
-before anything else does.
+A system that shapes how an agent works. It starts at level zero, the layer
+holding before anything else does.
 
-## Level zero
+## Run it
 
-Level zero is the rules that shape what the agent writes. It runs as a plugin
-whose hooks are a module, inside the harness process.
+    ./RUNME.sh
 
-That placement is the point. The harness lists a tool registered at
-`session.start` on turn one, so nothing waits for a build and nothing arrives
-late.
-
-## Running it
-
-Run RUNME. It installs what is missing, then hands every argument to the
-command line. A first run on a fresh box needs nothing typed beforehand.
-See RUNME -h for more.
+That installs what is missing and prints what the tree can do. On Windows,
+`.\RUNME.ps1` takes the same words.
