@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import { biomeBin } from "../level0/lib/code.js";
 import { actionables, bindsHere, standingLayer } from "../level0/lib/guidance.js";
 import { line as asLine } from "../level0/lib/refuse.js";
+import { EDITOR_SETTINGS, valeLsBin } from "../level0/lib/servers.js";
 import { calmed, SHOUTED } from "../level0/lib/shout.js";
 import { CONFIG, fromJson, unreasoned, valeBin } from "../level0/lib/vale.js";
 import { work } from "./work.js";
@@ -17,6 +18,7 @@ const bin = join(root, valeBin(process.platform));
 const STYLES = join(root, "spec", "config", "styles", "VoiceVale");
 const JUDGED = join(root, "spec", "config", "styles", "VoiceJudged");
 const biome = join(root, biomeBin(process.platform));
+const valeLs = join(root, valeLsBin(process.platform));
 const GUIDANCE = join(root, "spec", "guidance");
 const LEVEL0 = join(root, "spec", "config", "level0.json");
 const config = existsSync(LEVEL0) ? JSON.parse(readFileSync(LEVEL0, "utf8")) : {};
@@ -246,6 +248,17 @@ function doctor() {
       existsSync(biome) ? asked([biome, "--version"]) : "missing, run ./RUNME.sh",
     ],
     [
+      "vale-ls",
+      existsSync(valeLs) ? asked([valeLs, "--version"]) : "missing, run ./RUNME.sh",
+    ],
+    ["biome lsp-proxy", existsSync(biome) ? lspProxy() : "missing, run ./RUNME.sh"],
+    [
+      "editor",
+      existsSync(join(root, EDITOR_SETTINGS))
+        ? `${EDITOR_SETTINGS}, both servers`
+        : "missing",
+    ],
+    [
       "vale rules",
       existsSync(STYLES)
         ? `${readdirSync(STYLES).filter((n) => n.endsWith(".yml")).length} in VoiceVale`
@@ -276,6 +289,15 @@ function doctor() {
     console.log(`${what.padEnd(18)} ${String(said).trim() || "missing"}`);
   }
   return 0;
+}
+
+function lspProxy() {
+  const ran = spawnSync(biome, ["lsp-proxy", "--help"], {
+    encoding: "utf8",
+    shell: false,
+  });
+  if (ran.error || ran.status !== 0) return "this biome carries no lsp-proxy";
+  return asked([biome, "--version"]).replace(/^Version:\s*/, "biome ");
 }
 
 function asked(argv) {
