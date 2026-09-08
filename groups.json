@@ -1,4 +1,9 @@
 {
+  "group/level0": {
+    "state": "held",
+    "by": "93bab139",
+    "lapses": "2026-09-08T16:09:19Z"
+  },
   "group/voice": {
     "state": "",
     "depends_on": [
