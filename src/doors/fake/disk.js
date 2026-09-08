@@ -24,7 +24,7 @@ export function fakeDisk(seed = {}) {
       return said;
     },
     write: (path, text) => void files.set(norm(path), String(text)),
-    exists: (path) => files.has(norm(path)),
+    exists: (path) => files.has(norm(path)) || folders.has(norm(path)),
     remove(path) {
       const at = norm(path);
       for (const key of [...files.keys()]) {

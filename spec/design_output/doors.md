@@ -5,7 +5,7 @@ describes: [[src/doors]]
 
 # One door per outside thing
 
-A door is the one place this tree reaches a thing outside it. There are four,
+A door is the one place this tree reaches a thing outside it. There are five,
 each a function answering an object of verbs:
 
 | door | reaches | file |
@@ -14,9 +14,10 @@ each a function answering an object of verbs:
 | `disk` | the filesystem | `src/doors/disk.js` |
 | `git` | a repository | `src/doors/git.js` |
 | `clock` | the time now | `src/doors/clock.js` |
+| `log` | the log every door writes | `src/doors/log.js` |
 
 Everything above a door takes it as an argument. The command line builds all
-four once and hands them on, so a caller names what it reaches and a test hands
+five once and hands them on, so a caller names what it reaches and a test hands
 in something else.
 
 Vale holds the line: `DoorsOnly` refuses a `node:` import, a `Date.now`, a
@@ -24,11 +25,20 @@ Vale holds the line: `DoorsOnly` refuses a `node:` import, a `Date.now`, a
 because they reach nothing: `node:path`, `node:url`, `node:test`,
 `node:assert` and `node:assert/strict`.
 
-# Git is a door of its own
+# A door standing on another
 
-Git runs a program, so the git door takes the process door and builds on it. A
-fake process therefore fakes git, and `src/doors/fake/git.js` is that pairing
-under one name. It answers `ran`, the commands it takes, in order.
+Git runs a program, and the log writes a file, so each takes the door beneath it
+and builds on that. A fake of the door beneath therefore stands in for the one
+above, and one file holds each pairing under one name.
+
+| door | stands on | its fake |
+|---|---|---|
+| `git` | `proc` | `src/doors/fake/git.js`, over the fake process |
+| `log` | `disk` and `clock` | `src/doors/fake/log.js`, over the fake disk |
+
+The fake git answers `ran`, the commands it takes, in order. The fake log
+answers `files`, the fake disk holding what it writes. For what one log line
+holds, see [[spec/design_output/log]].
 
 # A fake behaves
 

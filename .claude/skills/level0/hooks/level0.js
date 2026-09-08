@@ -12,6 +12,7 @@ import {
 } from "../lib/code.js";
 import { bindsHere, envOf, standingLayer } from "../lib/guidance.js";
 import { judgeOf } from "../lib/judge.js";
+import { asLines, FOLDER, nameOf, rowOf } from "../lib/log.js";
 import { refusal, taught } from "../lib/refuse.js";
 import { readRule } from "../lib/rulefile.js";
 import { landsOnTrunk, touchesGit } from "../lib/trunk.js";
@@ -36,6 +37,7 @@ export function register(on, _options) {
   let handover = [];
   let waiting = false;
   let cloud = false;
+  let logbook = logHere(null);
 
   on("session.start", async ($, e, next) => {
     bin = await linterHere($);
@@ -54,6 +56,12 @@ export function register(on, _options) {
         `${new Date().toISOString()} vale=${bin ?? "missing"}\n`,
       );
     } catch {}
+
+    logbook = logHere($);
+    await logbook.say("info", "level0", `session start, ${await pruned($)}`, {
+      branch: await branchNow($),
+      vale: bin ?? "missing",
+    });
     return next(e);
   });
 
@@ -66,6 +74,10 @@ export function register(on, _options) {
     const how = landsOnTrunk(said, await branchNow($), TRUNK);
     if (!how) return next(e);
 
+    await logbook.say("warn", "bash", `refused a ${how} landing on ${TRUNK}`, {
+      tool: "Bash",
+      detail: said.slice(0, 120),
+    });
     return {
       deny: [
         `This box works a branch, and ${TRUNK} belongs to a person.`,
@@ -85,12 +97,13 @@ export function register(on, _options) {
     if (!writing) return next(e);
 
     if (CODE.test(writing.path)) {
-      return await codeDoor($, e, next, writing, formatter);
+      return await codeDoor($, e, next, writing, formatter, logbook);
     }
     if (!PROSE.test(writing.path)) return next(e);
 
     const where = shorten(writing.path);
     const found = [];
+    let door = "vale";
 
     if (bin) {
       const said = await lintText(writing.text, where, {
@@ -103,6 +116,7 @@ export function register(on, _options) {
     if (!found.length) {
       judge = judgeOf(config, await readRules($, JUDGED));
       if (judge.reads()) {
+        door = "judge";
         found.push(
           ...(await judge.run(writing.text, (text, labels, opts) =>
             $.model.classify(text, labels, opts),
@@ -116,6 +130,11 @@ export function register(on, _options) {
       return next(e);
     }
     judge.sawBreach();
+    await logbook.say("warn", door, `refused ${found.length} line(s) in ${where}`, {
+      file: where,
+      rule: found[0]?.rule,
+      tool: e.tool,
+    });
     return { deny: refusal(where, found) };
   });
 
@@ -230,6 +249,39 @@ export function register(on, _options) {
 
     return { ...said, blocks };
   });
+}
+
+// [[spec/design_output/log#where-the-writer-stands]]
+function logHere($) {
+  const rows = [];
+  const stamp = () => new Date().toISOString();
+  const id = Math.random().toString(16).slice(2).padEnd(8, "0").slice(0, 8);
+  const path = `${FOLDER}/${nameOf(stamp(), id)}`;
+
+  return {
+    path,
+    lines: () => rows.map((one) => ({ ...one })),
+    async say(level, door, said, more) {
+      rows.push(rowOf(stamp(), level, door, said, more));
+      if (!$) return rows[rows.length - 1];
+      try {
+        await $.fs.writeFile(path, asLines(rows));
+      } catch {}
+      return rows[rows.length - 1];
+    },
+  };
+}
+
+// [[spec/design_output/log#rotation-which-is-really-a-prune]]
+async function pruned($) {
+  try {
+    const ran = await $.process.run(["node", "src/scripts/prune.js"], {
+      timeoutMs: 30000,
+    });
+    return (ran.stdout ?? "").trim() || "no log file went";
+  } catch {
+    return "the prune ran nowhere";
+  }
 }
 
 // [[spec/design_output/work#two-handovers]]
@@ -349,7 +401,7 @@ async function formatterHere($) {
 }
 
 // [[spec/design_output/level0#the-formatter-applies-itself]]
-async function codeDoor($, e, next, writing, formatter) {
+async function codeDoor($, e, next, writing, formatter, logbook) {
   if (!formatter) return next(e);
   const run = (argv, init) => $.process.run(argv, init);
   const where = shorten(writing.path);
@@ -362,7 +414,14 @@ async function codeDoor($, e, next, writing, formatter) {
 
   const said = await lintCode(text, writing.path, { bin: formatter, run });
   const found = (said.found ?? []).filter((one) => one.severity === "error");
-  if (found.length) return { deny: refusal(where, found) };
+  if (found.length) {
+    await logbook.say("warn", "write", `refused ${found.length} line(s) in ${where}`, {
+      file: where,
+      rule: found[0]?.rule,
+      tool: e.tool,
+    });
+    return { deny: refusal(where, found) };
+  }
 
   if (e.tool === "Write" && text !== writing.text) {
     return next({ ...e, content: text });

@@ -35,6 +35,10 @@
       }
     ],
     "value": {
+      "level": {
+        "kind": "string",
+        "identifier": true
+      },
       "door": {
         "kind": "string",
         "identifier": true

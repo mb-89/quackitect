@@ -9,6 +9,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
 import { actionables, envOf } from "../../.claude/skills/level0/lib/guidance.js";
+import { nameOf, rowOf } from "../../.claude/skills/level0/lib/log.js";
 import { readRule } from "../../.claude/skills/level0/lib/rulefile.js";
 import { pathInScript, SCRIPT } from "../../.claude/skills/level0/lib/scripts.js";
 import {
@@ -109,6 +110,26 @@ test("Windows takes the biome extension, and every other platform the plain name
 
 test("a clone opens with both extensions recommended", () => {
   assert.deepEqual(read(EDITOR_EXTENSIONS).recommendations, EXTENSIONS);
+});
+
+test("the lnav format reads the file the log door writes", () => {
+  const format = read("spec/config/lnav/quackitect.json").quackitect_log;
+  const row = rowOf("2026-09-08T14:22:51.000Z", "warn", "write", "refused");
+
+  assert.equal(format.json, true);
+  assert.equal(format["timestamp-field"], "at");
+  assert.equal(format["level-field"], "level");
+  assert.equal(format["body-field"], "said");
+  assert.deepEqual(
+    format["line-format"].filter((one) => one.field).map((one) => one.field),
+    Object.keys(row),
+  );
+  assert.deepEqual(Object.keys(JSON.parse(format.sample[0].line)), Object.keys(row));
+  assert.deepEqual(Object.values(format.level).sort(), ["error", "info", "warn"]);
+  assert.match(
+    `.se/log/${nameOf(row.at, "a6f8c43b")}`,
+    new RegExp(format["file-pattern"]),
+  );
 });
 
 test("the judge settings this tree ships carry every field the judge reads", () => {

@@ -20,6 +20,7 @@ function through(door) {
   const said = {
     read: door.read(file),
     exists: door.exists(file),
+    folder: door.exists(under),
     missing: door.exists(join(at, "nothing.md")),
     list: door
       .list(at)
@@ -36,6 +37,7 @@ test("the real door writes, reads back, lists and removes", () => {
   const said = through(disk());
   assert.equal(said.read, "# Notes\n");
   assert.equal(said.exists, true);
+  assert.equal(said.folder, true);
   assert.equal(said.missing, false);
   assert.deepEqual(said.list, ["deep:dir", "notes.md:file"]);
   assert.equal(said.gone, false);

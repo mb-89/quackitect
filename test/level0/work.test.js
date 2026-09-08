@@ -6,8 +6,10 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
+import { fakeLog } from "../../src/doors/fake/log.js";
 import {
   BRIEF,
   CONTRACT_HEADING,
@@ -119,6 +121,27 @@ test("done stamps the brief and pushes the branch it stands on", () => {
   assert.equal(code, 0);
   assert.equal(statusOf(disk.read(HERE)), DONE);
   assert.ok(ranGit(outside).includes("git push origin work/fix-lsp"));
+});
+
+test("done says one line to the log, naming the branch and the code", async () => {
+  const { it, disk } = doorsSaying(onBranch("work/fix-lsp"), {
+    [HERE]: "---\nstatus: held\n---\n\n# The result\n",
+  });
+  it.log = fakeLog(fakeClock(), { folder: "/log", id: "a6f8c43b" });
+
+  const code = await heard(() => work(ROOT, ["done"], it)).code;
+
+  assert.equal(code, 0);
+  assert.equal(statusOf(disk.read(HERE)), DONE);
+  assert.deepEqual(it.log.lines(), [
+    {
+      at: "2026-01-01T00:00:00.000Z",
+      level: "info",
+      door: "work",
+      said: "done answered 0",
+      branch: "work/fix-lsp",
+    },
+  ]);
 });
 
 test("done off a work branch refuses, and reaches git no further", () => {

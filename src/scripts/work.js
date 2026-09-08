@@ -29,6 +29,9 @@ export function work(root, argv, doors) {
     list,
     collect,
   };
+  if (doing[what] && LOUD.includes(what)) {
+    return tell(it, what, doing[what](it, name, argv));
+  }
   if (!doing[what]) {
     console.log("Usage: ./RUNME.sh work <verb>\n");
     console.log("  new <name>    cut work/<name> from main with the brief, and push");
@@ -46,6 +49,17 @@ export function work(root, argv, doors) {
     return what ? 2 : 0;
   }
   return doing[what](it, name, argv);
+}
+
+const LOUD = ["new", "take", "done", "release", "merge", "close"];
+
+// [[spec/design_output/log#which-door-says-what]]
+function tell(it, what, code) {
+  if (!it.log) return code;
+  const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
+  return it.log
+    .say(code === 0 ? "info" : "warn", "work", `${what} answered ${code}`, { branch })
+    .then(() => code);
 }
 
 export function statusOf(text) {
