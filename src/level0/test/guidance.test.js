@@ -1,13 +1,13 @@
 // The guidance parser, tested. Level zero hands the agent the Actionables
 // chapter of every note, so what that chapter parses to is worth a test.
 
-import { test } from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync, readdirSync } from "node:fs";
-import { join, dirname } from "node:path";
+import { readdirSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { parse, actionables, standingLayer } from "../lib/guidance.mjs";
+import { actionables, parse, standingLayer } from "../lib/guidance.js";
 
 const root = dirname(dirname(dirname(dirname(fileURLToPath(import.meta.url)))));
 const GUIDANCE = join(root, "spec", "guidance");
@@ -35,7 +35,11 @@ Because of a thing that happened.
 
 test("a note parses into its three chapters", () => {
   const read = parse(note);
-  assert.deepEqual(Object.keys(read.chapters), ["Motivation", "Actionables", "Discussion"]);
+  assert.deepEqual(Object.keys(read.chapters), [
+    "Motivation",
+    "Actionables",
+    "Discussion",
+  ]);
   assert.match(read.chapters.Motivation, /Why this note exists/);
   assert.equal(read.front.kind, "[[guidance]]");
 });
@@ -72,6 +76,9 @@ test("every guidance note in this tree carries actionables", () => {
   for (const name of notes) {
     const rules = actionables(readFileSync(join(GUIDANCE, name), "utf8"));
     assert.ok(rules.length, `${name} carries an Actionables chapter`);
-    assert.ok(rules.length <= 10, `${name} holds ten rules or fewer, and holds ${rules.length}`);
+    assert.ok(
+      rules.length <= 10,
+      `${name} holds ten rules or fewer, and holds ${rules.length}`,
+    );
   }
 });

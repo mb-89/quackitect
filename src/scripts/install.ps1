@@ -13,6 +13,7 @@ $binDir = Join-Path $root ".se\bin"
 # Pinned, so every box builds the same tree. Vale ships a binary for each
 # platform, so nothing here compiles and no C toolchain is needed.
 $valeVersion = "3.20.0"
+$biomeVersion = "2.5.12"
 
 function Refresh-Path {
   # A program installed a moment ago is on the machine and not yet in this
@@ -49,6 +50,15 @@ function Get-Vale {
   Remove-Item $zip -Force
 }
 
+function Get-Biome {
+  $arch = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "arm64" } else { "x64" }
+  $from = "https://github.com/biomejs/biome/releases/download/@biomejs/biome@$biomeVersion/biome-win32-$arch.exe"
+
+  Write-Host "  downloading Biome $biomeVersion" -ForegroundColor Cyan
+  New-Item -ItemType Directory -Force $binDir | Out-Null
+  Invoke-WebRequest -Uri $from -OutFile (Join-Path $binDir "biome.exe") -UseBasicParsing
+}
+
 $needed = @(
   @{
     name = "node"
@@ -61,6 +71,12 @@ $needed = @(
     why  = "Vale holds the prose rules the write door and the linter read"
     have = { Test-Path (Join-Path $binDir "vale.exe") }
     get  = { Get-Vale }
+  },
+  @{
+    name = "biome"
+    why  = "Biome formats and lints the JavaScript in this tree"
+    have = { Test-Path (Join-Path $binDir "biome.exe") }
+    get  = { Get-Biome }
   }
 )
 

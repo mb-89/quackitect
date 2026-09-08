@@ -11,5 +11,5 @@ $here = $PSScriptRoot
 & powershell -NoProfile -ExecutionPolicy Bypass -File (Join-Path $here "src\scripts\install.ps1")
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-& node (Join-Path $here "src\scripts\cli.mjs") @args
+& node (Join-Path $here "src\scripts\cli.js") @args
 exit $LASTEXITCODE

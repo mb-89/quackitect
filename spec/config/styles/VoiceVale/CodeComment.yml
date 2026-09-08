@@ -1,0 +1,59 @@
+extends: script
+message: "Code carries no comment here. Write a header of five lines at the top, a pointer to a design output, or a suppression naming its rule."
+link: spec/guidance/code.md
+level: error
+scope: raw
+script: |
+  text := import("text")
+
+  headerLines := 5
+  lines := text.split(scope, "\n")
+  matches := []
+
+  offset := 0
+  seenCode := false
+  headerUsed := 0
+  inBlock := false
+
+  isAllowed := func(t) {
+    if text.contains(t, "[[") && text.contains(t, "]]") { return true }
+    if text.contains(t, "level0:") { return true }
+    if text.re_match(`^//\s*(go|ts|eslint|biome|nolint|lint):`, t) { return true }
+    return false
+  }
+
+  for i := 0; i < len(lines); i++ {
+    line := lines[i]
+    at := offset
+    offset += len(line) + 1
+    t := text.trim_space(line)
+
+    if len(t) == 0 { continue }
+
+    if i == 0 && text.has_prefix(t, "#!") { continue }
+
+    isComment := false
+    if inBlock {
+      isComment = true
+      if text.contains(t, "*/") { inBlock = false }
+    } else if text.has_prefix(t, "//") {
+      isComment = true
+    } else if text.has_prefix(t, "/*") {
+      isComment = true
+      if !text.contains(t, "*/") { inBlock = true }
+    }
+
+    if !isComment {
+      seenCode = true
+      continue
+    }
+
+    if isAllowed(t) { continue }
+
+    if !seenCode && headerUsed < headerLines {
+      headerUsed++
+      continue
+    }
+
+    matches = append(matches, {begin: at, end: at + len(line)})
+  }

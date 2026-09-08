@@ -1,27 +1,24 @@
-// The command line. Everything a person or a build asks of this tree is a verb
-// here, and RUNME hands every argument through untouched.
-//
-// It calls Vale through the same file level zero calls it through, so the write
-// door and this command never disagree about what is a breach.
+// The command line. RUNME hands every argument through untouched, and every
+// verb here calls the same checkers the write door calls.
 
-import { readFileSync, readdirSync, existsSync } from "node:fs";
-import { join, dirname, relative, sep } from "node:path";
-import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
-
-import { lintText, fromJson, unreasoned, valeBin, CONFIG } from "../level0/lib/vale.mjs";
-import { standingLayer, actionables } from "../level0/lib/guidance.mjs";
-import { line as asLine } from "../level0/lib/refuse.mjs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { dirname, join, relative, sep } from "node:path";
+import { fileURLToPath } from "node:url";
+import { biomeBin } from "../level0/lib/code.js";
+import { actionables, standingLayer } from "../level0/lib/guidance.js";
+import { line as asLine } from "../level0/lib/refuse.js";
+import { CONFIG, fromJson, unreasoned, valeBin } from "../level0/lib/vale.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const bin = join(root, valeBin(process.platform));
 const STYLES = join(root, "spec", "config", "styles", "VoiceVale");
 const JUDGED = join(root, "spec", "config", "styles", "VoiceJudged");
+const biome = join(root, biomeBin(process.platform));
 const GUIDANCE = join(root, "spec", "guidance");
 const LEVEL0 = join(root, "spec", "config", "level0.json");
 const config = existsSync(LEVEL0) ? JSON.parse(readFileSync(LEVEL0, "utf8")) : {};
 
-// The shape level zero hands Vale, over spawnSync instead of $.process.run.
 const run = async (argv, init = {}) => {
   const ran = spawnSync(argv[0], argv.slice(1), {
     cwd: init.cwd ?? root,
@@ -30,17 +27,30 @@ const run = async (argv, init = {}) => {
     shell: false,
   });
   if (ran.error) throw ran.error;
-  return { exitCode: ran.status ?? 1, stdout: ran.stdout ?? "", stderr: ran.stderr ?? "" };
+  return {
+    exitCode: ran.status ?? 1,
+    stdout: ran.stdout ?? "",
+    stderr: ran.stderr ?? "",
+  };
 };
 
 const verbs = {
-  check: { says: "the tests, then the rules over the tree", run: async (w) => (test() || await lint(w)) },
+  check: {
+    says: "the tests, then the rules over the tree",
+    run: async (w) => test() || (await lint(w)),
+  },
   lint: { says: "the rules over the tree, or over what you name", run: lint },
   fix: { says: "the fixes a program can make", run: fix },
   test: { says: "the tests alone", run: async () => test() },
   rules: { says: "the mechanical rules Vale holds", run: async () => listRules() },
-  standing: { says: "what level zero hands the agent every session", run: async () => standing() },
-  doctor: { says: "what is installed, and what level zero found", run: async () => doctor() },
+  standing: {
+    says: "what level zero hands the agent every session",
+    run: async () => standing(),
+  },
+  doctor: {
+    says: "what is installed, and what level zero found",
+    run: async () => doctor(),
+  },
 };
 
 const argv = process.argv.slice(2);
@@ -63,17 +73,39 @@ async function lint(where) {
     return 2;
   }
 
-  // Vale walks a folder itself, so the tree goes to it whole and the reading of
-  // what is prose stays Vale's.
-  // .se is runtime state and never travels, so the rules do not reach it.
-  const ran = await run([bin, "--config=" + CONFIG, "--output=JSON", "--no-exit",
-    "--glob=!{.se,node_modules,.git}/**", ...where]);
+  const ran = await run([
+    bin,
+    `--config=${CONFIG}`,
+    "--output=JSON",
+    "--no-exit",
+    "--glob=!{.se,node_modules,.git}/**",
+    ...where,
+  ]);
   const found = fromJson(ran.stdout);
 
-  // The one rule Vale cannot hold, because it is about Vale's own marker.
   for (const file of walk(where)) {
     for (const one of unreasoned(readFileSync(file, "utf8"))) {
       found.push({ ...one, file: show(file) });
+    }
+  }
+
+  if (existsSync(biome)) {
+    const code = spawnSync(
+      biome,
+      ["lint", "--config-path=spec/config", "--reporter=github", ...where],
+      { cwd: root, encoding: "utf8", shell: false },
+    );
+    for (const row of (code.stdout ?? "").split("\n")) {
+      const hit = /^::(\w+) title=([^,]+),file=([^,]+),line=(\d+).*?::(.*)$/.exec(row);
+      if (!hit) continue;
+      found.push({
+        file: hit[3],
+        rule: hit[2].replace(/^lint\//, ""),
+        line: Number(hit[4]),
+        column: 1,
+        message: hit[5],
+        severity: hit[1] === "warning" ? "warning" : "error",
+      });
     }
   }
 
@@ -95,25 +127,33 @@ async function lint(where) {
   return 1;
 }
 
-// Vale applies the fix a rule carries in its Action. A rule with no action is
-// left for lint, and this says nothing about it.
 async function fix(where) {
   if (!existsSync(bin)) {
     console.error("Vale is missing. Run ./RUNME.sh once and it installs.");
     return 2;
   }
-  const ran = spawnSync(bin, ["fix", "--apply", ...where], {
-    cwd: root, encoding: "utf8", stdio: "inherit", shell: false,
+  spawnSync(bin, ["fix", "--apply", ...where], {
+    cwd: root,
+    encoding: "utf8",
+    stdio: "inherit",
+    shell: false,
   });
-  if (ran.status !== 0) {
-    console.log("Vale applied no fix. Run ./RUNME.sh lint to see what is left.");
+  if (existsSync(biome)) {
+    spawnSync(biome, ["check", "--write", "--config-path=spec/config", ...where], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: "inherit",
+      shell: false,
+    });
   }
+  console.log("Run ./RUNME.sh lint to see what is left for a person.");
   return 0;
 }
 
 function test() {
-  const ran = spawnSync(process.execPath, ["--test", "src/level0/test/*.test.mjs"], {
-    cwd: root, stdio: "inherit",
+  const ran = spawnSync(process.execPath, ["--test", "src/level0/test/*.test.js"], {
+    cwd: root,
+    stdio: "inherit",
   });
   return ran.status ?? 1;
 }
@@ -131,8 +171,6 @@ function listRules() {
   return 0;
 }
 
-// What level zero appends to the system prompt: every guidance note's
-// Actionables chapter, and no other chapter.
 function standing() {
   if (!existsSync(GUIDANCE)) {
     console.error("There is no spec/guidance, so nothing is handed over.");
@@ -147,26 +185,46 @@ function standing() {
     return 0;
   }
   console.log(said);
-  // The number the agent's receipt line has to match. A reader compares the
-  // two and knows whether the rules reached the session.
   const count = notes.reduce((n, one) => n + actionables(one.text).length, 0);
   console.log(`
 rules: ${count}`);
   return 0;
 }
 
-// What is here and what is missing, so a person in trouble has one command that
-// answers rather than a search.
 function doctor() {
   const rows = [
     ["node", process.version],
     ["vale", existsSync(bin) ? asked([bin, "--version"]) : "missing, run ./RUNME.sh"],
-    ["vale rules", existsSync(STYLES) ? readdirSync(STYLES).filter((n) => n.endsWith(".yml")).length + " in VoiceVale" : "missing"],
-    ["judged rules", existsSync(JUDGED) ? readdirSync(JUDGED).filter((n) => n.endsWith(".yml")).length + " in VoiceJudged" : "none"],
-    ["judge", config.judge?.enabled === false ? "off in spec/config/level0.json"
-      : `on, model ${config.judge?.model ?? "default"}`],
+    [
+      "biome",
+      existsSync(biome) ? asked([biome, "--version"]) : "missing, run ./RUNME.sh",
+    ],
+    [
+      "vale rules",
+      existsSync(STYLES)
+        ? `${readdirSync(STYLES).filter((n) => n.endsWith(".yml")).length} in VoiceVale`
+        : "missing",
+    ],
+    [
+      "judged rules",
+      existsSync(JUDGED)
+        ? readdirSync(JUDGED).filter((n) => n.endsWith(".yml")).length +
+          " in VoiceJudged"
+        : "none",
+    ],
+    [
+      "judge",
+      config.judge?.enabled === false
+        ? "off in spec/config/level0.json"
+        : `on, model ${config.judge?.model ?? "default"}`,
+    ],
     ["level zero stamp", readIf(join(root, ".se", "level0.stamp"))],
-    ["cage", existsSync(join(root, ".claude", "settings.json")) ? "tracked, one file" : "missing"],
+    [
+      "cage",
+      existsSync(join(root, ".claude", "settings.json"))
+        ? "tracked, one file"
+        : "missing",
+    ],
   ];
   for (const [what, said] of rows) {
     console.log(`${what.padEnd(18)} ${String(said).trim() || "missing"}`);

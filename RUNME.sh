@@ -10,4 +10,4 @@ set -eu
 here=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 
 sh "$here/src/scripts/install.sh"
-exec node "$here/src/scripts/cli.mjs" "$@"
+exec node "$here/src/scripts/cli.js" "$@"

@@ -1,31 +1,23 @@
-// Vale, and the one place this tree calls it. Pure JavaScript with no `node:`
-// import, so the hooks module and the command line both load it and only the
-// way they run a program differs.
-//
-// The rules are in spec/config/styles. Nothing about a rule is written here.
-//
-// A caller hands in `run(argv, { stdin, cwd })`, which resolves
-// `{ exitCode, stdout, stderr }`. Level zero passes `$.process.run` and the
-// command line passes a wrapper over spawnSync.
+// Vale, and the one place this tree calls it. A caller hands in
+// run(argv, { stdin, cwd }); the rules live in spec/config/styles.
+// [[spec/design_output/level0#where-a-rule-lives]]
 
 export const VALE = ".se/bin/vale";
 export const CONFIG = ".vale.ini";
 
-// Vale reads its own marker and refuses a reason inside it, so the reason is a
-// comment of this tree's own, standing above the marker or beside it.
 const MARKER = /<!--\s*vale\s+([A-Za-z0-9_.-]+)\s*=\s*(NO|off)\s*-->/i;
 const REASON = /<!--\s*because:\s*(.+?)\s*-->/i;
 
 export function valeBin(platform) {
-  return platform === "win32" ? VALE + ".exe" : VALE;
+  return platform === "win32" ? `${VALE}.exe` : VALE;
 }
 
 export async function lintText(text, where, options = {}) {
   const { run, bin, cwd } = options;
   const argv = [
     bin ?? VALE,
-    "--config=" + CONFIG,
-    "--path=" + (where || "stdin.md"),
+    `--config=${CONFIG}`,
+    `--path=${where || "stdin.md"}`,
     "--output=JSON",
     "--no-exit",
   ];
@@ -37,7 +29,11 @@ export async function lintText(text, where, options = {}) {
     return { ran: false, why: String(err?.message ?? err), found: [] };
   }
   if (said?.exitCode !== 0 && !said?.stdout) {
-    return { ran: false, why: (said?.stderr || "vale answered nothing").trim(), found: [] };
+    return {
+      ran: false,
+      why: (said?.stderr || "vale answered nothing").trim(),
+      found: [],
+    };
   }
 
   return { ran: true, found: [...fromJson(said.stdout), ...unreasoned(text)] };
@@ -70,9 +66,6 @@ export function fromJson(stdout) {
   return out.sort((a, b) => a.line - b.line || a.column - b.column);
 }
 
-// A rule that cannot be switched off is switched off everywhere, so a line may
-// carry Vale's marker. This tree asks that the marker name its reason, because
-// an exemption nobody explained is a rule nobody trusts.
 export function unreasoned(text) {
   const lines = String(text ?? "").split(/\r?\n/);
   const out = [];

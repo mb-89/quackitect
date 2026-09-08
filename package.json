@@ -1,0 +1,7 @@
+{
+  "name": "quackitect",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Level zero: the rules that shape how an agent works."
+}

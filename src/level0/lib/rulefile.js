@@ -1,9 +1,5 @@
-// Reads a rule file. Pure JavaScript with no `node:` import and no library, so
-// the module and the command line read one parser.
-//
-// The rules that Vale does not hold are written in the same shape Vale's own
-// are, so a reader moving between the folders reads one format. This covers the
-// subset those files use: a scalar, a list of scalars, and a comment.
+// Reads a rule file: a scalar, a list of scalars, and a comment. The rules Vale
+// does not hold are written in the shape Vale's own are.
 
 export function readRule(text) {
   const out = {};
@@ -36,7 +32,10 @@ export function readRule(text) {
 
 function unquote(said) {
   const t = said.trim();
-  if ((t.startsWith('"') && t.endsWith('"')) || (t.startsWith("'") && t.endsWith("'"))) {
+  if (
+    (t.startsWith('"') && t.endsWith('"')) ||
+    (t.startsWith("'") && t.endsWith("'"))
+  ) {
     return t.slice(1, -1);
   }
   return t;

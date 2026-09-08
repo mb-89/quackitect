@@ -14,6 +14,7 @@ bin="$root/.se/bin"
 # Pinned, so every box builds the same tree. Vale ships a binary for each
 # platform, so nothing here compiles and no C toolchain is needed.
 vale_version=3.20.0
+biome_version=2.5.12
 
 say() { printf '%s\n' "$*"; }
 have() { command -v "$1" >/dev/null 2>&1; }
@@ -81,10 +82,28 @@ get_vale() {
   rm -rf "$tmp"
 }
 
+get_biome() {
+  case "$os" in
+    Windows) name="biome-win32-x64.exe" ;;
+    macOS)   name="biome-darwin-$( [ "$arch" = arm64 ] && echo arm64 || echo x64 )" ;;
+    *)       name="biome-linux-x64" ;;
+  esac
+  from="https://github.com/biomejs/biome/releases/download/@biomejs/biome@${biome_version}/${name}"
+
+  say "  downloading Biome ${biome_version}"
+  mkdir -p "$bin"
+  if have curl; then curl -fsSL "$from" -o "$bin/biome${exe}"
+  elif have wget; then wget -q "$from" -O "$bin/biome${exe}"
+  else say "Neither curl nor wget is here, so Biome cannot be downloaded." >&2; exit 1
+  fi
+  chmod +x "$bin/biome${exe}"
+}
+
 here() {
   case $1 in
-    node) have node ;;
-    vale) [ -x "$bin/vale${exe}" ] ;;
+    node)  have node ;;
+    vale)  [ -x "$bin/vale${exe}" ] ;;
+    biome) [ -x "$bin/biome${exe}" ] ;;
   esac
 }
 
@@ -92,6 +111,7 @@ why() {
   case $1 in
     node) say "node: the command line and the level zero rules are JavaScript" ;;
     vale) say "vale: Vale holds the prose rules the write door and the linter read" ;;
+    biome) say "biome: Biome formats and lints the JavaScript in this tree" ;;
   esac
 }
 
@@ -99,11 +119,12 @@ get() {
   case $1 in
     node) if [ "$pm" = "brew" ]; then install_with_pm node; else install_with_pm nodejs; fi ;;
     vale) get_vale ;;
+    biome) get_biome ;;
   esac
 }
 
 missing=""
-for one in node vale; do
+for one in node vale biome; do
   here "$one" || missing="$missing $one"
 done
 [ -n "$missing" ] || exit 0

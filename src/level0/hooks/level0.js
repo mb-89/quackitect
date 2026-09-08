@@ -1,36 +1,32 @@
-// LEVEL ZERO. The rules that shape what the agent writes, taken inside the
-// harness process rather than by a server it spawns.
-//
-// Nothing here waits for a build, so these rules hold on turn one of a clone
-// that has never been built. That is the whole reason this is a module: a tool
-// registered at session.start cannot arrive late, and six cloud sessions in
-// earlier lines died on a lane that could.
-//
-// The rules live in spec/config/styles and Vale holds them. This file holds the
-// doors, and it holds no rule.
+// LEVEL ZERO. The doors that shape what the agent writes, taken inside the
+// harness process. This file holds no rule: they live in spec/config/styles
+// and spec/guidance.
+// [[spec/design_output/level0#the-write-door]]
 
-import { lintText, VALE } from "../lib/vale.mjs";
-import { refusal, taught } from "../lib/refuse.mjs";
-import { standingLayer } from "../lib/guidance.mjs";
-import { readRule } from "../lib/rulefile.mjs";
-import { judgeOf } from "../lib/judge.mjs";
+import {
+  BIOME,
+  biomeBin,
+  CODE,
+  formatText,
+  lintText as lintCode,
+} from "../lib/code.js";
+import { standingLayer } from "../lib/guidance.js";
+import { judgeOf } from "../lib/judge.js";
+import { refusal, taught } from "../lib/refuse.js";
+import { readRule } from "../lib/rulefile.js";
+import { lintText, VALE } from "../lib/vale.js";
 
-// The prose the write door reads. Vale itself decides what inside a file is
-// prose, so a fenced block and a table need no rule here.
 const PROSE = /\.(md|markdown|txt)$/i;
 const GUIDANCE = "spec/guidance";
 const CONFIG = "spec/config/level0.json";
 const HANDOVER = ".se/HANDOVER.md";
 const JUDGED = "spec/config/styles/VoiceJudged";
 
-// The name an answer arrives under, so .vale.ini can hold it to a tighter
-// limit than a file takes.
 const ANSWER = "level0-answer.md";
 
-export function register(on, options) {
-  // Module state survives between hooks in one session, so the linter is found
-  // once and the door reads the answer.
+export function register(on, _options) {
   let bin = null;
+  let formatter = null;
   let standing = "";
   let config = {};
   let judge = judgeOf({});
@@ -39,32 +35,33 @@ export function register(on, options) {
   on("session.start", async ($, e, next) => {
     bin = await linterHere($);
     if (!bin) bin = await install($);
+    formatter = await formatterHere($);
     standing = await readGuidance($);
     config = await readConfig($);
     judge = judgeOf(config);
     handover = await takeHandover($);
 
     try {
-      await $.fs.writeFile(".se/level0.stamp",
-        new Date().toISOString() + " vale=" + (bin ?? "missing") + "\n");
-    } catch {
-      // .se is runtime state, and its absence is no reason to refuse a session.
-    }
+      await $.fs.writeFile(
+        ".se/level0.stamp",
+        `${new Date().toISOString()} vale=${bin ?? "missing"}\n`,
+      );
+    } catch {}
     return next(e);
   });
 
-  // THE WRITE DOOR. A write carrying a breach is refused with the reason, and
-  // the reason teaches the rest of the turn.
   on("tool.call", async ($, e, next) => {
     const writing = asWrite(e);
     if (!writing) return next(e);
+
+    if (CODE.test(writing.path)) {
+      return await codeDoor($, e, next, writing, formatter);
+    }
     if (!PROSE.test(writing.path)) return next(e);
 
     const where = shorten(writing.path);
     const found = [];
 
-    // The mechanical rules first, because they cost nothing. A checker that
-    // cannot run degrades the call and lets it through.
     if (bin) {
       const said = await lintText(writing.text, where, {
         bin,
@@ -73,14 +70,14 @@ export function register(on, options) {
       if (said.ran) found.push(...said.found);
     }
 
-    // The model last, and only when it earns the call. It spends one call per
-    // span, so it runs where the patterns already passed. The rules are read
-    // per write, so a rule a person adds holds on the next one.
     if (!found.length) {
       judge = judgeOf(config, await readRules($, JUDGED));
       if (judge.reads()) {
-        found.push(...await judge.run(writing.text,
-          (text, labels, opts) => $.model.classify(text, labels, opts)));
+        found.push(
+          ...(await judge.run(writing.text, (text, labels, opts) =>
+            $.model.classify(text, labels, opts),
+          )),
+        );
       }
     }
 
@@ -92,15 +89,10 @@ export function register(on, options) {
     return { deny: refusal(where, found) };
   });
 
-  // THE ANSWER IS READ TOO. A wall of prose in a chat answer costs the reader
-  // the same as one in a file, and the reader is the same person. This event
-  // cannot refuse a turn, so the note is drawn beneath the answer.
   on("turn.complete", async ($, e, next) => {
     const said = await next(e);
     if (!bin || !e.answer || e.reason !== "answer") return said;
 
-    // The answer goes to Vale under its own name, so .vale.ini holds it to the
-    // tighter limit a reader skimming an answer wants.
     const ran = await lintText(e.answer, ANSWER, {
       bin,
       run: (argv, init) => $.process.run(argv, init),
@@ -109,22 +101,19 @@ export function register(on, options) {
 
     return {
       ...said,
-      text: [said.text, "", ran.found.map((one) => "  " + one.message).join("\n"), "",
-        "  " + taught(ran.found)].filter(Boolean).join("\n"),
+      text: [
+        said.text,
+        "",
+        ran.found.map((one) => `  ${one.message}`).join("\n"),
+        "",
+        `  ${taught(ran.found)}`,
+      ]
+        .filter(Boolean)
+        .join("\n"),
     };
   });
 
-  // EVERYTHING THE AGENT READS ARRIVES HERE, ONCE. This event computes the
-  // context blocks a conversation's first user message carries, so it fires
-  // once per conversation and again when the context is cleared.
-  //
-  // The system prompt's sections stay free for guidance that depends on where
-  // the work stands, which is a later thing. A rule that always holds belongs
-  // in the conversation, where a compaction brings it back.
-  //
-  // Nothing here is projected into a file. A copy nobody can edit needs no
-  // guard to keep it honest.
-  on("prompt.context", async ($, e, next) => {
+  on("prompt.context", async (_$, e, next) => {
     const said = await next(e);
     const blocks = [...said.blocks];
 
@@ -143,8 +132,6 @@ export function register(on, options) {
       });
     }
 
-    // The last session's handover, read once and already deleted. Nobody has to
-    // remember to clear it, so nobody leaves a stale one.
     if (handover) {
       blocks.push({
         name: "level0-handover",
@@ -158,8 +145,6 @@ export function register(on, options) {
       });
     }
 
-    // The receipt. The agent counts the rules itself, because a number handed
-    // to it proves nothing: repeating a constant is not reading.
     if (standing) {
       blocks.push({
         name: "level0-receipt",
@@ -179,12 +164,6 @@ export function register(on, options) {
   });
 }
 
-// Reads the handover the last session left, then deletes it, so the next
-// session never picks up a stale one. Deleting it here rather than asking the
-// agent to leaves nothing for anybody to forget.
-//
-// The text is already in this module's own state by the time the file goes, so
-// the delete costs the session nothing.
 async function takeHandover($) {
   let text = "";
   try {
@@ -194,8 +173,6 @@ async function takeHandover($) {
   }
   if (!text.trim()) return "";
 
-  // $.fs writes and reads and does not delete, so the shell does it. A box
-  // carrying neither shell keeps the file, and the next session reads it twice.
   for (const argv of [
     ["rm", "-f", HANDOVER],
     ["cmd", "/c", "del", "/q", ".se\\HANDOVER.md"],
@@ -203,22 +180,21 @@ async function takeHandover($) {
     try {
       const ran = await $.process.run(argv, { timeoutMs: 10000 });
       if (ran.exitCode === 0) break;
-    } catch {
-      // The next way answers.
-    }
+    } catch {}
   }
   return text;
 }
 
-// The Actionables chapter of every guidance note, and no other chapter. The
-// argument behind a rule stays on disk for a reader who disagrees with it.
 async function readGuidance($) {
   try {
     const entries = await $.fs.listDir(GUIDANCE);
     const notes = [];
     for (const one of entries) {
       if (!one.name.endsWith(".md")) continue;
-      notes.push({ name: one.name, text: await $.fs.readFile(GUIDANCE + "/" + one.name) });
+      notes.push({
+        name: one.name,
+        text: await $.fs.readFile(`${GUIDANCE}/${one.name}`),
+      });
     }
     return standingLayer(notes);
   } catch {
@@ -226,15 +202,13 @@ async function readGuidance($) {
   }
 }
 
-// The rules of one folder, one file each. Read per write rather than once per
-// session, so a rule a person adds holds on the next write.
 async function readRules($, folder) {
   try {
     const entries = await $.fs.listDir(folder);
     const out = [];
     for (const one of entries) {
       if (!one.name.endsWith(".yml")) continue;
-      const rule = readRule(await $.fs.readFile(folder + "/" + one.name));
+      const rule = readRule(await $.fs.readFile(`${folder}/${one.name}`));
       out.push({ ...rule, name: one.name.replace(/\.yml$/, "") });
     }
     return out;
@@ -243,8 +217,6 @@ async function readRules($, folder) {
   }
 }
 
-// The switches a person owns. A missing file leaves every default standing, so
-// a clone works before anybody configures it.
 async function readConfig($) {
   try {
     return JSON.parse(await $.fs.readFile(CONFIG));
@@ -253,8 +225,8 @@ async function readConfig($) {
   }
 }
 
-async function linterHere($) {
-  for (const path of [VALE + ".exe", VALE]) {
+async function formatterHere($) {
+  for (const path of [`${BIOME}.exe`, BIOME]) {
     try {
       if (await $.fs.exists(path)) return path;
     } catch {
@@ -264,12 +236,50 @@ async function linterHere($) {
   return null;
 }
 
-// Level zero installs what it needs, so a first session on a fresh clone is
-// guarded without anybody having run RUNME first.
+// [[spec/design_output/level0#the-formatter-applies-itself]]
+async function codeDoor($, e, next, writing, formatter) {
+  if (!formatter) return next(e);
+  const run = (argv, init) => $.process.run(argv, init);
+  const where = shorten(writing.path);
+
+  let text = writing.text;
+  if (e.tool === "Write") {
+    const put = await formatText(text, writing.path, { bin: formatter, run });
+    if (put.ran) text = put.text;
+  }
+
+  const said = await lintCode(text, writing.path, { bin: formatter, run });
+  const found = (said.found ?? []).filter((one) => one.severity === "error");
+  if (found.length) return { deny: refusal(where, found) };
+
+  if (e.tool === "Write" && text !== writing.text) {
+    return next({ ...e, content: text });
+  }
+  return next(e);
+}
+
+async function linterHere($) {
+  for (const path of [`${VALE}.exe`, VALE]) {
+    try {
+      if (await $.fs.exists(path)) return path;
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
 async function install($) {
   const ways = [
     ["sh", "src/scripts/install.sh"],
-    ["powershell", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "src\\scripts\\install.ps1"],
+    [
+      "powershell",
+      "-NoProfile",
+      "-ExecutionPolicy",
+      "Bypass",
+      "-File",
+      "src\\scripts\\install.ps1",
+    ],
   ];
   for (const argv of ways) {
     try {
@@ -278,24 +288,16 @@ async function install($) {
         const found = await linterHere($);
         if (found) return found;
       }
-    } catch {
-      // A box may carry one shell and not the other. The next way answers.
-    }
+    } catch {}
   }
   return null;
 }
 
-
-// A refusal names the file the way a person writing it does, so the absolute
-// path the tool carries is cut to its last two parts.
 function shorten(path) {
   const parts = String(path).split(/[\\/]/).filter(Boolean);
   return parts.slice(-2).join("/");
 }
 
-// A tool's arguments are spread onto the event beside `tool` and `tool_use_id`,
-// so the text is at `e.content` and never at `e.input.content`. Write, Edit and
-// the multi-edit form each carry it under a different key.
 function asWrite(e) {
   if (!e?.file_path) return undefined;
   if (e.tool === "Write") {
