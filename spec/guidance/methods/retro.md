@@ -29,9 +29,9 @@ The retro is two halves: `se retro` collects and drains, and this file judges wh
 4. Score the last retro's improvements against this period's numbers, handed to you under `earlier`. Promote what worked, drop what did not. *
 5. Hunt waste in the log and the transcripts, a reader on every slice. Rank what repeats. *
 6. Count every shell command and say what each was standing in for. One is a tool you do not have. *
-7. Read what one turn costs, run `util/checks/benchmark.sh`, and rank the battery's lanes. Name what grew, then [[refactoring]]. *
+7. Read what one turn costs, run `src/scripts/checks/benchmark.sh`, and rank the battery's lanes. Name what grew, then [[refactoring]]. *
 8. For each pattern name its mechanization: a check, a refusal, a gate, a prefill, then a clearer sentence. *
-9. Judge every script in the drained scratchpad. Promote it to `util/checks/`, or delete it, and repair what the move breaks. *
+9. Judge every script in the drained scratchpad. Make it a rule in the engine, or delete it, and repair what the move breaks. *
 10. Merge what repeats into one class, then mint one note per improvement and nothing larger. *
 11. Report themes with counts and never the list. Say what you could not do and why. *
 12. Measure the session itself: errors and thinking length by fifths. A retro that reads only the work misses the worker. *
@@ -53,7 +53,7 @@ Refusing beats skipping: a skip list leaves the retro half done.
 The next one starts empty and nothing is counted twice.
 
 Ownership decides drain against copy: what this machine owns moves and the transcripts are copied.
-`util/checks/` is in version control and is never touched.
+`src/scripts/checks/` is in version control and is never touched.
 
 An input you had to go and find is one the next retro will also have to find.
 That is a fault in the verb, and fixing it is worth more than the input.

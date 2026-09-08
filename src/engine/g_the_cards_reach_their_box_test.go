@@ -10,14 +10,6 @@ import (
 // green run said nothing had been broken in a way it could see. These build a
 // card, hand it in, and read the answer.
 
-// cardsReachRoots is a tree with nothing in it, because the rule is decided off
-// the bytes going in and never off what the tree happens to hold.
-func cardsReachRoots(t *testing.T) Roots {
-	t.Helper()
-	dir := t.TempDir()
-	return Roots{Work: dir, Method: dir}
-}
-
 // cardsReachTheCard is the shape a card has: a list of numbered points under one
 // heading, and a discussion opening a section on each number.
 func cardsReachTheCard(points, sections []string) string {

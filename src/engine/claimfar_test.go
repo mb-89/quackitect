@@ -1,11 +1,9 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
-	"time"
 )
 
 // TWO BOXES, ONE REMOTE, AND THE LOSER WRITES ON THE WINNER'S COMMIT.
@@ -30,31 +28,6 @@ func aRemoteForClaims(t *testing.T) string {
 	at := filepath.Join(t.TempDir(), "remote.git")
 	gitAt(t, t.TempDir(), "init", "--bare", "--quiet", at)
 	return at
-}
-
-// aBoxHolding is a work tree with git in it, a remote, and one note that says
-// it is claimed. The note is written by hand, so this stands up without the
-// processes and the schemas a mint would want.
-func aBoxHolding(t *testing.T, remote, id, by string) Roots {
-	t.Helper()
-	root := t.TempDir()
-	r := Roots{Method: root, Work: root}
-	gitAt(t, root, "init", "--quiet")
-	if remote != "" {
-		gitAt(t, root, "remote", "add", "origin", remote)
-	}
-	at := filepath.Join(root, "spec", "work", id+".md")
-	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	// THE STAMP IS NOW, because a claim past its hours is dropped from the file
-	// on the next write, which is a different rule from the one under test.
-	note := "---\nkind: [[work-token]]\ntitle: " + id + "\nstatus: open\nclaimed_by: " + by +
-		"\nclaimed_at: \"" + time.Now().UTC().Format(time.RFC3339) + "\"\n---\n\n## detail\n\na claim.\n"
-	if err := os.WriteFile(at, []byte(note), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	return r
 }
 
 func TestAClaimIsWrittenOnTheFarCommit(t *testing.T) {

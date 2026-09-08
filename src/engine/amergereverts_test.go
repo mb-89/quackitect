@@ -14,30 +14,6 @@ import (
 // class is caught". Two commits say the same thing in milliseconds, and they can
 // be shown red.
 
-func aMergeTree(t *testing.T) (Roots, func(...string) string) {
-	t.Helper()
-	r := Roots{Method: filepath.Join("..", ".."), Work: t.TempDir()}
-	git := func(args ...string) string {
-		t.Helper()
-		out, _ := gitHere(r, args...) // a conflicting merge exits non-zero on purpose
-		return out
-	}
-	write := func(name, text string) {
-		t.Helper()
-		if err := os.WriteFile(filepath.Join(r.Work, name), []byte(text), 0o644); err != nil {
-			t.Fatal(err)
-		}
-	}
-	git("init", "--quiet", "--initial-branch", "main")
-	git("config", "user.email", "a@b.c")
-	git("config", "user.name", "a box")
-	write("shared.txt", "the base\n")
-	write("other.txt", "untouched\n")
-	git("add", "shared.txt", "other.txt")
-	git("commit", "--quiet", "-m", "the base")
-	return r, git
-}
-
 func at(r Roots, name string) string { return filepath.Join(r.Work, name) }
 
 // ONE SIDE MOVES THE FILE, THE OTHER LEAVES IT, AND THE MERGE WRITES A THIRD

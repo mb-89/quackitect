@@ -28,7 +28,7 @@ For what the engine offers, run `se --help`.
 6. Use the tool the engine gives you. *
 7. Change files with `se_apply`, naming the token on every write. *
 8. Run every shell command with `se_run`, naming the token. It could write. *
-9. A helper script goes in `.se/scratchpad/`. A standing check goes in `util/checks/`. *
+9. A helper script goes in `.se/scratchpad/`. A standing rule goes in the engine, as a refusal or a test. *
 10. Search the tree through the index: `se_find` for words, a regex or a path glob, `se_ask` for SQL. *
 11. Test through the engine: `se_test` runs what your delta reaches. A test you name runs, a pattern narrows. *
 12. Break work into sub-tokens with `se_work`, naming the parent. Your own todo list is refused. *
@@ -99,7 +99,7 @@ Ask from the end with a negative offset, which is usually where a failure says w
 
 ## 9. Where a script lives
 
-A script that earns its place moves from the scratchpad to `util/checks/`, which is in version control.
+A script that earns its place becomes a rule in the engine. It is a refusal at the door that decides it, or a Go test that plants its own case. A sweep over the tree finds the defect after it is in. It runs only when somebody remembers, and it slows as the tree grows. `src/scripts/checks/` keeps the lanes that need a whole scenario.
 So a worktree gets it and a retro cannot drain it.
 
 ## 10. The index is the search

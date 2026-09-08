@@ -49,7 +49,7 @@ merges on this branch differed from both their parents.
 
 ## Building and running
 
-- `sh util/checks/battery.sh` runs every check. It is the one command that says
+- `sh src/scripts/checks/battery.sh` runs every check. It is the one command that says
   whether the tree is sound.
 - `se --swap` rebuilds the engine and hands over to it. **This is the only way
   to rebuild it.** A plain `go build` on this box produces a 15 MB binary with

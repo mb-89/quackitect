@@ -21,7 +21,7 @@ This file is about tests as such:
 - when a property, a fake or a benchmark fits
 
 A reader of it needs to know nothing about the engine.
-A rule a program can check is a check in [[util/checks]], and it is not repeated here.
+A rule a program can check is a refusal in the engine or a test beside it, and it is not repeated here.
 This is craft guidance, read when writing a test, and it is not part of the standing layer.
 
 # Actionables

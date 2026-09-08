@@ -599,6 +599,7 @@ func theShapeOfTheTree(r Roots, files []string, content map[string][]byte, born 
 			aCardDiscussesEveryPointItLists,
 			theTravellingCageNamesNoRefusal,
 			everyFlagAVerbDeclaresHasALaneField,
+			aParallelTestSwappingASeamThroughAHelper,
 		} {
 			if err := refuse(r, born[at], rel, text); err != nil {
 				return err

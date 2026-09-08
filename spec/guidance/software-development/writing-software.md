@@ -19,7 +19,7 @@ The reader is an expert: a senior engineer or a strong model, who knows how to w
 What changes the outcome is not skill but what the reader does with it under pressure to close the token.
 Measured across 623 million changes, agent-era code duplicates more, reuses less, masks more errors and is refactored less.
 Each of those is a choice made in the moment, and this file names the other choice, with the reason.
-A rule a program can check is a check in [[util/checks]], and it is not repeated here.
+A rule a program can check is a refusal in the engine or a test beside it, and it is not repeated here.
 This is craft guidance, read when changing code, and it is not part of the standing layer.
 
 # Actionables

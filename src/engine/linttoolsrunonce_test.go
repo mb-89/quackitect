@@ -51,34 +51,6 @@ func TestTheBatteryRunsNoGoToolTheLintAlreadyRuns(t *testing.T) {
 	}
 }
 
-// aTreeTheLintFindsNothingIn is a tree the lint has nothing to say about, so a
-// clean of false in it is about one thing.
-//
-// THE PROCESSES ALONE ARE NOT ENOUGH. The lint also reads the icons, the
-// parameter declaration and the guidance, and a tree missing any of the three
-// carries a finding for it, which would answer this test's question for it.
-func aTreeTheLintFindsNothingIn(t *testing.T) Roots {
-	t.Helper()
-	r := aTreeWithTheProcesses(t)
-	if err := os.MkdirAll(filepath.Join(r.Method, "src", "config"), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	for _, name := range []string{"icons.json", "parameters.json"} {
-		b, err := os.ReadFile(filepath.Join("..", "..", "src", "config", name))
-		if err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(filepath.Join(r.Method, "src", "config", name), b, 0o644); err != nil {
-			t.Fatal(err)
-		}
-	}
-	from := filepath.Join("..", "..", "spec", "guidance")
-	if err := os.CopyFS(filepath.Join(r.Method, "spec", "guidance"), os.DirFS(from)); err != nil {
-		t.Fatal(err)
-	}
-	return r
-}
-
 // AND THE LINT DOES NOT ANSWER CLEAN OVER WHAT IT COULD NOT READ.
 //
 // clean was len(findings) equals zero. A box where golangci-lint will not start

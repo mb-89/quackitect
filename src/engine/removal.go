@@ -239,11 +239,33 @@ func underWork(work, p string) string {
 // enginereads.go.
 func readBy(r Roots, actor, work string) func(string) bool {
 	reads := LoadEvidence(r).Reads
+	// AND ONE AGENT ANSWERS TO MORE THAN ONE NAME. The harness notes a Read
+	// under the name it calls itself, main, and every engine call names the name
+	// it pulled with. An exact match made an agent's own reads invisible to it:
+	// fifty-six files were read and this door said nobody had looked at one of
+	// them. The gate already knows the two names are one agent, so the same
+	// question is asked here rather than a stricter one.
+	//
+	// THE MAP RUNS FROM THE HARNESS NAME TO THE NAMES IT PULLS WITH, so it is
+	// read in both directions. Asking it only forwards answers about an agent
+	// this one is not, and the read that has to be found was noted under the
+	// harness name.
+	names := map[string]bool{actor: true}
+	for _, also := range everyNameOf(r, actor) {
+		names[also] = true
+	}
+	for harness, pulled := range TheNamesItPullsWith(r) {
+		for _, one := range pulled {
+			if one == actor {
+				names[harness] = true
+			}
+		}
+	}
 	return func(p string) bool {
 		// THE KEY IS WHATEVER THE HARNESS GAVE, so both spellings are asked:
 		// the path resolved against the tree, and the path as it stands.
 		for _, key := range []string{underWork(work, p), clean(p)} {
-			if rec, ok := reads[key]; ok && rec.Actor == actor {
+			if rec, ok := reads[key]; ok && names[rec.Actor] {
 				return true
 			}
 		}
@@ -262,6 +284,9 @@ func ARemovalWithoutARead(r Roots, actor, command, work string) (string, bool) {
 			continue
 		}
 		for _, p := range filesAmong(words[at+1:]) {
+			if anEmptyFolder(underWork(work, p)) {
+				continue
+			}
 			if !anyInside([]string{p}, work) {
 				continue
 			}
@@ -452,6 +477,24 @@ func aCleanTakesWhatIsNotThere(why string) string {
 		"said, through the one door the removal guard did not watch. rm of that same file " +
 		"was refused, correctly, because nothing had read it.\n\n" +
 		"List the files you mean and read them, then delete those by name."
+}
+
+// anEmptyFolder says whether this path is a directory holding nothing.
+//
+// A FOLDER CANNOT BE READ, so the read rule could never be satisfied for one.
+// util/checks was emptied file by file, every one read and deleted, and then the
+// folder itself could not go: the door asked who had looked at a thing nobody
+// can look at. An empty folder carries nothing, so there is nothing to lose.
+//
+// A FOLDER WITH ANYTHING IN IT IS STILL REFUSED. That is the case this rule was
+// written for, where what goes is named nowhere in the command.
+func anEmptyFolder(path string) bool {
+	info, err := os.Stat(path)
+	if err != nil || !info.IsDir() {
+		return false
+	}
+	entries, err := os.ReadDir(path)
+	return err == nil && len(entries) == 0
 }
 
 // aRemovalNeedsARead is the refusal, and it names the file it is about.

@@ -22,28 +22,6 @@ const (
 	cageCitesALostToken    = "wk-4444444444"
 )
 
-// cageCitesFixture builds a tree carrying one note in the record, one row in the
-// archive, one note in the folder that never travels, and one file worth citing.
-func cageCitesFixture(t *testing.T) Roots {
-	t.Helper()
-	dir := t.TempDir()
-	write := func(rel, text string) {
-		at := filepath.Join(dir, filepath.FromSlash(rel))
-		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
-			t.Fatal(err)
-		}
-	}
-	write(TheTrackedFolder+"/"+cageCitesAHeldToken+".md", "kind: [[work-token]]\n")
-	write(TheTrackedFolder+"/archive.jsonl",
-		`{"id":"`+cageCitesAClosedToken+`","title":"a token that closed"}`+"\n")
-	write(cageCitesThePrivateFolder+"/"+cageCitesAPrivateToken+".md", "kind: [[work-token]]\n")
-	write("src/cage/hooks-the-harness-fires.md", "the table the spike measured\n")
-	return Roots{Work: dir, Method: dir}
-}
-
 // cageCitesSaying is a settings file whose comment says one thing, which is the
 // shape both cage files have: a long comment and the keys it explains.
 func cageCitesSaying(says string) string {

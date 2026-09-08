@@ -104,7 +104,7 @@ func startBattery(ctx context.Context, r Roots, actor, token string) ran {
 		return ran{ID: "battery", Kind: "battery", Said: "the battery's output file could not be made: " + err.Error()}
 	}
 	defer out.Close()
-	cmd := quiet.Detached(quiet.Quietly(exec.Command(sh, filepath.Join(r.Method, "util", "checks", "battery.sh"))))
+	cmd := quiet.Detached(quiet.Quietly(exec.Command(sh, TheBatteryAt(r.Method))))
 	cmd.Dir = r.Method
 	cmd.Env = buildEnv()
 	cmd.Stdout, cmd.Stderr = out, out
@@ -255,5 +255,25 @@ func lastLine(s string) string {
 	return ""
 }
 
-// A BATTERY RUN BY HAND IS ALREADY REFUSED. battery.sh lives under util/checks,
+// TheBatteryAt answers where the battery script is, asking the tree rather than
+// writing the folder down.
+//
+// THE CHECKS MOVED OUT OF util. util was the folder everything landed in that
+// had nowhere else to go, and it grew to hold the checks, the cage, the
+// installer and five declarations. It is gone, and a path built by joining its
+// name is a path to nothing.
+//
+// BOTH PLACES ARE ASKED WHILE A TREE MAY CARRY EITHER, and the new one is asked
+// first, so a tree that has moved is never answered out of the old folder.
+func TheBatteryAt(methodRoot string) string {
+	if at := filepath.Join(methodRoot, "src", "scripts", "checks", "battery.sh"); exists(at) {
+		return at
+	}
+	if was := filepath.Join(methodRoot, "util", "checks", "battery.sh"); exists(was) {
+		return was
+	}
+	return filepath.Join(methodRoot, "src", "scripts", "checks", "battery.sh")
+}
+
+// A BATTERY RUN BY HAND IS ALREADY REFUSED. battery.sh lives under src/scripts,
 // which ATestRunByHand names, so there is no second rule here.

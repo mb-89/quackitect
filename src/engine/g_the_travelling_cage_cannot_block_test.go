@@ -10,15 +10,6 @@ import (
 // said nobody had broken it lately and not that the rule was held. Each case
 // here writes one cage and reads the answer.
 
-// cageCannotBlockRoots is a tree with nothing in it. The rule is decided off the
-// bytes going in, so the door reads no folder, and a root is built anyway so
-// that a later reading has one and no case ever reaches the live tree.
-func cageCannotBlockRoots(t *testing.T) Roots {
-	t.Helper()
-	dir := t.TempDir()
-	return Roots{Work: dir, Method: dir}
-}
-
 // cageCannotBlockSaying is a cage registering one event that runs one thing,
 // which is the shape both travelling files have.
 func cageCannotBlockSaying(event, command string) string {

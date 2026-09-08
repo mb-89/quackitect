@@ -12,23 +12,6 @@ import (
 // measured was that nobody had broken the rule yet. These build the list, add
 // one row to it, and read the answer.
 
-// archiveRowsTravelFixture writes a list holding one good row and answers the
-// roots, the path of the list and the line it holds.
-func archiveRowsTravelFixture(t *testing.T) (Roots, string, string) {
-	t.Helper()
-	dir := t.TempDir()
-	rel := TheTrackedFolder + "/archive.jsonl"
-	if err := os.MkdirAll(filepath.Join(dir, filepath.FromSlash(TheTrackedFolder)), 0o755); err != nil {
-		t.Fatal(err)
-	}
-	held := `{"id":"tok-one","title":"a token that closed","process":"trivial","disposition":"done","on_branch":"` +
-		strings.Repeat("a", 40) + `"}` + "\n"
-	if err := os.WriteFile(filepath.Join(dir, filepath.FromSlash(rel)), []byte(held), 0o644); err != nil {
-		t.Fatal(err)
-	}
-	return Roots{Work: dir, Method: dir}, rel, held
-}
-
 // A ROW NAMING ONLY A TAG IS REFUSED, AND THE SAME ROW NAMING THE BLOB THE
 // BRANCH COMMITTED IS NOT. The tag is the shape that lost a note: the push was
 // refused by the proxy, and the local ref went down with the box.

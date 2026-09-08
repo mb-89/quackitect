@@ -10,7 +10,7 @@
 # IT LIVES BESIDE cherrypush.sh, out of .se and out of util/checks, for the two
 # reasons written in that file.
 #
-#   sh util/git/land.sh "<commit message>" <path> [<path> ...]
+#   sh src/scripts/land.sh "<commit message>" <path> [<path> ...]
 # A path this tree no longer holds is removed there.
 msg="$1"; shift
 cd "$(git rev-parse --show-toplevel)" || exit 1

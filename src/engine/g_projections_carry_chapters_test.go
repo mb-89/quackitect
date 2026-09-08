@@ -7,36 +7,6 @@ import (
 	"testing"
 )
 
-// THE TREE IS PLANTED HERE RATHER THAN READ OFF THE WORK FOLDER. A test that
-// judges whatever the real method happens to hold answers that nobody has
-// broken the rule yet, which is not the same answer as the rule holding. Every
-// case below builds its own method root, its own sources and its own
-// projection map.
-func aPlantedProjectionTree(t *testing.T) Roots {
-	t.Helper()
-	dir := t.TempDir()
-	write := func(rel, text string) {
-		at := filepath.Join(dir, filepath.FromSlash(rel))
-		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
-			t.Fatal(err)
-		}
-		if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
-			t.Fatal(err)
-		}
-	}
-	write("spec/config/projections.json", `{"projections":[
-	  {"name":"a chaptered projection","target":".made/rules.md","wrap":"markdown",
-	   "section":"Actionables","sources_from":"spec/guidance","preamble":"src/cage/how-to-read.md"},
-	  {"name":"a whole copy","target":".made/whole.json","wrap":"none",
-	   "sources":["src/cage/whole.json"]}
-	]}`)
-	write("src/cage/how-to-read.md", "# How to read this\n\nWhat you are looking at.\n")
-	write("src/cage/whole.json", "{}\n")
-	write("spec/guidance/one-rule.md", theGuidanceSource("one"))
-	write("spec/guidance/two-rules.md", theGuidanceSource("two"))
-	return Roots{Method: dir, Work: dir}
-}
-
 // A GUIDANCE FILE CARRIES MORE THAN THE CHAPTER THAT TRAVELS. Motivation is the
 // chapter the broken engine copied along, so every source here has one.
 func theGuidanceSource(which string) string {

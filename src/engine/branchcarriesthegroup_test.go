@@ -38,24 +38,6 @@ func TestTheGroupFilterIsTheBucket(t *testing.T) {
 	}
 }
 
-// aBoxOnBranch is a work root that is a repository standing on one branch.
-func aBoxOnBranch(t *testing.T, branch string) Roots {
-	t.Helper()
-	r := Roots{Method: filepath.Join("..", ".."), Work: t.TempDir()}
-	for _, args := range [][]string{
-		{"init", "--initial-branch", "main"},
-		{"config", "user.email", "a@b.c"},
-		{"config", "user.name", "a box"},
-		{"commit", "--allow-empty", "-m", "one"},
-		{"checkout", "-b", branch},
-	} {
-		if _, err := gitHere(r, args...); err != nil {
-			t.Fatalf("git %v: %v", args, err)
-		}
-	}
-	return r
-}
-
 // NAMING A BUCKET IS THE WHOLE OF CUTTING A GROUP. Nobody types a checkout,
 // which is the manual step the design exists to remove.
 func TestNamingABucketTakesItsBranch(t *testing.T) {

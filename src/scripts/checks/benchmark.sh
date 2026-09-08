@@ -6,8 +6,8 @@
 # noise to show. Save the output beside the retro and compare it with the
 # last one there; benchstat reads two of these files if it is installed.
 #
-#   sh util/checks/benchmark.sh            the engine's benchmarks, six runs each
-#   sh util/checks/benchmark.sh -count 3   fewer runs, when a first look is enough
+#   sh src/scripts/checks/benchmark.sh            the engine's benchmarks, six runs each
+#   sh src/scripts/checks/benchmark.sh -count 3   fewer runs, when a first look is enough
 set -e
 root=$(cd "$(dirname "$0")/../.." && pwd)
 cd "$root"

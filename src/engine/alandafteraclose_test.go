@@ -11,7 +11,7 @@ import (
 // that same token, was refused because the token had ended, so the hand minted
 // a token nobody wanted in order to run one command.
 //
-// MEASURED, 2026-09-07, on wk-48eee4caa6 closing itself. The notice read: land
+// MEASURED, September 2026, on a token closing itself. The notice read: land
 // every path this close wrote. The land answered: already ended as done, name a
 // token that is open, or mint one. Four closes that day paid the same toll.
 //
@@ -34,7 +34,7 @@ func TestALandRunsOnATokenThatJustClosed(t *testing.T) {
 	t.Cleanup(func() { theCloseWasAt = was })
 	theCloseWasAt = func(Roots, Token) (time.Time, bool) { return time.Now(), true }
 
-	land := `sh util/git/land.sh "the close named these" spec/work/` + tok.ID + `.md spec/work/archive.jsonl`
+	land := `sh src/scripts/land.sh "the close named these" spec/work/` + tok.ID + `.md spec/work/archive.jsonl`
 	if !aWarmLand(r, tok.ID, land) {
 		t.Errorf("a land naming the token that just closed was not allowed through")
 	}
@@ -65,7 +65,7 @@ func TestALandOnALongClosedTokenIsRefused(t *testing.T) {
 		return time.Now().Add(-24 * time.Hour), true
 	}
 
-	land := `sh util/git/land.sh "late" spec/work/` + tok.ID + `.md`
+	land := `sh src/scripts/land.sh "late" spec/work/` + tok.ID + `.md`
 	if aWarmLand(r, tok.ID, land) {
 		t.Errorf("a land named a token closed a day ago and was allowed through")
 	}

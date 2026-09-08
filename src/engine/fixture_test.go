@@ -35,7 +35,6 @@ import (
 // broken. A new test file declaring a fixture of its own is the shape this is
 // about, and it fails here rather than at a reader's discretion.
 func TestOneFileCarriesTheFixtureBuilders(t *testing.T) {
-	t.Parallel()
 	var stray []string
 	for _, name := range testFilesHere(t) {
 		if name == "fixture_test.go" {
@@ -1160,6 +1159,440 @@ dispositions:
 	path := filepath.Join(dir, "three.process.yaml")
 	if err := os.WriteFile(path, []byte(proc), 0o644); err != nil {
 		t.Fatalf("writing %s: %v", path, err)
+	}
+	return r
+}
+
+// ---- from amergereverts_test.go ----
+
+func aMergeTree(t *testing.T) (Roots, func(...string) string) {
+	t.Helper()
+	r := Roots{Method: filepath.Join("..", ".."), Work: t.TempDir()}
+	git := func(args ...string) string {
+		t.Helper()
+		out, _ := gitHere(r, args...) // a conflicting merge exits non-zero on purpose
+		return out
+	}
+	write := func(name, text string) {
+		t.Helper()
+		if err := os.WriteFile(filepath.Join(r.Work, name), []byte(text), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	git("init", "--quiet", "--initial-branch", "main")
+	git("config", "user.email", "a@b.c")
+	git("config", "user.name", "a box")
+	write("shared.txt", "the base\n")
+	write("other.txt", "untouched\n")
+	git("add", "shared.txt", "other.txt")
+	git("commit", "--quiet", "-m", "the base")
+	return r, git
+}
+
+// ---- from anemptygroupcloses_test.go ----
+
+// aGroupBoxWithWork is a tree the queue understands, standing on a group branch.
+func aGroupBoxWithWork(t *testing.T) Roots {
+	t.Helper()
+	r := aTreeWithTheProcesses(t)
+	for _, args := range [][]string{
+		{"init", "--initial-branch", "main"},
+		{"config", "user.email", "a@b.c"},
+		{"config", "user.name", "a box"},
+		{"commit", "--allow-empty", "-m", "one"},
+		{"checkout", "-b", "group/archive"},
+	} {
+		if _, err := gitHere(r, args...); err != nil {
+			t.Fatalf("git %v: %v", args, err)
+		}
+	}
+	if got := theGroupOnTheBranch(r); got != "archive" {
+		t.Fatalf("the tree stands on group %q, and this needs archive", got)
+	}
+	return r
+}
+
+// ---- from branchcarriesthegroup_test.go ----
+
+// aBoxOnBranch is a work root that is a repository standing on one branch.
+func aBoxOnBranch(t *testing.T, branch string) Roots {
+	t.Helper()
+	r := Roots{Method: filepath.Join("..", ".."), Work: t.TempDir()}
+	for _, args := range [][]string{
+		{"init", "--initial-branch", "main"},
+		{"config", "user.email", "a@b.c"},
+		{"config", "user.name", "a box"},
+		{"commit", "--allow-empty", "-m", "one"},
+		{"checkout", "-b", branch},
+	} {
+		if _, err := gitHere(r, args...); err != nil {
+			t.Fatalf("git %v: %v", args, err)
+		}
+	}
+	return r
+}
+
+// ---- from claimfar_test.go ----
+
+// aBoxHolding is a work tree with git in it, a remote, and one note that says
+// it is claimed. The note is written by hand, so this stands up without the
+// processes and the schemas a mint would want.
+func aBoxHolding(t *testing.T, remote, id, by string) Roots {
+	t.Helper()
+	root := t.TempDir()
+	r := Roots{Method: root, Work: root}
+	gitAt(t, root, "init", "--quiet")
+	if remote != "" {
+		gitAt(t, root, "remote", "add", "origin", remote)
+	}
+	at := filepath.Join(root, "spec", "work", id+".md")
+	if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	// THE STAMP IS NOW, because a claim past its hours is dropped from the file
+	// on the next write, which is a different rule from the one under test.
+	note := "---\nkind: [[work-token]]\ntitle: " + id + "\nstatus: open\nclaimed_by: " + by +
+		"\nclaimed_at: \"" + time.Now().UTC().Format(time.RFC3339) + "\"\n---\n\n## detail\n\na claim.\n"
+	if err := os.WriteFile(at, []byte(note), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	return r
+}
+
+// ---- from g_archive_rows_travel_test.go ----
+
+// archiveRowsTravelFixture writes a list holding one good row and answers the
+// roots, the path of the list and the line it holds.
+func archiveRowsTravelFixture(t *testing.T) (Roots, string, string) {
+	t.Helper()
+	dir := t.TempDir()
+	rel := TheTrackedFolder + "/archive.jsonl"
+	if err := os.MkdirAll(filepath.Join(dir, filepath.FromSlash(TheTrackedFolder)), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	held := `{"id":"tok-one","title":"a token that closed","process":"trivial","disposition":"done","on_branch":"` +
+		strings.Repeat("a", 40) + `"}` + "\n"
+	if err := os.WriteFile(filepath.Join(dir, filepath.FromSlash(rel)), []byte(held), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	return Roots{Work: dir, Method: dir}, rel, held
+}
+
+// ---- from g_commands_mirror_the_keywords_test.go ----
+
+// aDeclaredTreeWithTwoConsoleControls is the smallest declaration that answers
+// both shapes of line: a rung, which is sendable whole, and a number, which is
+// not. The third control is reachable from no console and answers no line.
+const aDeclaredTreeWithTwoConsoleControls = `{
+  "name": "quackitect",
+  "type": "group",
+  "children": [
+    {
+      "name": "control",
+      "type": "group",
+      "children": [
+        { "name": "ideation", "type": "bool", "console": true },
+        { "name": "parallel_agents", "type": "int", "console": true, "min": 0, "max": 20 },
+        { "name": "hidden", "type": "bool" }
+      ]
+    }
+  ]
+}
+`
+
+// aPlantedMethodRoot writes that declaration into a temporary folder and
+// answers roots pointed at it. The icon table is there because reading a tree
+// resolves the marks, and an empty table resolves every name to itself.
+func aPlantedMethodRoot(t *testing.T) Roots {
+	t.Helper()
+	dir := t.TempDir()
+	config := filepath.Join(dir, "spec", "config")
+	if err := os.MkdirAll(config, 0o755); err != nil {
+		t.Fatalf("the planted config folder could not be made: %v", err)
+	}
+	for name, text := range map[string]string{
+		"parameters.json": aDeclaredTreeWithTwoConsoleControls,
+		"icons.json":      "{}\n",
+	} {
+		if err := os.WriteFile(filepath.Join(config, name), []byte(text), 0o644); err != nil {
+			t.Fatalf("the planted %s could not be written: %v", name, err)
+		}
+	}
+	return Roots{Work: dir, Method: dir}
+}
+
+// ---- from g_projections_carry_chapters_test.go ----
+
+// THE TREE IS PLANTED HERE RATHER THAN READ OFF THE WORK FOLDER. A test that
+// judges whatever the real method happens to hold answers that nobody has
+// broken the rule yet, which is not the same answer as the rule holding. Every
+// case below builds its own method root, its own sources and its own
+// projection map.
+func aPlantedProjectionTree(t *testing.T) Roots {
+	t.Helper()
+	dir := t.TempDir()
+	write := func(rel, text string) {
+		at := filepath.Join(dir, filepath.FromSlash(rel))
+		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	write("spec/config/projections.json", `{"projections":[
+	  {"name":"a chaptered projection","target":".made/rules.md","wrap":"markdown",
+	   "section":"Actionables","sources_from":"spec/guidance","preamble":"src/cage/how-to-read.md"},
+	  {"name":"a whole copy","target":".made/whole.json","wrap":"none",
+	   "sources":["src/cage/whole.json"]}
+	]}`)
+	write("src/cage/how-to-read.md", "# How to read this\n\nWhat you are looking at.\n")
+	write("src/cage/whole.json", "{}\n")
+	write("spec/guidance/one-rule.md", theGuidanceSource("one"))
+	write("spec/guidance/two-rules.md", theGuidanceSource("two"))
+	return Roots{Method: dir, Work: dir}
+}
+
+// ---- from g_the_cage_cites_what_is_here_test.go ----
+
+// cageCitesFixture builds a tree carrying one note in the record, one row in the
+// archive, one note in the folder that never travels, and one file worth citing.
+func cageCitesFixture(t *testing.T) Roots {
+	t.Helper()
+	dir := t.TempDir()
+	write := func(rel, text string) {
+		at := filepath.Join(dir, filepath.FromSlash(rel))
+		if err := os.MkdirAll(filepath.Dir(at), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(at, []byte(text), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	write(TheTrackedFolder+"/"+cageCitesAHeldToken+".md", "kind: [[work-token]]\n")
+	write(TheTrackedFolder+"/archive.jsonl",
+		`{"id":"`+cageCitesAClosedToken+`","title":"a token that closed"}`+"\n")
+	write(cageCitesThePrivateFolder+"/"+cageCitesAPrivateToken+".md", "kind: [[work-token]]\n")
+	write("src/cage/hooks-the-harness-fires.md", "the table the spike measured\n")
+	return Roots{Work: dir, Method: dir}
+}
+
+// ---- from g_the_cards_reach_their_box_test.go ----
+
+// cardsReachRoots is a tree with nothing in it, because the rule is decided off
+// the bytes going in and never off what the tree happens to hold.
+func cardsReachRoots(t *testing.T) Roots {
+	t.Helper()
+	dir := t.TempDir()
+	return Roots{Work: dir, Method: dir}
+}
+
+// ---- from g_the_travelling_cage_cannot_block_test.go ----
+
+// cageCannotBlockRoots is a tree with nothing in it. The rule is decided off the
+// bytes going in, so the door reads no folder, and a root is built anyway so
+// that a later reading has one and no case ever reaches the live tree.
+func cageCannotBlockRoots(t *testing.T) Roots {
+	t.Helper()
+	dir := t.TempDir()
+	return Roots{Work: dir, Method: dir}
+}
+
+// ---- from landbeforeworking_test.go ----
+
+// aBoxBehindItsOrigin builds an origin, clones it, moves origin on by one
+// commit, and fetches. The clone is then one behind and knows it.
+func aBoxBehindItsOrigin(t *testing.T, branch string) Roots {
+	t.Helper()
+	origin := Roots{Method: filepath.Join("..", ".."), Work: t.TempDir()}
+	for _, args := range [][]string{
+		{"init", "--initial-branch", branch},
+		{"config", "user.email", "a@b.c"},
+		{"config", "user.name", "an origin"},
+		{"commit", "--allow-empty", "-m", "one"},
+	} {
+		if _, err := gitHere(origin, args...); err != nil {
+			t.Fatalf("origin git %v: %v", args, err)
+		}
+	}
+	box := Roots{Method: origin.Method, Work: t.TempDir()}
+	if _, err := gitHere(origin, "clone", "--quiet", origin.Work, box.Work); err != nil {
+		t.Fatalf("the clone failed: %v", err)
+	}
+	for _, args := range [][]string{
+		{"config", "user.email", "a@b.c"},
+		{"config", "user.name", "a box"},
+	} {
+		if _, err := gitHere(box, args...); err != nil {
+			t.Fatalf("the box could not be named: %v", err)
+		}
+	}
+	if _, err := gitHere(origin, "commit", "--allow-empty", "-m", "two"); err != nil {
+		t.Fatalf("origin could not move on: %v", err)
+	}
+	if _, err := gitHere(box, "fetch", "--quiet"); err != nil {
+		t.Fatalf("the box could not fetch: %v", err)
+	}
+	return box
+}
+
+// ---- from linttoolsrunonce_test.go ----
+
+// aTreeTheLintFindsNothingIn is a tree the lint has nothing to say about, so a
+// clean of false in it is about one thing.
+//
+// THE PROCESSES ALONE ARE NOT ENOUGH. The lint also reads the icons, the
+// parameter declaration and the guidance, and a tree missing any of the three
+// carries a finding for it, which would answer this test's question for it.
+func aTreeTheLintFindsNothingIn(t *testing.T) Roots {
+	t.Helper()
+	r := aTreeWithTheProcesses(t)
+	if err := os.MkdirAll(filepath.Join(r.Method, "src", "config"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	for _, name := range []string{"icons.json", "parameters.json"} {
+		b, err := os.ReadFile(filepath.Join("..", "..", "src", "config", name))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(filepath.Join(r.Method, "src", "config", name), b, 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	from := filepath.Join("..", "..", "spec", "guidance")
+	if err := os.CopyFS(filepath.Join(r.Method, "spec", "guidance"), os.DirFS(from)); err != nil {
+		t.Fatal(err)
+	}
+	return r
+}
+
+// ---- from mintapproach_test.go ----
+
+// aTreeRequiringAnApproach is a tree whose one process wants a detail and an
+// approach, which is the shape the standard process has.
+func aTreeRequiringAnApproach(t *testing.T) Roots {
+	t.Helper()
+	f := aTree(t)
+	dir := ProcessesDir(f.Work)
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	const proc = `name: shaped
+description: a change that wants a shape a reader can disagree with
+sections:
+  required:
+    - detail
+    - approach
+states:
+  - name: open
+    description: written with its approach, and waiting to be taken
+activities:
+  - name: ask
+    does: write it with its approach
+    to: open
+dispositions:
+  - name: done
+    description: it was done
+`
+	if err := os.WriteFile(filepath.Join(dir, "shaped.process.yaml"), []byte(proc), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	return f.Roots
+}
+
+// ---- from passovernamesthefile_test.go ----
+
+// aCloneWithBothKindsOfPassOver hands back a clone carrying two tokens the
+// branch has archived. One is a note under spec/work that the branch has moved
+// on from, so a fetch really would bring it into step. The other is a private
+// note under .se/work, which no fetch reaches at all.
+func aCloneWithBothKindsOfPassOver(t *testing.T) (Roots, Token, Token) {
+	t.Helper()
+	r := aTreeWithTheProcesses(t)
+	tok := mintUnclaimed(t, r, "behind the branch")
+	gitAt(t, r.Work, "add", "--", "doc", "src")
+	gitAt(t, r.Work, "commit", "--quiet", "-m", "the token")
+	clone := filepath.Join(t.TempDir(), "clone")
+	gitAt(t, r.Work, "clone", "--quiet", "--no-tags", "file://"+filepath.ToSlash(r.Work), clone)
+	behind := Roots{Method: clone, Work: clone}
+
+	// THE PRIVATE COPY IS MINTED IN THE CLONE, so it is under .se/work there
+	// and the branch has never carried it.
+	private, err := Mint(behind, Token{Tracked: local(), Process: "trivial", Title: "a private copy",
+		Detail:   "a copy of work the branch has already archived",
+		Criteria: []Criterion{{Says: "the notice names the file it means"}}})
+	if err != nil {
+		t.Fatalf("minting the private copy: %v", err)
+	}
+
+	// THE BRANCH CLOSES THE TRACKED ONE AND ARCHIVES BOTH IDS.
+	tok.Disposition, tok.Status = Done, "closed"
+	if err := SaveToken(r, tok); err != nil {
+		t.Fatalf("closing %s: %v", tok.ID, err)
+	}
+	list := filepath.Join(r.Work, "spec", "work", "archive.jsonl")
+	was, _ := os.ReadFile(list)
+	rows := string(was) +
+		`{"id":"` + tok.ID + `","title":"behind the branch","disposition":"done"}` + "\n" +
+		`{"id":"` + private.ID + `","title":"a private copy","disposition":"done"}` + "\n"
+	if err := os.WriteFile(list, []byte(rows), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	gitAt(t, r.Work, "add", "--all", "--", "spec/work")
+	gitAt(t, r.Work, "commit", "--quiet", "-m", "the close and the rows")
+
+	gitAt(t, clone, "fetch", "--quiet", "origin")
+	if at := noteAt(behind, tok.ID); at == "" {
+		t.Fatalf("the clone does not carry %s, so it is not behind the branch", tok.ID)
+	}
+	if at := noteAt(behind, private.ID); at == "" {
+		t.Fatalf("the clone does not carry %s, so there is no private copy to name", private.ID)
+	}
+	return behind, tok, private
+}
+
+// ---- from thebranchdisagrees_test.go ----
+
+// aCloneWhoseBranchDisagrees hands back a clone whose note is on the fetched
+// branch byte for byte as it is here, while that same branch archives the id.
+//
+// THE ARCHIVE ROW IS WRITTEN AND THE NOTE IS NOT TOUCHED, which is the shape
+// the record was actually found in: a close that wrote its row and left the
+// note standing.
+func aCloneWhoseBranchDisagrees(t *testing.T) (Roots, Token) {
+	t.Helper()
+	r := aTreeWithTheProcesses(t)
+	tok := mintUnclaimed(t, r, "the record disagrees")
+	gitAt(t, r.Work, "add", "--", "doc", "src")
+	gitAt(t, r.Work, "commit", "--quiet", "-m", "the token")
+	clone := filepath.Join(t.TempDir(), "clone")
+	gitAt(t, r.Work, "clone", "--quiet", "--no-tags", "file://"+filepath.ToSlash(r.Work), clone)
+
+	// THE BRANCH ARCHIVES THE ID AND LEAVES THE NOTE ALONE.
+	list := filepath.Join(r.Work, "spec", "work", "archive.jsonl")
+	was, _ := os.ReadFile(list)
+	row := string(was) + `{"id":"` + tok.ID + `","title":"` + tok.Title + `","disposition":"done"}` + "\n"
+	if err := os.WriteFile(list, []byte(row), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	gitAt(t, r.Work, "add", "--all", "--", "spec/work")
+	gitAt(t, r.Work, "commit", "--quiet", "-m", "the row and not the note")
+
+	gitAt(t, clone, "fetch", "--quiet", "origin")
+	behind := Roots{Method: clone, Work: clone}
+	if at := noteAt(behind, tok.ID); at == "" {
+		t.Fatalf("the clone does not carry %s, so there is nothing to disagree about", tok.ID)
+	}
+	return behind, tok
+}
+
+// ---- from thedigestseesitall_test.go ----
+
+func aTreeToProject(t *testing.T) Roots {
+	t.Helper()
+	r := aTreeWithTheProcesses(t)
+	if _, err := GuidanceDigest(r.Method); err != nil {
+		t.Skipf("this fixture carries no projections to digest: %v", err)
 	}
 	return r
 }

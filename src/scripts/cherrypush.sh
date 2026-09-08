@@ -13,7 +13,7 @@
 # under that folder in an interpreter's arguments as a check about to run, so
 # the door landed there and was refused the moment anyone opened it.
 #
-#   sh util/git/cherrypush.sh <commit>
+#   sh src/scripts/cherrypush.sh <commit>
 commit="$1"
 cd "$(git rev-parse --show-toplevel)" || exit 1
 # THE PROXY MOVES WHEN THE CONTAINER RESTARTS, so a box that keeps a helper for

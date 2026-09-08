@@ -28,47 +28,6 @@ import (
 // Everything below is planted in a temporary folder, and the live tree is
 // neither read nor written.
 
-// aDeclaredTreeWithTwoConsoleControls is the smallest declaration that answers
-// both shapes of line: a rung, which is sendable whole, and a number, which is
-// not. The third control is reachable from no console and answers no line.
-const aDeclaredTreeWithTwoConsoleControls = `{
-  "name": "quackitect",
-  "type": "group",
-  "children": [
-    {
-      "name": "control",
-      "type": "group",
-      "children": [
-        { "name": "ideation", "type": "bool", "console": true },
-        { "name": "parallel_agents", "type": "int", "console": true, "min": 0, "max": 20 },
-        { "name": "hidden", "type": "bool" }
-      ]
-    }
-  ]
-}
-`
-
-// aPlantedMethodRoot writes that declaration into a temporary folder and
-// answers roots pointed at it. The icon table is there because reading a tree
-// resolves the marks, and an empty table resolves every name to itself.
-func aPlantedMethodRoot(t *testing.T) Roots {
-	t.Helper()
-	dir := t.TempDir()
-	config := filepath.Join(dir, "spec", "config")
-	if err := os.MkdirAll(config, 0o755); err != nil {
-		t.Fatalf("the planted config folder could not be made: %v", err)
-	}
-	for name, text := range map[string]string{
-		"parameters.json": aDeclaredTreeWithTwoConsoleControls,
-		"icons.json":      "{}\n",
-	} {
-		if err := os.WriteFile(filepath.Join(config, name), []byte(text), 0o644); err != nil {
-			t.Fatalf("the planted %s could not be written: %v", name, err)
-		}
-	}
-	return Roots{Work: dir, Method: dir}
-}
-
 // theProjectedCommands answers what landed in the folder: the message each file
 // sends, by file name.
 func theProjectedCommands(t *testing.T, roots Roots) map[string]string {

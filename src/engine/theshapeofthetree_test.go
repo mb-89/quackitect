@@ -134,12 +134,12 @@ func TestTheShapeOfTheTreeIsDecidedAtTheDoor(t *testing.T) {
 		{
 			rule:    "the extension reaches for child_process once",
 			file:    "src/extension/deep/probe.ts",
-			planted: "import { execFile } from \"node:child_process\";\n\nexecFile(x, [\"--work\", w], { windowsHide: true });\n",
+			planted: "import { execFile } from \"node:child_process\";\n\nexecFile(x, [...startArgs()], { windowsHide: true });\n",
 			clean:   "import { runEngine } from \"../door\";\n",
 			says:    "already does",
 			standing: func(t *testing.T, r Roots) {
 				writeUnder(t, r, "src/extension/door.ts",
-					"import { spawn } from \"node:child_process\";\n\nspawn(e, [\"--work\", w], { windowsHide: true });\n")
+					"import { spawn } from \"node:child_process\";\n\nspawn(e, [...startArgs()], { windowsHide: true });\n")
 			},
 		},
 		{
@@ -151,8 +151,8 @@ func TestTheShapeOfTheTreeIsDecidedAtTheDoor(t *testing.T) {
 			// refuses a start whose arguments nothing can follow, and a clean
 			// case has to be clean for every rule at the door and not only
 			// for the one it is about.
-			planted: "import { spawn } from \"node:child_process\";\n\nspawn(e, [\"--work\", w], {});\n",
-			clean:   "import { spawn } from \"node:child_process\";\n\nspawn(e, [\"--work\", w], { windowsHide: true });\n",
+			planted: "import { spawn } from \"node:child_process\";\n\nspawn(e, [...startArgs()], {});\n",
+			clean:   "import { spawn } from \"node:child_process\";\n\nspawn(e, [...startArgs()], { windowsHide: true });\n",
 			says:    "windowsHide",
 		},
 		{

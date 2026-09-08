@@ -40,7 +40,7 @@
 6. Use the tool the engine gives you. *
 7. Change files with `se_apply`, naming the token on every write. *
 8. Run every shell command with `se_run`, naming the token. It could write. *
-9. A helper script goes in `.se/scratchpad/`. A standing check goes in `util/checks/`. *
+9. A helper script goes in `.se/scratchpad/`. A standing rule goes in the engine, as a refusal or a test. *
 10. Search the tree through the index: `se_find` for words, a regex or a path glob, `se_ask` for SQL. *
 11. Test through the engine: `se_test` runs what your delta reaches. A test you name runs, a pattern narrows. *
 12. Break work into sub-tokens with `se_work`, naming the parent. Your own todo list is refused. *

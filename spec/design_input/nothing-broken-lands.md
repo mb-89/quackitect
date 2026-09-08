@@ -94,7 +94,7 @@ being pushed:
 | notes | the same, and they are the input to every later decision |
 | `spec/design_input/**`, `spec/guidance/**` | prose cannot break a build |
 
-Anything carrying `src/**` or `util/checks/**` is code and is gated.
+Anything carrying `src/**` is code and is gated.
 
 ## What this would have caught, measured
 

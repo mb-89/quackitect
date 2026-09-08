@@ -6,7 +6,7 @@
 # place, immediately before submitting, and this prints what each one answered
 # rather than what it was expected to answer.
 #
-#   sh util/checks/battery.sh
+#   sh src/scripts/checks/battery.sh
 #
 # It exits non-zero when anything did.
 #
@@ -14,7 +14,7 @@
 # behaves, and a number that depends on the machine and its load is not an
 # answer to that: a test that waited for the operating system to notice a
 # file failed here once for no defect of the program's. Everything about
-# time is a benchmark, util/checks/benchmark.sh, run at the retro. The one
+# time is a benchmark, src/scripts/checks/benchmark.sh, run at the retro. The one
 # wait left is for the engine this battery starts to finish its start.
 cd "$(dirname "$0")/../.." || exit 1
 battery_began=$(date +%s)
@@ -454,9 +454,19 @@ start "se lint" .bin/se.exe lint
 #
 # So the list is the whole of it. A check that is not on the line does not run,
 # and checks-live-in-the-method is what says a folder holds one that nothing runs.
-for c in the-branch-head-builds render-check drive-editor drawn-classes-have-rules panel-draws-the-register adapter-decides-no-column engine-args engine-args-lifecycle engine-spawns liveness one-look panel-icons checks-live-in-the-method engine-spawns-catches panel-says-holding drive-panel burndown burndown-derives-nothing mcp-tools lane-answers-cold the-cards-reach-their-box the-travelling-cage-cannot-block windows-say-they-are-here projections-carry-chapters deleted-notes-have-a-row open-tokens-carry-their-sections commits-carry-one-token lane-carries-every-flag the-cage-cites-what-is-here tooltips-name-their-keywords the-tree-drops-nothing a-count-follows-the-engine archive-rows-travel commands-mirror-the-keywords criteria-name-a-runnable-command archived-notes-are-gone pushes-name-a-branch; do
-  if [ -f "util/checks/$c.mjs" ]; then
-    start "$c" node "util/checks/$c.mjs" "$root"
+# THE LIST IS WHAT IS LEFT, AND IT IS SHORT ON PURPOSE.
+#
+# Thirty-five of these were sweeps over whatever the tree happened to hold. Each
+# found a defect after it had landed, on a run somebody had to remember to make,
+# and each grew slower as the tree grew. They are refusals in the engine now, or
+# Go tests that plant their own case, so the engine decides them at the write and
+# go test drives them.
+#
+# WHAT STAYS NEEDS A WHOLE SCENARIO. One builds the committed head in a folder of
+# its own. The other drives TypeScript that Go cannot reach.
+for c in the-branch-head-builds liveness; do
+  if [ -f "src/scripts/checks/$c.mjs" ]; then
+    start "$c" node "src/scripts/checks/$c.mjs" "$root"
   else
     bad=$((bad + 1))
     say "$c" "FAIL it is not there, so it did not run"

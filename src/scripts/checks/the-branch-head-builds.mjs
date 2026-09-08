@@ -23,7 +23,7 @@
 // So this takes the head as git carries it, into a folder with nothing else in
 // it, and builds the engine there.
 //
-//   node util/checks/the-branch-head-builds.mjs <root>
+//   node src/scripts/checks/the-branch-head-builds.mjs <root>
 import { execFileSync, spawnSync } from "node:child_process";
 import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
 import { homedir, tmpdir } from "node:os";
