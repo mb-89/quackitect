@@ -14,6 +14,7 @@ import { bindsHere, envOf, standingLayer } from "../lib/guidance.js";
 import { judgeOf } from "../lib/judge.js";
 import { refusal, taught } from "../lib/refuse.js";
 import { readRule } from "../lib/rulefile.js";
+import { landsOnTrunk, touchesGit } from "../lib/trunk.js";
 import { lintText, VALE } from "../lib/vale.js";
 
 const PROSE = /\.(md|markdown|txt)$/i;
@@ -60,19 +61,16 @@ export function register(on, _options) {
   on("tool.call", { tool: "Bash" }, async ($, e, next) => {
     if (!cloud) return next(e);
     const said = String(e.command ?? "");
-    const commits = /\bgit\s+(?:-\S+\s+\S+\s+)*commit\b/.test(said);
-    const pushes = /\bgit\s+(?:-\S+\s+\S+\s+)*push\b/.test(said);
-    if (!commits && !pushes) return next(e);
+    if (!touchesGit(said).commits && !touchesGit(said).pushes) return next(e);
 
-    const branch = await branchNow($);
-    const atTrunk = pushes && new RegExp(`\\bpush\\b[^&|;]*\\b${TRUNK}\\b`).test(said);
-    if (branch !== TRUNK && !atTrunk) return next(e);
+    const how = landsOnTrunk(said, await branchNow($), TRUNK);
+    if (!how) return next(e);
 
     return {
       deny: [
         `This box works a branch, and ${TRUNK} belongs to a person.`,
         "",
-        branch === TRUNK
+        how === "commit"
           ? `You stand on ${TRUNK}, so this commit would land there.`
           : `This pushes ${TRUNK}, which no cloud box may move.`,
         "",
