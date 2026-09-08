@@ -18,11 +18,12 @@ export const DEFAULTS = {
   maxSpans: 24,
   warmupWrites: 4,
   thenEveryNth: 3,
-  rules: [],
 };
 
-export function judgeOf(config = {}) {
-  const settings = { ...DEFAULTS, ...(config.judge ?? {}) };
+// `config` is the control file and `rules` are the files under
+// spec/config/styles/VoiceJudged, each one read by readRule.
+export function judgeOf(config = {}, rules = []) {
+  const settings = { ...DEFAULTS, ...(config.judge ?? {}), rules };
   let written = 0;
   let clean = 0;
 
@@ -68,7 +69,7 @@ export function judgeOf(config = {}) {
             line: span.line,
             column: 1,
             said: cut(span.text),
-            message: `${rule.instead}`,
+            message: rule.message,
             severity: "error",
             fixable: false,
           });

@@ -57,7 +57,7 @@ export function fromJson(stdout) {
     for (const row of rows) {
       out.push({
         file,
-        rule: String(row.Check ?? "").replace(/^VoiceQuackitect\./, ""),
+        rule: String(row.Check ?? "").replace(/^VoiceVale\./, ""),
         line: row.Line ?? 1,
         column: row.Span?.[0] ?? 1,
         said: row.Match ?? "",

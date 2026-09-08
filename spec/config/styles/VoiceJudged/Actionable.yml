@@ -1,0 +1,11 @@
+# A model holds this rule. No pattern decides it.
+# Vale never reads this folder, because .vale.ini names VoiceQuackitect alone.
+extends: judge
+message: "Write what the reader does next. Put the background in spec/rationales."
+link: spec/guidance/guidance.md
+level: error
+ask: "Does this text tell the reader something they can act on, or does it explain where something came from, what once happened, or how many of something there were?"
+labels:
+  - actionable
+  - background
+refuses: background

@@ -8,7 +8,7 @@ explains: [[spec/guidance/voice]]
 Agents tend to write slop. The audience are non-native speakers whose patience
 runs short, so the prose stays terse and the vocabulary stays settled.
 
-Vale holds the mechanical rules in [[spec/config/styles/VoiceQuackitect]]. What
+Vale holds the mechanical rules in [[spec/config/styles/VoiceVale]]. What
 stays in the guidance needs a person or a model.
 
 ## 1. Say what is

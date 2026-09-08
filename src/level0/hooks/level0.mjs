@@ -12,7 +12,7 @@
 import { lintText, VALE } from "../lib/vale.mjs";
 import { refusal, taught } from "../lib/refuse.mjs";
 import { standingLayer } from "../lib/guidance.mjs";
-import { tooMuchProse, IN_AN_ANSWER, IN_A_DOCUMENT } from "../lib/shape.mjs";
+import { readRule } from "../lib/rulefile.mjs";
 import { judgeOf } from "../lib/judge.mjs";
 
 // The prose the write door reads. Vale itself decides what inside a file is
@@ -21,6 +21,11 @@ const PROSE = /\.(md|markdown|txt)$/i;
 const GUIDANCE = "spec/guidance";
 const CONFIG = "spec/config/level0.json";
 const HANDOVER = ".se/HANDOVER.md";
+const JUDGED = "spec/config/styles/VoiceJudged";
+
+// The name an answer arrives under, so .vale.ini can hold it to a tighter
+// limit than a file takes.
+const ANSWER = "level0-answer.md";
 
 export function register(on, options) {
   // Module state survives between hooks in one session, so the linter is found
@@ -67,13 +72,16 @@ export function register(on, options) {
       });
       if (said.ran) found.push(...said.found);
     }
-    found.push(...tooMuchProse(writing.text, config.shape?.inADocument ?? IN_A_DOCUMENT));
 
     // The model last, and only when it earns the call. It spends one call per
-    // span, so it runs where the patterns already passed.
-    if (!found.length && judge.reads()) {
-      found.push(...await judge.run(writing.text,
-        (text, labels, opts) => $.model.classify(text, labels, opts)));
+    // span, so it runs where the patterns already passed. The rules are read
+    // per write, so a rule a person adds holds on the next one.
+    if (!found.length) {
+      judge = judgeOf(config, await readRules($, JUDGED));
+      if (judge.reads()) {
+        found.push(...await judge.run(writing.text,
+          (text, labels, opts) => $.model.classify(text, labels, opts)));
+      }
     }
 
     if (!found.length) {
@@ -89,37 +97,41 @@ export function register(on, options) {
   // cannot refuse a turn, so the note is drawn beneath the answer.
   on("turn.complete", async ($, e, next) => {
     const said = await next(e);
-    if (!e.answer || e.reason !== "answer") return said;
+    if (!bin || !e.answer || e.reason !== "answer") return said;
 
-    const found = tooMuchProse(e.answer, config.shape?.inAnAnswer ?? IN_AN_ANSWER);
-    if (!found.length) return said;
+    // The answer goes to Vale under its own name, so .vale.ini holds it to the
+    // tighter limit a reader skimming an answer wants.
+    const ran = await lintText(e.answer, ANSWER, {
+      bin,
+      run: (argv, init) => $.process.run(argv, init),
+    });
+    if (!ran.ran || !ran.found.length) return said;
 
     return {
       ...said,
-      text: [said.text, "", found.map((one) => "  " + one.message).join("\n"), "",
-        "  " + taught(found)].filter(Boolean).join("\n"),
+      text: [said.text, "", ran.found.map((one) => "  " + one.message).join("\n"), "",
+        "  " + taught(ran.found)].filter(Boolean).join("\n"),
     };
   });
 
-  // THE STANDING LAYER, INJECTED AND NEVER PROJECTED. Every guidance note's
-  // Actionables chapter reaches the model inside the system prompt, computed
-  // here at session start.
+  // EVERYTHING THE AGENT READS ARRIVES HERE, ONCE. This event computes the
+  // context blocks a conversation's first user message carries, so it fires
+  // once per conversation and again when the context is cleared.
   //
-  // A projection would write the same text into a file in the tree, and a guard
-  // would then be needed to keep that copy honest. A copy nobody can edit needs
-  // no guard.
+  // The system prompt's sections stay free for guidance that depends on where
+  // the work stands, which is a later thing. A rule that always holds belongs
+  // in the conversation, where a compaction brings it back.
   //
-  // THE MATCHER IS NOT OPTIONAL. This event fires once for each of the two
-  // dozen sections the engine assembles, so a hook without one appends the
-  // rules to every section and to the empty ones as well. `output_style` is the
-  // slot that carries how the agent works, which is what these rules are.
-  on("prompt.section", { name: "output_style" }, async ($, e, next) => {
-    if (!standing) return next(e);
-    return next({
-      ...e,
-      text: [
-        e.text,
-        [
+  // Nothing here is projected into a file. A copy nobody can edit needs no
+  // guard to keep it honest.
+  on("prompt.context", async ($, e, next) => {
+    const said = await next(e);
+    const blocks = [...said.blocks];
+
+    if (standing) {
+      blocks.push({
+        name: "level0-rules",
+        text: [
           "# How this tree is worked",
           "",
           "These rules reach you before anything else. Vale holds the mechanical",
@@ -128,20 +140,8 @@ export function register(on, options) {
           "",
           standing,
         ].join("\n"),
-      ].filter(Boolean).join("\n\n"),
-    });
-  });
-
-  // THE RECEIPT, ASKED ONCE. This event computes the blocks the first user
-  // message carries, so it fires once per conversation. The ask rides here
-  // rather than in the system prompt, where it would ask on every answer.
-  //
-  // The agent counts the rules itself. A number handed to it proves nothing,
-  // because repeating a constant is not reading.
-  on("prompt.context", async ($, e, next) => {
-    if (!standing && !handover) return next(e);
-    const said = await next(e);
-    const blocks = [...said.blocks];
+      });
+    }
 
     // The last session's handover, read once and already deleted. Nobody has to
     // remember to clear it, so nobody leaves a stale one.
@@ -158,43 +158,25 @@ export function register(on, options) {
       });
     }
 
-    if (!standing) return { ...said, blocks };
-    return {
-      ...said,
-      blocks: [
-        ...blocks,
-        {
-          name: "level0",
-          text: [
-            "End your FIRST answer of this conversation with one last line, on its own:",
-            "",
-            "    rules: <n>",
-            "",
-            "where <n> is how many numbered rules stand in the section naming how this",
-            "tree is worked, counted across every heading there. Count them and write",
-            "what you counted. Write this line once and never again in this",
-            "conversation.",
-          ].join("\n"),
-        },
-      ],
-    };
-  });
-}
-
-// The Actionables chapter of every guidance note, and no other chapter. The
-// argument behind a rule stays on disk for a reader who disagrees with it.
-async function readGuidance($) {
-  try {
-    const entries = await $.fs.listDir(GUIDANCE);
-    const notes = [];
-    for (const one of entries) {
-      if (!one.name.endsWith(".md")) continue;
-      notes.push({ name: one.name, text: await $.fs.readFile(GUIDANCE + "/" + one.name) });
+    // The receipt. The agent counts the rules itself, because a number handed
+    // to it proves nothing: repeating a constant is not reading.
+    if (standing) {
+      blocks.push({
+        name: "level0-receipt",
+        text: [
+          "End your FIRST answer with one last line, on its own:",
+          "",
+          "    rules: <n>",
+          "",
+          "where <n> is how many numbered rules stand in the section naming how",
+          "this tree is worked, counted across every heading there. Count them",
+          "and write what you counted. Write this line once and never again.",
+        ].join("\n"),
+      });
     }
-    return standingLayer(notes);
-  } catch {
-    return "";
-  }
+
+    return { ...said, blocks };
+  });
 }
 
 // Reads the handover the last session left, then deletes it, so the next
@@ -226,6 +208,39 @@ async function takeHandover($) {
     }
   }
   return text;
+}
+
+// The Actionables chapter of every guidance note, and no other chapter. The
+// argument behind a rule stays on disk for a reader who disagrees with it.
+async function readGuidance($) {
+  try {
+    const entries = await $.fs.listDir(GUIDANCE);
+    const notes = [];
+    for (const one of entries) {
+      if (!one.name.endsWith(".md")) continue;
+      notes.push({ name: one.name, text: await $.fs.readFile(GUIDANCE + "/" + one.name) });
+    }
+    return standingLayer(notes);
+  } catch {
+    return "";
+  }
+}
+
+// The rules of one folder, one file each. Read per write rather than once per
+// session, so a rule a person adds holds on the next write.
+async function readRules($, folder) {
+  try {
+    const entries = await $.fs.listDir(folder);
+    const out = [];
+    for (const one of entries) {
+      if (!one.name.endsWith(".yml")) continue;
+      const rule = readRule(await $.fs.readFile(folder + "/" + one.name));
+      out.push({ ...rule, name: one.name.replace(/\.yml$/, "") });
+    }
+    return out;
+  } catch {
+    return [];
+  }
 }
 
 // The switches a person owns. A missing file leaves every default standing, so

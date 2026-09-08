@@ -35,7 +35,7 @@ const ruled = async (text) => {
 test("a finding is read out of Vale's JSON", () => {
   const found = fromJson(JSON.stringify({
     "notes.md": [{
-      Check: "VoiceQuackitect.Antithesis", Line: 3, Span: [14, 24],
+      Check: "VoiceVale.Antithesis", Line: 3, Span: [14, 24],
       Match: "rather than", Message: "Say what is.", Severity: "error",
       Action: { Name: "" },
     }],
@@ -52,10 +52,10 @@ test("output that is not JSON answers no finding", () => {
 });
 
 test("an exemption naming a reason passes, and one naming none is refused", () => {
-  const with_ = "<!-- because: the phrase is being quoted -->\n<!-- vale VoiceQuackitect.Antithesis = NO -->\nIt is a door rather than a window.";
+  const with_ = "<!-- because: the phrase is being quoted -->\n<!-- vale VoiceVale.Antithesis = NO -->\nIt is a door rather than a window.";
   assert.deepEqual(unreasoned(with_), []);
 
-  const without = "<!-- vale VoiceQuackitect.Antithesis = NO -->\nIt is a door rather than a window.";
+  const without = "<!-- vale VoiceVale.Antithesis = NO -->\nIt is a door rather than a window.";
   const found = unreasoned(without);
   assert.equal(found.length, 1);
   assert.equal(found[0].rule, "ExemptionCarriesAReason");

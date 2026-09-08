@@ -1,24 +1,11 @@
 {
-  "shape": {
-    "comment": "How many plain paragraphs may run together before a list, a table or a diagram is wanted. Mechanical, and always on.",
-    "inAnAnswer": 1,
-    "inADocument": 3
-  },
+  "comment": "The controls for level zero. Every rule lives in spec/config/styles, one file each: VoiceVale for the rules Vale holds, VoiceJudged for the rules a model holds.",
   "judge": {
-    "comment": "The rules no pattern holds. A model answers one label per span. Switch this off where it costs more than it earns.",
+    "comment": "Switch the model off where it costs more than it earns. The mechanical rules ignore this.",
     "enabled": true,
     "model": "haiku",
     "maxSpans": 24,
     "warmupWrites": 4,
-    "thenEveryNth": 3,
-    "rules": [
-      {
-        "name": "Actionable",
-        "ask": "Does this text tell the reader something they can act on, or does it explain where something came from, what once happened, or how many of something there were?",
-        "labels": ["actionable", "background"],
-        "refuses": "background",
-        "instead": "Write what the reader does next. Put the background in spec/rationales."
-      }
-    ]
+    "thenEveryNth": 3
   }
 }
