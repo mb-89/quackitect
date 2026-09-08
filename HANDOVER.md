@@ -1,6 +1,6 @@
 ---
 kind: [[handover]]
-status: held
+status: done
 ---
 
 # The editor holds the rules the write door holds
