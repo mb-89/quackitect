@@ -7,7 +7,13 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
-import { actionables, parse, standingLayer } from "../lib/guidance.js";
+import {
+  actionables,
+  bindsHere,
+  envOf,
+  parse,
+  standingLayer,
+} from "../lib/guidance.js";
 
 const root = dirname(dirname(dirname(dirname(fileURLToPath(import.meta.url)))));
 const GUIDANCE = join(root, "spec", "guidance");
@@ -80,5 +86,43 @@ test("every guidance note in this tree carries actionables", () => {
       rules.length <= 10,
       `${name} holds ten rules or fewer, and holds ${rules.length}`,
     );
+  }
+});
+
+test("a note naming no variable binds every box", () => {
+  assert.equal(bindsHere(note, {}), true);
+  assert.deepEqual(envOf(note), []);
+});
+
+test("a note names the variables it waits for", () => {
+  const waits = `---\nkind: [[guidance]]\nenv:\n  - ONE\n  - TWO\n---\n\n# Actionables\n\n1. Do it.\n`;
+  assert.deepEqual(envOf(waits), ["ONE", "TWO"]);
+  assert.equal(bindsHere(waits, {}), false, "no variable set");
+  assert.equal(bindsHere(waits, { TWO: "1" }), true, "one of them is enough");
+});
+
+test("an empty, zero or false value switches nothing on", () => {
+  const waits = `---\nkind: [[guidance]]\nenv: ONE\n---\n\n# Actionables\n\n1. Do it.\n`;
+  for (const said of ["", "0", "false", "FALSE", "  "]) {
+    assert.equal(
+      bindsHere(waits, { ONE: said }),
+      false,
+      `${JSON.stringify(said)} is no value`,
+    );
+  }
+  for (const said of ["1", "true", "yes"]) {
+    assert.equal(
+      bindsHere(waits, { ONE: said }),
+      true,
+      `${JSON.stringify(said)} is a value`,
+    );
+  }
+});
+
+test("every guidance note in this tree names variables that exist or none", () => {
+  for (const name of readdirSync(GUIDANCE).filter((n) => n.endsWith(".md"))) {
+    for (const one of envOf(readFileSync(join(GUIDANCE, name), "utf8"))) {
+      assert.match(one, /^[A-Z][A-Z0-9_]*$/, `${name} names ${one} as a variable`);
+    }
   }
 });

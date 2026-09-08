@@ -80,17 +80,24 @@ handover and the receipt arrive.
 The system prompt's sections stay free for guidance that depends on where the
 work stands.
 
-## Guidance that binds one kind of box
+## Guidance a variable switches on
 
-A guidance note may carry `only: cloud` or `only: desk` in its frontmatter, and
-level zero hands it over on that kind of box alone.
+A guidance note names the environment variables it waits for:
 
-`CLAUDE_CODE_REMOTE` says which box this is, and `SE_CLOUD` says so on a harness
-the table does not know. `./RUNME.sh standing` reads the same variables, so a
-person sees what a cloud box sees by setting one.
+    env:
+      - CLAUDE_CODE_REMOTE
+      - SE_CLOUD
 
-Every rule spends attention the other rules need, so a rule about pushing from
-a box that dies has no business on a desk.
+Level zero hands that note over where one of them carries a value. A note
+naming none binds every box, and `0`, `false` and an empty string count as no
+value.
+
+The variable does the deciding, so a new kind of box needs a new note and no
+code. `spec/guidance/cloud.md` waits for the two above, which is how a cloud
+session reads its own rules and a desk session skips them.
+
+`./RUNME.sh standing` reads the same variables, so setting one shows a person
+exactly what that box reads.
 
 ## Why the rules stay out of the tree
 

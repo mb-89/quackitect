@@ -1,7 +1,9 @@
 ---
 kind: [[guidance]]
 scope: ["a session on a cloud box, where nobody sits beside it"]
-only: cloud
+env:
+  - CLAUDE_CODE_REMOTE
+  - SE_CLOUD
 rationale: [[spec/rationales/cloud]]
 ---
 

@@ -10,7 +10,7 @@ import {
   formatText,
   lintText as lintCode,
 } from "../lib/code.js";
-import { onlyOf, standingLayer } from "../lib/guidance.js";
+import { bindsHere, envOf, standingLayer } from "../lib/guidance.js";
 import { judgeOf } from "../lib/judge.js";
 import { refusal, taught } from "../lib/refuse.js";
 import { readRule } from "../lib/rulefile.js";
@@ -37,7 +37,7 @@ export function register(on, _options) {
     bin = await linterHere($);
     if (!bin) bin = await install($);
     formatter = await formatterHere($);
-    standing = await readGuidance($, await onCloud($));
+    standing = await readGuidance($);
     config = await readConfig($);
     judge = judgeOf(config);
     handover = await takeHandover($);
@@ -205,34 +205,35 @@ async function erase($, path) {
   }
 }
 
-// [[spec/design_output/level0#guidance-that-binds-one-kind-of-box]]
-async function readGuidance($, cloud) {
+// [[spec/design_output/level0#guidance-a-variable-switches-on]]
+async function readGuidance($) {
   try {
     const entries = await $.fs.listDir(GUIDANCE);
     const notes = [];
+    const wanted = new Set();
     for (const one of entries) {
       if (!one.name.endsWith(".md")) continue;
       const text = await $.fs.readFile(`${GUIDANCE}/${one.name}`);
-      const only = onlyOf(text);
-      if (only === "cloud" && !cloud) continue;
-      if (only === "desk" && cloud) continue;
       notes.push({ name: one.name, text });
+      for (const name of envOf(text)) wanted.add(name);
     }
-    return standingLayer(notes);
+    const env = await readEnv($, [...wanted]);
+    return standingLayer(notes.filter((one) => bindsHere(one.text, env)));
   } catch {
     return "";
   }
 }
 
-async function onCloud($) {
+// The module reads no environment of its own, so it asks the host for the
+// variables the notes name, in one call.
+async function readEnv($, names) {
+  if (!names.length) return {};
+  const script = `console.log(JSON.stringify(${JSON.stringify(names)}.reduce((o,n)=>(o[n]=process.env[n]??"",o),{})))`;
   try {
-    const ran = await $.process.run(
-      ["node", "-p", "process.env.CLAUDE_CODE_REMOTE || process.env.SE_CLOUD || ''"],
-      { timeoutMs: 10000 },
-    );
-    return Boolean((ran.stdout ?? "").trim());
+    const ran = await $.process.run(["node", "-e", script], { timeoutMs: 10000 });
+    return JSON.parse((ran.stdout ?? "{}").trim() || "{}");
   } catch {
-    return false;
+    return {};
   }
 }
 
