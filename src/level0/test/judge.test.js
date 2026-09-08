@@ -6,6 +6,15 @@ import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import {
+  CONTRACT_HEADING,
+  DONE,
+  HELD,
+  setStatus,
+  statusOf,
+  TODO,
+  withContract,
+} from "../../scripts/work.js";
 import { judgeOf, spansIn } from "../lib/judge.js";
 import { readRule } from "../lib/rulefile.js";
 
@@ -121,4 +130,20 @@ test("the judge reads every warmup write, then samples, and a breach resets it",
 
   judge.sawBreach();
   assert.equal(judge.reads(), true, "a breach puts it back to reading everything");
+});
+
+test("every brief carries the contract, and adding it twice changes nothing", () => {
+  const once = withContract("# A brief\n\nDo the thing.\n");
+  assert.ok(once.includes(CONTRACT_HEADING), "the contract lands");
+  assert.ok(once.includes("./RUNME.sh work done"), "it names how to finish");
+  assert.ok(once.includes("./RUNME.sh work release"), "it names how to stop early");
+  assert.equal(withContract(once), once, "a second pass changes nothing");
+});
+
+test("the status moves through todo, held and done", () => {
+  const brief = setStatus("# A brief\n", TODO);
+  assert.equal(statusOf(brief), TODO);
+  assert.equal(statusOf(setStatus(brief, HELD)), HELD);
+  assert.equal(statusOf(setStatus(setStatus(brief, HELD), DONE)), DONE);
+  assert.equal(statusOf("# No frontmatter\n"), "");
 });

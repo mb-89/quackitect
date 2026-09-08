@@ -66,3 +66,14 @@ dressed as a rule, and everybody who clones reads it.
 Level zero reads both at session start and deletes both. An instruction to
 delete a file is a rule somebody forgets, and a door that consumes the file
 leaves nothing to forget.
+
+The cost lands on the other end. Nothing carries a handover forward unless a
+session writes a new one, under the same name:
+
+| where you work | write | then |
+|---|---|---|
+| your own box | `.se/HANDOVER.md` | nothing, git ignores it |
+| a work branch | `HANDOVER.md` | `./RUNME.sh work done`, which pushes it |
+
+A session that finishes without writing one leaves the next session with
+nothing, and the branch says `held` for ever.

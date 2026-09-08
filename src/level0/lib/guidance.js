@@ -32,9 +32,22 @@ function frontOf(text) {
   const found = /^---\r?\n([\s\S]*?)\r?\n---/.exec(String(text ?? ""));
   if (!found) return {};
   const out = {};
+  let list = null;
   for (const line of found[1].split(/\r?\n/)) {
+    const item = /^\s*-\s+(.*)$/.exec(line);
+    if (item && list) {
+      out[list].push(item[1].trim());
+      continue;
+    }
     const pair = /^([a-z_]+):\s*(.*)$/.exec(line);
-    if (pair) out[pair[1]] = pair[2];
+    if (!pair) continue;
+    if (pair[2].trim()) {
+      list = null;
+      out[pair[1]] = pair[2];
+    } else {
+      out[pair[1]] = [];
+      list = pair[1];
+    }
   }
   return out;
 }
@@ -60,6 +73,28 @@ export function actionables(text) {
   }
   if (held) out.push(held);
   return out.map((one) => one.replace(/\s*\*$/, "").trim()).filter(Boolean);
+}
+
+// [[spec/design_output/level0#guidance-a-variable-switches-on]]
+export function envOf(text) {
+  const said = parse(text).front.env;
+  if (!said) return [];
+  return (Array.isArray(said) ? said : [said])
+    .map((one) => String(one).trim())
+    .filter(Boolean);
+}
+
+export function bindsHere(text, env) {
+  const wants = envOf(text);
+  if (!wants.length) return true;
+  return wants.some((name) => truthy(env?.[name]));
+}
+
+function truthy(said) {
+  const t = String(said ?? "")
+    .trim()
+    .toLowerCase();
+  return Boolean(t) && t !== "0" && t !== "false";
 }
 
 export function standingLayer(notes) {

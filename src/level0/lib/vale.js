@@ -69,8 +69,16 @@ export function fromJson(stdout) {
 export function unreasoned(text) {
   const lines = String(text ?? "").split(/\r?\n/);
   const out = [];
+  let fenced = false;
   for (let i = 0; i < lines.length; i++) {
-    const found = MARKER.exec(lines[i]);
+    if (/^\s*(```|~~~)/.test(lines[i])) {
+      fenced = !fenced;
+      continue;
+    }
+    if (fenced) continue;
+
+    const bare = lines[i].replace(/`[^`]*`/g, "");
+    const found = MARKER.exec(bare);
     if (!found) continue;
     const above = i > 0 ? lines[i - 1] : "";
     if (REASON.test(lines[i]) || REASON.test(above)) continue;

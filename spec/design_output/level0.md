@@ -80,6 +80,25 @@ handover and the receipt arrive.
 The system prompt's sections stay free for guidance that depends on where the
 work stands.
 
+## Guidance a variable switches on
+
+A guidance note names the environment variables it waits for:
+
+    env:
+      - CLAUDE_CODE_REMOTE
+      - SE_CLOUD
+
+Level zero hands that note over where one of them carries a value. A note
+naming none binds every box, and `0`, `false` and an empty string count as no
+value.
+
+The variable does the deciding, so a new kind of box needs a new note and no
+code. `spec/guidance/cloud.md` waits for the two above, which is how a cloud
+session reads its own rules and a desk session skips them.
+
+`./RUNME.sh standing` reads the same variables, so setting one shows a person
+exactly what that box reads.
+
 ## Why the rules stay out of the tree
 
 A projection writes the rules into a file, and a guard then has to keep that
