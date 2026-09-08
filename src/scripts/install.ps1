@@ -52,8 +52,12 @@ function Get-Vale {
 
 function Get-ValeLs {
   $arch = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "arm64" } else { "64-bit" }
-  $servers = Join-Path $root "src\level0\lib\servers.js"
-  $from = & node --input-type=module -e "import { valeLsUrl } from 'file:///$($servers -replace '\\','/')'; process.stdout.write(valeLsUrl('Windows', '$arch'));"
+  Push-Location $root
+  try {
+    $from = & node --input-type=module -e "import { valeLsUrl } from './src/level0/lib/servers.js'; process.stdout.write(valeLsUrl('Windows', '$arch'));"
+  } finally {
+    Pop-Location
+  }
   if (-not $from) { throw "vale-ls ships no binary for Windows $arch." }
   $zip = Join-Path $env:TEMP (Split-Path $from -Leaf)
 

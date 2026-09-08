@@ -5,7 +5,12 @@
 export const SCRIPT = /\.(sh|ps1)$/i;
 
 const INLINE = /(?:^|\s)(-e|--input-type|-Command|-c)\s/;
-const INTERPOLATED = /\$\{?[A-Za-z_][A-Za-z0-9_]*\}?[/]/;
+
+// A path built from a variable, in either shell's spelling: $root/ and ${root}/
+// in sh, and PowerShell's $(...) subexpression, which carries a whole path.
+const INTERPOLATED = new RegExp(
+  ["\\$\\{?[A-Za-z_][A-Za-z0-9_:]*\\}?[/\\\\]", "file:///\\$", "['\"]\\$\\("].join("|"),
+);
 
 export function pathInScript(text, where) {
   const out = [];
