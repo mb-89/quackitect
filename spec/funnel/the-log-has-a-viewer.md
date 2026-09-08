@@ -12,7 +12,7 @@ here is the log format, and the viewer is a download.
 The acceptance test is one thing: it runs inside the editor's integrated
 terminal, where a person already sits.
 
-## What an earlier line built, and what it cost
+## What an earlier line builds, and what it pays
 
 That line wrote its own viewer: 2426 lines of Go over Bubble Tea, Lipgloss and
 fsnotify, reading a file and opening a detail beside it.
@@ -21,7 +21,7 @@ It carries a flag called `--keys`, whose help reads "print every key this
 terminal sends, and nothing else". A flag like that exists because keys stopped
 working somewhere, and the fastest way to find out was to ask the terminal.
 
-So the cost of building was 2426 lines and a key problem that outlived them.
+So building costs 2426 lines and a key problem that outlives them.
 
 ## What is on the shelf
 
@@ -45,6 +45,44 @@ than a person asked for, which costs a little learning and no correctness.
 Neither can be judged from a piped shell, because a TUI wants a real terminal.
 So this decision waits on somebody opening the integrated terminal and running
 both.
+
+## Opening one line, which is the thing that matters
+
+The earlier viewer put the full content in a panel beside the list. lnav swaps
+the whole screen instead:
+
+| what | lnav |
+|---|---|
+| open the focused line | `Shift+P` enters the PRETTY view |
+| walk the structure | a breadcrumb bar across the top |
+| go back | `q` |
+| a field's own detail | right-click opens the parser overlay |
+
+One key in, one key out, the whole message readable. The panel is gone and the
+gesture survives.
+
+## The format file is where the reading is decided
+
+lnav takes a format definition, and `line-format` names the fields that stand on
+the main row. EVERY FIELD LEFT OUT BECOMES A DETAIL LINE UNDER IT, which is
+nearer the earlier panel than the PRETTY view is.
+
+So the log is designed for the viewer rather than the other way round: a handful
+of fields on the row, everything else opening beneath it.
+
+    {
+      "$schema": "https://lnav.org/schemas/format-v1.schema.json",
+      "quackitect_log": {
+        "title": "quackitect",
+        "timestamp-field": "at",
+        "line-format": [{"field": "at"}, " ", {"field": "door"}, " ", {"field": "said"}],
+        "sample": [{"line": "{\"at\":\"2026-01-01T00:00:00Z\",\"door\":\"write\",\"said\":\"refused\"}"}]
+      }
+    }
+
+A format installs with `lnav -i <file>`, which copies it into the reader's own
+folder. It loads from no project directory, so the install script runs that line
+the way it runs every other.
 
 ## What this tree owes before either helps
 
