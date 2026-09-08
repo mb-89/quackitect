@@ -9,6 +9,7 @@ import { biomeBin } from "../level0/lib/code.js";
 import { actionables, standingLayer } from "../level0/lib/guidance.js";
 import { line as asLine } from "../level0/lib/refuse.js";
 import { CONFIG, fromJson, unreasoned, valeBin } from "../level0/lib/vale.js";
+import { work } from "./work.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const bin = join(root, valeBin(process.platform));
@@ -51,11 +52,16 @@ const verbs = {
     says: "what is installed, and what level zero found",
     run: async () => doctor(),
   },
+  work: {
+    says: "work branches: new, take, read, list",
+    run: async () => work(root, rest),
+  },
 };
 
 const argv = process.argv.slice(2);
 const verb = argv.find((a) => !a.startsWith("-")) ?? "help";
 const where = argv.filter((a) => !a.startsWith("-") && a !== verb);
+const rest = argv.slice(argv.indexOf(verb) + 1);
 
 if (verb === "help" || !verbs[verb]) {
   if (verb !== "help") console.error(`se: there is no verb called ${verb}\n`);

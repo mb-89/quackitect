@@ -20,6 +20,7 @@ const PROSE = /\.(md|markdown|txt)$/i;
 const GUIDANCE = "spec/guidance";
 const CONFIG = "spec/config/level0.json";
 const HANDOVER = ".se/HANDOVER.md";
+const BRIEF = "HANDOVER.md";
 const JUDGED = "spec/config/styles/VoiceJudged";
 
 const ANSWER = "level0-answer.md";
@@ -30,7 +31,7 @@ export function register(on, _options) {
   let standing = "";
   let config = {};
   let judge = judgeOf({});
-  let handover = "";
+  let handover = [];
 
   on("session.start", async ($, e, next) => {
     bin = await linterHere($);
@@ -132,15 +133,20 @@ export function register(on, _options) {
       });
     }
 
-    if (handover) {
+    for (const one of handover) {
+      const tracked = one.path === BRIEF;
       blocks.push({
-        name: "level0-handover",
+        name: tracked ? "level0-brief" : "level0-handover",
         text: [
-          "The last session on this box left this handover. It is already",
-          "deleted, so act on it now and leave a new one at .se/HANDOVER.md",
-          "before you finish.",
+          tracked
+            ? `This branch carries its work in ${BRIEF}, which git tracks.`
+            : `The last session on this box left ${HANDOVER}, which git ignores.`,
+          "Level zero has read it and deleted it, so act on it now.",
+          tracked
+            ? `Write what you did back to ${BRIEF}, then commit and push it.`
+            : `Leave the next session a new ${HANDOVER} before you finish.`,
           "",
-          handover.trim(),
+          one.text.trim(),
         ].join("\n"),
       });
     }
@@ -164,25 +170,34 @@ export function register(on, _options) {
   });
 }
 
+// [[spec/design_output/work#two-handovers]]
 async function takeHandover($) {
-  let text = "";
-  try {
-    text = await $.fs.readFile(HANDOVER);
-  } catch {
-    return "";
+  const said = [];
+  for (const path of [HANDOVER, BRIEF]) {
+    let text = "";
+    try {
+      text = await $.fs.readFile(path);
+    } catch {
+      continue;
+    }
+    if (!text.trim()) continue;
+    said.push({ path, text });
+    await erase($, path);
   }
-  if (!text.trim()) return "";
+  return said;
+}
 
+async function erase($, path) {
+  const windows = path.split("/").join("\\");
   for (const argv of [
-    ["rm", "-f", HANDOVER],
-    ["cmd", "/c", "del", "/q", ".se\\HANDOVER.md"],
+    ["rm", "-f", path],
+    ["cmd", "/c", "del", "/q", windows],
   ]) {
     try {
       const ran = await $.process.run(argv, { timeoutMs: 10000 });
-      if (ran.exitCode === 0) break;
+      if (ran.exitCode === 0) return;
     } catch {}
   }
-  return text;
 }
 
 async function readGuidance($) {

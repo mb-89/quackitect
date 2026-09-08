@@ -52,8 +52,17 @@ Another box reads that and acts on something untrue there. It also goes stale
 the moment somebody writes it. A file in the tree carrying last week's state is
 the drift every other rule here works to prevent.
 
-So it lives under `.se`, which git ignores and which stays on one box.
+So the local one lives under `.se`, which git ignores and which stays on one box.
 
-Level zero reads it at session start and deletes it. An instruction to delete a
-file is a rule somebody forgets; a door that consumes the file leaves nothing to
-forget.
+A work branch wants the other thing:
+
+- a cloud box gets only what git carries, so a brief under `.se` briefs nobody
+- `HANDOVER.md` sits at the root there, and git tracks it
+- the branch scopes it, so two pieces of work stay apart
+
+`main` refuses that file. A handover on the trunk is a note about one moment
+dressed as a rule, and everybody who clones reads it.
+
+Level zero reads both at session start and deletes both. An instruction to
+delete a file is a rule somebody forgets, and a door that consumes the file
+leaves nothing to forget.
