@@ -14,5 +14,5 @@ rationale: [[spec/rationales/guidance]]
 6. Give a rule needing argument a star, and argue it in the rationale under its number.
 7. Move a rule a program can check to that program, and leave a link in its place. *
 8. Write the present tense. `spec/rationales` is the one place the past tense belongs.
-9. Name the command that answers a count, and write no count a command answers.
+9. Leave the next session a handover at `.se/HANDOVER.md`, which stays on this box. *
 10. Write this chapter to stand alone, because level zero hands the reader this and nothing else.

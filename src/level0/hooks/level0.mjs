@@ -20,6 +20,7 @@ import { judgeOf } from "../lib/judge.mjs";
 const PROSE = /\.(md|markdown|txt)$/i;
 const GUIDANCE = "spec/guidance";
 const CONFIG = "spec/config/level0.json";
+const HANDOVER = ".se/HANDOVER.md";
 
 export function register(on, options) {
   // Module state survives between hooks in one session, so the linter is found
@@ -28,6 +29,7 @@ export function register(on, options) {
   let standing = "";
   let config = {};
   let judge = judgeOf({});
+  let handover = "";
 
   on("session.start", async ($, e, next) => {
     bin = await linterHere($);
@@ -35,6 +37,7 @@ export function register(on, options) {
     standing = await readGuidance($);
     config = await readConfig($);
     judge = judgeOf(config);
+    handover = await takeHandover($);
 
     try {
       await $.fs.writeFile(".se/level0.stamp",
@@ -136,12 +139,30 @@ export function register(on, options) {
   // The agent counts the rules itself. A number handed to it proves nothing,
   // because repeating a constant is not reading.
   on("prompt.context", async ($, e, next) => {
-    if (!standing) return next(e);
+    if (!standing && !handover) return next(e);
     const said = await next(e);
+    const blocks = [...said.blocks];
+
+    // The last session's handover, read once and already deleted. Nobody has to
+    // remember to clear it, so nobody leaves a stale one.
+    if (handover) {
+      blocks.push({
+        name: "level0-handover",
+        text: [
+          "The last session on this box left this handover. It is already",
+          "deleted, so act on it now and leave a new one at .se/HANDOVER.md",
+          "before you finish.",
+          "",
+          handover.trim(),
+        ].join("\n"),
+      });
+    }
+
+    if (!standing) return { ...said, blocks };
     return {
       ...said,
       blocks: [
-        ...said.blocks,
+        ...blocks,
         {
           name: "level0",
           text: [
@@ -174,6 +195,37 @@ async function readGuidance($) {
   } catch {
     return "";
   }
+}
+
+// Reads the handover the last session left, then deletes it, so the next
+// session never picks up a stale one. Deleting it here rather than asking the
+// agent to leaves nothing for anybody to forget.
+//
+// The text is already in this module's own state by the time the file goes, so
+// the delete costs the session nothing.
+async function takeHandover($) {
+  let text = "";
+  try {
+    text = await $.fs.readFile(HANDOVER);
+  } catch {
+    return "";
+  }
+  if (!text.trim()) return "";
+
+  // $.fs writes and reads and does not delete, so the shell does it. A box
+  // carrying neither shell keeps the file, and the next session reads it twice.
+  for (const argv of [
+    ["rm", "-f", HANDOVER],
+    ["cmd", "/c", "del", "/q", ".se\\HANDOVER.md"],
+  ]) {
+    try {
+      const ran = await $.process.run(argv, { timeoutMs: 10000 });
+      if (ran.exitCode === 0) break;
+    } catch {
+      // The next way answers.
+    }
+  }
+  return text;
 }
 
 // The switches a person owns. A missing file leaves every default standing, so

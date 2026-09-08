@@ -39,3 +39,21 @@ once.
 The prose costs attention and changes nothing, because the program refuses the
 breach either way. So the rule belongs to the program, and the prose keeps a
 link to it.
+
+## 9. Why the handover stays on the box
+
+A handover names what one box holds right now:
+
+- what stands half-built
+- what the last session learned the hard way
+- what to pick up first
+
+Another box reads that and acts on something untrue there. It also goes stale
+the moment somebody writes it. A file in the tree carrying last week's state is
+the drift every other rule here works to prevent.
+
+So it lives under `.se`, which git ignores and which stays on one box.
+
+Level zero reads it at session start and deletes it. An instruction to delete a
+file is a rule somebody forgets; a door that consumes the file leaves nothing to
+forget.
