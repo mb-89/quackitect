@@ -102,6 +102,8 @@ func main() {
 		return
 	}
 	if *root == "" {
+		// install.sh runs go run . from src/scripts/setup, which is three
+		// folders below the root, so the walk goes up three.
 		here, _ := os.Getwd()
 		at, ok := theTreeRootAbove(here)
 		if !ok {

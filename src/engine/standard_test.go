@@ -382,7 +382,7 @@ func TestTheQueueIsStaffed(t *testing.T) {
 func theParametersSay(t *testing.T, r Roots, key string, value any) {
 	t.Helper()
 	for _, name := range []string{"parameters.json", "icons.json"} {
-		b, err := os.ReadFile(filepath.Join("..", "..", "src", "config", name))
+		b, err := os.ReadFile(DeclaredAt(filepath.Join("..", ".."), name))
 		if err != nil {
 			t.Fatal(err)
 		}

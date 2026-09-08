@@ -6,6 +6,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"unicode"
 )
 
 // THE MECHANICAL VOICE CHECK, AT THE WRITE PATH.
@@ -133,11 +134,12 @@ func SentencesIn(line string) []string {
 	}
 	// Go's regular expressions have no lookbehind, so the terminator is kept
 	// by splitting after it rather than before the space.
+	said := []rune(line)
 	var out []string
 	cur := strings.Builder{}
-	for _, r := range line {
+	for i, r := range said {
 		cur.WriteRune(r)
-		if r == '.' || r == '!' || r == '?' {
+		if endsASentence(said, i) {
 			out = append(out, cur.String())
 			cur.Reset()
 		}
@@ -146,6 +148,33 @@ func SentencesIn(line string) []string {
 		out = append(out, cur.String())
 	}
 	return out
+}
+
+// endsASentence answers whether the stop at i closes a sentence.
+//
+// A stop inside a word belongs to the word. This tree writes .md, $.model.classify
+// and 2.1.263 in ordinary prose, and cutting at each one made a paragraph of one
+// sentence break a limit of six. A run of stops is an ellipsis and closes nothing.
+func endsASentence(said []rune, i int) bool {
+	switch said[i] {
+	case '.', '!', '?':
+	default:
+		return false
+	}
+	if i > 0 && said[i-1] == '.' {
+		return false
+	}
+	next := i + 1
+	for next < len(said) && unicode.IsSpace(said[next]) {
+		next++
+	}
+	if next == len(said) {
+		return true // the line ends here
+	}
+	if next == i+1 {
+		return false // the rune after joins this one, so both are one word
+	}
+	return !unicode.IsLower(said[next])
 }
 
 func stripMarkup(s string) string {

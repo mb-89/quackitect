@@ -596,7 +596,7 @@ func guidanceTree(t *testing.T) Roots {
 	      {"name":"stop_needs_claim","type":"bool","default":true,"narrow":"on"}]}]}`)
 	// The rules the guard checks against are data, so the fixture carries a
 	// copy of the ones the product ships.
-	if b, err := os.ReadFile(filepath.Join("..", "..", "src", "config", "voice-rules.json")); err == nil {
+	if b, err := os.ReadFile(DeclaredAt(filepath.Join("..", ".."), "voice-rules.json")); err == nil {
 		f.writeMethod("src/config/voice-rules.json", string(b))
 	}
 	return f.Roots
@@ -867,7 +867,7 @@ func aTreeWithTheProcesses(t *testing.T) Roots {
 	r, root := f.Roots, f.Work
 	withHistory(t, root)
 	for _, dir := range []string{"processes", "schemas"} {
-		from := filepath.Join("..", "..", "src", dir)
+		from := SpecAt(filepath.Join("..", ".."), dir)
 		to := filepath.Join(root, "src", dir)
 		if err := os.MkdirAll(to, 0o755); err != nil {
 			t.Fatal(err)
