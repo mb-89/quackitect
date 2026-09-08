@@ -1,6 +1,6 @@
 // The model as a judge, for the rules no pattern holds. A judged rule is a
 // question with a closed set of answers, read from spec/config/styles/VoiceJudged.
-// [[spec/design_output/level0#the-judge-costs-a-model-call]]
+// [[spec/design_output/level0#the-judge-costs-a-call]]
 
 export const DEFAULTS = {
   enabled: true,

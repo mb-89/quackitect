@@ -65,7 +65,7 @@ export function register(on, _options) {
     return next(e);
   });
 
-  // [[spec/design_output/work#a-cloud-box-writes-to-its-own-branch]]
+  // [[spec/design_output/work#a-box-writes-its-branch]]
   on("tool.call", { tool: "Bash" }, async ($, e, next) => {
     if (!cloud) return next(e);
     const said = String(e.command ?? "");
@@ -291,7 +291,7 @@ function logHere(writeFile) {
   };
 }
 
-// [[spec/design_output/log#rotation-which-is-really-a-prune]]
+// [[spec/design_output/log#rotation-really-a-prune]]
 async function pruned($) {
   try {
     const ran = await $.process.run(["node", "src/scripts/prune.js"], {
@@ -352,13 +352,13 @@ async function readGuidance($) {
   }
 }
 
-// [[spec/design_output/work#a-cloud-box-landing-on-trunk]]
+// [[spec/design_output/work#a-box-landing-on-trunk]]
 async function onACloudBox($) {
   const env = await readEnv($, ["CLAUDE_CODE_REMOTE", "SE_CLOUD"]);
   return bindsHere("---\nenv:\n  - CLAUDE_CODE_REMOTE\n  - SE_CLOUD\n---\n", env);
 }
 
-// [[spec/design_output/work#a-cloud-box-landing-off-a-work-branch]] says why.
+// [[spec/design_output/work#a-box-off-a-branch]] says why.
 async function offAWorkBranch($) {
   return !(await branchNow($)).startsWith("work/");
 }

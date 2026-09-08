@@ -3,7 +3,7 @@ kind: [[funnel]]
 about: who reads a branch before it reaches trunk
 ---
 
-# An agent reads a branch before a person merges it
+# A reader stands before trunk
 
 A branch comes back at `done` and a person merges it. That person reads the
 diff, or does not, and the second is what happens under time.
@@ -20,7 +20,7 @@ at all. Level zero holds neither today.
 So the shape is there. A door that notices a branch reaching `done` can start a
 reader without a person typing anything.
 
-## Two ways to place it, and they differ
+## Two places, and they differ
 
 | where | the cost | the gain |
 |---|---|---|

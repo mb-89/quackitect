@@ -3,7 +3,7 @@ kind: [[rationale]]
 explains: [[spec/guidance/working]]
 ---
 
-# Why the owner's prompt outranks the work
+# Why the owner outranks work
 
 ## decided
 

@@ -25,7 +25,7 @@ export function log(disk, clock, init = {}) {
       return row;
     },
 
-    // [[spec/design_output/log#rotation-which-is-really-a-prune]]
+    // [[spec/design_output/log#rotation-really-a-prune]]
     prune(caps = {}) {
       let names = [];
       try {

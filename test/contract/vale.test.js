@@ -1,6 +1,6 @@
 // The voice rules, through the real Vale. A rule asserted against a stub is a
 // rule nobody has run, so these cases spawn the binary and stand here.
-// [[spec/design_output/doors#every-door-has-exactly-one-contract-test]]
+// [[spec/design_output/doors#one-contract-test-per-door]]
 
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";

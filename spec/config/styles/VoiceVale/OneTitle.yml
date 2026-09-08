@@ -1,0 +1,9 @@
+extends: existence
+message: "A dash or a colon makes a heading into two. Name one thing."
+link: spec/guidance/voice.md
+level: error
+scope: heading
+nonword: true
+tokens:
+  - '\s[-–—]\s'
+  - ':\s'

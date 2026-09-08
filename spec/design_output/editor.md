@@ -16,7 +16,7 @@ rule name at the door.
 
 `./RUNME.sh doctor` names both, and their versions.
 
-# The judged rules stay at the door
+# Where the judged rules stay
 
 `spec/config/styles/VoiceJudged` asks a model one question per span. No language
 server speaks that, so the editor draws the Vale rules and the door draws the
@@ -74,7 +74,7 @@ So the copy in `.se/bin` serves two readers: `doctor`, and an editor that starts
 a server binary by path. A download that fails costs one warning line, and
 `./RUNME.sh` goes on, because Vale and Biome carry the doors.
 
-# The agent surface needs no entry
+# The agent surface needs nothing
 
 Level zero reads every Write and Edit at `tool.call` and runs Vale, Biome and
 the judge there. That door sits inside the harness process and speaks no

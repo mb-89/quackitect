@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // The prune, as a program, because the harness filesystem deletes nothing.
 // Level zero runs this at session.start, and a person may run it by hand.
-// [[spec/design_output/log#rotation-which-is-really-a-prune]]
+// [[spec/design_output/log#rotation-really-a-prune]]
 
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";

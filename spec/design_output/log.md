@@ -56,7 +56,7 @@ rewrite to one session, and the name carries the time, so a listing sorts by it:
 The file appears with the first line a door says. A session saying nothing
 leaves nothing behind.
 
-# Rotation, which is really a prune
+# Rotation, really a prune
 
 A session file closes when its session ends, so nothing rotates it.
 
@@ -110,3 +110,20 @@ Windows installer leaves winget alone.
 lnav loads a format from the reader's own folder, and from no project directory.
 So the installer runs `lnav -i spec/config/lnav/quackitect.json` once the binary
 lands. `test/contract/tree.test.js` holds that file to what the door writes.
+
+# The search writes itself down
+
+A web search and a web fetch each write one line under the door `search`. The
+query or the url stands on the row, and the rest opens beneath.
+
+An earlier line in this project leaves that duty with the agent. An agent
+forgets, and a hook forgets nothing.
+
+# The viewer learns this tree
+
+`src/scripts/lnav-reads.js` hands lnav the format, the theme, and the choice of
+theme. Node runs it, because the Windows build fails under a shell parent and
+answers 0 anyway. So the script reads the theme back, and trusts no exit code.
+
+The installer calls it once and stamps `.se/bin/.lnav-reads-this-tree`. Deleting
+that stamp asks for the three again.
