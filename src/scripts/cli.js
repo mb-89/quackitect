@@ -2,12 +2,13 @@
 // verb here calls the same checkers the write door calls.
 
 import { spawnSync } from "node:child_process";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
-import { dirname, join, relative, sep } from "node:path";
+import { existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { biomeBin } from "../level0/lib/code.js";
 import { actionables, bindsHere, standingLayer } from "../level0/lib/guidance.js";
 import { line as asLine } from "../level0/lib/refuse.js";
+import { calmed, SHOUTED } from "../level0/lib/shout.js";
 import { CONFIG, fromJson, unreasoned, valeBin } from "../level0/lib/vale.js";
 import { work } from "./work.js";
 
@@ -19,6 +20,8 @@ const biome = join(root, biomeBin(process.platform));
 const GUIDANCE = join(root, "spec", "guidance");
 const LEVEL0 = join(root, "spec", "config", "level0.json");
 const config = existsSync(LEVEL0) ? JSON.parse(readFileSync(LEVEL0, "utf8")) : {};
+const OURS = "--glob=!{.se,node_modules,.git}/**";
+const ROUNDS = 5;
 
 const run = async (argv, init = {}) => {
   const ran = spawnSync(argv[0], argv.slice(1), {
@@ -84,7 +87,7 @@ async function lint(where) {
     `--config=${CONFIG}`,
     "--output=JSON",
     "--no-exit",
-    "--glob=!{.se,node_modules,.git}/**",
+    OURS,
     ...where,
   ]);
   const found = fromJson(ran.stdout);
@@ -138,12 +141,18 @@ async function fix(where) {
     console.error("Vale is missing. Run ./RUNME.sh once and it installs.");
     return 2;
   }
-  spawnSync(bin, ["fix", "--apply", ...where], {
-    cwd: root,
-    encoding: "utf8",
-    stdio: "inherit",
-    shell: false,
-  });
+  for (let round = 0; round < ROUNDS; round++) {
+    const was = stamp(where);
+    await calm(where);
+    spawnSync(bin, ["fix", "--apply", `--config=${CONFIG}`, OURS, ...where], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: "inherit",
+      shell: false,
+    });
+    if (stamp(where) === was) break;
+  }
+
   if (existsSync(biome)) {
     spawnSync(biome, ["check", "--write", "--config-path=spec/config", ...where], {
       cwd: root,
@@ -154,6 +163,36 @@ async function fix(where) {
   }
   console.log("Run ./RUNME.sh lint to see what is left for a person.");
   return 0;
+}
+
+async function calm(where) {
+  const ran = await run([
+    bin,
+    `--config=${CONFIG}`,
+    "--output=JSON",
+    "--no-exit",
+    OURS,
+    ...where,
+  ]);
+
+  const perFile = new Map();
+  for (const one of fromJson(ran.stdout)) {
+    if (one.rule !== SHOUTED) continue;
+    perFile.set(one.file, [...(perFile.get(one.file) ?? []), one]);
+  }
+
+  for (const [file, rows] of perFile) {
+    const path = resolve(root, file);
+    const was = readFileSync(path, "utf8");
+    const now = calmed(was, rows);
+    if (now !== was) writeFileSync(path, now, "utf8");
+  }
+}
+
+function stamp(where) {
+  return walk(where)
+    .map((file) => `${file}\u0000${readFileSync(file, "utf8")}`)
+    .join("\u0000");
 }
 
 function test() {
