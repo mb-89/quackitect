@@ -3,6 +3,7 @@
 // and spec/guidance.
 // [[spec/design_output/level0#the-write-door]]
 
+import { opensATurn, reachesTheOwner, SAYS, spokeSince } from "../lib/answer.js";
 import { CODE, formatText, lintText as lintCode } from "../lib/code.js";
 import {
   bindsHere,
@@ -10,6 +11,7 @@ import {
   canaryIn,
   countsOf,
   envOf,
+  forHelper,
   parse,
   standingLayer,
 } from "../lib/guidance.js";
@@ -55,6 +57,7 @@ export function register(on, _options) {
   let logbook = logHere(null);
   let rules = [];
   let onAHeldBranch = false;
+  let owed = false;
   const list = todos();
   let tooth = toothOf();
 
@@ -111,6 +114,7 @@ export function register(on, _options) {
   on("prompt.submit", async (_$, e, next) => {
     const from = String(e.origin?.kind ?? "");
     tooth.sawPrompt(from === "plugin");
+    if (opensATurn(e.origin)) owed = true;
     await logbook.say("info", "prompt", String(e.text ?? ""), { detail: from });
     return next(e);
   });
@@ -120,6 +124,11 @@ export function register(on, _options) {
     tooth.sawCall(String(e.tool ?? ""));
     list.sawCall(e);
     await logbook.say("info", "tool", aimOf(e), { tool: e.tool });
+
+    // [[spec/design_output/level0#the-owners-prompt-comes-first]]
+    const answers = await answerDoor($, e, { owed, config, logbook });
+    if (answers.deny) return answers;
+    owed = answers.owed;
 
     const writing = asWrite(e);
     if (!writing) return next(e);
@@ -202,8 +211,18 @@ export function register(on, _options) {
     return { result: { ...said, counted: "at the end of this turn" } };
   });
 
+  // [[spec/design_output/level0#the-helper-takes-the-guidance]]
+  on("agent.spawn", async (_$, e, next) => {
+    if (!standing) return next(e);
+    await logbook.say("info", "agent", `handed the guidance to ${e.subagentType}`, {
+      detail: String(e.description ?? "").slice(0, 120),
+    });
+    return next({ ...e, prompt: forHelper(standing, e.prompt) });
+  });
+
   on("turn.complete", async ($, e, next) => {
     const said = await next(e);
+    owed = false;
     if (firstTurn && e.reason === "answer") {
       firstTurn = false;
       await heardCanary(logbook, canaryIn(e.answer, sentence), sentence);
@@ -327,6 +346,25 @@ export function register(on, _options) {
     if (name === "never") return false;
     return undefined;
   }
+}
+
+// [[spec/design_output/level0#the-owners-prompt-comes-first]]
+async function answerDoor($, e, it) {
+  if (!it.owed || it.config.answerFirst?.enabled === false) return { owed: it.owed };
+  if (e.agentId || reachesTheOwner(e.tool)) return { owed: it.owed };
+
+  let spoke = true;
+  try {
+    spoke = spokeSince(await $.session.messages());
+  } catch {
+    spoke = true;
+  }
+  if (spoke) return { owed: false };
+
+  await it.logbook.say("warn", "answer", `refused ${e.tool} before an answer`, {
+    tool: e.tool,
+  });
+  return { deny: SAYS, owed: true };
 }
 
 // [[spec/design_output/level0#the-canary]]
