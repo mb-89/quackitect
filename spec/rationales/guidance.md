@@ -31,7 +31,7 @@ for it, and a reader who wants to fight it knows where to go.
 Naming one folder for the past also makes the tense rule enforceable. Every other
 folder refuses it, and a linter decides that.
 
-## 7. A rule a program can check
+## 7. A rule a program checks
 
 A rule written in prose and also enforced by a program is read twice and obeyed
 once.
@@ -40,7 +40,7 @@ The prose costs attention and changes nothing, because the program refuses the
 breach either way. So the rule belongs to the program, and the prose keeps a
 link to it.
 
-## 9. Why the handover stays on the box
+## 9. Why the handover stays put
 
 A handover names what one box holds right now:
 

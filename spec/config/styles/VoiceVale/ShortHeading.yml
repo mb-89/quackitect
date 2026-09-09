@@ -1,0 +1,41 @@
+extends: script
+message: "A heading holds five words. Cut this one, and let the prose carry the rest."
+link: spec/guidance/voice.md
+level: error
+scope: raw
+script: |
+  text := import("text")
+
+  max := 5
+  lines := text.split(scope, "\n")
+  matches := []
+
+  fenced := false
+  offset := 0
+
+  for i := 0; i < len(lines); i++ {
+    line := lines[i]
+    at := offset
+    offset += len(line) + 1
+    trimmed := text.trim_space(line)
+
+    if text.has_prefix(trimmed, "```") {
+      fenced = !fenced
+      continue
+    }
+    if fenced { continue }
+    if !text.re_match(`^#{1,6}\s`, trimmed) { continue }
+
+    said := text.re_replace(`^#+\s*`, trimmed, "")
+    said = text.re_replace(`^[0-9]+[.)]\s*`, said, "")
+    said = text.re_replace(`[` + "`" + `*_]`, said, "")
+
+    words := 0
+    for one in text.split(said, " ") {
+      if len(text.trim_space(one)) > 0 { words = words + 1 }
+    }
+
+    if words > max {
+      matches = append(matches, {begin: at, end: at + len(line)})
+    }
+  }

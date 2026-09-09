@@ -56,7 +56,7 @@ The fake filesystem here holds a map, and what a test writes it reads back. The
 fake process answers from a table and throws on a command nobody taught it, so a
 wrong answer stays impossible.
 
-## 3. The contract keeps a fake honest
+## 3. The contract keeps fakes honest
 
 A fake with nothing behind it drifts from the thing it stands for. So one test
 per door drives the real tool and holds the contract, and everything above it

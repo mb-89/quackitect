@@ -1,6 +1,6 @@
 // Whether a shell command would put a commit on trunk. A cloud box works a
 // branch, so this decides what the write door refuses there.
-// [[spec/design_output/work#a-cloud-box-writes-to-its-own-branch]]
+// [[spec/design_output/work#a-box-writes-its-branch]]
 
 export function touchesGit(command) {
   const said = String(command ?? "");

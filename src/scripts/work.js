@@ -3,6 +3,8 @@
 // where that work stands.
 // [[spec/design_output/work#the-round-trip]]
 
+import { overLong, WORDS } from "../../.claude/skills/level0/lib/names.js";
+
 export const BRIEF = "HANDOVER.md";
 const TRUNK = "main";
 
@@ -71,7 +73,7 @@ export function statusOf(text) {
 
 export const URGENCY = ["now", "soon", "whenever"];
 
-// [[spec/design_output/work#urgency-and-what-a-branch-waits-for]]
+// [[spec/design_output/work#urgency-and-what-waits]]
 export function urgencyOf(text) {
   const said = frontField(text, "urgency").toLowerCase();
   return URGENCY.includes(said) ? said : "soon";
@@ -155,7 +157,7 @@ function push(it, branch, was, why) {
   return it.git.run(["push", "origin", branch]).ok;
 }
 
-// [[spec/design_output/work#trunk-comes-in-before-the-work-starts]]
+// [[spec/design_output/work#trunk-comes-in-first]]
 function sync(it) {
   const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
   if (!branch.startsWith("work/")) {
@@ -221,6 +223,10 @@ export function withContract(brief) {
 function newWork(it, name) {
   if (!name) {
     console.error("work new needs a name: ./RUNME.sh work new fix-lsp");
+    return 2;
+  }
+  if (overLong(name)) {
+    console.error(`A branch name holds ${WORDS} words, and ${name} holds more.`);
     return 2;
   }
   const branch = `work/${name}`;

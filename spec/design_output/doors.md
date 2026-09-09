@@ -50,7 +50,7 @@ tests its own script, so no door here has a mock.
 The fake clock stands still until a test moves it with `tick`, so a case that
 reads the time replays.
 
-# Two folders, and what each one costs
+# Two folders, and their cost
 
 | folder | what stands there | what it touches |
 |---|---|---|
@@ -60,7 +60,7 @@ reads the time replays.
 `FakeDoorsInTest` refuses a real door inside `test/level0`, so a test
 landing in the wrong folder says so at once.
 
-# Every door has exactly one contract test
+# One contract test per door
 
 A fake with nothing behind it drifts from the thing it stands for. So each door
 carries one test in `test/contract` under its own name, driving the real thing

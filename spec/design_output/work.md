@@ -19,7 +19,7 @@ Level zero reads both at `session.start`, hands each to the agent as a context
 block, and deletes both. So each one stays fresh, and nobody keeps a rule about
 clearing it.
 
-# The status says where the work stands
+# What the status says
 
 The handover carries frontmatter, and its `status` is the one field that moves:
 
@@ -61,13 +61,13 @@ The contract names six things:
 A brief depends on nothing outside itself, so a cloud session aiming at one
 branch reads it and knows how to finish.
 
-# Trunk comes in before the work starts
+# Trunk comes in first
 
 `work sync` merges `origin/main` into the branch. `work take` runs it, so a
 routine pays nothing to remember it. A conflict then stops the take, while the
 work it would cost still sits ahead.
 
-# A cloud box landing on trunk
+# A box landing on trunk
 
 A cloud session starting on `main` gets no brief, because trunk carries none.
 Level zero notices that and hands over a block naming `./RUNME.sh work take`.
@@ -83,7 +83,7 @@ Three things hold together for that block to appear:
 
 A desk session sees none of it.
 
-# A cloud box writes to its own branch
+# A box writes its branch
 
 A box starts on trunk and leaves it in its first command. The window for a
 commit landing wrongly is the minute before that.
@@ -99,7 +99,7 @@ of it, because a person on a desk merges by choice.
 `work take` and `work done` reach git inside the command line, so the door sees
 the verb and leaves the plumbing alone.
 
-# Urgency and what a branch waits for
+# Urgency, and what waits
 
 The frontmatter carries two more fields, and `work take` reads both:
 
@@ -143,7 +143,7 @@ number stands above zero. Push trunk first, and the merge outlives the branch.
 `close <name> --force` deletes a branch standing outside trunk, which drops the
 work on it.
 
-# A cloud box landing off a work branch
+# A box off a branch
 
 A routine run starts on a branch the platform names, such as
 `claude/gracious-hawking-zepc6h`, so asking whether the branch is `main` answers

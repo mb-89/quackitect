@@ -8,8 +8,10 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
+import { proc } from "../../src/doors/proc.js";
 import { actionables, envOf } from "../../.claude/skills/level0/lib/guidance.js";
 import { nameOf, rowOf } from "../../.claude/skills/level0/lib/log.js";
+import { overLong, WORDS } from "../../.claude/skills/level0/lib/names.js";
 import { readRule } from "../../.claude/skills/level0/lib/rulefile.js";
 import { pathInScript, SCRIPT } from "../../.claude/skills/level0/lib/scripts.js";
 import {
@@ -139,4 +141,19 @@ test("the judge settings this tree ships carry every field the judge reads", () 
   for (const field of ["maxSpans", "warmupWrites", "thenEveryNth"]) {
     assert.equal(typeof said[field], "number", `judge.${field} is a number`);
   }
+});
+
+// [[spec/design_output/level0#a-name-holds-five-words]]
+test("every tracked name in this tree holds five words", () => {
+  const said = proc().run(["git", "ls-files"], { cwd: root });
+  assert.equal(said.exitCode, 0, "git lists what it tracks");
+
+  const long = said.stdout
+    .split(/\r?\n/)
+    .map((one) => one.trim())
+    .filter(Boolean)
+    .map((path) => [path, overLong(path)])
+    .filter(([, part]) => part);
+
+  assert.deepEqual(long, [], `a name holds ${WORDS} words: ${JSON.stringify(long)}`);
 });

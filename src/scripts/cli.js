@@ -279,7 +279,7 @@ function test() {
   return ran.exitCode;
 }
 
-// [[spec/design_output/level0#the-engine-interface-takes-no-computed-access]]
+// [[spec/design_output/level0#no-computed-engine-access]]
 function pluginHolds() {
   const ran = outside.run(["claude", "plugin", "validate", PLUGIN], { cwd: root });
   if (ran.exitCode === 0) return 0;

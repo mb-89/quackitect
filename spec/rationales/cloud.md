@@ -8,7 +8,7 @@ explains: [[spec/guidance/cloud]]
 A cloud box clones the tree cold, holds nothing anybody typed, and stops when
 the session stops. Everything it learns dies with it unless git carries it.
 
-## 1. Why a routine takes its own branch
+## 1. Why a routine branches
 
 A routine starts on `main` and takes no branch argument. Level zero reads its
 context at `session.start`, before any checkout, so a hook sees nothing of a
@@ -17,13 +17,13 @@ branch the session moves to afterwards.
 `work take` closes that gap by printing the brief to standard output. The agent
 reads it from the command, and one routine prompt then serves every branch.
 
-## 2. Why a pointed agent needs no verb
+## 2. A pointed agent needs nothing
 
 A cloud agent aimed at `work/<name>` starts on the branch, so `HANDOVER.md` sits
 in the tree at `session.start` and level zero hands it over. That path needs no
 command, which is why the two entries differ.
 
-## 3. Trunk comes in, and goes back out by hand
+## 3. Trunk comes in by hand
 
 A branch cut a week ago works against a tree that has moved. Its tests pass
 against rules that moved, and the conflict surfaces at merge time, once the work

@@ -1,6 +1,6 @@
 // The fixer, over a real file. `vale fix --apply` writes to disk, so a fixer
 // asserted against a stub is a fixer nobody has run.
-// [[spec/design_output/doors#every-door-has-exactly-one-contract-test]]
+// [[spec/design_output/doors#one-contract-test-per-door]]
 
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";

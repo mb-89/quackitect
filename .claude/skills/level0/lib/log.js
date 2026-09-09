@@ -56,7 +56,7 @@ export function timeOf(name) {
   return Date.parse(`${said[1]}T${said[2]}:${said[3]}:${said[4]}.000Z`);
 }
 
-// [[spec/design_output/log#rotation-which-is-really-a-prune]]
+// [[spec/design_output/log#rotation-really-a-prune]]
 export function dropping(names, now, caps = {}) {
   const days = caps.days ?? DAYS;
   const keep = caps.files ?? FILES;
