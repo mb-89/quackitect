@@ -19,7 +19,7 @@ Level zero reads both at `session.start`, hands each to the agent as a context
 block, and deletes both. So each one stays fresh, and nobody keeps a rule about
 clearing it.
 
-# The status says where the work stands
+# What the status says
 
 The handover carries frontmatter, and its `status` is the one field that moves:
 
@@ -61,13 +61,13 @@ The contract names six things:
 A brief depends on nothing outside itself, so a cloud session aiming at one
 branch reads it and knows how to finish.
 
-# Trunk comes in before the work starts
+# Trunk comes in first
 
 `work sync` merges `origin/main` into the branch. `work take` runs it, so a
 routine pays nothing to remember it. A conflict then stops the take, while the
 work it would cost still sits ahead.
 
-# A cloud box landing on trunk
+# A box landing on trunk
 
 A cloud session starting on `main` gets no brief, because trunk carries none.
 Level zero notices that and hands over a block naming `./RUNME.sh work take`.
@@ -83,7 +83,7 @@ Three things hold together for that block to appear:
 
 A desk session sees none of it.
 
-# A cloud box writes to its own branch
+# A box writes its branch
 
 A box starts on trunk and leaves it in its first command. The window for a
 commit landing wrongly is the minute before that.
@@ -98,6 +98,57 @@ of it, because a person on a desk merges by choice.
 
 `work take` and `work done` reach git inside the command line, so the door sees
 the verb and leaves the plumbing alone.
+
+# Urgency, and what waits
+
+The frontmatter carries two more fields, and `work take` reads both:
+
+    urgency: now
+    depends_on:
+      - doors-and-fakes
+
+`take` drops every branch waiting on one still at `todo` or `held`, then sorts
+the rest by urgency: `now`, `soon`, `whenever`. A branch naming no urgency reads
+as `soon`.
+
+A branch meets its dependency once the branch it names reaches `done`, or goes
+because somebody merges and closes it. So a chain of work runs itself in order,
+with nobody holding the order in their head.
+
+`work list` shows what each branch waits for, in place of its urgency.
+
+# A merged branch goes
+
+`work merge <name>` runs on `main` and takes a branch standing at `done`. It
+merges with `--no-ff`, so the branch keeps its shape in the history, and drops
+`HANDOVER.md` inside the same commit: trunk carries no brief.
+
+A conflict stops the merge and leaves it standing, because resolving it belongs
+to the person merging.
+
+# A merged branch closes
+
+`work close [name]` deletes a branch git says is inside `main`, here and on
+origin. Naming no branch closes every one of them. It reaches two kinds:
+
+| branch | cut by | throwaway once |
+|---|---|---|
+| `work/<name>` | `work new` | trunk holds its commits |
+| `claude/<name>` | the platform, for a routine run | trunk holds its commits |
+
+Deleting a remote branch whose merge sits on this box alone loses the work. So
+`close` counts what local trunk holds beyond origin, and refuses while that
+number stands above zero. Push trunk first, and the merge outlives the branch.
+
+`close <name> --force` deletes a branch standing outside trunk, which drops the
+work on it.
+
+# A box off a branch
+
+A routine run starts on a branch the platform names, such as
+`claude/gracious-hawking-zepc6h`, so asking whether the branch is `main` answers
+no on every routine. What matters is standing outside a work branch, and that is
+what level zero asks.
 
 # Why a routine needs this
 

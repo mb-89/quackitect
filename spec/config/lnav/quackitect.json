@@ -1,0 +1,84 @@
+{
+  "$schema": "https://lnav.org/schemas/format-v1.schema.json",
+  "quackitect_log": {
+    "title": "quackitect",
+    "description": "one line for each thing a door does",
+    "file-pattern": "log.*[.]jsonl$",
+    "json": true,
+    "hide-extra": true,
+    "timestamp-field": "at",
+    "level-field": "level",
+    "body-field": "said",
+    "level": {
+      "error": "error",
+      "warning": "warn",
+      "info": "info"
+    },
+    "line-format": [
+      {
+        "field": "at",
+        "timestamp-format": "%H:%M:%S.%L"
+      },
+      " ",
+      {
+        "field": "level",
+        "min-width": 5
+      },
+      " ",
+      {
+        "field": "door",
+        "min-width": 8
+      },
+      " ",
+      {
+        "field": "said"
+      }
+    ],
+    "value": {
+      "level": {
+        "kind": "string",
+        "identifier": true
+      },
+      "door": {
+        "kind": "string",
+        "identifier": true
+      },
+      "said": {
+        "kind": "string"
+      },
+      "file": {
+        "kind": "string",
+        "identifier": true,
+        "hidden": true
+      },
+      "rule": {
+        "kind": "string",
+        "identifier": true,
+        "hidden": true
+      },
+      "branch": {
+        "kind": "string",
+        "identifier": true,
+        "hidden": true
+      },
+      "tool": {
+        "kind": "string",
+        "identifier": true,
+        "hidden": true
+      },
+      "ms": {
+        "kind": "integer",
+        "hidden": true
+      },
+      "detail": {
+        "kind": "string",
+        "hidden": true
+      }
+    },
+    "sample": [
+      {
+        "line": "{\"at\":\"2026-01-01T00:00:00.000Z\",\"level\":\"info\",\"door\":\"write\",\"said\":\"refused\"}"
+      }
+    ]
+  }
+}

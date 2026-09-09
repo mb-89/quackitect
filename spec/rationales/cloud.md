@@ -8,7 +8,7 @@ explains: [[spec/guidance/cloud]]
 A cloud box clones the tree cold, holds nothing anybody typed, and stops when
 the session stops. Everything it learns dies with it unless git carries it.
 
-## 1. Why a routine takes its own branch
+## 1. Why a routine branches
 
 A routine starts on `main` and takes no branch argument. Level zero reads its
 context at `session.start`, before any checkout, so a hook sees nothing of a
@@ -17,13 +17,13 @@ branch the session moves to afterwards.
 `work take` closes that gap by printing the brief to standard output. The agent
 reads it from the command, and one routine prompt then serves every branch.
 
-## 2. Why a pointed agent needs no verb
+## 2. A pointed agent needs nothing
 
 A cloud agent aimed at `work/<name>` starts on the branch, so `HANDOVER.md` sits
 in the tree at `session.start` and level zero hands it over. That path needs no
 command, which is why the two entries differ.
 
-## 3. Trunk comes in, and goes back out by hand
+## 3. Trunk comes in by hand
 
 A branch cut a week ago works against a tree that has moved. Its tests pass
 against rules that moved, and the conflict surfaces at merge time, once the work
@@ -59,7 +59,21 @@ session to collect it later.
 The box holds the only copy of anything uncommitted. There is no second chance
 to collect it, because nothing survives the session.
 
-## 9. Saying the commit
+## 9. One session, one branch
+
+A session reading this note from `take` to `done` finds no line saying it stops
+there. So it offers a second branch, having just closed its own, which is the
+reading the words allow.
+
+Two rules come close and both read as scope advice inside one branch. Rule 4
+draws the edge of the brief and says nothing about the session. Rule 7 says
+`work done` is last of these steps, and says nothing about the session either.
+
+A branch listing also goes stale inside a session. `work list` reads origin at
+the moment of the call, and an hour of work later another session has moved
+what it named. So run it again before naming a status out loud.
+
+## 10. Saying the commit
 
 A cloud box clones the branch tip as it stood when the session began. Somebody
 pushing a minute later leaves the box behind while it reports itself current.

@@ -14,6 +14,7 @@ $binDir = Join-Path $root ".se\bin"
 # platform, so nothing here compiles and no C toolchain is needed.
 $valeVersion = "3.20.0"
 $biomeVersion = "2.5.12"
+$lnavVersion = "0.14.1"
 
 function Refresh-Path {
   # A program installed a moment ago is on the machine and not yet in this
@@ -52,8 +53,12 @@ function Get-Vale {
 
 function Get-ValeLs {
   $arch = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "arm64" } else { "64-bit" }
-  $servers = Join-Path $root "src\level0\lib\servers.js"
-  $from = & node --input-type=module -e "import { valeLsUrl } from 'file:///$($servers -replace '\\','/')'; process.stdout.write(valeLsUrl('Windows', '$arch'));"
+  Push-Location $root
+  try {
+    $from = & node --input-type=module -e "import { valeLsUrl } from './.claude/skills/level0/lib/servers.js'; process.stdout.write(valeLsUrl('Windows', '$arch'));"
+  } finally {
+    Pop-Location
+  }
   if (-not $from) { throw "vale-ls ships no binary for Windows $arch." }
   $zip = Join-Path $env:TEMP (Split-Path $from -Leaf)
 
@@ -71,6 +76,36 @@ function Get-Biome {
   Write-Host "  downloading Biome $biomeVersion" -ForegroundColor Cyan
   New-Item -ItemType Directory -Force $binDir | Out-Null
   Invoke-WebRequest -Uri $from -OutFile (Join-Path $binDir "biome.exe") -UseBasicParsing
+}
+
+# The log viewer, which ships a Windows zip carrying its own msys dll. The
+# format file decides what a row shows, and lnav reads that from the reader's
+# own folder, so it lands with one -i.
+function Get-Lnav {
+  $arch = if ($env:PROCESSOR_ARCHITECTURE -eq "ARM64") { "arm64" } else { "x86_64" }
+  $name = "lnav-$lnavVersion-windows-$arch.zip"
+  $from = "https://github.com/tstack/lnav/releases/download/v$lnavVersion/$name"
+  $zip = Join-Path $env:TEMP $name
+  $out = Join-Path $env:TEMP "lnav-$lnavVersion-$arch"
+
+  Write-Host "  downloading lnav $lnavVersion" -ForegroundColor Cyan
+  New-Item -ItemType Directory -Force $binDir | Out-Null
+  Invoke-WebRequest -Uri $from -OutFile $zip -UseBasicParsing
+  Expand-Archive -LiteralPath $zip -DestinationPath $out -Force
+  foreach ($file in @("lnav.exe", "msys-2.0.dll")) {
+    Move-Item -Force (Join-Path $out "lnav-$lnavVersion\bin\$file") (Join-Path $binDir $file)
+  }
+  Remove-Item $zip, $out -Recurse -Force
+}
+
+# lnav reads a format and a theme from its own folder, and node hands them
+# over. One script serves both platforms, and it reads the answer back rather
+# than trusting the exit code.
+function Set-LnavReading {
+  Push-Location $root
+  try { node src/scripts/lnav-reads.js | Out-Null } finally { Pop-Location }
+  if ($LASTEXITCODE -ne 0) { return }
+  New-Item -ItemType File -Force (Join-Path $binDir ".lnav-reads-this-tree") | Out-Null
 }
 
 $needed = @(
@@ -98,6 +133,22 @@ $needed = @(
     have   = { Test-Path (Join-Path $binDir "vale-ls.exe") }
     get    = { Get-ValeLs }
     # The editor wants this one, and the doors hold without it.
+    wanted = $true
+  },
+  @{
+    name   = "lnav"
+    why    = "the viewer ./RUNME.sh log opens the door log in"
+    have   = { (Test-Path (Join-Path $binDir "lnav.exe")) -or ($null -ne (Get-Command lnav -ErrorAction SilentlyContinue)) }
+    get    = { Get-Lnav }
+    # ./RUNME.sh log prints plain rows without it.
+    wanted = $true
+  },
+  @{
+    name   = "lnav-format"
+    why    = "the row format and the dark theme, which lnav keeps in its own folder"
+    have   = { Test-Path (Join-Path $binDir ".lnav-reads-this-tree") }
+    get    = { Set-LnavReading }
+    # The log shows as raw JSON without it.
     wanted = $true
   }
 )

@@ -16,7 +16,7 @@ rule name at the door.
 
 `./RUNME.sh doctor` names both, and their versions.
 
-# The judged rules stay at the door
+# Where the judged rules stay
 
 `spec/config/styles/VoiceJudged` asks a model one question per span. No language
 server speaks that, so the editor draws the Vale rules and the door draws the
@@ -38,8 +38,9 @@ relative to the workspace folder:
 | `biome.lsp.bin` | a path per platform | Windows takes `biome.exe`, and the rest take `biome` |
 | `biome.configurationPath` | `spec/config/biome.json` | Biome looks for its config at the root, and this tree holds it under `spec` |
 
-`src/level0/test/servers.test.js` reads both files and asserts every row above,
-so the settings and `.se/bin` move together.
+`test/contract/tree.test.js` reads both files and asserts every row above, so
+the settings and `.se/bin` move together. It reads the real disk, which is what
+puts it in the contract folder.
 
 VS Code holds `vale.valeCLI.path` and `vale.valeCLI.config` at their user-level
 value until a person trusts the workspace. Trust the folder on the first open,
@@ -47,7 +48,7 @@ and the tracked values apply.
 
 # The asset matrix
 
-`src/level0/lib/servers.js` pins the version and names one release asset per
+`.claude/skills/level0/lib/servers.js` pins the version and names one release asset per
 platform. The install scripts ask node for the URL, so the matrix lives in one
 place and a test drives it.
 
@@ -73,7 +74,7 @@ So the copy in `.se/bin` serves two readers: `doctor`, and an editor that starts
 a server binary by path. A download that fails costs one warning line, and
 `./RUNME.sh` goes on, because Vale and Biome carry the doors.
 
-# The agent surface needs no entry
+# The agent surface needs nothing
 
 Level zero reads every Write and Edit at `tool.call` and runs Vale, Biome and
 the judge there. That door sits inside the harness process and speaks no

@@ -1,12 +1,12 @@
 extends: script
-message: "An answer runs more than one paragraph with no list, table or diagram. Carry the rest as structure."
+message: "Three paragraphs stand under one heading with no list, table or diagram between them. Carry the rest as structure, or open a heading."
 link: spec/guidance/voice.md
 level: error
 scope: raw
 script: |
   text := import("text")
 
-  max := 1
+  max := 2
   lines := text.split(scope, "\n")
   matches := []
 
