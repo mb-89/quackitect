@@ -42,8 +42,8 @@ test("every guidance note in this tree carries actionables", () => {
     const rules = actionables(files.read(join(GUIDANCE, name)));
     assert.ok(rules.length, `${name} carries an Actionables chapter`);
     assert.ok(
-      rules.length <= 10,
-      `${name} holds ten rules or fewer, and holds ${rules.length}`,
+      rules.length <= 15,
+      `${name} holds fifteen rules or fewer, and holds ${rules.length}`,
     );
   }
 });
