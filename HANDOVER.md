@@ -77,17 +77,18 @@ Say the same thing, and name our source.
 
 ## How a command sets it
 
-v4's command body is a magic string, `KEYWORD:ASK=ON`, which a hook matches out
-of the prompt. That works, and it costs a hook.
+Two roads, and take the second:
 
-This tree has a cheaper road, because `./RUNME.sh config <key> <value>` already
-writes the local file. A command file runs it directly, so the value lands
-before the turn starts and no hook reads a prompt.
+| road | what it costs |
+|---|---|
+| v4's, a magic string `KEYWORD:ASK=ON` that a hook matches | one hook reading every prompt |
+| ours, the command file runs `./RUNME.sh config <key> <value>` | nothing: the verb already writes the local file |
 
-Take that road, and say in your handback whether it holds.
+The second lands the value before the turn even starts. Say in your handback
+whether it holds on this client.
 
-Where a command file runs no program on this client, take v4's road instead:
-hook `prompt.submit`, match the string, write the value, drop the prompt.
+Where a command file runs no program here, take v4's road instead: hook
+`prompt.submit`, match the string, write the value, drop the prompt.
 
 # Who projects, and when
 
