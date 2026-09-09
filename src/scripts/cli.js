@@ -3,19 +3,29 @@
 
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { biomeBin } from "../../.claude/skills/level0/lib/code.js";
+import {
+  bindsHere,
+  canary,
+  countsOf,
+  standingLayer,
+} from "../../.claude/skills/level0/lib/guidance.js";
+import { asRow, lnavBin, rowsOf } from "../../.claude/skills/level0/lib/log.js";
+import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
+import { pathInScript, SCRIPT } from "../../.claude/skills/level0/lib/scripts.js";
+import { EDITOR_SETTINGS, valeLsBin } from "../../.claude/skills/level0/lib/servers.js";
+import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
+import {
+  CONFIG,
+  fromJson,
+  unreasoned,
+  valeBin,
+} from "../../.claude/skills/level0/lib/vale.js";
 import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
-import { biomeBin } from "../../.claude/skills/level0/lib/code.js";
-import { asRow, lnavBin, rowsOf } from "../../.claude/skills/level0/lib/log.js";
-import { actionables, bindsHere, standingLayer } from "../../.claude/skills/level0/lib/guidance.js";
-import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
-import { pathInScript, SCRIPT } from "../../.claude/skills/level0/lib/scripts.js";
-import { EDITOR_SETTINGS, valeLsBin } from "../../.claude/skills/level0/lib/servers.js";
-import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
-import { CONFIG, fromJson, unreasoned, valeBin } from "../../.claude/skills/level0/lib/vale.js";
 import { work } from "./work.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -347,9 +357,8 @@ function standing() {
     return 0;
   }
   console.log(said);
-  const count = notes.reduce((n, one) => n + actionables(one.text).length, 0);
-  console.log(`
-rules: ${count}`);
+  console.log("");
+  console.log(canary({ ...countsOf(notes), stop: config.stop?.enabled !== false }));
   return 0;
 }
 

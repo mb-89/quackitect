@@ -102,10 +102,41 @@ puts it back to reading everything.
 
 `prompt.context` computes the blocks a conversation's first message carries. It
 fires once, and again when the context clears, which is where the guidance, the
-handover and the receipt arrive.
+handover and the canary arrive.
 
 The system prompt's sections stay free for guidance that depends on where the
 work stands.
+
+The guidance needs no re-read per turn, and it decays nowhere. The engine's own
+type declaration says `prompt.context` fires once per conversation and again on
+"a re-read (compaction, `/clear`)". Level zero hooks it already, so a
+compaction and a `/clear` both bring the rules back.
+
+## The canary
+
+A session says out loud that level zero holds it. A session saying nothing
+stands outside the cage, and that failure costs this tree several cloud rounds
+already.
+
+    level0 holds this session: 53 rules, 6 notes, the stop hook on.
+
+The numbers come out of the standing block, so an agent says the line correctly
+only where the block reaches it. That is the whole of the proof. Where the stop
+hook stands off, the line ends `the stop hook off`, so the sentence says which
+cage this is.
+
+On the first `turn.complete` of a session, level zero looks for that sentence
+in the answer:
+
+| what it finds | what it does |
+|---|---|
+| the sentence, with its own numbers | one `info` line, door `level0` |
+| a sentence with other numbers | one `warn` line carrying both |
+| no sentence | one `warn` line saying the canary is absent |
+
+So the log carries the canary as well, and a person reads it later without
+watching the session run. `./RUNME.sh standing` ends with the same sentence,
+because `canary` builds it in `lib/guidance.js` and both callers read it there.
 
 ## Guidance a variable switches on
 

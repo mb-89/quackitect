@@ -2,7 +2,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { overLong, wordsIn, WORDS } from "../../.claude/skills/level0/lib/names.js";
+import { overLong, WORDS, wordsIn } from "../../.claude/skills/level0/lib/names.js";
 
 test("a name counts its words, and an extension counts none", () => {
   assert.equal(wordsIn("the-tooth-and-the-log"), 5);
@@ -18,7 +18,10 @@ test("a path answers the segment that runs long, and nothing where none does", (
     overLong("spec/funnel/an-agent-reads-what-comes-back.md"),
     "an-agent-reads-what-comes-back.md",
   );
-  assert.equal(overLong("a-name-that-runs-past-the-cap/x.js"), "a-name-that-runs-past-the-cap");
+  assert.equal(
+    overLong("a-name-that-runs-past-the-cap/x.js"),
+    "a-name-that-runs-past-the-cap",
+  );
 });
 
 test("the cap is the one the rules name", () => {

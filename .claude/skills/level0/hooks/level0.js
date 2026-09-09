@@ -10,7 +10,15 @@ import {
   formatText,
   lintText as lintCode,
 } from "../lib/code.js";
-import { bindsHere, envOf, parse, standingLayer } from "../lib/guidance.js";
+import {
+  bindsHere,
+  canary,
+  canaryIn,
+  countsOf,
+  envOf,
+  parse,
+  standingLayer,
+} from "../lib/guidance.js";
 import { judgeOf } from "../lib/judge.js";
 import { aimOf, asLines, FOLDER, nameOf, rowOf, writes } from "../lib/log.js";
 import { refusal, taught } from "../lib/refuse.js";
@@ -42,6 +50,8 @@ export function register(on, _options) {
   let bin = null;
   let formatter = null;
   let standing = "";
+  let sentence = "";
+  let firstTurn = true;
   let config = {};
   let judge = judgeOf({});
   let handover = [];
@@ -57,9 +67,16 @@ export function register(on, _options) {
     bin = await linterHere($);
     if (!bin) bin = await install($);
     formatter = await formatterHere($);
-    standing = await readGuidance($);
     config = await readConfig($);
     judge = judgeOf(config);
+
+    const guidance = await readGuidance($);
+    standing = guidance.said;
+    sentence = canary({
+      rules: guidance.rules,
+      notes: guidance.notes,
+      stop: config.stop?.enabled !== false,
+    });
     handover = await takeHandover($);
     cloud = await onACloudBox($);
     waiting = cloud && !handover.length && (await offAWorkBranch($));
@@ -187,6 +204,10 @@ export function register(on, _options) {
 
   on("turn.complete", async ($, e, next) => {
     const said = await next(e);
+    if (firstTurn && e.reason === "answer") {
+      firstTurn = false;
+      await heardCanary(logbook, canaryIn(e.answer, sentence), sentence);
+    }
     await bite($, e, { rules, tooth, logbook, ran: ranHere });
     if (!bin || !e.answer || e.reason !== "answer") return said;
 
@@ -280,17 +301,17 @@ export function register(on, _options) {
       });
     }
 
+    // [[spec/design_output/level0#the-canary]]
     if (standing) {
       blocks.push({
-        name: "level0-receipt",
+        name: "level0-canary",
         text: [
-          "End your FIRST answer with one last line, on its own:",
+          "End your FIRST answer with this line, on its own, word for word:",
           "",
-          "    rules: <n>",
+          `    ${sentence}`,
           "",
-          "where <n> is how many numbered rules stand in the section naming how",
-          "this tree is worked, counted across every heading there. Count them",
-          "and write what you counted. Write this line once and never again.",
+          "It says out loud that level zero holds this session, and the numbers",
+          "come from what it loaded. Write this line once and never again.",
         ].join("\n"),
       });
     }
@@ -306,6 +327,23 @@ export function register(on, _options) {
     if (name === "never") return false;
     return undefined;
   }
+}
+
+// [[spec/design_output/level0#the-canary]]
+async function heardCanary(logbook, heard, sentence) {
+  if (heard.found === "same") {
+    return logbook.say("info", "level0", "the canary comes back whole", {
+      detail: sentence,
+    });
+  }
+  if (heard.found === "other") {
+    return logbook.say("warn", "level0", "the canary comes back with other counts", {
+      detail: `said=${heard.said} holds=${sentence}`,
+    });
+  }
+  return logbook.say("warn", "level0", "the canary is absent from the answer", {
+    detail: sentence,
+  });
 }
 
 // [[spec/design_output/stop#the-vote]]
@@ -394,19 +432,17 @@ async function erase($, path) {
 // [[spec/design_output/level0#guidance-a-variable-switches-on]]
 async function readGuidance($) {
   try {
-    const entries = await $.fs.listDir(GUIDANCE);
     const notes = [];
     const wanted = new Set();
-    for (const one of entries) {
-      if (!one.name.endsWith(".md")) continue;
-      const text = await $.fs.readFile(`${GUIDANCE}/${one.name}`);
-      notes.push({ name: one.name, text });
-      for (const name of envOf(text)) wanted.add(name);
+    for (const one of await readFolder($, GUIDANCE, ".md")) {
+      notes.push(one);
+      for (const name of envOf(one.text)) wanted.add(name);
     }
     const env = await readEnv($, [...wanted]);
-    return standingLayer(notes.filter((one) => bindsHere(one.text, env)));
+    const here = notes.filter((one) => bindsHere(one.text, env));
+    return { said: standingLayer(here), ...countsOf(here) };
   } catch {
-    return "";
+    return { said: "", rules: 0, notes: 0 };
   }
 }
 

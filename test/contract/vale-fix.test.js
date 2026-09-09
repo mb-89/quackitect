@@ -6,10 +6,10 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { skip, test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { disk } from "../../src/doors/disk.js";
-import { proc } from "../../src/doors/proc.js";
 import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
 import { CONFIG, fromJson, valeBin } from "../../.claude/skills/level0/lib/vale.js";
+import { disk } from "../../src/doors/disk.js";
+import { proc } from "../../src/doors/proc.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();

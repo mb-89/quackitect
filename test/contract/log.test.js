@@ -4,12 +4,12 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { nameOf } from "../../.claude/skills/level0/lib/log.js";
 import { clock } from "../../src/doors/clock.js";
 import { disk } from "../../src/doors/disk.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import { log } from "../../src/doors/log.js";
-import { nameOf } from "../../.claude/skills/level0/lib/log.js";
 
 const AT = "2026-09-08T14:22:51.000Z";
 const ID = "a6f8c43b";

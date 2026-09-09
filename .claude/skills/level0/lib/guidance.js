@@ -1,8 +1,11 @@
 // Reads a guidance note and answers its chapters. Level zero hands the agent
-// the Actionables chapter and no other.
+// the Actionables chapter and no other, and the canary says what it handed.
 // [[spec/design_output/level0#the-standing-layer]]
 
 export const CHAPTERS = ["Motivation", "Actionables", "Discussion"];
+
+const CANARY =
+  /level0 holds this session: \d+ rules?, \d+ notes?, the stop hook (?:on|off)\./;
 
 export function parse(text) {
   const body = String(text ?? "").replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, "");
@@ -95,6 +98,28 @@ function truthy(said) {
     .trim()
     .toLowerCase();
   return Boolean(t) && t !== "0" && t !== "false";
+}
+
+// [[spec/design_output/level0#the-canary]]
+export function canary(counts) {
+  const rules = counts?.rules ?? 0;
+  const notes = counts?.notes ?? 0;
+  const tooth = counts?.stop === false ? "off" : "on";
+  return `level0 holds this session: ${rules} rules, ${notes} notes, the stop hook ${tooth}.`;
+}
+
+export function canaryIn(answer, said) {
+  const found = CANARY.exec(String(answer ?? ""));
+  if (!found) return { found: "none", said: "" };
+  return { found: found[0] === said ? "same" : "other", said: found[0] };
+}
+
+export function countsOf(notes) {
+  const carrying = notes.filter((one) => actionables(one.text).length);
+  return {
+    notes: carrying.length,
+    rules: carrying.reduce((n, one) => n + actionables(one.text).length, 0),
+  };
 }
 
 export function standingLayer(notes) {

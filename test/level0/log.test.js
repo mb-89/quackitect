@@ -3,9 +3,16 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import {
+  aimOf,
+  asRow,
+  nameOf,
+  rowsOf,
+  timeOf,
+  writes,
+} from "../../.claude/skills/level0/lib/log.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
-import { aimOf, asRow, nameOf, rowsOf, timeOf, writes } from "../../.claude/skills/level0/lib/log.js";
 
 const AT = "2026-09-08T14:22:51.000Z";
 const ID = "a6f8c43b";
@@ -123,10 +130,16 @@ test("a box writing nothing leaves no file behind", async () => {
 
 // [[spec/design_output/log#what-a-tool-line-names]]
 test("a tool line names the field the call aims at", () => {
-  assert.equal(aimOf({ tool: "Write", file_path: "spec/guidance/voice.md" }), "spec/guidance/voice.md");
+  assert.equal(
+    aimOf({ tool: "Write", file_path: "spec/guidance/voice.md" }),
+    "spec/guidance/voice.md",
+  );
   assert.equal(aimOf({ tool: "Edit", file_path: "RUNME.sh" }), "RUNME.sh");
   assert.equal(aimOf({ tool: "Bash", command: "git status" }), "git status");
   assert.equal(aimOf({ tool: "WebSearch", query: "lnav formats" }), "lnav formats");
-  assert.equal(aimOf({ tool: "WebFetch", url: "https://lnav.org" }), "https://lnav.org");
+  assert.equal(
+    aimOf({ tool: "WebFetch", url: "https://lnav.org" }),
+    "https://lnav.org",
+  );
   assert.equal(aimOf({ tool: "TaskList" }), "TaskList");
 });

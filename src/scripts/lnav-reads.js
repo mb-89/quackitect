@@ -6,9 +6,9 @@
 
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { lnavBin } from "../../.claude/skills/level0/lib/log.js";
 import { disk } from "../doors/disk.js";
 import { proc } from "../doors/proc.js";
-import { lnavBin } from "../../.claude/skills/level0/lib/log.js";
 
 const THEME = "quackitect";
 

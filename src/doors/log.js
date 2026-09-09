@@ -4,7 +4,13 @@
 // writes at decides which line reaches the file.
 // [[spec/design_output/log#where-the-writer-stands]]
 
-import { asLines, FOLDER, nameOf, rowOf, writes } from "../../.claude/skills/level0/lib/log.js";
+import {
+  asLines,
+  FOLDER,
+  nameOf,
+  rowOf,
+  writes,
+} from "../../.claude/skills/level0/lib/log.js";
 
 export function log(disk, clock, init = {}) {
   const folder = init.folder ?? FOLDER;

@@ -6,9 +6,9 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { skip, test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { lintText, valeBin } from "../../.claude/skills/level0/lib/vale.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
-import { lintText, valeBin } from "../../.claude/skills/level0/lib/vale.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -86,13 +86,16 @@ const answered = async (text) => {
   return said.found.map((f) => f.rule);
 };
 
-ifVale("a heading opens a fresh prose budget, and a third paragraph breaks it", async () => {
-  const two = "# One\n\nA paragraph.\n\nA second paragraph.\n";
-  assert.ok(!(await answered(two)).includes("PreferStructureAnswer"));
+ifVale(
+  "a heading opens a fresh prose budget, and a third paragraph breaks it",
+  async () => {
+    const two = "# One\n\nA paragraph.\n\nA second paragraph.\n";
+    assert.ok(!(await answered(two)).includes("PreferStructureAnswer"));
 
-  const across = `${two}\n# Two\n\nA paragraph.\n\nA second paragraph.\n`;
-  assert.ok(!(await answered(across)).includes("PreferStructureAnswer"));
+    const across = `${two}\n# Two\n\nA paragraph.\n\nA second paragraph.\n`;
+    assert.ok(!(await answered(across)).includes("PreferStructureAnswer"));
 
-  const three = `${two}\nA third paragraph.\n`;
-  assert.ok((await answered(three)).includes("PreferStructureAnswer"));
-});
+    const three = `${two}\nA third paragraph.\n`;
+    assert.ok((await answered(three)).includes("PreferStructureAnswer"));
+  },
+);

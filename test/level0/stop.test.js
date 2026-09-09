@@ -16,7 +16,13 @@ import {
 
 const TABLE = [
   { id: "talk", side: "stop", priority: 100, decides: "claimed", asks: "Talk?" },
-  { id: "carry-on", side: "continue", priority: 99, decides: "claimed", says: "Go on." },
+  {
+    id: "carry-on",
+    side: "continue",
+    priority: 99,
+    decides: "claimed",
+    says: "Go on.",
+  },
   {
     id: "new",
     side: "stop",
@@ -98,7 +104,13 @@ test("the tooth taken out ends the turn, whatever else fires", () => {
 
 test("a runs value the code does not know fires nothing and is named", () => {
   const rules = [
-    { id: "guess", side: "continue", priority: 80, decides: "mechanical", runs: "moon" },
+    {
+      id: "guess",
+      side: "continue",
+      priority: 80,
+      decides: "mechanical",
+      runs: "moon",
+    },
   ];
   const said = decide(rules, { ran: ranOf([]) });
   assert.equal(said.ends, true);
@@ -208,8 +220,14 @@ test("a rule file reads as a list of entries", () => {
 
 test("a second file adds a rule, and the pool holds both", () => {
   const said = pool([
-    { name: "level0.yml", text: "- id: a\n  side: stop\n  priority: 50\n  decides: claimed\n  asks: A?\n" },
-    { name: "level1.yml", text: "- id: b\n  side: continue\n  priority: 60\n  decides: mechanical\n  runs: never\n" },
+    {
+      name: "level0.yml",
+      text: "- id: a\n  side: stop\n  priority: 50\n  decides: claimed\n  asks: A?\n",
+    },
+    {
+      name: "level1.yml",
+      text: "- id: b\n  side: continue\n  priority: 60\n  decides: mechanical\n  runs: never\n",
+    },
   ]);
   assert.deepEqual(said.broken, []);
   assert.deepEqual(
@@ -221,7 +239,10 @@ test("a second file adds a rule, and the pool holds both", () => {
 test("a rule file that will not parse leaves the tooth harmless", () => {
   const said = pool([
     { name: "broken.yml", text: "id: [this is not, a list of entries\nside" },
-    { name: "level0.yml", text: "- id: a\n  side: stop\n  priority: 50\n  decides: claimed\n  asks: A?\n" },
+    {
+      name: "level0.yml",
+      text: "- id: a\n  side: stop\n  priority: 50\n  decides: claimed\n  asks: A?\n",
+    },
   ]);
   assert.deepEqual(said.broken, ["broken.yml"]);
   assert.deepEqual(
@@ -247,9 +268,15 @@ test("the claim tool offers the rules a claim may name", () => {
 test("a todo short of completed means work stands", () => {
   const it = todos();
   assert.equal(it.standing(), false);
-  it.sawCall({ tool: "TodoWrite", todos: [{ status: "completed" }, { status: "pending" }] });
+  it.sawCall({
+    tool: "TodoWrite",
+    todos: [{ status: "completed" }, { status: "pending" }],
+  });
   assert.equal(it.standing(), true);
-  it.sawCall({ tool: "TodoWrite", todos: [{ status: "completed" }, { status: "completed" }] });
+  it.sawCall({
+    tool: "TodoWrite",
+    todos: [{ status: "completed" }, { status: "completed" }],
+  });
   assert.equal(it.standing(), false);
 });
 
