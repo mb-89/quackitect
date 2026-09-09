@@ -6,141 +6,113 @@ urgency: now
 
 # The bash door reads more
 
-The write door guards two tools. `asWrite` in the hooks module answers on
-`e.file_path`, so a Write and an Edit reach every rule. Everything else goes
-straight by.
+Level zero reads a Bash command now. One parse in
+`.claude/skills/level0/lib/bash.js` answers five rules, and
+`spec/design_output/bash.md` says how each one works.
 
-A heredoc goes by, and so do `sed -i`, `tee` and every redirection. A session
-writing prose through `cat > spec/guidance/x.md` meets no rule, and the file
-lands however it likes.
-
-That is the largest hole in level zero today, and it is the first thing here.
-
-# What the door already does
-
-`tool.call` with the matcher `{ tool: "Bash" }` reads every command and refuses
-a commit or a push landing on trunk. It parses the command line already, and
-four more rules fit the parse it does.
-
-# A shell writes nothing
-
-Refuse a shell command writing a file the rules reach, and name the tool that
-works instead.
-
-| the door refuses | the door passes |
+| rule | what it refuses |
 |---|---|
-| `cat > spec/guidance/x.md`, and `>>` | anything under `.se/`, or a temp folder |
-| `tee` into a path the rules cover | a pipe writing nothing |
-| `sed -i`, `perl -i` | reading, searching, running |
-| a heredoc into `python`, `node` or `sh` writing such a path | the same, writing nowhere the rules reach |
+| `ShellWritesNothing` | a shell command landing a file Vale or Biome reads |
+| `CommitCarriesItsMessage` | `git commit` carrying no message a rule reads |
+| a voice rule, over the message | a commit message breaking the same rules a file meets |
+| `BranchNameHoldsFive` | `git checkout -b` or `git switch -c` past the word cap |
+| `TestRunPointsSomewhere` | `node --test` or `npm test` naming no file |
 
-The last row is the hard one and the one that matters. A session reaches for a
-heredoc because a formatter reflows a file between a read and an edit, and a
-string replacement then fails silently. That is a real reason, so the refusal
-says what to do instead: read the file again, then Edit.
+`tool.describe` is the carrot beside those sticks. Bash's description gains one
+paragraph naming `./RUNME.sh check`, `work`, `log` and `doctor`, and a contract
+test holds every named verb against `src/scripts/cli.js`.
 
-Where a command's target stays unreadable, let it through. A guess refusing
-honest work costs more than a hole this branch narrows.
+# What the door catches
 
-# A commit message meets voice
+A shell reaches a file through more roads than a redirection, and the parse
+reads each one:
 
-Every prose rule in this tree reads a file. `git commit -m "..."` is prose no
-rule reads, so the messages in this history pass by the writer's care alone.
+- `>` and `>>`, including `&>` and a glued `>path`
+- `tee <path>`
+- `sed -i` and `perl -i`, including `-i.bak` and a cluster such as `-pi`
+- `cp` or `mv` whose source stands outside what the rules reach
+- a heredoc into `sh`, which runs the shell parse again over the body
+- a heredoc into `python`, `node`, `ruby`, `perl` or `php`, where a write call
+  stands beside such a path
+- an inline script behind `bash -c`, `sh -lc`, `node -e` or `python -c`
+- any of those behind `xargs` or `find -exec`
+- `git commit -F -` fed by a heredoc, whose body the parse holds already
 
-Read the message and lint it the way the write door lints a file. Refuse a
-breach, naming the rule.
+# What it lets through
 
-Two forms carry a message a parse can read, and one does not:
+Each of these passes on purpose, and each one buys the refusals their honesty:
 
-| form | what to do |
+| the door passes | why |
 |---|---|
-| `-m "..."` | read it, lint it |
-| `-F <file>` | read the file, lint it |
-| neither | refuse: a commit through an editor is no thing an agent does |
+| anything under `.se/`, `.git/`, `node_modules/`, `/tmp/`, `/var/tmp/`, `/dev/` | no rule reads a file there |
+| a temp variable such as `$TMPDIR/x.md` | the same |
+| `mv spec/guidance/a.md spec/guidance/b.md` | a door reads both ends already |
+| `git commit --amend --no-edit`, `--fixup`, `--squash`, `-C` | the message stands already |
+| `git commit -F -` fed by a pipe | the door reads no stdin |
+| `node --test <file>`, `--test-name-pattern`, `--test-only` | the run points somewhere |
+| `git branch <name>` | the door reads two forms, and this is a third |
+| a redirection whose target reads as a variable or a glob | a guess costs more than the hole |
 
-Refusing the third closes the leak without asking anybody to type a new word.
+# What the parse reads wrongly
 
-# A branch name holds five
+One command lands a tracked file and the door passes it:
 
-`work new` refuses a long name. `git checkout -b` and `git switch -c` do not,
-and both reach the same tree.
+    find . -name '*.md' -exec sed -i 's/a/b/' {} +
 
-`overLong` in `lib/names.js` already answers this. Call it from the same parse.
+The parse reads the inner `sed -i`, and its target reads as `{}`. The enclosing
+`find` holds the real one, and reading it means running the search. So the door
+passes, the way it passes every target it cannot read.
 
-# A test run points somewhere
+`.se/scripts/edges.js` holds that case beside 21 others, and prints a `WRONG`
+line for any answer that misses. Run it after you touch the parse.
 
-The tree owns testing. `./RUNME.sh check` runs the suite, the doors check and
-`claude plugin validate`, and a bare `node --test` skips all three while
-answering green.
+# What the parse costs
 
-| command | verdict |
-|---|---|
-| `node --test`, `npm test` | refused, naming `./RUNME.sh check` |
-| `node --test test/level0/log.test.js` | allowed, one file |
-| `node --test --test-name-pattern="the prune"` | allowed, one case |
+| command | length | per parse |
+|---|---|---|
+| a real one from this session | 111 chars | 0.09 ms |
+| twenty of them in one chain, four times over | 4704 chars | 1.2 ms |
 
-A session can run a hundred single tests to dodge that. The log records every
-one, so a retro sees it, which is cheaper than a rule guessing at intent.
+`.se/scripts/probe.js` measures that, and runs 20 real commands from this
+session through the rules. None of them meets a refusal.
 
-# The description names verbs
+# What the heredoc refusal costs
 
-`tool.describe` fires once per tool per session and rewrites what the model
-reads. It is the carrot to the four sticks above.
+It costs one I use twice in this very session:
 
-Bash's description gains a line naming the tree's verbs: `./RUNME.sh check`,
-`./RUNME.sh work`, `./RUNME.sh log`, `./RUNME.sh config`. A model reading that
-first reaches for the verb before the raw command.
+1. `cat >> test/level0/hooks.test.js <<'EOF'` appends a block of cases.
+2. `python3 - <<'PY'` rewrites three paragraphs of `spec/design_output/bash.md`
+   in one pass.
 
-Two cautions from the type declaration:
+Both land a tracked file, and the new rule refuses both. The road it names is
+Read and then Edit, which costs two calls where one does. That is the price the
+brief asks for, so it stands, and the refusal names the road out loud.
 
-- The engine caches a rendered description for the session, so an unstable
-  answer spends the model's prompt cache on every call. Answer the same thing
-  every time.
-- `$.ui.invalidate("tool.describe")` clears that cache, and nothing here needs
-  to.
+# What surprises me
 
-# What every refusal owes
+- `claude plugin validate` reads an event name it knows nothing about and
+  passes. A probe registering `nonsense.event` validates green, so a typo in an
+  event name costs a silent hook and no error at all.
+- The client on this box carries 2.1.42, whose engine names no `tool.describe`
+  at all. So the describe hook stands on the type declaration alone, and
+  `spec/design_output/bash#what-stands-unproven` says so.
+- A voice rule reads a commit message cleanly. The messages on this branch pass
+  Vale under the path `level0-commit.md`, footer lines and all.
 
-A refusal that only says no teaches nothing. Each of these names the rule, the
-thing it refuses, and the road that works:
+# What is next
 
-    A shell writes past every rule in this tree, so this write meets none.
-    Read spec/guidance/voice.md with Read, then write it with Write.
+- `git branch <name>` cuts a branch the door reads none of.
+- A `find -exec` target reads as `{}`, and a rule reading `-name` closes it.
+- The door lints a commit message through Vale on every commit, which costs one
+  subprocess. Where that shows in a session, cache the answer per message.
+- `spec/guidance` names no rule about a shell write, because the door holds it.
+  A note saying so helps a session that meets the refusal cold.
 
-The refusal shape already stands in `lib/refuse.js`. Use it.
+## How this branch ends
 
-# What to prove first
-
-1. `./RUNME.sh check` passes, and it runs `claude plugin validate` for you.
-2. Each of the four refuses its case and passes the case beside it, under test
-   against a fake.
-3. A redirection into `.se/` passes, and one into `spec/` refuses.
-4. A commit message breaking a voice rule refuses, and a clean one commits.
-5. `git switch -c a-name-that-runs-past-the-cap` refuses.
-6. Bash's description carries the verbs, and answers the same string twice.
-
-# What your handback says
-
-- Which shell forms you catch, and which you let through on purpose.
-- Whether the heredoc refusal costs you a road you needed while working here.
-- What the parse costs on a long command, in milliseconds.
-- Any command the parse read wrongly, with the command.
-
-## How this branch runs
-
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
-
-1. Run `./RUNME.sh work sync` FIRST. It takes main into this branch, so
-   an old branch works against what the tree holds now. Resolve any conflict
-   before you start, because a conflict found later costs the work already
-   done.
-2. Commit and push each time you finish a thing. A cloud box dies and takes
-   its working tree with it.
-3. Write your result and your retro into `HANDOVER.md`, at the root, replacing
-   this brief. Say what surprises you and every dead end you walk into.
-4. Run `./RUNME.sh work done`, which sets the status and pushes.
-5. Run `./RUNME.sh work release` instead where you stop early, so the branch
-   goes back to `todo` for somebody else.
-6. Leave the merge into main to a person. A cloud box opens no pull
-   request, and trunk only ever comes towards you.
+1. Run `./RUNME.sh work sync` first, which takes main in.
+2. Commit and push each time a thing lands.
+3. Write the result and the retro back into `HANDOVER.md`.
+4. Run `./RUNME.sh work done`.
+5. Run `./RUNME.sh work release` on stopping early.
+6. Leave the merge to a person.
