@@ -124,6 +124,25 @@ on its next ask, so the two halves meet in the file and nowhere else.
 The ask lands in the standing block. Level zero reads the key and adds a line
 asking what the session is doing, then drops the key as the turn ends.
 
+# What waits for level one
+
+Declare these fields and draw none of them. An engine has to exist first, and
+this tree carries none. Declaring them now keeps the schema still when it
+arrives.
+
+| control | at rest | one click | five clicks |
+|---|---|---|---|
+| the engine | at rest | running | — |
+| binding | bound to the queue | unbound | god mode |
+| autonomy | finish your own token | start new tokens | ideation |
+
+Two widget types wait with them: `count`, a number the engine replaces on a
+beat, and `table`, rows the engine answers with the columns a declaration
+names. Neither has anything to read yet.
+
+Write this table into the design record you leave behind, so the next reader
+finds it without reading a brief that has already merged.
+
 # The local file dies
 
 A session is one VS Code window, from its opening to its end:
@@ -196,6 +215,8 @@ after the merge.
 - How `DoorsOnly` reads a folder importing `vscode`, and your answer to it.
 - Whether the process id draws the session line the way this brief claims.
 - The four things waiting on a person, as a list they can tick.
+- The mark the engine button wears, which the owner has yet to pick: play and
+  stop, one per state.
 
 ## How this branch runs
 
