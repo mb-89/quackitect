@@ -117,6 +117,29 @@ The reason, from v3:
 | hold | writes `stop.hold` | one mechanical rule in the stop table |
 | ask | writes `ask` | a line the context block carries |
 
+## The log tooltip teaches lnav
+
+An action opening another program hands a person that program's keys. Nobody
+reads a log viewer's manual first, and a person trapped in a full-screen tool
+opens it once.
+
+So the log button's hover carries five lines, and these five stand tested
+against this tree's own log:
+
+| key | what it does |
+|---|---|
+| `p` | open this line whole, with every field it hides |
+| `G` | jump to the newest line |
+| `/word` | find, and `n` for the next one |
+| `:filter-in <regex>` | keep only the lines that match, and `:filter-out` drops them |
+| `q` | leave |
+
+`q` earns its place over anything cleverer, for the reason above.
+
+The rule generalises. Where an action starts another program, its hover names
+the handful of keys that program needs, and the declaration carries them beside
+the `help`.
+
 The hold becomes a row in `spec/config/stop/level0.yml`, mechanical, `runs:
 owner-holds`, on the stop side above `work-waiting`. The tooth reads the config
 on its next ask, so the two halves meet in the file and nowhere else.
