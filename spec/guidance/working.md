@@ -14,3 +14,4 @@ rationale: [[spec/rationales/working]]
 6. Name the assumption you take where the owner says to carry on, and take it.
 7. Put a script of your own under `.se/scripts`, which git ignores.
 8. Read `.se/tools.json` for the path of a tool, and run `./RUNME.sh tools` where that file is absent.
+9. Fix what you trip over where the fix is trivial. Where it runs deeper, write the finding down and leave the code alone. *
