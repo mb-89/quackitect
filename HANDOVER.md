@@ -1,31 +1,103 @@
 ---
 kind: [[handover]]
-status: held
+status: todo
 urgency: now
 ---
 
-# A schema holds the config
+# The code asks, reading nothing
 
 Two rules in `test/contract/tree.test.js` read `spec/config/level0.json` and
-assert it carries what the code reads. A test is the wrong holder for that. A
-JSON Schema says the same thing, and the editor draws it without a server.
+assert it carries what the code reads. Two readers open that file directly:
 
-The wider job behind it is the owner's rule: a number belongs in config, and
-the code names a constant that reads it.
+- the hooks module, at `session.start`
+- the command line, at module load
+
+Each keeps what it finds for the life of its process. So a number stands in
+three places at once: the file, a reader holding a stale copy, and a constant
+somewhere reading nothing at all.
+
+This branch gives the tree one resolver. Code asks it for a key and takes what
+comes back. How the value gets there is none of the caller's business.
+
+# The three layers
+
+| layer | who writes it | when a reader reads it |
+|---|---|---|
+| `spec/config/level0.json` | the team, tracked in git | once, at start |
+| the environment | whoever launches the box | once, at start |
+| `.se/config.json` | a slash command, per box, git ignores it | on access, after a change check |
+
+A later layer beats an earlier one. So the per-box file beats the environment,
+and the environment beats the tracked file.
+
+Two things follow, and both matter:
+
+- **No default stands in code.** The tracked file is the defaults. A key the
+  code reads and the file lacks is a fault, and the schema below catches it.
+- **A key standing only in the per-box file still resolves.** The merge takes
+  every key it meets, whichever layer names it.
+
+# Why the local file differs
+
+| file | why it reads that way |
+|---|---|
+| the tracked one | it moves when somebody commits, so once is enough |
+| the per-box one | a slash command writes it mid-session |
+
+The per-box file is the state, so the resolver reads it on every ask. It is a
+small file, and a cache nobody has measured is a cache nobody needs.
+
+Measure that, and say the number in your handback:
+
+- The write door asks on every Write and Edit, so that is the ask to time.
+- Where one ask costs enough to see, check `mtimeMs` and `size` before the
+  read. `$.fs.stat` answers both.
+- Build that check only where the measurement calls for it.
+
+## A bad file changes nothing
+
+A slash command writes that file, so a half-written or unreadable one reaches
+the resolver eventually.
+
+The resolver shrugs. It keeps the layers beneath, says so once in the log under
+the door `level0`, and carries on.
+
+One bad command that takes a session down leaves a person deleting a file they
+cannot see, which is the worst way out of anything.
+
+# Where the resolver lives
+
+`.claude/skills/level0/lib/config.js`, free of `node:` imports, so the hooks
+module and the command line both load it.
+
+It takes its reads as arguments, the way `lintText` takes a binary. The hooks
+module hands it `$.fs`; the command line hands it the disk door. The resolver
+itself reaches nothing.
+
+Each process holds its own resolved copy. The one truth is the files, and two
+processes may see a change a moment apart. That is fine, and say so in the
+design record so nobody calls it a bug later.
 
 # The schema
 
-## What to write
+`spec/config/level0.schema.json`, draft 2020-12, and `spec/config/level0.json`
+gains `"$schema": "./level0.schema.json"` as its first key. The editor validates
+it from that line alone, with no extension and no server.
 
-`spec/config/level0.schema.json`, draft 2020-12, describing every field of
-`spec/config/level0.json`. Every property carries a `description`, because that
-string is what the editor shows on hover and what a later config editor reads.
+## Write it for an editor
 
-`spec/config/level0.json` gains `"$schema": "./level0.schema.json"` as its
-first key. The editor validates it from that line alone, so this half needs no
-extension and no server.
+VS Code builds its settings editor from schema entries. Follow the same
+conventions and a config pane later costs almost nothing:
 
-## What the schema must hold
+| key | why it earns its place |
+|---|---|
+| `type` | the control a pane draws |
+| `default` | what a pane shows where the file says nothing |
+| `description` | the hover, and the line a pane prints |
+| `enum` | a list becomes a dropdown |
+| `markdownDescription` | a link inside the hover |
+
+## What it must hold
 
 | object | fields the code reads |
 |---|---|
@@ -36,80 +108,86 @@ extension and no server.
 Read the code for the truth of that table. `judgeOf` in `lib/judge.js` and
 `toothOf` in `lib/stop.js` name what they read.
 
-Mark every object `"additionalProperties": false`. A typed key that nothing
-reads is the fault this schema exists to catch.
+Mark every object `"additionalProperties": false`. That governs the tracked
+file. The per-box file merges whatever it names, because it is a person's own
+override and the schema is the team's agreement.
 
-## What leaves the tests
+# The verb names the layer
+
+`./RUNME.sh config` prints every key, its value, and the layer answering it:
+
+    judge.enabled        true      spec/config/level0.json
+    judge.model          sonnet    .se/config.json
+    stop.mostInARow      3         spec/config/level0.json
+    log.level            warn      SE_LOG_LEVEL
+
+`git config --show-origin` is the shape to copy. Three layers with no way to
+ask which one answers leave a person guessing in three places.
+
+`./RUNME.sh config <key> <value>` writes the per-box file, making the directory
+where it stands missing. A slash command calls that verb later, so build the
+verb and leave the command alone.
+
+## The verb coerces
+
+A command line hands over text. `stop.mostInARow 5` writes the number `5`,
+because `"5" > 3` is a comparison somebody reads a bug report about later.
+
+The schema says the type, so the verb reads the schema and coerces to it.
+
+Where the schema knows no such key, write the text as given. A key only the
+local file names still resolves, and nothing knows its type.
+
+## A variable names a key
+
+One rule, both ways: `judge.maxSpans` reads `SE_JUDGE_MAX_SPANS`. Write the
+mapping in `lib/config.js` and hold it with a test in both directions.
+
+# The numbers leave the code
+
+| number | where | what to do |
+|---|---|---|
+| `WORDS = 5` | `lib/names.js` | move to `level0.json`, and let the caller hand it in |
+| `mostInARow` default | `lib/stop.js` | ask the resolver, and carry no default |
+| `max := 5` | `ShortHeading.yml` | leave it: a rule file is config already |
+| `max := 15` | `GuidanceCap.yml` | leave it, for the same reason |
+
+Biome carries `noMagicNumbers`. Turn it on in `spec/config/biome.json`, see how
+large the debt is, and say the number in your handback. Where the debt is small,
+pay it. Where it is large, name what you leave, and why.
+
+Expect noise: an index, a zero, a one, a slice bound. Configure the rule to skip
+those, and name the values you exempt.
+
+# What leaves the tests
 
 Delete these two from `test/contract/tree.test.js`:
 
 - the tooth settings carry every field the hook reads
 - the judge settings carry every field the judge reads
 
-Put one contract case in their place, in `test/contract/schema.test.js`: the
-schema refuses a config missing a field, and passes the config this tree ships.
-Validate with a schema library, or hand-roll the check the schema describes.
-
-# The numbers leave code
-
-## The rule
-
-A number in code names a constant, and that constant reads from the config of
-its level. A message prints the value it compares against, and spells no number
-in words.
-
-## Where they stand
-
-| number | where | what to do |
-|---|---|---|
-| `WORDS = 5` | `lib/names.js` | move to `level0.json`, and let the caller hand it in |
-| `mostInARow` default | `lib/stop.js` | read the config, and carry no default in code |
-| `max := 5` | `ShortHeading.yml` | leave it: a rule file is config already |
-| `max := 15` | `GuidanceCap.yml` | leave it, for the same reason |
-
-`lib/names.js` reaches nothing outside itself, so it takes the cap as an
-argument the way `lintText` takes a binary. The command line and the hooks
-module each read the config once, and hand it down.
-
-## What catches the next one
-
-Biome carries `noMagicNumbers`. Turn it on in `spec/config/biome.json`, see
-how large the debt is, and say the number in your handback. Where the debt is
-small, pay it. Where it is large, name what you leave, and why.
-
-Expect noise: an index, a zero, a one, a slice bound. Configure the rule to
-skip those, and name the values you exempt.
+The schema holds both. Put one contract case in their place: the schema refuses
+a config missing a field, and passes the config this tree ships.
 
 # What to prove first
 
 1. `./RUNME.sh check` passes, and it runs `claude plugin validate` for you.
-2. The schema refuses a config missing a field, under test.
-3. The editor draws a squiggle on a bad `level0.json`. Say how you see it.
-4. No number the config owns stands in code, and a grep in your handback shows
+2. Each layer beats the one under it, under test against a fake disk.
+3. A write to `.se/config.json` reaches the next ask.
+4. An unreadable `.se/config.json` leaves every other layer standing.
+5. The schema refuses a config missing a field.
+6. `./RUNME.sh config` names the layer answering each value.
+7. No number the config owns stands in code, and a grep in your handback shows
    what remains.
-5. `noMagicNumbers` runs, and you pay or name each of its findings.
 
 # What your handback says
 
+- What one ask costs inside the write door, and whether a cache earns a place.
 - The size of the magic-number debt, and the values you exempt.
-- Whether the editor draws the schema without an extension.
-- Every field the code reads that the config lacks.
+- Whether the editor draws the schema with no extension.
+- Every field the code reads and the config lacks.
 
-## How this branch runs
+# What this branch leaves alone
 
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
-
-1. Run `./RUNME.sh work sync` FIRST. It takes main into this branch, so
-   an old branch works against what the tree holds now. Resolve any conflict
-   before you start, because a conflict found later costs the work already
-   done.
-2. Commit and push each time you finish a thing. A cloud box dies and takes
-   its working tree with it.
-3. Write your result and your retro into `HANDOVER.md`, at the root, replacing
-   this brief. Say what surprises you and every dead end you walk into.
-4. Run `./RUNME.sh work done`, which sets the status and pushes.
-5. Run `./RUNME.sh work release` instead where you stop early, so the branch
-   goes back to `todo` for somebody else.
-6. Leave the merge into main to a person. A cloud box opens no pull
-   request, and trunk only ever comes towards you.
+The config pane in the editor, and the slash commands themselves. The verb is
+the surface both will call, so build the verb well and stop there.
