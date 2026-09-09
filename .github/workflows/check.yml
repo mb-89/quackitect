@@ -1,0 +1,23 @@
+# The rules over this tree, run by a machine with no stake in the answer.
+# A session says the check passes; this says whether it does.
+name: check
+on: push
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      # The installer downloads each binary from a pinned release. The key
+      # names those versions, so a bump fetches them once and no run after.
+      - uses: actions/cache@v4
+        with:
+          path: .se/bin
+          key: se-bin-vale3.20.0-biome2.5.12-lnav0.14.1
+
+      - run: ./RUNME.sh check
