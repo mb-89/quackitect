@@ -63,6 +63,7 @@ const lnav = whereIs(files, root, "lnav", known);
 const LOG = join(root, ".se", "log");
 const STYLES = join(root, "spec", "config", "styles", "VoiceVale");
 const JUDGED = join(root, "spec", "config", "styles", "VoiceJudged");
+const SHAPE = join(root, "spec", "config", "styles", "VoiceShape");
 const biome = whereIs(files, root, "biome", known);
 const GUIDANCE = join(root, "spec", "guidance");
 const DOORS = join(root, "src", "doors");
@@ -403,7 +404,9 @@ function doctor() {
     [
       "vale rules",
       files.exists(STYLES)
-        ? `${namesIn(STYLES, ".yml").length} in VoiceVale`
+        ? `${namesIn(STYLES, ".yml").length} in VoiceVale, ${
+            files.exists(SHAPE) ? namesIn(SHAPE, ".yml").length : 0
+          } in VoiceShape`
         : "missing",
     ],
     [
