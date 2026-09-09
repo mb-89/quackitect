@@ -17,6 +17,7 @@ import { EDITOR_SETTINGS, valeLsBin } from "../../.claude/skills/level0/lib/serv
 import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
 import { CONFIG, fromJson, unreasoned, valeBin } from "../../.claude/skills/level0/lib/vale.js";
 import { work } from "./work.js";
+import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 
@@ -281,7 +282,7 @@ function test() {
 
 // [[spec/design_output/level0#no-computed-engine-access]]
 function pluginHolds() {
-  const ran = outside.run(["claude", "plugin", "validate", PLUGIN], { cwd: root });
+  const ran = validatePlugin(outside.run, PLUGIN, root);
   if (ran.exitCode === 0) return 0;
   if (!ran.stdout && !ran.stderr) {
     console.log("claude stands nowhere, so the plugin goes unvalidated here.");

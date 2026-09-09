@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "$owner": "quackitect-level0",
+  "hooks": {
+    "sessionStart": [
+      {
+        "type": "command",
+        "command": "node src/scripts/copilot.js hook SessionStart",
+        "timeout": 60,
+        "timeoutSec": 60
+      }
+    ],
+    "preToolUse": [
+      {
+        "type": "command",
+        "command": "node src/scripts/copilot.js hook PreToolUse",
+        "timeout": 60,
+        "timeoutSec": 60
+      }
+    ],
+    "postToolUse": [
+      {
+        "type": "command",
+        "command": "node src/scripts/copilot.js hook PostToolUse",
+        "timeout": 60,
+        "timeoutSec": 60
+      }
+    ],
+    "agentStop": [
+      {
+        "type": "command",
+        "command": "node src/scripts/copilot.js hook Stop",
+        "timeout": 60,
+        "timeoutSec": 60
+      }
+    ]
+  }
+}

@@ -154,7 +154,10 @@ $needed = @(
 )
 
 $missing = @($needed | Where-Object { -not (& $_.have) })
-if ($missing.Count -eq 0) { exit 0 }
+if ($missing.Count -eq 0) {
+  & node (Join-Path $root "src\scripts\copilot.js") setup auto
+  exit $LASTEXITCODE
+}
 
 Write-Host "Installing what this tree needs." -ForegroundColor Cyan
 foreach ($one in $missing) {
@@ -173,4 +176,5 @@ foreach ($one in $missing) {
   }
 }
 Write-Host "Ready." -ForegroundColor Green
-exit 0
+& node (Join-Path $root "src\scripts\copilot.js") setup auto
+exit $LASTEXITCODE

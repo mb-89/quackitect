@@ -221,7 +221,10 @@ missing=""
 for one in node vale biome vale-ls lnav lnav-format; do
   here "$one" || missing="$missing $one"
 done
-[ -n "$missing" ] || exit 0
+if [ -z "$missing" ]; then
+  node "$root/src/scripts/copilot.js" setup auto
+  exit $?
+fi
 
 say "Installing what this tree needs."
 for one in $missing; do
@@ -238,3 +241,4 @@ for one in $missing; do
   fi
 done
 say "Ready."
+node "$root/src/scripts/copilot.js" setup auto

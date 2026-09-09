@@ -1,0 +1,17 @@
+# quackitect-level0
+name: Copilot setup
+on: workflow_dispatch
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install level zero
+        run: sh src/scripts/install.sh
+      - name: Prepare cloud hooks
+        run: node src/scripts/copilot.js setup cloud

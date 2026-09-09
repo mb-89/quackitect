@@ -5,4 +5,8 @@
 # tracked settings file, which carries no port and no machine-specific path.
 .claude/settings.local.json
 
+# Setup generates the Copilot registrations under .github, and this tree tracks
+# them on purpose. A cloud box reads its hooks and its setup job from the
+# default branch, so committing them is what keeps level zero active there.
+
 node_modules/
