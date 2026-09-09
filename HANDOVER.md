@@ -134,11 +134,9 @@ against this tree's own log:
 | `:filter-in <regex>` | keep only the lines that match, and `:filter-out` drops them |
 | `q` | leave |
 
-`q` earns its place over anything cleverer, for the reason above.
-
-The rule generalises. Where an action starts another program, its hover names
-the handful of keys that program needs, and the declaration carries them beside
-the `help`.
+`q` earns its place over anything cleverer, for the reason above. The rule
+generalises: where an action starts another program, its hover names the keys
+that program needs, and the declaration carries them beside the `help`.
 
 The hold becomes a row in `spec/config/stop/level0.yml`, mechanical, `runs:
 owner-holds`, on the stop side above `work-waiting`. The tooth reads the config
