@@ -13,6 +13,7 @@ import {
 import { asRow, rowsOf } from "../../.claude/skills/level0/lib/log.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
 import { pathInScript, SCRIPT } from "../../.claude/skills/level0/lib/scripts.js";
+import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { EDITOR_SETTINGS } from "../../.claude/skills/level0/lib/servers.js";
 import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
 import { TOOLS, WANTED } from "../../.claude/skills/level0/lib/tools.js";
@@ -81,7 +82,7 @@ const run = async (argv, init = {}) =>
 const verbs = {
   check: {
     says: "the tests, the doors, then the rules over the tree",
-    run: async (w) => test() || doorsHold() || pluginHolds() || (await lint(w)),
+    run: async (w) => stamped(test() || doorsHold() || pluginHolds() || (await lint(w))),
   },
   lint: { says: "the rules over the tree, or over what you name", run: lint },
   fix: { says: "the fixes a program can make", run: fix },
@@ -319,6 +320,19 @@ function pluginHolds() {
   console.error(`${ran.stdout}${ran.stderr}`.trim());
   console.error("The engine reads this module's source, and it refuses the above.");
   return 1;
+}
+
+// [[spec/design_output/work#the-battery-answers-before-done]]
+function stamped(code) {
+  const sha = it.git.run(["rev-parse", "HEAD"], true).out;
+  const clean = !it.git.run(["status", "--porcelain"], true).out;
+  files.makeDir(join(root, ".se"));
+  files.write(
+    join(root, STAMP),
+    `${JSON.stringify({ sha, ok: code === 0, clean, at: it.clock.now().toISOString() }, null, 2)}
+`,
+  );
+  return code;
 }
 
 // [[spec/guidance/testing]]
