@@ -7,12 +7,12 @@ import { fileURLToPath } from "node:url";
 import { test } from "node:test";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
-import { biomeBin } from "../../.claude/skills/level0/lib/code.js";
+import { readTools, whereIs } from "../../src/scripts/tools.js";
 import { candidateRun } from "../../.claude/skills/level0/lib/candidate-check.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
-const bin = join(root, biomeBin(process.platform));
+const bin = whereIs(files, root, "biome", readTools(files, root));
 
 test("real Biome emits a structured candidate report", {
   skip: !files.exists(bin),

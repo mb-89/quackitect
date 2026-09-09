@@ -1,13 +1,14 @@
 // Copilot's level zero, with every outside operation supplied by doors.
 // [[spec/design_output/copilot#one-runtime]]
 
-import { CODE, biomeBin, formatText, lintText as lintCode } from "./code.js";
+import { CODE, formatText, lintText as lintCode } from "./code.js";
 import { actionables, bindsHere, standingLayer } from "./guidance.js";
 import { mutations } from "./mutations.js";
 import { refusal } from "./refuse.js";
 import { readRule } from "./rulefile.js";
 import { landsOnTrunk } from "./trunk.js";
-import { lintText, valeBin } from "./vale.js";
+import { lintText } from "./vale.js";
+import { readTools, whereIs } from "../../../../src/scripts/tools.js";
 import { statusOf } from "../../../../src/scripts/work.js";
 import { candidateRun } from "./candidate-check.js";
 
@@ -34,8 +35,9 @@ export async function handle(event, it) {
       if (result.exitCode !== 0) throw new Error("Cannot identify the work branch.");
       return result.stdout.trim();
     };
-    const vale = it.join(it.root, valeBin(it.platform));
-    const biome = it.join(it.root, biomeBin(it.platform));
+    const known = readTools(it.disk, it.root);
+    const vale = whereIs(it.disk, it.root, "vale", known);
+    const biome = whereIs(it.disk, it.root, "biome", known);
     const ready = () => {
       if (![vale, biome].every((path) => it.disk.exists(path))) {
         throw new Error(

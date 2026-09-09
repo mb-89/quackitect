@@ -2,20 +2,16 @@
 // run(argv, { stdin, cwd }); the rules live in spec/config/styles.
 // [[spec/design_output/level0#where-a-rule-lives]]
 
-export const VALE = ".se/bin/vale";
 export const CONFIG = ".vale.ini";
 
 const MARKER = /<!--\s*vale\s+([A-Za-z0-9_.-]+)\s*=\s*(NO|off)\s*-->/i;
 const REASON = /<!--\s*because:\s*(.+?)\s*-->/i;
 
-export function valeBin(platform) {
-  return platform === "win32" ? `${VALE}.exe` : VALE;
-}
-
 export async function lintText(text, where, options = {}) {
   const { run, bin, cwd } = options;
+  if (!bin) return { ran: false, why: "no vale stands here", found: [] };
   const argv = [
-    bin ?? VALE,
+    bin,
     `--config=${CONFIG}`,
     `--path=${where || "stdin.md"}`,
     "--output=JSON",

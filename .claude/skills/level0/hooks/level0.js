@@ -3,20 +3,15 @@
 // and spec/guidance.
 // [[spec/design_output/level0#the-write-door]]
 
-import {
-  BIOME,
-  biomeBin,
-  CODE,
-  formatText,
-  lintText as lintCode,
-} from "../lib/code.js";
+import { CODE, formatText, lintText as lintCode } from "../lib/code.js";
 import { bindsHere, envOf, standingLayer } from "../lib/guidance.js";
 import { judgeOf } from "../lib/judge.js";
 import { asLines, FOLDER, nameOf, rowOf } from "../lib/log.js";
 import { refusal, taught } from "../lib/refuse.js";
 import { readRule } from "../lib/rulefile.js";
+import { guesses, pathOf, surveyOf, TOOLS } from "../lib/tools.js";
 import { landsOnTrunk, touchesGit } from "../lib/trunk.js";
-import { lintText, VALE } from "../lib/vale.js";
+import { lintText } from "../lib/vale.js";
 
 const PROSE = /\.(md|markdown|txt)$/i;
 const GUIDANCE = "spec/guidance";
@@ -40,9 +35,14 @@ export function register(on, _options) {
   let logbook = logHere(null);
 
   on("session.start", async ($, e, next) => {
-    bin = await linterHere($);
-    if (!bin) bin = await install($);
-    formatter = await formatterHere($);
+    let known = await readSurvey($);
+    bin = await toolHere($, known, "vale");
+    if (!bin) {
+      await install($);
+      known = await readSurvey($);
+      bin = await toolHere($, known, "vale");
+    }
+    formatter = await toolHere($, known, "biome");
     standing = await readGuidance($);
     config = await readConfig($);
     judge = judgeOf(config);
@@ -408,8 +408,19 @@ async function readConfig($) {
   }
 }
 
-async function formatterHere($) {
-  for (const path of [`${BIOME}.exe`, BIOME]) {
+// [[spec/design_output/tools#where-a-caller-looks]]
+async function readSurvey($) {
+  try {
+    return surveyOf(await $.fs.readFile(TOOLS));
+  } catch {
+    return {};
+  }
+}
+
+async function toolHere($, known, name) {
+  const said = pathOf(known, name);
+  for (const path of [said, ...guesses(name)]) {
+    if (!path) continue;
     try {
       if (await $.fs.exists(path)) return path;
     } catch {
@@ -448,17 +459,6 @@ async function codeDoor($, e, next, writing, formatter, logbook) {
   return next(e);
 }
 
-async function linterHere($) {
-  for (const path of [`${VALE}.exe`, VALE]) {
-    try {
-      if (await $.fs.exists(path)) return path;
-    } catch {
-      return null;
-    }
-  }
-  return null;
-}
-
 async function install($) {
   const ways = [
     ["sh", "src/scripts/install.sh"],
@@ -474,13 +474,10 @@ async function install($) {
   for (const argv of ways) {
     try {
       const ran = await $.process.run(argv, { timeoutMs: 300000 });
-      if (ran.exitCode === 0) {
-        const found = await linterHere($);
-        if (found) return found;
-      }
+      if (ran.exitCode === 0) return true;
     } catch {}
   }
-  return null;
+  return false;
 }
 
 function shorten(path) {

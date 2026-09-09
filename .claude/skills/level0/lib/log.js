@@ -4,7 +4,6 @@
 // [[spec/design_output/log#what-one-line-looks-like]]
 
 export const FOLDER = ".se/log";
-export const LNAV = ".se/bin/lnav";
 export const DAYS = 14;
 export const FILES = 200;
 export const LEAST = 20;
@@ -14,10 +13,6 @@ const SAID = 80;
 const OWN = ["at", "level", "door", "said"];
 const NAME = /^(\d{4}-\d{2}-\d{2})T(\d{2})-(\d{2})-(\d{2})-[0-9a-z]+\.jsonl$/;
 const DAY = 24 * 60 * 60 * 1000;
-
-export function lnavBin(platform) {
-  return platform === "win32" ? `${LNAV}.exe` : LNAV;
-}
 
 export function rowOf(at, level, door, said, more = {}) {
   const rest = {};
