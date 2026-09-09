@@ -7,6 +7,9 @@ import { test } from "node:test";
 import {
   actionables,
   bindsHere,
+  canary,
+  canaryIn,
+  countsOf,
   envOf,
   parse,
   standingLayer,
@@ -98,4 +101,47 @@ test("an empty, zero or false value switches nothing on", () => {
       `${JSON.stringify(said)} is a value`,
     );
   }
+});
+
+// [[spec/design_output/level0#the-canary]]
+test("the canary carries the counts level zero loaded", () => {
+  assert.equal(
+    canary({ rules: 14, notes: 5, stop: true }),
+    "level0 holds this session: 14 rules, 5 notes, the stop hook on.",
+  );
+  assert.match(canary({ rules: 1, notes: 1, stop: false }), /the stop hook off\.$/);
+});
+
+test("the canary counts the notes carrying a rule", () => {
+  const empty = `---\nkind: [[guidance]]\n---\n\n# Motivation\n\nNothing to do.\n`;
+  assert.deepEqual(
+    countsOf([
+      { name: "a.md", text: note },
+      { name: "b.md", text: empty },
+    ]),
+    {
+      notes: 1,
+      rules: 2,
+    },
+  );
+});
+
+test("an answer saying the line word for word comes back as the same", () => {
+  const said = canary({ rules: 14, notes: 5, stop: true });
+  const answer = `The work stands pushed.\n\n${said}\n`;
+  assert.deepEqual(canaryIn(answer, said), { found: "same", said });
+});
+
+test("an answer saying other counts comes back with both", () => {
+  const said = canary({ rules: 14, notes: 5, stop: true });
+  const other = canary({ rules: 9, notes: 5, stop: true });
+  assert.deepEqual(canaryIn(`I read ${other}`, said), { found: "other", said: other });
+});
+
+test("an answer saying nothing comes back absent", () => {
+  const said = canary({ rules: 14, notes: 5, stop: true });
+  assert.deepEqual(canaryIn("The work stands pushed.", said), {
+    found: "none",
+    said: "",
+  });
 });

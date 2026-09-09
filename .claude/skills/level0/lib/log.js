@@ -1,18 +1,15 @@
-// The shape of one log line, the name of the file it lands in, and the prune
-// that decides what goes. This module reaches nothing outside itself, so the
-// hook inside the harness and the door outside it both read it.
+// The shape of one log line, the name of the file it lands in, and the level a
+// box writes at. This module reaches nothing outside itself, so the hook inside
+// the harness and the door outside it both read it.
 // [[spec/design_output/log#what-one-line-looks-like]]
 
 export const FOLDER = ".se/log";
-export const DAYS = 14;
-export const FILES = 200;
-export const LEAST = 20;
 
 const LEVELS = ["info", "warn", "error"];
 const SAID = 80;
 const OWN = ["at", "level", "door", "said"];
 const NAME = /^(\d{4}-\d{2}-\d{2})T(\d{2})-(\d{2})-(\d{2})-[0-9a-z]+\.jsonl$/;
-const DAY = 24 * 60 * 60 * 1000;
+const AIMS = ["file_path", "command", "query", "url"];
 
 export function rowOf(at, level, door, said, more = {}) {
   const rest = {};
@@ -51,23 +48,23 @@ export function timeOf(name) {
   return Date.parse(`${said[1]}T${said[2]}:${said[3]}:${said[4]}.000Z`);
 }
 
-// [[spec/design_output/log#rotation-really-a-prune]]
-export function dropping(names, now, caps = {}) {
-  const days = caps.days ?? DAYS;
-  const keep = caps.files ?? FILES;
-  const least = caps.least ?? LEAST;
-  const mine = names
-    .map((name) => ({ name, at: timeOf(name) }))
-    .filter((one) => one.at > 0)
-    .sort((a, b) => a.at - b.at || a.name.localeCompare(b.name));
+// [[spec/design_output/log#what-a-box-writes]]
+export function writes(at, level) {
+  return rank(level) >= rank(at);
+}
 
-  const oldest = now - days * DAY;
-  const floor = mine.slice(Math.max(0, mine.length - least));
-  const young = (one) => one.at >= oldest || floor.includes(one);
-  const stale = mine.filter((one) => !young(one));
-  const left = mine.filter(young);
-  const over = left.slice(0, Math.max(0, left.length - keep));
-  return [...stale, ...over].map((one) => one.name);
+function rank(said) {
+  const found = LEVELS.indexOf(String(said ?? "").toLowerCase());
+  return found < 0 ? 0 : found;
+}
+
+// [[spec/design_output/log#what-a-tool-line-names]]
+export function aimOf(call) {
+  for (const field of AIMS) {
+    const said = call?.[field];
+    if (typeof said === "string" && said.trim()) return said.trim();
+  }
+  return String(call?.tool ?? "");
 }
 
 export function asRow(one) {

@@ -1,9 +1,16 @@
 // The log. One file per session under .se/log, and one JSON object per line.
 // The disk door offers no append, so each line rewrites the session file, and
-// one file per session bounds what that rewrite costs.
+// one file per session bounds what that rewrite costs. The level this box
+// writes at decides which line reaches the file.
 // [[spec/design_output/log#where-the-writer-stands]]
 
-import { asLines, dropping, FOLDER, nameOf, rowOf } from "../../.claude/skills/level0/lib/log.js";
+import {
+  asLines,
+  FOLDER,
+  nameOf,
+  rowOf,
+  writes,
+} from "../../.claude/skills/level0/lib/log.js";
 
 export function log(disk, clock, init = {}) {
   const folder = init.folder ?? FOLDER;
@@ -16,6 +23,7 @@ export function log(disk, clock, init = {}) {
     lines: () => rows.map((one) => ({ ...one })),
     async say(level, door, said, more) {
       const row = rowOf(clock.stamp(), level, door, said, more);
+      if (!writes(init.level, row.level)) return row;
       rows.push(row);
       if (!made) {
         await disk.makeDir(folder);
@@ -23,23 +31,6 @@ export function log(disk, clock, init = {}) {
       }
       await disk.write(path, asLines(rows));
       return row;
-    },
-
-    // [[spec/design_output/log#rotation-really-a-prune]]
-    prune(caps = {}) {
-      let names = [];
-      try {
-        names = disk
-          .list(folder)
-          .filter((one) => one.kind === "file")
-          .map((one) => one.name);
-      } catch {
-        return [];
-      }
-
-      const going = dropping(names, clock.now().getTime(), caps);
-      for (const name of going) disk.remove(`${folder}/${name}`);
-      return going;
     },
   };
 }

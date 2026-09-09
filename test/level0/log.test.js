@@ -1,22 +1,25 @@
-// The log line, the file it lands in, and the prune that decides what goes.
+// The log line, the file it lands in, and the level a box writes at.
 // [[spec/guidance/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import {
+  aimOf,
+  asRow,
+  nameOf,
+  rowsOf,
+  timeOf,
+  writes,
+} from "../../.claude/skills/level0/lib/log.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
-import { asRow, dropping, LEAST, nameOf, rowsOf, timeOf } from "../../.claude/skills/level0/lib/log.js";
 
 const AT = "2026-09-08T14:22:51.000Z";
 const ID = "a6f8c43b";
 const FOLDER = "/log";
 
-function door(from = AT) {
-  return fakeLog(fakeClock(from), { folder: FOLDER, id: ID });
-}
-
-function named(day, id = "0000000a") {
-  return `${day}-${id}.jsonl`;
+function door(from = AT, level) {
+  return fakeLog(fakeClock(from), { folder: FOLDER, id: ID, level });
 }
 
 test("a line carries the time, the level, the door and one sentence", async () => {
@@ -82,70 +85,61 @@ test("every line the door writes parses as JSON", async () => {
   assert.equal(text.endsWith("\n"), true);
 });
 
-test("the prune drops a file older than the day cap", async () => {
-  const it = door();
-  await it.say("info", "write", "a line, so the folder stands");
-  it.files.write(`${FOLDER}/${named("2026-08-01T00-00-00")}`, "{}\n");
-
-  const went = it.prune({ days: 14, files: 200, least: 0 });
-  assert.deepEqual(went, [named("2026-08-01T00-00-00")]);
-  assert.equal(it.files.exists(`${FOLDER}/${named("2026-08-01T00-00-00")}`), false);
-  assert.equal(it.files.exists(it.path), true);
-});
-
-test("the prune drops the oldest past the file cap", async () => {
-  const it = door();
-  await it.say("info", "write", "a line, so the folder stands");
-  for (const hour of ["09", "10", "11"]) {
-    it.files.write(`${FOLDER}/${named(`2026-09-08T${hour}-00-00`)}`, "{}\n");
-  }
-
-  const went = it.prune({ days: 14, files: 2 });
-  assert.deepEqual(went, [
-    named("2026-09-08T09-00-00"),
-    named("2026-09-08T10-00-00"),
-  ]);
-  assert.deepEqual(
-    it.files
-      .list(FOLDER)
-      .map((one) => one.name)
-      .sort(),
-    [named("2026-09-08T11-00-00"), "2026-09-08T14-22-51-a6f8c43b.jsonl"],
-  );
-});
-
-test("the prune leaves a file inside both caps", async () => {
-  const it = door();
-  await it.say("info", "write", "a line, so the folder stands");
-  assert.deepEqual(it.prune({ days: 14, files: 200 }), []);
-  assert.equal(it.files.exists(it.path), true);
-});
-
-test("the prune answers nothing where no folder stands", () => {
-  assert.deepEqual(door().prune(), []);
-});
-
-test("the prune reads a file this tree never named", () => {
-  const now = Date.parse("2026-09-08T14:00:00.000Z");
-  const caps = { least: 0 };
-  assert.deepEqual(dropping(["notes.md", named("2026-01-01T00-00-00")], now, caps), [
-    named("2026-01-01T00-00-00"),
-  ]);
-});
-
 test("a row without lnav shows the four fields, and the rest beneath", () => {
   const one = { at: AT, level: "warn", door: "write", said: "refused" };
   assert.equal(asRow(one), "14:22:51.000 warn  write  refused");
   assert.match(asRow({ ...one, rule: "Passive" }), /\n\s+rule=Passive$/);
 });
 
-test("a fortnight away leaves the newest files standing", () => {
-  const now = Date.parse("2026-09-08T12:00:00.000Z");
-  const old = (n) => nameOf(new Date(now - (60 + n) * 86400000).toISOString(), "aaaaaaaa");
-  const names = Array.from({ length: 30 }, (_, i) => old(i));
+test("a box at warn writes a refusal and a fault, and no info line", async () => {
+  const it = door(AT, "warn");
+  await it.say("info", "tool", "a call nobody refuses");
+  await it.say("warn", "write", "refused a line");
+  await it.say("error", "vale", "the linter fell over");
 
-  const went = dropping(names, now);
+  assert.deepEqual(
+    it.lines().map((one) => one.level),
+    ["warn", "error"],
+  );
+  assert.deepEqual(
+    rowsOf(it.files.read(it.path)).map((one) => one.door),
+    ["write", "vale"],
+  );
+});
 
-  assert.equal(names.length - went.length, LEAST, "the floor holds the newest");
-  assert.ok(!went.includes(old(0)), "the newest of the old stands");
+test("a box naming no level, and one naming a level nobody knows, write everything", () => {
+  for (const at of [undefined, "", "loud"]) {
+    for (const level of ["info", "warn", "error"]) {
+      assert.equal(writes(at, level), true, `${at} writes ${level}`);
+    }
+  }
+});
+
+test("a box at error writes a fault alone", () => {
+  assert.deepEqual(
+    ["info", "warn", "error"].map((level) => writes("error", level)),
+    [false, false, true],
+  );
+});
+
+test("a box writing nothing leaves no file behind", async () => {
+  const it = door(AT, "error");
+  await it.say("info", "tool", "a call nobody refuses");
+  assert.equal(it.files.exists(it.path), false);
+});
+
+// [[spec/design_output/log#what-a-tool-line-names]]
+test("a tool line names the field the call aims at", () => {
+  assert.equal(
+    aimOf({ tool: "Write", file_path: "spec/guidance/voice.md" }),
+    "spec/guidance/voice.md",
+  );
+  assert.equal(aimOf({ tool: "Edit", file_path: "RUNME.sh" }), "RUNME.sh");
+  assert.equal(aimOf({ tool: "Bash", command: "git status" }), "git status");
+  assert.equal(aimOf({ tool: "WebSearch", query: "lnav formats" }), "lnav formats");
+  assert.equal(
+    aimOf({ tool: "WebFetch", url: "https://lnav.org" }),
+    "https://lnav.org",
+  );
+  assert.equal(aimOf({ tool: "TaskList" }), "TaskList");
 });

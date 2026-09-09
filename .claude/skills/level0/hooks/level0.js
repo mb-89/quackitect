@@ -4,12 +4,30 @@
 // [[spec/design_output/level0#the-write-door]]
 
 import { CODE, formatText, lintText as lintCode } from "../lib/code.js";
-import { bindsHere, envOf, standingLayer } from "../lib/guidance.js";
+import {
+  bindsHere,
+  canary,
+  canaryIn,
+  countsOf,
+  envOf,
+  parse,
+  standingLayer,
+} from "../lib/guidance.js";
 import { judgeOf } from "../lib/judge.js";
-import { asLines, FOLDER, nameOf, rowOf } from "../lib/log.js";
+import { aimOf, asLines, FOLDER, nameOf, rowOf, writes } from "../lib/log.js";
 import { refusal, taught } from "../lib/refuse.js";
 import { readRule } from "../lib/rulefile.js";
 import { guesses, pathOf, surveyOf, TOOLS } from "../lib/tools.js";
+import {
+  claimSpec,
+  decide,
+  detail,
+  pool,
+  reprompt,
+  RULES,
+  todos,
+  toothOf,
+} from "../lib/stop.js";
 import { landsOnTrunk, touchesGit } from "../lib/trunk.js";
 import { lintText } from "../lib/vale.js";
 
@@ -27,12 +45,18 @@ export function register(on, _options) {
   let bin = null;
   let formatter = null;
   let standing = "";
+  let sentence = "";
+  let firstTurn = true;
   let config = {};
   let judge = judgeOf({});
   let handover = [];
   let waiting = false;
   let cloud = false;
   let logbook = logHere(null);
+  let rules = [];
+  let onAHeldBranch = false;
+  const list = todos();
+  let tooth = toothOf();
 
   on("session.start", async ($, e, next) => {
     let known = await readSurvey($);
@@ -43,12 +67,21 @@ export function register(on, _options) {
       bin = await toolHere($, known, "vale");
     }
     formatter = await toolHere($, known, "biome");
-    standing = await readGuidance($);
     config = await readConfig($);
     judge = judgeOf(config);
+
+    const guidance = await readGuidance($);
+    standing = guidance.said;
+    sentence = canary({
+      rules: guidance.rules,
+      notes: guidance.notes,
+      stop: config.stop?.enabled !== false,
+    });
     handover = await takeHandover($);
     cloud = await onACloudBox($);
     waiting = cloud && !handover.length && (await offAWorkBranch($));
+    onAHeldBranch = handover.some((one) => parse(one.text).front.status === "held");
+    tooth = toothOf({ mostInARow: config.stop?.mostInARow });
 
     try {
       await $.fs.writeFile(
@@ -57,61 +90,37 @@ export function register(on, _options) {
       );
     } catch {}
 
-    logbook = logHere((at, text) => $.fs.writeFile(at, text));
-    await logbook.say("info", "level0", `session start, ${await pruned($)}`, {
+    logbook = logHere((at, text) => $.fs.writeFile(at, text), config.log?.level);
+    await logbook.say("info", "level0", "session start", {
       branch: await branchNow($),
       vale: bin ?? "missing",
     });
+
+    // [[spec/design_output/stop#where-the-rules-live]]
+    const pooled = pool(await readFolder($, RULES, ".yml"));
+    rules = pooled.rules;
+    for (const name of pooled.broken) {
+      await logbook.say("warn", "stop", `${name} carries a rule nobody can read`, {
+        file: `${RULES}/${name}`,
+      });
+    }
+    await $.tool.register(claimSpec(rules));
     return next(e);
   });
 
-  // [[spec/design_output/work#a-box-writes-its-branch]]
-  on("tool.call", { tool: "Bash" }, async ($, e, next) => {
-    if (!cloud) return next(e);
-    const said = String(e.command ?? "");
-    if (!touchesGit(said).commits && !touchesGit(said).pushes) return next(e);
-
-    const how = landsOnTrunk(said, await branchNow($), TRUNK);
-    if (!how) return next(e);
-
-    await logbook.say("warn", "bash", `refused a ${how} landing on ${TRUNK}`, {
-      tool: "Bash",
-      detail: said.slice(0, 120),
-    });
-    return {
-      deny: [
-        `This box works a branch, and ${TRUNK} belongs to a person.`,
-        "",
-        how === "commit"
-          ? `You stand on ${TRUNK}, so this commit would land there.`
-          : `This pushes ${TRUNK}, which no cloud box may move.`,
-        "",
-        "Run `./RUNME.sh work take` to take a branch and move onto it. Every",
-        "commit then lands where it belongs, and the merge stays a person's.",
-      ].join("\n"),
-    };
+  on("prompt.submit", async (_$, e, next) => {
+    const from = String(e.origin?.kind ?? "");
+    tooth.sawPrompt(from === "plugin");
+    await logbook.say("info", "prompt", String(e.text ?? ""), { detail: from });
+    return next(e);
   });
 
-  // [[spec/design_output/log#the-search-writes-itself-down]]
-  on("tool.call", { tool: "WebSearch" }, async ($, e, next) => {
-    const said = await next(e);
-    await logbook.say("info", "search", String(e.query ?? "").slice(0, 120), {
-      tool: "WebSearch",
-      detail: [e.allowed_domains, e.blocked_domains].flat().filter(Boolean).join(" "),
-    });
-    return said;
-  });
-
-  on("tool.call", { tool: "WebFetch" }, async ($, e, next) => {
-    const said = await next(e);
-    await logbook.say("info", "search", String(e.url ?? "").slice(0, 120), {
-      tool: "WebFetch",
-      detail: String(e.prompt ?? "").slice(0, 200),
-    });
-    return said;
-  });
-
+  // [[spec/design_output/log#what-a-tool-line-names]]
   on("tool.call", async ($, e, next) => {
+    tooth.sawCall(String(e.tool ?? ""));
+    list.sawCall(e);
+    await logbook.say("info", "tool", aimOf(e), { tool: e.tool });
+
     const writing = asWrite(e);
     if (!writing) return next(e);
 
@@ -157,8 +166,49 @@ export function register(on, _options) {
     return { deny: refusal(where, found) };
   });
 
+  // [[spec/design_output/work#a-box-writes-its-branch]]
+  on("tool.call", { tool: "Bash" }, async ($, e, next) => {
+    if (!cloud) return next(e);
+    const said = String(e.command ?? "");
+    if (!touchesGit(said).commits && !touchesGit(said).pushes) return next(e);
+
+    const how = landsOnTrunk(said, await branchNow($), TRUNK);
+    if (!how) return next(e);
+
+    await logbook.say("warn", "bash", `refused a ${how} landing on ${TRUNK}`, {
+      tool: "Bash",
+      detail: said.slice(0, 120),
+    });
+    return {
+      deny: [
+        `This box works a branch, and ${TRUNK} belongs to a person.`,
+        "",
+        how === "commit"
+          ? `You stand on ${TRUNK}, so this commit would land there.`
+          : `This pushes ${TRUNK}, which no cloud box may move.`,
+        "",
+        "Run `./RUNME.sh work take` to take a branch and move onto it. Every",
+        "commit then lands where it belongs, and the merge stays a person's.",
+      ].join("\n"),
+    };
+  });
+
+  // [[spec/design_output/stop#the-claim-and-its-life]]
+  on("tool.call", { tool: "mcp__level0__claim_stop" }, async (_$, e, _next) => {
+    const said = tooth.claims(String(e.rule ?? ""), String(e.why ?? ""));
+    await logbook.say("info", "stop", `claimed ${said.rule}`, {
+      detail: said.why.slice(0, 120),
+    });
+    return { result: { ...said, counted: "at the end of this turn" } };
+  });
+
   on("turn.complete", async ($, e, next) => {
     const said = await next(e);
+    if (firstTurn && e.reason === "answer") {
+      firstTurn = false;
+      await heardCanary(logbook, canaryIn(e.answer, sentence), sentence);
+    }
+    await bite($, e, { rules, tooth, logbook, ran: ranHere });
     if (!bin || !e.answer || e.reason !== "answer") return said;
 
     const ran = await lintText(e.answer, ANSWER, {
@@ -251,27 +301,83 @@ export function register(on, _options) {
       });
     }
 
+    // [[spec/design_output/level0#the-canary]]
     if (standing) {
       blocks.push({
-        name: "level0-receipt",
+        name: "level0-canary",
         text: [
-          "End your FIRST answer with one last line, on its own:",
+          "End your FIRST answer with this line, on its own, word for word:",
           "",
-          "    rules: <n>",
+          `    ${sentence}`,
           "",
-          "where <n> is how many numbered rules stand in the section naming how",
-          "this tree is worked, counted across every heading there. Count them",
-          "and write what you counted. Write this line once and never again.",
+          "It says out loud that level zero holds this session, and the numbers",
+          "come from what it loaded. Write this line once and never again.",
         ].join("\n"),
       });
     }
 
     return { ...said, blocks };
   });
+
+  // [[spec/design_output/stop#the-mechanical-checks]]
+  function ranHere(name) {
+    if (name === "work-waiting") return list.standing() || onAHeldBranch;
+    if (name === "session-is-new") return tooth.isNew();
+    if (name === "stop-hook-off") return config.stop?.enabled === false;
+    if (name === "never") return false;
+    return undefined;
+  }
+}
+
+// [[spec/design_output/level0#the-canary]]
+async function heardCanary(logbook, heard, sentence) {
+  if (heard.found === "same") {
+    return logbook.say("info", "level0", "the canary comes back whole", {
+      detail: sentence,
+    });
+  }
+  if (heard.found === "other") {
+    return logbook.say("warn", "level0", "the canary comes back with other counts", {
+      detail: `said=${heard.said} holds=${sentence}`,
+    });
+  }
+  return logbook.say("warn", "level0", "the canary is absent from the answer", {
+    detail: sentence,
+  });
+}
+
+// [[spec/design_output/stop#the-vote]]
+async function bite($, e, it) {
+  if (e.reason !== "answer") return;
+
+  const decision = decide(it.rules, { claimed: it.tooth.claim()?.rule, ran: it.ran });
+  const said = it.tooth.atTurnEnd(decision);
+  const how = detail(said, said.inARow);
+
+  for (const name of said.unknown) {
+    await it.logbook.say("warn", "stop", `no check answers to ${name}`, { file: RULES });
+  }
+  if (said.runaway) {
+    await it.logbook.say("warn", "stop", "carried enough turns in a row", {
+      detail: how,
+    });
+  }
+  await it.logbook.say(
+    "info",
+    "stop",
+    said.ends ? "the turn ends" : "the turn goes on",
+    { detail: how },
+  );
+  if (said.ends) return;
+
+  // [[spec/design_output/stop#holding-a-turn-open]]
+  try {
+    $.prompt.submit({ text: reprompt(said) }).catch(() => {});
+  } catch {}
 }
 
 // [[spec/design_output/log#where-the-writer-stands]]
-function logHere(writeFile) {
+function logHere(writeFile, at) {
   const rows = [];
   const stamp = () => new Date().toISOString();
   const id = Math.random().toString(16).slice(2).padEnd(8, "0").slice(0, 8);
@@ -281,26 +387,16 @@ function logHere(writeFile) {
     path,
     lines: () => rows.map((one) => ({ ...one })),
     async say(level, door, said, more) {
-      rows.push(rowOf(stamp(), level, door, said, more));
-      if (!writeFile) return rows[rows.length - 1];
+      const row = rowOf(stamp(), level, door, said, more);
+      if (!writes(at, row.level)) return row;
+      rows.push(row);
+      if (!writeFile) return row;
       try {
         await writeFile(path, asLines(rows));
       } catch {}
-      return rows[rows.length - 1];
+      return row;
     },
   };
-}
-
-// [[spec/design_output/log#rotation-really-a-prune]]
-async function pruned($) {
-  try {
-    const ran = await $.process.run(["node", "src/scripts/prune.js"], {
-      timeoutMs: 30000,
-    });
-    return (ran.stdout ?? "").trim() || "no log file went";
-  } catch {
-    return "the prune ran nowhere";
-  }
 }
 
 // [[spec/design_output/work#two-handovers]]
@@ -336,19 +432,17 @@ async function erase($, path) {
 // [[spec/design_output/level0#guidance-a-variable-switches-on]]
 async function readGuidance($) {
   try {
-    const entries = await $.fs.listDir(GUIDANCE);
     const notes = [];
     const wanted = new Set();
-    for (const one of entries) {
-      if (!one.name.endsWith(".md")) continue;
-      const text = await $.fs.readFile(`${GUIDANCE}/${one.name}`);
-      notes.push({ name: one.name, text });
-      for (const name of envOf(text)) wanted.add(name);
+    for (const one of await readFolder($, GUIDANCE, ".md")) {
+      notes.push(one);
+      for (const name of envOf(one.text)) wanted.add(name);
     }
     const env = await readEnv($, [...wanted]);
-    return standingLayer(notes.filter((one) => bindsHere(one.text, env)));
+    const here = notes.filter((one) => bindsHere(one.text, env));
+    return { said: standingLayer(here), ...countsOf(here) };
   } catch {
-    return "";
+    return { said: "", rules: 0, notes: 0 };
   }
 }
 
@@ -382,6 +476,20 @@ async function readEnv($, names) {
     return JSON.parse((ran.stdout ?? "{}").trim() || "{}");
   } catch {
     return {};
+  }
+}
+
+async function readFolder($, folder, end) {
+  try {
+    const entries = await $.fs.listDir(folder);
+    const out = [];
+    for (const one of entries) {
+      if (!one.name.endsWith(end)) continue;
+      out.push({ name: one.name, text: await $.fs.readFile(`${folder}/${one.name}`) });
+    }
+    return out;
+  } catch {
+    return [];
   }
 }
 

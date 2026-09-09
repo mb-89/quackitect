@@ -22,6 +22,7 @@ import { installedTools, WANTED } from "../../.claude/skills/level0/lib/tools.js
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
 import { survey } from "../../src/scripts/tools.js";
+import { decide, pool } from "../../.claude/skills/level0/lib/stop.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -29,6 +30,8 @@ const files = disk();
 const GUIDANCE = join(root, "spec", "guidance");
 const JUDGED = join(root, "spec", "config", "styles", "VoiceJudged");
 const SCRIPTS = join(root, "src", "scripts");
+const STOP = join(root, "spec", "config", "stop");
+const RUNS = ["work-waiting", "session-is-new", "stop-hook-off", "never"];
 
 const read = (where) => JSON.parse(files.read(join(root, where)));
 const namesIn = (at, end) =>
@@ -134,6 +137,81 @@ test("the lnav format reads the file the log door writes", () => {
     `.se/log/${nameOf(row.at, "a6f8c43b")}`,
     new RegExp(format["file-pattern"]),
   );
+});
+
+// [[spec/design_output/stop#where-the-rules-live]]
+test("the stop rules this tree ships read back whole", () => {
+  const mine = namesIn(STOP, ".yml").map((name) => ({
+    name,
+    text: files.read(join(STOP, name)),
+  }));
+  assert.ok(mine.length, "spec/config/stop holds at least one file");
+
+  const said = pool(mine);
+  assert.deepEqual(said.broken, [], "every file reads back");
+  assert.deepEqual(
+    said.rules.map((one) => `${one.priority} ${one.side} ${one.id}`),
+    [
+      "100 stop the-owner-asks-to-talk",
+      "99 continue the-owner-says-carry-on",
+      "95 stop the-session-is-new",
+      "90 stop a-person-holds-the-answer",
+      "80 continue work-still-stands",
+      "45 stop the-work-stands-complete",
+      "10 stop an-update-is-worth-giving",
+      "0 continue the-tooth-is-out",
+    ],
+  );
+  for (const one of said.rules) {
+    if (one.decides === "mechanical") {
+      assert.ok(RUNS.includes(one.runs), `${one.id} names a check the code holds`);
+    }
+    assert.ok(one.says, `${one.id} says a sentence`);
+  }
+});
+
+test("a second file in the folder adds a rule with no code change", () => {
+  const mine = namesIn(STOP, ".yml").map((name) => ({
+    name,
+    text: files.read(join(STOP, name)),
+  }));
+  const said = pool([
+    ...mine,
+    {
+      name: "level1.yml",
+      text: "- id: a-later-level\n  side: stop\n  priority: 20\n  decides: claimed\n  asks: Later?\n  says: A later level says so.\n",
+    },
+  ]);
+  assert.deepEqual(said.broken, []);
+  assert.equal(said.rules.length, pool(mine).rules.length + 1);
+  assert.equal(
+    decide(said.rules, { claimed: "a-later-level", ran: () => false }).ends,
+    true,
+  );
+});
+
+// [[spec/design_output/log#nothing-here-deletes-a-log]]
+test("no code path in this tree deletes a log file", () => {
+  const said = proc().run(["git", "ls-files", "src/*.js", ".claude/*.js"], {
+    cwd: root,
+  });
+  assert.equal(said.exitCode, 0, "git lists what it tracks");
+
+  const found = [];
+  for (const path of said.stdout.split(/\r?\n/).filter(Boolean)) {
+    for (const line of files.read(join(root, path)).split(/\r?\n/)) {
+      const deletes = /\bremove\(|\bunlink|\brm\b|\bprune\b/.test(line);
+      if (deletes && /log/i.test(line)) found.push(`${path}: ${line.trim()}`);
+    }
+  }
+  assert.deepEqual(found, []);
+});
+
+test("the tooth settings this tree ships carry every field the hook reads", () => {
+  const said = read("spec/config/level0.json");
+  assert.equal(typeof said.stop.enabled, "boolean");
+  assert.equal(typeof said.stop.mostInARow, "number");
+  assert.equal(said.log.level, "info");
 });
 
 test("the judge settings this tree ships carry every field the judge reads", () => {

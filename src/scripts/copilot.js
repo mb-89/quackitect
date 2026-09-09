@@ -89,7 +89,6 @@ try {
       },
     };
     const result = await handle(event, it);
-    if (event.event === "SessionStart") book.prune();
     await book.say(
       result.deny || result.block || result.failed ? "warn" : "info",
       "copilot",

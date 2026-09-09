@@ -1,5 +1,24 @@
 // Reads a rule file: a scalar, a list of scalars, and a comment. The rules Vale
-// does not hold are written in the shape Vale's own are.
+// does not hold are written in the shape Vale's own are. A file of entries, one
+// rule each, reads through readEntries.
+// [[spec/design_output/stop#where-the-rules-live]]
+
+export function readEntries(text) {
+  const out = [];
+  let held = [];
+
+  for (const raw of String(text ?? "").split(/\r?\n/)) {
+    const opens = /^-\s+(\S.*)$/.exec(raw.replace(/\s+$/, ""));
+    if (opens) {
+      if (held.length) out.push(readRule(held.join("\n")));
+      held = [opens[1]];
+      continue;
+    }
+    if (held.length) held.push(raw.replace(/^\s{0,2}/, ""));
+  }
+  if (held.length) out.push(readRule(held.join("\n")));
+  return out.filter((one) => Object.keys(one).length);
+}
 
 export function readRule(text) {
   const out = {};
