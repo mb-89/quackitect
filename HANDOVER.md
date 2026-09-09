@@ -5,66 +5,59 @@ urgency: soon
 depends_on: the-config-holds-numbers
 ---
 
-# A server draws these rules
+# Every rule reaches the panel
 
-Eleven rules stand in `test/contract/tree.test.js`, and each one reads two
-files and compares them. No linter on the shelf holds a rule of that shape, so
-a person meets each one by breaking it and reading a stack trace.
+Eleven rules stand in `test/contract/tree.test.js`. A person meets each one by
+breaking it and reading a stack trace, because a test draws nowhere.
 
-This branch builds a language server that holds them and draws them where the
-writer stands.
+`main` now carries `.vscode/tasks.json`, which runs `./RUNME.sh lint` when the
+folder opens and reads every line of it into the Problems panel. So a rule that
+reaches `lint` reaches a person, over every file in the tree.
 
-# What v4 does
+This branch moves the eleven into `lint`. It writes no language server.
 
-v4 runs a language server over stdio speaking LSP 3.17, at `src/engine/lsp.go`,
-608 lines. Its comment says why it lives inside the engine:
+# Why no server here
 
-    It validates on every keystroke, and a process per keystroke is too slow
-    to type through.
+Two facts settle it, both measured on 2026-09-09:
 
-So one process holds the rules, and the same program holds the command line.
+- Vale's script sandbox offers `text` and `fmt` alone. No `os`, no `fs`, no
+  `json`. A rule sees the buffer it looks at and nothing else, so a rule
+  comparing two files cannot live in Vale.
+- A language server diagnoses the documents an editor opens. The owner asks for
+  every file in the folder, and that is a sweep.
 
-| what it answers | what it does |
-|---|---|
-| `initialize`, `initialized`, `shutdown`, `exit` | the handshake |
-| `textDocument/didOpen`, `didChange`, `didClose` | keeps the buffer, then diagnoses |
-| `textDocument/publishDiagnostics` | pushes a finding per rule, severity 1 |
-| `textDocument/documentLink` | makes every `[[name]]` clickable |
-| `textDocument/completion` | offers a note name inside brackets |
+`lint` already sweeps: it runs Vale over the tree, folds Biome's findings in,
+and prints one line each:
 
-Two more of its choices earn their place:
+    spec/guidance/voice.md:5:1: ShortHeading: A heading holds five words.
 
-- It indexes the workspace once at start, which is how a rule reading two files
-  answers fast.
-- It skips a parked file. A red mark on a parked draft is a server reading what
-  a person asks it to leave.
+Every line of that shape matches the task's pattern. A finding that reaches
+`lint` therefore reaches the panel, whoever holds the rule.
 
-# The client is the cost
+# What to build
 
-v4 pays for a VS Code extension of its own. Its LSP half is 37 lines:
+## Each rule becomes a function
 
-    const server = { command: exe, args: lspArgs(work) };
-    const options = { documentSelector: [{ scheme: "file", language: "markdown" }] };
-    client = new LanguageClient("quackitect", "quackitect", server, options);
+The eleven move to `.claude/skills/level0/lib/tree.js`, free of `node:` imports.
+Each answers a list of findings in the shape the tree already uses:
 
-That is small, and packaging an extension is not. This tree ships two servers
-already, vale-ls and Biome, and each arrives as a published extension a person
-installs. Ours has no publisher.
+    { file, rule, line, column, message, severity }
 
-Settle that first and say the answer in your handback:
+`pathInScript` in `lib/scripts.js` answers that shape today, and
+`line()` in `lib/refuse.js` prints it. Follow both.
 
-| way in | what it costs |
-|---|---|
-| our own extension, off any registry | a person installs a folder by hand |
-| a generic LSP client extension | one more dependency, configured in settings |
-| no editor at all, the verb alone | the rules stay where they are today, drawing nowhere |
+A rule reads what it compares through the disk door, handed in. A test then
+drives it against a fake tree and touches nothing.
 
-Take the smallest road that draws in the editor. A server nobody can start
-draws nothing.
+## `lint` calls them
 
-# The eleven rules it holds
+`lint` gains one loop over those functions, beside the loop it already runs for
+`pathInScript`.
 
-Read them out of `test/contract/tree.test.js` and move each one whole:
+A rule with no line to point at answers line 1 of the file it blames. A finding
+with no place lands nowhere in the panel.
+
+## The eleven
 
 | the rule | the two things it compares |
 |---|---|
@@ -80,63 +73,48 @@ Read them out of `test/contract/tree.test.js` and move each one whole:
 | the survey finds the node running it | `.se/tools.json`, the running process |
 | every script passes the path rule | every `.sh` and `.ps1` |
 
-Each becomes a function answering a list of findings, each finding carrying a
-file, a line, a column and a message. That shape already stands: `pathInScript`
-in `lib/scripts.js` answers it, and the refusal line in `lib/refuse.js` prints
-it.
+The last one stands in `lint` already, through `pathInScript`. Leave it where it
+is and count it as the pattern the other ten follow.
 
-# Where it lives
+# The half drawing live
 
-- The rules go in `.claude/skills/level0/lib/tree.js`, free of `node:` imports,
-  so the hooks module may read them later.
-- The server goes in `src/scripts/lsp.js`, reaching the outside through the
-  doors alone.
-- `./RUNME.sh lsp` starts it, and `./RUNME.sh lint` runs the same rules once
-  over the tree.
+The task sweeps when the folder opens. Vale draws under the line as a person
+types, and three of the eleven can move there as well:
 
-One holder, two callers. A rule that draws in the editor and a rule that fails
-the check are the same function.
+    [formats]
+    sh = md
+    ps1 = md
+
+Those two lines make Vale read a shell script. A probe rule inside
+`install.sh` draws at line 2, so this holds.
+
+With that, `NoPathInScript` becomes a Vale rule, its module goes, and a person
+sees the path fault while writing the line. Take this half only once the first
+half stands, and say in your handback whether the other two are worth moving.
+
+Watch the double report. A rule held by Vale and by `lib/tree.js` both prints
+twice in the panel.
 
 # What leaves the tests
 
-Delete the eleven from `test/contract/tree.test.js`. That file then holds the
-cases that read the real disk and nothing else, or it goes.
+Delete the ten that move. Put a contract case in their place for each. Hand the
+function a fake tree that breaks the rule and assert the finding. Then hand it
+this tree and assert none.
 
-Put a contract case in their place for each rule. Hand the function a tree that
-breaks it and assert the finding. Then hand it this tree and assert none. The
-fake disk makes that cheap.
+`test/contract/shape.test.js` is the pattern for a Vale rule, and
+`test/level0/tools.test.js` for a function over a fake disk.
 
 # What to prove first
 
 1. `./RUNME.sh check` passes, and it runs `claude plugin validate` for you.
-2. Each of the eleven answers a finding on a broken tree, under test.
-3. `./RUNME.sh lint` reports every one of them, so the check still holds.
-4. The server answers `initialize` and publishes a diagnostic. Prove it by
-   driving stdio from a test, with no editor.
-5. A person opens the tree in the editor and sees one of the eleven draw. Say
-   exactly what they install to get there.
+2. Each of the ten answers a finding on a broken tree, under test.
+3. `./RUNME.sh lint` prints every one of them in the standard line shape.
+4. A person opens the folder and the Problems panel carries them. Break one
+   rule on purpose, and say what the panel shows.
+5. `check` still fails where a rule fails, so the gate holds.
 
 # What your handback says
 
-- Which way into the editor you take, and what it costs a person.
-- How long the workspace index takes on this tree.
-- Which of the eleven refuse to move, and why.
-
-## How this branch runs
-
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
-
-1. Run `./RUNME.sh work sync` FIRST. It takes main into this branch, so
-   an old branch works against what the tree holds now. Resolve any conflict
-   before you start, because a conflict found later costs the work already
-   done.
-2. Commit and push each time you finish a thing. A cloud box dies and takes
-   its working tree with it.
-3. Write your result and your retro into `HANDOVER.md`, at the root, replacing
-   this brief. Say what surprises you and every dead end you walk into.
-4. Run `./RUNME.sh work done`, which sets the status and pushes.
-5. Run `./RUNME.sh work release` instead where you stop early, so the branch
-   goes back to `todo` for somebody else.
-6. Leave the merge into main to a person. A cloud box opens no pull
-   request, and trunk only ever comes towards you.
+- What the ten cost `lint` in milliseconds over this tree.
+- Whether the panel reads well, or whether one broken thing floods it.
+- Which rules go into Vale, and which of them report twice at first.
