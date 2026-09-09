@@ -3,81 +3,69 @@ kind: [[handover]]
 status: held
 ---
 
-# A tool says where it is, and nothing guesses
+# The survey stands
 
-Scripts in this tree name a path and hope. `.se/bin/vale.exe` is a guess about
-the platform. An interpolated `$root` is a guess about the shell, and it fails
-twice over, which is why `NoPathInScript` now refuses it.
+`.se/tools.json` names where every tool stands on this box, and each caller
+reads it. `spec/design_output/tools.md` says what the file holds and who reads
+it.
 
-Nothing asks the box where its tools are, so every caller guesses again.
+# What stands now
 
-## What to build
+| piece | where |
+|---|---|
+| the shape, and the rule over it | `.claude/skills/level0/lib/tools.js` |
+| the survey, and the reader | `src/scripts/tools.js` |
+| the verb `./RUNME.sh tools` | `src/scripts/cli.js` |
+| the survey at install | `src/scripts/install.sh`, `install.ps1` |
+| the design | `spec/design_output/tools.md` |
+| the cases | `test/level0/tools.test.js`, `test/contract/tree.test.js` |
 
-A survey that runs at install and writes `.se/tools.json`, naming what this box
-carries and where:
+Every caller now reads the survey:
 
-    {
-      "node":   { "path": "...", "version": "24.19.0" },
-      "vale":   { "path": "...", "version": "3.20.0" },
-      "biome":  { "path": "...", "version": "2.5.12" },
-      "valeLs": { "path": "...", "version": "0.5.1" },
-      "git":    { "path": "...", "version": "..." },
-      "sh":     { "path": "..." },
-      "python": { "path": "..." }
-    }
+- the command line takes each binary through `whereIs`
+- the hooks module reads the file at `session.start`, through `$.fs`
+- `./RUNME.sh doctor` prints the survey, and asks no tool for its version
+- `src/scripts/lnav-reads.js` finds the viewer the same way
 
-Then everything reads that file to find a tool:
+# Where the guess lives
 
-- `src/level0/lib/vale.js` and `code.js` take the path from it
-- the hooks module reads it at `session.start`
-- `./RUNME.sh doctor` prints it, which is most of what doctor already does
+The tree carries no `valeBin`, `biomeBin`, `lnavBin` or `valeLsBin`. One
+`guesses(name)` in `lib/tools.js` answers `.se/bin/<name>.exe` and `.se/bin/<name>`, and the
+caller takes whichever stands. So the fallback tests the disk in place of the
+platform.
 
-## Do this
+`lintText` and `formatText` take the binary from the caller. Handing them none
+answers `ran: false`, and the door carries on.
 
-1. Write the survey. It runs `command -v` or `Get-Command` per tool, and it
-   asks each one for its version. A tool it cannot find gets a null.
-2. Write `.se/tools.json` from it. Git ignores `.se`, so it stays on the box.
-3. Make the callers read it, with the guess as the fallback where the file is
-   absent.
-4. Say in the standing layer that `.se/scripts` is where a session writes a
-   script of its own, and that `.se/tools.json` says what it may call.
-5. Make a cloud session list every script it writes under `.se/scripts` in its
-   handover, so a person decides whether one earns a place in the tree.
-6. Take the guessed paths out of `src/level0/lib/vale.js`, `code.js` and
-   `servers.js`, or say on this handover why one stays.
+# Where a platform test stays
 
-## What holds
+Three stand, and each one earns it:
 
-- `./RUNME.sh check` is green
-- `.se/tools.json` names every tool the install script installs
-- a tool absent from the box reads as null, and the caller degrades and carries
-  on
-- no source file builds a path to a binary from a platform test, and this
-  handover names every one that still does, with its reason
-- `./RUNME.sh doctor` reads the survey, and probes nothing twice
+| where | why |
+|---|---|
+| `install.sh`, `install.ps1` | each platform carries its own release asset, and the download comes first |
+| `.vscode/settings.json` | the Biome extension reads a map keyed by platform, and reads no survey |
+| `spec/config/lnav` | lnav keeps its own folder, and takes the format through `-i` |
 
-## Where to look
+`./RUNME.sh doctor` still asks Biome about `lsp-proxy`. That question is about
+a capability, and the version beside it comes from the survey.
 
-- `src/scripts/install.sh` and `install.ps1` already find each tool to install it
-- `src/level0/lib/servers.js` holds the pin and the asset matrix for vale-ls
-- `src/level0/lib/scripts.js` holds the rule over an interpolated path
-- `spec/design_output/level0.md` says what each door does
+# What surprises me
 
-## How this branch runs
+- `work take` merges trunk itself, so `work sync` finds nothing to take
+- the brief names `src/level0/lib`, and the tree holds `.claude/skills/level0/lib`
+- `PATHEXT` says the box is Windows, so the walk needs no platform constant
+- Biome refuses `${exe}` inside a plain string, so the shell fixture is a template
 
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
+# Dead ends
 
-1. Run `./RUNME.sh work sync` FIRST. It takes main into this branch, so
-   an old branch works against what the tree holds now. Resolve any conflict
-   before you start, because a conflict found later costs the work already
-   done.
-2. Commit and push each time you finish a thing. A cloud box dies and takes
-   its working tree with it.
-3. Write your result and your retro into `HANDOVER.md`, at the root, replacing
-   this brief. Say what surprises you and every dead end you walk into.
-4. Run `./RUNME.sh work done`, which sets the status and pushes.
-5. Run `./RUNME.sh work release` instead where you stop early, so the branch
-   goes back to `todo` for somebody else.
-6. Leave the merge into main to a person. A cloud box opens no pull
-   request, and trunk only ever comes towards you.
+- a program at the top of `src/scripts/tools.js` runs on every import, so the
+  survey lives in a cli verb the installer calls
+- `command -v` needs a shell, and the process door spawns none, so the survey
+  walks the path variable itself
+
+# What I leave
+
+- no script under `.se/scripts`
+- `./RUNME.sh check`: 141 cases pass, and the rules pass over the tree
+- the merge into `main`, which belongs to a person
