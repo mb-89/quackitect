@@ -53,6 +53,15 @@ A plugin loads once per process at session start, so the session that changes
 the module runs the old one. `claude --init-only` fires no `session.start`, so a
 probe costs one `-p` turn and one model call.
 
+## The guidance stays put
+
+The rules reach the agent once and stand for the conversation. The engine's own
+type declaration says `prompt.context` fires once per conversation, and again
+on "a re-read (compaction, `/clear`)".
+
+Level zero hooks it already, so a compaction and a `/clear` both bring the
+rules back. Nothing here re-reads them per turn, and nothing needs to.
+
 # Where the plugin stands
 
 Level zero lives at `.claude/skills/level0`, holding its manifest, its hooks
@@ -67,11 +76,34 @@ A marketplace reaches no cloud box, which is why this shape stands:
 |---|---|---|
 | `extraKnownMarketplaces` in settings | the workspace carries accepted trust | no trust, so the key stays unread |
 | a routine's `extra_marketplaces` | the API stores it | the API answers 200 and drops the value |
-| `.claude/skills/<name>` | the settings source is on | it loads |
+| `.claude/skills/<name>` | the workspace carries accepted trust | no trust, so the scan skips it |
+| `claude --plugin-dir <path>` | the flag on the command line | it loads |
 
 The trust gate reads a flag a person accepts once per folder on one box. A
-cloud clone is a new folder every run, so it carries none, and every
-marketplace declared in the tree stays invisible there.
+cloud clone is a new folder every run, so it carries none.
+
+## The trust gate reaches skills
+
+Client 2.1.266 gates a skills-directory plugin on the same trust every
+marketplace waits for. `claude plugin list` says so on a cloud box:
+
+    ‼ 1 project-scope directory under ./.claude/skills/ that may load as a
+      plugin was skipped because this workspace was not trusted when plugins
+      were scanned.
+
+So level zero holds no cloud session that starts the ordinary way, and
+`~/.claude.json` carries `hasTrustDialogAccepted: false` there. The flag lives
+outside the tree, so no tracked file moves it.
+
+Two things reach a cloud box today:
+
+- `claude --plugin-dir .claude/skills/level0`, which loads the folder for that
+  session and skips the scan.
+- A box whose setup writes the trust flag into `~/.claude.json` before the
+  session starts.
+
+The canary finds this. A session saying the line out loud is a session level
+zero holds, and a cloud session that starts the ordinary way says nothing.
 
 # The write door
 
@@ -106,11 +138,6 @@ handover and the canary arrive.
 
 The system prompt's sections stay free for guidance that depends on where the
 work stands.
-
-The guidance needs no re-read per turn, and it decays nowhere. The engine's own
-type declaration says `prompt.context` fires once per conversation and again on
-"a re-read (compaction, `/clear`)". Level zero hooks it already, so a
-compaction and a `/clear` both bring the rules back.
 
 ## The canary
 

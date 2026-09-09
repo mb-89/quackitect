@@ -4,339 +4,171 @@ status: held
 urgency: now
 ---
 
-# The log takes everything, and a claim decides whether a turn may end
+# The tooth stands
 
-Two pieces of one thing. The log records what happens. The stop hook reads what
-stands and decides whether a turn may end.
+The three pieces the brief asks for stand, and `./RUNME.sh check` passes over
+this branch. The canary earns its keep on the first day: level zero reaches no
+cloud session that starts the ordinary way, and this branch proves why.
 
-This brief settles every decision. Read it whole, and ask for no design input.
-
-# Part one: the log takes everything
-
-## What goes out, and stays out
-
-Nothing this tree writes deletes a log. A retro owns deletion, this tree
-carries no retro, so the folder grows. A growing folder costs less than a
-folder swept empty under a person mid-diagnosis.
-
-1. Delete `src/scripts/prune.js`.
-2. Delete `dropping`, `DAYS`, `FILES`, `LEAST` and `DAY` from
-   `.claude/skills/level0/lib/log.js`.
-3. Delete `prune` from `src/doors/log.js` and from `src/doors/fake/log.js`.
-4. Drop the `session.start` call that runs the prune, and the `pruned` helper.
-5. Drop every test over a cap, in `test/level0/log.test.js` and
-   `test/contract/log.test.js`.
-6. Rewrite the rotation section of `spec/design_output/log.md`: a session file
-   closes when its session ends, and a retro removes it later.
-
-## What comes in
-
-| event | one line each | door |
+| piece | where it lives | what holds it |
 |---|---|---|
-| `tool.call`, matching nothing | every call a tool takes | `tool` |
-| `prompt.submit` | every prompt, as submitted | `prompt` |
+| the log takes every call | `hooks/level0.js`, `lib/log.js` | `test/level0/log.test.js`, `hooks.test.js` |
+| the level a box writes at | `lib/log.js`, `spec/config/level0.json` | `test/level0/log.test.js` |
+| the tooth | `lib/stop.js`, `spec/config/stop/level0.yml` | `test/level0/stop.test.js` |
+| the claim tool | `hooks/level0.js` | `test/level0/hooks.test.js` |
+| the canary | `lib/guidance.js` | `test/level0/guidance.test.js` |
+| the prune | gone | `test/contract/tree.test.js` |
 
-`turn.step` stays out. A transcript holds a turn's steps already, so a line per
-step buys a second copy of what stands elsewhere.
+# What the ten proofs answer
 
-The tool line names the tool and one field. That field says what the call aims
-at:
+| # | what the brief asks | where it stands |
+|---:|---|---|
+| 1 | `check` passes, and validates the plugin | `./RUNME.sh check`, 162 tests |
+| 2 | no code path deletes a log file | `tree.test.js`, and the grep below |
+| 3 | a tool call and a prompt each write one line | `hooks.test.js` |
+| 4 | a claim expires two ways | `stop.test.js` |
+| 5 | the free stop fires one time | `stop.test.js` |
+| 6 | a second rule file needs no code | `tree.test.js` |
+| 7 | the vote answers over a table | `stop.test.js` |
+| 8 | `mostInARow` ends a runaway | `stop.test.js`, and the trace below |
+| 9 | a broken rule file leaves the tooth harmless | `stop.test.js` |
+| 10 | the canary carries the counts | `guidance.test.js`, `hooks.test.js` |
 
-| tool | field |
+The grep for the second proof answers nothing, and a contract test runs it over
+every tracked file:
+
+    grep -rnE "remove\(|unlink|rm |prune" src .claude --include=*.js
+
+`test/level0/hooks.test.js` is the piece the brief does not ask for. It drives
+`register` against a fake engine interface, so the wiring itself carries tests:
+the lines, their order, the claim, the vote and the canary.
+
+# Level zero reaches no box
+
+This is the finding of the branch, and it outranks the work.
+
+    ‼ 1 project-scope directory under ./.claude/skills/ that may load as a
+      plugin was skipped because this workspace was not trusted when plugins
+      were scanned.
+
+`claude plugin list` says that in this tree, on this box. Client 2.1.266 gates
+a skills-directory plugin on the same trust a marketplace waits for, and
+`~/.claude.json` carries `hasTrustDialogAccepted: false` on a fresh clone.
+
+So `spec/design_output/level0.md` claims something this branch disproves, and
+it now carries the correction. The evidence is three sessions:
+
+| session | what happens |
 |---|---|
-| a write | the path |
-| Bash | the command |
-| a search | the query |
-| a fetch | the url |
+| this cloud session | no `.se/level0.stamp`, no standing block, and the brief stands |
+| `claude -p` in this tree | the same, and the agent knows no canary line |
+| `claude -p --plugin-dir .claude/skills/level0` | the stamp lands, the canary comes back whole |
 
-That choice sits in `.claude/skills/level0/lib/log.js`, and a test holds the
-field for each tool.
+Two ways in stand open, and neither travels in the tree:
 
-Watch the order. The write door and the trunk guard write their own lines
-already, so a plain `tool` line beside a `write` line reads as two events. Put
-the `tool` line down first, and let the door add what it refuses.
+- `claude --plugin-dir .claude/skills/level0`, which loads the folder for one
+  session and skips the scan.
+- A box whose setup writes the trust flag into `~/.claude.json` first.
 
-## Levels, and what a box writes
+The next branch belongs here. A cloud routine starting `claude` with
+`--plugin-dir` puts every rule in this tree back in front of the agent. A box
+accepting trust before the clone runs does the same.
 
-`spec/config/level0.json` takes a `log` object:
+# What one turn end costs
 
-    "log": {
-      "level": "info"
-    }
-
-| level | writes |
+| what runs | milliseconds |
 |---|---|
-| `info` | everything, and this is the default |
-| `warn` | a refusal and a fault |
-| `error` | a fault |
-
-A level the reader does not know reads as `info`, and a missing object reads as
-`info`. So a box configuring nothing writes everything.
-
-# Part two: the stop hook
-
-## The one thing to understand first
-
-Level zero spends no model call here. Another model knows nothing of whether
-this session stands in a discussion. So the agent says so itself: it CLAIMS a
-stop, and the hook only counts.
-
-`turn.complete` refuses nothing. Its declaration says a hook returns `{ text }`
-and that a different text shows beneath the answer, so the turn ends anyway.
-
-So the tooth works the other way round:
-
-- Where the table says carry on, the hook calls `$.prompt.submit({ text })`.
-- That prompt runs once the session goes idle, and opens another turn.
-- The agent keeps working, and the transcript carries a prompt the plugin owns.
-
-Say this in your handback where you meet it. A session torn down as the turn
-ends escapes the tooth: the prompt reaches a session that has already gone. A
-cloud routine ending its run is that case.
-
-## The claim, and how the agent makes one
-
-Level zero registers a tool at `session.start` through `$.tool.register`, and
-serves it by hooking `tool.call` with the matcher for its own name.
-
-    claim_stop({ rule: "the-work-is-finished", why: "one sentence" })
-
-The tool answers with the claim it holds, so the agent reads its own words back.
-
-A claim lives briefly, and this is the whole of its life:
-
-| what ends a claim | and then |
-|---|---|
-| the turn ends | the hook counts it |
-| two tool calls pass after it | the hook counts nothing |
-
-Whichever comes first. Two tool calls stand between a claim and a stop because
-an agent often reads one more thing before it stops. A third says it stands back
-at work, so the claim goes.
-
-A claim lives inside one turn, and the next turn opens with none.
-
-## The table
-
-| priority | side | rule | how |
-|---:|---|---|---|
-| 100 | stop | the owner asks to talk | claimed |
-| 99 | continue | the owner says carry on | claimed |
-| 95 | stop | the session is new | mechanical |
-| 90 | stop | blocked on what only a person gives | claimed |
-| 80 | continue | work still stands | mechanical |
-| 45 | stop | the work stands complete | claimed |
-| 10 | stop | a wish to give an update | claimed |
-| 0 | continue | the tooth is out | mechanical |
-
-The rule in one line: the turn ends where the claimed reason to stop stands
-above every reason to continue that fires.
-
-An unclaimed turn end carries the mechanical reasons to stop alone. A firing
-continue rule above them holds the turn open, and the hook re-prompts.
-
-One reason to stop asks for no claim, because the hook grants it on its own. A
-session may ask what to do before it does anything:
-
-| the free stop fires when | |
-|---|---|
-| fewer than 10 tool calls have passed | and |
-| the hook has granted no stop this session | |
-
-Both halves matter. The count alone hands out a free stop wherever it resets.
-The grant alone lets a session read for an hour and still call itself new.
-
-95 stands over `work-waiting`, so a list carried in from an earlier branch traps
-no fresh session. It stands under `the owner says carry on`, so a person saying
-get on with it spends the free stop.
-
-Four bands hold the numbers, so a later level lands without renumbering:
-
-| band | who writes there |
-|---|---|
-| 90 to 100 | the owner, and nothing overrides it |
-| 50 to 89 | the state of the work |
-| 1 to 49 | a preference |
-| 0 | the off switch |
-
-Three numbers carry an argument, and keep them where they stand:
-
-- 99 over 90 puts "carry on" over the block. A person saying carry on is a
-  person saying proceed on your best reading.
-- 45 under 80 keeps a finished piece from ending a session while a list still
-  holds something.
-- 0 for the off switch beats nothing, so every claim wins and the hook turns off
-  with no special case.
-
-## The file the rules live in
-
-`spec/config/stop/level0.yml`, one rule per entry. A new
-`.claude/skills/level0/lib/stop.js` reads every file in that folder and pools
-the entries, so a later level drops `level1.yml` beside it and changes no code.
-
-    - id: the-owner-asks-to-talk
-      side: stop
-      priority: 100
-      decides: claimed
-      asks: Does the last thing the owner said open a discussion?
-      says: The owner opens a discussion, so this turn ends and waits.
-
-    - id: work-still-stands
-      side: continue
-      priority: 80
-      decides: mechanical
-      runs: work-waiting
-      says: Something on your list stands unfinished, so carry on with it.
-
-A rule the reader cannot parse writes one `warn` line naming the file, and it
-stands out of the vote. A broken rule file leaves every turn as it stands.
-
-## The mechanical checks are functions
-
-`runs` names a function the hook holds. Keep it a function name: a shell
-command inside a config file is a hole somebody walks through.
-
-| `runs` | answers true when |
-|---|---|
-| `work-waiting` | a todo stands unfinished, or this branch stands at `held` |
-| `session-is-new` | under 10 tool calls stand behind this session, and the hook has granted no stop |
-| `stop-hook-off` | `spec/config/level0.json` says `stop.enabled` is false |
-| `never` | nothing, which is what an unbuilt rule takes |
-
-A `runs` value the code does not know answers false and writes one `warn` line.
-
-`work-waiting` reads the todo list, which is the one work state standing today.
-Watch `TodoWrite` go past on `tool.call` and hold the latest list in module
-state. Any item short of `completed` means work stands.
-
-## What the hook says when it holds a turn open
-
-The re-prompt carries two things: the `says` of the winning continue rule, and
-the `asks` of every stop rule standing unclaimed. The agent reads them and
-answers itself, because it is the only thing in the room that knows.
-
-    Something on your list stands unfinished, so carry on with it.
-
-    If that reading is wrong, claim the stop and end the turn:
-      - Does the last thing the owner said open a discussion?
-      - Does going on need what only a person can give?
-      - Does the work stand complete?
-
-## Three in a row, and the tooth relents
-
-The hook counts turns it has carried in a row, in module state.
-
-- Past `mostInARow`, default 3, it writes a `warn` line and lets the turn end.
-- A prompt from outside the plugin resets the count, because that is a person
-  taking the session back.
-
-`spec/config/level0.json` gains:
-
-    "stop": {
-      "enabled": true,
-      "mostInARow": 3
-    }
-
-The tooth is on for a desk session as well as a cloud one. The discussion rule
-covers a person standing there.
-
-## Every decision writes a line
-
-One line per turn end, at `info`, under the door `stop`:
-
-    said:   the turn ends, or the turn goes on
-    detail: stop=<id>@<priority> continue=<id>@<priority> inARow=<n>
-
-That line is the whole audit. A person reads a misfiring tooth out of the log.
-
-# What this brief settles, so you build none of it
-
-The guidance does not decay, and it needs no re-read per turn. The engine's own
-type declaration says `prompt.context` fires once per conversation and again on
-"a re-read (compaction, `/clear`)". Level zero hooks it already, so a compaction
-and a `/clear` both bring the rules back.
-
-Build nothing there. Write the fact into `spec/design_output/level0.md` under
-the harness surface, so the next reader stops asking.
-
-# Part three: the canary
-
-A session says out loud that level zero holds it. A session saying nothing
-stands outside the cage, and that failure costs this tree several cloud rounds
-already.
-
-## The line
-
-Level zero counts what it holds, so the standing block carries the sentence and
-asks for it back word for word in the first answer:
-
-    level0 holds this session: 14 rules, 5 notes, the stop hook on.
-
-The numbers come out of the block, so an agent says the line correctly only
-where the block reaches it. That is the whole of the proof.
-
-Where the stop hook stands off, the line ends `the stop hook off`, so the
-sentence says which cage this is.
-
-## The hook reads it back
-
-On the first `turn.complete` of a session, level zero looks for that sentence in
-the answer.
-
-| what it finds | what it does |
-|---|---|
-| the sentence, with its own numbers | one `info` line, door `level0` |
-| a sentence with other numbers | one `warn` line carrying both |
-| no sentence | one `warn` line saying the canary is absent |
-
-So the log carries the canary as well, and a person reads it later without
-watching the session run.
-
-## Where the words live
-
-The standing block builds in `.claude/skills/level0/lib/guidance.js`, and the
-canary belongs beside it. A guidance note carries actionables, and this sentence
-is a fact level zero states about itself.
-
-# What to prove before you call this done
-
-1. `./RUNME.sh check` passes, and it runs `claude plugin validate` for you.
-2. No code path deletes a log file. Prove it by grep, and say so.
-3. A tool call and a prompt each write one line, against the fake.
-4. A claim expires after two tool calls, and it expires at a turn end. Both
-   under test.
-5. The free stop fires one time in a session, under test.
-6. The table reads from the folder, and a second file adds a rule with no code
-   change.
-7. The vote answers over a table a test hands it, so the comparison stands
-   proven without a session.
-8. `mostInARow` ends a runaway.
-9. A rule file that will not parse leaves the tooth harmless.
-10. The canary carries the counts level zero loaded, and a missing canary
-    writes one `warn` line. Both under test.
-
-# What to say in your handback
-
-- What one turn end costs in milliseconds.
-- Whether the submitted prompt reaches a cloud box at all.
-- Whether two tool calls is the right life for a claim, from what you watch.
-- Every place the order of the log lines surprises you.
-
-## How this branch runs
-
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
-
-1. Run `./RUNME.sh work sync` FIRST. It takes main into this branch, so
-   an old branch works against what the tree holds now. Resolve any conflict
-   before you start, because a conflict found later costs the work already
-   done.
-2. Commit and push each time you finish a thing. A cloud box dies and takes
-   its working tree with it.
-3. Write your result and your retro into `HANDOVER.md`, at the root, replacing
-   this brief. Say what surprises you and every dead end you walk into.
-4. Run `./RUNME.sh work done`, which sets the status and pushes.
-5. Run `./RUNME.sh work release` instead where you stop early, so the branch
-   goes back to `todo` for somebody else.
-6. Leave the merge into main to a person. A cloud box opens no pull
-   request, and trunk only ever comes towards you.
+| the vote, the state and the stop line | 0.2 |
+| Vale over the answer, which stands there already | 44 |
+| the whole turn end | about 45 |
+
+The first row runs 500 times against a fake engine. The second runs Vale five
+times over a two-line answer. A tool line costs 0.4 ms, and it grows with the
+session, because each line rewrites the whole file.
+
+# The prompt reaches a box
+
+It does, and here is the trace of one `-p` session, ten Bash calls in:
+
+    00:42:09 warn  level0 the canary is absent from the answer
+    00:42:09 info  stop   the turn goes on   continue=work-still-stands@80 inARow=1
+    00:43:15 info  tool   select:mcp__level0__claim_stop   tool=ToolSearch
+    00:43:16 info  stop   claimed the-work-stands-complete
+    00:43:17 info  stop   the turn goes on   stop=...@45 continue=...@80 inARow=2
+    00:44:23 info  stop   the turn goes on   continue=work-still-stands@80 inARow=3
+    00:45:25 info  stop   claimed the-work-stands-complete
+    00:45:27 warn  stop   carried enough turns in a row
+    00:45:27 info  stop   the turn ends
+
+The re-prompt lands, the agent reads it, and it goes looking for the claim tool
+on its own. The whole tooth runs in the open there: the free stop, the carry,
+the claim, and `mostInARow` ending the runaway.
+
+## The claim arrives deferred
+
+`mcp__level0__claim_stop` reaches that session as a deferred tool, so the agent
+spends one `ToolSearch` before its first claim. The second claim goes straight
+to the tool.
+
+## Forty-five under eighty
+
+The trace shows the cost of the brief's own number. A branch at `held` keeps
+`work-waiting` true for the whole session, so a claimed
+`the-work-stands-complete` at 45 loses to 80 every time.
+
+A cloud session that finishes its work therefore spends three more turns before
+`mostInARow` lets it go. Each of those turns costs a model call, and the agent
+holds an empty list through all three.
+
+Two ways out, and the owner picks:
+
+- Put `the-work-stands-complete` over `work-still-stands`, which reads as "the
+  agent knows more about its own work than the branch status does".
+- Take the branch status out of `work-waiting`, and let the todo list stand
+  alone.
+
+# Two tool calls is enough
+
+The agent claims and answers inside the same turn both times in that trace, so
+every claim reaches the vote with life to spare. Two calls is generous, and the
+failure this branch finds sits at the vote instead.
+
+# Where the order surprises me
+
+- A `tool` line lands before the door refuses, which is what the brief asks
+  for. The write door and the trunk guard write a second line beneath it, so a
+  refusal reads as two events on purpose.
+- The plugin's own re-prompt writes no `prompt` line. The engine skips a
+  plugin's own hooks for its own `$.prompt.submit`, so the `stop` line saying
+  the turn goes on is the only record of it.
+- The canary line lands before the stop line, because the first turn checks it
+  before the vote.
+- A claim writes its line mid-turn, so a `stop` line saying `claimed` stands
+  above the `stop` line that counts it.
+
+# The dead ends
+
+1. `claude plugin validate` refuses two hooks on one event where neither
+   carries a matcher. So the `tool` line lives inside the write door's own
+   hook, and one unmatched hook stands per event.
+2. `$` reaches a function only where the hooks file declares that function at
+   its top. `bite` moves out of `register` and takes its state as an
+   argument.
+3. The off switch at priority 0 switches nothing off. A continue rule at 80
+   stands above it, so `decide` gives a firing `stop-hook-off` the last word,
+   and `spec/design_output/stop.md` argues that one line.
+4. Client 2.1.266 carries no `TodoWrite`. Its list is `TaskCreate` and
+   `TaskUpdate`, and each names one task. So `todos` counts creations against
+   completions, and takes a whole list where a build hands one over.
+5. `claude -p` answers exit code 2 on a session the tooth carries, and the log
+   shows every turn ending cleanly. Worth one look before somebody reads that
+   code as a fault.
+
+# What this branch drops
+
+- The two search hooks go. A web search and a web fetch write the `tool` line
+  every other call writes, so the `search` door stands nowhere.
+- The receipt block goes. The canary carries the rule count already, and a
+  second receipt is a second copy.
+- `spec/config/level0.json` carries `log` and `stop` now, and a contract test
+  holds every field.
