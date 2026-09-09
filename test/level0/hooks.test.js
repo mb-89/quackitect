@@ -59,14 +59,14 @@ function engine(seed = {}) {
 
   const $ = {
     fs: {
-      readFile: async (path) => {
+      read: async (path) => {
         if (!files.has(path)) throw new Error(`no ${path}`);
         return files.get(path);
       },
-      writeFile: async (path, text) => {
+      write: async (path, text) => {
         files.set(path, text);
       },
-      listDir: async (path) =>
+      list: async (path) =>
         [...files.keys()]
           .filter((one) => one.startsWith(`${path}/`))
           .map((one) => ({ name: one.slice(path.length + 1), kind: "file" })),

@@ -84,13 +84,13 @@ export function register(on, _options) {
     tooth = toothOf({ mostInARow: config.stop?.mostInARow });
 
     try {
-      await $.fs.writeFile(
+      await $.fs.write(
         ".se/level0.stamp",
         `${new Date().toISOString()} vale=${bin ?? "missing"}\n`,
       );
     } catch {}
 
-    logbook = logHere((at, text) => $.fs.writeFile(at, text), config.log?.level);
+    logbook = logHere((at, text) => $.fs.write(at, text), config.log?.level);
     await logbook.say("info", "level0", "session start", {
       branch: await branchNow($),
       vale: bin ?? "missing",
@@ -405,7 +405,7 @@ async function takeHandover($) {
   for (const path of [HANDOVER, BRIEF]) {
     let text = "";
     try {
-      text = await $.fs.readFile(path);
+      text = await $.fs.read(path);
     } catch {
       continue;
     }
@@ -481,11 +481,11 @@ async function readEnv($, names) {
 
 async function readFolder($, folder, end) {
   try {
-    const entries = await $.fs.listDir(folder);
+    const entries = await $.fs.list(folder);
     const out = [];
     for (const one of entries) {
       if (!one.name.endsWith(end)) continue;
-      out.push({ name: one.name, text: await $.fs.readFile(`${folder}/${one.name}`) });
+      out.push({ name: one.name, text: await $.fs.read(`${folder}/${one.name}`) });
     }
     return out;
   } catch {
@@ -495,11 +495,11 @@ async function readFolder($, folder, end) {
 
 async function readRules($, folder) {
   try {
-    const entries = await $.fs.listDir(folder);
+    const entries = await $.fs.list(folder);
     const out = [];
     for (const one of entries) {
       if (!one.name.endsWith(".yml")) continue;
-      const rule = readRule(await $.fs.readFile(`${folder}/${one.name}`));
+      const rule = readRule(await $.fs.read(`${folder}/${one.name}`));
       out.push({ ...rule, name: one.name.replace(/\.yml$/, "") });
     }
     return out;
@@ -510,7 +510,7 @@ async function readRules($, folder) {
 
 async function readConfig($) {
   try {
-    return JSON.parse(await $.fs.readFile(CONFIG));
+    return JSON.parse(await $.fs.read(CONFIG));
   } catch {
     return {};
   }
@@ -519,7 +519,7 @@ async function readConfig($) {
 // [[spec/design_output/tools#where-a-caller-looks]]
 async function readSurvey($) {
   try {
-    return surveyOf(await $.fs.readFile(TOOLS));
+    return surveyOf(await $.fs.read(TOOLS));
   } catch {
     return {};
   }
