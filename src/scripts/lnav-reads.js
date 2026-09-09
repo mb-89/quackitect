@@ -8,7 +8,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { disk } from "../doors/disk.js";
 import { proc } from "../doors/proc.js";
-import { lnavBin } from "../../.claude/skills/level0/lib/log.js";
+import { readTools, whereIs } from "./tools.js";
 
 const THEME = "quackitect";
 
@@ -18,7 +18,7 @@ const outside = proc();
 const config = join(root, "spec", "config", "lnav");
 
 function lnavHere() {
-  const here = join(root, lnavBin(process.platform));
+  const here = whereIs(files, root, "lnav", readTools(files, root));
   if (files.exists(here)) return here;
   try {
     return outside.run(["lnav", "-V"]).exitCode === 0 ? "lnav" : "";

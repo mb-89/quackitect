@@ -3,13 +3,8 @@
 // breach as they type and the agent meets the same rule at the write.
 // [[spec/design_output/editor#what-the-editor-runs]]
 
-export const VALE_LS = ".se/bin/vale-ls";
 export const VALE_LS_VERSION = "0.5.1";
 export const VALE_LS_RELEASES = "https://github.com/vale-cli/vale-ls/releases/download";
-
-export function valeLsBin(platform) {
-  return platform === "win32" ? `${VALE_LS}.exe` : VALE_LS;
-}
 
 // [[spec/design_output/editor#the-asset-matrix]]
 const TARGETS = {

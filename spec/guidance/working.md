@@ -11,3 +11,5 @@ rationale: [[spec/rationales/working]]
 3. Stop on three grounds: the owner opens a discussion, going on needs what only a person gives, or the work stands complete. *
 4. Put what you have done into the answer you already owe. *
 5. Name the assumption you take where the owner says to carry on, and take it.
+6. Put a script of your own under `.se/scripts`, which git ignores.
+7. Read `.se/tools.json` for the path of a tool, and run `./RUNME.sh tools` where that file is absent.

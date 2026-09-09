@@ -14,7 +14,7 @@ rationale: [[spec/rationales/cloud]]
 3. Take `main` into your branch before you start: `./RUNME.sh work sync`. *
 4. Work the branch you hold and stop at its edge. The brief is the whole job. *
 5. Commit and push each time you finish a thing, onto the branch you hold. *
-6. Write your result and your retro into `HANDOVER.md`, at the root, replacing the brief.
+6. Write your result, your retro and every script you write under `.se/scripts` into `HANDOVER.md`, replacing the brief.
 7. Run `./RUNME.sh work done` last. It sets the status and pushes.
 8. Leave the merge to a person. A cloud box opens no pull request.
 9. Stop after `work done`. One session works one branch, and the next branch belongs to the next session. *

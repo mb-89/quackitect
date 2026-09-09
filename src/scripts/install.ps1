@@ -153,8 +153,21 @@ $needed = @(
   }
 )
 
+# The survey names where each tool stands, and every caller reads it in place
+# of guessing. It runs where anything landed, and where the file is absent.
+function Write-Survey {
+  Push-Location $root
+  try { node src/scripts/cli.js tools | Out-Null } finally { Pop-Location }
+  if ($LASTEXITCODE -ne 0) {
+    Write-Warning "  the survey wrote no .se/tools.json, so every caller guesses again."
+  }
+}
+
 $missing = @($needed | Where-Object { -not (& $_.have) })
-if ($missing.Count -eq 0) { exit 0 }
+if ($missing.Count -eq 0) {
+  if (-not (Test-Path (Join-Path $root ".se\tools.json"))) { Write-Survey }
+  exit 0
+}
 
 Write-Host "Installing what this tree needs." -ForegroundColor Cyan
 foreach ($one in $missing) {
@@ -172,5 +185,6 @@ foreach ($one in $missing) {
     exit 1
   }
 }
+Write-Survey
 Write-Host "Ready." -ForegroundColor Green
 exit 0

@@ -2,19 +2,15 @@
 // import, so the write door and the command line share one caller.
 // [[spec/design_output/level0#the-formatter-applies-itself]]
 
-export const BIOME = ".se/bin/biome";
 export const CONFIG_DIR = "spec/config";
 
 export const CODE = /\.(js|jsx|ts|tsx|json|jsonc)$/i;
 
-export function biomeBin(platform) {
-  return platform === "win32" ? `${BIOME}.exe` : BIOME;
-}
-
 export async function formatText(text, where, options = {}) {
   const { run, bin, cwd } = options;
+  if (!bin) return { ran: false, why: "no biome stands here", text };
   const argv = [
-    bin ?? BIOME,
+    bin,
     "format",
     `--config-path=${CONFIG_DIR}`,
     `--stdin-file-path=${where}`,
@@ -34,8 +30,9 @@ export async function formatText(text, where, options = {}) {
 
 export async function lintText(text, where, options = {}) {
   const { run, bin, cwd } = options;
+  if (!bin) return { ran: false, why: "no biome stands here", found: [] };
   const argv = [
-    bin ?? BIOME,
+    bin,
     "lint",
     `--config-path=${CONFIG_DIR}`,
     `--stdin-file-path=${where}`,

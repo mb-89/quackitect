@@ -4,13 +4,11 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { VALE_LS_VERSION, valeLsAsset, valeLsBin, valeLsUrl } from "../../.claude/skills/level0/lib/servers.js";
-
-test("the binary sits beside vale and biome, and Windows takes the extension", () => {
-  assert.equal(valeLsBin("linux"), ".se/bin/vale-ls");
-  assert.equal(valeLsBin("darwin"), ".se/bin/vale-ls");
-  assert.equal(valeLsBin("win32"), ".se/bin/vale-ls.exe");
-});
+import {
+  VALE_LS_VERSION,
+  valeLsAsset,
+  valeLsUrl,
+} from "../../.claude/skills/level0/lib/servers.js";
 
 test("every platform the installer knows names an asset", () => {
   for (const os of ["Linux", "macOS", "Windows"]) {

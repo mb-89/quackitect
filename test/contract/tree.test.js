@@ -7,8 +7,6 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { disk } from "../../src/doors/disk.js";
-import { proc } from "../../src/doors/proc.js";
 import { actionables, envOf } from "../../.claude/skills/level0/lib/guidance.js";
 import { nameOf, rowOf } from "../../.claude/skills/level0/lib/log.js";
 import { overLong, WORDS } from "../../.claude/skills/level0/lib/names.js";
@@ -20,6 +18,10 @@ import {
   EXTENSIONS,
   namesTheBinaries,
 } from "../../.claude/skills/level0/lib/servers.js";
+import { installedTools, WANTED } from "../../.claude/skills/level0/lib/tools.js";
+import { disk } from "../../src/doors/disk.js";
+import { proc } from "../../src/doors/proc.js";
+import { survey } from "../../src/scripts/tools.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -156,4 +158,22 @@ test("every tracked name in this tree holds five words", () => {
     .filter(([, part]) => part);
 
   assert.deepEqual(long, [], `a name holds ${WORDS} words: ${JSON.stringify(long)}`);
+});
+
+// [[spec/design_output/tools#what-the-survey-names]]
+test("the survey names every tool the install script installs", () => {
+  const installs = installedTools(files.read(join(SCRIPTS, "install.sh")));
+  assert.ok(installs.length, "the install script names the tools it installs");
+
+  const wanted = WANTED.map((one) => one.name);
+  for (const name of installs) {
+    assert.ok(wanted.includes(name), `the survey names ${name}`);
+  }
+});
+
+test("the survey finds the node running it, and reads its version back", () => {
+  const found = survey({ disk: files, proc: proc() }, root, process.env);
+
+  assert.ok(found.node, "node stands on this box");
+  assert.equal(found.node.version, process.version.replace(/^v/, ""));
 });

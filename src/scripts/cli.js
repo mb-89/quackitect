@@ -3,19 +3,24 @@
 
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import {
+  actionables,
+  bindsHere,
+  standingLayer,
+} from "../../.claude/skills/level0/lib/guidance.js";
+import { asRow, rowsOf } from "../../.claude/skills/level0/lib/log.js";
+import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
+import { pathInScript, SCRIPT } from "../../.claude/skills/level0/lib/scripts.js";
+import { EDITOR_SETTINGS } from "../../.claude/skills/level0/lib/servers.js";
+import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
+import { TOOLS, WANTED } from "../../.claude/skills/level0/lib/tools.js";
+import { CONFIG, fromJson, unreasoned } from "../../.claude/skills/level0/lib/vale.js";
 import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
-import { biomeBin } from "../../.claude/skills/level0/lib/code.js";
-import { asRow, lnavBin, rowsOf } from "../../.claude/skills/level0/lib/log.js";
-import { actionables, bindsHere, standingLayer } from "../../.claude/skills/level0/lib/guidance.js";
-import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
-import { pathInScript, SCRIPT } from "../../.claude/skills/level0/lib/scripts.js";
-import { EDITOR_SETTINGS, valeLsBin } from "../../.claude/skills/level0/lib/servers.js";
-import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
-import { CONFIG, fromJson, unreasoned, valeBin } from "../../.claude/skills/level0/lib/vale.js";
+import { readTools, whereIs, writeSurvey } from "./tools.js";
 import { work } from "./work.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -38,13 +43,13 @@ const it = doorsHere();
 const files = it.disk;
 const outside = it.proc;
 
-const bin = join(root, valeBin(process.platform));
-const lnav = join(root, lnavBin(process.platform));
+const known = readTools(files, root);
+const bin = whereIs(files, root, "vale", known);
+const lnav = whereIs(files, root, "lnav", known);
 const LOG = join(root, ".se", "log");
 const STYLES = join(root, "spec", "config", "styles", "VoiceVale");
 const JUDGED = join(root, "spec", "config", "styles", "VoiceJudged");
-const biome = join(root, biomeBin(process.platform));
-const valeLs = join(root, valeLsBin(process.platform));
+const biome = whereIs(files, root, "biome", known);
 const GUIDANCE = join(root, "spec", "guidance");
 const DOORS = join(root, "src", "doors");
 const PLUGIN = join(".claude", "skills", "level0");
@@ -75,6 +80,10 @@ const verbs = {
   doctor: {
     says: "what is installed, and what level zero found",
     run: async () => doctor(),
+  },
+  tools: {
+    says: "ask this box where every tool stands, and write it down",
+    run: async () => tools(),
   },
   doors: {
     says: "every door, and the contract test that holds it",
@@ -348,18 +357,24 @@ rules: ${count}`);
   return 0;
 }
 
+// [[spec/design_output/tools#where-a-caller-looks]]
+function tools() {
+  const found = writeSurvey(it, root, process.env);
+  for (const one of WANTED)
+    console.log(`${one.name.padEnd(18)} ${standsAt(found[one.name])}`);
+  console.log(`\n${TOOLS} says this, and every caller reads it.`);
+  return 0;
+}
+
+function standsAt(one) {
+  if (!one) return "missing, run ./RUNME.sh";
+  return [one.version, one.path].filter(Boolean).join("  ");
+}
+
 function doctor() {
+  const found = Object.keys(known).length ? known : writeSurvey(it, root, process.env);
   const rows = [
-    ["node", process.version],
-    ["vale", files.exists(bin) ? asked([bin, "--version"]) : "missing, run ./RUNME.sh"],
-    [
-      "biome",
-      files.exists(biome) ? asked([biome, "--version"]) : "missing, run ./RUNME.sh",
-    ],
-    [
-      "vale-ls",
-      files.exists(valeLs) ? asked([valeLs, "--version"]) : "missing, run ./RUNME.sh",
-    ],
+    ...WANTED.map((one) => [one.name, standsAt(found[one.name])]),
     ["biome lsp-proxy", files.exists(biome) ? lspProxy() : "missing, run ./RUNME.sh"],
     [
       "editor",
@@ -385,6 +400,10 @@ function doctor() {
         ? "off in spec/config/level0.json"
         : `on, model ${config.judge?.model ?? "default"}`,
     ],
+    [
+      "survey",
+      files.exists(join(root, TOOLS)) ? TOOLS : "absent, run ./RUNME.sh tools",
+    ],
     ["level zero stamp", readIf(join(root, ".se", "level0.stamp"))],
     [
       "cage",
@@ -401,18 +420,7 @@ function doctor() {
 
 function lspProxy() {
   const ran = outside.run([biome, "lsp-proxy", "--help"]);
-  if (ran.exitCode !== 0) return "this biome carries no lsp-proxy";
-  return asked([biome, "--version"]).replace(/^Version:\s*/, "biome ");
-}
-
-function asked(argv) {
-  let ran;
-  try {
-    ran = outside.run(argv);
-  } catch {
-    return "missing";
-  }
-  return (ran.stdout || ran.stderr || "").split("\n")[0];
+  return ran.exitCode === 0 ? "this biome carries one" : "this biome carries none";
 }
 
 function namesIn(at, end) {
