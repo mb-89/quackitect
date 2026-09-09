@@ -70,6 +70,26 @@ test("tee and an in-place edit are writes, and a plain read is not", () => {
   assert.deepEqual(paths("sed -n '1,20p' README.md"), []);
 });
 
+test("a copy from outside the rules is refused, and a rename inside them passes", () => {
+  assert.deepEqual(paths("cp .se/draft.md README.md"), ["README.md"]);
+  assert.deepEqual(paths("mv /tmp/one.md spec/guidance/new.md"), [
+    "spec/guidance/new.md",
+  ]);
+  assert.deepEqual(paths("mv spec/guidance/a.md spec/guidance/b.md"), []);
+  assert.deepEqual(paths("cp README.md .se/backup.md"), []);
+  assert.deepEqual(paths("cp -r spec .se/spec"), []);
+});
+
+test("a nested command carries the same rules", () => {
+  assert.deepEqual(paths("ls spec | xargs -I{} sed -i 's/a/b/' README.md"), [
+    "README.md",
+  ]);
+  assert.deepEqual(paths("ls spec | xargs grep -i sed README.md"), []);
+  assert.deepEqual(paths("find . -name '*.md' -exec sed -i 's/a/b/' README.md +"), [
+    "README.md",
+  ]);
+});
+
 test("a heredoc writing through an interpreter is refused, and one writing nowhere passes", () => {
   const python = [
     "python3 - <<'PY'",
@@ -105,6 +125,19 @@ test("a heredoc writing through an interpreter is refused, and one writing nowhe
 
 test("a redirection inside a quoted word writes nothing", () => {
   assert.deepEqual(paths('git commit -m "the door reads > README.md now"'), []);
+});
+
+test("an inline script carries the same rules as the command line", () => {
+  assert.deepEqual(paths('bash -c "cat > README.md"'), ["README.md"]);
+  assert.deepEqual(paths('sh -lc "cat > README.md"'), ["README.md"]);
+  assert.deepEqual(paths("node -e \"require('fs').writeFileSync('README.md', 'x')\""), [
+    "README.md",
+  ]);
+  assert.deepEqual(paths('bash -c "cat > .se/one.md"'), []);
+  assert.deepEqual(
+    paths("node -e \"console.log(require('fs').readFileSync('README.md'))\""),
+    [],
+  );
 });
 
 // [[spec/design_output/bash#a-commit-message-meets-voice]]

@@ -40,6 +40,8 @@ const FREE = [
 
 const PASSES = new Set(["sudo", "env", "command", "nohup", "time", "exec"]);
 const EDITS = new Set(["sed", "perl"]);
+const COPIES = new Set(["cp", "mv"]);
+const TAKES = new Set(["-I", "-n", "-P", "-L", "-d", "-s", "-a", "-E"]);
 const SHELLS = new Set(["sh", "bash", "zsh", "dash"]);
 const READERS = new Set(["python", "python3", "node", "ruby", "perl", "php", "deno"]);
 const RUNNERS = new Set(["npm", "pnpm", "yarn", "bun"]);
@@ -229,17 +231,77 @@ function writesIn(segment, bodies) {
     });
   }
 
-  if (name === "tee" || (EDITS.has(name) && words.some((one) => IN_PLACE.test(one)))) {
-    const how = name === "tee" ? "tee" : `${name} -i`;
-    for (const arg of words.slice(1)) {
-      if (arg.startsWith("-") || !reaches(arg)) continue;
-      out.push({ path: clean(arg), how });
+  for (const run of runsIn(words)) out.push(...landsFrom(run));
+
+  for (const body of fedTo(segment, bodies)) {
+    for (const one of insideOf(name, body)) {
+      out.push({ path: one.path, how: `a heredoc into ${name}` });
     }
   }
 
-  for (const body of fedTo(segment, bodies)) {
-    const found = SHELLS.has(name) ? writesAPath(body) : writesInScript(body);
-    for (const one of found) out.push({ path: one.path, how: `a heredoc into ${name}` });
+  for (const body of inlineIn(segment)) {
+    for (const one of insideOf(name, body)) {
+      out.push({ path: one.path, how: `an inline script in ${name}` });
+    }
+  }
+  return out;
+}
+
+function landsFrom(words) {
+  const out = [];
+  const name = baseName(words[0]);
+  const args = words.slice(1);
+  const bare = args.filter((one) => !one.startsWith("-"));
+
+  if (name === "tee" || (EDITS.has(name) && args.some((one) => IN_PLACE.test(one)))) {
+    const how = name === "tee" ? "tee" : `${name} -i`;
+    for (const arg of bare) {
+      if (reaches(arg)) out.push({ path: clean(arg), how });
+    }
+  }
+
+  if (COPIES.has(name) && bare.length > 1) {
+    const dest = bare[bare.length - 1];
+    const from = bare.slice(0, -1);
+    if (reaches(dest) && !from.every((one) => reaches(one))) {
+      out.push({ path: clean(dest), how: name === "mv" ? "a move" : "a copy" });
+    }
+  }
+  return out;
+}
+
+// [[spec/design_output/bash#a-shell-writes-nothing]]
+function runsIn(words) {
+  const out = [words];
+  const at = words.findIndex((one) => one === "-exec" || one === "-execdir");
+  if (at >= 0) {
+    out.push(words.slice(at + 1).filter((one) => one !== ";" && one !== "+"));
+  }
+  if (baseName(words[0]) === "xargs") {
+    let i = 1;
+    while (i < words.length && words[i].startsWith("-")) {
+      if (TAKES.has(words[i])) i++;
+      i++;
+    }
+    out.push(words.slice(i));
+  }
+  return out.filter((one) => one.length);
+}
+
+function insideOf(name, body) {
+  return SHELLS.has(name) ? writesAPath(body) : writesInScript(body);
+}
+
+function inlineIn(segment) {
+  const words = wordsIn(segment);
+  const name = baseName(words[0]);
+  if (!SHELLS.has(name) && !READERS.has(name)) return [];
+
+  const wanted = SHELLS.has(name) ? /^-[A-Za-z]*c$/ : /^(-e|--eval|-c|--command)$/;
+  const out = [];
+  for (let i = 1; i < words.length; i++) {
+    if (!wanted.test(words[i]) || words[i + 1] === undefined) continue;
+    out.push(words[i + 1]);
   }
   return out;
 }

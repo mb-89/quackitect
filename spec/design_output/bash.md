@@ -42,16 +42,30 @@ refuses a shell command landing a file the rules cover.
 | `cat > spec/guidance/x.md`, and `>>` | anything under `.se/`, `.git/` or a temp folder |
 | `tee` into a path the rules cover | a pipe writing nothing |
 | `sed -i`, `perl -i` | reading, searching, running |
+| `cp` or `mv` from outside the rules into them | a rename inside the rules, where a door reads both ends |
 | a heredoc into a shell or a reader, writing such a path | the same, writing nowhere the rules reach |
+| `bash -c` or `node -e` writing such a path | the same, writing nowhere the rules reach |
+| the same, behind `xargs` or `find -exec` | a target the parse reads as `{}` |
 
 The rules cover what Vale and Biome read: `.md`, `.markdown`, `.txt`, and the
 JavaScript and JSON that `CODE` names. A path under `.se/`, `.git/`,
 `node_modules/`, `/tmp/`, `/var/tmp/`, `/dev/` or a temp variable stays free.
 
+So `cp` and `mv` refuse where a source stands outside what the rules reach:
+
+- a source outside them carries content no door reads
+- a source inside them carries content a door reads already
+
+`xargs` and `find -exec` carry a command inside a command, and the parse reads
+the inner one under the same rules. A target the parse reads as `{}` names no
+path, so it passes. The enclosing `find` holds the real target, and a guess at
+it refuses honest work.
+
 A heredoc into `sh` runs the shell parse again over the body. A heredoc into
 `python`, `node`, `ruby`, `perl` or `php` reads each line for a write call
 beside a path the rules cover: `open(..., "w")`, `writeFileSync(...)`,
-`write_text(...)` and their kind.
+`write_text(...)` and their kind. An inline script behind `-c` or `-e` meets
+the same two readings.
 
 That last row is the one that matters. A session reaches for a heredoc because
 a formatter reflows a file between a read and an edit, and a string replacement
