@@ -12,7 +12,7 @@ import {
 } from "../lib/code.js";
 import { bindsHere, envOf, standingLayer } from "../lib/guidance.js";
 import { judgeOf } from "../lib/judge.js";
-import { asLines, FOLDER, nameOf, rowOf } from "../lib/log.js";
+import { aimOf, asLines, FOLDER, nameOf, rowOf, writes } from "../lib/log.js";
 import { refusal, taught } from "../lib/refuse.js";
 import { readRule } from "../lib/rulefile.js";
 import { landsOnTrunk, touchesGit } from "../lib/trunk.js";
@@ -57,10 +57,17 @@ export function register(on, _options) {
       );
     } catch {}
 
-    logbook = logHere((at, text) => $.fs.writeFile(at, text));
-    await logbook.say("info", "level0", `session start, ${await pruned($)}`, {
+    logbook = logHere((at, text) => $.fs.writeFile(at, text), config.log?.level);
+    await logbook.say("info", "level0", "session start", {
       branch: await branchNow($),
       vale: bin ?? "missing",
+    });
+    return next(e);
+  });
+
+  on("prompt.submit", async (_$, e, next) => {
+    await logbook.say("info", "prompt", String(e.text ?? ""), {
+      detail: String(e.origin?.kind ?? ""),
     });
     return next(e);
   });
@@ -92,26 +99,10 @@ export function register(on, _options) {
     };
   });
 
-  // [[spec/design_output/log#the-search-writes-itself-down]]
-  on("tool.call", { tool: "WebSearch" }, async ($, e, next) => {
-    const said = await next(e);
-    await logbook.say("info", "search", String(e.query ?? "").slice(0, 120), {
-      tool: "WebSearch",
-      detail: [e.allowed_domains, e.blocked_domains].flat().filter(Boolean).join(" "),
-    });
-    return said;
-  });
-
-  on("tool.call", { tool: "WebFetch" }, async ($, e, next) => {
-    const said = await next(e);
-    await logbook.say("info", "search", String(e.url ?? "").slice(0, 120), {
-      tool: "WebFetch",
-      detail: String(e.prompt ?? "").slice(0, 200),
-    });
-    return said;
-  });
-
+  // [[spec/design_output/log#what-a-tool-line-names]]
   on("tool.call", async ($, e, next) => {
+    await logbook.say("info", "tool", aimOf(e), { tool: e.tool });
+
     const writing = asWrite(e);
     if (!writing) return next(e);
 
@@ -271,7 +262,7 @@ export function register(on, _options) {
 }
 
 // [[spec/design_output/log#where-the-writer-stands]]
-function logHere(writeFile) {
+function logHere(writeFile, at) {
   const rows = [];
   const stamp = () => new Date().toISOString();
   const id = Math.random().toString(16).slice(2).padEnd(8, "0").slice(0, 8);
@@ -281,26 +272,16 @@ function logHere(writeFile) {
     path,
     lines: () => rows.map((one) => ({ ...one })),
     async say(level, door, said, more) {
-      rows.push(rowOf(stamp(), level, door, said, more));
-      if (!writeFile) return rows[rows.length - 1];
+      const row = rowOf(stamp(), level, door, said, more);
+      if (!writes(at, row.level)) return row;
+      rows.push(row);
+      if (!writeFile) return row;
       try {
         await writeFile(path, asLines(rows));
       } catch {}
-      return rows[rows.length - 1];
+      return row;
     },
   };
-}
-
-// [[spec/design_output/log#rotation-really-a-prune]]
-async function pruned($) {
-  try {
-    const ran = await $.process.run(["node", "src/scripts/prune.js"], {
-      timeoutMs: 30000,
-    });
-    return (ran.stdout ?? "").trim() || "no log file went";
-  } catch {
-    return "the prune ran nowhere";
-  }
 }
 
 // [[spec/design_output/work#two-handovers]]

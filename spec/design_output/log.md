@@ -26,12 +26,56 @@ outside the three reads as `info`.
 
 | door | says | where it stands |
 |---|---|---|
-| `level0` | the session starts, and what the prune drops | `session.start` |
+| `level0` | the session starts, and the canary comes back | `session.start`, `turn.complete` |
+| `tool` | every call a tool takes | `tool.call` |
+| `prompt` | every prompt, as submitted | `prompt.submit` |
+| `stop` | a turn ends, or goes on | `turn.complete` |
 | `write` | the code door refuses a write | `tool.call` |
 | `vale` | the rules refuse prose, and how long a lint takes | the hook, and `lint` |
 | `judge` | a model refuses prose | `tool.call` |
 | `bash` | a commit or a push aims at trunk | `tool.call` |
 | `work` | a branch verb answers, and the branch it stands on | `work.js` |
+
+# What a tool line names
+
+The `tool` door writes one line per call, and the line names the tool and one
+field. That field says what the call aims at:
+
+| tool | field |
+|---|---|
+| a write | the path |
+| Bash | the command |
+| a search | the query |
+| a fetch | the url |
+
+`aimOf` reads them in that order and answers the first the call carries, and a
+call carrying none says its own name. A web search and a web fetch write the
+line every other tool writes. So the query and the url stand where a person
+already looks.
+
+`turn.step` stays out. A transcript holds a turn's steps already, so a line per
+step buys a second copy of what stands elsewhere.
+
+The write door and the trunk guard write their own lines. The `tool` line goes
+down first, and the door adds what it refuses beneath it.
+
+# What a box writes
+
+`spec/config/level0.json` takes a `log` object naming the level:
+
+    "log": {
+      "level": "info"
+    }
+
+| level | writes |
+|---|---|
+| `info` | everything, and this is the default |
+| `warn` | a refusal and a fault |
+| `error` | a fault |
+
+A level the reader does not know reads as `info`, and a missing object reads as
+`info`. So a box configuring nothing writes everything. `writes` decides, the
+door asks it before the line lands, and the hook asks it too.
 
 # Where the writer stands
 
@@ -56,25 +100,17 @@ rewrite to one session, and the name carries the time, so a listing sorts by it:
 The file appears with the first line a door says. A session saying nothing
 leaves nothing behind.
 
-# Rotation, really a prune
+# Nothing here deletes a log
 
-A session file closes when its session ends, so nothing rotates it.
+A session file closes when its session ends, so nothing rotates it, and the
+folder grows. A retro owns deletion, this tree carries no retro, and a person
+removes what a retro reaches.
 
-- Keep 14 days.
-- Keep at most 200 files.
-- Keep the newest 20 whatever their age.
-- Drop the oldest first when a cap breaks.
+A growing folder costs less than a folder swept empty under a person
+mid-diagnosis. So no code path in this tree deletes a log file, and `grep`
+answers that in one line:
 
-The third line is a floor under the first. A fortnight away puts every file
-past the age cap, and a folder swept empty leaves a person diagnosing yesterday
-with nothing. So the age cap reaches a file only where more than 20 stand.
-
-`dropping` decides, and it reads the time out of each name. The door removes
-what it names, and a file outside that naming stays where it is.
-
-`$.fs` deletes nothing, so level zero runs `node src/scripts/prune.js` at
-`session.start` through `$.process.run`. That script builds the real doors and
-prunes `.se/log`, which it makes where it stands missing.
+    grep -rn "remove\|unlink\|rm -" --include=*.js src .claude/skills
 
 # The verb
 
@@ -110,14 +146,6 @@ Windows installer leaves winget alone.
 lnav loads a format from the reader's own folder, and from no project directory.
 So the installer runs `lnav -i spec/config/lnav/quackitect.json` once the binary
 lands. `test/contract/tree.test.js` holds that file to what the door writes.
-
-# The search writes itself down
-
-A web search and a web fetch each write one line under the door `search`. The
-query or the url stands on the row, and the rest opens beneath.
-
-An earlier line in this project leaves that duty with the agent. An agent
-forgets, and a hook forgets nothing.
 
 # The viewer learns this tree
 

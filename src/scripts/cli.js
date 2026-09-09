@@ -19,17 +19,23 @@ import { CONFIG, fromJson, unreasoned, valeBin } from "../../.claude/skills/leve
 import { work } from "./work.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
+const LEVEL0 = join(root, "spec", "config", "level0.json");
 
 function doorsHere() {
   const outside = proc();
   const files = disk();
   const time = clock();
+  const said = files.exists(LEVEL0) ? JSON.parse(files.read(LEVEL0)) : {};
   return {
     proc: outside,
     disk: files,
     clock: time,
     git: git(outside, root),
-    log: log(files, time, { folder: join(root, ".se", "log") }),
+    log: log(files, time, {
+      folder: join(root, ".se", "log"),
+      level: said.log?.level,
+    }),
+    config: said,
     join,
   };
 }
@@ -49,8 +55,7 @@ const GUIDANCE = join(root, "spec", "guidance");
 const DOORS = join(root, "src", "doors");
 const PLUGIN = join(".claude", "skills", "level0");
 const CONTRACT = join(root, "test", "contract");
-const LEVEL0 = join(root, "spec", "config", "level0.json");
-const config = files.exists(LEVEL0) ? JSON.parse(files.read(LEVEL0)) : {};
+const config = it.config;
 const OURS = "--glob=!{.se,node_modules,.git}/**";
 const TESTS = "test/level0/*.test.js";
 const CONTRACT_TESTS = "test/contract/*.test.js";

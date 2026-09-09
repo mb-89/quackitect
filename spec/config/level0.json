@@ -1,5 +1,9 @@
 {
   "comment": "The controls for level zero. Every rule lives in spec/config/styles, one file each: VoiceVale for the rules Vale holds, VoiceJudged for the rules a model holds.",
+  "log": {
+    "comment": "The level this box writes at. info writes everything, warn writes a refusal and a fault, error writes a fault. A level nobody names reads as info.",
+    "level": "info"
+  },
   "judge": {
     "comment": "Switch the model off where it costs more than it earns. The mechanical rules ignore this.",
     "enabled": true,
