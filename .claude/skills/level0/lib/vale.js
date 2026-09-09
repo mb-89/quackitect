@@ -4,6 +4,8 @@
 
 export const CONFIG = ".vale.ini";
 
+export const PROSE = /\.(md|markdown|txt)$/i;
+
 const MARKER = /<!--\s*vale\s+([A-Za-z0-9_.-]+)\s*=\s*(NO|off)\s*-->/i;
 const REASON = /<!--\s*because:\s*(.+?)\s*-->/i;
 

@@ -7,6 +7,7 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { VERBS } from "../../.claude/skills/level0/lib/bash.js";
 import { actionables, envOf } from "../../.claude/skills/level0/lib/guidance.js";
 import { nameOf, rowOf } from "../../.claude/skills/level0/lib/log.js";
 import { overLong, WORDS } from "../../.claude/skills/level0/lib/names.js";
@@ -46,6 +47,15 @@ test("every script in this tree passes the rule", () => {
   for (const name of scripts) {
     const text = files.read(join(SCRIPTS, name));
     assert.deepEqual(pathInScript(text, name), [], `${name} interpolates no path`);
+  }
+});
+
+// [[spec/design_output/bash#the-description-names-verbs]]
+test("every verb the Bash description names stands in the command line", () => {
+  const said = files.read(join(SCRIPTS, "cli.js"));
+  assert.ok(VERBS.length, "the description names at least one verb");
+  for (const verb of VERBS) {
+    assert.match(said, new RegExp(`\\n  ${verb}: \\{`), `./RUNME.sh ${verb} stands`);
   }
 });
 

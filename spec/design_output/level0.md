@@ -113,6 +113,10 @@ and a breach comes back as `{ deny }` naming the rule, the line and the phrase.
 The refusal closes by asking the writer to hold that rule for the rest of the
 turn. A refusal teaching one line costs a round trip on every line.
 
+A shell reaches the same files through `>`, `tee`, `sed -i` and a heredoc, so
+`tool.call` reads a Bash command as well. For details, see
+[[spec/design_output/bash]].
+
 ## The formatter applies itself
 
 A formatter that asks permission is a formatter somebody skips. So the door
