@@ -80,7 +80,8 @@ export function writesAPath(command) {
 
 // [[spec/design_output/bash#a-commit-message-meets-voice]]
 export function commitIn(command) {
-  for (const one of partsOf(command).segments) {
+  const { segments, bodies } = partsOf(command);
+  for (const one of segments) {
     const words = wordsIn(one);
     if (baseName(words[0]) !== "git") continue;
 
@@ -101,7 +102,10 @@ export function commitIn(command) {
         continue;
       }
       const file = valueOf(arg, args[i + 1], ["-F", "--file"]);
-      if (file.found) return { form: "file", file: file.value };
+      if (!file.found) continue;
+      const body = bodiesIn(one, bodies)[0];
+      if (file.value === "-" && body !== undefined) return { form: "message", text: body };
+      return { form: "file", file: file.value };
     }
     if (said.length) return { form: "message", text: said.join("\n\n") };
     return { form: "none" };
@@ -241,10 +245,13 @@ function writesIn(segment, bodies) {
 }
 
 function fedTo(segment, bodies) {
-  const out = [];
   const name = baseName(wordsIn(segment)[0]);
-  if (!SHELLS.has(name) && !READERS.has(name)) return out;
+  if (!SHELLS.has(name) && !READERS.has(name)) return [];
+  return bodiesIn(segment, bodies);
+}
 
+function bodiesIn(segment, bodies) {
+  const out = [];
   for (let i = 0; i < segment.length; i++) {
     const one = segment[i];
     if (!one.op || one.text !== "<<") continue;

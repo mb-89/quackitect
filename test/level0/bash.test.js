@@ -132,6 +132,14 @@ test("a commit reading a file names the file, and one carrying neither is refuse
     form: "file",
     file: ".se/message.txt",
   });
+  assert.deepEqual(commitIn("git commit -q -F - <<'MSG'\nthe door reads more\nMSG"), {
+    form: "message",
+    text: "the door reads more",
+  });
+  assert.deepEqual(commitIn("cat .se/m.txt | git commit -F -"), {
+    form: "file",
+    file: "-",
+  });
   assert.deepEqual(commitIn("git commit"), { form: "none" });
   assert.deepEqual(commitIn("git commit -a"), { form: "none" });
   assert.deepEqual(commitIn("git commit --amend"), { form: "none" });

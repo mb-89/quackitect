@@ -67,6 +67,8 @@ prose no rule reads, so the door lints the message the way it lints a file.
 |---|---|
 | `-m "..."`, and `-m` twice | read it, lint it through Vale |
 | `-F <file>` | read the file, lint it |
+| `-F -`, fed by a heredoc | lint the heredoc body, which the parse holds already |
+| `-F -`, fed by a pipe | pass it, because the door reads no stdin |
 | `--no-edit`, `--fixup`, `--squash`, `-C` | pass it, because the message stands already |
 | none of those | refuse, because a commit through an editor is no thing an agent does |
 
@@ -116,6 +118,20 @@ runs.
 
 The engine caches a rendered description for the session, so `verbLine()` takes
 no argument and answers one constant string.
+
+# What stands unproven
+
+Two things here rest on the type declaration alone, so read them again before
+you trust them:
+
+| the claim | why it stands unproven |
+|---|---|
+| `tool.describe` fires once per tool and rewrites the description | the client on this box carries 2.1.42, whose engine names no such event |
+| the engine caches the rendered description | the same |
+
+`claude plugin validate` reads an event name it knows nothing about and passes.
+A probe registering `nonsense.event` validates green, so a typo in an event
+name costs a silent hook and no error.
 
 # What every refusal owes
 
