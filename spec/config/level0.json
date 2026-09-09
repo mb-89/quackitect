@@ -1,5 +1,10 @@
 {
   "comment": "The controls for level zero. Every rule lives in spec/config/styles, one file each: VoiceVale for the rules Vale holds, VoiceJudged for the rules a model holds.",
+  "stop": {
+    "comment": "The tooth. enabled false takes it out, and mostInARow caps the turns it carries one after another. The rules it votes over live in spec/config/stop.",
+    "enabled": true,
+    "mostInARow": 3
+  },
   "log": {
     "comment": "The level this box writes at. info writes everything, warn writes a refusal and a fault, error writes a fault. A level nobody names reads as info.",
     "level": "info"

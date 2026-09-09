@@ -10,11 +10,21 @@ import {
   formatText,
   lintText as lintCode,
 } from "../lib/code.js";
-import { bindsHere, envOf, standingLayer } from "../lib/guidance.js";
+import { bindsHere, envOf, parse, standingLayer } from "../lib/guidance.js";
 import { judgeOf } from "../lib/judge.js";
 import { aimOf, asLines, FOLDER, nameOf, rowOf, writes } from "../lib/log.js";
 import { refusal, taught } from "../lib/refuse.js";
 import { readRule } from "../lib/rulefile.js";
+import {
+  claimSpec,
+  decide,
+  detail,
+  pool,
+  reprompt,
+  RULES,
+  todos,
+  toothOf,
+} from "../lib/stop.js";
 import { landsOnTrunk, touchesGit } from "../lib/trunk.js";
 import { lintText, VALE } from "../lib/vale.js";
 
@@ -38,6 +48,10 @@ export function register(on, _options) {
   let waiting = false;
   let cloud = false;
   let logbook = logHere(null);
+  let rules = [];
+  let onAHeldBranch = false;
+  const list = todos();
+  let tooth = toothOf();
 
   on("session.start", async ($, e, next) => {
     bin = await linterHere($);
@@ -49,6 +63,8 @@ export function register(on, _options) {
     handover = await takeHandover($);
     cloud = await onACloudBox($);
     waiting = cloud && !handover.length && (await offAWorkBranch($));
+    onAHeldBranch = handover.some((one) => parse(one.text).front.status === "held");
+    tooth = toothOf({ mostInARow: config.stop?.mostInARow });
 
     try {
       await $.fs.writeFile(
@@ -62,45 +78,30 @@ export function register(on, _options) {
       branch: await branchNow($),
       vale: bin ?? "missing",
     });
+
+    // [[spec/design_output/stop#where-the-rules-live]]
+    const pooled = pool(await readFolder($, RULES, ".yml"));
+    rules = pooled.rules;
+    for (const name of pooled.broken) {
+      await logbook.say("warn", "stop", `${name} carries a rule nobody can read`, {
+        file: `${RULES}/${name}`,
+      });
+    }
+    await $.tool.register(claimSpec(rules));
     return next(e);
   });
 
   on("prompt.submit", async (_$, e, next) => {
-    await logbook.say("info", "prompt", String(e.text ?? ""), {
-      detail: String(e.origin?.kind ?? ""),
-    });
+    const from = String(e.origin?.kind ?? "");
+    tooth.sawPrompt(from === "plugin");
+    await logbook.say("info", "prompt", String(e.text ?? ""), { detail: from });
     return next(e);
-  });
-
-  // [[spec/design_output/work#a-box-writes-its-branch]]
-  on("tool.call", { tool: "Bash" }, async ($, e, next) => {
-    if (!cloud) return next(e);
-    const said = String(e.command ?? "");
-    if (!touchesGit(said).commits && !touchesGit(said).pushes) return next(e);
-
-    const how = landsOnTrunk(said, await branchNow($), TRUNK);
-    if (!how) return next(e);
-
-    await logbook.say("warn", "bash", `refused a ${how} landing on ${TRUNK}`, {
-      tool: "Bash",
-      detail: said.slice(0, 120),
-    });
-    return {
-      deny: [
-        `This box works a branch, and ${TRUNK} belongs to a person.`,
-        "",
-        how === "commit"
-          ? `You stand on ${TRUNK}, so this commit would land there.`
-          : `This pushes ${TRUNK}, which no cloud box may move.`,
-        "",
-        "Run `./RUNME.sh work take` to take a branch and move onto it. Every",
-        "commit then lands where it belongs, and the merge stays a person's.",
-      ].join("\n"),
-    };
   });
 
   // [[spec/design_output/log#what-a-tool-line-names]]
   on("tool.call", async ($, e, next) => {
+    tooth.sawCall(String(e.tool ?? ""));
+    list.sawCall(e);
     await logbook.say("info", "tool", aimOf(e), { tool: e.tool });
 
     const writing = asWrite(e);
@@ -148,8 +149,45 @@ export function register(on, _options) {
     return { deny: refusal(where, found) };
   });
 
+  // [[spec/design_output/work#a-box-writes-its-branch]]
+  on("tool.call", { tool: "Bash" }, async ($, e, next) => {
+    if (!cloud) return next(e);
+    const said = String(e.command ?? "");
+    if (!touchesGit(said).commits && !touchesGit(said).pushes) return next(e);
+
+    const how = landsOnTrunk(said, await branchNow($), TRUNK);
+    if (!how) return next(e);
+
+    await logbook.say("warn", "bash", `refused a ${how} landing on ${TRUNK}`, {
+      tool: "Bash",
+      detail: said.slice(0, 120),
+    });
+    return {
+      deny: [
+        `This box works a branch, and ${TRUNK} belongs to a person.`,
+        "",
+        how === "commit"
+          ? `You stand on ${TRUNK}, so this commit would land there.`
+          : `This pushes ${TRUNK}, which no cloud box may move.`,
+        "",
+        "Run `./RUNME.sh work take` to take a branch and move onto it. Every",
+        "commit then lands where it belongs, and the merge stays a person's.",
+      ].join("\n"),
+    };
+  });
+
+  // [[spec/design_output/stop#the-claim-and-its-life]]
+  on("tool.call", { tool: "mcp__level0__claim_stop" }, async (_$, e, _next) => {
+    const said = tooth.claims(String(e.rule ?? ""), String(e.why ?? ""));
+    await logbook.say("info", "stop", `claimed ${said.rule}`, {
+      detail: said.why.slice(0, 120),
+    });
+    return { result: { ...said, counted: "at the end of this turn" } };
+  });
+
   on("turn.complete", async ($, e, next) => {
     const said = await next(e);
+    await bite($, e, { rules, tooth, logbook, ran: ranHere });
     if (!bin || !e.answer || e.reason !== "answer") return said;
 
     const ran = await lintText(e.answer, ANSWER, {
@@ -259,6 +297,45 @@ export function register(on, _options) {
 
     return { ...said, blocks };
   });
+
+  // [[spec/design_output/stop#the-mechanical-checks]]
+  function ranHere(name) {
+    if (name === "work-waiting") return list.standing() || onAHeldBranch;
+    if (name === "session-is-new") return tooth.isNew();
+    if (name === "stop-hook-off") return config.stop?.enabled === false;
+    if (name === "never") return false;
+    return undefined;
+  }
+}
+
+// [[spec/design_output/stop#the-vote]]
+async function bite($, e, it) {
+  if (e.reason !== "answer") return;
+
+  const decision = decide(it.rules, { claimed: it.tooth.claim()?.rule, ran: it.ran });
+  const said = it.tooth.atTurnEnd(decision);
+  const how = detail(said, said.inARow);
+
+  for (const name of said.unknown) {
+    await it.logbook.say("warn", "stop", `no check answers to ${name}`, { file: RULES });
+  }
+  if (said.runaway) {
+    await it.logbook.say("warn", "stop", "carried enough turns in a row", {
+      detail: how,
+    });
+  }
+  await it.logbook.say(
+    "info",
+    "stop",
+    said.ends ? "the turn ends" : "the turn goes on",
+    { detail: how },
+  );
+  if (said.ends) return;
+
+  // [[spec/design_output/stop#holding-a-turn-open]]
+  try {
+    $.prompt.submit({ text: reprompt(said) }).catch(() => {});
+  } catch {}
 }
 
 // [[spec/design_output/log#where-the-writer-stands]]
@@ -363,6 +440,20 @@ async function readEnv($, names) {
     return JSON.parse((ran.stdout ?? "{}").trim() || "{}");
   } catch {
     return {};
+  }
+}
+
+async function readFolder($, folder, end) {
+  try {
+    const entries = await $.fs.listDir(folder);
+    const out = [];
+    for (const one of entries) {
+      if (!one.name.endsWith(end)) continue;
+      out.push({ name: one.name, text: await $.fs.readFile(`${folder}/${one.name}`) });
+    }
+    return out;
+  } catch {
+    return [];
   }
 }
 

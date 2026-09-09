@@ -1,0 +1,65 @@
+# The rules the tooth votes over, one entry each. Level zero pools every file in
+# this folder, so a later level drops level1.yml beside this one and changes no
+# code. A rule this reader cannot read stands out of the vote.
+#
+# side     stop ends the turn, continue holds it open and re-prompts.
+# priority the higher number wins, and a tie goes to stop.
+# decides  claimed means the agent says so, mechanical means a check answers.
+# runs     the mechanical check, by the name the hook holds it under.
+# asks     the question the re-prompt puts to the agent.
+# says     the sentence a person or an agent reads.
+
+- id: the-owner-asks-to-talk
+  side: stop
+  priority: 100
+  decides: claimed
+  asks: Does the last thing the owner said open a discussion?
+  says: The owner opens a discussion, so this turn ends and waits.
+
+- id: the-owner-says-carry-on
+  side: continue
+  priority: 99
+  decides: claimed
+  says: The owner says carry on, so carry on to the end of the work.
+
+- id: the-session-is-new
+  side: stop
+  priority: 95
+  decides: mechanical
+  runs: session-is-new
+  says: This session has barely started, so it may ask before it acts.
+
+- id: a-person-holds-the-answer
+  side: stop
+  priority: 90
+  decides: claimed
+  asks: Does going on need what only a person can give?
+  says: Going on needs what only a person gives, so this turn ends.
+
+- id: work-still-stands
+  side: continue
+  priority: 80
+  decides: mechanical
+  runs: work-waiting
+  says: Something on your list stands unfinished, so carry on with it.
+
+- id: the-work-stands-complete
+  side: stop
+  priority: 45
+  decides: claimed
+  asks: Does the work stand complete?
+  says: The work stands complete, so this turn ends.
+
+- id: an-update-is-worth-giving
+  side: stop
+  priority: 10
+  decides: claimed
+  asks: Is there an update the owner wants before you go on?
+  says: An update stands worth giving, so this turn ends.
+
+- id: the-tooth-is-out
+  side: continue
+  priority: 0
+  decides: mechanical
+  runs: stop-hook-off
+  says: The stop hook stands off in spec/config/level0.json.
