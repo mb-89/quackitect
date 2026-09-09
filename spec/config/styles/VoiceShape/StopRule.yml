@@ -1,0 +1,52 @@
+extends: script
+message: "A stop rule carries id, side, priority, decides and says."
+link: spec/design_output/stop.md
+level: error
+scope: raw
+script: |
+  text := import("text")
+
+  lines := text.split(scope, "\n")
+  matches := []
+
+  held := {}
+  at := 0
+  open := false
+
+  close := func() {
+    if !open { return }
+    whole := held["id"] != undefined && held["side"] != undefined &&
+      held["priority"] != undefined && held["decides"] != undefined &&
+      held["says"] != undefined
+    side := held["side"]
+    known := side == "stop" || side == "continue"
+    if !whole || !known {
+      matches = append(matches, {begin: at, end: at + 1})
+    }
+  }
+
+  offset := 0
+  for i := 0; i < len(lines); i++ {
+    line := lines[i]
+    here := offset
+    offset += len(line) + 1
+    trimmed := text.trim_space(line)
+
+    if text.has_prefix(trimmed, "#") { continue }
+
+    if text.re_match(`^-\s+id:\s*\S`, trimmed) {
+      close()
+      held = {}
+      open = true
+      at = here
+      held["id"] = text.trim_space(text.re_replace(`^-\s+id:\s*`, trimmed, ""))
+      continue
+    }
+    if !open { continue }
+
+    found := text.re_find(`^([a-z]+):\s*(\S.*)$`, trimmed, 1)
+    if found != undefined {
+      held[found[0][1].text] = text.trim_space(found[0][2].text)
+    }
+  }
+  close()

@@ -1,0 +1,53 @@
+extends: script
+message: "A note names an environment variable in capitals, digits and underscores."
+link: spec/guidance/guidance.md
+level: error
+scope: raw
+script: |
+  text := import("text")
+
+  lines := text.split(scope, "\n")
+  matches := []
+
+  front := false
+  reading := false
+  offset := 0
+  seen := 0
+
+  named := func(said) {
+    return text.re_match(`^[A-Z][A-Z0-9_]*$`, said)
+  }
+
+  for i := 0; i < len(lines); i++ {
+    line := lines[i]
+    here := offset
+    offset += len(line) + 1
+    trimmed := text.trim_space(line)
+
+    if trimmed == "---" {
+      seen = seen + 1
+      front = seen == 1
+      if seen > 1 { break }
+      continue
+    }
+    if !front { continue }
+
+    if text.has_prefix(trimmed, "env:") {
+      reading = true
+      rest := text.trim_space(text.re_replace(`^env:`, trimmed, ""))
+      if len(rest) > 0 && !named(rest) {
+        matches = append(matches, {begin: here, end: here + len(line)})
+      }
+      continue
+    }
+    if !reading { continue }
+
+    if text.has_prefix(trimmed, "- ") {
+      one := text.trim_space(text.re_replace(`^-`, trimmed, ""))
+      if !named(one) {
+        matches = append(matches, {begin: here, end: here + len(line)})
+      }
+      continue
+    }
+    if len(trimmed) > 0 { reading = false }
+  }

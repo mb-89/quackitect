@@ -16,7 +16,12 @@ import { pathInScript, SCRIPT } from "../../.claude/skills/level0/lib/scripts.js
 import { EDITOR_SETTINGS } from "../../.claude/skills/level0/lib/servers.js";
 import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
 import { TOOLS, WANTED } from "../../.claude/skills/level0/lib/tools.js";
-import { CONFIG, fromJson, unreasoned } from "../../.claude/skills/level0/lib/vale.js";
+import {
+  CONFIG,
+  faultIn,
+  fromJson,
+  unreasoned,
+} from "../../.claude/skills/level0/lib/vale.js";
 import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
@@ -137,6 +142,12 @@ async function lint(where) {
     OURS,
     ...where,
   ]);
+  const fault = faultIn(ran.stdout) || (ran.exitCode !== 0 && !ran.stdout ? ran.stderr.trim() : "");
+  if (fault) {
+    console.error(fault);
+    console.error("Vale read no file, so every rule it holds stands unchecked.");
+    return 1;
+  }
   const found = fromJson(ran.stdout);
 
   for (const file of walk(where)) {

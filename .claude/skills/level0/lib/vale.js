@@ -32,7 +32,23 @@ export async function lintText(text, where, options = {}) {
     };
   }
 
+  const fault = faultIn(said.stdout);
+  if (fault) return { ran: false, why: fault, found: [] };
+
   return { ran: true, found: [...fromJson(said.stdout), ...unreasoned(text)] };
+}
+
+// [[spec/design_output/level0#a-broken-rule-says-so]]
+export function faultIn(stdout) {
+  let read;
+  try {
+    read = JSON.parse(stdout || "{}");
+  } catch {
+    return String(stdout ?? "").trim() ? "vale answered something other than JSON" : "";
+  }
+  const code = read?.Code;
+  if (typeof code !== "string" || !/^E\d+$/.test(code)) return "";
+  return `${code} ${String(read.Text ?? "").split(/\r?\n/)[0]}`.trim();
 }
 
 export function fromJson(stdout) {

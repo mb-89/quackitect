@@ -212,13 +212,31 @@ Vale reads what a file holds, and its path stays outside that. So
 `.claude/skills/level0/lib/names.js` counts a name instead. `work new` refuses a
 long branch, and a contract test holds every tracked path.
 
+# A broken rule says so
+
+Vale answers a broken rule file with an `E201`. It writes that to standard
+error and leaves standard output empty, so a reader parsing JSON alone finds no
+breach.
+
+One broken rule therefore turns every rule in the tree off, and the tree
+answers that the rules pass.
+
+`faultIn` in `lib/vale.js` reads that answer, and `./RUNME.sh lint` stops on it.
+
 # Where a rule lives
 
 | folder | holder |
 |---|---|
-| `spec/config/styles/VoiceVale` | Vale reads it, because `.vale.ini` names the style |
+| `spec/config/styles/VoiceVale` | Vale reads it over prose and code |
+| `spec/config/styles/VoiceShape` | Vale reads it over the shape of a note or a rule file |
 | `spec/config/styles/VoiceJudged` | a model reads it, and no `BasedOnStyles` names it |
 | `spec/config/biome.json` | Biome reads it |
+
+`[formats]` in `.vale.ini` maps `yml` to `md`, so Vale reads a rule file at all.
+A path-scoped section names which shape rules reach which folder.
+
+The prose rules stay away from a rule file, because such a file lists the very
+words they refuse.
 
 Vale errors on a file carrying no `extends` key inside a style it reads. So the
 judged rules sit in a folder of their own.

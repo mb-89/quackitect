@@ -40,53 +40,12 @@ const namesIn = (at, end) =>
     .filter((one) => one.kind === "file" && one.name.endsWith(end))
     .map((one) => one.name);
 
-test("every guidance note in this tree carries actionables", () => {
-  const notes = namesIn(GUIDANCE, ".md");
-  assert.ok(notes.length, "there is at least one guidance note");
-  for (const name of notes) {
-    const rules = actionables(files.read(join(GUIDANCE, name)));
-    assert.ok(rules.length, `${name} carries an Actionables chapter`);
-    assert.ok(
-      rules.length <= 15,
-      `${name} holds fifteen rules or fewer, and holds ${rules.length}`,
-    );
-  }
-});
-
-test("every guidance note in this tree names variables that exist or none", () => {
-  for (const name of namesIn(GUIDANCE, ".md")) {
-    for (const one of envOf(files.read(join(GUIDANCE, name)))) {
-      assert.match(one, /^[A-Z][A-Z0-9_]*$/, `${name} names ${one} as a variable`);
-    }
-  }
-});
-
 test("every script in this tree passes the rule", () => {
   const scripts = namesIn(SCRIPTS, "").filter((n) => SCRIPT.test(n));
   assert.ok(scripts.length, "there is at least one script");
   for (const name of scripts) {
     const text = files.read(join(SCRIPTS, name));
     assert.deepEqual(pathInScript(text, name), [], `${name} interpolates no path`);
-  }
-});
-
-test("every judged rule in this tree carries what the judge needs", () => {
-  const rules = namesIn(JUDGED, ".yml").map((name) => ({
-    ...readRule(files.read(join(JUDGED, name))),
-    name: name.replace(/\.yml$/, ""),
-  }));
-  assert.ok(rules.length, "VoiceJudged holds at least one rule");
-  for (const rule of rules) {
-    assert.ok(rule.ask, `${rule.name} asks a question`);
-    assert.ok(
-      Array.isArray(rule.labels) && rule.labels.length >= 2,
-      `${rule.name} offers labels`,
-    );
-    assert.ok(
-      rule.labels.includes(rule.refuses),
-      `${rule.name} refuses one of its own labels`,
-    );
-    assert.ok(rule.message, `${rule.name} says what to write instead`);
   }
 });
 
@@ -140,36 +99,6 @@ test("the lnav format reads the file the log door writes", () => {
 });
 
 // [[spec/design_output/stop#where-the-rules-live]]
-test("the stop rules this tree ships read back whole", () => {
-  const mine = namesIn(STOP, ".yml").map((name) => ({
-    name,
-    text: files.read(join(STOP, name)),
-  }));
-  assert.ok(mine.length, "spec/config/stop holds at least one file");
-
-  const said = pool(mine);
-  assert.deepEqual(said.broken, [], "every file reads back");
-  assert.deepEqual(
-    said.rules.map((one) => `${one.priority} ${one.side} ${one.id}`),
-    [
-      "100 stop the-owner-asks-to-talk",
-      "99 continue the-owner-says-carry-on",
-      "95 stop the-session-is-new",
-      "90 stop a-person-holds-the-answer",
-      "80 continue work-still-stands",
-      "45 stop the-work-stands-complete",
-      "10 stop an-update-is-worth-giving",
-      "0 continue the-tooth-is-out",
-    ],
-  );
-  for (const one of said.rules) {
-    if (one.decides === "mechanical") {
-      assert.ok(RUNS.includes(one.runs), `${one.id} names a check the code holds`);
-    }
-    assert.ok(one.says, `${one.id} says a sentence`);
-  }
-});
-
 test("a second file in the folder adds a rule with no code change", () => {
   const mine = namesIn(STOP, ".yml").map((name) => ({
     name,

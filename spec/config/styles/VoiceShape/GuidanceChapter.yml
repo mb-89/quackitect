@@ -1,0 +1,28 @@
+extends: script
+message: "A guidance note carries an Actionables chapter, numbered one to a line."
+link: spec/guidance/guidance.md
+level: error
+scope: raw
+script: |
+  text := import("text")
+
+  lines := text.split(scope, "\n")
+  matches := []
+
+  chapter := false
+  rules := 0
+
+  for i := 0; i < len(lines); i++ {
+    trimmed := text.trim_space(lines[i])
+    if text.re_match(`^#+\s+Actionables\s*$`, trimmed) {
+      chapter = true
+      continue
+    }
+    if !chapter { continue }
+    if text.re_match(`^#+\s`, trimmed) { chapter = false; continue }
+    if text.re_match(`^[0-9]+\.\s+\S`, trimmed) { rules = rules + 1 }
+  }
+
+  if rules == 0 {
+    matches = append(matches, {begin: 0, end: len(text.trim_space(lines[0]))})
+  }
