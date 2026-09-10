@@ -63,6 +63,26 @@ ifVale("a sentence over the word limit is refused", async () => {
   assert.ok((await ruled(long)).includes("LongSentence"));
 });
 
+ifVale("the past tense is refused, and the words this tree means pass", async () => {
+  assert.ok(
+    (await ruled("Somebody wrote the note and finished the work.")).includes(
+      "PastTense",
+    ),
+    "a real past tense fires",
+  );
+
+  const quiet = async (text) => {
+    const found = await ruled(text);
+    assert.ok(!found.includes("PastTense"), `${text} answers ${found.join(", ")}`);
+  };
+
+  await quiet("The gate answers red where a test skips a case.");
+  await quiet("The verb buys one place, and a reader read what he held.");
+  await quiet("The rule holds its bound, and a numbered note stands.");
+  await quiet("A settled question waits, and a complicated one waits longer.");
+  await quiet("A rule the table switched off leaves a refused write behind.");
+});
+
 ifVale("a table and a list are not paragraphs", async () => {
   assert.deepEqual(await ruled("| a | b |\n| - | - |\n"), []);
   assert.deepEqual(await ruled("- one\n- two\n"), []);

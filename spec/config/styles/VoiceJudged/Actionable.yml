@@ -14,3 +14,10 @@ refuses: background
 # something else, so this question names the folder it reads.
 reads:
   - spec/guidance/*.md
+# A runtime older than `reads` falls back to this list, so both stand until
+# every session loads the reader that takes `reads`.
+ignores:
+  - spec/rationales/*.md
+  - spec/design_output/*.md
+  - spec/funnel/*.md
+  - .se/*.md
