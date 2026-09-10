@@ -167,6 +167,12 @@ So level zero holds no cloud session that starts the ordinary way, and
 `~/.claude.json` carries `hasTrustDialogAccepted: false` there. The flag lives
 outside the tree, so no tracked file moves it.
 
+The gate holds the scan alone. Measured on 2026-09-10 against client 2.1.267,
+by a probe on a cloud clone carrying no trust. The `env` key bites there, and
+so does a `permissions` deny rule in `.claude/settings.json`. So the tracked
+file still says what a session may do, and level zero is the one part waiting
+on the flag.
+
 Two things reach a cloud box today:
 
 - `claude --plugin-dir .claude/skills/level0`, which loads the folder for that
