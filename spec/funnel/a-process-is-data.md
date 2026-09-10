@@ -111,6 +111,42 @@ That schema carries two rulings this tree wants. A field stands there because
 something reads it. And a hold belongs to an agent and dies with the session,
 so it lives under `.se` and stays off the item.
 
+# Shape and movement
+
+A schema holds a shape, and a process holds a movement. A work item takes both,
+because it stands still as a note and moves as a run.
+
+| the shape | its instance | how the instance names it |
+|---|---|---|
+| `guidance.schema.yaml` | `spec/guidance/voice.md` | `kind: [[guidance]]` |
+| `standard.process.yaml` | a work item | `process: [[standard]]` |
+
+v4 wires the second row with one field. A work token reads `status` from
+`x-enum-from: process.states`, so the process owns the values and a new process
+costs one file.
+
+A process is a note as well, under `kind: process`, so a schema shapes it too.
+Then one rule covers the tree. A file names its kind, the kind names a schema,
+and a kind that moves names a process.
+
+# The item carries its progress
+
+The item marks a step done in its own file as it goes. The evidence for that
+step stands beside the mark, and the evidence system holds that shape.
+
+So a session that stops halfway hands the next one a file saying which steps
+stand done. Whoever picks the item up reads the marks and carries on from
+there.
+
+Only a work item takes a process for now:
+
+| the thing | does it take a process |
+|---|---|
+| a work item | yes, and it carries its own progress |
+| a funnel item | no, and it settles by a ruling |
+| the write door | no, it finishes inside one call |
+| the stop hook | no, it holds one turn |
+
 # This tree holds one already
 
 The work verb is a process with the data burned in:
@@ -142,6 +178,7 @@ webview host, the watcher and the projection all stand.
 
 | the question | what hangs on it |
 |---|---|
+| Where a done mark sits | The frontmatter reads at a glance, and the body holds the evidence |
 | Does the work verb become one of several | Whether a small fix stops paying a full brief |
 | Does the canvas draw, or draw and animate | Animation wants a runtime saying what it does |
 | Which reader holds a guard | A guard runs on data, so it wants a safe reader |
