@@ -6,6 +6,7 @@
 import { opensATurn, reachesTheOwner, SAYS, spokeSince } from "../lib/answer.js";
 import { commitIn, findings as readsCommand, verbLine } from "../lib/bash.js";
 import { CODE, formatText, lintText as lintCode } from "../lib/code.js";
+import { configOf, TRACKED } from "../lib/config.js";
 import {
   bindsHere,
   canary,
@@ -37,7 +38,6 @@ import { lintText, PROSE } from "../lib/vale.js";
 
 const GUIDANCE = "spec/guidance";
 const COMMIT = "level0-commit.md";
-const CONFIG = "spec/config/level0.json";
 const HANDOVER = ".se/HANDOVER.md";
 const BRIEF = "HANDOVER.md";
 const TRUNK = "main";
@@ -51,7 +51,7 @@ export function register(on, _options) {
   let standing = "";
   let sentence = "";
   let firstTurn = true;
-  let config = {};
+  let settings = configOf({ read: async () => "" });
   let judge = judgeOf({});
   let handover = [];
   let waiting = false;
@@ -75,7 +75,7 @@ export function register(on, _options) {
   const take = () => {
     bin = cage.bin ?? null;
     formatter = cage.formatter ?? null;
-    config = cage.config ?? {};
+    settings = cage.settings ?? settings;
     standing = cage.standing ?? "";
     sentence = cage.sentence ?? "";
     rules = cage.rules ?? [];
@@ -104,6 +104,9 @@ export function register(on, _options) {
       branch: await branchNow($),
       vale: bin ?? "missing",
     });
+    for (const fault of await settings.faults()) {
+      await logbook.say("warn", "config", fault, { file: TRACKED });
+    }
 
     await $.tool.register(claimSpec(rules));
     return next(e);
@@ -136,7 +139,7 @@ export function register(on, _options) {
     }
 
     // [[spec/design_output/level0#the-owners-prompt-comes-first]]
-    const answers = await answerDoor($, e, { owed, config, logbook });
+    const answers = await answerDoor($, e, { owed, settings, logbook });
     if (answers.deny) return answers;
     owed = answers.owed;
 
@@ -161,7 +164,7 @@ export function register(on, _options) {
     }
 
     if (!found.length) {
-      judge = judgeOf(config, await readRules($, JUDGED));
+      judge = judgeOf(await judgeSettings(settings), await readRules($, JUDGED));
       if (judge.reads()) {
         door = "judge";
         found.push(
@@ -215,7 +218,7 @@ export function register(on, _options) {
   // [[spec/design_output/bash#what-the-door-reads]]
   on("tool.call", { tool: "Bash" }, async ($, e, next) => {
     const said = String(e.command ?? "");
-    const found = readsCommand(said);
+    const found = readsCommand(said, await settings.ask("names.words"));
     found.push(...(await commitVoice($, said, bin)));
     if (!found.length) return next(e);
 
@@ -260,7 +263,14 @@ export function register(on, _options) {
       firstTurn = false;
       await heardCanary(logbook, canaryIn(e.answer, sentence), sentence);
     }
-    await bite($, e, { rules, tooth, logbook, ran: ranHere });
+    const off = (await settings.ask("stop.enabled")) === false;
+    await bite($, e, {
+      rules,
+      tooth,
+      logbook,
+      mostInARow: await settings.ask("stop.mostInARow"),
+      ran: (name) => ranHere(name, off),
+    });
     if (!bin || !e.answer || e.reason !== "answer") return said;
 
     const ran = await lintText(e.answer, ANSWER, {
@@ -372,10 +382,10 @@ export function register(on, _options) {
   });
 
   // [[spec/design_output/stop#the-mechanical-checks]]
-  function ranHere(name) {
+  function ranHere(name, off) {
     if (name === "work-waiting") return list.standing() || onAHeldBranch;
     if (name === "session-is-new") return tooth.isNew();
-    if (name === "stop-hook-off") return config.stop?.enabled === false;
+    if (name === "stop-hook-off") return off;
     if (name === "never") return false;
     return undefined;
   }
@@ -385,11 +395,14 @@ export function register(on, _options) {
 async function loadCage($, cage) {
   const faults = [];
 
-  cage.config = await readConfig($);
-  cage.judge = judgeOf(cage.config);
-  cage.tooth = toothOf({ mostInARow: cage.config.stop?.mostInARow });
+  cage.settings = configHere($);
+  cage.judge = judgeOf(await judgeSettings(cage.settings));
+  cage.tooth = toothOf({ mostInARow: await cage.settings.ask("stop.mostInARow") });
   if (!cage.wired) {
-    cage.logbook = logHere((at, text) => $.fs.write(at, text), cage.config.log?.level);
+    cage.logbook = logHere(
+      (at, text) => $.fs.write(at, text),
+      await cage.settings.ask("log.level"),
+    );
     cage.wired = true;
   }
 
@@ -409,7 +422,7 @@ async function loadCage($, cage) {
   cage.sentence = canary({
     rules: guidance.rules,
     notes: guidance.notes,
-    stop: cage.config.stop?.enabled !== false,
+    stop: (await cage.settings.ask("stop.enabled")) !== false,
   });
   if (!cage.standing) faults.push(`${GUIDANCE} hands over nothing`);
 
@@ -461,7 +474,8 @@ async function ensureCage($, cage) {
 
 // [[spec/design_output/level0#the-owners-prompt-comes-first]]
 async function answerDoor($, e, it) {
-  if (!it.owed || it.config.answerFirst?.enabled === false) return { owed: it.owed };
+  if (!it.owed) return { owed: it.owed };
+  if ((await it.settings.ask("answer.enabled")) === false) return { owed: it.owed };
   if (e.agentId || reachesTheOwner(e.tool)) return { owed: it.owed };
 
   let spoke = true;
@@ -500,6 +514,25 @@ async function commitVoice($, command, bin) {
   return ran.ran ? ran.found : [];
 }
 
+// [[spec/design_output/config#the-resolver-holds-the-layers]]
+function configHere($) {
+  return configOf({
+    read: (path) => $.fs.read(path),
+    write: (path, text) => $.fs.write(path, text),
+    readEnv: (names) => readEnv($, names),
+  });
+}
+
+async function judgeSettings(settings) {
+  return {
+    enabled: await settings.ask("judge.enabled"),
+    model: await settings.ask("judge.model"),
+    maxSpans: await settings.ask("judge.maxSpans"),
+    warmupWrites: await settings.ask("judge.warmupWrites"),
+    thenEveryNth: await settings.ask("judge.thenEveryNth"),
+  };
+}
+
 // [[spec/design_output/level0#the-canary]]
 async function heardCanary(logbook, heard, sentence) {
   if (heard.found === "same") {
@@ -522,7 +555,7 @@ async function bite($, e, it) {
   if (e.reason !== "answer") return;
 
   const decision = decide(it.rules, { claimed: it.tooth.claim()?.rule, ran: it.ran });
-  const said = it.tooth.atTurnEnd(decision);
+  const said = it.tooth.atTurnEnd(decision, it.mostInARow);
   const how = detail(said, said.inARow);
 
   for (const name of said.unknown) {
@@ -676,14 +709,6 @@ async function readRules($, folder) {
     return out;
   } catch {
     return [];
-  }
-}
-
-async function readConfig($) {
-  try {
-    return JSON.parse(await $.fs.read(CONFIG));
-  } catch {
-    return {};
   }
 }
 

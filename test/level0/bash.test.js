@@ -15,7 +15,8 @@ import {
   writesAPath,
 } from "../../.claude/skills/level0/lib/bash.js";
 
-const rules = (command) => findings(command).map((one) => one.rule);
+const WORDS = 5;
+const rules = (command) => findings(command, WORDS).map((one) => one.rule);
 const paths = (command) => writesAPath(command).map((one) => one.path);
 
 test("the rules reach a prose file and a code file, and stop at the ignored roots", () => {
@@ -230,7 +231,10 @@ test("a rule reads each command in a chain, and names the line it stands on", ()
 
   const two = "npm test\ncat > README.md";
   assert.deepEqual(rules(two).sort(), ["ShellWritesNothing", "TestRunPointsSomewhere"]);
-  assert.equal(findings(two).find((one) => one.rule === "ShellWritesNothing").line, 2);
+  assert.equal(
+    findings(two, WORDS).find((one) => one.rule === "ShellWritesNothing").line,
+    2,
+  );
 });
 
 test("every refusal names the rule, what it reads and the road that works", () => {
@@ -240,7 +244,7 @@ test("every refusal names the rule, what it reads and the road that works", () =
     "git switch -c a-name-that-runs-past-the-cap",
     "npm test",
   ]) {
-    const one = findings(said)[0];
+    const one = findings(said, WORDS)[0];
     assert.ok(one, said);
     assert.ok(one.said, `${said} names what it reads`);
     assert.match(one.message, /Write|Edit|RUNME|git commit -m|node --test/, said);

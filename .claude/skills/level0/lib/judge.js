@@ -2,16 +2,9 @@
 // question with a closed set of answers, read from spec/config/styles/VoiceJudged.
 // [[spec/design_output/level0#the-judge-costs-a-call]]
 
-export const DEFAULTS = {
-  enabled: true,
-  model: "haiku",
-  maxSpans: 24,
-  warmupWrites: 4,
-  thenEveryNth: 3,
-};
-
-export function judgeOf(config = {}, rules = []) {
-  const settings = { ...DEFAULTS, ...(config.judge ?? {}), rules };
+// [[spec/design_output/config#a-caller-hands-it-in]]
+export function judgeOf(said = {}, rules = []) {
+  const settings = { ...said, rules };
   let written = 0;
   let clean = 0;
 

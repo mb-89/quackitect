@@ -3,7 +3,7 @@
 // where that work stands.
 // [[spec/design_output/work#the-round-trip]]
 
-import { overLong, WORDS } from "../../.claude/skills/level0/lib/names.js";
+import { overLong } from "../../.claude/skills/level0/lib/names.js";
 import { saysGreen, STAMP, stampOf } from "../../.claude/skills/level0/lib/runs.js";
 
 export const BRIEF = "HANDOVER.md";
@@ -226,8 +226,8 @@ function newWork(it, name) {
     console.error("work new needs a name: ./RUNME.sh work new fix-lsp");
     return 2;
   }
-  if (overLong(name)) {
-    console.error(`A branch name holds ${WORDS} words, and ${name} holds more.`);
+  if (overLong(name, it.words)) {
+    console.error(`A branch name holds ${it.words} words, and ${name} holds more.`);
     return 2;
   }
   const branch = `work/${name}`;

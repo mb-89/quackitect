@@ -119,6 +119,18 @@ test("close reaches a work branch and a branch the platform cut", () => {
   assert.ok(!MINE.test("se/claims"));
 });
 
+// [[spec/design_output/config#a-caller-hands-it-in]]
+test("new refuses a name past the words the caller hands in", () => {
+  const { it } = doorsSaying(onBranch("main"), { [HERE]: "# A brief\n" });
+  const name = "one-two-three-four-five-six";
+
+  const { code, said } = heard(() => work(ROOT, ["new", name], { ...it, words: 5 }));
+
+  assert.equal(code, 2);
+  assert.equal(said, `A branch name holds 5 words, and ${name} holds more.`);
+  assert.equal(heard(() => work(ROOT, ["new", name], { ...it, words: 6 })).code, 0);
+});
+
 test("done stamps the brief and pushes the branch it stands on", () => {
   const { it, outside, disk } = doorsSaying(onBranch("work/fix-lsp"), {
     [HERE]: "---\nstatus: held\n---\n\n# The result\n",

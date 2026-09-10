@@ -8,10 +8,17 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { VERBS } from "../../.claude/skills/level0/lib/bash.js";
-import { actionables, envOf } from "../../.claude/skills/level0/lib/guidance.js";
+import {
+  configOf,
+  faultsIn,
+  flatten,
+  keyOf,
+  SCHEMA,
+  TRACKED,
+  varOf,
+} from "../../.claude/skills/level0/lib/config.js";
 import { nameOf, rowOf } from "../../.claude/skills/level0/lib/log.js";
-import { overLong, WORDS } from "../../.claude/skills/level0/lib/names.js";
-import { readRule } from "../../.claude/skills/level0/lib/rulefile.js";
+import { overLong } from "../../.claude/skills/level0/lib/names.js";
 import { pathInScript, SCRIPT } from "../../.claude/skills/level0/lib/scripts.js";
 import {
   EDITOR_EXTENSIONS,
@@ -28,13 +35,14 @@ import { decide, pool } from "../../.claude/skills/level0/lib/stop.js";
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
 
-const GUIDANCE = join(root, "spec", "guidance");
-const JUDGED = join(root, "spec", "config", "styles", "VoiceJudged");
 const SCRIPTS = join(root, "src", "scripts");
 const STOP = join(root, "spec", "config", "stop");
-const RUNS = ["work-waiting", "session-is-new", "stop-hook-off", "never"];
 
 const read = (where) => JSON.parse(files.read(join(root, where)));
+const settings = configOf({
+  read: async (where) => files.read(join(root, where)),
+  readEnv: async () => ({}),
+});
 const namesIn = (at, end) =>
   files
     .list(at)
@@ -70,10 +78,10 @@ test("the tracked settings name the binaries this tree installs", () => {
 });
 
 test("the editor draws the rules the write door draws, and no others", () => {
-  const settings = read(EDITOR_SETTINGS);
-  assert.equal(settings["vale.enableSpellcheck"], false);
-  assert.equal(settings["vale.valeCLI.minAlertLevel"], "inherited");
-  assert.equal(settings["vale.valeCLI.lintOnChange"], true);
+  const editor = read(EDITOR_SETTINGS);
+  assert.equal(editor["vale.enableSpellcheck"], false);
+  assert.equal(editor["vale.valeCLI.minAlertLevel"], "inherited");
+  assert.equal(editor["vale.valeCLI.lintOnChange"], true);
 });
 
 test("Windows takes the biome extension, and every other platform the plain name", () => {
@@ -82,6 +90,16 @@ test("Windows takes the biome extension, and every other platform the plain name
     const wants = platform.startsWith("win32") ? ".se/bin/biome.exe" : ".se/bin/biome";
     assert.equal(path, wants, platform);
   }
+});
+
+// [[spec/design_output/config#the-editor-draws-the-schema]]
+test("the editor draws the schema over the config, with no extension", () => {
+  const drawn = read(EDITOR_SETTINGS)["json.schemas"] ?? [];
+  const one = drawn.find((said) => said.fileMatch?.includes(`/${TRACKED}`));
+
+  assert.ok(one, `a schema stands over ${TRACKED}`);
+  assert.equal(one.url, `./${SCHEMA}`);
+  assert.equal(files.exists(join(root, SCHEMA)), true, "the schema stands there");
 });
 
 test("a clone opens with both extensions recommended", () => {
@@ -146,24 +164,30 @@ test("no code path in this tree deletes a log file", () => {
   assert.deepEqual(found, []);
 });
 
-test("the tooth settings this tree ships carry every field the hook reads", () => {
-  const said = read("spec/config/level0.json");
-  assert.equal(typeof said.stop.enabled, "boolean");
-  assert.equal(typeof said.stop.mostInARow, "number");
-  assert.equal(said.log.level, "info");
+// [[spec/design_output/config#the-schema-says-the-type]]
+test("the schema passes the config this tree ships, and refuses one short a field", async () => {
+  assert.deepEqual(await settings.faults(), []);
+
+  const short = flatten(read(TRACKED));
+  short.delete("judge.maxSpans");
+  assert.deepEqual(faultsIn(read(SCHEMA), short), ["judge.maxSpans is missing"]);
 });
 
-test("the judge settings this tree ships carry every field the judge reads", () => {
-  const said = read("spec/config/level0.json").judge;
-  assert.equal(typeof said.enabled, "boolean");
-  assert.equal(typeof said.model, "string");
-  for (const field of ["maxSpans", "warmupWrites", "thenEveryNth"]) {
-    assert.equal(typeof said[field], "number", `judge.${field} is a number`);
+// [[spec/design_output/config#a-variable-names-a-key]]
+test("every key this tree ships names one variable, and it names the key back", () => {
+  const keys = [...flatten(read(TRACKED)).keys()];
+  assert.ok(keys.length, "the tracked file carries a key");
+
+  for (const key of keys) {
+    assert.equal(keyOf(varOf(key)), key, `${varOf(key)} names ${key}`);
   }
 });
 
 // [[spec/design_output/level0#a-name-holds-five-words]]
-test("every tracked name in this tree holds five words", () => {
+test("every tracked name in this tree holds the words the config says", async () => {
+  const words = await settings.ask("names.words");
+  assert.ok(words > 0, "the config says how many words a name holds");
+
   const said = proc().run(["git", "ls-files"], { cwd: root });
   assert.equal(said.exitCode, 0, "git lists what it tracks");
 
@@ -171,10 +195,10 @@ test("every tracked name in this tree holds five words", () => {
     .split(/\r?\n/)
     .map((one) => one.trim())
     .filter(Boolean)
-    .map((path) => [path, overLong(path)])
+    .map((path) => [path, overLong(path, words)])
     .filter(([, part]) => part);
 
-  assert.deepEqual(long, [], `a name holds ${WORDS} words: ${JSON.stringify(long)}`);
+  assert.deepEqual(long, [], `a name holds ${words} words: ${JSON.stringify(long)}`);
 });
 
 // [[spec/design_output/tools#what-the-survey-names]]
