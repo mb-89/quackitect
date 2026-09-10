@@ -1,11 +1,9 @@
 # The argument for what another note instructs. Every other kind says what to
 # do, and this one says why, what it gives up, and what would make it wrong.
 #
-# A rationale stands behind anything, so both entries below turn on one fact:
-# whether the note it argues for marks its items.
-#
-#   the note marks items  ->  explains names it, and a chapter carries each mark
-#   the note marks none   ->  explains stands empty, and the chapters run free
+# A rationale stands behind anything, so `explains` stays optional. It is the
+# one trace this file keeps, because the linter resolves it already: where the
+# note it names marks its items, a chapter here carries each mark.
 #
 # The frontmatter half is JSON Schema 2020-12, https://json-schema.org/draft/2020-12.
 # The body half is this project's own, borrowed from https://document-schema.org.
@@ -21,7 +19,7 @@ frontmatter:
     kind:
       const: rationale
       x-link: true
-      description: which schema reads this note
+      description: the schema this note is minted from
 
     explains:
       x-link: true

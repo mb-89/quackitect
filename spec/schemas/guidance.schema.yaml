@@ -20,7 +20,7 @@ frontmatter:
     kind:
       const: guidance
       x-link: true
-      description: which schema reads this note
+      description: the schema this note is minted from
 
     scope:
       type: array
@@ -40,6 +40,11 @@ body:
   extraSections: false
 
   sections:
+    - header: Motivation
+      required: true
+      tense: present
+      description: why this note exists, and what goes wrong where nobody reads it
+
     - header: Actionables
       required: true
       list: true

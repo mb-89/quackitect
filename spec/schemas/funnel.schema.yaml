@@ -1,0 +1,43 @@
+# A thing the owner weighs, held where it stays visible until it settles. A
+# funnel note carries the shapes on offer and what each one costs.
+#
+# The closing chapter is the point of the kind. A funnel note that names
+# nothing open reads as a decision, and a decision belongs in a design input.
+#
+# The frontmatter half is JSON Schema 2020-12, https://json-schema.org/draft/2020-12.
+# The body half is this project's own, borrowed from https://document-schema.org.
+
+kind: funnel
+
+frontmatter:
+  type: object
+  additionalProperties: false
+  required:
+    - kind
+    - about
+  properties:
+    kind:
+      const: funnel
+      x-link: true
+      description: the schema this note is minted from
+
+    about:
+      description: the question this note holds open, in one line
+
+body:
+  headingLevel: 1
+  order: free
+  extraSections: true
+  tense: present
+
+  sections:
+    - header: Scope
+      required: true
+      description: the state of play, said before any shape on offer
+
+    - header: What stands open
+      position: last
+      required: true
+      description: every question still waiting, and what hangs on each one
+
+# Every chapter between the two carries its own name, one per shape on offer.

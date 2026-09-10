@@ -1,0 +1,57 @@
+# What one session hands the next, and what one branch hands whoever works it.
+# `HANDOVER.md` at the root carries a brief, and `.se/HANDOVER.md` carries a
+# session. One kind covers both, because a reader meets the same shape.
+#
+# A handover reaches one reader once, and level zero deletes the copy it reads.
+# So it carries a message, and the rules that hold documentation stand off it.
+#
+# `work.js` reads status and urgency already. An unknown urgency reads as
+# `soon` there, so a typo goes quiet. The enums below refuse it instead.
+#
+# The frontmatter half is JSON Schema 2020-12, https://json-schema.org/draft/2020-12.
+# The body half is this project's own, borrowed from https://document-schema.org.
+
+kind: handover
+
+frontmatter:
+  type: object
+  additionalProperties: false
+  required:
+    - kind
+    - status
+    - urgency
+  properties:
+    kind:
+      const: handover
+      x-link: true
+      description: the schema this note is minted from
+
+    status:
+      enum: [todo, held, done]
+      description: where the work stands, and the verbs move it
+
+    urgency:
+      enum: [now, soon, whenever]
+      description: which branch a session takes first
+
+    depends_on:
+      type: [array, string]
+      description: the branches this one waits for, a list or one line of names
+
+body:
+  headingLevel: 1
+  order: free
+  extraSections: true
+  tense: present
+
+  sections:
+    - header: Where it stands
+      required: true
+      description: the commit, the gate, and what the last session finished
+
+    - header: What waits
+      required: true
+      description: what the next reader does, one row per thing
+
+# A chapter between the two carries its own name. `work.js` appends `How this
+# branch runs` as a subsection, and that contract stands outside these two.

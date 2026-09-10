@@ -1,0 +1,34 @@
+# What the owner wants, in the owner's own words. It opens a chain that a
+# design output refines and a section of code implements.
+#
+# This is the thinnest kind on purpose. A note here is the owner thinking, and
+# a shape pressed on it would cost more than it returns.
+#
+# The frontmatter half is JSON Schema 2020-12, https://json-schema.org/draft/2020-12.
+# The body half is this project's own, borrowed from https://document-schema.org.
+
+kind: design_input
+
+frontmatter:
+  type: object
+  additionalProperties: false
+  required:
+    - kind
+  properties:
+    kind:
+      const: design_input
+      x-link: true
+      description: the schema this note is minted from
+
+body:
+  headingLevel: 1
+  order: free
+  extraSections: true
+  tense: present
+
+  sections:
+    - header: Scope
+      required: true
+      description: what the owner asks for, said before any detail
+
+# Every chapter after Scope carries its own name, one per thing the answer holds.

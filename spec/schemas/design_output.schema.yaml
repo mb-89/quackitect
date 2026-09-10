@@ -1,11 +1,11 @@
-# What a piece of this tree does, and why it takes the shape it takes. Code
-# names a section here, so a reader meets the mechanism one hop from the line.
+# What a piece of this tree does, and why it takes the shape it takes.
 #
-# A note describes a thing that stands, or it implements a design input. One of
-# the two, and one only.
+# A trace points up the chain and stands in one place. A design output refines
+# design inputs, and a section of code implements a design output. So this note
+# names the inputs above it, and the code below names this note.
 #
 # The body runs free. Twelve notes share no chapter, because each follows the
-# thing it describes.
+# thing it holds.
 #
 # The frontmatter half is JSON Schema 2020-12, https://json-schema.org/draft/2020-12.
 # The body half is this project's own, borrowed from https://document-schema.org.
@@ -17,26 +17,27 @@ frontmatter:
   additionalProperties: false
   required:
     - kind
-  oneOf:
-    - required: [describes]
-    - required: [implements]
   properties:
     kind:
       const: design_output
       x-link: true
-      description: which schema reads this note
+      description: the schema this note is minted from
 
-    describes:
+    refines:
+      type: array
       x-link: true
-      description: the file or folder this note explains, one link that resolves
-
-    implements:
-      x-link: true
-      description: the design input this note answers, one link that resolves
+      description: the design inputs this note refines, one link per entry
 
 body:
   headingLevel: 1
   order: free
   extraSections: true
   tense: present
-  description: one chapter per mechanism, named so a comment in the code can point at it
+
+  sections:
+    - header: Scope
+      required: true
+      description: what this note covers, said before any mechanism reaches the reader
+
+# Every chapter after Scope carries its own name, because each follows the thing
+# it holds. A comment in the code points at one of those names.
