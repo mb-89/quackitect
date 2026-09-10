@@ -1,6 +1,6 @@
 ---
 kind: [[handover]]
-status: held
+status: done
 urgency: soon
 depends_on: the-config-holds-numbers
 ---
