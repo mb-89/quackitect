@@ -4,146 +4,210 @@ status: held
 urgency: soon
 ---
 
-# A reader goes before trunk
+# The reader goes before trunk
 
-A branch comes back at `done` and somebody merges it. That somebody reads the
-diff, or runs out of afternoon and does not.
+Both halves stand. `./RUNME.sh work review <name>` gathers what a reader needs
+and answers the two mechanical questions, with no model in it. Level zero
+registers `review_branch`, runs that verb through `$.process.run`, spawns a
+reader with the material and the standing rules, and answers one short report.
 
-This branch builds the reader. It reports, and the merge happens anyway. Its
-whole job is to spare a person the read, and to hand back a short list of what
-to fix next.
+One review runs end to end on this box. The report reads well, and it names
+five real misses on the branch it reads.
 
-# What it is
+# Read this first
 
-| it is | it is not |
+`$.fs` on client 2.1.267 offers `read`, `write` and `list`. Level zero on trunk
+calls `readFile`, `writeFile` and `listDir`, which the client holds nowhere.
+
+| what breaks | what the session sees |
 |---|---|
-| a second pair of eyes | a gate |
-| a list of fixes | a verdict |
-| a thing you run when you want it | a thing that fires on its own |
+| `readGuidance` | no standing layer, so no rules and no canary |
+| `takeHandover` | no brief reaches the agent, and none goes |
+| `pool` over `spec/config/stop` | no stop rule, so the tooth votes on nothing |
+| `readSurvey`, `readConfig` | vale and the judge look missing |
+| `logHere` | level zero writes no log line at all |
 
-Nothing it says stops a merge. Build no refusal, no verdict field, and no
-switch holding a branch back.
+Every one of those call sites sits inside a `try {} catch {}` answering empty.
+So level zero comes up silent and looks alive. `.se/level0.stamp` is the tell:
+it stays absent on a box whose session loads level zero.
 
-# The verb collects
+`work/the-config-holds-numbers` carries the rename already. Take it from there,
+or give it a branch of its own. Add a contract test that drives one `$.fs` call
+against the running client, so the next rename says so out loud.
 
-`./RUNME.sh work review <name>` gathers what a reader needs and prints it. No
-model runs in this half, and every answer here is mechanical.
+This branch leaves that code alone, because it runs deeper than the brief.
+`spec/guidance/working.md` rule nine says to write it down.
 
-## What it gathers
+# What stands
 
-| the thing | where it comes from |
+| the thing | where |
 |---|---|
-| the brief | `HANDOVER.md` at the branch's first commit |
-| the handback | `HANDOVER.md` as the branch carries it now |
-| the shape of the diff | `git diff --stat main..work/<name>` |
-| the whole diff | `git diff main..work/<name>` |
-| the check | `./RUNME.sh check` on that branch |
+| the gathering and the report | `src/scripts/review.js` |
+| the shape both halves read | `.claude/skills/level0/lib/review.js` |
+| the tool and the spawn | `.claude/skills/level0/hooks/level0.js` |
+| the five questions | `spec/guidance/reviewing.md` |
+| the argument | `spec/rationales/reviewing.md` |
+| the design | `spec/design_output/review.md` |
+| the cases over fake doors | `test/level0/review.test.js` |
+| the cases over a fake engine | `test/level0/hooks.test.js` |
 
-The brief and the handback are one file at two commits. `work new` writes the
-brief in the branch's first commit, so read that commit for the brief and the
-tip for the handback.
+`./RUNME.sh check` passes: the tests, the doors, `claude plugin validate`, and
+the rules over the tree.
 
-## What it answers alone
+# What the spawn takes
 
-1. Does `./RUNME.sh check` pass on that branch? Run it, and print the exit.
-2. Does the handback carry a retro? Look for the chapter, and say yes or no.
+`$.agent.spawn` stands on client 2.1.267, and one call proves it live:
 
-Both are presence, not judgement. A model reading either of them wastes a call.
+    const said = await $.agent.spawn({
+      prompt,
+      description: "read work/<name>",
+      subagentType: "general-purpose",
+    });
 
-This half earns its place alone. A person runs the verb and reads the diff, with
-the mechanical answers standing in front of them.
+| field | what it does |
+|---|---|
+| `prompt` | the task the subagent runs with, and the one field it needs |
+| `description` | the few words the task shows as |
+| `subagentType` | `general-purpose`, `Explore`, `fork`, or a plugin's agent |
+| `model` | an alias or an id; absent lets the agent's own model decide |
+| `background` | true lets the call answer before the subagent does |
 
-# The reader runs elsewhere
+It resolves `{ model, text, isError? }` once the subagent runs, and `{ deny }`
+where a hook refuses the spawn. `text` carries the subagent's final message.
 
-The point of the reader is that the session asking for it spends no context on
-the diff. So it runs as an agent of its own.
+## Where it refuses
 
-## How the harness offers this
+The hook answers the mechanical half alone in three cases, each carrying a
+`reader` row that says why:
 
-`$.agent.spawn` shapes a helper before it starts: its prompt, its type, its
-model, its working folder. Level zero holds neither it nor `$.agent.offer`
-today, so this is new ground.
+- the call throws, on a build whose `$` carries no `agent`
+- the answer carries `deny`
+- the answer carries `isError`
 
-Prove it small before you build on it. Spawn an agent that answers one word,
-and say in your handback what the call takes and what it answers.
+The report carries an answer that parses as no JSON under `reader`, entire.
 
-## The shape to build
+# What one review costs
 
-1. Level zero registers a tool at `session.start`, `review_branch`, taking a
-   branch name.
-2. The hook serves it: it runs the collection from part one through
-   `$.process.run`, then spawns a reader with that material and the rule set.
-3. The reader answers the five questions below, and the tool answers its report.
+Measured on this box, over `work/the-config-holds-numbers`, a branch of seven
+commits and a diff of 1300 lines:
 
-A session then asks for a review in one tool call, and reads a short list.
-Where `$.agent.spawn` refuses to carry this, say so and leave part one standing.
-
-# The five questions
-
-They live in `spec/guidance/reviewing.md`, written as actionables the way every
-other guidance note is.
-
-| # | the question | who answers |
+| the half | seconds | model calls |
 |---|---|---|
-| 1 | Does the branch do what the brief asks? | the reader |
-| 2 | Is everything the diff touches beyond the brief a trivial fix? | the reader |
-| 3 | Does `./RUNME.sh check` pass? | the verb |
-| 4 | Does the handback carry a retro naming its surprises? | the verb |
-| 5 | Does every rule the branch adds carry a test proving it fires? | the reader |
+| the verb alone | 4 to 5 | 0 |
+| the whole tool | 199 | 1 spawn, plus the caller's own turn |
 
-## Why five carries weight
+The verb's seconds go almost entirely to the worktree check. The reader is one
+`general-purpose` subagent. It spends its own context on the diff and hands
+back four short lines.
 
-A rule firing on nothing looks alive. This tree meets that twice in two days:
+# Which question reads badly
 
-- A Vale rule carrying a runtime error puts `E201` on standard error and
-  nothing on standard output. The linter reads empty output and answers "The
-  rules pass", with every rule off.
-- A merge leaves `$` read bare in the hooks module, which the engine refuses.
-  `check` shows nothing, because nothing runs `claude plugin validate`.
+Question two, and the fault is mine, not the model's.
 
-So the question is not whether a test exists. It is whether a test feeds the
-rule something bad and asserts the rule refuses it.
+The verb first reads `git diff main..<ref>`, which the brief names. That diffs
+against trunk's tip. So a branch standing 19 commits behind trunk shows every
+commit trunk holds since as a removal, and the reader answers honestly:
 
-## Why two asks about triviality
+    beyond     Two entire subsystems, unrelated to config/schema, are deleted
+               and never disclosed in HANDOVER's 'what this branch leaves alone'
 
-A branch fixes what it trips over. `spec/guidance/working.md` rule nine says so:
-trivial goes in, deeper gets written down and left alone.
+The branch touches neither one. `git diff main...<ref>` reads from the merge
+base, and the tree takes three dots now. `rev-list` keeps two, because it
+counts the branch's own commits.
 
-So a file outside the brief is no fault by itself. The fault is a diversion, a
-redesign of something the brief leaves alone. Question two asks the reader to
-tell those apart, and that judgement is why a model answers it.
+Questions one and five come back well. Both name the file and the line, and a
+person checks either against the diff in a minute.
 
-# What the report looks like
+# Is the report short enough
 
-Short, and every line something to do:
+Yes where the reader keeps an answer to one line, and the one-line form on a
+clean branch is the whole point:
 
-    work/the-config-holds-numbers
+    work/level-zero-reaches-further   nothing to fix, and the merge is a person's.
 
-    check      passes
-    retro      present
-    brief      done, and nothing beyond it
-    tests      2 rules added, 1 carries no test:
-               VoiceShape.StopRule fires on nothing under test
-    beyond     src/doors/git.js, a one-line fix, trivial
+The live report runs longer than that. The reader writes a paragraph under
+`brief` and a list under `beyond`. The prompt asks for one short line, and a
+model under-obeys that where it finds a lot. A cap on each row holds the
+length, and it loses the detail that makes a row worth reading. Leave that
+call to whoever reads this note.
 
-    2 things to fix, and neither holds the merge.
+# The retro
 
-A report with nothing to say fits on one line.
+Every surprise this branch walks into, and what each one costs.
 
-# What to prove first
+## A cloud box wants trust
 
-1. `./RUNME.sh check` passes, and it runs `claude plugin validate` for you.
-2. The verb collects a brief, a handback and a diff from a fake git, under test.
-3. The verb answers the two mechanical questions, under test.
-4. The verb refuses a branch that does not stand, and says which.
-5. Where part two lands, one review runs end to end and the report reads well.
+`claude plugin list` on this box answers that it skips the skills directory,
+because the workspace carries no trust. So level zero holds no ordinary cloud
+session, and `spec/design_output/level0.md` says as much already.
 
-# What your handback says
+Proving part two therefore takes one of the two ways that note names. This box
+carries `hasTrustDialogAccepted: true` for this folder in `~/.claude.json` now,
+which is box-local and travels nowhere. `/root/.claude.json.bak` holds the copy
+from before.
 
-- What the spawn call takes and answers, and where it refuses.
-- What one review costs, in seconds and in model calls.
-- Which of the five questions the reader answers badly, and why.
-- Whether the report is short enough to read whole.
+## A long timeout throws
+
+`$.process.run` takes `timeoutMs` up to ten minutes. The hook first asks for
+fifteen, the call rejects, and the engine answers the session:
+
+    level0 registered the tool review_branch but no tool.call hook answered
+    this call
+
+So a hook that throws reads exactly like a hook nobody writes. The gathering
+asks for five minutes now.
+
+## The spawn wants a tool
+
+A `tool.call` hook waits 45 seconds on `$.process.run` and answers fine. A
+`prompt.submit` hook awaiting `$.agent.spawn` loses its dispatch, and nothing
+after the await runs. So a spawn belongs behind a tool, which is where this one
+sits.
+
+## RUNME writes to both streams
+
+The hook first runs `sh RUNME.sh work review <name> --json`. The install script
+writes to standard output and standard error both. So a failing gather carries
+those lines back, and the caller reads them as an injection attempt. The hook
+runs `node src/scripts/cli.js` now, and reads the verb alone.
+
+## Two halves both say brief
+
+`report` first takes one object. The verb's `brief` is the brief's whole text,
+and the reader's `brief` is its judgement. So a report with no reader behind it
+prints the brief entire. `report(material, read)` takes two arguments now.
+
+## A worktree costs no download
+
+`RUNME.sh` inside a fresh worktree downloads Vale, Biome and lnav into that
+worktree's own `.se/bin`, which is 190MB a review. Copying `.se/tools.json` in
+and running the command line directly skips the install altogether. Every
+surveyed path is absolute, and names a binary this box already holds.
+
+## The retro wants past tense
+
+`PastTense` refuses every sentence this chapter reaches for first, because a
+retro says what happens. Writing it in the present costs a rewrite of the whole
+note. The rule holds, and the note comes out saying what stands today. That is
+the better note.
+
+# Dead ends
+
+- `claude --plugin-dir <probe>` loads a probe plugin beside level zero, until
+  the workspace turns trusted. After that the probe's tools register nowhere,
+  and its calls answer `Tool not found`. Probe before you accept the trust, or
+  probe by hanging a hook on level zero itself.
+- `grep` over `cli.js` finds no engine surface, because the strings sit split.
+  `/plugin-types <dir>` is the one way to read what this build offers. It costs
+  one `-p` turn, writes `claude-code.d.ts`, and that file is where the rename
+  above shows without running anything.
+
+# What remains
+
+1. The `$.fs` rename above, which holds every other rule in this tree.
+2. A cap on how long one report row runs, where a report ever reads too long.
+3. `work review` reads one branch. `work collect` names every branch at `done`,
+   and reviewing all of them takes a loop nobody writes yet.
 
 ## How this branch runs
 
