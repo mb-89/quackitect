@@ -117,6 +117,29 @@ with nobody holding the order in their head.
 
 `work list` shows what each branch waits for, in place of its urgency.
 
+# The battery answers first
+
+`work done` reads a stamp before it claims anything. `./RUNME.sh check` writes
+`.se/check.json` on every run, naming the commit it stands on:
+
+    { "sha": "...", "ok": true, "clean": true, "at": "..." }
+
+`done` refuses on four counts, and each names itself:
+
+| the stamp says | done answers |
+|---|---|
+| nothing at all | no check has run here |
+| another commit | the check names that one instead |
+| an unclean tree | the check reads what the commit lacks |
+| red | the check says red, with the time |
+
+So `done` stops meaning "the session believes this passes". It comes to mean
+"a program runs on this commit, and it passes".
+
+The stamp lives under `.se`, which git ignores, so it travels nowhere. A
+different box reads its own answer, and `.github/workflows/check.yml` answers
+for a machine with no stake in it.
+
 # A merged branch goes
 
 `work merge <name>` runs on `main` and takes a branch standing at `done`. It

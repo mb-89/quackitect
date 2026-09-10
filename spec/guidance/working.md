@@ -15,3 +15,4 @@ rationale: [[spec/rationales/working]]
 7. Put a script of your own under `.se/scripts`, which git ignores.
 8. Read `.se/tools.json` for the path of a tool, and run `./RUNME.sh tools` where that file is absent.
 9. Fix what you trip over where the fix is trivial. Where it runs deeper, write the finding down and leave the code alone. *
+10. Show a brief to the owner before it reaches the cloud, and push nothing they have yet to read. *

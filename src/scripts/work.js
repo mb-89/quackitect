@@ -4,6 +4,7 @@
 // [[spec/design_output/work#the-round-trip]]
 
 import { overLong, WORDS } from "../../.claude/skills/level0/lib/names.js";
+import { saysGreen, STAMP, stampOf } from "../../.claude/skills/level0/lib/runs.js";
 
 export const BRIEF = "HANDOVER.md";
 const TRUNK = "main";
@@ -319,9 +320,24 @@ function finish(it) {
     console.error(`Write your result to ${BRIEF} first. It is what comes back.`);
     return 2;
   }
+  const said = batterySays(it);
+  if (!said.green) {
+    console.error(`${branch} claims nothing yet: ${said.says}.`);
+    console.error("Commit your work, run ./RUNME.sh check, then run work done.");
+    return 1;
+  }
+
   if (!push(it, branch, setStatus(it.disk.read(path), DONE), DONE)) return 1;
-  console.log(`${branch} stands at ${DONE}. The merge belongs to a person.`);
+  console.log(`${branch} stands at ${DONE}, and ${said.says}.`);
+  console.log("The merge belongs to a person.");
   return 0;
+}
+
+// [[spec/design_output/work#the-battery-answers-before-done]]
+function batterySays(it) {
+  const at = it.join(it.root, STAMP);
+  const text = it.disk.exists(at) ? it.disk.read(at) : "";
+  return saysGreen(stampOf(text), it.git.run(["rev-parse", "HEAD"], true).out);
 }
 
 function release(it, name) {
