@@ -6,8 +6,13 @@ import { matches } from "./paths.js";
 
 // [[spec/design_output/level0#a-judged-rule-scopes]]
 export function readsFor(rule, path) {
+  if (!path) return true;
+
+  const only = rule?.reads;
+  if (Array.isArray(only) && !only.some((glob) => matches(glob, path))) return false;
+
   const globs = rule?.ignores;
-  if (!path || !Array.isArray(globs)) return true;
+  if (!Array.isArray(globs)) return true;
   return !globs.some((glob) => matches(glob, path));
 }
 
