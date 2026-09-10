@@ -208,6 +208,39 @@ test("every widget writing a key names one the declaration carries", () => {
   }
 });
 
+// [[spec/design_output/extension#the-sidebar-draws-the-tree]]
+test("npm reaches the extension alone, and the root of the tree stays bare", () => {
+  const said = proc().run(["git", "ls-files", "*package.json"], { cwd: root });
+  const paths = said.stdout.split(/\r?\n/).filter(Boolean);
+
+  assert.ok(paths.includes("package.json"), "the root names one");
+  for (const path of paths) {
+    if (path === "package.json") continue;
+    assert.match(path, /^src\/extension\//, `${path} stands under the extension`);
+  }
+
+  const bare = read("package.json");
+  assert.equal(bare.dependencies, undefined);
+  assert.equal(bare.devDependencies, undefined);
+});
+
+// [[spec/design_output/extension#the-editor-is-a-door]]
+test("the extension imports the editor and its own folder, and nothing else", () => {
+  const found = proc().run(["git", "ls-files", "src/extension/**.js"], { cwd: root });
+  const paths = found.stdout.split(/\r?\n/).filter(Boolean);
+  assert.ok(paths.length > 5, "the extension carries its modules");
+
+  for (const path of paths) {
+    const text = files.read(join(root, path));
+    for (const hit of text.matchAll(/(?:from|require\()\s*["']([^"']+)["']/g)) {
+      const said = hit[1];
+      if (said === "vscode") continue;
+      assert.match(said, /^\.\.?\//, `${path} imports ${said} as a path of its own`);
+      assert.ok(!said.includes("../../"), `${path} stays inside src/extension`);
+    }
+  }
+});
+
 // [[spec/design_output/stop#the-mechanical-checks]]
 test("every mechanical check the stop table names stands in the hook", () => {
   const hook = files.read(join(root, ".claude", "skills", "level0", "hooks", "level0.js"));
