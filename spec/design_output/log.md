@@ -107,10 +107,9 @@ folder grows. A retro owns deletion, this tree carries no retro, and a person
 removes what a retro reaches.
 
 A growing folder costs less than a folder swept empty under a person
-mid-diagnosis. So no code path in this tree deletes a log file, and `grep`
-answers that in one line:
-
-    grep -rn "remove\|unlink\|rm -" --include=*.js src .claude/skills
+mid-diagnosis. So no code path in this tree deletes a log file, and
+`NoLogDeleted` reads every source file git holds to say so.
+For details, see [[spec/design_output/tree#the-rules-over-two-files]].
 
 # The verb
 
@@ -145,7 +144,9 @@ Windows installer leaves winget alone.
 
 lnav loads a format from the reader's own folder, and from no project directory.
 So the installer runs `lnav -i spec/config/lnav/quackitect.json` once the binary
-lands. `test/contract/tree.test.js` holds that file to what the door writes.
+lands. `LnavReadsTheLog` holds that file to what the door writes, and
+`./RUNME.sh lint` draws a drift into the problems panel.
+For details, see [[spec/design_output/tree#the-rules-over-two-files]].
 
 # The viewer learns this tree
 

@@ -486,10 +486,21 @@ exactly what that box reads.
 A projection writes the rules into a file, and a guard then has to keep that
 copy honest. A copy nobody can edit needs no guard.
 
-# The rules Vale cannot hold
+# The rules past one buffer
 
-Vale reads no `.sh` and no `.ps1`, so a rule over a shell script lives in
-`.claude/skills/level0/lib/scripts.js`, and the command line runs it beside Vale's own.
+Vale hands a rule one buffer, so a rule weighing two files stands outside it.
+Vale reads a shell script once `[formats]` names the ending, and the leading dot
+carries that mapping: `.ps1 = md` reads the file, and a bare `ps1 = md` answers
+`unsupported extension`.
+
+Both kinds reach a person the same way, through the command line and the panel:
+
+| the rule | where it lives |
+|---|---|
+| a rule weighing two files | `.claude/skills/level0/lib/tree.js` |
+| a rule over a shell script | `spec/config/styles/VoiceScript` |
+
+For details, see [[spec/design_output/tree#the-rules-over-two-files]].
 
 `NoPathInScript` refuses an interpolated path on a line running an inline
 script. Git Bash hands node a path beginning `/c/`, node reads it as a folder
@@ -507,7 +518,8 @@ colon inside one through `OneTitle`, because both turn one title into two.
 
 Vale reads what a file holds, and its path stays outside that. So
 `.claude/skills/level0/lib/names.js` counts a name instead. `work new` refuses a
-long branch, and a contract test holds every tracked path.
+long branch, and `NameHoldsTheWords` holds every path git tracks.
+For details, see [[spec/design_output/tree#the-rules-over-two-files]].
 
 The config holds the cap as `names.words`, and the caller hands it to
 `overLong`.
@@ -530,6 +542,7 @@ answers that the rules pass.
 |---|---|
 | `spec/config/styles/VoiceVale` | Vale reads it over prose and code |
 | `spec/config/styles/VoiceShape` | Vale reads it over the shape of a note or a rule file |
+| `spec/config/styles/VoiceScript` | Vale reads it over a shell script |
 | `spec/config/styles/VoiceJudged` | a model reads it, and no `BasedOnStyles` names it |
 | `spec/config/biome.json` | Biome reads it |
 
