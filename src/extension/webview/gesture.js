@@ -1,6 +1,6 @@
 // A click count picks a state. One press climbs one rung, five presses send
-// the far value, and a press away from rest falls back to rest. The caller
-// hands the time in, so a burst replays in a test.
+// the far value, and the dead window after a fire is what a person has to
+// spend to reach it. The caller hands the time in, so a burst replays.
 // [[spec/design_output/extension#a-gesture-picks-a-state]]
 
 export const BURST = 1000;
@@ -8,7 +8,7 @@ export const DEAD = 600;
 export const FAR = 5;
 
 export function fresh() {
-  return { began: -BURST, count: 0, deadUntil: -DEAD };
+  return { began: -Infinity, count: 0, deadUntil: -Infinity };
 }
 
 export function pressed(held, at, one) {
@@ -17,15 +17,16 @@ export function pressed(held, at, one) {
 
   const options = one?.options ?? [];
   const far = Number(one?.gesture ?? FAR);
+  const climbs = state.count === 1;
+  const sends = state.count === far && options.length > 2;
 
-  if (state.count === far && options.length > 2) {
-    return { state: { ...state, deadUntil: at + DEAD }, writes: options[2] };
-  }
-  if (state.count !== 1 || at < held.deadUntil) return { state, writes: undefined };
-
-  const rest = options[0];
+  if ((!climbs && !sends) || at < held.deadUntil) return { state, writes: undefined };
   return {
     state: { ...state, deadUntil: at + DEAD },
-    writes: one?.value === rest ? options[1] : rest,
+    writes: climbs ? oneRung(one, options) : options[2],
   };
+}
+
+function oneRung(one, options) {
+  return one?.value === options[0] ? options[1] : options[0];
 }
