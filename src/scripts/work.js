@@ -471,7 +471,7 @@ function close(it, name, argv) {
       .filter((row) => MINE.test(row)),
   );
 
-  const wanted = name ? [`work/${name}`] : [...inTrunk];
+  const wanted = name ? [MINE.test(name) ? name : `work/${name}`] : [...inTrunk];
   if (!wanted.length) {
     console.log(`No work branch stands inside ${TRUNK}.`);
     return 0;

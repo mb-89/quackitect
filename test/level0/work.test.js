@@ -321,6 +321,26 @@ test("close refuses a branch outside trunk, and deletes one inside it", () => {
   assert.ok(!ranGit(open.outside).some((one) => one.includes("--delete")));
 });
 
+// [[spec/design_output/work#a-merged-branch-closes]]
+test("close takes a name carrying its own prefix", () => {
+  const inside = {
+    "git rev-list --count origin/main..main": { stdout: "0\n" },
+    "git branch -r --merged origin/main": {
+      stdout: "  origin/main\n  origin/claude/roaming-hopper-ab12cd\n",
+    },
+  };
+
+  const shut = doorsSaying(inside);
+  const { code } = heard(() =>
+    work(ROOT, ["close", "claude/roaming-hopper-ab12cd"], shut.it),
+  );
+  assert.equal(code, 0);
+  assert.ok(
+    ranGit(shut.outside).includes("git push origin --delete claude/roaming-hopper-ab12cd"),
+    "it reaches the branch the platform cut",
+  );
+});
+
 test("close holds a trunk carrying commits origin has never seen", () => {
   const { it, outside } = doorsSaying({
     "git rev-list --count origin/main..main": { stdout: "2\n" },
