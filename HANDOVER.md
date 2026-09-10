@@ -11,8 +11,8 @@ and answers the two mechanical questions, with no model in it. Level zero
 registers `review_branch`, runs that verb through `$.process.run`, spawns a
 reader with the material and the standing rules, and answers one short report.
 
-One review runs end to end on this box. The report reads well, and it names
-five real misses on the branch it reads.
+Two reviews run end to end on this box. The report reads well, and it names
+real misses on the branch it reads, each against a file and a line.
 
 # Read this first
 
@@ -94,42 +94,50 @@ commits and a diff of 1300 lines:
 | the half | seconds | model calls |
 |---|---|---|
 | the verb alone | 4 to 5 | 0 |
-| the whole tool | 199 | 1 spawn, plus the caller's own turn |
+| the whole tool | 199 and 245, over two runs | 1 spawn, plus the caller's own turn |
 
 The verb's seconds go almost entirely to the worktree check. The reader is one
 `general-purpose` subagent. It spends its own context on the diff and hands
-back four short lines.
+back three rows of its own.
 
 # Which question reads badly
 
-Question two, and the fault is mine, not the model's.
+None of the five, once the diff carries the right base. The reader answers each
+one against the diff, and a person checks any of them in a minute.
 
-The verb first reads `git diff main..<ref>`, which the brief names. That diffs
-against trunk's tip. So a branch standing 19 commits behind trunk shows every
-commit trunk holds since as a removal, and the reader answers honestly:
+Question two reads badly under a two-dot diff, and the fault is mine. The verb
+first reads `git diff main..<ref>`, which the brief names. That diffs against
+trunk's tip. So a branch 19 commits behind trunk shows every commit trunk holds
+since as a removal, and the reader answers honestly:
 
     beyond     Two entire subsystems, unrelated to config/schema, are deleted
                and never disclosed in HANDOVER's 'what this branch leaves alone'
 
-The branch touches neither one. `git diff main...<ref>` reads from the merge
-base, and the tree takes three dots now. `rev-list` keeps two, because it
-counts the branch's own commits.
+The branch touches neither one. Under `main...<ref>` the same branch and the
+same question come back as three rows a person acts on:
 
-Questions one and five come back well. Both name the file and the line, and a
-person checks either against the diff in a minute.
+    beyond     Trivial, unrelated cleanup: src/scripts/lnav-reads.js ...
+               Diversion, not trivial: lib/config.js (new, 201 lines) is a full
+               three-layer resolver. The brief asked only that ...
+
+That is the judgement the brief wants from a model, and it takes the merge base
+to get there. `rev-list` keeps two dots, because it counts the branch's own
+commits.
+
+Question five reads best of the three. It names each rule the branch adds, says
+which a test drives with bad input, and says why the others fire on nothing.
 
 # Is the report short enough
 
-Yes where the reader keeps an answer to one line, and the one-line form on a
-clean branch is the whole point:
+A clean branch fits on one line, which is the whole point:
 
-    work/level-zero-reaches-further   nothing to fix, and the merge is a person's.
+    work/the-branch-gets-read   nothing to fix, and the merge is a person's.
 
-The live report runs longer than that. The reader writes a paragraph under
-`brief` and a list under `beyond`. The prompt asks for one short line, and a
-model under-obeys that where it finds a lot. A cap on each row holds the
-length, and it loses the detail that makes a row worth reading. Leave that
-call to whoever reads this note.
+A branch carrying eight things to fix runs about 25 lines. That reads whole,
+and every row of it names a file or a rule. The prompt asks for one short line
+an answer, and a model under-obeys that where it finds a lot. A cap on each row
+holds the length, and it loses the detail that makes a row worth reading. Leave
+that call to whoever reads this note.
 
 # The retro
 
