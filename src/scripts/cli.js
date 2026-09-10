@@ -10,6 +10,7 @@ import {
   countsOf,
   standingLayer,
 } from "../../.claude/skills/level0/lib/guidance.js";
+import { HEALTH, healthOf } from "../../.claude/skills/level0/lib/health.js";
 import { asRow, rowsOf } from "../../.claude/skills/level0/lib/log.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
 import { pathInScript, SCRIPT } from "../../.claude/skills/level0/lib/scripts.js";
@@ -81,8 +82,9 @@ const run = async (argv, init = {}) =>
 
 const verbs = {
   check: {
-    says: "the tests, the doors, then the rules over the tree",
-    run: async (w) => stamped(test() || doorsHold() || pluginHolds() || (await lint(w))),
+    says: "the tests, the doors, the cage, then the rules over the tree",
+    run: async (w) =>
+      stamped(test() || doorsHold() || pluginHolds() || cageHolds() || (await lint(w))),
   },
   lint: { says: "the rules over the tree, or over what you name", run: lint },
   fix: { says: "the fixes a program can make", run: fix },
@@ -322,6 +324,23 @@ function pluginHolds() {
   return 1;
 }
 
+// [[spec/design_output/level0#god-mode]]
+function cageHolds() {
+  const at = join(root, HEALTH);
+  if (!files.exists(at)) {
+    console.log("Level zero loads in no session here yet, so it says nothing.");
+    return 0;
+  }
+  const said = healthOf(files.read(at));
+  if (said.ok) {
+    console.log(`The cage holds, and it says so at ${said.at}.`);
+    return 0;
+  }
+  console.error(`The cage holds nothing: ${said.why}`);
+  console.error(`That session guards no write. Mend it, and ${HEALTH} turns green.`);
+  return 1;
+}
+
 // [[spec/design_output/work#the-battery-answers-before-done]]
 function stamped(code) {
   const sha = it.git.run(["rev-parse", "HEAD"], true).out;
@@ -446,11 +465,19 @@ function doctor() {
         ? "tracked, one file"
         : "missing",
     ],
+    ["cage holds", cageSays()],
   ];
   for (const [what, said] of rows) {
     console.log(`${what.padEnd(18)} ${String(said).trim() || "missing"}`);
   }
   return 0;
+}
+
+function cageSays() {
+  const at = join(root, HEALTH);
+  if (!files.exists(at)) return "no session says yet";
+  const said = healthOf(files.read(at));
+  return said.ok ? `yes, at ${said.at}` : `no, ${said.why}`;
 }
 
 function lspProxy() {

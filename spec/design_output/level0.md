@@ -440,3 +440,73 @@ short forms that read the same everywhere keep theirs.
 
 Vale drops both fixes and names the overlap. A token reaching past its own word
 therefore costs the fix beside it, so every token here stops at its own edge.
+
+# What the cage loads
+
+Level zero fills its state once: the linter it runs, the config it reads, the
+guidance it hands over, the rules the tooth votes on. Every door then reads that
+state.
+
+A session filling none of it holds every door open. `bin` stands at null, the
+write door skips the lint inside `if (bin)`, and the call passes. The tree reads
+green throughout, because `./RUNME.sh check` carries its own Vale and asks the
+plugin nothing.
+
+So the load stands in `loadCage`, and it answers two questions in place of one:
+
+| the load meets | the cage answers |
+|---|---|
+| a linter it finds | the write door reads a write |
+| a linter it misses | the cage holds nothing |
+| guidance it reads | the session carries the rules |
+| guidance it misses | the cage holds nothing |
+
+Every fault goes into one list, and the throw comes last, so a cage missing one
+thing still holds everything else it reads.
+
+`ensureCage` wraps that load in a `try`, and any door asks it. The first door to
+ask pays for the load, and the rest take the answer. A session the harness
+resumes carries no `session.start`, so the first `tool.call` loads the cage
+instead, and the session mends itself before it writes anything.
+
+The engine refuses `$` handed to a function nested inside `register`, so both
+stand at the top of the file and take the state as an argument.
+
+# God mode
+
+A cage holding nothing says so, and refuses the work until somebody mends it.
+`.se/level0.health` carries that answer:
+
+    { "ok": false, "why": "no vale stands here", "at": "..." }
+
+While `ok` reads false, the door refuses every call except the ones that mend
+the cage:
+
+| the call | god mode |
+|---|---|
+| a write under `.claude/skills/level0/` | passes |
+| a shell command landing no file | passes |
+| a read, a search, a question to the owner | passes |
+| every other write, and every other command | refuses |
+
+The refusal names the fault and the road out, so a session that meets it reads
+what to do. A door refusing everything would shut the road that mends it, and
+the session would stand there for good.
+
+The mend clears itself. `ensureCage` retries while the answer reads false, so
+the first call after a repair loads the rules again, writes `ok: true`, and says
+`the cage holds again` to the log. The install runs once, and a retry costs a
+read.
+
+## What stands outside
+
+A module failing to import registers no door at all, and every door inside it
+stays silent about that. Two things outside the process answer in their place:
+
+- `./RUNME.sh check` reads `.se/level0.health` and goes red where it reads
+  false. `doctor` prints the same line.
+- `test/contract/loads.test.js` imports the module, calls `register`, and names
+  every door it expects. A file carrying a conflict marker fails that test,
+  because a merge writes those into the very file the cage lives in.
+
+`.github/workflows/check.yml` runs both on a machine with no stake in it.

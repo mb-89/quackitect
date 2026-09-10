@@ -71,7 +71,7 @@ function engine(seed = {}, box = {}) {
         [...files.keys()]
           .filter((one) => one.startsWith(`${path}/`))
           .map((one) => ({ name: one.slice(path.length + 1), kind: "file" })),
-      exists: async (path) => Boolean(box.exists?.(path)),
+      exists: async (path) => (box.exists ? Boolean(box.exists(path)) : path === VALE),
     },
     process: {
       run: async (argv, init) =>
@@ -431,4 +431,82 @@ test("the Bash description names the verbs, and answers the same string twice", 
   assert.match(said.description, /^Runs a shell command\./);
   assert.match(said.description, /\.\/RUNME\.sh check/);
   assert.match(said.description, /\.\/RUNME\.sh work/);
+});
+
+const NO_CAGE = { exists: () => false };
+
+// [[spec/design_output/level0#god-mode]]
+test("a cage holding nothing refuses the work, and says what fails", async () => {
+  const it = await started(undefined, NO_CAGE);
+
+  const said = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/guidance/voice.md",
+    content: "a line the door never reads",
+  });
+
+  assert.match(said.deny, /^LEVEL ZERO HOLDS NOTHING/);
+  assert.match(said.deny, /no vale stands here/);
+  assert.match(said.deny, /RUNME\.sh check/);
+
+  const found = it.lines().filter((one) => one.door === "level0");
+  assert.deepEqual(found.map((one) => one.said), [
+    "the cage holds nothing",
+    "session start",
+    "god mode refuses Write",
+  ]);
+});
+
+// [[spec/design_output/level0#god-mode]]
+test("god mode leaves the road open that repairs the cage", async () => {
+  const it = await started(undefined, NO_CAGE);
+
+  const mending = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: ".claude/skills/level0/hooks/level0.js",
+    content: "// the mend",
+  });
+  assert.equal(mending.deny, undefined);
+
+  const reading = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.equal(reading.deny, undefined);
+
+  const looking = await it.raise("tool.call", { tool: "Bash", command: "git status" });
+  assert.equal(looking.deny, undefined);
+
+  const landing = await it.raise("tool.call", {
+    tool: "Bash",
+    command: "cat > spec/guidance/voice.md",
+  });
+  assert.match(landing.deny, /^LEVEL ZERO HOLDS NOTHING/);
+});
+
+// [[spec/design_output/level0#god-mode]]
+test("the cage clears god mode by itself once the repair lands", async () => {
+  let mended = false;
+  const it = await started(undefined, { exists: (path) => mended && path === VALE });
+
+  const refused = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/guidance/voice.md",
+    content: "a line",
+  });
+  assert.match(refused.deny, /^LEVEL ZERO HOLDS NOTHING/);
+
+  mended = true;
+  const passed = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/guidance/voice.md",
+    content: "a line",
+  });
+  assert.equal(passed.deny, undefined);
+  assert.equal(JSON.parse(it.files.get(".se/level0.health")).ok, true);
+
+  const found = it.lines().filter((one) => one.door === "level0");
+  assert.deepEqual(found.map((one) => one.said), [
+    "the cage holds nothing",
+    "session start",
+    "god mode refuses Write",
+    "the cage holds again",
+  ]);
 });

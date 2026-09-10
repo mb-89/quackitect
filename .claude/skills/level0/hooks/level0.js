@@ -16,6 +16,7 @@ import {
   parse,
   standingLayer,
 } from "../lib/guidance.js";
+import { godMode, HEALTH, repairs } from "../lib/health.js";
 import { judgeOf } from "../lib/judge.js";
 import { aimOf, asLines, FOLDER, nameOf, rowOf, writes } from "../lib/log.js";
 import { refusal, refusedCommand, taught } from "../lib/refuse.js";
@@ -62,30 +63,35 @@ export function register(on, _options) {
   const list = todos();
   let tooth = toothOf();
 
-  on("session.start", async ($, e, next) => {
-    let known = await readSurvey($);
-    bin = await toolHere($, known, "vale");
-    if (!bin) {
-      await install($);
-      known = await readSurvey($);
-      bin = await toolHere($, known, "vale");
-    }
-    formatter = await toolHere($, known, "biome");
-    config = await readConfig($);
-    judge = judgeOf(config);
+  // [[spec/design_output/level0#god-mode]]
+  const cage = {
+    health: { ok: false, why: "level zero never loads in this session", at: "" },
+    wired: false,
+    installed: false,
+    told: "",
+    logbook,
+  };
 
-    const guidance = await readGuidance($);
-    standing = guidance.said;
-    sentence = canary({
-      rules: guidance.rules,
-      notes: guidance.notes,
-      stop: config.stop?.enabled !== false,
-    });
+  const take = () => {
+    bin = cage.bin ?? null;
+    formatter = cage.formatter ?? null;
+    config = cage.config ?? {};
+    standing = cage.standing ?? "";
+    sentence = cage.sentence ?? "";
+    rules = cage.rules ?? [];
+    judge = cage.judge ?? judge;
+    tooth = cage.tooth ?? tooth;
+    logbook = cage.logbook ?? logbook;
+  };
+
+  on("session.start", async ($, e, next) => {
+    await ensureCage($, cage);
+    take();
+
     handover = await takeHandover($);
     cloud = await onACloudBox($);
     waiting = cloud && !handover.length && (await offAWorkBranch($));
     onAHeldBranch = handover.some((one) => parse(one.text).front.status === "held");
-    tooth = toothOf({ mostInARow: config.stop?.mostInARow });
 
     try {
       await $.fs.write(
@@ -94,20 +100,11 @@ export function register(on, _options) {
       );
     } catch {}
 
-    logbook = logHere((at, text) => $.fs.write(at, text), config.log?.level);
     await logbook.say("info", "level0", "session start", {
       branch: await branchNow($),
       vale: bin ?? "missing",
     });
 
-    // [[spec/design_output/stop#where-the-rules-live]]
-    const pooled = pool(await readFolder($, RULES, ".yml"));
-    rules = pooled.rules;
-    for (const name of pooled.broken) {
-      await logbook.say("warn", "stop", `${name} carries a rule nobody can read`, {
-        file: `${RULES}/${name}`,
-      });
-    }
     await $.tool.register(claimSpec(rules));
     return next(e);
   });
@@ -122,9 +119,21 @@ export function register(on, _options) {
 
   // [[spec/design_output/log#what-a-tool-line-names]]
   on("tool.call", async ($, e, next) => {
+    // [[spec/design_output/level0#god-mode]]
+    const well = await ensureCage($, cage);
+    take();
+
     tooth.sawCall(String(e.tool ?? ""));
     list.sawCall(e);
     await logbook.say("info", "tool", aimOf(e), { tool: e.tool });
+
+    if (!well.ok && !repairs(e, asWrite(e))) {
+      await logbook.say("warn", "level0", `god mode refuses ${e.tool}`, {
+        tool: e.tool,
+        detail: well.why,
+      });
+      return { deny: godMode(well) };
+    }
 
     // [[spec/design_output/level0#the-owners-prompt-comes-first]]
     const answers = await answerDoor($, e, { owed, config, logbook });
@@ -370,6 +379,84 @@ export function register(on, _options) {
     if (name === "never") return false;
     return undefined;
   }
+}
+
+// [[spec/design_output/level0#what-the-cage-loads]]
+async function loadCage($, cage) {
+  const faults = [];
+
+  cage.config = await readConfig($);
+  cage.judge = judgeOf(cage.config);
+  cage.tooth = toothOf({ mostInARow: cage.config.stop?.mostInARow });
+  if (!cage.wired) {
+    cage.logbook = logHere((at, text) => $.fs.write(at, text), cage.config.log?.level);
+    cage.wired = true;
+  }
+
+  let known = await readSurvey($);
+  cage.bin = await toolHere($, known, "vale");
+  if (!cage.bin && !cage.installed) {
+    cage.installed = true;
+    await install($);
+    known = await readSurvey($);
+    cage.bin = await toolHere($, known, "vale");
+  }
+  if (!cage.bin) faults.push("no vale stands here, so no voice rule reads a write");
+  cage.formatter = await toolHere($, known, "biome");
+
+  const guidance = await readGuidance($);
+  cage.standing = guidance.said;
+  cage.sentence = canary({
+    rules: guidance.rules,
+    notes: guidance.notes,
+    stop: cage.config.stop?.enabled !== false,
+  });
+  if (!cage.standing) faults.push(`${GUIDANCE} hands over nothing`);
+
+  // [[spec/design_output/stop#where-the-rules-live]]
+  const pooled = pool(await readFolder($, RULES, ".yml"));
+  cage.rules = pooled.rules;
+  for (const name of pooled.broken) {
+    await cage.logbook.say("warn", "stop", `${name} carries a rule nobody can read`, {
+      file: `${RULES}/${name}`,
+    });
+  }
+
+  if (faults.length) throw new Error(faults.join(", and "));
+}
+
+// [[spec/design_output/level0#god-mode]]
+async function ensureCage($, cage) {
+  if (cage.health.ok) return cage.health;
+
+  try {
+    await loadCage($, cage);
+    cage.health = { ok: true, why: "", at: new Date().toISOString() };
+  } catch (err) {
+    cage.health = {
+      ok: false,
+      why: String(err?.message ?? err),
+      at: new Date().toISOString(),
+    };
+  }
+
+  try {
+    await $.fs.write(HEALTH, `${JSON.stringify(cage.health, null, 2)}\n`);
+  } catch {}
+
+  if (cage.health.ok && cage.told) {
+    cage.told = "";
+    await cage.logbook.say("info", "level0", "the cage holds again", {
+      detail: cage.health.at,
+    });
+  }
+  if (!cage.health.ok && cage.health.why !== cage.told) {
+    cage.told = cage.health.why;
+    await cage.logbook.say("error", "level0", "the cage holds nothing", {
+      detail: cage.health.why,
+    });
+  }
+  return cage.health;
 }
 
 // [[spec/design_output/level0#the-owners-prompt-comes-first]]
