@@ -4,190 +4,178 @@ status: held
 urgency: now
 ---
 
-# The code asks, reading nothing
+# One resolver answers every key
 
-Two rules in `test/contract/tree.test.js` read `spec/config/level0.json` and
-assert it carries what the code reads. Two readers open that file directly:
+`.claude/skills/level0/lib/config.js` holds the three layers, and every reader
+asks it. For details, see [[spec/design_output/config#the-three-layers]].
 
-- the hooks module, at `session.start`
-- the command line, at module load
-
-Each keeps what it finds for the life of its process. So a number stands in
-three places at once: the file, a reader holding a stale copy, and a constant
-somewhere reading nothing at all.
-
-This branch gives the tree one resolver. Code asks it for a key and takes what
-comes back. How the value gets there is none of the caller's business.
-
-# The three layers
-
-| layer | who writes it | when a reader reads it |
+| what moves | from | to |
 |---|---|---|
-| `spec/config/level0.json` | the team, tracked in git | once, at start |
-| the environment | whoever launches the box | once, at start |
-| `.se/config.json` | a slash command, per box, git ignores it | on access, after a change check |
+| the tracked file | two readers holding a copy each | `configOf` |
+| `WORDS = 5` | `lib/names.js` | `names.words`, and the caller hands it in |
+| the `mostInARow` default | `lib/stop.js` | `stop.mostInARow`, at each turn end |
+| the `DEFAULTS` block | `lib/judge.js` | the `judge` keys, at each write |
+| the type of each key | two contract cases | `spec/config/level0.schema.json` |
 
-A later layer beats an earlier one. So the per-box file beats the environment,
-and the environment beats the tracked file.
+New surfaces:
 
-Two things follow, and both matter:
+- `./RUNME.sh config` prints every key, its value, and the layer answering it.
+- `./RUNME.sh config <key> <value>` writes `.se/config.json`, coercing to the
+  schema's type and making `.se` where that folder stands missing.
+- A session start writes one `warn` line per schema fault, door `config`.
 
-- **No default stands in code.** The tracked file is the defaults. A key the
-  code reads and the file lacks is a fault, and the schema below catches it.
-- **A key standing only in the per-box file still resolves.** The merge takes
-  every key it meets, whichever layer names it.
+# What the proofs say
 
-# Why the local file differs
-
-| file | why it reads that way |
+| what the brief asks | where it stands |
 |---|---|
-| the tracked one | it moves when somebody commits, so once is enough |
-| the per-box one | a slash command writes it mid-session |
+| `./RUNME.sh check` passes, and validates the plugin | 230 tests, and `√ Validation passed` |
+| each layer beats the one under it | `test/level0/config.test.js`, over a fake disk |
+| a write reaches the next ask | that file, and `test/level0/hooks.test.js` |
+| an unreadable per-box file leaves the rest standing | `test/level0/config.test.js` |
+| the schema refuses a config missing a field | `test/contract/tree.test.js` |
+| the verb names the layer answering | the sample under `#the-verb-names-the-layer` |
+| no number the config owns stands in code | the grep below |
 
-The per-box file is the state, so the resolver reads it on every ask. It is a
-small file, and a cache nobody has measured is a cache nobody needs.
+# One ask costs nothing
 
-Measure that, and say the number in your handback:
+The write door asks on every Write and Edit, so that is the ask this branch
+times:
 
-- The write door asks on every Write and Edit, so that is the ask to time.
-- Where one ask costs enough to see, check `mtimeMs` and `size` before the
-  read. `$.fs.stat` answers both.
-- Build that check only where the measurement calls for it.
-
-## A bad file changes nothing
-
-A slash command writes that file, so a half-written or unreadable one reaches
-the resolver eventually.
-
-The resolver shrugs. It keeps the layers beneath, says so once in the log under
-the door `level0`, and carries on.
-
-One bad command that takes a session down leaves a person deleting a file they
-cannot see, which is the worst way out of anything.
-
-# Where the resolver lives
-
-`.claude/skills/level0/lib/config.js`, free of `node:` imports, so the hooks
-module and the command line both load it.
-
-It takes its reads as arguments, the way `lintText` takes a binary. The hooks
-module hands it `$.fs`; the command line hands it the disk door. The resolver
-itself reaches nothing.
-
-Each process holds its own resolved copy. The one truth is the files, and two
-processes may see a change a moment apart. That is fine, and say so in the
-design record so nobody calls it a bug later.
-
-# The schema
-
-`spec/config/level0.schema.json`, draft 2020-12, and `spec/config/level0.json`
-gains `"$schema": "./level0.schema.json"` as its first key. The editor validates
-it from that line alone, with no extension and no server.
-
-## Write it for an editor
-
-VS Code builds its settings editor from schema entries. Follow the same
-conventions and a config pane later costs almost nothing:
-
-| key | why it earns its place |
+| what | cost |
 |---|---|
-| `type` | the control a pane draws |
-| `default` | what a pane shows where the file says nothing |
-| `description` | the hover, and the line a pane prints |
-| `enum` | a list becomes a dropdown |
-| `markdownDescription` | a link inside the hover |
+| one ask, reading `.se/config.json` | 0.0056 ms |
+| `stat` alone, the check a cache needs | 0.0017 ms |
+| Vale over one write | 88 ms |
+| Biome over one write | 101 ms |
 
-## What it must hold
+A cache earns no place here. It saves 0.0039 ms against a door already paying
+88 ms, so the resolver reads the file on every ask and carries no `mtimeMs`
+check. The script stands at the end of this file.
 
-| object | fields the code reads |
-|---|---|
-| `judge` | `enabled`, `model`, `maxSpans`, `warmupWrites`, `thenEveryNth` |
-| `stop` | `enabled`, `mostInARow` |
-| `log` | `level` |
+# The magic number debt
 
-Read the code for the truth of that table. `judgeOf` in `lib/judge.js` and
-`toothOf` in `lib/stop.js` name what they read.
+`noMagicNumbers` names 63 lines under `src` and `test`, and 69 counting the
+plugin's own modules. This tree holds the rule off in `spec/config/biome.json`,
+named there as `off` so a reader meets the decision:
 
-Mark every object `"additionalProperties": false`. That governs the tracked
-file. The per-box file merges whatever it names, because it is a person's own
-override and the schema is the team's agreement.
-
-# The verb names the layer
-
-`./RUNME.sh config` prints every key, its value, and the layer answering it:
-
-    judge.enabled        true      spec/config/level0.json
-    judge.model          sonnet    .se/config.json
-    stop.mostInARow      3         spec/config/level0.json
-    log.level            warn      SE_LOG_LEVEL
-
-`git config --show-origin` is the shape to copy. Three layers with no way to
-ask which one answers leave a person guessing in three places.
-
-`./RUNME.sh config <key> <value>` writes the per-box file, making the directory
-where it stands missing. A slash command calls that verb later, so build the
-verb and leave the command alone.
-
-## The verb coerces
-
-A command line hands over text. `stop.mostInARow 5` writes the number `5`,
-because `"5" > 3` is a comparison somebody reads a bug report about later.
-
-The schema says the type, so the verb reads the schema and coerces to it.
-
-Where the schema knows no such key, write the text as given. A key only the
-local file names still resolves, and nothing knows its type.
-
-## A variable names a key
-
-One rule, both ways: `judge.maxSpans` reads `SE_JUDGE_MAX_SPANS`. Write the
-mapping in `lib/config.js` and hold it with a test in both directions.
-
-# The numbers leave the code
-
-| number | where | what to do |
+| where | lines | what they are |
 |---|---|---|
-| `WORDS = 5` | `lib/names.js` | move to `level0.json`, and let the caller hand it in |
-| `mostInARow` default | `lib/stop.js` | ask the resolver, and carry no default |
-| `max := 5` | `ShortHeading.yml` | leave it: a rule file is config already |
-| `max := 15` | `GuidanceCap.yml` | leave it, for the same reason |
+| a test | 43 | the numbers a case names out loud |
+| `padEnd` and `padStart` | 15 | the column widths of a printed table |
+| a `slice` or a `repeat` | 2 | the offsets of a timestamp |
+| `src/scripts/copilot.js` | 3 | a deadline and a timeout, in milliseconds |
 
-Biome carries `noMagicNumbers`. Turn it on in `spec/config/biome.json`, see how
-large the debt is, and say the number in your handback. Where the debt is small,
-pay it. Where it is large, name what you leave, and why.
+Biome 2.5.12 takes no options for this rule, so the values this tree exempts
+are the rule's own:
 
-Expect noise: an index, a zero, a one, a slice bound. Configure the rule to skip
-those, and name the values you exempt.
+- `0`, `1`, `2`, `10`, `24` and `60`, anywhere they stand
+- an array index
+- an initial value in a declaration, and a default in a parameter
 
-# What leaves the tests
+Turning the rule on today buys 63 named constants for column widths. That reads
+worse than the `padEnd(18)` each one replaces.
 
-Delete these two from `test/contract/tree.test.js`:
+# The editor draws the schema
 
-- the tooth settings carry every field the hook reads
-- the judge settings carry every field the judge reads
+VS Code draws it with no extension. Its JSON language service reads
+`json.schemas` in `.vscode/settings.json`, and this branch points
+`spec/config/level0.json` at the schema beside it. A contract case holds that
+mapping, and the recommended extensions stay at two.
 
-The schema holds both. Put one contract case in their place: the schema refuses
-a config missing a field, and passes the config this tree ships.
+# What the config lacks
 
-# What to prove first
+Nothing the code reads. The schema demands every field, the tracked file
+carries them, and `./RUNME.sh config` names a fault where one goes missing.
 
-1. `./RUNME.sh check` passes, and it runs `claude plugin validate` for you.
-2. Each layer beats the one under it, under test against a fake disk.
-3. A write to `.se/config.json` reaches the next ask.
-4. An unreadable `.se/config.json` leaves every other layer standing.
-5. The schema refuses a config missing a field.
-6. `./RUNME.sh config` names the layer answering each value.
-7. No number the config owns stands in code, and a grep in your handback shows
-   what remains.
+This grep says what numbers remain in code:
 
-# What your handback says
+    grep -rnE "=\s*[0-9]+;|\?\?\s*[0-9]+" --include=*.js .claude src
 
-- What one ask costs inside the write door, and whether a cache earns a place.
-- The size of the magic-number debt, and the values you exempt.
-- Whether the editor draws the schema with no extension.
-- Every field the code reads and the config lacks.
+| number | where | why it stays |
+|---|---|---|
+| `LIVES = 2`, `FRESH = 10` | `lib/stop.js` | the claim's life and the fresh window, which the brief leaves alone |
+| `SAID = 80` | `lib/log.js` | the width one log line cuts to |
+| `ROUNDS = 5` | `src/scripts/cli.js` | the rounds the fixer runs |
+| `ASKING = 10000` | `src/scripts/tools.js` | the survey's timeout |
+| `4000`, `20000`, `100` | `src/scripts/copilot.js` | the timeouts of the Copilot runtime |
+| `max: 5`, `max: 15` | `ShortHeading.yml`, `GuidanceCap.yml` | a rule file is config already |
+
+`ShortHeading` and `names.words` both hold five. One counts the words in a
+heading and the other the words in a path, so the number stands twice on
+purpose. Move the rule file's copy where a later level teaches Vale to read the
+config.
+
+# What surprises me
+
+Three findings, and the first one this branch fixes:
+
+1. Biome reaches nothing. `biome lint --config-path=spec/config .` stops on
+   `Found a nested root configuration`, because the walk meets
+   `spec/config/biome.json` as a second root. `./RUNME.sh lint` then takes the
+   empty answer for a pass. Adding `!spec/**` to `files.includes` fixes it, and
+   the eight findings it uncovers stand fixed as well.
+2. The code write door refuses nothing. `biome lint --stdin-file-path=... --reporter=json`
+   writes the source to standard output and no diagnostics at all in 2.5.12, so
+   `fromJson` in `lib/code.js` parses the source and answers an empty list. The
+   formatter path works, because `biome format` answers the formatted text.
+   A fix writes the text to a temporary file and lints the path.
+3. The judge samples nothing. `tool.call` rebuilds it on every write, so
+   `written` starts at 0 each time and `reads()` answers true for the whole
+   session. Building it once at `session.start` and handing the rules in fixes
+   it, at the cost of a rule file read per session.
 
 # What this branch leaves alone
 
-The config pane in the editor, and the slash commands themselves. The verb is
-the surface both will call, so build the verb well and stop there.
+The config pane in the editor and the slash commands themselves, which the
+brief names. The verb is the surface both call.
+
+# The script this branch writes
+
+`.se/scripts/asks.js`, which git ignores:
+
+    // What one ask costs inside the write door, against what the door already pays.
+    import { configOf } from "../../.claude/skills/level0/lib/config.js";
+    import { disk } from "../../src/doors/disk.js";
+    import { proc } from "../../src/doors/proc.js";
+    import { statSync } from "node:fs";
+
+    const root = process.cwd();
+    const files = disk();
+    const at = (path) => `${root}/${path}`;
+    const it = configOf({
+      read: async (path) => files.read(at(path)),
+      write: async (path, text) => files.write(at(path), text),
+      makeDir: async (path) => files.makeDir(at(path)),
+      readEnv: async (names) =>
+        Object.fromEntries(names.map((n) => [n, process.env[n] ?? ""])),
+    });
+
+    await it.write("stop.mostInARow", "3");
+    const rounds = Number(process.argv[2] ?? 10000);
+
+    const timed = async (name, what) => {
+      await what();
+      const began = process.hrtime.bigint();
+      for (let i = 0; i < rounds; i++) await what();
+      const ms = Number(process.hrtime.bigint() - began) / 1e6;
+      console.log(`${name.padEnd(28)} ${(ms / rounds).toFixed(4)} ms per ask`);
+    };
+
+    await timed("ask, reading the file", () => it.ask("stop.mostInARow"));
+    await timed("stat alone", async () => {
+      const said = statSync(at(".se/config.json"));
+      return said.mtimeMs + said.size;
+    });
+    await timed("read alone", async () => files.read(at(".se/config.json")));
+
+    const outside = proc();
+    const one = (name, argv, stdin) => {
+      const began = process.hrtime.bigint();
+      outside.run(argv, { cwd: root, stdin });
+      const ms = Number(process.hrtime.bigint() - began) / 1e6;
+      console.log(`${name.padEnd(28)} ${ms.toFixed(2)} ms once`);
+    };
+    one("vale over one write", [".se/bin/vale", "--config=.vale.ini", "--output=JSON",
+      "--no-exit", "--ext=.md", "-"], "A door reads this line.\n");
+    one("biome over one write", [".se/bin/biome", "lint", "--config-path=spec/config",
+      "--stdin-file-path=src/x.js", "--reporter=json"], "export const one = 1;\n");

@@ -7,14 +7,12 @@ import { test } from "node:test";
 import { judgeOf, spansIn } from "../../.claude/skills/level0/lib/judge.js";
 import { readRule } from "../../.claude/skills/level0/lib/rulefile.js";
 
-const config = {
-  judge: {
-    enabled: true,
-    model: "haiku",
-    maxSpans: 24,
-    warmupWrites: 4,
-    thenEveryNth: 3,
-  },
+const settings = {
+  enabled: true,
+  model: "haiku",
+  maxSpans: 24,
+  warmupWrites: 4,
+  thenEveryNth: 3,
 };
 
 const ACTIONABLE = [
@@ -66,7 +64,7 @@ test("a short line costs no model call", () => {
 });
 
 test("the judge refuses on its refusing label and passes on the other", async () => {
-  const judge = judgeOf(config, rules);
+  const judge = judgeOf(settings, rules);
   const long =
     "This explains where the thing came from and what somebody once tried before now.";
 
@@ -79,7 +77,7 @@ test("the judge refuses on its refusing label and passes on the other", async ()
 });
 
 test("a model naming no label passes the text", async () => {
-  const judge = judgeOf(config, rules);
+  const judge = judgeOf(settings, rules);
   const long =
     "This explains where the thing came from and what somebody once tried before now.";
   assert.deepEqual(await judge.run(long, async () => undefined), []);
@@ -91,17 +89,17 @@ test("a model naming no label passes the text", async () => {
   );
 });
 
-test("the judge is off when the config says so", () => {
-  assert.equal(judgeOf({ judge: { enabled: false } }, rules).reads(), false);
+test("the judge is off where the settings say so", () => {
+  assert.equal(judgeOf({ ...settings, enabled: false }, rules).reads(), false);
 });
 
 test("the judge is off when no rule file stands", () => {
-  assert.equal(judgeOf(config, []).reads(), false);
+  assert.equal(judgeOf(settings, []).reads(), false);
 });
 
 test("the judge reads every warmup write, then samples, and a breach resets it", () => {
-  const judge = judgeOf(config, rules);
-  for (let i = 0; i < config.judge.warmupWrites; i++) {
+  const judge = judgeOf(settings, rules);
+  for (let i = 0; i < settings.warmupWrites; i++) {
     assert.equal(judge.reads(), true, `write ${i + 1} is inside the warmup`);
     judge.sawClean();
   }

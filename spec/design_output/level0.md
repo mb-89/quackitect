@@ -212,6 +212,10 @@ Vale reads what a file holds, and its path stays outside that. So
 `.claude/skills/level0/lib/names.js` counts a name instead. `work new` refuses a
 long branch, and a contract test holds every tracked path.
 
+The config holds the cap as `names.words`, and the caller hands it to
+`overLong`.
+For details, see [[spec/design_output/config#a-caller-hands-it-in]].
+
 # A broken rule says so
 
 Vale answers a broken rule file with an `E201`. It writes that to standard

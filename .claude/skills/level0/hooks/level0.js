@@ -4,6 +4,7 @@
 // [[spec/design_output/level0#the-write-door]]
 
 import { CODE, formatText, lintText as lintCode } from "../lib/code.js";
+import { configOf, TRACKED } from "../lib/config.js";
 import {
   bindsHere,
   canary,
@@ -33,7 +34,6 @@ import { lintText } from "../lib/vale.js";
 
 const PROSE = /\.(md|markdown|txt)$/i;
 const GUIDANCE = "spec/guidance";
-const CONFIG = "spec/config/level0.json";
 const HANDOVER = ".se/HANDOVER.md";
 const BRIEF = "HANDOVER.md";
 const TRUNK = "main";
@@ -47,7 +47,7 @@ export function register(on, _options) {
   let standing = "";
   let sentence = "";
   let firstTurn = true;
-  let config = {};
+  let settings = configOf({ read: async () => "" });
   let judge = judgeOf({});
   let handover = [];
   let waiting = false;
@@ -67,21 +67,20 @@ export function register(on, _options) {
       bin = await toolHere($, known, "vale");
     }
     formatter = await toolHere($, known, "biome");
-    config = await readConfig($);
-    judge = judgeOf(config);
+    settings = configHere($);
 
     const guidance = await readGuidance($);
     standing = guidance.said;
     sentence = canary({
       rules: guidance.rules,
       notes: guidance.notes,
-      stop: config.stop?.enabled !== false,
+      stop: (await settings.ask("stop.enabled")) !== false,
     });
     handover = await takeHandover($);
     cloud = await onACloudBox($);
     waiting = cloud && !handover.length && (await offAWorkBranch($));
     onAHeldBranch = handover.some((one) => parse(one.text).front.status === "held");
-    tooth = toothOf({ mostInARow: config.stop?.mostInARow });
+    tooth = toothOf();
 
     try {
       await $.fs.writeFile(
@@ -90,11 +89,17 @@ export function register(on, _options) {
       );
     } catch {}
 
-    logbook = logHere((at, text) => $.fs.writeFile(at, text), config.log?.level);
+    logbook = logHere(
+      (at, text) => $.fs.writeFile(at, text),
+      await settings.ask("log.level"),
+    );
     await logbook.say("info", "level0", "session start", {
       branch: await branchNow($),
       vale: bin ?? "missing",
     });
+    for (const fault of await settings.faults()) {
+      await logbook.say("warn", "config", fault, { file: TRACKED });
+    }
 
     // [[spec/design_output/stop#where-the-rules-live]]
     const pooled = pool(await readFolder($, RULES, ".yml"));
@@ -142,7 +147,7 @@ export function register(on, _options) {
     }
 
     if (!found.length) {
-      judge = judgeOf(config, await readRules($, JUDGED));
+      judge = judgeOf(await judgeSettings(settings), await readRules($, JUDGED));
       if (judge.reads()) {
         door = "judge";
         found.push(
@@ -208,7 +213,14 @@ export function register(on, _options) {
       firstTurn = false;
       await heardCanary(logbook, canaryIn(e.answer, sentence), sentence);
     }
-    await bite($, e, { rules, tooth, logbook, ran: ranHere });
+    const off = (await settings.ask("stop.enabled")) === false;
+    await bite($, e, {
+      rules,
+      tooth,
+      logbook,
+      mostInARow: await settings.ask("stop.mostInARow"),
+      ran: (name) => ranHere(name, off),
+    });
     if (!bin || !e.answer || e.reason !== "answer") return said;
 
     const ran = await lintText(e.answer, ANSWER, {
@@ -320,13 +332,32 @@ export function register(on, _options) {
   });
 
   // [[spec/design_output/stop#the-mechanical-checks]]
-  function ranHere(name) {
+  function ranHere(name, off) {
     if (name === "work-waiting") return list.standing() || onAHeldBranch;
     if (name === "session-is-new") return tooth.isNew();
-    if (name === "stop-hook-off") return config.stop?.enabled === false;
+    if (name === "stop-hook-off") return off;
     if (name === "never") return false;
     return undefined;
   }
+}
+
+// [[spec/design_output/config#the-resolver-holds-the-layers]]
+function configHere($) {
+  return configOf({
+    read: (path) => $.fs.readFile(path),
+    write: (path, text) => $.fs.writeFile(path, text),
+    readEnv: (names) => readEnv($, names),
+  });
+}
+
+async function judgeSettings(settings) {
+  return {
+    enabled: await settings.ask("judge.enabled"),
+    model: await settings.ask("judge.model"),
+    maxSpans: await settings.ask("judge.maxSpans"),
+    warmupWrites: await settings.ask("judge.warmupWrites"),
+    thenEveryNth: await settings.ask("judge.thenEveryNth"),
+  };
 }
 
 // [[spec/design_output/level0#the-canary]]
@@ -351,7 +382,7 @@ async function bite($, e, it) {
   if (e.reason !== "answer") return;
 
   const decision = decide(it.rules, { claimed: it.tooth.claim()?.rule, ran: it.ran });
-  const said = it.tooth.atTurnEnd(decision);
+  const said = it.tooth.atTurnEnd(decision, it.mostInARow);
   const how = detail(said, said.inARow);
 
   for (const name of said.unknown) {
@@ -505,14 +536,6 @@ async function readRules($, folder) {
     return out;
   } catch {
     return [];
-  }
-}
-
-async function readConfig($) {
-  try {
-    return JSON.parse(await $.fs.readFile(CONFIG));
-  } catch {
-    return {};
   }
 }
 

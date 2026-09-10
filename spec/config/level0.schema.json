@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "level zero",
+  "type": "object",
+  "required": ["stop", "log", "judge", "names"],
+  "properties": {
+    "comment": { "type": "string" },
+    "stop": {
+      "type": "object",
+      "required": ["enabled", "mostInARow"],
+      "properties": {
+        "comment": { "type": "string" },
+        "enabled": { "type": "boolean" },
+        "mostInARow": { "type": "number" }
+      }
+    },
+    "log": {
+      "type": "object",
+      "required": ["level"],
+      "properties": {
+        "comment": { "type": "string" },
+        "level": { "type": "string", "enum": ["info", "warn", "error"] }
+      }
+    },
+    "judge": {
+      "type": "object",
+      "required": ["enabled", "model", "maxSpans", "warmupWrites", "thenEveryNth"],
+      "properties": {
+        "comment": { "type": "string" },
+        "enabled": { "type": "boolean" },
+        "model": { "type": "string" },
+        "maxSpans": { "type": "number" },
+        "warmupWrites": { "type": "number" },
+        "thenEveryNth": { "type": "number" }
+      }
+    },
+    "names": {
+      "type": "object",
+      "required": ["words"],
+      "properties": {
+        "comment": { "type": "string" },
+        "words": { "type": "number" }
+      }
+    }
+  }
+}
