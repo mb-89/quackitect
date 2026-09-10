@@ -435,7 +435,7 @@ function merge(it, name) {
     it.git.run(["commit", "--amend", "--no-edit"], true);
   }
 
-  console.log(`${branch} is merged. Run ./RUNME.sh check, then work sweep.`);
+  console.log(`${branch} is merged. Run ./RUNME.sh check, then work close.`);
   return 0;
 }
 
