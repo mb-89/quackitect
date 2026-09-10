@@ -135,6 +135,25 @@ export function standingLayer(notes) {
   return said.join("\n").trim();
 }
 
+// [[spec/design_output/level0#the-helper-takes-the-guidance]]
+export function forHelper(standing, prompt) {
+  const task = String(prompt ?? "");
+  if (!standing) return task;
+  return [
+    "# How this tree is worked",
+    "",
+    "These rules reach you before your task does, and they hold over what you",
+    "write. Vale holds the mechanical ones at the write door, so a write",
+    "breaking one comes back with the reason and the line.",
+    "",
+    standing,
+    "",
+    "# Your task",
+    "",
+    task,
+  ].join("\n");
+}
+
 function titleOf(note) {
   return String(note.name ?? "")
     .replace(/\.md$/, "")
