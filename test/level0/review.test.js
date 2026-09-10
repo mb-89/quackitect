@@ -183,15 +183,15 @@ test("the verb refuses a review naming no branch", () => {
 });
 
 test("the report names the branch, every answer and the count", () => {
-  const said = report({
-    branch: BRANCH,
-    check: { ok: true, code: 0 },
-    retro: true,
-    brief: "done, and nothing beyond it",
-    beyond: "src/scripts/tools.js, a one-line fix, trivial",
-    tests: "2 rules added, 1 carries no test:\nStopRule fires on nothing",
-    fix: 2,
-  });
+  const said = report(
+    { branch: BRANCH, check: { ok: true, code: 0 }, retro: true },
+    {
+      brief: "done, and nothing beyond it",
+      beyond: "src/scripts/tools.js, a one-line fix, trivial",
+      tests: "2 rules added, 1 carries no test:\nStopRule fires on nothing",
+      fix: 2,
+    },
+  );
 
   assert.match(said, /^work\/the-config-holds-numbers$/m);
   assert.match(said, /^check {6}passes$/m);
@@ -202,25 +202,20 @@ test("the report names the branch, every answer and the count", () => {
 });
 
 test("a report with nothing to fix fits on one line", () => {
-  const said = report({
-    branch: BRANCH,
-    check: { ok: true, code: 0 },
-    retro: true,
-    brief: "done, and nothing beyond it",
-    fix: 0,
-  });
+  const said = report(
+    { branch: BRANCH, check: { ok: true, code: 0 }, retro: true },
+    { brief: "done, and nothing beyond it", fix: 0 },
+  );
 
   assert.equal(said.split("\n").length, 1);
   assert.match(said, /nothing to fix, and the merge is a person's\./);
 });
 
 test("a red check and an absent retro each count one thing to fix", () => {
-  const said = report({
-    branch: BRANCH,
-    check: { ok: false, code: 1 },
-    retro: false,
-    fix: 0,
-  });
+  const said = report(
+    { branch: BRANCH, check: { ok: false, code: 1 }, retro: false },
+    { fix: 0 },
+  );
 
   assert.match(said, /^check {6}answers 1$/m);
   assert.match(said, /^retro {6}absent from the handback$/m);
@@ -228,13 +223,10 @@ test("a red check and an absent retro each count one thing to fix", () => {
 });
 
 test("the report holds no merge back, whatever it finds", () => {
-  const bad = report({
-    branch: BRANCH,
-    check: { ok: false, code: 1 },
-    retro: false,
-    brief: "the brief asks for two things, and one lands",
-    fix: 4,
-  });
+  const bad = report(
+    { branch: BRANCH, check: { ok: false, code: 1 }, retro: false },
+    { brief: "the brief asks for two things, and one lands", fix: 4 },
+  );
 
   assert.match(bad, /the merge is a person's\./);
   assert.equal(/\bblock|\brefus|\bdeny|\bgate\b/i.test(bad), false);
@@ -255,7 +247,7 @@ test("a reader answering no JSON hands its words over, and counts one", () => {
 
   assert.equal(said.fix, 1);
   assert.equal(said.unread, "I could not read the diff.");
-  const shown = report({ branch: BRANCH, check: { ok: true }, retro: true, ...said });
+  const shown = report({ branch: BRANCH, check: { ok: true }, retro: true }, said);
   assert.match(shown, /^reader {5}I could not read the diff\.$/m);
 });
 
@@ -293,4 +285,44 @@ test("a run naming no failing row falls back to its last lines", () => {
   const said = whatFailed({ stdout: "one\ntwo\n", stderr: "the rules refuse three\n" });
 
   assert.match(said, /the rules refuse three/);
+});
+
+test("a red lint answers with the lines naming the rule", () => {
+  const said = whatFailed({
+    stdout: "The rules pass.\nspec/a.md:8:11: PastTense: Write the present tense.\n",
+    stderr: "",
+  });
+
+  assert.equal(said, "spec/a.md:8:11: PastTense: Write the present tense.");
+});
+
+// [[spec/design_output/review#what-the-report-looks-like]]
+test("the report says what a red check broke on, under the check row", () => {
+  const said = report(
+    {
+      branch: BRANCH,
+      retro: true,
+      check: { ok: false, code: 1, says: "not ok 3 - the door holds" },
+    },
+    { fix: 0 },
+  );
+
+  assert.match(said, /^check {6}answers 1:$/m);
+  assert.match(said, /^ {11}not ok 3 - the door holds$/m);
+  assert.match(said, /^1 thing to fix/m);
+});
+
+// [[spec/design_output/review#what-the-report-looks-like]]
+test("the verb alone prints the two rows it owns, and no brief", () => {
+  const { it } = doorsSaying(
+    standing({ [`git show ${REF}:HANDOVER.md`]: { stdout: BRIEF } }),
+  );
+
+  const { code, said } = heard(() => work(ROOT, ["review", NAME], it));
+
+  assert.equal(code, 0);
+  assert.match(said, /^check {6}passes$/m);
+  assert.match(said, /^retro {6}absent from the handback$/m);
+  assert.equal(said.includes("Hold the numbers"), false, "the brief stays out");
+  assert.match(said, /^1 thing to fix, and the merge is a person's\.$/m);
 });

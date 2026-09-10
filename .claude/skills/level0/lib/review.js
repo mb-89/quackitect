@@ -135,21 +135,21 @@ function line(said) {
 }
 
 // [[spec/design_output/review#what-the-report-looks-like]]
-export function report(said) {
+export function report(said, read = {}) {
   const check = said.check ?? {};
   const mechanical = (check.ok ? 0 : 1) + (said.retro ? 0 : 1);
-  const fix = mechanical + (said.fix ?? 0);
-  const unread = String(said.unread ?? "").trim();
+  const fix = mechanical + (read.fix ?? 0);
+  const unread = String(read.unread ?? "").trim();
   if (!fix && !unread) {
     return `${said.branch}   nothing to fix, and the merge is a person's.`;
   }
 
   const rows = [
-    ["check", check.ok ? "passes" : `answers ${check.code ?? "nothing"}`],
+    ["check", check.ok ? "passes" : redly(check)],
     ["retro", said.retro ? "present" : "absent from the handback"],
-    ["brief", said.brief],
-    ["tests", said.tests],
-    ["beyond", said.beyond],
+    ["brief", read.brief],
+    ["tests", read.tests],
+    ["beyond", read.beyond],
     ["reader", unread],
   ].filter(([, value]) => String(value ?? "").trim());
 
@@ -162,6 +162,12 @@ export function report(said) {
   }
   out.push("", closing(fix));
   return out.join("\n");
+}
+
+function redly(check) {
+  const says = String(check.says ?? "").trim();
+  const head = `answers ${check.code ?? "nothing"}`;
+  return says ? `${head}:\n${says}` : head;
 }
 
 function closing(fix) {

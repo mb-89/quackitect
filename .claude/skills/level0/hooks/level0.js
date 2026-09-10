@@ -232,7 +232,7 @@ export function register(on, _options) {
       branch: material.branch,
       detail: `check=${material.check?.code} retro=${material.retro} fix=${read.fix}`,
     });
-    return { result: report({ ...material, ...read }) };
+    return { result: report(material, read) };
   });
 
   on("turn.complete", async ($, e, next) => {

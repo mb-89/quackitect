@@ -111,12 +111,13 @@ function checkOn(it, at) {
 
 // [[spec/design_output/review#a-worktree-runs-the-check]]
 export function whatFailed(ran) {
-  const lines = `${ran.stdout ?? ""}\n${ran.stderr ?? ""}`.split(/\r?\n/);
-  const failed = lines
-    .map((one) => one.trim())
-    .filter((one) => /^not ok \d/.test(one) || /^\s*\d+ +[A-Za-z]+\.[A-Za-z]/.test(one));
-  if (failed.length) return failed.slice(0, LOUD).join("\n");
+  const lines = `${ran.stdout ?? ""}\n${ran.stderr ?? ""}`
+    .split(/\r?\n/)
+    .map((one) => one.trim());
 
-  const last = lines.map((one) => one.trim()).filter(Boolean);
-  return last.slice(-LOUD).join("\n");
+  for (const named of [/^not ok \d/, /^[^\s:]+:\d+:\d+: \S+: /]) {
+    const found = lines.filter((one) => named.test(one));
+    if (found.length) return found.slice(0, LOUD).join("\n");
+  }
+  return lines.filter(Boolean).slice(-LOUD).join("\n");
 }

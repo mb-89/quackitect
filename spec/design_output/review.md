@@ -93,6 +93,10 @@ The reader answers one JSON object, and `readerSays` reads it back:
 lands in the report under `reader`, whole, and counts as one thing to fix. So a
 reader that wanders still hands its reading over.
 
+`report` takes the gathering and this answer as two arguments, because both
+carry a key called `brief`. The verb passes the first alone, so a report with
+no reader behind it prints the two rows the verb owns and no brief.
+
 # What the report looks like
 
 Short, and every line something to do:
