@@ -54,7 +54,7 @@ function widget(cell) {
   ].join("");
 }
 
-// [[spec/design_output/extension#the-log-tooltip-teaches-lnav]]
+// [[spec/design_output/extension#the-log-opens-a-terminal]]
 function hover(cell) {
   return [
     cell.help ?? "",
@@ -65,7 +65,7 @@ function hover(cell) {
     .join("\n");
 }
 
-// [[spec/design_output/extension#a-mark-stands-as-its-codepoints]]
+// [[spec/design_output/extension#a-mark-and-its-codepoints]]
 function markOf(at) {
   return String(at ?? "")
     .split(/\s+/)
@@ -170,7 +170,7 @@ function placements(groups) {
   return [...out.values()];
 }
 
-// [[spec/design_output/extension#it-takes-the-editors-own-style]]
+// [[spec/design_output/extension#the-editor-picks-the-colours]]
 function style(groups) {
   return [
     "body { font-family: var(--vscode-font-family); font-size: var(--vscode-font-size);",

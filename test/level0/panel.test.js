@@ -77,7 +77,7 @@ function drawn(local = {}) {
   });
 }
 
-// [[spec/design_output/extension#a-mark-stands-as-its-codepoints]]
+// [[spec/design_output/extension#a-mark-and-its-codepoints]]
 test("a mark stands in the declaration as codepoints, and draws as the emoji", () => {
   assert.equal(markOf("U+270B U+1F916"), "✋\u{1F916}");
   assert.equal(markOf(""), "");
@@ -94,7 +94,7 @@ test("every widget of a group draws, each in the cell the declaration names", ()
   );
 });
 
-// [[spec/design_output/extension#the-log-tooltip-teaches-lnav]]
+// [[spec/design_output/extension#the-log-opens-a-terminal]]
 test("the log button's hover carries the lnav keys the declaration names", () => {
   const said = drawn();
   assert.match(
@@ -112,7 +112,7 @@ test("a status draws its light dark, because nothing writes a heartbeat yet", ()
   assert.match(drawn(), /<span class="light dark"><\/span>/);
 });
 
-// [[spec/design_output/extension#it-takes-the-editors-own-style]]
+// [[spec/design_output/extension#the-editor-picks-the-colours]]
 test("every colour the page names is a variable the editor sets", () => {
   const said = drawn();
   const colours = said.match(/(background|color|border):[^;}]+/g) ?? [];

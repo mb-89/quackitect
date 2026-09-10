@@ -60,7 +60,7 @@ test("two groups each hold their own grid, so one cell in both is no fault", () 
   assert.deepEqual(faultsIn(said), []);
 });
 
-// [[spec/design_output/extension#the-grid-is-checked]]
+// [[spec/design_output/extension#the-grid-check]]
 test("the line of a key is the line its entry opens on", () => {
   const text = [
     "{",

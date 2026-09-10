@@ -10,12 +10,12 @@ export const FINISHING = "finishing";
 export const STOPPED = "stopped";
 export const QUIET = "quiet";
 
-// [[spec/design_output/extension#the-hold-is-one-rule-in-the-table]]
+// [[spec/design_output/extension#the-hold-is-one-rule]]
 export function holds(said) {
   return String(said ?? RUNNING) === STOPPED;
 }
 
-// [[spec/design_output/extension#the-ask-is-a-line-in-the-block]]
+// [[spec/design_output/extension#the-ask-is-a-line]]
 export function controlBlock(said = {}) {
   const rows = [...heldSays(said.hold), ...askSays(said.wanted)];
   if (!rows.length) return "";

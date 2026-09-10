@@ -353,7 +353,7 @@ test("close holds a trunk carrying commits origin has never seen", () => {
   assert.ok(!ranGit(outside).some((one) => one.includes("--delete")));
 });
 
-// [[spec/design_output/work#the-battery-answers-before-done]]
+// [[spec/design_output/work#the-battery-answers-first]]
 test("done refuses where the battery answers nothing green", () => {
   const held = "---\nstatus: held\n---\n\n# The result\n";
 

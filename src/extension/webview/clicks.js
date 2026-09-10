@@ -26,7 +26,7 @@ export function messageFor(said, at, held) {
   };
 }
 
-// [[spec/design_output/extension#the-filter-takes-a-regular-expression]]
+// [[spec/design_output/extension#the-filter-reads-an-expression]]
 export function matches(said, filter) {
   if (!filter) return true;
   try {

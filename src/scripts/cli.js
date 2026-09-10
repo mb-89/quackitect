@@ -250,7 +250,7 @@ async function lint(where) {
   return 1;
 }
 
-// [[spec/design_output/extension#the-grid-is-checked]]
+// [[spec/design_output/extension#the-grid-check]]
 function gridFaults(where) {
   const at = join(root, SCHEMA);
   const reaches = where.some((one) => SCHEMA.startsWith(show(join(root, one))));
@@ -476,7 +476,7 @@ function cageHolds() {
   return 1;
 }
 
-// [[spec/design_output/work#the-battery-answers-before-done]]
+// [[spec/design_output/work#the-battery-answers-first]]
 function stamped(code) {
   const sha = it.git.run(["rev-parse", "HEAD"], true).out;
   const clean = !it.git.run(["status", "--porcelain"], true).out;

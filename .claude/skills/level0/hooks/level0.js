@@ -438,7 +438,7 @@ export function register(on, _options) {
       });
     }
 
-    // [[spec/design_output/extension#the-ask-is-a-line-in-the-block]]
+    // [[spec/design_output/extension#the-ask-is-a-line]]
     const asks = controlBlock({
       hold: await settings.ask("stop.hold"),
       wanted: await settings.ask(ASK),
@@ -474,7 +474,7 @@ export function register(on, _options) {
   }
 }
 
-// [[spec/design_output/extension#the-ask-is-a-line-in-the-block]]
+// [[spec/design_output/extension#the-ask-is-a-line]]
 async function dropAsk(settings, logbook) {
   const said = String((await settings.ask(ASK)) ?? QUIET);
   if (said === QUIET) return;

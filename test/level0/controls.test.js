@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { controlBlock, holds } from "../../.claude/skills/level0/lib/controls.js";
 
-// [[spec/design_output/extension#the-hold-is-one-rule-in-the-table]]
+// [[spec/design_output/extension#the-hold-is-one-rule]]
 test("the hold stops a turn at stopped, and at nothing else", () => {
   assert.equal(holds("stopped"), true);
   assert.equal(holds("finishing"), false);
@@ -15,7 +15,7 @@ test("the hold stops a turn at stopped, and at nothing else", () => {
   assert.equal(holds(undefined), false);
 });
 
-// [[spec/design_output/extension#the-ask-is-a-line-in-the-block]]
+// [[spec/design_output/extension#the-ask-is-a-line]]
 test("a running hold and a quiet ask put no block in front of the agent", () => {
   assert.equal(controlBlock({ hold: "running", wanted: "quiet" }), "");
   assert.equal(controlBlock({}), "");

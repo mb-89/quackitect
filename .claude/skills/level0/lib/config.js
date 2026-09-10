@@ -11,7 +11,7 @@ export const PREFIX = "SE_";
 
 const SAID = "comment";
 
-// [[spec/design_output/config#a-key-is-a-dotted-path]]
+// [[spec/design_output/config#a-key-names-a-path]]
 export function flatten(said, at = "") {
   const out = new Map();
   for (const [name, value] of Object.entries(said ?? {})) {

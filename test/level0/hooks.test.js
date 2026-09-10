@@ -254,7 +254,7 @@ test("a held branch carries the turn once the session stops being new", async ()
   assert.match(it.prompts[0].text, /- Does the work stand complete\?/);
 });
 
-// [[spec/design_output/extension#the-hold-is-one-rule-in-the-table]]
+// [[spec/design_output/extension#the-hold-is-one-rule]]
 test("the hold at stopped ends a turn the standing work would carry", async () => {
   const it = await started({ "HANDOVER.md": "---\nstatus: held\n---\n\n# The brief\n" });
   for (let i = 0; i < 10; i++) {
@@ -280,7 +280,7 @@ test("the hold at running leaves the vote as it stands", async () => {
   assert.equal(it.lines().filter((one) => one.door === "stop")[0].said, "the turn goes on");
 });
 
-// [[spec/design_output/extension#the-ask-is-a-line-in-the-block]]
+// [[spec/design_output/extension#the-ask-is-a-line]]
 test("the ask stands in the block, and the turn's end writes it back to quiet", async () => {
   const it = await started();
   it.files.set(".se/config.json", JSON.stringify({ ask: { wanted: "full" } }));

@@ -336,7 +336,7 @@ function finish(it) {
   return 0;
 }
 
-// [[spec/design_output/work#the-battery-answers-before-done]]
+// [[spec/design_output/work#the-battery-answers-first]]
 function batterySays(it) {
   const at = it.join(it.root, STAMP);
   const text = it.disk.exists(at) ? it.disk.read(at) : "";

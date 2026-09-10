@@ -1,7 +1,7 @@
 // The one module reaching the editor. Every call into vscode stands here, so
 // every other file in this folder answers a test with no editor running and
 // the extension holds no door of its own.
-// [[spec/design_output/extension#the-editor-comes-in-through-a-door]]
+// [[spec/design_output/extension#the-editor-is-a-door]]
 
 const vscode = require("vscode");
 

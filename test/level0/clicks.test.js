@@ -119,7 +119,7 @@ test("an editor changed in the bottom section posts the key and what stands in i
   assert.deepEqual(posted, [{ kind: "set", key: "judge.model", value: "sonnet" }]);
 });
 
-// [[spec/design_output/extension#the-filter-takes-a-regular-expression]]
+// [[spec/design_output/extension#the-filter-reads-an-expression]]
 test("the filter reads a regular expression, and a bad one reads as plain words", () => {
   assert.equal(matches("stop.hold running", "^stop\\."), true);
   assert.equal(matches("stop.hold running", "judge"), false);

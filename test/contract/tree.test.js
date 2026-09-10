@@ -175,7 +175,7 @@ test("the schema passes the config this tree ships, and refuses one short a fiel
   assert.deepEqual(faultsIn(read(SCHEMA), short), ["judge.maxSpans is missing"]);
 });
 
-// [[spec/design_output/extension#the-grid-is-checked]]
+// [[spec/design_output/extension#the-grid-check]]
 test("the schema this tree ships places every widget in a cell of its own", () => {
   assert.deepEqual(gridFaults(read(SCHEMA)), []);
 });
