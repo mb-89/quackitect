@@ -4,9 +4,10 @@
 // [[spec/design_output/level0#the-setup-writes-the-flag]]
 
 import assert from "node:assert/strict";
+import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { accept, configPath, FLAG, trusted } from "../../src/scripts/trust.js";
+import { accept, CONFIG, configPath, FLAG, trusted } from "../../src/scripts/trust.js";
 
 test("a config carrying nothing comes back trusting the folder", () => {
   const said = trusted({}, "/home/user/quackitect");
@@ -41,14 +42,14 @@ test("a project the config already names keeps its other fields", () => {
 });
 
 test("the config sits beside the home folder", () => {
-  assert.equal(configPath("/home/user"), "/home/user/.claude.json");
+  assert.equal(configPath("/home/user"), join("/home/user", CONFIG));
 });
 
 test("a box carrying no config gets one that trusts the folder", () => {
   const files = fakeDisk();
   const where = accept(files, "/home/user", "/home/user/quackitect");
 
-  assert.equal(where, "/home/user/.claude.json");
+  assert.equal(where, join("/home/user", CONFIG));
   const said = JSON.parse(files.read(where));
   assert.equal(said.projects["/home/user/quackitect"][FLAG], true);
 });
