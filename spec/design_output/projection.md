@@ -146,9 +146,23 @@ carries the cost of it, door `project`:
 
     {"door":"project","said":"0 file(s) written","ms":1,"detail":"1 projection(s), 15 target(s)"}
 
-Measured on 2026-09-10 against client 2.1.267, over one projection and fifteen
-targets. It costs **1 ms** where every file already reads as projected. It
-costs **4 ms** where all fifteen take a write.
+## What it costs
+
+Measured on 2026-09-10 over one projection and fifteen targets, twenty runs of
+each, against the real disk on a cloud box:
+
+| the run | cost |
+|---|---|
+| every target already reads as projected | 0.29 ms median, 0.20 ms low |
+| all fifteen take a write | 0.59 ms median, 0.45 ms low |
+
+So the log rounds it to `1` and a session start pays under a millisecond.
+
+These numbers come from the projector over the disk door. The hook reads and
+writes through `$.fs` instead, which costs more than the raw call.
+A box loading the hooks module measures the whole of it, because the log line
+carries the number. This box loads none, and
+[[spec/design_output/level0#the-trust-gate-reaches-skills]] says why.
 
 ## The hook only writes
 

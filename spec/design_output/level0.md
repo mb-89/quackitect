@@ -177,6 +177,16 @@ Two things reach a cloud box today:
 The canary finds this. A session saying the line out loud is a session level
 zero holds, and a cloud session that starts the ordinary way says nothing.
 
+Client 2.1.267 stands the same way, measured on 2026-09-10 on a cloud box. The
+debug log names the count, and `.se/level0.stamp` stands nowhere in the tree:
+
+    [plugins] Found 1 plugins (1 enabled, 0 disabled)
+    [plugins] Registered 0 hooks from 1 plugins
+
+The one plugin it counts belongs to the client. So a branch measuring what a
+hook costs at `session.start` measures the module itself here, and says which
+door it takes.
+
 # The write door
 
 `tool.call` reads every Write and Edit. Prose goes to Vale, code goes to Biome,
