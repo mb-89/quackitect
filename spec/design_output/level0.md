@@ -216,17 +216,30 @@ the one an environment carries leans on nothing:
     [ -d "$repo/.git" ] || repo=/home/user/quackitect
     python3 - "$repo" <<'PY' || true
     import json, os, sys
-    folder, path = sys.argv[1], os.path.expanduser("~/.claude.json")
-    try:
-        said = json.load(open(path))
-    except Exception:
-        said = {}
-    said["hasTrustDialogAccepted"] = True
-    said.setdefault("projects", {}).setdefault(folder, {})["hasTrustDialogAccepted"] = True
-    tmp = path + ".trust"
-    json.dump(said, open(tmp, "w"), indent=2)
-    os.replace(tmp, path)
-    print("trusted", folder, "in", path)
+    folder = sys.argv[1]
+
+    def merge(path, change):
+        try:
+            said = json.load(open(path))
+        except Exception:
+            said = {}
+        change(said)
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        tmp = path + ".tmp"
+        json.dump(said, open(tmp, "w"), indent=2)
+        os.replace(tmp, path)
+        return path
+
+    def trust(said):
+        said["hasTrustDialogAccepted"] = True
+        said.setdefault("projects", {}).setdefault(folder, {})["hasTrustDialogAccepted"] = True
+
+    def auto(said):
+        said.setdefault("permissions", {})["defaultMode"] = "auto"
+        said["skipAutoPermissionPrompt"] = True
+
+    print("trusted", folder, "in", merge(os.path.expanduser("~/.claude.json"), trust))
+    print("auto mode in", merge(os.path.expanduser("~/.claude/settings.json"), auto))
     PY
     exit 0
 
@@ -234,6 +247,22 @@ Both readers mark this folder one the client trusts, and both leave every other
 key and every other project alone. The `exit 0` holds a session up where the
 write fails. Nothing races either one, because the setup runs before a session
 holds the file.
+
+## Where the mode stands
+
+The client takes `permissions.defaultMode` values `auto` and `bypassPermissions`
+from user settings, and from the settings an organisation controls. A project
+file naming either one changes nothing. So the setup writes
+`~/.claude/settings.json`, and `.claude/settings.json` carries the allow list by
+itself.
+
+| what a file sets | project settings | user settings |
+|---|---|---|
+| `permissions.allow` | it holds | it holds |
+| `permissions.defaultMode: auto` | the client passes it by | it holds |
+
+A routine meeting a prompt stalls until a person looks. So an unattended box
+takes its mode from the setup.
 
 A box carrying that setup says the canary out loud. Measured on 2026-09-10, on
 a cloud box cloning `main`:
