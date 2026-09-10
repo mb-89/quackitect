@@ -10,6 +10,7 @@ import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
+import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import {
   BRIEF,
   CONTRACT_HEADING,
@@ -52,9 +53,16 @@ function heard(what) {
 
 const ranGit = (said) => said.ran.map((one) => one.argv.join(" "));
 
+const SHA = "b818c390c02737351bf1b73aba36a573d34d2ecc";
+
 const onBranch = (name) => ({
   "git rev-parse --abbrev-ref HEAD": { stdout: `${name}\n` },
+  "git rev-parse HEAD": { stdout: `${SHA}\n` },
 });
+
+const green = {
+  [join(ROOT, STAMP)]: JSON.stringify({ sha: SHA, ok: true, clean: true, at: "now" }),
+};
 
 test("every brief carries the contract, and adding it twice changes nothing", () => {
   const once = withContract("# A brief\n\nDo the thing.\n");
@@ -114,6 +122,7 @@ test("close reaches a work branch and a branch the platform cut", () => {
 test("done stamps the brief and pushes the branch it stands on", () => {
   const { it, outside, disk } = doorsSaying(onBranch("work/fix-lsp"), {
     [HERE]: "---\nstatus: held\n---\n\n# The result\n",
+    ...green,
   });
 
   const { code } = heard(() => work(ROOT, ["done"], it));
@@ -126,6 +135,7 @@ test("done stamps the brief and pushes the branch it stands on", () => {
 test("done says one line to the log, naming the branch and the code", async () => {
   const { it, disk } = doorsSaying(onBranch("work/fix-lsp"), {
     [HERE]: "---\nstatus: held\n---\n\n# The result\n",
+    ...green,
   });
   it.log = fakeLog(fakeClock(), { folder: "/log", id: "a6f8c43b" });
 
@@ -309,4 +319,33 @@ test("close holds a trunk carrying commits origin has never seen", () => {
   assert.equal(code, 1);
   assert.match(said, /Push main first/);
   assert.ok(!ranGit(outside).some((one) => one.includes("--delete")));
+});
+
+// [[spec/design_output/work#the-battery-answers-before-done]]
+test("done refuses where the battery answers nothing green", () => {
+  const held = "---\nstatus: held\n---\n\n# The result\n";
+
+  const none = doorsSaying(onBranch("work/fix-lsp"), { [HERE]: held });
+  const first = heard(() => work(ROOT, ["done"], none.it));
+  assert.equal(first.code, 1);
+  assert.match(first.said, /no check has run here/);
+  assert.equal(statusOf(none.disk.read(HERE)), "held");
+
+  const stale = doorsSaying(onBranch("work/fix-lsp"), {
+    [HERE]: held,
+    [join(ROOT, STAMP)]: JSON.stringify({ sha: "0000", ok: true, clean: true, at: "now" }),
+  });
+  assert.match(heard(() => work(ROOT, ["done"], stale.it)).said, /ran against 0000/);
+
+  const red = doorsSaying(onBranch("work/fix-lsp"), {
+    [HERE]: held,
+    [join(ROOT, STAMP)]: JSON.stringify({ sha: SHA, ok: false, clean: true, at: "now" }),
+  });
+  assert.match(heard(() => work(ROOT, ["done"], red.it)).said, /answered red/);
+
+  const dirty = doorsSaying(onBranch("work/fix-lsp"), {
+    [HERE]: held,
+    [join(ROOT, STAMP)]: JSON.stringify({ sha: SHA, ok: true, clean: false, at: "now" }),
+  });
+  assert.match(heard(() => work(ROOT, ["done"], dirty.it)).said, /unclean tree/);
 });
