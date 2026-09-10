@@ -36,6 +36,13 @@
   asks: Does going on need what only a person can give?
   says: Going on needs what only a person gives, so this turn ends.
 
+- id: the-owner-holds-this-session
+  side: stop
+  priority: 85
+  decides: mechanical
+  runs: owner-holds
+  says: The owner holds this session at stopped, so this turn ends here.
+
 - id: work-still-stands
   side: continue
   priority: 80

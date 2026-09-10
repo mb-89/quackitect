@@ -31,6 +31,8 @@ import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
 import { survey } from "../../src/scripts/tools.js";
 import { decide, pool } from "../../.claude/skills/level0/lib/stop.js";
+import { faultsIn as gridFaults } from "../../src/extension/lib/grid.js";
+import { drawnIn, entriesIn } from "../../src/extension/lib/widgets.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -171,6 +173,52 @@ test("the schema passes the config this tree ships, and refuses one short a fiel
   const short = flatten(read(TRACKED));
   short.delete("judge.maxSpans");
   assert.deepEqual(faultsIn(read(SCHEMA), short), ["judge.maxSpans is missing"]);
+});
+
+// [[spec/design_output/extension#the-grid-is-checked]]
+test("the schema this tree ships places every widget in a cell of its own", () => {
+  assert.deepEqual(gridFaults(read(SCHEMA)), []);
+});
+
+// [[spec/design_output/extension#one-declaration-draws-it]]
+test("three controls draw, and the level one widgets stand declared and undrawn", () => {
+  const schema = read(SCHEMA);
+  assert.deepEqual(
+    drawnIn(schema).map((one) => one.key),
+    ["stop.hold", "ask.wanted", "log.open"],
+  );
+
+  const waiting = entriesIn(schema).filter((one) => one.widget && !one.group);
+  assert.deepEqual(
+    waiting.map((one) => one.key),
+    ["engine.state", "engine.binding", "engine.autonomy"],
+  );
+  for (const one of waiting) {
+    assert.ok(one.help, `${one.key} says what it is`);
+  }
+});
+
+// [[spec/design_output/extension#a-click-writes-the-file]]
+test("every widget writing a key names one the declaration carries", () => {
+  const said = flatten(read(TRACKED));
+  for (const one of drawnIn(read(SCHEMA))) {
+    if (one.widget === "action") continue;
+    assert.ok(said.has(one.key), `${one.key} stands in ${TRACKED}`);
+    assert.ok(one.options.includes(said.get(one.key)), `${one.key} rests on an option`);
+  }
+});
+
+// [[spec/design_output/stop#the-mechanical-checks]]
+test("every mechanical check the stop table names stands in the hook", () => {
+  const hook = files.read(join(root, ".claude", "skills", "level0", "hooks", "level0.js"));
+  const named = pool(
+    namesIn(STOP, ".yml").map((name) => ({ name, text: files.read(join(STOP, name)) })),
+  ).rules.filter((one) => one.decides === "mechanical");
+
+  assert.ok(named.length, "the table names a mechanical rule");
+  for (const one of named) {
+    assert.match(hook, new RegExp(`"${one.runs}"`), `the hook answers ${one.runs}`);
+  }
 });
 
 // [[spec/design_output/config#a-variable-names-a-key]]

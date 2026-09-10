@@ -7,6 +7,7 @@ import { opensATurn, reachesTheOwner, SAYS, spokeSince } from "../lib/answer.js"
 import { commitIn, findings as readsCommand, verbLine } from "../lib/bash.js";
 import { CODE, formatText, lintText as lintCode } from "../lib/code.js";
 import { configOf, TRACKED } from "../lib/config.js";
+import { ASK, controlBlock, holds, QUIET } from "../lib/controls.js";
 import {
   bindsHere,
   canary,
@@ -336,13 +337,15 @@ export function register(on, _options) {
       await heardCanary(logbook, canaryIn(e.answer, sentence), sentence);
     }
     const off = (await settings.ask("stop.enabled")) === false;
+    const hold = await settings.ask("stop.hold");
     await bite($, e, {
       rules,
       tooth,
       logbook,
       mostInARow: await settings.ask("stop.mostInARow"),
-      ran: (name) => ranHere(name, off),
+      ran: (name) => ranHere(name, off, hold),
     });
+    await dropAsk(settings, logbook);
     if (!bin || !e.answer || e.reason !== "answer") return said;
 
     const ran = await lintText(e.answer, ANSWER, {
@@ -435,6 +438,13 @@ export function register(on, _options) {
       });
     }
 
+    // [[spec/design_output/extension#the-ask-is-a-line-in-the-block]]
+    const asks = controlBlock({
+      hold: await settings.ask("stop.hold"),
+      wanted: await settings.ask(ASK),
+    });
+    if (asks) blocks.push({ name: "level0-owner-asks", text: asks });
+
     // [[spec/design_output/level0#the-canary]]
     if (standing) {
       blocks.push({
@@ -454,13 +464,22 @@ export function register(on, _options) {
   });
 
   // [[spec/design_output/stop#the-mechanical-checks]]
-  function ranHere(name, off) {
+  function ranHere(name, off, hold) {
     if (name === "work-waiting") return list.standing() || onAHeldBranch;
     if (name === "session-is-new") return tooth.isNew();
     if (name === "stop-hook-off") return off;
+    if (name === "owner-holds") return holds(hold);
     if (name === "never") return false;
     return undefined;
   }
+}
+
+// [[spec/design_output/extension#the-ask-is-a-line-in-the-block]]
+async function dropAsk(settings, logbook) {
+  const said = String((await settings.ask(ASK)) ?? QUIET);
+  if (said === QUIET) return;
+  await settings.write(ASK, QUIET);
+  await logbook.say("info", "config", `the ask stood at ${said}, and drops to ${QUIET}`);
 }
 
 // [[spec/design_output/level0#what-the-cage-loads]]

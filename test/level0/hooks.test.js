@@ -39,6 +39,13 @@ const RULES = `- id: work-still-stands
   decides: claimed
   asks: Does the work stand complete?
   says: The work stands complete, so this turn ends.
+
+- id: the-owner-holds-this-session
+  side: stop
+  priority: 85
+  decides: mechanical
+  runs: owner-holds
+  says: The owner holds this session at stopped, so this turn ends here.
 `;
 
 const CONFIG = JSON.stringify({
@@ -245,6 +252,60 @@ test("a held branch carries the turn once the session stops being new", async ()
   assert.equal(it.prompts.length, 1);
   assert.match(it.prompts[0].text, /^Something on your list stands unfinished/);
   assert.match(it.prompts[0].text, /- Does the work stand complete\?/);
+});
+
+// [[spec/design_output/extension#the-hold-is-one-rule-in-the-table]]
+test("the hold at stopped ends a turn the standing work would carry", async () => {
+  const it = await started({ "HANDOVER.md": "---\nstatus: held\n---\n\n# The brief\n" });
+  for (let i = 0; i < 10; i++) {
+    await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  }
+  it.files.set(".se/config.json", JSON.stringify({ stop: { hold: "stopped" } }));
+  await it.raise("turn.complete", { ...answered, answer: "a step is done" });
+
+  const said = it.lines().filter((one) => one.door === "stop");
+  assert.equal(said[0].said, "the turn ends");
+  assert.match(said[0].detail, /^stop=the-owner-holds-this-session@85/);
+  assert.deepEqual(it.prompts, []);
+});
+
+test("the hold at running leaves the vote as it stands", async () => {
+  const it = await started({ "HANDOVER.md": "---\nstatus: held\n---\n\n# The brief\n" });
+  for (let i = 0; i < 10; i++) {
+    await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  }
+  it.files.set(".se/config.json", JSON.stringify({ stop: { hold: "running" } }));
+  await it.raise("turn.complete", { ...answered, answer: "a step is done" });
+
+  assert.equal(it.lines().filter((one) => one.door === "stop")[0].said, "the turn goes on");
+});
+
+// [[spec/design_output/extension#the-ask-is-a-line-in-the-block]]
+test("the ask stands in the block, and the turn's end writes it back to quiet", async () => {
+  const it = await started();
+  it.files.set(".se/config.json", JSON.stringify({ ask: { wanted: "full" } }));
+
+  const said = await it.raise("prompt.context", { blocks: [] });
+  const block = said.blocks.find((one) => one.name === "level0-owner-asks");
+  assert.match(block.text, /The owner asks for a full report/);
+
+  await it.raise("turn.complete", { ...answered, answer: "done" });
+  assert.equal(JSON.parse(it.files.get(".se/config.json")).ask.wanted, "quiet");
+  assert.equal(
+    (await it.raise("prompt.context", { blocks: [] })).blocks.find(
+      (one) => one.name === "level0-owner-asks",
+    ),
+    undefined,
+  );
+});
+
+test("a quiet ask and a running hold put no block in front of the agent", async () => {
+  const it = await started();
+  const said = await it.raise("prompt.context", { blocks: [] });
+  assert.equal(
+    said.blocks.find((one) => one.name === "level0-owner-asks"),
+    undefined,
+  );
 });
 
 // [[spec/design_output/config#the-schema-says-the-type]]
