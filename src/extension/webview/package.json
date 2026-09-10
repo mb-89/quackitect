@@ -1,0 +1,6 @@
+{
+  "name": "quackitect-webview",
+  "private": true,
+  "type": "module",
+  "description": "The scripts the browser side of the sidebar runs. A module here loads in the webview and in a test, and it reaches neither the editor nor node."
+}

@@ -1,0 +1,39 @@
+{
+  "name": "quackitect",
+  "displayName": "quackitect",
+  "description": "The tree, drawn as a sidebar. One declaration says what every value is and where it draws.",
+  "version": "0.1.0",
+  "private": true,
+  "publisher": "quackitect",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "main": "./extension.js",
+  "scripts": {
+    "package": "npx --yes @vscode/vsce package --allow-missing-repository"
+  },
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "quackitect",
+          "title": "quackitect",
+          "icon": "icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "quackitect": [
+        {
+          "type": "webview",
+          "id": "quackitect.sidebar",
+          "name": "the tree"
+        }
+      ]
+    }
+  }
+}

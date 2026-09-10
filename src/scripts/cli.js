@@ -22,7 +22,12 @@ import { pathInScript, SCRIPT } from "../../.claude/skills/level0/lib/scripts.js
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { EDITOR_SETTINGS } from "../../.claude/skills/level0/lib/servers.js";
 import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
-import { configOf, LOCAL } from "../../.claude/skills/level0/lib/config.js";
+import { configOf, LOCAL, SCHEMA } from "../../.claude/skills/level0/lib/config.js";
+import {
+  faultsIn as faultsInGrid,
+  lineOf,
+  RULE as GRID,
+} from "../extension/lib/grid.js";
 import { TOOLS, WANTED } from "../../.claude/skills/level0/lib/tools.js";
 import {
   CONFIG,
@@ -197,6 +202,8 @@ async function lint(where) {
     found.push(...pathInScript(files.read(file), show(file)));
   }
 
+  found.push(...gridFaults(where));
+
   if (files.exists(biome)) {
     const code = outside.run(
       [biome, "lint", "--config-path=spec/config", "--reporter=github", ...where],
@@ -241,6 +248,23 @@ async function lint(where) {
   }
   console.log(`${String(found.length).padStart(6)}  in all`);
   return 1;
+}
+
+// [[spec/design_output/extension#the-grid-is-checked]]
+function gridFaults(where) {
+  const at = join(root, SCHEMA);
+  const reaches = where.some((one) => SCHEMA.startsWith(show(join(root, one))));
+  if (!reaches || !files.exists(at)) return [];
+
+  const text = files.read(at);
+  return faultsInGrid(JSON.parse(text)).map((one) => ({
+    file: SCHEMA,
+    rule: GRID,
+    line: lineOf(text, one.key),
+    column: 1,
+    message: one.why,
+    severity: "error",
+  }));
 }
 
 // [[spec/design_output/log#lnav-and-how-it-installs]]
