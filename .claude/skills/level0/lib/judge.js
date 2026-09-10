@@ -2,16 +2,18 @@
 // question with a closed set of answers, read from spec/config/styles/VoiceJudged.
 // [[spec/design_output/level0#the-judge-costs-a-call]]
 
-export const DEFAULTS = {
-  enabled: true,
-  model: "haiku",
-  maxSpans: 24,
-  warmupWrites: 4,
-  thenEveryNth: 3,
-};
+import { matches } from "./paths.js";
 
-export function judgeOf(config = {}, rules = []) {
-  const settings = { ...DEFAULTS, ...(config.judge ?? {}), rules };
+// [[spec/design_output/level0#a-judged-rule-scopes]]
+export function readsFor(rule, path) {
+  const globs = rule?.ignores;
+  if (!path || !Array.isArray(globs)) return true;
+  return !globs.some((glob) => matches(glob, path));
+}
+
+// [[spec/design_output/config#a-caller-hands-it-in]]
+export function judgeOf(said = {}, rules = []) {
+  const settings = { ...said, rules };
   let written = 0;
   let clean = 0;
 
@@ -34,13 +36,16 @@ export function judgeOf(config = {}, rules = []) {
       clean++;
     },
 
-    async run(text, classify) {
+    async run(text, classify, path) {
       if (!classify) return [];
+      const asking = settings.rules.filter((rule) => readsFor(rule, path));
+      if (!asking.length) return [];
+
       const found = [];
       const spans = spansIn(text).slice(0, settings.maxSpans);
 
       for (const span of spans) {
-        for (const rule of settings.rules) {
+        for (const rule of asking) {
           let said;
           try {
             said = await classify(`${rule.ask}\n\nText:\n${span.text}`, rule.labels, {

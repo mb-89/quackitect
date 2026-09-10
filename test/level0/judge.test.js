@@ -7,14 +7,12 @@ import { test } from "node:test";
 import { judgeOf, spansIn } from "../../.claude/skills/level0/lib/judge.js";
 import { readRule } from "../../.claude/skills/level0/lib/rulefile.js";
 
-const config = {
-  judge: {
-    enabled: true,
-    model: "haiku",
-    maxSpans: 24,
-    warmupWrites: 4,
-    thenEveryNth: 3,
-  },
+const settings = {
+  enabled: true,
+  model: "haiku",
+  maxSpans: 24,
+  warmupWrites: 4,
+  thenEveryNth: 3,
 };
 
 const ACTIONABLE = [
@@ -66,7 +64,7 @@ test("a short line costs no model call", () => {
 });
 
 test("the judge refuses on its refusing label and passes on the other", async () => {
-  const judge = judgeOf(config, rules);
+  const judge = judgeOf(settings, rules);
   const long =
     "This explains where the thing came from and what somebody once tried before now.";
 
@@ -78,8 +76,40 @@ test("the judge refuses on its refusing label and passes on the other", async ()
   assert.deepEqual(await judge.run(long, async () => "actionable"), []);
 });
 
+// [[spec/design_output/level0#a-judged-rule-scopes]]
+test("a rule ignoring a folder costs no model call inside it", async () => {
+  const scoped = [
+    { ...readRule(`${ACTIONABLE}\nignores:\n  - spec/rationales/*.md`), name: "Actionable" },
+  ];
+  const judge = judgeOf(settings, scoped);
+  const long =
+    "This explains where the thing came from and what somebody once tried before now.";
+
+  let asked = 0;
+  const says = async () => {
+    asked++;
+    return "background";
+  };
+
+  assert.deepEqual(await judge.run(long, says, "spec/rationales/testing.md"), []);
+  assert.equal(asked, 0, "a file the globs reach costs nothing");
+
+  const found = await judge.run(long, says, "spec/guidance/testing.md");
+  assert.equal(found.length, 1, "the rule stands everywhere else");
+  assert.equal(asked, 1);
+});
+
+test("a rule naming no folder reads every path", async () => {
+  const judge = judgeOf(settings, rules);
+  const long =
+    "This explains where the thing came from and what somebody once tried before now.";
+
+  const found = await judge.run(long, async () => "background", "spec/rationales/a.md");
+  assert.equal(found.length, 1);
+});
+
 test("a model naming no label passes the text", async () => {
-  const judge = judgeOf(config, rules);
+  const judge = judgeOf(settings, rules);
   const long =
     "This explains where the thing came from and what somebody once tried before now.";
   assert.deepEqual(await judge.run(long, async () => undefined), []);
@@ -91,17 +121,17 @@ test("a model naming no label passes the text", async () => {
   );
 });
 
-test("the judge is off when the config says so", () => {
-  assert.equal(judgeOf({ judge: { enabled: false } }, rules).reads(), false);
+test("the judge is off where the settings say so", () => {
+  assert.equal(judgeOf({ ...settings, enabled: false }, rules).reads(), false);
 });
 
 test("the judge is off when no rule file stands", () => {
-  assert.equal(judgeOf(config, []).reads(), false);
+  assert.equal(judgeOf(settings, []).reads(), false);
 });
 
 test("the judge reads every warmup write, then samples, and a breach resets it", () => {
-  const judge = judgeOf(config, rules);
-  for (let i = 0; i < config.judge.warmupWrites; i++) {
+  const judge = judgeOf(settings, rules);
+  for (let i = 0; i < settings.warmupWrites; i++) {
     assert.equal(judge.reads(), true, `write ${i + 1} is inside the warmup`);
     judge.sawClean();
   }
