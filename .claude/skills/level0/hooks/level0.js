@@ -20,6 +20,14 @@ import {
 import { godMode, HEALTH, repairs } from "../lib/health.js";
 import { judgeOf } from "../lib/judge.js";
 import { aimOf, asLines, FOLDER, nameOf, rowOf, writes } from "../lib/log.js";
+import {
+  entriesIn,
+  ownerOf,
+  PROJECTIONS,
+  readsOf,
+  refusedWrite,
+  writesOf,
+} from "../lib/projection.js";
 import { refusal, refusedCommand, taught } from "../lib/refuse.js";
 import { readerAsks, readerSays, report, reviewSpec } from "../lib/review.js";
 import { readRule } from "../lib/rulefile.js";
@@ -63,6 +71,7 @@ export function register(on, _options) {
   let rules = [];
   let onAHeldBranch = false;
   let owed = false;
+  let projections = [];
   const list = todos();
   let tooth = toothOf();
 
@@ -111,6 +120,19 @@ export function register(on, _options) {
       await logbook.say("warn", "config", fault, { file: TRACKED });
     }
 
+    // [[spec/design_output/projection#who-projects-and-when]]
+    projections = entriesIn(await readIf($, PROJECTIONS));
+    if (projections.length) {
+      const drawn = await projectAll($, projections);
+      await logbook.say("info", "project", `${drawn.wrote} file(s) written`, {
+        ms: drawn.ms,
+        detail: `${projections.length} projection(s), ${drawn.size} target(s)`,
+      });
+      for (const path of drawn.refused) {
+        await logbook.say("warn", "project", "the box refuses a target", { file: path });
+      }
+    }
+
     await $.tool.register(claimSpec(rules));
     await $.tool.register(reviewSpec());
     return next(e);
@@ -143,12 +165,27 @@ export function register(on, _options) {
     }
 
     // [[spec/design_output/level0#the-owners-prompt-comes-first]]
-    const answers = await answerDoor($, e, { owed, settings, logbook });
+    const answers = await answerDoor($, e, {
+      owed,
+      off: (await settings.ask("answer.enabled")) === false,
+      logbook,
+    });
     if (answers.deny) return answers;
     owed = answers.owed;
 
     const writing = asWrite(e);
     if (!writing) return next(e);
+
+    // [[spec/design_output/projection#the-write-door-refuses-one]]
+    const owner = ownerOf(projections, writing.path);
+    if (owner) {
+      await logbook.say("warn", "project", `refused a write to ${shorten(writing.path)}`, {
+        file: shorten(writing.path),
+        tool: e.tool,
+        detail: owner.name ?? owner.target,
+      });
+      return { deny: refusedWrite(owner, writing.path) };
+    }
 
     if (CODE.test(writing.path)) {
       return await codeDoor($, e, next, writing, formatter, logbook);
@@ -501,10 +538,41 @@ async function ensureCage($, cage) {
   return cage.health;
 }
 
+// [[spec/design_output/projection#who-projects-and-when]]
+async function projectAll($, entries) {
+  const began = Date.now();
+  const refused = [];
+  let size = 0;
+  let wrote = 0;
+
+  for (const entry of entries) {
+    const texts = new Map();
+    for (const path of readsOf(entry)) texts.set(path, await readIf($, path));
+    for (const [path, text] of writesOf(entry, texts)) {
+      size++;
+      if ((await readIf($, path)) === text) continue;
+      try {
+        await $.fs.write(path, text);
+        wrote++;
+      } catch {
+        refused.push(path);
+      }
+    }
+  }
+  return { ms: Date.now() - began, size, wrote, refused };
+}
+
+async function readIf($, path) {
+  try {
+    return String(await $.fs.read(path));
+  } catch {
+    return "";
+  }
+}
+
 // [[spec/design_output/level0#the-owners-prompt-comes-first]]
 async function answerDoor($, e, it) {
-  if (!it.owed) return { owed: it.owed };
-  if ((await it.settings.ask("answer.enabled")) === false) return { owed: it.owed };
+  if (!it.owed || it.off) return { owed: it.owed };
   if (e.agentId || reachesTheOwner(e.tool)) return { owed: it.owed };
 
   let spoke = true;

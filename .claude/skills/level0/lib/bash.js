@@ -156,7 +156,7 @@ export function testIn(command) {
   return out;
 }
 
-export function findings(command, words) {
+export function findings(command, most) {
   const said = String(command ?? "");
   const out = [];
 
@@ -171,11 +171,11 @@ export function findings(command, words) {
   }
 
   for (const one of branchIn(said)) {
-    const part = overLong(one, words);
+    const part = overLong(one, most);
     if (!part) continue;
     out.push(
       row(said, "BranchNameHoldsFive", one, [
-        `A name holds ${words} words, and ${part} holds more. Cut it, or run`,
+        `A name holds ${most} words, and ${part} holds more. Cut it, or run`,
         "./RUNME.sh work new <name>, which cuts the branch and writes its brief.",
       ]),
     );

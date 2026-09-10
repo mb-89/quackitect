@@ -73,6 +73,7 @@ export function keysOf(schema) {
       out.push({
         key: `${section}.${leaf}`,
         type: one?.type,
+        options: Array.isArray(one?.enum) ? [...one.enum] : undefined,
         required: Boolean(wanted && said.required?.includes(leaf)),
       });
     }

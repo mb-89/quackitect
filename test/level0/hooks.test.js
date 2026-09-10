@@ -711,3 +711,102 @@ test("a reader that fails says so, and the check still stands", async () => {
   assert.match(said.result, /^check {6}passes$/m);
   assert.match(said.result, /^reader {5}the reader failed: it ran out$/m);
 });
+
+const PROJECTS = JSON.stringify({
+  projections: [
+    {
+      name: "the config commands",
+      shape: "config commands",
+      target: ".claude/commands",
+      from: "spec/config/level0.json",
+      schema: "spec/config/level0.schema.json",
+      wrap: "frontmatter",
+    },
+  ],
+});
+
+// [[spec/design_output/projection#who-projects-and-when]]
+test("a session start projects every target, and says what it costs", async () => {
+  const it = await started({ "spec/config/projections.json": PROJECTS });
+
+  const drawn = [...it.files.keys()].filter((one) => one.startsWith(".claude/commands/"));
+  assert.deepEqual(drawn.sort(), [
+    ".claude/commands/se-judge-enabled-false.md",
+    ".claude/commands/se-judge-enabled-true.md",
+    ".claude/commands/se-log-level.md",
+    ".claude/commands/se-stop-enabled-false.md",
+    ".claude/commands/se-stop-enabled-true.md",
+    ".claude/commands/se-stop-mostInARow.md",
+  ]);
+
+  const said = it.lines().find((one) => one.door === "project");
+  assert.equal(said.said, "6 file(s) written");
+  assert.equal(typeof said.ms, "number");
+  assert.equal(said.detail, "1 projection(s), 6 target(s)");
+});
+
+test("a second session start writes nothing, because every target stands", async () => {
+  const it = engine({ "spec/config/projections.json": PROJECTS });
+  await it.raise("session.start", {});
+  await it.raise("session.start", {});
+
+  const said = [...it.files]
+    .filter(([path]) => path.startsWith(".se/log/"))
+    .flatMap(([, text]) => rowsOf(text))
+    .filter((one) => one.door === "project");
+  assert.deepEqual(
+    said.map((one) => one.said),
+    ["6 file(s) written", "0 file(s) written"],
+    "the second start reads every target as it stands, so it writes none",
+  );
+});
+
+// [[spec/design_output/projection#the-write-door-refuses-one]]
+test("the write door refuses a write to a generated command", async () => {
+  const it = await started({ "spec/config/projections.json": PROJECTS });
+
+  for (const e of [
+    { tool: "Write", file_path: ".claude/commands/se-log-level.md", content: "mine\n" },
+    {
+      tool: "Edit",
+      file_path: "/home/one/tree/.claude/commands/se-stop-enabled-true.md",
+      new_string: "mine\n",
+    },
+  ]) {
+    const said = await it.raise("tool.call", e);
+    assert.match(said.deny, /is projected, so nothing may write it by hand/, e.tool);
+    assert.match(said.deny, /Edit spec\/config\/level0\.json instead/, e.tool);
+  }
+
+  const said = it.lines().filter((one) => one.door === "project" && one.tool);
+  assert.equal(said.length, 2, "each refusal writes one line");
+});
+
+test("the write door passes the source a projection reads", async () => {
+  const it = await started({ "spec/config/projections.json": PROJECTS });
+  const said = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/config/level0.json",
+    content: "{}\n",
+  });
+  assert.equal(said.deny, undefined);
+});
+
+test("a target the box refuses writes one warning, and the rest still land", async () => {
+  const it = engine({ "spec/config/projections.json": PROJECTS });
+  const files = it.files;
+  const was = files.set.bind(files);
+  files.set = (path, text) => {
+    if (path === ".claude/commands/se-log-level.md") throw new Error("read only");
+    return was(path, text);
+  };
+  await it.raise("session.start", {});
+  files.set = was;
+
+  const said = it.lines().filter((one) => one.door === "project");
+  assert.deepEqual(
+    said.map((one) => `${one.level} ${one.said}`),
+    ["info 5 file(s) written", "warn the box refuses a target"],
+  );
+  assert.equal(said[1].file, ".claude/commands/se-log-level.md");
+});
