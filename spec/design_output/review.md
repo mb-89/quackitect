@@ -128,6 +128,16 @@ report.
 So the session asking for a review spends one tool call and reads a short list.
 The diff reaches the reader's context alone.
 
+Two things about that call, both measured on client 2.1.267:
+
+| the thing | what the hook does |
+|---|---|
+| `timeoutMs` holds ten minutes at most | asks for five, and a longer ask rejects the call and skips the hook |
+| `RUNME.sh` writes install lines to both streams | runs `node src/scripts/cli.js`, whose output is the verb's alone |
+
+A call the engine rejects skips the hook, and the session then reads that level
+zero holds a tool nothing answers. So the ask stays inside the cap.
+
 ## Where the spawn refuses
 
 `$.agent.spawn` answers `{ deny }` where the engine refuses the spawn, and it

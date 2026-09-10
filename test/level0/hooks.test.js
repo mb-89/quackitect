@@ -291,8 +291,8 @@ test("the review tool runs the verb, spawns a reader and answers the report", as
 
   const ran = it.runs.find((one) => one.argv.includes("review"));
   assert.deepEqual(ran.argv, [
-    "sh",
-    "RUNME.sh",
+    "node",
+    "src/scripts/cli.js",
     "work",
     "review",
     "the-config-holds-numbers",

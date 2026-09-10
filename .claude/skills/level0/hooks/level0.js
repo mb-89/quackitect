@@ -46,7 +46,8 @@ const TRUNK = "main";
 const JUDGED = "spec/config/styles/VoiceJudged";
 
 const ANSWER = "level0-answer.md";
-const GATHERING = 900000;
+const GATHERING = 300000;
+const GATHER = ["node", "src/scripts/cli.js"];
 
 export function register(on, _options) {
   let bin = null;
@@ -215,12 +216,12 @@ export function register(on, _options) {
     const name = String(e.branch ?? "").trim();
     if (!name) return { result: "review_branch takes one branch name." };
 
-    const ran = await $.process.run(["sh", "RUNME.sh", "work", "review", name, "--json"], {
+    const ran = await $.process.run([...GATHER, "work", "review", name, "--json"], {
       timeoutMs: GATHERING,
     });
     const material = materialOf(ran.stdout);
     if (!material) {
-      const why = `${ran.stderr ?? ""}${ran.stdout ?? ""}`.trim();
+      const why = String(ran.stderr ?? "").trim() || String(ran.stdout ?? "").trim();
       await logbook.say("warn", "review", `the verb gathered nothing for ${name}`, {
         detail: why.slice(0, 200),
       });
