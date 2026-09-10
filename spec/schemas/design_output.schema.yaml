@@ -1,0 +1,42 @@
+# What a piece of this tree does, and why it takes the shape it takes. Code
+# names a section here, so a reader meets the mechanism one hop from the line.
+#
+# A note describes a thing that stands, or it implements a design input. One of
+# the two, and one only.
+#
+# The body runs free. Twelve notes share no chapter, because each follows the
+# thing it describes.
+#
+# The frontmatter half is JSON Schema 2020-12, https://json-schema.org/draft/2020-12.
+# The body half is this project's own, borrowed from https://document-schema.org.
+
+kind: design_output
+
+frontmatter:
+  type: object
+  additionalProperties: false
+  required:
+    - kind
+  oneOf:
+    - required: [describes]
+    - required: [implements]
+  properties:
+    kind:
+      const: design_output
+      x-link: true
+      description: which schema reads this note
+
+    describes:
+      x-link: true
+      description: the file or folder this note explains, one link that resolves
+
+    implements:
+      x-link: true
+      description: the design input this note answers, one link that resolves
+
+body:
+  headingLevel: 1
+  order: free
+  extraSections: true
+  tense: present
+  description: one chapter per mechanism, named so a comment in the code can point at it
