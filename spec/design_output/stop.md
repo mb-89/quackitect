@@ -175,16 +175,14 @@ answers itself, because it is the only thing in the room that knows.
 
 The hook counts the turns it has carried one after another.
 
-- Past `mostInARow`, default 3, it writes a `warn` line and lets the turn end.
+- Past `mostInARow`, it writes a `warn` line and lets the turn end.
 - A prompt from outside the plugin resets the count, because that is a person
   taking the session back.
 
-`spec/config/level0.json` carries both controls:
-
-    "stop": {
-      "enabled": true,
-      "mostInARow": 3
-    }
+The hook asks the resolver for `stop.mostInARow` and `stop.enabled` at each
+turn end, and `atTurnEnd` takes the cap as an argument. So the tooth carries no
+number of its own, and a write to `.se/config.json` reaches the next turn. For
+details, see [[spec/design_output/config#a-caller-hands-it-in]].
 
 The tooth is on for a desk session as well as a cloud one. The discussion rule
 covers a person standing there.

@@ -230,6 +230,52 @@ test("a held branch carries the turn once the session stops being new", async ()
   assert.match(it.prompts[0].text, /- Does the work stand complete\?/);
 });
 
+// [[spec/design_output/config#the-schema-says-the-type]]
+test("a session start says which field the config lacks", async () => {
+  const it = await started({
+    "spec/config/level0.schema.json": JSON.stringify({
+      type: "object",
+      required: ["stop"],
+      properties: {
+        stop: {
+          type: "object",
+          required: ["enabled", "mostInARow", "hardestWord"],
+          properties: {
+            enabled: { type: "boolean" },
+            mostInARow: { type: "number" },
+            hardestWord: { type: "string" },
+          },
+        },
+      },
+    }),
+  });
+
+  const said = it.lines().filter((one) => one.door === "config");
+  assert.deepEqual(
+    said.map((one) => one.said),
+    ["stop.hardestWord is missing"],
+  );
+});
+
+// [[spec/design_output/config#the-three-layers]]
+test("a write to the per-box file reaches the next turn end", async () => {
+  const it = await started({ "HANDOVER.md": "---\nstatus: held\n---\n\n# The brief\n" });
+  for (let i = 0; i < 10; i++) {
+    await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  }
+  it.files.set(".se/config.json", JSON.stringify({ stop: { mostInARow: 1 } }));
+
+  await it.raise("turn.complete", { ...answered, answer: "one step" });
+  await it.raise("turn.complete", { ...answered, answer: "another step" });
+
+  const said = it.lines().filter((one) => one.door === "stop");
+  assert.deepEqual(
+    said.map((one) => one.said),
+    ["the turn goes on", "carried enough turns in a row", "the turn ends"],
+    "the tracked file says three, and the per-box file cuts it to one",
+  );
+});
+
 // [[spec/design_output/level0#the-canary]]
 test("the canary comes back whole, and a missing one writes a warning", async () => {
   const said = canary({ rules: 2, notes: 1, stop: true });
@@ -320,12 +366,12 @@ test("a helper's call passes, because the helper owes the owner nothing", async 
   assert.equal(said.deny, undefined);
 });
 
-test("answerFirst turns the door off", async () => {
+test("the answer door turns off", async () => {
   const it = await started({
     "spec/config/level0.json": JSON.stringify({
       judge: { enabled: false },
       stop: { enabled: true, mostInARow: 3 },
-      answerFirst: { enabled: false },
+      answer: { enabled: false },
       log: { level: "info" },
     }),
   });

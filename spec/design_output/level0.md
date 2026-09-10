@@ -320,7 +320,7 @@ better than a refusal naming it.
 - `AskUserQuestion`, which reaches the owner itself. A door refusing it stops a
   session from asking the one thing it needs.
 
-`answerFirst` in `spec/config/level0.json` turns the door off, the way the judge
+`answer.enabled` in `spec/config/level0.json` turns the door off, the way the judge
 and the tooth turn off. A rule nobody can turn off stops the tree on the day it
 reads something wrongly.
 
@@ -374,6 +374,10 @@ colon inside one through `OneTitle`, because both turn one title into two.
 Vale reads what a file holds, and its path stays outside that. So
 `.claude/skills/level0/lib/names.js` counts a name instead. `work new` refuses a
 long branch, and a contract test holds every tracked path.
+
+The config holds the cap as `names.words`, and the caller hands it to
+`overLong`.
+For details, see [[spec/design_output/config#a-caller-hands-it-in]].
 
 # A broken rule says so
 

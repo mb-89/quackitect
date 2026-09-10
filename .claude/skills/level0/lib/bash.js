@@ -3,7 +3,7 @@
 // [[spec/design_output/bash#what-the-door-reads]]
 
 import { CODE } from "./code.js";
-import { overLong, WORDS } from "./names.js";
+import { overLong } from "./names.js";
 import { PROSE } from "./vale.js";
 
 export const VERBS = ["check", "work", "log", "doctor"];
@@ -156,7 +156,7 @@ export function testIn(command) {
   return out;
 }
 
-export function findings(command) {
+export function findings(command, most) {
   const said = String(command ?? "");
   const out = [];
 
@@ -171,11 +171,11 @@ export function findings(command) {
   }
 
   for (const one of branchIn(said)) {
-    const part = overLong(one);
+    const part = overLong(one, most);
     if (!part) continue;
     out.push(
       row(said, "BranchNameHoldsFive", one, [
-        `A name holds ${WORDS} words, and ${part} holds more. Cut it, or run`,
+        `A name holds ${most} words, and ${part} holds more. Cut it, or run`,
         "./RUNME.sh work new <name>, which cuts the branch and writes its brief.",
       ]),
     );

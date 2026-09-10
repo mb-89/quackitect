@@ -2,7 +2,6 @@
 // .se/tools.json, which every caller reads in place of a guess.
 // [[spec/design_output/tools#what-the-survey-writes]]
 
-import { join } from "node:path";
 import {
   callsOf,
   guesses,

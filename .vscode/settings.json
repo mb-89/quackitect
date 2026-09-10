@@ -16,6 +16,12 @@
     "win32-arm64": ".se/bin/biome.exe"
   },
   "biome.configurationPath": "spec/config/biome.json",
+  "json.schemas": [
+    {
+      "fileMatch": ["/spec/config/level0.json"],
+      "url": "./spec/config/level0.schema.json"
+    }
+  ],
   "biome.requireConfiguration": true,
   "editor.formatOnSave": true,
   "[javascript]": {

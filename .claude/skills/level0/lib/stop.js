@@ -10,7 +10,6 @@ export const TOOL = "claim_stop";
 export const CALLED = `mcp__level0__${TOOL}`;
 export const OFF = "stop-hook-off";
 export const LIVES = 2;
-export const IN_A_ROW = 3;
 export const FRESH = 10;
 
 const NEEDS = ["id", "side", "priority", "decides"];
@@ -134,7 +133,6 @@ export function claimSpec(rules) {
 // [[spec/design_output/stop#the-tooth-holds-its-state]]
 export function toothOf(init = {}) {
   const lives = init.lives ?? LIVES;
-  const mostInARow = init.mostInARow ?? IN_A_ROW;
   const fresh = init.fresh ?? FRESH;
 
   let calls = 0;
@@ -167,10 +165,11 @@ export function toothOf(init = {}) {
       if (!mine) inARow = 0;
     },
 
-    atTurnEnd(decision) {
+    // [[spec/design_output/config#a-caller-hands-it-in]]
+    atTurnEnd(decision, mostInARow) {
       const held = claim;
       claim = null;
-      const runaway = !decision.ends && inARow >= mostInARow;
+      const runaway = !decision.ends && mostInARow > 0 && inARow >= mostInARow;
       const ends = decision.ends || runaway;
       if (ends) {
         granted = true;
