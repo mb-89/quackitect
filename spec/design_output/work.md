@@ -189,3 +189,20 @@ it from the command, and one routine prompt then serves every branch:
 That verb fetches, picks a branch carrying a brief, checks it out, claims it by
 pushing, and prints what to do. A session losing the race meets a rejected
 push and takes the next one.
+
+# The routine a verb names
+
+One routine already works this queue. `do_work` holds the id
+`trig_01KCYQ2oxi7rnCuBZYJsnLnQ` and carries one prompt: `./RUNME.sh work take`.
+
+Firing it belongs to the session, because `RemoteTrigger` is a tool the client
+holds and the token stays inside that process. A shell verb reaches neither, so
+`work trigger` names what a session then fires:
+
+    ./RUNME.sh work trigger
+
+It prints the routine, the id, and every branch standing free. A branch on that
+list is one a box takes, so the length of the list says how many boxes to fire.
+
+`freeNow` answers that list from the briefs alone, and `take` picks the first of
+it. So the verb and the box share one rule.

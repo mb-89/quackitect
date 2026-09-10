@@ -16,6 +16,7 @@ import {
   CONTRACT_HEADING,
   DONE,
   dependsOn,
+  freeNow,
   HELD,
   MINE,
   setStatus,
@@ -380,4 +381,26 @@ test("done refuses where the battery answers nothing green", () => {
     [join(ROOT, STAMP)]: JSON.stringify({ sha: SHA, ok: true, clean: false, at: "now" }),
   });
   assert.match(heard(() => work(ROOT, ["done"], dirty.it)).said, /unclean tree/);
+});
+
+test("freeNow names a branch at todo waiting on nobody, and no other", () => {
+  const said = (status, waits) =>
+    `---\nstatus: ${status}\n${waits ? `depends_on: ${waits}\n` : ""}---\n\n# A brief\n`;
+
+  const free = freeNow(
+    new Map([
+      ["work/open", said(TODO)],
+      ["work/waiting", said(TODO, "open")],
+      ["work/holding", said(HELD)],
+      ["work/finished", said(DONE)],
+    ]),
+  );
+
+  assert.deepEqual(free, ["work/open"]);
+});
+
+test("freeNow frees a branch whose dependency left the queue", () => {
+  const waits = `---\nstatus: ${TODO}\ndepends_on: merged-already\n---\n\n# A brief\n`;
+
+  assert.deepEqual(freeNow(new Map([["work/late", waits]])), ["work/late"]);
 });

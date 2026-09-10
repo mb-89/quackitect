@@ -15,6 +15,9 @@ export const MINE = /^(work|claude)\//;
 
 export const TODO = "todo";
 export const HELD = "held";
+
+// [[spec/design_output/work#the-routine-a-verb-names]]
+export const ROUTINE = { name: "do_work", id: "trig_01KCYQ2oxi7rnCuBZYJsnLnQ" };
 export const DONE = "done";
 
 export function work(root, argv, doors) {
@@ -33,6 +36,7 @@ export function work(root, argv, doors) {
     review,
     list,
     collect,
+    trigger,
   };
   if (doing[what] && LOUD.includes(what)) {
     return tell(it, what, doing[what](it, name, argv));
@@ -52,6 +56,7 @@ export function work(root, argv, doors) {
     console.log("  merge <name>  take a done branch into main");
     console.log("  close [name]  delete a branch already inside main, or every one");
     console.log("  collect       every branch marked done, waiting on a merge");
+    console.log("  trigger       the routine that works a branch, and what stands free");
     return what ? 2 : 0;
   }
   return doing[what](it, name, argv);
@@ -309,6 +314,31 @@ function take(it) {
   console.log(`You are on ${branch}, and it now stands at ${HELD}.`);
   console.log(`Write your result into ${BRIEF}, then run ./RUNME.sh work done.\n`);
   console.log(brief.trim());
+  return 0;
+}
+
+// [[spec/design_output/work#the-routine-a-verb-names]]
+export function freeNow(briefs) {
+  const standing = new Map([...briefs].map(([b, text]) => [b, statusOf(text)]));
+  return [...briefs]
+    .filter(([, text]) => statusOf(text) === TODO)
+    .filter(([, text]) => !waitingOn(text, standing).length)
+    .map(([branch]) => branch);
+}
+
+function trigger(it) {
+  const free = freeNow(new Map(branches(it).map((b) => [b, briefOf(it, b)])));
+
+  console.log(`${ROUTINE.name} runs ./RUNME.sh work take on a cloud box.`);
+  console.log("Fire it with the RemoteTrigger tool, once for every box you want:\n");
+  console.log(`    action=run  trigger_id=${ROUTINE.id}\n`);
+
+  if (!free.length) {
+    console.log("No branch stands free, so a box fired now takes nothing.");
+    return 0;
+  }
+  console.log("These branches stand free, and a box takes one each:");
+  for (const branch of free) console.log(`  ${branch}`);
   return 0;
 }
 
