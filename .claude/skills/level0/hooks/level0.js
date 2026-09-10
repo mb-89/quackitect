@@ -4,6 +4,7 @@
 // [[spec/design_output/level0#the-write-door]]
 
 import { opensATurn, reachesTheOwner, SAYS, spokeSince } from "../lib/answer.js";
+import { commitIn, findings as readsCommand, verbLine } from "../lib/bash.js";
 import { CODE, formatText, lintText as lintCode } from "../lib/code.js";
 import {
   bindsHere,
@@ -17,7 +18,7 @@ import {
 } from "../lib/guidance.js";
 import { judgeOf } from "../lib/judge.js";
 import { aimOf, asLines, FOLDER, nameOf, rowOf, writes } from "../lib/log.js";
-import { refusal, taught } from "../lib/refuse.js";
+import { refusal, refusedCommand, taught } from "../lib/refuse.js";
 import { readRule } from "../lib/rulefile.js";
 import { guesses, pathOf, surveyOf, TOOLS } from "../lib/tools.js";
 import {
@@ -31,10 +32,10 @@ import {
   toothOf,
 } from "../lib/stop.js";
 import { landsOnTrunk, touchesGit } from "../lib/trunk.js";
-import { lintText } from "../lib/vale.js";
+import { lintText, PROSE } from "../lib/vale.js";
 
-const PROSE = /\.(md|markdown|txt)$/i;
 const GUIDANCE = "spec/guidance";
+const COMMIT = "level0-commit.md";
 const CONFIG = "spec/config/level0.json";
 const HANDOVER = ".se/HANDOVER.md";
 const BRIEF = "HANDOVER.md";
@@ -202,6 +203,29 @@ export function register(on, _options) {
     };
   });
 
+  // [[spec/design_output/bash#what-the-door-reads]]
+  on("tool.call", { tool: "Bash" }, async ($, e, next) => {
+    const said = String(e.command ?? "");
+    const found = readsCommand(said);
+    found.push(...(await commitVoice($, said, bin)));
+    if (!found.length) return next(e);
+
+    await logbook.say("warn", "bash", `refused ${found.length} rule(s) in a command`, {
+      tool: "Bash",
+      rule: found[0].rule,
+      detail: said.slice(0, 120),
+    });
+    return { deny: refusedCommand(said, found) };
+  });
+
+  // [[spec/design_output/bash#the-description-names-verbs]]
+  on("tool.describe", { tool: "Bash" }, async (_$, e, next) => {
+    const said = await next(e);
+    const base = said && typeof said === "object" ? said : {};
+    const text = String(base.description ?? e.description ?? "").trim();
+    return { ...base, description: [text, verbLine()].filter(Boolean).join("\n\n") };
+  });
+
   // [[spec/design_output/stop#the-claim-and-its-life]]
   on("tool.call", { tool: "mcp__level0__claim_stop" }, async (_$, e, _next) => {
     const said = tooth.claims(String(e.rule ?? ""), String(e.why ?? ""));
@@ -365,6 +389,28 @@ async function answerDoor($, e, it) {
     tool: e.tool,
   });
   return { deny: SAYS, owed: true };
+}
+
+// [[spec/design_output/bash#a-commit-message-meets-voice]]
+async function commitVoice($, command, bin) {
+  const said = commitIn(command);
+  if (!said || !bin) return [];
+
+  let text = String(said.text ?? "");
+  if (said.form === "file") {
+    try {
+      text = await $.fs.read(said.file);
+    } catch {
+      return [];
+    }
+  }
+  if (!text.trim()) return [];
+
+  const ran = await lintText(text, COMMIT, {
+    bin,
+    run: (argv, init) => $.process.run(argv, init),
+  });
+  return ran.ran ? ran.found : [];
 }
 
 // [[spec/design_output/level0#the-canary]]

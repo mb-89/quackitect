@@ -185,15 +185,19 @@ and a breach comes back as `{ deny }` naming the rule, the line and the phrase.
 The refusal closes by asking the writer to hold that rule for the rest of the
 turn. A refusal teaching one line costs a round trip on every line.
 
+A shell reaches the same files through `>`, `tee`, `sed -i` and a heredoc, so
+`tool.call` reads a Bash command as well. For details, see
+[[spec/design_output/bash]].
+
 ## The door reaches a helper
 
 A subagent's writes go through the same `tool.call` chain, so the door reads
 them the way it reads the session's own. A live run on 2026-09-09 watches it
 refuse a helper's `Write` over `Contraction`.
 
-That helper then writes the same text through `printf` in Bash, and the door
-reads nothing. The door hooks `Write`, `Edit` and `MultiEdit`, and a shell
-holds the way past it, for a helper and for a session alike.
+That helper then writes the same text through `printf` in Bash. The write door
+hooks `Write`, `Edit` and `MultiEdit` alone, so a shell reaches past it. The
+Bash door reads that road, for a helper and for a session alike.
 
 ## The formatter applies itself
 
