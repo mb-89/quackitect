@@ -63,3 +63,23 @@ per door drives the real tool and holds the contract, and everything above it
 runs on the fake.
 
 That test costs what the real thing costs, once for the suite.
+
+## 5. The doc comes first
+
+Agents in this tree keep inverting the order. They build the thing, write the
+design doc over what stands, then write tests against the code in front of them.
+Each artifact records the implementation and rules on nothing.
+
+| the order | what the doc holds | what the test holds |
+|---|---|---|
+| doc, test, code | what the work owes | the claim the doc makes |
+| code, doc, test | what the code does | the code, in another form |
+
+Read the reason a test gives on its failing run, and match it against the claim
+in the test's name. A test that follows the code passes on its first run and
+leaves that reason unread. A test failing on a missing import says nothing about
+the claim it names.
+
+Weigh the doc against the change. A doc costs a paragraph to change, and the
+same design in code costs the code. Write one where the design holds a decision
+somebody else would make differently, and skip it on a one-line fix.

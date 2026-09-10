@@ -1,12 +1,16 @@
 {
-  "comment": "The controls for level zero. Every rule lives in spec/config/styles, one file each: VoiceVale for the rules Vale holds, VoiceJudged for the rules a model holds.",
+  "comment": "The controls for level zero, and the defaults every box starts from. spec/config/level0.schema.json says the type of each one, the environment beats this file, and .se/config.json beats both. Ask ./RUNME.sh config which layer answers. Every rule lives in spec/config/styles, one file each: VoiceVale for the rules Vale holds, VoiceJudged for the rules a model holds.",
   "stop": {
     "comment": "The tooth. enabled false takes it out, and mostInARow caps the turns it carries one after another. The rules it votes over live in spec/config/stop.",
     "enabled": true,
     "mostInARow": 3
   },
+  "answer": {
+    "comment": "The door holding the owner's prompt first. It refuses a tool call in a turn a person opens where nothing has answered them yet. enabled false takes it out.",
+    "enabled": true
+  },
   "log": {
-    "comment": "The level this box writes at. info writes everything, warn writes a refusal and a fault, error writes a fault. A level nobody names reads as info.",
+    "comment": "The level this box writes at. info writes everything, warn writes a refusal and a fault, error writes a fault.",
     "level": "info"
   },
   "judge": {
@@ -16,5 +20,9 @@
     "maxSpans": 24,
     "warmupWrites": 4,
     "thenEveryNth": 3
+  },
+  "names": {
+    "comment": "The words a file, a folder and a branch name each hold at most. Vale counts a heading, and lib/names.js counts a path.",
+    "words": 5
   }
 }

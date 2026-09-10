@@ -3,7 +3,9 @@
 // where that work stands.
 // [[spec/design_output/work#the-round-trip]]
 
-import { overLong, WORDS } from "../../.claude/skills/level0/lib/names.js";
+import { overLong } from "../../.claude/skills/level0/lib/names.js";
+import { saysGreen, STAMP, stampOf } from "../../.claude/skills/level0/lib/runs.js";
+import { review } from "./review.js";
 
 export const BRIEF = "HANDOVER.md";
 const TRUNK = "main";
@@ -28,6 +30,7 @@ export function work(root, argv, doors) {
     merge,
     close,
     read,
+    review,
     list,
     collect,
   };
@@ -44,6 +47,7 @@ export function work(root, argv, doors) {
     console.log("  done          mark this branch done, commit and push");
     console.log("  release       put this branch, or the one you name, back to todo");
     console.log("  read <name>   print what stands on work/<name>");
+    console.log("  review <name> gather what a reader needs, and answer the report");
     console.log("  list          every work branch and its status");
     console.log("  merge <name>  take a done branch into main");
     console.log("  close [name]  delete a branch already inside main, or every one");
@@ -225,8 +229,8 @@ function newWork(it, name) {
     console.error("work new needs a name: ./RUNME.sh work new fix-lsp");
     return 2;
   }
-  if (overLong(name)) {
-    console.error(`A branch name holds ${WORDS} words, and ${name} holds more.`);
+  if (overLong(name, it.words)) {
+    console.error(`A branch name holds ${it.words} words, and ${name} holds more.`);
     return 2;
   }
   const branch = `work/${name}`;
@@ -319,9 +323,24 @@ function finish(it) {
     console.error(`Write your result to ${BRIEF} first. It is what comes back.`);
     return 2;
   }
+  const said = batterySays(it);
+  if (!said.green) {
+    console.error(`${branch} claims nothing yet: ${said.says}.`);
+    console.error("Commit your work, run ./RUNME.sh check, then run work done.");
+    return 1;
+  }
+
   if (!push(it, branch, setStatus(it.disk.read(path), DONE), DONE)) return 1;
-  console.log(`${branch} stands at ${DONE}. The merge belongs to a person.`);
+  console.log(`${branch} stands at ${DONE}, and ${said.says}.`);
+  console.log("The merge belongs to a person.");
   return 0;
+}
+
+// [[spec/design_output/work#the-battery-answers-before-done]]
+function batterySays(it) {
+  const at = it.join(it.root, STAMP);
+  const text = it.disk.exists(at) ? it.disk.read(at) : "";
+  return saysGreen(stampOf(text), it.git.run(["rev-parse", "HEAD"], true).out);
 }
 
 function release(it, name) {
@@ -419,7 +438,7 @@ function merge(it, name) {
     it.git.run(["commit", "--amend", "--no-edit"], true);
   }
 
-  console.log(`${branch} is merged. Run ./RUNME.sh check, then work sweep.`);
+  console.log(`${branch} is merged. Run ./RUNME.sh check, then work close.`);
   return 0;
 }
 
@@ -452,7 +471,7 @@ function close(it, name, argv) {
       .filter((row) => MINE.test(row)),
   );
 
-  const wanted = name ? [`work/${name}`] : [...inTrunk];
+  const wanted = name ? [MINE.test(name) ? name : `work/${name}`] : [...inTrunk];
   if (!wanted.length) {
     console.log(`No work branch stands inside ${TRUNK}.`);
     return 0;

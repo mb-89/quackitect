@@ -17,16 +17,36 @@ export function refusal(where, found) {
   return lines.join("\n");
 }
 
+// [[spec/design_output/bash#what-every-refusal-owes]]
+export function refusedCommand(command, found) {
+  const lines = [];
+  lines.push("Level zero refuses this command.");
+  lines.push("");
+  lines.push(`  ran: ${cut(command, 120)}`);
+  lines.push("");
+
+  for (const one of found) {
+    lines.push(`  ${one.rule}`);
+    if (one.said) lines.push(`    reads: ${cut(one.said)}`);
+    lines.push(`    ${one.message}`);
+    lines.push("");
+  }
+
+  lines.push(`Hold ${namesOf(found)} for the rest of this turn.`);
+  return lines.join("\n");
+}
+
 export function taught(found) {
-  const names = [...new Set(found.map((f) => f.rule))];
-  const list =
-    names.length === 1
-      ? names[0]
-      : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
   return (
-    `Hold ${list} for the rest of this turn: apply the same rule to every line you write next, ` +
+    `Hold ${namesOf(found)} for the rest of this turn: apply the same rule to every line you write next, ` +
     "and fix the lines you already wrote if they break it."
   );
+}
+
+function namesOf(found) {
+  const names = [...new Set(found.map((f) => f.rule))];
+  if (names.length === 1) return names[0];
+  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
 }
 
 export function line(one, where) {

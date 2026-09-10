@@ -16,6 +16,78 @@ its first session with nothing typed.
 Every line here comes from running it on 2026-09-08 against client 2.1.263. The
 surface is early access and moves, so run it again before you trust this.
 
+The sections below carry their own date where a later run measures them again.
+
+## The file surface renames itself
+
+Measured on 2026-09-09 against client 2.1.267:
+
+| what this tree calls | what the client offers |
+|---|---|
+| `$.fs.readFile` | `$.fs.read` |
+| `$.fs.writeFile` | `$.fs.write` |
+| `$.fs.listDir` | `$.fs.list` |
+
+The old three answer `undefined`. A hook calling one throws, the engine skips
+that hook, and the chain carries on without it.
+
+So on that client level zero writes no stamp, writes no log line, reads no
+guidance and holds no write door. The prompt says nothing about it.
+
+Three readings of the same module, and what each one tells you:
+
+| what you run | what it says about a moved method |
+|---|---|
+| `claude plugin validate` | nothing, it reads which nouns the source touches |
+| `claude --debug` | the throw, in the debug log alone |
+| `/plugin-types` | the running build's own declarations |
+
+So read `/plugin-types` first, and run the module against the client before you
+trust it.
+
+## A subagent brings no session
+
+Measured on 2026-09-09 against client 2.1.267, by a probe writing one file per
+hook event through a whole run.
+
+| what a subagent fires | what reaches it |
+|---|---|
+| `session.start` | nothing, the session fires it once |
+| `prompt.context` | nothing, so the standing layer misses it |
+| `tool.call` | the session's own hooks, `agentId` set |
+
+One module instance holds the session and every subagent inside it. A
+subagent's calls come back through the session's own hooks, under an `agentId`
+the main loop leaves out.
+
+So the write door already holds over a helper, and the guidance is the gap.
+`agent.spawn` closes it.
+
+## The spawn carries a rewrite
+
+Measured the same day and the same way. `agent.spawn` fires once per subagent,
+before its model resolves.
+
+| what the event carries | what a hook does with it |
+|---|---|
+| `prompt`, `description`, `subagentType` | a rewrite stands |
+| `model`, `cwd`, `background` | a rewrite stands |
+| `tool_use_id`, `fork`, `parentModel` | pinned |
+
+A hook calling `next({ ...e, prompt })` hands the subagent the new prompt. A
+probe prepending one instruction sees the subagent obey it, and `next(e)`
+resolves to `{ model }`, the id the spawn settles on.
+
+## A step arrives late
+
+`turn.step` fires once the step's tool calls run. It says what a step does, and
+a door reading it learns too late.
+
+`$.session.messages()` answers sooner. At `tool.call` the transcript already
+carries the text the model writes in that same response.
+
+So a hook there reads whether the session has spoken this turn.
+
 ## Arguments arrive on the event
 
 A tool's arguments sit on the event beside `tool` and `tool_use_id`, so a write
@@ -44,8 +116,8 @@ before a session starts.
 
 ## The filesystem reads and writes
 
-`$.fs` offers `readFile`, `writeFile`, `listDir`, `exists`, `stat` and
-`ancestors`. It deletes nothing, so a delete goes through `$.process.run`.
+`$.fs` offers `read`, `write`, `list`, `exists`, `stat` and `ancestors`. It
+deletes nothing, so a delete goes through `$.process.run`.
 
 ## A session misses its install
 
@@ -95,6 +167,21 @@ So level zero holds no cloud session that starts the ordinary way, and
 `~/.claude.json` carries `hasTrustDialogAccepted: false` there. The flag lives
 outside the tree, so no tracked file moves it.
 
+The gate holds the scan alone. Measured on 2026-09-10 against client 2.1.267,
+by a probe on a cloud clone carrying no trust. The `env` key bites there, and
+so does a `permissions` deny rule in `.claude/settings.json`. So the tracked
+file still says what a session may do, and level zero is the one part waiting
+on the flag.
+
+Read the flag before you read anything else. A second probe the same day, on
+client 2.1.42, reads the box around it:
+
+| what a cloud box carries | what the probe reads |
+|---|---|
+| `CLAUDE_CODE_ENABLE_FUNCTION_HOOKS` | `1`, so the switch stands ready |
+| `hasTrustDialogAccepted`, per project | `false`, and the top level holds no key |
+| permission mode | auto, and no call there raises a prompt |
+
 Two things reach a cloud box today:
 
 - `claude --plugin-dir .claude/skills/level0`, which loads the folder for that
@@ -105,6 +192,68 @@ Two things reach a cloud box today:
 The canary finds this. A session saying the line out loud is a session level
 zero holds, and a cloud session that starts the ordinary way says nothing.
 
+Client 2.1.267 stands the same way, measured on 2026-09-10 on a cloud box. The
+debug log names the count, and `.se/level0.stamp` stands nowhere in the tree:
+
+    [plugins] Found 1 plugins (1 enabled, 0 disabled)
+    [plugins] Registered 0 hooks from 1 plugins
+
+The one plugin it counts belongs to the client. So a branch measuring what a
+hook costs at `session.start` measures the module itself here, and says which
+door it takes.
+
+## The setup writes the flag
+
+`src/scripts/trust.js` writes it where the tree and `node` both stand to hand.
+A cloud environment carries neither at setup time. Measured on 2026-09-10: a
+setup naming `node src/scripts/trust.js` fails, and the session ends at
+`init_script` with no first turn. A failing setup takes the session with it, so
+the one an environment carries leans on nothing:
+
+    #!/bin/bash
+    set -u
+    repo="$PWD"
+    [ -d "$repo/.git" ] || repo=/home/user/quackitect
+    python3 - "$repo" <<'PY' || true
+    import json, os, sys
+    folder, path = sys.argv[1], os.path.expanduser("~/.claude.json")
+    try:
+        said = json.load(open(path))
+    except Exception:
+        said = {}
+    said["hasTrustDialogAccepted"] = True
+    said.setdefault("projects", {}).setdefault(folder, {})["hasTrustDialogAccepted"] = True
+    tmp = path + ".trust"
+    json.dump(said, open(tmp, "w"), indent=2)
+    os.replace(tmp, path)
+    print("trusted", folder, "in", path)
+    PY
+    exit 0
+
+Both readers mark this folder one the client trusts, and both leave every other
+key and every other project alone. The `exit 0` holds a session up where the
+write fails. Nothing races either one, because the setup runs before a session
+holds the file.
+
+A box carrying that setup says the canary out loud. Measured on 2026-09-10, on
+a cloud box cloning `main`:
+
+| what a box answers | with no setup | with the setup |
+|---|---|---|
+| `hasTrustDialogAccepted` | false | true |
+| `claude plugin list` | the scan skips one folder | level zero loads |
+| the canary line | absent | the session says it |
+| the cloud guidance | absent | the standing layer carries it |
+
+The scan happens once, at the start, so a session already under way needs one
+more step. The client names it in the same line the probe read: once the trust
+stands, `/reload-plugins` loads what qualifies, and a relaunch does the same. A
+person types that, so the setup stays the road for a box nobody watches.
+
+The flag sits in the home of the box, which a cloud box puts at `/root` while
+the tree sits under `/home/user`. So the script reads `HOME` for the path, and
+it prints the file it writes for the setup log to carry.
+
 # The write door
 
 `tool.call` reads every Write and Edit. Prose goes to Vale, code goes to Biome,
@@ -112,6 +261,20 @@ and a breach comes back as `{ deny }` naming the rule, the line and the phrase.
 
 The refusal closes by asking the writer to hold that rule for the rest of the
 turn. A refusal teaching one line costs a round trip on every line.
+
+A shell reaches the same files through `>`, `tee`, `sed -i` and a heredoc, so
+`tool.call` reads a Bash command as well. For details, see
+[[spec/design_output/bash]].
+
+## The door reaches a helper
+
+A subagent's writes go through the same `tool.call` chain, so the door reads
+them the way it reads the session's own. A live run on 2026-09-09 watches it
+refuse a helper's `Write` over `Contraction`.
+
+That helper then writes the same text through `printf` in Bash. The write door
+hooks `Write`, `Edit` and `MultiEdit` alone, so a shell reaches past it. The
+Bash door reads that road, for a helper and for a session alike.
 
 ## The formatter applies itself
 
@@ -129,6 +292,34 @@ question per span, so it runs where the patterns already passed.
 
 It reads every span of the first writes in a session, then samples. A breach
 puts it back to reading everything.
+
+## The path a rule reads
+
+Hand every rule the path the repo root holds. Vale scopes on it, and the judge
+scopes on it.
+
+| what the client sends | what the door hands on |
+|---|---|
+| `C:\...\quackitect-v5\spec\rationales\a.md` | `spec/rationales/a.md` |
+| `spec/rationales/a.md` | `spec/rationales/a.md` |
+
+Keep every folder in that path, so `[spec/rationales/*.md]` and each other
+`.vale.ini` section matches what Vale reads at `--path`.
+
+Ask git for the root once a session, through `git rev-parse --show-toplevel`,
+and take it off the front with `relativeTo`. Leave the path whole where the box
+answers nothing.
+
+## A judged rule scopes
+
+Give a judged rule `ignores`, holding one glob a line. The judge asks the model
+nothing for a file those globs reach.
+
+    ignores:
+      - spec/rationales/*.md
+
+List a folder there where the rule's question misreads its job. `Actionable`
+ignores `spec/rationales` and `spec/design_output`, and stands everywhere else.
 
 # The standing layer
 
@@ -164,6 +355,83 @@ in the answer:
 So the log carries the canary as well, and a person reads it later without
 watching the session run. `./RUNME.sh standing` ends with the same sentence,
 because `canary` builds it in `lib/guidance.js` and both callers read it there.
+
+## The helper takes the guidance
+
+A subagent reads no standing layer of its own, so `agent.spawn` hands it one.
+The hook prepends the session's own standing text to the spawn's prompt, under
+the heading the session reads, and puts the task under `# Your task`.
+
+One guidance file then binds every agent in the tree, and no helper reads a
+second copy. `forHelper` in `lib/guidance.js` builds the text, and the log
+writes one `agent` line naming the type it reaches.
+
+The rules a helper writes under are the rules the write door holds it to, so
+the two now say the same thing.
+
+# The owner's prompt comes first
+
+`spec/guidance/working.md` opens with two rules: answer the owner before the
+next tool call, and open that answer by saying back what you understood.
+
+Both hold exactly as well as a session remembers them. So a door holds them
+instead.
+
+## What the door reads
+
+The door marks a turn a person opens, and refuses the first `tool.call` of that
+turn while nothing has reached them.
+
+| what the hook holds | when |
+|---|---|
+| a turn stands open, and nothing answers it | `prompt.submit`, from a person |
+| the turn carries an answer | any text the session sends |
+| the mark clears | `turn.complete` |
+
+Whether the turn carries an answer comes out of `$.session.messages()`. The
+prompt standing open is the last user message carrying no tool result, and text
+from the session after it answers that prompt.
+
+The read costs no model call, and it sees text the model writes beside the very
+call the door holds. A response opening with a sentence and closing with a tool
+call therefore passes.
+
+## Which prompt opens a turn
+
+`e.origin.kind` says who asks. A person asks through `composer`, `bridge`,
+`sdk`, `scheduled-trigger`, `slack-ping`, `channel` and `auto-continuation`. A
+routine's prompt belongs to the person behind the routine.
+
+Every other kind is a machine talking to the session, and a machine waits. The
+tooth submits prompts under `plugin`, and a session owes no readback to itself.
+
+`unclassified` stays out. The engine hands it both a person's socket and its own
+delivery receipts, so a door reading it bites the wrong turn.
+
+## What the refusal says
+
+    The owner asked something and nothing has answered it. Say back what you
+    understood and what you do next, then work.
+
+That is the rule in its own words, and a refusal quoting the rule teaches it
+better than a refusal naming it.
+
+## Where it must not bite
+
+- A turn nobody opens.
+- A turn the session has already answered, however briefly.
+- A helper's call. A subagent's `tool.call` carries `agentId`, and a helper owes
+  the owner no readback.
+- `AskUserQuestion`, which reaches the owner itself. A door refusing it stops a
+  session from asking the one thing it needs.
+
+`answer.enabled` in `spec/config/level0.json` turns the door off, the way the judge
+and the tooth turn off. A rule nobody can turn off stops the tree on the day it
+reads something wrongly.
+
+The door sits inside the write door's own `tool.call` hook, after the log line
+and before the linting. The engine refuses a second `tool.call` hook carrying no
+matcher, so one hook holds both.
 
 ## Guidance a variable switches on
 
@@ -211,6 +479,10 @@ colon inside one through `OneTitle`, because both turn one title into two.
 Vale reads what a file holds, and its path stays outside that. So
 `.claude/skills/level0/lib/names.js` counts a name instead. `work new` refuses a
 long branch, and a contract test holds every tracked path.
+
+The config holds the cap as `names.words`, and the caller hands it to
+`overLong`.
+For details, see [[spec/design_output/config#a-caller-hands-it-in]].
 
 # A broken rule says so
 
@@ -277,3 +549,73 @@ short forms that read the same everywhere keep theirs.
 
 Vale drops both fixes and names the overlap. A token reaching past its own word
 therefore costs the fix beside it, so every token here stops at its own edge.
+
+# What the cage loads
+
+Level zero fills its state once: the linter it runs, the config it reads, the
+guidance it hands over, the rules the tooth votes on. Every door then reads that
+state.
+
+A session filling none of it holds every door open. `bin` stands at null, the
+write door skips the lint inside `if (bin)`, and the call passes. The tree reads
+green throughout, because `./RUNME.sh check` carries its own Vale and asks the
+plugin nothing.
+
+So the load stands in `loadCage`, and it answers two questions in place of one:
+
+| the load meets | the cage answers |
+|---|---|
+| a linter it finds | the write door reads a write |
+| a linter it misses | the cage holds nothing |
+| guidance it reads | the session carries the rules |
+| guidance it misses | the cage holds nothing |
+
+Every fault goes into one list, and the throw comes last, so a cage missing one
+thing still holds everything else it reads.
+
+`ensureCage` wraps that load in a `try`, and any door asks it. The first door to
+ask pays for the load, and the rest take the answer. A session the harness
+resumes carries no `session.start`, so the first `tool.call` loads the cage
+instead, and the session mends itself before it writes anything.
+
+The engine refuses `$` handed to a function nested inside `register`, so both
+stand at the top of the file and take the state as an argument.
+
+# God mode
+
+A cage holding nothing says so, and refuses the work until somebody mends it.
+`.se/level0.health` carries that answer:
+
+    { "ok": false, "why": "no vale stands here", "at": "..." }
+
+While `ok` reads false, the door refuses every call except the ones that mend
+the cage:
+
+| the call | god mode |
+|---|---|
+| a write under `.claude/skills/level0/` | passes |
+| a shell command landing no file | passes |
+| a read, a search, a question to the owner | passes |
+| every other write, and every other command | refuses |
+
+The refusal names the fault and the road out, so a session that meets it reads
+what to do. A door refusing everything would shut the road that mends it, and
+the session would stand there for good.
+
+The mend clears itself. `ensureCage` retries while the answer reads false, so
+the first call after a repair loads the rules again, writes `ok: true`, and says
+`the cage holds again` to the log. The install runs once, and a retry costs a
+read.
+
+## What stands outside
+
+A module failing to import registers no door at all, and every door inside it
+stays silent about that. Two things outside the process answer in their place:
+
+- `./RUNME.sh check` reads `.se/level0.health` and goes red where it reads
+  false. `doctor` prints the same line.
+- `test/contract/loads.test.js` imports the module, calls `register`, and names
+  every door it expects. A file carrying a conflict marker fails that test,
+  because a merge writes those into the very file the cage lives in.
+
+`.github/workflows/check.yml` runs both on a machine with no stake in it.

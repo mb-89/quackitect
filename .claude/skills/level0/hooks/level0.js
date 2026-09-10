@@ -3,19 +3,34 @@
 // and spec/guidance.
 // [[spec/design_output/level0#the-write-door]]
 
+import { opensATurn, reachesTheOwner, SAYS, spokeSince } from "../lib/answer.js";
+import { commitIn, findings as readsCommand, verbLine } from "../lib/bash.js";
 import { CODE, formatText, lintText as lintCode } from "../lib/code.js";
+import { configOf, TRACKED } from "../lib/config.js";
 import {
   bindsHere,
   canary,
   canaryIn,
   countsOf,
   envOf,
+  forHelper,
   parse,
   standingLayer,
 } from "../lib/guidance.js";
+import { godMode, HEALTH, repairs } from "../lib/health.js";
 import { judgeOf } from "../lib/judge.js";
 import { aimOf, asLines, FOLDER, nameOf, rowOf, writes } from "../lib/log.js";
-import { refusal, taught } from "../lib/refuse.js";
+import { relativeTo } from "../lib/paths.js";
+import {
+  entriesIn,
+  ownerOf,
+  PROJECTIONS,
+  readsOf,
+  refusedWrite,
+  writesOf,
+} from "../lib/projection.js";
+import { refusal, refusedCommand, taught } from "../lib/refuse.js";
+import { readerAsks, readerSays, report, reviewSpec } from "../lib/review.js";
 import { readRule } from "../lib/rulefile.js";
 import { guesses, pathOf, surveyOf, TOOLS } from "../lib/tools.js";
 import {
@@ -29,17 +44,18 @@ import {
   toothOf,
 } from "../lib/stop.js";
 import { landsOnTrunk, touchesGit } from "../lib/trunk.js";
-import { lintText } from "../lib/vale.js";
+import { lintText, PROSE } from "../lib/vale.js";
 
-const PROSE = /\.(md|markdown|txt)$/i;
 const GUIDANCE = "spec/guidance";
-const CONFIG = "spec/config/level0.json";
+const COMMIT = "level0-commit.md";
 const HANDOVER = ".se/HANDOVER.md";
 const BRIEF = "HANDOVER.md";
 const TRUNK = "main";
 const JUDGED = "spec/config/styles/VoiceJudged";
 
 const ANSWER = "level0-answer.md";
+const GATHERING = 300000;
+const GATHER = ["node", "src/scripts/cli.js"];
 
 export function register(on, _options) {
   let bin = null;
@@ -47,7 +63,7 @@ export function register(on, _options) {
   let standing = "";
   let sentence = "";
   let firstTurn = true;
-  let config = {};
+  let settings = configOf({ read: async () => "" });
   let judge = judgeOf({});
   let handover = [];
   let waiting = false;
@@ -55,81 +71,132 @@ export function register(on, _options) {
   let logbook = logHere(null);
   let rules = [];
   let onAHeldBranch = false;
+  let owed = false;
+  let root = "";
+  let projections = [];
   const list = todos();
   let tooth = toothOf();
 
-  on("session.start", async ($, e, next) => {
-    let known = await readSurvey($);
-    bin = await toolHere($, known, "vale");
-    if (!bin) {
-      await install($);
-      known = await readSurvey($);
-      bin = await toolHere($, known, "vale");
-    }
-    formatter = await toolHere($, known, "biome");
-    config = await readConfig($);
-    judge = judgeOf(config);
+  // [[spec/design_output/level0#god-mode]]
+  const cage = {
+    health: { ok: false, why: "level zero never loads in this session", at: "" },
+    wired: false,
+    installed: false,
+    told: "",
+    logbook,
+  };
 
-    const guidance = await readGuidance($);
-    standing = guidance.said;
-    sentence = canary({
-      rules: guidance.rules,
-      notes: guidance.notes,
-      stop: config.stop?.enabled !== false,
-    });
+  const take = () => {
+    bin = cage.bin ?? null;
+    formatter = cage.formatter ?? null;
+    root = cage.root ?? root;
+    settings = cage.settings ?? settings;
+    standing = cage.standing ?? "";
+    sentence = cage.sentence ?? "";
+    rules = cage.rules ?? [];
+    judge = cage.judge ?? judge;
+    tooth = cage.tooth ?? tooth;
+    logbook = cage.logbook ?? logbook;
+  };
+
+  on("session.start", async ($, e, next) => {
+    await ensureCage($, cage);
+    take();
+
     handover = await takeHandover($);
     cloud = await onACloudBox($);
     waiting = cloud && !handover.length && (await offAWorkBranch($));
     onAHeldBranch = handover.some((one) => parse(one.text).front.status === "held");
-    tooth = toothOf({ mostInARow: config.stop?.mostInARow });
 
     try {
-      await $.fs.writeFile(
+      await $.fs.write(
         ".se/level0.stamp",
         `${new Date().toISOString()} vale=${bin ?? "missing"}\n`,
       );
     } catch {}
 
-    logbook = logHere((at, text) => $.fs.writeFile(at, text), config.log?.level);
     await logbook.say("info", "level0", "session start", {
       branch: await branchNow($),
       vale: bin ?? "missing",
     });
-
-    // [[spec/design_output/stop#where-the-rules-live]]
-    const pooled = pool(await readFolder($, RULES, ".yml"));
-    rules = pooled.rules;
-    for (const name of pooled.broken) {
-      await logbook.say("warn", "stop", `${name} carries a rule nobody can read`, {
-        file: `${RULES}/${name}`,
-      });
+    for (const fault of await settings.faults()) {
+      await logbook.say("warn", "config", fault, { file: TRACKED });
     }
+
+    // [[spec/design_output/projection#who-projects-and-when]]
+    projections = entriesIn(await readIf($, PROJECTIONS));
+    if (projections.length) {
+      const drawn = await projectAll($, projections);
+      await logbook.say("info", "project", `${drawn.wrote} file(s) written`, {
+        ms: drawn.ms,
+        detail: `${projections.length} projection(s), ${drawn.size} target(s)`,
+      });
+      for (const path of drawn.refused) {
+        await logbook.say("warn", "project", "the box refuses a target", { file: path });
+      }
+    }
+
     await $.tool.register(claimSpec(rules));
+    await $.tool.register(reviewSpec());
     return next(e);
   });
 
   on("prompt.submit", async (_$, e, next) => {
     const from = String(e.origin?.kind ?? "");
     tooth.sawPrompt(from === "plugin");
+    if (opensATurn(e.origin)) owed = true;
     await logbook.say("info", "prompt", String(e.text ?? ""), { detail: from });
     return next(e);
   });
 
   // [[spec/design_output/log#what-a-tool-line-names]]
   on("tool.call", async ($, e, next) => {
+    // [[spec/design_output/level0#god-mode]]
+    const well = await ensureCage($, cage);
+    take();
+
     tooth.sawCall(String(e.tool ?? ""));
     list.sawCall(e);
     await logbook.say("info", "tool", aimOf(e), { tool: e.tool });
 
+    if (!well.ok && !repairs(e, asWrite(e))) {
+      await logbook.say("warn", "level0", `god mode refuses ${e.tool}`, {
+        tool: e.tool,
+        detail: well.why,
+      });
+      return { deny: godMode(well) };
+    }
+
+    // [[spec/design_output/level0#the-owners-prompt-comes-first]]
+    const answers = await answerDoor($, e, {
+      owed,
+      off: (await settings.ask("answer.enabled")) === false,
+      logbook,
+    });
+    if (answers.deny) return answers;
+    owed = answers.owed;
+
     const writing = asWrite(e);
     if (!writing) return next(e);
 
+    // [[spec/design_output/projection#the-write-door-refuses-one]]
+    const owner = ownerOf(projections, writing.path);
+    if (owner) {
+      const at = relativeTo(root, writing.path);
+      await logbook.say("warn", "project", `refused a write to ${at}`, {
+        file: at,
+        tool: e.tool,
+        detail: owner.name ?? owner.target,
+      });
+      return { deny: refusedWrite(owner, writing.path) };
+    }
+
     if (CODE.test(writing.path)) {
-      return await codeDoor($, e, next, writing, formatter, logbook);
+      return await codeDoor($, e, next, writing, formatter, logbook, root);
     }
     if (!PROSE.test(writing.path)) return next(e);
 
-    const where = shorten(writing.path);
+    const where = relativeTo(root, writing.path);
     const found = [];
     let door = "vale";
 
@@ -142,12 +209,14 @@ export function register(on, _options) {
     }
 
     if (!found.length) {
-      judge = judgeOf(config, await readRules($, JUDGED));
+      judge = judgeOf(await judgeSettings(settings), await readRules($, JUDGED));
       if (judge.reads()) {
         door = "judge";
         found.push(
-          ...(await judge.run(writing.text, (text, labels, opts) =>
-            $.model.classify(text, labels, opts),
+          ...(await judge.run(
+            writing.text,
+            (text, labels, opts) => $.model.classify(text, labels, opts),
+            where,
           )),
         );
       }
@@ -193,6 +262,29 @@ export function register(on, _options) {
     };
   });
 
+  // [[spec/design_output/bash#what-the-door-reads]]
+  on("tool.call", { tool: "Bash" }, async ($, e, next) => {
+    const said = String(e.command ?? "");
+    const found = readsCommand(said, await settings.ask("names.words"));
+    found.push(...(await commitVoice($, said, bin)));
+    if (!found.length) return next(e);
+
+    await logbook.say("warn", "bash", `refused ${found.length} rule(s) in a command`, {
+      tool: "Bash",
+      rule: found[0].rule,
+      detail: said.slice(0, 120),
+    });
+    return { deny: refusedCommand(said, found) };
+  });
+
+  // [[spec/design_output/bash#the-description-names-verbs]]
+  on("tool.describe", { tool: "Bash" }, async (_$, e, next) => {
+    const said = await next(e);
+    const base = said && typeof said === "object" ? said : {};
+    const text = String(base.description ?? e.description ?? "").trim();
+    return { ...base, description: [text, verbLine()].filter(Boolean).join("\n\n") };
+  });
+
   // [[spec/design_output/stop#the-claim-and-its-life]]
   on("tool.call", { tool: "mcp__level0__claim_stop" }, async (_$, e, _next) => {
     const said = tooth.claims(String(e.rule ?? ""), String(e.why ?? ""));
@@ -202,13 +294,55 @@ export function register(on, _options) {
     return { result: { ...said, counted: "at the end of this turn" } };
   });
 
+  // [[spec/design_output/level0#the-helper-takes-the-guidance]]
+  on("agent.spawn", async (_$, e, next) => {
+    if (!standing) return next(e);
+    await logbook.say("info", "agent", `handed the guidance to ${e.subagentType}`, {
+      detail: String(e.description ?? "").slice(0, 120),
+    });
+    return next({ ...e, prompt: forHelper(standing, e.prompt) });
+  });
+
+  // [[spec/design_output/review#the-tool-the-session-calls]]
+  on("tool.call", { tool: "mcp__level0__review_branch" }, async ($, e, _next) => {
+    const name = String(e.branch ?? "").trim();
+    if (!name) return { result: "review_branch takes one branch name." };
+
+    const ran = await $.process.run([...GATHER, "work", "review", name, "--json"], {
+      timeoutMs: GATHERING,
+    });
+    const material = materialOf(ran.stdout);
+    if (!material) {
+      const why = String(ran.stderr ?? "").trim() || String(ran.stdout ?? "").trim();
+      await logbook.say("warn", "review", `the verb gathered nothing for ${name}`, {
+        detail: why.slice(0, 200),
+      });
+      return { result: `${name}: the verb gathered nothing.\n\n${why}` };
+    }
+
+    const read = await readerRuns($, material, standing);
+    await logbook.say("info", "review", `read ${material.branch}`, {
+      branch: material.branch,
+      detail: `check=${material.check?.code} retro=${material.retro} fix=${read.fix}`,
+    });
+    return { result: report(material, read) };
+  });
+
   on("turn.complete", async ($, e, next) => {
     const said = await next(e);
+    owed = false;
     if (firstTurn && e.reason === "answer") {
       firstTurn = false;
       await heardCanary(logbook, canaryIn(e.answer, sentence), sentence);
     }
-    await bite($, e, { rules, tooth, logbook, ran: ranHere });
+    const off = (await settings.ask("stop.enabled")) === false;
+    await bite($, e, {
+      rules,
+      tooth,
+      logbook,
+      mostInARow: await settings.ask("stop.mostInARow"),
+      ran: (name) => ranHere(name, off),
+    });
     if (!bin || !e.answer || e.reason !== "answer") return said;
 
     const ran = await lintText(e.answer, ANSWER, {
@@ -320,13 +454,227 @@ export function register(on, _options) {
   });
 
   // [[spec/design_output/stop#the-mechanical-checks]]
-  function ranHere(name) {
+  function ranHere(name, off) {
     if (name === "work-waiting") return list.standing() || onAHeldBranch;
     if (name === "session-is-new") return tooth.isNew();
-    if (name === "stop-hook-off") return config.stop?.enabled === false;
+    if (name === "stop-hook-off") return off;
     if (name === "never") return false;
     return undefined;
   }
+}
+
+// [[spec/design_output/level0#what-the-cage-loads]]
+async function loadCage($, cage) {
+  const faults = [];
+
+  cage.root = await rootHere($);
+  cage.settings = configHere($);
+  cage.judge = judgeOf(await judgeSettings(cage.settings));
+  cage.tooth = toothOf({ mostInARow: await cage.settings.ask("stop.mostInARow") });
+  if (!cage.wired) {
+    cage.logbook = logHere(
+      (at, text) => $.fs.write(at, text),
+      await cage.settings.ask("log.level"),
+    );
+    cage.wired = true;
+  }
+
+  let known = await readSurvey($);
+  cage.bin = await toolHere($, known, "vale");
+  if (!cage.bin && !cage.installed) {
+    cage.installed = true;
+    await install($);
+    known = await readSurvey($);
+    cage.bin = await toolHere($, known, "vale");
+  }
+  if (!cage.bin) faults.push("no vale stands here, so no voice rule reads a write");
+  cage.formatter = await toolHere($, known, "biome");
+
+  const guidance = await readGuidance($);
+  cage.standing = guidance.said;
+  cage.sentence = canary({
+    rules: guidance.rules,
+    notes: guidance.notes,
+    stop: (await cage.settings.ask("stop.enabled")) !== false,
+  });
+  if (!cage.standing) faults.push(`${GUIDANCE} hands over nothing`);
+
+  // [[spec/design_output/stop#where-the-rules-live]]
+  const pooled = pool(await readFolder($, RULES, ".yml"));
+  cage.rules = pooled.rules;
+  for (const name of pooled.broken) {
+    await cage.logbook.say("warn", "stop", `${name} carries a rule nobody can read`, {
+      file: `${RULES}/${name}`,
+    });
+  }
+
+  if (faults.length) throw new Error(faults.join(", and "));
+}
+
+// [[spec/design_output/level0#god-mode]]
+async function ensureCage($, cage) {
+  if (cage.health.ok) return cage.health;
+
+  try {
+    await loadCage($, cage);
+    cage.health = { ok: true, why: "", at: new Date().toISOString() };
+  } catch (err) {
+    cage.health = {
+      ok: false,
+      why: String(err?.message ?? err),
+      at: new Date().toISOString(),
+    };
+  }
+
+  try {
+    await $.fs.write(HEALTH, `${JSON.stringify(cage.health, null, 2)}\n`);
+  } catch {}
+
+  if (cage.health.ok && cage.told) {
+    cage.told = "";
+    await cage.logbook.say("info", "level0", "the cage holds again", {
+      detail: cage.health.at,
+    });
+  }
+  if (!cage.health.ok && cage.health.why !== cage.told) {
+    cage.told = cage.health.why;
+    await cage.logbook.say("error", "level0", "the cage holds nothing", {
+      detail: cage.health.why,
+    });
+  }
+  return cage.health;
+}
+
+// [[spec/design_output/level0#the-path-a-rule-reads]]
+async function rootHere($) {
+  try {
+    const said = await $.process.run(["git", "rev-parse", "--show-toplevel"]);
+    return said?.exitCode === 0 ? String(said.stdout ?? "").trim() : "";
+  } catch {
+    return "";
+  }
+}
+
+// [[spec/design_output/projection#who-projects-and-when]]
+async function projectAll($, entries) {
+  const began = Date.now();
+  const refused = [];
+  let size = 0;
+  let wrote = 0;
+
+  for (const entry of entries) {
+    const texts = new Map();
+    for (const path of readsOf(entry)) texts.set(path, await readIf($, path));
+    for (const [path, text] of writesOf(entry, texts)) {
+      size++;
+      if ((await readIf($, path)) === text) continue;
+      try {
+        await $.fs.write(path, text);
+        wrote++;
+      } catch {
+        refused.push(path);
+      }
+    }
+  }
+  return { ms: Date.now() - began, size, wrote, refused };
+}
+
+async function readIf($, path) {
+  try {
+    return String(await $.fs.read(path));
+  } catch {
+    return "";
+  }
+}
+
+// [[spec/design_output/level0#the-owners-prompt-comes-first]]
+async function answerDoor($, e, it) {
+  if (!it.owed || it.off) return { owed: it.owed };
+  if (e.agentId || reachesTheOwner(e.tool)) return { owed: it.owed };
+
+  let spoke = true;
+  try {
+    spoke = spokeSince(await $.session.messages());
+  } catch {
+    spoke = true;
+  }
+  if (spoke) return { owed: false };
+
+  await it.logbook.say("warn", "answer", `refused ${e.tool} before an answer`, {
+    tool: e.tool,
+  });
+  return { deny: SAYS, owed: true };
+}
+
+// [[spec/design_output/bash#a-commit-message-meets-voice]]
+async function commitVoice($, command, bin) {
+  const said = commitIn(command);
+  if (!said || !bin) return [];
+
+  let text = String(said.text ?? "");
+  if (said.form === "file") {
+    try {
+      text = await $.fs.read(said.file);
+    } catch {
+      return [];
+    }
+  }
+  if (!text.trim()) return [];
+
+  const ran = await lintText(text, COMMIT, {
+    bin,
+    run: (argv, init) => $.process.run(argv, init),
+  });
+  return ran.ran ? ran.found : [];
+}
+
+// [[spec/design_output/config#the-resolver-holds-the-layers]]
+function configHere($) {
+  return configOf({
+    read: (path) => $.fs.read(path),
+    write: (path, text) => $.fs.write(path, text),
+    readEnv: (names) => readEnv($, names),
+  });
+}
+
+async function judgeSettings(settings) {
+  return {
+    enabled: await settings.ask("judge.enabled"),
+    model: await settings.ask("judge.model"),
+    maxSpans: await settings.ask("judge.maxSpans"),
+    warmupWrites: await settings.ask("judge.warmupWrites"),
+    thenEveryNth: await settings.ask("judge.thenEveryNth"),
+  };
+}
+
+// [[spec/design_output/review#what-the-reader-answers]]
+function materialOf(stdout) {
+  const lines = String(stdout ?? "").split(/\r?\n/).reverse();
+  for (const line of lines) {
+    if (!line.startsWith("{")) continue;
+    try {
+      const read = JSON.parse(line);
+      if (read.branch) return read;
+    } catch {}
+  }
+  return null;
+}
+
+// [[spec/design_output/review#where-the-spawn-refuses]]
+async function readerRuns($, material, rules) {
+  let said = null;
+  try {
+    said = await $.agent.spawn({
+      prompt: readerAsks(material, rules),
+      description: `read ${material.branch}`,
+      subagentType: "general-purpose",
+    });
+  } catch (bad) {
+    return { fix: 0, unread: `no reader ran here: ${bad?.message ?? bad}` };
+  }
+  if (said?.deny) return { fix: 0, unread: `the spawn is refused: ${said.deny}` };
+  if (said?.isError) return { fix: 0, unread: `the reader failed: ${said.text ?? ""}` };
+  return readerSays(said?.text);
 }
 
 // [[spec/design_output/level0#the-canary]]
@@ -351,7 +699,7 @@ async function bite($, e, it) {
   if (e.reason !== "answer") return;
 
   const decision = decide(it.rules, { claimed: it.tooth.claim()?.rule, ran: it.ran });
-  const said = it.tooth.atTurnEnd(decision);
+  const said = it.tooth.atTurnEnd(decision, it.mostInARow);
   const how = detail(said, said.inARow);
 
   for (const name of said.unknown) {
@@ -405,7 +753,7 @@ async function takeHandover($) {
   for (const path of [HANDOVER, BRIEF]) {
     let text = "";
     try {
-      text = await $.fs.readFile(path);
+      text = await $.fs.read(path);
     } catch {
       continue;
     }
@@ -481,11 +829,11 @@ async function readEnv($, names) {
 
 async function readFolder($, folder, end) {
   try {
-    const entries = await $.fs.listDir(folder);
+    const entries = await $.fs.list(folder);
     const out = [];
     for (const one of entries) {
       if (!one.name.endsWith(end)) continue;
-      out.push({ name: one.name, text: await $.fs.readFile(`${folder}/${one.name}`) });
+      out.push({ name: one.name, text: await $.fs.read(`${folder}/${one.name}`) });
     }
     return out;
   } catch {
@@ -495,11 +843,11 @@ async function readFolder($, folder, end) {
 
 async function readRules($, folder) {
   try {
-    const entries = await $.fs.listDir(folder);
+    const entries = await $.fs.list(folder);
     const out = [];
     for (const one of entries) {
       if (!one.name.endsWith(".yml")) continue;
-      const rule = readRule(await $.fs.readFile(`${folder}/${one.name}`));
+      const rule = readRule(await $.fs.read(`${folder}/${one.name}`));
       out.push({ ...rule, name: one.name.replace(/\.yml$/, "") });
     }
     return out;
@@ -508,18 +856,10 @@ async function readRules($, folder) {
   }
 }
 
-async function readConfig($) {
-  try {
-    return JSON.parse(await $.fs.readFile(CONFIG));
-  } catch {
-    return {};
-  }
-}
-
 // [[spec/design_output/tools#where-a-caller-looks]]
 async function readSurvey($) {
   try {
-    return surveyOf(await $.fs.readFile(TOOLS));
+    return surveyOf(await $.fs.read(TOOLS));
   } catch {
     return {};
   }
@@ -539,10 +879,10 @@ async function toolHere($, known, name) {
 }
 
 // [[spec/design_output/level0#the-formatter-applies-itself]]
-async function codeDoor($, e, next, writing, formatter, logbook) {
+async function codeDoor($, e, next, writing, formatter, logbook, root) {
   if (!formatter) return next(e);
   const run = (argv, init) => $.process.run(argv, init);
-  const where = shorten(writing.path);
+  const where = relativeTo(root, writing.path);
 
   let text = writing.text;
   if (e.tool === "Write") {
@@ -586,11 +926,6 @@ async function install($) {
     } catch {}
   }
   return false;
-}
-
-function shorten(path) {
-  const parts = String(path).split(/[\\/]/).filter(Boolean);
-  return parts.slice(-2).join("/");
 }
 
 function asWrite(e) {
