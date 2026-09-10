@@ -15,7 +15,7 @@ import {
   writesAPath,
 } from "../../.claude/skills/level0/lib/bash.js";
 
-const rules = (command) => findings(command).map((one) => one.rule);
+const rules = (command, most = 5) => findings(command, most).map((one) => one.rule);
 const paths = (command) => writesAPath(command).map((one) => one.path);
 
 test("the rules reach a prose file and a code file, and stop at the ignored roots", () => {
@@ -240,7 +240,7 @@ test("every refusal names the rule, what it reads and the road that works", () =
     "git switch -c a-name-that-runs-past-the-cap",
     "npm test",
   ]) {
-    const one = findings(said)[0];
+    const one = findings(said, 5)[0];
     assert.ok(one, said);
     assert.ok(one.said, `${said} names what it reads`);
     assert.match(one.message, /Write|Edit|RUNME|git commit -m|node --test/, said);

@@ -173,9 +173,11 @@ test("the free stop goes once ten tool calls stand behind the session", () => {
 
 // [[spec/design_output/stop#three-in-a-row]]
 test("mostInARow ends a runaway", () => {
-  const it = toothOf({ mostInARow: 3 });
+  const it = toothOf();
   const carried = [];
-  for (let i = 0; i < 4; i++) carried.push(it.atTurnEnd(voted(["work-waiting"])).ends);
+  for (let i = 0; i < 4; i++) {
+    carried.push(it.atTurnEnd(voted(["work-waiting"]), 3).ends);
+  }
   assert.deepEqual(carried, [false, false, false, true]);
   assert.equal(it.inARow(), 0, "the count starts again");
 });

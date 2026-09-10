@@ -3,8 +3,9 @@
 // where that work stands.
 // [[spec/design_output/work#the-round-trip]]
 
-import { overLong, WORDS } from "../../.claude/skills/level0/lib/names.js";
+import { overLong } from "../../.claude/skills/level0/lib/names.js";
 import { saysGreen, STAMP, stampOf } from "../../.claude/skills/level0/lib/runs.js";
+import { review } from "./review.js";
 
 export const BRIEF = "HANDOVER.md";
 const TRUNK = "main";
@@ -29,6 +30,7 @@ export function work(root, argv, doors) {
     merge,
     close,
     read,
+    review,
     list,
     collect,
   };
@@ -45,6 +47,7 @@ export function work(root, argv, doors) {
     console.log("  done          mark this branch done, commit and push");
     console.log("  release       put this branch, or the one you name, back to todo");
     console.log("  read <name>   print what stands on work/<name>");
+    console.log("  review <name> gather what a reader needs, and answer the report");
     console.log("  list          every work branch and its status");
     console.log("  merge <name>  take a done branch into main");
     console.log("  close [name]  delete a branch already inside main, or every one");
@@ -226,8 +229,8 @@ function newWork(it, name) {
     console.error("work new needs a name: ./RUNME.sh work new fix-lsp");
     return 2;
   }
-  if (overLong(name)) {
-    console.error(`A branch name holds ${WORDS} words, and ${name} holds more.`);
+  if (overLong(name, it.words)) {
+    console.error(`A branch name holds ${it.words} words, and ${name} holds more.`);
     return 2;
   }
   const branch = `work/${name}`;

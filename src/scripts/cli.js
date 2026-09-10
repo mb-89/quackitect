@@ -4,18 +4,25 @@
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  actionables,
   bindsHere,
   canary,
   countsOf,
   standingLayer,
 } from "../../.claude/skills/level0/lib/guidance.js";
+import { HEALTH, healthOf } from "../../.claude/skills/level0/lib/health.js";
 import { asRow, rowsOf } from "../../.claude/skills/level0/lib/log.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
+import {
+  entriesIn,
+  PROJECTIONS,
+  readAll,
+  staleIn,
+} from "../../.claude/skills/level0/lib/projection.js";
 import { pathInScript, SCRIPT } from "../../.claude/skills/level0/lib/scripts.js";
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { EDITOR_SETTINGS } from "../../.claude/skills/level0/lib/servers.js";
 import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
+import { configOf, LOCAL } from "../../.claude/skills/level0/lib/config.js";
 import { TOOLS, WANTED } from "../../.claude/skills/level0/lib/tools.js";
 import {
   CONFIG,
@@ -33,13 +40,23 @@ import { work } from "./work.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
-const LEVEL0 = join(root, "spec", "config", "level0.json");
 
-function doorsHere() {
+// [[spec/design_output/config#the-resolver-holds-the-layers]]
+function configHere(files) {
+  return configOf({
+    read: async (path) => files.read(join(root, path)),
+    write: async (path, text) => files.write(join(root, path), text),
+    makeDir: async (path) => files.makeDir(join(root, path)),
+    readEnv: async (names) =>
+      Object.fromEntries(names.map((name) => [name, process.env[name] ?? ""])),
+  });
+}
+
+async function doorsHere() {
   const outside = proc();
   const files = disk();
   const time = clock();
-  const said = files.exists(LEVEL0) ? JSON.parse(files.read(LEVEL0)) : {};
+  const said = configHere(files);
   return {
     proc: outside,
     disk: files,
@@ -47,14 +64,16 @@ function doorsHere() {
     git: git(outside, root),
     log: log(files, time, {
       folder: join(root, ".se", "log"),
-      level: said.log?.level,
+      level: await said.ask("log.level"),
     }),
     config: said,
+    words: await said.ask("names.words"),
+    node: process.execPath,
     join,
   };
 }
 
-const it = doorsHere();
+const it = await doorsHere();
 const files = it.disk;
 const outside = it.proc;
 
@@ -70,7 +89,7 @@ const GUIDANCE = join(root, "spec", "guidance");
 const DOORS = join(root, "src", "doors");
 const PLUGIN = join(".claude", "skills", "level0");
 const CONTRACT = join(root, "test", "contract");
-const config = it.config;
+const settings = it.config;
 const OURS = "--glob=!{.se,node_modules,.git}/**";
 const TESTS = "test/level0/*.test.js";
 const CONTRACT_TESTS = "test/contract/*.test.js";
@@ -81,8 +100,16 @@ const run = async (argv, init = {}) =>
 
 const verbs = {
   check: {
-    says: "the tests, the doors, then the rules over the tree",
-    run: async (w) => stamped(test() || doorsHold() || pluginHolds() || (await lint(w))),
+    says: "the tests, the doors, the cage, then the rules over the tree",
+    run: async (w) =>
+      stamped(
+        test() ||
+          doorsHold() ||
+          projectionsHold() ||
+          pluginHolds() ||
+          cageHolds() ||
+          (await lint(w)),
+      ),
   },
   lint: { says: "the rules over the tree, or over what you name", run: lint },
   fix: { says: "the fixes a program can make", run: fix },
@@ -90,11 +117,11 @@ const verbs = {
   rules: { says: "the mechanical rules Vale holds", run: async () => listRules() },
   standing: {
     says: "what level zero hands the agent every session",
-    run: async () => standing(),
+    run: () => standing(),
   },
   doctor: {
     says: "what is installed, and what level zero found",
-    run: async () => doctor(),
+    run: () => doctor(),
   },
   tools: {
     says: "ask this box where every tool stands, and write it down",
@@ -104,8 +131,16 @@ const verbs = {
     says: "every door, and the contract test that holds it",
     run: async () => doorsHold(),
   },
+  project: {
+    says: "write every projection again, from the source it names",
+    run: async () => project(),
+  },
+  config: {
+    says: "every key, its value, and the layer answering it",
+    run: async () => readConfig(rest),
+  },
   work: {
-    says: "work branches: new, take, read, list",
+    says: "work branches: new, take, read, review, list",
     run: async () => work(root, rest, it),
   },
   log: {
@@ -246,6 +281,37 @@ function readLog(argv) {
   return 0;
 }
 
+// [[spec/design_output/config#the-verb-names-the-layer]]
+async function readConfig(argv) {
+  const [key, ...said] = argv.filter((one) => !one.startsWith("-"));
+
+  if (key && said.length) {
+    const wrote = await settings.write(key, said.join(" "));
+    console.log(`${wrote.key} is ${JSON.stringify(wrote.value)} in ${wrote.layer}.`);
+    return 0;
+  }
+
+  const rows = await settings.all();
+  const wanted = key ? rows.filter((one) => one.key === key) : rows;
+  if (key && !wanted.length) {
+    console.error(`No layer answers ${key}. Run ./RUNME.sh config to see every key.`);
+    return 2;
+  }
+  for (const one of wanted) {
+    console.log(
+      `${one.key.padEnd(22)} ${String(one.value).padEnd(9)} ${one.layer}`,
+    );
+  }
+  if (key) return 0;
+
+  for (const fault of await settings.faults()) {
+    console.error(`${fault}, and the code reading it finds nothing.`);
+  }
+  console.log("");
+  console.log(`Write one: ./RUNME.sh config <key> <value>, which lands in ${LOCAL}.`);
+  return 0;
+}
+
 async function fix(where) {
   if (!files.exists(bin)) {
     console.error("Vale is missing. Run ./RUNME.sh once and it installs.");
@@ -309,6 +375,53 @@ function test() {
   return ran.exitCode;
 }
 
+// [[spec/design_output/projection#what-goes-where-is-data]]
+function projections() {
+  const at = join(root, PROJECTIONS);
+  return files.exists(at) ? entriesIn(files.read(at)) : [];
+}
+
+function under(path) {
+  return join(root, String(path).split("/").join(sep));
+}
+
+// [[spec/design_output/projection#check-refuses-a-stale-one]]
+function projectionsHold() {
+  const entries = projections();
+  if (!entries.length) {
+    console.log(`${PROJECTIONS} names no projection, so nothing is projected.`);
+    return 0;
+  }
+
+  const said = readAll(entries, files, under);
+  const found = staleIn(said.wanted, said.standing);
+  if (!found.length) {
+    console.log(`${entries.length} projection(s), and every target reads as projected.`);
+    return 0;
+  }
+  for (const one of found) console.error(`${one.path} ${one.how}`);
+  console.error("A projection is read-only, so edit the source it names instead.");
+  console.error("Run ./RUNME.sh project, which writes every target again.");
+  return 1;
+}
+
+// [[spec/design_output/projection#who-projects-and-when]]
+function project() {
+  const entries = projections();
+  const { wanted, standing } = readAll(entries, files, under);
+
+  for (const [path, text] of wanted) {
+    files.makeDir(dirname(under(path)));
+    if (standing.get(path) !== text) files.write(under(path), text);
+  }
+  for (const path of standing.keys()) {
+    if (!wanted.has(path)) files.remove(under(path));
+  }
+
+  console.log(`${wanted.size} file(s) projected from ${entries.length} projection(s).`);
+  return 0;
+}
+
 // [[spec/design_output/level0#no-computed-engine-access]]
 function pluginHolds() {
   const ran = validatePlugin(outside.run, PLUGIN, root);
@@ -319,6 +432,23 @@ function pluginHolds() {
   }
   console.error(`${ran.stdout}${ran.stderr}`.trim());
   console.error("The engine reads this module's source, and it refuses the above.");
+  return 1;
+}
+
+// [[spec/design_output/level0#god-mode]]
+function cageHolds() {
+  const at = join(root, HEALTH);
+  if (!files.exists(at)) {
+    console.log("Level zero loads in no session here yet, so it says nothing.");
+    return 0;
+  }
+  const said = healthOf(files.read(at));
+  if (said.ok) {
+    console.log(`The cage holds, and it says so at ${said.at}.`);
+    return 0;
+  }
+  console.error(`The cage holds nothing: ${said.why}`);
+  console.error(`That session guards no write. Mend it, and ${HEALTH} turns green.`);
   return 1;
 }
 
@@ -371,7 +501,7 @@ function listRules() {
   return 0;
 }
 
-function standing() {
+async function standing() {
   if (!files.exists(GUIDANCE)) {
     console.error("There is no spec/guidance, so nothing is handed over.");
     return 2;
@@ -386,7 +516,8 @@ function standing() {
   }
   console.log(said);
   console.log("");
-  console.log(canary({ ...countsOf(notes), stop: config.stop?.enabled !== false }));
+  const stop = (await settings.ask("stop.enabled")) !== false;
+  console.log(canary({ ...countsOf(notes), stop }));
   return 0;
 }
 
@@ -404,7 +535,7 @@ function standsAt(one) {
   return [one.version, one.path].filter(Boolean).join("  ");
 }
 
-function doctor() {
+async function doctor() {
   const found = Object.keys(known).length ? known : writeSurvey(it, root, process.env);
   const rows = [
     ...WANTED.map((one) => [one.name, standsAt(found[one.name])]),
@@ -429,12 +560,7 @@ function doctor() {
         ? `${namesIn(JUDGED, ".yml").length} in VoiceJudged`
         : "none",
     ],
-    [
-      "judge",
-      config.judge?.enabled === false
-        ? "off in spec/config/level0.json"
-        : `on, model ${config.judge?.model ?? "default"}`,
-    ],
+    ["judge", await judgeStands()],
     [
       "survey",
       files.exists(join(root, TOOLS)) ? TOOLS : "absent, run ./RUNME.sh tools",
@@ -446,11 +572,27 @@ function doctor() {
         ? "tracked, one file"
         : "missing",
     ],
+    ["cage holds", cageSays()],
   ];
   for (const [what, said] of rows) {
     console.log(`${what.padEnd(18)} ${String(said).trim() || "missing"}`);
   }
   return 0;
+}
+
+function cageSays() {
+  const at = join(root, HEALTH);
+  if (!files.exists(at)) return "no session says yet";
+  const said = healthOf(files.read(at));
+  return said.ok ? `yes, at ${said.at}` : `no, ${said.why}`;
+}
+
+async function judgeStands() {
+  if ((await settings.ask("judge.enabled")) === false) {
+    return `off in ${await settings.layerOf("judge.enabled")}`;
+  }
+  const model = await settings.ask("judge.model");
+  return `on, model ${model} out of ${await settings.layerOf("judge.model")}`;
 }
 
 function lspProxy() {

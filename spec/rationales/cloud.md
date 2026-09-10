@@ -32,8 +32,8 @@ stands and the box holds nothing.
 `work sync` takes `main` in before the first edit, so a conflict costs nothing
 yet. `work take` runs it, so a routine pays nothing to remember it.
 
-Trunk travels one way. A cloud box opens no pull request, so the merge back is a
-person's.
+Trunk travels one way, and a cloud box opens no pull request. Merge the branch
+from a box holding trunk, and close it there once the merge stands.
 
 ## 4. One branch, one job
 
