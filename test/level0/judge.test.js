@@ -76,6 +76,38 @@ test("the judge refuses on its refusing label and passes on the other", async ()
   assert.deepEqual(await judge.run(long, async () => "actionable"), []);
 });
 
+// [[spec/design_output/level0#a-judged-rule-scopes]]
+test("a rule ignoring a folder costs no model call inside it", async () => {
+  const scoped = [
+    { ...readRule(`${ACTIONABLE}\nignores:\n  - spec/rationales/*.md`), name: "Actionable" },
+  ];
+  const judge = judgeOf(settings, scoped);
+  const long =
+    "This explains where the thing came from and what somebody once tried before now.";
+
+  let asked = 0;
+  const says = async () => {
+    asked++;
+    return "background";
+  };
+
+  assert.deepEqual(await judge.run(long, says, "spec/rationales/testing.md"), []);
+  assert.equal(asked, 0, "a file the globs reach costs nothing");
+
+  const found = await judge.run(long, says, "spec/guidance/testing.md");
+  assert.equal(found.length, 1, "the rule stands everywhere else");
+  assert.equal(asked, 1);
+});
+
+test("a rule naming no folder reads every path", async () => {
+  const judge = judgeOf(settings, rules);
+  const long =
+    "This explains where the thing came from and what somebody once tried before now.";
+
+  const found = await judge.run(long, async () => "background", "spec/rationales/a.md");
+  assert.equal(found.length, 1);
+});
+
 test("a model naming no label passes the text", async () => {
   const judge = judgeOf(settings, rules);
   const long =

@@ -284,6 +284,34 @@ question per span, so it runs where the patterns already passed.
 It reads every span of the first writes in a session, then samples. A breach
 puts it back to reading everything.
 
+## The path a rule reads
+
+Hand every rule the path the repo root holds. Vale scopes on it, and the judge
+scopes on it.
+
+| what the client sends | what the door hands on |
+|---|---|
+| `C:\...\quackitect-v5\spec\rationales\a.md` | `spec/rationales/a.md` |
+| `spec/rationales/a.md` | `spec/rationales/a.md` |
+
+Keep every folder in that path, so `[spec/rationales/*.md]` and each other
+`.vale.ini` section matches what Vale reads at `--path`.
+
+Ask git for the root once a session, through `git rev-parse --show-toplevel`,
+and take it off the front with `relativeTo`. Leave the path whole where the box
+answers nothing.
+
+## A judged rule scopes
+
+Give a judged rule `ignores`, holding one glob a line. The judge asks the model
+nothing for a file those globs reach.
+
+    ignores:
+      - spec/rationales/*.md
+
+List a folder there where the rule's question misreads its job. `Actionable`
+ignores `spec/rationales` and `spec/design_output`, and stands everywhere else.
+
 # The standing layer
 
 `prompt.context` computes the blocks a conversation's first message carries. It

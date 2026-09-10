@@ -20,6 +20,7 @@ import {
 import { godMode, HEALTH, repairs } from "../lib/health.js";
 import { judgeOf } from "../lib/judge.js";
 import { aimOf, asLines, FOLDER, nameOf, rowOf, writes } from "../lib/log.js";
+import { relativeTo } from "../lib/paths.js";
 import {
   entriesIn,
   ownerOf,
@@ -71,6 +72,7 @@ export function register(on, _options) {
   let rules = [];
   let onAHeldBranch = false;
   let owed = false;
+  let root = "";
   let projections = [];
   const list = todos();
   let tooth = toothOf();
@@ -87,6 +89,7 @@ export function register(on, _options) {
   const take = () => {
     bin = cage.bin ?? null;
     formatter = cage.formatter ?? null;
+    root = cage.root ?? root;
     settings = cage.settings ?? settings;
     standing = cage.standing ?? "";
     sentence = cage.sentence ?? "";
@@ -179,8 +182,9 @@ export function register(on, _options) {
     // [[spec/design_output/projection#the-write-door-refuses-one]]
     const owner = ownerOf(projections, writing.path);
     if (owner) {
-      await logbook.say("warn", "project", `refused a write to ${shorten(writing.path)}`, {
-        file: shorten(writing.path),
+      const at = relativeTo(root, writing.path);
+      await logbook.say("warn", "project", `refused a write to ${at}`, {
+        file: at,
         tool: e.tool,
         detail: owner.name ?? owner.target,
       });
@@ -188,11 +192,11 @@ export function register(on, _options) {
     }
 
     if (CODE.test(writing.path)) {
-      return await codeDoor($, e, next, writing, formatter, logbook);
+      return await codeDoor($, e, next, writing, formatter, logbook, root);
     }
     if (!PROSE.test(writing.path)) return next(e);
 
-    const where = shorten(writing.path);
+    const where = relativeTo(root, writing.path);
     const found = [];
     let door = "vale";
 
@@ -209,8 +213,10 @@ export function register(on, _options) {
       if (judge.reads()) {
         door = "judge";
         found.push(
-          ...(await judge.run(writing.text, (text, labels, opts) =>
-            $.model.classify(text, labels, opts),
+          ...(await judge.run(
+            writing.text,
+            (text, labels, opts) => $.model.classify(text, labels, opts),
+            where,
           )),
         );
       }
@@ -461,6 +467,7 @@ export function register(on, _options) {
 async function loadCage($, cage) {
   const faults = [];
 
+  cage.root = await rootHere($);
   cage.settings = configHere($);
   cage.judge = judgeOf(await judgeSettings(cage.settings));
   cage.tooth = toothOf({ mostInARow: await cage.settings.ask("stop.mostInARow") });
@@ -536,6 +543,16 @@ async function ensureCage($, cage) {
     });
   }
   return cage.health;
+}
+
+// [[spec/design_output/level0#the-path-a-rule-reads]]
+async function rootHere($) {
+  try {
+    const said = await $.process.run(["git", "rev-parse", "--show-toplevel"]);
+    return said?.exitCode === 0 ? String(said.stdout ?? "").trim() : "";
+  } catch {
+    return "";
+  }
 }
 
 // [[spec/design_output/projection#who-projects-and-when]]
@@ -862,10 +879,10 @@ async function toolHere($, known, name) {
 }
 
 // [[spec/design_output/level0#the-formatter-applies-itself]]
-async function codeDoor($, e, next, writing, formatter, logbook) {
+async function codeDoor($, e, next, writing, formatter, logbook, root) {
   if (!formatter) return next(e);
   const run = (argv, init) => $.process.run(argv, init);
-  const where = shorten(writing.path);
+  const where = relativeTo(root, writing.path);
 
   let text = writing.text;
   if (e.tool === "Write") {
@@ -909,11 +926,6 @@ async function install($) {
     } catch {}
   }
   return false;
-}
-
-function shorten(path) {
-  const parts = String(path).split(/[\\/]/).filter(Boolean);
-  return parts.slice(-2).join("/");
 }
 
 function asWrite(e) {

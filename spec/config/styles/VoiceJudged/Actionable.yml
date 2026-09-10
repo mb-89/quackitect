@@ -9,3 +9,8 @@ labels:
   - actionable
   - background
 refuses: background
+# A rationale carries the argument and a design doc carries the mechanism, so
+# this question misreads both folders.
+ignores:
+  - spec/rationales/*.md
+  - spec/design_output/*.md
