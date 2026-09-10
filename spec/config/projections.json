@@ -1,0 +1,13 @@
+{
+  "comment": "WHAT IS PROJECTED WHERE. Each entry is one projection, and the engine writes every one at each session start. Adding a projection is an entry here and no code change. A target is read-only to a person: the write door refuses a write to one, and ./RUNME.sh check refuses one standing stale.",
+  "projections": [
+    {
+      "name": "the config commands",
+      "shape": "config commands",
+      "target": ".claude/commands",
+      "from": "spec/config/level0.json",
+      "schema": "spec/config/level0.schema.json",
+      "wrap": "frontmatter"
+    }
+  ]
+}

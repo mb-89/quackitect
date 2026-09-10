@@ -11,6 +11,12 @@ import {
 } from "../../.claude/skills/level0/lib/guidance.js";
 import { asRow, rowsOf } from "../../.claude/skills/level0/lib/log.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
+import {
+  entriesIn,
+  PROJECTIONS,
+  readAll,
+  staleIn,
+} from "../../.claude/skills/level0/lib/projection.js";
 import { pathInScript, SCRIPT } from "../../.claude/skills/level0/lib/scripts.js";
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { EDITOR_SETTINGS } from "../../.claude/skills/level0/lib/servers.js";
@@ -93,7 +99,8 @@ const run = async (argv, init = {}) =>
 const verbs = {
   check: {
     says: "the tests, the doors, then the rules over the tree",
-    run: async (w) => stamped(test() || doorsHold() || pluginHolds() || (await lint(w))),
+    run: async (w) =>
+      stamped(test() || doorsHold() || projectionsHold() || pluginHolds() || (await lint(w))),
   },
   lint: { says: "the rules over the tree, or over what you name", run: lint },
   fix: { says: "the fixes a program can make", run: fix },
@@ -114,6 +121,10 @@ const verbs = {
   doors: {
     says: "every door, and the contract test that holds it",
     run: async () => doorsHold(),
+  },
+  project: {
+    says: "write every projection again, from the source it names",
+    run: async () => project(),
   },
   config: {
     says: "every key, its value, and the layer answering it",
@@ -353,6 +364,53 @@ function test() {
     inherit: true,
   });
   return ran.exitCode;
+}
+
+// [[spec/design_output/projection#what-goes-where-is-data]]
+function projections() {
+  const at = join(root, PROJECTIONS);
+  return files.exists(at) ? entriesIn(files.read(at)) : [];
+}
+
+function under(path) {
+  return join(root, String(path).split("/").join(sep));
+}
+
+// [[spec/design_output/projection#check-refuses-a-stale-one]]
+function projectionsHold() {
+  const entries = projections();
+  if (!entries.length) {
+    console.log(`${PROJECTIONS} names no projection, so nothing is projected.`);
+    return 0;
+  }
+
+  const said = readAll(entries, files, under);
+  const found = staleIn(said.wanted, said.standing);
+  if (!found.length) {
+    console.log(`${entries.length} projection(s), and every target reads as projected.`);
+    return 0;
+  }
+  for (const one of found) console.error(`${one.path} ${one.how}`);
+  console.error("A projection is read-only, so edit the source it names instead.");
+  console.error("Run ./RUNME.sh project, which writes every target again.");
+  return 1;
+}
+
+// [[spec/design_output/projection#who-projects-and-when]]
+function project() {
+  const entries = projections();
+  const { wanted, standing } = readAll(entries, files, under);
+
+  for (const [path, text] of wanted) {
+    files.makeDir(dirname(under(path)));
+    if (standing.get(path) !== text) files.write(under(path), text);
+  }
+  for (const path of standing.keys()) {
+    if (!wanted.has(path)) files.remove(under(path));
+  }
+
+  console.log(`${wanted.size} file(s) projected from ${entries.length} projection(s).`);
+  return 0;
 }
 
 // [[spec/design_output/level0#no-computed-engine-access]]
