@@ -9,7 +9,7 @@ rationale: [[spec/rationales/cloud]]
 
 # Actionables
 
-1. Run `./RUNME.sh work take` first where you start on `main`. It gives you a branch and its brief. *
+1. Run `./RUNME.sh work take` first where you start on `main` or on a branch the platform cut. It gives you a branch and its brief, and the branch you start on carries no work. *
 2. Read the brief level zero hands you where you start on a `work/` branch already. *
 3. Take `main` into your branch before you start: `./RUNME.sh work sync`. *
 4. Work the branch you hold and stop at its edge. The brief is the whole job. *

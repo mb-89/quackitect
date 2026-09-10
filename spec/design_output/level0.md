@@ -173,6 +173,15 @@ so does a `permissions` deny rule in `.claude/settings.json`. So the tracked
 file still says what a session may do, and level zero is the one part waiting
 on the flag.
 
+Read the flag before you read anything else. A second probe the same day, on
+client 2.1.42, reads the box around it:
+
+| what a cloud box carries | what the probe reads |
+|---|---|
+| `CLAUDE_CODE_ENABLE_FUNCTION_HOOKS` | `1`, so the switch stands ready |
+| `hasTrustDialogAccepted`, per project | `false`, and the top level holds no key |
+| permission mode | auto, and no call there raises a prompt |
+
 Two things reach a cloud box today:
 
 - `claude --plugin-dir .claude/skills/level0`, which loads the folder for that
