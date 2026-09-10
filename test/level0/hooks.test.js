@@ -558,3 +558,22 @@ test("the write door passes the source a projection reads", async () => {
   });
   assert.equal(said.deny, undefined);
 });
+
+test("a target the box refuses writes one warning, and the rest still land", async () => {
+  const it = engine({ "spec/config/projections.json": PROJECTS });
+  const files = it.files;
+  const was = files.set.bind(files);
+  files.set = (path, text) => {
+    if (path === ".claude/commands/se-log-level.md") throw new Error("read only");
+    return was(path, text);
+  };
+  await it.raise("session.start", {});
+  files.set = was;
+
+  const said = it.lines().filter((one) => one.door === "project");
+  assert.deepEqual(
+    said.map((one) => `${one.level} ${one.said}`),
+    ["info 5 file(s) written", "warn the box refuses a target"],
+  );
+  assert.equal(said[1].file, ".claude/commands/se-log-level.md");
+});

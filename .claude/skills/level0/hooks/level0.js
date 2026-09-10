@@ -119,6 +119,9 @@ export function register(on, _options) {
         ms: drawn.ms,
         detail: `${projections.length} projection(s), ${drawn.size} target(s)`,
       });
+      for (const path of drawn.refused) {
+        await logbook.say("warn", "project", "the box refuses a target", { file: path });
+      }
     }
 
     // [[spec/design_output/stop#where-the-rules-live]]
@@ -418,6 +421,7 @@ export function register(on, _options) {
 // [[spec/design_output/projection#who-projects-and-when]]
 async function projectAll($, entries) {
   const began = Date.now();
+  const refused = [];
   let size = 0;
   let wrote = 0;
 
@@ -430,10 +434,12 @@ async function projectAll($, entries) {
       try {
         await $.fs.write(path, text);
         wrote++;
-      } catch {}
+      } catch {
+        refused.push(path);
+      }
     }
   }
-  return { ms: Date.now() - began, size, wrote };
+  return { ms: Date.now() - began, size, wrote, refused };
 }
 
 async function readIf($, path) {
