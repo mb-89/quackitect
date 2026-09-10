@@ -5,158 +5,172 @@ urgency: soon
 depends_on: the-config-holds-numbers
 ---
 
-# One source, written everywhere
+# The projector stands
 
-`spec/config/level0.json` says what every value is, and a slash command that
-sets one has to exist as a file. Hand-writing both gives two files that agree
-for about a month.
+`spec/config/projections.json` says where each projection lands.
+`.claude/skills/level0/lib/projection.js` holds the mechanism, and
+[[spec/design_output/projection]] carries the whole design.
 
-So the tree projects: one source, several targets, and a program keeping that
-relation alive.
+The first target is `.claude/commands`, holding fifteen slash commands, one per
+settable value in `spec/config/level0.json`.
 
-This branch builds the projector and its first target. The sidebar comes later
-and reads the same declaration, so leave every widget field alone.
+# What the proofs say
 
-# What projection is
-
-v4's ruling, and it stands:
-
-    Projection is one mechanism and not a feature of one file. What is
-    projected where is data. The engine projects and nobody copies by hand. A
-    changed original re-projects on its own. A projection is read-only to the
-    user, and it says that it is one.
-
-And the failure it exists to stop:
-
-    v3 placed files as a step in the installer, so a projection could be
-    refreshed only by running the installer again. That made a projection
-    correct immediately after an install and drifting afterwards.
-
-# What goes where is data
-
-`spec/config/projections.json`, holding a list. Each entry names one
-projection, so adding one is an edit to data and no program changes.
-
-v4's entry shape, worth following:
-
-    {
-      "name": "the config commands",
-      "target": ".claude/commands",
-      "from": "spec/config/level0.json",
-      "wrap": "frontmatter"
-    }
-
-Read v4's own file at `spec/config/projections.json` for the rest of its
-vocabulary. It carries `sources`, `sources_from`, `wrap`, `section`, `preamble`
-and `local`, each answering a target it meets. Take what this tree needs and
-leave the rest.
-
-# The first target
-
-One slash command per settable value. A value with a small set of options gets
-one command each; a value taking a number gets one command taking an argument.
-
-| the parameter | the command |
+| what the brief asks | where it stands |
 |---|---|
-| `stop.hold`, with three options | three files, one per option |
-| `judge.model`, a string | one file, taking the value as an argument |
+| `check` passes, and validates the plugin | 289 tests, and `√ Validation passed` |
+| every settable value carries a command | `.claude/commands`, fifteen files |
+| no file stands for a value nobody declares | `staleIn` answers `extra`, and `project` drops it |
+| `check` refuses a hand edit, under test | `test/level0/projection.test.js`, over a fake disk |
+| the write door refuses a generated file | `test/level0/hooks.test.js`, both `Write` and `Edit` |
+| a command sets the value, end to end | measured below, twice |
+| a second entry projects with no code change | `test/level0/projection.test.js` |
 
-Name a file for the path it sets, so a person reading `.claude/commands` sees
-the tree: `se-stop-hold-stopped.md`, `se-judge-model.md`.
+# The command road works here
 
-## Each file says so
+Measured on 2026-09-10 against client 2.1.267, in a copy of this tree:
 
-v4 writes this into the description of each one, and the wording earns its
-place:
+    $ claude -p "/se-log-level-warn"
+    $ cat .se/config.json
+    { "log": { "level": "warn" } }
 
-    GENERATED. Edit the source named below, not this file. It is written again
-    every time the tree is projected, so an edit here is lost.
-    Source: spec/config/level0.json
+    $ claude -p "/se-judge-model sonnet"
+    $ cat .se/config.json
+    { "log": { "level": "warn" }, "judge": { "model": "sonnet" } }
 
-Say the same thing, and name our source.
+So the second road holds. A command file carries `!` and the run, names the
+verb in `allowed-tools`, and the client runs it before the turn opens. A file
+taking an argument carries `$ARGUMENTS`, and the client fills it in ahead of the
+run.
 
-## How a command sets it
+The keyword road stays unbuilt, and nothing in this branch reads a prompt.
 
-Two roads, and take the second:
+# What projecting costs
 
-| road | what it costs |
+Twenty runs of each, over one projection and fifteen targets:
+
+| the run | cost |
 |---|---|
-| v4's, a magic string `KEYWORD:ASK=ON` that a hook matches | one hook reading every prompt |
-| ours, the command file runs `./RUNME.sh config <key> <value>` | nothing: the verb already writes the local file |
+| every target already reads as projected | 0.29 ms median, 0.20 ms low |
+| all fifteen take a write | 0.59 ms median, 0.45 ms low |
 
-The second lands the value before the turn even starts. Say in your handback
-whether it holds on this client.
+The number comes from the projector over the disk door. **The hooks module
+loads nowhere on this box**, so no `session.start` line stands to read. Client
+2.1.267 counts one plugin, which belongs to the client, and registers no hook
+from it. [[spec/design_output/level0#the-trust-gate-reaches-skills]] predicts
+this, and it now carries the count and the client.
 
-Where a command file runs no program here, take v4's road instead: hook
-`prompt.submit`, match the string, write the value, drop the prompt.
+Whoever runs a box that loads the module reads the true figure off the log line,
+door `project`, which carries `ms`.
 
-# Who projects, and when
+# The fields taken from v4
 
-Level zero, at `session.start`. It runs there already and it holds
-`$.fs.writeFile`, so no engine has to exist for this to work.
+| field | here |
+|---|---|
+| `name`, `target`, `wrap` | taken as they stand |
+| `sources`, `sources_from` | left, because `from` names one declaration |
+| `section` | left, because a chapter of a note projects nowhere yet |
+| `preamble` | left, because no target here opens with borrowed text |
+| `local` | left, because git tracks every target here |
+| `shape`, `schema` | new, because a key needs its type before it is a command |
 
-Projecting on every session start is what makes the relation stand. A person
-edits `level0.json`, starts a session, and the commands are right.
+A target here holds many files, where every v4 target is one file. One value
+becomes one command, so the declaration sets how many files land.
 
-# Two guards
+# Where a value holds out
 
-## Check refuses a stale one
+## The word cap refuses one
 
-`./RUNME.sh check` projects in memory, compares each target against the file on
-disk, and refuses a difference. It names the file and the verb that mends it.
+`stop.mostInARow` reads as `se-stop-most-in-a-row` in kebab case, and that name
+holds six words where this tree allows five. So the leaf keeps the case the key
+holds, and the file reads `se-stop-mostInARow.md`. Every other name comes out
+under the cap by luck alone, so a longer key coming later meets the same wall.
 
-Compare in memory, so a fake disk drives the whole thing in a test.
+## A two word section breaks
 
-## The write door refuses one
+`answerFirst.enabled` reads back from `SE_ANSWER_FIRST_ENABLED` as
+`answer.firstEnabled`, so the contract test on the variable mapping refuses it.
+The config design says a key holds one section and one leaf, and `answerFirst`
+holds a section of two words. This branch renames it to `answer.enabled`, which
+matches `stop.enabled` and `judge.enabled` and the name the log door already
+uses.
 
-v4 calls a projection the one forbidden destination. A person editing one loses
-that edit at the next projection.
+## A comment carries no command
 
-The write door already reads every Write and Edit. It reads
-`spec/config/projections.json` and refuses a write to anything a projection
-owns, naming the source to edit.
+`flatten` skips every `comment` key, so the prose beside a value takes no file.
+That falls out of the config resolver, and it costs nothing here.
 
-That refusal is the one place this branch touches the hooks module.
+# The surprise
 
-# What to prove first
+**The branch this one depends on stands done and outside `main`.**
 
-1. `./RUNME.sh check` passes, and it runs `claude plugin validate` for you.
-2. Every settable value in `level0.json` has a command file, and no file stands
-   for a value the declaration no longer names.
-3. `check` refuses a projection somebody edits by hand, under test.
-4. The write door refuses a write to a generated command, under test.
-5. A generated command sets the value, end to end. Run one and read the file.
-6. A second entry in `projections.json` projects with no code change.
+`work take` reads `depends_on` and holds a branch only while its dependency
+stands at `todo` or `held`. A `done` dependency counts as satisfied, and it
+waits on a person to merge it. So this box takes a branch whose dependency it
+cannot read, and `./RUNME.sh config` stands nowhere in the tree the brief
+describes.
 
-# What your handback says
+This branch merges `origin/work/the-config-holds-numbers` into itself and goes
+on. `./RUNME.sh work sync` takes trunk alone, and no verb takes a dependency, so
+the merge happens by hand. It costs four resolutions:
 
-- Whether a command file runs `./RUNME.sh config` on this client, or whether
-  the keyword road is the one that works.
-- What projecting costs at `session.start`, in milliseconds.
-- Which of v4's projection fields you take, and which you leave.
-- Every place a value resisted becoming a command.
+| what collides | how it resolves |
+|---|---|
+| `$.fs.readFile` and `$.fs.write` | main renames the file surface, so the resolver follows |
+| `answerFirst` reaching the old config | it asks the resolver, the way the tooth does |
+| `findings` importing `WORDS` | the caller hands the word cap in |
+| `answerFirst` breaking the round trip | it becomes `answer` |
+
+**A person merging this branch takes both pieces of work in one go.** Read
+`./RUNME.sh work read the-config-holds-numbers` for the handback under this
+one, because `HANDOVER.md` carries one file and this one replaces it.
+
+## What the next branch pays
+
+`the-sidebar-draws-it` waits on this one and reads the same declaration. It
+meets this merged history, so it takes no second merge.
+
+Two things stop this. A `work depend` verb takes a done dependency in. A merge
+to trunk soon after a branch says done leaves nothing to take.
+
+# The dead ends
+
+## A nested client loads none
+
+Measuring the session start asks for a client running under this one. Two runs
+answer with no `.se/level0.stamp` and no log line, in a copy of the tree and in
+the tree itself. The debug log names the count, and the trust gate section
+already carries the reason.
+
+Reading `/root/.claude/debug` answers what `claude --debug` swallows, which is
+worth knowing on the next branch that measures a hook.
+
+## The generated files meet Vale
+
+`.claude/commands` sits inside the glob the rules read, so every projected file
+meets `PastTense`, `LongSentence` and the rest. The first draft breaks four of
+them. The projector now wraps its lines at the width a person holds, and the
+body says what is.
+
+This is the good kind of dead end. A generated file that ducks the rules reads
+as a second voice in the tree.
+
+## The output meets them harder
+
+Fourteen findings over the first draft of [[spec/design_output/projection]],
+most of them `Antithesis` and `ShortHeading`. Writing a design output costs
+about as long as writing the code it describes.
 
 # What this branch leaves alone
 
-Every widget field in the declaration: `group`, `row`, `column`, `icon`. The
-sidebar branch adds those and reads the same file. Touch neither, and project
-nothing for them.
+Every widget field in the declaration: `group`, `row`, `column`, `icon`. Nothing
+here reads one, and nothing projects one.
 
-## How this branch runs
+# What comes next
 
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
-
-1. Run `./RUNME.sh work sync` FIRST. It takes main into this branch, so
-   an old branch works against what the tree holds now. Resolve any conflict
-   before you start, because a conflict found later costs the work already
-   done.
-2. Commit and push each time you finish a thing. A cloud box dies and takes
-   its working tree with it.
-3. Write your result and your retro into `HANDOVER.md`, at the root, replacing
-   this brief. Say what surprises you and every dead end you walk into.
-4. Run `./RUNME.sh work done`, which sets the status and pushes.
-5. Run `./RUNME.sh work release` instead where you stop early, so the branch
-   goes back to `todo` for somebody else.
-6. Leave the merge into main to a person. A cloud box opens no pull
-   request, and trunk only ever comes towards you.
+1. A person merges this branch, which carries the config resolver with it.
+2. A person runs `./RUNME.sh work close the-config-holds-numbers` after that.
+3. The sidebar branch reads `spec/config/level0.json` and adds the widget
+   fields.
+4. A box that loads the hooks module reads the real `session.start` cost off the
+   log and writes it into the design output.
