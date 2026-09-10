@@ -20,6 +20,7 @@ import {
 } from "../../.claude/skills/level0/lib/projection.js";
 import { pathInScript, SCRIPT } from "../../.claude/skills/level0/lib/scripts.js";
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
+import { treeFaults, treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { EDITOR_SETTINGS } from "../../.claude/skills/level0/lib/servers.js";
 import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
 import { configOf, LOCAL } from "../../.claude/skills/level0/lib/config.js";
@@ -197,6 +198,9 @@ async function lint(where) {
     found.push(...pathInScript(files.read(file), show(file)));
   }
 
+  // [[spec/design_output/tree#when-the-sweep-runs]]
+  if (where.includes(".")) found.push(...treeFaults(treeHere()));
+
   if (files.exists(biome)) {
     const code = outside.run(
       [biome, "lint", "--config-path=spec/config", "--reporter=github", ...where],
@@ -241,6 +245,17 @@ async function lint(where) {
   }
   console.log(`${String(found.length).padStart(6)}  in all`);
   return 1;
+}
+
+// [[spec/design_output/tree#the-tree-handed-in]]
+function treeHere() {
+  return treeOf({
+    disk: files,
+    git: it.git,
+    root,
+    words: it.words,
+    node: process.version.replace(/^v/, ""),
+  });
 }
 
 // [[spec/design_output/log#lnav-and-how-it-installs]]

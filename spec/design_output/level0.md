@@ -459,8 +459,16 @@ copy honest. A copy nobody can edit needs no guard.
 
 # The rules Vale cannot hold
 
-Vale reads no `.sh` and no `.ps1`, so a rule over a shell script lives in
-`.claude/skills/level0/lib/scripts.js`, and the command line runs it beside Vale's own.
+Vale hands a rule one buffer, and it reads no `.sh` and no `.ps1`. Two kinds of
+rule therefore live outside it, and the command line runs both beside Vale's
+own:
+
+| the rule | where it lives |
+|---|---|
+| a rule over a shell script | `.claude/skills/level0/lib/scripts.js` |
+| a rule weighing two files | `.claude/skills/level0/lib/tree.js` |
+
+For details, see [[spec/design_output/tree#the-rules-over-two-files]].
 
 `NoPathInScript` refuses an interpolated path on a line running an inline
 script. Git Bash hands node a path beginning `/c/`, node reads it as a folder
@@ -478,7 +486,8 @@ colon inside one through `OneTitle`, because both turn one title into two.
 
 Vale reads what a file holds, and its path stays outside that. So
 `.claude/skills/level0/lib/names.js` counts a name instead. `work new` refuses a
-long branch, and a contract test holds every tracked path.
+long branch, and `NameHoldsTheWords` holds every path git tracks.
+For details, see [[spec/design_output/tree#the-rules-over-two-files]].
 
 The config holds the cap as `names.words`, and the caller hands it to
 `overLong`.

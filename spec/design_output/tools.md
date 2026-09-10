@@ -50,8 +50,9 @@ finds a tool in `.se/bin`.
 
 # What the survey names
 
-`WANTED` names every tool a caller asks for. A contract test holds it against
-the install script: a tool the installer installs stands in the survey.
+`WANTED` names every tool a caller asks for. `SurveyNamesInstalls` holds it
+against the install script: a tool the installer installs stands in the survey.
+For details, see [[spec/design_output/tree#the-rules-over-two-files]].
 
 The rule reads the `here()` cases, so `lnav-format` stays out of it. A stamp
 file is no tool.

@@ -38,9 +38,11 @@ relative to the workspace folder:
 | `biome.lsp.bin` | a path per platform | Windows takes `biome.exe`, and the rest take `biome` |
 | `biome.configurationPath` | `spec/config/biome.json` | Biome looks for its config at the root, and this tree holds it under `spec` |
 
-`test/contract/tree.test.js` reads both files and asserts every row above, so
-the settings and `.se/bin` move together. It reads the real disk, which is what
-puts it in the contract folder.
+`SettingsNameBinaries`, `EditorDrawsWriteRules`, `BiomeOnWindows` and
+`ExtensionsOnOffer` weigh both files and hold every row above, so the settings
+and `.se/bin` move together. `./RUNME.sh lint` runs them, so a drift lands in
+the problems panel of the editor they configure.
+For details, see [[spec/design_output/tree#the-rules-over-two-files]].
 
 VS Code holds `vale.valeCLI.path` and `vale.valeCLI.config` at their user-level
 value until a person trusts the workspace. Trust the folder on the first open,
