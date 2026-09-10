@@ -47,7 +47,7 @@ const CONFIG = JSON.stringify({
   log: { level: "info" },
 });
 
-function engine(seed = {}) {
+function engine(seed = {}, taught = {}) {
   const files = new Map([
     ["spec/guidance/working.md", NOTE],
     ["spec/config/stop/level0.yml", RULES],
@@ -56,8 +56,17 @@ function engine(seed = {}) {
   ]);
   const registered = [];
   const prompts = [];
+  const runs = [];
+  const spawns = [];
 
   const $ = {
+    agent: {
+      spawn: async (input) => {
+        spawns.push(input);
+        if (!taught.spawn) throw new Error("this engine offers no agent");
+        return taught.spawn(input);
+      },
+    },
     fs: {
       readFile: async (path) => {
         if (!files.has(path)) throw new Error(`no ${path}`);
@@ -72,7 +81,13 @@ function engine(seed = {}) {
           .map((one) => ({ name: one.slice(path.length + 1), kind: "file" })),
       exists: async () => false,
     },
-    process: { run: async () => ({ exitCode: 0, stdout: "", stderr: "" }) },
+    process: {
+      run: async (argv, init) => {
+        runs.push({ argv: [...argv], init });
+        const said = taught.run ? taught.run(argv) : null;
+        return said ?? { exitCode: 0, stdout: "", stderr: "" };
+      },
+    },
     model: { classify: async () => [] },
     tool: {
       register: async (spec) => {
@@ -102,6 +117,8 @@ function engine(seed = {}) {
     files,
     registered,
     prompts,
+    runs,
+    spawns,
     async raise(event, e, tool) {
       let said = e;
       for (const one of of(event, tool)) {
@@ -116,26 +133,29 @@ function engine(seed = {}) {
   };
 }
 
-async function started(seed) {
-  const it = engine(seed);
+async function started(seed, taught) {
+  const it = engine(seed, taught);
   await it.raise("session.start", {});
   return it;
 }
 
 const answered = { reason: "answer", answer: "", durationMs: 1, aborted: false };
 
-test("a session start writes one line, and registers the claim tool", async () => {
+test("a session start writes one line, and registers both tools", async () => {
   const it = await started();
 
   assert.deepEqual(
     it.lines().map((one) => `${one.door} ${one.said}`),
     ["level0 session start"],
   );
-  assert.equal(it.registered.length, 1);
-  assert.equal(it.registered[0].name, "claim_stop");
+  assert.deepEqual(
+    it.registered.map((one) => one.name),
+    ["claim_stop", "review_branch"],
+  );
   assert.deepEqual(it.registered[0].inputSchema.properties.rule.enum, [
     "the-work-stands-complete",
   ]);
+  assert.deepEqual(it.registered[1].inputSchema.required, ["branch"]);
 });
 
 // [[spec/design_output/log#what-a-tool-line-names]]
@@ -234,4 +254,102 @@ test("a claim reaches the vote, and the tooth counts it once", async () => {
   assert.equal(said[0].said, "claimed the-work-stands-complete");
   assert.equal(said[1].said, "the turn goes on", "work stands over a finished piece");
   assert.match(said[1].detail, /^stop=the-work-stands-complete@45/);
+});
+
+const MATERIAL = {
+  branch: "work/the-config-holds-numbers",
+  ref: "origin/work/the-config-holds-numbers",
+  brief: "# Hold the numbers\n",
+  handback: "# It holds\n\n# Retro\n\nOne surprise.\n",
+  retro: true,
+  stat: " src/a.js | 2 +-\n",
+  diff: "diff --git a/src/a.js\n",
+  check: { ok: true, code: 0, says: "" },
+};
+
+const gathers = (said) => (argv) =>
+  argv.includes("review") ? { exitCode: 0, stdout: `${said}\n` } : null;
+
+// [[spec/design_output/review#the-tool-the-session-calls]]
+test("the review tool runs the verb, spawns a reader and answers the report", async () => {
+  const it = await started(
+    {},
+    {
+      run: gathers(JSON.stringify(MATERIAL)),
+      spawn: async () => ({
+        model: "a-model",
+        text: '{"brief":"done","beyond":"none","tests":"1 rule, 1 test","fix":1}',
+      }),
+    },
+  );
+
+  const said = await it.raise(
+    "tool.call",
+    { tool: "mcp__level0__review_branch", branch: "the-config-holds-numbers" },
+    "mcp__level0__review_branch",
+  );
+
+  const ran = it.runs.find((one) => one.argv.includes("review"));
+  assert.deepEqual(ran.argv, [
+    "sh",
+    "RUNME.sh",
+    "work",
+    "review",
+    "the-config-holds-numbers",
+    "--json",
+  ]);
+  assert.match(it.spawns[0].prompt, /Hold the numbers/, "the reader gets the brief");
+  assert.match(it.spawns[0].prompt, /The first rule/, "and the rules this tree holds");
+  assert.match(said.result, /^check {6}passes$/m);
+  assert.match(said.result, /^retro {6}present$/m);
+  assert.match(said.result, /^brief {6}done$/m);
+  assert.match(said.result, /^1 thing to fix, and the merge is a person's\.$/m);
+});
+
+// [[spec/design_output/review#where-the-spawn-refuses]]
+test("a spawn that refuses leaves the mechanical half standing", async () => {
+  const it = await started({}, { run: gathers(JSON.stringify(MATERIAL)) });
+
+  const said = await it.raise(
+    "tool.call",
+    { tool: "mcp__level0__review_branch", branch: "the-config-holds-numbers" },
+    "mcp__level0__review_branch",
+  );
+
+  assert.match(said.result, /^check {6}passes$/m);
+  assert.match(said.result, /^reader {5}no reader ran here: this engine offers no agent$/m);
+});
+
+test("the review tool refuses a call naming no branch", async () => {
+  const it = await started();
+
+  const said = await it.raise(
+    "tool.call",
+    { tool: "mcp__level0__review_branch", branch: "" },
+    "mcp__level0__review_branch",
+  );
+
+  assert.match(said.result, /takes one branch name/);
+  assert.deepEqual(
+    it.runs.filter((one) => one.argv.includes("review")),
+    [],
+    "it gathers nothing",
+  );
+});
+
+test("a verb that gathers nothing comes back with what it said", async () => {
+  const it = await started(
+    {},
+    { run: () => ({ exitCode: 1, stdout: "", stderr: "work/gone stands nowhere.\n" }) },
+  );
+
+  const said = await it.raise(
+    "tool.call",
+    { tool: "mcp__level0__review_branch", branch: "gone" },
+    "mcp__level0__review_branch",
+  );
+
+  assert.match(said.result, /gone: the verb gathered nothing/);
+  assert.match(said.result, /work\/gone stands nowhere/);
+  assert.deepEqual(it.spawns, [], "no reader runs on nothing");
 });

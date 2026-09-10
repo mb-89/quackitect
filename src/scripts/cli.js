@@ -50,6 +50,7 @@ function doorsHere() {
       level: said.log?.level,
     }),
     config: said,
+    node: process.execPath,
     join,
   };
 }
@@ -105,7 +106,7 @@ const verbs = {
     run: async () => doorsHold(),
   },
   work: {
-    says: "work branches: new, take, read, list",
+    says: "work branches: new, take, read, review, list",
     run: async () => work(root, rest, it),
   },
   log: {
