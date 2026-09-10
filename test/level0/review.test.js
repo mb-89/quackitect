@@ -341,3 +341,22 @@ test("the diff runs from the merge base, so trunk's own work stays out", () => {
     "a two-dot diff reads trunk's later commits as this branch removing them",
   );
 });
+
+// [[spec/design_output/review#a-worktree-runs-the-check]]
+test("a worktree that opens nowhere answers so, and runs no check", () => {
+  const { it } = doorsSaying(
+    standing({ [`git worktree add --detach ${AT} ${REF}`]: { exitCode: 1 } }),
+  );
+
+  const { said } = heard(() => work(ROOT, ["review", NAME, "--json"], it));
+  const material = JSON.parse(said);
+
+  assert.equal(material.check.ok, false);
+  assert.equal(material.check.code, null);
+  assert.match(material.check.says, /no worktree opens on origin\/work/);
+  assert.equal(
+    it.proc.ran.some((one) => one.argv.includes("src/scripts/cli.js")),
+    false,
+    "no check runs where no worktree stands",
+  );
+});

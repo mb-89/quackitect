@@ -11,8 +11,10 @@ and answers the two mechanical questions, with no model in it. Level zero
 registers `review_branch`, runs that verb through `$.process.run`, spawns a
 reader with the material and the standing rules, and answers one short report.
 
-Two reviews run end to end on this box. The report reads well, and it names
-real misses on the branch it reads, each against a file and a line.
+Three reviews run end to end on this box, and the third reads this branch. It
+names three rules here that fire on nothing under test, all three correctly,
+and this branch now carries a test for each. That is the reader paying for
+itself on its first day.
 
 # Read this first
 
@@ -94,7 +96,7 @@ commits and a diff of 1300 lines:
 | the half | seconds | model calls |
 |---|---|---|
 | the verb alone | 4 to 5 | 0 |
-| the whole tool | 199 and 245, over two runs | 1 spawn, plus the caller's own turn |
+| the whole tool | 199, 245 and 254, over three runs | 1 spawn, plus the caller's own turn |
 
 The verb's seconds go almost entirely to the worktree check. The reader is one
 `general-purpose` subagent. It spends its own context on the diff and hands
@@ -126,6 +128,15 @@ commits.
 
 Question five reads best of the three. It names each rule the branch adds, says
 which a test drives with bad input, and says why the others fire on nothing.
+
+On this branch it reads:
+
+    tests      13 refusal/detector rules added. 10 carry a test that feeds bad
+               input and asserts the refusal ... 3 fire on nothing under test:
+               checkOn's 'no worktree opens on <ref>' branch ... and two of
+               readerRuns' three spawn-refusal branches
+
+Every one of those three is real, and each carries a test now.
 
 # Is the report short enough
 

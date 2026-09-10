@@ -353,3 +353,43 @@ test("a verb that gathers nothing comes back with what it said", async () => {
   assert.match(said.result, /work\/gone stands nowhere/);
   assert.deepEqual(it.spawns, [], "no reader runs on nothing");
 });
+
+// [[spec/design_output/review#where-the-spawn-refuses]]
+test("a spawn the engine refuses says so, and the check still stands", async () => {
+  const it = await started(
+    {},
+    {
+      run: gathers(JSON.stringify(MATERIAL)),
+      spawn: async () => ({ model: "a-model", deny: "this session spawns nothing" }),
+    },
+  );
+
+  const said = await it.raise(
+    "tool.call",
+    { tool: "mcp__level0__review_branch", branch: "the-config-holds-numbers" },
+    "mcp__level0__review_branch",
+  );
+
+  assert.match(said.result, /^check {6}passes$/m);
+  assert.match(said.result, /^reader {5}the spawn is refused: this session spawns nothing$/m);
+});
+
+// [[spec/design_output/review#where-the-spawn-refuses]]
+test("a reader that fails says so, and the check still stands", async () => {
+  const it = await started(
+    {},
+    {
+      run: gathers(JSON.stringify(MATERIAL)),
+      spawn: async () => ({ model: "a-model", isError: true, text: "it ran out" }),
+    },
+  );
+
+  const said = await it.raise(
+    "tool.call",
+    { tool: "mcp__level0__review_branch", branch: "the-config-holds-numbers" },
+    "mcp__level0__review_branch",
+  );
+
+  assert.match(said.result, /^check {6}passes$/m);
+  assert.match(said.result, /^reader {5}the reader failed: it ran out$/m);
+});
