@@ -195,13 +195,46 @@ door it takes.
 
 ## The setup writes the flag
 
-`src/scripts/trust.js` writes it, and an environment names one setup command:
+`src/scripts/trust.js` writes it where the tree and `node` both stand to hand.
+A cloud environment carries neither at setup time. Measured on 2026-09-10: a
+setup naming `node src/scripts/trust.js` fails, and the session ends at
+`init_script` with no first turn. A failing setup takes the session with it, so
+the one an environment carries leans on nothing:
 
-    node src/scripts/trust.js
+    #!/bin/bash
+    set -u
+    repo="$PWD"
+    [ -d "$repo/.git" ] || repo=/home/user/quackitect
+    python3 - "$repo" <<'PY' || true
+    import json, os, sys
+    folder, path = sys.argv[1], os.path.expanduser("~/.claude.json")
+    try:
+        said = json.load(open(path))
+    except Exception:
+        said = {}
+    said["hasTrustDialogAccepted"] = True
+    said.setdefault("projects", {}).setdefault(folder, {})["hasTrustDialogAccepted"] = True
+    tmp = path + ".trust"
+    json.dump(said, open(tmp, "w"), indent=2)
+    os.replace(tmp, path)
+    print("trusted", folder, "in", path)
+    PY
+    exit 0
 
-It reads `~/.claude.json`, marks this folder one the client trusts, and leaves
-every other key and every other project alone. Nothing races it, because the
-setup runs before a session holds the file.
+Both readers mark this folder one the client trusts, and both leave every other
+key and every other project alone. The `exit 0` holds a session up where the
+write fails. Nothing races either one, because the setup runs before a session
+holds the file.
+
+A box carrying that setup says the canary out loud. Measured on 2026-09-10, on
+a cloud box cloning `main`:
+
+| what a box answers | with no setup | with the setup |
+|---|---|---|
+| `hasTrustDialogAccepted` | false | true |
+| `claude plugin list` | the scan skips one folder | level zero loads |
+| the canary line | absent | the session says it |
+| the cloud guidance | absent | the standing layer carries it |
 
 The scan happens once, at the start, so a session already under way needs one
 more step. The client names it in the same line the probe read: once the trust
