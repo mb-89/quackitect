@@ -62,6 +62,7 @@ async function doorsHere() {
     }),
     config: said,
     words: await said.ask("names.words"),
+    node: process.execPath,
     join,
   };
 }
@@ -122,7 +123,7 @@ const verbs = {
     run: async () => readConfig(rest),
   },
   work: {
-    says: "work branches: new, take, read, list",
+    says: "work branches: new, take, read, review, list",
     run: async () => work(root, rest, it),
   },
   log: {

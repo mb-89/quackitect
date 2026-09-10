@@ -21,6 +21,7 @@ import { godMode, HEALTH, repairs } from "../lib/health.js";
 import { judgeOf } from "../lib/judge.js";
 import { aimOf, asLines, FOLDER, nameOf, rowOf, writes } from "../lib/log.js";
 import { refusal, refusedCommand, taught } from "../lib/refuse.js";
+import { readerAsks, readerSays, report, reviewSpec } from "../lib/review.js";
 import { readRule } from "../lib/rulefile.js";
 import { guesses, pathOf, surveyOf, TOOLS } from "../lib/tools.js";
 import {
@@ -44,6 +45,8 @@ const TRUNK = "main";
 const JUDGED = "spec/config/styles/VoiceJudged";
 
 const ANSWER = "level0-answer.md";
+const GATHERING = 300000;
+const GATHER = ["node", "src/scripts/cli.js"];
 
 export function register(on, _options) {
   let bin = null;
@@ -109,6 +112,7 @@ export function register(on, _options) {
     }
 
     await $.tool.register(claimSpec(rules));
+    await $.tool.register(reviewSpec());
     return next(e);
   });
 
@@ -254,6 +258,31 @@ export function register(on, _options) {
       detail: String(e.description ?? "").slice(0, 120),
     });
     return next({ ...e, prompt: forHelper(standing, e.prompt) });
+  });
+
+  // [[spec/design_output/review#the-tool-the-session-calls]]
+  on("tool.call", { tool: "mcp__level0__review_branch" }, async ($, e, _next) => {
+    const name = String(e.branch ?? "").trim();
+    if (!name) return { result: "review_branch takes one branch name." };
+
+    const ran = await $.process.run([...GATHER, "work", "review", name, "--json"], {
+      timeoutMs: GATHERING,
+    });
+    const material = materialOf(ran.stdout);
+    if (!material) {
+      const why = String(ran.stderr ?? "").trim() || String(ran.stdout ?? "").trim();
+      await logbook.say("warn", "review", `the verb gathered nothing for ${name}`, {
+        detail: why.slice(0, 200),
+      });
+      return { result: `${name}: the verb gathered nothing.\n\n${why}` };
+    }
+
+    const read = await readerRuns($, material, standing);
+    await logbook.say("info", "review", `read ${material.branch}`, {
+      branch: material.branch,
+      detail: `check=${material.check?.code} retro=${material.retro} fix=${read.fix}`,
+    });
+    return { result: report(material, read) };
   });
 
   on("turn.complete", async ($, e, next) => {
@@ -531,6 +560,36 @@ async function judgeSettings(settings) {
     warmupWrites: await settings.ask("judge.warmupWrites"),
     thenEveryNth: await settings.ask("judge.thenEveryNth"),
   };
+}
+
+// [[spec/design_output/review#what-the-reader-answers]]
+function materialOf(stdout) {
+  const lines = String(stdout ?? "").split(/\r?\n/).reverse();
+  for (const line of lines) {
+    if (!line.startsWith("{")) continue;
+    try {
+      const read = JSON.parse(line);
+      if (read.branch) return read;
+    } catch {}
+  }
+  return null;
+}
+
+// [[spec/design_output/review#where-the-spawn-refuses]]
+async function readerRuns($, material, rules) {
+  let said = null;
+  try {
+    said = await $.agent.spawn({
+      prompt: readerAsks(material, rules),
+      description: `read ${material.branch}`,
+      subagentType: "general-purpose",
+    });
+  } catch (bad) {
+    return { fix: 0, unread: `no reader ran here: ${bad?.message ?? bad}` };
+  }
+  if (said?.deny) return { fix: 0, unread: `the spawn is refused: ${said.deny}` };
+  if (said?.isError) return { fix: 0, unread: `the reader failed: ${said.text ?? ""}` };
+  return readerSays(said?.text);
 }
 
 // [[spec/design_output/level0#the-canary]]
