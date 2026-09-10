@@ -1,0 +1,50 @@
+# A guidance note carries the rules for one audience, and nothing else. The
+# argument for a starred rule stands in the rationale this note links.
+#
+# The frontmatter half is JSON Schema 2020-12, https://json-schema.org/draft/2020-12.
+# The body half is this project's own, borrowed from https://document-schema.org.
+# A value written [[like this]] is a link, and the name inside is the value.
+#
+# A bound a rule already holds stays with that rule. VoiceVale/LongSentence
+# bounds every sentence here at 25 words, so this file names no word count.
+
+kind: guidance
+
+frontmatter:
+  type: object
+  additionalProperties: false
+  required:
+    - kind
+    - scope
+  properties:
+    kind:
+      const: guidance
+      x-link: true
+      description: which schema reads this note
+
+    scope:
+      type: array
+      description: who this note binds, one entry per audience
+
+    rationale:
+      x-link: true
+      description: the note arguing for the starred rules, one link
+
+    env:
+      type: array
+      description: the variables saying a session is in scope, where that scope is a machine
+
+body:
+  headingLevel: 1
+  order: strict
+  extraSections: false
+
+  sections:
+    - header: Actionables
+      required: true
+      list: true
+      ordered: true
+      detailMarker: "*"
+      tense: present
+      maxItems: 15
+      description: one rule per item, in the active voice, as an instruction

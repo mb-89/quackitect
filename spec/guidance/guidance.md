@@ -10,7 +10,7 @@ rationale: [[spec/rationales/guidance]]
 2. Put the argument, the history and the measurement in `spec/rationales/<name>.md`. *
 3. A guidance note holds one chapter, `Actionables`, and links its rationale in the frontmatter.
 4. Write one rule per item, in the active voice and the present tense, as an instruction.
-5. Hold a note to ten rules. An eleventh rule means two notes.
+5. Hold a note to the items its schema allows. [[spec/config/schemas]]
 6. Give a rule needing argument a star, and argue it in the rationale under its number.
 7. Move a rule a program can check to that program, and leave a link in its place. *
 8. Write the present tense. `spec/rationales` is the one place the past tense belongs.
