@@ -56,17 +56,18 @@ function engine(seed = {}) {
   ]);
   const registered = [];
   const prompts = [];
+  const said = [];
 
   const $ = {
     fs: {
-      readFile: async (path) => {
+      read: async (path) => {
         if (!files.has(path)) throw new Error(`no ${path}`);
         return files.get(path);
       },
-      writeFile: async (path, text) => {
+      write: async (path, text) => {
         files.set(path, text);
       },
-      listDir: async (path) =>
+      list: async (path) =>
         [...files.keys()]
           .filter((one) => one.startsWith(`${path}/`))
           .map((one) => ({ name: one.slice(path.length + 1), kind: "file" })),
@@ -86,6 +87,7 @@ function engine(seed = {}) {
         return { text: input.text };
       },
     },
+    session: { messages: async () => said },
   };
 
   const hooks = [];
@@ -102,6 +104,7 @@ function engine(seed = {}) {
     files,
     registered,
     prompts,
+    transcript: said,
     async raise(event, e, tool) {
       let said = e;
       for (const one of of(event, tool)) {
@@ -234,4 +237,90 @@ test("a claim reaches the vote, and the tooth counts it once", async () => {
   assert.equal(said[0].said, "claimed the-work-stands-complete");
   assert.equal(said[1].said, "the turn goes on", "work stands over a finished piece");
   assert.match(said[1].detail, /^stop=the-work-stands-complete@45/);
+});
+
+// [[spec/design_output/level0#the-owners-prompt-comes-first]]
+test("the first call of an unanswered turn refuses, and the next one passes", async () => {
+  const it = await started();
+  await it.raise("prompt.submit", { text: "build the door", origin: { kind: "composer" } });
+  it.transcript.push({ role: "user", text: "build the door" });
+
+  const refused = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.match(refused.deny, /^The owner asked something and nothing has answered it\./);
+
+  it.transcript.push({ role: "assistant", text: "You want the door. I read the brief." });
+  const passed = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.equal(passed.deny, undefined);
+
+  const found = it.lines().filter((one) => one.door === "answer");
+  assert.deepEqual(found.map((one) => one.said), ["refused Read before an answer"]);
+});
+
+test("a prompt the plugin submits refuses nothing", async () => {
+  const it = await started();
+  await it.raise("prompt.submit", {
+    text: "carry on",
+    origin: { kind: "plugin", name: "level0" },
+  });
+
+  const said = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.equal(said.deny, undefined);
+});
+
+test("a helper's call passes, because the helper owes the owner nothing", async () => {
+  const it = await started();
+  await it.raise("prompt.submit", { text: "build the door", origin: { kind: "composer" } });
+  it.transcript.push({ role: "user", text: "build the door" });
+
+  const said = await it.raise("tool.call", {
+    tool: "Read",
+    file_path: "a.md",
+    agentId: "a19eab2edc664d20a",
+  });
+  assert.equal(said.deny, undefined);
+});
+
+test("answerFirst turns the door off", async () => {
+  const it = await started({
+    "spec/config/level0.json": JSON.stringify({
+      judge: { enabled: false },
+      stop: { enabled: true, mostInARow: 3 },
+      answerFirst: { enabled: false },
+      log: { level: "info" },
+    }),
+  });
+  await it.raise("prompt.submit", { text: "build the door", origin: { kind: "composer" } });
+  it.transcript.push({ role: "user", text: "build the door" });
+
+  const said = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.equal(said.deny, undefined);
+});
+
+test("the turn's end clears what the turn owed", async () => {
+  const it = await started();
+  await it.raise("prompt.submit", { text: "build the door", origin: { kind: "composer" } });
+  it.transcript.push({ role: "user", text: "build the door" });
+  await it.raise("turn.complete", { ...answered, answer: "done" });
+
+  const said = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.equal(said.deny, undefined);
+});
+
+// [[spec/design_output/level0#the-helper-takes-the-guidance]]
+test("a spawn carries the guidance the session reads, and its task after it", async () => {
+  const it = await started();
+  const said = await it.raise("agent.spawn", {
+    subagentType: "general-purpose",
+    description: "read the note",
+    prompt: "Read note.txt and report what it holds.",
+  });
+
+  assert.match(said.prompt, /^# How this tree is worked/);
+  assert.match(said.prompt, /1\. The first rule\./);
+  assert.match(said.prompt, /# Your task\n\nRead note\.txt and report what it holds\.$/);
+
+  const found = it.lines().filter((one) => one.door === "agent");
+  assert.deepEqual(found.map((one) => one.said), [
+    "handed the guidance to general-purpose",
+  ]);
 });
