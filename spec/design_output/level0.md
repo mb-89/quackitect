@@ -105,6 +105,25 @@ Two things reach a cloud box today:
 The canary finds this. A session saying the line out loud is a session level
 zero holds, and a cloud session that starts the ordinary way says nothing.
 
+## The setup writes the flag
+
+`src/scripts/trust.js` writes it, and an environment names one setup command:
+
+    node src/scripts/trust.js
+
+It reads `~/.claude.json`, marks this folder one the client trusts, and leaves
+every other key and every other project alone. Nothing races it, because the
+setup runs before a session holds the file.
+
+The scan happens once, at the start, so a session already under way needs one
+more step. The client names it in the same line the probe read: once the trust
+stands, `/reload-plugins` loads what qualifies, and a relaunch does the same. A
+person types that, so the setup stays the road for a box nobody watches.
+
+The flag sits in the home of the box, which a cloud box puts at `/root` while
+the tree sits under `/home/user`. So the script reads `HOME` for the path, and
+it prints the file it writes for the setup log to carry.
+
 # The write door
 
 `tool.call` reads every Write and Edit. Prose goes to Vale, code goes to Biome,
