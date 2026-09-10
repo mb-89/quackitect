@@ -3,7 +3,12 @@
   "stop": {
     "comment": "The tooth. enabled false takes it out, and mostInARow caps the turns it carries one after another. The rules it votes over live in spec/config/stop.",
     "enabled": true,
-    "mostInARow": 3
+    "mostInARow": 3,
+    "hold": "running"
+  },
+  "ask": {
+    "comment": "What the owner wants said. The standing block carries a line while this stands past quiet, and the turn's end writes it back to quiet.",
+    "wanted": "quiet"
   },
   "answer": {
     "comment": "The door holding the owner's prompt first. It refuses a tool call in a turn a person opens where nothing has answered them yet. enabled false takes it out.",

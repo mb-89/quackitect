@@ -21,6 +21,7 @@ import {
   EDITOR_EXTENSIONS,
   EDITOR_SETTINGS,
 } from "../../.claude/skills/level0/lib/servers.js";
+import { pool } from "../../.claude/skills/level0/lib/stop.js";
 import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import {
   biomeOnWindows,
@@ -44,6 +45,8 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { git } from "../../src/doors/git.js";
 import { proc } from "../../src/doors/proc.js";
+import { faultsIn as gridFaults } from "../../src/extension/lib/grid.js";
+import { drawnIn, entriesIn } from "../../src/extension/lib/widgets.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -81,6 +84,12 @@ const fakeTree = (seed, paths = [], node = NODE) =>
     words,
     node,
   });
+
+const namesIn = (at, end) =>
+  files
+    .list(at)
+    .filter((one) => one.kind === "file" && one.name.endsWith(end))
+    .map((one) => one.name);
 
 const edited = (where, change) => {
   const said = read(where);
@@ -304,6 +313,86 @@ test("the schema passes the config this tree ships, and refuses one short a fiel
   const short = flatten(read(TRACKED));
   short.delete("judge.maxSpans");
   assert.deepEqual(faultsIn(read(SCHEMA), short), ["judge.maxSpans is missing"]);
+});
+
+// [[spec/design_output/extension#the-grid-check]]
+test("the schema this tree ships places every widget in a cell of its own", () => {
+  assert.deepEqual(gridFaults(read(SCHEMA)), []);
+});
+
+// [[spec/design_output/extension#one-declaration-draws-it]]
+test("three controls draw, and the level one widgets stand declared and undrawn", () => {
+  const schema = read(SCHEMA);
+  assert.deepEqual(
+    drawnIn(schema).map((one) => one.key),
+    ["stop.hold", "ask.wanted", "log.open"],
+  );
+
+  const waiting = entriesIn(schema).filter((one) => one.widget && !one.group);
+  assert.deepEqual(
+    waiting.map((one) => one.key),
+    ["engine.state", "engine.binding", "engine.autonomy"],
+  );
+  for (const one of waiting) {
+    assert.ok(one.help, `${one.key} says what it is`);
+  }
+});
+
+// [[spec/design_output/extension#a-click-writes-the-file]]
+test("every widget writing a key names one the declaration carries", () => {
+  const said = flatten(read(TRACKED));
+  for (const one of drawnIn(read(SCHEMA))) {
+    if (one.widget === "action") continue;
+    assert.ok(said.has(one.key), `${one.key} stands in ${TRACKED}`);
+    assert.ok(one.options.includes(said.get(one.key)), `${one.key} rests on an option`);
+  }
+});
+
+// [[spec/design_output/extension#the-sidebar-draws-the-tree]]
+test("npm reaches the extension alone, and the root of the tree stays bare", () => {
+  const said = proc().run(["git", "ls-files", "*package.json"], { cwd: root });
+  const paths = said.stdout.split(/\r?\n/).filter(Boolean);
+
+  assert.ok(paths.includes("package.json"), "the root names one");
+  for (const path of paths) {
+    if (path === "package.json") continue;
+    assert.match(path, /^src\/extension\//, `${path} stands under the extension`);
+  }
+
+  const bare = read("package.json");
+  assert.equal(bare.dependencies, undefined);
+  assert.equal(bare.devDependencies, undefined);
+});
+
+// [[spec/design_output/extension#the-editor-is-a-door]]
+test("the extension imports the editor and its own folder, and nothing else", () => {
+  const found = proc().run(["git", "ls-files", "src/extension/**.js"], { cwd: root });
+  const paths = found.stdout.split(/\r?\n/).filter(Boolean);
+  assert.ok(paths.length > 5, "the extension carries its modules");
+
+  for (const path of paths) {
+    const text = files.read(join(root, path));
+    for (const hit of text.matchAll(/(?:from|require\()\s*["']([^"']+)["']/g)) {
+      const said = hit[1];
+      if (said === "vscode") continue;
+      assert.match(said, /^\.\.?\//, `${path} imports ${said} as a path of its own`);
+      assert.ok(!said.includes("../../"), `${path} stays inside src/extension`);
+    }
+  }
+});
+
+// [[spec/design_output/stop#the-mechanical-checks]]
+test("every mechanical check the stop table names stands in the hook", () => {
+  const hook = files.read(join(root, ".claude", "skills", "level0", "hooks", "level0.js"));
+  const at = join(root, STOP);
+  const named = pool(
+    namesIn(at, ".yml").map((name) => ({ name, text: files.read(join(at, name)) })),
+  ).rules.filter((one) => one.decides === "mechanical");
+
+  assert.ok(named.length, "the table names a mechanical rule");
+  for (const one of named) {
+    assert.match(hook, new RegExp(`"${one.runs}"`), `the hook answers ${one.runs}`);
+  }
 });
 
 // [[spec/design_output/config#a-variable-names-a-key]]

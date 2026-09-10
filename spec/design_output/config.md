@@ -80,9 +80,17 @@ directions over it.
 whole file carries. `keysOf` reads it, `typeOf` answers one key, and `faultsIn`
 names a key the tracked file lacks and a key carrying another type.
 
-The schema carries no prose, because the `comment` beside each value in the
-tracked file says what the value is for. A session start writes one `warn` line
-per fault, door `config`, and `./RUNME.sh config` says the same on the way out.
+The `comment` beside each section of the tracked file says what that section is
+for. A session start writes one `warn` line per fault, door `config`, and
+`./RUNME.sh config` says the same on the way out.
+
+## The schema says the drawing
+
+A key carries `help` and `unit` beside its type, and the sidebar hovers the one
+and prints the other. A key drawing as a control carries more:
+[[spec/design_output/extension#one-declaration-draws-it]] names every field.
+`keysOf` answers the type alone, and `entriesIn` in the extension answers the
+whole entry.
 
 ## The editor draws the schema
 
