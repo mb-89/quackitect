@@ -5,6 +5,10 @@
     "enabled": true,
     "mostInARow": 3
   },
+  "answerFirst": {
+    "comment": "The door holding the owner's prompt first. It refuses a tool call in a turn a person opens where nothing has answered them yet. enabled false takes it out.",
+    "enabled": true
+  },
   "log": {
     "comment": "The level this box writes at. info writes everything, warn writes a refusal and a fault, error writes a fault. A level nobody names reads as info.",
     "level": "info"

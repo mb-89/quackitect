@@ -3,6 +3,8 @@
 // and spec/guidance.
 // [[spec/design_output/level0#the-write-door]]
 
+import { opensATurn, reachesTheOwner, SAYS, spokeSince } from "../lib/answer.js";
+import { commitIn, findings as readsCommand, verbLine } from "../lib/bash.js";
 import { CODE, formatText, lintText as lintCode } from "../lib/code.js";
 import {
   bindsHere,
@@ -10,12 +12,13 @@ import {
   canaryIn,
   countsOf,
   envOf,
+  forHelper,
   parse,
   standingLayer,
 } from "../lib/guidance.js";
 import { judgeOf } from "../lib/judge.js";
 import { aimOf, asLines, FOLDER, nameOf, rowOf, writes } from "../lib/log.js";
-import { refusal, taught } from "../lib/refuse.js";
+import { refusal, refusedCommand, taught } from "../lib/refuse.js";
 import { readRule } from "../lib/rulefile.js";
 import { guesses, pathOf, surveyOf, TOOLS } from "../lib/tools.js";
 import {
@@ -29,10 +32,10 @@ import {
   toothOf,
 } from "../lib/stop.js";
 import { landsOnTrunk, touchesGit } from "../lib/trunk.js";
-import { lintText } from "../lib/vale.js";
+import { lintText, PROSE } from "../lib/vale.js";
 
-const PROSE = /\.(md|markdown|txt)$/i;
 const GUIDANCE = "spec/guidance";
+const COMMIT = "level0-commit.md";
 const CONFIG = "spec/config/level0.json";
 const HANDOVER = ".se/HANDOVER.md";
 const BRIEF = "HANDOVER.md";
@@ -55,6 +58,7 @@ export function register(on, _options) {
   let logbook = logHere(null);
   let rules = [];
   let onAHeldBranch = false;
+  let owed = false;
   const list = todos();
   let tooth = toothOf();
 
@@ -84,13 +88,13 @@ export function register(on, _options) {
     tooth = toothOf({ mostInARow: config.stop?.mostInARow });
 
     try {
-      await $.fs.writeFile(
+      await $.fs.write(
         ".se/level0.stamp",
         `${new Date().toISOString()} vale=${bin ?? "missing"}\n`,
       );
     } catch {}
 
-    logbook = logHere((at, text) => $.fs.writeFile(at, text), config.log?.level);
+    logbook = logHere((at, text) => $.fs.write(at, text), config.log?.level);
     await logbook.say("info", "level0", "session start", {
       branch: await branchNow($),
       vale: bin ?? "missing",
@@ -111,6 +115,7 @@ export function register(on, _options) {
   on("prompt.submit", async (_$, e, next) => {
     const from = String(e.origin?.kind ?? "");
     tooth.sawPrompt(from === "plugin");
+    if (opensATurn(e.origin)) owed = true;
     await logbook.say("info", "prompt", String(e.text ?? ""), { detail: from });
     return next(e);
   });
@@ -120,6 +125,11 @@ export function register(on, _options) {
     tooth.sawCall(String(e.tool ?? ""));
     list.sawCall(e);
     await logbook.say("info", "tool", aimOf(e), { tool: e.tool });
+
+    // [[spec/design_output/level0#the-owners-prompt-comes-first]]
+    const answers = await answerDoor($, e, { owed, config, logbook });
+    if (answers.deny) return answers;
+    owed = answers.owed;
 
     const writing = asWrite(e);
     if (!writing) return next(e);
@@ -193,6 +203,29 @@ export function register(on, _options) {
     };
   });
 
+  // [[spec/design_output/bash#what-the-door-reads]]
+  on("tool.call", { tool: "Bash" }, async ($, e, next) => {
+    const said = String(e.command ?? "");
+    const found = readsCommand(said);
+    found.push(...(await commitVoice($, said, bin)));
+    if (!found.length) return next(e);
+
+    await logbook.say("warn", "bash", `refused ${found.length} rule(s) in a command`, {
+      tool: "Bash",
+      rule: found[0].rule,
+      detail: said.slice(0, 120),
+    });
+    return { deny: refusedCommand(said, found) };
+  });
+
+  // [[spec/design_output/bash#the-description-names-verbs]]
+  on("tool.describe", { tool: "Bash" }, async (_$, e, next) => {
+    const said = await next(e);
+    const base = said && typeof said === "object" ? said : {};
+    const text = String(base.description ?? e.description ?? "").trim();
+    return { ...base, description: [text, verbLine()].filter(Boolean).join("\n\n") };
+  });
+
   // [[spec/design_output/stop#the-claim-and-its-life]]
   on("tool.call", { tool: "mcp__level0__claim_stop" }, async (_$, e, _next) => {
     const said = tooth.claims(String(e.rule ?? ""), String(e.why ?? ""));
@@ -202,8 +235,18 @@ export function register(on, _options) {
     return { result: { ...said, counted: "at the end of this turn" } };
   });
 
+  // [[spec/design_output/level0#the-helper-takes-the-guidance]]
+  on("agent.spawn", async (_$, e, next) => {
+    if (!standing) return next(e);
+    await logbook.say("info", "agent", `handed the guidance to ${e.subagentType}`, {
+      detail: String(e.description ?? "").slice(0, 120),
+    });
+    return next({ ...e, prompt: forHelper(standing, e.prompt) });
+  });
+
   on("turn.complete", async ($, e, next) => {
     const said = await next(e);
+    owed = false;
     if (firstTurn && e.reason === "answer") {
       firstTurn = false;
       await heardCanary(logbook, canaryIn(e.answer, sentence), sentence);
@@ -329,6 +372,47 @@ export function register(on, _options) {
   }
 }
 
+// [[spec/design_output/level0#the-owners-prompt-comes-first]]
+async function answerDoor($, e, it) {
+  if (!it.owed || it.config.answerFirst?.enabled === false) return { owed: it.owed };
+  if (e.agentId || reachesTheOwner(e.tool)) return { owed: it.owed };
+
+  let spoke = true;
+  try {
+    spoke = spokeSince(await $.session.messages());
+  } catch {
+    spoke = true;
+  }
+  if (spoke) return { owed: false };
+
+  await it.logbook.say("warn", "answer", `refused ${e.tool} before an answer`, {
+    tool: e.tool,
+  });
+  return { deny: SAYS, owed: true };
+}
+
+// [[spec/design_output/bash#a-commit-message-meets-voice]]
+async function commitVoice($, command, bin) {
+  const said = commitIn(command);
+  if (!said || !bin) return [];
+
+  let text = String(said.text ?? "");
+  if (said.form === "file") {
+    try {
+      text = await $.fs.read(said.file);
+    } catch {
+      return [];
+    }
+  }
+  if (!text.trim()) return [];
+
+  const ran = await lintText(text, COMMIT, {
+    bin,
+    run: (argv, init) => $.process.run(argv, init),
+  });
+  return ran.ran ? ran.found : [];
+}
+
 // [[spec/design_output/level0#the-canary]]
 async function heardCanary(logbook, heard, sentence) {
   if (heard.found === "same") {
@@ -405,7 +489,7 @@ async function takeHandover($) {
   for (const path of [HANDOVER, BRIEF]) {
     let text = "";
     try {
-      text = await $.fs.readFile(path);
+      text = await $.fs.read(path);
     } catch {
       continue;
     }
@@ -481,11 +565,11 @@ async function readEnv($, names) {
 
 async function readFolder($, folder, end) {
   try {
-    const entries = await $.fs.listDir(folder);
+    const entries = await $.fs.list(folder);
     const out = [];
     for (const one of entries) {
       if (!one.name.endsWith(end)) continue;
-      out.push({ name: one.name, text: await $.fs.readFile(`${folder}/${one.name}`) });
+      out.push({ name: one.name, text: await $.fs.read(`${folder}/${one.name}`) });
     }
     return out;
   } catch {
@@ -495,11 +579,11 @@ async function readFolder($, folder, end) {
 
 async function readRules($, folder) {
   try {
-    const entries = await $.fs.listDir(folder);
+    const entries = await $.fs.list(folder);
     const out = [];
     for (const one of entries) {
       if (!one.name.endsWith(".yml")) continue;
-      const rule = readRule(await $.fs.readFile(`${folder}/${one.name}`));
+      const rule = readRule(await $.fs.read(`${folder}/${one.name}`));
       out.push({ ...rule, name: one.name.replace(/\.yml$/, "") });
     }
     return out;
@@ -510,7 +594,7 @@ async function readRules($, folder) {
 
 async function readConfig($) {
   try {
-    return JSON.parse(await $.fs.readFile(CONFIG));
+    return JSON.parse(await $.fs.read(CONFIG));
   } catch {
     return {};
   }
@@ -519,7 +603,7 @@ async function readConfig($) {
 // [[spec/design_output/tools#where-a-caller-looks]]
 async function readSurvey($) {
   try {
-    return surveyOf(await $.fs.readFile(TOOLS));
+    return surveyOf(await $.fs.read(TOOLS));
   } catch {
     return {};
   }
