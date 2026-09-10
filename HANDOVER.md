@@ -1,6 +1,6 @@
 ---
 kind: [[handover]]
-status: held
+status: done
 urgency: whenever
 depends_on: the-projection-writes-it
 ---
