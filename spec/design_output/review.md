@@ -33,8 +33,8 @@ mechanical answers in front of them while they do.
 |---|---|
 | the brief | `HANDOVER.md` at the branch's first commit |
 | the handback | `HANDOVER.md` as the branch carries it now |
-| the shape of the diff | `git diff --stat main..<ref>` |
-| the whole diff | `git diff main..<ref>` |
+| the shape of the diff | `git diff --stat main...<ref>` |
+| the whole diff | `git diff main...<ref>` |
 | the check | `./RUNME.sh check` on that branch |
 
 The brief and the handback are one file at two commits. `work new` writes the
@@ -51,6 +51,16 @@ a person merges and origin is what the reader reads.
 
 Trunk resolves the same way, and a branch carrying no commit beyond trunk stops
 the verb with a line saying so.
+
+## Three dots, not two
+
+Three dots read the diff from where the branch leaves trunk. Two dots read it
+from trunk's tip, so a branch standing behind trunk shows every commit trunk
+holds since as a removal.
+
+One real review pays that price here. A branch 19 commits behind trunk answers
+"two entire subsystems, deleted and undisclosed", over code the branch leaves
+alone. `rev-list` keeps two dots, because it counts the branch's own commits.
 
 # A worktree runs the check
 

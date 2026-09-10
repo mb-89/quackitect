@@ -55,8 +55,8 @@ function gather(it, at) {
     brief: show(it, `${at.first}:${BRIEF}`),
     handback,
     retro: retroIn(handback),
-    stat: it.git.run(["diff", "--stat", `${at.trunk}..${at.ref}`], true).out,
-    diff: capped(it.git.run(["diff", `${at.trunk}..${at.ref}`], true).out),
+    stat: it.git.run(["diff", "--stat", `${at.trunk}...${at.ref}`], true).out,
+    diff: capped(it.git.run(["diff", `${at.trunk}...${at.ref}`], true).out),
     check: checkOn(it, at),
   };
 }

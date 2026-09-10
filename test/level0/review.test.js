@@ -55,8 +55,8 @@ const standing = (more = {}) => ({
   [`git rev-list --reverse origin/main..${REF}`]: { stdout: `${FIRST}\n2222\n` },
   [`git show ${FIRST}:HANDOVER.md`]: { stdout: BRIEF },
   [`git show ${REF}:HANDOVER.md`]: { stdout: HANDBACK },
-  [`git diff --stat origin/main..${REF}`]: { stdout: " src/a.js | 2 +-\n" },
-  [`git diff origin/main..${REF}`]: { stdout: "diff --git a/src/a.js\n" },
+  [`git diff --stat origin/main...${REF}`]: { stdout: " src/a.js | 2 +-\n" },
+  [`git diff origin/main...${REF}`]: { stdout: "diff --git a/src/a.js\n" },
   "git worktree prune": { exitCode: 0 },
   [`git worktree add --detach ${AT} ${REF}`]: { exitCode: 0 },
   [`git worktree remove --force ${AT}`]: { exitCode: 0 },
@@ -325,4 +325,19 @@ test("the verb alone prints the two rows it owns, and no brief", () => {
   assert.match(said, /^retro {6}absent from the handback$/m);
   assert.equal(said.includes("Hold the numbers"), false, "the brief stays out");
   assert.match(said, /^1 thing to fix, and the merge is a person's\.$/m);
+});
+
+// [[spec/design_output/review#three-dots-not-two]]
+test("the diff runs from the merge base, so trunk's own work stays out", () => {
+  const { it, outside } = doorsSaying(standing());
+
+  heard(() => work(ROOT, ["review", NAME, "--json"], it));
+
+  const ran = ranGit(outside);
+  assert.ok(ran.includes(`git diff origin/main...${REF}`), "three dots, not two");
+  assert.equal(
+    ran.includes(`git diff origin/main..${REF}`),
+    false,
+    "a two-dot diff reads trunk's later commits as this branch removing them",
+  );
 });
