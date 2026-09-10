@@ -1,0 +1,24 @@
+extends: script
+message: "An interpolated path breaks under another shell: Git Bash hands node /c/... and node reads C:c.... Change into the root first and pass a relative path."
+link: spec/design_output/level0.md
+level: error
+scope: raw
+script: |
+  text := import("text")
+
+  lines := text.split(scope, "\n")
+  matches := []
+  offset := 0
+
+  for i := 0; i < len(lines); i++ {
+    line := lines[i]
+    at := offset
+    offset += len(line) + 1
+    t := text.trim_space(line)
+
+    if text.has_prefix(t, "#") { continue }
+    if !text.re_match(`(^|\s)(-e|--input-type|-Command|-c)\s`, line) { continue }
+    if !text.re_match(`\$\{?[A-Za-z_][A-Za-z0-9_:]*\}?[/\\]|file:///\$|['"]\$\(`, line) { continue }
+
+    matches = append(matches, {begin: at, end: at + len(line)})
+  }

@@ -79,15 +79,15 @@ whatever path a person names.
 
 # The script rule draws live
 
-`[formats]` in `.vale.ini` maps `sh` and `ps1` to `md`, so Vale reads a shell
-script. `spec/config/styles/VoiceScript` holds one rule over those two
-endings, and `NoPathInScript` stands there.
+`[formats]` in `.vale.ini` maps `.sh` and `.ps1` to `md`, so Vale reads a shell
+script. `spec/config/styles/VoiceScript` holds one rule over those two endings,
+and `NoPathInScript` stands there.
 
-A person then meets the path fault under the line as they type, and the
-command line meets the same rule name. `lib/scripts.js` holds `SCRIPT`, the
-ending pattern the walk reads, and nothing else.
+A person then meets the path fault under the line while typing, and the command
+line meets the same rule name. So `lib/scripts.js` goes, and the loop beside it
+in `lint` goes with it.
 
-For details, see [[spec/design_output/level0#the-rules-vale-cannot-hold]].
+For details, see [[spec/design_output/level0#the-rules-past-one-buffer]].
 
 # What stays outside
 

@@ -17,7 +17,6 @@ import {
   TRACKED,
   varOf,
 } from "../../.claude/skills/level0/lib/config.js";
-import { pathInScript, SCRIPT } from "../../.claude/skills/level0/lib/scripts.js";
 import {
   EDITOR_EXTENSIONS,
   EDITOR_SETTINGS,
@@ -61,12 +60,6 @@ const settings = configOf({
   read: async (where) => files.read(join(root, where)),
   readEnv: async () => ({}),
 });
-const namesIn = (at, end) =>
-  files
-    .list(at)
-    .filter((one) => one.kind === "file" && one.name.endsWith(end))
-    .map((one) => one.name);
-
 const words = await settings.ask("names.words");
 const here = treeOf({
   disk: files,
@@ -94,15 +87,6 @@ const edited = (where, change) => {
   change(said);
   return JSON.stringify(said, null, 2);
 };
-
-test("every script in this tree passes the rule", () => {
-  const scripts = namesIn(SCRIPTS, "").filter((n) => SCRIPT.test(n));
-  assert.ok(scripts.length, "there is at least one script");
-  for (const name of scripts) {
-    const said = files.read(join(SCRIPTS, name));
-    assert.deepEqual(pathInScript(said, name), [], `${name} interpolates no path`);
-  }
-});
 
 // [[spec/design_output/bash#the-description-names-verbs]]
 test("every verb the Bash description names stands in the command line", () => {

@@ -457,16 +457,19 @@ exactly what that box reads.
 A projection writes the rules into a file, and a guard then has to keep that
 copy honest. A copy nobody can edit needs no guard.
 
-# The rules Vale cannot hold
+# The rules past one buffer
 
-Vale hands a rule one buffer, and it reads no `.sh` and no `.ps1`. Two kinds of
-rule therefore live outside it, and the command line runs both beside Vale's
-own:
+Vale hands a rule one buffer, so a rule weighing two files stands outside it.
+Vale reads a shell script once `[formats]` names the ending, and the leading dot
+carries that mapping: `.ps1 = md` reads the file, and a bare `ps1 = md` answers
+`unsupported extension`.
+
+Both kinds reach a person the same way, through the command line and the panel:
 
 | the rule | where it lives |
 |---|---|
-| a rule over a shell script | `.claude/skills/level0/lib/scripts.js` |
 | a rule weighing two files | `.claude/skills/level0/lib/tree.js` |
+| a rule over a shell script | `spec/config/styles/VoiceScript` |
 
 For details, see [[spec/design_output/tree#the-rules-over-two-files]].
 
@@ -510,6 +513,7 @@ answers that the rules pass.
 |---|---|
 | `spec/config/styles/VoiceVale` | Vale reads it over prose and code |
 | `spec/config/styles/VoiceShape` | Vale reads it over the shape of a note or a rule file |
+| `spec/config/styles/VoiceScript` | Vale reads it over a shell script |
 | `spec/config/styles/VoiceJudged` | a model reads it, and no `BasedOnStyles` names it |
 | `spec/config/biome.json` | Biome reads it |
 

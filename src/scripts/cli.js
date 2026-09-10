@@ -18,7 +18,6 @@ import {
   readAll,
   staleIn,
 } from "../../.claude/skills/level0/lib/projection.js";
-import { pathInScript, SCRIPT } from "../../.claude/skills/level0/lib/scripts.js";
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { treeFaults, treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { EDITOR_SETTINGS } from "../../.claude/skills/level0/lib/servers.js";
@@ -85,6 +84,7 @@ const LOG = join(root, ".se", "log");
 const STYLES = join(root, "spec", "config", "styles", "VoiceVale");
 const JUDGED = join(root, "spec", "config", "styles", "VoiceJudged");
 const SHAPE = join(root, "spec", "config", "styles", "VoiceShape");
+const SCRIPTED = join(root, "spec", "config", "styles", "VoiceScript");
 const biome = whereIs(files, root, "biome", known);
 const GUIDANCE = join(root, "spec", "guidance");
 const DOORS = join(root, "src", "doors");
@@ -192,10 +192,6 @@ async function lint(where) {
     for (const one of unreasoned(files.read(file))) {
       found.push({ ...one, file: show(file) });
     }
-  }
-
-  for (const file of walk(where, SCRIPT)) {
-    found.push(...pathInScript(files.read(file), show(file)));
   }
 
   // [[spec/design_output/tree#when-the-sweep-runs]]
@@ -508,10 +504,13 @@ function listRules() {
     console.error("The style folder is missing.");
     return 2;
   }
-  for (const name of namesIn(STYLES, ".yml")) {
-    const text = files.read(join(STYLES, name));
-    const message = /^message:\s*"?(.*?)"?\s*$/m.exec(text)?.[1] ?? "";
-    console.log(`${name.replace(/\.yml$/, "").padEnd(20)} ${message}`);
+  for (const at of [STYLES, SHAPE, SCRIPTED]) {
+    if (!files.exists(at)) continue;
+    for (const name of namesIn(at, ".yml")) {
+      const text = files.read(join(at, name));
+      const message = /^message:\s*"?(.*?)"?\s*$/m.exec(text)?.[1] ?? "";
+      console.log(`${name.replace(/\.yml$/, "").padEnd(20)} ${message}`);
+    }
   }
   return 0;
 }
@@ -566,7 +565,9 @@ async function doctor() {
       files.exists(STYLES)
         ? `${namesIn(STYLES, ".yml").length} in VoiceVale, ${
             files.exists(SHAPE) ? namesIn(SHAPE, ".yml").length : 0
-          } in VoiceShape`
+          } in VoiceShape, ${
+            files.exists(SCRIPTED) ? namesIn(SCRIPTED, ".yml").length : 0
+          } in VoiceScript`
         : "missing",
     ],
     [
