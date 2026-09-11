@@ -96,7 +96,7 @@ test("the score counts the findings a thousand words, outside a fence", () => {
   assert.equal(scoreOf(prose, []), 0);
   assert.equal(scoreOf("", [{}]), 0);
 
-  const fenced = ["one two three four five", "```", "a b c d e f g h", "```"].join("\n");
+  const fenced = ["one two three four five", "```", "a b c", "```"].join("\n");
   assert.equal(wordsIn(fenced), 5);
 });
 
@@ -112,7 +112,13 @@ test("the two bands cut the score into three", () => {
 });
 
 const FOUND = [
-  { rule: "PastTense", line: 1, column: 7, said: "was", message: "Write the present tense." },
+  {
+    rule: "PastTense",
+    line: 1,
+    column: 7,
+    said: "was",
+    message: "Write the present tense.",
+  },
 ];
 
 function over(words = 20) {
@@ -148,7 +154,7 @@ test("a turn end under the warning sends nothing, and holds nothing", () => {
   assert.equal(gate.waiting(), null);
 });
 
-// [[spec/design_output/level0#the-carry-rides-the-next-prompt]]
+// [[spec/design_output/level0#the-carry-rides-a-prompt]]
 test("a turn end in the middle band holds the findings for the next prompt", () => {
   const gate = gateOf();
   const said = gate.atTurnEnd({
@@ -229,11 +235,15 @@ test("the gate says rewrite over the ceiling, and names every finding", () => {
 });
 
 test("the gate reads an answer clean where nothing stands", () => {
-  const said = answerFindings("level0-answer.md", { found: [], score: 0, band: "clean" });
+  const said = answerFindings("level0-answer.md", {
+    found: [],
+    score: 0,
+    band: "clean",
+  });
   assert.match(said, /meets the gate clean/);
 });
 
-// [[spec/design_output/level0#the-carry-rides-the-next-prompt]]
+// [[spec/design_output/level0#the-carry-rides-a-prompt]]
 test("the carry is one line naming the findings", () => {
   const said = carried(FOUND, 9.5);
   assert.equal(said.includes("\n"), false);

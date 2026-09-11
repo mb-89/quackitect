@@ -1,8 +1,8 @@
-// The owner's prompt comes first. This holds the rule the answer door reads:
-// which prompts open a turn a person is waiting on, whether the session has
-// said anything back since, which call counts as reaching them anyway, and
-// what a refusal says.
+// The owner's prompt comes first, and the gate reads the answer at the turn's
+// end. This holds both rules: which prompts open a turn a person is waiting on,
+// what a refusal says, and the score, the bands and the state of the gate.
 // [[spec/design_output/level0#the-owners-prompt-comes-first]]
+// [[spec/design_output/level0#the-gate-reads-the-answer]]
 
 // [[spec/design_output/level0#which-prompt-opens-a-turn]]
 const OPENS = new Set([
@@ -79,9 +79,6 @@ export function spokeSince(messages) {
   return Boolean(answerAfter(messages, ""));
 }
 
-// THE GATE OVER THE ANSWER. The turn's end runs the answer through Vale, and
-// the score cuts into three bands: nothing, a line on the next prompt, or one
-// re-prompt saying rewrite.
 // [[spec/design_output/level0#the-gate-reads-the-answer]]
 
 export const CHECK = "check_answer";
@@ -138,7 +135,7 @@ export function gateOf() {
       if (!mine) inARow = 0;
     },
 
-    // [[spec/design_output/level0#the-carry-rides-the-next-prompt]]
+    // [[spec/design_output/level0#the-carry-rides-a-prompt]]
     takeWaiting() {
       const held = waiting;
       waiting = null;

@@ -217,7 +217,7 @@ export function register(on, _options) {
     const text = String(e.text ?? "");
     await logbook.say("info", "prompt", text, { detail: from, text });
 
-    // [[spec/design_output/level0#the-carry-rides-the-next-prompt]]
+    // [[spec/design_output/level0#the-carry-rides-a-prompt]]
     const held = opensATurn(e.origin) ? gate.takeWaiting() : null;
     if (!held) return next(e);
     const line = carried(held.found, held.score);
@@ -571,7 +571,8 @@ export function register(on, _options) {
       mostInARow,
       toothSpoke: Boolean(bit?.sent),
     });
-    await logbook.say(read.band === "clean" ? "info" : "warn", "answer", `the gate reads ${read.band}`, {
+    const level = read.band === "clean" ? "info" : "warn";
+    await logbook.say(level, "answer", `the gate reads ${read.band}`, {
       detail: `score=${read.score} findings=${ran.found.length} inARow=${gate.inARow()}`,
     });
     if (!read.sends) return said;

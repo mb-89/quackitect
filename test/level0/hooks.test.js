@@ -1151,8 +1151,7 @@ test("a target the box refuses writes one warning, and the rest still land", asy
   assert.equal(said[1].file, ".claude/commands/se-config-log-level.md");
 });
 
-// The bands the gate reads. They stand beside the tracked defaults, so a test
-// naming a score names what the gate does with it.
+// [[spec/design_output/level0#the-three-bands]]
 const BANDED = { "spec/config/level0.json": JSON.stringify({
   judge: { enabled: false },
   stop: { enabled: true, mostInARow: 3 },
@@ -1171,7 +1170,10 @@ test("an answer over the ceiling meets one re-prompt, and one alone", async () =
   await it.raise("turn.complete", { ...answered, answer: OVER });
 
   assert.equal(it.prompts.length, 1);
-  assert.match(it.prompts[0].text, /^The voice rules refuse this answer\. Write it again\./);
+  assert.match(
+    it.prompts[0].text,
+    /^The voice rules refuse this answer\. Write it again\./,
+  );
   assert.match(it.prompts[0].text, /50 findings a thousand words/);
   assert.match(it.prompts[0].text, /level0-answer\.md:1:7 {2}PastTense/);
   assert.match(it.prompts[0].text, /Hold PastTense for the rest of this turn/);
@@ -1187,7 +1189,7 @@ test("an answer over the ceiling meets one re-prompt, and one alone", async () =
   assert.match(gate[0].detail, /^score=50 findings=1 inARow=1$/);
 });
 
-// [[spec/design_output/level0#the-carry-rides-the-next-prompt]]
+// [[spec/design_output/level0#the-carry-rides-a-prompt]]
 test("an answer under the ceiling rides the next prompt as one line", async () => {
   const it = await started(BANDED, valeOnAnswer(PAST));
   await it.raise("turn.complete", { ...answered, answer: UNDER });
@@ -1197,7 +1199,10 @@ test("an answer under the ceiling rides the next prompt as one line", async () =
     text: "carry on",
     origin: { kind: "composer" },
   });
-  assert.match(said.text, /^carry on\n\nThe answer before this scored 10 findings a thousand words\./);
+  assert.match(
+    said.text,
+    /^carry on\n\nThe answer before this scored 10 findings a thousand words\./,
+  );
   assert.equal(said.text.split("\n\n")[1].includes("\n"), false, "the carry is one line");
 
   const again = await it.raise("prompt.submit", {
