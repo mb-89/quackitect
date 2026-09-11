@@ -4,111 +4,143 @@ status: held
 urgency: now
 ---
 
-# The schema reads a note
+# Where it stands
 
-Build the reader and the checker for `spec/schemas`, and name every note that
-departs from its schema. Refuse nothing on this branch.
+The schema reads a note. `spec/schemas` holds six proposals, and a program now
+reads all six, weighs every note against its kind, and names each departure at
+warning severity.
 
-Read the six files in `spec/schemas` first. They stand as proposals. Change one
-where this tree says its shape is wrong, and say which and why in the handback.
-
-# What lands
-
-| the piece | where |
+| the piece | where it lands |
 |---|---|
-| the underscore skip | every linter, and the write door |
 | the reader and the checker | `.claude/skills/level0/lib/schema.js` |
-| the findings, at warning severity | `src/scripts/cli.js`, beside `tree.js` |
+| the findings, at warning | `src/scripts/cli.js`, beside `treeFaults` |
+| the underscore skip | `lib/paths.js`, and seven callers of it |
 | the `mint` verb | `./RUNME.sh mint <kind> <path>` |
+| the design note | `spec/design_output/schema.md` |
+| the tests | `test/level0/schema.test.js`, `test/contract/schema.test.js` |
 
-# Take the underscore first
+Every claim the brief asks for stands:
 
-Make every linter, the write door and the language server pass over a file
-whose name opens with an underscore. Park a draft as `_note.md`, and the tree
-stays green while a kind settles.
-
-Land this before anything else. It is the escape every later step leans on.
-
-# The checker answers findings
-
-A finding carries the shape this tree already prints:
-
-    { file, rule, line, column, message, severity }
-
-`pathInScript` and the ten rules in `lib/tree.js` answer that shape today, and
-`line()` in `lib/refuse.js` prints it. Follow both.
-
-Name the rule for what it holds, so a reader sees the schema and the section:
-
-    spec/guidance/voice.md:7:1: Schema.Actionables: A note holds 15 items.
-
-The reader takes the schema text and answers a shape. The checker takes that
-shape and a note, and answers findings. Hand both the disk through the door, so
-a test drives them over a fake tree.
-
-# Warning, and error later
-
-Every finding lands at `severity: warning` on this branch. So `./RUNME.sh lint`
-names each departure and the Problems panel draws it, while `check` stays
-green.
-
-The next branch flips them to error and puts the checker at the write door.
-Leave that alone here.
-
-# Mint writes a valid note
-
-`./RUNME.sh mint <kind> <path>` reads the schema for that kind and writes a
-note the checker passes:
-
-| what mint writes | from |
-|---|---|
-| the frontmatter fields the schema requires | `frontmatter.required` |
-| one heading per section the schema names | `body.sections[].header` |
-| the description under each, as an HTML comment | `description` |
-
-Hold a judge away from those comments, and count none of them toward a bound.
-Read v4's ruling at `spec/rationale/a-section-is-measured-in-words`: the
-template's own comments stay outside the size.
-
-# What to watch
-
-| the thing | what to do |
-|---|---|
-| A cloud box holds one session | The hooks module loads once at the start, so prove this through `./RUNME.sh lint` and the tests |
-| A shape rule meets a fragment | An `Edit` hands a whole-document rule the edited lines alone, so the write door waits for the next branch |
-| The guidance notes load by path | Level zero reads `spec/guidance/*.md`, so an underscore there takes the rules away from the agent |
-| Vale reads `exceptions` | `VoiceVale/PastTense` carries eleven words the tagger misreads |
-
-# What to prove
-
-1. `./RUNME.sh check` passes, and it answers green with the findings standing.
-2. A `_note.md` breaking a rule answers nothing from any linter.
-3. Each schema keyword takes a test that feeds a bad note and reads the refusal.
+1. `./RUNME.sh check` answers 0 with 39 findings standing.
+2. A `_note.md` breaking a rule answers nothing, from Vale or the sweep.
+3. Each keyword the checker holds takes a case feeding it a bad note.
 4. `./RUNME.sh lint` names every departure in the standard line shape.
 5. `./RUNME.sh mint` writes one note per kind, and the checker passes each one.
 
-# What the handback says
+# What the checker finds
 
-- How many notes depart, one row per kind, so the next branch reads its size.
-- Which schema keywords a program cannot check, and what each one costs.
-- Which of the six schemas you change, and what the tree says that moves you.
-- What `lint` costs in milliseconds with the checker running.
+33 notes carry a kind, 22 of them depart, and the departures count 39:
 
-## How this branch runs
+| kind | notes | depart | findings |
+|---|---|---|---|
+| design_output | 15 | 15 | 29 |
+| rationale | 8 | 4 | 6 |
+| guidance | 7 | 0 | 0 |
+| design_input | 1 | 1 | 1 |
+| funnel | 1 | 1 | 1 |
+| handover | 1 | 0 | 0 |
 
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
+Three departures carry the weight, and a person owns each one:
 
-1. Run `./RUNME.sh work sync` FIRST. It takes main into this branch, so
-   an old branch works against what the tree holds now. Resolve any conflict
-   before you start, because a conflict found later costs the work already
-   done.
-2. Commit and push each time you finish a thing. A cloud box dies and takes
-   its working tree with it.
-3. Write your result and your retro into `HANDOVER.md`, at the root, replacing
-   this brief. Say what surprises you and every dead end you walk into.
-4. Run `./RUNME.sh work done`, which sets the status and pushes.
-5. Run `./RUNME.sh work release` instead where you stop early, so the branch
-   goes back to `todo` for somebody else.
-6. Leave the merge into main to a person. A cloud box opens no pull
-   request, and trunk only ever comes towards you.
+| the departure | how many | what stands behind it |
+|---|---|---|
+| `Schema.Scope` | 16 | every design output and the one funnel open with their own chapter |
+| `Schema.describes` | 14 | every design output names the code it describes, and the schema forbids the field |
+| `Schema.Why` | 4 | two rationales title their own chapter, and two number their chapters backwards |
+
+The two backward ones are real disorder: `spec/rationales/testing.md` runs 4
+then 3, and `spec/rationales/voice.md` runs 10 then 4.
+
+# What a program passes over
+
+Four keywords answer no finding, and each one costs something:
+
+| keyword | why a program passes | what it costs |
+|---|---|---|
+| `tense` | Vale holds `PastTense` over the whole file | a chapter marked `past` inside a present-tense note meets no rule |
+| `detailMarker` | the marker is one rule's own choice | a rule wanting an argument and carrying no star stays quiet |
+| `description` | it is prose for a person | mint carries it, and nothing weighs a chapter against it |
+| `matches` | it names a second note, and resolving a link is a job of its own | a rationale chapter answering no item stays quiet |
+
+`matches` is the one worth building. It reaches `explains`, reads the note that
+link names, and counts the starred items. A link resolver lands first.
+
+# The schema this branch changes
+
+`spec/schemas/guidance.schema.yaml` loses its `Motivation` chapter. Two rules
+in the standing layer move it:
+
+1. `spec/guidance/guidance.md` rule 3 says a guidance note holds one chapter,
+   `Actionables`, and links its rationale in the frontmatter.
+2. Rule 2 puts the argument, the history and the measurement in
+   `spec/rationales`.
+
+So a required `Motivation` chapter asks every note to carry its argument twice,
+against the standing rule of this tree. All seven guidance notes depart from
+that chapter, and the seven pass once it goes.
+
+The next candidate is `design_output`, and it needs a person:
+
+| the reading | what it says |
+|---|---|
+| the notes | 14 of 15 name `describes` or `implements`, so the schema wants the field |
+| the schema's own comment | the code below names the note, so the field is a second copy of that trace |
+
+# What lint costs
+
+| the run | milliseconds |
+|---|---|
+| `./RUNME.sh lint` over the tree | 780 |
+| `schemaFaults` inside it | 9 |
+| `treeFaults` beside it | 9 |
+
+Vale carries the rest. The checker reads 33 notes and six schemas through the
+disk door, and it adds about one percent.
+
+# What waits
+
+| the thing | what the next session does |
+|---|---|
+| the severity flip | `SEVERITY` in `lib/schema.js` says `warning` in one place, so error is a one-word change |
+| the write door | an `Edit` hands a whole-document rule the edited lines alone, so the door reads the file off disk first |
+| the 39 findings | decide `describes` and `Scope` for design outputs, then mend the four rationales |
+| `matches` | build the link resolver, then the keyword |
+| the handover kind | `work.js` appends `How this branch runs` as a heading, and the schema counts it a chapter |
+
+Nothing on this branch refuses a write. The findings stand at warning, and
+`./RUNME.sh check` stays green while a person reads them.
+
+# The retro
+
+Four things surprise me:
+
+1. `kind: [[guidance]]` reads as a flow list before it reads as a link, because
+   both open with a bracket. The link case goes first, and a test holds it.
+2. Vale reads a heading inside a template literal in a test file, so a YAML
+   comment there trips `ShortHeading`. The comment goes.
+3. `lint` answers 1 for any finding at all. The green check this brief asks for
+   needs the exit to weigh severity, so a warning names itself and passes.
+4. `spec/rationale/a-section-is-measured-in-words` stands nowhere in this tree.
+   The ruling it names still holds. `spansIn` in `lib/judge.js` skips a line
+   opening `<!--` already, so mint writes each description as one line and
+   `lib/judge.js` stays as it is.
+
+Two dead ends:
+
+1. A second `--glob` flag for Vale works, and one nested pattern says the same
+   thing in one place. `--glob=!{{.se,node_modules,.git}/**,**/_*}` stands.
+2. Clearing `BasedOnStyles` in `.vale.ini` skips a draft for the language
+   server, and the CLI glob alone leaves the editor drawing. Both land, because
+   the two readers take different doors.
+
+The hook change waits for the next session: a cloud box loads the hooks module
+once, at the start. So the tests prove the write door skip, and Vale over a
+parked name proves it again.
+
+Three scripts stand under `.se/scripts`, which git ignores:
+
+| the script | what it answers |
+|---|---|
+| `probe.mjs` | the schemas as they read, and what mint writes |
+| `probe2.mjs` | every finding, and the departures per kind |
+| `cost.mjs` | what the checker costs beside the tree rules |
