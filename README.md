@@ -8,8 +8,9 @@ holding before anything else does.
     ./RUNME.sh
 
 That installs what is missing, links the sidebar, and opens this folder in the
-editor. On Windows a person clicks `RUNME.cmd`, which hands the same words to
-the shell Git ships. `./RUNME.sh help` names every verb.
+editor. On Windows a person clicks `RUNME.cmd`, or types `.\RUNME.ps1` where
+they already stand. Both hand the same words to the shell Git ships, so one
+installer serves every box. `./RUNME.sh help` names every verb.
 
 ## The sidebar
 

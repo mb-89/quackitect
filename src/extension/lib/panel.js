@@ -65,11 +65,12 @@ function widget(cell) {
   return [
     `<button class="widget ${placeOf(cell)}${away ? " away" : ""}${held ? " held" : ""}"`,
     ` data-key="${escaped(cell.key)}" data-widget="${escaped(cell.widget)}"`,
-    ` data-runs="${escaped(cell.runs ?? "")}" data-value="${escaped(cell.value ?? "")}"`,
+    ` data-runs="${escaped(cell.runs ?? "")}" data-reads="${escaped(cell.reads ?? "")}"`,
+    ` data-value="${escaped(cell.value ?? "")}"`,
     ` data-options="${escaped((cell.options ?? []).join(" "))}"`,
     ` data-gesture="${escaped(cell.gesture ?? "")}"`,
     ` title="${escaped(hover(cell))}">`,
-    `<span class="mark">${escaped(markOf(cell.at))}</span>`,
+    `<span class="mark">${escaped(markFor(cell))}</span>`,
     cell.widget === "status" ? `<span class="light ${escaped(cell.lit)}"></span>` : "",
     "</button>",
   ].join("");
@@ -84,6 +85,14 @@ function hover(cell) {
   ]
     .filter(Boolean)
     .join("\n");
+}
+
+// [[spec/design_output/extension#a-mark-for-every-state]]
+function markFor(cell) {
+  const marks = String(cell.at ?? "").split(",");
+  if (marks.length < 2) return markOf(cell.at);
+  const at = (cell.options ?? []).indexOf(cell.value);
+  return markOf(marks[at < 0 ? 0 : at]);
 }
 
 // [[spec/design_output/extension#a-mark-and-its-codepoints]]

@@ -4,6 +4,7 @@
 // [[spec/design_output/extension#the-view-holds-nothing]]
 
 const { panelHtml } = require("./lib/panel.js");
+const { newestIn, rowsIn } = require("./lib/rows.js");
 const { opened } = require("./lib/session.js");
 const { asType, parsed, withValue } = require("./lib/values.js");
 const {
@@ -48,6 +49,7 @@ function sidebarOf(door) {
     // [[spec/design_output/extension#a-click-writes-the-file]]
     async took(message) {
       if (message?.kind === "run") return door.runs(String(message.runs ?? ""));
+      if (message?.kind === "show") return shows(door, String(message.reads ?? ""));
       if (message?.kind !== "set" || !message.key) return undefined;
 
       const schema = parsed(await door.read(SCHEMA));
@@ -66,6 +68,16 @@ function sidebarOf(door) {
       return said;
     },
   };
+}
+
+// [[spec/design_output/extension#the-button-prints-the-log]]
+async function shows(door, folder) {
+  if (!folder) return undefined;
+  const name = newestIn(await door.list(folder));
+  if (!name) {
+    return door.says(["No log stands yet. A door writes one the next time it says a line."]);
+  }
+  return door.says(rowsIn(await door.read(`${folder}/${name}`)));
 }
 
 module.exports = { SCHEMA, sidebarOf };

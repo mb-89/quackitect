@@ -119,7 +119,6 @@
         "open": {
           "help": "Open the log in lnav, in a terminal beside the editor.",
           "widget": "action",
-          "runs": "./RUNME.sh log --plain",
           "icon": "the scroll",
           "at": "U+1F4DC",
           "group": "agent control",
@@ -133,7 +132,8 @@
             "/word find, and n for the next one",
             ":filter-in <regex> keep the lines matching, and :filter-out drops them",
             "q leave"
-          ]
+          ],
+          "reads": ".se/log"
         }
       }
     },
@@ -227,7 +227,7 @@
           "widget": "toggle",
           "gesture": 5,
           "icon": "the chain and the broken chain",
-          "at": "U+1F517 U+1F4A5",
+          "at": "U+1F517, U+1F517 U+274C, U+1F916",
           "group": "agent control",
           "row": 0,
           "column": 3,

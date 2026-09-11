@@ -14,6 +14,7 @@ function editorDoor(context) {
   let page = null;
 
   const uriOf = (path) => vscode.Uri.joinPath(folder.uri, ...String(path).split("/"));
+  let console_ = null;
 
   return {
     holds: () => Boolean(folder),
@@ -37,6 +38,22 @@ function editorDoor(context) {
       } catch {
         return "";
       }
+    },
+
+    async list(path) {
+      try {
+        return (await vscode.workspace.fs.readDirectory(uriOf(path))).map(([name]) => name);
+      } catch {
+        return [];
+      }
+    },
+
+    // [[spec/design_output/extension#the-button-prints-the-log]]
+    says(lines) {
+      console_ = console_ ?? vscode.window.createOutputChannel(NAME);
+      console_.clear();
+      for (const one of lines) console_.appendLine(String(one));
+      console_.show(true);
     },
 
     async write(path, text) {

@@ -209,10 +209,15 @@ editor_names() {
      process.stdout.write(p.publisher + '.' + p.name + ' ' + p.version);") 2>/dev/null
 }
 
+# A COPY IS A STALE EXTENSION, AND THAT IS THE ONE THING THIS CANNOT BE. A copy
+# draws the tree as it stood at the install, so an edit reaches nobody. Proving
+# a link on every shell is more than this can carry, so it links every run.
 editor_linked() {
   [ -d "$editor_folder" ] || return 0
+  [ "$os" = "Windows" ] && return 1
   set -- $(editor_names)
   [ -n "${1:-}" ] && [ -n "${2:-}" ] || return 1
+  [ -L "$editor_folder/$1-$2" ] || return 1
   [ -f "$editor_folder/$1-$2/package.json" ] || return 1
   grep -q "\"$1\"" "$editor_folder/extensions.json" 2>/dev/null
 }

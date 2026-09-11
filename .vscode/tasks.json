@@ -6,18 +6,28 @@
       "detail": "Every rule this tree holds, over every file, into the Problems panel.",
       "type": "shell",
       "command": "./RUNME.sh",
-      "args": ["lint"],
-      "options": { "cwd": "${workspaceFolder}" },
-      "presentation": {
-        "reveal": "silent",
-        "panel": "dedicated",
-        "clear": true
+      "args": [
+        "lint"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
       },
-      "runOptions": { "runOn": "folderOpen" },
+      "presentation": {
+        "reveal": "never",
+        "panel": "shared",
+        "clear": true,
+        "close": true
+      },
+      "runOptions": {
+        "runOn": "folderOpen"
+      },
       "problemMatcher": {
         "owner": "quackitect",
         "source": "quackitect",
-        "fileLocation": ["relative", "${workspaceFolder}"],
+        "fileLocation": [
+          "relative",
+          "${workspaceFolder}"
+        ],
         "severity": "error",
         "pattern": {
           "regexp": "^(.+?):(\\d+):(\\d+): (\\S+): (.*)$",
@@ -27,6 +37,9 @@
           "code": 4,
           "message": 5
         }
+      },
+      "windows": {
+        "command": ".\\RUNME.ps1"
       }
     }
   ]

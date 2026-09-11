@@ -9,7 +9,10 @@ const GONE = "gone";
 
 export function messageFor(said, at, held) {
   if (said?.widget === "action") {
-    return { message: { kind: "run", key: said.key, runs: said.runs }, state: held };
+    const message = said.reads
+      ? { kind: "show", key: said.key, reads: said.reads }
+      : { kind: "run", key: said.key, runs: said.runs };
+    return { message, state: held };
   }
   const options = String(said?.options ?? "")
     .split(" ")
