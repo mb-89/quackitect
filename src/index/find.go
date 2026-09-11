@@ -1,6 +1,5 @@
-// THE QUESTIONS THE INDEX ANSWERS. Each one is a walk the tree used to take:
-// what a word appears in, what links here, and what points at nothing. The
-// door hands these to a verb and to the agent, and both ask the same rows.
+// The questions the index answers. Each one stands in place of a walk, and
+// the door hands them to a verb and to the write door alike.
 // [[spec/design_output/index#the-questions-it-answers]]
 package main
 
@@ -22,8 +21,6 @@ type Link struct {
 	Line   int    `json:"line"`
 }
 
-// Find answers every line carrying the words, newest question first. The words
-// go to FTS5, so a phrase in quotes and a trailing star both answer.
 func Find(db *sql.DB, words string, limit int) ([]Hit, error) {
 	if strings.TrimSpace(words) == "" {
 		return []Hit{}, nil
@@ -51,8 +48,6 @@ func Find(db *sql.DB, words string, limit int) ([]Hit, error) {
 	return out, rows.Err()
 }
 
-// Links answers what reaches a note, which is the question a person asks
-// before moving one.
 func Links(db *sql.DB, target string) ([]Link, error) {
 	rows, err := db.Query(
 		`SELECT from_path, key, target, line FROM link
@@ -64,7 +59,6 @@ func Links(db *sql.DB, target string) ([]Link, error) {
 	return linksOf(rows)
 }
 
-// Dangling answers every link naming nothing this tree holds.
 func Dangling(db *sql.DB) ([]Link, error) {
 	rows, err := db.Query(
 		`SELECT from_path, key, target, line FROM link
@@ -88,8 +82,6 @@ func linksOf(rows *sql.Rows) ([]Link, error) {
 	return out, rows.Err()
 }
 
-// Same answers every file carrying the size and the hash of another, which is
-// the copy question the guard used to walk a folder to answer.
 func Same(db *sql.DB, path string) ([]string, error) {
 	rows, err := db.Query(
 		`SELECT other.path FROM file

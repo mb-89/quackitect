@@ -1,6 +1,5 @@
-// THE SEARCH THE AGENT RUNS, ANSWERED OUT OF THE ROWS. Every text file keeps
-// its whole body here, so a pattern meets the tree in one process holding warm
-// memory instead of a thousand reads walking a disk.
+// The search the agent runs, answered out of the rows. Every text file keeps
+// its whole body here, so a pattern meets the tree in one warm process.
 // [[spec/design_output/index#the-search-reads-the-rows]]
 package main
 
@@ -10,7 +9,6 @@ import (
 	"strings"
 )
 
-// GrepAsk is one search, shaped the way the tool that asks it is shaped.
 type GrepAsk struct {
 	Pattern     string `json:"pattern"`
 	Path        string `json:"path"`
@@ -21,16 +19,12 @@ type GrepAsk struct {
 	Limit       int    `json:"limit"`
 }
 
-// Found is one line, marked by whether the pattern meets it or it stands
-// beside a line the pattern meets.
 type Found struct {
 	Line  int    `json:"line"`
 	Text  string `json:"text"`
 	Match bool   `json:"match"`
 }
 
-// FileHits gathers what one file answers, so a caller renders paths, counts
-// or lines out of the same answer.
 type FileHits struct {
 	Path  string  `json:"path"`
 	Count int     `json:"count"`
@@ -43,8 +37,6 @@ type GrepSaid struct {
 	Cut   bool       `json:"cut"`
 }
 
-// Grep answers every file carrying the pattern, in path order, with the lines
-// each one matches and the lines the caller asks for around them.
 func Grep(db *sql.DB, ask GrepAsk) (GrepSaid, error) {
 	said := GrepSaid{Files: []FileHits{}}
 	if strings.TrimSpace(ask.Pattern) == "" {
@@ -96,8 +88,6 @@ func Grep(db *sql.DB, ask GrepAsk) (GrepSaid, error) {
 	return said, rows.Err()
 }
 
-// hitsIn reads one body. The lines around a hit come in marked, so a caller
-// prints them the way the tool it stands behind prints them.
 func hitsIn(path, text string, shape *regexp.Regexp, ask GrepAsk) FileHits {
 	one := FileHits{Path: path, Lines: []Found{}}
 	body := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
@@ -140,8 +130,6 @@ type GlobSaid struct {
 	Cut   bool     `json:"cut"`
 }
 
-// Glob answers the paths a pattern names, the newest first, which is the
-// order the tool it stands behind promises.
 func Glob(db *sql.DB, ask GlobAsk) (GlobSaid, error) {
 	said := GlobSaid{Paths: []string{}}
 	fits, err := matcher(ask.Pattern)

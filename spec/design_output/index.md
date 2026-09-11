@@ -23,6 +23,28 @@ and the root ride in a `meta` row, and either one disagreeing drops the file
 whole. The tree fills it again in seconds, and a half-migrated index answers
 out of a shape two writers disagree about.
 
+## The rows the walk writes
+
+One walk fills four tables and two full-text ones. It writes them in a single
+transaction, so a reader meets the whole answer or the one before it.
+
+| table | what it holds |
+|---|---|
+| `meta` | the version and the root, which decide whether the file lives |
+| `file` | every path, its size, its time, its hash, and its text |
+| `note` | every markdown file carrying frontmatter |
+| `link` | every `[[name]]`, and the path it resolves to |
+| `note_text` | the bodies, for ranking |
+| `line_text` | every line, for the word question |
+
+Four folders stay outside the walk: `.git`, `.se`, `node_modules` and
+`.claude-plugin`. The first two hold the machinery, and the rest hold what a
+tool writes on its own.
+
+The file opens in WAL mode with a busy timeout, so a reader waits on no
+writer. The door writes while a verb reads, and the two meet on one file
+without either one blocking.
+
 ## The door owns the database
 
 One process owns the file, keeps the tree and the rows in step, and answers
@@ -129,10 +151,17 @@ answers for the same pattern.
 ## A note and its links
 
 A note is a markdown file carrying frontmatter between two rulers. Its keys
-land in `note`, its body lands in the full-text table, and every `[[name]]` in
-the frontmatter or the body lands in `link`. A link names the note whose `id`
-matches, or the file at that path, and one naming neither keeps a null. That
-null is what `dangling` reads.
+land in `note`, its body lands in the full-text table, and every bracketed name
+in the frontmatter or the body lands in `link`.
+
+A link resolves against four things, in this order. The file at that exact
+path comes first, then the same path with `.md` on the end. Then the note whose
+`id` matches, and last the folder of that name. An anchor after a `#` drops
+before any of it.
+
+Two kinds of bracket stay out of `link`. The `kind` key names a taxonomy and no
+file, and a target carrying `<` or `>` is a shape a document spells out. Both
+would read as broken links forever, which costs `dangling` its meaning.
 
 ## The compiler it needs
 

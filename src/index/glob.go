@@ -1,6 +1,5 @@
-// A GLOB IS A REGEXP NOBODY WRITES OUT. The tools hand patterns shaped like
-// `**/*.js`, and the rows hold slash-separated paths, so one translation
-// answers both the file question and the filter on a search.
+// A glob, turned into a regexp over a slash-separated path. One translation
+// answers the file question and the filter on a search alike.
 // [[spec/design_output/index#a-glob-becomes-a-pattern]]
 package main
 
@@ -9,7 +8,6 @@ import (
 	"strings"
 )
 
-// globOf turns one glob into an anchored regexp over a slash-separated path.
 func globOf(said string) (*regexp.Regexp, error) {
 	var out strings.Builder
 	out.WriteString("^")
@@ -65,8 +63,6 @@ func alternation(said string) string {
 	return "(?:" + strings.Join(parts, "|") + ")"
 }
 
-// matcher answers a function saying whether a path stands inside a glob. A
-// glob carrying no slash reads as a name, which is what ripgrep answers.
 func matcher(said string) (func(string) bool, error) {
 	if strings.TrimSpace(said) == "" {
 		return func(string) bool { return true }, nil
@@ -85,7 +81,6 @@ func matcher(said string) (func(string) bool, error) {
 	}, nil
 }
 
-// under answers whether a path sits at or inside a folder the caller names.
 func under(path, folder string) bool {
 	clean := strings.Trim(strings.TrimPrefix(folder, "./"), "/")
 	if clean == "" || clean == "." {

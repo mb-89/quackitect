@@ -1,10 +1,5 @@
-// THE DOOR. The index is not a file a caller opens; it is a process that owns
-// it. One writer keeps the tree and the rows in step, every reader asks the
-// same warm cache, and nobody races anybody on the file.
-//
-// It listens on loopback, on a port the machine picks, and writes where it
-// stands into .se/index.json. A caller reads that file rather than working a
-// port out of the folder path, which is the one thing v4 ruled against.
+// The resident process that owns the database. One writer keeps the tree and
+// the rows in step, and every reader asks the same warm cache.
 // [[spec/design_output/index#the-door-owns-the-database]]
 package main
 
@@ -23,7 +18,6 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
-// Standing is what the door writes down, and what a caller reads to reach it.
 type Standing struct {
 	Port int    `json:"port"`
 	Pid  int    `json:"pid"`
@@ -49,8 +43,6 @@ type door struct {
 	dirty chan struct{}
 	eyes  *fsnotify.Watcher
 
-	// pending says the tree moved since the last sweep. A question arriving
-	// first sweeps before it answers, so a caller reads what it wrote.
 	pending atomic.Bool
 }
 
@@ -58,8 +50,6 @@ func standingPath(root string) string {
 	return filepath.Join(root, ".se", "index.json")
 }
 
-// Serve opens the index, warms it, watches the tree and answers until it is
-// asked to stop. It answers the address it stands on, so a test can reach it.
 func Serve(root, at string) (*http.Server, net.Listener, error) {
 	db, err := Open(root, at)
 	if err != nil {
@@ -82,8 +72,6 @@ func Serve(root, at string) (*http.Server, net.Listener, error) {
 	go one.sweeps()
 	go server.Serve(listen)
 
-	// The watch is what keeps it warm. A tree nobody can watch still answers,
-	// out of the walk the door took on the way up.
 	eyes, err := watches(root, one)
 	if err == nil {
 		one.eyes = eyes
@@ -91,7 +79,6 @@ func Serve(root, at string) (*http.Server, net.Listener, error) {
 	return server, listen, one.stands(listen)
 }
 
-// stands writes where the door is, so a caller finds it without guessing.
 func (one *door) stands(listen net.Listener) error {
 	if err := os.MkdirAll(filepath.Dir(standingPath(one.root)), 0o755); err != nil {
 		return err
@@ -107,8 +94,6 @@ func (one *door) stands(listen net.Listener) error {
 	return os.WriteFile(standingPath(one.root), append(said, '\n'), 0o644)
 }
 
-// Touched says the tree moved. The sweep that follows is one reindex however
-// many writes arrive, because a build touching a thousand files is one answer.
 func (one *door) Touched() {
 	one.pending.Store(true)
 	select {
@@ -126,8 +111,6 @@ func (one *door) sweeps() {
 	}
 }
 
-// settles brings the rows level with the tree where a watcher saw it move.
-// The guard stands around it, so one sweep runs at a time.
 func (one *door) settles() {
 	if one.pending.Swap(false) {
 		Reindex(one.db, one.root)

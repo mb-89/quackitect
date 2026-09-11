@@ -1,6 +1,5 @@
-// The search and the file question, driven over a tree a case writes. Both
-// answer what the tools they stand behind answer, so a caller reads one shape.
-// [[spec/design_output/index#the-search-reads-the-rows]]
+// The search and the file question, driven over a tree a case writes.
+// [[spec/guidance/code/testing]]
 package main
 
 import "testing"

@@ -1,6 +1,5 @@
-// THE FRONTMATTER AND THE LINKS, READ WITHOUT A PARSER. A note carries a few
-// flat keys between two rulers, and a link is a name in double brackets. Both
-// are pure functions over a string, so a case drives them with no disk.
+// The frontmatter and the links, read with no parser. Both are pure functions
+// over a string, so a case drives them with no disk.
 // [[spec/design_output/index#a-note-and-its-links]]
 package main
 
@@ -12,8 +11,6 @@ type linkAt struct {
 	line   int
 }
 
-// frontOf splits a note into its frontmatter and its body. A note carrying no
-// ruler is all body, which is what a plain markdown file is.
 func frontOf(text string) (map[string]string, string) {
 	said := strings.ReplaceAll(text, "\r\n", "\n")
 	if !strings.HasPrefix(said, "---\n") {
@@ -49,11 +46,12 @@ func frontOf(text string) (map[string]string, string) {
 	return front, body
 }
 
-// linksIn answers every link a note carries: the frontmatter ones under the
-// field that names them, and the body ones under no key at all.
 func linksIn(front map[string]string, body string) []linkAt {
 	out := []linkAt{}
 	for _, key := range sorted(front) {
+		if key == "kind" {
+			continue
+		}
 		for _, target := range bracketed(front[key]) {
 			out = append(out, linkAt{key: key, target: target, line: 0})
 		}
@@ -67,7 +65,6 @@ func linksIn(front map[string]string, body string) []linkAt {
 }
 
 // bracketed answers what stands inside every [[ ]] of a line. A link naming an
-// anchor keeps the whole of it, because the file is what the anchor sits in.
 func bracketed(said string) []string {
 	out := []string{}
 	rest := said
@@ -81,7 +78,8 @@ func bracketed(said string) []string {
 		if shut < 0 {
 			return out
 		}
-		if target := strings.TrimSpace(rest[:shut]); target != "" {
+		target := strings.TrimSpace(rest[:shut])
+		if target != "" && !strings.ContainsAny(target, "<>") {
 			out = append(out, target)
 		}
 		rest = rest[shut+2:]

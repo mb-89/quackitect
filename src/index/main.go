@@ -1,6 +1,5 @@
-// THE COMMAND LINE OVER THE DOOR. Every verb here asks the resident process,
-// and starts one where none stands. So a caller never opens the database
-// itself, and the tree has one writer however many people ask it questions.
+// The command line over the door. Every verb here asks the resident process,
+// and starts one where none stands.
 // [[spec/design_output/index#the-door-owns-the-database]]
 package main
 
@@ -64,8 +63,6 @@ func serves(root string) int {
 	return 0
 }
 
-// asks reaches the door, starting one where none answers. A caller waits for
-// the first warm walk, which is the one cost the index takes.
 func asks(root string, argv []string) int {
 	said, err := reaches(root, argv)
 	if err != nil {
@@ -139,8 +136,6 @@ func posts(standing Standing, argv []string) (answer, error) {
 	return out, json.NewDecoder(said.Body).Decode(&out)
 }
 
-// asked shapes one command line into a method and its parameters. The call
-// verb hands JSON straight through, which is what the write door asks with.
 func asked(argv []string) (string, json.RawMessage) {
 	if argv[0] == "call" {
 		if len(argv) < 2 {
@@ -174,7 +169,6 @@ func asRaw(said map[string]any) json.RawMessage {
 	return out
 }
 
-// starts puts a door up and waits for it to say where it stands.
 func starts(root string) error {
 	self, err := os.Executable()
 	if err != nil {
