@@ -55,6 +55,30 @@ case "$(uname -m)" in
   *)             arch=64-bit ;;
 esac
 
+# Windows carries no package manager this script can name, and winget ships
+# with the operating system. A program installed a moment ago is on the machine
+# and not in this shell, so the usual node folder joins the PATH here.
+get_node() {
+  if [ "$os" != "Windows" ]; then
+    if [ "$pm" = "brew" ]; then install_with_pm node; else install_with_pm nodejs; fi
+    return 0
+  fi
+
+  have winget || {
+    say "winget is missing, so node cannot be installed." >&2
+    say "Install App Installer from the Microsoft Store and run this again." >&2
+    exit 1
+  }
+
+  say "  installing node through winget"
+  # winget answers a non-zero code where the package already stands current,
+  # and the check after this reads what the box carries either way.
+  winget install --id OpenJS.NodeJS.LTS --exact --silent \
+    --accept-source-agreements --accept-package-agreements || true
+  PATH="$PATH:/c/Program Files/nodejs"
+  export PATH
+}
+
 get_vale() {
   if [ "$os" = "Windows" ]; then
     name="vale_${vale_version}_Windows_${arch}.zip"
@@ -202,8 +226,15 @@ link_editor() {
 
   say "  linking the sidebar at $dest"
   rm -rf "$dest"
-  ln -s "$root/src/extension" "$dest" 2>/dev/null ||
-    cp -R "$root/src/extension" "$dest" || return 1
+  if [ "$os" = "Windows" ]; then
+    # A junction needs no administrator, where a symbolic link asks for one,
+    # and the shell Git ships hands a program its own paths through cygpath.
+    cmd //c mklink /J "$(cygpath -w "$dest")" "$(cygpath -w "$root/src/extension")" >/dev/null ||
+      cp -R "$root/src/extension" "$dest" || return 1
+  else
+    ln -s "$root/src/extension" "$dest" 2>/dev/null ||
+      cp -R "$root/src/extension" "$dest" || return 1
+  fi
   [ -f "$dest/package.json" ] || return 1
   (cd "$root" && node src/scripts/editor.js) || return 1
 }
@@ -276,7 +307,7 @@ why() {
 
 get() {
   case $1 in
-    node) if [ "$pm" = "brew" ]; then install_with_pm node; else install_with_pm nodejs; fi ;;
+    node) get_node ;;
     vale) get_vale ;;
     biome) get_biome ;;
     vale-ls) get_vale_ls ;;

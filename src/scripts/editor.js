@@ -97,7 +97,7 @@ export function manifestPath(root) {
 
 // [[spec/design_output/extension#a-box-names-its-home]]
 export function homeIn(env) {
-  return env.HOME || env.USERPROFILE || "";
+  return env.USERPROFILE || env.HOME || "";
 }
 
 function main(env) {

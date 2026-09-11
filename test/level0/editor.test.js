@@ -106,5 +106,6 @@ test("the home folder comes from either name a box uses", () => {
   assert.equal(homeIn({ HOME: "/home/user" }), "/home/user");
   assert.equal(homeIn({ USERPROFILE: "C:\\Users\\mb" }), "C:\\Users\\mb");
   assert.equal(homeIn({ HOME: "", USERPROFILE: "C:\\Users\\mb" }), "C:\\Users\\mb");
+  assert.equal(homeIn({ HOME: "/c/Users/mb", USERPROFILE: "C:\\Users\\mb" }), "C:\\Users\\mb");
   assert.equal(homeIn({}), "");
 });

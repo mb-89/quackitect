@@ -102,7 +102,7 @@ Only a person calls work merge after reviewing the durable result and retro.
 
 # Verification record
 
-Run `./RUNME.ps1 check` on Windows for the current test and lint results.
+Run `./RUNME.sh check` for the current test and lint results.
 Claude's executable is absent here, so native plugin validation remains open.
 Claude's hooks and judge stay unchanged.
 
