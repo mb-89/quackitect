@@ -83,22 +83,33 @@ func asks(root string, argv []string) int {
 	return 0
 }
 
+// [[spec/design_output/index#a-door-comes-back]]
 func reaches(root string, argv []string) (answer, error) {
-	for try := 0; try < 2; try++ {
+	for try := 0; try < 3; try++ {
 		standing, err := standingOf(root)
-		if err == nil {
+		if err == nil && stands(standing, root) {
 			said, err := posts(standing, argv)
 			if err == nil {
 				return said, nil
 			}
 		}
-		if try == 0 {
-			if err := starts(root); err != nil {
-				return answer{}, err
-			}
+		if err == nil && standing.Port != 0 && !stands(standing, root) {
+			posts(standing, []string{"stop"})
+		}
+		os.Remove(standingPath(root))
+		if err := starts(root); err != nil {
+			return answer{}, err
 		}
 	}
 	return answer{}, errorOf("the index door does not answer, and one would not start")
+}
+
+// [[spec/design_output/index#a-door-comes-back]]
+func stands(said Standing, root string) bool {
+	if said.Root != "" && said.Root != root {
+		return false
+	}
+	return said.Stamp == stampHere()
 }
 
 func standingOf(root string) (Standing, error) {

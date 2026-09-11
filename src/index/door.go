@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -19,9 +20,10 @@ import (
 )
 
 type Standing struct {
-	Port int    `json:"port"`
-	Pid  int    `json:"pid"`
-	Root string `json:"root"`
+	Port  int    `json:"port"`
+	Pid   int    `json:"pid"`
+	Root  string `json:"root"`
+	Stamp string `json:"stamp"`
 }
 
 type call struct {
@@ -84,9 +86,10 @@ func (one *door) stands(listen net.Listener) error {
 		return err
 	}
 	said, err := json.Marshal(Standing{
-		Port: listen.Addr().(*net.TCPAddr).Port,
-		Pid:  os.Getpid(),
-		Root: one.root,
+		Port:  listen.Addr().(*net.TCPAddr).Port,
+		Pid:   os.Getpid(),
+		Root:  one.root,
+		Stamp: stampHere(),
 	})
 	if err != nil {
 		return err
@@ -173,12 +176,35 @@ func (one *door) answers(said call) (any, error) {
 	case "reindex":
 		count, err := Reindex(one.db, one.root)
 		return map[string]int{"files": count}, err
+	case "stop":
+		go stopsSoon(one.root)
+		return map[string]string{"stopping": one.root}, nil
 	case "standing":
 		var files int
 		one.db.QueryRow(`SELECT count(*) FROM file`).Scan(&files)
 		return map[string]any{"root": one.root, "files": files}, nil
 	}
 	return nil, errorOf("no method called " + said.Method)
+}
+
+// [[spec/design_output/index#a-door-comes-back]]
+func stampHere() string {
+	self, err := os.Executable()
+	if err != nil {
+		return ""
+	}
+	said, err := os.Stat(self)
+	if err != nil {
+		return ""
+	}
+	return said.ModTime().UTC().Format(time.RFC3339Nano) + ":" + strconv.FormatInt(said.Size(), 10)
+}
+
+// [[spec/design_output/index#a-door-comes-back]]
+func stopsSoon(root string) {
+	time.Sleep(100 * time.Millisecond)
+	os.Remove(standingPath(root))
+	os.Exit(0)
 }
 
 type errorOf string

@@ -14,9 +14,12 @@ type GrepAsk struct {
 	Path        string `json:"path"`
 	Glob        string `json:"glob"`
 	Insensitive bool   `json:"insensitive"`
+	Multiline   bool   `json:"multiline"`
+	Only        bool   `json:"only"`
 	Before      int    `json:"before"`
 	After       int    `json:"after"`
 	Limit       int    `json:"limit"`
+	Offset      int    `json:"offset"`
 }
 
 type Found struct {
@@ -44,6 +47,9 @@ func Grep(db *sql.DB, ask GrepAsk) (GrepSaid, error) {
 	}
 
 	pattern := ask.Pattern
+	if ask.Multiline {
+		pattern = "(?s)" + pattern
+	}
 	if ask.Insensitive {
 		pattern = "(?i)" + pattern
 	}
@@ -66,6 +72,7 @@ func Grep(db *sql.DB, ask GrepAsk) (GrepSaid, error) {
 	if limit <= 0 {
 		limit = 200
 	}
+	skipped := 0
 	for rows.Next() {
 		var path, text string
 		if err := rows.Scan(&path, &text); err != nil {
@@ -79,6 +86,10 @@ func Grep(db *sql.DB, ask GrepAsk) (GrepSaid, error) {
 			continue
 		}
 		said.Total += one.Count
+		if skipped < ask.Offset {
+			skipped++
+			continue
+		}
 		if len(said.Files) >= limit {
 			said.Cut = true
 			continue
@@ -91,6 +102,9 @@ func Grep(db *sql.DB, ask GrepAsk) (GrepSaid, error) {
 func hitsIn(path, text string, shape *regexp.Regexp, ask GrepAsk) FileHits {
 	one := FileHits{Path: path, Lines: []Found{}}
 	body := strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
+	if ask.Multiline {
+		return acrossLines(path, text, shape, ask)
+	}
 
 	wanted := map[int]bool{}
 	hit := map[int]bool{}
@@ -114,9 +128,40 @@ func hitsIn(path, text string, shape *regexp.Regexp, ask GrepAsk) FileHits {
 		if !wanted[n] {
 			continue
 		}
-		one.Lines = append(one.Lines, Found{Line: n + 1, Text: body[n], Match: hit[n]})
+		said := body[n]
+		if ask.Only && hit[n] {
+			said = strings.Join(shape.FindAllString(body[n], -1), "\n")
+		}
+		one.Lines = append(one.Lines, Found{Line: n + 1, Text: said, Match: hit[n]})
 	}
 	return one
+}
+
+// [[spec/design_output/index#a-match-may-span-lines]]
+func acrossLines(path, text string, shape *regexp.Regexp, ask GrepAsk) FileHits {
+	one := FileHits{Path: path, Lines: []Found{}}
+	said := strings.ReplaceAll(text, "\r\n", "\n")
+
+	for _, at := range shape.FindAllStringIndex(said, -1) {
+		one.Count++
+		line := strings.Count(said[:at[0]], "\n") + 1
+		held := said[at[0]:at[1]]
+		if !ask.Only {
+			held = wholeLines(said, at[0], at[1])
+		}
+		one.Lines = append(one.Lines, Found{Line: line, Text: held, Match: true})
+	}
+	return one
+}
+
+// [[spec/design_output/index#a-match-may-span-lines]]
+func wholeLines(said string, from, to int) string {
+	start := strings.LastIndexByte(said[:from], '\n') + 1
+	end := strings.IndexByte(said[to:], '\n')
+	if end < 0 {
+		return said[start:]
+	}
+	return said[start : to+end]
 }
 
 type GlobAsk struct {

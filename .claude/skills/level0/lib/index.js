@@ -7,6 +7,30 @@ export const BIN = ".se/bin/se-index";
 const CONTENT = "content";
 const COUNT = "count";
 
+// [[spec/design_output/index#a-type-is-a-glob]]
+export const KINDS = {
+  js: "*.{js,jsx,mjs,cjs}",
+  ts: "*.{ts,tsx,mts,cts}",
+  py: "*.{py,pyi}",
+  go: "*.go",
+  rust: "*.rs",
+  java: "*.java",
+  c: "*.{c,h}",
+  cpp: "*.{cpp,cc,cxx,hpp,hh,hxx}",
+  cs: "*.cs",
+  rb: "*.rb",
+  php: "*.php",
+  sh: "*.{sh,bash,zsh}",
+  md: "*.{md,markdown}",
+  json: "*.json",
+  yaml: "*.{yaml,yml}",
+  toml: "*.toml",
+  html: "*.{html,htm}",
+  css: "*.{css,scss,sass}",
+  sql: "*.sql",
+  xml: "*.xml",
+};
+
 // [[spec/design_output/index#where-the-disk-still-answers]]
 export function asked(e) {
   if (e?.tool === "Grep") return grepAsked(e);
@@ -17,21 +41,35 @@ export function asked(e) {
 function grepAsked(e) {
   const pattern = String(e.pattern ?? "");
   if (!pattern) return null;
-  if (e.multiline || e.type || e["-o"] || e.offset) return null;
+
+  const glob = globOf(e);
+  if (glob === null) return null;
 
   const around = Number(e["-C"] ?? e.context ?? 0) || 0;
   return {
     method: "grep",
     params: {
       pattern,
+      glob,
       path: String(e.path ?? ""),
-      glob: String(e.glob ?? ""),
       insensitive: Boolean(e["-i"]),
+      multiline: Boolean(e.multiline),
+      only: Boolean(e["-o"]),
       before: Number(e["-B"] ?? around) || 0,
       after: Number(e["-A"] ?? around) || 0,
       limit: Number(e.head_limit ?? 0) || 0,
+      offset: Number(e.offset ?? 0) || 0,
     },
   };
+}
+
+// [[spec/design_output/index#a-type-is-a-glob]]
+function globOf(e) {
+  const said = String(e.glob ?? "");
+  const kind = String(e.type ?? "").trim().toLowerCase();
+  if (!kind) return said;
+  if (said) return null;
+  return KINDS[kind] ?? null;
 }
 
 function globAsked(e) {

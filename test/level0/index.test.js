@@ -21,10 +21,24 @@ test("a search becomes a question the door answers", () => {
 });
 
 test("a shape the rows hold no answer for goes back to the tool", () => {
-  assert.equal(asked({ tool: "Grep", pattern: "one", multiline: true }), null);
-  assert.equal(asked({ tool: "Grep", pattern: "one", type: "js" }), null);
   assert.equal(asked({ tool: "Grep", pattern: "" }), null);
   assert.equal(asked({ tool: "Read", file_path: "one.js" }), null);
+  assert.equal(asked({ tool: "Grep", pattern: "one", type: "klingon" }), null);
+  assert.equal(asked({ tool: "Grep", pattern: "one", type: "js", glob: "*.md" }), null);
+});
+
+test("a match spanning lines and a bare match both go to the rows", () => {
+  const many = asked({ tool: "Grep", pattern: "a[\\s\\S]*b", multiline: true });
+  assert.equal(many.params.multiline, true);
+
+  const only = asked({ tool: "Grep", pattern: "one", "-o": true, offset: 5 });
+  assert.equal(only.params.only, true);
+  assert.equal(only.params.offset, 5);
+});
+
+test("a type names the files a glob would name", () => {
+  assert.equal(asked({ tool: "Grep", pattern: "one", type: "js" }).params.glob, "*.{js,jsx,mjs,cjs}");
+  assert.equal(asked({ tool: "Grep", pattern: "one", type: "go" }).params.glob, "*.go");
 });
 
 test("a file question carries its pattern", () => {

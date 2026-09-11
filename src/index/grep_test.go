@@ -2,7 +2,10 @@
 // [[spec/guidance/code/testing]]
 package main
 
-import "testing"
+import (
+	"strings"
+	"testing"
+)
 
 func TestGrepFindsALineAndItsPath(t *testing.T) {
 	db := opened(t, tree(t))
@@ -103,6 +106,40 @@ func TestGlobTranslatesTheShapes(t *testing.T) {
 		}
 		if fits(one.path) != one.hits {
 			t.Fatalf("%s over %s answers %v", one.glob, one.path, !one.hits)
+		}
+	}
+}
+
+func TestGrepReadsAMatchAcrossLines(t *testing.T) {
+	db := opened(t, tree(t))
+
+	said, err := Grep(db, GrepAsk{Pattern: `first note says.*\n.*`, Multiline: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if said.Total != 1 {
+		t.Fatalf("the pattern spans two lines once, and this says %d", said.Total)
+	}
+	if !strings.Contains(said.Files[0].Lines[0].Text, "\n") {
+		t.Fatalf("a match over two lines carries both: %q", said.Files[0].Lines[0].Text)
+	}
+	if said.Files[0].Lines[0].Line != 6 {
+		t.Fatalf("the hit names the line it starts on: %d", said.Files[0].Lines[0].Line)
+	}
+}
+
+func TestGrepAnswersTheMatchAlone(t *testing.T) {
+	db := opened(t, tree(t))
+
+	said, err := Grep(db, GrepAsk{Pattern: `\[\[\w+\]\]`, Only: true})
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, one := range said.Files {
+		for _, line := range one.Lines {
+			if !strings.HasPrefix(line.Text, "[[") {
+				t.Fatalf("only the match comes back: %q", line.Text)
+			}
 		}
 	}
 }

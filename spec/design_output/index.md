@@ -63,6 +63,26 @@ path, because a clone carries the path and answers on another port.
 | asks, with none | one starts, walks the tree once, and answers |
 | asks a method nobody declares | the name comes back in the error |
 
+## A door comes back
+
+Every part here goes down and comes back with no session restarting. A caller
+asks the door on every question, so nothing caches a decision made at start.
+
+| what happens | what the next question does |
+|---|---|
+| the door takes a kill | the stale standing file goes, and a fresh door stands |
+| the binary rebuilds | the old door takes a stop, and the new build answers |
+| a door stands over another tree | the same, because the root rides in the file |
+| no binary stands yet | the disk answers, and the index joins the moment it builds |
+
+The standing file carries a stamp: the build's own time and size. A caller
+whose stamp disagrees asks that door to stop, drops the file, and starts one of
+its own. So fixing a bug in the index costs a rebuild and the next question.
+
+A cold build of the index takes about seventy seconds, because cgo compiles
+SQLite. It runs as a want. So a session starts with the disk answering, and
+picks the index up on the first question after the build lands.
+
 ## The watcher keeps it warm
 
 The watch is what holds the rows level with the tree. It watches every folder
@@ -141,13 +161,46 @@ else. These send the question back to the tool:
 | what stands | why the disk answers |
 |---|---|
 | a path outside this tree | the rows hold this tree alone |
-| `multiline`, a `type` filter, `-o` | the rows hold no answer of that shape |
+| a `type` this tree maps nowhere | a guess at what it means answers wrong |
+| a `type` and a `glob` together | the rows take one filter at a time |
 | a pattern Go declines to compile | a wrong answer costs more than a walk |
 | no index stands here | a tree with no door still works |
 | any error from the door | the same reason |
 
+Everything else the tools take reaches the rows:
+
+| what a caller asks for | where it answers |
+|---|---|
+| a match spanning lines | the whole body, in one question |
+| a `type` filter | the glob that type names |
+| the match alone, an offset, a limit | the same rows |
+| the lines around a hit, a case-blind read | the same rows |
+
 A single-file `Read` goes to the disk always. A search reading a file a moment
 late costs a repeat; an edit built on text a moment late costs the edit.
+
+## A match may span lines
+
+Every text file keeps its whole body, so a pattern crossing a line break is one
+question over one string. The rows answer it the way they answer any other: the
+hit names the line it starts on, and carries every line it covers.
+
+The same body answers the match alone, where a caller asks for that, and an
+offset over the files a sweep already counted.
+
+## A type is a glob
+
+A `type` names a family of files, and this tree holds the twenty families the
+tools ask for. Each one turns into a glob before the question leaves.
+
+| type | the files it names |
+|---|---|
+| `js`, `ts` | `*.{js,jsx,mjs,cjs}`, `*.{ts,tsx,mts,cts}` |
+| `go`, `rust`, `py` | `*.go`, `*.rs`, `*.{py,pyi}` |
+| `md`, `json`, `yaml` | `*.{md,markdown}`, `*.json`, `*.{yaml,yml}` |
+
+A name outside the table sends the question to the disk, because a guess at
+what a caller means answers the wrong files.
 
 ## A glob becomes a pattern
 
