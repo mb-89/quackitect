@@ -75,17 +75,17 @@ in the work root, because that is the tree a person opens.
 ## A vehicle stands alone
 
 A vehicle carries the whole method and answers for itself. It reaches back to
-the tree it comes out of for nothing, because a corporate machine may hold the
-vehicle and reach the tree it came from never.
+its origin for nothing at all. A corporate machine holds the vehicle, and the
+tree behind it stands outside every wall that machine sits inside.
 
 Proven against a real copy, in `test/contract/vehicle.test.js`:
 
 | what stands | what the copy answers |
 |---|---|
-| its identity | its own, and other than the one it came from |
+| its identity | its own, and other than its origin's |
 | its roots | itself as method and as work |
 | its contract tests | 73 of 73, out of its own folder |
-| its answer to `vehicle` | no path naming the tree behind it |
+| its answer to `vehicle` | no path naming its origin |
 
 A fresh copy takes two steps that any fresh clone takes: `git init`, and one
 run of `RUNME`, which surveys the tools and builds what it needs.
