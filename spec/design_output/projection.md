@@ -1,7 +1,11 @@
 ---
 kind: [[design_output]]
-describes: [[.claude/skills/level0/lib/projection.js]]
 ---
+
+# Scope
+
+`.claude/skills/level0/lib/projection.js` writes one source into every target.
+This note covers the projections, the door refusing a target, and the verb.
 
 # One source, written everywhere
 

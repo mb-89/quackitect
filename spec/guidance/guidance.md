@@ -8,10 +8,10 @@ rationale: [[spec/rationales/guidance]]
 
 1. Write what the reader does next. Everything in this tree is actionable. *
 2. Put the argument, the history and the measurement in `spec/rationales/<name>.md`. *
-3. A guidance note holds one chapter, `Actionables`, and links its rationale in the frontmatter.
-4. Write one rule per item, in the active voice and the present tense, as an instruction.
+3. Give a guidance note a rationale, and link it from the frontmatter. [[spec/schemas]]
+4. Write a rule as an instruction, in the active voice. [[spec/schemas]]
 5. Hold a note to the items its schema allows. [[spec/schemas]]
-6. Give a rule needing argument a star, and argue it in the rationale under its number.
+6. Star a rule wanting argument, and argue it in the rationale. [[spec/schemas]]
 7. Move a rule a program can check to that program, and leave a link in its place. *
 8. Write the present tense. `spec/rationales` is the one place the past tense belongs.
 9. Write a new handover before you finish, because level zero consumes the one it finds. *

@@ -1,7 +1,11 @@
 ---
 kind: [[design_output]]
-describes: [[.claude/skills/level0/lib/tree.js]]
 ---
+
+# Scope
+
+`.claude/skills/level0/lib/tree.js` holds the rules weighing two files at once.
+This note covers those rules, what each one answers, and the sweep running them.
 
 # The rules over two files
 

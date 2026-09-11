@@ -1,7 +1,11 @@
 ---
 kind: [[design_output]]
-describes: [[src/scripts/work.js]]
 ---
+
+# Scope
+
+`src/scripts/work.js` holds every verb over a work branch. This note covers the
+branch, its two handovers, the status it carries, and the round trip.
 
 # What a work branch is
 
@@ -122,6 +126,8 @@ itself in order, and each link starts from the one before it.
 from a trunk carrying none of that work. It then builds that work a second time.
 
 `work list` shows what each branch waits for, in place of its urgency.
+`setStatus` writes `urgency: soon` onto a brief carrying none, so every brief it
+mints holds to its schema. [[spec/schemas]]
 
 # The battery answers first
 

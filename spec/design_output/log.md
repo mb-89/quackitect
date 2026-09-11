@@ -1,7 +1,11 @@
 ---
 kind: [[design_output]]
-describes: [[src/doors/log.js]]
 ---
+
+# Scope
+
+`src/doors/log.js` writes one line for each thing a door does. This note covers
+the shape of a line, who says what, and who reads it back.
 
 # What one line looks like
 

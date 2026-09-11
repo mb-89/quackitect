@@ -35,15 +35,6 @@ So a writer picks the shape first and falls back to prose. Level zero counts the
 paragraphs running together with no structure between them. An answer takes a
 tighter limit than a file, because a reader skims an answer.
 
-## 10. Parallel things
-
-A paragraph naming seven things to do and two to decide is two lists wearing
-prose. The reader has to count, and cannot tell at a glance which item carries
-which status.
-
-So parallel items go one to a line, each with what stands against it. This binds
-a chat answer as much as a file, because the reader is the same person.
-
 ## 4. Authority and provenance
 
 The thing holding the information is the thing stating it. A test decides how
@@ -68,3 +59,12 @@ reader which day that was. So the prose names the command and the reader runs it
 A count of a list needs no time to go wrong. A sentence saying four regions above
 a list of six hands the reader two answers, and the list is the one that cannot
 drift.
+
+## 10. Parallel things
+
+A paragraph naming seven things to do and two to decide is two lists wearing
+prose. The reader has to count, and cannot tell at a glance which item carries
+which status.
+
+So parallel items go one to a line, each with what stands against it. This binds
+a chat answer as much as a file, because the reader is the same person.

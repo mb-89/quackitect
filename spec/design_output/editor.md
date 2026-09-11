@@ -1,7 +1,11 @@
 ---
 kind: [[design_output]]
-describes: [[.vscode]]
 ---
+
+# Scope
+
+`.vscode` starts the servers holding this tree's rules as a person types. This
+note covers those servers, the settings git tracks, and the assets they want.
 
 # What the editor runs
 

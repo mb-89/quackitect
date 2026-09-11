@@ -2,6 +2,11 @@
 kind: [[design_input]]
 ---
 
+# Scope
+
+One level zero over two harnesses, Claude and Copilot. The owner asks for the
+same rules, the same branches and the same commands on each one.
+
 # One level zero
 
 Keep all harness differences in level zero. Levels above it use the same

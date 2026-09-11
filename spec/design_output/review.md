@@ -1,7 +1,11 @@
 ---
 kind: [[design_output]]
-describes: [[src/scripts/review.js]]
 ---
+
+# Scope
+
+`src/scripts/review.js` gathers what a reader wants off a branch. This note
+covers the verb, the worktree it runs in, and the five questions it answers.
 
 # What the reader is
 

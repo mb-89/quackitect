@@ -1,7 +1,11 @@
 ---
 kind: [[design_output]]
-describes: [[src/doors]]
 ---
+
+# Scope
+
+`src/doors` holds every reach outside this tree. This note covers the doors,
+the fakes beside them, and the contract tests over both.
 
 # One door per outside thing
 

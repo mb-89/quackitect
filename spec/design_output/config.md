@@ -1,7 +1,11 @@
 ---
 kind: [[design_output]]
-describes: [[.claude/skills/level0/lib/config.js]]
 ---
+
+# Scope
+
+`.claude/skills/level0/lib/config.js` answers every number and switch this tree
+holds. This note covers the layers it reads and the verb over them.
 
 # What the resolver is
 

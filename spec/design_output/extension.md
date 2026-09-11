@@ -1,7 +1,11 @@
 ---
 kind: [[design_output]]
-describes: [[src/extension/extension.js]]
 ---
+
+# Scope
+
+`src/extension` draws one sidebar in the editor. This note covers the
+declaration behind it, the five widgets, and the grid holding them.
 
 # The sidebar draws the tree
 

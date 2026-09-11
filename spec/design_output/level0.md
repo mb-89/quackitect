@@ -1,7 +1,11 @@
 ---
 kind: [[design_output]]
-describes: [[.claude/skills/level0]]
 ---
+
+# Scope
+
+`.claude/skills/level0` is the plugin holding every door. This note covers the
+harness surface, the write door, and the standing layer it hands each session.
 
 # What level zero is
 
