@@ -21,7 +21,7 @@ import {
 import { godMode, HEALTH, repairs } from "../lib/health.js";
 import { judgeOf } from "../lib/judge.js";
 import { aimOf, asLines, FOLDER, nameOf, rowOf, writes } from "../lib/log.js";
-import { relativeTo } from "../lib/paths.js";
+import { isDraft, relativeTo } from "../lib/paths.js";
 import {
   entriesIn,
   ownerOf,
@@ -192,12 +192,16 @@ export function register(on, _options) {
       return { deny: refusedWrite(owner, writing.path) };
     }
 
+    const where = relativeTo(root, writing.path);
+
+    // [[spec/design_output/schema#the-underscore-parks-a-draft]]
+    if (isDraft(where)) return next(e);
+
     if (CODE.test(writing.path)) {
       return await codeDoor($, e, next, writing, formatter, logbook, root);
     }
     if (!PROSE.test(writing.path)) return next(e);
 
-    const where = relativeTo(root, writing.path);
     const found = [];
     let door = "vale";
 
@@ -851,7 +855,7 @@ async function readFolder($, folder, end) {
     const entries = await $.fs.list(folder);
     const out = [];
     for (const one of entries) {
-      if (!one.name.endsWith(end)) continue;
+      if (!one.name.endsWith(end) || isDraft(one.name)) continue;
       out.push({ name: one.name, text: await $.fs.read(`${folder}/${one.name}`) });
     }
     return out;
@@ -865,7 +869,7 @@ async function readRules($, folder) {
     const entries = await $.fs.list(folder);
     const out = [];
     for (const one of entries) {
-      if (!one.name.endsWith(".yml")) continue;
+      if (!one.name.endsWith(".yml") || isDraft(one.name)) continue;
       const rule = readRule(await $.fs.read(`${folder}/${one.name}`));
       out.push({ ...rule, name: one.name.replace(/\.yml$/, "") });
     }

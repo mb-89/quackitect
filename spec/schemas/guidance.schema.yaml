@@ -1,6 +1,10 @@
 # A guidance note carries the rules for one audience, and nothing else. The
 # argument for a starred rule stands in the rationale this note links.
 #
+# One chapter stands here, because spec/guidance/guidance.md says a note holds
+# `Actionables` alone and links its rationale. A Motivation chapter would carry
+# the argument a second time, and the rationale is where it belongs.
+#
 # The frontmatter half is JSON Schema 2020-12, https://json-schema.org/draft/2020-12.
 # The body half is this project's own, borrowed from https://document-schema.org.
 # A value written [[like this]] is a link, and the name inside is the value.
@@ -40,11 +44,6 @@ body:
   extraSections: false
 
   sections:
-    - header: Motivation
-      required: true
-      tense: present
-      description: why this note exists, and what goes wrong where nobody reads it
-
     - header: Actionables
       required: true
       list: true
