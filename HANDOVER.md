@@ -32,8 +32,9 @@ keeps level zero out of a cloud session, and `./RUNME.sh doctor` reads the stamp
 as absent here.
 
 So the number comes out of the gate's own scorer, over the one pair of drafts
-this branch writes. `.se/scripts/score.mjs` runs it, reading a file as
-`level0-answer.md`:
+this branch writes. `scoreOf` in `lib/answer.js` answers it, over Vale under
+`--path=level0-answer.md`. The script driving that pair stands under `.se`, which
+git ignores, so it travels nowhere:
 
 | what | words | findings | the score | the band |
 |---|---|---|---|---|
