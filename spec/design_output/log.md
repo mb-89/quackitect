@@ -59,7 +59,7 @@ For details, see [[spec/design_output/level0#a-step-carries-the-answer]].
 | `prompt` | every prompt, as submitted | `prompt.submit` |
 | `stop` | a turn ends, or goes on | `turn.complete` |
 | `reply` | every answer ending a turn | `turn.complete` |
-| `answer` | a call the gate warns or refuses | `tool.call` |
+| `answer` | the session's answer to a demand | `turn.step`, `tool.call` |
 | `write` | the code door refuses a write | `tool.call` |
 | `vale` | the rules refuse prose, and how long a lint takes | the hook, and `lint` |
 | `judge` | a model refuses prose | `tool.call` |
