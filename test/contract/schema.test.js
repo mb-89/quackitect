@@ -9,6 +9,7 @@ import { skip, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import {
   checkNote,
+  isNoteKind,
   mintNote,
   schemaFaults,
   schemasIn,
@@ -53,13 +54,21 @@ test("every schema in the folder reads, and names the kind its file names", () =
   for (const name of here.names("spec/schemas", ".schema.yaml")) {
     const kind = name.slice(0, -".schema.yaml".length);
     assert.ok(schemas.has(kind), `${name} names ${kind}`);
-    assert.ok(schemas.get(kind).body?.sections?.length, `${kind} names a chapter`);
+  }
+  // [[spec/design_output/schema#a-note-kind-holds-chapters]]
+  assert.ok(notes().size >= 6, `${notes().size} note kinds read`);
+  for (const [kind, schema] of notes()) {
+    assert.ok(schema.body?.sections?.length, `${kind} names a chapter`);
   }
 });
 
+function notes() {
+  return new Map([...schemas].filter(([, schema]) => isNoteKind(schema)));
+}
+
 // [[spec/design_output/schema#mint-writes-a-valid-note]]
 test("mint writes one note per kind, and the checker passes each one", () => {
-  for (const [kind, schema] of schemas) {
+  for (const [kind, schema] of notes()) {
     const text = mintNote(schema);
     assert.deepEqual(checkNote(text, schema, `${kind}.md`), [], `${kind} mints clean`);
     assert.match(

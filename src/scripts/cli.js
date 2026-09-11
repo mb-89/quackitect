@@ -22,6 +22,7 @@ import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import {
   END as SCHEMA_END,
+  isNoteKind,
   mintNote,
   readYaml,
   schemaFaults,
@@ -616,6 +617,9 @@ function mint(argv) {
   const [kind, path] = argv.filter((one) => !one.startsWith("-"));
   const kinds = namesIn(join(root, SCHEMAS), SCHEMA_END)
     .map((name) => name.slice(0, -SCHEMA_END.length))
+    .filter((name) =>
+      isNoteKind(readYaml(files.read(join(root, SCHEMAS, `${name}${SCHEMA_END}`)))),
+    )
     .sort();
 
   if (!kind || !path) {

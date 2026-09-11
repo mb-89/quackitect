@@ -459,6 +459,11 @@ export function refusedNote(where, kind, found) {
   ].join("\n");
 }
 
+// [[spec/design_output/schema#a-note-kind-holds-chapters]]
+export function isNoteKind(schema) {
+  return Boolean(schema?.body?.sections?.length);
+}
+
 // [[spec/design_output/schema#mint-writes-a-valid-note]]
 export function mintNote(schema) {
   const spec = schema?.frontmatter ?? {};

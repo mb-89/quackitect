@@ -6,79 +6,131 @@ urgency: now
 
 # Where it stands
 
-The funnel note `spec/funnel/a-paragraph-has-a-schema.md` names six branches,
-and this is the fourth. Read its chapter on the doors first. The note stands on
-the branch `claude/friendly-brown-k6kohy` until the owner merges it, so take
-that branch in where `work sync` leaves the note absent.
+The answer gate bites. `turn.complete` scores the answer, and the score falls in
+one of three bands: nothing, one line on the next prompt, or one re-prompt saying
+rewrite. `check_answer` stands beside `claim_stop`, and the guidance sends a
+session to it. This branch builds, tests and pushes every piece the brief names.
 
-`turn.complete` in `hooks/level0.js` already runs Vale over the answer under
-the `*answer.md` section of `.vale.ini`. It hands the findings back as text
-under the answer, and the turn ends. Over 212 answers from four days, three in
-four carry a finding, so that text changes nothing. The tooth in `lib/stop.js`
-already re-prompts through `$.prompt.submit`, and `claim_stop` already
-registers a tool at `session.start`. This branch joins those three.
+| the piece | where | what proves it |
+|---|---|---|
+| the two bands | `spec/config/level0.json`, and its schema | `./RUNME.sh config` names `answer.warnAt` at 5 and `answer.ceiling` at 15 |
+| the re-prompt | `hooks/level0.js`, at `turn.complete` | a fake session over the ceiling meets one re-prompt, and a second turn end none |
+| the carry | `hooks/level0.js`, at `prompt.submit` | the next prompt from a person carries one line, once |
+| the tool | `hooks/level0.js`, beside `claim_stop` | the tool answers a draft, and reads a clean one clean |
+| the guidance line | `spec/guidance/working.md` | rule 11, and the note stands at eleven of fifteen |
+| the design note | `spec/design_output/level0.md` | eight chapters under `The gate reads the answer`, and every marker points at one |
+
+The tests run 574 green, up 17. `./RUNME.sh lint` passes over the whole tree.
+`./RUNME.sh check` answers red on one thing this branch leaves alone, under the
+findings below, so `work done` refuses and this note stands at `held`.
+
+# The number
+
+`./RUNME.sh voice measure` stands nowhere in this tree. The verbs branch has yet
+to land. This box holds no transcript of answers either. The trust gate
+keeps level zero out of a cloud session, and `./RUNME.sh doctor` reads the stamp
+as absent here.
+
+So the number comes out of the gate's own scorer, over the one pair of drafts
+this branch writes. `.se/scripts/score.mjs` runs it, reading a file as
+`level0-answer.md`:
+
+| what | words | findings | the score | the band |
+|---|---|---|---|---|
+| the design chapter, first draft | 618 | 3 | 4.9 | clean |
+| the design chapter, as it stands | 624 | 0 | 0 | clean |
+
+Both sit under the warning. The number from before is 4.9, the number after it
+is 0, and both stand beside the answer-transcript number the brief asks for.
 
 # What waits
 
-| the piece | where | proves it |
+| the thing | who | what it costs |
 |---|---|---|
-| the two bands in the config | `spec/config/level0.json`, and its schema | `./RUNME.sh config` names `answer.warnAt` and `answer.ceiling` |
-| the re-prompt over the ceiling | `hooks/level0.js`, at `turn.complete` | a fake session over the ceiling meets one re-prompt, and one alone |
-| the carry under the ceiling | `hooks/level0.js`, at `prompt.submit` | the next prompt from a person carries one line naming the findings |
-| the `check_answer` tool | `hooks/level0.js`, beside `claim_stop` | the tool answers the findings of a draft |
-| the guidance line | `spec/guidance/working.md` | the note stays under its cap |
+| the `turn.step` hook migrates to an async generator | the owner, with a probe | `./RUNME.sh check` stands red until it lands, so no branch reaches `done` |
+| the two bands meet a real session | the owner | the first tuning, once level zero reads answers somewhere |
+| `voice measure` lands | the verbs branch | the delta per branch the funnel note asks for |
+| the paragraph schema finds its folder | the owner | one decision, and the note kinds read cleanly either way |
 
-# What the bands do
+# The findings
 
-The score of an answer is its findings per thousand words, the number
-`voice measure` prints. Two values in `level0.json` cut it into three bands:
+## 1. The validator refuses this module
 
-| the score | what happens |
-|---|---|
-| under `warnAt` | nothing |
-| from `warnAt` to `ceiling` | the findings wait, and the next prompt a person sends carries them as one line |
-| over `ceiling` | one re-prompt saying rewrite, naming the findings, once per turn |
+Measured on 2026-09-11 against client 2.1.269, on `origin/main` in a worktree of
+its own, so this stands ahead of the branch:
 
-A re-prompt is a `$.prompt.submit` from the hook, the way the tooth does it.
-The prompt carries the findings in the wording `refusal` in `lib/refuse.js`
-already uses. The answer door reads `e.origin.kind`, and a plugin prompt is a
-machine, so the door owes it no readback. `stop.mostInARow` caps the re-prompts
-the way it caps the tooth, and a lock per turn holds the count at one.
+    modules../level0.js: level0: hooks/level0.js:487: the hook on "turn.step"
+    is not an async generator: turn.step streams, so it takes
+    async function* ($, e, next) { ... }, which yields the chunks and returns
+    the result
 
-Start both values at `warnAt: 5` and `ceiling: 15`. The owner tunes them, and
-the funnel note holds the ceiling open.
+`pluginHolds()` runs inside `./RUNME.sh check`, so the check answers red and
+`work done` reads the battery and refuses. Every branch in this tree meets it,
+and this one leaves it as it stands.
 
-# What the tool does
+The remedy reads like three lines of work, and it costs more. The hook and its
+own test both carry the old contract. A guess at the new one lands a hook the
+engine skips in silence. `/plugin-types` writes the running build's
+declarations, and this box carries none, so the migration wants a probe on a
+client that loads the plugin. Read
+[[spec/design_output/level0#the-harness-surface]] before you touch it, and
+measure it again on the day.
 
-`check_answer({ text })` runs the draft through `lintText` as `level0-answer.md`
-and answers the findings, in the same wording the re-prompt carries. A draft
-that comes back clean meets the gate clean. The guidance carries one line:
-check a draft over sixty words before you send it.
+## 2. A short answer scores high
 
-# How to build it
+The score is a rate, so the denominator decides. Twenty words and one finding
+read as fifty, which stands over the ceiling. So an answer of one sentence
+carrying one finding earns a rewrite. The brief sets the score and names no
+floor, so the code holds none.
 
-Test through the fakes in `src/doors/fake`, with a fake session that ends a
-turn with a known answer. Assert one re-prompt over the ceiling, none under
-it, and one line on the next prompt. Assert that a second turn end inside the
-same turn submits nothing. Run `./RUNME.sh voice measure` over the transcripts
-of a session under this branch, and write the number into the handback beside
-the number from before.
+Two ways out, and the owner picks one:
 
-## How this branch runs
+- Tune `answer.ceiling` up, which the funnel note already holds open.
+- Give the score a floor in words, and the guidance already names sixty.
 
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
+## 3. The tooth goes first
 
-1. Run `./RUNME.sh work sync` FIRST. It takes main into this branch, so
-   an old branch works against what the tree holds now. Resolve any conflict
-   before you start, because a conflict found later costs the work already
-   done.
-2. Commit and push each time you finish a thing. A cloud box dies and takes
-   its working tree with it.
-3. Write your result and your retro into `HANDOVER.md`, at the root, replacing
-   this brief. Say what surprises you and every dead end you walk into.
-4. Run `./RUNME.sh work done`, which sets the status and pushes.
-5. Run `./RUNME.sh work release` instead where you stop early, so the branch
-   goes back to `todo` for somebody else.
-6. Leave the merge into main to a person. A cloud box opens no pull
-   request, and trunk only ever comes towards you.
+One prompt goes out per turn end. Where the tooth holds the turn open, that
+prompt belongs to the tooth, and the gate holds its findings over for the next
+one. The brief names neither case. Two prompts from one turn end read like a way
+to confuse the harness, so the gate gives way. See
+[[spec/design_output/level0#the-re-prompt-over-the-ceiling]].
+
+## 4. Two fixes come from elsewhere
+
+Two fixes this branch makes stand outside the brief, and both are trivial. Revert
+either one where you disagree.
+
+| where | what it reads | why |
+|---|---|---|
+| `spec/funnel/level-zero-closes.md` | `signed` in a table cell, and a heading of six words | `./RUNME.sh lint` answers red over the whole tree |
+| `test/contract/schema.test.js`, `src/scripts/cli.js`, `lib/schema.js` | every schema under `spec/schemas` reads as a note kind | `paragraph.schema.yaml` is a rule source, so two tests fail and `mint paragraph` writes an empty note |
+
+The second one adds `isNoteKind`, and
+[[spec/design_output/schema#a-note-kind-holds-chapters]] says what it holds
+apart. Where the paragraph schema belongs somewhere other than `spec/schemas`,
+that predicate comes back out.
+
+# The retro
+
+What surprises me, in the order it arrives:
+
+1. The brief says run `./RUNME.sh voice measure`, and no `voice` verb stands.
+   The funnel note puts that verb on the first of six branches. This is the
+   fourth, so the order the note names slips.
+2. `./RUNME.sh check` already stands red on two counts, ahead of the first line
+   this branch writes. A session reading `work done` as its last step meets that
+   at the end, where it costs the most. So read the battery first, and this note
+   says so above.
+3. The `CodeComment` rule admits five lines of header ahead of any code, and a
+   `[[link]]` after it. A prose comment over a chapter in the middle of a file
+   breaks it, so the prose moves up into the header.
+4. `ShortHeading` counts five words, and three of my eight chapter names want a
+   cut. A marker in the code carries the kebab case of the heading, so a cut name
+   is a rename in every file pointing at it.
+5. The answer register turns `PastTense` off. The first draft of the design
+   chapter scores 4.9 as an answer and 4 findings as prose, and one `PastTense`
+   row is the whole difference.
+
+No dead end costs real time here. The one I meet twice is the heading cap. I
+write a name, the linter cuts it, and every marker follows.

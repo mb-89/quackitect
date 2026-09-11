@@ -118,6 +118,16 @@ files, so a departure reaches the problems panel where a person reads it.
 
 A file carrying no `kind` reaches no schema, and the sweep passes over it.
 
+# A note kind holds chapters
+
+`spec/schemas` holds two sorts of schema. A note kind names the chapters a note
+of that kind carries, under `body`. A rule source names values a projection
+reads, and `paragraph.schema.yaml` is the first of those.
+
+`isNoteKind(schema)` tells them apart on the `body` key. `mint` names the note
+kinds alone, so a rule source earns no empty note, and the contract test over
+mint reads the same set.
+
 # Mint writes a valid note
 
 `./RUNME.sh mint <kind> <path>` reads the schema for that kind and writes the
