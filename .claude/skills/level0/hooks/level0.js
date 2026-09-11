@@ -57,7 +57,7 @@ import {
 import { landsOnTrunk, touchesGit } from "../lib/trunk.js";
 import { deeply, layered } from "../lib/layer.js";
 import { MARKER, pairOf } from "../lib/vehicle.js";
-import { lintText } from "../lib/vale.js";
+import { CONFIG, lintText } from "../lib/vale.js";
 
 const GUIDANCE = "spec/guidance";
 const COMMIT = "level0-commit.md";
@@ -73,6 +73,7 @@ const GATHER = ["node", "src/scripts/cli.js"];
 export function register(on, _options) {
   let bin = null;
   let formatter = null;
+  let styles = CONFIG;
   let standing = "";
   let sentence = "";
   let firstTurn = true;
@@ -102,6 +103,7 @@ export function register(on, _options) {
   const take = () => {
     bin = cage.bin ?? null;
     formatter = cage.formatter ?? null;
+    styles = cage.styles ?? CONFIG;
     root = cage.root ?? root;
     settings = cage.settings ?? settings;
     standing = cage.standing ?? "";
@@ -221,6 +223,7 @@ export function register(on, _options) {
     if (bin) {
       const said = await lintText(writing.text, where, {
         bin,
+        config: styles,
         run: (argv, init) => $.process.run(argv, init),
       });
       if (said.ran) found.push(...said.found);
@@ -287,7 +290,7 @@ export function register(on, _options) {
   on("tool.call", { tool: "Bash" }, async ($, e, next) => {
     const said = String(e.command ?? "");
     const found = readsCommand(said, await settings.ask("names.words"));
-    found.push(...(await commitVoice($, said, bin)));
+    found.push(...(await commitVoice($, said, bin, styles)));
     if (!found.length) return next(e);
 
     await logbook.say("warn", "bash", `refused ${found.length} rule(s) in a command`, {
@@ -426,6 +429,7 @@ export function register(on, _options) {
 
     const ran = await lintText(e.answer, ANSWER, {
       bin,
+      config: styles,
       run: (argv, init) => $.process.run(argv, init),
     });
     if (!ran.ran || !ran.found.length) return said;
@@ -566,6 +570,8 @@ async function loadCage($, cage) {
   // [[spec/design_output/vehicle#one-tree-drives-itself]]
   cage.roots = pairOf(await methodUp($, cage.root), cage.root);
   cage.settings = configHere($, cage.roots);
+  // [[spec/design_output/vehicle#the-styles-assemble-once]]
+  cage.styles = await stylesHere($, cage.roots);
   cage.judge = judgeOf(await judgeSettings(cage.settings));
   cage.tooth = toothOf({ mostInARow: await cage.settings.ask("stop.mostInARow") });
   if (!cage.wired) {
@@ -640,6 +646,20 @@ async function ensureCage($, cage) {
     });
   }
   return cage.health;
+}
+
+// [[spec/design_output/vehicle#the-styles-assemble-once]]
+async function stylesHere($, roots) {
+  if (roots?.itself !== false) return CONFIG;
+
+  try {
+    const ran = await $.process.run(
+      ["node", `${roots.method}/src/scripts/cli.js`, "styles"],
+      { timeoutMs: 60000 },
+    );
+    if (ran?.exitCode === 0) return ".se/vale/.vale.ini";
+  } catch {}
+  return CONFIG;
 }
 
 // [[spec/design_output/vehicle#a-marker-names-the-root]]
@@ -757,7 +777,7 @@ async function answerDoor($, e, it) {
 }
 
 // [[spec/design_output/bash#a-commit-message-meets-voice]]
-async function commitVoice($, command, bin) {
+async function commitVoice($, command, bin, styles) {
   const said = commitIn(command);
   if (!said || !bin) return [];
 
@@ -773,6 +793,7 @@ async function commitVoice($, command, bin) {
 
   const ran = await lintText(text, COMMIT, {
     bin,
+    config: styles,
     run: (argv, init) => $.process.run(argv, init),
   });
   return ran.ran ? ran.found : [];

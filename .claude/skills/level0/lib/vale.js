@@ -10,11 +10,11 @@ const MARKER = /<!--\s*vale\s+([A-Za-z0-9_.-]+)\s*=\s*(NO|off)\s*-->/i;
 const REASON = /<!--\s*because:\s*(.+?)\s*-->/i;
 
 export async function lintText(text, where, options = {}) {
-  const { run, bin, cwd } = options;
+  const { run, bin, cwd, config } = options;
   if (!bin) return { ran: false, why: "no vale stands here", found: [] };
   const argv = [
     bin,
-    `--config=${CONFIG}`,
+    `--config=${config || CONFIG}`,
     `--path=${where || "stdin.md"}`,
     "--output=JSON",
     "--no-exit",

@@ -22,6 +22,14 @@ export function deeply(under, over) {
   return out;
 }
 
+// [[spec/design_output/vehicle#the-styles-assemble-once]]
+export function stylesIn(read, styles) {
+  const said = String(read ?? "");
+  const at = said.search(/^StylesPath\s*=.*$/m);
+  if (at < 0) return `StylesPath = ${styles}\n${said}`;
+  return said.replace(/^StylesPath\s*=.*$/m, `StylesPath = ${styles}`);
+}
+
 function plain(said) {
   return Boolean(said) && typeof said === "object" && !Array.isArray(said);
 }

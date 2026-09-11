@@ -4,7 +4,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { configOf } from "../../.claude/skills/level0/lib/config.js";
-import { deeply, layered } from "../../.claude/skills/level0/lib/layer.js";
+import { deeply, layered, stylesIn } from "../../.claude/skills/level0/lib/layer.js";
 
 test("a name the work root repeats replaces the method's", () => {
   const said = layered(
@@ -77,4 +77,14 @@ test("a project naming nothing takes the method's whole config", async () => {
   });
   assert.equal(await said.ask("log.level"), "info");
   assert.match(await said.text(), /"level": "info"/);
+});
+
+test("the assembled config names the styles beside it", () => {
+  const said = stylesIn("# a note\nStylesPath = spec/config/styles\nMinAlertLevel = suggestion\n", "styles");
+  assert.match(said, /^StylesPath = styles$/m);
+  assert.equal(said.includes("spec/config/styles"), false);
+  assert.match(said, /MinAlertLevel/);
+
+  const bare = stylesIn("MinAlertLevel = suggestion\n", "styles");
+  assert.match(bare, /^StylesPath = styles$/m);
 });

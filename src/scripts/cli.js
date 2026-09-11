@@ -45,6 +45,7 @@ import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
+import { assemble } from "./styles.js";
 import { readTools, whereIs, writeSurvey } from "./tools.js";
 import { entryOf } from "../../.claude/skills/level0/lib/vehicle.js";
 import {
@@ -210,6 +211,10 @@ const verbs = {
     says: "which root answers a path, and what it stands over",
     run: async () => theLayer(rest),
   },
+  styles: {
+    says: "the rules Vale reads, assembled where two roots hold them",
+    run: async () => theStyles(),
+  },
   notes: {
     says: "the notes the words belong to, ranked by name and body",
     run: async () => asksIndex(["notes", ...rest]),
@@ -335,6 +340,19 @@ function whichVehicle(list, from) {
 function named(argv, flag) {
   const at = argv.indexOf(flag);
   return at >= 0 ? (argv[at + 1] ?? "") : "";
+}
+
+// [[spec/design_output/vehicle#the-styles-assemble-once]]
+function theStyles() {
+  const pair = rootsHere(files, process.env, here);
+  const said = assemble(files, pair);
+  if (pair.itself) {
+    console.log(`this tree reads ${said.config}, and no assembly stands between.`);
+    return 0;
+  }
+  console.log(`${said.wrote} rule file(s) assembled into ${said.config}.`);
+  console.log("The method's rules come down, and this project's stand over them.");
+  return 0;
 }
 
 // [[spec/design_output/vehicle#the-layer-that-answers]]

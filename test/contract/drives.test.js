@@ -112,6 +112,50 @@ describe("a vehicle drives a project", () => {
     assert.match(stop, new RegExp(vehicle), "a key it stays silent about comes down");
   });
 
+  test("the project adds a Vale style to itself, and only to itself", () => {
+    files.makeDir(join(project, "spec", "config", "styles", "House"));
+    files.write(
+      join(project, "spec", "config", "styles", "House", "NoBird.yml"),
+      'extends: existence\nmessage: "Say duck, not bird."\nlevel: error\ntokens:\n  - bird\n',
+    );
+    files.makeDir(join(project, "spec", "config", "styles", "VoiceVale"));
+    files.write(
+      join(project, "spec", "config", "styles", "VoiceVale", "Antithesis.yml"),
+      'extends: existence\nmessage: "this project speaks for itself"\nlevel: warning\ntokens:\n  - zzz\n',
+    );
+
+    const said = drives(["styles"], project);
+    assert.equal(said.exitCode, 0, said.stderr);
+
+    const into = join(project, ".se", "vale");
+    assert.match(files.read(join(into, ".vale.ini")), /^StylesPath = styles$/m);
+    assert.ok(
+      files.exists(join(into, "styles", "House", "NoBird.yml")),
+      "a style the project alone holds joins the set",
+    );
+    assert.match(
+      files.read(join(into, "styles", "VoiceVale", "Antithesis.yml")),
+      /speaks for itself/,
+      "and one it names again stands over the method's",
+    );
+    assert.ok(
+      files.exists(join(into, "styles", "VoiceVale", "CodeComment.yml")),
+      "every style it stays silent about comes down",
+    );
+
+    assert.equal(
+      files.exists(join(vehicle, "spec", "config", "styles", "House")),
+      false,
+      "the vehicle takes none of it",
+    );
+    assert.equal(
+      files.read(join(vehicle, "spec", "config", "styles", "VoiceVale", "Antithesis.yml"))
+        .includes("speaks for itself"),
+      false,
+      "and keeps the rule it had",
+    );
+  });
+
   test("nothing the project does reaches the vehicle", () => {
     const said = files.read(join(vehicle, "spec", "guidance", "voice.md"));
     assert.equal(said.includes("python"), false, "the vehicle's rule stands as it was");

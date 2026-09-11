@@ -123,6 +123,30 @@ A driver named in `.se/project.json` answers before the walk does. The link
 puts the marker inside the project, so a walk alone would read the project as
 its own method root and drive nothing.
 
+## The styles assemble once
+
+Vale reads one config and one styles folder, so two roots of rules need an
+assembly. `RUNME styles` writes the method's styles into `.se/vale/styles`,
+then the project's over them by name, and rewrites `StylesPath` to point
+beside itself.
+
+| what the project holds | what the assembly answers |
+|---|---|
+| a style nobody else names | it joins the set |
+| a style the method names too | the project's stands over it |
+| silence | the method's comes down |
+
+A project adds a rule to itself and to nothing else. The method's styles folder
+takes none of it, which is what keeps a vehicle handing the same rules to every
+project it drives.
+
+Nobody edits `.se/vale`, and git ignores it. The write door assembles it at the
+session's start and reads its config, so a rule the project adds holds at the
+next write.
+
+This tree drives itself, so it reads `.vale.ini` where it stands. No assembly
+comes between.
+
 ## The layer that answers
 
 `RUNME resolve <path>` names the root a file comes out of, and what it stands
