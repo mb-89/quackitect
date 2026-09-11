@@ -21,7 +21,7 @@ warning severity.
 
 Every claim the brief asks for stands:
 
-1. `./RUNME.sh check` answers 0 with 39 findings standing.
+1. `./RUNME.sh check` answers 0 with 37 findings standing.
 2. A `_note.md` breaking a rule answers nothing, from Vale or the sweep.
 3. Each keyword the checker holds takes a case feeding it a bad note.
 4. `./RUNME.sh lint` names every departure in the standard line shape.
@@ -29,7 +29,7 @@ Every claim the brief asks for stands:
 
 # What the checker finds
 
-33 notes carry a kind, 22 of them depart, and the departures count 39:
+33 notes carry a kind, 21 of them depart, and the departures count 37:
 
 | kind | notes | depart | findings |
 |---|---|---|---|
@@ -103,7 +103,7 @@ disk door, and it adds about one percent.
 |---|---|
 | the severity flip | `SEVERITY` in `lib/schema.js` says `warning` in one place, so error is a one-word change |
 | the write door | an `Edit` hands a whole-document rule the edited lines alone, so the door reads the file off disk first |
-| the 39 findings | decide `describes` and `Scope` for design outputs, then mend the four rationales |
+| the 37 findings | decide `describes` and `Scope` for design outputs, then mend the four rationales |
 | `matches` | build the link resolver, then the keyword |
 | the handover kind | `work.js` appends `How this branch runs` as a heading, and the schema counts it a chapter |
 
