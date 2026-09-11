@@ -2,14 +2,27 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "level zero",
   "type": "object",
-  "required": ["stop", "answer", "log", "judge", "names", "ask"],
+  "required": [
+    "stop",
+    "answer",
+    "log",
+    "judge",
+    "names",
+    "ask"
+  ],
   "properties": {
-    "comment": { "type": "string" },
+    "comment": {
+      "type": "string"
+    },
     "answer": {
       "type": "object",
-      "required": ["enabled"],
+      "required": [
+        "enabled"
+      ],
       "properties": {
-        "comment": { "type": "string" },
+        "comment": {
+          "type": "string"
+        },
         "enabled": {
           "type": "boolean",
           "help": "The door holding the owner's prompt first. false takes it out."
@@ -18,9 +31,15 @@
     },
     "stop": {
       "type": "object",
-      "required": ["enabled", "mostInARow", "hold"],
+      "required": [
+        "enabled",
+        "mostInARow",
+        "hold"
+      ],
       "properties": {
-        "comment": { "type": "string" },
+        "comment": {
+          "type": "string"
+        },
         "enabled": {
           "type": "boolean",
           "help": "The tooth. false ends every turn where the agent asks to end it."
@@ -32,10 +51,14 @@
         },
         "hold": {
           "type": "string",
-          "enum": ["running", "finishing", "stopped"],
+          "enum": [
+            "running",
+            "finishing",
+            "stopped"
+          ],
           "help": "What the session does when it reaches the end of a turn.",
           "widget": "toggle",
-          "gesture": 5,
+          "gesture": 2,
           "icon": "the raised hand and the robot",
           "at": "U+270B U+1F916",
           "group": "agent control",
@@ -48,17 +71,25 @@
     },
     "ask": {
       "type": "object",
-      "required": ["wanted"],
+      "required": [
+        "wanted"
+      ],
       "properties": {
-        "comment": { "type": "string" },
+        "comment": {
+          "type": "string"
+        },
         "wanted": {
           "type": "string",
-          "enum": ["quiet", "short", "full"],
+          "enum": [
+            "quiet",
+            "short",
+            "full"
+          ],
           "help": "What the owner wants said at the end of this turn.",
           "widget": "toggle",
           "gesture": 5,
-          "icon": "the speech balloon",
-          "at": "U+1F4AC",
+          "icon": "the question mark and the robot",
+          "at": "U+2753 U+1F916",
           "group": "agent control",
           "row": 0,
           "column": 2,
@@ -69,18 +100,26 @@
     },
     "log": {
       "type": "object",
-      "required": ["level"],
+      "required": [
+        "level"
+      ],
       "properties": {
-        "comment": { "type": "string" },
+        "comment": {
+          "type": "string"
+        },
         "level": {
           "type": "string",
-          "enum": ["info", "warn", "error"],
+          "enum": [
+            "info",
+            "warn",
+            "error"
+          ],
           "help": "The level this box writes at. info writes every line a door says."
         },
         "open": {
           "help": "Open the log in lnav, in a terminal beside the editor.",
           "widget": "action",
-          "runs": "./RUNME.sh log",
+          "runs": "./RUNME.sh log --plain",
           "icon": "the scroll",
           "at": "U+1F4DC",
           "group": "agent control",
@@ -100,9 +139,17 @@
     },
     "judge": {
       "type": "object",
-      "required": ["enabled", "model", "maxSpans", "warmupWrites", "thenEveryNth"],
+      "required": [
+        "enabled",
+        "model",
+        "maxSpans",
+        "warmupWrites",
+        "thenEveryNth"
+      ],
       "properties": {
-        "comment": { "type": "string" },
+        "comment": {
+          "type": "string"
+        },
         "enabled": {
           "type": "boolean",
           "help": "The model reading a write. false leaves the mechanical rules alone."
@@ -130,9 +177,13 @@
     },
     "names": {
       "type": "object",
-      "required": ["words"],
+      "required": [
+        "words"
+      ],
       "properties": {
-        "comment": { "type": "string" },
+        "comment": {
+          "type": "string"
+        },
         "words": {
           "type": "number",
           "unit": "words",
@@ -144,10 +195,15 @@
       "comment": "Level one. Each key here names a widget nothing draws yet, because an engine has to answer it first. Marking a group is what draws one.",
       "type": "object",
       "properties": {
-        "comment": { "type": "string" },
+        "comment": {
+          "type": "string"
+        },
         "state": {
           "type": "string",
-          "enum": ["rest", "running"],
+          "enum": [
+            "rest",
+            "running"
+          ],
           "help": "What a person last asked the engine to do.",
           "widget": "status",
           "sets": "engine.state",
@@ -162,16 +218,29 @@
         },
         "binding": {
           "type": "string",
-          "enum": ["queue", "unbound", "god"],
+          "enum": [
+            "queue",
+            "unbound",
+            "god"
+          ],
           "help": "Where the session takes its work from.",
           "widget": "toggle",
           "gesture": 5,
           "icon": "the chain and the broken chain",
-          "at": "U+1F517 U+1F4A5"
+          "at": "U+1F517 U+1F4A5",
+          "group": "agent control",
+          "row": 0,
+          "column": 3,
+          "rowSpan": 1,
+          "colSpan": 1
         },
         "autonomy": {
           "type": "string",
-          "enum": ["finish", "start", "ideation"],
+          "enum": [
+            "finish",
+            "start",
+            "ideation"
+          ],
           "help": "How far the session goes on its own.",
           "widget": "toggle",
           "gesture": 5,

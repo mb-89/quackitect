@@ -19,11 +19,30 @@ function panelHtml(model) {
     `<style nonce="${nonce}">${style(groups)}</style>`,
     "</head>",
     "<body>",
+    chooser(groups),
     ...groups.map((one) => section(one)),
     tree(model),
     `<script type="module" nonce="${nonce}" src="${escaped(model?.script ?? "")}"></script>`,
     "</body>",
     "</html>",
+  ].join("\n");
+}
+
+// [[spec/design_output/extension#the-gear-picks-the-sections]]
+function chooser(groups) {
+  const names = [...groups.map((one) => one.name), CONFIG];
+  return [
+    '<div class="bar">',
+    `<button class="gear" title="the sections this panel draws">${markOf("U+2699")}</button>`,
+    '<div class="chooser" hidden>',
+    ...names.map(
+      (name) =>
+        `<label><input type="checkbox" class="pick" data-pick="${escaped(name)}"${
+          name === CONFIG ? "" : " checked"
+        }>${escaped(name)}</label>`,
+    ),
+    "</div>",
+    "</div>",
   ].join("\n");
 }
 
@@ -38,17 +57,19 @@ function section(group) {
   ].join("\n");
 }
 
+// [[spec/design_output/extension#a-mark-alone-says-it]]
 function widget(cell) {
   const away = cell.value !== undefined && cell.value !== cell.rest;
+  const far = (cell.options ?? [])[2];
+  const held = far !== undefined && cell.value === far;
   return [
-    `<button class="widget ${placeOf(cell)}${away ? " away" : ""}"`,
+    `<button class="widget ${placeOf(cell)}${away ? " away" : ""}${held ? " held" : ""}"`,
     ` data-key="${escaped(cell.key)}" data-widget="${escaped(cell.widget)}"`,
     ` data-runs="${escaped(cell.runs ?? "")}" data-value="${escaped(cell.value ?? "")}"`,
     ` data-options="${escaped((cell.options ?? []).join(" "))}"`,
     ` data-gesture="${escaped(cell.gesture ?? "")}"`,
     ` title="${escaped(hover(cell))}">`,
     `<span class="mark">${escaped(markOf(cell.at))}</span>`,
-    `<span class="said">${escaped(String(cell.value ?? cell.leaf))}</span>`,
     cell.widget === "status" ? `<span class="light ${escaped(cell.lit)}"></span>` : "",
     "</button>",
   ].join("");
@@ -77,7 +98,7 @@ function markOf(at) {
 // [[spec/design_output/extension#the-bottom-section]]
 function tree(model) {
   return [
-    `<details class="section" data-section="${CONFIG}">`,
+    `<details class="section gone" data-section="${CONFIG}">`,
     `<summary>${CONFIG}</summary>`,
     '<input class="filter" type="text" placeholder="a regular expression over the keys">',
     '<div class="tree">',
@@ -187,7 +208,19 @@ function style(groups) {
     ".widget.away { color: var(--vscode-button-foreground);",
     "  background: var(--vscode-button-background); }",
     ".mark { font-size: 1.2em; }",
-    ".said { font-size: 0.85em; opacity: 0.9; }",
+    ".widget.held { background: var(--vscode-inputValidation-errorBackground,",
+    "  var(--vscode-errorForeground)); color: var(--vscode-errorForeground);",
+    "  border-color: var(--vscode-errorForeground); animation: pulse 1.2s infinite; }",
+    "@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.45; } 100% { opacity: 1; } }",
+    ".bar { display: flex; justify-content: flex-end; position: relative; }",
+    ".gear { background: var(--vscode-sideBar-background, transparent);",
+    "  border: 1px solid var(--vscode-contrastBorder, transparent); cursor: pointer;",
+    "  font-size: 1.1em; color: var(--vscode-foreground); padding: 2px 4px; }",
+    ".chooser { position: absolute; right: 0; top: 100%; z-index: 1; padding: 4px 6px;",
+    "  display: flex; flex-direction: column; gap: 2px;",
+    "  background: var(--vscode-editorWidget-background, var(--vscode-editor-background));",
+    "  border: 1px solid var(--vscode-editorWidget-border, var(--vscode-panel-border)); }",
+    ".chooser label { display: flex; align-items: center; gap: 4px; font-size: 0.9em; }",
     ".light { width: 6px; height: 6px; border-radius: 50%;",
     "  background: var(--vscode-charts-green); }",
     ".light.dark { background: var(--vscode-disabledForeground); }",

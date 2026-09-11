@@ -114,12 +114,12 @@ test("a run message opens the run the declaration names, and writes nothing", as
 test("the widget follows the file, because a redraw reads the file again", async () => {
   const door = doorOf();
   const sidebar = sidebarOf(door);
-  assert.ok(!/class="widget at-0-1-1-1 away"/.test(await sidebar.html()));
+  assert.ok(!/class="widget at-0-1-1-1 away/.test(await sidebar.html()));
 
   door.files.write(LOCAL, JSON.stringify({ stop: { hold: "stopped" } }));
   const now = await sidebar.html();
-  assert.match(now, /class="widget at-0-1-1-1 away"/);
-  assert.match(now, /<span class="said">stopped<\/span>/);
+  assert.match(now, /class="widget at-0-1-1-1 away held"/);
+  assert.ok(!/class="said"/.test(now), "the mark stands alone");
 });
 
 // [[spec/design_output/extension#the-local-file-dies]]
@@ -172,5 +172,5 @@ test("the view opening draws the page once, and the watcher draws it again", asy
   door.files.write(LOCAL, JSON.stringify({ stop: { hold: "finishing" } }));
   await watch.draw();
   assert.equal(drawn.length, 2);
-  assert.match(drawn[1], /<span class="said">finishing<\/span>/);
+  assert.match(drawn[1], /class="widget at-0-1-1-1 away"/);
 });

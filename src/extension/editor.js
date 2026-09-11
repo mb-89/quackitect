@@ -59,12 +59,15 @@ function editorDoor(context) {
     // [[spec/design_output/extension#the-log-opens-a-terminal]]
     runs(line) {
       if (!line) return;
+      // [[spec/design_output/extension#a-terminal-opens-on-windows]]
+      const said =
+        process.platform === "win32" ? line.replace(/^\.\/RUNME\.sh/, ".\\RUNME.cmd") : line;
       const shell = vscode.window.createTerminal({
         name: NAME,
         cwd: folder.uri.fsPath,
       });
       shell.show();
-      shell.sendText(line);
+      shell.sendText(said);
     },
 
     registerView(id, resolve) {

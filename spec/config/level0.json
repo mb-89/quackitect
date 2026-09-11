@@ -6,6 +6,10 @@
     "mostInARow": 3,
     "hold": "running"
   },
+  "engine": {
+    "comment": "The engine level one brings. binding says what the agent answers to: the queue it takes work from, unbound, or god mode, which five presses reach and which draws a pulse while it stands.",
+    "binding": "queue"
+  },
   "ask": {
     "comment": "What the owner wants said. The standing block carries a line while this stands past quiet, and the turn's end writes it back to quiet.",
     "wanted": "quiet"

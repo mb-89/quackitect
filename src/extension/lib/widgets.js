@@ -7,6 +7,8 @@ const SAID = "comment";
 const WIDE = 5;
 const DRAWS = ["action", "toggle", "status", "count", "table"];
 const TRACKED = "spec/config/level0.json";
+// [[spec/design_output/extension#the-tree-holds-config-alone]]
+const MACHINERY = ["session"];
 const LOCAL = ".se/config.json";
 
 function entriesIn(schema) {
@@ -88,7 +90,8 @@ function treeIn(schema, files) {
 function sectionsOf(said, known) {
   const out = [];
   for (const [section, held] of Object.entries(said ?? {})) {
-    if (section === SAID || !held || typeof held !== "object") continue;
+    if (section === SAID || MACHINERY.includes(section)) continue;
+    if (!held || typeof held !== "object") continue;
     const rows = [];
     for (const [leaf, value] of Object.entries(held)) {
       if (leaf === SAID) continue;

@@ -8,6 +8,7 @@ import { test } from "node:test";
 import {
   matches,
   messageFor,
+  picked,
   restore,
   show,
   wire,
@@ -163,4 +164,56 @@ test("opening a section writes what the page holds, and no value with it", () =>
   );
   root.fire("toggle", { dataset: { section: "config" }, open: true });
   assert.deepEqual(held, { open: { config: true } });
+});
+
+// [[spec/design_output/extension#the-gear-picks-the-sections]]
+test("the gear opens the chooser, and a tick brings its section back", () => {
+  const chooser = { sel: ".chooser", hidden: true };
+  const gear = { sel: ".gear", closest: (want) => (want === ".gear" ? gear : null) };
+  const section = node("details.section", { dataset: { section: "config" } });
+  const box = {
+    sel: '.pick[data-pick="config"]',
+    checked: false,
+    dataset: { pick: "config" },
+    closest: () => null,
+  };
+  const root = page([chooser, gear, section, box]);
+
+  let state = {};
+  const view = {
+    get: () => state,
+    set: (one) => {
+      state = one;
+    },
+  };
+  wire(root, () => {}, view, () => 0);
+
+  root.fire("click", gear);
+  assert.equal(chooser.hidden, false, "the gear opens it");
+
+  box.checked = true;
+  root.fire("change", box);
+  assert.deepEqual(state.picks, { config: true }, "the choice rides in the state");
+  assert.ok(!section.classList.contains("gone"), "the section stands again");
+});
+
+test("a section a person unticks goes, and the tick rides through a redraw", () => {
+  const section = node("details.section", {
+    classes: [],
+    dataset: { section: "agent control" },
+  });
+  const box = {
+    sel: '.pick[data-pick="agent control"]',
+    checked: true,
+    dataset: { pick: "agent control" },
+  };
+  const root = page([section, box]);
+
+  picked(root, { "agent control": false });
+  assert.ok(section.classList.contains("gone"));
+  assert.equal(box.checked, false);
+
+  restore(root, { picks: { "agent control": true } });
+  assert.ok(!section.classList.contains("gone"));
+  assert.equal(box.checked, true);
 });

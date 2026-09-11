@@ -401,6 +401,51 @@ while every other extension goes, which is a person watching the lot uninstall
 itself at once. So the writer counts the ids it read, refuses a write that
 drops one, and leaves `extensions.json.before-quackitect` beside the file.
 
+# What a button draws
+
+## A mark alone says it
+
+A button draws its mark and no word. A word under it repeats the value the mark
+already carries, and four of those make a panel read as a paragraph.
+
+| what a widget wears | when |
+|---|---|
+| the mark | always |
+| the `away` colour | the value stands off its rest |
+| a red pulse | the value stands at the far end |
+
+The far end is the third option, which a gesture reaches. `stop.hold` takes two
+presses to `stopped`, and `ask.wanted` and `engine.binding` take five.
+
+## The gear picks the sections
+
+A gear stands at the top and names every section the panel holds. A person
+ticks the ones they want, and the choice rides in the view state, so it stands
+through a redraw.
+
+Config starts unticked. A person reaching for a key ticks it open, and the
+panel stays four buttons wide for everybody else.
+
+## The tree holds config alone
+
+The bottom section draws the two config files and leaves `session` out of them.
+That key holds the id a window writes to know itself again, and it answers
+nobody who reads it.
+
+## The button prints the log
+
+The log button runs `./RUNME.sh log --plain`, so the rows land in the terminal
+it opens. The bare verb hands the file to lnav instead, which takes the whole
+terminal for its own screen. A button answers with rows where they stand.
+
+Where no log stands yet, the verb says so in one line and answers zero.
+
+## A terminal opens on Windows
+
+A terminal opens on the shell the box prefers, which is PowerShell there, and
+that shell reads no `./RUNME.sh`. So the door hands it `.\RUNME.cmd` instead,
+which is the same doorway a person clicks.
+
 # What stands open
 
 - The extension holds its own reader of a key, because `lib/config.js` in the

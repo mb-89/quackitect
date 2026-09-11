@@ -104,8 +104,14 @@ test("the log button's hover carries the lnav keys the declaration names", () =>
 });
 
 test("a widget away from rest wears the mark saying so, and one at rest does not", () => {
-  assert.ok(!/class="widget at-0-1-1-2 away"/.test(drawn()));
-  assert.match(drawn({ stop: { hold: "stopped" } }), /class="widget at-0-1-1-2 away"/);
+  assert.ok(!/class="widget at-0-1-1-2 away/.test(drawn()));
+  assert.match(drawn({ stop: { hold: "finishing" } }), /class="widget at-0-1-1-2 away"/);
+});
+
+// [[spec/design_output/extension#a-mark-alone-says-it]]
+test("the far value pulses, and every widget draws its mark and no word", () => {
+  assert.match(drawn({ stop: { hold: "stopped" } }), /class="widget at-0-1-1-2 away held"/);
+  assert.ok(!/class="said"/.test(drawn()), "no word stands under a mark");
 });
 
 test("a status draws its light dark, because nothing writes a heartbeat yet", () => {
@@ -140,10 +146,9 @@ test("the bottom section comes last and starts collapsed, and every other opens"
   const sections = said.match(
     /<details class="section" data-section="([^"]+)"( open)?>/g,
   );
-  assert.deepEqual(sections, [
-    '<details class="section" data-section="agent control" open>',
-    '<details class="section" data-section="config">',
-  ]);
+  assert.deepEqual(sections, ['<details class="section" data-section="agent control" open>']);
+  assert.match(said, /<details class="section gone" data-section="config">/);
+  assert.ok(said.indexOf('data-section="config"') > said.indexOf('data-section="agent control"'));
 });
 
 test("the bottom section draws an editor matching the type, and the unit beside it", () => {

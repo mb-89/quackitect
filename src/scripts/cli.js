@@ -323,7 +323,8 @@ function readLog(argv) {
 
   const all = argv.includes("--all");
   const newest = names[names.length - 1];
-  const viewer = lnavHere();
+  // [[spec/design_output/extension#the-button-prints-the-log]]
+  const viewer = argv.includes("--plain") ? "" : lnavHere();
   if (viewer) {
     return outside.run([viewer, all ? LOG : join(LOG, newest)], {
       cwd: root,
@@ -335,9 +336,11 @@ function readLog(argv) {
     console.log(name);
     for (const one of rowsOf(files.read(join(LOG, name)))) console.log(asRow(one));
   }
-  console.log("");
-  console.log("lnav draws these rows, and opens the rest of a line under it.");
-  console.log("Run ./RUNME.sh once, which installs it into .se/bin.");
+  if (!argv.includes("--plain")) {
+    console.log("");
+    console.log("lnav draws these rows, and opens the rest of a line under it.");
+    console.log("Run ./RUNME.sh once, which installs it into .se/bin.");
+  }
   return 0;
 }
 
