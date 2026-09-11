@@ -17,17 +17,7 @@ misreads: 3
 layers:
   characters:
     admits: letters, digits, space, and the punctuation below
-    punctuation:
-      - "."
-      - ","
-      - "?"
-      - "!"
-      - ":"
-      - "("
-      - ")"
-      - "'"
-      - '"'
-      - "-"
+    punctuation: [full stop, comma, question mark, exclamation mark, colon, parentheses, apostrophe, quotation mark, hyphen]
     exceptions: []
 
   markup:
