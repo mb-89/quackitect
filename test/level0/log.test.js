@@ -1,11 +1,14 @@
 // The log line, the file it lands in, and the level a box writes at.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   aimOf,
+  appended,
+  archiveOf,
   asRow,
+  logSpec,
   nameOf,
   rowsOf,
   timeOf,
@@ -19,16 +22,16 @@ const ID = "a6f8c43b";
 const FOLDER = "/log";
 
 function door(from = AT, level) {
-  return fakeLog(fakeClock(from), { folder: FOLDER, id: ID, level });
+  return fakeLog(fakeClock(from), { folder: FOLDER, level });
 }
 
-test("a line carries the time, the level, the door and one sentence", async () => {
+test("a line carries the time, the level, the kind and one sentence", async () => {
   const it = door();
   const row = await it.say("warn", "write", "refused a line");
   assert.deepEqual(row, {
     at: AT,
     level: "warn",
-    door: "write",
+    kind: "write",
     said: "refused a line",
   });
 });
@@ -55,18 +58,43 @@ test("a level nobody names reads as info", async () => {
   assert.equal(row.level, "info");
 });
 
-test("the file name carries the day and the time", () => {
+test("an old session's name carries the day and the time", () => {
   assert.equal(nameOf(AT, ID), "2026-09-08T14-22-51-a6f8c43b.jsonl");
   assert.equal(timeOf(nameOf(AT, ID)), Date.parse("2026-09-08T14:22:51.000Z"));
   assert.equal(timeOf("notes.md"), 0);
 });
 
-test("the door writes one file, and a second line keeps the first", async () => {
+// [[spec/design_output/log#a-session-rotates-its-file]]
+test("an old session takes the name of its first line's time, or of now", () => {
+  const text = `${JSON.stringify({ at: AT, level: "info", kind: "level0", said: "session start" })}\n`;
+  assert.equal(archiveOf(text, "2026-09-09T00:00:00.000Z", ID), `.se/log/old/${nameOf(AT, ID)}`);
+  assert.equal(
+    archiveOf("not json\n", "2026-09-09T00:00:00.000Z", ID),
+    `.se/log/old/${nameOf("2026-09-09T00:00:00.000Z", ID)}`,
+  );
+});
+
+// [[spec/design_output/log#every-writer-appends]]
+test("a line appended keeps every line before it, and mends a missing newline", () => {
+  const row = { at: AT, level: "info", kind: "work", said: "pushed" };
+  assert.equal(appended("", row), `${JSON.stringify(row)}\n`);
+  assert.equal(appended('{"a":1}', row), `{"a":1}\n${JSON.stringify(row)}\n`);
+  assert.equal(appended('{"a":1}\n', row), `{"a":1}\n${JSON.stringify(row)}\n`);
+});
+
+// [[spec/design_output/log#the-log-tool]]
+test("the log tool asks for a kind and one sentence", () => {
+  const spec = logSpec();
+  assert.equal(spec.name, "log");
+  assert.deepEqual(spec.inputSchema.required, ["kind", "said"]);
+});
+
+test("the door writes the session file, and a second line keeps the first", async () => {
   const it = door();
   await it.say("info", "work", "took work/the-log-gets-written");
   await it.say("info", "work", "pushed");
 
-  assert.equal(it.path, `${FOLDER}/2026-09-08T14-22-51-a6f8c43b.jsonl`);
+  assert.equal(it.path, `${FOLDER}/session.jsonl`);
   assert.deepEqual(
     rowsOf(it.files.read(it.path)).map((one) => one.said),
     ["took work/the-log-gets-written", "pushed"],
@@ -86,7 +114,7 @@ test("every line the door writes parses as JSON", async () => {
 });
 
 test("a row without lnav shows the four fields, and the rest beneath", () => {
-  const one = { at: AT, level: "warn", door: "write", said: "refused" };
+  const one = { at: AT, level: "warn", kind: "write", said: "refused" };
   assert.equal(asRow(one), "14:22:51.000 warn  write  refused");
   assert.match(asRow({ ...one, rule: "Passive" }), /\n\s+rule=Passive$/);
 });
@@ -102,7 +130,7 @@ test("a box at warn writes a refusal and a fault, and no info line", async () =>
     ["warn", "error"],
   );
   assert.deepEqual(
-    rowsOf(it.files.read(it.path)).map((one) => one.door),
+    rowsOf(it.files.read(it.path)).map((one) => one.kind),
     ["write", "vale"],
   );
 });

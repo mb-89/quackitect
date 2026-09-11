@@ -1,7 +1,13 @@
 ---
 kind: [[design_output]]
-implements: [[spec/design_input/copilot]]
+refines:
+  - [[spec/design_input/copilot]]
 ---
+
+# Scope
+
+One level zero holds two surfaces. This note covers the runtime under
+`src/scripts/copilot.js` and the decisions it hands each surface.
 
 # Events and feedback
 

@@ -1,6 +1,6 @@
 // The clock door, against the real clock. A test above this one hands in the
 // fake, so a case replays at the same instant every run.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";

@@ -10,7 +10,7 @@ import {
   standingLayer,
 } from "../../.claude/skills/level0/lib/guidance.js";
 import { HEALTH, healthOf } from "../../.claude/skills/level0/lib/health.js";
-import { asRow, rowsOf } from "../../.claude/skills/level0/lib/log.js";
+import { asRow, OLD, rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
 import {
   entriesIn,
@@ -19,10 +19,23 @@ import {
   staleIn,
 } from "../../.claude/skills/level0/lib/projection.js";
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
+import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
+import {
+  END as SCHEMA_END,
+  mintNote,
+  readYaml,
+  schemaFaults,
+  SCHEMAS,
+} from "../../.claude/skills/level0/lib/schema.js";
 import { treeFaults, treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { EDITOR_SETTINGS } from "../../.claude/skills/level0/lib/servers.js";
 import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
-import { configOf, LOCAL, SCHEMA } from "../../.claude/skills/level0/lib/config.js";
+import {
+  configOf,
+  LOCAL,
+  SCHEMA,
+  TRACKED,
+} from "../../.claude/skills/level0/lib/config.js";
 import {
   faultsIn as faultsInGrid,
   lineOf,
@@ -41,17 +54,35 @@ import { git } from "../doors/git.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { readTools, whereIs, writeSurvey } from "./tools.js";
+import { SOURCE as VIEWER, viewerOf } from "./viewer.js";
+import {
+  attach,
+  detach,
+  entryFor,
+  produce,
+  registerCopy,
+  readRegister,
+  rootsHere,
+} from "./vehicle.js";
 import { work } from "./work.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 
+// [[spec/design_output/vehicle#the-work-root-inherits]]
+function atRoot(path) {
+  const said = String(path ?? "");
+  return said.startsWith("/") || /^[A-Za-z]:/.test(said) ? said : join(root, said);
+}
+
 // [[spec/design_output/config#the-resolver-holds-the-layers]]
-function configHere(files) {
+function configHere(files, pair) {
   return configOf({
-    read: async (path) => files.read(join(root, path)),
-    write: async (path, text) => files.write(join(root, path), text),
-    makeDir: async (path) => files.makeDir(join(root, path)),
+    tracked: pair?.itself === false ? [join(pair.method, TRACKED), TRACKED] : [TRACKED],
+    schema: pair?.itself === false ? join(pair.method, SCHEMA) : SCHEMA,
+    read: async (path) => files.read(atRoot(path)),
+    write: async (path, text) => files.write(atRoot(path), text),
+    makeDir: async (path) => files.makeDir(atRoot(path)),
     readEnv: async (names) =>
       Object.fromEntries(names.map((name) => [name, process.env[name] ?? ""])),
   });
@@ -61,7 +92,7 @@ async function doorsHere() {
   const outside = proc();
   const files = disk();
   const time = clock();
-  const said = configHere(files);
+  const said = configHere(files, rootsHere(files, process.env, root));
   return {
     proc: outside,
     disk: files,
@@ -84,7 +115,7 @@ const outside = it.proc;
 
 const known = readTools(files, root);
 const bin = whereIs(files, root, "vale", known);
-const lnav = whereIs(files, root, "lnav", known);
+const go = whereIs(files, root, "go", known);
 const LOG = join(root, ".se", "log");
 const STYLES = join(root, "spec", "config", "styles", "VoiceVale");
 const JUDGED = join(root, "spec", "config", "styles", "VoiceJudged");
@@ -96,7 +127,8 @@ const DOORS = join(root, "src", "doors");
 const PLUGIN = join(".claude", "skills", "level0");
 const CONTRACT = join(root, "test", "contract");
 const settings = it.config;
-const OURS = "--glob=!{.se,node_modules,.git}/**";
+const PARKED = ["{.se,node_modules,.git,.claude/types}/**", "**/_*"];
+const OURS = `--glob=!{${PARKED.join(",")}}`;
 const TESTS = "test/level0/*.test.js";
 const CONTRACT_TESTS = "test/contract/*.test.js";
 const ROUNDS = 5;
@@ -110,6 +142,7 @@ const verbs = {
     run: async (w) =>
       stamped(
         test() ||
+          viewerHolds() ||
           doorsHold() ||
           projectionsHold() ||
           pluginHolds() ||
@@ -149,17 +182,25 @@ const verbs = {
     says: "work branches: new, take, read, review, list",
     run: async () => work(root, rest, it),
   },
-  log: {
-    says: "what every door says, through lnav where it stands",
-    run: async () => readLog(rest),
+  mint: {
+    says: "write a new note of a kind, in the shape its schema names",
+    run: async () => mint(rest),
   },
-  open: {
-    says: "the tree in the editor, which a bare RUNME does",
-    run: async () => openEditor(),
+  log: {
+    says: "what every door says, in the viewer this tree builds",
+    run: async () => readLog(rest),
   },
   find: {
     says: "every line carrying the words, out of the index",
     run: async () => asksIndex(["find", ...rest]),
+  },
+  vehicle: {
+    says: "this copy, the project it drives, and a copy made elsewhere",
+    run: async () => theVehicle(rest),
+  },
+  notes: {
+    says: "the notes the words belong to, ranked by name and body",
+    run: async () => asksIndex(["notes", ...rest]),
   },
   links: {
     says: "what reaches a note, and what reaches nothing",
@@ -172,7 +213,7 @@ const verbs = {
 };
 
 const argv = process.argv.slice(2);
-const verb = argv.find((a) => !a.startsWith("-")) ?? "open";
+const verb = argv.find((a) => !a.startsWith("-")) ?? "help";
 const where = argv.filter((a) => !a.startsWith("-") && a !== verb);
 const rest = argv.slice(argv.indexOf(verb) + 1);
 
@@ -186,6 +227,61 @@ if (verb === "help" || !verbs[verb]) {
 }
 process.exit((await verbs[verb].run(where.length ? where : ["."])) ?? 0);
 
+// [[spec/design_output/vehicle#three-things-a-copy-needs]]
+function theVehicle(argv) {
+  const env = process.env;
+  const said = argv[0] ?? "here";
+  const pair = rootsHere(files, env, root);
+  const made = entryFor(files, it.clock, env, pair.method, version());
+
+  if (said === "produce" || said === "into") {
+    const dest = argv[1];
+    if (!dest) {
+      console.error("se vehicle produce <folder>: say where the copy lands.");
+      return 2;
+    }
+    const put = produce(files, pair.method, dest, said === "into");
+    if (!put.ok) {
+      console.error(put.why);
+      return 1;
+    }
+    console.log(`${put.count} file(s) copied into ${dest}.`);
+    console.log("It makes its own identity the first time it runs.");
+    return 0;
+  }
+  if (said === "attach") {
+    attach(files, it.clock, pair.work, made.id);
+    console.log(`${pair.work} names ${made.id} as the copy driving it.`);
+    return 0;
+  }
+  if (said === "detach") {
+    detach(files, pair.work);
+    console.log(`${pair.work} names no driver, so the next start asks again.`);
+    return 0;
+  }
+  if (said === "register") {
+    const wrote = registerCopy(files, env, made.entry);
+    console.log(wrote ? `${made.id} stands in the register.` : "no register takes a write here.");
+    return wrote ? 0 : 1;
+  }
+
+  console.log(`method  ${pair.method}`);
+  console.log(`work    ${pair.work}`);
+  console.log(`copy    ${made.id}${pair.itself ? "  (this tree drives itself)" : ""}`);
+  for (const one of readRegister(files, env)) {
+    console.log(`  ${one.id}  ${one.version}  ${one.method_root}`);
+  }
+  return 0;
+}
+
+function version() {
+  try {
+    return JSON.parse(files.read(join(root, "package.json"))).version ?? "0";
+  } catch {
+    return "0";
+  }
+}
+
 // [[spec/design_output/index#the-door-owns-the-database]]
 function asksIndex(argv) {
   const at = join(root, ".se", "bin", `se-index${process.platform === "win32" ? ".exe" : ""}`);
@@ -197,27 +293,6 @@ function asksIndex(argv) {
 
   const said = it.proc.run([at, ...argv], { cwd: root, inherit: true });
   return said.exitCode;
-}
-
-// [[spec/design_output/editor#one-click-opens-the-editor]]
-function openEditor() {
-  for (const call of ["code", "code.cmd"]) {
-    if (editorOpens(call)) {
-      console.log("The editor opens on this tree.");
-      return 0;
-    }
-  }
-
-  console.error("No editor answered here. Install VS Code, or open this folder in one.");
-  return 1;
-}
-
-function editorOpens(call) {
-  try {
-    return it.proc.run([call, "."], { cwd: root }).exitCode === 0;
-  } catch {
-    return false;
-  }
 }
 
 async function lint(where) {
@@ -250,7 +325,11 @@ async function lint(where) {
   }
 
   // [[spec/design_output/tree#when-the-sweep-runs]]
-  if (where.includes(".")) found.push(...treeFaults(treeHere()));
+  if (where.includes(".")) {
+    const tree = treeHere();
+    found.push(...treeFaults(tree));
+    found.push(...schemaFaults(tree));
+  }
 
   found.push(...gridFaults(where));
 
@@ -261,7 +340,7 @@ async function lint(where) {
     );
     for (const row of code.stdout.split("\n")) {
       const hit = /^::(\w+) title=([^,]+),file=([^,]+),line=(\d+).*?::(.*)$/.exec(row);
-      if (!hit) continue;
+      if (!hit || isDraft(hit[3])) continue;
       found.push({
         file: hit[3],
         rule: hit[2].replace(/^lint\//, ""),
@@ -297,7 +376,13 @@ async function lint(where) {
     console.log(`${String(count).padStart(6)}  ${rule}`);
   }
   console.log(`${String(found.length).padStart(6)}  in all`);
-  return 1;
+
+  // [[spec/design_output/schema#warning-now-and-error-later]]
+  const refused = found.filter((one) => one.severity !== "warning").length;
+  if (refused) return 1;
+  console.log("");
+  console.log(`${found.length} stand at warning, which the panel draws and check allows.`);
+  return 0;
 }
 
 // [[spec/design_output/tree#the-tree-handed-in]]
@@ -328,45 +413,59 @@ function gridFaults(where) {
   }));
 }
 
-// [[spec/design_output/log#lnav-and-how-it-installs]]
-function lnavHere() {
-  if (files.exists(lnav)) return lnav;
-  try {
-    return outside.run(["lnav", "-V"]).exitCode === 0 ? "lnav" : "";
-  } catch {
-    return "";
-  }
-}
-
-// [[spec/design_output/log#the-verb]]
+// [[spec/design_output/viewer#the-verb-builds-it]]
 function readLog(argv) {
-  const names = files.exists(LOG) ? namesIn(LOG, ".jsonl").sort() : [];
-  if (!names.length) {
-    console.log("No log stands yet. A door writes one the next time it says a line.");
+  const plain = argv.includes("--plain");
+  const viewer = plain ? { exe: "", why: "" } : viewerHere();
+  if (viewer.why) console.error(viewer.why);
+  const session = join(root, SESSION);
+  if (viewer.exe) {
+    files.makeDir(LOG);
+    return outside.run([viewer.exe, session], { cwd: root, inherit: true }).exitCode;
+  }
+
+  const old = join(root, OLD);
+  const read = [
+    ...(argv.includes("--all") && files.exists(old)
+      ? namesIn(old, ".jsonl").sort().map((name) => join(old, name))
+      : []),
+    ...(files.exists(session) ? [session] : []),
+  ];
+  if (!read.length) {
+    console.log("No log stands yet. A writer starts one the next time it says a line.");
     return 0;
   }
-
-  const all = argv.includes("--all");
-  const newest = names[names.length - 1];
-  // [[spec/design_output/extension#the-button-prints-the-log]]
-  const viewer = argv.includes("--plain") ? "" : lnavHere();
-  if (viewer) {
-    return outside.run([viewer, all ? LOG : join(LOG, newest)], {
-      cwd: root,
-      inherit: true,
-    }).exitCode;
+  for (const path of read) {
+    console.log(show(path));
+    for (const one of rowsOf(files.read(path))) console.log(asRow(one));
   }
-
-  for (const name of all ? names : [newest]) {
-    console.log(name);
-    for (const one of rowsOf(files.read(join(LOG, name)))) console.log(asRow(one));
-  }
-  if (!argv.includes("--plain")) {
+  if (!plain) {
     console.log("");
-    console.log("lnav draws these rows, and opens the rest of a line under it.");
-    console.log("Run ./RUNME.sh once, which installs it into .se/bin.");
+    console.log("Go builds the viewer these rows open in. Install Go, and run this again.");
   }
   return 0;
+}
+
+function viewerHere() {
+  return viewerOf({
+    disk: files,
+    proc: outside,
+    root: root.split(sep).join("/"),
+    go,
+    windows: process.platform === "win32",
+  });
+}
+
+// [[spec/design_output/viewer#the-check-runs-its-tests]]
+function viewerHolds() {
+  let ran;
+  try {
+    ran = outside.run([go, "test", "./..."], { cwd: join(root, VIEWER), inherit: true });
+  } catch {
+    console.log("go stands nowhere, so the viewer's tests go unrun here.");
+    return 0;
+  }
+  return ran.exitCode;
 }
 
 // [[spec/design_output/config#the-verb-names-the-layer]]
@@ -375,6 +474,8 @@ async function readConfig(argv) {
 
   if (key && said.length) {
     const wrote = await settings.write(key, said.join(" "));
+    // [[spec/design_output/log#a-setting-writes-a-line]]
+    await it.log.say("info", "config", `${wrote.key} is ${wrote.value}`, { detail: wrote.layer });
     console.log(`${wrote.key} is ${JSON.stringify(wrote.value)} in ${wrote.layer}.`);
     return 0;
   }
@@ -510,6 +611,37 @@ function project() {
   return 0;
 }
 
+// [[spec/design_output/schema#mint-writes-a-valid-note]]
+function mint(argv) {
+  const [kind, path] = argv.filter((one) => !one.startsWith("-"));
+  const kinds = namesIn(join(root, SCHEMAS), SCHEMA_END)
+    .map((name) => name.slice(0, -SCHEMA_END.length))
+    .sort();
+
+  if (!kind || !path) {
+    console.error("Usage: ./RUNME.sh mint <kind> <path>\n");
+    console.error(`${SCHEMAS} holds ${kinds.join(", ")}.`);
+    return 2;
+  }
+  if (!kinds.includes(kind)) {
+    console.error(`${SCHEMAS} holds no ${kind}. It holds ${kinds.join(", ")}.`);
+    return 2;
+  }
+
+  const at = under(path);
+  if (files.exists(at)) {
+    console.error(`${path} stands already. Name a path nothing holds yet.`);
+    return 2;
+  }
+
+  const schema = readYaml(files.read(join(root, SCHEMAS, `${kind}${SCHEMA_END}`)));
+  files.makeDir(dirname(at));
+  files.write(at, mintNote(schema));
+  console.log(`${path} stands, in the shape ${kind} names.`);
+  console.log("Write it, then run ./RUNME.sh lint to read what is left.");
+  return 0;
+}
+
 // [[spec/design_output/level0#no-computed-engine-access]]
 function pluginHolds() {
   const ran = validatePlugin(outside.run, PLUGIN, root);
@@ -553,7 +685,7 @@ function stamped(code) {
   return code;
 }
 
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 function doorsHold() {
   const named = (at, end) =>
     files
@@ -598,6 +730,7 @@ async function standing() {
     return 2;
   }
   const notes = namesIn(GUIDANCE, ".md")
+    .filter((name) => !isDraft(name))
     .map((n) => ({ name: n, text: files.read(join(GUIDANCE, n)) }))
     .filter(({ text }) => bindsHere(text, process.env));
   const said = standingLayer(notes);
@@ -713,7 +846,7 @@ function walk(where, wanted = /\.(md|markdown|txt)$/i) {
   const SKIP = new Set([".git", "node_modules", ".se", ".claude", ".claude-plugin"]);
   const into = (path) => {
     for (const entry of files.list(path)) {
-      if (SKIP.has(entry.name)) continue;
+      if (SKIP.has(entry.name) || isDraft(entry.name)) continue;
       const under = join(path, entry.name);
       if (entry.kind === "dir") into(under);
       else if (wanted.test(entry.name)) out.push(under);

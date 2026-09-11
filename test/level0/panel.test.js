@@ -1,7 +1,7 @@
 // The renderer, read as the string it answers. Every case asserts one thing
 // the page has to carry, because the editor drawing it is what a person checks
 // once and a string is what a box checks every time.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
@@ -17,8 +17,8 @@ const SCHEMA = {
         open: {
           widget: "action",
           runs: "./RUNME.sh log",
-          help: "Open the log in lnav.",
-          keys: ["q leave", "G jump to the newest line"],
+          help: "Open the log viewer.",
+          keys: ["q leave", "end follow the newest line"],
           at: "U+1F4DC",
           group: "agent control",
           row: 0,
@@ -96,12 +96,36 @@ test("every widget of a group draws, each in the cell the declaration names", ()
 });
 
 // [[spec/design_output/extension#the-log-opens-a-terminal]]
-test("the log button's hover carries the lnav keys the declaration names", () => {
+test("the log button's hover carries the viewer keys the declaration names", () => {
   const said = drawn();
   assert.match(
     said,
-    /title="Open the log in lnav\.\nq leave\nG jump to the newest line/,
+    /title="Open the log viewer\.\nq leave\nend follow the newest line/,
   );
+});
+
+// [[spec/design_output/extension#the-gear-picks-the-sections]]
+test("the gear stands on top, and config stands at the foot of the window", () => {
+  const said = drawn();
+  assert.ok(said.indexOf('class="gear"') < said.indexOf('data-section="agent control"'));
+  assert.ok(said.indexOf('data-section="config"') > said.indexOf('data-section="agent control"'));
+  assert.match(said, /body \{ display: flex; flex-direction: column;/);
+  assert.match(said, /details\.section\[data-section='config'\] \{ margin-top: auto; flex: 0 1 auto;/);
+  assert.match(said, /\.chooser \{[^}]*top: 100%;/);
+});
+
+test("the controls take the scroll bar first, and config keeps its room longest", () => {
+  const said = drawn();
+  assert.ok(said.indexOf('<div class="top">') < said.indexOf('data-section="agent control"'));
+  assert.match(said, /\.top \{ flex: 1 1000 auto; min-height: 0; overflow-y: auto; \}/);
+});
+
+// [[spec/design_output/extension#a-mark-alone-says-it]]
+test("a widget centres its mark across and down, and a wrapped mark too", () => {
+  const widget = /\.widget \{([^}]*)\}/.exec(drawn())?.[1] ?? "";
+  assert.match(widget, /align-items: center;/);
+  assert.match(widget, /justify-content: center;/);
+  assert.match(widget, /text-align: center;/);
 });
 
 test("a widget away from rest wears the mark saying so, and one at rest does not", () => {

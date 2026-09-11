@@ -1,6 +1,6 @@
 // The survey, over a fake box. These cases assert what a caller reads out of
 // .se/tools.json, so a wrong path shows here first.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
@@ -61,12 +61,12 @@ test("a tool this tree asks no version of stands with its path alone", () => {
 });
 
 test("a tool answering nothing about its version keeps its path", () => {
-  const files = boxWith([`${BIN}/lnav`]);
-  const outside = fakeProc({ [`${BIN}/lnav -V`]: { exitCode: 1, stdout: "" } });
+  const files = boxWith([`${BIN}/go`]);
+  const outside = fakeProc({ [`${BIN}/go version`]: { exitCode: 1, stdout: "" } });
 
   const found = survey({ disk: files, proc: outside }, ROOT, UNIX);
 
-  assert.deepEqual(found.lnav, { path: `${BIN}/lnav`, version: "" });
+  assert.deepEqual(found.go, { path: `${BIN}/go`, version: "" });
 });
 
 test("python answers to python3 first, and to python after it", () => {
@@ -116,7 +116,7 @@ test("a box carrying PATHEXT splits on the semicolon and takes each ending", () 
 test("a version reads as the number a tool prints on its first line", () => {
   assert.equal(versionOf("v24.19.0\n"), "24.19.0");
   assert.equal(versionOf("Version: 2.5.12"), "2.5.12");
-  assert.equal(versionOf("lnav 0.14.1\nbuilt somewhere"), "0.14.1");
+  assert.equal(versionOf("go version go1.27.0 windows/amd64\n"), "1.27.0");
   assert.equal(versionOf("it says nothing"), "");
 });
 
@@ -129,11 +129,11 @@ test("a broken survey file reads as an empty box, and refuses nobody", () => {
 
 test("a caller takes the surveyed path, and the guess where none stands", () => {
   const files = boxWith([`${BIN}/vale`, "/opt/biome"]);
-  const known = { biome: { path: "/opt/biome" }, lnav: { path: "/gone/lnav" } };
+  const known = { biome: { path: "/opt/biome" }, go: { path: "/gone/go" } };
 
   assert.equal(whereIs(files, ROOT, "biome", known), "/opt/biome");
   assert.equal(whereIs(files, ROOT, "vale", known), `${BIN}/vale`);
-  assert.equal(whereIs(files, ROOT, "lnav", known), "lnav");
+  assert.equal(whereIs(files, ROOT, "go", known), "go");
 });
 
 test("a guess names the Windows binary and the plain one, and nothing else", () => {
@@ -144,17 +144,17 @@ test("a box with no survey file hands the caller an empty one", () => {
   assert.deepEqual(readTools(boxWith([]), ROOT), {});
 });
 
-test("the rule reads the tools the install script installs, and no format file", () => {
+test("the rule reads the tools the install script installs, and no link", () => {
   const said = [
     "here() {",
     "  case $1 in",
     "    node)    have node ;;",
     `    vale)    [ -x "$bin/vale\${exe}" ] ;;`,
-    `    lnav)    [ -x "$bin/lnav\${exe}" ] || have lnav ;;`,
-    '    lnav-format) [ -f "$bin/.lnav-reads-this-tree" ] ;;',
+    "    go)      have go ;;",
+    "    editor-link) editor_linked ;;",
     "  esac",
     "}",
   ].join("\n");
 
-  assert.deepEqual(installedTools(said), ["node", "vale", "lnav"]);
+  assert.deepEqual(installedTools(said), ["node", "vale", "go"]);
 });

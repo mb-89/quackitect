@@ -20,7 +20,9 @@ function panelHtml(model) {
     "</head>",
     "<body>",
     chooser(groups),
+    '<div class="top">',
     ...groups.map((one) => section(one)),
+    "</div>",
     tree(model),
     `<script type="module" nonce="${nonce}" src="${escaped(model?.script ?? "")}"></script>`,
     "</body>",
@@ -81,10 +83,22 @@ function hover(cell) {
   return [
     cell.help ?? "",
     ...(cell.keys ?? []),
+    ...commandsOf(cell),
     cell.layer ? `${cell.key} answers out of ${cell.layer}` : "",
   ]
     .filter(Boolean)
     .join("\n");
+}
+
+// [[spec/design_output/extension#a-button-names-its-commands]]
+function commandsOf(cell) {
+  if (cell.widget === "action" || !cell.options?.length) return [];
+  const group = String(cell.group ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  const leaf = String(cell.leaf ?? String(cell.key).split(".").pop());
+  return cell.options.map((one) => `/se-${group}-${leaf}-${one}`);
 }
 
 // [[spec/design_output/extension#a-mark-a-person-types]]
@@ -204,18 +218,26 @@ function style(groups) {
     "  color: var(--vscode-sideBarSectionHeader-foreground); padding: 4px 0; }",
     `.grid { display: grid; gap: 4px; padding: 4px 0;`,
     `  grid-template-columns: repeat(${WIDE}, 1fr); }`,
-    ".widget { display: flex; flex-direction: column; align-items: center; gap: 2px;",
+    ".widget { display: flex; flex-direction: column; align-items: center;",
+    "  justify-content: center; text-align: center; gap: 2px;",
     "  border: 1px solid var(--vscode-contrastBorder, transparent); border-radius: 4px;",
     "  padding: 6px 2px; cursor: pointer; color: var(--vscode-button-secondaryForeground);",
     "  background: var(--vscode-button-secondaryBackground); }",
     ".widget:hover { background: var(--vscode-button-secondaryHoverBackground); }",
     ".widget.away { color: var(--vscode-button-foreground);",
     "  background: var(--vscode-button-background); }",
-    ".mark { font-size: 1.2em; }",
+    ".mark { font-size: 1.2em; line-height: 1.2; display: block; }",
     ".widget.held { background: var(--vscode-inputValidation-errorBackground,",
     "  var(--vscode-errorForeground)); color: var(--vscode-errorForeground);",
     "  border-color: var(--vscode-errorForeground); animation: pulse 1.2s infinite; }",
     "@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.45; } 100% { opacity: 1; } }",
+    "html, body { height: 100%; margin: 0; }",
+    "body { display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; }",
+    ".bar { flex: none; }",
+    ".top { flex: 1 1000 auto; min-height: 0; overflow-y: auto; }",
+    "details.section[data-section='config'] { margin-top: auto; flex: 0 1 auto;",
+    "  min-height: 0; overflow-y: auto;",
+    "  border-top: 1px solid var(--vscode-sideBarSectionHeader-border, var(--vscode-panel-border)); }",
     ".bar { display: flex; justify-content: flex-end; position: relative; }",
     ".gear { background: var(--vscode-sideBar-background, transparent);",
     "  border: 1px solid var(--vscode-contrastBorder, transparent); cursor: pointer;",
@@ -256,4 +278,4 @@ function escaped(said) {
     .join("&quot;");
 }
 
-module.exports = { CONFIG, escaped, markOf, panelHtml };
+module.exports = { CONFIG, commandsOf, escaped, markOf, panelHtml };

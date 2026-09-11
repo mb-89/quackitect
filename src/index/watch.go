@@ -1,7 +1,5 @@
-// THE WATCHER. What makes the index warm rather than a file somebody rebuilds.
-// It watches every folder the walk covers, and a write anywhere under the tree
-// marks the index dirty. One sweep answers a burst, so a build touching a
-// thousand files costs one walk and not a thousand.
+// The watch that holds the rows level with the tree. One sweep answers a
+// burst, so a build touching a thousand files costs one walk.
 // [[spec/design_output/index#the-watcher-keeps-it-warm]]
 package main
 
@@ -12,9 +10,6 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
-// watches puts a watch on every folder under the root, and answers the watcher
-// so the door can close it. A folder that arrives later is watched when the
-// sweep that follows walks it.
 func watches(root string, one *door) (*fsnotify.Watcher, error) {
 	eyes, err := fsnotify.NewWatcher()
 	if err != nil {

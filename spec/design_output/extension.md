@@ -1,7 +1,11 @@
 ---
 kind: [[design_output]]
-describes: [[src/extension/extension.js]]
 ---
+
+# Scope
+
+`src/extension` draws one sidebar in the editor. This note covers the
+declaration behind it, the five widgets, and the grid holding them.
 
 # The sidebar draws the tree
 
@@ -9,24 +13,39 @@ describes: [[src/extension/extension.js]]
 says what every value is and where it draws. The extension turns that into a
 page. It carries no dependency, and `./RUNME.sh` links the folder in.
 
-| piece | file |
-|---|---|
-| what the editor loads | `extension.js` |
-| the one module reaching vscode | `editor.js` |
-| the wiring under it | `sidebar.js` |
-| the declaration as widgets | `lib/widgets.js` |
-| the grid check | `lib/grid.js` |
-| declaration to HTML | `lib/panel.js` |
-| a key in the local file | `lib/values.js` |
-| the session boundary | `lib/session.js` |
-| a click to a message | `webview/clicks.js` |
-| a click count to a state | `webview/gesture.js` |
+- `extension.js`: what the editor loads
+- `editor.js`: the one module reaching vscode
+- `sidebar.js`: the wiring under it
+- `lib/widgets.js`: the declaration as widgets
+- `lib/grid.js`: the grid check
+- `lib/panel.js`: declaration to HTML
+- `lib/values.js`: a key in the local file
+- `lib/session.js`: the session boundary
+- `lib/gesture.js`: a press count to a state, held in the host
+- `lib/logbook.js`: the sidebar's lines in the door log
+- `webview/clicks.js`: a click to a message
 
 # It starts silent
 
 The extension registers one view and starts nothing. No engine, no server and
 no process runs until a button says so. `activate` proves it: a test drives it
 with a fake editor, and asserts that the door stays quiet.
+
+The editor starts it only in a folder carrying `spec/config/level0.schema.json`,
+and the view shows only where `activate` sets `quackitect.here`. The view and
+the bar holding it both carry the name `quackitect`, so the header says it once.
+
+## An empty folder stays quiet
+
+A folder carrying no tree gets no view, no mark and no write. The Biome
+extension starts in every folder, and it offers to install itself globally where
+it finds no binary. So `activate` sets two Biome keys in the user settings,
+where a person has set neither:
+
+- `biome.requireConfiguration` to `true`
+- `biome.suggestInstallingGlobally` to `false`
+
+A key a person holds in the user settings stays as they set it.
 
 A person opening the view is what draws the page. The view then reads three
 files, draws once, and asks the editor to watch them.
@@ -177,7 +196,7 @@ The four buttons, and the one file naming them,
 
 | key | `icon` | what it does |
 |---|---|---|
-| `log.open` | 📜 | runs `./RUNME.sh log`, which opens lnav in a terminal |
+| `log.open` | 📜 | runs `./RUNME.sh log`, which opens the log viewer in a terminal |
 | `stop.hold` | ✋🤖 | running, then finishing, and stops at five presses |
 | `ask.wanted` | ❓🤖 | quiet, then short, and the full report at five presses |
 | `engine.binding` | ❌🔗🤖 | the queue, then unbound, and god mode at five presses |
@@ -210,8 +229,8 @@ Naming coordinates costs one check, and `faultsIn` runs it:
 | a widget past the fifth column | `reaches column 6, and the grid is 5 wide` |
 
 `./RUNME.sh lint` runs the check. `lineOf` names the line the entry opens on,
-so the Problems panel takes it through the matcher `.vscode/tasks.json` already
-carries. Two groups each hold their own grid, so one cell in both is no fault.
+so the finding points at the entry. Two groups each hold their own grid, so one
+cell in both is no fault.
 
 # The bottom section
 
@@ -238,8 +257,8 @@ posts a message:
 
 | what a person does | the message |
 |---|---|
-| clicks an action | `{kind: "run", runs}` |
-| clicks a toggle | `{kind: "set", key, value}` |
+| clicks an action | `{kind: "run", key, runs}` |
+| clicks a toggle | `{kind: "press", key}` |
 | changes an editor in the tree | `{kind: "set", key, value}` |
 | types in the filter | none, and the rows hide |
 | opens a section | none, and the page holds it |
@@ -256,22 +275,48 @@ A click count picks which of three a control holds:
 | hold | running | finish this work | stop now |
 | ask | quiet | a short update | a full report |
 
+The host counts the presses, and the page counts none. Every write draws the
+page again, and a new page carries a new script. So a count kept in the page
+starts over at every press, and stands at one.
+
 `pressed` takes the press time as an argument, so a burst replays in a test:
 
-- a burst runs 1000ms from its first press, and a press past that opens a new one
+- a press within 800ms of the last one joins its burst, and a later one opens a new burst
 - the first press of a burst climbs one rung
+- presses two to four stand by
 - a press away from rest falls back to rest, however far it stands
 - the fifth press of a burst sends the far value
-- the button stands dead for 600ms after it fires
-
-The dead window is what a person spends to reach the far value. Five presses
-inside 600ms send the first rung alone. A burst reaching its fifth press after
-that window sends `stopped`.
+- the button stands dead for 600ms after the far value, so a sixth press stands by too
 
 Climbing goes one rung at a time, because handing over a whole ladder in one
 click is a move a person should mean. Releasing goes any distance at once, so a
 stray press always falls DOWN. That asymmetry is the safety, and it stands in
 place of a dialog asking whether a person means it.
+
+## A press writes a line
+
+Every press that writes, every run and every edit in the config tree writes a
+`sidebar` line to the door log. For details, see
+[[spec/design_output/log#which-door-says-what]].
+
+- One press writes `stop.hold is finishing`, with the detail `one press`.
+- Five presses write `stop.hold is stopped`, with the detail `5 presses`.
+- The log button writes `log.open runs ./RUNME.sh log`.
+- An edit in the config tree writes `stop.mostInARow is 5`, with the detail `the config tree`.
+
+A window writes one file, named by its first line, and writes it whole on every
+line. The row shape comes from `lib/log.js`, the module every writer reads. The
+line honours `log.level`, the same as every other door.
+
+## A button names its commands
+
+A slash command and a button set the same key through the same file, so each
+shows what the other sets. The hover of a toggle names a command for each of its
+states down the widget path, as `/se-agent-control-hold-stopped`. The config
+tree answers the same key down the config path. The projection writes both. For
+details, see [[spec/design_output/projection#the-first-target]].
+
+A test holds every command a hover names to a file in `.claude/commands`.
 
 # The editor is a door
 
@@ -300,17 +345,10 @@ widget: the verb writes the local file, and the watcher does the rest.
 
 ## The log opens a terminal
 
-The log action runs `./RUNME.sh log`, which opens lnav in a terminal beside the
-editor. An action opening another program hands a person that program's keys.
-So the declaration carries them and the hover says them:
-
-| key | what it does |
-|---|---|
-| `p` | open this line whole, with every field it hides |
-| `G` | jump to the newest line |
-| `/word` | find, and `n` for the next one |
-| `:filter-in <regex>` | keep the lines matching, and `:filter-out` drops them |
-| `q` | leave |
+The log action runs `./RUNME.sh log`, which opens the log viewer in a terminal
+beside the editor. An action opening another program hands a person that
+program's keys. So the declaration carries them and the hover says them.
+For details, see [[spec/design_output/viewer#the-keys]].
 
 The rule generalises. Where an action starts another program, its hover names
 the keys that program needs, and the declaration carries them beside the
@@ -380,6 +418,19 @@ The link points at the tree, so an edit draws on the next window and no second
 install stands between them. `servers.js` holds the two ids, so the shell names
 none of its own.
 
+## The link stands
+
+`src/scripts/editor.js` makes the link through the disk door, and the shell asks
+it first:
+
+- `linked` answers 0 where the link reaches this tree and the list names the id, and prints nothing.
+- `link` removes a copy or a stale link, links `src/extension`, and writes the entry.
+
+The link is a junction on Windows, which needs no administrator, and a symbolic
+link elsewhere. A standing link answers `linked`, so a run where nothing
+installs prints nothing. `link` refuses a destination outside
+`~/.vscode/extensions`.
+
 ## A file another program owns
 
 A linked folder draws nothing on its own. The editor loads what
@@ -437,6 +488,38 @@ through a redraw.
 Config starts unticked. A person reaching for a key ticks it open, and the
 panel stays four buttons wide for everybody else.
 
+## Config stands at the foot
+
+The config section stands at the foot of the window, the way the outline and
+the timeline stand at the foot of the explorer. The page is a column the height
+of the view, and config takes the room under the controls. Opened, it grows
+upward from the foot.
+
+Where the sections outgrow the window, the controls give room first and take a
+scroll bar. Config gives room once the controls hold none to give, and then
+scrolls too.
+
+## The status bar says it
+
+A state away from rest stands in the status bar at its far left, so a person
+sees it with the panel shut. `lib/states.js` decides what stands:
+
+- `engine.binding` at `god` reads `level zero refuses nothing`, on the error colour.
+- `engine.binding` at `unbound` reads `unbound`, on the warning colour.
+- `stop.hold` at `finishing` reads `finishing`, on the warning colour.
+- `stop.hold` at `stopped` reads `stopped`, on the error colour.
+
+A click on one puts its key back at rest, through the command `quackitect.rest`.
+A state arriving while the window runs raises a warning toast once, and the
+toast offers the same way back. A state standing when the window opens shows in
+the bar and raises no toast.
+
+## RUNME opens the panel
+
+A bare RUNME writes `.se/show-panel` before it opens the editor. `activate`
+reads it, shows the quackitect panel, and empties it. So the panel opens for a
+person who starts from RUNME, and an ordinary start stays silent.
+
 ## The tree holds config alone
 
 The bottom section draws the two config files and leaves `session` out of them.
@@ -445,11 +528,11 @@ nobody who reads it.
 
 ## The button prints the log
 
-The log button runs `./RUNME.sh log --plain`, so the rows land in the terminal
-it opens. The bare verb hands the file to lnav instead, which takes the whole
-terminal for its own screen. A button answers with rows where they stand.
+The log button runs `./RUNME.sh log`, and the viewer takes the terminal it
+opens. `--plain` prints the rows into that terminal instead, and so does a box
+where Go builds no viewer.
 
-Where no log stands yet, the verb says so in one line and answers zero.
+Where no log stands yet, the plain verb says so in one line and answers zero.
 
 ## A terminal opens on Windows
 

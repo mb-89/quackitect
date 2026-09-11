@@ -1,7 +1,11 @@
 ---
 kind: [[design_output]]
-describes: [[src/scripts/review.js]]
 ---
+
+# Scope
+
+`src/scripts/review.js` gathers what a reader wants off a branch. This note
+covers the verb, the worktree it runs in, and the five questions it answers.
 
 # What the reader is
 
@@ -84,7 +88,7 @@ row the test runner writes, and the last lines of the run where it writes none.
 
 # The five questions
 
-They live in `spec/guidance/reviewing.md`, written as actionables the way every
+They live in `spec/guidance/review/reviewing.md`, written as actionables the way every
 other guidance note is. Level zero hands them to every session, so the reader
 gets them inside the standing layer and the prompt names no rule twice.
 

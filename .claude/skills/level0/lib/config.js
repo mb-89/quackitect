@@ -3,6 +3,8 @@
 // file says every type, and a written text lands as its own kind.
 // [[spec/design_output/config#the-three-layers]]
 
+import { deeply } from "./layer.js";
+
 export const TRACKED = "spec/config/level0.json";
 export const SCHEMA = "spec/config/level0.schema.json";
 export const LOCAL = ".se/config.json";
@@ -113,6 +115,8 @@ export function faultsIn(schema, said) {
 // [[spec/design_output/config#the-resolver-holds-the-layers]]
 export function configOf(it) {
   let held = null;
+  const stack = it.tracked?.length ? it.tracked : [TRACKED];
+  const shape = it.schema ?? SCHEMA;
 
   const parsed = async (path) => {
     let text = "";
@@ -130,8 +134,18 @@ export function configOf(it) {
 
   const base = async () => {
     if (held) return held;
-    const schema = await parsed(SCHEMA);
-    const tracked = flatten(await parsed(TRACKED));
+    const schema = await parsed(shape);
+
+    // [[spec/design_output/vehicle#the-work-root-inherits]]
+    const layers = [];
+    let whole = {};
+    for (const at of stack) {
+      const read = await parsed(at);
+      layers.push([at, flatten(read)]);
+      whole = deeply(whole, read);
+    }
+    const tracked = flatten(whole);
+
     const names = new Map();
     for (const key of [...tracked.keys(), ...keysOf(schema).map((one) => one.key)]) {
       names.set(varOf(key), key);
@@ -143,14 +157,16 @@ export function configOf(it) {
       if (value === undefined || value === "") continue;
       env.set(key, coerce(value, typeOf(schema, key)));
     }
-    held = { schema, tracked, env };
+    held = { schema, tracked, whole, layers, env };
     return held;
   };
 
   const seen = async () => {
-    const { tracked, env } = await base();
+    const { layers, env } = await base();
     const said = new Map();
-    for (const [key, value] of tracked) said.set(key, { value, layer: TRACKED });
+    for (const [at, one] of layers) {
+      for (const [key, value] of one) said.set(key, { value, layer: at });
+    }
     for (const [key, value] of env) said.set(key, { value, layer: varOf(key) });
     for (const [key, value] of flatten(await parsed(LOCAL))) {
       said.set(key, { value, layer: LOCAL });
@@ -178,12 +194,17 @@ export function configOf(it) {
       return faultsIn(schema, tracked);
     },
 
+    // [[spec/design_output/vehicle#the-work-root-inherits]]
+    async text() {
+      return `${JSON.stringify((await base()).whole, null, 2)}\n`;
+    },
+
     // [[spec/design_output/config#the-verb-writes-one-layer]]
     async write(key, said) {
       const { schema } = await base();
       const value = coerce(said, typeOf(schema, key));
       const was = await parsed(LOCAL);
-      const now = merged(was, nest(key, value));
+      const now = deeply(was, nest(key, value));
       if (it.makeDir) await it.makeDir(FOLDER);
       await it.write(LOCAL, `${JSON.stringify(now, null, 2)}\n`);
       return { key, value, layer: LOCAL };
@@ -191,12 +212,3 @@ export function configOf(it) {
   };
 }
 
-function merged(was, now) {
-  const out = { ...was };
-  for (const [name, value] of Object.entries(now)) {
-    const under = out[name];
-    const both = value && typeof value === "object" && under && typeof under === "object";
-    out[name] = both ? merged(under, value) : value;
-  }
-  return out;
-}

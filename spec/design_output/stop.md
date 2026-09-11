@@ -1,7 +1,11 @@
 ---
 kind: [[design_output]]
-describes: [[.claude/skills/level0/lib/stop.js]]
 ---
+
+# Scope
+
+`.claude/skills/level0/lib/stop.js` decides whether a turn ends. This note
+covers the tooth, the vote it runs, and the claim the agent makes.
 
 # What the tooth is
 

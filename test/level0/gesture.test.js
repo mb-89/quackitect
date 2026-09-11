@@ -1,10 +1,10 @@
 // The gesture, replayed. Each case hands the press times in, so the burst that
 // a person makes with a mouse runs here with no clock at all.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { BURST, fresh, pressed } from "../../src/extension/webview/gesture.js";
+import { BURST, DEAD, fresh, pressed } from "../../src/extension/lib/gesture.js";
 
 const HOLD = {
   options: ["running", "finishing", "stopped"],
@@ -44,7 +44,19 @@ test("a person clicking fast reaches the far value, at any speed they hold", () 
 });
 
 test("the window runs from the last press, so a slow hand still counts", () => {
-  assert.deepEqual(burst([0, 700, 1400, 2100, 2800 + BURST + 1]), ["finishing", "finishing"]);
+  assert.deepEqual(burst([0, 700, 1400, 2100, 2800 + BURST + 1]), [
+    "finishing",
+    "finishing",
+  ]);
+});
+
+test("a sixth press inside the dead moment undoes nothing, and one after it acts", () => {
+  assert.deepEqual(burst([0, 100, 200, 300, 400, 500]), ["finishing", "stopped"]);
+  assert.deepEqual(burst([0, 100, 200, 300, 400, 400 + DEAD]), [
+    "finishing",
+    "stopped",
+    "finishing",
+  ]);
 });
 
 test("a press away from rest falls back to rest, however far it stands", () => {
@@ -53,10 +65,18 @@ test("a press away from rest falls back to rest, however far it stands", () => {
 });
 
 test("a control holding two options answers one press and never the fifth", () => {
-  const two = { options: ["true", "false"], gesture: 5, value: "true" };
+  const two = { options: ["true", "false"], gesture: 5, value: true };
   assert.deepEqual(burst([0, 200, 400, 600, 800], two), ["false"]);
 });
 
 test("a widget naming no options writes nothing", () => {
   assert.deepEqual(burst([0, 200, 400, 600, 800], { options: [] }), []);
+});
+
+test("each write names how the press reached it", () => {
+  const first = pressed(fresh(), 0, HOLD);
+  assert.equal(first.how, "one press");
+  let state = first.state;
+  for (const at of [100, 200, 300]) state = pressed(state, at, HOLD).state;
+  assert.equal(pressed(state, 400, HOLD).how, "5 presses");
 });

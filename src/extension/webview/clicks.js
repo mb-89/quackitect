@@ -3,27 +3,12 @@
 // page its HTML again.
 // [[spec/design_output/extension#a-click-becomes-a-message]]
 
-import { fresh, pressed } from "./gesture.js";
-
 const GONE = "gone";
 
-export function messageFor(said, at, held) {
-  if (said?.widget === "action") {
-    return { message: { kind: "run", key: said.key, runs: said.runs }, state: held };
-  }
-  const options = String(said?.options ?? "")
-    .split(" ")
-    .filter(Boolean);
-  const ran = pressed(held, at, {
-    options,
-    value: said?.value,
-    gesture: Number(said?.gesture) || undefined,
-  });
-  if (ran.writes === undefined) return { message: undefined, state: ran.state };
-  return {
-    message: { kind: "set", key: said?.key, value: ran.writes },
-    state: ran.state,
-  };
+export function messageFor(said) {
+  if (said?.widget === "action") return { kind: "run", key: said.key, runs: said.runs };
+  if (!said?.key) return undefined;
+  return { kind: "press", key: said.key };
 }
 
 // [[spec/design_output/extension#the-filter-reads-an-expression]]
@@ -64,8 +49,7 @@ export function picked(root, picks) {
 }
 
 // [[spec/design_output/extension#a-click-becomes-a-message]]
-export function wire(root, post, view, now) {
-  const held = new Map();
+export function wire(root, post, view) {
   const said = view.get() ?? {};
 
   root.addEventListener("click", (event) => {
@@ -78,10 +62,8 @@ export function wire(root, post, view, now) {
 
     const at = event.target?.closest?.(".widget");
     if (!at) return;
-    const was = held.get(at.dataset.key) ?? fresh();
-    const one = messageFor(at.dataset, now(), was);
-    held.set(at.dataset.key, one.state);
-    if (one.message) post(one.message);
+    const message = messageFor(at.dataset);
+    if (message) post(message);
   });
 
   root.addEventListener("change", (event) => {
@@ -112,7 +94,6 @@ export function wire(root, post, view, now) {
   });
 
   restore(root, said);
-  return { held };
 }
 
 export function restore(root, said) {
@@ -128,10 +109,8 @@ export function restore(root, said) {
 
 if (typeof document !== "undefined" && typeof acquireVsCodeApi === "function") {
   const said = acquireVsCodeApi();
-  wire(
-    document,
-    (message) => said.postMessage(message),
-    { get: () => said.getState(), set: (one) => said.setState(one) },
-    () => performance.now(),
-  );
+  wire(document, (message) => said.postMessage(message), {
+    get: () => said.getState(),
+    set: (one) => said.setState(one),
+  });
 }

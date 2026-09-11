@@ -87,6 +87,36 @@ export function register(files, folder, mine) {
   return { wrote: true, why: found.replaced ? "the entry stood already, and it stands again" : "the entry went in" };
 }
 
+// [[spec/design_output/extension#the-link-stands]]
+export function linkedAt(files, dest, source) {
+  if (!files.isLink(dest)) return false;
+  return same(files.realOf(dest), files.realOf(source));
+}
+
+export function linkAt(files, dest, source) {
+  if (!shape(dest).includes("/.vscode/extensions/")) {
+    return { linked: false, why: `${dest} stands outside the editor's folder, so nothing goes there` };
+  }
+  if (linkedAt(files, dest, source)) return { linked: true, why: "the link stands already" };
+  if (files.exists(dest)) files.remove(dest);
+  files.link(source, dest);
+  return { linked: true, why: "the link went in" };
+}
+
+export function registered(files, folder, id) {
+  const where = join(folder, LIST);
+  if (!files.exists(where)) return false;
+  return readEntries(files.read(where)).entries.some((one) => one.identifier.id === id);
+}
+
+function shape(path) {
+  return String(path).split("\\").join("/");
+}
+
+function same(one, two) {
+  return shape(one).toLowerCase() === shape(two).toLowerCase();
+}
+
 export function rootHere() {
   return dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 }
@@ -100,7 +130,8 @@ export function homeIn(env) {
   return env.USERPROFILE || env.HOME || "";
 }
 
-function main(env) {
+// [[spec/design_output/extension#the-link-stands]]
+function main(env, verb) {
   const home = homeIn(env);
   if (!home) {
     console.error("This box names no home folder, so the editor's list has none.");
@@ -108,14 +139,23 @@ function main(env) {
   }
 
   const files = disk();
-  const said = JSON.parse(files.read(manifestPath(rootHere())));
+  const root = rootHere();
+  const said = JSON.parse(files.read(manifestPath(root)));
   const id = `${said.publisher}.${said.name}`;
   const folder = join(home, ".vscode", "extensions");
   const dest = join(folder, `${id}-${said.version}`);
+  const source = dirname(manifestPath(root));
 
+  if (verb === "linked") {
+    return linkedAt(files, dest, source) && registered(files, folder, id) ? 0 : 1;
+  }
+
+  const linked = linkAt(files, dest, source);
+  console.log(`${id}: ${linked.why}.`);
+  if (!linked.linked) return 1;
   const found = register(files, folder, entryFor(id, said.version, dest, clock().now().getTime()));
   console.log(`${id}: ${found.why}.`);
   return found.wrote ? 0 : 1;
 }
 
-if (process.argv[1]?.endsWith("editor.js")) process.exit(main(process.env));
+if (process.argv[1]?.endsWith("editor.js")) process.exit(main(process.env, process.argv[2]));

@@ -28,8 +28,6 @@ import {
   editorDrawsWriteRules,
   extensionsOnOffer,
   INSTALL,
-  lnavReadsTheLog,
-  LNAV,
   nameHoldsTheWords,
   noLogDeleted,
   settingsNameBinaries,
@@ -46,6 +44,7 @@ import { fakeGit } from "../../src/doors/fake/git.js";
 import { git } from "../../src/doors/git.js";
 import { proc } from "../../src/doors/proc.js";
 import { faultsIn as gridFaults } from "../../src/extension/lib/grid.js";
+import { commandsOf } from "../../src/extension/lib/panel.js";
 import { drawnIn, entriesIn } from "../../src/extension/lib/widgets.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -212,21 +211,6 @@ test("a clone opening without both extensions is refused", () => {
   assert.deepEqual(extensionsOnOffer(here), []);
 });
 
-test("an lnav format reading another field is refused", () => {
-  const found = lnavReadsTheLog(
-    fakeTree({
-      [LNAV]: edited(LNAV, (said) => {
-        said.quackitect_log["body-field"] = "message";
-      }),
-    }),
-  );
-
-  assert.equal(found.length, 1);
-  assert.equal(found[0].rule, "LnavReadsTheLog");
-  assert.match(found[0].message, /body-field/);
-  assert.deepEqual(lnavReadsTheLog(here), []);
-});
-
 // [[spec/design_output/stop#where-the-rules-live]]
 test("a stop file short of a field is refused", () => {
   const found = stopFolderIsData(
@@ -346,6 +330,17 @@ test("every widget writing a key names one the declaration carries", () => {
     assert.ok(said.has(one.key), `${one.key} stands in ${TRACKED}`);
     assert.ok(one.options.includes(said.get(one.key)), `${one.key} rests on an option`);
   }
+});
+
+// [[spec/design_output/extension#a-button-names-its-commands]]
+test("every slash command a button's hover names stands in .claude/commands", () => {
+  const standing = new Set(files.list(join(root, ".claude", "commands")).map((one) => one.name));
+  const named = drawnIn(read(SCHEMA)).flatMap((one) => commandsOf(one));
+  assert.ok(named.includes("/se-agent-control-hold-stopped"), "the hold button names its far end");
+  for (const one of named) {
+    assert.ok(standing.has(`${one.slice(1)}.md`), `${one} stands as a command`);
+  }
+  assert.equal(commandsOf({ key: "log.open", widget: "action" }).length, 0);
 });
 
 // [[spec/design_output/extension#the-sidebar-draws-the-tree]]

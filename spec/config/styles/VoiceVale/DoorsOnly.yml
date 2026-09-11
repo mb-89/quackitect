@@ -1,6 +1,6 @@
 extends: script
 message: "Only a door reaches outside. Import it from src/doors instead."
-link: spec/guidance/testing.md
+link: spec/guidance/code/testing.md
 level: error
 scope: raw
 script: |

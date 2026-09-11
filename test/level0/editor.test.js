@@ -10,10 +10,55 @@ import {
   homeIn,
   KEPT,
   LIST,
+  linkAt,
+  linkedAt,
   readEntries,
   register,
+  registered,
   upsert,
 } from "../../src/scripts/editor.js";
+
+const SOURCE = "/tree/src/extension";
+const DEST = "/home/user/.vscode/extensions/quackitect.quackitect-0.1.0";
+
+// [[spec/design_output/extension#the-link-stands]]
+test("a copy standing where the link belongs goes, and the link takes its place", () => {
+  const files = fakeDisk({ [`${DEST}/stale.js`]: "old", [`${SOURCE}/package.json`]: "{}" });
+  assert.equal(linkedAt(files, DEST, SOURCE), false);
+
+  assert.deepEqual(linkAt(files, DEST, SOURCE), { linked: true, why: "the link went in" });
+  assert.equal(linkedAt(files, DEST, SOURCE), true);
+  assert.equal(files.exists(`${DEST}/stale.js`), false, "the copy is gone");
+});
+
+test("a link standing already stays, and a second run touches nothing", () => {
+  const files = fakeDisk({ [`${SOURCE}/package.json`]: "{}" });
+  files.link(SOURCE, DEST);
+  assert.deepEqual(linkAt(files, DEST, SOURCE), { linked: true, why: "the link stands already" });
+});
+
+test("a link pointing at another tree goes, and this tree's link goes in", () => {
+  const files = fakeDisk();
+  files.link("/other/tree/src/extension", DEST);
+  assert.equal(linkedAt(files, DEST, SOURCE), false);
+  linkAt(files, DEST, SOURCE);
+  assert.equal(linkedAt(files, DEST, SOURCE), true);
+});
+
+test("a destination outside the editor's folder is refused, and nothing is removed", () => {
+  const files = fakeDisk({ "/home/user/notes/keep.md": "mine" });
+  const said = linkAt(files, "/home/user/notes", SOURCE);
+  assert.equal(said.linked, false);
+  assert.equal(files.read("/home/user/notes/keep.md"), "mine");
+});
+
+test("the list names the id, or the extension stands unregistered", () => {
+  const folder = "/home/user/.vscode/extensions";
+  const files = fakeDisk({ [`${folder}/${LIST}`]: JSON.stringify([other("a.b")]) });
+  assert.equal(registered(files, folder, ID), false);
+  register(files, folder, mine());
+  assert.equal(registered(files, folder, ID), true);
+});
 
 const ID = "quackitect.quackitect";
 const FOLDER = "/home/user/.vscode/extensions";

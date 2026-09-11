@@ -1,7 +1,11 @@
 ---
 kind: [[design_output]]
-describes: [[.claude/skills/level0/lib/bash.js]]
 ---
+
+# Scope
+
+`.claude/skills/level0/lib/bash.js` reads every command the agent runs. This
+note covers the parse it makes and the four rules standing on that parse.
 
 # What the door reads
 

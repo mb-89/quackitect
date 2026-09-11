@@ -1,7 +1,11 @@
 ---
 kind: [[design_output]]
-describes: [[.claude/skills/level0/lib/tree.js]]
 ---
+
+# Scope
+
+`.claude/skills/level0/lib/tree.js` holds the rules weighing two files at once.
+This note covers those rules, what each one answers, and the sweep running them.
 
 # The rules over two files
 
@@ -9,7 +13,7 @@ Vale hands a rule one buffer. Its script sandbox offers `text` and `fmt` alone,
 so a rule weighing a config against the code reading it finds no second file
 there.
 
-Ten such rules live in `.claude/skills/level0/lib/tree.js`. `./RUNME.sh lint`
+These rules live in `.claude/skills/level0/lib/tree.js`. `./RUNME.sh lint`
 runs each one over the whole tree, beside the rules Vale holds and the rules
 Biome holds.
 
@@ -19,23 +23,21 @@ Biome holds.
 | `EditorDrawsWriteRules` | `.vscode/settings.json`, `.vale.ini` |
 | `BiomeOnWindows` | `.vscode/settings.json`, the platform map inside it |
 | `ExtensionsOnOffer` | `.vscode/extensions.json`, `.vscode/settings.json` |
-| `LnavReadsTheLog` | `spec/config/lnav/quackitect.json`, `lib/log.js` |
 | `StopFolderIsData` | `spec/config/stop`, `lib/stop.js` |
 | `NoLogDeleted` | every source file git holds |
 | `NameHoldsTheWords` | every path git holds |
 | `SurveyNamesInstalls` | `src/scripts/install.sh`, `lib/tools.js` |
 | `SurveyFindsNode` | `.se/tools.json`, the node running the sweep |
 
-# Why the panel reads them
+# Why lint prints them
 
-`.vscode/tasks.json` runs `./RUNME.sh lint` when the folder opens and matches
-every line of this shape:
+`./RUNME.sh lint` prints every finding in one shape, whoever holds the rule:
 
     spec/guidance/voice.md:5:1: ShortHeading: A heading holds five words.
 
-A finding that reaches `lint` therefore reaches the problems panel, whoever
-holds the rule. A test draws nowhere, so a rule living as a test alone meets a
-person as a stack trace.
+The editor starts nothing when the folder opens, so a person runs `lint`, or
+`check`, to read them. A test draws nowhere, so a rule living as a test alone
+meets a person as a stack trace.
 
 # What a rule answers
 

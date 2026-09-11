@@ -1,44 +1,86 @@
 ---
 kind: [[design_output]]
-describes: [[src/doors/log.js]]
 ---
+
+# Scope
+
+`src/doors/log.js` writes one line for each thing a door does. This note covers
+the shape of a line, who says what, and who reads it back.
 
 # What one line looks like
 
-One JSON object per line, and one file per session. lnav reads a folder of them
-and merges by time.
+One JSON object per line, in one file per session: `.se/log/session.jsonl`.
+The viewer reads it. For details, see [[spec/design_output/viewer]].
 
 | field | holds | on the row |
 |---|---|---|
 | `at` | ISO 8601 UTC with milliseconds | yes |
 | `level` | `info`, `warn` or `error` | yes |
-| `door` | who says it | yes |
+| `kind` | what the line is | yes |
 | `said` | one sentence, 80 characters at most | yes |
+| `text` | the whole text, where `said` clips it | no |
 | the rest | `file`, `rule`, `branch`, `tool`, `ms`, `detail` | no |
 
-lnav drops every field the row leaves out onto a detail line beneath it. So a
-field earns the row only where a person scans for it.
+The viewer shows every field the row leaves out in the details. So a field earns
+the row only where a person scans for it.
 
 `rowOf` clips `said` to 80 characters and folds its whitespace, and a level
-outside the three reads as `info`.
+outside the three reads as `info`. A line written before the rename carries
+`door` in place of `kind`, and the viewer reads either.
 
-# Which door says what
+# A reply beside its prompt
 
-| door | says | where it stands |
+The `prompt` kind carries what the owner submits, and the `reply` kind carries
+the answer that ends the turn. Both carry the whole of it in `text`. The details
+of a prompt show its reply, and the details of a reply show its prompt.
+
+A reply stands at the turn's end, and the answer stands right under its prompt.
+
+# The answer under its prompt
+
+The hook writes an `answer` line at `info` the moment it finds the session's
+answer to a demand. A demand is a prompt, an update a person asks for, or a
+hold. The line carries the whole answer in `text` and the demand in `detail`.
+The session writes nothing for it, because the cage writes it.
+
+Two more kinds come out of the gate:
+
+- `gate` carries a call the gate warns or refuses, at `warn`.
+- `god` carries a refusal god mode passes, at `warn`.
+
+For details, see [[spec/design_output/level0#a-step-carries-the-answer]].
+
+# Which kind says what
+
+| kind | says | where it stands |
 |---|---|---|
 | `level0` | the session starts, and the canary comes back | `session.start`, `turn.complete` |
 | `tool` | every call a tool takes | `tool.call` |
 | `prompt` | every prompt, as submitted | `prompt.submit` |
 | `stop` | a turn ends, or goes on | `turn.complete` |
+| `reply` | every answer ending a turn | `turn.complete` |
+| `answer` | the session's answer to a demand | `turn.step`, `tool.call` |
 | `write` | the code door refuses a write | `tool.call` |
 | `vale` | the rules refuse prose, and how long a lint takes | the hook, and `lint` |
 | `judge` | a model refuses prose | `tool.call` |
 | `bash` | a commit or a push aims at trunk | `tool.call` |
 | `work` | a branch verb answers, and the branch it stands on | `work.js` |
 
+A line the `log` tool writes carries the kind the agent names.
+
+# A setting writes a line
+
+A key moves in two ways, and each writes a line naming the key and its value:
+
+- The `sidebar` kind carries a press, a run or an edit in the sidebar.
+- The `config` kind carries `./RUNME.sh config <key> <value>`, which every slash command runs.
+
+So a hold a button sets and a slash command lifts stands in the log twice, once
+per writer. For details, see [[spec/design_output/extension#a-press-writes-a-line]].
+
 # What a tool line names
 
-The `tool` door writes one line per call, and the line names the tool and one
+The `tool` kind writes one line per call, and the line names the tool and one
 field. That field says what the call aims at:
 
 | tool | field |
@@ -74,85 +116,61 @@ down first, and the door adds what it refuses beneath it.
 | `error` | a fault |
 
 A level the reader does not know reads as `info`, and a missing object reads as
-`info`. So a box configuring nothing writes everything. `writes` decides, the
-door asks it before the line lands, and the hook asks it too.
+`info`. So a box configuring nothing writes everything. `writes` decides, and
+every writer asks it before the line lands.
 
 # Where the writer stands
 
-`src/level0/lib/log.js` shapes a line and reaches nothing. Two writers read it,
-because two runtimes write:
+`.claude/skills/level0/lib/log.js` shapes a line and reaches nothing. Three
+writers read it, because three runtimes write:
 
-| writer | reaches disk through | why |
-|---|---|---|
-| `src/doors/log.js` | the disk door | the command line builds every door |
-| `logHere` in `hooks/level0.js` | `$.fs.writeFile` | the plugin folder carries `src/level0` alone |
+- `logHere` in `hooks/level0.js`, through `$.fs`
+- `src/doors/log.js`, through the disk door, for the command line
+- `src/extension/lib/logbook.js`, through the editor door, for the sidebar
 
 The door takes the disk and the clock as arguments, the way the git door takes
 the process door. `src/doors/fake/log.js` pairs it with the fake disk, so a test
 reads back what a door says and touches nothing.
 
-`$.fs` offers `readFile`, `writeFile`, `listDir` and `exists`. It offers no
-append, so each line rewrites the whole file. One file per session bounds that
-rewrite to one session, and the name carries the time, so a listing sorts by it:
+# Every writer appends
 
-    .se/log/2026-09-08T14-22-51-a6f8c43b.jsonl
+Every writer adds its line to the end of `session.jsonl`, and keeps every line
+the others hold there. So the hook, the command line and the sidebar land in
+one file, in the order they happen.
 
-The file appears with the first line a door says. A session saying nothing
-leaves nothing behind.
+- The command line appends through the disk door's `append`.
+- `$.fs` offers `read`, `write`, `list`, `exists` and `stat`, and no append. So
+  the hook reads the file and writes it back one line longer.
+- The editor's file system offers no append either, so the sidebar does the same.
+
+The hook and the sidebar each queue their lines, so one of them writes one line
+at a time. `$.fs` refuses a read or a write over 4 MiB, and one session stays
+under that.
+
+# A session rotates its file
+
+At session start, the hook moves the last session's file into `.se/log/old`,
+named by the time of its first line, and starts `session.jsonl` empty:
+
+    .se/log/old/2026-09-08T14-22-51-a6f8c43b.jsonl
+
+`$.fs` offers no move, so the hook writes the old text to its new name and then
+empties the session file. The log keeps every session, and the viewer shows the
+current one alone.
+
+# The log tool
+
+Level zero registers `mcp__level0__log`. The agent calls it with a kind and one
+sentence, and `text` where one sentence runs short. The hook stamps the time and
+appends the line the way it appends its own. So a status or a note the agent
+means for the owner lands where the owner reads.
 
 # Nothing here deletes a log
 
-A session file closes when its session ends, so nothing rotates it, and the
-folder grows. A retro owns deletion, this tree carries no retro, and a person
-removes what a retro reaches.
+Rotation moves a session aside, so the folder grows. A retro owns deletion,
+this tree carries no retro, and a person removes what a retro reaches.
 
 A growing folder costs less than a folder swept empty under a person
 mid-diagnosis. So no code path in this tree deletes a log file, and
 `NoLogDeleted` reads every source file git holds to say so.
 For details, see [[spec/design_output/tree#the-rules-over-two-files]].
-
-# The verb
-
-`./RUNME.sh log` opens the log.
-
-| what stands | what the verb does |
-|---|---|
-| lnav in `.se/bin`, or on the path | runs it over the newest file, and inherits the terminal |
-| `--all` beside it | hands lnav the whole folder, which it merges by time |
-| no lnav | prints the newest file as plain rows, and names the install |
-
-A TUI wants a real terminal, so the runner hands it the terminal it stands in.
-
-# lnav, and how it installs
-
-Release 0.14.1 ships one zip per platform, and the installer takes it the way it
-takes Vale, at a fixed version into `.se/bin`.
-
-| platform | asset | lands as |
-|---|---|---|
-| Linux | `lnav-0.14.1-linux-musl-<cpu>.zip` | `.se/bin/lnav` |
-| Windows | `lnav-0.14.1-windows-<cpu>.zip` | `.se/bin/lnav.exe`, beside `msys-2.0.dll` |
-| macOS | brew | wherever brew puts it |
-
-That release carries no macOS zip, so brew answers there, and the command line
-reads `lnav` off the path where `.se/bin` holds none.
-
-lnav is a want. `install.sh` sorts a want from a need in `wanted()`, and
-`install.sh` marks one in `wanted`. A box without lnav keeps every
-other rule. Winget carries an older candidate build, so the
-Windows installer leaves winget alone.
-
-lnav loads a format from the reader's own folder, and from no project directory.
-So the installer runs `lnav -i spec/config/lnav/quackitect.json` once the binary
-lands. `LnavReadsTheLog` holds that file to what the door writes, and
-`./RUNME.sh lint` draws a drift into the problems panel.
-For details, see [[spec/design_output/tree#the-rules-over-two-files]].
-
-# The viewer learns this tree
-
-`src/scripts/lnav-reads.js` hands lnav the format, the theme, and the choice of
-theme. Node runs it, because the Windows build fails under a shell parent and
-answers 0 anyway. So the script reads the theme back, and trusts no exit code.
-
-The installer calls it once and stamps `.se/bin/.lnav-reads-this-tree`. Deleting
-that stamp asks for the three again.

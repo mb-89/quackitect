@@ -115,7 +115,7 @@
           "help": "The level this box writes at. info writes every line a door says."
         },
         "open": {
-          "help": "Open the log in lnav, in a terminal beside the editor.",
+          "help": "Open the log viewer, in a terminal beside the editor.",
           "widget": "action",
           "icon": "📜",
           "group": "agent control",
@@ -124,10 +124,11 @@
           "rowSpan": 1,
           "colSpan": 1,
           "keys": [
-            "p open this line whole, with every field it hides",
-            "G jump to the newest line",
-            "/word find, and n for the next one",
-            ":filter-in <regex> keep the lines matching, and :filter-out drops them",
+            "w s move up and down the log",
+            "enter open the details, and enter again closes them",
+            "up down scroll the details",
+            "pgup pgdown step a whole window",
+            "home the first line, end the newest, and it follows",
             "q leave"
           ],
           "runs": "./RUNME.sh log"

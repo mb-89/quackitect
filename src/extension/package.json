@@ -1,7 +1,7 @@
 {
   "name": "quackitect",
   "displayName": "quackitect",
-  "description": "The tree, drawn as a sidebar. One declaration says what every value is and where it draws.",
+  "description": "quackitect, drawn as a sidebar. One declaration says what every value is and where it draws.",
   "version": "0.1.0",
   "private": true,
   "publisher": "quackitect",
@@ -13,6 +13,9 @@
     "Other"
   ],
   "main": "./extension.js",
+  "activationEvents": [
+    "workspaceContains:spec/config/level0.schema.json"
+  ],
   "scripts": {
     "package": "npx --yes @vscode/vsce package --allow-missing-repository"
   },
@@ -31,7 +34,8 @@
         {
           "type": "webview",
           "id": "quackitect.sidebar",
-          "name": "the tree"
+          "name": "quackitect",
+          "when": "quackitect.here"
         }
       ]
     }

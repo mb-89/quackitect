@@ -3,6 +3,8 @@
 
 import { spawnSync } from "node:child_process";
 
+const BUFFER = 64 * 1024 * 1024;
+
 export function proc() {
   return {
     run(argv, init = {}) {
@@ -12,6 +14,7 @@ export function proc() {
         encoding: "utf8",
         shell: false,
         timeout: init.timeoutMs,
+        maxBuffer: BUFFER,
         stdio: init.inherit ? "inherit" : undefined,
       });
       if (ran.error) throw ran.error;

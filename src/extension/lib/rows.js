@@ -2,7 +2,7 @@
 // the plugin's lib is a module and the editor loads a script here.
 // [[spec/design_output/extension#the-button-prints-the-log]]
 
-const OWN = ["at", "level", "door", "said"];
+const OWN = ["at", "level", "kind", "said"];
 
 function newestIn(names) {
   return [...(names ?? [])].filter((one) => one.endsWith(".jsonl")).sort().pop() ?? "";
@@ -28,7 +28,7 @@ function rowOf(line) {
   const head = [
     String(said.at ?? "").slice(11, 23),
     String(said.level ?? "").padEnd(5),
-    String(said.door ?? "").padEnd(6),
+    String(said.kind ?? "").padEnd(6),
     said.said ?? "",
   ].join(" ");
 
