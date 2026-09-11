@@ -38,7 +38,7 @@ test("the verbs the command line runs reach git inside node, so they pass here",
   for (const said of [
     "./RUNME.sh work take",
     "./RUNME.sh work done",
-    "RUNME.ps1 work new x",
+    "RUNME.cmd work new x",
   ]) {
     assert.equal(landsOnTrunk(said, "main"), "", said);
   }

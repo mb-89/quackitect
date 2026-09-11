@@ -7,15 +7,16 @@ holding before anything else does.
 
     ./RUNME.sh
 
-That installs what is missing and prints what the tree can do. On Windows,
-`.\RUNME.ps1` takes the same words.
+That installs what is missing, links the sidebar, and opens this folder in the
+editor. On Windows a person clicks `RUNME.cmd`, which hands the same words to
+the shell Git ships. `./RUNME.sh help` names every verb.
 
 ## The sidebar
 
-`src/extension` draws this tree as a VS Code sidebar. It carries no dependency,
-so a person runs it from the folder:
+`src/extension` draws this tree as a VS Code sidebar. `./RUNME.sh` links it in
+and names it to the editor, so a person runs one command:
 
-1. Open this folder in VS Code and press F5, which opens a second window.
-2. Click the duck in the activity bar of that window.
+1. Run `./RUNME.sh`, or click `RUNME.cmd` on Windows.
+2. Click the duck in the activity bar.
 
 [[spec/design_output/extension]] says what draws, and what waits for an engine.

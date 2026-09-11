@@ -927,17 +927,7 @@ async function codeDoor($, e, next, writing, formatter, logbook, root) {
 }
 
 async function install($) {
-  const ways = [
-    ["sh", "src/scripts/install.sh"],
-    [
-      "powershell",
-      "-NoProfile",
-      "-ExecutionPolicy",
-      "Bypass",
-      "-File",
-      "src\\scripts\\install.ps1",
-    ],
-  ];
+  const ways = [["sh", "src/scripts/install.sh"]];
   for (const argv of ways) {
     try {
       const ran = await $.process.run(argv, { timeoutMs: 300000 });

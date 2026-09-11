@@ -138,7 +138,7 @@ That release carries no macOS zip, so brew answers there, and the command line
 reads `lnav` off the path where `.se/bin` holds none.
 
 lnav is a want. `install.sh` sorts a want from a need in `wanted()`, and
-`install.ps1` marks one with `wanted = $true`. A box without lnav keeps every
+`install.sh` marks one in `wanted`. A box without lnav keeps every
 other rule. Winget carries an older candidate build, so the
 Windows installer leaves winget alone.
 

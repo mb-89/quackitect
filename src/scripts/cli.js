@@ -153,10 +153,14 @@ const verbs = {
     says: "what every door says, through lnav where it stands",
     run: async () => readLog(rest),
   },
+  open: {
+    says: "the tree in the editor, which a bare RUNME does",
+    run: async () => openEditor(),
+  },
 };
 
 const argv = process.argv.slice(2);
-const verb = argv.find((a) => !a.startsWith("-")) ?? "help";
+const verb = argv.find((a) => !a.startsWith("-")) ?? "open";
 const where = argv.filter((a) => !a.startsWith("-") && a !== verb);
 const rest = argv.slice(argv.indexOf(verb) + 1);
 
@@ -169,6 +173,27 @@ if (verb === "help" || !verbs[verb]) {
   process.exit(verb === "help" ? 0 : 2);
 }
 process.exit((await verbs[verb].run(where.length ? where : ["."])) ?? 0);
+
+// [[spec/design_output/editor#one-click-opens-the-editor]]
+function openEditor() {
+  for (const call of ["code", "code.cmd"]) {
+    if (editorOpens(call)) {
+      console.log("The editor opens on this tree.");
+      return 0;
+    }
+  }
+
+  console.error("No editor answered here. Install VS Code, or open this folder in one.");
+  return 1;
+}
+
+function editorOpens(call) {
+  try {
+    return it.proc.run([call, "."], { cwd: root }).exitCode === 0;
+  } catch {
+    return false;
+  }
+}
 
 async function lint(where) {
   if (!files.exists(bin)) {

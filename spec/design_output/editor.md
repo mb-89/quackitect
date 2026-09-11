@@ -81,3 +81,19 @@ a server binary by path. A download that fails costs one warning line, and
 Level zero reads every Write and Edit at `tool.call` and runs Vale, Biome and
 the judge there. That door sits inside the harness process and speaks no
 language server protocol, so `.claude` takes no editor entry at all.
+
+# One click opens the editor
+
+`./RUNME.sh` carrying no verb opens the tree in the editor. The install runs
+first, as it does for every verb, so one command installs what the tree needs,
+links the sidebar, and draws it.
+
+| what a person types | what happens |
+|---|---|
+| `./RUNME.sh` | the install, then the editor opens here |
+| `./RUNME.sh open` | the same, named out loud |
+| `./RUNME.sh help` | the verbs, as the usage line |
+
+The call goes to `code` and then `code.cmd`, because the shell Git ships on
+Windows finds the second one. It runs from the root and names `.`, so no
+absolute path crosses into a program that would read it another way.

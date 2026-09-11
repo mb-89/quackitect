@@ -7,7 +7,7 @@ describes: [[src/extension/extension.js]]
 
 `src/extension` is a VS Code extension drawing one sidebar. The declaration
 says what every value is and where it draws. The extension turns that into a
-page. It carries no dependency, and the folder is what a person installs.
+page. It carries no dependency, and `./RUNME.sh` links the folder in.
 
 | piece | file |
 |---|---|
@@ -353,6 +353,53 @@ Every layer but the drawing runs with no editor:
 | a click to a message | the webview script over a fake page |
 | the watcher to a redraw | a fake door, then the renderer again |
 | the local file dying | two ids, and what the second one clears |
+
+# The editor finds it
+
+`./RUNME.sh` links the folder and names it in the editor's own list, so a clone
+draws the sidebar with nothing typed. Two steps in the install loop, and both
+are wants: a box carrying no editor answers them and prints nothing.
+
+| step | what it does | where it stops |
+|---|---|---|
+| `editor-link` | links `src/extension` and writes the entry | no `~/.vscode/extensions` folder |
+| `editor-extensions` | installs the two ids the settings point at | no `code` on the PATH |
+
+The link points at the tree, so an edit draws on the next window and no second
+install stands between them. `servers.js` holds the two ids, so the shell names
+none of its own.
+
+## A file another program owns
+
+A linked folder draws nothing on its own. The editor loads what
+`~/.vscode/extensions/extensions.json` names, and that file holds every
+extension a person has. So `src/scripts/editor.js` writes it, and v3 and v4
+both paid for the rules it holds:
+
+| what the writer meets | what it does |
+|---|---|
+| an element with no id | drops it, and carries it nowhere |
+| entries under a `value` wrapper | reads them out of it |
+| a key the editor owns | carries it verbatim |
+| one entry in the list | writes an array holding it |
+| a file that reads as no JSON | leaves it as it stands |
+
+Carrying an element nothing identifies makes the damage permanent, because
+every later run writes it back. Writing an object where the list holds one
+entry breaks a box owning no other extension.
+
+## A box names its home
+
+Windows leaves `HOME` unset and names the folder `USERPROFILE`, and the same
+script runs there under the shell Git ships. So the writer reads either name
+and answers the empty string where a box carries none.
+
+## A lost id stands refused
+
+The entry going in is not the proof. A writer checking its own id alone passes
+while every other extension goes, which is a person watching the lot uninstall
+itself at once. So the writer counts the ids it read, refuses a write that
+drops one, and leaves `extensions.json.before-quackitect` beside the file.
 
 # What stands open
 
