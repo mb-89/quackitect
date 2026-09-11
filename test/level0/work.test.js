@@ -18,7 +18,9 @@ import {
   dependsOn,
   freeNow,
   HELD,
+  MERGED,
   MINE,
+  standingOf,
   setStatus,
   statusOf,
   TODO,
@@ -95,14 +97,30 @@ test("a dependency reads as a list or on one line, with the prefix dropped", () 
   assert.deepEqual(dependsOn("---\nstatus: todo\n---\n"), []);
 });
 
-test("a branch waits only for one still standing at todo or held", () => {
-  const brief = "---\ndepends_on:\n  - open\n  - busy\n  - ready\n  - gone\n---\n";
+// [[spec/design_output/work#a-dependency-waits-for-trunk]]
+test("a branch waits for a dependency until trunk holds it", () => {
+  const brief = "---\ndepends_on:\n  - open\n  - busy\n  - ready\n  - merged\n  - gone\n---\n";
   const standing = new Map([
     ["work/open", TODO],
     ["work/busy", HELD],
     ["work/ready", DONE],
+    ["work/merged", MERGED],
   ]);
-  assert.deepEqual(waitingOn(brief, standing), ["open", "busy"]);
+  assert.deepEqual(waitingOn(brief, standing), ["open", "busy", "ready"]);
+});
+
+test("a dependency done and unmerged holds its dependent, and merged frees it", () => {
+  const said = (status, waits) =>
+    `---\nstatus: ${status}\n${waits ? `depends_on: ${waits}\n` : ""}---\n\n# A brief\n`;
+  const briefs = new Map([
+    ["work/the-schema-reads", said(DONE)],
+    ["work/the-schema-refuses", said(TODO, "the-schema-reads")],
+  ]);
+  assert.deepEqual(freeNow(briefs), [], "done waits on a person's merge");
+  assert.deepEqual(freeNow(briefs, new Set(["work/the-schema-reads"])), [
+    "work/the-schema-refuses",
+  ]);
+  assert.equal(standingOf(briefs, new Set(["work/the-schema-reads"])).get("work/the-schema-reads"), MERGED);
 });
 
 test("urgency orders now before soon before whenever", () => {

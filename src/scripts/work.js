@@ -19,6 +19,7 @@ export const HELD = "held";
 // [[spec/design_output/work#the-routine-a-verb-names]]
 export const ROUTINE = { name: "do_work", id: "trig_01KCYQ2oxi7rnCuBZYJsnLnQ" };
 export const DONE = "done";
+export const MERGED = "merged";
 
 export function work(root, argv, doors) {
   const it = { root, ...doors };
@@ -119,11 +120,28 @@ function frontField(text, key) {
   return said ? said[1] : "";
 }
 
+// [[spec/design_output/work#a-dependency-waits-for-trunk]]
 export function waitingOn(text, standing) {
   return dependsOn(text).filter((name) => {
     const status = standing.get(`work/${name}`);
-    return status === TODO || status === HELD;
+    return status === TODO || status === HELD || status === DONE;
   });
+}
+
+export function standingOf(briefs, merged = new Set()) {
+  return new Map(
+    [...briefs].map(([branch, text]) => [branch, merged.has(branch) ? MERGED : statusOf(text)]),
+  );
+}
+
+function mergedHere(it) {
+  return new Set(
+    it.git
+      .run(["branch", "-r", "--merged", `origin/${TRUNK}`], true)
+      .out.split("\n")
+      .map((row) => row.trim().replace("origin/", ""))
+      .filter((row) => MINE.test(row)),
+  );
 }
 
 export function setStatus(text, to) {
@@ -271,7 +289,7 @@ function take(it) {
   if (dirty(it)) return 2;
 
   const briefs = new Map(branches(it).map((b) => [b, briefOf(it, b)]));
-  const standing = new Map([...briefs].map(([b, text]) => [b, statusOf(text)]));
+  const standing = standingOf(briefs, mergedHere(it));
   const open = [...briefs].filter(([, text]) => statusOf(text) === TODO);
 
   if (!open.length) {
@@ -318,8 +336,8 @@ function take(it) {
 }
 
 // [[spec/design_output/work#the-routine-a-verb-names]]
-export function freeNow(briefs) {
-  const standing = new Map([...briefs].map(([b, text]) => [b, statusOf(text)]));
+export function freeNow(briefs, merged = new Set()) {
+  const standing = standingOf(briefs, merged);
   return [...briefs]
     .filter(([, text]) => statusOf(text) === TODO)
     .filter(([, text]) => !waitingOn(text, standing).length)
@@ -327,7 +345,7 @@ export function freeNow(briefs) {
 }
 
 function trigger(it) {
-  const free = freeNow(new Map(branches(it).map((b) => [b, briefOf(it, b)])));
+  const free = freeNow(new Map(branches(it).map((b) => [b, briefOf(it, b)])), mergedHere(it));
 
   console.log(`${ROUTINE.name} runs ./RUNME.sh work take on a cloud box.`);
   console.log("Fire it with the RemoteTrigger tool, once for every box you want:\n");
@@ -425,7 +443,7 @@ function list(it) {
     return 0;
   }
   const briefs = new Map(all.map((b) => [b, briefOf(it, b)]));
-  const standing = new Map([...briefs].map(([b, text]) => [b, statusOf(text)]));
+  const standing = standingOf(briefs, mergedHere(it));
   for (const branch of all) {
     const text = briefs.get(branch);
     const status = statusOf(text) || "no status";
@@ -493,13 +511,7 @@ function close(it, name, argv) {
     return 1;
   }
 
-  const inTrunk = new Set(
-    it.git
-      .run(["branch", "-r", "--merged", `origin/${TRUNK}`], true)
-      .out.split("\n")
-      .map((row) => row.trim().replace("origin/", ""))
-      .filter((row) => MINE.test(row)),
-  );
+  const inTrunk = mergedHere(it);
 
   const wanted = name ? [MINE.test(name) ? name : `work/${name}`] : [...inTrunk];
   if (!wanted.length) {

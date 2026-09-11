@@ -107,13 +107,19 @@ The frontmatter carries two more fields, and `work take` reads both:
     depends_on:
       - doors-and-fakes
 
-`take` drops every branch waiting on one still at `todo` or `held`, then sorts
-the rest by urgency: `now`, `soon`, `whenever`. A branch naming no urgency reads
-as `soon`.
+`take` drops every branch waiting on one still at `todo`, `held` or `done`,
+then sorts the rest by urgency: `now`, `soon`, `whenever`. A branch naming no
+urgency reads as `soon`.
 
-A branch meets its dependency once the branch it names reaches `done`, or goes
-because somebody merges and closes it. So a chain of work runs itself in order,
-with nobody holding the order in their head.
+## A dependency waits for trunk
+
+A branch meets its dependency once trunk holds the branch it names, or once that
+branch goes because somebody merges and closes it. `done` alone holds the
+dependent, because `done` waits on a person's merge. So a chain of work runs
+itself in order, and each link starts from the one before it.
+
+`take` merges trunk in. A dependent taken before its dependency lands starts
+from a trunk carrying none of that work. It then builds that work a second time.
 
 `work list` shows what each branch waits for, in place of its urgency.
 
