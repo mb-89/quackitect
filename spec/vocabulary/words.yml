@@ -1,0 +1,1655 @@
+# The words a paragraph may use, one entry a line, and the retro grows it.
+# from says where an entry comes from: openste, tree, pronoun, session or owner.
+# A session adds an entry with a meaning, and insteadOf names the words it replaces.
+# The refusal that names an outside word hands the writer this list's road.
+# [[spec/schemas/paragraph.schema.yaml]]
+
+words:
+  - {word: a, pos: DET, from: openste}
+  - {word: ability, pos: NOUN, from: openste}
+  - {word: about, pos: ADP, from: openste}
+  - {word: above, pos: ADP, from: openste, insteadOf: [over]}
+  - {word: absent, from: tree}
+  - {word: absorb, pos: VERB, from: openste}
+  - {word: accept, pos: VERB, from: openste}
+  - {word: acceptance, from: tree}
+  - {word: access, pos: NOUN, from: openste}
+  - {word: accident, pos: NOUN, from: openste}
+  - {word: accidental, pos: ADJ, from: openste}
+  - {word: accidentally, pos: ADV, from: openste}
+  - {word: accurate, pos: ADJ, from: openste}
+  - {word: accurately, pos: ADV, from: openste}
+  - {word: across, pos: ADP, from: openste}
+  - {word: act, from: tree}
+  - {word: action, pos: NOUN, from: openste}
+  - {word: actionable, from: tree}
+  - {word: actionables, from: tree}
+  - {word: activation, from: tree}
+  - {word: acts, from: tree}
+  - {word: actual, from: tree}
+  - {word: adapt, pos: VERB, from: openste}
+  - {word: add, pos: VERB, from: openste}
+  - {word: adjust, pos: VERB, from: openste}
+  - {word: adjustable, pos: ADJ, from: openste}
+  - {word: adjustment, pos: NOUN, from: openste}
+  - {word: after, pos: CCONJ, from: openste}
+  - {word: afternoon, from: tree}
+  - {word: afterwards, from: tree}
+  - {word: again, pos: ADV, from: openste}
+  - {word: against, pos: ADP, from: openste}
+  - {word: age, pos: NOUN, from: openste}
+  - {word: agent, pos: NOUN, from: openste}
+  - {word: ago, pos: ADV, from: openste}
+  - {word: agree, pos: VERB, from: openste}
+  - {word: ahead, from: tree}
+  - {word: aims, from: tree}
+  - {word: align, pos: VERB, from: openste}
+  - {word: all, pos: ADJ, from: openste}
+  - {word: allow, from: tree}
+  - {word: allowed, from: tree}
+  - {word: almost, pos: ADV, from: openste}
+  - {word: alone, from: tree}
+  - {word: along, pos: ADP, from: openste}
+  - {word: already, from: tree}
+  - {word: also, pos: ADV, from: openste}
+  - {word: alternative, pos: ADJ, from: openste, insteadOf: [alternate]}
+  - {word: although, pos: CCONJ, from: openste}
+  - {word: always, pos: ADV, from: openste}
+  - {word: ambiguous, from: tree}
+  - {word: amount, pos: NOUN, from: openste}
+  - {word: an, pos: DET, from: openste}
+  - {word: analog, pos: ADJ, from: openste}
+  - {word: and, pos: CCONJ, from: openste}
+  - {word: another, from: tree}
+  - {word: answer, pos: NOUN, from: openste}
+  - {word: any, from: tree}
+  - {word: anything, from: tree}
+  - {word: anyway, from: tree}
+  - {word: anywhere, from: tree}
+  - {word: apart, pos: ADV, from: openste}
+  - {word: appear, pos: VERB, from: openste}
+  - {word: append, from: tree}
+  - {word: applicable, pos: ADJ, from: openste}
+  - {word: apply, pos: VERB, from: openste}
+  - {word: appreciate, pos: VERB, from: openste}
+  - {word: approval, pos: NOUN, from: openste}
+  - {word: approved, pos: ADJ, from: openste}
+  - {word: approximate, pos: ADJ, from: openste}
+  - {word: approximately, pos: ADV, from: openste}
+  - {word: are, pos: VERB, from: openste}
+  - {word: area, pos: NOUN, from: openste}
+  - {word: argument, from: tree}
+  - {word: arguments, from: tree}
+  - {word: arm, from: tree}
+  - {word: around, pos: ADP, from: openste}
+  - {word: array, from: tree}
+  - {word: arrive, from: tree}
+  - {word: arrives, from: tree}
+  - {word: arrow, pos: NOUN, from: openste}
+  - {word: artwork, pos: NOUN, from: openste}
+  - {word: as, pos: ADP, from: openste}
+  - {word: ask, from: tree}
+  - {word: asked, from: tree}
+  - {word: asking, from: tree}
+  - {word: asks, from: tree}
+  - {word: assemble, pos: VERB, from: openste}
+  - {word: assembly, pos: NOUN, from: openste}
+  - {word: assert, from: tree}
+  - {word: asserting, from: tree}
+  - {word: asserts, from: tree}
+  - {word: asset, from: tree}
+  - {word: assigned, from: tree}
+  - {word: assignment, pos: NOUN, from: openste}
+  - {word: at, pos: ADP, from: openste}
+  - {word: attach, pos: VERB, from: openste, insteadOf: [secure]}
+  - {word: attempt, from: tree}
+  - {word: attention, pos: NOUN, from: openste}
+  - {word: attribute, from: tree}
+  - {word: audience, from: tree}
+  - {word: authority, pos: NOUN, from: openste}
+  - {word: auto, from: tree}
+  - {word: automatic, pos: ADJ, from: openste}
+  - {word: automatically, pos: ADV, from: openste}
+  - {word: auxiliary, pos: ADJ, from: openste}
+  - {word: available, pos: ADJ, from: openste}
+  - {word: away, from: tree}
+  - {word: back, from: tree}
+  - {word: backup, pos: NOUN, from: openste}
+  - {word: backward, pos: ADV, from: openste}
+  - {word: bad, pos: ADJ, from: openste}
+  - {word: balance, pos: VERB, from: openste}
+  - {word: bare, pos: ADJ, from: openste}
+  - {word: bash, from: tree}
+  - {word: basic, pos: ADJ, from: openste}
+  - {word: batch, from: tree}
+  - {word: be, pos: VERB, from: openste}
+  - {word: beats, from: tree}
+  - {word: because, pos: CCONJ, from: openste, insteadOf: [since]}
+  - {word: become, pos: VERB, from: openste}
+  - {word: before, pos: ADP, from: openste}
+  - {word: behaves, from: tree}
+  - {word: behavior, from: tree}
+  - {word: behind, pos: ADP, from: openste}
+  - {word: belief, pos: NOUN, from: openste}
+  - {word: belongs, from: tree}
+  - {word: below, pos: ADP, from: openste, insteadOf: [under]}
+  - {word: bend, pos: VERB, from: openste}
+  - {word: beneath, from: tree}
+  - {word: beside, from: tree}
+  - {word: best, pos: ADJ, from: openste}
+  - {word: better, pos: ADJ, from: openste}
+  - {word: between, pos: ADP, from: openste}
+  - {word: beyond, from: tree}
+  - {word: binary, from: tree}
+  - {word: binds, from: tree}
+  - {word: biome, from: tree}
+  - {word: bites, from: tree}
+  - {word: bleed, pos: VERB, from: openste}
+  - {word: block, from: tree}
+  - {word: blockage, pos: NOUN, from: openste}
+  - {word: blocked, pos: ADJ, from: openste}
+  - {word: blocks, from: tree}
+  - {word: blow, pos: VERB, from: openste}
+  - {word: blunt, pos: ADJ, from: openste}
+  - {word: body, from: tree}
+  - {word: bond, pos: NOUN, from: openste}
+  - {word: boring, pos: ADJ, from: openste}
+  - {word: both, from: tree}
+  - {word: bottom, from: tree}
+  - {word: bound, from: tree}
+  - {word: boundary, from: tree}
+  - {word: box, from: tree}
+  - {word: boy, pos: NOUN, from: openste}
+  - {word: braille, pos: ADJ, from: openste}
+  - {word: branch, from: tree}
+  - {word: breach, from: tree}
+  - {word: break, pos: VERB, from: openste}
+  - {word: breathe, pos: VERB, from: openste}
+  - {word: brew, from: tree}
+  - {word: brief, from: tree}
+  - {word: briefly, from: tree}
+  - {word: briefs, from: tree}
+  - {word: bright, pos: ADJ, from: openste}
+  - {word: brightly, pos: ADV, from: openste}
+  - {word: broken, from: tree}
+  - {word: brother, pos: NOUN, from: openste}
+  - {word: browser, from: tree}
+  - {word: bubble, pos: NOUN, from: openste}
+  - {word: buffer, from: tree}
+  - {word: bug, from: tree}
+  - {word: build, from: tree}
+  - {word: builds, from: tree}
+  - {word: built, from: tree}
+  - {word: burn, pos: VERB, from: openste}
+  - {word: burst, from: tree}
+  - {word: but, pos: CCONJ, from: openste, insteadOf: [however]}
+  - {word: button, from: tree}
+  - {word: buttons, from: tree}
+  - {word: buys, from: tree}
+  - {word: by, pos: ADP, from: openste}
+  - {word: bypass, pos: VERB, from: openste}
+  - {word: cache, from: tree}
+  - {word: caches, from: tree}
+  - {word: cage, from: tree}
+  - {word: calculate, pos: VERB, from: openste}
+  - {word: calibrate, pos: VERB, from: openste}
+  - {word: calibration, pos: NOUN, from: openste}
+  - {word: call, from: tree}
+  - {word: caller, from: tree}
+  - {word: callers, from: tree}
+  - {word: calling, from: tree}
+  - {word: calls, from: tree}
+  - {word: calm, pos: ADJ, from: openste}
+  - {word: came, from: tree}
+  - {word: camel, from: tree}
+  - {word: can, pos: VERB, from: openste, insteadOf: [may]}
+  - {word: canary, from: tree}
+  - {word: cancel, pos: VERB, from: openste}
+  - {word: candidate, from: tree}
+  - {word: cannot, pos: VERB, from: openste}
+  - {word: cap, from: tree}
+  - {word: capacity, pos: NOUN, from: openste}
+  - {word: careful, pos: ADJ, from: openste}
+  - {word: carefully, pos: ADV, from: openste}
+  - {word: carries, from: tree}
+  - {word: carrot, from: tree}
+  - {word: carry, from: tree}
+  - {word: carrying, from: tree}
+  - {word: case, from: tree}
+  - {word: cases, from: tree}
+  - {word: catch, pos: VERB, from: openste}
+  - {word: category, pos: NOUN, from: openste}
+  - {word: cause, pos: VERB, from: openste}
+  - {word: cell, from: tree}
+  - {word: chain, from: tree}
+  - {word: change, pos: VERB, from: openste}
+  - {word: chapter, from: tree}
+  - {word: characters, from: tree}
+  - {word: charge, pos: VERB, from: openste}
+  - {word: chat, from: tree}
+  - {word: check, pos: NOUN, from: openste}
+  - {word: checkout, from: tree}
+  - {word: checkpoint, from: tree}
+  - {word: child, pos: NOUN, from: openste}
+  - {word: choice, pos: NOUN, from: openste}
+  - {word: choose, pos: VERB, from: openste}
+  - {word: circular, pos: ADJ, from: openste}
+  - {word: citation, pos: NOUN, from: openste}
+  - {word: cite, pos: VERB, from: openste}
+  - {word: claim, from: tree}
+  - {word: claimed, from: tree}
+  - {word: claims, from: tree}
+  - {word: class, from: tree}
+  - {word: claude, from: tree}
+  - {word: clean, pos: ADJ, from: openste}
+  - {word: clear, pos: ADJ, from: openste}
+  - {word: clearance, pos: NOUN, from: openste}
+  - {word: clearly, pos: ADV, from: openste}
+  - {word: click, from: tree}
+  - {word: clicks, from: tree}
+  - {word: client, from: tree}
+  - {word: climbs, from: tree}
+  - {word: clock, from: tree}
+  - {word: clockwise, pos: ADV, from: openste}
+  - {word: clogged, pos: ADJ, from: openste}
+  - {word: clone, from: tree}
+  - {word: clones, from: tree}
+  - {word: close, from: tree}
+  - {word: closes, from: tree}
+  - {word: cloud, from: tree}
+  - {word: code, from: tree}
+  - {word: coil, pos: NOUN, from: openste}
+  - {word: cold, pos: ADJ, from: openste}
+  - {word: collapsed, from: tree}
+  - {word: collect, pos: VERB, from: openste}
+  - {word: colon, from: tree}
+  - {word: color, pos: NOUN, from: openste}
+  - {word: colour, from: tree}
+  - {word: column, pos: NOUN, from: openste}
+  - {word: come, pos: VERB, from: openste}
+  - {word: comfortable, pos: ADJ, from: openste}
+  - {word: command, from: tree}
+  - {word: commands, from: tree}
+  - {word: comment, from: tree}
+  - {word: comments, from: tree}
+  - {word: commit, from: tree}
+  - {word: commits, from: tree}
+  - {word: communicate, pos: VERB, from: openste}
+  - {word: compaction, from: tree}
+  - {word: compare, pos: VERB, from: openste}
+  - {word: compatible, pos: ADJ, from: openste}
+  - {word: compiler, from: tree}
+  - {word: compiles, from: tree}
+  - {word: complete, pos: VERB, from: openste}
+  - {word: completed, pos: ADJ, from: openste, insteadOf: [complete]}
+  - {word: completion, from: tree}
+  - {word: complex, pos: ADJ, from: openste}
+  - {word: component, pos: NOUN, from: openste}
+  - {word: compress, pos: VERB, from: openste}
+  - {word: concentration, pos: NOUN, from: openste}
+  - {word: concept, pos: NOUN, from: openste}
+  - {word: condition, pos: NOUN, from: openste}
+  - {word: confidential, pos: ADJ, from: openste}
+  - {word: config, from: tree}
+  - {word: confirm, from: tree}
+  - {word: conflict, from: tree}
+  - {word: confuse, pos: VERB, from: openste}
+  - {word: connect, pos: VERB, from: openste}
+  - {word: connection, pos: NOUN, from: openste}
+  - {word: connotation, pos: NOUN, from: openste}
+  - {word: constant, pos: ADJ, from: openste}
+  - {word: constantly, pos: ADV, from: openste}
+  - {word: consumes, from: tree}
+  - {word: contain, pos: VERB, from: openste}
+  - {word: container, pos: NOUN, from: openste}
+  - {word: contamination, pos: NOUN, from: openste}
+  - {word: content, pos: NOUN, from: openste}
+  - {word: contents, pos: NOUN, from: openste}
+  - {word: context, pos: NOUN, from: openste}
+  - {word: continue, pos: VERB, from: openste}
+  - {word: continuous, pos: ADJ, from: openste}
+  - {word: continuously, pos: ADV, from: openste}
+  - {word: contour, pos: NOUN, from: openste}
+  - {word: contract, from: tree}
+  - {word: contrast, pos: NOUN, from: openste}
+  - {word: control, pos: NOUN, from: openste}
+  - {word: conversation, from: tree}
+  - {word: cool, pos: ADJ, from: openste}
+  - {word: coordinates, from: tree}
+  - {word: copy, pos: VERB, from: openste}
+  - {word: corner, pos: NOUN, from: openste}
+  - {word: correct, pos: ADJ, from: openste}
+  - {word: correction, pos: NOUN, from: openste}
+  - {word: correctly, pos: ADV, from: openste}
+  - {word: cost, from: tree}
+  - {word: costs, from: tree}
+  - {word: count, pos: VERB, from: openste}
+  - {word: counterclockwise, pos: ADV, from: openste}
+  - {word: cover, from: tree}
+  - {word: covers, from: tree}
+  - {word: create, pos: VERB, from: openste}
+  - {word: credentials, from: tree}
+  - {word: current, from: tree}
+  - {word: curve, pos: NOUN, from: openste}
+  - {word: cut, pos: VERB, from: openste}
+  - {word: cycle, pos: NOUN, from: openste}
+  - {word: damaged, pos: ADJ, from: openste}
+  - {word: dangerous, pos: ADJ, from: openste}
+  - {word: dark, from: tree}
+  - {word: dash, from: tree}
+  - {word: data, pos: NOUN, from: openste}
+  - {word: database, from: tree}
+  - {word: date, pos: NOUN, from: openste}
+  - {word: day, pos: NOUN, from: openste}
+  - {word: dead, from: tree}
+  - {word: deaf, pos: ADJ, from: openste}
+  - {word: debug, from: tree}
+  - {word: decided, from: tree}
+  - {word: decides, from: tree}
+  - {word: deciding, from: tree}
+  - {word: decision, pos: NOUN, from: openste}
+  - {word: declaration, from: tree}
+  - {word: decrease, pos: VERB, from: openste}
+  - {word: dedicated, pos: ADJ, from: openste}
+  - {word: deeper, from: tree}
+  - {word: def, from: tree}
+  - {word: default, pos: ADJ, from: openste}
+  - {word: defect, from: tree}
+  - {word: defective, pos: ADJ, from: openste}
+  - {word: definition, pos: NOUN, from: openste}
+  - {word: delete, from: tree}
+  - {word: deletes, from: tree}
+  - {word: deleting, from: tree}
+  - {word: dependency, from: tree}
+  - {word: depends, from: tree}
+  - {word: depth, pos: NOUN, from: openste}
+  - {word: describes, from: tree}
+  - {word: description, from: tree}
+  - {word: design, from: tree}
+  - {word: desk, from: tree}
+  - {word: detail, from: tree}
+  - {word: details, from: tree}
+  - {word: deterioration, pos: NOUN, from: openste}
+  - {word: device, pos: NOUN, from: openste}
+  - {word: diagonally, pos: ADV, from: openste}
+  - {word: diagram, from: tree}
+  - {word: dies, from: tree}
+  - {word: diff, from: tree}
+  - {word: difference, pos: NOUN, from: openste}
+  - {word: different, pos: ADJ, from: openste}
+  - {word: differently, pos: ADV, from: openste}
+  - {word: differs, from: tree}
+  - {word: difficult, pos: ADJ, from: openste}
+  - {word: digital, pos: ADJ, from: openste}
+  - {word: digitally, pos: ADV, from: openste}
+  - {word: dimension, pos: NOUN, from: openste}
+  - {word: dimly, pos: ADV, from: openste}
+  - {word: direction, pos: NOUN, from: openste}
+  - {word: directly, pos: ADV, from: openste}
+  - {word: directory, from: tree}
+  - {word: dirty, pos: ADJ, from: openste}
+  - {word: disagree, from: tree}
+  - {word: disagrees, from: tree}
+  - {word: disappear, pos: VERB, from: openste}
+  - {word: disassemble, pos: VERB, from: openste}
+  - {word: discard, pos: VERB, from: openste}
+  - {word: disconnect, pos: VERB, from: openste}
+  - {word: discovery, from: tree}
+  - {word: discussion, from: tree}
+  - {word: disengage, pos: VERB, from: openste}
+  - {word: disk, from: tree}
+  - {word: dispatch, from: tree}
+  - {word: display, pos: NOUN, from: openste}
+  - {word: distance, pos: NOUN, from: openste}
+  - {word: distract, pos: VERB, from: openste}
+  - {word: divide, pos: VERB, from: openste}
+  - {word: do, pos: VERB, from: openste, insteadOf: [perform, repeat]}
+  - {word: doc, from: tree}
+  - {word: does, from: tree}
+  - {word: done, from: tree}
+  - {word: door, from: tree}
+  - {word: doors, from: tree}
+  - {word: dot, from: tree}
+  - {word: dots, from: tree}
+  - {word: down, pos: ADJ, from: openste}
+  - {word: download, pos: VERB, from: openste}
+  - {word: downstream, pos: ADJ, from: openste}
+  - {word: draft, from: tree}
+  - {word: drain, pos: VERB, from: openste}
+  - {word: dramatic, pos: ADJ, from: openste}
+  - {word: draw, from: tree}
+  - {word: drawing, from: tree}
+  - {word: draws, from: tree}
+  - {word: drift, from: tree}
+  - {word: drifts, from: tree}
+  - {word: drink, pos: VERB, from: openste}
+  - {word: drive, from: tree}
+  - {word: drives, from: tree}
+  - {word: driving, from: tree}
+  - {word: drop, pos: NOUN, from: openste}
+  - {word: dry, pos: VERB, from: openste}
+  - {word: during, pos: ADP, from: openste}
+  - {word: each, pos: PRON, from: openste}
+  - {word: earlier, from: tree}
+  - {word: early, from: tree}
+  - {word: earns, from: tree}
+  - {word: easily, pos: ADV, from: openste}
+  - {word: easy, pos: ADJ, from: openste}
+  - {word: edge, pos: NOUN, from: openste}
+  - {word: edit, pos: VERB, from: openste}
+  - {word: edition, pos: NOUN, from: openste}
+  - {word: editor, from: tree}
+  - {word: education, pos: NOUN, from: openste}
+  - {word: effect, pos: NOUN, from: openste}
+  - {word: effective, pos: ADJ, from: openste}
+  - {word: effort, pos: NOUN, from: openste}
+  - {word: either, from: tree}
+  - {word: electric, pos: ADJ, from: openste}
+  - {word: electrical, pos: ADJ, from: openste}
+  - {word: electrically, pos: ADV, from: openste}
+  - {word: electronic, pos: ADJ, from: openste}
+  - {word: electronically, pos: ADV, from: openste}
+  - {word: element, pos: NOUN, from: openste}
+  - {word: else, from: tree}
+  - {word: elsewhere, from: tree}
+  - {word: email, pos: NOUN, from: openste}
+  - {word: emergency, pos: NOUN, from: openste}
+  - {word: emphasis, pos: NOUN, from: openste}
+  - {word: empty, pos: ADJ, from: openste}
+  - {word: end, pos: NOUN, from: openste}
+  - {word: endings, from: tree}
+  - {word: enforced, from: tree}
+  - {word: engage, pos: VERB, from: openste}
+  - {word: engine, from: tree}
+  - {word: enough, pos: ADJ, from: openste}
+  - {word: enter, pos: VERB, from: openste}
+  - {word: entrance, pos: NOUN, from: openste}
+  - {word: entry, pos: NOUN, from: openste}
+  - {word: env, from: tree}
+  - {word: envelopes, from: tree}
+  - {word: environment, from: tree}
+  - {word: equal, pos: ADJ, from: openste}
+  - {word: equally, pos: ADV, from: openste}
+  - {word: equipment, pos: NOUN, from: openste}
+  - {word: equivalent, pos: ADJ, from: openste}
+  - {word: erase, pos: VERB, from: openste}
+  - {word: error, pos: NOUN, from: openste}
+  - {word: estimate, pos: NOUN, from: openste}
+  - {word: event, pos: NOUN, from: openste}
+  - {word: every, from: tree}
+  - {word: everybody, from: tree}
+  - {word: everything, from: tree}
+  - {word: everywhere, from: tree}
+  - {word: exactly, from: tree}
+  - {word: examine, pos: VERB, from: openste}
+  - {word: example, pos: NOUN, from: openste}
+  - {word: except, from: tree}
+  - {word: exciting, pos: ADJ, from: openste}
+  - {word: executable, from: tree}
+  - {word: exhaust, pos: NOUN, from: openste}
+  - {word: exist, from: tree}
+  - {word: existing, from: tree}
+  - {word: exists, from: tree}
+  - {word: exit, pos: NOUN, from: openste}
+  - {word: expand, pos: VERB, from: openste}
+  - {word: expects, from: tree}
+  - {word: experience, pos: NOUN, from: openste}
+  - {word: expired, pos: ADJ, from: openste}
+  - {word: explain, pos: VERB, from: openste}
+  - {word: explicit, from: tree}
+  - {word: explosion, pos: NOUN, from: openste}
+  - {word: explosive, pos: ADJ, from: openste}
+  - {word: expression, pos: NOUN, from: openste}
+  - {word: extend, pos: VERB, from: openste}
+  - {word: extension, pos: NOUN, from: openste}
+  - {word: external, pos: ADJ, from: openste}
+  - {word: externally, pos: ADV, from: openste}
+  - {word: extinguish, pos: VERB, from: openste}
+  - {word: eyes, from: tree}
+  - {word: facial, pos: ADJ, from: openste}
+  - {word: facility, pos: NOUN, from: openste}
+  - {word: fact, pos: NOUN, from: openste}
+  - {word: fail, from: tree}
+  - {word: failing, from: tree}
+  - {word: fails, from: tree}
+  - {word: failure, from: tree}
+  - {word: fake, from: tree}
+  - {word: fakes, from: tree}
+  - {word: fall, pos: VERB, from: openste}
+  - {word: false, from: tree}
+  - {word: far, pos: ADJ, from: openste}
+  - {word: fast, pos: ADJ, from: openste}
+  - {word: fault, from: tree}
+  - {word: faults, from: tree}
+  - {word: feature, from: tree}
+  - {word: fed, from: tree}
+  - {word: feedback, pos: NOUN, from: openste}
+  - {word: feeds, from: tree}
+  - {word: feel, pos: VERB, from: openste}
+  - {word: feeling, pos: NOUN, from: openste}
+  - {word: female, pos: ADJ, from: openste}
+  - {word: fetch, from: tree}
+  - {word: fetches, from: tree}
+  - {word: few, from: tree}
+  - {word: field, from: tree}
+  - {word: fields, from: tree}
+  - {word: fifteen, from: tree}
+  - {word: fifth, from: tree}
+  - {word: file, from: tree}
+  - {word: files, from: tree}
+  - {word: filesystem, from: tree}
+  - {word: fill, pos: VERB, from: openste}
+  - {word: filter, from: tree}
+  - {word: filtered, pos: ADJ, from: openste}
+  - {word: find, pos: VERB, from: openste}
+  - {word: findings, from: tree}
+  - {word: finish, from: tree}
+  - {word: finished, from: tree}
+  - {word: finishes, from: tree}
+  - {word: finishing, from: tree}
+  - {word: fires, from: tree}
+  - {word: firing, from: tree}
+  - {word: first, pos: ADV, from: openste}
+  - {word: fits, from: tree}
+  - {word: five, from: tree}
+  - {word: fix, from: tree}
+  - {word: fixes, from: tree}
+  - {word: flag, from: tree}
+  - {word: flame, pos: NOUN, from: openste}
+  - {word: flammable, pos: ADJ, from: openste}
+  - {word: flange, pos: NOUN, from: openste}
+  - {word: flash, pos: VERB, from: openste}
+  - {word: flat, pos: ADJ, from: openste}
+  - {word: flexible, pos: ADJ, from: openste}
+  - {word: floor, from: tree}
+  - {word: flow, pos: NOUN, from: openste}
+  - {word: fluent, pos: ADJ, from: openste}
+  - {word: fluid, pos: NOUN, from: openste}
+  - {word: flush, pos: VERB, from: openste}
+  - {word: fold, pos: VERB, from: openste}
+  - {word: folder, pos: NOUN, from: openste}
+  - {word: follow, pos: VERB, from: openste}
+  - {word: for, pos: ADP, from: openste}
+  - {word: forget, pos: VERB, from: openste}
+  - {word: form, from: tree}
+  - {word: format, pos: NOUN, from: openste}
+  - {word: formatter, from: tree}
+  - {word: forward, pos: ADJ, from: openste}
+  - {word: four, from: tree}
+  - {word: free, pos: ADJ, from: openste}
+  - {word: freely, pos: ADV, from: openste}
+  - {word: freeze, pos: VERB, from: openste}
+  - {word: frequent, pos: ADJ, from: openste}
+  - {word: frequently, pos: ADV, from: openste}
+  - {word: fresh, from: tree}
+  - {word: from, pos: ADP, from: openste}
+  - {word: front, pos: NOUN, from: openste}
+  - {word: frontmatter, from: tree}
+  - {word: full, pos: ADJ, from: openste}
+  - {word: full-screen, pos: ADJ, from: openste}
+  - {word: full-text, from: tree}
+  - {word: fully, pos: ADV, from: openste}
+  - {word: function, from: tree}
+  - {word: funny, pos: ADJ, from: openste}
+  - {word: future, pos: NOUN, from: openste}
+  - {word: gains, from: tree}
+  - {word: gap, from: tree}
+  - {word: gas, pos: NOUN, from: openste}
+  - {word: gate, from: tree}
+  - {word: gathering, from: tree}
+  - {word: gear, from: tree}
+  - {word: general, pos: ADJ, from: openste}
+  - {word: generated, from: tree}
+  - {word: gesture, from: tree}
+  - {word: get, pos: VERB, from: openste, insteadOf: [reach]}
+  - {word: git, from: tree}
+  - {word: give, pos: VERB, from: openste}
+  - {word: glossy, pos: ADJ, from: openste}
+  - {word: go, pos: VERB, from: openste}
+  - {word: god, from: tree}
+  - {word: goes, from: tree}
+  - {word: going, from: tree}
+  - {word: good, pos: ADJ, from: openste}
+  - {word: gradually, pos: ADV, from: openste}
+  - {word: granted, from: tree}
+  - {word: grants, from: tree}
+  - {word: green, from: tree}
+  - {word: grep, from: tree}
+  - {word: grid, from: tree}
+  - {word: groove, pos: NOUN, from: openste}
+  - {word: ground, pos: NOUN, from: openste}
+  - {word: group, pos: NOUN, from: openste}
+  - {word: grows, from: tree}
+  - {word: guard, from: tree}
+  - {word: guards, from: tree}
+  - {word: guess, from: tree}
+  - {word: guessing, from: tree}
+  - {word: guidance, from: tree}
+  - {word: half, from: tree}
+  - {word: halves, from: tree}
+  - {word: hand, from: tree}
+  - {word: handback, from: tree}
+  - {word: handed, from: tree}
+  - {word: handing, from: tree}
+  - {word: handover, from: tree}
+  - {word: handovers, from: tree}
+  - {word: hands, from: tree}
+  - {word: hang, pos: VERB, from: openste}
+  - {word: happen, pos: VERB, from: openste}
+  - {word: happy, pos: ADJ, from: openste}
+  - {word: hard, pos: ADJ, from: openste}
+  - {word: harmony, pos: NOUN, from: openste}
+  - {word: harness, from: tree}
+  - {word: has, from: tree}
+  - {word: hash, from: tree}
+  - {word: hastrustdialogaccepted, from: tree}
+  - {word: have, pos: VERB, from: openste}
+  - {word: he, pos: PRON, from: pronoun}
+  - {word: head, pos: NOUN, from: openste}
+  - {word: hear, pos: VERB, from: openste}
+  - {word: hearing, pos: ADJ, from: openste}
+  - {word: heat, pos: NOUN, from: openste}
+  - {word: heavy, pos: ADJ, from: openste}
+  - {word: height, pos: NOUN, from: openste}
+  - {word: held, from: tree}
+  - {word: help, pos: VERB, from: openste}
+  - {word: her, pos: PRON, from: pronoun}
+  - {word: here, pos: ADV, from: openste}
+  - {word: heredoc, from: tree}
+  - {word: hers, pos: PRON, from: pronoun}
+  - {word: herself, pos: PRON, from: openste}
+  - {word: hides, from: tree}
+  - {word: high, pos: ADJ, from: openste}
+  - {word: highlight, pos: VERB, from: openste}
+  - {word: him, pos: PRON, from: pronoun}
+  - {word: himself, pos: PRON, from: openste}
+  - {word: his, pos: PRON, from: pronoun}
+  - {word: history, from: tree}
+  - {word: hit, pos: VERB, from: openste}
+  - {word: hold, from: tree}
+  - {word: holding, from: tree}
+  - {word: holds, from: tree}
+  - {word: hole, pos: NOUN, from: openste}
+  - {word: home, from: tree}
+  - {word: honest, from: tree}
+  - {word: hook, from: tree}
+  - {word: hooks, from: tree}
+  - {word: hope, pos: VERB, from: openste}
+  - {word: horizontal, pos: ADJ, from: openste}
+  - {word: horizontally, pos: ADV, from: openste}
+  - {word: host, from: tree}
+  - {word: hot, pos: ADJ, from: openste}
+  - {word: hour, pos: NOUN, from: openste}
+  - {word: hover, from: tree}
+  - {word: how, pos: ADV, from: openste}
+  - {word: however, from: tree}
+  - {word: hydraulic, pos: ADJ, from: openste}
+  - {word: hydraulically, pos: ADV, from: openste}
+  - {word: i, pos: PRON, from: pronoun}
+  - {word: id, from: tree}
+  - {word: identification, pos: NOUN, from: openste}
+  - {word: identify, pos: VERB, from: openste}
+  - {word: identity, from: tree}
+  - {word: idle, from: tree}
+  - {word: ids, from: tree}
+  - {word: if, pos: CCONJ, from: openste}
+  - {word: ignore, pos: VERB, from: openste}
+  - {word: illuminate, pos: VERB, from: openste}
+  - {word: imagine, pos: VERB, from: openste}
+  - {word: immediately, pos: ADV, from: openste}
+  - {word: implementation, from: tree}
+  - {word: import, from: tree}
+  - {word: important, pos: ADJ, from: openste}
+  - {word: imports, from: tree}
+  - {word: in, pos: ADV, from: openste}
+  - {word: inarow, from: tree}
+  - {word: incident, pos: NOUN, from: openste}
+  - {word: include, pos: VERB, from: openste}
+  - {word: incorrect, pos: ADJ, from: openste}
+  - {word: incorrectly, pos: ADV, from: openste}
+  - {word: increase, pos: VERB, from: openste}
+  - {word: increment, pos: NOUN, from: openste}
+  - {word: independently, pos: ADV, from: openste}
+  - {word: index, from: tree}
+  - {word: indication, pos: NOUN, from: openste}
+  - {word: indicator, pos: NOUN, from: openste}
+  - {word: information, pos: NOUN, from: openste}
+  - {word: initial, pos: ADJ, from: openste}
+  - {word: initially, pos: ADV, from: openste}
+  - {word: injury, pos: NOUN, from: openste}
+  - {word: inline, from: tree}
+  - {word: inner, pos: ADJ, from: openste}
+  - {word: input, pos: NOUN, from: openste}
+  - {word: inside, from: tree}
+  - {word: inspect, from: tree}
+  - {word: inspection, pos: NOUN, from: openste}
+  - {word: install, pos: VERB, from: openste, insteadOf: [fit]}
+  - {word: installation, pos: NOUN, from: openste}
+  - {word: instead, from: tree}
+  - {word: instruction, pos: NOUN, from: openste}
+  - {word: instrument, pos: NOUN, from: openste}
+  - {word: insulation, pos: NOUN, from: openste}
+  - {word: intelligent, pos: ADJ, from: openste}
+  - {word: intensity, pos: NOUN, from: openste}
+  - {word: interact, pos: VERB, from: openste}
+  - {word: interchange, pos: VERB, from: openste}
+  - {word: interchangeable, pos: ADJ, from: openste}
+  - {word: interesting, pos: ADJ, from: openste}
+  - {word: interface, pos: NOUN, from: openste}
+  - {word: intermittent, pos: ADJ, from: openste}
+  - {word: intermittently, pos: ADV, from: openste}
+  - {word: internal, pos: ADJ, from: openste}
+  - {word: internally, pos: ADV, from: openste}
+  - {word: interpret, pos: VERB, from: openste}
+  - {word: interpreter, pos: NOUN, from: openste}
+  - {word: interval, pos: NOUN, from: openste}
+  - {word: into, pos: ADP, from: openste}
+  - {word: investigation, pos: NOUN, from: openste}
+  - {word: irregular, pos: ADJ, from: openste}
+  - {word: irregularly, pos: ADV, from: openste}
+  - {word: is, pos: VERB, from: openste}
+  - {word: isolate, pos: VERB, from: openste}
+  - {word: it, pos: PRON, from: openste}
+  - {word: item, pos: NOUN, from: openste}
+  - {word: its, pos: ADJ, from: openste}
+  - {word: itself, pos: PRON, from: openste}
+  - {word: javascript, from: tree}
+  - {word: job, from: tree}
+  - {word: joins, from: tree}
+  - {word: joint, pos: NOUN, from: openste}
+  - {word: judge, from: tree}
+  - {word: judged, from: tree}
+  - {word: judgement, from: tree}
+  - {word: keep, pos: VERB, from: openste}
+  - {word: key, from: tree}
+  - {word: keyed, from: tree}
+  - {word: keys, from: tree}
+  - {word: keyword, from: tree}
+  - {word: kill, pos: VERB, from: openste}
+  - {word: kind, from: tree}
+  - {word: kinds, from: tree}
+  - {word: know, pos: VERB, from: openste}
+  - {word: lacks, from: tree}
+  - {word: laminated, pos: ADJ, from: openste}
+  - {word: lamination, pos: NOUN, from: openste}
+  - {word: land, from: tree}
+  - {word: landing, from: tree}
+  - {word: lands, from: tree}
+  - {word: language, pos: NOUN, from: openste}
+  - {word: large, pos: ADJ, from: openste}
+  - {word: last, from: tree}
+  - {word: late, pos: ADJ, from: openste}
+  - {word: later, from: tree}
+  - {word: lateral, pos: ADJ, from: openste}
+  - {word: laterally, pos: ADV, from: openste}
+  - {word: layer, pos: NOUN, from: openste}
+  - {word: leaf, from: tree}
+  - {word: leak, pos: NOUN, from: openste}
+  - {word: leakage, pos: NOUN, from: openste}
+  - {word: learn, pos: VERB, from: openste}
+  - {word: leave, from: tree}
+  - {word: leaves, from: tree}
+  - {word: left, pos: ADJ, from: openste}
+  - {word: length, pos: NOUN, from: openste}
+  - {word: less, pos: ADJ, from: openste}
+  - {word: let, pos: VERB, from: openste}
+  - {word: level, pos: ADJ, from: openste}
+  - {word: life, pos: NOUN, from: openste}
+  - {word: lift, pos: VERB, from: openste}
+  - {word: light, pos: ADJ, from: openste}
+  - {word: lighting, pos: NOUN, from: openste}
+  - {word: lightly, pos: ADV, from: openste}
+  - {word: like, pos: ADJ, from: openste}
+  - {word: limit, pos: NOUN, from: openste}
+  - {word: line, from: tree}
+  - {word: linear, pos: ADJ, from: openste}
+  - {word: lines, from: tree}
+  - {word: link, pos: NOUN, from: openste}
+  - {word: lint, from: tree}
+  - {word: linter, from: tree}
+  - {word: linting, from: tree}
+  - {word: lints, from: tree}
+  - {word: linux, from: tree}
+  - {word: liquid, pos: ADJ, from: openste}
+  - {word: list, from: tree}
+  - {word: listen, pos: VERB, from: openste}
+  - {word: listing, from: tree}
+  - {word: lists, from: tree}
+  - {word: live, from: tree}
+  - {word: lives, from: tree}
+  - {word: lnav, from: tree}
+  - {word: load, from: tree}
+  - {word: loads, from: tree}
+  - {word: local, pos: ADJ, from: openste}
+  - {word: location, pos: NOUN, from: openste}
+  - {word: lock, pos: VERB, from: openste}
+  - {word: log, from: tree}
+  - {word: long, pos: ADJ, from: openste}
+  - {word: longitudinal, pos: ADJ, from: openste}
+  - {word: longitudinally, pos: ADV, from: openste}
+  - {word: look, pos: VERB, from: openste}
+  - {word: loop, from: tree}
+  - {word: loose, pos: ADJ, from: openste}
+  - {word: loosely, pos: ADV, from: openste}
+  - {word: loosen, pos: VERB, from: openste}
+  - {word: loses, from: tree}
+  - {word: lost, from: tree}
+  - {word: loud, from: tree}
+  - {word: low, pos: ADJ, from: openste}
+  - {word: lower, pos: VERB, from: openste}
+  - {word: lowercase, pos: NOUN, from: openste}
+  - {word: lubricate, pos: VERB, from: openste}
+  - {word: machine, from: tree}
+  - {word: macos, from: tree}
+  - {word: made, from: tree}
+  - {word: magic, from: tree}
+  - {word: magnetic, pos: ADJ, from: openste}
+  - {word: magnetically, pos: ADV, from: openste}
+  - {word: main, from: tree}
+  - {word: maintenance, pos: NOUN, from: openste}
+  - {word: make, pos: VERB, from: openste}
+  - {word: male, pos: ADJ, from: openste}
+  - {word: malfunction, pos: NOUN, from: openste}
+  - {word: man, pos: NOUN, from: openste}
+  - {word: mandatory, pos: ADJ, from: openste}
+  - {word: manual, pos: ADJ, from: openste}
+  - {word: manually, pos: ADV, from: openste}
+  - {word: many, pos: ADJ, from: openste}
+  - {word: map, from: tree}
+  - {word: maps, from: tree}
+  - {word: mark, pos: NOUN, from: openste}
+  - {word: markdown, from: tree}
+  - {word: marketplace, from: tree}
+  - {word: mass, pos: NOUN, from: openste}
+  - {word: match, from: tree}
+  - {word: matcher, from: tree}
+  - {word: matches, from: tree}
+  - {word: matching, from: tree}
+  - {word: material, pos: NOUN, from: openste}
+  - {word: matrix, from: tree}
+  - {word: matte, pos: ADJ, from: openste}
+  - {word: matters, from: tree}
+  - {word: maximum, pos: ADJ, from: openste}
+  - {word: may, from: tree}
+  - {word: me, pos: PRON, from: pronoun}
+  - {word: mean, pos: VERB, from: openste}
+  - {word: meaning, pos: NOUN, from: openste}
+  - {word: measure, pos: VERB, from: openste}
+  - {word: mechanical, pos: ADJ, from: openste}
+  - {word: mechanically, pos: ADV, from: openste}
+  - {word: mechanism, pos: NOUN, from: openste}
+  - {word: median, from: tree}
+  - {word: medical, pos: ADJ, from: openste}
+  - {word: meeting, pos: NOUN, from: openste}
+  - {word: meets, from: tree}
+  - {word: member, pos: NOUN, from: openste}
+  - {word: memory, from: tree}
+  - {word: mend, from: tree}
+  - {word: mends, from: tree}
+  - {word: merge, from: tree}
+  - {word: merged, from: tree}
+  - {word: merges, from: tree}
+  - {word: merging, from: tree}
+  - {word: message, from: tree}
+  - {word: met, from: tree}
+  - {word: method, pos: NOUN, from: openste}
+  - {word: mid-session, from: tree}
+  - {word: middle, pos: ADJ, from: openste}
+  - {word: milliseconds, from: tree}
+  - {word: mine, pos: PRON, from: pronoun}
+  - {word: minimum, pos: ADJ, from: openste}
+  - {word: minus, pos: ADP, from: openste}
+  - {word: minute, from: tree}
+  - {word: misses, from: tree}
+  - {word: missing, pos: ADJ, from: openste}
+  - {word: mixture, pos: NOUN, from: openste}
+  - {word: mobile, pos: ADJ, from: openste}
+  - {word: mock, from: tree}
+  - {word: mock-based, from: tree}
+  - {word: mode, pos: NOUN, from: openste}
+  - {word: model, from: tree}
+  - {word: moderate, pos: ADJ, from: openste}
+  - {word: moderately, pos: ADV, from: openste}
+  - {word: module, from: tree}
+  - {word: modules, from: tree}
+  - {word: moist, pos: ADJ, from: openste}
+  - {word: moment, from: tree}
+  - {word: momentarily, pos: ADV, from: openste}
+  - {word: monitor, pos: VERB, from: openste}
+  - {word: month, pos: NOUN, from: openste}
+  - {word: more, pos: ADJ, from: openste, insteadOf: [further]}
+  - {word: most, pos: ADJ, from: openste}
+  - {word: movable, pos: ADJ, from: openste}
+  - {word: move, pos: VERB, from: openste}
+  - {word: movement, pos: NOUN, from: openste}
+  - {word: ms, from: tree}
+  - {word: much, pos: ADJ, from: openste}
+  - {word: multiply, pos: VERB, from: openste}
+  - {word: must, pos: VERB, from: openste, insteadOf: [shall, should]}
+  - {word: my, pos: PRON, from: pronoun}
+  - {word: myself, pos: PRON, from: openste}
+  - {word: name, pos: NOUN, from: openste}
+  - {word: natural, pos: ADJ, from: openste}
+  - {word: near, pos: ADJ, from: openste}
+  - {word: necessary, pos: ADJ, from: openste, insteadOf: [need, required]}
+  - {word: need, from: tree}
+  - {word: needing, from: tree}
+  - {word: needs, from: tree}
+  - {word: neither, from: tree}
+  - {word: nested, from: tree}
+  - {word: neutral, pos: ADJ, from: openste}
+  - {word: new, pos: ADJ, from: openste}
+  - {word: next, from: tree}
+  - {word: no, pos: ADJ, from: openste}
+  - {word: nobody, from: tree}
+  - {word: node, from: tree}
+  - {word: noise, pos: NOUN, from: openste}
+  - {word: nonce, from: tree}
+  - {word: nonce-x, from: tree}
+  - {word: none, pos: PRON, from: openste}
+  - {word: normal, from: tree}
+  - {word: nose, pos: NOUN, from: openste}
+  - {word: not, pos: ADV, from: openste}
+  - {word: notch, pos: NOUN, from: openste}
+  - {word: note, from: tree}
+  - {word: nothing, from: tree}
+  - {word: now, pos: ADV, from: openste}
+  - {word: nowhere, from: tree}
+  - {word: null, from: tree}
+  - {word: number, pos: NOUN, from: openste}
+  - {word: obey, pos: VERB, from: openste, insteadOf: [follow]}
+  - {word: object, pos: NOUN, from: openste}
+  - {word: of, pos: ADP, from: openste}
+  - {word: off, pos: ADJ, from: openste}
+  - {word: off-screen, pos: ADJ, from: openste}
+  - {word: offers, from: tree}
+  - {word: often, from: tree}
+  - {word: ok, from: tree}
+  - {word: old, pos: ADJ, from: openste}
+  - {word: omit, pos: VERB, from: openste}
+  - {word: on, pos: ADJ, from: openste}
+  - {word: on-screen, pos: ADJ, from: openste}
+  - {word: once, from: tree}
+  - {word: one, pos: PRON, from: openste}
+  - {word: one-line, from: tree}
+  - {word: only, pos: ADJ, from: openste}
+  - {word: onto, pos: ADP, from: openste}
+  - {word: open, pos: ADJ, from: openste}
+  - {word: opening, pos: NOUN, from: openste}
+  - {word: operate, pos: VERB, from: openste}
+  - {word: operation, pos: NOUN, from: openste}
+  - {word: operator, from: tree}
+  - {word: opposite, pos: ADP, from: openste}
+  - {word: option, pos: NOUN, from: openste}
+  - {word: optional, pos: ADJ, from: openste}
+  - {word: or, pos: CCONJ, from: openste}
+  - {word: order, pos: NOUN, from: openste}
+  - {word: ordinary, from: tree}
+  - {word: organize, pos: VERB, from: openste}
+  - {word: origin, from: tree}
+  - {word: original, from: tree}
+  - {word: other, pos: ADJ, from: openste}
+  - {word: otherwise, from: tree}
+  - {word: our, pos: PRON, from: pronoun}
+  - {word: ours, pos: PRON, from: pronoun}
+  - {word: ourselves, pos: PRON, from: openste}
+  - {word: out, pos: ADV, from: openste}
+  - {word: outdoors, pos: ADV, from: openste}
+  - {word: outer, pos: ADJ, from: openste}
+  - {word: outlives, from: tree}
+  - {word: output, pos: NOUN, from: openste}
+  - {word: outside, from: tree}
+  - {word: over, from: tree}
+  - {word: overlap, pos: NOUN, from: openste}
+  - {word: override, pos: VERB, from: openste}
+  - {word: owes, from: tree}
+  - {word: own, from: tree}
+  - {word: owner, from: tree}
+  - {word: owns, from: tree}
+  - {word: page, pos: NOUN, from: openste}
+  - {word: paint, pos: VERB, from: openste}
+  - {word: pair, pos: NOUN, from: openste}
+  - {word: panel, from: tree}
+  - {word: paragraph, from: tree}
+  - {word: parallel, pos: ADJ, from: openste}
+  - {word: parse, from: tree}
+  - {word: part, pos: NOUN, from: openste, insteadOf: [portion]}
+  - {word: particle, pos: NOUN, from: openste}
+  - {word: pass, from: tree}
+  - {word: passed, from: tree}
+  - {word: passes, from: tree}
+  - {word: passing, from: tree}
+  - {word: past, pos: NOUN, from: openste}
+  - {word: paste, pos: NOUN, from: openste}
+  - {word: patch, pos: NOUN, from: openste}
+  - {word: path, from: tree}
+  - {word: paths, from: tree}
+  - {word: pattern, from: tree}
+  - {word: pays, from: tree}
+  - {word: people, from: tree}
+  - {word: per, from: tree}
+  - {word: per-box, from: tree}
+  - {word: performance, pos: NOUN, from: openste}
+  - {word: period, pos: NOUN, from: openste}
+  - {word: permanent, pos: ADJ, from: openste}
+  - {word: permanently, pos: ADV, from: openste}
+  - {word: permission, from: tree}
+  - {word: permitted, pos: ADJ, from: openste, insteadOf: [acceptable]}
+  - {word: perpendicular, pos: ADJ, from: openste}
+  - {word: person, pos: NOUN, from: openste, insteadOf: [people]}
+  - {word: personnel, pos: NOUN, from: openste}
+  - {word: phrase, pos: NOUN, from: openste}
+  - {word: picks, from: tree}
+  - {word: piece, pos: NOUN, from: openste}
+  - {word: pinned, from: tree}
+  - {word: pipe, from: tree}
+  - {word: place, from: tree}
+  - {word: placement, from: tree}
+  - {word: places, from: tree}
+  - {word: plain, from: tree}
+  - {word: platform, from: tree}
+  - {word: play, pos: NOUN, from: openste}
+  - {word: please, pos: INTJ, from: openste}
+  - {word: plugin, from: tree}
+  - {word: plugins, from: tree}
+  - {word: plus, pos: ADP, from: openste}
+  - {word: pneumatic, pos: ADJ, from: openste}
+  - {word: pneumatically, pos: ADV, from: openste}
+  - {word: point, pos: NOUN, from: openste}
+  - {word: poisonous, pos: ADJ, from: openste}
+  - {word: policy, from: tree}
+  - {word: polish, pos: VERB, from: openste}
+  - {word: port, from: tree}
+  - {word: position, from: tree}
+  - {word: possible, pos: ADJ, from: openste}
+  - {word: possibly, pos: ADV, from: openste}
+  - {word: posts, from: tree}
+  - {word: precaution, pos: NOUN, from: openste}
+  - {word: precision, pos: NOUN, from: openste}
+  - {word: prepare, pos: VERB, from: openste}
+  - {word: present, from: tree}
+  - {word: press, from: tree}
+  - {word: presses, from: tree}
+  - {word: pressurization, pos: NOUN, from: openste}
+  - {word: pressurize, pos: VERB, from: openste}
+  - {word: prevent, pos: VERB, from: openste, insteadOf: [avoid]}
+  - {word: price, from: tree}
+  - {word: primary, pos: ADJ, from: openste, insteadOf: [main]}
+  - {word: principle, pos: NOUN, from: openste}
+  - {word: print, from: tree}
+  - {word: prints, from: tree}
+  - {word: priority, from: tree}
+  - {word: probable, pos: ADJ, from: openste}
+  - {word: probably, pos: ADV, from: openste}
+  - {word: probe, from: tree}
+  - {word: problem, pos: NOUN, from: openste}
+  - {word: procedure, pos: NOUN, from: openste}
+  - {word: process, from: tree}
+  - {word: produce, pos: VERB, from: openste}
+  - {word: production, pos: NOUN, from: openste}
+  - {word: program, from: tree}
+  - {word: project, from: tree}
+  - {word: projected, from: tree}
+  - {word: projecting, from: tree}
+  - {word: projection, from: tree}
+  - {word: projector, from: tree}
+  - {word: projects, from: tree}
+  - {word: prompt, from: tree}
+  - {word: proof, from: tree}
+  - {word: property, pos: NOUN, from: openste}
+  - {word: proportion, pos: NOUN, from: openste}
+  - {word: proposal, from: tree}
+  - {word: proposed, from: tree}
+  - {word: prose, from: tree}
+  - {word: protection, pos: NOUN, from: openste}
+  - {word: protective, pos: ADJ, from: openste}
+  - {word: proves, from: tree}
+  - {word: publication, pos: NOUN, from: openste}
+  - {word: pull, pos: VERB, from: openste}
+  - {word: pulse, from: tree}
+  - {word: purpose, pos: NOUN, from: openste}
+  - {word: push, pos: VERB, from: openste, insteadOf: [press]}
+  - {word: put, pos: VERB, from: openste, insteadOf: [insert]}
+  - {word: quality, pos: NOUN, from: openste}
+  - {word: query, from: tree}
+  - {word: question, pos: NOUN, from: openste}
+  - {word: queue, from: tree}
+  - {word: quickly, pos: ADV, from: openste}
+  - {word: quiet, from: tree}
+  - {word: quote, pos: VERB, from: openste}
+  - {word: race, from: tree}
+  - {word: radial, pos: ADJ, from: openste}
+  - {word: radially, pos: ADV, from: openste}
+  - {word: radioactive, pos: ADJ, from: openste}
+  - {word: random, pos: ADJ, from: openste}
+  - {word: randomly, pos: ADV, from: openste}
+  - {word: range, pos: NOUN, from: openste}
+  - {word: rate, pos: NOUN, from: openste}
+  - {word: rationale, from: tree}
+  - {word: re-prompt, from: tree}
+  - {word: reach, from: tree}
+  - {word: reaches, from: tree}
+  - {word: reaching, from: tree}
+  - {word: read, pos: VERB, from: openste}
+  - {word: read-only, from: tree}
+  - {word: readback, from: tree}
+  - {word: reader, pos: NOUN, from: openste}
+  - {word: readings, from: tree}
+  - {word: real, from: tree}
+  - {word: rear, pos: NOUN, from: openste}
+  - {word: reason, from: tree}
+  - {word: reasonable, pos: ADJ, from: openste}
+  - {word: receipt, from: tree}
+  - {word: receive, pos: VERB, from: openste}
+  - {word: recommend, pos: VERB, from: openste}
+  - {word: record, pos: VERB, from: openste}
+  - {word: recover, from: tree}
+  - {word: recovery, from: tree}
+  - {word: recycle, pos: VERB, from: openste}
+  - {word: red, from: tree}
+  - {word: redraw, from: tree}
+  - {word: refer, pos: VERB, from: openste}
+  - {word: reference, pos: NOUN, from: openste}
+  - {word: reflection, pos: NOUN, from: openste}
+  - {word: refuel, pos: VERB, from: openste}
+  - {word: refusal, from: tree}
+  - {word: refuse, from: tree}
+  - {word: refused, from: tree}
+  - {word: refuses, from: tree}
+  - {word: refusing, from: tree}
+  - {word: registers, from: tree}
+  - {word: registrations, from: tree}
+  - {word: regular, pos: ADJ, from: openste}
+  - {word: regularly, pos: ADV, from: openste}
+  - {word: reject, pos: VERB, from: openste}
+  - {word: related, pos: ADJ, from: openste}
+  - {word: relation, pos: NOUN, from: openste}
+  - {word: relative, from: tree}
+  - {word: release, pos: VERB, from: openste}
+  - {word: reload, from: tree}
+  - {word: remain, from: tree}
+  - {word: remaining, pos: ADJ, from: openste, insteadOf: [old]}
+  - {word: remember, pos: VERB, from: openste}
+  - {word: remote, from: tree}
+  - {word: removal, pos: NOUN, from: openste}
+  - {word: remove, pos: VERB, from: openste}
+  - {word: rename, from: tree}
+  - {word: rendered, from: tree}
+  - {word: renderer, from: tree}
+  - {word: repair, pos: NOUN, from: openste}
+  - {word: repeats, from: tree}
+  - {word: replace, pos: VERB, from: openste}
+  - {word: replacement, pos: NOUN, from: openste}
+  - {word: replays, from: tree}
+  - {word: repo, from: tree}
+  - {word: report, pos: NOUN, from: openste}
+  - {word: repository, from: tree}
+  - {word: request, from: tree}
+  - {word: required, from: tree}
+  - {word: requirement, pos: NOUN, from: openste}
+  - {word: resets, from: tree}
+  - {word: resistant, pos: ADJ, from: openste}
+  - {word: resolver, from: tree}
+  - {word: resolves, from: tree}
+  - {word: response, from: tree}
+  - {word: responsibility, pos: NOUN, from: openste}
+  - {word: rest, from: tree}
+  - {word: result, pos: NOUN, from: openste}
+  - {word: retract, pos: VERB, from: openste}
+  - {word: retraction, pos: NOUN, from: openste}
+  - {word: retries, from: tree}
+  - {word: retro, from: tree}
+  - {word: retry, from: tree}
+  - {word: return, from: tree}
+  - {word: returns, from: tree}
+  - {word: review, from: tree}
+  - {word: reviewer, from: tree}
+  - {word: revisit, from: tree}
+  - {word: rewrite, from: tree}
+  - {word: rewrites, from: tree}
+  - {word: rides, from: tree}
+  - {word: right, pos: ADJ, from: openste}
+  - {word: rigid, pos: ADJ, from: openste}
+  - {word: risk, pos: NOUN, from: openste}
+  - {word: road, from: tree}
+  - {word: roads, from: tree}
+  - {word: root, from: tree}
+  - {word: rough, pos: ADJ, from: openste}
+  - {word: round, from: tree}
+  - {word: rounded, pos: ADJ, from: openste}
+  - {word: rounds, from: tree}
+  - {word: routine, from: tree}
+  - {word: routing, pos: NOUN, from: openste}
+  - {word: row, pos: NOUN, from: openste}
+  - {word: rule, from: tree}
+  - {word: rules, from: tree}
+  - {word: ruling, from: tree}
+  - {word: run, pos: VERB, from: openste}
+  - {word: rung, from: tree}
+  - {word: runner, from: tree}
+  - {word: running, from: tree}
+  - {word: runtime, from: tree}
+  - {word: s, from: tree}
+  - {word: sad, pos: ADJ, from: openste}
+  - {word: safe, pos: ADJ, from: openste}
+  - {word: safely, pos: ADV, from: openste}
+  - {word: safety, pos: NOUN, from: openste}
+  - {word: said, from: tree}
+  - {word: same, pos: ADJ, from: openste}
+  - {word: sandbox, from: tree}
+  - {word: satisfactorily, pos: ADV, from: openste}
+  - {word: satisfactory, pos: ADJ, from: openste}
+  - {word: save, from: tree}
+  - {word: say, pos: VERB, from: openste}
+  - {word: scan, from: tree}
+  - {word: schedule, pos: VERB, from: openste}
+  - {word: schema, from: tree}
+  - {word: scope, from: tree}
+  - {word: scopes, from: tree}
+  - {word: screenshot, pos: NOUN, from: openste}
+  - {word: script, pos: NOUN, from: openste}
+  - {word: scripture, pos: NOUN, from: openste}
+  - {word: se, from: tree}
+  - {word: search, from: tree}
+  - {word: second, from: tree}
+  - {word: secondary, pos: ADJ, from: openste}
+  - {word: seconds, from: tree}
+  - {word: section, from: tree}
+  - {word: sections, from: tree}
+  - {word: see, pos: VERB, from: openste}
+  - {word: segment, from: tree}
+  - {word: select, pos: VERB, from: openste}
+  - {word: semicolon, from: tree}
+  - {word: send, pos: VERB, from: openste}
+  - {word: sense, pos: VERB, from: openste}
+  - {word: sensitive, pos: ADJ, from: openste}
+  - {word: sentence, from: tree}
+  - {word: separation, pos: NOUN, from: openste}
+  - {word: serious, pos: ADJ, from: openste}
+  - {word: server, from: tree}
+  - {word: serves, from: tree}
+  - {word: serviceable, pos: ADJ, from: openste}
+  - {word: servicing, pos: NOUN, from: openste}
+  - {word: session, from: tree}
+  - {word: sessions, from: tree}
+  - {word: set, pos: NOUN, from: openste}
+  - {word: setting, pos: NOUN, from: openste}
+  - {word: settled, from: tree}
+  - {word: setup, from: tree}
+  - {word: shadow, pos: NOUN, from: openste}
+  - {word: shake, pos: VERB, from: openste}
+  - {word: shape, pos: NOUN, from: openste}
+  - {word: share, from: tree}
+  - {word: sharp, pos: ADJ, from: openste}
+  - {word: she, pos: PRON, from: pronoun}
+  - {word: sheet, pos: NOUN, from: openste}
+  - {word: shell, from: tree}
+  - {word: shiny, pos: ADJ, from: openste}
+  - {word: ships, from: tree}
+  - {word: shock, pos: NOUN, from: openste}
+  - {word: short, pos: ADJ, from: openste}
+  - {word: should, from: tree}
+  - {word: shout, from: tree}
+  - {word: show, pos: VERB, from: openste}
+  - {word: side, pos: NOUN, from: openste}
+  - {word: sidebar, from: tree}
+  - {word: sign, pos: NOUN, from: openste}
+  - {word: signer, pos: NOUN, from: openste}
+  - {word: silent, from: tree}
+  - {word: silently, from: tree}
+  - {word: simple, pos: ADJ, from: openste}
+  - {word: simulate, pos: VERB, from: openste}
+  - {word: since, pos: CCONJ, from: openste}
+  - {word: sister, pos: NOUN, from: openste}
+  - {word: sit, from: tree}
+  - {word: sits, from: tree}
+  - {word: situation, pos: NOUN, from: openste}
+  - {word: six, from: tree}
+  - {word: size, from: tree}
+  - {word: skips, from: tree}
+  - {word: slash, from: tree}
+  - {word: slot, pos: NOUN, from: openste}
+  - {word: slow, pos: ADJ, from: openste}
+  - {word: slowly, pos: ADV, from: openste}
+  - {word: small, pos: ADJ, from: openste}
+  - {word: smoke, pos: NOUN, from: openste}
+  - {word: smooth, pos: ADJ, from: openste}
+  - {word: smoothly, pos: ADV, from: openste}
+  - {word: so, from: tree}
+  - {word: soft, pos: ADJ, from: openste}
+  - {word: solid, pos: NOUN, from: openste}
+  - {word: solution, pos: NOUN, from: openste}
+  - {word: some, pos: PRON, from: openste}
+  - {word: somebody, from: tree}
+  - {word: something, pos: PRON, from: openste}
+  - {word: sometimes, pos: ADV, from: openste}
+  - {word: somewhere, from: tree}
+  - {word: sorts, from: tree}
+  - {word: sound, pos: NOUN, from: openste}
+  - {word: source, pos: NOUN, from: openste}
+  - {word: span, from: tree}
+  - {word: spawn, from: tree}
+  - {word: speak, pos: VERB, from: openste}
+  - {word: special, pos: ADJ, from: openste}
+  - {word: specially, pos: ADV, from: openste}
+  - {word: specific, pos: ADJ, from: openste}
+  - {word: specified, pos: ADJ, from: openste}
+  - {word: speed, pos: NOUN, from: openste}
+  - {word: spelling, pos: NOUN, from: openste}
+  - {word: spends, from: tree}
+  - {word: spill, pos: VERB, from: openste}
+  - {word: split, from: tree}
+  - {word: splits, from: tree}
+  - {word: spray, pos: VERB, from: openste}
+  - {word: stable, pos: ADJ, from: openste}
+  - {word: stake, from: tree}
+  - {word: stale, from: tree}
+  - {word: stamp, from: tree}
+  - {word: stamps, from: tree}
+  - {word: stand, from: tree}
+  - {word: standard, pos: ADJ, from: openste}
+  - {word: standing, from: tree}
+  - {word: stands, from: tree}
+  - {word: start, pos: NOUN, from: openste}
+  - {word: startup, from: tree}
+  - {word: state, from: tree}
+  - {word: states, from: tree}
+  - {word: status, from: tree}
+  - {word: stay, pos: VERB, from: openste}
+  - {word: stdin, from: tree}
+  - {word: step, pos: NOUN, from: openste}
+  - {word: still, from: tree}
+  - {word: stood, from: tree}
+  - {word: stop, pos: VERB, from: openste}
+  - {word: stores, from: tree}
+  - {word: story, pos: NOUN, from: openste}
+  - {word: straight, pos: ADJ, from: openste}
+  - {word: stress, pos: NOUN, from: openste}
+  - {word: string, from: tree}
+  - {word: strip, pos: NOUN, from: openste}
+  - {word: stripe, pos: NOUN, from: openste}
+  - {word: strong, pos: ADJ, from: openste}
+  - {word: structural, pos: ADJ, from: openste}
+  - {word: structurally, pos: ADV, from: openste}
+  - {word: structure, pos: NOUN, from: openste}
+  - {word: style, from: tree}
+  - {word: subagent, from: tree}
+  - {word: subassembly, pos: NOUN, from: openste}
+  - {word: submits, from: tree}
+  - {word: subsequent, pos: ADJ, from: openste}
+  - {word: subsequently, pos: ADV, from: openste}
+  - {word: subtract, pos: VERB, from: openste}
+  - {word: successful, from: tree}
+  - {word: such, pos: ADJ, from: openste}
+  - {word: sudden, pos: ADJ, from: openste}
+  - {word: suddenly, pos: ADV, from: openste}
+  - {word: suggest, pos: VERB, from: openste}
+  - {word: suite, from: tree}
+  - {word: suites, from: tree}
+  - {word: sum, pos: NOUN, from: openste}
+  - {word: supply, pos: VERB, from: openste}
+  - {word: sure, pos: ADJ, from: openste}
+  - {word: surface, pos: NOUN, from: openste}
+  - {word: survey, from: tree}
+  - {word: surveyed, from: tree}
+  - {word: survives, from: tree}
+  - {word: swap, from: tree}
+  - {word: sweep, from: tree}
+  - {word: switch, from: tree}
+  - {word: switches, from: tree}
+  - {word: symbol, pos: NOUN, from: openste}
+  - {word: symmetrical, pos: ADJ, from: openste}
+  - {word: symmetrically, pos: ADV, from: openste}
+  - {word: symptom, pos: NOUN, from: openste}
+  - {word: synchronized, pos: ADJ, from: openste}
+  - {word: system, pos: NOUN, from: openste}
+  - {word: table, pos: NOUN, from: openste}
+  - {word: tag, pos: VERB, from: openste}
+  - {word: take, from: tree}
+  - {word: takes, from: tree}
+  - {word: taking, from: tree}
+  - {word: tap, pos: VERB, from: openste}
+  - {word: target, pos: NOUN, from: openste}
+  - {word: task, pos: NOUN, from: openste}
+  - {word: teaches, from: tree}
+  - {word: team, from: tree}
+  - {word: tell, pos: VERB, from: openste}
+  - {word: temp, from: tree}
+  - {word: temporarily, pos: ADV, from: openste}
+  - {word: temporary, pos: ADJ, from: openste}
+  - {word: ten, from: tree}
+  - {word: tense, from: tree}
+  - {word: terminal, from: tree}
+  - {word: tertiary, pos: ADJ, from: openste}
+  - {word: test, pos: NOUN, from: openste}
+  - {word: text, pos: NOUN, from: openste}
+  - {word: than, pos: CCONJ, from: openste}
+  - {word: thanks, pos: INTJ, from: openste}
+  - {word: that, pos: CCONJ, from: openste}
+  - {word: the, pos: DET, from: openste}
+  - {word: their, pos: ADJ, from: openste}
+  - {word: theirs, pos: PRON, from: pronoun}
+  - {word: them, pos: PRON, from: openste}
+  - {word: theme, pos: NOUN, from: openste}
+  - {word: themselves, pos: PRON, from: openste}
+  - {word: then, pos: ADV, from: openste}
+  - {word: there, pos: PRON, from: openste}
+  - {word: therefore, pos: INTJ, from: openste}
+  - {word: these, pos: ADJ, from: openste}
+  - {word: they, pos: PRON, from: openste}
+  - {word: thick, pos: ADJ, from: openste}
+  - {word: thickness, pos: NOUN, from: openste}
+  - {word: thing, from: tree}
+  - {word: things, from: tree}
+  - {word: think, pos: VERB, from: openste}
+  - {word: third, from: tree}
+  - {word: this, pos: PRON, from: openste}
+  - {word: those, pos: PRON, from: openste}
+  - {word: three, from: tree}
+  - {word: through, pos: ADP, from: openste}
+  - {word: throw, from: tree}
+  - {word: throws, from: tree}
+  - {word: thus, pos: ADV, from: openste, insteadOf: [therefore]}
+  - {word: ticks, from: tree}
+  - {word: tight, pos: ADJ, from: openste}
+  - {word: tighten, pos: VERB, from: openste}
+  - {word: tightly, pos: ADV, from: openste}
+  - {word: tilt, pos: VERB, from: openste}
+  - {word: time, from: tree}
+  - {word: timeout, from: tree}
+  - {word: tip, from: tree}
+  - {word: tmp, from: tree}
+  - {word: to, pos: ADP, from: openste}
+  - {word: today, from: tree}
+  - {word: todo, from: tree}
+  - {word: together, pos: ADV, from: openste}
+  - {word: toggle, from: tree}
+  - {word: token, from: tree}
+  - {word: tokens, from: tree}
+  - {word: tolerance, pos: NOUN, from: openste}
+  - {word: tone, pos: NOUN, from: openste}
+  - {word: too, pos: ADV, from: openste}
+  - {word: took, from: tree}
+  - {word: tool, pos: NOUN, from: openste}
+  - {word: tooth, from: tree}
+  - {word: top, pos: ADJ, from: openste}
+  - {word: total, pos: ADJ, from: openste}
+  - {word: touch, pos: VERB, from: openste}
+  - {word: tracked, from: tree}
+  - {word: tracks, from: tree}
+  - {word: train, pos: VERB, from: openste}
+  - {word: training, pos: NOUN, from: openste}
+  - {word: transcript, from: tree}
+  - {word: translate, pos: VERB, from: openste}
+  - {word: translation, pos: NOUN, from: openste}
+  - {word: translator, pos: NOUN, from: openste}
+  - {word: transmit, pos: VERB, from: openste}
+  - {word: transparent, pos: ADJ, from: openste}
+  - {word: travel, pos: NOUN, from: openste}
+  - {word: tree, from: tree}
+  - {word: trigger, from: tree}
+  - {word: trip, from: tree}
+  - {word: trivial, from: tree}
+  - {word: true, from: tree}
+  - {word: trunk, from: tree}
+  - {word: trust, from: tree}
+  - {word: trusted, from: tree}
+  - {word: trusts, from: tree}
+  - {word: truth, from: tree}
+  - {word: try, pos: VERB, from: openste}
+  - {word: tune, pos: VERB, from: openste}
+  - {word: turn, pos: VERB, from: openste, insteadOf: [rotate]}
+  - {word: twice, from: tree}
+  - {word: two, from: tree}
+  - {word: type, pos: NOUN, from: openste}
+  - {word: typical, pos: ADJ, from: openste}
+  - {word: unbound, from: tree}
+  - {word: unchanged, from: tree}
+  - {word: unclaimed, from: tree}
+  - {word: uncommitted, from: tree}
+  - {word: under, from: tree}
+  - {word: understand, pos: VERB, from: openste}
+  - {word: understood, from: tree}
+  - {word: unfinished, from: tree}
+  - {word: unfold, pos: VERB, from: openste}
+  - {word: uninstall, pos: VERB, from: openste}
+  - {word: unit, pos: NOUN, from: openste}
+  - {word: universal, pos: ADJ, from: openste}
+  - {word: unknown, pos: ADJ, from: openste}
+  - {word: unless, pos: CCONJ, from: openste}
+  - {word: unlock, pos: VERB, from: openste}
+  - {word: unproven, from: tree}
+  - {word: unread, from: tree}
+  - {word: unsatisfactorily, pos: ADV, from: openste}
+  - {word: unsatisfactory, pos: ADJ, from: openste}
+  - {word: unserviceable, pos: ADJ, from: openste}
+  - {word: until, pos: CCONJ, from: openste}
+  - {word: unusual, pos: ADJ, from: openste}
+  - {word: unusually, pos: ADV, from: openste}
+  - {word: unwanted, pos: ADJ, from: openste}
+  - {word: unwind, pos: VERB, from: openste}
+  - {word: up, pos: ADV, from: openste}
+  - {word: up-to-date, pos: ADJ, from: openste}
+  - {word: update, pos: NOUN, from: openste}
+  - {word: upgrade, pos: VERB, from: openste}
+  - {word: upload, pos: VERB, from: openste}
+  - {word: uppercase, pos: NOUN, from: openste}
+  - {word: urgency, from: tree}
+  - {word: url, from: tree}
+  - {word: us, pos: PRON, from: pronoun}
+  - {word: use, pos: VERB, from: openste, insteadOf: [using]}
+  - {word: user, pos: NOUN, from: openste}
+  - {word: usual, pos: ADJ, from: openste}
+  - {word: usually, pos: ADV, from: openste}
+  - {word: v, from: tree}
+  - {word: vale, from: tree}
+  - {word: vale-ls, from: tree}
+  - {word: validate, from: tree}
+  - {word: validation, from: tree}
+  - {word: value, pos: NOUN, from: openste}
+  - {word: variable, from: tree}
+  - {word: variables, from: tree}
+  - {word: verb, from: tree}
+  - {word: verbs, from: tree}
+  - {word: verdict, from: tree}
+  - {word: verify, from: tree}
+  - {word: vernacular, pos: ADJ, from: openste}
+  - {word: version, pos: NOUN, from: openste}
+  - {word: vertical, pos: ADJ, from: openste}
+  - {word: vertically, pos: ADV, from: openste}
+  - {word: very, pos: ADV, from: openste}
+  - {word: video, pos: NOUN, from: openste}
+  - {word: view, from: tree}
+  - {word: visual, pos: ADJ, from: openste}
+  - {word: visually, pos: ADV, from: openste}
+  - {word: voice, pos: NOUN, from: openste}
+  - {word: volume, pos: NOUN, from: openste}
+  - {word: vote, from: tree}
+  - {word: vs, from: tree}
+  - {word: wait, pos: VERB, from: openste}
+  - {word: walk, pos: VERB, from: openste}
+  - {word: want, pos: VERB, from: openste}
+  - {word: warm, from: tree}
+  - {word: warning, from: tree}
+  - {word: was, pos: VERB, from: openste}
+  - {word: watch, pos: VERB, from: openste}
+  - {word: way, from: tree}
+  - {word: we, pos: PRON, from: openste}
+  - {word: weak, pos: ADJ, from: openste}
+  - {word: wear, pos: VERB, from: openste}
+  - {word: weather, pos: NOUN, from: openste}
+  - {word: web, from: tree}
+  - {word: webview, from: tree}
+  - {word: week, pos: NOUN, from: openste}
+  - {word: weigh, pos: VERB, from: openste}
+  - {word: weight, pos: NOUN, from: openste}
+  - {word: well, from: tree}
+  - {word: went, pos: VERB, from: openste}
+  - {word: were, pos: VERB, from: openste}
+  - {word: wet, pos: ADJ, from: openste}
+  - {word: what, from: openste}
+  - {word: whatever, from: tree}
+  - {word: when, pos: CCONJ, from: openste}
+  - {word: where, pos: CCONJ, from: openste}
+  - {word: wherever, from: tree}
+  - {word: whether, from: tree}
+  - {word: which, pos: PRON, from: openste}
+  - {word: whichever, from: tree}
+  - {word: while, pos: CCONJ, from: openste}
+  - {word: who, pos: PRON, from: openste}
+  - {word: whoever, from: tree}
+  - {word: whole, from: tree}
+  - {word: whom, pos: PRON, from: pronoun}
+  - {word: whose, from: tree}
+  - {word: why, from: openste}
+  - {word: wide, pos: ADJ, from: openste}
+  - {word: widget, from: tree}
+  - {word: widgets, from: tree}
+  - {word: width, pos: NOUN, from: openste}
+  - {word: will, pos: VERB, from: openste}
+  - {word: wind, pos: VERB, from: openste}
+  - {word: window, from: tree}
+  - {word: windows, from: tree}
+  - {word: winget, from: tree}
+  - {word: wins, from: tree}
+  - {word: with, pos: ADP, from: openste}
+  - {word: without, pos: ADP, from: openste}
+  - {word: woman, pos: NOUN, from: openste}
+  - {word: word, from: tree}
+  - {word: words, from: tree}
+  - {word: work, from: tree}
+  - {word: workday, pos: NOUN, from: openste}
+  - {word: worker, from: tree}
+  - {word: workflow, pos: NOUN, from: openste}
+  - {word: working, from: tree}
+  - {word: works, from: tree}
+  - {word: workspace, from: tree}
+  - {word: worktree, from: tree}
+  - {word: worry, pos: VERB, from: openste}
+  - {word: worse, pos: ADJ, from: openste}
+  - {word: worst, pos: ADJ, from: openste}
+  - {word: worth, from: tree}
+  - {word: would, pos: VERB, from: openste}
+  - {word: wrapper, from: tree}
+  - {word: wraps, from: tree}
+  - {word: write, pos: VERB, from: openste}
+  - {word: writer, from: tree}
+  - {word: writers, from: tree}
+  - {word: written, from: tree}
+  - {word: wrong, from: tree}
+  - {word: wrongly, from: tree}
+  - {word: wrote, from: tree}
+  - {word: x, from: tree}
+  - {word: year, pos: NOUN, from: openste}
+  - {word: yes, pos: ADV, from: openste}
+  - {word: yet, from: tree}
+  - {word: you, pos: PRON, from: openste}
+  - {word: young, pos: ADJ, from: openste}
+  - {word: your, pos: ADJ, from: openste}
+  - {word: yours, pos: PRON, from: pronoun}
+  - {word: yourself, pos: PRON, from: openste}
+  - {word: yourselves, pos: PRON, from: openste}
+  - {word: zero, from: tree}
+  - {word: zip, from: tree}
+
+  - {word: damage, from: openste}
