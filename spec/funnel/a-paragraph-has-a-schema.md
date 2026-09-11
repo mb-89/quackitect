@@ -19,7 +19,7 @@ files by everything.
 This note settles four things, and the owner weighs the rest under the last
 chapter:
 
-- the shape of the schema
+- the shape of the schema, which stands as `spec/schemas/paragraph.schema.yaml`
 - the projection that writes it into Vale
 - the doors that read it
 - the loop that grows it
@@ -29,6 +29,7 @@ chapter:
 | the thing | where it lives | who writes it |
 |---|---|---|
 | the schema | `spec/schemas/paragraph.schema.yaml` | a person, and the retro |
+| the vocabulary | `spec/vocabulary/words.yml` | a person, the session, and the retro |
 | the Vale rules | `spec/config/styles/VoiceParagraph/*.yml` | the projection |
 | the judged rules | `spec/config/styles/VoiceJudged/*.yml` | the projection |
 | the register sections | `.vale.ini` | a person, for now |
@@ -56,7 +57,7 @@ so the rule files stay honest.
 
 # What the schema admits
 
-The schema holds six layers. Four of them enumerate a set, and a door refuses
+The schema holds seven layers. Five of them enumerate a set, and a door refuses
 what stands outside it. Two of them name a set no pattern holds, and the judge
 asks one question each.
 
@@ -67,6 +68,7 @@ asks one question each.
 | shape | six sentences a paragraph and three paragraphs a run, with three and two in an answer | Vale script |
 | sentence | two to twenty-five words, twenty in a list item, a plain opening, `. ? !` last, four code spans at most | Vale script |
 | grammar | one finite verb in a simple tense, no auxiliary chain, a modal from the register | Vale sequence |
+| vocabulary | a word from `words.yml`, a code span, a link, a path, or a name | Vale script |
 | meaning | one thing the reader acts on, in the shape it has | the judge |
 
 A plain opening is a capital, a digit, a code span or a quote. The first row
@@ -88,24 +90,39 @@ The tagger misreads a heading, a table cell and a quoted command, so this row
 stays a blacklist inside the whitelist. `Passive` and `PastTense` already stand
 in that form, and they move under the schema as they are.
 
-# The vocabulary stays out
+# The vocabulary grows itself
 
-A word whitelist is the one layer the numbers refuse. Against the OpenSTE list
-of admitted words, after code spans, links, paths and names come out:
+A word whitelist holds where its seed covers the writer, and the numbers say
+what the seed has to be. Against the OpenSTE list alone, 42 percent of the
+words in the uploaded answers stand outside. So does 39 percent of the owner's
+own prose in `spec/guidance`. This tree's voice runs on words of its own.
 
-| text | outside the list |
-|---|---|
-| the uploaded answers | 42 percent |
-| `spec/guidance` and `spec/rationales`, the owner's voice | 39 percent |
-| `spec/design_output` | 41 percent |
+So the seed takes three sources, and `spec/vocabulary/words.yml` holds them:
 
-The top outside words in the owner's prose are "nothing", "so", "branch",
-"rule", "session", "holds", "door", "carries", "stands". This tree's voice runs
-on a vocabulary of its own, and a dictionary of nine hundred words refuses it.
-So the vocabulary layer waits for a register that wants it, and none does today.
+| source | entries carry | what it adds |
+|---|---|---|
+| OpenSTE, MIT | `from: openste`, and a part of speech | the 900 words the standard admits |
+| the tree's own prose, words used twice or more | `from: tree` | the words this voice runs on |
+| the pronouns | `from: pronoun` | the words OpenSTE leaves to the writer |
 
-The word rules that stay are the ones with a closed set: no contraction, no
-Latin short form, and the modal set of the register.
+Against that seed, the answers stand 10 percent outside. The outside words are
+contractions, past-tense forms and words used once, and the grammar layer
+refuses the first two already. So the tail the vocabulary layer meets on its
+own is a few percent, and the session adds those on the fly:
+
+1. The door refuses a paragraph and names every word outside the list.
+2. Where an entry carries `insteadOf`, the refusal hands the writer the better
+   word, so a refusal teaches the swap.
+3. The session adds the missing word to `words.yml` with a meaning, under
+   `from: session`, and writes the paragraph again.
+4. The retro reads every `from: session` entry and keeps it or cuts it.
+
+The swaps seed from the standard's own list of the writer errors it meets most,
+which the video kit paraphrases under MIT. An entry the session adds carries
+its own `insteadOf` where it knows one.
+
+The word rules with a closed set stay beside it: no contraction, no Latin short
+form, and the modal set of the register.
 
 # The registers
 
@@ -115,7 +132,7 @@ else, so the schema holds them as overrides:
 | register | reaches | what changes |
 |---|---|---|
 | prose | every `.md` and every comment | the defaults above |
-| answer | the chat, as `*answer.md` | three sentences a paragraph, two paragraphs a run, the question table first |
+| answer | the chat, as `*answer.md` | three sentences a paragraph, two paragraphs a run, the question table and the TL;DR list first |
 | requirement | `spec/requirements/*.md` | the modals `shall`, `should` and `must` join the set, each with the meaning RFC 2119 gives it |
 
 The modal set of the prose register is `can`, `must` and `will`. A
@@ -145,13 +162,17 @@ call. The table lands at the turn's end when the answer takes research.
 
 # The bottom line comes first
 
-Under the question table, an answer opens with its outcome and puts detail
-under it. Two rules hold that, one mechanical and one judged:
+Under the question table, an answer opens with a TL;DR list and puts the detail
+under it. Three rules hold that, two mechanical and one judged:
 
-- The first paragraph of an answer, or of a chapter, holds one to three
-  sentences and no list. The shape rule holds it.
-- The judge asks whether the first paragraph states the outcome, or whether
-  the outcome arrives late. The rule refuses `late`.
+- The block after the question table is a list. Each item is one sentence,
+  and each sentence is one bottom line. The shape rule holds it.
+- No heading stands before that list. The markup rule holds it.
+- The judge asks whether the list states the outcome, or whether the outcome
+  arrives late, under a heading. The rule refuses `late`.
+
+So an answer reads in three tiers: what you ask, what stands, and then the
+detail for whoever reads on.
 
 # A list is a list
 
@@ -209,9 +230,10 @@ The loop has four parts, and three of them stand already:
 
 The projection carries an exception into the rule, so the schema stays the one
 place a person edits. `PastTense` already holds eleven exceptions inside its
-own file, and they move into the schema with it. The first write of this very
-note meets three more: the tagger reads `bold`, `add` and `approved` as the
-past tense.
+own file, and they move into the schema with it. The writes of this very note
+meet five more. The tagger reads `bold`, `add`, `approved` and the word for
+ten tens as the past tense. And the door lints an edit's fragment on its own,
+so a lone table row reads as one too.
 
 A count guards the loop. A rule refusing the same phrase past a set number in
 one session writes a `warn` row naming itself. So a rule that misreads shows
@@ -228,13 +250,19 @@ up on the day, and the twelfth misread has a place to land.
 | the judge | one call per paragraph for the table and diagram questions, at the judge's own sampling |
 | the first weeks | false refusals, and the retro loop is the answer to them |
 
-The work splits into five branches, each with a delta the measurement reports:
+The work splits into six branches, in this order, each with a delta the
+measurement reports:
 
-1. The verbs: `measure` and `voice refused`, so the retro has rows to read.
-2. The schema, the projector, the four enumerable layers, and their tests.
-3. The answer gate with its bands, and `check_answer`.
-4. The question table and the bottom line, mechanical half first.
-5. The judged rows, and the requirement register.
+| branch | does | touches | proves it |
+|---|---|---|---|
+| the verbs | `voice measure` scores a folder, and `voice refused` ranks the log's refusals | `src/scripts`, `RUNME.sh` | a fixture folder scores a known number |
+| the schema and the projector | one `shape` in `projection.js` reads the schema and writes a rule file per enumerable layer | `lib/projection.js`, `projections.json`, `VoiceParagraph` | each rule refuses a bad fixture, and the nine hand rules it replaces come out |
+| the vocabulary | the projection inlines `words.yml` into one rule, the refusal names the outside words and the swaps, and the cage reloads on a write to the list | `lib/vale.js`, `lib/refuse.js`, `words.yml` | a paragraph with one outside word meets a refusal naming it |
+| the answer gate | `turn.complete` re-prompts under the bands, `prompt.submit` carries a warning forward, and `check_answer` registers beside `claim_stop` | `hooks/level0.js`, `level0.json` | a fake session over the ceiling meets one re-prompt, and one alone |
+| the question and the TL;DR | `prompt.submit` counts the questions, and the answer register demands the table and the list first | `lib/answer.js`, the schema | a prompt with two questions refuses an answer opening with prose |
+| the judged rows and the register | `BottomLineFirst` and `ShapeFits` join `VoiceJudged`, and `spec/requirements` takes its modals | `VoiceJudged`, `.vale.ini` | a fake judge labels a fixture, and the door refuses the refused label |
+
+Each branch lands alone, and the measurement after each one reports the delta.
 
 # What stands open
 
@@ -244,5 +272,6 @@ The work splits into five branches, each with a delta the measurement reports:
 | where the rule card sits mid-turn | `prompt.section` may fire per request, and a probe on the client says whether the card and the last score live there |
 | the ceiling for the answer gate | how often the owner sees a second answer |
 | the judge on every paragraph | the cost of the table and diagram questions, with or without sampling |
-| a strict register with the dictionary | whether any text here ever wants it, and which list it takes |
+| when a word the session adds takes effect | the cage reloads the rule on the write, or the next session reads it |
+| a strict register with the OpenSTE words alone | whether a procedure or an error message here ever wants it |
 | the file name of a checked draft | `.se/answer.md` through the write door, or the tool alone |
