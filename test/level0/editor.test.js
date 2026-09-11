@@ -5,7 +5,15 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { entryFor, KEPT, LIST, readEntries, register, upsert } from "../../src/scripts/editor.js";
+import {
+  entryFor,
+  homeIn,
+  KEPT,
+  LIST,
+  readEntries,
+  register,
+  upsert,
+} from "../../src/scripts/editor.js";
 
 const ID = "quackitect.quackitect";
 const FOLDER = "/home/user/.vscode/extensions";
@@ -92,4 +100,11 @@ test("the entry names the folder the editor reads it through", () => {
   assert.equal(said.location.path, `${FOLDER}/${ID}-0.1.0`);
   assert.equal(said.relativeLocation, `${ID}-0.1.0`);
   assert.equal(said.metadata.source, "vsix");
+});
+
+test("the home folder comes from either name a box uses", () => {
+  assert.equal(homeIn({ HOME: "/home/user" }), "/home/user");
+  assert.equal(homeIn({ USERPROFILE: "C:\\Users\\mb" }), "C:\\Users\\mb");
+  assert.equal(homeIn({ HOME: "", USERPROFILE: "C:\\Users\\mb" }), "C:\\Users\\mb");
+  assert.equal(homeIn({}), "");
 });

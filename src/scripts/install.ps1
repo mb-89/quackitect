@@ -108,6 +108,93 @@ function Set-LnavReading {
   New-Item -ItemType File -Force (Join-Path $binDir ".lnav-reads-this-tree") | Out-Null
 }
 
+# THE EDITOR FINDS WHAT ITS OWN LIST NAMES, AND A LINKED FOLDER IS NOT ON IT.
+# So the link goes in beside an entry in extensions.json, and node writes that
+# file. A junction is what links here: a symbolic link asks for an
+# administrator, and a person running RUNME is not one.
+$extensionsDir = Join-Path $env:USERPROFILE ".vscode\extensions"
+
+function Read-EditorNames {
+  Push-Location $root
+  try {
+    $said = & node -e "const p = require('./src/extension/package.json'); process.stdout.write(p.publisher + '.' + p.name + ' ' + p.version);"
+  } finally {
+    Pop-Location
+  }
+  if (-not $said) { throw "the extension manifest answers no id." }
+  return ($said -split "\s+")
+}
+
+function Test-EditorLink {
+  if (-not (Test-Path $extensionsDir)) { return $true }
+  $names = Read-EditorNames
+  $dest = Join-Path $extensionsDir "$($names[0])-$($names[1])"
+  if (-not (Test-Path (Join-Path $dest "package.json"))) { return $false }
+
+  $list = Join-Path $extensionsDir "extensions.json"
+  if (-not (Test-Path $list)) { return $false }
+  return (Get-Content -Raw $list).Contains($names[0])
+}
+
+# Remove-Item walks into a junction on Windows PowerShell, so a careless delete
+# empties the tree the link points at. Deleting the directory entry itself
+# removes the link and leaves the far end alone.
+function Remove-EditorLink($dest) {
+  if (-not (Test-Path $dest)) { return }
+  $item = Get-Item -Force $dest
+  if ($item.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+    [IO.Directory]::Delete($dest, $false)
+    return
+  }
+  Remove-Item -Recurse -Force $dest
+}
+
+function Add-EditorLink {
+  if (-not (Test-Path $extensionsDir)) { return }
+  $names = Read-EditorNames
+  $dest = Join-Path $extensionsDir "$($names[0])-$($names[1])"
+
+  Write-Host "  linking the sidebar at $dest" -ForegroundColor Cyan
+  Remove-EditorLink $dest
+  New-Item -ItemType Junction -Path $dest -Target (Join-Path $root "src\extension") | Out-Null
+  if (-not (Test-Path (Join-Path $dest "package.json"))) {
+    throw "the link stands and the editor would read nothing through it: $dest"
+  }
+
+  Push-Location $root
+  try { node src/scripts/editor.js } finally { Pop-Location }
+  if ($LASTEXITCODE -ne 0) { throw "the editor's own list stands as it was." }
+}
+
+# servers.js holds the two ids, so this script names none of its own and one
+# list serves the editor and the recommendation both.
+function Get-ExtensionIds {
+  Push-Location $root
+  try {
+    $said = & node --input-type=module -e "import { EXTENSIONS } from './.claude/skills/level0/lib/servers.js'; process.stdout.write(EXTENSIONS.join(' '));"
+  } finally {
+    Pop-Location
+  }
+  return ($said -split "\s+" | Where-Object { $_ })
+}
+
+function Test-EditorExtensions {
+  if (-not (Get-Command code -ErrorAction SilentlyContinue)) { return $true }
+  $listed = @(& code --list-extensions)
+  foreach ($id in Get-ExtensionIds) {
+    if ($listed -notcontains $id) { return $false }
+  }
+  return $true
+}
+
+function Install-EditorExtensions {
+  if (-not (Get-Command code -ErrorAction SilentlyContinue)) { return }
+  foreach ($id in Get-ExtensionIds) {
+    Write-Host "  installing $id" -ForegroundColor Cyan
+    & code --install-extension $id --force | Out-Null
+  }
+}
+
 $needed = @(
   @{
     name = "node"

@@ -95,16 +95,22 @@ export function manifestPath(root) {
   return join(root, "src", "extension", "package.json");
 }
 
+// [[spec/design_output/extension#a-box-names-its-home]]
+export function homeIn(env) {
+  return env.HOME || env.USERPROFILE || "";
+}
+
 function main(env) {
-  if (!env.HOME) {
-    console.error("This box names no HOME, so the editor's list has no folder.");
+  const home = homeIn(env);
+  if (!home) {
+    console.error("This box names no home folder, so the editor's list has none.");
     return 1;
   }
 
   const files = disk();
   const said = JSON.parse(files.read(manifestPath(rootHere())));
   const id = `${said.publisher}.${said.name}`;
-  const folder = join(env.HOME, ".vscode", "extensions");
+  const folder = join(home, ".vscode", "extensions");
   const dest = join(folder, `${id}-${said.version}`);
 
   const found = register(files, folder, entryFor(id, said.version, dest, clock().now().getTime()));

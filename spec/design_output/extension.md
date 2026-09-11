@@ -388,6 +388,12 @@ Carrying an element nothing identifies makes the damage permanent, because
 every later run writes it back. Writing an object where the list holds one
 entry breaks a box owning no other extension.
 
+## A box names its home
+
+Windows leaves `HOME` unset and names the folder `USERPROFILE`, and the same
+script runs there under the shell Git ships. So the writer reads either name
+and answers the empty string where a box carries none.
+
 ## A lost id stands refused
 
 The entry going in is not the proof. A writer checking its own id alone passes
