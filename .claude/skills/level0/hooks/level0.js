@@ -6,7 +6,7 @@
 import { opensATurn, reachesTheOwner, SAYS, spokeSince } from "../lib/answer.js";
 import { commitIn, findings as readsCommand, verbLine } from "../lib/bash.js";
 import { CODE, formatText, lintText as lintCode } from "../lib/code.js";
-import { configOf, TRACKED } from "../lib/config.js";
+import { configOf, SCHEMA, TRACKED } from "../lib/config.js";
 import { ASK, controlBlock, holds, QUIET } from "../lib/controls.js";
 import {
   bindsHere,
@@ -55,6 +55,7 @@ import {
   toothOf,
 } from "../lib/stop.js";
 import { landsOnTrunk, touchesGit } from "../lib/trunk.js";
+import { deeply, layered } from "../lib/layer.js";
 import { MARKER, pairOf } from "../lib/vehicle.js";
 import { lintText } from "../lib/vale.js";
 
@@ -136,9 +137,9 @@ export function register(on, _options) {
     }
 
     // [[spec/design_output/projection#who-projects-and-when]]
-    projections = entriesIn(await readIf($, PROJECTIONS));
+    projections = entriesIn(await inherited($, cage.roots, PROJECTIONS));
     if (projections.length) {
-      const drawn = await projectAll($, projections);
+      const drawn = await projectAll($, cage.roots, projections, settings);
       await logbook.say("info", "project", `${drawn.wrote} file(s) written`, {
         ms: drawn.ms,
         detail: `${projections.length} projection(s), ${drawn.size} target(s)`,
@@ -228,7 +229,7 @@ export function register(on, _options) {
     if (!found.length) {
       judge = judgeOf(
         await judgeSettings(settings),
-        await readRules($, methodAt(cage.roots, JUDGED)),
+        await readRules($, cage.roots, JUDGED),
       );
       if (judge.reads()) {
         door = "judge";
@@ -564,7 +565,7 @@ async function loadCage($, cage) {
   cage.root = await rootHere($);
   // [[spec/design_output/vehicle#one-tree-drives-itself]]
   cage.roots = pairOf(await methodUp($, cage.root), cage.root);
-  cage.settings = configHere($);
+  cage.settings = configHere($, cage.roots);
   cage.judge = judgeOf(await judgeSettings(cage.settings));
   cage.tooth = toothOf({ mostInARow: await cage.settings.ask("stop.mostInARow") });
   if (!cage.wired) {
@@ -596,7 +597,7 @@ async function loadCage($, cage) {
   if (!cage.standing) faults.push(`${GUIDANCE} hands over nothing`);
 
   // [[spec/design_output/stop#where-the-rules-live]]
-  const pooled = pool(await readFolder($, methodAt(cage.roots, RULES), ".yml"));
+  const pooled = pool(await readFolder($, cage.roots, RULES, ".yml"));
   cage.rules = pooled.rules;
   for (const name of pooled.broken) {
     await cage.logbook.say("warn", "stop", `${name} carries a rule nobody can read`, {
@@ -665,6 +666,11 @@ function methodAt(roots, path) {
   return roots?.itself === false ? `${roots.method}/${path}` : path;
 }
 
+// [[spec/design_output/vehicle#the-work-root-inherits]]
+function layersOf(roots, path) {
+  return roots?.itself === false ? [`${roots.method}/${path}`, path] : [path];
+}
+
 // [[spec/design_output/level0#the-path-a-rule-reads]]
 async function rootHere($) {
   try {
@@ -676,7 +682,7 @@ async function rootHere($) {
 }
 
 // [[spec/design_output/projection#who-projects-and-when]]
-async function projectAll($, entries) {
+async function projectAll($, roots, entries, settings) {
   const began = Date.now();
   const refused = [];
   let size = 0;
@@ -684,7 +690,9 @@ async function projectAll($, entries) {
 
   for (const entry of entries) {
     const texts = new Map();
-    for (const path of readsOf(entry)) texts.set(path, await readIf($, path));
+    for (const path of readsOf(entry)) {
+      texts.set(path, await projected($, roots, path, settings));
+    }
     for (const [path, text] of writesOf(entry, texts)) {
       size++;
       if ((await readIf($, path)) === text) continue;
@@ -697,6 +705,28 @@ async function projectAll($, entries) {
     }
   }
   return { ms: Date.now() - began, size, wrote, refused };
+}
+
+// [[spec/design_output/vehicle#the-work-root-inherits]]
+async function projected($, roots, path, settings) {
+  if (path === TRACKED) return settings.text();
+  return inherited($, roots, path);
+}
+
+// [[spec/design_output/vehicle#the-work-root-inherits]]
+async function inherited($, roots, path) {
+  const under = await readIf($, methodAt(roots, path));
+  if (roots?.itself !== false) return under;
+
+  const over = await readIf($, path);
+  if (!over.trim()) return under;
+  if (!path.endsWith(".json")) return over;
+
+  try {
+    return `${JSON.stringify(deeply(JSON.parse(under || "{}"), JSON.parse(over)), null, 2)}\n`;
+  } catch {
+    return over;
+  }
 }
 
 async function readIf($, path) {
@@ -749,8 +779,10 @@ async function commitVoice($, command, bin) {
 }
 
 // [[spec/design_output/config#the-resolver-holds-the-layers]]
-function configHere($) {
+function configHere($, roots) {
   return configOf({
+    tracked: layersOf(roots, TRACKED),
+    schema: methodAt(roots, SCHEMA),
     read: (path) => $.fs.read(path),
     write: (path, text) => $.fs.write(path, text),
     readEnv: (names) => readEnv($, names),
@@ -902,7 +934,7 @@ async function readGuidance($, roots) {
   try {
     const notes = [];
     const wanted = new Set();
-    for (const one of await readFolder($, methodAt(roots, GUIDANCE), ".md")) {
+    for (const one of await readFolder($, roots, GUIDANCE, ".md")) {
       notes.push(one);
       for (const name of envOf(one.text)) wanted.add(name);
     }
@@ -947,7 +979,14 @@ async function readEnv($, names) {
   }
 }
 
-async function readFolder($, folder, end) {
+// [[spec/design_output/vehicle#the-work-root-inherits]]
+async function readFolder($, roots, folder, end) {
+  const under = await inFolder($, methodAt(roots, folder), end);
+  if (roots?.itself !== false) return under;
+  return layered(under, await inFolder($, folder, end));
+}
+
+async function inFolder($, folder, end) {
   try {
     const entries = await $.fs.list(folder);
     const out = [];
@@ -961,19 +1000,12 @@ async function readFolder($, folder, end) {
   }
 }
 
-async function readRules($, folder) {
-  try {
-    const entries = await $.fs.list(folder);
-    const out = [];
-    for (const one of entries) {
-      if (!one.name.endsWith(".yml")) continue;
-      const rule = readRule(await $.fs.read(`${folder}/${one.name}`));
-      out.push({ ...rule, name: one.name.replace(/\.yml$/, "") });
-    }
-    return out;
-  } catch {
-    return [];
-  }
+// [[spec/design_output/vehicle#the-work-root-inherits]]
+async function readRules($, roots, folder) {
+  return (await readFolder($, roots, folder, ".yml")).map((one) => ({
+    ...readRule(one.text),
+    name: one.name.replace(/\.yml$/, ""),
+  }));
 }
 
 // [[spec/design_output/tools#where-a-caller-looks]]

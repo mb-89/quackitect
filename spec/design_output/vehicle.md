@@ -50,6 +50,28 @@ Where the two agree, every path stays as it reads. Where they differ, the
 method root carries the rules, the guidance and the judged styles. The files
 under the agent's hands stay in the work root.
 
+## The work root inherits
+
+A copy hands its rules down, and the work root takes them the way a class takes
+what it extends. The unit is the file.
+
+| what the work root does | what stands |
+|---|---|
+| stays silent | the method's file comes down as it is |
+| names a file again | the work root's file replaces that one |
+| names a file nobody else holds | it joins the set |
+
+So a project adds its own guidance note beside the ones it inherits, and
+replaces one whole where it disagrees. Every folder the rules live in works
+this way: the guidance, the stop rules, and the judged styles.
+
+The config joins key by key, because a key is its unit. The method's values
+stand and the work root's values beat them. A project names only what it
+changes, and `./RUNME.sh config` says which layer answers a key.
+
+A projection declaration joins the same way where it is JSON. Its targets land
+in the work root, because that is the tree a person opens.
+
 ## A project names its driver
 
 `attach` writes the identity into the work tree, and `detach` takes it out so

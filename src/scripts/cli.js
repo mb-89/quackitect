@@ -22,7 +22,12 @@ import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { treeFaults, treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { EDITOR_SETTINGS } from "../../.claude/skills/level0/lib/servers.js";
 import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
-import { configOf, LOCAL, SCHEMA } from "../../.claude/skills/level0/lib/config.js";
+import {
+  configOf,
+  LOCAL,
+  SCHEMA,
+  TRACKED,
+} from "../../.claude/skills/level0/lib/config.js";
 import {
   faultsIn as faultsInGrid,
   lineOf,
@@ -55,12 +60,20 @@ import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js"
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 
+// [[spec/design_output/vehicle#the-work-root-inherits]]
+function atRoot(path) {
+  const said = String(path ?? "");
+  return said.startsWith("/") || /^[A-Za-z]:/.test(said) ? said : join(root, said);
+}
+
 // [[spec/design_output/config#the-resolver-holds-the-layers]]
-function configHere(files) {
+function configHere(files, pair) {
   return configOf({
-    read: async (path) => files.read(join(root, path)),
-    write: async (path, text) => files.write(join(root, path), text),
-    makeDir: async (path) => files.makeDir(join(root, path)),
+    tracked: pair?.itself === false ? [join(pair.method, TRACKED), TRACKED] : [TRACKED],
+    schema: pair?.itself === false ? join(pair.method, SCHEMA) : SCHEMA,
+    read: async (path) => files.read(atRoot(path)),
+    write: async (path, text) => files.write(atRoot(path), text),
+    makeDir: async (path) => files.makeDir(atRoot(path)),
     readEnv: async (names) =>
       Object.fromEntries(names.map((name) => [name, process.env[name] ?? ""])),
   });
@@ -70,7 +83,7 @@ async function doorsHere() {
   const outside = proc();
   const files = disk();
   const time = clock();
-  const said = configHere(files);
+  const said = configHere(files, rootsHere(files, process.env, root));
   return {
     proc: outside,
     disk: files,
