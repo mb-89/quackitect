@@ -60,7 +60,7 @@ each piece lands on the ladder.
 | v3 | typed refusals with an executable remedy, and a registry of them | level zero holds it, as `refuse.js`, and the registry is the log |
 | v3 | word-ordered scales in place of numbers | nothing missing today, and `stop.hold` and `ask.wanted` are the first two scales |
 | v3 | a demands ledger, the compiled criteria per step, so a moved tree says which signed steps reopen | level one, with the evidence |
-| v3 | the privacy one-door, a six-word-run check between a digest and its private source | level zero, open below, because it is a guard and `.se` holds the private half today |
+| v3 | the privacy one-door, a six-word-run check and an opaque-token check between a tracked text and its private source | level zero, on `work/the-private-half-stays-home` and the commit door beside it |
 | v3 | `se_test` as a question, with polling refused | level zero holds the half it needs, and the Bash door points a test run at one file |
 | v3 | controls that only ever stop the engine refusing | the invariant the sidebar's three waiting controls owe |
 | v3 | `doors.md` with a written reason per boundary and no off-switch | level zero holds it, as `DoorsOnly` and the contract tests |
@@ -129,6 +129,8 @@ migration branch is the cost to plan for.
 | the third language server, and one verb asking all three | `work/the-server-holds-the-shape` |
 | a folder that admits its own kind alone, and `mint_note` writing a note from its fields | `work/the-folder-names-the-kind` |
 | a probe that the standing layer survives a compaction, and a log line that shows any compaction | `work/the-layer-survives-compaction` |
+| the private half under `.se`, and the door refusing a run, a token or a shape that leaks | `work/the-private-half-stays-home` |
+| the commit as the door, reading the staged delta in the Bash door and in a git hook | `work/the-commit-carries-nothing-private` |
 
 The measurement decides the close. `./RUNME.sh voice measure` over a session's
 transcript, once the gate stands, says whether the chat lands under the
@@ -138,7 +140,7 @@ ceiling. That number, and a green check, is what done means here.
 
 | level | what it holds | what waits there |
 |---|---|---|
-| one, work | work items, their evidence, and the engine | the engine and its three sidebar controls, proof of reading, the demands ledger, `assertCanSupply`, the spawn ceiling, the token bill |
+| one, work | work items, their evidence, and the engine | the engine and its three sidebar controls, proof of reading, the demands ledger, `assertCanSupply`, the spawn ceiling, the token bill, the inbox of raw notes |
 | two, processes | processes as data, and the runs over them | the four processes, the orphan check, the canvas, the retro as a process, the work verb as one process of several |
 | three, applications | the specific processes | whatever a project brings |
 
@@ -146,8 +148,7 @@ ceiling. That number, and a green check, is what done means here.
 
 | the question | what hangs on it |
 |---|---|
-| whether the privacy door comes over from v3 and v4 | a rule over two files, refusing a tracked note that shares a six-word run with a file under `.se`, and the older design says how they read it |
 | what breaks when Claude Mods lands | the declarations move, and one branch pays the migration |
 | whether the canary stays once the client names what loads | `InstructionsLoaded` reads `CLAUDE.md` today, and a plugin's block waits |
 | whether the trunk guard reads `git -C <path> push` | the field names it as the road past a text rule |
-| where level zero ends | at the nine branches, or at the measurement showing the chat under the ceiling |
+| where level zero ends | at the eleven branches, or at the measurement showing the chat under the ceiling |
