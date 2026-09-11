@@ -18,6 +18,17 @@ The Bash door in `lib/bash.js` reads every `git commit` today, to lint the
 message. So the door already stands where the delta passes, and it reads the
 box through the process door.
 
+# What the tree carries today
+
+A grep on 2026-09-11 says what the check meets on its first run:
+
+| what stands | where | what the branch does |
+|---|---|---|
+| no email address | any tracked text | nothing |
+| the owner's handle, as the plugin's author | `.claude/skills/level0/.claude-plugin/plugin.json` | passes, because the handle owning the origin is public, and the allow list below says so |
+| a home path naming a person's user | `test/level0/paths.test.js`, `test/level0/editor.test.js` | renames the user in the fixture to `one`, so the test says the same and carries nobody |
+| a cloud box with no user name and `Claude` as its git name | the box itself | passes, and a desk box is where the check earns its keep |
+
 # What waits
 
 | the piece | where | proves it |
@@ -26,8 +37,10 @@ box through the process door.
 | the commit in the Bash door | `lib/bash.js` | `git commit` with a private delta refuses, naming the file, the line and what leaks |
 | the git hook | `.githooks/pre-commit` | a commit a person makes by hand refuses the same way |
 | the hook wired | `RUNME.sh`, `install.sh`, `RUNME.ps1` | `./RUNME.sh` sets `core.hooksPath`, and `doctor` says so |
+| the allow list | `lib/private.js` | the nobody users and the origin's owner pass |
 | the added lines alone | `lib/private.js` | a line the delta removes never refuses, so a leak can leave the tree |
 | the escape | `lib/bash.js` | `git commit --no-verify` refuses on a cloud box, and the desk box logs it |
+| the two fixtures | `test/level0` | both tests pass with `one` for the user |
 
 # The delta
 
@@ -42,10 +55,12 @@ calls them over the added lines:
 
 | check | reads |
 |---|---|
-| the shapes | an email address, a phone number, a home path with a user other than `user` and `root` |
+| the shapes | an email address, a phone number, a home path with a user outside the allow list |
 | the box's names | the user name, the home folder, the git name and email of the box |
 | the run and the token | every file under `.se/notes`, against the added lines |
 
+The allow list holds the nobody users, `user`, `root`, `one` and `somebody`,
+and the handle that owns the origin, read out of `git remote get-url origin`.
 A binary file and a file under `.se` stay out, and `.se` stays out of git
 already.
 
