@@ -20,6 +20,15 @@ import {
 } from "../lib/guidance.js";
 import { godMode, HEALTH, repairs } from "../lib/health.js";
 import { asked, BIN, readsAnswer, said as saidOf } from "../lib/index.js";
+import { applied, filesIn, patchSpec, replaceSpec } from "../lib/apply.js";
+import {
+  FOLDER as UNDONE,
+  journalOf,
+  nameOf as undoName,
+  newestOn,
+  restores,
+  undoSpec,
+} from "../lib/undo.js";
 import { judgeOf } from "../lib/judge.js";
 import { aimOf, asLines, FOLDER, nameOf, rowOf, writes } from "../lib/log.js";
 import { relativeTo } from "../lib/paths.js";
@@ -143,6 +152,9 @@ export function register(on, _options) {
 
     await $.tool.register(claimSpec(rules));
     await $.tool.register(reviewSpec());
+    await $.tool.register(patchSpec());
+    await $.tool.register(replaceSpec());
+    await $.tool.register(undoSpec());
     return next(e);
   });
 
@@ -279,6 +291,41 @@ export function register(on, _options) {
       detail: said.slice(0, 120),
     });
     return { deny: refusedCommand(said, found) };
+  });
+
+  // [[spec/design_output/apply#validate-everything-then-write]]
+  on("tool.call", { tool: "mcp__level0__patch" }, async ($, e, _next) => {
+    const ops = Array.isArray(e.ops) ? e.ops : [];
+    const took = applied(await readsFiles($, root, filesIn(ops)), ops);
+    if (!took.ok) return { result: took.why };
+    if (e.preview === true) return { result: wouldLand(took) };
+    return { result: await lands($, root, took, String(e.on ?? ""), logbook) };
+  });
+
+  // [[spec/design_output/apply#a-pattern-matching-nothing]]
+  on("tool.call", { tool: "mcp__level0__replace" }, async ($, e, _next) => {
+    const swept = await sweeps($, root, e);
+    if (swept.why) return { result: swept.why };
+
+    const took = applied(swept.held, swept.ops);
+    if (!took.ok) return { result: took.why };
+
+    const hits = Object.values(took.counts).reduce((n, one) => n + one, 0);
+    const wanted = e.expect_count;
+    if (wanted !== undefined && Number(wanted) !== hits) {
+      return { result: `the pattern matches ${hits} times, and expect_count says ${wanted}` };
+    }
+    if (e.preview === true) return { result: wouldLand(took) };
+    return { result: await lands($, root, took, String(e.on ?? ""), logbook) };
+  });
+
+  // [[spec/design_output/apply#drift-refuses-the-restore]]
+  on("tool.call", { tool: "mcp__level0__undo" }, async ($, e, _next) => {
+    const said = await takesBack($, root, String(e.on ?? ""));
+    await logbook.say(said.ok ? "info" : "warn", "undo", said.result.split("\n")[0], {
+      detail: String(e.on ?? ""),
+    });
+    return { result: said.result };
   });
 
   // [[spec/design_output/index#the-door-answers-the-tools]]
@@ -999,6 +1046,163 @@ function warms($, root) {
       at ? $.process.run([at, "standing"], { cwd: root, timeoutMs: 60000 }) : null,
     )
     .catch(() => {});
+}
+
+// [[spec/design_output/apply#bytes-in-bytes-out]]
+async function readsFiles($, root, paths) {
+  const held = {};
+  for (const path of paths) {
+    const at = inTheTree(root, path);
+    if (!at) {
+      held[path] = { exists: false, outside: true };
+      continue;
+    }
+    try {
+      held[path] = { exists: true, text: String(await $.fs.read(at)) };
+    } catch {
+      held[path] = { exists: false };
+    }
+  }
+  return held;
+}
+
+// [[spec/design_output/apply#bytes-in-bytes-out]]
+function inTheTree(root, path) {
+  const said = relativeTo(root, String(path ?? "")).split("\\").join("/");
+  if (!said || said.startsWith("/") || said.startsWith("../") || /^[A-Za-z]:/.test(said)) {
+    return "";
+  }
+  return said;
+}
+
+// [[spec/design_output/apply#the-journal-holds-both-halves]]
+async function lands($, root, took, on, logbook) {
+  const at = new Date().toISOString();
+  const entry = journalOf(at, on, "level0", took.files);
+  const where = `${UNDONE}/${undoName(at)}`;
+
+  try {
+    await $.fs.write(where, `${JSON.stringify(entry, null, 2)}\n`);
+  } catch (bad) {
+    return `the undo journal would not write, so nothing did: ${bad?.message ?? bad}`;
+  }
+
+  const wrote = [];
+  for (const one of took.files) {
+    const path = inTheTree(root, one.file);
+    try {
+      await $.fs.write(path, one.made);
+      wrote.push(one.file);
+    } catch (bad) {
+      return [
+        `${one.file} would not write: ${bad?.message ?? bad}`,
+        `The tree stands part written. Run undo to put it back, out of ${where}.`,
+      ].join("\n");
+    }
+  }
+
+  await logbook.say("info", "apply", `${wrote.length} file(s) written`, {
+    detail: on.slice(0, 120),
+    file: where,
+  });
+  return [
+    `${wrote.length} file(s) written, and ${where} holds what they said before.`,
+    ...wrote.map((one) => `  ${one} (${took.counts[one]} place(s))`),
+    "",
+    "Run undo to take this back while nothing else touches these files.",
+  ].join("\n");
+}
+
+// [[spec/design_output/apply#drift-refuses-the-restore]]
+async function takesBack($, root, on) {
+  let names = [];
+  try {
+    names = (await $.fs.list(UNDONE)).map((one) => one.name).filter((one) => one.endsWith(".json"));
+  } catch {
+    return { ok: false, result: "nothing to undo: no apply journals one here" };
+  }
+  if (!names.length) return { ok: false, result: "nothing to undo: no apply journals one here" };
+
+  const entries = {};
+  for (const name of names) {
+    try {
+      entries[name] = JSON.parse(String(await $.fs.read(`${UNDONE}/${name}`)));
+    } catch {}
+  }
+
+  const newest = newestOn(names, entries, on);
+  if (!newest) {
+    return {
+      ok: false,
+      result: `nothing of ${on || "this session"} to undo: an undo takes back what its own name wrote`,
+    };
+  }
+
+  const held = await readsFiles($, root, newest.entry.files.map((one) => one.file));
+  const said = restores(newest.entry, held);
+  if (!said.ok) return { ok: false, result: said.why };
+
+  const done = [];
+  for (const one of said.writes) {
+    await $.fs.write(inTheTree(root, one.file), one.text);
+    done.push(`  put back ${one.file}`);
+  }
+  for (const path of said.removes) {
+    await erase($, inTheTree(root, path));
+    done.push(`  removed ${path}, which the apply made`);
+  }
+  await erase($, `${UNDONE}/${newest.name}`);
+  return { ok: true, result: [`${done.length} file(s) come back.`, ...done].join("\n") };
+}
+
+// [[spec/design_output/apply#a-pattern-matching-nothing]]
+async function sweeps($, root, e) {
+  const pattern = String(e.pattern ?? "");
+  const glob = String(e.glob ?? "");
+  const flags = `${String(e.flags ?? "").replace(/[^ims]/g, "")}g`;
+
+  let shape;
+  try {
+    shape = new RegExp(pattern, flags);
+  } catch (bad) {
+    return { why: `the pattern compiles to nothing: ${bad?.message ?? bad}` };
+  }
+
+  const answer = await askIndex($, root, {
+    method: "grep",
+    params: { pattern, glob, limit: 0 },
+  });
+  if (!answer) return { why: "the index answers nothing here, so the sweep has no list to work" };
+
+  const paths = (answer.files ?? []).map((one) => one.path);
+  if (!paths.length) return { why: "the pattern matches nothing under that glob" };
+
+  const held = await readsFiles($, root, paths);
+  const ops = [];
+  for (const path of paths) {
+    const text = held[path]?.text ?? "";
+    shape.lastIndex = 0;
+    if (!shape.test(text)) continue;
+    ops.push({
+      file: path,
+      op: "regex",
+      pattern,
+      replacement: String(e.replacement ?? ""),
+      flags: String(e.flags ?? ""),
+    });
+  }
+  if (!ops.length) return { why: "the pattern matches nothing under that glob" };
+  return { held, ops };
+}
+
+// [[spec/design_output/apply#validate-everything-then-write]]
+function wouldLand(took) {
+  const rows = took.files
+    .map((one) => `  ${one.file} (${took.counts[one.file]} place(s))${one.born ? ", new" : ""}`)
+    .sort();
+  return [`${took.files.length} file(s) would change, and nothing is written.`, ...rows].join(
+    "\n",
+  );
 }
 
 function asWrite(e) {

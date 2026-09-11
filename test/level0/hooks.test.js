@@ -180,7 +180,7 @@ const PAST = [
 
 const answered = { reason: "answer", answer: "", durationMs: 1, aborted: false };
 
-test("a session start writes one line, and registers both tools", async () => {
+test("a session start writes one line, and registers every tool", async () => {
   const it = await started();
 
   assert.deepEqual(
@@ -189,7 +189,7 @@ test("a session start writes one line, and registers both tools", async () => {
   );
   assert.deepEqual(
     it.registered.map((one) => one.name),
-    ["claim_stop", "review_branch"],
+    ["claim_stop", "review_branch", "patch", "replace", "undo"],
   );
   assert.deepEqual(it.registered[0].inputSchema.properties.rule.enum, [
     "the-work-stands-complete",
