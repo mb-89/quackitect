@@ -47,7 +47,7 @@ import {
   SESSION,
   writes,
 } from "../lib/log.js";
-import { relativeTo } from "../lib/paths.js";
+import { isDraft, relativeTo } from "../lib/paths.js";
 import {
   entriesIn,
   ownerOf,
@@ -248,11 +248,15 @@ export function register(on, _options) {
       return { deny: refusedWrite(owner, writing.path) };
     }
 
+    const where = relativeTo(root, writing.path);
+
+    // [[spec/design_output/schema#the-underscore-parks-a-draft]]
+    if (isDraft(where)) return onward(e);
+
     if (CODE.test(writing.path)) {
       return await codeDoor($, e, onward, writing, formatter, logbook, root);
     }
 
-    const where = relativeTo(root, writing.path);
     const found = [];
     let kind = "vale";
 
@@ -1124,7 +1128,7 @@ async function inFolder($, folder, end) {
     const entries = await $.fs.list(folder);
     const out = [];
     for (const one of entries) {
-      if (!one.name.endsWith(end)) continue;
+      if (!one.name.endsWith(end) || isDraft(one.name)) continue;
       out.push({ name: one.name, text: await $.fs.read(`${folder}/${one.name}`) });
     }
     return out;

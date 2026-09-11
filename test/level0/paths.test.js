@@ -4,7 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { matches, relativeTo } from "../../.claude/skills/level0/lib/paths.js";
+import { isDraft, matches, relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 
 const ROOT = "C:/Users/mb/Desktop/ai/quackitect-v5";
 
@@ -37,6 +37,16 @@ test("a path the root misses comes back whole", () => {
 
 test("a root carrying a trailing slash reads the same", () => {
   assert.equal(relativeTo(`${ROOT}/`, `${ROOT}/README.md`), "README.md");
+});
+
+// [[spec/design_output/schema#the-underscore-parks-a-draft]]
+test("a name opening with an underscore parks a draft, at any depth", () => {
+  assert.equal(isDraft("_note.md"), true);
+  assert.equal(isDraft("spec/guidance/_note.md"), true);
+  assert.equal(isDraft("spec\\guidance\\_note.md"), true);
+  assert.equal(isDraft("_drafts/note.md"), true);
+  assert.equal(isDraft("spec/guidance/note.md"), false);
+  assert.equal(isDraft("spec/guidance/a_note.md"), false);
 });
 
 test("a glob reads one folder deep, and a double star reads past it", () => {

@@ -4,6 +4,7 @@
 // [[spec/design_output/tree#the-rules-over-two-files]]
 
 import { overLong } from "./names.js";
+import { isDraft } from "./paths.js";
 import {
   EDITOR_EXTENSIONS,
   EDITOR_SETTINGS,
@@ -73,7 +74,8 @@ export function treeOf(it) {
         .run(["ls-files"], true)
         .out.split(/\r?\n/)
         .map((one) => one.trim())
-        .filter(Boolean);
+        .filter(Boolean)
+        .filter((one) => !isDraft(one));
       return held;
     },
   };

@@ -19,6 +19,14 @@ import {
   staleIn,
 } from "../../.claude/skills/level0/lib/projection.js";
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
+import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
+import {
+  END as SCHEMA_END,
+  mintNote,
+  readYaml,
+  schemaFaults,
+  SCHEMAS,
+} from "../../.claude/skills/level0/lib/schema.js";
 import { treeFaults, treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { EDITOR_SETTINGS } from "../../.claude/skills/level0/lib/servers.js";
 import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
@@ -119,7 +127,8 @@ const DOORS = join(root, "src", "doors");
 const PLUGIN = join(".claude", "skills", "level0");
 const CONTRACT = join(root, "test", "contract");
 const settings = it.config;
-const OURS = "--glob=!{.se,node_modules,.git,.claude/types}/**";
+const PARKED = ["{.se,node_modules,.git,.claude/types}/**", "**/_*"];
+const OURS = `--glob=!{${PARKED.join(",")}}`;
 const TESTS = "test/level0/*.test.js";
 const CONTRACT_TESTS = "test/contract/*.test.js";
 const ROUNDS = 5;
@@ -172,6 +181,10 @@ const verbs = {
   work: {
     says: "work branches: new, take, read, review, list",
     run: async () => work(root, rest, it),
+  },
+  mint: {
+    says: "write a new note of a kind, in the shape its schema names",
+    run: async () => mint(rest),
   },
   log: {
     says: "what every door says, in the viewer this tree builds",
@@ -312,7 +325,11 @@ async function lint(where) {
   }
 
   // [[spec/design_output/tree#when-the-sweep-runs]]
-  if (where.includes(".")) found.push(...treeFaults(treeHere()));
+  if (where.includes(".")) {
+    const tree = treeHere();
+    found.push(...treeFaults(tree));
+    found.push(...schemaFaults(tree));
+  }
 
   found.push(...gridFaults(where));
 
@@ -323,7 +340,7 @@ async function lint(where) {
     );
     for (const row of code.stdout.split("\n")) {
       const hit = /^::(\w+) title=([^,]+),file=([^,]+),line=(\d+).*?::(.*)$/.exec(row);
-      if (!hit) continue;
+      if (!hit || isDraft(hit[3])) continue;
       found.push({
         file: hit[3],
         rule: hit[2].replace(/^lint\//, ""),
@@ -359,7 +376,13 @@ async function lint(where) {
     console.log(`${String(count).padStart(6)}  ${rule}`);
   }
   console.log(`${String(found.length).padStart(6)}  in all`);
-  return 1;
+
+  // [[spec/design_output/schema#warning-now-and-error-later]]
+  const refused = found.filter((one) => one.severity !== "warning").length;
+  if (refused) return 1;
+  console.log("");
+  console.log(`${found.length} stand at warning, which the panel draws and check allows.`);
+  return 0;
 }
 
 // [[spec/design_output/tree#the-tree-handed-in]]
@@ -588,6 +611,37 @@ function project() {
   return 0;
 }
 
+// [[spec/design_output/schema#mint-writes-a-valid-note]]
+function mint(argv) {
+  const [kind, path] = argv.filter((one) => !one.startsWith("-"));
+  const kinds = namesIn(join(root, SCHEMAS), SCHEMA_END)
+    .map((name) => name.slice(0, -SCHEMA_END.length))
+    .sort();
+
+  if (!kind || !path) {
+    console.error("Usage: ./RUNME.sh mint <kind> <path>\n");
+    console.error(`${SCHEMAS} holds ${kinds.join(", ")}.`);
+    return 2;
+  }
+  if (!kinds.includes(kind)) {
+    console.error(`${SCHEMAS} holds no ${kind}. It holds ${kinds.join(", ")}.`);
+    return 2;
+  }
+
+  const at = under(path);
+  if (files.exists(at)) {
+    console.error(`${path} stands already. Name a path nothing holds yet.`);
+    return 2;
+  }
+
+  const schema = readYaml(files.read(join(root, SCHEMAS, `${kind}${SCHEMA_END}`)));
+  files.makeDir(dirname(at));
+  files.write(at, mintNote(schema));
+  console.log(`${path} stands, in the shape ${kind} names.`);
+  console.log("Write it, then run ./RUNME.sh lint to read what is left.");
+  return 0;
+}
+
 // [[spec/design_output/level0#no-computed-engine-access]]
 function pluginHolds() {
   const ran = validatePlugin(outside.run, PLUGIN, root);
@@ -676,6 +730,7 @@ async function standing() {
     return 2;
   }
   const notes = namesIn(GUIDANCE, ".md")
+    .filter((name) => !isDraft(name))
     .map((n) => ({ name: n, text: files.read(join(GUIDANCE, n)) }))
     .filter(({ text }) => bindsHere(text, process.env));
   const said = standingLayer(notes);
@@ -791,7 +846,7 @@ function walk(where, wanted = /\.(md|markdown|txt)$/i) {
   const SKIP = new Set([".git", "node_modules", ".se", ".claude", ".claude-plugin"]);
   const into = (path) => {
     for (const entry of files.list(path)) {
-      if (SKIP.has(entry.name)) continue;
+      if (SKIP.has(entry.name) || isDraft(entry.name)) continue;
       const under = join(path, entry.name);
       if (entry.kind === "dir") into(under);
       else if (wanted.test(entry.name)) out.push(under);
