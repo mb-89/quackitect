@@ -1,6 +1,6 @@
 // The survey, over a fake box. These cases assert what a caller reads out of
 // .se/tools.json, so a wrong path shows here first.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";

@@ -2,6 +2,7 @@
 // [[spec/design_output/doors#one-door-per-outside-thing]]
 
 import {
+  chmodSync,
   existsSync,
   mkdirSync,
   mkdtempSync,
@@ -18,6 +19,7 @@ export function disk() {
     read: (path) => readFileSync(path, "utf8"),
     write: (path, text) => writeFileSync(path, text, { encoding: "utf8" }),
     exists: (path) => existsSync(path),
+    runnable: (path) => chmodSync(path, 0o755),
     list: (path) => readdirSync(path, { withFileTypes: true }).map(named),
     makeDir: (path) => mkdirSync(path, { recursive: true }),
     remove: (path) => rmSync(path, { force: true, recursive: true }),

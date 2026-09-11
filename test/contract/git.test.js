@@ -1,6 +1,6 @@
 // The git door, against a real repository this test builds and throws away.
 // Everything above it takes the fake process, so git costs the suite once.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { join } from "node:path";

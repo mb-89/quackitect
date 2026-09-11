@@ -1,6 +1,6 @@
 // The gesture, replayed. Each case hands the press times in, so the burst that
 // a person makes with a mouse runs here with no clock at all.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";

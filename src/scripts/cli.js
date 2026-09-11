@@ -638,7 +638,7 @@ function stamped(code) {
   return code;
 }
 
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 function doorsHold() {
   const named = (at, end) =>
     files

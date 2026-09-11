@@ -121,7 +121,9 @@ export function produce(files, method, dest, into) {
         walk(next);
         continue;
       }
-      files.write(join(dest, next), files.read(join(method, next)));
+      const at = join(dest, next);
+      files.write(at, files.read(join(method, next)));
+      if (next.endsWith(".sh")) files.runnable(at);
       count++;
     }
   };

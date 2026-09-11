@@ -72,6 +72,28 @@ changes, and `./RUNME.sh config` says which layer answers a key.
 A projection declaration joins the same way where it is JSON. Its targets land
 in the work root, because that is the tree a person opens.
 
+## A vehicle stands alone
+
+A vehicle carries the whole method and answers for itself. It reaches back to
+the tree it comes out of for nothing, because a corporate machine may hold the
+vehicle and reach the tree it came from never.
+
+Proven against a real copy, in `test/contract/vehicle.test.js`:
+
+| what stands | what the copy answers |
+|---|---|
+| its identity | its own, and other than the one it came from |
+| its roots | itself as method and as work |
+| its contract tests | 73 of 73, out of its own folder |
+| its answer to `vehicle` | no path naming the tree behind it |
+
+A fresh copy takes two steps that any fresh clone takes: `git init`, and one
+run of `RUNME`, which surveys the tools and builds what it needs.
+
+The run bit travels with the scripts. A copy whose `RUNME.sh` arrives
+unrunnable answers `Permission denied`, and the vehicle stands there unable to
+take its own first step.
+
 ## A project names its driver
 
 `attach` writes the identity into the work tree, and `detach` takes it out so

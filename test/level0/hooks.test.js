@@ -1,7 +1,7 @@
 // The hooks module, driven by a fake engine. It reaches the harness through
 // the interface the engine hands it, so a fake interface stands in and the
 // lines it writes come back out of memory.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";

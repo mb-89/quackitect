@@ -1,6 +1,6 @@
 // The log door, against the real filesystem. Every other test takes the fake,
 // and this one holds the fake to what the disk does.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";

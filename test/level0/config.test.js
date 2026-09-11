@@ -1,6 +1,6 @@
 // The resolver, driven over a fake disk. Three layers stand in memory, a write
 // lands in the per-box file, and every ask reads that file again.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";

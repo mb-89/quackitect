@@ -1,7 +1,7 @@
 // The browser side, driven with no browser. A fake page answers the four calls
 // the script makes, so a click becomes a message here exactly as it does in the
 // webview.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
