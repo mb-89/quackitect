@@ -17,7 +17,17 @@ misreads: 3
 layers:
   characters:
     admits: letters, digits, space, and the punctuation below
-    punctuation: [".", ",", "?", "!", ":", "(", ")", "'", "\"", "-"]
+    punctuation:
+      - "."
+      - ","
+      - "?"
+      - "!"
+      - ":"
+      - "("
+      - ")"
+      - "'"
+      - '"'
+      - "-"
     exceptions: []
 
   markup:
