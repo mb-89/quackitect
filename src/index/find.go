@@ -9,9 +9,10 @@ import (
 )
 
 type Hit struct {
-	Path string `json:"path"`
-	Line int    `json:"line"`
-	Text string `json:"text"`
+	Path  string  `json:"path"`
+	Line  int     `json:"line"`
+	Text  string  `json:"text"`
+	Score float64 `json:"score"`
 }
 
 type Link struct {
@@ -30,8 +31,8 @@ func Find(db *sql.DB, words string, limit int) ([]Hit, error) {
 	}
 
 	rows, err := db.Query(
-		`SELECT path, n, text FROM line_text WHERE line_text MATCH ? ORDER BY rank LIMIT ?`,
-		words, limit)
+		`SELECT path, n, text, -bm25(line_text) FROM line_text
+		 WHERE line_text MATCH ? ORDER BY rank LIMIT ?`, words, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +41,35 @@ func Find(db *sql.DB, words string, limit int) ([]Hit, error) {
 	out := []Hit{}
 	for rows.Next() {
 		var one Hit
-		if err := rows.Scan(&one.Path, &one.Line, &one.Text); err != nil {
+		if err := rows.Scan(&one.Path, &one.Line, &one.Text, &one.Score); err != nil {
+			return nil, err
+		}
+		out = append(out, one)
+	}
+	return out, rows.Err()
+}
+
+// [[spec/design_output/index#the-rank-is-bm25]]
+func Notes(db *sql.DB, words string, limit int) ([]Hit, error) {
+	if strings.TrimSpace(words) == "" {
+		return []Hit{}, nil
+	}
+	if limit <= 0 {
+		limit = 20
+	}
+
+	rows, err := db.Query(
+		`SELECT path, 0, id, -bm25(note_text, 10.0, 1.0) FROM note_text
+		 WHERE note_text MATCH ? ORDER BY rank LIMIT ?`, words, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	out := []Hit{}
+	for rows.Next() {
+		var one Hit
+		if err := rows.Scan(&one.Path, &one.Line, &one.Text, &one.Score); err != nil {
 			return nil, err
 		}
 		out = append(out, one)

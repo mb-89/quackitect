@@ -161,6 +161,10 @@ const verbs = {
     says: "every line carrying the words, out of the index",
     run: async () => asksIndex(["find", ...rest]),
   },
+  notes: {
+    says: "the notes the words belong to, ranked by name and body",
+    run: async () => asksIndex(["notes", ...rest]),
+  },
   links: {
     says: "what reaches a note, and what reaches nothing",
     run: async () => asksIndex(rest.length ? ["links", ...rest] : ["dangling"]),

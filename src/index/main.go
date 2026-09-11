@@ -20,7 +20,7 @@ import (
 func main() {
 	argv := os.Args[1:]
 	if len(argv) == 0 {
-		fmt.Fprintln(os.Stderr, "usage: se-index <serve|find|links|dangling|same|reindex|standing> [words]\n       se-index call <method> <json params>")
+		fmt.Fprintln(os.Stderr, "usage: se-index <serve|find|notes|links|dangling|same|reindex|standing> [words]\n       se-index call <method> <json params>")
 		os.Exit(2)
 	}
 
@@ -150,7 +150,7 @@ func asked(argv []string) (string, json.RawMessage) {
 	params := map[string]any{}
 	if len(argv) > 1 {
 		switch argv[0] {
-		case "find":
+		case "find", "notes":
 			params["words"] = argv[1]
 			if len(argv) > 2 {
 				params["limit"], _ = strconv.Atoi(argv[2])

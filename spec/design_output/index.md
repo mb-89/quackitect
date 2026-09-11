@@ -79,11 +79,27 @@ Each one is a walk the tree used to take:
 | verb | asks |
 |---|---|
 | `find` | every line carrying the words, through FTS5 |
+| `notes` | the notes the words belong to, ranked by name and body |
+| `grep` | every line one pattern matches, with its neighbours |
+| `glob` | every path one glob names, the newest first |
 | `links` | what reaches a note, which is what a person asks before moving one |
 | `dangling` | every link naming nothing this tree holds |
 | `same` | every file carrying the size and hash of another |
 | `reindex` | the walk again, now |
 | `standing` | the root the door holds, and how many files it counts |
+
+## The rank is BM25
+
+FTS5 ranks with BM25, and `ORDER BY rank` takes it. Both word questions carry
+the score back, so a caller sees how far the first answer stands above the
+second.
+
+`notes` weights the columns: a note whose name carries the word scores ten
+times what a body mention scores. So asking for `index` answers the two notes
+about the index, ahead of every note that mentions one.
+
+`find` reads `line_text`, whose one indexed column leaves nothing to weight.
+It ranks by how rare the words are and how short the line is.
 
 ## The search reads the rows
 

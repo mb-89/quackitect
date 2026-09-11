@@ -162,6 +162,8 @@ func (one *door) answers(said call) (any, error) {
 		return Glob(one.db, ask)
 	case "find":
 		return Find(one.db, asked.Words, asked.Limit)
+	case "notes":
+		return Notes(one.db, asked.Words, asked.Limit)
 	case "links":
 		return Links(one.db, asked.Target)
 	case "dangling":
