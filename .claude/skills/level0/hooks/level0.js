@@ -55,6 +55,7 @@ import {
   toothOf,
 } from "../lib/stop.js";
 import { landsOnTrunk, touchesGit } from "../lib/trunk.js";
+import { MARKER, pairOf } from "../lib/vehicle.js";
 import { lintText } from "../lib/vale.js";
 
 const GUIDANCE = "spec/guidance";
@@ -225,7 +226,10 @@ export function register(on, _options) {
     }
 
     if (!found.length) {
-      judge = judgeOf(await judgeSettings(settings), await readRules($, JUDGED));
+      judge = judgeOf(
+        await judgeSettings(settings),
+        await readRules($, methodAt(cage.roots, JUDGED)),
+      );
       if (judge.reads()) {
         door = "judge";
         found.push(
@@ -558,6 +562,8 @@ async function loadCage($, cage) {
   const faults = [];
 
   cage.root = await rootHere($);
+  // [[spec/design_output/vehicle#one-tree-drives-itself]]
+  cage.roots = pairOf(await methodUp($, cage.root), cage.root);
   cage.settings = configHere($);
   cage.judge = judgeOf(await judgeSettings(cage.settings));
   cage.tooth = toothOf({ mostInARow: await cage.settings.ask("stop.mostInARow") });
@@ -580,7 +586,7 @@ async function loadCage($, cage) {
   if (!cage.bin) faults.push("no vale stands here, so no voice rule reads a write");
   cage.formatter = await toolHere($, known, "biome");
 
-  const guidance = await readGuidance($);
+  const guidance = await readGuidance($, cage.roots);
   cage.standing = guidance.said;
   cage.sentence = canary({
     rules: guidance.rules,
@@ -590,7 +596,7 @@ async function loadCage($, cage) {
   if (!cage.standing) faults.push(`${GUIDANCE} hands over nothing`);
 
   // [[spec/design_output/stop#where-the-rules-live]]
-  const pooled = pool(await readFolder($, RULES, ".yml"));
+  const pooled = pool(await readFolder($, methodAt(cage.roots, RULES), ".yml"));
   cage.rules = pooled.rules;
   for (const name of pooled.broken) {
     await cage.logbook.say("warn", "stop", `${name} carries a rule nobody can read`, {
@@ -633,6 +639,30 @@ async function ensureCage($, cage) {
     });
   }
   return cage.health;
+}
+
+// [[spec/design_output/vehicle#a-marker-names-the-root]]
+async function methodUp($, work) {
+  let here = String(work ?? "")
+    .split("\\")
+    .join("/")
+    .replace(/\/+$/, "");
+  while (here) {
+    try {
+      if (await $.fs.exists(`${here}/${MARKER}`)) return here;
+    } catch {
+      return "";
+    }
+    const up = here.slice(0, here.lastIndexOf("/"));
+    if (!up || up === here) return "";
+    here = up;
+  }
+  return "";
+}
+
+// [[spec/design_output/vehicle#one-tree-drives-itself]]
+function methodAt(roots, path) {
+  return roots?.itself === false ? `${roots.method}/${path}` : path;
 }
 
 // [[spec/design_output/level0#the-path-a-rule-reads]]
@@ -868,11 +898,11 @@ async function erase($, path) {
 }
 
 // [[spec/design_output/level0#guidance-a-variable-switches-on]]
-async function readGuidance($) {
+async function readGuidance($, roots) {
   try {
     const notes = [];
     const wanted = new Set();
-    for (const one of await readFolder($, GUIDANCE, ".md")) {
+    for (const one of await readFolder($, methodAt(roots, GUIDANCE), ".md")) {
       notes.push(one);
       for (const name of envOf(one.text)) wanted.add(name);
     }
