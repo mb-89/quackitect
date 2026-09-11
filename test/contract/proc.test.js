@@ -52,3 +52,10 @@ test("the real door hands standard input to the program", () => {
   );
   assert.equal(said.stdout, "back");
 });
+
+test("a run carries the environment a caller hands it", () => {
+  const said = proc().run(["node", "-e", "process.stdout.write(process.env.SE_PROBE ?? '')"], {
+    env: { ...process.env, SE_PROBE: "carried" },
+  });
+  assert.equal(said.stdout, "carried");
+});

@@ -100,6 +100,40 @@ take its own first step.
 the next start asks again. An identity the register cannot place is a fact
 about this machine: the copy stands somewhere else.
 
+## A project borrows its cage
+
+A project holds its own work and none of the method. `RUNME drive` writes two
+things into it, and both belong in its ignore file:
+
+| what lands | what it is |
+|---|---|
+| `.se/project.json` | the identity of the copy driving it |
+| `.claude/skills/level0` | a link into the vehicle, so the harness finds the cage |
+
+It adds those two lines to `.gitignore` and writes nothing else. No `spec`, no
+`src`, no launcher, no readme. A folder of Python scripts stays a folder of
+Python scripts, and the scripts run as they always run. The vehicle is what the
+*development* of that project needs.
+
+The link is what lets the editor's agent load the rules at all: the harness
+scans the folder it opens. A terminal reaches the same cage with
+`claude --plugin-dir <vehicle>/.claude/skills/level0`, which writes nothing.
+
+A driver named in `.se/project.json` answers before the walk does. The link
+puts the marker inside the project, so a walk alone would read the project as
+its own method root and drive nothing.
+
+## The layer that answers
+
+`RUNME resolve <path>` names the root a file comes out of, and what it stands
+over:
+
+    work    /work/spec/guidance/voice.md
+      over  /vehicle/spec/guidance/voice.md
+
+A path the project stays silent about answers `method`. A path in neither root
+answers nothing, which is a thing a caller reports and stops on.
+
 ## The register places an identity
 
 Every copy writes itself into `~/.se/registry.json`, or into each folder

@@ -5,12 +5,15 @@ export function fakeDisk(seed = {}) {
   const files = new Map(Object.entries(seed).map(([at, said]) => [norm(at), said]));
   const folders = new Set();
   const runs = new Set();
+  const links = new Map();
   let made = 0;
 
   return {
     files,
     runs,
+    links,
     runnable: (path) => void runs.add(norm(path)),
+    link: (from, to) => void links.set(norm(to), norm(from)),
     tempDir(prefix = "tmp") {
       made++;
       const at = `/tmp/${prefix}${made}`;

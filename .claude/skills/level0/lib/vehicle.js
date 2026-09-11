@@ -7,6 +7,8 @@ export const COPY = ".se/copy.json";
 export const PROJECT = ".se/project.json";
 export const REGISTER = "registry.json";
 export const MARKER = ".claude/skills/level0/.claude-plugin/plugin.json";
+export const CAGE = ".claude/skills/level0";
+export const IGNORED = [".se/", ".claude/skills/level0"];
 
 // [[spec/design_output/vehicle#what-travels-into-a-copy]]
 export const LEFT = [".git", ".se", "node_modules", "_to_delete"];
@@ -68,6 +70,17 @@ export function travels(rel) {
   const said = String(rel ?? "").split("\\").join("/");
   if (!said || said === ".") return false;
   return !LEFT.includes(said.split("/")[0]);
+}
+
+// [[spec/design_output/vehicle#a-project-borrows-its-cage]]
+export function ignores(read) {
+  const lines = String(read ?? "").split(/\r?\n/);
+  const wanted = IGNORED.filter((one) => !lines.includes(one));
+  if (!wanted.length) return "";
+
+  const held = String(read ?? "");
+  const under = held && !held.endsWith("\n") ? `${held}\n` : held;
+  return `${under}${wanted.join("\n")}\n`;
 }
 
 // [[spec/design_output/vehicle#one-tree-drives-itself]]

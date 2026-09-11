@@ -1,7 +1,7 @@
 // The command line. RUNME hands every argument through untouched, and every
 // verb here calls the same checkers the write door calls.
 
-import { dirname, join, relative, resolve, sep } from "node:path";
+import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   bindsHere,
@@ -46,24 +46,39 @@ import { git } from "../doors/git.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { readTools, whereIs, writeSurvey } from "./tools.js";
+import { entryOf } from "../../.claude/skills/level0/lib/vehicle.js";
 import {
+  answersFor,
   attach,
+  copyHere,
   detach,
   entryFor,
   produce,
   registerCopy,
   readRegister,
   rootsHere,
+  stub,
 } from "./vehicle.js";
 import { work } from "./work.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 
+// [[spec/design_output/vehicle#one-tree-drives-itself]]
+const here = workRoot();
+
+function workRoot() {
+  const said = process.env.SE_WORK;
+  if (said) return said;
+  const cwd = process.cwd();
+  const under = relative(root, cwd);
+  return !under || (!under.startsWith("..") && !isAbsolute(under)) ? root : cwd;
+}
+
 // [[spec/design_output/vehicle#the-work-root-inherits]]
 function atRoot(path) {
   const said = String(path ?? "");
-  return said.startsWith("/") || /^[A-Za-z]:/.test(said) ? said : join(root, said);
+  return isAbsolute(said) ? said : join(here, said);
 }
 
 // [[spec/design_output/config#the-resolver-holds-the-layers]]
@@ -83,7 +98,7 @@ async function doorsHere() {
   const outside = proc();
   const files = disk();
   const time = clock();
-  const said = configHere(files, rootsHere(files, process.env, root));
+  const said = configHere(files, rootsHere(files, process.env, here));
   return {
     proc: outside,
     disk: files,
@@ -187,6 +202,14 @@ const verbs = {
     says: "this copy, the project it drives, and a copy made elsewhere",
     run: async () => theVehicle(rest),
   },
+  drive: {
+    says: "make a folder a project this copy drives",
+    run: async () => theDriven(rest),
+  },
+  resolve: {
+    says: "which root answers a path, and what it stands over",
+    run: async () => theLayer(rest),
+  },
   notes: {
     says: "the notes the words belong to, ranked by name and body",
     run: async () => asksIndex(["notes", ...rest]),
@@ -220,7 +243,7 @@ process.exit((await verbs[verb].run(where.length ? where : ["."])) ?? 0);
 function theVehicle(argv) {
   const env = process.env;
   const said = argv[0] ?? "here";
-  const pair = rootsHere(files, env, root);
+  const pair = rootsHere(files, env, here);
   const made = entryFor(files, it.clock, env, pair.method, version());
 
   if (said === "produce" || said === "into") {
@@ -234,8 +257,13 @@ function theVehicle(argv) {
       console.error(put.why);
       return 1;
     }
+
+    // [[spec/design_output/vehicle#a-vehicle-stands-alone]]
+    const born = copyHere(files, it.clock, dest);
+    registerCopy(files, env, entryOf(born, version(), dest, it.clock.stamp()));
     console.log(`${put.count} file(s) copied into ${dest}.`);
-    console.log("It makes its own identity the first time it runs.");
+    console.log(`It stands as ${born}, and the register names it.`);
+    console.log("Run RUNME there once: it surveys the tools and builds what it needs.");
     return 0;
   }
   if (said === "attach") {
@@ -269,6 +297,63 @@ function version() {
   } catch {
     return "0";
   }
+}
+
+// [[spec/design_output/vehicle#a-project-borrows-its-cage]]
+function theDriven(argv) {
+  const env = process.env;
+  const dest = argv.find((one) => !one.startsWith("--")) ?? here;
+  const from = named(argv, "--from");
+
+  const list = readRegister(files, env);
+  const method = whichVehicle(list, from);
+  if (!method) {
+    console.error(from ? `no copy answers to ${from}.` : "say which copy drives it: --from <id or folder>");
+    for (const one of list) console.error(`  ${one.id}  ${one.version}  ${one.method_root}`);
+    return list.length ? 2 : 1;
+  }
+
+  const born = copyHere(files, it.clock, method);
+  const made = stub(files, it.clock, method, dest, born);
+  if (!made.ok) {
+    console.error(made.why);
+    return 1;
+  }
+  console.log(`${dest} is a project that ${born} drives.`);
+  for (const one of made.made) console.log(`  ${one}`);
+  console.log("Open it in the editor: the cage links back, and nothing else of the method lands here.");
+  return 0;
+}
+
+function whichVehicle(list, from) {
+  if (!from) return list.length === 1 ? list[0].method_root : "";
+  const byId = list.find((one) => one.id === from);
+  if (byId) return byId.method_root;
+  return files.exists(join(from, ".claude/skills/level0/.claude-plugin/plugin.json")) ? from : "";
+}
+
+function named(argv, flag) {
+  const at = argv.indexOf(flag);
+  return at >= 0 ? (argv[at + 1] ?? "") : "";
+}
+
+// [[spec/design_output/vehicle#the-layer-that-answers]]
+function theLayer(argv) {
+  const path = argv.find((one) => !one.startsWith("--"));
+  if (!path) {
+    console.error("se resolve <path>: name a path relative to the tree.");
+    return 2;
+  }
+
+  const pair = rootsHere(files, process.env, here);
+  const said = answersFor(files, pair, path);
+  if (!said) {
+    console.error(`${path} stands in neither root.`);
+    return 1;
+  }
+  console.log(`${said.layer}  ${said.at}`);
+  if (said.over) console.log(`  over  ${said.over}`);
+  return 0;
 }
 
 // [[spec/design_output/index#the-door-owns-the-database]]

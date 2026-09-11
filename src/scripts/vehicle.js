@@ -5,10 +5,12 @@
 import { join } from "node:path";
 import {
   attaches,
+  CAGE,
   COPY,
   copyOf,
   drivenOf,
   entryOf,
+  ignores,
   MARKER,
   onlyCopy,
   pairOf,
@@ -34,6 +36,8 @@ export function methodRootFrom(files, start) {
 
 // [[spec/design_output/vehicle#three-things-a-copy-needs]]
 export function copyHere(files, time, method) {
+  if (!files.exists(join(method, MARKER))) return "";
+
   const at = join(method, COPY);
   const said = copyOf(readIf(files, at), idOf(time), time.stamp());
   if (said.made) {
@@ -93,15 +97,60 @@ export function detach(files, work) {
   files.remove(join(work, PROJECT));
 }
 
+// [[spec/design_output/vehicle#a-project-borrows-its-cage]]
+export function stub(files, time, method, dest, id) {
+  if (!files.exists(join(method, MARKER))) {
+    return { ok: false, why: `${method} carries no method, so it drives nothing` };
+  }
+
+  const made = [];
+  files.makeDir(join(dest, ".se"));
+  files.remove(join(dest, COPY));
+  attach(files, time, dest, id);
+  made.push(PROJECT);
+
+  const at = join(dest, CAGE);
+  if (!files.exists(at)) {
+    files.makeDir(join(dest, ".claude", "skills"));
+    try {
+      files.link(join(method, CAGE), at);
+      made.push(CAGE);
+    } catch (bad) {
+      return { ok: false, why: `the cage would not link: ${bad?.message ?? bad}`, made };
+    }
+  }
+
+  const said = ignores(readIf(files, join(dest, ".gitignore")));
+  if (said) {
+    files.write(join(dest, ".gitignore"), said);
+    made.push(".gitignore");
+  }
+  return { ok: true, made };
+}
+
+// [[spec/design_output/vehicle#the-layer-that-answers]]
+export function answersFor(files, pair, path) {
+  const work = join(pair.work, path);
+  const method = join(pair.method, path);
+  if (pair.itself) return files.exists(work) ? { layer: "this tree", at: work } : null;
+
+  if (files.exists(work)) {
+    return { layer: "work", at: work, over: files.exists(method) ? method : "" };
+  }
+  if (files.exists(method)) return { layer: "method", at: method, over: "" };
+  return null;
+}
+
 // [[spec/design_output/vehicle#one-tree-drives-itself]]
 export function rootsHere(files, env, work) {
-  const here = methodRootFrom(files, work);
-  if (here) return pairOf(here, work);
-
   const list = readRegister(files, env);
   const driven = drivenOf(readIf(files, join(work, PROJECT)));
   const named = driven ? resolves(list, driven.driver) : "";
-  return pairOf(named || onlyCopy(list), work);
+  if (named) return pairOf(named, work);
+
+  const up = methodRootFrom(files, work);
+  if (up) return pairOf(up, work);
+  return pairOf(onlyCopy(list), work);
 }
 
 // [[spec/design_output/vehicle#what-travels-into-a-copy]]
