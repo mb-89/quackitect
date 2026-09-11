@@ -8,7 +8,7 @@ explains: [[spec/design_output/apply]]
 Every rule in the write tools has a price behind it. v4 and v3 both carried an
 applier, and the shape they reached came out of work they lost on the way.
 
-# The journal came second
+## 1. The journal came second
 
 The first applier wrote the file and kept nothing else. `.se` sits outside git.
 So a file the engine overwrote went for good, unless a later apply happened to
@@ -28,7 +28,7 @@ The journal also moved in front of the write. A journal nobody could write used
 to leave a bulk edit nobody could undo. That is the incident the whole thing
 exists to prevent.
 
-# The entry had no owner
+## 2. The entry had no owner
 
 The folder held a bare list of files. The undo took the newest list in it,
 whoever had written it. One agent on a tree misses that for years.
@@ -41,7 +41,7 @@ Measured once, on that tree: an undo named on one token restored a file
 belonging to another actor's token. The newer content went for good, both files
 being untracked.
 
-# Two answers on line endings
+## 3. Two answers on line endings
 
 v3's patch applied a CRLF or LF mismatch in the file's own endings, and named
 the correction on the result. v4 went the other way and stayed byte-exact,
@@ -50,7 +50,7 @@ because the edit says which bytes to replace.
 The owner chose v4's answer for v5, working on Windows, where the question
 bites hardest. A silent correction is a write nobody asked for.
 
-# Preview became optional
+## 4. Preview became optional
 
 v3 made `preview: true` the first call of any sweep, and read the blast radius
 back before it wrote. That was the safety net where there was nothing to undo

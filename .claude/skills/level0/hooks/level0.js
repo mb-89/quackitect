@@ -59,6 +59,14 @@ import {
 import { refusal, refusedCommand, taught } from "../lib/refuse.js";
 import { readerAsks, readerSays, report, reviewSpec } from "../lib/review.js";
 import { readRule } from "../lib/rulefile.js";
+import {
+  checkNote,
+  END as SCHEMA_END,
+  kindOf,
+  refusedNote,
+  SCHEMAS,
+  schemasFrom,
+} from "../lib/schema.js";
 import { guesses, pathOf, surveyOf, TOOLS } from "../lib/tools.js";
 import {
   claimSpec,
@@ -105,6 +113,7 @@ export function register(on, _options) {
   const seen = { ask: QUIET, hold: "running" };
   let root = "";
   let projections = [];
+  let schemas = new Map();
   const list = todos();
   let tooth = toothOf();
 
@@ -153,6 +162,9 @@ export function register(on, _options) {
     for (const fault of await settings.faults()) {
       await logbook.say("warn", "config", fault, { file: TRACKED });
     }
+
+    // [[spec/design_output/schema#the-door-refuses-a-departure]]
+    schemas = schemasFrom(await readFolder($, cage.roots, SCHEMAS, SCHEMA_END));
 
     // [[spec/design_output/projection#who-projects-and-when]]
     projections = entriesIn(await inherited($, cage.roots, PROJECTIONS));
@@ -252,6 +264,22 @@ export function register(on, _options) {
 
     // [[spec/design_output/schema#the-underscore-parks-a-draft]]
     if (isDraft(where)) return onward(e);
+
+    // [[spec/design_output/schema#the-door-refuses-a-departure]]
+    if (where.endsWith(".md")) {
+      const whole = await wholeAfter($, e, writing);
+      const kind = kindOf(whole);
+      const schema = schemas.get(kind);
+      const found = schema ? checkNote(whole, schema, where) : [];
+      if (found.length) {
+        await logbook.say("warn", "schema", `refused ${found.length} line(s) in ${where}`, {
+          file: where,
+          rule: found[0]?.rule,
+          tool: e.tool,
+        });
+        return { deny: refusedNote(where, kind, found) };
+      }
+    }
 
     if (CODE.test(writing.path)) {
       return await codeDoor($, e, onward, writing, formatter, logbook, root);
@@ -1402,6 +1430,26 @@ function wouldLand(took) {
   return [`${took.files.length} file(s) would change, and nothing is written.`, ...rows].join(
     "\n",
   );
+}
+
+// [[spec/design_output/schema#the-door-refuses-a-departure]]
+async function wholeAfter($, e, writing) {
+  if (e.tool === "Write") return writing.text;
+  let was = "";
+  try {
+    was = String(await $.fs.read(writing.path));
+  } catch {
+    return writing.text;
+  }
+  const edits = e.tool === "MultiEdit" && Array.isArray(e.edits) ? e.edits : [e];
+  let text = was;
+  for (const one of edits) {
+    const from = String(one?.old_string ?? "");
+    const to = String(one?.new_string ?? "");
+    if (!from) continue;
+    text = one?.replace_all ? text.split(from).join(to) : text.replace(from, () => to);
+  }
+  return text;
 }
 
 function asWrite(e) {

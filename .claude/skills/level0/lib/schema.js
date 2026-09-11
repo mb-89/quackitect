@@ -5,7 +5,7 @@
 
 export const SCHEMAS = "spec/schemas";
 export const END = ".schema.yaml";
-export const SEVERITY = "warning";
+export const SEVERITY = "error";
 
 const HEADING = /^(#{1,6})\s+(.+?)\s*$/;
 const FENCE = /^\s*(```|~~~)/;
@@ -437,6 +437,26 @@ export function schemaFaults(tree) {
     out.push(...checkNote(text, schema, path));
   }
   return out;
+}
+
+// [[spec/design_output/schema#the-door-refuses-a-departure]]
+export function schemasFrom(files) {
+  const out = new Map();
+  for (const one of files ?? []) {
+    const said = readYaml(one.text);
+    if (said?.kind) out.set(String(said.kind), said);
+  }
+  return out;
+}
+
+export function refusedNote(where, kind, found) {
+  return [
+    `The ${kind} schema refuses this write to ${where}.`,
+    "",
+    ...found.map((one) => `  ${where}:${one.line}:${one.column}  ${one.rule}\n    ${one.message}`),
+    "",
+    `Run ./RUNME.sh mint ${kind} <path> for the shape it names, or park a draft as _name.md.`,
+  ].join("\n");
 }
 
 // [[spec/design_output/schema#mint-writes-a-valid-note]]

@@ -567,6 +567,80 @@ test("out of god mode the same refusal stands", async () => {
   assert.equal(it.lines().filter((one) => one.kind === "god").length, 0);
 });
 
+const NOTE_SCHEMA = [
+  "kind: design_output",
+  "",
+  "frontmatter:",
+  "  type: object",
+  "  required:",
+  "    - kind",
+  "  properties:",
+  "    kind:",
+  "      const: design_output",
+  "      x-link: true",
+  "",
+  "body:",
+  "  headingLevel: 1",
+  "  sections:",
+  "    - header: Scope",
+  "      required: true",
+  "",
+].join("\n");
+
+const SHAPED = "---\nkind: [[design_output]]\n---\n\n# Scope\n\nThis note covers one thing.\n";
+const SHAPELESS = "---\nkind: [[design_output]]\n---\n\n# Something else\n\nNo scope here.\n";
+
+// [[spec/design_output/schema#the-door-refuses-a-departure]]
+test("the door refuses a note departing from its schema, and names the fix", async () => {
+  const it = await started({ "spec/schemas/design_output.schema.yaml": NOTE_SCHEMA });
+  const said = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/design_output/door.md",
+    content: SHAPELESS,
+  });
+  assert.match(said.deny ?? "", /^The design_output schema refuses this write to spec\/design_output\/door\.md\./);
+  assert.match(said.deny, /Schema\.Scope/);
+  assert.match(said.deny, /\.\/RUNME\.sh mint design_output <path>/);
+  assert.ok(it.lines().some((one) => one.kind === "schema"));
+});
+
+test("a note meeting its schema passes, and so does a draft", async () => {
+  const it = await started({ "spec/schemas/design_output.schema.yaml": NOTE_SCHEMA });
+  const shaped = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/design_output/door.md",
+    content: SHAPED,
+  });
+  assert.equal(shaped.deny, undefined);
+  const draft = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/design_output/_door.md",
+    content: SHAPELESS,
+  });
+  assert.equal(draft.deny, undefined);
+});
+
+test("an edit is weighed as the whole file it leaves behind", async () => {
+  const it = await started({
+    "spec/schemas/design_output.schema.yaml": NOTE_SCHEMA,
+    "spec/design_output/door.md": SHAPED,
+  });
+  const small = await it.raise("tool.call", {
+    tool: "Edit",
+    file_path: "spec/design_output/door.md",
+    old_string: "one thing",
+    new_string: "two things",
+  });
+  assert.equal(small.deny, undefined, "a fragment carrying no heading still leaves a shaped note");
+  const breaking = await it.raise("tool.call", {
+    tool: "Edit",
+    file_path: "spec/design_output/door.md",
+    old_string: "# Scope",
+    new_string: "# Elsewhere",
+  });
+  assert.match(breaking.deny ?? "", /Schema\.Scope/);
+});
+
 // [[spec/design_output/log#a-session-rotates-its-file]]
 test("a session start moves the last session into old, and starts the file fresh", async () => {
   const last = `${JSON.stringify({ at: "2026-09-10T08:00:00.000Z", level: "info", kind: "level0", said: "session start" })}\n`;

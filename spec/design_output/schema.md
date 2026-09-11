@@ -1,6 +1,5 @@
 ---
 kind: [[design_output]]
-describes: [[.claude/skills/level0/lib/schema.js]]
 ---
 
 # Scope
@@ -154,12 +153,18 @@ kind settles.
 A parked guidance note hands the agent no rule, because the same skip takes it
 out of the standing layer.
 
-# Warning now and error later
+# The door refuses a departure
 
-Every finding stands at `severity: warning`, which `SEVERITY` names in one
-place. So `./RUNME.sh lint` names each departure, the panel draws it, and
-`./RUNME.sh check` stays green while the notes catch up.
+Every note stands at its shape, so every finding stands at `severity: error`,
+which `SEVERITY` names in one place. `./RUNME.sh check` turns red on a
+departure.
 
-The next branch flips that constant and puts the checker at the write door.
-An `Edit` hands a whole-document rule the edited lines alone, so that door
-waits for a reader that holds the whole file.
+The write door weighs every markdown write against the schema its `kind` names.
+The schemas load once, at `session.start`. An `Edit` hands the door the edited
+lines alone, so `wholeAfter` reads the file and applies the edit first. The door
+then weighs the whole note it leaves behind.
+
+A departure stands refused, and the refusal names each finding and two ways on:
+
+- `./RUNME.sh mint <kind> <path>` writes the shape the schema names.
+- A draft named `_name.md` stands outside every rule while it settles.

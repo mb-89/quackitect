@@ -1,7 +1,12 @@
 ---
 kind: [[design_output]]
-describes: [[src/index]]
 ---
+
+# Scope
+
+`src/index` holds the index over this tree. This note covers the database, the
+watcher keeping it warm, and the questions it answers. For the argument, see
+[[spec/rationales/index]].
 
 # The index is warm
 

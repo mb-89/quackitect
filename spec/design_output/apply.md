@@ -1,8 +1,12 @@
 ---
 kind: [[design_output]]
-describes: [[.claude/skills/level0/lib/apply.js]]
-rationale: [[spec/rationales/apply]]
 ---
+
+# Scope
+
+`.claude/skills/level0/lib/apply.js` holds the write tools the agent calls. This
+note covers the tools and the journal behind them. For the argument, see
+[[spec/rationales/apply]].
 
 # The write tools
 

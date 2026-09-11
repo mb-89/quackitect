@@ -1,7 +1,11 @@
 ---
 kind: [[design_output]]
-describes: [[src/viewer/main.go]]
 ---
+
+# Scope
+
+`src/viewer` holds the log viewer. This note covers the window, its keys, the
+filter, and how a line arrives.
 
 # The viewer
 

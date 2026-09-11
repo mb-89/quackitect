@@ -17,7 +17,7 @@ v4 answered with three parts:
 | a project naming that identity | the project moving |
 | a register from identity to place | both, on any machine |
 
-# The guess was confident
+## 1. The guess was confident
 
 The method root used to be the folder two above the executable. That holds only
 where the program runs out of its own bin folder. Run from anywhere else, it
@@ -30,7 +30,7 @@ the temporary folder answer that folder as its method root.
 So the walk looks for a marker the method tree actually carries, and answers
 empty where there is none. Empty is a thing a caller reports and stops on.
 
-# Registering bought nothing
+## 2. Registering bought nothing
 
 v3 made a person register both roots by hand. v4 dropped that ceremony.
 

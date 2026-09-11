@@ -124,7 +124,8 @@ test("a note in the shape its schema names breaks no rule", () => {
   assert.deepEqual(found(good), []);
 });
 
-test("every finding carries the shape this tree prints, at warning", () => {
+// [[spec/design_output/schema#the-door-refuses-a-departure]]
+test("every finding carries the shape this tree prints, at error", () => {
   const one = found(swap("status: todo\n", ""))[0];
   assert.deepEqual(Object.keys(one).sort(), [
     "column",
@@ -137,11 +138,7 @@ test("every finding carries the shape this tree prints, at warning", () => {
   assert.equal(one.file, NOTE);
   assert.equal(one.column, 1);
   assert.equal(one.severity, SEVERITY);
-  assert.equal(
-    SEVERITY,
-    "warning",
-    "this branch names every departure and refuses none",
-  );
+  assert.equal(SEVERITY, "error", "every note stands at its shape, so a departure turns check red");
 });
 
 test("a note short of a required field is refused", () => {

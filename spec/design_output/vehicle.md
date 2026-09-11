@@ -1,8 +1,12 @@
 ---
 kind: [[design_output]]
-describes: [[src/scripts/vehicle.js]]
-rationale: [[spec/rationales/vehicle]]
 ---
+
+# Scope
+
+`src/scripts/vehicle.js` carries this tooling into another project. This note
+covers the copy, the project it drives, and the roots between them. For the
+argument, see [[spec/rationales/vehicle]].
 
 # A copy and its project
 
