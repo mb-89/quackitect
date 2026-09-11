@@ -173,14 +173,78 @@ get_vale_ls() {
   rm -rf "$tmp"
 }
 
+# THE EDITOR FINDS WHAT ITS OWN LIST NAMES, AND A LINKED FOLDER IS NOT ON IT.
+# So the link goes in beside an entry in extensions.json, and node writes that
+# file: it keeps every entry it cannot read and refuses a write losing an id.
+# The link points at the tree, so an edit draws without a second install.
+editor_folder="$HOME/.vscode/extensions"
+
+editor_names() {
+  (cd "$root" && node -e \
+    "const p=require('./src/extension/package.json');
+     process.stdout.write(p.publisher + '.' + p.name + ' ' + p.version);") 2>/dev/null
+}
+
+editor_linked() {
+  [ -d "$editor_folder" ] || return 0
+  set -- $(editor_names)
+  [ -n "${1:-}" ] && [ -n "${2:-}" ] || return 1
+  [ -f "$editor_folder/$1-$2/package.json" ] || return 1
+  grep -q "\"$1\"" "$editor_folder/extensions.json" 2>/dev/null
+}
+
+link_editor() {
+  [ -d "$editor_folder" ] || return 0
+  set -- $(editor_names)
+  [ -n "${1:-}" ] && [ -n "${2:-}" ] || return 1
+  dest="$editor_folder/$1-$2"
+  case "$dest" in *"/.vscode/extensions/"*) ;; *) return 1 ;; esac
+
+  say "  linking the sidebar at $dest"
+  rm -rf "$dest"
+  ln -s "$root/src/extension" "$dest" 2>/dev/null ||
+    cp -R "$root/src/extension" "$dest" || return 1
+  [ -f "$dest/package.json" ] || return 1
+  (cd "$root" && node src/scripts/editor.js) || return 1
+}
+
+# The two the tracked settings point at. servers.js holds the ids, so the shell
+# names none of its own and one list serves the editor and the recommendation.
+extension_ids() {
+  (cd "$root" && node --input-type=module -e \
+    "import { EXTENSIONS } from './.claude/skills/level0/lib/servers.js';
+     process.stdout.write(EXTENSIONS.join('\n'));") 2>/dev/null
+}
+
+extensions_here() {
+  have code || return 0
+  listed=$(code --list-extensions 2>/dev/null) || return 1
+  for id in $(extension_ids); do
+    printf '%s\n' "$listed" | grep -qix "$id" || return 1
+  done
+}
+
+get_extensions() {
+  have code || return 0
+  for id in $(extension_ids); do
+    say "  installing $id"
+    code --install-extension "$id" --force >/dev/null 2>&1 || return 1
+  done
+}
+
 # A want, rather than a need: the tree still lints and tests without it.
-wanted() { [ "$1" = "vale-ls" ] || [ "$1" = "lnav" ] || [ "$1" = "lnav-format" ]; }
+wanted() {
+  [ "$1" = "vale-ls" ] || [ "$1" = "lnav" ] || [ "$1" = "lnav-format" ] ||
+    [ "$1" = "editor-link" ] || [ "$1" = "editor-extensions" ]
+}
 
 missed() {
   case $1 in
     vale-ls) say "  vale-ls stays missing, so the editor manages its own copy." >&2 ;;
     lnav)    say "  lnav stays missing, so ./RUNME.sh log prints plain rows." >&2 ;;
     lnav-format) say "  lnav reads its own format, so the log shows as raw JSON." >&2 ;;
+    editor-link) say "  the sidebar stays unlinked, so the editor draws no panel here." >&2 ;;
+    editor-extensions) say "  no code on the PATH, so a person takes the recommendation." >&2 ;;
   esac
 }
 
@@ -192,6 +256,8 @@ here() {
     vale-ls) [ -x "$bin/vale-ls${exe}" ] ;;
     lnav)    [ -x "$bin/lnav${exe}" ] || have lnav ;;
     lnav-format) [ -f "$bin/.lnav-reads-this-tree" ] ;;
+    editor-link) editor_linked ;;
+    editor-extensions) extensions_here ;;
   esac
 }
 
@@ -203,6 +269,8 @@ why() {
     vale-ls) say "vale-ls: the Vale language server, so an editor draws the same rules" ;;
     lnav) say "lnav: the viewer ./RUNME.sh log opens the door log in" ;;
     lnav-format) say "lnav-format: the row format and the dark theme, which lnav keeps in its own folder" ;;
+    editor-link) say "editor-link: this tree's own sidebar, linked into the editor and named in its list" ;;
+    editor-extensions) say "editor-extensions: the Vale and Biome extensions the tracked settings point at" ;;
   esac
 }
 
@@ -214,11 +282,13 @@ get() {
     vale-ls) get_vale_ls ;;
     lnav) get_lnav ;;
     lnav-format) format_lnav ;;
+    editor-link) link_editor ;;
+    editor-extensions) get_extensions ;;
   esac
 }
 
 missing=""
-for one in node vale biome vale-ls lnav lnav-format; do
+for one in node vale biome vale-ls lnav lnav-format editor-link editor-extensions; do
   here "$one" || missing="$missing $one"
 done
 
