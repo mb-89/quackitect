@@ -1,6 +1,6 @@
 ---
 kind: [[rationale]]
-explains: [[spec/guidance/index]]
+explains: [[spec/design_output/index]]
 ---
 
 # Why a session asks first

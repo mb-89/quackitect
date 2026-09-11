@@ -1,6 +1,6 @@
 ---
 kind: [[rationale]]
-explains: [[spec/guidance/testing]]
+explains: [[spec/guidance/code/testing]]
 ---
 
 # Why

@@ -84,7 +84,7 @@ row the test runner writes, and the last lines of the run where it writes none.
 
 # The five questions
 
-They live in `spec/guidance/reviewing.md`, written as actionables the way every
+They live in `spec/guidance/review/reviewing.md`, written as actionables the way every
 other guidance note is. Level zero hands them to every session, so the reader
 gets them inside the standing layer and the prompt names no rule twice.
 

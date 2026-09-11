@@ -80,12 +80,40 @@ The write door hands these two answers back to the agent in place of the tools
 that walk a disk. Where a search asks for something these rows hold no answer
 for, the door says so and the disk answers instead.
 
-A question arriving after the watcher saw the tree move sweeps first. So a
+A question arriving after the watcher sees the tree move sweeps first. So a
 search after a write reads the write, and a caller meets one truth.
+
+## The door answers the tools
+
+The write door takes a `Grep` or a `Glob` before it runs and asks the index
+instead. The agent reads the same shape it always reads, and learns nothing
+about which side answers. So a session searches this tree hundreds of
+times and walks the disk none of them.
+
+The hook reaches the door the way every caller reaches it, through the binary
+in `.se/bin`. A generic `call` verb carries the question as JSON, so the hook
+holds no second copy of the protocol. The session's start puts the door up
+without waiting, which leaves the first question warm.
+
+## Where the disk still answers
+
+The index answers where it answers faithfully, and stands aside everywhere
+else. These send the question back to the tool:
+
+| what stands | why the disk answers |
+|---|---|
+| a path outside this tree | the rows hold this tree alone |
+| `multiline`, a `type` filter, `-o` | the rows hold no answer of that shape |
+| a pattern Go declines to compile | a wrong answer costs more than a walk |
+| no index stands here | a tree with no door still works |
+| any error from the door | the same reason |
+
+A single-file `Read` goes to the disk always. A search reading a file a moment
+late costs a repeat; an edit built on text a moment late costs the edit.
 
 ## A glob becomes a pattern
 
-The tools hand patterns shaped like `**/*.js`, and the rows hold paths with
+The tools hand patterns like `**/*.js`, and the rows hold paths with
 slashes. One translation turns a glob into an anchored regexp:
 
 | shape | what it means |

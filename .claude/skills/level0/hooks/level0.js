@@ -19,6 +19,7 @@ import {
   standingLayer,
 } from "../lib/guidance.js";
 import { godMode, HEALTH, repairs } from "../lib/health.js";
+import { asked, BIN, readsAnswer, said as saidOf } from "../lib/index.js";
 import { judgeOf } from "../lib/judge.js";
 import { aimOf, asLines, FOLDER, nameOf, rowOf, writes } from "../lib/log.js";
 import { relativeTo } from "../lib/paths.js";
@@ -45,7 +46,7 @@ import {
   toothOf,
 } from "../lib/stop.js";
 import { landsOnTrunk, touchesGit } from "../lib/trunk.js";
-import { lintText, PROSE } from "../lib/vale.js";
+import { lintText } from "../lib/vale.js";
 
 const GUIDANCE = "spec/guidance";
 const COMMIT = "level0-commit.md";
@@ -137,6 +138,9 @@ export function register(on, _options) {
       }
     }
 
+    // [[spec/design_output/index#the-door-answers-the-tools]]
+    warms($, root);
+
     await $.tool.register(claimSpec(rules));
     await $.tool.register(reviewSpec());
     return next(e);
@@ -195,7 +199,6 @@ export function register(on, _options) {
     if (CODE.test(writing.path)) {
       return await codeDoor($, e, next, writing, formatter, logbook, root);
     }
-    if (!PROSE.test(writing.path)) return next(e);
 
     const where = relativeTo(root, writing.path);
     const found = [];
@@ -277,6 +280,27 @@ export function register(on, _options) {
     });
     return { deny: refusedCommand(said, found) };
   });
+
+  // [[spec/design_output/index#the-door-answers-the-tools]]
+  for (const tool of ["Grep", "Glob"]) {
+    on("tool.call", { tool }, async ($, e, next) => {
+      const ask = asked(e);
+      if (!ask || !root) return next(e);
+
+      const where = relativeTo(root, String(e.path ?? ""));
+      if (/^([A-Za-z]:)?[\\/]/.test(where)) return next(e);
+      ask.params.path = where;
+
+      const answer = await askIndex($, root, ask);
+      if (!answer) return next(e);
+
+      await logbook.say("info", "index", `${ask.method} reads the rows`, {
+        tool,
+        detail: String(e.pattern ?? "").slice(0, 120),
+      });
+      return { result: saidOf(e, answer) };
+    });
+  }
 
   // [[spec/design_output/bash#the-description-names-verbs]]
   on("tool.describe", { tool: "Bash" }, async (_$, e, next) => {
@@ -935,6 +959,46 @@ async function install($) {
     } catch {}
   }
   return false;
+}
+
+// [[spec/design_output/index#the-door-answers-the-tools]]
+async function whereIsIndex($, root) {
+  for (const at of [`${root}/${BIN}`, `${root}/${BIN}.exe`]) {
+    try {
+      if (await $.fs.exists(at)) return at;
+    } catch {
+      return "";
+    }
+  }
+  return "";
+}
+
+// [[spec/design_output/index#the-door-answers-the-tools]]
+async function askIndex($, root, ask) {
+  const at = await whereIsIndex($, root);
+  if (!at) return null;
+
+  let ran;
+  try {
+    ran = await $.process.run([at, "call", ask.method, JSON.stringify(ask.params)], {
+      cwd: root,
+      timeoutMs: 20000,
+    });
+  } catch {
+    return null;
+  }
+  if (ran?.exitCode !== 0) return null;
+  return readsAnswer(ran.stdout);
+}
+
+// [[spec/design_output/index#the-door-answers-the-tools]]
+function warms($, root) {
+  if (!root) return;
+  whereIsIndex($, root)
+    .then((at) =>
+      at ? $.process.run([at, "standing"], { cwd: root, timeoutMs: 60000 }) : null,
+    )
+    .catch(() => {});
 }
 
 function asWrite(e) {
