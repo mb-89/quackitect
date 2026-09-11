@@ -17,6 +17,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
@@ -47,6 +48,10 @@ type door struct {
 	guard sync.Mutex
 	dirty chan struct{}
 	eyes  *fsnotify.Watcher
+
+	// pending says the tree moved since the last sweep. A question arriving
+	// first sweeps before it answers, so a caller reads what it wrote.
+	pending atomic.Bool
 }
 
 func standingPath(root string) string {
@@ -105,6 +110,7 @@ func (one *door) stands(listen net.Listener) error {
 // Touched says the tree moved. The sweep that follows is one reindex however
 // many writes arrive, because a build touching a thousand files is one answer.
 func (one *door) Touched() {
+	one.pending.Store(true)
 	select {
 	case one.dirty <- struct{}{}:
 	default:
@@ -115,8 +121,16 @@ func (one *door) sweeps() {
 	for range one.dirty {
 		time.Sleep(200 * time.Millisecond) // the rest of a burst lands in this
 		one.guard.Lock()
-		Reindex(one.db, one.root)
+		one.settles()
 		one.guard.Unlock()
+	}
+}
+
+// settles brings the rows level with the tree where a watcher saw it move.
+// The guard stands around it, so one sweep runs at a time.
+func (one *door) settles() {
+	if one.pending.Swap(false) {
+		Reindex(one.db, one.root)
 	}
 }
 
@@ -129,6 +143,7 @@ func (one *door) took(w http.ResponseWriter, r *http.Request) {
 
 	one.guard.Lock()
 	defer one.guard.Unlock()
+	one.settles()
 
 	result, err := one.answers(said)
 	if err != nil {
@@ -150,6 +165,18 @@ func (one *door) answers(said call) (any, error) {
 	}
 
 	switch strings.ToLower(said.Method) {
+	case "grep":
+		var ask GrepAsk
+		if err := json.Unmarshal(said.Params, &ask); err != nil {
+			return nil, err
+		}
+		return Grep(one.db, ask)
+	case "glob":
+		var ask GlobAsk
+		if err := json.Unmarshal(said.Params, &ask); err != nil {
+			return nil, err
+		}
+		return Glob(one.db, ask)
 	case "find":
 		return Find(one.db, asked.Words, asked.Limit)
 	case "links":

@@ -21,7 +21,7 @@ import (
 func main() {
 	argv := os.Args[1:]
 	if len(argv) == 0 {
-		fmt.Fprintln(os.Stderr, "usage: se-index <serve|find|links|dangling|same|reindex|standing> [words]")
+		fmt.Fprintln(os.Stderr, "usage: se-index <serve|find|links|dangling|same|reindex|standing> [words]\n       se-index call <method> <json params>")
 		os.Exit(2)
 	}
 
@@ -120,22 +120,9 @@ func standingOf(root string) (Standing, error) {
 }
 
 func posts(standing Standing, argv []string) (answer, error) {
-	params := map[string]any{}
-	if len(argv) > 1 {
-		switch argv[0] {
-		case "find":
-			params["words"] = argv[1]
-			if len(argv) > 2 {
-				params["limit"], _ = strconv.Atoi(argv[2])
-			}
-		case "links":
-			params["target"] = argv[1]
-		case "same":
-			params["path"] = argv[1]
-		}
-	}
+	method, params := asked(argv)
 
-	body, err := json.Marshal(call{Method: argv[0], Params: asRaw(params), ID: 1})
+	body, err := json.Marshal(call{Method: method, Params: params, ID: 1})
 	if err != nil {
 		return answer{}, err
 	}
@@ -150,6 +137,36 @@ func posts(standing Standing, argv []string) (answer, error) {
 
 	var out answer
 	return out, json.NewDecoder(said.Body).Decode(&out)
+}
+
+// asked shapes one command line into a method and its parameters. The call
+// verb hands JSON straight through, which is what the write door asks with.
+func asked(argv []string) (string, json.RawMessage) {
+	if argv[0] == "call" {
+		if len(argv) < 2 {
+			return "", json.RawMessage("{}")
+		}
+		if len(argv) < 3 {
+			return argv[1], json.RawMessage("{}")
+		}
+		return argv[1], json.RawMessage(argv[2])
+	}
+
+	params := map[string]any{}
+	if len(argv) > 1 {
+		switch argv[0] {
+		case "find":
+			params["words"] = argv[1]
+			if len(argv) > 2 {
+				params["limit"], _ = strconv.Atoi(argv[2])
+			}
+		case "links":
+			params["target"] = argv[1]
+		case "same":
+			params["path"] = argv[1]
+		}
+	}
+	return argv[0], asRaw(params)
 }
 
 func asRaw(said map[string]any) json.RawMessage {

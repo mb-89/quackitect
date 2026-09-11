@@ -63,6 +63,41 @@ Each one is a walk the tree used to take:
 | `reindex` | the walk again, now |
 | `standing` | the root the door holds, and how many files it counts |
 
+## The search reads the rows
+
+Every text file keeps its whole body in `file.text`, so a pattern meets the
+tree in one warm process. The `grep` question compiles the pattern with Go's
+regexp engine, which is the engine ripgrep uses, and walks the bodies in path
+order. It answers each file, how many lines it carries, and those lines with
+the ones the caller asks for around them.
+
+| question | asks |
+|---|---|
+| `grep` | every line one pattern matches, with its neighbours |
+| `glob` | every path one glob names, the newest first |
+
+The write door hands these two answers back to the agent in place of the tools
+that walk a disk. Where a search asks for something these rows hold no answer
+for, the door says so and the disk answers instead.
+
+A question arriving after the watcher saw the tree move sweeps first. So a
+search after a write reads the write, and a caller meets one truth.
+
+## A glob becomes a pattern
+
+The tools hand patterns shaped like `**/*.js`, and the rows hold paths with
+slashes. One translation turns a glob into an anchored regexp:
+
+| shape | what it means |
+|---|---|
+| `**/` | any run of folders, or none |
+| `*` | anything inside one name |
+| `?` | one character inside a name |
+| `{a,b}` | either one |
+
+A glob carrying no slash reads as a name at any depth, which is what ripgrep
+answers for the same pattern.
+
 ## A note and its links
 
 A note is a markdown file carrying frontmatter between two rulers. Its keys

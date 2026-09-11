@@ -28,7 +28,8 @@ CREATE TABLE IF NOT EXISTS file (
   path  TEXT PRIMARY KEY,
   size  INTEGER NOT NULL,
   mtime INTEGER NOT NULL,
-  hash  TEXT NOT NULL
+  hash  TEXT NOT NULL,
+  text  TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS file_size_hash ON file (size, hash);
 CREATE TABLE IF NOT EXISTS note (
@@ -55,7 +56,7 @@ CREATE VIRTUAL TABLE IF NOT EXISTS line_text USING fts5 (path UNINDEXED, n UNIND
 
 // The version rides in meta beside the root. Either one disagreeing drops the
 // file, because an index built under another tree answers about that tree.
-const version = "1"
+const version = "2"
 
 // Skipped folders never reach the walk. .se holds the index itself, and the
 // rest carry what a tool wrote rather than what a person did.
@@ -188,18 +189,21 @@ func one(tx *sql.Tx, abs, rel string, info os.FileInfo) error {
 	}
 
 	sum := sha256.Sum256(body)
+	text := ""
+	if isText(body) {
+		text = string(body)
+	}
 	if _, err := tx.Exec(
-		`INSERT INTO file (path, size, mtime, hash) VALUES (?, ?, ?, ?)
+		`INSERT INTO file (path, size, mtime, hash, text) VALUES (?, ?, ?, ?, ?)
 		 ON CONFLICT (path) DO UPDATE SET size = excluded.size,
-		   mtime = excluded.mtime, hash = excluded.hash`,
-		rel, info.Size(), info.ModTime().UnixNano(), hex.EncodeToString(sum[:])); err != nil {
+		   mtime = excluded.mtime, hash = excluded.hash, text = excluded.text`,
+		rel, info.Size(), info.ModTime().UnixNano(), hex.EncodeToString(sum[:]), text); err != nil {
 		return err
 	}
 
-	if !isText(body) {
+	if text == "" {
 		return nil
 	}
-	text := string(body)
 	if err := lines(tx, rel, text); err != nil {
 		return err
 	}
