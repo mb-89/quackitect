@@ -77,11 +77,12 @@ function drawn(local = {}) {
   });
 }
 
-// [[spec/design_output/extension#a-mark-and-its-codepoints]]
-test("a mark stands in the declaration as codepoints, and draws as the emoji", () => {
+// [[spec/design_output/extension#a-mark-a-person-types]]
+test("a mark stands as the emoji a person types, and codepoints draw the same", () => {
+  assert.equal(markOf("✋\u{1F916}"), "✋\u{1F916}");
+  assert.equal(markOf("❌\u{1F517}\u{1F916}"), "❌\u{1F517}\u{1F916}");
   assert.equal(markOf("U+270B U+1F916"), "✋\u{1F916}");
   assert.equal(markOf(""), "");
-  assert.equal(markOf("the raised hand"), "");
 });
 
 test("every widget of a group draws, each in the cell the declaration names", () => {

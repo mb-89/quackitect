@@ -43,8 +43,7 @@ already carries the type and the options:
       "help": "What the session does when it reaches the end of a turn.",
       "widget": "toggle",
       "gesture": 5,
-      "icon": "the raised hand and the robot",
-      "at": "U+270B U+1F916",
+      "icon": "✋🤖",
       "group": "agent control",
       "row": 0, "column": 1, "rowSpan": 1, "colSpan": 1
     }
@@ -55,8 +54,7 @@ already carries the type and the options:
 | `group` | the section it draws in, and naming one draws it |
 | `row`, `column`, `rowSpan`, `colSpan` | where it sits in the grid |
 | `gesture` | the press count sending the far value |
-| `icon` | the mark, in words a search finds |
-| `at` | the same mark as codepoints |
+| `icon` | the mark the button wears |
 | `help` | the sentence a hover carries |
 | `unit` | the word standing beside an editor |
 | `runs` | what an action runs |
@@ -168,11 +166,24 @@ colour the page names, and refuses one standing outside the editor's own
 values. The light and dark classes come from the host, so a person changing
 theme moves the page with no redraw.
 
-## A mark and its codepoints
+## A mark a person types
 
-The declaration names a mark twice: `icon` in words, and `at` as codepoints.
-`markOf` turns `U+270B U+1F916` into the two characters. An emoji in a source
-file hides from a search, and the words beside it answer one.
+`icon` carries the emoji, as a person types them. One field says it, because two
+fields for one mark are two things to keep in step. A mark written the old way,
+as `U+270B`, draws the same character.
+
+The four buttons, and the one file naming them,
+`spec/config/level0.schema.json`:
+
+| key | `icon` | what it does |
+|---|---|---|
+| `log.open` | 📜 | runs `./RUNME.sh log`, which opens lnav in a terminal |
+| `stop.hold` | ✋🤖 | running, then finishing, and stops at five presses |
+| `ask.wanted` | ❓🤖 | quiet, then short, and the full report at five presses |
+| `engine.binding` | ❌🔗🤖 | the queue, then unbound, and god mode at five presses |
+
+A mark stands still. The button says the state by the colour it wears, and by
+the pulse it takes at the far end.
 
 ## The page carries a nonce
 
@@ -443,8 +454,8 @@ Where no log stands yet, the verb says so in one line and answers zero.
 ## A terminal opens on Windows
 
 A terminal opens on the shell the box prefers, which is PowerShell there, and
-that shell reads no `./RUNME.sh`. So the door hands it `.\RUNME.cmd` instead,
-which is the same doorway a person clicks.
+that shell reads no `./RUNME.sh`. So the door hands it `.\RUNME.ps1` instead,
+which is the doorway a person there already takes.
 
 # What stands open
 

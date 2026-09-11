@@ -58,9 +58,8 @@
           ],
           "help": "What the session does when it reaches the end of a turn.",
           "widget": "toggle",
-          "gesture": 2,
-          "icon": "the raised hand and the robot",
-          "at": "U+270B U+1F916",
+          "gesture": 5,
+          "icon": "✋🤖",
           "group": "agent control",
           "row": 0,
           "column": 1,
@@ -88,8 +87,7 @@
           "help": "What the owner wants said at the end of this turn.",
           "widget": "toggle",
           "gesture": 5,
-          "icon": "the question mark and the robot",
-          "at": "U+2753 U+1F916",
+          "icon": "❓🤖",
           "group": "agent control",
           "row": 0,
           "column": 2,
@@ -119,8 +117,7 @@
         "open": {
           "help": "Open the log in lnav, in a terminal beside the editor.",
           "widget": "action",
-          "icon": "the scroll",
-          "at": "U+1F4DC",
+          "icon": "📜",
           "group": "agent control",
           "row": 0,
           "column": 0,
@@ -133,7 +130,7 @@
             ":filter-in <regex> keep the lines matching, and :filter-out drops them",
             "q leave"
           ],
-          "reads": ".se/log"
+          "runs": "./RUNME.sh log"
         }
       }
     },
@@ -226,8 +223,7 @@
           "help": "Where the session takes its work from.",
           "widget": "toggle",
           "gesture": 5,
-          "icon": "the chain and the broken chain",
-          "at": "U+1F517, U+1F517 U+274C, U+1F916",
+          "icon": "❌🔗🤖",
           "group": "agent control",
           "row": 0,
           "column": 3,
@@ -244,8 +240,7 @@
           "help": "How far the session goes on its own.",
           "widget": "toggle",
           "gesture": 5,
-          "icon": "the rocket",
-          "at": "U+1F680"
+          "icon": "U+1F680"
         }
       }
     }

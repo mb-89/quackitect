@@ -70,7 +70,7 @@ function widget(cell) {
     ` data-options="${escaped((cell.options ?? []).join(" "))}"`,
     ` data-gesture="${escaped(cell.gesture ?? "")}"`,
     ` title="${escaped(hover(cell))}">`,
-    `<span class="mark">${escaped(markFor(cell))}</span>`,
+    `<span class="mark">${escaped(markOf(cell.icon))}</span>`,
     cell.widget === "status" ? `<span class="light ${escaped(cell.lit)}"></span>` : "",
     "</button>",
   ].join("");
@@ -87,17 +87,11 @@ function hover(cell) {
     .join("\n");
 }
 
-// [[spec/design_output/extension#a-mark-for-every-state]]
-function markFor(cell) {
-  const marks = String(cell.at ?? "").split(",");
-  if (marks.length < 2) return markOf(cell.at);
-  const at = (cell.options ?? []).indexOf(cell.value);
-  return markOf(marks[at < 0 ? 0 : at]);
-}
-
-// [[spec/design_output/extension#a-mark-and-its-codepoints]]
+// [[spec/design_output/extension#a-mark-a-person-types]]
 function markOf(at) {
-  return String(at ?? "")
+  const said = String(at ?? "");
+  if (!/U\+[0-9A-Fa-f]+/.test(said)) return said.split(/\s+/).join("");
+  return said
     .split(/\s+/)
     .filter((one) => /^U\+[0-9A-Fa-f]+$/.test(one))
     .map((one) => String.fromCodePoint(Number.parseInt(one.slice(2), 16)))
@@ -203,6 +197,7 @@ function placements(groups) {
 // [[spec/design_output/extension#the-editor-picks-the-colours]]
 function style(groups) {
   return [
+    "[hidden] { display: none !important; }",
     "body { font-family: var(--vscode-font-family); font-size: var(--vscode-font-size);",
     "  color: var(--vscode-foreground); padding: 0 4px; }",
     "summary { cursor: pointer; text-transform: lowercase;",

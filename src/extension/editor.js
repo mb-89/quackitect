@@ -78,7 +78,7 @@ function editorDoor(context) {
       if (!line) return;
       // [[spec/design_output/extension#a-terminal-opens-on-windows]]
       const said =
-        process.platform === "win32" ? line.replace(/^\.\/RUNME\.sh/, ".\\RUNME.cmd") : line;
+        process.platform === "win32" ? line.replace(/^\.\/RUNME\.sh/, ".\\RUNME.ps1") : line;
       const shell = vscode.window.createTerminal({
         name: NAME,
         cwd: folder.uri.fsPath,
