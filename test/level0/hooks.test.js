@@ -166,6 +166,23 @@ function valeSaying(found) {
   };
 }
 
+// [[spec/design_output/level0#the-gate-reads-the-answer]]
+function valeOnAnswer(found) {
+  return {
+    exists: (path) => path === VALE,
+    run: (argv) => {
+      const path = argv.find((one) => String(one).startsWith("--path="));
+      if (!path) return { exitCode: 0, stdout: "", stderr: "" };
+      const rows = path === "--path=level0-answer.md" ? found : [];
+      return {
+        exitCode: 0,
+        stdout: JSON.stringify({ [path.slice("--path=".length)]: rows }),
+        stderr: "",
+      };
+    },
+  };
+}
+
 const PAST = [
   {
     Check: "VoiceVale.PastTense",
@@ -188,12 +205,13 @@ test("a session start writes one line, and registers every tool", async () => {
   );
   assert.deepEqual(
     it.registered.map((one) => one.name),
-    ["claim_stop", "review_branch", "log", "patch", "replace", "undo"],
+    ["claim_stop", "check_answer", "review_branch", "log", "patch", "replace", "undo"],
   );
   assert.deepEqual(it.registered[0].inputSchema.properties.rule.enum, [
     "the-work-stands-complete",
   ]);
-  assert.deepEqual(it.registered[1].inputSchema.required, ["branch"]);
+  assert.deepEqual(it.registered[1].inputSchema.required, ["text"]);
+  assert.deepEqual(it.registered[2].inputSchema.required, ["branch"]);
 });
 
 // [[spec/design_output/log#what-a-tool-line-names]]
@@ -1131,4 +1149,96 @@ test("a target the box refuses writes one warning, and the rest still land", asy
     ["info 5 file(s) written", "warn the box refuses a target"],
   );
   assert.equal(said[1].file, ".claude/commands/se-config-log-level.md");
+});
+
+// The bands the gate reads. They stand beside the tracked defaults, so a test
+// naming a score names what the gate does with it.
+const BANDED = { "spec/config/level0.json": JSON.stringify({
+  judge: { enabled: false },
+  stop: { enabled: true, mostInARow: 3 },
+  log: { level: "info" },
+  answer: { warnAt: 5, ceiling: 15 },
+}) };
+
+const OVER = "word ".repeat(20).trim();
+const UNDER = "word ".repeat(100).trim();
+const CLEAN = "word ".repeat(400).trim();
+const DRAFT = "mcp__level0__check_answer";
+
+// [[spec/design_output/level0#the-re-prompt-over-the-ceiling]]
+test("an answer over the ceiling meets one re-prompt, and one alone", async () => {
+  const it = await started(BANDED, valeOnAnswer(PAST));
+  await it.raise("turn.complete", { ...answered, answer: OVER });
+
+  assert.equal(it.prompts.length, 1);
+  assert.match(it.prompts[0].text, /^The voice rules refuse this answer\. Write it again\./);
+  assert.match(it.prompts[0].text, /50 findings a thousand words/);
+  assert.match(it.prompts[0].text, /level0-answer\.md:1:7 {2}PastTense/);
+  assert.match(it.prompts[0].text, /Hold PastTense for the rest of this turn/);
+
+  await it.raise("turn.complete", { ...answered, answer: OVER });
+  assert.equal(it.prompts.length, 1, "a second turn end inside the turn submits nothing");
+
+  const gate = it.lines().filter((one) => one.kind === "answer");
+  assert.deepEqual(
+    gate.map((one) => one.said),
+    ["the gate reads rewrite", "the gate reads rewrite"],
+  );
+  assert.match(gate[0].detail, /^score=50 findings=1 inARow=1$/);
+});
+
+// [[spec/design_output/level0#the-carry-rides-the-next-prompt]]
+test("an answer under the ceiling rides the next prompt as one line", async () => {
+  const it = await started(BANDED, valeOnAnswer(PAST));
+  await it.raise("turn.complete", { ...answered, answer: UNDER });
+  assert.equal(it.prompts.length, 0);
+
+  const said = await it.raise("prompt.submit", {
+    text: "carry on",
+    origin: { kind: "composer" },
+  });
+  assert.match(said.text, /^carry on\n\nThe answer before this scored 10 findings a thousand words\./);
+  assert.equal(said.text.split("\n\n")[1].includes("\n"), false, "the carry is one line");
+
+  const again = await it.raise("prompt.submit", {
+    text: "carry on",
+    origin: { kind: "composer" },
+  });
+  assert.equal(again.text, "carry on", "the findings ride once");
+});
+
+// [[spec/design_output/level0#the-three-bands]]
+test("an answer under the warning meets nothing at all", async () => {
+  const it = await started(BANDED, valeOnAnswer(PAST));
+  await it.raise("turn.complete", { ...answered, answer: CLEAN });
+  assert.equal(it.prompts.length, 0);
+
+  const said = await it.raise("prompt.submit", {
+    text: "carry on",
+    origin: { kind: "composer" },
+  });
+  assert.equal(said.text, "carry on");
+  assert.equal(
+    it.lines().find((one) => one.kind === "answer").said,
+    "the gate reads clean",
+  );
+});
+
+// [[spec/design_output/level0#the-tool-reads-a-draft]]
+test("the draft tool answers the findings of a draft", async () => {
+  const it = await started(BANDED, valeOnAnswer(PAST));
+  const said = await it.raise("tool.call", { tool: DRAFT, text: OVER }, DRAFT);
+
+  assert.match(said.result, /^The voice rules refuse this answer\./);
+  assert.match(said.result, /Hold PastTense for the rest of this turn/);
+  assert.equal(it.prompts.length, 0, "the tool submits nothing");
+});
+
+test("the draft tool reads a clean draft clean, and an empty one back", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  const clean = await it.raise("tool.call", { tool: DRAFT, text: OVER }, DRAFT);
+  assert.match(clean.result, /meets the gate clean/);
+
+  const empty = await it.raise("tool.call", { tool: DRAFT, text: "  " }, DRAFT);
+  assert.match(empty.result, /takes the text of one draft/);
 });
