@@ -1,7 +1,7 @@
 // The renderer, read as the string it answers. Every case asserts one thing
 // the page has to carry, because the editor drawing it is what a person checks
 // once and a string is what a box checks every time.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";

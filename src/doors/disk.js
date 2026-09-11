@@ -3,6 +3,7 @@
 
 import {
   appendFileSync,
+  chmodSync,
   existsSync,
   lstatSync,
   mkdirSync,
@@ -24,6 +25,7 @@ export function disk() {
     write: (path, text) => writeFileSync(path, text, { encoding: "utf8" }),
     append: (path, text) => appendFileSync(path, text, { encoding: "utf8" }),
     exists: (path) => existsSync(path),
+    runnable: (path) => chmodSync(path, 0o755),
     list: (path) => readdirSync(path, { withFileTypes: true }).map(named),
     makeDir: (path) => mkdirSync(path, { recursive: true }),
     remove: (path) =>

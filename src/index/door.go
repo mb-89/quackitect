@@ -1,10 +1,5 @@
-// THE DOOR. The index is not a file a caller opens; it is a process that owns
-// it. One writer keeps the tree and the rows in step, every reader asks the
-// same warm cache, and nobody races anybody on the file.
-//
-// It listens on loopback, on a port the machine picks, and writes where it
-// stands into .se/index.json. A caller reads that file rather than working a
-// port out of the folder path, which is the one thing v4 ruled against.
+// The resident process that owns the database. One writer keeps the tree and
+// the rows in step, and every reader asks the same warm cache.
 // [[spec/design_output/index#the-door-owns-the-database]]
 package main
 
@@ -15,18 +10,20 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/fsnotify/fsnotify"
 )
 
-// Standing is what the door writes down, and what a caller reads to reach it.
 type Standing struct {
-	Port int    `json:"port"`
-	Pid  int    `json:"pid"`
-	Root string `json:"root"`
+	Port  int    `json:"port"`
+	Pid   int    `json:"pid"`
+	Root  string `json:"root"`
+	Stamp string `json:"stamp"`
 }
 
 type call struct {
@@ -47,14 +44,14 @@ type door struct {
 	guard sync.Mutex
 	dirty chan struct{}
 	eyes  *fsnotify.Watcher
+
+	pending atomic.Bool
 }
 
 func standingPath(root string) string {
 	return filepath.Join(root, ".se", "index.json")
 }
 
-// Serve opens the index, warms it, watches the tree and answers until it is
-// asked to stop. It answers the address it stands on, so a test can reach it.
 func Serve(root, at string) (*http.Server, net.Listener, error) {
 	db, err := Open(root, at)
 	if err != nil {
@@ -77,8 +74,6 @@ func Serve(root, at string) (*http.Server, net.Listener, error) {
 	go one.sweeps()
 	go server.Serve(listen)
 
-	// The watch is what keeps it warm. A tree nobody can watch still answers,
-	// out of the walk the door took on the way up.
 	eyes, err := watches(root, one)
 	if err == nil {
 		one.eyes = eyes
@@ -86,15 +81,15 @@ func Serve(root, at string) (*http.Server, net.Listener, error) {
 	return server, listen, one.stands(listen)
 }
 
-// stands writes where the door is, so a caller finds it without guessing.
 func (one *door) stands(listen net.Listener) error {
 	if err := os.MkdirAll(filepath.Dir(standingPath(one.root)), 0o755); err != nil {
 		return err
 	}
 	said, err := json.Marshal(Standing{
-		Port: listen.Addr().(*net.TCPAddr).Port,
-		Pid:  os.Getpid(),
-		Root: one.root,
+		Port:  listen.Addr().(*net.TCPAddr).Port,
+		Pid:   os.Getpid(),
+		Root:  one.root,
+		Stamp: stampHere(),
 	})
 	if err != nil {
 		return err
@@ -102,9 +97,8 @@ func (one *door) stands(listen net.Listener) error {
 	return os.WriteFile(standingPath(one.root), append(said, '\n'), 0o644)
 }
 
-// Touched says the tree moved. The sweep that follows is one reindex however
-// many writes arrive, because a build touching a thousand files is one answer.
 func (one *door) Touched() {
+	one.pending.Store(true)
 	select {
 	case one.dirty <- struct{}{}:
 	default:
@@ -115,8 +109,14 @@ func (one *door) sweeps() {
 	for range one.dirty {
 		time.Sleep(200 * time.Millisecond) // the rest of a burst lands in this
 		one.guard.Lock()
-		Reindex(one.db, one.root)
+		one.settles()
 		one.guard.Unlock()
+	}
+}
+
+func (one *door) settles() {
+	if one.pending.Swap(false) {
+		Reindex(one.db, one.root)
 	}
 }
 
@@ -129,6 +129,7 @@ func (one *door) took(w http.ResponseWriter, r *http.Request) {
 
 	one.guard.Lock()
 	defer one.guard.Unlock()
+	one.settles()
 
 	result, err := one.answers(said)
 	if err != nil {
@@ -150,8 +151,22 @@ func (one *door) answers(said call) (any, error) {
 	}
 
 	switch strings.ToLower(said.Method) {
+	case "grep":
+		var ask GrepAsk
+		if err := json.Unmarshal(said.Params, &ask); err != nil {
+			return nil, err
+		}
+		return Grep(one.db, ask)
+	case "glob":
+		var ask GlobAsk
+		if err := json.Unmarshal(said.Params, &ask); err != nil {
+			return nil, err
+		}
+		return Glob(one.db, ask)
 	case "find":
 		return Find(one.db, asked.Words, asked.Limit)
+	case "notes":
+		return Notes(one.db, asked.Words, asked.Limit)
 	case "links":
 		return Links(one.db, asked.Target)
 	case "dangling":
@@ -161,12 +176,35 @@ func (one *door) answers(said call) (any, error) {
 	case "reindex":
 		count, err := Reindex(one.db, one.root)
 		return map[string]int{"files": count}, err
+	case "stop":
+		go stopsSoon(one.root)
+		return map[string]string{"stopping": one.root}, nil
 	case "standing":
 		var files int
 		one.db.QueryRow(`SELECT count(*) FROM file`).Scan(&files)
 		return map[string]any{"root": one.root, "files": files}, nil
 	}
 	return nil, errorOf("no method called " + said.Method)
+}
+
+// [[spec/design_output/index#a-door-comes-back]]
+func stampHere() string {
+	self, err := os.Executable()
+	if err != nil {
+		return ""
+	}
+	said, err := os.Stat(self)
+	if err != nil {
+		return ""
+	}
+	return said.ModTime().UTC().Format(time.RFC3339Nano) + ":" + strconv.FormatInt(said.Size(), 10)
+}
+
+// [[spec/design_output/index#a-door-comes-back]]
+func stopsSoon(root string) {
+	time.Sleep(100 * time.Millisecond)
+	os.Remove(standingPath(root))
+	os.Exit(0)
 }
 
 type errorOf string

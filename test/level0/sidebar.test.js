@@ -1,7 +1,7 @@
 // The sidebar with a fake editor. Every layer but the drawing runs here: a
 // message lands in the file, the watcher draws the file again, and a window
 // that opens twice takes the local values with it.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";

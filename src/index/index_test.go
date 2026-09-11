@@ -1,6 +1,6 @@
 // The index, driven over a tree a case writes. Every question here is one a
 // verb asks, so what the door answers stands proven with no door running.
-// [[spec/design_output/index#the-index-is-warm]]
+// [[spec/guidance/code/testing]]
 package main
 
 import (

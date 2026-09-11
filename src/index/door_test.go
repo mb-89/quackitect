@@ -92,3 +92,20 @@ func TestAWriteUnderTheTreeReachesTheIndex(t *testing.T) {
 	}
 	t.Fatal("a file written under the tree never reached the index")
 }
+
+func TestADoorFromAnotherBuildStandsAside(t *testing.T) {
+	root := t.TempDir()
+
+	if stands(Standing{Root: root, Stamp: stampHere()}, root) != true {
+		t.Fatal("this build talks to its own door")
+	}
+	if stands(Standing{Root: root, Stamp: "another build"}, root) {
+		t.Fatal("a door from another build stands aside for this one")
+	}
+	if stands(Standing{Root: "/somewhere/else", Stamp: stampHere()}, root) {
+		t.Fatal("a door over another tree answers about that tree")
+	}
+	if stampHere() == "" {
+		t.Fatal("a build with no stamp leaves every door looking stale")
+	}
+}

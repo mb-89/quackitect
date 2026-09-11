@@ -22,7 +22,12 @@ import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { treeFaults, treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { EDITOR_SETTINGS } from "../../.claude/skills/level0/lib/servers.js";
 import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
-import { configOf, LOCAL, SCHEMA } from "../../.claude/skills/level0/lib/config.js";
+import {
+  configOf,
+  LOCAL,
+  SCHEMA,
+  TRACKED,
+} from "../../.claude/skills/level0/lib/config.js";
 import {
   faultsIn as faultsInGrid,
   lineOf,
@@ -42,17 +47,34 @@ import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { readTools, whereIs, writeSurvey } from "./tools.js";
 import { SOURCE as VIEWER, viewerOf } from "./viewer.js";
+import {
+  attach,
+  detach,
+  entryFor,
+  produce,
+  registerCopy,
+  readRegister,
+  rootsHere,
+} from "./vehicle.js";
 import { work } from "./work.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 
+// [[spec/design_output/vehicle#the-work-root-inherits]]
+function atRoot(path) {
+  const said = String(path ?? "");
+  return said.startsWith("/") || /^[A-Za-z]:/.test(said) ? said : join(root, said);
+}
+
 // [[spec/design_output/config#the-resolver-holds-the-layers]]
-function configHere(files) {
+function configHere(files, pair) {
   return configOf({
-    read: async (path) => files.read(join(root, path)),
-    write: async (path, text) => files.write(join(root, path), text),
-    makeDir: async (path) => files.makeDir(join(root, path)),
+    tracked: pair?.itself === false ? [join(pair.method, TRACKED), TRACKED] : [TRACKED],
+    schema: pair?.itself === false ? join(pair.method, SCHEMA) : SCHEMA,
+    read: async (path) => files.read(atRoot(path)),
+    write: async (path, text) => files.write(atRoot(path), text),
+    makeDir: async (path) => files.makeDir(atRoot(path)),
     readEnv: async (names) =>
       Object.fromEntries(names.map((name) => [name, process.env[name] ?? ""])),
   });
@@ -62,7 +84,7 @@ async function doorsHere() {
   const outside = proc();
   const files = disk();
   const time = clock();
-  const said = configHere(files);
+  const said = configHere(files, rootsHere(files, process.env, root));
   return {
     proc: outside,
     disk: files,
@@ -159,6 +181,14 @@ const verbs = {
     says: "every line carrying the words, out of the index",
     run: async () => asksIndex(["find", ...rest]),
   },
+  vehicle: {
+    says: "this copy, the project it drives, and a copy made elsewhere",
+    run: async () => theVehicle(rest),
+  },
+  notes: {
+    says: "the notes the words belong to, ranked by name and body",
+    run: async () => asksIndex(["notes", ...rest]),
+  },
   links: {
     says: "what reaches a note, and what reaches nothing",
     run: async () => asksIndex(rest.length ? ["links", ...rest] : ["dangling"]),
@@ -183,6 +213,61 @@ if (verb === "help" || !verbs[verb]) {
   process.exit(verb === "help" ? 0 : 2);
 }
 process.exit((await verbs[verb].run(where.length ? where : ["."])) ?? 0);
+
+// [[spec/design_output/vehicle#three-things-a-copy-needs]]
+function theVehicle(argv) {
+  const env = process.env;
+  const said = argv[0] ?? "here";
+  const pair = rootsHere(files, env, root);
+  const made = entryFor(files, it.clock, env, pair.method, version());
+
+  if (said === "produce" || said === "into") {
+    const dest = argv[1];
+    if (!dest) {
+      console.error("se vehicle produce <folder>: say where the copy lands.");
+      return 2;
+    }
+    const put = produce(files, pair.method, dest, said === "into");
+    if (!put.ok) {
+      console.error(put.why);
+      return 1;
+    }
+    console.log(`${put.count} file(s) copied into ${dest}.`);
+    console.log("It makes its own identity the first time it runs.");
+    return 0;
+  }
+  if (said === "attach") {
+    attach(files, it.clock, pair.work, made.id);
+    console.log(`${pair.work} names ${made.id} as the copy driving it.`);
+    return 0;
+  }
+  if (said === "detach") {
+    detach(files, pair.work);
+    console.log(`${pair.work} names no driver, so the next start asks again.`);
+    return 0;
+  }
+  if (said === "register") {
+    const wrote = registerCopy(files, env, made.entry);
+    console.log(wrote ? `${made.id} stands in the register.` : "no register takes a write here.");
+    return wrote ? 0 : 1;
+  }
+
+  console.log(`method  ${pair.method}`);
+  console.log(`work    ${pair.work}`);
+  console.log(`copy    ${made.id}${pair.itself ? "  (this tree drives itself)" : ""}`);
+  for (const one of readRegister(files, env)) {
+    console.log(`  ${one.id}  ${one.version}  ${one.method_root}`);
+  }
+  return 0;
+}
+
+function version() {
+  try {
+    return JSON.parse(files.read(join(root, "package.json"))).version ?? "0";
+  } catch {
+    return "0";
+  }
+}
 
 // [[spec/design_output/index#the-door-owns-the-database]]
 function asksIndex(argv) {
@@ -546,7 +631,7 @@ function stamped(code) {
   return code;
 }
 
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 function doorsHold() {
   const named = (at, end) =>
     files

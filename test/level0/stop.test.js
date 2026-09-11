@@ -1,5 +1,5 @@
 // The tooth: the rule files, the vote, the claim and its life, the runaway.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";

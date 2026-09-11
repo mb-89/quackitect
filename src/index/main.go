@@ -1,6 +1,5 @@
-// THE COMMAND LINE OVER THE DOOR. Every verb here asks the resident process,
-// and starts one where none stands. So a caller never opens the database
-// itself, and the tree has one writer however many people ask it questions.
+// The command line over the door. Every verb here asks the resident process,
+// and starts one where none stands.
 // [[spec/design_output/index#the-door-owns-the-database]]
 package main
 
@@ -21,7 +20,7 @@ import (
 func main() {
 	argv := os.Args[1:]
 	if len(argv) == 0 {
-		fmt.Fprintln(os.Stderr, "usage: se-index <serve|find|links|dangling|same|reindex|standing> [words]")
+		fmt.Fprintln(os.Stderr, "usage: se-index <serve|find|notes|links|dangling|same|reindex|standing> [words]\n       se-index call <method> <json params>")
 		os.Exit(2)
 	}
 
@@ -64,8 +63,6 @@ func serves(root string) int {
 	return 0
 }
 
-// asks reaches the door, starting one where none answers. A caller waits for
-// the first warm walk, which is the one cost the index takes.
 func asks(root string, argv []string) int {
 	said, err := reaches(root, argv)
 	if err != nil {
@@ -86,22 +83,33 @@ func asks(root string, argv []string) int {
 	return 0
 }
 
+// [[spec/design_output/index#a-door-comes-back]]
 func reaches(root string, argv []string) (answer, error) {
-	for try := 0; try < 2; try++ {
+	for try := 0; try < 3; try++ {
 		standing, err := standingOf(root)
-		if err == nil {
+		if err == nil && stands(standing, root) {
 			said, err := posts(standing, argv)
 			if err == nil {
 				return said, nil
 			}
 		}
-		if try == 0 {
-			if err := starts(root); err != nil {
-				return answer{}, err
-			}
+		if err == nil && standing.Port != 0 && !stands(standing, root) {
+			posts(standing, []string{"stop"})
+		}
+		os.Remove(standingPath(root))
+		if err := starts(root); err != nil {
+			return answer{}, err
 		}
 	}
 	return answer{}, errorOf("the index door does not answer, and one would not start")
+}
+
+// [[spec/design_output/index#a-door-comes-back]]
+func stands(said Standing, root string) bool {
+	if said.Root != "" && said.Root != root {
+		return false
+	}
+	return said.Stamp == stampHere()
 }
 
 func standingOf(root string) (Standing, error) {
@@ -120,22 +128,9 @@ func standingOf(root string) (Standing, error) {
 }
 
 func posts(standing Standing, argv []string) (answer, error) {
-	params := map[string]any{}
-	if len(argv) > 1 {
-		switch argv[0] {
-		case "find":
-			params["words"] = argv[1]
-			if len(argv) > 2 {
-				params["limit"], _ = strconv.Atoi(argv[2])
-			}
-		case "links":
-			params["target"] = argv[1]
-		case "same":
-			params["path"] = argv[1]
-		}
-	}
+	method, params := asked(argv)
 
-	body, err := json.Marshal(call{Method: argv[0], Params: asRaw(params), ID: 1})
+	body, err := json.Marshal(call{Method: method, Params: params, ID: 1})
 	if err != nil {
 		return answer{}, err
 	}
@@ -152,12 +147,39 @@ func posts(standing Standing, argv []string) (answer, error) {
 	return out, json.NewDecoder(said.Body).Decode(&out)
 }
 
+func asked(argv []string) (string, json.RawMessage) {
+	if argv[0] == "call" {
+		if len(argv) < 2 {
+			return "", json.RawMessage("{}")
+		}
+		if len(argv) < 3 {
+			return argv[1], json.RawMessage("{}")
+		}
+		return argv[1], json.RawMessage(argv[2])
+	}
+
+	params := map[string]any{}
+	if len(argv) > 1 {
+		switch argv[0] {
+		case "find", "notes":
+			params["words"] = argv[1]
+			if len(argv) > 2 {
+				params["limit"], _ = strconv.Atoi(argv[2])
+			}
+		case "links":
+			params["target"] = argv[1]
+		case "same":
+			params["path"] = argv[1]
+		}
+	}
+	return argv[0], asRaw(params)
+}
+
 func asRaw(said map[string]any) json.RawMessage {
 	out, _ := json.Marshal(said)
 	return out
 }
 
-// starts puts a door up and waits for it to say where it stands.
 func starts(root string) error {
 	self, err := os.Executable()
 	if err != nil {

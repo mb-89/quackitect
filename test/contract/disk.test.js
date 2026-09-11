@@ -1,12 +1,13 @@
 // The disk door, against the real filesystem. Every other test takes the fake,
 // and this one holds the fake to what the disk does.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { disk } from "../../src/doors/disk.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { proc } from "../../src/doors/proc.js";
 
 function through(door) {
   const at = door.tempDir("level0-disk-");
@@ -102,5 +103,21 @@ test("the fake links the way the real door links", () => {
 test("both doors refuse a file nobody wrote", () => {
   for (const door of [disk(), fakeDisk()]) {
     assert.throws(() => door.read("/nothing/at/all.md"), /no such file|ENOENT/);
+  }
+});
+
+test("a file made runnable runs", () => {
+  const files = disk();
+  const where = files.tempDir("disk-");
+  try {
+    const at = join(where, "one.sh");
+    files.write(at, "#!/usr/bin/env sh\necho here\n");
+    files.runnable(at);
+
+    const said = proc().run([at], { cwd: where });
+    assert.equal(said.exitCode, 0, said.stderr);
+    assert.match(said.stdout, /here/);
+  } finally {
+    files.remove(where);
   }
 });

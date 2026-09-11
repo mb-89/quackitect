@@ -1,7 +1,7 @@
 // The hooks module, driven by a fake engine. It reaches the harness through
 // the interface the engine hands it, so a fake interface stands in and the
 // lines it writes come back out of memory.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
@@ -179,7 +179,7 @@ const PAST = [
 
 const answered = { reason: "answer", answer: "", durationMs: 1, aborted: false };
 
-test("a session start writes one line, and registers both tools", async () => {
+test("a session start writes one line, and registers every tool", async () => {
   const it = await started();
 
   assert.deepEqual(
@@ -188,7 +188,7 @@ test("a session start writes one line, and registers both tools", async () => {
   );
   assert.deepEqual(
     it.registered.map((one) => one.name),
-    ["claim_stop", "review_branch", "log"],
+    ["claim_stop", "review_branch", "log", "patch", "replace", "undo"],
   );
   assert.deepEqual(it.registered[0].inputSchema.properties.rule.enum, [
     "the-work-stands-complete",

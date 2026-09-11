@@ -1,6 +1,6 @@
 extends: script
 message: "Code carries no comment here. Write a header of five lines at the top, a pointer to a design output, or a suppression naming its rule."
-link: spec/guidance/code.md
+link: spec/guidance/code/code.md
 level: error
 scope: raw
 script: |

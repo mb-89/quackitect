@@ -1,7 +1,7 @@
 // The two controls that reach level zero. The hold answers the tooth and the
 // ask answers the block, so each case here says what one value of the key puts
 // in front of the agent.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";

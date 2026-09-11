@@ -1,10 +1,6 @@
-// THE INDEX. A database over the tree, and never a second truth.
-//
-// The files are the truth. This is rebuilt from them, kept in step by the
-// watcher the resident door runs, and dropped whole where its schema or its
-// root disagrees with the tree it sits under. A reader finding it stale or
-// absent reads the files, the way it did before the index stood.
-// [[spec/design_output/index#the-index-is-warm]]
+// The shape, the walk, and the rows it writes. The files stay the truth, and
+// every row here comes out of them.
+// [[spec/design_output/index#the-rows-the-walk-writes]]
 package main
 
 import (
@@ -19,16 +15,14 @@ import (
 	_ "github.com/mattn/go-sqlite3" // the real SQLite, through cgo, so FTS5 answers
 )
 
-// THE SHAPE STANDS IN ONE STRING, AND THE VERSION BESIDE IT. A schema that
-// moves drops the file rather than migrating it, because the tree rebuilds it
-// in seconds and a half-migrated index is a truth nobody can read.
 const shape = `
 CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS file (
   path  TEXT PRIMARY KEY,
   size  INTEGER NOT NULL,
   mtime INTEGER NOT NULL,
-  hash  TEXT NOT NULL
+  hash  TEXT NOT NULL,
+  text  TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS file_size_hash ON file (size, hash);
 CREATE TABLE IF NOT EXISTS note (
@@ -53,18 +47,12 @@ CREATE VIRTUAL TABLE IF NOT EXISTS note_text USING fts5 (path UNINDEXED, id, bod
 CREATE VIRTUAL TABLE IF NOT EXISTS line_text USING fts5 (path UNINDEXED, n UNINDEXED, text);
 `
 
-// The version rides in meta beside the root. Either one disagreeing drops the
-// file, because an index built under another tree answers about that tree.
-const version = "1"
+const version = "2"
 
-// Skipped folders never reach the walk. .se holds the index itself, and the
-// rest carry what a tool wrote rather than what a person did.
 var skipped = map[string]bool{
 	".git": true, ".se": true, "node_modules": true, ".claude-plugin": true,
 }
 
-// Open answers the index for a root, building its shape where the file is new
-// and dropping it where the shape or the root it names has moved.
 func Open(root, at string) (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", dsn(at))
 	if err != nil {
@@ -91,8 +79,6 @@ func Open(root, at string) (*sql.DB, error) {
 	return db, setMeta(db, root)
 }
 
-// WAL SO A READER NEVER WAITS ON THE WRITER. The door writes while a verb
-// reads, and the two meeting on one file is what a busy timeout answers.
 func dsn(at string) string {
 	return "file:" + at + "?_journal_mode=WAL&_busy_timeout=5000&_synchronous=NORMAL"
 }
@@ -123,8 +109,6 @@ func setMeta(db *sql.DB, root string) error {
 	return nil
 }
 
-// Reindex walks the tree and writes what it finds, in one transaction, so a
-// reader meets the whole answer or the one before it.
 func Reindex(db *sql.DB, root string) (int, error) {
 	tx, err := db.Begin()
 	if err != nil {
@@ -179,8 +163,6 @@ func relOf(root, abs string) (string, bool) {
 	return filepath.ToSlash(rel), true
 }
 
-// one writes a single file: its size and hash always, and its note and links
-// where it is markdown carrying frontmatter.
 func one(tx *sql.Tx, abs, rel string, info os.FileInfo) error {
 	body, err := os.ReadFile(abs)
 	if err != nil {
@@ -188,18 +170,21 @@ func one(tx *sql.Tx, abs, rel string, info os.FileInfo) error {
 	}
 
 	sum := sha256.Sum256(body)
+	text := ""
+	if isText(body) {
+		text = string(body)
+	}
 	if _, err := tx.Exec(
-		`INSERT INTO file (path, size, mtime, hash) VALUES (?, ?, ?, ?)
+		`INSERT INTO file (path, size, mtime, hash, text) VALUES (?, ?, ?, ?, ?)
 		 ON CONFLICT (path) DO UPDATE SET size = excluded.size,
-		   mtime = excluded.mtime, hash = excluded.hash`,
-		rel, info.Size(), info.ModTime().UnixNano(), hex.EncodeToString(sum[:])); err != nil {
+		   mtime = excluded.mtime, hash = excluded.hash, text = excluded.text`,
+		rel, info.Size(), info.ModTime().UnixNano(), hex.EncodeToString(sum[:]), text); err != nil {
 		return err
 	}
 
-	if !isText(body) {
+	if text == "" {
 		return nil
 	}
-	text := string(body)
 	if err := lines(tx, rel, text); err != nil {
 		return err
 	}
@@ -209,9 +194,6 @@ func one(tx *sql.Tx, abs, rel string, info os.FileInfo) error {
 	return note(tx, rel, text)
 }
 
-// EVERY LINE OF EVERY TEXT FILE IS A ROW, so a search over the tree is a
-// question and never a walk. FTS5 keeps the text it indexes, so the same rows
-// answer MATCH and a plain SELECT.
 func lines(tx *sql.Tx, rel, text string) error {
 	for n, line := range strings.Split(text, "\n") {
 		if strings.TrimSpace(line) == "" {
@@ -269,17 +251,102 @@ func note(tx *sql.Tx, rel, text string) error {
 	return nil
 }
 
-// resolve names the file every link points at, where one stands. A link
-// naming nothing keeps a null, which is what dangling reads.
 func resolve(tx *sql.Tx) error {
-	_, err := tx.Exec(`
-		UPDATE link SET to_path = (
-		  SELECT path FROM note WHERE note.id = link.target
-		  UNION ALL
-		  SELECT path FROM file WHERE file.path = link.target
-		  LIMIT 1
-		)`)
-	return err
+	ids, paths, folders, err := known(tx)
+	if err != nil {
+		return err
+	}
+
+	rows, err := tx.Query(`SELECT rowid, target FROM link`)
+	if err != nil {
+		return err
+	}
+	found := map[int64]string{}
+	for rows.Next() {
+		var id int64
+		var target string
+		if err := rows.Scan(&id, &target); err != nil {
+			rows.Close()
+			return err
+		}
+		if at := pointsAt(target, ids, paths, folders); at != "" {
+			found[id] = at
+		}
+	}
+	rows.Close()
+	if err := rows.Err(); err != nil {
+		return err
+	}
+
+	for id, at := range found {
+		if _, err := tx.Exec(`UPDATE link SET to_path = ? WHERE rowid = ?`, at, id); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// [[spec/design_output/index#a-note-and-its-links]]
+func pointsAt(target string, ids, paths, folders map[string]string) string {
+	name := strings.TrimSpace(target)
+	if at := strings.IndexByte(name, '#'); at >= 0 {
+		name = strings.TrimSpace(name[:at])
+	}
+	name = strings.Trim(name, "/")
+	if name == "" {
+		return ""
+	}
+
+	for _, said := range []string{name, name + ".md"} {
+		if at, ok := paths[said]; ok {
+			return at
+		}
+	}
+	if at, ok := ids[name]; ok {
+		return at
+	}
+	if at, ok := folders[name]; ok {
+		return at
+	}
+	return ""
+}
+
+func known(tx *sql.Tx) (ids, paths, folders map[string]string, err error) {
+	ids, paths, folders = map[string]string{}, map[string]string{}, map[string]string{}
+
+	rows, err := tx.Query(`SELECT path FROM file`)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	for rows.Next() {
+		var path string
+		if err := rows.Scan(&path); err != nil {
+			rows.Close()
+			return nil, nil, nil, err
+		}
+		paths[path] = path
+		for at := strings.LastIndexByte(path, '/'); at > 0; at = strings.LastIndexByte(path[:at], '/') {
+			folders[path[:at]] = path[:at]
+		}
+	}
+	rows.Close()
+	if err := rows.Err(); err != nil {
+		return nil, nil, nil, err
+	}
+
+	notes, err := tx.Query(`SELECT id, path FROM note`)
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	defer notes.Close()
+	for notes.Next() {
+		var id, path string
+		if err := notes.Scan(&id, &path); err != nil {
+			return nil, nil, nil, err
+		}
+		ids[id] = path
+	}
+	return ids, paths, folders, notes.Err()
 }
 
 func asJSON(front map[string]string) string {

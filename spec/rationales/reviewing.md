@@ -1,6 +1,6 @@
 ---
 kind: [[rationale]]
-explains: [[spec/guidance/reviewing]]
+explains: [[spec/guidance/review/reviewing]]
 ---
 
 # Why a reader goes first

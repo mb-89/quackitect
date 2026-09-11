@@ -13,7 +13,7 @@ import {
 } from "../lib/answer.js";
 import { commitIn, findings as readsCommand, verbLine } from "../lib/bash.js";
 import { CODE, formatText, lintText as lintCode } from "../lib/code.js";
-import { configOf, TRACKED } from "../lib/config.js";
+import { configOf, SCHEMA, TRACKED } from "../lib/config.js";
 import { ASK, controlBlock, holds, QUIET } from "../lib/controls.js";
 import {
   bindsHere,
@@ -26,6 +26,16 @@ import {
   standingLayer,
 } from "../lib/guidance.js";
 import { godMode, HEALTH, repairs } from "../lib/health.js";
+import { asked, BIN, readsAnswer, said as saidOf } from "../lib/index.js";
+import { applied, filesIn, patchSpec, replaceSpec } from "../lib/apply.js";
+import {
+  FOLDER as UNDONE,
+  journalOf,
+  nameOf as undoName,
+  newestOn,
+  restores,
+  undoSpec,
+} from "../lib/undo.js";
 import { judgeOf } from "../lib/judge.js";
 import {
   aimOf,
@@ -61,7 +71,9 @@ import {
   toothOf,
 } from "../lib/stop.js";
 import { landsOnTrunk, touchesGit } from "../lib/trunk.js";
-import { lintText, PROSE } from "../lib/vale.js";
+import { deeply, layered } from "../lib/layer.js";
+import { MARKER, pairOf } from "../lib/vehicle.js";
+import { lintText } from "../lib/vale.js";
 
 const GUIDANCE = "spec/guidance";
 const COMMIT = "level0-commit.md";
@@ -143,9 +155,9 @@ export function register(on, _options) {
     }
 
     // [[spec/design_output/projection#who-projects-and-when]]
-    projections = entriesIn(await readIf($, PROJECTIONS));
+    projections = entriesIn(await inherited($, cage.roots, PROJECTIONS));
     if (projections.length) {
-      const drawn = await projectAll($, projections);
+      const drawn = await projectAll($, cage.roots, projections, settings);
       await logbook.say("info", "project", `${drawn.wrote} file(s) written`, {
         ms: drawn.ms,
         detail: `${projections.length} projection(s), ${drawn.size} target(s)`,
@@ -155,9 +167,15 @@ export function register(on, _options) {
       }
     }
 
+    // [[spec/design_output/index#the-door-answers-the-tools]]
+    warms($, root);
+
     await $.tool.register(claimSpec(rules));
     await $.tool.register(reviewSpec());
     await $.tool.register(logSpec());
+    await $.tool.register(patchSpec());
+    await $.tool.register(replaceSpec());
+    await $.tool.register(undoSpec());
     return next(e);
   });
 
@@ -233,7 +251,6 @@ export function register(on, _options) {
     if (CODE.test(writing.path)) {
       return await codeDoor($, e, onward, writing, formatter, logbook, root);
     }
-    if (!PROSE.test(writing.path)) return onward(e);
 
     const where = relativeTo(root, writing.path);
     const found = [];
@@ -248,7 +265,10 @@ export function register(on, _options) {
     }
 
     if (!found.length) {
-      judge = judgeOf(await judgeSettings(settings), await readRules($, JUDGED));
+      judge = judgeOf(
+        await judgeSettings(settings),
+        await readRules($, cage.roots, JUDGED),
+      );
       if (judge.reads()) {
         kind = "judge";
         found.push(
@@ -323,6 +343,62 @@ export function register(on, _options) {
     })();
     return godPasses(logbook, settings, e, next, said);
   });
+
+  // [[spec/design_output/apply#validate-everything-then-write]]
+  on("tool.call", { tool: "mcp__level0__patch" }, async ($, e, _next) => {
+    const ops = Array.isArray(e.ops) ? e.ops : [];
+    const took = applied(await readsFiles($, root, filesIn(ops)), ops);
+    if (!took.ok) return { result: took.why };
+    if (e.preview === true) return { result: wouldLand(took) };
+    return { result: await lands($, root, took, String(e.on ?? ""), logbook) };
+  });
+
+  // [[spec/design_output/apply#a-pattern-matching-nothing]]
+  on("tool.call", { tool: "mcp__level0__replace" }, async ($, e, _next) => {
+    const swept = await sweeps($, root, e);
+    if (swept.why) return { result: swept.why };
+
+    const took = applied(swept.held, swept.ops);
+    if (!took.ok) return { result: took.why };
+
+    const hits = Object.values(took.counts).reduce((n, one) => n + one, 0);
+    const wanted = e.expect_count;
+    if (wanted !== undefined && Number(wanted) !== hits) {
+      return { result: `the pattern matches ${hits} times, and expect_count says ${wanted}` };
+    }
+    if (e.preview === true) return { result: wouldLand(took) };
+    return { result: await lands($, root, took, String(e.on ?? ""), logbook) };
+  });
+
+  // [[spec/design_output/apply#drift-refuses-the-restore]]
+  on("tool.call", { tool: "mcp__level0__undo" }, async ($, e, _next) => {
+    const said = await takesBack($, root, String(e.on ?? ""));
+    await logbook.say(said.ok ? "info" : "warn", "undo", said.result.split("\n")[0], {
+      detail: String(e.on ?? ""),
+    });
+    return { result: said.result };
+  });
+
+  // [[spec/design_output/index#the-door-answers-the-tools]]
+  for (const tool of ["Grep", "Glob"]) {
+    on("tool.call", { tool }, async ($, e, next) => {
+      const ask = asked(e);
+      if (!ask || !root) return next(e);
+
+      const where = relativeTo(root, String(e.path ?? ""));
+      if (/^([A-Za-z]:)?[\\/]/.test(where)) return next(e);
+      ask.params.path = where;
+
+      const answer = await askIndex($, root, ask);
+      if (!answer) return next(e);
+
+      await logbook.say("info", "index", `${ask.method} reads the rows`, {
+        tool,
+        detail: String(e.pattern ?? "").slice(0, 120),
+      });
+      return { result: saidOf(e, answer) };
+    });
+  }
 
   // [[spec/design_output/bash#the-description-names-verbs]]
   on("tool.describe", { tool: "Bash" }, async (_$, e, next) => {
@@ -551,7 +627,9 @@ async function loadCage($, cage) {
   const faults = [];
 
   cage.root = await rootHere($);
-  cage.settings = configHere($);
+  // [[spec/design_output/vehicle#one-tree-drives-itself]]
+  cage.roots = pairOf(await methodUp($, cage.root), cage.root);
+  cage.settings = configHere($, cage.roots);
   cage.judge = judgeOf(await judgeSettings(cage.settings));
   cage.tooth = toothOf({ mostInARow: await cage.settings.ask("stop.mostInARow") });
   if (!cage.wired) {
@@ -574,7 +652,7 @@ async function loadCage($, cage) {
   if (!cage.bin) faults.push("no vale stands here, so no voice rule reads a write");
   cage.formatter = await toolHere($, known, "biome");
 
-  const guidance = await readGuidance($);
+  const guidance = await readGuidance($, cage.roots);
   cage.standing = guidance.said;
   cage.sentence = canary({
     rules: guidance.rules,
@@ -584,7 +662,7 @@ async function loadCage($, cage) {
   if (!cage.standing) faults.push(`${GUIDANCE} hands over nothing`);
 
   // [[spec/design_output/stop#where-the-rules-live]]
-  const pooled = pool(await readFolder($, RULES, ".yml"));
+  const pooled = pool(await readFolder($, cage.roots, RULES, ".yml"));
   cage.rules = pooled.rules;
   for (const name of pooled.broken) {
     await cage.logbook.say("warn", "stop", `${name} carries a rule nobody can read`, {
@@ -629,6 +707,35 @@ async function ensureCage($, cage) {
   return cage.health;
 }
 
+// [[spec/design_output/vehicle#a-marker-names-the-root]]
+async function methodUp($, work) {
+  let here = String(work ?? "")
+    .split("\\")
+    .join("/")
+    .replace(/\/+$/, "");
+  while (here) {
+    try {
+      if (await $.fs.exists(`${here}/${MARKER}`)) return here;
+    } catch {
+      return "";
+    }
+    const up = here.slice(0, here.lastIndexOf("/"));
+    if (!up || up === here) return "";
+    here = up;
+  }
+  return "";
+}
+
+// [[spec/design_output/vehicle#one-tree-drives-itself]]
+function methodAt(roots, path) {
+  return roots?.itself === false ? `${roots.method}/${path}` : path;
+}
+
+// [[spec/design_output/vehicle#the-work-root-inherits]]
+function layersOf(roots, path) {
+  return roots?.itself === false ? [`${roots.method}/${path}`, path] : [path];
+}
+
 // [[spec/design_output/level0#the-path-a-rule-reads]]
 async function rootHere($) {
   try {
@@ -640,7 +747,7 @@ async function rootHere($) {
 }
 
 // [[spec/design_output/projection#who-projects-and-when]]
-async function projectAll($, entries) {
+async function projectAll($, roots, entries, settings) {
   const began = Date.now();
   const refused = [];
   let size = 0;
@@ -648,7 +755,9 @@ async function projectAll($, entries) {
 
   for (const entry of entries) {
     const texts = new Map();
-    for (const path of readsOf(entry)) texts.set(path, await readIf($, path));
+    for (const path of readsOf(entry)) {
+      texts.set(path, await projected($, roots, path, settings));
+    }
     for (const [path, text] of writesOf(entry, texts)) {
       size++;
       if ((await readIf($, path)) === text) continue;
@@ -661,6 +770,28 @@ async function projectAll($, entries) {
     }
   }
   return { ms: Date.now() - began, size, wrote, refused };
+}
+
+// [[spec/design_output/vehicle#the-work-root-inherits]]
+async function projected($, roots, path, settings) {
+  if (path === TRACKED) return settings.text();
+  return inherited($, roots, path);
+}
+
+// [[spec/design_output/vehicle#the-work-root-inherits]]
+async function inherited($, roots, path) {
+  const under = await readIf($, methodAt(roots, path));
+  if (roots?.itself !== false) return under;
+
+  const over = await readIf($, path);
+  if (!over.trim()) return under;
+  if (!path.endsWith(".json")) return over;
+
+  try {
+    return `${JSON.stringify(deeply(JSON.parse(under || "{}"), JSON.parse(over)), null, 2)}\n`;
+  } catch {
+    return over;
+  }
 }
 
 async function readIf($, path) {
@@ -762,8 +893,10 @@ async function commitVoice($, command, bin) {
 }
 
 // [[spec/design_output/config#the-resolver-holds-the-layers]]
-function configHere($) {
+function configHere($, roots) {
   return configOf({
+    tracked: layersOf(roots, TRACKED),
+    schema: methodAt(roots, SCHEMA),
     read: (path) => $.fs.read(path),
     write: (path, text) => $.fs.write(path, text),
     readEnv: (names) => readEnv($, names),
@@ -930,11 +1063,11 @@ async function erase($, path) {
 }
 
 // [[spec/design_output/level0#guidance-a-variable-switches-on]]
-async function readGuidance($) {
+async function readGuidance($, roots) {
   try {
     const notes = [];
     const wanted = new Set();
-    for (const one of await readFolder($, GUIDANCE, ".md")) {
+    for (const one of await readFolder($, roots, GUIDANCE, ".md")) {
       notes.push(one);
       for (const name of envOf(one.text)) wanted.add(name);
     }
@@ -979,7 +1112,14 @@ async function readEnv($, names) {
   }
 }
 
-async function readFolder($, folder, end) {
+// [[spec/design_output/vehicle#the-work-root-inherits]]
+async function readFolder($, roots, folder, end) {
+  const under = await inFolder($, methodAt(roots, folder), end);
+  if (roots?.itself !== false) return under;
+  return layered(under, await inFolder($, folder, end));
+}
+
+async function inFolder($, folder, end) {
   try {
     const entries = await $.fs.list(folder);
     const out = [];
@@ -993,19 +1133,12 @@ async function readFolder($, folder, end) {
   }
 }
 
-async function readRules($, folder) {
-  try {
-    const entries = await $.fs.list(folder);
-    const out = [];
-    for (const one of entries) {
-      if (!one.name.endsWith(".yml")) continue;
-      const rule = readRule(await $.fs.read(`${folder}/${one.name}`));
-      out.push({ ...rule, name: one.name.replace(/\.yml$/, "") });
-    }
-    return out;
-  } catch {
-    return [];
-  }
+// [[spec/design_output/vehicle#the-work-root-inherits]]
+async function readRules($, roots, folder) {
+  return (await readFolder($, roots, folder, ".yml")).map((one) => ({
+    ...readRule(one.text),
+    name: one.name.replace(/\.yml$/, ""),
+  }));
 }
 
 // [[spec/design_output/tools#where-a-caller-looks]]
@@ -1068,6 +1201,203 @@ async function install($) {
     } catch {}
   }
   return false;
+}
+
+// [[spec/design_output/index#the-door-answers-the-tools]]
+async function whereIsIndex($, root) {
+  for (const at of [`${root}/${BIN}`, `${root}/${BIN}.exe`]) {
+    try {
+      if (await $.fs.exists(at)) return at;
+    } catch {
+      return "";
+    }
+  }
+  return "";
+}
+
+// [[spec/design_output/index#the-door-answers-the-tools]]
+async function askIndex($, root, ask) {
+  const at = await whereIsIndex($, root);
+  if (!at) return null;
+
+  let ran;
+  try {
+    ran = await $.process.run([at, "call", ask.method, JSON.stringify(ask.params)], {
+      cwd: root,
+      timeoutMs: 20000,
+    });
+  } catch {
+    return null;
+  }
+  if (ran?.exitCode !== 0) return null;
+  return readsAnswer(ran.stdout);
+}
+
+// [[spec/design_output/index#the-door-answers-the-tools]]
+function warms($, root) {
+  if (!root) return;
+  whereIsIndex($, root)
+    .then((at) =>
+      at ? $.process.run([at, "standing"], { cwd: root, timeoutMs: 60000 }) : null,
+    )
+    .catch(() => {});
+}
+
+// [[spec/design_output/apply#bytes-in-bytes-out]]
+async function readsFiles($, root, paths) {
+  const held = {};
+  for (const path of paths) {
+    const at = inTheTree(root, path);
+    if (!at) {
+      held[path] = { exists: false, outside: true };
+      continue;
+    }
+    try {
+      held[path] = { exists: true, text: String(await $.fs.read(at)) };
+    } catch {
+      held[path] = { exists: false };
+    }
+  }
+  return held;
+}
+
+// [[spec/design_output/apply#bytes-in-bytes-out]]
+function inTheTree(root, path) {
+  const said = relativeTo(root, String(path ?? "")).split("\\").join("/");
+  if (!said || said.startsWith("/") || said.startsWith("../") || /^[A-Za-z]:/.test(said)) {
+    return "";
+  }
+  return said;
+}
+
+// [[spec/design_output/apply#the-journal-holds-both-halves]]
+async function lands($, root, took, on, logbook) {
+  const at = new Date().toISOString();
+  const entry = journalOf(at, on, "level0", took.files);
+  const where = `${UNDONE}/${undoName(at)}`;
+
+  try {
+    await $.fs.write(where, `${JSON.stringify(entry, null, 2)}\n`);
+  } catch (bad) {
+    return `the undo journal would not write, so nothing did: ${bad?.message ?? bad}`;
+  }
+
+  const wrote = [];
+  for (const one of took.files) {
+    const path = inTheTree(root, one.file);
+    try {
+      await $.fs.write(path, one.made);
+      wrote.push(one.file);
+    } catch (bad) {
+      return [
+        `${one.file} would not write: ${bad?.message ?? bad}`,
+        `The tree stands part written. Run undo to put it back, out of ${where}.`,
+      ].join("\n");
+    }
+  }
+
+  await logbook.say("info", "apply", `${wrote.length} file(s) written`, {
+    detail: on.slice(0, 120),
+    file: where,
+  });
+  return [
+    `${wrote.length} file(s) written, and ${where} holds what they said before.`,
+    ...wrote.map((one) => `  ${one} (${took.counts[one]} place(s))`),
+    "",
+    "Run undo to take this back while nothing else touches these files.",
+  ].join("\n");
+}
+
+// [[spec/design_output/apply#drift-refuses-the-restore]]
+async function takesBack($, root, on) {
+  let names = [];
+  try {
+    names = (await $.fs.list(UNDONE)).map((one) => one.name).filter((one) => one.endsWith(".json"));
+  } catch {
+    return { ok: false, result: "nothing to undo: no apply journals one here" };
+  }
+  if (!names.length) return { ok: false, result: "nothing to undo: no apply journals one here" };
+
+  const entries = {};
+  for (const name of names) {
+    try {
+      entries[name] = JSON.parse(String(await $.fs.read(`${UNDONE}/${name}`)));
+    } catch {}
+  }
+
+  const newest = newestOn(names, entries, on);
+  if (!newest) {
+    return {
+      ok: false,
+      result: `nothing of ${on || "this session"} to undo: an undo takes back what its own name wrote`,
+    };
+  }
+
+  const held = await readsFiles($, root, newest.entry.files.map((one) => one.file));
+  const said = restores(newest.entry, held);
+  if (!said.ok) return { ok: false, result: said.why };
+
+  const done = [];
+  for (const one of said.writes) {
+    await $.fs.write(inTheTree(root, one.file), one.text);
+    done.push(`  put back ${one.file}`);
+  }
+  for (const path of said.removes) {
+    await erase($, inTheTree(root, path));
+    done.push(`  removed ${path}, which the apply made`);
+  }
+  await erase($, `${UNDONE}/${newest.name}`);
+  return { ok: true, result: [`${done.length} file(s) come back.`, ...done].join("\n") };
+}
+
+// [[spec/design_output/apply#a-pattern-matching-nothing]]
+async function sweeps($, root, e) {
+  const pattern = String(e.pattern ?? "");
+  const glob = String(e.glob ?? "");
+  const flags = `${String(e.flags ?? "").replace(/[^ims]/g, "")}g`;
+
+  let shape;
+  try {
+    shape = new RegExp(pattern, flags);
+  } catch (bad) {
+    return { why: `the pattern compiles to nothing: ${bad?.message ?? bad}` };
+  }
+
+  const answer = await askIndex($, root, {
+    method: "grep",
+    params: { pattern, glob, limit: 0 },
+  });
+  if (!answer) return { why: "the index answers nothing here, so the sweep has no list to work" };
+
+  const paths = (answer.files ?? []).map((one) => one.path);
+  if (!paths.length) return { why: "the pattern matches nothing under that glob" };
+
+  const held = await readsFiles($, root, paths);
+  const ops = [];
+  for (const path of paths) {
+    const text = held[path]?.text ?? "";
+    shape.lastIndex = 0;
+    if (!shape.test(text)) continue;
+    ops.push({
+      file: path,
+      op: "regex",
+      pattern,
+      replacement: String(e.replacement ?? ""),
+      flags: String(e.flags ?? ""),
+    });
+  }
+  if (!ops.length) return { why: "the pattern matches nothing under that glob" };
+  return { held, ops };
+}
+
+// [[spec/design_output/apply#validate-everything-then-write]]
+function wouldLand(took) {
+  const rows = took.files
+    .map((one) => `  ${one.file} (${took.counts[one.file]} place(s))${one.born ? ", new" : ""}`)
+    .sort();
+  return [`${took.files.length} file(s) would change, and nothing is written.`, ...rows].join(
+    "\n",
+  );
 }
 
 function asWrite(e) {

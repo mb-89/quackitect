@@ -1,6 +1,6 @@
 // The rule the answer door reads: which prompts open a turn, and whether the
 // session has answered the one standing open.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";

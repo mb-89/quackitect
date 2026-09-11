@@ -1,5 +1,5 @@
 // The log line, the file it lands in, and the level a box writes at.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";

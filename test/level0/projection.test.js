@@ -1,6 +1,6 @@
 // The projector, over texts alone. It reads no disk and writes none, so every
 // case here hands it a source and reads the map it answers.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
