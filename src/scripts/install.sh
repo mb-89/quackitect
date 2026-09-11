@@ -197,6 +197,47 @@ get_vale_ls() {
   rm -rf "$tmp"
 }
 
+# THE INDEX IS C, SO A BUILD NEEDS A C COMPILER. The pinned Zig is one download
+# and no system toolchain, and a box that already carries a working compiler
+# uses that. A name on the PATH is no proof, so this compiles a probe file.
+# [[spec/design_output/index#the-compiler-it-needs]]
+zig_version=0.16.0
+
+working_compiler() {
+  tmp=$(mktemp -d) || return 1
+  printf 'int probe(void) { return 0; }\n' > "$tmp/probe.c"
+  for one in cc gcc clang; do
+    have "$one" || continue
+    if (cd "$tmp" && "$one" -c probe.c -o probe.o) >/dev/null 2>&1; then
+      rm -rf "$tmp"; printf '%s' "$one"; return 0
+    fi
+  done
+  rm -rf "$tmp"; return 1
+}
+
+# zig is a toolbox and its C compiler is a subcommand, so the pinned answer is
+# two words. A compiler that is already a compiler is one.
+compiler_here() {
+  if [ -x "$bin/zig/zig${exe}" ]; then
+    printf '%s' "$bin/zig/zig${exe} cc"
+    return 0
+  fi
+  working_compiler
+}
+
+index_here() { [ -x "$bin/se-index${exe}" ]; }
+
+get_index() {
+  cc=$(compiler_here) || {
+    say "  no C compiler stands here, so the index waits." >&2
+    return 1
+  }
+  say "  building the index with $cc"
+  (cd "$root/src/index" && CC="$cc" CGO_ENABLED=1 GOFLAGS=-tags=sqlite_fts5 \
+    go build -o "$bin/se-index${exe}" .) || return 1
+  index_here
+}
+
 # THE EDITOR FINDS WHAT ITS OWN LIST NAMES, AND A LINKED FOLDER IS NOT ON IT.
 # So the link goes in beside an entry in extensions.json, and node writes that
 # file: it keeps every entry it cannot read and refuses a write losing an id.
@@ -271,7 +312,7 @@ get_extensions() {
 # A want, rather than a need: the tree still lints and tests without it.
 wanted() {
   [ "$1" = "vale-ls" ] || [ "$1" = "lnav" ] || [ "$1" = "lnav-format" ] ||
-    [ "$1" = "editor-link" ] || [ "$1" = "editor-extensions" ]
+    [ "$1" = "editor-link" ] || [ "$1" = "editor-extensions" ] || [ "$1" = "index" ]
 }
 
 missed() {
@@ -279,6 +320,7 @@ missed() {
     vale-ls) say "  vale-ls stays missing, so the editor manages its own copy." >&2 ;;
     lnav)    say "  lnav stays missing, so ./RUNME.sh log prints plain rows." >&2 ;;
     lnav-format) say "  lnav reads its own format, so the log shows as raw JSON." >&2 ;;
+    index) say "  the index stays unbuilt, so find and links read the files." >&2 ;;
     editor-link) say "  the sidebar stays unlinked, so the editor draws no panel here." >&2 ;;
     editor-extensions) say "  no code on the PATH, so a person takes the recommendation." >&2 ;;
   esac
@@ -292,6 +334,7 @@ here() {
     vale-ls) [ -x "$bin/vale-ls${exe}" ] ;;
     lnav)    [ -x "$bin/lnav${exe}" ] || have lnav ;;
     lnav-format) [ -f "$bin/.lnav-reads-this-tree" ] ;;
+    index) index_here ;;
     editor-link) editor_linked ;;
     editor-extensions) extensions_here ;;
   esac
@@ -305,6 +348,7 @@ why() {
     vale-ls) say "vale-ls: the Vale language server, so an editor draws the same rules" ;;
     lnav) say "lnav: the viewer ./RUNME.sh log opens the door log in" ;;
     lnav-format) say "lnav-format: the row format and the dark theme, which lnav keeps in its own folder" ;;
+    index) say "index: the warm model of this tree, which find and links ask" ;;
     editor-link) say "editor-link: this tree's own sidebar, linked into the editor and named in its list" ;;
     editor-extensions) say "editor-extensions: the Vale and Biome extensions the tracked settings point at" ;;
   esac
@@ -318,13 +362,14 @@ get() {
     vale-ls) get_vale_ls ;;
     lnav) get_lnav ;;
     lnav-format) format_lnav ;;
+    index) get_index ;;
     editor-link) link_editor ;;
     editor-extensions) get_extensions ;;
   esac
 }
 
 missing=""
-for one in node vale biome vale-ls lnav lnav-format editor-link editor-extensions; do
+for one in node vale biome vale-ls lnav lnav-format index editor-link editor-extensions; do
   here "$one" || missing="$missing $one"
 done
 

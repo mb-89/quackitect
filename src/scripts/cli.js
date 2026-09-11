@@ -157,6 +157,18 @@ const verbs = {
     says: "the tree in the editor, which a bare RUNME does",
     run: async () => openEditor(),
   },
+  find: {
+    says: "every line carrying the words, out of the index",
+    run: async () => asksIndex(["find", ...rest]),
+  },
+  links: {
+    says: "what reaches a note, and what reaches nothing",
+    run: async () => asksIndex(rest.length ? ["links", ...rest] : ["dangling"]),
+  },
+  index: {
+    says: "the index itself: standing, reindex, or same <path>",
+    run: async () => asksIndex(rest.length ? rest : ["standing"]),
+  },
 };
 
 const argv = process.argv.slice(2);
@@ -173,6 +185,19 @@ if (verb === "help" || !verbs[verb]) {
   process.exit(verb === "help" ? 0 : 2);
 }
 process.exit((await verbs[verb].run(where.length ? where : ["."])) ?? 0);
+
+// [[spec/design_output/index#the-door-owns-the-database]]
+function asksIndex(argv) {
+  const at = join(root, ".se", "bin", `se-index${process.platform === "win32" ? ".exe" : ""}`);
+  if (!files.exists(at)) {
+    console.error("The index stands unbuilt here, so nothing answers.");
+    console.error("Run ./RUNME.sh once, which builds it where a C compiler stands.");
+    return 1;
+  }
+
+  const said = it.proc.run([at, ...argv], { cwd: root, inherit: true });
+  return said.exitCode;
+}
 
 // [[spec/design_output/editor#one-click-opens-the-editor]]
 function openEditor() {
