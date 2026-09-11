@@ -109,7 +109,7 @@ what to do about it:
 | worktrees, which the client holds | the work branch | keep the brief and the handover, and let a worktree hold the isolation |
 | the `Concise` output style | `ask.wanted` | keep, because ours is one turn's state and theirs is a session's |
 | `security-guidance`, a judge that warns alone | the judge, which refuses | keep the refusal, and read their pattern for the cost |
-| managed settings, `allowManagedHooksOnly` | nothing guards the cage's own files | open, below |
+| managed settings guarding the hooks from the agent | the doors reading the cage's files like any file, the check validating the plugin, the loads test refusing a broken module | keep as it stands, because the owner works those files every day and the guard is for a fleet |
 | function hooks, on their way as Claude Mods within weeks | the whole module | one migration branch on the day it lands |
 
 The function hooks are the ground level zero stands on, and their author says
@@ -124,8 +124,7 @@ migration branch is the cost to plan for.
 | the paragraph schema, its projection, the vocabulary, the answer gate, the question and the TL;DR, the judged rows | six work branches, from `a-paragraph-has-a-schema` |
 | the third language server, and one verb asking all three | `work/the-server-holds-the-shape` |
 | a folder that admits its own kind alone, and `mint_note` writing a note from its fields | `work/the-folder-names-the-kind` |
-| the cage guarding its own files | open, below |
-| a probe that the standing layer survives a compaction | open, below |
+| a probe that the standing layer survives a compaction, and a log line that shows any compaction | `work/the-layer-survives-compaction` |
 
 The measurement decides the close. `./RUNME.sh voice measure` over a session's
 transcript, once the gate stands, says whether the chat lands under the
@@ -146,10 +145,8 @@ ceiling. That number, and a green check, is what done means here.
 
 | the question | what hangs on it |
 |---|---|
-| whether the cage guards its own files | a session can edit `.claude/skills/level0`, `.vale.ini`, the styles and the schemas today, and the field guards that layer first |
-| whether the standing layer survives a compaction | `prompt.context` says it fires again, and the client's docs say a compaction summarises hook context, so a probe decides |
 | what breaks when Claude Mods lands | the declarations move, and one branch pays the migration |
 | whether the canary stays once the client names what loads | `InstructionsLoaded` reads `CLAUDE.md` today, and a plugin's block waits |
 | whether proof of reading comes over from v3 | the canary proves arrival, and a probe proves reading, at the cost of a question per document |
 | whether the trunk guard reads `git -C <path> push` | the field names it as the road past a text rule |
-| where level zero ends | at the seven branches, or at the measurement showing the chat under the ceiling |
+| where level zero ends | at the nine branches, or at the measurement showing the chat under the ceiling |
