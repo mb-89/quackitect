@@ -15,6 +15,17 @@ const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
 const outside = proc();
 
+// [[spec/design_output/vehicle#a-vehicle-stands-alone]]
+const GIT_BASH = [
+  `${process.env.ProgramFiles}\\Git\\bin\\bash.exe`,
+  `${process.env["ProgramFiles(x86)"]}\\Git\\bin\\bash.exe`,
+  `${process.env.LocalAppData}\\Programs\\Git\\bin\\bash.exe`,
+];
+const SHELL =
+  process.platform === "win32" ? (GIT_BASH.find((one) => files.exists(one)) ?? "bash") : "sh";
+const quoted = (said) => String(said).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const either = (path) => `(?:${quoted(path)}|${quoted(path.split("\\").join("/"))})`;
+
 test("a copy carries the method, its run bits, and no private material", () => {
   const where = files.tempDir("vehicle-");
   const dest = join(where, "copy");
@@ -34,7 +45,7 @@ test("a copy carries the method, its run bits, and no private material", () => {
       assert.equal(files.exists(join(dest, path)), false, `${path} stays behind`);
     }
 
-    const ran = outside.run(["sh", "-c", "test -x RUNME.sh"], { cwd: dest });
+    const ran = outside.run([SHELL, "-c", "test -x RUNME.sh"], { cwd: dest });
     assert.equal(ran.exitCode, 0, "RUNME.sh comes over runnable");
   } finally {
     files.remove(where);
@@ -63,10 +74,10 @@ test("a copy answers its own verbs, with no tree behind it", () => {
   try {
     produce(files, root, dest);
 
-    const said = outside.run(["sh", "RUNME.sh", "vehicle"], { cwd: dest });
+    const said = outside.run([SHELL, "RUNME.sh", "vehicle"], { cwd: dest });
     assert.equal(said.exitCode, 0, said.stderr);
-    assert.match(said.stdout, new RegExp(`method\\s+${dest}`), "it names itself as method");
-    assert.match(said.stdout, new RegExp(`work\\s+${dest}`), "and as work");
+    assert.match(said.stdout, new RegExp(`method\\s+${either(dest)}`), "it names itself as method");
+    assert.match(said.stdout, new RegExp(`work\\s+${either(dest)}`), "and as work");
     assert.match(said.stdout, /drives itself/);
     assert.equal(
       said.stdout.includes(root),
