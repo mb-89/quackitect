@@ -8,9 +8,10 @@ urgency: now
 
 The owner rules that private data lives under `.se`, which git ignores, and
 that nothing reaching git may be private. Private means a person's name, a
-username, a path on a disk, and unstructured input such as a note somebody
-stores for later and cleans up never. A date stays public, because the design
-outputs carry them.
+username, a date, a path on a disk, and unstructured input such as a note
+somebody stores for later and cleans up never. A date is private in prose,
+because a date in a tracked note says when somebody looks and nothing a reader
+acts on, and the client version beside it already says which build.
 
 v3 holds the guard this branch brings over, on `origin/v3` under
 `deliverable/engine/pool.ts` and `deliverable/tests/pool-mint.test.ts`, with
@@ -28,24 +29,44 @@ v3 writes one limit down, in a test named for it: a bare name passes, because
 nothing tells a name from any other word, and the author stands alone against
 that. Keep the test and its name.
 
+# What the tree carries today
+
+A grep on the day of this brief says what the shapes rule meets on its first
+run, and the branch cleans each one:
+
+| what stands | where | what the branch does |
+|---|---|---|
+| eleven lines with a date, each one `measured on <date> against client <version>` | `spec/design_output/level0.md`, `projection.md`, and the roundup in `spec/funnel` | drops the date, because the client version says which build |
+| the owner's handle, as the plugin's author | `.claude/skills/level0/.claude-plugin/plugin.json` | writes the project's name there, `quackitect`, so no handle stands in a tracked file |
+| a home path naming a person's user | `test/level0/paths.test.js`, `test/level0/editor.test.js` | renames the user in the fixture to `one` |
+| no email address | any tracked text | nothing |
+
 # What waits
 
 | the piece | where | proves it |
 |---|---|---|
-| the shapes rule | `spec/config/styles/VoiceVale/Private.yml` | an email address, a phone number and a home path refuse in any tracked text |
+| the shapes rule | `spec/config/styles/VoiceVale/Private.yml` | an email address, a phone number, a date and a home path refuse in any tracked prose |
 | the box's own names | `lib/tree.js`, as `NothingPrivateTravels` | the user name, the home path, and the git name and email of the box refuse in a tracked file |
 | the run and the token, at the door | `hooks/level0.js`, in the write door | a tracked write sharing six words with a file under `.se/notes` refuses, and one carrying a path from it refuses alone |
 | the second door | `lib/bash.js` | `git add` naming a path under `.se` refuses, with `-f` or without |
 | the limit, written down | a test under `test/level0` | a bare name passes, and the test says so in its name |
 | the judged half | `spec/config/styles/VoiceJudged/Role.yml` | the judge refuses `person`, and passes `role` |
+| the tree, clean | the four rows above | `./RUNME.sh check` passes with the rule on |
 | the guidance line | `spec/guidance/voice.md` | the note stays under its cap |
 
 # The shapes
 
-`Private.yml` holds the mechanical shapes in one existence rule: an email
-address, a phone number, and an absolute path under a home folder on any of
-the three platforms. A cloud box writes paths under `/home/user`, and the
-design outputs carry them, so the rule reads `user` and `root` as nobody.
+`Private.yml` holds the mechanical shapes in one existence rule over prose:
+an email address, a phone number, a date in the ISO form or with a month's
+name, and an absolute path under a home folder on any of the three platforms.
+The nobody users pass, `user`, `root`, `one` and `somebody`, because a cloud
+box writes paths under `/home/user` and a fixture writes `/Users/one`.
+
+A date in a fixture under `test` or in a log line under `.se` stays out,
+because the rule reads prose alone and `.se` reaches git never. The
+timestamped file name in `spec/design_output/log.md` is an example of a
+shape, and the branch says in the handback whether the rule reads it as a
+date and what it does about that.
 
 `NothingPrivateTravels` reads the box at lint time, the way `SurveyFindsNode`
 reads it: the user name, the home folder, and `git config user.name` and
@@ -87,8 +108,9 @@ Port v3's two functions, the run and the tokens, test for test, over strings
 alone. Test the door with a fake disk holding one note and one write that
 shares a run, and one that shares a path. Test the tree rule with a fake box
 naming a user, and a fixture file carrying that name. Test the Bash door with
-`git add -f .se/notes/one.md`. Run `./RUNME.sh check` over the tree, because
-the tree may carry a shape today, and say in the handback what it names.
+`git add -f .se/notes/one.md`. Clean the four rows above, then run
+`./RUNME.sh check` with the rule on, and say in the handback what else it
+names.
 
 ## How this branch runs
 
