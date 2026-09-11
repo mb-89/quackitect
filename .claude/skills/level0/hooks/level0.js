@@ -3,7 +3,14 @@
 // and spec/guidance.
 // [[spec/design_output/level0#the-write-door]]
 
-import { opensATurn, reachesTheOwner, SAYS, spokeSince } from "../lib/answer.js";
+import {
+  answerAfter,
+  lastSaid,
+  opensATurn,
+  reachesTheOwner,
+  SAYS,
+  warns,
+} from "../lib/answer.js";
 import { commitIn, findings as readsCommand, verbLine } from "../lib/bash.js";
 import { CODE, formatText, lintText as lintCode } from "../lib/code.js";
 import { configOf, TRACKED } from "../lib/config.js";
@@ -20,7 +27,16 @@ import {
 } from "../lib/guidance.js";
 import { godMode, HEALTH, repairs } from "../lib/health.js";
 import { judgeOf } from "../lib/judge.js";
-import { aimOf, asLines, FOLDER, nameOf, rowOf, writes } from "../lib/log.js";
+import {
+  aimOf,
+  appended,
+  archiveOf,
+  LOG_TOOL,
+  logSpec,
+  rowOf,
+  SESSION,
+  writes,
+} from "../lib/log.js";
 import { relativeTo } from "../lib/paths.js";
 import {
   entriesIn,
@@ -55,6 +71,7 @@ const TRUNK = "main";
 const JUDGED = "spec/config/styles/VoiceJudged";
 
 const ANSWER = "level0-answer.md";
+const GOD = "god";
 const GATHERING = 300000;
 const GATHER = ["node", "src/scripts/cli.js"];
 
@@ -72,7 +89,8 @@ export function register(on, _options) {
   let logbook = logHere(null);
   let rules = [];
   let onAHeldBranch = false;
-  let owed = false;
+  let owed = null;
+  const seen = { ask: QUIET, hold: "running" };
   let root = "";
   let projections = [];
   const list = todos();
@@ -139,19 +157,34 @@ export function register(on, _options) {
 
     await $.tool.register(claimSpec(rules));
     await $.tool.register(reviewSpec());
+    await $.tool.register(logSpec());
     return next(e);
   });
 
-  on("prompt.submit", async (_$, e, next) => {
+  // [[spec/design_output/log#the-log-tool]]
+  on("tool.call", { tool: `mcp__level0__${LOG_TOOL}` }, async (_$, e, _next) => {
+    const row = await logbook.say(
+      String(e.level ?? "info"),
+      String(e.kind ?? "note"),
+      String(e.said ?? ""),
+      e.text ? { text: String(e.text) } : {},
+    );
+    return { result: `logged: ${row.kind} ${row.said}` };
+  });
+
+  on("prompt.submit", async ($, e, next) => {
     const from = String(e.origin?.kind ?? "");
     tooth.sawPrompt(from === "plugin");
-    if (opensATurn(e.origin)) owed = true;
-    await logbook.say("info", "prompt", String(e.text ?? ""), { detail: from });
+    if (opensATurn(e.origin)) owed = await owing($, "The owner sent a prompt");
+    const text = String(e.text ?? "");
+    await logbook.say("info", "prompt", text, { detail: from, text });
     return next(e);
   });
 
   // [[spec/design_output/log#what-a-tool-line-names]]
+  // [[spec/design_output/level0#the-owner-binds-god]]
   on("tool.call", async ($, e, next) => {
+    const said = await (async () => {
     // [[spec/design_output/level0#god-mode]]
     const well = await ensureCage($, cage);
     take();
@@ -169,6 +202,8 @@ export function register(on, _options) {
     }
 
     // [[spec/design_output/level0#the-owners-prompt-comes-first]]
+    const asked = await askedNow(settings, seen);
+    if (asked) owed = await owing($, asked);
     const answers = await answerDoor($, e, {
       owed,
       off: (await settings.ask("answer.enabled")) === false,
@@ -176,9 +211,12 @@ export function register(on, _options) {
     });
     if (answers.deny) return answers;
     owed = answers.owed;
+    const onward = answers.warn
+      ? async (given) => withContext(await next(given), answers.warn)
+      : next;
 
     const writing = asWrite(e);
-    if (!writing) return next(e);
+    if (!writing) return onward(e);
 
     // [[spec/design_output/projection#the-write-door-refuses-one]]
     const owner = ownerOf(projections, writing.path);
@@ -193,13 +231,13 @@ export function register(on, _options) {
     }
 
     if (CODE.test(writing.path)) {
-      return await codeDoor($, e, next, writing, formatter, logbook, root);
+      return await codeDoor($, e, onward, writing, formatter, logbook, root);
     }
-    if (!PROSE.test(writing.path)) return next(e);
+    if (!PROSE.test(writing.path)) return onward(e);
 
     const where = relativeTo(root, writing.path);
     const found = [];
-    let door = "vale";
+    let kind = "vale";
 
     if (bin) {
       const said = await lintText(writing.text, where, {
@@ -212,7 +250,7 @@ export function register(on, _options) {
     if (!found.length) {
       judge = judgeOf(await judgeSettings(settings), await readRules($, JUDGED));
       if (judge.reads()) {
-        door = "judge";
+        kind = "judge";
         found.push(
           ...(await judge.run(
             writing.text,
@@ -225,19 +263,22 @@ export function register(on, _options) {
 
     if (!found.length) {
       judge.sawClean();
-      return next(e);
+      return onward(e);
     }
     judge.sawBreach();
-    await logbook.say("warn", door, `refused ${found.length} line(s) in ${where}`, {
+    await logbook.say("warn", kind, `refused ${found.length} line(s) in ${where}`, {
       file: where,
       rule: found[0]?.rule,
       tool: e.tool,
     });
     return { deny: refusal(where, found) };
+    })();
+    return godPasses(logbook, settings, e, next, said);
   });
 
   // [[spec/design_output/work#a-box-writes-its-branch]]
   on("tool.call", { tool: "Bash" }, async ($, e, next) => {
+    const said = await (async () => {
     if (!cloud) return next(e);
     const said = String(e.command ?? "");
     if (!touchesGit(said).commits && !touchesGit(said).pushes) return next(e);
@@ -261,10 +302,13 @@ export function register(on, _options) {
         "commit then lands where it belongs, and the merge stays a person's.",
       ].join("\n"),
     };
+    })();
+    return godPasses(logbook, settings, e, next, said);
   });
 
   // [[spec/design_output/bash#what-the-door-reads]]
   on("tool.call", { tool: "Bash" }, async ($, e, next) => {
+    const said = await (async () => {
     const said = String(e.command ?? "");
     const found = readsCommand(said, await settings.ask("names.words"));
     found.push(...(await commitVoice($, said, bin)));
@@ -276,6 +320,8 @@ export function register(on, _options) {
       detail: said.slice(0, 120),
     });
     return { deny: refusedCommand(said, found) };
+    })();
+    return godPasses(logbook, settings, e, next, said);
   });
 
   // [[spec/design_output/bash#the-description-names-verbs]]
@@ -329,9 +375,27 @@ export function register(on, _options) {
     return { result: report(material, read) };
   });
 
+  // [[spec/design_output/level0#a-step-carries-the-answer]]
+  on("turn.step", async (_$, e, next) => {
+    const said = await next(e);
+    if (!owed || (await settings.ask("answer.enabled")) === false) return said;
+    const text = String(e.answer ?? "").trim();
+    if (text) {
+      await logbook.say("info", "answer", text, { text, detail: owed.why });
+      owed = null;
+    } else {
+      owed = { ...owed, stepped: true };
+    }
+    return said;
+  });
+
   on("turn.complete", async ($, e, next) => {
     const said = await next(e);
-    owed = false;
+    owed = null;
+    // [[spec/design_output/log#a-reply-beside-its-prompt]]
+    if (e.reason === "answer" && e.answer) {
+      await logbook.say("info", "reply", e.answer, { text: String(e.answer) });
+    }
     if (firstTurn && e.reason === "answer") {
       firstTurn = false;
       await heardCanary(logbook, canaryIn(e.answer, sentence), sentence);
@@ -492,9 +556,10 @@ async function loadCage($, cage) {
   cage.tooth = toothOf({ mostInARow: await cage.settings.ask("stop.mostInARow") });
   if (!cage.wired) {
     cage.logbook = logHere(
-      (at, text) => $.fs.write(at, text),
+      { read: (at) => $.fs.read(at), write: (at, text) => $.fs.write(at, text) },
       await cage.settings.ask("log.level"),
     );
+    await cage.logbook.rotate();
     cage.wired = true;
   }
 
@@ -606,23 +671,72 @@ async function readIf($, path) {
   }
 }
 
-// [[spec/design_output/level0#the-owners-prompt-comes-first]]
+// [[spec/design_output/level0#one-warning-then-a-refusal]]
 async function answerDoor($, e, it) {
-  if (!it.owed || it.off) return { owed: it.owed };
-  if (e.agentId || reachesTheOwner(e.tool)) return { owed: it.owed };
+  const owed = it.owed;
+  if (!owed || it.off) return { owed };
+  if (e.agentId || reachesTheOwner(e.tool)) return { owed };
 
-  let spoke = true;
+  let said = "";
   try {
-    spoke = spokeSince(await $.session.messages());
+    said = answerAfter(await $.session.messages(), owed.seen);
   } catch {
-    spoke = true;
+    return { owed: null };
   }
-  if (spoke) return { owed: false };
+  // [[spec/design_output/log#the-answer-under-its-prompt]]
+  if (said) {
+    await it.logbook.say("info", "answer", said, { text: said, detail: owed.why });
+    return { owed: null };
+  }
+  if (!owed.stepped) return { owed };
 
-  await it.logbook.say("warn", "answer", `refused ${e.tool} before an answer`, {
+  if (!owed.warned) {
+    await it.logbook.say("warn", "gate", `warned ${e.tool} before an answer`, {
+      tool: e.tool,
+      detail: owed.why,
+    });
+    return { owed: { ...owed, warned: true }, warn: warns(owed.why) };
+  }
+  await it.logbook.say("warn", "gate", `refused ${e.tool} before an answer`, {
     tool: e.tool,
+    detail: owed.why,
   });
-  return { deny: SAYS, owed: true };
+  return { deny: `${owed.why}. ${SAYS}`, owed };
+}
+
+// [[spec/design_output/level0#what-counts-as-owed]]
+async function owing($, why) {
+  let seen = "";
+  try {
+    seen = lastSaid(await $.session.messages());
+  } catch {}
+  return { why, seen, warned: false, stepped: false };
+}
+
+async function askedNow(settings, seen) {
+  const ask = String((await settings.ask(ASK)) ?? QUIET);
+  const hold = String((await settings.ask("stop.hold")) ?? "running");
+  let why = "";
+  if (ask !== seen.ask && ask !== QUIET) why = `The owner asks for a ${ask} update`;
+  if (hold !== seen.hold && hold === "stopped") why = "The owner holds this session at stopped";
+  seen.ask = ask;
+  seen.hold = hold;
+  return why;
+}
+
+// [[spec/design_output/level0#the-owner-binds-god]]
+async function godPasses(logbook, settings, e, next, said) {
+  if (!said?.deny || (await settings.ask("engine.binding")) !== GOD) return said;
+  await logbook.say("warn", "god", `passed ${e.tool} past a refusal`, {
+    tool: e.tool,
+    detail: String(said.deny).replace(/\s+/g, " ").slice(0, 200),
+  });
+  return next(e);
+}
+
+function withContext(said, text) {
+  if (!said || said.deny) return said;
+  return { ...said, context: [...(said.context ?? []), text] };
 }
 
 // [[spec/design_output/bash#a-commit-message-meets-voice]]
@@ -744,23 +858,42 @@ async function bite($, e, it) {
 }
 
 // [[spec/design_output/log#where-the-writer-stands]]
-function logHere(writeFile, at) {
+function logHere(fs, at) {
   const rows = [];
   const stamp = () => new Date().toISOString();
   const id = Math.random().toString(16).slice(2).padEnd(8, "0").slice(0, 8);
-  const path = `${FOLDER}/${nameOf(stamp(), id)}`;
+  let queue = Promise.resolve();
+  const inTurn = (work) => {
+    queue = queue.then(work).catch(() => {});
+    return queue;
+  };
+  const readNow = async () => {
+    try {
+      return String(await fs.read(SESSION));
+    } catch {
+      return "";
+    }
+  };
 
   return {
-    path,
+    path: SESSION,
     lines: () => rows.map((one) => ({ ...one })),
-    async say(level, door, said, more) {
-      const row = rowOf(stamp(), level, door, said, more);
+    // [[spec/design_output/log#a-session-rotates-its-file]]
+    async rotate() {
+      if (!fs) return;
+      await inTurn(async () => {
+        const was = await readNow();
+        if (!was.trim()) return;
+        await fs.write(archiveOf(was, stamp(), id), was);
+        await fs.write(SESSION, "");
+      });
+    },
+    async say(level, kind, said, more) {
+      const row = rowOf(stamp(), level, kind, said, more);
       if (!writes(at, row.level)) return row;
       rows.push(row);
-      if (!writeFile) return row;
-      try {
-        await writeFile(path, asLines(rows));
-      } catch {}
+      if (!fs) return row;
+      await inTurn(async () => fs.write(SESSION, appended(await readNow(), row)));
       return row;
     },
   };

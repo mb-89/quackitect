@@ -6,12 +6,19 @@
 const vscode = require("vscode");
 
 const NAME = "quackitect";
+const FAR_LEFT = Number.MAX_SAFE_INTEGER;
+const PUT_BACK = "Put it back";
+const QUIET = [
+  ["requireConfiguration", true],
+  ["suggestInstallingGlobally", false],
+];
 
 function editorDoor(context) {
   const folder = vscode.workspace.workspaceFolders?.[0];
   const decoder = new TextDecoder();
   const encoder = new TextEncoder();
   let page = null;
+  const bars = new Map();
 
   const uriOf = (path) => vscode.Uri.joinPath(folder.uri, ...String(path).split("/"));
   let console_ = null;
@@ -22,6 +29,57 @@ function editorDoor(context) {
       page = one;
     },
     pid: () => process.ppid,
+    now: () => Date.now(),
+
+    // [[spec/design_output/extension#it-starts-silent]]
+    marks(name, on) {
+      vscode.commands.executeCommand("setContext", name, on);
+    },
+
+    registers(name, run) {
+      context.subscriptions.push(vscode.commands.registerCommand(name, run));
+    },
+
+    // [[spec/design_output/extension#the-status-bar-says-it]]
+    shows(states, command) {
+      const keys = new Set(states.map((one) => one.key));
+      for (const [key, item] of bars) {
+        if (!keys.has(key)) item.hide();
+      }
+      states.forEach((one, at) => {
+        let item = bars.get(one.key);
+        if (!item) {
+          item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, FAR_LEFT - at);
+          context.subscriptions.push(item);
+          bars.set(one.key, item);
+        }
+        item.text = one.text;
+        item.tooltip = one.tip;
+        item.backgroundColor = new vscode.ThemeColor(`statusBarItem.${one.tone}Background`);
+        item.command = { command, title: one.tip, arguments: [one.key, one.rest] };
+        item.show();
+      });
+    },
+
+    toasts(one, command) {
+      Promise.resolve(vscode.window.showWarningMessage(one.toast, PUT_BACK)).then((picked) => {
+        if (picked === PUT_BACK) vscode.commands.executeCommand(command, one.key, one.rest);
+      });
+    },
+
+    // [[spec/design_output/extension#runme-opens-the-panel]]
+    reveals() {
+      vscode.commands.executeCommand(`workbench.view.extension.${NAME}`);
+    },
+
+    // [[spec/design_output/extension#an-empty-folder-stays-quiet]]
+    quiets() {
+      const biome = vscode.workspace.getConfiguration("biome");
+      for (const [key, value] of QUIET) {
+        if (biome.inspect(key)?.globalValue !== undefined) continue;
+        Promise.resolve(biome.update(key, value, vscode.ConfigurationTarget.Global)).catch(() => {});
+      }
+    },
     nonce: () => globalThis.crypto.randomUUID().split("-").join(""),
     source: () => page?.webview?.cspSource ?? "",
 

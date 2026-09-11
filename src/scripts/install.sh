@@ -15,7 +15,6 @@ bin="$root/.se/bin"
 # platform, so nothing here compiles and no C toolchain is needed.
 vale_version=3.20.0
 biome_version=2.5.12
-lnav_version=0.14.1
 # vale-ls pins itself in .claude/skills/level0/lib/servers.js, which a test drives.
 
 say() { printf '%s\n' "$*"; }
@@ -123,48 +122,22 @@ get_biome() {
   chmod +x "$bin/biome${exe}"
 }
 
-# The log viewer. Release 0.14.1 ships Linux and Windows zips, and macOS takes
-# it from brew. The format file decides what a row shows, and lnav reads that
-# from the reader's own folder, so it lands with one -i.
-get_lnav() {
-  if [ "$os" = "macOS" ]; then
-    install_with_pm lnav
+# Go builds the log viewer, and ./RUNME.sh log builds it the first time it runs.
+get_go() {
+  if [ "$os" = "Windows" ]; then
+    have winget || return 1
+    say "  installing go through winget"
+    winget install --id GoLang.Go --exact --silent \
+      --accept-source-agreements --accept-package-agreements || true
+    PATH="$PATH:/c/Program Files/Go/bin"
+    export PATH
     return 0
   fi
-
-  case "$os" in
-    Windows) plat=windows ;;
-    *)       plat=linux-musl ;;
+  case "$pm" in
+    apt-get) install_with_pm golang-go ;;
+    dnf)     install_with_pm golang ;;
+    *)       install_with_pm go ;;
   esac
-  cpu=$( [ "$arch" = arm64 ] && echo arm64 || echo x86_64 )
-  name="lnav-${lnav_version}-${plat}-${cpu}.zip"
-  from="https://github.com/tstack/lnav/releases/download/v${lnav_version}/${name}"
-
-  say "  downloading lnav ${lnav_version}"
-  mkdir -p "$bin"
-  tmp=$(mktemp -d)
-  if have curl; then curl -fsSL "$from" -o "$tmp/$name" || return 1
-  elif have wget; then wget -q "$from" -O "$tmp/$name" || return 1
-  else say "Neither curl nor wget downloads lnav here." >&2; return 1
-  fi
-
-  unpack "$tmp/$name" "$tmp" || return 1
-  if [ "$os" = "Windows" ]; then
-    mv "$tmp/lnav-${lnav_version}/bin/lnav.exe" "$bin/lnav.exe" || return 1
-    mv "$tmp/lnav-${lnav_version}/bin/msys-2.0.dll" "$bin/msys-2.0.dll" || return 1
-  else
-    mv "$tmp/lnav-${lnav_version}/lnav" "$bin/lnav" || return 1
-  fi
-  chmod +x "$bin/lnav${exe}"
-  rm -rf "$tmp"
-}
-
-# lnav reads a format and a theme from its own folder, and node hands them
-# over: the Windows build answers 0 after failing under a shell parent, so the
-# script reads the answer back. The stamp keeps this off every later run.
-format_lnav() {
-  (cd "$root" && node src/scripts/lnav-reads.js >/dev/null 2>&1) || return 1
-  mkdir -p "$bin" && : > "$bin/.lnav-reads-this-tree"
 }
 
 unpack() {
@@ -244,45 +217,18 @@ get_index() {
 # The link points at the tree, so an edit draws without a second install.
 editor_folder="$HOME/.vscode/extensions"
 
-editor_names() {
-  (cd "$root" && node -e \
-    "const p=require('./src/extension/package.json');
-     process.stdout.write(p.publisher + '.' + p.name + ' ' + p.version);") 2>/dev/null
-}
-
 # A COPY IS A STALE EXTENSION, AND THAT IS THE ONE THING THIS CANNOT BE. A copy
-# draws the tree as it stood at the install, so an edit reaches nobody. Proving
-# a link on every shell is more than this can carry, so it links every run.
+# draws the tree as it stood at the install, so an edit reaches nobody. Node
+# makes the link, a junction on Windows, and node answers whether it stands.
 editor_linked() {
   [ -d "$editor_folder" ] || return 0
-  [ "$os" = "Windows" ] && return 1
-  set -- $(editor_names)
-  [ -n "${1:-}" ] && [ -n "${2:-}" ] || return 1
-  [ -L "$editor_folder/$1-$2" ] || return 1
-  [ -f "$editor_folder/$1-$2/package.json" ] || return 1
-  grep -q "\"$1\"" "$editor_folder/extensions.json" 2>/dev/null
+  (cd "$root" && node src/scripts/editor.js linked) >/dev/null 2>&1
 }
 
 link_editor() {
   [ -d "$editor_folder" ] || return 0
-  set -- $(editor_names)
-  [ -n "${1:-}" ] && [ -n "${2:-}" ] || return 1
-  dest="$editor_folder/$1-$2"
-  case "$dest" in *"/.vscode/extensions/"*) ;; *) return 1 ;; esac
-
-  say "  linking the sidebar at $dest"
-  rm -rf "$dest"
-  if [ "$os" = "Windows" ]; then
-    # A junction needs no administrator, where a symbolic link asks for one,
-    # and the shell Git ships hands a program its own paths through cygpath.
-    cmd //c mklink /J "$(cygpath -w "$dest")" "$(cygpath -w "$root/src/extension")" >/dev/null ||
-      cp -R "$root/src/extension" "$dest" || return 1
-  else
-    ln -s "$root/src/extension" "$dest" 2>/dev/null ||
-      cp -R "$root/src/extension" "$dest" || return 1
-  fi
-  [ -f "$dest/package.json" ] || return 1
-  (cd "$root" && node src/scripts/editor.js) || return 1
+  say "  linking the sidebar into the editor"
+  (cd "$root" && node src/scripts/editor.js link) || return 1
 }
 
 # The two the tracked settings point at. servers.js holds the ids, so the shell
@@ -311,15 +257,14 @@ get_extensions() {
 
 # A want, rather than a need: the tree still lints and tests without it.
 wanted() {
-  [ "$1" = "vale-ls" ] || [ "$1" = "lnav" ] || [ "$1" = "lnav-format" ] ||
+  [ "$1" = "vale-ls" ] || [ "$1" = "go" ] ||
     [ "$1" = "editor-link" ] || [ "$1" = "editor-extensions" ] || [ "$1" = "index" ]
 }
 
 missed() {
   case $1 in
     vale-ls) say "  vale-ls stays missing, so the editor manages its own copy." >&2 ;;
-    lnav)    say "  lnav stays missing, so ./RUNME.sh log prints plain rows." >&2 ;;
-    lnav-format) say "  lnav reads its own format, so the log shows as raw JSON." >&2 ;;
+    go)      say "  go stays missing, so ./RUNME.sh log prints plain rows." >&2 ;;
     index) say "  the index stays unbuilt, so find and links read the files." >&2 ;;
     editor-link) say "  the sidebar stays unlinked, so the editor draws no panel here." >&2 ;;
     editor-extensions) say "  no code on the PATH, so a person takes the recommendation." >&2 ;;
@@ -332,9 +277,8 @@ here() {
     vale)    [ -x "$bin/vale${exe}" ] ;;
     biome)   [ -x "$bin/biome${exe}" ] ;;
     vale-ls) [ -x "$bin/vale-ls${exe}" ] ;;
-    lnav)    [ -x "$bin/lnav${exe}" ] || have lnav ;;
-    lnav-format) [ -f "$bin/.lnav-reads-this-tree" ] ;;
-    index) index_here ;;
+    go)      have go ;;
+    index) index_here || ! compiler_here >/dev/null ;;
     editor-link) editor_linked ;;
     editor-extensions) extensions_here ;;
   esac
@@ -346,8 +290,7 @@ why() {
     vale) say "vale: Vale holds the prose rules the write door and the linter read" ;;
     biome) say "biome: Biome formats and lints the JavaScript in this tree" ;;
     vale-ls) say "vale-ls: the Vale language server, so an editor draws the same rules" ;;
-    lnav) say "lnav: the viewer ./RUNME.sh log opens the door log in" ;;
-    lnav-format) say "lnav-format: the row format and the dark theme, which lnav keeps in its own folder" ;;
+    go) say "go: it builds the viewer ./RUNME.sh log opens the door log in, and the index" ;;
     index) say "index: the warm model of this tree, which find and links ask" ;;
     editor-link) say "editor-link: this tree's own sidebar, linked into the editor and named in its list" ;;
     editor-extensions) say "editor-extensions: the Vale and Biome extensions the tracked settings point at" ;;
@@ -360,8 +303,7 @@ get() {
     vale) get_vale ;;
     biome) get_biome ;;
     vale-ls) get_vale_ls ;;
-    lnav) get_lnav ;;
-    lnav-format) format_lnav ;;
+    go) get_go ;;
     index) get_index ;;
     editor-link) link_editor ;;
     editor-extensions) get_extensions ;;
@@ -369,7 +311,7 @@ get() {
 }
 
 missing=""
-for one in node vale biome vale-ls lnav lnav-format index editor-link editor-extensions; do
+for one in node vale biome vale-ls go index editor-link editor-extensions; do
   here "$one" || missing="$missing $one"
 done
 

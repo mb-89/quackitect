@@ -9,7 +9,7 @@ import { newestIn, rowOf, rowsIn } from "../../src/extension/lib/rows.js";
 const LINE = JSON.stringify({
   at: "2026-09-10T16:27:50.479Z",
   level: "warn",
-  door: "vale",
+  kind: "vale",
   said: "5 line(s) break a rule",
   ms: 373,
 });

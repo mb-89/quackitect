@@ -160,7 +160,7 @@ test("done says one line to the log, naming the branch and the code", async () =
     {
       at: "2026-01-01T00:00:00.000Z",
       level: "info",
-      door: "work",
+      kind: "work",
       said: "done answered 0",
       branch: "work/fix-lsp",
     },

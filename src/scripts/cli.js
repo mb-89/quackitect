@@ -10,7 +10,7 @@ import {
   standingLayer,
 } from "../../.claude/skills/level0/lib/guidance.js";
 import { HEALTH, healthOf } from "../../.claude/skills/level0/lib/health.js";
-import { asRow, rowsOf } from "../../.claude/skills/level0/lib/log.js";
+import { asRow, OLD, rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
 import {
   entriesIn,
@@ -41,6 +41,7 @@ import { git } from "../doors/git.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { readTools, whereIs, writeSurvey } from "./tools.js";
+import { SOURCE as VIEWER, viewerOf } from "./viewer.js";
 import { work } from "./work.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 
@@ -84,7 +85,7 @@ const outside = it.proc;
 
 const known = readTools(files, root);
 const bin = whereIs(files, root, "vale", known);
-const lnav = whereIs(files, root, "lnav", known);
+const go = whereIs(files, root, "go", known);
 const LOG = join(root, ".se", "log");
 const STYLES = join(root, "spec", "config", "styles", "VoiceVale");
 const JUDGED = join(root, "spec", "config", "styles", "VoiceJudged");
@@ -96,7 +97,7 @@ const DOORS = join(root, "src", "doors");
 const PLUGIN = join(".claude", "skills", "level0");
 const CONTRACT = join(root, "test", "contract");
 const settings = it.config;
-const OURS = "--glob=!{.se,node_modules,.git}/**";
+const OURS = "--glob=!{.se,node_modules,.git,.claude/types}/**";
 const TESTS = "test/level0/*.test.js";
 const CONTRACT_TESTS = "test/contract/*.test.js";
 const ROUNDS = 5;
@@ -110,6 +111,7 @@ const verbs = {
     run: async (w) =>
       stamped(
         test() ||
+          viewerHolds() ||
           doorsHold() ||
           projectionsHold() ||
           pluginHolds() ||
@@ -150,12 +152,8 @@ const verbs = {
     run: async () => work(root, rest, it),
   },
   log: {
-    says: "what every door says, through lnav where it stands",
+    says: "what every door says, in the viewer this tree builds",
     run: async () => readLog(rest),
-  },
-  open: {
-    says: "the tree in the editor, which a bare RUNME does",
-    run: async () => openEditor(),
   },
   find: {
     says: "every line carrying the words, out of the index",
@@ -172,7 +170,7 @@ const verbs = {
 };
 
 const argv = process.argv.slice(2);
-const verb = argv.find((a) => !a.startsWith("-")) ?? "open";
+const verb = argv.find((a) => !a.startsWith("-")) ?? "help";
 const where = argv.filter((a) => !a.startsWith("-") && a !== verb);
 const rest = argv.slice(argv.indexOf(verb) + 1);
 
@@ -197,27 +195,6 @@ function asksIndex(argv) {
 
   const said = it.proc.run([at, ...argv], { cwd: root, inherit: true });
   return said.exitCode;
-}
-
-// [[spec/design_output/editor#one-click-opens-the-editor]]
-function openEditor() {
-  for (const call of ["code", "code.cmd"]) {
-    if (editorOpens(call)) {
-      console.log("The editor opens on this tree.");
-      return 0;
-    }
-  }
-
-  console.error("No editor answered here. Install VS Code, or open this folder in one.");
-  return 1;
-}
-
-function editorOpens(call) {
-  try {
-    return it.proc.run([call, "."], { cwd: root }).exitCode === 0;
-  } catch {
-    return false;
-  }
 }
 
 async function lint(where) {
@@ -328,45 +305,59 @@ function gridFaults(where) {
   }));
 }
 
-// [[spec/design_output/log#lnav-and-how-it-installs]]
-function lnavHere() {
-  if (files.exists(lnav)) return lnav;
-  try {
-    return outside.run(["lnav", "-V"]).exitCode === 0 ? "lnav" : "";
-  } catch {
-    return "";
-  }
-}
-
-// [[spec/design_output/log#the-verb]]
+// [[spec/design_output/viewer#the-verb-builds-it]]
 function readLog(argv) {
-  const names = files.exists(LOG) ? namesIn(LOG, ".jsonl").sort() : [];
-  if (!names.length) {
-    console.log("No log stands yet. A door writes one the next time it says a line.");
+  const plain = argv.includes("--plain");
+  const viewer = plain ? { exe: "", why: "" } : viewerHere();
+  if (viewer.why) console.error(viewer.why);
+  const session = join(root, SESSION);
+  if (viewer.exe) {
+    files.makeDir(LOG);
+    return outside.run([viewer.exe, session], { cwd: root, inherit: true }).exitCode;
+  }
+
+  const old = join(root, OLD);
+  const read = [
+    ...(argv.includes("--all") && files.exists(old)
+      ? namesIn(old, ".jsonl").sort().map((name) => join(old, name))
+      : []),
+    ...(files.exists(session) ? [session] : []),
+  ];
+  if (!read.length) {
+    console.log("No log stands yet. A writer starts one the next time it says a line.");
     return 0;
   }
-
-  const all = argv.includes("--all");
-  const newest = names[names.length - 1];
-  // [[spec/design_output/extension#the-button-prints-the-log]]
-  const viewer = argv.includes("--plain") ? "" : lnavHere();
-  if (viewer) {
-    return outside.run([viewer, all ? LOG : join(LOG, newest)], {
-      cwd: root,
-      inherit: true,
-    }).exitCode;
+  for (const path of read) {
+    console.log(show(path));
+    for (const one of rowsOf(files.read(path))) console.log(asRow(one));
   }
-
-  for (const name of all ? names : [newest]) {
-    console.log(name);
-    for (const one of rowsOf(files.read(join(LOG, name)))) console.log(asRow(one));
-  }
-  if (!argv.includes("--plain")) {
+  if (!plain) {
     console.log("");
-    console.log("lnav draws these rows, and opens the rest of a line under it.");
-    console.log("Run ./RUNME.sh once, which installs it into .se/bin.");
+    console.log("Go builds the viewer these rows open in. Install Go, and run this again.");
   }
   return 0;
+}
+
+function viewerHere() {
+  return viewerOf({
+    disk: files,
+    proc: outside,
+    root: root.split(sep).join("/"),
+    go,
+    windows: process.platform === "win32",
+  });
+}
+
+// [[spec/design_output/viewer#the-check-runs-its-tests]]
+function viewerHolds() {
+  let ran;
+  try {
+    ran = outside.run([go, "test", "./..."], { cwd: join(root, VIEWER), inherit: true });
+  } catch {
+    console.log("go stands nowhere, so the viewer's tests go unrun here.");
+    return 0;
+  }
+  return ran.exitCode;
 }
 
 // [[spec/design_output/config#the-verb-names-the-layer]]
@@ -375,6 +366,8 @@ async function readConfig(argv) {
 
   if (key && said.length) {
     const wrote = await settings.write(key, said.join(" "));
+    // [[spec/design_output/log#a-setting-writes-a-line]]
+    await it.log.say("info", "config", `${wrote.key} is ${wrote.value}`, { detail: wrote.layer });
     console.log(`${wrote.key} is ${JSON.stringify(wrote.value)} in ${wrote.layer}.`);
     return 0;
   }

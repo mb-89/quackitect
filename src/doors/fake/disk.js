@@ -4,10 +4,21 @@
 export function fakeDisk(seed = {}) {
   const files = new Map(Object.entries(seed).map(([at, said]) => [norm(at), said]));
   const folders = new Set();
+  const links = new Map();
   let made = 0;
 
   return {
     files,
+    link(target, path) {
+      if (files.has(norm(path)) || folders.has(norm(path)) || links.has(norm(path))) {
+        const err = new Error(`file already exists: ${path}`);
+        err.code = "EEXIST";
+        throw err;
+      }
+      links.set(norm(path), norm(target));
+    },
+    isLink: (path) => links.has(norm(path)),
+    realOf: (path) => links.get(norm(path)) ?? norm(path),
     tempDir(prefix = "tmp") {
       made++;
       const at = `/tmp/${prefix}${made}`;
@@ -24,9 +35,15 @@ export function fakeDisk(seed = {}) {
       return said;
     },
     write: (path, text) => void files.set(norm(path), String(text)),
-    exists: (path) => files.has(norm(path)) || folders.has(norm(path)),
+    append: (path, text) => void files.set(norm(path), `${files.get(norm(path)) ?? ""}${text}`),
+    exists(path) {
+      const at = norm(path);
+      if (files.has(at) || folders.has(at) || links.has(at)) return true;
+      return [...files.keys(), ...folders].some((one) => one.startsWith(`${at}/`));
+    },
     remove(path) {
       const at = norm(path);
+      if (links.delete(at)) return;
       for (const key of [...files.keys()]) {
         if (key === at || key.startsWith(`${at}/`)) files.delete(key);
       }

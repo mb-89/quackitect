@@ -12,7 +12,7 @@ tree calls stands on this box:
       "node": { "path": "/usr/bin/node", "version": "24.19.0" },
       "vale": { "path": "/home/one/quackitect/.se/bin/vale", "version": "3.20.0" },
       "sh":   { "path": "/bin/sh" },
-      "lnav": null
+      "go":   null
     }
 
 A tool the box carries nowhere reads as `null`, and the caller carries on
@@ -54,8 +54,8 @@ finds a tool in `.se/bin`.
 against the install script: a tool the installer installs stands in the survey.
 For details, see [[spec/design_output/tree#the-rules-over-two-files]].
 
-The rule reads the `here()` cases, so `lnav-format` stays out of it. A stamp
-file is no tool.
+The rule reads the `here()` cases that test a binary, so `editor-link` stays
+out of it. A link is no tool.
 
 # Scripts a session writes
 
