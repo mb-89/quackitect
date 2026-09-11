@@ -1,6 +1,7 @@
 ---
-description: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
+description: "config / answer / enabled: sets answer.enabled to true. The door holding the owner's prompt first. false takes it out."
 allowed-tools: Bash(./RUNME.sh config:*)
+generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
 ---
 
 !`./RUNME.sh config answer.enabled true`

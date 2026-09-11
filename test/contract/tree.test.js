@@ -336,7 +336,7 @@ test("every widget writing a key names one the declaration carries", () => {
 test("every slash command a button's hover names stands in .claude/commands", () => {
   const standing = new Set(files.list(join(root, ".claude", "commands")).map((one) => one.name));
   const named = drawnIn(read(SCHEMA)).flatMap((one) => commandsOf(one));
-  assert.ok(named.includes("/se-stop-hold-stopped"), "the hold button names its far end");
+  assert.ok(named.includes("/se-agent-control-hold-stopped"), "the hold button names its far end");
   for (const one of named) {
     assert.ok(standing.has(`${one.slice(1)}.md`), `${one} stands as a command`);
   }

@@ -979,12 +979,12 @@ test("a session start projects every target, and says what it costs", async () =
 
   const drawn = [...it.files.keys()].filter((one) => one.startsWith(".claude/commands/"));
   assert.deepEqual(drawn.sort(), [
-    ".claude/commands/se-judge-enabled-false.md",
-    ".claude/commands/se-judge-enabled-true.md",
-    ".claude/commands/se-log-level.md",
-    ".claude/commands/se-stop-enabled-false.md",
-    ".claude/commands/se-stop-enabled-true.md",
-    ".claude/commands/se-stop-mostInARow.md",
+    ".claude/commands/se-config-judge-enabled-false.md",
+    ".claude/commands/se-config-judge-enabled-true.md",
+    ".claude/commands/se-config-log-level.md",
+    ".claude/commands/se-config-stop-enabled-false.md",
+    ".claude/commands/se-config-stop-enabled-true.md",
+    ".claude/commands/se-config-stop-mostInARow.md",
   ]);
 
   const said = it.lines().find((one) => one.kind === "project");
@@ -1014,10 +1014,10 @@ test("the write door refuses a write to a generated command", async () => {
   const it = await started({ "spec/config/projections.json": PROJECTS });
 
   for (const e of [
-    { tool: "Write", file_path: ".claude/commands/se-log-level.md", content: "mine\n" },
+    { tool: "Write", file_path: ".claude/commands/se-config-log-level.md", content: "mine\n" },
     {
       tool: "Edit",
-      file_path: "/home/one/tree/.claude/commands/se-stop-enabled-true.md",
+      file_path: "/home/one/tree/.claude/commands/se-config-stop-enabled-true.md",
       new_string: "mine\n",
     },
   ]) {
@@ -1045,7 +1045,7 @@ test("a target the box refuses writes one warning, and the rest still land", asy
   const files = it.files;
   const was = files.set.bind(files);
   files.set = (path, text) => {
-    if (path === ".claude/commands/se-log-level.md") throw new Error("read only");
+    if (path === ".claude/commands/se-config-log-level.md") throw new Error("read only");
     return was(path, text);
   };
   await it.raise("session.start", {});
@@ -1056,5 +1056,5 @@ test("a target the box refuses writes one warning, and the rest still land", asy
     said.map((one) => `${one.level} ${one.said}`),
     ["info 5 file(s) written", "warn the box refuses a target"],
   );
-  assert.equal(said[1].file, ".claude/commands/se-log-level.md");
+  assert.equal(said[1].file, ".claude/commands/se-config-log-level.md");
 });

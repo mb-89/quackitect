@@ -1,6 +1,7 @@
 ---
-description: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
+description: "config / stop / enabled: sets stop.enabled to true. The tooth. false ends every turn where the agent asks to end it."
 allowed-tools: Bash(./RUNME.sh config:*)
+generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
 ---
 
 !`./RUNME.sh config stop.enabled true`

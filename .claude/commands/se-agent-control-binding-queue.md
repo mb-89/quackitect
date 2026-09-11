@@ -1,6 +1,7 @@
 ---
-description: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
+description: "agent control / binding: sets engine.binding to queue. Where the session takes its work from."
 allowed-tools: Bash(./RUNME.sh config:*)
+generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
 ---
 
 !`./RUNME.sh config engine.binding queue`

@@ -93,8 +93,12 @@ function hover(cell) {
 // [[spec/design_output/extension#a-button-names-its-commands]]
 function commandsOf(cell) {
   if (cell.widget === "action" || !cell.options?.length) return [];
-  const path = String(cell.key).split(".").join("-");
-  return cell.options.map((one) => `/se-${path}-${one}`);
+  const group = String(cell.group ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  const leaf = String(cell.leaf ?? String(cell.key).split(".").pop());
+  return cell.options.map((one) => `/se-${group}-${leaf}-${one}`);
 }
 
 // [[spec/design_output/extension#a-mark-a-person-types]]

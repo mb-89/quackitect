@@ -1,6 +1,7 @@
 ---
-description: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
+description: "config / stop / hold: sets stop.hold to finishing. What the session does when it reaches the end of a turn."
 allowed-tools: Bash(./RUNME.sh config:*)
+generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
 ---
 
 !`./RUNME.sh config stop.hold finishing`

@@ -308,7 +308,8 @@ line honours `log.level`, the same as every other door.
 
 A slash command and a button set the same key through the same file, so each
 shows what the other sets. The hover of a toggle names a command for each of its
-states, as `/se-stop-hold-stopped`. The projection writes those commands. For
+states down the widget path, as `/se-agent-control-hold-stopped`. The config
+tree answers the same key down the config path. The projection writes both. For
 details, see [[spec/design_output/projection#the-first-target]].
 
 A test holds every command a hover names to a file in `.claude/commands`.

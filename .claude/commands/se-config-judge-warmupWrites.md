@@ -1,6 +1,8 @@
 ---
-description: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
+description: "config / judge / warmupWrites: sets judge.warmupWrites to what you type. The writes a session judges before it starts skipping."
+argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
+generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
 ---
 
 !`./RUNME.sh config judge.warmupWrites $ARGUMENTS`

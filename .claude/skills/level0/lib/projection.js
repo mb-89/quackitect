@@ -12,6 +12,8 @@ export const COMMANDS = "config commands";
 
 const PREFIX = "se-";
 const ARGUMENT = "$ARGUMENTS";
+const CONFIG_PATH = "config";
+const SETS = ["toggle"];
 
 // [[spec/design_output/projection#each-file-says-so]]
 export function saysGenerated(from) {
@@ -39,16 +41,56 @@ export function writesOf(entry, texts) {
   if (entry?.shape !== COMMANDS) return out;
 
   const said = flatten(parsed(texts.get(entry.from)));
-  const schema = keysOf(parsed(texts.get(entry.schema)));
+  const raw = parsed(texts.get(entry.schema));
+  const schema = keysOf(raw);
   const target = folderOf(entry.target);
+  const put = (files) => {
+    for (const file of files) out.set(`${target}/${file.name}`, file.text);
+  };
+
+  const declared = (key) => {
+    const [section, leaf] = key.split(".");
+    const help = raw?.properties?.[section]?.properties?.[leaf]?.help;
+    return { ...schema.find((each) => each.key === key), help };
+  };
 
   for (const [key, value] of said) {
-    const one = schema.find((each) => each.key === key);
-    for (const file of commandsFor(key, value, one, entry)) {
-      out.set(`${target}/${file.name}`, file.text);
-    }
+    put(commandsFor(key, value, declared(key), entry, configPath(key)));
+  }
+  // [[spec/design_output/projection#a-widget-takes-its-path]]
+  for (const widget of widgetsIn(raw)) {
+    put(commandsFor(widget.key, said.get(widget.key), declared(widget.key), entry, widget.path));
   }
   return out;
+}
+
+// [[spec/design_output/projection#a-name-carries-the-path]]
+export function configPath(key) {
+  const [section, leaf] = String(key).split(".");
+  return { stem: [CONFIG_PATH, section, leaf], label: [CONFIG_PATH, section, leaf] };
+}
+
+// [[spec/design_output/projection#a-widget-takes-its-path]]
+export function widgetsIn(schema) {
+  const out = [];
+  for (const [section, said] of Object.entries(schema?.properties ?? {})) {
+    for (const [leaf, one] of Object.entries(said?.properties ?? {})) {
+      if (!one?.group || !SETS.includes(one.widget) || !Array.isArray(one.enum)) continue;
+      out.push({ key: `${section}.${leaf}`, section, leaf, group: String(one.group) });
+    }
+  }
+  return out.map((one) => {
+    const shared = out.filter((each) => each.group === one.group && each.leaf === one.leaf);
+    const tail = shared.length > 1 ? [one.section, one.leaf] : [one.leaf];
+    return { ...one, path: { stem: [slug(one.group), ...tail], label: [one.group, ...tail] } };
+  });
+}
+
+function slug(said) {
+  return String(said)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 // [[spec/design_output/projection#the-first-target]]
@@ -59,30 +101,37 @@ export function optionsFor(value, said) {
   return [];
 }
 
-export function nameOf(key, option) {
-  const path = String(key).split(".").join("-");
+export function nameOf(stem, option) {
+  const path = [].concat(stem).join("-");
   return `${PREFIX}${path}${option === undefined ? "" : `-${option}`}.md`;
 }
 
-function commandsFor(key, value, said, entry) {
+function commandsFor(key, value, said, entry, path) {
   const options = optionsFor(value, said);
   const opens = `The line above runs before this turn opens, so \`${key}\` reads`;
+  const where = path.label.join(" / ");
+  const help = said?.help ? ` ${said.help}` : "";
   if (!options.length) {
     return [
       {
-        name: nameOf(key),
-        text: fileFor(entry, key, ARGUMENT, `${opens} what you type after the name.`),
+        name: nameOf(path.stem),
+        text: fileFor(entry, key, ARGUMENT, `${opens} what you type after the name.`, {
+          description: `${where}: sets ${key} to what you type.${help}`,
+          hint: "<value>",
+        }),
       },
     ];
   }
   return options.map((option) => ({
-    name: nameOf(key, option),
-    text: fileFor(entry, key, option, `${opens} \`${option}\` from here on.`),
+    name: nameOf(path.stem, option),
+    text: fileFor(entry, key, option, `${opens} \`${option}\` from here on.`, {
+      description: `${where}: sets ${key} to ${option}.${help}`,
+    }),
   }));
 }
 
 // [[spec/design_output/projection#how-a-command-sets-it]]
-function fileFor(entry, key, said, sentence) {
+function fileFor(entry, key, said, sentence, shown) {
   const body = [
     `!\`./RUNME.sh config ${key} ${said}\``,
     "",
@@ -96,8 +145,10 @@ function fileFor(entry, key, said, sentence) {
   if (entry?.wrap !== "frontmatter") return body;
   return [
     "---",
-    `description: ${JSON.stringify(saysGenerated(entry.from))}`,
+    `description: ${JSON.stringify(shown.description)}`,
+    ...(shown.hint ? [`argument-hint: ${JSON.stringify(shown.hint)}`] : []),
     "allowed-tools: Bash(./RUNME.sh config:*)",
+    `generated: ${JSON.stringify(saysGenerated(entry.from))}`,
     "---",
     "",
     body,
