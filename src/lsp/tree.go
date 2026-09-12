@@ -37,8 +37,7 @@ func treeAt(root string) *Tree {
 	return &Tree{Root: root, overlay: map[string]string{}}
 }
 
-// Holds parks the text of a buffer the editor owns, so a check reads what a
-// person types before the disk carries it.
+// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
 func (one *Tree) Holds(path, text string) {
 	one.guard.Lock()
 	defer one.guard.Unlock()
@@ -122,7 +121,6 @@ func gitHolds(root string) []string {
 	return out
 }
 
-// A clone with no git walks the disk, so every rule still answers.
 // [[spec/design_output/tree#the-tree-handed-in]]
 func diskHolds(root string) []string {
 	out := []string{}
@@ -148,7 +146,7 @@ func diskHolds(root string) []string {
 	return out
 }
 
-// Forgets drops the walk, so the next sweep reads what git holds now.
+// [[spec/design_output/tree#the-tree-handed-in]]
 func (one *Tree) Forgets() {
 	one.guard.Lock()
 	defer one.guard.Unlock()
@@ -462,7 +460,7 @@ func surveyFindsNode(tree *Tree) []Finding {
 		return []Finding{fault(rule, Install, 1,
 			ToolsAt+" stands nowhere, so every caller guesses a path. Run ./RUNME.sh tools.")}
 	}
-	// The sweep names the node that runs it, and no node runs this server.
+	// [[spec/design_output/tools#what-the-survey-writes]]
 	if tree.Node == "" {
 		return nil
 	}

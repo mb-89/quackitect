@@ -104,7 +104,7 @@ func reads(reader *bufio.Reader) (message, error) {
 	return said, json.Unmarshal(body, &said)
 }
 
-// took answers whether the pipe closes.
+// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
 func (one *server) took(said message) bool {
 	switch said.Method {
 	case "initialize":

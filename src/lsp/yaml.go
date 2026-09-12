@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-// Doc is a map that keeps the order its file writes.
+// [[spec/design_output/schema#the-yaml-a-schema-reads]]
 type Doc struct {
 	order []string
 	at    map[string]any

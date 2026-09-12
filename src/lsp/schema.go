@@ -16,8 +16,7 @@ const (
 	SchemaEnd = ".schema.yaml"
 )
 
-// Schemas keep the order the folder lists them, so a governor answers the same
-// way every sweep.
+// [[spec/design_output/schema#the-schemas-read-once]]
 type Kinds struct {
 	order []string
 	at    map[string]*Doc
@@ -537,7 +536,7 @@ func holds(allowed []any, said any) bool {
 	return false
 }
 
-// same reads the way strict equality reads: a type apart is a value apart.
+// [[spec/design_output/schema#a-finding-names-the-section]]
 func same(a, b any) bool {
 	one, ours := a.([]any)
 	two, theirs := b.([]any)

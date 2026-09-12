@@ -64,7 +64,7 @@ func globOf(glob string) *regexp.Regexp {
 	return found
 }
 
-// The split keeps the wildcards, the way the JavaScript capture group does.
+// [[spec/design_output/level0#the-path-a-rule-reads]]
 func splitKeeping(said string) []string {
 	out := []string{}
 	at := 0

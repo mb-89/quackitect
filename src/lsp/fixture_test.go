@@ -6,8 +6,7 @@ import (
 	"testing"
 )
 
-// a tree written to a temp folder, so every check runs over something a test
-// owns whole.
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
 func fixture(t *testing.T, files map[string]string) *Tree {
 	t.Helper()
 	root := t.TempDir()

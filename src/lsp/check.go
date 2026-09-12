@@ -20,7 +20,7 @@ func checkerAt(root string) *Checker {
 	return &Checker{tree: tree}
 }
 
-// A rule reading two files answers where either of them changes.
+// [[spec/design_output/tree#the-rules-over-two-files]]
 var readers = map[string][]func(*Tree) []Finding{
 	Settings: {settingsNameBinaries, editorDrawsWriteRules, biomeOnWindows, extensionsOnOffer},
 	Install:  {settingsNameBinaries, surveyNamesInstalls},

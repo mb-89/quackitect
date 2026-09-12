@@ -25,7 +25,7 @@ func asList(said any) []any {
 	return []any{said}
 }
 
-// flat mirrors `[value].flat()`: one line reads as a list of one.
+// [[spec/design_output/schema#the-yaml-a-schema-reads]]
 func flat(said any) []any {
 	if said == nil {
 		return []any{nil}
@@ -73,7 +73,7 @@ func asBool(said any) bool {
 	return held && one
 }
 
-// strings takes a field that holds one line or a list of them.
+// [[spec/design_output/schema#the-yaml-a-schema-reads]]
 func stringsOf(said any) []string {
 	out := []string{}
 	for _, one := range flat(said) {

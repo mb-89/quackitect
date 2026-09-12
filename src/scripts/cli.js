@@ -28,7 +28,11 @@ import {
   SCHEMAS,
   schemasIn,
 } from "../../.claude/skills/level0/lib/schema.js";
-import { treeFaults, treeOf } from "../../.claude/skills/level0/lib/tree.js";
+import {
+  stopFolderIsData,
+  treeFaults,
+  treeOf,
+} from "../../.claude/skills/level0/lib/tree.js";
 import { EDITOR_SETTINGS } from "../../.claude/skills/level0/lib/servers.js";
 import { calmed, SHOUTED } from "../../.claude/skills/level0/lib/shout.js";
 import {
@@ -127,6 +131,7 @@ const JUDGED = join(root, "spec", "config", "styles", "VoiceJudged");
 const SHAPE = join(root, "spec", "config", "styles", "VoiceShape");
 const SCRIPTED = join(root, "spec", "config", "styles", "VoiceScript");
 const biome = whereIs(files, root, "biome", known);
+const lsp = whereIs(files, root, "se-lsp", known);
 const GUIDANCE = join(root, "spec", "guidance");
 const DOORS = join(root, "src", "doors");
 const PLUGIN = join(".claude", "skills", "level0");
@@ -337,11 +342,20 @@ async function lint(where) {
     }
   }
 
+  // [[spec/design_output/lsp#one-checker-every-front-asks]]
+  const said = serverFaults(where);
+  if (said) found.push(...said);
+
   // [[spec/design_output/tree#when-the-sweep-runs]]
   if (where.includes(".")) {
     const tree = treeHere();
-    found.push(...treeFaults(tree));
-    found.push(...schemaFaults(tree));
+    if (said) {
+      // [[spec/design_output/lsp#one-checker-every-front-asks]]
+      found.push(...stopFolderIsData(tree));
+    } else {
+      found.push(...treeFaults(tree));
+      found.push(...schemaFaults(tree));
+    }
   }
 
   found.push(...gridFaults(where));
@@ -399,6 +413,19 @@ async function lint(where) {
 }
 
 // [[spec/design_output/tree#the-tree-handed-in]]
+// [[spec/design_output/lsp#one-checker-every-front-asks]]
+function serverFaults(where) {
+  if (!files.exists(lsp)) return null;
+  const ran = outside.run([lsp, "check", ...where], { cwd: root });
+  if (ran.exitCode !== 0) return null;
+  try {
+    const said = JSON.parse(ran.stdout || "[]");
+    return Array.isArray(said) ? said : null;
+  } catch {
+    return null;
+  }
+}
+
 function treeHere() {
   return treeOf({
     disk: files,
