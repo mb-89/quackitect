@@ -1,0 +1,103 @@
+# A change that wants an approach first, tests before code, and a second
+# pair of eyes after. The ask is the owner's words, the design phase turns
+# them into an approach a reader can disagree with, and the rest implements it.
+# [[spec/design_input/the-agent-pulls-tickets#the-route]]
+name: standard
+for: a change that wants an approach first, tests before code, and a second pair of eyes after
+ask:
+  - name: gain
+    form: text
+    says: what is gained by doing it, and not only what it does
+  - name: breaks
+    form: text
+    says: what breaks if it is never done
+  - name: done_when
+    form: list
+    says: one line each, decidable, naming the command that decides it
+steps:
+  - name: design
+    reads: [[spec/guidance/voice]]
+    steps:
+      - name: draft
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+      - name: review
+        does: reads the approach against the ask
+        not: draft
+        on_fail: draft
+        reads: [[spec/guidance/review/reviewing]]
+        input: design/draft
+        evidence:
+          - name: verdict
+            form: verdict
+            says: pass or fail, with findings one a line
+  - name: implement
+    reads: [[spec/guidance/code/testing]]
+    needs: [work test]
+    input: design/draft
+    checklist:
+      - the change touches no file the ask leaves out
+      - every door the change reaches has a fake
+      - a comment names the approach the change implements
+    steps:
+      - name: tests-red
+        does: writes the tests the ask calls for
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
+      - name: reflect
+        does: names the class of error in the findings, and the fix for the class
+        when: returned
+        input: verdict
+        evidence:
+          - name: class
+            form: text
+            says: the class of error the findings describe, and the fix for the class
+      - name: change
+        does: makes the change
+        reads: [[spec/guidance/code/code]]
+        evidence:
+          - name: lint
+            form: command
+            expects: 0
+            says: the tree builds and lints
+      - name: tests-green
+        does: makes the tests pass
+        input: tests-red
+        evidence:
+          - name: tests
+            form: command
+            expects: green
+            says: the same tests pass
+          - name: check
+            form: command
+            expects: 0
+            says: the check is green on the commit
+          - name: says
+            form: text
+            says: what changes and why, for a reader who was not there
+  - name: verdict
+    does: reads every hunk against the ask and the approach
+    not: implement
+    on_fail: implement/reflect
+    reads: [[spec/guidance/review/reviewing]]
+    input: [diff, implement]
+    to: retro
+    evidence:
+      - name: read
+        form: files
+        says: every file you read, one a line
+      - name: verdict
+        form: verdict
+        says: pass or fail, findings one a line

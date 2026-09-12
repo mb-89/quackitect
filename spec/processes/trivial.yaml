@@ -1,0 +1,39 @@
+# A fix small enough that the ask is the design. One step, and the ask
+# carries the criteria, so the mint refuses a thin one before anyone works it.
+# [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+name: trivial
+for: a fix small enough that the ask is the design
+ask:
+  - name: gain
+    form: text
+    says: what is gained by doing it, and not only what it does
+  - name: breaks
+    form: text
+    says: what breaks if it is never done
+  - name: done_when
+    form: list
+    says: one line each, decidable, naming the command that decides it
+steps:
+  - name: do
+    does: makes the change, with the test that covers it
+    from: anyone
+    by: anyone
+    to: retro
+    input: ask
+    reads: [[spec/guidance/working]]
+    needs: [work test]
+    checklist:
+      - the change follows the ask, or the discussion says why it departs
+      - the cleanup the change reveals is in the change, or is a note of its own
+    evidence:
+      - name: tests
+        form: command
+        expects: green
+        says: the tests that cover the change, or the check where it touches no code
+      - name: check
+        form: command
+        expects: 0
+        says: the check is green on the commit
+      - name: says
+        form: text
+        says: what changes and why, for a reader who was not there
