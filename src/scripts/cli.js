@@ -646,6 +646,7 @@ function mint(argv) {
   if (!kind || !path) {
     console.error("Usage: ./RUNME.sh mint <kind> <path> [--field=value ...]\n");
     console.error(`${SCHEMAS} holds ${kinds.join(", ")}.`);
+    console.error("A ticket takes --process=<name>, and the route and its hash copy in.");
     return 2;
   }
 
