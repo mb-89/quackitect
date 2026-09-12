@@ -269,6 +269,7 @@ set_hooks() {
   say "  pointing git at $hooks_folder"
   (cd "$root" && git config core.hooksPath "$hooks_folder") || return 1
   chmod +x "$root/$hooks_folder/pre-commit" 2>/dev/null || true
+  chmod +x "$root/$hooks_folder/pre-push" 2>/dev/null || true
 }
 
 # A want, rather than a need: the tree still lints and tests without it.
@@ -312,7 +313,7 @@ why() {
     index) say "index: the warm model of this tree, which find and links ask" ;;
     editor-link) say "editor-link: this tree's own sidebar, linked into the editor and named in its list" ;;
     editor-extensions) say "editor-extensions: the Vale and Biome extensions the tracked settings point at" ;;
-    git-hooks) say "git-hooks: the pre-commit door, so a commit by hand meets the privacy check" ;;
+    git-hooks) say "git-hooks: the pre-commit and pre-push doors, so a commit by hand meets the privacy check and a push to main meets the battery" ;;
   esac
 }
 
