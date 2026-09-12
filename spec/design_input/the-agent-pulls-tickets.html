@@ -267,7 +267,7 @@ Shaded fields are the verbs' to write; a hand edit by an agent to any of them is
 <span class="v">    checklist:</span>
 <span class="v">      - the change touches no file the ask leaves out</span>
 <span class="v">      - every door the change reaches has a fake</span>
-<span class="v">      - a comment names the note the change implements</span>
+<span class="v">      - a comment names the approach the change implements</span>
 <span class="v">    steps:</span>
 <span class="v">      - name: tests-red</span>
 <span class="v">        does: writes the tests the ask calls for</span>
@@ -308,6 +308,9 @@ Shaded fields are the verbs' to write; a hand edit by an agent to any of them is
 <span class="v">            form: command</span>
 <span class="v">            expects: 0</span>
 <span class="v">            says: the check is green on the commit</span>
+<span class="v">          - name: says</span>
+<span class="v">            form: text</span>
+<span class="v">            says: what changes and why, for a reader who was not there</span>
 <span class="v">  - name: verdict</span>
 <span class="v">    does: reads every hunk against the ask and the approach</span>
 <span class="v">    not: implement</span>
@@ -384,6 +387,9 @@ whole. The rest stands in [[spec/design_output/schema#the-judge-reads-paragraphs
 
 <span class="h">### check</span>
 <span class="c">&lt;!-- command, expects 0 · the check is green on the commit --&gt;</span>
+
+<span class="h">### says</span>
+<span class="c">&lt;!-- text · what changes and why, for a reader who was not there --&gt;</span>
 
 <span class="h">### checked</span>
 <span class="c">&lt;!-- checklist · one line per item of implement's checklist, on how you take it into account --&gt;</span>
@@ -923,7 +929,7 @@ field on a step, and the engine hands nothing back with a field empty. It reuses
 mines what <code>collect</code> lays out, leaf by leaf.</p>
 <div class="scroll"><table>
 <tr><th>step</th><th>by</th><th>evidence</th></tr>
-<tr><td class="m">collect</td><td>anyone</td><td>one command, <code>work retro collect</code>, which refuses while a hand holds a ticket</td></tr>
+<tr><td class="m">collect</td><td>anyone</td><td>one command, <code>retro collect</code>, which refuses while a hand holds a ticket</td></tr>
 <tr><td class="m">field</td><td>person</td><td><code>answers</code>, one line each, and each becomes a note</td></tr>
 <tr><td class="m">score</td><td>anyone</td><td><code>scored</code>, one line per last improvement with what the numbers show and what that teaches, and <code>rate</code></td></tr>
 <tr><td class="m">notes</td><td>anyone</td><td>one command, which passes when the private folder is empty</td></tr>
@@ -933,7 +939,7 @@ mines what <code>collect</code> lays out, leaf by leaf.</p>
 <tr><td class="m">report</td><td>person</td><td><code>misses</code>, what the retro skips, and the reading itself is the gate</td></tr>
 <tr><td class="m">distribute</td><td>anyone</td><td><code>groups</code>, one line per ticket with its group and urgency</td></tr>
 </table></div>
-<p><code>work retro collect</code> takes what it names into the retro folder and nothing else, so a keep list
+<p><code>retro collect</code> takes what it names into the retro folder and nothing else, so a keep list
 that goes stale is no risk: the log after a rotation, every script anyone writes, a copy of every private
 note, and the transcripts with their thoughts. It never touches the retro folders themselves under
 <code>.se/retro/</code>, nor the hold, the box id, the config, the bin or the handover. It lists the tickets
@@ -997,9 +1003,12 @@ branch. Now the two coincide, so one word stays: group.</p>
 other verb belongs to a person or the engine. The shell is the verb, under <code>./RUNME.sh work</code>,
 and a plugin tool wraps it for a session that holds the plugin. The engine is these verbs and the beat,
 and it runs with nobody on the box, which is why it stands in level one and outside level zero. A pull carries at most two things: the
-ticket it hands back and a verdict. The file is the payload, because the hand wrote its evidence through
-the write door before it pulled. A leaf holding a <code>verdict</code> field takes the verdict from the
-field, and the flag is refused there.</p>
+ticket it hands back and a verdict: <code>pass</code>, <code>fail</code> with a reason, or <code>became</code>
+with the successor the hand minted, on which the ticket closes once the successor exists. The file is the
+payload, because the hand wrote its evidence through the write door before it pulled. A leaf holding a
+<code>verdict</code> field takes the verdict from the field, and the flag is refused there. A verdict that
+passes can still carry findings, and each becomes a note the reviewer mints with <code>from</code> naming
+the ticket.</p>
 
 <figure>
 <svg viewBox="0 0 900 300" role="img"

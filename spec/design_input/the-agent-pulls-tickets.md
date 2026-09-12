@@ -160,7 +160,7 @@ differs: its own reads, its own hand rule, and the form of its evidence.
         checklist:
           - the change touches no file the ask leaves out
           - every door the change reaches has a fake
-          - a comment names the note the change implements
+          - a comment names the approach the change implements
         steps:
           - name: tests-red
             does: writes the tests the ask calls for
@@ -201,6 +201,9 @@ differs: its own reads, its own hand rule, and the form of its evidence.
                 form: command
                 expects: 0
                 says: the check is green on the commit
+              - name: says
+                form: text
+                says: what changes and why, for a reader who was not there
       - name: verdict
         does: reads every hunk against the ask and the approach
         not: implement
@@ -343,7 +346,9 @@ path. That is the first branch's real size.
 
 A review is a step and no state. So is a test, an approval, a translation or a
 deploy. A new kind of work adds a row to a route and moves nothing in the
-schema.
+schema. A verdict that passes can still carry findings. Each one becomes a
+note the reviewer mints with `from` naming the ticket, which is v4's rule
+that a finding is a token of its own.
 
 A step with `by: children` belongs to no hand, and it has two ends. The box
 leaves it when no child stands at a step an agent can take. The step ends
@@ -688,7 +693,7 @@ what `collect` lays out.
 
 | step | by | evidence |
 |---|---|---|
-| `collect` | anyone | one command, `work retro collect`, which refuses while a hand holds a ticket |
+| `collect` | anyone | one command, `retro collect`, which refuses while a hand holds a ticket |
 | `field` | person | `answers`, one line each, and each becomes a note |
 | `score` | anyone | `scored`, one line per last improvement with what the numbers show and what that teaches, and `rate`, a command |
 | `notes` | anyone | one command, which passes when the private folder is empty |
@@ -698,7 +703,7 @@ what `collect` lays out.
 | `report` | person | `misses`, what the retro skips, and the reading itself is the gate |
 | `distribute` | anyone | `groups`, one line per ticket with its group and urgency |
 
-`work retro collect` takes what it names into the retro folder, and every line it
+`retro collect` takes what it names into the retro folder, and every line it
 takes has a reader. Nothing it takes goes unread, and the `unread` leaf
 checks the manifest against the leaves to say so:
 
@@ -816,9 +821,11 @@ That is why it stands in level one and outside level zero. Level zero holds
 before anything else does, and the engine has to keep working with no person
 there.
 
-A pull carries at most two things: the ticket it hands back and a verdict,
-`pass` or `fail` with a reason. The file is the payload, because the hand
-writes its evidence through the write door before it pulls. A leaf holding a
+A pull carries at most two things: the ticket it hands back and a verdict.
+The verdict is `pass`, `fail` with a reason, or `became` with the successor
+the hand mints, and on `became` the ticket closes with that reason once the
+successor exists. The file is the payload, because the hand writes its
+evidence through the write door before it pulls. A leaf holding a
 `verdict` field takes the verdict from the field, and the pull refuses the
 flag there. The other side fetches the branch, then checks, cheapest first:
 
@@ -1142,7 +1149,7 @@ Ten branches, and the dependencies make the order binding:
 | 6 | `guidance-rides-the-step` | `reads`, the verb, the log line, the standing layer shrinks | 4 |
 | 7 | `the-work-group-draws` | the `work` group, its four controls, the count on the editor button, the beat, the notification that names questions and stale groups | 4 |
 | 8 | `level-zero-hands-over` | the brief door goes, and the controls wire up | 4 |
-| 9 | `the-retro-is-a-ticket` | `work retro collect`, the chapters and the counts, the files the mine leaves read, `work retro notes` and `score`, the readers as helpers, the first retro on a desk | 4, 5 |
+| 9 | `the-retro-is-a-ticket` | `retro collect`, the chapters and the counts, the files the mine leaves read, `retro notes` and `score`, the readers as helpers, the first retro on a desk | 4, 5 |
 | 10 | `the-cloud-run-is-a-group` | the cloud guidance around the pull, the routine takes a group, the brief's contract retires, `adopt`, the first cloud run | 4, 8, 9 |
 
 Nine briefs stand on their `work/` branches, cut from this note, and each

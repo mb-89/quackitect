@@ -16,12 +16,12 @@ steps:
   - name: collect
     does: takes what it names under .se into the retro folder, cuts the window into chapters, mints a reader per chapter, and lays the rest out as files
     by: anyone
-    needs: [work retro]
+    needs: [retro]
     evidence:
       - name: run
         form: command
         expects: 0
-        says: work retro collect, which refuses while a hand holds a ticket, and takes nothing it does not name
+        says: retro collect, which refuses while a hand holds a ticket, and takes nothing it does not name
   - name: field
     does: asks what came back from real use since the last retro, and stops
     by: person
@@ -40,15 +40,15 @@ steps:
       - name: rate
         form: command
         expects: 0
-        says: work retro score, which prints how many stand in the tree
+        says: retro score, which prints how many stand in the tree
   - name: notes
     does: decides every note, the field's answers among them
-    needs: [work retro]
+    needs: [retro]
     evidence:
       - name: drained
         form: command
         expects: 0
-        says: work retro notes, which passes when the private folder is empty
+        says: retro notes, which passes when the private folder is empty
   - name: readers
     by: children
   - name: mine

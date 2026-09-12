@@ -44,12 +44,12 @@ steps:
     steps:
       - name: notes
         does: decides every private note on the box, and works what it mints into this group
-        needs: [work retro]
+        needs: [retro]
         evidence:
           - name: drained
             form: command
             expects: 0
-            says: work retro notes, which passes when the private folder is empty
+            says: retro notes, which passes when the private folder is empty
       - name: write
         does: writes the retro over the box's own window
         input: [children, notes]
