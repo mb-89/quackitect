@@ -97,7 +97,6 @@ import { guesses, pathOf, surveyOf, TOOLS } from "../lib/tools.js";
 import {
   askForLine,
   challenge,
-  claimSpec,
   decide,
   detail,
   pool,
@@ -225,7 +224,6 @@ export function register(on, _options) {
     // [[spec/design_output/index#the-door-answers-the-tools]]
     warms($, root);
 
-    await $.tool.register(claimSpec(rules));
     await $.tool.register(checkSpec());
     await $.tool.register(mintSpec(schemas));
     await $.tool.register(reviewSpec());
@@ -261,8 +259,9 @@ export function register(on, _options) {
     const held = opensATurn(e.origin) ? gate.takeWaiting() : null;
     if (!held) return next(e);
     const line = carried(held.found, held.score);
-    await logbook.say("info", "answer", "the findings ride this prompt", {
-      detail: `score=${held.score}`,
+    // [[spec/design_output/log#a-row-carries-its-kind]]
+    await logbook.say("info", "gate", "the findings ride this prompt", {
+      detail: `score=${held.score} findings=${held.found.length}`,
     });
     return next({ ...e, text: [text, line].filter(Boolean).join("\n\n") });
   });
@@ -566,15 +565,6 @@ export function register(on, _options) {
       tool: MINT_TOOL,
     });
     return { result: said.result };
-  });
-
-  // [[spec/design_output/stop#the-claim-and-its-life]]
-  on("tool.call", { tool: "mcp__level0__claim_stop" }, async (_$, e, _next) => {
-    const said = tooth.claims(String(e.rule ?? ""), String(e.why ?? ""));
-    await logbook.say("info", "stop", `claimed ${said.rule}`, {
-      detail: said.why.slice(0, 120),
-    });
-    return { result: { ...said, counted: "at the end of this turn" } };
   });
 
   // [[spec/design_output/level0#the-tool-reads-a-draft]]
@@ -1268,8 +1258,7 @@ async function bite($, e, it) {
 
 // [[spec/design_output/stop#the-vote]]
 async function voteNow($, e, it, reason) {
-  const claimed = reason ?? it.tooth.claim()?.rule;
-  const decision = decide(it.rules, { claimed, ran: it.ran });
+  const decision = decide(it.rules, { claimed: reason, ran: it.ran });
   const said = it.tooth.atTurnEnd(decision, it.mostInARow);
   const how = detail(said, said.inARow);
 

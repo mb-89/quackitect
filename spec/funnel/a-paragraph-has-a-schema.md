@@ -258,7 +258,7 @@ measurement reports:
 | the verbs | `voice measure` scores a folder, and `voice refused` ranks the log's refusals | `src/scripts`, `RUNME.sh` | a fixture folder scores a known number |
 | the schema and the projector | one `shape` in `projection.js` reads the schema and writes a rule file per enumerable layer | `lib/projection.js`, `projections.json`, `VoiceParagraph` | each rule refuses a bad fixture, and the nine hand rules it replaces come out |
 | the vocabulary | the projection inlines `words.yml` into one rule, the refusal names the outside words and the swaps, and the cage reloads on a write to the list | `lib/vale.js`, `lib/refuse.js`, `words.yml` | a paragraph with one outside word meets a refusal naming it |
-| the answer gate | `turn.complete` re-prompts under the bands, `prompt.submit` carries a warning forward, and `check_answer` registers beside `claim_stop` | `hooks/level0.js`, `level0.json` | a fake session over the ceiling meets one re-prompt, and one alone |
+| the answer gate | `turn.complete` re-prompts under the bands, `prompt.submit` carries a warning forward, and `check_answer` registers at the session's start | `hooks/level0.js`, `level0.json` | a fake session over the ceiling meets one re-prompt, and one alone |
 | the question and the TL;DR | `prompt.submit` counts the questions, and the answer register demands the table and the list first | `lib/answer.js`, the schema | a prompt with two questions refuses an answer opening with prose |
 | the judged rows and the register | `BottomLineFirst` and `ShapeFits` join `VoiceJudged`, and `spec/requirements` takes its modals | `VoiceJudged`, `.vale.ini` | a fake judge labels a fixture, and the door refuses the refused label |
 

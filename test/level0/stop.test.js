@@ -6,7 +6,6 @@ import { test } from "node:test";
 import {
   askForLine,
   challenge,
-  claimSpec,
   decide,
   detail,
   pool,
@@ -198,25 +197,12 @@ test("the re-prompt drops the question the agent already claimed", () => {
   assert.equal(reprompt(voted(["work-waiting"], "done")).includes("Complete?"), false);
 });
 
-// [[spec/design_output/stop#the-claim-and-its-life]]
-test("a claim lives two tool calls, and a third ends it", () => {
+// [[spec/design_output/stop#the-claim-rides-the-answer]]
+test("the claim lives as long as the answer naming it, and no longer", () => {
   const it = toothOf();
-  it.claims("done", "the branch is pushed");
-  it.sawCall("claim_stop");
-  assert.equal(it.claim().rule, "done", "its own call spends nothing");
-  it.sawCall("Read");
-  it.sawCall("Bash");
-  assert.equal(it.claim().rule, "done", "two calls stand between");
-  it.sawCall("Read");
-  assert.equal(it.claim(), null);
-});
-
-test("a claim ends at the turn end, and the next turn opens with none", () => {
-  const it = toothOf();
-  it.claims("talk", "the owner asked a question");
   const said = it.atTurnEnd(voted([], "talk"));
-  assert.equal(said.claim.rule, "talk");
-  assert.equal(it.claim(), null);
+  assert.equal(said.stop.id, "talk", "the line's reason reaches the vote");
+  assert.equal(it.atTurnEnd(voted([])).stop, undefined, "the next turn opens with none");
 });
 
 test("the free stop fires one time in a session", () => {
@@ -313,18 +299,6 @@ test("a rule file that will not parse leaves the tooth harmless", () => {
     ["a"],
   );
   assert.equal(decide(said.rules, { ran: ranOf([]) }).ends, true);
-});
-
-test("the claim tool offers the rules a claim may name", () => {
-  const said = claimSpec(TABLE);
-  assert.equal(said.name, "claim_stop");
-  assert.deepEqual(said.inputSchema.properties.rule.enum, [
-    "talk",
-    "carry-on",
-    "blocked",
-    "done",
-  ]);
-  assert.deepEqual(said.inputSchema.required, ["rule", "why"]);
 });
 
 // [[spec/design_output/stop#what-the-todo-list-says]]

@@ -178,26 +178,16 @@ The free stop asks for both halves. The count alone hands out a free stop
 wherever it resets. The grant alone lets a session read for an hour and still
 call itself new.
 
-# The claim and its life
+# The claim rides the answer
 
-Level zero registers `claim_stop` at `session.start` through `$.tool.register`,
-and serves it by hooking `tool.call` with the matcher for its own name:
+The line carries the claim. `bite` reads the reason out of the answer and hands
+it to `decide` as `claimed`, so a claim lives exactly as long as the answer
+naming it. For details, see [[spec/design_output/stop#the-line-ends-a-turn]].
 
-    claim_stop({ rule: "the-work-stands-complete", why: "one sentence" })
-
-The tool answers with the claim it holds, so the agent reads its own words
-back. A claim lives briefly, and this is the whole of its life:
-
-| what ends a claim | and then |
-|---|---|
-| the turn ends | the hook counts it |
-| two tool calls pass after it | the hook counts nothing |
-
-Whichever comes first. Two tool calls stand between a claim and a stop because
-an agent often reads one more thing before it stops. A third says it stands
-back at work, so the claim goes. The claim's own call spends none of that life.
-
-A claim lives inside one turn, and the next turn opens with none.
+A tool carries none of this now. `claim_stop` costs nothing to call, stays
+inside the machinery where the owner sits outside it, and an agent skipping it
+stops all the same. So the tool goes, and the line stands in its place. The
+line costs a sentence the owner reads, and its absence holds the turn open.
 
 # The tooth holds its state
 

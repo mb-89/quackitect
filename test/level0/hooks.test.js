@@ -238,14 +238,11 @@ test("a session start writes one line, and registers every tool", async () => {
   );
   assert.deepEqual(
     it.registered.map((one) => one.name),
-    ["claim_stop", "check_answer", "mint_note", "review_branch", "log", "patch", "replace", "undo"],
+    ["check_answer", "mint_note", "review_branch", "log", "patch", "replace", "undo"],
   );
-  assert.deepEqual(it.registered[0].inputSchema.properties.rule.enum, [
-    "the-work-stands-complete",
-  ]);
-  assert.deepEqual(it.registered[1].inputSchema.required, ["text"]);
-  assert.deepEqual(it.registered[2].inputSchema.required, ["kind", "path"]);
-  assert.deepEqual(it.registered[3].inputSchema.required, ["branch"]);
+  assert.deepEqual(it.registered[0].inputSchema.required, ["text"]);
+  assert.deepEqual(it.registered[1].inputSchema.required, ["kind", "path"]);
+  assert.deepEqual(it.registered[2].inputSchema.required, ["branch"]);
 });
 
 // [[spec/design_output/log#what-a-tool-line-names]]
@@ -632,28 +629,18 @@ test("the debt reaches no subagent, and holds no question to the owner", async (
 });
 
 // [[spec/design_output/stop#the-line-ends-a-turn]]
-test("the line reaches the vote, and a claim without one ends nothing", async () => {
+test("the line reaches the vote, and an answer without one ends nothing", async () => {
   const it = await started({
     "HANDOVER.md": "---\nstatus: held\n---\n\n# The brief\n",
   });
   for (let i = 0; i < 10; i++) {
     await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   }
-  await it.raise(
-    "tool.call",
-    {
-      tool: "mcp__level0__claim_stop",
-      rule: "the-work-stands-complete",
-      why: "pushed",
-    },
-    "mcp__level0__claim_stop",
-  );
   await it.raise("turn.complete", { ...answered, answer: "the work stands complete" });
 
   const first = it.lines().filter((one) => one.kind === "stop");
-  assert.equal(first[0].said, "claimed the-work-stands-complete");
-  assert.equal(first[1].said, "the turn goes on");
-  assert.equal(first[1].detail, "no line", "the claim alone ends no turn");
+  assert.equal(first[0].said, "the turn goes on");
+  assert.equal(first[0].detail, "no line", "an answer saying so ends no turn");
 
   await endsATurn(it, "the work stands complete");
   const said = it.lines().filter((one) => one.kind === "stop");

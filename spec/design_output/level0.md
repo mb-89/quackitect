@@ -744,8 +744,8 @@ The turn's end answers what comes next.
 coming back clean meets the gate clean, so the tool closes the gap a gate
 refusing nothing leaves open.
 
-The tool registers beside `claim_stop` at the session's start, and
-`spec/guidance/working.md` carries the line that sends a session to it.
+The tool registers at the session's start, and `spec/guidance/working.md`
+carries the line that sends a session to it.
 
 # The rules past one buffer
 

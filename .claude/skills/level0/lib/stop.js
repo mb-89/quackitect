@@ -6,10 +6,7 @@
 import { readEntries } from "./rulefile.js";
 
 export const RULES = "spec/config/stop";
-export const TOOL = "claim_stop";
-export const CALLED = `mcp__level0__${TOOL}`;
 export const OFF = "stop-hook-off";
-export const LIVES = 2;
 export const FRESH = 10;
 
 const NEEDS = ["id", "side", "priority", "decides"];
@@ -178,57 +175,21 @@ export function askForLine(rules, said) {
   ].join("\n");
 }
 
-// [[spec/design_output/stop#the-claim-and-its-life]]
-export function claimSpec(rules) {
-  const claimable = (rules ?? []).filter((one) => one.decides === "claimed");
-  return {
-    name: TOOL,
-    description: [
-      "Claims a reason this turn may end, or a reason to carry on.",
-      "Level zero counts the claim at the turn end, and the claim goes",
-      `after ${LIVES} more tool calls. One rule id and one sentence:`,
-      ...claimable.map((one) => `${one.id} (${one.side}) ${one.asks ?? one.says ?? ""}`),
-    ].join(" "),
-    inputSchema: {
-      type: "object",
-      properties: {
-        rule: { type: "string", enum: claimable.map((one) => one.id) },
-        why: { type: "string" },
-      },
-      required: ["rule", "why"],
-    },
-  };
-}
-
 // [[spec/design_output/stop#the-tooth-holds-its-state]]
 export function toothOf(init = {}) {
-  const lives = init.lives ?? LIVES;
   const fresh = init.fresh ?? FRESH;
 
   let calls = 0;
   let granted = false;
   let inARow = 0;
-  let claim = null;
-  let since = 0;
 
   return {
     calls: () => calls,
     inARow: () => inARow,
-    claim: () => claim,
     isNew: () => calls < fresh && !granted,
 
-    claims(rule, why) {
-      claim = { rule, why };
-      since = 0;
-      return claim;
-    },
-
-    sawCall(tool) {
+    sawCall() {
       calls += 1;
-      if (!claim || tool === TOOL || tool === CALLED) return claim;
-      since += 1;
-      if (since > lives) claim = null;
-      return claim;
     },
 
     sawPrompt(mine) {
@@ -237,8 +198,6 @@ export function toothOf(init = {}) {
 
     // [[spec/design_output/config#a-caller-hands-it-in]]
     atTurnEnd(decision, mostInARow) {
-      const held = claim;
-      claim = null;
       const runaway = !decision.ends && mostInARow > 0 && inARow >= mostInARow;
       const ends = decision.ends || runaway;
       if (ends) {
@@ -247,7 +206,7 @@ export function toothOf(init = {}) {
       } else {
         inARow += 1;
       }
-      return { ...decision, ends, runaway, claim: held, inARow };
+      return { ...decision, ends, runaway, inARow };
     },
   };
 }
