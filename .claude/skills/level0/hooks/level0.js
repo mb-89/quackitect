@@ -79,10 +79,16 @@ import { readRule } from "../lib/rulefile.js";
 import {
   checkNote,
   END as SCHEMA_END,
+  governorOf,
   kindOf,
+  MINT_TOOL,
+  mintedNote,
+  mintSpec,
+  refusedKind,
   refusedNote,
   SCHEMAS,
   schemasFrom,
+  strangerFault,
 } from "../lib/schema.js";
 import { guesses, pathOf, surveyOf, TOOLS } from "../lib/tools.js";
 import {
@@ -204,6 +210,7 @@ export function register(on, _options) {
 
     await $.tool.register(claimSpec(rules));
     await $.tool.register(checkSpec());
+    await $.tool.register(mintSpec(schemas));
     await $.tool.register(reviewSpec());
     await $.tool.register(logSpec());
     await $.tool.register(patchSpec());
@@ -312,6 +319,19 @@ export function register(on, _options) {
     if (where.endsWith(".md")) {
       const whole = await wholeAfter($, e, writing);
       const kind = kindOf(whole);
+
+      // [[spec/design_output/schema#a-folder-names-its-kind]]
+      const governor = governorOf(schemas, where);
+      const stranger = governor ? strangerFault(whole, governor, where) : null;
+      if (stranger) {
+        await logbook.say("warn", "schema", `refused a stranger in ${where}`, {
+          file: where,
+          rule: stranger.rule,
+          tool: e.tool,
+        });
+        return { deny: refusedKind(where, governor, stranger) };
+      }
+
       const schema = schemas.get(kind);
       const found = schema ? checkNote(whole, schema, where) : [];
       if (found.length) {
@@ -508,6 +528,16 @@ export function register(on, _options) {
     const base = said && typeof said === "object" ? said : {};
     const text = String(base.description ?? e.description ?? "").trim();
     return { ...base, description: [text, verbLine()].filter(Boolean).join("\n\n") };
+  });
+
+  // [[spec/design_output/schema#the-tool-writes-the-note]]
+  on("tool.call", { tool: `mcp__level0__${MINT_TOOL}` }, async ($, e, _next) => {
+    const said = await mints($, schemas, e);
+    await logbook.say(said.ok ? "info" : "warn", "schema", said.result.split("\n")[0], {
+      file: String(e.path ?? ""),
+      tool: MINT_TOOL,
+    });
+    return { result: said.result };
   });
 
   // [[spec/design_output/stop#the-claim-and-its-life]]
@@ -1562,6 +1592,43 @@ function wouldLand(took) {
   return [`${took.files.length} file(s) would change, and nothing is written.`, ...rows].join(
     "\n",
   );
+}
+
+// [[spec/design_output/schema#the-tool-writes-the-note]]
+async function mints($, schemas, e) {
+  const made = mintedNote(schemas, e);
+  if (made.why) return { ok: false, result: made.why };
+  if (await stands($, made.path)) {
+    return { ok: false, result: `${made.path} stands already. Name a path nothing holds yet.` };
+  }
+
+  try {
+    await $.fs.write(made.path, made.text);
+  } catch (why) {
+    return { ok: false, result: `${made.path} takes no write: ${String(why?.message ?? why)}` };
+  }
+  return { ok: true, result: leftIn(made) };
+}
+
+function leftIn(made) {
+  const rows = made.left.map((one) => `  ${one.file}:${one.line}:1  ${one.rule}\n    ${one.message}`);
+  if (!rows.length) return `${made.path} stands, in the shape ${made.kind} names.`;
+  return [
+    `${made.path} stands, in the shape ${made.kind} names.`,
+    "",
+    ...rows,
+    "",
+    "Edit each one, because the sweep names every placeholder still standing.",
+  ].join("\n");
+}
+
+async function stands($, path) {
+  try {
+    await $.fs.read(path);
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 // [[spec/design_output/schema#the-door-refuses-a-departure]]
