@@ -20,24 +20,36 @@ const PAIR = /^([^:\s][^:]*):\s*(.*)$/;
 const COMMENT = /<!--[\s\S]*?-->/g;
 
 // [[spec/design_output/schema#the-yaml-a-schema-reads]]
-export function readYaml(text) {
+// [[spec/design_output/schema#a-line-per-nested-key]]
+export function readYaml(text, lines) {
   const rows = [];
+  let at = 0;
   for (const raw of String(text ?? "").split(/\r?\n/)) {
+    at += 1;
     const line = raw.replace(/\s+$/, "");
     if (!line.trim() || /^\s*#/.test(line)) continue;
-    rows.push({ indent: line.search(/\S/), said: line.trim() });
+    rows.push({ indent: line.search(/\S/), said: line.trim(), line: at });
   }
-  const cursor = { at: 0 };
-  return rows.length ? block(rows, cursor, rows[0].indent) : {};
+  const cursor = { at: 0, lines: lines ?? null };
+  return rows.length ? block(rows, cursor, rows[0].indent, "") : {};
 }
 
-function block(rows, cursor, indent) {
+// [[spec/design_output/schema#a-line-per-nested-key]]
+function mark(cursor, path, line) {
+  if (cursor.lines && path && !cursor.lines.has(path)) cursor.lines.set(path, line);
+}
+
+function keyed(path, key) {
+  return path ? `${path}.${key}` : key;
+}
+
+function block(rows, cursor, indent, path) {
   return rows[cursor.at].said.startsWith("- ")
-    ? listAt(rows, cursor, indent)
-    : mapAt(rows, cursor, indent);
+    ? listAt(rows, cursor, indent, path)
+    : mapAt(rows, cursor, indent, path);
 }
 
-function mapAt(rows, cursor, indent) {
+function mapAt(rows, cursor, indent, path) {
   const out = {};
   while (cursor.at < rows.length) {
     const one = rows[cursor.at];
@@ -45,20 +57,25 @@ function mapAt(rows, cursor, indent) {
     const pair = PAIR.exec(one.said);
     if (!pair) break;
     cursor.at += 1;
-    out[pair[1].trim()] = pair[2].trim()
+    const key = pair[1].trim();
+    const at = keyed(path, key);
+    mark(cursor, at, one.line);
+    out[key] = pair[2].trim()
       ? scalar(pair[2].trim())
-      : under(rows, cursor, one.indent);
+      : under(rows, cursor, one.indent, at);
   }
   return out;
 }
 
-function listAt(rows, cursor, indent) {
+function listAt(rows, cursor, indent, path) {
   const out = [];
   while (cursor.at < rows.length) {
     const one = rows[cursor.at];
     if (one.indent !== indent || !one.said.startsWith("- ")) break;
     cursor.at += 1;
 
+    const at = `${path}[${out.length}]`;
+    mark(cursor, at, one.line);
     const rest = one.said.slice(2).trim();
     const pair = PAIR.exec(rest);
     if (!pair) {
@@ -67,29 +84,33 @@ function listAt(rows, cursor, indent) {
     }
 
     const item = {};
+    const first = keyed(at, pair[1].trim());
+    mark(cursor, first, one.line);
     item[pair[1].trim()] = pair[2].trim()
       ? scalar(pair[2].trim())
-      : under(rows, cursor, one.indent + 2);
+      : under(rows, cursor, one.indent + 2, first);
     while (cursor.at < rows.length && rows[cursor.at].indent > one.indent) {
       const next = rows[cursor.at];
       const more = PAIR.exec(next.said);
       if (!more) break;
       cursor.at += 1;
+      const deeper = keyed(at, more[1].trim());
+      mark(cursor, deeper, next.line);
       item[more[1].trim()] = more[2].trim()
         ? scalar(more[2].trim())
-        : under(rows, cursor, next.indent);
+        : under(rows, cursor, next.indent, deeper);
     }
     out.push(item);
   }
   return out;
 }
 
-function under(rows, cursor, indent) {
+function under(rows, cursor, indent, path) {
   const next = rows[cursor.at];
   if (!next) return null;
-  if (next.indent > indent) return block(rows, cursor, next.indent);
+  if (next.indent > indent) return block(rows, cursor, next.indent, path);
   if (next.indent === indent && next.said.startsWith("- ")) {
-    return listAt(rows, cursor, indent);
+    return listAt(rows, cursor, indent, path);
   }
   return null;
 }
@@ -130,12 +151,11 @@ function frontOf(rows) {
   if (close < 0) return { stands: false, said: {}, lines: {} };
 
   const held = rows.slice(1, close);
+  const map = new Map();
+  const said = readYaml(held.join("\n"), map);
   const lines = {};
-  for (let i = 0; i < held.length; i++) {
-    const pair = PAIR.exec(held[i]);
-    if (pair && held[i].search(/\S/) === 0) lines[pair[1].trim()] = i + 2;
-  }
-  return { stands: true, said: readYaml(held.join("\n")), lines };
+  for (const [path, line] of map) lines[path] = line + 1;
+  return { stands: true, said, lines };
 }
 
 function sectionsOf(rows) {
@@ -168,12 +188,31 @@ export function isNoteSchema(said) {
   return Boolean(said?.kind) && Boolean(said?.body?.sections?.length);
 }
 
+// [[spec/design_output/schema#a-data-schema-holds-yaml]]
+export function isDataSchema(said) {
+  return Boolean(said?.kind) && Boolean(said?.data);
+}
+
 // [[spec/design_output/schema#the-schemas-read-once]]
 export function schemasIn(tree) {
+  return kindsIn(tree, isNoteSchema);
+}
+
+// [[spec/design_output/schema#a-data-schema-holds-yaml]]
+export function dataSchemasIn(tree) {
+  return kindsIn(tree, isDataSchema);
+}
+
+// [[spec/design_output/schema#one-home-for-a-shape]]
+export function allSchemasIn(tree) {
+  return kindsIn(tree, (said) => Boolean(said?.kind));
+}
+
+function kindsIn(tree, holds) {
   const out = new Map();
   for (const name of tree.names(SCHEMAS, END)) {
     const said = readYaml(tree.read(`${SCHEMAS}/${name}`));
-    if (isNoteSchema(said)) out.set(String(said.kind), said);
+    if (holds(said)) out.set(String(said.kind), said);
   }
   return out;
 }
@@ -211,45 +250,116 @@ export function strangerFault(text, schema, where) {
 }
 
 // [[spec/design_output/schema#a-finding-names-the-section]]
-export function checkNote(text, schema, where) {
+export function checkNote(text, schema, where, schemas) {
   const note = readNote(text);
   const kind = String(schema?.kind ?? "");
+  const spec = schema?.frontmatter ?? {};
+  if (!note.front.stands) {
+    return [fault("Frontmatter", where, 1, `A ${kind} note opens with frontmatter.`)];
+  }
+  const held = heldIn(note.front, schema, kind, where, "frontmatter", schemas);
   return [
-    ...frontFaults(note, schema?.frontmatter ?? {}, kind, where),
+    ...mapFaults(note.front.said ?? {}, spec, held, ""),
     ...bodyFaults(note, schema?.body ?? {}, kind, where),
   ];
 }
 
-function frontFaults(note, spec, kind, where) {
-  if (!note.front.stands) {
-    return [fault("Frontmatter", where, 1, `A ${kind} note opens with frontmatter.`)];
-  }
+// [[spec/design_output/schema#a-data-schema-holds-yaml]]
+export function checkData(text, schema, where, schemas) {
+  const lines = new Map();
+  const said = readYaml(text, lines);
+  const spec = schema?.data ?? {};
+  const kind = String(schema?.kind ?? "");
+  const front = { said, lines: Object.fromEntries(lines) };
+  return mapFaults(said, spec, heldIn(front, schema, kind, where, "file", schemas), "");
+}
 
+// [[spec/design_output/schema#the-checker-walks-every-key]]
+function heldIn(front, schema, kind, where, calls, schemas) {
+  return {
+    kind,
+    where,
+    lines: front.lines ?? {},
+    root: front.said ?? {},
+    calls,
+    schema,
+    schemas,
+  };
+}
+
+// [[spec/design_output/schema#one-home-for-a-shape]]
+export function refOf(said, schema, schemas) {
+  const [name, pointer] = String(said ?? "").split("#");
+  const root = name ? (schemas?.get?.(name) ?? null) : schema;
+  if (!root) return {};
+  const path = String(pointer ?? "").replace(/^\/?/, "");
+  if (!path) return root;
+
+  let at = root;
+  for (const part of path.split("/")) {
+    if (at === null || typeof at !== "object") return {};
+    at = at[part.replace(/~1/g, "/").replace(/~0/g, "~")];
+  }
+  return at && typeof at === "object" ? at : {};
+}
+
+function solved(rule, held) {
+  if (!rule?.$ref) return rule;
+  const { $ref, ...beside } = rule;
+  return { ...refOf($ref, held.schema, held.schemas), ...beside };
+}
+
+function lineOf(held, path) {
+  return held.lines?.[path] ?? 1;
+}
+
+// [[spec/design_output/schema#the-checker-walks-every-key]]
+function mapFaults(said, spec, held, path) {
   const out = [];
-  const said = note.front.said ?? {};
   const props = spec.properties ?? {};
 
   for (const key of spec.required ?? []) {
-    if (!empty(said[key])) continue;
-    out.push(fault(key, where, 1, `A ${kind} note names ${key} in its frontmatter.`));
+    if (!empty(said?.[key])) continue;
+    out.push(
+      fault(
+        key,
+        held.where,
+        lineOf(held, path),
+        path
+          ? `${path} names ${key}, and a ${held.kind} names it on every entry.`
+          : `A ${held.kind} names ${key} in its ${held.calls}.`,
+      ),
+    );
   }
 
-  for (const [key, value] of Object.entries(said)) {
+  for (const [key, value] of Object.entries(said ?? {})) {
+    const at = keyed(path, key);
     const rule = props[key];
-    const line = note.front.lines[key] ?? 1;
+    const line = lineOf(held, at);
     if (!rule) {
       if (spec.additionalProperties === false) {
-        out.push(fault(key, where, line, `The ${kind} schema names no ${key}.`));
+        out.push(
+          fault(
+            key,
+            held.where,
+            line,
+            path
+              ? `The ${held.kind} schema names no ${key} under ${path}.`
+              : `The ${held.kind} schema names no ${key}.`,
+          ),
+        );
       }
       continue;
     }
-    out.push(...fieldFaults(key, value, rule, kind, where, line));
+    out.push(...fieldFaults(key, value, solved(rule, held), held, at, line));
   }
   return out;
 }
 
-function fieldFaults(key, value, rule, kind, where, line) {
+function fieldFaults(key, value, rule, held, at, line) {
   const out = [];
+  const kind = held.kind;
+  const where = held.where;
   const said = rule["x-link"] ? linkless(value) : value;
 
   if (rule["x-link"] && !linked(value)) {
@@ -287,25 +397,142 @@ function fieldFaults(key, value, rule, kind, where, line) {
       ),
     );
   }
+  out.push(...refersFaults(key, value, rule, held, at, line));
+  out.push(...deeperFaults(value, rule, held, at));
   return out;
+}
+
+// [[spec/design_output/schema#the-checker-walks-every-key]]
+function deeperFaults(value, rule, held, at) {
+  const out = [];
+  const items = solved(rule.items, held);
+  if (items?.properties && Array.isArray(value)) {
+    for (let i = 0; i < value.length; i++) {
+      if (!value[i] || typeof value[i] !== "object") continue;
+      out.push(...mapFaults(value[i], items, held, `${at}[${i}]`));
+    }
+  }
+  if (rule.properties && value && typeof value === "object" && !Array.isArray(value)) {
+    out.push(...mapFaults(value, rule, held, at));
+  }
+  return out;
+}
+
+// [[spec/design_output/schema#three-keywords-name-a-step]]
+function refersFaults(key, value, rule, held, at, line) {
+  const earlier = rule["x-earlier"];
+  const list = rule["x-names"] ?? earlier;
+  if (!list) return [];
+
+  const walk = entriesIn(held.root?.[list], list);
+  const holder = holderOf(walk, at);
+  const out = [];
+
+  for (const one of [value].flat()) {
+    const said = wanted(String(one ?? "").trim(), rule);
+    if (said === null) continue;
+    const found = entryNamed(walk, said, holder);
+    if (!found) {
+      out.push(
+        fault(
+          key,
+          held.where,
+          line,
+          `${key} names ${show(said)}, and ${list} holds ${names(walk) || "no entry"}.`,
+        ),
+      );
+      continue;
+    }
+    if (rule["x-leaf"] && !found.leaf) {
+      out.push(
+        fault(key, held.where, line, `${key} names a leaf, and ${found.path} holds steps.`),
+      );
+    }
+    if (earlier && holder && walk.indexOf(found) >= walk.indexOf(holder)) {
+      out.push(
+        fault(
+          key,
+          held.where,
+          line,
+          `${key} names ${found.path}, and a ${held.kind} names a step standing before ${holder.path}.`,
+        ),
+      );
+    }
+  }
+  return out;
+}
+
+// [[spec/design_output/schema#three-keywords-name-a-step]]
+function wanted(said, rule) {
+  if (!said) return null;
+  if ([rule["x-words"] ?? []].flat().includes(said)) return null;
+  const prefix = rule["x-prefix"];
+  if (!prefix) return said;
+  return said.startsWith(`${prefix} `) ? said.slice(prefix.length + 1).trim() : said;
+}
+
+// [[spec/design_output/schema#three-keywords-name-a-step]]
+export function entriesIn(list, base, parent = "", out = []) {
+  const held = [list ?? []].flat();
+  for (let i = 0; i < held.length; i++) {
+    const one = held[i];
+    if (!one || typeof one !== "object") continue;
+    const name = String(one.name ?? "");
+    const path = parent ? `${parent}/${name}` : name;
+    const at = `${base}[${i}]`;
+    const under = [one.steps ?? []].flat().filter((it) => it && typeof it === "object");
+    out.push({ name, path, parent, at, said: one, leaf: under.length === 0 });
+    if (under.length) entriesIn(one.steps, `${at}.steps`, path, out);
+  }
+  return out;
+}
+
+// [[spec/design_output/schema#three-keywords-name-a-step]]
+function holderOf(walk, at) {
+  let out = null;
+  for (const one of walk) {
+    if (!String(at).startsWith(`${one.at}.`)) continue;
+    if (!out || one.at.length > out.at.length) out = one;
+  }
+  return out;
+}
+
+// [[spec/design_output/schema#three-keywords-name-a-step]]
+export function entryNamed(walk, said, holder) {
+  const want = String(said ?? "").trim();
+  if (!want) return null;
+  if (want.includes("/")) return walk.find((one) => one.path === want) ?? null;
+  const parent = holder ? holder.parent : "";
+  const sibling = walk.find((one) => one.parent === parent && one.name === want);
+  if (sibling) return sibling;
+  return walk.find((one) => one.parent === "" && one.name === want) ?? null;
+}
+
+function names(walk) {
+  return walk.map((one) => one.path).join(", ");
 }
 
 function bodyFaults(note, spec, kind, where) {
   const level = spec.headingLevel ?? 1;
-  const wanted = spec.sections ?? [];
-  const standing = note.sections.filter((one) => one.level === level);
-  const named = new Map(wanted.map((one) => [one.header, one]));
+  const wanted = chaptersWanted(spec.sections ?? [], note.front.said ?? {}, level);
+  const levels = new Set(wanted.map((one) => one.level ?? level));
+  const nested = wanted.some((one) => (one.level ?? level) > level);
+  const standing = note.sections.filter((one) =>
+    nested ? one.level >= level : levels.has(one.level),
+  );
+  const top = standing.filter((one) => one.level === level);
+  const named = new Map(wanted.map((one) => [`${one.level ?? level} ${one.header}`, one]));
   const out = [];
 
   for (const one of wanted) {
-    if (!one.required || standing.some((held) => held.header === one.header)) continue;
-    out.push(
-      fault(one.header, where, 1, `A ${kind} note carries a ${one.header} chapter.`),
-    );
+    const at = one.level ?? level;
+    if (!one.required || standing.some((held) => held.header === one.header && held.level === at))
+      continue;
+    out.push(fault(one.header, where, 1, `A ${kind} carries a ${one.header} chapter.`));
   }
 
   for (const held of standing) {
-    if (named.has(held.header)) continue;
+    if (named.has(`${held.level} ${held.header}`)) continue;
     if (spec.extraSections === false) {
       out.push(
         fault(
@@ -318,14 +545,60 @@ function bodyFaults(note, spec, kind, where) {
     }
   }
 
-  if (spec.order === "strict") out.push(...orderFaults(standing, wanted, kind, where));
-  out.push(...lastFaults(standing, wanted, where));
+  const once = wanted.filter((one) => (one.level ?? level) === level);
+  if (spec.order === "strict") out.push(...orderFaults(top, once, kind, where));
+  out.push(...lastFaults(top, once, where));
 
   for (const held of standing) {
-    const rule = named.get(held.header);
+    const rule = named.get(`${held.level} ${held.header}`);
     if (rule) out.push(...sectionFaults(held, rule, note, where));
   }
   return out;
+}
+
+// [[spec/design_output/schema#three-keywords-name-a-step]]
+export function chaptersWanted(sections, front, level) {
+  const out = [];
+  for (const one of sections ?? []) {
+    const list = one["x-one-per"];
+    if (!list) {
+      out.push({ ...one, level: one.level ?? level });
+      continue;
+    }
+    out.push(...chaptersOf(front?.[list], level, one));
+  }
+  return out;
+}
+
+function chaptersOf(list, level, rule) {
+  const out = [];
+  for (const one of [list ?? []].flat()) {
+    if (!one || typeof one !== "object") continue;
+    const header = String(one.name ?? "").trim();
+    if (!header) continue;
+    out.push({
+      ...rule,
+      header,
+      level,
+      required: true,
+      description: sayOf(one),
+      form: String(one.form ?? ""),
+    });
+    for (const value of Object.values(one)) {
+      if (!Array.isArray(value)) continue;
+      if (!value.some((it) => it && typeof it === "object" && it.name)) continue;
+      out.push(...chaptersOf(value, level + 1, rule));
+    }
+  }
+  return out;
+}
+
+// [[spec/design_output/schema#the-render-follows-the-tree]]
+function sayOf(one) {
+  for (const key of ["does", "says"]) {
+    if (String(one?.[key] ?? "").trim()) return String(one[key]).trim();
+  }
+  return "";
 }
 
 function orderFaults(standing, wanted, kind, where) {
@@ -466,7 +739,11 @@ export function placeholderFaults(text, schema, where) {
   }
 
   const named = new Map(
-    (schema?.body?.sections ?? [])
+    chaptersWanted(
+      schema?.body?.sections ?? [],
+      note.front.said ?? {},
+      schema?.body?.headingLevel ?? 1,
+    )
       .filter((one) => one.description)
       .map((one) => [one.header, `<!-- ${one.description} -->`]),
   );
@@ -494,11 +771,17 @@ function left(file, line, what) {
 // [[spec/design_output/schema#the-sweep-over-the-tree]]
 export function schemaFaults(tree) {
   const schemas = schemasIn(tree);
+  const data = dataSchemasIn(tree);
+  const every = allSchemasIn(tree);
   const out = [];
   if (!schemas.size) return out;
 
   for (const path of tree.paths()) {
-    if (!path.endsWith(".md")) continue;
+    if (!path.endsWith(".md")) {
+      const governor = governorOf(data, path);
+      if (governor) out.push(...checkData(tree.read(path), governor, path, every));
+      continue;
+    }
     const text = tree.read(path);
     const kind = kindOf(text);
     const governor = governorOf(schemas, path);
@@ -521,7 +804,7 @@ export function schemaFaults(tree) {
       );
       continue;
     }
-    out.push(...checkNote(text, schema, path));
+    out.push(...checkNote(text, schema, path, every));
     out.push(...placeholderFaults(text, schema, path));
   }
   return out;
@@ -529,10 +812,24 @@ export function schemaFaults(tree) {
 
 // [[spec/design_output/schema#the-door-refuses-a-departure]]
 export function schemasFrom(files) {
+  return kindsFrom(files, isNoteSchema);
+}
+
+// [[spec/design_output/schema#a-data-schema-holds-yaml]]
+export function dataSchemasFrom(files) {
+  return kindsFrom(files, isDataSchema);
+}
+
+// [[spec/design_output/schema#one-home-for-a-shape]]
+export function allSchemasFrom(files) {
+  return kindsFrom(files, (said) => Boolean(said?.kind));
+}
+
+function kindsFrom(files, holds) {
   const out = new Map();
   for (const one of files ?? []) {
     const said = readYaml(one.text);
-    if (isNoteSchema(said)) out.set(String(said.kind), said);
+    if (holds(said)) out.set(String(said.kind), said);
   }
   return out;
 }
@@ -562,29 +859,32 @@ export function refusedKind(where, schema, found) {
 }
 
 // [[spec/design_output/schema#mint-writes-a-valid-note]]
+// [[spec/design_output/schema#the-render-follows-the-tree]]
 export function mintNote(schema, fields) {
   const spec = schema?.frontmatter ?? {};
   const props = spec.properties ?? {};
   const given = handedIn(fields);
   const required = spec.required ?? [];
   const rows = ["---"];
+  const front = {};
 
-  for (const key of required) rows.push(`${key}: ${saidFor(key, props[key], given)}`);
+  for (const key of required) rows.push(...frontRows(key, props[key], given, front));
   for (const key of Object.keys(props)) {
     if (required.includes(key) || !given.has(slugOf(key))) continue;
-    rows.push(`${key}: ${saidFor(key, props[key], given)}`);
+    rows.push(...frontRows(key, props[key], given, front));
   }
   rows.push("---", "");
 
-  const hashes = "#".repeat(schema?.body?.headingLevel ?? 1);
-  for (const one of schema?.body?.sections ?? []) {
-    rows.push(`${hashes} ${one.header}`, "");
+  const level = schema?.body?.headingLevel ?? 1;
+  for (const one of chaptersWanted(schema?.body?.sections ?? [], front, level)) {
+    rows.push(`${"#".repeat(one.level ?? level)} ${one.header}`, "");
     const said = given.get(slugOf(one.header));
     if (said !== undefined && String(said).trim()) {
       rows.push(String(said).trim(), "");
       continue;
     }
     if (one.description) rows.push(`<!-- ${one.description} -->`, "");
+    if (one.form) rows.push(`<!-- the form is ${one.form} -->`, "");
     if (one.list)
       rows.push(
         one.ordered ? "1. Say the first one here." : "- Say the first one here.",
@@ -592,6 +892,66 @@ export function mintNote(schema, fields) {
       );
   }
   return `${rows.join("\n").trimEnd()}\n`;
+}
+
+// [[spec/design_output/schema#the-render-follows-the-tree]]
+function frontRows(key, rule, given, front) {
+  const said = given.get(slugOf(key));
+  const bare = said === undefined || (typeof said !== "object" && String(said).trim() === "");
+
+  if (rule?.const !== undefined) {
+    front[key] = rule.const;
+    return [`${key}: ${minted(rule)}`];
+  }
+  const value = bare ? rule?.default : said;
+  if (value !== undefined && value !== null && typeof value === "object" && !Array.isArray(value)) {
+    front[key] = value;
+    return [`${key}:`, ...yamlRows(value, 2)];
+  }
+  if (Array.isArray(value) && value.some((one) => one && typeof one === "object")) {
+    front[key] = value;
+    return [`${key}:`, ...yamlRows(value, 2)];
+  }
+  if (bare && rule?.default === undefined) {
+    front[key] = minted(rule);
+    return [`${key}: ${minted(rule)}`];
+  }
+  front[key] = value;
+  return [`${key}: ${written(value, rule)}`];
+}
+
+// [[spec/design_output/schema#the-render-follows-the-tree]]
+function yamlRows(value, pad) {
+  const gap = " ".repeat(pad);
+  if (Array.isArray(value)) {
+    return value.flatMap((one) => {
+      if (!one || typeof one !== "object" || Array.isArray(one)) {
+        return [`${gap}- ${flatOf(one)}`];
+      }
+      const rows = Object.entries(one).flatMap(([key, said]) => keyRows(key, said, pad + 2));
+      return [`${gap}- ${rows[0].trim()}`, ...rows.slice(1)];
+    });
+  }
+  if (value && typeof value === "object") {
+    return Object.entries(value).flatMap(([key, said]) => keyRows(key, said, pad));
+  }
+  return [`${gap}${flatOf(value)}`];
+}
+
+function keyRows(key, said, pad) {
+  const gap = " ".repeat(pad);
+  if (said && typeof said === "object" && !Array.isArray(said)) {
+    return [`${gap}${key}:`, ...yamlRows(said, pad + 2)];
+  }
+  if (Array.isArray(said) && said.some((one) => one && typeof one === "object")) {
+    return [`${gap}${key}:`, ...yamlRows(said, pad + 2)];
+  }
+  return [`${gap}${key}: ${flatOf(said)}`];
+}
+
+function flatOf(said) {
+  if (Array.isArray(said)) return `[${said.map((one) => `"${one}"`).join(", ")}]`;
+  return String(said ?? "");
 }
 
 // [[spec/design_output/schema#the-fields-a-caller-names]]
@@ -710,7 +1070,7 @@ export function mintedNote(schemas, ask) {
   }
 
   const text = mintNote(schema, ask?.fields);
-  const found = checkNote(text, schema, path);
+  const found = checkNote(text, schema, path, schemas);
   if (found.length) return { why: refusedNote(path, kind, found), found };
   return { text, path, kind, left: placeholderFaults(text, schema, path) };
 }

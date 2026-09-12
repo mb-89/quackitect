@@ -55,11 +55,28 @@ A note reads as a frontmatter half and a body half.
 |---|---|
 | `front.stands` | whether the note opens with frontmatter |
 | `front.said` | the fields, through the same YAML reader |
-| `front.lines` | the line each field stands on |
+| `front.lines` | the line each key stands on, at every depth |
 | `sections` | every heading, its level, its line, and the lines under it |
 
 A fenced block holds no heading, so the reader counts the fences and passes
 over what stands between them.
+
+# A line per nested key
+
+`readYaml(text, lines)` takes a `Map` and writes the line of every key into it.
+The key's own path is the entry, and the reader builds it as it walks:
+
+| the key | its path |
+|---|---|
+| a key of the top map | `state` |
+| a key of a nested map | `growth.who` |
+| an entry of a list | `steps[1]` |
+| a key of that entry | `steps[1].by` |
+| a key one list deeper | `steps[1].steps[0].by` |
+
+`front.lines` carries that map, shifted by the opening `---`. So a finding on a
+nested key points at the line it stands on. A caller reading a top-level key
+reads the line it read before this.
 
 # The schemas read once
 
@@ -69,17 +86,35 @@ map answers the schema for that kind.
 
 # A schema names its chapters
 
-`spec/schemas` holds two shapes. A note schema names the chapters a note of
-that kind carries, and `isNoteSchema` is what tells one from the other.
+`spec/schemas` holds three shapes, and one key tells each from the others:
 
 | the shape | what it names | who reads it |
 |---|---|---|
 | a note schema | `body.sections`, one chapter an entry | the write door, `./RUNME.sh mint` |
+| a data schema | `data`, the rules over a bare YAML file | the sweep, and the write door |
 | a model schema | the values a projector writes into a rule | a projector, and a person |
 
-`spec/schemas/paragraph.schema.yaml` is the second shape. It names no chapter,
-so `schemasIn` leaves it out, the write door asks it nothing, and `mint` offers
-the note kinds alone. For details, see [[spec/funnel/a-paragraph-has-a-schema]].
+`isNoteSchema` reads the first and `isDataSchema` the second. A schema naming
+neither is the third, and no checker asks it anything.
+
+`spec/schemas/paragraph.schema.yaml` is the third shape. It names no chapter, so
+`schemasIn` leaves it out, the write door asks it nothing, and `mint` offers the
+note kinds alone. For details, see [[spec/funnel/a-paragraph-has-a-schema]].
+
+# A data schema holds YAML
+
+A data schema governs a file that is YAML whole, with no frontmatter and no
+body. `spec/schemas/process.schema.yaml` is the one this tree ships, and it
+holds `spec/processes/*.yaml`.
+
+| it takes | it answers |
+|---|---|
+| `checkData(text, schema, where, schemas)` | the findings over the file as one map |
+| `dataSchemasIn(tree)` | a map from kind to data schema |
+| `dataSchemasFrom(files)` | the same, off the files the door loads |
+
+`data` holds the same rules `frontmatter` does, because one walk weighs both. So
+a keyword lands once and every kind reads it.
 
 # A folder names its kind
 
@@ -139,9 +174,64 @@ These keywords answer a finding today:
 | `list`, `ordered` | prose where a numbered list belongs |
 | `maxItems` | one item past the cap |
 | `subsections` | a chapter opening with no number, or numbers running back |
+| `x-one-per` | a chapter missing for a step, or a chapter naming no step |
+| `x-names` | a value naming no entry of the list it points at |
+| `x-earlier` | a value naming an entry at or after its own |
 
 `tense`, `detailMarker`, `description` and `matches` answer none. Vale holds
 the tense, a person reads the marker, and `matches` reaches a second file.
+
+# The checker walks every key
+
+`mapFaults` weighs one map against one set of rules, and it calls itself. So the
+same keyword reads at every depth:
+
+| the rule carries | the checker does |
+|---|---|
+| `items.properties` | walks each entry of the list, as `steps[1]` |
+| `properties` on a map | walks the map's own keys, as `growth.who` |
+| `$ref` | reads the rule the pointer names, and a key beside it wins |
+
+A finding names the line its key stands on. A field outside the properties of
+its own entry reads `names no <key> under steps[1]`.
+
+# One home for a shape
+
+A route stands on a ticket, on a group note and in a process file. One rule
+holds it, in `ticket.schema.yaml`, and the other two name it:
+
+    steps:
+      $ref: "ticket#/frontmatter/properties/steps"
+
+`refOf(said, schema, schemas)` reads the kind before the `#` and the JSON
+pointer after it. A pointer with no kind reads this schema's own root. That is
+how the route's `steps` key names itself, and how the tree nests.
+
+`allSchemasIn(tree)` and `allSchemasFrom(files)` answer every kind, so a pointer
+across files resolves. A caller handing in the note kinds alone resolves a
+pointer into those, and a pointer it cannot read weighs nothing.
+
+# Three keywords name a step
+
+A route is a tree of named steps, and three keywords reach into it:
+
+| keyword | the value | what it holds |
+|---|---|---|
+| `x-one-per` | the list the chapters follow | a chapter per entry, nested as the entries nest |
+| `x-names` | the list a value names an entry of | the value names an entry |
+| `x-earlier` | the same list | the entry stands before the one holding the key |
+
+Three modifiers ride them:
+
+| modifier | what it does |
+|---|---|
+| `x-leaf` | the entry it names carries no steps of its own |
+| `x-words` | the values the check passes over, such as `ask` and `diff` |
+| `x-prefix` | the word a value opens with, so `not implement` names `implement` |
+
+`entriesIn` walks the list, and `entryNamed` resolves one name: a sibling first,
+an entry from the top second, and a path with a slash exactly. So `draft` inside
+`design` reads `design/draft`, and `implement/reflect` says which.
 
 # A comment counts toward nothing
 
@@ -171,12 +261,31 @@ note it names:
 |---|---|
 | the fields the schema requires | `frontmatter.required` |
 | a link, an enum value, or the description | `const`, `enum`, `description` |
+| a nested block, where a field takes one | `default`, and the fields a caller names |
 | one heading per chapter | `body.sections[].header` |
 | the description under each, as a comment | `description` |
 | one item, where a chapter holds a list | `list`, `ordered` |
 
 The checker passes every note mint writes, and a contract test asserts that
 over every kind a schema describes.
+
+# The render follows the tree
+
+A ticket's body follows its route, so the render reads the frontmatter it writes
+first. `frontRows` keeps every value in a map, and `chaptersWanted` expands
+`x-one-per` off that map.
+
+| the route holds | the render writes |
+|---|---|
+| a phase | a heading at the body's own level |
+| a leaf under it | a heading one level under its phase |
+| an evidence field of a leaf | a heading one level under the leaf |
+| a step's `does` | the comment under the step's heading |
+| a field's `says` | the comment under the field's heading |
+| a field's `form` | a second comment, naming the form |
+
+`yamlRows` writes a nested value back as the YAML the reader reads. So a route
+the mint takes comes back off the file the same shape.
 
 # The tool writes the note
 

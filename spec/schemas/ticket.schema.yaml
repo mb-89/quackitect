@@ -1,0 +1,210 @@
+# One unit of work, as one markdown note. The file name is the id, and it holds
+# five words at most, the cap `names.words` already sets.
+#
+# Two folders carry a ticket, and the folder says which kind stands there:
+# `spec/tickets/` travels and is a promise the tree keeps, and `.se/tickets/`
+# dies with the box. One schema covers both, because a hand meets one shape.
+#
+# This file is the one home of a route. `process.schema.yaml` and
+# `group.schema.yaml` name `steps` from here, so one rule holds the tree.
+#
+# `state`, `step` and `steps` are the verbs' to write. The write door refuses an
+# agent's hand edit to the three, and a person's editor stands outside it.
+#
+# The frontmatter half is JSON Schema 2020-12, https://json-schema.org/draft/2020-12.
+# The body half is this project's own, borrowed from https://document-schema.org.
+# [[spec/design_input/the-agent-pulls-tickets]]
+
+kind: ticket
+
+governs:
+  - spec/tickets/**
+  - .se/tickets/**
+
+frontmatter:
+  type: object
+  additionalProperties: false
+  required:
+    - kind
+    - state
+    - urgency
+    - steps
+  properties:
+    kind:
+      const: ticket
+      x-link: true
+      description: the schema this note is minted from
+
+    state:
+      enum: [draft, open, closed]
+      description: whether anybody pulls it, and the pull writes this
+
+    reason:
+      enum: [done, dropped, became]
+      description: how the work stopped, on a closed ticket alone
+
+    urgency:
+      enum: [now, soon, whenever]
+      description: which ticket the pull hands out first
+
+    step:
+      type: string
+      x-names: steps
+      x-leaf: true
+      description: the leaf of the route this ticket stands on, as a path
+
+    steps:
+      type: array
+      description: the route, as a tree of steps in the order a hand meets them
+      default:
+        - name: do
+          does: makes the change the ask names
+          evidence:
+            - name: change
+              form: text
+              says: what you change, and what surprises you
+      items:
+        type: object
+        additionalProperties: false
+        required:
+          - name
+        properties:
+          name:
+            type: string
+            description: one word or a hyphenated pair, unique among its siblings
+
+          steps:
+            $ref: "#/frontmatter/properties/steps"
+            description: the steps under this phase, in order
+
+          does:
+            type: string
+            description: one line on what the hand does at this leaf
+
+          by:
+            type: string
+            x-names: steps
+            x-words: [anyone, person, agent, children, tickets]
+            x-prefix: not
+            description: the hand this step admits, as a word or not <step>
+
+          reads:
+            type: [array, string]
+            x-link: true
+            description: the guidance notes this step's hand reads, as links
+
+          on_fail:
+            type: string
+            x-earlier: steps
+            description: the earlier step a failed hand-back sends the ticket to
+
+          asks:
+            type: string
+            description: the question a person answers, on a step a person takes
+
+          options:
+            type: array
+            description: the words that answer `asks`, where one word answers it
+
+          when:
+            enum: [returned, cloud, desk]
+            description: the condition the pull reads, and it skips the leaf where it fails
+
+          checklist:
+            type: array
+            description: what a hand has to do here, one item a line, which the retro grows
+
+          input:
+            type: [array, string]
+            x-earlier: steps
+            x-words: [ask, diff]
+            description: what this step reads, as ask, diff, or an earlier step
+
+          needs:
+            type: array
+            description: the verbs and tools this step runs, which the pull checks on the box
+
+          from:
+            type: string
+            description: who hands this step its input, where that is a person or the outside
+
+          to:
+            type: string
+            description: who takes the output, where that is the owner, the retro or the merge
+
+          evidence:
+            type: array
+            description: the fields this leaf's hand fills
+            items:
+              type: object
+              additionalProperties: false
+              required:
+                - name
+                - form
+                - says
+              properties:
+                name:
+                  type: string
+                  description: one word, unique among the fields of this leaf
+
+                form:
+                  enum: [text, list, command, link, files, choice, checklist, verdict]
+                  description: what the hand writes, and what the engine checks
+
+                says:
+                  type: string
+                  description: one line on what goes in this field
+
+                expects:
+                  type: [integer, string]
+                  description: the exit code or the word a command answers with
+
+                options:
+                  type: array
+                  description: the words a choice takes
+
+    process:
+      x-link: true
+      description: the route the mint copies from, as a link to a process
+
+    process_hash:
+      type: string
+      description: the hash of the process file the route is copied from
+
+    record:
+      type: array
+      description: the engine's entry per leaf handed back, and no hand writes it
+
+    group:
+      type: string
+      description: the branch this ticket lands on, which a person writes
+
+    parent:
+      type: string
+      description: the ticket whose children step waits for this one
+
+    depends_on:
+      type: [array, string]
+      description: the tickets this one waits for, a list or one line of names
+
+    successors:
+      type: [array, string]
+      description: the tickets this one became, on reason became
+
+body:
+  headingLevel: 1
+  order: strict
+  extraSections: false
+  tense: present
+
+  sections:
+    - header: Ask
+      required: true
+      description: what this ticket asks for, and what done looks like
+
+    - x-one-per: steps
+
+    - header: Discussion
+      required: true
+      position: last
+      description: what anybody adds, at any time, on this ticket
