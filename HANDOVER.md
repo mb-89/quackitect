@@ -2,6 +2,7 @@
 kind: [[handover]]
 status: held
 urgency: now
+depends_on: [the-voice-verbs]
 ---
 
 # Where it stands
