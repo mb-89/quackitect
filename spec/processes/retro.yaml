@@ -1,18 +1,19 @@
 # The tree's retro: a window of the record turned into changes to the
 # machinery, on a desk, with the owner at two steps. It is blameless, and it
-# fixes what produced a bad output: a prompt, a guidance line, a form, a
-# refusal, a tool. Its readers are children, one per chapter of the window
-# and one for the shell commands, so a reader per slice is mechanical.
+# repairs what produced a bad output: a prompt, a guidance line, a form, a
+# refusal, a tool. Its children are one reader per chapter of the window, so
+# a reader per slice is mechanical, and the mine phase is the retro's own
+# hand reading what collect lays out.
 # [[spec/design_input/the-agent-pulls-tickets#the-retro]]
 name: retro
-for: a window of the record turned into changes to the machinery
+for: a window of the record, and the changes to the machinery it earns
 ask:
   - name: why
     form: text
     says: what calls for it, as notes standing open, an iteration ending, or the owner asking
 steps:
   - name: collect
-    does: drains the box into the retro folder, cuts the window into chapters, and mints a reader per chapter and one for the commands
+    does: drains the box into the retro folder, cuts the window into chapters, mints a reader per chapter, and lays the rest out as files
     by: anyone
     needs: [work collect]
     evidence:
@@ -34,11 +35,11 @@ steps:
     evidence:
       - name: scored
         form: list
-        says: one line per improvement, with what happened and what that teaches
+        says: one line per improvement, with what the numbers show and what that teaches
       - name: rate
         form: command
         expects: 0
-        says: work retro score, which prints how many landed
+        says: work retro score, which prints how many stand in the tree
   - name: notes
     does: decides every note, the field's answers among them
     needs: [work retro]
@@ -50,22 +51,73 @@ steps:
   - name: readers
     by: children
   - name: mine
-    does: reads the closed readers into themes with counts
-    input: readers
     reads: [[spec/guidance/working]]
-    evidence:
-      - name: themes
-        form: list
-        says: one line per theme, with its count and the chapters it stands in
-      - name: repeats
-        form: list
-        says: each theme an earlier retro already named, with the link
+    input: collect
+    steps:
+      - name: chapters
+        does: reads the closed chapter readers into themes with counts
+        input: readers
+        evidence:
+          - name: themes
+            form: list
+            says: one line per theme, with its count and the chapters it stands in
+          - name: repeats
+            form: list
+            says: each theme an earlier retro names already, with the link
+          - name: thoughts
+            form: text
+            says: what the readers' thoughts fields say together, as doubts and workarounds that repeat
+      - name: shell
+        does: reads the shell commands of the window, grouped by the job in the retro folder
+        evidence:
+          - name: learn
+            form: text
+            says: what the groups say about what the tree lacks
+          - name: tools
+            form: list
+            says: which groups become a verb or a flag, and which stay shell
+          - name: guidance
+            form: list
+            says: which groups want a sentence, and where
+          - name: block
+            form: list
+            says: which groups a door refuses from now on, and why
+      - name: refusals
+        does: reads the doors' refusals of the window, by rule
+        evidence:
+          - name: rules
+            form: list
+            says: one line per rule, with its count, and whether the rule or the hand is wrong
+          - name: noise
+            form: list
+            says: the rules that fire and teach nothing, each with the fix
+      - name: records
+        does: reads the records of the tickets that close in the window
+        evidence:
+          - name: steps
+            form: list
+            says: the steps that fail back or meet refused most, per process, with counts
+          - name: people
+            form: list
+            says: what the person steps ask, and how long each waits
+          - name: skips
+            form: text
+            says: what the conditions skip, and whether rightly
       - name: worker
-        form: text
-        says: how the worker changed over the window, off the chapter counts
+        does: reads the counts per chapter as a curve
+        evidence:
+          - name: curve
+            form: text
+            says: errors and the length of a thought per chapter, and where they turn
+          - name: cuts
+            form: list
+            says: where the worker cuts scope and calls it something else, each with its moment
       - name: unread
-        form: text
-        says: what could not be read, and why
+        does: names what the retro could not read
+        evidence:
+          - name: unread
+            form: text
+            says: what could not be read, and why, so the next retro inherits no hidden gap
   - name: improve
     does: mints one ticket per class, each with its home and its card
     input: mine
@@ -78,7 +130,7 @@ steps:
     evidence:
       - name: tickets
         form: list
-        says: one link per ticket, with its class, its home, what is planned, and what the next numbers show if it works
+        says: one link per ticket, with its class, its home, the plan, and what the next numbers show if it works
   - name: report
     does: reads the retro whole and says what it misses
     by: person
@@ -86,7 +138,7 @@ steps:
     evidence:
       - name: misses
         form: text
-        says: what the retro missed, or nothing
+        says: what the retro misses, or nothing
   - name: distribute
     does: puts every minted ticket into a group with an urgency, cut into groups that run alone
     input: [improve, report]
