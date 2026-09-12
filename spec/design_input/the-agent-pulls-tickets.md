@@ -114,25 +114,59 @@ failed step sends the ticket back to.
 
     steps:
       - name: draft
+        of: design
         by: anyone
         reads: [[spec/guidance/writing]]
       - name: review-design
+        of: design
         by: not draft
         on_fail: draft
         reads: [[spec/guidance/review/reviewing]]
+      - name: tests-red
+        of: implement
+        by: anyone
+        reads: [[spec/guidance/code/testing]]
       - name: implement
+        of: implement
+        by: anyone
+        reads: [[spec/guidance/code/code]]
+      - name: tests-green
+        of: implement
         by: anyone
       - name: review-build
+        of: review
         by: not implement
         on_fail: implement
+        reads: [[spec/guidance/review/reviewing]]
 
 | field | holds |
 |---|---|
 | `name` | one word or a hyphenated pair, unique on the ticket |
-| `by` | `anyone`, `person`, `agent`, `children`, or `not <step>` |
+| `of` | the phase this step belongs to, a name over several steps |
+| `by` | `anyone`, `person`, `agent`, `children`, or `not <step or phase>` |
 | `reads` | links to the guidance notes the step's hand reads |
-| `on_fail` | an earlier step, where a failed hand-back sends the ticket |
+| `on_fail` | an earlier step or phase, where a failed hand-back sends the ticket |
 | `asks` | the question a person answers, on a step a person takes |
+
+A step is the unit of the pull, and a phase is a name over steps. So a
+sub-step is a step, and the pull hands out one step at a time. A phase named
+in `on_fail` resolves to its first step, and `not implement` excludes the
+hand of every step of that phase. A child ticket stays the unit that changes
+hands or runs beside another, which is what the complex process is for.
+
+The implement phase of the standard process shows how a step forces a way of
+working without a word of prose:
+
+| step | the hand does | the engine checks at the hand-back |
+|---|---|---|
+| `tests-red` | writes the tests the ask calls for | the tests the branch adds or changes fail, and the failure is an assertion, with no build fault |
+| `implement` | makes the change | the tree builds and lints |
+| `tests-green` | makes the tests pass | the same tests pass, and the check is green on the commit |
+
+Red for the right reason splits in two. The class of the failure is
+mechanical, and the test verb names it. Whether the assertion names the
+behaviour the ask describes is a judgement, and the judge reads the failing
+assertion against the ask where `judge.enabled` says so.
 
 The body carries one chapter per step, named after it, in route order. Each
 holds two subsections. `Done when` is a list with one criterion a line, and
@@ -177,6 +211,22 @@ a token in the archive with its evidence empty.
 The tickets folder stands beside the rationales in `.vale.ini`, so an evidence
 chapter and a discussion may carry the past tense.
 
+# The test verb
+
+`work test` runs the tests the branch adds or changes since the take, or the
+ones a step names, and answers one word and a reason:
+
+| answer | means |
+|---|---|
+| `green` | every test it runs passes |
+| `red`, assertion | a test fails on its own assertion, which is the red a `tests-red` step wants |
+| `red`, build | the file loads no test, because the tree fails to build or to parse |
+| `red`, missing | the branch changes no test, so there is nothing to run |
+
+A `decided by` line names it with the answer it expects, as `work test
+--expect red`. The verb reads the delta off git, which is the half of v4's
+test map that a branch already carries.
+
 # Processes are routes
 
 A process is a route the mint copies onto a ticket. Level one ships three,
@@ -186,7 +236,7 @@ and nothing more:
 | process | route | for |
 |---|---|---|
 | `trivial` | `do` | a fix small enough that the ask is the design |
-| `standard` | `draft`, `review-design`, `implement`, `review-build` | a change that wants an approach first and a second pair of eyes after |
+| `standard` | `draft`, `review-design`, `tests-red`, `implement`, `tests-green`, `review-build` | a change that wants an approach first, tests before code, and a second pair of eyes after |
 | `complex` | `split`, `children`, `review-whole` | a change too large to review whole |
 
 A complex ticket's work is other tickets. Its `split` step writes the children,
@@ -265,7 +315,7 @@ Then one of three answers comes back:
 
 | answer | when | the hand does |
 |---|---|---|
-| `work` | a ticket at a step, with the step's guidance inline and the file's path | the step, then pulls again naming it |
+| `work` | one step of a ticket, with its guidance inline and the file's path | the step, then pulls again naming it |
 | `refused` | a check fails, and the findings stand one a line | fixes it, and the ticket stays in hand |
 | `wait` | nothing to hand out, and the reason with it | says so, and stops |
 
@@ -281,6 +331,12 @@ On `pass` the engine does six things in one call:
 
 On `fail` it sets `step` to the row's `on_fail`, writes the reason on the
 evidence, and reopens the ticket.
+
+A `work` answer says one thing to do. It carries the ask and the current step
+alone, with its done-when and its guidance. It says the position too: which
+step of how many, in which phase. The whole file stands on disk and nothing
+hides it, so a hand that wants the picture reads the file. The pull hands it
+the step.
 
 The pull runs at two levels, and the same rule shape holds at each:
 
@@ -349,9 +405,27 @@ notes' actionables inline, so the hand holds them the moment it holds the
 step. The `guidance` verb answers a named note, or, unnamed, the notes the
 current step lists and the always-on ones.
 
-Every guidance answer writes a log line, which proves arrival the way the
-canary proves the standing layer. The proof of application is the hand-back:
-the commands, the evidence and the judge.
+The pull is the one road to a hand-back, and the pull hands the guidance. So
+a step with `reads` is a step no hand works before the notes reach it, and
+the engine keeps no quiz to prove it. What it keeps is the arrival:
+
+| the engine writes | where | it lasts |
+|---|---|---|
+| one log line per note handed over | the log | for the record |
+| the notes this hand holds for this step, by name and hash | `.se/hold.json` | the session |
+
+The hold says which notes reach this session, so the pull hands them once per
+step and session. Three things hand them again:
+
+- a `refused` answer, which quotes the rules its findings cite
+- a compaction, which level zero already notices
+- a note whose hash moves
+
+A refresher on every pull costs tokens and buys nothing the hold does not
+know.
+
+The proof of application is the hand-back: the commands, the evidence and the
+judge.
 
 Level one carries no reading probe, and two measurements say why:
 
@@ -494,3 +568,4 @@ wants moved. The old verbs go once the last brief merges.
 - whether a person step may go to a spawned strong model at high autonomy
 - whether yours drowns in parked conditions, and a parked state returns
 - a WIP limit per step, which is Kanban's one knob and stands outside this note
+- whether a guidance card's own items become steps at the mint, which v3 tried as card marking and level two may take up

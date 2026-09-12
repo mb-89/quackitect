@@ -98,8 +98,7 @@
 
 <h1>The agent pulls tickets</h1>
 <p class="sub">Level one, drawn. The record is the design input beside this page,
-<code>spec/design_input/the-agent-pulls-tickets.md</code>, committed as <code>1d176f22</code> on
-<code>claude/relaxed-knuth-f0uk4d</code>. This page draws that note and adds the one thing the tree gives
+<code>spec/design_input/the-agent-pulls-tickets.md</code>, on <code>claude/relaxed-knuth-f0uk4d</code>. This page draws that note and adds the one thing the tree gives
 no home to yet: what the field does with the same problem.</p>
 
 <div class="here">
@@ -237,17 +236,30 @@ verbs' to write; a hand edit by an agent to any of them is refused.</p>
   - the-vocabulary-grows
 <span class="v"><span class="k">steps:</span></span>
 <span class="v">  - name: draft</span>
+<span class="v">    of: design</span>
 <span class="v">    by: anyone</span>
 <span class="v">    reads: [[spec/guidance/writing]]</span>
 <span class="v">  - name: review-design</span>
+<span class="v">    of: design</span>
 <span class="v">    by: not draft</span>
 <span class="v">    on_fail: draft</span>
 <span class="v">    reads: [[spec/guidance/review/reviewing]]</span>
+<span class="v">  - name: tests-red</span>
+<span class="v">    of: implement</span>
+<span class="v">    by: anyone</span>
+<span class="v">    reads: [[spec/guidance/code/testing]]</span>
 <span class="v">  - name: implement</span>
+<span class="v">    of: implement</span>
+<span class="v">    by: anyone</span>
+<span class="v">    reads: [[spec/guidance/code/code]]</span>
+<span class="v">  - name: tests-green</span>
+<span class="v">    of: implement</span>
 <span class="v">    by: anyone</span>
 <span class="v">  - name: review-build</span>
+<span class="v">    of: review</span>
 <span class="v">    by: not implement</span>
 <span class="v">    on_fail: implement</span>
+<span class="v">    reads: [[spec/guidance/review/reviewing]]</span>
 <span class="k">---</span>
 
 <span class="h"># Ask</span>
@@ -269,8 +281,19 @@ for the characters layer.
 - one verdict, pass or fail, with findings one a line
 <span class="h">## Evidence</span>
 
+<span class="h"># tests-red</span>
+<span class="h">## Done when</span>
+- the tests the branch adds fail on their assertion, decided by ./RUNME.sh work test --expect red
+<span class="h">## Evidence</span>
+
 <span class="h"># implement</span>
 <span class="h">## Done when</span>
+- the tree builds and lints, decided by ./RUNME.sh lint
+<span class="h">## Evidence</span>
+
+<span class="h"># tests-green</span>
+<span class="h">## Done when</span>
+- the same tests pass, decided by ./RUNME.sh work test --expect green
 - the check is green on the commit, decided by ./RUNME.sh check
 <span class="h">## Evidence</span>
 
@@ -343,65 +366,99 @@ step, not a state. So is a test, an approval, a translation or a deploy. Adding 
 to a route and moves nothing in the schema.</p>
 
 <figure>
-<svg viewBox="0 0 940 280" role="img"
-     aria-label="A route drawn as boxes left to right: draft, review-design, implement, review-build, then closed. Pass arrows go right. Fail arrows curve back from each review to the step it reviews. The step pointer sits on review-design. Below it, a dashed red person step, inserted by an escalation, takes the pointer and hands it back into review-design.">
-  <g font-size="12.5" fill="currentColor">
-    <rect x="40" y="100" width="120" height="52" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
-    <text x="100" y="131" text-anchor="middle" font-weight="700">draft</text>
-    <rect x="225" y="100" width="160" height="52" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.8"/>
-    <text x="305" y="125" text-anchor="middle" font-weight="700">review-design</text>
-    <text x="305" y="142" text-anchor="middle" fill="var(--muted)" font-size="11">by: not draft</text>
-    <rect x="450" y="100" width="130" height="52" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
-    <text x="515" y="131" text-anchor="middle" font-weight="700">implement</text>
-    <rect x="645" y="100" width="150" height="52" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
-    <text x="720" y="125" text-anchor="middle" font-weight="700">review-build</text>
-    <text x="720" y="142" text-anchor="middle" fill="var(--muted)" font-size="11">by: not implement</text>
-    <rect x="850" y="108" width="80" height="36" rx="18" fill="var(--panel)" stroke="var(--muted)" stroke-width="1.2" stroke-dasharray="4 3"/>
-    <text x="890" y="130" text-anchor="middle" fill="var(--muted)">closed</text>
-    <!-- step pointer -->
-    <polygon points="305,86 297,72 313,72" fill="var(--accent)"/>
-    <text x="305" y="62" text-anchor="middle" fill="var(--accent)" font-size="11.5" font-weight="700">step</text>
-    <!-- person step -->
-    <rect x="130" y="205" width="240" height="46" rx="6" fill="var(--person-soft)" stroke="var(--person)" stroke-width="1.4" stroke-dasharray="5 4"/>
-    <text x="250" y="225" text-anchor="middle" fill="var(--person)" font-weight="700">person-1 · by: person</text>
-    <text x="250" y="242" text-anchor="middle" fill="var(--person)" font-size="11">asks: which of the two schemas stands?</text>
-  </g>
-  <g fill="none" stroke="currentColor" stroke-width="1.4">
-    <line x1="160" y1="126" x2="225" y2="126" marker-end="url(#ar)"/>
-    <line x1="385" y1="126" x2="450" y2="126" marker-end="url(#ar)"/>
-    <line x1="580" y1="126" x2="645" y2="126" marker-end="url(#ar)"/>
-    <line x1="795" y1="126" x2="850" y2="126" marker-end="url(#ar)"/>
-    <!-- fail loops -->
-    <path d="M330,100 C330,40 110,40 100,100" marker-end="url(#ar)"/>
-    <path d="M745,100 C745,40 525,40 515,100" marker-end="url(#ar)"/>
-    <!-- escalation -->
-    <path d="M285,152 L285,205" stroke="var(--person)" stroke-dasharray="5 4" marker-end="url(#arp)"/>
-    <path d="M325,205 L325,152" stroke="var(--person)" stroke-dasharray="5 4" marker-end="url(#arp)"/>
+<svg viewBox="0 0 1120 320" role="img"
+     aria-label="The standard route drawn as six boxes left to right in three phases: draft and review-design under design; tests-red, implement and tests-green under implement; review-build under review; then closed. Pass arrows go right. A fail arrow curves back from review-design to draft, and one from review-build to tests-red, the first step of the implement phase. The step pointer sits on review-design. Below it a dashed red person step, inserted by an escalation, takes the pointer and hands it back into review-design.">
+  <g fill="none" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3">
+    <rect x="22" y="112" width="286" height="80" rx="8"/>
+    <rect x="327" y="112" width="406" height="80" rx="8"/>
+    <rect x="752" y="112" width="151" height="80" rx="8"/>
   </g>
   <g font-size="11.5" fill="var(--muted)">
-    <text x="192" y="118" text-anchor="middle">pass</text>
-    <text x="417" y="118" text-anchor="middle">pass</text>
-    <text x="612" y="118" text-anchor="middle">pass</text>
-    <text x="822" y="118" text-anchor="middle">done</text>
-    <text x="215" y="52" text-anchor="middle">fail · on_fail: draft</text>
-    <text x="630" y="52" text-anchor="middle">fail · on_fail: implement</text>
-    <text x="255" y="185" text-anchor="end" fill="var(--person)">escalate</text>
-    <text x="352" y="185" text-anchor="start" fill="var(--person)">answer, then on</text>
+    <text x="32" y="187">of: design</text>
+    <text x="337" y="187">of: implement</text>
+    <text x="762" y="187">of: review</text>
+  </g>
+  <g font-size="12.5" fill="currentColor">
+    <rect x="30" y="120" width="100" height="52" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="80" y="151" text-anchor="middle" font-weight="700">draft</text>
+    <rect x="165" y="120" width="135" height="52" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.8"/>
+    <text x="232" y="145" text-anchor="middle" font-weight="700">review-design</text>
+    <text x="232" y="162" text-anchor="middle" fill="var(--muted)" font-size="11">by: not draft</text>
+    <rect x="335" y="120" width="105" height="52" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="387" y="145" text-anchor="middle" font-weight="700">tests-red</text>
+    <text x="387" y="162" text-anchor="middle" fill="var(--muted)" font-size="11">test --expect red</text>
+    <rect x="470" y="120" width="110" height="52" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="525" y="145" text-anchor="middle" font-weight="700">implement</text>
+    <text x="525" y="162" text-anchor="middle" fill="var(--muted)" font-size="11">builds and lints</text>
+    <rect x="610" y="120" width="115" height="52" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="667" y="145" text-anchor="middle" font-weight="700">tests-green</text>
+    <text x="667" y="162" text-anchor="middle" fill="var(--muted)" font-size="11">test --expect green</text>
+    <rect x="760" y="120" width="135" height="52" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="827" y="145" text-anchor="middle" font-weight="700">review-build</text>
+    <text x="827" y="162" text-anchor="middle" fill="var(--muted)" font-size="11">by: not implement</text>
+    <rect x="930" y="128" width="80" height="36" rx="18" fill="var(--panel)" stroke="var(--muted)" stroke-width="1.2" stroke-dasharray="4 3"/>
+    <text x="970" y="150" text-anchor="middle" fill="var(--muted)">closed</text>
+    <polygon points="200,106 192,92 208,92" fill="var(--accent)"/>
+    <text x="200" y="82" text-anchor="middle" fill="var(--accent)" font-size="11.5" font-weight="700">step</text>
+    <rect x="100" y="232" width="265" height="46" rx="6" fill="var(--person-soft)" stroke="var(--person)" stroke-width="1.4" stroke-dasharray="5 4"/>
+    <text x="232" y="252" text-anchor="middle" fill="var(--person)" font-weight="700">person-1 · by: person</text>
+    <text x="232" y="269" text-anchor="middle" fill="var(--person)" font-size="11">asks: which of the two schemas stands?</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.4">
+    <line x1="130" y1="146" x2="165" y2="146" marker-end="url(#ar)"/>
+    <line x1="300" y1="146" x2="335" y2="146" marker-end="url(#ar)"/>
+    <line x1="440" y1="146" x2="470" y2="146" marker-end="url(#ar)"/>
+    <line x1="580" y1="146" x2="610" y2="146" marker-end="url(#ar)"/>
+    <line x1="725" y1="146" x2="760" y2="146" marker-end="url(#ar)"/>
+    <line x1="895" y1="146" x2="930" y2="146" marker-end="url(#ar)"/>
+    <path d="M285,120 C285,40 90,40 80,120" marker-end="url(#ar)"/>
+    <path d="M870,120 C870,20 400,20 387,120" marker-end="url(#ar)"/>
+    <path d="M215,172 L215,232" stroke="var(--person)" stroke-dasharray="5 4" marker-end="url(#arp)"/>
+    <path d="M250,232 L250,172" stroke="var(--person)" stroke-dasharray="5 4" marker-end="url(#arp)"/>
+  </g>
+  <g font-size="11.5" fill="var(--muted)">
+    <text x="147" y="138" text-anchor="middle">pass</text>
+    <text x="317" y="138" text-anchor="middle">pass</text>
+    <text x="455" y="138" text-anchor="middle">pass</text>
+    <text x="595" y="138" text-anchor="middle">pass</text>
+    <text x="742" y="138" text-anchor="middle">pass</text>
+    <text x="912" y="138" text-anchor="middle">done</text>
+    <text x="175" y="50" text-anchor="middle">fail · on_fail: draft</text>
+    <text x="628" y="34" text-anchor="middle">fail · on_fail: implement, so its first step</text>
+    <text x="205" y="213" text-anchor="end" fill="var(--person)">escalate</text>
+    <text x="258" y="213" text-anchor="start" fill="var(--person)">answer, then on</text>
   </g>
 </svg>
-<figcaption>The route of a standard ticket. A verdict decides pass or fail, and the route says where a fail
-goes. The <b class="p">red step</b> is not in the process: an escalation inserts it in front of the current
-step, a person answers under its evidence, and the pointer moves on into the step it left.</figcaption>
+<figcaption>The standard route. A step is the unit of the pull and a phase is a name over steps, so a
+sub-step is a step. The implement phase forces tests before code: <code>tests-red</code> hands back only
+when the tests the branch adds fail on their own assertion, and <code>tests-green</code> only when they pass.
+The <b class="p">red step</b> is not in the process: an escalation inserts it in front of the current step,
+a person answers under its evidence, and the pointer moves on into the step it left.</figcaption>
 </figure>
 
 <div class="scroll"><table>
 <tr><th>step field</th><th>holds</th></tr>
 <tr><td class="m">name</td><td>one word or a hyphenated pair, unique on the ticket</td></tr>
-<tr><td class="m">by</td><td><code>anyone</code>, <code>person</code>, <code>agent</code>, <code>children</code>, or <code>not &lt;step&gt;</code></td></tr>
+<tr><td class="m">of</td><td>the phase this step belongs to, a name over several steps</td></tr>
+<tr><td class="m">by</td><td><code>anyone</code>, <code>person</code>, <code>agent</code>, <code>children</code>, or <code>not &lt;step or phase&gt;</code></td></tr>
 <tr><td class="m">reads</td><td>links to the guidance notes the step's hand reads</td></tr>
-<tr><td class="m">on_fail</td><td>an earlier step, where a failed hand-back sends the ticket</td></tr>
+<tr><td class="m">on_fail</td><td>an earlier step or phase; a phase resolves to its first step</td></tr>
 <tr><td class="m">asks</td><td>the question a person answers, on a step a person takes</td></tr>
 </table></div>
+
+<h3>Red for the right reason</h3>
+<div class="scroll"><table>
+<tr><th>step</th><th>the hand does</th><th>the engine checks at the hand-back</th></tr>
+<tr><td class="m">tests-red</td><td>writes the tests the ask calls for</td><td>the tests the branch adds or changes fail, and the failure is an assertion, with no build fault</td></tr>
+<tr><td class="m">implement</td><td>makes the change</td><td>the tree builds and lints</td></tr>
+<tr><td class="m">tests-green</td><td>makes the tests pass</td><td>the same tests pass, and the check is green on the commit</td></tr>
+</table></div>
+<p>The right reason splits in two. The class of the failure is mechanical, and the test verb names it:
+<code>green</code>, or <code>red</code> with <code>assertion</code>, <code>build</code> or <code>missing</code>.
+Whether the assertion names the behaviour the ask describes is a judgement, and the judge reads the failing
+assertion against the ask where <code>judge.enabled</code> says so. A child ticket stays the unit that
+changes hands or runs beside another; a sub-step is a row, because a row costs a chapter and a ticket costs
+a file, a group and a landing.</p>
 
 <p>Three keywords join the schema checker so the shape holds mechanically: <code>x-one-per</code>, so a
 chapter stands for every entry of a named list under that entry's name; <code>x-names</code>, so
@@ -423,6 +480,19 @@ cannot write those lines, so a tick stands only where the engine ran the command
 <tr><td>the tips</td><td>the engine</td><td>the branch tip at the take and at the hand-back, the two hashes v4 wrote on a token</td></tr>
 </table></div>
 
+<h3>The test verb</h3>
+<p><code>work test</code> runs the tests the branch adds or changes since the take, or the ones a step
+names, and answers one word and a reason. A <code>decided by</code> line names it with the answer it
+expects, as <code>work test --expect red</code>. The verb reads the delta off git, which is the half of v4's
+test map that a branch already carries.</p>
+<div class="scroll"><table>
+<tr><th>answer</th><th>means</th></tr>
+<tr><td class="m">green</td><td>every test it runs passes</td></tr>
+<tr><td class="m">red · assertion</td><td>a test fails on its own assertion, which is the red a <code>tests-red</code> step wants</td></tr>
+<tr><td class="m">red · build</td><td>the file loads no test, because the tree fails to build or to parse</td></tr>
+<tr><td class="m">red · missing</td><td>the branch changes no test, so there is nothing to run</td></tr>
+</table></div>
+
 <p>The diff of the work is the group's branch, and <code>git log</code> on the ticket file is its history.
 So a ticket carries no time and no line number, and a reader finds both in git. The tickets folder stands
 beside the rationales in <code>.vale.ini</code>, so an evidence chapter and a discussion may say what
@@ -439,7 +509,7 @@ that, and a process file changes without reaching a ticket in flight.</p>
 <div class="scroll"><table>
 <tr><th>process</th><th>route</th><th>for</th></tr>
 <tr><td class="m">trivial</td><td class="m">do</td><td>a fix small enough that the ask is the design</td></tr>
-<tr><td class="m">standard</td><td class="m">draft · review-design · implement · review-build</td><td>a change that wants an approach first and a second pair of eyes after</td></tr>
+<tr><td class="m">standard</td><td class="m">draft · review-design · tests-red · implement · tests-green · review-build</td><td>a change that wants an approach first, tests before code, and a second pair of eyes after</td></tr>
 <tr><td class="m">complex</td><td class="m">split · children · review-whole</td><td>a change too large to review whole</td></tr>
 </table></div>
 
@@ -581,7 +651,7 @@ the write door before it pulled.</p>
   </g>
   <g font-size="11.5">
     <text x="365" y="118" text-anchor="middle" fill="var(--accent)" font-weight="700">pull · ticket, pass or fail with a reason</text>
-    <text x="365" y="155" text-anchor="middle" fill="var(--muted)">work · the next ticket, its guidance inline, the file's path</text>
+    <text x="365" y="155" text-anchor="middle" fill="var(--muted)">work · one step of a ticket, its guidance inline, the file's path</text>
     <text x="365" y="177" text-anchor="middle" fill="var(--muted)">refused · the findings one a line; the ticket stays in hand</text>
     <text x="365" y="240" text-anchor="middle" fill="var(--muted)">wait · nothing to hand out, and why: finishing, unbound, deps, empty</text>
   </g>
@@ -589,6 +659,11 @@ the write door before it pulled.</p>
 <figcaption>One verb, both ways. A hand-back and the next take are one call, so finishing one ticket and
 receiving the next cannot come apart, which is the ruling v3 and v4 both reach.</figcaption>
 </figure>
+
+<p>A <code>work</code> answer says one thing to do. It carries the ask and the current step alone, with
+its done-when and its guidance, and the position: which step of how many, in which phase. The whole file
+stands on disk and nothing hides it, so a hand that wants the picture reads the file. The pull hands it the
+step.</p>
 
 <h3>The pull runs at two levels</h3>
 <div class="scroll"><table>
@@ -636,9 +711,23 @@ the count that ends that.</p>
 
 <p>Each step names the guidance it reads. The pull's <code>work</code> answer carries those notes'
 actionables inline, so the hand holds them the moment it holds the step. The <code>guidance</code> verb
-answers a named note, or, unnamed, the notes the current step lists and the always-on ones. Every guidance
-answer writes a log line, which proves arrival the way the canary proves the standing layer. The proof of
-application is the hand-back: the commands, the evidence and the judge.</p>
+answers a named note, or, unnamed, the notes the current step lists and the always-on ones.</p>
+
+<p>The pull is the one road to a hand-back, and the pull hands the guidance. So a step with
+<code>reads</code> is a step no hand works before the notes reach it, and the engine keeps no quiz to prove
+it. What it keeps is the arrival, and the arrival says when to hand the notes again.</p>
+
+<div class="scroll"><table>
+<tr><th>the engine writes</th><th>where</th><th>it lasts</th></tr>
+<tr><td>one log line per note handed over</td><td>the log</td><td>for the record</td></tr>
+<tr><td>the notes this hand holds for this step, by name and hash</td><td class="m">.se/hold.json</td><td>the session</td></tr>
+</table></div>
+
+<p>The hold says which notes reach this session, so the pull hands them once per step and session, and
+again on three things: a <code>refused</code> answer, which quotes the rules its findings cite; a
+compaction, which level zero already notices; and a note whose hash moves. A refresher on every pull costs
+tokens and buys nothing the hold does not know. The proof of application is the hand-back: the commands,
+the evidence and the judge.</p>
 
 <div class="scroll"><table>
 <tr><th>measurement</th><th>says</th><th>so</th></tr>
@@ -847,6 +936,7 @@ level one stays still while level two invents flows.</p>
   <li>whether a person step may go to a spawned strong model at high autonomy</li>
   <li>whether yours drowns in parked conditions, and a parked state returns</li>
   <li>a WIP limit per step, which is Kanban's one knob and stands outside the note</li>
+  <li>whether a guidance card's own items become steps at the mint, which v3 tried as card marking and level two may take up</li>
 </ul>
 
 <p class="note">Confidence. The design is the owner's, argued over one afternoon against v3, v4 and the
