@@ -1150,7 +1150,7 @@ Ten branches, and the dependencies make the order binding:
 | 7 | `the-work-group-draws` | the `work` group, its four controls, the count on the editor button, the beat, the notification that names questions and stale groups | 4 |
 | 8 | `level-zero-hands-over` | the brief door goes, and the controls wire up | 4 |
 | 9 | `the-retro-is-a-ticket` | `retro collect`, the chapters and the counts, the files the mine leaves read, `retro notes` and `score`, the readers as helpers, the first retro on a desk | 4, 5 |
-| 10 | `the-cloud-run-is-a-group` | the cloud guidance around the pull, the routine takes a group, the brief's contract retires, `adopt`, the first cloud run | 4, 8, 9 |
+| 10 | `the-box-runs-the-route` | the cloud guidance around the pull, the routine takes a group, the brief's contract retires, `adopt`, the first cloud run | 4, 8, 9 |
 
 Nine briefs stand on their `work/` branches, cut from this note, and each
 names the chapters it implements. The tenth is the cloud run, and it waits
