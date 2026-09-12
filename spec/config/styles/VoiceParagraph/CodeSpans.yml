@@ -1,0 +1,46 @@
+# GENERATED. Edit the source named below, not this file. It is written again
+# every time the tree is projected, so an edit here is lost. Source:
+# spec/schemas/paragraph.schema.yaml
+extends: script
+message: "A sentence holds 4 code spans."
+link: spec/funnel/a-paragraph-has-a-schema.md
+level: error
+scope: raw
+script: |
+  text := import("text")
+
+  matches := []
+
+  rows := func(said) {
+    out := []
+    at := 0
+    for line in text.split(said, "\n") {
+      out = append(out, {said: line, begin: at, end: at + len(line)})
+      at += len(line) + 1
+    }
+    return out
+  }
+
+  fenced := false
+
+  for row in rows(scope) {
+    trimmed := text.trim_space(row.said)
+    if text.has_prefix(trimmed, "```") {
+      fenced = !fenced
+      continue
+    }
+    if fenced { continue }
+    if text.has_prefix(trimmed, "|") { continue }
+    if text.has_prefix(trimmed, "#") { continue }
+    if text.has_prefix(trimmed, ">") { continue }
+
+    seen := text.re_find("`[^`]*`", row.said, -1)
+    if is_undefined(seen) { continue }
+    if len(seen) > 4 {
+      matches = append(matches, {
+        begin: row.begin,
+        end: row.end,
+        message: "A sentence holds 4 code spans, and this line holds " + string(len(seen)) + ". Carry the rest as a list or a table."
+      })
+    }
+  }

@@ -1,0 +1,191 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "the paragraph schema",
+  "comment": "WHAT THE PARAGRAPH SCHEMA HOLDS. spec/schemas/paragraph.schema.yaml carries the values, and this says the type of each key. ./RUNME.sh check reads both, so a layer that goes missing fails the check before the projection writes a rule file without it.",
+  "type": "object",
+  "required": ["kind", "misreads", "layers", "registers"],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "help": "The note kind this schema weighs."
+    },
+    "misreads": {
+      "type": "number",
+      "unit": "refusals of one phrase in one session",
+      "help": "The count past which a rule refusing the same phrase writes a warn row naming itself."
+    },
+    "layers": {
+      "type": "object",
+      "required": [
+        "characters",
+        "markup",
+        "shape",
+        "sentence",
+        "grammar",
+        "vocabulary",
+        "meaning"
+      ],
+      "properties": {
+        "characters": {
+          "type": "object",
+          "required": ["admits", "punctuation", "exceptions"],
+          "properties": {
+            "admits": { "type": "string" },
+            "punctuation": { "type": "array", "items": { "type": "string" } },
+            "exceptions": { "type": "array" }
+          }
+        },
+        "markup": {
+          "type": "object",
+          "required": ["admits", "heading", "strongLead", "exceptions"],
+          "properties": {
+            "admits": { "type": "array", "items": { "type": "string" } },
+            "heading": {
+              "type": "object",
+              "required": ["words", "oneTitle"],
+              "properties": {
+                "words": { "type": "number" },
+                "oneTitle": { "type": "boolean" }
+              }
+            },
+            "strongLead": {
+              "type": "object",
+              "required": ["words"],
+              "properties": { "words": { "type": "number" } }
+            },
+            "exceptions": { "type": "array" }
+          }
+        },
+        "shape": {
+          "type": "object",
+          "required": [
+            "sentencesPerParagraph",
+            "paragraphsPerRun",
+            "listWhen",
+            "exceptions"
+          ],
+          "properties": {
+            "sentencesPerParagraph": { "type": "number" },
+            "paragraphsPerRun": { "type": "number" },
+            "listWhen": { "type": "string" },
+            "exceptions": { "type": "array" }
+          }
+        },
+        "sentence": {
+          "type": "object",
+          "required": ["words", "opensWith", "closesWith", "codeSpans", "exceptions"],
+          "properties": {
+            "words": {
+              "type": "object",
+              "required": ["min", "max", "listItem"],
+              "properties": {
+                "min": { "type": "number" },
+                "max": { "type": "number" },
+                "listItem": { "type": "number" }
+              }
+            },
+            "opensWith": { "type": "array", "items": { "type": "string" } },
+            "closesWith": { "type": "array", "items": { "type": "string" } },
+            "codeSpans": { "type": "number" },
+            "exceptions": { "type": "array" }
+          }
+        },
+        "grammar": {
+          "type": "object",
+          "required": [
+            "finiteVerbs",
+            "tenses",
+            "auxiliaryChains",
+            "modals",
+            "contractions",
+            "latinShortForms",
+            "exceptions"
+          ],
+          "properties": {
+            "finiteVerbs": { "type": "number" },
+            "tenses": { "type": "array", "items": { "type": "string" } },
+            "auxiliaryChains": { "type": "string", "enum": ["refused", "admitted"] },
+            "modals": { "type": "array", "items": { "type": "string" } },
+            "contractions": { "type": "string", "enum": ["refused", "admitted"] },
+            "latinShortForms": { "type": "string", "enum": ["refused", "admitted"] },
+            "exceptions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["word", "reason"],
+                "properties": {
+                  "word": { "type": "string" },
+                  "reason": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "vocabulary": {
+          "type": "object",
+          "required": ["words", "outside", "growth", "exceptions"],
+          "properties": {
+            "words": { "type": "string" },
+            "outside": { "type": "array", "items": { "type": "string" } },
+            "growth": { "type": "object" },
+            "exceptions": { "type": "array" }
+          }
+        },
+        "meaning": {
+          "type": "object",
+          "required": ["judged"],
+          "properties": {
+            "judged": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["id", "asks", "labels", "refuses"],
+                "properties": {
+                  "id": { "type": "string" },
+                  "asks": { "type": "string" },
+                  "labels": { "type": "array", "items": { "type": "string" } }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "registers": {
+      "type": "object",
+      "required": ["prose", "answer", "requirement"],
+      "properties": {
+        "prose": {
+          "type": "object",
+          "required": ["paths"],
+          "properties": { "paths": { "type": "array", "items": { "type": "string" } } }
+        },
+        "answer": {
+          "type": "object",
+          "required": ["paths", "shape", "opens", "then"],
+          "properties": {
+            "paths": { "type": "array", "items": { "type": "string" } },
+            "shape": {
+              "type": "object",
+              "required": ["sentencesPerParagraph", "paragraphsPerRun"],
+              "properties": {
+                "sentencesPerParagraph": { "type": "number" },
+                "paragraphsPerRun": { "type": "number" }
+              }
+            },
+            "opens": { "type": "array" },
+            "then": { "type": "string" }
+          }
+        },
+        "requirement": {
+          "type": "object",
+          "required": ["paths", "grammar"],
+          "properties": {
+            "paths": { "type": "array", "items": { "type": "string" } },
+            "grammar": { "type": "object" }
+          }
+        }
+      }
+    }
+  }
+}

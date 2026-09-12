@@ -18,7 +18,9 @@ layers:
   characters:
     admits: letters, digits, space, and the punctuation below
     punctuation: [full stop, comma, question mark, exclamation mark, colon, parentheses, apostrophe, quotation mark, hyphen]
-    exceptions: []
+    exceptions:
+      - word: TL;DR
+        reason: a name the answer register uses, and the semicolon belongs to it
 
   markup:
     admits:

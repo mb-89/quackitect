@@ -1,0 +1,86 @@
+# GENERATED. Edit the source named below, not this file. It is written again
+# every time the tree is projected, so an edit here is lost. Source:
+# spec/schemas/paragraph.schema.yaml
+extends: script
+message: "A run holds 2 paragraphs in an answer."
+link: spec/funnel/a-paragraph-has-a-schema.md
+level: error
+scope: raw
+script: |
+  text := import("text")
+
+  matches := []
+
+  rows := func(said) {
+    out := []
+    at := 0
+    for line in text.split(said, "\n") {
+      out = append(out, {said: line, begin: at, end: at + len(line)})
+      at += len(line) + 1
+    }
+    return out
+  }
+
+  structure := func(line) {
+    t := text.trim_space(line)
+    if text.has_prefix(t, "#") { return true }
+    if text.has_prefix(t, "|") { return true }
+    if text.has_prefix(t, ">") { return true }
+    if text.has_prefix(t, "- ") { return true }
+    if text.has_prefix(t, "* ") { return true }
+    if text.has_prefix(t, "+ ") { return true }
+    if text.has_prefix(t, "---") { return true }
+    if text.re_match(`^[0-9]+[.)] `, t) { return true }
+    if text.re_match(`^ {4,}[^ ]`, line) { return true }
+    return false
+  }
+
+  said := scope
+
+  fenced := false
+  inPara := false
+  run := 0
+  runStart := 0
+  runEnd := 0
+
+  closeRun := func() {
+    if run > 2 {
+      matches = append(matches, {
+        begin: runStart,
+        end: runEnd,
+        message: "A run holds 2 paragraphs in an answer with no list, table or diagram between them, and this one holds " + string(run) + ". Carry the rest as structure."
+      })
+    }
+    run = 0
+  }
+
+  for row in rows(said) {
+    trimmed := text.trim_space(row.said)
+
+    if text.has_prefix(trimmed, "```") {
+      inPara = false
+      closeRun()
+      fenced = !fenced
+      continue
+    }
+    if fenced { continue }
+
+    if len(trimmed) == 0 {
+      inPara = false
+      continue
+    }
+
+    if structure(row.said) {
+      inPara = false
+      closeRun()
+      continue
+    }
+
+    if !inPara {
+      inPara = true
+      if run == 0 { runStart = row.begin }
+      run++
+    }
+    runEnd = row.end
+  }
+  closeRun()

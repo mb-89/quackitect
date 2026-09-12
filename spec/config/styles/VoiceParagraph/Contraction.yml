@@ -1,9 +1,9 @@
-# The action is replace, because a contraction has one written-out form. Each
-# token captures its first letter, and the swap writes it back as $1, so a fix
-# keeps the case the line already carries.
+# GENERATED. Edit the source named below, not this file. It is written again
+# every time the tree is projected, so an edit here is lost. Source:
+# spec/schemas/paragraph.schema.yaml
 extends: substitution
 message: "Write both words: '%s' instead of '%s'."
-link: spec/guidance/voice.md
+link: spec/funnel/a-paragraph-has-a-schema.md
 level: error
 ignorecase: true
 action:

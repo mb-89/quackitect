@@ -4,11 +4,23 @@
 // [[spec/design_output/projection#what-goes-where-is-data]]
 
 import { flatten, keysOf, LOCAL, TRACKED } from "./config.js";
+import { faultsOf, PARAGRAPH, rulesFrom, RULES } from "./paragraph.js";
+import { readYaml } from "./schema.js";
 
 export const PROJECTIONS = "spec/config/projections.json";
 
 // [[spec/design_output/projection#the-first-target]]
 export const COMMANDS = "config commands";
+
+// [[spec/design_output/projection#the-second-target]]
+export { PARAGRAPH } from "./paragraph.js";
+
+// A shape says which extension its target folder holds, so the compare reads
+// the files the projector writes and no other.
+const HOLDS = new Map([
+  [COMMANDS, ".md"],
+  [PARAGRAPH, RULES],
+]);
 
 const PREFIX = "se-";
 const ARGUMENT = "$ARGUMENTS";
@@ -38,6 +50,7 @@ export function readsOf(entry) {
 // [[spec/design_output/projection#projecting-in-memory]]
 export function writesOf(entry, texts) {
   const out = new Map();
+  if (entry?.shape === PARAGRAPH) return paragraphsOf(entry, texts);
   if (entry?.shape !== COMMANDS) return out;
 
   const said = flatten(parsed(texts.get(entry.from)));
@@ -62,6 +75,30 @@ export function writesOf(entry, texts) {
     put(commandsFor(widget.key, said.get(widget.key), declared(widget.key), entry, widget.path));
   }
   return out;
+}
+
+// [[spec/design_output/projection#the-second-target]]
+function paragraphsOf(entry, texts) {
+  const out = new Map();
+  const source = texts.get(entry.from);
+  if (source === undefined) return out;
+
+  const target = folderOf(entry.target);
+  for (const [name, text] of rulesFrom(readYaml(source), saysGenerated(entry.from))) {
+    out.set(`${target}/${name}`, text);
+  }
+  return out;
+}
+
+// [[spec/design_output/projection#a-missing-layer-fails-the-check]]
+export function faultsIn(entry, texts) {
+  if (entry?.shape !== PARAGRAPH) return [];
+  const source = texts.get(entry.from);
+  const shape = texts.get(entry.schema);
+  if (source === undefined || shape === undefined) return [];
+  return faultsOf(readYaml(source), parsed(shape)).map(
+    (said) => `${entry.from}: ${said}`,
+  );
 }
 
 // [[spec/design_output/projection#a-name-carries-the-path]]
@@ -159,6 +196,7 @@ function fileFor(entry, key, said, sentence, shown) {
 export function readAll(entries, disk, at = (path) => path) {
   const wanted = new Map();
   const standing = new Map();
+  const faults = [];
 
   for (const entry of entries) {
     const texts = new Map();
@@ -166,15 +204,17 @@ export function readAll(entries, disk, at = (path) => path) {
       if (disk.exists(at(path))) texts.set(path, disk.read(at(path)));
     }
     for (const [path, text] of writesOf(entry, texts)) wanted.set(path, text);
+    faults.push(...faultsIn(entry, texts));
 
     const folder = folderOf(entry.target);
+    const end = HOLDS.get(entry.shape) ?? ".md";
     if (!disk.exists(at(folder))) continue;
     for (const one of disk.list(at(folder))) {
-      if (one.kind !== "file" || !one.name.endsWith(".md")) continue;
+      if (one.kind !== "file" || !one.name.endsWith(end)) continue;
       standing.set(`${folder}/${one.name}`, disk.read(at(`${folder}/${one.name}`)));
     }
   }
-  return { wanted, standing };
+  return { wanted, standing, faults };
 }
 
 // [[spec/design_output/projection#the-write-door-refuses-one]]

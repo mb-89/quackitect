@@ -1,0 +1,12 @@
+# GENERATED. Edit the source named below, not this file. It is written again
+# every time the tree is projected, so an edit here is lost. Source:
+# spec/schemas/paragraph.schema.yaml
+extends: sequence
+message: "Write the simple tense and name the time: '%s %s'."
+link: spec/funnel/a-paragraph-has-a-schema.md
+level: error
+ignorecase: true
+tokens:
+  - pattern: '(?:have|has|had)'
+    tag: VB*
+  - tag: VBN
