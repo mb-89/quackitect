@@ -592,7 +592,7 @@ test("a group holds where the record says so, and stands free where it says noth
   assert.equal(groupStanding(""), "");
 });
 
-// [[spec/design_output/work#one-row-per-group-and-per-ticket]]
+// [[spec/design_output/work#a-row-per-group]]
 test("list names a group, a brief and a loose ticket, each as its own kind", () => {
   const loose = CHILD("one-group", "open").replace("group: one-group\n", "");
   const { it } = doorsSaying({

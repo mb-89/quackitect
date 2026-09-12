@@ -191,14 +191,11 @@ export function groupStanding(text) {
 // [[spec/design_output/work#a-group-is-a-ticket]]
 function standOf(it) {
   return branches(it).map((branch) => {
+    // [[spec/design_output/work#a-brief-drains-first]]
     const name = branch.replace(/^work\//, "");
-    const ticket = textAt(it, `origin/${branch}`, ticketAt(name));
-    return {
-      branch,
-      name,
-      brief: briefOf(it, branch),
-      ticket: isGroup(ticket) ? ticket : "",
-    };
+    const brief = briefOf(it, branch);
+    const ticket = brief ? "" : textAt(it, `origin/${branch}`, ticketAt(name));
+    return { branch, name, brief, ticket: isGroup(ticket) ? ticket : "" };
   });
 }
 
@@ -528,10 +525,12 @@ function finish(it) {
     console.error(`work done runs on a work branch, and this is ${branch}.`);
     return 2;
   }
+  // [[spec/design_output/work#a-brief-drains-first]]
   const name = branch.replace(/^work\//, "");
   const at = ticketAt(name);
   const group = it.join(it.root, at);
-  const path = it.disk.exists(group) ? group : it.join(it.root, BRIEF);
+  const brief = it.join(it.root, BRIEF);
+  const path = it.disk.exists(brief) ? brief : group;
   if (!it.disk.exists(path)) {
     console.error(`Write your result to ${BRIEF} first. It is what comes back.`);
     return 2;
@@ -540,7 +539,7 @@ function finish(it) {
   const stopped = ready(it, branch);
   if (stopped.code) return stopped.code;
 
-  if (path === group) return leaves(it, branch, at, group, stopped.says);
+  if (path === group) return leaves(it, branch, at, path, stopped.says);
 
   if (!push(it, branch, setStatus(it.disk.read(path), DONE), DONE)) return 1;
   console.log(`${branch} stands at ${DONE}, and ${stopped.says}.`);
@@ -660,7 +659,7 @@ function read(it, name) {
   return 0;
 }
 
-// [[spec/design_output/work#one-row-per-group-and-per-ticket]]
+// [[spec/design_output/work#a-row-per-group]]
 function list(it) {
   const stand = standOf(it);
   const standing = standingAll(stand, mergedHere(it));
@@ -687,7 +686,7 @@ function list(it) {
   return 0;
 }
 
-// [[spec/design_output/work#one-row-per-group-and-per-ticket]]
+// [[spec/design_output/work#a-row-per-group]]
 function rowOf(it, one, standing, now) {
   const text = noteOf(one);
   const kind = one.brief ? "brief" : GROUP;
@@ -705,7 +704,7 @@ function rowOf(it, one, standing, now) {
   };
 }
 
-// [[spec/design_output/work#one-row-per-group-and-per-ticket]]
+// [[spec/design_output/work#a-row-per-group]]
 function looseRows(it) {
   return ticketsOn(it, `origin/${TRUNK}`)
     .filter((one) => !fieldOf(one.text, GROUP) && !isGroup(one.text))
