@@ -282,6 +282,13 @@ The stamp lives under `.se`, which git ignores, so it travels nowhere. A
 different box reads its own answer, and `.github/workflows/check.yml` answers
 for a machine with no stake in it.
 
+A push to trunk reads the same stamp at two doors, and each stands without the
+other. The Bash door refuses a session's push on a red, stale, unclean or
+absent stamp. `.githooks/pre-push` refuses the same push from a terminal, or
+from a session that runs no plugin, and `install.sh` points git at it beside
+the commit hook. A push to a work branch meets neither, because mid-work
+carries red.
+
 # A merged branch goes
 
 `work merge <name>` runs on `main` and takes a branch standing at `done`. A

@@ -865,10 +865,12 @@ async function doctor() {
 // [[spec/design_output/private#two-doors-one-check]]
 function hooksSay() {
   const at = join(HOOKS, "pre-commit");
+  const push = join(HOOKS, "pre-push");
   if (!files.exists(join(root, at))) return `${at} stands nowhere`;
+  if (!files.exists(join(root, push))) return `${push} stands nowhere`;
 
   const said = it.git.run(["config", "--get", "core.hooksPath"], true).out;
-  if (said === HOOKS) return `${at}, which git reads`;
+  if (said === HOOKS) return `${at} and ${push}, which git reads`;
   return `git reads ${said || "its own folder"}, so run ./RUNME.sh`;
 }
 
