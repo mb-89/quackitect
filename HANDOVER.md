@@ -33,13 +33,13 @@ copies, and why a retro refuses while anyone holds work.
 | the piece | where | proves it |
 |---|---|---|
 | `work collect` | `src/scripts/work.js` | it rotates the log, drains `.se/log`, `.se/scripts` and the scratchpad, copies the transcripts, and refuses while a hand holds a ticket |
-| the take list | `work collect` | it takes what it names and nothing else, so `.se/retro/`, the hold, the box id, the config, the bin and the handover stand untouched |
+| the take list | `work collect` | it takes what it names and nothing else, so `.se/retro/`, the hold, the box id, the config, the bin and the handover stand as they are |
 | every line a reader | `work collect` and the routes | the manifest names each thing taken, and the `unread` leaf checks it against what the leaves read |
 | the manifest | `.se/retro/<stamp>/manifest.jsonl` | one line per thing taken, with its origin and its fate |
 | the window | `work collect` | from the last retro's close commit to now, and from the first commit where none stands |
 | the chapters | `work collect` | six hours that hold activity, off the timestamps, one private `chapter` ticket each with its counts as the ask |
 | the counts | `work collect` | prompts, tool calls, shell commands, refusals by kind, errors, tickets that move, notes that appear, the median length of a thought |
-| the files the mine leaves read | `work collect` | the shell commands grouped by the job, the refusals by rule, the closed tickets' records, the counts per chapter, the scripts, and the merged groups' retro leaves |
+| the files the mine leaves read | `work collect` | the shell commands by job, the refusals by rule, the closed tickets' records, the counts per chapter, the scripts, the merged groups' retro leaves |
 | `/se-retro` | the projection, beside the config commands | it mints a retro and pulls it |
 | `by: helper` | the pull | a reader goes to a hand the engine spawns for it, and to nobody else |
 | `work retro notes` | `work.js` | it passes when `.se/tickets/` holds no note, and the group's retro phase runs the same command |
