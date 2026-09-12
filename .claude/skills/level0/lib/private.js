@@ -30,6 +30,18 @@ export function namesAPerson(said) {
 }
 
 // [[spec/design_output/private#the-box-names-the-owner]]
+export function boxOf(env, git) {
+  const said = env ?? {};
+  const asked = (key) => (git ? git.run(["config", key], true).out : "");
+  return {
+    user: said.USER || said.USERNAME || said.LOGNAME || "",
+    home: said.HOME || said.USERPROFILE || "",
+    name: asked("user.name"),
+    email: asked("user.email"),
+  };
+}
+
+// [[spec/design_output/private#the-box-names-the-owner]]
 export function carriesTheName(line, name) {
   const said = String(name ?? "");
   if (!said) return false;

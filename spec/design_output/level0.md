@@ -294,15 +294,19 @@ it prints the file it writes for the setup log to carry.
 
 # The write door
 
-`tool.call` reads every Write and Edit. Prose goes to Vale, code goes to Biome,
-and a breach comes back as `{ deny }` naming the rule, the line and the phrase.
+`tool.call` reads every Write and Edit. A breach comes back as `{ deny }`
+naming the rule, the line and the phrase.
 
-The refusal closes by asking the writer to hold that rule for the rest of the
-turn. A refusal teaching one line costs a round trip on every line.
+| what the write carries | what reads it |
+|---|---|
+| a run or a token out of a note under `.se/notes` | [[spec/design_output/private#the-door-reads-the-notes]] |
+| prose | Vale, then the judge |
+| code | Biome |
+| a shell command landing a file | [[spec/design_output/bash]] |
 
-A shell reaches the same files through `>`, `tee`, `sed -i` and a heredoc, so
-`tool.call` reads a Bash command as well. For details, see
-[[spec/design_output/bash]].
+The private half answers first, so a note's own words stop at the door. The
+refusal closes by asking the writer to hold that rule for the rest of the turn.
+A refusal teaching one line costs a round trip on every line.
 
 ## The door reaches a helper
 

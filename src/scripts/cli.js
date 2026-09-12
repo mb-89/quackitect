@@ -20,12 +20,14 @@ import {
 } from "../../.claude/skills/level0/lib/projection.js";
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
+import { boxOf } from "../../.claude/skills/level0/lib/private.js";
 import {
   END as SCHEMA_END,
   mintNote,
   readYaml,
   schemaFaults,
   SCHEMAS,
+  schemasIn,
 } from "../../.claude/skills/level0/lib/schema.js";
 import { treeFaults, treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { EDITOR_SETTINGS } from "../../.claude/skills/level0/lib/servers.js";
@@ -393,19 +395,8 @@ function treeHere() {
     root,
     words: it.words,
     node: process.version.replace(/^v/, ""),
-    box: boxHere(),
+    box: boxOf(process.env, it.git),
   });
-}
-
-// [[spec/design_output/private#the-box-names-the-owner]]
-function boxHere() {
-  const env = process.env;
-  return {
-    user: env.USER || env.USERNAME || env.LOGNAME || "",
-    home: env.HOME || env.USERPROFILE || "",
-    name: it.git.run(["config", "user.name"], true).out,
-    email: it.git.run(["config", "user.email"], true).out,
-  };
 }
 
 // [[spec/design_output/extension#the-grid-check]]
@@ -626,9 +617,7 @@ function project() {
 // [[spec/design_output/schema#mint-writes-a-valid-note]]
 function mint(argv) {
   const [kind, path] = argv.filter((one) => !one.startsWith("-"));
-  const kinds = namesIn(join(root, SCHEMAS), SCHEMA_END)
-    .map((name) => name.slice(0, -SCHEMA_END.length))
-    .sort();
+  const kinds = [...schemasIn(treeHere()).keys()].sort();
 
   if (!kind || !path) {
     console.error("Usage: ./RUNME.sh mint <kind> <path>\n");

@@ -500,8 +500,8 @@ export function register(on, _options) {
   });
 
   // [[spec/design_output/level0#a-step-carries-the-answer]]
-  on("turn.step", async (_$, e, next) => {
-    const said = await next(e);
+  on("turn.step", async function* (_$, e, next) {
+    const said = yield* next(e);
     if (!owed || (await settings.ask("answer.enabled")) === false) return said;
     const text = String(e.answer ?? "").trim();
     if (text) {

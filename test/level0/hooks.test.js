@@ -117,6 +117,8 @@ function engine(seed = {}, taught = {}) {
     hooks.push({ event, matcher: hook ? matcher : null, hook: hook ?? matcher });
   register(on, {});
 
+  const streams = (hook) => hook?.constructor?.name === "AsyncGeneratorFunction";
+
   const of = (event, tool) =>
     hooks.filter(
       (one) => one.event === event && (!one.matcher || one.matcher.tool === tool),
@@ -131,6 +133,18 @@ function engine(seed = {}, taught = {}) {
     spawns,
     async raise(event, e, tool) {
       const chain = of(event, tool);
+      // [[spec/design_output/level0#a-step-carries-the-answer]]
+      if (chain.some((one) => streams(one.hook))) {
+        const step = (at) =>
+          async function* (given) {
+            if (at >= chain.length) return given;
+            return yield* chain[at].hook($, given, step(at + 1));
+          };
+        const running = step(0)(e);
+        let said = await running.next();
+        while (!said.done) said = await running.next();
+        return said.value;
+      }
       const step = (at) => async (given) =>
         at < chain.length ? chain[at].hook($, given, step(at + 1)) : given;
       return step(0)(e);
