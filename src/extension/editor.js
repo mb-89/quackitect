@@ -131,6 +131,11 @@ function editorDoor(context) {
       }
     },
 
+    // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
+    imports(path) {
+      return import(uriOf(path).fsPath);
+    },
+
     // [[spec/design_output/extension#the-log-opens-a-terminal]]
     runs(line) {
       if (!line) return;
