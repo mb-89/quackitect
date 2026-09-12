@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { readNote, readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import {
+  engineRows,
   placesIn,
   refusedTicket,
   ticketFaults,
@@ -195,6 +196,73 @@ test("the places answer the ask of a draft, the step's fields and the discussion
 test("a ticket standing at no leaf of its route offers a hand no field", () => {
   const said = open.replace("step: implement/change", "step: nowhere");
   assert.deepEqual([...placesIn(readNote(said), SCHEMA).keys()], ["1 Discussion"]);
+});
+
+const recorded = open.replace(
+  "steps:\n",
+  `record:
+  - step: implement/change
+    hand: a box, a session and an agent
+    took: abc1234
+    gave: def5678
+    returns: 1
+    answered:
+      - name: lint
+        exit: 0
+        said: the tree lints
+steps:
+`,
+);
+
+// [[spec/design_output/schema#the-record-draws-itself]]
+test("the record draws a line under its leaf, and one under a command field", () => {
+  assert.deepEqual(engineRows(readNote(recorded), SCHEMA), [
+    {
+      key: "2 change",
+      said:
+        "The hand is `a box, a session and an agent`, and the branch runs `abc1234` to `def5678`, and this leaf returns 1.",
+    },
+    {
+      key: "3 lint",
+      said: "answered: exit `0`, and the last line reads `the tree lints`.",
+    },
+  ]);
+});
+
+// [[spec/design_output/schema#the-record-draws-itself]]
+test("a skipped leaf draws the reason the pull passes it over", () => {
+  const said = recorded
+    .replace("    returns: 1", "    skipped: true\n    why: the box runs on a desk")
+    .replace(/ {4}answered:\n(?: {6}.*\n| {8}.*\n)+/, "");
+  assert.deepEqual(engineRows(readNote(said), SCHEMA), [
+    { key: "2 change", said: "The pull skips this leaf, because the box runs on a desk." },
+  ]);
+});
+
+// [[spec/design_output/schema#the-record-draws-itself]]
+test("an answered line the record says stands, and one it fails to say refuses", () => {
+  const drawn = recorded.replace(
+    "### lint\n",
+    "### lint\n\nanswered: exit `0`, and the last line reads `the tree lints`.\n",
+  );
+  assert.deepEqual(ticketFaults(recorded, drawn, SCHEMA, WHERE), []);
+
+  const claimed = recorded.replace("### lint\n", "### lint\n\nanswered: exit `0`.\n");
+  const found = ticketFaults(recorded, claimed, SCHEMA, WHERE);
+  assert.deepEqual(
+    found.map((one) => one.rule),
+    ["Ticket.lint"],
+  );
+  assert.match(found[0].message, /An answered line is the engine's/);
+});
+
+// [[spec/design_output/schema#the-record-draws-itself]]
+test("an answered line on a leaf with no record entry refuses", () => {
+  const claimed = open.replace("### lint\n", "### lint\n\nanswered: exit `0`.\n");
+  assert.deepEqual(
+    ticketFaults(open, claimed, SCHEMA, WHERE).map((one) => one.rule),
+    ["Ticket.lint"],
+  );
 });
 
 // [[spec/design_output/schema#the-three-places]]

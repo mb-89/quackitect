@@ -408,3 +408,19 @@ ask of an open ticket are the engine's.
 
 A file the door finds empty is a mint, and the mint writes every place at once.
 So the rule reaches the second write and no first one.
+
+# The record draws itself
+
+`record` carries one entry per leaf the pull takes, and `engineRows` answers the
+lines that entry draws:
+
+| the entry says | the render draws it |
+|---|---|
+| the hand, the two branch tips, the returns | one line under the leaf's chapter |
+| `skipped` and `why` | one line saying the pull passes the leaf over |
+| an `answered` entry per command field | one line under that field's chapter |
+
+An `answered` line belongs to the engine. `engineFaults` reads every such line in
+the body and refuses the ones `record` fails to say. So a write claiming an exit
+code meets a refusal. The pull writes these rows at the hand-back, and a fresh
+mint carries no record, so it draws none.

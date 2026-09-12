@@ -178,6 +178,62 @@ frontmatter:
       type: array
       x-engine: true
       description: the engine's entry per leaf the pull takes, and no hand writes it
+      items:
+        type: object
+        additionalProperties: false
+        required:
+          - step
+        properties:
+          step:
+            type: string
+            x-names: steps
+            x-leaf: true
+            description: the leaf this entry stands for, as a path
+
+          hand:
+            type: string
+            description: the box, the session and the agent, where the harness names one
+
+          took:
+            type: string
+            description: the branch tip at the take
+
+          gave:
+            type: string
+            description: the branch tip at the hand-back
+
+          returns:
+            type: integer
+            description: how often this leaf fails back
+
+          skipped:
+            type: boolean
+            description: whether the pull passes this leaf over
+
+          why:
+            type: string
+            description: the reason the pull passes it over
+
+          answered:
+            type: array
+            description: one entry per command field, as the engine runs it
+            items:
+              type: object
+              additionalProperties: false
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: the evidence field this answer stands under
+
+                exit:
+                  type: integer
+                  description: the exit code the command answers
+
+                said:
+                  type: string
+                  description: the last line the command prints
 
     group:
       type: string

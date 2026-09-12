@@ -7,17 +7,80 @@ import { entriesIn, readNote } from "./schema.js";
 
 export const SEVERITY = "error";
 export const HAND = "hand";
+export const ANSWERED = "answered:";
 
 // [[spec/design_output/schema#the-three-places]]
 export function ticketFaults(was, now, schema, where) {
-  const old = readNote(was);
-  if (!old.front.stands) return [];
-
   const note = readNote(now);
+  const old = readNote(was);
+  if (!old.front.stands) return engineFaults(note, schema, where);
+
   return [
     ...verbFaults(old, note, schema, where),
     ...placeFaults(old, note, schema, where),
+    ...engineFaults(note, schema, where),
   ];
+}
+
+// [[spec/design_output/schema#the-record-draws-itself]]
+export function engineRows(note, schema) {
+  const front = note.front.said ?? {};
+  const level = schema?.body?.headingLevel ?? 1;
+  const walk = entriesIn(front.steps, "steps");
+  const out = [];
+
+  for (const one of [front.record ?? []].flat()) {
+    const leaf = walk.find((held) => held.path === String(one?.step ?? ""));
+    if (!leaf) continue;
+    const deep = level + leaf.path.split("/").length - 1;
+    out.push({ key: `${deep} ${leaf.name}`, said: leafRow(one) });
+    for (const said of [one.answered ?? []].flat()) {
+      if (!said?.name) continue;
+      out.push({ key: `${deep + 1} ${said.name}`, said: answeredRow(said) });
+    }
+  }
+  return out;
+}
+
+// [[spec/design_output/schema#the-record-draws-itself]]
+function leafRow(one) {
+  if (one.skipped) {
+    return `The pull skips this leaf, because ${one.why ?? "its condition fails to hold"}.`;
+  }
+  const parts = [`The hand is \`${one.hand ?? "nobody"}\``];
+  if (one.took || one.gave) {
+    parts.push(`the branch runs \`${one.took ?? ""}\` to \`${one.gave ?? ""}\``);
+  }
+  parts.push(`this leaf returns ${one.returns ?? 0}`);
+  return `${parts.join(", and ")}.`;
+}
+
+// [[spec/design_output/schema#the-record-draws-itself]]
+function answeredRow(said) {
+  return `${ANSWERED} exit \`${said.exit ?? ""}\`, and the last line reads \`${said.said ?? ""}\`.`;
+}
+
+// [[spec/design_output/schema#the-record-draws-itself]]
+function engineFaults(note, schema, where) {
+  const rows = new Map(engineRows(note, schema).map((one) => [one.key, one.said]));
+  const out = [];
+
+  for (const one of note.sections) {
+    for (let i = 0; i < one.own.length; i++) {
+      const said = String(one.own[i]).trim();
+      if (!said.startsWith(ANSWERED)) continue;
+      if (said === rows.get(keyOf(one))) continue;
+      out.push(
+        fault(
+          one.header,
+          where,
+          one.line + i + 1,
+          `An answered line is the engine's, and it draws what record says.`,
+        ),
+      );
+    }
+  }
+  return out;
 }
 
 // [[spec/design_output/schema#the-verbs-own-three-fields]]

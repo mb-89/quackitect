@@ -206,6 +206,33 @@ test("a chapter missing for an evidence field is refused", () => {
   );
 });
 
+// [[spec/design_output/schema#the-record-draws-itself]]
+test("a record entry reads under the schema, and a step it names has to stand", () => {
+  const said = routed.replace(
+    "steps:\n",
+    `record:
+  - step: design/review
+    hand: a box, a session and an agent
+    took: abc1234
+    gave: def5678
+    returns: 1
+    answered:
+      - name: verdict
+        exit: 0
+        said: pass
+steps:
+`,
+  );
+  assert.deepEqual(weighed(said), []);
+
+  const bad = weighed(said.replace("  - step: design/review", "  - step: design/nowhere"));
+  assert.deepEqual(
+    bad.map((one) => one.rule),
+    ["Schema.step"],
+  );
+  assert.equal(bad[0].line, 7);
+});
+
 // [[spec/design_output/schema#a-data-schema-holds-yaml]]
 test("a process file reads under the process schema, and a stray key is refused", () => {
   const where = "spec/processes/standard.yaml";
