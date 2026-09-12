@@ -831,14 +831,17 @@ and rides the step.</p>
 <!-- ============================================================ -->
 <h2 id="s10"><span class="n">10</span>What a person sees</h2>
 
-<p>Three surfaces draw the folder and the branches, and none keeps a second record: the Kanban board under
-a sidebar group named <code>work</code>, <code>work list</code> in a terminal, and the ticket file itself.
-Beside the board stand two buttons. <code>note</code> mints a note in one press, which is the shortcut a hand
-takes mid-work. <code>mint</code> mints anything else: a ticket by process, or any note a schema in the tree
-holds. Yours stands first: every ticket at a step whose <code>by</code> is <code>person</code>, with its
-question. The beat counts that list, and the routine's notification carries the count. The rows below are
-examples of the shape, drawn from the names on today's branches; what stands on the board past these columns
-waits for a design note of its own once the back end stands, with v4's work editor as its starting point.</p>
+<p>Three surfaces draw the folder and the branches, and none keeps a second record: the work editor, which
+a button in the sidebar opens; <code>work list</code> in a terminal; and the ticket file itself. The editor
+stands outside the sidebar, in a window of its own, and its shape waits for a design note of its own once
+the back end stands. v4's work editor is the starting point, and it may end as a Kanban board or as
+something else. The sidebar gains one group named <code>work</code> with four controls: the editor button,
+which carries the count of tickets waiting on you the way a mail icon carries its unread count;
+<code>note</code>, which mints a note in one press; <code>mint</code>, which mints anything else, a ticket by
+process or any note a schema holds; and the engine's switch. The count is the declared <code>count</code>
+widget, replaced by the beat on every tick, so a person sees that something waits on them with the editor
+shut. The rows below are examples of one shape the editor may take, drawn from the names on today's
+branches.</p>
 
 <div class="board">
   <div class="col"><h4 class="you">yours · 2</h4>
@@ -864,7 +867,7 @@ waits for a design note of its own once the back end stands, with v4's work edit
 
 <div class="scroll"><table>
 <tr><th>surface</th><th>draws</th></tr>
-<tr><td>the Kanban board, under <code>work</code> in the sidebar</td><td>every ticket, under yours, urgent, in work, open and done</td></tr>
+<tr><td>the work editor, which a button in the sidebar opens</td><td>every ticket, under yours, urgent, in work, open and done</td></tr>
 <tr><td class="m">./RUNME.sh work list</td><td>the same rows in a terminal, with the age of each held branch</td></tr>
 <tr><td>the ticket file itself</td><td>the ask, the route, the evidence, the discussion</td></tr>
 </table></div>
@@ -908,7 +911,7 @@ fact it meets is a route.</p>
 <tr><td>the stop rule</td><td class="m">spec/config/stop/level1.yml</td></tr>
 <tr><td>the hold and the box id</td><td class="m">.se/hold.json · .se/box.json</td></tr>
 <tr><td>the config</td><td>the <code>engine</code> and <code>work</code> sections of <code>spec/config/level0.json</code></td></tr>
-<tr><td>the board and the two buttons</td><td>the <code>work</code> group in <code>spec/config/level0.schema.json</code></td></tr>
+<tr><td>the <code>work</code> group and its four controls</td><td class="m">spec/config/level0.schema.json</td></tr>
 </table></div>
 
 <div class="scroll"><table>
@@ -976,7 +979,7 @@ ones a person wants moved, and the old verbs go once the last brief merges.</p>
     <rect x="750" y="78" width="180" height="40" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="840" y="103" text-anchor="middle" font-weight="700">6 · guidance rides the step</text>
     <rect x="750" y="144" width="180" height="40" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
-    <text x="840" y="169" text-anchor="middle" font-weight="700">7 · the Kanban board under work</text>
+    <text x="840" y="169" text-anchor="middle" font-weight="700">7 · the work group draws</text>
     <rect x="750" y="210" width="180" height="40" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="840" y="235" text-anchor="middle" font-weight="700">8 · level zero hands over</text>
   </g>

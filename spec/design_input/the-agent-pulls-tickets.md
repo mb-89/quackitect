@@ -569,20 +569,25 @@ record:
 
 | surface | draws |
 |---|---|
-| the Kanban board, under `work` in the sidebar | every ticket, under yours, urgent, in work, open and done |
+| the work editor, which a button in the sidebar opens | every ticket, under yours, urgent, in work, open and done |
 | `./RUNME.sh work list` | the same rows in a terminal, with the age of each held branch |
 | the ticket file itself | the ask, the route, the evidence, the discussion |
 
-The board is the declared `table` widget, drawn under a sidebar group of its
-own named `work`, beside two buttons:
+The editor stands outside the sidebar, in a window of its own. Its shape waits
+for a design note of its own once the back end stands, and v4's work editor is
+the starting point. It may end as a Kanban board, or as something else. The
+sidebar gains one group, `work`, and it holds four controls:
 
-| button | mints |
+| control | does |
 |---|---|
-| `note` | a note, in one press, which is the shortcut a hand takes mid-work |
-| `mint` | anything else: a ticket by process, or any note a schema in the tree holds |
+| the editor button | opens the work editor, and carries the count of tickets waiting on you, the way a mail icon carries its unread count |
+| `note` | mints a note in one press, which is the shortcut a hand takes mid-work |
+| `mint` | mints anything else: a ticket by process, or any note a schema in the tree holds |
+| the engine's switch | starts and stops the beat, which is the `engine.state` widget the schema already declares |
 
-What stands on the board past those columns waits for a design note of its
-own, once the back end stands. v4's work editor is the starting point for it.
+The count on the editor button is the declared `count` widget, which the beat
+replaces on every tick. So a person sees that something waits on them with the
+editor shut, and clicks.
 
 Yours stands first: every ticket at a step whose `by` is `person`, with its
 `asks`. The beat counts that list, and the routine's notification carries the
@@ -635,7 +640,7 @@ the only fact it meets is a route.
 | the stop rule | `spec/config/stop/level1.yml` |
 | the hold and the box id | `.se/hold.json`, `.se/box.json` |
 | the config | the `engine` and `work` sections of `spec/config/level0.json` |
-| the board and the two buttons | the `work` group in `spec/config/level0.schema.json` |
+| the `work` group and its four controls | `spec/config/level0.schema.json` |
 
 | key | default | what it decides |
 |---|---|---|
@@ -679,7 +684,7 @@ Eight branches, and the dependencies make the order binding:
 | 4 | `the-agent-pulls-a-ticket` | the pull, its checks, its answers, the hold file, the stop rule | 2, 3 |
 | 5 | `a-step-changes-hands` | the hand id, the spawn, person steps, escalation | 4 |
 | 6 | `guidance-rides-the-step` | `reads`, the verb, the log line, the standing layer shrinks | 4 |
-| 7 | `the-board-draws-the-folder` | the Kanban board under `work`, the note and mint buttons, the beat, the routine fires by count | 4 |
+| 7 | `the-work-group-draws` | the `work` group, its four controls, the count on the editor button, the beat, the routine fires by count | 4 |
 | 8 | `level-zero-hands-over-the-pull` | the brief door goes, and the controls wire up | 4 |
 
 The eleven work branches standing today finish under the verbs they carry.
