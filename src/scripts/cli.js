@@ -109,6 +109,7 @@ async function doorsHere() {
     }),
     config: said,
     words: await said.ask("names.words"),
+    stale: await said.ask("work.staleAfter"),
     node: process.execPath,
     join,
   };
