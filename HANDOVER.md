@@ -1,6 +1,6 @@
 ---
 kind: [[handover]]
-status: held
+status: todo
 urgency: now
 depends_on: [the-voice-verbs]
 ---
