@@ -12,7 +12,7 @@ ask:
     says: what calls for it, as notes standing open, an iteration ending, or the owner asking
 steps:
   - name: collect
-    does: drains the box into the retro folder, cuts the window into chapters, and mints a reader per chapter and one for the commands
+    does: drains the box into the retro folder, cuts the window into chapters, and mints a reader per chapter and one for the shell
     by: anyone
     needs: [work collect]
     evidence:

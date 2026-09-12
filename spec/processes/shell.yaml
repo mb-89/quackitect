@@ -2,7 +2,7 @@
 # one, read by one hand the engine spawns for it. A group that repeats is a
 # tool the tree lacks, written out one command at a time.
 # [[spec/design_input/the-agent-pulls-tickets#the-retro]]
-name: commands
+name: shell
 for: the shell commands of a retro's window, grouped by the job
 ask:
   - name: groups

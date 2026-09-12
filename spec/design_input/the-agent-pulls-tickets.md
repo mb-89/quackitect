@@ -457,7 +457,7 @@ Each stands under `process.schema.yaml` and holds the ask's fields under
 | `group` | `sync`, `tickets`, `retro` (notes, write, cloud) | a set of tickets one box works on one branch, and what a cloud run does |
 | `retro` | `collect`, `field`, `score`, `notes`, `readers`, `mine`, `improve`, `report`, `distribute` | a window of the record, and the changes to the machinery it earns |
 | `chapter` | `read` | one chapter of a retro's window, read by one spawned hand |
-| `commands` | `read` | the shell commands of a retro's window, grouped by the job |
+| `shell` | `read` | the shell commands of a retro's window, grouped by the job |
 
 A note is the smallest ticket, and it is where most work starts. A hand that
 meets an idea, a bug or a doubt mid-work writes a note and carries on. Its
@@ -703,7 +703,7 @@ synthesizes.
 | `field` | person | `answers`, one line each, and each becomes a note |
 | `score` | anyone | `scored`, one line per last improvement with what the numbers show and what that teaches, and `rate`, a command |
 | `notes` | anyone | one command, which passes when the private folder is empty |
-| `readers` | children | none, and it ends when every chapter and the commands ticket close |
+| `readers` | children | none, and it ends when every chapter and the shell ticket close |
 | `mine` | anyone | `themes`, `repeats`, `worker`, `unread` |
 | `improve` | anyone | `tickets`, one link each with its class, its home, the plan, and what the next numbers show if it works |
 | `report` | person | `misses`, what the retro skips, and the reading itself is the gate |
@@ -736,11 +736,11 @@ stands per chapter for free.
 
 Each chapter is a private ticket under `chapter`, with the counts as its ask
 and one hand the engine spawns for it. The shell commands get one ticket
-under `commands`, grouped by the job with a count and an example each. That
+under `shell`, grouped by the job with a count and an example each. That
 is v3's reader per slice as a mechanism. `by: helper` is the word for a hand
 the engine spawns for a step and nobody else.
 
-| the chapter reader answers | the commands reader answers |
+| the chapter reader answers | the shell reader answers |
 |---|---|
 | the work of these hours | what the groups say about what the tree lacks |
 | what goes well, and what makes it go well | which groups become a verb or a flag |
@@ -1126,7 +1126,7 @@ Nine branches, and the dependencies make the order binding:
 | 6 | `guidance-rides-the-step` | `reads`, the verb, the log line, the standing layer shrinks | 4 |
 | 7 | `the-work-group-draws` | the `work` group, its four controls, the count on the editor button, the beat, the notification that names questions and stale groups | 4 |
 | 8 | `level-zero-hands-over` | the brief door goes, and the controls wire up | 4 |
-| 9 | `the-retro-is-a-ticket` | `work collect`, the chapters and the counts, `work retro notes` and `score`, the readers as helpers | 4, 5 |
+| 9 | `the-retro-is-a-ticket` | `work collect`, the chapters, the shell ticket and the counts, `work retro notes` and `score`, the readers as helpers | 4, 5 |
 
 Eight briefs stand on their `work/` branches, cut from this note, and each
 names the chapters it implements. The ninth waits for the retro's shape, which
