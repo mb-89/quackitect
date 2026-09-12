@@ -95,6 +95,7 @@ import {
   schemasFrom,
   strangerFault,
 } from "../lib/schema.js";
+import { refusedTicket, ticketFaults } from "../lib/ticket.js";
 import { guesses, pathOf, surveyOf, TOOLS } from "../lib/tools.js";
 import {
   askForLine,
@@ -365,7 +366,7 @@ export function register(on, _options) {
       }
 
       const schema = schemas.get(kind);
-      const found = schema ? checkNote(whole, schema, where) : [];
+      const found = schema ? checkNote(whole, schema, where, schemas) : [];
       if (found.length) {
         await logbook.say("warn", "schema", `refused ${found.length} line(s) in ${where}`, {
           file: where,
@@ -373,6 +374,19 @@ export function register(on, _options) {
           tool: e.tool,
         });
         return { deny: refusedNote(where, kind, found) };
+      }
+
+      // [[spec/design_output/schema#the-three-places]]
+      const held = schema
+        ? ticketFaults(await textAt($, writing.path), whole, schema, where)
+        : [];
+      if (held.length) {
+        await logbook.say("warn", "ticket", `refused ${held.length} line(s) in ${where}`, {
+          file: where,
+          rule: held[0]?.rule,
+          tool: e.tool,
+        });
+        return { deny: refusedTicket(where, kind, held) };
       }
     }
 
@@ -1820,6 +1834,15 @@ async function stands($, path) {
     return true;
   } catch {
     return false;
+  }
+}
+
+// [[spec/design_output/schema#the-three-places]]
+async function textAt($, path) {
+  try {
+    return String(await $.fs.read(path));
+  } catch {
+    return "";
   }
 }
 

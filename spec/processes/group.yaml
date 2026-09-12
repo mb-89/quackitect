@@ -4,7 +4,6 @@
 # the unit that lands. A group inside a group runs on the outer branch. This
 # route is what a cloud run does, step by step.
 # [[spec/design_input/the-agent-pulls-tickets#a-group-is-a-branch]]
-name: group
 for: a set of tickets that lands as one, on one branch where it is the outermost
 ask:
   - name: goal
