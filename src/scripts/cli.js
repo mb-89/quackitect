@@ -21,10 +21,10 @@ import {
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import {
-  END as SCHEMA_END,
-  mintNote,
-  readYaml,
+  fieldsIn,
+  mintedNote,
   schemaFaults,
+  schemasIn,
   SCHEMAS,
 } from "../../.claude/skills/level0/lib/schema.js";
 import { treeFaults, treeOf } from "../../.claude/skills/level0/lib/tree.js";
@@ -612,19 +612,27 @@ function project() {
 }
 
 // [[spec/design_output/schema#mint-writes-a-valid-note]]
+// [[spec/design_output/schema#the-fields-a-person-and-a-session-hand-in]]
 function mint(argv) {
   const [kind, path] = argv.filter((one) => !one.startsWith("-"));
-  const kinds = namesIn(join(root, SCHEMAS), SCHEMA_END)
-    .map((name) => name.slice(0, -SCHEMA_END.length))
-    .sort();
+  const schemas = schemasIn(treeHere());
+  const kinds = [...schemas.keys()].sort();
 
   if (!kind || !path) {
-    console.error("Usage: ./RUNME.sh mint <kind> <path>\n");
+    console.error("Usage: ./RUNME.sh mint <kind> <path> [--field=value ...]\n");
     console.error(`${SCHEMAS} holds ${kinds.join(", ")}.`);
     return 2;
   }
-  if (!kinds.includes(kind)) {
+
+  const schema = schemas.get(kind);
+  if (!schema) {
     console.error(`${SCHEMAS} holds no ${kind}. It holds ${kinds.join(", ")}.`);
+    return 2;
+  }
+
+  const handed = fieldsIn(argv, schema);
+  if (handed.why) {
+    console.error(handed.why);
     return 2;
   }
 
@@ -634,10 +642,16 @@ function mint(argv) {
     return 2;
   }
 
-  const schema = readYaml(files.read(join(root, SCHEMAS, `${kind}${SCHEMA_END}`)));
+  const made = mintedNote(schemas, { kind, path, fields: handed.fields });
+  if (made.why) {
+    console.error(made.why);
+    return 2;
+  }
+
   files.makeDir(dirname(at));
-  files.write(at, mintNote(schema));
+  files.write(at, made.text);
   console.log(`${path} stands, in the shape ${kind} names.`);
+  for (const one of made.left) console.log(asLine(one, one.file));
   console.log("Write it, then run ./RUNME.sh lint to read what is left.");
   return 0;
 }

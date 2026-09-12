@@ -188,12 +188,13 @@ test("a session start writes one line, and registers every tool", async () => {
   );
   assert.deepEqual(
     it.registered.map((one) => one.name),
-    ["claim_stop", "review_branch", "log", "patch", "replace", "undo"],
+    ["claim_stop", "mint_note", "review_branch", "log", "patch", "replace", "undo"],
   );
   assert.deepEqual(it.registered[0].inputSchema.properties.rule.enum, [
     "the-work-stands-complete",
   ]);
-  assert.deepEqual(it.registered[1].inputSchema.required, ["branch"]);
+  assert.deepEqual(it.registered[1].inputSchema.required, ["kind", "path"]);
+  assert.deepEqual(it.registered[2].inputSchema.required, ["branch"]);
 });
 
 // [[spec/design_output/log#what-a-tool-line-names]]
