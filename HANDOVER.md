@@ -1,92 +1,116 @@
 ---
 kind: [[handover]]
-status: held
+status: done
 urgency: now
 depends_on: [the-voice-verbs]
 ---
 
 # Where it stands
 
-The funnel note `spec/funnel/a-paragraph-has-a-schema.md` names six branches,
-and this is the second. Read that note first. It stands on the branch
-`claude/friendly-brown-k6kohy` until the owner merges it, so take that branch
-in where `work sync` leaves the note absent.
+The paragraph schema projects into Vale, and `./RUNME.sh check` reads green.
+One entry in `spec/config/projections.json` names the shape `paragraph rules`,
+and `lib/paragraph.js` reads the schema and writes sixteen rule files under
+`spec/config/styles/VoiceParagraph`. The ten hand-written rules leave
+`VoiceVale`, and `spec/schemas/paragraph.schema.schema.json` types every key
+the schema holds.
 
-`spec/schemas/paragraph.schema.yaml` stands on the same branch. It names seven
-layers and three registers, and `readYaml` in `lib/schema.js` reads it. The
-projector in `lib/projection.js` holds one shape today, the config commands.
-Ten hand-written rules under `spec/config/styles/VoiceVale` say what the
-schema's enumerable layers say.
-
-# What waits
-
-| the piece | where | proves it |
+| the piece | where | what proves it |
 |---|---|---|
-| the type of each schema key | `spec/schemas/paragraph.schema.schema.json` | a schema missing a layer fails the check |
-| the shape `paragraph rules` | `lib/projection.js` | a fake tree gets one rule file per layer |
+| the shape of the schema | `spec/schemas/paragraph.schema.schema.json` | a layer going missing fails the check |
+| the shape `paragraph rules` | `lib/paragraph.js` | a fake tree gets sixteen rule files |
 | the entry naming it | `spec/config/projections.json` | the session start writes the target |
-| the rule files | `spec/config/styles/VoiceParagraph` | each one refuses a bad fixture |
-| the sections naming the style | `.vale.ini` | the prose and answer registers read it |
-| the ten hand rules, which go | `spec/config/styles/VoiceVale` | the check stays green without them |
+| the rule files | `spec/config/styles/VoiceParagraph` | each refuses a fixture and passes another |
+| the register sections | `.vale.ini` | prose and answer read their own caps |
+| the ten hand rules | out of `VoiceVale` | the check stays green without them |
 
 # What the projection writes
 
-One rule file per enumerable layer, and the projector holds the Tengo template
-while the schema hands it the values:
-
-| layer | rule | the template |
+| layer | rule | reads |
 |---|---|---|
-| characters | `Characters.yml` | a script over the raw scope refusing any character outside the set, past a fence and a code span |
-| markup | `Markup.yml` | a script admitting the markup the layer lists, with the heading cap and the strong-lead cap |
-| shape | `Shape.yml` | the paragraph and run caps, in the shape `PreferStructure` holds today |
-| sentence | `Sentence.yml` | the word caps, the opening, the closing and the code-span cap |
-| grammar | `Auxiliary.yml`, `Modal.yml`, `Contraction.yml`, `Latin.yml`, `PastTense.yml` | the sequence and substitution rules, with the exceptions from the schema |
+| characters | `Characters.yml` | the punctuation set, by name |
+| markup | `Markup.yml` | the heading cap, the one title, the strong lead |
+| shape | `Shape.yml`, `ShapeAnswer.yml` | the paragraphs one run holds |
+| shape | `Paragraph.yml`, `ParagraphAnswer.yml` | the sentences one paragraph holds |
+| sentence | `Sentence.yml` | the words one sentence holds |
+| sentence | `ListItem.yml`, `CodeSpans.yml` | the tighter cap, and the spans |
+| grammar | `Auxiliary.yml`, `Progressive.yml` | the chains the schema refuses |
+| grammar | `Modal.yml` | every modal the register leaves out |
+| grammar | `Contraction.yml`, `Latin.yml`, `EtCetera.yml` | the short forms and their swaps |
+| grammar | `PastTense.yml` | the tenses, with the exceptions the retro grows |
 
-The punctuation stands by name in the schema, `full stop` and its kind, because
-the YAML reader splits a scalar on a colon. The projector maps each name to its
-character.
+For details, see [[spec/design_output/projection#the-second-target]].
 
-The answer register changes two caps, so the projector writes the answer
-variant of `Shape.yml` beside the prose one, the way `PreferStructureAnswer`
-stands beside `PreferStructure` today. The requirement register waits for a
-later branch, so write nothing for it here.
+# The measurement
 
-# What comes out
+`./RUNME.sh voice measure spec` scores zero findings a thousand words on both
+sides, because the verb reads the rules standing at the moment it runs:
 
-These ten files say what the projection now says, so remove them and let the
-targets stand in their place:
+| when | words | findings | a thousand words |
+|---|---|---|---|
+| before, under ten hand rules | 45613 | 0 | 0.0 |
+| after, under sixteen projected rules | 46290 | 0 | 0.0 |
 
-- `LongSentence`, `LongParagraph`, `PreferStructure`, `PreferStructureAnswer`
-- `Contraction`, `LatinAbbreviation`, `EtCetera`
-- `ShortHeading`, `OneTitle`
-- `PastTense`, whose eleven exceptions already stand in the schema
+The number carrying the delta is a different one. Turning the new rules on
+raises 166 findings over a tree the ten rules read as green:
 
-`Passive`, `Antithesis`, `ShoutedLead` and the code rules stay as they are.
+| rule | findings | what it catches |
+|---|---|---|
+| `Characters` | 37 | the semicolon, the em dash, six emoji, a stray mark |
+| `Modal` | 35 | `may`, `would`, `should`, `could` and `shall` in prose |
+| `ListItem`, `CodeSpans` | 32 | a line listing five or more literal values |
+| `Auxiliary`, `Progressive` | 21 | the perfect and the progressive |
+| the rest | 41 | rule faults of mine, under the dead ends below |
 
-# How to build it
+This branch answers all 166. The prose moves where the rule reads right, and
+the schema takes the two words the tagger misreads.
 
-Every projected rule takes a test that feeds it something bad and asserts the
-refusal, and one that feeds it something clean. Run the tests over the fake
-disk. Keep the write door refusing a hand edit to a target, and keep
-`./RUNME.sh check` refusing a stale one, both of which `projection.js` does
-today. Run `./RUNME.sh voice measure` over `spec` before and after, where the
-first branch has landed, and write the two numbers into the handback.
+# What surprises me
 
-## How this branch runs
+- A Vale script match carries its own `message`. So one file says a different
+  thing per finding, and no note here says so.
+- A `scope: raw` rule over a code file reads the whole source, where the rule
+  wants the comment. So a cap reaching a comment stays out of a script rule.
+- The shape layer and the sentence layer split in two for that reason. A scoped
+  rule takes the cap, and a script rule takes the rest.
+- A Vale sequence exception reads the whole phrase. One word the tagger
+  misreads stands in the file once per auxiliary in front of it.
+- A YAML double-quoted scalar reads `\b` as a backspace. A swap key is a
+  regular expression, so every one of them takes single quotes.
+- A `.yml` file under `spec/config/styles` reaches no `BasedOnStyles` section.
+  So the projected rule files lint nowhere, and they need no exemption.
+- This tree's commit convention opens with the branch name, which carries a
+  slash. A path stands outside every layer for that reason.
 
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
+# The dead ends
 
-1. Run `./RUNME.sh work sync` FIRST. It takes main into this branch, so
-   an old branch works against what the tree holds now. Resolve any conflict
-   before you start, because a conflict found later costs the work already
-   done.
-2. Commit and push each time you finish a thing. A cloud box dies and takes
-   its working tree with it.
-3. Write your result and your retro into `HANDOVER.md`, at the root, replacing
-   this brief. Say what surprises you and every dead end you walk into.
-4. Run `./RUNME.sh work done`, which sets the status and pushes.
-5. Run `./RUNME.sh work release` instead where you stop early, so the branch
-   goes back to `todo` for somebody else.
-6. Leave the merge into main to a person. A cloud box opens no pull
-   request, and trunk only ever comes towards you.
+- A first `blanked` rebuilds the text once per match. Vale kills it at its
+  two-second bound, and it reads every match in one pass now.
+- A Tengo map literal refuses a trailing comma. The parse error names a line of
+  the generated file, where the fault sits in the template.
+- The code-span cap counts per line at first, so it refuses a table row of five
+  cells. It counts per sentence now, and a table row carries none.
+- The run rule blanks an indented block ahead of the structure test, so a run
+  stays open to the end. It reads the raw scope now.
+- `fromJson` strips `VoiceVale.` alone, so a contract test naming a rule by its
+  leaf fails against the new style. It strips either prose style now.
+- The progressive fixture `is reading` passes, because the tagger reads
+  `reading` as a noun. The test says `is holding`.
+
+# What waits
+
+| the thing | why it waits |
+|---|---|
+| the vocabulary layer | the next branch, and `words.yml` stands empty here |
+| the meaning layer | `VoiceJudged` takes it with the judged rows branch |
+| the requirement register | no `spec/requirements` folder stands yet |
+| the sentence opening and closing | a colon opening a fence refuses half the tree |
+| the two-word minimum | untried, and a one-word line is common in a table |
+| `.vale.ini` as a target | the funnel note leaves it open, and it stays by hand |
+
+The `misreads` count guarding the retro loop stands in the schema and reads
+nowhere yet. `./RUNME.sh voice refused` ranks what the doors turn away, and the
+warn row naming a rule refusing one phrase too often waits for its own branch.
+
+This session writes two scripts under `.se/scripts`, and git carries neither.
+One lists the characters standing outside the set once the markup goes, and one
+pipes a fixture through the real binary. The contract test holds what both say.

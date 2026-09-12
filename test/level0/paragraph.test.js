@@ -11,7 +11,9 @@ import {
 } from "../../.claude/skills/level0/lib/paragraph.js";
 import {
   faultsIn,
+  ownerOf,
   readAll,
+  refusedWrite,
   staleIn,
   writesOf,
 } from "../../.claude/skills/level0/lib/projection.js";
@@ -300,3 +302,15 @@ test("the compare reads the ending this shape writes, and leaves the rest", () =
 function readSchema() {
   return readYaml(SCHEMA);
 }
+
+// [[spec/design_output/projection#the-write-door-refuses-one]]
+test("a hand edit to a rule file meets the refusal naming the schema", () => {
+  const path = `${TARGET}/Sentence.yml`;
+  assert.equal(ownerOf([ENTRY], path), ENTRY);
+  assert.equal(ownerOf([ENTRY], "spec/config/styles/VoiceVale/Passive.yml"), undefined);
+
+  const said = refusedWrite(ENTRY, path);
+  assert.match(said, /is projected, so nothing may write it by hand/);
+  assert.match(said, /the paragraph rules/);
+  assert.match(said, /spec\/schemas\/paragraph\.schema\.yaml/);
+});
