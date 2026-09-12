@@ -51,7 +51,7 @@ names the commit the brief lives in, and the tip carries the handback.
 
 The verb fetches, then takes `origin/work/<name>` where origin carries it and
 the local branch otherwise. `work merge` merges from origin, so origin is what
-a person merges and origin is what the reader reads.
+the merge takes and origin is what the reader reads.
 
 Trunk resolves the same way, and a branch carrying no commit beyond trunk stops
 the verb with a line saying so.

@@ -68,6 +68,7 @@ import {
 } from "./vehicle.js";
 import { HOOKS } from "./precommit.js";
 import { probe } from "./probe.js";
+import { voice } from "./voice.js";
 import { work } from "./work.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 
@@ -193,6 +194,10 @@ const verbs = {
   probe: {
     says: "measure the client itself: compact says what a compaction keeps",
     run: async () => probe(root, rest, it, whereIs(files, root, "claude", known)),
+  },
+  voice: {
+    says: "measure scores a folder, and refused ranks what the doors turn away",
+    run: async () => voice(root, rest, it, bin),
   },
   log: {
     says: "what every door says, in the viewer this tree builds",

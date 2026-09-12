@@ -544,6 +544,77 @@ test("the canary comes back whole, and a missing one writes a warning", async ()
   assert.equal(found.said, "the canary is absent from the answer");
 });
 
+// [[spec/design_output/level0#the-canary-owes-a-debt]]
+test("a first answer carrying the canary leaves the session owing nothing", async () => {
+  const it = await started();
+  await it.raise("turn.complete", { ...answered, answer: `Done.\n\n${SENTENCE}` });
+  for (let i = 0; i < 3; i++) {
+    const said = await it.raise("tool.call", { tool: "Read", file_path: `${i}.md` });
+    assert.equal(said.deny, undefined, "a paid session passes every call");
+  }
+  assert.equal(it.lines().filter((one) => one.kind === "gate").length, 0);
+});
+
+test("a first answer missing the canary warns one call, then refuses every one", async () => {
+  const it = await started();
+  await it.raise("turn.complete", { ...answered, answer: "Done." });
+
+  const first = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.equal(first.deny, undefined, "the first call warns and goes on");
+  assert.match(String(first.context), /owes the canary/);
+
+  for (const file of ["b.md", "c.md"]) {
+    const said = await it.raise("tool.call", { tool: "Read", file_path: file });
+    assert.match(String(said.deny), /owes the canary/);
+    assert.ok(said.deny.includes(SENTENCE), "the refusal names the line it owes");
+  }
+
+  assert.deepEqual(
+    it.lines().filter((one) => one.kind === "gate").map((one) => [one.level, one.said]),
+    [
+      ["warn", "warned Read before the canary"],
+      ["warn", "refused Read before the canary"],
+      ["warn", "refused Read before the canary"],
+    ],
+  );
+});
+
+test("a later answer carrying the canary clears the debt, and calls pass again", async () => {
+  const it = await started();
+  await it.raise("turn.complete", { ...answered, answer: "Done." });
+  await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  const refused = await it.raise("tool.call", { tool: "Read", file_path: "b.md" });
+  assert.ok(refused.deny, "the debt stands before the line lands");
+
+  await it.raise("turn.complete", { ...answered, answer: `Sorry.\n\n${SENTENCE}` });
+  const after = await it.raise("tool.call", { tool: "Read", file_path: "c.md" });
+  assert.equal(after.deny, undefined);
+  assert.equal(
+    it.lines().filter((one) => one.said === "the canary comes back whole").length,
+    1,
+  );
+});
+
+test("a canary carrying other counts owes the same debt as none", async () => {
+  const it = await started();
+  const wrong = canary({ rules: 99, notes: 9, stop: true });
+  await it.raise("turn.complete", { ...answered, answer: `Done.\n\n${wrong}` });
+  await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  const said = await it.raise("tool.call", { tool: "Read", file_path: "b.md" });
+  assert.match(String(said.deny), /owes the canary/);
+});
+
+test("the debt reaches no subagent, and holds no question to the owner", async () => {
+  const it = await started();
+  await it.raise("turn.complete", { ...answered, answer: "Done." });
+  for (let i = 0; i < 3; i++) {
+    const helper = await it.raise("tool.call", { tool: "Read", agentId: "a1", file_path: "x.md" });
+    assert.equal(helper.deny, undefined, "a helper owes no canary of its own");
+    const asks = await it.raise("tool.call", { tool: "AskUserQuestion", questions: [] });
+    assert.equal(asks.deny, undefined, "the door never blocks the road to the owner");
+  }
+});
+
 test("a claim reaches the vote, and the tooth counts it once", async () => {
   const it = await started({
     "HANDOVER.md": "---\nstatus: held\n---\n\n# The brief\n",
@@ -1316,7 +1387,7 @@ test("the review tool runs the verb, spawns a reader and answers the report", as
   assert.match(said.result, /^check {6}passes$/m);
   assert.match(said.result, /^retro {6}present$/m);
   assert.match(said.result, /^brief {6}done$/m);
-  assert.match(said.result, /^1 thing to fix, and the merge is a person's\.$/m);
+  assert.match(said.result, /^1 thing to fix\. Run work merge once every fix lands\.$/m);
 });
 
 // [[spec/design_output/review#where-the-spawn-refuses]]

@@ -248,12 +248,14 @@ export function withContract(brief) {
     "2. Commit and push each time you finish a thing. A cloud box dies and takes",
     "   its working tree with it.",
     `3. Write your result and your retro into \`${BRIEF}\`, at the root, replacing`,
-    "   this brief. Say what surprises you and every dead end you walk into.",
+    "   this brief. Head the retro `What surprises me`, and name every dead end",
+    "   you walk into.",
     "4. Run `./RUNME.sh work done`, which sets the status and pushes.",
     "5. Run `./RUNME.sh work release` instead where you stop early, so the branch",
     "   goes back to `todo` for somebody else.",
-    `6. Leave the merge into ${TRUNK} to a person. A cloud box opens no pull`,
-    "   request, and trunk only ever comes towards you.",
+    `6. Run \`./RUNME.sh work merge <name>\` from ${TRUNK} to take it in, then`,
+    "   `work close`. A cloud box stops at step 4, because the harness holds",
+    `   ${TRUNK} shut there and a cloud box opens no pull request.`,
     "",
   ].join("\n");
 }
@@ -391,7 +393,8 @@ function finish(it) {
 
   if (!push(it, branch, setStatus(it.disk.read(path), DONE), DONE)) return 1;
   console.log(`${branch} stands at ${DONE}, and ${said.says}.`);
-  console.log("The merge belongs to a person.");
+  console.log(`Run ./RUNME.sh work merge ${branch.replace("work/", "")} from ${TRUNK}.`);
+  console.log("A cloud box stops here, because the harness holds trunk shut.");
   return 0;
 }
 
