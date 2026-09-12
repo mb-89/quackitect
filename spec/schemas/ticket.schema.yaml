@@ -5,8 +5,9 @@
 # `spec/tickets/` travels and is a promise the tree keeps, and `.se/tickets/`
 # dies with the box. One schema covers both, because a hand meets one shape.
 #
-# This file is the one home of a route. `process.schema.yaml` and
-# `group.schema.yaml` name `steps` from here, so one rule holds the tree.
+# This file is the one home of a route. `process.schema.yaml` names `steps` from
+# here, so one rule holds the tree. A group is a ticket of this kind carrying the
+# `group` route, so it needs no schema of its own.
 #
 # `state`, `step` and `steps` are the verbs' to write. The write door refuses an
 # agent's hand edit to the three, and a person's editor stands outside it.
@@ -87,7 +88,7 @@ frontmatter:
           by:
             type: string
             x-names: steps
-            x-words: [anyone, person, agent, children, tickets]
+            x-words: [anyone, person, agent, helper, retro, children]
             x-prefix: not
             description: the hand this step admits, as a word or not <step>
 

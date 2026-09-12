@@ -1,6 +1,6 @@
 # A process is a route the mint copies onto a ticket. It is a bare YAML file
-# under `spec/processes/`, holding a `steps` list and nothing more, so a reader
-# meets the route and no frontmatter around it.
+# under `spec/processes/`, holding its name, what it is for, the ask's fields
+# and the route, so a reader meets the route and no frontmatter around it.
 #
 # This schema names no `body`, so it governs a file rather than a note. The
 # checker weighs the whole file as one map, `schemasIn` leaves it out, and `mint`
@@ -23,6 +23,18 @@ data:
   required:
     - steps
   properties:
+    name:
+      type: string
+      description: the word a ticket names under process, and the file name says it too
+
+    for:
+      type: string
+      description: one line on the work this route carries
+
+    ask:
+      $ref: "ticket#/frontmatter/properties/steps/items/properties/evidence"
+      description: the fields the ask holds, which a hand fills at the mint
+
     steps:
       $ref: "ticket#/frontmatter/properties/steps"
       description: the route, as a tree of steps in the order a hand meets them

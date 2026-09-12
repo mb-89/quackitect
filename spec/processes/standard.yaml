@@ -89,7 +89,7 @@ steps:
             says: what changes and why, for a reader who was not there
   - name: verdict
     does: reads every hunk against the ask and the approach
-    not: implement
+    by: not implement
     on_fail: implement/reflect
     reads: [[spec/guidance/review/reviewing]]
     input: [diff, implement]
