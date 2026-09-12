@@ -1,10 +1,11 @@
-# A group is the unit a box works and the unit that lands: a ticket under
-# this process is a branch, work/<name>, and its children are the tickets
-# naming it under group. The group's own leaves stand around the children,
-# and this route is what a cloud run does, step by step.
+# A group is a ticket whose work is other tickets. The split mints them or
+# assigns standing ones, they run in its place, and a retro reads the run.
+# The outermost group is a branch, work/<name>, and the unit a box works and
+# the unit that lands. A group inside a group runs on the outer branch. This
+# route is what a cloud run does, step by step.
 # [[spec/design_input/the-agent-pulls-tickets#a-group-is-a-branch]]
 name: group
-for: a set of tickets one box works on one branch, which lands as one merge
+for: a set of tickets that lands as one, on one branch where it is the outermost
 ask:
   - name: goal
     form: text
@@ -20,8 +21,23 @@ steps:
         form: command
         expects: 0
         says: work sync, so the branch carries trunk
-  - name: tickets
-    by: tickets
+  - name: split
+    does: mints the children, or assigns standing tickets, each naming this group
+    from: anyone
+    by: anyone
+    input: ask
+    reads: [[spec/guidance/working]]
+    checklist:
+      - every child is small enough to review whole, or is a group itself
+      - the children add up to the goal, and nothing of the goal stands outside them
+      - a child that waits on another names it under depends_on
+    evidence:
+      - name: children
+        form: list
+        says: every child as a link, one a line, with its process
+  - name: children
+    by: children
+    on_fail: split
   - name: retro
     reads: [[spec/guidance/working]]
     to: retro
@@ -36,7 +52,7 @@ steps:
             says: work retro notes, which passes when the private folder is empty
       - name: write
         does: writes the retro over the box's own window
-        input: [tickets, notes]
+        input: [children, notes]
         evidence:
           - name: done
             form: list

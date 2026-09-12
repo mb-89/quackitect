@@ -430,8 +430,7 @@ whole. The rest stands in [[spec/design_output/schema#the-judge-reads-paragraphs
 <tr><td class="m">process</td><td>the board and the retro, as the route the mint copies from</td></tr>
 <tr><td class="m">process_hash</td><td><code>work reroute</code> and the board, which flag a route older than its process</td></tr>
 <tr><td class="m">record</td><td>the render, the checks and the retro, as the engine's entry per leaf handed back</td></tr>
-<tr><td class="m">group</td><td>the pull, as the branch this ticket lands on</td></tr>
-<tr><td class="m">parent</td><td>the pull, which hands a child out before its parent</td></tr>
+<tr><td class="m">group</td><td>the pull, as the group this ticket lands in, and the branch where that group is the outermost</td></tr>
 <tr><td class="m">depends_on</td><td>the pull, which holds a ticket until they close</td></tr>
 <tr><td class="m">successors</td><td>the board, on reason <code>became</code></td></tr>
 <tr><td class="m">urgency</td><td>the pull, as <code>now</code>, <code>soon</code> or <code>whenever</code></td></tr>
@@ -549,7 +548,7 @@ person answers under its evidence, and the pointer moves on into the leaf it lef
 <tr><th>step field</th><th>holds</th></tr>
 <tr><td class="m">name</td><td>one word or a hyphenated pair, unique among its siblings</td></tr>
 <tr><td class="m">steps</td><td>the steps under a phase, in order</td></tr>
-<tr><td class="m">by</td><td><code>anyone</code>, <code>person</code>, <code>agent</code>, <code>helper</code>, <code>retro</code>, <code>children</code>, or <code>tickets</code></td></tr>
+<tr><td class="m">by</td><td><code>anyone</code>, <code>person</code>, <code>agent</code>, <code>helper</code>, <code>retro</code>, or <code>children</code></td></tr>
 <tr><td class="m">not</td><td>a step whose hand this step's hand may not be, as <code>draft</code> or <code>implement</code></td></tr>
 <tr><td class="m">reads</td><td>links to the guidance notes the step's hand reads</td></tr>
 <tr><td class="m">on_fail</td><td>an earlier step, where a failed hand-back sends the ticket</td></tr>
@@ -705,7 +704,7 @@ happened.</p>
 <h2 id="s5"><span class="n">5</span>Processes are routes</h2>
 
 <p>A process is a route the mint copies onto a ticket. Level one ships four for tickets and one for a group,
-as YAML files under <code>spec/processes/</code>, eight of them and in the tree already, each under <code>process.schema.yaml</code> and holding a
+as YAML files under <code>spec/processes/</code>, six of them and in the tree already, each under <code>process.schema.yaml</code> and holding a
 <code>steps</code> list beside the ask's fields, and nothing more. The ask is a form too: the process names
 its fields with the same forms the evidence takes, the mint renders them under <code>Ask</code>, and the verb
 that opens a ticket refuses <code>open</code> while one stands empty. The mint takes
@@ -720,11 +719,9 @@ and the board flags a ticket whose hash trails its process.</p>
 <tr><td class="m">note</td><td class="m">decide</td><td>a thing to look at later, with no work in it yet</td></tr>
 <tr><td class="m">trivial</td><td class="m">do</td><td>a fix small enough that the ask is the design</td></tr>
 <tr><td class="m">standard</td><td class="m">design (draft, review) · implement (tests-red, change, tests-green) · verdict</td><td>a change that wants an approach first, tests before code, and a second pair of eyes after</td></tr>
-<tr><td class="m">complex</td><td class="m">split · children · verdict</td><td>a change too large to review whole</td></tr>
-<tr><td class="m">group</td><td class="m">sync (cloud) · tickets · retro (notes, write, cloud)</td><td>a set of tickets one box works on one branch, and what a cloud run does</td></tr>
-<tr><td class="m">retro</td><td class="m">collect · field · score · notes · readers · mine · improve · report · distribute</td><td>a window of the record, and the changes to the machinery it earns</td></tr>
+<tr><td class="m">group</td><td class="m">sync (cloud) · split · children · retro (notes, write, cloud)</td><td>a set of tickets that lands as one, and what a cloud run does</td></tr>
+<tr><td class="m">retro</td><td class="m">collect · field · score · notes · readers · mine (six leaves) · improve · report · distribute</td><td>a window of the record, and the changes to the machinery it earns</td></tr>
 <tr><td class="m">chapter</td><td class="m">read</td><td>one chapter of a retro's window, read by one spawned hand</td></tr>
-<tr><td class="m">shell</td><td class="m">read</td><td>the shell commands of a retro's window, grouped by the job</td></tr>
 </table></div>
 
 <p>A note is the smallest ticket, and it is where most work starts. A hand that meets an idea, a bug or a
@@ -746,10 +743,10 @@ readback stays owed everywhere else.</p>
 
 <figure>
 <svg viewBox="0 0 900 250" role="img"
-     aria-label="A complex ticket at its children step sits above three child tickets, each with its own route. Arrows down say parent. One arrow back up says that the last child to close advances the parent to review-whole.">
+     aria-label="A group at its children step sits above three child tickets, each with its own route. Arrows down say group. One arrow back up says that every child closed done or became advances the group to its retro.">
   <g font-size="12.5" fill="currentColor">
     <rect x="260" y="24" width="380" height="58" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/>
-    <text x="450" y="48" text-anchor="middle" font-weight="700">the-judge-reads-paragraphs · complex</text>
+    <text x="450" y="48" text-anchor="middle" font-weight="700">the-judge-reads-paragraphs · group</text>
     <text x="450" y="68" text-anchor="middle" fill="var(--muted)" font-size="11.5">step: children · by: children · nobody pulls it here</text>
 
     <rect x="60" y="160" width="220" height="58" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
@@ -771,17 +768,18 @@ readback stays owed everywhere else.</p>
     <path d="M840,175 C880,120 700,60 640,58" stroke="var(--accent)" stroke-dasharray="5 4" marker-end="url(#ara)"/>
   </g>
   <g font-size="11.5" fill="var(--muted)">
-    <text x="232" y="118" text-anchor="middle">parent</text>
-    <text x="466" y="125" text-anchor="start">parent</text>
-    <text x="668" y="118" text-anchor="middle">parent</text>
+    <text x="232" y="118" text-anchor="middle">group</text>
+    <text x="466" y="125" text-anchor="start">group</text>
+    <text x="668" y="118" text-anchor="middle">group</text>
     <text x="800" y="102" text-anchor="start" fill="var(--accent)">every child done or became</text>
-    <text x="800" y="117" text-anchor="start" fill="var(--accent)">advances the parent to verdict</text>
+    <text x="800" y="117" text-anchor="start" fill="var(--accent)">advances the group to its retro</text>
   </g>
 </svg>
-<figcaption>Complexity composes through <code>parent</code>. A complex ticket's <code>split</code> step writes
-the children, its <code>children</code> step belongs to nobody while they run, and its <code>verdict</code>
-step reads what they add up to. A child closed <code>dropped</code> sends the parent to its
-<code>on_fail</code>, and a parent whose children run in another group advances on trunk once they land.
+<figcaption>A large change composes through <code>group</code>. A group's <code>split</code> step mints the
+children or assigns standing tickets, its <code>children</code> step belongs to nobody while they run, and
+its <code>retro</code> reads the run. The step has two ends: the box leaves it when no child stands at an
+agent step, and it ends when every child closes <code>done</code> or <code>became</code>. A child closed
+<code>dropped</code> sends the group back to <code>split</code>. The merge is the verdict over the sum.
 Every route stays short. Names are examples.</figcaption>
 </figure>
 
@@ -817,14 +815,13 @@ those two and no third.</p>
 
 <p>A ticket is too small for a branch, and a branch is too heavy for every ticket. So the unit a box works
 and the unit that lands is a group: a ticket under the <code>group</code> process, and a branch named
-<code>work/&lt;group&gt;</code> after it. Its children are the tickets naming it under <code>group</code>, so
-a group is a complex ticket whose children a person assigns, and one schema covers everything that moves.
-Three things tell the two apart: a complex ticket's <code>split</code> mints its children and they carry
-<code>parent</code>, while a person assigns a group's and they carry <code>group</code>; <code>children</code>
-ends when every child closes, while <code>tickets</code> holds whenever a child stands at an agent step, so a
-parked child blocks nothing; and a <code>verdict</code> reads the sum, while a <code>retro</code> reads the
-run. The route is what a cloud run does step by step: <code>sync</code> under <code>when: cloud</code>, the
-children, then a retro phase of three leaves. A ticket names its group in one
+<code>work/&lt;group&gt;</code> after it. Its children are the tickets naming it under <code>group</code>,
+and a group inside a group runs on the outer branch, so one schema covers everything that moves and one
+relation says where work lands. The route is what a cloud run does step by step: <code>sync</code> under
+<code>when: cloud</code>, then <code>split</code>, where the hand mints the children or assigns standing
+tickets and where the editor lets a person drag them in, then the children, then a retro phase of three
+leaves. The <code>children</code> step has two ends: the box leaves it when no child stands at an agent step,
+and it ends when every child closes. A ticket names its group in one
 field, and a person writes that field. A group of one ticket is the ordinary case, and a group of five is
 the same shape.</p>
 
@@ -876,7 +873,7 @@ who holds it or since when: git does.</figcaption>
 
 <div class="scroll"><table>
 <tr><th>rule</th><th>what it says</th></tr>
-<tr><td>the branch is the claim</td><td>the take writes the hand and <code>took</code> into the group's record under <code>tickets</code> and pushes, and the push arbitrates two boxes</td></tr>
+<tr><td>the branch is the claim</td><td>the take writes the hand and <code>took</code> into the group's record under <code>children</code> and pushes, and the push arbitrates two boxes</td></tr>
 <tr><td>held derives</td><td>a group holds where its newest record entry carries <code>took</code> and no <code>gave</code>, and <code>work list</code> reads it so</td></tr>
 <tr><td>a group has a route</td><td>the ticket carries the <code>group</code> route, and the pull hands its leaves out around the children</td></tr>
 <tr><td>a stale group is yours</td><td>a held group whose tip is older than <code>work.staleAfter</code> stands under yours with three answers, and <code>release</code>, <code>take</code> and <code>close</code> are the verbs</td></tr>
@@ -888,7 +885,7 @@ who holds it or since when: git does.</figcaption>
 <tr><td>a group returns</td><td>an open group nobody holds comes back to the beat once a person answers on its branch</td></tr>
 <tr><td>the merge is a person's</td><td><code>work merge</code> takes an ended group into trunk, and <code>work close</code> drops the branch</td></tr>
 <tr><td>the merge lands the truth</td><td><code>work merge</code> runs the check on the merge commit and undoes it on red; it refuses where trunk's copy of the group or of a child differs from the branch point, and names the lines</td></tr>
-<tr><td>the merge frees the tickets</td><td>an open child of a merged group loses its <code>group</code>, so a parent waiting on children or on a person stands loose on trunk</td></tr>
+<tr><td>the merge frees the tickets</td><td>an open child of a merged group loses its <code>group</code>, so a ticket waiting on a person stands loose on trunk</td></tr>
 </table></div>
 
 <p>A hand mints where it means to work. A ticket it means to do itself goes into its own group and lands
@@ -911,7 +908,7 @@ is the only retro that box ever runs.</p>
 <p>A private note stays on its box, so the drain closes each one as <code>dropped</code> with a reason, as
 <code>done</code> on the spot, or as <code>became</code>, a tracked ticket with its ask filled from the note.
 A ticket the drain mints names this group, and then the box works it before the group ends, since
-<code>tickets</code> is a standing condition. Or it names no group, and then it rides the branch and lands on
+<code>children</code> has two ends. Or it names no group, and then it rides the branch and lands on
 trunk at the merge, where a person sorts it. It is <code>open</code> where the drain fills its ask and
 <code>draft</code> where it cannot. The six lines <code>work new</code> appends to a brief today are this
 route one for one, so the first cloud run under the pull is the first process running as data.</p>
@@ -921,17 +918,17 @@ route one for one, so the first cloud run under the pull is the first process ru
 repairs the generator of a bad output: a prompt, a guidance line, a form, a refusal, a tool. The route
 stands in <code>spec/processes/retro.yaml</code>, and a retro is a ticket, so its evidence is the report, in
 git. The retro keeps missing things because nothing refuses a retro that skips one, so every question is a
-field on a step, and the engine hands nothing back with a field empty. It reuses the complex shape:
-<code>collect</code> mints the readers, a <code>children</code> step waits for them, and the retro itself
-only synthesizes.</p>
+field on a step, and the engine hands nothing back with a field empty. It reuses the group's shape:
+<code>collect</code> mints the readers, a <code>children</code> step waits for them, and the retro's own hand
+mines what <code>collect</code> lays out, leaf by leaf.</p>
 <div class="scroll"><table>
 <tr><th>step</th><th>by</th><th>evidence</th></tr>
 <tr><td class="m">collect</td><td>anyone</td><td>one command, <code>work collect</code>, which refuses while a hand holds a ticket</td></tr>
 <tr><td class="m">field</td><td>person</td><td><code>answers</code>, one line each, and each becomes a note</td></tr>
 <tr><td class="m">score</td><td>anyone</td><td><code>scored</code>, one line per last improvement with what the numbers show and what that teaches, and <code>rate</code></td></tr>
 <tr><td class="m">notes</td><td>anyone</td><td>one command, which passes when the private folder is empty</td></tr>
-<tr><td class="m">readers</td><td>children</td><td>none, and it ends when every chapter and the shell ticket close</td></tr>
-<tr><td class="m">mine</td><td>anyone</td><td><code>themes</code>, <code>repeats</code>, <code>worker</code>, <code>unread</code></td></tr>
+<tr><td class="m">readers</td><td>children</td><td>none, and it ends when every chapter closes</td></tr>
+<tr><td class="m">mine</td><td>anyone</td><td>six leaves, one table below</td></tr>
 <tr><td class="m">improve</td><td>anyone</td><td><code>tickets</code>, one link each with its class, its home, the plan, and what the next numbers show if it works</td></tr>
 <tr><td class="m">report</td><td>person</td><td><code>misses</code>, what the retro skips, and the reading itself is the gate</td></tr>
 <tr><td class="m">distribute</td><td>anyone</td><td><code>groups</code>, one line per ticket with its group and urgency</td></tr>
@@ -944,13 +941,20 @@ verb cuts it into chapters of six hours that hold activity, with the counts per 
 anyone reads a word: prompts, tool calls, shell commands, refusals by kind, errors, tickets that move, notes
 that appear, and the median length of a thought. So the worker's thinning over a long window, which v4
 measured by fifths, stands per chapter for free.</p>
+<p>Each chapter is a private ticket under <code>chapter</code>, with the counts as its ask and one hand the
+engine spawns for it, which <code>by: helper</code> names. Its reader answers five things: the work of these
+hours; what goes well, and what makes it go well; what goes badly, each with its moment in the log or the
+transcript; how each bad line stops happening, by its home; and what the thoughts say that the actions do
+not. The rest of the window is one reading, so the retro's own hand does it, leaf by leaf under
+<code>mine</code>, and <code>collect</code> lays each leaf's material out as a file in the retro folder.</p>
 <div class="scroll"><table>
-<tr><th>the chapter reader answers, one hand per chapter</th><th>the shell reader answers</th></tr>
-<tr><td>the work of these hours</td><td>what the groups say about what the tree lacks</td></tr>
-<tr><td>what goes well, and what makes it go well</td><td>which groups become a verb or a flag</td></tr>
-<tr><td>what goes badly, each with its moment</td><td>which groups want a sentence, and where</td></tr>
-<tr><td>how each bad line stops happening, by its home</td><td>which groups a door refuses from now on, and why</td></tr>
-<tr><td>what the thoughts say that the actions do not</td><td></td></tr>
+<tr><th>mine leaf</th><th>reads</th><th>answers</th></tr>
+<tr><td class="m">chapters</td><td>the closed readers</td><td>themes with counts and the chapters they stand in, the themes an earlier retro names already, and what the readers' thoughts say together</td></tr>
+<tr><td class="m">shell</td><td>the shell commands, grouped by the job with a count and an example</td><td>what the groups say the tree lacks, which become a verb or a flag, which want a sentence, which a door refuses from now on</td></tr>
+<tr><td class="m">refusals</td><td>the doors' refusals, by rule</td><td>which rule fires how often, whether the rule or the hand is wrong, and which rules fire and teach nothing</td></tr>
+<tr><td class="m">records</td><td>the records of the tickets that close in the window</td><td>the steps that fail back or meet <code>refused</code> most per process, what the person steps ask and how long each waits, and what the conditions skip</td></tr>
+<tr><td class="m">worker</td><td>the counts per chapter</td><td>where errors and the length of a thought turn, and where the worker cuts scope and calls it something else</td></tr>
+<tr><td class="m">unread</td><td>everything</td><td>what stays unread, and why</td></tr>
 </table></div>
 <div class="scroll"><table>
 <tr><th>an improvement's home, by the order that asks the least</th><th>where</th></tr>
@@ -1041,7 +1045,7 @@ reads the file.</p>
 <div class="scroll"><table>
 <tr><th>who pulls</th><th>what</th><th>the rule</th></tr>
 <tr><td>the beat</td><td>a box per free group</td><td>groups at <code>todo</code>, none of whose tickets wait on an unmerged group, by urgency</td></tr>
-<tr><td>the box</td><td>the next ticket of its group</td><td>tickets at <code>open</code> with no open dependency on trunk, children before parents, a step this hand may take, by urgency then name</td></tr>
+<tr><td>the box</td><td>the next ticket of its group</td><td>tickets at <code>open</code> with no open dependency on trunk, children before their group, a step this hand can take, by urgency then name</td></tr>
 <tr><td>a person</td><td>anything</td><td>the same two lists on the board, and no refusal</td></tr>
 </table></div>
 
@@ -1199,7 +1203,7 @@ comes. A second routine is a second box, and a person creates it.</p>
 
 <p>Level two is processes as machines, and it reaches the agent by no road. It reads the folder of tickets,
 derives where each machine stands from the states and steps it finds there, mints tickets with routes, sets
-<code>parent</code> on them, and reacts to a close by minting the next. The agent still pulls, and the only
+<code>group</code> on them, and reacts to a close by minting the next. The agent still pulls, and the only
 fact it meets is a route.</p>
 
 <!-- ============================================================ -->
@@ -1354,7 +1358,7 @@ says where it stands now.</p>
 <tr><td>an approval bound to the diff it saw</td><td>GitHub, Copilot, Backlog.md</td><td class="ok">answered</td><td>a verdict from a hand that moved the tip is refused, and the <code>read</code> list must cover the diff</td></tr>
 <tr><td>a lost update caught</td><td>Azure DevOps, beads, Backlog.md</td><td class="ok">answered</td><td>the merge refuses a trunk copy that moved since the branch point, and the pull fetches before every hand-out</td></tr>
 <tr><td>a versioned route with a migration</td><td>Camunda, Temporal, Jira, Symphony</td><td class="ok">answered</td><td>the mint writes the process hash, and <code>work reroute</code> copies a fix over the leaves not yet reached</td></tr>
-<tr><td>a dropped child that does not pass silently</td><td>GitHub Actions, beads</td><td class="ok">answered</td><td><code>children</code> ends on <code>done</code> or <code>became</code>, a <code>dropped</code> child sends the parent to <code>on_fail</code>, the sweep refuses a cycle</td></tr>
+<tr><td>a dropped child that does not pass silently</td><td>GitHub Actions, beads</td><td class="ok">answered</td><td><code>children</code> ends on <code>done</code> or <code>became</code>, a <code>dropped</code> child sends the group back to <code>split</code>, the sweep refuses a cycle</td></tr>
 <tr><td>a conditional step</td><td>BPMN gateways, GitHub Actions <code>if</code></td><td class="ok">answered</td><td><code>when</code> with the engine's own conditions: <code>returned</code>, <code>cloud</code>, <code>desk</code></td></tr>
 <tr><td>a note with an origin, and none lost with the box</td><td>beads, GTD, Backlog.md</td><td class="ok">answered</td><td><code>work note</code> writes <code>from</code> off the hold, and the group's <code>retro</code> step decides every note before the box ends</td></tr>
 <tr><td>a typed ask with a one-click answer</td><td>Linear, Camunda, Gas Town</td><td class="half">in part</td><td><code>asks</code> may carry <code>options</code>, answered as a <code>choice</code>; no addressee and no severity, since one owner reads them</td></tr>
