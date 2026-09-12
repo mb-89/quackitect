@@ -267,7 +267,7 @@ Shaded fields are the verbs' to write; a hand edit by an agent to any of them is
 <span class="v">    checklist:</span>
 <span class="v">      - the change touches no file the ask leaves out</span>
 <span class="v">      - every door the change reaches has a fake</span>
-<span class="v">      - a comment names the note the change implements</span>
+<span class="v">      - a comment names the approach the change implements</span>
 <span class="v">    steps:</span>
 <span class="v">      - name: tests-red</span>
 <span class="v">        does: writes the tests the ask calls for</span>
@@ -308,6 +308,9 @@ Shaded fields are the verbs' to write; a hand edit by an agent to any of them is
 <span class="v">            form: command</span>
 <span class="v">            expects: 0</span>
 <span class="v">            says: the check is green on the commit</span>
+<span class="v">          - name: says</span>
+<span class="v">            form: text</span>
+<span class="v">            says: what changes and why, for a reader who was not there</span>
 <span class="v">  - name: verdict</span>
 <span class="v">    does: reads every hunk against the ask and the approach</span>
 <span class="v">    not: implement</span>
@@ -384,6 +387,9 @@ whole. The rest stands in [[spec/design_output/schema#the-judge-reads-paragraphs
 
 <span class="h">### check</span>
 <span class="c">&lt;!-- command, expects 0 · the check is green on the commit --&gt;</span>
+
+<span class="h">### says</span>
+<span class="c">&lt;!-- text · what changes and why, for a reader who was not there --&gt;</span>
 
 <span class="h">### checked</span>
 <span class="c">&lt;!-- checklist · one line per item of implement's checklist, on how you take it into account --&gt;</span>
@@ -720,7 +726,7 @@ and the board flags a ticket whose hash trails its process.</p>
 <tr><td class="m">trivial</td><td class="m">do</td><td>a fix small enough that the ask is the design</td></tr>
 <tr><td class="m">standard</td><td class="m">design (draft, review) · implement (tests-red, change, tests-green) · verdict</td><td>a change that wants an approach first, tests before code, and a second pair of eyes after</td></tr>
 <tr><td class="m">group</td><td class="m">sync (cloud) · split · children · retro (notes, write, cloud)</td><td>a set of tickets that lands as one, and what a cloud run does</td></tr>
-<tr><td class="m">retro</td><td class="m">collect · field · score · notes · readers · mine (eight leaves) · improve · report · distribute</td><td>a window of the record, and the changes to the machinery it earns</td></tr>
+<tr><td class="m">retro</td><td class="m">collect · field · score · notes · readers · mine (nine leaves) · improve · report · distribute</td><td>a window of the record, and the changes to the machinery it earns</td></tr>
 <tr><td class="m">chapter</td><td class="m">read</td><td>one chapter of a retro's window, read by one spawned hand</td></tr>
 </table></div>
 
@@ -923,17 +929,17 @@ field on a step, and the engine hands nothing back with a field empty. It reuses
 mines what <code>collect</code> lays out, leaf by leaf.</p>
 <div class="scroll"><table>
 <tr><th>step</th><th>by</th><th>evidence</th></tr>
-<tr><td class="m">collect</td><td>anyone</td><td>one command, <code>work collect</code>, which refuses while a hand holds a ticket</td></tr>
+<tr><td class="m">collect</td><td>anyone</td><td>one command, <code>retro collect</code>, which refuses while a hand holds a ticket</td></tr>
 <tr><td class="m">field</td><td>person</td><td><code>answers</code>, one line each, and each becomes a note</td></tr>
 <tr><td class="m">score</td><td>anyone</td><td><code>scored</code>, one line per last improvement with what the numbers show and what that teaches, and <code>rate</code></td></tr>
 <tr><td class="m">notes</td><td>anyone</td><td>one command, which passes when the private folder is empty</td></tr>
 <tr><td class="m">readers</td><td>children</td><td>none, and it ends when every chapter closes</td></tr>
-<tr><td class="m">mine</td><td>anyone</td><td>eight leaves, one table below</td></tr>
+<tr><td class="m">mine</td><td>anyone</td><td>nine leaves, one table below</td></tr>
 <tr><td class="m">improve</td><td>anyone</td><td><code>tickets</code>, one link each with its class, its home, the plan, and what the next numbers show if it works</td></tr>
 <tr><td class="m">report</td><td>person</td><td><code>misses</code>, what the retro skips, and the reading itself is the gate</td></tr>
 <tr><td class="m">distribute</td><td>anyone</td><td><code>groups</code>, one line per ticket with its group and urgency</td></tr>
 </table></div>
-<p><code>work collect</code> takes what it names into the retro folder and nothing else, so a keep list
+<p><code>retro collect</code> takes what it names into the retro folder and nothing else, so a keep list
 that goes stale is no risk: the log after a rotation, every script anyone writes, a copy of every private
 note, and the transcripts with their thoughts. It never touches the retro folders themselves under
 <code>.se/retro/</code>, nor the hold, the box id, the config, the bin or the handover. It lists the tickets
@@ -949,8 +955,9 @@ verb cuts it into chapters of six hours that hold activity, with the counts per 
 anyone reads a word: prompts, tool calls, shell commands, refusals by kind, errors, tickets that move, notes
 that appear, and the median length of a thought. So the worker's thinning over a long window, which v4
 measured by fifths, stands per chapter for free.</p>
-<p>Each chapter is a private ticket under <code>chapter</code>, with the counts as its ask and one hand the
-engine spawns for it, which <code>by: helper</code> names. Its reader answers five things: the work of these
+<p>Each chapter is a private ticket under <code>chapter</code>, with the counts as its ask. The engine
+spawns <code>work.retroReaders</code> hands for them, four by default, and each takes the next chapter when
+it closes its own until none stands; <code>by: helper</code> names such a hand. A reader answers five things: the work of these
 hours; what goes well, and what makes it go well; what goes badly, each with its moment in the log or the
 transcript; how each bad line stops happening, by its home; and what the thoughts say that the actions do
 not. The rest of the window is one reading, so the retro's own hand does it, leaf by leaf under
@@ -960,11 +967,12 @@ not. The rest of the window is one reading, so the retro's own hand does it, lea
 <tr><td class="m">chapters</td><td>the closed readers</td><td>themes with counts and the chapters they stand in, the themes an earlier retro names already, and what the readers' thoughts say together</td></tr>
 <tr><td class="m">shell</td><td>the shell commands, grouped by the job with a count and an example</td><td>what the groups say the tree lacks, which become a verb or a flag, which want a sentence, which a door refuses from now on</td></tr>
 <tr><td class="m">refusals</td><td>the doors' refusals, by rule</td><td>which rule fires how often, whether the rule or the hand is wrong, and which rules fire and teach nothing</td></tr>
-<tr><td class="m">records</td><td>the records of the tickets that close in the window</td><td>the steps that fail back or meet <code>refused</code> most per process, what the person steps ask and how long each waits, and what the conditions skip</td></tr>
+<tr><td class="m">tickets</td><td>the records of the tickets that close in the window, which are the engine's entries on each and no log</td><td>the steps that fail back or meet <code>refused</code> most per process, what the person steps ask and how long each waits, and what the conditions skip</td></tr>
 <tr><td class="m">worker</td><td>the counts per chapter</td><td>where errors and the length of a thought turn, and where the worker cuts scope and calls it something else</td></tr>
 <tr><td class="m">scripts</td><td>every script collect took</td><td>which becomes a check, a flag or a verb, with its home, and which dies, with the reason</td></tr>
 <tr><td class="m">runs</td><td>the retro leaves of the groups that merged</td><td>what the boxes lacked and met, what repeats across runs, and what they left for a person that still stands</td></tr>
 <tr><td class="m">unread</td><td>the manifest, against what every leaf read</td><td>every line no leaf read, and why</td></tr>
+<tr><td class="m">method</td><td>this retro's own run</td><td>what each leaf earned and cost, the readers' questions with no answer, and what changes in the retro route or its verb, as tickets</td></tr>
 </table></div>
 <div class="scroll"><table>
 <tr><th>an improvement's home, by the order that asks the least</th><th>where</th></tr>
@@ -995,9 +1003,12 @@ branch. Now the two coincide, so one word stays: group.</p>
 other verb belongs to a person or the engine. The shell is the verb, under <code>./RUNME.sh work</code>,
 and a plugin tool wraps it for a session that holds the plugin. The engine is these verbs and the beat,
 and it runs with nobody on the box, which is why it stands in level one and outside level zero. A pull carries at most two things: the
-ticket it hands back and a verdict. The file is the payload, because the hand wrote its evidence through
-the write door before it pulled. A leaf holding a <code>verdict</code> field takes the verdict from the
-field, and the flag is refused there.</p>
+ticket it hands back and a verdict: <code>pass</code>, <code>fail</code> with a reason, or <code>became</code>
+with the successor the hand minted, on which the ticket closes once the successor exists. The file is the
+payload, because the hand wrote its evidence through the write door before it pulled. A leaf holding a
+<code>verdict</code> field takes the verdict from the field, and the flag is refused there. A verdict that
+passes can still carry findings, and each becomes a note the reviewer mints with <code>from</code> naming
+the ticket.</p>
 
 <figure>
 <svg viewBox="0 0 900 300" role="img"
@@ -1240,6 +1251,7 @@ fact it meets is a route.</p>
 <tr><td class="m">work.stepsBeforeSplit</td><td class="num">3</td><td>when an escalating ticket must split</td></tr>
 <tr><td class="m">work.staleAfter</td><td class="num">12h</td><td>when the notification names a held group as stale</td></tr>
 <tr><td class="m">work.retroCap</td><td class="num">7</td><td>how many improvements one retro mints at most</td></tr>
+<tr><td class="m">work.retroReaders</td><td class="num">4</td><td>how many hands read a retro's chapters at once</td></tr>
 <tr><td class="m">work.personSigns</td><td class="num">off</td><td>whether a person's hand-back needs a signed commit</td></tr>
 <tr><td class="m">work.filter</td><td class="num">empty</td><td>what a person's pull sees, over the branch</td></tr>
 </table></div>
@@ -1272,9 +1284,9 @@ fact it meets is a route.</p>
 <!-- ============================================================ -->
 <h2 id="s14"><span class="n">14</span>The order of work</h2>
 
-<p>Nine branches, and the dependencies make the order binding. Eight briefs stand on their
-<code>work/</code> branches, cut from the note, and each names the chapters it implements; the ninth, the
-retro as a ticket, waits for the retro's shape, which the note now carries. The editor's live
+<p>Ten branches, and the dependencies make the order binding. Nine briefs stand on their
+<code>work/</code> branches, cut from the note, and each names the chapters it implements; the tenth, the
+cloud run as a group, waits for the retro, since a group's retro phase runs the retro's notes command. The editor's live
 drawing, its block library and the evidence form wait for branch 2 and are desk work with the owner. The
 five work branches standing today finish under the verbs they carry. A brief branch is one whose tip carries <code>HANDOVER.md</code>, and
 <code>work list</code> tells the two kinds apart by that; <code>take</code> keeps serving a brief until
@@ -1282,8 +1294,8 @@ five work branches standing today finish under the verbs they carry. A brief bra
 ones a person wants moved, and the old verbs go once the last brief merges.</p>
 
 <figure>
-<svg viewBox="0 0 940 336" role="img"
-     aria-label="A dependency graph of nine branches. Branch 1, the ticket schema, comes first. Branches 2, a process is a route, and 3, a group is a branch, depend on 1. Branch 4, the agent pulls a ticket, depends on 2 and 3. Branches 5 to 8, hands, guidance, the board and level zero, each depend on 4. Branch 9, the retro is a ticket, depends on 4 and 5.">
+<svg viewBox="0 0 940 402" role="img"
+     aria-label="A dependency graph of ten branches. Branch 1, the ticket schema, comes first. Branches 2, a process is a route, and 3, a group is a branch, depend on 1. Branch 4, the agent pulls a ticket, depends on 2 and 3. Branches 5 to 8, hands, guidance, the board and level zero, each depend on 4. Branch 9, the retro is a ticket, depends on 4 and 5. Branch 10, the cloud run is a group, depends on 4, 8 and 9.">
   <g font-size="12" fill="currentColor">
     <rect x="30" y="112" width="190" height="44" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/>
     <text x="125" y="130" text-anchor="middle" font-weight="700">1 · the ticket has a schema</text>
@@ -1311,6 +1323,8 @@ ones a person wants moved, and the old verbs go once the last brief merges.</p>
     <text x="840" y="235" text-anchor="middle" font-weight="700">8 · level zero hands over</text>
     <rect x="750" y="276" width="180" height="40" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="840" y="301" text-anchor="middle" font-weight="700">9 · the retro is a ticket</text>
+    <rect x="750" y="342" width="180" height="40" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="840" y="367" text-anchor="middle" font-weight="700">10 · the cloud run is a group</text>
   </g>
   <g fill="none" stroke="currentColor" stroke-width="1.4">
     <path d="M220,134 L245,134 L245,74 L270,74" marker-end="url(#ar)"/>
@@ -1322,10 +1336,12 @@ ones a person wants moved, and the old verbs go once the last brief merges.</p>
     <path d="M700,134 L725,134 L725,164 L750,164" marker-end="url(#ar)"/>
     <path d="M700,134 L725,134 L725,230 L750,230" marker-end="url(#ar)"/>
     <path d="M700,134 L725,134 L725,296 L750,296" marker-end="url(#ar)"/>
+    <path d="M700,134 L725,134 L725,362 L750,362" marker-end="url(#ar)"/>
   </g>
 </svg>
 <figcaption>Two branches carry the weight: the schema, which everything reads, and the pull, which
-everything after it rides on. Five to nine run in parallel once four lands, and nine also wants five.</figcaption>
+everything after it rides on. Five to nine run in parallel once four lands, nine also wants five, and ten
+closes the order after eight and nine.</figcaption>
 </figure>
 
 <!-- ============================================================ -->
