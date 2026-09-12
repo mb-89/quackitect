@@ -35,7 +35,7 @@ run from `sync` to the retro's last leaf.
 | `sync` on a cloud box | the pull | `when: cloud` holds on a cloud box, and the leaf runs first |
 | the retro phase on a cloud box | the pull | `retro/notes` empties the private folder, `retro/write` fills, and `retro/cloud` runs there alone |
 | `adopt` over the standing briefs | `work adopt` | each of the five brief branches becomes a group ticket and one child, or closes |
-| the first cloud run under the route | a real routine firing | one group runs from `sync` to its retro on a cloud box, and lands by a person's merge |
+| the first cloud run under the route | a real routine firing | one group runs from `sync` to its retro on a cloud box, and lands by a desk's merge |
 | the handover in the retro | the retro leaves | what the brief's handback carries today stands in `write` and `cloud` |
 
 # The rules to hold
