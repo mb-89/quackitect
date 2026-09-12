@@ -1757,3 +1757,71 @@ test("the draft tool reads a clean draft clean, and an empty one back", async ()
   const empty = await it.raise("tool.call", { tool: DRAFT, text: "  " }, DRAFT);
   assert.match(empty.result, /takes the text of one draft/);
 });
+
+const ASKS = "Where does the door stand? What does it read?";
+const TABLE = [
+  "| question | answer |",
+  "|---|---|",
+  "| where does it stand | in `lib/answer.js` |",
+  "| what does it read | the first block |",
+].join("\n");
+
+// [[spec/design_output/level0#the-table-answers-every-question]]
+test("a prompt with two questions refuses an answer opening with prose", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  await it.raise("prompt.submit", { text: ASKS, origin: { kind: "composer" } });
+  await it.raise("turn.complete", { ...answered, answer: OVER });
+
+  assert.equal(it.prompts.length, 1);
+  assert.match(it.prompts[0].text, /QuestionTable/);
+  assert.match(it.prompts[0].text, /asks 2 questions/);
+  assert.match(it.prompts[0].text, /opens with no table/);
+});
+
+// [[spec/design_output/level0#the-table-answers-every-question]]
+test("an answer opening with the table meets the gate clean", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  await it.raise("prompt.submit", { text: ASKS, origin: { kind: "composer" } });
+  await it.raise("turn.complete", { ...answered, answer: `${TABLE}\n\n${OVER}` });
+
+  assert.equal(it.prompts.length, 0);
+  assert.equal(
+    it.lines().find((one) => one.kind === "answer").said,
+    "the gate reads clean",
+  );
+});
+
+// [[spec/design_output/level0#the-door-counts-the-questions]]
+test("a prompt from a machine leaves the count standing", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  await it.raise("prompt.submit", { text: ASKS, origin: { kind: "composer" } });
+  await it.raise("prompt.submit", { text: "carry on", origin: { kind: "plugin" } });
+  await it.raise("turn.complete", { ...answered, answer: OVER });
+
+  assert.match(it.prompts[0].text, /asks 2 questions/);
+});
+
+// [[spec/design_output/level0#the-door-counts-the-questions]]
+test("a prompt carrying no question demands no table", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  await it.raise("prompt.submit", { text: "build it", origin: { kind: "composer" } });
+  await it.raise("turn.complete", { ...answered, answer: OVER });
+
+  assert.equal(it.prompts.length, 0);
+});
+
+// [[spec/design_output/level0#the-tool-reads-a-draft]]
+test("the draft tool reads the count the prompt sets", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  await it.raise("prompt.submit", { text: ASKS, origin: { kind: "composer" } });
+
+  const said = await it.raise("tool.call", { tool: DRAFT, text: OVER }, DRAFT);
+  assert.match(said.result, /QuestionTable/);
+
+  const met = await it.raise(
+    "tool.call",
+    { tool: DRAFT, text: `${TABLE}\n\n${OVER}` },
+    DRAFT,
+  );
+  assert.match(met.result, /meets the gate clean/);
+});
