@@ -14,7 +14,7 @@ brief. The branch is the unit, and a session works it whole.
 
 # Two handovers
 
-| file | tracked | who reads it | where it may stand |
+| file | tracked | who reads it | where it can stand |
 |---|---|---|---|
 | `.se/HANDOVER.md` | no | the next session on this box | anywhere |
 | `HANDOVER.md` | yes | whoever works the branch | a work branch alone |
@@ -41,8 +41,8 @@ a rejected push and takes the next.
 1. Write the brief to `HANDOVER.md` on `main`.
 2. `./RUNME.sh work new <name>` cuts the branch, stamps `status: todo`, commits
    and pushes. `main` loses the file in the same act.
-3. A cloud session works the branch and pushes to it. The merge belongs to a
-   person, because a cloud box opens no pull request.
+3. A session works the branch and pushes to it. A cloud session stops there,
+   because the harness holds `main` shut and a cloud box opens no pull request.
 4. That session writes its result and its retro into `HANDOVER.md`, then runs
    `./RUNME.sh work done`, which stamps `status: done` and pushes.
 5. `./RUNME.sh work collect` names every branch standing at `done`.
@@ -60,7 +60,7 @@ The contract names six things:
 - write the result and the retro back into `HANDOVER.md`
 - run `work done`
 - run `work release` on stopping early
-- leave the merge to a person
+- run `work merge` from trunk, which a cloud box leaves to a box off the cloud
 
 A brief depends on nothing outside itself, so a cloud session aiming at one
 branch reads it and knows how to finish.
@@ -69,7 +69,7 @@ branch reads it and knows how to finish.
 
 `work sync` merges `origin/main` into the branch. `work take` runs it, so a
 routine pays nothing to remember it. A conflict then stops the take, while the
-work it would cost still sits ahead.
+work it costs still sits ahead.
 
 # A box landing on trunk
 
@@ -98,7 +98,9 @@ Level zero refuses, on a cloud box:
 - a `git push` naming `main`, from any branch
 
 The refusal names `./RUNME.sh work take` as the way out. A desk box meets none
-of it, because a person on a desk merges by choice.
+of it, because a box off the cloud merges by choice. The harness is the whole
+of the reason a cloud box stops: it opens no pull request, so trunk reaches it
+one way.
 
 `work take` and `work done` reach git inside the command line, so the door sees
 the verb and leaves the plumbing alone.
@@ -110,6 +112,9 @@ The frontmatter carries two more fields, and `work take` reads both:
     urgency: now
     depends_on:
       - doors-and-fakes
+
+A flow list on one line, `depends_on: [a, b]`, says the same as the block
+list, with or without quotes around a name.
 
 `take` drops every branch waiting on one still at `todo`, `held` or `done`,
 then sorts the rest by urgency: `now`, `soon`, `whenever`. A branch naming no
@@ -140,7 +145,7 @@ mints holds to its schema. [[spec/schemas]]
 
 | the stamp says | done answers |
 |---|---|
-| nothing at all | no check has run here |
+| nothing at all | no check runs here |
 | another commit | the check names that one instead |
 | an unclean tree | the check reads what the commit lacks |
 | red | the check says red, with the time |

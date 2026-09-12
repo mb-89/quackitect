@@ -6,7 +6,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { register } from "../../.claude/skills/level0/hooks/level0.js";
-import { canary } from "../../.claude/skills/level0/lib/guidance.js";
+import { canary, HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { rowsOf } from "../../.claude/skills/level0/lib/log.js";
 
 const NOTE = `---
@@ -66,6 +66,7 @@ function engine(seed = {}, taught = {}) {
   const said = [];
   const runs = [];
   const spawns = [];
+  const commands = [];
 
   const $ = {
     agent: {
@@ -109,6 +110,13 @@ function engine(seed = {}, taught = {}) {
         return { text: input.text };
       },
     },
+    command: {
+      run: async (input) => {
+        commands.push(input);
+        if (!taught.command) throw new Error("this engine runs no command");
+        return taught.command(input);
+      },
+    },
     session: { messages: async () => said },
   };
 
@@ -116,6 +124,8 @@ function engine(seed = {}, taught = {}) {
   const on = (event, matcher, hook) =>
     hooks.push({ event, matcher: hook ? matcher : null, hook: hook ?? matcher });
   register(on, {});
+
+  const streams = (hook) => hook?.constructor?.name === "AsyncGeneratorFunction";
 
   const of = (event, tool) =>
     hooks.filter(
@@ -129,8 +139,21 @@ function engine(seed = {}, taught = {}) {
     transcript: said,
     runs,
     spawns,
+    commands,
     async raise(event, e, tool) {
       const chain = of(event, tool);
+      // [[spec/design_output/level0#a-step-carries-the-answer]]
+      if (chain.some((one) => streams(one.hook))) {
+        const step = (at) =>
+          async function* (given) {
+            if (at >= chain.length) return given;
+            return yield* chain[at].hook($, given, step(at + 1));
+          };
+        const running = step(0)(e);
+        let said = await running.next();
+        while (!said.done) said = await running.next();
+        return said.value;
+      }
       const step = (at) => async (given) =>
         at < chain.length ? chain[at].hook($, given, step(at + 1)) : given;
       return step(0)(e);
@@ -166,6 +189,23 @@ function valeSaying(found) {
   };
 }
 
+// [[spec/design_output/level0#the-gate-reads-the-answer]]
+function valeOnAnswer(found) {
+  return {
+    exists: (path) => path === VALE,
+    run: (argv) => {
+      const path = argv.find((one) => String(one).startsWith("--path="));
+      if (!path) return { exitCode: 0, stdout: "", stderr: "" };
+      const rows = path === "--path=level0-answer.md" ? found : [];
+      return {
+        exitCode: 0,
+        stdout: JSON.stringify({ [path.slice("--path=".length)]: rows }),
+        stderr: "",
+      };
+    },
+  };
+}
+
 const PAST = [
   {
     Check: "VoiceVale.PastTense",
@@ -179,6 +219,16 @@ const PAST = [
 
 const answered = { reason: "answer", answer: "", durationMs: 1, aborted: false };
 
+// [[spec/design_output/stop#the-line-ends-a-turn]]
+const STOPS = "Stop requested. Reason [the-work-stands-complete]. Nothing waits.";
+
+// [[spec/design_output/stop#the-challenge-spends-one-allowance]]
+async function endsATurn(it, answer = "done") {
+  const text = `${answer}\n\n${STOPS}`;
+  await it.raise("turn.complete", { ...answered, answer: text });
+  await it.raise("turn.complete", { ...answered, answer: text });
+}
+
 test("a session start writes one line, and registers every tool", async () => {
   const it = await started();
 
@@ -188,12 +238,11 @@ test("a session start writes one line, and registers every tool", async () => {
   );
   assert.deepEqual(
     it.registered.map((one) => one.name),
-    ["claim_stop", "review_branch", "log", "patch", "replace", "undo"],
+    ["check_answer", "mint_note", "review_branch", "log", "patch", "replace", "undo"],
   );
-  assert.deepEqual(it.registered[0].inputSchema.properties.rule.enum, [
-    "the-work-stands-complete",
-  ]);
-  assert.deepEqual(it.registered[1].inputSchema.required, ["branch"]);
+  assert.deepEqual(it.registered[0].inputSchema.required, ["text"]);
+  assert.deepEqual(it.registered[1].inputSchema.required, ["kind", "path"]);
+  assert.deepEqual(it.registered[2].inputSchema.required, ["branch"]);
 });
 
 // [[spec/design_output/log#what-a-tool-line-names]]
@@ -252,13 +301,13 @@ test("a turn ending with no answer writes no reply", async () => {
 // [[spec/design_output/stop#every-decision-writes-a-line]]
 test("a turn end writes one stop line", async () => {
   const it = await started();
-  await it.raise("turn.complete", { ...answered, answer: "done" });
+  await endsATurn(it);
 
   const said = it.lines().filter((one) => one.kind === "stop");
-  assert.equal(said.length, 1);
-  assert.equal(said[0].said, "the turn ends");
-  assert.match(said[0].detail, /^stop=the-session-is-new@95 continue=none@0 inARow=0$/);
-  assert.deepEqual(it.prompts, []);
+  assert.equal(said.length, 2, "the challenge writes one, and the vote the other");
+  assert.equal(said[1].said, "the turn ends");
+  assert.match(said[1].detail, /^stop=the-session-is-new@95 continue=none@0 inARow=0$/);
+  assert.equal(it.prompts.length, 1, "the challenge alone reaches the agent");
 });
 
 // [[spec/design_output/stop#holding-a-turn-open]]
@@ -269,14 +318,14 @@ test("a held branch carries the turn once the session stops being new", async ()
   for (let i = 0; i < 10; i++) {
     await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   }
-  await it.raise("turn.complete", { ...answered, answer: "a step is done" });
+  await endsATurn(it, "a step is done");
 
   const said = it.lines().filter((one) => one.kind === "stop");
-  assert.equal(said[0].said, "the turn goes on");
-  assert.match(said[0].detail, /continue=work-still-stands@80 inARow=1$/);
-  assert.equal(it.prompts.length, 1);
-  assert.match(it.prompts[0].text, /^Something on your list stands unfinished/);
-  assert.match(it.prompts[0].text, /- Does the work stand complete\?/);
+  assert.equal(said[1].said, "the turn goes on");
+  assert.match(said[1].detail, /continue=work-still-stands@80 inARow=1$/);
+  assert.equal(it.prompts.length, 2, "the challenge, and the vote holding it open");
+  assert.match(it.prompts[1].text, /^Something on your list stands unfinished/);
+  assert.match(it.prompts[1].text, /Stop requested\. Reason \[<id>\]/);
 });
 
 // [[spec/design_output/extension#the-hold-is-one-rule]]
@@ -286,12 +335,12 @@ test("the hold at stopped ends a turn the standing work would carry", async () =
     await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   }
   it.files.set(".se/config.json", JSON.stringify({ stop: { hold: "stopped" } }));
-  await it.raise("turn.complete", { ...answered, answer: "a step is done" });
+  await endsATurn(it, "a step is done");
 
   const said = it.lines().filter((one) => one.kind === "stop");
-  assert.equal(said[0].said, "the turn ends");
-  assert.match(said[0].detail, /^stop=the-owner-holds-this-session@85/);
-  assert.deepEqual(it.prompts, []);
+  assert.equal(said[1].said, "the turn ends");
+  assert.match(said[1].detail, /^stop=the-owner-holds-this-session@85/);
+  assert.equal(it.prompts.length, 1, "the challenge alone reaches the agent");
 });
 
 test("the hold at running leaves the vote as it stands", async () => {
@@ -321,6 +370,103 @@ test("the ask stands in the block, and the turn's end writes it back to quiet", 
       (one) => one.name === "level0-owner-asks",
     ),
     undefined,
+  );
+});
+
+// [[spec/design_output/level0#the-layer-after-a-compaction]]
+const PROBING = {
+  run: (argv) => ({
+    exitCode: 0,
+    stdout: String(argv[2]).includes("SE_PROBE_COMPACT")
+      ? JSON.stringify({ SE_PROBE_COMPACT: "1" })
+      : "{}",
+    stderr: "",
+  }),
+  command: () => ({}),
+};
+
+const SENTENCE = canary({ rules: 2, notes: 1, stop: true });
+
+test("every read of the context writes one line naming its blocks and its reason", async () => {
+  const it = await started();
+
+  await it.raise("prompt.context", { blocks: [] });
+  await it.raise("prompt.context", { blocks: [] });
+
+  const lines = it.lines().filter((one) => one.kind === "context");
+  assert.deepEqual(
+    lines.map((one) => one.reason),
+    ["first", "re-read"],
+  );
+  assert.equal(lines[0].said, "2 block(s) reach the session");
+  assert.equal(lines[0].detail, "level0-rules level0-canary");
+});
+
+test("a compaction writes one line naming what fired it and what it keeps", async () => {
+  const it = await started();
+
+  await it.raise("session.compact", { trigger: "manual", messages: [1, 2, 3] });
+
+  const line = it.lines().find((one) => one.kind === "compact");
+  assert.equal(line.said, "a compaction runs");
+  assert.equal(line.trigger, "manual");
+  assert.equal(line.messages, 3);
+});
+
+test("the variable makes the first turn compact and ask for the canary again", async () => {
+  const it = await started({}, PROBING);
+  await it.raise("prompt.context", { blocks: [] });
+
+  await it.raise("turn.complete", { ...answered, answer: SENTENCE });
+
+  assert.deepEqual(it.commands, [{ command: "compact" }]);
+  assert.deepEqual(
+    it.prompts.map((one) => one.text),
+    ["Say the canary line again, on its own, and nothing else."],
+  );
+});
+
+test("no variable leaves an ordinary session compacting on nobody's word", async () => {
+  const it = await started();
+  await it.raise("prompt.context", { blocks: [] });
+
+  await it.raise("turn.complete", { ...answered, answer: SENTENCE });
+
+  assert.deepEqual(it.commands, []);
+  assert.deepEqual(it.prompts, []);
+});
+
+test("the re-read under the probe asks the agent for the canary a second time", async () => {
+  const it = await started({}, PROBING);
+  await it.raise("prompt.context", { blocks: [] });
+
+  const said = await it.raise("prompt.context", { blocks: [] });
+
+  assert.match(
+    said.blocks.find((one) => one.name === "level0-probe-asks-again").text,
+    /End your next answer with the canary line above/,
+  );
+
+  const plain = await started();
+  await plain.raise("prompt.context", { blocks: [] });
+  const again = await plain.raise("prompt.context", { blocks: [] });
+  assert.equal(
+    again.blocks.find((one) => one.name === "level0-probe-asks-again"),
+    undefined,
+  );
+});
+
+test("the answer after the compaction writes the canary line the verb reads", async () => {
+  const it = await started({}, PROBING);
+  await it.raise("prompt.context", { blocks: [] });
+  await it.raise("turn.complete", { ...answered, answer: SENTENCE });
+  await it.raise("prompt.context", { blocks: [] });
+
+  await it.raise("turn.complete", { ...answered, answer: `again\n\n${SENTENCE}` });
+
+  assert.deepEqual(
+    it.lines().filter((one) => one.said === HEARD.same).length,
+    2,
   );
 });
 
@@ -368,14 +514,20 @@ test("a write to the per-box file reaches the next turn end", async () => {
   }
   it.files.set(".se/config.json", JSON.stringify({ stop: { mostInARow: 1 } }));
 
-  await it.raise("turn.complete", { ...answered, answer: "one step" });
-  await it.raise("turn.complete", { ...answered, answer: "another step" });
+  for (const step of ["one step", "another step", "a third step"]) {
+    await it.raise("turn.complete", { ...answered, answer: `${step}\n\n${STOPS}` });
+  }
 
   const said = it.lines().filter((one) => one.kind === "stop");
   assert.deepEqual(
     said.map((one) => one.said),
-    ["the turn goes on", "carried enough turns in a row", "the turn ends"],
-    "the tracked file says three, and the per-box file cuts it to one",
+    [
+      "the turn goes on",
+      "the turn goes on",
+      "carried enough turns in a row",
+      "the turn ends",
+    ],
+    "the challenge opens, and the per-box file cuts the carry to one",
   );
 });
 
@@ -405,28 +557,99 @@ test("the canary comes back whole, and a missing one writes a warning", async ()
   assert.equal(found.said, "the canary is absent from the answer");
 });
 
-test("a claim reaches the vote, and the tooth counts it once", async () => {
+// [[spec/design_output/level0#the-canary-owes-a-debt]]
+test("a first answer carrying the canary leaves the session owing nothing", async () => {
+  const it = await started();
+  await it.raise("turn.complete", { ...answered, answer: `Done.\n\n${SENTENCE}` });
+  for (let i = 0; i < 3; i++) {
+    const said = await it.raise("tool.call", { tool: "Read", file_path: `${i}.md` });
+    assert.equal(said.deny, undefined, "a paid session passes every call");
+  }
+  assert.equal(it.lines().filter((one) => one.kind === "gate").length, 0);
+});
+
+test("a first answer missing the canary warns one call, then refuses every one", async () => {
+  const it = await started();
+  await it.raise("turn.complete", { ...answered, answer: "Done." });
+
+  const first = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.equal(first.deny, undefined, "the first call warns and goes on");
+  assert.match(String(first.context), /owes the canary/);
+
+  for (const file of ["b.md", "c.md"]) {
+    const said = await it.raise("tool.call", { tool: "Read", file_path: file });
+    assert.match(String(said.deny), /owes the canary/);
+    assert.ok(said.deny.includes(SENTENCE), "the refusal names the line it owes");
+  }
+
+  assert.deepEqual(
+    it.lines().filter((one) => one.kind === "gate").map((one) => [one.level, one.said]),
+    [
+      ["warn", "warned Read before the canary"],
+      ["warn", "refused Read before the canary"],
+      ["warn", "refused Read before the canary"],
+    ],
+  );
+});
+
+test("a later answer carrying the canary clears the debt, and calls pass again", async () => {
+  const it = await started();
+  await it.raise("turn.complete", { ...answered, answer: "Done." });
+  await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  const refused = await it.raise("tool.call", { tool: "Read", file_path: "b.md" });
+  assert.ok(refused.deny, "the debt stands before the line lands");
+
+  await it.raise("turn.complete", { ...answered, answer: `Sorry.\n\n${SENTENCE}` });
+  const after = await it.raise("tool.call", { tool: "Read", file_path: "c.md" });
+  assert.equal(after.deny, undefined);
+  assert.equal(
+    it.lines().filter((one) => one.said === "the canary comes back whole").length,
+    1,
+  );
+});
+
+test("a canary carrying other counts owes the same debt as none", async () => {
+  const it = await started();
+  const wrong = canary({ rules: 99, notes: 9, stop: true });
+  await it.raise("turn.complete", { ...answered, answer: `Done.\n\n${wrong}` });
+  await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  const said = await it.raise("tool.call", { tool: "Read", file_path: "b.md" });
+  assert.match(String(said.deny), /owes the canary/);
+});
+
+test("the debt reaches no subagent, and holds no question to the owner", async () => {
+  const it = await started();
+  await it.raise("turn.complete", { ...answered, answer: "Done." });
+  for (let i = 0; i < 3; i++) {
+    const helper = await it.raise("tool.call", { tool: "Read", agentId: "a1", file_path: "x.md" });
+    assert.equal(helper.deny, undefined, "a helper owes no canary of its own");
+    const asks = await it.raise("tool.call", { tool: "AskUserQuestion", questions: [] });
+    assert.equal(asks.deny, undefined, "the door never blocks the road to the owner");
+  }
+});
+
+// [[spec/design_output/stop#the-line-ends-a-turn]]
+test("the line reaches the vote, and an answer without one ends nothing", async () => {
   const it = await started({
     "HANDOVER.md": "---\nstatus: held\n---\n\n# The brief\n",
   });
   for (let i = 0; i < 10; i++) {
     await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   }
-  await it.raise(
-    "tool.call",
-    {
-      tool: "mcp__level0__claim_stop",
-      rule: "the-work-stands-complete",
-      why: "pushed",
-    },
-    "mcp__level0__claim_stop",
-  );
   await it.raise("turn.complete", { ...answered, answer: "the work stands complete" });
 
+  const first = it.lines().filter((one) => one.kind === "stop");
+  assert.equal(first[0].said, "the turn goes on");
+  assert.equal(first[0].detail, "no line", "an answer saying so ends no turn");
+
+  await endsATurn(it, "the work stands complete");
   const said = it.lines().filter((one) => one.kind === "stop");
-  assert.equal(said[0].said, "claimed the-work-stands-complete");
-  assert.equal(said[1].said, "the turn goes on", "work stands over a finished piece");
-  assert.match(said[1].detail, /^stop=the-work-stands-complete@45/);
+  assert.equal(said[said.length - 1].said, "the turn goes on");
+  assert.match(
+    said[said.length - 1].detail,
+    /^stop=the-work-stands-complete@45/,
+    "work stands over a finished piece",
+  );
 });
 
 // [[spec/design_output/level0#one-warning-then-a-refusal]]
@@ -567,8 +790,62 @@ test("out of god mode the same refusal stands", async () => {
   assert.equal(it.lines().filter((one) => one.kind === "god").length, 0);
 });
 
+// [[spec/design_output/private#the-door-reads-the-notes]]
+const RAW_NOTE =
+  "the box at /home/somebody/secrets stalls badly whenever somebody starts it twice";
+
+test("a tracked write sharing six words with a note refuses, and quotes the run", async () => {
+  const it = await started({ ".se/notes/one.md": RAW_NOTE });
+  const said = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/funnel/a.md",
+    content: "Noticed: it stalls badly whenever somebody starts it twice.\n",
+  });
+  assert.match(said.deny ?? "", /^spec\/funnel\/a\.md carries \d+ words straight from a note/);
+  assert.match(said.deny, /stalls badly whenever somebody starts it/);
+  assert.match(said.deny, /\.se\/notes/);
+  const line = it.lines().find((one) => one.kind === "private");
+  assert.equal(line.said, "refused a run out of one.md");
+  assert.equal(line.rule, "NothingPrivateTravels");
+});
+
+test("a tracked write carrying one path out of a note refuses on that word alone", async () => {
+  const it = await started({ ".se/notes/one.md": RAW_NOTE });
+  const said = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/funnel/a.md",
+    content: "Somebody looks under /home/somebody/secrets when there is time.\n",
+  });
+  assert.match(said.deny ?? "", /"\/home\/somebody\/secrets"/);
+  assert.match(said.deny, /one word is enough to leak/);
+  assert.equal(it.lines().find((one) => one.kind === "private").said, "refused a token out of one.md");
+});
+
+test("the handover a session leaves behind stays outside the check", async () => {
+  const it = await started({ ".se/notes/one.md": RAW_NOTE });
+  const said = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: ".se/HANDOVER.md",
+    content: `${RAW_NOTE}\n`,
+  });
+  assert.equal(said.deny, undefined);
+});
+
+test("a folder holding no note refuses nothing", async () => {
+  const it = await started();
+  const said = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/funnel/a.md",
+    content: "A statement authored for this tree, and shared with no note.\n",
+  });
+  assert.equal(said.deny, undefined);
+});
+
 const NOTE_SCHEMA = [
   "kind: design_output",
+  "",
+  "governs:",
+  "  - spec/design_output/**",
   "",
   "frontmatter:",
   "  type: object",
@@ -584,6 +861,7 @@ const NOTE_SCHEMA = [
   "  sections:",
   "    - header: Scope",
   "      required: true",
+  "      description: what this note covers",
   "",
 ].join("\n");
 
@@ -618,6 +896,109 @@ test("a note meeting its schema passes, and so does a draft", async () => {
     content: SHAPELESS,
   });
   assert.equal(draft.deny, undefined);
+});
+
+// [[spec/design_output/schema#a-folder-names-its-kind]]
+test("the door refuses a kind-less file in a governed folder, and names the road", async () => {
+  const it = await started({ "spec/schemas/design_output.schema.yaml": NOTE_SCHEMA });
+  const said = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/design_output/bare.md",
+    content: "# A file carrying no kind\n",
+  });
+  assert.match(said.deny ?? "", /^spec\/schemas\/design_output\.schema\.yaml governs spec\/design_output\/bare\.md/);
+  assert.match(said.deny, /Schema\.Kind/);
+  assert.match(said.deny, /names no kind/);
+  assert.match(said.deny, /mint_note/);
+  assert.ok(it.lines().some((one) => /refused a stranger/.test(one.said)));
+});
+
+test("the door refuses a note of another kind in a governed folder", async () => {
+  const it = await started({ "spec/schemas/design_output.schema.yaml": NOTE_SCHEMA });
+  const said = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/design_output/wrong.md",
+    content: "---\nkind: [[guidance]]\n---\n\n# Scope\n\nA note of another kind.\n",
+  });
+  assert.match(said.deny ?? "", /reads as a guidance, and the design_output schema governs this path/);
+});
+
+test("a kind-less file outside every governed folder passes, and so does a draft inside one", async () => {
+  const it = await started({ "spec/schemas/design_output.schema.yaml": NOTE_SCHEMA });
+  const outside = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "AGENTS.md",
+    content: "# Notes for this project\n",
+  });
+  assert.equal(outside.deny, undefined);
+  const parked = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/design_output/_bare.md",
+    content: "# A draft carrying no kind\n",
+  });
+  assert.equal(parked.deny, undefined);
+});
+
+// [[spec/design_output/schema#the-tool-writes-the-note]]
+test("the tool writes the note, and the checker passes what it writes", async () => {
+  const it = await started({ "spec/schemas/design_output.schema.yaml": NOTE_SCHEMA });
+  const said = await it.raise(
+    "tool.call",
+    {
+      tool: "mcp__level0__mint_note",
+      kind: "design_output",
+      path: "spec/design_output/fresh.md",
+      fields: { Scope: "What this note covers." },
+    },
+    "mcp__level0__mint_note",
+  );
+  assert.match(said.result, /^spec\/design_output\/fresh\.md stands, in the shape design_output names\./);
+  assert.equal(
+    it.files.get("spec/design_output/fresh.md"),
+    "---\nkind: [[design_output]]\n---\n\n# Scope\n\nWhat this note covers.\n",
+  );
+  assert.ok(it.lines().some((one) => one.kind === "schema"));
+});
+
+test("a field the tool never takes leaves a placeholder, and the answer names it", async () => {
+  const it = await started({ "spec/schemas/design_output.schema.yaml": NOTE_SCHEMA });
+  const said = await it.raise(
+    "tool.call",
+    {
+      tool: "mcp__level0__mint_note",
+      kind: "design_output",
+      path: "spec/design_output/fresh.md",
+    },
+    "mcp__level0__mint_note",
+  );
+  assert.match(said.result, /Schema\.Placeholder/);
+  assert.match(it.files.get("spec/design_output/fresh.md"), /<!-- what this note covers -->/);
+});
+
+test("the tool writes nothing where a path stands already, or a kind reaches no schema", async () => {
+  const it = await started({
+    "spec/schemas/design_output.schema.yaml": NOTE_SCHEMA,
+    "spec/design_output/door.md": SHAPED,
+  });
+  const stood = await it.raise(
+    "tool.call",
+    {
+      tool: "mcp__level0__mint_note",
+      kind: "design_output",
+      path: "spec/design_output/door.md",
+    },
+    "mcp__level0__mint_note",
+  );
+  assert.match(stood.result, /stands already/);
+  assert.equal(it.files.get("spec/design_output/door.md"), SHAPED);
+
+  const stranger = await it.raise(
+    "tool.call",
+    { tool: "mcp__level0__mint_note", kind: "stranger", path: "spec/design_output/x.md" },
+    "mcp__level0__mint_note",
+  );
+  assert.match(stranger.result, /holds no stranger/);
+  assert.equal(it.files.has("spec/design_output/x.md"), false);
 });
 
 test("an edit is weighed as the whole file it leaves behind", async () => {
@@ -805,6 +1186,128 @@ test("a commit reading its message from a file meets the same rules", async () =
   assert.match(said.deny, /PastTense/);
 });
 
+// [[spec/design_output/private#a-fixture-carries-no-shape]]
+const ADDRESS = ["duck", "quacks.org"].join("@");
+
+const DELTA = `diff --git a/spec/guidance/voice.md b/spec/guidance/voice.md
+--- a/spec/guidance/voice.md
++++ b/spec/guidance/voice.md
+@@ -4,0 +5 @@ kind
++Write to ${ADDRESS} where the door refuses.
+`;
+
+// [[spec/design_output/work#a-red-battery-pushes-nothing]]
+function boxAtHead(head, env = {}) {
+  return {
+    exists: (path) => path === VALE,
+    run: (argv) => {
+      if (argv[0] === "node") {
+        return { exitCode: 0, stdout: JSON.stringify(env), stderr: "" };
+      }
+      if (argv[0] === "git" && argv[1] === "rev-parse" && argv[2] === "HEAD") {
+        return { exitCode: 0, stdout: `${head}\n`, stderr: "" };
+      }
+      return { exitCode: 0, stdout: "", stderr: "" };
+    },
+  };
+}
+
+function boxSaying(delta, env = {}) {
+  return {
+    exists: (path) => path === VALE,
+    run: (argv) => {
+      if (argv[0] === "node") {
+        return { exitCode: 0, stdout: JSON.stringify(env), stderr: "" };
+      }
+      if (argv[0] === "git" && argv[1] === "diff") {
+        return { exitCode: 0, stdout: delta, stderr: "" };
+      }
+      return { exitCode: 0, stdout: "", stderr: "" };
+    },
+  };
+}
+
+const privateLines = (it) =>
+  it
+    .lines()
+    .filter((one) => one.kind === "private")
+    .map((one) => one.said);
+
+// [[spec/design_output/private#two-doors-one-check]]
+test("a commit whose delta carries a private line is refused, naming the line", async () => {
+  const it = await started(undefined, boxSaying(DELTA));
+  const said = await it.raise(
+    "tool.call",
+    { tool: "Bash", command: 'git commit -m "the door reads more"' },
+    "Bash",
+  );
+
+  assert.match(said.deny, /ShapeStaysHome/);
+  assert.match(said.deny, /spec\/guidance\/voice.md:5:1/);
+  assert.match(said.deny, new RegExp(ADDRESS));
+  assert.deepEqual(privateLines(it), ["refused 1 line(s) in a commit"]);
+});
+
+test("a commit whose delta adds nothing private passes the door", async () => {
+  const it = await started(undefined, boxSaying(""));
+  const said = await it.raise(
+    "tool.call",
+    { tool: "Bash", command: 'git commit -m "the door reads more"' },
+    "Bash",
+  );
+  assert.equal(said.deny, undefined);
+});
+
+// [[spec/design_output/work#a-red-battery-pushes-nothing]]
+test("a push to trunk takes a green battery, and a work branch takes none", async () => {
+  const HEAD = "a1b2c3d4e5f6";
+  const it = await started(undefined, boxAtHead(HEAD));
+  const push = { tool: "Bash", command: "git push origin main" };
+  const pushes = () => it.raise("tool.call", push, "Bash");
+  const stamp = (said) => it.files.set(".se/check.json", JSON.stringify(said));
+
+  assert.match(String((await pushes()).deny), /no check has run here/);
+
+  stamp({ sha: "beef", ok: true, clean: true });
+  assert.match(String((await pushes()).deny), /the check ran against beef/);
+
+  stamp({ sha: HEAD, ok: true, clean: false });
+  assert.match(String((await pushes()).deny), /over an unclean tree/);
+
+  stamp({ sha: HEAD, ok: false, clean: true, at: "now" });
+  assert.match(String((await pushes()).deny), /the check answered red/);
+
+  stamp({ sha: HEAD, ok: true, clean: true });
+  assert.equal((await pushes()).deny, undefined, "a green battery pushes trunk");
+
+  const branch = await it.raise(
+    "tool.call",
+    { tool: "Bash", command: "git push origin work/a-thing" },
+    "Bash",
+  );
+  assert.equal(branch.deny, undefined, "a work branch meets no battery");
+});
+
+// [[spec/design_output/private#the-escape]]
+test("no-verify is refused on a cloud box, and the desk box writes a line", async () => {
+  const cloud = await started(undefined, boxSaying("", { CLAUDE_CODE_REMOTE: "1" }));
+  const said = await cloud.raise(
+    "tool.call",
+    { tool: "Bash", command: 'git commit --no-verify -m "the door reads more"' },
+    "Bash",
+  );
+  assert.match(said.deny, /CommitMeetsTheDoor/);
+
+  const desk = await started(undefined, boxSaying(""));
+  const passed = await desk.raise(
+    "tool.call",
+    { tool: "Bash", command: 'git commit -n -m "the door reads more"' },
+    "Bash",
+  );
+  assert.equal(passed.deny, undefined);
+  assert.deepEqual(privateLines(desk), ["a commit steps past the hook"]);
+});
+
 // [[spec/design_output/bash#the-description-names-verbs]]
 test("the Bash description names the verbs, and answers the same string twice", async () => {
   const it = await started();
@@ -943,7 +1446,7 @@ test("the review tool runs the verb, spawns a reader and answers the report", as
   assert.match(said.result, /^check {6}passes$/m);
   assert.match(said.result, /^retro {6}present$/m);
   assert.match(said.result, /^brief {6}done$/m);
-  assert.match(said.result, /^1 thing to fix, and the merge is a person's\.$/m);
+  assert.match(said.result, /^1 thing to fix\. Run work merge once every fix lands\.$/m);
 });
 
 // [[spec/design_output/review#where-the-spawn-refuses]]
@@ -1131,4 +1634,101 @@ test("a target the box refuses writes one warning, and the rest still land", asy
     ["info 5 file(s) written", "warn the box refuses a target"],
   );
   assert.equal(said[1].file, ".claude/commands/se-config-log-level.md");
+});
+
+// [[spec/design_output/level0#the-three-bands]]
+const BANDED = { "spec/config/level0.json": JSON.stringify({
+  judge: { enabled: false },
+  stop: { enabled: false, mostInARow: 3 },
+  log: { level: "info" },
+  answer: { warnAt: 5, ceiling: 15 },
+}) };
+
+const OVER = "word ".repeat(20).trim();
+const UNDER = "word ".repeat(100).trim();
+const CLEAN = "word ".repeat(400).trim();
+const DRAFT = "mcp__level0__check_answer";
+
+// [[spec/design_output/level0#the-re-prompt-over-the-ceiling]]
+test("an answer over the ceiling meets one re-prompt, and one alone", async () => {
+  const it = await started(BANDED, valeOnAnswer(PAST));
+  await it.raise("turn.complete", { ...answered, answer: OVER });
+
+  assert.equal(it.prompts.length, 1);
+  assert.match(
+    it.prompts[0].text,
+    /^The voice rules refuse this answer\. Write it again\./,
+  );
+  assert.match(it.prompts[0].text, /50 findings a thousand words/);
+  assert.match(it.prompts[0].text, /level0-answer\.md:1:7 {2}PastTense/);
+  assert.match(it.prompts[0].text, /Hold PastTense for the rest of this turn/);
+
+  await it.raise("turn.complete", { ...answered, answer: OVER });
+  assert.equal(it.prompts.length, 1, "a second turn end inside the turn submits nothing");
+
+  const gate = it.lines().filter((one) => one.kind === "answer");
+  assert.deepEqual(
+    gate.map((one) => one.said),
+    ["the gate reads rewrite", "the gate reads rewrite"],
+  );
+  assert.match(gate[0].detail, /^score=50 findings=1 inARow=1$/);
+});
+
+// [[spec/design_output/level0#the-carry-rides-a-prompt]]
+test("an answer under the ceiling rides the next prompt as one line", async () => {
+  const it = await started(BANDED, valeOnAnswer(PAST));
+  await it.raise("turn.complete", { ...answered, answer: UNDER });
+  assert.equal(it.prompts.length, 0);
+
+  const said = await it.raise("prompt.submit", {
+    text: "carry on",
+    origin: { kind: "composer" },
+  });
+  assert.match(
+    said.text,
+    /^carry on\n\nThe answer before this scored 10 findings a thousand words\./,
+  );
+  assert.equal(said.text.split("\n\n")[1].includes("\n"), false, "the carry is one line");
+
+  const again = await it.raise("prompt.submit", {
+    text: "carry on",
+    origin: { kind: "composer" },
+  });
+  assert.equal(again.text, "carry on", "the findings ride once");
+});
+
+// [[spec/design_output/level0#the-three-bands]]
+test("an answer under the warning meets nothing at all", async () => {
+  const it = await started(BANDED, valeOnAnswer(PAST));
+  await it.raise("turn.complete", { ...answered, answer: CLEAN });
+  assert.equal(it.prompts.length, 0);
+
+  const said = await it.raise("prompt.submit", {
+    text: "carry on",
+    origin: { kind: "composer" },
+  });
+  assert.equal(said.text, "carry on");
+  assert.equal(
+    it.lines().find((one) => one.kind === "answer").said,
+    "the gate reads clean",
+  );
+});
+
+// [[spec/design_output/level0#the-tool-reads-a-draft]]
+test("the draft tool answers the findings of a draft", async () => {
+  const it = await started(BANDED, valeOnAnswer(PAST));
+  const said = await it.raise("tool.call", { tool: DRAFT, text: OVER }, DRAFT);
+
+  assert.match(said.result, /^The voice rules refuse this answer\./);
+  assert.match(said.result, /Hold PastTense for the rest of this turn/);
+  assert.equal(it.prompts.length, 0, "the tool submits nothing");
+});
+
+test("the draft tool reads a clean draft clean, and an empty one back", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  const clean = await it.raise("tool.call", { tool: DRAFT, text: OVER }, DRAFT);
+  assert.match(clean.result, /meets the gate clean/);
+
+  const empty = await it.raise("tool.call", { tool: DRAFT, text: "  " }, DRAFT);
+  assert.match(empty.result, /takes the text of one draft/);
 });

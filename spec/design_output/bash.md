@@ -5,12 +5,13 @@ kind: [[design_output]]
 # Scope
 
 `.claude/skills/level0/lib/bash.js` reads every command the agent runs. This
-note covers the parse it makes and the four rules standing on that parse.
+note covers the parse it makes and the five rules standing on that parse. The
+delta a commit carries stands in [[spec/design_output/private]].
 
 # What the door reads
 
 `tool.call` with the matcher `{ tool: "Bash" }` hands the whole command line
-over. One parse splits it, and the four rules below read that one parse.
+over. One parse splits it, and the five rules below read that one parse.
 
 | the parse answers | the rule it feeds |
 |---|---|
@@ -18,6 +19,7 @@ over. One parse splits it, and the four rules below read that one parse.
 | the message a commit carries | a commit message meets voice |
 | the name a checkout cuts | a branch name holds five |
 | a test run naming no file | a test run points somewhere |
+| a commit stepping past the hook | the escape, in [[spec/design_output/private]] |
 
 The parse reads quotes, backslashes, operators and heredoc bodies. A word
 inside quotes carries no operator, so `git commit -m "a > b"` writes nothing.
@@ -30,7 +32,7 @@ work costs more than the hole this leaves.
 1. Lift each heredoc body out, keyed by its word, and leave `<<WORD` standing.
 2. Walk the text once, taking a quoted run whole and an operator as its own
    token.
-3. Cut the tokens into segments at `&&`, `||`, `|`, `;`, `&` and a newline.
+3. Cut the tokens into segments at an operator and at a newline.
 4. Read each segment as a command name, its words, and its redirections.
 
 A segment carries its own verdict, so a chain refuses on the one command that
@@ -65,8 +67,8 @@ the inner one under the same rules. A target the parse reads as `{}` names no
 path, so it passes. The enclosing `find` holds the real target, and a guess at
 it refuses honest work.
 
-A heredoc into `sh` runs the shell parse again over the body. A heredoc into
-`python`, `node`, `ruby`, `perl` or `php` reads each line for a write call
+A heredoc into `sh` runs the shell parse again over the body. A heredoc into an
+interpreter reads each line for a write call
 beside a path the rules cover: `open(..., "w")`, `writeFileSync(...)`,
 `write_text(...)` and their kind. An inline script behind `-c` or `-e` meets
 the same two readings.
@@ -97,6 +99,10 @@ naming the rule, the line and the phrase.
 `git commit --amend` on its own opens an editor, so it meets the last row.
 `git commit --amend --no-edit` carries its message forward and passes.
 
+The same parse answers whether the commit steps past the pre-commit hook, and
+`skipsTheHook` reads `--no-verify` and every form `-n` takes.
+[[spec/design_output/private#the-escape]] says which box refuses it.
+
 # A branch name holds five
 
 `work new` refuses a long name, and `git checkout -b` reaches the same tree.
@@ -124,10 +130,20 @@ validate`. A bare `node --test` skips the last two and answers green.
 A session runs a hundred single tests to dodge that. The log records every one,
 so a retro sees it, which costs less than a rule guessing at intent.
 
+# A git add stays out
+
+`.se` holds the private half, and git ignores it. `addsIn` reads a command and
+answers every path under `.se` a `git add` names, with `-f` or without.
+
+    git add -f .se/notes/one.md
+
+`PrivateStaysHome` is the finding, and the refusal names the folder and the
+road back. For details, see [[spec/design_output/private#the-second-door]].
+
 # The description names verbs
 
 `tool.describe` rewrites what the model reads before it reaches for a tool. It
-is the carrot to the four sticks above.
+is the carrot to the five sticks above.
 
 Bash's description gains a paragraph naming the tree's verbs, and `VERBS` in
 `lib/bash.js` holds the list. A contract test reads `src/scripts/cli.js` and
