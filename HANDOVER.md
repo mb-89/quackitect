@@ -1,6 +1,6 @@
 ---
 kind: [[handover]]
-status: todo
+status: held
 urgency: now
 ---
 
