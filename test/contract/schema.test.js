@@ -8,12 +8,15 @@ import { dirname } from "node:path";
 import { skip, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import {
+  allSchemasIn,
+  checkData,
   checkNote,
   governorOf,
   isNoteSchema,
   kindOf,
   LEFT,
   mintNote,
+  processHash,
   readYaml,
   schemaFaults,
   schemasIn,
@@ -24,6 +27,7 @@ import { lintText } from "../../.claude/skills/level0/lib/vale.js";
 import { disk } from "../../src/doors/disk.js";
 import { git } from "../../src/doors/git.js";
 import { proc } from "../../src/doors/proc.js";
+import { PROCESSES } from "../../src/scripts/process.js";
 import { readTools, whereIs } from "../../src/scripts/tools.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -105,6 +109,44 @@ test("every departure in this tree carries the shape the panel draws", () => {
     [],
     "no note in this tree departs from the schema its kind names",
   );
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+test("every process this tree ships passes the process schema, and its slots hold", () => {
+  const standing = here
+    .paths()
+    .filter((one) => one.startsWith(`${PROCESSES}/`) && one.endsWith(".yaml"));
+  assert.ok(standing.length >= 6, `${standing.length} processes stand`);
+
+  const all = allSchemasIn(here);
+  for (const path of standing) {
+    const text = here.read(path);
+    assert.deepEqual(checkData(text, all.get("process"), path, all), [], path);
+    assert.match(processHash(text), /^[0-9a-f]{16}$/, `${path} answers a hash`);
+  }
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+test("the mint copies every process onto a ticket the checker passes", () => {
+  const ticket = schemas.get("ticket");
+  for (const path of here
+    .paths()
+    .filter((one) => one.startsWith(`${PROCESSES}/`) && one.endsWith(".yaml"))) {
+    const said = readYaml(here.read(path));
+    const made = mintNote(ticket, {
+      state: "open",
+      urgency: "soon",
+      process: path.replace(/\.yaml$/, ""),
+      process_hash: processHash(said),
+      steps: said.steps,
+    });
+    const found = checkNote(made, ticket, "spec/tickets/one.md", schemas);
+    assert.deepEqual(
+      found.filter((one) => one.severity === SEVERITY),
+      [],
+      `${path} mints a whole ticket`,
+    );
+  }
 });
 
 test("the guidance notes this tree ships hold the shape guidance names", () => {
