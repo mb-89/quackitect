@@ -1,51 +1,40 @@
 ---
 kind: [[handover]]
-status: held
+status: todo
 urgency: now
 ---
 
 # Where it stands
 
-The canary bites. The door stands in `hooks/level0.js` as `canaryDoor`, the
-wording in `lib/guidance.js` as `OWES`, the chapter in
-`spec/design_output/level0#the-canary-owes-a-debt`, and five tests in
-`test/level0/hooks.test.js` hold it.
+The canary bites. A session that skips the line meets a warning on its next
+tool call and a refusal on every one after.
 
-`./RUNME.sh check` answers 1, and no test fails. The one error stands on main
-already and this branch never touches it. For details, see the last chapter.
+`./RUNME.sh check` answers 0 on client 2.1.269.
 
 | the piece | where it landed |
 |---|---|
 | the debt opens on a first answer missing the line | `hooks/level0.js`, `turn.complete` |
 | a later answer holding the line clears it | the same hook |
 | one warning, then a refusal | `canaryDoor`, beside `answerDoor` |
-| the refusal carries the sentence | `OWES.denies` |
+| the refusal carries the sentence | `OWES` in `lib/guidance.js` |
 | a wrong count owes what silence owes | `canaryIn` answers `other`, and the door reads it unpaid |
-| a helper and the owner's road pass | `e.agentId` and `reachesTheOwner` |
+| a helper and the road to the owner pass | `e.agentId` and `reachesTheOwner` |
 | god mode passes it | `godPasses` wraps the hook, so this costs no code |
+| the chapter says the tooth | `spec/design_output/level0#the-canary-owes-a-debt` |
+
+Five tests in `test/level0/hooks.test.js` hold the door.
 
 # What waits
 
-A person merges this into main, because trunk only ever comes towards a box.
+Nothing on this branch. Merge it and close it.
 
-Run `./RUNME.sh work done` once the battery answers green. The verb refuses a
-red one, and it is right to.
+# What surprises me
 
-# The error this branch inherits
+The canary carried no tooth at all. `heardCanary` wrote a warning and the
+session ran on. Every other rule in this tree bites at a door, so the one rule
+proving the cage holds a session was the one rule holding nothing.
 
-`hooks/level0.js` registers `on("session.compact", ...)`. The client on this box
-reads 2.1.266 and holds no such event, so the plugin validator refuses the
-module and `check` answers 1.
-
-`spec/design_output/level0#three-roads-to-a-compaction` measures that event
-against client 2.1.269. So the code names an event a later client carries, and
-the skew is the whole of the fault. The validator reads the module source, so
-no runtime guard reaches it.
-
-Three roads stand open, and the owner picks one:
-
-| road | what it costs |
-|---|---|
-| take the client to 2.1.269 or past it | the box changes, and the design already measures this road |
-| drop the `session.compact` hook | the compaction line leaves the log |
-| pin the design to 2.1.266 and drop the hook | the two say the same thing again |
+The box ran client 2.1.266 while the design measured `session.compact` against
+2.1.269, so the plugin validator refused the module and the battery read red.
+The owner took the client to 2.1.269 and the battery went green. The code wants
+no change.
