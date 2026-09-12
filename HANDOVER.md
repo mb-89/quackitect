@@ -1,97 +1,85 @@
 ---
 kind: [[handover]]
-status: held
-urgency: now
+status: done
+urgency: soon
 ---
 
 # Where it stands
 
-The standing layer reaches the session at `prompt.context`, which the engine
-declares fires once per conversation and again on a re-read, a compaction or a
-`/clear`. The design in `spec/design_output/level0.md` rests on that
-declaration. The client's own docs say a compaction summarises hook context,
-so the two disagree, and nothing in this tree measures it.
+The standing layer survives a compaction. Measured on 2026-09-12 against client
+2.1.269, three times, by `./RUNME.sh probe compact` running the real client
+headless. A compaction fires `prompt.context` a second time, level zero hands
+the same blocks over, and the answer after it carries the canary with its own
+numbers. One run takes 90 seconds.
 
-The log writes a `level0` line at `session.start` and one for the canary at
-the first `turn.complete`. `prompt.context` writes nothing, so a compaction
-that drops the block leaves no trace, and one that keeps it leaves none
-either. The `$` surface offers `$.session.compact({ instructions })` and
-`$.command.run({ command })`, both callable from `turn.complete` or later, and
-the engine names a `session.compact` event a hook can read.
+Every piece the brief names stands, and one beyond it:
+
+| the piece | where | standing |
+|---|---|---|
+| a log line at `prompt.context` | `hooks/level0.js` | the `context` kind, naming its blocks and `first` or `re-read` |
+| a log line at `session.compact` | `hooks/level0.js` | the `compact` kind, naming the trigger and the messages it keeps |
+| `./RUNME.sh probe compact` | `src/scripts/probe.js` | answers `survives`, `drops` or `no compaction` |
+| the forced compaction | `hooks/level0.js`, under `SE_PROBE_COMPACT` | takes the `$.command.run` road |
+| a contract test | `test/contract/compact.test.js` | drives the verb, and skips where no client stands |
+| `turn.step` takes an async generator | `hooks/level0.js` | the fix making every line above reachable |
+
+`spec/design_output/level0.md` carries the three roads, the reading table and
+the four readings that catch a cage standing off.
+
+# The dead end
+
+Level zero loads in no session on this box, and nothing says so. A plain
+`async` hook on `turn.step` fails `claude plugin validate` on client 2.1.269,
+which wants `async function* ($, e, next)`, and the client then refuses every
+hook in the module. Meanwhile `claude plugin list` says `√ loaded`.
+
+So the whole cage stands off: no stamp, no log line, no canary, no write door.
+The brief's own build measures nothing until that one signature takes the
+generator shape.
+
+Read it out of four places, and the first one lies:
+
+| what you run | what it says |
+|---|---|
+| `claude plugin list` | `√ loaded`, whatever the hooks do |
+| `claude plugin validate .claude/skills/level0` | the hook, the line and the shape it wants |
+| `.se/level0.stamp` | absent where `session.start` reaches no hook |
+| `./RUNME.sh log` | empty where every door stays silent |
+
+`./RUNME.sh check` runs the validator already, so a green check catches this
+from now on. It stands red here for another reason, below.
+
+# What surprises me
+
+- `$.session.compact` throws under `-p`, and names the reason: compaction there runs inside a turn. A session under the editor may still take it.
+- `$.command.run({ command: "compact" })` holds, and `session.compact` fires inside the call, one minute after it opens. Every run measures the same minute.
+- `prompt.context` fires once per conversation, and a second prompt on its own brings no second read. A control run proves it, so the second read belongs to the compaction.
+- The event carries `blocks` and nothing else, so the hook counts its own reads to tell `first` from `re-read`.
+- An agent reads `Say the canary line, and nothing else.` as a probe of its system prompt and refuses. The verb opens with `Say hello in one line.` instead, and the canary rule does the rest.
+- A `-p` run keeps its process alive long enough to compact, submit and answer, so the night routine asks for the verb and nothing else.
+- Every probe run eats `HANDOVER.md`, because the child session takes the handover the way any session does. Keep a copy before you run the verb on a branch carrying a brief.
 
 # What waits
 
-| the piece | where | proves it |
+| the thing | where | why |
 |---|---|---|
-| a log line at `prompt.context` | `hooks/level0.js` | the line names the blocks it hands over and the reason, first or re-read |
-| a log line at `session.compact` | `hooks/level0.js` | the line says a compaction happens, and what it keeps |
-| `./RUNME.sh probe compact` | `src/scripts/cli.js`, and a lib beside it | the verb answers `survives` or `drops`, with the two log lines it reads |
-| the forced compaction | `hooks/level0.js`, under `SE_PROBE_COMPACT` | a session under the variable compacts after its first turn |
-| a contract test | `test/contract/compact.test.js` | the verb runs against the real client and answers one of the two words |
-| the result, in the handback | `HANDOVER.md` | the first measured answer, and the road that measures it |
+| two red tests | `test/contract/schema.test.js` | `spec/schemas/paragraph.schema.yaml` names no chapter, so the sweep and `mint` both refuse it. Red before this branch, and untouched by it |
+| two voice findings | `spec/funnel/level-zero-closes.md` | a past tense on line 62 and a long heading on line 139. Red before this branch, and untouched by it |
+| one `context` line goes missing once | `.se/log/session.jsonl` | the first measured run carries `re-read` and no `first`, and the two after it carry both. Two writers appending to one file is the suspect |
+| the `--resume` road | `spec/design_output/level0#three-roads-to-a-compaction` | untried, because the command road holds |
+| a night routine | wherever `do_work` lives | its one prompt is `./RUNME.sh probe compact`, and the answer lands in the log and in the verb's exit code |
 
-# What the probe does
+# What the routine needs
 
-The verb starts the client headless with `SE_PROBE_COMPACT=1`, asks for the
-canary line, forces a compaction, asks for the canary line again, and reads
-the log. Three roads can force the compaction, and the branch measures which
-one holds:
+Nothing beyond the verb. It runs the client itself, writes the answer to
+standard output, and exits 0 on `survives` and 1 on anything else. The survey
+names `claude` now, so the verb finds the client where it stands.
 
-| road | what the hook does |
-|---|---|
-| `$.session.compact` | at the first `turn.complete`, compacts, then submits the second prompt through `$.prompt.submit` |
-| `$.command.run` | the same, running `compact` as the command |
-| two headless runs | the verb runs the client twice with `--resume`, and the hook compacts at the end of the first |
+# What runs green here
 
-The answer reads out of the log:
+`./RUNME.sh check` stands red on the two schema tests above, and every other
+part of it answers. The tests pass, 570 of 572. `claude plugin validate`
+passes. The doors hold. The rules pass over every file this branch writes.
 
-| the log carries | the verb answers |
-|---|---|
-| two `prompt.context` lines, and the second canary matches | `survives` |
-| one `prompt.context` line, or a second canary with other numbers | `drops` |
-| no `session.compact` line | `no compaction`, and the road stands unproven |
-
-Write the road that holds into the design note, and the ones that fail into
-the handback with what each one answers.
-
-# Without the verb
-
-The two log lines pay on their own. Once they stand, any session that compacts
-in the ordinary course shows a second `prompt.context` line in `./RUNME.sh
-log`, and the answer after it carries the canary or not. So a person reads
-tomorrow's compaction out of the log, with no probe.
-
-# At night
-
-A routine runs the verb on a cloud box, the way `do_work` runs `work take`.
-Its one prompt is `./RUNME.sh probe compact`, and the answer lands in the
-log and in the session's own transcript. Say in the handback what the routine
-needs beyond the verb, and whether a `-p` run keeps its process alive long
-enough for the hook to compact and submit.
-
-# How to build it
-
-Test the log lines with a fake `$` and a fake log, and assert the fields. Test
-the verb's reading as a pure function over log rows, with fixtures for each of
-the three answers. Keep the forced compaction behind the variable, so no
-ordinary session ever compacts on the hook's word. Run the contract test once
-on this box and write the answer into the handback.
-
-## How this branch runs
-
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
-
-1. Run `./RUNME.sh work sync` FIRST. It takes main into this branch, so
-   an old branch works against what the tree holds now. Resolve any conflict
-   before you start, because a conflict found later costs the work already
-   done.
-2. Commit and push each time you finish a thing. A cloud box dies and takes
-   its working tree with it.
-3. Write your result and your retro into `HANDOVER.md`, at the root, replacing
-   this brief. Say what surprises you and every dead end you walk into.
-4. Run `./RUNME.sh work done`, which sets the status and pushes.
-5. Run `./RUNME.sh work release` instead where you stop early, so the branch
-   goes back to `todo` for somebody else.
-6. Leave the merge into main to a person. A cloud box opens no pull
-   request, and trunk only ever comes towards you.
+The auto mode holding this session refuses a handful of Bash calls that spawn
+the client, so several runs take `node src/scripts/cli.js` as the road in.

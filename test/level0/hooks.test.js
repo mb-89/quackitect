@@ -156,6 +156,7 @@ function engine(seed = {}, taught = {}) {
 
 // [[spec/design_output/level0#a-step-streams]]
 async function* nothing(said) {
+  yield* [];
   return said;
 }
 

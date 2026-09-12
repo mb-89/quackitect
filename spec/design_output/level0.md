@@ -91,7 +91,7 @@ validate`, and the client then loads none of the module:
 
 | what a person sees | what stands behind it |
 |---|---|
-| `claude plugin list` says `√ loaded` | the plugin is adopted, and its hooks are refused |
+| `claude plugin list` says `√ loaded` | the client adopts the plugin, and refuses its hooks |
 | no `.se/level0.stamp` | `session.start` reaches no hook |
 | no line in `./RUNME.sh log` | every door in the module stays silent |
 | the canary is absent from every answer | the standing layer reaches no session |
@@ -163,15 +163,15 @@ rules back. Nothing here re-reads them per turn, and nothing needs to.
 # The layer after a compaction
 
 The layer survives. Measured on 2026-09-12 against client 2.1.269, by the probe
-below: a compaction fires `prompt.context` a second time, the hook hands the
+below. A compaction fires `prompt.context` a second time, the hook hands the
 same blocks over, and the answer after it carries the canary with its own
 numbers.
 
-An ordinary second prompt fires `prompt.context` no second time, so the event
-counts conversations and not prompts. That control is what makes the second
-read a compaction's own.
+A second prompt on its own fires `prompt.context` once only, so the event
+counts a conversation. That control is what makes the second read a
+compaction's own.
 
-## Three roads, and the one that holds
+## Three roads to a compaction
 
 | road | what it answers on client 2.1.269 |
 |---|---|
@@ -197,8 +197,8 @@ asks for the canary, and reads the log that run leaves:
 5. The second answer carries the canary, and `turn.complete` writes the same
    line the first turn writes.
 
-The numbers come out of the standing block alone, so an answer carrying them
-proves the block reached the model past the compaction.
+The numbers come out of the standing block alone. So an answer carrying them
+proves the block stands in front of the model past the compaction.
 
 ## What the probe reads
 
