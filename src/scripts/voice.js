@@ -133,14 +133,17 @@ function pullAnswers(root, folder, it) {
 function filesUnder(disk, at, wanted) {
   const out = [];
   const into = (path) => {
-    let rows = null;
+    let rows = [];
     try {
-      rows = disk.list(path);
+      rows = disk.list(path) ?? [];
     } catch {
+      rows = [];
+    }
+    if (!rows.length) {
       if (wanted.test(path) && disk.exists(path)) out.push(path);
       return;
     }
-    for (const one of rows ?? []) {
+    for (const one of rows) {
       const held = join(path, one.name);
       if (one.kind === "dir") into(held);
       else if (wanted.test(one.name)) out.push(held);
