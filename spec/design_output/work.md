@@ -111,6 +111,9 @@ The frontmatter carries two more fields, and `work take` reads both:
     depends_on:
       - doors-and-fakes
 
+A flow list on one line, `depends_on: [a, b]`, says the same as the block
+list, with or without quotes around a name.
+
 `take` drops every branch waiting on one still at `todo`, `held` or `done`,
 then sorts the rest by urgency: `now`, `soon`, `whenever`. A branch naming no
 urgency reads as `soon`.
