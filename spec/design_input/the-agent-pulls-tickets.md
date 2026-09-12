@@ -79,9 +79,9 @@ reader:
 | `successors` | the board, on reason `became` |
 | `urgency` | the pull, as `now`, `soon` or `whenever` |
 
-The body holds the ask, one chapter per step, and a discussion. The schema
-demands each, and `mint` writes each one's description as a comment, so a
-person meeting a fresh ticket reads what goes where.
+The body holds the ask, a chapter per step nested as the steps nest, and a
+discussion. The schema demands each, and `mint` writes each one's description
+as a comment, so a person meeting a fresh ticket reads what goes where.
 
 # The lifecycle
 
@@ -108,59 +108,94 @@ edits what they like.
 
 # The route
 
-A ticket carries its own route as a list of steps in the frontmatter, in
-order. Each step says what it does, who may do it, what it reads, and where a
-failed step sends the ticket back to.
+A ticket carries its own route as a tree of steps in the frontmatter. A step
+with `steps` under it is a phase, and it carries what its steps share. A step
+with none is a leaf, and the pull hands out leaves alone. A leaf carries what
+differs: its own reads, its own hand rule, and the form of its evidence.
 
     steps:
-      - name: draft
-        of: design
-        by: anyone
+      - name: design
         reads: [[spec/guidance/writing]]
-      - name: review-design
-        of: design
-        by: not draft
-        on_fail: draft
-        reads: [[spec/guidance/review/reviewing]]
-      - name: tests-red
-        of: implement
-        by: anyone
-        reads: [[spec/guidance/code/testing]]
+        steps:
+          - name: draft
+            evidence:
+              - name: note
+                form: link
+                says: the design input this step writes
+          - name: review
+            by: not draft
+            on_fail: draft
+            reads: [[spec/guidance/review/reviewing]]
+            evidence:
+              - name: verdict
+                form: verdict
+                says: pass or fail, with findings one a line
       - name: implement
-        of: implement
-        by: anyone
-        reads: [[spec/guidance/code/code]]
-      - name: tests-green
-        of: implement
-        by: anyone
-      - name: review-build
-        of: review
+        reads: [[spec/guidance/code/testing]]
+        steps:
+          - name: tests-red
+            evidence:
+              - name: tests
+                form: command
+                expects: red
+                says: the tests you write fail on their own assertion
+              - name: seen
+                form: text
+                says: what you see, and what surprises you
+          - name: change
+            reads: [[spec/guidance/code/code]]
+            evidence:
+              - name: lint
+                form: command
+                expects: 0
+                says: the tree builds and lints
+          - name: tests-green
+            evidence:
+              - name: tests
+                form: command
+                expects: green
+                says: the same tests pass
+              - name: check
+                form: command
+                expects: 0
+                says: the check is green on the commit
+      - name: verdict
         by: not implement
         on_fail: implement
         reads: [[spec/guidance/review/reviewing]]
+        evidence:
+          - name: verdict
+            form: verdict
+            says: pass or fail, every hunk read, findings one a line
 
 | field | holds |
 |---|---|
-| `name` | one word or a hyphenated pair, unique on the ticket |
-| `of` | the phase this step belongs to, a name over several steps |
-| `by` | `anyone`, `person`, `agent`, `children`, or `not <step or phase>` |
+| `name` | one word or a hyphenated pair, unique among its siblings |
+| `steps` | the steps under a phase, in order |
+| `by` | `anyone`, `person`, `agent`, `children`, or `not <step>` |
 | `reads` | links to the guidance notes the step's hand reads |
-| `on_fail` | an earlier step or phase, where a failed hand-back sends the ticket |
+| `on_fail` | an earlier step, where a failed hand-back sends the ticket |
 | `asks` | the question a person answers, on a step a person takes |
+| `evidence` | the fields a leaf's hand fills, each with a name, a form and a `says` |
 
-A step is the unit of the pull, and a phase is a name over steps. So a
-sub-step is a step, and the pull hands out one step at a time. A phase named
-in `on_fail` resolves to its first step, and `not implement` excludes the
-hand of every step of that phase. A child ticket stays the unit that changes
-hands or runs beside another, which is what the complex process is for.
+Four rules hold the tree together:
+
+- A leaf inherits `by`, `reads` and `on_fail` from the phases above it. The reads add up, and the other two take the nearest value.
+- A name refers to a sibling first, and to a step from the top second. A path with a slash, as `design/review`, says exactly.
+- `not implement` excludes the hand of every leaf under `implement`, and `on_fail: implement` sends the ticket to that phase's first leaf.
+- `step` names a leaf by its path, as `implement/tests-red`.
+
+The chapters follow the tree. A phase's chapter holds its steps' chapters and
+nothing else. A leaf's chapter holds its evidence and nothing else, so a
+sub-step costs a chapter and a ticket stays one file.
 
 The implement phase of the standard process shows how a step forces a way of
 working without a word of prose:
 
-| step | the hand does | the engine checks at the hand-back |
+| leaf | the hand does | the engine checks at the hand-back |
 |---|---|---|
 | `tests-red` | writes the tests the ask calls for | the tests the branch adds or changes fail, and the failure is an assertion, with no build fault |
-| `implement` | makes the change | the tree builds and lints |
+| `change` | makes the change | the tree builds and lints |
 | `tests-green` | makes the tests pass | the same tests pass, and the check is green on the commit |
 
 Red for the right reason splits in two. The class of the failure is
@@ -168,14 +203,9 @@ mechanical, and the test verb names it. Whether the assertion names the
 behaviour the ask describes is a judgement, and the judge reads the failing
 assertion against the ask where `judge.enabled` says so.
 
-The body carries one chapter per step, named after it, in route order. Each
-holds two subsections. `Done when` is a list with one criterion a line, and
-`Evidence` is prose. A criterion that a command decides names the command
-after the words `decided by`, and the engine runs it.
-
 Three keywords join the schema checker for this:
 
-- `x-one-per`: a chapter stands for every entry of a named list, under that entry's name
+- `x-one-per`: a chapter stands for every step, nested as the steps nest, under the step's name
 - `x-names`: a field's value names an entry of a named list
 - `x-earlier`: a field names an entry standing before its own
 
@@ -190,13 +220,49 @@ A step with `by: children` belongs to no hand. It ends when the last ticket
 naming this one as `parent` closes. The pull advances the parent the moment it
 accepts that child.
 
+# Evidence has a form
+
+A leaf names its evidence as fields, and each field has a form. The mint
+renders the fields into the leaf's chapter with a comment each. So a person
+sees what goes where, and an agent meets the same slots.
+
+| form | the hand writes | the engine checks |
+|---|---|---|
+| `text` | prose | it holds text |
+| `list` | one item a line | it holds one item at least |
+| `command` | one command line | it runs from the root and answers the exit or the word `expects` carries |
+| `link` | a link or a path | it resolves in the tree or on the branch |
+| `verdict` | `pass` or `fail`, then findings one a line | one of the two words, and findings where it fails |
+
+`expects` names what a command must answer: an exit code, or a word the verb
+prints, such as the test verb's `red`. The engine writes an `answered` line
+under a command field with the exit and the last line. The hand cannot write
+that line, and a criterion with no evidence behind it is guidance, so no form
+takes a tick.
+
+A ticket takes a hand's writing in three places, and each opens with a
+comment that says so:
+
+| place | who writes | when |
+|---|---|---|
+| the ask | the minter, or a person | while the ticket is a draft |
+| a leaf's fields | the hand at that step | while it holds the step |
+| the discussion | anyone | always |
+
+Everything else on the ticket is the engine's. The write door weighs a ticket
+write against the render of the ticket's own frontmatter. It refuses a write
+that changes anything outside those places, and names the line.
+
+A person and an agent meet one form through two doors. The person fills the
+slots in the editor. The agent fills them through the write door, or hands the fields back
+as the pull's payload. Either way the engine writes them into the same slots.
+
 # Evidence per step
 
-The evidence chapter of a step carries what the hand sees and what the engine
-measures. The hand writes prose: what it does, what surprises it, what it
-leaves. The engine appends, at the hand-back:
+A leaf's chapter carries what the hand fills in and what the engine measures.
+The hand fills the fields the leaf names. The engine appends, at the hand-back:
 
-- one line per criterion with a command: the command, its exit and its last line
+- an `answered` line under each command field: the exit and the last line
 - the hand, as the box, the session and the agent where the harness names one
 - the branch tip at the take and at the hand-back, the two hashes v4 writes on a token
 
@@ -204,8 +270,8 @@ The diff of the work is the group's branch, and `git log` on the ticket file
 is its history. So a ticket carries no time and no line number, which v4
 rules, and a reader finds both in git.
 
-A tick stands only where the engine runs the command, because the engine
-writes the mechanical lines and the hand cannot. That answers v4's finding of
+A command field answers only where the engine runs it, because the engine
+writes the `answered` line and the hand cannot. That answers v4's finding of
 a token in the archive with its evidence empty.
 
 The tickets folder stands beside the rationales in `.vale.ini`, so an evidence
@@ -223,9 +289,9 @@ ones a step names, and answers one word and a reason:
 | `red`, build | the file loads no test, because the tree fails to build or to parse |
 | `red`, missing | the branch changes no test, so there is nothing to run |
 
-A `decided by` line names it with the answer it expects, as `work test
---expect red`. The verb reads the delta off git, which is the half of v4's
-test map that a branch already carries.
+A command field names it with `expects: red` or `expects: green`. The verb
+reads the delta off git, which is the half of v4's test map that a branch
+already carries.
 
 # Processes are routes
 
@@ -236,14 +302,14 @@ and nothing more:
 | process | route | for |
 |---|---|---|
 | `trivial` | `do` | a fix small enough that the ask is the design |
-| `standard` | `draft`, `review-design`, `tests-red`, `implement`, `tests-green`, `review-build` | a change that wants an approach first, tests before code, and a second pair of eyes after |
-| `complex` | `split`, `children`, `review-whole` | a change too large to review whole |
+| `standard` | `design` (draft, review), `implement` (tests-red, change, tests-green), `verdict` | a change that wants an approach first, tests before code, and a second pair of eyes after |
+| `complex` | `split`, `children`, `verdict` | a change too large to review whole |
 
 A complex ticket's work is other tickets. Its `split` step writes the children,
 each one trivial, standard or complex, and its done-when says every child
 exists with a process and a group. Its `children` step belongs to nobody, and
-the children run in its place. Its `review-whole` step reads what the children
-add up to. So complexity composes through `parent`, and every route stays
+the children run in its place. Its `verdict` step reads what the children add
+up to. So complexity composes through `parent`, and every route stays
 short.
 
 The mint takes `--process <name>` and copies the route, so the ticket depends
@@ -305,8 +371,8 @@ A pull carries at most two things: the ticket it hands back and a verdict,
 writes its evidence through the write door before it pulls. The other side
 then checks, cheapest first:
 
-1. The ticket passes its schema, and the step's evidence chapter holds text.
-2. Every `decided by` command of the step runs from the root and answers zero.
+1. The ticket passes its schema, and every field of the leaf holds what its form asks.
+2. Every command field of the leaf runs from the root and answers the exit or the word `expects` carries.
 3. The hand may take this step, by the route's `by`.
 4. The judge reads the evidence against the step's guidance, where
    `judge.enabled` says so.
@@ -315,7 +381,7 @@ Then one of three answers comes back:
 
 | answer | when | the hand does |
 |---|---|---|
-| `work` | one step of a ticket, with its guidance inline and the file's path | the step, then pulls again naming it |
+| `work` | one leaf of a ticket, with its fields and its guidance inline and the file's path | the step, then pulls again naming it |
 | `refused` | a check fails, and the findings stand one a line | fixes it, and the ticket stays in hand |
 | `wait` | nothing to hand out, and the reason with it | says so, and stops |
 
@@ -332,11 +398,12 @@ On `pass` the engine does six things in one call:
 On `fail` it sets `step` to the row's `on_fail`, writes the reason on the
 evidence, and reopens the ticket.
 
-A `work` answer says one thing to do. It carries the ask and the current step
-alone, with its done-when and its guidance. It says the position too: which
-step of how many, in which phase. The whole file stands on disk and nothing
-hides it, so a hand that wants the picture reads the file. The pull hands it
-the step.
+A `work` answer says one thing to do, and it hands the leaf, not the whole
+ticket. It carries the ask and the leaf alone: its fields, their forms, and
+what each says. It carries the guidance the leaf and its phases name. It says
+the position too: which leaf of how many, under which phase. It names the
+file and the chapter to write in. The whole file stands on disk and nothing
+hides it, so a hand that wants the picture reads the file.
 
 The pull runs at two levels, and the same rule shape holds at each:
 
@@ -542,6 +609,7 @@ the only fact it meets is a route.
 | a spawn ceiling of zero for delegated writing | v3 | the engine spawns for a step alone, and the session spawns for nothing |
 | controls only ever stop the engine refusing | v3 | stays |
 | notes, then the retro, then the mint | v3 | the mint's privacy check on promotion |
+| the machine builds the form, and a pull carries it back | v3 | the evidence forms, which the mint renders |
 
 # The order of work
 
@@ -569,3 +637,4 @@ wants moved. The old verbs go once the last brief merges.
 - whether yours drowns in parked conditions, and a parked state returns
 - a WIP limit per step, which is Kanban's one knob and stands outside this note
 - whether a guidance card's own items become steps at the mint, which v3 tried as card marking and level two may take up
+- more forms, such as a number or a date, as the routes come to ask for them
