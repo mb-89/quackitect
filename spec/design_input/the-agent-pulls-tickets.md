@@ -580,10 +580,10 @@ sidebar gains one group, `work`, and it holds four controls:
 
 | control | does |
 |---|---|
+| the engine's switch | starts and stops the beat, which is the `engine.state` widget the schema already declares |
 | the editor button | opens the work editor, and carries the count of tickets waiting on you, the way a mail icon carries its unread count |
 | `note` | mints a note in one press, which is the shortcut a hand takes mid-work |
 | `mint` | mints anything else: a ticket by process, or any note a schema in the tree holds |
-| the engine's switch | starts and stops the beat, which is the `engine.state` widget the schema already declares |
 
 The count on the editor button is the declared `count` widget, which the beat
 replaces on every tick. So a person sees that something waits on them with the
