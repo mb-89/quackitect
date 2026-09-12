@@ -1,0 +1,16 @@
+# GENERATED. Edit the source named below, not this file. It is written again
+# every time the tree is projected, so an edit here is lost. Source:
+# spec/schemas/paragraph.schema.yaml
+extends: existence
+message: "This register holds the modals can, must, will. Say what is, or name the one that binds."
+link: spec/funnel/a-paragraph-has-a-schema.md
+level: error
+ignorecase: true
+tokens:
+  - '\bcould\b'
+  - '\bmay\b'
+  - '\bmight\b'
+  - '\bought\b'
+  - '\bshall\b'
+  - '\bshould\b'
+  - '\bwould\b'

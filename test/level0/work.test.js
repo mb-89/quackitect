@@ -97,6 +97,14 @@ test("a dependency reads as a list or on one line, with the prefix dropped", () 
   assert.deepEqual(dependsOn("---\nstatus: todo\n---\n"), []);
 });
 
+// [[spec/design_output/work#urgency-and-what-waits]]
+test("a dependency in a flow list reads without its brackets or its quotes", () => {
+  assert.deepEqual(dependsOn("---\ndepends_on: [one, work/two]\n---\n"), ["one", "two"]);
+  assert.deepEqual(dependsOn('---\ndepends_on: ["one", \'two\']\n---\n'), ["one", "two"]);
+  assert.deepEqual(dependsOn("---\ndepends_on: []\n---\n"), []);
+  assert.deepEqual(dependsOn('---\ndepends_on:\n  - "one"\n---\n'), ["one"]);
+});
+
 // [[spec/design_output/work#a-dependency-waits-for-trunk]]
 test("a branch waits for a dependency until trunk holds it", () => {
   const brief = "---\ndepends_on:\n  - open\n  - busy\n  - ready\n  - merged\n  - gone\n---\n";
@@ -116,7 +124,7 @@ test("a dependency done and unmerged holds its dependent, and merged frees it", 
     ["work/the-schema-reads", said(DONE)],
     ["work/the-schema-refuses", said(TODO, "the-schema-reads")],
   ]);
-  assert.deepEqual(freeNow(briefs), [], "done waits on a person's merge");
+  assert.deepEqual(freeNow(briefs), [], "done waits on a merge");
   assert.deepEqual(freeNow(briefs, new Set(["work/the-schema-reads"])), [
     "work/the-schema-refuses",
   ]);
@@ -370,6 +378,24 @@ test("close holds a trunk carrying commits origin has never seen", () => {
   assert.equal(code, 1);
   assert.match(said, /Push main first/);
   assert.ok(!ranGit(outside).some((one) => one.includes("--delete")));
+});
+
+// [[spec/design_output/work#trunk-comes-in-last-too]]
+test("done refuses a branch trunk stands ahead of, and names the sync", () => {
+  const held = "---\nstatus: held\n---\n\n# The result\n";
+  const behind = doorsSaying(
+    {
+      ...onBranch("work/fix-lsp"),
+      "git rev-list --count HEAD..origin/main": { stdout: "3\n" },
+    },
+    { [HERE]: held, ...green },
+  );
+
+  const { code, said } = heard(() => work(ROOT, ["done"], behind.it));
+  assert.equal(code, 1);
+  assert.match(said, /main holds 3 commit\(s\) work\/fix-lsp lacks/);
+  assert.match(said, /work sync/);
+  assert.equal(statusOf(behind.disk.read(HERE)), "held", "the status stands");
 });
 
 // [[spec/design_output/work#the-battery-answers-first]]

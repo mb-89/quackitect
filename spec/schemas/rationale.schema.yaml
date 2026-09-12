@@ -10,6 +10,9 @@
 
 kind: rationale
 
+governs:
+  - spec/rationales/**
+
 frontmatter:
   type: object
   additionalProperties: false

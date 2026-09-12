@@ -14,5 +14,5 @@ rationale: [[spec/rationales/reviewing]]
 6. Feed a rule something bad and assert it refuses, because a test asserting nothing passes. *
 7. Count a file outside the brief as a fault only where it redesigns what the brief leaves alone. *
 8. Write each answer as one short line, and keep the whole report short enough to skim.
-9. Hand the report back as a list of fixes, and leave the merge to a person. *
+9. Hand the report back as a list of fixes, and merge once every fix lands. *
 10. Run `./RUNME.sh work review <name>` to gather all of this from git.

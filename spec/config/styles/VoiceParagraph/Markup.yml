@@ -1,0 +1,108 @@
+# GENERATED. Edit the source named below, not this file. It is written again
+# every time the tree is projected, so an edit here is lost. Source:
+# spec/schemas/paragraph.schema.yaml
+extends: script
+message: "This markup stands outside what a paragraph admits."
+link: spec/funnel/a-paragraph-has-a-schema.md
+level: error
+scope: raw
+script: |
+  text := import("text")
+
+  matches := []
+
+  blanked := func(said, pattern) {
+    found := text.re_find(pattern, said, -1)
+    if is_undefined(found) { return said }
+    parts := []
+    at := 0
+    for one in found {
+      m := one[0]
+      parts = append(parts, said[at:m.begin])
+      parts = append(parts, text.repeat(" ", m.end - m.begin))
+      at = m.end
+    }
+    parts = append(parts, said[at:])
+    return text.join(parts, "")
+  }
+
+  plain := func(said) {
+    out := said
+    out = blanked(out, `(?s)^---\n.*?\n---`)
+    out = blanked(out, "(?s)```.*?```")
+    out = blanked(out, `(?s)~~~.*?~~~`)
+    out = blanked(out, `(?s)<!--.*?-->`)
+    out = blanked(out, `(?m)^(?:\t| {4,}).*$`)
+    out = blanked(out, "(?s)`[^`]*`")
+    out = blanked(out, `https?://[^\s)]+`)
+    out = blanked(out, `\[\[[^\]]*\]\]`)
+    out = blanked(out, `\[[^\]]*\]\([^)]*\)`)
+    out = blanked(out, `[A-Za-z0-9_.-]+/[A-Za-z0-9_./-]+`)
+    return out
+  }
+
+  rows := func(said) {
+    out := []
+    at := 0
+    for line in text.split(said, "\n") {
+      out = append(out, {said: line, begin: at, end: at + len(line)})
+      at += len(line) + 1
+    }
+    return out
+  }
+
+  words := func(said) {
+    n := 0
+    for one in text.split(said, " ") {
+      if len(text.trim_space(one)) > 0 { n = n + 1 }
+    }
+    return n
+  }
+
+  said := plain(scope)
+
+  for row in rows(said) {
+    line := text.trim_space(row.said)
+
+    if text.re_match(`^#{1,6}\s`, line) {
+      title := text.re_replace(`^#+\s*`, line, "")
+      title = text.re_replace(`^[0-9]+[.)]\s*`, title, "")
+      title = text.re_replace(`[*_]`, title, "")
+      if words(title) > 5 {
+        matches = append(matches, {
+          begin: row.begin,
+          end: row.end,
+          message: "A heading holds 5 words, and this one holds " + string(words(title)) + ". Cut it, and let the prose carry the rest."
+        })
+      }
+      if text.re_match(`\s[-]\s|:\s`, title) {
+        matches = append(matches, {
+          begin: row.begin,
+          end: row.end,
+          message: "A dash or a colon makes a heading into two. Name one thing."
+        })
+      }
+    }
+
+    found := text.re_find(`^[ \t]*(?:[-*+]|[0-9]+[.)])\s+\*\*([^*]+)\*\*`, row.said, 1)
+    if !is_undefined(found) {
+      if words(found[0][1].text) > 4 {
+        matches = append(matches, {
+          begin: row.begin,
+          end: row.end,
+          message: "A strong lead holds 4 words, and this one holds " + string(words(found[0][1].text)) + ". Cut it."
+        })
+      }
+    }
+  }
+
+  outside := text.re_find(`!\[[^\]]*\]\(|</?[A-Za-z][A-Za-z0-9]*(?:\s[^>]*)?>`, said, -1)
+  if !is_undefined(outside) {
+    for one in outside {
+      matches = append(matches, {
+        begin: one[0].begin,
+        end: one[0].end,
+        message: "An image and a tag stand outside the markup a paragraph admits. Write a code span, a link, a fence, a table, a list item, a heading or a strong lead."
+      })
+    }
+  }

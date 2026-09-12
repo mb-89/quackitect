@@ -9,6 +9,9 @@
 
 kind: funnel
 
+governs:
+  - spec/funnel/**
+
 frontmatter:
   type: object
   additionalProperties: false

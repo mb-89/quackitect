@@ -6,25 +6,25 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { isDraft, matches, relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 
-const ROOT = "C:/Users/mb/Desktop/ai/quackitect-v5";
+const ROOT = "C:/Users/one/Desktop/ai/quackitect-v5";
 
 test("a path under the root reads as the root holds it", () => {
   assert.equal(
-    relativeTo(ROOT, "C:/Users/mb/Desktop/ai/quackitect-v5/spec/rationales/a.md"),
+    relativeTo(ROOT, "C:/Users/one/Desktop/ai/quackitect-v5/spec/rationales/a.md"),
     "spec/rationales/a.md",
   );
 });
 
 test("a windows separator answers the one vale reads", () => {
   assert.equal(
-    relativeTo(ROOT, "C:\\Users\\mb\\Desktop\\ai\\quackitect-v5\\spec\\guidance\\a.md"),
+    relativeTo(ROOT, "C:\\Users\\one\\Desktop\\ai\\quackitect-v5\\spec\\guidance\\a.md"),
     "spec/guidance/a.md",
   );
 });
 
 test("a drive letter in either case names the same root", () => {
   assert.equal(
-    relativeTo("c:/users/mb/desktop/ai/quackitect-v5", `${ROOT}/src/scripts/cli.js`),
+    relativeTo("c:/users/one/desktop/ai/quackitect-v5", `${ROOT}/src/scripts/cli.js`),
     "src/scripts/cli.js",
   );
 });

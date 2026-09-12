@@ -255,9 +255,25 @@ get_extensions() {
   done
 }
 
+# THE COMMIT DOOR A PERSON MEETS. Git reads a hook out of core.hooksPath, and
+# .githooks holds this tree's own, so one line points git at it. The Bash door
+# holds the same check for a session, and each stands without the other.
+# [[spec/design_output/private#two-doors-one-check]]
+hooks_folder=".githooks"
+
+hooks_here() {
+  [ "$(cd "$root" && git config --get core.hooksPath 2>/dev/null)" = "$hooks_folder" ]
+}
+
+set_hooks() {
+  say "  pointing git at $hooks_folder"
+  (cd "$root" && git config core.hooksPath "$hooks_folder") || return 1
+  chmod +x "$root/$hooks_folder/pre-commit" 2>/dev/null || true
+}
+
 # A want, rather than a need: the tree still lints and tests without it.
 wanted() {
-  [ "$1" = "vale-ls" ] || [ "$1" = "go" ] ||
+  [ "$1" = "vale-ls" ] || [ "$1" = "go" ] || [ "$1" = "git-hooks" ] ||
     [ "$1" = "editor-link" ] || [ "$1" = "editor-extensions" ] || [ "$1" = "index" ]
 }
 
@@ -268,6 +284,7 @@ missed() {
     index) say "  the index stays unbuilt, so find and links read the files." >&2 ;;
     editor-link) say "  the sidebar stays unlinked, so the editor draws no panel here." >&2 ;;
     editor-extensions) say "  no code on the PATH, so a person takes the recommendation." >&2 ;;
+    git-hooks) say "  git reads its own hooks here, so a hand commit meets no privacy check." >&2 ;;
   esac
 }
 
@@ -281,6 +298,7 @@ here() {
     index) index_here || ! compiler_here >/dev/null ;;
     editor-link) editor_linked ;;
     editor-extensions) extensions_here ;;
+    git-hooks) hooks_here ;;
   esac
 }
 
@@ -294,6 +312,7 @@ why() {
     index) say "index: the warm model of this tree, which find and links ask" ;;
     editor-link) say "editor-link: this tree's own sidebar, linked into the editor and named in its list" ;;
     editor-extensions) say "editor-extensions: the Vale and Biome extensions the tracked settings point at" ;;
+    git-hooks) say "git-hooks: the pre-commit door, so a commit by hand meets the privacy check" ;;
   esac
 }
 
@@ -307,11 +326,12 @@ get() {
     index) get_index ;;
     editor-link) link_editor ;;
     editor-extensions) get_extensions ;;
+    git-hooks) set_hooks ;;
   esac
 }
 
 missing=""
-for one in node vale biome vale-ls go index editor-link editor-extensions; do
+for one in node vale biome vale-ls go index editor-link editor-extensions git-hooks; do
   here "$one" || missing="$missing $one"
 done
 

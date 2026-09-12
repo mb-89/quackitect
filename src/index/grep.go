@@ -137,7 +137,7 @@ func hitsIn(path, text string, shape *regexp.Regexp, ask GrepAsk) FileHits {
 	return one
 }
 
-// [[spec/design_output/index#a-match-may-span-lines]]
+// [[spec/design_output/index#a-match-spans-lines]]
 func acrossLines(path, text string, shape *regexp.Regexp, ask GrepAsk) FileHits {
 	one := FileHits{Path: path, Lines: []Found{}}
 	said := strings.ReplaceAll(text, "\r\n", "\n")
@@ -154,7 +154,7 @@ func acrossLines(path, text string, shape *regexp.Regexp, ask GrepAsk) FileHits 
 	return one
 }
 
-// [[spec/design_output/index#a-match-may-span-lines]]
+// [[spec/design_output/index#a-match-spans-lines]]
 func wholeLines(said string, from, to int) string {
 	start := strings.LastIndexByte(said[:from], '\n') + 1
 	end := strings.IndexByte(said[to:], '\n')
