@@ -108,6 +108,7 @@ import {
   toothOf,
   withoutStopLine,
 } from "../lib/stop.js";
+import { saysGreen, STAMP, stampOf } from "../lib/runs.js";
 import { landsOnTrunk, touchesGit } from "../lib/trunk.js";
 import { deeply, layered } from "../lib/layer.js";
 import { MARKER, pairOf } from "../lib/vehicle.js";
@@ -419,12 +420,31 @@ export function register(on, _options) {
   // [[spec/design_output/work#a-box-writes-its-branch]]
   on("tool.call", { tool: "Bash" }, async ($, e, next) => {
     const said = await (async () => {
-    if (!cloud) return next(e);
     const said = String(e.command ?? "");
     if (!touchesGit(said).commits && !touchesGit(said).pushes) return next(e);
 
     const how = landsOnTrunk(said, await branchNow($), TRUNK);
     if (!how) return next(e);
+
+    // [[spec/design_output/work#a-red-battery-pushes-nothing]]
+    if (how === "push") {
+      const battery = await batteryHere($);
+      if (!battery.green) {
+        await logbook.say("warn", "bash", `refused a push to ${TRUNK} on a red battery`, {
+          tool: "Bash",
+          detail: battery.says,
+        });
+        return {
+          deny: [
+            `${TRUNK} takes a green battery, and ${battery.says}.`,
+            "",
+            "Run `./RUNME.sh check` last, after your final commit. The stamp names",
+            "the commit it ran against, so a commit after it reads stale.",
+          ].join("\n"),
+        };
+      }
+    }
+
     // [[spec/design_output/work#a-box-writes-its-branch]]
     if (!cloud) return next(e);
 
@@ -1442,6 +1462,17 @@ async function offAWorkBranch($) {
 
 async function branchNow($) {
   return await gitSays($, ["rev-parse", "--abbrev-ref", "HEAD"]);
+}
+
+// [[spec/design_output/work#a-red-battery-pushes-nothing]]
+async function batteryHere($) {
+  let text = "";
+  try {
+    text = String(await $.fs.read(STAMP));
+  } catch {
+    return { green: false, says: "no check has run here" };
+  }
+  return saysGreen(stampOf(text), await gitSays($, ["rev-parse", "HEAD"]));
 }
 
 async function readEnv($, names) {

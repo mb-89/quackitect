@@ -1196,6 +1196,22 @@ const DELTA = `diff --git a/spec/guidance/voice.md b/spec/guidance/voice.md
 +Write to ${ADDRESS} where the door refuses.
 `;
 
+// [[spec/design_output/work#a-red-battery-pushes-nothing]]
+function boxAtHead(head, env = {}) {
+  return {
+    exists: (path) => path === VALE,
+    run: (argv) => {
+      if (argv[0] === "node") {
+        return { exitCode: 0, stdout: JSON.stringify(env), stderr: "" };
+      }
+      if (argv[0] === "git" && argv[1] === "rev-parse" && argv[2] === "HEAD") {
+        return { exitCode: 0, stdout: `${head}\n`, stderr: "" };
+      }
+      return { exitCode: 0, stdout: "", stderr: "" };
+    },
+  };
+}
+
 function boxSaying(delta, env = {}) {
   return {
     exists: (path) => path === VALE,
@@ -1240,6 +1256,36 @@ test("a commit whose delta adds nothing private passes the door", async () => {
     "Bash",
   );
   assert.equal(said.deny, undefined);
+});
+
+// [[spec/design_output/work#a-red-battery-pushes-nothing]]
+test("a push to trunk takes a green battery, and a work branch takes none", async () => {
+  const HEAD = "a1b2c3d4e5f6";
+  const it = await started(undefined, boxAtHead(HEAD));
+  const push = { tool: "Bash", command: "git push origin main" };
+  const pushes = () => it.raise("tool.call", push, "Bash");
+  const stamp = (said) => it.files.set(".se/check.json", JSON.stringify(said));
+
+  assert.match(String((await pushes()).deny), /no check has run here/);
+
+  stamp({ sha: "beef", ok: true, clean: true });
+  assert.match(String((await pushes()).deny), /the check ran against beef/);
+
+  stamp({ sha: HEAD, ok: true, clean: false });
+  assert.match(String((await pushes()).deny), /over an unclean tree/);
+
+  stamp({ sha: HEAD, ok: false, clean: true, at: "now" });
+  assert.match(String((await pushes()).deny), /the check answered red/);
+
+  stamp({ sha: HEAD, ok: true, clean: true });
+  assert.equal((await pushes()).deny, undefined, "a green battery pushes trunk");
+
+  const branch = await it.raise(
+    "tool.call",
+    { tool: "Bash", command: "git push origin work/a-thing" },
+    "Bash",
+  );
+  assert.equal(branch.deny, undefined, "a work branch meets no battery");
 });
 
 // [[spec/design_output/private#the-escape]]
