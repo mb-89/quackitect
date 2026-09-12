@@ -1387,7 +1387,7 @@ test("the review tool runs the verb, spawns a reader and answers the report", as
   assert.match(said.result, /^check {6}passes$/m);
   assert.match(said.result, /^retro {6}present$/m);
   assert.match(said.result, /^brief {6}done$/m);
-  assert.match(said.result, /^1 thing to fix, and the merge is a person's\.$/m);
+  assert.match(said.result, /^1 thing to fix\. Run work merge once every fix lands\.$/m);
 });
 
 // [[spec/design_output/review#where-the-spawn-refuses]]
