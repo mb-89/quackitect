@@ -16,3 +16,5 @@ rationale: [[spec/rationales/voice]]
 8. Name the command that answers a count, and write no count a command answers. *
 9. List what a compression cut, each sentence surviving elsewhere or cut on purpose.
 10. Write three or more parallel things one to a line, each with its status. *
+11. Keep out of a tracked file what git may carry nowhere: a name, an address, a date in prose, a path on a disk.
+12. Name the role, and leave the person out: the owner, the agent, the reader, the reviewer, the maintainer.

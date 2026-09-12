@@ -12,6 +12,7 @@ export const WANTED = [
   { name: "vale-ls", asks: ["--version"] },
   { name: "go", asks: ["version"] },
   { name: "git", asks: ["--version"] },
+  { name: "claude", asks: ["--version"] },
   { name: "sh", asks: [] },
   { name: "python", asks: ["--version"], calls: ["python3", "python"] },
 ];

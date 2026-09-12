@@ -17,6 +17,8 @@ const files = disk();
 const DOORS = [
   "session.start",
   "prompt.submit",
+  "prompt.context",
+  "session.compact",
   "tool.call",
   "turn.complete",
   "agent.spawn",

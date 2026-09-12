@@ -3,9 +3,13 @@
 // The caller hands the tree in, so a test drives both over a fake one.
 // [[spec/design_output/schema#the-reader-and-the-checker]]
 
+import { isDraft, matches } from "./paths.js";
+
 export const SCHEMAS = "spec/schemas";
 export const END = ".schema.yaml";
 export const SEVERITY = "error";
+export const LEFT = "warning";
+export const MINT_TOOL = "mint_note";
 
 const HEADING = /^(#{1,6})\s+(.+?)\s*$/;
 const FENCE = /^\s*(```|~~~)/;
@@ -159,14 +163,51 @@ export function kindOf(text) {
   return said ? String(linkless(said)) : "";
 }
 
+// [[spec/design_output/schema#a-schema-names-its-chapters]]
+export function isNoteSchema(said) {
+  return Boolean(said?.kind) && Boolean(said?.body?.sections?.length);
+}
+
 // [[spec/design_output/schema#the-schemas-read-once]]
 export function schemasIn(tree) {
   const out = new Map();
   for (const name of tree.names(SCHEMAS, END)) {
     const said = readYaml(tree.read(`${SCHEMAS}/${name}`));
-    if (said?.kind) out.set(String(said.kind), said);
+    if (isNoteSchema(said)) out.set(String(said.kind), said);
   }
   return out;
+}
+
+// [[spec/design_output/schema#a-folder-names-its-kind]]
+export function governorOf(schemas, path) {
+  const where = String(path ?? "").split("\\").join("/");
+  for (const schema of schemas?.values?.() ?? []) {
+    for (const glob of [schema.governs ?? []].flat()) {
+      if (matches(glob, where)) return schema;
+    }
+  }
+  return null;
+}
+
+// [[spec/design_output/schema#a-folder-names-its-kind]]
+export function strangerFault(text, schema, where) {
+  const held = String(schema?.kind ?? "");
+  const kind = kindOf(text);
+  if (!held || kind === held) return null;
+  if (!kind) {
+    return fault(
+      "Kind",
+      where,
+      1,
+      `${where} names no kind, and the ${held} schema governs this path.`,
+    );
+  }
+  return fault(
+    "Kind",
+    where,
+    1,
+    `${where} reads as a ${kind}, and the ${held} schema governs this path.`,
+  );
 }
 
 // [[spec/design_output/schema#a-finding-names-the-section]]
@@ -410,6 +451,46 @@ export function itemsIn(rows) {
   return out;
 }
 
+// [[spec/design_output/schema#a-placeholder-stands-at-warning]]
+export function placeholderFaults(text, schema, where) {
+  const rows = String(text ?? "").split(/\r?\n/);
+  const note = readNote(text);
+  const props = schema?.frontmatter?.properties ?? {};
+  const out = [];
+
+  for (const [key, line] of Object.entries(note.front.lines ?? {})) {
+    const rule = props[key];
+    if (!rule || rule.const !== undefined || Array.isArray(rule.enum)) continue;
+    if (String(rows[line - 1] ?? "").trim() !== `${key}: ${minted(rule)}`) continue;
+    out.push(left(where, line, key));
+  }
+
+  const named = new Map(
+    (schema?.body?.sections ?? [])
+      .filter((one) => one.description)
+      .map((one) => [one.header, `<!-- ${one.description} -->`]),
+  );
+  for (const held of note.sections) {
+    const said = named.get(held.header);
+    if (!said) continue;
+    const at = held.own.findIndex((line) => String(line).trim() === said);
+    if (at < 0) continue;
+    out.push(left(where, held.line + at + 1, held.header));
+  }
+  return out;
+}
+
+function left(file, line, what) {
+  return {
+    file,
+    rule: "Schema.Placeholder",
+    line,
+    column: 1,
+    message: `${what} still carries the placeholder mint writes. Say what stands there.`,
+    severity: LEFT,
+  };
+}
+
 // [[spec/design_output/schema#the-sweep-over-the-tree]]
 export function schemaFaults(tree) {
   const schemas = schemasIn(tree);
@@ -420,6 +501,12 @@ export function schemaFaults(tree) {
     if (!path.endsWith(".md")) continue;
     const text = tree.read(path);
     const kind = kindOf(text);
+    const governor = governorOf(schemas, path);
+
+    if (governor && governor.kind !== kind) {
+      out.push(strangerFault(text, governor, path));
+      continue;
+    }
     if (!kind) continue;
 
     const schema = schemas.get(kind);
@@ -435,6 +522,7 @@ export function schemaFaults(tree) {
       continue;
     }
     out.push(...checkNote(text, schema, path));
+    out.push(...placeholderFaults(text, schema, path));
   }
   return out;
 }
@@ -444,7 +532,7 @@ export function schemasFrom(files) {
   const out = new Map();
   for (const one of files ?? []) {
     const said = readYaml(one.text);
-    if (said?.kind) out.set(String(said.kind), said);
+    if (isNoteSchema(said)) out.set(String(said.kind), said);
   }
   return out;
 }
@@ -459,17 +547,43 @@ export function refusedNote(where, kind, found) {
   ].join("\n");
 }
 
+// [[spec/design_output/schema#a-folder-names-its-kind]]
+export function refusedKind(where, schema, found) {
+  const kind = String(schema?.kind ?? "");
+  return [
+    `${SCHEMAS}/${kind}${END} governs ${where}, and it refuses this write.`,
+    "",
+    `  ${where}:${found.line}:${found.column}  ${found.rule}`,
+    `    ${found.message}`,
+    "",
+    `Call ${MINT_TOOL} with kind ${kind}, this path and the fields, and it writes the note.`,
+    "A draft named _name.md stands outside every rule while a kind settles.",
+  ].join("\n");
+}
+
 // [[spec/design_output/schema#mint-writes-a-valid-note]]
-export function mintNote(schema) {
+export function mintNote(schema, fields) {
   const spec = schema?.frontmatter ?? {};
   const props = spec.properties ?? {};
+  const given = handedIn(fields);
+  const required = spec.required ?? [];
   const rows = ["---"];
-  for (const key of spec.required ?? []) rows.push(`${key}: ${minted(props[key])}`);
+
+  for (const key of required) rows.push(`${key}: ${saidFor(key, props[key], given)}`);
+  for (const key of Object.keys(props)) {
+    if (required.includes(key) || !given.has(slugOf(key))) continue;
+    rows.push(`${key}: ${saidFor(key, props[key], given)}`);
+  }
   rows.push("---", "");
 
   const hashes = "#".repeat(schema?.body?.headingLevel ?? 1);
   for (const one of schema?.body?.sections ?? []) {
     rows.push(`${hashes} ${one.header}`, "");
+    const said = given.get(slugOf(one.header));
+    if (said !== undefined && String(said).trim()) {
+      rows.push(String(said).trim(), "");
+      continue;
+    }
     if (one.description) rows.push(`<!-- ${one.description} -->`, "");
     if (one.list)
       rows.push(
@@ -478,6 +592,127 @@ export function mintNote(schema) {
       );
   }
   return `${rows.join("\n").trimEnd()}\n`;
+}
+
+// [[spec/design_output/schema#the-fields-a-caller-names]]
+export function slugOf(said) {
+  return String(said ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function handedIn(fields) {
+  const out = new Map();
+  if (!fields || typeof fields !== "object" || Array.isArray(fields)) return out;
+  for (const [key, value] of Object.entries(fields)) out.set(slugOf(key), value);
+  return out;
+}
+
+function saidFor(key, rule, given) {
+  if (rule?.const !== undefined) return minted(rule);
+  const said = given.get(slugOf(key));
+  if (said === undefined || String(said).trim() === "") return minted(rule);
+  return written(said, rule);
+}
+
+function written(said, rule) {
+  const list = [said].flat().filter((one) => String(one).trim() !== "");
+  const each = list.map((one) =>
+    rule?.["x-link"] && !LINK.test(String(one).trim())
+      ? `[[${String(one).trim()}]]`
+      : String(one).trim(),
+  );
+  if (Array.isArray(said) || [rule?.type].flat().includes("array")) {
+    return `[${each.map((one) => `"${one}"`).join(", ")}]`;
+  }
+  return each[0] ?? "";
+}
+
+// [[spec/design_output/schema#the-fields-a-caller-names]]
+export function fieldsIn(argv, schema) {
+  const named = new Map();
+  for (const key of Object.keys(schema?.frontmatter?.properties ?? {})) {
+    named.set(slugOf(key), key);
+  }
+  for (const one of schema?.body?.sections ?? []) named.set(slugOf(one.header), one.header);
+
+  const fields = {};
+  for (const arg of argv ?? []) {
+    const pair = /^--([^=]+)=([\s\S]*)$/.exec(String(arg));
+    if (!pair) continue;
+    const key = named.get(slugOf(pair[1]));
+    if (!key) {
+      return {
+        why: `${pair[1]} names no field of a ${schema?.kind} note. It takes ${[...named.values()].join(", ")}.`,
+      };
+    }
+    fields[key] = pair[2];
+  }
+  return { fields };
+}
+
+// [[spec/design_output/schema#the-tool-writes-the-note]]
+export function mintSpec(schemas) {
+  const kinds = [...(schemas?.keys?.() ?? [])].sort();
+  return {
+    name: MINT_TOOL,
+    description: [
+      "Writes a new note of a kind, in the shape its schema names. Hand the",
+      "frontmatter values and the text under each chapter in fields, by header.",
+      "A field left out takes the placeholder its schema describes, which the",
+      "sweep names at warning until you fill it in. The tool runs the checker",
+      `over what it writes, and no file lands where the schema refuses it. ${SCHEMAS}`,
+      `holds ${kinds.join(", ")}.`,
+    ].join(" "),
+    inputSchema: {
+      type: "object",
+      properties: {
+        kind: {
+          type: "string",
+          enum: kinds,
+          description: "the kind of note, which names the schema it is minted from",
+        },
+        path: {
+          type: "string",
+          description: "where the note lands, such as spec/funnel/a-name.md",
+        },
+        fields: {
+          type: "object",
+          description:
+            "the frontmatter values and the text under each chapter, keyed by field name and by header",
+        },
+      },
+      required: ["kind", "path"],
+    },
+  };
+}
+
+// [[spec/design_output/schema#the-tool-writes-the-note]]
+export function mintedNote(schemas, ask) {
+  const kind = String(ask?.kind ?? "").trim();
+  const path = String(ask?.path ?? "").trim();
+  const kinds = [...(schemas?.keys?.() ?? [])].sort().join(", ");
+
+  if (!kind || !path) {
+    return { why: `${MINT_TOOL} takes a kind and a path. ${SCHEMAS} holds ${kinds}.` };
+  }
+  if (!path.endsWith(".md")) return { why: `${path} names no markdown file.` };
+
+  const schema = schemas.get(kind);
+  if (!schema) return { why: `${SCHEMAS} holds no ${kind}. It holds ${kinds}.` };
+
+  const governor = isDraft(path) ? null : governorOf(schemas, path);
+  if (governor && governor.kind !== kind) {
+    return {
+      why: `${governor.kind} governs ${path}, and this note names ${kind}. Name a path the ${kind} schema governs.`,
+    };
+  }
+
+  const text = mintNote(schema, ask?.fields);
+  const found = checkNote(text, schema, path);
+  if (found.length) return { why: refusedNote(path, kind, found), found };
+  return { text, path, kind, left: placeholderFaults(text, schema, path) };
 }
 
 function minted(rule) {
