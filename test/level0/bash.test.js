@@ -10,13 +10,15 @@ import {
   commitIn,
   findings,
   reaches,
+  skipsTheHook,
   testIn,
   VERBS,
   verbLine,
   writesAPath,
 } from "../../.claude/skills/level0/lib/bash.js";
 
-const rules = (command, most = 5) => findings(command, most).map((one) => one.rule);
+const rules = (command, most = 5, it = {}) =>
+  findings(command, most, it).map((one) => one.rule);
 const paths = (command) => writesAPath(command).map((one) => one.path);
 
 test("the rules reach a prose file and a code file, and stop at the ignored roots", () => {
@@ -269,6 +271,34 @@ test("every refusal names the rule, what it reads and the road that works", () =
     assert.match(one.message, /Write|Edit|RUNME|git commit -m|node --test/, said);
     assert.equal(one.severity, "error");
   }
+});
+
+// [[spec/design_output/private#the-escape]]
+test("the reader finds no-verify in every form the flag takes", () => {
+  for (const said of [
+    'git commit --no-verify -m "one"',
+    'git commit -n -m "one"',
+    'git commit -an -m "one"',
+    "git -C . commit --no-verify --amend --no-edit",
+    'git add -A && git commit -n -m "one"',
+  ]) {
+    assert.equal(skipsTheHook(said), true, said);
+  }
+  for (const said of [
+    'git commit -m "one"',
+    'git commit -m "no verify here"',
+    'git commit -am "nothing"',
+    "git push --no-verify",
+    "git commit --amend --no-edit",
+  ]) {
+    assert.equal(skipsTheHook(said), false, said);
+  }
+});
+
+test("a cloud box refuses the escape, and a desk box reads no rule in it", () => {
+  const said = 'git commit --no-verify -m "one"';
+  assert.deepEqual(rules(said, 5, { cloud: true }), ["CommitMeetsTheDoor"]);
+  assert.deepEqual(rules(said), []);
 });
 
 // [[spec/design_output/bash#the-description-names-verbs]]

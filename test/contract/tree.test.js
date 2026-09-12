@@ -115,17 +115,20 @@ test("this tree breaks none of the rules over two files", () => {
   assert.deepEqual(treeFaults(here), []);
 });
 
+// [[spec/design_output/private#a-fixture-carries-no-shape]]
+const FNORDWICK_HOME = ["C:/Users", "fnordwick"].join("/");
+
 // [[spec/design_output/private#the-box-names-the-owner]]
 test("a tracked file carrying a name off this box is refused", () => {
   const seed = {
-    "test/level0/paths.test.js": 'const ROOT = "C:/Users/fnordwick/ai";\n',
+    "test/level0/paths.test.js": `const ROOT = "${FNORDWICK_HOME}/ai";\n`,
     "spec/guidance/one.md": "The maintainer reaches nobody at all here.\n",
   };
   const paths = ["test/level0/paths.test.js", "spec/guidance/one.md"];
   const found = nothingPrivateTravels(
     fakeTree(seed, paths, NODE, {
       user: "fnordwick",
-      home: "C:/Users/fnordwick",
+      home: FNORDWICK_HOME,
       name: "Fnordwick",
       email: "fnordwick@example.com",
     }),
@@ -166,9 +169,10 @@ test("a box naming nobody reads clean, and so does this tree", () => {
   assert.deepEqual(nothingPrivateTravels(here), []);
 });
 
+// [[spec/design_output/private#a-fixture-carries-no-shape]]
 test("a name standing inside a longer word carries no person", () => {
-  const seed = { "spec/funnel/one.md": "Combine the two, and the number holds.\n" };
-  const box = { user: "mb", home: "/home/mb", name: "", email: "" };
+  const seed = { "spec/funnel/one.md": "The oxygen in the galaxy holds.\n" };
+  const box = { user: "xy", home: ["/home", "xy"].join("/"), name: "", email: "" };
   assert.deepEqual(
     nothingPrivateTravels(fakeTree(seed, ["spec/funnel/one.md"], NODE, box)),
     [],

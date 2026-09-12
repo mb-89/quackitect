@@ -49,6 +49,7 @@ const SHELLS = new Set(["sh", "bash", "zsh", "dash"]);
 const READERS = new Set(["python", "python3", "node", "ruby", "perl", "php", "deno"]);
 const RUNNERS = new Set(["npm", "pnpm", "yarn", "bun"]);
 
+const VALUED = ["m", "F", "C", "c", "t", "S", "u"];
 const IN_PLACE = /^(--in-place(=.*)?|-[A-Za-z]*i[A-Za-z]*(\.\S+)?)$/;
 const CARRIED = [
   "-C",
@@ -118,6 +119,19 @@ export function commitIn(command) {
   return null;
 }
 
+// [[spec/design_output/private#the-escape]]
+export function skipsTheHook(command) {
+  for (const one of partsOf(command).segments) {
+    const words = wordsIn(one);
+    if (baseName(words[0]) !== "git") continue;
+
+    const rest = afterGit(words);
+    if (rest[0] !== "commit") continue;
+    if (steps(rest.slice(1))) return true;
+  }
+  return false;
+}
+
 // [[spec/design_output/bash#a-branch-name-holds-five]]
 export function branchIn(command) {
   const out = [];
@@ -178,7 +192,7 @@ export function addsIn(command) {
   return out;
 }
 
-export function findings(command, most) {
+export function findings(command, most, it = {}) {
   const said = String(command ?? "");
   const out = [];
 
@@ -223,6 +237,16 @@ export function findings(command, most) {
     );
   }
 
+  if (it.cloud && skipsTheHook(said)) {
+    out.push(
+      row(said, "CommitMeetsTheDoor", "--no-verify", [
+        "The pre-commit hook holds the privacy check, and this flag steps past it.",
+        "A cloud box carries no person, so the flag stays home here: drop it, and",
+        "commit through the door.",
+      ]),
+    );
+  }
+
   const commit = commitIn(said);
   if (commit?.form === "none") {
     out.push(
@@ -238,13 +262,14 @@ export function findings(command, most) {
 
 // [[spec/design_output/bash#the-description-names-verbs]]
 export function verbLine() {
+  const verbs = VERBS.map((one) => `./RUNME.sh ${one}`).join(", ");
   return [
-    "This tree owns its own verbs, and each one runs the checks that belong to it:",
-    VERBS.map((one) => `./RUNME.sh ${one}`).join(", "),
-    ". Reach for the verb before the raw command. Level zero refuses a shell write",
-    "to a file the rules reach, a commit carrying no message, a branch name past",
-    "five words, and a test run naming no file.",
-  ].join("");
+    `This tree owns its own verbs, and each one runs the checks that belong to it: ${verbs}.`,
+    "Reach for the verb before the raw command.",
+    "Level zero refuses a shell write to a file the rules reach, a commit carrying",
+    "no message, a branch name past five words, a test run naming no file, and a",
+    "commit whose delta carries something private.",
+  ].join(" ");
 }
 
 function writesIn(segment, bodies) {
@@ -506,6 +531,18 @@ function valueOf(arg, next, flags) {
     }
   }
   return { found: false };
+}
+
+function steps(args) {
+  for (const arg of args) {
+    if (arg === "--no-verify") return true;
+    if (!/^-[A-Za-z]+$/.test(arg)) continue;
+    for (const letter of arg.slice(1)) {
+      if (letter === "n") return true;
+      if (VALUED.includes(letter)) break;
+    }
+  }
+  return false;
 }
 
 function narrowed(args) {

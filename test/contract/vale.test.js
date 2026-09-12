@@ -121,13 +121,17 @@ ifVale(
   },
 );
 
+// [[spec/design_output/private#a-fixture-carries-no-shape]]
+const SECRETS = ["/home", "fnordwick", "secrets"].join("/");
+const CALLED = ["+49 30", "1234 5678"].join(" ");
+
 // [[spec/design_output/private#the-shapes]]
 ifVale("the shapes rule refuses an address, a number, a date and a home path", async () => {
   for (const said of [
     "Reach the owner at somebody@example.com when the box stalls.",
-    "Call +49 30 1234 5678 about it, and say what stalls.",
+    `Call ${CALLED} about it, and say what stalls.`,
     "Measured on 2026-09-10 against client 2.1.267, on a cloud box.",
-    "The probe writes under /home/fnordwick/secrets and reads it back.",
+    `The probe writes under ${SECRETS} and reads it back.`,
     "A box answers C:\\Users\\fnordwick\\Desktop as the home folder there.",
   ]) {
     assert.ok((await ruled(said)).includes("Private"), said);
@@ -138,7 +142,7 @@ ifVale("a nobody user, a version and an example pass the shapes rule", async () 
   for (const said of [
     "A cloud box writes under /home/user, and a fixture writes /Users/one.",
     "Client 2.1.267 stands the same way, and the number 1024 passes.",
-    "    the indented example: 2026-09-08 and /home/fnordwick/secrets\n",
+    `    the indented example: 2026-09-08 and ${SECRETS}\n`,
   ]) {
     assert.ok(!(await ruled(said)).includes("Private"), said);
   }
