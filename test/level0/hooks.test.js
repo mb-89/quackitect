@@ -571,6 +571,9 @@ test("out of god mode the same refusal stands", async () => {
 const NOTE_SCHEMA = [
   "kind: design_output",
   "",
+  "governs:",
+  "  - spec/design_output/**",
+  "",
   "frontmatter:",
   "  type: object",
   "  required:",
@@ -585,6 +588,7 @@ const NOTE_SCHEMA = [
   "  sections:",
   "    - header: Scope",
   "      required: true",
+  "      description: what this note covers",
   "",
 ].join("\n");
 
@@ -619,6 +623,109 @@ test("a note meeting its schema passes, and so does a draft", async () => {
     content: SHAPELESS,
   });
   assert.equal(draft.deny, undefined);
+});
+
+// [[spec/design_output/schema#a-folder-names-its-kind]]
+test("the door refuses a kind-less file in a governed folder, and names the road", async () => {
+  const it = await started({ "spec/schemas/design_output.schema.yaml": NOTE_SCHEMA });
+  const said = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/design_output/bare.md",
+    content: "# A file carrying no kind\n",
+  });
+  assert.match(said.deny ?? "", /^spec\/schemas\/design_output\.schema\.yaml governs spec\/design_output\/bare\.md/);
+  assert.match(said.deny, /Schema\.Kind/);
+  assert.match(said.deny, /names no kind/);
+  assert.match(said.deny, /mint_note/);
+  assert.ok(it.lines().some((one) => /refused a stranger/.test(one.said)));
+});
+
+test("the door refuses a note of another kind in a governed folder", async () => {
+  const it = await started({ "spec/schemas/design_output.schema.yaml": NOTE_SCHEMA });
+  const said = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/design_output/wrong.md",
+    content: "---\nkind: [[guidance]]\n---\n\n# Scope\n\nA note of another kind.\n",
+  });
+  assert.match(said.deny ?? "", /reads as a guidance, and the design_output schema governs this path/);
+});
+
+test("a kind-less file outside every governed folder passes, and so does a draft inside one", async () => {
+  const it = await started({ "spec/schemas/design_output.schema.yaml": NOTE_SCHEMA });
+  const outside = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "AGENTS.md",
+    content: "# Notes for this project\n",
+  });
+  assert.equal(outside.deny, undefined);
+  const parked = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/design_output/_bare.md",
+    content: "# A draft carrying no kind\n",
+  });
+  assert.equal(parked.deny, undefined);
+});
+
+// [[spec/design_output/schema#the-tool-writes-the-note]]
+test("the tool writes the note, and the checker passes what it writes", async () => {
+  const it = await started({ "spec/schemas/design_output.schema.yaml": NOTE_SCHEMA });
+  const said = await it.raise(
+    "tool.call",
+    {
+      tool: "mcp__level0__mint_note",
+      kind: "design_output",
+      path: "spec/design_output/fresh.md",
+      fields: { Scope: "What this note covers." },
+    },
+    "mcp__level0__mint_note",
+  );
+  assert.match(said.result, /^spec\/design_output\/fresh\.md stands, in the shape design_output names\./);
+  assert.equal(
+    it.files.get("spec/design_output/fresh.md"),
+    "---\nkind: [[design_output]]\n---\n\n# Scope\n\nWhat this note covers.\n",
+  );
+  assert.ok(it.lines().some((one) => one.kind === "schema"));
+});
+
+test("a field the tool never takes leaves a placeholder, and the answer names it", async () => {
+  const it = await started({ "spec/schemas/design_output.schema.yaml": NOTE_SCHEMA });
+  const said = await it.raise(
+    "tool.call",
+    {
+      tool: "mcp__level0__mint_note",
+      kind: "design_output",
+      path: "spec/design_output/fresh.md",
+    },
+    "mcp__level0__mint_note",
+  );
+  assert.match(said.result, /Schema\.Placeholder/);
+  assert.match(it.files.get("spec/design_output/fresh.md"), /<!-- what this note covers -->/);
+});
+
+test("the tool writes nothing where a path stands already, or a kind reaches no schema", async () => {
+  const it = await started({
+    "spec/schemas/design_output.schema.yaml": NOTE_SCHEMA,
+    "spec/design_output/door.md": SHAPED,
+  });
+  const stood = await it.raise(
+    "tool.call",
+    {
+      tool: "mcp__level0__mint_note",
+      kind: "design_output",
+      path: "spec/design_output/door.md",
+    },
+    "mcp__level0__mint_note",
+  );
+  assert.match(stood.result, /stands already/);
+  assert.equal(it.files.get("spec/design_output/door.md"), SHAPED);
+
+  const stranger = await it.raise(
+    "tool.call",
+    { tool: "mcp__level0__mint_note", kind: "stranger", path: "spec/design_output/x.md" },
+    "mcp__level0__mint_note",
+  );
+  assert.match(stranger.result, /holds no stranger/);
+  assert.equal(it.files.has("spec/design_output/x.md"), false);
 });
 
 test("an edit is weighed as the whole file it leaves behind", async () => {

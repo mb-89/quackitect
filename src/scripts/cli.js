@@ -612,7 +612,7 @@ function project() {
 }
 
 // [[spec/design_output/schema#mint-writes-a-valid-note]]
-// [[spec/design_output/schema#the-fields-a-person-and-a-session-hand-in]]
+// [[spec/design_output/schema#the-fields-a-caller-names]]
 function mint(argv) {
   const [kind, path] = argv.filter((one) => !one.startsWith("-"));
   const schemas = schemasIn(treeHere());

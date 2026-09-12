@@ -1492,7 +1492,8 @@ function leftIn(made) {
 
 async function stands($, path) {
   try {
-    return Boolean(await $.fs.exists(path));
+    await $.fs.read(path);
+    return true;
   } catch {
     return false;
   }

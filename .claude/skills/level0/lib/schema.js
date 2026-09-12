@@ -594,7 +594,7 @@ export function mintNote(schema, fields) {
   return `${rows.join("\n").trimEnd()}\n`;
 }
 
-// [[spec/design_output/schema#the-fields-a-person-and-a-session-hand-in]]
+// [[spec/design_output/schema#the-fields-a-caller-names]]
 export function slugOf(said) {
   return String(said ?? "")
     .toLowerCase()
@@ -628,7 +628,7 @@ function written(said, rule) {
   return each[0] ?? "";
 }
 
-// [[spec/design_output/schema#the-fields-a-person-and-a-session-hand-in]]
+// [[spec/design_output/schema#the-fields-a-caller-names]]
 export function fieldsIn(argv, schema) {
   const named = new Map();
   for (const key of Object.keys(schema?.frontmatter?.properties ?? {})) {
