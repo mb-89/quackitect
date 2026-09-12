@@ -7,75 +7,53 @@ depends_on: [the-answer-gate-bites, the-schema-projects-vale]
 
 # Where it stands
 
-The funnel note `spec/funnel/a-paragraph-has-a-schema.md` names six branches,
-and this is the fifth. Read its two chapters on the question and the bottom
-line first. The note stands on the branch `claude/friendly-brown-k6kohy` until
-the owner merges it, so take that branch in where `work sync` leaves the note
-absent.
+The answer register holds its two opening blocks, and `./RUNME.sh check` passes
+over 746 tests. The fifth branch of
+[[spec/funnel/a-paragraph-has-a-schema]] stands complete.
 
-The gate from the fourth branch re-prompts over the ceiling and carries a
-warning forward, and `check_answer` lints a draft. The projector from the
-second branch writes the answer register's rules. `lib/answer.js` holds the
-door that reads a person's prompt and refuses the first tool call before a
-readback. This branch gives the answer register its two opening blocks.
+| the piece | where it lives | what proves it |
+|---|---|---|
+| the question count | `questionsIn` in `lib/answer.js`, called at `prompt.submit` | `test/level0/answer.test.js`, and the hook test drives it to the gate |
+| the question table | `tableFaults` in `lib/answer.js`, read by the gate and by `check_answer` | `test/level0/hooks.test.js`, over a prompt carrying two questions |
+| the TL;DR list | `opening` in `lib/paragraph.js`, which writes `ShapeAnswer.yml` | `test/contract/paragraph.test.js`, through the real Vale |
+| the guidance line | rule 13 of `spec/guidance/voice.md` | the note stands at 13 rules under a cap of 15 |
+
+The design chapters stand under `spec/design_output/level0.md` and
+`spec/design_output/projection.md`, and the code points at them.
 
 # What waits
 
-| the piece | where | proves it |
-|---|---|---|
-| the question count | `lib/answer.js`, at `prompt.submit` | a prompt with two questions counts two, and a question inside a fence counts none |
-| the question table | `lib/answer.js`, read by the gate and by `check_answer` | an answer opening with prose refuses under a count of two |
-| the TL;DR list | the answer register, in the schema and its projection | an answer opening with a heading refuses |
-| the guidance line | `spec/guidance/voice.md` | the note stays under its cap |
+| the thing | why |
+|---|---|
+| the sixth branch | `BottomLineFirst` and `ShapeFits` join `VoiceJudged`, and `spec/requirements` takes its modals |
+| the measurement | `.se/scripts/measure.sh` reads the delta this branch makes, over the answers of a session running under it |
+| the funnel row | the branch table of the funnel note carries no status, so a reader counts the branches by hand |
 
-# The question table
+# What surprises me
 
-`prompt.submit` from a person, by the kinds `opensATurn` names, counts the
-sentences of the prompt closing on `?` outside a fence. The count holds for the
-turn, and a plugin prompt leaves it as it stands.
+- The write door lints an edit fragment alone, so an edit adding rule 13 to
+  `spec/guidance/voice.md` meets `GuidanceChapter`. Write the whole note instead.
+- `CodeComment` refuses a comment line carrying no `[[link]]`, so a two line
+  comment needs the link on both lines. One pointer line does the job.
+- The commit door refuses the attribution trailer a harness asks for. The
+  address reads as private, and the angle brackets stand outside the character
+  set, so every commit here carries the message alone.
+- `check_answer` and the gate now score one finding from `lib/answer.js` beside
+  the findings of Vale. The score is a rate over words, so a short answer with
+  no table reads far over the ceiling.
 
-At the turn's end, and in `check_answer`, the first block of the answer has to
-be a table. Its header row reads `question` and `answer`, and its body holds at
-least as many rows as the count. A count of zero demands no table. This check
-lives in `lib/answer.js` beside the door, because Vale reads no session state.
+# The dead ends
 
-A question the session cannot answer still gets its row, and the answer cell
-says what blocks it.
+- The first plan hands the TL;DR list its own rule file. That costs four edits
+  to `.vale.ini`, one per section standing the answer rules off, so the check
+  lands in `ShapeAnswer.yml` the way the brief says.
+- Folding the check into `ShapeAnswer.yml` breaks two fixtures that open an
+  answer with a heading or with prose. Both now open with a list, which is the
+  shape the rule asks for.
 
-# The TL;DR list
+# Read it by eye
 
-After the question table, or first where no table stands, the answer opens
-with a list. Each item is one sentence, and no heading stands before the list.
-The schema's answer register names this under `opens`. The projection writes
-it as a rule in the answer variant of `Shape.yml`, so the same rule reads a
-draft and the answer.
-
-The rest of the answer follows under headings, and the rules the tree holds
-already read that part.
-
-# How to build it
-
-Test the count as a pure function over prompt text. Test the table check as a
-pure function over answer text and a count. Test the list rule through Vale
-with a fixture answer that opens with a heading, and one that opens with a
-list. Then run one session under this branch and read its first three answers
-by eye. The shape is the point, and the numbers say little about it.
-
-## How this branch runs
-
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
-
-1. Run `./RUNME.sh work sync` FIRST. It takes main into this branch, so
-   an old branch works against what the tree holds now. Resolve any conflict
-   before you start, because a conflict found later costs the work already
-   done.
-2. Commit and push each time you finish a thing. A cloud box dies and takes
-   its working tree with it.
-3. Write your result and your retro into `HANDOVER.md`, at the root, replacing
-   this brief. Say what surprises you and every dead end you walk into.
-4. Run `./RUNME.sh work done`, which sets the status and pushes.
-5. Run `./RUNME.sh work release` instead where you stop early, so the branch
-   goes back to `todo` for somebody else.
-6. Leave the merge into main to a person. A cloud box opens no pull
-   request, and trunk only ever comes towards you.
+Run a session under this branch and watch the first three answers. A prompt
+carrying a question mark demands the table, and every answer opens with a list.
+The gate names `QuestionTable` where the table goes missing, and `ShapeAnswer`
+where the list does.
