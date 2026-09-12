@@ -10,6 +10,7 @@ reads one, how it weighs a note against one, and what it answers.
 | the piece | where |
 |---|---|
 | the reader and the checker | `.claude/skills/level0/lib/schema.js` |
+| the ticket door | `.claude/skills/level0/lib/ticket.js` |
 | the sweep, beside the tree rules | `src/scripts/cli.js` |
 | the underscore skip | `lib/paths.js`, and every caller of it |
 | the `mint` verb | `src/scripts/cli.js` |
@@ -371,3 +372,39 @@ A departure stands refused, and the refusal names each finding and two ways on:
 
 A stranger in a governed folder takes its own refusal, `refusedKind`, which
 names the schema file, the finding and `mint_note` as the road.
+
+# The verbs own three fields
+
+A property naming `x-engine: true` belongs to the verbs, and an agent's write to
+it stands refused. Four carry it on a ticket:
+
+| field | who writes it |
+|---|---|
+| `state` | the mint, the pull at every hand-off, and a person |
+| `step` | the pull, as the row of the route the ticket stands on |
+| `steps` | the mint, `work reroute`, and a person |
+| `record` | the pull, at the hand-back |
+
+`verbFaults` compares the old value against the new one, so a write leaving a
+field where it stands reaches no rule. A person's editor meets no door here, so a
+person edits what they like.
+
+# The three places
+
+`ticketFaults(was, now, schema, where)` weighs a ticket write against the render
+of the ticket's own frontmatter. A body section names who writes it, and the door
+reads that and nothing of its own:
+
+| `x-written` | the place | when a hand writes it |
+|---|---|---|
+| `draft` | the `Ask` chapter | while `state` reads `draft` |
+| `hand` | the fields of the leaf `step` names | while the ticket stands there |
+| `anyone` | the `Discussion` chapter | always |
+
+`placesIn` reads the route, finds the leaf `step` names, and answers the heading
+of each of its evidence fields. A chapter outside that set stands refused where
+the write changes its lines. So a phase's chapter, another leaf's fields and the
+ask of an open ticket are the engine's.
+
+A file the door finds empty is a mint, and the mint writes every place at once.
+So the rule reaches the second write and no first one.

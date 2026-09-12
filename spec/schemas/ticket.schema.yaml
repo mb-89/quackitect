@@ -37,6 +37,7 @@ frontmatter:
 
     state:
       enum: [draft, open, closed]
+      x-engine: true
       description: whether anybody pulls it, and the pull writes this
 
     reason:
@@ -51,10 +52,12 @@ frontmatter:
       type: string
       x-names: steps
       x-leaf: true
+      x-engine: true
       description: the leaf of the route this ticket stands on, as a path
 
     steps:
       type: array
+      x-engine: true
       description: the route, as a tree of steps in the order a hand meets them
       default:
         - name: do
@@ -173,7 +176,8 @@ frontmatter:
 
     record:
       type: array
-      description: the engine's entry per leaf handed back, and no hand writes it
+      x-engine: true
+      description: the engine's entry per leaf the pull takes, and no hand writes it
 
     group:
       type: string
@@ -200,11 +204,14 @@ body:
   sections:
     - header: Ask
       required: true
+      x-written: draft
       description: what this ticket asks for, and what done looks like
 
     - x-one-per: steps
+      x-written: hand
 
     - header: Discussion
       required: true
       position: last
+      x-written: anyone
       description: what anybody adds, at any time, on this ticket
