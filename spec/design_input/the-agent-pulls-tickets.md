@@ -137,17 +137,17 @@ differs: its own reads, its own hand rule, and the form of its evidence.
 
     steps:
       - name: design
-        reads: [[spec/guidance/writing]]
+        reads: [[spec/guidance/voice]]
         steps:
           - name: draft
-            does: writes the design input the ask calls for
+            does: writes the approach the ask calls for
             evidence:
-              - name: note
-                form: link
-                says: the design input this step writes
+              - name: approach
+                form: text
+                says: the approach here where it takes minutes, or a link to the design output where it takes a note
           - name: review
-            does: reads the design input against the ask
-            by: not draft
+            does: reads the approach against the ask
+            not: draft
             on_fail: draft
             reads: [[spec/guidance/review/reviewing]]
             evidence:
@@ -202,12 +202,12 @@ differs: its own reads, its own hand rule, and the form of its evidence.
                 expects: 0
                 says: the check is green on the commit
       - name: verdict
-        does: reads every hunk against the ask and the design input
-        by: not implement
+        does: reads every hunk against the ask and the approach
+        not: implement
         on_fail: implement/reflect
         reads: [[spec/guidance/review/reviewing]]
         input: [diff, implement]
-        to: the owner
+        to: owner
         evidence:
           - name: read
             form: files
@@ -220,7 +220,8 @@ differs: its own reads, its own hand rule, and the form of its evidence.
 |---|---|
 | `name` | one word or a hyphenated pair, unique among its siblings |
 | `steps` | the steps under a phase, in order |
-| `by` | `anyone`, `person`, `agent`, `retro`, `children`, `tickets`, or `not <step>` |
+| `by` | `anyone`, `person`, `agent`, `retro`, `children`, or `tickets` |
+| `not` | a step whose hand this step's hand may not be, as `draft` or `implement` |
 | `reads` | links to the guidance notes the step's hand reads |
 | `on_fail` | an earlier step, where a failed hand-back sends the ticket |
 | `asks` | the question a person answers, on a step a person takes, with `options` where one word answers it |
@@ -258,11 +259,32 @@ Four rules hold the tree together:
 
 - A leaf inherits `by`, `reads`, `on_fail`, `input`, `needs`, `from` and `to` from the phases above it. The reads and the needs add up, `from` reaches the first leaf, `to` reaches the last, and the rest take the nearest value.
 - A name refers to a sibling first, and to a step from the top second. A path with a slash, as `design/review`, says exactly.
-- `not implement` excludes the hand of every leaf the mint puts under `implement`, and `on_fail: implement` sends the ticket to that phase's first leaf.
+- `not: implement` excludes the hand of every leaf the mint puts under `implement`, and `on_fail: implement` sends the ticket to that phase's first leaf.
 - `step` names a leaf by its path, as `implement/tests-red`.
 - A leaf with no `on_fail` fails back to itself, and an inserted step counts for no `not`.
 - A checklist adds up from the phases above, the way reads do, and the leaf answers it in a field it takes without naming one, `checked`.
 - The pull skips a leaf whose `when` fails to hold, and the engine writes `skipped` and the reason into the record.
+
+The route is a closed vocabulary, and the schema names every word of it:
+
+| key | takes |
+|---|---|
+| `name` | a word, or a hyphenated pair |
+| `steps` | a list of steps |
+| `does`, `asks` | a line of text |
+| `by` | one word from its list |
+| `not`, `on_fail` | a step's name or path |
+| `when` | one word: `returned`, `cloud` or `desk` |
+| `input` | the words `ask` and `diff`, and steps' names or paths |
+| `from`, `to` | one word: `anyone`, `person`, `retro`, `owner` or `merge` |
+| `reads` | links |
+| `needs` | words, each a verb or a tool the box names |
+| `checklist` | lines of text |
+| `evidence` | fields, each with `name`, `form`, `says`, and `expects` or `options` where the form takes one |
+
+Every value is a word from a list, a name or a path, a link, a number, a line
+of text, or a list of those. No value carries an expression. So a reader takes
+a route apart with the schema alone and no parser of its own.
 
 | `when` | holds where |
 |---|---|
@@ -382,6 +404,10 @@ into `record` at the hand-back, and the render draws it under the chapter:
 - the hand, as the box, the session and the agent where the harness names one
 - the branch tip at the take and at the hand-back, the two hashes v4 writes on a token
 - the returns, which count how often the leaf fails back
+- the tip at a release too, so the delta of every hand on a ticket stands in git whichever way the hand leaves
+
+For now the retro reads those deltas. A gate may read a change in its place
+once the processes stand.
 
 The diff of the work is the group's branch, and `git log` on the ticket file
 is its history. So a ticket carries no time and no line number, which v4
@@ -651,7 +677,7 @@ flag there. The other side fetches the branch, then checks, cheapest first:
 1. The hand-back matches the hold: this ticket, this step, this take hash. One the record answers already gets the recorded answer, and one whose take hash trails the branch gets `refused` as stale.
 2. The ticket passes its schema, and every field of the leaf holds what its form asks.
 3. Every command field of the leaf runs from the root and answers the exit or the word `expects` carries.
-4. The hand may take this step, by the route's `by`, and a verdict comes from a hand that leaves the tip where it stands.
+4. The hand may take this step, by the route's `by` and `not`, and a verdict comes from a hand that leaves the tip where it stands.
 5. The judge reads the evidence against the step's guidance, on every
    hand-back, where `judge.enabled` says so.
 
@@ -988,3 +1014,5 @@ ones a person wants moved. The old verbs go once the last brief merges.
 - whether a guidance card's own items become steps at the mint, which v3 tried as card marking and level two may take up
 - more forms, such as a number or a date, as the routes come to ask for them
 - animation of a process run, which a feed into the emitter's graph adds later
+- the form of a review report, which may take a schema of its own, and what a passing verdict's open points become
+- a plainer word than `says` on a field
