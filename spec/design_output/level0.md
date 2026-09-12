@@ -17,14 +17,14 @@ its first session with nothing typed.
 
 # The harness surface
 
-Every line here comes from running it on 2026-09-08 against client 2.1.263. The
+Every line here comes from running it against client 2.1.263. The
 surface is early access and moves, so run it again before you trust this.
 
 The sections below carry their own date where a later run measures them again.
 
 ## The file surface renames itself
 
-Measured on 2026-09-09 against client 2.1.267:
+Measured against client 2.1.267:
 
 | what this tree calls | what the client offers |
 |---|---|
@@ -51,7 +51,7 @@ trust it.
 
 ## A subagent brings no session
 
-Measured on 2026-09-09 against client 2.1.267, by a probe writing one file per
+Measured against client 2.1.267, by a probe writing one file per
 hook event through a whole run.
 
 | what a subagent fires | what reaches it |
@@ -84,7 +84,7 @@ resolves to `{ model }`, the id the spawn settles on.
 
 ## A step streams
 
-Measured on 2026-09-12 against client 2.1.269. `turn.step` streams, so its hook
+Measured against client 2.1.269. `turn.step` streams, so its hook
 takes `async function* ($, e, next)`, yields the chunks through `yield* next(e)`
 and returns the result. A plain `async` hook there fails `claude plugin
 validate`, and the client then loads none of the module:
@@ -106,7 +106,7 @@ moves with the build.
 `turn.step` fires at the step's first tool result, so its first call runs
 before it. It carries the step's visible text in `answer`.
 
-Measured on 2026-09-11, in a session past 4096 messages: at `tool.call`,
+Measured against client 2.1.267, in a session past 4096 messages: at `tool.call`,
 `$.session.messages()` carries no text from the response in flight. The list
 also answers its newest 4096 alone, so a position in it shifts.
 
@@ -162,7 +162,7 @@ rules back. Nothing here re-reads them per turn, and nothing needs to.
 
 # The layer after a compaction
 
-The layer survives. Measured on 2026-09-12 against client 2.1.269, by the probe
+The layer survives. Measured against client 2.1.269, by the probe
 below. A compaction fires `prompt.context` a second time, the hook hands the
 same blocks over, and the answer after it carries the canary with its own
 numbers.
@@ -257,7 +257,7 @@ So level zero holds no cloud session that starts the ordinary way, and
 `~/.claude.json` carries `hasTrustDialogAccepted: false` there. The flag lives
 outside the tree, so no tracked file moves it.
 
-The gate holds the scan alone. Measured on 2026-09-10 against client 2.1.267,
+The gate holds the scan alone. Measured against client 2.1.267,
 by a probe on a cloud clone carrying no trust. The `env` key bites there, and
 so does a `permissions` deny rule in `.claude/settings.json`. So the tracked
 file still says what a session may do, and level zero is the one part waiting
@@ -282,7 +282,7 @@ Two things reach a cloud box today:
 The canary finds this. A session saying the line out loud is a session level
 zero holds, and a cloud session that starts the ordinary way says nothing.
 
-Client 2.1.267 stands the same way, measured on 2026-09-10 on a cloud box. The
+Client 2.1.267 stands the same way, measured on a cloud box. The
 debug log names the count, and `.se/level0.stamp` stands nowhere in the tree:
 
     [plugins] Found 1 plugins (1 enabled, 0 disabled)
@@ -295,7 +295,8 @@ door it takes.
 ## The setup writes the flag
 
 `src/scripts/trust.js` writes it where the tree and `node` both stand to hand.
-A cloud environment carries neither at setup time. Measured on 2026-09-10: a
+A cloud environment carries neither at setup time. Measured against client
+2.1.267: a
 setup naming `node src/scripts/trust.js` fails, and the session ends at
 `init_script` with no first turn. A failing setup takes the session with it, so
 the one an environment carries leans on nothing:
@@ -354,7 +355,8 @@ itself.
 A routine meeting a prompt stalls until a person looks. So an unattended box
 takes its mode from the setup.
 
-A box carrying that setup says the canary out loud. Measured on 2026-09-10, on
+A box carrying that setup says the canary out loud. Measured against client
+2.1.267, on
 a cloud box cloning `main`:
 
 | what a box answers | with no setup | with the setup |
@@ -375,20 +377,25 @@ it prints the file it writes for the setup log to carry.
 
 # The write door
 
-`tool.call` reads every Write and Edit. Prose goes to Vale, code goes to Biome,
-and a breach comes back as `{ deny }` naming the rule, the line and the phrase.
+`tool.call` reads every Write and Edit. A breach comes back as `{ deny }`
+naming the rule, the line and the phrase.
 
-The refusal closes by asking the writer to hold that rule for the rest of the
-turn. A refusal teaching one line costs a round trip on every line.
+| what the write carries | what reads it |
+|---|---|
+| a run or a token out of a note under `.se/notes` | [[spec/design_output/private#the-door-reads-the-notes]] |
+| prose | Vale, then the judge |
+| code | Biome |
+| a shell command landing a file | [[spec/design_output/bash]] |
 
-A shell reaches the same files through `>`, `tee`, `sed -i` and a heredoc, so
-`tool.call` reads a Bash command as well. For details, see
-[[spec/design_output/bash]].
+The private half answers first, so a note's own words stop at the door. The
+refusal closes by asking the writer to hold that rule for the rest of the turn.
+A refusal teaching one line costs a round trip on every line.
 
 ## The door reaches a helper
 
 A subagent's writes go through the same `tool.call` chain, so the door reads
-them the way it reads the session's own. A live run on 2026-09-09 watches it
+them the way it reads the session's own. A live run against client 2.1.267
+watches it
 refuse a helper's `Write` over `Contraction`.
 
 That helper then writes the same text through `printf` in Bash. The write door
@@ -614,6 +621,98 @@ exactly what that box reads.
 
 A projection writes the rules into a file, and a guard then has to keep that
 copy honest. A copy nobody can edit needs no guard.
+
+# The gate reads the answer
+
+The turn's end runs the answer through Vale under the `*answer.md` section of
+`.vale.ini`, and the score of what comes back cuts into three bands. The reply
+already stands on screen when `turn.complete` fires, so the gate refuses
+nothing. It re-prompts, it carries a line into the next prompt, or it does
+nothing at all.
+
+The measurement behind the bands stands in
+[[spec/funnel/a-paragraph-has-a-schema]].
+
+## The score is a rate
+
+The score of an answer is its findings a thousand words, over the words standing
+outside every fence. A fence belongs to the formatter and the compiler, so it
+counts for nothing on either side of that division.
+
+A short answer scores high on one finding. Twenty words and one finding read as
+fifty, which stands over the ceiling. So the owner tunes the two values against
+the answers a session really writes.
+
+## The three bands
+
+`answer.warnAt` and `answer.ceiling` in `spec/config/level0.json` hold the two
+edges, and the score falls in one of three bands:
+
+| the score | what happens |
+|---|---|
+| under `warnAt` | nothing |
+| from `warnAt` to the ceiling | the findings ride the next prompt as one line |
+| at the ceiling or over it | one re-prompt saying rewrite, once per turn |
+
+An answer carrying no finding reads clean, whatever its length. Every band
+writes one `answer` line naming the score, the findings and the count.
+
+## The re-prompt over the ceiling
+
+A re-prompt is a `$.prompt.submit` from the hook, the way the tooth does it.
+Three things hold the count at one:
+
+- A lock per turn. A second turn end inside one turn submits nothing, and the
+  findings wait instead.
+- `stop.mostInARow`, which caps the re-prompts the way it caps the tooth. The
+  next prompt from a person drops the count.
+- The tooth itself. One prompt goes out per turn end, and where the tooth holds
+  the turn open that prompt belongs to it. The findings wait for the next one.
+
+The prompt carries the findings in the wording `refusal` in `lib/refuse.js`
+already uses, because a refusal quoting the rule teaches it better than a
+refusal naming it. The door holding the owner's prompt first reads
+`e.origin.kind`, and a plugin prompt is a machine, so that door owes this one no
+readback.
+
+## The carry rides a prompt
+
+Under the ceiling the findings wait for the next prompt a person sends, and ride
+it as one line under the text. The line names the score and every rule behind
+it, and asks the session to hold those rules for the rest of the turn.
+
+The findings ride once. A prompt from a machine leaves them waiting, so the line
+reaches a person's turn and no other.
+
+## The gate holds its state
+
+`gateOf` in `lib/answer.js` holds the lock, the count and the findings waiting,
+and the hook hands it one reading per turn end. It mirrors the tooth. A prompt
+from a person drops the count, and a prompt of the hook's own leaves it standing.
+The turn's end answers what comes next.
+
+## What the gate says
+
+    The voice rules refuse this answer. Write it again.
+
+      the score is 50 findings a thousand words.
+
+      level0-answer.md:1:7  PastTense
+        wrote: was
+        Write the present tense: 'was'.
+
+    Hold PastTense for the rest of this turn: apply the same rule to every line
+    you write next, and fix the lines you already wrote if they break it.
+
+## The tool reads a draft
+
+`check_answer` takes one draft, runs it through the answer register as
+`level0-answer.md`, and answers the findings in the wording above. A draft
+coming back clean meets the gate clean, so the tool closes the gap a gate
+refusing nothing leaves open.
+
+The tool registers beside `claim_stop` at the session's start, and
+`spec/guidance/working.md` carries the line that sends a session to it.
 
 # The rules past one buffer
 

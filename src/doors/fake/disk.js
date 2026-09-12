@@ -8,6 +8,13 @@ export function fakeDisk(seed = {}) {
   const runs = new Set();
   let made = 0;
 
+  // [[spec/design_output/extension#a-link-pointing-nowhere]]
+  function exists(at, hops = 0) {
+    if (links.has(at)) return hops < 8 && exists(links.get(at), hops + 1);
+    if (files.has(at) || folders.has(at)) return true;
+    return [...files.keys(), ...folders].some((one) => one.startsWith(`${at}/`));
+  }
+
   return {
     files,
     link(target, path) {
@@ -39,11 +46,7 @@ export function fakeDisk(seed = {}) {
     },
     write: (path, text) => void files.set(norm(path), String(text)),
     append: (path, text) => void files.set(norm(path), `${files.get(norm(path)) ?? ""}${text}`),
-    exists(path) {
-      const at = norm(path);
-      if (files.has(at) || folders.has(at) || links.has(at)) return true;
-      return [...files.keys(), ...folders].some((one) => one.startsWith(`${at}/`));
-    },
+    exists: (path) => exists(norm(path)),
     remove(path) {
       const at = norm(path);
       if (links.delete(at)) return;

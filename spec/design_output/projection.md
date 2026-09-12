@@ -173,7 +173,7 @@ carries the cost of it, door `project`:
 
 ## What it costs
 
-Measured on 2026-09-10 over one projection and fifteen targets, twenty runs of
+Measured over one projection and fifteen targets, twenty runs of
 each, against the real disk on a cloud box:
 
 | the run | cost |

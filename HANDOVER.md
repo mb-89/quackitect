@@ -6,13 +6,12 @@ urgency: soon
 
 # Where it stands
 
-The work stands finished, and `./RUNME.sh work done` refuses it. The branch
-gate reads `./RUNME.sh check`, which runs red on two tests standing outside
-this branch. Settle those, run `check`, then run `work done`. The two stand in
-`What waits` below.
+The work stands finished. The branch gate reads `./RUNME.sh check`, which runs
+red on two tests standing outside this branch until trunk brings the fix in.
+The sync at the end of this note takes it, and `work done` closes the branch.
 
-The standing layer survives a compaction. Measured on 2026-09-12 against client
-2.1.269, three times, by `./RUNME.sh probe compact` running the real client
+The standing layer survives a compaction. Measured against client 2.1.269,
+three times, by `./RUNME.sh probe compact` running the real client
 headless. A compaction fires `prompt.context` a second time, level zero hands
 the same blocks over, and the answer after it carries the canary with its own
 numbers. One run takes 90 seconds.
@@ -68,8 +67,8 @@ from now on. It stands red here for another reason, below.
 
 | the thing | where | why |
 |---|---|---|
-| two red tests, and the gate they hold shut | `test/contract/schema.test.js` | `spec/schemas/paragraph.schema.yaml` carries `layers` and `registers`, and no `body`. The sweep reads every file in `spec/schemas` as a note kind, so it and `mint` both refuse this one. Red before this branch, and untouched by it. Either the paragraph schema takes a body, or it stands in a folder of its own. That call belongs to whoever owns [[spec/funnel/a-paragraph-has-a-schema]] |
-| two voice findings | `spec/funnel/level-zero-closes.md` | a past tense on line 62 and a long heading on line 139. Red before this branch, and untouched by it |
+| two red tests, and the gate they hold shut | `test/contract/schema.test.js` | green now: trunk's `isNoteSchema` keeps `spec/schemas/paragraph.schema.yaml` out of the note kinds |
+| two voice findings | `spec/funnel/level-zero-closes.md` | green now: trunk cuts the past tense and the long heading |
 | one `context` line goes missing once | `.se/log/session.jsonl` | the first measured run carries `re-read` and no `first`, and the two after it carry both. Two writers appending to one file is the suspect |
 | the `--resume` road | `spec/design_output/level0#three-roads-to-a-compaction` | untried, because the command road holds |
 | a night routine | wherever `do_work` lives | its one prompt is `./RUNME.sh probe compact`, and the answer lands in the log and in the verb's exit code |
@@ -82,9 +81,9 @@ names `claude` now, so the verb finds the client where it stands.
 
 # What runs green here
 
-`./RUNME.sh check` stands red on the two schema tests above, and every other
-part of it answers. The tests pass, 570 of 572. `claude plugin validate`
-passes. The doors hold. The rules pass over every file this branch writes.
+`./RUNME.sh check` stands green on this head after the sync below. The tests
+pass, `claude plugin validate` passes, the doors hold, and the rules pass over
+every file this branch writes.
 
 `SE_SLOW=1 ./RUNME.sh test` adds the compaction contract test, which pays
 ninety seconds and two model calls. Without the variable `check` stays fast,
@@ -92,3 +91,12 @@ and this branch runs the test three times by hand.
 
 The auto mode holding this session refuses a handful of Bash calls that spawn
 the client, so several runs take `node src/scripts/cli.js` as the road in.
+
+# The sync
+
+Trunk comes in with four branches, and three files conflict. Trunk carries the
+same `turn.step` generator this branch writes, so the hook keeps one and the
+marker over it. The answer gate reads what the tooth sends at the turn's end,
+and the probe holds the tooth off after the compaction. So the two stand in
+one expression. The fake engine keeps trunk's streaming chain, which reads the
+hook's own shape in place of the event's name.
