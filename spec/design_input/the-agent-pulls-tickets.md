@@ -15,6 +15,13 @@ tickets and see where the work stands. The agent knows nothing of either. The
 word is ticket. Work token and work item retire, and one word names the thing
 everywhere.
 
+The level pays for the work the tree keeps putting off:
+
+- the design input and the design output phases, whose notes come back as other than the ask
+- the retro, which holds only where a hand produces defined evidence at every step, under a schema
+
+That is what the level is for, and no count of briefs decides it.
+
 This note settles the shape of level one:
 
 - what a ticket is, and the two kinds of ticket
@@ -738,6 +745,13 @@ record:
 | `./RUNME.sh work list` | the same rows in a terminal, with the age of each held branch |
 | the ticket file itself | the ask, the route, the evidence, the discussion |
 
+The board draws what the machine holds, and nothing more. A ticket in a held
+group shows its group's state and the age of the branch's tip, and no state
+of its own. The branch is responsible for it, and nobody on trunk touches it.
+A ticket a branch wants seen on trunk lands there by a merge. The board
+fetches on the schedule the tree already has. So a tip nobody fetches yet
+stays unknown to the board, and any reader of git expects that.
+
 The editor stands outside the sidebar, in a window of its own. Its shape waits
 for a design note of its own once the back end stands, and v4's work editor is
 the starting point. It may end as a Kanban board, or as something else. The
@@ -856,9 +870,11 @@ Eight branches, and the dependencies make the order binding:
 | 5 | `a-step-changes-hands` | the hand id, the spawn and its tag, person steps, escalation | 4 |
 | 6 | `guidance-rides-the-step` | `reads`, the verb, the log line, the standing layer shrinks | 4 |
 | 7 | `the-work-group-draws` | the `work` group, its four controls, the count on the editor button, the beat, the notification that names questions and stale groups | 4 |
-| 8 | `level-zero-hands-over-the-pull` | the brief door goes, and the controls wire up | 4 |
+| 8 | `level-zero-hands-over` | the brief door goes, and the controls wire up | 4 |
 
-The five work branches standing today finish under the verbs they carry. A
+The eight briefs stand on their `work/` branches, cut from this note, and
+each names the chapters it implements. The five work branches standing today
+finish under the verbs they carry. A
 brief branch is one whose tip carries `HANDOVER.md`, and `work list` tells the
 two kinds apart by that. `take` keeps serving a brief until `work list` names
 none. `adopt` turns a brief into a group note and one tracked ticket, for the
@@ -870,7 +886,6 @@ ones a person wants moved. The old verbs go once the last brief merges.
 - whether yours drowns in parked conditions, and a parked state returns
 - a heartbeat ref per held group, if a tip's age proves too coarse a sign of a dead box
 - how the judge reads a checklist's lines against its items, once the first process shows the shape
-- what the board costs on many branches, which the editor's note takes up
 - a WIP limit per step, which is Kanban's one knob and stands outside this note
 - whether a guidance card's own items become steps at the mint, which v3 tried as card marking and level two may take up
 - more forms, such as a number or a date, as the routes come to ask for them

@@ -139,7 +139,9 @@ work live there, and this page points at them where it draws them.</p>
 <p class="lead">Level zero is agent control, and it stands. Level one is the ticket system. The agent
 pulls tickets, works the ticket in hand, and pulls again. The ticket system decides which ticket comes
 back. A person works the same tickets, in the same files, with the same verbs. Processes mint the tickets,
-and the state machines of level two read them and see where the work stands.</p>
+and the state machines of level two read them and see where the work stands. The level pays for the work
+the tree keeps putting off: the design input and design output phases come back as other than the ask, and
+the retro holds only where a hand produces defined evidence at every step, under a schema.</p>
 
 <div class="rules">
   <div class="rule"><b>The agent pulls.</b><p>One verb hands it a ticket at a step, and the same verb hands
@@ -981,7 +983,11 @@ and rides the step.</p>
 <h2 id="s10"><span class="n">10</span>What a person sees</h2>
 
 <p>Three surfaces draw the folder and the branches, and none keeps a second record: the work editor, which
-a button in the sidebar opens; <code>work list</code> in a terminal; and the ticket file itself. The editor
+a button in the sidebar opens; <code>work list</code> in a terminal; and the ticket file itself. The board
+draws what the machine holds, and nothing more: a ticket in a held group shows its group's state and the
+age of the branch's tip, and no state of its own, since the branch is responsible for it and nobody on trunk
+touches it. The board fetches on the schedule the tree already has, so a tip nobody fetches yet stays
+unknown to it, as any reader of git expects. The editor
 stands outside the sidebar, in a window of its own, and its shape waits for a design note of its own once
 the back end stands. v4's work editor is the starting point, and it may end as a Kanban board or as
 something else. The sidebar gains one group named <code>work</code> with four controls, in this order: the engine's
@@ -1105,8 +1111,9 @@ fact it meets is a route.</p>
 <!-- ============================================================ -->
 <h2 id="s14"><span class="n">14</span>The order of work</h2>
 
-<p>Eight branches, and the dependencies make the order binding. The five work branches standing today
-finish under the verbs they carry. A brief branch is one whose tip carries <code>HANDOVER.md</code>, and
+<p>Eight branches, and the dependencies make the order binding. The eight briefs stand on their
+<code>work/</code> branches, cut from the note, and each names the chapters it implements. The five work
+branches standing today finish under the verbs they carry. A brief branch is one whose tip carries <code>HANDOVER.md</code>, and
 <code>work list</code> tells the two kinds apart by that; <code>take</code> keeps serving a brief until
 <code>work list</code> names none; <code>adopt</code> turns a brief into a group note and one ticket for the
 ones a person wants moved, and the old verbs go once the last brief merges.</p>
@@ -1218,7 +1225,6 @@ level one stays still while level two invents flows.</p>
   <li>whether yours drowns in parked conditions, and a parked state returns</li>
   <li>a heartbeat ref per held group, if a tip's age proves too coarse a sign of a dead box</li>
   <li>two hands on one verdict, which a process may ask for as data once one hand's verdict is measured</li>
-  <li>what the board costs on many branches, which the editor's note takes up</li>
   <li>a WIP limit per step, which is Kanban's one knob and stands outside the note</li>
   <li>whether a guidance card's own items become steps at the mint, which v3 tried as card marking and level two may take up</li>
   <li>more forms, such as a number or a date, as the routes come to ask for them</li>
