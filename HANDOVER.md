@@ -6,76 +6,105 @@ urgency: now
 
 # Where it stands
 
-The design input `spec/design_input/the-agent-pulls-tickets.md` says what the
-owner asks for, and the page beside it draws it. Read the note first. It
-stands on the branch `claude/relaxed-knuth-f0uk4d` until the owner merges it,
-so take that branch in where `work sync` leaves it absent.
+The three schemas of level one stand, the checker reads a route, and `mint`
+writes a ticket a hand can work. Branch 1 of eight is complete, and branches 2
+and 3 read what it lands.
 
-This branch is the first of eight, and everything after it reads what it
-lands. Its chapters are A ticket is a note, The lifecycle, The route, Evidence
-has a form, and Evidence per step.
-
-| what stands today | where |
+| what lands | where |
 |---|---|
-| the schema checker, over top-level scalars alone | `.claude/skills/level0/lib/schema.js`, `fieldFaults` and `frontFaults` |
-| the line map, over indent-0 keys alone | `note.front.lines` |
-| `mint`, which writes one valid note per kind | `./RUNME.sh mint <kind>`, in `src/scripts/cli.js` |
-| the schemas, one per kind | `spec/schemas/*.schema.yaml` |
-| the contract test over the schema folder | `test/contract/schema.test.js`, red on the paragraph kind today |
+| the ticket schema, and the one home of the route | `spec/schemas/ticket.schema.yaml` |
+| the group schema, naming the route from there | `spec/schemas/group.schema.yaml` |
+| the process schema, over a bare YAML file | `spec/schemas/process.schema.yaml` |
+| a line per key at every depth of the frontmatter | `lib/schema.js`, `readYaml` |
+| one walk over a map, at every depth | `lib/schema.js`, `mapFaults` |
+| `x-one-per`, `x-names`, `x-earlier`, and three modifiers | `lib/schema.js` |
+| `$ref`, inside a schema and across two | `lib/schema.js`, `refOf` |
+| a data schema, which governs YAML and no note | `lib/schema.js`, `checkData` |
+| the render of the route, as a chapter per step | `lib/schema.js`, `mintNote` |
+| the three places, and the verbs' four fields | `lib/ticket.js` |
+| the record's shape, and the lines it draws | `lib/ticket.js`, `engineRows` |
+| the past tense, over a ticket and a group | `.vale.ini` |
 
-The paragraph schema is a YAML kind with no body, and the checker reads it as
-a note. That is why two tests stand red on `main`. This branch teaches the
-checker a YAML kind under a schema, and those tests go green with it.
+The design output says how each piece works, in [[spec/design_output/schema]].
+Six chapters are new there, and every comment in the code points at one.
+
+| the proof | where |
+|---|---|
+| the checker, keyword by keyword | `test/level0/schema.test.js`, 17 new cases |
+| the door, place by place | `test/level0/ticket.test.js`, 15 cases |
+| the three kinds, off disk, with a fixture per refusal | `test/contract/ticket.test.js` |
+
+`./RUNME.sh check` answers green: 773 tests, no fault, and the sweep names no
+line.
 
 # What waits
 
-| the piece | where | proves it |
-|---|---|---|
-| the ticket schema | `spec/schemas/ticket.schema.yaml` | `mint ticket` writes a note the checker passes |
-| the group schema | `spec/schemas/group.schema.yaml` | `mint group` writes a note the checker passes |
-| the process schema, over a bare YAML file | `spec/schemas/process.schema.yaml` | the checker reads `spec/processes/standard.yaml` under it |
-| a YAML kind under a schema | `lib/schema.js` | the paragraph schema tests go green |
-| recursion into `steps` and `evidence` | `lib/schema.js` | a fault on `steps[1].steps[0].by` names its line |
-| `x-one-per`, `x-names`, `x-earlier` | `lib/schema.js` | a route with a missing chapter, a bad `on_fail` and a bad `step` refuses three ways |
-| the route's fields | the ticket and process schemas | `by`, `reads`, `on_fail`, `asks`, `when`, `checklist`, `does`, `input`, `needs`, `from`, `to`, `evidence` |
-| the forms | the schemas | `text`, `list`, `command`, `link`, `files`, `choice`, `checklist`, `verdict` |
-| the verbs' fields | the ticket schema and the write door | the door refuses an agent's edit to `state`, `step` or `steps` |
-| the render | `mint` | the chapters follow the tree, a field is a heading under its leaf, and the comment beneath |
-| the three places | the write door | the door refuses a write outside a field's slot, the discussion or a draft's ask, and names the line |
-| the record | the ticket schema and the render | `record` renders under each leaf, and no hand writes it |
-| the private folder | `.se/tickets/` | a private ticket passes the same schema |
+Branch 2 writes the five route files under `spec/processes/`. The contract test
+already binds them, so a bad one turns the check red the moment it lands.
 
-# The rules to hold
+| the piece | whose it is |
+|---|---|
+| `spec/processes/<name>.yaml`, five of them | branch 2 |
+| the six slots' three checks, in the mint and the lint | branch 2 |
+| `--process` at the mint, and `work reroute` | branch 2 |
+| `not <phase>` read as every leaf under it | branch 4, at the pull |
+| the rows `engineRows` answers, written into the file | branch 4, at the hand-back |
+| `reason` on a closed ticket alone | open, and the retro says why |
 
-- A name refers to a sibling first, and to a step from the top second. A path with a slash says exactly.
-- `not <phase>` reads every leaf the mint puts under that phase.
-- A leaf with no `on_fail` fails back to itself.
-- The three keywords read the way `required` and `enum` do, so the door, the sweep and the language server read one rule.
-- The six slots derive where the route says nothing: the step before, its evidence, the next step.
+Six findings stand, and each one waits on a person:
 
-# The tests
+| the finding | what to do |
+|---|---|
+| trunk answers red over the owner's design input | keep the vale stanza, or reword the note |
+| 12 pointers in the code name no heading | add a sweep, and fix the twelve |
+| `reason` binds on `closed` alone, and no keyword says so | add a conditional, or leave it to the pull |
+| `order: strict` holds at the body's own level | two leaves can carry a field of one name |
+| the commit door refuses the attribution trailer | the Private rule reads the address in it |
+| the brief names two red tests that stand green | read the count off the check, not a brief |
 
-The contract test over the schema folder stays the proof. Add one fixture per
-refusal under `test/contract/`, so a nested fault, a bad path and an orphan
-field each refuse with a line. Run `./RUNME.sh check` before every push.
+# What surprises me
 
-## How this branch runs
+The brief says two tests stand red on `main` over the paragraph kind. They stand
+green. `./RUNME.sh check` runs 730 tests at the branch point with no fault, and
+`isNoteSchema` already leaves the paragraph schema out.
 
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
+So the YAML kind wants a design, and no repair. The design output now names the
+three shapes a schema takes:
 
-1. Run `./RUNME.sh work sync` FIRST. It takes main into this branch, so
-   an old branch works against what the tree holds now. Resolve any conflict
-   before you start, because a conflict found later costs the work already
-   done.
-2. Commit and push each time you finish a thing. A cloud box dies and takes
-   its working tree with it.
-3. Write your result and your retro into `HANDOVER.md`, at the root, replacing
-   this brief. Head the retro `What surprises me`, and name every dead end
-   you walk into.
-4. Run `./RUNME.sh work done`, which sets the status and pushes.
-5. Run `./RUNME.sh work release` instead where you stop early, so the branch
-   goes back to `todo` for somebody else.
-6. Run `./RUNME.sh work merge <name>` from main to take it in, then
-   `work close`. A cloud box stops at step 4, because the harness holds
-   main shut there and a cloud box opens no pull request.
+- a note schema, which names the chapters of a note
+- a data schema, which names the rules over a bare YAML file
+- a model schema, which a projector reads and no checker does
+
+Trunk answers red, and it answers red before this branch starts. Twenty-five
+voice findings stand in `spec/design_input/the-agent-pulls-tickets.md`, mostly
+the modal `may`. `work done` reads the check's stamp, so no branch of these eight
+finishes while trunk stands red.
+
+I take the narrow way out, and the owner picks between two:
+
+| the way | what it costs |
+|---|---|
+| one stanza in `.vale.ini`, which this branch takes | four rules go quiet over `spec/design_input/*.md` |
+| a reword of the note, in 25 places | every one of the eight briefs quotes that note |
+
+The stanza puts the design inputs beside the rationales, for the permission modal
+and the long list item. No word of the owner's note moves, and one commit takes
+it back.
+
+Five dead ends, one a line:
+
+- Vale refuses a prose comment in code, and wants a link on every one past the header.
+- Level zero refuses `cat >>` into a test, and every other shell write.
+- A heading holds five words, so six pointers in the code want renaming.
+- `expects: string` is wrong, because `expects: 0` reads as an integer.
+- The commit door refuses the attribution trailer, on the address inside it.
+
+Two calls stand behind the shape, and the argument for each reads short:
+
+| the call | why |
+|---|---|
+| the route lives in one file | a copy in three schemas is a defect, so `refOf` reads a kind |
+| the door reads the schema | `x-written` and `x-engine` say who writes, so the door holds no list |
+
+A new kind opts into the door by naming those two keys, and the door changes
+nowhere. I write no script, so `.se/scripts` stays empty.
