@@ -95,15 +95,20 @@ import {
 } from "../lib/schema.js";
 import { guesses, pathOf, surveyOf, TOOLS } from "../lib/tools.js";
 import {
-  claimSpec,
+  askForLine,
+  challenge,
   decide,
   detail,
   pool,
   reprompt,
   RULES,
+  stopLineIn,
+  stopReasons,
   todos,
   toothOf,
+  withoutStopLine,
 } from "../lib/stop.js";
+import { saysGreen, STAMP, stampOf } from "../lib/runs.js";
 import { landsOnTrunk, touchesGit } from "../lib/trunk.js";
 import { deeply, layered } from "../lib/layer.js";
 import { MARKER, pairOf } from "../lib/vehicle.js";
@@ -144,6 +149,8 @@ export function register(on, _options) {
   let owed = null;
   // [[spec/design_output/level0#the-canary-owes-a-debt]]
   let owesCanary = null;
+  // [[spec/design_output/stop#the-line-ends-a-turn]]
+  let stopAsked = false;
   const seen = { ask: QUIET, hold: "running" };
   let root = "";
   let projections = [];
@@ -218,7 +225,6 @@ export function register(on, _options) {
     // [[spec/design_output/index#the-door-answers-the-tools]]
     warms($, root);
 
-    await $.tool.register(claimSpec(rules));
     await $.tool.register(checkSpec());
     await $.tool.register(mintSpec(schemas));
     await $.tool.register(reviewSpec());
@@ -245,6 +251,8 @@ export function register(on, _options) {
     tooth.sawPrompt(from === "plugin");
     gate.sawPrompt(from === "plugin");
     if (opensATurn(e.origin)) owed = await owing($, "The owner sent a prompt");
+    // [[spec/design_output/stop#the-challenge-spends-one-allowance]]
+    if (opensATurn(e.origin)) stopAsked = false;
     const text = String(e.text ?? "");
     await logbook.say("info", "prompt", text, { detail: from, text });
 
@@ -252,8 +260,9 @@ export function register(on, _options) {
     const held = opensATurn(e.origin) ? gate.takeWaiting() : null;
     if (!held) return next(e);
     const line = carried(held.found, held.score);
-    await logbook.say("info", "answer", "the findings ride this prompt", {
-      detail: `score=${held.score}`,
+    // [[spec/design_output/log#a-row-carries-its-kind]]
+    await logbook.say("info", "gate", "the findings ride this prompt", {
+      detail: `score=${held.score} findings=${held.found.length}`,
     });
     return next({ ...e, text: [text, line].filter(Boolean).join("\n\n") });
   });
@@ -411,12 +420,31 @@ export function register(on, _options) {
   // [[spec/design_output/work#a-box-writes-its-branch]]
   on("tool.call", { tool: "Bash" }, async ($, e, next) => {
     const said = await (async () => {
-    if (!cloud) return next(e);
     const said = String(e.command ?? "");
     if (!touchesGit(said).commits && !touchesGit(said).pushes) return next(e);
 
     const how = landsOnTrunk(said, await branchNow($), TRUNK);
     if (!how) return next(e);
+
+    // [[spec/design_output/work#a-red-battery-pushes-nothing]]
+    if (how === "push") {
+      const battery = await batteryHere($);
+      if (!battery.green) {
+        await logbook.say("warn", "bash", `refused a push to ${TRUNK} on a red battery`, {
+          tool: "Bash",
+          detail: battery.says,
+        });
+        return {
+          deny: [
+            `${TRUNK} takes a green battery, and ${battery.says}.`,
+            "",
+            "Run `./RUNME.sh check` last, after your final commit. The stamp names",
+            "the commit it ran against, so a commit after it reads stale.",
+          ].join("\n"),
+        };
+      }
+    }
+
     // [[spec/design_output/work#a-box-writes-its-branch]]
     if (!cloud) return next(e);
 
@@ -559,15 +587,6 @@ export function register(on, _options) {
     return { result: said.result };
   });
 
-  // [[spec/design_output/stop#the-claim-and-its-life]]
-  on("tool.call", { tool: "mcp__level0__claim_stop" }, async (_$, e, _next) => {
-    const said = tooth.claims(String(e.rule ?? ""), String(e.why ?? ""));
-    await logbook.say("info", "stop", `claimed ${said.rule}`, {
-      detail: said.why.slice(0, 120),
-    });
-    return { result: { ...said, counted: "at the end of this turn" } };
-  });
-
   // [[spec/design_output/level0#the-tool-reads-a-draft]]
   on("tool.call", { tool: `mcp__level0__${CHECK}` }, async ($, e, _next) => {
     const text = String(e.text ?? "");
@@ -681,11 +700,21 @@ export function register(on, _options) {
           logbook,
           mostInARow,
           ran: (name) => ranHere(name, off, hold),
+          off,
+          // [[spec/design_output/stop#the-canary-ends-turn-one]]
+          saidCanary: canaryIn(e.answer, sentence).found === "same",
+          // [[spec/design_output/stop#the-challenge-spends-one-allowance]]
+          asked: () => stopAsked,
+          asks: () => {
+            stopAsked = true;
+          },
         });
     await dropAsk(settings, logbook);
     if (!bin || !e.answer || e.reason !== "answer") return said;
 
-    const ran = await lintText(e.answer, ANSWER, {
+    // [[spec/design_output/stop#the-voice-skips-the-line]]
+    const spoken = withoutStopLine(e.answer);
+    const ran = await lintText(spoken, ANSWER, {
       bin,
       run: (argv, init) => $.process.run(argv, init),
     });
@@ -694,7 +723,7 @@ export function register(on, _options) {
     // [[spec/design_output/level0#the-three-bands]]
     const read = gate.atTurnEnd({
       ...(await bands(settings)),
-      text: e.answer,
+      text: spoken,
       found: ran.found,
       mostInARow,
       toothSpoke: Boolean(bit?.sent),
@@ -1229,7 +1258,27 @@ async function forceCompaction($, logbook) {
 async function bite($, e, it) {
   if (e.reason !== "answer") return { sent: false };
 
-  const decision = decide(it.rules, { claimed: it.tooth.claim()?.rule, ran: it.ran });
+  // [[spec/design_output/stop#the-line-ends-a-turn]]
+  const line = stopLineIn(e.answer);
+  const known = line && stopReasons(it.rules).some((one) => one.id === line.reason);
+
+  if (it.off) return voteNow($, e, it, line?.reason);
+  if (!line && !it.saidCanary) return holdOpen($, it, askForLine(it.rules), "no line");
+  if (line && !known) {
+    return holdOpen($, it, askForLine(it.rules, line.reason), `${line.reason} is unknown`);
+  }
+  // [[spec/design_output/stop#the-challenge-spends-one-allowance]]
+  if (line && !it.asked()) {
+    it.asks();
+    return holdOpen($, it, challenge(it.rules, line.reason), `${line.reason} meets the challenge`);
+  }
+
+  return voteNow($, e, it, line?.reason);
+}
+
+// [[spec/design_output/stop#the-vote]]
+async function voteNow($, e, it, reason) {
+  const decision = decide(it.rules, { claimed: reason, ran: it.ran });
   const said = it.tooth.atTurnEnd(decision, it.mostInARow);
   const how = detail(said, said.inARow);
 
@@ -1252,6 +1301,15 @@ async function bite($, e, it) {
   // [[spec/design_output/stop#holding-a-turn-open]]
   try {
     $.prompt.submit({ text: reprompt(said) }).catch(() => {});
+  } catch {}
+  return { sent: true };
+}
+
+// [[spec/design_output/stop#the-line-ends-a-turn]]
+async function holdOpen($, it, text, why) {
+  await it.logbook.say("info", "stop", "the turn goes on", { detail: why });
+  try {
+    $.prompt.submit({ text }).catch(() => {});
   } catch {}
   return { sent: true };
 }
@@ -1404,6 +1462,17 @@ async function offAWorkBranch($) {
 
 async function branchNow($) {
   return await gitSays($, ["rev-parse", "--abbrev-ref", "HEAD"]);
+}
+
+// [[spec/design_output/work#a-red-battery-pushes-nothing]]
+async function batteryHere($) {
+  let text = "";
+  try {
+    text = String(await $.fs.read(STAMP));
+  } catch {
+    return { green: false, says: "no check has run here" };
+  }
+  return saysGreen(stampOf(text), await gitSays($, ["rev-parse", "HEAD"]));
 }
 
 async function readEnv($, names) {
