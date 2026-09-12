@@ -597,6 +597,11 @@ function projectionsHold() {
   }
 
   const said = readAll(entries, files, under);
+  if (said.faults.length) {
+    for (const one of said.faults) console.error(one);
+    console.error("A source stands away from the shape beside it, so no target is written.");
+    return 1;
+  }
   const found = staleIn(said.wanted, said.standing);
   if (!found.length) {
     console.log(`${entries.length} projection(s), and every target reads as projected.`);

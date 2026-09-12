@@ -168,7 +168,7 @@ and 69 counting the plugin's own modules:
 The rule takes no options in Biome 2.5.12, so a tree turning it on takes every
 line above with it. Its own exemptions are the whole of what a person gets:
 
-- the values `0`, `1`, `2`, `10`, `24` and `60`, anywhere they stand
+- the values 0, 1, 2, 10, 24 and 60, anywhere they stand
 - an array index
 - an initial value in a declaration, and a default in a parameter
 

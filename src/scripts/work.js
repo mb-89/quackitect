@@ -250,10 +250,12 @@ export function withContract(brief) {
     `3. Write your result and your retro into \`${BRIEF}\`, at the root, replacing`,
     "   this brief. Head the retro `What surprises me`, and name every dead end",
     "   you walk into.",
-    "4. Run `./RUNME.sh work done`, which sets the status and pushes.",
-    "5. Run `./RUNME.sh work release` instead where you stop early, so the branch",
+    `4. Run \`./RUNME.sh work sync\` again, so ${TRUNK} comes in last too.`,
+    "   Run `./RUNME.sh check` after it, and answer whatever the merge turns red.",
+    "5. Run `./RUNME.sh work done`, which sets the status and pushes.",
+    "6. Run `./RUNME.sh work release` instead where you stop early, so the branch",
     "   goes back to `todo` for somebody else.",
-    `6. Run \`./RUNME.sh work merge <name>\` from ${TRUNK} to take it in, then`,
+    `7. Run \`./RUNME.sh work merge <name>\` from ${TRUNK} to take it in, then`,
     "   `work close`. A cloud box stops at step 4, because the harness holds",
     `   ${TRUNK} shut there and a cloud box opens no pull request.`,
     "",
@@ -384,6 +386,18 @@ function finish(it) {
     console.error(`Write your result to ${BRIEF} first. It is what comes back.`);
     return 2;
   }
+  // [[spec/design_output/work#trunk-comes-in-last-too]]
+  it.git.run(["fetch", "origin", TRUNK], true);
+  const behind = Number(
+    it.git.run(["rev-list", "--count", `HEAD..origin/${TRUNK}`], true).out,
+  );
+  if (Number.isFinite(behind) && behind > 0) {
+    console.error(`${TRUNK} holds ${behind} commit(s) ${branch} lacks.`);
+    console.error("Run ./RUNME.sh work sync, then check, then work done.");
+    console.error("A branch older than a rule greens itself and reddens trunk.");
+    return 1;
+  }
+
   const said = batterySays(it);
   if (!said.green) {
     console.error(`${branch} claims nothing yet: ${said.says}.`);

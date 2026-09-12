@@ -380,6 +380,24 @@ test("close holds a trunk carrying commits origin has never seen", () => {
   assert.ok(!ranGit(outside).some((one) => one.includes("--delete")));
 });
 
+// [[spec/design_output/work#trunk-comes-in-last-too]]
+test("done refuses a branch trunk stands ahead of, and names the sync", () => {
+  const held = "---\nstatus: held\n---\n\n# The result\n";
+  const behind = doorsSaying(
+    {
+      ...onBranch("work/fix-lsp"),
+      "git rev-list --count HEAD..origin/main": { stdout: "3\n" },
+    },
+    { [HERE]: held, ...green },
+  );
+
+  const { code, said } = heard(() => work(ROOT, ["done"], behind.it));
+  assert.equal(code, 1);
+  assert.match(said, /main holds 3 commit\(s\) work\/fix-lsp lacks/);
+  assert.match(said, /work sync/);
+  assert.equal(statusOf(behind.disk.read(HERE)), "held", "the status stands");
+});
+
 // [[spec/design_output/work#the-battery-answers-first]]
 test("done refuses where the battery answers nothing green", () => {
   const held = "---\nstatus: held\n---\n\n# The result\n";

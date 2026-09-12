@@ -33,7 +33,7 @@ help` names the verbs, `./RUNME.sh rules` the mechanical rules, and
 | the tooth | votes at every turn's end over the rules in `spec/config/stop`, re-prompts through `$.prompt.submit`, and takes a claim | `stop` |
 | the answer door | refuses the first tool call of a person's turn before a readback | `level0` |
 | the judge | asks a model one question per span for the rules no pattern holds | `level0` |
-| the tools | `claim_stop`, `review_branch`, `log`, `patch`, `replace` and `undo`, each one a `tool.call` hook | `stop`, `review`, `log`, `apply` |
+| the tools | `review_branch`, `log`, `patch`, `replace` and `undo`, each one a `tool.call` hook | `review`, `log`, `apply` |
 | the index | answers `Grep` and `Glob` out of warm rows, and holds every link and note | `index` |
 | the projections | write a generated file from one source at every session start, and refuse a hand edit to a target | `projection` |
 | the config | one resolver over three layers, and a verb naming which layer answers | `config` |

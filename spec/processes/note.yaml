@@ -1,0 +1,24 @@
+# The smallest ticket: a thing to look at later, with no work in it yet.
+# A hand mints one mid-work and carries on. A retro decides it.
+# [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+name: note
+for: a thing to look at later, with no work in it yet
+ask:
+  - name: line
+    form: text
+    says: the smallest case that shows it, why it matters, and what a stranger needs in order to act on it
+steps:
+  - name: decide
+    does: says what the note becomes, and closes it
+    from: anyone
+    by: retro
+    to: retro
+    input: ask
+    evidence:
+      - name: outcome
+        form: choice
+        options: [dropped, done, became]
+        says: what the note becomes
+      - name: says
+        form: text
+        says: why, in a line, or what the successor carries

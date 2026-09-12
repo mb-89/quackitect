@@ -148,6 +148,105 @@ answer, and it costs a hook over every prompt.
 
 The second road asks the client for nothing but the run it already offers.
 
+# The second target
+
+`spec/schemas/paragraph.schema.yaml` says what a paragraph holds, and
+`VoiceParagraph` is its projection. The shape `paragraph rules` reads it and
+writes one rule file per check:
+
+    {
+      "name": "the paragraph rules",
+      "shape": "paragraph rules",
+      "target": "spec/config/styles/VoiceParagraph",
+      "from": "spec/schemas/paragraph.schema.yaml",
+      "schema": "spec/schemas/paragraph.schema.schema.json",
+      "wrap": "none"
+    }
+
+The schema holds the values and `lib/paragraph.js` holds the Tengo. So a cap
+moves in one file, and the rule file carrying it follows at the next
+projection. `wrap` reads `none`, because a rule file is YAML and its mark
+stands in a comment at the top.
+
+| layer | rule | what it reads |
+|---|---|---|
+| characters | `Characters.yml` | the punctuation set, by name |
+| markup | `Markup.yml` | the heading cap, the one title and the strong-lead cap |
+| shape | `Shape.yml`, `ShapeAnswer.yml` | the paragraphs one run holds |
+| shape | `Paragraph.yml`, `ParagraphAnswer.yml` | the sentences one paragraph holds |
+| sentence | `Sentence.yml` | the words one sentence holds |
+| sentence | `ListItem.yml`, `CodeSpans.yml` | the tighter cap in a list item, and the spans |
+| grammar | `Auxiliary.yml`, `Progressive.yml` | the chains the schema refuses |
+| grammar | `Modal.yml` | every modal the register leaves out |
+| grammar | `Contraction.yml`, `Latin.yml`, `EtCetera.yml` | the short forms, with their swaps |
+| grammar | `PastTense.yml` | the tenses, with the exceptions the retro grows |
+
+## A layer writes two files
+
+A Vale rule file carries one `extends`, and a script rule carries one scope. So
+a layer writing two kinds of check writes two files:
+
+| why two | which |
+|---|---|
+| a raw scope reads a whole source file, so a shape check reaches prose alone | `Shape.yml` beside `Paragraph.yml` |
+| the answer register changes two caps | `ShapeAnswer.yml` beside `Shape.yml` |
+| the perfect reads `VBN` and the progressive reads `VBG` | `Progressive.yml` beside `Auxiliary.yml` |
+| a substitution carries one action, and `and so on` carries none | `EtCetera.yml` beside `Latin.yml` |
+
+`Paragraph.yml` and `Sentence.yml` count in a scope Vale gives them, so they
+reach a comment in code as well as a paragraph of prose. A script rule reads
+the raw scope, which in a code file is the whole source, so `.vale.ini` stands
+every script rule off there.
+
+## The schema names a mark
+
+The YAML reader splits a scalar on a colon. So the punctuation layer names each
+mark in words, and the projector maps the name to its character. The name `full
+stop` carries a `.`, and its kind follows.
+
+## What stands outside a layer
+
+A fence, a code span, the frontmatter, a link and a path stand outside every
+layer, because the formatter and the compiler hold those. Each script rule
+blanks them before it reads, and the blank keeps the length, so an offset still
+points at the line under it.
+
+## The grammar rules
+
+The tagger misreads a heading, a table cell and a quoted command, so the
+grammar layer stays a blacklist inside the whitelist. The schema carries the
+words it misreads, one word and one reason each, and the projector writes them
+into every rule reading a tag.
+
+Two shapes of the YAML matter:
+
+| the piece | the shape |
+|---|---|
+| a sequence exception | the whole phrase, so one word stands once per auxiliary in front of it |
+| a swap key | a single-quoted scalar, because a double-quoted one reads `\b` as a backspace |
+
+The contraction table, the Latin table and the modal list belong to English, so
+the projector holds all three. The schema says whether each rule stands.
+
+## A shape says its ending
+
+A target folder holds the files its shape writes. The shape `config commands`
+writes markdown and `paragraph rules` writes YAML, so the compare reads the
+ending the shape names.
+
+# A missing layer fails
+
+`spec/schemas/paragraph.schema.schema.json` says the type of every key the
+paragraph schema holds. `./RUNME.sh check` reads both and names what stands
+apart:
+
+    spec/schemas/paragraph.schema.yaml: layers.grammar is missing
+    A source stands away from the shape beside it, so no target is written.
+
+A layer that goes missing projects a rule file without it, and the tree then
+reads green while a check stands absent. The fault comes ahead of the stale
+compare, so a source standing apart writes no target.
+
 # Projecting in memory
 
 `writesOf` takes one entry and the texts it reads, and answers a map from path
