@@ -1,0 +1,858 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Agent Pulls Tickets</title>
+<style>
+  :root{
+    --bg:#fbfaf8; --fg:#1a1917; --muted:#6b6862; --rule:#dedad2;
+    --panel:#ffffff; --accent:#8a4b2a; --accent-soft:#f2e7df;
+    --person:#a8322a; --person-soft:#f7e3e0; --engine:#3b5a86; --engine-soft:#e3ebf5;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#15140f; --fg:#e9e5dc; --muted:#9a958a; --rule:#332f28;
+      --panel:#1c1a15; --accent:#d4915f; --accent-soft:#2a211a;
+      --person:#e38a80; --person-soft:#33201d; --engine:#8fb0e0; --engine-soft:#1d2532;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#15140f; --fg:#e9e5dc; --muted:#9a958a; --rule:#332f28;
+    --panel:#1c1a15; --accent:#d4915f; --accent-soft:#2a211a;
+    --person:#e38a80; --person-soft:#33201d; --engine:#8fb0e0; --engine-soft:#1d2532;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--bg);color:var(--fg);margin:0;
+    font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+  .wrap{max-width:1160px;margin:0 auto;padding-block:44px 88px;padding-inline:24px}
+  h1{font-size:30px;margin:0 0 4px;letter-spacing:-.02em;text-wrap:balance}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 26px;max-width:72ch}
+  h2{font-size:20px;margin:54px 0 6px;padding-top:16px;border-top:2px solid var(--fg);text-wrap:balance}
+  h2 .n{color:var(--accent);font-variant-numeric:tabular-nums;margin-right:10px}
+  h3{font-size:15px;margin:26px 0 6px}
+  p{margin:10px 0;max-width:76ch}
+  p.lead{font-size:17px;max-width:70ch}
+  code{font-family:var(--mono);font-size:.87em;background:var(--accent-soft);padding:1px 5px;border-radius:3px}
+  figure{margin:22px 0 8px;padding:18px 14px 10px;background:var(--panel);
+    border:1px solid var(--rule);border-radius:8px;overflow-x:auto}
+  figure svg{display:block;max-width:100%;height:auto;margin:0 auto}
+  figcaption{color:var(--muted);font-size:13px;margin-top:14px;padding:0 6px;text-align:left}
+  .scroll{overflow-x:auto;margin:14px 0;border:1px solid var(--rule);border-radius:6px;background:var(--panel)}
+  table{border-collapse:collapse;width:100%;font-size:13.5px}
+  th,td{text-align:left;padding:8px 11px;border-bottom:1px solid var(--rule);vertical-align:top}
+  th{font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);
+    font-weight:600;white-space:nowrap;background:var(--bg);position:sticky;top:0}
+  tr:last-child td{border-bottom:none}
+  td.m,th.m{font-family:var(--mono);font-size:12.5px;white-space:nowrap}
+  td.num{font-variant-numeric:tabular-nums;text-align:right}
+  ul,ol{padding-left:22px;max-width:76ch} li{margin:6px 0}
+  .here{background:var(--panel);border:1px solid var(--rule);border-left:4px solid var(--accent);
+    border-radius:0 6px 6px 0;padding:4px 20px 14px;margin:18px 0}
+  .note{font-size:13.5px;color:var(--muted);border-left:2px solid var(--rule);padding-left:14px;margin:14px 0;max-width:76ch}
+  b.a{color:var(--accent)}
+  b.p{color:var(--person)}
+  .toc{columns:2;column-gap:40px;font-size:14px;padding-left:22px;margin:0 0 8px}
+  .toc li{margin:3px 0;break-inside:avoid}
+  a{color:var(--accent)} a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .rules{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:18px 0}
+  .rule{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:14px 16px}
+  .rule b{display:block;font-size:15px;margin-bottom:6px}
+  .rule p{font-size:14px;margin:0;color:var(--fg)}
+  .pills{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0}
+  .pill{font-family:var(--mono);font-size:12.5px;padding:3px 10px;border:1px solid var(--rule);border-radius:999px;background:var(--panel)}
+  .pill.person{border-color:var(--person);color:var(--person);background:var(--person-soft)}
+  .pill.derived{border-style:dashed;color:var(--muted)}
+  .arrow{color:var(--muted)}
+  .split{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:18px;align-items:start;margin:18px 0}
+  pre.file{margin:0;font-family:var(--mono);font-size:12.5px;line-height:1.5;background:var(--panel);
+    border:1px solid var(--rule);border-radius:8px;padding:14px 16px;overflow-x:auto;white-space:pre}
+  pre.file .k{color:var(--muted)}
+  pre.file .v{background:var(--accent-soft);border-radius:3px}
+  pre.file .e{background:var(--engine-soft);border-radius:3px}
+  pre.file .c{color:var(--muted);font-style:italic}
+  pre.file .h{font-weight:700}
+  .legend{font-size:13.5px}
+  .legend li{margin:8px 0}
+  .sw{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:-2px;margin-right:6px;border:1px solid var(--rule)}
+  .board{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin:14px 0}
+  .col{background:var(--panel);border:1px solid var(--rule);border-radius:8px;padding:10px;min-width:0}
+  .col h4{margin:0 0 8px;font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}
+  .col h4.you{color:var(--person)}
+  .card{font-family:var(--mono);font-size:11.5px;line-height:1.35;border:1px solid var(--rule);border-radius:5px;padding:6px 8px;margin:6px 0;background:var(--bg);overflow-wrap:anywhere}
+  .card .s{display:block;color:var(--muted);font-family:inherit}
+  .card.person{border-color:var(--person)}
+  @media (max-width:820px){
+    .rules{grid-template-columns:1fr}
+    .split{grid-template-columns:1fr}
+    .board{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .toc{columns:1}
+  }
+  @media (max-width:480px){ .board{grid-template-columns:1fr} }
+  @media (prefers-reduced-motion: reduce){ *{scroll-behavior:auto} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>The agent pulls tickets</h1>
+<p class="sub">Level one, drawn. The record is the design input beside this page,
+<code>spec/design_input/the-agent-pulls-tickets.md</code>, committed as <code>1d176f22</code> on
+<code>claude/relaxed-knuth-f0uk4d</code>. This page draws that note and adds the one thing the tree gives
+no home to yet: what the field does with the same problem.</p>
+
+<div class="here">
+<p><b>What this page is.</b> The drawings of the level one design, the example ticket as a file, and the
+comparison with ten systems that organize work for agents. Where a sentence here and the note disagree,
+the note stands and this page is stale.</p>
+<p><b>What this page is not.</b> A second copy of the note. The rulings, the field table and the order of
+work live there, and this page points at them where it draws them.</p>
+</div>
+
+<ol class="toc">
+  <li><a href="#s1">The shape</a></li>
+  <li><a href="#s2">A ticket, as a file</a></li>
+  <li><a href="#s3">The lifecycle and the route</a></li>
+  <li><a href="#s4">Evidence per step</a></li>
+  <li><a href="#s5">Processes are routes</a></li>
+  <li><a href="#s6">A group is a branch</a></li>
+  <li><a href="#s7">The pull</a></li>
+  <li><a href="#s8">Hands and escalation</a></li>
+  <li><a href="#s9">Guidance rides the step</a></li>
+  <li><a href="#s10">What a person sees</a></li>
+  <li><a href="#s11">Level zero and level two</a></li>
+  <li><a href="#s12">Where it lives</a></li>
+  <li><a href="#s13">Rulings from v3 and v4</a></li>
+  <li><a href="#s14">The order of work</a></li>
+  <li><a href="#s15">What the field does</a></li>
+  <li><a href="#s16">What this leaves open</a></li>
+</ol>
+
+<!-- ============================================================ -->
+<h2 id="s1"><span class="n">1</span>The shape</h2>
+
+<p class="lead">Level zero is agent control, and it stands. Level one is the ticket system. The agent
+pulls tickets, works the ticket in hand, and pulls again. The ticket system decides which ticket comes
+back. A person works the same tickets, in the same files, with the same verbs. Processes mint the tickets,
+and the state machines of level two read them and see where the work stands.</p>
+
+<div class="rules">
+  <div class="rule"><b>The agent pulls.</b><p>One verb hands it a ticket at a step, and the same verb hands
+  the ticket back. It chooses no ticket, edits no state, and reads no process.</p></div>
+  <div class="rule"><b>The engine decides.</b><p>It hands out the next ticket by rules a person reads as data,
+  checks every hand-back mechanically, and moves the ticket on.</p></div>
+  <div class="rule"><b>A person works the same files.</b><p>Every ticket is a markdown note a person opens,
+  edits and pulls, under the same rules the agent meets, with no refusal.</p></div>
+</div>
+
+<figure>
+<svg viewBox="0 0 900 330" role="img"
+     aria-label="Three levels stacked in the middle: level two, level one, level zero. The agent on the left pulls from level one and gets work, refused or wait back. Level zero holds doors over the agent. Level two mints tickets into level one's folder and reads it. A person on the right edits the same files and pulls the same way.">
+  <defs>
+    <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="currentColor"/>
+    </marker>
+    <marker id="ara" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/>
+    </marker>
+    <marker id="arp" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="var(--person)"/>
+    </marker>
+  </defs>
+  <g font-size="12" fill="currentColor">
+    <!-- the agent -->
+    <rect x="40" y="125" width="160" height="70" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="120" y="155" text-anchor="middle" font-size="14" font-weight="700">the agent</text>
+    <text x="120" y="175" text-anchor="middle" fill="var(--muted)">a session on a box</text>
+
+    <!-- level two -->
+    <rect x="330" y="30" width="250" height="62" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4" stroke-dasharray="5 4"/>
+    <text x="455" y="56" text-anchor="middle" font-size="14" font-weight="700">level two</text>
+    <text x="455" y="76" text-anchor="middle" fill="var(--muted)">processes as machines</text>
+
+    <!-- level one -->
+    <rect x="330" y="125" width="250" height="70" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/>
+    <text x="455" y="151" text-anchor="middle" font-size="14" font-weight="700">level one</text>
+    <text x="455" y="171" text-anchor="middle" fill="var(--muted)">tickets, groups, the pull</text>
+    <text x="455" y="186" text-anchor="middle" fill="var(--muted)" font-size="11">spec/tickets · spec/groups · work/&lt;group&gt;</text>
+
+    <!-- level zero -->
+    <rect x="330" y="228" width="250" height="62" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="455" y="254" text-anchor="middle" font-size="14" font-weight="700">level zero</text>
+    <text x="455" y="274" text-anchor="middle" fill="var(--muted)">agent control: the doors</text>
+
+    <!-- a person -->
+    <rect x="710" y="125" width="150" height="70" rx="6" fill="var(--panel)" stroke="var(--person)" stroke-width="1.4"/>
+    <text x="785" y="155" text-anchor="middle" font-size="14" font-weight="700">a person</text>
+    <text x="785" y="175" text-anchor="middle" fill="var(--muted)">desk, editor, board</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.4">
+    <!-- agent -> level one: pull -->
+    <line x1="200" y1="145" x2="330" y2="145" stroke="var(--accent)" marker-end="url(#ara)"/>
+    <!-- level one -> agent: answer -->
+    <line x1="330" y1="178" x2="200" y2="178" stroke="var(--accent)" marker-end="url(#ara)"/>
+    <!-- level zero -> agent -->
+    <path d="M330,259 L120,259 L120,195" marker-end="url(#ar)"/>
+    <!-- level two -> level one -->
+    <line x1="420" y1="92" x2="420" y2="125" marker-end="url(#ar)"/>
+    <line x1="490" y1="125" x2="490" y2="92" marker-end="url(#ar)"/>
+    <!-- person -> level one -->
+    <line x1="710" y1="160" x2="580" y2="160" stroke="var(--person)" marker-end="url(#arp)"/>
+    <!-- person -> level two -->
+    <path d="M785,125 L785,61 L580,61" stroke="var(--person)" marker-end="url(#arp)"/>
+  </g>
+  <g font-size="11.5" fill="var(--muted)">
+    <text x="265" y="139" text-anchor="middle">pull · hand back</text>
+    <text x="265" y="195" text-anchor="middle">work · refused · wait</text>
+    <text x="205" y="275" text-anchor="start">refuses, hands the standing layer</text>
+    <text x="405" y="112" text-anchor="end">mints</text>
+    <text x="505" y="112" text-anchor="start">reads</text>
+    <text x="645" y="153" text-anchor="middle">edits, pulls</text>
+    <text x="682" y="55" text-anchor="middle">writes routes</text>
+  </g>
+</svg>
+<figcaption>Who talks to what. The agent meets level one through one verb and level zero through its doors.
+Level two never reaches the agent: it mints tickets into the folder and reads the folder back. A person
+reaches everything, with no refusal.</figcaption>
+</figure>
+
+<!-- ============================================================ -->
+<h2 id="s2"><span class="n">2</span>A ticket, as a file</h2>
+
+<p>A ticket is one markdown note under a schema, <code>kind: [[ticket]]</code>. The file name is its id and
+holds five words at most, which is the cap the tree already sets on every name. The frontmatter holds what
+a program reads. The body holds the ask, one chapter per step, and a discussion. Shaded fields are the
+verbs' to write; a hand edit by an agent to any of them is refused.</p>
+
+<div class="split">
+<pre class="file"><span class="k">---</span>
+<span class="k">kind:</span> [[ticket]]
+<span class="v"><span class="k">state:</span> open</span>
+<span class="v"><span class="k">step:</span> review-design</span>
+<span class="k">process:</span> [[standard]]
+<span class="k">group:</span> voice
+<span class="k">urgency:</span> soon
+<span class="k">depends_on:</span>
+  - the-vocabulary-grows
+<span class="v"><span class="k">steps:</span></span>
+<span class="v">  - name: draft</span>
+<span class="v">    by: anyone</span>
+<span class="v">    reads: [[spec/guidance/writing]]</span>
+<span class="v">  - name: review-design</span>
+<span class="v">    by: not draft</span>
+<span class="v">    on_fail: draft</span>
+<span class="v">    reads: [[spec/guidance/review/reviewing]]</span>
+<span class="v">  - name: implement</span>
+<span class="v">    by: anyone</span>
+<span class="v">  - name: review-build</span>
+<span class="v">    by: not implement</span>
+<span class="v">    on_fail: implement</span>
+<span class="k">---</span>
+
+<span class="h"># Ask</span>
+<span class="c">&lt;!-- what is asked, or what is wrong, and why it matters --&gt;</span>
+The judge reads a write one span at a time and misses the
+paragraph a span sits in.
+
+<span class="h"># draft</span>
+<span class="h">## Done when</span>
+- the note passes its schema, decided by ./RUNME.sh lint spec/design_input/x.md
+<span class="h">## Evidence</span>
+The draft names the paragraph as the unit and leaves the span
+for the characters layer.
+<span class="e">./RUNME.sh lint spec/design_input/x.md · exit 0 · The rules pass.</span>
+<span class="e">hand: box 3f9a · session 12 · tip a1b2c3 → d4e5f6</span>
+
+<span class="h"># review-design</span>
+<span class="h">## Done when</span>
+- one verdict, pass or fail, with findings one a line
+<span class="h">## Evidence</span>
+
+<span class="h"># implement</span>
+<span class="h">## Done when</span>
+- the check is green on the commit, decided by ./RUNME.sh check
+<span class="h">## Evidence</span>
+
+<span class="h"># review-build</span>
+<span class="h">## Done when</span>
+- one verdict, with every criterion's command run again
+<span class="h">## Evidence</span>
+
+<span class="h"># Discussion</span>
+</pre>
+
+<div class="legend">
+<ul>
+  <li><span class="sw" style="background:var(--accent-soft)"></span><b>The verbs' to write.</b> <code>state</code>,
+  <code>step</code> and <code>steps</code>. The pull moves them, the mint and a person set them, an agent's hand
+  edit is refused.</li>
+  <li><span class="sw" style="background:var(--engine-soft)"></span><b>The engine appends.</b> At every
+  hand-back: one line per command with its exit and last line, the hand, and the branch tip at take and at
+  hand-back.</li>
+  <li><span class="sw" style="background:var(--panel)"></span><b>A person or a hand writes.</b> The ask, the
+  done-when lines, the evidence prose, the discussion.</li>
+  <li><b>The comments are the fill-in help.</b> <code>mint</code> writes each chapter's description as a comment,
+  and the language server completes <code>state</code>, <code>step</code>, <code>by</code> and <code>group</code>
+  from the schema, the route and the folder.</li>
+</ul>
+</div>
+</div>
+
+<h3>Every field names its reader</h3>
+<div class="scroll"><table>
+<tr><th>field</th><th>who reads it</th></tr>
+<tr><td class="m">state</td><td>the pull rule and the board</td></tr>
+<tr><td class="m">reason</td><td>the board, on <code>closed</code> alone: <code>done</code>, <code>dropped</code> or <code>became</code></td></tr>
+<tr><td class="m">step</td><td>the pull, as the row of the route the ticket stands on</td></tr>
+<tr><td class="m">steps</td><td>the pull, the checks and the board</td></tr>
+<tr><td class="m">process</td><td>the board and the retro, as the route the mint copies from</td></tr>
+<tr><td class="m">group</td><td>the pull, as the branch this ticket lands on</td></tr>
+<tr><td class="m">parent</td><td>the pull, which hands a child out before its parent</td></tr>
+<tr><td class="m">depends_on</td><td>the pull, which holds a ticket until they close</td></tr>
+<tr><td class="m">successors</td><td>the board, on reason <code>became</code></td></tr>
+<tr><td class="m">urgency</td><td>the pull, as <code>now</code>, <code>soon</code> or <code>whenever</code></td></tr>
+</table></div>
+
+<h3>Two kinds, and the folder says which</h3>
+<div class="scroll"><table>
+<tr><th>kind</th><th>folder</th><th>travels</th><th>who may pull it</th></tr>
+<tr><td>tracked</td><td class="m">spec/tickets/</td><td>yes, on trunk and on a group's branch</td><td>any hand the route admits</td></tr>
+<tr><td>private</td><td class="m">.se/tickets/</td><td>no, it dies with the box</td><td>the hand on this box alone</td></tr>
+</table></div>
+<p class="note">A private ticket is a hand's own breakdown, a bug it trips over, a note for the retro. It
+moves to <code>spec/tickets/</code> through the mint alone, which runs the privacy check the commit door holds.</p>
+
+<!-- ============================================================ -->
+<h2 id="s3"><span class="n">3</span>The lifecycle and the route</h2>
+
+<p>The lifecycle is generic and small. It answers whether a hand may pull the ticket and whether it is
+finished, and nothing about what kind of work it is. In work and parked are derived, not stored.</p>
+
+<div class="pills">
+  <span class="pill">draft</span><span class="arrow">→</span>
+  <span class="pill">open</span><span class="arrow">→</span>
+  <span class="pill">closed · reason</span>
+  <span class="arrow" style="margin-left:18px">derived:</span>
+  <span class="pill derived">in work = a group holds it and a hand holds it</span>
+  <span class="pill derived">parked = open at a person step with a condition</span>
+</div>
+
+<p>The kind of work lives in the route, which the ticket carries as its own list of steps. A review is a
+step, not a state. So is a test, an approval, a translation or a deploy. Adding a kind of work adds a row
+to a route and moves nothing in the schema.</p>
+
+<figure>
+<svg viewBox="0 0 940 280" role="img"
+     aria-label="A route drawn as boxes left to right: draft, review-design, implement, review-build, then closed. Pass arrows go right. Fail arrows curve back from each review to the step it reviews. The step pointer sits on review-design. Below it, a dashed red person step, inserted by an escalation, takes the pointer and hands it back into review-design.">
+  <g font-size="12.5" fill="currentColor">
+    <rect x="40" y="100" width="120" height="52" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="100" y="131" text-anchor="middle" font-weight="700">draft</text>
+    <rect x="225" y="100" width="160" height="52" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.8"/>
+    <text x="305" y="125" text-anchor="middle" font-weight="700">review-design</text>
+    <text x="305" y="142" text-anchor="middle" fill="var(--muted)" font-size="11">by: not draft</text>
+    <rect x="450" y="100" width="130" height="52" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="515" y="131" text-anchor="middle" font-weight="700">implement</text>
+    <rect x="645" y="100" width="150" height="52" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="720" y="125" text-anchor="middle" font-weight="700">review-build</text>
+    <text x="720" y="142" text-anchor="middle" fill="var(--muted)" font-size="11">by: not implement</text>
+    <rect x="850" y="108" width="80" height="36" rx="18" fill="var(--panel)" stroke="var(--muted)" stroke-width="1.2" stroke-dasharray="4 3"/>
+    <text x="890" y="130" text-anchor="middle" fill="var(--muted)">closed</text>
+    <!-- step pointer -->
+    <polygon points="305,86 297,72 313,72" fill="var(--accent)"/>
+    <text x="305" y="62" text-anchor="middle" fill="var(--accent)" font-size="11.5" font-weight="700">step</text>
+    <!-- person step -->
+    <rect x="130" y="205" width="240" height="46" rx="6" fill="var(--person-soft)" stroke="var(--person)" stroke-width="1.4" stroke-dasharray="5 4"/>
+    <text x="250" y="225" text-anchor="middle" fill="var(--person)" font-weight="700">person-1 · by: person</text>
+    <text x="250" y="242" text-anchor="middle" fill="var(--person)" font-size="11">asks: which of the two schemas stands?</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.4">
+    <line x1="160" y1="126" x2="225" y2="126" marker-end="url(#ar)"/>
+    <line x1="385" y1="126" x2="450" y2="126" marker-end="url(#ar)"/>
+    <line x1="580" y1="126" x2="645" y2="126" marker-end="url(#ar)"/>
+    <line x1="795" y1="126" x2="850" y2="126" marker-end="url(#ar)"/>
+    <!-- fail loops -->
+    <path d="M330,100 C330,40 110,40 100,100" marker-end="url(#ar)"/>
+    <path d="M745,100 C745,40 525,40 515,100" marker-end="url(#ar)"/>
+    <!-- escalation -->
+    <path d="M285,152 L285,205" stroke="var(--person)" stroke-dasharray="5 4" marker-end="url(#arp)"/>
+    <path d="M325,205 L325,152" stroke="var(--person)" stroke-dasharray="5 4" marker-end="url(#arp)"/>
+  </g>
+  <g font-size="11.5" fill="var(--muted)">
+    <text x="192" y="118" text-anchor="middle">pass</text>
+    <text x="417" y="118" text-anchor="middle">pass</text>
+    <text x="612" y="118" text-anchor="middle">pass</text>
+    <text x="822" y="118" text-anchor="middle">done</text>
+    <text x="215" y="52" text-anchor="middle">fail · on_fail: draft</text>
+    <text x="630" y="52" text-anchor="middle">fail · on_fail: implement</text>
+    <text x="255" y="185" text-anchor="end" fill="var(--person)">escalate</text>
+    <text x="352" y="185" text-anchor="start" fill="var(--person)">answer, then on</text>
+  </g>
+</svg>
+<figcaption>The route of a standard ticket. A verdict decides pass or fail, and the route says where a fail
+goes. The <b class="p">red step</b> is not in the process: an escalation inserts it in front of the current
+step, a person answers under its evidence, and the pointer moves on into the step it left.</figcaption>
+</figure>
+
+<div class="scroll"><table>
+<tr><th>step field</th><th>holds</th></tr>
+<tr><td class="m">name</td><td>one word or a hyphenated pair, unique on the ticket</td></tr>
+<tr><td class="m">by</td><td><code>anyone</code>, <code>person</code>, <code>agent</code>, <code>children</code>, or <code>not &lt;step&gt;</code></td></tr>
+<tr><td class="m">reads</td><td>links to the guidance notes the step's hand reads</td></tr>
+<tr><td class="m">on_fail</td><td>an earlier step, where a failed hand-back sends the ticket</td></tr>
+<tr><td class="m">asks</td><td>the question a person answers, on a step a person takes</td></tr>
+</table></div>
+
+<p>Three keywords join the schema checker so the shape holds mechanically: <code>x-one-per</code>, so a
+chapter stands for every entry of a named list under that entry's name; <code>x-names</code>, so
+<code>step</code> names an entry of <code>steps</code>; and <code>x-earlier</code>, so <code>on_fail</code>
+names a step that stands before its own. The write door, the sweep and the language server read one rule.</p>
+
+<!-- ============================================================ -->
+<h2 id="s4"><span class="n">4</span>Evidence per step</h2>
+
+<p>The evidence chapter of a step carries what the hand sees and what the engine measures. The hand writes
+prose: what it does, what surprises it, what it leaves. The engine appends at the hand-back, and the hand
+cannot write those lines, so a tick stands only where the engine ran the command.</p>
+
+<div class="scroll"><table>
+<tr><th>line</th><th>written by</th><th>holds</th></tr>
+<tr><td>the prose</td><td>the hand</td><td>what it did, what it saw, what it leaves</td></tr>
+<tr><td>one line per criterion with a command</td><td>the engine</td><td>the command, its exit, its last line</td></tr>
+<tr><td>the hand</td><td>the engine</td><td>the box, the session, and the agent where the harness names one</td></tr>
+<tr><td>the tips</td><td>the engine</td><td>the branch tip at the take and at the hand-back, the two hashes v4 wrote on a token</td></tr>
+</table></div>
+
+<p>The diff of the work is the group's branch, and <code>git log</code> on the ticket file is its history.
+So a ticket carries no time and no line number, and a reader finds both in git. The tickets folder stands
+beside the rationales in <code>.vale.ini</code>, so an evidence chapter and a discussion may say what
+happened.</p>
+
+<!-- ============================================================ -->
+<h2 id="s5"><span class="n">5</span>Processes are routes</h2>
+
+<p>A process is a route the mint copies onto a ticket. Level one ships three, under
+<code>spec/processes/</code>, each a note holding a <code>steps</code> list and nothing more. The mint takes
+<code>--process &lt;name&gt;</code> and copies the route, so the ticket depends on nothing outside itself after
+that, and a process file changes without reaching a ticket in flight.</p>
+
+<div class="scroll"><table>
+<tr><th>process</th><th>route</th><th>for</th></tr>
+<tr><td class="m">trivial</td><td class="m">do</td><td>a fix small enough that the ask is the design</td></tr>
+<tr><td class="m">standard</td><td class="m">draft · review-design · implement · review-build</td><td>a change that wants an approach first and a second pair of eyes after</td></tr>
+<tr><td class="m">complex</td><td class="m">split · children · review-whole</td><td>a change too large to review whole</td></tr>
+</table></div>
+
+<figure>
+<svg viewBox="0 0 900 250" role="img"
+     aria-label="A complex ticket at its children step sits above three child tickets, each with its own route. Arrows down say parent. One arrow back up says that the last child to close advances the parent to review-whole.">
+  <g font-size="12.5" fill="currentColor">
+    <rect x="260" y="24" width="380" height="58" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/>
+    <text x="450" y="48" text-anchor="middle" font-weight="700">the-judge-reads-paragraphs · complex</text>
+    <text x="450" y="68" text-anchor="middle" fill="var(--muted)" font-size="11.5">step: children · by: children · nobody pulls it here</text>
+
+    <rect x="60" y="160" width="220" height="58" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="170" y="184" text-anchor="middle" font-weight="700">the-span-becomes-a-paragraph</text>
+    <text x="170" y="203" text-anchor="middle" fill="var(--muted)" font-size="11.5">trivial · do · closed</text>
+
+    <rect x="340" y="160" width="220" height="58" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="450" y="184" text-anchor="middle" font-weight="700">the-judge-takes-a-paragraph</text>
+    <text x="450" y="203" text-anchor="middle" fill="var(--muted)" font-size="11.5">standard · at implement · open</text>
+
+    <rect x="620" y="160" width="220" height="58" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="730" y="184" text-anchor="middle" font-weight="700">the-projection-writes-the-rule</text>
+    <text x="730" y="203" text-anchor="middle" fill="var(--muted)" font-size="11.5">trivial · do · open</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.4">
+    <path d="M330,82 L170,160" marker-end="url(#ar)"/>
+    <line x1="450" y1="82" x2="450" y2="160" marker-end="url(#ar)"/>
+    <path d="M570,82 L730,160" marker-end="url(#ar)"/>
+    <path d="M840,175 C880,120 700,60 640,58" stroke="var(--accent)" stroke-dasharray="5 4" marker-end="url(#ara)"/>
+  </g>
+  <g font-size="11.5" fill="var(--muted)">
+    <text x="232" y="118" text-anchor="middle">parent</text>
+    <text x="466" y="125" text-anchor="start">parent</text>
+    <text x="668" y="118" text-anchor="middle">parent</text>
+    <text x="800" y="102" text-anchor="start" fill="var(--accent)">the last close advances</text>
+    <text x="800" y="117" text-anchor="start" fill="var(--accent)">the parent to review-whole</text>
+  </g>
+</svg>
+<figcaption>Complexity composes through <code>parent</code>. A complex ticket's <code>split</code> step writes
+the children, its <code>children</code> step belongs to nobody while they run, and its <code>review-whole</code>
+step reads what they add up to. Every route stays short. Names are examples.</figcaption>
+</figure>
+
+<!-- ============================================================ -->
+<h2 id="s6"><span class="n">6</span>A group is a branch</h2>
+
+<p>A ticket is too small for a branch, and a branch is too heavy for every ticket. So the unit a box works
+and the unit that lands is a group: a branch named <code>work/&lt;group&gt;</code>, and a note under
+<code>spec/groups/</code> holding its state and its ask. A ticket names its group in one field, and a person
+writes that field. A group of one ticket is the ordinary case, and a group of five is the same shape.</p>
+
+<figure>
+<svg viewBox="0 0 940 240" role="img"
+     aria-label="A git graph. Main runs along the bottom. A branch work/voice leaves main after a commit that puts the group note and its tickets on trunk. On the branch: a commit take sets state held, then one commit per ticket hand-back, then a retro commit sets state done. The branch merges back to main with no fast-forward. A bracket over the branch tip says the lease is the age of this tip.">
+  <g fill="none" stroke="currentColor" stroke-width="2">
+    <line x1="40" y1="180" x2="900" y2="180"/>
+    <path d="M140,180 C170,180 170,80 200,80 L760,80 C790,80 790,180 820,180" stroke="var(--accent)"/>
+  </g>
+  <g stroke="currentColor" stroke-width="1.6">
+    <circle cx="140" cy="180" r="6" fill="var(--panel)"/>
+    <circle cx="820" cy="180" r="6" fill="var(--panel)"/>
+    <circle cx="230" cy="80" r="6" fill="var(--accent-soft)" stroke="var(--accent)"/>
+    <circle cx="360" cy="80" r="6" fill="var(--accent-soft)" stroke="var(--accent)"/>
+    <circle cx="490" cy="80" r="6" fill="var(--accent-soft)" stroke="var(--accent)"/>
+    <circle cx="620" cy="80" r="6" fill="var(--person-soft)" stroke="var(--person)"/>
+    <circle cx="740" cy="80" r="6" fill="var(--accent-soft)" stroke="var(--accent)"/>
+  </g>
+  <g font-size="12" fill="currentColor">
+    <text x="60" y="205" text-anchor="start" font-weight="700">main</text>
+    <text x="140" y="222" text-anchor="middle" fill="var(--muted)" font-size="11.5">the group note, todo, and its</text>
+    <text x="140" y="236" text-anchor="middle" fill="var(--muted)" font-size="11.5">tickets land on trunk</text>
+    <text x="820" y="222" text-anchor="middle" fill="var(--muted)" font-size="11.5">work merge, no fast-forward</text>
+    <text x="820" y="236" text-anchor="middle" fill="var(--muted)" font-size="11.5">then work close drops the branch</text>
+    <text x="200" y="62" text-anchor="start" fill="var(--accent)" font-weight="700">work/voice</text>
+    <text x="230" y="105" text-anchor="middle" font-size="11.5">take</text>
+    <text x="230" y="120" text-anchor="middle" fill="var(--muted)" font-size="11">state: held</text>
+    <text x="230" y="134" text-anchor="middle" fill="var(--muted)" font-size="11">the push is the claim</text>
+    <text x="360" y="105" text-anchor="middle" font-size="11.5">ticket a · pass</text>
+    <text x="490" y="105" text-anchor="middle" font-size="11.5">ticket b · pass</text>
+    <text x="620" y="105" text-anchor="middle" font-size="11.5" fill="var(--person)">ticket c · escalate</text>
+    <text x="620" y="120" text-anchor="middle" fill="var(--muted)" font-size="11">a person step waits;</text>
+    <text x="620" y="134" text-anchor="middle" fill="var(--muted)" font-size="11">the box goes on with d</text>
+    <text x="740" y="105" text-anchor="middle" font-size="11.5">retro</text>
+    <text x="740" y="120" text-anchor="middle" fill="var(--muted)" font-size="11">state: done</text>
+  </g>
+  <g fill="none" stroke="var(--muted)" stroke-width="1.2">
+    <path d="M680,40 L680,30 L800,30 L800,40"/>
+  </g>
+  <text x="740" y="22" text-anchor="middle" font-size="11.5" fill="var(--muted)">lease = the age of this tip · older than 3 h reads as free</text>
+</svg>
+<figcaption>The branch is the claim and the tip is the lease. Every accepted hand-back is a push, so a
+working box renews its lease by working. Nothing on the ticket says who holds it or since when: git does.</figcaption>
+</figure>
+
+<div class="scroll"><table>
+<tr><th>rule</th><th>what it says</th></tr>
+<tr><td>the branch is the claim</td><td>taking a group pushes <code>state: held</code> on the group note, and the push arbitrates two boxes</td></tr>
+<tr><td>the tip is the lease</td><td>a held group whose branch tip is older than <code>work.leaseHours</code> reads as free again</td></tr>
+<tr><td>one box, one group</td><td>a box works one group at a time, and the group's tickets one at a time</td></tr>
+<tr><td>the branch is the filter</td><td>on a group's branch the pull sees that group's tickets alone, and widens nothing; a filter a person sets in config outranks the branch</td></tr>
+<tr><td>the branch holds the truth</td><td>while the branch stands, its copy of the group note and of its tickets is the record</td></tr>
+<tr><td>a group ends</td><td>when no ticket in it stands at a step an agent may take</td></tr>
+<tr><td>the merge is a person's</td><td><code>work merge</code> takes an ended group into trunk, and <code>work close</code> drops the branch</td></tr>
+</table></div>
+
+<p class="note">v4 ran this shape under two words, <code>bucket</code> on the token and <code>group/</code> on the
+branch. Now the two coincide, so one word stays: group.</p>
+
+<!-- ============================================================ -->
+<h2 id="s7"><span class="n">7</span>The pull</h2>
+
+<p>The agent holds three verbs: <code>pull</code>, <code>guidance</code> and <code>escalate</code>. Every
+other verb belongs to a person or the engine. The shell is the verb, under <code>./RUNME.sh work</code>,
+and a plugin tool wraps it for a session that holds the plugin. A pull carries at most two things: the
+ticket it hands back and a verdict. The file is the payload, because the hand wrote its evidence through
+the write door before it pulled.</p>
+
+<figure>
+<svg viewBox="0 0 900 300" role="img"
+     aria-label="A hand on the left pulls, naming the ticket it hands back and a verdict. The engine on the right runs four checks in order: schema and evidence, the decided-by commands, the hand rule, the judge. Three arrows come back: work with the next ticket, refused with findings, or wait with a reason.">
+  <g font-size="12.5" fill="currentColor">
+    <rect x="40" y="110" width="150" height="80" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="115" y="145" text-anchor="middle" font-size="14" font-weight="700">a hand</text>
+    <text x="115" y="166" text-anchor="middle" fill="var(--muted)" font-size="11.5">a box, or a person</text>
+
+    <rect x="540" y="40" width="320" height="220" rx="6" fill="var(--engine-soft)" stroke="var(--engine)" stroke-width="1.6"/>
+    <text x="700" y="66" text-anchor="middle" font-size="14" font-weight="700">the engine</text>
+    <text x="700" y="84" text-anchor="middle" fill="var(--muted)" font-size="11.5">checks, cheapest first</text>
+    <text x="565" y="118" font-size="12">1&#160;&#160;the ticket passes its schema, and the step's evidence holds text</text>
+    <text x="565" y="146" font-size="12">2&#160;&#160;every <tspan font-family="var(--mono)">decided by</tspan> command runs and answers zero</text>
+    <text x="565" y="174" font-size="12">3&#160;&#160;this hand may take this step, by the route's <tspan font-family="var(--mono)">by</tspan></text>
+    <text x="565" y="202" font-size="12">4&#160;&#160;the judge reads the evidence, where <tspan font-family="var(--mono)">judge.enabled</tspan></text>
+    <text x="565" y="238" font-size="11.5" fill="var(--muted)">then: append the evidence lines, move the step, commit, push, answer</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.4">
+    <line x1="190" y1="125" x2="540" y2="125" stroke="var(--accent)" marker-end="url(#ara)"/>
+    <line x1="540" y1="160" x2="190" y2="160" marker-end="url(#ar)"/>
+    <line x1="540" y1="182" x2="190" y2="182" marker-end="url(#ar)"/>
+    <path d="M540,204 L365,204 L365,220 L190,220" marker-end="url(#ar)"/>
+  </g>
+  <g font-size="11.5">
+    <text x="365" y="118" text-anchor="middle" fill="var(--accent)" font-weight="700">pull · ticket, pass or fail with a reason</text>
+    <text x="365" y="155" text-anchor="middle" fill="var(--muted)">work · the next ticket, its guidance inline, the file's path</text>
+    <text x="365" y="177" text-anchor="middle" fill="var(--muted)">refused · the findings one a line; the ticket stays in hand</text>
+    <text x="365" y="240" text-anchor="middle" fill="var(--muted)">wait · nothing to hand out, and why: finishing, unbound, deps, empty</text>
+  </g>
+</svg>
+<figcaption>One verb, both ways. A hand-back and the next take are one call, so finishing one ticket and
+receiving the next cannot come apart, which is the ruling v3 and v4 both reach.</figcaption>
+</figure>
+
+<h3>The pull runs at two levels</h3>
+<div class="scroll"><table>
+<tr><th>who pulls</th><th>what</th><th>the rule</th></tr>
+<tr><td>the beat</td><td>a box per free group</td><td>groups at <code>todo</code> or lapsed, none of whose tickets wait on an unmerged group, by urgency</td></tr>
+<tr><td>the box</td><td>the next ticket of its group</td><td>tickets at <code>open</code> with no open dependency, children before parents, a step this hand may take, by urgency then name</td></tr>
+<tr><td>a person</td><td>anything</td><td>the same two lists on the board, and no refusal</td></tr>
+</table></div>
+
+<p>The pull writes <code>.se/hold.json</code> naming the ticket, the step, the group and the hand. The
+tooth's <code>work-waiting</code> check reads it, so a turn ends on a fact where a ticket stands in hand.</p>
+
+<!-- ============================================================ -->
+<h2 id="s8"><span class="n">8</span>Hands and escalation</h2>
+
+<p>A hand is a box, a session on it, and an agent inside it where the harness names one. A person's hand is
+their git author name. A role is a property of a step, and no agent holds one for life. When the next
+step's <code>by</code> excludes the hand that pulls, the pull spawns a hand for it through the hook, with a
+prompt the engine writes from the ticket and the step's guidance. The session sees the outcome and its next
+ticket, and shapes nothing of the spawn. That answers v4's objection to a session spawning its own
+reviewer.</p>
+
+<p>A hand that cannot go on without a person calls <code>escalate</code> with the question. The engine
+inserts a step in front of the current one, <code>by: person</code>, with the question under
+<code>asks</code>, mints its chapter, and points <code>step</code> at it. The ticket stays <code>open</code>
+and is now a person's to pull. The person answers under the step's evidence and hands it back, and the
+engine advances into the step behind it. A gate the mint writes and an escalation the engine inserts are
+one mechanism; a park is the same, with the condition as the question.</p>
+
+<div class="scroll"><table>
+<tr><th>trigger</th><th>who inserts</th><th>the knob</th></tr>
+<tr><td>the hand needs a person</td><td>the hand, through the verb</td><td>none</td></tr>
+<tr><td>the same hand-back meets <code>refused</code> N times</td><td>the engine</td><td class="m">work.refusalsBeforePerson</td></tr>
+<tr><td>the lease lapses N times on one ticket</td><td>the engine</td><td class="m">work.lapsesBeforePerson</td></tr>
+<tr><td>a step a person takes, from the mint</td><td>the mint</td><td>none</td></tr>
+</table></div>
+
+<p class="note">A ticket that gathers more inserted steps than <code>work.stepsBeforeSplit</code> is the wrong
+size. The engine refuses another insertion and asks for a split into sub-tickets, closing the ticket with
+reason <code>became</code>. v3 measured the identical refusal twenty-seven times in nine seconds; this is
+the count that ends that.</p>
+
+<!-- ============================================================ -->
+<h2 id="s9"><span class="n">9</span>Guidance rides the step</h2>
+
+<p>Each step names the guidance it reads. The pull's <code>work</code> answer carries those notes'
+actionables inline, so the hand holds them the moment it holds the step. The <code>guidance</code> verb
+answers a named note, or, unnamed, the notes the current step lists and the always-on ones. Every guidance
+answer writes a log line, which proves arrival the way the canary proves the standing layer. The proof of
+application is the hand-back: the commands, the evidence and the judge.</p>
+
+<div class="scroll"><table>
+<tr><th>measurement</th><th>says</th><th>so</th></tr>
+<tr><td>v3, on its own reading probes</td><td>evidence, not enforcement; a model that skims and guesses passes; boot paid about fourteen reads for them</td><td>no probe at level one</td></tr>
+<tr><td>v5, on the field</td><td>a door holds a rule in every run, a prompt in about four runs of five</td><td>the door and the hand-back carry the rule</td></tr>
+</table></div>
+
+<p>The standing layer shrinks to the notes that bind every session. A note a step names leaves the layer
+and rides the step.</p>
+
+<!-- ============================================================ -->
+<h2 id="s10"><span class="n">10</span>What a person sees</h2>
+
+<p>The board draws the folder and the branches, and keeps no second record. Yours stands first: every
+ticket at a step whose <code>by</code> is <code>person</code>, with its question. The beat counts that list,
+and the routine's notification carries the count. The rows below are examples of the shape, drawn from the
+names on today's branches.</p>
+
+<div class="board">
+  <div class="col"><h4 class="you">yours · 2</h4>
+    <div class="card person">the-judge-reads-paragraphs<span class="s">person-1 · which schema stands?</span></div>
+    <div class="card person">the-question-comes-first<span class="s">review-design · verdict owed</span></div>
+  </div>
+  <div class="col"><h4>urgent · 1</h4>
+    <div class="card">the-answer-gate-bites<span class="s">now · voice · implement</span></div>
+  </div>
+  <div class="col"><h4>in work · 3</h4>
+    <div class="card">the-schema-projects-vale<span class="s">voice · implement · box 3f9a</span></div>
+    <div class="card">the-server-holds-the-shape<span class="s">editor · draft · box 7c21</span></div>
+    <div class="card">the-vocabulary-grows<span class="s">voice · do · box 3f9a</span></div>
+  </div>
+  <div class="col"><h4>open · 2</h4>
+    <div class="card">the-folder-names-the-kind<span class="s">soon · schema · do</span></div>
+    <div class="card">the-voice-verbs<span class="s">now · no group yet</span></div>
+  </div>
+  <div class="col"><h4>done · 1</h4>
+    <div class="card">the-private-half-stays-home<span class="s">closed · done · merge owed</span></div>
+  </div>
+</div>
+
+<div class="scroll"><table>
+<tr><th>surface</th><th>draws</th></tr>
+<tr><td>the sidebar's <code>table</code> widget</td><td>every ticket, under yours, urgent, in work, open and done</td></tr>
+<tr><td class="m">./RUNME.sh work list</td><td>the same rows in a terminal</td></tr>
+<tr><td>a projection to <code>BOARD.md</code></td><td>the same rows for a reader with no sidebar</td></tr>
+<tr><td>the ticket file itself</td><td>the ask, the route, the evidence, the discussion</td></tr>
+</table></div>
+
+<p>A person mints from the sidebar's text box or the verb, edits a ticket in the editor, drags a ticket
+into a group by writing the field, and hands a step back with the same verb a box uses. The language
+server names a departure from the schema as they type and completes the fields from the schema, the route
+and the folder. The routine fires one box on its clock; that box runs the beat, which fires the routine
+again for every other free group, up to <code>engine.boxes</code>.</p>
+
+<!-- ============================================================ -->
+<h2 id="s11"><span class="n">11</span>Level zero and level two</h2>
+
+<div class="scroll"><table>
+<tr><th>level zero today</th><th>after level one</th></tr>
+<tr><td>the brief door hands over <code>HANDOVER.md</code> and deletes it</td><td>the tracked brief goes, and the block on a cloud box says to run the pull</td></tr>
+<tr><td><code>.se/HANDOVER.md</code> hands one session the next</td><td>unchanged</td></tr>
+<tr><td><code>work-waiting</code> counts tasks</td><td>it reads <code>.se/hold.json</code> and counts private tickets</td></tr>
+<tr><td><code>engine.binding</code> at <code>queue</code> and <code>unbound</code> draw the status bar</td><td><code>queue</code> hands out; <code>unbound</code> hands out nothing, and a hand may take a named ticket</td></tr>
+<tr><td><code>engine.autonomy</code> draws nowhere</td><td><code>finish</code> mints nothing, <code>start</code> mints into its own group, <code>ideation</code> mints drafts into the backlog</td></tr>
+<tr><td><code>engine.state</code> and <code>engine.beat</code> draw nowhere</td><td>the beat writes them</td></tr>
+<tr><td>the trunk guard refuses a commit on <code>main</code></td><td>unchanged</td></tr>
+</table></div>
+
+<p>Level two is processes as machines, and it reaches the agent by no road. It reads the folder of tickets,
+derives where each machine stands from the states and steps it finds there, mints tickets with routes, sets
+<code>parent</code> on them, and reacts to a close by minting the next. The agent still pulls, and the only
+fact it meets is a route.</p>
+
+<!-- ============================================================ -->
+<h2 id="s12"><span class="n">12</span>Where it lives</h2>
+
+<div class="scroll"><table>
+<tr><th>piece</th><th>where</th></tr>
+<tr><td>the schemas</td><td class="m">spec/schemas/ticket.schema.yaml · group.schema.yaml · process.schema.yaml</td></tr>
+<tr><td>the folders</td><td class="m">spec/tickets/ · spec/groups/ · spec/processes/ · .se/tickets/</td></tr>
+<tr><td>the verbs</td><td class="m">src/scripts/work.js, under ./RUNME.sh work</td></tr>
+<tr><td>the tool wrapper and the spawn</td><td class="m">.claude/skills/level1/</td></tr>
+<tr><td>the stop rule</td><td class="m">spec/config/stop/level1.yml</td></tr>
+<tr><td>the hold and the box id</td><td class="m">.se/hold.json · .se/box.json</td></tr>
+<tr><td>the config</td><td>the <code>engine</code> and <code>work</code> sections of <code>spec/config/level0.json</code></td></tr>
+</table></div>
+
+<div class="scroll"><table>
+<tr><th>key</th><th>default</th><th>what it decides</th></tr>
+<tr><td class="m">work.leaseHours</td><td class="num">3</td><td>when a held group reads as free</td></tr>
+<tr><td class="m">work.refusalsBeforePerson</td><td class="num">5</td><td>when a refused hand-back becomes a person's step</td></tr>
+<tr><td class="m">work.lapsesBeforePerson</td><td class="num">2</td><td>when a lapsed ticket becomes a person's step</td></tr>
+<tr><td class="m">work.stepsBeforeSplit</td><td class="num">3</td><td>when an escalating ticket must split</td></tr>
+<tr><td class="m">work.filter</td><td class="num">empty</td><td>what a person's pull sees, over the branch</td></tr>
+<tr><td class="m">engine.boxes</td><td class="num">1</td><td>how many boxes the beat fires at most</td></tr>
+</table></div>
+
+<!-- ============================================================ -->
+<h2 id="s13"><span class="n">13</span>Rulings from v3 and v4</h2>
+
+<div class="scroll"><table>
+<tr><th>ruling</th><th>from</th><th>where it lands</th></tr>
+<tr><td>the pull is the one verb, and a submission rides it</td><td>v3, v4</td><td>stays whole</td></tr>
+<tr><td>one token in hand</td><td>v4</td><td>one ticket in hand, in <code>.se/hold.json</code></td></tr>
+<tr><td>the hold is engine state, and the claim travels</td><td>v4</td><td>the hold file, and the group's push</td></tr>
+<tr><td>the token carries no time</td><td>v4</td><td>stays, and the lease reads git</td></tr>
+<tr><td>a field stands because something reads it</td><td>v4</td><td>the field table in section 2</td></tr>
+<tr><td>a todo is a sub-token</td><td>v4</td><td>private sub-tickets, and the tooth counts them</td></tr>
+<tr><td>every token names its closer</td><td>v4</td><td>the route's last step</td></tr>
+<tr><td>a refusal is a menu</td><td>v4</td><td>the <code>refused</code> answer names the fix</td></tr>
+<tr><td>the bucket is the person's</td><td>v4</td><td>the group, and the word bucket retires</td></tr>
+<tr><td>processes as data</td><td>v4</td><td>routes now, and machines at level two</td></tr>
+<tr><td>a write names its token</td><td>v4</td><td>out: the hold names it, and the write door is level zero's</td></tr>
+<tr><td>the staffing gate and the reviewer queue</td><td>v4</td><td>out: a step spawns its own hand</td></tr>
+<tr><td>the reading proof</td><td>v3</td><td>out, for the log line; open as a level two option</td></tr>
+<tr><td>a spawn ceiling of zero for delegated writing</td><td>v3</td><td>the engine spawns for a step alone, and the session spawns for nothing</td></tr>
+<tr><td>controls only ever stop the engine refusing</td><td>v3</td><td>stays</td></tr>
+<tr><td>notes, then the retro, then the mint</td><td>v3</td><td>the mint's privacy check on promotion</td></tr>
+</table></div>
+
+<!-- ============================================================ -->
+<h2 id="s14"><span class="n">14</span>The order of work</h2>
+
+<p>Eight branches, and the dependencies make the order binding. The eleven work branches standing today
+finish under the verbs they carry; <code>adopt</code> turns a brief into a group note and one ticket for the
+ones a person wants moved, and the old verbs go once the last brief merges.</p>
+
+<figure>
+<svg viewBox="0 0 940 270" role="img"
+     aria-label="A dependency graph of eight branches. Branch 1, the ticket schema, comes first. Branches 2, a process is a route, and 3, a group is a branch, depend on 1. Branch 4, the agent pulls a ticket, depends on 2 and 3. Branches 5 to 8, hands, guidance, the board and level zero, each depend on 4.">
+  <g font-size="12" fill="currentColor">
+    <rect x="30" y="112" width="190" height="44" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/>
+    <text x="125" y="130" text-anchor="middle" font-weight="700">1 · the ticket has a schema</text>
+    <text x="125" y="147" text-anchor="middle" fill="var(--muted)" font-size="11">schemas, keywords, mint</text>
+
+    <rect x="270" y="52" width="190" height="44" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="365" y="70" text-anchor="middle" font-weight="700">2 · a process is a route</text>
+    <text x="365" y="87" text-anchor="middle" fill="var(--muted)" font-size="11">three routes, a chapter per step</text>
+
+    <rect x="270" y="172" width="190" height="44" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="365" y="190" text-anchor="middle" font-weight="700">3 · a group is a branch</text>
+    <text x="365" y="207" text-anchor="middle" fill="var(--muted)" font-size="11">take, lease, merge, close, adopt</text>
+
+    <rect x="510" y="112" width="190" height="44" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/>
+    <text x="605" y="130" text-anchor="middle" font-weight="700">4 · the agent pulls a ticket</text>
+    <text x="605" y="147" text-anchor="middle" fill="var(--muted)" font-size="11">the pull, its checks, the hold</text>
+
+    <rect x="750" y="12" width="180" height="40" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="840" y="37" text-anchor="middle" font-weight="700">5 · a step changes hands</text>
+    <rect x="750" y="78" width="180" height="40" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="840" y="103" text-anchor="middle" font-weight="700">6 · guidance rides the step</text>
+    <rect x="750" y="144" width="180" height="40" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="840" y="169" text-anchor="middle" font-weight="700">7 · the board draws the folder</text>
+    <rect x="750" y="210" width="180" height="40" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="840" y="235" text-anchor="middle" font-weight="700">8 · level zero hands over</text>
+  </g>
+  <g fill="none" stroke="currentColor" stroke-width="1.4">
+    <path d="M220,134 L245,134 L245,74 L270,74" marker-end="url(#ar)"/>
+    <path d="M220,134 L245,134 L245,194 L270,194" marker-end="url(#ar)"/>
+    <path d="M460,74 L485,74 L485,134 L510,134" marker-end="url(#ar)"/>
+    <path d="M460,194 L485,194 L485,134 L510,134" marker-end="url(#ar)"/>
+    <path d="M700,134 L725,134 L725,32 L750,32" marker-end="url(#ar)"/>
+    <path d="M700,134 L725,134 L725,98 L750,98" marker-end="url(#ar)"/>
+    <path d="M700,134 L725,134 L725,164 L750,164" marker-end="url(#ar)"/>
+    <path d="M700,134 L725,134 L725,230 L750,230" marker-end="url(#ar)"/>
+  </g>
+</svg>
+<figcaption>Two branches carry the weight: the schema, which everything reads, and the pull, which
+everything after it rides on. Five to eight run in parallel once four lands.</figcaption>
+</figure>
+
+<!-- ============================================================ -->
+<h2 id="s15"><span class="n">15</span>What the field does</h2>
+
+<p>Ten systems that organize work for agents, read in September 2026. The mechanics level one keeps are
+the ones they converge on: a store the person reads, an atomic or arbitrated claim, isolation per unit, one
+unit per fresh session, a state that means a person must look, and something that recovers a dead agent.
+None of them makes every write name its ticket, runs processes as data, or forces a reviewer's verdict
+before close; the traveler on the ticket is where this design stands apart.</p>
+
+<div class="scroll"><table>
+<tr><th>system</th><th>the item</th><th>how it is claimed</th><th>isolation</th><th>a person's handoff</th><th>a dead agent</th></tr>
+<tr><td>OpenAI Symphony</td><td>a tracker issue in an active state</td><td>the orchestrator reserves it; the agent never claims</td><td>a workspace per issue, reused across runs</td><td>a handoff state such as Human Review</td><td>a restart re-polls the tracker; no orchestrator database</td></tr>
+<tr><td>GitHub Copilot coding agent</td><td>an issue assigned to the agent</td><td>the assignment</td><td>a sandboxed runner and a draft pull request</td><td>the pull request review; comments iterate</td><td>the pull request stands with progress</td></tr>
+<tr><td>Linear for Agents</td><td>an issue delegated to an agent; the human keeps ownership</td><td>the delegation</td><td>the agent's own</td><td>session states pending, active, awaitingInput, complete, error, stale</td><td>stale</td></tr>
+<tr><td>Devin</td><td>a Jira or Linear ticket assigned to the bot</td><td>the assignment; a playbook label picks the process</td><td>a session</td><td>the ticket</td><td>the session</td></tr>
+<tr><td>beads</td><td>a git-backed issue with hash ids and typed dependencies</td><td><code>bd update --claim</code>, atomic assignee plus status</td><td>none; the store merges</td><td>none built in</td><td>none built in</td></tr>
+<tr><td>Gas Town</td><td>a bead, bundled into convoys</td><td>slung onto an agent's hook, a worktree</td><td>a worktree per agent, a merge queue that bisects</td><td>the Refinery gate</td><td>a Witness nudges or hands off; identity persists, sessions die</td></tr>
+<tr><td>Claude Code agent teams</td><td>a task in a shared list</td><td>a file lock; lead assigns or self-claim; deps block claiming</td><td>worktrees by convention</td><td>TaskCompleted hooks as gates</td><td>status lags; the lead nudges</td></tr>
+<tr><td>Backlog.md</td><td>a markdown task with acceptance criteria and a definition of done</td><td>assignee in frontmatter</td><td>one task, one context window, one pull request</td><td>plan approval before coding</td><td>none</td></tr>
+<tr><td>Paperclip</td><td>an issue on a shared board</td><td>an atomic checkout on the next heartbeat</td><td>per agent</td><td>status in review, approvals</td><td>the heartbeat</td></tr>
+<tr><td>Ralph loop</td><td>one PRD story per iteration</td><td>the loop picks it</td><td>a fresh context per iteration</td><td>git and a progress file</td><td>the next iteration</td></tr>
+</table></div>
+
+<p>Two of them are worth naming for what they settle. Symphony's rule that only the orchestrator mutates
+scheduling state is the pull's rule here: the agent mutates the work, the engine mutates <code>state</code>
+and <code>step</code>. Azure DevOps and Jira model a multi-hand flow as a custom workflow per work item
+type, which is a schema change per process; the traveler puts the same flow on the ticket as data, so
+level one stays still while level two invents flows.</p>
+
+<!-- ============================================================ -->
+<h2 id="s16"><span class="n">16</span>What this leaves open</h2>
+
+<ul>
+  <li>the lease length, which three hours seeds from v4</li>
+  <li>whether a person step may go to a spawned strong model at high autonomy</li>
+  <li>whether yours drowns in parked conditions, and a parked state returns</li>
+  <li>a WIP limit per step, which is Kanban's one knob and stands outside the note</li>
+</ul>
+
+<p class="note">Confidence. The design is the owner's, argued over one afternoon against v3, v4 and the
+field, and it is a design input: what to build, why, and in which order. Nothing in it is measured yet.
+The first branch that lands, the schema, is where the measuring starts.</p>
+
+</div>
+</body>
+</html>
