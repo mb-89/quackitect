@@ -62,6 +62,7 @@ frontmatter:
       default:
         - name: do
           does: makes the change the ask names
+          to: retro
           evidence:
             - name: change
               form: text
@@ -125,6 +126,7 @@ frontmatter:
           input:
             type: [array, string]
             x-earlier: steps
+            x-fields: evidence
             x-words: [ask, diff]
             description: what this step reads, as ask, diff, or an earlier step
 

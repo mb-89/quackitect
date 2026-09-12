@@ -42,6 +42,7 @@ steps:
         says: retro score, which prints how many stand in the tree
   - name: notes
     does: decides every note, the field's answers among them
+    input: field
     needs: [retro]
     evidence:
       - name: drained
@@ -148,7 +149,7 @@ steps:
             says: what changes in the retro route or its verb, and why, each a ticket the improve step mints
   - name: improve
     does: mints one ticket per class, each with its home and its card
-    input: mine
+    input: [mine, score]
     checklist:
       - one class, one ticket, and no more than work.retroCap of them
       - the home is the earliest in the order that removes the waste

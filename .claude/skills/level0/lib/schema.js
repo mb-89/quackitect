@@ -260,6 +260,7 @@ export function checkNote(text, schema, where, schemas) {
   const held = heldIn(note.front, schema, kind, where, "frontmatter", schemas);
   return [
     ...mapFaults(note.front.said ?? {}, spec, held, ""),
+    ...slotFaults(note.front.said ?? {}, where),
     ...bodyFaults(note, schema?.body ?? {}, kind, where),
   ];
 }
@@ -271,7 +272,10 @@ export function checkData(text, schema, where, schemas) {
   const spec = schema?.data ?? {};
   const kind = String(schema?.kind ?? "");
   const front = { said, lines: Object.fromEntries(lines) };
-  return mapFaults(said, spec, heldIn(front, schema, kind, where, "file", schemas), "");
+  return [
+    ...mapFaults(said, spec, heldIn(front, schema, kind, where, "file", schemas), ""),
+    ...slotFaults(said, where),
+  ];
 }
 
 // [[spec/design_output/schema#the-checker-walks-every-key]]
@@ -433,6 +437,7 @@ function refersFaults(key, value, rule, held, at, line) {
     if (said === null) continue;
     const found = entryNamed(walk, said, holder);
     if (!found) {
+      if (fieldBefore(walk, holder, said, rule)) continue;
       out.push(
         fault(
           key,
@@ -449,6 +454,7 @@ function refersFaults(key, value, rule, held, at, line) {
       );
     }
     if (earlier && holder && walk.indexOf(found) >= walk.indexOf(holder)) {
+      if (fieldBefore(walk, holder, said, rule)) continue;
       out.push(
         fault(
           key,
@@ -460,6 +466,20 @@ function refersFaults(key, value, rule, held, at, line) {
     }
   }
   return out;
+}
+
+// `x-fields` is the fourth modifier. It names the list on an entry whose own
+// fields a value may name, so `input: verdict` reads the evidence a step before
+// it wrote, and no step of that name.
+// [[spec/design_output/schema#three-keywords-name-a-step]]
+function fieldBefore(walk, holder, said, rule) {
+  const list = rule["x-fields"];
+  if (!list || !holder) return false;
+  const until = walk.indexOf(holder);
+  return walk.some(
+    (one, at) =>
+      at < until && [one.said?.[list] ?? []].flat().some((field) => field?.name === said),
+  );
 }
 
 // [[spec/design_output/schema#three-keywords-name-a-step]]
@@ -510,6 +530,145 @@ export function entryNamed(walk, said, holder) {
 
 function names(walk) {
   return walk.map((one) => one.path).join(", ");
+}
+
+// A step is a form with six slots. The route says four of them in a field, and
+// derives the rest, so three of the six earn a mechanical check here.
+// [[spec/design_input/the-agent-pulls-tickets#the-route]]
+export const OUTSIDE = ["ask", "diff"];
+const ENGINE_READS = ["command", "verdict"];
+
+// [[spec/design_input/the-agent-pulls-tickets#the-route]]
+export function slotFaults(said, where) {
+  const walk = entriesIn(said?.steps, "steps");
+  if (!walk.length) return [];
+  const readers = walk.map((one, at) => ({ one, at, tokens: inputOf(one.said) }));
+  return [...unfedIn(walk, readers, where), ...orphansIn(walk, readers, where)];
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-route]]
+function unfedIn(walk, readers, where) {
+  const out = [];
+  for (const { one, at, tokens } of readers) {
+    for (const token of tokens) {
+      if (OUTSIDE.includes(token)) continue;
+      if (feedsIt(walk, one, at, token)) continue;
+      out.push(
+        fault(
+          "Input",
+          where,
+          1,
+          `${one.path} reads ${token}, and no step before it holds that. A step reads ${OUTSIDE.join(", ")}, an earlier step, or an earlier field.`,
+        ),
+      );
+    }
+  }
+  return out;
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-route]]
+function feedsIt(walk, holder, at, token) {
+  const step = entryNamed(walk, token, holder);
+  if (step && walk.indexOf(step) < at) return true;
+  return walk.some(
+    (one, i) =>
+      i < at && [one.said?.evidence ?? []].flat().some((field) => field?.name === token),
+  );
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-route]]
+function orphansIn(walk, readers, where) {
+  const out = [];
+  for (const [at, one] of walk.entries()) {
+    if (!one.leaf) continue;
+    for (const field of [one.said?.evidence ?? []].flat()) {
+      if (!field?.name) continue;
+      if (ENGINE_READS.includes(String(field.form))) continue;
+      if (handedOn(walk, one)) continue;
+      if (readIn(walk, readers, at, one, field.name)) continue;
+      out.push(
+        fault(
+          "Output",
+          where,
+          1,
+          `${one.path} writes ${field.name}, and nothing reads it. Name it under a later step's input, or say who takes the output under to.`,
+        ),
+      );
+    }
+  }
+  return out;
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-route]]
+function handedOn(walk, leaf) {
+  let at = leaf;
+  while (at) {
+    if (String(at.said?.to ?? "").trim()) return true;
+    at = walk.find((one) => one.path === at.parent) ?? null;
+  }
+  return false;
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-route]]
+function readIn(walk, readers, at, leaf, field) {
+  const mine = new Set(ancestryOf(leaf));
+  return readers.some(({ one, at: seat, tokens }) => {
+    if (seat <= at || mine.has(one.path)) return false;
+    return tokens.some(
+      (token) => token === field || mine.has(entryNamed(walk, token, one)?.path ?? ""),
+    );
+  });
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-route]]
+function ancestryOf(leaf) {
+  const out = [leaf.path];
+  const parts = String(leaf.path).split("/");
+  while (parts.length > 1) {
+    parts.pop();
+    out.push(parts.join("/"));
+  }
+  return out;
+}
+
+function inputOf(said) {
+  return [said?.input ?? []]
+    .flat()
+    .map((one) => String(one ?? "").trim())
+    .filter(Boolean);
+}
+
+// The hash reads the route, which is what the drawing derives from. So a
+// comment or a reordered key moves nothing, and a changed step moves it.
+// [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
+export function canonicalOf(said) {
+  if (Array.isArray(said)) return said.map(canonicalOf);
+  if (said && typeof said === "object") {
+    const out = {};
+    for (const key of Object.keys(said).sort()) out[key] = canonicalOf(said[key]);
+    return out;
+  }
+  return said === undefined || said === null ? "" : String(said);
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
+export function hashOf(said) {
+  const text = JSON.stringify(canonicalOf(said));
+  let low = 0x811c9dc5;
+  let high = 0x9e3779b9;
+  for (let i = 0; i < text.length; i++) {
+    const code = text.charCodeAt(i);
+    low = Math.imul(low ^ code, 0x01000193) >>> 0;
+    high = Math.imul(high + code + 1, 0x85ebca6b) >>> 0;
+    high = ((high << 13) | (high >>> 19)) >>> 0;
+  }
+  return `${low.toString(16).padStart(8, "0")}${high.toString(16).padStart(8, "0")}`;
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+export function processHash(said) {
+  const held = typeof said === "string" ? readYaml(said) : (said ?? {});
+  return hashOf({ ask: held.ask ?? [], steps: held.steps ?? [] });
 }
 
 function bodyFaults(note, spec, kind, where) {
@@ -919,6 +1078,50 @@ function frontRows(key, rule, given, front) {
   }
   front[key] = value;
   return [`${key}: ${written(value, rule)}`];
+}
+
+// A reroute copies the current route over a ticket. The frontmatter takes the
+// new route, and the body follows it: a chapter the new route still names keeps
+// what the hand wrote, and a chapter it adds takes the comment the mint writes.
+// [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+export function reRouted(text, schema, route, hash) {
+  const note = readNote(text);
+  const front = { ...(note.front.said ?? {}), steps: route };
+  if (hash) front.process_hash = hash;
+
+  const level = schema?.body?.headingLevel ?? 1;
+  const held = new Map(note.sections.map((one) => [`${one.level} ${one.header}`, one.own]));
+  const rows = ["---", ...frontRowsHeld(front, schema), "---", ""];
+
+  for (const one of chaptersWanted(schema?.body?.sections ?? [], front, level)) {
+    const deep = one.level ?? level;
+    rows.push(`${"#".repeat(deep)} ${one.header}`, "");
+    const own = trimmed(held.get(`${deep} ${one.header}`));
+    if (own.length) {
+      rows.push(...own, "");
+      continue;
+    }
+    if (one.description) rows.push(`<!-- ${one.description} -->`, "");
+    if (one.form) rows.push(`<!-- the form is ${one.form} -->`, "");
+  }
+  return `${rows.join("\n").trimEnd()}\n`;
+}
+
+// [[spec/design_output/schema#the-render-follows-the-tree]]
+function frontRowsHeld(front, schema) {
+  const props = Object.keys(schema?.frontmatter?.properties ?? {});
+  const keys = [
+    ...props.filter((key) => front[key] !== undefined),
+    ...Object.keys(front).filter((key) => !props.includes(key)),
+  ];
+  return keys.flatMap((key) => keyRows(key, front[key], 0));
+}
+
+function trimmed(own) {
+  const rows = [...(own ?? [])];
+  while (rows.length && !rows[0].trim()) rows.shift();
+  while (rows.length && !rows[rows.length - 1].trim()) rows.pop();
+  return rows;
 }
 
 // [[spec/design_output/schema#the-render-follows-the-tree]]

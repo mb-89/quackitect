@@ -67,6 +67,8 @@ import {
   rootsHere,
 } from "./vehicle.js";
 import { HOOKS } from "./precommit.js";
+import { graphIn } from "./graph.js";
+import { withRoute } from "./process.js";
 import { probe } from "./probe.js";
 import { voice } from "./voice.js";
 import { work } from "./work.js";
@@ -190,6 +192,10 @@ const verbs = {
   mint: {
     says: "write a new note of a kind, in the shape its schema names",
     run: async () => mint(rest),
+  },
+  graph: {
+    says: "a process or a ticket, drawn as the graph the editor reads",
+    run: async () => drawing(rest),
   },
   probe: {
     says: "measure the client itself: compact says what a compaction keeps",
@@ -655,13 +661,20 @@ function mint(argv) {
     return 2;
   }
 
+  // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+  const copied = withRoute(files, root, join, schema, handed.fields);
+  if (copied.why) {
+    console.error(copied.why);
+    return 2;
+  }
+
   const at = under(path);
   if (files.exists(at)) {
     console.error(`${path} stands already. Name a path nothing holds yet.`);
     return 2;
   }
 
-  const made = mintedNote(schemas, { kind, path, fields: handed.fields });
+  const made = mintedNote(schemas, { kind, path, fields: copied.fields });
   if (made.why) {
     console.error(made.why);
     return 2;
@@ -672,6 +685,26 @@ function mint(argv) {
   console.log(`${path} stands, in the shape ${kind} names.`);
   for (const one of made.left) console.log(asLine(one, one.file));
   console.log("Write it, then run ./RUNME.sh lint to read what is left.");
+  return 0;
+}
+
+// The editor is the one reader of the graph, and it draws from the file at
+// every open. This verb is the seam: the emitter answers a graph, and no
+// picture and no colour stand here.
+// [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
+function drawing(argv) {
+  const path = argv.filter((one) => !one.startsWith("-"))[0];
+  if (!path) {
+    console.error("Usage: ./RUNME.sh graph <process or ticket>\n");
+    console.error("It answers the nodes and the edges as JSON, and draws nothing.");
+    return 2;
+  }
+  const at = under(path);
+  if (!files.exists(at)) {
+    console.error(`${path} stands nowhere.`);
+    return 2;
+  }
+  console.log(JSON.stringify(graphIn(files.read(at)), null, 2));
   return 0;
 }
 
