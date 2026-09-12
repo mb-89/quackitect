@@ -45,6 +45,18 @@ test("a run that hands its output through answers the exit code alone", () => {
   assert.equal(said.stdout, "");
 });
 
+test("the real door hands a named variable to the program, and keeps the rest", () => {
+  const said = proc().run(
+    [
+      process.execPath,
+      "-e",
+      "process.stdout.write(process.env.SE_SAYS + ':' + Boolean(process.env.PATH))",
+    ],
+    { env: { SE_SAYS: "quack" } },
+  );
+  assert.equal(said.stdout, "quack:true");
+});
+
 test("the real door hands standard input to the program", () => {
   const said = proc().run(
     [process.execPath, "-e", "process.stdin.pipe(process.stdout)"],

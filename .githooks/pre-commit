@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+# The commit door for a person in a terminal. Git runs it, and the same check
+# the Bash door calls reads the same delta. install.sh points core.hooksPath
+# here, and doctor names the path it finds.
+# [[spec/design_output/private#two-doors-one-check]]
+set -eu
+here=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+
+cd "$here" || exit 0
+command -v node >/dev/null 2>&1 || exit 0
+
+git diff --cached --unified=0 | node src/scripts/precommit.js

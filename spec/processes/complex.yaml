@@ -1,0 +1,48 @@
+# A change too large to review whole. Its work is other tickets: the split
+# mints them, they run in its place, and a verdict reads what they add up to.
+# The verdict comes after every child stands closed, and never before.
+# [[spec/design_input/the-agent-pulls-tickets#children-and-private-tickets]]
+name: complex
+for: a change too large to review whole
+ask:
+  - name: gain
+    form: text
+    says: what is gained by doing it, and not only what it does
+  - name: breaks
+    form: text
+    says: what breaks if it is never done
+  - name: done_when
+    form: list
+    says: one line each, decidable, naming the command that decides it
+steps:
+  - name: split
+    does: mints the children, each trivial, standard or complex, with this ticket as their parent
+    from: anyone
+    by: anyone
+    input: ask
+    reads: [[spec/guidance/working]]
+    checklist:
+      - every child is small enough to review whole, or is complex itself
+      - the children add up to the ask, and nothing of the ask stands outside them
+      - a child that waits on another names it under depends_on
+    evidence:
+      - name: children
+        form: list
+        says: every child as a link, one a line, with its process
+  - name: children
+    by: children
+    on_fail: split
+  - name: verdict
+    does: reads what the children add up to against the ask
+    not: split
+    on_fail: split
+    reads: [[spec/guidance/review/reviewing]]
+    input: [ask, children]
+    to: retro
+    evidence:
+      - name: read
+        form: list
+        says: every child you read, one a line, with what its own verdict says
+      - name: verdict
+        form: verdict
+        says: pass or fail, findings one a line

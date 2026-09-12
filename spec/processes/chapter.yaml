@@ -1,0 +1,37 @@
+# One chapter of a retro's window, six hours that hold activity, read by one
+# hand the engine spawns for it. The counts stand in the ask before a word
+# is read, and the four questions are the fields.
+# [[spec/design_input/the-agent-pulls-tickets#the-retro]]
+name: chapter
+for: one chapter of a retro's window, read by one hand
+ask:
+  - name: window
+    form: text
+    says: the chapter's first and last moment, which collect writes
+  - name: counts
+    form: list
+    says: prompts, tool calls, shell commands, refusals by kind, tickets moved, notes minted, the median length of a thought, and errors, which collect writes
+steps:
+  - name: read
+    does: reads the chapter's log and transcript, and answers the four questions
+    from: engine
+    by: helper
+    input: ask
+    reads: [[spec/guidance/working]]
+    to: retro
+    evidence:
+      - name: done
+        form: list
+        says: what was done in these hours
+      - name: well
+        form: list
+        says: what went well, and what made it go well
+      - name: badly
+        form: list
+        says: what did not, each with its moment in the log or the transcript
+      - name: improve
+        form: list
+        says: how each bad line stops happening, named by its home
+      - name: thoughts
+        form: text
+        says: what the thoughts say that the actions do not, as doubts, workarounds, and scope cut and called something else

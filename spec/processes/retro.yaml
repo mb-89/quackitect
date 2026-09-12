@@ -1,0 +1,97 @@
+# The tree's retro: a window of the record turned into changes to the
+# machinery, on a desk, with the owner at two steps. It is blameless, and it
+# fixes what produced a bad output: a prompt, a guidance line, a form, a
+# refusal, a tool. Its readers are children, one per chapter of the window
+# and one for the shell commands, so a reader per slice is mechanical.
+# [[spec/design_input/the-agent-pulls-tickets#the-retro]]
+name: retro
+for: a window of the record turned into changes to the machinery
+ask:
+  - name: why
+    form: text
+    says: what calls for it, as notes standing open, an iteration ending, or the owner asking
+steps:
+  - name: collect
+    does: drains the box into the retro folder, cuts the window into chapters, and mints a reader per chapter and one for the commands
+    by: anyone
+    needs: [work collect]
+    evidence:
+      - name: run
+        form: command
+        expects: 0
+        says: work collect, which refuses while a hand holds a ticket
+  - name: field
+    does: asks what came back from real use since the last retro, and stops
+    by: person
+    asks: what came back from real use since the last retro?
+    evidence:
+      - name: answers
+        form: list
+        says: one line each, and each becomes a note
+  - name: score
+    does: scores the last retro's improvements against this window's numbers
+    input: collect
+    evidence:
+      - name: scored
+        form: list
+        says: one line per improvement, with what happened and what that teaches
+      - name: rate
+        form: command
+        expects: 0
+        says: work retro score, which prints how many landed
+  - name: notes
+    does: decides every note, the field's answers among them
+    needs: [work retro]
+    evidence:
+      - name: drained
+        form: command
+        expects: 0
+        says: work retro notes, which passes when the private folder is empty
+  - name: readers
+    by: children
+  - name: mine
+    does: reads the closed readers into themes with counts
+    input: readers
+    reads: [[spec/guidance/working]]
+    evidence:
+      - name: themes
+        form: list
+        says: one line per theme, with its count and the chapters it stands in
+      - name: repeats
+        form: list
+        says: each theme an earlier retro already named, with the link
+      - name: worker
+        form: text
+        says: how the worker changed over the window, off the chapter counts
+      - name: unread
+        form: text
+        says: what could not be read, and why
+  - name: improve
+    does: mints one ticket per class, each with its home and its card
+    input: mine
+    checklist:
+      - one class, one ticket, and no more than work.retroCap of them
+      - the home is the earliest in the order that removes the waste
+      - a keep rule is counted over the tree before it is agreed
+      - a route edited on a ticket goes back into its process file, or the file says why not
+      - the process is read against what the field does now
+    evidence:
+      - name: tickets
+        form: list
+        says: one link per ticket, with its class, its home, what is planned, and what the next numbers show if it works
+  - name: report
+    does: reads the retro whole and says what it misses
+    by: person
+    asks: what does this retro miss?
+    evidence:
+      - name: misses
+        form: text
+        says: what the retro missed, or nothing
+  - name: distribute
+    does: puts every minted ticket into a group with an urgency, cut into groups that run alone
+    input: [improve, report]
+    to: owner
+    evidence:
+      - name: groups
+        form: list
+        says: one line per ticket, with its group and its urgency

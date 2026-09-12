@@ -33,7 +33,7 @@ help` names the verbs, `./RUNME.sh rules` the mechanical rules, and
 | the tooth | votes at every turn's end over the rules in `spec/config/stop`, re-prompts through `$.prompt.submit`, and takes a claim | `stop` |
 | the answer door | refuses the first tool call of a person's turn before a readback | `level0` |
 | the judge | asks a model one question per span for the rules no pattern holds | `level0` |
-| the tools | `claim_stop`, `review_branch`, `log`, `patch`, `replace` and `undo`, each one a `tool.call` hook | `stop`, `review`, `log`, `apply` |
+| the tools | `review_branch`, `log`, `patch`, `replace` and `undo`, each one a `tool.call` hook | `review`, `log`, `apply` |
 | the index | answers `Grep` and `Glob` out of warm rows, and holds every link and note | `index` |
 | the projections | write a generated file from one source at every session start, and refuse a hand edit to a target | `projection` |
 | the config | one resolver over three layers, and a verb naming which layer answers | `config` |
@@ -59,7 +59,7 @@ each piece lands on the ladder.
 | v3 | `assertCanSupply`, a criterion refused at compile time where no tool can supply its evidence | level one, with the evidence |
 | v3 | typed refusals with an executable remedy, and a registry of them | level zero holds it, as `refuse.js`, and the registry is the log |
 | v3 | word-ordered scales in place of numbers | nothing missing today, and `stop.hold` and `ask.wanted` are the first two scales |
-| v3 | a demands ledger, the compiled criteria per step, so a moved tree says which signed steps reopen | level one, with the evidence |
+| v3 | a demands ledger, the compiled criteria per step, so a moved tree says which steps reopen | level one, with the evidence |
 | v3 | the privacy one-door, a six-word-run check and an opaque-token check between a tracked text and its private source | level zero, on `work/the-private-half-stays-home` and the commit door beside it |
 | v3 | `se_test` as a question, with polling refused | level zero holds the half it needs, and the Bash door points a test run at one file |
 | v3 | controls that only ever stop the engine refusing | the invariant the sidebar's three waiting controls owe |
@@ -74,7 +74,7 @@ each piece lands on the ladder.
 
 # What the field puts here
 
-Two surveys on 2026-09-11 read the harness engineering writeups, the guardrail
+Two surveys read the harness engineering writeups, the guardrail
 frameworks, the Claude Code docs and the plugin ecosystem. The line every
 mature system draws is the one this tree draws:
 
@@ -136,7 +136,7 @@ The measurement decides the close. `./RUNME.sh voice measure` over a session's
 transcript, once the gate stands, says whether the chat lands under the
 ceiling. That number, and a green check, is what done means here.
 
-# What waits for the levels above
+# What waits above
 
 | level | what it holds | what waits there |
 |---|---|---|

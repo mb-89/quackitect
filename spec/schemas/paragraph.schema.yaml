@@ -18,7 +18,9 @@ layers:
   characters:
     admits: letters, digits, space, and the punctuation below
     punctuation: [full stop, comma, question mark, exclamation mark, colon, parentheses, apostrophe, quotation mark, hyphen]
-    exceptions: []
+    exceptions:
+      - word: TL;DR
+        reason: a name the answer register uses, and the semicolon belongs to it
 
   markup:
     admits:
@@ -88,6 +90,10 @@ layers:
         reason: an imperative here, and the tagger reads a past tense
       - word: approved
         reason: an adjective here, on a word list
+      - word: missing
+        reason: an adjective here, and the tagger reads a progressive
+      - word: standing
+        reason: a gerund here, and the tagger reads a progressive
 
   vocabulary:
     words: spec/vocabulary/words.yml

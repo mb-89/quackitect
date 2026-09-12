@@ -20,12 +20,13 @@ import {
 } from "../../.claude/skills/level0/lib/projection.js";
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
+import { boxOf } from "../../.claude/skills/level0/lib/private.js";
 import {
-  END as SCHEMA_END,
-  mintNote,
-  readYaml,
+  fieldsIn,
+  mintedNote,
   schemaFaults,
   SCHEMAS,
+  schemasIn,
 } from "../../.claude/skills/level0/lib/schema.js";
 import { treeFaults, treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { EDITOR_SETTINGS } from "../../.claude/skills/level0/lib/servers.js";
@@ -53,6 +54,7 @@ import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
+import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { readTools, whereIs, writeSurvey } from "./tools.js";
 import { SOURCE as VIEWER, viewerOf } from "./viewer.js";
 import {
@@ -64,6 +66,9 @@ import {
   readRegister,
   rootsHere,
 } from "./vehicle.js";
+import { HOOKS } from "./precommit.js";
+import { probe } from "./probe.js";
+import { voice } from "./voice.js";
 import { work } from "./work.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 
@@ -185,6 +190,14 @@ const verbs = {
   mint: {
     says: "write a new note of a kind, in the shape its schema names",
     run: async () => mint(rest),
+  },
+  probe: {
+    says: "measure the client itself: compact says what a compaction keeps",
+    run: async () => probe(root, rest, it, whereIs(files, root, "claude", known)),
+  },
+  voice: {
+    says: "measure scores a folder, and refused ranks what the doors turn away",
+    run: async () => voice(root, rest, it, bin),
   },
   log: {
     says: "what every door says, in the viewer this tree builds",
@@ -393,6 +406,7 @@ function treeHere() {
     root,
     words: it.words,
     node: process.version.replace(/^v/, ""),
+    box: boxOf(process.env, it.git),
   });
 }
 
@@ -583,6 +597,11 @@ function projectionsHold() {
   }
 
   const said = readAll(entries, files, under);
+  if (said.faults.length) {
+    for (const one of said.faults) console.error(one);
+    console.error("A source stands away from the shape beside it, so no target is written.");
+    return 1;
+  }
   const found = staleIn(said.wanted, said.standing);
   if (!found.length) {
     console.log(`${entries.length} projection(s), and every target reads as projected.`);
@@ -612,19 +631,27 @@ function project() {
 }
 
 // [[spec/design_output/schema#mint-writes-a-valid-note]]
+// [[spec/design_output/schema#the-fields-a-caller-names]]
 function mint(argv) {
   const [kind, path] = argv.filter((one) => !one.startsWith("-"));
-  const kinds = namesIn(join(root, SCHEMAS), SCHEMA_END)
-    .map((name) => name.slice(0, -SCHEMA_END.length))
-    .sort();
+  const schemas = schemasIn(treeHere());
+  const kinds = [...schemas.keys()].sort();
 
   if (!kind || !path) {
-    console.error("Usage: ./RUNME.sh mint <kind> <path>\n");
+    console.error("Usage: ./RUNME.sh mint <kind> <path> [--field=value ...]\n");
     console.error(`${SCHEMAS} holds ${kinds.join(", ")}.`);
     return 2;
   }
-  if (!kinds.includes(kind)) {
+
+  const schema = schemas.get(kind);
+  if (!schema) {
     console.error(`${SCHEMAS} holds no ${kind}. It holds ${kinds.join(", ")}.`);
+    return 2;
+  }
+
+  const handed = fieldsIn(argv, schema);
+  if (handed.why) {
+    console.error(handed.why);
     return 2;
   }
 
@@ -634,10 +661,16 @@ function mint(argv) {
     return 2;
   }
 
-  const schema = readYaml(files.read(join(root, SCHEMAS, `${kind}${SCHEMA_END}`)));
+  const made = mintedNote(schemas, { kind, path, fields: handed.fields });
+  if (made.why) {
+    console.error(made.why);
+    return 2;
+  }
+
   files.makeDir(dirname(at));
-  files.write(at, mintNote(schema));
+  files.write(at, made.text);
   console.log(`${path} stands, in the shape ${kind} names.`);
+  for (const one of made.left) console.log(asLine(one, one.file));
   console.log("Write it, then run ./RUNME.sh lint to read what is left.");
   return 0;
 }
@@ -759,6 +792,26 @@ function standsAt(one) {
   return [one.version, one.path].filter(Boolean).join("  ");
 }
 
+// [[spec/design_output/extension#a-link-pointing-nowhere]]
+function sidebarSays() {
+  const home = homeIn(process.env);
+  const folder = join(home, ".vscode", "extensions");
+  if (!home || !files.exists(folder)) return "no editor folder on this box, so no link";
+
+  const said = JSON.parse(files.read(manifestPath(root)));
+  const id = `${said.publisher}.${said.name}`;
+  const dest = join(folder, `${id}-${said.version}`);
+  if (linkedAt(files, dest, dirname(manifestPath(root)))) {
+    return registered(files, folder, id)
+      ? `linked, and the list names ${id}`
+      : `linked, and the list misses ${id}: run ./RUNME.sh`;
+  }
+  if (files.isLink(dest) && !files.exists(dest)) return "a link pointing nowhere: run ./RUNME.sh";
+  if (files.isLink(dest)) return "a link into another tree: run ./RUNME.sh";
+  if (files.exists(dest)) return "a copy in place of the link: run ./RUNME.sh";
+  return "unlinked: run ./RUNME.sh";
+}
+
 async function doctor() {
   const found = Object.keys(known).length ? known : writeSurvey(it, root, process.env);
   const rows = [
@@ -770,6 +823,8 @@ async function doctor() {
         ? `${EDITOR_SETTINGS}, both servers`
         : "missing",
     ],
+    ["sidebar", sidebarSays()],
+    ["commit hook", hooksSay()],
     [
       "vale rules",
       files.exists(STYLES)
@@ -804,6 +859,16 @@ async function doctor() {
     console.log(`${what.padEnd(18)} ${String(said).trim() || "missing"}`);
   }
   return 0;
+}
+
+// [[spec/design_output/private#two-doors-one-check]]
+function hooksSay() {
+  const at = join(HOOKS, "pre-commit");
+  if (!files.exists(join(root, at))) return `${at} stands nowhere`;
+
+  const said = it.git.run(["config", "--get", "core.hooksPath"], true).out;
+  if (said === HOOKS) return `${at}, which git reads`;
+  return `git reads ${said || "its own folder"}, so run ./RUNME.sh`;
 }
 
 function cageSays() {
