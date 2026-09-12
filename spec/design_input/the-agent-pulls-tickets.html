@@ -711,7 +711,8 @@ branch. Now the two coincide, so one word stays: group.</p>
 
 <p>The agent holds three verbs: <code>pull</code>, <code>guidance</code> and <code>escalate</code>. Every
 other verb belongs to a person or the engine. The shell is the verb, under <code>./RUNME.sh work</code>,
-and a plugin tool wraps it for a session that holds the plugin. A pull carries at most two things: the
+and a plugin tool wraps it for a session that holds the plugin. The engine is these verbs and the beat,
+and it runs with nobody on the box, which is why it stands in level one and outside level zero. A pull carries at most two things: the
 ticket it hands back and a verdict. The file is the payload, because the hand wrote its evidence through
 the write door before it pulled.</p>
 
@@ -830,10 +831,14 @@ and rides the step.</p>
 <!-- ============================================================ -->
 <h2 id="s10"><span class="n">10</span>What a person sees</h2>
 
-<p>The board draws the folder and the branches, and keeps no second record. Yours stands first: every
-ticket at a step whose <code>by</code> is <code>person</code>, with its question. The beat counts that list,
-and the routine's notification carries the count. The rows below are examples of the shape, drawn from the
-names on today's branches.</p>
+<p>Three surfaces draw the folder and the branches, and none keeps a second record: the Kanban board under
+a sidebar group named <code>work</code>, <code>work list</code> in a terminal, and the ticket file itself.
+Beside the board stand two buttons. <code>note</code> mints a note in one press, which is the shortcut a hand
+takes mid-work. <code>mint</code> mints anything else: a ticket by process, or any note a schema in the tree
+holds. Yours stands first: every ticket at a step whose <code>by</code> is <code>person</code>, with its
+question. The beat counts that list, and the routine's notification carries the count. The rows below are
+examples of the shape, drawn from the names on today's branches; what stands on the board past these columns
+waits for a design note of its own once the back end stands, with v4's work editor as its starting point.</p>
 
 <div class="board">
   <div class="col"><h4 class="you">yours · 2</h4>
@@ -859,13 +864,12 @@ names on today's branches.</p>
 
 <div class="scroll"><table>
 <tr><th>surface</th><th>draws</th></tr>
-<tr><td>the sidebar's <code>table</code> widget</td><td>every ticket, under yours, urgent, in work, open and done</td></tr>
-<tr><td class="m">./RUNME.sh work list</td><td>the same rows in a terminal</td></tr>
-<tr><td>a projection to <code>BOARD.md</code></td><td>the same rows for a reader with no sidebar</td></tr>
+<tr><td>the Kanban board, under <code>work</code> in the sidebar</td><td>every ticket, under yours, urgent, in work, open and done</td></tr>
+<tr><td class="m">./RUNME.sh work list</td><td>the same rows in a terminal, with the age of each held branch</td></tr>
 <tr><td>the ticket file itself</td><td>the ask, the route, the evidence, the discussion</td></tr>
 </table></div>
 
-<p>A person mints from the sidebar's text box or the verb, edits a ticket in the editor, drags a ticket
+<p>A person mints from the two buttons or the verb, edits a ticket in the editor, drags a ticket
 into a group by writing the field, and hands a step back with the same verb a box uses. The language
 server names a departure from the schema as they type and completes the fields from the schema, the route
 and the folder. The routine fires one box on its clock; that box runs the beat, which fires the routine
@@ -904,6 +908,7 @@ fact it meets is a route.</p>
 <tr><td>the stop rule</td><td class="m">spec/config/stop/level1.yml</td></tr>
 <tr><td>the hold and the box id</td><td class="m">.se/hold.json · .se/box.json</td></tr>
 <tr><td>the config</td><td>the <code>engine</code> and <code>work</code> sections of <code>spec/config/level0.json</code></td></tr>
+<tr><td>the board and the two buttons</td><td>the <code>work</code> group in <code>spec/config/level0.schema.json</code></td></tr>
 </table></div>
 
 <div class="scroll"><table>
@@ -971,7 +976,7 @@ ones a person wants moved, and the old verbs go once the last brief merges.</p>
     <rect x="750" y="78" width="180" height="40" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="840" y="103" text-anchor="middle" font-weight="700">6 · guidance rides the step</text>
     <rect x="750" y="144" width="180" height="40" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
-    <text x="840" y="169" text-anchor="middle" font-weight="700">7 · the board draws the folder</text>
+    <text x="840" y="169" text-anchor="middle" font-weight="700">7 · the Kanban board under work</text>
     <rect x="750" y="210" width="180" height="40" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="840" y="235" text-anchor="middle" font-weight="700">8 · level zero hands over</text>
   </g>

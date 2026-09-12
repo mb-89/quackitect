@@ -406,6 +406,11 @@ verb belongs to a person or the engine. The shell is the verb, under
 `./RUNME.sh work`. A plugin tool wraps it for a session that holds the plugin,
 which is v4's ruling that one function runs under both doors.
 
+The engine is these verbs and the beat, and it runs with nobody on the box.
+That is why it stands in level one and outside level zero. Level zero holds
+before anything else does, and the engine has to keep working with no person
+there.
+
 A pull carries at most two things: the ticket it hands back and a verdict,
 `pass` or `fail` with a reason. The file is the payload, because the hand
 writes its evidence through the write door before it pulls. The other side
@@ -559,25 +564,34 @@ ticket in hand the way it counts a task today.
 
 # What a person sees
 
-The board draws the folder and the branches, and keeps no second record:
+Three surfaces draw the folder and the branches, and none keeps a second
+record:
 
 | surface | draws |
 |---|---|
-| the sidebar's `table` widget | every ticket, under yours, urgent, in work, open and done |
-| `./RUNME.sh work list` | the same rows in a terminal |
-| a projection to `BOARD.md` | the same rows for a reader with no sidebar |
+| the Kanban board, under `work` in the sidebar | every ticket, under yours, urgent, in work, open and done |
+| `./RUNME.sh work list` | the same rows in a terminal, with the age of each held branch |
 | the ticket file itself | the ask, the route, the evidence, the discussion |
+
+The board is the declared `table` widget, drawn under a sidebar group of its
+own named `work`, beside two buttons:
+
+| button | mints |
+|---|---|
+| `note` | a note, in one press, which is the shortcut a hand takes mid-work |
+| `mint` | anything else: a ticket by process, or any note a schema in the tree holds |
+
+What stands on the board past those columns waits for a design note of its
+own, once the back end stands. v4's work editor is the starting point for it.
 
 Yours stands first: every ticket at a step whose `by` is `person`, with its
 `asks`. The beat counts that list, and the routine's notification carries the
-count.
-
-The routine fires one box on its clock. That box runs the beat, which fires
-the routine again for every other free group, up to `engine.boxes`.
+count. The routine fires one box on its clock. That box runs the beat, which
+fires the routine again for every other free group, up to `engine.boxes`.
 
 A person does four things, each with a verb or a click:
 
-- mints from the sidebar's text box or the verb
+- mints from the two buttons or the verb
 - edits a ticket in the editor
 - drags a ticket into a group by writing the field
 - hands a step back with the same verb a box uses
@@ -621,6 +635,7 @@ the only fact it meets is a route.
 | the stop rule | `spec/config/stop/level1.yml` |
 | the hold and the box id | `.se/hold.json`, `.se/box.json` |
 | the config | the `engine` and `work` sections of `spec/config/level0.json` |
+| the board and the two buttons | the `work` group in `spec/config/level0.schema.json` |
 
 | key | default | what it decides |
 |---|---|---|
@@ -664,7 +679,7 @@ Eight branches, and the dependencies make the order binding:
 | 4 | `the-agent-pulls-a-ticket` | the pull, its checks, its answers, the hold file, the stop rule | 2, 3 |
 | 5 | `a-step-changes-hands` | the hand id, the spawn, person steps, escalation | 4 |
 | 6 | `guidance-rides-the-step` | `reads`, the verb, the log line, the standing layer shrinks | 4 |
-| 7 | `the-board-draws-the-folder` | the table widget, yours, the beat, the routine fires by count | 4 |
+| 7 | `the-board-draws-the-folder` | the Kanban board under `work`, the note and mint buttons, the beat, the routine fires by count | 4 |
 | 8 | `level-zero-hands-over-the-pull` | the brief door goes, and the controls wire up | 4 |
 
 The eleven work branches standing today finish under the verbs they carry.
