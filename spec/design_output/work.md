@@ -58,6 +58,7 @@ The contract names six things:
 - run `work sync` first, which takes `main` in
 - push each time a thing lands
 - write the result and the retro back into `HANDOVER.md`
+- run `work sync` again, so trunk comes in last too
 - run `work done`
 - run `work release` on stopping early
 - run `work merge` from trunk, which a cloud box leaves to a box off the cloud
@@ -70,6 +71,23 @@ branch reads it and knows how to finish.
 `work sync` merges `origin/main` into the branch. `work take` runs it, so a
 routine pays nothing to remember it. A conflict then stops the take, while the
 work it costs still sits ahead.
+
+## Trunk comes in last too
+
+A branch greens its own tip, and the merge result reads green nowhere. So a
+branch older than a rule passes `work done` and reddens trunk at the merge.
+This tree hits that twice in one day.
+
+`work done` fetches trunk and refuses a branch trunk stands ahead of:
+
+| what it finds | what it does |
+|---|---|
+| the branch carries every commit on trunk | it reads the battery next |
+| trunk holds a commit the branch lacks | it refuses, and names `work sync` |
+
+So the battery a branch claims stands over the tree the merge produces. The
+contract carries the same step, because a reader acts on it before the verb
+ever runs.
 
 # A box landing on trunk
 
