@@ -27,6 +27,7 @@ import {
 const PROSE = /\.(md|markdown|txt)$/i;
 const ROWS = /\.jsonl$/i;
 const TRANSCRIPTS = "--transcripts";
+const NOISE = [".git", "node_modules"];
 
 // [[spec/funnel/a-paragraph-has-a-schema]]
 export async function voice(root, argv, it, bin) {
@@ -62,8 +63,9 @@ async function measure(root, argv, it, bin) {
     folder = MEASURED;
   }
 
+  const skip = folder.split("/")[0] === ".se" ? NOISE : [...NOISE, ".se"];
   const at = under(root, folder);
-  const paths = filesUnder(it.disk, at, PROSE);
+  const paths = filesUnder(it.disk, at, PROSE, skip);
   if (!paths.length) {
     console.error(`No markdown file stands under ${folder}.`);
     return 1;
@@ -130,7 +132,7 @@ function pullAnswers(root, folder, it) {
 }
 
 // [[spec/funnel/a-paragraph-has-a-schema]]
-function filesUnder(disk, at, wanted) {
+function filesUnder(disk, at, wanted, skip = []) {
   const out = [];
   const into = (path) => {
     let rows = [];
@@ -144,6 +146,7 @@ function filesUnder(disk, at, wanted) {
       return;
     }
     for (const one of rows) {
+      if (skip.includes(one.name) || one.name.startsWith("_")) continue;
       const held = join(path, one.name);
       if (one.kind === "dir") into(held);
       else if (wanted.test(one.name)) out.push(held);
