@@ -781,23 +781,17 @@ Every route stays short. Names are examples.</figcaption>
 <p>A process file is data, and its drawing derives from it. One emitter reads a route, and a record where a
 ticket carries one, into a graph: a node per phase and per leaf, a pass edge between neighbours, a fail edge
 back with its label, a dotted node for <code>when</code>, a marked node for a person step, and the pointer,
-the skips and the returns off the record. Three readers draw that graph, and none keeps a second copy.</p>
-<div class="scroll"><table>
-<tr><th>reader</th><th>draws</th></tr>
-<tr><td>the projection</td><td><code>spec/processes/&lt;name&gt;.md</code>, a target with a Mermaid fence, which GitHub, Obsidian and the editor's preview render</td></tr>
-<tr><td>the editor</td><td>the same graph live, for a process and for a ticket with its position</td></tr>
-<tr><td class="m">work show &lt;ticket&gt;</td><td>the graph as text in a terminal</td></tr>
-</table></div>
-<p>The projection is an entry in <code>projections.json</code>, so the door refuses a hand edit to the drawing
-and a stale drawing fails <code>check</code>. Every earlier version wanted that property under the name
-executable diagram: v1 as a lint-pinned Mermaid subset, v2 and v3 as an Obsidian canvas the engine compiled,
-v4 as a React Flow canvas fed by a narrating runtime. The tree reaches it from the other side: the data
-runs, and the picture cannot drift. v1's rules carry over whole: nodes declared before edges, every edge
-labelled, no coordinates, the hash over the graph and not the bytes, and a pinned subset nobody authors.</p>
+the skips and the returns off the record. One reader draws that graph: the editor, live, for a process and
+for a ticket with its position. It draws from the file at every open, so no second copy stands anywhere to
+drift, and nobody else needs the picture: an agent reads the YAML, and a person reads the editor.</p>
+<p>Every earlier version wanted that property under the name executable diagram: v1 as a lint-pinned Mermaid
+subset, v2 and v3 as an Obsidian canvas the engine compiled, v4 as a React Flow canvas fed by a narrating
+runtime. The tree reaches it from the other side: the data runs, and the picture derives. v1's rules carry
+over whole: nodes declared before edges, every edge labelled, no coordinates, and the hash over the graph
+and not the bytes.</p>
 <p>The drawing carries no style of its own. The extension holds one common style sheet, and it takes its
-colours and its type from the editor's theme, which is VS Code's; the Mermaid fence takes the same classes.
-A cloud box prepares the emitter, the projection and the webview's wiring, and spends nothing on graphical
-design, which is desk work. A ticket's drawing animates nothing, because the record is the run and every
+colours and its type from the editor's theme, which is VS Code's. A cloud box prepares the emitter and the
+webview's wiring, and spends nothing on graphical design, which is desk work. A ticket's drawing animates nothing, because the record is the run and every
 hand-back is a push; a process may animate a run later, and since the emitter reads a graph, a feed that
 moves the pointer adds that and rewrites nothing.</p>
 <div class="scroll"><table>
@@ -1139,8 +1133,8 @@ fact it meets is a route.</p>
 <tr><th>piece</th><th>where</th></tr>
 <tr><td>the schemas</td><td class="m">spec/schemas/ticket.schema.yaml · group.schema.yaml · process.schema.yaml</td></tr>
 <tr><td>the folders</td><td class="m">spec/tickets/ · spec/groups/ · spec/processes/ · .se/tickets/</td></tr>
-<tr><td>the processes and their drawings</td><td class="m">spec/processes/&lt;name&gt;.yaml · the projected spec/processes/&lt;name&gt;.md</td></tr>
-<tr><td>the emitter and the projection entry</td><td>shared by the projection and the editor · one row in <code>spec/config/projections.json</code></td></tr>
+<tr><td>the processes</td><td class="m">spec/processes/&lt;name&gt;.yaml</td></tr>
+<tr><td>the emitter</td><td>one module the editor reads, beside the verbs</td></tr>
 <tr><td>the verbs</td><td class="m">src/scripts/work.js, under ./RUNME.sh work</td></tr>
 <tr><td>the tool wrapper and the spawn</td><td class="m">.claude/skills/level1/</td></tr>
 <tr><td>the stop rule</td><td class="m">spec/config/stop/level1.yml</td></tr>
@@ -1205,7 +1199,7 @@ ones a person wants moved, and the old verbs go once the last brief merges.</p>
 
     <rect x="270" y="52" width="190" height="44" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="365" y="70" text-anchor="middle" font-weight="700">2 · a process is a route</text>
-    <text x="365" y="87" text-anchor="middle" fill="var(--muted)" font-size="11">five routes, the slots, the emitter, the drawing, reroute</text>
+    <text x="365" y="87" text-anchor="middle" fill="var(--muted)" font-size="11">five routes, the slots, the emitter, reroute</text>
 
     <rect x="270" y="172" width="190" height="44" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="365" y="190" text-anchor="middle" font-weight="700">3 · a group is a branch</text>

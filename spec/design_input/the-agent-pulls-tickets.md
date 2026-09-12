@@ -479,31 +479,23 @@ route, and a record where a ticket carries one, into a graph:
 | a marked node | `by: person` |
 | the pointer, the skips and the returns | `step` and the record |
 
-Three readers draw that graph, and none keeps a second copy:
-
-| reader | draws |
-|---|---|
-| the projection | `spec/processes/<name>.md`, a target with a Mermaid fence, which GitHub, Obsidian and the editor's preview render |
-| the editor | the same graph live, for a process and for a ticket with its position |
-| `work show <ticket>` | the graph as text in a terminal |
-
-The projection is an entry in `projections.json`, so the door refuses a hand
-edit to the drawing and a stale drawing fails `check`. Every earlier version
-wants that property under the name executable diagram. The tree reaches it
-from the other side: the data runs, and the picture cannot drift.
+One reader draws that graph: the editor, live, for a process and for a ticket
+with its position. It draws from the file at every open, so no second copy
+stands anywhere to drift. Nobody else needs the picture, since an agent reads
+the YAML and a person reads the editor. Every earlier version wants that
+property under the name executable diagram. The tree reaches it from the
+other side: the data runs, and the picture derives.
 
 The drawing carries no style of its own. The extension holds one common style
 sheet, and it takes its colours and its type from the editor's theme, which
-is VS Code's. The Mermaid fence takes the same classes. A cloud box prepares
-the emitter, the projection and the webview's wiring, and spends nothing on
-graphical design, which is desk work.
+is VS Code's. A cloud box prepares the emitter and the webview's wiring, and
+spends nothing on graphical design, which is desk work.
 
 v1's rules for a drawn model carry over whole:
 
 - the nodes stand declared before the edges, and every edge carries a label
 - no coordinates, and the layout derives
 - the hash reads the graph, so a comment or a reordered key moves nothing
-- the syntax is a pinned subset of Mermaid, and nobody authors it, so nothing lints it
 
 A ticket's drawing animates nothing, because the record is the run and every
 hand-back is a push. A process may animate a run later. The emitter reads a
@@ -913,8 +905,8 @@ the only fact it meets is a route.
 |---|---|
 | the schemas | `spec/schemas/ticket.schema.yaml`, `group.schema.yaml`, `process.schema.yaml` |
 | the folders | `spec/tickets/`, `spec/groups/`, `spec/processes/`, `.se/tickets/` |
-| the processes and their drawings | `spec/processes/<name>.yaml`, and the projected `spec/processes/<name>.md` |
-| the emitter and the projection entry | shared by the projection and the editor, and one row in `spec/config/projections.json` |
+| the processes | `spec/processes/<name>.yaml` |
+| the emitter | one module the editor reads, beside the verbs |
 | the verbs | `src/scripts/work.js`, under `./RUNME.sh work` |
 | the tool wrapper and the spawn | `.claude/skills/level1/`, beside level zero |
 | the stop rule | `spec/config/stop/level1.yml` |
@@ -961,7 +953,7 @@ Eight branches, and the dependencies make the order binding:
 | # | branch | holds | after |
 |---|---|---|---|
 | 1 | `the-ticket-has-a-schema` | the three schemas, the checker's recursion, a YAML kind under a schema, the three keywords, `mint`, the private folder | |
-| 2 | `a-process-is-a-route` | the five route files, `when`, checklists, the six slots, the emitter and the projected drawing, the note verb, the copy at the mint, `reroute` | 1 |
+| 2 | `a-process-is-a-route` | the five route files, `when`, checklists, the six slots, the emitter, the note verb, the copy at the mint, `reroute` | 1 |
 | 3 | `a-group-is-a-branch` | the group note, take, list with the age of a held branch, merge with the check, close, and `adopt` for a brief | 1 |
 | 4 | `the-agent-pulls-a-ticket` | the pull, its checks, its answers, the record, a hold per hand, the stop rule | 2, 3 |
 | 5 | `a-step-changes-hands` | the hand id, the spawn and its tag, person steps, escalation | 4 |
