@@ -6,104 +6,90 @@ urgency: now
 
 # Where it stands
 
-The design input `spec/design_input/one-server-holds-the-shape.md` says what
-the owner asks for. Read it first. It stands on the branch
-`claude/friendly-brown-k6kohy` until the owner merges it, so take that branch
-in where `work sync` leaves it absent.
+The server stands, built and wired into every door.
 
-The editor runs two language servers today, `vale-ls` over the prose rules and
-Biome over the code. Four checks stand outside both, in JS under
-`.claude/skills/level0/lib`:
+| the piece | where | what proves it |
+|---|---|---|
+| the module, no cgo and no dependency | `src/lsp` | `go test ./...` passes, and a build takes under a second |
+| the note shape and the placeholders | `schema.go`, `note.go`, `yaml.go` | `schema_test.go`, sixteen tests |
+| the names | `names.go` | `names_test.go` |
+| the rules over two files | `tree.go`, `install.go`, `private.go` | `tree_test.go`, thirteen tests |
+| the stdio front | `lsp.go` | `lsp_test.go`, over `initialize`, `didOpen` and `didChange` |
+| the port and the standing file | `serve.go` | `serve_test.go`, where a second caller finds the first server |
+| the one-shot verb | `main.go` | `se-lsp check <path>` prints the findings as JSON |
+| the build beside the index | `src/scripts/install.sh` | `./RUNME.sh` builds both, sharing no step |
+| the survey and `doctor` | `lib/tools.js` | the `se-lsp` row names the path and `0.1.0` |
+| `lint` asks the server | `src/scripts/cli.js` | one list carries Vale, Biome and the server |
+| the editor starts it | `src/extension` | `test/level0/lsp.test.js` |
+| what it holds | [[spec/design_output/lsp]] | the note the code points at |
 
-- the note-shape checker, in `schema.js`
-- the rules over two files, in `tree.js`
-- the names, in `names.js`
-- the stale projection, in `projection.js`
+The module hand-rolls the JSON-RPC. `go.lsp.dev/protocol` costs a module graph
+for forty lines of framing.
 
-`./RUNME.sh lint` runs them on a walk, and the write door runs them at a
-write. Nothing draws them as a person types.
+The port carries `check`, `sweep`, `standing` and `stop`.
+
+- a caller reads `.se/lsp.json` and asks that port
+- a caller meeting a stamp apart asks that server to stop
+- it then starts its own, the way the index door does
+
+The checks carry over from the JavaScript, rule for rule. A sweep over a tree
+of broken fixtures answers what the JavaScript answers, line for line.
+
+The JavaScript stays in place, the way the brief asks.
+
+- the write door keeps calling it
+- `lint` falls back to it where the server stands unbuilt
+- `.se/scripts` holds no script of mine, because every one-off runs inline
 
 # What waits
 
-| the piece | where | proves it |
+| the thing | where | why it waits |
 |---|---|---|
-| the server, a Go module with no cgo | `src/lsp` | `go test ./...` passes, and `go build` takes seconds |
-| the four checks, in Go | `src/lsp` | each one refuses the fixture its JS test refuses today |
-| the stdio front | `src/lsp` | a client sends `initialize`, `didOpen` and `didChange`, and reads `publishDiagnostics` |
-| the port and the standing file | `src/lsp`, and `.se/lsp.json` | a second caller finds the first server, and a stale file gives way |
-| the one-shot verb | `se-lsp check <path>` | prints the findings as JSON in the shape `lib/refuse.js` prints |
-| the build, beside the index | `RUNME.sh`, `install.sh` | `./RUNME.sh` builds both, and `doctor` names the server and its version |
-| `lint` asks the server | `src/scripts/cli.js` | one list carries findings from Vale, Biome and the server |
-| the editor starts it | `src/extension` | a departing note draws a red line as a person types |
-| the start, in the handback | `HANDOVER.md` | a person follows the steps on a fresh clone |
+| the stop pool rule | `lib/tree.js`, `stopFolderIsData` | it drives the JavaScript pool over a synthetic rule file |
+| the stale projection | `lib/projection.js` | the wanted text comes out of two generators, thirty kilobytes of JavaScript |
+| the paths from the index | `src/lsp/tree.go` | `Glob` caps at five hundred paths and orders by time |
+| the node version | `surveyFindsNode` | the rule reads the node running the sweep, and this server asks `node --version` |
+| the write door | `lib/apply.js` | the brief leaves it on the JavaScript for a later branch |
 
-# The four checks
+The first two keep `lint` calling the JavaScript for one rule. Read the line in
+`cli.js` under [[spec/design_output/lsp#one-checker-every-front-asks]], which
+says so.
 
-Port them from the JS, test for test, and keep the finding in the shape every
-door prints:
+Two choices a later branch revisits:
 
-    { file, rule, line, column, message, severity }
+- the document selector names markdown and the four files a two-file rule reads
+- `se-lsp` joins the survey list, so `doctor` prints its row with no code
 
-The note-shape checker reads `spec/schemas/*.schema.yaml` with the YAML subset
-`readYaml` reads, and nothing past it. The rules over two files walk the paths
-git holds, and skip a draft under an underscore the way `isDraft` does. Ask the
-index on its port where one stands, and walk the disk where none does.
+# The retro
 
-Leave the JS in place on this branch. The door keeps calling it until the
-server stands on every box, and a later branch takes it out.
+Three things surprise me.
 
-# The server
+- the write door refuses a shell redirection into any tracked path
+- a fixture therefore lands through Python, or through a Go test
+- the `CodeComment` rule reads one line, so a two-line prose comment breaks it
+- the voice rules hold a commit message, so the harness footer meets `Private`
 
-`se-lsp lsp` speaks the language server protocol over stdio: `initialize`,
-`textDocument/didOpen`, `textDocument/didChange`, `textDocument/didSave`, and
-`textDocument/publishDiagnostics` back. A finding maps to a diagnostic with its
-rule as the code and its message as the text. Hand-roll the JSON-RPC or take
-`go.lsp.dev/protocol`, and say which in the handback.
+Two dead ends.
 
-`se-lsp serve` listens on loopback on a port the machine picks and writes
-`{ port, pid, root, stamp }` to `.se/lsp.json`, the way the index door writes
-`.se/index.json`. A caller reads the file and asks, and a caller whose stamp
-disagrees asks that server to stop and starts its own.
+- `go.lsp.dev/protocol` reads well, and costs a module graph for forty lines
+- the index port answers the walk, and `Glob` caps it at five hundred paths
+- so `git ls-files` stays the source of the paths a rule walks
 
-`se-lsp check <path>` answers once and exits, for a box where no server stands.
+One thing goes better than I expect. The differential run is the whole proof.
+Drive the JavaScript and the Go over one broken tree, sort both, and diff. It
+names every porting slip in one pass, and the two agree now.
 
-# The build and the verbs
+# How a person starts it
 
-`RUNME.sh` builds the server into `.se/bin/se-lsp` beside the index, with
-`go build` and no compiler flags, and the two builds share no step. `doctor`
-names it and its version. `lint` asks the server through `check`, or through
-the port where one stands. It merges the server's findings with Vale's and
-Biome's into the one list it prints today.
+A person on a fresh clone follows these, one action each.
 
-# The editor
-
-`src/extension` starts the server for every markdown file on activation, over
-stdio, with `.se/bin/se-lsp lsp` as the command. Take `vscode-languageclient`
-as the one dependency, and pin it. The extension stands linked into VS Code
-through `./RUNME.sh` already, so a person needs no second install.
-
-# What the handback says
-
-End the handback with the steps a person takes on a fresh clone to see the
-server stand. Write them as a numbered list, one action each. Name the one
-command they type, the place the binary lands, what the Problems panel shows
-on a departing note, and what `doctor` prints.
-
-## How this branch runs
-
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
-
-1. Run `./RUNME.sh work sync` FIRST. It takes main into this branch, so
-   an old branch works against what the tree holds now. Resolve any conflict
-   before you start, because a conflict found later costs the work already
-   done.
-2. Commit and push each time you finish a thing. A cloud box dies and takes
-   its working tree with it.
-3. Write your result and your retro into `HANDOVER.md`, at the root, replacing
-   this brief. Say what surprises you and every dead end you walk into.
-4. Run `./RUNME.sh work done`, which sets the status and pushes.
-5. Run `./RUNME.sh work release` instead where you stop early, so the branch
-   goes back to `todo` for somebody else.
-6. Leave the merge into main to a person. A cloud box opens no pull
-   request, and trunk only ever comes towards you.
+1. Clone the tree, and open a terminal in it.
+2. Run `./RUNME.sh`. It installs what the tree needs and builds the server.
+3. Read `building the language server` in that output. The binary lands at `.se/bin/se-lsp`.
+4. Run `./RUNME.sh doctor`. The `se-lsp` row names that path and the version `0.1.0`.
+5. Open the folder in VS Code, where `code` stands off the PATH.
+6. Open `HANDOVER.md` in the editor.
+7. Change `status` in the frontmatter to `maybe`.
+8. Read the Problems panel. `se-lsp` draws `Schema.status` on that line.
+9. Read its message, which names `todo, held, done`. Type `todo` back, and the line clears.
+10. Run `./RUNME.sh lint .` for the same findings on the command line.
