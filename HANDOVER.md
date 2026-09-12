@@ -1,6 +1,6 @@
 ---
 kind: [[handover]]
-status: held
+status: done
 urgency: soon
 depends_on: [the-answer-gate-bites, the-schema-projects-vale]
 ---
