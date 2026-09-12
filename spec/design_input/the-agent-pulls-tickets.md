@@ -57,11 +57,11 @@ Two kinds stand, and the folder says which, the way v4 rules it:
 | tracked | `spec/tickets/` | yes, on trunk and on a group's branch | any hand the route admits |
 | private | `.se/tickets/` | no, it dies with the box | the hand on this box alone |
 
-A private ticket is how a hand organizes its own work. It holds a breakdown
-of the ticket in hand, a bug it trips over, or a note for the retro. A ticket
-in `spec/tickets/` is a promise the tree keeps. A private ticket moves there
-through the mint alone. The mint runs the privacy check the commit door holds,
-so a raw note reaches trunk by no other road.
+A private ticket is how a hand organizes its own work. It holds a note, which
+is the smallest ticket there is, or a breakdown of the ticket in hand. A
+ticket in `spec/tickets/` is a promise the tree keeps. A private ticket moves
+there through the mint alone. The mint runs the privacy check the commit door
+holds, so a raw note reaches trunk by no other road.
 
 The frontmatter carries what a program reads, and every field names its
 reader:
@@ -301,9 +301,37 @@ and nothing more:
 
 | process | route | for |
 |---|---|---|
+| `note` | `decide` | a thing to look at later, with no work in it yet |
 | `trivial` | `do` | a fix small enough that the ask is the design |
 | `standard` | `design` (draft, review), `implement` (tests-red, change, tests-green), `verdict` | a change that wants an approach first, tests before code, and a second pair of eyes after |
 | `complex` | `split`, `children`, `verdict` | a change too large to review whole |
+
+A note is the smallest ticket, and it is where most work starts. A hand that
+meets an idea, a bug or a doubt mid-work writes a note and carries on. Its
+hold stays where it is. `work note` takes a name and a line and answers at
+once. The note is private and stays on the box. The mint's comment on its ask
+carries three hints and nothing else:
+
+- the smallest case that shows it
+- why it matters
+- what a stranger needs in order to act on it
+
+Its one step, `decide`, is where somebody reads it later and says what it
+becomes. The step closes the note as `dropped`, or as `done` where the answer
+is small enough to do on the spot. Or it closes the note as `became`, and
+names the tracked ticket the mint cuts from it. On a desk that reading is the
+retro's. On a cloud box the pull hands a hand its own notes once its group's
+tickets run out. A note that stays behind dies with the box.
+
+A note also answers. The answer door holds every tool call until the owner's
+prompt has an answer. A prompt that says "make a note of this" wants one thing
+back: the note. So three things happen at once:
+
+- `work note` writes a `note` line to the log
+- the answer door counts that line as the answer
+- the viewer draws it pink, right under the prompt
+
+The owner reads that the agent understood, and the agent carries on.
 
 A complex ticket's work is other tickets. Its `split` step writes the children,
 each one trivial, standard or complex, and its done-when says every child
@@ -344,17 +372,29 @@ shape.
 | rule | what it says |
 |---|---|
 | the branch is the claim | taking a group pushes `state: held` on the group note, and the push arbitrates two boxes |
-| the tip is the lease | a held group whose branch tip is older than `work.leaseHours` reads as free again |
+| a stale branch is a person's | `work list` says how long each held branch has stood still, and a person releases or closes it |
 | one box, one group | a box works one group at a time, and the group's tickets one at a time |
 | the branch is the filter | on a group's branch the pull sees that group's tickets alone, and widens nothing |
+| trunk hands out no group's ticket | on trunk the pull offers a box a group to take, and a person the tickets of no group |
 | the branch holds the truth | while the branch stands, its copy of the group note and of its tickets is the record |
 | a group ends | when no ticket in it stands at a step an agent may take |
 | the merge is a person's | `work merge` takes an ended group into trunk, and `work close` drops the branch |
 
 A box starting on trunk or on a branch the platform names takes a group first.
-On a desk, a person on trunk sees every ticket, and a person on a group's
-branch sees that group, as a box does. A filter a person sets in config
-outranks the branch, which v4 rules.
+A group's tickets live on its branch, and a hand works them there alone. On a
+desk, a person on trunk sees every ticket, and a person on a group's branch
+sees that group, as a box does. A filter a person sets in config outranks the
+branch, which v4 rules.
+
+There is no lease. A branch somebody holds stays held until a person looks. A
+branch held for a long time is something a person has to look at in any case.
+So `work list` names the age of each held branch's tip, and that age is the
+signal.
+
+A hand mints where it means to work:
+
+- a ticket it means to do itself goes into its own group, and lands with it
+- a ticket it leaves for others carries no group, and a person sorts it later
 
 The retro chapter replaces the brief's handback. The hand that ends a group
 writes it before the last push.
@@ -409,7 +449,7 @@ The pull runs at two levels, and the same rule shape holds at each:
 
 | who pulls | what | the rule |
 |---|---|---|
-| the beat | a box per free group | groups at `todo` or lapsed, none of whose tickets wait on an unmerged group, by urgency |
+| the beat | a box per free group | groups at `todo`, none of whose tickets wait on an unmerged group, by urgency |
 | the box | the next ticket of its group | tickets at `open` with no open dependency, children before parents, a step this hand may take, by urgency then name |
 | a person | anything | the same two lists on the board, and no refusal |
 
@@ -453,7 +493,6 @@ the engine advances into the step behind it.
 |---|---|---|
 | the hand needs a person | the hand, through the verb | none |
 | the same hand-back meets `refused` N times | the engine | `work.refusalsBeforePerson` |
-| the lease lapses N times on one ticket | the engine | `work.lapsesBeforePerson` |
 | a step a person takes, from the mint | the mint | none |
 
 A gate and an escalation are one mechanism, one the mint writes and one the
@@ -512,7 +551,8 @@ rule. A box at autonomy `start` may mint sub-tickets into its own group. A bug
 it trips over goes the same way, which is the owner's ruling from v4 on a bug
 found in the bucket.
 
-Private tickets carry the same schema in `.se/tickets/`. The pull hands one to
+Private tickets carry the same schema in `.se/tickets/`, and two kinds stand
+there: a note, and a breakdown of the ticket in hand. The pull hands one to
 the hand on its own box alone, after the group's tracked tickets run out. That
 is v4's rule that an empty queue drains the notes. The tooth counts a private
 ticket in hand the way it counts a task today.
@@ -553,8 +593,10 @@ folder.
 | the brief door hands over `HANDOVER.md` and deletes it | the tracked brief goes, and the block on a cloud box says to run the pull |
 | `.se/HANDOVER.md` hands one session the next | unchanged |
 | `work-waiting` counts tasks | it reads `.se/hold.json` and counts private tickets |
+| the answer door reads the session's text alone | it counts a `note` line as an answer too |
+| the viewer colours every kind it knows | `note` draws pink, under the prompt it answers |
 | `engine.binding` at `queue` and `unbound` draw the status bar | `queue` hands out, `unbound` hands out nothing, and a hand may take a named ticket |
-| `engine.autonomy` draws nowhere | `finish` mints nothing, `start` mints into its own group, `ideation` mints drafts into the backlog |
+| `engine.autonomy` draws nowhere | `finish` mints notes alone, `start` mints into its own group, `ideation` mints loose tickets into the backlog |
 | `engine.state` and `engine.beat` draw nowhere | the beat writes them |
 | the trunk guard refuses a commit on `main` | unchanged |
 
@@ -582,9 +624,7 @@ the only fact it meets is a route.
 
 | key | default | what it decides |
 |---|---|---|
-| `work.leaseHours` | 3 | when a held group reads as free |
 | `work.refusalsBeforePerson` | 5 | when a refused hand-back becomes a person's step |
-| `work.lapsesBeforePerson` | 2 | when a lapsed ticket becomes a person's step |
 | `work.stepsBeforeSplit` | 3 | when an escalating ticket must split |
 | `work.filter` | empty | what a person's pull sees, over the branch |
 | `engine.boxes` | 1 | how many boxes the beat fires at most |
@@ -596,7 +636,7 @@ the only fact it meets is a route.
 | the pull is the one verb, and a submission rides it | v3, v4 | stays whole |
 | one token in hand | v4 | one ticket in hand, in `.se/hold.json` |
 | the hold is engine state, and the claim travels | v4 | the hold file, and the group's push |
-| the token carries no time | v4 | stays, and the lease reads git |
+| the token carries no time | v4 | stays, and `work list` reads a branch's age off git |
 | a field stands because something reads it | v4 | the field table above |
 | a todo is a sub-token | v4 | private sub-tickets, and the tooth counts them |
 | every token names its closer | v4 | the route's last step |
@@ -608,7 +648,8 @@ the only fact it meets is a route.
 | the reading proof | v3 | out, for the log line, and open as a level two option |
 | a spawn ceiling of zero for delegated writing | v3 | the engine spawns for a step alone, and the session spawns for nothing |
 | controls only ever stop the engine refusing | v3 | stays |
-| notes, then the retro, then the mint | v3 | the mint's privacy check on promotion |
+| notes, then the retro, then the mint | v3 | the note process, and the mint's privacy check on promotion |
+| a claim lapses after a set number of hours | v4 | out, because a stale branch is a person's to look at |
 | the machine builds the form, and a pull carries it back | v3 | the evidence forms, which the mint renders |
 
 # The order of work
@@ -618,8 +659,8 @@ Eight branches, and the dependencies make the order binding:
 | # | branch | holds | after |
 |---|---|---|---|
 | 1 | `the-ticket-has-a-schema` | the three schemas, the three keywords, `mint`, the private folder | |
-| 2 | `a-process-is-a-route` | the three route files, the copy at the mint, a chapter per step | 1 |
-| 3 | `a-group-is-a-branch` | the group note, take, lease, list, merge, close, and `adopt` for a brief | 1 |
+| 2 | `a-process-is-a-route` | the four route files, the note verb, the copy at the mint, a chapter per step | 1 |
+| 3 | `a-group-is-a-branch` | the group note, take, list with the age of a held branch, merge, close, and `adopt` for a brief | 1 |
 | 4 | `the-agent-pulls-a-ticket` | the pull, its checks, its answers, the hold file, the stop rule | 2, 3 |
 | 5 | `a-step-changes-hands` | the hand id, the spawn, person steps, escalation | 4 |
 | 6 | `guidance-rides-the-step` | `reads`, the verb, the log line, the standing layer shrinks | 4 |
@@ -632,7 +673,6 @@ wants moved. The old verbs go once the last brief merges.
 
 # What this leaves open
 
-- the lease length, which three hours seeds from v4
 - whether a person step may go to a spawned strong model at high autonomy
 - whether yours drowns in parked conditions, and a parked state returns
 - a WIP limit per step, which is Kanban's one knob and stands outside this note

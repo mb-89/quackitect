@@ -373,8 +373,9 @@ paragraph a span sits in.
 <tr><td>tracked</td><td class="m">spec/tickets/</td><td>yes, on trunk and on a group's branch</td><td>any hand the route admits</td></tr>
 <tr><td>private</td><td class="m">.se/tickets/</td><td>no, it dies with the box</td><td>the hand on this box alone</td></tr>
 </table></div>
-<p class="note">A private ticket is a hand's own breakdown, a bug it trips over, a note for the retro. It
-moves to <code>spec/tickets/</code> through the mint alone, which runs the privacy check the commit door holds.</p>
+<p class="note">A private ticket is a note, which is the smallest ticket there is, or a hand's own breakdown of
+the ticket in hand. It moves to <code>spec/tickets/</code> through the mint alone, which runs the privacy check
+the commit door holds.</p>
 
 <!-- ============================================================ -->
 <h2 id="s3"><span class="n">3</span>The lifecycle and the route</h2>
@@ -573,10 +574,26 @@ that, and a process file changes without reaching a ticket in flight.</p>
 
 <div class="scroll"><table>
 <tr><th>process</th><th>route</th><th>for</th></tr>
+<tr><td class="m">note</td><td class="m">decide</td><td>a thing to look at later, with no work in it yet</td></tr>
 <tr><td class="m">trivial</td><td class="m">do</td><td>a fix small enough that the ask is the design</td></tr>
 <tr><td class="m">standard</td><td class="m">design (draft, review) · implement (tests-red, change, tests-green) · verdict</td><td>a change that wants an approach first, tests before code, and a second pair of eyes after</td></tr>
 <tr><td class="m">complex</td><td class="m">split · children · verdict</td><td>a change too large to review whole</td></tr>
 </table></div>
+
+<p>A note is the smallest ticket, and it is where most work starts. A hand that meets an idea, a bug or a
+doubt mid-work writes one with <code>work note</code> and carries on; its hold stays where it is. The note is
+private and stays on the box, and the mint's comment on its ask carries three hints and nothing else: the
+smallest case that shows it, why it matters, and what a stranger needs in order to act on it. Its one step,
+<code>decide</code>, is where somebody reads it later and closes it as <code>dropped</code>, as <code>done</code>
+where the answer is small enough to do on the spot, or as <code>became</code>, naming the tracked ticket the
+mint cuts from it. On a desk that reading is the retro's. On a cloud box the pull hands a hand its own notes
+once its group's tickets run out, because a note that stays behind dies with the box.</p>
+
+<p>A note also answers. The answer door holds every tool call until the owner's prompt has an answer, and a
+prompt that says "make a note of this" wants one thing back: the note. So <code>work note</code> writes a
+<code>note</code> line to the log, the answer door counts that line as the answer, and the viewer draws it
+<b style="color:#c2418a">pink</b>, right under the prompt. The owner reads that the agent understood, and
+the agent carries on.</p>
 
 <figure>
 <svg viewBox="0 0 900 250" role="img"
@@ -662,22 +679,29 @@ writes that field. A group of one ticket is the ordinary case, and a group of fi
   <g fill="none" stroke="var(--muted)" stroke-width="1.2">
     <path d="M680,40 L680,30 L800,30 L800,40"/>
   </g>
-  <text x="740" y="22" text-anchor="middle" font-size="11.5" fill="var(--muted)">lease = the age of this tip · older than 3 h reads as free</text>
+  <text x="740" y="22" text-anchor="middle" font-size="11.5" fill="var(--muted)">work list says how long this tip has stood still · a person decides</text>
 </svg>
-<figcaption>The branch is the claim and the tip is the lease. Every accepted hand-back is a push, so a
-working box renews its lease by working. Nothing on the ticket says who holds it or since when: git does.</figcaption>
+<figcaption>The branch is the claim, and there is no lease. Every accepted hand-back is a push, so
+<code>work list</code> reads how long a held branch has stood still off its tip, and a person decides what a
+stale one needs. Nothing on the ticket says who holds it or since when: git does.</figcaption>
 </figure>
 
 <div class="scroll"><table>
 <tr><th>rule</th><th>what it says</th></tr>
 <tr><td>the branch is the claim</td><td>taking a group pushes <code>state: held</code> on the group note, and the push arbitrates two boxes</td></tr>
-<tr><td>the tip is the lease</td><td>a held group whose branch tip is older than <code>work.leaseHours</code> reads as free again</td></tr>
+<tr><td>a stale branch is a person's</td><td><code>work list</code> says how long each held branch has stood still, and a person releases or closes it</td></tr>
 <tr><td>one box, one group</td><td>a box works one group at a time, and the group's tickets one at a time</td></tr>
 <tr><td>the branch is the filter</td><td>on a group's branch the pull sees that group's tickets alone, and widens nothing; a filter a person sets in config outranks the branch</td></tr>
+<tr><td>trunk hands out no group's ticket</td><td>on trunk the pull offers a box a group to take, and a person the tickets of no group; a group's tickets are worked on its branch alone</td></tr>
 <tr><td>the branch holds the truth</td><td>while the branch stands, its copy of the group note and of its tickets is the record</td></tr>
 <tr><td>a group ends</td><td>when no ticket in it stands at a step an agent may take</td></tr>
 <tr><td>the merge is a person's</td><td><code>work merge</code> takes an ended group into trunk, and <code>work close</code> drops the branch</td></tr>
 </table></div>
+
+<p>A hand mints where it means to work. A ticket it means to do itself goes into its own group and lands
+with it. A ticket it leaves for others carries no group, and a person sorts it later. There is no lease: a
+branch held for a long time is something a person has to look at in any case, so the age of its tip is the
+signal and <code>work list</code> names it.</p>
 
 <p class="note">v4 ran this shape under two words, <code>bucket</code> on the token and <code>group/</code> on the
 branch. Now the two coincide, so one word stays: group.</p>
@@ -734,7 +758,7 @@ reads the file.</p>
 <h3>The pull runs at two levels</h3>
 <div class="scroll"><table>
 <tr><th>who pulls</th><th>what</th><th>the rule</th></tr>
-<tr><td>the beat</td><td>a box per free group</td><td>groups at <code>todo</code> or lapsed, none of whose tickets wait on an unmerged group, by urgency</td></tr>
+<tr><td>the beat</td><td>a box per free group</td><td>groups at <code>todo</code>, none of whose tickets wait on an unmerged group, by urgency</td></tr>
 <tr><td>the box</td><td>the next ticket of its group</td><td>tickets at <code>open</code> with no open dependency, children before parents, a step this hand may take, by urgency then name</td></tr>
 <tr><td>a person</td><td>anything</td><td>the same two lists on the board, and no refusal</td></tr>
 </table></div>
@@ -763,7 +787,6 @@ one mechanism; a park is the same, with the condition as the question.</p>
 <tr><th>trigger</th><th>who inserts</th><th>the knob</th></tr>
 <tr><td>the hand needs a person</td><td>the hand, through the verb</td><td>none</td></tr>
 <tr><td>the same hand-back meets <code>refused</code> N times</td><td>the engine</td><td class="m">work.refusalsBeforePerson</td></tr>
-<tr><td>the lease lapses N times on one ticket</td><td>the engine</td><td class="m">work.lapsesBeforePerson</td></tr>
 <tr><td>a step a person takes, from the mint</td><td>the mint</td><td>none</td></tr>
 </table></div>
 
@@ -856,8 +879,10 @@ again for every other free group, up to <code>engine.boxes</code>.</p>
 <tr><td>the brief door hands over <code>HANDOVER.md</code> and deletes it</td><td>the tracked brief goes, and the block on a cloud box says to run the pull</td></tr>
 <tr><td><code>.se/HANDOVER.md</code> hands one session the next</td><td>unchanged</td></tr>
 <tr><td><code>work-waiting</code> counts tasks</td><td>it reads <code>.se/hold.json</code> and counts private tickets</td></tr>
+<tr><td>the answer door reads the session's text alone</td><td>it counts a <code>note</code> line as an answer too</td></tr>
+<tr><td>the viewer colours every kind it knows</td><td><code>note</code> draws pink, under the prompt it answers</td></tr>
 <tr><td><code>engine.binding</code> at <code>queue</code> and <code>unbound</code> draw the status bar</td><td><code>queue</code> hands out; <code>unbound</code> hands out nothing, and a hand may take a named ticket</td></tr>
-<tr><td><code>engine.autonomy</code> draws nowhere</td><td><code>finish</code> mints nothing, <code>start</code> mints into its own group, <code>ideation</code> mints drafts into the backlog</td></tr>
+<tr><td><code>engine.autonomy</code> draws nowhere</td><td><code>finish</code> mints notes alone, <code>start</code> mints into its own group, <code>ideation</code> mints loose tickets into the backlog</td></tr>
 <tr><td><code>engine.state</code> and <code>engine.beat</code> draw nowhere</td><td>the beat writes them</td></tr>
 <tr><td>the trunk guard refuses a commit on <code>main</code></td><td>unchanged</td></tr>
 </table></div>
@@ -883,9 +908,7 @@ fact it meets is a route.</p>
 
 <div class="scroll"><table>
 <tr><th>key</th><th>default</th><th>what it decides</th></tr>
-<tr><td class="m">work.leaseHours</td><td class="num">3</td><td>when a held group reads as free</td></tr>
 <tr><td class="m">work.refusalsBeforePerson</td><td class="num">5</td><td>when a refused hand-back becomes a person's step</td></tr>
-<tr><td class="m">work.lapsesBeforePerson</td><td class="num">2</td><td>when a lapsed ticket becomes a person's step</td></tr>
 <tr><td class="m">work.stepsBeforeSplit</td><td class="num">3</td><td>when an escalating ticket must split</td></tr>
 <tr><td class="m">work.filter</td><td class="num">empty</td><td>what a person's pull sees, over the branch</td></tr>
 <tr><td class="m">engine.boxes</td><td class="num">1</td><td>how many boxes the beat fires at most</td></tr>
@@ -899,7 +922,7 @@ fact it meets is a route.</p>
 <tr><td>the pull is the one verb, and a submission rides it</td><td>v3, v4</td><td>stays whole</td></tr>
 <tr><td>one token in hand</td><td>v4</td><td>one ticket in hand, in <code>.se/hold.json</code></td></tr>
 <tr><td>the hold is engine state, and the claim travels</td><td>v4</td><td>the hold file, and the group's push</td></tr>
-<tr><td>the token carries no time</td><td>v4</td><td>stays, and the lease reads git</td></tr>
+<tr><td>the token carries no time</td><td>v4</td><td>stays, and <code>work list</code> reads a branch's age off git</td></tr>
 <tr><td>a field stands because something reads it</td><td>v4</td><td>the field table in section 2</td></tr>
 <tr><td>a todo is a sub-token</td><td>v4</td><td>private sub-tickets, and the tooth counts them</td></tr>
 <tr><td>every token names its closer</td><td>v4</td><td>the route's last step</td></tr>
@@ -911,7 +934,8 @@ fact it meets is a route.</p>
 <tr><td>the reading proof</td><td>v3</td><td>out, for the log line; open as a level two option</td></tr>
 <tr><td>a spawn ceiling of zero for delegated writing</td><td>v3</td><td>the engine spawns for a step alone, and the session spawns for nothing</td></tr>
 <tr><td>controls only ever stop the engine refusing</td><td>v3</td><td>stays</td></tr>
-<tr><td>notes, then the retro, then the mint</td><td>v3</td><td>the mint's privacy check on promotion</td></tr>
+<tr><td>notes, then the retro, then the mint</td><td>v3</td><td>the note process, and the mint's privacy check on promotion</td></tr>
+<tr><td>a claim lapses after a set number of hours</td><td>v4</td><td>out: a stale branch is a person's to look at</td></tr>
 <tr><td>the machine builds the form, and a pull carries it back</td><td>v3</td><td>the evidence forms, which the mint renders</td></tr>
 </table></div>
 
@@ -932,11 +956,11 @@ ones a person wants moved, and the old verbs go once the last brief merges.</p>
 
     <rect x="270" y="52" width="190" height="44" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="365" y="70" text-anchor="middle" font-weight="700">2 · a process is a route</text>
-    <text x="365" y="87" text-anchor="middle" fill="var(--muted)" font-size="11">three routes, a chapter per step</text>
+    <text x="365" y="87" text-anchor="middle" fill="var(--muted)" font-size="11">four routes, the note verb, a chapter per step</text>
 
     <rect x="270" y="172" width="190" height="44" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="365" y="190" text-anchor="middle" font-weight="700">3 · a group is a branch</text>
-    <text x="365" y="207" text-anchor="middle" fill="var(--muted)" font-size="11">take, lease, merge, close, adopt</text>
+    <text x="365" y="207" text-anchor="middle" fill="var(--muted)" font-size="11">take, list with the age, merge, close, adopt</text>
 
     <rect x="510" y="112" width="190" height="44" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/>
     <text x="605" y="130" text-anchor="middle" font-weight="700">4 · the agent pulls a ticket</text>
@@ -999,7 +1023,6 @@ level one stays still while level two invents flows.</p>
 <h2 id="s16"><span class="n">16</span>What this leaves open</h2>
 
 <ul>
-  <li>the lease length, which three hours seeds from v4</li>
   <li>whether a person step may go to a spawned strong model at high autonomy</li>
   <li>whether yours drowns in parked conditions, and a parked state returns</li>
   <li>a WIP limit per step, which is Kanban's one knob and stands outside the note</li>
