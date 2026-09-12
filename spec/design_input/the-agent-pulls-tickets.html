@@ -181,7 +181,7 @@ the retro holds only where a hand produces defined evidence at every step, under
     <rect x="330" y="125" width="250" height="70" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/>
     <text x="455" y="151" text-anchor="middle" font-size="14" font-weight="700">level one</text>
     <text x="455" y="171" text-anchor="middle" fill="var(--muted)">tickets, groups, the pull</text>
-    <text x="455" y="186" text-anchor="middle" fill="var(--muted)" font-size="11">spec/tickets · spec/groups · work/&lt;group&gt;</text>
+    <text x="455" y="186" text-anchor="middle" fill="var(--muted)" font-size="11">spec/tickets · spec/processes · work/&lt;group&gt;</text>
 
     <!-- level zero -->
     <rect x="330" y="228" width="250" height="62" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
@@ -549,7 +549,7 @@ person answers under its evidence, and the pointer moves on into the leaf it lef
 <tr><th>step field</th><th>holds</th></tr>
 <tr><td class="m">name</td><td>one word or a hyphenated pair, unique among its siblings</td></tr>
 <tr><td class="m">steps</td><td>the steps under a phase, in order</td></tr>
-<tr><td class="m">by</td><td><code>anyone</code>, <code>person</code>, <code>agent</code>, <code>retro</code>, <code>children</code>, or <code>tickets</code></td></tr>
+<tr><td class="m">by</td><td><code>anyone</code>, <code>person</code>, <code>agent</code>, <code>helper</code>, <code>retro</code>, <code>children</code>, or <code>tickets</code></td></tr>
 <tr><td class="m">not</td><td>a step whose hand this step's hand may not be, as <code>draft</code> or <code>implement</code></td></tr>
 <tr><td class="m">reads</td><td>links to the guidance notes the step's hand reads</td></tr>
 <tr><td class="m">on_fail</td><td>an earlier step, where a failed hand-back sends the ticket</td></tr>
@@ -559,7 +559,7 @@ person answers under its evidence, and the pointer moves on into the leaf it lef
 <tr><td class="m">does</td><td>one line on what the hand does at this leaf, which the <code>work</code> answer says first</td></tr>
 <tr><td class="m">input</td><td>what the step reads: <code>ask</code>, <code>diff</code>, or earlier evidence by path</td></tr>
 <tr><td class="m">needs</td><td>the verbs and tools the step runs, which the pull checks on the box first</td></tr>
-<tr><td class="m">from</td><td>who hands the step its input, where that is a person or the outside</td></tr>
+<tr><td class="m">from</td><td>who hands the step its input, where that is a person, the engine or the outside</td></tr>
 <tr><td class="m">to</td><td>who takes the output, where that is the owner, the retro or the merge</td></tr>
 <tr><td class="m">evidence</td><td>the fields a leaf's hand fills, each with a name, a form and a <code>says</code></td></tr>
 </table></div>
@@ -705,7 +705,7 @@ happened.</p>
 <h2 id="s5"><span class="n">5</span>Processes are routes</h2>
 
 <p>A process is a route the mint copies onto a ticket. Level one ships four for tickets and one for a group,
-as YAML files under <code>spec/processes/</code>, each under <code>process.schema.yaml</code> and holding a
+as YAML files under <code>spec/processes/</code>, eight of them and in the tree already, each under <code>process.schema.yaml</code> and holding a
 <code>steps</code> list beside the ask's fields, and nothing more. The ask is a form too: the process names
 its fields with the same forms the evidence takes, the mint renders them under <code>Ask</code>, and the verb
 that opens a ticket refuses <code>open</code> while one stands empty. The mint takes
@@ -721,7 +721,10 @@ and the board flags a ticket whose hash trails its process.</p>
 <tr><td class="m">trivial</td><td class="m">do</td><td>a fix small enough that the ask is the design</td></tr>
 <tr><td class="m">standard</td><td class="m">design (draft, review) · implement (tests-red, change, tests-green) · verdict</td><td>a change that wants an approach first, tests before code, and a second pair of eyes after</td></tr>
 <tr><td class="m">complex</td><td class="m">split · children · verdict</td><td>a change too large to review whole</td></tr>
-<tr><td class="m">group</td><td class="m">sync (cloud) · tickets · retro</td><td>the route a group note carries around its tickets</td></tr>
+<tr><td class="m">group</td><td class="m">sync (cloud) · tickets · retro (notes, write, cloud)</td><td>a set of tickets one box works on one branch, and what a cloud run does</td></tr>
+<tr><td class="m">retro</td><td class="m">collect · field · score · notes · readers · mine · improve · report · distribute</td><td>a window of the record, and the changes to the machinery it earns</td></tr>
+<tr><td class="m">chapter</td><td class="m">read</td><td>one chapter of a retro's window, read by one spawned hand</td></tr>
+<tr><td class="m">commands</td><td class="m">read</td><td>the shell commands of a retro's window, grouped by the job</td></tr>
 </table></div>
 
 <p>A note is the smallest ticket, and it is where most work starts. A hand that meets an idea, a bug or a
@@ -813,18 +816,21 @@ those two and no third.</p>
 <h2 id="s6"><span class="n">6</span>A group is a branch</h2>
 
 <p>A ticket is too small for a branch, and a branch is too heavy for every ticket. So the unit a box works
-and the unit that lands is a group: a branch named <code>work/&lt;group&gt;</code>, and a note under
-<code>spec/groups/</code> holding its state, its ask and a route of its own, which the <code>group</code>
-process copies onto it. The pull hands the group's own leaves out before and after its tickets, so a group
-and a ticket meet one pull: <code>sync</code> carries <code>when: cloud</code>, the
-<code>tickets</code> step belongs to no hand and ends when no ticket stands at a step an agent may take, and
-the <code>retro</code> step writes what the brief's handback carries today. A ticket names its group in one
+and the unit that lands is a group: a ticket under the <code>group</code> process, and a branch named
+<code>work/&lt;group&gt;</code> after it. Its children are the tickets naming it under <code>group</code>, so
+a group is a complex ticket whose children a person assigns, and one schema covers everything that moves.
+Three things tell the two apart: a complex ticket's <code>split</code> mints its children and they carry
+<code>parent</code>, while a person assigns a group's and they carry <code>group</code>; <code>children</code>
+ends when every child closes, while <code>tickets</code> holds whenever a child stands at an agent step, so a
+parked child blocks nothing; and a <code>verdict</code> reads the sum, while a <code>retro</code> reads the
+run. The route is what a cloud run does step by step: <code>sync</code> under <code>when: cloud</code>, the
+children, then a retro phase of three leaves. A ticket names its group in one
 field, and a person writes that field. A group of one ticket is the ordinary case, and a group of five is
 the same shape.</p>
 
 <figure>
 <svg viewBox="0 0 940 240" role="img"
-     aria-label="A git graph. Main runs along the bottom. A branch work/voice leaves main after a commit that puts the group note and its tickets on trunk. On the branch: a commit take sets state held, then one commit per ticket hand-back, then a retro commit sets state done. The branch merges back to main with no fast-forward. A bracket over the branch tip says the lease is the age of this tip.">
+     aria-label="A git graph. Main runs along the bottom. A branch work/voice leaves main after a commit that puts the group ticket and its children on trunk. On the branch: a commit take writes the hand and took into the group's record, then one commit per ticket hand-back, then a retro commit sets state done. The branch merges back to main with no fast-forward. A bracket over the branch tip says the lease is the age of this tip.">
   <g fill="none" stroke="currentColor" stroke-width="2">
     <line x1="40" y1="180" x2="900" y2="180"/>
     <path d="M140,180 C170,180 170,80 200,80 L760,80 C790,80 790,180 820,180" stroke="var(--accent)"/>
@@ -840,13 +846,13 @@ the same shape.</p>
   </g>
   <g font-size="12" fill="currentColor">
     <text x="60" y="205" text-anchor="start" font-weight="700">main</text>
-    <text x="140" y="222" text-anchor="middle" fill="var(--muted)" font-size="11.5">the group note, todo, and its</text>
+    <text x="140" y="222" text-anchor="middle" fill="var(--muted)" font-size="11.5">the group ticket, open, and its</text>
     <text x="140" y="236" text-anchor="middle" fill="var(--muted)" font-size="11.5">tickets land on trunk</text>
     <text x="820" y="222" text-anchor="middle" fill="var(--muted)" font-size="11.5">work merge, no fast-forward</text>
     <text x="820" y="236" text-anchor="middle" fill="var(--muted)" font-size="11.5">then work close drops the branch</text>
     <text x="200" y="62" text-anchor="start" fill="var(--accent)" font-weight="700">work/voice</text>
     <text x="230" y="105" text-anchor="middle" font-size="11.5">take</text>
-    <text x="230" y="120" text-anchor="middle" fill="var(--muted)" font-size="11">state: held</text>
+    <text x="230" y="120" text-anchor="middle" fill="var(--muted)" font-size="11">took, in the record</text>
     <text x="230" y="134" text-anchor="middle" fill="var(--muted)" font-size="11">the push is the claim</text>
     <text x="360" y="105" text-anchor="middle" font-size="11.5">ticket a · pass</text>
     <text x="490" y="105" text-anchor="middle" font-size="11.5">ticket b · pass</text>
@@ -854,12 +860,12 @@ the same shape.</p>
     <text x="620" y="120" text-anchor="middle" fill="var(--muted)" font-size="11">a person step waits;</text>
     <text x="620" y="134" text-anchor="middle" fill="var(--muted)" font-size="11">the box goes on with d</text>
     <text x="740" y="105" text-anchor="middle" font-size="11.5">retro</text>
-    <text x="740" y="120" text-anchor="middle" fill="var(--muted)" font-size="11">state: done</text>
+    <text x="740" y="120" text-anchor="middle" fill="var(--muted)" font-size="11">gave, and closed</text>
   </g>
   <g fill="none" stroke="var(--muted)" stroke-width="1.2">
     <path d="M680,40 L680,30 L800,30 L800,40"/>
   </g>
-  <text x="740" y="22" text-anchor="middle" font-size="11.5" fill="var(--muted)">work list reads this tip's age · past work.staleAfter it is yours: release, take, close</text>
+  <text x="740" y="22" text-anchor="middle" font-size="11.5" fill="var(--muted)">work list reads this tip's age · past work.staleAfter it is yours</text>
 </svg>
 <figcaption>The branch is the claim, and there is no lease. Every accepted hand-back is a push, so
 <code>work list</code> reads how long a held branch has stood still off its tip. Past
@@ -870,18 +876,19 @@ who holds it or since when: git does.</figcaption>
 
 <div class="scroll"><table>
 <tr><th>rule</th><th>what it says</th></tr>
-<tr><td>the branch is the claim</td><td>taking a group pushes <code>state: held</code> on the group note, and the push arbitrates two boxes</td></tr>
-<tr><td>a group has a route</td><td>the group note carries steps from the <code>group</code> process, and the pull hands them out around the tickets</td></tr>
+<tr><td>the branch is the claim</td><td>the take writes the hand and <code>took</code> into the group's record under <code>tickets</code> and pushes, and the push arbitrates two boxes</td></tr>
+<tr><td>held derives</td><td>a group holds where its newest record entry carries <code>took</code> and no <code>gave</code>, and <code>work list</code> reads it so</td></tr>
+<tr><td>a group has a route</td><td>the ticket carries the <code>group</code> route, and the pull hands its leaves out around the children</td></tr>
 <tr><td>a stale group is yours</td><td>a held group whose tip is older than <code>work.staleAfter</code> stands under yours with three answers, and <code>release</code>, <code>take</code> and <code>close</code> are the verbs</td></tr>
-<tr><td>one box, one group</td><td>a box works one group at a time, and the group's tickets one at a time</td></tr>
+<tr><td>one box, one group</td><td>a box works one group at a time, and the group's children one at a time</td></tr>
 <tr><td>the branch is the filter</td><td>on a group's branch the pull sees that group's tickets alone, and widens nothing; a filter a person sets in config outranks the branch</td></tr>
 <tr><td>trunk hands out no group's ticket</td><td>on trunk the pull offers a box a group to take, and a person the tickets of no group; a group's tickets are worked on its branch alone</td></tr>
-<tr><td>the branch holds the truth</td><td>while the branch stands, its copy of the group note and of its tickets is the record</td></tr>
-<tr><td>a box leaves</td><td>when the group's last leaf passes, and pushes <code>state: done</code> where every ticket stands closed, else <code>state: todo</code></td></tr>
-<tr><td>a group returns</td><td>a group at <code>todo</code> with a parked ticket comes back to the beat once a person answers on its branch</td></tr>
+<tr><td>the branch holds the truth</td><td>while the branch stands, its copy of the group and of its children is the record</td></tr>
+<tr><td>a box leaves</td><td>when the group's last leaf passes, it writes <code>gave</code>, closes the group as <code>done</code> where every child stands closed, and leaves it open otherwise</td></tr>
+<tr><td>a group returns</td><td>an open group nobody holds comes back to the beat once a person answers on its branch</td></tr>
 <tr><td>the merge is a person's</td><td><code>work merge</code> takes an ended group into trunk, and <code>work close</code> drops the branch</td></tr>
-<tr><td>the merge lands the truth</td><td><code>work merge</code> runs the check on the merge commit and undoes it on red; it refuses where trunk's copy of a ticket or of the group note differs from the branch point, and names the lines</td></tr>
-<tr><td>the merge frees the tickets</td><td>an open ticket of a merged group loses its <code>group</code>, so a parent waiting on children or on a person stands loose on trunk</td></tr>
+<tr><td>the merge lands the truth</td><td><code>work merge</code> runs the check on the merge commit and undoes it on red; it refuses where trunk's copy of the group or of a child differs from the branch point, and names the lines</td></tr>
+<tr><td>the merge frees the tickets</td><td>an open child of a merged group loses its <code>group</code>, so a parent waiting on children or on a person stands loose on trunk</td></tr>
 </table></div>
 
 <p>A hand mints where it means to work. A ticket it means to do itself goes into its own group and lands
@@ -891,14 +898,78 @@ no lease: a branch held for a long time is something a person has to look at in 
 tip is the signal, and past <code>work.staleAfter</code> the group is implicitly yours. The rule derives
 from the tip, so nothing writes to a branch nobody holds.</p>
 
-<h3>A cloud box</h3>
-<p>A cloud box differs from a desk in one step, <code>sync</code>, which carries <code>when: cloud</code> and
-takes trunk into the branch first. The <code>retro</code> step is the same on both, and it decides every
-private note on the box. A private note stays on its box, so the retro closes
-each one as <code>dropped</code> with a reason, as <code>done</code> on the spot, or as <code>became</code>,
-where the mint cuts a loose draft ticket from it through the privacy check. That ticket rides the group's
-branch, and a person sorts it after the merge. The engine's check on the retro is the folder:
-<code>.se/tickets/</code> holds no note at the hand-back.</p>
+<h3>The group's retro, and a cloud box</h3>
+<p>A cloud box differs from a desk in one leaf, <code>sync</code>, which takes trunk into the branch first,
+and in the retro's <code>cloud</code> leaf. The retro phase is the group's own retro, and on a cloud box it
+is the only retro that box ever runs.</p>
+<div class="scroll"><table>
+<tr><th>leaf</th><th>does</th></tr>
+<tr><td class="m">retro/notes</td><td>decides every private note on the box, and its command passes when the private folder is empty</td></tr>
+<tr><td class="m">retro/write</td><td>the four questions over the box's own window, and what the thoughts say that the actions do not</td></tr>
+<tr><td class="m">retro/cloud</td><td>under <code>when: cloud</code>: what the box lacks, what it meets, and what it leaves for a person</td></tr>
+</table></div>
+<p>A private note stays on its box, so the drain closes each one as <code>dropped</code> with a reason, as
+<code>done</code> on the spot, or as <code>became</code>, a tracked ticket with its ask filled from the note.
+A ticket the drain mints names this group, and then the box works it before the group ends, since
+<code>tickets</code> is a standing condition. Or it names no group, and then it rides the branch and lands on
+trunk at the merge, where a person sorts it. It is <code>open</code> where the drain fills its ask and
+<code>draft</code> where it cannot. The six lines <code>work new</code> appends to a brief today are this
+route one for one, so the first cloud run under the pull is the first process running as data.</p>
+
+<h3>The retro</h3>
+<p>The tree's retro turns a window of the record into changes to the machinery. It is blameless, and it
+repairs the generator of a bad output: a prompt, a guidance line, a form, a refusal, a tool. The route
+stands in <code>spec/processes/retro.yaml</code>, and a retro is a ticket, so its evidence is the report, in
+git. The retro keeps missing things because nothing refuses a retro that skips one, so every question is a
+field on a step, and the engine hands nothing back with a field empty. It reuses the complex shape:
+<code>collect</code> mints the readers, a <code>children</code> step waits for them, and the retro itself
+only synthesizes.</p>
+<div class="scroll"><table>
+<tr><th>step</th><th>by</th><th>evidence</th></tr>
+<tr><td class="m">collect</td><td>anyone</td><td>one command, <code>work collect</code>, which refuses while a hand holds a ticket</td></tr>
+<tr><td class="m">field</td><td>person</td><td><code>answers</code>, one line each, and each becomes a note</td></tr>
+<tr><td class="m">score</td><td>anyone</td><td><code>scored</code>, one line per last improvement with what the numbers show and what that teaches, and <code>rate</code></td></tr>
+<tr><td class="m">notes</td><td>anyone</td><td>one command, which passes when the private folder is empty</td></tr>
+<tr><td class="m">readers</td><td>children</td><td>none, and it ends when every chapter and the commands ticket close</td></tr>
+<tr><td class="m">mine</td><td>anyone</td><td><code>themes</code>, <code>repeats</code>, <code>worker</code>, <code>unread</code></td></tr>
+<tr><td class="m">improve</td><td>anyone</td><td><code>tickets</code>, one link each with its class, its home, the plan, and what the next numbers show if it works</td></tr>
+<tr><td class="m">report</td><td>person</td><td><code>misses</code>, what the retro skips, and the reading itself is the gate</td></tr>
+<tr><td class="m">distribute</td><td>anyone</td><td><code>groups</code>, one line per ticket with its group and urgency</td></tr>
+</table></div>
+<p><code>work collect</code> drains everything under <code>.se</code> into the retro folder: the log after a
+rotation, every script anyone writes, a copy of every private note, and the transcripts with their thoughts.
+It lists the tickets that close in the window with their records, the retro leaves of every group that
+merges in it, and the earlier retros. The window runs from the last retro's close commit to now, and the
+verb cuts it into chapters of six hours that hold activity, with the counts per chapter written before
+anyone reads a word: prompts, tool calls, shell commands, refusals by kind, errors, tickets that move, notes
+that appear, and the median length of a thought. So the worker's thinning over a long window, which v4
+measured by fifths, stands per chapter for free.</p>
+<div class="scroll"><table>
+<tr><th>the chapter reader answers, one hand per chapter</th><th>the commands reader answers</th></tr>
+<tr><td>the work of these hours</td><td>what the groups say about what the tree lacks</td></tr>
+<tr><td>what goes well, and what makes it go well</td><td>which groups become a verb or a flag</td></tr>
+<tr><td>what goes badly, each with its moment</td><td>which groups want a sentence, and where</td></tr>
+<tr><td>how each bad line stops happening, by its home</td><td>which groups a door refuses from now on, and why</td></tr>
+<tr><td>what the thoughts say that the actions do not</td><td></td></tr>
+</table></div>
+<div class="scroll"><table>
+<tr><th>an improvement's home, by the order that asks the least</th><th>where</th></tr>
+<tr><td>a check, which runs without being read</td><td>the sweep</td></tr>
+<tr><td>a refusal, a door rule</td><td>level zero</td></tr>
+<tr><td>a gate: a form, an <code>expects</code>, a <code>needs</code></td><td>a process file</td></tr>
+<tr><td>a prefill: a mint comment, a field</td><td>a schema or a process</td></tr>
+<tr><td>a checklist line</td><td>a process file</td></tr>
+<tr><td>a verb or a script</td><td>level one, <code>src/scripts</code></td></tr>
+<tr><td>a knob</td><td>the config</td></tr>
+<tr><td>a sentence, last</td><td>guidance</td></tr>
+</table></div>
+<p>The kata card spans two retros: the minting one writes the plan and what the next numbers show if it
+works, and the next one's <code>score</code> step writes what the numbers show, what that teaches, and the
+rate. A cap, <code>work.retroCap</code>, keeps the minted list to what gets done. The group's retro is the
+small one, and the tree's retro reads it: a cloud box has nobody to ask and no earlier retro, so
+<code>field</code> and <code>score</code> belong to the desk alone, and its proposals are tickets with no
+group that the next desk retro scores like any other. A person mints a retro by hand for now; later the
+engine refuses a new iteration while notes stand open, and that refusal is what mints one.</p>
 
 <p class="note">v4 ran this shape under two words, <code>bucket</code> on the token and <code>group/</code> on the
 branch. Now the two coincide, so one word stays: group.</p>
@@ -1122,7 +1193,7 @@ comes. A second routine is a second box, and a person creates it.</p>
 <tr><td>the spawn hook hands the guidance to a helper</td><td>it tags the helper with the session's hand too</td></tr>
 <tr><td><code>engine.binding</code> at <code>queue</code> and <code>unbound</code> draw the status bar</td><td><code>queue</code> hands out; <code>unbound</code> hands out nothing, and <code>pull &lt;ticket&gt;</code> takes a named one</td></tr>
 <tr><td><code>engine.autonomy</code> draws nowhere</td><td><code>finish</code> mints notes alone, <code>start</code> mints into its own group, <code>ideation</code> mints loose tickets, which ride the group's branch on a cloud box</td></tr>
-<tr><td><code>engine.state</code> and <code>engine.beat</code> draw nowhere</td><td>the switch runs the beat on a desk, and <code>engine.beat</code> reads the newest group note off the branches</td></tr>
+<tr><td><code>engine.state</code> and <code>engine.beat</code> draw nowhere</td><td>the switch runs the beat on a desk, and <code>engine.beat</code> reads the newest tip of a group's branch</td></tr>
 <tr><td>the trunk guard refuses a commit on <code>main</code></td><td>unchanged</td></tr>
 </table></div>
 
@@ -1136,8 +1207,8 @@ fact it meets is a route.</p>
 
 <div class="scroll"><table>
 <tr><th>piece</th><th>where</th></tr>
-<tr><td>the schemas</td><td class="m">spec/schemas/ticket.schema.yaml · group.schema.yaml · process.schema.yaml</td></tr>
-<tr><td>the folders</td><td class="m">spec/tickets/ · spec/groups/ · spec/processes/ · .se/tickets/</td></tr>
+<tr><td>the schemas</td><td class="m">spec/schemas/ticket.schema.yaml · process.schema.yaml</td></tr>
+<tr><td>the folders</td><td class="m">spec/tickets/ · spec/processes/ · .se/tickets/ · .se/retro/</td></tr>
 <tr><td>the processes</td><td class="m">spec/processes/&lt;name&gt;.yaml</td></tr>
 <tr><td>the emitter</td><td>one module the editor reads, beside the verbs</td></tr>
 <tr><td>the verbs</td><td class="m">src/scripts/work.js, under ./RUNME.sh work</td></tr>
@@ -1154,6 +1225,7 @@ fact it meets is a route.</p>
 <tr><td class="m">work.failsBeforePerson</td><td class="num">2</td><td>when a step that keeps failing back becomes a person's step</td></tr>
 <tr><td class="m">work.stepsBeforeSplit</td><td class="num">3</td><td>when an escalating ticket must split</td></tr>
 <tr><td class="m">work.staleAfter</td><td class="num">12h</td><td>when the notification names a held group as stale</td></tr>
+<tr><td class="m">work.retroCap</td><td class="num">7</td><td>how many improvements one retro mints at most</td></tr>
 <tr><td class="m">work.personSigns</td><td class="num">off</td><td>whether a person's hand-back needs a signed commit</td></tr>
 <tr><td class="m">work.filter</td><td class="num">empty</td><td>what a person's pull sees, over the branch</td></tr>
 </table></div>
@@ -1165,7 +1237,7 @@ fact it meets is a route.</p>
 <tr><th>ruling</th><th>from</th><th>where it lands</th></tr>
 <tr><td>the pull is the one verb, and a submission rides it</td><td>v3, v4</td><td>stays whole</td></tr>
 <tr><td>one token in hand</td><td>v4</td><td>one ticket in hand per hand, under <code>.se/hold/</code></td></tr>
-<tr><td>the hold is engine state, and the claim travels</td><td>v4</td><td>the hold file, and the group's push</td></tr>
+<tr><td>the hold is engine state, and the claim travels</td><td>v4</td><td>the hold file, and the record's push on the group</td></tr>
 <tr><td>the token carries no time</td><td>v4</td><td>stays, and <code>work list</code> reads a branch's age off git</td></tr>
 <tr><td>a field stands because something reads it</td><td>v4</td><td>the field table in section 2</td></tr>
 <tr><td>a todo is a sub-token</td><td>v4</td><td>private sub-tickets, and the tooth counts them</td></tr>
@@ -1186,33 +1258,34 @@ fact it meets is a route.</p>
 <!-- ============================================================ -->
 <h2 id="s14"><span class="n">14</span>The order of work</h2>
 
-<p>Eight branches, and the dependencies make the order binding. The eight briefs stand on their
-<code>work/</code> branches, cut from the note, and each names the chapters it implements. The editor's live
+<p>Nine branches, and the dependencies make the order binding. Eight briefs stand on their
+<code>work/</code> branches, cut from the note, and each names the chapters it implements; the ninth, the
+retro as a ticket, waits for the retro's shape, which the note now carries. The editor's live
 drawing, its block library and the evidence form wait for branch 2 and are desk work with the owner. The
 five work branches standing today finish under the verbs they carry. A brief branch is one whose tip carries <code>HANDOVER.md</code>, and
 <code>work list</code> tells the two kinds apart by that; <code>take</code> keeps serving a brief until
-<code>work list</code> names none; <code>adopt</code> turns a brief into a group note and one ticket for the
+<code>work list</code> names none; <code>adopt</code> turns a brief into a group ticket and one child for the
 ones a person wants moved, and the old verbs go once the last brief merges.</p>
 
 <figure>
-<svg viewBox="0 0 940 270" role="img"
-     aria-label="A dependency graph of eight branches. Branch 1, the ticket schema, comes first. Branches 2, a process is a route, and 3, a group is a branch, depend on 1. Branch 4, the agent pulls a ticket, depends on 2 and 3. Branches 5 to 8, hands, guidance, the board and level zero, each depend on 4.">
+<svg viewBox="0 0 940 336" role="img"
+     aria-label="A dependency graph of nine branches. Branch 1, the ticket schema, comes first. Branches 2, a process is a route, and 3, a group is a branch, depend on 1. Branch 4, the agent pulls a ticket, depends on 2 and 3. Branches 5 to 8, hands, guidance, the board and level zero, each depend on 4. Branch 9, the retro is a ticket, depends on 4 and 5.">
   <g font-size="12" fill="currentColor">
     <rect x="30" y="112" width="190" height="44" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/>
     <text x="125" y="130" text-anchor="middle" font-weight="700">1 · the ticket has a schema</text>
-    <text x="125" y="147" text-anchor="middle" fill="var(--muted)" font-size="11">schemas, a YAML kind, the checker's recursion, mint</text>
+    <text x="125" y="147" text-anchor="middle" fill="var(--muted)" font-size="11">schemas, checker, mint</text>
 
     <rect x="270" y="52" width="190" height="44" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="365" y="70" text-anchor="middle" font-weight="700">2 · a process is a route</text>
-    <text x="365" y="87" text-anchor="middle" fill="var(--muted)" font-size="11">five routes, the slots, the emitter, reroute</text>
+    <text x="365" y="87" text-anchor="middle" fill="var(--muted)" font-size="11">routes, slots, emitter, reroute</text>
 
     <rect x="270" y="172" width="190" height="44" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="365" y="190" text-anchor="middle" font-weight="700">3 · a group is a branch</text>
-    <text x="365" y="207" text-anchor="middle" fill="var(--muted)" font-size="11">take, list with the age, merge with the check, close, adopt</text>
+    <text x="365" y="207" text-anchor="middle" fill="var(--muted)" font-size="11">take, list, merge, close, adopt</text>
 
     <rect x="510" y="112" width="190" height="44" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/>
     <text x="605" y="130" text-anchor="middle" font-weight="700">4 · the agent pulls a ticket</text>
-    <text x="605" y="147" text-anchor="middle" fill="var(--muted)" font-size="11">the pull, its checks, the record, a hold per hand</text>
+    <text x="605" y="147" text-anchor="middle" fill="var(--muted)" font-size="11">the pull, its checks, the record</text>
 
     <rect x="750" y="12" width="180" height="40" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="840" y="37" text-anchor="middle" font-weight="700">5 · a step changes hands</text>
@@ -1222,6 +1295,8 @@ ones a person wants moved, and the old verbs go once the last brief merges.</p>
     <text x="840" y="169" text-anchor="middle" font-weight="700">7 · the work group draws</text>
     <rect x="750" y="210" width="180" height="40" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="840" y="235" text-anchor="middle" font-weight="700">8 · level zero hands over</text>
+    <rect x="750" y="276" width="180" height="40" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
+    <text x="840" y="301" text-anchor="middle" font-weight="700">9 · the retro is a ticket</text>
   </g>
   <g fill="none" stroke="currentColor" stroke-width="1.4">
     <path d="M220,134 L245,134 L245,74 L270,74" marker-end="url(#ar)"/>
@@ -1232,10 +1307,11 @@ ones a person wants moved, and the old verbs go once the last brief merges.</p>
     <path d="M700,134 L725,134 L725,98 L750,98" marker-end="url(#ar)"/>
     <path d="M700,134 L725,134 L725,164 L750,164" marker-end="url(#ar)"/>
     <path d="M700,134 L725,134 L725,230 L750,230" marker-end="url(#ar)"/>
+    <path d="M700,134 L725,134 L725,296 L750,296" marker-end="url(#ar)"/>
   </g>
 </svg>
 <figcaption>Two branches carry the weight: the schema, which everything reads, and the pull, which
-everything after it rides on. Five to eight run in parallel once four lands.</figcaption>
+everything after it rides on. Five to nine run in parallel once four lands, and nine also wants five.</figcaption>
 </figure>
 
 <!-- ============================================================ -->
@@ -1262,7 +1338,7 @@ which is the <code>read</code> list.</p>
 <tr><td>Backlog.md</td><td>a markdown task with acceptance criteria and a definition of done</td><td>assignee in frontmatter</td><td>one task, one context window, one pull request</td><td>plan approval before coding</td><td>none</td></tr>
 <tr><td>Paperclip</td><td>an issue on a shared board</td><td>an atomic checkout on the next heartbeat</td><td>per agent</td><td>status in review, approvals</td><td>the heartbeat</td></tr>
 <tr><td>Ralph loop</td><td>one PRD story per iteration</td><td>the loop picks it</td><td>a fresh context per iteration</td><td>git and a progress file</td><td>the next iteration</td></tr>
-<tr class="us"><td><b>level one</b></td><td>a markdown ticket with a route, in git</td><td>the push of <code>state: held</code> on the group note</td><td>a branch per group, one box per group</td><td>a person step; yours, oldest first</td><td>past <code>work.staleAfter</code> the group is implicitly yours</td></tr>
+<tr class="us"><td><b>level one</b></td><td>a markdown ticket with a route, in git</td><td>the push of a record entry on the group ticket</td><td>a branch per group, one box per group</td><td>a person step; yours, oldest first</td><td>past <code>work.staleAfter</code> the group is implicitly yours</td></tr>
 </table></div>
 
 <h3>What the field asked, and what stands</h3>
@@ -1305,6 +1381,7 @@ level one stays still while level two invents flows.</p>
   <li>whether a guidance card's own items become steps at the mint, which v3 tried as card marking and level two may take up</li>
   <li>more forms, such as a number or a date, as the routes come to ask for them</li>
   <li>animation of a process run, which a feed into the emitter's graph adds later</li>
+  <li>the pull handing a cloud box its retro early when the cap is near, if the platform names the cap</li>
   <li>the form of a review report, which may take a schema of its own, and what a passing verdict's open points become</li>
   <li>a plainer word than <code>says</code> on a field</li>
 </ul>
