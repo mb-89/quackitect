@@ -95,14 +95,19 @@ import {
 } from "../lib/schema.js";
 import { guesses, pathOf, surveyOf, TOOLS } from "../lib/tools.js";
 import {
+  askForLine,
+  challenge,
   claimSpec,
   decide,
   detail,
   pool,
   reprompt,
   RULES,
+  stopLineIn,
+  stopReasons,
   todos,
   toothOf,
+  withoutStopLine,
 } from "../lib/stop.js";
 import { landsOnTrunk, touchesGit } from "../lib/trunk.js";
 import { deeply, layered } from "../lib/layer.js";
@@ -144,6 +149,8 @@ export function register(on, _options) {
   let owed = null;
   // [[spec/design_output/level0#the-canary-owes-a-debt]]
   let owesCanary = null;
+  // [[spec/design_output/stop#the-line-ends-a-turn]]
+  let stopAsked = false;
   const seen = { ask: QUIET, hold: "running" };
   let root = "";
   let projections = [];
@@ -245,6 +252,8 @@ export function register(on, _options) {
     tooth.sawPrompt(from === "plugin");
     gate.sawPrompt(from === "plugin");
     if (opensATurn(e.origin)) owed = await owing($, "The owner sent a prompt");
+    // [[spec/design_output/stop#the-challenge-spends-one-allowance]]
+    if (opensATurn(e.origin)) stopAsked = false;
     const text = String(e.text ?? "");
     await logbook.say("info", "prompt", text, { detail: from, text });
 
@@ -681,11 +690,21 @@ export function register(on, _options) {
           logbook,
           mostInARow,
           ran: (name) => ranHere(name, off, hold),
+          off,
+          // [[spec/design_output/stop#the-canary-ends-turn-one]]
+          saidCanary: canaryIn(e.answer, sentence).found === "same",
+          // [[spec/design_output/stop#the-challenge-spends-one-allowance]]
+          asked: () => stopAsked,
+          asks: () => {
+            stopAsked = true;
+          },
         });
     await dropAsk(settings, logbook);
     if (!bin || !e.answer || e.reason !== "answer") return said;
 
-    const ran = await lintText(e.answer, ANSWER, {
+    // [[spec/design_output/stop#the-voice-skips-the-line]]
+    const spoken = withoutStopLine(e.answer);
+    const ran = await lintText(spoken, ANSWER, {
       bin,
       run: (argv, init) => $.process.run(argv, init),
     });
@@ -694,7 +713,7 @@ export function register(on, _options) {
     // [[spec/design_output/level0#the-three-bands]]
     const read = gate.atTurnEnd({
       ...(await bands(settings)),
-      text: e.answer,
+      text: spoken,
       found: ran.found,
       mostInARow,
       toothSpoke: Boolean(bit?.sent),
@@ -1229,7 +1248,28 @@ async function forceCompaction($, logbook) {
 async function bite($, e, it) {
   if (e.reason !== "answer") return { sent: false };
 
-  const decision = decide(it.rules, { claimed: it.tooth.claim()?.rule, ran: it.ran });
+  // [[spec/design_output/stop#the-line-ends-a-turn]]
+  const line = stopLineIn(e.answer);
+  const known = line && stopReasons(it.rules).some((one) => one.id === line.reason);
+
+  if (it.off) return voteNow($, e, it, line?.reason);
+  if (!line && !it.saidCanary) return holdOpen($, it, askForLine(it.rules), "no line");
+  if (line && !known) {
+    return holdOpen($, it, askForLine(it.rules, line.reason), `${line.reason} is unknown`);
+  }
+  // [[spec/design_output/stop#the-challenge-spends-one-allowance]]
+  if (line && !it.asked()) {
+    it.asks();
+    return holdOpen($, it, challenge(it.rules, line.reason), `${line.reason} meets the challenge`);
+  }
+
+  return voteNow($, e, it, line?.reason);
+}
+
+// [[spec/design_output/stop#the-vote]]
+async function voteNow($, e, it, reason) {
+  const claimed = reason ?? it.tooth.claim()?.rule;
+  const decision = decide(it.rules, { claimed, ran: it.ran });
   const said = it.tooth.atTurnEnd(decision, it.mostInARow);
   const how = detail(said, said.inARow);
 
@@ -1252,6 +1292,15 @@ async function bite($, e, it) {
   // [[spec/design_output/stop#holding-a-turn-open]]
   try {
     $.prompt.submit({ text: reprompt(said) }).catch(() => {});
+  } catch {}
+  return { sent: true };
+}
+
+// [[spec/design_output/stop#the-line-ends-a-turn]]
+async function holdOpen($, it, text, why) {
+  await it.logbook.say("info", "stop", "the turn goes on", { detail: why });
+  try {
+    $.prompt.submit({ text }).catch(() => {});
   } catch {}
   return { sent: true };
 }

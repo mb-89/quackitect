@@ -36,6 +36,78 @@ A session torn down as the turn ends escapes the tooth, because the prompt
 reaches a session that has already gone. A cloud routine ending its run is that
 case.
 
+# The line ends a turn
+
+A turn ends where the agent asks for it in one line, last in the answer:
+
+    Stop requested. Reason [<id>]. <what the owner does next>
+
+The ids come from the stop side rules the agent claims, in
+`spec/config/stop/level0.yml`. The line stands where the owner reads it, so a
+stop becomes a thing spoken out loud. A tool call stays inside the machinery,
+and the owner sits outside it.
+
+`stopLineIn` reads the last non empty line and answers the reason and the
+context. A line standing elsewhere reads as absent, and so does a line bending
+the shape.
+
+| what the answer carries | what the tooth does |
+|---|---|
+| a known id, once the challenge stands spent | the vote runs with that claim |
+| a known id, fresh | the challenge, and the turn holds open |
+| a line naming an id nobody holds | the id list, and the turn holds open |
+| no line at all | the ask, and the turn holds open |
+| the canary, on turn one | the vote runs |
+
+## A turn with no line
+
+The floor of zero ends a turn nobody votes on. So stopping is what happens
+where nothing speaks, and a session stops too often for that one reason.
+
+A turn end now carries the line or holds open. `askForLine` says the shape and
+lists every id. The line feeds the claim, and the priorities decide the rest:
+
+- the vote keeps deciding
+- `spec/config/stop/level0.yml` keeps every rule, side and priority
+- `stop.mostInARow` keeps capping a runaway
+
+## The challenge spends one allowance
+
+A fresh line meets one question before the tooth grants it. The turn holds
+open, the agent reads `challenge`, and its next step settles the matter:
+
+| what the agent reads | what it does next |
+|---|---|
+| the stop stands | the same line, and the turn ends |
+| the stop falls | it carries on, and says nothing of it |
+
+The question is the one that matters: does going on need the owner, or does the
+stop hand over an update the work carries past? An update is a line in the next
+answer, and the work goes on under it.
+
+The challenge costs no round trip to the owner. It is one step of the same
+agent inside the same turn.
+
+The allowance belongs to the session, and one prompt from the owner refills it.
+A subagent spends none of it, because the flag moves at the session's own turn
+end alone.
+
+## The canary ends turn one
+
+The canary is a formatted line of its own, and turn one carries it. So an
+answer holding the canary reaches the vote with no stop line beside it. For
+details, see [[spec/design_output/level0#the-canary-owes-a-debt]].
+
+## The voice skips the line
+
+`withoutStopLine` takes the line off before the gate lints the answer. The line
+carries protocol, so its words score nothing and its own tense trips no rule.
+
+## The off switch takes it
+
+`stop.enabled` at false skips every step above and votes at once. The switch
+takes the whole tooth out, and the line stands as part of the tooth.
+
 # The vote
 
 Every rule carries a side, a priority and a way of firing. The turn ends where
