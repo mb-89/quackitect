@@ -393,7 +393,19 @@ function treeHere() {
     root,
     words: it.words,
     node: process.version.replace(/^v/, ""),
+    box: boxHere(),
   });
+}
+
+// [[spec/design_output/private#the-box-names-the-owner]]
+function boxHere() {
+  const env = process.env;
+  return {
+    user: env.USER || env.USERNAME || env.LOGNAME || "",
+    home: env.HOME || env.USERPROFILE || "",
+    name: it.git.run(["config", "user.name"], true).out,
+    email: it.git.run(["config", "user.email"], true).out,
+  };
 }
 
 // [[spec/design_output/extension#the-grid-check]]

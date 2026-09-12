@@ -17,14 +17,14 @@ its first session with nothing typed.
 
 # The harness surface
 
-Every line here comes from running it on 2026-09-08 against client 2.1.263. The
+Every line here comes from running it against client 2.1.263. The
 surface is early access and moves, so run it again before you trust this.
 
 The sections below carry their own date where a later run measures them again.
 
 ## The file surface renames itself
 
-Measured on 2026-09-09 against client 2.1.267:
+Measured against client 2.1.267:
 
 | what this tree calls | what the client offers |
 |---|---|
@@ -51,7 +51,7 @@ trust it.
 
 ## A subagent brings no session
 
-Measured on 2026-09-09 against client 2.1.267, by a probe writing one file per
+Measured against client 2.1.267, by a probe writing one file per
 hook event through a whole run.
 
 | what a subagent fires | what reaches it |
@@ -87,7 +87,7 @@ resolves to `{ model }`, the id the spawn settles on.
 `turn.step` fires at the step's first tool result, so its first call runs
 before it. It carries the step's visible text in `answer`.
 
-Measured on 2026-09-11, in a session past 4096 messages: at `tool.call`,
+Measured against client 2.1.267, in a session past 4096 messages: at `tool.call`,
 `$.session.messages()` carries no text from the response in flight. The list
 also answers its newest 4096 alone, so a position in it shifts.
 
@@ -174,7 +174,7 @@ So level zero holds no cloud session that starts the ordinary way, and
 `~/.claude.json` carries `hasTrustDialogAccepted: false` there. The flag lives
 outside the tree, so no tracked file moves it.
 
-The gate holds the scan alone. Measured on 2026-09-10 against client 2.1.267,
+The gate holds the scan alone. Measured against client 2.1.267,
 by a probe on a cloud clone carrying no trust. The `env` key bites there, and
 so does a `permissions` deny rule in `.claude/settings.json`. So the tracked
 file still says what a session may do, and level zero is the one part waiting
@@ -199,7 +199,7 @@ Two things reach a cloud box today:
 The canary finds this. A session saying the line out loud is a session level
 zero holds, and a cloud session that starts the ordinary way says nothing.
 
-Client 2.1.267 stands the same way, measured on 2026-09-10 on a cloud box. The
+Client 2.1.267 stands the same way, measured on a cloud box. The
 debug log names the count, and `.se/level0.stamp` stands nowhere in the tree:
 
     [plugins] Found 1 plugins (1 enabled, 0 disabled)
@@ -212,7 +212,8 @@ door it takes.
 ## The setup writes the flag
 
 `src/scripts/trust.js` writes it where the tree and `node` both stand to hand.
-A cloud environment carries neither at setup time. Measured on 2026-09-10: a
+A cloud environment carries neither at setup time. Measured against client
+2.1.267: a
 setup naming `node src/scripts/trust.js` fails, and the session ends at
 `init_script` with no first turn. A failing setup takes the session with it, so
 the one an environment carries leans on nothing:
@@ -271,7 +272,8 @@ itself.
 A routine meeting a prompt stalls until a person looks. So an unattended box
 takes its mode from the setup.
 
-A box carrying that setup says the canary out loud. Measured on 2026-09-10, on
+A box carrying that setup says the canary out loud. Measured against client
+2.1.267, on
 a cloud box cloning `main`:
 
 | what a box answers | with no setup | with the setup |
@@ -305,7 +307,8 @@ A shell reaches the same files through `>`, `tee`, `sed -i` and a heredoc, so
 ## The door reaches a helper
 
 A subagent's writes go through the same `tool.call` chain, so the door reads
-them the way it reads the session's own. A live run on 2026-09-09 watches it
+them the way it reads the session's own. A live run against client 2.1.267
+watches it
 refuse a helper's `Write` over `Contraction`.
 
 That helper then writes the same text through `printf` in Bash. The write door
