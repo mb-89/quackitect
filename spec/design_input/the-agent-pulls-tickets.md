@@ -453,7 +453,7 @@ Each stands under `process.schema.yaml` and holds the ask's fields under
 | `trivial` | `do` | a fix small enough that the ask is the design |
 | `standard` | `design` (draft, review), `implement` (tests-red, change, tests-green), `verdict` | a change that wants an approach first, tests before code, and a second pair of eyes after |
 | `group` | `sync`, `split`, `children`, `retro` (notes, write, cloud) | a set of tickets that lands as one, and what a cloud run does |
-| `retro` | `collect`, `field`, `score`, `notes`, `readers`, `mine` (eight leaves), `improve`, `report`, `distribute` | a window of the record, and the changes to the machinery it earns |
+| `retro` | `collect`, `field`, `score`, `notes`, `readers`, `mine` (nine leaves), `improve`, `report`, `distribute` | a window of the record, and the changes to the machinery it earns |
 | `chapter` | `read` | one chapter of a retro's window, read by one spawned hand |
 
 A note is the smallest ticket, and it is where most work starts. A hand that
@@ -693,7 +693,7 @@ what `collect` lays out.
 | `score` | anyone | `scored`, one line per last improvement with what the numbers show and what that teaches, and `rate`, a command |
 | `notes` | anyone | one command, which passes when the private folder is empty |
 | `readers` | children | none, and it ends when every chapter closes |
-| `mine` | anyone | eight leaves, one table below |
+| `mine` | anyone | nine leaves, one table below |
 | `improve` | anyone | `tickets`, one link each with its class, its home, the plan, and what the next numbers show if it works |
 | `report` | person | `misses`, what the retro skips, and the reading itself is the gate |
 | `distribute` | anyone | `groups`, one line per ticket with its group and urgency |
@@ -704,7 +704,7 @@ checks the manifest against the leaves to say so:
 
 | what collect takes | from | who reads it |
 |---|---|---|
-| the log, after a rotation | `.se/log/` | every chapter's reader, its own slice, and the `shell`, `refusals` and `worker` leaves over the whole |
+| the log, after a rotation | `.se/log/` | every chapter's reader, its own slice, and the `shell`, `refusals` and `worker` leaves over the whole. A record is no log: it is the engine's entries on a ticket |
 | every script anyone writes | `.se/scripts/`, the scratchpad | the `scripts` leaf |
 | every private note, as a copy | `.se/tickets/` | the `notes` step, which decides each |
 | the transcripts, thoughts and all, as a copy | the harness's own files | every chapter's reader, its own slice, and the `worker` leaf for the length of a thought |
@@ -733,10 +733,12 @@ writes the counts per chapter before anyone reads a word:
 So the worker's thinning over a long window, which v4 measures by fifths,
 stands per chapter for free.
 
-Each chapter is a private ticket under `chapter`, with the counts as its ask
-and one hand the engine spawns for it. That is v3's reader per slice as a
-mechanism. `by: helper` is the word for a hand the engine spawns for a step
-and nobody else. A chapter's reader answers five things:
+Each chapter is a private ticket under `chapter`, with the counts as its ask.
+The engine spawns `work.retroReaders` hands for them, four by default, and
+each takes the next chapter when it closes its own until none stands. That is
+v3's reader per slice as a mechanism, under a cap on the hands. `by: helper` is
+the word for a hand the engine spawns for a step and nobody else. A chapter's
+reader answers five things:
 
 - the work of these hours
 - what goes well, and what makes it go well
@@ -753,11 +755,12 @@ retro folder, and a leaf answers its questions and nothing else:
 | `chapters` | the closed readers | themes with counts and the chapters they stand in, the themes an earlier retro names already, and what the readers' thoughts say together |
 | `shell` | the shell commands, grouped by the job with a count and an example | what the groups say the tree lacks, which become a verb or a flag, which want a sentence, which a door refuses from now on |
 | `refusals` | the doors' refusals, by rule | which rule fires how often, whether the rule or the hand is wrong, and which rules fire and teach nothing |
-| `records` | the records of the tickets that close in the window | the steps that fail back or meet `refused` most per process, what the person steps ask and how long each waits, and what the conditions skip |
+| `tickets` | the records of the tickets that close in the window, which are the engine's entries on each and no log | the steps that fail back or meet `refused` most per process, what the person steps ask and how long each waits, and what the conditions skip |
 | `worker` | the counts per chapter | where errors and the length of a thought turn, and where the worker cuts scope and calls it something else |
 | `scripts` | every script collect takes | which becomes a check, a flag or a verb, with its home, and which dies, with the reason |
 | `runs` | the retro leaves of the groups that merge in the window | what the boxes lack and meet, what repeats across runs, and what they leave for a person that still stands |
 | `unread` | the manifest, against what every leaf read | every line no leaf read, and why |
+| `method` | this retro's own run | what each leaf earned and cost, the readers' questions with no answer, and what changes in the retro route or its verb, as tickets |
 
 An improvement is a ticket the retro mints, one per class. The retro names
 its home by the order that asks the least of anybody:
@@ -1098,6 +1101,7 @@ the only fact it meets is a route.
 | `work.stepsBeforeSplit` | 3 | when an escalating ticket must split |
 | `work.staleAfter` | `12h` | when the notification names a held group as stale |
 | `work.retroCap` | 7 | how many improvements one retro mints at most |
+| `work.retroReaders` | 4 | how many hands read a retro's chapters at once |
 | `work.personSigns` | off | whether a person's hand-back needs a signed commit |
 | `work.filter` | empty | what a person's pull sees, over the branch |
 
@@ -1126,7 +1130,7 @@ the only fact it meets is a route.
 
 # The order of work
 
-Nine branches, and the dependencies make the order binding:
+Ten branches, and the dependencies make the order binding:
 
 | no | branch | holds | after |
 |---|---|---|---|
@@ -1138,11 +1142,12 @@ Nine branches, and the dependencies make the order binding:
 | 6 | `guidance-rides-the-step` | `reads`, the verb, the log line, the standing layer shrinks | 4 |
 | 7 | `the-work-group-draws` | the `work` group, its four controls, the count on the editor button, the beat, the notification that names questions and stale groups | 4 |
 | 8 | `level-zero-hands-over` | the brief door goes, and the controls wire up | 4 |
-| 9 | `the-retro-is-a-ticket` | `work collect`, the chapters and the counts, the files the mine leaves read, `work retro notes` and `score`, the readers as helpers | 4, 5 |
+| 9 | `the-retro-is-a-ticket` | `work collect`, the chapters and the counts, the files the mine leaves read, `work retro notes` and `score`, the readers as helpers, the first retro on a desk | 4, 5 |
+| 10 | `the-cloud-run-is-a-group` | the cloud guidance around the pull, the routine takes a group, the brief's contract retires, `adopt`, the first cloud run | 4, 8, 9 |
 
-Eight briefs stand on their `work/` branches, cut from this note, and each
-names the chapters it implements. The ninth waits for the retro's shape, which
-this note now carries. The editor's live drawing, its block
+Nine briefs stand on their `work/` branches, cut from this note, and each
+names the chapters it implements. The tenth is the cloud run, and it waits
+for the retro, since a group's retro phase runs the retro's notes command. The editor's live drawing, its block
 library and the evidence form wait for branch 2. They are desk work with the
 owner, and no cloud brief carries them.
 

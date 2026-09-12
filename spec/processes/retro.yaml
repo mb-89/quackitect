@@ -1,9 +1,10 @@
 # The tree's retro: a window of the record turned into changes to the
 # machinery, on a desk, with the owner at two steps. It is blameless, and it
 # repairs what produced a bad output: a prompt, a guidance line, a form, a
-# refusal, a tool. Its children are one reader per chapter of the window, so
-# a reader per slice is mechanical, and the mine phase is the retro's own
-# hand reading what collect lays out.
+# refusal, a tool. Its children are one ticket per chapter of the window,
+# read by work.retroReaders hands the engine spawns, each taking the next
+# chapter until none stands. The mine phase is the retro's own hand reading
+# what collect lays out, and its last leaves read the retro itself.
 # [[spec/design_input/the-agent-pulls-tickets#the-retro]]
 name: retro
 for: a window of the record, and the changes to the machinery it earns
@@ -91,8 +92,8 @@ steps:
           - name: noise
             form: list
             says: the rules that fire and teach nothing, each with the fix
-      - name: records
-        does: reads the records of the tickets that close in the window
+      - name: tickets
+        does: reads the records of the tickets that close in the window, which are the engine's entries on each and no log
         evidence:
           - name: steps
             form: list
@@ -136,6 +137,16 @@ steps:
           - name: unread
             form: text
             says: every line of the manifest no leaf read, and why, so the next retro inherits no hidden gap
+      - name: method
+        does: reads this retro's own run, so the next one runs better
+        input: [collect, readers]
+        evidence:
+          - name: earned
+            form: list
+            says: one line per leaf, with what it earned and what it cost, and the readers' questions with no answer
+          - name: change
+            form: list
+            says: what changes in the retro route or its verb, and why, each a ticket the improve step mints
   - name: improve
     does: mints one ticket per class, each with its home and its card
     input: mine
