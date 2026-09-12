@@ -32,21 +32,24 @@ copies, and why a retro refuses while anyone holds work.
 
 | the piece | where | proves it |
 |---|---|---|
-| `work collect` | `src/scripts/work.js` | it rotates the log, drains `.se/log`, `.se/scripts` and the scratchpad, copies the transcripts, and refuses while a hand holds a ticket |
-| the take list | `work collect` | it takes what it names and nothing else, so `.se/retro/`, the hold, the box id, the config, the bin and the handover stand as they are |
-| every line a reader | `work collect` and the routes | the manifest names each thing taken, and the `unread` leaf checks it against what the leaves read |
+| `retro collect` | `src/scripts/work.js` | it rotates the log, drains `.se/log`, `.se/scripts` and the scratchpad, copies the transcripts, and refuses while a hand holds a ticket |
+| the take list | `retro collect` | it takes what it names and nothing else, so `.se/retro/`, the hold, the box id, the config, the bin and the handover stand as they are |
+| every line a reader | `retro collect` and the routes | the manifest names each thing taken, and the `unread` leaf checks it against what the leaves read |
 | the manifest | `.se/retro/<stamp>/manifest.jsonl` | one line per thing taken, with its origin and its fate |
-| the window | `work collect` | from the last retro's close commit to now, and from the first commit where none stands |
-| the chapters | `work collect` | six hours that hold activity, off the timestamps, one private `chapter` ticket each with its counts as the ask |
-| the counts | `work collect` | prompts, tool calls, shell commands, refusals by kind, errors, tickets that move, notes that appear, the median length of a thought |
-| the files the mine leaves read | `work collect` | the shell commands by job, the refusals by rule, the closed tickets' records, the counts per chapter, the scripts, the merged groups' retro leaves |
+| the window | `retro collect` | from the last retro's close commit to now, and from the first commit where none stands |
+| the chapters | `retro collect` | six hours that hold activity, off the timestamps, one private `chapter` ticket each with its counts as the ask |
+| the counts | `retro collect` | prompts, tool calls, shell commands, refusals by kind, errors, tickets that move, notes that appear, the median length of a thought |
+| the files the mine leaves read | `retro collect` | the shell commands by job, the refusals by rule, the closed tickets' records, the counts per chapter, the scripts, the merged groups' retro leaves |
 | `/se-retro` | the projection, beside the config commands | it mints a retro and pulls it |
 | `by: helper` | the pull | a reader goes to a hand the engine spawns for it, and to nobody else |
-| `work retro notes` | `work.js` | it passes when `.se/tickets/` holds no note, and the group's retro phase runs the same command |
-| `work retro score` | `work.js` | it prints how many of the last retro's improvements stand in the tree |
-| the lists in the folder | `work collect` | the tickets that close in the window with their records, the retro leaves of the groups that merge in it, and the earlier retros |
+| `work.retroReaders` | the config and the pull | four hands read the chapters at once, and each takes the next chapter until none stands |
+| the `method` leaf | the retro route | the retro reads its own run, and what it changes in the route goes out as a ticket |
+| `retro notes` | `work.js` | it passes when `.se/tickets/` holds no note, and the group's retro phase runs the same command |
+| `retro score` | `work.js` | it prints how many of the last retro's improvements stand in the tree |
+| the lists in the folder | `retro collect` | the tickets that close in the window with their records, the retro leaves of the groups that merge in it, and the earlier retros |
 | `work.retroCap` | the config | it reads, default 7 |
 | the first retro | a desk, with the owner | one retro of this project runs end to end, and its report stands as a closed ticket |
+| `retro` as its own verb | `src/scripts/cli.js` | `./RUNME.sh retro collect`, `retro notes` and `retro score` stand beside `work`, and `/se-retro` starts a retro |
 
 # The rules to hold
 
@@ -55,7 +58,7 @@ copies, and why a retro refuses while anyone holds work.
 - The transcripts are another program's files. Copy them, and delete none.
 - A person can take every step of the retro. `collect` is a command, and `mine` is a reading with fields.
 - Nothing under `.se/retro` reaches git. The ticket's evidence is what travels.
-- A chapter's reader is a fresh hand. The retro's own hand reads no chapter.
+- A chapter's reader is a spawned hand, and four read at once. The retro's own hand reads no chapter.
 - The window's first retro is long, and that is the point: the project holds no earlier one.
 
 ## How this branch runs
