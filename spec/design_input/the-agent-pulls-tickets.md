@@ -347,8 +347,8 @@ path. That is the first branch's real size.
 A review is a step and no state. So is a test, an approval, a translation or a
 deploy. A new kind of work adds a row to a route and moves nothing in the
 schema. A verdict that passes can still carry findings. Each one becomes a
-note the reviewer mints with `from` naming the ticket, which is v4's rule
-that a finding is a token of its own.
+note the reviewer mints with `from` naming the ticket. That is v4's rule that
+a finding is a token of its own.
 
 A step with `by: children` belongs to no hand, and it has two ends. The box
 leaves it when no child stands at a step an agent can take. The step ends
