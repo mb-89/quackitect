@@ -38,10 +38,28 @@ test("a link standing already stays, and a second run touches nothing", () => {
 });
 
 test("a link pointing at another tree goes, and this tree's link goes in", () => {
-  const files = fakeDisk();
+  const files = fakeDisk({
+    [`${SOURCE}/package.json`]: "{}",
+    "/other/tree/src/extension/package.json": "{}",
+  });
   files.link("/other/tree/src/extension", DEST);
   assert.equal(linkedAt(files, DEST, SOURCE), false);
-  linkAt(files, DEST, SOURCE);
+  assert.deepEqual(linkAt(files, DEST, SOURCE), { linked: true, why: "the link went in" });
+  assert.equal(linkedAt(files, DEST, SOURCE), true);
+});
+
+// [[spec/design_output/extension#a-link-pointing-nowhere]]
+test("a link pointing nowhere reads as no link, and this tree's link takes its place", () => {
+  const files = fakeDisk({ [`${SOURCE}/package.json`]: "{}" });
+  files.link("/gone/tree/src/extension", DEST);
+  assert.equal(files.isLink(DEST), true);
+  assert.equal(files.exists(DEST), false, "nothing stands behind the link");
+  assert.equal(linkedAt(files, DEST, SOURCE), false);
+
+  assert.deepEqual(linkAt(files, DEST, SOURCE), {
+    linked: true,
+    why: "a link pointing nowhere went, and the link went in",
+  });
   assert.equal(linkedAt(files, DEST, SOURCE), true);
 });
 

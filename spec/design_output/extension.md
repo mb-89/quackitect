@@ -424,12 +424,24 @@ none of its own.
 it first:
 
 - `linked` answers 0 where the link reaches this tree and the list names the id, and prints nothing.
-- `link` removes a copy or a stale link, links `src/extension`, and writes the entry.
+- `link` removes a copy, a stale link or a link pointing nowhere, links `src/extension`, and writes the entry.
 
 The link is a junction on Windows, which needs no administrator, and a symbolic
 link elsewhere. A standing link answers `linked`, so a run where nothing
 installs prints nothing. `link` refuses a destination outside
 `~/.vscode/extensions`.
+
+## A link pointing nowhere
+
+A tree that moves leaves the junction pointing at the old place. The editor
+then names the folder invalid, because `package.json` stands nowhere behind
+it, and the sidebar goes.
+
+The disk door reads such a link as a link, and reaches no folder behind it. So
+`linked` reads it as no link, `link` removes it the way it removes a copy, and
+the next `./RUNME.sh` mends it. The fake disk follows a link the same way, and
+the contract test holds both doors to it. `./RUNME.sh doctor` says where the
+link stands, in a row named `sidebar`.
 
 ## A file another program owns
 

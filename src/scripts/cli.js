@@ -55,6 +55,7 @@ import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
+import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { readTools, whereIs, writeSurvey } from "./tools.js";
 import { SOURCE as VIEWER, viewerOf } from "./viewer.js";
 import {
@@ -760,6 +761,26 @@ function standsAt(one) {
   return [one.version, one.path].filter(Boolean).join("  ");
 }
 
+// [[spec/design_output/extension#a-link-pointing-nowhere]]
+function sidebarSays() {
+  const home = homeIn(process.env);
+  const folder = join(home, ".vscode", "extensions");
+  if (!home || !files.exists(folder)) return "no editor folder on this box, so no link";
+
+  const said = JSON.parse(files.read(manifestPath(root)));
+  const id = `${said.publisher}.${said.name}`;
+  const dest = join(folder, `${id}-${said.version}`);
+  if (linkedAt(files, dest, dirname(manifestPath(root)))) {
+    return registered(files, folder, id)
+      ? `linked, and the list names ${id}`
+      : `linked, and the list misses ${id}: run ./RUNME.sh`;
+  }
+  if (files.isLink(dest) && !files.exists(dest)) return "a link pointing nowhere: run ./RUNME.sh";
+  if (files.isLink(dest)) return "a link into another tree: run ./RUNME.sh";
+  if (files.exists(dest)) return "a copy in place of the link: run ./RUNME.sh";
+  return "unlinked: run ./RUNME.sh";
+}
+
 async function doctor() {
   const found = Object.keys(known).length ? known : writeSurvey(it, root, process.env);
   const rows = [
@@ -771,6 +792,7 @@ async function doctor() {
         ? `${EDITOR_SETTINGS}, both servers`
         : "missing",
     ],
+    ["sidebar", sidebarSays()],
     [
       "vale rules",
       files.exists(STYLES)
