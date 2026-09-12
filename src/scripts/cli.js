@@ -597,6 +597,11 @@ function projectionsHold() {
   }
 
   const said = readAll(entries, files, under);
+  if (said.faults.length) {
+    for (const one of said.faults) console.error(one);
+    console.error("A source stands away from the shape beside it, so no target is written.");
+    return 1;
+  }
   const found = staleIn(said.wanted, said.standing);
   if (!found.length) {
     console.log(`${entries.length} projection(s), and every target reads as projected.`);
@@ -859,10 +864,12 @@ async function doctor() {
 // [[spec/design_output/private#two-doors-one-check]]
 function hooksSay() {
   const at = join(HOOKS, "pre-commit");
+  const push = join(HOOKS, "pre-push");
   if (!files.exists(join(root, at))) return `${at} stands nowhere`;
+  if (!files.exists(join(root, push))) return `${push} stands nowhere`;
 
   const said = it.git.run(["config", "--get", "core.hooksPath"], true).out;
-  if (said === HOOKS) return `${at}, which git reads`;
+  if (said === HOOKS) return `${at} and ${push}, which git reads`;
   return `git reads ${said || "its own folder"}, so run ./RUNME.sh`;
 }
 

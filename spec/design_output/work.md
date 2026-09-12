@@ -14,7 +14,7 @@ brief. The branch is the unit, and a session works it whole.
 
 # Two handovers
 
-| file | tracked | who reads it | where it may stand |
+| file | tracked | who reads it | where it can stand |
 |---|---|---|---|
 | `.se/HANDOVER.md` | no | the next session on this box | anywhere |
 | `HANDOVER.md` | yes | whoever works the branch | a work branch alone |
@@ -58,6 +58,7 @@ The contract names six things:
 - run `work sync` first, which takes `main` in
 - push each time a thing lands
 - write the result and the retro back into `HANDOVER.md`
+- run `work sync` again, so trunk comes in last too
 - run `work done`
 - run `work release` on stopping early
 - run `work merge` from trunk, which a cloud box leaves to a box off the cloud
@@ -69,7 +70,24 @@ branch reads it and knows how to finish.
 
 `work sync` merges `origin/main` into the branch. `work take` runs it, so a
 routine pays nothing to remember it. A conflict then stops the take, while the
-work it would cost still sits ahead.
+work it costs still sits ahead.
+
+## Trunk comes in last too
+
+A branch greens its own tip, and the merge result reads green nowhere. So a
+branch older than a rule passes `work done` and reddens trunk at the merge.
+This tree hits that twice in one day.
+
+`work done` fetches trunk and refuses a branch trunk stands ahead of:
+
+| what it finds | what it does |
+|---|---|
+| the branch carries every commit on trunk | it reads the battery next |
+| trunk holds a commit the branch lacks | it refuses, and names `work sync` |
+
+So the battery a branch claims stands over the tree the merge produces. The
+contract carries the same step, because a reader acts on it before the verb
+ever runs.
 
 # A box landing on trunk
 
@@ -124,7 +142,8 @@ urgency reads as `soon`.
 
 A branch meets its dependency once trunk holds the branch it names, or once that
 branch goes because somebody merges and closes it. `done` alone holds the
-dependent, because `done` waits on a person's merge. So a chain of work runs
+dependent, because `done` waits on the merge, which a box off the cloud runs.
+So a chain of work runs
 itself in order, and each link starts from the one before it.
 
 `take` merges trunk in. A dependent taken before its dependency lands starts
@@ -145,7 +164,7 @@ mints holds to its schema. [[spec/schemas]]
 
 | the stamp says | done answers |
 |---|---|
-| nothing at all | no check has run here |
+| nothing at all | no check runs here |
 | another commit | the check names that one instead |
 | an unclean tree | the check reads what the commit lacks |
 | red | the check says red, with the time |
@@ -156,6 +175,13 @@ So `done` stops meaning "the session believes this passes". It comes to mean
 The stamp lives under `.se`, which git ignores, so it travels nowhere. A
 different box reads its own answer, and `.github/workflows/check.yml` answers
 for a machine with no stake in it.
+
+A push to trunk reads the same stamp at two doors, and each stands without the
+other. The Bash door refuses a session's push on a red, stale, unclean or
+absent stamp. `.githooks/pre-push` refuses the same push from a terminal, or
+from a session that runs no plugin, and `install.sh` points git at it beside
+the commit hook. A push to a work branch meets neither, because mid-work
+carries red.
 
 # A merged branch goes
 
