@@ -213,6 +213,10 @@ proves the block stands in front of the model past the compaction.
 
 The verb exits 0 on `survives` and 1 on anything else.
 
+`test/contract/compact.test.js` drives the verb against the real client. One
+run costs ninety seconds and two model calls, so `SE_SLOW` switches it on and
+`./RUNME.sh check` stays fast without it.
+
 ## Without the verb
 
 The two log lines pay on their own. A session that compacts in the ordinary

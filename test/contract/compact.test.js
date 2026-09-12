@@ -1,5 +1,6 @@
 // The compaction probe, against the real client. One headless run, two turns,
-// and the word the verb reads out of the log it leaves.
+// and the word the verb reads out of the log it leaves. It costs ninety
+// seconds and two model calls, so SE_SLOW switches it on.
 // [[spec/design_output/level0#the-layer-after-a-compaction]]
 
 import assert from "node:assert/strict";
@@ -16,10 +17,11 @@ const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
 const outside = proc();
 const client = whereIs(files, root, "claude", readTools(files, root));
-const ifClient = files.exists(client) ? test : skip;
+const asked = String(process.env.SE_SLOW ?? "").trim();
+const ifAsked = asked && files.exists(client) ? test : skip;
 const WAIT = 900000;
 
-ifClient(
+ifAsked(
   "the verb answers one word, and the log carries the two lines it reads",
   { timeout: WAIT },
   () => {
