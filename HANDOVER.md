@@ -37,7 +37,7 @@ copies, and why a retro refuses while anyone holds work.
 | the window | `work collect` | from the last retro's close commit to now, and from the first commit where none stands |
 | the chapters | `work collect` | six hours that hold activity, off the timestamps, one private `chapter` ticket each with its counts as the ask |
 | the counts | `work collect` | prompts, tool calls, shell commands, refusals by kind, errors, tickets that move, notes that appear, the median length of a thought |
-| the files the mine leaves read | `work collect` | the shell commands grouped by the job with a count and an example, the refusals by rule, the records of the closed tickets, and the counts per chapter |
+| the files the mine leaves read | `work collect` | the shell commands grouped by the job, the refusals by rule, the closed tickets' records, and the counts per chapter |
 | `by: helper` | the pull | a reader goes to a hand the engine spawns for it, and to nobody else |
 | `work retro notes` | `work.js` | it passes when `.se/tickets/` holds no note, and the group's retro phase runs the same command |
 | `work retro score` | `work.js` | it prints how many of the last retro's improvements stand in the tree |
