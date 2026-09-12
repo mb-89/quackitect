@@ -11,10 +11,10 @@ pull request there.
 
 `./RUNME.sh check` answers 0.
 
-The design said this correctly all along.
+The design says this correctly already.
 `spec/design_output/work#a-box-writes-its-branch` scopes the trunk guard to a
-cloud box. The code missed that scope and refused every box, and the guidance
-around it spread the wrong rule into every brief the tree writes.
+cloud box. The code misses that scope and refuses every box, and the guidance
+around it spreads the wrong rule into every brief the tree writes.
 
 | the piece | what it says now |
 |---|---|
@@ -32,5 +32,5 @@ Nothing on this branch. Merge it and close it.
 # What stays
 
 The copilot road keeps its rule. `lib/copilot-dispatch.js` and
-`lib/copilot-runtime.js` speak to a box that truly may never merge, and
-`spec/rationales/cloud.md` records why. All three stand as they were.
+`lib/copilot-runtime.js` speak to a box the harness holds shut, and
+`spec/rationales/cloud.md` records why. This branch leaves all three alone.
