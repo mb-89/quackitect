@@ -260,7 +260,7 @@ export function checkNote(text, schema, where, schemas) {
   const held = heldIn(note.front, schema, kind, where, "frontmatter", schemas);
   return [
     ...mapFaults(note.front.said ?? {}, spec, held, ""),
-    ...slotFaults(note.front.said ?? {}, where),
+    ...slotFaults(note.front.said ?? {}, where, note.front.lines),
     ...bodyFaults(note, schema?.body ?? {}, kind, where),
   ];
 }
@@ -274,7 +274,7 @@ export function checkData(text, schema, where, schemas) {
   const front = { said, lines: Object.fromEntries(lines) };
   return [
     ...mapFaults(said, spec, heldIn(front, schema, kind, where, "file", schemas), ""),
-    ...slotFaults(said, where),
+    ...slotFaults(said, where, front.lines),
   ];
 }
 
@@ -468,9 +468,6 @@ function refersFaults(key, value, rule, held, at, line) {
   return out;
 }
 
-// `x-fields` is the fourth modifier. It names the list on an entry whose own
-// fields a value may name, so `input: verdict` reads the evidence a step before
-// it wrote, and no step of that name.
 // [[spec/design_output/schema#three-keywords-name-a-step]]
 function fieldBefore(walk, holder, said, rule) {
   const list = rule["x-fields"];
@@ -532,22 +529,25 @@ function names(walk) {
   return walk.map((one) => one.path).join(", ");
 }
 
-// A step is a form with six slots. The route says four of them in a field, and
-// derives the rest, so three of the six earn a mechanical check here.
 // [[spec/design_input/the-agent-pulls-tickets#the-route]]
 export const OUTSIDE = ["ask", "diff"];
 const ENGINE_READS = ["command", "verdict"];
 
 // [[spec/design_input/the-agent-pulls-tickets#the-route]]
-export function slotFaults(said, where) {
+export function slotFaults(said, where, lines) {
   const walk = entriesIn(said?.steps, "steps");
   if (!walk.length) return [];
+  const held = { where, lines: lines ?? {} };
   const readers = walk.map((one, at) => ({ one, at, tokens: inputOf(one.said) }));
-  return [...unfedIn(walk, readers, where), ...orphansIn(walk, readers, where)];
+  return [...unfedIn(walk, readers, held), ...orphansIn(walk, readers, held)];
+}
+
+function slotLine(held, at) {
+  return held.lines?.[at] ?? 1;
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-route]]
-function unfedIn(walk, readers, where) {
+function unfedIn(walk, readers, held) {
   const out = [];
   for (const { one, at, tokens } of readers) {
     for (const token of tokens) {
@@ -556,8 +556,8 @@ function unfedIn(walk, readers, where) {
       out.push(
         fault(
           "Input",
-          where,
-          1,
+          held.where,
+          slotLine(held, `${one.at}.input`),
           `${one.path} reads ${token}, and no step before it holds that. A step reads ${OUTSIDE.join(", ")}, an earlier step, or an earlier field.`,
         ),
       );
@@ -577,11 +577,12 @@ function feedsIt(walk, holder, at, token) {
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-route]]
-function orphansIn(walk, readers, where) {
+function orphansIn(walk, readers, held) {
   const out = [];
   for (const [at, one] of walk.entries()) {
     if (!one.leaf) continue;
-    for (const field of [one.said?.evidence ?? []].flat()) {
+    const fields = [one.said?.evidence ?? []].flat();
+    for (const [i, field] of fields.entries()) {
       if (!field?.name) continue;
       if (ENGINE_READS.includes(String(field.form))) continue;
       if (handedOn(walk, one)) continue;
@@ -589,8 +590,8 @@ function orphansIn(walk, readers, where) {
       out.push(
         fault(
           "Output",
-          where,
-          1,
+          held.where,
+          slotLine(held, `${one.at}.evidence[${i}].name`),
           `${one.path} writes ${field.name}, and nothing reads it. Name it under a later step's input, or say who takes the output under to.`,
         ),
       );
@@ -638,8 +639,6 @@ function inputOf(said) {
     .filter(Boolean);
 }
 
-// The hash reads the route, which is what the drawing derives from. So a
-// comment or a reordered key moves nothing, and a changed step moves it.
 // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
 export function canonicalOf(said) {
   if (Array.isArray(said)) return said.map(canonicalOf);
@@ -1080,9 +1079,6 @@ function frontRows(key, rule, given, front) {
   return [`${key}: ${written(value, rule)}`];
 }
 
-// A reroute copies the current route over a ticket. The frontmatter takes the
-// new route, and the body follows it: a chapter the new route still names keeps
-// what the hand wrote, and a chapter it adds takes the comment the mint writes.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 export function reRouted(text, schema, route, hash) {
   const note = readNote(text);

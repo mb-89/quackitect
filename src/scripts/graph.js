@@ -36,8 +36,6 @@ export function graphIn(text) {
   );
 }
 
-// A node per phase and per leaf. A `when` draws it dotted, a person step marks
-// it, and the record says where the ticket stands and what it skipped.
 // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
 function nodeOf(one, front, record) {
   const said = one.said ?? {};
@@ -63,7 +61,6 @@ function nodeOf(one, front, record) {
   return node;
 }
 
-// A phase holds its steps, and the edge says so. Every edge carries a label.
 // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
 function holdEdges(walk) {
   return walk
@@ -71,7 +68,6 @@ function holdEdges(walk) {
     .map((one) => ({ from: one.parent, to: one.path, kind: HOLDS, label: HOLDS }));
 }
 
-// A pass edge between neighbours, which are the siblings in their order.
 // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
 function passEdges(walk) {
   const out = [];
@@ -82,7 +78,6 @@ function passEdges(walk) {
   return out;
 }
 
-// A fail edge back, from the step that fails to the step `on_fail` names.
 // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
 function failEdges(walk) {
   const out = [];

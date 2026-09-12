@@ -17,12 +17,17 @@ import {
   DONE,
   dependsOn,
   freeNow,
+  fromHold,
   HELD,
+  HOLD,
   MERGED,
   MINE,
+  NOTE,
+  rerouted,
   standingOf,
   setStatus,
   statusOf,
+  TICKETS,
   TODO,
   URGENCY,
   urgencyOf,
@@ -447,4 +452,283 @@ test("freeNow frees a branch whose dependency left the queue", () => {
   const waits = `---\nstatus: ${TODO}\ndepends_on: merged-already\n---\n\n# A brief\n`;
 
   assert.deepEqual(freeNow(new Map([["work/late", waits]])), ["work/late"]);
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+const at =(path) => join(ROOT, ...path.split("/"));
+
+const NOTE_PROCESS = `for: a thing to look at later
+ask:
+  - name: line
+    form: text
+    says: the smallest case that shows it
+steps:
+  - name: decide
+    does: says what the note becomes
+    from: anyone
+    by: retro
+    to: retro
+    input: ask
+    evidence:
+      - name: outcome
+        form: text
+        says: what the note becomes
+`;
+
+const TRIVIAL_PROCESS = `for: a fix small enough that the ask is the design
+steps:
+  - name: do
+    does: makes the change
+    to: retro
+    evidence:
+      - name: says
+        form: text
+        says: what changes and why
+`;
+
+// [[spec/design_output/doors#a-fake-behaves]]
+const TICKET_SCHEMA = `kind: ticket
+
+governs:
+  - .se/tickets/**
+
+frontmatter:
+  type: object
+  additionalProperties: false
+  required: [kind, state, urgency, steps]
+  properties:
+    kind:
+      const: ticket
+      x-link: true
+      description: the schema this note is minted from
+    state:
+      enum: [draft, open, closed]
+      description: whether anybody pulls it
+    urgency:
+      enum: [now, soon, whenever]
+      description: which ticket the pull hands out first
+    step:
+      type: string
+      x-names: steps
+      x-leaf: true
+      description: the leaf of the route this ticket stands on
+    steps:
+      type: array
+      description: the route, as a tree of steps
+      items:
+        type: object
+        additionalProperties: false
+        required: [name]
+        properties:
+          name:
+            type: string
+            description: one word, unique among its siblings
+          steps:
+            $ref: "#/frontmatter/properties/steps"
+            description: the steps under this phase
+          does:
+            type: string
+            description: what the hand does at this leaf
+          by:
+            type: string
+            description: the hand this step admits
+          from:
+            type: string
+            description: who hands this step its input
+          to:
+            type: string
+            description: who takes the output
+          input:
+            type: [array, string]
+            x-earlier: steps
+            x-fields: evidence
+            x-words: [ask, diff]
+            description: what this step reads
+          evidence:
+            type: array
+            description: the fields this leaf's hand fills
+            items:
+              type: object
+              additionalProperties: false
+              required: [name, form, says]
+              properties:
+                name:
+                  type: string
+                  description: one word
+                form:
+                  enum: [text, command]
+                  description: what the hand writes
+                says:
+                  type: string
+                  description: one line on what goes here
+    process:
+      x-link: true
+      description: the route the mint copies from
+    process_hash:
+      type: string
+      description: the hash of the process file the route is copied from
+
+body:
+  headingLevel: 1
+  order: strict
+  extraSections: false
+
+  sections:
+    - header: Ask
+      required: true
+      description: what this ticket asks for
+    - x-one-per: steps
+    - header: Discussion
+      required: true
+      position: last
+      description: what anybody adds, at any time
+`;
+
+function treeWithProcesses(files = {}) {
+  const said = doorsSaying(onBranch("work/one"), {
+    [at("spec/schemas/ticket.schema.yaml")]: TICKET_SCHEMA,
+    [at("spec/processes/note.yaml")]: NOTE_PROCESS,
+    [at("spec/processes/trivial.yaml")]: TRIVIAL_PROCESS,
+    ...files,
+  });
+  said.it.words = 5;
+  return said;
+}
+
+test("work note writes a private ticket off the note process, and says so", () => {
+  const said = treeWithProcesses();
+  const ran = heard(() => work(ROOT, ["note", "slow-lint", "The", "lint", "drags."], said.it));
+
+  assert.equal(ran.code, 0);
+  const text = said.disk.read(at(`${TICKETS}/slow-lint.md`));
+  assert.match(text, /^kind: \[\[ticket\]\]$/m);
+  assert.match(text, /^state: open$/m);
+  assert.match(text, /^step: decide$/m);
+  assert.match(text, /^process: \[\[spec\/processes\/note\]\]$/m);
+  assert.match(text, /^process_hash: [0-9a-f]{16}$/m);
+  assert.match(text, /The lint drags\./);
+  assert.match(ran.said, /waits for a retro to decide it/);
+});
+
+test("work note writes a note row, so the answer door reads it off the log", () => {
+  const rows = [];
+  const said = treeWithProcesses();
+  said.it.log = {
+    say: (level, kind, line, more) => {
+      rows.push({ level, kind, line, more });
+      return Promise.resolve();
+    },
+  };
+  work(ROOT, ["note", "slow-lint", "The lint drags."], said.it);
+  assert.deepEqual(rows, [
+    { level: "info", kind: NOTE, line: "The lint drags.", more: { ticket: "slow-lint" } },
+  ]);
+});
+
+test("work note writes from off the hold, as the ticket and the step in hand", () => {
+  const said = treeWithProcesses({
+    [at(HOLD)]: JSON.stringify({ ticket: "a-route-is-a-graph", step: "implement/change" }),
+  });
+  heard(() => work(ROOT, ["note", "slow-lint", "The lint drags."], said.it));
+  assert.match(
+    said.disk.read(at(`${TICKETS}/slow-lint.md`)),
+    /^ {4}from: a-route-is-a-graph\/implement\/change$/m,
+  );
+});
+
+test("work note takes a name and a line, and refuses a note standing already", () => {
+  const said = treeWithProcesses();
+  assert.equal(heard(() => work(ROOT, ["note", "slow-lint"], said.it)).code, 2);
+  heard(() => work(ROOT, ["note", "slow-lint", "The lint drags."], said.it));
+  const twice = heard(() => work(ROOT, ["note", "slow-lint", "Again."], said.it));
+  assert.equal(twice.code, 2);
+  assert.match(twice.said, /stands already/);
+});
+
+test("a reroute refuses where step names a leaf the new route lacks", () => {
+  const front = `---\nkind: [[ticket]]\nstate: open\nurgency: soon\nstep: decide\nsteps:\n  - name: decide\n    does: says what the note becomes\n    to: retro\nprocess: [[spec/processes/note]]\nprocess_hash: old\n---\n\n# Ask\n\nA thing.\n\n# decide\n\n<!-- says what the note becomes -->\n\n# Discussion\n\nNothing yet.\n`;
+  const said = treeWithProcesses({ [at(`${TICKETS}/slow-lint.md`)]: front });
+  const ran = heard(() =>
+    work(ROOT, ["reroute", "slow-lint", "--process=trivial"], said.it),
+  );
+  assert.equal(ran.code, 1);
+  assert.match(ran.said, /holds no such leaf/);
+});
+
+test("a reroute copies the current route, and keeps the leaves already reached", () => {
+  const front = `---\nkind: [[ticket]]\nstate: open\nurgency: soon\nstep: do\nsteps:\n  - name: do\n    does: makes the change, the old way\n    to: retro\n    evidence:\n      - name: says\n        form: text\n        says: what changes and why\nprocess: [[spec/processes/trivial]]\nprocess_hash: old\n---\n\n# Ask\n\nA thing.\n\n# do\n\n<!-- makes the change, the old way -->\n\n## says\n\nIt changes the lint.\n\n# Discussion\n\nNothing yet.\n`;
+  const said = treeWithProcesses({ [at(`${TICKETS}/slow-lint.md`)]: front });
+  const ran = heard(() => work(ROOT, ["reroute", "slow-lint"], said.it));
+
+  assert.equal(ran.code, 0);
+  const now = said.disk.read(at(`${TICKETS}/slow-lint.md`));
+  assert.match(now, /makes the change, the old way/, "the leaf in hand keeps what it holds");
+  assert.match(now, /It changes the lint\./, "the chapter keeps what the hand wrote");
+  assert.match(now, /^process_hash: [0-9a-f]{16}$/m);
+});
+
+test("a reroute leaves a ticket whose hash already matches its process", () => {
+  const said = treeWithProcesses();
+  heard(() => work(ROOT, ["note", "slow-lint", "The lint drags."], said.it));
+  const was = said.disk.read(at(`${TICKETS}/slow-lint.md`));
+  const ran = heard(() => work(ROOT, ["reroute", "slow-lint"], said.it));
+
+  assert.equal(ran.code, 0);
+  assert.match(ran.said, /already carries note as it stands/);
+  assert.equal(said.disk.read(at(`${TICKETS}/slow-lint.md`)), was);
+});
+
+test("a reroute names no ticket, and a ticket standing nowhere, and refuses", () => {
+  const said = treeWithProcesses();
+  assert.equal(heard(() => work(ROOT, ["reroute"], said.it)).code, 2);
+  assert.equal(heard(() => work(ROOT, ["reroute", "nowhere"], said.it)).code, 2);
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+test("rerouted takes the new leaf where the ticket has yet to reach it", () => {
+  const front = {
+    step: "one",
+    steps: [
+      { name: "one", does: "the old first" },
+      { name: "two", does: "the old second" },
+    ],
+  };
+  const route = [
+    { name: "one", does: "the new first" },
+    { name: "two", does: "the new second" },
+  ];
+  const said = rerouted(front, route);
+  assert.equal(said.kept, 1);
+  assert.equal(said.steps[0].does, "the old first");
+  assert.equal(said.steps[1].does, "the new second");
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+test("a leaf the record holds keeps what it holds, wherever the pointer stands", () => {
+  const front = {
+    step: "two",
+    record: [{ step: "one" }],
+    steps: [
+      { name: "one", does: "the old first" },
+      { name: "two", does: "the old second" },
+      { name: "three", does: "the old third" },
+    ],
+  };
+  const said = rerouted(front, [
+    { name: "one", does: "the new first" },
+    { name: "two", does: "the new second" },
+    { name: "three", does: "the new third" },
+  ]);
+  assert.equal(said.steps[0].does, "the old first");
+  assert.equal(said.steps[1].does, "the old second");
+  assert.equal(said.steps[2].does, "the new third");
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+test("a hold names the from of every leaf, and a phase keeps its own", () => {
+  const route = [{ name: "one" }, { name: "up", steps: [{ name: "deep" }] }];
+  const said = fromHold(route, { ticket: "a-ticket", step: "one" });
+  assert.equal(said[0].from, "a-ticket/one");
+  assert.equal(said[1].from, undefined);
+  assert.deepEqual(fromHold(route, null), route);
 });

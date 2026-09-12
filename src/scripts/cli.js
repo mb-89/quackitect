@@ -688,9 +688,6 @@ function mint(argv) {
   return 0;
 }
 
-// The editor is the one reader of the graph, and it draws from the file at
-// every open. This verb is the seam: the emitter answers a graph, and no
-// picture and no colour stand here.
 // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
 function drawing(argv) {
   const path = argv.filter((one) => !one.startsWith("-"))[0];

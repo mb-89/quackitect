@@ -579,9 +579,6 @@ export const HOLD = ".se/hold.json";
 export const NOTE = "note";
 const SCHEMAS = "spec/schemas";
 
-// A note is the smallest ticket, and it is where most work starts. A hand that
-// meets an idea, a bug or a doubt mid-work writes one and carries on. It stays
-// on the box, and a retro decides it.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 function note(it, name, argv) {
   const line = (argv ?? []).slice(2).join(" ").trim();
@@ -631,16 +628,12 @@ function note(it, name, argv) {
   return said(it, NOTE, line, { ticket: name });
 }
 
-// The note answers. work note writes a note row, the answer door reads it off
-// the log, and the viewer draws it under the prompt.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 function said(it, kind, line, more) {
   if (!it.log) return 0;
   return it.log.say("info", kind, line, more).then(() => 0);
 }
 
-// work note writes `from` off the hold, as the ticket and the step in hand.
-// The pull is a later branch, so a box holding nothing writes anyone.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 export function fromHold(route, hold) {
   const said = hold?.ticket && hold?.step ? `${hold.ticket}/${hold.step}` : "";
@@ -658,9 +651,6 @@ function holdOf(it) {
   }
 }
 
-// A fix to a process reaches a ticket in flight through work reroute, which
-// copies the current route over the leaves the ticket has yet to reach. It
-// refuses where `step` names a leaf the new route lacks.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 function reroute(it, name, argv) {
   if (!name) {

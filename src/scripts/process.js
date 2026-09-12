@@ -29,9 +29,6 @@ export function standingIn(files, root, join) {
     .sort();
 }
 
-// The mint takes --process <name>, copies the route, and writes the process
-// file's hash beside it. So the ticket depends on nothing outside itself after
-// that, and a later edit to the file reaches it through work reroute alone.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 export function withRoute(files, root, join, schema, fields) {
   const said = { ...(fields ?? {}) };
