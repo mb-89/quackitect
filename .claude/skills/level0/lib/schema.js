@@ -159,12 +159,17 @@ export function kindOf(text) {
   return said ? String(linkless(said)) : "";
 }
 
+// [[spec/design_output/schema#a-schema-names-its-chapters]]
+export function isNoteSchema(said) {
+  return Boolean(said?.kind) && Boolean(said?.body?.sections?.length);
+}
+
 // [[spec/design_output/schema#the-schemas-read-once]]
 export function schemasIn(tree) {
   const out = new Map();
   for (const name of tree.names(SCHEMAS, END)) {
     const said = readYaml(tree.read(`${SCHEMAS}/${name}`));
-    if (said?.kind) out.set(String(said.kind), said);
+    if (isNoteSchema(said)) out.set(String(said.kind), said);
   }
   return out;
 }
@@ -444,7 +449,7 @@ export function schemasFrom(files) {
   const out = new Map();
   for (const one of files ?? []) {
     const said = readYaml(one.text);
-    if (said?.kind) out.set(String(said.kind), said);
+    if (isNoteSchema(said)) out.set(String(said.kind), said);
   }
   return out;
 }
@@ -457,11 +462,6 @@ export function refusedNote(where, kind, found) {
     "",
     `Run ./RUNME.sh mint ${kind} <path> for the shape it names, or park a draft as _name.md.`,
   ].join("\n");
-}
-
-// [[spec/design_output/schema#a-note-kind-holds-chapters]]
-export function isNoteKind(schema) {
-  return Boolean(schema?.body?.sections?.length);
 }
 
 // [[spec/design_output/schema#mint-writes-a-valid-note]]

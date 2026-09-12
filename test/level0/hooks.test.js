@@ -117,6 +117,8 @@ function engine(seed = {}, taught = {}) {
     hooks.push({ event, matcher: hook ? matcher : null, hook: hook ?? matcher });
   register(on, {});
 
+  const streams = (hook) => hook?.constructor?.name === "AsyncGeneratorFunction";
+
   const of = (event, tool) =>
     hooks.filter(
       (one) => one.event === event && (!one.matcher || one.matcher.tool === tool),
@@ -131,6 +133,18 @@ function engine(seed = {}, taught = {}) {
     spawns,
     async raise(event, e, tool) {
       const chain = of(event, tool);
+      // [[spec/design_output/level0#a-step-carries-the-answer]]
+      if (chain.some((one) => streams(one.hook))) {
+        const step = (at) =>
+          async function* (given) {
+            if (at >= chain.length) return given;
+            return yield* chain[at].hook($, given, step(at + 1));
+          };
+        const running = step(0)(e);
+        let said = await running.next();
+        while (!said.done) said = await running.next();
+        return said.value;
+      }
       const step = (at) => async (given) =>
         at < chain.length ? chain[at].hook($, given, step(at + 1)) : given;
       return step(0)(e);
@@ -583,6 +597,57 @@ test("out of god mode the same refusal stands", async () => {
   const said = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   assert.match(said.deny, /^The owner sent a prompt\./);
   assert.equal(it.lines().filter((one) => one.kind === "god").length, 0);
+});
+
+// [[spec/design_output/private#the-door-reads-the-notes]]
+const RAW_NOTE =
+  "the box at /home/somebody/secrets stalls badly whenever somebody starts it twice";
+
+test("a tracked write sharing six words with a note refuses, and quotes the run", async () => {
+  const it = await started({ ".se/notes/one.md": RAW_NOTE });
+  const said = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/funnel/a.md",
+    content: "Noticed: it stalls badly whenever somebody starts it twice.\n",
+  });
+  assert.match(said.deny ?? "", /^spec\/funnel\/a\.md carries \d+ words straight from a note/);
+  assert.match(said.deny, /stalls badly whenever somebody starts it/);
+  assert.match(said.deny, /\.se\/notes/);
+  const line = it.lines().find((one) => one.kind === "private");
+  assert.equal(line.said, "refused a run out of one.md");
+  assert.equal(line.rule, "NothingPrivateTravels");
+});
+
+test("a tracked write carrying one path out of a note refuses on that word alone", async () => {
+  const it = await started({ ".se/notes/one.md": RAW_NOTE });
+  const said = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/funnel/a.md",
+    content: "Somebody looks under /home/somebody/secrets when there is time.\n",
+  });
+  assert.match(said.deny ?? "", /"\/home\/somebody\/secrets"/);
+  assert.match(said.deny, /one word is enough to leak/);
+  assert.equal(it.lines().find((one) => one.kind === "private").said, "refused a token out of one.md");
+});
+
+test("the handover a session leaves behind stays outside the check", async () => {
+  const it = await started({ ".se/notes/one.md": RAW_NOTE });
+  const said = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: ".se/HANDOVER.md",
+    content: `${RAW_NOTE}\n`,
+  });
+  assert.equal(said.deny, undefined);
+});
+
+test("a folder holding no note refuses nothing", async () => {
+  const it = await started();
+  const said = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/funnel/a.md",
+    content: "A statement authored for this tree, and shared with no note.\n",
+  });
+  assert.equal(said.deny, undefined);
 });
 
 const NOTE_SCHEMA = [

@@ -9,8 +9,9 @@ import { skip, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import {
   checkNote,
-  isNoteKind,
+  isNoteSchema,
   mintNote,
+  readYaml,
   schemaFaults,
   schemasIn,
   SEVERITY,
@@ -49,26 +50,21 @@ const ruled = async (text, where) => {
 const PAST =
   "---\nkind: [[guidance]]\n---\n\n# Nothing\n\nThe tree was installed here.\n";
 
-test("every schema in the folder reads, and names the kind its file names", () => {
+// [[spec/design_output/schema#a-schema-names-its-chapters]]
+test("every note schema reads, names a chapter, and names the kind its file names", () => {
   assert.ok(schemas.size >= 6, `${schemas.size} schemas read`);
   for (const name of here.names("spec/schemas", ".schema.yaml")) {
     const kind = name.slice(0, -".schema.yaml".length);
-    assert.ok(schemas.has(kind), `${name} names ${kind}`);
-  }
-  // [[spec/design_output/schema#a-note-kind-holds-chapters]]
-  assert.ok(notes().size >= 6, `${notes().size} note kinds read`);
-  for (const [kind, schema] of notes()) {
-    assert.ok(schema.body?.sections?.length, `${kind} names a chapter`);
+    const said = readYaml(here.read(`spec/schemas/${name}`));
+    assert.equal(String(said.kind ?? ""), kind, `${name} names ${kind}`);
+    assert.equal(schemas.has(kind), isNoteSchema(said), `${kind} reads as a note schema`);
+    if (isNoteSchema(said)) assert.ok(said.body.sections.length, `${kind} names a chapter`);
   }
 });
 
-function notes() {
-  return new Map([...schemas].filter(([, schema]) => isNoteKind(schema)));
-}
-
 // [[spec/design_output/schema#mint-writes-a-valid-note]]
 test("mint writes one note per kind, and the checker passes each one", () => {
-  for (const [kind, schema] of notes()) {
+  for (const [kind, schema] of schemas) {
     const text = mintNote(schema);
     assert.deepEqual(checkNote(text, schema, `${kind}.md`), [], `${kind} mints clean`);
     assert.match(

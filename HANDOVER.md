@@ -20,9 +20,9 @@ session to it. This branch builds, tests and pushes every piece the brief names.
 | the guidance line | `spec/guidance/working.md` | rule 11, and the note stands at eleven of fifteen |
 | the design note | `spec/design_output/level0.md` | eight chapters under `The gate reads the answer`, and every marker points at one |
 
-The tests run 574 green, up 17. `./RUNME.sh lint` passes over the whole tree.
-`./RUNME.sh check` answers red on one thing this branch leaves alone, under the
-findings below, so `work done` refuses and this note stands at `held`.
+The tests run green, and `./RUNME.sh lint` passes over the whole tree. Trunk
+brings the fix for the one red the findings below name. The sync at the end of
+this note takes it in, and `./RUNME.sh check` stands green on this branch.
 
 # The number
 
@@ -48,7 +48,7 @@ is 0, and both stand beside the answer-transcript number the brief asks for.
 
 | the thing | who | what it costs |
 |---|---|---|
-| the `turn.step` hook migrates to an async generator | the owner, with a probe | `./RUNME.sh check` stands red until it lands, so no branch reaches `done` |
+| the `turn.step` hook migrates to an async generator | trunk, out of `work/the-private-half-stays-home` | the sync below takes it, and `./RUNME.sh check` stands green |
 | the two bands meet a real session | the owner | the first tuning, once level zero reads answers somewhere |
 | `voice measure` lands | the verbs branch | the delta per branch the funnel note asks for |
 | the paragraph schema finds its folder | the owner | one decision, and the note kinds read cleanly either way |
@@ -57,8 +57,8 @@ is 0, and both stand beside the answer-transcript number the brief asks for.
 
 ## 1. The validator refuses this module
 
-Measured on 2026-09-11 against client 2.1.269, on `origin/main` in a worktree of
-its own, so this stands ahead of the branch:
+Measured against client 2.1.269, on `origin/main` in a worktree of its own, so
+this stands ahead of the branch:
 
     modules../level0.js: level0: hooks/level0.js:487: the hook on "turn.step"
     is not an async generator: turn.step streams, so it takes
@@ -107,10 +107,9 @@ either one where you disagree.
 | `spec/funnel/level-zero-closes.md` | `signed` in a table cell, and a heading of six words | `./RUNME.sh lint` answers red over the whole tree |
 | `test/contract/schema.test.js`, `src/scripts/cli.js`, `lib/schema.js` | every schema under `spec/schemas` reads as a note kind | `paragraph.schema.yaml` is a rule source, so two tests fail and `mint paragraph` writes an empty note |
 
-The second one adds `isNoteKind`, and
-[[spec/design_output/schema#a-note-kind-holds-chapters]] says what it holds
-apart. Where the paragraph schema belongs somewhere other than `spec/schemas`,
-that predicate comes back out.
+The second one adds `isNoteKind`. Trunk lands the same fix as `isNoteSchema`,
+and [[spec/design_output/schema#a-schema-names-its-chapters]] says what it
+holds apart. So `isNoteKind` and its chapter go in the sync below.
 
 # The retro
 
@@ -135,3 +134,19 @@ What surprises me, in the order it arrives:
 
 No dead end costs real time here. The one I meet twice is the heading cap. I
 write a name, the linter cuts it, and every marker follows.
+
+# The sync
+
+Trunk comes in with `work/the-private-half-stays-home`, which holds the three
+fixes this branch waits for: the `turn.step` generator, `isNoteSchema`, and the
+two trims in `spec/funnel/level-zero-closes.md`. Three files conflict, and each
+takes trunk's side:
+
+| file | why trunk wins |
+|---|---|
+| `spec/funnel/level-zero-closes.md` | both trim the same two lines, and trunk's trim stands on `main` |
+| `src/scripts/cli.js` | `mint` reads its kinds out of `schemasIn`, which `isNoteSchema` filters already |
+| `test/contract/schema.test.js` | the contract reads `isNoteSchema`, and one predicate is enough |
+
+`isNoteKind` goes out of `lib/schema.js` with its chapter, and nothing in the
+tree names it. `./RUNME.sh check` runs green on this head.

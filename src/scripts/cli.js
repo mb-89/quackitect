@@ -20,13 +20,14 @@ import {
 } from "../../.claude/skills/level0/lib/projection.js";
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
+import { boxOf } from "../../.claude/skills/level0/lib/private.js";
 import {
   END as SCHEMA_END,
-  isNoteKind,
   mintNote,
   readYaml,
   schemaFaults,
   SCHEMAS,
+  schemasIn,
 } from "../../.claude/skills/level0/lib/schema.js";
 import { treeFaults, treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { EDITOR_SETTINGS } from "../../.claude/skills/level0/lib/servers.js";
@@ -54,6 +55,7 @@ import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
+import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { readTools, whereIs, writeSurvey } from "./tools.js";
 import { SOURCE as VIEWER, viewerOf } from "./viewer.js";
 import {
@@ -394,6 +396,7 @@ function treeHere() {
     root,
     words: it.words,
     node: process.version.replace(/^v/, ""),
+    box: boxOf(process.env, it.git),
   });
 }
 
@@ -615,12 +618,7 @@ function project() {
 // [[spec/design_output/schema#mint-writes-a-valid-note]]
 function mint(argv) {
   const [kind, path] = argv.filter((one) => !one.startsWith("-"));
-  const kinds = namesIn(join(root, SCHEMAS), SCHEMA_END)
-    .map((name) => name.slice(0, -SCHEMA_END.length))
-    .filter((name) =>
-      isNoteKind(readYaml(files.read(join(root, SCHEMAS, `${name}${SCHEMA_END}`)))),
-    )
-    .sort();
+  const kinds = [...schemasIn(treeHere()).keys()].sort();
 
   if (!kind || !path) {
     console.error("Usage: ./RUNME.sh mint <kind> <path>\n");
@@ -763,6 +761,26 @@ function standsAt(one) {
   return [one.version, one.path].filter(Boolean).join("  ");
 }
 
+// [[spec/design_output/extension#a-link-pointing-nowhere]]
+function sidebarSays() {
+  const home = homeIn(process.env);
+  const folder = join(home, ".vscode", "extensions");
+  if (!home || !files.exists(folder)) return "no editor folder on this box, so no link";
+
+  const said = JSON.parse(files.read(manifestPath(root)));
+  const id = `${said.publisher}.${said.name}`;
+  const dest = join(folder, `${id}-${said.version}`);
+  if (linkedAt(files, dest, dirname(manifestPath(root)))) {
+    return registered(files, folder, id)
+      ? `linked, and the list names ${id}`
+      : `linked, and the list misses ${id}: run ./RUNME.sh`;
+  }
+  if (files.isLink(dest) && !files.exists(dest)) return "a link pointing nowhere: run ./RUNME.sh";
+  if (files.isLink(dest)) return "a link into another tree: run ./RUNME.sh";
+  if (files.exists(dest)) return "a copy in place of the link: run ./RUNME.sh";
+  return "unlinked: run ./RUNME.sh";
+}
+
 async function doctor() {
   const found = Object.keys(known).length ? known : writeSurvey(it, root, process.env);
   const rows = [
@@ -774,6 +792,7 @@ async function doctor() {
         ? `${EDITOR_SETTINGS}, both servers`
         : "missing",
     ],
+    ["sidebar", sidebarSays()],
     [
       "vale rules",
       files.exists(STYLES)

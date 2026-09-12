@@ -3,6 +3,6 @@
   "description": "Level zero: the rules that shape what the agent writes, taken inside the harness process. The voice rules hold at the write door on turn one of a clone that has never been built.",
   "version": "0.1.0",
   "author": {
-    "name": "mb-89"
+    "name": "quackitect"
   }
 }

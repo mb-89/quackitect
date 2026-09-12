@@ -64,6 +64,20 @@ over what stands between them.
 kind to schema. A note names its kind as a link, `kindOf` unwraps it, and the
 map answers the schema for that kind.
 
+# A schema names its chapters
+
+`spec/schemas` holds two shapes. A note schema names the chapters a note of
+that kind carries, and `isNoteSchema` is what tells one from the other.
+
+| the shape | what it names | who reads it |
+|---|---|---|
+| a note schema | `body.sections`, one chapter an entry | the write door, `./RUNME.sh mint` |
+| a model schema | the values a projector writes into a rule | a projector, and a person |
+
+`spec/schemas/paragraph.schema.yaml` is the second shape. It names no chapter,
+so `schemasIn` leaves it out, the write door asks it nothing, and `mint` offers
+the note kinds alone. For details, see [[spec/funnel/a-paragraph-has-a-schema]].
+
 # A finding names the section
 
 A finding carries the shape every rule in this tree answers:
@@ -117,16 +131,6 @@ kind, and checks each one. `./RUNME.sh lint` runs it beside the rules over two
 files, so a departure reaches the problems panel where a person reads it.
 
 A file carrying no `kind` reaches no schema, and the sweep passes over it.
-
-# A note kind holds chapters
-
-`spec/schemas` holds two sorts of schema. A note kind names the chapters a note
-of that kind carries, under `body`. A rule source names values a projection
-reads, and `paragraph.schema.yaml` is the first of those.
-
-`isNoteKind(schema)` tells them apart on the `body` key. `mint` names the note
-kinds alone, so a rule source earns no empty note, and the contract test over
-mint reads the same set.
 
 # Mint writes a valid note
 

@@ -97,6 +97,14 @@ test("a dependency reads as a list or on one line, with the prefix dropped", () 
   assert.deepEqual(dependsOn("---\nstatus: todo\n---\n"), []);
 });
 
+// [[spec/design_output/work#urgency-and-what-waits]]
+test("a dependency in a flow list reads without its brackets or its quotes", () => {
+  assert.deepEqual(dependsOn("---\ndepends_on: [one, work/two]\n---\n"), ["one", "two"]);
+  assert.deepEqual(dependsOn('---\ndepends_on: ["one", \'two\']\n---\n'), ["one", "two"]);
+  assert.deepEqual(dependsOn("---\ndepends_on: []\n---\n"), []);
+  assert.deepEqual(dependsOn('---\ndepends_on:\n  - "one"\n---\n'), ["one"]);
+});
+
 // [[spec/design_output/work#a-dependency-waits-for-trunk]]
 test("a branch waits for a dependency until trunk holds it", () => {
   const brief = "---\ndepends_on:\n  - open\n  - busy\n  - ready\n  - merged\n  - gone\n---\n";

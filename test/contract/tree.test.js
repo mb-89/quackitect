@@ -30,6 +30,7 @@ import {
   INSTALL,
   nameHoldsTheWords,
   noLogDeleted,
+  nothingPrivateTravels,
   settingsNameBinaries,
   stopFolderIsData,
   surveyFindsNode,
@@ -38,6 +39,7 @@ import {
   treeOf,
   VALE_INI,
 } from "../../.claude/skills/level0/lib/tree.js";
+import { boxOf } from "../../.claude/skills/level0/lib/private.js";
 import { disk } from "../../src/doors/disk.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
@@ -63,15 +65,17 @@ const settings = configOf({
   readEnv: async () => ({}),
 });
 const words = await settings.ask("names.words");
+const gitHere = git(outside, root);
 const here = treeOf({
   disk: files,
-  git: git(outside, root),
+  git: gitHere,
   root,
   words,
   node: NODE,
+  box: boxOf(process.env, gitHere),
 });
 
-const fakeTree = (seed, paths = [], node = NODE) =>
+const fakeTree = (seed, paths = [], node = NODE, box = {}) =>
   treeOf({
     disk: fakeDisk(
       Object.fromEntries(
@@ -82,6 +86,7 @@ const fakeTree = (seed, paths = [], node = NODE) =>
     root: FAKE,
     words,
     node,
+    box,
   });
 
 const namesIn = (at, end) =>
@@ -108,6 +113,66 @@ test("every verb the Bash description names stands in the command line", () => {
 // [[spec/design_output/tree#the-rules-over-two-files]]
 test("this tree breaks none of the rules over two files", () => {
   assert.deepEqual(treeFaults(here), []);
+});
+
+// [[spec/design_output/private#the-box-names-the-owner]]
+test("a tracked file carrying a name off this box is refused", () => {
+  const seed = {
+    "test/level0/paths.test.js": 'const ROOT = "C:/Users/fnordwick/ai";\n',
+    "spec/guidance/one.md": "The maintainer reaches nobody at all here.\n",
+  };
+  const paths = ["test/level0/paths.test.js", "spec/guidance/one.md"];
+  const found = nothingPrivateTravels(
+    fakeTree(seed, paths, NODE, {
+      user: "fnordwick",
+      home: "C:/Users/fnordwick",
+      name: "Fnordwick",
+      email: "fnordwick@example.com",
+    }),
+  );
+
+  assert.equal(found.length, 2, "the user and the home folder both stand in that line");
+  assert.equal(found[0].rule, "NothingPrivateTravels");
+  assert.equal(found[0].file, "test/level0/paths.test.js");
+  assert.equal(found[0].line, 1);
+  assert.match(found[0].message, /the user this box runs as/);
+  assert.match(found[1].message, /the home folder on this box/);
+});
+
+test("a git name and a git address off this box are refused too", () => {
+  const seed = { "spec/funnel/one.md": "Ask Fnordwick, or fnordwick@example.com.\n" };
+  const found = nothingPrivateTravels(
+    fakeTree(seed, ["spec/funnel/one.md"], NODE, {
+      user: "",
+      home: "/home/user",
+      name: "Fnordwick",
+      email: "fnordwick@example.com",
+    }),
+  );
+
+  assert.deepEqual(
+    found.map((one) => one.message.replace(/, and git.*/, "")),
+    ["This line carries the git name on this box", "This line carries the git address on this box"],
+  );
+});
+
+test("a box naming nobody reads clean, and so does this tree", () => {
+  const seed = { "spec/funnel/one.md": "A cloud box writes under /home/user, as root.\n" };
+  const box = { user: "root", home: "/home/user", name: "Claude", email: "" };
+  assert.deepEqual(
+    nothingPrivateTravels(fakeTree(seed, ["spec/funnel/one.md"], NODE, box)),
+    [],
+  );
+  assert.deepEqual(nothingPrivateTravels(here), []);
+});
+
+test("a name standing inside a longer word carries no person", () => {
+  const seed = { "spec/funnel/one.md": "Combine the two, and the number holds.\n" };
+  const box = { user: "mb", home: "/home/mb", name: "", email: "" };
+  assert.deepEqual(
+    nothingPrivateTravels(fakeTree(seed, ["spec/funnel/one.md"], NODE, box)),
+    [],
+  );
 });
 
 test("a settings file naming another binary is refused", () => {

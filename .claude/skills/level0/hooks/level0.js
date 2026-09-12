@@ -53,6 +53,7 @@ import {
   writes,
 } from "../lib/log.js";
 import { isDraft, relativeTo } from "../lib/paths.js";
+import { carriedFrom, NOTES, refusedPrivate } from "../lib/private.js";
 import {
   entriesIn,
   ownerOf,
@@ -88,12 +89,14 @@ import { deeply, layered } from "../lib/layer.js";
 import { MARKER, pairOf } from "../lib/vehicle.js";
 import { lintText } from "../lib/vale.js";
 
+const SE = ".se";
 const GUIDANCE = "spec/guidance";
 const COMMIT = "level0-commit.md";
-const HANDOVER = ".se/HANDOVER.md";
+const HANDOVER = `${SE}/HANDOVER.md`;
 const BRIEF = "HANDOVER.md";
 const TRUNK = "main";
 const JUDGED = "spec/config/styles/VoiceJudged";
+const PRIVATE = "NothingPrivateTravels";
 
 const ANSWER = "level0-answer.md";
 const GOD = "god";
@@ -280,6 +283,19 @@ export function register(on, _options) {
 
     // [[spec/design_output/schema#the-underscore-parks-a-draft]]
     if (isDraft(where)) return onward(e);
+
+    // [[spec/design_output/private#the-door-reads-the-notes]]
+    const carried = where.startsWith(`${SE}/`)
+      ? null
+      : carriedFrom(writing.text, await inFolder($, NOTES, ".md"));
+    if (carried) {
+      await logbook.say("warn", "private", `refused a ${carried.how} out of ${carried.note}`, {
+        file: where,
+        rule: PRIVATE,
+        tool: e.tool,
+      });
+      return { deny: refusedPrivate(where, carried) };
+    }
 
     // [[spec/design_output/schema#the-door-refuses-a-departure]]
     if (where.endsWith(".md")) {
@@ -520,8 +536,8 @@ export function register(on, _options) {
   });
 
   // [[spec/design_output/level0#a-step-carries-the-answer]]
-  on("turn.step", async (_$, e, next) => {
-    const said = await next(e);
+  on("turn.step", async function* (_$, e, next) {
+    const said = yield* next(e);
     if (!owed || (await settings.ask("answer.enabled")) === false) return said;
     const text = String(e.answer ?? "").trim();
     if (text) {

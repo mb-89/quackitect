@@ -124,6 +124,16 @@ validate`. A bare `node --test` skips the last two and answers green.
 A session runs a hundred single tests to dodge that. The log records every one,
 so a retro sees it, which costs less than a rule guessing at intent.
 
+# A git add stays out
+
+`.se` holds the private half, and git ignores it. `addsIn` reads a command and
+answers every path under `.se` a `git add` names, with `-f` or without.
+
+    git add -f .se/notes/one.md
+
+`PrivateStaysHome` is the finding, and the refusal names the folder and the
+road back. For details, see [[spec/design_output/private#the-second-door]].
+
 # The description names verbs
 
 `tool.describe` rewrites what the model reads before it reaches for a tool. It
