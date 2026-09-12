@@ -14,6 +14,22 @@ export const HEARD = {
   none: "the canary is absent from the answer",
 };
 
+// [[spec/design_output/level0#the-canary-owes-a-debt]]
+export const OWES = {
+  warns: (sentence) =>
+    [
+      "This session owes the canary. End your answer with this line, on its own,",
+      `word for word: ${sentence} The numbers come from what level zero loaded.`,
+      "Level zero refuses the next tool call until that line stands in an answer.",
+    ].join(" "),
+  denies: (sentence) =>
+    [
+      "This session owes the canary, and no answer carries it. End your next",
+      `answer with this line, on its own, word for word: ${sentence}`,
+      "Level zero refuses every tool call until it stands.",
+    ].join(" "),
+};
+
 // [[spec/design_output/level0#the-layer-after-a-compaction]]
 export const PROBE = {
   variable: "SE_PROBE_COMPACT",

@@ -33,6 +33,7 @@ import {
   envOf,
   forHelper,
   HEARD,
+  OWES,
   parse,
   PROBE,
   standingLayer,
@@ -141,6 +142,8 @@ export function register(on, _options) {
   let rules = [];
   let onAHeldBranch = false;
   let owed = null;
+  // [[spec/design_output/level0#the-canary-owes-a-debt]]
+  let owesCanary = null;
   const seen = { ask: QUIET, hold: "running" };
   let root = "";
   let projections = [];
@@ -285,8 +288,15 @@ export function register(on, _options) {
     });
     if (answers.deny) return answers;
     owed = answers.owed;
-    const onward = answers.warn
-      ? async (given) => withContext(await next(given), answers.warn)
+
+    // [[spec/design_output/level0#the-canary-owes-a-debt]]
+    const canaries = await canaryDoor(e, { owes: owesCanary, sentence, logbook });
+    if (canaries.deny) return canaries;
+    owesCanary = canaries.owes;
+
+    const warning = [answers.warn, canaries.warn].filter(Boolean).join("\n\n");
+    const onward = warning
+      ? async (given) => withContext(await next(given), warning)
       : next;
 
     const writing = asWrite(e);
@@ -636,7 +646,17 @@ export function register(on, _options) {
     }
     if (firstTurn && e.reason === "answer") {
       firstTurn = false;
-      await heardCanary(logbook, canaryIn(e.answer, sentence), sentence);
+      const heard = canaryIn(e.answer, sentence);
+      await heardCanary(logbook, heard, sentence);
+      // [[spec/design_output/level0#the-canary-owes-a-debt]]
+      if (heard.found !== "same") owesCanary = { warned: false };
+    } else if (owesCanary && e.reason === "answer") {
+      // [[spec/design_output/level0#the-canary-owes-a-debt]]
+      const heard = canaryIn(e.answer, sentence);
+      if (heard.found === "same") {
+        owesCanary = null;
+        await heardCanary(logbook, heard, sentence);
+      }
     }
     // [[spec/design_output/level0#the-layer-after-a-compaction]]
     if (probing && e.reason === "answer") {
@@ -1165,6 +1185,26 @@ async function heardCanary(logbook, heard, sentence) {
     });
   }
   return logbook.say("warn", "level0", HEARD.none, { detail: sentence });
+}
+
+// [[spec/design_output/level0#the-canary-owes-a-debt]]
+async function canaryDoor(e, it) {
+  const owes = it.owes;
+  if (!owes) return { owes };
+  if (e.agentId || reachesTheOwner(e.tool)) return { owes };
+
+  if (!owes.warned) {
+    await it.logbook.say("warn", "gate", `warned ${e.tool} before the canary`, {
+      tool: e.tool,
+      detail: it.sentence,
+    });
+    return { owes: { ...owes, warned: true }, warn: OWES.warns(it.sentence) };
+  }
+  await it.logbook.say("warn", "gate", `refused ${e.tool} before the canary`, {
+    tool: e.tool,
+    detail: it.sentence,
+  });
+  return { deny: OWES.denies(it.sentence), owes };
 }
 
 // [[spec/design_output/level0#the-layer-after-a-compaction]]
