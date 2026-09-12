@@ -453,7 +453,7 @@ Each stands under `process.schema.yaml` and holds the ask's fields under
 | `trivial` | `do` | a fix small enough that the ask is the design |
 | `standard` | `design` (draft, review), `implement` (tests-red, change, tests-green), `verdict` | a change that wants an approach first, tests before code, and a second pair of eyes after |
 | `group` | `sync`, `split`, `children`, `retro` (notes, write, cloud) | a set of tickets that lands as one, and what a cloud run does |
-| `retro` | `collect`, `field`, `score`, `notes`, `readers`, `mine` (six leaves), `improve`, `report`, `distribute` | a window of the record, and the changes to the machinery it earns |
+| `retro` | `collect`, `field`, `score`, `notes`, `readers`, `mine` (eight leaves), `improve`, `report`, `distribute` | a window of the record, and the changes to the machinery it earns |
 | `chapter` | `read` | one chapter of a retro's window, read by one spawned hand |
 
 A note is the smallest ticket, and it is where most work starts. A hand that
@@ -693,22 +693,32 @@ what `collect` lays out.
 | `score` | anyone | `scored`, one line per last improvement with what the numbers show and what that teaches, and `rate`, a command |
 | `notes` | anyone | one command, which passes when the private folder is empty |
 | `readers` | children | none, and it ends when every chapter closes |
-| `mine` | anyone | six leaves, one table below |
+| `mine` | anyone | eight leaves, one table below |
 | `improve` | anyone | `tickets`, one link each with its class, its home, the plan, and what the next numbers show if it works |
 | `report` | person | `misses`, what the retro skips, and the reading itself is the gate |
 | `distribute` | anyone | `groups`, one line per ticket with its group and urgency |
 
-`work collect` drains the box and cuts the window:
+`work collect` takes what it names into the retro folder, and every line it
+takes has a reader. Nothing it takes goes unread, and the `unread` leaf
+checks the manifest against the leaves to say so:
 
-| what | from | the verb |
+| what collect takes | from | who reads it |
 |---|---|---|
-| the log, after a rotation | `.se/log/` | drains it into the retro folder |
-| every script anyone writes | `.se/scripts/`, the scratchpad | drains it |
-| every private note | `.se/tickets/` | drains a copy, and the `notes` step decides each |
-| the transcripts, thoughts and all | the harness's own files | copies them |
-| the tickets that close in the window, with their records | git | lists them |
-| the retro leaves of every group that merges in the window | git | lists them |
-| the earlier retros | the retro tickets in git | lists them |
+| the log, after a rotation | `.se/log/` | every chapter's reader, its own slice, and the `shell`, `refusals` and `worker` leaves over the whole |
+| every script anyone writes | `.se/scripts/`, the scratchpad | the `scripts` leaf |
+| every private note, as a copy | `.se/tickets/` | the `notes` step, which decides each |
+| the transcripts, thoughts and all, as a copy | the harness's own files | every chapter's reader, its own slice, and the `worker` leaf for the length of a thought |
+| the tickets that close in the window, with their records | git | the `records` leaf |
+| the retro leaves of every group that merges in the window | git | the `runs` leaf |
+| the earlier retros | the retro tickets in git | the `score` step, and the `chapters` leaf for repeats |
+| the manifest, one line per thing taken | the verb itself | the `unread` leaf |
+
+The verb takes by a list of what it names and by nothing else, so a keep list
+that goes stale is no risk. The retro folders themselves, under `.se/retro/`,
+stand outside that list, and so do the hold, the box id, the config, the bin
+and the handover. A drain has no undo, so the verb refuses while a hand holds
+a ticket. `/se-retro` is the slash command that mints a retro and pulls it,
+and the projection writes it beside the config commands.
 
 The window runs from the last retro's close commit to now, and for the first
 one from the tree's first commit. The verb cuts it into chapters of six hours
@@ -745,7 +755,9 @@ retro folder, and a leaf answers its questions and nothing else:
 | `refusals` | the doors' refusals, by rule | which rule fires how often, whether the rule or the hand is wrong, and which rules fire and teach nothing |
 | `records` | the records of the tickets that close in the window | the steps that fail back or meet `refused` most per process, what the person steps ask and how long each waits, and what the conditions skip |
 | `worker` | the counts per chapter | where errors and the length of a thought turn, and where the worker cuts scope and calls it something else |
-| `unread` | everything | what stays unread, and why |
+| `scripts` | every script collect takes | which becomes a check, a flag or a verb, with its home, and which dies, with the reason |
+| `runs` | the retro leaves of the groups that merge in the window | what the boxes lack and meet, what repeats across runs, and what they leave for a person that still stands |
+| `unread` | the manifest, against what every leaf read | every line no leaf read, and why |
 
 An improvement is a ticket the retro mints, one per class. The retro names
 its home by the order that asks the least of anybody:
@@ -785,8 +797,9 @@ at the merge, and the next desk retro scores them like any other. A box that
 dies before its retro leaves none, the stale rule catches the group, and the
 notes die with the box, as ruled.
 
-A person mints a retro by hand for now. Later the engine refuses a new
-iteration while notes stand open, and that refusal is what mints one.
+A person mints a retro by hand for now, with `/se-retro`. Later the engine
+refuses a new iteration while notes stand open, and that refusal is what
+mints one.
 
 # The pull
 
