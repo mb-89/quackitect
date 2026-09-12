@@ -110,7 +110,18 @@ export function dependsOn(text) {
     }
     if (row.trim()) reading = false;
   }
-  return out.map((one) => one.trim().replace(/^work\//, "")).filter(Boolean);
+  return out.map(named).filter(Boolean);
+}
+
+// [[spec/design_output/work#urgency-and-what-waits]]
+function named(said) {
+  return String(said)
+    .trim()
+    .replace(/^\[|\]$/g, "")
+    .trim()
+    .replace(/^["']|["']$/g, "")
+    .trim()
+    .replace(/^work\//, "");
 }
 
 function frontField(text, key) {

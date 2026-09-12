@@ -3,9 +3,10 @@
 // [[spec/design_output/doors#one-contract-test-per-door]]
 
 import assert from "node:assert/strict";
-import { dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { skip, test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { NOBODY } from "../../.claude/skills/level0/lib/private.js";
 import { lintText } from "../../.claude/skills/level0/lib/vale.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
@@ -120,3 +121,39 @@ ifVale(
     assert.ok((await answered(three)).includes("PreferStructureAnswer"));
   },
 );
+
+// [[spec/design_output/private#a-fixture-carries-no-shape]]
+const SECRETS = ["/home", "fnordwick", "secrets"].join("/");
+const CALLED = ["+49 30", "1234 5678"].join(" ");
+
+// [[spec/design_output/private#the-shapes]]
+ifVale("the shapes rule refuses an address, a number, a date and a home path", async () => {
+  for (const said of [
+    "Reach the owner at somebody@example.com when the box stalls.",
+    `Call ${CALLED} about it, and say what stalls.`,
+    "Measured on 2026-09-10 against client 2.1.267, on a cloud box.",
+    `The probe writes under ${SECRETS} and reads it back.`,
+    "A box answers C:\\Users\\fnordwick\\Desktop as the home folder there.",
+  ]) {
+    assert.ok((await ruled(said)).includes("Private"), said);
+  }
+});
+
+ifVale("a nobody user, a version and an example pass the shapes rule", async () => {
+  for (const said of [
+    "A cloud box writes under /home/user, and a fixture writes /Users/one.",
+    "A runner writes under /home/runner, and an agent under /home/claude.",
+    "Client 2.1.267 stands the same way, and the number 1024 passes.",
+    `    the indented example: 2026-09-08 and ${SECRETS}\n`,
+  ]) {
+    assert.ok(!(await ruled(said)).includes("Private"), said);
+  }
+});
+
+test("the shapes rule and the commit door pass one list of nobody users", () => {
+  const rule = files.read(join(root, "spec/config/styles/VoiceVale/Private.yml"));
+  const listed = /nobody := \[([^\]]*)\]/.exec(rule);
+  assert.ok(listed, "the rule names its nobody users");
+  const names = listed[1].split(",").map((one) => one.trim().replace(/^"|"$/g, ""));
+  assert.deepEqual(names.sort(), [...NOBODY].sort());
+});
