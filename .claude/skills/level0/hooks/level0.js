@@ -589,7 +589,8 @@ export function register(on, _options) {
 
   // [[spec/design_output/level0#the-tool-reads-a-draft]]
   on("tool.call", { tool: `mcp__level0__${CHECK}` }, async ($, e, _next) => {
-    const text = String(e.text ?? "");
+    // [[spec/design_output/stop#the-voice-skips-the-line]]
+    const text = withoutStopLine(String(e.text ?? ""));
     if (!text.trim()) return { result: `${CHECK} takes the text of one draft.` };
     if (!bin) return { result: "No vale stands here, so the draft goes unread." };
 

@@ -1258,6 +1258,31 @@ test("a commit whose delta adds nothing private passes the door", async () => {
   assert.equal(said.deny, undefined);
 });
 
+// [[spec/design_output/stop#the-voice-skips-the-line]]
+test("the draft tool reads the prose, and the stop line scores nothing", async () => {
+  const read = [];
+  const taught = valeOnAnswer([]);
+  const it = await started(BANDED, {
+    ...taught,
+    run: (argv, init) => {
+      if (init?.stdin !== undefined) read.push(String(init.stdin));
+      return taught.run(argv, init);
+    },
+  });
+
+  const line = "Stop requested. Reason [the-work-stands-complete]. Nothing waits.";
+  const said = await it.raise(
+    "tool.call",
+    { tool: DRAFT, text: `${"word ".repeat(40).trim()}\n\n${line}` },
+    DRAFT,
+  );
+
+  assert.match(String(said.result), /meets the gate clean/);
+  assert.equal(read.length, 1, "the tool reads the draft once");
+  assert.equal(read[0].includes("Stop requested"), false, "the line reaches Vale nowhere");
+  assert.match(read[0], /^word word/, "the prose reaches it whole");
+});
+
 // [[spec/design_output/work#a-red-battery-pushes-nothing]]
 test("a push to trunk takes a green battery, and a work branch takes none", async () => {
   const HEAD = "a1b2c3d4e5f6";
