@@ -24,13 +24,13 @@ Reject paths outside the tree and writes to the adapter source or rule configura
 Shell commands remain outside full filesystem mediation.
 
 Allow reads, creates, edits and deletions under `.se` through the ordinary tools.
-Apply normal content checks. A handover claim coordinates consumption at startup;
+Apply normal content checks. A handover claim coordinates consumption at startup.
 it grants no special file access and imposes no write restriction.
 
 # State between processes
 
 Store records under `.se/copilot`, keyed by a hash of the session ID.
-A directory lock serializes updates; an atomic rename publishes each record.
+A directory lock serializes updates. An atomic rename publishes each record.
 Save a claimed handover before deleting its original. A claim outlives a crash.
 
 Release claims after successful completion, not after an error or timeout.
@@ -47,10 +47,10 @@ receipt. Judged rule messages reach context without a classification call.
 Completion formats code the session touches and checks results in bounded batches.
 Cloud completion also checks the assigned branch, clean tree and remote head.
 
-Check four files per completion batch. Spend failure retries on actual issues;
+Check four files per completion batch. Spend failure retries on actual issues.
 request another batch without spending that budget when valid files remain.
 Keep handover claims until every batch passes. Host continuation limits still
-apply; the local retry counter cannot override them.
+apply. The local retry counter cannot override them.
 
 # Candidate reports
 
@@ -67,7 +67,7 @@ Both installers run `setup auto`, including when every binary exists.
 The generator owns only its marked registrations. It preserves user files.
 
 Commit the hook and setup workflow to the default branch before cloud work.
-The cloud setup marker selects cloud response envelopes; local sessions use
+The cloud setup marker selects cloud response envelopes. A local session use
 VS Code envelopes. No Claude callback reaches this entry point.
 
 # Validate the installation
@@ -89,7 +89,7 @@ It checks existing comments before retrying an ambiguous network failure.
 
 Save the claim commit as the attempt identity before contacting GitHub.
 Include both branch and attempt in the comment marker. A checkpoint before
-a retry keeps that identity; release and a new claim produce another one.
+a retry keeps that identity. A release and a new claim produce another one.
 
 Inspect the GitHub job to confirm acceptance and its assigned head branch.
 Repository policy or bot credentials can prevent a comment from starting work.
@@ -115,7 +115,7 @@ Claude's hooks and judge stay unchanged.
 The real stdin integration test checks startup guidance and its numeric receipt.
 It confirms a Biome debugger refusal and a clean candidate's acceptance,
 with no target file write. Hook outcomes use the existing log door.
-Stop retries have a bound; unfinished work keeps its recovery record.
+Stop retries have a bound. Unfinished work keeps its recovery record.
 
 Complete these host checks before claiming live compatibility:
 
@@ -134,7 +134,7 @@ out of the runtime and dispatch unit suites.
 
 Run `node --test test/level0/copilot-runtime.test.js` for runtime decisions.
 Run `node --test test/level0/copilot-dispatch.test.js` for dispatch attempts.
-Use `fakeProc`, `fakeDisk` and `fakeSession`; reject unexpected process commands.
+Use `fakeProc`, `fakeDisk` and `fakeSession`. Reject unexpected process commands.
 
 Model branch, claim SHA, checkpoint SHA and comments as in-memory state.
 Test a lost response with the same attempt and a new claim with another one.
@@ -150,9 +150,9 @@ This proposal adds no rule category and changes no harness behavior yet.
 | Guarantee | Current owner | Recommendation |
 | --- | --- | --- |
 | Preserve the brief until a result exists | `session.withState` and `handle` | Keep the session door contract and mock-based handover tests. |
-| Request each work attempt once | `dispatch` | Keep mock-based retry tests; verify live job acceptance separately. |
-| Keep the worker on its work branch | Level-zero guards and host credentials | Retain branch-specific credentials; use repository rules to reserve merging for a person. |
-| Accept only a commit whose checks pass | Human review; hooks check selected writes | Add a required CI status for the exact candidate commit. |
+| Request each work attempt once | `dispatch` | Keep mock-based retry tests, and verify live job acceptance separately. |
+| Keep the worker on its work branch | Level-zero guards and host credentials | Retain branch-specific credentials, and use repository rules to reserve merging for a person. |
+| Accept only a commit whose checks pass | Human review, and hooks check selected writes | Add a required CI status for the exact candidate commit. |
 
 # Proposed implementation
 

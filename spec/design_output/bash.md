@@ -32,7 +32,7 @@ work costs more than the hole this leaves.
 1. Lift each heredoc body out, keyed by its word, and leave `<<WORD` standing.
 2. Walk the text once, taking a quoted run whole and an operator as its own
    token.
-3. Cut the tokens into segments at `&&`, `||`, `|`, `;`, `&` and a newline.
+3. Cut the tokens into segments at an operator and at a newline.
 4. Read each segment as a command name, its words, and its redirections.
 
 A segment carries its own verdict, so a chain refuses on the one command that
@@ -67,8 +67,8 @@ the inner one under the same rules. A target the parse reads as `{}` names no
 path, so it passes. The enclosing `find` holds the real target, and a guess at
 it refuses honest work.
 
-A heredoc into `sh` runs the shell parse again over the body. A heredoc into
-`python`, `node`, `ruby`, `perl` or `php` reads each line for a write call
+A heredoc into `sh` runs the shell parse again over the body. A heredoc into an
+interpreter reads each line for a write call
 beside a path the rules cover: `open(..., "w")`, `writeFileSync(...)`,
 `write_text(...)` and their kind. An inline script behind `-c` or `-e` meets
 the same two readings.

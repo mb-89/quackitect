@@ -182,9 +182,9 @@ Everything else the tools take reaches the rows:
 | the lines around a hit, a case-blind read | the same rows |
 
 A single-file `Read` goes to the disk always. A search reading a file a moment
-late costs a repeat; an edit built on text a moment late costs the edit.
+late costs a repeat. An edit built on text a moment late costs the edit.
 
-## A match may span lines
+## A match spans lines
 
 Every text file keeps its whole body, so a pattern crossing a line break is one
 question over one string. The rows answer it the way they answer any other: the
@@ -235,7 +235,7 @@ before any of it.
 
 Two kinds of bracket stay out of `link`. The `kind` key names a taxonomy and no
 file, and a target carrying `<` or `>` is a shape a document spells out. Both
-would read as broken links forever, which costs `dangling` its meaning.
+read as broken links forever, which costs `dangling` its meaning.
 
 ## The compiler it needs
 

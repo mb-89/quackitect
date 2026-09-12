@@ -49,7 +49,7 @@ the file is absent:
 | `./RUNME.sh doctor` | the survey, and it probes nothing twice |
 
 `whereIs` takes the surveyed path first. It falls back to `.se/bin/<name>.exe`,
-then `.se/bin/<name>`, then the bare name. So a clone nobody has surveyed still
+then `.se/bin/<name>`, then the bare name. So a clone nobody surveys still
 finds a tool in `.se/bin`.
 
 # What the survey names
@@ -66,6 +66,6 @@ out of it. A link is no tool.
 A session writing a script of its own puts it under `.se/scripts`. Git ignores
 that folder, so the script lives on the box and travels nowhere.
 
-`.se/tools.json` says what such a script may call. A cloud session lists every
+`.se/tools.json` says what such a script can call. A cloud session lists every
 script it leaves there in its handover, so a person decides whether one earns a
 place in `src/scripts`.

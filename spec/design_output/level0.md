@@ -10,7 +10,7 @@ harness surface, the write door, and the standing layer it hands each session.
 # What level zero is
 
 A plugin whose hooks are a module. It runs inside the harness process and asks
-for no server, so its rules hold on turn one of a clone nobody has built.
+for no server, so its rules hold on turn one of a clone nobody builds.
 
 `.claude/settings.json` turns it on and git tracks that file, so a clone guards
 its first session with nothing typed.
@@ -142,7 +142,7 @@ before a session starts.
 
 ## The filesystem reads and writes
 
-`$.fs` offers `read`, `write`, `list`, `exists`, `stat` and `ancestors`. It
+`$.fs` reads a file, writes one, lists a folder and answers what stands. It
 deletes nothing, so a delete goes through `$.process.run`.
 
 ## A session misses its install
@@ -179,8 +179,8 @@ compaction's own.
 | `$.session.compact({ instructions })` | it throws under `-p`: compaction there runs inside a turn |
 | two headless runs under `--resume` | untried, because the first road holds |
 
-`$.session.compact` names the reason itself, so a session under the editor may
-still take it. The probe takes the command road, which holds in both places.
+`$.session.compact` names the reason itself, so a session under the editor
+still takes it. The probe takes the command road, which holds in both places.
 
 ## What the probe does
 
@@ -260,7 +260,7 @@ outside the tree, so no tracked file moves it.
 The gate holds the scan alone. Measured against client 2.1.267,
 by a probe on a cloud clone carrying no trust. The `env` key bites there, and
 so does a `permissions` deny rule in `.claude/settings.json`. So the tracked
-file still says what a session may do, and level zero is the one part waiting
+file still says what a session can do, and level zero is the one part waiting
 on the flag.
 
 Read the flag before you read anything else. A second probe the same day, on
@@ -489,7 +489,7 @@ and the owner reads the failure long afterwards. So the sentence carries a
 debt, and the cage holds the session to it.
 
 The debt opens where the first `turn.complete` carries an answer the canary is
-absent from. `canaryIn` answers `same`, `other` or `none`, and `same` alone
+absent from. `canaryIn` answers `same`, `other` or `none`. The first one alone
 pays. A line with other counts comes out of a block the session lacks, so it
 owes what silence owes.
 
@@ -539,7 +539,7 @@ instead.
 ## What the door reads
 
 The door marks what a person waits for, and holds every `tool.call` while
-nothing has reached them. Text the session writes after the mark answers it,
+nothing reaches them. Text the session writes after the mark answers it,
 and `turn.complete` clears the mark.
 
 Whether an answer stands comes out of `$.session.messages()`. The mark notes how
@@ -559,7 +559,7 @@ with a warning of its own.
 
 ## One warning, then a refusal
 
-The response in flight when a demand lands may carry the answer, and its text
+The response in flight when a demand lands can carry the answer, and its text
 reaches the hook only once the response completes. So every call of that
 response passes.
 
@@ -596,9 +596,13 @@ bar. For details, see [[spec/design_output/extension#the-status-bar-says-it]].
 
 ## Which prompt opens a turn
 
-`e.origin.kind` says who asks. A person asks through `composer`, `bridge`,
-`sdk`, `scheduled-trigger`, `slack-ping`, `channel` and `auto-continuation`. A
-routine's prompt belongs to the person behind the routine.
+`e.origin.kind` says who asks. Seven kinds carry a person:
+
+- `composer`, `bridge` and `sdk`
+- `scheduled-trigger` and `slack-ping`
+- `channel` and `auto-continuation`
+
+A routine's prompt belongs to the person behind it.
 
 Every other kind is a machine talking to the session, and a machine waits. The
 tooth submits prompts under `plugin`, and a session owes no readback to itself.
@@ -744,8 +748,8 @@ The turn's end answers what comes next.
 coming back clean meets the gate clean, so the tool closes the gap a gate
 refusing nothing leaves open.
 
-The tool registers beside `claim_stop` at the session's start, and
-`spec/guidance/working.md` carries the line that sends a session to it.
+The tool registers at the session's start, and `spec/guidance/working.md`
+carries the line that sends a session to it.
 
 # The rules past one buffer
 
@@ -902,8 +906,8 @@ the cage:
 | every other write, and every other command | refuses |
 
 The refusal names the fault and the road out, so a session that meets it reads
-what to do. A door refusing everything would shut the road that mends it, and
-the session would stand there for good.
+what to do. A door refusing everything shuts the road that mends it, and
+the session stands there for good.
 
 The mend clears itself. `ensureCage` retries while the answer reads false, so
 the first call after a repair loads the rules again, writes `ok: true`, and says
