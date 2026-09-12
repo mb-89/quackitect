@@ -434,11 +434,12 @@ carries three hints and nothing else:
 Its one step, `decide`, is where a retro reads it later and says what it
 becomes. The step closes the note as `dropped`, or as `done` where the answer
 is small enough to do on the spot. Or it closes the note as `became`, and
-names the tracked ticket the mint cuts from it. Anyone mints a note, and a
-retro decides it. The step says `by: retro`, and a hand at a retro step is
-the one hand the pull hands a note to. A group's retro decides the notes its
-box minted, and the tree's retro decides the rest. A note that stays behind on a
-cloud box dies with it.
+names the tracked ticket the mint cuts from it.
+
+Anyone mints a note, and a retro decides it. The step says `by: retro`, and a
+hand at a retro step is the one hand the pull hands a note to. A group's retro
+decides the notes its box minted, and the tree's retro decides the rest. A
+note that stays behind on a cloud box dies with it.
 
 A note also answers. The answer door holds every tool call until the owner's
 prompt has an answer. A prompt that says "make a note of this" wants one thing
