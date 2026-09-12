@@ -720,7 +720,7 @@ and the board flags a ticket whose hash trails its process.</p>
 <tr><td class="m">trivial</td><td class="m">do</td><td>a fix small enough that the ask is the design</td></tr>
 <tr><td class="m">standard</td><td class="m">design (draft, review) · implement (tests-red, change, tests-green) · verdict</td><td>a change that wants an approach first, tests before code, and a second pair of eyes after</td></tr>
 <tr><td class="m">group</td><td class="m">sync (cloud) · split · children · retro (notes, write, cloud)</td><td>a set of tickets that lands as one, and what a cloud run does</td></tr>
-<tr><td class="m">retro</td><td class="m">collect · field · score · notes · readers · mine (six leaves) · improve · report · distribute</td><td>a window of the record, and the changes to the machinery it earns</td></tr>
+<tr><td class="m">retro</td><td class="m">collect · field · score · notes · readers · mine (eight leaves) · improve · report · distribute</td><td>a window of the record, and the changes to the machinery it earns</td></tr>
 <tr><td class="m">chapter</td><td class="m">read</td><td>one chapter of a retro's window, read by one spawned hand</td></tr>
 </table></div>
 
@@ -928,15 +928,23 @@ mines what <code>collect</code> lays out, leaf by leaf.</p>
 <tr><td class="m">score</td><td>anyone</td><td><code>scored</code>, one line per last improvement with what the numbers show and what that teaches, and <code>rate</code></td></tr>
 <tr><td class="m">notes</td><td>anyone</td><td>one command, which passes when the private folder is empty</td></tr>
 <tr><td class="m">readers</td><td>children</td><td>none, and it ends when every chapter closes</td></tr>
-<tr><td class="m">mine</td><td>anyone</td><td>six leaves, one table below</td></tr>
+<tr><td class="m">mine</td><td>anyone</td><td>eight leaves, one table below</td></tr>
 <tr><td class="m">improve</td><td>anyone</td><td><code>tickets</code>, one link each with its class, its home, the plan, and what the next numbers show if it works</td></tr>
 <tr><td class="m">report</td><td>person</td><td><code>misses</code>, what the retro skips, and the reading itself is the gate</td></tr>
 <tr><td class="m">distribute</td><td>anyone</td><td><code>groups</code>, one line per ticket with its group and urgency</td></tr>
 </table></div>
-<p><code>work collect</code> drains everything under <code>.se</code> into the retro folder: the log after a
-rotation, every script anyone writes, a copy of every private note, and the transcripts with their thoughts.
-It lists the tickets that close in the window with their records, the retro leaves of every group that
-merges in it, and the earlier retros. The window runs from the last retro's close commit to now, and the
+<p><code>work collect</code> takes what it names into the retro folder and nothing else, so a keep list
+that goes stale is no risk: the log after a rotation, every script anyone writes, a copy of every private
+note, and the transcripts with their thoughts. It never touches the retro folders themselves under
+<code>.se/retro/</code>, nor the hold, the box id, the config, the bin or the handover. It lists the tickets
+that close in the window with their records, the retro leaves of every group that merges in it, and the
+earlier retros, and it writes a manifest with one line per thing taken. Every line has a reader: the
+chapter readers take the log and the transcripts slice by slice, the <code>shell</code>,
+<code>refusals</code> and <code>worker</code> leaves read them whole, the <code>scripts</code> leaf judges
+the scripts, the <code>records</code> leaf reads the closed tickets, the <code>runs</code> leaf reads the
+cloud retros, <code>score</code> reads the earlier retros, and <code>unread</code> checks the manifest
+against all of them. <code>/se-retro</code> is the slash command that mints a retro and pulls it. The window
+runs from the last retro's close commit to now, and the
 verb cuts it into chapters of six hours that hold activity, with the counts per chapter written before
 anyone reads a word: prompts, tool calls, shell commands, refusals by kind, errors, tickets that move, notes
 that appear, and the median length of a thought. So the worker's thinning over a long window, which v4
@@ -954,7 +962,9 @@ not. The rest of the window is one reading, so the retro's own hand does it, lea
 <tr><td class="m">refusals</td><td>the doors' refusals, by rule</td><td>which rule fires how often, whether the rule or the hand is wrong, and which rules fire and teach nothing</td></tr>
 <tr><td class="m">records</td><td>the records of the tickets that close in the window</td><td>the steps that fail back or meet <code>refused</code> most per process, what the person steps ask and how long each waits, and what the conditions skip</td></tr>
 <tr><td class="m">worker</td><td>the counts per chapter</td><td>where errors and the length of a thought turn, and where the worker cuts scope and calls it something else</td></tr>
-<tr><td class="m">unread</td><td>everything</td><td>what stays unread, and why</td></tr>
+<tr><td class="m">scripts</td><td>every script collect took</td><td>which becomes a check, a flag or a verb, with its home, and which dies, with the reason</td></tr>
+<tr><td class="m">runs</td><td>the retro leaves of the groups that merged</td><td>what the boxes lacked and met, what repeats across runs, and what they left for a person that still stands</td></tr>
+<tr><td class="m">unread</td><td>the manifest, against what every leaf read</td><td>every line no leaf read, and why</td></tr>
 </table></div>
 <div class="scroll"><table>
 <tr><th>an improvement's home, by the order that asks the least</th><th>where</th></tr>
@@ -972,8 +982,8 @@ works, and the next one's <code>score</code> step writes what the numbers show, 
 rate. A cap, <code>work.retroCap</code>, keeps the minted list to what gets done. The group's retro is the
 small one, and the tree's retro reads it: a cloud box has nobody to ask and no earlier retro, so
 <code>field</code> and <code>score</code> belong to the desk alone, and its proposals are tickets with no
-group that the next desk retro scores like any other. A person mints a retro by hand for now; later the
-engine refuses a new iteration while notes stand open, and that refusal is what mints one.</p>
+group that the next desk retro scores like any other. A person mints a retro by hand for now, with <code>/se-retro</code>;
+later the engine refuses a new iteration while notes stand open, and that refusal is what mints one.</p>
 
 <p class="note">v4 ran this shape under two words, <code>bucket</code> on the token and <code>group/</code> on the
 branch. Now the two coincide, so one word stays: group.</p>

@@ -13,14 +13,14 @@ ask:
     says: what calls for it, as notes standing open, an iteration ending, or the owner asking
 steps:
   - name: collect
-    does: drains the box into the retro folder, cuts the window into chapters, mints a reader per chapter, and lays the rest out as files
+    does: takes what it names under .se into the retro folder, cuts the window into chapters, mints a reader per chapter, and lays the rest out as files
     by: anyone
     needs: [work collect]
     evidence:
       - name: run
         form: command
         expects: 0
-        says: work collect, which refuses while a hand holds a ticket
+        says: work collect, which refuses while a hand holds a ticket, and takes nothing it does not name
   - name: field
     does: asks what came back from real use since the last retro, and stops
     by: person
@@ -112,12 +112,30 @@ steps:
           - name: cuts
             form: list
             says: where the worker cuts scope and calls it something else, each with its moment
+      - name: scripts
+        does: judges every script collect took from the box
+        evidence:
+          - name: kept
+            form: list
+            says: each script that becomes a check, a flag or a verb, with its home
+          - name: dropped
+            form: list
+            says: each script that dies, with the reason
+      - name: runs
+        does: reads the retro leaves of the groups that merged in the window
+        evidence:
+          - name: lacked
+            form: list
+            says: what the boxes lacked and met, with what repeats across runs
+          - name: left
+            form: list
+            says: what the boxes left for a person that still stands
       - name: unread
-        does: names what the retro could not read
+        does: reads the manifest against what every leaf read
         evidence:
           - name: unread
             form: text
-            says: what could not be read, and why, so the next retro inherits no hidden gap
+            says: every line of the manifest no leaf read, and why, so the next retro inherits no hidden gap
   - name: improve
     does: mints one ticket per class, each with its home and its card
     input: mine
