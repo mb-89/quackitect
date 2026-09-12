@@ -219,6 +219,16 @@ const PAST = [
 
 const answered = { reason: "answer", answer: "", durationMs: 1, aborted: false };
 
+// [[spec/design_output/stop#the-line-ends-a-turn]]
+const STOPS = "Stop requested. Reason [the-work-stands-complete]. Nothing waits.";
+
+// [[spec/design_output/stop#the-challenge-spends-one-allowance]]
+async function endsATurn(it, answer = "done") {
+  const text = `${answer}\n\n${STOPS}`;
+  await it.raise("turn.complete", { ...answered, answer: text });
+  await it.raise("turn.complete", { ...answered, answer: text });
+}
+
 test("a session start writes one line, and registers every tool", async () => {
   const it = await started();
 
@@ -294,13 +304,13 @@ test("a turn ending with no answer writes no reply", async () => {
 // [[spec/design_output/stop#every-decision-writes-a-line]]
 test("a turn end writes one stop line", async () => {
   const it = await started();
-  await it.raise("turn.complete", { ...answered, answer: "done" });
+  await endsATurn(it);
 
   const said = it.lines().filter((one) => one.kind === "stop");
-  assert.equal(said.length, 1);
-  assert.equal(said[0].said, "the turn ends");
-  assert.match(said[0].detail, /^stop=the-session-is-new@95 continue=none@0 inARow=0$/);
-  assert.deepEqual(it.prompts, []);
+  assert.equal(said.length, 2, "the challenge writes one, and the vote the other");
+  assert.equal(said[1].said, "the turn ends");
+  assert.match(said[1].detail, /^stop=the-session-is-new@95 continue=none@0 inARow=0$/);
+  assert.equal(it.prompts.length, 1, "the challenge alone reaches the agent");
 });
 
 // [[spec/design_output/stop#holding-a-turn-open]]
@@ -311,14 +321,14 @@ test("a held branch carries the turn once the session stops being new", async ()
   for (let i = 0; i < 10; i++) {
     await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   }
-  await it.raise("turn.complete", { ...answered, answer: "a step is done" });
+  await endsATurn(it, "a step is done");
 
   const said = it.lines().filter((one) => one.kind === "stop");
-  assert.equal(said[0].said, "the turn goes on");
-  assert.match(said[0].detail, /continue=work-still-stands@80 inARow=1$/);
-  assert.equal(it.prompts.length, 1);
-  assert.match(it.prompts[0].text, /^Something on your list stands unfinished/);
-  assert.match(it.prompts[0].text, /- Does the work stand complete\?/);
+  assert.equal(said[1].said, "the turn goes on");
+  assert.match(said[1].detail, /continue=work-still-stands@80 inARow=1$/);
+  assert.equal(it.prompts.length, 2, "the challenge, and the vote holding it open");
+  assert.match(it.prompts[1].text, /^Something on your list stands unfinished/);
+  assert.match(it.prompts[1].text, /Stop requested\. Reason \[<id>\]/);
 });
 
 // [[spec/design_output/extension#the-hold-is-one-rule]]
@@ -328,12 +338,12 @@ test("the hold at stopped ends a turn the standing work would carry", async () =
     await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   }
   it.files.set(".se/config.json", JSON.stringify({ stop: { hold: "stopped" } }));
-  await it.raise("turn.complete", { ...answered, answer: "a step is done" });
+  await endsATurn(it, "a step is done");
 
   const said = it.lines().filter((one) => one.kind === "stop");
-  assert.equal(said[0].said, "the turn ends");
-  assert.match(said[0].detail, /^stop=the-owner-holds-this-session@85/);
-  assert.deepEqual(it.prompts, []);
+  assert.equal(said[1].said, "the turn ends");
+  assert.match(said[1].detail, /^stop=the-owner-holds-this-session@85/);
+  assert.equal(it.prompts.length, 1, "the challenge alone reaches the agent");
 });
 
 test("the hold at running leaves the vote as it stands", async () => {
@@ -507,14 +517,20 @@ test("a write to the per-box file reaches the next turn end", async () => {
   }
   it.files.set(".se/config.json", JSON.stringify({ stop: { mostInARow: 1 } }));
 
-  await it.raise("turn.complete", { ...answered, answer: "one step" });
-  await it.raise("turn.complete", { ...answered, answer: "another step" });
+  for (const step of ["one step", "another step", "a third step"]) {
+    await it.raise("turn.complete", { ...answered, answer: `${step}\n\n${STOPS}` });
+  }
 
   const said = it.lines().filter((one) => one.kind === "stop");
   assert.deepEqual(
     said.map((one) => one.said),
-    ["the turn goes on", "carried enough turns in a row", "the turn ends"],
-    "the tracked file says three, and the per-box file cuts it to one",
+    [
+      "the turn goes on",
+      "the turn goes on",
+      "carried enough turns in a row",
+      "the turn ends",
+    ],
+    "the challenge opens, and the per-box file cuts the carry to one",
   );
 });
 
@@ -615,7 +631,8 @@ test("the debt reaches no subagent, and holds no question to the owner", async (
   }
 });
 
-test("a claim reaches the vote, and the tooth counts it once", async () => {
+// [[spec/design_output/stop#the-line-ends-a-turn]]
+test("the line reaches the vote, and a claim without one ends nothing", async () => {
   const it = await started({
     "HANDOVER.md": "---\nstatus: held\n---\n\n# The brief\n",
   });
@@ -633,10 +650,19 @@ test("a claim reaches the vote, and the tooth counts it once", async () => {
   );
   await it.raise("turn.complete", { ...answered, answer: "the work stands complete" });
 
+  const first = it.lines().filter((one) => one.kind === "stop");
+  assert.equal(first[0].said, "claimed the-work-stands-complete");
+  assert.equal(first[1].said, "the turn goes on");
+  assert.equal(first[1].detail, "no line", "the claim alone ends no turn");
+
+  await endsATurn(it, "the work stands complete");
   const said = it.lines().filter((one) => one.kind === "stop");
-  assert.equal(said[0].said, "claimed the-work-stands-complete");
-  assert.equal(said[1].said, "the turn goes on", "work stands over a finished piece");
-  assert.match(said[1].detail, /^stop=the-work-stands-complete@45/);
+  assert.equal(said[said.length - 1].said, "the turn goes on");
+  assert.match(
+    said[said.length - 1].detail,
+    /^stop=the-work-stands-complete@45/,
+    "work stands over a finished piece",
+  );
 });
 
 // [[spec/design_output/level0#one-warning-then-a-refusal]]
@@ -1580,7 +1606,7 @@ test("a target the box refuses writes one warning, and the rest still land", asy
 // [[spec/design_output/level0#the-three-bands]]
 const BANDED = { "spec/config/level0.json": JSON.stringify({
   judge: { enabled: false },
-  stop: { enabled: true, mostInARow: 3 },
+  stop: { enabled: false, mostInARow: 3 },
   log: { level: "info" },
   answer: { warnAt: 5, ceiling: 15 },
 }) };
