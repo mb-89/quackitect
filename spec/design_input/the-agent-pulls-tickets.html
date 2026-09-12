@@ -923,7 +923,7 @@ field on a step, and the engine hands nothing back with a field empty. It reuses
 mines what <code>collect</code> lays out, leaf by leaf.</p>
 <div class="scroll"><table>
 <tr><th>step</th><th>by</th><th>evidence</th></tr>
-<tr><td class="m">collect</td><td>anyone</td><td>one command, <code>work collect</code>, which refuses while a hand holds a ticket</td></tr>
+<tr><td class="m">collect</td><td>anyone</td><td>one command, <code>work retro collect</code>, which refuses while a hand holds a ticket</td></tr>
 <tr><td class="m">field</td><td>person</td><td><code>answers</code>, one line each, and each becomes a note</td></tr>
 <tr><td class="m">score</td><td>anyone</td><td><code>scored</code>, one line per last improvement with what the numbers show and what that teaches, and <code>rate</code></td></tr>
 <tr><td class="m">notes</td><td>anyone</td><td>one command, which passes when the private folder is empty</td></tr>
@@ -933,7 +933,7 @@ mines what <code>collect</code> lays out, leaf by leaf.</p>
 <tr><td class="m">report</td><td>person</td><td><code>misses</code>, what the retro skips, and the reading itself is the gate</td></tr>
 <tr><td class="m">distribute</td><td>anyone</td><td><code>groups</code>, one line per ticket with its group and urgency</td></tr>
 </table></div>
-<p><code>work collect</code> takes what it names into the retro folder and nothing else, so a keep list
+<p><code>work retro collect</code> takes what it names into the retro folder and nothing else, so a keep list
 that goes stale is no risk: the log after a rotation, every script anyone writes, a copy of every private
 note, and the transcripts with their thoughts. It never touches the retro folders themselves under
 <code>.se/retro/</code>, nor the hold, the box id, the config, the bin or the handover. It lists the tickets

@@ -688,7 +688,7 @@ what `collect` lays out.
 
 | step | by | evidence |
 |---|---|---|
-| `collect` | anyone | one command, `work collect`, which refuses while a hand holds a ticket |
+| `collect` | anyone | one command, `work retro collect`, which refuses while a hand holds a ticket |
 | `field` | person | `answers`, one line each, and each becomes a note |
 | `score` | anyone | `scored`, one line per last improvement with what the numbers show and what that teaches, and `rate`, a command |
 | `notes` | anyone | one command, which passes when the private folder is empty |
@@ -698,7 +698,7 @@ what `collect` lays out.
 | `report` | person | `misses`, what the retro skips, and the reading itself is the gate |
 | `distribute` | anyone | `groups`, one line per ticket with its group and urgency |
 
-`work collect` takes what it names into the retro folder, and every line it
+`work retro collect` takes what it names into the retro folder, and every line it
 takes has a reader. Nothing it takes goes unread, and the `unread` leaf
 checks the manifest against the leaves to say so:
 
@@ -1142,7 +1142,7 @@ Ten branches, and the dependencies make the order binding:
 | 6 | `guidance-rides-the-step` | `reads`, the verb, the log line, the standing layer shrinks | 4 |
 | 7 | `the-work-group-draws` | the `work` group, its four controls, the count on the editor button, the beat, the notification that names questions and stale groups | 4 |
 | 8 | `level-zero-hands-over` | the brief door goes, and the controls wire up | 4 |
-| 9 | `the-retro-is-a-ticket` | `work collect`, the chapters and the counts, the files the mine leaves read, `work retro notes` and `score`, the readers as helpers, the first retro on a desk | 4, 5 |
+| 9 | `the-retro-is-a-ticket` | `work retro collect`, the chapters and the counts, the files the mine leaves read, `work retro notes` and `score`, the readers as helpers, the first retro on a desk | 4, 5 |
 | 10 | `the-cloud-run-is-a-group` | the cloud guidance around the pull, the routine takes a group, the brief's contract retires, `adopt`, the first cloud run | 4, 8, 9 |
 
 Nine briefs stand on their `work/` branches, cut from this note, and each

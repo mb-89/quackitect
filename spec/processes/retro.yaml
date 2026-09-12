@@ -16,12 +16,12 @@ steps:
   - name: collect
     does: takes what it names under .se into the retro folder, cuts the window into chapters, mints a reader per chapter, and lays the rest out as files
     by: anyone
-    needs: [work collect]
+    needs: [work retro]
     evidence:
       - name: run
         form: command
         expects: 0
-        says: work collect, which refuses while a hand holds a ticket, and takes nothing it does not name
+        says: work retro collect, which refuses while a hand holds a ticket, and takes nothing it does not name
   - name: field
     does: asks what came back from real use since the last retro, and stops
     by: person
