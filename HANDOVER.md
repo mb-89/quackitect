@@ -7,58 +7,103 @@ depends_on: [the-ticket-has-a-schema]
 
 # Where it stands
 
-The design input `spec/design_input/the-agent-pulls-tickets.md` says what the
-owner asks for, and the page beside it draws it. Read the note first. It
-stands on the branch `claude/relaxed-knuth-f0uk4d` until the owner merges it,
-so take that branch in where `work sync` leaves it absent.
+This branch stands green on `./RUNME.sh check`, with 809 tests passing and 12
+placeholders at warning. It carries trunk as of the merge of
+`work/a-red-push-meets-git`.
 
-This branch turns the brief on a branch into a group of tickets on a branch.
-A group is a ticket under the `group` process, and its children are the
-tickets naming it under `group`. The schema branch lands a group schema of its
-own, because its brief predates that ruling. This branch removes it, and the
-design is the newer of the two. Its chapters are A group is a branch, and
-What a person sees.
+A group is a ticket now. `spec/schemas/group.schema.yaml` goes, no file names a
+group kind, and `src/scripts/group.js` reads a group off
+`spec/tickets/<name>.md`. The verbs in `src/scripts/work.js` take it, list it,
+close it, merge it, and adopt a brief into it.
+`spec/design_output/work.md` says the whole of it.
 
-| what stands today | where |
+| the row the brief names | where it lands |
 |---|---|
-| the work verbs over a brief | `src/scripts/work.js`: `new`, `take`, `sync`, `done`, `release`, `merge`, `close`, `list`, `collect` |
-| the claim, which is a push of `status: held` | `work take` |
-| the merge, which merges and prints "run check" | `work merge`, and it runs no check |
-| the rules the verbs follow | `spec/design_output/work.md` |
-| five brief branches at `todo` | `work list` |
+| the group ticket | `spec/tickets/a-group-is-a-branch.md`, with one child beside it |
+| the group schema goes | `spec/schemas`, `.vale.ini`, `test/contract/ticket.test.js` |
+| `take` over a group | `claimGroup` in `work.js`, and two cases in `work.test.js` |
+| held derives | `groupStanding` in `work.js`, off `heldIn` in `group.js` |
+| `work list` | `list`, `rowOf` and `looseRows` in `work.js` |
+| the stale rule | `rowOf` and `letGo` in `work.js`, under `work.staleAfter` |
+| `work merge` runs the check | `checkSays` in `work.js`, which resets trunk on red |
+| the moved trunk copy | `movedOnTrunk` in `work.js`, which names the lines |
+| the merge frees the tickets | `freeChildren` in `work.js` |
+| a box leaves | `leaves` in `work.js`, which writes `gave` and shuts the group |
+| `work close` | unchanged, and a case holds it over a group branch |
+| `work adopt <brief>` | `adopt` and `minted` in `work.js` |
+| the config | `work.staleAfter` in `spec/config/level0.json`, default `12h` |
+
+Two rulings this branch makes, which the design leaves to whoever writes it:
+
+| the ruling | why |
+|---|---|
+| a brief wins while `HANDOVER.md` stands, in `list` and in `done` alike | `work adopt` dropping that file is the one switch, so the brief queue drains first |
+| the hand reads `box <id>` off `.se/copy.json` | a ticket travels, and the private rule refuses a person's name in a tracked file |
+
+The hand id proper belongs to `a-step-changes-hands`, which names the session
+and the agent beside the box.
 
 # What waits
 
 | the piece | where | proves it |
 |---|---|---|
-| the group ticket | `spec/tickets/<name>.md` | it passes the ticket schema, and carries the `group` route from `spec/processes/group.yaml` |
-| the group schema goes | `spec/schemas/group.schema.yaml`, and what reads it in `lib/` and `.vale.ini` | no file names a group kind, and `check` stays green |
-| `work take` over a group | `work.js` | it writes the hand and `took` into the group's record and pushes, and a second take fails on the push |
-| held derives | `work list` | a group holds where its newest record entry carries `took` and no `gave` |
-| `work list` | `work.js` | one row per group and per loose ticket, the age of each held tip, and a brief told apart by `HANDOVER.md` at its tip |
-| the stale rule | `work list` | a held group older than `work.staleAfter` stands under yours with release, take and close |
-| `work merge` | `work.js` | it runs the check on the merge commit and undoes it on red |
-| the moved trunk copy | `work merge` | it refuses where trunk's copy of a ticket or the group note differs from the branch point, and names the lines |
-| the merge frees the tickets | `work merge` | an open child of a merged group loses its `group` |
-| a box leaves | `work.js` | the last leaf writes `gave`, closes the group as `done` where every child stands closed, and leaves it open otherwise |
-| `work close` | `work.js` | it drops the branch after the merge |
-| `work adopt <brief>` | `work.js` | a brief branch becomes a group ticket and one child |
-| the config | `spec/config/level0.json` | `work.staleAfter` reads, default `12h` |
+| the pull hands out a child | `the-agent-pulls-a-ticket` | a ticket at an agent step comes back from the pull |
+| `list` names the tickets inside a held group | `spec/tickets/the-verbs-read-a-group.md` | a row per ticket of the group, under the group's row |
+| `process_hash` at the mint | `a-process-is-a-route` | `adopt` writes the route and no hash, so a reroute reads nothing |
+| the group's `split` leaf runs | `the-agent-pulls-a-ticket` | `adopt` mints one child, and `split` mints the rest |
+| the brief's contract retires | `the-box-runs-the-route` | `withContract` still writes the seven steps |
 
-# The rules to hold
+`work adopt` runs on no branch in this tree yet, because every brief branch
+standing is somebody's work in flight. Run it on the first branch a person
+wants moved, and read `spec/design_output/work#a-brief-becomes-a-group` first.
 
-- The branch is the claim, and the branch is the filter.
-- Trunk hands out no group's ticket. A person on trunk sees the loose ones.
-- A group of one ticket is the ordinary case.
-- There is no lease. A stale group is implicitly a person's, and the rule derives from the tip.
-- `tickets` is a standing condition: the pull hands out a child whenever one stands at an agent step.
-- `take` keeps serving a brief until `work list` names none.
+# What surprises me
 
-# The tests
+**Trunk moves twice under this branch, and the second move costs a conflict.**
 
-`work.js` runs under the fake doors, so every verb takes a test beside the
-ones standing in `test/`. Add one per row above, and one for the rejected
-push. Run `./RUNME.sh check` before every push.
+| the moment | what it says |
+|---|---|
+| the first `./RUNME.sh check` | the tree stands red, and the red belongs to trunk |
+| `work sync` at the end | `a-process-is-a-route` and `a-red-push-meets-git` both land |
+| the conflict | two schema files, and both carry a fix this branch already makes |
+
+The resolution is cheap, because the two fixes agree. An hour of work on top of
+them turns it expensive. The contract's step 1 earns its shouting.
+
+**The red trunk costs two boxes the same work.** `spec/processes/chapter.yaml`
+and `standard.yaml` break the process schema on arrival: the schema names no
+`name`, `for` or `ask`, and the files carry all three. The design branch and the
+schema branch each land a half of it.
+
+- this branch fixes it minimally, because `work done` reads the battery first
+- `a-process-is-a-route` then lands the proper fix, and the merge takes mine out
+- `work take` says nothing about a red trunk, so the next box pays the same toll
+
+**The write door is the best part of this tree and the slowest to learn.** Four
+attempts buy one commit message, and three buy one chapter of
+`spec/design_output/work.md`. Every refusal is right, and the refusal names the
+line and the rule, so a second try lands.
+
+| the rule a draft breaks | how it reads |
+|---|---|
+| Shape | a run of more than three paragraphs with no list or table between them |
+| Markup | a heading past five words |
+| Modal | `may` and `would`, where the register holds can, must and will |
+| PastTense | the participle the tagger finds in `closed`, `shuts` and `moved` |
+| Private | an address in a commit message, which the harness asks for |
+
+**Two dead ends, each one a door holding a rule this branch meets late:**
+
+| the dead end | what stands in the way | the way out |
+|---|---|---|
+| the attribution trailers | the private rule refuses the address the harness asks for | the tree's rule wins, so these commits carry no trailer |
+| re-minting a ticket | `mint_note` refuses a path that stands, and the ticket door refuses a hand's Ask on an open ticket | delete the file and mint it again, because `state: draft` is the one window |
+
+**The fake process door stays quiet where it can speak.** `fakeGit` seeds the
+key `git`, so the fake answers an empty success for any git command nobody
+teaches it. A new git call in `work.js` then reads as a success in every old
+case. `tipAge` and `ticketsOn` both go in that way, unseen. A fake that refuses
+an untaught `git ls-tree` says so at once.
 
 ## How this branch runs
 
