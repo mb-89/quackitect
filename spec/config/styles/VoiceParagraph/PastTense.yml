@@ -14,12 +14,14 @@ exceptions:
   - buys
   - complicated
   - held
+  - missing
   - numbered
   - read
   - red
   - refused
   - settled
   - skips
+  - standing
   - switched
 tokens:
   - tag: VBD

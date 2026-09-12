@@ -7,5 +7,5 @@ link: spec/funnel/a-paragraph-has-a-schema.md
 level: error
 nonword: true
 swap:
-  "\\betc\\.": "and so on"
-  "\\bEtc\\.": "And so on"
+  '\betc\.': "and so on"
+  '\bEtc\.': "And so on"

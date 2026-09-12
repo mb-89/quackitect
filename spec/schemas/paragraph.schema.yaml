@@ -90,6 +90,10 @@ layers:
         reason: an imperative here, and the tagger reads a past tense
       - word: approved
         reason: an adjective here, on a word list
+      - word: missing
+        reason: an adjective here, and the tagger reads a progressive
+      - word: standing
+        reason: a gerund here, and the tagger reads a progressive
 
   vocabulary:
     words: spec/vocabulary/words.yml

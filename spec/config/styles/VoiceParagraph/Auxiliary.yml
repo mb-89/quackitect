@@ -6,6 +6,55 @@ message: "Write the simple tense and name the time: '%s %s'."
 link: spec/funnel/a-paragraph-has-a-schema.md
 level: error
 ignorecase: true
+exceptions:
+  - had add
+  - had approved
+  - had bold
+  - had bound
+  - had buys
+  - had complicated
+  - had held
+  - had missing
+  - had numbered
+  - had read
+  - had red
+  - had refused
+  - had settled
+  - had skips
+  - had standing
+  - had switched
+  - has add
+  - has approved
+  - has bold
+  - has bound
+  - has buys
+  - has complicated
+  - has held
+  - has missing
+  - has numbered
+  - has read
+  - has red
+  - has refused
+  - has settled
+  - has skips
+  - has standing
+  - has switched
+  - have add
+  - have approved
+  - have bold
+  - have bound
+  - have buys
+  - have complicated
+  - have held
+  - have missing
+  - have numbered
+  - have read
+  - have red
+  - have refused
+  - have settled
+  - have skips
+  - have standing
+  - have switched
 tokens:
   - pattern: '(?:have|has|had)'
     tag: VB*

@@ -15,8 +15,7 @@ export const COMMANDS = "config commands";
 // [[spec/design_output/projection#the-second-target]]
 export { PARAGRAPH } from "./paragraph.js";
 
-// A shape says which extension its target folder holds, so the compare reads
-// the files the projector writes and no other.
+// [[spec/design_output/projection#a-shape-says-its-ending]]
 const HOLDS = new Map([
   [COMMANDS, ".md"],
   [PARAGRAPH, RULES],
@@ -90,7 +89,7 @@ function paragraphsOf(entry, texts) {
   return out;
 }
 
-// [[spec/design_output/projection#a-missing-layer-fails-the-check]]
+// [[spec/design_output/projection#a-missing-layer-fails]]
 export function faultsIn(entry, texts) {
   if (entry?.shape !== PARAGRAPH) return [];
   const source = texts.get(entry.from);

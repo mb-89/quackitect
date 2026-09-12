@@ -9,11 +9,11 @@ nonword: true
 action:
   name: replace
 swap:
-  "\\be\\.g\\.": "for example"
-  "\\bE\\.g\\.": "For example"
-  "\\bi\\.e\\.": "that is"
-  "\\bI\\.e\\.": "That is"
-  "\\bviz\\.": "namely"
-  "\\bViz\\.": "Namely"
-  "\\bcf\\.": "compare"
-  "\\bCf\\.": "Compare"
+  '\be\.g\.': "for example"
+  '\bE\.g\.': "For example"
+  '\bi\.e\.': "that is"
+  '\bI\.e\.': "That is"
+  '\bviz\.': "namely"
+  '\bViz\.': "Namely"
+  '\bcf\.': "compare"
+  '\bCf\.': "Compare"

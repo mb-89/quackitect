@@ -34,13 +34,15 @@ script: |
     if text.has_prefix(trimmed, "#") { continue }
     if text.has_prefix(trimmed, ">") { continue }
 
-    seen := text.re_find("`[^`]*`", row.said, -1)
-    if is_undefined(seen) { continue }
-    if len(seen) > 4 {
-      matches = append(matches, {
-        begin: row.begin,
-        end: row.end,
-        message: "A sentence holds 4 code spans, and this line holds " + string(len(seen)) + ". Carry the rest as a list or a table."
-      })
+    for part in text.re_split(`[.!?]+(?:\s|$)`, row.said, -1) {
+      seen := text.re_find("`[^`]*`", part, -1)
+      if is_undefined(seen) { continue }
+      if len(seen) > 4 {
+        matches = append(matches, {
+          begin: row.begin,
+          end: row.end,
+          message: "A sentence holds 4 code spans, and this one holds " + string(len(seen)) + ". Carry the rest as a list or a table."
+        })
+      }
     }
   }

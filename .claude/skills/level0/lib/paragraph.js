@@ -7,8 +7,7 @@ export const PARAGRAPH = "paragraph rules";
 export const RULES = ".yml";
 export const LINK = "spec/funnel/a-paragraph-has-a-schema.md";
 
-// The schema names a mark and this says which character it is, because the
-// YAML reader splits a scalar on a colon.
+// [[spec/design_output/projection#the-schema-names-a-mark]]
 const MARKS = new Map([
   ["full stop", "."],
   ["comma", ","],
@@ -25,8 +24,11 @@ const MARKS = new Map([
   ["plus", "+"],
 ]);
 
-// Every modal English holds. The register admits a few of them, and this rule
-// refuses the rest.
+// [[spec/design_output/projection#the-grammar-rules]]
+const PERFECT = ["have", "has", "had"];
+const BEING = ["am", "are", "is", "was", "were", "be", "been", "being"];
+
+// [[spec/design_output/projection#the-grammar-rules]]
 const MODALS = [
   "can",
   "could",
@@ -40,9 +42,7 @@ const MODALS = [
   "would",
 ];
 
-// A contraction has one written-out form, so the action is a replacement. Each
-// token captures its first letter and the swap writes it back, so a fix keeps
-// the case the line carries.
+// [[spec/design_output/projection#the-grammar-rules]]
 const CONTRACTIONS = [
   ["(c)an't", "$1annot"],
   ["(w)on't", "$1ill not"],
@@ -65,9 +65,7 @@ const CONTRACTIONS = [
   ["(i)t'll", "$1t will"],
 ];
 
-// Each short form here introduces what follows, so it reads the same wherever
-// it stands. The reading opens on a different letter, so a capture group
-// carries no case and each token stands twice.
+// [[spec/design_output/projection#the-grammar-rules]]
 const LATIN = [
   ["\\be\\.g\\.", "for example"],
   ["\\bE\\.g\\.", "For example"],
@@ -79,15 +77,13 @@ const LATIN = [
   ["\\bCf\\.", "Compare"],
 ];
 
-// The short form for `and so on` ends a sentence as often as it stands inside
-// one, and Vale reads one replacement per matched text. So this one carries no
-// action and a person writes it out.
+// [[spec/design_output/projection#the-grammar-rules]]
 const ET_CETERA = [
   ["\\betc\\.", "and so on"],
   ["\\bEtc\\.", "And so on"],
 ];
 
-// [[spec/design_output/projection#a-missing-layer-fails-the-check]]
+// [[spec/design_output/projection#a-missing-layer-fails]]
 export function faultsOf(said, shape) {
   if (!shape || typeof shape !== "object") return [];
   return faultsUnder(said ?? {}, shape, "");
@@ -187,11 +183,7 @@ function scripted(message, lines) {
   return `${head(message)}\n${lines.map((one) => `  ${one}`.trimEnd()).join("\n")}\n`;
 }
 
-// Every script rule reads the raw scope, so it first blanks what stands
-// outside every layer: a fence, a code span, the frontmatter, a link and a
-// path. The blank keeps the length, so an offset still points at the line it
-// came from.
-// A rule takes the helpers it calls and no others.
+// [[spec/design_output/projection#what-stands-outside-a-layer]]
 function prelude(wanted, blanks = true) {
   const held = new Map(HELPERS);
   const names = blanks ? ["blanked", "plain", ...wanted] : wanted;
@@ -289,18 +281,17 @@ const HELPERS = new Map([
   ],
 ]);
 
-// A Tengo literal for a text this module writes into a script.
+// [[spec/design_output/projection#the-second-target]]
 function quoted(said) {
   return JSON.stringify(String(said));
 }
 
-// The words a layer leaves standing. An entry names a word and the reason it
-// stays, and the retro reads the list.
+// [[spec/design_output/projection#the-grammar-rules]]
 function left(layer) {
   return (layer?.exceptions ?? []).map((one) => String(one?.word ?? one)).filter(Boolean);
 }
 
-// One word, as a regular expression matching that word and nothing around it.
+// [[spec/design_output/projection#the-grammar-rules]]
 function pattern(said) {
   return said.replace(/[\\^$.|?*+()[\]{}]/g, "\\$&");
 }
@@ -321,7 +312,6 @@ function characters(layer) {
     "said = blanked(said, `(?m)^[ \\t]*> ?`)",
     "said = blanked(said, `\\|`)",
     "said = blanked(said, `[*_]`)",
-    // The retro grows this list, one word and one reason each.
     ...left(layer).map((one) => `said = blanked(said, ${quoted(pattern(one))})`),
     "",
     `found := text.re_find(\`[^\\pL\\pN\\s${escaped(set)}]\`, said, -1)`,
@@ -401,9 +391,7 @@ function markup(layer) {
 }
 
 
-// The run of paragraphs. A raw scope reads the whole file, so this rule reaches
-// prose alone and the section for code turns it off.
-// [[spec/design_output/projection#the-second-target]]
+// [[spec/design_output/projection#a-layer-writes-two-files]]
 function run(layer, where) {
   const most = Number(layer.paragraphsPerRun ?? 3);
 
@@ -461,9 +449,7 @@ function run(layer, where) {
   ]);
 }
 
-// The sentences one paragraph holds. Vale scopes this one, so it reaches a
-// comment as well as a paragraph of prose.
-// [[spec/design_output/projection#the-second-target]]
+// [[spec/design_output/projection#a-layer-writes-two-files]]
 function paragraph(layer, where) {
   const most = Number(layer.sentencesPerParagraph ?? 6);
   return counted(
@@ -474,8 +460,7 @@ function paragraph(layer, where) {
   );
 }
 
-// The words one sentence holds, in the same scope Vale gives the tagger.
-// [[spec/design_output/projection#the-second-target]]
+// [[spec/design_output/projection#a-layer-writes-two-files]]
 function sentence(layer) {
   const most = Number(layer.words?.max ?? 25);
   return counted(
@@ -486,9 +471,7 @@ function sentence(layer) {
   );
 }
 
-// A list item takes a tighter cap and no scope names one, so this rule walks
-// the raw text and reaches prose alone.
-// [[spec/design_output/projection#the-second-target]]
+// [[spec/design_output/projection#a-layer-writes-two-files]]
 function listItem(layer) {
   const most = Number(layer.words?.listItem ?? 20);
 
@@ -520,9 +503,7 @@ function listItem(layer) {
   ]);
 }
 
-// The code spans one sentence holds. A table row and a heading carry no
-// sentence, so the count reads a line of prose and a list item.
-// [[spec/design_output/projection#the-second-target]]
+// [[spec/design_output/projection#a-layer-writes-two-files]]
 function codeSpans(layer) {
   const most = Number(layer.codeSpans ?? 4);
 
@@ -541,14 +522,16 @@ function codeSpans(layer) {
     '  if text.has_prefix(trimmed, "#") { continue }',
     '  if text.has_prefix(trimmed, ">") { continue }',
     "",
-    '  seen := text.re_find("`[^`]*`", row.said, -1)',
-    "  if is_undefined(seen) { continue }",
-    `  if len(seen) > ${most} {`,
-    "    matches = append(matches, {",
-    "      begin: row.begin,",
-    "      end: row.end,",
-    `      message: "A sentence holds ${most} code spans, and this line holds " + string(len(seen)) + ". Carry the rest as a list or a table."`,
-    "    })",
+    "  for part in text.re_split(`[.!?]+(?:\\s|$)`, row.said, -1) {",
+    '    seen := text.re_find("`[^`]*`", part, -1)',
+    "    if is_undefined(seen) { continue }",
+    `    if len(seen) > ${most} {`,
+    "      matches = append(matches, {",
+    "        begin: row.begin,",
+    "        end: row.end,",
+    `        message: "A sentence holds ${most} code spans, and this one holds " + string(len(seen)) + ". Carry the rest as a list or a table."`,
+    "      })",
+    "    }",
     "  }",
     "}",
   ]);
@@ -568,9 +551,7 @@ function counted(message, scope, token, most) {
 }
 
 
-// The tagger misreads a heading, a table cell and a quoted command, so this
-// layer stays a blacklist inside the whitelist and the schema carries the
-// exceptions the retro grows.
+// [[spec/design_output/projection#the-grammar-rules]]
 function grammar(layer) {
   const out = new Map();
   const left = (layer.exceptions ?? []).map((one) => String(one?.word ?? one)).sort();
@@ -582,16 +563,18 @@ function grammar(layer) {
       "Auxiliary.yml",
       sequenced(
         "Write the simple tense and name the time: '%s %s'.",
-        ["(?:have|has|had)", "VB*"],
+        PERFECT,
         "VBN",
+        left,
       ),
     );
     out.set(
       "Progressive.yml",
       sequenced(
         "Write the simple tense: '%s %s'.",
-        ["(?:am|are|is|was|were|be|been|being)", "VB*"],
+        BEING,
         "VBG",
+        left,
       ),
     );
   }
@@ -663,16 +646,19 @@ function grammar(layer) {
   return out;
 }
 
-function sequenced(message, first, tag) {
+// [[spec/design_output/projection#the-grammar-rules]]
+function sequenced(message, heads, tag, left = []) {
+  const said = heads.flatMap((head) => left.map((one) => `${head} ${one}`)).sort();
   return [
     "extends: sequence",
     `message: ${JSON.stringify(message)}`,
     `link: ${LINK}`,
     "level: error",
     "ignorecase: true",
+    ...(said.length ? ["exceptions:", ...said.map((one) => `  - ${one}`)] : []),
     "tokens:",
-    `  - pattern: '${first[0]}'`,
-    `    tag: ${first[1]}`,
+    `  - pattern: '(?:${heads.join("|")})'`,
+    "    tag: VB*",
     `  - tag: ${tag}`,
     "",
   ].join("\n");
@@ -688,9 +674,14 @@ function swapped(message, pairs, how) {
     ...(how.nonword ? ["nonword: true"] : []),
     ...(how.replace ? ["action:", "  name: replace"] : []),
     "swap:",
-    ...pairs.map(([from, to]) => `  ${JSON.stringify(from)}: ${JSON.stringify(to)}`),
+    ...pairs.map(([from, to]) => `  ${single(from)}: ${JSON.stringify(to)}`),
     "",
   ].join("\n");
+}
+
+// [[spec/design_output/projection#the-grammar-rules]]
+function single(said) {
+  return `'${String(said).split("'").join("''")}'`;
 }
 
 function escaped(set) {

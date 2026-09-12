@@ -14,7 +14,7 @@ brief. The branch is the unit, and a session works it whole.
 
 # Two handovers
 
-| file | tracked | who reads it | where it may stand |
+| file | tracked | who reads it | where it can stand |
 |---|---|---|---|
 | `.se/HANDOVER.md` | no | the next session on this box | anywhere |
 | `HANDOVER.md` | yes | whoever works the branch | a work branch alone |
@@ -69,7 +69,7 @@ branch reads it and knows how to finish.
 
 `work sync` merges `origin/main` into the branch. `work take` runs it, so a
 routine pays nothing to remember it. A conflict then stops the take, while the
-work it would cost still sits ahead.
+work it costs still sits ahead.
 
 # A box landing on trunk
 
@@ -145,7 +145,7 @@ mints holds to its schema. [[spec/schemas]]
 
 | the stamp says | done answers |
 |---|---|
-| nothing at all | no check has run here |
+| nothing at all | no check runs here |
 | another commit | the check names that one instead |
 | an unclean tree | the check reads what the commit lacks |
 | red | the check says red, with the time |
