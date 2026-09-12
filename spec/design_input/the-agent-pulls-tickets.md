@@ -409,9 +409,9 @@ git, which is the half of v4's test map that a branch already carries.
 # Processes are routes
 
 A process is a route the mint copies onto a ticket. Level one ships four for
-tickets and one for a group, as YAML files under `spec/processes/`, each under
-`process.schema.yaml` and holding the ask's hints under `ask` and the route
-under `steps`, and nothing more:
+tickets and one for a group, as YAML files under `spec/processes/`. Each
+stands under `process.schema.yaml` and holds the ask's hints under `ask`, the
+route under `steps`, and nothing more:
 
 | process | route | for |
 |---|---|---|
@@ -435,9 +435,9 @@ Its one step, `decide`, is where a retro reads it later and says what it
 becomes. The step closes the note as `dropped`, or as `done` where the answer
 is small enough to do on the spot. Or it closes the note as `became`, and
 names the tracked ticket the mint cuts from it. Anyone mints a note, and a
-retro decides it: the step says `by: retro`, and a hand at a retro step is the
-one hand the pull hands a note to. A group's retro decides the notes its box
-minted, and the tree's retro decides the rest. A note that stays behind on a
+retro decides it. The step says `by: retro`, and a hand at a retro step is
+the one hand the pull hands a note to. A group's retro decides the notes its
+box minted, and the tree's retro decides the rest. A note that stays behind on a
 cloud box dies with it.
 
 A note also answers. The answer door holds every tool call until the owner's
