@@ -18,9 +18,8 @@ The drawing is a projection.
 
 | what stands today | where |
 |---|---|
-| the projections, one entry each | `spec/config/projections.json`, and `.claude/skills/level0/lib/projection.js` |
-| the write door, which refuses a hand edit to a target | `.claude/skills/level0/hooks/level0.js` |
 | the log, one row per event | `.se/log/session.jsonl`, through `lib/log.js` |
+| the extension and its webview, where the editor draws | `src/extension/` |
 | the hold this branch reads | none yet, since the pull is a later branch |
 
 # What waits
@@ -33,9 +32,7 @@ The drawing is a projection.
 | `work reroute <ticket>` | `src/scripts/work.js` | it recopies the leaves not yet reached, and refuses a `step` the new route lacks |
 | `work note <name> <line>` | `src/scripts/work.js` | it writes a private note with `from`, and a `note` row in the log |
 | the six slots and their checks | `lib/schema.js` and `lint` | an orphan output, an unfed input and a route with both refuse |
-| the emitter | one module the projection and the editor share | a route and a record answer a graph, and the graph answers a Mermaid fence |
-| the projected drawing | `spec/processes/<name>.md`, one row in `projections.json` | the door refuses a hand edit, and a stale drawing fails `check` |
-| `work show <ticket>` | `src/scripts/work.js` | it prints the graph as text |
+| the emitter | one module beside the verbs, which the editor reads | a route and a record answer a graph, with a test per node and edge kind |
 
 # The graph
 
@@ -46,10 +43,11 @@ The emitter answers a graph and no picture:
 - a dotted node for `when`, and a marked node for a person step
 - for a ticket, the pointer, the skips and the returns off the record
 
-The Mermaid fence follows v1's rules: nodes before edges, every edge with a
-label, no coordinates. The fence carries classes and no colours, since the
-extension's one style sheet holds the style. Spend nothing on graphical
-design here, because that is desk work with the owner.
+The editor is the one reader of the graph, and it draws it live from the
+file at every open. The graph follows v1's rules: nodes before edges, every
+edge with a label, no coordinates. Spend nothing on graphical design here,
+because the extension's one style sheet holds the style and that is desk
+work with the owner.
 
 # The note answers
 
