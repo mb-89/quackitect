@@ -484,14 +484,14 @@ because `canary` builds it in `lib/guidance.js` and both callers read it there.
 
 ## The canary owes a debt
 
-The log alone holds nobody. A session that never says the line runs to the end
-unheld, and the owner reads the failure afterwards or never. So the sentence
-carries a debt, and the cage holds the session to it.
+The log alone holds nobody. A session skipping the line runs free to the end,
+and the owner reads the failure long afterwards. So the sentence carries a
+debt, and the cage holds the session to it.
 
 The debt opens where the first `turn.complete` carries an answer the canary is
 absent from. `canaryIn` answers `same`, `other` or `none`, and `same` alone
-pays: a line with other counts comes out of a block that never reached the
-session, so it owes what silence owes.
+pays. A line with other counts comes out of a block the session lacks, so it
+owes what silence owes.
 
 While the debt stands, `tool.call` behaves the way the owner's prompt door
 behaves. For details, see [[spec/design_output/level0#one-warning-then-a-refusal]].
@@ -499,20 +499,21 @@ behaves. For details, see [[spec/design_output/level0#one-warning-then-a-refusal
 | the call | what it meets | the `gate` line |
 |---|---|---|
 | the first | a warning after its result | `warned <tool> before the canary` |
-| every one after | a refusal naming the line it owes | `refused <tool> before the canary` |
+| every one after | a refusal naming the debt | `refused <tool> before the canary` |
 
 The refusal carries the sentence itself, so the session reads what to say. Any
-later answer holding it clears the debt, writes the `info` line the whole
-canary writes, and every call passes again.
+later answer holding it clears the debt. That answer writes the `info` line the
+whole canary writes, and every call passes again.
 
-Two roads stay open, because a debt this session owes reaches neither. A
-subagent carries no canary of its own, and `AskUserQuestion` is the road to the
-owner. `godPasses` wraps the door, so the binding at `god` passes the refusal
-like every other.
+Two roads stay open, because this session's own debt reaches past both:
+
+- a subagent carries a canary of its own, so `e.agentId` passes
+- `AskUserQuestion` is the road to the owner, so `reachesTheOwner` passes
+- `godPasses` wraps the door, so the binding at `god` passes the refusal
 
 The probe after a compaction pays nothing. It reads the canary through
-`heardCanary` on a session that said the line once already, so no second debt
-opens.
+`heardCanary` on a session holding the line already, so a second debt stays
+shut.
 
 ## The helper takes the guidance
 

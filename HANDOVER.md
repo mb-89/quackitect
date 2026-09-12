@@ -11,7 +11,7 @@ tool call and a refusal on every one after.
 
 `./RUNME.sh check` answers 0 on client 2.1.269.
 
-| the piece | where it landed |
+| the piece | where it stands |
 |---|---|
 | the debt opens on a first answer missing the line | `hooks/level0.js`, `turn.complete` |
 | a later answer holding the line clears it | the same hook |
@@ -30,11 +30,12 @@ Nothing on this branch. Merge it and close it.
 
 # What surprises me
 
-The canary carried no tooth at all. `heardCanary` wrote a warning and the
-session ran on. Every other rule in this tree bites at a door, so the one rule
-proving the cage holds a session was the one rule holding nothing.
+The canary carries no tooth at all before this branch. `heardCanary` writes a
+warning and the session runs on. Every other rule in this tree bites at a door.
+So the one rule proving the cage holds a session is the one rule holding
+nothing.
 
-The box ran client 2.1.266 while the design measured `session.compact` against
-2.1.269, so the plugin validator refused the module and the battery read red.
-The owner took the client to 2.1.269 and the battery went green. The code wants
-no change.
+The box starts this branch on client 2.1.266. The design measures
+`session.compact` against 2.1.269, so the plugin validator refuses the module
+and the battery reads red. The owner takes the client to 2.1.269, the battery
+turns green, and the code wants no change.
