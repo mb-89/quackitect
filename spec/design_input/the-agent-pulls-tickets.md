@@ -141,6 +141,10 @@ differs: its own reads, its own hand rule, and the form of its evidence.
                 says: pass or fail, with findings one a line
       - name: implement
         reads: [[spec/guidance/code/testing]]
+        checklist:
+          - the change touches no file the ask leaves out
+          - every door the change reaches has a fake
+          - a comment names the note the change implements
         steps:
           - name: tests-red
             evidence:
@@ -151,6 +155,12 @@ differs: its own reads, its own hand rule, and the form of its evidence.
               - name: seen
                 form: text
                 says: what you see, and what surprises you
+          - name: reflect
+            when: returned
+            evidence:
+              - name: class
+                form: text
+                says: the class of error the findings describe, and the fix for the class
           - name: change
             reads: [[spec/guidance/code/code]]
             evidence:
@@ -170,7 +180,7 @@ differs: its own reads, its own hand rule, and the form of its evidence.
                 says: the check is green on the commit
       - name: verdict
         by: not implement
-        on_fail: implement/change
+        on_fail: implement/reflect
         reads: [[spec/guidance/review/reviewing]]
         evidence:
           - name: read
@@ -188,6 +198,8 @@ differs: its own reads, its own hand rule, and the form of its evidence.
 | `reads` | links to the guidance notes the step's hand reads |
 | `on_fail` | an earlier step, where a failed hand-back sends the ticket |
 | `asks` | the question a person answers, on a step a person takes, with `options` where one word answers it |
+| `when` | `returned`, `cloud` or `desk`, and the pull skips the leaf where it fails to hold |
+| `checklist` | what a hand has to do here, one item a line, which the retro grows |
 | `evidence` | the fields a leaf's hand fills, each with a name, a form and a `says` |
 
 Four rules hold the tree together:
@@ -197,6 +209,32 @@ Four rules hold the tree together:
 - `not implement` excludes the hand of every leaf the mint puts under `implement`, and `on_fail: implement` sends the ticket to that phase's first leaf.
 - `step` names a leaf by its path, as `implement/tests-red`.
 - A leaf with no `on_fail` fails back to itself, and an inserted step counts for no `not`.
+- A checklist adds up from the phases above, the way reads do, and the leaf answers it in a field it takes without naming one, `checked`.
+- The pull skips a leaf whose `when` fails to hold, and the engine writes `skipped` and the reason into the record.
+
+| `when` | holds where |
+|---|---|
+| `returned` | the ticket arrives at this leaf by an `on_fail` |
+| `cloud` | the box runs under the cloud guidance |
+| `desk` | a person's box |
+
+So `reflect` runs on the way back from a failed verdict alone. It asks for
+the class of error the findings describe and the fix for that class. So the
+fix reaches the class and no single instance. The list of conditions is the
+engine's, and a route names one or none.
+
+A checklist is what a hand has to do at this step, and it stands in the
+process, where guidance stays general:
+
+| moment | the checklist |
+|---|---|
+| the hand-out | the `work` answer carries it, so the hand knows what it has to do |
+| the hand-back | one line per item, on how the hand takes it into account |
+| the retro | grows it, so the items are the tree's memory of what goes wrong |
+
+A hand reads the items as institutional knowledge, and no tick answers one.
+The first process the tree writes shows how they bake in. Until the judge
+reads the lines, the tree trusts the hand.
 
 The chapters follow the tree. A phase's chapter holds its steps' chapters and
 nothing else. A leaf's chapter holds its evidence and nothing else, so a
@@ -253,6 +291,7 @@ sees what goes where, and an agent meets the same slots.
 | `link` | a link or a path | it resolves in the tree or on the branch |
 | `files` | the files read, one a line | every file the branch changes since the ticket's first take stands in it |
 | `choice` | one of the words `options` names | it is one of them |
+| `checklist` | one line per item of the step's checklist, on how you take it into account | a line stands for every item, and the judge reads them against the items |
 | `verdict` | `pass` or `fail`, then findings one a line | one of the two words, and findings where it fails |
 
 `expects` names what a command must answer: an exit code, or a word the verb
@@ -323,9 +362,9 @@ git, which is the half of v4's test map that a branch already carries.
 
 # Processes are routes
 
-A process is a route the mint copies onto a ticket. Level one ships three,
-under `spec/processes/`, each a note of kind `process` holding a `steps` list
-and nothing more:
+A process is a route the mint copies onto a ticket. Level one ships four for
+tickets and one for a group, under `spec/processes/`, each a note of kind
+`process` holding a `steps` list and nothing more:
 
 | process | route | for |
 |---|---|---|
@@ -383,20 +422,68 @@ row by row.
 # A group is a branch
 
 A group is the unit a box works and the unit that lands. It is a branch named
-`work/<group>`, and a note of kind `group` under `spec/groups/` holding its
-state and its ask:
+`work/<group>`, and a note of kind `group` under `spec/groups/`. The note
+holds its state, its ask and a route of its own, which the `group` process
+copies onto it:
 
     ---
     kind: [[group]]
     state: todo
     urgency: soon
+    process: [[group]]
+    steps:
+      - name: sync
+        when: cloud
+        evidence:
+          - name: sync
+            form: command
+            expects: 0
+            says: work sync, so the branch carries trunk
+      - name: tickets
+        by: tickets
+      - name: retro
+        evidence:
+          - name: retro
+            form: text
+            says: what surprises the hands that work it, and every dead end
+      - name: drain
+        when: cloud
+        evidence:
+          - name: notes
+            form: list
+            says: every private note on the box, one a line, with what became of it
     ---
 
     # Ask
     <!-- what these tickets add up to, for the hand that takes them -->
 
-    # Retro
-    <!-- what surprises the hands that work it, and every dead end -->
+The pull hands the group's own leaves out before and after its tickets, so a
+group and a ticket meet one pull. Its `tickets` step belongs to no hand, the
+way `children` does, and ends when no ticket in the group stands at a step an
+agent may take. The retro is a step, and the hand that reaches it writes what
+the brief's handback carries today.
+
+A cloud box differs from a desk in what stands around the tickets, and each
+of those steps carries `when: cloud`:
+
+| step | the cloud box does |
+|---|---|
+| `sync` | takes trunk into the branch first, so it works on the latest |
+| `drain` | decides every private note on the box before the box ends |
+| `retro` | writes the handover, which every box writes |
+
+A private note stays on its box. So the drain closes each one, and the close
+names what comes of it:
+
+| close | what happens |
+|---|---|
+| `dropped` | nothing, and the reason stands in the field |
+| `done` | the hand does it on the spot |
+| `became` | the mint cuts a loose draft ticket from it, through the privacy check |
+
+A ticket the drain mints rides the group's branch, and a person sorts it
+after the merge. The engine's check on the drain is the folder: `.se/tickets/`
+holds no note at the hand-back.
 
 A ticket names its group in one field, and a person writes that field. A
 ticket with no group is backlog a person has yet to sort, and no box takes it.
@@ -406,12 +493,13 @@ shape.
 | rule | what it says |
 |---|---|
 | the branch is the claim | taking a group pushes `state: held` on the group note, and the push arbitrates two boxes |
-| a stale branch is a person's | `work list` says how long each held branch has stood still, and a person releases or closes it |
+| a group has a route | the group note carries steps from the `group` process, and the pull hands them out around the tickets |
+| a stale group is yours | a held group whose tip is older than `work.staleAfter` stands under yours with three answers, and `release`, `take` and `close` are the verbs |
 | one box, one group | a box works one group at a time, and the group's tickets one at a time |
 | the branch is the filter | on a group's branch the pull sees that group's tickets alone, and widens nothing |
 | trunk hands out no group's ticket | on trunk the pull offers a box a group to take, and a person the tickets of no group |
 | the branch holds the truth | while the branch stands, its copy of the group note and of its tickets is the record |
-| a box leaves | when no ticket in it stands at a step an agent may take, and pushes `state: done` where every ticket stands closed, else `state: todo` |
+| a box leaves | when the group's last leaf passes, and pushes `state: done` where every ticket stands closed, else `state: todo` |
 | a group returns | a group at `todo` with a parked ticket comes back to the beat once a person answers on its branch |
 | the merge is a person's | `work merge` takes an ended group into trunk, and `work close` drops the branch |
 | the merge lands the truth | `work merge` runs the check on the merge commit and undoes it on red. It refuses where trunk's copy of a ticket or of the group note differs from the branch point, and names the lines |
@@ -426,18 +514,22 @@ branch, which v4 rules.
 There is no lease. A branch somebody holds stays held until a person looks. A
 branch held for a long time is something a person has to look at in any case.
 So `work list` names the age of each held branch's tip, and that age is the
-signal. The beat's notification names every held group whose tip is older
-than `work.staleAfter`, so it prompts the look, and the release stays a
-person's.
+signal.
+
+| the tip's age | means |
+|---|---|
+| under `work.staleAfter` | a box holds the group, and nothing asks |
+| past it | the group is implicitly a person's, and stands under yours with three answers: release, take over, or close |
+
+The routine's notification names a stale group, and no box takes it again
+before a person answers. The rule derives from the tip, so nothing writes to
+a branch nobody holds.
 
 A hand mints where it means to work:
 
 - a ticket it means to do itself goes into its own group, and lands with it
 - a ticket it leaves for others carries no group, and a person sorts it later
 - on a cloud box a loose ticket rides the group's branch and lands at the merge, since the box commits on no trunk
-
-The retro chapter replaces the brief's handback. The hand that ends a group
-writes it before the last push.
 
 # The pull
 
@@ -662,9 +754,10 @@ The count on the editor button is the declared `count` widget, which the beat
 replaces on every tick. So a person sees that something waits on them with the
 editor shut, and clicks.
 
-Yours stands first: every ticket at a step whose `by` is `person`, with its
-`asks`, oldest first. The routine's notification names each question with its
-age, and every held group whose tip is older than `work.staleAfter`. The
+Yours stands first, oldest first: every ticket at a step whose `by` is
+`person`, with its `asks`. Every held group whose tip is older than
+`work.staleAfter` stands there too, with its three answers. The routine's
+notification names each of them with its age. The
 routine fires one box on its clock. That box takes a free group, works it,
 and takes the next free group until none stands or its cap comes. A second
 routine is a second box, and a person creates it.
@@ -757,7 +850,7 @@ Eight branches, and the dependencies make the order binding:
 | # | branch | holds | after |
 |---|---|---|---|
 | 1 | `the-ticket-has-a-schema` | the three schemas, the checker's recursion, the three keywords, `mint`, the private folder | |
-| 2 | `a-process-is-a-route` | the four route files, the note verb, the copy and the hash at the mint, `reroute`, a chapter per step | 1 |
+| 2 | `a-process-is-a-route` | the five route files, `when`, checklists, the note verb, the copy and the hash at the mint, `reroute`, a chapter per step | 1 |
 | 3 | `a-group-is-a-branch` | the group note, take, list with the age of a held branch, merge with the check, close, and `adopt` for a brief | 1 |
 | 4 | `the-agent-pulls-a-ticket` | the pull, its checks, its answers, the record, a hold per hand, the stop rule | 2, 3 |
 | 5 | `a-step-changes-hands` | the hand id, the spawn and its tag, person steps, escalation | 4 |
@@ -776,7 +869,7 @@ ones a person wants moved. The old verbs go once the last brief merges.
 - whether a person step may go to a spawned strong model at high autonomy
 - whether yours drowns in parked conditions, and a parked state returns
 - a heartbeat ref per held group, if a tip's age proves too coarse a sign of a dead box
-- two hands on one verdict, which a process may ask for as data once the measurement of one hand's verdict stands
+- how the judge reads a checklist's lines against its items, once the first process shows the shape
 - what the board costs on many branches, which the editor's note takes up
 - a WIP limit per step, which is Kanban's one knob and stands outside this note
 - whether a guidance card's own items become steps at the mint, which v3 tried as card marking and level two may take up
