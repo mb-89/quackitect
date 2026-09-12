@@ -1,6 +1,6 @@
 ---
 kind: [[handover]]
-status: held
+status: done
 urgency: now
 depends_on: [the-private-half-stays-home]
 ---
