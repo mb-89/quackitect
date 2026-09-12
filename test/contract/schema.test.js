@@ -9,7 +9,9 @@ import { skip, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import {
   checkNote,
+  isNoteSchema,
   mintNote,
+  readYaml,
   schemaFaults,
   schemasIn,
   SEVERITY,
@@ -48,12 +50,15 @@ const ruled = async (text, where) => {
 const PAST =
   "---\nkind: [[guidance]]\n---\n\n# Nothing\n\nThe tree was installed here.\n";
 
-test("every schema in the folder reads, and names the kind its file names", () => {
+// [[spec/design_output/schema#a-schema-names-its-chapters]]
+test("every note schema reads, names a chapter, and names the kind its file names", () => {
   assert.ok(schemas.size >= 6, `${schemas.size} schemas read`);
   for (const name of here.names("spec/schemas", ".schema.yaml")) {
     const kind = name.slice(0, -".schema.yaml".length);
-    assert.ok(schemas.has(kind), `${name} names ${kind}`);
-    assert.ok(schemas.get(kind).body?.sections?.length, `${kind} names a chapter`);
+    const said = readYaml(here.read(`spec/schemas/${name}`));
+    assert.equal(String(said.kind ?? ""), kind, `${name} names ${kind}`);
+    assert.equal(schemas.has(kind), isNoteSchema(said), `${kind} reads as a note schema`);
+    if (isNoteSchema(said)) assert.ok(said.body.sections.length, `${kind} names a chapter`);
   }
 });
 

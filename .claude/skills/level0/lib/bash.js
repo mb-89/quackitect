@@ -4,9 +4,12 @@
 
 import { CODE } from "./code.js";
 import { overLong } from "./names.js";
+import { NOTES } from "./private.js";
 import { PROSE } from "./vale.js";
 
 export const VERBS = ["check", "work", "log", "doctor"];
+
+const HOME = NOTES.split("/")[0];
 
 const OPERATORS = [
   "<<<",
@@ -170,6 +173,25 @@ export function testIn(command) {
   return out;
 }
 
+// [[spec/design_output/private#the-second-door]]
+export function addsIn(command) {
+  const out = [];
+  for (const one of partsOf(command).segments) {
+    const words = wordsIn(one);
+    if (baseName(words[0]) !== "git") continue;
+
+    const rest = afterGit(words);
+    if (rest[0] !== "add" && rest[0] !== "stage") continue;
+
+    for (const arg of rest.slice(1)) {
+      if (arg.startsWith("-")) continue;
+      const said = clean(arg);
+      if (said === HOME || said.startsWith(`${HOME}/`)) out.push(said);
+    }
+  }
+  return out;
+}
+
 export function findings(command, most, it = {}) {
   const said = String(command ?? "");
   const out = [];
@@ -201,6 +223,16 @@ export function findings(command, most, it = {}) {
         "./RUNME.sh check runs the suite, the doors check and the plugin check, and",
         `${one} runs the suite alone. Run ./RUNME.sh check, or name one file:`,
         "node --test test/level0/log.test.js.",
+      ]),
+    );
+  }
+
+  for (const one of addsIn(said)) {
+    out.push(
+      row(said, "PrivateStaysHome", one, [
+        `${HOME} is the private half, and git ignores it. ${one} carries a raw note,`,
+        "a log line or a key, and a tracked file carries what an author writes for a",
+        `reader outside this box. Write that, and leave ${NOTES} where it stands.`,
       ]),
     );
   }

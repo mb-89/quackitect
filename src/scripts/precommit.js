@@ -5,7 +5,11 @@
 
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { NOTES, privateNow } from "../../.claude/skills/level0/lib/private.js";
+import {
+  boxOf as boxIn,
+  NOTES,
+  privateNow,
+} from "../../.claude/skills/level0/lib/private.js";
 import { refusedDelta } from "../../.claude/skills/level0/lib/refuse.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
@@ -24,14 +28,9 @@ export async function holds(it, delta) {
   return { code: 1, said: refusedDelta(found) };
 }
 
+// [[spec/design_output/private#the-box-names-the-owner]]
 export function boxOf(it) {
-  const env = it.env ?? {};
-  return {
-    user: env.USER || env.USERNAME || "",
-    home: env.HOME || env.USERPROFILE || "",
-    name: it.git.run(["config", "--get", "user.name"], true).out,
-    email: it.git.run(["config", "--get", "user.email"], true).out,
-  };
+  return boxIn(it.env ?? {}, it.git);
 }
 
 export function notesOf(it) {

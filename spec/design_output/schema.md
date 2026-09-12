@@ -64,6 +64,20 @@ over what stands between them.
 kind to schema. A note names its kind as a link, `kindOf` unwraps it, and the
 map answers the schema for that kind.
 
+# A schema names its chapters
+
+`spec/schemas` holds two shapes. A note schema names the chapters a note of
+that kind carries, and `isNoteSchema` is what tells one from the other.
+
+| the shape | what it names | who reads it |
+|---|---|---|
+| a note schema | `body.sections`, one chapter an entry | the write door, `./RUNME.sh mint` |
+| a model schema | the values a projector writes into a rule | a projector, and a person |
+
+`spec/schemas/paragraph.schema.yaml` is the second shape. It names no chapter,
+so `schemasIn` leaves it out, the write door asks it nothing, and `mint` offers
+the note kinds alone. For details, see [[spec/funnel/a-paragraph-has-a-schema]].
+
 # A finding names the section
 
 A finding carries the shape every rule in this tree answers:

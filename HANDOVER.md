@@ -17,7 +17,7 @@ call the one check over the one delta.
 | the commit in the Bash door | `hooks/level0.js`, `lib/bash.js` | `test/level0/hooks.test.js`, a fake engine answering a staged diff |
 | the git hook | `.githooks/pre-commit`, `src/scripts/precommit.js` | `test/level0/precommit.test.js`, six cases over a fake disk and a fake git |
 | the hook in place | `install.sh` | `./RUNME.sh doctor` names `.githooks/pre-commit, which git reads` |
-| the allow list | `lib/private.js` | the four nobody users pass, and a fifth name refuses |
+| the allow list | `NOBODY` in `lib/private.js`, out of trunk | the nobody users and the agent names pass, and a real handle refuses |
 | the added lines alone | `lib/private.js` | the fixture diff removes the same line it adds, and the reader answers one |
 | the escape | `lib/bash.js` | `test/level0/bash.test.js`, every form `-n` takes |
 | the note | `spec/design_output/private.md` | `./RUNME.sh lint` passes, and every marker in the new code points at a chapter |
@@ -30,16 +30,13 @@ holds the hand that builds it.
 
 | the thing | who | what it costs |
 |---|---|---|
-| the `turn.step` hook migrates to an async generator | the owner, with a probe | `./RUNME.sh check` stands red, so `work done` refuses and this note stands at `held` |
-| the paragraph schema finds its folder | the owner | two contract cases stand red, and `the-answer-gate-bites` carries the fix already |
-| the write door and the sweep | `the-private-half-stays-home` | `lib/private.js` holds the three checks, and that branch calls them where prose lands |
+| the `turn.step` hook migrates to an async generator | trunk, out of `work/the-private-half-stays-home` | the sync below takes it, and `./RUNME.sh check` stands green |
+| the paragraph schema finds its folder | trunk | `isNoteSchema` tells a note schema from a model schema, and the two contract cases pass |
+| the write door and the sweep | trunk | both stand, and the sync below joins the two copies of `lib/private.js` into one |
 | a note under `.se/notes` | a later level | the run check answers on an empty list today |
 
-`./RUNME.sh check` answers red on the first two rows, and both stand on
-`origin/main` ahead of the first line this branch writes.
-`the-answer-gate-bites` measures the same two, names the owner on both, and
-holds for the same reason. So this branch leaves them where that one leaves
-them, and adds no second copy of either fix.
+Both reds stand on `origin/main` ahead of the first line this branch writes,
+and trunk carries the fix for both now. The sync below takes it in.
 
 # The cost of every commit
 
@@ -101,3 +98,33 @@ What surprises me, in the order it arrives:
 The one dead end: the run check reporting a line. Reading the added lines one at
 a time misses a run crossing two of them, and joining the file loses the line
 number. One word list per file, each word carrying its line, answers both.
+
+# The sync
+
+Trunk comes in with two branches: `work/the-private-half-stays-home`, holding
+its own port of the run and the token, and `work/the-answer-gate-bites`. Six
+files conflict, and two ports of one guard become one `lib/private.js`:
+
+| what stands | where it comes from |
+|---|---|
+| `wordsOf`, `isIdentifier`, `longestSharedRun`, `sharedIdentifiers`, `carriedFrom` | trunk, at the write door |
+| `tokensOf`, `longestRun`, `sharedTokens` | this branch, as the primitives both doors read |
+| `addedIn`, the three checks, `privateIn`, `privateNow` | this branch, at the commit door |
+| `NOBODY`, `namesAPerson`, `boxOf`, `carriesTheName` | trunk, and the commit door reads them too |
+
+So the token reads a dot between letters at both doors, `NOBODY` is the one
+allow list, and `precommit.js` reads the box through trunk's `boxOf`. The two
+design notes become one the same way, and the two test files stand in one
+file. `bash.js` keeps `addsIn` beside `skipsTheHook`, the hook keeps both
+doors, and `doctor` names the sidebar link beside the commit hook.
+
+One fixture in `test/contract/tree.test.js` carries the owner's handle as a
+whole word, so `NothingPrivateTravels` reads it red on the owner's desk. It
+carries a handle nobody owns now, and assembles its home path at runtime.
+
+The commit door refuses the first commit it reads, this sync, on six lines.
+Trunk's contract fixtures for the lint rule and the Vale shapes carry a home
+path and a phone number in the open. They assemble their shapes at runtime
+now, the way this branch's own fixtures do. One of the six is a false reading,
+`/Users/one.` at the end of a sentence, so the home path shape drops a
+trailing dot.

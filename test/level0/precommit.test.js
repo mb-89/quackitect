@@ -35,8 +35,8 @@ function box(seed = {}, said = {}) {
     root: ROOT,
     disk: fakeDisk(seed),
     git: fakeGit({
-      "git config --get user.name": { stdout: said.name ?? "" },
-      "git config --get user.email": { stdout: said.email ?? "" },
+      "git config user.name": { stdout: said.name ?? "" },
+      "git config user.email": { stdout: said.email ?? "" },
     }),
     env: said.env ?? {},
     join: (...parts) => parts.join("/"),

@@ -5,6 +5,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
+  addsIn,
   branchIn,
   commitIn,
   findings,
@@ -179,6 +180,28 @@ test("a commit reading a file names the file, and one carrying neither is refuse
   assert.deepEqual(commitIn("git commit -a"), { form: "none" });
   assert.deepEqual(commitIn("git commit --amend"), { form: "none" });
   assert.deepEqual(rules("git commit -a"), ["CommitCarriesItsMessage"]);
+});
+
+// [[spec/design_output/private#the-second-door]]
+test("a git add naming a path under .se refuses, with -f or without", () => {
+  assert.deepEqual(addsIn("git add -f .se/notes/one.md"), [".se/notes/one.md"]);
+  assert.deepEqual(addsIn("git add .se/notes/one.md"), [".se/notes/one.md"]);
+  assert.deepEqual(addsIn("git add --force .se/HANDOVER.md"), [".se/HANDOVER.md"]);
+  assert.deepEqual(addsIn("cd x && git stage .se/log/session.jsonl"), [".se/log/session.jsonl"]);
+  assert.deepEqual(rules("git add -f .se/notes/one.md"), ["PrivateStaysHome"]);
+});
+
+test("a git add reaching no .se path passes", () => {
+  for (const said of ["git add -A", "git add .", "git add spec/a.md", "git status"]) {
+    assert.deepEqual(addsIn(said), [], said);
+    assert.deepEqual(rules(said), [], said);
+  }
+});
+
+test("the refusal over .se names the folder and the road back", () => {
+  const [said] = findings("git add -f .se/notes/one.md", 5);
+  assert.match(said.message, /\.se is the private half, and git ignores it/);
+  assert.match(said.message, /\.se\/notes/);
 });
 
 test("a commit carrying a message from elsewhere passes unread", () => {
