@@ -99,6 +99,12 @@ phase. Each field is a heading one level under the leaf, with the mint's
 comment beneath. The comment stays where it is and counts toward nothing, the
 way a comment in a brief counts today.
 
+The ask is a form too. The process names its fields with the same forms the
+evidence takes, and the mint renders them under the Ask chapter. The verb
+that opens a ticket refuses `open` while one of them stands empty. So the
+criteria v4 puts on its ask activity come over as slots, and a thin ask stops
+at the mint.
+
 # The lifecycle
 
 Three states, and the reason a closed ticket carries:
@@ -410,8 +416,8 @@ git, which is the half of v4's test map that a branch already carries.
 
 A process is a route the mint copies onto a ticket. Level one ships four for
 tickets and one for a group, as YAML files under `spec/processes/`. Each
-stands under `process.schema.yaml` and holds the ask's hints under `ask`, the
-route under `steps`, and nothing more:
+stands under `process.schema.yaml` and holds the ask's fields under `ask`,
+the route under `steps`, and nothing more:
 
 | process | route | for |
 |---|---|---|
@@ -424,8 +430,8 @@ A note is the smallest ticket, and it is where most work starts. A hand that
 meets an idea, a bug or a doubt mid-work writes a note and carries on. Its
 hold stays where it is. `work note` takes a name and a line, writes `from`
 off the hold as the ticket and step in hand, and answers at once. The note is
-private and stays on the box. The mint's comment on its ask
-carries three hints and nothing else:
+private and stays on the box. Its ask is one field, `line`, and the field's
+`says` carries three hints and nothing else:
 
 - the smallest case that shows it
 - why it matters
@@ -550,7 +556,9 @@ copies onto it:
     ---
 
     # Ask
-    <!-- what these tickets add up to, for the hand that takes them -->
+
+    ## goal
+    <!-- text · what these tickets add up to, for the hand that takes them -->
 
 The pull hands the group's own leaves out before and after its tickets, so a
 group and a ticket meet one pull. Its `tickets` step belongs to no hand, the

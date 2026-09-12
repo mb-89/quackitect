@@ -704,7 +704,9 @@ happened.</p>
 
 <p>A process is a route the mint copies onto a ticket. Level one ships four for tickets and one for a group,
 as YAML files under <code>spec/processes/</code>, each under <code>process.schema.yaml</code> and holding a
-<code>steps</code> list under the ask's hints, and nothing more. The mint takes
+<code>steps</code> list beside the ask's fields, and nothing more. The ask is a form too: the process names
+its fields with the same forms the evidence takes, the mint renders them under <code>Ask</code>, and the verb
+that opens a ticket refuses <code>open</code> while one stands empty. The mint takes
 <code>--process &lt;name&gt;</code>, copies the route, and writes the process file's hash beside it, so the
 ticket depends on nothing outside itself after that, and a process file changes without reaching a ticket in
 flight. A fix to a process reaches a ticket through <code>work reroute</code>, which copies the current route
@@ -722,7 +724,7 @@ and the board flags a ticket whose hash trails its process.</p>
 
 <p>A note is the smallest ticket, and it is where most work starts. A hand that meets an idea, a bug or a
 doubt mid-work writes one with <code>work note</code> and carries on; its hold stays where it is, and the
-note carries <code>from</code>, the ticket and step in hand. The note is private and stays on the box, and the mint's comment on its ask carries three hints and nothing else: the
+note carries <code>from</code>, the ticket and step in hand. The note is private and stays on the box, and its ask is one field, <code>line</code>, whose <code>says</code> carries three hints and nothing else: the
 smallest case that shows it, why it matters, and what a stranger needs in order to act on it. Its one step,
 <code>decide</code>, is where a retro reads it later and closes it as <code>dropped</code>, as <code>done</code>
 where the answer is small enough to do on the spot, or as <code>became</code>, naming the tracked ticket the
