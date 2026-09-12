@@ -269,8 +269,9 @@ prose, as one script rule:
 | a date | the ISO form, or a month's name beside a day |
 | a home path | `/home`, `/Users`, or a drive letter over `Users` |
 
-The nobody users pass: `user`, `root`, `one` and `somebody`. A cloud box
-writes paths under `/home/user`, and a fixture writes `/Users/one`.
+The names on `NOBODY` pass, the same list the commit door reads, and a
+contract test holds the rule's list to it. A cloud box writes paths under
+`/home/user`, a runner under `/home/runner`, and a fixture writes `/Users/one`.
 
 The rule reads prose alone. A fence, a four-space indent and an inline code
 span each open an example. An example says what a shape looks like, so the

@@ -1,5 +1,6 @@
 # The mechanical half of what stays home. A script holds these shapes, and
-# no token list does, because the home-path shape passes four nobody users and
+# no token list does, because the home-path shape passes the names NOBODY in
+# lib/private.js holds, a contract test holds the two lists to one, and
 # RE2 carries no negative lookahead. The rule reads prose alone: a fence and a
 # four-space indent both open an example, an inline code span opens one too,
 # and an example says what a shape looks like.
@@ -21,7 +22,7 @@ script: |
     `(?:/home/|/Users/|[A-Za-z]:[\\/][Uu]sers[\\/])[A-Za-z0-9_-]+(?:[.][A-Za-z0-9_-]+)*`
   ]
 
-  nobody := ["user", "root", "one", "somebody"]
+  nobody := ["user", "root", "one", "somebody", "nobody", "agent", "claude", "runner", "ubuntu", "vscode"]
   fence := "``" + "`"
 
   lines := text.split(scope, "\n")

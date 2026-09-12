@@ -3,9 +3,10 @@
 // [[spec/design_output/doors#one-contract-test-per-door]]
 
 import assert from "node:assert/strict";
-import { dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { skip, test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { NOBODY } from "../../.claude/skills/level0/lib/private.js";
 import { lintText } from "../../.claude/skills/level0/lib/vale.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
@@ -141,9 +142,18 @@ ifVale("the shapes rule refuses an address, a number, a date and a home path", a
 ifVale("a nobody user, a version and an example pass the shapes rule", async () => {
   for (const said of [
     "A cloud box writes under /home/user, and a fixture writes /Users/one.",
+    "A runner writes under /home/runner, and an agent under /home/claude.",
     "Client 2.1.267 stands the same way, and the number 1024 passes.",
     `    the indented example: 2026-09-08 and ${SECRETS}\n`,
   ]) {
     assert.ok(!(await ruled(said)).includes("Private"), said);
   }
+});
+
+test("the shapes rule and the commit door pass one list of nobody users", () => {
+  const rule = files.read(join(root, "spec/config/styles/VoiceVale/Private.yml"));
+  const listed = /nobody := \[([^\]]*)\]/.exec(rule);
+  assert.ok(listed, "the rule names its nobody users");
+  const names = listed[1].split(",").map((one) => one.trim().replace(/^"|"$/g, ""));
+  assert.deepEqual(names.sort(), [...NOBODY].sort());
 });
