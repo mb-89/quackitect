@@ -17,6 +17,13 @@ export function matches(glob, path) {
   return globOf(glob).test(slashed(path));
 }
 
+// [[spec/design_output/schema#the-underscore-parks-a-draft]]
+export function isDraft(path) {
+  return slashed(path)
+    .split("/")
+    .some((part) => part.startsWith("_"));
+}
+
 function slashed(said) {
   return String(said ?? "")
     .split("\\")

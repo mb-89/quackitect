@@ -19,11 +19,32 @@ function panelHtml(model) {
     `<style nonce="${nonce}">${style(groups)}</style>`,
     "</head>",
     "<body>",
+    chooser(groups),
+    '<div class="top">',
     ...groups.map((one) => section(one)),
+    "</div>",
     tree(model),
     `<script type="module" nonce="${nonce}" src="${escaped(model?.script ?? "")}"></script>`,
     "</body>",
     "</html>",
+  ].join("\n");
+}
+
+// [[spec/design_output/extension#the-gear-picks-the-sections]]
+function chooser(groups) {
+  const names = [...groups.map((one) => one.name), CONFIG];
+  return [
+    '<div class="bar">',
+    `<button class="gear" title="the sections this panel draws">${markOf("U+2699")}</button>`,
+    '<div class="chooser" hidden>',
+    ...names.map(
+      (name) =>
+        `<label><input type="checkbox" class="pick" data-pick="${escaped(name)}"${
+          name === CONFIG ? "" : " checked"
+        }>${escaped(name)}</label>`,
+    ),
+    "</div>",
+    "</div>",
   ].join("\n");
 }
 
@@ -38,17 +59,20 @@ function section(group) {
   ].join("\n");
 }
 
+// [[spec/design_output/extension#a-mark-alone-says-it]]
 function widget(cell) {
   const away = cell.value !== undefined && cell.value !== cell.rest;
+  const far = (cell.options ?? [])[2];
+  const held = far !== undefined && cell.value === far;
   return [
-    `<button class="widget ${placeOf(cell)}${away ? " away" : ""}"`,
+    `<button class="widget ${placeOf(cell)}${away ? " away" : ""}${held ? " held" : ""}"`,
     ` data-key="${escaped(cell.key)}" data-widget="${escaped(cell.widget)}"`,
-    ` data-runs="${escaped(cell.runs ?? "")}" data-value="${escaped(cell.value ?? "")}"`,
+    ` data-runs="${escaped(cell.runs ?? "")}" data-reads="${escaped(cell.reads ?? "")}"`,
+    ` data-value="${escaped(cell.value ?? "")}"`,
     ` data-options="${escaped((cell.options ?? []).join(" "))}"`,
     ` data-gesture="${escaped(cell.gesture ?? "")}"`,
     ` title="${escaped(hover(cell))}">`,
-    `<span class="mark">${escaped(markOf(cell.at))}</span>`,
-    `<span class="said">${escaped(String(cell.value ?? cell.leaf))}</span>`,
+    `<span class="mark">${escaped(markOf(cell.icon))}</span>`,
     cell.widget === "status" ? `<span class="light ${escaped(cell.lit)}"></span>` : "",
     "</button>",
   ].join("");
@@ -59,15 +83,29 @@ function hover(cell) {
   return [
     cell.help ?? "",
     ...(cell.keys ?? []),
+    ...commandsOf(cell),
     cell.layer ? `${cell.key} answers out of ${cell.layer}` : "",
   ]
     .filter(Boolean)
     .join("\n");
 }
 
-// [[spec/design_output/extension#a-mark-and-its-codepoints]]
+// [[spec/design_output/extension#a-button-names-its-commands]]
+function commandsOf(cell) {
+  if (cell.widget === "action" || !cell.options?.length) return [];
+  const group = String(cell.group ?? "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  const leaf = String(cell.leaf ?? String(cell.key).split(".").pop());
+  return cell.options.map((one) => `/se-${group}-${leaf}-${one}`);
+}
+
+// [[spec/design_output/extension#a-mark-a-person-types]]
 function markOf(at) {
-  return String(at ?? "")
+  const said = String(at ?? "");
+  if (!/U\+[0-9A-Fa-f]+/.test(said)) return said.split(/\s+/).join("");
+  return said
     .split(/\s+/)
     .filter((one) => /^U\+[0-9A-Fa-f]+$/.test(one))
     .map((one) => String.fromCodePoint(Number.parseInt(one.slice(2), 16)))
@@ -77,7 +115,7 @@ function markOf(at) {
 // [[spec/design_output/extension#the-bottom-section]]
 function tree(model) {
   return [
-    `<details class="section" data-section="${CONFIG}">`,
+    `<details class="section gone" data-section="${CONFIG}">`,
     `<summary>${CONFIG}</summary>`,
     '<input class="filter" type="text" placeholder="a regular expression over the keys">',
     '<div class="tree">',
@@ -173,21 +211,42 @@ function placements(groups) {
 // [[spec/design_output/extension#the-editor-picks-the-colours]]
 function style(groups) {
   return [
+    "[hidden] { display: none !important; }",
     "body { font-family: var(--vscode-font-family); font-size: var(--vscode-font-size);",
     "  color: var(--vscode-foreground); padding: 0 4px; }",
     "summary { cursor: pointer; text-transform: lowercase;",
     "  color: var(--vscode-sideBarSectionHeader-foreground); padding: 4px 0; }",
     `.grid { display: grid; gap: 4px; padding: 4px 0;`,
     `  grid-template-columns: repeat(${WIDE}, 1fr); }`,
-    ".widget { display: flex; flex-direction: column; align-items: center; gap: 2px;",
+    ".widget { display: flex; flex-direction: column; align-items: center;",
+    "  justify-content: center; text-align: center; gap: 2px;",
     "  border: 1px solid var(--vscode-contrastBorder, transparent); border-radius: 4px;",
     "  padding: 6px 2px; cursor: pointer; color: var(--vscode-button-secondaryForeground);",
     "  background: var(--vscode-button-secondaryBackground); }",
     ".widget:hover { background: var(--vscode-button-secondaryHoverBackground); }",
     ".widget.away { color: var(--vscode-button-foreground);",
     "  background: var(--vscode-button-background); }",
-    ".mark { font-size: 1.2em; }",
-    ".said { font-size: 0.85em; opacity: 0.9; }",
+    ".mark { font-size: 1.2em; line-height: 1.2; display: block; }",
+    ".widget.held { background: var(--vscode-inputValidation-errorBackground,",
+    "  var(--vscode-errorForeground)); color: var(--vscode-errorForeground);",
+    "  border-color: var(--vscode-errorForeground); animation: pulse 1.2s infinite; }",
+    "@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.45; } 100% { opacity: 1; } }",
+    "html, body { height: 100%; margin: 0; }",
+    "body { display: flex; flex-direction: column; box-sizing: border-box; overflow: hidden; }",
+    ".bar { flex: none; }",
+    ".top { flex: 1 1000 auto; min-height: 0; overflow-y: auto; }",
+    "details.section[data-section='config'] { margin-top: auto; flex: 0 1 auto;",
+    "  min-height: 0; overflow-y: auto;",
+    "  border-top: 1px solid var(--vscode-sideBarSectionHeader-border, var(--vscode-panel-border)); }",
+    ".bar { display: flex; justify-content: flex-end; position: relative; }",
+    ".gear { background: var(--vscode-sideBar-background, transparent);",
+    "  border: 1px solid var(--vscode-contrastBorder, transparent); cursor: pointer;",
+    "  font-size: 1.1em; color: var(--vscode-foreground); padding: 2px 4px; }",
+    ".chooser { position: absolute; right: 0; top: 100%; z-index: 1; padding: 4px 6px;",
+    "  display: flex; flex-direction: column; gap: 2px;",
+    "  background: var(--vscode-editorWidget-background, var(--vscode-editor-background));",
+    "  border: 1px solid var(--vscode-editorWidget-border, var(--vscode-panel-border)); }",
+    ".chooser label { display: flex; align-items: center; gap: 4px; font-size: 0.9em; }",
     ".light { width: 6px; height: 6px; border-radius: 50%;",
     "  background: var(--vscode-charts-green); }",
     ".light.dark { background: var(--vscode-disabledForeground); }",
@@ -219,4 +278,4 @@ function escaped(said) {
     .join("&quot;");
 }
 
-module.exports = { CONFIG, escaped, markOf, panelHtml };
+module.exports = { CONFIG, commandsOf, escaped, markOf, panelHtml };

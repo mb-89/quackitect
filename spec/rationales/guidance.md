@@ -29,7 +29,14 @@ So the argument sits one link away. A reader who accepts the rule pays nothing
 for it, and a reader who wants to fight it knows where to go.
 
 Naming one folder for the past also makes the tense rule enforceable. Every other
-folder refuses it, and a linter decides that.
+folder refuses it, and a linter decides that. The schema proposed a `Motivation`
+chapter here as well, and three things in the tree sent it back:
+
+| what said so | what it said |
+|---|---|
+| `VoiceJudged/Actionable` | it refused background prose under `spec/guidance` |
+| guidance rule 2 | the argument belonged one link away |
+| the seven rationales | each already opened with that motivation |
 
 ## 7. A rule a program checks
 

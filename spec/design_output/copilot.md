@@ -1,7 +1,13 @@
 ---
 kind: [[design_output]]
-implements: [[spec/design_input/copilot]]
+refines:
+  - [[spec/design_input/copilot]]
 ---
+
+# Scope
+
+One level zero holds two surfaces. This note covers the runtime under
+`src/scripts/copilot.js` and the decisions it hands each surface.
 
 # Events and feedback
 
@@ -102,7 +108,7 @@ Only a person calls work merge after reviewing the durable result and retro.
 
 # Verification record
 
-Run `./RUNME.ps1 check` on Windows for the current test and lint results.
+Run `./RUNME.sh check` for the current test and lint results.
 Claude's executable is absent here, so native plugin validation remains open.
 Claude's hooks and judge stay unchanged.
 

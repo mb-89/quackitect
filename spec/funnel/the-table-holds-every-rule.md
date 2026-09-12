@@ -3,7 +3,7 @@ kind: [[funnel]]
 about: where the rules live, and three shapes the owner weighs
 ---
 
-# The rules live apart
+# Scope
 
 A rule in this tree lives in one of four homes, and each home names a rule its
 own way:

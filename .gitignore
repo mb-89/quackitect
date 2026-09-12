@@ -5,6 +5,10 @@
 # tracked settings file, which carries no port and no machine-specific path.
 .claude/settings.local.json
 
+# /plugin-types writes the plugin API of the running build here. A new build
+# writes it again, so each box keeps its own.
+.claude/types/
+
 # Setup generates the Copilot registrations under .github, and this tree tracks
 # them on purpose. A cloud box reads its hooks and its setup job from the
 # default branch, so committing them is what keeps level zero active there.

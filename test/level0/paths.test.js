@@ -4,27 +4,27 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { matches, relativeTo } from "../../.claude/skills/level0/lib/paths.js";
+import { isDraft, matches, relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 
-const ROOT = "C:/Users/mb/Desktop/ai/quackitect-v5";
+const ROOT = "C:/Users/one/Desktop/ai/quackitect-v5";
 
 test("a path under the root reads as the root holds it", () => {
   assert.equal(
-    relativeTo(ROOT, "C:/Users/mb/Desktop/ai/quackitect-v5/spec/rationales/a.md"),
+    relativeTo(ROOT, "C:/Users/one/Desktop/ai/quackitect-v5/spec/rationales/a.md"),
     "spec/rationales/a.md",
   );
 });
 
 test("a windows separator answers the one vale reads", () => {
   assert.equal(
-    relativeTo(ROOT, "C:\\Users\\mb\\Desktop\\ai\\quackitect-v5\\spec\\guidance\\a.md"),
+    relativeTo(ROOT, "C:\\Users\\one\\Desktop\\ai\\quackitect-v5\\spec\\guidance\\a.md"),
     "spec/guidance/a.md",
   );
 });
 
 test("a drive letter in either case names the same root", () => {
   assert.equal(
-    relativeTo("c:/users/mb/desktop/ai/quackitect-v5", `${ROOT}/src/scripts/cli.js`),
+    relativeTo("c:/users/one/desktop/ai/quackitect-v5", `${ROOT}/src/scripts/cli.js`),
     "src/scripts/cli.js",
   );
 });
@@ -37,6 +37,16 @@ test("a path the root misses comes back whole", () => {
 
 test("a root carrying a trailing slash reads the same", () => {
   assert.equal(relativeTo(`${ROOT}/`, `${ROOT}/README.md`), "README.md");
+});
+
+// [[spec/design_output/schema#the-underscore-parks-a-draft]]
+test("a name opening with an underscore parks a draft, at any depth", () => {
+  assert.equal(isDraft("_note.md"), true);
+  assert.equal(isDraft("spec/guidance/_note.md"), true);
+  assert.equal(isDraft("spec\\guidance\\_note.md"), true);
+  assert.equal(isDraft("_drafts/note.md"), true);
+  assert.equal(isDraft("spec/guidance/note.md"), false);
+  assert.equal(isDraft("spec/guidance/a_note.md"), false);
 });
 
 test("a glob reads one folder deep, and a double star reads past it", () => {

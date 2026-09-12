@@ -1,7 +1,11 @@
 ---
 kind: [[design_output]]
-describes: [[.claude/skills/level0]]
 ---
+
+# Scope
+
+`.claude/skills/level0` is the plugin holding every door. This note covers the
+harness surface, the write door, and the standing layer it hands each session.
 
 # What level zero is
 
@@ -13,14 +17,14 @@ its first session with nothing typed.
 
 # The harness surface
 
-Every line here comes from running it on 2026-09-08 against client 2.1.263. The
+Every line here comes from running it against client 2.1.263. The
 surface is early access and moves, so run it again before you trust this.
 
 The sections below carry their own date where a later run measures them again.
 
 ## The file surface renames itself
 
-Measured on 2026-09-09 against client 2.1.267:
+Measured against client 2.1.267:
 
 | what this tree calls | what the client offers |
 |---|---|
@@ -47,7 +51,7 @@ trust it.
 
 ## A subagent brings no session
 
-Measured on 2026-09-09 against client 2.1.267, by a probe writing one file per
+Measured against client 2.1.267, by a probe writing one file per
 hook event through a whole run.
 
 | what a subagent fires | what reaches it |
@@ -80,13 +84,16 @@ resolves to `{ model }`, the id the spawn settles on.
 
 ## A step arrives late
 
-`turn.step` fires once the step's tool calls run. It says what a step does, and
-a door reading it learns too late.
+`turn.step` fires at the step's first tool result, so its first call runs
+before it. It carries the step's visible text in `answer`.
 
-`$.session.messages()` answers sooner. At `tool.call` the transcript already
-carries the text the model writes in that same response.
+Measured against client 2.1.267, in a session past 4096 messages: at `tool.call`,
+`$.session.messages()` carries no text from the response in flight. The list
+also answers its newest 4096 alone, so a position in it shifts.
 
-So a hook there reads whether the session has spoken this turn.
+So the answer gate reads the step first and the transcript second, and lets the
+calls of a response in flight pass. For details, see
+[[spec/design_output/level0#a-step-carries-the-answer]].
 
 ## Arguments arrive on the event
 
@@ -167,7 +174,7 @@ So level zero holds no cloud session that starts the ordinary way, and
 `~/.claude.json` carries `hasTrustDialogAccepted: false` there. The flag lives
 outside the tree, so no tracked file moves it.
 
-The gate holds the scan alone. Measured on 2026-09-10 against client 2.1.267,
+The gate holds the scan alone. Measured against client 2.1.267,
 by a probe on a cloud clone carrying no trust. The `env` key bites there, and
 so does a `permissions` deny rule in `.claude/settings.json`. So the tracked
 file still says what a session may do, and level zero is the one part waiting
@@ -192,7 +199,7 @@ Two things reach a cloud box today:
 The canary finds this. A session saying the line out loud is a session level
 zero holds, and a cloud session that starts the ordinary way says nothing.
 
-Client 2.1.267 stands the same way, measured on 2026-09-10 on a cloud box. The
+Client 2.1.267 stands the same way, measured on a cloud box. The
 debug log names the count, and `.se/level0.stamp` stands nowhere in the tree:
 
     [plugins] Found 1 plugins (1 enabled, 0 disabled)
@@ -205,7 +212,8 @@ door it takes.
 ## The setup writes the flag
 
 `src/scripts/trust.js` writes it where the tree and `node` both stand to hand.
-A cloud environment carries neither at setup time. Measured on 2026-09-10: a
+A cloud environment carries neither at setup time. Measured against client
+2.1.267: a
 setup naming `node src/scripts/trust.js` fails, and the session ends at
 `init_script` with no first turn. A failing setup takes the session with it, so
 the one an environment carries leans on nothing:
@@ -264,7 +272,8 @@ itself.
 A routine meeting a prompt stalls until a person looks. So an unattended box
 takes its mode from the setup.
 
-A box carrying that setup says the canary out loud. Measured on 2026-09-10, on
+A box carrying that setup says the canary out loud. Measured against client
+2.1.267, on
 a cloud box cloning `main`:
 
 | what a box answers | with no setup | with the setup |
@@ -285,20 +294,25 @@ it prints the file it writes for the setup log to carry.
 
 # The write door
 
-`tool.call` reads every Write and Edit. Prose goes to Vale, code goes to Biome,
-and a breach comes back as `{ deny }` naming the rule, the line and the phrase.
+`tool.call` reads every Write and Edit. A breach comes back as `{ deny }`
+naming the rule, the line and the phrase.
 
-The refusal closes by asking the writer to hold that rule for the rest of the
-turn. A refusal teaching one line costs a round trip on every line.
+| what the write carries | what reads it |
+|---|---|
+| a run or a token out of a note under `.se/notes` | [[spec/design_output/private#the-door-reads-the-notes]] |
+| prose | Vale, then the judge |
+| code | Biome |
+| a shell command landing a file | [[spec/design_output/bash]] |
 
-A shell reaches the same files through `>`, `tee`, `sed -i` and a heredoc, so
-`tool.call` reads a Bash command as well. For details, see
-[[spec/design_output/bash]].
+The private half answers first, so a note's own words stop at the door. The
+refusal closes by asking the writer to hold that rule for the rest of the turn.
+A refusal teaching one line costs a round trip on every line.
 
 ## The door reaches a helper
 
 A subagent's writes go through the same `tool.call` chain, so the door reads
-them the way it reads the session's own. A live run on 2026-09-09 watches it
+them the way it reads the session's own. A live run against client 2.1.267
+watches it
 refuse a helper's `Write` over `Contraction`.
 
 That helper then writes the same text through `printf` in Bash. The write door
@@ -408,22 +422,61 @@ instead.
 
 ## What the door reads
 
-The door marks a turn a person opens, and refuses the first `tool.call` of that
-turn while nothing has reached them.
+The door marks what a person waits for, and holds every `tool.call` while
+nothing has reached them. Text the session writes after the mark answers it,
+and `turn.complete` clears the mark.
 
-| what the hook holds | when |
-|---|---|
-| a turn stands open, and nothing answers it | `prompt.submit`, from a person |
-| the turn carries an answer | any text the session sends |
-| the mark clears | `turn.complete` |
+Whether an answer stands comes out of `$.session.messages()`. The mark notes how
+many messages stand when it goes down, and text from the session past that
+point answers it. Text from before the mark answers an older demand, and counts
+for nothing.
 
-Whether the turn carries an answer comes out of `$.session.messages()`. The
-prompt standing open is the last user message carrying no tool result, and text
-from the session after it answers that prompt.
+## What counts as owed
 
-The read costs no model call, and it sees text the model writes beside the very
-call the door holds. A response opening with a sentence and closing with a tool
-call therefore passes.
+- A prompt a person opens a turn with, at `prompt.submit`.
+- An update a person asks for: `ask.wanted` moving away from `quiet`.
+- A hold: `stop.hold` moving to `stopped`.
+
+The hook reads the two keys at every `tool.call`, so a button pressed mid-turn
+reaches the next call. The latest demand replaces the one before it, and starts
+with a warning of its own.
+
+## One warning, then a refusal
+
+The response in flight when a demand lands may carry the answer, and its text
+reaches the hook only once the response completes. So every call of that
+response passes.
+
+A response completing with no text leaves the demand open. The next call runs,
+and carries a warning the session reads after the tool's result. The warning
+names what the person waits for. The call after it stands refused, and every
+call after that, until an answer stands.
+
+Each writes a `gate` line at `warn`: `warned Read before an answer`, then
+`refused Read before an answer`, with the demand in the detail.
+
+## A step carries the answer
+
+`turn.step` hands the hook each response once its blocks stand, with its
+visible text in `answer`. Text there answers the demand, and the hook writes it
+as the `answer` line. For details, see
+[[spec/design_output/log#the-answer-under-its-prompt]].
+
+The transcript stands behind the step. `$.session.messages()` answers its newest
+4096 messages alone, so the door remembers the last answer standing when the
+demand lands, and text after that one answers it. A position in the list shifts
+as the window slides, so the door counts none.
+
+## The owner binds god
+
+`engine.binding` at `god` takes every refusal level zero holds out of the way.
+The hook wraps every `tool.call` it registers. Where a hook refuses and the
+binding reads `god`, the call goes on. A `god` line names the refusal it passes.
+The answer gate, the write door, the trunk guard and the cage all pass.
+
+The binding comes out of the config layers at the moment of the refusal, so a
+button press reaches the next call. The sidebar shows the binding in the status
+bar. For details, see [[spec/design_output/extension#the-status-bar-says-it]].
 
 ## Which prompt opens a turn
 
@@ -439,10 +492,10 @@ delivery receipts, so a door reading it bites the wrong turn.
 
 ## What the refusal says
 
-    The owner asked something and nothing has answered it. Say back what you
-    understood and what you do next, then work.
+    The owner sent a prompt. The owner asked something and nothing has
+    answered it. Say back what you understood and what you do next, then work.
 
-That is the rule in its own words, and a refusal quoting the rule teaches it
+The refusal opens with the demand. The rest is the rule in its own words, and a refusal quoting the rule teaches it
 better than a refusal naming it.
 
 ## Where it must not bite

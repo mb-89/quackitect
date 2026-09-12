@@ -1,6 +1,6 @@
 // The process door, against the real thing. It runs one program here, so the
 // suite pays that cost once and every other test takes the fake.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";

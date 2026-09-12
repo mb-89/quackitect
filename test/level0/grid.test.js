@@ -1,6 +1,6 @@
 // The grid check. Each case hands it a declaration that breaks the rule and
 // asserts it names the widget, because a check nobody can fail holds nothing.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";

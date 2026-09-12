@@ -1,7 +1,11 @@
 ---
 kind: [[design_output]]
-describes: [[.claude/skills/level0/lib/tree.js]]
 ---
+
+# Scope
+
+`.claude/skills/level0/lib/tree.js` holds the rules weighing two files at once.
+This note covers those rules, what each one answers, and the sweep running them.
 
 # The rules over two files
 
@@ -9,7 +13,7 @@ Vale hands a rule one buffer. Its script sandbox offers `text` and `fmt` alone,
 so a rule weighing a config against the code reading it finds no second file
 there.
 
-Ten such rules live in `.claude/skills/level0/lib/tree.js`. `./RUNME.sh lint`
+These rules live in `.claude/skills/level0/lib/tree.js`. `./RUNME.sh lint`
 runs each one over the whole tree, beside the rules Vale holds and the rules
 Biome holds.
 
@@ -19,23 +23,22 @@ Biome holds.
 | `EditorDrawsWriteRules` | `.vscode/settings.json`, `.vale.ini` |
 | `BiomeOnWindows` | `.vscode/settings.json`, the platform map inside it |
 | `ExtensionsOnOffer` | `.vscode/extensions.json`, `.vscode/settings.json` |
-| `LnavReadsTheLog` | `spec/config/lnav/quackitect.json`, `lib/log.js` |
 | `StopFolderIsData` | `spec/config/stop`, `lib/stop.js` |
 | `NoLogDeleted` | every source file git holds |
 | `NameHoldsTheWords` | every path git holds |
+| `NothingPrivateTravels` | every text file git holds, and the box it lints on |
 | `SurveyNamesInstalls` | `src/scripts/install.sh`, `lib/tools.js` |
 | `SurveyFindsNode` | `.se/tools.json`, the node running the sweep |
 
-# Why the panel reads them
+# Why lint prints them
 
-`.vscode/tasks.json` runs `./RUNME.sh lint` when the folder opens and matches
-every line of this shape:
+`./RUNME.sh lint` prints every finding in one shape, whoever holds the rule:
 
     spec/guidance/voice.md:5:1: ShortHeading: A heading holds five words.
 
-A finding that reaches `lint` therefore reaches the problems panel, whoever
-holds the rule. A test draws nowhere, so a rule living as a test alone meets a
-person as a stack trace.
+The editor starts nothing when the folder opens, so a person runs `lint`, or
+`check`, to read them. A test draws nowhere, so a rule living as a test alone
+meets a person as a stack trace.
 
 # What a rule answers
 
@@ -64,9 +67,12 @@ door and the root, and it answers relative paths:
 | `paths()` | every path git holds |
 | `words` | the cap `names.words` says |
 | `node` | the version of the node running the sweep |
+| `box` | the user, the home folder and the git name and address here |
 
 A rule reaches nothing else, so a test hands it a fake tree over `fakeDisk` and
-`fakeGit` and touches memory alone.
+`fakeGit` and touches memory alone. `boxOf` in `lib/private.js` reads the four
+names in `box`, and [[spec/design_output/private#the-box-names-the-owner]] says
+what the rule over them does.
 
 # When the sweep runs
 
@@ -91,7 +97,7 @@ For details, see [[spec/design_output/level0#the-rules-past-one-buffer]].
 
 # What stays outside
 
-Three of the ten weigh a config against a constant this tree holds in
+Three of these weigh a config against a constant this tree holds in
 JavaScript: the extension ids, the platform map and the binary paths. Moving
 one into Vale copies that constant into a rule file, and a second copy is a
 defect.

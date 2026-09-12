@@ -3,8 +3,9 @@
 // whole tree into the problems panel.
 // [[spec/design_output/tree#the-rules-over-two-files]]
 
-import { FOLDER, nameOf, rowOf } from "./log.js";
 import { overLong } from "./names.js";
+import { isDraft } from "./paths.js";
+import { carriesTheName, namesAPerson } from "./private.js";
 import {
   EDITOR_EXTENSIONS,
   EDITOR_SETTINGS,
@@ -15,16 +16,13 @@ import { decide, pool, RULES as STOP } from "./stop.js";
 import { BIN, installedTools, TOOLS, WANTED } from "./tools.js";
 
 export const INSTALL = "src/scripts/install.sh";
-export const LNAV = "spec/config/lnav/quackitect.json";
 export const VALE_INI = ".vale.ini";
 
 const STOP_LIB = ".claude/skills/level0/lib/stop.js";
 const SOURCE = /^(?:src|\.claude)\/.*\.js$/;
+const TEXT = /\.(?:md|markdown|txt|ya?ml|json|js|ts|tsx|go|sh|ps1|ini|mod)$/i;
 const DELETES = /\bremove\(|\bunlink|\brm\b|\bprune\b/;
 const LOGGED = /log/i;
-const LEVELS = ["error", "info", "warn"];
-const STAMP = "2026-09-08T14:22:51.000Z";
-const ID = "a6f8c43b";
 
 const LATER = {
   name: "level1.yml",
@@ -54,6 +52,7 @@ export function treeOf(it) {
   return {
     words: it.words ?? 0,
     node: it.node ?? "",
+    box: it.box ?? {},
     read(path) {
       try {
         return it.disk.read(at(path));
@@ -78,7 +77,8 @@ export function treeOf(it) {
         .run(["ls-files"], true)
         .out.split(/\r?\n/)
         .map((one) => one.trim())
-        .filter(Boolean);
+        .filter(Boolean)
+        .filter((one) => !isDraft(one));
       return held;
     },
   };
@@ -249,85 +249,6 @@ export function extensionsOnOffer(tree) {
   return out;
 }
 
-// [[spec/design_output/log#what-one-line-looks-like]]
-export function lnavReadsTheLog(tree) {
-  const rule = "LnavReadsTheLog";
-  const text = tree.read(LNAV);
-  const said = parsed(text)?.quackitect_log;
-  if (!said) return [unread(rule, LNAV)];
-
-  const out = [];
-  const row = rowOf(STAMP, "warn", "write", "refused");
-  const wanted = [
-    ["json", true],
-    ["timestamp-field", "at"],
-    ["level-field", "level"],
-    ["body-field", "said"],
-  ];
-  for (const [key, value] of wanted) {
-    if (said[key] === value) continue;
-    out.push(
-      fault(
-        rule,
-        LNAV,
-        `${key} reads ${JSON.stringify(said[key])}, and the log door writes ${JSON.stringify(value)}.`,
-        lineOf(text, `"${key}"`),
-      ),
-    );
-  }
-
-  const drawn = (said["line-format"] ?? [])
-    .filter((one) => one.field)
-    .map((one) => one.field);
-  const keys = Object.keys(row);
-  if (drawn.join(",") !== keys.join(",")) {
-    out.push(
-      fault(
-        rule,
-        LNAV,
-        `line-format draws ${drawn.join(", ")}, and one row carries ${keys.join(", ")}.`,
-        lineOf(text, "line-format"),
-      ),
-    );
-  }
-
-  const sample = Object.keys(parsed(said.sample?.[0]?.line ?? "") ?? {});
-  if (sample.join(",") !== keys.join(",")) {
-    out.push(
-      fault(
-        rule,
-        LNAV,
-        `The sample line carries ${sample.join(", ") || "nothing"}, and one row carries ${keys.join(", ")}.`,
-        lineOf(text, "sample"),
-      ),
-    );
-  }
-
-  const levels = Object.values(said.level ?? {}).sort();
-  if (levels.join(",") !== LEVELS.join(",")) {
-    out.push(
-      fault(
-        rule,
-        LNAV,
-        `level maps to ${levels.join(", ") || "nothing"}, and the log door writes ${LEVELS.join(", ")}.`,
-        lineOf(text, `"level":`),
-      ),
-    );
-  }
-
-  if (!matches(said["file-pattern"], `${FOLDER}/${nameOf(row.at, ID)}`)) {
-    out.push(
-      fault(
-        rule,
-        LNAV,
-        `file-pattern reads ${said["file-pattern"]}, and the log door writes ${nameOf(row.at, ID)}.`,
-        lineOf(text, "file-pattern"),
-      ),
-    );
-  }
-  return out;
-}
-
 // [[spec/design_output/stop#where-the-rules-live]]
 export function stopFolderIsData(tree) {
   const rule = "StopFolderIsData";
@@ -411,6 +332,45 @@ export function nameHoldsTheWords(tree) {
   return out;
 }
 
+// [[spec/design_output/private#the-box-names-the-owner]]
+export function nothingPrivateTravels(tree) {
+  const rule = "NothingPrivateTravels";
+  const box = tree.box ?? {};
+  const home = String(box.home ?? "").replace(/[/\\]+$/, "");
+
+  const wanted = [
+    ["the user this box runs as", box.user],
+    ["the home folder on this box", homeNames(home) ? home : ""],
+    ["the git name on this box", box.name],
+    ["the git address on this box", box.email],
+  ].filter(([, said]) => namesAPerson(said));
+  if (!wanted.length) return [];
+
+  const out = [];
+  for (const path of tree.paths().filter((one) => TEXT.test(one))) {
+    const lines = tree.read(path).split(/\r?\n/);
+    for (let i = 0; i < lines.length; i++) {
+      for (const [what, said] of wanted) {
+        if (!carriesTheName(lines[i], said)) continue;
+        out.push(
+          fault(
+            rule,
+            path,
+            `This line carries ${what}, and git carries this file everywhere. Say what the thing is, in words a reader outside this box acts on.`,
+            i + 1,
+          ),
+        );
+      }
+    }
+  }
+  return out;
+}
+
+function homeNames(home) {
+  const who = String(home).split(/[/\\]+/).filter(Boolean).pop() ?? "";
+  return namesAPerson(who);
+}
+
 // [[spec/design_output/tools#what-the-survey-names]]
 export function surveyNamesInstalls(tree) {
   const rule = "SurveyNamesInstalls";
@@ -467,10 +427,10 @@ export const RULES = [
   editorDrawsWriteRules,
   biomeOnWindows,
   extensionsOnOffer,
-  lnavReadsTheLog,
   stopFolderIsData,
   noLogDeleted,
   nameHoldsTheWords,
+  nothingPrivateTravels,
   surveyNamesInstalls,
   surveyFindsNode,
 ];
@@ -508,12 +468,4 @@ function lineOf(text, needle) {
     if (lines[i].includes(needle)) return i + 1;
   }
   return 1;
-}
-
-function matches(pattern, said) {
-  try {
-    return new RegExp(String(pattern)).test(said);
-  } catch {
-    return false;
-  }
 }

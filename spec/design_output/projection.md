@@ -1,7 +1,11 @@
 ---
 kind: [[design_output]]
-describes: [[.claude/skills/level0/lib/projection.js]]
 ---
+
+# Scope
+
+`.claude/skills/level0/lib/projection.js` writes one source into every target.
+This note covers the projections, the door refusing a target, and the verb.
 
 # One source, written everywhere
 
@@ -68,26 +72,46 @@ One slash command per settable value, under `.claude/commands`:
 The keys come from the declaration and the types come from the schema. A key
 the declaration drops loses its file, and a key it gains grows one.
 
-## A name carries the key
+## A name carries the path
 
-`se-` holds these commands together in a menu nobody else fills. The rest of
-the name is the key, with a dash where the dot stands:
+A command sits on the same path a person walks in the sidebar. `se-` holds the
+commands together in a menu nobody else fills, and the path follows:
 
-    se-log-level-info.md
-    se-judge-model.md
-    se-stop-mostInARow.md
+    se-config-log-level-info.md
+    se-config-judge-model.md
+    se-agent-control-hold-stopped.md
+
+Every value the declaration carries takes the config path: `config`, then the
+section, then the leaf. That is the tree the config section draws.
 
 The leaf keeps the case the key holds. A name holds five words, and
-`se-stop-most-in-a-row` holds six, so kebab casing the leaf writes a name this
-tree refuses.
+`se-config-stop-most-in-a-row` holds eight, so kebab casing the leaf writes a
+name this tree refuses.
+
+## A widget takes its path
+
+A toggle the schema draws in a group takes a second command down the group's
+path: the group in kebab case, then the leaf. So the hold button in agent
+control answers `se-agent-control-hold-stopped`, and the config tree answers
+`se-config-stop-hold-stopped`. Both run the same verb.
+
+A group holding two toggles on one leaf names each by its section and leaf.
+An action takes no command, because it runs a program and sets no value. The
+sidebar hover names the widget path. For details, see
+[[spec/design_output/extension#a-button-names-its-commands]].
 
 ## Each file says so
 
-The description of every file says what it is:
+The `generated` key of every file says what it is:
 
     GENERATED. Edit the source named below, not this file. It is written again
     every time the tree is projected, so an edit here is lost.
     Source: spec/config/level0.json
+
+The `description` is what the command menu shows. It names the path and the
+change, and carries the key's help from the schema:
+
+    agent control / hold: sets stop.hold to stopped. What the session does when it reaches the end of a turn.
 
 The body meets the same rules every other markdown file meets, because Vale
 reads `.claude/commands` with everything else. So the projector wraps each line
@@ -105,14 +129,15 @@ Two roads stand open, and this tree takes the second:
 The file carries the run in its body and names the verb in `allowed-tools`:
 
     ---
-    description: "GENERATED. ... Source: spec/config/level0.json"
+    description: "config / log / level: sets log.level to info."
     allowed-tools: Bash(./RUNME.sh config:*)
+    generated: "GENERATED. ... Source: spec/config/level0.json"
     ---
 
     !`./RUNME.sh config log.level info`
 
-A file taking an argument carries `$ARGUMENTS` where the value stands, and the
-client puts what a person types there.
+A file taking an argument carries `$ARGUMENTS` where the value stands, and an
+`argument-hint` of `<value>`. The client puts what a person types there.
 
 ### Why the keyword road waits
 
@@ -148,7 +173,7 @@ carries the cost of it, door `project`:
 
 ## What it costs
 
-Measured on 2026-09-10 over one projection and fifteen targets, twenty runs of
+Measured over one projection and fifteen targets, twenty runs of
 each, against the real disk on a cloud box:
 
 | the run | cost |
@@ -176,7 +201,7 @@ project` drops it.
 `./RUNME.sh check` projects in memory, compares each target against the file on
 disk, and refuses a difference:
 
-    .claude/commands/se-log-level-info.md differs
+    .claude/commands/se-config-log-level-info.md differs
     A projection is read-only, so edit the source it names instead.
     Run ./RUNME.sh project, which writes every target again.
 
@@ -193,7 +218,7 @@ disk, and refuses a difference:
 A projection is the one forbidden destination. A person editing one loses that
 edit at the next projection, so the door refuses the write instead:
 
-    .claude/commands/se-log-level-info.md is projected, so nothing may write it by hand.
+    .claude/commands/se-config-log-level-info.md is projected, so nothing may write it by hand.
 
       projection: the config commands
       source:     spec/config/level0.json

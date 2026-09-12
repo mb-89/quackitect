@@ -1,6 +1,6 @@
 ---
 kind: [[rationale]]
-explains: [[spec/guidance/testing]]
+explains: [[spec/guidance/code/testing]]
 ---
 
 # Why
@@ -46,6 +46,14 @@ An earlier line wrote fifteen rules of testing craft as guidance and enforced
 none of them. The rules were right and the suite grew slow anyway, which is the
 whole argument for a check.
 
+## 3. The contract keeps fakes honest
+
+A fake with nothing behind it drifts from the thing it stands for. So one test
+per door drives the real tool and holds the contract, and everything above it
+runs on the fake.
+
+That test costs what the real thing costs, once for the suite.
+
 ## 4. A fake behaves
 
 Fowler draws the line: a fake behaves, and somebody scripts a mock. A mock
@@ -55,14 +63,6 @@ for nothing.
 The fake filesystem here holds a map, and what a test writes it reads back. The
 fake process answers from a table and throws on a command nobody taught it, so a
 wrong answer stays impossible.
-
-## 3. The contract keeps fakes honest
-
-A fake with nothing behind it drifts from the thing it stands for. So one test
-per door drives the real tool and holds the contract, and everything above it
-runs on the fake.
-
-That test costs what the real thing costs, once for the suite.
 
 ## 5. The doc comes first
 

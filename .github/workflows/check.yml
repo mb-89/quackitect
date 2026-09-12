@@ -13,11 +13,16 @@ jobs:
         with:
           node-version: "22"
 
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: src/viewer/go.mod
+          cache-dependency-path: src/viewer/go.sum
+
       # The installer downloads each binary from a pinned release. The key
       # names those versions, so a bump fetches them once and no run after.
       - uses: actions/cache@v4
         with:
           path: .se/bin
-          key: se-bin-vale3.20.0-biome2.5.12-lnav0.14.1
+          key: se-bin-vale3.20.0-biome2.5.12
 
       - run: ./RUNME.sh check

@@ -1,6 +1,6 @@
 // The declaration read as widgets. A schema in memory stands for the tracked
 // one, so a case here says what a field does and no file has to hold it.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";

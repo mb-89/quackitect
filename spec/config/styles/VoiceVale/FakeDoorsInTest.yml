@@ -1,6 +1,6 @@
 extends: script
 message: "A normal test takes a fake: import from doors/fake. A test driving the real thing belongs in test/contract."
-link: spec/guidance/testing.md
+link: spec/guidance/code/testing.md
 level: error
 scope: raw
 script: |

@@ -1,7 +1,11 @@
 ---
 kind: [[design_output]]
-describes: [[.vscode]]
 ---
+
+# Scope
+
+`.vscode` starts the servers holding this tree's rules as a person types. This
+note covers those servers, the settings git tracks, and the assets they want.
 
 # What the editor runs
 
@@ -81,3 +85,18 @@ a server binary by path. A download that fails costs one warning line, and
 Level zero reads every Write and Edit at `tool.call` and runs Vale, Biome and
 the judge there. That door sits inside the harness process and speaks no
 language server protocol, so `.claude` takes no editor entry at all.
+
+# One command opens the editor
+
+A person takes the tree and runs RUNME, bare. RUNME installs what the tree
+needs, links the sidebar, opens the editor here, and shows the quackitect panel.
+
+- `.\RUNME.ps1` runs the install through `RUNME.sh`, then starts `code` itself.
+  PowerShell finds `code.cmd` on its own.
+- `./RUNME.sh` runs the install, then starts `code` where the path carries one.
+- A verb after either hands the verb to the command line, and opens nothing.
+
+The PowerShell doorway sets `SE_EDITOR_OPENS`, so `RUNME.sh` leaves the opening
+to it and the editor opens once. Before it opens, RUNME writes
+`.se/show-panel`. For details, see
+[[spec/design_output/extension#runme-opens-the-panel]].

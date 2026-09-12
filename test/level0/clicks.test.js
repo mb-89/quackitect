@@ -1,18 +1,18 @@
 // The browser side, driven with no browser. A fake page answers the four calls
 // the script makes, so a click becomes a message here exactly as it does in the
 // webview.
-// [[spec/guidance/testing]]
+// [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   matches,
   messageFor,
+  picked,
   restore,
   show,
   wire,
 } from "../../src/extension/webview/clicks.js";
-import { fresh } from "../../src/extension/webview/gesture.js";
 
 function node(sel, said = {}) {
   const classes = new Set(said.classes ?? []);
@@ -53,64 +53,41 @@ const HOLD = {
 
 // [[spec/design_output/extension#a-click-becomes-a-message]]
 test("a click on an action asks for the run the declaration names", () => {
-  const said = messageFor(
-    { key: "log.open", widget: "action", runs: "./RUNME.sh log" },
-    0,
-    fresh(),
-  );
-  assert.deepEqual(said.message, {
+  assert.deepEqual(messageFor({ key: "log.open", widget: "action", runs: "./RUNME.sh log" }), {
     kind: "run",
     key: "log.open",
     runs: "./RUNME.sh log",
   });
 });
 
-test("a click on a toggle asks for the value one rung up, and never draws it", () => {
-  const said = messageFor(HOLD, 0, fresh());
-  assert.deepEqual(said.message, { kind: "set", key: "stop.hold", value: "finishing" });
-});
-
-test("a second click inside the burst asks for nothing", () => {
-  const first = messageFor(HOLD, 0, fresh());
-  assert.equal(messageFor(HOLD, 100, first.state).message, undefined);
+// [[spec/design_output/extension#a-gesture-picks-a-state]]
+test("a click on a toggle posts the press alone, and the host counts it", () => {
+  assert.deepEqual(messageFor(HOLD), { kind: "press", key: "stop.hold" });
 });
 
 test("a click on the page away from a widget posts nothing", () => {
   const root = page([]);
   const posted = [];
-  wire(
-    root,
-    (one) => posted.push(one),
-    { get: () => ({}), set: () => {} },
-    () => 0,
-  );
+  wire(root, (one) => posted.push(one), { get: () => ({}), set: () => {} });
   root.fire("click", { closest: () => null });
   assert.deepEqual(posted, []);
 });
 
-test("a widget clicked on the page posts the message the gesture answers", () => {
+test("five clicks on a widget post five presses, and the page counts none", () => {
   const widget = { dataset: HOLD };
   const root = page([]);
   const posted = [];
-  wire(
-    root,
-    (one) => posted.push(one),
-    { get: () => ({}), set: () => {} },
-    () => 0,
-  );
-  root.fire("click", { closest: (want) => (want === ".widget" ? widget : null) });
-  assert.deepEqual(posted, [{ kind: "set", key: "stop.hold", value: "finishing" }]);
+  wire(root, (one) => posted.push(one), { get: () => ({}), set: () => {} });
+  for (let i = 0; i < 5; i++) {
+    root.fire("click", { closest: (want) => (want === ".widget" ? widget : null) });
+  }
+  assert.deepEqual(posted, Array(5).fill({ kind: "press", key: "stop.hold" }));
 });
 
 test("an editor changed in the bottom section posts the key and what stands in it", () => {
   const root = page([]);
   const posted = [];
-  wire(
-    root,
-    (one) => posted.push(one),
-    { get: () => ({}), set: () => {} },
-    () => 0,
-  );
+  wire(root, (one) => posted.push(one), { get: () => ({}), set: () => {} });
   root.fire("change", {
     dataset: { key: "judge.model" },
     value: "sonnet",
@@ -155,12 +132,59 @@ test("the page takes back the filter and the sections the last look held", () =>
 test("opening a section writes what the page holds, and no value with it", () => {
   const root = page([]);
   let held = {};
-  wire(
-    root,
-    () => {},
-    { get: () => held, set: (one) => (held = one) },
-    () => 0,
-  );
+  wire(root, () => {}, { get: () => held, set: (one) => (held = one) });
   root.fire("toggle", { dataset: { section: "config" }, open: true });
   assert.deepEqual(held, { open: { config: true } });
+});
+
+// [[spec/design_output/extension#the-gear-picks-the-sections]]
+test("the gear opens the chooser, and a tick brings its section back", () => {
+  const chooser = { sel: ".chooser", hidden: true };
+  const gear = { sel: ".gear", closest: (want) => (want === ".gear" ? gear : null) };
+  const section = node("details.section", { dataset: { section: "config" } });
+  const box = {
+    sel: '.pick[data-pick="config"]',
+    checked: false,
+    dataset: { pick: "config" },
+    closest: () => null,
+  };
+  const root = page([chooser, gear, section, box]);
+
+  let state = {};
+  const view = {
+    get: () => state,
+    set: (one) => {
+      state = one;
+    },
+  };
+  wire(root, () => {}, view);
+
+  root.fire("click", gear);
+  assert.equal(chooser.hidden, false, "the gear opens it");
+
+  box.checked = true;
+  root.fire("change", box);
+  assert.deepEqual(state.picks, { config: true }, "the choice rides in the state");
+  assert.ok(!section.classList.contains("gone"), "the section stands again");
+});
+
+test("a section a person unticks goes, and the tick rides through a redraw", () => {
+  const section = node("details.section", {
+    classes: [],
+    dataset: { section: "agent control" },
+  });
+  const box = {
+    sel: '.pick[data-pick="agent control"]',
+    checked: true,
+    dataset: { pick: "agent control" },
+  };
+  const root = page([section, box]);
+
+  picked(root, { "agent control": false });
+  assert.ok(section.classList.contains("gone"));
+  assert.equal(box.checked, false);
+
+  restore(root, { picks: { "agent control": true } });
+  assert.ok(!section.classList.contains("gone"));
+  assert.equal(box.checked, true);
 });
