@@ -1143,7 +1143,7 @@ Ten branches, and the dependencies make the order binding:
 |---|---|---|---|
 | 1 | `the-ticket-has-a-schema` | the two schemas, the checker's recursion, a YAML kind under a schema, the three keywords, `mint`, the private folder | |
 | 2 | `a-process-is-a-route` | the six route files under the schema, `when`, checklists, the six slots, the emitter, the note verb, the copy at the mint, `reroute` | 1 |
-| 3 | `a-group-is-a-branch` | the group as a ticket and its schema gone, the take as a record push, list with the tip's age, merge with the check, close, `adopt` | 1 |
+| 3 | `a-group-is-a-branch` | the group as a ticket and no group schema, the take as a record push, list, merge with the check, close, `adopt` | 1 |
 | 4 | `the-agent-pulls-a-ticket` | the pull, its checks, its answers, the record, a hold per hand, the stop rule | 2, 3 |
 | 5 | `a-step-changes-hands` | the hand id, the spawn and its tag, person steps, escalation | 4 |
 | 6 | `guidance-rides-the-step` | `reads`, the verb, the log line, the standing layer shrinks | 4 |
