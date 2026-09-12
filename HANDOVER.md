@@ -7,10 +7,8 @@ urgency: soon
 # Where it stands
 
 Every schema takes a `governs` list, and the door, the sweep and the new
-`mint_note` tool all read it. `./RUNME.sh test` passes 582 tests, and
-`./RUNME.sh lint` names two lines, both of which stand on main untouched by this
-branch. `./RUNME.sh check` goes red before the sweep, and the next chapter says
-why.
+`mint_note` tool all read it. `./RUNME.sh test` passes, and `./RUNME.sh check`
+stands green after the sync at the end of this note.
 
 | the piece | where it stands |
 |---|---|
@@ -28,21 +26,12 @@ why.
 
 | the thing | what it asks |
 |---|---|
-| `./RUNME.sh check` on main | the plugin gate refuses the `turn.step` hook |
-| `spec/funnel/level-zero-closes.md` | two lines break a Vale rule, on main too |
-| `paragraph.schema.yaml` | it governs nothing, and no note names its kind |
+| `./RUNME.sh check` on main | green now: trunk carries the `turn.step` generator and the two cuts in the funnel note |
+| `paragraph.schema.yaml` | it governs nothing, and no note names its kind, so `isNoteSchema` keeps it out of the note kinds |
 
-The plugin gate is the one thing between this branch and a green `check`. The
-engine reads `.claude/skills/level0/hooks/level0.js` and refuses line 517.
-`turn.step` streams, so it takes `async function* ($, e, next)`, and this tree
-writes `async ($, e, next)`. The same hook stands at line 487 on main and draws
-the same refusal there, so it comes from elsewhere. The fix reaches the answer
-door, which this brief leaves alone. A branch of its own takes it.
-
-So `./RUNME.sh work done` refuses, and this branch stands at `held` with the
-work complete. Green that gate, run `./RUNME.sh check`, and `work done` closes
-it. The 582 tests, the doors, the viewer, the projections and the rules over
-the tree all pass on this head.
+The plugin gate stands between this branch and a green `check` until trunk
+brings the `turn.step` generator in. The sync below takes it, and
+`./RUNME.sh check` runs green on this head, so `work done` closes the branch.
 
 # What the tree carries today
 
@@ -97,3 +86,11 @@ that each one reads as the kind that glob holds.
    goes back to `todo` for somebody else.
 6. Leave the merge into main to a person. A cloud box opens no pull
    request, and trunk only ever comes towards you.
+
+# The sync
+
+Trunk comes in with three branches, and six files conflict. `describesANote`
+and trunk's `isNoteSchema` are one predicate, so `isNoteSchema` stays and the
+chapter over it stands beside `A folder names its kind`. The write door
+registers `check_answer` and `mint_note` both, and the contract test reads
+`isNoteSchema` where it read `describesANote`.
