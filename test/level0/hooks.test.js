@@ -805,6 +805,82 @@ test("a commit reading its message from a file meets the same rules", async () =
   assert.match(said.deny, /PastTense/);
 });
 
+// [[spec/design_output/private#a-fixture-carries-no-shape]]
+const ADDRESS = ["duck", "quacks.org"].join("@");
+
+const DELTA = `diff --git a/spec/guidance/voice.md b/spec/guidance/voice.md
+--- a/spec/guidance/voice.md
++++ b/spec/guidance/voice.md
+@@ -4,0 +5 @@ kind
++Write to ${ADDRESS} where the door refuses.
+`;
+
+function boxSaying(delta, env = {}) {
+  return {
+    exists: (path) => path === VALE,
+    run: (argv) => {
+      if (argv[0] === "node") {
+        return { exitCode: 0, stdout: JSON.stringify(env), stderr: "" };
+      }
+      if (argv[0] === "git" && argv[1] === "diff") {
+        return { exitCode: 0, stdout: delta, stderr: "" };
+      }
+      return { exitCode: 0, stdout: "", stderr: "" };
+    },
+  };
+}
+
+const privateLines = (it) =>
+  it
+    .lines()
+    .filter((one) => one.kind === "private")
+    .map((one) => one.said);
+
+// [[spec/design_output/private#two-doors-one-check]]
+test("a commit whose delta carries a private line is refused, naming the line", async () => {
+  const it = await started(undefined, boxSaying(DELTA));
+  const said = await it.raise(
+    "tool.call",
+    { tool: "Bash", command: 'git commit -m "the door reads more"' },
+    "Bash",
+  );
+
+  assert.match(said.deny, /ShapeStaysHome/);
+  assert.match(said.deny, /spec\/guidance\/voice.md:5:1/);
+  assert.match(said.deny, new RegExp(ADDRESS));
+  assert.deepEqual(privateLines(it), ["refused 1 line(s) in a commit"]);
+});
+
+test("a commit whose delta adds nothing private passes the door", async () => {
+  const it = await started(undefined, boxSaying(""));
+  const said = await it.raise(
+    "tool.call",
+    { tool: "Bash", command: 'git commit -m "the door reads more"' },
+    "Bash",
+  );
+  assert.equal(said.deny, undefined);
+});
+
+// [[spec/design_output/private#the-escape]]
+test("no-verify is refused on a cloud box, and the desk box writes a line", async () => {
+  const cloud = await started(undefined, boxSaying("", { CLAUDE_CODE_REMOTE: "1" }));
+  const said = await cloud.raise(
+    "tool.call",
+    { tool: "Bash", command: 'git commit --no-verify -m "the door reads more"' },
+    "Bash",
+  );
+  assert.match(said.deny, /CommitMeetsTheDoor/);
+
+  const desk = await started(undefined, boxSaying(""));
+  const passed = await desk.raise(
+    "tool.call",
+    { tool: "Bash", command: 'git commit -n -m "the door reads more"' },
+    "Bash",
+  );
+  assert.equal(passed.deny, undefined);
+  assert.deepEqual(privateLines(desk), ["a commit steps past the hook"]);
+});
+
 // [[spec/design_output/bash#the-description-names-verbs]]
 test("the Bash description names the verbs, and answers the same string twice", async () => {
   const it = await started();

@@ -11,7 +11,12 @@ import {
   SAYS,
   warns,
 } from "../lib/answer.js";
-import { commitIn, findings as readsCommand, verbLine } from "../lib/bash.js";
+import {
+  commitIn,
+  findings as readsCommand,
+  skipsTheHook,
+  verbLine,
+} from "../lib/bash.js";
 import { CODE, formatText, lintText as lintCode } from "../lib/code.js";
 import { configOf, SCHEMA, TRACKED } from "../lib/config.js";
 import { ASK, controlBlock, holds, QUIET } from "../lib/controls.js";
@@ -56,7 +61,8 @@ import {
   refusedWrite,
   writesOf,
 } from "../lib/projection.js";
-import { refusal, refusedCommand, taught } from "../lib/refuse.js";
+import { NOTES, privateNow } from "../lib/private.js";
+import { refusal, refusedCommand, refusedDelta, taught } from "../lib/refuse.js";
 import { readerAsks, readerSays, report, reviewSpec } from "../lib/review.js";
 import { readRule } from "../lib/rulefile.js";
 import {
@@ -362,8 +368,16 @@ export function register(on, _options) {
   on("tool.call", { tool: "Bash" }, async ($, e, next) => {
     const said = await (async () => {
     const said = String(e.command ?? "");
-    const found = readsCommand(said, await settings.ask("names.words"));
+    const found = readsCommand(said, await settings.ask("names.words"), { cloud });
     found.push(...(await commitVoice($, said, bin)));
+
+    // [[spec/design_output/private#the-escape]]
+    if (!cloud && skipsTheHook(said)) {
+      await logbook.say("warn", "private", "a commit steps past the hook", {
+        tool: "Bash",
+        detail: said.slice(0, 120),
+      });
+    }
     if (!found.length) return next(e);
 
     await logbook.say("warn", "bash", `refused ${found.length} rule(s) in a command`, {
@@ -372,6 +386,25 @@ export function register(on, _options) {
       detail: said.slice(0, 120),
     });
     return { deny: refusedCommand(said, found) };
+    })();
+    return godPasses(logbook, settings, e, next, said);
+  });
+
+  // [[spec/design_output/private#two-doors-one-check]]
+  on("tool.call", { tool: "Bash" }, async ($, e, next) => {
+    const said = await (async () => {
+    const command = String(e.command ?? "");
+    if (!commitIn(command)) return next(e);
+
+    const found = await privateNow(theDelta($));
+    if (!found.length) return next(e);
+
+    await logbook.say("warn", "private", `refused ${found.length} line(s) in a commit`, {
+      tool: "Bash",
+      file: found[0].file,
+      rule: found[0].rule,
+    });
+    return { deny: refusedDelta(found) };
     })();
     return godPasses(logbook, settings, e, next, said);
   });
@@ -1111,6 +1144,38 @@ async function readGuidance($, roots) {
   }
 }
 
+// [[spec/design_output/private#two-doors-one-check]]
+function theDelta($) {
+  return {
+    diff: async () => await gitSays($, ["diff", "--cached", "--unified=0"]),
+    box: async () => await boxOf($),
+    notes: async () =>
+      (await inFolder($, NOTES, "")).map((one) => ({
+        ...one,
+        name: `${NOTES}/${one.name}`,
+      })),
+  };
+}
+
+async function boxOf($) {
+  const env = await readEnv($, ["USER", "USERNAME", "HOME", "USERPROFILE"]);
+  return {
+    user: env.USER || env.USERNAME || "",
+    home: env.HOME || env.USERPROFILE || "",
+    name: await gitSays($, ["config", "--get", "user.name"]),
+    email: await gitSays($, ["config", "--get", "user.email"]),
+  };
+}
+
+async function gitSays($, args) {
+  try {
+    const ran = await $.process.run(["git", ...args], { timeoutMs: 10000 });
+    return (ran.stdout ?? "").trim();
+  } catch {
+    return "";
+  }
+}
+
 // [[spec/design_output/work#a-box-landing-on-trunk]]
 async function onACloudBox($) {
   const env = await readEnv($, ["CLAUDE_CODE_REMOTE", "SE_CLOUD"]);
@@ -1123,14 +1188,7 @@ async function offAWorkBranch($) {
 }
 
 async function branchNow($) {
-  try {
-    const ran = await $.process.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], {
-      timeoutMs: 10000,
-    });
-    return (ran.stdout ?? "").trim();
-  } catch {
-    return "";
-  }
+  return await gitSays($, ["rev-parse", "--abbrev-ref", "HEAD"]);
 }
 
 async function readEnv($, names) {

@@ -36,6 +36,26 @@ export function refusedCommand(command, found) {
   return lines.join("\n");
 }
 
+// [[spec/design_output/private#two-doors-one-check]]
+export function refusedDelta(found) {
+  const lines = [];
+  lines.push("This commit carries something private, so the door holds it here.");
+  lines.push("");
+
+  for (const one of found) {
+    lines.push(`  ${one.file}:${one.line}:${one.column}  ${one.rule}`);
+    lines.push(`    adds: ${cut(one.said)}`);
+    lines.push(`    ${one.message}`);
+    lines.push("");
+  }
+
+  lines.push(
+    "Take the line out of the delta, stage the file again, and commit. A line " +
+      "the delta removes passes always, so a leak leaves this tree the same way.",
+  );
+  return lines.join("\n");
+}
+
 export function taught(found) {
   return (
     `Hold ${namesOf(found)} for the rest of this turn: apply the same rule to every line you write next, ` +

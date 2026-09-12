@@ -64,6 +64,7 @@ import {
   readRegister,
   rootsHere,
 } from "./vehicle.js";
+import { HOOKS } from "./precommit.js";
 import { work } from "./work.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 
@@ -770,6 +771,7 @@ async function doctor() {
         ? `${EDITOR_SETTINGS}, both servers`
         : "missing",
     ],
+    ["commit hook", hooksSay()],
     [
       "vale rules",
       files.exists(STYLES)
@@ -804,6 +806,16 @@ async function doctor() {
     console.log(`${what.padEnd(18)} ${String(said).trim() || "missing"}`);
   }
   return 0;
+}
+
+// [[spec/design_output/private#two-doors-one-check]]
+function hooksSay() {
+  const at = join(HOOKS, "pre-commit");
+  if (!files.exists(join(root, at))) return `${at} stands nowhere`;
+
+  const said = it.git.run(["config", "--get", "core.hooksPath"], true).out;
+  if (said === HOOKS) return `${at}, which git reads`;
+  return `git reads ${said || "its own folder"}, so run ./RUNME.sh`;
 }
 
 function cageSays() {
