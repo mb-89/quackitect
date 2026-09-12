@@ -569,10 +569,10 @@ export function mintNote(schema, fields) {
   const required = spec.required ?? [];
   const rows = ["---"];
 
-  for (const key of required) rows.push(`${key}: ${valueOf(key, props[key], given)}`);
+  for (const key of required) rows.push(`${key}: ${saidFor(key, props[key], given)}`);
   for (const key of Object.keys(props)) {
     if (required.includes(key) || !given.has(slugOf(key))) continue;
-    rows.push(`${key}: ${valueOf(key, props[key], given)}`);
+    rows.push(`${key}: ${saidFor(key, props[key], given)}`);
   }
   rows.push("---", "");
 
@@ -604,11 +604,12 @@ export function slugOf(said) {
 
 function handedIn(fields) {
   const out = new Map();
-  for (const [key, value] of Object.entries(fields ?? {})) out.set(slugOf(key), value);
+  if (!fields || typeof fields !== "object" || Array.isArray(fields)) return out;
+  for (const [key, value] of Object.entries(fields)) out.set(slugOf(key), value);
   return out;
 }
 
-function valueOf(key, rule, given) {
+function saidFor(key, rule, given) {
   if (rule?.const !== undefined) return minted(rule);
   const said = given.get(slugOf(key));
   if (said === undefined || String(said).trim() === "") return minted(rule);

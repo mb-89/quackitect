@@ -1,93 +1,83 @@
 ---
 kind: [[handover]]
 status: held
-urgency: now
+urgency: soon
 ---
 
 # Where it stands
 
-`spec/schemas` holds one schema per kind of note, and `lib/schema.js` reads
-them. The write door weighs every markdown write against the schema its
-`kind` names. `./RUNME.sh mint <kind> <path>` writes a note in the shape a
-schema names, with the description of each chapter as an HTML comment. Two
-things stand open, and the owner asks for both.
+Every schema takes a `governs` list, and the door, the sweep and the new
+`mint_note` tool all read it. `./RUNME.sh test` passes 582 tests, and
+`./RUNME.sh lint` names two lines, both of which stand on main untouched by this
+branch. `./RUNME.sh check` goes red before the sweep, and the next chapter says
+why.
 
-A note carrying no `kind` reaches no schema and passes, wherever it stands. So
-a file under `spec/guidance` with no frontmatter meets no rule of the guidance
-schema, and a rationale under `spec/funnel` passes as a funnel.
-
-`mint` writes a template and hands the agent a file to edit. The owner asks for
-the other way round: the agent hands the fields over, and the note comes out of
-the schema.
+| the piece | where it stands |
+|---|---|
+| `governs` in every schema | six schemas name a folder or a path |
+| the reader answering a path | `governorOf` in `lib/schema.js` |
+| the door refusing a stranger | `hooks/level0.js`, beside the departure door |
+| the sweep naming one | `schemaFaults`, over every path git holds |
+| the `mint_note` tool | registered at `session.start`, beside `claim_stop` |
+| a placeholder for an absent field | `mintNote(schema, fields)` |
+| the placeholder as a finding | `placeholderFaults`, at `warning` |
+| the `mint` verb taking the same fields | `fieldsIn` reads `--name=value` |
+| the guidance line | rule 11 in `spec/guidance/guidance.md` |
 
 # What waits
 
-| the piece | where | proves it |
-|---|---|---|
-| `governs` in every schema | `spec/schemas/*.schema.yaml` | each schema names the folders it holds |
-| the door refuses a stranger in a governed folder | `lib/schema.js`, and the write door | a kind-less file under `spec/guidance` refuses, and a funnel note there refuses |
-| the sweep names one too | `schemaFaults` | `./RUNME.sh check` goes red on a stranger already in the tree |
-| the `mint_note` tool | `hooks/level0.js`, beside `claim_stop` | the tool takes a kind, a path and the fields, and writes a note the checker passes |
-| a placeholder for a field the agent leaves out | `lib/schema.js` | a note minted with one chapter carries the comment for the rest |
-| the placeholder as a finding | `schemaFaults` | a note still carrying a placeholder comment stands at `warning` |
-| the guidance line | `spec/guidance/guidance.md` | the note stays under its cap |
-
-# A folder names its kind
-
-Each schema takes a `governs` list, one glob a line:
-
-    governs:
-      - spec/guidance/**/*.md
-
-The reader answers, for any path, which schema governs it, and a path no
-schema governs stays as it stands today. In a governed folder the door holds
-three things:
-
-| the write | what happens |
+| the thing | what it asks |
 |---|---|
-| a note of the governed kind | the checker weighs it, as today |
-| a note of another kind | refused, naming the kind the folder holds |
-| a file with no `kind` | refused, naming the schema and `mint_note` as the road |
+| `./RUNME.sh check` on main | the plugin gate refuses the `turn.step` hook |
+| `spec/funnel/level-zero-closes.md` | two lines break a Vale rule, on main too |
+| `paragraph.schema.yaml` | it governs nothing, and no note names its kind |
 
-A draft under an underscore stays outside every rule, as it does today. The
-handover schema governs `HANDOVER.md` at the root and `.se/HANDOVER.md`, so
-its `governs` names two paths and no folder.
+The plugin gate is the one thing between this branch and a green `check`. The
+engine reads `.claude/skills/level0/hooks/level0.js` and refuses line 517.
+`turn.step` streams, so it takes `async function* ($, e, next)`, and this tree
+writes `async ($, e, next)`. The same hook stands at line 487 on main and draws
+the same refusal there, so it comes from elsewhere. The fix reaches the answer
+door, which this brief leaves alone. A branch of its own takes it.
 
-The folder names differ from the kinds in two places, `spec/rationales` for
-`rationale` and `spec/design_input` for `design_input`. `governs` says the
-folder outright, so no rule about names has to hold.
+# What the tree carries today
 
-# The tool writes the note
+No stranger stands in a governed folder. The sweep answers nothing over the
+tree. A contract test now walks every note under a `governs` glob, and asserts
+that each one reads as the kind that glob holds.
 
-`mint_note({ kind, path, fields })` reads the schema for the kind and writes
-the note. `fields` carries the frontmatter values and the text under each
-chapter, by header. The tool runs the checker over what it writes and answers
-the findings. A note the schema refuses comes back with the finding, and no
-file lands.
+# The surprises
 
-A field the agent leaves out takes the placeholder `mint` writes today, the
-chapter's description as a comment. So the note lands whole in shape, and the
-sweep names each placeholder still standing at `warning`, under
-`Schema.Placeholder`. The agent fills it in with an Edit, which the door weighs
-as today.
+1. `spec/guidance/**/*.md` misses `spec/guidance/voice.md`. The glob reader in
+   `lib/paths.js` reads `**` as `.*`, and it keeps the `/` after it literal. So
+   that pattern wants two slashes. Every `governs` entry says the folder
+   outright, `spec/guidance/**`, which reads both depths. The brief's own
+   example carries this, so read a glob here as this reader reads it.
+2. `paragraph.schema.yaml` holds a `kind` and describes no note. So the reader
+   counts it as a seventh note kind, and the contract test stands red on main
+   today. `schemasIn` now keeps a schema carrying a `body`, and the design note
+   says why.
+3. A placeholder belongs outside `checkNote`. The door refuses whatever
+   `checkNote` names, so a minted note refuses itself on its first edit. The
+   placeholders live in `placeholderFaults`, which the sweep and the tool call
+   and the door leaves alone.
+4. A frontmatter placeholder reads off the raw line, past the parsed value. The
+   YAML reader splits a flow list on every comma, even inside a quote. So
+   `scope: ["one entry, and another"]` comes back as two entries. Comparing the
+   line against what `mint` writes sidesteps that.
+5. A field taking an `enum` carries a real value. `status: todo` is the shape a
+   handover names, so the finding passes over `const` and `enum` both.
 
-`./RUNME.sh mint` keeps its verb and takes the same fields on the command
-line, so a person and a session read one shape.
+# The dead ends
 
-# How to build it
-
-Test the reader and the checker over the fake disk with a fixture schema
-carrying `governs`. Test the door with a fake `$` handing in a kind-less write
-under a governed folder, and assert the refusal names the schema. Test the
-tool with a fake session and assert the note it writes passes the checker,
-with one placeholder where a field is absent. Run `./RUNME.sh check` over the
-tree, because the tree may carry a stranger today, and say in the handback
-which files it names.
+1. Comparing a placeholder by parsed value. See surprise four.
+2. Probing a path with `$.fs.exists` before the tool writes. The fake engine in
+   `test/level0/hooks.test.js` answers `exists` for the Vale binary alone, so
+   the tool reads a path that stands and writes over it. It reads the file
+   instead, which both engines answer the same way.
+3. Leaving the anchor `schema#warning-now-and-error-later` dangling. Two places
+   reach it and no chapter answers, so this branch writes the chapter.
 
 ## How this branch runs
-
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
 
 1. Run `./RUNME.sh work sync` FIRST. It takes main into this branch, so
    an old branch works against what the tree holds now. Resolve any conflict
