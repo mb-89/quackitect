@@ -625,20 +625,41 @@ function release(it, name) {
   if (dirty(it)) return 2;
 
   const brief = briefOf(it, branch);
-  if (!brief) {
-    console.error(`${branch} carries no ${BRIEF}.`);
+  const named = branch.replace(/^work\//, "");
+  const ticket = brief ? "" : textAt(it, `origin/${branch}`, ticketAt(named));
+  if (!brief && !isGroup(ticket)) {
+    console.error(`${branch} carries no ${BRIEF} and no group.`);
     return 1;
   }
-  if (statusOf(brief) === DONE) {
+  const standing = brief ? statusOf(brief) : groupStanding(ticket);
+  if (standing === DONE) {
     console.error(`${branch} stands at ${DONE}. Read it before you reopen it.`);
     return 1;
   }
 
-  if (!it.git.run(["switch", branch], true).ok) {
-    if (!it.git.run(["switch", "-c", branch, `origin/${branch}`]).ok) return 1;
-  }
-  it.git.run(["reset", "--hard", `origin/${branch}`], true);
+  if (!onBranch(it, branch)) return 1;
+  if (!brief) return letGo(it, branch, named, here);
   if (!push(it, branch, setStatus(brief, TODO), TODO)) return 1;
+  if (here !== branch) it.git.run(["switch", here], true);
+
+  console.log(`${branch} stands at ${TODO} again, and is free for anybody.`);
+  return 0;
+}
+
+// [[spec/design_output/work#a-stale-group-is-yours]]
+function letGo(it, branch, name, here) {
+  const at = ticketAt(name);
+  const path = it.join(it.root, at);
+  const held = heldIn(it.disk.read(path));
+  if (!held) {
+    console.log(`${branch} holds nobody already, so it is free for anybody.`);
+    return 0;
+  }
+
+  it.disk.write(path, withGave(it.disk.read(path), it.git.run(["rev-parse", "HEAD"], true).out));
+  it.git.run(["add", at], true);
+  it.git.run(["commit", "-m", `${branch}: ${held.hand} lets it go`], true);
+  if (!it.git.run(["push", "origin", branch]).ok) return 1;
   if (here !== branch) it.git.run(["switch", here], true);
 
   console.log(`${branch} stands at ${TODO} again, and is free for anybody.`);
@@ -756,8 +777,9 @@ function merge(it, name) {
   }
 
   const freed = group ? freeChildren(it, name) : [];
-  if (it.git.run(["rm", "--cached", "-q", BRIEF], true).ok) dropBrief(it);
-  if (freed.length || !group) it.git.run(["commit", "--amend", "--no-edit"], true);
+  const dropped = it.git.run(["rm", "--cached", "-q", BRIEF], true).ok;
+  if (dropped) dropBrief(it);
+  if (freed.length || dropped) it.git.run(["commit", "--amend", "--no-edit"], true);
 
   // [[spec/design_output/work#the-merge-lands-the-truth]]
   const said = checkSays(it);

@@ -94,7 +94,14 @@ the age of the tip is the signal:
 | under `work.staleAfter` | a box holds the group, and nothing asks |
 | past it | the group is a person's, and `list` puts it under yours |
 
-Under yours it carries three answers: release it, take it over, or close it.
+Under yours it carries three answers, and each is a verb:
+
+| the answer | the verb | what it does |
+|---|---|---|
+| release it | `work release <name>` | writes `gave`, so the group stands at `todo` |
+| take it over | `work take` | claims it again, with a record entry of its own |
+| close it | `work close <name> --force` | drops the branch, and the work on it |
+
 `work.staleAfter` reads `12h` by default, and the rule derives from the tip, so
 nothing writes to a branch nobody holds.
 

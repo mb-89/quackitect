@@ -767,6 +767,31 @@ test("merge frees an open ticket of the group it takes in, and leaves a closed o
   assert.ok(ranGit(outside).includes("git commit --amend --no-edit"));
 });
 
+// [[spec/design_output/work#a-stale-group-is-yours]]
+test("release writes gave onto a held group, and frees it for anybody", () => {
+  const took = withEntry(GROUP_NOTE, { step: "sync", hand: "box 3f9a", took: "a1b2c3" });
+  const { it, outside, disk } = doorsSaying(groupRemote(took), { [on("one-group")]: took });
+
+  const { code, said } = heard(() => work(ROOT, ["release"], it));
+
+  assert.equal(code, 0);
+  assert.equal(recordIn(disk.read(on("one-group"))).at(-1).gave, SHA);
+  assert.equal(groupStanding(disk.read(on("one-group"))), TODO);
+  assert.match(said, /free for anybody/);
+  assert.ok(ranGit(outside).includes("git push origin work/one-group"));
+});
+
+// [[spec/design_output/work#a-stale-group-is-yours]]
+test("release on a group nobody holds writes nothing, and says so", () => {
+  const { it, outside } = doorsSaying(groupRemote(), { [on("one-group")]: GROUP_NOTE });
+
+  const { code, said } = heard(() => work(ROOT, ["release"], it));
+
+  assert.equal(code, 0);
+  assert.match(said, /holds nobody already/);
+  assert.ok(!ranGit(outside).some((one) => one.startsWith("git commit")));
+});
+
 // [[spec/design_output/work#a-merged-branch-closes]]
 test("close drops a group's branch once trunk holds it", () => {
   const { it, outside } = doorsSaying({
