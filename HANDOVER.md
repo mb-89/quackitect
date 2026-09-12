@@ -6,84 +6,66 @@ urgency: now
 
 # Where it stands
 
-The funnel note `spec/funnel/a-paragraph-has-a-schema.md` names six branches,
-and this is the first. Read that note before anything else. It stands on the
-branch `claude/friendly-brown-k6kohy` until the owner merges it, so take that
-branch in where `work sync` leaves the note absent.
+Both verbs stand on the command line, and `./RUNME.sh check` passes at 697
+tests with the rules green. The code lands at `c5b653dd`, and this handover
+and the status ride on top of it.
 
-The door log under `.se/log` writes one row per refusal, with the rule, the
-tool and the phrase. Nothing reads those rows. The measurement behind the note
-lives as three scripts under `.se/scripts` on one box, off git. This branch
-brings it into the tree as a verb.
+| the piece | where it lives | stands |
+|---|---|---|
+| `voice measure <folder>` | `src/scripts/voice.js`, `lib/voice.js` | yes |
+| `voice measure --transcripts <f>` | the same pair | yes |
+| `voice refused [days]` | the same pair | yes |
+| both verbs in the help | `src/scripts/cli.js` | yes |
+
+The split follows the brief. `lib/voice.js` holds every function taking rows
+and answering rows, and `test/level0/verbs.test.js` drives it over fixtures.
+`src/scripts/voice.js` reaches the disk, the clock and the process, and
+`test/level0/voiceverb.test.js` drives it over the fakes.
 
 # What waits
 
-| the piece | where | proves it |
+| the piece | where | why it waits |
 |---|---|---|
-| `./RUNME.sh voice measure <folder>` | `src/scripts/cli.js`, and a lib beside it | a fixture folder scores a known number |
-| `./RUNME.sh voice measure --transcripts <folder>` | the same | a fixture transcript yields its answers as files |
-| `./RUNME.sh voice refused [days]` | the same | a fixture log ranks its rows in a known order |
-| the two verbs in `RUNME.sh help` | `RUNME.sh` | the help names both |
+| a phrase on a refusal row | `hooks/level0.js` | the doors log the rule and drop the match |
+| the second branch | `work/the-schema-projects-vale` | it now declares `depends_on` on this one |
 
-# What measure does
+A refusal row carries `rule`, `tool` and `file`, and no phrase. The Vale
+finding carries its match as `said`, so one more field on four log rows
+lights up the phrase column. This branch changes no door, so that waits.
 
-`voice measure <folder>` reads every markdown file under a folder. It runs the
-tree's own Vale over each one under the answer register, the way the write door
-runs it. It prints one row per file and one total row:
+# The numbers
 
-    file            words  findings  per 1000 words  top rules
-    003-answer.md     517         6            11.6  LongSentence 4, Passive 2
+| what | words | findings | a thousand words |
+|---|---|---|---|
+| `spec` | 45327 | 0 | 0.0 |
+| the whole tree | 49795 | 0 | 0.0 |
+| the answers of this session | 1486 | 9 | 6.1 |
 
-The per-1000 number is the score. Lower is cleaner, and the delta between two
-runs is the signal. Print the rule counts over the whole folder last, in rank
-order.
+The tree scores zero, which the green lint says too. So the delta the next
+branch reports comes off a clean floor. The answers score 6.1, and the gate
+puts one answer of mine at 8.4 the same day.
 
-`--transcripts <folder>` first pulls the answers out of a folder of session
-transcripts, the `.jsonl` files the client writes under its projects folder.
-Keep the rows of type `assistant` that carry no `agentId` and stand on no
-sidechain. Join their text blocks. Skip an answer under 25 words. Write one file
-per answer as `<session>/NNN-answer.md` under `.se/measure`, then measure that
-folder. The file name ends in `answer.md`, so `.vale.ini` reads it as an answer.
+# What surprises me
 
-# What refused does
+1. Vale takes the folder relative to the root. An absolute path stops its
+   per-path sections from matching, and `spec/rationales` then lights up 108
+   `PastTense` findings that `.vale.ini` turns off there. The fix is one
+   argument, and the trap is silent.
+2. The fake disk answers an empty list where the real one throws. A walk
+   meeting a file path has to read both.
+3. Measuring the root sweeps `.se` in, and the scratch there is the very
+   output of `--transcripts`. So the walk skips `.se` unless the folder you
+   name opens with it.
+4. `voice.test.js` already covers the voice rules, so the verb tests take
+   two other names.
 
-`voice refused [days]` reads every `.se/log/*.jsonl` from the last days, seven
-by default. It keeps the rows at level `warn` that carry a rule. It ranks rule
-by phrase, so the retro sees which rule fires most and on what:
+# The dead end I meet
 
-    rule            fires   phrase
-    PastTense          14   bold
-    LongSentence       11   ...
-    ShellWritesNothing  3   {vid}.txt
+The funnel note names six branches in order, and nothing maps that order
+where a program reads it. So `work take` hands out the second branch while
+this one stands at `todo`, and this session starts on the wrong one.
 
-The retro reads that table and names what the door refused wrongly. So print
-the phrase where the row carries one, and the tool where it carries none.
-
-# How to build it
-
-Reach the disk and the log through `src/doors`, and test against the fakes in
-`src/doors/fake`. Keep the extraction and the ranking as pure functions that
-take rows and answer rows. A test then feeds them a fixture and asserts the
-order. Vale runs through the process door, the way `lib/vale.js` runs it.
-
-Change no rule and no door on this branch. The verbs read, and later branches
-report their delta through them.
-
-## How this branch runs
-
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
-
-1. Run `./RUNME.sh work sync` FIRST. It takes main into this branch, so
-   an old branch works against what the tree holds now. Resolve any conflict
-   before you start, because a conflict found later costs the work already
-   done.
-2. Commit and push each time you finish a thing. A cloud box dies and takes
-   its working tree with it.
-3. Write your result and your retro into `HANDOVER.md`, at the root, replacing
-   this brief. Say what surprises you and every dead end you walk into.
-4. Run `./RUNME.sh work done`, which sets the status and pushes.
-5. Run `./RUNME.sh work release` instead where you stop early, so the branch
-   goes back to `todo` for somebody else.
-6. Leave the merge into main to a person. A cloud box opens no pull
-   request, and trunk only ever comes towards you.
+The owner settles it, and `work/the-schema-projects-vale` now declares
+`depends_on: [the-voice-verbs]`. A dependency naming no branch reads as
+satisfied, and that is right. A done branch merges into main and goes away,
+so its absence says the work lands.
