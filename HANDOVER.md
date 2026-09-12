@@ -39,6 +39,11 @@ writes `async ($, e, next)`. The same hook stands at line 487 on main and draws
 the same refusal there, so it comes from elsewhere. The fix reaches the answer
 door, which this brief leaves alone. A branch of its own takes it.
 
+So `./RUNME.sh work done` refuses, and this branch stands at `held` with the
+work complete. Green that gate, run `./RUNME.sh check`, and `work done` closes
+it. The 582 tests, the doors, the viewer, the projections and the rules over
+the tree all pass on this head.
+
 # What the tree carries today
 
 No stranger stands in a governed folder. The sweep answers nothing over the
