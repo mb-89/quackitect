@@ -6,7 +6,6 @@
 # chapter until none stands. The mine phase is the retro's own hand reading
 # what collect lays out, and its last leaves read the retro itself.
 # [[spec/design_input/the-agent-pulls-tickets#the-retro]]
-name: retro
 for: a window of the record, and the changes to the machinery it earns
 ask:
   - name: why

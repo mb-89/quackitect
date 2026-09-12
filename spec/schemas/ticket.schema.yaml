@@ -87,9 +87,14 @@ frontmatter:
           by:
             type: string
             x-names: steps
-            x-words: [anyone, person, agent, children, tickets]
+            x-words: [anyone, person, agent, helper, retro, children, tickets]
             x-prefix: not
             description: the hand this step admits, as a word or not <step>
+
+          not:
+            type: string
+            x-names: steps
+            description: a step whose hand this step's hand may not be
 
           reads:
             type: [array, string]
