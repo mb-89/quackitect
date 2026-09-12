@@ -7,95 +7,97 @@ depends_on: [the-private-half-stays-home]
 
 # Where it stands
 
-The owner rules that nothing private reaches git, and names the commit as the
-door that holds it: a check reads the delta a commit carries, and a delta
-carrying something private refuses the commit. The branch
-`the-private-half-stays-home` brings the checks themselves over from v3, the
-six-word run, the opaque token and the shapes, and puts them at the write door
-and on the sweep. It also cleans the tree of what stands there today, the
-dates in prose, the handle in the plugin manifest and two fixtures naming a
-person's user. This branch puts the checks at the commit.
+The commit door stands, and it holds this branch's own commits. A delta reader
+answers the lines a commit adds, three checks read those alone, and two doors
+call the one check over the one delta.
 
-The Bash door in `lib/bash.js` reads every `git commit` today, to lint the
-message. So the door already stands where the delta passes, and it reads the
-box through the process door.
+| the piece | where | what proves it |
+|---|---|---|
+| the delta check | `lib/private.js` | `test/level0/private.test.js`, fourteen cases over a fixture diff |
+| the commit in the Bash door | `hooks/level0.js`, `lib/bash.js` | `test/level0/hooks.test.js`, a fake engine answering a staged diff |
+| the git hook | `.githooks/pre-commit`, `src/scripts/precommit.js` | `test/level0/precommit.test.js`, six cases over a fake disk and a fake git |
+| the hook in place | `install.sh` | `./RUNME.sh doctor` names `.githooks/pre-commit, which git reads` |
+| the allow list | `lib/private.js` | the four nobody users pass, and a fifth name refuses |
+| the added lines alone | `lib/private.js` | the fixture diff removes the same line it adds, and the reader answers one |
+| the escape | `lib/bash.js` | `test/level0/bash.test.js`, every form `-n` takes |
+| the note | `spec/design_output/private.md` | `./RUNME.sh lint` passes, and every marker in the new code points at a chapter |
+
+The suite runs 582, up 25. `./RUNME.sh lint` passes over everything this branch
+writes. This commit itself lands through `.githooks/pre-commit`, so the door
+holds the hand that builds it.
 
 # What waits
 
-| the piece | where | proves it |
+| the thing | who | what it costs |
 |---|---|---|
-| the delta check | `lib/private.js`, over the text of `git diff --cached` | a staged file carrying a shape, a name of the box or a run from `.se/notes` refuses |
-| the commit in the Bash door | `lib/bash.js` | `git commit` with a private delta refuses, naming the file, the line and what leaks |
-| the git hook | `.githooks/pre-commit` | a commit a person makes by hand refuses the same way |
-| the hook wired | `RUNME.sh`, `install.sh`, `RUNME.ps1` | `./RUNME.sh` sets `core.hooksPath`, and `doctor` says so |
-| the allow list | `lib/private.js` | the nobody users pass, and nothing else does |
-| the added lines alone | `lib/private.js` | a line the delta removes never refuses, so a leak can leave the tree |
-| the escape | `lib/bash.js` | `git commit --no-verify` refuses on a cloud box, and the desk box logs it |
+| the `turn.step` hook migrates to an async generator | the owner, with a probe | `./RUNME.sh check` stands red, so `work done` refuses and this note stands at `held` |
+| the paragraph schema finds its folder | the owner | two contract cases stand red, and `the-answer-gate-bites` carries the fix already |
+| the write door and the sweep | `the-private-half-stays-home` | `lib/private.js` holds the three checks, and that branch calls them where prose lands |
+| a note under `.se/notes` | a later level | the run check answers on an empty list today |
 
-# The delta
+`./RUNME.sh check` answers red on the first two rows, and both stand on
+`origin/main` ahead of the first line this branch writes.
+`the-answer-gate-bites` measures the same two, names the owner on both, and
+holds for the same reason. So this branch leaves them where that one leaves
+them, and adds no second copy of either fix.
 
-The check reads what a commit adds, and nothing else. `git diff --cached
---unified=0` names each file and each added line with its number, so a
-refusal points at the line the person or the session sees. A removed line
-passes, because taking a leak out of the tree is the one commit that must
-always land.
+# The cost of every commit
 
-The three checks are the ones the privacy branch builds, and this branch
-calls them over the added lines:
+Every commit pays this check, so here is the reading. The delta carries a
+hundred files and two thousand lines it adds, and `.se/notes` holds one note:
 
-| check | reads |
+| what the box reads | median |
 |---|---|
-| the shapes | an email address, a phone number, a date in prose, a home path with a user outside the allow list |
-| the box's names | the user name, the home folder, the git name and email of the box |
-| the run and the token | every file under `.se/notes`, against the added lines |
+| the delta alone, no note | 10 ms |
+| one note of 500 words | 129 ms |
+| one note of 5000 words | 1219 ms |
+| the hook end to end, over node and git | 94 ms |
 
-The allow list holds the nobody users, `user`, `root`, `one` and `somebody`,
-and nothing else. The handle owning the origin stands in git's own metadata
-and in no tracked file, once the privacy branch names the project in the
-manifest. A binary file and a file under `.se` stay out, and `.se` stays out
-of git already.
+The delta walk is cheap and flat. The run check weighs the words of one file
+against the words of each note, and that product is the whole slope. Ten notes
+of 5000 words on a delta of this size costs twelve seconds, which no commit
+should pay. Two roads out, and the owner picks one:
 
-# Two doors, one check
+- Cap what the run check reads, by words of note or by files of delta.
+- Index the note words once per commit, and read each file against the index.
 
-| the commit comes from | the door |
-|---|---|
-| a session, through the Bash tool | `lib/bash.js`, before the command runs |
-| a person, in a terminal | `.githooks/pre-commit`, which git runs |
+The reading comes out of `privateIn` over a generated diff, under
+`.se/scripts`, which git ignores. `node --test test/level0/private.test.js`
+answers the same shape in milliseconds.
 
-Both call the same function over the same delta, so the two refuse the same
-thing in the same words. The pre-commit hook runs `node` on
-`.claude/skills/level0/lib/private.js` with the delta on stdin, and answers
-the exit code git reads. `./RUNME.sh` sets `core.hooksPath` to `.githooks`
-once, the way it links the editor, and `doctor` names the path it finds.
+# The retro
 
-`--no-verify` skips a git hook by design. On a cloud box the Bash door refuses
-it, because a cloud box has no person behind it. On a desk box the door lets
-it pass and writes a `warn` line, because a person owns their own escape.
+What surprises me, in the order it arrives:
 
-# How to build it
+1. The check refuses its own proof. A test of the shapes wants an address in it,
+   and the door reads a tracked test file like any other. Every fixture here now
+   assembles its shape at runtime, and
+   [[spec/design_output/private#a-fixture-carries-no-shape]] says so. That is a
+   second limit beside v3's bare name, and it belongs in the note.
+2. `./RUNME.sh check` already stands red on two counts, out of main.
+   `the-answer-gate-bites` says the same thing in its own handback, and a reader
+   of both meets one message twice. So the battery comes first, ahead of any
+   line of code.
+3. `./RUNME.sh fix` reformats thirty-one files this branch reaches nowhere near.
+   The current Biome sorts imports differently from the tree as it stands, so
+   one `fix` over a folder buries a small diff. This branch reverts every file
+   it owns nothing in, and formats its own four. A person wanting one clean
+   sweep of the tree owns that as its own commit.
+4. The brief puts the delta on stdin into `lib/private.js` itself. A module
+   under `lib` reaches nothing outside, by the rule `DoorsOnly` holds, so the
+   hook runs `src/scripts/precommit.js`, which builds the doors and hands the
+   text in. The pipe stands where the brief puts it, one layer out.
+5. The three checks stand in `lib/private.js` on this branch, and the brief reads
+   as though the privacy branch writes them first. That branch stands at `todo`,
+   so this one ports v3's run and token itself. The privacy branch calls the same
+   functions at the write door and on the sweep, and writes no second copy.
+6. A box's git name of one word collides with ordinary prose. This cloud box
+   answers a name this tree's own prose carries. The match reads a whole word in
+   the case the box answers, which keeps a lowercase `.claude/` in a path
+   passing. So the door holds the hand writing this note, which is the point. A
+   handle of one lowercase word would refuse half the tree, so read that row
+   again on a desk box before you trust it.
 
-Test the delta reader as a pure function over a fixture diff, with one added
-line that leaks and one removed line that carries the same text. Test the
-Bash door with a fake process answering a staged diff. Test the hook script
-against a fixture on stdin, and its exit code. Say in the handback how long
-the check takes on a commit of a hundred files, because every commit pays
-it.
-
-## How this branch runs
-
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
-
-1. Run `./RUNME.sh work sync` FIRST. It takes main into this branch, so
-   an old branch works against what the tree holds now. Resolve any conflict
-   before you start, because a conflict found later costs the work already
-   done.
-2. Commit and push each time you finish a thing. A cloud box dies and takes
-   its working tree with it.
-3. Write your result and your retro into `HANDOVER.md`, at the root, replacing
-   this brief. Say what surprises you and every dead end you walk into.
-4. Run `./RUNME.sh work done`, which sets the status and pushes.
-5. Run `./RUNME.sh work release` instead where you stop early, so the branch
-   goes back to `todo` for somebody else.
-6. Leave the merge into main to a person. A cloud box opens no pull
-   request, and trunk only ever comes towards you.
+The one dead end: the run check reporting a line. Reading the added lines one at
+a time misses a run crossing two of them, and joining the file loses the line
+number. One word list per file, each word carrying its line, answers both.
