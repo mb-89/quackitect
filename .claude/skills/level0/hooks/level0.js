@@ -5,10 +5,15 @@
 
 import {
   answerAfter,
+  bandOf,
+  CHECK,
+  checkSpec,
+  gateOf,
   lastSaid,
   opensATurn,
   reachesTheOwner,
   SAYS,
+  scoreOf,
   warns,
 } from "../lib/answer.js";
 import { commitIn, findings as readsCommand, verbLine } from "../lib/bash.js";
@@ -57,7 +62,7 @@ import {
   refusedWrite,
   writesOf,
 } from "../lib/projection.js";
-import { refusal, refusedCommand, taught } from "../lib/refuse.js";
+import { answerFindings, carried, refusal, refusedCommand } from "../lib/refuse.js";
 import { readerAsks, readerSays, report, reviewSpec } from "../lib/review.js";
 import { readRule } from "../lib/rulefile.js";
 import {
@@ -119,6 +124,7 @@ export function register(on, _options) {
   let schemas = new Map();
   const list = todos();
   let tooth = toothOf();
+  const gate = gateOf();
 
   // [[spec/design_output/level0#god-mode]]
   const cage = {
@@ -186,6 +192,7 @@ export function register(on, _options) {
     warms($, root);
 
     await $.tool.register(claimSpec(rules));
+    await $.tool.register(checkSpec());
     await $.tool.register(reviewSpec());
     await $.tool.register(logSpec());
     await $.tool.register(patchSpec());
@@ -208,10 +215,19 @@ export function register(on, _options) {
   on("prompt.submit", async ($, e, next) => {
     const from = String(e.origin?.kind ?? "");
     tooth.sawPrompt(from === "plugin");
+    gate.sawPrompt(from === "plugin");
     if (opensATurn(e.origin)) owed = await owing($, "The owner sent a prompt");
     const text = String(e.text ?? "");
     await logbook.say("info", "prompt", text, { detail: from, text });
-    return next(e);
+
+    // [[spec/design_output/level0#the-carry-rides-a-prompt]]
+    const held = opensATurn(e.origin) ? gate.takeWaiting() : null;
+    if (!held) return next(e);
+    const line = carried(held.found, held.score);
+    await logbook.say("info", "answer", "the findings ride this prompt", {
+      detail: `score=${held.score}`,
+    });
+    return next({ ...e, text: [text, line].filter(Boolean).join("\n\n") });
   });
 
   // [[spec/design_output/log#what-a-tool-line-names]]
@@ -465,6 +481,26 @@ export function register(on, _options) {
     return { result: { ...said, counted: "at the end of this turn" } };
   });
 
+  // [[spec/design_output/level0#the-tool-reads-a-draft]]
+  on("tool.call", { tool: `mcp__level0__${CHECK}` }, async ($, e, _next) => {
+    const text = String(e.text ?? "");
+    if (!text.trim()) return { result: `${CHECK} takes the text of one draft.` };
+    if (!bin) return { result: "No vale stands here, so the draft goes unread." };
+
+    const ran = await lintText(text, ANSWER, {
+      bin,
+      run: (argv, init) => $.process.run(argv, init),
+    });
+    if (!ran.ran) return { result: `Vale read nothing: ${ran.why}` };
+
+    const score = scoreOf(text, ran.found);
+    const band = ran.found.length ? bandOf(score, await bands(settings)) : "clean";
+    await logbook.say("info", "answer", `a draft reads ${band}`, {
+      detail: `score=${score} findings=${ran.found.length}`,
+    });
+    return { result: answerFindings(ANSWER, { found: ran.found, score, band }) };
+  });
+
   // [[spec/design_output/level0#the-helper-takes-the-guidance]]
   on("agent.spawn", async (_$, e, next) => {
     if (!standing) return next(e);
@@ -526,11 +562,12 @@ export function register(on, _options) {
     }
     const off = (await settings.ask("stop.enabled")) === false;
     const hold = await settings.ask("stop.hold");
-    await bite($, e, {
+    const mostInARow = await settings.ask("stop.mostInARow");
+    const bit = await bite($, e, {
       rules,
       tooth,
       logbook,
-      mostInARow: await settings.ask("stop.mostInARow"),
+      mostInARow,
       ran: (name) => ranHere(name, off, hold),
     });
     await dropAsk(settings, logbook);
@@ -540,20 +577,27 @@ export function register(on, _options) {
       bin,
       run: (argv, init) => $.process.run(argv, init),
     });
-    if (!ran.ran || !ran.found.length) return said;
+    if (!ran.ran) return said;
 
-    return {
-      ...said,
-      text: [
-        said.text,
-        "",
-        ran.found.map((one) => `  ${one.message}`).join("\n"),
-        "",
-        `  ${taught(ran.found)}`,
-      ]
-        .filter(Boolean)
-        .join("\n"),
-    };
+    // [[spec/design_output/level0#the-three-bands]]
+    const read = gate.atTurnEnd({
+      ...(await bands(settings)),
+      text: e.answer,
+      found: ran.found,
+      mostInARow,
+      toothSpoke: Boolean(bit?.sent),
+    });
+    const level = read.band === "clean" ? "info" : "warn";
+    await logbook.say(level, "answer", `the gate reads ${read.band}`, {
+      detail: `score=${read.score} findings=${ran.found.length} inARow=${gate.inARow()}`,
+    });
+    if (!read.sends) return said;
+
+    // [[spec/design_output/level0#the-re-prompt-over-the-ceiling]]
+    try {
+      $.prompt.submit({ text: answerFindings(ANSWER, read) }).catch(() => {});
+    } catch {}
+    return said;
   });
 
   on("prompt.context", async (_$, e, next) => {
@@ -1010,7 +1054,7 @@ async function heardCanary(logbook, heard, sentence) {
 
 // [[spec/design_output/stop#the-vote]]
 async function bite($, e, it) {
-  if (e.reason !== "answer") return;
+  if (e.reason !== "answer") return { sent: false };
 
   const decision = decide(it.rules, { claimed: it.tooth.claim()?.rule, ran: it.ran });
   const said = it.tooth.atTurnEnd(decision, it.mostInARow);
@@ -1030,12 +1074,21 @@ async function bite($, e, it) {
     said.ends ? "the turn ends" : "the turn goes on",
     { detail: how },
   );
-  if (said.ends) return;
+  if (said.ends) return { sent: false };
 
   // [[spec/design_output/stop#holding-a-turn-open]]
   try {
     $.prompt.submit({ text: reprompt(said) }).catch(() => {});
   } catch {}
+  return { sent: true };
+}
+
+// [[spec/design_output/level0#the-three-bands]]
+async function bands(settings) {
+  return {
+    warnAt: await settings.ask("answer.warnAt"),
+    ceiling: await settings.ask("answer.ceiling"),
+  };
 }
 
 // [[spec/design_output/log#where-the-writer-stands]]

@@ -539,6 +539,98 @@ exactly what that box reads.
 A projection writes the rules into a file, and a guard then has to keep that
 copy honest. A copy nobody can edit needs no guard.
 
+# The gate reads the answer
+
+The turn's end runs the answer through Vale under the `*answer.md` section of
+`.vale.ini`, and the score of what comes back cuts into three bands. The reply
+already stands on screen when `turn.complete` fires, so the gate refuses
+nothing. It re-prompts, it carries a line into the next prompt, or it does
+nothing at all.
+
+The measurement behind the bands stands in
+[[spec/funnel/a-paragraph-has-a-schema]].
+
+## The score is a rate
+
+The score of an answer is its findings a thousand words, over the words standing
+outside every fence. A fence belongs to the formatter and the compiler, so it
+counts for nothing on either side of that division.
+
+A short answer scores high on one finding. Twenty words and one finding read as
+fifty, which stands over the ceiling. So the owner tunes the two values against
+the answers a session really writes.
+
+## The three bands
+
+`answer.warnAt` and `answer.ceiling` in `spec/config/level0.json` hold the two
+edges, and the score falls in one of three bands:
+
+| the score | what happens |
+|---|---|
+| under `warnAt` | nothing |
+| from `warnAt` to the ceiling | the findings ride the next prompt as one line |
+| at the ceiling or over it | one re-prompt saying rewrite, once per turn |
+
+An answer carrying no finding reads clean, whatever its length. Every band
+writes one `answer` line naming the score, the findings and the count.
+
+## The re-prompt over the ceiling
+
+A re-prompt is a `$.prompt.submit` from the hook, the way the tooth does it.
+Three things hold the count at one:
+
+- A lock per turn. A second turn end inside one turn submits nothing, and the
+  findings wait instead.
+- `stop.mostInARow`, which caps the re-prompts the way it caps the tooth. The
+  next prompt from a person drops the count.
+- The tooth itself. One prompt goes out per turn end, and where the tooth holds
+  the turn open that prompt belongs to it. The findings wait for the next one.
+
+The prompt carries the findings in the wording `refusal` in `lib/refuse.js`
+already uses, because a refusal quoting the rule teaches it better than a
+refusal naming it. The door holding the owner's prompt first reads
+`e.origin.kind`, and a plugin prompt is a machine, so that door owes this one no
+readback.
+
+## The carry rides a prompt
+
+Under the ceiling the findings wait for the next prompt a person sends, and ride
+it as one line under the text. The line names the score and every rule behind
+it, and asks the session to hold those rules for the rest of the turn.
+
+The findings ride once. A prompt from a machine leaves them waiting, so the line
+reaches a person's turn and no other.
+
+## The gate holds its state
+
+`gateOf` in `lib/answer.js` holds the lock, the count and the findings waiting,
+and the hook hands it one reading per turn end. It mirrors the tooth. A prompt
+from a person drops the count, and a prompt of the hook's own leaves it standing.
+The turn's end answers what comes next.
+
+## What the gate says
+
+    The voice rules refuse this answer. Write it again.
+
+      the score is 50 findings a thousand words.
+
+      level0-answer.md:1:7  PastTense
+        wrote: was
+        Write the present tense: 'was'.
+
+    Hold PastTense for the rest of this turn: apply the same rule to every line
+    you write next, and fix the lines you already wrote if they break it.
+
+## The tool reads a draft
+
+`check_answer` takes one draft, runs it through the answer register as
+`level0-answer.md`, and answers the findings in the wording above. A draft
+coming back clean meets the gate clean, so the tool closes the gap a gate
+refusing nothing leaves open.
+
+The tool registers beside `claim_stop` at the session's start, and
+`spec/guidance/working.md` carries the line that sends a session to it.
+
 # The rules past one buffer
 
 Vale hands a rule one buffer, so a rule weighing two files stands outside it.
