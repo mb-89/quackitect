@@ -1,5 +1,5 @@
 // The rules over a shell command. A shell reaches every file a Write reaches,
-// so the door parses the command line and reads what it would land.
+// so the door parses the command line and reads what it lands.
 // [[spec/design_output/bash#what-the-door-reads]]
 
 import { CODE } from "./code.js";

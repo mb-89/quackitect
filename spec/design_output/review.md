@@ -70,7 +70,7 @@ alone. `rev-list` keeps two dots, because it counts the branch's own commits.
 
 `git worktree add --detach .se/review/<branch>` opens the branch beside the
 tree the caller stands in. So a review costs the caller no checkout, and it
-reads a branch a person already has checked out somewhere else.
+reads a branch a person already checks out somewhere else.
 
 Three things follow from where that worktree lands:
 

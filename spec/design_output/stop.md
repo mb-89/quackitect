@@ -153,7 +153,7 @@ Three numbers carry an argument, and they stay where they stand:
 
 `stop.enabled` set to false takes the tooth out, and the rule at priority 0
 records it. That rule wins no vote on its own, because a continue rule at 80
-stands above it. The tooth would then carry the turn with the switch off.
+stands above it. The tooth then carries the turn with the switch off.
 
 So a firing `stop-hook-off` ends the turn whatever else fires, and `decide`
 holds that one line. The switch stays in the table, and the code reads it from
@@ -167,7 +167,7 @@ a hole somebody walks through, so the name reaches a function alone.
 | `runs` | answers true when |
 |---|---|
 | `work-waiting` | a todo stands unfinished, or this branch stands at `held` |
-| `session-is-new` | under 10 tool calls stand behind this session, and the hook has granted no stop |
+| `session-is-new` | under 10 tool calls stand behind this session, and the hook grants no stop |
 | `stop-hook-off` | `spec/config/level0.json` says `stop.enabled` is false |
 | `never` | nothing, which is what an unbuilt rule takes |
 
@@ -239,7 +239,7 @@ answers itself, because it is the only thing in the room that knows.
 
 # Three in a row
 
-The hook counts the turns it has carried one after another.
+The hook counts the turns it carries one after another.
 
 - Past `mostInARow`, it writes a `warn` line and lets the turn end.
 - A prompt from outside the plugin resets the count, because that is a person

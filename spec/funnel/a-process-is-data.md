@@ -30,7 +30,7 @@ them. Each activity carries all six:
 | enabler | what the step needs and leaves whole | absent from the code |
 
 `spec/processes/standard.process.yaml` shows one. An activity also names `by`,
-which says who may run it, and `to`, which says the state it moves the item to.
+which says who can run it, and `to`, which says the state it moves the item to.
 It carries `criteria` as well, each one a `says` line and a word on whether it
 asks for evidence.
 

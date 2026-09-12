@@ -11,7 +11,7 @@ costs, so that is the thing to rule on.
 ## 1. One door per outside thing
 
 Measured in this tree at 41 tests: 8 tests that spawn a binary cost 862ms, and
-33 tests running in memory cost 43ms. So a fifth of the tests take 95% of the
+33 tests running in memory cost 43ms. So a fifth of the tests take 95 percent of the
 time, and that ratio worsens as the suite grows.
 
 An earlier line of this project measured the same shape at its own scale. The

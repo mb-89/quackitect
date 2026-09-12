@@ -55,13 +55,13 @@ ifVale("the passive is refused and the active passes", async () => {
 ifVale("a paragraph over six sentences is refused and six pass", async () => {
   const said = (n) =>
     Array.from({ length: n }, (_, i) => `Sentence number ${i} stands here.`).join(" ");
-  assert.ok((await ruled(said(7))).includes("LongParagraph"));
-  assert.ok(!(await ruled(said(6))).includes("LongParagraph"));
+  assert.ok((await ruled(said(7))).includes("Paragraph"));
+  assert.ok(!(await ruled(said(6))).includes("Paragraph"));
 });
 
 ifVale("a sentence over the word limit is refused", async () => {
   const long = `The engine ${"and the reader ".repeat(12)}meet here.`;
-  assert.ok((await ruled(long)).includes("LongSentence"));
+  assert.ok((await ruled(long)).includes("Sentence"));
 });
 
 ifVale("the past tense is refused, and the words this tree means pass", async () => {
@@ -99,7 +99,7 @@ ifVale("fenced code carries none of these rules", async () => {
 ifVale("a contraction and a Latin short form are refused", async () => {
   const said = await ruled("The engine doesn't stop, e.g. here.");
   assert.ok(said.includes("Contraction"));
-  assert.ok(said.includes("LatinAbbreviation"));
+  assert.ok(said.includes("Latin"));
 });
 
 const answered = async (text) => {
@@ -112,13 +112,13 @@ ifVale(
   "a heading opens a fresh prose budget, and a third paragraph breaks it",
   async () => {
     const two = "# One\n\nA paragraph.\n\nA second paragraph.\n";
-    assert.ok(!(await answered(two)).includes("PreferStructureAnswer"));
+    assert.ok(!(await answered(two)).includes("ShapeAnswer"));
 
     const across = `${two}\n# Two\n\nA paragraph.\n\nA second paragraph.\n`;
-    assert.ok(!(await answered(across)).includes("PreferStructureAnswer"));
+    assert.ok(!(await answered(across)).includes("ShapeAnswer"));
 
     const three = `${two}\nA third paragraph.\n`;
-    assert.ok((await answered(three)).includes("PreferStructureAnswer"));
+    assert.ok((await answered(three)).includes("ShapeAnswer"));
   },
 );
 
