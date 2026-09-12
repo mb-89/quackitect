@@ -282,9 +282,10 @@ The route is a closed vocabulary, and the schema names every word of it:
 | `checklist` | lines of text |
 | `evidence` | fields, each with `name`, `form`, `says`, and `expects` or `options` where the form takes one |
 
-Every value is a word from a list, a name or a path, a link, a number, a line
-of text, or a list of those. No value carries an expression. So a reader takes
-a route apart with the schema alone and no parser of its own.
+Every value is one of six things. It is a word from a list, a name or a
+path, a link, a number, a line of text, or a list of those. No value carries
+an expression. So a reader takes a route apart with the schema alone and no
+parser of its own.
 
 | `when` | holds where |
 |---|---|
@@ -406,14 +407,15 @@ into `record` at the hand-back, and the render draws it under the chapter:
 - the returns, which count how often the leaf fails back
 - the tip at a release too, so the delta of every hand on a ticket stands in git whichever way the hand leaves
 
-For now the retro reads those deltas. A gate may read a change in its place
-once the processes stand.
+| who reads a delta | when |
+|---|---|
+| the retro | now, over every ticket its own delta holds |
+| a gate | later, in the retro's place, once the processes stand |
+| the test verb | at every hand-back, from the ticket's first take to the tip, so ticket three of a group runs its own tests alone |
 
 The diff of the work is the group's branch, and `git log` on the ticket file
 is its history. So a ticket carries no time and no line number, which v4
-rules, and a reader finds both in git. The test verb's delta runs from the
-ticket's first take on the branch to the tip. So ticket three of a group runs
-its own tests and no other ticket's.
+rules, and a reader finds both in git.
 
 A command field answers only where the engine runs it, because the engine
 writes the `answered` line and the hand cannot. That answers v4's finding of
