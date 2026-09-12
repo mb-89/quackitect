@@ -1,78 +1,51 @@
 ---
 kind: [[handover]]
-status: todo
+status: held
 urgency: now
 ---
 
 # Where it stands
 
-The canary says out loud that level zero holds a session, and today it says
-it into the log alone. `heardCanary` in `hooks/level0.js` writes one `info`
-line where the sentence comes back whole and one `warn` line where it comes
-back wrong or absent. Nothing refuses. So a session that never says the line
-runs to the end unheld, and the owner reads the failure afterwards or never.
+The canary bites. The door stands in `hooks/level0.js` as `canaryDoor`, the
+wording in `lib/guidance.js` as `OWES`, the chapter in
+`spec/design_output/level0#the-canary-owes-a-debt`, and five tests in
+`test/level0/hooks.test.js` hold it.
 
-The owner asks for the tooth. A session owes the canary at the end of its
-first answer, and the cage holds every tool call until that debt clears.
+`./RUNME.sh check` answers 1, and no test fails. The one error stands on main
+already and this branch never touches it. For details, see the last chapter.
 
-The shape already stands in this tree twice. `spec/design_output/level0#one-warning-then-a-refusal`
-holds the owner's prompt the same way: one warning, then a refusal, until an
-answer lands. The answer gate re-prompts through `$.prompt.submit`. This
-branch reaches for both and adds no third mechanism.
+| the piece | where it landed |
+|---|---|
+| the debt opens on a first answer missing the line | `hooks/level0.js`, `turn.complete` |
+| a later answer holding the line clears it | the same hook |
+| one warning, then a refusal | `canaryDoor`, beside `answerDoor` |
+| the refusal carries the sentence | `OWES.denies` |
+| a wrong count owes what silence owes | `canaryIn` answers `other`, and the door reads it unpaid |
+| a helper and the owner's road pass | `e.agentId` and `reachesTheOwner` |
+| god mode passes it | `godPasses` wraps the hook, so this costs no code |
 
 # What waits
 
-| the piece | where | proves it |
-|---|---|---|
-| the canary debt opens at session start | `hooks/level0.js` | a fake session carries the debt before the first answer |
-| a first answer carrying the line clears it | `hooks/level0.js` | the debt reads clear, and the log writes one `info` line |
-| a first answer missing the line opens the refusal | `hooks/level0.js` | the debt stands, and the log writes one `warn` line |
-| the next tool call warns, and every one after refuses | `hooks/level0.js` | a fake run warns once and refuses twice |
-| the refusal re-prompts for the line | `hooks/level0.js` | the fake prompt road carries one submit |
-| a wrong count refuses the same as none | `lib/guidance.js` | `canaryIn` answers `other`, and the door treats it as unpaid |
-| god mode passes the refusal | `hooks/level0.js` | the binding at `god` lets the call through, and a `god` line names it |
-| the canary chapter says the tooth | `spec/design_output/level0.md` | `./RUNME.sh check` answers 0 |
+A person merges this into main, because trunk only ever comes towards a box.
 
-# What the door does
+Run `./RUNME.sh work done` once the battery answers green. The verb refuses a
+red one, and it is right to.
 
-The debt opens at `session.start` and closes on the first `turn.complete`
-that carries an answer holding the sentence with this session's own counts.
-`canaryIn` answers `same`, `other` or `none` already, and only `same` pays.
+# The error this branch inherits
 
-While the debt stands past the first answer, `tool.call` behaves the way the
-owner's prompt door behaves:
+`hooks/level0.js` registers `on("session.compact", ...)`. The client on this box
+reads 2.1.266 and holds no such event, so the plugin validator refuses the
+module and `check` answers 1.
 
-- the first call warns, and the session reads the warning after the result
-- every call after it stands refused
-- each writes a `gate` line, `warned` then `refused`, naming the canary
+`spec/design_output/level0#three-roads-to-a-compaction` measures that event
+against client 2.1.269. So the code names an event a later client carries, and
+the skew is the whole of the fault. The validator reads the module source, so
+no runtime guard reaches it.
 
-The refusal names the line the session owes and the counts it holds, so the
-agent reads what to say and says it.
+Three roads stand open, and the owner picks one:
 
-# What it leaves alone
-
-The probe after a compaction reads the canary through the same helper. Leave
-that road paying no debt: a compaction opens no new one, because the session
-said the line once already.
-
-Change no other door. The write door, the trunk guard and the stop hook stay
-as they stand.
-
-## How this branch runs
-
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
-
-1. Run `./RUNME.sh work sync` FIRST. It takes main into this branch, so
-   an old branch works against what the tree holds now. Resolve any conflict
-   before you start, because a conflict found later costs the work already
-   done.
-2. Commit and push each time you finish a thing. A cloud box dies and takes
-   its working tree with it.
-3. Write your result and your retro into `HANDOVER.md`, at the root, replacing
-   this brief. Say what surprises you and every dead end you walk into.
-4. Run `./RUNME.sh work done`, which sets the status and pushes.
-5. Run `./RUNME.sh work release` instead where you stop early, so the branch
-   goes back to `todo` for somebody else.
-6. Leave the merge into main to a person. A cloud box opens no pull
-   request, and trunk only ever comes towards you.
+| road | what it costs |
+|---|---|
+| take the client to 2.1.269 or past it | the box changes, and the design already measures this road |
+| drop the `session.compact` hook | the compaction line leaves the log |
+| pin the design to 2.1.266 and drop the hook | the two say the same thing again |
