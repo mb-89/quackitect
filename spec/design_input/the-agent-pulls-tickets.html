@@ -247,11 +247,13 @@ Shaded fields are the verbs' to write; a hand edit by an agent to any of them is
 <span class="v">    reads: [[spec/guidance/writing]]</span>
 <span class="v">    steps:</span>
 <span class="v">      - name: draft</span>
+<span class="v">        does: writes the design input the ask calls for</span>
 <span class="v">        evidence:</span>
 <span class="v">          - name: note</span>
 <span class="v">            form: link</span>
 <span class="v">            says: the design input this step writes</span>
 <span class="v">      - name: review</span>
+<span class="v">        does: reads the design input against the ask</span>
 <span class="v">        by: not draft</span>
 <span class="v">        on_fail: draft</span>
 <span class="v">        reads: [[spec/guidance/review/reviewing]]</span>
@@ -261,12 +263,15 @@ Shaded fields are the verbs' to write; a hand edit by an agent to any of them is
 <span class="v">            says: pass or fail, with findings one a line</span>
 <span class="v">  - name: implement</span>
 <span class="v">    reads: [[spec/guidance/code/testing]]</span>
+<span class="v">    needs: [work test]</span>
 <span class="v">    checklist:</span>
 <span class="v">      - the change touches no file the ask leaves out</span>
 <span class="v">      - every door the change reaches has a fake</span>
 <span class="v">      - a comment names the note the change implements</span>
 <span class="v">    steps:</span>
 <span class="v">      - name: tests-red</span>
+<span class="v">        does: writes the tests the ask calls for</span>
+<span class="v">        input: design/draft</span>
 <span class="v">        evidence:</span>
 <span class="v">          - name: tests</span>
 <span class="v">            form: command</span>
@@ -276,12 +281,15 @@ Shaded fields are the verbs' to write; a hand edit by an agent to any of them is
 <span class="v">            form: text</span>
 <span class="v">            says: what you see, and what surprises you</span>
 <span class="v">      - name: reflect</span>
+<span class="v">        does: names the class of error in the findings, and the fix for the class</span>
 <span class="v">        when: returned</span>
+<span class="v">        input: verdict</span>
 <span class="v">        evidence:</span>
 <span class="v">          - name: class</span>
 <span class="v">            form: text</span>
 <span class="v">            says: the class of error the findings describe, and the fix for the class</span>
 <span class="v">      - name: change</span>
+<span class="v">        does: makes the change</span>
 <span class="v">        reads: [[spec/guidance/code/code]]</span>
 <span class="v">        evidence:</span>
 <span class="v">          - name: lint</span>
@@ -289,6 +297,8 @@ Shaded fields are the verbs' to write; a hand edit by an agent to any of them is
 <span class="v">            expects: 0</span>
 <span class="v">            says: the tree builds and lints</span>
 <span class="v">      - name: tests-green</span>
+<span class="v">        does: makes the tests pass</span>
+<span class="v">        input: tests-red</span>
 <span class="v">        evidence:</span>
 <span class="v">          - name: tests</span>
 <span class="v">            form: command</span>
@@ -299,9 +309,12 @@ Shaded fields are the verbs' to write; a hand edit by an agent to any of them is
 <span class="v">            expects: 0</span>
 <span class="v">            says: the check is green on the commit</span>
 <span class="v">  - name: verdict</span>
+<span class="v">    does: reads every hunk against the ask and the design input</span>
 <span class="v">    by: not implement</span>
 <span class="v">    on_fail: implement/reflect</span>
 <span class="v">    reads: [[spec/guidance/review/reviewing]]</span>
+<span class="v">    input: [diff, implement]</span>
+<span class="v">    to: the owner</span>
 <span class="v">    evidence:</span>
 <span class="v">      - name: read</span>
 <span class="v">        form: files</span>
@@ -541,12 +554,38 @@ person answers under its evidence, and the pointer moves on into the leaf it lef
 <tr><td class="m">asks</td><td>the question a person answers, on a step a person takes, with <code>options</code> where one word answers it</td></tr>
 <tr><td class="m">when</td><td><code>returned</code>, <code>cloud</code> or <code>desk</code>, and the pull skips the leaf where it fails to hold</td></tr>
 <tr><td class="m">checklist</td><td>what a hand has to do here, one item a line, which the retro grows</td></tr>
+<tr><td class="m">does</td><td>one line on what the hand does at this leaf, which the <code>work</code> answer says first</td></tr>
+<tr><td class="m">input</td><td>what the step reads: <code>ask</code>, <code>diff</code>, or earlier evidence by path</td></tr>
+<tr><td class="m">needs</td><td>the verbs and tools the step runs, which the pull checks on the box first</td></tr>
+<tr><td class="m">from</td><td>who hands the step its input, where that is a person or the outside</td></tr>
+<tr><td class="m">to</td><td>who takes the output, where that is the owner, the retro or the merge</td></tr>
 <tr><td class="m">evidence</td><td>the fields a leaf's hand fills, each with a name, a form and a <code>says</code></td></tr>
 </table></div>
 
+<h3>A step is a form with six slots</h3>
+<p>That is v4's SIPOC ruling, and the route says each slot in one field or derives it. An author writes
+<code>does</code> on every leaf, and the other four where the default is wrong.</p>
+<div class="scroll"><table>
+<tr><th>slot</th><th>the route says it as</th><th>the default</th></tr>
+<tr><td>supplier</td><td class="m">from</td><td>the step before</td></tr>
+<tr><td>input</td><td class="m">input</td><td>the evidence of the step before</td></tr>
+<tr><td>process</td><td class="m">does</td><td>none, since a leaf says what it does</td></tr>
+<tr><td>output</td><td>the <code>evidence</code> fields</td><td>none, since a leaf names its fields</td></tr>
+<tr><td>customer</td><td class="m">to</td><td>the next step</td></tr>
+<tr><td>enabler</td><td><code>reads</code> and <code>needs</code></td><td>none</td></tr>
+</table></div>
+<div class="scroll"><table>
+<tr><th>check the slots earn</th><th>who runs it</th><th>what it refuses</th></tr>
+<tr><td>an output nothing reads</td><td>the mint and the lint</td><td>an evidence field no later step, no <code>to</code> and no engine check reads</td></tr>
+<tr><td>an input nothing supplies</td><td>the mint and the lint</td><td>an <code>input</code> naming evidence no earlier step holds</td></tr>
+<tr><td>an enabler out of reach</td><td>the pull, at the hand-out</td><td>a <code>needs</code> the box lacks, which answers <code>wait</code> with the reason</td></tr>
+</table></div>
+
 <ul>
-  <li>A leaf inherits <code>by</code>, <code>reads</code> and <code>on_fail</code> from the phases above it. The
-  reads add up, and the other two take the nearest value.</li>
+  <li>A leaf inherits <code>by</code>, <code>reads</code>, <code>on_fail</code>, <code>input</code>,
+  <code>needs</code>, <code>from</code> and <code>to</code> from the phases above it. The reads and the needs
+  add up, <code>from</code> reaches the first leaf, <code>to</code> reaches the last, and the rest take the
+  nearest value.</li>
   <li>A name refers to a sibling first, and to a step from the top second. A path with a slash, as
   <code>design/review</code>, says exactly.</li>
   <li><code>not implement</code> excludes the hand of every leaf the mint puts under <code>implement</code>,
@@ -664,7 +703,8 @@ happened.</p>
 <h2 id="s5"><span class="n">5</span>Processes are routes</h2>
 
 <p>A process is a route the mint copies onto a ticket. Level one ships four for tickets and one for a group,
-under <code>spec/processes/</code>, each a note holding a <code>steps</code> list and nothing more. The mint takes
+as YAML files under <code>spec/processes/</code>, each under <code>process.schema.yaml</code> and holding a
+<code>steps</code> list and nothing more. The mint takes
 <code>--process &lt;name&gt;</code>, copies the route, and writes the process file's hash beside it, so the
 ticket depends on nothing outside itself after that, and a process file changes without reaching a ticket in
 flight. A fix to a process reaches a ticket through <code>work reroute</code>, which copies the current route
@@ -736,6 +776,39 @@ step reads what they add up to. A child closed <code>dropped</code> sends the pa
 <code>on_fail</code>, and a parent whose children run in another group advances on trunk once they land.
 Every route stays short. Names are examples.</figcaption>
 </figure>
+
+<h3>The drawing is a projection</h3>
+<p>A process file is data, and its drawing derives from it. One emitter reads a route, and a record where a
+ticket carries one, into a graph: a node per phase and per leaf, a pass edge between neighbours, a fail edge
+back with its label, a dotted node for <code>when</code>, a marked node for a person step, and the pointer,
+the skips and the returns off the record. Three readers draw that graph, and none keeps a second copy.</p>
+<div class="scroll"><table>
+<tr><th>reader</th><th>draws</th></tr>
+<tr><td>the projection</td><td><code>spec/processes/&lt;name&gt;.md</code>, a target with a Mermaid fence, which GitHub, Obsidian and the editor's preview render</td></tr>
+<tr><td>the editor</td><td>the same graph live, for a process and for a ticket with its position</td></tr>
+<tr><td class="m">work show &lt;ticket&gt;</td><td>the graph as text in a terminal</td></tr>
+</table></div>
+<p>The projection is an entry in <code>projections.json</code>, so the door refuses a hand edit to the drawing
+and a stale drawing fails <code>check</code>. Every earlier version wanted that property under the name
+executable diagram: v1 as a lint-pinned Mermaid subset, v2 and v3 as an Obsidian canvas the engine compiled,
+v4 as a React Flow canvas fed by a narrating runtime. The tree reaches it from the other side: the data
+runs, and the picture cannot drift. v1's rules carry over whole: nodes declared before edges, every edge
+labelled, no coordinates, the hash over the graph and not the bytes, and a pinned subset nobody authors.</p>
+<p>The drawing carries no style of its own. The extension holds one common style sheet, and it takes its
+colours and its type from the editor's theme, which is VS Code's; the Mermaid fence takes the same classes.
+A cloud box prepares the emitter, the projection and the webview's wiring, and spends nothing on graphical
+design, which is desk work. A ticket's drawing animates nothing, because the record is the run and every
+hand-back is a push; a process may animate a run later, and since the emitter reads a graph, a feed that
+moves the pointer adds that and rewrites nothing.</p>
+<div class="scroll"><table>
+<tr><th>the editor gains, on a desk with the owner</th><th>what a person does with it</th></tr>
+<tr><td>a library of blocks at the side, the way Simulink shows one</td><td>drags a leaf, a phase, a person step, a review, an evidence form or a condition into the drawing</td></tr>
+<tr><td>wires between blocks</td><td>draws the order and the fail edges, and the editor writes the YAML</td></tr>
+<tr><td>a form behind every leaf</td><td>fills a ticket's evidence through the drawing, with one input per checklist item</td></tr>
+</table></div>
+<p class="note">One reader serves both files. The tree's YAML reader reads a process file whole and a ticket's
+frontmatter; the section reader reads the ticket's body, which holds the prose places. The editor holds
+those two and no third.</p>
 
 <!-- ============================================================ -->
 <h2 id="s6"><span class="n">6</span>A group is a branch</h2>
@@ -1022,13 +1095,14 @@ branches.</p>
 
 <div class="scroll"><table>
 <tr><th>surface</th><th>draws</th></tr>
-<tr><td>the work editor, which a button in the sidebar opens</td><td>every ticket, under yours, urgent, in work, open and done</td></tr>
+<tr><td>the work editor, which a button in the sidebar opens</td><td>every ticket, under yours, urgent, in work, open and done, and a ticket's route as a drawing a person works through</td></tr>
 <tr><td class="m">./RUNME.sh work list</td><td>the same rows in a terminal, with the age of each held branch</td></tr>
 <tr><td>the ticket file itself</td><td>the ask, the route, the evidence, the discussion</td></tr>
 </table></div>
 
-<p>A person mints from the two buttons or the verb, edits a ticket in the editor, drags a ticket
-into a group by writing the field, and hands a step back with the same verb a box uses. The language
+<p>A person mints from the two buttons or the verb, fills a leaf's fields through the drawing and edits no
+YAML by hand unless they want to, drags a ticket into a group by writing the field, and hands a step back
+with the same verb a box uses. The language
 server names a departure from the schema as they type and completes the fields from the schema, the route
 and the folder. Yours sorts oldest first and holds every ticket at a person step and every held group older
 than <code>work.staleAfter</code>, with its three answers; the routine's notification names each of them
@@ -1065,6 +1139,8 @@ fact it meets is a route.</p>
 <tr><th>piece</th><th>where</th></tr>
 <tr><td>the schemas</td><td class="m">spec/schemas/ticket.schema.yaml · group.schema.yaml · process.schema.yaml</td></tr>
 <tr><td>the folders</td><td class="m">spec/tickets/ · spec/groups/ · spec/processes/ · .se/tickets/</td></tr>
+<tr><td>the processes and their drawings</td><td class="m">spec/processes/&lt;name&gt;.yaml · the projected spec/processes/&lt;name&gt;.md</td></tr>
+<tr><td>the emitter and the projection entry</td><td>shared by the projection and the editor · one row in <code>spec/config/projections.json</code></td></tr>
 <tr><td>the verbs</td><td class="m">src/scripts/work.js, under ./RUNME.sh work</td></tr>
 <tr><td>the tool wrapper and the spawn</td><td class="m">.claude/skills/level1/</td></tr>
 <tr><td>the stop rule</td><td class="m">spec/config/stop/level1.yml</td></tr>
@@ -1112,8 +1188,9 @@ fact it meets is a route.</p>
 <h2 id="s14"><span class="n">14</span>The order of work</h2>
 
 <p>Eight branches, and the dependencies make the order binding. The eight briefs stand on their
-<code>work/</code> branches, cut from the note, and each names the chapters it implements. The five work
-branches standing today finish under the verbs they carry. A brief branch is one whose tip carries <code>HANDOVER.md</code>, and
+<code>work/</code> branches, cut from the note, and each names the chapters it implements. The editor's live
+drawing, its block library and the evidence form wait for branch 2 and are desk work with the owner. The
+five work branches standing today finish under the verbs they carry. A brief branch is one whose tip carries <code>HANDOVER.md</code>, and
 <code>work list</code> tells the two kinds apart by that; <code>take</code> keeps serving a brief until
 <code>work list</code> names none; <code>adopt</code> turns a brief into a group note and one ticket for the
 ones a person wants moved, and the old verbs go once the last brief merges.</p>
@@ -1124,11 +1201,11 @@ ones a person wants moved, and the old verbs go once the last brief merges.</p>
   <g font-size="12" fill="currentColor">
     <rect x="30" y="112" width="190" height="44" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/>
     <text x="125" y="130" text-anchor="middle" font-weight="700">1 · the ticket has a schema</text>
-    <text x="125" y="147" text-anchor="middle" fill="var(--muted)" font-size="11">schemas, the checker's recursion, keywords, mint</text>
+    <text x="125" y="147" text-anchor="middle" fill="var(--muted)" font-size="11">schemas, a YAML kind, the checker's recursion, mint</text>
 
     <rect x="270" y="52" width="190" height="44" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="365" y="70" text-anchor="middle" font-weight="700">2 · a process is a route</text>
-    <text x="365" y="87" text-anchor="middle" fill="var(--muted)" font-size="11">five routes, when, checklists, the note verb, reroute</text>
+    <text x="365" y="87" text-anchor="middle" fill="var(--muted)" font-size="11">five routes, the slots, the emitter, the drawing, reroute</text>
 
     <rect x="270" y="172" width="190" height="44" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="365" y="190" text-anchor="middle" font-weight="700">3 · a group is a branch</text>
@@ -1228,6 +1305,7 @@ level one stays still while level two invents flows.</p>
   <li>a WIP limit per step, which is Kanban's one knob and stands outside the note</li>
   <li>whether a guidance card's own items become steps at the mint, which v3 tried as card marking and level two may take up</li>
   <li>more forms, such as a number or a date, as the routes come to ask for them</li>
+  <li>animation of a process run, which a feed into the emitter's graph adds later</li>
 </ul>
 
 <p class="note">Confidence. The design is the owner's, argued over one afternoon against v3, v4 and the

@@ -134,11 +134,13 @@ differs: its own reads, its own hand rule, and the form of its evidence.
         reads: [[spec/guidance/writing]]
         steps:
           - name: draft
+            does: writes the design input the ask calls for
             evidence:
               - name: note
                 form: link
                 says: the design input this step writes
           - name: review
+            does: reads the design input against the ask
             by: not draft
             on_fail: draft
             reads: [[spec/guidance/review/reviewing]]
@@ -148,12 +150,15 @@ differs: its own reads, its own hand rule, and the form of its evidence.
                 says: pass or fail, with findings one a line
       - name: implement
         reads: [[spec/guidance/code/testing]]
+        needs: [work test]
         checklist:
           - the change touches no file the ask leaves out
           - every door the change reaches has a fake
           - a comment names the note the change implements
         steps:
           - name: tests-red
+            does: writes the tests the ask calls for
+            input: design/draft
             evidence:
               - name: tests
                 form: command
@@ -163,12 +168,15 @@ differs: its own reads, its own hand rule, and the form of its evidence.
                 form: text
                 says: what you see, and what surprises you
           - name: reflect
+            does: names the class of error in the findings, and the fix for the class
             when: returned
+            input: verdict
             evidence:
               - name: class
                 form: text
                 says: the class of error the findings describe, and the fix for the class
           - name: change
+            does: makes the change
             reads: [[spec/guidance/code/code]]
             evidence:
               - name: lint
@@ -176,6 +184,8 @@ differs: its own reads, its own hand rule, and the form of its evidence.
                 expects: 0
                 says: the tree builds and lints
           - name: tests-green
+            does: makes the tests pass
+            input: tests-red
             evidence:
               - name: tests
                 form: command
@@ -186,9 +196,12 @@ differs: its own reads, its own hand rule, and the form of its evidence.
                 expects: 0
                 says: the check is green on the commit
       - name: verdict
+        does: reads every hunk against the ask and the design input
         by: not implement
         on_fail: implement/reflect
         reads: [[spec/guidance/review/reviewing]]
+        input: [diff, implement]
+        to: the owner
         evidence:
           - name: read
             form: files
@@ -207,11 +220,37 @@ differs: its own reads, its own hand rule, and the form of its evidence.
 | `asks` | the question a person answers, on a step a person takes, with `options` where one word answers it |
 | `when` | `returned`, `cloud` or `desk`, and the pull skips the leaf where it fails to hold |
 | `checklist` | what a hand has to do here, one item a line, which the retro grows |
+| `does` | one line on what the hand does at this leaf, which the `work` answer says first |
+| `input` | what the step reads: `ask`, `diff`, or earlier evidence by path |
+| `needs` | the verbs and tools the step runs, which the pull checks on the box first |
+| `from` | who hands the step its input, where that is a person or the outside |
+| `to` | who takes the output, where that is the owner, the retro or the merge |
 | `evidence` | the fields a leaf's hand fills, each with a name, a form and a `says` |
+
+A step is a form with six slots, which is v4's SIPOC ruling. The route says
+each slot in one field, or derives it:
+
+| slot | the route says it as | the default |
+|---|---|---|
+| supplier | `from` | the step before |
+| input | `input` | the evidence of the step before |
+| process | `does` | nothing, since a leaf says what it does |
+| output | the `evidence` fields | nothing, since a leaf names its fields |
+| customer | `to` | the next step |
+| enabler | `reads` and `needs` | nothing |
+
+So an author writes `does` on every leaf, and `input`, `needs`, `from` and
+`to` where the default is wrong. The slots earn three mechanical checks:
+
+| check | who runs it | what it refuses |
+|---|---|---|
+| an output nothing reads | the mint and the lint | an evidence field no later step, no `to` and no engine check reads |
+| an input nothing supplies | the mint and the lint | an `input` naming evidence no earlier step holds |
+| an enabler out of reach | the pull, at the hand-out | a `needs` the box lacks, which answers `wait` with the reason |
 
 Four rules hold the tree together:
 
-- A leaf inherits `by`, `reads` and `on_fail` from the phases above it. The reads add up, and the other two take the nearest value.
+- A leaf inherits `by`, `reads`, `on_fail`, `input`, `needs`, `from` and `to` from the phases above it. The reads and the needs add up, `from` reaches the first leaf, `to` reaches the last, and the rest take the nearest value.
 - A name refers to a sibling first, and to a step from the top second. A path with a slash, as `design/review`, says exactly.
 - `not implement` excludes the hand of every leaf the mint puts under `implement`, and `on_fail: implement` sends the ticket to that phase's first leaf.
 - `step` names a leaf by its path, as `implement/tests-red`.
@@ -370,8 +409,8 @@ git, which is the half of v4's test map that a branch already carries.
 # Processes are routes
 
 A process is a route the mint copies onto a ticket. Level one ships four for
-tickets and one for a group, under `spec/processes/`, each a note of kind
-`process` holding a `steps` list and nothing more:
+tickets and one for a group, as YAML files under `spec/processes/`, each under
+`process.schema.yaml` and holding a `steps` list and nothing more:
 
 | process | route | for |
 |---|---|---|
@@ -425,6 +464,62 @@ ticket has yet to reach. It refuses where `step` names a leaf the new route
 lacks, and the board flags a ticket whose hash trails its process. A person
 may edit a route on a ticket by hand, and a machine at level two may write one
 row by row.
+
+# The drawing is a projection
+
+A process file is data, and its drawing derives from it. One emitter reads a
+route, and a record where a ticket carries one, into a graph:
+
+| in the graph | from |
+|---|---|
+| a node per phase and per leaf | `steps` |
+| a pass edge between neighbours | the order |
+| a fail edge back, with its label | `on_fail` |
+| a dotted node | `when` |
+| a marked node | `by: person` |
+| the pointer, the skips and the returns | `step` and the record |
+
+Three readers draw that graph, and none keeps a second copy:
+
+| reader | draws |
+|---|---|
+| the projection | `spec/processes/<name>.md`, a target with a Mermaid fence, which GitHub, Obsidian and the editor's preview render |
+| the editor | the same graph live, for a process and for a ticket with its position |
+| `work show <ticket>` | the graph as text in a terminal |
+
+The projection is an entry in `projections.json`, so the door refuses a hand
+edit to the drawing and a stale drawing fails `check`. Every earlier version
+wants that property under the name executable diagram. The tree reaches it
+from the other side: the data runs, and the picture cannot drift.
+
+The drawing carries no style of its own. The extension holds one common style
+sheet, and it takes its colours and its type from the editor's theme, which
+is VS Code's. The Mermaid fence takes the same classes. A cloud box prepares
+the emitter, the projection and the webview's wiring, and spends nothing on
+graphical design, which is desk work.
+
+v1's rules for a drawn model carry over whole:
+
+- the nodes stand declared before the edges, and every edge carries a label
+- no coordinates, and the layout derives
+- the hash reads the graph, so a comment or a reordered key moves nothing
+- the syntax is a pinned subset of Mermaid, and nobody authors it, so nothing lints it
+
+A ticket's drawing animates nothing, because the record is the run and every
+hand-back is a push. A process may animate a run later. The emitter reads a
+graph, so a feed that moves the pointer adds that and rewrites nothing.
+
+The editor takes the drawing further, and that is desk work with the owner:
+
+| the editor gains | what a person does with it |
+|---|---|
+| a library of blocks at the side, the way Simulink shows one | drags a leaf, a phase, a person step, a review, an evidence form or a condition into the drawing |
+| wires between blocks | draws the order and the fail edges, and the editor writes the YAML |
+| a form behind every leaf | fills a ticket's evidence through the drawing, with one input per checklist item |
+
+One reader serves both files. The tree's YAML reader reads a process file
+whole and a ticket's frontmatter. The section reader reads the ticket's body,
+which holds the prose places. The editor holds those two and no third.
 
 # A group is a branch
 
@@ -741,7 +836,7 @@ record:
 
 | surface | draws |
 |---|---|
-| the work editor, which a button in the sidebar opens | every ticket, under yours, urgent, in work, open and done |
+| the work editor, which a button in the sidebar opens | every ticket, under yours, urgent, in work, open and done, and a ticket's route as a drawing a person works through |
 | `./RUNME.sh work list` | the same rows in a terminal, with the age of each held branch |
 | the ticket file itself | the ask, the route, the evidence, the discussion |
 
@@ -779,7 +874,7 @@ routine is a second box, and a person creates it.
 A person does four things, each with a verb or a click:
 
 - mints from the two buttons or the verb
-- edits a ticket in the editor
+- fills a leaf's fields through the drawing, and edits no YAML by hand unless they want to
 - drags a ticket into a group by writing the field
 - hands a step back with the same verb a box uses
 
@@ -818,6 +913,8 @@ the only fact it meets is a route.
 |---|---|
 | the schemas | `spec/schemas/ticket.schema.yaml`, `group.schema.yaml`, `process.schema.yaml` |
 | the folders | `spec/tickets/`, `spec/groups/`, `spec/processes/`, `.se/tickets/` |
+| the processes and their drawings | `spec/processes/<name>.yaml`, and the projected `spec/processes/<name>.md` |
+| the emitter and the projection entry | shared by the projection and the editor, and one row in `spec/config/projections.json` |
 | the verbs | `src/scripts/work.js`, under `./RUNME.sh work` |
 | the tool wrapper and the spawn | `.claude/skills/level1/`, beside level zero |
 | the stop rule | `spec/config/stop/level1.yml` |
@@ -863,8 +960,8 @@ Eight branches, and the dependencies make the order binding:
 
 | # | branch | holds | after |
 |---|---|---|---|
-| 1 | `the-ticket-has-a-schema` | the three schemas, the checker's recursion, the three keywords, `mint`, the private folder | |
-| 2 | `a-process-is-a-route` | the five route files, `when`, checklists, the note verb, the copy and the hash at the mint, `reroute`, a chapter per step | 1 |
+| 1 | `the-ticket-has-a-schema` | the three schemas, the checker's recursion, a YAML kind under a schema, the three keywords, `mint`, the private folder | |
+| 2 | `a-process-is-a-route` | the five route files, `when`, checklists, the six slots, the emitter and the projected drawing, the note verb, the copy at the mint, `reroute` | 1 |
 | 3 | `a-group-is-a-branch` | the group note, take, list with the age of a held branch, merge with the check, close, and `adopt` for a brief | 1 |
 | 4 | `the-agent-pulls-a-ticket` | the pull, its checks, its answers, the record, a hold per hand, the stop rule | 2, 3 |
 | 5 | `a-step-changes-hands` | the hand id, the spawn and its tag, person steps, escalation | 4 |
@@ -873,8 +970,11 @@ Eight branches, and the dependencies make the order binding:
 | 8 | `level-zero-hands-over` | the brief door goes, and the controls wire up | 4 |
 
 The eight briefs stand on their `work/` branches, cut from this note, and
-each names the chapters it implements. The five work branches standing today
-finish under the verbs they carry. A
+each names the chapters it implements. The editor's live drawing, its block
+library and the evidence form wait for branch 2. They are desk work with the
+owner, and no cloud brief carries them.
+
+The five work branches standing today finish under the verbs they carry. A
 brief branch is one whose tip carries `HANDOVER.md`, and `work list` tells the
 two kinds apart by that. `take` keeps serving a brief until `work list` names
 none. `adopt` turns a brief into a group note and one tracked ticket, for the
@@ -889,3 +989,4 @@ ones a person wants moved. The old verbs go once the last brief merges.
 - a WIP limit per step, which is Kanban's one knob and stands outside this note
 - whether a guidance card's own items become steps at the mint, which v3 tried as card marking and level two may take up
 - more forms, such as a number or a date, as the routes come to ask for them
+- animation of a process run, which a feed into the emitter's graph adds later
