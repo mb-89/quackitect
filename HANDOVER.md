@@ -13,7 +13,9 @@ stands on the branch `claude/relaxed-knuth-f0uk4d` until the owner merges it,
 so take that branch in where `work sync` leaves it absent.
 
 This branch turns the brief on a branch into a group of tickets on a branch.
-Its chapters are A group is a branch, and What a person sees.
+A group is a ticket under the `group` process, and its children are the
+tickets naming it under `group`. Its chapters are A group is a branch, and
+What a person sees.
 
 | what stands today | where |
 |---|---|
@@ -27,15 +29,17 @@ Its chapters are A group is a branch, and What a person sees.
 
 | the piece | where | proves it |
 |---|---|---|
-| the group note | `spec/groups/<name>.md` | it passes the group schema, and carries the `group` route |
-| `work take` over a group | `work.js` | it pushes `state: held` on the group note, and a second take fails on the push |
+| the group ticket | `spec/tickets/<name>.md` | it passes the ticket schema, and carries the `group` route |
+| `work take` over a group | `work.js` | it writes the hand and `took` into the group's record and pushes, and a second take fails on the push |
+| held derives | `work list` | a group holds where its newest record entry carries `took` and no `gave` |
 | `work list` | `work.js` | one row per group and per loose ticket, the age of each held tip, and a brief told apart by `HANDOVER.md` at its tip |
 | the stale rule | `work list` | a held group older than `work.staleAfter` stands under yours with release, take and close |
 | `work merge` | `work.js` | it runs the check on the merge commit and undoes it on red |
 | the moved trunk copy | `work merge` | it refuses where trunk's copy of a ticket or the group note differs from the branch point, and names the lines |
-| the merge frees the tickets | `work merge` | an open ticket of a merged group loses its `group` |
+| the merge frees the tickets | `work merge` | an open child of a merged group loses its `group` |
+| a box leaves | `work.js` | the last leaf writes `gave`, closes the group as `done` where every child stands closed, and leaves it open otherwise |
 | `work close` | `work.js` | it drops the branch after the merge |
-| `work adopt <brief>` | `work.js` | a brief branch becomes a group note and one ticket |
+| `work adopt <brief>` | `work.js` | a brief branch becomes a group ticket and one child |
 | the config | `spec/config/level0.json` | `work.staleAfter` reads, default `12h` |
 
 # The rules to hold
@@ -44,6 +48,7 @@ Its chapters are A group is a branch, and What a person sees.
 - Trunk hands out no group's ticket. A person on trunk sees the loose ones.
 - A group of one ticket is the ordinary case.
 - There is no lease. A stale group is implicitly a person's, and the rule derives from the tip.
+- `tickets` is a standing condition: the pull hands out a child whenever one stands at an agent step.
 - `take` keeps serving a brief until `work list` names none.
 
 # The tests
