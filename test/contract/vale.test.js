@@ -111,7 +111,7 @@ const answered = async (text) => {
 ifVale(
   "a heading opens a fresh prose budget, and a third paragraph breaks it",
   async () => {
-    const two = "# One\n\nA paragraph.\n\nA second paragraph.\n";
+    const two = "- The bottom line.\n\n# One\n\nA paragraph.\n\nA second paragraph.\n";
     assert.ok(!(await answered(two)).includes("ShapeAnswer"));
 
     const across = `${two}\n# Two\n\nA paragraph.\n\nA second paragraph.\n`;

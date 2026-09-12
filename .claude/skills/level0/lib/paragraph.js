@@ -141,8 +141,8 @@ export function rulesFrom(said, banner = "") {
 
   put("Characters.yml", characters(layers.characters ?? {}));
   put("Markup.yml", markup(layers.markup ?? {}));
-  put("Shape.yml", run(layers.shape ?? {}, ""));
-  put("ShapeAnswer.yml", run(held, " in an answer"));
+  put("Shape.yml", run(layers.shape ?? {}, "", []));
+  put("ShapeAnswer.yml", run(held, " in an answer", answer.opens ?? []));
   put("Paragraph.yml", paragraph(layers.shape ?? {}, ""));
   put("ParagraphAnswer.yml", paragraph(held, " in an answer"));
   put("Sentence.yml", sentence(layers.sentence ?? {}));
@@ -391,8 +391,63 @@ function markup(layer) {
 }
 
 
+// [[spec/design_output/projection#the-list-opens-an-answer]]
+const OPENS_LIST = [
+  "An answer opens with a list, one sentence an item and one bottom line each.",
+  "Write that list here.",
+].join(" ");
+
+// [[spec/design_output/projection#the-list-opens-an-answer]]
+const OPENS_HEADING = [
+  "A heading stands under the TL;DR list, and this one opens the answer.",
+  "Write the list first.",
+].join(" ");
+
+// [[spec/design_output/projection#the-list-opens-an-answer]]
+function opening(opens) {
+  const list = Array.isArray(opens) ? opens : [];
+  if (!list.some((one) => String(one?.block) === "tldr")) return [];
+  const table = list.some((one) => String(one?.block) === "questions");
+
+  return [
+    "",
+    "opened := false",
+    'first := {said: "", begin: 0, end: 0}',
+    "fence := false",
+    "",
+    "for row in rows(said) {",
+    "  if opened { break }",
+    "  line := text.trim_space(row.said)",
+    '  if text.has_prefix(line, "```") {',
+    "    fence = !fence",
+    "    continue",
+    "  }",
+    "  if fence { continue }",
+    "  if len(line) == 0 { continue }",
+    ...(table ? ['  if text.has_prefix(line, "|") { continue }'] : []),
+    "  first = row",
+    "  opened = true",
+    "}",
+    "",
+    "if opened {",
+    "  head := text.trim_space(first.said)",
+    "  if !text.re_match(`^(?:[-*+]|[0-9]+[.)])\\s+\\S`, head) {",
+    `    why := ${quoted(OPENS_LIST)}`,
+    '    if text.has_prefix(head, "#") {',
+    `      why = ${quoted(OPENS_HEADING)}`,
+    "    }",
+    "    matches = append(matches, {",
+    "      begin: first.begin,",
+    "      end: first.end,",
+    "      message: why",
+    "    })",
+    "  }",
+    "}",
+  ];
+}
+
 // [[spec/design_output/projection#a-layer-writes-two-files]]
-function run(layer, where) {
+function run(layer, where, opens = []) {
   const most = Number(layer.paragraphsPerRun ?? 3);
 
   return scripted(`A run holds ${most} paragraphs${where}.`, [
@@ -446,6 +501,7 @@ function run(layer, where) {
     "  runEnd = row.end",
     "}",
     "closeRun()",
+    ...opening(opens),
   ]);
 }
 

@@ -9,10 +9,13 @@ import {
   checkSpec,
   gateOf,
   opensATurn,
+  questionsIn,
   reachesTheOwner,
   SAYS,
   scoreOf,
   spokeSince,
+  TABLE,
+  tableFaults,
   wordsIn,
 } from "../../.claude/skills/level0/lib/answer.js";
 import {
@@ -249,4 +252,59 @@ test("the carry is one line naming the findings", () => {
   assert.equal(said.includes("\n"), false);
   assert.match(said, /scored 9\.5 findings a thousand words/);
   assert.match(said, /Hold PastTense/);
+});
+
+// [[spec/design_output/level0#the-door-counts-the-questions]]
+test("a prompt with two questions counts two, and a fenced one counts none", () => {
+  assert.equal(questionsIn("Where does the door stand? What does it read?"), 2);
+  assert.equal(questionsIn("Build the door.\nRun the tests."), 0);
+  assert.equal(questionsIn("```\nWhere does it stand?\n```\n"), 0);
+  assert.equal(questionsIn("Where does it stand?\n```\nAnd here?\n```\n"), 1);
+  assert.equal(questionsIn("Where does it stand??"), 1);
+  assert.equal(questionsIn(undefined), 0);
+});
+
+// [[spec/design_output/level0#the-table-answers-every-question]]
+const TABLE_ROWS = [
+  "| question | answer |",
+  "|---|---|",
+  "| where does it stand | in `lib/answer.js` |",
+  "| what does it read | the first block |",
+].join("\n");
+
+test("a count of zero demands no table", () => {
+  assert.deepEqual(tableFaults("The door stands here.", 0), []);
+  assert.deepEqual(tableFaults("The door stands here.", undefined), []);
+});
+
+test("an answer opening with prose refuses under a count of two", () => {
+  const found = tableFaults("The door stands here.\n\nMore text.\n", 2);
+  assert.equal(found.length, 1);
+  assert.equal(found[0].rule, TABLE);
+  assert.equal(found[0].line, 1);
+  assert.match(found[0].message, /asks 2 questions/);
+  assert.match(found[0].message, /opens with no table/);
+});
+
+test("a table naming the two columns and a row a question passes", () => {
+  assert.deepEqual(tableFaults(`${TABLE_ROWS}\n\nThe detail follows.\n`, 2), []);
+  assert.deepEqual(tableFaults(`\n\n${TABLE_ROWS}\n`, 1), []);
+});
+
+test("a table short of a row names the shortfall", () => {
+  const found = tableFaults(`${TABLE_ROWS}\n`, 3);
+  assert.equal(found.length, 1);
+  assert.match(found[0].message, /holds 2 rows/);
+});
+
+test("a table under other column names refuses", () => {
+  const said = "| ask | said |\n|---|---|\n| where | here |\n";
+  const found = tableFaults(said, 1);
+  assert.equal(found.length, 1);
+  assert.match(found[0].message, /reads ask, said/);
+});
+
+test("a heading and a list open no question table", () => {
+  assert.match(tableFaults("# The door\n", 1)[0].message, /no table/);
+  assert.match(tableFaults("- The door stands here.\n", 1)[0].message, /no table/);
 });
