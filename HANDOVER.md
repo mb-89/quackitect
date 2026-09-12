@@ -6,49 +6,32 @@ urgency: now
 
 # Where it stands
 
-The review verb says two things the tree stopped meaning.
+The review verb says what the tree means. `./RUNME.sh check` answers 0.
 
-It closes every report with `the merge is a person's`. The owner rules that an
-agent merges, and `work/an-agent-merges` carried that through the tree already.
-The review verb sits outside that sweep.
+| the piece | what it says now |
+|---|---|
+| the closing line | `Run work merge once every fix lands` |
+| the line for a clean branch | `Run work merge to take it in` |
+| `retroIn` | it reads `retro`, `surprises` and `dead end` in a heading |
+| the brief contract | step 3 names the heading `What surprises me` |
 
-It also reads a retro by looking for the word `retro` in a heading. The brief
-contract asks for something else: say what surprises you and every dead end you
-walk into. So a handback obeying the contract reports its retro absent. The
-voice verbs branch hit this: it carries a full retro under `What surprises me`
-and a dead end chapter, and the verb called it missing.
+Six tests move with the wording, and three new cases hold `retroIn` against
+the headings the contract asks for.
 
 # What waits
 
-| the piece | where | proves it |
-|---|---|---|
-| the report names the merge verb | `lib/review.js` | the two closing lines say it |
-| `retroIn` reads the chapter the contract asks for | `lib/review.js` | a handback under `What surprises me` reads as carrying one |
-| the contract names the heading | `src/scripts/work.js` | a new brief says where the retro goes |
-| the two agree | both | a fixture handback passes the verb |
+Nothing on this branch. Merge it and close it.
 
-# Why the two disagree
+# What surprises me
 
 The contract and the detector each name a retro their own way, and nothing
-holds them to one wording. Name the heading in the contract, and read that
-heading in `retroIn`. One wording then reaches both.
+holds them to one wording. So a handback obeying the contract to the letter
+reports its retro absent, and the reviewer reads a fault that stands nowhere.
+`work/the-voice-verbs` carries a full retro and the verb calls it missing.
 
-## How this branch runs
+The fix names one wording and puts it in both places. A rule living in prose
+alone drifts from the program reading it.
 
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
-
-1. Run `./RUNME.sh work sync` FIRST. It takes main into this branch, so
-   an old branch works against what the tree holds now. Resolve any conflict
-   before you start, because a conflict found later costs the work already
-   done.
-2. Commit and push each time you finish a thing. A cloud box dies and takes
-   its working tree with it.
-3. Write your result and your retro into `HANDOVER.md`, at the root, replacing
-   this brief. Say what surprises you and every dead end you walk into.
-4. Run `./RUNME.sh work done`, which sets the status and pushes.
-5. Run `./RUNME.sh work release` instead where you stop early, so the branch
-   goes back to `todo` for somebody else.
-6. Run `./RUNME.sh work merge <name>` from main to take it in, then
-   `work close`. A cloud box stops at step 4, because the harness holds
-   main shut there and a cloud box opens no pull request.
+The `CodeComment` rule takes a design pointer or a five line header, and it
+refuses a plain sentence. Two comments of mine read as prose, and the sweep
+refuses both.

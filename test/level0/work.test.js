@@ -124,7 +124,7 @@ test("a dependency done and unmerged holds its dependent, and merged frees it", 
     ["work/the-schema-reads", said(DONE)],
     ["work/the-schema-refuses", said(TODO, "the-schema-reads")],
   ]);
-  assert.deepEqual(freeNow(briefs), [], "done waits on a person's merge");
+  assert.deepEqual(freeNow(briefs), [], "done waits on a merge");
   assert.deepEqual(freeNow(briefs, new Set(["work/the-schema-reads"])), [
     "work/the-schema-refuses",
   ]);
