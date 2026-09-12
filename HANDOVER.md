@@ -14,7 +14,9 @@ so take that branch in where `work sync` leaves it absent.
 
 This branch turns the brief on a branch into a group of tickets on a branch.
 A group is a ticket under the `group` process, and its children are the
-tickets naming it under `group`. Its chapters are A group is a branch, and
+tickets naming it under `group`. The schema branch lands a group schema of its
+own, because its brief predates that ruling. This branch removes it, and the
+design is the newer of the two. Its chapters are A group is a branch, and
 What a person sees.
 
 | what stands today | where |
@@ -29,7 +31,8 @@ What a person sees.
 
 | the piece | where | proves it |
 |---|---|---|
-| the group ticket | `spec/tickets/<name>.md` | it passes the ticket schema, and carries the `group` route |
+| the group ticket | `spec/tickets/<name>.md` | it passes the ticket schema, and carries the `group` route from `spec/processes/group.yaml` |
+| the group schema goes | `spec/schemas/group.schema.yaml`, and what reads it in `lib/` and `.vale.ini` | no file names a group kind, and `check` stays green |
 | `work take` over a group | `work.js` | it writes the hand and `took` into the group's record and pushes, and a second take fails on the push |
 | held derives | `work list` | a group holds where its newest record entry carries `took` and no `gave` |
 | `work list` | `work.js` | one row per group and per loose ticket, the age of each held tip, and a brief told apart by `HANDOVER.md` at its tip |
