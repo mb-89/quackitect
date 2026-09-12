@@ -13,6 +13,9 @@
     "Other"
   ],
   "main": "./extension.js",
+  "dependencies": {
+    "vscode-languageclient": "9.0.1"
+  },
   "activationEvents": [
     "workspaceContains:spec/config/level0.schema.json"
   ],

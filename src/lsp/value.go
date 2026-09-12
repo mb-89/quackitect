@@ -1,5 +1,5 @@
 // Reading a loose value the way the JavaScript reads one. A schema field takes
-// one line or a list, and every caller asks these and never the type itself.
+// one line or a list, so every caller asks these and reads the shape back.
 // [[spec/design_output/schema#the-yaml-a-schema-reads]]
 package main
 

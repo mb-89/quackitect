@@ -4,6 +4,7 @@
 // [[spec/design_output/extension#it-starts-silent]]
 
 const { SCHEMA, sidebarOf } = require("./sidebar.js");
+const { serverAsk } = require("./lib/lsp.js");
 const { toastsOf } = require("./lib/states.js");
 
 const VIEW = "quackitect.sidebar";
@@ -16,6 +17,7 @@ async function activate(context, given) {
   if (!door.holds() || !(await door.read(SCHEMA))) return;
   door.marks(HERE, true);
   door.quiets();
+  await startsServer(door);
   const sidebar = sidebarOf(door);
 
   // [[spec/design_output/extension#the-status-bar-says-it]]
@@ -46,6 +48,14 @@ async function activate(context, given) {
   });
 }
 
+// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+async function startsServer(door) {
+  if (!door.startsServer) return "";
+  const ask = serverAsk(door.root(), process.platform);
+  if (!(await door.list(ask.folder)).includes(ask.binary)) return "";
+  return door.startsServer(ask);
+}
+
 function deactivate() {}
 
-module.exports = { HERE, REST, SHOW, VIEW, activate, deactivate };
+module.exports = { HERE, REST, SHOW, VIEW, activate, deactivate, startsServer };

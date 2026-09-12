@@ -227,6 +227,18 @@ get_index() {
 # So the link goes in beside an entry in extensions.json, and node writes that
 # file: it keeps every entry it cannot read and refuses a write losing an id.
 # The link points at the tree, so an edit draws without a second install.
+# THE LANGUAGE CLIENT IS THE EXTENSION'S ONE DEPENDENCY, PINNED IN ITS MANIFEST.
+# The link points at the tree, so the modules land beside the extension and no
+# copy travels. A box with no registry keeps the sidebar and loses the server.
+# [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+client_folder="$root/src/extension/node_modules/vscode-languageclient"
+
+get_client() {
+  say "  installing the language client"
+  (cd "$root/src/extension" && npm install --no-audit --no-fund --silent) || return 1
+  [ -d "$client_folder" ]
+}
+
 editor_folder="$HOME/.vscode/extensions"
 
 # A COPY IS A STALE EXTENSION, AND THAT IS THE ONE THING THIS CANNOT BE. A copy
@@ -287,7 +299,7 @@ set_hooks() {
 wanted() {
   [ "$1" = "vale-ls" ] || [ "$1" = "go" ] || [ "$1" = "git-hooks" ] ||
     [ "$1" = "editor-link" ] || [ "$1" = "editor-extensions" ] ||
-    [ "$1" = "index" ] || [ "$1" = "se-lsp" ]
+    [ "$1" = "index" ] || [ "$1" = "se-lsp" ] || [ "$1" = "editor-client" ]
 }
 
 missed() {
@@ -296,6 +308,7 @@ missed() {
     go)      say "  go stays missing, so ./RUNME.sh log prints plain rows." >&2 ;;
     index) say "  the index stays unbuilt, so find and links read the files." >&2 ;;
     se-lsp) say "  the language server stays unbuilt, so lint reads the node rules." >&2 ;;
+    editor-client) say "  no language client here, so the editor draws no server line." >&2 ;;
     editor-link) say "  the sidebar stays unlinked, so the editor draws no panel here." >&2 ;;
     editor-extensions) say "  no code on the PATH, so a person takes the recommendation." >&2 ;;
     git-hooks) say "  git reads its own hooks here, so a hand commit meets no privacy check." >&2 ;;
@@ -311,6 +324,7 @@ here() {
     go)      have go ;;
     index) index_here || ! compiler_here >/dev/null ;;
     se-lsp) lsp_here || ! have go ;;
+    editor-client) [ -d "$client_folder" ] ;;
     editor-link) editor_linked ;;
     editor-extensions) extensions_here ;;
     git-hooks) hooks_here ;;
@@ -326,6 +340,7 @@ why() {
     go) say "go: it builds the viewer ./RUNME.sh log opens the door log in, and the index" ;;
     index) say "index: the warm model of this tree, which find and links ask" ;;
     se-lsp) say "se-lsp: this tree's own language server, which draws the note shape and the names" ;;
+    editor-client) say "editor-client: the language client the extension starts the server through" ;;
     editor-link) say "editor-link: this tree's own sidebar, linked into the editor and named in its list" ;;
     editor-extensions) say "editor-extensions: the Vale and Biome extensions the tracked settings point at" ;;
     git-hooks) say "git-hooks: the pre-commit door, so a commit by hand meets the privacy check" ;;
@@ -341,6 +356,7 @@ get() {
     go) get_go ;;
     index) get_index ;;
     se-lsp) get_lsp ;;
+    editor-client) get_client ;;
     editor-link) link_editor ;;
     editor-extensions) get_extensions ;;
     git-hooks) set_hooks ;;
@@ -348,7 +364,8 @@ get() {
 }
 
 missing=""
-for one in node vale biome vale-ls go index se-lsp editor-link editor-extensions git-hooks; do
+for one in node vale biome vale-ls go index se-lsp editor-client editor-link \
+  editor-extensions git-hooks; do
   here "$one" || missing="$missing $one"
 done
 
