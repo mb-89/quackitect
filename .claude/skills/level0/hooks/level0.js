@@ -407,6 +407,8 @@ export function register(on, _options) {
 
     const how = landsOnTrunk(said, await branchNow($), TRUNK);
     if (!how) return next(e);
+    // [[spec/design_output/work#a-box-writes-its-branch]]
+    if (!cloud) return next(e);
 
     await logbook.say("warn", "bash", `refused a ${how} landing on ${TRUNK}`, {
       tool: "Bash",
@@ -414,14 +416,14 @@ export function register(on, _options) {
     });
     return {
       deny: [
-        `This box works a branch, and ${TRUNK} belongs to a person.`,
+        `A cloud box works a branch, and the harness holds ${TRUNK} shut here.`,
         "",
         how === "commit"
           ? `You stand on ${TRUNK}, so this commit would land there.`
-          : `This pushes ${TRUNK}, which no cloud box may move.`,
+          : `This pushes ${TRUNK}, which a cloud box may never move.`,
         "",
-        "Run `./RUNME.sh work take` to take a branch and move onto it. Every",
-        "commit then lands where it belongs, and the merge stays a person's.",
+        "Run `./RUNME.sh work take` to take a branch and move onto it. Push that",
+        "branch, run `work done`, and a box off the cloud takes it into trunk.",
       ].join("\n"),
     };
     })();
