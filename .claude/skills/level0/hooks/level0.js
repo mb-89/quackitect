@@ -22,7 +22,9 @@ import {
   countsOf,
   envOf,
   forHelper,
+  HEARD,
   parse,
+  PROBE,
   standingLayer,
 } from "../lib/guidance.js";
 import { godMode, HEALTH, repairs } from "../lib/health.js";
@@ -106,6 +108,10 @@ export function register(on, _options) {
   let handover = [];
   let waiting = false;
   let cloud = false;
+  let probing = false;
+  let probeRan = false;
+  let probeDone = false;
+  let reads = 0;
   let logbook = logHere(null);
   let rules = [];
   let onAHeldBranch = false;
@@ -145,6 +151,7 @@ export function register(on, _options) {
 
     handover = await takeHandover($);
     cloud = await onACloudBox($);
+    probing = await probesCompaction($);
     waiting = cloud && !handover.length && (await offAWorkBranch($));
     onAHeldBranch = handover.some((one) => parse(one.text).front.status === "held");
 
@@ -484,8 +491,9 @@ export function register(on, _options) {
   });
 
   // [[spec/design_output/level0#a-step-carries-the-answer]]
-  on("turn.step", async (_$, e, next) => {
-    const said = await next(e);
+  // [[spec/design_output/level0#a-step-streams]]
+  on("turn.step", async function* (_$, e, next) {
+    const said = yield* next(e);
     if (!owed || (await settings.ask("answer.enabled")) === false) return said;
     const text = String(e.answer ?? "").trim();
     if (text) {
@@ -508,15 +516,29 @@ export function register(on, _options) {
       firstTurn = false;
       await heardCanary(logbook, canaryIn(e.answer, sentence), sentence);
     }
+    // [[spec/design_output/level0#the-layer-after-a-compaction]]
+    if (probing && e.reason === "answer") {
+      if (probeRan) {
+        probing = false;
+        probeDone = true;
+        await heardCanary(logbook, canaryIn(e.answer, sentence), sentence);
+      } else {
+        probeRan = true;
+        await forceCompaction($, logbook);
+      }
+    }
     const off = (await settings.ask("stop.enabled")) === false;
     const hold = await settings.ask("stop.hold");
-    await bite($, e, {
-      rules,
-      tooth,
-      logbook,
-      mostInARow: await settings.ask("stop.mostInARow"),
-      ran: (name) => ranHere(name, off, hold),
-    });
+    // [[spec/design_output/level0#what-the-probe-does]]
+    if (!probeDone) {
+      await bite($, e, {
+        rules,
+        tooth,
+        logbook,
+        mostInARow: await settings.ask("stop.mostInARow"),
+        ran: (name) => ranHere(name, off, hold),
+      });
+    }
     await dropAsk(settings, logbook);
     if (!bin || !e.answer || e.reason !== "answer") return said;
 
@@ -543,6 +565,7 @@ export function register(on, _options) {
   on("prompt.context", async (_$, e, next) => {
     const said = await next(e);
     const blocks = [...said.blocks];
+    reads += 1;
 
     if (standing) {
       blocks.push({
@@ -632,7 +655,33 @@ export function register(on, _options) {
       });
     }
 
+    // [[spec/design_output/level0#the-layer-after-a-compaction]]
+    if (probing && reads > 1) {
+      blocks.push({
+        name: "level0-probe-asks-again",
+        text: [
+          "A probe measures this compaction, and the owner started it.",
+          "",
+          "End your next answer with the canary line above, word for word, once.",
+          "Read the numbers off the block that carries it, and write no other line.",
+        ].join("\n"),
+      });
+    }
+
+    await logbook.say("info", "context", `${blocks.length} block(s) reach the session`, {
+      detail: blocks.map((one) => one.name).join(" "),
+      reason: reads === 1 ? "first" : "re-read",
+    });
     return { ...said, blocks };
+  });
+
+  // [[spec/design_output/level0#the-layer-after-a-compaction]]
+  on("session.compact", async (_$, e, next) => {
+    await logbook.say("info", "compact", "a compaction runs", {
+      trigger: String(e?.trigger ?? "unknown"),
+      messages: Array.isArray(e?.messages) ? e.messages.length : 0,
+    });
+    return next(e);
   });
 
   // [[spec/design_output/stop#the-mechanical-checks]]
@@ -978,18 +1027,32 @@ async function readerRuns($, material, rules) {
 // [[spec/design_output/level0#the-canary]]
 async function heardCanary(logbook, heard, sentence) {
   if (heard.found === "same") {
-    return logbook.say("info", "level0", "the canary comes back whole", {
-      detail: sentence,
-    });
+    return logbook.say("info", "level0", HEARD.same, { detail: sentence });
   }
   if (heard.found === "other") {
-    return logbook.say("warn", "level0", "the canary comes back with other counts", {
+    return logbook.say("warn", "level0", HEARD.other, {
       detail: `said=${heard.said} holds=${sentence}`,
     });
   }
-  return logbook.say("warn", "level0", "the canary is absent from the answer", {
-    detail: sentence,
-  });
+  return logbook.say("warn", "level0", HEARD.none, { detail: sentence });
+}
+
+// [[spec/design_output/level0#the-layer-after-a-compaction]]
+async function forceCompaction($, logbook) {
+  try {
+    await $.command.run({ command: "compact" });
+  } catch (err) {
+    return logbook.say("warn", "compact", "the command road refuses a compaction", {
+      detail: String(err?.message ?? err),
+    });
+  }
+  try {
+    await $.prompt.submit({ text: PROBE.asks });
+  } catch (err) {
+    await logbook.say("warn", "compact", "the probe submits no second prompt", {
+      detail: String(err?.message ?? err),
+    });
+  }
 }
 
 // [[spec/design_output/stop#the-vote]]
@@ -1115,6 +1178,12 @@ async function readGuidance($, roots) {
 async function onACloudBox($) {
   const env = await readEnv($, ["CLAUDE_CODE_REMOTE", "SE_CLOUD"]);
   return bindsHere("---\nenv:\n  - CLAUDE_CODE_REMOTE\n  - SE_CLOUD\n---\n", env);
+}
+
+// [[spec/design_output/level0#the-layer-after-a-compaction]]
+async function probesCompaction($) {
+  const env = await readEnv($, [PROBE.variable]);
+  return bindsHere(`---\nenv:\n  - ${PROBE.variable}\n---\n`, env);
 }
 
 // [[spec/design_output/work#a-box-off-a-branch]] says why.

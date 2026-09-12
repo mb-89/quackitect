@@ -82,6 +82,25 @@ A hook calling `next({ ...e, prompt })` hands the subagent the new prompt. A
 probe prepending one instruction sees the subagent obey it, and `next(e)`
 resolves to `{ model }`, the id the spawn settles on.
 
+## A step streams
+
+Measured on 2026-09-12 against client 2.1.269. `turn.step` streams, so its hook
+takes `async function* ($, e, next)`, yields the chunks through `yield* next(e)`
+and returns the result. A plain `async` hook there fails `claude plugin
+validate`, and the client then loads none of the module:
+
+| what a person sees | what stands behind it |
+|---|---|
+| `claude plugin list` says `√ loaded` | the plugin is adopted, and its hooks are refused |
+| no `.se/level0.stamp` | `session.start` reaches no hook |
+| no line in `./RUNME.sh log` | every door in the module stays silent |
+| the canary is absent from every answer | the standing layer reaches no session |
+
+So one hook of the wrong shape takes the whole cage off, and the four readings
+above are how a person catches it. Run `claude plugin validate
+.claude/skills/level0` on the client of the day, because the shape a hook takes
+moves with the build.
+
 ## A step arrives late
 
 `turn.step` fires at the step's first tool result, so its first call runs
@@ -140,6 +159,66 @@ on "a re-read (compaction, `/clear`)".
 
 Level zero hooks it already, so a compaction and a `/clear` both bring the
 rules back. Nothing here re-reads them per turn, and nothing needs to.
+
+# The layer after a compaction
+
+The layer survives. Measured on 2026-09-12 against client 2.1.269, by the probe
+below: a compaction fires `prompt.context` a second time, the hook hands the
+same blocks over, and the answer after it carries the canary with its own
+numbers.
+
+An ordinary second prompt fires `prompt.context` no second time, so the event
+counts conversations and not prompts. That control is what makes the second
+read a compaction's own.
+
+## Three roads, and the one that holds
+
+| road | what it answers on client 2.1.269 |
+|---|---|
+| `$.command.run({ command: "compact" })` | it holds, and `session.compact` fires inside the call |
+| `$.session.compact({ instructions })` | it throws under `-p`: compaction there runs inside a turn |
+| two headless runs under `--resume` | untried, because the first road holds |
+
+`$.session.compact` names the reason itself, so a session under the editor may
+still take it. The probe takes the command road, which holds in both places.
+
+## What the probe does
+
+`./RUNME.sh probe compact` runs the client headless under `SE_PROBE_COMPACT`,
+asks for the canary, and reads the log that run leaves:
+
+1. The hook reads the variable at `session.start`, and stands idle without it.
+2. At the first `turn.complete` it runs the compact command, then submits a
+   second prompt asking for the canary again.
+3. `session.compact` writes a line naming what fires it and how many messages
+   it keeps.
+4. The re-read of `prompt.context` carries one extra block, which asks for the
+   canary a second time and carries none of its numbers.
+5. The second answer carries the canary, and `turn.complete` writes the same
+   line the first turn writes.
+
+The numbers come out of the standing block alone, so an answer carrying them
+proves the block reached the model past the compaction.
+
+## What the probe reads
+
+`readsCompaction` in `src/scripts/probe.js` is a pure function over log rows:
+
+| the log carries | the verb answers |
+|---|---|
+| a `compact` line, a `re-read` context line, and the canary whole | `survives` |
+| a `compact` line, and a canary absent or carrying other numbers | `drops` |
+| a `compact` line, and no `re-read` context line | `drops` |
+| no `compact` line at `info` | `no compaction`, and the road stands unproven |
+
+The verb exits 0 on `survives` and 1 on anything else.
+
+## Without the verb
+
+The two log lines pay on their own. A session that compacts in the ordinary
+course writes a second `context` line in `./RUNME.sh log`, with `reason` at
+`re-read`, and a `compact` line beside it. So a person reads a compaction out
+of the log with no probe running.
 
 # Where the plugin stands
 

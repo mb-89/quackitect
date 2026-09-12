@@ -6,7 +6,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { register } from "../../.claude/skills/level0/hooks/level0.js";
-import { canary } from "../../.claude/skills/level0/lib/guidance.js";
+import { canary, HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { rowsOf } from "../../.claude/skills/level0/lib/log.js";
 
 const NOTE = `---
@@ -66,6 +66,7 @@ function engine(seed = {}, taught = {}) {
   const said = [];
   const runs = [];
   const spawns = [];
+  const commands = [];
 
   const $ = {
     agent: {
@@ -109,6 +110,13 @@ function engine(seed = {}, taught = {}) {
         return { text: input.text };
       },
     },
+    command: {
+      run: async (input) => {
+        commands.push(input);
+        if (!taught.command) throw new Error("this engine runs no command");
+        return taught.command(input);
+      },
+    },
     session: { messages: async () => said },
   };
 
@@ -129,17 +137,32 @@ function engine(seed = {}, taught = {}) {
     transcript: said,
     runs,
     spawns,
+    commands,
     async raise(event, e, tool) {
       const chain = of(event, tool);
-      const step = (at) => async (given) =>
-        at < chain.length ? chain[at].hook($, given, step(at + 1)) : given;
-      return step(0)(e);
+      const streams = event === "turn.step";
+      const step = (at) => (given) => {
+        if (at >= chain.length) return streams ? nothing(given) : given;
+        return chain[at].hook($, given, step(at + 1));
+      };
+      return streams ? drained(step(0)(e)) : step(0)(e);
     },
     lines() {
       const path = [...files.keys()].find((one) => one.startsWith(".se/log/"));
       return path ? rowsOf(files.get(path)) : [];
     },
   };
+}
+
+// [[spec/design_output/level0#a-step-streams]]
+async function* nothing(said) {
+  return said;
+}
+
+async function drained(stream) {
+  let step = await stream.next();
+  while (!step.done) step = await stream.next();
+  return step.value;
 }
 
 async function started(seed, taught) {
@@ -321,6 +344,103 @@ test("the ask stands in the block, and the turn's end writes it back to quiet", 
       (one) => one.name === "level0-owner-asks",
     ),
     undefined,
+  );
+});
+
+// [[spec/design_output/level0#the-layer-after-a-compaction]]
+const PROBING = {
+  run: (argv) => ({
+    exitCode: 0,
+    stdout: String(argv[2]).includes("SE_PROBE_COMPACT")
+      ? JSON.stringify({ SE_PROBE_COMPACT: "1" })
+      : "{}",
+    stderr: "",
+  }),
+  command: () => ({}),
+};
+
+const SENTENCE = canary({ rules: 2, notes: 1, stop: true });
+
+test("every read of the context writes one line naming its blocks and its reason", async () => {
+  const it = await started();
+
+  await it.raise("prompt.context", { blocks: [] });
+  await it.raise("prompt.context", { blocks: [] });
+
+  const lines = it.lines().filter((one) => one.kind === "context");
+  assert.deepEqual(
+    lines.map((one) => one.reason),
+    ["first", "re-read"],
+  );
+  assert.equal(lines[0].said, "2 block(s) reach the session");
+  assert.equal(lines[0].detail, "level0-rules level0-canary");
+});
+
+test("a compaction writes one line naming what fired it and what it keeps", async () => {
+  const it = await started();
+
+  await it.raise("session.compact", { trigger: "manual", messages: [1, 2, 3] });
+
+  const line = it.lines().find((one) => one.kind === "compact");
+  assert.equal(line.said, "a compaction runs");
+  assert.equal(line.trigger, "manual");
+  assert.equal(line.messages, 3);
+});
+
+test("the variable makes the first turn compact and ask for the canary again", async () => {
+  const it = await started({}, PROBING);
+  await it.raise("prompt.context", { blocks: [] });
+
+  await it.raise("turn.complete", { ...answered, answer: SENTENCE });
+
+  assert.deepEqual(it.commands, [{ command: "compact" }]);
+  assert.deepEqual(
+    it.prompts.map((one) => one.text),
+    ["Say the canary line again, on its own, and nothing else."],
+  );
+});
+
+test("no variable leaves an ordinary session compacting on nobody's word", async () => {
+  const it = await started();
+  await it.raise("prompt.context", { blocks: [] });
+
+  await it.raise("turn.complete", { ...answered, answer: SENTENCE });
+
+  assert.deepEqual(it.commands, []);
+  assert.deepEqual(it.prompts, []);
+});
+
+test("the re-read under the probe asks the agent for the canary a second time", async () => {
+  const it = await started({}, PROBING);
+  await it.raise("prompt.context", { blocks: [] });
+
+  const said = await it.raise("prompt.context", { blocks: [] });
+
+  assert.match(
+    said.blocks.find((one) => one.name === "level0-probe-asks-again").text,
+    /End your next answer with the canary line above/,
+  );
+
+  const plain = await started();
+  await plain.raise("prompt.context", { blocks: [] });
+  const again = await plain.raise("prompt.context", { blocks: [] });
+  assert.equal(
+    again.blocks.find((one) => one.name === "level0-probe-asks-again"),
+    undefined,
+  );
+});
+
+test("the answer after the compaction writes the canary line the verb reads", async () => {
+  const it = await started({}, PROBING);
+  await it.raise("prompt.context", { blocks: [] });
+  await it.raise("turn.complete", { ...answered, answer: SENTENCE });
+  await it.raise("prompt.context", { blocks: [] });
+
+  await it.raise("turn.complete", { ...answered, answer: `again\n\n${SENTENCE}` });
+
+  assert.deepEqual(
+    it.lines().filter((one) => one.said === HEARD.same).length,
+    2,
   );
 });
 
