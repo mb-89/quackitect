@@ -608,7 +608,7 @@ into the group goes to work before the retro's last leaf.
 | the branch holds the truth | while the branch stands, its copy of the group and of its children is the record |
 | a box leaves | when the group's last leaf passes, it writes `gave`, closes the group as `done` where every child stands closed, and leaves it open otherwise |
 | a group returns | an open group nobody holds comes back to the beat once a person answers on its branch |
-| the merge is a person's | `work merge` takes a group into trunk, and `work close` drops the branch |
+| the merge is a desk's | `work merge` runs on a box off the cloud, an agent's or a person's, since a cloud box pushes no trunk, and `work close` drops the branch |
 | the merge lands the truth | `work merge` runs the check on the merge commit and undoes it on red. It refuses where trunk's copy of the group or of a child differs from the branch point, and names the lines |
 | the merge frees the tickets | an open child of a merged group loses its `group`, so a ticket waiting on a person stands loose on trunk |
 

@@ -124,7 +124,7 @@ Complete these host checks before claiming live compatibility:
 2. Publish the registrations to the default branch after review.
 	Dispatch a draft work pull request with a person's GitHub credentials.
 3. Confirm the cloud job uses that head, pushes its result and retro,
-	and leaves the merge to a person. Test job interruption and work recovery.
+	and leaves the merge to a desk. Test job interruption and work recovery.
 
 # Tests above the doors
 

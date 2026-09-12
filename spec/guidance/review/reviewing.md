@@ -1,6 +1,6 @@
 ---
 kind: [[guidance]]
-scope: ["a branch coming back at done, before a person merges it"]
+scope: ["a branch coming back at done, before a desk merges it"]
 rationale: [[spec/rationales/reviewing]]
 ---
 

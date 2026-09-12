@@ -142,7 +142,8 @@ urgency reads as `soon`.
 
 A branch meets its dependency once trunk holds the branch it names, or once that
 branch goes because somebody merges and closes it. `done` alone holds the
-dependent, because `done` waits on a person's merge. So a chain of work runs
+dependent, because `done` waits on the merge, which a box off the cloud runs.
+So a chain of work runs
 itself in order, and each link starts from the one before it.
 
 `take` merges trunk in. A dependent taken before its dependency lands starts
