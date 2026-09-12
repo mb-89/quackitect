@@ -26,8 +26,10 @@ This note settles the shape of level one:
 - what level zero changes, and what level two reads
 - the order the work lands in
 
-It reads `main` at commit 3cf9076, with eleven work branches standing. It
-carries the rulings v3 and v4 leave behind, and names each one it drops.
+It reads `main` at commit 4f4711d, with five work branches standing. It
+carries the rulings v3 and v4 leave behind, and names each one it drops. A
+red team, a steel-man and a survey of the field read the first draft, and
+what they earn stands folded in.
 
 # Three rules hold level one
 
@@ -73,6 +75,8 @@ reader:
 | `step` | the pull, as the row of the route the ticket stands on |
 | `steps` | the pull, the checks and the board |
 | `process` | the board and the retro, as the route the mint copies from |
+| `process_hash` | `work reroute` and the board, which flag a route older than its process |
+| `record` | the render, the checks and the retro, as the engine's entry per leaf handed back |
 | `group` | the pull, as the branch this ticket lands on |
 | `parent` | the pull, which hands a child out before its parent |
 | `depends_on` | the pull, which holds a ticket until they close |
@@ -82,6 +86,11 @@ reader:
 The body holds the ask, a chapter per step nested as the steps nest, and a
 discussion. The schema demands each, and `mint` writes each one's description
 as a comment, so a person meeting a fresh ticket reads what goes where.
+
+A leaf's chapter carries the leaf's name as its heading, one level under its
+phase. Each field is a heading one level under the leaf, with the mint's
+comment beneath. The comment stays where it is and counts toward nothing, the
+way a comment in a brief counts today.
 
 # The lifecycle
 
@@ -137,7 +146,7 @@ differs: its own reads, its own hand rule, and the form of its evidence.
             evidence:
               - name: tests
                 form: command
-                expects: red
+                expects: assertion
                 says: the tests you write fail on their own assertion
               - name: seen
                 form: text
@@ -161,12 +170,15 @@ differs: its own reads, its own hand rule, and the form of its evidence.
                 says: the check is green on the commit
       - name: verdict
         by: not implement
-        on_fail: implement
+        on_fail: implement/change
         reads: [[spec/guidance/review/reviewing]]
         evidence:
+          - name: read
+            form: files
+            says: every file you read, one a line
           - name: verdict
             form: verdict
-            says: pass or fail, every hunk read, findings one a line
+            says: pass or fail, findings one a line
 
 | field | holds |
 |---|---|
@@ -175,15 +187,16 @@ differs: its own reads, its own hand rule, and the form of its evidence.
 | `by` | `anyone`, `person`, `agent`, `children`, or `not <step>` |
 | `reads` | links to the guidance notes the step's hand reads |
 | `on_fail` | an earlier step, where a failed hand-back sends the ticket |
-| `asks` | the question a person answers, on a step a person takes |
+| `asks` | the question a person answers, on a step a person takes, with `options` where one word answers it |
 | `evidence` | the fields a leaf's hand fills, each with a name, a form and a `says` |
 
 Four rules hold the tree together:
 
 - A leaf inherits `by`, `reads` and `on_fail` from the phases above it. The reads add up, and the other two take the nearest value.
 - A name refers to a sibling first, and to a step from the top second. A path with a slash, as `design/review`, says exactly.
-- `not implement` excludes the hand of every leaf under `implement`, and `on_fail: implement` sends the ticket to that phase's first leaf.
+- `not implement` excludes the hand of every leaf the mint puts under `implement`, and `on_fail: implement` sends the ticket to that phase's first leaf.
 - `step` names a leaf by its path, as `implement/tests-red`.
+- A leaf with no `on_fail` fails back to itself, and an inserted step counts for no `not`.
 
 The chapters follow the tree. A phase's chapter holds its steps' chapters and
 nothing else. A leaf's chapter holds its evidence and nothing else, so a
@@ -194,7 +207,7 @@ working without a word of prose:
 
 | leaf | the hand does | the engine checks at the hand-back |
 |---|---|---|
-| `tests-red` | writes the tests the ask calls for | the tests the branch adds or changes fail, and the failure is an assertion, with no build fault |
+| `tests-red` | writes the tests the ask calls for | the tests the branch adds or changes since the ticket's first take fail, and the failure is an assertion, with no build fault |
 | `change` | makes the change | the tree builds and lints |
 | `tests-green` | makes the tests pass | the same tests pass, and the check is green on the commit |
 
@@ -210,15 +223,21 @@ Three keywords join the schema checker for this:
 - `x-earlier`: a field names an entry standing before its own
 
 The checker holds them the way it holds `required` and `enum`, so the write
-door, the sweep and the language server read one rule.
+door, the sweep and the language server read one rule. The checker today
+reads top-level scalars alone. Before the keywords land, it learns to recurse
+into `steps` and `evidence`, to keep a line per nested key, and to resolve a
+path. That is the first branch's real size.
 
 A review is a step and no state. So is a test, an approval, a translation or a
 deploy. A new kind of work adds a row to a route and moves nothing in the
 schema.
 
-A step with `by: children` belongs to no hand. It ends when the last ticket
-naming this one as `parent` closes. The pull advances the parent the moment it
-accepts that child.
+A step with `by: children` belongs to no hand. It ends when every ticket
+naming this one as `parent` closes `done` or `became`. A child that closes
+`dropped` sends the parent to the step's `on_fail`. The pull derives that at
+every hand-out from what stands closed on trunk. So a parent whose children
+run in another group advances once they land. The sweep refuses a cycle in
+`parent` or `depends_on`.
 
 # Evidence has a form
 
@@ -232,13 +251,15 @@ sees what goes where, and an agent meets the same slots.
 | `list` | one item a line | it holds one item at least |
 | `command` | one command line | it runs from the root and answers the exit or the word `expects` carries |
 | `link` | a link or a path | it resolves in the tree or on the branch |
+| `files` | the files read, one a line | every file the branch changes since the ticket's first take stands in it |
+| `choice` | one of the words `options` names | it is one of them |
 | `verdict` | `pass` or `fail`, then findings one a line | one of the two words, and findings where it fails |
 
 `expects` names what a command must answer: an exit code, or a word the verb
-prints, such as the test verb's `red`. The engine writes an `answered` line
-under a command field with the exit and the last line. The hand cannot write
-that line, and a criterion with no evidence behind it is guidance, so no form
-takes a tick.
+prints, such as the test verb's `assertion`. The engine writes each command's
+exit and last line into the ticket's `record`, and the render draws them under
+the field as an `answered` line. The hand cannot write that line, and a
+criterion with no evidence behind it is guidance, so no form takes a tick.
 
 A ticket takes a hand's writing in three places, and each opens with a
 comment that says so:
@@ -250,8 +271,11 @@ comment that says so:
 | the discussion | anyone | always |
 
 Everything else on the ticket is the engine's. The write door weighs a ticket
-write against the render of the ticket's own frontmatter. It refuses a write
-that changes anything outside those places, and names the line.
+write against the render of the ticket's own frontmatter. That render is the
+route and the record drawn as chapters. A changed line stands inside one of
+the three places, or the door refuses the write and names the line. So the
+door needs no hold to know the places. The Bash door reads what a command
+lands, so a heredoc meets the same rule.
 
 A person and an agent meet one form through two doors. The person fills the
 slots in the editor. The agent fills them through the write door, or hands the fields back
@@ -260,15 +284,19 @@ as the pull's payload. Either way the engine writes them into the same slots.
 # Evidence per step
 
 A leaf's chapter carries what the hand fills in and what the engine measures.
-The hand fills the fields the leaf names. The engine appends, at the hand-back:
+The hand fills the fields the leaf names. The engine writes one entry per leaf
+into `record` at the hand-back, and the render draws it under the chapter:
 
-- an `answered` line under each command field: the exit and the last line
+- the exit and the last line of each command field, as an `answered` line
 - the hand, as the box, the session and the agent where the harness names one
 - the branch tip at the take and at the hand-back, the two hashes v4 writes on a token
+- the returns, which count how often the leaf fails back
 
 The diff of the work is the group's branch, and `git log` on the ticket file
 is its history. So a ticket carries no time and no line number, which v4
-rules, and a reader finds both in git.
+rules, and a reader finds both in git. The test verb's delta runs from the
+ticket's first take on the branch to the tip. So ticket three of a group runs
+its own tests and no other ticket's.
 
 A command field answers only where the engine runs it, because the engine
 writes the `answered` line and the hand cannot. That answers v4's finding of
@@ -285,13 +313,13 @@ ones a step names, and answers one word and a reason:
 | answer | means |
 |---|---|
 | `green` | every test it runs passes |
-| `red`, assertion | a test fails on its own assertion, which is the red a `tests-red` step wants |
-| `red`, build | the file loads no test, because the tree fails to build or to parse |
-| `red`, missing | the branch changes no test, so there is nothing to run |
+| `assertion` | a test fails on its own assertion, which is the red a `tests-red` step wants |
+| `build` | the file loads no test, because the tree fails to build or to parse |
+| `missing` | the branch changes no test, so there is nothing to run |
 
-A command field names it with `expects: red` or `expects: green`. The verb
-reads the delta off git, which is the half of v4's test map that a branch
-already carries.
+A command field names it with `expects: assertion` or `expects: green`, so a
+build fault or a missing test passes for no red. The verb reads the delta off
+git, which is the half of v4's test map that a branch already carries.
 
 # Processes are routes
 
@@ -308,8 +336,9 @@ and nothing more:
 
 A note is the smallest ticket, and it is where most work starts. A hand that
 meets an idea, a bug or a doubt mid-work writes a note and carries on. Its
-hold stays where it is. `work note` takes a name and a line and answers at
-once. The note is private and stays on the box. The mint's comment on its ask
+hold stays where it is. `work note` takes a name and a line, writes `from`
+off the hold as the ticket and step in hand, and answers at once. The note is
+private and stays on the box. The mint's comment on its ask
 carries three hints and nothing else:
 
 - the smallest case that shows it
@@ -328,10 +357,11 @@ prompt has an answer. A prompt that says "make a note of this" wants one thing
 back: the note. So three things happen at once:
 
 - `work note` writes a `note` line to the log
-- the answer door counts that line as the answer
+- the answer door reads that line off the log, and counts it where the prompt names a note
 - the viewer draws it pink, right under the prompt
 
-The owner reads that the agent understood, and the agent carries on.
+The owner reads that the agent understood, and the agent carries on. A note
+answers no other prompt, so the readback stays owed everywhere else.
 
 A complex ticket's work is other tickets. Its `split` step writes the children,
 each one trivial, standard or complex, and its done-when says every child
@@ -340,11 +370,15 @@ the children run in its place. Its `verdict` step reads what the children add
 up to. So complexity composes through `parent`, and every route stays
 short.
 
-The mint takes `--process <name>` and copies the route, so the ticket depends
-on nothing outside itself after that. A process file changes without reaching
-a ticket in flight, which is the frozen window v3 rules for an iteration. A
-person may edit a route on a ticket by hand, and a machine at level two may
-write one row by row.
+The mint takes `--process <name>`, copies the route, and writes the process
+file's hash beside it. So the ticket depends on nothing outside itself after
+that. A process file changes without reaching a ticket in flight, which is the
+frozen window v3 rules for an iteration. A fix to a process reaches a ticket
+through `work reroute`, which copies the current route over the leaves the
+ticket has yet to reach. It refuses where `step` names a leaf the new route
+lacks, and the board flags a ticket whose hash trails its process. A person
+may edit a route on a ticket by hand, and a machine at level two may write one
+row by row.
 
 # A group is a branch
 
@@ -377,8 +411,11 @@ shape.
 | the branch is the filter | on a group's branch the pull sees that group's tickets alone, and widens nothing |
 | trunk hands out no group's ticket | on trunk the pull offers a box a group to take, and a person the tickets of no group |
 | the branch holds the truth | while the branch stands, its copy of the group note and of its tickets is the record |
-| a group ends | when no ticket in it stands at a step an agent may take |
+| a box leaves | when no ticket in it stands at a step an agent may take, and pushes `state: done` where every ticket stands closed, else `state: todo` |
+| a group returns | a group at `todo` with a parked ticket comes back to the beat once a person answers on its branch |
 | the merge is a person's | `work merge` takes an ended group into trunk, and `work close` drops the branch |
+| the merge lands the truth | `work merge` runs the check on the merge commit and undoes it on red. It refuses where trunk's copy of a ticket or of the group note differs from the branch point, and names the lines |
+| the merge frees the tickets | an open ticket of a merged group loses its `group`, so a parent waiting on children or on a person stands loose on trunk |
 
 A box starting on trunk or on a branch the platform names takes a group first.
 A group's tickets live on its branch, and a hand works them there alone. On a
@@ -389,12 +426,15 @@ branch, which v4 rules.
 There is no lease. A branch somebody holds stays held until a person looks. A
 branch held for a long time is something a person has to look at in any case.
 So `work list` names the age of each held branch's tip, and that age is the
-signal.
+signal. The beat's notification names every held group whose tip is older
+than `work.staleAfter`, so it prompts the look, and the release stays a
+person's.
 
 A hand mints where it means to work:
 
 - a ticket it means to do itself goes into its own group, and lands with it
 - a ticket it leaves for others carries no group, and a person sorts it later
+- on a cloud box a loose ticket rides the group's branch and lands at the merge, since the box commits on no trunk
 
 The retro chapter replaces the brief's handback. The hand that ends a group
 writes it before the last push.
@@ -413,14 +453,20 @@ there.
 
 A pull carries at most two things: the ticket it hands back and a verdict,
 `pass` or `fail` with a reason. The file is the payload, because the hand
-writes its evidence through the write door before it pulls. The other side
-then checks, cheapest first:
+writes its evidence through the write door before it pulls. A leaf holding a
+`verdict` field takes the verdict from the field, and the pull refuses the
+flag there. The other side fetches the branch, then checks, cheapest first:
 
-1. The ticket passes its schema, and every field of the leaf holds what its form asks.
-2. Every command field of the leaf runs from the root and answers the exit or the word `expects` carries.
-3. The hand may take this step, by the route's `by`.
-4. The judge reads the evidence against the step's guidance, where
-   `judge.enabled` says so.
+1. The hand-back matches the hold: this ticket, this step, this take hash. One the record answers already gets the recorded answer, and one whose take hash trails the branch gets `refused` as stale.
+2. The ticket passes its schema, and every field of the leaf holds what its form asks.
+3. Every command field of the leaf runs from the root and answers the exit or the word `expects` carries.
+4. The hand may take this step, by the route's `by`, and a verdict comes from a hand that leaves the tip where it stands.
+5. The judge reads the evidence against the step's guidance, on every
+   hand-back, where `judge.enabled` says so.
+
+The judge runs in the plugin wrapper, since a shell verb reaches no model. A
+person's hand-back from the shell meets the four mechanical checks. The judge
+reads it at the next agent pull on that ticket.
 
 Then one of three answers comes back:
 
@@ -432,16 +478,27 @@ Then one of three answers comes back:
 
 On `pass` the engine does six things in one call:
 
-1. It appends the evidence lines.
+1. It writes the leaf's entry into `record`.
 2. It advances `step`, or closes the ticket at the last step with reason
    `done`.
 3. It sets `state: open`, so the next hand may pull it.
-4. It commits on the group's branch.
-5. It pushes.
-6. It answers the next ticket.
+4. It commits the step's work and the ticket as one commit on the group's
+   branch, named by the ticket and the step.
+5. It pushes. Where the push fails, it fetches, rebases that one commit, and
+   tries once more, or answers `refused` and says the branch moves.
+6. It answers the next ticket, or `done` to a hand the engine spawns for one
+   step.
 
-On `fail` it sets `step` to the row's `on_fail`, writes the reason on the
-evidence, and reopens the ticket.
+On `fail` it does four things:
+
+1. It sets `step` to the row's `on_fail`, or to the step itself where none
+   stands.
+2. It writes the reason on the evidence.
+3. It counts the return in `record`.
+4. It reopens the ticket.
+
+At `work.failsBeforePerson` returns it inserts a person step carrying the last
+findings, the way a refusal does.
 
 A `work` answer says one thing to do, and it hands the leaf, not the whole
 ticket. It carries the ask and the leaf alone: its fields, their forms, and
@@ -455,19 +512,29 @@ The pull runs at two levels, and the same rule shape holds at each:
 | who pulls | what | the rule |
 |---|---|---|
 | the beat | a box per free group | groups at `todo`, none of whose tickets wait on an unmerged group, by urgency |
-| the box | the next ticket of its group | tickets at `open` with no open dependency, children before parents, a step this hand may take, by urgency then name |
+| the box | the next ticket of its group | tickets at `open` with no open dependency on trunk, children before parents, a step this hand may take, by urgency then name |
 | a person | anything | the same two lists on the board, and no refusal |
 
-The pull writes `.se/hold.json` naming the ticket, the step, the group and the
-hand. The tooth's `work-waiting` check reads it, so a turn ends on a fact where
-a ticket stands in hand.
+The pull writes a hold per hand under `.se/hold/`, naming the ticket, the
+step, the group, the hand and the take hash. The pull refuses a second live
+hold for one session. The tooth's `work-waiting` check reads the session's
+own, so a turn ends on a fact where a ticket stands in hand.
 
 # Hands
 
 A hand is a box, a session on it, and an agent inside it where the harness
 names one. The engine mints the box id once into `.se/box.json`, the way v4
-does, and reads the session and the agent off level zero. A person's hand is
-their git author name.
+does, and reads the session and the agent off level zero.
+
+| hand | is |
+|---|---|
+| a helper the session spawns | the session's own hand, and the spawn hook tags it so |
+| a hand the engine spawns for a step | a hand of its own |
+| a person | their git author name |
+
+So a session's own helper reviews nothing of the session's work. The verb
+refuses `by: person` where the environment names an agent's harness, and
+`work.personSigns` asks for a signed commit as the stronger door.
 
 A role is a property of a step, and no agent holds one for life. When the next
 step's `by` excludes the hand that pulls, the pull spawns a hand for it
@@ -491,23 +558,27 @@ The engine then does four things:
 3. It points `step` at the new row.
 4. It leaves the state at `open`, so the ticket is now a person's to pull.
 
-The person writes the answer under the step's evidence and hands it back, and
-the engine advances into the step behind it.
+The inserted step carries one field, `answer`, of form `text`, or of form
+`choice` where `asks` carries `options`. The person fills it and hands the
+step back, and the engine advances into the step behind it.
 
 | trigger | who inserts | the knob |
 |---|---|---|
 | the hand needs a person | the hand, through the verb | none |
 | the same hand-back meets `refused` N times | the engine | `work.refusalsBeforePerson` |
+| a step fails back N times | the engine | `work.failsBeforePerson` |
 | a step a person takes, from the mint | the mint | none |
 
 A gate and an escalation are one mechanism, one the mint writes and one the
 engine inserts on the way. A park is the same: a person step whose `asks`
 carries the condition. The group keeps moving, because the box works its
-other tickets while a person step waits.
+other tickets while a person step waits. When none of them stands at an
+agent's step, the box leaves the group at `todo`. A box returns once the
+person answers on the branch.
 
 A ticket that gathers more inserted steps than `work.stepsBeforeSplit` is the
-wrong size. The engine refuses another insertion and asks for a split into
-sub-tickets, closing the ticket with reason `became`.
+wrong size. The engine refuses another insertion and answers the ask: split
+it. The ticket closes as `became` once its successors exist, and no sooner.
 
 # Guidance rides the step
 
@@ -523,7 +594,7 @@ the engine keeps no quiz to prove it. What it keeps is the arrival:
 | the engine writes | where | it lasts |
 |---|---|---|
 | one log line per note handed over | the log | for the record |
-| the notes this hand holds for this step, by name and hash | `.se/hold.json` | the session |
+| the notes this hand holds for this step, by name and hash | the hand's hold file | the session |
 
 The hold says which notes reach this session, so the pull hands them once per
 step and session. Three things hand them again:
@@ -536,7 +607,9 @@ A refresher on every pull costs tokens and buys nothing the hold does not
 know.
 
 The proof of application is the hand-back: the commands, the evidence and the
-judge.
+judge. The judge reads every hand-back, and the write door's sampling reaches
+it nowhere. If its findings run at the rate the transcripts show for a
+prompt, three hand-backs in four, the hash-keyed probe returns.
 
 Level one carries no reading probe, and two measurements say why:
 
@@ -552,7 +625,7 @@ names leaves the layer and rides the step.
 
 A ticket names its `parent`, and the pull hands a child out before its parent.
 A parent at a `children` step waits for its last child, which is v4's scope
-rule. A box at autonomy `start` may mint sub-tickets into its own group. A bug
+rule. It waits on trunk where the children run in another group. A box at autonomy `start` may mint sub-tickets into its own group. A bug
 it trips over goes the same way, which is the owner's ruling from v4 on a bug
 found in the bucket.
 
@@ -590,9 +663,11 @@ replaces on every tick. So a person sees that something waits on them with the
 editor shut, and clicks.
 
 Yours stands first: every ticket at a step whose `by` is `person`, with its
-`asks`. The beat counts that list, and the routine's notification carries the
-count. The routine fires one box on its clock. That box runs the beat, which
-fires the routine again for every other free group, up to `engine.boxes`.
+`asks`, oldest first. The routine's notification names each question with its
+age, and every held group whose tip is older than `work.staleAfter`. The
+routine fires one box on its clock. That box takes a free group, works it,
+and takes the next free group until none stands or its cap comes. A second
+routine is a second box, and a person creates it.
 
 A person does four things, each with a verb or a click:
 
@@ -611,12 +686,13 @@ folder.
 |---|---|
 | the brief door hands over `HANDOVER.md` and deletes it | the tracked brief goes, and the block on a cloud box says to run the pull |
 | `.se/HANDOVER.md` hands one session the next | unchanged |
-| `work-waiting` counts tasks | it reads `.se/hold.json` and counts private tickets |
-| the answer door reads the session's text alone | it counts a `note` line as an answer too |
+| `work-waiting` counts tasks | it reads the session's hold file and counts private tickets |
+| the answer door reads the session's text alone | it reads the `note` row off the log too, where the prompt names a note |
 | the viewer colours every kind it knows | `note` draws pink, under the prompt it answers |
-| `engine.binding` at `queue` and `unbound` draw the status bar | `queue` hands out, `unbound` hands out nothing, and a hand may take a named ticket |
-| `engine.autonomy` draws nowhere | `finish` mints notes alone, `start` mints into its own group, `ideation` mints loose tickets into the backlog |
-| `engine.state` and `engine.beat` draw nowhere | the beat writes them |
+| the spawn hook hands the guidance to a helper | it tags the helper with the session's hand too |
+| `engine.binding` at `queue` and `unbound` draw the status bar | `queue` hands out, `unbound` hands out nothing, and `pull <ticket>` takes a named one |
+| `engine.autonomy` draws nowhere | `finish` mints notes alone, `start` mints into its own group, `ideation` mints loose tickets, which ride the group's branch on a cloud box |
+| `engine.state` and `engine.beat` draw nowhere | the switch runs the beat on a desk, and `engine.beat` reads the newest group note off the branches |
 | the trunk guard refuses a commit on `main` | unchanged |
 
 The cloud guidance note changes one line: the first verb is the pull.
@@ -638,23 +714,25 @@ the only fact it meets is a route.
 | the verbs | `src/scripts/work.js`, under `./RUNME.sh work` |
 | the tool wrapper and the spawn | `.claude/skills/level1/`, beside level zero |
 | the stop rule | `spec/config/stop/level1.yml` |
-| the hold and the box id | `.se/hold.json`, `.se/box.json` |
+| the hold and the box id | `.se/hold/<hand>.json`, `.se/box.json` |
 | the config | the `engine` and `work` sections of `spec/config/level0.json` |
 | the `work` group and its four controls | `spec/config/level0.schema.json` |
 
 | key | default | what it decides |
 |---|---|---|
 | `work.refusalsBeforePerson` | 5 | when a refused hand-back becomes a person's step |
+| `work.failsBeforePerson` | 2 | when a step that keeps failing back becomes a person's step |
 | `work.stepsBeforeSplit` | 3 | when an escalating ticket must split |
+| `work.staleAfter` | `12h` | when the notification names a held group as stale |
+| `work.personSigns` | off | whether a person's hand-back needs a signed commit |
 | `work.filter` | empty | what a person's pull sees, over the branch |
-| `engine.boxes` | 1 | how many boxes the beat fires at most |
 
 # Rulings from v3 and v4
 
 | ruling | from | where it lands |
 |---|---|---|
 | the pull is the one verb, and a submission rides it | v3, v4 | stays whole |
-| one token in hand | v4 | one ticket in hand, in `.se/hold.json` |
+| one token in hand | v4 | one ticket in hand per hand, under `.se/hold/` |
 | the hold is engine state, and the claim travels | v4 | the hold file, and the group's push |
 | the token carries no time | v4 | stays, and `work list` reads a branch's age off git |
 | a field stands because something reads it | v4 | the field table above |
@@ -666,10 +744,10 @@ the only fact it meets is a route.
 | a write names its token | v4 | out, because the hold names it and the write door is level zero's |
 | the staffing gate and the reviewer queue | v4 | out, because a step spawns its own hand |
 | the reading proof | v3 | out, for the log line, and open as a level two option |
-| a spawn ceiling of zero for delegated writing | v3 | the engine spawns for a step alone, and the session spawns for nothing |
+| a spawn ceiling of zero for delegated writing | v3 | the engine spawns for a step alone, and a hand the session spawns is the session's |
 | controls only ever stop the engine refusing | v3 | stays |
 | notes, then the retro, then the mint | v3 | the note process, and the mint's privacy check on promotion |
-| a claim lapses after a set number of hours | v4 | out, because a stale branch is a person's to look at |
+| a claim lapses after a set number of hours | v4 | out, because a stale branch is a person's to look at, and the beat names it |
 | the machine builds the form, and a pull carries it back | v3 | the evidence forms, which the mint renders |
 
 # The order of work
@@ -678,23 +756,28 @@ Eight branches, and the dependencies make the order binding:
 
 | # | branch | holds | after |
 |---|---|---|---|
-| 1 | `the-ticket-has-a-schema` | the three schemas, the three keywords, `mint`, the private folder | |
-| 2 | `a-process-is-a-route` | the four route files, the note verb, the copy at the mint, a chapter per step | 1 |
-| 3 | `a-group-is-a-branch` | the group note, take, list with the age of a held branch, merge, close, and `adopt` for a brief | 1 |
-| 4 | `the-agent-pulls-a-ticket` | the pull, its checks, its answers, the hold file, the stop rule | 2, 3 |
-| 5 | `a-step-changes-hands` | the hand id, the spawn, person steps, escalation | 4 |
+| 1 | `the-ticket-has-a-schema` | the three schemas, the checker's recursion, the three keywords, `mint`, the private folder | |
+| 2 | `a-process-is-a-route` | the four route files, the note verb, the copy and the hash at the mint, `reroute`, a chapter per step | 1 |
+| 3 | `a-group-is-a-branch` | the group note, take, list with the age of a held branch, merge with the check, close, and `adopt` for a brief | 1 |
+| 4 | `the-agent-pulls-a-ticket` | the pull, its checks, its answers, the record, a hold per hand, the stop rule | 2, 3 |
+| 5 | `a-step-changes-hands` | the hand id, the spawn and its tag, person steps, escalation | 4 |
 | 6 | `guidance-rides-the-step` | `reads`, the verb, the log line, the standing layer shrinks | 4 |
-| 7 | `the-work-group-draws` | the `work` group, its four controls, the count on the editor button, the beat, the routine fires by count | 4 |
+| 7 | `the-work-group-draws` | the `work` group, its four controls, the count on the editor button, the beat, the notification that names questions and stale groups | 4 |
 | 8 | `level-zero-hands-over-the-pull` | the brief door goes, and the controls wire up | 4 |
 
-The eleven work branches standing today finish under the verbs they carry.
-`adopt` turns a brief into a group note and one ticket, for the ones a person
-wants moved. The old verbs go once the last brief merges.
+The five work branches standing today finish under the verbs they carry. A
+brief branch is one whose tip carries `HANDOVER.md`, and `work list` tells the
+two kinds apart by that. `take` keeps serving a brief until `work list` names
+none. `adopt` turns a brief into a group note and one tracked ticket, for the
+ones a person wants moved. The old verbs go once the last brief merges.
 
 # What this leaves open
 
 - whether a person step may go to a spawned strong model at high autonomy
 - whether yours drowns in parked conditions, and a parked state returns
+- a heartbeat ref per held group, if a tip's age proves too coarse a sign of a dead box
+- two hands on one verdict, which a process may ask for as data once the measurement of one hand's verdict stands
+- what the board costs on many branches, which the editor's note takes up
 - a WIP limit per step, which is Kanban's one knob and stands outside this note
 - whether a guidance card's own items become steps at the mint, which v3 tried as card marking and level two may take up
 - more forms, such as a number or a date, as the routes come to ask for them

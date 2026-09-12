@@ -103,7 +103,8 @@ no home to yet: what the field does with the same problem.</p>
 
 <div class="here">
 <p><b>What this page is.</b> The drawings of the level one design, the example ticket as a file, and the
-comparison with ten systems that organize work for agents. Where a sentence here and the note disagree,
+comparison with ten systems that organize work for agents. A red team, a steel-man and a survey of the
+field read the first draft, and what they earn is folded in. Where a sentence here and the note disagree,
 the note stands and this page is stale.</p>
 <p><b>What this page is not.</b> A second copy of the note. The rulings, the field table and the order of
 work live there, and this page points at them where it draws them.</p>
@@ -230,6 +231,7 @@ Shaded fields are the verbs' to write; a hand edit by an agent to any of them is
 <span class="v"><span class="k">state:</span> open</span>
 <span class="v"><span class="k">step:</span> design/review</span>
 <span class="k">process:</span> [[standard]]
+<span class="k">process_hash:</span> 7c1e9b2
 <span class="k">group:</span> voice
 <span class="k">urgency:</span> soon
 <span class="k">depends_on:</span>
@@ -258,7 +260,7 @@ Shaded fields are the verbs' to write; a hand edit by an agent to any of them is
 <span class="v">        evidence:</span>
 <span class="v">          - name: tests</span>
 <span class="v">            form: command</span>
-<span class="v">            expects: red</span>
+<span class="v">            expects: assertion</span>
 <span class="v">            says: the tests you write fail on their own assertion</span>
 <span class="v">          - name: seen</span>
 <span class="v">            form: text</span>
@@ -282,12 +284,23 @@ Shaded fields are the verbs' to write; a hand edit by an agent to any of them is
 <span class="v">            says: the check is green on the commit</span>
 <span class="v">  - name: verdict</span>
 <span class="v">    by: not implement</span>
-<span class="v">    on_fail: implement</span>
+<span class="v">    on_fail: implement/change</span>
 <span class="v">    reads: [[spec/guidance/review/reviewing]]</span>
 <span class="v">    evidence:</span>
+<span class="v">      - name: read</span>
+<span class="v">        form: files</span>
+<span class="v">        says: every file you read, one a line</span>
 <span class="v">      - name: verdict</span>
 <span class="v">        form: verdict</span>
-<span class="v">        says: pass or fail, every hunk read, findings one a line</span>
+<span class="v">        says: pass or fail, findings one a line</span>
+<span class="e">record:</span>
+<span class="e">  design/draft:</span>
+<span class="e">    hand: box 3f9a · session 12</span>
+<span class="e">    took: a1b2c3</span>
+<span class="e">    gave: d4e5f6</span>
+<span class="e">    answered:</span>
+<span class="e">      note: resolves</span>
+<span class="e">    returns: 0</span>
 <span class="k">---</span>
 
 <span class="h"># Ask</span>
@@ -299,36 +312,50 @@ paragraph a span sits in.
 <span class="c">&lt;!-- a phase: its steps stand below, and nothing is written here --&gt;</span>
 
 <span class="h">## draft</span>
-<span class="c">&lt;!-- evidence for draft: write in the fields, and nowhere else on this ticket --&gt;</span>
-- note (link): [[spec/design_input/the-judge-reads-paragraphs]]
-  <span class="c">&lt;!-- the design input this step writes --&gt;</span>
-<span class="e">  answered: resolves</span>
-<span class="e">hand: box 3f9a · session 12 · tip a1b2c3 → d4e5f6</span>
+<span class="c">&lt;!-- evidence for draft: write under its fields, and nowhere else on this ticket --&gt;</span>
+
+<span class="h">### note</span>
+<span class="c">&lt;!-- link · the design input this step writes --&gt;</span>
+[[spec/design_input/the-judge-reads-paragraphs]]
+<span class="e">answered: resolves</span>
+<span class="e">hand: box 3f9a · session 12 · tip a1b2c3 → d4e5f6 · returns 0</span>
 
 <span class="h">## review</span>
-<span class="c">&lt;!-- evidence for review: write in the fields, and nowhere else on this ticket --&gt;</span>
-- verdict (verdict):
-  <span class="c">&lt;!-- pass or fail, with findings one a line --&gt;</span>
+<span class="c">&lt;!-- evidence for review: write under its fields, and nowhere else on this ticket --&gt;</span>
+
+<span class="h">### verdict</span>
+<span class="c">&lt;!-- verdict · pass or fail, with findings one a line --&gt;</span>
 
 <span class="h"># implement</span>
 
 <span class="h">## tests-red</span>
-- tests (command, expects red):
-  <span class="c">&lt;!-- the tests you write fail on their own assertion --&gt;</span>
-- seen (text):
-  <span class="c">&lt;!-- what you see, and what surprises you --&gt;</span>
+
+<span class="h">### tests</span>
+<span class="c">&lt;!-- command, expects assertion · the tests you write fail on their own assertion --&gt;</span>
+
+<span class="h">### seen</span>
+<span class="c">&lt;!-- text · what you see, and what surprises you --&gt;</span>
 
 <span class="h">## change</span>
-- lint (command, expects 0):
-  <span class="c">&lt;!-- the tree builds and lints --&gt;</span>
+
+<span class="h">### lint</span>
+<span class="c">&lt;!-- command, expects 0 · the tree builds and lints --&gt;</span>
 
 <span class="h">## tests-green</span>
-- tests (command, expects green):
-- check (command, expects 0):
+
+<span class="h">### tests</span>
+<span class="c">&lt;!-- command, expects green · the same tests pass --&gt;</span>
+
+<span class="h">### check</span>
+<span class="c">&lt;!-- command, expects 0 · the check is green on the commit --&gt;</span>
 
 <span class="h"># verdict</span>
-- verdict (verdict):
-  <span class="c">&lt;!-- pass or fail, every hunk read, findings one a line --&gt;</span>
+
+<span class="h">## read</span>
+<span class="c">&lt;!-- files · every file you read, one a line --&gt;</span>
+
+<span class="h">## verdict</span>
+<span class="c">&lt;!-- verdict · pass or fail, findings one a line --&gt;</span>
 
 <span class="h"># Discussion</span>
 <span class="c">&lt;!-- anyone writes here, at any time --&gt;</span>
@@ -339,12 +366,14 @@ paragraph a span sits in.
   <li><span class="sw" style="background:var(--accent-soft)"></span><b>The verbs' to write.</b> <code>state</code>,
   <code>step</code> and <code>steps</code>. The pull moves them, the mint and a person set them, an agent's hand
   edit is refused.</li>
-  <li><span class="sw" style="background:var(--engine-soft)"></span><b>The engine appends.</b> At every
-  hand-back: an <code>answered</code> line under each command field with its exit and last line, the hand,
-  and the branch tip at take and at hand-back.</li>
+  <li><span class="sw" style="background:var(--engine-soft)"></span><b>The engine's record.</b> At every
+  hand-back the engine writes the leaf's entry into <code>record</code>: the hand, the tip at take and at
+  hand-back, each command's exit and last line, and the returns. The render draws the entry under the
+  leaf, so a person reads it there and no hand can write it.</li>
   <li><span class="sw" style="background:var(--panel)"></span><b>A hand writes in three places, and a
   comment marks each.</b> The ask while the ticket is a draft, the fields of the leaf it holds, and the
-  discussion. A write anywhere else is refused, and the refusal names the line.</li>
+  discussion. A field is a heading one level under its leaf, and the slot runs to the next heading. A
+  write anywhere else is refused, and the refusal names the line.</li>
   <li><b>The comments are the fill-in help.</b> <code>mint</code> writes each chapter's description as a comment,
   and the language server completes <code>state</code>, <code>step</code>, <code>by</code> and <code>group</code>
   from the schema, the route and the folder.</li>
@@ -360,6 +389,8 @@ paragraph a span sits in.
 <tr><td class="m">step</td><td>the pull, as the row of the route the ticket stands on</td></tr>
 <tr><td class="m">steps</td><td>the pull, the checks and the board</td></tr>
 <tr><td class="m">process</td><td>the board and the retro, as the route the mint copies from</td></tr>
+<tr><td class="m">process_hash</td><td><code>work reroute</code> and the board, which flag a route older than its process</td></tr>
+<tr><td class="m">record</td><td>the render, the checks and the retro, as the engine's entry per leaf handed back</td></tr>
 <tr><td class="m">group</td><td>the pull, as the branch this ticket lands on</td></tr>
 <tr><td class="m">parent</td><td>the pull, which hands a child out before its parent</td></tr>
 <tr><td class="m">depends_on</td><td>the pull, which holds a ticket until they close</td></tr>
@@ -400,7 +431,7 @@ kind of work adds a leaf to a route and moves nothing in the schema.</p>
 
 <figure>
 <svg viewBox="0 0 1120 320" role="img"
-     aria-label="The standard route drawn as six leaf boxes left to right: draft and review under the phase design; tests-red, change and tests-green under the phase implement; then verdict on its own; then closed. Pass arrows go right. A fail arrow curves back from review to draft, and one from verdict to tests-red, the first leaf of implement. The step pointer sits on review. Below it a dashed red person step, inserted by an escalation, takes the pointer and hands it back into review.">
+     aria-label="The standard route drawn as six leaf boxes left to right: draft and review under the phase design; tests-red, change and tests-green under the phase implement; then verdict on its own; then closed. Pass arrows go right. A fail arrow curves back from review to draft, and one from verdict to change. The step pointer sits on review. Below it a dashed red person step, inserted by an escalation, takes the pointer and hands it back into review.">
   <g fill="none" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3">
     <rect x="22" y="112" width="286" height="80" rx="8"/>
     <rect x="327" y="112" width="406" height="80" rx="8"/>
@@ -418,7 +449,7 @@ kind of work adds a leaf to a route and moves nothing in the schema.</p>
     <text x="232" y="162" text-anchor="middle" fill="var(--muted)" font-size="11">by: not draft</text>
     <rect x="335" y="120" width="105" height="52" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="387" y="145" text-anchor="middle" font-weight="700">tests-red</text>
-    <text x="387" y="162" text-anchor="middle" fill="var(--muted)" font-size="11">tests: expects red</text>
+    <text x="387" y="162" text-anchor="middle" fill="var(--muted)" font-size="11">tests: expects assertion</text>
     <rect x="470" y="120" width="110" height="52" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="525" y="145" text-anchor="middle" font-weight="700">change</text>
     <text x="525" y="162" text-anchor="middle" fill="var(--muted)" font-size="11">lint: expects 0</text>
@@ -444,7 +475,7 @@ kind of work adds a leaf to a route and moves nothing in the schema.</p>
     <line x1="725" y1="146" x2="760" y2="146" marker-end="url(#ar)"/>
     <line x1="895" y1="146" x2="930" y2="146" marker-end="url(#ar)"/>
     <path d="M285,120 C285,40 90,40 80,120" marker-end="url(#ar)"/>
-    <path d="M870,120 C870,20 400,20 387,120" marker-end="url(#ar)"/>
+    <path d="M870,120 C870,30 540,30 525,120" marker-end="url(#ar)"/>
     <path d="M215,172 L215,232" stroke="var(--person)" stroke-dasharray="5 4" marker-end="url(#arp)"/>
     <path d="M250,232 L250,172" stroke="var(--person)" stroke-dasharray="5 4" marker-end="url(#arp)"/>
   </g>
@@ -456,7 +487,7 @@ kind of work adds a leaf to a route and moves nothing in the schema.</p>
     <text x="742" y="138" text-anchor="middle">pass</text>
     <text x="912" y="138" text-anchor="middle">done</text>
     <text x="175" y="50" text-anchor="middle">fail · on_fail: draft</text>
-    <text x="628" y="34" text-anchor="middle">fail · on_fail: implement, so its first leaf</text>
+    <text x="700" y="40" text-anchor="middle">fail · on_fail: implement/change</text>
     <text x="205" y="213" text-anchor="end" fill="var(--person)">escalate</text>
     <text x="258" y="213" text-anchor="start" fill="var(--person)">answer, then on</text>
   </g>
@@ -475,7 +506,7 @@ person answers under its evidence, and the pointer moves on into the leaf it lef
 <tr><td class="m">by</td><td><code>anyone</code>, <code>person</code>, <code>agent</code>, <code>children</code>, or <code>not &lt;step&gt;</code></td></tr>
 <tr><td class="m">reads</td><td>links to the guidance notes the step's hand reads</td></tr>
 <tr><td class="m">on_fail</td><td>an earlier step, where a failed hand-back sends the ticket</td></tr>
-<tr><td class="m">asks</td><td>the question a person answers, on a step a person takes</td></tr>
+<tr><td class="m">asks</td><td>the question a person answers, on a step a person takes, with <code>options</code> where one word answers it</td></tr>
 <tr><td class="m">evidence</td><td>the fields a leaf's hand fills, each with a name, a form and a <code>says</code></td></tr>
 </table></div>
 
@@ -484,21 +515,24 @@ person answers under its evidence, and the pointer moves on into the leaf it lef
   reads add up, and the other two take the nearest value.</li>
   <li>A name refers to a sibling first, and to a step from the top second. A path with a slash, as
   <code>design/review</code>, says exactly.</li>
-  <li><code>not implement</code> excludes the hand of every leaf under <code>implement</code>, and
-  <code>on_fail: implement</code> sends the ticket to that phase's first leaf.</li>
+  <li><code>not implement</code> excludes the hand of every leaf the mint puts under <code>implement</code>,
+  and <code>on_fail: implement</code> sends the ticket to that phase's first leaf.</li>
   <li><code>step</code> names a leaf by its path, as <code>implement/tests-red</code>. The chapters follow the
   tree: a phase's chapter holds its steps' chapters, a leaf's chapter holds its evidence, and nothing else.</li>
+  <li>A leaf with no <code>on_fail</code> fails back to itself, and an inserted step counts for no
+  <code>not</code>.</li>
 </ul>
 
 <h3>Red for the right reason</h3>
 <div class="scroll"><table>
 <tr><th>step</th><th>the hand does</th><th>the engine checks at the hand-back</th></tr>
-<tr><td class="m">tests-red</td><td>writes the tests the ask calls for</td><td>the tests the branch adds or changes fail, and the failure is an assertion, with no build fault</td></tr>
+<tr><td class="m">tests-red</td><td>writes the tests the ask calls for</td><td>the tests the branch adds or changes since the ticket's first take fail, and the failure is an assertion, with no build fault</td></tr>
 <tr><td class="m">change</td><td>makes the change</td><td>the tree builds and lints</td></tr>
 <tr><td class="m">tests-green</td><td>makes the tests pass</td><td>the same tests pass, and the check is green on the commit</td></tr>
 </table></div>
-<p>The right reason splits in two. The class of the failure is mechanical, and the test verb names it:
-<code>green</code>, or <code>red</code> with <code>assertion</code>, <code>build</code> or <code>missing</code>.
+<p>The right reason splits in two. The class of the failure is mechanical, and the test verb prints it as
+the one word <code>expects</code> matches: <code>green</code>, <code>assertion</code>, <code>build</code> or
+<code>missing</code>, so a build fault or a missing test passes for no red.
 Whether the assertion names the behaviour the ask describes is a judgement, and the judge reads the failing
 assertion against the ask where <code>judge.enabled</code> says so. A child ticket stays the unit that
 changes hands or runs beside another; a sub-step is a leaf, because a leaf costs a chapter and a ticket
@@ -507,7 +541,10 @@ costs a file, a group and a landing.</p>
 <p>Three keywords join the schema checker so the shape holds mechanically: <code>x-one-per</code>, so a
 chapter stands for every step, nested as the steps nest, under the step's name; <code>x-names</code>, so
 <code>step</code> names an entry of <code>steps</code>; and <code>x-earlier</code>, so <code>on_fail</code>
-names a step that stands before its own. The write door, the sweep and the language server read one rule.</p>
+names a step that stands before its own. The write door, the sweep and the language server read one rule.
+The checker today reads top-level scalars alone; before the keywords land it learns to recurse into
+<code>steps</code> and <code>evidence</code>, to keep a line per nested key, and to resolve a path. That is
+the first branch's real size.</p>
 
 <!-- ============================================================ -->
 <h2 id="s4"><span class="n">4</span>Evidence per step</h2>
@@ -522,6 +559,8 @@ criterion with no evidence behind it is guidance, so no form takes a tick.</p>
 <tr><td class="m">list</td><td>one item a line</td><td>it holds one item at least</td></tr>
 <tr><td class="m">command</td><td>one command line</td><td>it runs from the root and answers the exit or the word <code>expects</code> carries</td></tr>
 <tr><td class="m">link</td><td>a link or a path</td><td>it resolves in the tree or on the branch</td></tr>
+<tr><td class="m">files</td><td>the files read, one a line</td><td>every file the branch changes since the ticket's first take stands in it</td></tr>
+<tr><td class="m">choice</td><td>one of the words <code>options</code> names</td><td>it is one of them</td></tr>
 <tr><td class="m">verdict</td><td><code>pass</code> or <code>fail</code>, then findings one a line</td><td>one of the two words, and findings where it fails</td></tr>
 </table></div>
 
@@ -533,30 +572,35 @@ criterion with no evidence behind it is guidance, so no form takes a tick.</p>
 <tr><td>the discussion</td><td>anyone</td><td>always</td></tr>
 </table></div>
 <p>Everything else on the ticket is the engine's. The write door weighs a ticket write against the render of
-the ticket's own frontmatter and refuses a write that changes anything outside those places, naming the
-line. A person and an agent meet one form through two doors: the person fills the slots in the editor, and
+the ticket's own frontmatter, which is the route and the record drawn as chapters. A changed line stands
+inside one of the three places, or the door refuses the write and names the line, so the door needs no
+hold to know the places. The Bash door reads what a command lands, so a heredoc meets the same rule. A
+person and an agent meet one form through two doors: the person fills the slots in the editor, and
 the agent fills them through the write door or hands the fields back as the pull's payload, which the engine
 writes into the same slots.</p>
 
-<h3>What the engine appends</h3>
+<h3>What the engine records</h3>
 <div class="scroll"><table>
 <tr><th>line</th><th>written by</th><th>holds</th></tr>
 <tr><td>the fields</td><td>the hand</td><td>what the leaf asks for, in the form it asks</td></tr>
-<tr><td>an <code>answered</code> line under each command field</td><td>the engine</td><td>the exit, and the last line</td></tr>
-<tr><td>the hand</td><td>the engine</td><td>the box, the session, and the agent where the harness names one</td></tr>
-<tr><td>the tips</td><td>the engine</td><td>the branch tip at the take and at the hand-back, the two hashes v4 wrote on a token</td></tr>
+<tr><td>an <code>answered</code> line under each command field</td><td>the engine, into <code>record</code></td><td>the exit, and the last line</td></tr>
+<tr><td>the hand</td><td>the engine, into <code>record</code></td><td>the box, the session, and the agent where the harness names one</td></tr>
+<tr><td>the tips</td><td>the engine, into <code>record</code></td><td>the branch tip at the take and at the hand-back, the two hashes v4 wrote on a token</td></tr>
+<tr><td>the returns</td><td>the engine, into <code>record</code></td><td>how often the leaf fails back, which <code>work.failsBeforePerson</code> reads</td></tr>
 </table></div>
 
 <h3>The test verb</h3>
-<p><code>work test</code> runs the tests the branch adds or changes since the take, or the ones a step
-names, and answers one word and a reason. A command field names it with the answer it wants, as <code>expects: red</code> on a command field. The verb reads the delta off git, which is the half of
-v4's test map that a branch already carries.</p>
+<p><code>work test</code> runs the tests the branch adds or changes since the ticket's first take, or the
+ones a step names, and answers one word and a reason. A command field names it with the answer it wants,
+as <code>expects: assertion</code> or <code>expects: green</code>. The verb reads the delta off git, which
+is the half of v4's test map that a branch already carries, and the record holds the first take's hash, so
+ticket three of a group runs its own tests and no other ticket's.</p>
 <div class="scroll"><table>
 <tr><th>answer</th><th>means</th></tr>
 <tr><td class="m">green</td><td>every test it runs passes</td></tr>
-<tr><td class="m">red · assertion</td><td>a test fails on its own assertion, which is the red a <code>tests-red</code> step wants</td></tr>
-<tr><td class="m">red · build</td><td>the file loads no test, because the tree fails to build or to parse</td></tr>
-<tr><td class="m">red · missing</td><td>the branch changes no test, so there is nothing to run</td></tr>
+<tr><td class="m">assertion</td><td>a test fails on its own assertion, which is the red a <code>tests-red</code> step wants</td></tr>
+<tr><td class="m">build</td><td>the file loads no test, because the tree fails to build or to parse</td></tr>
+<tr><td class="m">missing</td><td>the branch changes no test, so there is nothing to run</td></tr>
 </table></div>
 
 <p>The diff of the work is the group's branch, and <code>git log</code> on the ticket file is its history.
@@ -569,8 +613,11 @@ happened.</p>
 
 <p>A process is a route the mint copies onto a ticket. Level one ships three, under
 <code>spec/processes/</code>, each a note holding a <code>steps</code> list and nothing more. The mint takes
-<code>--process &lt;name&gt;</code> and copies the route, so the ticket depends on nothing outside itself after
-that, and a process file changes without reaching a ticket in flight.</p>
+<code>--process &lt;name&gt;</code>, copies the route, and writes the process file's hash beside it, so the
+ticket depends on nothing outside itself after that, and a process file changes without reaching a ticket in
+flight. A fix to a process reaches a ticket through <code>work reroute</code>, which copies the current route
+over the leaves the ticket has yet to reach, refuses where <code>step</code> names a leaf the new route lacks,
+and the board flags a ticket whose hash trails its process.</p>
 
 <div class="scroll"><table>
 <tr><th>process</th><th>route</th><th>for</th></tr>
@@ -581,8 +628,8 @@ that, and a process file changes without reaching a ticket in flight.</p>
 </table></div>
 
 <p>A note is the smallest ticket, and it is where most work starts. A hand that meets an idea, a bug or a
-doubt mid-work writes one with <code>work note</code> and carries on; its hold stays where it is. The note is
-private and stays on the box, and the mint's comment on its ask carries three hints and nothing else: the
+doubt mid-work writes one with <code>work note</code> and carries on; its hold stays where it is, and the
+note carries <code>from</code>, the ticket and step in hand. The note is private and stays on the box, and the mint's comment on its ask carries three hints and nothing else: the
 smallest case that shows it, why it matters, and what a stranger needs in order to act on it. Its one step,
 <code>decide</code>, is where somebody reads it later and closes it as <code>dropped</code>, as <code>done</code>
 where the answer is small enough to do on the spot, or as <code>became</code>, naming the tracked ticket the
@@ -591,9 +638,10 @@ once its group's tickets run out, because a note that stays behind dies with the
 
 <p>A note also answers. The answer door holds every tool call until the owner's prompt has an answer, and a
 prompt that says "make a note of this" wants one thing back: the note. So <code>work note</code> writes a
-<code>note</code> line to the log, the answer door counts that line as the answer, and the viewer draws it
-<b style="color:#c2418a">pink</b>, right under the prompt. The owner reads that the agent understood, and
-the agent carries on.</p>
+<code>note</code> line to the log, the answer door reads that line off the log and counts it where the
+prompt names a note, and the viewer draws it <b style="color:#c2418a">pink</b>, right under the prompt. The
+owner reads that the agent understood, and the agent carries on. A note answers no other prompt, so the
+readback stays owed everywhere else.</p>
 
 <figure>
 <svg viewBox="0 0 900 250" role="img"
@@ -625,13 +673,15 @@ the agent carries on.</p>
     <text x="232" y="118" text-anchor="middle">parent</text>
     <text x="466" y="125" text-anchor="start">parent</text>
     <text x="668" y="118" text-anchor="middle">parent</text>
-    <text x="800" y="102" text-anchor="start" fill="var(--accent)">the last close advances</text>
-    <text x="800" y="117" text-anchor="start" fill="var(--accent)">the parent to verdict</text>
+    <text x="800" y="102" text-anchor="start" fill="var(--accent)">every child done or became</text>
+    <text x="800" y="117" text-anchor="start" fill="var(--accent)">advances the parent to verdict</text>
   </g>
 </svg>
 <figcaption>Complexity composes through <code>parent</code>. A complex ticket's <code>split</code> step writes
 the children, its <code>children</code> step belongs to nobody while they run, and its <code>verdict</code>
-step reads what they add up to. Every route stays short. Names are examples.</figcaption>
+step reads what they add up to. A child closed <code>dropped</code> sends the parent to its
+<code>on_fail</code>, and a parent whose children run in another group advances on trunk once they land.
+Every route stays short. Names are examples.</figcaption>
 </figure>
 
 <!-- ============================================================ -->
@@ -679,11 +729,12 @@ writes that field. A group of one ticket is the ordinary case, and a group of fi
   <g fill="none" stroke="var(--muted)" stroke-width="1.2">
     <path d="M680,40 L680,30 L800,30 L800,40"/>
   </g>
-  <text x="740" y="22" text-anchor="middle" font-size="11.5" fill="var(--muted)">work list says how long this tip has stood still · a person decides</text>
+  <text x="740" y="22" text-anchor="middle" font-size="11.5" fill="var(--muted)">work list reads this tip's age · the beat names it stale · a person releases</text>
 </svg>
 <figcaption>The branch is the claim, and there is no lease. Every accepted hand-back is a push, so
-<code>work list</code> reads how long a held branch has stood still off its tip, and a person decides what a
-stale one needs. Nothing on the ticket says who holds it or since when: git does.</figcaption>
+<code>work list</code> reads how long a held branch has stood still off its tip, the beat's notification
+names a held group whose tip is older than <code>work.staleAfter</code>, and a person decides what a stale
+one needs. Nothing on the ticket says who holds it or since when: git does.</figcaption>
 </figure>
 
 <div class="scroll"><table>
@@ -694,14 +745,19 @@ stale one needs. Nothing on the ticket says who holds it or since when: git does
 <tr><td>the branch is the filter</td><td>on a group's branch the pull sees that group's tickets alone, and widens nothing; a filter a person sets in config outranks the branch</td></tr>
 <tr><td>trunk hands out no group's ticket</td><td>on trunk the pull offers a box a group to take, and a person the tickets of no group; a group's tickets are worked on its branch alone</td></tr>
 <tr><td>the branch holds the truth</td><td>while the branch stands, its copy of the group note and of its tickets is the record</td></tr>
-<tr><td>a group ends</td><td>when no ticket in it stands at a step an agent may take</td></tr>
+<tr><td>a box leaves</td><td>when no ticket in it stands at a step an agent may take, and pushes <code>state: done</code> where every ticket stands closed, else <code>state: todo</code></td></tr>
+<tr><td>a group returns</td><td>a group at <code>todo</code> with a parked ticket comes back to the beat once a person answers on its branch</td></tr>
 <tr><td>the merge is a person's</td><td><code>work merge</code> takes an ended group into trunk, and <code>work close</code> drops the branch</td></tr>
+<tr><td>the merge lands the truth</td><td><code>work merge</code> runs the check on the merge commit and undoes it on red; it refuses where trunk's copy of a ticket or of the group note differs from the branch point, and names the lines</td></tr>
+<tr><td>the merge frees the tickets</td><td>an open ticket of a merged group loses its <code>group</code>, so a parent waiting on children or on a person stands loose on trunk</td></tr>
 </table></div>
 
 <p>A hand mints where it means to work. A ticket it means to do itself goes into its own group and lands
-with it. A ticket it leaves for others carries no group, and a person sorts it later. There is no lease: a
-branch held for a long time is something a person has to look at in any case, so the age of its tip is the
-signal and <code>work list</code> names it.</p>
+with it. A ticket it leaves for others carries no group, and a person sorts it later. On a cloud box a
+loose ticket rides the group's branch and lands at the merge, since the box commits on no trunk. There is
+no lease: a branch held for a long time is something a person has to look at in any case, so the age of its
+tip is the signal, <code>work list</code> names it, and the beat's notification names the ones older than
+<code>work.staleAfter</code>.</p>
 
 <p class="note">v4 ran this shape under two words, <code>bucket</code> on the token and <code>group/</code> on the
 branch. Now the two coincide, so one word stays: group.</p>
@@ -714,41 +770,54 @@ other verb belongs to a person or the engine. The shell is the verb, under <code
 and a plugin tool wraps it for a session that holds the plugin. The engine is these verbs and the beat,
 and it runs with nobody on the box, which is why it stands in level one and outside level zero. A pull carries at most two things: the
 ticket it hands back and a verdict. The file is the payload, because the hand wrote its evidence through
-the write door before it pulled.</p>
+the write door before it pulled. A leaf holding a <code>verdict</code> field takes the verdict from the
+field, and the flag is refused there.</p>
 
 <figure>
 <svg viewBox="0 0 900 300" role="img"
-     aria-label="A hand on the left pulls, naming the ticket it hands back and a verdict. The engine on the right runs four checks in order: schema and evidence, the decided-by commands, the hand rule, the judge. Three arrows come back: work with the next ticket, refused with findings, or wait with a reason.">
+     aria-label="A hand on the left pulls, naming the ticket it hands back and a verdict. The engine on the right runs five checks in order: the hold and the take hash, schema and evidence, the command fields, the hand rule, the judge. Three arrows come back: work with the next ticket, refused with findings, or wait with a reason.">
   <g font-size="12.5" fill="currentColor">
     <rect x="40" y="110" width="150" height="80" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="115" y="145" text-anchor="middle" font-size="14" font-weight="700">a hand</text>
     <text x="115" y="166" text-anchor="middle" fill="var(--muted)" font-size="11.5">a box, or a person</text>
 
-    <rect x="540" y="40" width="320" height="220" rx="6" fill="var(--engine-soft)" stroke="var(--engine)" stroke-width="1.6"/>
-    <text x="700" y="66" text-anchor="middle" font-size="14" font-weight="700">the engine</text>
-    <text x="700" y="84" text-anchor="middle" fill="var(--muted)" font-size="11.5">checks, cheapest first</text>
-    <text x="565" y="118" font-size="12">1&#160;&#160;the ticket passes its schema, and every field holds what its form asks</text>
-    <text x="565" y="146" font-size="12">2&#160;&#160;every command field runs and answers what <tspan font-family="var(--mono)">expects</tspan> carries</text>
-    <text x="565" y="174" font-size="12">3&#160;&#160;this hand may take this step, by the route's <tspan font-family="var(--mono)">by</tspan></text>
-    <text x="565" y="202" font-size="12">4&#160;&#160;the judge reads the evidence, where <tspan font-family="var(--mono)">judge.enabled</tspan></text>
-    <text x="565" y="238" font-size="11.5" fill="var(--muted)">then: append the evidence lines, move the step, commit, push, answer</text>
+    <rect x="500" y="40" width="380" height="220" rx="6" fill="var(--engine-soft)" stroke="var(--engine)" stroke-width="1.6"/>
+    <text x="690" y="66" text-anchor="middle" font-size="14" font-weight="700">the engine</text>
+    <text x="690" y="84" text-anchor="middle" fill="var(--muted)" font-size="11.5">checks, cheapest first</text>
+    <text x="520" y="108" font-size="12">1&#160;&#160;the hold matches: this ticket, this step, this take hash</text>
+    <text x="520" y="132" font-size="12">2&#160;&#160;the schema passes, and each field fits its form</text>
+    <text x="520" y="156" font-size="12">3&#160;&#160;each command field answers what <tspan font-family="var(--mono)">expects</tspan> carries</text>
+    <text x="520" y="180" font-size="12">4&#160;&#160;this hand may take this step, by the route's <tspan font-family="var(--mono)">by</tspan></text>
+    <text x="520" y="204" font-size="12">5&#160;&#160;the judge reads the evidence, every hand-back</text>
+    <text x="520" y="238" font-size="11.5" fill="var(--muted)">then: write the record, move the step, commit, push, answer</text>
   </g>
   <g fill="none" stroke="currentColor" stroke-width="1.4">
-    <line x1="190" y1="125" x2="540" y2="125" stroke="var(--accent)" marker-end="url(#ara)"/>
-    <line x1="540" y1="160" x2="190" y2="160" marker-end="url(#ar)"/>
-    <line x1="540" y1="182" x2="190" y2="182" marker-end="url(#ar)"/>
-    <path d="M540,204 L365,204 L365,220 L190,220" marker-end="url(#ar)"/>
+    <line x1="190" y1="125" x2="500" y2="125" stroke="var(--accent)" marker-end="url(#ara)"/>
+    <line x1="500" y1="160" x2="190" y2="160" marker-end="url(#ar)"/>
+    <line x1="500" y1="182" x2="190" y2="182" marker-end="url(#ar)"/>
+    <path d="M500,204 L345,204 L345,220 L190,220" marker-end="url(#ar)"/>
   </g>
   <g font-size="11.5">
-    <text x="365" y="118" text-anchor="middle" fill="var(--accent)" font-weight="700">pull · ticket, pass or fail with a reason</text>
-    <text x="365" y="155" text-anchor="middle" fill="var(--muted)">work · one leaf of a ticket, its fields and guidance inline, the file's path</text>
-    <text x="365" y="177" text-anchor="middle" fill="var(--muted)">refused · the findings one a line; the ticket stays in hand</text>
-    <text x="365" y="240" text-anchor="middle" fill="var(--muted)">wait · nothing to hand out, and why: finishing, unbound, deps, empty</text>
+    <text x="345" y="118" text-anchor="middle" fill="var(--accent)" font-weight="700">pull · ticket, pass or fail with a reason</text>
+    <text x="345" y="155" text-anchor="middle" fill="var(--muted)">work · one leaf, fields and guidance inline</text>
+    <text x="345" y="177" text-anchor="middle" fill="var(--muted)">refused · findings one a line, ticket stays in hand</text>
+    <text x="345" y="240" text-anchor="middle" fill="var(--muted)">wait · nothing to hand out, and why</text>
   </g>
 </svg>
 <figcaption>One verb, both ways. A hand-back and the next take are one call, so finishing one ticket and
 receiving the next cannot come apart, which is the ruling v3 and v4 both reach.</figcaption>
 </figure>
+
+<p>On <code>pass</code> the engine writes the leaf's entry into <code>record</code>, moves the step, commits
+the step's work and the ticket as one commit named by ticket and step, pushes, and answers the next ticket,
+or <code>done</code> to a hand it spawned for one step. A push that fails fetches, rebases that one commit
+and tries once more, or answers <code>refused</code> and says the branch moved. A hand-back the record
+already answers gets the recorded answer, and one whose take hash trails the branch is refused as stale, so
+a retry and a dead box's late push both land nothing twice. On <code>fail</code> it sets <code>step</code> to
+the row's <code>on_fail</code>, or to the step itself where none stands, counts the return, and at
+<code>work.failsBeforePerson</code> returns inserts a person step carrying the last findings. The judge runs
+in the plugin wrapper, since a shell verb reaches no model: a person's hand-back from the shell meets the
+four mechanical checks, and the judge reads it at the next agent pull on that ticket.</p>
 
 <p>A <code>work</code> answer says one thing to do, and it hands the leaf, not the whole ticket. It
 carries the ask and the leaf alone: its fields, their forms and what each says, the guidance the leaf and
@@ -760,18 +829,24 @@ reads the file.</p>
 <div class="scroll"><table>
 <tr><th>who pulls</th><th>what</th><th>the rule</th></tr>
 <tr><td>the beat</td><td>a box per free group</td><td>groups at <code>todo</code>, none of whose tickets wait on an unmerged group, by urgency</td></tr>
-<tr><td>the box</td><td>the next ticket of its group</td><td>tickets at <code>open</code> with no open dependency, children before parents, a step this hand may take, by urgency then name</td></tr>
+<tr><td>the box</td><td>the next ticket of its group</td><td>tickets at <code>open</code> with no open dependency on trunk, children before parents, a step this hand may take, by urgency then name</td></tr>
 <tr><td>a person</td><td>anything</td><td>the same two lists on the board, and no refusal</td></tr>
 </table></div>
 
-<p>The pull writes <code>.se/hold.json</code> naming the ticket, the step, the group and the hand. The
-tooth's <code>work-waiting</code> check reads it, so a turn ends on a fact where a ticket stands in hand.</p>
+<p>The pull fetches the branch before every hand-out and hand-back. It writes a hold per hand under
+<code>.se/hold/</code>, naming the ticket, the step, the group, the hand and the take hash, and refuses a
+second live hold for one session. The tooth's <code>work-waiting</code> check reads the session's own, so a
+turn ends on a fact where a ticket stands in hand.</p>
 
 <!-- ============================================================ -->
 <h2 id="s8"><span class="n">8</span>Hands and escalation</h2>
 
-<p>A hand is a box, a session on it, and an agent inside it where the harness names one. A person's hand is
-their git author name. A role is a property of a step, and no agent holds one for life. When the next
+<p>A hand is a box, a session on it, and an agent inside it where the harness names one. A helper the
+session spawns is the session's own hand, and the spawn hook tags it so; only a hand the engine spawns for a
+step is a hand of its own, so a session's own helper reviews nothing of the session's work. A person's hand
+is their git author name; the verb refuses <code>by: person</code> where the environment names an agent's
+harness, and <code>work.personSigns</code> asks for a signed commit as the stronger door. A role is a
+property of a step, and no agent holds one for life. When the next
 step's <code>by</code> excludes the hand that pulls, the pull spawns a hand for it through the hook, with a
 prompt the engine writes from the ticket and the step's guidance. The session sees the outcome and its next
 ticket, and shapes nothing of the spawn. That answers v4's objection to a session spawning its own
@@ -780,21 +855,26 @@ reviewer.</p>
 <p>A hand that cannot go on without a person calls <code>escalate</code> with the question. The engine
 inserts a step in front of the current one, <code>by: person</code>, with the question under
 <code>asks</code>, mints its chapter, and points <code>step</code> at it. The ticket stays <code>open</code>
-and is now a person's to pull. The person answers under the step's evidence and hands it back, and the
-engine advances into the step behind it. A gate the mint writes and an escalation the engine inserts are
-one mechanism; a park is the same, with the condition as the question.</p>
+and is now a person's to pull. The inserted step carries one field, <code>answer</code>, of form
+<code>text</code>, or of form <code>choice</code> where <code>asks</code> carries <code>options</code>. The
+person fills it and hands the step back, and the engine advances into the step behind it. A gate the mint
+writes and an escalation the engine inserts are one mechanism; a park is the same, with the condition as the
+question. The box works the group's other tickets while a person step waits, and when none stands at an
+agent's step it leaves the group at <code>todo</code>, so a box returns once the person answers on the
+branch.</p>
 
 <div class="scroll"><table>
 <tr><th>trigger</th><th>who inserts</th><th>the knob</th></tr>
 <tr><td>the hand needs a person</td><td>the hand, through the verb</td><td>none</td></tr>
 <tr><td>the same hand-back meets <code>refused</code> N times</td><td>the engine</td><td class="m">work.refusalsBeforePerson</td></tr>
+<tr><td>a step fails back N times</td><td>the engine</td><td class="m">work.failsBeforePerson</td></tr>
 <tr><td>a step a person takes, from the mint</td><td>the mint</td><td>none</td></tr>
 </table></div>
 
 <p class="note">A ticket that gathers more inserted steps than <code>work.stepsBeforeSplit</code> is the wrong
-size. The engine refuses another insertion and asks for a split into sub-tickets, closing the ticket with
-reason <code>became</code>. v3 measured the identical refusal twenty-seven times in nine seconds; this is
-the count that ends that.</p>
+size. The engine refuses another insertion and answers the ask: split it. The ticket closes as
+<code>became</code> once its successors exist, and no sooner. v3 measured the identical refusal twenty-seven
+times in nine seconds; this is the count that ends that.</p>
 
 <!-- ============================================================ -->
 <h2 id="s9"><span class="n">9</span>Guidance rides the step</h2>
@@ -810,14 +890,16 @@ it. What it keeps is the arrival, and the arrival says when to hand the notes ag
 <div class="scroll"><table>
 <tr><th>the engine writes</th><th>where</th><th>it lasts</th></tr>
 <tr><td>one log line per note handed over</td><td>the log</td><td>for the record</td></tr>
-<tr><td>the notes this hand holds for this step, by name and hash</td><td class="m">.se/hold.json</td><td>the session</td></tr>
+<tr><td>the notes this hand holds for this step, by name and hash</td><td>the hand's hold file</td><td>the session</td></tr>
 </table></div>
 
 <p>The hold says which notes reach this session, so the pull hands them once per step and session, and
 again on three things: a <code>refused</code> answer, which quotes the rules its findings cite; a
 compaction, which level zero already notices; and a note whose hash moves. A refresher on every pull costs
 tokens and buys nothing the hold does not know. The proof of application is the hand-back: the commands,
-the evidence and the judge.</p>
+the evidence and the judge. The judge reads every hand-back, and the write door's sampling reaches it
+nowhere; if its findings run at the rate the transcripts show for a prompt, three hand-backs in four, the
+hash-keyed probe returns.</p>
 
 <div class="scroll"><table>
 <tr><th>measurement</th><th>says</th><th>so</th></tr>
@@ -875,8 +957,10 @@ branches.</p>
 <p>A person mints from the two buttons or the verb, edits a ticket in the editor, drags a ticket
 into a group by writing the field, and hands a step back with the same verb a box uses. The language
 server names a departure from the schema as they type and completes the fields from the schema, the route
-and the folder. The routine fires one box on its clock; that box runs the beat, which fires the routine
-again for every other free group, up to <code>engine.boxes</code>.</p>
+and the folder. Yours sorts oldest first, and the routine's notification names each question with its age
+and every held group whose tip is older than <code>work.staleAfter</code>. The routine fires one box on its
+clock; that box takes a free group, works it, and takes the next free group until none stands or its cap
+comes. A second routine is a second box, and a person creates it.</p>
 
 <!-- ============================================================ -->
 <h2 id="s11"><span class="n">11</span>Level zero and level two</h2>
@@ -885,12 +969,13 @@ again for every other free group, up to <code>engine.boxes</code>.</p>
 <tr><th>level zero today</th><th>after level one</th></tr>
 <tr><td>the brief door hands over <code>HANDOVER.md</code> and deletes it</td><td>the tracked brief goes, and the block on a cloud box says to run the pull</td></tr>
 <tr><td><code>.se/HANDOVER.md</code> hands one session the next</td><td>unchanged</td></tr>
-<tr><td><code>work-waiting</code> counts tasks</td><td>it reads <code>.se/hold.json</code> and counts private tickets</td></tr>
-<tr><td>the answer door reads the session's text alone</td><td>it counts a <code>note</code> line as an answer too</td></tr>
+<tr><td><code>work-waiting</code> counts tasks</td><td>it reads the session's hold file and counts private tickets</td></tr>
+<tr><td>the answer door reads the session's text alone</td><td>it reads the <code>note</code> row off the log too, where the prompt names a note</td></tr>
 <tr><td>the viewer colours every kind it knows</td><td><code>note</code> draws pink, under the prompt it answers</td></tr>
-<tr><td><code>engine.binding</code> at <code>queue</code> and <code>unbound</code> draw the status bar</td><td><code>queue</code> hands out; <code>unbound</code> hands out nothing, and a hand may take a named ticket</td></tr>
-<tr><td><code>engine.autonomy</code> draws nowhere</td><td><code>finish</code> mints notes alone, <code>start</code> mints into its own group, <code>ideation</code> mints loose tickets into the backlog</td></tr>
-<tr><td><code>engine.state</code> and <code>engine.beat</code> draw nowhere</td><td>the beat writes them</td></tr>
+<tr><td>the spawn hook hands the guidance to a helper</td><td>it tags the helper with the session's hand too</td></tr>
+<tr><td><code>engine.binding</code> at <code>queue</code> and <code>unbound</code> draw the status bar</td><td><code>queue</code> hands out; <code>unbound</code> hands out nothing, and <code>pull &lt;ticket&gt;</code> takes a named one</td></tr>
+<tr><td><code>engine.autonomy</code> draws nowhere</td><td><code>finish</code> mints notes alone, <code>start</code> mints into its own group, <code>ideation</code> mints loose tickets, which ride the group's branch on a cloud box</td></tr>
+<tr><td><code>engine.state</code> and <code>engine.beat</code> draw nowhere</td><td>the switch runs the beat on a desk, and <code>engine.beat</code> reads the newest group note off the branches</td></tr>
 <tr><td>the trunk guard refuses a commit on <code>main</code></td><td>unchanged</td></tr>
 </table></div>
 
@@ -909,7 +994,7 @@ fact it meets is a route.</p>
 <tr><td>the verbs</td><td class="m">src/scripts/work.js, under ./RUNME.sh work</td></tr>
 <tr><td>the tool wrapper and the spawn</td><td class="m">.claude/skills/level1/</td></tr>
 <tr><td>the stop rule</td><td class="m">spec/config/stop/level1.yml</td></tr>
-<tr><td>the hold and the box id</td><td class="m">.se/hold.json · .se/box.json</td></tr>
+<tr><td>the hold and the box id</td><td class="m">.se/hold/&lt;hand&gt;.json · .se/box.json</td></tr>
 <tr><td>the config</td><td>the <code>engine</code> and <code>work</code> sections of <code>spec/config/level0.json</code></td></tr>
 <tr><td>the <code>work</code> group and its four controls</td><td class="m">spec/config/level0.schema.json</td></tr>
 </table></div>
@@ -917,9 +1002,11 @@ fact it meets is a route.</p>
 <div class="scroll"><table>
 <tr><th>key</th><th>default</th><th>what it decides</th></tr>
 <tr><td class="m">work.refusalsBeforePerson</td><td class="num">5</td><td>when a refused hand-back becomes a person's step</td></tr>
+<tr><td class="m">work.failsBeforePerson</td><td class="num">2</td><td>when a step that keeps failing back becomes a person's step</td></tr>
 <tr><td class="m">work.stepsBeforeSplit</td><td class="num">3</td><td>when an escalating ticket must split</td></tr>
+<tr><td class="m">work.staleAfter</td><td class="num">12h</td><td>when the notification names a held group as stale</td></tr>
+<tr><td class="m">work.personSigns</td><td class="num">off</td><td>whether a person's hand-back needs a signed commit</td></tr>
 <tr><td class="m">work.filter</td><td class="num">empty</td><td>what a person's pull sees, over the branch</td></tr>
-<tr><td class="m">engine.boxes</td><td class="num">1</td><td>how many boxes the beat fires at most</td></tr>
 </table></div>
 
 <!-- ============================================================ -->
@@ -928,7 +1015,7 @@ fact it meets is a route.</p>
 <div class="scroll"><table>
 <tr><th>ruling</th><th>from</th><th>where it lands</th></tr>
 <tr><td>the pull is the one verb, and a submission rides it</td><td>v3, v4</td><td>stays whole</td></tr>
-<tr><td>one token in hand</td><td>v4</td><td>one ticket in hand, in <code>.se/hold.json</code></td></tr>
+<tr><td>one token in hand</td><td>v4</td><td>one ticket in hand per hand, under <code>.se/hold/</code></td></tr>
 <tr><td>the hold is engine state, and the claim travels</td><td>v4</td><td>the hold file, and the group's push</td></tr>
 <tr><td>the token carries no time</td><td>v4</td><td>stays, and <code>work list</code> reads a branch's age off git</td></tr>
 <tr><td>a field stands because something reads it</td><td>v4</td><td>the field table in section 2</td></tr>
@@ -940,18 +1027,20 @@ fact it meets is a route.</p>
 <tr><td>a write names its token</td><td>v4</td><td>out: the hold names it, and the write door is level zero's</td></tr>
 <tr><td>the staffing gate and the reviewer queue</td><td>v4</td><td>out: a step spawns its own hand</td></tr>
 <tr><td>the reading proof</td><td>v3</td><td>out, for the log line; open as a level two option</td></tr>
-<tr><td>a spawn ceiling of zero for delegated writing</td><td>v3</td><td>the engine spawns for a step alone, and the session spawns for nothing</td></tr>
+<tr><td>a spawn ceiling of zero for delegated writing</td><td>v3</td><td>the engine spawns for a step alone, and a hand the session spawns is the session's</td></tr>
 <tr><td>controls only ever stop the engine refusing</td><td>v3</td><td>stays</td></tr>
 <tr><td>notes, then the retro, then the mint</td><td>v3</td><td>the note process, and the mint's privacy check on promotion</td></tr>
-<tr><td>a claim lapses after a set number of hours</td><td>v4</td><td>out: a stale branch is a person's to look at</td></tr>
+<tr><td>a claim lapses after a set number of hours</td><td>v4</td><td>out: a stale branch is a person's to look at, and the beat names it</td></tr>
 <tr><td>the machine builds the form, and a pull carries it back</td><td>v3</td><td>the evidence forms, which the mint renders</td></tr>
 </table></div>
 
 <!-- ============================================================ -->
 <h2 id="s14"><span class="n">14</span>The order of work</h2>
 
-<p>Eight branches, and the dependencies make the order binding. The eleven work branches standing today
-finish under the verbs they carry; <code>adopt</code> turns a brief into a group note and one ticket for the
+<p>Eight branches, and the dependencies make the order binding. The five work branches standing today
+finish under the verbs they carry. A brief branch is one whose tip carries <code>HANDOVER.md</code>, and
+<code>work list</code> tells the two kinds apart by that; <code>take</code> keeps serving a brief until
+<code>work list</code> names none; <code>adopt</code> turns a brief into a group note and one ticket for the
 ones a person wants moved, and the old verbs go once the last brief merges.</p>
 
 <figure>
@@ -960,19 +1049,19 @@ ones a person wants moved, and the old verbs go once the last brief merges.</p>
   <g font-size="12" fill="currentColor">
     <rect x="30" y="112" width="190" height="44" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/>
     <text x="125" y="130" text-anchor="middle" font-weight="700">1 · the ticket has a schema</text>
-    <text x="125" y="147" text-anchor="middle" fill="var(--muted)" font-size="11">schemas, keywords, mint</text>
+    <text x="125" y="147" text-anchor="middle" fill="var(--muted)" font-size="11">schemas, the checker's recursion, keywords, mint</text>
 
     <rect x="270" y="52" width="190" height="44" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="365" y="70" text-anchor="middle" font-weight="700">2 · a process is a route</text>
-    <text x="365" y="87" text-anchor="middle" fill="var(--muted)" font-size="11">four routes, the note verb, a chapter per step</text>
+    <text x="365" y="87" text-anchor="middle" fill="var(--muted)" font-size="11">four routes, the note verb, reroute, a chapter per step</text>
 
     <rect x="270" y="172" width="190" height="44" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="365" y="190" text-anchor="middle" font-weight="700">3 · a group is a branch</text>
-    <text x="365" y="207" text-anchor="middle" fill="var(--muted)" font-size="11">take, list with the age, merge, close, adopt</text>
+    <text x="365" y="207" text-anchor="middle" fill="var(--muted)" font-size="11">take, list with the age, merge with the check, close, adopt</text>
 
     <rect x="510" y="112" width="190" height="44" rx="6" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/>
     <text x="605" y="130" text-anchor="middle" font-weight="700">4 · the agent pulls a ticket</text>
-    <text x="605" y="147" text-anchor="middle" fill="var(--muted)" font-size="11">the pull, its checks, the hold</text>
+    <text x="605" y="147" text-anchor="middle" fill="var(--muted)" font-size="11">the pull, its checks, the record, a hold per hand</text>
 
     <rect x="750" y="12" width="180" height="40" rx="6" fill="var(--panel)" stroke="currentColor" stroke-width="1.4"/>
     <text x="840" y="37" text-anchor="middle" font-weight="700">5 · a step changes hands</text>
@@ -1005,7 +1094,10 @@ everything after it rides on. Five to eight run in parallel once four lands.</fi
 the ones they converge on: a store the person reads, an atomic or arbitrated claim, isolation per unit, one
 unit per fresh session, a state that means a person must look, and something that recovers a dead agent.
 None of them makes every write name its ticket, runs processes as data, or forces a reviewer's verdict
-before close; the traveler on the ticket is where this design stands apart.</p>
+before close; the traveler on the ticket is where this design stands apart. The review after the first
+draft took three things the field keys on and the draft lacked: an idempotency key for a retry, which is
+the take hash; a bound on a fail loop, which is the returns count; and a verdict tied to the diff it read,
+which is the <code>read</code> list.</p>
 
 <div class="scroll"><table>
 <tr><th>system</th><th>the item</th><th>how it is claimed</th><th>isolation</th><th>a person's handoff</th><th>a dead agent</th></tr>
@@ -1033,6 +1125,9 @@ level one stays still while level two invents flows.</p>
 <ul>
   <li>whether a person step may go to a spawned strong model at high autonomy</li>
   <li>whether yours drowns in parked conditions, and a parked state returns</li>
+  <li>a heartbeat ref per held group, if a tip's age proves too coarse a sign of a dead box</li>
+  <li>two hands on one verdict, which a process may ask for as data once one hand's verdict is measured</li>
+  <li>what the board costs on many branches, which the editor's note takes up</li>
   <li>a WIP limit per step, which is Kanban's one knob and stands outside the note</li>
   <li>whether a guidance card's own items become steps at the mint, which v3 tried as card marking and level two may take up</li>
   <li>more forms, such as a number or a date, as the routes come to ask for them</li>
