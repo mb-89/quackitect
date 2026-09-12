@@ -214,7 +214,7 @@ differs: its own reads, its own hand rule, and the form of its evidence.
 |---|---|
 | `name` | one word or a hyphenated pair, unique among its siblings |
 | `steps` | the steps under a phase, in order |
-| `by` | `anyone`, `person`, `agent`, `children`, or `not <step>` |
+| `by` | `anyone`, `person`, `agent`, `retro`, `children`, `tickets`, or `not <step>` |
 | `reads` | links to the guidance notes the step's hand reads |
 | `on_fail` | an earlier step, where a failed hand-back sends the ticket |
 | `asks` | the question a person answers, on a step a person takes, with `options` where one word answers it |
@@ -410,7 +410,8 @@ git, which is the half of v4's test map that a branch already carries.
 
 A process is a route the mint copies onto a ticket. Level one ships four for
 tickets and one for a group, as YAML files under `spec/processes/`, each under
-`process.schema.yaml` and holding a `steps` list and nothing more:
+`process.schema.yaml` and holding the ask's hints under `ask` and the route
+under `steps`, and nothing more:
 
 | process | route | for |
 |---|---|---|
@@ -430,12 +431,14 @@ carries three hints and nothing else:
 - why it matters
 - what a stranger needs in order to act on it
 
-Its one step, `decide`, is where somebody reads it later and says what it
+Its one step, `decide`, is where a retro reads it later and says what it
 becomes. The step closes the note as `dropped`, or as `done` where the answer
 is small enough to do on the spot. Or it closes the note as `became`, and
-names the tracked ticket the mint cuts from it. On a desk that reading is the
-retro's. On a cloud box the pull hands a hand its own notes once its group's
-tickets run out. A note that stays behind dies with the box.
+names the tracked ticket the mint cuts from it. Anyone mints a note, and a
+retro decides it: the step says `by: retro`, and a hand at a retro step is the
+one hand the pull hands a note to. A group's retro decides the notes its box
+minted, and the tree's retro decides the rest. A note that stays behind on a
+cloud box dies with it.
 
 A note also answers. The answer door holds every tool call until the owner's
 prompt has an answer. A prompt that says "make a note of this" wants one thing
@@ -540,12 +543,9 @@ copies onto it:
           - name: retro
             form: text
             says: what surprises the hands that work it, and every dead end
-      - name: drain
-        when: cloud
-        evidence:
           - name: notes
             form: list
-            says: every private note on the box, one a line, with what became of it
+            says: every private note on the box, one a line, with what it becomes
     ---
 
     # Ask
@@ -555,18 +555,14 @@ The pull hands the group's own leaves out before and after its tickets, so a
 group and a ticket meet one pull. Its `tickets` step belongs to no hand, the
 way `children` does, and ends when no ticket in the group stands at a step an
 agent may take. The retro is a step, and the hand that reaches it writes what
-the brief's handback carries today.
+the brief's handback carries today and decides the box's notes. So every
+group ends in a retro, and a cloud box's retro is the one it gets.
 
-A cloud box differs from a desk in what stands around the tickets, and each
-of those steps carries `when: cloud`:
+A cloud box differs from a desk in one step, `sync`, which carries
+`when: cloud` and takes trunk into the branch first. Everything else around
+the tickets is the same on both.
 
-| step | the cloud box does |
-|---|---|
-| `sync` | takes trunk into the branch first, so it works on the latest |
-| `drain` | decides every private note on the box before the box ends |
-| `retro` | writes the handover, which every box writes |
-
-A private note stays on its box. So the drain closes each one, and the close
+A private note stays on its box. So the retro closes each one, and the close
 names what comes of it:
 
 | close | what happens |
@@ -575,8 +571,8 @@ names what comes of it:
 | `done` | the hand does it on the spot |
 | `became` | the mint cuts a loose draft ticket from it, through the privacy check |
 
-A ticket the drain mints rides the group's branch, and a person sorts it
-after the merge. The engine's check on the drain is the folder: `.se/tickets/`
+A ticket the retro mints rides the group's branch, and a person sorts it
+after the merge. The engine's check on the retro is the folder: `.se/tickets/`
 holds no note at the hand-back.
 
 A ticket names its group in one field, and a person writes that field. A
@@ -816,10 +812,11 @@ it trips over goes the same way, which is the owner's ruling from v4 on a bug
 found in the bucket.
 
 Private tickets carry the same schema in `.se/tickets/`, and two kinds stand
-there: a note, and a breakdown of the ticket in hand. The pull hands one to
-the hand on its own box alone, after the group's tracked tickets run out. That
-is v4's rule that an empty queue drains the notes. The tooth counts a private
-ticket in hand the way it counts a task today.
+there: a note, and a breakdown of the ticket in hand. The pull hands a
+breakdown to the hand on its own box alone, and a note to that box's hand at
+a retro step. That is v4's rule that an empty queue drains the notes, with
+the retro as the moment. The tooth counts a private ticket in hand the way it
+counts a task today.
 
 # What a person sees
 

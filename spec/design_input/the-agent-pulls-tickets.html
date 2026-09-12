@@ -548,7 +548,7 @@ person answers under its evidence, and the pointer moves on into the leaf it lef
 <tr><th>step field</th><th>holds</th></tr>
 <tr><td class="m">name</td><td>one word or a hyphenated pair, unique among its siblings</td></tr>
 <tr><td class="m">steps</td><td>the steps under a phase, in order</td></tr>
-<tr><td class="m">by</td><td><code>anyone</code>, <code>person</code>, <code>agent</code>, <code>children</code>, or <code>not &lt;step&gt;</code></td></tr>
+<tr><td class="m">by</td><td><code>anyone</code>, <code>person</code>, <code>agent</code>, <code>retro</code>, <code>children</code>, <code>tickets</code>, or <code>not &lt;step&gt;</code></td></tr>
 <tr><td class="m">reads</td><td>links to the guidance notes the step's hand reads</td></tr>
 <tr><td class="m">on_fail</td><td>an earlier step, where a failed hand-back sends the ticket</td></tr>
 <tr><td class="m">asks</td><td>the question a person answers, on a step a person takes, with <code>options</code> where one word answers it</td></tr>
@@ -704,7 +704,7 @@ happened.</p>
 
 <p>A process is a route the mint copies onto a ticket. Level one ships four for tickets and one for a group,
 as YAML files under <code>spec/processes/</code>, each under <code>process.schema.yaml</code> and holding a
-<code>steps</code> list and nothing more. The mint takes
+<code>steps</code> list under the ask's hints, and nothing more. The mint takes
 <code>--process &lt;name&gt;</code>, copies the route, and writes the process file's hash beside it, so the
 ticket depends on nothing outside itself after that, and a process file changes without reaching a ticket in
 flight. A fix to a process reaches a ticket through <code>work reroute</code>, which copies the current route
@@ -717,17 +717,18 @@ and the board flags a ticket whose hash trails its process.</p>
 <tr><td class="m">trivial</td><td class="m">do</td><td>a fix small enough that the ask is the design</td></tr>
 <tr><td class="m">standard</td><td class="m">design (draft, review) · implement (tests-red, change, tests-green) · verdict</td><td>a change that wants an approach first, tests before code, and a second pair of eyes after</td></tr>
 <tr><td class="m">complex</td><td class="m">split · children · verdict</td><td>a change too large to review whole</td></tr>
-<tr><td class="m">group</td><td class="m">sync (cloud) · tickets · retro · drain (cloud)</td><td>the route a group note carries around its tickets</td></tr>
+<tr><td class="m">group</td><td class="m">sync (cloud) · tickets · retro</td><td>the route a group note carries around its tickets</td></tr>
 </table></div>
 
 <p>A note is the smallest ticket, and it is where most work starts. A hand that meets an idea, a bug or a
 doubt mid-work writes one with <code>work note</code> and carries on; its hold stays where it is, and the
 note carries <code>from</code>, the ticket and step in hand. The note is private and stays on the box, and the mint's comment on its ask carries three hints and nothing else: the
 smallest case that shows it, why it matters, and what a stranger needs in order to act on it. Its one step,
-<code>decide</code>, is where somebody reads it later and closes it as <code>dropped</code>, as <code>done</code>
+<code>decide</code>, is where a retro reads it later and closes it as <code>dropped</code>, as <code>done</code>
 where the answer is small enough to do on the spot, or as <code>became</code>, naming the tracked ticket the
-mint cuts from it. On a desk that reading is the retro's. On a cloud box the pull hands a hand its own notes
-once its group's tickets run out, because a note that stays behind dies with the box.</p>
+mint cuts from it. Anyone mints a note and a retro decides it: the step says <code>by: retro</code>, and a
+hand at a retro step is the one hand the pull hands a note to. A group's retro decides the notes its box
+minted, the tree's retro decides the rest, and a note that stays behind on a cloud box dies with it.</p>
 
 <p>A note also answers. The answer door holds every tool call until the owner's prompt has an answer, and a
 prompt that says "make a note of this" wants one thing back: the note. So <code>work note</code> writes a
@@ -811,7 +812,7 @@ those two and no third.</p>
 and the unit that lands is a group: a branch named <code>work/&lt;group&gt;</code>, and a note under
 <code>spec/groups/</code> holding its state, its ask and a route of its own, which the <code>group</code>
 process copies onto it. The pull hands the group's own leaves out before and after its tickets, so a group
-and a ticket meet one pull: <code>sync</code> and <code>drain</code> carry <code>when: cloud</code>, the
+and a ticket meet one pull: <code>sync</code> carries <code>when: cloud</code>, the
 <code>tickets</code> step belongs to no hand and ends when no ticket stands at a step an agent may take, and
 the <code>retro</code> step writes what the brief's handback carries today. A ticket names its group in one
 field, and a person writes that field. A group of one ticket is the ordinary case, and a group of five is
@@ -848,7 +849,7 @@ the same shape.</p>
     <text x="620" y="105" text-anchor="middle" font-size="11.5" fill="var(--person)">ticket c · escalate</text>
     <text x="620" y="120" text-anchor="middle" fill="var(--muted)" font-size="11">a person step waits;</text>
     <text x="620" y="134" text-anchor="middle" fill="var(--muted)" font-size="11">the box goes on with d</text>
-    <text x="740" y="105" text-anchor="middle" font-size="11.5">retro · drain</text>
+    <text x="740" y="105" text-anchor="middle" font-size="11.5">retro</text>
     <text x="740" y="120" text-anchor="middle" fill="var(--muted)" font-size="11">state: done</text>
   </g>
   <g fill="none" stroke="var(--muted)" stroke-width="1.2">
@@ -887,12 +888,12 @@ tip is the signal, and past <code>work.staleAfter</code> the group is implicitly
 from the tip, so nothing writes to a branch nobody holds.</p>
 
 <h3>A cloud box</h3>
-<p>A cloud box differs from a desk in what stands around the tickets, and each of those steps carries
-<code>when: cloud</code>: <code>sync</code> takes trunk into the branch first, and <code>drain</code> decides
-every private note on the box before the box ends. A private note stays on its box, so the drain closes
+<p>A cloud box differs from a desk in one step, <code>sync</code>, which carries <code>when: cloud</code> and
+takes trunk into the branch first. The <code>retro</code> step is the same on both, and it decides every
+private note on the box. A private note stays on its box, so the retro closes
 each one as <code>dropped</code> with a reason, as <code>done</code> on the spot, or as <code>became</code>,
 where the mint cuts a loose draft ticket from it through the privacy check. That ticket rides the group's
-branch, and a person sorts it after the merge. The engine's check on the drain is the folder:
+branch, and a person sorts it after the merge. The engine's check on the retro is the folder:
 <code>.se/tickets/</code> holds no note at the hand-back.</p>
 
 <p class="note">v4 ran this shape under two words, <code>bucket</code> on the token and <code>group/</code> on the
@@ -1275,7 +1276,7 @@ says where it stands now.</p>
 <tr><td>a versioned route with a migration</td><td>Camunda, Temporal, Jira, Symphony</td><td class="ok">answered</td><td>the mint writes the process hash, and <code>work reroute</code> copies a fix over the leaves not yet reached</td></tr>
 <tr><td>a dropped child that does not pass silently</td><td>GitHub Actions, beads</td><td class="ok">answered</td><td><code>children</code> ends on <code>done</code> or <code>became</code>, a <code>dropped</code> child sends the parent to <code>on_fail</code>, the sweep refuses a cycle</td></tr>
 <tr><td>a conditional step</td><td>BPMN gateways, GitHub Actions <code>if</code></td><td class="ok">answered</td><td><code>when</code> with the engine's own conditions: <code>returned</code>, <code>cloud</code>, <code>desk</code></td></tr>
-<tr><td>a note with an origin, and none lost with the box</td><td>beads, GTD, Backlog.md</td><td class="ok">answered</td><td><code>work note</code> writes <code>from</code> off the hold, and a cloud box's <code>drain</code> step decides every note before the box ends</td></tr>
+<tr><td>a note with an origin, and none lost with the box</td><td>beads, GTD, Backlog.md</td><td class="ok">answered</td><td><code>work note</code> writes <code>from</code> off the hold, and the group's <code>retro</code> step decides every note before the box ends</td></tr>
 <tr><td>a typed ask with a one-click answer</td><td>Linear, Camunda, Gas Town</td><td class="half">in part</td><td><code>asks</code> may carry <code>options</code>, answered as a <code>choice</code>; no addressee and no severity, since one owner reads them</td></tr>
 <tr><td>a person's identity that an agent cannot borrow</td><td>GitHub signed commits, Azure DevOps rules</td><td class="ok">answered</td><td>the verb refuses <code>by: person</code> under an agent's harness, and <code>work.personSigns</code> asks for a signed commit</td></tr>
 <tr><td>two independent verdicts per step</td><td>Bun's port, GitHub's n+1 approvals</td><td class="no">rejected</td><td>the first verdict is the hand's own, over the checklist, before it submits; v4 measured eleven reviewers for nothing</td></tr>
