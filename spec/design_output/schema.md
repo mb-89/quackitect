@@ -288,6 +288,10 @@ first. `frontRows` keeps every value in a map, and `chaptersWanted` expands
 `yamlRows` writes a nested value back as the YAML the reader reads. So a route
 the mint takes comes back off the file the same shape.
 
+A step's chapter holds its fields and no prose, so its comment stands at no
+warning. `x-fills` marks the chapters a hand fills, and
+[[spec/design_output/schema#a-placeholder-stands-at-warning]] reads it.
+
 # The tool writes the note
 
 `mint_note({ kind, path, fields })` reads the schema for the kind and writes the

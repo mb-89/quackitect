@@ -583,6 +583,7 @@ function chaptersOf(list, level, rule) {
       required: true,
       description: sayOf(one),
       form: String(one.form ?? ""),
+      "x-fills": Boolean(one.form),
     });
     for (const value of Object.values(one)) {
       if (!Array.isArray(value)) continue;
@@ -744,7 +745,7 @@ export function placeholderFaults(text, schema, where) {
       note.front.said ?? {},
       schema?.body?.headingLevel ?? 1,
     )
-      .filter((one) => one.description)
+      .filter((one) => one.description && one["x-fills"] !== false)
       .map((one) => [one.header, `<!-- ${one.description} -->`]),
   );
   for (const held of note.sections) {

@@ -811,6 +811,16 @@ test("mint writes the route as a block, and a chapter per step under it", () => 
   assert.deepEqual(routed(text), [], "the note mint writes passes the checker");
 });
 
+// [[spec/design_output/schema#a-placeholder-stands-at-warning]]
+test("a field stands at warning while it is empty, and a step's chapter never does", () => {
+  const left = placeholderFaults(mintNote(ROUTED), ROUTED, ROUTE);
+  assert.deepEqual(
+    left.map((one) => one.message.split(" ")[0]),
+    ["Ask", "change"],
+    "the hand fills the ask and the field, and a step's chapter holds its fields",
+  );
+});
+
 const PROCESS = readYaml(`
 kind: process
 
