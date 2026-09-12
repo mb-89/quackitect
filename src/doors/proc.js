@@ -10,6 +10,7 @@ export function proc() {
     run(argv, init = {}) {
       const ran = spawnSync(argv[0], argv.slice(1), {
         cwd: init.cwd,
+        env: init.env ? { ...process.env, ...init.env } : undefined,
         input: init.inherit ? undefined : (init.stdin ?? ""),
         encoding: "utf8",
         shell: false,

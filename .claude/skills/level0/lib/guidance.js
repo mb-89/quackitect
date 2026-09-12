@@ -7,6 +7,20 @@ export const CHAPTERS = ["Motivation", "Actionables", "Discussion"];
 const CANARY =
   /level0 holds this session: \d+ rules?, \d+ notes?, the stop hook (?:on|off)\./;
 
+// [[spec/design_output/level0#the-canary]]
+export const HEARD = {
+  same: "the canary comes back whole",
+  other: "the canary comes back with other counts",
+  none: "the canary is absent from the answer",
+};
+
+// [[spec/design_output/level0#the-layer-after-a-compaction]]
+export const PROBE = {
+  variable: "SE_PROBE_COMPACT",
+  opens: "Say hello in one line.",
+  asks: "Say the canary line again, on its own, and nothing else.",
+};
+
 export function parse(text) {
   const body = String(text ?? "").replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, "");
   const out = { front: frontOf(text), chapters: {} };

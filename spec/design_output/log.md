@@ -65,6 +65,8 @@ For details, see [[spec/design_output/level0#a-step-carries-the-answer]].
 | `judge` | a model refuses prose | `tool.call` |
 | `bash` | a commit or a push aims at trunk | `tool.call` |
 | `work` | a branch verb answers, and the branch it stands on | `work.js` |
+| `context` | the blocks reaching the session, and whether a re-read brings them | `prompt.context` |
+| `compact` | a compaction runs, what fires it, and how many messages it keeps | `session.compact` |
 
 A line the `log` tool writes carries the kind the agent names.
 

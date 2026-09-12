@@ -67,6 +67,7 @@ import {
   rootsHere,
 } from "./vehicle.js";
 import { HOOKS } from "./precommit.js";
+import { probe } from "./probe.js";
 import { work } from "./work.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 
@@ -188,6 +189,10 @@ const verbs = {
   mint: {
     says: "write a new note of a kind, in the shape its schema names",
     run: async () => mint(rest),
+  },
+  probe: {
+    says: "measure the client itself: compact says what a compaction keeps",
+    run: async () => probe(root, rest, it, whereIs(files, root, "claude", known)),
   },
   log: {
     says: "what every door says, in the viewer this tree builds",
