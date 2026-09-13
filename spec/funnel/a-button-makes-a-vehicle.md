@@ -49,6 +49,35 @@ One press makes a vehicle in the folder the press asks for.
 | the icon | one file | this tree keeps its icon, a vehicle draws its initials, in a file under the config the owner swaps |
 | the editor link | one link | one link per brand, both in the editor, one in use at a time |
 
+# The stub
+
+A stub is a bare project the method drives from outside, and the project runs without the method.
+
+| shape | holds | who drives it |
+|---|---|---|
+| the engine | this tree, the method | itself |
+| a vehicle | a copy of the method under its own brand | itself |
+| a stub | a project's spec and product, and the bridgehead | the vehicle it starts with, or the engine |
+
+- v1 holds this shape as `quack start stubs <folder>`: a small set of link files, and nothing copied in.
+- The stub adds guidance and rules of its own, and overrides one it disagrees with. It holds no copy of anything.
+- Working on this tree is the one case where method and work are the same folder.
+- A second button, beside the vehicle's, makes a stub.
+
+# The bridgehead
+
+The bridgehead is what the stub carries so an agent starting in the stub meets the cage at once.
+
+| where the agent starts | what the bridgehead does |
+|---|---|
+| a desk with the stub's vehicle on it | resolves the vehicle through the register, and loads its plugin from there |
+| a cloud box with nothing on it | installs the stub's vehicle first, and the vehicle inserts itself into the bridgehead |
+
+- The bridgehead is the plugin settings, a `RUNME` shim, and the link naming the stub's vehicle, and nothing more.
+- A stub starts with one vehicle, and the link names that one. A stub of vehicle two installs vehicle two.
+- Every rule, every ticket and every door then applies to the project, under the project's own `spec/tickets`.
+- v1 spawns its agents itself and reaches no cloud, so the cloud road stands new here.
+
 # What stands today
 
 | what | where |
@@ -61,5 +90,4 @@ One press makes a vehicle in the folder the press asks for.
 # What stands open
 
 - how a click picks the extension in use, where two stand in the editor
-- what the stub is, which the owner names beside the vehicle and this tree holds nowhere
-- an engine update between a vehicle and its origin, parked for later
+- what the bridgehead writes, and how a vehicle inserts itself into it on a cloud box
