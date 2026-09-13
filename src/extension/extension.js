@@ -45,6 +45,8 @@ async function activate(context, given) {
     await sidebar.opened(door.pid());
     await draw();
     door.watch(sidebar.watches, draw);
+    // [[spec/design_output/extension#the-hook-button]]
+    door.onProcess?.(draw);
   });
 }
 

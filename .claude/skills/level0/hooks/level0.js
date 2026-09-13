@@ -17,8 +17,10 @@ export function register(on, _options) {
 }
 
 async function seen($, e, next) {
+  // The first event of a session hands an empty table as $, and goes on untouched.
   const event = String(next?.event ?? "event");
-  const answer = await ask($, event, e);
+  if (event === "engine.create") return next(e);
+  const answer = await ask($, event, e, next);
   if (!answer) return next(e);
   if (answer.result !== undefined) return answer.result;
   if (answer.event !== undefined) return next(answer.event);
@@ -26,10 +28,10 @@ async function seen($, e, next) {
 }
 
 // One request an event. The answer is JSON, or nothing where the server is down.
-async function ask($, event, e) {
+async function ask($, event, e, next) {
   let body = "";
   try {
-    body = JSON.stringify({ event, e: e ?? null });
+    body = JSON.stringify({ event, e: e ?? null, origin: next?.origin ?? null });
   } catch {
     body = JSON.stringify({ event, e: String(e) });
   }
@@ -51,7 +53,6 @@ async function ask($, event, e) {
 // The server is down: one line in the log, once, and the event goes on.
 async function down($, event, error) {
   if (saidDown) return;
-  saidDown = true;
   const row = rowOf(new Date().toISOString(), "warn", "bridge", `the server answers nothing at ${URL}`, {
     event,
     detail: String(error?.message ?? error),
@@ -63,5 +64,6 @@ async function down($, event, error) {
     } catch {}
     if (held && !held.endsWith("\n")) held += "\n";
     await $.fs.write(SESSION, `${held}${JSON.stringify(row)}\n`);
+    saidDown = true;
   } catch {}
 }

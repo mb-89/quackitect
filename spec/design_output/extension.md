@@ -354,6 +354,25 @@ The rule holds for every action. Where an action starts another program, its hov
 the keys that program needs, and the declaration carries them beside the
 `help`.
 
+## The hook button
+
+The hook stands before the log in the agent control, and it is a `process`
+widget: a button for a program the extension itself runs. A click starts the
+server behind the bridgehead as a child of the extension, and a click on a
+running one kills it. Shift and click starts it under the editor's debugger,
+through the launch config the declaration names. The light says which: dark
+for nothing, green for the server, amber for the server under the debugger.
+
+Before the debugger starts, the extension reads the server's file and finds
+the function the declaration names under `pauses`. It puts a source break on
+the first `return` in it. So the break stands as a red dot in the file, and a
+person turns it into a log point or a condition. The dot moves with the
+function, and a dot standing on that line already stays.
+
+A dead server blocks nothing, so the agent runs the same with the light dark.
+The sidebar writes the start and the stop at `info`, and so does the server.
+For details, see [[spec/design_output/level0#the-bridgehead-and-the-server]].
+
 # What level zero holds
 
 Three controls work with no engine, because the stop table and the standing

@@ -113,6 +113,27 @@
         }
       }
     },
+    "bridge": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "hook": {
+          "help": "The hook: start the server behind the bridgehead, and click again to kill it. Shift and click starts it under the debugger, paused at the return of decide.",
+          "widget": "process",
+          "icon": "🎣",
+          "group": "agent control",
+          "row": 0,
+          "column": 0,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "runs": "src/doors/bridge.js",
+          "launch": "the server",
+          "pauses": "decide"
+        }
+      }
+    },
     "log": {
       "type": "object",
       "required": [
@@ -139,7 +160,7 @@
           "icon": "📜",
           "group": "agent control",
           "row": 0,
-          "column": 0,
+          "column": 1,
           "rowSpan": 1,
           "colSpan": 1,
           "keys": [
