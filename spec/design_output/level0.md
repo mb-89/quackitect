@@ -15,20 +15,36 @@ for no server, so its rules hold on turn one of a clone nobody builds.
 `.claude/settings.json` turns it on and git tracks that file, so a clone guards
 its first session with nothing typed.
 
-# One closure on every door
+# The bridgehead and the server
 
-Level zero is one small module, `hooks/level0.js`. One closure stands on every
-door the client offers, writes what it gets to the log at `debug`, whole, and
-hands the event on untouched. A line names the event and its tool in `said`,
-and carries the whole event as text. The viewer clips what it draws, and the
-log keeps everything. So the log shows
-every event the client raises, in order, with what each one holds, and the
-viewer's floor at `debug` reads it.
+Level zero is two pieces. The bridgehead, `hooks/level0.js`, is the module the
+client loads: one door for every event, `*`, and one function behind it. It
+posts each event to the server on this box and does what the answer says.
 
-The module before it stands beside it as `hooks/level0-old.js`, with every
-door of this note, and the client loads it nowhere. The tests of those doors
-read that file. The chapters below describe the old module. The small one
-takes a door over one at a time, each with its debug lines around it.
+| the answer | the bridgehead does |
+|---|---|
+| `{ pass: true }` | hands the event on |
+| `{ result }` | returns the result to the client |
+| `{ event }` | hands the changed event on |
+| nothing, the server down | hands the event on, and writes one `warn` line, once |
+
+The server, `src/doors/bridge.js`, is plain node. It logs every event at
+`debug`, whole, decides it in `decide`, and holds the state. `./RUNME.sh
+serve` starts it, and `--inspect` on that verb opens it to the debugger. The
+launch config `the server` starts it under the editor's debugger, so a break in
+`decide` binds, pauses, and takes new breaks while the agent runs.
+
+A server killed and running again takes the next event as its own, because
+the bridgehead holds no state and no connection. So the session goes on across
+every restart of the server, and the client reloads the bridgehead for no
+change of a door. Three headless turns say so, against client 2.1.269. The
+first posts 186 events. The second completes with the server down. The third
+lands on the server running again.
+
+The module before the bridgehead stands beside it as `hooks/level0-old.js`,
+with every door of this note, and the client loads it nowhere. The tests of
+those doors read that file. The chapters below describe the old module. The
+server takes a door over one at a time, each with its debug lines around it.
 
 # The harness surface
 
