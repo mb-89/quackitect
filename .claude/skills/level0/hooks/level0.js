@@ -66,7 +66,7 @@ import {
   SESSION,
   writes,
 } from "../lib/log.js";
-import { isDraft, relativeTo } from "../lib/paths.js";
+import { isDraft, matches, relativeTo } from "../lib/paths.js";
 import { carriedFrom, NOTES, privateNow, refusedPrivate } from "../lib/private.js";
 import {
   entriesIn,
@@ -1805,9 +1805,8 @@ async function sweeps($, root, e) {
     method: "grep",
     params: { pattern, glob, limit: 0 },
   });
-  if (!answer) return { why: "the index answers nothing here, so the sweep has no list to work" };
-
-  const paths = (answer.files ?? []).map((one) => one.path);
+  // [[spec/design_output/apply#the-disk-stands-in]]
+  const paths = answer ? (answer.files ?? []).map((one) => one.path) : await treeFiles($, root, glob);
   if (!paths.length) return { why: "the pattern matches nothing under that glob" };
 
   const held = await readsFiles($, root, paths);
@@ -1829,6 +1828,24 @@ async function sweeps($, root, e) {
 }
 
 // [[spec/design_output/apply#validate-everything-then-write]]
+// [[spec/design_output/apply#the-disk-stands-in]]
+async function treeFiles($, root, glob) {
+  let ran;
+  try {
+    ran = await $.process.run(["git", "ls-files", "-co", "--exclude-standard"], {
+      cwd: root,
+      timeoutMs: 20000,
+    });
+  } catch {
+    return [];
+  }
+  if (ran?.exitCode !== 0) return [];
+  return String(ran.stdout ?? "")
+    .split(/\r?\n/)
+    .map((one) => one.trim())
+    .filter((one) => one && (!glob || matches(glob, one)));
+}
+
 function wouldLand(took) {
   const rows = took.files
     .map((one) => `  ${one.file} (${took.counts[one.file]} place(s))${one.born ? ", new" : ""}`)

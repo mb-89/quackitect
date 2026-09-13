@@ -715,6 +715,32 @@ test("a prompt landing mid-response skips that response's silent step", async ()
   assert.equal(after.deny, undefined);
 });
 
+// [[spec/design_output/apply#the-disk-stands-in]]
+test("replace sweeps the files git lists where no index stands", async () => {
+  const it = await started(
+    { "docs/a.md": "work reroute here", "docs/b.md": "nothing", "src/c.js": "work reroute" },
+    {
+      run: (argv) =>
+        argv[0] === "git" && argv[1] === "ls-files"
+          ? { exitCode: 0, stdout: "docs/a.md\ndocs/b.md\nsrc/c.js\n", stderr: "" }
+          : { exitCode: 0, stdout: "", stderr: "" },
+    },
+  );
+  const said = await it.raise(
+    "tool.call",
+    {
+      tool: "mcp__level0__replace",
+      glob: "docs/**/*.md",
+      pattern: "work reroute",
+      replacement: "ticket update",
+      preview: true,
+    },
+    "mcp__level0__replace",
+  );
+  assert.match(said.result, /^1 file\(s\) would change/);
+  assert.match(said.result, /docs\/a\.md \(1 place\(s\)\)/);
+});
+
 // [[spec/design_output/log#an-answer-rides-the-tool]]
 test("an answer through the log tool clears the demand, and lands in the log", async () => {
   const it = await started();
