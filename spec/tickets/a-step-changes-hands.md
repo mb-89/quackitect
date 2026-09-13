@@ -86,7 +86,11 @@ record:
       - name: sync
         exit: 0
         said: work/a-step-changes-hands already carries every commit on main.
-step: split
+  - step: split
+    hand: box b71bba5a7b0c
+    hash_before: 02834b8cfe784fd57403133f142dfc327e93d800
+    hash_after: 02834b8cfe784fd57403133f142dfc327e93d800
+step: children
 ---
 
 # Ask
@@ -113,6 +117,14 @@ The pull learns who holds a step. The group holds one child, [[spec/tickets/step
 <!-- every child as a link, one a line, with its process -->
 
 <!-- the form is list -->
+
+- [[spec/tickets/step-changes-hands]], under the standard process
+
+## checked
+
+- the one child reads whole, because its ask holds one table of pieces and one design note takes them
+- the child carries every piece the group asks for, and the group itself holds the retro alone
+- the child waits on no other ticket, so it names nothing under depends_on
 
 # children
 
