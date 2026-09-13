@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 steps:
   - name: sync
@@ -106,7 +106,12 @@ record:
     hand: box 36d4a566c587
     hash_before: 158614f408d6d4fade7e8f259ec21ab6a537a777
     hash_after: 158614f408d6d4fade7e8f259ec21ab6a537a777
+  - step: retro/cloud
+    hand: box 36d4a566c587
+    hash_before: 63b861cecfb94d79bfd205b8d95953e8a7f42cc2
+    hash_after: 63b861cecfb94d79bfd205b8d95953e8a7f42cc2
 step: retro/cloud
+reason: done
 ---
 
 # Ask
@@ -238,17 +243,33 @@ The box takes the shell hand-back past the judge, and gives the bridgehead its p
 
 <!-- the form is list -->
 
+- a judge that names the rule it refuses on. The log holds the pull's tool line and no reading of the draft.
+- a verb that closes a private note. The box tags the note todo and pulls it as a hand named retro.
+- a live client to load the bridgehead into, so the import at session start stays a later group's proof
+- no tool, no host, no right and no install stood in the way
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- the judge on the draft, four times, and the fifth refusal stood one short of the cap
+- the write door on the design output chapter, the ticket chapters and the retro, each naming its line
+- the ticket door on the note's state field, which the verbs hold
+- the pull's hold on the note while the group stood in hand, and the todo tag went around it
+- no trunk guard, no conflict at sync, no hook fault, and no test that fails on the box alone
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- no person step stands parked, and the child closes done
+- no ticket stands minted with no group
+- this ticket is the handover. The improve list names five fixes, each by its home, for the owner to rule on.
+- the shim's register road and the bridgehead's import wait on the two groups the design input names
 
 # Discussion
 
