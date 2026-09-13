@@ -167,7 +167,11 @@ record:
     hand: box d49afdfe301a64
     hash_before: 833b1d1b9d323c42eb27459af1a9c2fc772839a2
     hash_after: 833b1d1b9d323c42eb27459af1a9c2fc772839a2
-step: retro/cloud
+  - step: retro/cloud
+    hand: box d49afdfe301a64
+    hash_before: c5665b398c5fa262dcea42c581434dd623a9fd92
+    hash_after: c5665b398c5fa262dcea42c581434dd623a9fd92
+step: children
 ---
 
 # Ask
@@ -310,36 +314,37 @@ The thoughts weigh the child's route against this box before a line of code stan
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
 
-- a second hand on the box. So the child's review and verdict steps under `not` park once the draft passes.
-- a nested session that answers in time. `claude -p` under the plugin folder runs into the canary gate and the stop, twice. The log holds the tool line `select:mcp__level1__pull`.
+- a second hand on the box at first. Now the pull answers `spawn`, and the session spawns the hand it names.
+- a session that answers in time under `claude -p`. It runs into the canary gate and the stop, twice. The log holds the tool line `select:mcp__level1__pull`.
+- a hook that reloads its door on a fix. A reviewer's fix to the door reaches this session nowhere.
 - a retro verb past `notes`, so the group's retro route carries a stub the retro branch replaces
 - no host, no right and no install stood in the way
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
 
 - the bash door, ShellWritesNothing, on a `sed -i` into the hook module and on a redirection into the scratchpad
 - the write door, on the child ticket's brief chapters and on the design note's sentences, tense and paragraphs
-- the bash door, on three commit messages past the sentence, paragraph and shape caps
+- the bash door, on commit messages past the sentence, paragraph and shape caps
 - the plugin validator, on the wrapper's import past its folder
-- no trunk guard, no conflict at sync, no cap, and no test that fails on the box alone
+- the ticket door, on every write to the child, until a reviewer hand found the two chapters of one name
+- the refusal cap, which put a person step before the child's verdict after five refusals on engine faults
+- no trunk guard, no conflict past two syncs, no cap, and no test that fails on the box alone
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
 
-- agent-pulls-ticket stands open at design/review, which waits for a hand other than this box. Its verdict step waits the same way.
-- the child's leaves under `implement` carry no record, because the engine lands in the branch's commits first. The reviewer reads the branch diff.
+- agent-pulls-ticket stands open at `person-1`, a person's step before its verdict. The verdict chapter holds the reviewer's findings already.
+- a person answers that step, or takes it out of the route. The next pull then spawns a hand for the verdict again.
+- the three engine faults the verdict names stand fixed on the branch, so the next verdict reads a sound engine
 - no ticket stands minted with no group
-- this ticket is the handover. The group stays open at children until another hand answers the review on this branch. `branch done` names the child.
+- this ticket is the handover. The group stays open at children until the child closes, and `branch done` names the child.
 
 # Discussion
 
