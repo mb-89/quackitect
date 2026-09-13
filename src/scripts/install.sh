@@ -394,9 +394,12 @@ get() {
   esac
 }
 
+# SE_INSTALL_SKIP names the wants a caller leaves out, so a test vehicle builds
+# no index and links no editor while it proves the copy stands alone.
 missing=""
 for one in node vale biome vale-ls go index se-lsp editor-client editor-link \
   editor-extensions git-hooks; do
+  case " ${SE_INSTALL_SKIP:-} " in *" $one "*) continue ;; esac
   here "$one" || missing="$missing $one"
 done
 
