@@ -378,6 +378,7 @@ function urgency(text) {
 
 // [[spec/design_output/pull#what-a-hand-out-reads]]
 function handOut(it, who) {
+  repairPersonSteps(it, who);
   const all = ticketsHere(it);
   const groupTicket = all.find((one) => !one.private && one.name === who.group);
   const tagged = all.filter((one) => one.private && String(one.front.todo) === "true");
@@ -1411,6 +1412,37 @@ function shut(text, front, reason) {
 }
 
 // [[spec/design_output/pull#a-person-step-goes-in]]
+function repairPersonSteps(it, who) {
+  for (const one of ticketsHere(it)) {
+    const put = withEngineReader(it, one);
+    if (!put) continue;
+    one.text = put;
+    landed(it, one, ["a person step names the engine as its reader"]);
+    if (!one.private) pushed(it, who.branch);
+  }
+}
+
+export function withEngineReader(it, one) {
+  const front = frontOf(one.text);
+  const lacking = walkOf(front).filter(
+    (held) => /^person(-\d+)?$/.test(held.name) && String(held.said.by) === "person" && !held.said.to,
+  );
+  if (!lacking.length) return "";
+  const steps = structuredClone(front.steps ?? []);
+  for (const held of lacking) {
+    let list = steps;
+    const parts = held.path.split("/");
+    for (const part of parts.slice(0, -1)) {
+      list = [list.find((step) => String(step?.name) === part)?.steps ?? []].flat();
+    }
+    const step = list.find((step) => String(step?.name) === parts.at(-1));
+    if (step) step.to = "engine";
+  }
+  const schema = schemasHere(it).get("ticket");
+  return schema ? reRouted(one.text, schema, steps, "") : "";
+}
+
+// [[spec/design_output/pull#a-person-step-goes-in]]
 export function withPersonStep(it, one, before, asks, options) {
   const front = frontOf(one.text);
   const walk = walkOf(front);
@@ -1439,6 +1471,7 @@ export function withPersonStep(it, one, before, asks, options) {
     name,
     does: "answers the question the engine asks",
     by: "person",
+    to: "engine",
     asks,
     evidence: [
       {

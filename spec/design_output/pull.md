@@ -248,7 +248,9 @@ before the target.
 ## A person step goes in
 
 `withPersonStep` puts a step named `person-<n>` before the target, `by:
-person`, with the question under `asks` and one `answer` field. The route
+person`, `to: engine`, with the question under `asks` and one `answer`
+field. The engine reads the answer, so the slot check finds a reader. A
+hand-out repairs a standing person step that names no reader. The route
 re-renders through the reader the mint uses. So every chapter the hand fills
 stays, and the new one takes its comment. A ticket carrying
 `work.stepsBeforeSplit` person steps refuses another, and asks for a split.
