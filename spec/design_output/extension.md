@@ -40,7 +40,7 @@ the bar holding it both carry the name `quackitect`, so the header says it once.
 A folder carrying no tree gets no view, no mark and no write. The Biome
 extension starts in every folder, and it offers to install itself globally where
 it finds no binary. So `activate` sets two Biome keys in the user settings,
-where a person has set neither:
+where a person sets neither:
 
 - `biome.requireConfiguration` to `true`
 - `biome.suggestInstallingGlobally` to `false`
@@ -113,7 +113,7 @@ options and its mark, and each leaves the group open:
 
 | control | at rest | one click | five clicks |
 |---|---|---|---|
-| the engine | at rest | running | — |
+| the engine | at rest | running | none |
 | binding | bound to the queue | unbound | god mode |
 | autonomy | finish your own token | start new tokens | ideation |
 
@@ -196,10 +196,10 @@ The four buttons, and the one file naming them,
 
 | key | `icon` | what it does |
 |---|---|---|
-| `log.open` | 📜 | runs `./RUNME.sh log`, which opens the log viewer in a terminal |
-| `stop.hold` | ✋🤖 | running, then finishing, and stops at five presses |
-| `ask.wanted` | ❓🤖 | quiet, then short, and the full report at five presses |
-| `engine.binding` | ❌🔗🤖 | the queue, then unbound, and god mode at five presses |
+| `log.open` | `📜` | runs `./RUNME.sh log`, which opens the log viewer in a terminal |
+| `stop.hold` | `✋🤖` | running, then finishing, and stops at five presses |
+| `ask.wanted` | `❓🤖` | quiet, then short, and the full report at five presses |
+| `engine.binding` | `❌🔗🤖` | the queue, then unbound, and god mode at five presses |
 
 A mark stands still. The button says the state by the colour it wears, and by
 the pulse it takes at the far end.
@@ -289,7 +289,7 @@ starts over at every press, and stands at one.
 - the button stands dead for 600ms after the far value, so a sixth press stands by too
 
 Climbing goes one rung at a time, because handing over a whole ladder in one
-click is a move a person should mean. Releasing goes any distance at once, so a
+click is a move a person means. Releasing goes any distance at once, so a
 stray press always falls DOWN. That asymmetry is the safety, and it stands in
 place of a dialog asking whether a person means it.
 
@@ -424,12 +424,24 @@ none of its own.
 it first:
 
 - `linked` answers 0 where the link reaches this tree and the list names the id, and prints nothing.
-- `link` removes a copy or a stale link, links `src/extension`, and writes the entry.
+- `link` removes a copy, a stale link or a link pointing nowhere, links `src/extension`, and writes the entry.
 
 The link is a junction on Windows, which needs no administrator, and a symbolic
 link elsewhere. A standing link answers `linked`, so a run where nothing
 installs prints nothing. `link` refuses a destination outside
 `~/.vscode/extensions`.
+
+## A link pointing nowhere
+
+A tree that moves leaves the junction pointing at the old place. The editor
+then names the folder invalid, because `package.json` stands nowhere behind
+it, and the sidebar goes.
+
+The disk door reads such a link as a link, and reaches no folder behind it. So
+`linked` reads it as no link, `link` removes it the way it removes a copy, and
+the next `./RUNME.sh` mends it. The fake disk follows a link the same way, and
+the contract test holds both doors to it. `./RUNME.sh doctor` says where the
+link stands, in a row named `sidebar`.
 
 ## A file another program owns
 

@@ -1,0 +1,20 @@
+# A model holds this rule. A name passes every pattern: it is an ordinary word
+# of ordinary length carrying no separator, so the run and the token at the
+# write door reach it never. This question reads who a tracked note names.
+# Vale never reads this folder, because .vale.ini names no VoiceJudged.
+extends: judge
+message: "Name the role, and leave the person out. This tree holds the owner, the agent, the reader, the reviewer and the maintainer."
+link: spec/guidance/voice.md
+level: error
+ask: "Does this text name a role somebody holds, such as the owner, the agent, the reader, the reviewer or the maintainer, or does it name one particular person, through a name, a handle or an address?"
+labels:
+  - role
+  - person
+refuses: person
+# The tracked notes alone. A raw note under .se reaches git never, and the two
+# checks at the write door already stand between it and what git carries.
+reads:
+  - "*.md"
+  - spec/**/*.md
+ignores:
+  - .se/*.md

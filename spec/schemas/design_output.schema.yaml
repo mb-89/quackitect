@@ -12,6 +12,9 @@
 
 kind: design_output
 
+governs:
+  - spec/design_output/**
+
 frontmatter:
   type: object
   additionalProperties: false

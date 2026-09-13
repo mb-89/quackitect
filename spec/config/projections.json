@@ -8,6 +8,14 @@
       "from": "spec/config/level0.json",
       "schema": "spec/config/level0.schema.json",
       "wrap": "frontmatter"
+    },
+    {
+      "name": "the paragraph rules",
+      "shape": "paragraph rules",
+      "target": "spec/config/styles/VoiceParagraph",
+      "from": "spec/schemas/paragraph.schema.yaml",
+      "schema": "spec/schemas/paragraph.schema.schema.json",
+      "wrap": "none"
     }
   ]
 }

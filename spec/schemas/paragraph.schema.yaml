@@ -1,0 +1,148 @@
+# What a paragraph may hold, and nothing else. A door refuses what stands
+# outside these sets, so this file is a whitelist and names no bad word.
+#
+# The projection writes it into spec/config/styles/VoiceParagraph, one rule per
+# layer, and into VoiceJudged for the layers a model holds. A person edits this
+# file, and the write door refuses a hand edit to a target.
+# [[spec/funnel/a-paragraph-has-a-schema]]
+#
+# A register overrides a value for the paths it names, and keeps every value it
+# leaves out. `exceptions` under a layer is the list the retro grows: one entry,
+# one reason. A count guards it, so a rule refusing one phrase past `misreads`
+# times in a session writes a warn row naming itself.
+
+kind: paragraph
+misreads: 3
+
+layers:
+  characters:
+    admits: letters, digits, space, and the punctuation below
+    punctuation: [full stop, comma, question mark, exclamation mark, colon, parentheses, apostrophe, quotation mark, hyphen]
+    exceptions:
+      - word: TL;DR
+        reason: a name the answer register uses, and the semicolon belongs to it
+
+  markup:
+    admits:
+      - a code span
+      - a link, [[wiki]] or [text](target)
+      - a fence
+      - a table
+      - a list item, ordered or not
+      - a heading
+      - a strong lead on a bullet
+    heading:
+      words: 5
+      oneTitle: true
+    strongLead:
+      words: 4
+    exceptions: []
+
+  shape:
+    sentencesPerParagraph: 6
+    paragraphsPerRun: 3
+    listWhen: three or more parallel things stand in one sentence
+    exceptions: []
+
+  sentence:
+    words:
+      min: 2
+      max: 25
+      listItem: 20
+    opensWith: [a capital, a digit, a code span, a quote]
+    closesWith: [".", "?", "!"]
+    codeSpans: 4
+    exceptions: []
+
+  grammar:
+    finiteVerbs: 1
+    tenses: [simple present, simple past, simple future, imperative, infinitive]
+    auxiliaryChains: refused
+    modals: [can, must, will]
+    contractions: refused
+    latinShortForms: refused
+    exceptions:
+      - word: bound
+        reason: a status here, and the tagger reads a past tense
+      - word: buys
+        reason: the tagger reads a past tense, and the word carries none
+      - word: complicated
+        reason: an adjective here
+      - word: held
+        reason: a status here
+      - word: numbered
+        reason: an adjective here
+      - word: read
+        reason: a noun and a present tense here
+      - word: red
+        reason: a colour, and the tagger reads a past tense
+      - word: refused
+        reason: an adjective here
+      - word: settled
+        reason: an adjective here
+      - word: skips
+        reason: the tagger reads a past tense, and the word carries none
+      - word: switched
+        reason: an adjective here
+      - word: bold
+        reason: a markup word, and the tagger reads a past tense
+      - word: add
+        reason: an imperative here, and the tagger reads a past tense
+      - word: approved
+        reason: an adjective here, on a word list
+      - word: missing
+        reason: an adjective here, and the tagger reads a progressive
+      - word: standing
+        reason: a gerund here, and the tagger reads a progressive
+
+  vocabulary:
+    words: spec/vocabulary/words.yml
+    outside:
+      - a code span
+      - a link
+      - a path
+      - a word opening with a capital past the first word
+    growth:
+      who: the session, on the refusal that names the word
+      entry: word, meaning, from, and insteadOf where a better word exists
+      review: the retro reads every entry with `from: session` and keeps it or cuts it
+    exceptions: []
+
+  meaning:
+    judged:
+      - id: Actionable
+        asks: does this text tell the reader something they can act on?
+        labels: [actionable, background]
+        refuses: background
+      - id: BottomLineFirst
+        asks: does the first block state the outcome, or does the outcome arrive late?
+        labels: [first, late]
+        refuses: late
+      - id: ShapeFits
+        asks: do these sentences give the same fields for different things, or say what reaches what, or neither?
+        labels: [prose, table, diagram]
+        refuses: [table, diagram]
+
+registers:
+  prose:
+    paths: ["*.md", "*.markdown", "*.txt", "a comment in code"]
+
+  answer:
+    paths: ["*answer.md"]
+    shape:
+      sentencesPerParagraph: 3
+      paragraphsPerRun: 2
+    opens:
+      - block: questions
+        when: the prompt carries a sentence closing on `?`
+        shape: a table headed `question` and `answer`, one row per question
+      - block: tldr
+        when: always
+        shape: a list, one sentence per item, one bottom line each, before any heading
+    then: the detail, under headings
+
+  requirement:
+    paths: ["spec/requirements/*.md"]
+    grammar:
+      modals: [can, must, will, shall, should]
+      meaning: shall binds and should advises, as RFC 2119 gives them

@@ -1,0 +1,177 @@
+# The tree's retro: a window of the record turned into changes to the
+# machinery, on a desk, with the owner at two steps. It is blameless, and it
+# repairs what produced a bad output: a prompt, a guidance line, a form, a
+# refusal, a tool. Its children are one ticket per chapter of the window,
+# read by work.retroReaders hands the engine spawns, each taking the next
+# chapter until none stands. The mine phase is the retro's own hand reading
+# what collect lays out, and its last leaves read the retro itself.
+# [[spec/design_input/the-agent-pulls-tickets#the-retro]]
+for: a window of the record, and the changes to the machinery it earns
+ask:
+  - name: why
+    form: text
+    says: what calls for it, as notes standing open, an iteration ending, or the owner asking
+steps:
+  - name: collect
+    does: takes what it names under .se into the retro folder, cuts the window into chapters, mints a reader per chapter, and lays the rest out as files
+    by: anyone
+    needs: [retro]
+    evidence:
+      - name: run
+        form: command
+        expects: 0
+        says: retro collect, which refuses while a hand holds a ticket, and takes nothing it does not name
+  - name: field
+    does: asks what came back from real use since the last retro, and stops
+    by: person
+    asks: what came back from real use since the last retro?
+    evidence:
+      - name: answers
+        form: list
+        says: one line each, and each becomes a note
+  - name: score
+    does: scores the last retro's improvements against this window's numbers
+    input: collect
+    evidence:
+      - name: scored
+        form: list
+        says: one line per improvement, with what the numbers show and what that teaches
+      - name: rate
+        form: command
+        expects: 0
+        says: retro score, which prints how many stand in the tree
+  - name: notes
+    does: decides every note, the field's answers among them
+    needs: [retro]
+    evidence:
+      - name: drained
+        form: command
+        expects: 0
+        says: retro notes, which passes when the private folder is empty
+  - name: readers
+    by: children
+  - name: mine
+    reads: [[spec/guidance/working]]
+    input: collect
+    steps:
+      - name: chapters
+        does: reads the closed chapter readers into themes with counts
+        input: readers
+        evidence:
+          - name: themes
+            form: list
+            says: one line per theme, with its count and the chapters it stands in
+          - name: repeats
+            form: list
+            says: each theme an earlier retro names already, with the link
+          - name: thoughts
+            form: text
+            says: what the readers' thoughts fields say together, as doubts and workarounds that repeat
+      - name: shell
+        does: reads the shell commands of the window, grouped by the job in the retro folder
+        evidence:
+          - name: learn
+            form: text
+            says: what the groups say about what the tree lacks
+          - name: tools
+            form: list
+            says: which groups become a verb or a flag, and which stay shell
+          - name: guidance
+            form: list
+            says: which groups want a sentence, and where
+          - name: block
+            form: list
+            says: which groups a door refuses from now on, and why
+      - name: refusals
+        does: reads the doors' refusals of the window, by rule
+        evidence:
+          - name: rules
+            form: list
+            says: one line per rule, with its count, and whether the rule or the hand is wrong
+          - name: noise
+            form: list
+            says: the rules that fire and teach nothing, each with the fix
+      - name: tickets
+        does: reads the records of the tickets that close in the window, which are the engine's entries on each and no log
+        evidence:
+          - name: steps
+            form: list
+            says: the steps that fail back or meet refused most, per process, with counts
+          - name: people
+            form: list
+            says: what the person steps ask, and how long each waits
+          - name: skips
+            form: text
+            says: what the conditions skip, and whether rightly
+      - name: worker
+        does: reads the counts per chapter as a curve
+        evidence:
+          - name: curve
+            form: text
+            says: errors and the length of a thought per chapter, and where they turn
+          - name: cuts
+            form: list
+            says: where the worker cuts scope and calls it something else, each with its moment
+      - name: scripts
+        does: judges every script collect took from the box
+        evidence:
+          - name: kept
+            form: list
+            says: each script that becomes a check, a flag or a verb, with its home
+          - name: dropped
+            form: list
+            says: each script that dies, with the reason
+      - name: runs
+        does: reads the retro leaves of the groups that merged in the window
+        evidence:
+          - name: lacked
+            form: list
+            says: what the boxes lacked and met, with what repeats across runs
+          - name: left
+            form: list
+            says: what the boxes left for a person that still stands
+      - name: unread
+        does: reads the manifest against what every leaf read
+        evidence:
+          - name: unread
+            form: text
+            says: every line of the manifest no leaf read, and why, so the next retro inherits no hidden gap
+      - name: method
+        does: reads this retro's own run, so the next one runs better
+        input: [collect, readers]
+        evidence:
+          - name: earned
+            form: list
+            says: one line per leaf, with what it earned and what it cost, and the readers' questions with no answer
+          - name: change
+            form: list
+            says: what changes in the retro route or its verb, and why, each a ticket the improve step mints
+  - name: improve
+    does: mints one ticket per class, each with its home and its card
+    input: mine
+    checklist:
+      - one class, one ticket, and no more than work.retroCap of them
+      - the home is the earliest in the order that removes the waste
+      - a keep rule is counted over the tree before it is agreed
+      - a route edited on a ticket goes back into its process file, or the file says why not
+      - the process is read against what the field does now
+    evidence:
+      - name: tickets
+        form: list
+        says: one link per ticket, with its class, its home, the plan, and what the next numbers show if it works
+  - name: report
+    does: reads the retro whole and says what it misses
+    by: person
+    asks: what does this retro miss?
+    evidence:
+      - name: misses
+        form: text
+        says: what the retro misses, or nothing
+  - name: distribute
+    does: puts every minted ticket into a group with an urgency, cut into groups that run alone
+    input: [improve, report]
+    to: owner
+    evidence:
+      - name: groups
+        form: list
+        says: one line per ticket, with its group and its urgency

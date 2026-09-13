@@ -1,0 +1,62 @@
+# GENERATED. Edit the source named below, not this file. It is written again
+# every time the tree is projected, so an edit here is lost. Source:
+# spec/schemas/paragraph.schema.yaml
+extends: script
+message: "A character stands outside the set a paragraph admits: letters, digits, space, and . , ? ! : ( ) ' \" -. Write it in words, or put it in a code span."
+link: spec/funnel/a-paragraph-has-a-schema.md
+level: error
+scope: raw
+script: |
+  text := import("text")
+
+  matches := []
+
+  blanked := func(said, pattern) {
+    found := text.re_find(pattern, said, -1)
+    if is_undefined(found) { return said }
+    parts := []
+    at := 0
+    for one in found {
+      m := one[0]
+      parts = append(parts, said[at:m.begin])
+      parts = append(parts, text.repeat(" ", m.end - m.begin))
+      at = m.end
+    }
+    parts = append(parts, said[at:])
+    return text.join(parts, "")
+  }
+
+  plain := func(said) {
+    out := said
+    out = blanked(out, `(?s)^---\n.*?\n---`)
+    out = blanked(out, "(?s)```.*?```")
+    out = blanked(out, `(?s)~~~.*?~~~`)
+    out = blanked(out, `(?s)<!--.*?-->`)
+    out = blanked(out, `(?m)^(?:\t| {4,}).*$`)
+    out = blanked(out, "(?s)`[^`]*`")
+    out = blanked(out, `https?://[^\s)]+`)
+    out = blanked(out, `\[\[[^\]]*\]\]`)
+    out = blanked(out, `\[[^\]]*\]\([^)]*\)`)
+    out = blanked(out, `[A-Za-z0-9_.-]+/[A-Za-z0-9_./-]+`)
+    return out
+  }
+
+  said := plain(scope)
+  said = blanked(said, `(?m)^#{1,6} +`)
+  said = blanked(said, `(?m)^[ \t]*(?:[-*+]|[0-9]+[.)]) +`)
+  said = blanked(said, `(?m)^[ \t]*> ?`)
+  said = blanked(said, `\|`)
+  said = blanked(said, `[*_]`)
+  said = blanked(said, "TL;DR")
+
+  found := text.re_find(`[^\pL\pN\s\.\,\?\!\:\(\)\'\"\-]`, said, -1)
+  if !is_undefined(found) {
+    for one in found {
+      m := one[0]
+      matches = append(matches, {
+        begin: m.begin,
+        end: m.end,
+        message: "The character " + m.text + " " + "stands outside the set a paragraph admits: letters, digits, space, and . , ? ! : ( ) ' \" -. Write it in words, or put it in a code span."
+      })
+    }
+  }

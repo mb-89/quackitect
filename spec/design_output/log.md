@@ -65,6 +65,8 @@ For details, see [[spec/design_output/level0#a-step-carries-the-answer]].
 | `judge` | a model refuses prose | `tool.call` |
 | `bash` | a commit or a push aims at trunk | `tool.call` |
 | `work` | a branch verb answers, and the branch it stands on | `work.js` |
+| `context` | the blocks reaching the session, and whether a re-read brings them | `prompt.context` |
+| `compact` | a compaction runs, what fires it, and how many messages it keeps | `session.compact` |
 
 A line the `log` tool writes carries the kind the agent names.
 
@@ -139,8 +141,8 @@ the others hold there. So the hook, the command line and the sidebar land in
 one file, in the order they happen.
 
 - The command line appends through the disk door's `append`.
-- `$.fs` offers `read`, `write`, `list`, `exists` and `stat`, and no append. So
-  the hook reads the file and writes it back one line longer.
+- `$.fs` offers no append, so the hook reads the file and writes it back one
+  line longer.
 - The editor's file system offers no append either, so the sidebar does the same.
 
 The hook and the sidebar each queue their lines, so one of them writes one line

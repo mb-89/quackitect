@@ -78,6 +78,14 @@ function linking(door) {
   door.remove(link);
   said.gone = door.exists(link);
   said.kept = door.exists(join(target, "one.md"));
+
+  // [[spec/design_output/extension#a-link-pointing-nowhere]]
+  const dangling = join(at, "dangling");
+  door.link(join(at, "nowhere"), dangling);
+  said.dangling = door.isLink(dangling);
+  said.reaches = door.exists(dangling);
+  door.remove(dangling);
+  said.danglingGone = door.isLink(dangling);
   door.remove(at);
   return said;
 }
@@ -93,6 +101,9 @@ test("a link reads as a link to its target, and removing it keeps the target", (
     again: "EEXIST",
     gone: false,
     kept: true,
+    dangling: true,
+    reaches: false,
+    danglingGone: false,
   });
 });
 

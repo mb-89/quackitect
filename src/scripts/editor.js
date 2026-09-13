@@ -89,7 +89,7 @@ export function register(files, folder, mine) {
 
 // [[spec/design_output/extension#the-link-stands]]
 export function linkedAt(files, dest, source) {
-  if (!files.isLink(dest)) return false;
+  if (!files.isLink(dest) || !files.exists(dest)) return false;
   return same(files.realOf(dest), files.realOf(source));
 }
 
@@ -98,9 +98,14 @@ export function linkAt(files, dest, source) {
     return { linked: false, why: `${dest} stands outside the editor's folder, so nothing goes there` };
   }
   if (linkedAt(files, dest, source)) return { linked: true, why: "the link stands already" };
-  if (files.exists(dest)) files.remove(dest);
+  // [[spec/design_output/extension#a-link-pointing-nowhere]]
+  const nowhere = files.isLink(dest) && !files.exists(dest);
+  if (nowhere || files.exists(dest)) files.remove(dest);
   files.link(source, dest);
-  return { linked: true, why: "the link went in" };
+  return {
+    linked: true,
+    why: nowhere ? "a link pointing nowhere went, and the link went in" : "the link went in",
+  };
 }
 
 export function registered(files, folder, id) {

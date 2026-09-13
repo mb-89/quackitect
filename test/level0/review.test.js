@@ -81,6 +81,10 @@ test("a retro reads from a heading, and its absence reads as absent", () => {
   assert.equal(retroIn("# The result\n\n# My retrospective\n\nA surprise.\n"), true);
   assert.equal(retroIn("# The result\n\nI wrote a retro somewhere.\n"), false);
   assert.equal(retroIn(""), false);
+  // [[spec/design_output/work#every-brief-carries-the-contract]]
+  assert.equal(retroIn("# Where it stands\n\n# What surprises me\n\nA trap.\n"), true);
+  assert.equal(retroIn("# Where it stands\n\n# The dead end I meet\n\nA wall.\n"), true);
+  assert.equal(retroIn("# Where it stands\n\nA surprise stands in this line.\n"), false);
 });
 
 test("the verb gathers the brief, the handback and both diffs", () => {
@@ -198,7 +202,7 @@ test("the report names the branch, every answer and the count", () => {
   assert.match(said, /^retro {6}present$/m);
   assert.match(said, /^tests {6}2 rules added, 1 carries no test:$/m);
   assert.match(said, /^ {11}StopRule fires on nothing$/m);
-  assert.match(said, /^2 things to fix, and the merge is a person's\.$/m);
+  assert.match(said, /^2 things to fix\. Run work merge once every fix lands\.$/m);
 });
 
 test("a report with nothing to fix fits on one line", () => {
@@ -208,7 +212,7 @@ test("a report with nothing to fix fits on one line", () => {
   );
 
   assert.equal(said.split("\n").length, 1);
-  assert.match(said, /nothing to fix, and the merge is a person's\./);
+  assert.match(said, /nothing to fix\. Run work merge to take it in\./);
 });
 
 test("a red check and an absent retro each count one thing to fix", () => {
@@ -228,7 +232,7 @@ test("the report holds no merge back, whatever it finds", () => {
     { brief: "the brief asks for two things, and one lands", fix: 4 },
   );
 
-  assert.match(bad, /the merge is a person's\./);
+  assert.match(bad, /Run work merge once every fix lands\./);
   assert.equal(/\bblock|\brefus|\bdeny|\bgate\b/i.test(bad), false);
 });
 
@@ -324,7 +328,7 @@ test("the verb alone prints the two rows it owns, and no brief", () => {
   assert.match(said, /^check {6}passes$/m);
   assert.match(said, /^retro {6}absent from the handback$/m);
   assert.equal(said.includes("Hold the numbers"), false, "the brief stays out");
-  assert.match(said, /^1 thing to fix, and the merge is a person's\.$/m);
+  assert.match(said, /^1 thing to fix\. Run work merge once every fix lands\.$/m);
 });
 
 // [[spec/design_output/review#three-dots-not-two]]

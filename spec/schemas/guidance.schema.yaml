@@ -14,6 +14,9 @@
 
 kind: guidance
 
+governs:
+  - spec/guidance/**
+
 frontmatter:
   type: object
   additionalProperties: false

@@ -13,6 +13,10 @@
 
 kind: handover
 
+governs:
+  - HANDOVER.md
+  - .se/HANDOVER.md
+
 frontmatter:
   type: object
   additionalProperties: false

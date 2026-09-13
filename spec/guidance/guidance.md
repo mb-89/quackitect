@@ -16,3 +16,4 @@ rationale: [[spec/rationales/guidance]]
 8. Write the present tense. `spec/rationales` is the one place the past tense belongs.
 9. Write a new handover before you finish, because level zero consumes the one it finds. *
 10. Write this chapter to stand alone, because level zero hands the reader this and nothing else.
+11. Call `mint_note` to write a new note, because a governed folder holds one kind alone. [[spec/schemas]]

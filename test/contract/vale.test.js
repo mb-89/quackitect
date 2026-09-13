@@ -3,9 +3,10 @@
 // [[spec/design_output/doors#one-contract-test-per-door]]
 
 import assert from "node:assert/strict";
-import { dirname } from "node:path";
+import { dirname, join } from "node:path";
 import { skip, test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { NOBODY } from "../../.claude/skills/level0/lib/private.js";
 import { lintText } from "../../.claude/skills/level0/lib/vale.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
@@ -54,13 +55,13 @@ ifVale("the passive is refused and the active passes", async () => {
 ifVale("a paragraph over six sentences is refused and six pass", async () => {
   const said = (n) =>
     Array.from({ length: n }, (_, i) => `Sentence number ${i} stands here.`).join(" ");
-  assert.ok((await ruled(said(7))).includes("LongParagraph"));
-  assert.ok(!(await ruled(said(6))).includes("LongParagraph"));
+  assert.ok((await ruled(said(7))).includes("Paragraph"));
+  assert.ok(!(await ruled(said(6))).includes("Paragraph"));
 });
 
 ifVale("a sentence over the word limit is refused", async () => {
   const long = `The engine ${"and the reader ".repeat(12)}meet here.`;
-  assert.ok((await ruled(long)).includes("LongSentence"));
+  assert.ok((await ruled(long)).includes("Sentence"));
 });
 
 ifVale("the past tense is refused, and the words this tree means pass", async () => {
@@ -98,7 +99,7 @@ ifVale("fenced code carries none of these rules", async () => {
 ifVale("a contraction and a Latin short form are refused", async () => {
   const said = await ruled("The engine doesn't stop, e.g. here.");
   assert.ok(said.includes("Contraction"));
-  assert.ok(said.includes("LatinAbbreviation"));
+  assert.ok(said.includes("Latin"));
 });
 
 const answered = async (text) => {
@@ -111,12 +112,48 @@ ifVale(
   "a heading opens a fresh prose budget, and a third paragraph breaks it",
   async () => {
     const two = "# One\n\nA paragraph.\n\nA second paragraph.\n";
-    assert.ok(!(await answered(two)).includes("PreferStructureAnswer"));
+    assert.ok(!(await answered(two)).includes("ShapeAnswer"));
 
     const across = `${two}\n# Two\n\nA paragraph.\n\nA second paragraph.\n`;
-    assert.ok(!(await answered(across)).includes("PreferStructureAnswer"));
+    assert.ok(!(await answered(across)).includes("ShapeAnswer"));
 
     const three = `${two}\nA third paragraph.\n`;
-    assert.ok((await answered(three)).includes("PreferStructureAnswer"));
+    assert.ok((await answered(three)).includes("ShapeAnswer"));
   },
 );
+
+// [[spec/design_output/private#a-fixture-carries-no-shape]]
+const SECRETS = ["/home", "fnordwick", "secrets"].join("/");
+const CALLED = ["+49 30", "1234 5678"].join(" ");
+
+// [[spec/design_output/private#the-shapes]]
+ifVale("the shapes rule refuses an address, a number, a date and a home path", async () => {
+  for (const said of [
+    "Reach the owner at somebody@example.com when the box stalls.",
+    `Call ${CALLED} about it, and say what stalls.`,
+    "Measured on 2026-09-10 against client 2.1.267, on a cloud box.",
+    `The probe writes under ${SECRETS} and reads it back.`,
+    "A box answers C:\\Users\\fnordwick\\Desktop as the home folder there.",
+  ]) {
+    assert.ok((await ruled(said)).includes("Private"), said);
+  }
+});
+
+ifVale("a nobody user, a version and an example pass the shapes rule", async () => {
+  for (const said of [
+    "A cloud box writes under /home/user, and a fixture writes /Users/one.",
+    "A runner writes under /home/runner, and an agent under /home/claude.",
+    "Client 2.1.267 stands the same way, and the number 1024 passes.",
+    `    the indented example: 2026-09-08 and ${SECRETS}\n`,
+  ]) {
+    assert.ok(!(await ruled(said)).includes("Private"), said);
+  }
+});
+
+test("the shapes rule and the commit door pass one list of nobody users", () => {
+  const rule = files.read(join(root, "spec/config/styles/VoiceVale/Private.yml"));
+  const listed = /nobody := \[([^\]]*)\]/.exec(rule);
+  assert.ok(listed, "the rule names its nobody users");
+  const names = listed[1].split(",").map((one) => one.trim().replace(/^"|"$/g, ""));
+  assert.deepEqual(names.sort(), [...NOBODY].sort());
+});

@@ -9,6 +9,9 @@
 
 kind: design_input
 
+governs:
+  - spec/design_input/**
+
 frontmatter:
   type: object
   additionalProperties: false

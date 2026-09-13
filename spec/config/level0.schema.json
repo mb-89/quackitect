@@ -17,7 +17,9 @@
     "answer": {
       "type": "object",
       "required": [
-        "enabled"
+        "enabled",
+        "warnAt",
+        "ceiling"
       ],
       "properties": {
         "comment": {
@@ -26,6 +28,16 @@
         "enabled": {
           "type": "boolean",
           "help": "The door holding the owner's prompt first. false takes it out."
+        },
+        "warnAt": {
+          "type": "number",
+          "unit": "findings a thousand words",
+          "help": "The score where the findings start riding the next prompt."
+        },
+        "ceiling": {
+          "type": "number",
+          "unit": "findings a thousand words",
+          "help": "The score where the gate asks for one rewrite."
         }
       }
     },
