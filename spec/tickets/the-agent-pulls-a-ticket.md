@@ -163,7 +163,11 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
-step: retro/write
+  - step: retro/write
+    hand: box d49afdfe301a64
+    hash_before: 833b1d1b9d323c42eb27459af1a9c2fc772839a2
+    hash_after: 833b1d1b9d323c42eb27459af1a9c2fc772839a2
+step: retro/cloud
 ---
 
 # Ask
@@ -228,35 +232,36 @@ Done is one of two things, and the retro over the box's own window with it:
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
 
 - agent-pulls-ticket: the pull, its checks, its answers, the record and the hold stand in `src/scripts/pull.js`
 - `branch test` answers green, assertion, build or missing over the delta from the take
 - `branch pull --back` puts a leaf back into the hand that holds its record entry
+- `branch pull --drop` drops a hold, and `--fields` hands the fields back as the payload
+- a step that excludes the only hand answers `spawn`, and a hand under `--as` works that one step
+- `branch done` refuses while a hand can take a step. The stop hook holds the turn while the box holds a group.
+- the rule that ends turn one stays off a cloud box, and an open private ticket carries the turn
 - `ticket open` turns a draft into a pullable ticket, and `retro notes` drains the private folder
 - the schema renders a `checked` chapter under a leaf with a checklist. The ticket door lets the hand write it.
-- the stop hook reads the hold folder, and the rule stands in `spec/config/stop/level1.yml`
-- the wrapper under `.claude/skills/level1` registers the pull as a tool. It asks the judge over the shell's JSON.
-- a flow list keeps a comma inside its quotes, which the group's own checklist trips over
-- this group walks its own route under the pull, and every leaf carries a record entry
-- the design output stands at `spec/design_output/pull.md`. Every function points at a chapter of it.
+- the ticket door reads two chapters of one name apart, which a reviewer hand found and fixed
+- the wrapper under `.claude/skills/level1` registers the pull as a tool, and spawns the hand a spawn answer names
+- the pull on trunk runs the take, and a flow list keeps a comma inside its quotes
+- two spawned hands worked the child's review and its verdict, and the verdict names three engine faults, now fixed
+- the design output stands at `spec/design_output/pull.md`, and every function points at a chapter of it
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
 
 - the fakes carry every case. Git stands on the process door, and a ticket stands as text in a map.
-- the real pull walks the child's draft leaf and every leaf of this group on the first run. The tests drive the same code.
-- the write door catches the child ticket's brief chapters at the first edit, before the check runs
-- the voice door holds the design note and the commit message to the caps, and each rewrite reads better
+- the real pull walks every leaf of the child and of this group. Two spawned hands take the steps that exclude the box.
+- the engine's refusals name the fault each time. A reviewer hand fixes the door, and the box fixes the engine.
+- the payload road lets a hand work past a stale door, because the engine writes the fields itself
 
 ### badly
 
 <!-- what did not, each with its moment in the log or the transcript -->
-
 <!-- the form is list -->
 
 - the first edits go through a shell heredoc past every rule. The bash door then refuses a `sed -i` with ShellWritesNothing.
@@ -266,11 +271,13 @@ Done is one of two things, and the retro over the box's own window with it:
 - the nested `claude -p` run under the plugin folder spends its turns on the canary gate and the stop. It times out twice.
 - the plugin validator refuses the wrapper's import of the engine. So the judge's material moves into the shell as `--judge`.
 - the hand-back lets the retro's evidence through past the voice rules. The sweep names it once the leaf leaves the hand.
+- the box ran `branch done` with the review open, and the stop hook let the turn end. No rule read the held group.
+- the hook loads the ticket door once, so the reviewer's fix reaches this session nowhere. The payload road goes around it.
+- the verdict hand met five refusals on the engine's own faults. So the refusal cap put a person step before the verdict.
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
 
 - a refusal, level zero: the bash door refuses a heredoc or a script that writes a governed file
@@ -280,18 +287,21 @@ Done is one of two things, and the retro over the box's own window with it:
 - a verb, level one: `branch pull --judge` stands. The wrapper's end-to-end run waits for a desk with a live model.
 - a knob, the config: a nested session under `-p` reads `stop.enabled false` off the environment. So a probe answers in time.
 - a gate, the pull: the hand-back runs the voice rules over the chapter now. `--back` reopens a leaf the sweep names.
+- a rule, the stop hook: `the-group-stands-in-hand` carries the turn, which stands now
+- a knob, the config: a refusal from an engine fault counts for no person step, which the retro rules on
+- a check, the sweep: the hook reloads its door on a fix, or the check names the stale hook
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
 
-The thoughts weigh the child's route against this box before a line of code stands. They settle three things the actions show as facts alone:
+The thoughts weigh the child's route against this box before a line of code stands. They settle four things the actions show as facts alone:
 
-- the review and the verdict steps each name `not`, and one box holds one hand. So the child parks at review.
+- the review and the verdict steps each name `not`, and one box holds one hand. So the box spawns a hand for each.
 - the engine has to exist before a ticket can take a record. So the box builds it first, and walks its group after.
 - `needs: ["retro"]` answers `wait` for good on a box with no retro verb. So `retro notes` stands as a stub.
+- the owner rules that the box spawns the hand a `not` step needs. So the design input's line on a session's helper yields.
 
 ## cloud
 
