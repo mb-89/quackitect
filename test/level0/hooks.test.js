@@ -241,8 +241,7 @@ async function endsATurn(it, answer = "done") {
   await it.raise("turn.complete", { ...answered, answer: `${answer}\n\n${NEEDS}` });
 }
 
-// The first turn ends on the canary, so a test of the call starts past it.
-// [[spec/design_output/stop#the-canary-ends-turn-one]]
+// The first turn ends on the canary, so a test of the call starts past it. [[spec/design_output/stop#the-canary-ends-turn-one]]
 async function startedPast(seed, taught) {
   const it = await started(seed, taught);
   await it.raise("turn.complete", { ...answered, answer: canary({ rules: 2, notes: 1, stop: true }) });
