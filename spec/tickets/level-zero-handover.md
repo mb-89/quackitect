@@ -92,6 +92,12 @@ group: level-zero-hands-over
 
 # Ask
 
+The engine also hands the agent the tool list. At session start it surveys
+which tools stand on the box, the way v4 did, and the standing layer carries
+one line per tool saying when to reach for it. Today `./RUNME.sh tools`
+writes `.se/tools.json` and no session reads it, so an agent reads the disk
+with Grep and skips the index, patch and replace.
+
 # Where it stands
 
 The design input `spec/design_input/the-agent-pulls-tickets.md` says what the
