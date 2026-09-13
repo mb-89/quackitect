@@ -78,7 +78,10 @@ record:
   - step: sync
     hand: box d42624a67d18a8
     hash_before: 1a9a2d76f8e0d8fb1904a9efe154e03a6e17b014
-step: sync
+  - step: sync
+    skipped: true
+    why: the box runs off the cloud
+step: split
 ---
 
 # Ask
