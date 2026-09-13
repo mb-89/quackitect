@@ -82,9 +82,7 @@ export function withEntry(text, entry) {
   const shut = frontShut(rows);
   if (shut < 0) return rows.join("\n");
 
-  const item = Object.entries(entry)
-    .filter(([, said]) => said !== undefined && String(said) !== "")
-    .map(([key, said], at) => `${at ? "    " : "  - "}${key}: ${said}`);
+  const item = entryRows(entry);
   if (!item.length) return rows.join("\n");
 
   const opens = keyAt(rows, shut, "record");
@@ -153,6 +151,27 @@ export function aged(seconds) {
   if (held >= SPANS.d) return `${Math.floor(held / SPANS.d)}d`;
   if (held >= SPANS.h) return `${Math.floor(held / SPANS.h)}h`;
   return `${Math.floor(held / SPANS.m)}m`;
+}
+
+// [[spec/design_output/pull#the-record-holds-the-answers]]
+function entryRows(entry) {
+  const out = [];
+  for (const [key, said] of Object.entries(entry)) {
+    if (said === undefined || said === null || String(said) === "" || (Array.isArray(said) && !said.length)) continue;
+    const lead = out.length ? "    " : "  - ";
+    if (!Array.isArray(said)) {
+      out.push(`${lead}${key}: ${said}`);
+      continue;
+    }
+    out.push(`${lead}${key}:`);
+    for (const one of said) {
+      const pairs = Object.entries(one ?? {}).filter(([, value]) => value !== undefined && value !== null);
+      for (const [at, [name, value]] of pairs.entries()) {
+        out.push(`${at ? "        " : "      - "}${name}: ${value}`);
+      }
+    }
+  }
+  return out;
 }
 
 function frontShut(rows) {

@@ -1048,11 +1048,11 @@ script: |
   immense immersion immigrant immigrants immigration imminent immortal
   immune immunity immunization immunology imo imp impact impacted impacts
   impaired impairment impartial impedance imperative imperial implant
-  implants implementation implementations implemented implementing
-  implements implication implications implicit implied implies imply
-  import importance important importantly imported importer importers
-  importing imports impose imposed imposing impossible impotence impress
-  impressed impression impressions impressive impressum imprint
+  implants implement implementation implementations implemented
+  implementing implements implication implications implicit implied
+  implies imply import importance important importantly imported importer
+  importers importing imports impose imposed imposing impossible impotence
+  impress impressed impression impressions impressive impressum imprint
   imprisonment improper improve improved improvement improvements improves
   improving impulse ims in inability inaccuracies inaccurate inactive
   inadequate inappropriate inaugural inboard inbound inbox inc incense
@@ -2299,12 +2299,11 @@ script: |
   roads := `
   additionally=also amongst=among approximately=about artefact=artifact
   assist=help attempt=try commence=start demonstrate=show ensure=make sure
-  facilitate=help furthermore=also however=but implement=build
-  initiate=start invoke=call leverage=use mend=fix modify=change
-  numerous=many obtain=get prior=before purchase=buy regarding=about
-  skim=read subsequently=then sufficient=enough terminate=end terse=short
-  therefore=so utilise=use utilize=use validate=check verify=check
-  whilst=while wrongly=in error
+  facilitate=help furthermore=also however=but initiate=start invoke=call
+  leverage=use mend=fix modify=change numerous=many obtain=get
+  prior=before purchase=buy regarding=about skim=read subsequently=then
+  sufficient=enough terminate=end terse=short therefore=so utilise=use
+  utilize=use validate=check verify=check whilst=while wrongly=in error
   `
 
   swaps := {}

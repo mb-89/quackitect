@@ -10,7 +10,6 @@ import {
   reaches,
   TODO as PARKED,
 } from "../../.claude/skills/level0/lib/todo.js";
-import { COPY } from "../../.claude/skills/level0/lib/vehicle.js";
 import {
   aged,
   askOf,
@@ -30,6 +29,7 @@ import {
   withHashAfter,
   withoutField,
 } from "./group.js";
+import { handOf, pull, takeable, testVerb } from "./pull.js";
 import { review } from "./review.js";
 
 export const BRIEF = "HANDOVER.md";
@@ -61,6 +61,9 @@ export function work(root, argv, doors) {
     read,
     review,
     list,
+    // [[spec/design_output/pull#the-hand-out]]
+    pull: (it, _name, argv) => pull({ ...it, take: () => take(it) }, argv),
+    test: (it, _name, argv) => testVerb(it, argv),
   };
   if (doing[what] && LOUD.includes(what)) {
     return tell(it, what, doing[what](it, name, argv));
@@ -77,6 +80,8 @@ export function work(root, argv, doors) {
     console.log("  list [--done] every work branch and its status, or the done ones alone");
     console.log("  merge <name>  take a done branch into main");
     console.log("  close [name]  delete a branch already inside main, or every one");
+    console.log("  pull [ticket] take the next leaf of this group, or hand one back with --pass, --fail, --became");
+    console.log("  test [file]   run the tests the branch changes since the take: green, assertion, build or missing");
     return what ? 2 : 0;
   }
   return doing[what](it, name, argv);
@@ -91,7 +96,7 @@ export function cloud(root, argv, doors) {
   return argv[0] ? 2 : 0;
 }
 
-const LOUD = ["new", "take", "done", "release", "merge", "close"];
+const LOUD = ["new", "take", "done", "release", "merge", "close", "pull"];
 
 // [[spec/design_output/log#which-door-says-what]]
 function tell(it, what, code) {
@@ -222,17 +227,6 @@ function noteOf(one) {
 function textAt(it, ref, path) {
   const said = it.git.run(["show", `${ref}:${path}`], true);
   return said.ok ? `${said.out}\n` : "";
-}
-
-// [[spec/design_output/work#the-take-writes-the-record]]
-function handOf(it) {
-  const at = it.join(it.root, COPY);
-  if (!it.disk.exists(at)) return "an unnamed box";
-  try {
-    return `box ${JSON.parse(it.disk.read(at)).id}`;
-  } catch {
-    return "an unnamed box";
-  }
 }
 
 // [[spec/design_output/work#the-merge-frees-the-tickets]]
@@ -625,6 +619,19 @@ function leaves(it, branch, at, path, says) {
   const open = childrenHere(it, name).filter(
     (one) => fieldOf(one.text, "state") !== CLOSED,
   );
+
+  // [[spec/design_output/pull#done-leaves-no-takeable-step]]
+  const busy = [...open, { name, text: it.disk.read(path) }]
+    .map((one) => ({ name: one.name, step: takeable(it, one) }))
+    .filter((one) => one.step);
+  if (busy.length) {
+    for (const one of busy) {
+      console.error(`${one.name} stands at ${one.step}, and a hand can take it.`);
+    }
+    console.error("Run ./RUNME.sh branch pull, and spawn the hand a spawn answer names.");
+    console.error("branch done leaves a group only when every open step waits for a person.");
+    return 1;
+  }
 
   let now = withHashAfter(it.disk.read(path), after);
   // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]] takes the tag off.
