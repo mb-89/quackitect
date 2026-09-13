@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: soon
 steps:
   - name: design
@@ -88,6 +88,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[standard]]
 group: the-agent-pulls-a-ticket
+step: design/review
+record:
+  - step: design/draft
+    hand: box d49afdfe301a64
+    hash_before: 498aad19b4261f5a7e49f30bee2d9b19b79659a4
+    hash_after: 498aad19b4261f5a7e49f30bee2d9b19b79659a4
 ---
 
 # Ask
@@ -160,6 +166,8 @@ rejected push takes one of its own. Drive one real pull under
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+One module beside the work verbs holds the engine, and the branch verb hands it `pull` and `test`. The hand-out reads every ticket on the branch and offers four pools in order: a tagged note, the children, the group, the private tickets. The hand-back runs the four mechanical checks in the shell and leaves the judge to the plugin wrapper. Every case runs under the fakes, and one real pull walks this ticket. For details, see [[spec/design_output/pull]].
 
 ## review
 
