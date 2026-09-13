@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: now
 steps:
   - name: sync
@@ -78,6 +78,7 @@ record:
   - step: sync
     hand: box 36d4a566c587
     hash_before: f404ac8bd5b48bd57f074eec2ec3a84ed88d7203
+step: sync
 ---
 
 # Ask

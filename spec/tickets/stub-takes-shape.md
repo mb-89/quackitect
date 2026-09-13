@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: now
 steps:
   - name: design
@@ -89,6 +89,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-stub-takes-shape
+step: design/review
+record:
+  - step: design/draft
+    hand: box 36d4a566c587
+    hash_before: 023e4ccfaf9cd0f7f960cecb9dd70289d3ea5b10
+    hash_after: 023e4ccfaf9cd0f7f960cecb9dd70289d3ea5b10
 ---
 
 # Ask
@@ -118,6 +124,18 @@ Read [[spec/design_input/a-stub-takes-its-vehicle]] first, the chapters The stub
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+| the ask says | the approach answers |
+|---|---|
+| one verb writes the stub's files | the verb `stub` writes each file through the disk door, and a pure module names the files |
+| `vehicle.json` carries the vehicle's identity, its name and its repo | the pure module builds that record off the register entry and `git remote get-url origin`, and the verb refuses a vehicle with no remote unless `--upstream` names one |
+| a contract test reads every file back | one test produces a stub into a folder it makes, reads each file, and finds no file of the method |
+| the design output carries a chapter on the stub | the chapter stands. For details, see [[spec/design_output/vehicle#a-stub-takes-its-vehicle]]. |
+
+- the shim hands every argument to the vehicle's `RUNME.sh`, with the work root set to the stub
+- the bridgehead is a plugin of its own. It reads the record at session start and hands every hook to the vehicle's module.
+- an empty folder travels with git through one `.gitkeep`
+- the verb `vehicle into` stands as it is, and the stub verb copies nothing out of the method
 
 ## review
 
