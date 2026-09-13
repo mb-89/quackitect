@@ -1116,6 +1116,24 @@ test("ticket open turns a draft with an ask into an open ticket at its first lea
   assert.equal(heard(() => ticket(ROOT, ["open", "a-child"], empty.it)).code, 1);
 });
 
+// [[spec/design_output/pull#the-five-checks]]
+test("the judge's material is the leaf's evidence and the rules its reads name, as JSON", () => {
+  const { it } = doors(standing(filled(CHILD(), "### approach", "The approach.")));
+  heard(() => work(ROOT, ["pull"], it));
+
+  const { code, said } = heard(() => work(ROOT, ["pull", "a-child", "--judge"], it));
+
+  assert.equal(code, 0);
+  assert.deepEqual(JSON.parse(said), {
+    ticket: "a-child",
+    step: "design/draft",
+    evidence: "approach:\nThe approach.",
+    rules: ["Say what is.", "Put the bottom line first."],
+  });
+  const none = doors(standing());
+  assert.equal(heard(() => work(ROOT, ["pull", "a-child", "--judge"], none.it)).said, "null");
+});
+
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 test("the hold reads back what the pull writes, and a box with no id mints one", () => {
   const { it, disk } = doors(standing());

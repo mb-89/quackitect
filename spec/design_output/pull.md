@@ -143,6 +143,12 @@ hash is no ancestor of the tip. Then the hold drops, and the hand pulls again.
 
 The first four run in the shell, so a person's hand-back meets them too.
 
+The wrapper under `.claude/skills/level1` imports nothing past its own folder,
+because the plugin validator refuses an import that leaves it. So the shell
+hands it the material: `branch pull <ticket> --judge` prints the leaf's
+evidence and the rules its reads name, as JSON. The wrapper asks the model
+once over that, and a `breaks` answers `refused` before the shell runs.
+
 ## The fields hold their forms
 
 `chapterOf` reads the leaf's chapter by walking the headings as the route

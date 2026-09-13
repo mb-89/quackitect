@@ -209,6 +209,7 @@ export function pull(it, argv) {
   const hand = handOf(it);
   const held = holdOf(it, hand);
 
+  if (rest.includes("--judge")) return judgeMaterial(it, held, name);
   if (verdict.said || name)
     return handBack(it, { hand, branch, group, held }, name, verdict);
   if (held) {
@@ -220,6 +221,29 @@ export function pull(it, argv) {
   }
   if (!fetched(it, branch)) return 1;
   return handOut(it, { hand, branch, group });
+}
+
+// [[spec/design_output/pull#the-five-checks]]
+function judgeMaterial(it, held, name) {
+  if (!held || (name && name !== held.ticket)) {
+    console.log("null");
+    return 1;
+  }
+  const at = it.join(it.root, ...held.path.split("/"));
+  if (!it.disk.exists(at)) {
+    console.log("null");
+    return 1;
+  }
+  const text = it.disk.read(at);
+  const leaf = leafOf(frontOf(text), held.step);
+  const chapter = chapterOf(text, held.step);
+  const evidence = [
+    ...chapter.own,
+    ...[...chapter.fields].flatMap(([field, rows]) => [`${field}:`, ...rows]),
+  ].join("\n");
+  const rules = (leaf?.reads ?? []).flatMap((path) => actionables(guidanceText(it, path)));
+  console.log(JSON.stringify({ ticket: held.ticket, step: held.step, evidence, rules }));
+  return 0;
 }
 
 // [[spec/design_output/pull#the-hand-out]]
