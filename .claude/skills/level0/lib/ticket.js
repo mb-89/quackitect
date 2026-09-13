@@ -120,13 +120,14 @@ function placeFaults(old, note, schema, where) {
   const places = placesIn(note, schema);
   if (!places.size) return [];
 
-  const held = new Map(old.sections.map((one) => [keyOf(one), one.own.join("\n")]));
+  // Two leaves name one field alike, so the old chapter is the nth of its key.
+  const held = new Map(old.sections.map((one, i) => [nthKey(old.sections, i), one.own.join("\n")]));
   const out = [];
 
-  for (const one of note.sections) {
+  for (const [i, one] of note.sections.entries()) {
     const key = keyOf(one);
     if (places.has(key)) continue;
-    if (held.get(key) === one.own.join("\n")) continue;
+    if (held.get(nthKey(note.sections, i)) === one.own.join("\n")) continue;
     out.push(
       fault(
         one.header,
@@ -200,6 +201,12 @@ function said(places) {
 
 function keyOf(one) {
   return `${one.level} ${one.header}`;
+}
+
+function nthKey(sections, at) {
+  const key = keyOf(sections[at]);
+  const nth = sections.slice(0, at).filter((one) => keyOf(one) === key).length;
+  return `${key} #${nth}`;
 }
 
 function same(one, two) {
