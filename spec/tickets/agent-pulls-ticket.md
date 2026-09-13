@@ -2,6 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: soon
+step: person-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -72,6 +73,14 @@ steps:
           - name: says
             form: text
             says: what changes and why, for a reader who was not there
+  - name: person-1
+    does: answers the question the engine asks
+    by: person
+    asks: the hand-back met refused 5 times: verdict breaks Vocabulary at line 96 of its chapter: splices stands outside the words this tree writes. Write a core word, or add splices to spec/vocabulary/terms.yml with the note that defines it.
+    evidence:
+      - name: answer
+        form: text
+        says: the answer, which the step behind this one reads
   - name: verdict
     does: reads every hunk against the ask and the approach
     not: implement
@@ -87,8 +96,6 @@ steps:
         form: verdict
         says: pass or fail, findings one a line
 process: [[standard]]
-group: the-agent-pulls-a-ticket
-step: verdict
 record:
   - step: design/draft
     hand: box d49afdfe301a64
@@ -128,6 +135,7 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+group: the-agent-pulls-a-ticket
 ---
 
 # Ask
@@ -228,7 +236,7 @@ pass
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+<!-- the same tests pass -->
 <!-- the form is command -->
 
 ./RUNME.sh branch test
@@ -242,9 +250,9 @@ The verb runs the four test files the branch changes since the take, and one ass
 
 ### checked
 
-- the change reaches the stop hook and its test alone, under the stop rule row of the ask
-- the hook reaches the disk through the harness fake, and the verb tests carry the fake disk
-- the hook names the design chapter on the private queue beside the check it adds
+- the change touches the stop hook, its ticket lib and two notes, and no other file
+- the hook reaches the disk through the harness, and the hook tests carry its fake
+- the check points at the private queue chapter of the pull note
 
 ## reflect
 
@@ -255,6 +263,12 @@ The verb runs the four test files the branch changes since the take, and one ass
 <!-- the class of error the findings describe, and the fix for the class -->
 
 <!-- the form is text -->
+
+### checked
+
+- the change touches the stop hook, its ticket lib and two notes, and no other file
+- the hook reaches the disk through the harness, and the hook tests carry its fake
+- the check points at the private queue chapter of the pull note
 
 ## change
 
@@ -269,7 +283,7 @@ The verb runs the four test files the branch changes since the take, and one ass
 
 ### checked
 
-- the change touches the stop hook, its ticket lib, the schema note and the pull note, and no other file
+- the change touches the stop hook, its ticket lib and two notes, and no other file
 - the hook reaches the disk through the harness, and the hook tests carry its fake
 - the check points at the private queue chapter of the pull note
 
@@ -304,6 +318,16 @@ The stop hook now counts an open private ticket the way it counts a hold. A note
 - the hook reaches the disk through the harness, and the hook tests carry its fake
 - the check points at the private queue chapter of the pull note
 
+# person-1
+
+<!-- answers the question the engine asks -->
+
+## answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
+
 # verdict
 
 <!-- reads every hunk against the ask and the approach -->
@@ -311,14 +335,106 @@ The stop hook now counts an open private ticket the way it counts a hold. A note
 ## read
 
 <!-- every file you read, one a line -->
-
 <!-- the form is files -->
+
+    - .claude/commands/se-config-answer-ceiling.md
+    - .claude/skills/level0/hooks/level0.js
+    - .claude/skills/level0/lib/answer.js
+    - .claude/skills/level0/lib/apply.js
+    - .claude/skills/level0/lib/judge.js
+    - .claude/skills/level0/lib/paragraph.js
+    - .claude/skills/level0/lib/projection.js
+    - .claude/skills/level0/lib/refuse.js
+    - .claude/skills/level0/lib/schema.js
+    - .claude/skills/level0/lib/stop.js
+    - .claude/skills/level0/lib/ticket.js
+    - .claude/skills/level0/lib/todo.js
+    - .claude/skills/level0/lib/vocabulary.js
+    - .claude/skills/level1/hooks/level1.js
+    - .claude/skills/level1/lib/pull.js
+    - .vale.ini
+    - spec/config/level0.json
+    - spec/config/level0.schema.json
+    - spec/config/stop/level1.yml
+    - spec/config/styles/VoiceParagraph/Vocabulary.yml
+    - spec/config/styles/VoiceShape/VocabularyEntry.yml
+    - spec/design_input/copilot.md
+    - spec/design_input/the-agent-pulls-tickets.md
+    - spec/design_output/apply.md
+    - spec/design_output/bash.md
+    - spec/design_output/config.md
+    - spec/design_output/copilot.md
+    - spec/design_output/doors.md
+    - spec/design_output/editor.md
+    - spec/design_output/extension.md
+    - spec/design_output/index.md
+    - spec/design_output/level0.md
+    - spec/design_output/private.md
+    - spec/design_output/projection.md
+    - spec/design_output/pull.md
+    - spec/design_output/schema.md
+    - spec/design_output/stop.md
+    - spec/design_output/tree.md
+    - spec/design_output/vehicle.md
+    - spec/design_output/vocabulary.md
+    - spec/design_output/work.md
+    - spec/funnel/a-paragraph-has-a-schema.md
+    - spec/funnel/level-zero-closes.md
+    - spec/funnel/the-table-holds-every-rule.md
+    - spec/guidance/review/reviewing.md
+    - spec/guidance/tickets.md
+    - spec/guidance/voice.md
+    - spec/processes/retro.yaml
+    - spec/rationales/cloud.md
+    - spec/rationales/extension.md
+    - spec/rationales/reviewing.md
+    - spec/rationales/testing.md
+    - spec/rationales/tickets.md
+    - spec/rationales/voice.md
+    - spec/schemas/paragraph.schema.schema.json
+    - spec/schemas/paragraph.schema.yaml
+    - spec/schemas/ticket.schema.yaml
+    - spec/tickets/agent-pulls-ticket.md
+    - spec/tickets/the-agent-pulls-a-ticket.md
+    - spec/vocabulary/core.yml
+    - spec/vocabulary/swaps.yml
+    - spec/vocabulary/terms.yml
+    - spec/vocabulary/words.yml
+    - src/scripts/cli.js
+    - src/scripts/install.sh
+    - src/scripts/prepush.js
+    - src/scripts/pull.js
+    - src/scripts/ticket.js
+    - src/scripts/work.js
+    - test/contract/vale.test.js
+    - test/contract/vehicle.test.js
+    - test/contract/vocabulary.test.js
+    - test/level0/answer.test.js
+    - test/level0/hooks.test.js
+    - test/level0/level1.test.js
+    - test/level0/prepush.test.js
+    - test/level0/pull.test.js
+    - test/level0/ticket-verb.test.js
+    - test/level0/ticket.test.js
+    - test/level0/todo.test.js
+    - test/level0/vocabulary.test.js
+    - test/level0/work.test.js
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+- the files check slices a trimmed porcelain row, so a modified file loses its first letter
+- so a payload hand-back on a files field refuses its own ticket, and staging it first gets through
+- the voice rule reads a files field as prose, so a path with no slash breaks the vocabulary
+- the payload writer splices by the own rows, so a fence in a field swallows the next heading
+- the wrapper judges the leaf in hand alone, so a person's shell hand-back meets no judge later
+- the wrapper's tool handler carries no hook test, so the judge and the spawn loop go unproven
+- the payload lands on disk before the stale-hold check, so a stale hand-back still writes the file
+- the branch lands every other row of the ask, the check answers 0, and the retro stands
+- the retro names the real pull under the plugin timing out twice
 
 # Discussion
 
