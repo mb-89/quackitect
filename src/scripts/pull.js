@@ -1562,7 +1562,7 @@ export function testVerb(it, argv) {
     return 1;
   }
 
-  // The spec reporter answers a pipe too past node 23, and the count reads tap.
+  // [[spec/design_output/pull#the-test-verb]]
   const ran = it.proc.run([it.node ?? "node", "--test", "--test-reporter=tap", ...files], {
     cwd: it.root,
   });

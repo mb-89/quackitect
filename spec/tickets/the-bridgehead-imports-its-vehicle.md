@@ -83,7 +83,7 @@ step: sync
 
 # Ask
 
-The probe every other branch leans on: a plugin that imports a hooks module from a path it reads at session start, and forwards every event to it.
+The probe every other branch leans on. A plugin imports a hooks module from a path it reads at session start, and forwards every event to it.
 
 The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group, its proof and what it waits for. The funnel [[spec/funnel/a-button-makes-a-vehicle]] carries the owner's ask.
 

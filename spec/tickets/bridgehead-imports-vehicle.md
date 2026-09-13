@@ -116,8 +116,10 @@ Proof that a stub can carry a small plugin of its own and still run the vehicle'
 Every stub branch builds on a guess, and the first cloud run finds out the hard way.
 
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
-- a probe plugin under a fixture folder imports a hooks module from a path it reads at session start, and forwards session.start, tool.call and turn.complete to it
-- claude plugin validate passes on the probe, and the answer says which import shape it admits: a dynamic import, a re-export, or neither
+- a probe plugin under a fixture folder imports a hooks module from a path it reads at session start
+- the probe forwards session.start, tool.call and turn.complete to that module
+- `claude plugin validate` passes on the probe
+- the answer says which import shape the client admits: a dynamic import, a re-export, or neither
 - a headless session in the fixture answers the canary with the imported module's numbers, read off the log
 - spec/design_output/level0.md carries a chapter naming the shape that holds and the one that fails
 

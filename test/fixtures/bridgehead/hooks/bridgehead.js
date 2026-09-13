@@ -57,8 +57,7 @@ async function note($, fault) {
   } catch {}
 }
 
-// The hand the vehicle gets: every noun the harness offers, spelled at its own
-// call site, and nothing of the harness object itself.
+// [[spec/design_output/level0#a-bridgehead-imports-a-copy]]
 function handOf($) {
   return {
     fs: {
@@ -77,8 +76,7 @@ function handOf($) {
   };
 }
 
-// Every hook of the vehicle on this event, in the order it registered them,
-// each handing the event on through next.
+// [[spec/design_output/level0#a-bridgehead-imports-a-copy]]
 function chain(hand, held, event, e, next) {
   const rows = (held.table.get(event) ?? []).filter((one) => matches(one.when, e));
   const step = (at, ev) =>
@@ -99,8 +97,7 @@ function matches(when, e) {
   return Object.entries(when).every(([key, value]) => e?.[key] === value);
 }
 
-// A path on any box reads as a file URL, and a URL or a relative specifier
-// stands as it is.
+// [[spec/design_output/level0#a-bridgehead-imports-a-copy]]
 function urlOf(at) {
   if (at.startsWith("file:") || at.startsWith(".")) return at;
   const flat = at.split("\\").join("/");
