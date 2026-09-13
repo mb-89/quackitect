@@ -140,7 +140,11 @@ record:
     hash_after: fa0936e091ab0dd92d55e0be15b79a1604f8af96
     returns: 2
     why: the hand takes it back
-step: retro/write
+  - step: retro/write
+    hand: box d49afdfe301a64
+    hash_before: 590d4fe90275fd98c35b914d9728eabceb137769
+    hash_after: 590d4fe90275fd98c35b914d9728eabceb137769
+step: retro/cloud
 ---
 
 # Ask
@@ -264,11 +268,11 @@ Done is one of two things, and the retro over the box's own window with it:
 
 <!-- the form is text -->
 
-The thoughts weigh the child's route against this box before a line of code stands. The review and the verdict steps each name `not`, and one box holds one hand. So the child parks at review whatever the engine does, and the group stays open by design.
+The thoughts weigh the child's route against this box before a line of code stands. They settle three things the actions show as facts alone:
 
-The actions show a box that builds the engine, then walks its own group with it. The thoughts show that order as a choice. The engine has to exist before a ticket can take a record.
-
-The thoughts also settle that `needs: ["retro"]` answers `wait` for good on a box with no retro verb. That is why `retro notes` stands as a stub now, and the design says so.
+- the review and the verdict steps each name `not`, and one box holds one hand. So the child parks at review.
+- the engine has to exist before a ticket can take a record. So the box builds it first, and walks its group after.
+- `needs: ["retro"]` answers `wait` for good on a box with no retro verb. So `retro notes` stands as a stub.
 
 ## cloud
 
@@ -311,3 +315,5 @@ The thoughts also settle that `needs: ["retro"]` answers `wait` for good on a bo
 # Discussion
 
 This is the first group a box works under the pull, so its own record is the first run of the group route as data. The child ticket carries the brief's tables, because the brief is where the owner wrote them.
+
+The swap `implement` to `build` leaves the vocabulary on this branch. The standard route names a step `implement`, the engine renders that name as a chapter heading, and a swap on the word turns every standard ticket red. The word belongs to the process file, and a rename there is the owner's call.
