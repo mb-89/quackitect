@@ -100,7 +100,7 @@ import {
   schemasFrom,
   strangerFault,
 } from "../lib/schema.js";
-import { refusedTicket, ticketFaults } from "../lib/ticket.js";
+import { heldGroup, openPrivate, refusedTicket, ticketFaults } from "../lib/ticket.js";
 import { reaches, refusedTodo, taggedIn } from "../lib/todo.js";
 import { guesses, pathOf, surveyOf, TOOLS } from "../lib/tools.js";
 import {
@@ -123,6 +123,8 @@ import { MARKER, pairOf } from "../lib/vehicle.js";
 import { lintText } from "../lib/vale.js";
 
 const SE = ".se";
+const HOLDS = `${SE}/hold`;
+const PRIVATE_TICKETS = `${SE}/tickets`;
 const GUIDANCE = "spec/guidance";
 const COMMIT = "level0-commit.md";
 const HANDOVER = `${SE}/HANDOVER.md`;
@@ -154,6 +156,9 @@ export function register(on, _options) {
   let logbook = logHere(null);
   let rules = [];
   let onAHeldBranch = false;
+  // [[spec/design_output/pull#the-hand-and-the-hold]]
+  let inHand = false;
+  let groupHeld = false;
   let owed = null;
   let inFlight = 0;
   let indexDead = "";
@@ -685,9 +690,11 @@ export function register(on, _options) {
   });
 
   // [[spec/design_output/stop#the-stop-is-one-call]]
-  on("tool.call", { tool: STOP_CALL }, async (_$, e, _next) => {
+  on("tool.call", { tool: STOP_CALL }, async ($, e, _next) => {
     const off = (await settings.ask("stop.enabled")) === false;
     const hold = await settings.ask("stop.hold");
+    inHand = await holdStands($);
+    groupHeld = await groupInHand($);
     const reason = String(e.reason ?? "");
     // [[spec/design_output/stop#the-canary-ends-turn-one]]
     if (firstTurn) {
@@ -805,6 +812,8 @@ export function register(on, _options) {
     }
     const off = (await settings.ask("stop.enabled")) === false;
     const hold = await settings.ask("stop.hold");
+    inHand = await holdStands($);
+    groupHeld = await groupInHand($);
     const mostInARow = await settings.ask("stop.mostInARow");
     // [[spec/design_output/level0#what-the-probe-does]]
     const bit = probeDone
@@ -981,12 +990,54 @@ export function register(on, _options) {
   // [[spec/design_output/stop#the-mechanical-checks]]
   function ranHere(name, off, hold) {
     if (name === "work-waiting") return list.standing() || onAHeldBranch;
-    if (name === "session-is-new") return tooth.isNew();
+    if (name === "ticket-in-hand") return inHand;
+    if (name === "group-in-hand") return groupHeld;
+    // [[spec/design_output/pull#the-group-holds-the-turn]]
+    if (name === "session-is-new") return !cloud && tooth.isNew();
     if (name === "stop-hook-off") return off;
     if (name === "owner-holds") return holds(hold);
     if (name === "never") return false;
     return undefined;
   }
+}
+
+// [[spec/design_output/pull#the-group-holds-the-turn]]
+async function groupInHand($) {
+  const branch = await branchNow($);
+  if (!branch.startsWith("work/")) return false;
+  try {
+    return heldGroup(await $.fs.read(`spec/tickets/${branch.slice(5)}.md`));
+  } catch {
+    return false;
+  }
+}
+
+// [[spec/design_output/pull#the-hand-and-the-hold]]
+async function holdStands($) {
+  if (await holdFileStands($)) return true;
+  return privateStands($);
+}
+
+async function holdFileStands($) {
+  try {
+    const entries = await $.fs.list(HOLDS);
+    return entries.some((one) => one.name.endsWith(".json"));
+  } catch {
+    return false;
+  }
+}
+
+// [[spec/design_output/pull#the-private-queue]]
+async function privateStands($) {
+  try {
+    for (const one of await $.fs.list(PRIVATE_TICKETS)) {
+      if (!one.name.endsWith(".md")) continue;
+      if (openPrivate(await $.fs.read(`${PRIVATE_TICKETS}/${one.name}`))) return true;
+    }
+  } catch {
+    return false;
+  }
+  return false;
 }
 
 // [[spec/design_output/extension#the-ask-is-a-line]]

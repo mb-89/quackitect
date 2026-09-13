@@ -358,6 +358,61 @@ test("a held branch carries the turn once the session stops being new", async ()
   assert.ok(it.prompts[0].text.split("\n").length <= 5, "five lines at most");
 });
 
+// [[spec/design_output/pull#the-private-queue]]
+test("an open private ticket carries the turn, and a note alone waits for the retro", async () => {
+  const rule = "- id: a-ticket-stands-in-hand\n  side: continue\n  priority: 81\n  decides: mechanical\n  runs: ticket-in-hand\n  says: A ticket stands in your hand.\n";
+  const piece = (process) =>
+    `---\nkind: [[ticket]]\nstate: open\nprocess: [[${process}]]\nsteps:\n  - name: do\n---\n\n# Ask\n\nOne.\n`;
+  const carried = await started(
+    { ".se/tickets/a-piece.md": piece("trivial"), "spec/config/stop/level1.yml": rule },
+    boxSaying("", { CLAUDE_CODE_REMOTE: "1" }),
+  );
+  await carried.raise("turn.complete", {
+    ...answered,
+    answer: `a leaf is done\n\n${canary({ rules: 2, notes: 1, stop: true })}`,
+  });
+  const said = carried.lines().filter((one) => one.kind === "stop");
+  assert.equal(said.at(-1).said, "the turn goes on");
+  assert.match(said.at(-1).detail, /continue=a-ticket-stands-in-hand@81/);
+
+  const waits = await started(
+    { ".se/tickets/a-note.md": piece("note"), "spec/config/stop/level1.yml": rule },
+    boxSaying("", { CLAUDE_CODE_REMOTE: "1" }),
+  );
+  await waits.raise("turn.complete", {
+    ...answered,
+    answer: `a leaf is done\n\n${canary({ rules: 2, notes: 1, stop: true })}`,
+  });
+  const quiet = waits.lines().filter((one) => one.kind === "stop");
+  assert.equal(quiet.at(-1).said, "the turn ends", "a note waits for a retro, and carries nothing");
+});
+
+// [[spec/design_output/pull#the-group-holds-the-turn]]
+test("a held group carries the turn on a cloud box, from turn one", async () => {
+  const group = "---\nkind: [[ticket]]\nstate: open\nstep: children\nrecord:\n  - step: sync\n    hand: box 3f9a\n    hash_before: a1b2c3\n---\n\n# Ask\n\nOne.\n";
+  const rule = "- id: the-group-stands-in-hand\n  side: continue\n  priority: 82\n  decides: mechanical\n  runs: group-in-hand\n  says: This box holds a group, so pull.\n";
+  const it = await started(
+    { "spec/tickets/one-group.md": group, "spec/config/stop/level1.yml": rule },
+    {
+      ...boxSaying("", { CLAUDE_CODE_REMOTE: "1" }),
+      run: (argv) => {
+        if (argv[0] === "node") return { exitCode: 0, stdout: JSON.stringify({ CLAUDE_CODE_REMOTE: "1" }), stderr: "" };
+        if (argv[0] === "git" && argv[1] === "rev-parse") return { exitCode: 0, stdout: "work/one-group\n", stderr: "" };
+        return { exitCode: 0, stdout: "", stderr: "" };
+      },
+    },
+  );
+  await it.raise("turn.complete", {
+    ...answered,
+    answer: `a leaf is done\n\n${canary({ rules: 2, notes: 1, stop: true })}`,
+  });
+
+  const said = it.lines().filter((one) => one.kind === "stop");
+  assert.equal(said.at(-1).said, "the turn goes on");
+  assert.match(said.at(-1).detail, /continue=the-group-stands-in-hand@82/);
+  assert.doesNotMatch(said.at(-1).detail, /the-session-is-new/, "a cloud box has nobody to ask");
+});
+
 // [[spec/design_output/extension#the-hold-is-one-rule]]
 test("the hold at stopped ends a turn the standing work would carry", async () => {
   const it = await startedPast({ "HANDOVER.md": "---\nstatus: held\n---\n\n# The brief\n" });

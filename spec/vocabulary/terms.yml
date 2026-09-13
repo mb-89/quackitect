@@ -4,6 +4,7 @@
 # [[spec/schemas/paragraph.schema.yaml]]
 
 terms:
+  - {word: splice, defines: "[[spec/design_input/the-agent-pulls-tickets]]"}
   - {word: bridgehead, defines: "[[spec/funnel/a-button-makes-a-vehicle#the-bridgehead]]"}
   - {word: shim, defines: "[[spec/funnel/a-button-makes-a-vehicle#the-bridgehead]]"}
   - {word: stub, defines: "[[spec/funnel/a-button-makes-a-vehicle#the-stub]]"}

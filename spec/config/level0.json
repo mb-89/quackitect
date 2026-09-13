@@ -7,8 +7,11 @@
     "hold": "running"
   },
   "work": {
-    "comment": "The knobs the work verbs read. staleAfter is the age of a held group's tip that puts the group under yours, with release, take and close as the three answers.",
-    "staleAfter": "12h"
+    "comment": "The knobs the work verbs read. staleAfter is the age of a held group's tip that puts the group under yours, with release, take and close as the three answers. failsBeforePerson and refusalsBeforePerson say when the pull inserts a person step, and stepsBeforeSplit says how many of those a ticket carries before it splits.",
+    "staleAfter": "12h",
+    "failsBeforePerson": 2,
+    "refusalsBeforePerson": 5,
+    "stepsBeforeSplit": 3
   },
   "engine": {
     "comment": "The engine level one brings. binding says what the agent answers to: the queue it takes work from, unbound, or god mode, which five presses reach and which draws a pulse while it stands.",
