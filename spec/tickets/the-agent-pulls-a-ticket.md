@@ -130,7 +130,11 @@ record:
     hand: box d49afdfe301a64
     hash_before: c9845dd6d407dd06c90cd5fb74dfaf37b4e81004
     hash_after: 61e266b7dee01457ff9c6e91ab7078165002add6
-step: retro/cloud
+  - step: retro/cloud
+    hand: box d49afdfe301a64
+    hash_before: 500fd9f9079ce5bf55a7071104930285a33b6870
+    hash_after: 500fd9f9079ce5bf55a7071104930285a33b6870
+step: children
 ---
 
 # Ask
@@ -270,8 +274,8 @@ The thoughts also settle that `needs: ["retro"]` answers `wait` for good on a bo
 
 <!-- the form is list -->
 
-- a second hand on the box, so the child's review and verdict steps under `not` park at the first hand-out after the draft passes
-- a nested session that answers inside a timeout: `claude -p` under the plugin folder ran into the canary gate and the stop, twice, at the tool line `select:mcp__level1__pull` in the log
+- a second hand on the box. So the child's review and verdict steps under `not` park once the draft passes.
+- a nested session that answers in time. `claude -p` under the plugin folder runs into the canary gate and the stop, twice. The log holds the tool line `select:mcp__level1__pull`.
 - a retro verb past `notes`, so the group's retro route carries a stub the retro branch replaces
 - no host, no right and no install stood in the way
 
@@ -294,9 +298,9 @@ The thoughts also settle that `needs: ["retro"]` answers `wait` for good on a bo
 <!-- the form is list -->
 
 - agent-pulls-ticket stands open at design/review, which waits for a hand other than this box. Its verdict step waits the same way.
-- the child's implement leaves carry no record, because the engine landed in the branch's commits first. The reviewer reads the branch diff.
+- the child's leaves under `implement` carry no record, because the engine lands in the branch's commits first. The reviewer reads the branch diff.
 - no ticket stands minted with no group
-- this ticket is the handover. The group stays open at children until another hand answers the review on this branch, and `branch done` names the child.
+- this ticket is the handover. The group stays open at children until another hand answers the review on this branch. `branch done` names the child.
 
 # Discussion
 
