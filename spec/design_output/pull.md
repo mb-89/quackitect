@@ -14,7 +14,7 @@ stop hook reads off the hold. The verbs around the branch stand in
 
 # The three answers
 
-`branch pull` answers one of three words, first on its own line, with the
+`branch pull` answers one of five words, first on its own line, with the
 detail under it:
 
 | answer | when | the hand does |
@@ -22,6 +22,8 @@ detail under it:
 | `work` | one leaf of a ticket, with its fields, its guidance and the file to write in | the step, then pulls again naming the ticket |
 | `refused` | a check fails, and the findings stand one a line | fixes it, and the ticket stays in hand |
 | `wait` | nothing to hand out, and a reason per ticket the pull skips | says so, and stops |
+| `spawn` | the only open step excludes this hand, with a helper's name and its prompt | spawns that hand, and pulls again once it answers |
+| `done` | a hand under `--as` hands its one step back | stops, because a one-step hand takes no next leaf |
 
 The hand-out is `branch pull`. The hand-back is `branch pull <ticket>` with a
 verdict: `--pass`, `--fail "why"` or `--became <ticket>`. A leaf holding a
@@ -96,6 +98,7 @@ holds no open note.
 | `by: helper` | nobody yet, until the spawn lands |
 | `by: retro` | a hand while its group stands at a retro step, or a note with the tag |
 | `not: draft` | a hand other than the one the record names on `draft`, and every leaf under a phase |
+| `not: design`, with `person-1` inserted under it | the hands the record names on the leaves the mint wrote, and the person step counts for no `not` |
 
 An agent is a hand whose environment names a harness. The command line reads
 that off `CLAUDECODE`, `CLAUDE_CODE_REMOTE` or `SE_CLOUD`. A verdict comes from
@@ -153,6 +156,7 @@ that a session's helper reviews none of its work yields to that ruling.
 | the pull says | who acts |
 |---|---|
 | `spawn`, a helper name and a prompt | the wrapper calls the harness, or the session spawns a subagent with the prompt |
+| `spawn`, off a plugin | nobody: the shell moves nothing, the step stays parked for a person or a spawned hand, and the answer says so |
 | `work` under `--as <helper>` | the spawned hand, which takes that one leaf |
 | `done` after its hand-back | the spawned hand stops, and the session pulls again |
 
@@ -277,7 +281,9 @@ before the target.
 
 `withPersonStep` puts a step named `person-<n>` before the target, `by:
 person`, `to: engine`, with the question under `asks` and one `answer`
-field. The engine reads the answer, so the slot check finds a reader. A
+field. It points `step` at the inserted row and leaves the state at `open`,
+so the ticket is a person's to pull. The engine reads the answer, so the
+slot check finds a reader. A
 hand-out repairs a standing person step that names no reader. The route
 re-renders through the reader the mint uses. So every chapter the hand fills
 stays, and the new one takes its comment. A ticket carrying
