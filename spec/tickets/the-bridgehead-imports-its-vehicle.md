@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 steps:
   - name: sync
@@ -97,7 +97,15 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box d42624a67d18a8
+    hash_before: 48829e344d1b1d4f86d5a2d801468b9010bfda31
+    hash_after: 48829e344d1b1d4f86d5a2d801468b9010bfda31
+  - step: retro/cloud
+    skipped: true
+    why: the box runs off the cloud
 step: retro/write
+reason: done
 ---
 
 # Ask
@@ -156,32 +164,53 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- bridgehead-probe-lands: the probe plugin, the fake vehicle, the unit test, the contract test and the chapter
+- bridgehead-imports-vehicle: the approach and its review, then it becomes bridgehead-probe-lands
+- the test verb names the tap reporter
+- a became hand-back reads no field of the leaf
+- two private notes become tree tickets: the-stub-plugin-name and edit-door-reads-whole
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the client answers each import shape in one headless turn, so the four shapes cost minutes
+- the pull hands out leaf by leaf, and each refusal names the line. The fields land on the second try.
+- a helper hand takes the review from the prompt the pull prints
 
 ### badly
 
 <!-- what did not, each with its moment in the log or the transcript -->
-
 <!-- the form is list -->
+
+- the standard route asks for a red test, and a probe writes its code first. The tests-red leaf refuses at the hand-back.
+- the test verb answers build on node 24, at the first branch test call, because the count reads tap
+- a became hand-back checks the fields of the leaf first, at the first became call
+- the retro/notes leaf goes out before the private notes, so the hand holds it and pulls no note
+- the Edit door of this session refuses the ticket chapters with Schema.checked, so four writes go past it by script
+- the hand-back refuses long sentences four times, at every fields payload
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- a probe takes the trivial route from the mint: spec/guidance/tickets, a line naming which route a probe takes
+- the tap reporter stands in src/scripts/pull.js, with its test
+- the became check stands in src/scripts/pull.js, with its test
+- the pull offers a private note at a retro step before the group leaf: spec/design_output/pull, What a hand-out reads
+- the door reads the ticket schema of the tree, and no older one: spec/tickets/the-hook-reloads-its-door
+- a draft field goes through check_answer first: spec/guidance/working, rule 12
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The thoughts circle the client longer than the actions show. Three failing shapes read as the end of the stub design. Then the file table of the design input says the vehicle writes the bridgehead at an update. So a copy inside the plugin folder is the design, and the probe names it. The second circle is the route. The transcript weighs a fake red test before it takes the became road, and the became road is the honest one.
 
 ## cloud
 
