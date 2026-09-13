@@ -154,6 +154,8 @@ export function register(on, _options) {
   let onAHeldBranch = false;
   let owed = null;
   let inFlight = 0;
+  // [[spec/design_output/level0#the-canary-reads-the-whole-turn]]
+  let turnText = "";
   let indexDead = "";
   // [[spec/design_output/level0#the-door-counts-the-questions]]
   let asks = 0;
@@ -718,8 +720,10 @@ export function register(on, _options) {
   on("turn.step", async function* (_$, e, next) {
     const said = yield* next(e);
     inFlight = 0;
-    if (!owed || (await settings.ask("answer.enabled")) === false) return said;
     const text = String(e.answer ?? "").trim();
+    // [[spec/design_output/level0#the-canary-reads-the-whole-turn]]
+    if (text) turnText += `\n${text}`;
+    if (!owed || (await settings.ask("answer.enabled")) === false) return said;
     // [[spec/design_output/level0#a-prompt-mid-turn]]
     if (owed.skips > 0 || !text) {
       await logbook.say("info", "step", `step ${e.index} carries ${text.length} character(s)`, {
@@ -743,19 +747,22 @@ export function register(on, _options) {
     const said = await next(e);
     owed = null;
     inFlight = 0;
+    // [[spec/design_output/level0#the-canary-reads-the-whole-turn]]
+    const spokenTurn = `${turnText}\n${String(e.answer ?? "")}`;
+    turnText = "";
     // [[spec/design_output/log#a-reply-beside-its-prompt]]
     if (e.reason === "answer" && e.answer) {
       await logbook.say("info", "reply", e.answer, { text: String(e.answer) });
     }
     if (firstTurn && e.reason === "answer") {
       firstTurn = false;
-      const heard = canaryIn(e.answer, sentence);
+      const heard = canaryIn(spokenTurn, sentence);
       await heardCanary(logbook, heard, sentence);
       // [[spec/design_output/level0#the-canary-owes-a-debt]]
       if (heard.found !== "same") owesCanary = { warned: false };
     } else if (owesCanary && e.reason === "answer") {
       // [[spec/design_output/level0#the-canary-owes-a-debt]]
-      const heard = canaryIn(e.answer, sentence);
+      const heard = canaryIn(spokenTurn, sentence);
       if (heard.found === "same") {
         owesCanary = null;
         await heardCanary(logbook, heard, sentence);
@@ -766,7 +773,7 @@ export function register(on, _options) {
       if (probeRan) {
         probing = false;
         probeDone = true;
-        await heardCanary(logbook, canaryIn(e.answer, sentence), sentence);
+        await heardCanary(logbook, canaryIn(spokenTurn, sentence), sentence);
       } else {
         probeRan = true;
         await forceCompaction($, logbook);
@@ -786,7 +793,7 @@ export function register(on, _options) {
           ran: (name) => ranHere(name, off, hold),
           off,
           // [[spec/design_output/stop#the-canary-ends-turn-one]]
-          saidCanary: canaryIn(e.answer, sentence).found === "same",
+          saidCanary: canaryIn(spokenTurn, sentence).found === "same",
           // [[spec/design_output/stop#the-claim-rides-the-call]]
           claim,
         });

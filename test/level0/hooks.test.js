@@ -554,6 +554,18 @@ test("a write to the per-box file reaches the next turn end", async () => {
 });
 
 // [[spec/design_output/level0#the-canary]]
+// [[spec/design_output/level0#the-canary-reads-the-whole-turn]]
+test("a canary written before the stop call counts, whatever the turn's last line", async () => {
+  const said = canary({ rules: 2, notes: 1, stop: true });
+  const it = await started();
+  await it.raise("turn.step", { turnId: "t", index: 0, answer: `Done.\n\n${said}`, toolUses: [], stopReason: "tool_use" });
+  await it.raise("turn.complete", { ...answered, answer: "Ending my turn." });
+
+  assert.equal(it.lines().some((one) => one.level === "warn" && /canary/.test(one.said)), false);
+  const after = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.equal(after.context, undefined, "no debt stands");
+});
+
 test("the canary comes back whole, and a missing one writes a warning", async () => {
   const said = canary({ rules: 2, notes: 1, stop: true });
 

@@ -102,6 +102,16 @@ steps:
           - name: swapped
             form: list
             says: one line per term moved to the swaps, with the word to write instead
+      - name: memory
+        does: reads the agent's memory folder on this box, moves every entry that shapes how the agent works into the tree as guidance, a ticket or a rule, and deletes it there
+        reads: [[spec/guidance/working]]
+        evidence:
+          - name: moved
+            form: list
+            says: one line per entry, with its home in the tree, or the reason it dies
+          - name: emptied
+            form: text
+            says: the memory folder holds no entry that shapes behavior, because git carries none of it
       - name: tickets
         does: reads the records of the tickets that close in the window, which are the engine's entries on each and no log
         evidence:

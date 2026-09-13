@@ -540,6 +540,12 @@ The probe after a compaction pays nothing. It reads the canary through
 `heardCanary` on a session holding the line already, so a second debt stays
 shut.
 
+## The canary reads the turn
+
+- Outcome: a canary written anywhere in the first turn stands, whatever the last line.
+- Cause: the stop call ends a turn on one closing line, which the turn's end reads as the answer.
+- Read: every `turn.step` adds its text to the turn, and the turn's end reads the whole.
+
 ## The helper takes the guidance
 
 A subagent reads no standing layer of its own, so `agent.spawn` hands it one.
