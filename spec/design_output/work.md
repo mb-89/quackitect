@@ -34,8 +34,8 @@ shape.
 
 ## A brief drains first
 
-A branch carrying `HANDOVER.md` is a brief branch, whatever else stands on it,
-and a group ticket in place of that file turns it into a group. `take` hands
+A branch carrying `HANDOVER.md` is a brief branch, whatever else stands on it.
+A group ticket in place of that file turns it into a group. `take` hands
 out every brief branch before it hands out a group, so the branches standing
 before the ticket system finish under the verbs they carry.
 
