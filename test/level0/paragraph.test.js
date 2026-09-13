@@ -187,6 +187,31 @@ test("a cap moves in the schema, and the rule file carrying it follows", () => {
   assert.match(tighter.get("Shape.yml"), /run > 2/);
 });
 
+// [[spec/design_output/projection#the-list-opens-an-answer]]
+test("the answer rule holds the opening list, and the prose rule holds none", () => {
+  const files = drawn();
+  const answer = files.get(`${TARGET}/ShapeAnswer.yml`);
+  assert.match(answer, /An answer opens with a list/);
+  assert.match(answer, /A heading stands under the TL;DR list/);
+  assert.ok(!files.get(`${TARGET}/Shape.yml`).includes("opens with a list"));
+
+  // [[spec/design_output/projection#the-list-opens-an-answer]]
+  assert.ok(!answer.includes('has_prefix(line, "|")'));
+
+  const asked = rulesFrom({
+    registers: {
+      answer: { opens: [{ block: "questions" }, { block: "tldr" }] },
+    },
+  });
+  assert.match(asked.get("ShapeAnswer.yml"), /has_prefix\(line, "\|"\)/);
+});
+
+// [[spec/design_output/projection#the-list-opens-an-answer]]
+test("an answer register naming no tldr block writes no opening rule", () => {
+  const bare = rulesFrom({ registers: { answer: { opens: [] } } });
+  assert.ok(!bare.get("ShapeAnswer.yml").includes("opens with a list"));
+});
+
 // [[spec/design_output/projection#the-schema-names-a-mark]]
 test("the punctuation stands by name, and the rule carries the character", () => {
   const said = drawn().get(`${TARGET}/Characters.yml`);

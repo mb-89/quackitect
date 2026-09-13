@@ -751,6 +751,39 @@ refusing nothing leaves open.
 The tool registers at the session's start, and `spec/guidance/working.md`
 carries the line that sends a session to it.
 
+# The question comes first
+
+A prompt carrying a question gets its answer first, in a table a reader skims.
+The count comes from the prompt, and the table check reads the answer against
+it. Both stand in `lib/answer.js`, beside the door, because Vale reads no
+session state.
+
+For the argument, see [[spec/funnel/a-paragraph-has-a-schema]].
+
+## The door counts the questions
+
+`prompt.submit` counts the sentences of the prompt closing on `?` outside a
+fence, for the kinds `opensATurn` names. The count holds for the turn, and a
+prompt from a machine leaves it standing. So a re-prompt from the gate or the
+tooth leaves the count alone.
+
+## The table answers every question
+
+The gate and `check_answer` read the first block of the answer against the
+count. The block is a table, its header names `question` and `answer`, and its
+body holds one row a question.
+
+| the answer opens with | what the check says |
+|---|---|
+| a table naming the two columns, with rows enough | nothing |
+| prose, a heading or a list | the answer opens with no table |
+| a table naming other columns | the header reads the wrong names |
+| a table short of a row | the table holds too few rows |
+
+A count of zero demands no table. A question the session cannot answer still
+takes its row, and the answer cell says what blocks it. The finding reads
+`QuestionTable`, and it joins the findings of Vale, so one score weighs both.
+
 # The rules past one buffer
 
 Vale hands a rule one buffer, so a rule weighing two files stands outside it.

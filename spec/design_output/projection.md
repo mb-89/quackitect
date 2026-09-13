@@ -198,6 +198,26 @@ reach a comment in code as well as a paragraph of prose. A script rule reads
 the raw scope, which in a code file is the whole source, so `.vale.ini` stands
 every script rule off there.
 
+## The list opens an answer
+
+`registers.answer.opens` names the blocks an answer opens with, and the
+projector reads the one under `block: tldr`. It writes a second check into
+`ShapeAnswer.yml`, so the run cap and the opening rule reach an answer together.
+
+The check walks to the first line standing outside a fence, a blank and a
+leading table row, and reads it:
+
+| the first line | what the rule says |
+|---|---|
+| a list item | nothing |
+| a heading | a heading stands under the list |
+| anything else | an answer opens with a list |
+
+The entry under `block: questions` turns the skip of the table rows on, because
+the question table stands over the list. The count behind that table lives in
+`lib/answer.js`, so this rule asks for the list alone.
+[[spec/design_output/level0#the-question-comes-first]]
+
 ## The schema names a mark
 
 The YAML reader splits a scalar on a colon. So the punctuation layer names each

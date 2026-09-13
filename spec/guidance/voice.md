@@ -18,3 +18,4 @@ rationale: [[spec/rationales/voice]]
 10. Write three or more parallel things one to a line, each with its status. *
 11. A tracked file holds no name, no address, no date in prose and no disk path.
 12. Name the role, and leave the person out: the owner, the agent, the reader, the reviewer, the maintainer.
+13. Open an answer with a table of the questions the prompt asks, then the TL;DR list.

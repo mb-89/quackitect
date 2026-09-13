@@ -80,11 +80,29 @@ ifVale(
       Array.from({ length: n }, (_, i) => `Paragraph number ${i} stands here.`).join(
         "\n\n",
       );
-    await refuses("ShapeAnswer", `${said(3)}\n`, "answer.md");
-    await passes("ShapeAnswer", `${said(2)}\n`, "answer.md");
+    // [[spec/design_output/projection#the-list-opens-an-answer]]
+    const opened = (n) => `- The bottom line stands here.\n\n${said(n)}`;
+    await refuses("ShapeAnswer", `${opened(3)}\n`, "answer.md");
+    await passes("ShapeAnswer", `${opened(2)}\n`, "answer.md");
     await passes("ShapeAnswer", `${said(3)}\n`);
   },
 );
+
+// [[spec/design_output/projection#the-list-opens-an-answer]]
+ifVale("an answer opening with a heading or prose is refused", async () => {
+  await refuses("ShapeAnswer", "# One thing\n\n- The bottom line.\n", "answer.md");
+  await refuses("ShapeAnswer", "The bottom line stands here.\n", "answer.md");
+  await passes("ShapeAnswer", "- The bottom line stands here.\n", "answer.md");
+  await passes("ShapeAnswer", "1. The bottom line stands here.\n", "answer.md");
+
+  // [[spec/design_output/level0#the-question-comes-first]]
+  const table = "| question | answer |\n|---|---|\n| where | here |\n";
+  await passes("ShapeAnswer", `${table}\n- The bottom line.\n`, "answer.md");
+  await refuses("ShapeAnswer", `${table}\n# One thing\n`, "answer.md");
+
+  // [[spec/design_output/projection#a-layer-writes-two-files]]
+  await passes("ShapeAnswer", "# One thing\n\nThe line stands here.\n");
+});
 
 // [[spec/design_output/projection#a-layer-writes-two-files]]
 ifVale(

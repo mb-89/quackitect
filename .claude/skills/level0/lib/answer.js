@@ -79,6 +79,81 @@ export function spokeSince(messages) {
   return Boolean(answerAfter(messages, ""));
 }
 
+// [[spec/design_output/level0#the-question-comes-first]]
+
+export const TABLE = "QuestionTable";
+const HEADS = ["question", "answer"];
+
+// [[spec/design_output/level0#the-door-counts-the-questions]]
+export function questionsIn(text) {
+  let fenced = false;
+  let count = 0;
+  for (const line of String(text ?? "").split(/\r?\n/)) {
+    if (/^\s*(```|~~~)/.test(line)) {
+      fenced = !fenced;
+      continue;
+    }
+    if (fenced) continue;
+    count += (line.match(/\?+(?=\s|$)/g) ?? []).length;
+  }
+  return count;
+}
+
+// [[spec/design_output/level0#the-table-answers-every-question]]
+export function tableFaults(text, asked) {
+  const count = Number(asked ?? 0);
+  if (!Number.isFinite(count) || count < 1) return [];
+
+  const rows = String(text ?? "").split(/\r?\n/);
+  let at = 0;
+  while (at < rows.length && !rows[at].trim()) at += 1;
+  const block = [];
+  for (let i = at; i < rows.length && rows[i].trim(); i++) block.push(rows[i].trim());
+
+  const head = block[0] ?? "";
+  const one = (message) => [
+    { line: at + 1, column: 1, rule: TABLE, said: head, message },
+  ];
+
+  if (!head.startsWith("|")) {
+    return one(
+      `The prompt asks ${many(count, "question")}, and this answer opens with no table. Open it with a table headed question and answer.`,
+    );
+  }
+
+  const cells = cellsOf(head).map((cell) => cell.toLowerCase());
+  if (HEADS.some((want, i) => cells[i] !== want)) {
+    return one(
+      `A question table heads its two columns question and answer, and this one reads ${cells.join(", ") || "nothing"}. Write the two names.`,
+    );
+  }
+
+  const body = block.slice(1).filter((row) => row.startsWith("|") && !ruled(row));
+  if (body.length < count) {
+    return one(
+      `The prompt asks ${many(count, "question")}, and the table holds ${many(body.length, "row")}. Give every question a row, and say what blocks the open ones.`,
+    );
+  }
+  return [];
+}
+
+function cellsOf(row) {
+  return String(row)
+    .replace(/^\s*\|/, "")
+    .replace(/\|\s*$/, "")
+    .split("|")
+    .map((cell) => cell.trim());
+}
+
+// [[spec/design_output/level0#the-table-answers-every-question]]
+function ruled(row) {
+  return /^\|[\s:|-]+\|?$/.test(row);
+}
+
+function many(count, what) {
+  return `${count} ${what}${count === 1 ? "" : "s"}`;
+}
+
 // [[spec/design_output/level0#the-gate-reads-the-answer]]
 
 export const CHECK = "check_answer";
