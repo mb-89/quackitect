@@ -88,12 +88,16 @@ steps:
         says: pass or fail, findings one a line
 process: [[standard]]
 group: the-agent-pulls-a-ticket
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d49afdfe301a64
     hash_before: 498aad19b4261f5a7e49f30bee2d9b19b79659a4
     hash_after: 498aad19b4261f5a7e49f30bee2d9b19b79659a4
+  - step: design/review
+    hand: box d49afdfe301a64 · helper-2
+    hash_before: dfceb7dfbcf41bd854dfad206c132fe05a3cdcef
+    hash_after: dfceb7dfbcf41bd854dfad206c132fe05a3cdcef
 ---
 
 # Ask
@@ -176,8 +180,15 @@ One module beside the work verbs holds the engine, and the branch verb hands it 
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- the approach covers every row of the ask, from the hand-out to the plugin wrapper
+- the design note holds the three answers, the five checks, the pass, the fail and the rejected push
+- the ask names `work.js` and the note names `pull.js`, so the implement step settles the file
+- the ask names the stop rule `work-waiting` and the note names `the-group-stands-in-hand`, so one name wins
+- the note names no test for the rejected push, so the tests-red step adds one
+- the note names no stop config file, so the implement step writes `spec/config/stop/level1.yml`
 
 # implement
 
