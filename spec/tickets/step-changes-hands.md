@@ -2,10 +2,20 @@
 kind: [[ticket]]
 state: open
 urgency: soon
+step: design/person-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: "design/review failed back 2 times: The table under The three answers lists five words, and the heading and the Scope line name three. The heading and the Scope line name five."
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -87,8 +97,6 @@ steps:
         form: verdict
         says: pass or fail, findings one a line
 process: [[standard]]
-group: a-step-changes-hands
-step: design/review
 record:
   - step: design/draft
     hand: box b71bba5a7b0c
@@ -104,6 +112,13 @@ record:
     hand: box b71bba5a7b0c
     hash_before: fc2c7c45cfbb4c8f2f92c0e6f98fe96fbef6e140
     hash_after: fc2c7c45cfbb4c8f2f92c0e6f98fe96fbef6e140
+  - step: design/review
+    hand: box b71bba5a7b0c · helper-4
+    hash_before: 085829be36d10ddb72a67b33e0cbcedf2b62c6ad
+    hash_after: 085829be36d10ddb72a67b33e0cbcedf2b62c6ad
+    returns: 2
+    why: The table under The three answers lists five words, and the heading and the Scope line name three. The heading and the Scope line name five.
+group: a-step-changes-hands
 ---
 
 # Ask
@@ -152,6 +167,16 @@ tickets.
 
 # design
 
+## person-1
+
+<!-- answers the question the engine asks -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
+
 ## draft
 
 <!-- writes the approach the ask calls for -->
@@ -175,10 +200,7 @@ The approach stands in [[spec/design_output/pull#the-hand-and-the-hold]].
 <!-- the form is verdict -->
 
 fail
-- The ask rules that an inserted step counts for no `not`. The hand rule says where a `not` meets an inserted step.
-- The ask rules that the shell pull off a plugin parks the step for a person. A hand of its own says so.
-- The three answers table names three words, and A hand of its own adds two. One table lists all five.
-- The ask proves the person step by `step` pointing at the inserted row. A person step goes in says where `step` lands.
+- The table under The three answers lists five words, and the heading and the Scope line name three. The heading and the Scope line name five.
 
 # implement
 
@@ -188,7 +210,7 @@ fail
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+<!-- the same tests pass -->
 
 <!-- the form is command -->
 
@@ -197,6 +219,12 @@ fail
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 ## reflect
 
@@ -208,6 +236,12 @@ fail
 
 <!-- the form is text -->
 
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
 ## change
 
 <!-- makes the change -->
@@ -217,6 +251,12 @@ fail
 <!-- the tree builds and lints -->
 
 <!-- the form is command -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 ## tests-green
 
@@ -239,6 +279,12 @@ fail
 <!-- what changes and why, for a reader who was not there -->
 
 <!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 # verdict
 
