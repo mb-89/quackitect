@@ -1916,13 +1916,14 @@ test("an answer over the ceiling reaches no prompt, and rides the next call once
 
   const call = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   assert.equal(call.deny, undefined);
-  assert.match(call.context.at(-1), /^The gate read your last answer at rewrite, and it stands as sent\./);
-  assert.match(call.context.at(-1), /50 findings a thousand words/);
-  assert.match(call.context.at(-1), /level0-answer\.md:1:7 {2}PastTense/);
-  assert.match(call.context.at(-1), /Hold PastTense for the rest of this turn/);
+  const note = call.context.join("\n");
+  assert.match(note, /The gate read your last answer at rewrite, and it stands as sent\./);
+  assert.match(note, /50 findings a thousand words/);
+  assert.match(note, /level0-answer\.md:1:7 {2}PastTense/);
+  assert.match(note, /Hold PastTense for the rest of this turn/);
 
   const again = await it.raise("tool.call", { tool: "Read", file_path: "b.md" });
-  assert.equal(again.context, undefined, "the findings ride once");
+  assert.doesNotMatch((again.context ?? []).join("\n"), /The gate read/, "the findings ride once");
 });
 
 // [[spec/design_output/level0#the-three-bands]]
@@ -2016,7 +2017,8 @@ test("a prompt from a machine leaves the count standing", async () => {
   await it.raise("prompt.submit", { text: "carry on", origin: { kind: "plugin" } });
   await it.raise("turn.complete", { ...answered, answer: OVER });
 
-  assert.match(it.prompts[0].text, /asks 2 questions/);
+  const call = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.match(call.context.join("\n"), /asks 2 questions/);
 });
 
 // [[spec/design_output/level0#the-owner-answers-by-number]]
