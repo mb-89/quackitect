@@ -41,7 +41,7 @@ run from `sync` to the retro's last leaf.
 # The rules to hold
 
 - The cloud box commits on no trunk. A ticket with no group rides the branch to the merge.
-- A box leaving a group writes `gave`, and the group stays open where a child stands parked.
+- A box leaving a group writes `hash_after`, and the group stays open where a child stands parked.
 - The private notes die with the box unless the retro decides them, so the retro phase runs before the cap.
 - What the box lacks, meets and leaves stands in the `cloud` leaf, and the tree's retro reads it.
 - Drive one real run before `work done`, and write what you see in the retro.
