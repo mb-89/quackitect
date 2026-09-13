@@ -1757,3 +1757,84 @@ test("the draft tool reads a clean draft clean, and an empty one back", async ()
   const empty = await it.raise("tool.call", { tool: DRAFT, text: "  " }, DRAFT);
   assert.match(empty.result, /takes the text of one draft/);
 });
+
+const WORDS = "spec/vocabulary/words.yml";
+const RULE = "spec/config/styles/VoiceParagraph/Vocabulary.yml";
+
+const PARAGRAPHS = JSON.stringify({
+  projections: [
+    {
+      name: "the paragraph rules",
+      shape: "paragraph rules",
+      target: "spec/config/styles/VoiceParagraph",
+      from: "spec/schemas/paragraph.schema.yaml",
+      wrap: "none",
+    },
+  ],
+});
+
+const PARAGRAPH_SCHEMA = `
+kind: paragraph
+layers:
+  vocabulary:
+    words: ${WORDS}
+    exceptions: []
+`;
+
+const SEED = `words:
+  - {word: door, from: tree}
+  - {word: the, from: openste}
+`;
+
+const listed = (seed = SEED) => ({
+  "spec/config/projections.json": PARAGRAPHS,
+  "spec/schemas/paragraph.schema.yaml": PARAGRAPH_SCHEMA,
+  [WORDS]: seed,
+});
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+test("the word list reaches the rule at a session's start", async () => {
+  const it = await started(listed());
+  assert.match(it.files.get(RULE), /\bdoor\b/);
+  assert.ok(!/\bhandover\b/.test(it.files.get(RULE)), "a word nobody wrote stands nowhere");
+});
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+test("a write to the list re-projects, so the next write reads the new rule", async () => {
+  const it = await started(listed());
+  const before = it.files.get(RULE);
+  assert.ok(!/\bhandover\b/.test(before));
+
+  const grown = `${SEED}  - {word: handover, from: session, meaning: the note a branch hands on}\n`;
+  const wrote = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: WORDS,
+    content: grown,
+  });
+  assert.equal(wrote.deny, undefined, "the list is a source, so the door passes the write");
+
+  // The harness writes what the door passes, the way the client does.
+  it.files.set(WORDS, grown);
+  assert.equal(it.files.get(RULE), before, "the rule waits for the next call");
+
+  await it.raise("tool.call", { tool: "Read", file_path: "anything.md" });
+  assert.match(it.files.get(RULE), /\bhandover\b/, "the next call carries the new word");
+
+  const said = it.lines().filter((one) => one.kind === "project");
+  assert.match(said.at(-1).said, /^spec\/vocabulary\/words\.yml moved/);
+});
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+test("a write to a file no projection reads leaves the rule alone", async () => {
+  const it = await started(listed());
+  const before = it.lines().filter((one) => one.kind === "project").length;
+
+  await it.raise("tool.call", { tool: "Write", file_path: "notes.md", content: "The door.\n" });
+  await it.raise("tool.call", { tool: "Read", file_path: "anything.md" });
+
+  assert.equal(
+    it.lines().filter((one) => one.kind === "project").length,
+    before,
+    "nothing re-projects, so no line lands",
+  );
+});

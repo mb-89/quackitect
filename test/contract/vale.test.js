@@ -27,6 +27,13 @@ const ruled = async (text) => {
   return said.found.map((f) => f.rule);
 };
 
+// [[spec/funnel/a-paragraph-has-a-schema]]
+const saidOf = async (text, rule) => {
+  const said = await lintText(text, "notes.md", { run, bin });
+  assert.ok(said.ran, `vale ran: ${said.why}`);
+  return said.found.filter((one) => one.rule === rule).map((one) => one.message);
+};
+
 ifVale(
   "a shouted lead is refused and an acronym inside a sentence passes",
   async () => {
@@ -147,6 +154,47 @@ ifVale("a nobody user, a version and an example pass the shapes rule", async () 
     `    the indented example: 2026-09-08 and ${SECRETS}\n`,
   ]) {
     assert.ok(!(await ruled(said)).includes("Private"), said);
+  }
+});
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+ifVale("a word the list leaves out is refused, and the refusal names it", async () => {
+  const said = await saidOf("The door refuses a flibbertigibbet.", "Vocabulary");
+  assert.equal(said.length, 1);
+  assert.match(said[0], /^flibbertigibbet stands outside the words this tree writes/);
+  assert.match(said[0], /from: session/);
+});
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+ifVale("a word the list swaps is refused, and the refusal names the swap", async () => {
+  assert.deepEqual(await saidOf("The door utilize the list.", "Vocabulary"), [
+    "utilize stands outside the words this tree writes. Write use instead.",
+  ]);
+});
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+ifVale("the words this tree writes pass, and so does what stands outside a layer", async () => {
+  for (const said of [
+    "The door refuses a write, and the writer reads the refusal.",
+    "A run of doors reads the rules, and the rules stand in one folder.",
+    "The tree writes `flibbertigibbet` in a code span, so the rule reads past it.",
+    "A path like spec/vocabulary/words.yml stands outside the layer.",
+    "The owner reads [[spec/funnel/a-paragraph-has-a-schema]] first.",
+    "A capital past the first word names Flibbertigibbet, so it stands.",
+    "The door reads 2048 bytes and the rule passes over a digit.",
+  ]) {
+    assert.deepEqual(await saidOf(said, "Vocabulary"), [], said);
+  }
+});
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+ifVale("a plural, a past form and an -ing form of a listed word stand", async () => {
+  for (const said of [
+    "The door refuses a write, and the doors refused it.",
+    "The door is refusing a write, and the writer stands waiting.",
+    "The rules carry the tries a session tried.",
+  ]) {
+    assert.deepEqual(await saidOf(said, "Vocabulary"), [], said);
   }
 });
 

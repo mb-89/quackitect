@@ -403,7 +403,7 @@ script: |
     if text.re_match(`[0-9_]`, w) { continue }
     head := w[0:1]
     if head != text.to_lower(head) && !opens(m.begin) { continue }
-    if len(w) == 1 && head != text.to_lower(head) { continue }
+    if len(w) == 1 { continue }
 
     low := text.to_lower(w)
     low = text.trim_suffix(low, "'s")

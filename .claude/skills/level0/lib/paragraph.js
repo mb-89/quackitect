@@ -633,8 +633,8 @@ function vocabulary(layer, list) {
     "  if text.re_match(`[0-9_]`, w) { continue }",
     "  head := w[0:1]",
     "  if head != text.to_lower(head) && !opens(m.begin) { continue }",
-    // A lone capital names a key, a column or a label. [[spec/funnel/a-paragraph-has-a-schema]]
-    "  if len(w) == 1 && head != text.to_lower(head) { continue }",
+    // One letter names a key, a column or a label. [[spec/funnel/a-paragraph-has-a-schema]]
+    "  if len(w) == 1 { continue }",
     "",
     "  low := text.to_lower(w)",
     '  low = text.trim_suffix(low, "\'s")',

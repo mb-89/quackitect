@@ -1,13 +1,55 @@
 // The wording of a refusal, written once and read by every door.
 // [[spec/design_output/level0#the-write-door]]
 
+import { LIST } from "./vocabulary.js";
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+export const VOCABULARY = "Vocabulary";
+
 export function refusal(where, found) {
   return [
     `The voice rules refuse this write to ${where}.`,
     "",
     ...bodyOf(where, found),
     taught(found),
+    ...road(found),
   ].join("\n");
+}
+
+// A word the list leaves out has two roads, and the refusal names both.
+// [[spec/funnel/a-paragraph-has-a-schema]]
+export function grown(found) {
+  const words = outsideIn(found);
+  if (!words.length) return "";
+  return [
+    `The list holds the words this tree writes, and ${LIST} is where it grows.`,
+    `Write a word standing on it, or add ${namesThe(words)} there as`,
+    "`- {word: <the word>, from: session, meaning: <one phrase>}` and write the line again.",
+    "The next write reads the new rule, and the retro keeps the entry or cuts it.",
+  ].join("\n");
+}
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+function road(found) {
+  const said = grown(found);
+  return said ? ["", said] : [];
+}
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+function outsideIn(found) {
+  const out = new Set();
+  for (const one of found ?? []) {
+    if (!String(one?.rule ?? "").endsWith(VOCABULARY)) continue;
+    const said = String(one?.said ?? "").trim().toLowerCase();
+    if (said) out.add(said);
+  }
+  return [...out];
+}
+
+function namesThe(words) {
+  const shown = words.slice(0, 5).map((one) => `\`${one}\``);
+  const tail = words.length > 5 ? `, and ${words.length - 5} more` : "";
+  return `${shown.join(", ")}${tail}`;
 }
 
 // [[spec/design_output/level0#what-the-gate-says]]
@@ -28,6 +70,7 @@ export function answerFindings(where, it) {
     "",
     ...bodyOf(where, found),
     taught(found),
+    ...road(found),
   ].join("\n");
 }
 

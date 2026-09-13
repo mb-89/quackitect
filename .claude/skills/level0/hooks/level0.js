@@ -63,6 +63,7 @@ import {
 import { isDraft, relativeTo } from "../lib/paths.js";
 import { carriedFrom, NOTES, privateNow, refusedPrivate } from "../lib/private.js";
 import {
+  alsoReads,
   entriesIn,
   ownerOf,
   PROJECTIONS,
@@ -166,6 +167,10 @@ export function register(on, _options) {
     wired: false,
     installed: false,
     told: "",
+    // [[spec/funnel/a-paragraph-has-a-schema]]
+    projections: [],
+    sources: [],
+    restale: "",
     logbook,
   };
 
@@ -212,8 +217,11 @@ export function register(on, _options) {
 
     // [[spec/design_output/projection#who-projects-and-when]]
     projections = entriesIn(await inherited($, cage.roots, PROJECTIONS));
+    // [[spec/funnel/a-paragraph-has-a-schema]]
+    cage.projections = projections;
     if (projections.length) {
       const drawn = await projectAll($, cage.roots, projections, settings);
+      cage.sources = drawn.sources;
       await logbook.say("info", "project", `${drawn.wrote} file(s) written`, {
         ms: drawn.ms,
         detail: `${projections.length} projection(s), ${drawn.size} target(s)`,
@@ -305,11 +313,22 @@ export function register(on, _options) {
     owesCanary = canaries.owes;
 
     const warning = [answers.warn, canaries.warn].filter(Boolean).join("\n\n");
-    const onward = warning
-      ? async (given) => withContext(await next(given), warning)
+    const writing = asWrite(e);
+
+    // [[spec/funnel/a-paragraph-has-a-schema]]
+    const feeds = writing ? feedsAProjection(cage.sources, relativeTo(root, writing.path)) : "";
+    const after = feeds
+      ? async (given) => {
+          const said = await next(given);
+          cage.restale = feeds;
+          return said;
+        }
       : next;
 
-    const writing = asWrite(e);
+    const onward = warning
+      ? async (given) => withContext(await after(given), warning)
+      : after;
+
     if (!writing) return onward(e);
 
     // [[spec/design_output/projection#the-write-door-refuses-one]]
@@ -950,6 +969,17 @@ async function loadCage($, cage) {
 
 // [[spec/design_output/level0#god-mode]]
 async function ensureCage($, cage) {
+  // [[spec/funnel/a-paragraph-has-a-schema]]
+  if (cage.health.ok && cage.restale) {
+    const said = cage.restale;
+    cage.restale = "";
+    const drawn = await projectAll($, cage.roots, cage.projections ?? [], cage.settings);
+    cage.sources = drawn.sources.length ? drawn.sources : cage.sources;
+    await cage.logbook.say("info", "project", `${said} moved, so ${drawn.wrote} file(s) follow`, {
+      file: said,
+      ms: drawn.ms,
+    });
+  }
   if (cage.health.ok) return cage.health;
 
   try {
@@ -1021,10 +1051,19 @@ async function rootHere($) {
   }
 }
 
+// A write to a source makes the rule it feeds stale. [[spec/funnel/a-paragraph-has-a-schema]]
+function feedsAProjection(sources, where) {
+  const said = String(where ?? "")
+    .split("\\")
+    .join("/");
+  return said && (sources ?? []).includes(said) ? said : "";
+}
+
 // [[spec/design_output/projection#who-projects-and-when]]
 async function projectAll($, roots, entries, settings) {
   const began = Date.now();
   const refused = [];
+  const sources = new Set();
   let size = 0;
   let wrote = 0;
 
@@ -1033,6 +1072,11 @@ async function projectAll($, roots, entries, settings) {
     for (const path of readsOf(entry)) {
       texts.set(path, await projected($, roots, path, settings));
     }
+    // [[spec/funnel/a-paragraph-has-a-schema]]
+    for (const path of alsoReads(entry, texts)) {
+      texts.set(path, await projected($, roots, path, settings));
+    }
+    for (const path of texts.keys()) sources.add(path);
     for (const [path, text] of writesOf(entry, texts)) {
       size++;
       if ((await readIf($, path)) === text) continue;
@@ -1044,7 +1088,7 @@ async function projectAll($, roots, entries, settings) {
       }
     }
   }
-  return { ms: Date.now() - began, size, wrote, refused };
+  return { ms: Date.now() - began, size, wrote, refused, sources: [...sources] };
 }
 
 // [[spec/design_output/vehicle#the-work-root-inherits]]
