@@ -8,6 +8,7 @@ import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
+import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 import { fieldOf, recordIn, withEntry, withField } from "../../src/scripts/group.js";
 import {
   chapterOf,
@@ -1016,6 +1017,11 @@ test("a leaf inherits by, on_fail and the checklist from its phases, and reads a
   assert.equal(leaf.by, "agent");
   assert.equal(leaf.on_fail, "implement");
   assert.deepEqual(leaf.checklist, ["a", "b"]);
+  const quoted = leafOf(
+    readNote('---\nsteps:\n  - name: do\n    checklist: ["one, and two", "three"]\n---\n').front.said,
+    "do",
+  );
+  assert.deepEqual(quoted.checklist, ["one, and two", "three"], "a comma inside quotes stays");
   assert.deepEqual(leaf.reads, ["x", "y"]);
   assert.equal(leaf.at, 0);
   assert.equal(leafOf(front, "implement"), null, "a phase is no leaf");

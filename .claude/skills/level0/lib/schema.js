@@ -119,9 +119,7 @@ function scalar(said) {
   const flat = unquote(said);
   if (LINK.test(flat)) return flat;
   if (flat.startsWith("[") && flat.endsWith("]")) {
-    return flat
-      .slice(1, -1)
-      .split(",")
+    return flowItems(flat.slice(1, -1))
       .map((one) => unquote(one.trim()))
       .filter((one) => one !== "");
   }
@@ -129,6 +127,33 @@ function scalar(said) {
   if (flat === "false") return false;
   if (/^-?\d+$/.test(flat)) return Number(flat);
   return flat;
+}
+
+// [[spec/design_output/pull#the-fields-hold-their-forms]]
+function flowItems(inside) {
+  const out = [];
+  let held = "";
+  let quote = "";
+  for (const char of inside) {
+    if (quote) {
+      held += char;
+      if (char === quote) quote = "";
+      continue;
+    }
+    if (char === '"' || char === "'") {
+      quote = char;
+      held += char;
+      continue;
+    }
+    if (char === ",") {
+      out.push(held);
+      held = "";
+      continue;
+    }
+    held += char;
+  }
+  out.push(held);
+  return out;
 }
 
 function unquote(said) {
