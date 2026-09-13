@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: now
 steps:
   - name: design
@@ -89,6 +89,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-bridgehead-imports-its-vehicle
+step: design/review
+record:
+  - step: design/draft
+    hand: box d42624a67d18a8
+    hash_before: 8284697262ac902b1d5a5fcf477be632e0b81c12
+    hash_after: 8284697262ac902b1d5a5fcf477be632e0b81c12
 ---
 
 # Ask
@@ -116,8 +122,9 @@ Read [[spec/design_input/a-stub-takes-its-vehicle]] first, the chapters The stub
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The probe stands under test/fixtures/bridgehead, a plugin of its own. Its one module reads the vehicle file at session start, imports the module it names, and hands every event on. Four import shapes go through `claude plugin validate` and one headless turn each. A chapter of the design output names the one that holds. For details, see [[spec/design_output/level0#a-bridgehead-imports-a-copy]].
 
 ## review
 

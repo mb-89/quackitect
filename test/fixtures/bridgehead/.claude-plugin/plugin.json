@@ -1,0 +1,8 @@
+{
+  "name": "bridgehead",
+  "description": "The bridgehead: a plugin of its own in a stub. It reads the vehicle at session start, imports the vehicle's hooks module, and hands every event to it.",
+  "version": "0.1.0",
+  "author": {
+    "name": "quackitect"
+  }
+}
