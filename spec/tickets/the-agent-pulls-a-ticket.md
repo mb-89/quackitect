@@ -320,4 +320,4 @@ The thoughts weigh the child's route against this box before a line of code stan
 
 This is the first group a box works under the pull, so its own record is the first run of the group route as data. The child ticket carries the brief's tables, because the brief is where the owner wrote them.
 
-The swap `implement` to `build` leaves the vocabulary on this branch. The standard route names a step `implement`, the engine renders that name as a chapter heading, and a swap on the word turns every standard ticket red. The word belongs to the process file, and a rename there is the owner's call.
+The swap `implement` to `build` leaves the vocabulary on this branch. The standard route names a step `implement`, and the engine renders that name as a chapter heading. So a swap on the word turns every standard ticket red. The word belongs to the process file, and a rename there is the owner's call.
