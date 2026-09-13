@@ -37,7 +37,7 @@ export const TODO = "todo";
 export const HELD = "held";
 
 // [[spec/design_output/work#the-routine-a-verb-names]]
-export const ROUTINE = { name: "do_work", id: "trig_01KCYQ2oxi7rnCuBZYJsnLnQ" };
+export const ROUTINE = { name: "do_work", id: "trig_01EenLoDAB3NdmANnRM9mSh6" };
 export const DONE = "done";
 export const MERGED = "merged";
 

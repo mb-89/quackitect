@@ -364,7 +364,7 @@ push and takes the next one.
 # The routine a verb names
 
 One routine already works this queue. `do_work` holds the id
-`trig_01KCYQ2oxi7rnCuBZYJsnLnQ` and carries one prompt: `./RUNME.sh branch take`.
+`trig_01EenLoDAB3NdmANnRM9mSh6` and carries one prompt: `./RUNME.sh branch take`.
 
 Firing it belongs to the session, because `RemoteTrigger` is a tool the client
 holds and the token stays inside that process. A shell verb reaches neither, so
