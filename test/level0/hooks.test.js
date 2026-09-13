@@ -1813,7 +1813,7 @@ test("a write to the list re-projects, so the next write reads the new rule", as
   });
   assert.equal(wrote.deny, undefined, "the list is a source, so the door passes the write");
 
-  // The harness writes what the door passes, the way the client does.
+  // The harness writes what the door passes. [[spec/funnel/a-paragraph-has-a-schema]]
   it.files.set(WORDS, grown);
   assert.equal(it.files.get(RULE), before, "the rule waits for the next call");
 

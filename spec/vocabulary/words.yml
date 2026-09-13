@@ -2259,6 +2259,7 @@ words:
   - {word: plan, from: tree}
   - {word: planning, from: tree}
   - {word: plumbing, from: tree}
+  - {word: plural, from: session, meaning: the form of a word naming more than one}
   - {word: pointer, from: tree}
   - {word: poll, from: tree}
   - {word: polling, from: tree}
@@ -2496,6 +2497,7 @@ words:
   - {word: summary, from: tree}
   - {word: supplier, from: tree}
   - {word: supported, from: tree}
+  - {word: surprise, from: session, meaning: a thing the work answers that nobody expects}
   - {word: survived, from: tree}
   - {word: surviving, from: tree}
   - {word: swept, from: tree}

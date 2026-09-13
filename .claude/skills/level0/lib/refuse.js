@@ -16,8 +16,7 @@ export function refusal(where, found) {
   ].join("\n");
 }
 
-// A word the list leaves out has two roads, and the refusal names both.
-// [[spec/funnel/a-paragraph-has-a-schema]]
+// A word off the list has two roads, and the refusal names both. [[spec/funnel/a-paragraph-has-a-schema]]
 export function grown(found) {
   const words = outsideIn(found);
   if (!words.length) return "";
