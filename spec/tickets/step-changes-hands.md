@@ -123,18 +123,20 @@ group: a-step-changes-hands
 
 # Ask
 
-The pull learns who holds a step: the hand carries the box, the session and the agent, a helper carries the session's hand, a person's step refuses an agent, and an escalation inserts a person step through a verb. The chapters below say where it stands, what waits and the rules to hold.
+The pull learns who holds a step:
+
+- the hand carries the box, the session and the agent
+- a helper carries the session's hand
+- a person's step refuses an agent
+- an escalation inserts a person step through a verb
+
+The chapters below say where it stands, what waits and the rules to hold.
 
 **Where it stands.**
 
-The design input `spec/design_input/the-agent-pulls-tickets.md` says what the
-owner asks for, and the page beside it draws it. Read the note first. It
-stands on the branch `claude/relaxed-knuth-f0uk4d` until the owner merges it,
-so take that branch in where `work sync` leaves it absent.
-
-The pull lands before this branch, and this one teaches it who holds a step.
-Its chapters are Hands, Escalation is a step, and Children and private
-tickets.
+- the design input [[spec/design_input/the-agent-pulls-tickets]] says what the owner asks for, and the page beside it draws it
+- the pull lands before this branch, and this one teaches it who holds a step
+- the chapters to read are Hands, Escalation is a step, and Children and private tickets
 
 | what stands today | where |
 |---|---|
@@ -304,11 +306,9 @@ fail
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+The box meets four defects on the way to the person step, each for the implement leaf:
 
-The box met four defects on the way to the person step, each for the implement leaf:
-
-- the wrapper judges the ticket on disk before the shell writes the `--fields` payload, so the judge reads an empty chapter
+- the wrapper judges the ticket on disk before the shell writes the fields, so the judge reads an empty chapter
 - the wrapper reads a spawn answer at the first line alone, and misses the spawn that follows a pass
 - the judge refuses a list of links and passes one bare link, so the approach field holds one link
-- the second review failed on one nit, and `work.failsBeforePerson` at 2 parked the ticket, so a person answers `design/person-1`
+- the second review fails on one small finding, and the fail cap parks the ticket at `design/person-1` for a person

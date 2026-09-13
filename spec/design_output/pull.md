@@ -98,7 +98,7 @@ holds no open note.
 | `by: helper` | nobody yet, until the spawn lands |
 | `by: retro` | a hand while its group stands at a retro step, or a note with the tag |
 | `not: draft` | a hand other than the one the record names on `draft`, and every leaf under a phase |
-| `not: design`, with `person-1` inserted under it | the hands the record names on the leaves the mint wrote, and the person step counts for no `not` |
+| `not: design`, with `person-1` inserted under it | the hands the record names on the leaves the mint writes, and the person step counts for no `not` |
 
 An agent is a hand whose environment names a harness. The command line reads
 that off `CLAUDECODE`, `CLAUDE_CODE_REMOTE` or `SE_CLOUD`. A verdict comes from
@@ -106,9 +106,9 @@ a hand that leaves the tip where it stands. So a hand-back on a verdict leaf
 refuses where the tip differs from the take.
 
 `work.personSigns` is the stronger door on a person's hand. Switched on, a
-person's hand-back on a tracked ticket meets a tip whose signature reads
-good or untrusted-good under `git log --format=%G?`, or the pull refuses it
-and names the tip. An agent's hand-back and a private ticket meet no
+person's hand-back on a tracked ticket meets a signed tip. The signature
+reads good or untrusted-good under `git log --format=%G?`, or the pull
+refuses the hand-back and names the tip. An agent's hand-back and a private ticket meet no
 signature check.
 
 ## The hand and the hold
@@ -127,7 +127,7 @@ into one hand.
 | the box file alone, off a harness | `person <git author name>` |
 
 A helper the session spawns runs on the same box under the same session file,
-so it carries the session's hand, and a `not` that excludes the session
+so it carries the session's hand. A `not` that excludes the session
 excludes the helper. The hold slugs the hand into its file name.
 
 The hold stands at `.se/hold/<hand>.json`. It names the ticket, its path, the
@@ -166,8 +166,8 @@ out. The record names the helper on the leaf, so `not` reads the two hands
 apart.
 
 The wrapper tags every other spawn. Its `agent.spawn` hook reads the session
-file and puts one line at the head of the prompt: this helper is the
-session's own hand, and it pulls under no `--as`. A spawn the wrapper makes
+file and puts one line at the head of the prompt. The line says this helper
+is the session's own hand, and it pulls under no `--as`. A spawn the wrapper makes
 itself carries no tag, because that hand is its own. So the two kinds of
 helper read apart in the prompt and in the record.
 
@@ -208,9 +208,9 @@ because the plugin validator refuses an import that leaves it. So the shell
 hands it the material: `branch pull <ticket> --judge` prints the leaf's
 evidence and the rules its reads name, as JSON. The wrapper asks the model
 once over that, and a `breaks` answers `refused` before the shell runs. The
-judge run carries the `--fields` payload the hand-back carries, and the
-material lays the payload over the ticket before it reads the evidence, so
-the judge reads what the hand wrote and never the empty chapter.
+judge run carries the `--fields` payload of the hand-back. The material lays
+the payload over the ticket before it reads the evidence, so the judge reads
+what the hand writes.
 
 ## The fields hold their forms
 
@@ -282,19 +282,20 @@ before the target.
 `withPersonStep` puts a step named `person-<n>` before the target, `by:
 person`, `to: engine`, with the question under `asks` and one `answer`
 field. It points `step` at the inserted row and leaves the state at `open`,
-so the ticket is a person's to pull. The engine reads the answer, so the
-slot check finds a reader. A
+so the ticket is a person's to pull.
+
+The engine reads the answer, so the slot check finds a reader. A
 hand-out repairs a standing person step that names no reader. The route
 re-renders through the reader the mint uses. So every chapter the hand fills
 stays, and the new one takes its comment. A ticket carrying
 `work.stepsBeforeSplit` person steps refuses another, and asks for a split.
 
 A hand that cannot go on without a person runs `branch escalate <question>`,
-and `--options a,b,c` makes the answer a choice. The verb reads the hold,
-puts the person step before the held leaf through the same function, drops
-the hold, commits by ticket and step, pushes, and hands out the next ticket.
-With no hold standing it refuses and names the pull. So the three inserters,
-the hand, the refusal count and the fail count, share one mechanism.
+and `--options a,b,c` makes the answer a choice. The verb reads the hold
+and puts the person step before the held leaf through the same function.
+Then it drops the hold, commits by ticket and step, pushes, and hands out
+the next ticket. With no hold standing it refuses and names the pull. So the
+hand, the refusal count and the fail count insert through one mechanism.
 
 # A leaf comes back
 

@@ -115,7 +115,7 @@ step: children
 
 # Ask
 
-The pull learns who holds a step. The group holds one child, [[spec/tickets/step-changes-hands]], whose ask carries the pieces: the hand id, the helper's tag, the person's hand, the escalation verb and the group that leaves at `todo`. The design input [[spec/design_input/the-agent-pulls-tickets]] draws it under Hands, Escalation is a step, and Children and private tickets.
+The pull learns who holds a step. The group holds one child, [[spec/tickets/step-changes-hands]]. Its ask carries the pieces: the hand id, the helper's tag, the person's hand, the escalation verb and the group that leaves at `todo`. The design input [[spec/design_input/the-agent-pulls-tickets]] draws it under Hands, Escalation is a step, and Children and private tickets.
 
 # sync
 
@@ -258,6 +258,4 @@ The judge is the one door with no finding under it. A refusal that names no rule
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
-
-The judge refuses the one-line command under retro/notes against the working rules, twice in a row, and those rules govern a session's conduct and read nothing in a command. The hand-back takes the shell road there, which the design names as a person's road, and the judge reads it at the next agent pull.
+The judge refuses the one-line command under retro/notes against the working rules, twice in a row. Those rules govern a session's conduct and read nothing in a command. The hand-back takes the shell road there, which the design names as a person's road. The judge reads it at the next agent pull.
