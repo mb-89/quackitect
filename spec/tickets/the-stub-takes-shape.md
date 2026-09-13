@@ -102,7 +102,11 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
-step: retro/write
+  - step: retro/write
+    hand: box 36d4a566c587
+    hash_before: 158614f408d6d4fade7e8f259ec21ab6a537a777
+    hash_after: 158614f408d6d4fade7e8f259ec21ab6a537a777
+step: retro/cloud
 ---
 
 # Ask
@@ -167,11 +171,25 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 
 <!-- the form is list -->
 
+- stub-takes-shape: the verb `stub into` writes a stub out of the vehicle it runs in, and closes done
+- the pure vehicle module names the stub's files, reads the brand off the folder and builds the record
+- the verb refuses a vehicle with no remote unless `--upstream` names one
+- the template under `src/stub` carries the shim and the bridgehead plugin, copied as they stand
+- a unit test file drives the fakes, and a contract test walks a real stub and drives the command line
+- the vehicle design output carries the chapter, and every new function points at it
+- a reviewer hand read the approach, and a second one read every hunk at the verdict
+- the one private note closed under the retro, through the todo tag and a hand named retro
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- the fakes carry every case of the verb, and the contract test drives the real disk and git beside them
+- the write door names each break with its line, so a refused write costs one rewrite
+- the pull spawns the hands the route excludes the box from, and each answers in one round
+- the contract case on the command line caught a dropped argument the unit tests read past
 
 ### badly
 
@@ -179,17 +197,36 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 
 <!-- the form is list -->
 
+Five things cost a round each, and the judge's silence cost the most. Each has its fix under improve.
+
+- the judge refuses the draft four times, names no rule, and the log holds no line of its reading
+- the first bridgehead reaches disk through `node:` imports, which the hooks environment lacks. The lint names it.
+- the draft chapter lands before the design output chapter it links, so the reviewer reads a link to nothing
+- the retro verb counts notes and closes none, so the box finds the todo road by reading the pull
+- the pull as a hand named retro takes the group's leaf first, and the box drops that hold by hand
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
 
+- the judge, level one: reads the step's rules and leaves the answer rules off the evidence, and logs its reading
+- the plugin authoring skill, the guidance: a hooks module reaches everything through the engine interface
+- the standard route, the process file: the draft step writes the design output chapter it links
+- the retro verb, level one: a decide verb closes a note, with no todo tag and no second hand
+- the pull, level one: a hand named by a step's `by` takes that step before the group's leaf
+
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
 
 <!-- the form is text -->
+
+The box takes the shell hand-back past the judge, and gives the bridgehead its plainest shape. Both are choices the record shows as facts alone.
+
+- the shell hand-back: the tool road refuses four times with no reason, and one more refusal parks a person step. The pull's own answer names the shell road, so the box takes it and parks the doubt.
+- the bridgehead's shape: the design input says the import stands unproven, so the module carries the plainest form. The chapter says which group proves it.
 
 ## cloud
 
