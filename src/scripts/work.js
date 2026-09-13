@@ -915,7 +915,11 @@ function adopt(it, name, argv) {
   const schema = readYaml(it.disk.read(it.join(it.root, TICKET_SCHEMA)));
   const brief = it.disk.read(at);
   const wrote = [
-    minted(it, schema, GROUP, ticketAt(group), { Ask: askOf(brief) || headingOf(brief) }),
+    minted(it, schema, GROUP, ticketAt(group), {
+      Ask: askOf(brief) || headingOf(brief),
+      urgency: urgencyOf(brief),
+      ...(dependsOn(brief).length ? { depends_on: dependsOn(brief) } : {}),
+    }),
     minted(it, schema, "standard", ticketAt(child), { Ask: bodyOf(brief), group }),
   ];
   if (wrote.some((one) => !one)) return 1;
@@ -942,7 +946,7 @@ function minted(it, schema, process, at, fields) {
   it.disk.makeDir(it.join(it.root, TICKETS));
   it.disk.write(
     it.join(it.root, at),
-    mintNote(schema, { ...fields, process, steps: route.steps, urgency: "soon" }),
+    mintNote(schema, { urgency: "soon", ...fields, process, steps: route.steps }),
   );
   return true;
 }
