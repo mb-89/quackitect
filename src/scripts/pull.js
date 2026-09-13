@@ -12,6 +12,7 @@ import {
   readNote,
   reRouted,
 } from "../../.claude/skills/level0/lib/schema.js";
+import { CONFIG as VALE_CONFIG, faultIn, fromJson } from "../../.claude/skills/level0/lib/vale.js";
 import { COPY } from "../../.claude/skills/level0/lib/vehicle.js";
 import {
   CLOSED,
@@ -210,6 +211,8 @@ export function pull(it, argv) {
   const held = holdOf(it, hand);
 
   if (rest.includes("--judge")) return judgeMaterial(it, held, name);
+  if (verdict.said === "back")
+    return takeBack(it, { hand, branch, group, held }, name, verdict.reason);
   if (verdict.said || name)
     return handBack(it, { hand, branch, group, held }, name, verdict);
   if (held) {
@@ -248,15 +251,14 @@ function judgeMaterial(it, held, name) {
 
 // [[spec/design_output/pull#the-hand-out]]
 function verdictFlag(rest) {
-  const said = rest.find((one) => /^--(pass|fail|became)(=|$)/.test(one));
+  const said = rest.find((one) => /^--(pass|fail|became|back)(=|$)/.test(one));
   if (!said) return { said: "" };
-  const [, word, eq, inline] = /^--(pass|fail|became)(=)?(.*)$/.exec(said);
+  const [, word, eq, inline] = /^--(pass|fail|became|back)(=)?(.*)$/.exec(said);
   const after = eq ? inline : (rest[rest.indexOf(said) + 1] ?? "");
   if (word === "pass") return { said: "pass" };
   if (!after || after.startsWith("--")) {
-    return {
-      why: `--${word} takes ${word === "fail" ? "a reason" : "the successor"}: --${word} "..."`,
-    };
+    const takes = { fail: "a reason", became: "the successor", back: "the leaf" }[word];
+    return { why: `--${word} takes ${takes}: --${word} "..."` };
   }
   return { said: word, reason: after };
 }
@@ -653,6 +655,53 @@ function guidanceText(it, path) {
 }
 
 
+// [[spec/design_output/pull#a-leaf-comes-back]]
+function takeBack(it, who, name, path) {
+  if (who.held) {
+    say(REFUSED, [`${who.held.ticket} stands in your hand at ${who.held.step}. Hand it back first.`]);
+    return 1;
+  }
+  if (!name) {
+    say(REFUSED, ["--back names the ticket and the leaf: branch pull <ticket> --back <leaf>"]);
+    return 1;
+  }
+  if (!fetched(it, who.branch)) return 1;
+  const one = ticketsHere(it).find((held) => held.name === name);
+  if (!one) {
+    say(REFUSED, [`${name} stands nowhere under ${TICKETS} or ${NOTES}.`]);
+    return 1;
+  }
+  const leaf = leafOf(one.front, path);
+  if (!leaf) {
+    say(REFUSED, [`${path} names no leaf of ${name}.`]);
+    return 1;
+  }
+  const wrote = entriesOf(one.front)
+    .filter((entry) => String(entry.step) === path && !entry.skipped)
+    .at(-1);
+  if (!wrote || String(wrote.hand ?? "") !== who.hand) {
+    say(REFUSED, [`${path} carries no hand-back by ${who.hand}, so it is another hand's or nobody's.`]);
+    return 1;
+  }
+  const tip = one.private ? "" : tipOf(it);
+  const text = withEntry(one.text, {
+    step: path,
+    hand: who.hand,
+    hash_before: tip,
+    hash_after: tip,
+    returns: returnsOf(one.front, path) + 1,
+    why: "the hand takes it back",
+  });
+  one.text = withField(withField(text, "step", path), "state", OPEN);
+  landed(it, one, [`${who.hand} takes ${path} back`]);
+  if (!one.private && !pushed(it, who.branch)) {
+    say(REFUSED, [`${who.branch} moves under this take-back, and one rebase fell short. Pull again.`]);
+    return 1;
+  }
+  say(WORK, [`${name} stands at ${path} again, and the next pull hands it out.`]);
+  return handOut(it, who);
+}
+
 // [[spec/design_output/pull#the-hand-back]]
 function handBack(it, who, name, verdict) {
   const held = who.held;
@@ -748,6 +797,7 @@ function handBack(it, who, name, verdict) {
   }
   const chapter = chapterOf(one.text, leaf.path);
   found.push(...formFaults(it, one, leaf, chapter, held));
+  if (!found.length) found.push(...voiceFaults(it, one, leaf, chapter));
   const answered = found.length ? [] : commandsRun(it, leaf, chapter, found);
   found.push(...handFaults(it, one, leaf, who.hand, held));
 
@@ -927,6 +977,29 @@ export function verdictIn(rows) {
     .map((row) => row.replace(/^[-*]\s+/, "").trim())
     .filter(Boolean);
   return { said: word, reason: rest.join("; ") };
+}
+
+// [[spec/design_output/pull#the-voice-reads-the-evidence]]
+function voiceFaults(it, one, leaf, chapter) {
+  if (!it.vale) return [];
+  const rows = [...chapter.own, ...[...chapter.fields].flatMap(([, held]) => ["", ...held])];
+  const text = rows.join("\n");
+  if (!text.trim()) return [];
+  let ran;
+  try {
+    ran = it.proc.run(
+      [it.vale, `--config=${VALE_CONFIG}`, `--path=${one.path}`, "--output=JSON", "--no-exit"],
+      { stdin: text, cwd: it.root },
+    );
+  } catch {
+    return [];
+  }
+  if (faultIn(ran.stdout)) return [];
+  return fromJson(ran.stdout)
+    .filter((fault) => fault.severity === "error")
+    .map(
+    (fault) => `${leaf.path} breaks ${fault.rule} at line ${fault.line} of its chapter: ${fault.message}`,
+  );
 }
 
 // [[spec/design_output/pull#the-commands-answer]]

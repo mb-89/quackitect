@@ -37,7 +37,8 @@ the group's leaves around its tickets.
 ## The pull fetches first
 
 Every hand-out and hand-back fetches the branch. Where origin holds commits
-this box lacks, the pull fast-forwards, and it refuses where the two diverge.
+this box lacks, the pull fast-forwards. It refuses where each side holds a
+commit the other lacks.
 
 ## What a hand-out reads
 
@@ -56,7 +57,7 @@ before the group's own leaves.
 
 ## Children before their group
 
-`childrenOf` walks `group` transitively, so a group inside a group runs on the
+`childrenOf` walks `group` up the chain, so a group inside a group runs on the
 outer branch. A step under `by: children` belongs to nobody, and the pull
 derives it at every hand-out:
 
@@ -168,6 +169,12 @@ nests, and each field is the heading one level under it. A comment, an
 The schema renders `checked` as an optional chapter under every leaf whose
 chain carries a checklist, and the ticket door lets the hand write it.
 
+## The voice reads the evidence
+
+The hand-back runs the voice rules over the leaf's chapter where vale stands
+on the box, the way the write door does. An error is a finding, so the sweep
+names nothing later that the hand-back let through.
+
 ## The commands answer
 
 A command field runs, and its exit and last line land in the record under
@@ -196,8 +203,8 @@ one level deeper, which is how `answered` lands.
 ## The rejected push
 
 A push origin refuses fetches the branch, rebases once, and pushes again. A
-rebase that fails aborts, and the pull answers `refused` with the branch
-moving. The hold stays, so the next hand-back finds the record with its
+rebase that fails stops and puts the tree back, and the pull answers
+`refused` with the branch moving. The hold stays, so the next hand-back finds the record with its
 answer and pushes again.
 
 # The fail
@@ -210,11 +217,19 @@ before the target.
 
 ## A person step goes in
 
-`withPersonStep` splices a step named `person-<n>` before the target, `by:
+`withPersonStep` puts a step named `person-<n>` before the target, `by:
 person`, with the question under `asks` and one `answer` field. The route
 re-renders through the reader the mint uses. So every chapter the hand fills
 stays, and the new one takes its comment. A ticket carrying
 `work.stepsBeforeSplit` person steps refuses another, and asks for a split.
+
+# A leaf comes back
+
+`branch pull <ticket> --back <leaf>` puts a leaf back into the hand that
+holds its record entry. The record names this hand on that leaf, or the pull
+refuses, so nobody takes another hand's work back. The pull writes a return with the
+reason, sets `step` to the leaf, commits, pushes and hands the leaf out again.
+So a hand fixes what the sweep names later through the one road there is.
 
 # Became
 

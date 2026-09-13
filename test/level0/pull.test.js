@@ -513,6 +513,52 @@ test("a hand-back with a field empty answers refused, keeps the hold, and counts
 });
 
 // [[spec/design_output/pull#the-pass]]
+test("the voice rules read the evidence at the hand-back, and an error refuses it", () => {
+  const vale = "/tree/.se/bin/vale";
+  const long = JSON.stringify({
+    "stdin.md": [{ Check: "VoiceParagraph.Sentence", Line: 2, Span: [1, 3], Message: "A sentence holds 25 words.", Severity: "error" }],
+  });
+  const { it, disk } = doors(standing(filled(CHILD(), "### approach", "A long approach.")), {
+    [`${vale} --config=.vale.ini --path=spec/tickets/a-child.md --output=JSON --no-exit`]: { stdout: long },
+  });
+  it.vale = vale;
+  heard(() => work(ROOT, ["pull"], it));
+
+  const { code, said } = heard(() => work(ROOT, ["pull", "a-child", "--pass"], it));
+
+  assert.equal(code, 1);
+  assert.match(said, /design\/draft breaks Sentence at line 2 of its chapter: A sentence holds 25 words\./);
+  assert.equal(disk.exists(HOLD), true);
+});
+
+// [[spec/design_output/pull#a-leaf-comes-back]]
+test("a hand takes a leaf it passed back, and another hand's leaf stays", () => {
+  const passed = withEntry(CHILD("open", "design/review"), {
+    step: "design/draft",
+    hand: HAND,
+    hash_before: SHA,
+    hash_after: SHA,
+  });
+  const { it, disk, outside } = doors(standing(passed, withField(GROUP_NOTE, "state", "closed")));
+
+  const { code, said } = heard(() => work(ROOT, ["pull", "a-child", "--back", "design/draft"], it));
+
+  assert.equal(code, 0);
+  const now = disk.read(at("spec/tickets/a-child.md"));
+  assert.equal(fieldOf(now, "step"), "design/draft");
+  assert.equal(recordIn(now).at(-1).returns, 1);
+  assert.equal(recordIn(now).at(-1).why, "the hand takes it back");
+  assert.ok(ranGit(outside).includes(`git push origin ${BRANCH}`));
+  assert.match(said, /a-child stands at design\/draft again/);
+  assert.match(said, /^work {2}a-child at design\/draft/m, "the next pull hands it out at once");
+
+  const other = doors(standing(passed.replace(`hand: ${HAND}`, "hand: box other")));
+  const refused = heard(() => work(ROOT, ["pull", "a-child", "--back", "design/draft"], other.it));
+  assert.equal(refused.code, 1);
+  assert.match(refused.said, /carries no hand-back by box d462e994b4cef/);
+});
+
+// [[spec/design_output/pull#the-pass]]
 test("a pass writes the record, moves the step, commits by ticket and step, pushes, and hands out the next", () => {
   const { it, disk, outside } = doors(
     standing(CHILD(), withField(GROUP_NOTE, "state", "closed")),

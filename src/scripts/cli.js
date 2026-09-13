@@ -135,6 +135,8 @@ const outside = it.proc;
 
 const known = readTools(files, root);
 const bin = whereIs(files, root, "vale", known);
+// [[spec/design_output/pull#the-voice-reads-the-evidence]]
+it.vale = bin;
 const go = whereIs(files, root, "go", known);
 const LOG = join(root, ".se", "log");
 const STYLES = join(root, "spec", "config", "styles", "VoiceVale");
