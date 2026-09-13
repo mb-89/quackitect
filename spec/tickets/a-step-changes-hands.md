@@ -106,7 +106,11 @@ record:
     hand: box b71bba5a7b0c
     hash_before: bd762fe7dd88a63e0a36c0dda34de5c7c5d1eb7e
     hash_after: bd762fe7dd88a63e0a36c0dda34de5c7c5d1eb7e
-step: retro/cloud
+  - step: retro/cloud
+    hand: box b71bba5a7b0c
+    hash_before: 98e847c28ede0c4a15a3c6901b7a6c959d20634e
+    hash_after: 98e847c28ede0c4a15a3c6901b7a6c959d20634e
+step: children
 ---
 
 # Ask
@@ -227,17 +231,30 @@ The judge is the one door with no finding under it. A refusal that names no rule
 
 <!-- the form is list -->
 
+- the harness types under the types folder, at the plugin skill's read, so the hook's session id stays unread
+- no host the proxy refuses, no right the platform refuses, and no install
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- the canary hook refuses every tool call until the answer carries its line, at the first turn's end
+- the write door refuses a past tense in a commit message, at the commit of the pull note
+- the judge refuses five hand-backs and names no rule, at the draft leaf
+- the fail cap parks the child at design/person-1 after two reviews
+- no conflict at sync, and no test fails on the box alone
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- design/person-1 on the child waits for a person, and the design already answers the finding it asks about
+- no ticket minted with no group
+- the group ticket is the handover, and it says the child's implement leaves wait on the person's answer
 
 # Discussion
 
