@@ -88,12 +88,18 @@ steps:
         says: pass or fail, findings one a line
 process: [[standard]]
 group: a-step-changes-hands
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box b71bba5a7b0c
     hash_before: 7cc6056895245ab2e0dc5945cfd609d6d51dfaae
     hash_after: 7cc6056895245ab2e0dc5945cfd609d6d51dfaae
+  - step: design/review
+    hand: box b71bba5a7b0c · helper-2
+    hash_before: 666e313b04a7c7916fc2f1cbee59d68fb20fecbc
+    hash_after: 666e313b04a7c7916fc2f1cbee59d68fb20fecbc
+    returns: 1
+    why: The ask rules that an inserted step counts for no `not`. The hand rule says where a `not` meets an inserted step.; The ask rules that the shell pull off a plugin parks the step for a person. A hand of its own says so.; The three answers table names three words, and A hand of its own adds two. One table lists all five.; The ask proves the person step by `step` pointing at the inserted row. A person step goes in says where `step` lands.
 ---
 
 # Ask
@@ -163,6 +169,12 @@ The approach stands in [[spec/design_output/pull#the-hand-and-the-hold]].
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+- The ask rules that an inserted step counts for no `not`. The hand rule says where a `not` meets an inserted step.
+- The ask rules that the shell pull off a plugin parks the step for a person. A hand of its own says so.
+- The three answers table names three words, and A hand of its own adds two. One table lists all five.
+- The ask proves the person step by `step` pointing at the inserted row. A person step goes in says where `step` lands.
 
 # implement
 
