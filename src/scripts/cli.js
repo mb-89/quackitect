@@ -146,6 +146,7 @@ const lsp = whereIs(files, root, "se-lsp", known);
 const GUIDANCE = join(root, "spec", "guidance");
 const DOORS = join(root, "src", "doors");
 const PLUGIN = join(".claude", "skills", "level0");
+const LEVEL1 = join(".claude", "skills", "level1");
 const CONTRACT = join(root, "test", "contract");
 const settings = it.config;
 const PARKED = ["{.se,node_modules,.git,.claude/types}/**", "**/_*"];
@@ -756,15 +757,18 @@ function drawing(argv) {
 
 // [[spec/design_output/level0#no-computed-engine-access]]
 function pluginHolds() {
-  const ran = validatePlugin(outside.run, PLUGIN, root);
-  if (ran.exitCode === 0) return 0;
-  if (!ran.stdout && !ran.stderr) {
-    console.log("claude stands nowhere, so the plugin goes unvalidated here.");
-    return 0;
+  for (const plugin of [PLUGIN, LEVEL1]) {
+    const ran = validatePlugin(outside.run, plugin, root);
+    if (ran.exitCode === 0) continue;
+    if (!ran.stdout && !ran.stderr) {
+      console.log("claude stands nowhere, so the plugin goes unvalidated here.");
+      return 0;
+    }
+    console.error(`${ran.stdout}${ran.stderr}`.trim());
+    console.error("The engine reads this module's source, and it refuses the above.");
+    return 1;
   }
-  console.error(`${ran.stdout}${ran.stderr}`.trim());
-  console.error("The engine reads this module's source, and it refuses the above.");
-  return 1;
+  return 0;
 }
 
 // [[spec/design_output/level0#god-mode]]
