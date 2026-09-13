@@ -1,7 +1,7 @@
 // The pull. One verb hands a hand the next leaf of a ticket, and the same verb
 // takes the leaf back with a verdict. The engine checks the hand-back, writes
 // the record, moves the step, commits, pushes, and hands out the next leaf.
-// [[spec/design_output/pull#the-three-answers]]
+// [[spec/design_output/pull#the-five-answers]]
 
 import { actionables } from "../../.claude/skills/level0/lib/guidance.js";
 import {
@@ -1605,7 +1605,7 @@ export function testSays(ran, files) {
   return `build, because ${count("fail")} test(s) fail outside an assertion: ${(line ?? "").trim().slice(0, 160)}`;
 }
 
-// [[spec/design_output/pull#the-three-answers]]
+// [[spec/design_output/pull#the-five-answers]]
 function say(word, rows) {
   const out = [word, ...rows.map((row) => `  ${row}`)];
   if (word === REFUSED) console.error(out.join("\n"));

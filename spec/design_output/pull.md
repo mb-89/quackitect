@@ -8,11 +8,11 @@ refines:
 
 `src/scripts/pull.js` holds the pull and the test verb, under `./RUNME.sh
 branch`. This note covers the hand-out, the hand-back with its five checks,
-and the three answers. It covers the record, the hold per hand, and what the
+and the five answers. It covers the record, the hold per hand, and what the
 stop hook reads off the hold. The verbs around the branch stand in
 [[spec/design_output/work]].
 
-# The three answers
+# The five answers
 
 `branch pull` answers one of five words, first on its own line, with the
 detail under it:

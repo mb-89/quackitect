@@ -305,3 +305,10 @@ fail
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The box met four defects on the way to the person step, each for the implement leaf:
+
+- the wrapper judges the ticket on disk before the shell writes the `--fields` payload, so the judge reads an empty chapter
+- the wrapper reads a spawn answer at the first line alone, and misses the spawn that follows a pass
+- the judge refuses a list of links and passes one bare link, so the approach field holds one link
+- the second review failed on one nit, and `work.failsBeforePerson` at 2 parked the ticket, so a person answers `design/person-1`
