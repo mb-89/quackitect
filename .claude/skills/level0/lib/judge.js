@@ -177,8 +177,7 @@ export function chaptersIn(text) {
     held.push(line);
   }
   close();
-  // [[spec/design_output/level0#a-judged-rule-cuts]] An edit hands the judge the
-  // tail of the chapter above it, and that tail carries no outcome of its own.
+  // [[spec/design_output/level0#a-judged-rule-cuts]]
   const kept = headed ? out.filter((one) => one.headed) : out;
   return kept
     .filter((one) => one.text.split(/\s+/).length >= 12)

@@ -186,7 +186,7 @@ func bodyFaults(note Note, spec *Doc, kind, where string) []Finding {
 	if spec.Has("headingLevel") {
 		level = asInt(spec.Get("headingLevel"))
 	}
-	wanted := asList(spec.Get("sections"))
+	wanted := chaptersWanted(asList(spec.Get("sections")), note.Front.Said)
 
 	standing := []standingAt{}
 	for i, one := range note.Sections {
@@ -234,6 +234,40 @@ func bodyFaults(note Note, spec *Doc, kind, where string) []Finding {
 	for _, held := range standing {
 		if rule, ours := named[held.Header]; ours {
 			out = append(out, sectionFaults(held, rule, note, where)...)
+		}
+	}
+	return out
+}
+
+// [[spec/design_output/schema#three-keywords-name-a-step]]
+func chaptersWanted(sections []any, front *Doc) []any {
+	out := []any{}
+	for _, one := range sections {
+		rule := asDoc(one)
+		list := ""
+		if rule != nil {
+			list = asString(rule.Get("x-one-per"))
+		}
+		if list == "" {
+			out = append(out, one)
+			continue
+		}
+		if front == nil {
+			continue
+		}
+		for _, step := range asList(front.Get(list)) {
+			said := asDoc(step)
+			if said == nil {
+				continue
+			}
+			header := strings.TrimSpace(asString(said.Get("name")))
+			if header == "" {
+				continue
+			}
+			chapter := newDoc()
+			chapter.Set("header", header)
+			chapter.Set("required", true)
+			out = append(out, chapter)
 		}
 	}
 	return out

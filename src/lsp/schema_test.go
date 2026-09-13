@@ -87,6 +87,42 @@ func TestAFieldTheSchemaNamesNotRefuses(t *testing.T) {
 	}
 }
 
+const ticketSchema = `kind: ticket
+frontmatter:
+  type: object
+  properties:
+    kind:
+      const: ticket
+      x-link: true
+    steps:
+      type: array
+body:
+  headingLevel: 1
+  order: strict
+  extraSections: false
+  sections:
+    - header: Ask
+      required: true
+    - x-one-per: steps
+    - header: Discussion
+      required: true
+      position: last
+`
+
+// [[spec/design_output/schema#three-keywords-name-a-step]]
+func TestAStepNamesItsOwnChapter(t *testing.T) {
+	schema := asDoc(readYaml(ticketSchema))
+	note := "---\nkind: [[ticket]]\nsteps:\n  - name: do\n    does: makes it\n---\n\n# Ask\n\nA thing.\n\n# do\n\nDone.\n\n# Discussion\n"
+	if found := checkNote(note, schema, "spec/tickets/a.md"); len(found) != 0 {
+		t.Fatalf("a chapter a step names answers %v", rules(found))
+	}
+
+	missing := strings.Replace(note, "# do\n\nDone.\n\n", "", 1)
+	if names(checkNote(missing, schema, "spec/tickets/a.md"), "Schema.do") != 1 {
+		t.Fatal("a step with no chapter answers nothing")
+	}
+}
+
 func TestALinkFieldNamesALink(t *testing.T) {
 	found := checkNote("---\nkind: handover\nstatus: todo\n---\n\n# Where it stands\n\n# What waits\n\n1. Go.\n",
 		schemaHere(t), "HANDOVER.md")
