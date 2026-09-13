@@ -15,7 +15,6 @@ import {
   opensATurn,
   questionsIn,
   reachesTheOwner,
-  SAYS,
   scoreOf,
   tableFaults,
   warns,
@@ -751,13 +750,14 @@ export function register(on, _options) {
 
   // [[spec/design_output/level0#a-step-carries-the-answer]]
   // [[spec/design_output/level0#a-step-streams]]
-  on("turn.step", async function* (_$, e, next) {
+  on("turn.step", async function* ($, e, next) {
     // [[spec/design_output/level0#a-helper-ends-no-turn]]
     if (e.agentId) return yield* next(e);
     const said = yield* next(e);
     inFlight = 0;
     if (!owed || (await settings.ask("answer.enabled")) === false) return said;
-    const text = String(e.answer ?? "").trim();
+    // The step's own text stands empty on the client of the day, so the transcript answers where the event holds nothing. [[spec/design_output/level0#a-step-carries-the-answer]]
+    const text = String(e.answer ?? "").trim() || (await spokenSince($, owed.seen));
     // [[spec/design_output/level0#a-prompt-mid-turn]]
     if (owed.skips > 0 || !text) {
       await logbook.say("info", "step", `step ${e.index} carries ${text.length} character(s)`, {
@@ -782,6 +782,10 @@ export function register(on, _options) {
     const said = await next(e);
     // [[spec/design_output/level0#a-helper-ends-no-turn]]
     if (e.agentId) return said;
+    // The answer to the owner's prompt lands in the log at the latest here, off the turn's own text. [[spec/design_output/log#an-answer-stands-in-chat]]
+    if (owed && e.reason === "answer" && String(e.answer ?? "").trim()) {
+      await logbook.say("info", "answer", String(e.answer), { text: String(e.answer), detail: owed.why });
+    }
     owed = null;
     inFlight = 0;
     // [[spec/design_output/log#a-reply-beside-its-prompt]]
@@ -1256,7 +1260,7 @@ async function readIf($, path) {
   }
 }
 
-// [[spec/design_output/level0#one-warning-then-a-refusal]]
+// [[spec/design_output/level0#a-warning-on-every-call]]
 async function answerDoor($, e, it) {
   const owed = it.owed;
   if (!owed || it.off) return { owed };
@@ -1275,18 +1279,21 @@ async function answerDoor($, e, it) {
   }
   if (!owed.stepped) return { owed };
 
-  if (!owed.warned) {
-    await it.logbook.say("warn", "gate", `warned ${e.tool} before an answer`, {
-      tool: e.tool,
-      detail: owed.why,
-    });
-    return { owed: { ...owed, warned: true }, warn: warns(owed.why) };
-  }
-  await it.logbook.say("warn", "gate", `refused ${e.tool} before an answer`, {
+  // The door warns on every call and refuses none, because a refused call fires no step and the text of that step reaches nothing. [[spec/design_output/level0#a-warning-on-every-call]]
+  await it.logbook.say("warn", "gate", `warned ${e.tool} before an answer`, {
     tool: e.tool,
     detail: owed.why,
   });
-  return { deny: `${owed.why}. ${SAYS}`, owed };
+  return { owed: { ...owed, warned: true }, warn: warns(owed.why) };
+}
+
+// [[spec/design_output/level0#a-step-carries-the-answer]]
+async function spokenSince($, seen) {
+  try {
+    return answerAfter(await $.session.messages(), seen);
+  } catch {
+    return "";
+  }
 }
 
 // [[spec/design_output/level0#what-counts-as-owed]]

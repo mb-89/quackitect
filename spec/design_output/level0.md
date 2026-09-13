@@ -622,19 +622,20 @@ The hook reads the two keys at every `tool.call`, so a button pressed mid-turn
 reaches the next call. The latest demand replaces the one before it, and starts
 with a warning of its own.
 
-## One warning, then a refusal
+## A warning on every call
+
+The door refuses no call. A refused call fires no step, and the text of that
+step reaches nothing. So a refusal locks the session, the stop call with it.
+Every call while the demand stands carries a warning instead.
 
 The response in flight when a demand lands can carry the answer, and its text
 reaches the hook only once the response completes. So every call of that
-response passes.
+response passes with no warning. A response completing with no text leaves the
+demand open. Each call after it carries the warning, and the session reads it
+after the tool's result. The warning names what the person waits for.
 
-A response completing with no text leaves the demand open. The next call runs,
-and carries a warning the session reads after the tool's result. The warning
-names what the person waits for. The call after it stands refused, and every
-call after that, until an answer stands.
-
-Each writes a `gate` line at `warn`: `warned Read before an answer`, then
-`refused Read before an answer`, with the demand in the detail.
+Each such call writes a `gate` line at `warn`: `warned Read before an answer`,
+with the demand in the detail.
 
 ## A prompt mid-turn
 
@@ -646,10 +647,12 @@ Each writes a `gate` line at `warn`: `warned Read before an answer`, then
 
 ## A step carries the answer
 
-`turn.step` hands the hook each response once its blocks stand, with its
-visible text in `answer`. Text there answers the demand, and the hook writes it
-as the `answer` line. For details, see
-[[spec/design_output/log#the-answer-under-its-prompt]].
+The hook reads the answer off the transcript after each step, and off the
+turn's own text at the turn end. `turn.step` hands the hook each response once
+its blocks stand, with its visible text in `answer`. On client 2.1.269 that
+field stands empty, whatever the response says. Text found in either place
+answers the demand, and the hook writes it as the `answer` line. For details,
+see [[spec/design_output/log#the-answer-under-its-prompt]].
 
 The transcript stands behind the step. `$.session.messages()` answers its newest
 4096 messages alone, so the door remembers the last answer standing when the

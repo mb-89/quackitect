@@ -754,7 +754,7 @@ test("the call reaches the vote, and an answer without one ends nothing", async 
 });
 
 // [[spec/design_output/level0#one-warning-then-a-refusal]]
-test("a response with no answer earns one warning on the next call, then a refusal", async () => {
+test("a response with no answer earns a warning on every call after it, and no refusal", async () => {
   const it = await started();
   await it.raise("prompt.submit", { text: "build the door", origin: { kind: "composer" } });
   it.transcript.push({ role: "user", text: "build the door" });
@@ -768,13 +768,14 @@ test("a response with no answer earns one warning on the next call, then a refus
   assert.equal(warned.deny, undefined);
   assert.match(warned.context.at(-1), /^The owner sent a prompt, and nothing has answered it yet\./);
 
-  const refused = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
-  assert.match(refused.deny, /^The owner sent a prompt\. The owner asked something/);
+  const again = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.equal(again.deny, undefined, "the door refuses nothing");
+  assert.match(again.context.at(-1), /^The owner sent a prompt, and nothing has answered it yet\./);
 
   const found = it.lines().filter((one) => one.kind === "gate");
   assert.deepEqual(found.map((one) => [one.level, one.said]), [
     ["warn", "warned Read before an answer"],
-    ["warn", "refused Read before an answer"],
+    ["warn", "warned Read before an answer"],
   ]);
 });
 
@@ -881,8 +882,36 @@ test("a prompt mid-turn still binds a response that ignores it", async () => {
 
   const warned = await it.raise("tool.call", { tool: "Read", file_path: "b.md" });
   assert.match(warned.context.at(-1), /^The owner sent a prompt/);
-  const refused = await it.raise("tool.call", { tool: "Read", file_path: "c.md" });
-  assert.match(refused.deny, /^The owner sent a prompt\./);
+  await it.raise("turn.step", { turnId: "t", index: 6, answer: "", toolUses: [], stopReason: "tool_use" });
+  const again = await it.raise("tool.call", { tool: "Read", file_path: "c.md" });
+  assert.equal(again.deny, undefined, "the door refuses nothing");
+  assert.match(again.context.at(-1), /^The owner sent a prompt/);
+  const stop = await it.raise("tool.call", { tool: STOP, reason: "the-owner-asks-to-talk", next: "Nothing waits." }, STOP);
+  assert.equal(stop.deny, undefined, "the stop call passes the door");
+});
+
+// [[spec/design_output/level0#a-step-carries-the-answer]]
+test("a step whose event holds no text reads the transcript, and the answer there clears the demand", async () => {
+  const it = await started();
+  await it.raise("prompt.submit", { text: "build the door", origin: { kind: "composer" } });
+  it.transcript.push({ role: "assistant", text: "You want the door. I read the brief first." });
+  await it.raise("turn.step", { turnId: "t", index: 0, answer: "", toolUses: [], stopReason: "tool_use" });
+
+  const after = await it.raise("tool.call", { tool: "Read", file_path: "b.md" });
+  assert.equal(after.context, undefined);
+  const answer = it.lines().find((one) => one.kind === "answer");
+  assert.equal(answer.text, "You want the door. I read the brief first.");
+});
+
+// [[spec/design_output/log#an-answer-stands-in-chat]]
+test("a turn ending with the demand standing logs the turn's text as the answer", async () => {
+  const it = await startedPast();
+  await it.raise("prompt.submit", { text: "build the door", origin: { kind: "composer" } });
+  await it.raise("turn.complete", { ...answered, answer: "You want the door. Nothing waits on you." });
+
+  const answer = it.since().find((one) => one.kind === "answer");
+  assert.equal(answer.text, "You want the door. Nothing waits on you.");
+  assert.equal(answer.detail, "The owner sent a prompt");
 });
 
 // [[spec/design_output/level0#a-step-carries-the-answer]]
@@ -942,7 +971,7 @@ test("an answer written before the prompt lands counts for nothing", async () =>
 });
 
 // [[spec/design_output/level0#what-counts-as-owed]]
-test("an update the sidebar asks for mid-turn warns once and then refuses", async () => {
+test("an update the sidebar asks for mid-turn warns on each call until it stands", async () => {
   const it = await started();
   await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   it.files.set(".se/config.json", JSON.stringify({ ask: { wanted: "short" } }));
@@ -951,8 +980,9 @@ test("an update the sidebar asks for mid-turn warns once and then refuses", asyn
 
   const warned = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   assert.match(warned.context.at(-1), /^The owner asks for a short update/);
-  const refused = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
-  assert.match(refused.deny, /^The owner asks for a short update\./);
+  const again = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.equal(again.deny, undefined);
+  assert.match(again.context.at(-1), /^The owner asks for a short update/);
 
   await it.raise("turn.step", { turnId: "t", index: 1, answer: "Short update: the door stands.", toolUses: [], stopReason: "tool_use" });
   const passed = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
@@ -975,26 +1005,34 @@ test("a hold at stopped owes an answer, and the later demand replaces the earlie
 
 // [[spec/design_output/level0#the-owner-binds-god]]
 test("god mode passes every refusal, and writes each one it passes", async () => {
-  const it = await started({ ".se/config.json": JSON.stringify({ engine: { binding: "god" } }) });
-  await it.raise("prompt.submit", { text: "build the door", origin: { kind: "composer" } });
-  await it.raise("turn.step", { turnId: "t", index: 0, answer: "", toolUses: [], stopReason: "tool_use" });
-  await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  const it = await started({
+    ".se/config.json": JSON.stringify({ engine: { binding: "god" } }),
+    ".se/notes/one.md": RAW_NOTE,
+  });
 
-  const said = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  const said = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/funnel/a.md",
+    content: "Noticed: it stalls badly whenever somebody starts it twice.\n",
+  });
   assert.equal(said.deny, undefined);
   const god = it.lines().filter((one) => one.kind === "god");
-  assert.deepEqual(god.map((one) => one.said), ["passed Read past a refusal"]);
-  assert.match(god[0].detail, /^The owner sent a prompt\./);
+  assert.deepEqual(god.map((one) => one.said), ["passed Write past a refusal"]);
+  assert.match(god[0].detail, /carries \d+ words straight from a note/);
 });
 
 test("out of god mode the same refusal stands", async () => {
-  const it = await started({ ".se/config.json": JSON.stringify({ engine: { binding: "queue" } }) });
-  await it.raise("prompt.submit", { text: "build the door", origin: { kind: "composer" } });
-  await it.raise("turn.step", { turnId: "t", index: 0, answer: "", toolUses: [], stopReason: "tool_use" });
-  await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  const it = await started({
+    ".se/config.json": JSON.stringify({ engine: { binding: "queue" } }),
+    ".se/notes/one.md": RAW_NOTE,
+  });
 
-  const said = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
-  assert.match(said.deny, /^The owner sent a prompt\./);
+  const said = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/funnel/a.md",
+    content: "Noticed: it stalls badly whenever somebody starts it twice.\n",
+  });
+  assert.match(said.deny, /carries \d+ words straight from a note/);
   assert.equal(it.lines().filter((one) => one.kind === "god").length, 0);
 });
 
@@ -2086,10 +2124,7 @@ test("an answer opening with the table meets the gate clean", async () => {
   await it.raise("turn.complete", { ...answered, answer: `${TABLE}\n\n${OVER}` });
 
   assert.equal(it.prompts.length, 0);
-  assert.equal(
-    it.lines().find((one) => one.kind === "answer").said,
-    "the gate reads clean",
-  );
+  assert.ok(it.lines().some((one) => one.kind === "answer" && one.said === "the gate reads clean"));
 });
 
 // [[spec/design_output/level0#the-door-counts-the-questions]]

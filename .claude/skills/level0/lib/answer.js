@@ -25,7 +25,7 @@ export const SAYS = [
   "The log takes the answer from the chat, so the log tool answers nothing.",
 ].join("\n");
 
-// [[spec/design_output/level0#one-warning-then-a-refusal]]
+// [[spec/design_output/level0#a-warning-on-every-call]]
 export function warns(why) {
   return [
     `${why}, and nothing has answered it yet. Write the answer in the chat, as`,
