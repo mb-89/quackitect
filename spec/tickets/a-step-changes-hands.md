@@ -109,7 +109,7 @@ record:
   - step: retro/cloud
     hand: box b71bba5a7b0c
     hash_before: 98e847c28ede0c4a15a3c6901b7a6c959d20634e
-    hash_after: 98e847c28ede0c4a15a3c6901b7a6c959d20634e
+    hash_after: 7ce2a4d293f4149208527700dee5cb37b8a4b002
 step: children
 ---
 
