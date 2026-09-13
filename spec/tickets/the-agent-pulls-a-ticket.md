@@ -151,7 +151,11 @@ record:
   - step: children
     hand: box d49afdfe301a64
     hash_before: 7cdc1828f7c128a64e37bd45e7b6a1756e8187cb
-step: children
+  - step: children
+    hand: box d49afdfe301a64
+    skipped: true
+    why: the box leaves it while agent-pulls-ticket stand open
+step: retro/notes
 ---
 
 # Ask
