@@ -151,7 +151,7 @@ test("the tool takes one reason out of the rules, and names each one", () => {
 test("a sound reason stands, a fact over it falls, and an unknown id says so", () => {
   const stands = stopAnswer(TABLE, "talk", voted([], "talk"));
   assert.equal(stands.ends, true);
-  assert.match(stands.result, /^The stop stands\. .*Write nothing more\.$/);
+  assert.match(stands.result, /^The stop stands\. .*Write the one word Stopped, and nothing more\.$/);
 
   const falls = stopAnswer(TABLE, "done", voted(["work-waiting"], "done"));
   assert.deepEqual([falls.known, falls.ends], [true, false]);

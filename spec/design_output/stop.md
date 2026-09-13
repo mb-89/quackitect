@@ -153,6 +153,12 @@ The free stop asks for both halves. The count alone hands out a free stop
 wherever it resets. The grant alone lets a session read for an hour and still
 call itself new.
 
+# A standing stop ends it
+
+- Outcome: a stop that stands ends the turn, and nothing from level zero reaches the prompt after it.
+- Close: the call answers "Write the one word Stopped", because the harness asks for text after a tool call.
+- Gate: the turn end still reads the answer, and its findings land in the log at `warn`.
+
 # The claim rides the call
 
 The call carries the claim, and the hook hands the reason to `decide` as

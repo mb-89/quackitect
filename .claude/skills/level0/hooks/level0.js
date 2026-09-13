@@ -653,7 +653,7 @@ export function register(on, _options) {
       ran: (name) => ranHere(name, off, hold),
     });
     const said = stopAnswer(rules, reason, decision);
-    if (said.known) claim = { reason, next: String(e.next ?? "") };
+    if (said.known) claim = { reason, next: String(e.next ?? ""), ends: said.ends };
     await logbook.say(said.known ? "info" : "warn", "stop", stopSaid(said, reason), {
       detail: detail(decision, tooth.inARow()),
     });
@@ -804,7 +804,8 @@ export function register(on, _options) {
     await logbook.say(level, "answer", `the gate reads ${read.band}`, {
       detail: `score=${read.score} findings=${found.length} inARow=${gate.inARow()}`,
     });
-    if (!read.sends) return said;
+    // [[spec/design_output/stop#a-standing-stop-ends-it]]
+    if (!read.sends || stood?.ends) return said;
 
     // [[spec/design_output/level0#the-re-prompt-over-the-ceiling]]
     try {
