@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: whenever
 steps:
   - name: sync
@@ -78,11 +78,12 @@ record:
   - step: sync
     hand: box b71bba5a7b0c
     hash_before: 30750b0403b60ea900582a7d55bff0ba773252b9
+step: sync
 ---
 
 # Ask
 
-Where it stands
+The pull learns who holds a step. The group holds one child, [[spec/tickets/step-changes-hands]], whose ask carries the pieces: the hand id, the helper's tag, the person's hand, the escalation verb and the group that leaves at `todo`. The design input [[spec/design_input/the-agent-pulls-tickets]] draws it under Hands, Escalation is a step, and Children and private tickets.
 
 # sync
 
