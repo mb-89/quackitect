@@ -95,7 +95,7 @@ test("a call reaching the owner passes, and every other call does not", () => {
 
 test("the refusal quotes the rule it holds", () => {
   assert.match(SAYS, /^The owner asked something and nothing has answered it\./);
-  assert.match(SAYS, /Say back what you\n\s*understood and what you do next, then work\.$/);
+  assert.match(SAYS, /Call mcp__level0__log\n\s*with kind answer, saying what you understood and what you do next, then work\.$/);
 });
 
 // [[spec/design_output/level0#the-score-is-a-rate]]

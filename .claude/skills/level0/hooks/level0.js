@@ -59,6 +59,7 @@ import {
   aimOf,
   appended,
   archiveOf,
+  answersTheOwner,
   LOG_TOOL,
   logSpec,
   rowOf,
@@ -246,6 +247,8 @@ export function register(on, _options) {
 
   // [[spec/design_output/log#the-log-tool]]
   on("tool.call", { tool: `mcp__level0__${LOG_TOOL}` }, async (_$, e, _next) => {
+    // [[spec/design_output/log#an-answer-rides-the-tool]]
+    if (answersTheOwner(e)) owed = null;
     const row = await logbook.say(
       String(e.level ?? "info"),
       String(e.kind ?? "note"),

@@ -715,6 +715,26 @@ test("a prompt landing mid-response skips that response's silent step", async ()
   assert.equal(after.deny, undefined);
 });
 
+// [[spec/design_output/log#an-answer-rides-the-tool]]
+test("an answer through the log tool clears the demand, and lands in the log", async () => {
+  const it = await started();
+  await it.raise("prompt.submit", { text: "and push it", origin: { kind: "composer" } });
+  await it.raise("turn.step", { turnId: "t", index: 0, answer: "", toolUses: [], stopReason: "tool_use" });
+  await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+
+  const answered = await it.raise(
+    "tool.call",
+    { tool: "mcp__level0__log", kind: "answer", said: "You want it pushed. I push after the check." },
+    "mcp__level0__log",
+  );
+  assert.equal(answered.deny, undefined);
+  assert.ok(it.lines().some((one) => one.kind === "answer" && /pushed/.test(one.said)));
+
+  const after = await it.raise("tool.call", { tool: "Read", file_path: "b.md" });
+  assert.equal(after.deny, undefined);
+  assert.equal(after.context, undefined);
+});
+
 // [[spec/design_output/level0#a-prompt-mid-turn]]
 test("a prompt mid-turn still binds a response that ignores it", async () => {
   const it = await started();
