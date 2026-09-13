@@ -869,12 +869,19 @@ export function chapterOf(text, path) {
   const level = parts.length;
   const own = lines(sections[found].own);
   const fields = new Map();
+  const raw = [...prose(sections[found].own)];
   for (let i = found + 1; i < sections.length; i++) {
     if (sections[i].level <= level) break;
-    if (sections[i].level === level + 1)
+    if (sections[i].level === level + 1) {
       fields.set(sections[i].header, lines(sections[i].own));
+      raw.push("", ...prose(sections[i].own));
+    }
   }
-  return { stands: true, own, fields };
+  return { stands: true, own, fields, raw };
+}
+
+function prose(own) {
+  return (own ?? []).filter((row) => !COMMENT.test(row) && !ANSWERED.test(row));
 }
 
 function lines(own) {
@@ -982,7 +989,7 @@ export function verdictIn(rows) {
 // [[spec/design_output/pull#the-voice-reads-the-evidence]]
 function voiceFaults(it, one, leaf, chapter) {
   if (!it.vale) return [];
-  const rows = [...chapter.own, ...[...chapter.fields].flatMap(([, held]) => ["", ...held])];
+  const rows = chapter.raw ?? [];
   const text = rows.join("\n");
   if (!text.trim()) return [];
   let ran;
