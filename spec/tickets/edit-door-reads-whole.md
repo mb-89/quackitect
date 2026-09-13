@@ -33,7 +33,8 @@ step: do
 
 The Edit door lints the replaced text alone. So a shape rule over a whole file, such as VocabularyEntry or GuidanceChapter, refuses an edit that stands far from its header. Without it an agent inserts near a header to pass, and the file drifts. Done is one thing:
 
-- the door reads the file as it stands after the edit, and a test under test/level0/hooks.test.js proves an edit far from a header passes
+- the door reads the file as it stands after the edit
+- a test under test/level0/hooks.test.js proves an edit far from a header passes
 
 # do
 

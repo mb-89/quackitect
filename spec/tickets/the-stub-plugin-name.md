@@ -32,10 +32,10 @@ step: do
 
 # Ask
 
-A tool registers under the plugin's name. Level zero under a bridgehead answers to mcp__bridgehead__stop, and its guidance names mcp__level0__stop. So an agent in a stub reads a name no tool carries. Done is one of two things, decided on this ticket:
+A tool registers under the plugin's name. Level zero under a bridgehead answers to `mcp__bridgehead__stop`, and its guidance names `mcp__level0__stop`. So an agent in a stub reads a name no tool carries. Done is one of two things, decided on this ticket:
 
 - the stub's plugin folder carries the name level0, and the design input's file table says so
-- level zero reads its name off the event, and every place naming mcp__level0__ reads it there
+- level zero reads its name off the event, and every place naming `mcp__level0__` reads it there
 
 # do
 
