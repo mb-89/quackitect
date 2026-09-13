@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: soon
 steps:
   - name: sync
@@ -78,6 +78,15 @@ record:
   - step: sync
     hand: an unnamed box
     hash_before: b0eba19f17474e1b311a53564228e73f2db54852
+  - step: sync
+    hand: box d49afdfe301a64
+    hash_before: e41a185a0be3e8593b2bc9ada89b3d44c95992a4
+    hash_after: ee264c82a7be39a66a62114933336c336478cfa8
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-agent-pulls-a-ticket already carries every commit on main.
+step: split
 ---
 
 # Ask
@@ -98,6 +107,8 @@ Done is one of two things, and the retro over the box's own window with it:
 <!-- work sync, so the branch carries trunk -->
 
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
