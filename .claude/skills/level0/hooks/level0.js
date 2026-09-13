@@ -483,8 +483,8 @@ export function register(on, _options) {
           ? `You stand on ${TRUNK}, so this commit would land there.`
           : `This pushes ${TRUNK}, which a cloud box may never move.`,
         "",
-        "Run `./RUNME.sh work take` to take a branch and move onto it. Push that",
-        "branch, run `work done`, and a box off the cloud takes it into trunk.",
+        "Run `./RUNME.sh branch take` to take a branch and move onto it. Push that",
+        "branch, run `branch done`, and a box off the cloud takes it into trunk.",
       ].join("\n"),
     };
     })();
@@ -669,7 +669,7 @@ export function register(on, _options) {
     const name = String(e.branch ?? "").trim();
     if (!name) return { result: "review_branch takes one branch name." };
 
-    const ran = await $.process.run([...GATHER, "work", "review", name, "--json"], {
+    const ran = await $.process.run([...GATHER, "branch", "review", name, "--json"], {
       timeoutMs: GATHERING,
     });
     const material = materialOf(ran.stdout);
@@ -843,7 +843,7 @@ export function register(on, _options) {
             ? `Before you finish: write your result and your retro into ${BRIEF}, at`
             : `Before you finish: write the next session a new ${HANDOVER}, at`,
           tracked
-            ? "that same path, then run ./RUNME.sh work done, which pushes it."
+            ? "that same path, then run ./RUNME.sh branch done, which pushes it."
             : "that same path. Say what stands, what is next, and what surprises you.",
           "",
           one.text.trim(),
@@ -862,7 +862,7 @@ export function register(on, _options) {
           "",
           "Run this first:",
           "",
-          "    ./RUNME.sh work take",
+          "    ./RUNME.sh branch take",
           "",
           "It takes the next branch nobody holds, moves you onto it, takes trunk",
           "into it, and prints the brief. Do what the brief says, and finish the",

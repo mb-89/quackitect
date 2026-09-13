@@ -1,5 +1,5 @@
 // What the battery says about one commit. The check stamps the commit it runs
-// against, and `work done` reads that stamp, where it once read a claim.
+// against, and `branch done` reads that stamp, where it once read a claim.
 // [[spec/design_output/work#the-battery-answers-first]]
 
 export const STAMP = ".se/check.json";

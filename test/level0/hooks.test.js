@@ -1460,7 +1460,7 @@ test("the Bash description names the verbs, and answers the same string twice", 
   assert.equal(said.description, again.description);
   assert.match(said.description, /^Runs a shell command\./);
   assert.match(said.description, /\.\/RUNME\.sh check/);
-  assert.match(said.description, /\.\/RUNME\.sh work/);
+  assert.match(said.description, /\.\/RUNME\.sh branch/);
 });
 
 const NO_CAGE = { exists: () => false };
@@ -1578,7 +1578,7 @@ test("the review tool runs the verb, spawns a reader and answers the report", as
   assert.deepEqual(ran.argv, [
     "node",
     "src/scripts/cli.js",
-    "work",
+    "branch",
     "review",
     "the-config-holds-numbers",
     "--json",
@@ -1588,7 +1588,7 @@ test("the review tool runs the verb, spawns a reader and answers the report", as
   assert.match(said.result, /^check {6}passes$/m);
   assert.match(said.result, /^retro {6}present$/m);
   assert.match(said.result, /^brief {6}done$/m);
-  assert.match(said.result, /^1 thing to fix\. Run work merge once every fix lands\.$/m);
+  assert.match(said.result, /^1 thing to fix\. Run branch merge once every fix lands\.$/m);
 });
 
 // [[spec/design_output/review#where-the-spawn-refuses]]

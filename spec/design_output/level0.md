@@ -870,7 +870,7 @@ most. Vale counts a heading, through `ShortHeading`, and refuses a dash or a
 colon inside one through `OneTitle`, because both turn one title into two.
 
 Vale reads what a file holds, and its path stays outside that. So
-`.claude/skills/level0/lib/names.js` counts a name instead. `work new` refuses a
+`.claude/skills/level0/lib/names.js` counts a name instead. `branch new` refuses a
 long branch, and `NameHoldsTheWords` holds every path git tracks.
 For details, see [[spec/design_output/tree#the-rules-over-two-files]].
 

@@ -15,4 +15,4 @@ rationale: [[spec/rationales/reviewing]]
 7. Count a file outside the brief as a fault only where it redesigns what the brief leaves alone. *
 8. Write each answer as one short line, and keep the whole report short enough to skim.
 9. Hand the report back as a list of fixes, and merge once every fix lands. *
-10. Run `./RUNME.sh work review <name>` to gather all of this from git.
+10. Run `./RUNME.sh branch review <name>` to gather all of this from git.

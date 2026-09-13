@@ -143,7 +143,7 @@ export function report(said, read = {}) {
   const fix = mechanical + (read.fix ?? 0);
   const unread = String(read.unread ?? "").trim();
   if (!fix && !unread) {
-    return `${said.branch}   nothing to fix. Run work merge to take it in.`;
+    return `${said.branch}   nothing to fix. Run branch merge to take it in.`;
   }
 
   const rows = [
@@ -174,5 +174,5 @@ function redly(check) {
 
 function closing(fix) {
   const many = `${fix} thing${fix === 1 ? "" : "s"} to fix`;
-  return `${fix ? many : "Nothing to fix"}. Run work merge once every fix lands.`;
+  return `${fix ? many : "Nothing to fix"}. Run branch merge once every fix lands.`;
 }
