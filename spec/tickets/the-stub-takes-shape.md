@@ -94,7 +94,15 @@ record:
     hand: the engine
     hash_before: 3140683cc7b50d384e620f4dd81ecae9ae91564b
     hash_after: 3140683cc7b50d384e620f4dd81ecae9ae91564b
-step: retro/notes
+  - step: retro/notes
+    hand: box 36d4a566c587
+    hash_before: 6d6d1cfcd89dc25d917f9144e8b5e098dcbd4519
+    hash_after: 6d6d1cfcd89dc25d917f9144e8b5e098dcbd4519
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+step: retro/write
 ---
 
 # Ask
@@ -146,6 +154,8 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 <!-- retro notes, which passes when the private folder is empty -->
 
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
