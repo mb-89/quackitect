@@ -859,19 +859,6 @@ test("a helper's turn end prompts nothing, logs no reply, and votes no stop", as
   );
 });
 
-// [[spec/design_output/log#an-answer-stands-in-chat]]
-test("every text the agent writes mid-turn lands in the log whole, with no demand standing", async () => {
-  const it = await started();
-  const text = "Reading the door first, then the tests.\n\n- one\n- two";
-  await it.raise("turn.step", { turnId: "t", index: 0, answer: text, toolUses: [], stopReason: "tool_use" });
-  await it.raise("turn.step", { turnId: "t", index: 1, answer: "", toolUses: [], stopReason: "tool_use" });
-
-  const rows = it.lines().filter((one) => one.kind === "answer");
-  assert.equal(rows.length, 1);
-  assert.equal(rows[0].text, text);
-  assert.equal(rows[0].detail, undefined);
-});
-
 // [[spec/design_output/level0#a-helper-ends-no-turn]]
 test("a helper's step text answers no demand of the owner's", async () => {
   const it = await started();
@@ -914,20 +901,18 @@ test("a step carrying text answers the prompt, and every call after it passes", 
 });
 
 // [[spec/design_output/log#the-answer-under-its-prompt]]
-test("the answer lands as an info line under its prompt, whole, and the text after it too", async () => {
+test("the answer lands as an info line under its prompt, whole, and once", async () => {
   const it = await started();
   await it.raise("prompt.submit", { text: "build the door", origin: { kind: "composer" } });
   await it.raise("turn.step", { turnId: "t", index: 0, answer: "You want the door. I read the brief first.", toolUses: [], stopReason: "tool_use" });
   await it.raise("turn.step", { turnId: "t", index: 1, answer: "Now the hinge.", toolUses: [], stopReason: "tool_use" });
 
   const kinds = it.lines().map((one) => one.kind);
-  assert.deepEqual(kinds.slice(1), ["prompt", "answer", "answer"]);
-  const [answer, later] = it.lines().filter((one) => one.kind === "answer");
+  assert.deepEqual(kinds.slice(1), ["prompt", "answer"]);
+  const answer = it.lines().find((one) => one.kind === "answer");
   assert.equal(answer.level, "info");
   assert.equal(answer.text, "You want the door. I read the brief first.");
   assert.equal(answer.detail, "The owner sent a prompt");
-  assert.equal(later.text, "Now the hinge.");
-  assert.equal(later.detail, undefined);
 });
 
 test("an answer the transcript holds counts too, however the transcript windows", async () => {

@@ -169,7 +169,7 @@ means for the owner lands where the owner reads.
 
 # An answer stands in chat
 
-- Outcome: every text the agent writes in the chat lands in the log whole, under kind `answer`. The agent calls nothing for it.
+- Outcome: the answer to the owner's prompt stands in the chat as text. The hook logs it whole under kind `answer`, and the agent calls nothing for it.
 - Cause: an answer through the log tool alone reaches no chat, and the owner reads the chat mid-turn.
 - Door: the step carrying the text clears the demand, and a log call of kind `answer` clears nothing.
 - Teacher: the warning and the refusal ask for text in the chat, and name no call.

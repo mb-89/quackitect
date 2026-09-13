@@ -756,10 +756,8 @@ export function register(on, _options) {
     if (e.agentId) return yield* next(e);
     const said = yield* next(e);
     inFlight = 0;
-    const text = String(e.answer ?? "").trim();
-    // Every text the agent writes in the chat lands in the log, whole, and the agent calls nothing for it. [[spec/design_output/log#an-answer-stands-in-chat]]
-    if (text) await logbook.say("info", "answer", text, { text, ...(owed ? { detail: owed.why } : {}) });
     if (!owed || (await settings.ask("answer.enabled")) === false) return said;
+    const text = String(e.answer ?? "").trim();
     // [[spec/design_output/level0#a-prompt-mid-turn]]
     if (owed.skips > 0 || !text) {
       await logbook.say("info", "step", `step ${e.index} carries ${text.length} character(s)`, {
@@ -770,7 +768,13 @@ export function register(on, _options) {
       owed = { ...owed, skips: owed.skips - 1 };
       return said;
     }
-    owed = text ? null : { ...owed, stepped: true };
+    // The answer to the owner's prompt lands in the log from the chat, and the agent calls nothing for it. [[spec/design_output/log#an-answer-stands-in-chat]]
+    if (text) {
+      await logbook.say("info", "answer", text, { text, detail: owed.why });
+      owed = null;
+    } else {
+      owed = { ...owed, stepped: true };
+    }
     return said;
   });
 
