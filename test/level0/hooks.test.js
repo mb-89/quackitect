@@ -1890,7 +1890,6 @@ const UNDER = "word ".repeat(100).trim();
 const CLEAN = "word ".repeat(400).trim();
 const DRAFT = "mcp__level0__check_answer";
 
-// [[spec/design_output/level0#the-re-prompt-over-the-ceiling]]
 // [[spec/design_output/stop#a-standing-stop-ends-it]]
 test("a standing stop ends the turn, and the gate reads and writes nothing", async () => {
   const it = await startedPast(BANDED, valeOnAnswer(PAST));
@@ -1906,28 +1905,24 @@ test("a standing stop ends the turn, and the gate reads and writes nothing", asy
   );
 });
 
-test("an answer over the ceiling meets one re-prompt, and one alone", async () => {
+test("an answer over the ceiling reaches no prompt, and rides the next call once", async () => {
   const it = await started(BANDED, valeOnAnswer(PAST));
   await it.raise("turn.complete", { ...answered, answer: OVER });
 
-  assert.equal(it.prompts.length, 1);
-  assert.match(
-    it.prompts[0].text,
-    /^The voice rules refuse this answer\. Write it again\./,
-  );
-  assert.match(it.prompts[0].text, /50 findings a thousand words/);
-  assert.match(it.prompts[0].text, /level0-answer\.md:1:7 {2}PastTense/);
-  assert.match(it.prompts[0].text, /Hold PastTense for the rest of this turn/);
-
-  await it.raise("turn.complete", { ...answered, answer: OVER });
-  assert.equal(it.prompts.length, 1, "a second turn end inside the turn submits nothing");
-
+  assert.equal(it.prompts.length, 0, "the answer stands as sent, and nothing prints twice");
   const gate = it.lines().filter((one) => one.kind === "answer");
-  assert.deepEqual(
-    gate.map((one) => one.said),
-    ["the gate reads rewrite", "the gate reads rewrite"],
-  );
-  assert.match(gate[0].detail, /^score=50 findings=1 inARow=1$/);
+  assert.deepEqual(gate.map((one) => one.said), ["the gate reads rewrite"]);
+  assert.match(gate[0].detail, /^score=50 findings=1$/);
+
+  const call = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.equal(call.deny, undefined);
+  assert.match(call.context.at(-1), /^The gate read your last answer at rewrite, and it stands as sent\./);
+  assert.match(call.context.at(-1), /50 findings a thousand words/);
+  assert.match(call.context.at(-1), /level0-answer\.md:1:7 {2}PastTense/);
+  assert.match(call.context.at(-1), /Hold PastTense for the rest of this turn/);
+
+  const again = await it.raise("tool.call", { tool: "Read", file_path: "b.md" });
+  assert.equal(again.context, undefined, "the findings ride once");
 });
 
 // [[spec/design_output/level0#the-three-bands]]
@@ -1988,15 +1983,17 @@ const TABLE = [
 ].join("\n");
 
 // [[spec/design_output/level0#the-table-answers-every-question]]
-test("a prompt with two questions refuses an answer opening with prose", async () => {
+test("a prompt with two questions reads an answer opening with prose as a rewrite", async () => {
   const it = await started(BANDED, valeOnAnswer([]));
   await it.raise("prompt.submit", { text: ASKS, origin: { kind: "composer" } });
+  await it.raise("turn.step", { turnId: "t", index: 0, answer: "You ask two things.", toolUses: [], stopReason: "tool_use" });
   await it.raise("turn.complete", { ...answered, answer: OVER });
 
-  assert.equal(it.prompts.length, 1);
-  assert.match(it.prompts[0].text, /QuestionTable/);
-  assert.match(it.prompts[0].text, /asks 2 questions/);
-  assert.match(it.prompts[0].text, /opens with no table/);
+  assert.equal(it.prompts.length, 0);
+  const call = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.match(call.context.at(-1), /QuestionTable/);
+  assert.match(call.context.at(-1), /asks 2 questions/);
+  assert.match(call.context.at(-1), /opens with no table/);
 });
 
 // [[spec/design_output/level0#the-table-answers-every-question]]

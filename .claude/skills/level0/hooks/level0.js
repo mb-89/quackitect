@@ -79,6 +79,7 @@ import {
 } from "../lib/projection.js";
 import {
   answerFindings,
+  gateNote,
   refusal,
   refusedCommand,
   refusedDelta,
@@ -274,7 +275,6 @@ export function register(on, _options) {
   on("prompt.submit", async ($, e, next) => {
     const from = String(e.origin?.kind ?? "");
     tooth.sawPrompt(from === "plugin");
-    gate.sawPrompt(from === "plugin");
     // [[spec/design_output/level0#a-prompt-mid-turn]]
     if (opensATurn(e.origin)) {
       owed = { ...(await owing($, "The owner sent a prompt")), skips: inFlight > 0 ? 1 : 0 };
@@ -327,7 +327,11 @@ export function register(on, _options) {
     if (canaries.deny) return canaries;
     owesCanary = canaries.owes;
 
-    const warning = [answers.warn, canaries.warn].filter(Boolean).join("\n\n");
+    // [[spec/design_output/level0#the-findings-ride-the-next-call]]
+    const gateHeld = e.agentId ? null : gate.takeWaiting();
+    const warning = [answers.warn, canaries.warn, gateHeld ? gateNote(ANSWER, gateHeld) : ""]
+      .filter(Boolean)
+      .join("\n\n");
     const writing = asWrite(e);
 
     // [[spec/funnel/a-paragraph-has-a-schema]]
@@ -841,23 +845,11 @@ export function register(on, _options) {
     ];
 
     // [[spec/design_output/level0#the-three-bands]]
-    const read = gate.atTurnEnd({
-      ...(await bands(settings)),
-      text: spoken,
-      found,
-      mostInARow,
-      toothSpoke: Boolean(bit?.sent),
-    });
+    const read = gate.atTurnEnd({ ...(await bands(settings)), text: spoken, found });
     const level = read.band === "clean" ? "info" : "warn";
     await logbook.say(level, "answer", `the gate reads ${read.band}`, {
-      detail: `score=${read.score} findings=${found.length} inARow=${gate.inARow()}`,
+      detail: `score=${read.score} findings=${found.length}`,
     });
-    if (!read.sends) return said;
-
-    // [[spec/design_output/level0#the-re-prompt-over-the-ceiling]]
-    try {
-      $.prompt.submit({ text: answerFindings(ANSWER, read) }).catch(() => {});
-    } catch {}
     return said;
   });
 

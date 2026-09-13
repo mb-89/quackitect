@@ -293,31 +293,25 @@ export function bandOf(score, bands, found) {
 
 // [[spec/design_output/level0#the-gate-holds-its-state]]
 export function gateOf() {
-  let sent = false;
-  let inARow = 0;
+  let waiting = null;
 
   return {
-    inARow: () => inARow,
-
-    sawPrompt(mine) {
-      sent = false;
-      if (!mine) inARow = 0;
-    },
+    waiting: () => waiting,
 
     // [[spec/design_output/level0#the-three-bands]]
     atTurnEnd(it) {
       const found = it?.found ?? [];
       const score = scoreOf(it?.text, found);
       const band = found.length ? bandOf(score, it, found) : CLEAN;
-      const said = { score, band, found, sends: false, runaway: false, held: false };
-      if (band === CLEAN || band === CARRY) return said;
+      if (band !== CLEAN) waiting = { found, score, band };
+      return { score, band, found };
+    },
 
-      const most = Number(it?.mostInARow ?? 0);
-      const runaway = most > 0 && inARow >= most;
-      if (sent || runaway || it?.toothSpoke) return { ...said, runaway, held: true };
-      sent = true;
-      inARow += 1;
-      return { ...said, sends: true };
+    // [[spec/design_output/level0#the-findings-ride-the-next-call]]
+    takeWaiting() {
+      const held = waiting;
+      waiting = null;
+      return held;
     },
   };
 }

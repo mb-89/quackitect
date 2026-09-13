@@ -37,7 +37,7 @@
         "ceiling": {
           "type": "number",
           "unit": "findings a thousand words",
-          "help": "The score where the gate asks for one rewrite."
+          "help": "The score where the gate names the band rewrite in its log line."
         },
         "words": {
           "type": "number",
