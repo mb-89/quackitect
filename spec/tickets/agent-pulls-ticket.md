@@ -1,8 +1,8 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
-step: person-1
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -137,6 +137,7 @@ record:
         exit: 0
         said: The rules pass.
 group: the-agent-pulls-a-ticket
+reason: done
 ---
 
 # Ask
@@ -327,7 +328,7 @@ The stop hook now counts an open private ticket the way it counts a hold. A note
 
 <!-- the answer, which the step behind this one reads -->
 
-<!-- the form is text -->
+splice stands as a term under spec/vocabulary/terms.yml, so the hand-back passes the vocabulary rule. The verdict below reads the branch as merged.
 
 # verdict
 
@@ -426,16 +427,15 @@ The stop hook now counts an open private ticket the way it counts a hold. A note
 <!-- pass or fail, findings one a line -->
 <!-- the form is verdict -->
 
-fail
-- the files check slices a trimmed porcelain row, so a modified file loses its first letter
-- so a payload hand-back on a files field refuses its own ticket, and staging it first gets through
-- the voice rule reads a files field as prose, so a path with no slash breaks the vocabulary
-- the payload writer splices by the own rows, so a fence in a field swallows the next heading
-- the wrapper judges the leaf in hand alone, so a person's shell hand-back meets no judge later
-- the wrapper's tool handler carries no hook test, so the judge and the spawn loop go unproven
-- the payload lands on disk before the stale-hold check, so a stale hand-back still writes the file
-- the branch lands every other row of the ask, the check answers 0, and the retro stands
-- the retro names the real pull under the plugin timing out twice
+pass
+- the files check reads the porcelain row whole, so a modified file keeps its first letter
+- a payload hand-back on a files field passes its own ticket
+- the voice rule leaves a files field alone, so a path with no slash breaks no vocabulary
+- the payload writer writes by chapter, so a fence in a field swallows no heading
+- the branch lands every row of the ask, and the check answers 0 on the merge with trunk
+- the retro stands
+- four findings stand on tickets of their own: refusal-cap-inserts-no-person, refused-payload-stays-off-disk, the-hook-reloads-its-door
+- what only a person reads stands on a-person-reads-the-pull
 
 # Discussion
 

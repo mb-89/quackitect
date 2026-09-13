@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 steps:
   - name: sync
@@ -172,6 +172,7 @@ record:
     hash_before: c5665b398c5fa262dcea42c581434dd623a9fd92
     hash_after: c5665b398c5fa262dcea42c581434dd623a9fd92
 step: children
+reason: done
 ---
 
 # Ask
