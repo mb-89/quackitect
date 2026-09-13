@@ -721,7 +721,7 @@ edges, and the score falls in one of three bands:
 | the score | what happens |
 |---|---|
 | under `warnAt` | nothing |
-| from `warnAt` to the ceiling | the findings ride the next prompt as one line |
+| from `warnAt` to the ceiling | the `answer` line at `warn`, and nothing reaches the prompt |
 | at the ceiling or over it | one re-prompt saying rewrite, once per turn |
 
 An answer carrying no finding reads clean, whatever its length. Every band
@@ -744,15 +744,6 @@ already uses, because a refusal quoting the rule teaches it better than a
 refusal naming it. The door holding the owner's prompt first reads
 `e.origin.kind`, and a plugin prompt is a machine, so that door owes this one no
 readback.
-
-## The carry rides a prompt
-
-Under the ceiling the findings wait for the next prompt a person sends, and ride
-it as one line under the text. The line names the score and every rule behind
-it, and asks the session to hold those rules for the rest of the turn.
-
-The findings ride once. A prompt from a machine leaves them waiting, so the line
-reaches a person's turn and no other.
 
 ## The gate holds its state
 

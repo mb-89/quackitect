@@ -78,7 +78,6 @@ import {
 } from "../lib/projection.js";
 import {
   answerFindings,
-  carried,
   refusal,
   refusedCommand,
   refusedDelta,
@@ -272,16 +271,7 @@ export function register(on, _options) {
     // [[spec/design_output/level0#the-door-counts-the-questions]]
     if (opensATurn(e.origin)) asks = questionsIn(text);
     await logbook.say("info", "prompt", text, { detail: from, text });
-
-    // [[spec/design_output/level0#the-carry-rides-a-prompt]]
-    const held = opensATurn(e.origin) ? gate.takeWaiting() : null;
-    if (!held) return next(e);
-    const line = carried(held.found, held.score);
-    // [[spec/design_output/log#a-row-carries-its-kind]]
-    await logbook.say("info", "gate", "the findings ride this prompt", {
-      detail: `score=${held.score} findings=${held.found.length}`,
-    });
-    return next({ ...e, text: [text, line].filter(Boolean).join("\n\n") });
+    return next(e);
   });
 
   // [[spec/design_output/log#what-a-tool-line-names]]

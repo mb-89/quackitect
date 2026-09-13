@@ -1790,8 +1790,8 @@ test("an answer over the ceiling meets one re-prompt, and one alone", async () =
   assert.match(gate[0].detail, /^score=50 findings=1 inARow=1$/);
 });
 
-// [[spec/design_output/level0#the-carry-rides-a-prompt]]
-test("an answer under the ceiling rides the next prompt as one line", async () => {
+// [[spec/design_output/level0#the-three-bands]]
+test("an answer under the ceiling leaves the next prompt as the owner wrote it", async () => {
   const it = await started(BANDED, valeOnAnswer(PAST));
   await it.raise("turn.complete", { ...answered, answer: UNDER });
   assert.equal(it.prompts.length, 0);
@@ -1800,17 +1800,7 @@ test("an answer under the ceiling rides the next prompt as one line", async () =
     text: "carry on",
     origin: { kind: "composer" },
   });
-  assert.match(
-    said.text,
-    /^carry on\n\nThe answer before this scored 10 findings a thousand words\./,
-  );
-  assert.equal(said.text.split("\n\n")[1].includes("\n"), false, "the carry is one line");
-
-  const again = await it.raise("prompt.submit", {
-    text: "carry on",
-    origin: { kind: "composer" },
-  });
-  assert.equal(again.text, "carry on", "the findings ride once");
+  assert.equal(said.text, "carry on");
 });
 
 // [[spec/design_output/level0#the-three-bands]]

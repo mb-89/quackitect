@@ -295,22 +295,13 @@ export function bandOf(score, bands, found) {
 export function gateOf() {
   let sent = false;
   let inARow = 0;
-  let waiting = null;
 
   return {
     inARow: () => inARow,
-    waiting: () => waiting,
 
     sawPrompt(mine) {
       sent = false;
       if (!mine) inARow = 0;
-    },
-
-    // [[spec/design_output/level0#the-carry-rides-a-prompt]]
-    takeWaiting() {
-      const held = waiting;
-      waiting = null;
-      return held;
     },
 
     // [[spec/design_output/level0#the-three-bands]]
@@ -319,18 +310,11 @@ export function gateOf() {
       const score = scoreOf(it?.text, found);
       const band = found.length ? bandOf(score, it, found) : CLEAN;
       const said = { score, band, found, sends: false, runaway: false, held: false };
-      if (band === CLEAN) return said;
-      if (band === CARRY) {
-        waiting = { found, score };
-        return said;
-      }
+      if (band === CLEAN || band === CARRY) return said;
 
       const most = Number(it?.mostInARow ?? 0);
       const runaway = most > 0 && inARow >= most;
-      if (sent || runaway || it?.toothSpoke) {
-        waiting = { found, score };
-        return { ...said, runaway, held: true };
-      }
+      if (sent || runaway || it?.toothSpoke) return { ...said, runaway, held: true };
       sent = true;
       inARow += 1;
       return { ...said, sends: true };
