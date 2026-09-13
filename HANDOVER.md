@@ -1,6 +1,6 @@
 ---
 kind: [[handover]]
-status: todo
+status: held
 urgency: soon
 depends_on: [the-schema-projects-vale]
 ---
