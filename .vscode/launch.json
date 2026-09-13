@@ -6,6 +6,15 @@
       "type": "extensionHost",
       "request": "launch",
       "args": ["--extensionDevelopmentPath=${workspaceFolder}/src/extension"]
+    },
+    {
+      "name": "the server",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/doors/bridge.js",
+      "args": ["${workspaceFolder}"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
     }
   ]
 }

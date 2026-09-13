@@ -15,6 +15,21 @@ for no server, so its rules hold on turn one of a clone nobody builds.
 `.claude/settings.json` turns it on and git tracks that file, so a clone guards
 its first session with nothing typed.
 
+# One closure on every door
+
+Level zero is one small module, `hooks/level0.js`. One closure stands on every
+door the client offers, writes what it gets to the log at `debug`, whole, and
+hands the event on untouched. A line names the event and its tool in `said`,
+and carries the whole event as text. The viewer clips what it draws, and the
+log keeps everything. So the log shows
+every event the client raises, in order, with what each one holds, and the
+viewer's floor at `debug` reads it.
+
+The module before it stands beside it as `hooks/level0-old.js`, with every
+door of this note, and the client loads it nowhere. The tests of those doors
+read that file. The chapters below describe the old module. The small one
+takes a door over one at a time, each with its debug lines around it.
+
 # The harness surface
 
 Every line here comes from running it against client 2.1.263. The

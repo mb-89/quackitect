@@ -238,6 +238,10 @@ const verbs = {
     says: "what every door says, in the viewer this tree builds",
     run: async () => readLog(rest),
   },
+  serve: {
+    says: "the server behind the bridgehead, under the debugger with --inspect",
+    run: async () => serveBridge(rest),
+  },
   find: {
     says: "every line carrying the words, out of the index",
     run: async () => asksIndex(["find", ...rest]),
@@ -482,6 +486,13 @@ function gridFaults(where) {
     message: one.why,
     severity: "error",
   }));
+}
+
+// The server runs as its own node process, so the debugger attaches to it and a restart loses the session nothing. [[spec/design_output/level0#the-bridgehead-and-the-server]]
+function serveBridge(argv) {
+  const inspect = argv.filter((one) => one.startsWith("--inspect"));
+  const server = join(root, "src", "doors", "bridge.js");
+  return outside.run([process.execPath, ...inspect, server, root], { cwd: root, inherit: true }).exitCode;
 }
 
 // [[spec/design_output/viewer#the-verb-builds-it]]

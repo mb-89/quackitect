@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-import { register } from "../../.claude/skills/level0/hooks/level0.js";
+import { register } from "../../.claude/skills/level0/hooks/level0-old.js";
 import { disk } from "../../src/doors/disk.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));

@@ -5,7 +5,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { register } from "../../.claude/skills/level0/hooks/level0.js";
+import { register } from "../../.claude/skills/level0/hooks/level0-old.js";
 import { canary, HEARD } from "../../.claude/skills/level0/lib/guidance.js";
 import { rowsOf } from "../../.claude/skills/level0/lib/log.js";
 
@@ -621,6 +621,25 @@ test("a write to the per-box file reaches the next turn end", async () => {
 
 // [[spec/design_output/level0#the-canary]]
 // [[spec/design_output/stop#the-canary-ends-turn-one]]
+// [[spec/design_output/stop#the-mark-survives-a-reload]]
+test("a module running again mid-session reads the mark, and the stop stands past turn one", async () => {
+  const it = await started();
+  assert.equal(String(it.files.get(".se/level0.turned") ?? "").trim(), "", "the session start writes the mark empty");
+  await it.raise("turn.complete", { ...answered, answer: canary({ rules: 2, notes: 1, stop: true }) });
+  assert.match(String(it.files.get(".se/level0.turned")), /^\d{4}-/, "the first turn end writes the mark");
+
+  const again = engine({
+    ...Object.fromEntries(it.files),
+    ".se/config.json": JSON.stringify({ log: { level: "debug" } }),
+  });
+  const said = await again.raise("tool.call", { tool: STOP, reason: "the-work-stands-complete", next: "Nothing waits." }, STOP);
+  assert.match(said.result, /^The stop stands/);
+  assert.ok(
+    again.lines().some((one) => one.level === "debug" && /runs again past turn one/.test(one.said)),
+    "the module says it runs again",
+  );
+});
+
 test("the stop call falls in the first turn, and names the canary as the one way out", async () => {
   const it = await started();
   const said = await stops(it);
