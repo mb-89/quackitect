@@ -48,6 +48,7 @@ words:
   - {word: admits, from: tree}
   - {word: adopts, from: tree}
   - {word: advances, from: tree}
+  - {word: adverb, from: session, meaning: a word telling how far or how much}
   - {word: advice, from: tree}
   - {word: advises, from: tree}
   - {word: after, pos: CCONJ, from: openste}
@@ -377,6 +378,7 @@ words:
   - {word: claims, from: tree}
   - {word: class, from: tree}
   - {word: classification, from: tree}
+  - {word: classifier, from: session, meaning: the door judging what a call may do}
   - {word: claude, from: tree}
   - {word: clean, pos: ADJ, from: openste}
   - {word: cleanup, from: tree}
@@ -428,6 +430,7 @@ words:
   - {word: compaction, from: tree}
   - {word: compacts, from: tree}
   - {word: compare, pos: VERB, from: openste}
+  - {word: comparative, from: session, meaning: the form of a word saying more of a thing}
   - {word: compatibility, from: tree}
   - {word: compatible, pos: ADJ, from: openste}
   - {word: compile, from: tree}
@@ -460,6 +463,7 @@ words:
   - {word: confirm, from: tree}
   - {word: conflict, from: tree}
   - {word: confuse, pos: VERB, from: openste}
+  - {word: conjunction, from: session, meaning: a word joining two halves of a sentence}
   - {word: connect, pos: VERB, from: openste}
   - {word: connection, pos: NOUN, from: openste}
   - {word: connotation, pos: NOUN, from: openste}
@@ -494,6 +498,7 @@ words:
   - {word: copy, pos: VERB, from: openste}
   - {word: corner, pos: NOUN, from: openste}
   - {word: corporate, from: tree}
+  - {word: corpus, from: session, meaning: the body of prose a measurement reads}
   - {word: correct, pos: ADJ, from: openste}
   - {word: correction, pos: NOUN, from: openste}
   - {word: corrective, from: tree}
@@ -2009,6 +2014,7 @@ words:
   - {word: grew, from: tree}
   - {word: grey, from: tree}
   - {word: growing, from: tree}
+  - {word: growth, from: session, meaning: the list taking a word it leaves out}
   - {word: guarantee, from: tree}
   - {word: guarantees, from: tree}
   - {word: guardrail, from: tree}
@@ -2218,6 +2224,7 @@ words:
   - {word: outline, from: tree}
   - {word: outranks, from: tree}
   - {word: outright, from: tree}
+  - {word: overrun, from: session, meaning: to run past what a thing holds}
   - {word: overwriting, from: tree}
   - {word: overwritten, from: tree}
   - {word: overwrote, from: tree}
@@ -2474,6 +2481,7 @@ words:
   - {word: star, from: tree}
   - {word: stdio, from: tree}
   - {word: steel, from: tree}
+  - {word: stem, from: session, meaning: the root of a word the rule reduces to}
   - {word: sticks, from: tree}
   - {word: storage, from: tree}
   - {word: store, from: tree}
@@ -2496,6 +2504,7 @@ words:
   - {word: successors, from: tree}
   - {word: summary, from: tree}
   - {word: supplier, from: tree}
+  - {word: superlative, from: session, meaning: the form of a word saying the most of a thing}
   - {word: supported, from: tree}
   - {word: surprise, from: session, meaning: a thing the work answers that nobody expects}
   - {word: survived, from: tree}
@@ -2515,6 +2524,7 @@ words:
   - {word: teaching, from: tree}
   - {word: template, from: tree}
   - {word: tend, from: tree}
+  - {word: tengo, from: session, meaning: the language a script rule runs}
   - {word: tenth, from: tree}
   - {word: terms, from: tree}
   - {word: terse, from: tree}
