@@ -9,6 +9,14 @@ export const SEVERITY = "error";
 export const HAND = "hand";
 export const ANSWERED = "answered:";
 
+// [[spec/design_output/pull#the-private-queue]]
+export function openPrivate(text) {
+  const front = readNote(String(text ?? "")).front.said ?? {};
+  if (String(front.state ?? "") !== "open") return false;
+  const process = String(front.process ?? "").replace(/^\[\[|\]\]$/g, "");
+  return process !== "note" && !process.endsWith("/note");
+}
+
 // [[spec/design_output/pull#the-group-holds-the-turn]]
 export function heldGroup(text) {
   const front = readNote(String(text ?? "")).front.said ?? {};
@@ -120,7 +128,7 @@ function placeFaults(old, note, schema, where) {
   const places = placesIn(note, schema);
   if (!places.size) return [];
 
-  // Two leaves name one field alike, so the old chapter is the nth of its key.
+  // [[spec/design_output/schema#the-three-places]]
   const held = new Map(old.sections.map((one, i) => [nthKey(old.sections, i), one.own.join("\n")]));
   const out = [];
 

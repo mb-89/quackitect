@@ -100,7 +100,7 @@ import {
   schemasFrom,
   strangerFault,
 } from "../lib/schema.js";
-import { heldGroup, refusedTicket, ticketFaults } from "../lib/ticket.js";
+import { heldGroup, openPrivate, refusedTicket, ticketFaults } from "../lib/ticket.js";
 import { reaches, refusedTodo, taggedIn } from "../lib/todo.js";
 import { guesses, pathOf, surveyOf, TOOLS } from "../lib/tools.js";
 import {
@@ -124,6 +124,7 @@ import { lintText } from "../lib/vale.js";
 
 const SE = ".se";
 const HOLDS = `${SE}/hold`;
+const PRIVATE_TICKETS = `${SE}/tickets`;
 const GUIDANCE = "spec/guidance";
 const COMMIT = "level0-commit.md";
 const HANDOVER = `${SE}/HANDOVER.md`;
@@ -1013,12 +1014,30 @@ async function groupInHand($) {
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 async function holdStands($) {
+  if (await holdFileStands($)) return true;
+  return privateStands($);
+}
+
+async function holdFileStands($) {
   try {
     const entries = await $.fs.list(HOLDS);
     return entries.some((one) => one.name.endsWith(".json"));
   } catch {
     return false;
   }
+}
+
+// [[spec/design_output/pull#the-private-queue]]
+async function privateStands($) {
+  try {
+    for (const one of await $.fs.list(PRIVATE_TICKETS)) {
+      if (!one.name.endsWith(".md")) continue;
+      if (openPrivate(await $.fs.read(`${PRIVATE_TICKETS}/${one.name}`))) return true;
+    }
+  } catch {
+    return false;
+  }
+  return false;
 }
 
 // [[spec/design_output/extension#the-ask-is-a-line]]

@@ -410,6 +410,11 @@ of each of its evidence fields. A chapter outside that set stands refused where
 the write changes its lines. So a phase's chapter, another leaf's fields and the
 ask of an open ticket are the engine's.
 
+Two leaves name one field alike, as `tests` under `tests-red` and under
+`tests-green`. So the door names an old chapter by its level, its header and
+its place among the chapters of that name. Each one then reads against its
+own.
+
 A file the door finds empty is a mint, and the mint writes every place at once.
 So the rule reaches the second write and no first one.
 

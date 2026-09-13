@@ -363,10 +363,10 @@ test("an open private ticket carries the turn, and a note alone waits for the re
   const rule = "- id: a-ticket-stands-in-hand\n  side: continue\n  priority: 81\n  decides: mechanical\n  runs: ticket-in-hand\n  says: A ticket stands in your hand.\n";
   const piece = (process) =>
     `---\nkind: [[ticket]]\nstate: open\nprocess: [[${process}]]\nsteps:\n  - name: do\n---\n\n# Ask\n\nOne.\n`;
-  const carried = await started({
-    ".se/tickets/a-piece.md": piece("trivial"),
-    "spec/config/stop/level1.yml": rule,
-  });
+  const carried = await started(
+    { ".se/tickets/a-piece.md": piece("trivial"), "spec/config/stop/level1.yml": rule },
+    boxSaying("", { CLAUDE_CODE_REMOTE: "1" }),
+  );
   await carried.raise("turn.complete", {
     ...answered,
     answer: `a leaf is done\n\n${canary({ rules: 2, notes: 1, stop: true })}`,
@@ -375,10 +375,10 @@ test("an open private ticket carries the turn, and a note alone waits for the re
   assert.equal(said.at(-1).said, "the turn goes on");
   assert.match(said.at(-1).detail, /continue=a-ticket-stands-in-hand@81/);
 
-  const waits = await started({
-    ".se/tickets/a-note.md": piece("note"),
-    "spec/config/stop/level1.yml": rule,
-  });
+  const waits = await started(
+    { ".se/tickets/a-note.md": piece("note"), "spec/config/stop/level1.yml": rule },
+    boxSaying("", { CLAUDE_CODE_REMOTE: "1" }),
+  );
   await waits.raise("turn.complete", {
     ...answered,
     answer: `a leaf is done\n\n${canary({ rules: 2, notes: 1, stop: true })}`,

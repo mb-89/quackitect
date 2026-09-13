@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[standard]]
 group: the-agent-pulls-a-ticket
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d49afdfe301a64
@@ -109,6 +109,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d49afdfe301a64
+    hash_before: ef56e031e23add53823e98c64c8ea53c93f2f8ee
+    hash_after: ef56e031e23add53823e98c64c8ea53c93f2f8ee
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -244,8 +252,15 @@ The verb runs the four test files the branch changes since the take, and one ass
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
+
+### checked
+
+- the change touches the stop hook, its ticket lib, the schema note and the pull note, and no other file
+- the hook reaches the disk through the harness, and the hook tests carry its fake
+- the check points at the private queue chapter of the pull note
 
 ## tests-green
 
