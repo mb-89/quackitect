@@ -47,33 +47,61 @@ export function judgeOf(said = {}, rules = []) {
       if (!asking.length) return [];
 
       const found = [];
-      const spans = spansIn(text).slice(0, settings.maxSpans);
 
-      for (const span of spans) {
-        for (const rule of asking) {
-          let said;
-          try {
-            said = await classify(`${rule.ask}\n\nText:\n${span.text}`, rule.labels, {
-              model: settings.model,
+      for (const [cut, rules] of grouped(asking)) {
+        for (const span of cut(text).slice(0, settings.maxSpans)) {
+          for (const rule of rules) {
+            let said;
+            try {
+              said = await classify(`${rule.ask}\n\nText:\n${span.text}`, rule.labels, {
+                model: settings.model,
+              });
+            } catch {
+              said = undefined;
+            }
+            if (!refusedBy(rule, said)) continue;
+            found.push({
+              rule: rule.name,
+              line: span.line,
+              column: 1,
+              said: shortened(span.text),
+              message: rule.message,
+              severity: "error",
+              fixable: false,
             });
-          } catch {
-            said = undefined;
           }
-          if (said !== rule.refuses) continue;
-          found.push({
-            rule: rule.name,
-            line: span.line,
-            column: 1,
-            said: cut(span.text),
-            message: rule.message,
-            severity: "error",
-            fixable: false,
-          });
         }
       }
       return found;
     },
   };
+}
+
+// [[spec/design_output/level0#a-judged-rule-scopes]]
+export function refusedBy(rule, said) {
+  if (typeof said !== "string") return false;
+  return [].concat(rule?.refuses ?? []).includes(said);
+}
+
+// [[spec/design_output/level0#a-judged-rule-cuts]]
+const CUTS = new Map([
+  ["paragraph", spansIn],
+  ["chapter", chaptersIn],
+]);
+
+// [[spec/design_output/level0#a-judged-rule-cuts]]
+export function cutFor(rule) {
+  return CUTS.get(String(rule?.span ?? "paragraph")) ?? spansIn;
+}
+
+function grouped(rules) {
+  const out = new Map();
+  for (const rule of rules) {
+    const cut = cutFor(rule);
+    if (!out.has(cut)) out.set(cut, []);
+    out.get(cut).push(rule);
+  }
+  return out;
 }
 
 export function spansIn(text) {
@@ -120,7 +148,46 @@ export function spansIn(text) {
   return out.filter((one) => one.text.split(/\s+/).length >= 12);
 }
 
-function cut(said, at = 72) {
+// [[spec/design_output/level0#a-judged-rule-cuts]]
+export function chaptersIn(text) {
+  const lines = bodyOf(text);
+  const out = [];
+  let held = [];
+  let at = 1;
+  let fenced = false;
+
+  const close = () => {
+    if (held.join(" ").trim()) out.push({ text: held.join("\n").trim(), line: at });
+    held = [];
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (/^\s*(```|~~~)/.test(line)) {
+      fenced = !fenced;
+      held.push(line);
+      continue;
+    }
+    if (!fenced && /^#{1,6}\s/.test(line.trim())) {
+      close();
+      at = i + 1;
+    }
+    held.push(line);
+  }
+  close();
+  return out.filter((one) => one.text.split(/\s+/).length >= 12);
+}
+
+// [[spec/design_output/level0#a-judged-rule-cuts]]
+function bodyOf(text) {
+  const lines = String(text ?? "").split(/\r?\n/);
+  if (lines[0]?.trim() !== "---") return lines;
+  const shut = lines.findIndex((line, i) => i > 0 && line.trim() === "---");
+  if (shut < 0) return lines;
+  return lines.map((line, i) => (i <= shut ? "" : line));
+}
+
+function shortened(said, at = 72) {
   const flat = String(said ?? "")
     .replace(/\s+/g, " ")
     .trim();

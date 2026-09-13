@@ -1,0 +1,18 @@
+# GENERATED. Edit the source named below, not this file. It is written again
+# every time the tree is projected, so an edit here is lost. Source:
+# spec/schemas/paragraph.schema.yaml
+extends: judge
+message: "Put the bottom line first, and the detail under it."
+link: spec/guidance/voice.md
+level: error
+ask: "Does the first block of this text state the outcome, or does the outcome arrive late, under a heading or at the end?"
+labels:
+  - first
+  - late
+refuses: late
+span: chapter
+reads:
+  - "*.md"
+  - "spec/**/*.md"
+ignores:
+  - ".se/*.md"

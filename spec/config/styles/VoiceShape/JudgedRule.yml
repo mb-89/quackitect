@@ -1,5 +1,5 @@
 extends: script
-message: "A judged rule carries ask, message and two labels, and refuses one of them."
+message: "A judged rule carries ask, message and two labels, and refuses a label it names."
 link: spec/guidance/guidance.md
 level: error
 scope: raw
@@ -12,8 +12,8 @@ script: |
   asks := false
   says := false
   labels := 0
-  refuses := ""
-  inList := false
+  refused := []
+  inList := ""
   named := {}
 
   for i := 0; i < len(lines); i++ {
@@ -22,25 +22,34 @@ script: |
 
     if text.has_prefix(trimmed, "#") { continue }
 
-    if text.re_match(`^ask:\s*\S`, trimmed) { asks = true; inList = false; continue }
-    if text.re_match(`^message:\s*\S`, trimmed) { says = true; inList = false; continue }
+    if text.re_match(`^ask:\s*\S`, trimmed) { asks = true; inList = ""; continue }
+    if text.re_match(`^message:\s*\S`, trimmed) { says = true; inList = ""; continue }
     if text.re_match(`^refuses:\s*\S`, trimmed) {
-      refuses = text.trim_space(text.re_replace(`^refuses:\s*`, trimmed, ""))
-      inList = false
+      refused = append(refused, text.trim_space(text.re_replace(`^refuses:\s*`, trimmed, "")))
+      inList = ""
       continue
     }
-    if text.re_match(`^labels:\s*$`, trimmed) { inList = true; continue }
-    if inList {
+    if text.re_match(`^refuses:\s*$`, trimmed) { inList = "refuses"; continue }
+    if text.re_match(`^labels:\s*$`, trimmed) { inList = "labels"; continue }
+    if inList != "" {
       if text.re_match(`^-\s+\S`, trimmed) {
-        labels = labels + 1
-        named[text.trim_space(text.re_replace(`^-\s+`, trimmed, ""))] = true
+        one := text.trim_space(text.re_replace(`^-\s+`, trimmed, ""))
+        if inList == "labels" {
+          labels = labels + 1
+          named[one] = true
+        } else {
+          refused = append(refused, one)
+        }
         continue
       }
-      if len(trimmed) > 0 { inList = false }
+      if len(trimmed) > 0 { inList = "" }
     }
   }
 
-  ok := asks && says && labels >= 2 && refuses != "" && named[refuses] != undefined
+  ok := asks && says && labels >= 2 && len(refused) > 0
+  for one in refused {
+    if named[one] == undefined { ok = false }
+  }
   if !ok {
     matches = append(matches, {begin: 0, end: len(text.trim_space(lines[0]))})
   }
