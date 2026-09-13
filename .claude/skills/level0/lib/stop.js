@@ -6,11 +6,16 @@
 import { readEntries } from "./rulefile.js";
 
 export const RULES = "spec/config/stop";
-export const TOOL = "claim_stop";
-export const CALLED = `mcp__level0__${TOOL}`;
 export const OFF = "stop-hook-off";
-export const LIVES = 2;
 export const FRESH = 10;
+
+// [[spec/design_output/stop#the-stop-is-one-call]]
+export const STOP_TOOL = "stop";
+export const STOP_CALL = `mcp__level0__${STOP_TOOL}`;
+
+// [[spec/design_output/level0#the-needs-table]]
+export const NEEDS_LINE =
+  "Before the call, close the answer with the heading What the agent needs and a table headed No., question and proposed answer, one numbered row a need.";
 
 const NEEDS = ["id", "side", "priority", "decides"];
 const SIDES = ["stop", "continue"];
@@ -96,69 +101,91 @@ export function detail(decision, inARow) {
   return `stop=${named(decision.stop)} continue=${named(decision.go)} inARow=${inARow}`;
 }
 
-// [[spec/design_output/stop#what-the-re-prompt-says]]
-export function reprompt(decision) {
-  return [
-    decision.go?.says ?? "",
-    "",
-    "If that reading is wrong, claim the stop and end the turn:",
-    ...decision.unclaimed.map((one) => `  - ${one.asks}`),
-  ]
-    .join("\n")
-    .trimStart();
+export function stopReasons(rules) {
+  return (rules ?? []).filter(asks);
 }
 
-// [[spec/design_output/stop#the-claim-and-its-life]]
-export function claimSpec(rules) {
-  const claimable = (rules ?? []).filter((one) => one.decides === "claimed");
+// [[spec/design_output/stop#the-stop-is-one-call]]
+export function stopSpec(rules) {
+  const reasons = stopReasons(rules);
+  const reason = {
+    type: "string",
+    description: "The id of your reason, one of the stop rules this tree holds.",
+  };
+  if (reasons.length) reason.enum = reasons.map((one) => one.id);
   return {
-    name: TOOL,
+    name: STOP_TOOL,
     description: [
-      "Claims a reason this turn may end, or a reason to carry on.",
-      "Level zero counts the claim at the turn end, and the claim goes",
-      `after ${LIVES} more tool calls. One rule id and one sentence:`,
-      ...claimable.map((one) => `${one.id} (${one.side}) ${one.asks ?? one.says ?? ""}`),
-    ].join(" "),
+      "Ends this turn. Call it last, once your answer stands, and write nothing",
+      "after it. The result says whether the stop stands. Where it falls, the",
+      `result names the fact, so carry on. ${NEEDS_LINE} The reasons:`,
+      ...reasons.map((one) => `${one.id}: ${one.asks}`),
+    ].join("\n"),
     inputSchema: {
       type: "object",
       properties: {
-        rule: { type: "string", enum: claimable.map((one) => one.id) },
-        why: { type: "string" },
+        reason,
+        next: { type: "string", description: "What the owner does next, in one sentence." },
       },
-      required: ["rule", "why"],
+      required: ["reason", "next"],
     },
   };
 }
 
+// [[spec/design_output/stop#the-claim-rides-the-call]]
+export function stopAnswer(rules, reason, decision) {
+  const known = stopReasons(rules).some((one) => one.id === reason);
+  if (!known) {
+    const ids = stopReasons(rules)
+      .map((one) => one.id)
+      .join(", ");
+    return { known, ends: false, result: `${reason} names no reason this tree holds. The ids: ${ids}.` };
+  }
+  if (decision.ends) {
+    const why = decision.stop?.says ?? "";
+    return { known, ends: true, result: `The stop stands. ${why} Write nothing more.`.replace(/\s+/g, " ") };
+  }
+  return { known, ends: false, result: `The stop falls. ${decision.go?.says ?? ""}`.trim() };
+}
+
+// [[spec/design_output/stop#what-the-re-prompt-says]]
+export function reprompt(decision) {
+  const why = decision.go?.says ?? "";
+  return [
+    `${why} To stop, call ${STOP_CALL} last, with one reason:`.trim(),
+    ...askLines(decision.unclaimed),
+    NEEDS_LINE,
+  ].join("\n");
+}
+
+// [[spec/design_output/stop#a-turn-with-no-call]]
+export function askForStop(rules) {
+  return [
+    `This turn ends with no stop, so it holds open. Carry on, or call ${STOP_CALL} last, with one reason:`,
+    ...askLines(stopReasons(rules)),
+    NEEDS_LINE,
+  ].join("\n");
+}
+
+function askLines(rules) {
+  return (rules ?? []).map((one) => `  ${one.id}: ${one.asks}`);
+}
+
 // [[spec/design_output/stop#the-tooth-holds-its-state]]
 export function toothOf(init = {}) {
-  const lives = init.lives ?? LIVES;
   const fresh = init.fresh ?? FRESH;
 
   let calls = 0;
   let granted = false;
   let inARow = 0;
-  let claim = null;
-  let since = 0;
 
   return {
     calls: () => calls,
     inARow: () => inARow,
-    claim: () => claim,
     isNew: () => calls < fresh && !granted,
 
-    claims(rule, why) {
-      claim = { rule, why };
-      since = 0;
-      return claim;
-    },
-
-    sawCall(tool) {
+    sawCall() {
       calls += 1;
-      if (!claim || tool === TOOL || tool === CALLED) return claim;
-      since += 1;
-      if (since > lives) claim = null;
-      return claim;
     },
 
     sawPrompt(mine) {
@@ -167,8 +194,6 @@ export function toothOf(init = {}) {
 
     // [[spec/design_output/config#a-caller-hands-it-in]]
     atTurnEnd(decision, mostInARow) {
-      const held = claim;
-      claim = null;
       const runaway = !decision.ends && mostInARow > 0 && inARow >= mostInARow;
       const ends = decision.ends || runaway;
       if (ends) {
@@ -177,7 +202,7 @@ export function toothOf(init = {}) {
       } else {
         inARow += 1;
       }
-      return { ...decision, ends, runaway, claim: held, inARow };
+      return { ...decision, ends, runaway, inARow };
     },
   };
 }

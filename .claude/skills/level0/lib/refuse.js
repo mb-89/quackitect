@@ -31,11 +31,6 @@ export function answerFindings(where, it) {
   ].join("\n");
 }
 
-// [[spec/design_output/level0#the-carry-rides-a-prompt]]
-export function carried(found, score) {
-  return `The answer before this scored ${score} findings a thousand words. ${taught(found)}`;
-}
-
 function bodyOf(where, found) {
   const lines = [];
   for (const one of found ?? []) {

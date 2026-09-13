@@ -219,6 +219,27 @@ const PAST = [
 
 const answered = { reason: "answer", answer: "", durationMs: 1, aborted: false };
 
+// [[spec/design_output/stop#the-stop-is-one-call]]
+const STOP = "mcp__level0__stop";
+
+async function stops(it, reason = "the-work-stands-complete") {
+  return it.raise("tool.call", { tool: STOP, reason, next: "Nothing waits." }, STOP);
+}
+
+// [[spec/design_output/level0#the-needs-table]]
+const NEEDS = [
+  "## What the agent needs",
+  "",
+  "| No. | Question | Proposed answer |",
+  "|---|---|---|",
+  "| 1 | Anything? | Nothing waits on you. |",
+].join("\n");
+
+async function endsATurn(it, answer = "done") {
+  await stops(it);
+  await it.raise("turn.complete", { ...answered, answer: `${answer}\n\n${NEEDS}` });
+}
+
 test("a session start writes one line, and registers every tool", async () => {
   const it = await started();
 
@@ -228,14 +249,15 @@ test("a session start writes one line, and registers every tool", async () => {
   );
   assert.deepEqual(
     it.registered.map((one) => one.name),
-    ["claim_stop", "check_answer", "mint_note", "review_branch", "log", "patch", "replace", "undo"],
+    ["check_answer", "mint_note", "review_branch", "log", "patch", "replace", "undo", "stop"],
   );
-  assert.deepEqual(it.registered[0].inputSchema.properties.rule.enum, [
+  assert.deepEqual(it.registered[0].inputSchema.required, ["text"]);
+  assert.deepEqual(it.registered[1].inputSchema.required, ["kind", "path"]);
+  assert.deepEqual(it.registered[2].inputSchema.required, ["branch"]);
+  assert.deepEqual(it.registered[7].inputSchema.required, ["reason", "next"]);
+  assert.deepEqual(it.registered[7].inputSchema.properties.reason.enum, [
     "the-work-stands-complete",
   ]);
-  assert.deepEqual(it.registered[1].inputSchema.required, ["text"]);
-  assert.deepEqual(it.registered[2].inputSchema.required, ["kind", "path"]);
-  assert.deepEqual(it.registered[3].inputSchema.required, ["branch"]);
 });
 
 // [[spec/design_output/log#what-a-tool-line-names]]
@@ -294,13 +316,14 @@ test("a turn ending with no answer writes no reply", async () => {
 // [[spec/design_output/stop#every-decision-writes-a-line]]
 test("a turn end writes one stop line", async () => {
   const it = await started();
-  await it.raise("turn.complete", { ...answered, answer: "done" });
+  await endsATurn(it);
 
   const said = it.lines().filter((one) => one.kind === "stop");
-  assert.equal(said.length, 1);
-  assert.equal(said[0].said, "the turn ends");
-  assert.match(said[0].detail, /^stop=the-session-is-new@95 continue=none@0 inARow=0$/);
-  assert.deepEqual(it.prompts, []);
+  assert.equal(said.length, 2, "the call writes one, and the vote the other");
+  assert.equal(said[0].said, "the stop stands");
+  assert.equal(said[1].said, "the turn ends");
+  assert.match(said[1].detail, /^stop=the-session-is-new@95 continue=none@0 inARow=0$/);
+  assert.equal(it.prompts.length, 0, "nothing reaches the agent");
 });
 
 // [[spec/design_output/stop#holding-a-turn-open]]
@@ -311,14 +334,16 @@ test("a held branch carries the turn once the session stops being new", async ()
   for (let i = 0; i < 10; i++) {
     await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   }
-  await it.raise("turn.complete", { ...answered, answer: "a step is done" });
+  await endsATurn(it, "a step is done");
 
   const said = it.lines().filter((one) => one.kind === "stop");
-  assert.equal(said[0].said, "the turn goes on");
-  assert.match(said[0].detail, /continue=work-still-stands@80 inARow=1$/);
-  assert.equal(it.prompts.length, 1);
+  assert.equal(said[0].said, "the stop falls");
+  assert.equal(said[1].said, "the turn goes on");
+  assert.match(said[1].detail, /continue=work-still-stands@80 inARow=1$/);
+  assert.equal(it.prompts.length, 1, "the vote holding it open");
   assert.match(it.prompts[0].text, /^Something on your list stands unfinished/);
-  assert.match(it.prompts[0].text, /- Does the work stand complete\?/);
+  assert.match(it.prompts[0].text, /call mcp__level0__stop last/);
+  assert.ok(it.prompts[0].text.split("\n").length <= 5, "five lines at most");
 });
 
 // [[spec/design_output/extension#the-hold-is-one-rule]]
@@ -328,12 +353,12 @@ test("the hold at stopped ends a turn the standing work would carry", async () =
     await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   }
   it.files.set(".se/config.json", JSON.stringify({ stop: { hold: "stopped" } }));
-  await it.raise("turn.complete", { ...answered, answer: "a step is done" });
+  await endsATurn(it, "a step is done");
 
   const said = it.lines().filter((one) => one.kind === "stop");
-  assert.equal(said[0].said, "the turn ends");
-  assert.match(said[0].detail, /^stop=the-owner-holds-this-session@85/);
-  assert.deepEqual(it.prompts, []);
+  assert.equal(said[1].said, "the turn ends");
+  assert.match(said[1].detail, /^stop=the-owner-holds-this-session@85/);
+  assert.equal(it.prompts.length, 0, "nothing reaches the agent");
 });
 
 test("the hold at running leaves the vote as it stands", async () => {
@@ -507,14 +532,23 @@ test("a write to the per-box file reaches the next turn end", async () => {
   }
   it.files.set(".se/config.json", JSON.stringify({ stop: { mostInARow: 1 } }));
 
-  await it.raise("turn.complete", { ...answered, answer: "one step" });
-  await it.raise("turn.complete", { ...answered, answer: "another step" });
+  for (const step of [SENTENCE, "another step", "a third step"]) {
+    await endsATurn(it, step);
+  }
 
   const said = it.lines().filter((one) => one.kind === "stop");
   assert.deepEqual(
     said.map((one) => one.said),
-    ["the turn goes on", "carried enough turns in a row", "the turn ends"],
-    "the tracked file says three, and the per-box file cuts it to one",
+    [
+      "the stop falls",
+      "the turn goes on",
+      "the stop falls",
+      "carried enough turns in a row",
+      "the turn ends",
+      "the stop falls",
+      "the turn goes on",
+    ],
+    "the per-box file cuts the carry to one",
   );
 });
 
@@ -615,28 +649,28 @@ test("the debt reaches no subagent, and holds no question to the owner", async (
   }
 });
 
-test("a claim reaches the vote, and the tooth counts it once", async () => {
+// [[spec/design_output/stop#the-stop-is-one-call]]
+test("the call reaches the vote, and an answer without one ends nothing", async () => {
   const it = await started({
     "HANDOVER.md": "---\nstatus: held\n---\n\n# The brief\n",
   });
   for (let i = 0; i < 10; i++) {
     await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   }
-  await it.raise(
-    "tool.call",
-    {
-      tool: "mcp__level0__claim_stop",
-      rule: "the-work-stands-complete",
-      why: "pushed",
-    },
-    "mcp__level0__claim_stop",
-  );
   await it.raise("turn.complete", { ...answered, answer: "the work stands complete" });
 
+  const first = it.lines().filter((one) => one.kind === "stop");
+  assert.equal(first[0].said, "the turn goes on");
+  assert.equal(first[0].detail, "no stop", "an answer saying so ends no turn");
+
+  await endsATurn(it, "the work stands complete");
   const said = it.lines().filter((one) => one.kind === "stop");
-  assert.equal(said[0].said, "claimed the-work-stands-complete");
-  assert.equal(said[1].said, "the turn goes on", "work stands over a finished piece");
-  assert.match(said[1].detail, /^stop=the-work-stands-complete@45/);
+  assert.equal(said[said.length - 1].said, "the turn goes on");
+  assert.match(
+    said[said.length - 1].detail,
+    /^stop=the-work-stands-complete@45/,
+    "work stands over a finished piece",
+  );
 });
 
 // [[spec/design_output/level0#one-warning-then-a-refusal]]
@@ -662,6 +696,84 @@ test("a response with no answer earns one warning on the next call, then a refus
     ["warn", "warned Read before an answer"],
     ["warn", "refused Read before an answer"],
   ]);
+});
+
+// [[spec/design_output/level0#a-prompt-mid-turn]]
+test("a prompt landing mid-response skips that response's silent step", async () => {
+  const it = await started();
+  await it.raise("tool.call", { tool: "Read", file_path: "before.md" });
+  await it.raise("prompt.submit", { text: "and push it", origin: { kind: "composer" } });
+  await it.raise("turn.step", { turnId: "t", index: 4, answer: "", toolUses: [], stopReason: "tool_use" });
+
+  for (let i = 0; i < 2; i++) {
+    const said = await it.raise("tool.call", { tool: "Read", file_path: `${i}.md` });
+    assert.equal(said.deny, undefined, "the response reading the prompt passes");
+    assert.equal(said.context, undefined, "and meets no warning");
+  }
+  await it.raise("turn.step", { turnId: "t", index: 5, answer: "You want it pushed. I push.", toolUses: [], stopReason: "tool_use" });
+  const after = await it.raise("tool.call", { tool: "Read", file_path: "c.md" });
+  assert.equal(after.deny, undefined);
+});
+
+// [[spec/design_output/apply#the-disk-stands-in]]
+test("replace sweeps the files git lists where no index stands", async () => {
+  const it = await started(
+    { "docs/a.md": "work reroute here", "docs/b.md": "nothing", "src/c.js": "work reroute" },
+    {
+      run: (argv) =>
+        argv[0] === "git" && argv[1] === "ls-files"
+          ? { exitCode: 0, stdout: "docs/a.md\ndocs/b.md\nsrc/c.js\n", stderr: "" }
+          : { exitCode: 0, stdout: "", stderr: "" },
+    },
+  );
+  const said = await it.raise(
+    "tool.call",
+    {
+      tool: "mcp__level0__replace",
+      glob: "docs/**/*.md",
+      pattern: "work reroute",
+      replacement: "ticket update",
+      preview: true,
+    },
+    "mcp__level0__replace",
+  );
+  assert.match(said.result, /^1 file\(s\) would change/);
+  assert.match(said.result, /docs\/a\.md \(1 place\(s\)\)/);
+});
+
+// [[spec/design_output/log#an-answer-rides-the-tool]]
+test("an answer through the log tool clears the demand, and lands in the log", async () => {
+  const it = await started();
+  await it.raise("prompt.submit", { text: "and push it", origin: { kind: "composer" } });
+  await it.raise("turn.step", { turnId: "t", index: 0, answer: "", toolUses: [], stopReason: "tool_use" });
+  await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+
+  const answered = await it.raise(
+    "tool.call",
+    { tool: "mcp__level0__log", kind: "answer", said: "You want it pushed. I push after the check." },
+    "mcp__level0__log",
+  );
+  assert.equal(answered.deny, undefined);
+  assert.ok(it.lines().some((one) => one.kind === "answer" && /pushed/.test(one.said)));
+
+  const after = await it.raise("tool.call", { tool: "Read", file_path: "b.md" });
+  assert.equal(after.deny, undefined);
+  assert.equal(after.context, undefined);
+});
+
+// [[spec/design_output/level0#a-prompt-mid-turn]]
+test("a prompt mid-turn still binds a response that ignores it", async () => {
+  const it = await started();
+  await it.raise("tool.call", { tool: "Read", file_path: "before.md" });
+  await it.raise("prompt.submit", { text: "and push it", origin: { kind: "composer" } });
+  await it.raise("turn.step", { turnId: "t", index: 4, answer: "", toolUses: [], stopReason: "tool_use" });
+  await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  await it.raise("turn.step", { turnId: "t", index: 5, answer: "", toolUses: [], stopReason: "tool_use" });
+
+  const warned = await it.raise("tool.call", { tool: "Read", file_path: "b.md" });
+  assert.match(warned.context.at(-1), /^The owner sent a prompt/);
+  const refused = await it.raise("tool.call", { tool: "Read", file_path: "c.md" });
+  assert.match(refused.deny, /^The owner sent a prompt\./);
 });
 
 // [[spec/design_output/level0#a-step-carries-the-answer]]
@@ -1173,6 +1285,30 @@ test("a commit reading its message from a file meets the same rules", async () =
   assert.match(said.deny, /PastTense/);
 });
 
+test("a trailer paragraph under the message reaches Vale nowhere", async () => {
+  const read = [];
+  const taught = valeSaying([]);
+  const it = await started(undefined, {
+    ...taught,
+    run: (argv, init) => {
+      if (init?.stdin !== undefined) read.push(String(init.stdin));
+      return taught.run(argv, init);
+    },
+  });
+  const said = await it.raise(
+    "tool.call",
+    {
+      tool: "Bash",
+      command: 'git commit -m "the door reads more" -m "Co-Authored-By: the agent"',
+    },
+    "Bash",
+  );
+  assert.equal(said.deny, undefined);
+  assert.equal(read.length, 1, "the door reads the message once");
+  assert.equal(read[0].includes("Co-Authored-By"), false, "the trailer stays out");
+  assert.match(read[0], /^the door reads more/);
+});
+
 // [[spec/design_output/private#a-fixture-carries-no-shape]]
 const ADDRESS = ["duck", "quacks.org"].join("@");
 
@@ -1182,6 +1318,22 @@ const DELTA = `diff --git a/spec/guidance/voice.md b/spec/guidance/voice.md
 @@ -4,0 +5 @@ kind
 +Write to ${ADDRESS} where the door refuses.
 `;
+
+// [[spec/design_output/work#a-red-battery-pushes-nothing]]
+function boxAtHead(head, env = {}) {
+  return {
+    exists: (path) => path === VALE,
+    run: (argv) => {
+      if (argv[0] === "node") {
+        return { exitCode: 0, stdout: JSON.stringify(env), stderr: "" };
+      }
+      if (argv[0] === "git" && argv[1] === "rev-parse" && argv[2] === "HEAD") {
+        return { exitCode: 0, stdout: `${head}\n`, stderr: "" };
+      }
+      return { exitCode: 0, stdout: "", stderr: "" };
+    },
+  };
+}
 
 function boxSaying(delta, env = {}) {
   return {
@@ -1227,6 +1379,55 @@ test("a commit whose delta adds nothing private passes the door", async () => {
     "Bash",
   );
   assert.equal(said.deny, undefined);
+});
+
+// [[spec/design_output/level0#the-needs-table]]
+test("the draft tool demands the needs table where the draft ends on a stop", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  const prose = "word ".repeat(40).trim();
+
+  const bare = await it.raise("tool.call", { tool: DRAFT, text: prose, stop: true }, DRAFT);
+  assert.match(String(bare.result), /NeedsTable/);
+
+  const closed = await it.raise(
+    "tool.call",
+    { tool: DRAFT, text: `${prose}\n\n${NEEDS}`, stop: true },
+    DRAFT,
+  );
+  assert.match(String(closed.result), /meets the gate clean/);
+
+  const going = await it.raise("tool.call", { tool: DRAFT, text: prose }, DRAFT);
+  assert.match(String(going.result), /meets the gate clean/, "a draft going on owes no table");
+});
+
+// [[spec/design_output/work#a-red-battery-pushes-nothing]]
+test("a push to trunk takes a green battery, and a work branch takes none", async () => {
+  const HEAD = "a1b2c3d4e5f6";
+  const it = await started(undefined, boxAtHead(HEAD));
+  const push = { tool: "Bash", command: "git push origin main" };
+  const pushes = () => it.raise("tool.call", push, "Bash");
+  const stamp = (said) => it.files.set(".se/check.json", JSON.stringify(said));
+
+  assert.match(String((await pushes()).deny), /no check has run here/);
+
+  stamp({ sha: "beef", ok: true, clean: true });
+  assert.match(String((await pushes()).deny), /the check ran against beef/);
+
+  stamp({ sha: HEAD, ok: true, clean: false });
+  assert.match(String((await pushes()).deny), /over an unclean tree/);
+
+  stamp({ sha: HEAD, ok: false, clean: true, at: "now" });
+  assert.match(String((await pushes()).deny), /the check answered red/);
+
+  stamp({ sha: HEAD, ok: true, clean: true });
+  assert.equal((await pushes()).deny, undefined, "a green battery pushes trunk");
+
+  const branch = await it.raise(
+    "tool.call",
+    { tool: "Bash", command: "git push origin work/a-thing" },
+    "Bash",
+  );
+  assert.equal(branch.deny, undefined, "a work branch meets no battery");
 });
 
 // [[spec/design_output/private#the-escape]]
@@ -1580,7 +1781,7 @@ test("a target the box refuses writes one warning, and the rest still land", asy
 // [[spec/design_output/level0#the-three-bands]]
 const BANDED = { "spec/config/level0.json": JSON.stringify({
   judge: { enabled: false },
-  stop: { enabled: true, mostInARow: 3 },
+  stop: { enabled: false, mostInARow: 3 },
   log: { level: "info" },
   answer: { warnAt: 5, ceiling: 15 },
 }) };
@@ -1615,8 +1816,8 @@ test("an answer over the ceiling meets one re-prompt, and one alone", async () =
   assert.match(gate[0].detail, /^score=50 findings=1 inARow=1$/);
 });
 
-// [[spec/design_output/level0#the-carry-rides-a-prompt]]
-test("an answer under the ceiling rides the next prompt as one line", async () => {
+// [[spec/design_output/level0#the-three-bands]]
+test("an answer under the ceiling leaves the next prompt as the owner wrote it", async () => {
   const it = await started(BANDED, valeOnAnswer(PAST));
   await it.raise("turn.complete", { ...answered, answer: UNDER });
   assert.equal(it.prompts.length, 0);
@@ -1625,17 +1826,7 @@ test("an answer under the ceiling rides the next prompt as one line", async () =
     text: "carry on",
     origin: { kind: "composer" },
   });
-  assert.match(
-    said.text,
-    /^carry on\n\nThe answer before this scored 10 findings a thousand words\./,
-  );
-  assert.equal(said.text.split("\n\n")[1].includes("\n"), false, "the carry is one line");
-
-  const again = await it.raise("prompt.submit", {
-    text: "carry on",
-    origin: { kind: "composer" },
-  });
-  assert.equal(again.text, "carry on", "the findings ride once");
+  assert.equal(said.text, "carry on");
 });
 
 // [[spec/design_output/level0#the-three-bands]]
@@ -1672,4 +1863,99 @@ test("the draft tool reads a clean draft clean, and an empty one back", async ()
 
   const empty = await it.raise("tool.call", { tool: DRAFT, text: "  " }, DRAFT);
   assert.match(empty.result, /takes the text of one draft/);
+});
+
+const ASKS = "Where does the door stand? What does it read?";
+const TABLE = [
+  "| question | answer |",
+  "|---|---|",
+  "| where does it stand | in `lib/answer.js` |",
+  "| what does it read | the first block |",
+].join("\n");
+
+// [[spec/design_output/level0#the-table-answers-every-question]]
+test("a prompt with two questions refuses an answer opening with prose", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  await it.raise("prompt.submit", { text: ASKS, origin: { kind: "composer" } });
+  await it.raise("turn.complete", { ...answered, answer: OVER });
+
+  assert.equal(it.prompts.length, 1);
+  assert.match(it.prompts[0].text, /QuestionTable/);
+  assert.match(it.prompts[0].text, /asks 2 questions/);
+  assert.match(it.prompts[0].text, /opens with no table/);
+});
+
+// [[spec/design_output/level0#the-table-answers-every-question]]
+test("an answer opening with the table meets the gate clean", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  await it.raise("prompt.submit", { text: ASKS, origin: { kind: "composer" } });
+  await it.raise("turn.complete", { ...answered, answer: `${TABLE}\n\n${OVER}` });
+
+  assert.equal(it.prompts.length, 0);
+  assert.equal(
+    it.lines().find((one) => one.kind === "answer").said,
+    "the gate reads clean",
+  );
+});
+
+// [[spec/design_output/level0#the-door-counts-the-questions]]
+test("a prompt from a machine leaves the count standing", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  await it.raise("prompt.submit", { text: ASKS, origin: { kind: "composer" } });
+  await it.raise("prompt.submit", { text: "carry on", origin: { kind: "plugin" } });
+  await it.raise("turn.complete", { ...answered, answer: OVER });
+
+  assert.match(it.prompts[0].text, /asks 2 questions/);
+});
+
+// [[spec/design_output/level0#the-owner-answers-by-number]]
+test("a stop with no needs table meets a rewrite, whatever the score", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  await stops(it);
+  await it.raise("turn.complete", { ...answered, answer: CLEAN });
+
+  assert.equal(it.prompts.length, 1);
+  assert.match(it.prompts[0].text, /Write it again/);
+  assert.match(it.prompts[0].text, /NeedsTable/);
+});
+
+// [[spec/design_output/level0#the-cap-counts-the-prose]]
+test("the draft tool refuses a draft over the word cap", async () => {
+  const capped = { "spec/config/level0.json": JSON.stringify({
+    ...JSON.parse(BANDED["spec/config/level0.json"]),
+    answer: { warnAt: 5, ceiling: 15, words: 150 },
+  }) };
+  const it = await started(capped, valeOnAnswer([]));
+
+  const over = await it.raise("tool.call", { tool: DRAFT, text: CLEAN }, DRAFT);
+  assert.match(over.result, /AnswerLength/);
+  assert.match(over.result, /Write it again/);
+
+  const under = await it.raise("tool.call", { tool: DRAFT, text: OVER }, DRAFT);
+  assert.match(under.result, /meets the gate clean/);
+});
+
+// [[spec/design_output/level0#the-door-counts-the-questions]]
+test("a prompt carrying no question demands no table", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  await it.raise("prompt.submit", { text: "build it", origin: { kind: "composer" } });
+  await it.raise("turn.complete", { ...answered, answer: OVER });
+
+  assert.equal(it.prompts.length, 0);
+});
+
+// [[spec/design_output/level0#the-tool-reads-a-draft]]
+test("the draft tool reads the count the prompt sets", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  await it.raise("prompt.submit", { text: ASKS, origin: { kind: "composer" } });
+
+  const said = await it.raise("tool.call", { tool: DRAFT, text: OVER }, DRAFT);
+  assert.match(said.result, /QuestionTable/);
+
+  const met = await it.raise(
+    "tool.call",
+    { tool: DRAFT, text: `${TABLE}\n\n${OVER}` },
+    DRAFT,
+  );
+  assert.match(met.result, /meets the gate clean/);
 });
