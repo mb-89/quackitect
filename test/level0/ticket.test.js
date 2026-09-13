@@ -203,8 +203,8 @@ const recorded = open.replace(
   `record:
   - step: implement/change
     hand: a box, a session and an agent
-    took: abc1234
-    gave: def5678
+    hash_before: abc1234
+    hash_after: def5678
     returns: 1
     answered:
       - name: lint

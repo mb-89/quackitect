@@ -17,7 +17,7 @@ import {
   ticketAt,
   withEntry,
   withField,
-  withGave,
+  withHashAfter,
   withoutField,
 } from "../../src/scripts/group.js";
 
@@ -86,13 +86,13 @@ test("the step of a group with none is the first leaf of its route", () => {
 
 // [[spec/design_output/work#the-take-writes-the-record]]
 test("the take writes one record entry, and a second entry lands under the first", () => {
-  const once = withEntry(NOTE, { step: "sync", hand: "box 3f9a", took: "a1b2c3" });
+  const once = withEntry(NOTE, { step: "sync", hand: "box 3f9a", hash_before: "a1b2c3" });
   assert.deepEqual(recordIn(once), [
-    { step: "sync", hand: "box 3f9a", took: "a1b2c3" },
+    { step: "sync", hand: "box 3f9a", hash_before: "a1b2c3" },
   ]);
   assert.match(
     once,
-    /^record:\n {2}- step: sync\n {4}hand: box 3f9a\n {4}took: a1b2c3$/m,
+    /^record:\n {2}- step: sync\n {4}hand: box 3f9a\n {4}hash_before: a1b2c3$/m,
   );
   assert.equal(
     askOf(once),
@@ -103,7 +103,7 @@ test("the take writes one record entry, and a second entry lands under the first
   const twice = withEntry(once, {
     step: "retro/write",
     hand: "box 7c1d",
-    took: "d4e5f6",
+    hash_before: "d4e5f6",
   });
   assert.deepEqual(
     recordIn(twice).map((one) => one.step),
@@ -112,26 +112,26 @@ test("the take writes one record entry, and a second entry lands under the first
 });
 
 // [[spec/design_output/work#held-derives-from-the-record]]
-test("a group holds where its newest entry carries took and no gave", () => {
+test("a group holds where its newest entry carries hash_before and no hash_after", () => {
   assert.equal(heldIn(NOTE), null, "a group nobody took holds nowhere");
 
-  const took = withEntry(NOTE, { step: "sync", hand: "box 3f9a", took: "a1b2c3" });
-  assert.deepEqual(heldIn(took), { step: "sync", hand: "box 3f9a", took: "a1b2c3" });
+  const took = withEntry(NOTE, { step: "sync", hand: "box 3f9a", hash_before: "a1b2c3" });
+  assert.deepEqual(heldIn(took), { step: "sync", hand: "box 3f9a", hash_before: "a1b2c3" });
 
-  const gave = withGave(took, "d4e5f6");
+  const gave = withHashAfter(took, "d4e5f6");
   assert.equal(heldIn(gave), null, "a box that left holds nothing");
-  assert.equal(recordIn(gave).at(-1).gave, "d4e5f6");
+  assert.equal(recordIn(gave).at(-1).hash_after, "d4e5f6");
 
-  const again = withEntry(gave, { step: "sync", hand: "box 7c1d", took: "0a0b0c" });
+  const again = withEntry(gave, { step: "sync", hand: "box 7c1d", hash_before: "0a0b0c" });
   assert.equal(heldIn(again).hand, "box 7c1d", "the newest entry answers");
 });
 
 // [[spec/design_output/work#a-box-leaves]]
-test("a second gave on one entry replaces the first, and writes no other line", () => {
-  const took = withEntry(NOTE, { step: "sync", hand: "box 3f9a", took: "a1b2c3" });
-  const gave = withGave(withGave(took, "d4e5f6"), "99a888");
+test("a second hash_after on one entry replaces the first, and writes no other line", () => {
+  const took = withEntry(NOTE, { step: "sync", hand: "box 3f9a", hash_before: "a1b2c3" });
+  const gave = withHashAfter(withHashAfter(took, "d4e5f6"), "99a888");
   assert.equal(recordIn(gave).length, 1);
-  assert.equal(recordIn(gave)[0].gave, "99a888");
+  assert.equal(recordIn(gave)[0].hash_after, "99a888");
 });
 
 // [[spec/design_output/work#a-box-leaves]]

@@ -45,11 +45,11 @@ export function recordIn(text) {
 // [[spec/design_output/work#held-derives-from-the-record]]
 export function heldIn(text) {
   const held = recordIn(text).at(-1);
-  if (!held?.took || held.gave) return null;
+  if (!held?.hash_before || held.hash_after) return null;
   return {
     step: bare(held.step ?? ""),
     hand: bare(held.hand ?? ""),
-    took: bare(held.took),
+    hash_before: bare(held.hash_before),
   };
 }
 
@@ -96,7 +96,7 @@ export function withEntry(text, entry) {
 }
 
 // [[spec/design_output/work#a-box-leaves]]
-export function withGave(text, gave) {
+export function withHashAfter(text, after) {
   const rows = String(text ?? "").split("\n");
   const shut = frontShut(rows);
   const opens = shut < 0 ? -1 : keyAt(rows, shut, "record");
@@ -108,12 +108,12 @@ export function withGave(text, gave) {
   if (last < 0) return rows.join("\n");
 
   for (let at = last; at < ends; at++) {
-    if (/^\s+gave:/.test(rows[at])) {
-      rows[at] = `    gave: ${gave}`;
+    if (/^\s+hash_after:/.test(rows[at])) {
+      rows[at] = `    hash_after: ${after}`;
       return rows.join("\n");
     }
   }
-  rows.splice(ends, 0, `    gave: ${gave}`);
+  rows.splice(ends, 0, `    hash_after: ${after}`);
   return rows.join("\n");
 }
 
