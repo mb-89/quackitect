@@ -4,7 +4,7 @@
 // [[spec/design_output/projection#what-goes-where-is-data]]
 
 import { flatten, keysOf, LOCAL, TRACKED } from "./config.js";
-import { faultsOf, PARAGRAPH, rulesFrom, RULES } from "./paragraph.js";
+import { faultsOf, JUDGED, judgedFrom, PARAGRAPH, rulesFrom, RULES } from "./paragraph.js";
 import { readYaml } from "./schema.js";
 
 export const PROJECTIONS = "spec/config/projections.json";
@@ -15,10 +15,14 @@ export const COMMANDS = "config commands";
 // [[spec/design_output/projection#the-second-target]]
 export { PARAGRAPH } from "./paragraph.js";
 
+// [[spec/design_output/projection#the-judged-rules]]
+export { JUDGED } from "./paragraph.js";
+
 // [[spec/design_output/projection#a-shape-says-its-ending]]
 const HOLDS = new Map([
   [COMMANDS, ".md"],
   [PARAGRAPH, RULES],
+  [JUDGED, RULES],
 ]);
 
 const PREFIX = "se-";
@@ -49,7 +53,8 @@ export function readsOf(entry) {
 // [[spec/design_output/projection#projecting-in-memory]]
 export function writesOf(entry, texts) {
   const out = new Map();
-  if (entry?.shape === PARAGRAPH) return paragraphsOf(entry, texts);
+  if (entry?.shape === PARAGRAPH) return schemaInto(entry, texts, rulesFrom);
+  if (entry?.shape === JUDGED) return schemaInto(entry, texts, judgedFrom);
   if (entry?.shape !== COMMANDS) return out;
 
   const said = flatten(parsed(texts.get(entry.from)));
@@ -77,13 +82,13 @@ export function writesOf(entry, texts) {
 }
 
 // [[spec/design_output/projection#the-second-target]]
-function paragraphsOf(entry, texts) {
+function schemaInto(entry, texts, write) {
   const out = new Map();
   const source = texts.get(entry.from);
   if (source === undefined) return out;
 
   const target = folderOf(entry.target);
-  for (const [name, text] of rulesFrom(readYaml(source), saysGenerated(entry.from))) {
+  for (const [name, text] of write(readYaml(source), saysGenerated(entry.from))) {
     out.set(`${target}/${name}`, text);
   }
   return out;

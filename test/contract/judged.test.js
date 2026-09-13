@@ -51,6 +51,52 @@ test("Role refuses a span the judge calls a person, and passes one it calls a ro
   assert.deepEqual(clean, []);
 });
 
+// [[spec/design_output/level0#a-judged-rule-cuts]]
+test("ShapeFits refuses the table and the diagram, and passes prose", async () => {
+  const rule = ruleNamed("ShapeFits");
+  assert.deepEqual(rule.labels, ["prose", "table", "diagram"]);
+  assert.deepEqual(rule.refuses, ["table", "diagram"]);
+
+  const judge = judgeOf(settings, [rule]);
+  for (const label of ["table", "diagram"]) {
+    const found = await judge.run(SPAN, async () => label, "spec/guidance/voice.md");
+    assert.equal(found.length, 1, label);
+    assert.match(found[0].message, /table or a diagram/);
+  }
+  assert.deepEqual(await judge.run(SPAN, async () => "prose", "spec/guidance/voice.md"), []);
+});
+
+// [[spec/design_output/level0#a-judged-rule-cuts]]
+test("BottomLineFirst reads a chapter, and refuses an outcome arriving late", async () => {
+  const rule = ruleNamed("BottomLineFirst");
+  assert.equal(rule.span, "chapter");
+  assert.deepEqual(rule.labels, ["first", "late", "even"]);
+  assert.equal(rule.refuses, "late");
+
+  const note = `# One chapter\n\n${SPAN}\n\n# Another chapter\n\n${SPAN}\n`;
+  const asked = [];
+  const judge = judgeOf(settings, [rule]);
+  const found = await judge.run(
+    note,
+    async (said) => {
+      asked.push(said);
+      return "late";
+    },
+    "spec/guidance/voice.md",
+  );
+
+  assert.equal(asked.length, 2, "one question a chapter");
+  assert.match(asked[0], /# One chapter/);
+  assert.equal(found.length, 2);
+  assert.match(found[0].message, /bottom line first/);
+});
+
+test("ShapeFits reads every path, and the two new rules cost nothing under .se", () => {
+  assert.equal(readsFor(ruleNamed("ShapeFits"), ".se/HANDOVER.md"), true);
+  assert.equal(readsFor(ruleNamed("BottomLineFirst"), ".se/HANDOVER.md"), false);
+  assert.equal(readsFor(ruleNamed("BottomLineFirst"), "spec/guidance/voice.md"), true);
+});
+
 test("Role reads the tracked notes, and the private half costs no call", () => {
   const rule = ruleNamed("Role");
   for (const path of ["spec/guidance/voice.md", "spec/funnel/a.md", "README.md"]) {

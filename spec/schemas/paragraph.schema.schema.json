@@ -139,11 +139,16 @@
               "type": "array",
               "items": {
                 "type": "object",
-                "required": ["id", "asks", "labels", "refuses"],
+                "required": ["id", "asks", "message", "labels", "refuses", "span"],
                 "properties": {
                   "id": { "type": "string" },
                   "asks": { "type": "string" },
-                  "labels": { "type": "array", "items": { "type": "string" } }
+                  "message": { "type": "string" },
+                  "link": { "type": "string" },
+                  "span": { "type": "string", "enum": ["paragraph", "chapter"] },
+                  "labels": { "type": "array", "items": { "type": "string" } },
+                  "reads": { "type": "array", "items": { "type": "string" } },
+                  "ignores": { "type": "array", "items": { "type": "string" } }
                 }
               }
             }

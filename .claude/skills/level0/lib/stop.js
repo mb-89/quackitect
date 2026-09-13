@@ -13,6 +13,10 @@ export const FRESH = 10;
 export const STOP_TOOL = "stop";
 export const STOP_CALL = `mcp__level0__${STOP_TOOL}`;
 
+// [[spec/design_output/level0#the-needs-table]]
+export const NEEDS_LINE =
+  "Before the call, close the answer with the heading What the agent needs and a table headed No., question and proposed answer, one numbered row a need.";
+
 const NEEDS = ["id", "side", "priority", "decides"];
 const SIDES = ["stop", "continue"];
 const DECIDES = ["claimed", "mechanical"];
@@ -114,7 +118,7 @@ export function stopSpec(rules) {
     description: [
       "Ends this turn. Call it last, once your answer stands, and write nothing",
       "after it. The result says whether the stop stands. Where it falls, the",
-      "result names the fact, so carry on. The reasons:",
+      `result names the fact, so carry on. ${NEEDS_LINE} The reasons:`,
       ...reasons.map((one) => `${one.id}: ${one.asks}`),
     ].join("\n"),
     inputSchema: {
@@ -150,6 +154,7 @@ export function reprompt(decision) {
   return [
     `${why} To stop, call ${STOP_CALL} last, with one reason:`.trim(),
     ...askLines(decision.unclaimed),
+    NEEDS_LINE,
   ].join("\n");
 }
 
@@ -158,6 +163,7 @@ export function askForStop(rules) {
   return [
     `This turn ends with no stop, so it holds open. Carry on, or call ${STOP_CALL} last, with one reason:`,
     ...askLines(stopReasons(rules)),
+    NEEDS_LINE,
   ].join("\n");
 }
 

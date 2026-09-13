@@ -25,6 +25,22 @@ function editorDoor(context) {
 
   return {
     holds: () => Boolean(folder),
+    root: () => folder?.uri?.fsPath ?? "",
+
+    // [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+    startsServer(ask) {
+      let node;
+      try {
+        node = require("vscode-languageclient/node");
+      } catch {
+        return "";
+      }
+      const client = new node.LanguageClient(ask.id, ask.name, ask.server, ask.client);
+      context.subscriptions.push(client);
+      client.start();
+      return ask.server.command;
+    },
+
     takes: (one) => {
       page = one;
     },

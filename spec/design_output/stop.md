@@ -64,9 +64,9 @@ the agent carries on.
 The floor of zero ends a turn nobody votes on. So stopping is what happens
 where nothing speaks, and a session stops too often for that one reason.
 
-A turn end carries a claim or holds open. `askForStop` names the call and
-lists every id, in five lines. The claim feeds the vote, and the priorities
-decide the rest:
+A turn end carries a claim or holds open. `askForStop` names the call, lists
+every id one to a line, and asks for the needs table in one line. The claim
+feeds the vote, and the priorities decide the rest:
 
 - the vote keeps deciding
 - `spec/config/stop/level0.yml` keeps every rule, side and priority
@@ -208,16 +208,21 @@ Vale writes its own.
 
 # What the re-prompt says
 
-The re-prompt carries two things in five lines: the `says` of the winning
-continue rule, and the `asks` of every stop rule standing unclaimed. The agent
-reads them and answers itself, because it is the only thing in the room that
-knows.
+The re-prompt carries three things, and the ids stand one to a line:
+
+- the `says` of the winning continue rule, and the call to make
+- the `asks` of every stop rule with no claim on it
+- the needs table the answer closes with, in one line
+
+The agent reads them and answers itself, because it is the only thing in the
+room that knows. For the table, see [[spec/design_output/level0#the-needs-table]].
 
     Something on your list stands unfinished, so carry on with it. To stop, call mcp__level0__stop last, with one reason:
       the-owner-asks-to-talk: Does the last thing the owner said open a discussion?
       a-person-holds-the-answer: Does going on need what only a person can give?
       the-work-stands-complete: Does the work stand complete?
       an-update-is-worth-giving: Is there an update the owner wants before you go on?
+    Before the call, close the answer with the heading What the agent needs and a table headed No., question and proposed answer, one numbered row a need.
 
 # Three in a row
 

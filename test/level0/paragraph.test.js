@@ -6,6 +6,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   faultsOf,
+  JUDGED,
   PARAGRAPH,
   rulesFrom,
 } from "../../.claude/skills/level0/lib/paragraph.js";
@@ -23,6 +24,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 const SOURCE = "spec/schemas/paragraph.schema.yaml";
 const SHAPE = "spec/schemas/paragraph.schema.schema.json";
 const TARGET = "spec/config/styles/VoiceParagraph";
+const JUDGED_TARGET = "spec/config/styles/VoiceJudged";
 
 const SCHEMA = `
 kind: paragraph
@@ -81,8 +83,19 @@ layers:
     judged:
       - id: Actionable
         asks: does this text tell the reader something they can act on?
+        message: Write what the reader does next.
+        link: spec/guidance/guidance.md
         labels: [actionable, background]
         refuses: background
+        span: paragraph
+        reads: ["*.md"]
+        ignores: [.se/*.md]
+      - id: ShapeFits
+        asks: do these sentences give the same fields for different things?
+        message: Reach for a table first.
+        labels: [prose, table, diagram]
+        refuses: [table, diagram]
+        span: chapter
 
 registers:
   prose:
@@ -107,6 +120,15 @@ const ENTRY = {
   name: "the paragraph rules",
   shape: PARAGRAPH,
   target: TARGET,
+  from: SOURCE,
+  schema: SHAPE,
+  wrap: "none",
+};
+
+const JUDGED_ENTRY = {
+  name: "the judged rules",
+  shape: JUDGED,
+  target: JUDGED_TARGET,
   from: SOURCE,
   schema: SHAPE,
   wrap: "none",
@@ -159,6 +181,7 @@ test("every layer takes its rule file, and the answer register takes its own", (
     `${TARGET}/ListItem.yml`,
     `${TARGET}/Markup.yml`,
     `${TARGET}/Modal.yml`,
+    `${TARGET}/ModalRequirement.yml`,
     `${TARGET}/Paragraph.yml`,
     `${TARGET}/ParagraphAnswer.yml`,
     `${TARGET}/PastTense.yml`,
@@ -167,6 +190,50 @@ test("every layer takes its rule file, and the answer register takes its own", (
     `${TARGET}/Shape.yml`,
     `${TARGET}/ShapeAnswer.yml`,
   ]);
+});
+
+// [[spec/design_output/projection#the-judged-rules]]
+test("the meaning layer writes one rule file per judged rule", () => {
+  const files = writesOf(
+    JUDGED_ENTRY,
+    new Map([
+      [SOURCE, SCHEMA],
+      [SHAPE, SHAPE_JSON],
+    ]),
+  );
+  assert.deepEqual([...files.keys()].sort(), [
+    `${JUDGED_TARGET}/Actionable.yml`,
+    `${JUDGED_TARGET}/ShapeFits.yml`,
+  ]);
+
+  const said = files.get(`${JUDGED_TARGET}/Actionable.yml`);
+  assert.match(said, /^extends: judge$/m);
+  assert.match(said, /^refuses: background$/m);
+  assert.match(said, /^ {2}- "\*\.md"$/m);
+  assert.match(said, /^link: spec\/guidance\/guidance\.md$/m);
+  assert.ok(!said.includes("span:"), "a paragraph is the span a rule takes by default");
+});
+
+// [[spec/design_output/projection#the-judged-rules]]
+test("a rule refusing two labels writes a list, and names its span", () => {
+  const files = writesOf(JUDGED_ENTRY, new Map([[SOURCE, SCHEMA]]));
+  const said = files.get(`${JUDGED_TARGET}/ShapeFits.yml`);
+  assert.match(said, /^refuses:\n {2}- table\n {2}- diagram$/m);
+  assert.match(said, /^span: chapter$/m);
+  assert.match(said, /^link: spec\/funnel\/a-paragraph-has-a-schema\.md$/m);
+});
+
+// [[spec/design_output/projection#a-layer-writes-two-files]]
+test("the requirement register takes the modal rule in its own variant", () => {
+  const files = drawn();
+  const prose = files.get(`${TARGET}/Modal.yml`);
+  const binding = files.get(`${TARGET}/ModalRequirement.yml`);
+
+  assert.match(prose, /- '\\bshall\\b'/, "the prose register refuses shall");
+  assert.ok(!binding.includes("\\bshall\\b"), "the requirement register admits it");
+  assert.ok(!binding.includes("\\bshould\\b"), "and admits should beside it");
+  assert.match(binding, /- '\\bmay\\b'/, "and refuses the rest of the set");
+  assert.match(binding, /can, must, will, shall, should/);
 });
 
 // [[spec/design_output/projection#the-second-target]]
@@ -185,6 +252,31 @@ test("a cap moves in the schema, and the rule file carrying it follows", () => {
   });
   assert.match(tighter.get("Paragraph.yml"), /max: 4/);
   assert.match(tighter.get("Shape.yml"), /run > 2/);
+});
+
+// [[spec/design_output/projection#the-list-opens-an-answer]]
+test("the answer rule holds the opening list, and the prose rule holds none", () => {
+  const files = drawn();
+  const answer = files.get(`${TARGET}/ShapeAnswer.yml`);
+  assert.match(answer, /An answer opens with a list/);
+  assert.match(answer, /A heading stands under the TL;DR list/);
+  assert.ok(!files.get(`${TARGET}/Shape.yml`).includes("opens with a list"));
+
+  // [[spec/design_output/projection#the-list-opens-an-answer]]
+  assert.ok(!answer.includes('has_prefix(line, "|")'));
+
+  const asked = rulesFrom({
+    registers: {
+      answer: { opens: [{ block: "questions" }, { block: "tldr" }] },
+    },
+  });
+  assert.match(asked.get("ShapeAnswer.yml"), /has_prefix\(line, "\|"\)/);
+});
+
+// [[spec/design_output/projection#the-list-opens-an-answer]]
+test("an answer register naming no tldr block writes no opening rule", () => {
+  const bare = rulesFrom({ registers: { answer: { opens: [] } } });
+  assert.ok(!bare.get("ShapeAnswer.yml").includes("opens with a list"));
 });
 
 // [[spec/design_output/projection#the-schema-names-a-mark]]
@@ -276,7 +368,7 @@ test("the compare reads the ending this shape writes, and leaves the rest", () =
   disk.makeDir(TARGET);
 
   const first = readAll([ENTRY], disk);
-  assert.equal(first.wanted.size, 16);
+  assert.equal(first.wanted.size, 17);
   assert.deepEqual(first.faults, []);
   assert.deepEqual(
     [...new Set(staleIn(first.wanted, first.standing).map((one) => one.how))],

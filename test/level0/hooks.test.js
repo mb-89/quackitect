@@ -226,9 +226,18 @@ async function stops(it, reason = "the-work-stands-complete") {
   return it.raise("tool.call", { tool: STOP, reason, next: "Nothing waits." }, STOP);
 }
 
+// [[spec/design_output/level0#the-needs-table]]
+const NEEDS = [
+  "## What the agent needs",
+  "",
+  "| No. | Question | Proposed answer |",
+  "|---|---|---|",
+  "| 1 | Anything? | Nothing waits on you. |",
+].join("\n");
+
 async function endsATurn(it, answer = "done") {
   await stops(it);
-  await it.raise("turn.complete", { ...answered, answer });
+  await it.raise("turn.complete", { ...answered, answer: `${answer}\n\n${NEEDS}` });
 }
 
 test("a session start writes one line, and registers every tool", async () => {
@@ -1294,6 +1303,25 @@ test("a commit whose delta adds nothing private passes the door", async () => {
   assert.equal(said.deny, undefined);
 });
 
+// [[spec/design_output/level0#the-needs-table]]
+test("the draft tool demands the needs table where the draft ends on a stop", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  const prose = "word ".repeat(40).trim();
+
+  const bare = await it.raise("tool.call", { tool: DRAFT, text: prose, stop: true }, DRAFT);
+  assert.match(String(bare.result), /NeedsTable/);
+
+  const closed = await it.raise(
+    "tool.call",
+    { tool: DRAFT, text: `${prose}\n\n${NEEDS}`, stop: true },
+    DRAFT,
+  );
+  assert.match(String(closed.result), /meets the gate clean/);
+
+  const going = await it.raise("tool.call", { tool: DRAFT, text: prose }, DRAFT);
+  assert.match(String(going.result), /meets the gate clean/, "a draft going on owes no table");
+});
+
 // [[spec/design_output/work#a-red-battery-pushes-nothing]]
 test("a push to trunk takes a green battery, and a work branch takes none", async () => {
   const HEAD = "a1b2c3d4e5f6";
@@ -1767,4 +1795,99 @@ test("the draft tool reads a clean draft clean, and an empty one back", async ()
 
   const empty = await it.raise("tool.call", { tool: DRAFT, text: "  " }, DRAFT);
   assert.match(empty.result, /takes the text of one draft/);
+});
+
+const ASKS = "Where does the door stand? What does it read?";
+const TABLE = [
+  "| question | answer |",
+  "|---|---|",
+  "| where does it stand | in `lib/answer.js` |",
+  "| what does it read | the first block |",
+].join("\n");
+
+// [[spec/design_output/level0#the-table-answers-every-question]]
+test("a prompt with two questions refuses an answer opening with prose", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  await it.raise("prompt.submit", { text: ASKS, origin: { kind: "composer" } });
+  await it.raise("turn.complete", { ...answered, answer: OVER });
+
+  assert.equal(it.prompts.length, 1);
+  assert.match(it.prompts[0].text, /QuestionTable/);
+  assert.match(it.prompts[0].text, /asks 2 questions/);
+  assert.match(it.prompts[0].text, /opens with no table/);
+});
+
+// [[spec/design_output/level0#the-table-answers-every-question]]
+test("an answer opening with the table meets the gate clean", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  await it.raise("prompt.submit", { text: ASKS, origin: { kind: "composer" } });
+  await it.raise("turn.complete", { ...answered, answer: `${TABLE}\n\n${OVER}` });
+
+  assert.equal(it.prompts.length, 0);
+  assert.equal(
+    it.lines().find((one) => one.kind === "answer").said,
+    "the gate reads clean",
+  );
+});
+
+// [[spec/design_output/level0#the-door-counts-the-questions]]
+test("a prompt from a machine leaves the count standing", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  await it.raise("prompt.submit", { text: ASKS, origin: { kind: "composer" } });
+  await it.raise("prompt.submit", { text: "carry on", origin: { kind: "plugin" } });
+  await it.raise("turn.complete", { ...answered, answer: OVER });
+
+  assert.match(it.prompts[0].text, /asks 2 questions/);
+});
+
+// [[spec/design_output/level0#the-owner-answers-by-number]]
+test("a stop with no needs table meets a rewrite, whatever the score", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  await stops(it);
+  await it.raise("turn.complete", { ...answered, answer: CLEAN });
+
+  assert.equal(it.prompts.length, 1);
+  assert.match(it.prompts[0].text, /Write it again/);
+  assert.match(it.prompts[0].text, /NeedsTable/);
+});
+
+// [[spec/design_output/level0#the-cap-counts-the-prose]]
+test("the draft tool refuses a draft over the word cap", async () => {
+  const capped = { "spec/config/level0.json": JSON.stringify({
+    ...JSON.parse(BANDED["spec/config/level0.json"]),
+    answer: { warnAt: 5, ceiling: 15, words: 150 },
+  }) };
+  const it = await started(capped, valeOnAnswer([]));
+
+  const over = await it.raise("tool.call", { tool: DRAFT, text: CLEAN }, DRAFT);
+  assert.match(over.result, /AnswerLength/);
+  assert.match(over.result, /Write it again/);
+
+  const under = await it.raise("tool.call", { tool: DRAFT, text: OVER }, DRAFT);
+  assert.match(under.result, /meets the gate clean/);
+});
+
+// [[spec/design_output/level0#the-door-counts-the-questions]]
+test("a prompt carrying no question demands no table", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  await it.raise("prompt.submit", { text: "build it", origin: { kind: "composer" } });
+  await it.raise("turn.complete", { ...answered, answer: OVER });
+
+  assert.equal(it.prompts.length, 0);
+});
+
+// [[spec/design_output/level0#the-tool-reads-a-draft]]
+test("the draft tool reads the count the prompt sets", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  await it.raise("prompt.submit", { text: ASKS, origin: { kind: "composer" } });
+
+  const said = await it.raise("tool.call", { tool: DRAFT, text: OVER }, DRAFT);
+  assert.match(said.result, /QuestionTable/);
+
+  const met = await it.raise(
+    "tool.call",
+    { tool: DRAFT, text: `${TABLE}\n\n${OVER}` },
+    DRAFT,
+  );
+  assert.match(met.result, /meets the gate clean/);
 });

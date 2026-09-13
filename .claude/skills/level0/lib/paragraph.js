@@ -4,6 +4,7 @@
 // [[spec/design_output/projection#the-second-target]]
 
 export const PARAGRAPH = "paragraph rules";
+export const JUDGED = "judged rules";
 export const RULES = ".yml";
 export const LINK = "spec/funnel/a-paragraph-has-a-schema.md";
 
@@ -141,15 +142,58 @@ export function rulesFrom(said, banner = "") {
 
   put("Characters.yml", characters(layers.characters ?? {}));
   put("Markup.yml", markup(layers.markup ?? {}));
-  put("Shape.yml", run(layers.shape ?? {}, ""));
-  put("ShapeAnswer.yml", run(held, " in an answer"));
+  put("Shape.yml", run(layers.shape ?? {}, "", []));
+  put("ShapeAnswer.yml", run(held, " in an answer", answer.opens ?? []));
   put("Paragraph.yml", paragraph(layers.shape ?? {}, ""));
   put("ParagraphAnswer.yml", paragraph(held, " in an answer"));
   put("Sentence.yml", sentence(layers.sentence ?? {}));
   put("ListItem.yml", listItem(layers.sentence ?? {}));
   put("CodeSpans.yml", codeSpans(layers.sentence ?? {}));
   for (const [name, body] of grammar(layers.grammar ?? {})) put(name, body);
+
+  // [[spec/design_output/projection#a-layer-writes-two-files]]
+  const binding = { ...(layers.grammar ?? {}), ...(said?.registers?.requirement?.grammar ?? {}) };
+  const modals = modal(binding);
+  if (modals) put("ModalRequirement.yml", modals);
   return out;
+}
+
+// [[spec/design_output/projection#the-judged-rules]]
+export function judgedFrom(said, banner = "") {
+  const out = new Map();
+  for (const rule of said?.layers?.meaning?.judged ?? []) {
+    if (!rule?.id) continue;
+    out.set(`${rule.id}${RULES}`, file(banner, judged(rule)));
+  }
+  return out;
+}
+
+// [[spec/design_output/projection#the-judged-rules]]
+function judged(rule) {
+  const labels = [].concat(rule.labels ?? []);
+  const refuses = [].concat(rule.refuses ?? []);
+  const span = String(rule.span ?? "paragraph");
+
+  return [
+    "extends: judge",
+    `message: ${JSON.stringify(String(rule.message ?? ""))}`,
+    `link: ${rule.link ?? LINK}`,
+    "level: error",
+    `ask: ${JSON.stringify(String(rule.asks ?? ""))}`,
+    "labels:",
+    ...labels.map((one) => `  - ${one}`),
+    ...(refuses.length === 1 ? [`refuses: ${refuses[0]}`] : ["refuses:", ...refuses.map((one) => `  - ${one}`)]),
+    ...(span === "paragraph" ? [] : [`span: ${span}`]),
+    ...listed("reads", rule.reads),
+    ...listed("ignores", rule.ignores),
+    "",
+  ].join("\n");
+}
+
+function listed(key, said) {
+  const rows = [].concat(said ?? []).filter(Boolean);
+  if (!rows.length) return [];
+  return [`${key}:`, ...rows.map((one) => `  - ${JSON.stringify(String(one))}`)];
 }
 
 function file(banner, body) {
@@ -391,8 +435,63 @@ function markup(layer) {
 }
 
 
+// [[spec/design_output/projection#the-list-opens-an-answer]]
+const OPENS_LIST = [
+  "An answer opens with a list, one sentence an item and one bottom line each.",
+  "Write that list here.",
+].join(" ");
+
+// [[spec/design_output/projection#the-list-opens-an-answer]]
+const OPENS_HEADING = [
+  "A heading stands under the TL;DR list, and this one opens the answer.",
+  "Write the list first.",
+].join(" ");
+
+// [[spec/design_output/projection#the-list-opens-an-answer]]
+function opening(opens) {
+  const list = Array.isArray(opens) ? opens : [];
+  if (!list.some((one) => String(one?.block) === "tldr")) return [];
+  const table = list.some((one) => String(one?.block) === "questions");
+
+  return [
+    "",
+    "opened := false",
+    'first := {said: "", begin: 0, end: 0}',
+    "fence := false",
+    "",
+    "for row in rows(said) {",
+    "  if opened { break }",
+    "  line := text.trim_space(row.said)",
+    '  if text.has_prefix(line, "```") {',
+    "    fence = !fence",
+    "    continue",
+    "  }",
+    "  if fence { continue }",
+    "  if len(line) == 0 { continue }",
+    ...(table ? ['  if text.has_prefix(line, "|") { continue }'] : []),
+    "  first = row",
+    "  opened = true",
+    "}",
+    "",
+    "if opened {",
+    "  head := text.trim_space(first.said)",
+    "  if !text.re_match(`^(?:[-*+]|[0-9]+[.)])\\s+\\S`, head) {",
+    `    why := ${quoted(OPENS_LIST)}`,
+    '    if text.has_prefix(head, "#") {',
+    `      why = ${quoted(OPENS_HEADING)}`,
+    "    }",
+    "    matches = append(matches, {",
+    "      begin: first.begin,",
+    "      end: first.end,",
+    "      message: why",
+    "    })",
+    "  }",
+    "}",
+  ];
+}
+
 // [[spec/design_output/projection#a-layer-writes-two-files]]
-function run(layer, where) {
+function run(layer, where, opens = []) {
   const most = Number(layer.paragraphsPerRun ?? 3);
 
   return scripted(`A run holds ${most} paragraphs${where}.`, [
@@ -446,6 +545,7 @@ function run(layer, where) {
     "  runEnd = row.end",
     "}",
     "closeRun()",
+    ...opening(opens),
   ]);
 }
 
@@ -555,8 +655,6 @@ function counted(message, scope, token, most) {
 function grammar(layer) {
   const out = new Map();
   const left = (layer.exceptions ?? []).map((one) => String(one?.word ?? one)).sort();
-  const modals = new Set((layer.modals ?? []).map((one) => String(one)));
-  const refused = MODALS.filter((one) => !modals.has(one));
 
   if (layer.auxiliaryChains === "refused") {
     out.set(
@@ -579,23 +677,8 @@ function grammar(layer) {
     );
   }
 
-  if (refused.length) {
-    out.set(
-      "Modal.yml",
-      [
-        "extends: existence",
-        `message: ${JSON.stringify(
-          `This register holds the modals ${[...modals].join(", ")}. Say what is, or name the one that binds.`,
-        )}`,
-        `link: ${LINK}`,
-        "level: error",
-        "ignorecase: true",
-        "tokens:",
-        ...refused.map((one) => `  - '\\b${one}\\b'`),
-        "",
-      ].join("\n"),
-    );
-  }
+  const said = modal(layer);
+  if (said) out.set("Modal.yml", said);
 
   if (layer.contractions === "refused") {
     out.set(
@@ -644,6 +727,26 @@ function grammar(layer) {
     );
   }
   return out;
+}
+
+// [[spec/design_output/projection#the-grammar-rules]]
+function modal(layer) {
+  const modals = new Set((layer?.modals ?? []).map((one) => String(one)));
+  const refused = MODALS.filter((one) => !modals.has(one));
+  if (!refused.length) return undefined;
+
+  return [
+    "extends: existence",
+    `message: ${JSON.stringify(
+      `This register holds the modals ${[...modals].join(", ")}. Say what is, or name the one that binds.`,
+    )}`,
+    `link: ${LINK}`,
+    "level: error",
+    "ignorecase: true",
+    "tokens:",
+    ...refused.map((one) => `  - '\\b${one}\\b'`),
+    "",
+  ].join("\n");
 }
 
 // [[spec/design_output/projection#the-grammar-rules]]

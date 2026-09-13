@@ -10,10 +10,14 @@ import {
   checkSpec,
   gateOf,
   lastSaid,
+  lengthFaults,
+  needsFaults,
   opensATurn,
+  questionsIn,
   reachesTheOwner,
   SAYS,
   scoreOf,
+  tableFaults,
   warns,
 } from "../lib/answer.js";
 import {
@@ -148,6 +152,8 @@ export function register(on, _options) {
   let rules = [];
   let onAHeldBranch = false;
   let owed = null;
+  // [[spec/design_output/level0#the-door-counts-the-questions]]
+  let asks = 0;
   // [[spec/design_output/level0#the-canary-owes-a-debt]]
   let owesCanary = null;
   // [[spec/design_output/stop#the-claim-rides-the-call]]
@@ -256,6 +262,8 @@ export function register(on, _options) {
     // [[spec/design_output/stop#the-claim-rides-the-call]]
     if (opensATurn(e.origin)) claim = null;
     const text = String(e.text ?? "");
+    // [[spec/design_output/level0#the-door-counts-the-questions]]
+    if (opensATurn(e.origin)) asks = questionsIn(text);
     await logbook.say("info", "prompt", text, { detail: from, text });
 
     // [[spec/design_output/level0#the-carry-rides-a-prompt]]
@@ -616,12 +624,20 @@ export function register(on, _options) {
     });
     if (!ran.ran) return { result: `Vale read nothing: ${ran.why}` };
 
-    const score = scoreOf(text, ran.found);
-    const band = ran.found.length ? bandOf(score, await bands(settings)) : "clean";
+    // [[spec/design_output/level0#the-table-answers-every-question]]
+    // [[spec/design_output/level0#the-owner-answers-by-number]]
+    const found = [
+      ...tableFaults(text, asks),
+      ...needsFaults(text, Boolean(e.stop)),
+      ...lengthFaults(text, await settings.ask("answer.words")),
+      ...ran.found,
+    ];
+    const score = scoreOf(text, found);
+    const band = found.length ? bandOf(score, await bands(settings), found) : "clean";
     await logbook.say("info", "answer", `a draft reads ${band}`, {
-      detail: `score=${score} findings=${ran.found.length}`,
+      detail: `score=${score} findings=${found.length}`,
     });
-    return { result: answerFindings(ANSWER, { found: ran.found, score, band }) };
+    return { result: answerFindings(ANSWER, { found, score, band }) };
   });
 
   // [[spec/design_output/stop#the-stop-is-one-call]]
@@ -740,6 +756,7 @@ export function register(on, _options) {
           // [[spec/design_output/stop#the-claim-rides-the-call]]
           claim,
         });
+    const stood = claim;
     claim = null;
     await dropAsk(settings, logbook);
     if (!bin || !e.answer || e.reason !== "answer") return said;
@@ -751,17 +768,26 @@ export function register(on, _options) {
     });
     if (!ran.ran) return said;
 
+    // [[spec/design_output/level0#the-table-answers-every-question]]
+    // [[spec/design_output/level0#the-owner-answers-by-number]]
+    const found = [
+      ...tableFaults(spoken, asks),
+      ...needsFaults(spoken, stood),
+      ...lengthFaults(spoken, await settings.ask("answer.words")),
+      ...ran.found,
+    ];
+
     // [[spec/design_output/level0#the-three-bands]]
     const read = gate.atTurnEnd({
       ...(await bands(settings)),
       text: spoken,
-      found: ran.found,
+      found,
       mostInARow,
       toothSpoke: Boolean(bit?.sent),
     });
     const level = read.band === "clean" ? "info" : "warn";
     await logbook.say(level, "answer", `the gate reads ${read.band}`, {
-      detail: `score=${read.score} findings=${ran.found.length} inARow=${gate.inARow()}`,
+      detail: `score=${read.score} findings=${found.length} inARow=${gate.inARow()}`,
     });
     if (!read.sends) return said;
 
