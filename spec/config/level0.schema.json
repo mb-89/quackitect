@@ -79,7 +79,7 @@
           "icon": "✋🤖",
           "group": "agent control",
           "row": 0,
-          "column": 1,
+          "column": 2,
           "rowSpan": 1,
           "colSpan": 1
         }
@@ -107,7 +107,7 @@
           "icon": "❓🤖",
           "group": "agent control",
           "row": 0,
-          "column": 2,
+          "column": 3,
           "rowSpan": 1,
           "colSpan": 1
         }
@@ -296,7 +296,7 @@
           "icon": "❌🔗🤖",
           "group": "agent control",
           "row": 0,
-          "column": 3,
+          "column": 4,
           "rowSpan": 1,
           "colSpan": 1
         },
