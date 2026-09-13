@@ -1,9 +1,96 @@
 ---
-kind: [[handover]]
-status: todo
-urgency: whenever
-depends_on: [the-agent-pulls-a-ticket, a-step-changes-hands]
+kind: [[ticket]]
+state: draft
+urgency: soon
+steps:
+  - name: design
+    reads: [[spec/guidance/voice]]
+    steps:
+      - name: draft
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+      - name: review
+        does: reads the approach against the ask
+        not: draft
+        on_fail: draft
+        reads: [[spec/guidance/review/reviewing]]
+        input: design/draft
+        evidence:
+          - name: verdict
+            form: verdict
+            says: pass or fail, with findings one a line
+  - name: implement
+    reads: [[spec/guidance/code/testing]]
+    needs: ["work test"]
+    input: design/draft
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements"]
+    steps:
+      - name: tests-red
+        does: writes the tests the ask calls for
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
+      - name: reflect
+        does: names the class of error in the findings, and the fix for the class
+        when: returned
+        input: verdict
+        evidence:
+          - name: class
+            form: text
+            says: the class of error the findings describe, and the fix for the class
+      - name: change
+        does: makes the change
+        reads: [[spec/guidance/code/code]]
+        evidence:
+          - name: lint
+            form: command
+            expects: 0
+            says: the tree builds and lints
+      - name: tests-green
+        does: makes the tests pass
+        input: tests-red
+        evidence:
+          - name: tests
+            form: command
+            expects: green
+            says: the same tests pass
+          - name: check
+            form: command
+            expects: 0
+            says: the check is green on the commit
+          - name: says
+            form: text
+            says: what changes and why, for a reader who was not there
+  - name: verdict
+    does: reads every hunk against the ask and the approach
+    not: implement
+    on_fail: implement/reflect
+    reads: [[spec/guidance/review/reviewing]]
+    input: ["diff", "implement"]
+    to: retro
+    evidence:
+      - name: read
+        form: files
+        says: every file you read, one a line
+      - name: verdict
+        form: verdict
+        says: pass or fail, findings one a line
+process: [[standard]]
+group: the-retro-is-a-ticket
 ---
+
+# Ask
 
 # Where it stands
 
@@ -61,25 +148,104 @@ copies, and why a retro refuses while anyone holds work.
 - A chapter's reader is a spawned hand, and four read at once. The retro's own hand reads no chapter.
 - The window's first retro is long, and that is the point: the project holds no earlier one.
 
-## How this branch runs
+# design
 
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
+## draft
 
-1. Run `./RUNME.sh work sync` FIRST. It takes main into this branch, so
-   an old branch works against what the tree holds now. Resolve any conflict
-   before you start, because a conflict found later costs the work already
-   done.
-2. Commit and push each time you finish a thing. A cloud box dies and takes
-   its working tree with it.
-3. Write your result and your retro into `HANDOVER.md`, at the root, replacing
-   this brief. Head the retro `What surprises me`, and name every dead end
-   you walk into.
-4. Run `./RUNME.sh work sync` again, so main comes in last too.
-   Run `./RUNME.sh check` after it, and answer whatever the merge turns red.
-5. Run `./RUNME.sh work done`, which sets the status and pushes.
-6. Run `./RUNME.sh work release` instead where you stop early, so the branch
-   goes back to `todo` for somebody else.
-7. Run `./RUNME.sh work merge <name>` from main to take it in, then
-   `work close`. A cloud box stops at step 4, because the harness holds
-   main shut there and a cloud box opens no pull request.
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+
+<!-- the form is text -->
+
+## review
+
+<!-- reads the approach against the ask -->
+
+### verdict
+
+<!-- pass or fail, with findings one a line -->
+
+<!-- the form is verdict -->
+
+# implement
+
+## tests-red
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+
+<!-- the form is command -->
+
+### seen
+
+<!-- what you see, and what surprises you -->
+
+<!-- the form is text -->
+
+## reflect
+
+<!-- names the class of error in the findings, and the fix for the class -->
+
+### class
+
+<!-- the class of error the findings describe, and the fix for the class -->
+
+<!-- the form is text -->
+
+## change
+
+<!-- makes the change -->
+
+### lint
+
+<!-- the tree builds and lints -->
+
+<!-- the form is command -->
+
+## tests-green
+
+<!-- makes the tests pass -->
+
+### tests
+
+<!-- the same tests pass -->
+
+<!-- the form is command -->
+
+### check
+
+<!-- the check is green on the commit -->
+
+<!-- the form is command -->
+
+### says
+
+<!-- what changes and why, for a reader who was not there -->
+
+<!-- the form is text -->
+
+# verdict
+
+<!-- reads every hunk against the ask and the approach -->
+
+## read
+
+<!-- every file you read, one a line -->
+
+<!-- the form is files -->
+
+## verdict
+
+<!-- pass or fail, findings one a line -->
+
+<!-- the form is verdict -->
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->
