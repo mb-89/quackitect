@@ -16,6 +16,7 @@ import {
   holdOf,
   holdsVerb,
   leafOf,
+  takeable,
   testSays,
   verdictIn,
   withPersonStep,
@@ -589,8 +590,58 @@ test("a pass writes the record, moves the step, commits by ticket and step, push
   // [[spec/design_output/pull#the-hand-rule]]
   assert.match(
     said,
-    /^wait\n {2}a-child waits for a hand other than box d462e994b4cef, which wrote design\/draft/m,
+    /^spawn\n {2}a-child at design\/review waits for a hand other than box d462e994b4cef, which wrote design\/draft/m,
   );
+});
+
+// [[spec/design_output/pull#a-hand-of-its-own]]
+test("a step that excludes the only hand answers spawn, with the helper's name and its prompt", () => {
+  const took = withEntry(CHILD("open", "design/review"), {
+    step: "design/draft",
+    hand: HAND,
+    hash_before: SHA,
+    hash_after: SHA,
+  });
+  const { it, disk } = doors(standing(took, withField(GROUP_NOTE, "state", "closed")));
+
+  const { code, said } = heard(() => work(ROOT, ["pull"], it));
+
+  assert.equal(code, 0);
+  assert.match(said, /^spawn\n {2}a-child at design\/review waits for a hand other than box d462e994b4cef/);
+  assert.match(said, /named helper-2, and you work one step of one ticket/);
+  assert.match(said, /branch pull --as helper-2/);
+  assert.match(said, /branch pull a-child --as helper-2`\. It checks/);
+  assert.equal(disk.exists(HOLD), false, "the spawn answer holds nothing");
+  assert.equal(takeable(it, { text: took }), "design/review", "a spawned hand can take it");
+  assert.equal(takeable(it, { text: took.replace("not: draft", "by: person") }), "");
+  assert.equal(takeable(it, { text: CHILD("closed", "design/review") }), "");
+});
+
+// [[spec/design_output/pull#a-hand-of-its-own]]
+test("a hand under --as works one step under its own name, and the pull answers done after it", () => {
+  const took = withEntry(CHILD("open", "design/review"), {
+    step: "design/draft",
+    hand: HAND,
+    hash_before: SHA,
+    hash_after: SHA,
+  });
+  const { it, disk } = doors(standing(took));
+  const helper = join(ROOT, ".se/hold/box-d462e994b4cef-helper-2.json");
+
+  const out = heard(() => work(ROOT, ["pull", "--as", "helper-2"], it));
+  assert.equal(out.code, 0);
+  assert.match(out.said, /^work {2}a-child at design\/review/);
+  assert.equal(JSON.parse(disk.read(helper)).hand, "box d462e994b4cef · helper-2");
+
+  disk.write(at("spec/tickets/a-child.md"), filled(took, "### verdict", "pass"));
+  const back = heard(() => work(ROOT, ["pull", "a-child", "--as", "helper-2"], it));
+  assert.equal(back.code, 0);
+  assert.match(back.said, /^done\n {2}box d462e994b4cef · helper-2 works one step, and it is done/m);
+  assert.doesNotMatch(back.said, /^work {2}/m, "a one-step hand takes no next leaf");
+  const now = disk.read(at("spec/tickets/a-child.md"));
+  assert.equal(recordIn(now).at(-1).hand, "box d462e994b4cef · helper-2");
+  assert.equal(fieldOf(now, "step"), "implement/tests-red");
+  assert.equal(disk.exists(helper), false);
 });
 
 // [[spec/design_output/pull#the-hand-rule]]
@@ -939,7 +990,7 @@ test("the group's last leaf returns to children while a child stands open, and c
   const stays = open.disk.read(at("spec/tickets/one-group.md"));
   assert.equal(fieldOf(stays, "state"), "open");
   assert.equal(fieldOf(stays, "step"), "children");
-  assert.match(back.said, /^ {2}one-group waits for a-child/m, "the box leaves once, and waits the second time");
+  assert.match(back.said, /^spawn\n {2}a-child at design\/review/m, "the box leaves once, and asks for a hand the second time");
 
   const shut = doors(
     standing(

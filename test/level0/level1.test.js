@@ -10,7 +10,16 @@ import {
   PULL_CALL,
   pullArgv,
   pullSpec,
+  spawnPromptIn,
 } from "../../.claude/skills/level1/lib/pull.js";
+
+// [[spec/design_output/pull#a-hand-of-its-own]]
+test("the wrapper reads the prompt out of a spawn answer, and nothing out of any other", () => {
+  const said = "spawn\n  a-child at design/review waits for a hand other than box 1.\n  Spawn a hand.\n\nYou are a hand of your own, named helper-2.\n1. Run it.";
+  assert.equal(spawnPromptIn(said), "You are a hand of your own, named helper-2.\n1. Run it.");
+  assert.equal(spawnPromptIn("work  a-child at design/draft\n\nprose"), "");
+  assert.equal(spawnPromptIn(""), "");
+});
 
 // [[spec/design_output/pull#the-hand-out]]
 test("the tool hands the shell verb the same words a person types", () => {

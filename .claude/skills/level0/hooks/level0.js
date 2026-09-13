@@ -99,7 +99,7 @@ import {
   schemasFrom,
   strangerFault,
 } from "../lib/schema.js";
-import { refusedTicket, ticketFaults } from "../lib/ticket.js";
+import { heldGroup, refusedTicket, ticketFaults } from "../lib/ticket.js";
 import { guesses, pathOf, surveyOf, TOOLS } from "../lib/tools.js";
 import {
   askForStop,
@@ -155,6 +155,7 @@ export function register(on, _options) {
   let onAHeldBranch = false;
   // [[spec/design_output/pull#the-hand-and-the-hold]]
   let inHand = false;
+  let groupHeld = false;
   let owed = null;
   let inFlight = 0;
   let indexDead = "";
@@ -670,6 +671,7 @@ export function register(on, _options) {
     const off = (await settings.ask("stop.enabled")) === false;
     const hold = await settings.ask("stop.hold");
     inHand = await holdStands($);
+    groupHeld = await groupInHand($);
     const reason = String(e.reason ?? "");
     const decision = decide(rules, {
       claimed: reason,
@@ -779,6 +781,7 @@ export function register(on, _options) {
     const off = (await settings.ask("stop.enabled")) === false;
     const hold = await settings.ask("stop.hold");
     inHand = await holdStands($);
+    groupHeld = await groupInHand($);
     const mostInARow = await settings.ask("stop.mostInARow");
     // [[spec/design_output/level0#what-the-probe-does]]
     const bit = probeDone
@@ -968,11 +971,24 @@ export function register(on, _options) {
   function ranHere(name, off, hold) {
     if (name === "work-waiting") return list.standing() || onAHeldBranch;
     if (name === "ticket-in-hand") return inHand;
-    if (name === "session-is-new") return tooth.isNew();
+    if (name === "group-in-hand") return groupHeld;
+    // [[spec/design_output/pull#the-group-holds-the-turn]]
+    if (name === "session-is-new") return !cloud && tooth.isNew();
     if (name === "stop-hook-off") return off;
     if (name === "owner-holds") return holds(hold);
     if (name === "never") return false;
     return undefined;
+  }
+}
+
+// [[spec/design_output/pull#the-group-holds-the-turn]]
+async function groupInHand($) {
+  const branch = await branchNow($);
+  if (!branch.startsWith("work/")) return false;
+  try {
+    return heldGroup(await $.fs.read(`spec/tickets/${branch.slice(5)}.md`));
+  } catch {
+    return false;
   }
 }
 

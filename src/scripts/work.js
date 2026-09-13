@@ -24,7 +24,7 @@ import {
   withHashAfter,
   withoutField,
 } from "./group.js";
-import { handOf, pull, testVerb } from "./pull.js";
+import { handOf, pull, takeable, testVerb } from "./pull.js";
 import { review } from "./review.js";
 
 export const BRIEF = "HANDOVER.md";
@@ -567,6 +567,19 @@ function leaves(it, branch, at, path, says) {
   const open = childrenHere(it, name).filter(
     (one) => fieldOf(one.text, "state") !== CLOSED,
   );
+
+  // [[spec/design_output/pull#done-leaves-no-takeable-step]]
+  const busy = [...open, { name, text: it.disk.read(path) }]
+    .map((one) => ({ name: one.name, step: takeable(it, one) }))
+    .filter((one) => one.step);
+  if (busy.length) {
+    for (const one of busy) {
+      console.error(`${one.name} stands at ${one.step}, and a hand can take it.`);
+    }
+    console.error("Run ./RUNME.sh branch pull, and spawn the hand a spawn answer names.");
+    console.error("branch done leaves a group only when every open step waits for a person.");
+    return 1;
+  }
 
   let now = withHashAfter(it.disk.read(path), after);
   if (!open.length) now = withField(withField(now, "state", CLOSED), "reason", DONE);

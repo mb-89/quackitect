@@ -66,6 +66,14 @@ export function judgeAsk(evidence, rules) {
   ].join("\n");
 }
 
+// [[spec/design_output/pull#a-hand-of-its-own]]
+export function spawnPromptIn(answer) {
+  const rows = String(answer ?? "").split("\n");
+  if (rows[0]?.trim() !== "spawn") return "";
+  const blank = rows.indexOf("");
+  return blank < 0 ? "" : rows.slice(blank + 1).join("\n").trim();
+}
+
 export function judgeRefusal(said) {
   return [
     "refused",

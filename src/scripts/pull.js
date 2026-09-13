@@ -191,7 +191,8 @@ export function leafOf(front, path) {
 // [[spec/design_output/pull#the-hand-out]]
 export function pull(it, argv) {
   const rest = (argv ?? []).slice(1);
-  const name = rest.find((one) => !one.startsWith("--")) ?? "";
+  const name = positionalOf(rest);
+  const as = flagValue(rest, "--as");
   const verdict = verdictFlag(rest);
   if (verdict.why) {
     console.error(verdict.why);
@@ -207,14 +208,13 @@ export function pull(it, argv) {
     return 2;
   }
   const group = branch.replace(/^work\//, "");
-  const hand = handOf(it);
+  const hand = as ? `${handOf(it)} · ${as}` : handOf(it);
   const held = holdOf(it, hand);
+  const who = { hand, branch, group, held, oneStep: Boolean(as) };
 
   if (rest.includes("--judge")) return judgeMaterial(it, held, name);
-  if (verdict.said === "back")
-    return takeBack(it, { hand, branch, group, held }, name, verdict.reason);
-  if (verdict.said || name)
-    return handBack(it, { hand, branch, group, held }, name, verdict);
+  if (verdict.said === "back") return takeBack(it, who, name, verdict.reason);
+  if (verdict.said || name) return handBack(it, who, name, verdict);
   if (held) {
     say(REFUSED, [
       `${held.ticket} stands in your hand at ${held.step}, and one hand holds one ticket.`,
@@ -223,7 +223,29 @@ export function pull(it, argv) {
     return 1;
   }
   if (!fetched(it, branch)) return 1;
-  return handOut(it, { hand, branch, group });
+  return handOut(it, who);
+}
+
+// [[spec/design_output/pull#a-hand-of-its-own]]
+const TAKES = ["--as", "--fail", "--became", "--back"];
+
+function positionalOf(rest) {
+  for (let i = 0; i < rest.length; i++) {
+    const one = rest[i];
+    if (one.startsWith("--")) {
+      if (TAKES.includes(one)) i++;
+      continue;
+    }
+    return one;
+  }
+  return "";
+}
+
+function flagValue(rest, flag) {
+  const at = rest.indexOf(flag);
+  if (at >= 0) return String(rest[at + 1] ?? "").trim();
+  const inline = rest.find((one) => one.startsWith(`${flag}=`));
+  return inline ? inline.slice(flag.length + 1).trim() : "";
 }
 
 // [[spec/design_output/pull#the-five-checks]]
@@ -353,16 +375,63 @@ function handOut(it, who) {
   ];
 
   const why = [];
+  let other = null;
   for (const pool of pools) {
     for (const one of pool) {
       const said = offer(it, who, one, all);
       if (said.leaf) return handed(it, who, one, said.leaf);
       if (said.why) why.push(`${one.name} ${said.why}`);
+      if (said.other && !other) other = { one, leaf: said.other, why: said.why };
     }
   }
 
+  if (other && !who.oneStep) return spawnAnswer(other);
   say(WAIT, why.length ? why : ["no ticket of this group stands open"]);
   return 0;
+}
+
+// [[spec/design_output/pull#a-hand-of-its-own]]
+export const SPAWN = "spawn";
+export const HELPER = "helper";
+
+function spawnAnswer(other) {
+  const helper = `${HELPER}-${entriesOf(other.one.front).length + 1}`;
+  say(SPAWN, [
+    `${other.one.name} at ${other.leaf.path} ${other.why}.`,
+    "Spawn a hand of its own with the prompt below, and pull again once it answers.",
+  ]);
+  console.log("");
+  console.log(spawnPrompt(other.one.name, other.leaf, helper));
+  return 0;
+}
+
+// [[spec/design_output/pull#a-hand-of-its-own]]
+export function spawnPrompt(ticket, leaf, helper) {
+  const verdict = leaf.evidence.some((field) => field.form === "verdict");
+  const back = verdict
+    ? `./RUNME.sh branch pull ${ticket} --as ${helper}`
+    : `./RUNME.sh branch pull ${ticket} --as ${helper} --pass, or --fail "why"`;
+  return [
+    `You are a hand of your own on this box, named ${helper}, and you work one step of one ticket.`,
+    "",
+    `1. Run \`./RUNME.sh branch pull --as ${helper}\` from the root. It hands you ${ticket} at ${leaf.path}, with its fields and its guidance.`,
+    "2. Write the fields into the ticket where the answer says, under the headings it names, and change nothing else.",
+    `3. Run \`${back}\`. It checks the hand-back and answers done, or refused with what to fix.`,
+    "4. Answer with what the last pull said, word for word.",
+  ].join("\n");
+}
+
+// [[spec/design_output/pull#done-leaves-no-takeable-step]]
+export function takeable(it, one) {
+  const front = frontOf(one.text);
+  if (String(front.state ?? "") !== OPEN) return "";
+  const path = String(front.step ?? "").trim() || (leavesOf(front)[0]?.path ?? "");
+  const leaf = leafOf(front, path);
+  if (!leaf) return "";
+  if (["person", "children", "helper"].includes(leaf.by)) return "";
+  if (leaf.by === "agent" && !it.agent) return "";
+  if (leaf.needs.some((need) => !holdsVerb(need))) return "";
+  return leaf.path;
 }
 
 // [[spec/design_output/pull#what-a-hand-out-reads]]
@@ -537,7 +606,7 @@ function admits(it, who, one, leaf, all) {
   if (lacking.length)
     return { why: `needs ${lacking.join(", ")}, which this box lacks` };
   const other = excludes(one.front, leaf, who.hand);
-  if (other) return { why: other };
+  if (other) return { why: other, other: leaf };
   return { leaf };
 }
 
@@ -749,11 +818,9 @@ function handBack(it, who, name, verdict) {
       ]);
       return 1;
     }
-    dropHold(it, who.hand);
-    say(WORK, [
+    return onward(it, who, [
       `${held.ticket} at ${held.step} answered already, and the record holds it.`,
     ]);
-    return handOut(it, who);
   }
   if (fieldOf(one.text, "step") !== held.step) {
     dropHold(it, who.hand);
@@ -1112,9 +1179,7 @@ function passed(it, who, one, leaf, held, answered) {
     ]);
     return 1;
   }
-  dropHold(it, who.hand);
-  say(WORK, [`${one.name} ${changes.join(", ")}.`]);
-  return handOut(it, who);
+  return onward(it, who, [`${one.name} ${changes.join(", ")}.`]);
 }
 
 // [[spec/design_output/pull#children-before-their-group]]
@@ -1160,9 +1225,7 @@ function failed(it, who, one, leaf, held, reason, answered) {
     ]);
     return 1;
   }
-  dropHold(it, who.hand);
-  say(WORK, [`${one.name} ${changes.join(", ")}.`]);
-  return handOut(it, who);
+  return onward(it, who, [`${one.name} ${changes.join(", ")}.`]);
 }
 
 // [[spec/design_output/pull#the-fail]]
@@ -1212,9 +1275,16 @@ function became(it, who, one, leaf, held, successor, answered) {
     ]);
     return 1;
   }
+  return onward(it, who, [`${one.name} closes became ${successor}.`]);
+}
+
+// [[spec/design_output/pull#a-hand-of-its-own]]
+function onward(it, who, rows) {
   dropHold(it, who.hand);
-  say(WORK, [`${one.name} closes became ${successor}.`]);
-  return handOut(it, who);
+  say(WORK, rows);
+  if (!who.oneStep) return handOut(it, who);
+  say(DONE, [`${who.hand} works one step, and it is done. Stop here.`]);
+  return 0;
 }
 
 function shut(text, front, reason) {

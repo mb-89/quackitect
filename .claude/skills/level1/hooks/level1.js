@@ -1,7 +1,7 @@
 // Level one's hook module: the pull as a tool. It registers the tool, runs the
-// shell verb under it, and reads a hand-back with the judge first, because a
-// shell verb reaches no model and the hook process does. It imports nothing
-// past its own folder, and the shell hands it the material as JSON.
+// shell verb under it, reads a hand-back with the judge first, and spawns the
+// hand a spawn answer names, because a shell verb reaches no model and no
+// agent, and the hook process reaches both.
 // [[spec/design_output/pull#the-five-checks]]
 
 import {
@@ -12,12 +12,14 @@ import {
   PULL_CALL,
   pullArgv,
   pullSpec,
+  spawnPromptIn,
 } from "../lib/pull.js";
 
 const CLI = ["node", "src/scripts/cli.js"];
 const CONFIG = "spec/config/level0.json";
 const RUNNING = 600000;
 const JUDGE = "--judge";
+const SPAWNS = 3;
 
 export function register(on, _options) {
   on("session.start", async ($, e, next) => {
@@ -31,11 +33,39 @@ export function register(on, _options) {
       const said = await judged($, argv);
       if (said) return { result: said };
     }
-    const ran = await $.process.run([...CLI, ...argv], { timeoutMs: RUNNING });
-    return {
-      result: `${ran.stdout ?? ""}${ran.stderr ?? ""}`.trim() || `exit ${ran.exitCode}`,
-    };
+    let answer = await pulled($, argv);
+    // [[spec/design_output/pull#a-hand-of-its-own]]
+    for (let round = 0; round < SPAWNS; round++) {
+      const prompt = spawnPromptIn(answer);
+      if (!prompt) break;
+      const said = await spawned($, prompt);
+      if (said) return { result: `${answer}\n\n${said}` };
+      answer = await pulled($, ["branch", "pull"]);
+    }
+    return { result: answer };
   });
+}
+
+async function pulled($, argv) {
+  const ran = await $.process.run([...CLI, ...argv], { timeoutMs: RUNNING });
+  return `${ran.stdout ?? ""}${ran.stderr ?? ""}`.trim() || `exit ${ran.exitCode}`;
+}
+
+// [[spec/design_output/pull#a-hand-of-its-own]]
+async function spawned($, prompt) {
+  let said;
+  try {
+    said = await $.agent.spawn({
+      prompt,
+      description: "a hand of its own works one step",
+      subagentType: "general-purpose",
+    });
+  } catch (bad) {
+    return `no hand spawns here: ${bad?.message ?? bad}`;
+  }
+  if (said?.deny) return `the spawn is refused: ${said.deny}`;
+  if (said?.isError) return `the hand failed: ${said.text ?? ""}`;
+  return "";
 }
 
 // [[spec/design_output/pull#the-five-checks]]
@@ -44,7 +74,9 @@ async function judged($, argv) {
   const judge = settings?.judge ?? {};
   if (judge.enabled === false) return "";
 
-  const ran = await $.process.run([...CLI, ...argv.slice(0, 3), JUDGE], { timeoutMs: RUNNING });
+  const ran = await $.process.run([...CLI, ...argv.slice(0, 3), JUDGE], {
+    timeoutMs: RUNNING,
+  });
   const material = parsed(ran.stdout);
   if (!material?.rules?.length || !String(material.evidence ?? "").trim()) return "";
 

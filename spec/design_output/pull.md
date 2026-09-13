@@ -121,6 +121,26 @@ under. A checklist on the leaf or a phase above it adds the `checked` field,
 one line per item. Then come the actionables of every note the leaf reads,
 and the line that hands it back.
 
+# A hand of its own
+
+A step under `not` excludes the hand the record names on the step it names,
+and one box holds one hand. So where such a step is the only work, the pull answers
+`spawn`, with the name of a hand to make and the prompt it takes. The owner
+rules that on a cloud box the session spawns that hand itself, and the
+wrapper under level one spawns it through the hook. The design input's line
+that a session's helper reviews none of its work yields to that ruling.
+
+| the pull says | who acts |
+|---|---|
+| `spawn`, a helper name and a prompt | the wrapper calls the harness, or the session spawns a subagent with the prompt |
+| `work` under `--as <helper>` | the spawned hand, which takes that one leaf |
+| `done` after its hand-back | the spawned hand stops, and the session pulls again |
+
+`--as <name>` makes the hand `box <id> · <name>`, with a hold of its own.
+Such a hand works one step: its hand-back answers `done` and hands nothing
+out. The record names the helper on the leaf, so `not` reads the two hands
+apart.
+
 # The hand-back
 
 ## The hand-back matches the hold
@@ -230,6 +250,23 @@ holds its record entry. The record names this hand on that leaf, or the pull
 refuses, so nobody takes another hand's work back. The pull writes a return with the
 reason, sets `step` to the leaf, commits, pushes and hands the leaf out again.
 So a hand fixes what the sweep names later through the one road there is.
+
+# Done leaves no takeable step
+
+`branch done` refuses while a ticket of the group stands at a step a hand
+can take. A hand can take a step where `by` names no person, no child and no
+helper, and the box holds every verb it needs. A step under `not` counts, because a spawned hand takes
+it. So a box leaves a group only when every open step waits for a person, or
+when the group closes.
+
+# The group holds the turn
+
+The stop hook reads the group ticket of the branch the box stands on. A
+newest record entry with `hash_before` and no `hash_after` on an open group
+fires `the-group-stands-in-hand`, which carries the turn. So a cloud box
+keeps pulling until `branch done` writes `hash_after`, and the rule
+`the-session-is-new` stays off on a cloud box, because nobody sits beside it
+to ask.
 
 # Became
 

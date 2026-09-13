@@ -9,6 +9,17 @@ export const SEVERITY = "error";
 export const HAND = "hand";
 export const ANSWERED = "answered:";
 
+// [[spec/design_output/pull#the-group-holds-the-turn]]
+export function heldGroup(text) {
+  const front = readNote(String(text ?? "")).front.said ?? {};
+  const last = [front.record ?? []]
+    .flat()
+    .filter((one) => one && typeof one === "object")
+    .at(-1);
+  if (String(front.state ?? "") === "closed") return false;
+  return Boolean(last?.hash_before) && !last?.hash_after;
+}
+
 // [[spec/design_output/schema#the-three-places]]
 export function ticketFaults(was, now, schema, where) {
   const note = readNote(now);

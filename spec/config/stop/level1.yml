@@ -2,6 +2,13 @@
 # .se/hold, and a turn ending with a hold standing ends on a ticket half done.
 # The hook reads the folder, so the rule needs no claim from the agent.
 
+- id: the-group-stands-in-hand
+  side: continue
+  priority: 82
+  decides: mechanical
+  runs: group-in-hand
+  says: This box holds a group, so run ./RUNME.sh branch pull, spawn the hand a spawn answer names, and run branch done once the pull answers wait.
+
 - id: a-ticket-stands-in-hand
   side: continue
   priority: 81
