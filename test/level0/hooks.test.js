@@ -358,6 +358,35 @@ test("a held branch carries the turn once the session stops being new", async ()
   assert.ok(it.prompts[0].text.split("\n").length <= 5, "five lines at most");
 });
 
+// [[spec/design_output/pull#the-private-queue]]
+test("an open private ticket carries the turn, and a note alone waits for the retro", async () => {
+  const rule = "- id: a-ticket-stands-in-hand\n  side: continue\n  priority: 81\n  decides: mechanical\n  runs: ticket-in-hand\n  says: A ticket stands in your hand.\n";
+  const piece = (process) =>
+    `---\nkind: [[ticket]]\nstate: open\nprocess: [[${process}]]\nsteps:\n  - name: do\n---\n\n# Ask\n\nOne.\n`;
+  const carried = await started({
+    ".se/tickets/a-piece.md": piece("trivial"),
+    "spec/config/stop/level1.yml": rule,
+  });
+  await carried.raise("turn.complete", {
+    ...answered,
+    answer: `a leaf is done\n\n${canary({ rules: 2, notes: 1, stop: true })}`,
+  });
+  const said = carried.lines().filter((one) => one.kind === "stop");
+  assert.equal(said.at(-1).said, "the turn goes on");
+  assert.match(said.at(-1).detail, /continue=a-ticket-stands-in-hand@81/);
+
+  const waits = await started({
+    ".se/tickets/a-note.md": piece("note"),
+    "spec/config/stop/level1.yml": rule,
+  });
+  await waits.raise("turn.complete", {
+    ...answered,
+    answer: `a leaf is done\n\n${canary({ rules: 2, notes: 1, stop: true })}`,
+  });
+  const quiet = waits.lines().filter((one) => one.kind === "stop");
+  assert.equal(quiet.at(-1).said, "the turn ends", "a note waits for a retro, and carries nothing");
+});
+
 // [[spec/design_output/pull#the-group-holds-the-turn]]
 test("a held group carries the turn on a cloud box, from turn one", async () => {
   const group = "---\nkind: [[ticket]]\nstate: open\nstep: children\nrecord:\n  - step: sync\n    hand: box 3f9a\n    hash_before: a1b2c3\n---\n\n# Ask\n\nOne.\n";

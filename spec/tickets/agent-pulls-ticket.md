@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[standard]]
 group: the-agent-pulls-a-ticket
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d49afdfe301a64
@@ -98,6 +98,17 @@ record:
     hand: box d49afdfe301a64 · helper-2
     hash_before: dfceb7dfbcf41bd854dfad206c132fe05a3cdcef
     hash_after: dfceb7dfbcf41bd854dfad206c132fe05a3cdcef
+  - step: implement/tests-red
+    hand: box d49afdfe301a64
+    hash_before: c23cd73cf8720d3e1e74607a27b213971bf92a19
+    hash_after: c23cd73cf8720d3e1e74607a27b213971bf92a19
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -199,14 +210,22 @@ pass
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The verb runs the four test files the branch changes since the take, and one assertion fails: the private ticket carries no turn yet. The surprise is the size of the delta, because the take stands before the engine landed. So the verb runs the whole window, and one red line decides the word.
+
+### checked
+
+- the change reaches the stop hook and its test alone, under the stop rule row of the ask
+- the hook reaches the disk through the harness fake, and the verb tests carry the fake disk
+- the hook names the design chapter on the private queue beside the check it adds
 
 ## reflect
 
