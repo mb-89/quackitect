@@ -4,17 +4,123 @@ kind: [[design_output]]
 
 # Scope
 
-`src/scripts/work.js` holds every verb over a work branch. This note covers the
-branch, its two handovers, the status it carries, and the round trip.
+`src/scripts/work.js` holds every verb over a work branch, and
+`src/scripts/group.js` holds what a group's ticket reads and writes. This note
+covers the branch, the group on it, the brief that drains, and the round trip.
 
 # What a work branch is
 
-One piece of work, held by one branch named `work/<name>`, carrying its own
-brief. The branch is the unit, and a session works it whole.
+One piece of work, held by one branch named `work/<name>`. The branch carries a
+group ticket, or the brief the last of the old branches still carries. The
+branch is the unit, and a session works it whole.
+
+# A group is a ticket
+
+A group is a ticket whose work is other tickets. It stands at
+`spec/tickets/<name>.md` on the branch `work/<name>`, carries `process:
+[[group]]`, and its children are the tickets naming `<name>` under `group`. So
+one schema covers everything that moves, and `spec/schemas` names no group kind.
+[[spec/schemas]]
+
+| what | where |
+|---|---|
+| the group | `spec/tickets/<name>.md`, on `work/<name>` |
+| its route | `spec/processes/group.yaml`, copied at the mint |
+| its children | every ticket under `spec/tickets` naming it under `group` |
+| the claim | the push that writes the record |
+
+A group of one ticket is the ordinary case, and a group of five is the same
+shape.
+
+## A brief drains first
+
+A branch carrying `HANDOVER.md` is a brief branch, whatever else stands on it,
+and `work adopt` dropping that file is what turns it into a group. `take` hands
+out every brief branch before it hands out a group, so the branches standing
+before the ticket system finish under the verbs they carry.
+
+# The take writes the record
+
+`take` claims a group by writing one entry into the group ticket's `record`:
+
+    record:
+      - step: children
+        hand: box d462e994b4cef
+        took: a1b2c3
+
+`step` is the leaf the group stands on, `hand` names the box out of
+`.se/copy.json`, and `took` is the branch tip at the claim. The push arbitrates:
+two boxes reaching for one group means one of them meets a rejected push and
+takes the next.
+
+The hand names the box and no person, because the ticket travels and
+`spec/guidance/private` binds what a tracked file carries. [[spec/guidance]]
+
+## Held derives from the record
+
+A group holds where its newest record entry carries `took` and no `gave`.
+Nothing writes a status beside it, so a branch nobody holds takes no write at
+all:
+
+| the record says | the group stands at |
+|---|---|
+| nothing, or a newest entry with `gave` | `todo` |
+| a newest entry with `took` and no `gave` | `held` |
+| `state: closed` on the ticket | `done` |
+
+# A row per group
+
+`work list` names one row per branch and one per loose ticket on trunk:
+
+| column | says |
+|---|---|
+| the name | the branch, or the ticket's file name |
+| the kind | `group`, `brief` or `ticket` |
+| the status | `todo`, `held`, `done` or `merged` |
+| the why | the urgency, or what it waits for |
+| the age | the age of the tip, on a held branch |
+
+A loose ticket is one on trunk naming no group, which is backlog a person has
+yet to sort. A ticket in a group shows nowhere on trunk, because its branch is
+responsible for it.
+
+## A stale group is yours
+
+There is no lease. A branch somebody holds stays held until a person looks, and
+the age of the tip is the signal:
+
+| the tip's age | means |
+|---|---|
+| under `work.staleAfter` | a box holds the group, and nothing asks |
+| past it | the group is a person's, and `list` puts it under yours |
+
+Under yours it carries three answers, and each is a verb:
+
+| the answer | the verb | what it does |
+|---|---|---|
+| release it | `work release <name>` | writes `gave`, so the group stands at `todo` |
+| take it over | `work take` | claims it again, with a record entry of its own |
+| close it | `work close <name> --force` | drops the branch, and the work on it |
+
+`work.staleAfter` reads `12h` by default, and the rule derives from the tip, so
+nothing writes to a branch nobody holds.
+
+# A box leaves
+
+`work done` on a group branch writes `gave` into the newest record entry, which
+is the box saying it leaves. Then it reads the children:
+
+| what stands | what the group becomes |
+|---|---|
+| no ticket in it stands open | `state: closed`, `reason: done` |
+| one of them stands open | `state: open`, and `done` names each open one |
+
+So an open group nobody holds comes back to the queue, and a person answers on
+its branch.
 
 # Two handovers
 
-| file | tracked | who reads it | where it may stand |
+| file | tracked | who reads it | where it can stand |
 |---|---|---|---|
 | `.se/HANDOVER.md` | no | the next session on this box | anywhere |
 | `HANDOVER.md` | yes | whoever works the branch | a work branch alone |
@@ -58,6 +164,7 @@ The contract names six things:
 - run `work sync` first, which takes `main` in
 - push each time a thing lands
 - write the result and the retro back into `HANDOVER.md`
+- run `work sync` again, so trunk comes in last too
 - run `work done`
 - run `work release` on stopping early
 - run `work merge` from trunk, which a cloud box leaves to a box off the cloud
@@ -69,7 +176,24 @@ branch reads it and knows how to finish.
 
 `work sync` merges `origin/main` into the branch. `work take` runs it, so a
 routine pays nothing to remember it. A conflict then stops the take, while the
-work it would cost still sits ahead.
+work it costs still sits ahead.
+
+## Trunk comes in last too
+
+A branch greens its own tip, and the merge result reads green nowhere. So a
+branch older than a rule passes `work done` and reddens trunk at the merge.
+This tree hits that twice in one day.
+
+`work done` fetches trunk and refuses a branch trunk stands ahead of:
+
+| what it finds | what it does |
+|---|---|
+| the branch carries every commit on trunk | it reads the battery next |
+| trunk holds a commit the branch lacks | it refuses, and names `work sync` |
+
+So the battery a branch claims stands over the tree the merge produces. The
+contract carries the same step, because a reader acts on it before the verb
+ever runs.
 
 # A box landing on trunk
 
@@ -124,7 +248,8 @@ urgency reads as `soon`.
 
 A branch meets its dependency once trunk holds the branch it names, or once that
 branch goes because somebody merges and closes it. `done` alone holds the
-dependent, because `done` waits on a person's merge. So a chain of work runs
+dependent, because `done` waits on the merge, which a box off the cloud runs.
+So a chain of work runs
 itself in order, and each link starts from the one before it.
 
 `take` merges trunk in. A dependent taken before its dependency lands starts
@@ -145,7 +270,7 @@ mints holds to its schema. [[spec/schemas]]
 
 | the stamp says | done answers |
 |---|---|
-| nothing at all | no check has run here |
+| nothing at all | no check runs here |
 | another commit | the check names that one instead |
 | an unclean tree | the check reads what the commit lacks |
 | red | the check says red, with the time |
@@ -157,14 +282,57 @@ The stamp lives under `.se`, which git ignores, so it travels nowhere. A
 different box reads its own answer, and `.github/workflows/check.yml` answers
 for a machine with no stake in it.
 
+A push to trunk reads the same stamp at two doors, and each stands without the
+other. The Bash door refuses a session's push on a red, stale, unclean or
+absent stamp. `.githooks/pre-push` refuses the same push from a terminal, or
+from a session that runs no plugin, and `install.sh` points git at it beside
+the commit hook. A push to a work branch meets neither, because mid-work
+carries red.
+
 # A merged branch goes
 
-`work merge <name>` runs on `main` and takes a branch standing at `done`. It
-merges with `--no-ff`, so the branch keeps its shape in the history, and drops
+`work merge <name>` runs on `main` and takes a branch standing at `done`. A
+group stands at `done` where its ticket reads `state: closed`. It merges with
+`--no-ff`, so the branch keeps its shape in the history, and drops
 `HANDOVER.md` inside the same commit: trunk carries no brief.
 
 A conflict stops the merge and leaves it standing, because resolving it belongs
 to the person merging.
+
+## The merge lands the truth
+
+While a branch stands, its copy of the group and of its tickets is the record.
+So `merge` reads trunk against the branch point before it merges anything:
+
+| what it finds under `spec/tickets` | what it does |
+|---|---|
+| trunk's copy matches the branch point | it merges |
+| trunk moves a ticket the branch touches | it refuses, and names the lines |
+
+Then it runs `./RUNME.sh check` on the merge commit itself, which is the one
+tree nobody tests before this point. A red check resets trunk to its own tip
+again, so `main` takes a branch only where the merged tree passes.
+
+## The merge frees the tickets
+
+An open ticket of the group loses its `group` field inside the merge commit. So
+a ticket waiting on a person stands loose on trunk, where `work list` names it
+and a person sorts it. A closed ticket keeps its `group`, because the pair is
+the history of one group and what it holds.
+
+# A brief becomes a group
+
+`work adopt` runs on a brief branch and writes two tickets in place of
+`HANDOVER.md`:
+
+| what it writes | from |
+|---|---|
+| `spec/tickets/<branch>.md`, the group | the `group` route, with the brief's ask |
+| `spec/tickets/<child>.md`, one ticket | the `standard` route, with the brief's body |
+
+The child takes its name from the brief's first heading, and `work adopt <name>
+<child>` names it instead. A name matching the group's, or one past
+`names.words`, stops the verb and asks for one.
 
 # A merged branch closes
 

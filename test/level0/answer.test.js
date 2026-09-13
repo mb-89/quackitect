@@ -6,19 +6,26 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   bandOf,
+  CELL_WORDS,
   checkSpec,
   gateOf,
+  LENGTH,
+  lengthFaults,
+  NEEDS,
+  needsFaults,
   opensATurn,
+  proseWordsIn,
+  questionsIn,
   reachesTheOwner,
   SAYS,
   scoreOf,
+  shapeIn,
   spokeSince,
+  TABLE,
+  tableFaults,
   wordsIn,
 } from "../../.claude/skills/level0/lib/answer.js";
-import {
-  answerFindings,
-  carried,
-} from "../../.claude/skills/level0/lib/refuse.js";
+import { answerFindings } from "../../.claude/skills/level0/lib/refuse.js";
 
 // [[spec/design_output/level0#the-owners-prompt-comes-first]]
 test("a person opens a turn, and a machine does not", () => {
@@ -85,7 +92,7 @@ test("a call reaching the owner passes, and every other call does not", () => {
 
 test("the refusal quotes the rule it holds", () => {
   assert.match(SAYS, /^The owner asked something and nothing has answered it\./);
-  assert.match(SAYS, /Say back what you\n\s*understood and what you do next, then work\.$/);
+  assert.match(SAYS, /Call mcp__level0__log\n\s*with kind answer, saying what you understood and what you do next, then work\.$/);
 });
 
 // [[spec/design_output/level0#the-score-is-a-rate]]
@@ -151,11 +158,10 @@ test("a turn end under the warning sends nothing, and holds nothing", () => {
   });
   assert.equal(said.band, "clean");
   assert.equal(said.sends, false);
-  assert.equal(gate.waiting(), null);
 });
 
-// [[spec/design_output/level0#the-carry-rides-a-prompt]]
-test("a turn end in the middle band holds the findings for the next prompt", () => {
+// [[spec/design_output/level0#the-three-bands]]
+test("a turn end in the middle band sends nothing", () => {
   const gate = gateOf();
   const said = gate.atTurnEnd({
     warnAt: 5,
@@ -166,9 +172,6 @@ test("a turn end in the middle band holds the findings for the next prompt", () 
   });
   assert.equal(said.band, "carry");
   assert.equal(said.sends, false);
-  assert.deepEqual(gate.waiting(), { found: FOUND, score: 10 });
-  assert.deepEqual(gate.takeWaiting(), { found: FOUND, score: 10 });
-  assert.equal(gate.takeWaiting(), null);
 });
 
 test("an answer carrying no finding reads clean, whatever its length", () => {
@@ -209,7 +212,6 @@ test("the gate holds its re-prompt where the tooth already spoke", () => {
   });
   assert.equal(said.sends, false);
   assert.equal(said.held, true);
-  assert.deepEqual(gate.waiting(), { found: FOUND, score: 50 });
 });
 
 // [[spec/design_output/level0#the-tool-reads-a-draft]]
@@ -243,10 +245,134 @@ test("the gate reads an answer clean where nothing stands", () => {
   assert.match(said, /meets the gate clean/);
 });
 
-// [[spec/design_output/level0#the-carry-rides-a-prompt]]
-test("the carry is one line naming the findings", () => {
-  const said = carried(FOUND, 9.5);
-  assert.equal(said.includes("\n"), false);
-  assert.match(said, /scored 9\.5 findings a thousand words/);
-  assert.match(said, /Hold PastTense/);
+// [[spec/design_output/level0#the-door-counts-the-questions]]
+test("a prompt with two questions counts two, and a fenced one counts none", () => {
+  assert.equal(questionsIn("Where does the door stand? What does it read?"), 2);
+  assert.equal(questionsIn("Build the door.\nRun the tests."), 0);
+  assert.equal(questionsIn("```\nWhere does it stand?\n```\n"), 0);
+  assert.equal(questionsIn("Where does it stand?\n```\nAnd here?\n```\n"), 1);
+  assert.equal(questionsIn("Where does it stand??"), 1);
+  assert.equal(questionsIn(undefined), 0);
+});
+
+// [[spec/design_output/level0#the-table-answers-every-question]]
+const TABLE_ROWS = [
+  "| question | answer |",
+  "|---|---|",
+  "| where does it stand | in `lib/answer.js` |",
+  "| what does it read | the first block |",
+].join("\n");
+
+test("a count of zero demands no table", () => {
+  assert.deepEqual(tableFaults("The door stands here.", 0), []);
+  assert.deepEqual(tableFaults("The door stands here.", undefined), []);
+});
+
+test("an answer opening with prose refuses under a count of two", () => {
+  const found = tableFaults("The door stands here.\n\nMore text.\n", 2);
+  assert.equal(found.length, 1);
+  assert.equal(found[0].rule, TABLE);
+  assert.equal(found[0].line, 1);
+  assert.match(found[0].message, /asks 2 questions/);
+  assert.match(found[0].message, /opens with no table/);
+});
+
+test("a table naming the two columns and a row a question passes", () => {
+  assert.deepEqual(tableFaults(`${TABLE_ROWS}\n\nThe detail follows.\n`, 2), []);
+  assert.deepEqual(tableFaults(`\n\n${TABLE_ROWS}\n`, 1), []);
+});
+
+test("a table short of a row names the shortfall", () => {
+  const found = tableFaults(`${TABLE_ROWS}\n`, 3);
+  assert.equal(found.length, 1);
+  assert.match(found[0].message, /holds 2 rows/);
+});
+
+test("a table under other column names refuses", () => {
+  const said = "| ask | said |\n|---|---|\n| where | here |\n";
+  const found = tableFaults(said, 1);
+  assert.equal(found.length, 1);
+  assert.match(found[0].message, /reads ask, said/);
+});
+
+test("a heading and a list open no question table", () => {
+  assert.match(tableFaults("# The door\n", 1)[0].message, /no table/);
+  assert.match(tableFaults("- The door stands here.\n", 1)[0].message, /no table/);
+});
+
+// [[spec/design_output/level0#the-needs-table]]
+const NEEDS_ROWS = [
+  "## What the agent needs",
+  "",
+  "| No. | Question | Proposed answer |",
+  "|---|---|---|",
+  "| 1 | Push main red? | No, hold it local. |",
+  "| 2 | Cap the words? | Yes, 150 an answer. |",
+].join("\n");
+
+test("an answer with no stop line demands no needs table", () => {
+  assert.deepEqual(needsFaults("The door stands here.", null), []);
+});
+
+test("a needs table under its heading passes", () => {
+  assert.deepEqual(needsFaults(`The door stands.\n\n${NEEDS_ROWS}\n`, { reason: "x" }), []);
+});
+
+test("a stop line with prose above it refuses", () => {
+  const found = needsFaults("The door stands.\n\nMore prose.", { reason: "x" });
+  assert.equal(found.length, 1);
+  assert.equal(found[0].rule, NEEDS);
+  assert.match(found[0].message, /no table above it/);
+});
+
+test("a needs table under no heading refuses", () => {
+  const bare = NEEDS_ROWS.split("\n").slice(2).join("\n");
+  assert.match(needsFaults(`Prose.\n\n${bare}`, {})[0].message, /under no heading/);
+});
+
+test("a needs table under other column names refuses", () => {
+  const said = "## What the agent needs\n\n| question | answer |\n|---|---|\n| a | b |";
+  assert.match(needsFaults(said, {})[0].message, /reads question, answer/);
+});
+
+test("a needs table numbers its rows in order", () => {
+  const found = needsFaults(NEEDS_ROWS.replace("| 2 |", "| 3 |"), {});
+  assert.equal(found.length, 1);
+  assert.match(found[0].message, /Row 2 .* carries the number 3/);
+});
+
+test("a needs table cell holds no code and few words", () => {
+  const code = NEEDS_ROWS.replace("No, hold it local.", "Run `work close`.");
+  assert.match(needsFaults(code, {})[0].message, /holds no code/);
+  const long = NEEDS_ROWS.replace("No, hold it local.", "word ".repeat(CELL_WORDS + 1).trim());
+  assert.match(needsFaults(long, {})[0].message, new RegExp(`holds ${CELL_WORDS + 1}`));
+});
+
+test("a needs table with no row refuses", () => {
+  const empty = NEEDS_ROWS.split("\n").slice(0, 4).join("\n");
+  assert.match(needsFaults(empty, {})[0].message, /holds no row/);
+});
+
+// [[spec/design_output/level0#the-cap-counts-the-prose]]
+test("the cap counts prose and leaves tables and fences out", () => {
+  const fence = "```\nfour five\n```";
+  assert.equal(proseWordsIn(`one two three\n\n${NEEDS_ROWS}\n\n${fence}\n`), 7);
+});
+
+test("an answer over the cap refuses, and one under it passes", () => {
+  assert.deepEqual(lengthFaults("word ".repeat(150), 150), []);
+  const found = lengthFaults("word ".repeat(151), 150);
+  assert.equal(found.length, 1);
+  assert.equal(found[0].rule, LENGTH);
+  assert.match(found[0].message, /holds 151/);
+  assert.deepEqual(lengthFaults("word ".repeat(900), undefined), []);
+});
+
+// [[spec/design_output/level0#a-shape-finding-rewrites]]
+test("a shape finding asks for a rewrite whatever the score", () => {
+  const bands = { warnAt: 5, ceiling: 15 };
+  assert.equal(shapeIn([{ rule: NEEDS }]), true);
+  assert.equal(shapeIn([{ rule: "Passive" }]), false);
+  assert.equal(bandOf(0.1, bands, [{ rule: NEEDS }]), "rewrite");
+  assert.equal(bandOf(0.1, bands, [{ rule: "Passive" }]), "clean");
 });

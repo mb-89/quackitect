@@ -112,6 +112,6 @@ ifVale("fenced code keeps every breach it carries", () => {
 ifVale("an exempted span keeps its breach", () => {
   const was =
     "# Notes\n\n<!-- because: the fixer leaves this alone -->\n" +
-    "<!-- vale VoiceVale.Contraction = NO -->\nIt's here.\n";
+    "<!-- vale VoiceParagraph.Contraction = NO -->\nIt's here.\n";
   assert.equal(fixed(was), was);
 });

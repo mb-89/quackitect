@@ -25,6 +25,22 @@ function editorDoor(context) {
 
   return {
     holds: () => Boolean(folder),
+    root: () => folder?.uri?.fsPath ?? "",
+
+    // [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+    startsServer(ask) {
+      let node;
+      try {
+        node = require("vscode-languageclient/node");
+      } catch {
+        return "";
+      }
+      const client = new node.LanguageClient(ask.id, ask.name, ask.server, ask.client);
+      context.subscriptions.push(client);
+      client.start();
+      return ask.server.command;
+    },
+
     takes: (one) => {
       page = one;
     },
@@ -129,6 +145,11 @@ function editorDoor(context) {
         one.onDidDelete(said);
         context.subscriptions.push(one);
       }
+    },
+
+    // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
+    imports(path) {
+      return import(uriOf(path).fsPath);
     },
 
     // [[spec/design_output/extension#the-log-opens-a-terminal]]

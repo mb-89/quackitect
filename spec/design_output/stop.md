@@ -36,6 +36,53 @@ A session torn down as the turn ends escapes the tooth, because the prompt
 reaches a session that has already gone. A cloud routine ending its run is that
 case.
 
+# The stop is one call
+
+A turn ends where the agent asks for it, and the ask is one tool call, last:
+
+    stop  reason=<id>  next=<what the owner does next>
+
+The ids come from the stop side rules the agent claims, in
+`spec/config/stop/level0.yml`. The tool's schema lists them under `reason`.
+The call stands in the transcript where the owner reads it, so a stop is a
+thing spoken out loud. The answer above it carries prose alone.
+
+The call runs the vote at once, and its result says which way it goes:
+
+| what the call carries | what comes back | what the agent does |
+|---|---|---|
+| a reason that stands | the rule's sentence, and "write nothing more" | it ends the turn |
+| a reason a fact contradicts | the fact, in one line | it carries on |
+| an id nobody holds | the ids | it carries on |
+
+A claim lives until the next tool call or the turn's end, whichever comes
+first. So the stop is the last thing an agent does, and a call after it says
+the agent carries on.
+
+## A turn with no call
+
+The floor of zero ends a turn nobody votes on. So stopping is what happens
+where nothing speaks, and a session stops too often for that one reason.
+
+A turn end carries a claim or holds open. `askForStop` names the call, lists
+every id one to a line, and asks for the needs table in one line. The claim
+feeds the vote, and the priorities decide the rest:
+
+- the vote keeps deciding
+- `spec/config/stop/level0.yml` keeps every rule, side and priority
+- `stop.mostInARow` keeps capping a runaway
+
+## The canary ends turn one
+
+The canary is a formatted line of its own, and turn one carries it. So an
+answer holding the canary reaches the vote with no call beside it. For
+details, see [[spec/design_output/level0#the-canary-owes-a-debt]].
+
+## The off switch takes it
+
+`stop.enabled` at false skips the hold above and votes at once. The switch
+takes the whole tooth out, and the call stands as part of the tooth.
+
 # The vote
 
 Every rule carries a side, a priority and a way of firing. The turn ends where
@@ -46,7 +93,7 @@ the reason to stop stands above every reason to continue that fires.
 | 100 | stop | the owner asks to talk | claimed |
 | 99 | continue | the owner says carry on | claimed |
 | 95 | stop | the session is new | mechanical |
-| 90 | stop | blocked on what only a person gives | claimed |
+| 90 | stop | blocked on what only the owner gives | claimed |
 | 80 | continue | work still stands | mechanical |
 | 45 | stop | the work stands complete | claimed |
 | 10 | stop | a wish to give an update | claimed |
@@ -70,18 +117,18 @@ Four bands hold the numbers, so a later level lands without renumbering:
 
 Three numbers carry an argument, and they stay where they stand:
 
-- 99 over 90 puts "carry on" over the block. A person saying carry on is a
-  person saying proceed on your best reading.
+- 99 over 90 puts "carry on" over the block. The owner saying carry on says
+  proceed on your best reading.
 - 45 under 80 keeps a finished piece from ending a session while a list still
   holds something.
 - 95 over 80 frees a session that opens with an old list on it. 95 under 99
-  spends that free stop where a person says get on with it.
+  spends that free stop where the owner says get on with it.
 
 ## The off switch answers alone
 
 `stop.enabled` set to false takes the tooth out, and the rule at priority 0
 records it. That rule wins no vote on its own, because a continue rule at 80
-stands above it. The tooth would then carry the turn with the switch off.
+stands above it. The tooth then carries the turn with the switch off.
 
 So a firing `stop-hook-off` ends the turn whatever else fires, and `decide`
 holds that one line. The switch stays in the table, and the code reads it from
@@ -95,7 +142,7 @@ a hole somebody walks through, so the name reaches a function alone.
 | `runs` | answers true when |
 |---|---|
 | `work-waiting` | a todo stands unfinished, or this branch stands at `held` |
-| `session-is-new` | under 10 tool calls stand behind this session, and the hook has granted no stop |
+| `session-is-new` | under 10 tool calls stand behind this session, and the hook grants no stop |
 | `stop-hook-off` | `spec/config/level0.json` says `stop.enabled` is false |
 | `never` | nothing, which is what an unbuilt rule takes |
 
@@ -106,40 +153,37 @@ The free stop asks for both halves. The count alone hands out a free stop
 wherever it resets. The grant alone lets a session read for an hour and still
 call itself new.
 
-# The claim and its life
+# The claim rides the call
 
-Level zero registers `claim_stop` at `session.start` through `$.tool.register`,
-and serves it by hooking `tool.call` with the matcher for its own name:
+The call carries the claim, and the hook hands the reason to `decide` as
+`claimed` twice:
 
-    claim_stop({ rule: "the-work-stands-complete", why: "one sentence" })
-
-The tool answers with the claim it holds, so the agent reads its own words
-back. A claim lives briefly, and this is the whole of its life:
-
-| what ends a claim | and then |
+| where | what the vote is for |
 |---|---|
-| the turn ends | the hook counts it |
-| two tool calls pass after it | the hook counts nothing |
+| inside the call | the result answers the agent at once |
+| at the turn's end | the tooth confirms it where the turn ends |
 
-Whichever comes first. Two tool calls stand between a claim and a stop because
-an agent often reads one more thing before it stops. A third says it stands
-back at work, so the claim goes. The claim's own call spends none of that life.
+The second vote reads the same facts, so the first answer stands.
 
-A claim lives inside one turn, and the next turn opens with none.
+The other road is a line last in the answer, which the tooth reads back. It
+costs a challenge, and the challenge costs a second answer for every stop, so
+the owner reads two endings. The call costs one line in the transcript, and
+its absence holds the turn open.
 
 # The tooth holds its state
 
-`toothOf` holds four counts in module state:
+`toothOf` holds three counts in module state, and the hook holds the claim
+beside it:
 
 | count | what it stands for |
 |---|---|
 | calls | the tool calls this session |
 | inARow | the turns the tooth carries one after another |
-| since | the tool calls a claim still lives through |
 | granted | whether the hook grants a stop already |
+| claim | the reason the last call names, until the next call or the turn's end |
 
-The module reloads with the plugin, so every count starts again where a person
-edits level zero mid-session.
+The module reloads with the plugin, so every count starts again where the
+maintainer edits level zero mid-session.
 
 # Where the rules live
 
@@ -164,23 +208,28 @@ Vale writes its own.
 
 # What the re-prompt says
 
-The re-prompt carries two things: the `says` of the winning continue rule, and
-the `asks` of every stop rule standing unclaimed. The agent reads them and
-answers itself, because it is the only thing in the room that knows.
+The re-prompt carries three things, and the ids stand one to a line:
 
-    Something on your list stands unfinished, so carry on with it.
+- the `says` of the winning continue rule, and the call to make
+- the `asks` of every stop rule with no claim on it
+- the needs table the answer closes with, in one line
 
-    If that reading is wrong, claim the stop and end the turn:
-      - Does the last thing the owner said open a discussion?
-      - Does going on need what only a person can give?
-      - Does the work stand complete?
+The agent reads them and answers itself, because it is the only thing in the
+room that knows. For the table, see [[spec/design_output/level0#the-needs-table]].
+
+    Something on your list stands unfinished, so carry on with it. To stop, call mcp__level0__stop last, with one reason:
+      the-owner-asks-to-talk: Does the last thing the owner said open a discussion?
+      a-person-holds-the-answer: Does going on need what only a person can give?
+      the-work-stands-complete: Does the work stand complete?
+      an-update-is-worth-giving: Is there an update the owner wants before you go on?
+    Before the call, close the answer with the heading What the agent needs and a table headed No., question and proposed answer, one numbered row a need.
 
 # Three in a row
 
-The hook counts the turns it has carried one after another.
+The hook counts the turns it carries one after another.
 
 - Past `mostInARow`, it writes a `warn` line and lets the turn end.
-- A prompt from outside the plugin resets the count, because that is a person
+- A prompt from outside the plugin resets the count, because that is the owner
   taking the session back.
 
 The hook asks the resolver for `stop.mostInARow` and `stop.enabled` at each
@@ -189,13 +238,13 @@ number of its own, and a write to `.se/config.json` reaches the next turn. For
 details, see [[spec/design_output/config#a-caller-hands-it-in]].
 
 The tooth is on for a desk session as well as a cloud one. The discussion rule
-covers a person standing there.
+covers the owner standing there.
 
 # What the todo list says
 
 `work-waiting` reads the todo list, which is one of the two work states
 standing today. The other is the branch: a brief at `held` says this session
-holds work a person gives it.
+holds work the owner gives it.
 
 Client 2.1.266 carries no `TodoWrite`. Its list is `TaskCreate` and
 `TaskUpdate`, which name one task a call, so `todos` counts:
@@ -211,10 +260,11 @@ counting right.
 
 # Every decision writes a line
 
-One line per turn end, at `info`, under the door `stop`:
+One line per call, and one per turn end, at `info`, under the door `stop`:
 
+    said:   the stop stands, or the stop falls
     said:   the turn ends, or the turn goes on
     detail: stop=<id>@<priority> continue=<id>@<priority> inARow=<n>
 
-That line is the whole audit. A person reads a misfiring tooth out of the log,
-and `./RUNME.sh log` opens it.
+Those lines are the whole audit. The maintainer reads a misfiring tooth out of
+the log, and `./RUNME.sh log` opens it.
