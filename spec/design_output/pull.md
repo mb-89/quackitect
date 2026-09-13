@@ -110,7 +110,8 @@ replays.
 
 The hold stands at `.se/hold/<hand>.json`. It names the ticket, its path, the
 step, the group, the take hash, and the guidance notes by name and hash. The
-pull refuses a second hand-out while a hold stands. The stop hook reads the
+pull refuses a second hand-out while a hold stands, and `branch pull --drop`
+drops the hold with the leaf where it stands. The stop hook reads the
 folder, so a turn ending with a hold standing carries on.
 
 ## The work answer

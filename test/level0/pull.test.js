@@ -618,6 +618,41 @@ test("a step that excludes the only hand answers spawn, with the helper's name a
 });
 
 // [[spec/design_output/pull#a-hand-of-its-own]]
+test("the spawn comes before the group's own leaves, and the box leaves children past no takeable child", () => {
+  const took = withEntry(CHILD("open", "design/review"), {
+    step: "design/draft",
+    hand: HAND,
+    hash_before: SHA,
+    hash_after: SHA,
+  });
+  const { it, disk } = doors(standing(took, withField(GROUP_NOTE, "step", "children")));
+
+  const { said } = heard(() => work(ROOT, ["pull"], it));
+
+  assert.match(said, /^spawn\n {2}a-child at design\/review/);
+  const group = disk.read(at("spec/tickets/one-group.md"));
+  assert.equal(fieldOf(group, "step"), "children", "the group stays at children");
+  assert.equal(recordIn(group).length, 0, "the box leaves no entry while a hand can take the child");
+
+  const dropped = heard(() => work(ROOT, ["pull", "--drop"], it));
+  assert.match(dropped.said, /nothing stands in your hand/);
+});
+
+// [[spec/design_output/pull#the-hand-and-the-hold]]
+test("a hold drops on request, and the leaf stays where it stands", () => {
+  const { it, disk } = doors(standing());
+  heard(() => work(ROOT, ["pull"], it));
+  assert.equal(disk.exists(HOLD), true);
+
+  const { code, said } = heard(() => work(ROOT, ["pull", "--drop"], it));
+
+  assert.equal(code, 0);
+  assert.match(said, /the hold drops, and a-child stays at design\/draft/);
+  assert.equal(disk.exists(HOLD), false);
+  assert.equal(fieldOf(disk.read(at("spec/tickets/a-child.md")), "step"), "design/draft");
+});
+
+// [[spec/design_output/pull#a-hand-of-its-own]]
 test("a hand under --as works one step under its own name, and the pull answers done after it", () => {
   const took = withEntry(CHILD("open", "design/review"), {
     step: "design/draft",
@@ -911,7 +946,7 @@ test("a leaf needing a verb the box lacks answers wait, with the reason", () => 
 
 // [[spec/design_output/pull#children-before-their-group]]
 test("the group's children step derives from its tickets, and the box leaves it while a child waits", () => {
-  const parked = CHILD("open", "design/review");
+  const parked = CHILD("open", "design/review").replace("        not: draft\n", "        by: person\n");
   const { it, disk } = doors(
     standing(parked, withField(GROUP_NOTE, "step", "children")),
     {
@@ -976,7 +1011,7 @@ test("the group's last leaf returns to children while a child stands open, and c
     skipped: true,
     why: "the box leaves it while a-child stand open",
   });
-  const parked = withEntry(CHILD("open", "design/review"), {
+  const parked = withEntry(CHILD("open", "design/review").replace("        not: draft\n", "        by: person\n"), {
     step: "design/draft",
     hand: HAND,
     hash_before: SHA,
@@ -990,7 +1025,7 @@ test("the group's last leaf returns to children while a child stands open, and c
   const stays = open.disk.read(at("spec/tickets/one-group.md"));
   assert.equal(fieldOf(stays, "state"), "open");
   assert.equal(fieldOf(stays, "step"), "children");
-  assert.match(back.said, /^spawn\n {2}a-child at design\/review/m, "the box leaves once, and asks for a hand the second time");
+  assert.match(back.said, /^ {2}a-child waits for a person at design\/review/m, "the box leaves once, and waits the second time");
 
   const shut = doors(
     standing(

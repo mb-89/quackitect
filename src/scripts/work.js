@@ -10,7 +10,6 @@ import {
   reaches,
   TODO as PARKED,
 } from "../../.claude/skills/level0/lib/todo.js";
-import { COPY } from "../../.claude/skills/level0/lib/vehicle.js";
 import {
   aged,
   askOf,

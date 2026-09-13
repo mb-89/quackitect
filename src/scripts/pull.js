@@ -213,6 +213,7 @@ export function pull(it, argv) {
   const who = { hand, branch, group, held, oneStep: Boolean(as) };
 
   if (rest.includes("--judge")) return judgeMaterial(it, held, name);
+  if (rest.includes("--drop")) return dropped(it, who);
   if (verdict.said === "back") return takeBack(it, who, name, verdict.reason);
   if (verdict.said || name) return handBack(it, who, name, verdict);
   if (held) {
@@ -246,6 +247,19 @@ function flagValue(rest, flag) {
   if (at >= 0) return String(rest[at + 1] ?? "").trim();
   const inline = rest.find((one) => one.startsWith(`${flag}=`));
   return inline ? inline.slice(flag.length + 1).trim() : "";
+}
+
+// [[spec/design_output/pull#the-hand-and-the-hold]]
+function dropped(it, who) {
+  if (!who.held) {
+    say(WAIT, ["nothing stands in your hand, so nothing drops."]);
+    return 0;
+  }
+  dropHold(it, who.hand);
+  say(WORK, [
+    `the hold drops, and ${who.held.ticket} stays at ${who.held.step} for the next pull.`,
+  ]);
+  return 0;
 }
 
 // [[spec/design_output/pull#the-five-checks]]
@@ -383,9 +397,9 @@ function handOut(it, who) {
       if (said.why) why.push(`${one.name} ${said.why}`);
       if (said.other && !other) other = { one, leaf: said.other, why: said.why };
     }
+    if (other && !who.oneStep) return spawnAnswer(other);
   }
 
-  if (other && !who.oneStep) return spawnAnswer(other);
   say(WAIT, why.length ? why : ["no ticket of this group stands open"]);
   return 0;
 }
@@ -510,6 +524,11 @@ function advanced(it, who, one, all) {
         continue;
       }
       if (said.open.length) {
+        const busy = said.open.filter((name) => {
+          const child = all.find((held) => !held.private && held.name === name);
+          return child && takeable(it, child);
+        });
+        if (busy.length) return { why: `waits for ${busy.join(", ")}, which a hand can take` };
         const left = entriesOf(front)
           .filter((entry) => String(entry.step) === leaf.path)
           .at(-1);
