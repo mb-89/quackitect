@@ -76,7 +76,7 @@ steps:
   - name: person-1
     does: answers the question the engine asks
     by: person
-    asks: the hand-back met refused 5 times: verdict breaks Vocabulary at line 96 of its chapter: splices stands outside the words this tree writes. Write a core word, or add splices to spec/vocabulary/terms.yml with the note that defines it.
+    asks: "the hand-back met refused 5 times: verdict breaks Vocabulary at line 96 of its chapter: splices stands outside the words this tree writes. Write a core word, or add splices to spec/vocabulary/terms.yml with the note that defines it."
     evidence:
       - name: answer
         form: text
