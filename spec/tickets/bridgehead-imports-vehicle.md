@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 steps:
   - name: design
@@ -99,6 +99,12 @@ record:
     hand: box d42624a67d18a8 · helper-2
     hash_before: fb943ac658bbd74dd0dd6316fc62b3e36bff576a
     hash_after: fb943ac658bbd74dd0dd6316fc62b3e36bff576a
+  - step: implement/tests-red
+    hand: box d42624a67d18a8
+    hash_before: c87b1c2501a7f577189321a559eabd6bfc873138
+    hash_after: c87b1c2501a7f577189321a559eabd6bfc873138
+reason: became
+successors: [bridgehead-probe-lands]
 ---
 
 # Ask

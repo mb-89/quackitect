@@ -52,7 +52,7 @@ On a cloud box:
 | 8 | the vehicle registers itself and attaches to the stub | `.se/project.json` in the stub names the vehicle, and step 3 follows |
 | 9 | the routine's first session ends on the install, and the cage holds the second | a routine run against a stub repo, read off its log |
 
-Step 3 stands unproven: a hook that imports a module from outside its plugin at runtime. The validator refuses a static import past the plugin root, and a dynamic one stands untried. That probe comes first, because every branch below leans on its answer.
+The bridgehead carries a copy of the vehicle's hooks and lib. The client loads a hooks module from inside the plugin's folder alone, and an update refreshes the copy. For details, see [[spec/design_output/level0#a-bridgehead-imports-a-copy]].
 
 # The branches
 

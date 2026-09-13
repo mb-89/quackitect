@@ -284,6 +284,8 @@ to ask.
 
 `--became <ticket>` closes the ticket with `reason: became` and names the
 successor. The successor stands in the tree already, or the pull refuses.
+The hand-back checks the hold and the hand, and reads no field of the leaf,
+because the successor carries the work from here.
 
 # The private queue
 
@@ -316,3 +318,6 @@ first take, or the files it names. It answers one word with a reason:
 The delta reads off `git diff` from the first `hash_before` on the ticket in
 hand, or from the branch point where no hold stands. The files git has yet to
 see count too.
+
+The run names the tap reporter, because node past 23 answers a pipe with the
+spec reporter too, and the count reads the tap lines.
