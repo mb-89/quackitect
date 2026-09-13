@@ -59,7 +59,6 @@ import {
   aimOf,
   appended,
   archiveOf,
-  answersTheOwner,
   LOG_TOOL,
   logSpec,
   rowOf,
@@ -266,8 +265,7 @@ export function register(on, _options) {
 
   // [[spec/design_output/log#the-log-tool]]
   on("tool.call", { tool: `mcp__level0__${LOG_TOOL}` }, async (_$, e, _next) => {
-    // [[spec/design_output/log#an-answer-rides-the-tool]]
-    if (answersTheOwner(e)) owed = null;
+    // [[spec/design_output/log#an-answer-stands-in-chat]]
     const row = await logbook.say(
       String(e.level ?? "info"),
       String(e.kind ?? "note"),
@@ -754,10 +752,14 @@ export function register(on, _options) {
   // [[spec/design_output/level0#a-step-carries-the-answer]]
   // [[spec/design_output/level0#a-step-streams]]
   on("turn.step", async function* (_$, e, next) {
+    // [[spec/design_output/level0#a-helper-ends-no-turn]]
+    if (e.agentId) return yield* next(e);
     const said = yield* next(e);
     inFlight = 0;
-    if (!owed || (await settings.ask("answer.enabled")) === false) return said;
     const text = String(e.answer ?? "").trim();
+    // Every text the agent writes in the chat lands in the log, whole, and the agent calls nothing for it. [[spec/design_output/log#an-answer-stands-in-chat]]
+    if (text) await logbook.say("info", "answer", text, { text, ...(owed ? { detail: owed.why } : {}) });
+    if (!owed || (await settings.ask("answer.enabled")) === false) return said;
     // [[spec/design_output/level0#a-prompt-mid-turn]]
     if (owed.skips > 0 || !text) {
       await logbook.say("info", "step", `step ${e.index} carries ${text.length} character(s)`, {
@@ -768,17 +770,14 @@ export function register(on, _options) {
       owed = { ...owed, skips: owed.skips - 1 };
       return said;
     }
-    if (text) {
-      await logbook.say("info", "answer", text, { text, detail: owed.why });
-      owed = null;
-    } else {
-      owed = { ...owed, stepped: true };
-    }
+    owed = text ? null : { ...owed, stepped: true };
     return said;
   });
 
   on("turn.complete", async ($, e, next) => {
     const said = await next(e);
+    // [[spec/design_output/level0#a-helper-ends-no-turn]]
+    if (e.agentId) return said;
     owed = null;
     inFlight = 0;
     // [[spec/design_output/log#a-reply-beside-its-prompt]]

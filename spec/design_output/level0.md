@@ -67,6 +67,13 @@ the main loop leaves out.
 So the write door already holds over a helper, and the guidance is the gap.
 `agent.spawn` closes it.
 
+## A helper ends no turn
+
+- Outcome: a helper's `turn.step` and `turn.complete` reach the session's hooks, and both return at once under an `agentId`.
+- Cause: the gate reads a helper's answer at its turn end and prompts the session after a standing stop.
+- Door: a helper gets no reply line, no canary, no stop vote and no gate. So nothing from level zero prompts after a standing stop.
+- Demand: a helper's step text answers no demand of the owner's, so the session's own text has to.
+
 ## The spawn carries a rewrite
 
 Measured the same day and the same way. `agent.spawn` fires once per subagent,
@@ -140,28 +147,38 @@ root, and it names the file. So the whole of level zero stands inside one
 folder. A shape holding `lib` under `src` and the hooks module elsewhere fails
 before a session starts.
 
-## A bridgehead imports a copy
+## A stub names its vehicle
 
-A stub carries a plugin of its own, the bridgehead, and the vehicle's hooks run
-under it. Measured against client 2.1.269 with the probe under
-`test/fixtures/bridgehead`, one headless turn a shape:
+A stub runs the vehicle's level zero with no plugin folder of its own and no
+copy in the tree. The client loads the plugin from the vehicle's folder,
+because that folder is a marketplace: `.claude-plugin/marketplace.json` at the
+vehicle's root names `./.claude/skills/level0`. The stub names the marketplace
+under `extraKnownMarketplaces` with a directory source, and enables
+`level0@<brand>` under `enabledPlugins`. One `claude plugin install` at install
+time, and every session there carries the cage. Measured against client
+2.1.269 on a throwaway stub: the canary comes back, and the tools keep the
+name `level0`.
 
-| the import | `claude plugin validate` | the client at session start |
-|---|---|---|
-| a file URL outside the folder | passes | refuses: a hooks module imports its own files by relative path, and nothing else |
-| a relative path climbing past the folder | passes | refuses: outside the plugin's folder |
-| a link inside the folder pointing out | passes | refuses: no such file under the folder |
-| a relative path to a copy inside the folder | passes | loads, and the canary comes back whole |
+The client keeps a cache of the plugin folder under the user's home, one per
+version, off every tree. `claude plugin update` refreshes it. The path to the
+vehicle differs per box, so the shim writes it into `.claude/settings.local.json`,
+which git ignores.
 
-So the vehicle's `hooks` and `lib` stand as a copy inside the bridgehead's
-folder, written at attach and refreshed at an update. The bridgehead reads
-which module to import off `vehicle.json` at session start, and the import
-stays a relative path.
+Every road that runs the vehicle's code inside a plugin of the stub's own fails.
+One headless turn a road says so:
 
-Two more things the probe answers:
+| the road | what stops it |
+|---|---|
+| a dynamic import of a file URL outside the folder | the loader: a hooks module imports its own files by relative path, and nothing else |
+| a relative path climbing past the folder | the loader: outside the plugin's folder |
+| a link inside the folder pointing out | the loader: no such file under the folder |
+| the code read as text, built with `Function` | the sandbox refuses code built from a string |
+| a copy of `hooks` and `lib` inside the folder | nothing, and the owner refuses a copy in a tree |
 
-- `claude plugin validate` follows `$` into a function declared at the top of the file alone. So the bridgehead hands the vehicle a mirror of `$`, one noun a method. Each method calls `$.noun.method(...)` at its own call site.
-- a tool registers under the plugin's name. Level zero under the bridgehead answers to `mcp__bridgehead__stop`, and its guidance names `mcp__level0__stop`. So the stub's plugin folder carries the name `level0`, or level zero reads its name off the event.
+Two more things the probes answer. `claude plugin validate` follows `$` into
+a function declared at the top of the file alone, so a hook hands `$` nowhere
+else. A marketplace entry's `source` is a relative path under the marketplace
+root, so the vehicle is its own marketplace.
 
 ## The filesystem reads and writes
 

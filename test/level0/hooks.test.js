@@ -823,24 +823,64 @@ test("a session with an index standing warms it and says nothing", async () => {
   assert.equal(said.blocks.some((one) => one.name === "level0-index"), false);
 });
 
-// [[spec/design_output/log#an-answer-rides-the-tool]]
-test("an answer through the log tool clears the demand, and lands in the log", async () => {
+// [[spec/design_output/log#an-answer-stands-in-chat]]
+test("an answer through the log tool alone leaves the demand, and the chat text clears it", async () => {
   const it = await started();
   await it.raise("prompt.submit", { text: "and push it", origin: { kind: "composer" } });
   await it.raise("turn.step", { turnId: "t", index: 0, answer: "", toolUses: [], stopReason: "tool_use" });
-  await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
 
-  const answered = await it.raise(
+  const logged = await it.raise(
     "tool.call",
     { tool: "mcp__level0__log", kind: "answer", said: "You want it pushed. I push after the check." },
     "mcp__level0__log",
   );
-  assert.equal(answered.deny, undefined);
-  assert.ok(it.lines().some((one) => one.kind === "answer" && /pushed/.test(one.said)));
+  assert.equal(logged.deny, undefined);
+  await it.raise("turn.step", { turnId: "t", index: 1, answer: "", toolUses: [], stopReason: "tool_use" });
 
+  const warned = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.match(warned.context.at(-1), /Write the answer in the chat/);
+
+  await it.raise("turn.step", { turnId: "t", index: 2, answer: "You want it pushed. I push after the check.", toolUses: [], stopReason: "tool_use" });
   const after = await it.raise("tool.call", { tool: "Read", file_path: "b.md" });
   assert.equal(after.deny, undefined);
   assert.equal(after.context, undefined);
+});
+
+// [[spec/design_output/level0#a-helper-ends-no-turn]]
+test("a helper's turn end prompts nothing, logs no reply, and votes no stop", async () => {
+  const it = await startedPast();
+
+  await it.raise("turn.complete", { ...answered, agentId: "a1", answer: "Based on the docs, here is the answer." });
+
+  assert.deepEqual(it.promptsSince(), []);
+  assert.deepEqual(
+    it.since().filter((one) => ["reply", "stop", "answer", "level0"].includes(one.kind)),
+    [],
+  );
+});
+
+// [[spec/design_output/log#an-answer-stands-in-chat]]
+test("every text the agent writes mid-turn lands in the log whole, with no demand standing", async () => {
+  const it = await started();
+  const text = "Reading the door first, then the tests.\n\n- one\n- two";
+  await it.raise("turn.step", { turnId: "t", index: 0, answer: text, toolUses: [], stopReason: "tool_use" });
+  await it.raise("turn.step", { turnId: "t", index: 1, answer: "", toolUses: [], stopReason: "tool_use" });
+
+  const rows = it.lines().filter((one) => one.kind === "answer");
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].text, text);
+  assert.equal(rows[0].detail, undefined);
+});
+
+// [[spec/design_output/level0#a-helper-ends-no-turn]]
+test("a helper's step text answers no demand of the owner's", async () => {
+  const it = await started();
+  await it.raise("prompt.submit", { text: "and push it", origin: { kind: "composer" } });
+  await it.raise("turn.step", { turnId: "h", index: 0, agentId: "a1", answer: "The helper says plenty.", toolUses: [], stopReason: "end_turn" });
+  await it.raise("turn.step", { turnId: "t", index: 0, answer: "", toolUses: [], stopReason: "tool_use" });
+
+  const warned = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.match(warned.context.at(-1), /^The owner sent a prompt/);
 });
 
 // [[spec/design_output/level0#a-prompt-mid-turn]]
@@ -874,18 +914,20 @@ test("a step carrying text answers the prompt, and every call after it passes", 
 });
 
 // [[spec/design_output/log#the-answer-under-its-prompt]]
-test("the answer lands as an info line under its prompt, whole, and once", async () => {
+test("the answer lands as an info line under its prompt, whole, and the text after it too", async () => {
   const it = await started();
   await it.raise("prompt.submit", { text: "build the door", origin: { kind: "composer" } });
   await it.raise("turn.step", { turnId: "t", index: 0, answer: "You want the door. I read the brief first.", toolUses: [], stopReason: "tool_use" });
   await it.raise("turn.step", { turnId: "t", index: 1, answer: "Now the hinge.", toolUses: [], stopReason: "tool_use" });
 
   const kinds = it.lines().map((one) => one.kind);
-  assert.deepEqual(kinds.slice(1), ["prompt", "answer"]);
-  const answer = it.lines().find((one) => one.kind === "answer");
+  assert.deepEqual(kinds.slice(1), ["prompt", "answer", "answer"]);
+  const [answer, later] = it.lines().filter((one) => one.kind === "answer");
   assert.equal(answer.level, "info");
   assert.equal(answer.text, "You want the door. I read the brief first.");
   assert.equal(answer.detail, "The owner sent a prompt");
+  assert.equal(later.text, "Now the hinge.");
+  assert.equal(later.detail, undefined);
 });
 
 test("an answer the transcript holds counts too, however the transcript windows", async () => {

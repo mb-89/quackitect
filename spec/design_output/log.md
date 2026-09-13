@@ -167,12 +167,12 @@ sentence, and `text` where one sentence runs short. The hook stamps the time and
 appends the line the way it appends its own. So a status or a note the agent
 means for the owner lands where the owner reads.
 
-# An answer rides the tool
+# An answer stands in chat
 
-- Outcome: a log call of kind `answer` answers the owner's prompt, and the line lands in the log.
-- Cause: text written beside a tool call reaches the transcript as thinking, and the door reads text alone.
-- Door: the call clears the demand, so the next call passes.
-- Teacher: the warning and the refusal name the call.
+- Outcome: every text the agent writes in the chat lands in the log whole, under kind `answer`. The agent calls nothing for it.
+- Cause: an answer through the log tool alone reaches no chat, and the owner reads the chat mid-turn.
+- Door: the step carrying the text clears the demand, and a log call of kind `answer` clears nothing.
+- Teacher: the warning and the refusal ask for text in the chat, and name no call.
 
 # Nothing here deletes a log
 

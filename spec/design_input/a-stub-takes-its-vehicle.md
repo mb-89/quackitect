@@ -24,10 +24,10 @@ A stub is a bare folder plus the bridgehead. Every file in it travels with git, 
 | `project/src/` | the product, which runs with no method beside it | the project |
 | `vehicle.json` | the vehicle's identity, its brand, and its upstream repo | the stub verb, off the vehicle's register entry and its git remote |
 | `RUNME.sh` | a shim: resolves the vehicle and hands every argument to the vehicle's `RUNME.sh`, with the work root set to this folder | the stub verb, and the vehicle at an update |
-| `.claude/settings.json` | the cage's settings, the same on every box | the stub verb |
-| `.claude/skills/bridgehead/` | a plugin of its own, small, that resolves the vehicle at session start and hands every hook to it | the stub verb, and the vehicle at an update |
+| `.claude/settings.json` | the cage's settings, the same on every box, and the vehicle's plugin enabled by name | the stub verb |
+| `.claude/settings.local.json` | the vehicle's folder on this box, as the marketplace the plugin loads from, off git | the shim at install |
 
-The client adopts a plugin from the folder it opens alone, so the stub carries its own plugin folder, and that plugin is the bridgehead.
+The client loads a plugin from a folder a settings file names as a marketplace. So the stub carries no plugin folder, and the bridgehead is two settings lines and the shim. For details, see [[spec/design_output/level0#a-stub-names-its-vehicle]].
 
 # The bridgehead step by step
 
@@ -39,7 +39,7 @@ On a desk:
 |---|---|---|
 | 1 | `session.start` reads `vehicle.json` | a fixture stub with a fake register answers the vehicle's path |
 | 2 | asks the register for the vehicle's method root | the register test that stands, over a stub |
-| 3 | imports the copy of the vehicle's hooks inside its own folder | a probe session in a stub answers the canary through the bridgehead |
+| 3 | the client loads the vehicle's plugin from the vehicle's folder, and caches it under the user's home | a headless session in a stub answers the canary, and the stub holds no plugin folder |
 | 4 | every later event reaches the vehicle's hook with the work root set to the stub | the write door refuses a bad write in the stub, and the ticket verbs read the stub's tickets |
 
 On a cloud box:
@@ -49,10 +49,10 @@ On a cloud box:
 | 5 | the register holds no such vehicle | a fixture with an empty register takes this road |
 | 6 | clones the upstream repo into `~/.se/vehicles/<brand>` | a fake git records the clone with the URL from `vehicle.json` |
 | 7 | runs the vehicle's `RUNME`, which surveys the tools and builds what it needs | the install test that stands, in the clone |
-| 8 | the vehicle registers itself and attaches to the stub | `.se/project.json` in the stub names the vehicle, and step 3 follows |
+| 8 | the vehicle registers itself, attaches to the stub, and installs its plugin into the client | `.se/project.json` in the stub names the vehicle, and step 3 follows |
 | 9 | the routine's first session ends on the install, and the cage holds the second | a routine run against a stub repo, read off its log |
 
-The bridgehead carries a copy of the vehicle's hooks and lib. The client loads a hooks module from inside the plugin's folder alone, and an update refreshes the copy. For details, see [[spec/design_output/level0#a-bridgehead-imports-a-copy]].
+Step 3 stands proven on the client's own plugin config. Every road that runs the vehicle's code inside a plugin of the stub's own fails. For details, see [[spec/design_output/level0#a-stub-names-its-vehicle]].
 
 # The branches
 
@@ -60,11 +60,11 @@ One group per step that stands alone, in the order their proofs build on one ano
 
 | group | ask | waits for |
 |---|---|---|
-| `the-bridgehead-imports-its-vehicle` | the probe: a plugin that imports a hooks module from a path it reads at session start, and forwards every event | nothing |
+| `the-bridgehead-imports-its-vehicle` | the probe: how a stub runs the vehicle's hooks with no copy in it. The answer: the client's own plugin config | nothing |
 | `the-stub-takes-shape` | `./RUNME.sh stub into <folder>` writes the files above, and a contract test produces a stub and reads them back | nothing |
 | `the-shim-resolves-the-vehicle` | the stub's `RUNME.sh` finds the vehicle through the register and runs its verbs over the stub | `the-stub-takes-shape` |
 | `the-verbs-read-two-roots` | the ticket verbs, the pull and the doors read tickets and guidance off the work root, and rules off the method root | `the-shim-resolves-the-vehicle` |
-| `the-bridgehead-installs-upstream` | a cloud box clones the upstream, runs its `RUNME`, registers and attaches | `the-bridgehead-imports-its-vehicle`, `the-stub-takes-shape` |
+| `the-bridgehead-installs-upstream` | a cloud box clones the upstream, runs its `RUNME`, registers, attaches and installs the plugin | `the-bridgehead-imports-its-vehicle`, `the-stub-takes-shape` |
 | `the-sidebar-makes-both` | two buttons beside the engine marks: one makes a vehicle, one makes a stub, each asking for a folder | `the-stub-takes-shape` |
 | `the-brand-reads-the-folder` | the extension id, the view id and the icon read the folder name, so two brands stand side by side | nothing |
 
@@ -75,3 +75,4 @@ One group per step that stands alone, in the order their proofs build on one ano
 - The routine's environment: the cloud box holds no vehicle, so the routine's prompt names the stub repo and nothing else.
 - A cloud test: one routine run against a stub repo, read off its log, is the proof of step 9. Nothing on a desk stands in for it.
 - The work root in every door. Today the method root carries the rules and the work root the files. The stub is the first tree where the two differ for real.
+- The marketplace file at the vehicle's root, `.claude-plugin/marketplace.json`, which names the plugin the client installs.

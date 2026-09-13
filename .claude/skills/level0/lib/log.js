@@ -8,12 +8,8 @@ export const SESSION = `${FOLDER}/session.jsonl`;
 export const OLD = `${FOLDER}/old`;
 export const LOG_TOOL = "log";
 
-// [[spec/design_output/log#an-answer-rides-the-tool]]
+// [[spec/design_output/log#an-answer-stands-in-chat]]
 export const ANSWER_KIND = "answer";
-
-export function answersTheOwner(e) {
-  return String(e?.kind ?? "") === ANSWER_KIND && Boolean(String(e?.said ?? "").trim());
-}
 
 const LEVELS = ["info", "warn", "error"];
 const SAID = 80;
@@ -30,7 +26,7 @@ export function rowOf(at, level, kind, said, more = {}) {
     at,
     level: LEVELS.includes(level) ? level : "info",
     kind: String(kind),
-    // An answer keeps its whole text, because the owner reads it there. [[spec/design_output/log#an-answer-rides-the-tool]]
+    // An answer keeps its whole text, because the owner reads it there. [[spec/design_output/log#an-answer-stands-in-chat]]
     said:
       String(kind) === ANSWER_KIND
         ? String(said).replace(/\s+/g, " ").trim()
@@ -68,8 +64,8 @@ export function logSpec() {
       "Writes one line to this session's log, the one the owner reads in the",
       "viewer. The hook stamps the time. Name the kind, such as status or note,",
       "and say one sentence; text carries more where one sentence runs short.",
-      `Kind ${ANSWER_KIND} answers the owner's prompt: call it first after a prompt,`,
-      "with what you understood and what you do next, and the door lets the work on.",
+      "An answer to the owner's prompt stands in the chat, as text, and the hook",
+      `logs it from there under kind ${ANSWER_KIND}. This tool answers no prompt.`,
     ].join(" "),
     inputSchema: {
       type: "object",

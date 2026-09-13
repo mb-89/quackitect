@@ -20,16 +20,17 @@ const REACHES = new Set(["AskUserQuestion"]);
 
 // [[spec/design_output/level0#what-the-refusal-says]]
 export const SAYS = [
-  "The owner asked something and nothing has answered it. Call mcp__level0__log",
-  "with kind answer, saying what you understood and what you do next, then work.",
+  "The owner asked something and nothing has answered it. Write the answer in",
+  "the chat, as text: what you understood and what you do next. Then work.",
+  "The log takes the answer from the chat, so the log tool answers nothing.",
 ].join("\n");
 
 // [[spec/design_output/level0#one-warning-then-a-refusal]]
 export function warns(why) {
   return [
-    `${why}, and nothing has answered it yet. Call mcp__level0__log with kind`,
-    "answer, saying what you understood and what you do next, before the next",
-    "tool call. Level zero refuses that call until an answer stands.",
+    `${why}, and nothing has answered it yet. Write the answer in the chat, as`,
+    "text before the next tool call: what you understood and what you do next.",
+    "Level zero refuses that call until an answer stands in the chat.",
   ].join(" ");
 }
 
