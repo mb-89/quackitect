@@ -32,7 +32,8 @@ export function fieldOf(text, key) {
 
 // [[spec/design_output/work#a-group-is-a-ticket]]
 export function isGroup(text) {
-  return Boolean(text) && fieldOf(text, "process") === GROUP;
+  // The mint links the process by its path, and a hand by its name. [[spec/design_output/work#a-group-is-a-ticket]]
+  return Boolean(text) && fieldOf(text, "process").split("/").pop() === GROUP;
 }
 
 // [[spec/design_output/work#the-take-writes-the-record]]
