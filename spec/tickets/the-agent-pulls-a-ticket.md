@@ -144,7 +144,11 @@ record:
     hand: box d49afdfe301a64
     hash_before: 590d4fe90275fd98c35b914d9728eabceb137769
     hash_after: 590d4fe90275fd98c35b914d9728eabceb137769
-step: retro/cloud
+  - step: retro/cloud
+    hand: box d49afdfe301a64
+    hash_before: 0666bf721e15413180332f74c30d6f154b53c604
+    hash_after: 0666bf721e15413180332f74c30d6f154b53c604
+step: children
 ---
 
 # Ask
