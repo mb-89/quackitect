@@ -102,7 +102,11 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
-step: retro/write
+  - step: retro/write
+    hand: box b71bba5a7b0c
+    hash_before: bd762fe7dd88a63e0a36c0dda34de5c7c5d1eb7e
+    hash_after: bd762fe7dd88a63e0a36c0dda34de5c7c5d1eb7e
+step: retro/cloud
 ---
 
 # Ask
@@ -164,11 +168,21 @@ The pull learns who holds a step. The group holds one child, [[spec/tickets/step
 
 <!-- the form is list -->
 
+- the group and its child open with their asks written
+- the pull's design output takes the hand, the helper's tag, the signed commit and the escalation verb
+- the same note takes the judged fields and the five answers
+- the child passes design/draft twice, and two reviews fail it back to design/person-1
+- the group passes sync, split and retro/notes on this box
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- the work answer carries a hand through a leaf with no guess, because it names the fields and the guidance
+- a spawned hand reviews the draft alone and hands back under --as, because the engine's prompt is complete
+- the write door catches tense and shape at the write, so a slip costs one retry and no commit
 
 ### badly
 
@@ -176,17 +190,32 @@ The pull learns who holds a step. The group holds one child, [[spec/tickets/step
 
 <!-- the form is list -->
 
+- the judge refuses the approach five times and names no rule, at the refused lines over design/draft
+- the judge passes one bare link there, so the field holds one link
+- the judge refuses a one-line command under retro/notes, at the two refused lines over retro/notes
+- the wrapper judges the ticket on disk before the shell writes the fields, at the first refused line
+- the wrapper misses the spawn answer under a pass line, at the line answering work then spawn
+- the second review fails the draft on one small finding, and the fail count parks the ticket
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
 
+- the judge names the rule it reads as broken, in the wrapper's refusal line
+- the judge reads a command field and a link field as no prose, in the shell's judge material
+- the judge run takes the fields the hand-back carries, in the wrapper and the shell's judge material
+- the wrapper reads the spawn line at any row, in its spawn reader
+- a reviewer's small finding rides a pass and fails no leaf back, in the reviewing guidance
+
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
 
 <!-- the form is text -->
+
+The judge is the one door with no finding under it. A refusal that names no rule sends the hand guessing, and five guesses cost more than the door earns. The person step on a small finding reads as the cap doing its job. The box leaves the way the design says.
 
 ## cloud
 
