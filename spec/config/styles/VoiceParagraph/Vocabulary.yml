@@ -1,0 +1,317 @@
+# GENERATED. Edit the source named below, not this file. It is written again
+# every time the tree is projected, so an edit here is lost. Source:
+# spec/schemas/paragraph.schema.yaml
+extends: script
+message: "A word stands outside the words this tree writes. Write a word from spec/vocabulary/words.yml, or add it there with `from: session` and a meaning."
+link: spec/funnel/a-paragraph-has-a-schema.md
+level: error
+scope: raw
+script: |
+  text := import("text")
+
+  matches := []
+
+  blanked := func(said, pattern) {
+    found := text.re_find(pattern, said, -1)
+    if is_undefined(found) { return said }
+    parts := []
+    at := 0
+    for one in found {
+      m := one[0]
+      parts = append(parts, said[at:m.begin])
+      parts = append(parts, text.repeat(" ", m.end - m.begin))
+      at = m.end
+    }
+    parts = append(parts, said[at:])
+    return text.join(parts, "")
+  }
+
+  plain := func(said) {
+    out := said
+    out = blanked(out, `(?s)^---\n.*?\n---`)
+    out = blanked(out, "(?s)```.*?```")
+    out = blanked(out, `(?s)~~~.*?~~~`)
+    out = blanked(out, `(?s)<!--.*?-->`)
+    out = blanked(out, `(?m)^(?:\t| {4,}).*$`)
+    out = blanked(out, "(?s)`[^`]*`")
+    out = blanked(out, `https?://[^\s)]+`)
+    out = blanked(out, `\[\[[^\]]*\]\]`)
+    out = blanked(out, `\[[^\]]*\]\([^)]*\)`)
+    out = blanked(out, `[A-Za-z0-9_.-]+/[A-Za-z0-9_./-]+`)
+    return out
+  }
+
+  list := `
+  a ability about above absent absorb accept acceptance access accident
+  accidental accidentally accurate accurately across act action actionable
+  actionables activation acts actual adapt add adjust adjustable
+  adjustment after afternoon afterwards again against age agent ago agree
+  ahead aims align all allow allowed almost alone along already also
+  alternative although always ambiguous amount an analog and another
+  answer any anything anyway anywhere apart appear append applicable apply
+  appreciate approval approved approximate approximately are area argument
+  arguments arm around array arrive arrives arrow artwork as ask asked
+  asking asks assemble assembly assert asserting asserts asset assigned
+  assignment at attach attempt attention attribute audience authority auto
+  automatic automatically auxiliary available away back backup backward
+  bad balance bare based bash basic batch be beats because become before
+  behaves behavior behind belief belongs below bend beneath beside best
+  better between beyond binary binds biome bites bleed block blockage
+  blocked blocks blow blunt body bond boring both bottom bound boundary
+  box boy braille branch breach break breathe brew brief briefly briefs
+  bright brightly broken brother browser bubble buffer bug build builds
+  built burn burst but button buttons buys by bypass cache caches cage
+  calculate calibrate calibration call caller callers calling calls calm
+  came camel can canary cancel candidate cannot cap capacity careful
+  carefully carries carrot carry carrying case cases catch category cause
+  cell chain change chapter characters charge chat check checkout
+  checkpoint child choice choose circular citation cite claim claimed
+  claims class claude clean clear clearance clearly click clicks client
+  climbs clock clockwise clogged clone clones close closes cloud code coil
+  cold collapsed collect colon color colour column come comfortable
+  command commands comment comments commit commits communicate compaction
+  compare compatible compiler compiles complete completed completion
+  complex component compress concentration concept condition confidential
+  config confirm conflict confuse connect connection connotation constant
+  constantly consumes contain container contamination content contents
+  context continue continuous continuously contour contract contrast
+  control conversation cool coordinates copy corner correct correction
+  correctly cost costs count counterclockwise cover covers create
+  credentials current curve cut cycle damage damaged dangerous dark dash
+  data database date day dead deaf debug decided decides deciding decision
+  declaration decrease dedicated deeper def default defect defective
+  definition delete deletes deleting dependency depends depth describes
+  description design desk detail details deterioration device diagonally
+  diagram dies diff difference different differently differs difficult
+  digital digitally dimension dimly direction directly directory dirty
+  disagree disagrees disappear disassemble discard disconnect discovery
+  discussion disengage disk dispatch display distance distract divide do
+  doc does done door doors dot dots down download downstream draft drain
+  dramatic draw drawing draws drift drifts drink drive drives driving drop
+  dry during each earlier early earns easily easy edge edit edition editor
+  education effect effective effort either electric electrical
+  electrically electronic electronically element else elsewhere email
+  emergency emphasis empty end endings enforced engage engine enough enter
+  entrance entry env envelopes environment equal equally equipment
+  equivalent erase error estimate event every everybody everything
+  everywhere exactly examine example except exciting executable exhaust
+  exist existing exists exit expand expects experience expired explain
+  explicit explosion explosive expression extend extension external
+  externally extinguish eyes facial facility fact fail failing fails
+  failure fake fakes fall false far fast fault faults feature fed feedback
+  feeds feel feeling female fetch fetches few field fields fifteen fifth
+  file files filesystem fill filter filtered find findings finish finished
+  finishes finishing fires firing first fits five fix fixes flag flame
+  flammable flange flash flat flexible floor flow fluent fluid flush fold
+  folder follow for forget form format formatter forward four free freely
+  freeze frequent frequently fresh from front frontmatter full fully
+  function funny future gains gap gas gate gathering gear general
+  generated gesture get git give glossy go god goes going good gradually
+  granted grants green grep grid groove ground group grows guard guards
+  guess guessing guidance half halves hand handback handed handing
+  handover handovers hands hang happen happy hard harmony harness has hash
+  hastrustdialogaccepted have he head hear hearing heat heavy height held
+  help her here heredoc hers herself hides high highlight him himself his
+  history hit hold holding holds hole home honest hook hooks hope
+  horizontal horizontally host hot hour hover how however hydraulic
+  hydraulically i id identification identify identity idle ids if ignore
+  illuminate imagine immediately implementation import important imports
+  in inarow incident include incorrect incorrectly increase increment
+  independently index indication indicator information initial initially
+  injury inline inner input inside inspect inspection install installation
+  instead instruction instrument insulation intelligent intensity interact
+  interchange interchangeable interesting interface intermittent
+  intermittently internal internally interpret interpreter interval into
+  investigation irregular irregularly is isolate it item its itself
+  javascript job joins joint judge judged judgement keep key keyed keys
+  keyword kill kind kinds know lacks laminated lamination land landing
+  lands language large last late later lateral laterally layer leaf leak
+  leakage learn leave leaves left length less let level life lift light
+  lighting lightly like limit line linear lines link lint linter linting
+  lints linux liquid list listen listing lists live lives lnav load loads
+  local location lock log long longitudinal longitudinally look loop loose
+  loosely loosen loses lost loud low lower lowercase ls lubricate machine
+  macos made magic magnetic magnetically main maintenance make male
+  malfunction man mandatory manual manually many map maps mark markdown
+  marketplace mass match matcher matches matching material matrix matte
+  matters maximum may me mean meaning measure mechanical mechanically
+  mechanism median medical meeting meets member memory mend mends merge
+  merged merges merging message met method mid middle milliseconds mine
+  minimum minus minute misses missing mixture mobile mock mode model
+  moderate moderately module modules moist moment momentarily monitor
+  month more most movable move movement ms much multiply must my myself
+  name natural near necessary need needing needs neither nested neutral
+  new next no nobody node noise nonce none normal nose not notch note
+  nothing now nowhere null number obey object of off offers often ok old
+  omit on once one only onto open opening operate operation operator
+  opposite option optional or order ordinary organize origin original
+  other otherwise our ours ourselves out outdoors outer outlives output
+  outside over overlap override owes own owner owns page paint pair panel
+  paragraph parallel parse part particle pass passed passes passing past
+  paste patch path paths pattern pays people per performance period
+  permanent permanently permission permitted perpendicular person
+  personnel phrase picks piece pinned pipe place placement places plain
+  platform play please plugin plugins plus pneumatic pneumatically point
+  poisonous policy polish port position possible possibly posts precaution
+  precision prepare present press presses pressurization pressurize
+  prevent price primary principle print prints priority probable probably
+  probe problem procedure process produce production program project
+  projected projecting projection projector projects prompt proof property
+  proportion proposal proposed prose protection protective proves
+  publication pull pulse purpose push put quality query question queue
+  quickly quiet quote race radial radially radioactive random randomly
+  range rate rationale re reach reaches reaching read readback reader
+  readings real rear reason reasonable receipt receive recommend record
+  recover recovery recycle red redraw refer reference reflection refuel
+  refusal refuse refused refuses refusing registers registrations regular
+  regularly reject related relation relative release reload remain
+  remaining remember remote removal remove rename rendered renderer repair
+  repeats replace replacement replays repo report repository request
+  required requirement resets resistant resolver resolves response
+  responsibility rest result retract retraction retries retro retry return
+  returns review reviewer revisit rewrite rewrites rides right rigid risk
+  road roads root rough round rounded rounds routine routing row rule
+  rules ruling run rung runner running runtime s sad safe safely safety
+  said same sandbox satisfactorily satisfactory save say scan schedule
+  schema scope scopes screen screenshot script scripture se search second
+  secondary seconds section sections see segment select semicolon send
+  sense sensitive sentence separation serious server serves serviceable
+  servicing session sessions set setting settled setup shadow shake shape
+  share sharp she sheet shell shiny ships shock short should shout show
+  side sidebar sign signer silent silently simple simulate since sister
+  sit sits situation six size skips slash slot slow slowly small smoke
+  smooth smoothly so soft solid solution some somebody something sometimes
+  somewhere sorts sound source span spawn speak special specially specific
+  specified speed spelling spends spill split splits spray stable stake
+  stale stamp stamps stand standard standing stands start startup state
+  states status stay stdin step still stood stop stores story straight
+  stress string strip stripe strong structural structurally structure
+  style subagent subassembly submits subsequent subsequently subtract
+  successful such sudden suddenly suggest suite suites sum supply sure
+  surface survey surveyed survives swap sweep switch switches symbol
+  symmetrical symmetrically symptom synchronized system table tag take
+  takes taking tap target task teaches team tell temp temporarily
+  temporary ten tense terminal tertiary test text than thanks that the
+  their theirs them theme themselves then there therefore these they thick
+  thickness thing things think third this those three through throw throws
+  thus ticks tight tighten tightly tilt time timeout tip tmp to today todo
+  together toggle token tokens tolerance tone too took tool tooth top
+  total touch tracked tracks train training transcript translate
+  translation translator transmit transparent travel tree trigger trip
+  trivial true trunk trust trusted trusts truth try tune turn twice two
+  type typical unbound unchanged unclaimed uncommitted under understand
+  understood unfinished unfold uninstall unit universal unknown unless
+  unlock unproven unread unsatisfactorily unsatisfactory unserviceable
+  until unusual unusually unwanted unwind up update upgrade upload
+  uppercase urgency url us use user usual usually v vale validate
+  validation value variable variables verb verbs verdict verify vernacular
+  version vertical vertically very video view visual visually voice volume
+  vote vs wait walk want warm warning was watch way we weak wear weather
+  web webview week weigh weight well went were wet what whatever when
+  where wherever whether which whichever while who whoever whole whom
+  whose why wide widget widgets width will wind window windows winget wins
+  with without woman word words work workday worker workflow working works
+  workspace worktree worry worse worst worth would wrapper wraps write
+  writer writers written wrong wrongly wrote x year yes yet you young your
+  yours yourself yourselves zero zip
+  `
+
+  inside := {}
+  for w in text.re_split(`\s+`, list, -1) {
+    if len(w) > 0 { inside[w] = 1 }
+  }
+
+  roads := `
+  acceptable=permitted alternate=alternative avoid=prevent fit=install
+  further=more insert=put perform=do portion=part repeat=do rotate=turn
+  secure=attach shall=must using=use utilise=use utilize=use
+  `
+
+  swaps := {}
+  for one in text.re_split(`\s+`, roads, -1) {
+    pair := text.split(one, "=")
+    if len(pair) == 2 { swaps[pair[0]] = pair[1] }
+  }
+
+  known := func(w) {
+    if inside[w] != undefined { return true }
+    n := len(w)
+    if n > 3 && text.has_suffix(w, "ies") {
+      if inside[w[:n-3] + "y"] != undefined { return true }
+    }
+    if n > 2 && text.has_suffix(w, "es") {
+      if inside[w[:n-2]] != undefined { return true }
+      if inside[w[:n-1]] != undefined { return true }
+    }
+    if n > 1 && text.has_suffix(w, "s") {
+      if inside[w[:n-1]] != undefined { return true }
+    }
+    if n > 3 && text.has_suffix(w, "ied") {
+      if inside[w[:n-3] + "y"] != undefined { return true }
+    }
+    if n > 2 && text.has_suffix(w, "ed") {
+      if inside[w[:n-2]] != undefined { return true }
+      if inside[w[:n-1]] != undefined { return true }
+      if inside[w[:n-3]] != undefined { return true }
+    }
+    if n > 3 && text.has_suffix(w, "ing") {
+      if inside[w[:n-3]] != undefined { return true }
+      if inside[w[:n-3] + "e"] != undefined { return true }
+      if inside[w[:n-4]] != undefined { return true }
+    }
+    return false
+  }
+
+  said := plain(scope)
+  said = blanked(said, `(?m)^#{1,6} +`)
+  said = blanked(said, `(?m)^[ \t]*(?:[-*+]|[0-9]+[.)]) +`)
+  said = blanked(said, `(?m)^[ \t]*> ?`)
+  said = blanked(said, `\|`)
+  said = blanked(said, `[*_]`)
+
+  opens := func(at) {
+    i := at - 1
+    for i >= 0 {
+      c := said[i:i+1]
+      if c == " " || c == "\t" || c == "\n" { i-- ; continue }
+      if c == "." || c == "!" || c == "?" || c == ":" || c == ";" { return true }
+      return false
+    }
+    return true
+  }
+
+  found := text.re_find(`[A-Za-z][A-Za-z0-9'’-]*`, said, -1)
+  if is_undefined(found) { found = [] }
+
+  for one in found {
+    m := one[0]
+    w := m.text
+    if text.re_match(`[0-9_]`, w) { continue }
+    head := w[0:1]
+    if head != text.to_lower(head) && !opens(m.begin) { continue }
+
+    low := text.to_lower(w)
+    low = text.trim_suffix(low, "'s")
+    low = text.trim_suffix(low, "’s")
+    if text.contains(low, "'") || text.contains(low, "’") { continue }
+
+    bad := ""
+    for part in text.split(low, "-") {
+      p := text.trim_space(part)
+      if len(p) == 0 { continue }
+      if known(p) { continue }
+      bad = p
+      break
+    }
+    if bad == "" { continue }
+
+    road := swaps[bad]
+    say := bad + " stands outside the words this tree writes. "
+    if road != undefined {
+      say += "Write " + road + " instead."
+    } else {
+      say += "Write a word from spec/vocabulary/words.yml, or add " + bad +
+        " to it with `from: session` and a meaning."
+    }
+    matches = append(matches, {begin: m.begin, end: m.end, message: say})
+  }

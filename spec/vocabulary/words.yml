@@ -1537,7 +1537,7 @@ words:
   - {word: urgency, from: tree}
   - {word: url, from: tree}
   - {word: us, pos: PRON, from: pronoun}
-  - {word: use, pos: VERB, from: openste, insteadOf: [using]}
+  - {word: use, pos: VERB, from: openste, insteadOf: [using, utilize, utilise]}
   - {word: user, pos: NOUN, from: openste}
   - {word: usual, pos: ADJ, from: openste}
   - {word: usually, pos: ADV, from: openste}

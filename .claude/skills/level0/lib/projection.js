@@ -6,6 +6,7 @@
 import { flatten, keysOf, LOCAL, TRACKED } from "./config.js";
 import { faultsOf, PARAGRAPH, rulesFrom, RULES } from "./paragraph.js";
 import { readYaml } from "./schema.js";
+import { pathOf } from "./vocabulary.js";
 
 export const PROJECTIONS = "spec/config/projections.json";
 
@@ -46,6 +47,15 @@ export function readsOf(entry) {
   return [entry?.from, entry?.schema].filter(Boolean);
 }
 
+// The schema names the word list, so the reader takes a second pass over the disk. [[spec/funnel/a-paragraph-has-a-schema]]
+export function alsoReads(entry, texts) {
+  if (entry?.shape !== PARAGRAPH) return [];
+  const source = texts?.get(entry.from);
+  if (source === undefined) return [];
+  const path = pathOf(readYaml(source));
+  return path && !texts.has(path) ? [path] : [];
+}
+
 // [[spec/design_output/projection#projecting-in-memory]]
 export function writesOf(entry, texts) {
   const out = new Map();
@@ -83,7 +93,10 @@ function paragraphsOf(entry, texts) {
   if (source === undefined) return out;
 
   const target = folderOf(entry.target);
-  for (const [name, text] of rulesFrom(readYaml(source), saysGenerated(entry.from))) {
+  const said = readYaml(source);
+  // [[spec/funnel/a-paragraph-has-a-schema]]
+  const list = readYaml(texts.get(pathOf(said)) ?? "");
+  for (const [name, text] of rulesFrom(said, saysGenerated(entry.from), list)) {
     out.set(`${target}/${name}`, text);
   }
   return out;
@@ -200,6 +213,10 @@ export function readAll(entries, disk, at = (path) => path) {
   for (const entry of entries) {
     const texts = new Map();
     for (const path of readsOf(entry)) {
+      if (disk.exists(at(path))) texts.set(path, disk.read(at(path)));
+    }
+    // [[spec/funnel/a-paragraph-has-a-schema]]
+    for (const path of alsoReads(entry, texts)) {
       if (disk.exists(at(path))) texts.set(path, disk.read(at(path)));
     }
     for (const [path, text] of writesOf(entry, texts)) wanted.set(path, text);

@@ -1,0 +1,77 @@
+extends: script
+message: "A word list entry carries word and from, and a meaning where from reads session."
+link: spec/funnel/a-paragraph-has-a-schema.md
+level: error
+scope: raw
+script: |
+  text := import("text")
+
+  lines := text.split(scope, "\n")
+  matches := []
+
+  offset := 0
+
+  for i := 0; i < len(lines); i++ {
+    line := lines[i]
+    at := offset
+    offset += len(line) + 1
+    trimmed := text.trim_space(line)
+
+    if !text.has_prefix(trimmed, "- {") { continue }
+    if !text.has_suffix(trimmed, "}") {
+      matches = append(matches, {
+        begin: at,
+        end: at + len(line),
+        message: "An entry stands on one line, and this one leaves its brace open."
+      })
+      continue
+    }
+
+    body := trimmed[3:len(trimmed)-1]
+    held := {}
+    for part in text.split(body, ",") {
+      pair := text.split(part, ":")
+      if len(pair) < 2 { continue }
+      held[text.trim_space(pair[0])] = text.trim_space(pair[1])
+    }
+
+    if held.word == undefined || held.word == "" {
+      matches = append(matches, {
+        begin: at,
+        end: at + len(line),
+        message: "An entry names its word. Write word: <the word> first."
+      })
+      continue
+    }
+    if held.from == undefined || held.from == "" {
+      matches = append(matches, {
+        begin: at,
+        end: at + len(line),
+        message: "An entry says where it comes from. Write from: openste, tree, pronoun, session or owner."
+      })
+      continue
+    }
+    if !text.re_match(`^(openste|tree|pronoun|session|owner)$`, held.from) {
+      matches = append(matches, {
+        begin: at,
+        end: at + len(line),
+        message: "from reads " + held.from + ". Write openste, tree, pronoun, session or owner."
+      })
+      continue
+    }
+    if held.from == "session" && (held.meaning == undefined || held.meaning == "") {
+      matches = append(matches, {
+        begin: at,
+        end: at + len(line),
+        message: "A word the session adds carries a meaning of one short phrase, so the retro can keep it or cut it."
+      })
+      continue
+    }
+    if !text.re_match(`^[a-z][a-z-]*$`, held.word) {
+      matches = append(matches, {
+        begin: at,
+        end: at + len(line),
+        message: held.word + " stands outside the shape of a word: lower case letters and a hyphen."
+      })
+    }
+  }
