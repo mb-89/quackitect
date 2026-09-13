@@ -10,6 +10,8 @@ import {
   checkSpec,
   gateOf,
   lastSaid,
+  lengthFaults,
+  needsFaults,
   opensATurn,
   questionsIn,
   reachesTheOwner,
@@ -621,9 +623,15 @@ export function register(on, _options) {
     if (!ran.ran) return { result: `Vale read nothing: ${ran.why}` };
 
     // [[spec/design_output/level0#the-table-answers-every-question]]
-    const found = [...tableFaults(text, asks), ...ran.found];
+    // [[spec/design_output/level0#the-owner-answers-by-number]]
+    const found = [
+      ...tableFaults(text, asks),
+      ...needsFaults(text, stopLineIn(String(e.text ?? ""))),
+      ...lengthFaults(text, await settings.ask("answer.words")),
+      ...ran.found,
+    ];
     const score = scoreOf(text, found);
-    const band = found.length ? bandOf(score, await bands(settings)) : "clean";
+    const band = found.length ? bandOf(score, await bands(settings), found) : "clean";
     await logbook.say("info", "answer", `a draft reads ${band}`, {
       detail: `score=${score} findings=${found.length}`,
     });
@@ -744,7 +752,13 @@ export function register(on, _options) {
     if (!ran.ran) return said;
 
     // [[spec/design_output/level0#the-table-answers-every-question]]
-    const found = [...tableFaults(spoken, asks), ...ran.found];
+    // [[spec/design_output/level0#the-owner-answers-by-number]]
+    const found = [
+      ...tableFaults(spoken, asks),
+      ...needsFaults(spoken, stopLineIn(e.answer)),
+      ...lengthFaults(spoken, await settings.ask("answer.words")),
+      ...ran.found,
+    ];
 
     // [[spec/design_output/level0#the-three-bands]]
     const read = gate.atTurnEnd({

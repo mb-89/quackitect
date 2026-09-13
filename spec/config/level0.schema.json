@@ -38,6 +38,11 @@
           "type": "number",
           "unit": "findings a thousand words",
           "help": "The score where the gate asks for one rewrite."
+        },
+        "words": {
+          "type": "number",
+          "unit": "words",
+          "help": "The words an answer holds outside its code and tables."
         }
       }
     },

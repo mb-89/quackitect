@@ -222,9 +222,18 @@ const answered = { reason: "answer", answer: "", durationMs: 1, aborted: false }
 // [[spec/design_output/stop#the-line-ends-a-turn]]
 const STOPS = "Stop requested. Reason [the-work-stands-complete]. Nothing waits.";
 
+// [[spec/design_output/level0#the-needs-table]]
+const NEEDS = [
+  "## What the agent needs",
+  "",
+  "| No. | Question | Proposed answer |",
+  "|---|---|---|",
+  "| 1 | Anything? | Nothing waits on you. |",
+].join("\n");
+
 // [[spec/design_output/stop#the-challenge-spends-one-allowance]]
 async function endsATurn(it, answer = "done") {
-  const text = `${answer}\n\n${STOPS}`;
+  const text = `${answer}\n\n${NEEDS}\n\n${STOPS}`;
   await it.raise("turn.complete", { ...answered, answer: text });
   await it.raise("turn.complete", { ...answered, answer: text });
 }
@@ -1273,7 +1282,7 @@ test("the draft tool reads the prose, and the stop line scores nothing", async (
   const line = "Stop requested. Reason [the-work-stands-complete]. Nothing waits.";
   const said = await it.raise(
     "tool.call",
-    { tool: DRAFT, text: `${"word ".repeat(40).trim()}\n\n${line}` },
+    { tool: DRAFT, text: `${"word ".repeat(40).trim()}\n\n${NEEDS}\n\n${line}` },
     DRAFT,
   );
 
@@ -1799,6 +1808,32 @@ test("a prompt from a machine leaves the count standing", async () => {
   await it.raise("turn.complete", { ...answered, answer: OVER });
 
   assert.match(it.prompts[0].text, /asks 2 questions/);
+});
+
+// [[spec/design_output/level0#the-owner-answers-by-number]]
+test("a stop line with no needs table meets a rewrite, whatever the score", async () => {
+  const it = await started(BANDED, valeOnAnswer([]));
+  await it.raise("turn.complete", { ...answered, answer: `${CLEAN}\n\n${STOPS}` });
+
+  assert.equal(it.prompts.length, 1);
+  assert.match(it.prompts[0].text, /Write it again/);
+  assert.match(it.prompts[0].text, /NeedsTable/);
+});
+
+// [[spec/design_output/level0#the-cap-counts-the-prose]]
+test("the draft tool refuses a draft over the word cap", async () => {
+  const capped = { "spec/config/level0.json": JSON.stringify({
+    ...JSON.parse(BANDED["spec/config/level0.json"]),
+    answer: { warnAt: 5, ceiling: 15, words: 150 },
+  }) };
+  const it = await started(capped, valeOnAnswer([]));
+
+  const over = await it.raise("tool.call", { tool: DRAFT, text: CLEAN }, DRAFT);
+  assert.match(over.result, /AnswerLength/);
+  assert.match(over.result, /Write it again/);
+
+  const under = await it.raise("tool.call", { tool: DRAFT, text: OVER }, DRAFT);
+  assert.match(under.result, /meets the gate clean/);
 });
 
 // [[spec/design_output/level0#the-door-counts-the-questions]]

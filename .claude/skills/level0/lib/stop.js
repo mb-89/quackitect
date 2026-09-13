@@ -102,11 +102,20 @@ export function reprompt(decision) {
     "",
     "  Stop requested. Reason [<id>]. <what the owner does next>",
     "",
+    NEEDS_LINE,
+    "",
     ...decision.unclaimed.map((one) => `  - ${one.id}: ${one.asks}`),
   ]
     .join("\n")
     .trimStart();
 }
+
+// [[spec/design_output/level0#the-needs-table]]
+export const NEEDS_LINE = [
+  "Above the stop line, write the heading What the agent needs and a table",
+  "headed No., question and proposed answer, one numbered row a need. The",
+  "owner answers by number.",
+].join("\n");
 
 // [[spec/design_output/stop#the-line-ends-a-turn]]
 export const LINE = /^Stop requested\. Reason \[([a-z0-9-]+)\]\.\s*(.*)$/;
@@ -152,6 +161,8 @@ export function challenge(rules, reason) {
     "",
     "Where the stop stands, end your next answer with the same line and this",
     "turn ends. Where it falls, carry on and say nothing of it.",
+    "",
+    NEEDS_LINE,
     ...(others.length ? ["", "The other reasons this tree holds:"] : []),
     ...others.map((one) => `  - ${one.id}: ${one.says ?? one.asks}`),
   ].join("\n");
@@ -169,6 +180,8 @@ export function askForLine(rules, said) {
     "one line, last, and exactly this shape:",
     "",
     "  Stop requested. Reason [<id>]. <what the owner does next>",
+    "",
+    NEEDS_LINE,
     "",
     "The ids:",
     ...stopReasons(rules).map((one) => `  - ${one.id}: ${one.says ?? one.asks}`),

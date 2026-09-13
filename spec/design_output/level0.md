@@ -807,6 +807,37 @@ A count of zero demands no table. A question the session cannot answer still
 takes its row, and the answer cell says what blocks it. The finding reads
 `QuestionTable`, and it joins the findings of Vale, so one score weighs both.
 
+# The owner answers by number
+
+- Outcome: the owner answers a stop with numbers alone.
+- Holder: three shape checks in `lib/answer.js`, read by the gate and `check_answer`.
+
+## The needs table
+
+- Outcome: a numbered needs table closes every answer ending on a stop line.
+- Finding: `NeedsTable`.
+- Teacher: the stop texts in `lib/stop.js`.
+
+| the check reads | what it demands |
+|---|---|
+| the heading | `What the agent needs`, at any level |
+| the columns | `No.`, `question` and `proposed answer`, in order |
+| the first cell of a row | 1, 2, 3 in order |
+| every other cell | no code, and 12 words at most |
+| the body | one row at least, and one saying nothing waits where nothing does |
+
+## The cap counts the prose
+
+- Outcome: an answer past `answer.words` meets a rewrite.
+- Count: every word outside a fence and outside a table row.
+- Finding: `AnswerLength`. A missing value leaves the cap off.
+
+## A shape finding rewrites
+
+- Outcome: a shape finding asks for a rewrite, whatever the score.
+- Shape findings: `QuestionTable`, `NeedsTable`, `AnswerLength`.
+- Cause: a rate lets one finding in a long answer pass.
+
 # The rules past one buffer
 
 Vale hands a rule one buffer, so a rule weighing two files stands outside it.
