@@ -7,7 +7,7 @@ about: "the vehicle system: one button in the sidebar makes an independent copy 
 
 The owner wants one button in the sidebar. A press makes a vehicle: an independent copy of this tree, in a folder the owner names. The vehicle works on itself and on a project of its own. The vehicle is the point. The brand it carries is a detail under it.
 
-This note collects what the owner asks, what stands in the tree, and what stands open, so a design input can follow.
+This note collects what the owner asks, what stands in the tree, and what stands open, so a design input can follow. The drawings of the method and project split stand beside it in `a-button-makes-a-vehicle.html`.
 
 # Why a vehicle
 
