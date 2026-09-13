@@ -6,6 +6,12 @@
 import { overLong } from "../../.claude/skills/level0/lib/names.js";
 import { saysGreen, STAMP, stampOf } from "../../.claude/skills/level0/lib/runs.js";
 import {
+  isTagged,
+  reaches,
+  TODO as PARKED,
+} from "../../.claude/skills/level0/lib/todo.js";
+import { COPY } from "../../.claude/skills/level0/lib/vehicle.js";
+import {
   aged,
   askOf,
   CLOSED,
@@ -270,12 +276,40 @@ function briefOf(it, branch) {
   return said.ok ? said.out : "";
 }
 
+// [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
 function dirty(it) {
-  const said = it.git.run(["status", "--porcelain"], true).out;
-  if (!said) return false;
+  const left = standingIn(it).filter((one) => !one.parked);
+  if (!left.length) return false;
   console.error("This tree carries uncommitted changes, so no branch may move.");
   console.error("Commit them, or stash them, and run this again.");
   return true;
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+function standingIn(it) {
+  const said = it.git.run(["status", "--porcelain"], true).out;
+  return said
+    .split("\n")
+    .filter(Boolean)
+    .map((row) => {
+      const name = changedIn(row);
+      return { name, parked: parkedHere(it, name) };
+    });
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+export function changedIn(row) {
+  const found = /^\s*\S{1,2}\s+(.*)$/.exec(String(row));
+  const said = (found ? found[1] : String(row)).trim();
+  const moved = said.split(" -> ");
+  return (moved.at(-1) ?? said).replace(/^"|"$/g, "");
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+function parkedHere(it, name) {
+  if (!reaches(name)) return false;
+  const at = it.join(it.root, ...name.split("/"));
+  return it.disk.exists(at) && isTagged(it.disk.read(at));
 }
 
 function push(it, branch, was, why) {
@@ -425,12 +459,30 @@ function take(it) {
   return one.brief ? claimBrief(it, one.branch) : claimGroup(it, one);
 }
 
+// [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
 function onBranch(it, branch) {
+  const parked = parkedFiles(it);
+  for (const one of parked) it.git.run(["checkout", "--", one.name], true);
+
   if (!it.git.run(["switch", branch], true).ok) {
     if (!it.git.run(["switch", "-c", branch, `origin/${branch}`]).ok) return false;
   }
   it.git.run(["reset", "--hard", `origin/${branch}`], true);
+
+  for (const one of parked) {
+    it.disk.write(it.join(it.root, ...one.name.split("/")), one.text);
+  }
   return true;
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+function parkedFiles(it) {
+  return standingIn(it)
+    .filter((one) => one.parked)
+    .map((one) => ({
+      name: one.name,
+      text: it.disk.read(it.join(it.root, ...one.name.split("/"))),
+    }));
 }
 
 function claimBrief(it, branch) {
@@ -582,7 +634,10 @@ function leaves(it, branch, at, path, says) {
   }
 
   let now = withHashAfter(it.disk.read(path), after);
-  if (!open.length) now = withField(withField(now, "state", CLOSED), "reason", DONE);
+  // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]] takes the tag off.
+  if (!open.length) {
+    now = withoutField(withField(withField(now, "state", CLOSED), "reason", DONE), PARKED);
+  }
   it.disk.write(path, now);
   it.git.run(["add", at], true);
   it.git.run(["commit", "-m", `${branch}: the box leaves`], true);

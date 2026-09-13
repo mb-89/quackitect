@@ -22,7 +22,7 @@
     "wanted": "quiet"
   },
   "answer": {
-    "comment": "The door holding the owner's prompt first, and the gate reading the answer at the turn's end. The door refuses a tool call in a turn a person opens where nothing has answered them yet, and enabled false takes it out. warnAt and ceiling cut the gate's score, the findings a thousand words, into three bands: under warnAt nothing happens, from warnAt to the ceiling the gate writes a warn line to the log, and at the ceiling the gate asks for one rewrite. words caps an answer outside its code and tables, and a shape finding asks for the rewrite whatever the score.",
+    "comment": "The door holding the owner's prompt first, and the gate reading the answer at the turn's end. The door refuses a tool call in a turn a person opens where nothing has answered them yet, and enabled false takes it out. warnAt and ceiling cut the gate's score, the findings a thousand words, into bands: under warnAt nothing happens, and from warnAt up the gate writes a warn line to the log and hands the findings to the session's next tool call, once. The ceiling names the band rewrite in that line. words caps an answer outside its code and tables, and a shape finding asks for the rewrite whatever the score.",
     "enabled": true,
     "warnAt": 5,
     "ceiling": 15,

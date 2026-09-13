@@ -105,7 +105,8 @@ function grouped(rules) {
 }
 
 export function spansIn(text) {
-  const lines = String(text ?? "").split(/\r?\n/);
+  // The frontmatter stands outside every cut. [[spec/design_output/level0#a-judged-rule-cuts]]
+  const lines = bodyOf(text);
   const out = [];
   let held = [];
   let at = 0;

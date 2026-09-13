@@ -721,36 +721,19 @@ edges, and the score falls in one of three bands:
 | the score | what happens |
 |---|---|
 | under `warnAt` | nothing |
-| from `warnAt` to the ceiling | the `answer` line at `warn`, and nothing reaches the prompt |
-| at the ceiling or over it | one re-prompt saying rewrite, once per turn |
+| from `warnAt` up | the `answer` line at `warn`, and the findings ride the next tool call |
 
 An answer carrying no finding reads clean, whatever its length. Every band
-writes one `answer` line naming the score, the findings and the count.
+writes one `answer` line naming the score and the findings. The ceiling names
+the band `rewrite` in that line, and nothing more hangs on it.
 
-## The re-prompt over the ceiling
+## The findings ride the call
 
-A re-prompt is a `$.prompt.submit` from the hook, the way the tooth does it.
-Three things hold the count at one:
-
-- A lock per turn. A second turn end inside one turn submits nothing, and the
-  findings wait instead.
-- `stop.mostInARow`, which caps the re-prompts the way it caps the tooth. The
-  next prompt from a person drops the count.
-- The tooth itself. One prompt goes out per turn end, and where the tooth holds
-  the turn open that prompt belongs to it. The findings wait for the next one.
-
-The prompt carries the findings in the wording `refusal` in `lib/refuse.js`
-already uses, because a refusal quoting the rule teaches it better than a
-refusal naming it. The door holding the owner's prompt first reads
-`e.origin.kind`, and a plugin prompt is a machine, so that door owes this one no
-readback.
-
-## The gate holds its state
-
-`gateOf` in `lib/answer.js` holds the lock, the count and the findings waiting,
-and the hook hands it one reading per turn end. It mirrors the tooth. A prompt
-from a person drops the count, and a prompt of the hook's own leaves it standing.
-The turn's end answers what comes next.
+- Outcome: the gate submits no prompt, so no answer prints twice.
+- Cause: an answer in the chat is out the moment the session sends it.
+- Holder: `gateOf` in `lib/answer.js` keeps the findings of the last answer.
+- Ride: the session's next tool call carries them as context, once, in the wording `gateNote` writes.
+- Lint: `check_answer` reads a draft before it goes out, and the guidance sends every long draft there.
 
 ## What the gate says
 

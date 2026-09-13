@@ -241,6 +241,17 @@ async function endsATurn(it, answer = "done") {
   await it.raise("turn.complete", { ...answered, answer: `${answer}\n\n${NEEDS}` });
 }
 
+// The first turn ends on the canary, so a test of the call starts past it. [[spec/design_output/stop#the-canary-ends-turn-one]]
+async function startedPast(seed, taught) {
+  const it = await started(seed, taught);
+  await it.raise("turn.complete", { ...answered, answer: canary({ rules: 2, notes: 1, stop: true }) });
+  const mark = it.lines().length;
+  const prompts = it.prompts.length;
+  it.since = () => it.lines().slice(mark);
+  it.promptsSince = () => it.prompts.slice(prompts);
+  return it;
+}
+
 test("a session start writes one line, and registers every tool", async () => {
   const it = await started();
 
@@ -316,20 +327,20 @@ test("a turn ending with no answer writes no reply", async () => {
 
 // [[spec/design_output/stop#every-decision-writes-a-line]]
 test("a turn end writes one stop line", async () => {
-  const it = await started();
+  const it = await startedPast();
   await endsATurn(it);
 
-  const said = it.lines().filter((one) => one.kind === "stop");
+  const said = it.since().filter((one) => one.kind === "stop");
   assert.equal(said.length, 2, "the call writes one, and the vote the other");
   assert.equal(said[0].said, "the stop stands");
   assert.equal(said[1].said, "the turn ends");
-  assert.match(said[1].detail, /^stop=the-session-is-new@95 continue=none@0 inARow=0$/);
+  assert.match(said[1].detail, /^stop=the-work-stands-complete@45 continue=none@0 inARow=0$/);
   assert.equal(it.prompts.length, 0, "nothing reaches the agent");
 });
 
 // [[spec/design_output/stop#holding-a-turn-open]]
 test("a held branch carries the turn once the session stops being new", async () => {
-  const it = await started({
+  const it = await startedPast({
     "HANDOVER.md": "---\nstatus: held\n---\n\n# The brief\n",
   });
   for (let i = 0; i < 10; i++) {
@@ -337,7 +348,7 @@ test("a held branch carries the turn once the session stops being new", async ()
   }
   await endsATurn(it, "a step is done");
 
-  const said = it.lines().filter((one) => one.kind === "stop");
+  const said = it.since().filter((one) => one.kind === "stop");
   assert.equal(said[0].said, "the stop falls");
   assert.equal(said[1].said, "the turn goes on");
   assert.match(said[1].detail, /continue=work-still-stands@80 inARow=1$/);
@@ -362,7 +373,10 @@ test("a held group carries the turn on a cloud box, from turn one", async () => 
       },
     },
   );
-  await endsATurn(it, "a leaf is done");
+  await it.raise("turn.complete", {
+    ...answered,
+    answer: `a leaf is done\n\n${canary({ rules: 2, notes: 1, stop: true })}`,
+  });
 
   const said = it.lines().filter((one) => one.kind === "stop");
   assert.equal(said.at(-1).said, "the turn goes on");
@@ -372,14 +386,14 @@ test("a held group carries the turn on a cloud box, from turn one", async () => 
 
 // [[spec/design_output/extension#the-hold-is-one-rule]]
 test("the hold at stopped ends a turn the standing work would carry", async () => {
-  const it = await started({ "HANDOVER.md": "---\nstatus: held\n---\n\n# The brief\n" });
+  const it = await startedPast({ "HANDOVER.md": "---\nstatus: held\n---\n\n# The brief\n" });
   for (let i = 0; i < 10; i++) {
     await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   }
   it.files.set(".se/config.json", JSON.stringify({ stop: { hold: "stopped" } }));
   await endsATurn(it, "a step is done");
 
-  const said = it.lines().filter((one) => one.kind === "stop");
+  const said = it.since().filter((one) => one.kind === "stop");
   assert.equal(said[1].said, "the turn ends");
   assert.match(said[1].detail, /^stop=the-owner-holds-this-session@85/);
   assert.equal(it.prompts.length, 0, "nothing reaches the agent");
@@ -550,7 +564,7 @@ test("a session start says which field the config lacks", async () => {
 
 // [[spec/design_output/config#the-three-layers]]
 test("a write to the per-box file reaches the next turn end", async () => {
-  const it = await started({ "HANDOVER.md": "---\nstatus: held\n---\n\n# The brief\n" });
+  const it = await startedPast({ "HANDOVER.md": "---\nstatus: held\n---\n\n# The brief\n" });
   for (let i = 0; i < 10; i++) {
     await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   }
@@ -560,7 +574,7 @@ test("a write to the per-box file reaches the next turn end", async () => {
     await endsATurn(it, step);
   }
 
-  const said = it.lines().filter((one) => one.kind === "stop");
+  const said = it.since().filter((one) => one.kind === "stop");
   assert.deepEqual(
     said.map((one) => one.said),
     [
@@ -577,6 +591,19 @@ test("a write to the per-box file reaches the next turn end", async () => {
 });
 
 // [[spec/design_output/level0#the-canary]]
+// [[spec/design_output/stop#the-canary-ends-turn-one]]
+test("the stop call falls in the first turn, and names the canary as the one way out", async () => {
+  const it = await started();
+  const said = await stops(it);
+  assert.match(said.result, /^The stop falls\. The first turn ends on the canary line alone/);
+  assert.match(said.result, /level0 holds this session/);
+  assert.ok(it.lines().some((one) => one.kind === "stop" && one.level === "warn"));
+
+  await it.raise("turn.complete", { ...answered, answer: "done" });
+  const again = await stops(it);
+  assert.doesNotMatch(again.result, /first turn/, "the second turn takes the call");
+});
+
 test("the canary comes back whole, and a missing one writes a warning", async () => {
   const said = canary({ rules: 2, notes: 1, stop: true });
 
@@ -1456,6 +1483,78 @@ test("a push to trunk takes a green battery, and a work branch takes none", asyn
   assert.equal(branch.deny, undefined, "a work branch meets no battery");
 });
 
+// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+const TAGGED_NOTE = `---\nkind: [[ticket]]\nstate: open\nurgency: whenever\ntodo: true\n---\n\n# Ask\n\nLook at the lint.\n\n# Discussion\n\nNothing yet.\n`;
+
+// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+function boxCarrying(notes, env = {}) {
+  const names = Object.keys(notes).join("\n");
+  return {
+    exists: (path) => path === VALE,
+    run: (argv) => {
+      if (argv[0] === "node") {
+        return { exitCode: 0, stdout: JSON.stringify(env), stderr: "" };
+      }
+      if (argv[0] === "git" && argv[1] === "log") {
+        return { exitCode: 0, stdout: `${names}\n`, stderr: "" };
+      }
+      if (argv[0] === "git" && argv[1] === "show") {
+        const text = notes[String(argv[2]).slice("HEAD:".length)];
+        return { exitCode: 0, stdout: text ?? "", stderr: "" };
+      }
+      return { exitCode: 0, stdout: "", stderr: "" };
+    },
+  };
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+test("a push carrying a tagged note is refused, and the refusal names the file", async () => {
+  const it = await started(
+    undefined,
+    boxCarrying({ "spec/tickets/slow-lint.md": TAGGED_NOTE, "src/x.js": "// code" }),
+  );
+  const said = await it.raise(
+    "tool.call",
+    { tool: "Bash", command: "git push -u origin work/a-thing" },
+    "Bash",
+  );
+
+  assert.match(String(said.deny), /spec\/tickets\/slow-lint\.md/);
+  assert.match(String(said.deny), /ticket todo <name> --off/);
+  assert.ok(
+    it.lines().some((one) => one.kind === "todo"),
+    "the door writes a todo row",
+  );
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+test("a commit carrying a tagged note passes, because the push is the one gate", async () => {
+  const it = await started(
+    undefined,
+    boxCarrying({ "spec/tickets/slow-lint.md": TAGGED_NOTE }),
+  );
+  const said = await it.raise(
+    "tool.call",
+    { tool: "Bash", command: 'git commit -m "the note parks the work"' },
+    "Bash",
+  );
+
+  assert.equal(said.deny, undefined);
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+test("a push carrying no tagged note lands", async () => {
+  const free = TAGGED_NOTE.replace("todo: true\n", "");
+  const it = await started(undefined, boxCarrying({ "spec/tickets/x.md": free }));
+  const said = await it.raise(
+    "tool.call",
+    { tool: "Bash", command: "git push -u origin work/a-thing" },
+    "Bash",
+  );
+
+  assert.equal(said.deny, undefined);
+});
+
 // [[spec/design_output/private#the-escape]]
 test("no-verify is refused on a cloud box, and the desk box writes a line", async () => {
   const cloud = await started(undefined, boxSaying("", { CLAUDE_CODE_REMOTE: "1" }));
@@ -1817,44 +1916,40 @@ const UNDER = "word ".repeat(100).trim();
 const CLEAN = "word ".repeat(400).trim();
 const DRAFT = "mcp__level0__check_answer";
 
-// [[spec/design_output/level0#the-re-prompt-over-the-ceiling]]
 // [[spec/design_output/stop#a-standing-stop-ends-it]]
 test("a standing stop ends the turn, and the gate reads and writes nothing", async () => {
-  const it = await started(BANDED, valeOnAnswer(PAST));
+  const it = await startedPast(BANDED, valeOnAnswer(PAST));
   const said = await stops(it);
   assert.match(said.result, /Write the words Ending my turn, and nothing more\.$/);
   await it.raise("turn.complete", { ...answered, answer: "Ending my turn." });
 
-  assert.equal(it.prompts.length, 0, "nothing reaches the prompt");
+  assert.equal(it.promptsSince().length, 0, "nothing reaches the prompt");
   assert.equal(
-    it.lines().some((one) => one.kind === "answer" && /the gate reads/.test(one.said)),
+    it.since().some((one) => one.kind === "answer" && /the gate reads/.test(one.said)),
     false,
     "no gate line",
   );
 });
 
-test("an answer over the ceiling meets one re-prompt, and one alone", async () => {
+test("an answer over the ceiling reaches no prompt, and rides the next call once", async () => {
   const it = await started(BANDED, valeOnAnswer(PAST));
   await it.raise("turn.complete", { ...answered, answer: OVER });
 
-  assert.equal(it.prompts.length, 1);
-  assert.match(
-    it.prompts[0].text,
-    /^The voice rules refuse this answer\. Write it again\./,
-  );
-  assert.match(it.prompts[0].text, /50 findings a thousand words/);
-  assert.match(it.prompts[0].text, /level0-answer\.md:1:7 {2}PastTense/);
-  assert.match(it.prompts[0].text, /Hold PastTense for the rest of this turn/);
-
-  await it.raise("turn.complete", { ...answered, answer: OVER });
-  assert.equal(it.prompts.length, 1, "a second turn end inside the turn submits nothing");
-
+  assert.equal(it.prompts.length, 0, "the answer stands as sent, and nothing prints twice");
   const gate = it.lines().filter((one) => one.kind === "answer");
-  assert.deepEqual(
-    gate.map((one) => one.said),
-    ["the gate reads rewrite", "the gate reads rewrite"],
-  );
-  assert.match(gate[0].detail, /^score=50 findings=1 inARow=1$/);
+  assert.deepEqual(gate.map((one) => one.said), ["the gate reads rewrite"]);
+  assert.match(gate[0].detail, /^score=50 findings=1$/);
+
+  const call = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.equal(call.deny, undefined);
+  const note = call.context.join("\n");
+  assert.match(note, /The gate read your last answer at rewrite, and it stands as sent\./);
+  assert.match(note, /50 findings a thousand words/);
+  assert.match(note, /level0-answer\.md:1:7 {2}PastTense/);
+  assert.match(note, /Hold PastTense for the rest of this turn/);
+
+  const again = await it.raise("tool.call", { tool: "Read", file_path: "b.md" });
+  assert.doesNotMatch((again.context ?? []).join("\n"), /The gate read/, "the findings ride once");
 });
 
 // [[spec/design_output/level0#the-three-bands]]
@@ -1915,15 +2010,17 @@ const TABLE = [
 ].join("\n");
 
 // [[spec/design_output/level0#the-table-answers-every-question]]
-test("a prompt with two questions refuses an answer opening with prose", async () => {
+test("a prompt with two questions reads an answer opening with prose as a rewrite", async () => {
   const it = await started(BANDED, valeOnAnswer([]));
   await it.raise("prompt.submit", { text: ASKS, origin: { kind: "composer" } });
+  await it.raise("turn.step", { turnId: "t", index: 0, answer: "You ask two things.", toolUses: [], stopReason: "tool_use" });
   await it.raise("turn.complete", { ...answered, answer: OVER });
 
-  assert.equal(it.prompts.length, 1);
-  assert.match(it.prompts[0].text, /QuestionTable/);
-  assert.match(it.prompts[0].text, /asks 2 questions/);
-  assert.match(it.prompts[0].text, /opens with no table/);
+  assert.equal(it.prompts.length, 0);
+  const call = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.match(call.context.at(-1), /QuestionTable/);
+  assert.match(call.context.at(-1), /asks 2 questions/);
+  assert.match(call.context.at(-1), /opens with no table/);
 });
 
 // [[spec/design_output/level0#the-table-answers-every-question]]
@@ -1946,7 +2043,8 @@ test("a prompt from a machine leaves the count standing", async () => {
   await it.raise("prompt.submit", { text: "carry on", origin: { kind: "plugin" } });
   await it.raise("turn.complete", { ...answered, answer: OVER });
 
-  assert.match(it.prompts[0].text, /asks 2 questions/);
+  const call = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.match(call.context.join("\n"), /asks 2 questions/);
 });
 
 // [[spec/design_output/level0#the-owner-answers-by-number]]

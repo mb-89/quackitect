@@ -79,6 +79,7 @@ import {
 } from "../lib/projection.js";
 import {
   answerFindings,
+  gateNote,
   refusal,
   refusedCommand,
   refusedDelta,
@@ -100,6 +101,7 @@ import {
   strangerFault,
 } from "../lib/schema.js";
 import { heldGroup, refusedTicket, ticketFaults } from "../lib/ticket.js";
+import { reaches, refusedTodo, taggedIn } from "../lib/todo.js";
 import { guesses, pathOf, surveyOf, TOOLS } from "../lib/tools.js";
 import {
   askForStop,
@@ -277,7 +279,6 @@ export function register(on, _options) {
   on("prompt.submit", async ($, e, next) => {
     const from = String(e.origin?.kind ?? "");
     tooth.sawPrompt(from === "plugin");
-    gate.sawPrompt(from === "plugin");
     // [[spec/design_output/level0#a-prompt-mid-turn]]
     if (opensATurn(e.origin)) {
       owed = { ...(await owing($, "The owner sent a prompt")), skips: inFlight > 0 ? 1 : 0 };
@@ -330,7 +331,11 @@ export function register(on, _options) {
     if (canaries.deny) return canaries;
     owesCanary = canaries.owes;
 
-    const warning = [answers.warn, canaries.warn].filter(Boolean).join("\n\n");
+    // [[spec/design_output/level0#the-findings-ride-the-next-call]]
+    const gateHeld = e.agentId ? null : gate.takeWaiting();
+    const warning = [answers.warn, canaries.warn, gateHeld ? gateNote(ANSWER, gateHeld) : ""]
+      .filter(Boolean)
+      .join("\n\n");
     const writing = asWrite(e);
 
     // [[spec/funnel/a-paragraph-has-a-schema]]
@@ -545,6 +550,23 @@ export function register(on, _options) {
     return godPasses(logbook, settings, e, next, said);
   });
 
+  // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+  on("tool.call", { tool: "Bash" }, async ($, e, next) => {
+    const said = await (async () => {
+    if (!touchesGit(String(e.command ?? "")).pushes) return next(e);
+
+    const found = taggedIn(await theCarried($));
+    if (!found.length) return next(e);
+
+    await logbook.say("warn", "todo", `refused a push carrying ${found.length} note(s)`, {
+      tool: "Bash",
+      file: found[0],
+    });
+    return { deny: refusedTodo(found) };
+    })();
+    return godPasses(logbook, settings, e, next, said);
+  });
+
   // [[spec/design_output/private#two-doors-one-check]]
   on("tool.call", { tool: "Bash" }, async ($, e, next) => {
     const said = await (async () => {
@@ -673,6 +695,15 @@ export function register(on, _options) {
     inHand = await holdStands($);
     groupHeld = await groupInHand($);
     const reason = String(e.reason ?? "");
+    // [[spec/design_output/stop#the-canary-ends-turn-one]]
+    if (firstTurn) {
+      await logbook.say("warn", "stop", "the first turn ends on the canary, and on no call", {
+        detail: reason,
+      });
+      return {
+        result: `The stop falls. The first turn ends on the canary line alone, written last: ${sentence}`,
+      };
+    }
     const decision = decide(rules, {
       claimed: reason,
       ran: (name) => ranHere(name, off, hold),
@@ -822,23 +853,11 @@ export function register(on, _options) {
     ];
 
     // [[spec/design_output/level0#the-three-bands]]
-    const read = gate.atTurnEnd({
-      ...(await bands(settings)),
-      text: spoken,
-      found,
-      mostInARow,
-      toothSpoke: Boolean(bit?.sent),
-    });
+    const read = gate.atTurnEnd({ ...(await bands(settings)), text: spoken, found });
     const level = read.band === "clean" ? "info" : "warn";
     await logbook.say(level, "answer", `the gate reads ${read.band}`, {
-      detail: `score=${read.score} findings=${found.length} inARow=${gate.inARow()}`,
+      detail: `score=${read.score} findings=${found.length}`,
     });
-    if (!read.sends) return said;
-
-    // [[spec/design_output/level0#the-re-prompt-over-the-ceiling]]
-    try {
-      $.prompt.submit({ text: answerFindings(ANSWER, read) }).catch(() => {});
-    } catch {}
     return said;
   });
 
@@ -1572,6 +1591,31 @@ function theDelta($) {
         name: `${NOTES}/${one.name}`,
       })),
   };
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+async function theCarried($) {
+  const said = await gitSays($, [
+    "log",
+    "--format=",
+    "--name-only",
+    "HEAD",
+    "--not",
+    "--remotes",
+  ]);
+  const names = new Set(
+    said
+      .split("\n")
+      .map((row) => row.trim())
+      .filter(reaches),
+  );
+
+  const out = [];
+  for (const name of names) {
+    const text = await gitSays($, ["show", `HEAD:${name}`]);
+    if (text) out.push({ name, text });
+  }
+  return out;
 }
 
 async function boxHere($) {

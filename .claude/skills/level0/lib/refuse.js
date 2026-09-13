@@ -73,6 +73,20 @@ export function answerFindings(where, it) {
   ].join("\n");
 }
 
+// The answer stands as sent, so the note teaches and asks for nothing. [[spec/design_output/level0#the-findings-ride-the-next-call]]
+export function gateNote(where, it) {
+  const found = it?.found ?? [];
+  return [
+    `The gate read your last answer at ${it?.band ?? "carry"}, and it stands as sent.`,
+    "",
+    `  the score is ${it?.score ?? 0} findings a thousand words.`,
+    "",
+    ...bodyOf(where, found),
+    taught(found),
+    ...road(found),
+  ].join("\n");
+}
+
 function bodyOf(where, found) {
   const lines = [];
   for (const one of found ?? []) {
