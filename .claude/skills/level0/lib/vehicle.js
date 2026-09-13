@@ -78,7 +78,7 @@ export function pairOf(method, work) {
   return { ...held, itself: same(held.method, held.work) };
 }
 
-function same(one, other) {
+export function same(one, other) {
   return slashed(one).replace(/\/+$/, "") === slashed(other).replace(/\/+$/, "");
 }
 

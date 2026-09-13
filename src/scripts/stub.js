@@ -8,6 +8,7 @@ import {
   KEEP,
   LINK,
   linkOf,
+  same,
   SETTINGS,
   settingsOf,
   STUB_FOLDERS,
@@ -85,9 +86,4 @@ function readIf(files, at) {
 
 function asJson(record) {
   return `${JSON.stringify(record, null, 2)}\n`;
-}
-
-function same(one, other) {
-  const plain = (said) => String(said ?? "").split("\\").join("/").replace(/\/+$/, "");
-  return plain(one) === plain(other);
 }

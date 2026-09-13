@@ -78,7 +78,15 @@ record:
   - step: sync
     hand: box 36d4a566c587
     hash_before: f404ac8bd5b48bd57f074eec2ec3a84ed88d7203
-step: sync
+  - step: sync
+    hand: box 36d4a566c587
+    hash_before: da84f29ac90fa5302046ad42b46c16defb6485ab
+    hash_after: da84f29ac90fa5302046ad42b46c16defb6485ab
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-stub-takes-shape already carries every commit on main.
+step: split
 ---
 
 # Ask
@@ -96,6 +104,8 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 <!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
