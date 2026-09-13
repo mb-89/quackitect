@@ -78,7 +78,15 @@ record:
   - step: sync
     hand: box b71bba5a7b0c
     hash_before: 30750b0403b60ea900582a7d55bff0ba773252b9
-step: sync
+  - step: sync
+    hand: box b71bba5a7b0c
+    hash_before: 3a1748319aeadf464b247f0d8b505ce178950839
+    hash_after: 3a1748319aeadf464b247f0d8b505ce178950839
+    answered:
+      - name: sync
+        exit: 0
+        said: work/a-step-changes-hands already carries every commit on main.
+step: split
 ---
 
 # Ask
@@ -92,8 +100,9 @@ The pull learns who holds a step. The group holds one child, [[spec/tickets/step
 ## sync
 
 <!-- work sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
