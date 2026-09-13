@@ -96,17 +96,25 @@ layers:
         reason: a gerund here, and the tagger reads a progressive
 
   vocabulary:
-    words: spec/vocabulary/words.yml
+    core: spec/vocabulary/core.yml
+    terms: spec/vocabulary/terms.yml
+    swaps: spec/vocabulary/swaps.yml
+    stems: a plural, a past form and an -ing form of a listed word stand
     outside:
       - a code span
       - a link
       - a path
       - a word opening with a capital past the first word
     growth:
-      who: the session, on the refusal that names the word
-      entry: word, meaning, from, and insteadOf where a better word exists
-      review: the retro reads every entry with `from: session` and keeps it or cuts it
-    exceptions: []
+      who: a person, or a session together with the note that defines the word
+      entry: word and defines, a link to the note that defines it
+      review: the retro reads the terms added since, keeps each, or moves it to the swaps with the word to write
+      swap: a swap wins over every list, so a swapped word meets a refusal until the writer takes the word it names
+    exceptions:
+      - word: TL;DR
+        reason: a name the answer register uses, and its tail reads as a word
+      - word: isnt
+        reason: the voice rule against the negative writes it, and the apostrophe belongs to a contraction
 
   # The judge holds this layer, one question per rule. The projection writes
   # each entry into spec/config/styles/VoiceJudged. `span` says what one

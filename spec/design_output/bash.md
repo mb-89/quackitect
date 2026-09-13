@@ -64,7 +64,7 @@ So `cp` and `mv` refuse where a source stands outside what the rules reach:
 
 `xargs` and `find -exec` carry a command inside a command, and the parse reads
 the inner one under the same rules. A target the parse reads as `{}` names no
-path, so it passes. The enclosing `find` holds the real target, and a guess at
+path, so it passes. The outer `find` holds the real target, and a guess at
 it refuses honest work.
 
 A heredoc into `sh` runs the shell parse again over the body. A heredoc into an
@@ -171,7 +171,7 @@ you trust them:
 | the engine caches the rendered description | the same |
 
 `claude plugin validate` reads an event name it knows nothing about and passes.
-A probe registering `nonsense.event` validates green, so a typo in an event
+A probe registering `nonsense.event` checks green, so a typo in an event
 name costs a silent hook and no error.
 
 # What every refusal owes

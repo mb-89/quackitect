@@ -77,6 +77,11 @@ function listAt(rows, cursor, indent, path) {
     const at = `${path}[${out.length}]`;
     mark(cursor, at, one.line);
     const rest = one.said.slice(2).trim();
+    // [[spec/funnel/a-paragraph-has-a-schema]]
+    if (rest.startsWith("{")) {
+      out.push(scalar(rest));
+      continue;
+    }
     const pair = PAIR.exec(rest);
     if (!pair) {
       out.push(scalar(rest));
@@ -118,6 +123,8 @@ function under(rows, cursor, indent, path) {
 function scalar(said) {
   const flat = unquote(said);
   if (LINK.test(flat)) return flat;
+  // [[spec/funnel/a-paragraph-has-a-schema]]
+  if (flat.startsWith("{") && flat.endsWith("}")) return mapping(flat.slice(1, -1));
   if (flat.startsWith("[") && flat.endsWith("]")) {
     return flat
       .slice(1, -1)
@@ -129,6 +136,36 @@ function scalar(said) {
   if (flat === "false") return false;
   if (/^-?\d+$/.test(flat)) return Number(flat);
   return flat;
+}
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+function mapping(said) {
+  const out = {};
+  for (const one of parted(said)) {
+    const pair = PAIR.exec(one.trim());
+    if (!pair) continue;
+    out[pair[1].trim()] = scalar(pair[2].trim());
+  }
+  return out;
+}
+
+// A comma inside a bracket belongs to its own list. [[spec/funnel/a-paragraph-has-a-schema]]
+function parted(said) {
+  const out = [];
+  let depth = 0;
+  let held = "";
+  for (const one of String(said)) {
+    if (one === "[" || one === "{") depth += 1;
+    if (one === "]" || one === "}") depth -= 1;
+    if (one === "," && depth === 0) {
+      out.push(held);
+      held = "";
+      continue;
+    }
+    held += one;
+  }
+  out.push(held);
+  return out.filter((one) => one.trim() !== "");
 }
 
 function unquote(said) {

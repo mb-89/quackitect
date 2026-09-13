@@ -46,11 +46,11 @@ Cloud progress must reach the remote work branch. A local cache is temporary.
 
 Keep `work/<name>` and `todo`, `held`, `done` as the work contract.
 Claim before dispatch. Use a draft pull request with that branch as its head.
-Invoke Copilot on that pull request, which authorizes that head branch.
+Call Copilot on that pull request, which authorizes that head branch.
 The dispatcher creates the pull request. The worker does not create one.
 
 Leave merging to a person. Report dispatch failures for recovery.
-Do not give the worker broader credentials to evade branch restrictions.
+Do not give the worker broader credentials to get past branch restrictions.
 
 Give each claim its own dispatch identity. Reuse that identity for a request
 retry. Issue a new request after release and a new claim on the same branch.
@@ -61,7 +61,7 @@ Reuse the installers for dependencies. Generate Copilot registrations without
 overwriting user customizations. Permit both harnesses on one machine.
 An explicit setup target handles cloud preparation and ambiguous detection.
 Cloud hook and setup registrations must reach the default branch before use.
-Claude must not import or invoke the Copilot runtime.
+Claude must not import or call the Copilot runtime.
 
 # Checks define acceptance
 
@@ -71,7 +71,7 @@ Test each outside boundary once through its door contract. Use mocks for
 runtime and dispatch behavior. Add no duplicate real-Git workflow tests.
 
 Run the existing checks to detect Claude regressions.
-Verify VS Code startup and a real cloud branch round trip before claiming
+Check VS Code startup and a real cloud branch round trip before claiming
 live compatibility. Unit tests alone cannot prove platform integration.
 
 # Known platform limits

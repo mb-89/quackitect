@@ -6,6 +6,7 @@
 import { flatten, keysOf, LOCAL, TRACKED } from "./config.js";
 import { faultsOf, JUDGED, judgedFrom, PARAGRAPH, rulesFrom, RULES } from "./paragraph.js";
 import { readYaml } from "./schema.js";
+import { pathsOf } from "./vocabulary.js";
 
 export const PROJECTIONS = "spec/config/projections.json";
 
@@ -50,6 +51,21 @@ export function readsOf(entry) {
   return [entry?.from, entry?.schema].filter(Boolean);
 }
 
+// The schema names the word lists, so the reader takes a second pass over the disk. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+export function alsoReads(entry, texts) {
+  if (entry?.shape !== PARAGRAPH) return [];
+  const source = texts?.get(entry.from);
+  if (source === undefined) return [];
+  return Object.values(pathsOf(readYaml(source))).filter((path) => path && !texts.has(path));
+}
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+function listsOf(said, texts) {
+  const paths = pathsOf(said);
+  const read = (path) => readYaml(texts.get(path) ?? "");
+  return { core: read(paths.core), terms: read(paths.terms), swaps: read(paths.swaps) };
+}
+
 // [[spec/design_output/projection#projecting-in-memory]]
 export function writesOf(entry, texts) {
   const out = new Map();
@@ -88,7 +104,10 @@ function schemaInto(entry, texts, write) {
   if (source === undefined) return out;
 
   const target = folderOf(entry.target);
-  for (const [name, text] of write(readYaml(source), saysGenerated(entry.from))) {
+  const said = readYaml(source);
+  // [[spec/funnel/a-paragraph-has-a-schema]]
+  const lists = listsOf(said, texts);
+  for (const [name, text] of write(said, saysGenerated(entry.from), lists)) {
     out.set(`${target}/${name}`, text);
   }
   return out;
@@ -205,6 +224,10 @@ export function readAll(entries, disk, at = (path) => path) {
   for (const entry of entries) {
     const texts = new Map();
     for (const path of readsOf(entry)) {
+      if (disk.exists(at(path))) texts.set(path, disk.read(at(path)));
+    }
+    // [[spec/funnel/a-paragraph-has-a-schema]]
+    for (const path of alsoReads(entry, texts)) {
       if (disk.exists(at(path))) texts.set(path, disk.read(at(path)));
     }
     for (const [path, text] of writesOf(entry, texts)) wanted.set(path, text);

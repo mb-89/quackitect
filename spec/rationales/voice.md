@@ -5,8 +5,8 @@ explains: [[spec/guidance/voice]]
 
 # Why
 
-Agents tend to write slop. The audience are non-native speakers whose patience
-runs short, so the prose stays terse and the vocabulary stays settled.
+Agents tend to write filler. The audience are non-native speakers whose patience
+runs short, so the prose stays short and the vocabulary stays settled.
 
 Vale holds the mechanical rules in [[spec/config/styles/VoiceVale]]. What
 stays in the guidance needs a person or a model.
@@ -33,7 +33,7 @@ whether it names four things or six, and which of them still owes work.
 
 So a writer picks the shape first and falls back to prose. Level zero counts the
 paragraphs running together with no structure between them. An answer takes a
-tighter limit than a file, because a reader skims an answer.
+tighter limit than a file, because a reader takes an answer in at a glance.
 
 ## 4. Authority and provenance
 

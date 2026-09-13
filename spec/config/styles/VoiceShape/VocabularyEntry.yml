@@ -1,0 +1,94 @@
+extends: script
+message: "A core entry carries word and from, a term carries word and the note that defines it, and a swap carries word and write."
+link: spec/design_output/vocabulary.md
+level: error
+scope: raw
+script: |
+  text := import("text")
+
+  lines := text.split(scope, "\n")
+  matches := []
+
+  offset := 0
+  kind := ""
+
+  for i := 0; i < len(lines); i++ {
+    line := lines[i]
+    at := offset
+    offset += len(line) + 1
+    trimmed := text.trim_space(line)
+
+    if trimmed == "words:" { kind = "core"; continue }
+    if trimmed == "terms:" { kind = "term"; continue }
+    if trimmed == "swaps:" { kind = "swap"; continue }
+    if !text.has_prefix(trimmed, "- {") { continue }
+    if !text.has_suffix(trimmed, "}") {
+      matches = append(matches, {
+        begin: at,
+        end: at + len(line),
+        message: "An entry stands on one line, and this one leaves its brace open."
+      })
+      continue
+    }
+
+    body := trimmed[3:len(trimmed)-1]
+    held := {}
+    for part in text.split(body, ",") {
+      pair := text.split(part, ":")
+      if len(pair) < 2 { continue }
+      held[text.trim_space(pair[0])] = text.trim_space(text.join(pair[1:], ":"))
+    }
+
+    if held.word == undefined || held.word == "" {
+      matches = append(matches, {
+        begin: at,
+        end: at + len(line),
+        message: "An entry names its word. Write word: <the word> first."
+      })
+      continue
+    }
+    if !text.re_match(`^[a-z][a-z-]*( [a-z][a-z-]*)*$`, held.word) {
+      matches = append(matches, {
+        begin: at,
+        end: at + len(line),
+        message: held.word + " stands outside the shape of a word: lower case letters, a hyphen, and a space between two words."
+      })
+      continue
+    }
+
+    if kind == "core" {
+      if held.from == undefined || !text.re_match(`^(ste|openste|common|pronoun)$`, held.from) {
+        matches = append(matches, {
+          begin: at,
+          end: at + len(line),
+          message: "A core entry says where it comes from. Write from: ste, openste, common or pronoun."
+        })
+      }
+      continue
+    }
+    if kind == "term" {
+      if held.defines == undefined || !text.re_match(`^"?\[\[[^\]\s]+\]\]"?$`, held.defines) {
+        matches = append(matches, {
+          begin: at,
+          end: at + len(line),
+          message: held.word + " names no defining note. Write defines: \"[[the note]]\", because a term with no note is jargon."
+        })
+      }
+      continue
+    }
+    if kind == "swap" {
+      if held.write == undefined || held.write == "" {
+        matches = append(matches, {
+          begin: at,
+          end: at + len(line),
+          message: "A swap names the core word to write. Write write: <the word>."
+        })
+      }
+      continue
+    }
+    matches = append(matches, {
+      begin: at,
+      end: at + len(line),
+      message: "An entry stands under words:, terms: or swaps:, and this one stands under none."
+    })
+  }

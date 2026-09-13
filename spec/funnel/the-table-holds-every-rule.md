@@ -100,7 +100,7 @@ Four things hold whichever shape wins:
 3. A rule carries a test proving it fires, and an argument in a rationale.
 4. A count catches a rule that misreads. `PastTense` misreads eleven words in
    one session, and a person catches all eleven. The exceptions land on `main`,
-   and the count that finds the twelfth stands nowhere.
+   and the count that finds number twelve stands nowhere.
 
 # What decides it
 

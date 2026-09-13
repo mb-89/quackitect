@@ -221,7 +221,7 @@ differs: its own reads, its own hand rule, and the form of its evidence.
 
 | field | holds |
 |---|---|
-| `name` | one word or a hyphenated pair, unique among its siblings |
+| `name` | one word or a pair with a hyphen, unique among its siblings |
 | `steps` | the steps under a phase, in order |
 | `by` | `anyone`, `person`, `agent`, `helper`, `retro`, or `children` |
 | `not` | a step whose hand this step's hand can not be, as `draft` or `implement` |
@@ -272,7 +272,7 @@ The route is a closed vocabulary, and the schema names every word of it:
 
 | key | takes |
 |---|---|
-| `name` | a word, or a hyphenated pair |
+| `name` | a word, or a pair with a hyphen |
 | `steps` | a list of steps |
 | `does`, `asks` | a line of text |
 | `by` | one word from its list |
@@ -318,7 +318,7 @@ The chapters follow the tree. A phase's chapter holds its steps' chapters and
 nothing else. A leaf's chapter holds its evidence and nothing else, so a
 sub-step costs a chapter and a ticket stays one file.
 
-The implement phase of the standard process shows how a step forces a way of
+The `implement` phase of the standard process shows how a step forces a way of
 working without a word of prose:
 
 | leaf | the hand does | the engine checks at the hand-back |
@@ -599,11 +599,11 @@ into the group goes to work before the retro's last leaf.
 
 | rule | what it says |
 |---|---|
-| the branch is the claim | the take writes the hand and `hash_before` into the group's record under `children` and pushes, and the push arbitrates two boxes |
+| the branch is the claim | the take writes the hand and `hash_before` into the group's record under `children` and pushes, and the push decides between two boxes |
 | held derives | a group holds where its newest record entry carries `hash_before` and no `hash_after`, and `branch list` reads it so |
 | a stale group is yours | a held group whose tip is older than `work.staleAfter` stands under yours with three answers, and `release`, `take` and `close` are the verbs |
 | one box, one group | a box works one group at a time, and the group's children one at a time |
-| the branch is the filter | on a group's branch the pull sees that group alone, and widens nothing |
+| the branch is the filter | on a group's branch the pull sees that group alone, and opens nothing wider |
 | trunk hands out no group's child | on trunk the pull offers a box a group to take, and a person the tickets of no group |
 | the branch holds the truth | while the branch stands, its copy of the group and of its children is the record |
 | a box leaves | when the group's last leaf passes, it writes `hash_after`, closes the group as `done` where every child stands closed, and leaves it open otherwise |
@@ -681,7 +681,7 @@ data, and the brief's contract retires with it.
 
 The tree's retro turns a window of the record into changes to the machinery.
 It is blameless, and it repairs the generator of a bad output: a prompt, a
-guidance line, a form, a refusal, a tool. Repairing the artefact is fine, and
+guidance line, a form, a refusal, a tool. Repairing the artifact is fine, and
 the finding is the generator. The route stands in `spec/processes/retro.yaml`,
 and a retro is a ticket, so its evidence is the report, in git.
 
@@ -781,7 +781,7 @@ its home by the order that asks the least of anybody:
 | a knob | a default | the config |
 | a sentence | works on whoever reads and remembers it | guidance, last |
 
-The kata card spans two retros:
+The `kata` card spans two retros:
 
 | the retro | writes |
 |---|---|
@@ -1141,7 +1141,7 @@ the only fact it meets is a route.
 |---|---|---|
 | `work.refusalsBeforePerson` | 5 | when a refused hand-back becomes a person's step |
 | `work.failsBeforePerson` | 2 | when a step that keeps failing back becomes a person's step |
-| `work.stepsBeforeSplit` | 3 | when an escalating ticket must split |
+| `work.stepsBeforeSplit` | 3 | when a ticket on escalation must split |
 | `work.staleAfter` | `12h` | when the notification names a held group as stale |
 | `work.retroCap` | 7 | how many improvements one retro mints at most |
 | `work.retroReaders` | 4 | how many hands read a retro's chapters at once |
@@ -1203,7 +1203,7 @@ ones a person wants moved. The old verbs go once the last brief merges.
 # What this leaves open
 
 - whether a person step can go to a spawned strong model at high autonomy
-- whether yours drowns in parked conditions, and a parked state returns
+- whether yours fills with parked conditions, and a parked state returns
 - a heartbeat ref per held group, if a tip's age proves too coarse a sign of a dead box
 - how the judge reads a checklist's lines against its items, once the first process shows the shape
 - a WIP limit per step, which is Kanban's one knob and stands outside this note

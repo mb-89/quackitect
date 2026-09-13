@@ -51,7 +51,7 @@ door in this tree already answers:
 answers the same shape.
 
 A finding names a file that stands on disk, so the panel opens it. A rule with
-no line to point at answers line 1, and a rule that finds the offending key
+no line to point at answers line 1, and a rule that finds the key at fault
 answers the line holding it.
 
 # The tree handed in

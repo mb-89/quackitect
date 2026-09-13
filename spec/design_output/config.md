@@ -52,8 +52,9 @@ door asks on every Write and Edit, which makes that the ask worth timing:
 | Biome over one write | 101 ms |
 
 The handover on this branch carries the script, which measures the first three
-over 10000 rounds and the last two once each. One ask costs a sixteen-thousandth of the cheapest door the
-write path already pays, so this tree holds no cache and no `mtimeMs` check.
+over 10000 rounds and the last two once each. One ask costs one part in sixteen
+thousand of the cheapest door the write path already pays. So this tree holds
+no cache and no `mtimeMs` check.
 Measure again where the per-box file grows past a few keys.
 
 # A key names a path

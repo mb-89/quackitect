@@ -53,7 +53,7 @@ without either one blocking.
 ## The door owns the database
 
 One process owns the file, keeps the tree and the rows in step, and answers
-every question, so one writer stands however many people ask. It listens on
+every question. One writer stands for any number of readers. It listens on
 loopback on a port the machine picks, and writes where it stands into
 `.se/index.json`.
 
