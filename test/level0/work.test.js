@@ -622,6 +622,22 @@ test("take claims a group by writing the hand and hash_before into its record, a
   assert.match(said, /Two tickets that land as one/);
 });
 
+// [[spec/design_output/pull#the-hand-out]]
+test("a pull on trunk takes a group, the way branch take does", () => {
+  const { it, outside, disk } = doorsSaying(
+    { ...groupRemote(), "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } },
+    { [on("one-group")]: GROUP_NOTE, ...HAND },
+  );
+
+  const { code, said } = heard(() => work(ROOT, ["pull"], it));
+
+  assert.equal(code, 0);
+  assert.ok(ranGit(outside).includes("git switch work/one-group"), "the pull takes the group");
+  assert.ok(ranGit(outside).includes("git push origin work/one-group"));
+  assert.equal(heldIn(disk.read(on("one-group"))).hand, "box d462e994b4cef");
+  assert.match(said, /Two tickets that land as one/);
+});
+
 // [[spec/design_output/work#the-take-writes-the-record]]
 test("a second take meets a rejected push, and says so", () => {
   const { it } = doorsSaying(

@@ -32,6 +32,11 @@ export function pullSpec() {
           type: "string",
           description: "the reason on a fail, or the successor on a became",
         },
+        fields: {
+          type: "object",
+          description:
+            "the text of each field of the leaf in hand, keyed by field name, which the engine writes into the ticket before it checks",
+        },
       },
     },
   };
@@ -46,6 +51,9 @@ export function pullArgv(said = {}) {
   if (verdict === "pass") out.push("--pass");
   if (verdict === "fail" || verdict === "became") {
     out.push(`--${verdict}`, String(said.reason ?? "").trim());
+  }
+  if (said.fields && typeof said.fields === "object") {
+    out.push("--fields", JSON.stringify(said.fields));
   }
   return out;
 }

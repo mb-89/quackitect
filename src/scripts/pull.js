@@ -200,6 +200,7 @@ export function pull(it, argv) {
   }
 
   const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
+  if (branch === TRUNK && it.take && !verdict.said && !name) return it.take();
   if (!branch.startsWith("work/")) {
     console.error(`branch pull runs on a work branch, and this is ${branch}.`);
     console.error(
@@ -211,6 +212,7 @@ export function pull(it, argv) {
   const hand = as ? `${handOf(it)} · ${as}` : handOf(it);
   const held = holdOf(it, hand);
   const who = { hand, branch, group, held, oneStep: Boolean(as) };
+  it.argv = rest;
 
   if (rest.includes("--judge")) return judgeMaterial(it, held, name);
   if (rest.includes("--drop")) return dropped(it, who);
@@ -228,7 +230,7 @@ export function pull(it, argv) {
 }
 
 // [[spec/design_output/pull#a-hand-of-its-own]]
-const TAKES = ["--as", "--fail", "--became", "--back"];
+const TAKES = ["--as", "--fail", "--became", "--back", "--fields"];
 
 function positionalOf(rest) {
   for (let i = 0; i < rest.length; i++) {
@@ -822,6 +824,19 @@ function handBack(it, who, name, verdict) {
   one.text = it.disk.read(at);
   one.front = frontOf(one.text);
 
+  // [[spec/design_output/pull#the-fields-ride-the-payload]]
+  const payload = flagValue(it.argv ?? [], "--fields");
+  if (payload) {
+    const put = withPayload(one.text, held.step, payload);
+    if (put.why) {
+      say(REFUSED, [put.why]);
+      return 1;
+    }
+    one.text = put.text;
+    one.front = frontOf(one.text);
+    it.disk.write(at, one.text);
+  }
+
   // [[spec/design_output/pull#the-hand-back-matches-the-hold]]
   const done = recordIn(one.text).find(
     (entry) =>
@@ -930,6 +945,77 @@ function refused(it, who, one, leaf, held, found) {
     `Fix it, and ${one.name} stays in hand at ${leaf.path}.`,
   ]);
   return 1;
+}
+
+// [[spec/design_output/pull#the-fields-ride-the-payload]]
+export function withPayload(text, path, payload) {
+  const fields = parsed(payload);
+  if (!fields || typeof fields !== "object" || Array.isArray(fields)) {
+    return { why: "--fields takes a JSON object, one key per field of the leaf in hand." };
+  }
+  let now = String(text ?? "");
+  for (const [name, said] of Object.entries(fields)) {
+    const put = withFieldText(now, path, name, String(said ?? ""));
+    if (put.why) return put;
+    now = put.text;
+  }
+  return { text: now };
+}
+
+// [[spec/design_output/pull#the-fields-ride-the-payload]]
+function withFieldText(text, path, name, said) {
+  const sections = readNote(text).sections;
+  const leaf = sectionAt(sections, path);
+  if (leaf < 0) return { why: `${path} holds no chapter to write ${name} into.` };
+  const level = path.split("/").length + 1;
+  let field = -1;
+  for (let i = leaf + 1; i < sections.length; i++) {
+    if (sections[i].level < level) break;
+    if (sections[i].level === level && sections[i].header === name) {
+      field = i;
+      break;
+    }
+  }
+  const rows = text.split(/\r?\n/);
+  if (field < 0) {
+    if (name !== CHECKED) return { why: `${path} holds no field ${name}.` };
+    const end = chapterEnd(sections, leaf, level - 1, rows.length);
+    rows.splice(end, 0, `${"#".repeat(level)} ${CHECKED}`, "", ...said.split("\n"), "");
+    return { text: rows.join("\n") };
+  }
+  const start = sections[field].line;
+  const own = sections[field].own;
+  const kept = own.filter((row) => COMMENT.test(row));
+  const gap = kept.length ? [""] : [];
+  rows.splice(start, own.length, "", ...kept, ...gap, ...said.split("\n"), "");
+  return { text: rows.join("\n") };
+}
+
+function sectionAt(sections, path) {
+  const parts = path.split("/");
+  let from = 0;
+  let found = -1;
+  for (let depth = 0; depth < parts.length; depth++) {
+    const level = depth + 1;
+    found = -1;
+    for (let i = from; i < sections.length; i++) {
+      if (sections[i].level < level && i > from) break;
+      if (sections[i].level === level && sections[i].header === parts[depth]) {
+        found = i;
+        break;
+      }
+    }
+    if (found < 0) return -1;
+    from = found + 1;
+  }
+  return found;
+}
+
+function chapterEnd(sections, at, level, last) {
+  for (let i = at + 1; i < sections.length; i++) {
+    if (sections[i].level <= level) return sections[i].line - 1;
+  }
+  return last;
 }
 
 // [[spec/design_output/pull#the-fields-hold-their-forms]]

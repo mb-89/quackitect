@@ -61,7 +61,8 @@ export function work(root, argv, doors) {
     read,
     review,
     list,
-    pull: (it, _name, argv) => pull(it, argv),
+    // [[spec/design_output/pull#the-hand-out]]
+    pull: (it, _name, argv) => pull({ ...it, take: () => take(it) }, argv),
     test: (it, _name, argv) => testVerb(it, argv),
   };
   if (doing[what] && LOUD.includes(what)) {

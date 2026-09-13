@@ -41,6 +41,14 @@ test("the tool hands the shell verb the same words a person types", () => {
     pullArgv({ ticket: "a-child", verdict: "became", reason: "a-group" }),
     ["branch", "pull", "a-child", "--became", "a-group"],
   );
+  assert.deepEqual(pullArgv({ ticket: "a-child", verdict: "pass", fields: { approach: "x" } }), [
+    "branch",
+    "pull",
+    "a-child",
+    "--pass",
+    "--fields",
+    '{"approach":"x"}',
+  ]);
   assert.equal(PULL_CALL, "mcp__level1__pull");
   assert.equal(pullSpec().name, "pull");
   assert.deepEqual(pullSpec().inputSchema.properties.verdict.enum, [

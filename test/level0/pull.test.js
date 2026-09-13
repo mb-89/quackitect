@@ -19,6 +19,7 @@ import {
   takeable,
   testSays,
   verdictIn,
+  withPayload,
   withPersonStep,
 } from "../../src/scripts/pull.js";
 import { ticket } from "../../src/scripts/ticket.js";
@@ -454,7 +455,10 @@ const standing = (child = CHILD(), group = GROUP_NOTE, extra = {}) => ({
 
 // [[spec/design_output/pull#the-hand-out]]
 test("a pull off a work branch refuses, and names the take", () => {
-  const { it } = doors({}, { "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } });
+  const { it } = doors(
+    {},
+    { "git rev-parse --abbrev-ref HEAD": { stdout: "claude/roaming-hopper-ab12cd\n" } },
+  );
 
   const { code, said } = heard(() => work(ROOT, ["pull"], it));
 
@@ -636,6 +640,28 @@ test("the spawn comes before the group's own leaves, and the box leaves children
 
   const dropped = heard(() => work(ROOT, ["pull", "--drop"], it));
   assert.match(dropped.said, /nothing stands in your hand/);
+});
+
+// [[spec/design_output/pull#the-fields-ride-the-payload]]
+test("the fields ride the payload, and the engine writes them under their headings before it checks", () => {
+  const { it, disk } = doors(standing(CHILD(), withField(GROUP_NOTE, "state", "closed")));
+  heard(() => work(ROOT, ["pull"], it));
+
+  const wrong = heard(() => work(ROOT, ["pull", "a-child", "--pass", "--fields", '{"nowhere": "x"}'], it));
+  assert.equal(wrong.code, 1);
+  assert.match(wrong.said, /design\/draft holds no field nowhere/);
+
+  const { code } = heard(() =>
+    work(ROOT, ["pull", "a-child", "--pass", "--fields", '{"approach": "Read it.\\nThen write."}'], it),
+  );
+  assert.equal(code, 0);
+  const now = disk.read(at("spec/tickets/a-child.md"));
+  assert.match(now, /### approach\n\n<!-- the approach -->\n\nRead it\.\nThen write\.\n/);
+  assert.equal(fieldOf(now, "step"), "design/review");
+
+  const listed = withPayload(CHILD("open", "implement/tests-red"), "implement/tests-red", '{"tests": "node --test", "checked": "- one\\n- two"}');
+  assert.match(listed.text, /### tests\n\nnode --test\n\n### checked\n\n- one\n- two\n\n## reflect/);
+  assert.match(withPayload("x", "a", "nope").why, /takes a JSON object/);
 });
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]

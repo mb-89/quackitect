@@ -30,8 +30,8 @@ there.
 
 # The hand-out
 
-The pull runs on a work branch alone. On trunk it names `branch take`. That is
-the two-level rule. A box on trunk takes a group, and a box on a branch takes
+The pull runs on a work branch. On trunk it runs `branch take`, which claims
+a group and moves the box onto its branch. That is the two-level rule. A box on trunk takes a group, and a box on a branch takes
 the group's leaves around its tickets.
 
 ## The pull fetches first
@@ -154,6 +154,15 @@ still owed, and drops the hold.
 
 A hold is stale where the ticket stands at another step, or where the take
 hash is no ancestor of the tip. Then the hold drops, and the hand pulls again.
+
+## The fields ride the payload
+
+A hand fills the slots through the write door, or hands the fields back as
+the pull's payload. `--fields '{"verdict": "pass"}'` carries one key per
+field of the leaf in hand, and `checked` where a checklist stands. The engine
+writes each text under its heading, past the mint's comments. Then it runs
+the checks over the file as it stands. The pull refuses a key naming no
+field of the leaf.
 
 ## The five checks
 
