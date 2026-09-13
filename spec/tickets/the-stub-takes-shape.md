@@ -86,7 +86,11 @@ record:
       - name: sync
         exit: 0
         said: work/the-stub-takes-shape already carries every commit on main.
-step: split
+  - step: split
+    hand: box 36d4a566c587
+    hash_before: 6054740320208c5ef5f2c86a1197a7d0462973b8
+    hash_after: 6054740320208c5ef5f2c86a1197a7d0462973b8
+step: children
 ---
 
 # Ask
@@ -116,6 +120,14 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 <!-- every child as a link, one a line, with its process -->
 
 <!-- the form is list -->
+
+- [[spec/tickets/stub-takes-shape]], under the standard process
+
+## checked
+
+- the one child is the verb, its proof and its chapter. One reviewer reads its diff whole at the verdict.
+- the child's ask carries every line of the brief. The design input hands the shim and the import to later groups.
+- the child waits on no other ticket, and the design input says this group waits for nothing
 
 # children
 
