@@ -13,3 +13,8 @@ labels:
 refuses:
   - table
   - diagram
+reads:
+  - "*.md"
+  - "spec/**/*.md"
+ignores:
+  - ".se/*.md"

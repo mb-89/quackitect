@@ -172,6 +172,8 @@ layers:
         labels: [prose, table, diagram]
         refuses: [table, diagram]
         span: paragraph
+        reads: ["*.md", spec/**/*.md]
+        ignores: [.se/*.md]
 
 registers:
   prose:
