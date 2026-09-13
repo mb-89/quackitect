@@ -1,6 +1,6 @@
 ---
 kind: [[funnel]]
-about: the vehicle system: one button in the sidebar makes an independent copy of this tree that works on itself
+about: "the vehicle system: one button in the sidebar makes an independent copy of this tree that works on itself"
 ---
 
 # Scope

@@ -30,7 +30,11 @@ export function rowOf(at, level, kind, said, more = {}) {
     at,
     level: LEVELS.includes(level) ? level : "info",
     kind: String(kind),
-    said: String(said).replace(/\s+/g, " ").trim().slice(0, SAID),
+    // An answer keeps its whole text, because the owner reads it there. [[spec/design_output/log#an-answer-rides-the-tool]]
+    said:
+      String(kind) === ANSWER_KIND
+        ? String(said).replace(/\s+/g, " ").trim()
+        : String(said).replace(/\s+/g, " ").trim().slice(0, SAID),
     ...rest,
   };
 }
@@ -71,7 +75,10 @@ export function logSpec() {
       type: "object",
       properties: {
         kind: { type: "string", description: `What the line is, such as ${ANSWER_KIND}, status or note.` },
-        said: { type: "string", description: "One sentence, 80 characters at most." },
+        said: {
+          type: "string",
+          description: "One sentence, 80 characters at most. An answer carries its whole text here.",
+        },
         text: { type: "string", description: "The whole text, where said runs short." },
         level: { type: "string", enum: LEVELS, description: "info, warn or error." },
       },
