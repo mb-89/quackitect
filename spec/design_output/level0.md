@@ -816,7 +816,7 @@ takes its row, and the answer cell says what blocks it. The finding reads
 
 ## The needs table
 
-- Outcome: a numbered needs table closes every answer ending on a stop line.
+- Outcome: a numbered needs table closes every answer ending on a stop call.
 - Finding: `NeedsTable`.
 - Teacher: the stop texts in `lib/stop.js`.
 

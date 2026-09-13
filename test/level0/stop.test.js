@@ -4,18 +4,17 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
-  askForLine,
-  challenge,
+  askForStop,
   decide,
   detail,
   pool,
   reprompt,
   rulesOf,
-  stopLineIn,
+  stopAnswer,
   stopReasons,
+  stopSpec,
   todos,
   toothOf,
-  withoutStopLine,
 } from "../../.claude/skills/level0/lib/stop.js";
 
 const TABLE = [
@@ -129,61 +128,47 @@ test("the line names both sides and the count", () => {
   assert.equal(detail(voted([]), 0), "stop=none@0 continue=none@0 inARow=0");
 });
 
-test("the re-prompt says why it carries on, then asks every unclaimed stop", () => {
+test("the re-prompt says why it carries on, then asks every unclaimed stop, in five lines", () => {
   const said = reprompt(voted(["work-waiting"]));
-  assert.match(said, /^Something stands unfinished\./);
-  assert.match(said, /Stop requested\. Reason \[<id>\]\./, "it names the line");
+  assert.match(said, /^Something stands unfinished\. To stop, call mcp__level0__stop last/);
   for (const asked of ["Talk?", "A person?", "Complete?"]) {
     assert.ok(said.includes(`: ${asked}`), `it asks ${asked}`);
   }
+  assert.ok(said.split("\n").length <= 5, "five lines at most");
 });
 
-// [[spec/design_output/stop#the-line-ends-a-turn]]
-test("the line reads its reason and its context off the last line", () => {
-  const said = stopLineIn("Work done.\n\nStop requested. Reason [a-person-holds-the-answer]. Pick a road.");
-  assert.deepEqual(said, { reason: "a-person-holds-the-answer", context: "Pick a road." });
+// [[spec/design_output/stop#the-stop-is-one-call]]
+test("the tool takes one reason out of the rules, and names each one", () => {
+  const spec = stopSpec(TABLE);
+  assert.equal(spec.name, "stop");
+  assert.deepEqual(spec.inputSchema.required, ["reason", "next"]);
+  assert.deepEqual(spec.inputSchema.properties.reason.enum, ["talk", "blocked", "done"]);
+  assert.ok(spec.description.includes("done: Complete?"), "it names the question");
+  assert.equal(stopSpec([]).inputSchema.properties.reason.enum, undefined);
 });
 
-test("a line standing anywhere but last reads as no line", () => {
-  const buried = "Stop requested. Reason [the-work-stands-complete]. Done.\n\nAnd one more thing.";
-  assert.equal(stopLineIn(buried), null);
-  assert.equal(stopLineIn("nothing here"), null);
-  assert.equal(stopLineIn(""), null);
+// [[spec/design_output/stop#the-claim-rides-the-call]]
+test("a sound reason stands, a fact over it falls, and an unknown id says so", () => {
+  const stands = stopAnswer(TABLE, "talk", voted([], "talk"));
+  assert.equal(stands.ends, true);
+  assert.match(stands.result, /^The stop stands\. .*Write nothing more\.$/);
+
+  const falls = stopAnswer(TABLE, "done", voted(["work-waiting"], "done"));
+  assert.deepEqual([falls.known, falls.ends], [true, false]);
+  assert.equal(falls.result, "The stop falls. Something stands unfinished.");
+
+  const wrong = stopAnswer(TABLE, "tired", voted([], "tired"));
+  assert.equal(wrong.known, false);
+  assert.equal(wrong.result, "tired names no reason this tree holds. The ids: talk, blocked, done.");
 });
 
-test("a line the format bends reads as no line", () => {
-  assert.equal(stopLineIn("stop requested. Reason [x]. lower"), null);
-  assert.equal(stopLineIn("Stop requested. Reason x. no brackets"), null);
-  assert.equal(stopLineIn("Stop requested. Reason [Upper]. caps"), null);
-});
-
-// [[spec/design_output/stop#the-voice-skips-the-line]]
-test("the voice reads the prose, and the line stands outside it", () => {
-  const answer = "The work stands.\n\nStop requested. Reason [the-work-stands-complete]. Nothing waits.";
-  assert.equal(withoutStopLine(answer), "The work stands.");
-  assert.equal(withoutStopLine("No line here."), "No line here.");
-  assert.equal(withoutStopLine(""), "");
-});
-
-// [[spec/design_output/stop#what-the-challenge-says]]
-test("the challenge names the reason, the question and every other id", () => {
-  const said = challenge(TABLE, "done");
-  assert.match(said, /^You ask to stop for done\./);
-  assert.match(said, /going on needs the owner/);
-  assert.match(said, /hands over an update the work carries past/);
-  assert.ok(said.includes("  - talk:"), "it names another id");
-  assert.equal(said.includes("  - done:"), false, "it skips its own");
-});
-
-// [[spec/design_output/stop#a-turn-with-no-line]]
-test("the ask names the shape, and an unknown id says so", () => {
-  const bare = askForLine(TABLE);
-  assert.match(bare, /^This turn ends with no stop line/);
-  assert.match(bare, /Stop requested\. Reason \[<id>\]\./);
-  assert.ok(bare.includes("  - done:"), "it lists the ids");
-
-  const wrong = askForLine(TABLE, "i-am-tired");
-  assert.match(wrong, /^`i-am-tired` names no rule this tree holds/);
+// [[spec/design_output/stop#a-turn-with-no-call]]
+test("the ask for a stop names the call and every id, in five lines", () => {
+  const said = askForStop(TABLE);
+  assert.match(said, /^This turn ends with no stop, so it holds open\./);
+  assert.ok(said.includes("mcp__level0__stop"), "it names the call");
+  assert.ok(said.includes("  done: Complete?"), "it lists the ids");
+  assert.ok(said.split("\n").length <= 5, "five lines at most");
 });
 
 test("the reasons are the stop side claimed rules, and no other", () => {
@@ -197,11 +182,11 @@ test("the re-prompt drops the question the agent already claimed", () => {
   assert.equal(reprompt(voted(["work-waiting"], "done")).includes("Complete?"), false);
 });
 
-// [[spec/design_output/stop#the-claim-rides-the-answer]]
-test("the claim lives as long as the answer naming it, and no longer", () => {
+// [[spec/design_output/stop#the-claim-rides-the-call]]
+test("the claim lives as long as the call naming it, and no longer", () => {
   const it = toothOf();
   const said = it.atTurnEnd(voted([], "talk"));
-  assert.equal(said.stop.id, "talk", "the line's reason reaches the vote");
+  assert.equal(said.stop.id, "talk", "the call's reason reaches the vote");
   assert.equal(it.atTurnEnd(voted([])).stop, undefined, "the next turn opens with none");
 });
 
