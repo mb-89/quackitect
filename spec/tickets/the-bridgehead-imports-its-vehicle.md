@@ -81,7 +81,11 @@ record:
   - step: sync
     skipped: true
     why: the box runs off the cloud
-step: split
+  - step: split
+    hand: box d42624a67d18a8
+    hash_before: 4ab44c819b8d390fc6bb94fc105edf7d3d0b1c9b
+    hash_after: 4ab44c819b8d390fc6bb94fc105edf7d3d0b1c9b
+step: children
 ---
 
 # Ask
@@ -107,8 +111,16 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/bridgehead-imports-vehicle]], under the standard process, which becomes the next
+- [[spec/tickets/bridgehead-probe-lands]], under the trivial process
+
+## checked
+
+- each child is the probe whole, small enough to read in one sitting
+- the two children add up to the goal: the probe, its tests and the chapter. Nothing of the goal stands outside them.
+- the second child waits on no other ticket, because the first becomes it
 
 # children
 
