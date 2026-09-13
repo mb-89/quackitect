@@ -29,7 +29,7 @@
     "words": 150
   },
   "log": {
-    "comment": "The level this box writes at. info writes everything, warn writes a refusal and a fault, error writes a fault.",
+    "comment": "The level this box writes at, on the ladder debug, info, warn, error, fatal. info writes every line a door says, debug writes what the hooks see too, warn writes a refusal and a fault, error writes a fault, fatal writes what ends a session.",
     "level": "info"
   },
   "judge": {

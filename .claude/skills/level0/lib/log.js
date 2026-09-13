@@ -11,7 +11,9 @@ export const LOG_TOOL = "log";
 // [[spec/design_output/log#an-answer-stands-in-chat]]
 export const ANSWER_KIND = "answer";
 
-const LEVELS = ["info", "warn", "error"];
+// The ladder Python's logging climbs, and an empty or unknown level reads as info. [[spec/design_output/log#what-a-box-writes]]
+export const LEVELS = ["debug", "info", "warn", "error", "fatal"];
+const DEFAULT = "info";
 const SAID = 80;
 const OWN = ["at", "level", "kind", "said"];
 const NAME = /^(\d{4}-\d{2}-\d{2})T(\d{2})-(\d{2})-(\d{2})-[0-9a-z]+\.jsonl$/;
@@ -24,7 +26,7 @@ export function rowOf(at, level, kind, said, more = {}) {
   }
   return {
     at,
-    level: LEVELS.includes(level) ? level : "info",
+    level: LEVELS.includes(level) ? level : DEFAULT,
     kind: String(kind),
     // An answer keeps its whole text, because the owner reads it there. [[spec/design_output/log#an-answer-stands-in-chat]]
     said:
@@ -76,7 +78,7 @@ export function logSpec() {
           description: "One sentence, 80 characters at most. An answer carries its whole text here.",
         },
         text: { type: "string", description: "The whole text, where said runs short." },
-        level: { type: "string", enum: LEVELS, description: "info, warn or error." },
+        level: { type: "string", enum: LEVELS, description: "debug, info, warn, error or fatal." },
       },
       required: ["kind", "said"],
     },
@@ -107,9 +109,9 @@ export function writes(at, level) {
   return rank(level) >= rank(at);
 }
 
-function rank(said) {
+export function rank(said) {
   const found = LEVELS.indexOf(String(said ?? "").toLowerCase());
-  return found < 0 ? 0 : found;
+  return found < 0 ? LEVELS.indexOf(DEFAULT) : found;
 }
 
 // [[spec/design_output/log#what-a-tool-line-names]]

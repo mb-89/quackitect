@@ -15,7 +15,7 @@ The viewer reads it. For details, see [[spec/design_output/viewer]].
 | field | holds | on the row |
 |---|---|---|
 | `at` | ISO 8601 UTC with milliseconds | yes |
-| `level` | `info`, `warn` or `error` | yes |
+| `level` | `debug`, `info`, `warn`, `error` or `fatal`, and every line carries one | yes |
 | `kind` | what the line is | yes |
 | `said` | one sentence, 80 characters at most | yes |
 | `text` | the whole text, where `said` clips it | no |
@@ -25,7 +25,7 @@ The viewer shows every field the row leaves out in the details. So a field earns
 the row only where a person scans for it.
 
 `rowOf` clips `said` to 80 characters and folds its whitespace, and a level
-outside the three reads as `info`. A line written before the rename carries
+outside the five, or none, reads as `info`. A line written before the rename carries
 `door` in place of `kind`, and the viewer reads either.
 
 # A reply beside its prompt
@@ -111,15 +111,23 @@ down first, and the door adds what it refuses beneath it.
       "level": "info"
     }
 
+The ladder is the one Python's logging climbs, and a box writes the lines at
+its level and above:
+
 | level | writes |
 |---|---|
-| `info` | everything, and this is the default |
+| `debug` | what the hooks see, and everything above |
+| `info` | every line a door says, and this is the default |
 | `warn` | a refusal and a fault |
 | `error` | a fault |
+| `fatal` | what ends a session |
 
 A level the reader does not know reads as `info`, and a missing object reads as
-`info`. So a box configuring nothing writes everything. `writes` decides, and
-every writer asks it before the line lands.
+`info`. So a box configuring nothing writes every line a door says, and a debug
+line stays off its disk until it asks for it. `writes` decides, and every
+writer asks it before the line lands. The viewer holds a floor of its own over
+what the disk carries. For details, see
+[[spec/design_output/viewer#alt-l-raises-the-floor]].
 
 # Where the writer stands
 

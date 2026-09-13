@@ -125,11 +125,13 @@
         "level": {
           "type": "string",
           "enum": [
+            "debug",
             "info",
             "warn",
-            "error"
+            "error",
+            "fatal"
           ],
-          "help": "The level this box writes at. info writes every line a door says."
+          "help": "The level this box writes at. info writes every line a door says, and debug writes what the hooks see too."
         },
         "open": {
           "help": "Open the log viewer, in a terminal beside the editor.",
