@@ -30,15 +30,7 @@ process_hash: 62642eaf8f9c9c53
 
 # Ask
 
-## gain
-
-A person reads the pull as the owner meets it in a live session: the take, the hand-back, the refusal and the parked step. The engine checks stand green. What the tests leave out is how the words land on a person.
-
-## breaks
-
-The pull ships with messages no person read, so the owner learns the pull by tripping over it, and every trip costs a session.
-
-## done_when
+A person reads the pull as the owner meets it in a live session: the take, the hand-back, the refusal and the parked step. The engine checks stand green. What the tests leave out is how the words land on a person. Without this the owner learns the pull by tripping over it, and every trip costs a session. Done is four things:
 
 - the owner runs `./RUNME.sh branch take` on a group with an open child. The message names the step and the files.
 - the owner hands a thin leaf back with `./RUNME.sh branch done`. The refusal says what to write, and where.
