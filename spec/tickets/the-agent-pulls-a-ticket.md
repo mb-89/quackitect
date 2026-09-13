@@ -110,7 +110,13 @@ record:
     hand: box d49afdfe301a64
     hash_before: 4eb957b1313f06c4e69ab29a3e763b8ac34d160b
     hash_after: 4eb957b1313f06c4e69ab29a3e763b8ac34d160b
-step: children
+  - step: split
+    hand: box d49afdfe301a64
+    hash_before: ae84900b95a2c902314c4875af2398e09f692e49
+    hash_after: ae84900b95a2c902314c4875af2398e09f692e49
+    returns: 1
+    why: the hand takes it back
+step: split
 ---
 
 # Ask
