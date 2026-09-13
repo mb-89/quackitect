@@ -3,7 +3,7 @@
 // where it stands. Everything here reads or writes that one note.
 // [[spec/design_output/work#a-group-is-a-ticket]]
 
-import { readNote, readYaml } from "../../.claude/skills/level0/lib/schema.js";
+import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 
 export const TICKETS = "spec/tickets";
 export const GROUP = "group";
@@ -45,11 +45,11 @@ export function recordIn(text) {
 // [[spec/design_output/work#held-derives-from-the-record]]
 export function heldIn(text) {
   const held = recordIn(text).at(-1);
-  if (!held?.took || held.gave) return null;
+  if (!held?.hash_before || held.hash_after) return null;
   return {
     step: bare(held.step ?? ""),
     hand: bare(held.hand ?? ""),
-    took: bare(held.took),
+    hash_before: bare(held.hash_before),
   };
 }
 
@@ -67,7 +67,7 @@ export function stepOf(text) {
   return bare(front.step ?? "") || firstLeaf(front.steps);
 }
 
-// [[spec/design_output/work#a-brief-becomes-a-group]]
+// [[spec/design_output/work#a-group-is-a-ticket]]
 export function askOf(text) {
   const said = readNote(String(text ?? "")).sections.find(
     (one) => one.header.toLowerCase() === "ask",
@@ -96,7 +96,7 @@ export function withEntry(text, entry) {
 }
 
 // [[spec/design_output/work#a-box-leaves]]
-export function withGave(text, gave) {
+export function withHashAfter(text, after) {
   const rows = String(text ?? "").split("\n");
   const shut = frontShut(rows);
   const opens = shut < 0 ? -1 : keyAt(rows, shut, "record");
@@ -108,12 +108,12 @@ export function withGave(text, gave) {
   if (last < 0) return rows.join("\n");
 
   for (let at = last; at < ends; at++) {
-    if (/^\s+gave:/.test(rows[at])) {
-      rows[at] = `    gave: ${gave}`;
+    if (/^\s+hash_after:/.test(rows[at])) {
+      rows[at] = `    hash_after: ${after}`;
       return rows.join("\n");
     }
   }
-  rows.splice(ends, 0, `    gave: ${gave}`);
+  rows.splice(ends, 0, `    hash_after: ${after}`);
   return rows.join("\n");
 }
 
@@ -138,12 +138,6 @@ export function withoutField(text, key) {
 
   rows.splice(at, blockEnd(rows, at, shut) - at);
   return rows.join("\n");
-}
-
-// [[spec/design_output/work#a-brief-becomes-a-group]]
-export function routeOf(text) {
-  const said = readYaml(String(text ?? ""));
-  return { steps: said?.steps ?? [], ask: said?.ask ?? [] };
 }
 
 // [[spec/design_output/work#a-stale-group-is-yours]]

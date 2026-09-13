@@ -66,7 +66,7 @@ import {
   SESSION,
   writes,
 } from "../lib/log.js";
-import { isDraft, matches, relativeTo } from "../lib/paths.js";
+import { isDraft, relativeTo } from "../lib/paths.js";
 import { carriedFrom, NOTES, privateNow, refusedPrivate } from "../lib/private.js";
 import {
   entriesIn,
@@ -153,6 +153,7 @@ export function register(on, _options) {
   let onAHeldBranch = false;
   let owed = null;
   let inFlight = 0;
+  let indexDead = "";
   // [[spec/design_output/level0#the-door-counts-the-questions]]
   let asks = 0;
   // [[spec/design_output/level0#the-canary-owes-a-debt]]
@@ -230,8 +231,12 @@ export function register(on, _options) {
       }
     }
 
-    // [[spec/design_output/index#the-door-answers-the-tools]]
-    warms($, root);
+    // [[spec/design_output/index#a-dead-index-speaks]]
+    indexDead = "";
+    await warms($, root, async (why) => {
+      indexDead = why;
+      await logbook.say("warn", "index", "the index is dead", { detail: why });
+    });
 
     await $.tool.register(checkSpec());
     await $.tool.register(mintSpec(schemas));
@@ -483,8 +488,8 @@ export function register(on, _options) {
           ? `You stand on ${TRUNK}, so this commit would land there.`
           : `This pushes ${TRUNK}, which a cloud box may never move.`,
         "",
-        "Run `./RUNME.sh work take` to take a branch and move onto it. Push that",
-        "branch, run `work done`, and a box off the cloud takes it into trunk.",
+        "Run `./RUNME.sh branch take` to take a branch and move onto it. Push that",
+        "branch, run `branch done`, and a box off the cloud takes it into trunk.",
       ].join("\n"),
     };
     })();
@@ -648,7 +653,7 @@ export function register(on, _options) {
       ran: (name) => ranHere(name, off, hold),
     });
     const said = stopAnswer(rules, reason, decision);
-    if (said.known) claim = { reason, next: String(e.next ?? "") };
+    if (said.known) claim = { reason, next: String(e.next ?? ""), ends: said.ends };
     await logbook.say(said.known ? "info" : "warn", "stop", stopSaid(said, reason), {
       detail: detail(decision, tooth.inARow()),
     });
@@ -669,7 +674,7 @@ export function register(on, _options) {
     const name = String(e.branch ?? "").trim();
     if (!name) return { result: "review_branch takes one branch name." };
 
-    const ran = await $.process.run([...GATHER, "work", "review", name, "--json"], {
+    const ran = await $.process.run([...GATHER, "branch", "review", name, "--json"], {
       timeoutMs: GATHERING,
     });
     const material = materialOf(ran.stdout);
@@ -769,6 +774,8 @@ export function register(on, _options) {
     const stood = claim;
     claim = null;
     await dropAsk(settings, logbook);
+    // [[spec/design_output/stop#a-standing-stop-ends-it]]
+    if (stood?.ends) return said;
     if (!bin || !e.answer || e.reason !== "answer") return said;
 
     const spoken = String(e.answer ?? "");
@@ -813,6 +820,9 @@ export function register(on, _options) {
     const blocks = [...said.blocks];
     reads += 1;
 
+    // [[spec/design_output/index#a-dead-index-speaks]]
+    if (indexDead) blocks.push({ name: "level0-index", text: deadIndexBlock(indexDead) });
+
     if (standing) {
       blocks.push({
         name: "level0-rules",
@@ -843,7 +853,7 @@ export function register(on, _options) {
             ? `Before you finish: write your result and your retro into ${BRIEF}, at`
             : `Before you finish: write the next session a new ${HANDOVER}, at`,
           tracked
-            ? "that same path, then run ./RUNME.sh work done, which pushes it."
+            ? "that same path, then run ./RUNME.sh branch done, which pushes it."
             : "that same path. Say what stands, what is next, and what surprises you.",
           "",
           one.text.trim(),
@@ -862,7 +872,7 @@ export function register(on, _options) {
           "",
           "Run this first:",
           "",
-          "    ./RUNME.sh work take",
+          "    ./RUNME.sh branch take",
           "",
           "It takes the next branch nobody holds, moves you onto it, takes trunk",
           "into it, and prints the brief. Do what the brief says, and finish the",
@@ -1643,7 +1653,8 @@ async function install($) {
 
 // [[spec/design_output/index#the-door-answers-the-tools]]
 async function whereIsIndex($, root) {
-  for (const at of [`${root}/${BIN}`, `${root}/${BIN}.exe`]) {
+  const base = root ? `${root}/${BIN}` : BIN;
+  for (const at of [base, `${base}.exe`]) {
     try {
       if (await $.fs.exists(at)) return at;
     } catch {
@@ -1672,13 +1683,26 @@ async function askIndex($, root, ask) {
 }
 
 // [[spec/design_output/index#the-door-answers-the-tools]]
-function warms($, root) {
-  if (!root) return;
-  whereIsIndex($, root)
-    .then((at) =>
-      at ? $.process.run([at, "standing"], { cwd: root, timeoutMs: 60000 }) : null,
-    )
-    .catch(() => {});
+// [[spec/design_output/index#a-dead-index-speaks]]
+async function warms($, root, dead) {
+  const at = await whereIsIndex($, root);
+  if (!at) {
+    await dead(`no ${BIN} stands on this box`);
+    return;
+  }
+  $.process
+    .run([at, "standing"], { cwd: root, timeoutMs: 60000 })
+    .then((ran) => (ran?.exitCode === 0 ? null : dead(`${BIN} standing answers ${ran?.exitCode}`)))
+    .catch((why) => dead(`${BIN} standing throws: ${String(why?.message ?? why)}`));
+}
+
+// [[spec/design_output/index#a-dead-index-speaks]]
+function deadIndexBlock(why) {
+  return [
+    `The index is dead: ${why}.`,
+    "Run ./RUNME.sh, which installs Zig and builds the index, then restart the",
+    "session. Until then Grep and Glob read the disk and replace refuses.",
+  ].join("\n");
 }
 
 // [[spec/design_output/apply#bytes-in-bytes-out]]
@@ -1805,8 +1829,10 @@ async function sweeps($, root, e) {
     method: "grep",
     params: { pattern, glob, limit: 0 },
   });
-  // [[spec/design_output/apply#the-disk-stands-in]]
-  const paths = answer ? (answer.files ?? []).map((one) => one.path) : await treeFiles($, root, glob);
+  // [[spec/design_output/index#a-dead-index-speaks]]
+  if (!answer) return { why: "the index is dead, so the sweep has no list. Run ./RUNME.sh, then restart" };
+
+  const paths = (answer.files ?? []).map((one) => one.path);
   if (!paths.length) return { why: "the pattern matches nothing under that glob" };
 
   const held = await readsFiles($, root, paths);
@@ -1828,24 +1854,6 @@ async function sweeps($, root, e) {
 }
 
 // [[spec/design_output/apply#validate-everything-then-write]]
-// [[spec/design_output/apply#the-disk-stands-in]]
-async function treeFiles($, root, glob) {
-  let ran;
-  try {
-    ran = await $.process.run(["git", "ls-files", "-co", "--exclude-standard"], {
-      cwd: root,
-      timeoutMs: 20000,
-    });
-  } catch {
-    return [];
-  }
-  if (ran?.exitCode !== 0) return [];
-  return String(ran.stdout ?? "")
-    .split(/\r?\n/)
-    .map((one) => one.trim())
-    .filter((one) => one && (!glob || matches(glob, one)));
-}
-
 function wouldLand(took) {
   const rows = took.files
     .map((one) => `  ${one.file} (${took.counts[one.file]} place(s))${one.born ? ", new" : ""}`)

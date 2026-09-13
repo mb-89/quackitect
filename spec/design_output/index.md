@@ -244,9 +244,9 @@ than a walk. So a build needs a C compiler, and this tree takes them in order:
 
 | what stands | what the build uses |
 |---|---|
-| the pinned Zig | `CC=<zig> cc`, one download and no system compiler |
+| the pinned Zig in `.se/bin/zig` | `CC=<zig> cc` |
 | a working `cc`, `gcc` or `clang` | that one |
-| neither | no index, and every verb says so |
+| neither | the installer downloads the pinned Zig, and builds with it |
 
 The pin is Zig 0.16.0. The installer compiles a probe file, because a name on
 the PATH answers `--version` from a wrapper carrying no backend. Such a wrapper
@@ -256,3 +256,11 @@ fault reads as anything but a missing compiler.
 `GOFLAGS=-tags=sqlite_fts5` rides with the compiler in one place. The driver
 compiles the full-text module in only when asked, so a build carrying the one
 carries the other.
+
+## A dead index speaks
+
+- Outcome: a session with no working index hears it on turn one, and nothing falls back in silence.
+- Check: `session.start` looks for the binary and runs `standing`.
+- Log: a missing binary or a failing `standing` writes one `index` line at `warn`.
+- Block: every read of the context carries `level0-index`, naming the cause and `./RUNME.sh`.
+- Sweep: `replace` refuses on a dead index, and names the same fix.

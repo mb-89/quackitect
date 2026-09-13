@@ -76,7 +76,7 @@ import { withRoute } from "./process.js";
 import { probe } from "./probe.js";
 import { voice } from "./voice.js";
 import { ticket } from "./ticket.js";
-import { work } from "./work.js";
+import { cloud, work } from "./work.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -192,9 +192,13 @@ const verbs = {
     says: "every key, its value, and the layer answering it",
     run: async () => readConfig(rest),
   },
-  work: {
-    says: "work branches and groups: take, list, done, merge, adopt",
+  branch: {
+    says: "work branches and groups: new, take, sync, done, list, merge, close",
     run: async () => work(root, rest, it),
+  },
+  cloud: {
+    says: "the cloud routine: trigger",
+    run: async () => cloud(root, rest, it),
   },
   ticket: {
     says: "tickets that stay on this box: note, update",

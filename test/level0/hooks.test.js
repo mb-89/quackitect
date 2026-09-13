@@ -89,7 +89,7 @@ function engine(seed = {}, taught = {}) {
           .filter((one) => one.startsWith(`${path}/`))
           .map((one) => ({ name: one.slice(path.length + 1), kind: "file" })),
       exists: async (path) =>
-        taught.exists ? Boolean(taught.exists(path)) : path === VALE,
+        taught.exists ? Boolean(taught.exists(path)) : path === VALE || path === INDEX,
     },
     process: {
       run: async (argv, init) => {
@@ -172,6 +172,7 @@ async function started(seed, taught) {
 }
 
 const VALE = ".se/bin/vale";
+const INDEX = ".se/bin/se-index";
 
 function valeSaying(found) {
   return {
@@ -715,30 +716,32 @@ test("a prompt landing mid-response skips that response's silent step", async ()
   assert.equal(after.deny, undefined);
 });
 
-// [[spec/design_output/apply#the-disk-stands-in]]
-test("replace sweeps the files git lists where no index stands", async () => {
-  const it = await started(
-    { "docs/a.md": "work reroute here", "docs/b.md": "nothing", "src/c.js": "work reroute" },
-    {
-      run: (argv) =>
-        argv[0] === "git" && argv[1] === "ls-files"
-          ? { exitCode: 0, stdout: "docs/a.md\ndocs/b.md\nsrc/c.js\n", stderr: "" }
-          : { exitCode: 0, stdout: "", stderr: "" },
-    },
-  );
-  const said = await it.raise(
+// [[spec/design_output/index#a-dead-index-speaks]]
+test("a session with no index writes a warn line and hands the agent the fix", async () => {
+  const it = await started({}, { exists: (path) => path === VALE });
+  const dead = it.lines().find((one) => one.kind === "index");
+  assert.equal(dead.level, "warn");
+  assert.match(dead.detail, /no \.se\/bin\/se-index stands/);
+
+  const said = await it.raise("prompt.context", { blocks: [] });
+  const block = said.blocks.find((one) => one.name === "level0-index");
+  assert.match(block.text, /^The index is dead/);
+  assert.match(block.text, /Run \.\/RUNME\.sh/);
+
+  const swept = await it.raise(
     "tool.call",
-    {
-      tool: "mcp__level0__replace",
-      glob: "docs/**/*.md",
-      pattern: "work reroute",
-      replacement: "ticket update",
-      preview: true,
-    },
+    { tool: "mcp__level0__replace", glob: "**/*.md", pattern: "x", replacement: "y" },
     "mcp__level0__replace",
   );
-  assert.match(said.result, /^1 file\(s\) would change/);
-  assert.match(said.result, /docs\/a\.md \(1 place\(s\)\)/);
+  assert.match(swept.result, /the index is dead/);
+});
+
+// [[spec/design_output/index#a-dead-index-speaks]]
+test("a session with an index standing warms it and says nothing", async () => {
+  const it = await started();
+  assert.equal(it.lines().some((one) => one.kind === "index"), false);
+  const said = await it.raise("prompt.context", { blocks: [] });
+  assert.equal(said.blocks.some((one) => one.name === "level0-index"), false);
 });
 
 // [[spec/design_output/log#an-answer-rides-the-tool]]
@@ -1460,7 +1463,7 @@ test("the Bash description names the verbs, and answers the same string twice", 
   assert.equal(said.description, again.description);
   assert.match(said.description, /^Runs a shell command\./);
   assert.match(said.description, /\.\/RUNME\.sh check/);
-  assert.match(said.description, /\.\/RUNME\.sh work/);
+  assert.match(said.description, /\.\/RUNME\.sh branch/);
 });
 
 const NO_CAGE = { exists: () => false };
@@ -1578,7 +1581,7 @@ test("the review tool runs the verb, spawns a reader and answers the report", as
   assert.deepEqual(ran.argv, [
     "node",
     "src/scripts/cli.js",
-    "work",
+    "branch",
     "review",
     "the-config-holds-numbers",
     "--json",
@@ -1588,7 +1591,7 @@ test("the review tool runs the verb, spawns a reader and answers the report", as
   assert.match(said.result, /^check {6}passes$/m);
   assert.match(said.result, /^retro {6}present$/m);
   assert.match(said.result, /^brief {6}done$/m);
-  assert.match(said.result, /^1 thing to fix\. Run work merge once every fix lands\.$/m);
+  assert.match(said.result, /^1 thing to fix\. Run branch merge once every fix lands\.$/m);
 });
 
 // [[spec/design_output/review#where-the-spawn-refuses]]
@@ -1792,6 +1795,21 @@ const CLEAN = "word ".repeat(400).trim();
 const DRAFT = "mcp__level0__check_answer";
 
 // [[spec/design_output/level0#the-re-prompt-over-the-ceiling]]
+// [[spec/design_output/stop#a-standing-stop-ends-it]]
+test("a standing stop ends the turn, and the gate reads and writes nothing", async () => {
+  const it = await started(BANDED, valeOnAnswer(PAST));
+  const said = await stops(it);
+  assert.match(said.result, /Write the words Ending my turn, and nothing more\.$/);
+  await it.raise("turn.complete", { ...answered, answer: "Ending my turn." });
+
+  assert.equal(it.prompts.length, 0, "nothing reaches the prompt");
+  assert.equal(
+    it.lines().some((one) => one.kind === "answer" && /the gate reads/.test(one.said)),
+    false,
+    "no gate line",
+  );
+});
+
 test("an answer over the ceiling meets one re-prompt, and one alone", async () => {
   const it = await started(BANDED, valeOnAnswer(PAST));
   await it.raise("turn.complete", { ...answered, answer: OVER });
@@ -1909,16 +1927,6 @@ test("a prompt from a machine leaves the count standing", async () => {
 });
 
 // [[spec/design_output/level0#the-owner-answers-by-number]]
-test("a stop with no needs table meets a rewrite, whatever the score", async () => {
-  const it = await started(BANDED, valeOnAnswer([]));
-  await stops(it);
-  await it.raise("turn.complete", { ...answered, answer: CLEAN });
-
-  assert.equal(it.prompts.length, 1);
-  assert.match(it.prompts[0].text, /Write it again/);
-  assert.match(it.prompts[0].text, /NeedsTable/);
-});
-
 // [[spec/design_output/level0#the-cap-counts-the-prose]]
 test("the draft tool refuses a draft over the word cap", async () => {
   const capped = { "spec/config/level0.json": JSON.stringify({

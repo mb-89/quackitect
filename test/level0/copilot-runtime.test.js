@@ -239,7 +239,7 @@ test("cloud guards every tool and leaves PR operations to the dispatcher", async
     "git switch main",
     "gh pr create",
     "gh pr merge 7",
-    "node src/scripts/cli.js work release another",
+    "node src/scripts/cli.js branch release another",
   ]) {
     assert.ok(
       (

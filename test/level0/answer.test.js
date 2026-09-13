@@ -342,7 +342,7 @@ test("a needs table numbers its rows in order", () => {
 });
 
 test("a needs table cell holds no code and few words", () => {
-  const code = NEEDS_ROWS.replace("No, hold it local.", "Run `work close`.");
+  const code = NEEDS_ROWS.replace("No, hold it local.", "Run `branch close`.");
   assert.match(needsFaults(code, {})[0].message, /holds no code/);
   const long = NEEDS_ROWS.replace("No, hold it local.", "word ".repeat(CELL_WORDS + 1).trim());
   assert.match(needsFaults(long, {})[0].message, new RegExp(`holds ${CELL_WORDS + 1}`));
