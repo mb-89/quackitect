@@ -159,6 +159,7 @@ test("every layer takes its rule file, and the answer register takes its own", (
     `${TARGET}/ListItem.yml`,
     `${TARGET}/Markup.yml`,
     `${TARGET}/Modal.yml`,
+    `${TARGET}/ModalRequirement.yml`,
     `${TARGET}/Paragraph.yml`,
     `${TARGET}/ParagraphAnswer.yml`,
     `${TARGET}/PastTense.yml`,
@@ -276,7 +277,7 @@ test("the compare reads the ending this shape writes, and leaves the rest", () =
   disk.makeDir(TARGET);
 
   const first = readAll([ENTRY], disk);
-  assert.equal(first.wanted.size, 16);
+  assert.equal(first.wanted.size, 17);
   assert.deepEqual(first.faults, []);
   assert.deepEqual(
     [...new Set(staleIn(first.wanted, first.standing).map((one) => one.how))],
