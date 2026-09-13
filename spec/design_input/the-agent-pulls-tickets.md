@@ -83,7 +83,7 @@ reader:
 | `step` | the pull, as the row of the route the ticket stands on |
 | `steps` | the pull, the checks and the board |
 | `process` | the board and the retro, as the route the mint copies from |
-| `process_hash` | `work reroute` and the board, which flag a route older than its process |
+| `process_hash` | `ticket update` and the board, which flag a route older than its process |
 | `record` | the render, the checks and the retro, as the engine's entry per leaf handed back |
 | `group` | the pull, as the group this ticket lands in, and the branch where that group is the outermost |
 | `depends_on` | the pull, which holds a ticket until they close |
@@ -463,7 +463,7 @@ Each stands under `process.schema.yaml` and holds the ask's fields under
 
 A note is the smallest ticket, and it is where most work starts. A hand that
 meets an idea, a bug or a doubt mid-work writes a note and carries on. Its
-hold stays where it is. `work note` takes a name and a line, writes `from`
+hold stays where it is. `ticket note` takes a name and a line, writes `from`
 off the hold as the ticket and step in hand, and answers at once. The note is
 private and stays on the box. Its ask is one field, `line`, and the field's
 `says` carries three hints and nothing else:
@@ -486,7 +486,7 @@ A note also answers. The answer door holds every tool call until the owner's
 prompt has an answer. A prompt that says "make a note of this" wants one thing
 back: the note. So three things happen at once:
 
-- `work note` writes a `note` line to the log
+- `ticket note` writes a `note` line to the log
 - the answer door reads that line off the log, and counts it where the prompt names a note
 - the viewer draws it pink, right under the prompt
 
@@ -504,7 +504,7 @@ The mint takes `--process <name>`, copies the route, and writes the process
 file's hash beside it. So the ticket depends on nothing outside itself after
 that. A process file changes without reaching a ticket in flight, which is the
 frozen window v3 rules for an iteration. A fix to a process reaches a ticket
-through `work reroute`, which copies the current route over the leaves the
+through `ticket update`, which copies the current route over the leaves the
 ticket has yet to reach. It refuses where `step` names a leaf the new route
 lacks, and the board flags a ticket whose hash trails its process. A person
 can edit a route on a ticket by hand, and a machine at level two can write one
@@ -578,7 +578,7 @@ moves and one relation says where work lands.
     record:
       children:
         hand: box 3f9a · session 12
-        took: a1b2c3
+        hash_before: a1b2c3
     ---
 
     # Ask
@@ -599,14 +599,14 @@ into the group goes to work before the retro's last leaf.
 
 | rule | what it says |
 |---|---|
-| the branch is the claim | the take writes the hand and `took` into the group's record under `children` and pushes, and the push arbitrates two boxes |
-| held derives | a group holds where its newest record entry carries `took` and no `gave`, and `work list` reads it so |
+| the branch is the claim | the take writes the hand and `hash_before` into the group's record under `children` and pushes, and the push arbitrates two boxes |
+| held derives | a group holds where its newest record entry carries `hash_before` and no `hash_after`, and `work list` reads it so |
 | a stale group is yours | a held group whose tip is older than `work.staleAfter` stands under yours with three answers, and `release`, `take` and `close` are the verbs |
 | one box, one group | a box works one group at a time, and the group's children one at a time |
 | the branch is the filter | on a group's branch the pull sees that group alone, and widens nothing |
 | trunk hands out no group's child | on trunk the pull offers a box a group to take, and a person the tickets of no group |
 | the branch holds the truth | while the branch stands, its copy of the group and of its children is the record |
-| a box leaves | when the group's last leaf passes, it writes `gave`, closes the group as `done` where every child stands closed, and leaves it open otherwise |
+| a box leaves | when the group's last leaf passes, it writes `hash_after`, closes the group as `done` where every child stands closed, and leaves it open otherwise |
 | a group returns | an open group nobody holds comes back to the beat once a person answers on its branch |
 | the merge is a desk's | `work merge` runs on a box off the cloud, an agent's or a person's, since a cloud box pushes no trunk, and `work close` drops the branch |
 | the merge lands the truth | `work merge` runs the check on the merge commit and undoes it on red. It refuses where trunk's copy of the group or of a child differs from the branch point, and names the lines |

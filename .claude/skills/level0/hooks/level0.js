@@ -152,6 +152,7 @@ export function register(on, _options) {
   let rules = [];
   let onAHeldBranch = false;
   let owed = null;
+  let running = false;
   // [[spec/design_output/level0#the-door-counts-the-questions]]
   let asks = 0;
   // [[spec/design_output/level0#the-canary-owes-a-debt]]
@@ -258,7 +259,8 @@ export function register(on, _options) {
     const from = String(e.origin?.kind ?? "");
     tooth.sawPrompt(from === "plugin");
     gate.sawPrompt(from === "plugin");
-    if (opensATurn(e.origin)) owed = await owing($, "The owner sent a prompt");
+    // [[spec/design_output/level0#a-prompt-mid-turn]]
+    if (opensATurn(e.origin)) owed = { ...(await owing($, "The owner sent a prompt")), midTurn: running };
     // [[spec/design_output/stop#the-claim-rides-the-call]]
     if (opensATurn(e.origin)) claim = null;
     const text = String(e.text ?? "");
@@ -706,9 +708,16 @@ export function register(on, _options) {
     return said;
   });
 
+  // [[spec/design_output/level0#a-prompt-mid-turn]]
+  on("turn.start", async (_$, e, next) => {
+    running = true;
+    return next(e);
+  });
+
   on("turn.complete", async ($, e, next) => {
     const said = await next(e);
     owed = null;
+    running = false;
     // [[spec/design_output/log#a-reply-beside-its-prompt]]
     if (e.reason === "answer" && e.answer) {
       await logbook.say("info", "reply", e.answer, { text: String(e.answer) });
@@ -1138,6 +1147,8 @@ async function answerDoor($, e, it) {
   }
   if (!owed.stepped) return { owed };
 
+  // [[spec/design_output/level0#a-prompt-mid-turn]]
+  if (owed.midTurn && owed.warned) return { owed: null };
   if (!owed.warned) {
     await it.logbook.say("warn", "gate", `warned ${e.tool} before an answer`, {
       tool: e.tool,

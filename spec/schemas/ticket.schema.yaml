@@ -63,6 +63,7 @@ frontmatter:
       default:
         - name: do
           does: makes the change the ask names
+          to: retro
           evidence:
             - name: change
               form: text
@@ -126,6 +127,7 @@ frontmatter:
           input:
             type: [array, string]
             x-earlier: steps
+            x-fields: evidence
             x-words: [ask, diff]
             description: what this step reads, as ask, diff, or an earlier step
 
@@ -200,13 +202,13 @@ frontmatter:
             type: string
             description: the box, the session and the agent, where the harness names one
 
-          took:
+          hash_before:
             type: string
-            description: the branch tip at the take
+            description: the branch tip when the hand picks the step up
 
-          gave:
+          hash_after:
             type: string
-            description: the branch tip at the hand-back
+            description: the branch tip when the hand puts the step down
 
           returns:
             type: integer

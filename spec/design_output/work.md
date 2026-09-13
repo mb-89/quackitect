@@ -46,10 +46,10 @@ before the ticket system finish under the verbs they carry.
     record:
       - step: children
         hand: box d462e994b4cef
-        took: a1b2c3
+        hash_before: a1b2c3
 
 `step` is the leaf the group stands on, `hand` names the box out of
-`.se/copy.json`, and `took` is the branch tip at the claim. The push arbitrates:
+`.se/copy.json`, and `hash_before` is the branch tip at the claim. The push arbitrates:
 two boxes reaching for one group means one of them meets a rejected push and
 takes the next.
 
@@ -58,14 +58,14 @@ The hand names the box and no person, because the ticket travels and
 
 ## Held derives from the record
 
-A group holds where its newest record entry carries `took` and no `gave`.
+A group holds where its newest record entry carries `hash_before` and no `hash_after`.
 Nothing writes a status beside it, so a branch nobody holds takes no write at
 all:
 
 | the record says | the group stands at |
 |---|---|
-| nothing, or a newest entry with `gave` | `todo` |
-| a newest entry with `took` and no `gave` | `held` |
+| nothing, or a newest entry with `hash_after` | `todo` |
+| a newest entry with `hash_before` and no `hash_after` | `held` |
 | `state: closed` on the ticket | `done` |
 
 # A row per group
@@ -98,7 +98,7 @@ Under yours it carries three answers, and each is a verb:
 
 | the answer | the verb | what it does |
 |---|---|---|
-| release it | `work release <name>` | writes `gave`, so the group stands at `todo` |
+| release it | `work release <name>` | writes `hash_after`, so the group stands at `todo` |
 | take it over | `work take` | claims it again, with a record entry of its own |
 | close it | `work close <name> --force` | drops the branch, and the work on it |
 
@@ -107,7 +107,7 @@ nothing writes to a branch nobody holds.
 
 # A box leaves
 
-`work done` on a group branch writes `gave` into the newest record entry, which
+`work done` on a group branch writes `hash_after` into the newest record entry, which
 is the box saying it leaves. Then it reads the children:
 
 | what stands | what the group becomes |

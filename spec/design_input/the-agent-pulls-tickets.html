@@ -328,8 +328,8 @@ Shaded fields are the verbs' to write; a hand edit by an agent to any of them is
 <span class="e">record:</span>
 <span class="e">  design/draft:</span>
 <span class="e">    hand: box 3f9a · session 12</span>
-<span class="e">    took: a1b2c3</span>
-<span class="e">    gave: d4e5f6</span>
+<span class="e">    hash_before: a1b2c3</span>
+<span class="e">    hash_after: d4e5f6</span>
 <span class="e">    answered:</span>
 <span class="e">      note: resolves</span>
 <span class="e">    returns: 0</span>
@@ -855,7 +855,7 @@ the same shape.</p>
     <text x="820" y="236" text-anchor="middle" fill="var(--muted)" font-size="11.5">then work close drops the branch</text>
     <text x="200" y="62" text-anchor="start" fill="var(--accent)" font-weight="700">work/voice</text>
     <text x="230" y="105" text-anchor="middle" font-size="11.5">take</text>
-    <text x="230" y="120" text-anchor="middle" fill="var(--muted)" font-size="11">took, in the record</text>
+    <text x="230" y="120" text-anchor="middle" fill="var(--muted)" font-size="11">hash_before, in the record</text>
     <text x="230" y="134" text-anchor="middle" fill="var(--muted)" font-size="11">the push is the claim</text>
     <text x="360" y="105" text-anchor="middle" font-size="11.5">ticket a · pass</text>
     <text x="490" y="105" text-anchor="middle" font-size="11.5">ticket b · pass</text>
@@ -863,7 +863,7 @@ the same shape.</p>
     <text x="620" y="120" text-anchor="middle" fill="var(--muted)" font-size="11">a person step waits;</text>
     <text x="620" y="134" text-anchor="middle" fill="var(--muted)" font-size="11">the box goes on with d</text>
     <text x="740" y="105" text-anchor="middle" font-size="11.5">retro</text>
-    <text x="740" y="120" text-anchor="middle" fill="var(--muted)" font-size="11">gave, and closed</text>
+    <text x="740" y="120" text-anchor="middle" fill="var(--muted)" font-size="11">hash_after, and closed</text>
   </g>
   <g fill="none" stroke="var(--muted)" stroke-width="1.2">
     <path d="M680,40 L680,30 L800,30 L800,40"/>
@@ -879,15 +879,15 @@ who holds it or since when: git does.</figcaption>
 
 <div class="scroll"><table>
 <tr><th>rule</th><th>what it says</th></tr>
-<tr><td>the branch is the claim</td><td>the take writes the hand and <code>took</code> into the group's record under <code>children</code> and pushes, and the push arbitrates two boxes</td></tr>
-<tr><td>held derives</td><td>a group holds where its newest record entry carries <code>took</code> and no <code>gave</code>, and <code>work list</code> reads it so</td></tr>
+<tr><td>the branch is the claim</td><td>the take writes the hand and <code>hash_before</code> into the group's record under <code>children</code> and pushes, and the push arbitrates two boxes</td></tr>
+<tr><td>held derives</td><td>a group holds where its newest record entry carries <code>hash_before</code> and no <code>hash_after</code>, and <code>work list</code> reads it so</td></tr>
 <tr><td>a group has a route</td><td>the ticket carries the <code>group</code> route, and the pull hands its leaves out around the children</td></tr>
 <tr><td>a stale group is yours</td><td>a held group whose tip is older than <code>work.staleAfter</code> stands under yours with three answers, and <code>release</code>, <code>take</code> and <code>close</code> are the verbs</td></tr>
 <tr><td>one box, one group</td><td>a box works one group at a time, and the group's children one at a time</td></tr>
 <tr><td>the branch is the filter</td><td>on a group's branch the pull sees that group's tickets alone, and widens nothing; a filter a person sets in config outranks the branch</td></tr>
 <tr><td>trunk hands out no group's ticket</td><td>on trunk the pull offers a box a group to take, and a person the tickets of no group; a group's tickets are worked on its branch alone</td></tr>
 <tr><td>the branch holds the truth</td><td>while the branch stands, its copy of the group and of its children is the record</td></tr>
-<tr><td>a box leaves</td><td>when the group's last leaf passes, it writes <code>gave</code>, closes the group as <code>done</code> where every child stands closed, and leaves it open otherwise</td></tr>
+<tr><td>a box leaves</td><td>when the group's last leaf passes, it writes <code>hash_after</code>, closes the group as <code>done</code> where every child stands closed, and leaves it open otherwise</td></tr>
 <tr><td>a group returns</td><td>an open group nobody holds comes back to the beat once a person answers on its branch</td></tr>
 <tr><td>the merge is a desk's</td><td><code>work merge</code> runs on a box off the cloud, an agent's or a person's, since a cloud box pushes no trunk, and <code>work close</code> drops the branch</td></tr>
 <tr><td>the merge lands the truth</td><td><code>work merge</code> runs the check on the merge commit and undoes it on red; it refuses where trunk's copy of the group or of a child differs from the branch point, and names the lines</td></tr>

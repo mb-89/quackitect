@@ -698,6 +698,30 @@ test("a response with no answer earns one warning on the next call, then a refus
   ]);
 });
 
+// [[spec/design_output/level0#a-prompt-mid-turn]]
+test("a prompt arriving mid-turn earns one warning at most, and no refusal", async () => {
+  const it = await started();
+  await it.raise("turn.start", { turnId: "t" });
+  await it.raise("prompt.submit", { text: "and push it", origin: { kind: "composer" } });
+  await it.raise("turn.step", { turnId: "t", index: 3, answer: "", toolUses: [], stopReason: "tool_use" });
+
+  const warned = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.equal(warned.deny, undefined);
+  assert.match(warned.context.at(-1), /^The owner sent a prompt/);
+
+  for (let i = 0; i < 3; i++) {
+    const said = await it.raise("tool.call", { tool: "Read", file_path: `${i}.md` });
+    assert.equal(said.deny, undefined, "the response in flight carries no refusal");
+  }
+
+  await it.raise("turn.complete", { ...answered, answer: "pushed" });
+  await it.raise("prompt.submit", { text: "build the door", origin: { kind: "composer" } });
+  await it.raise("turn.step", { turnId: "u", index: 0, answer: "", toolUses: [], stopReason: "tool_use" });
+  await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  const refused = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.match(refused.deny, /^The owner sent a prompt\./, "a prompt opening a turn still binds");
+});
+
 // [[spec/design_output/level0#a-step-carries-the-answer]]
 test("a step carrying text answers the prompt, and every call after it passes", async () => {
   const it = await started();
