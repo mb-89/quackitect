@@ -32,12 +32,17 @@
         "warnAt": {
           "type": "number",
           "unit": "findings a thousand words",
-          "help": "The score where the findings start riding the next prompt."
+          "help": "The score where the gate starts writing a warn line to the log."
         },
         "ceiling": {
           "type": "number",
           "unit": "findings a thousand words",
           "help": "The score where the gate asks for one rewrite."
+        },
+        "words": {
+          "type": "number",
+          "unit": "words",
+          "help": "The words an answer holds outside its code and tables."
         }
       }
     },
@@ -198,6 +203,20 @@
           "type": "number",
           "unit": "words",
           "help": "The words a file, a folder and a branch name each hold at most."
+        }
+      }
+    },
+    "work": {
+      "comment": "Level one. The knobs the work verbs read over a group and its tickets.",
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "staleAfter": {
+          "type": "string",
+          "unit": "a span, as 90m, 12h or 3d",
+          "help": "The age of a held group's tip that puts it under yours."
         }
       }
     },

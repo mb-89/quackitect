@@ -2,7 +2,6 @@
 # pair of eyes after. The ask is the owner's words, the design phase turns
 # them into an approach a reader can disagree with, and the rest implements it.
 # [[spec/design_input/the-agent-pulls-tickets#the-route]]
-name: standard
 for: a change that wants an approach first, tests before code, and a second pair of eyes after
 ask:
   - name: gain

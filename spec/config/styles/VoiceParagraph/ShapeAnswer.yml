@@ -84,3 +84,36 @@ script: |
     runEnd = row.end
   }
   closeRun()
+
+  opened := false
+  first := {said: "", begin: 0, end: 0}
+  fence := false
+
+  for row in rows(said) {
+    if opened { break }
+    line := text.trim_space(row.said)
+    if text.has_prefix(line, "```") {
+      fence = !fence
+      continue
+    }
+    if fence { continue }
+    if len(line) == 0 { continue }
+    if text.has_prefix(line, "|") { continue }
+    first = row
+    opened = true
+  }
+
+  if opened {
+    head := text.trim_space(first.said)
+    if !text.re_match(`^(?:[-*+]|[0-9]+[.)])\s+\S`, head) {
+      why := "An answer opens with a list, one sentence an item and one bottom line each. Write that list here."
+      if text.has_prefix(head, "#") {
+        why = "A heading stands under the TL;DR list, and this one opens the answer. Write the list first."
+      }
+      matches = append(matches, {
+        begin: first.begin,
+        end: first.end,
+        message: why
+      })
+    }
+  }

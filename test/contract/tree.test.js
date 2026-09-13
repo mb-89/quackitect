@@ -429,19 +429,30 @@ test("npm reaches the extension alone, and the root of the tree stays bare", () 
 });
 
 // [[spec/design_output/extension#the-editor-is-a-door]]
-test("the extension imports the editor and its own folder, and nothing else", () => {
+test("the extension imports the editor, its own folder, and what it declares", () => {
   const found = proc().run(["git", "ls-files", "src/extension/**.js"], { cwd: root });
   const paths = found.stdout.split(/\r?\n/).filter(Boolean);
   assert.ok(paths.length > 5, "the extension carries its modules");
+
+  const declared = Object.keys(read("src/extension/package.json").dependencies ?? {});
+  const named = (said) => declared.some((one) => said === one || said.startsWith(`${one}/`));
 
   for (const path of paths) {
     const text = files.read(join(root, path));
     for (const hit of text.matchAll(/(?:from|require\()\s*["']([^"']+)["']/g)) {
       const said = hit[1];
-      if (said === "vscode") continue;
+      if (said === "vscode" || named(said)) continue;
       assert.match(said, /^\.\.?\//, `${path} imports ${said} as a path of its own`);
       assert.ok(!said.includes("../../"), `${path} stays inside src/extension`);
     }
+  }
+});
+
+// [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
+test("every package the extension declares carries an exact version", () => {
+  const declared = read("src/extension/package.json").dependencies ?? {};
+  for (const [name, said] of Object.entries(declared)) {
+    assert.match(said, /^\d+\.\d+\.\d+$/, `${name} names one version and no range`);
   }
 });
 

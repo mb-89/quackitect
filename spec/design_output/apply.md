@@ -62,6 +62,12 @@ agent who counts first learns at once when the tree disagrees.
 walk. It reads those files, keeps the ones a JavaScript regex agrees with, and
 hands the rest to the same manifest `patch` runs.
 
+## The disk stands in
+
+- Outcome: `replace` sweeps a tree where no index stands.
+- List: `git ls-files -co --exclude-standard`, cut to the glob.
+- Cause: the index needs a C compiler, and a box without one leaves it absent.
+
 ## The journal holds both halves
 
 `.se/undo/<time>.json` holds every file this apply touches: `was`, the text

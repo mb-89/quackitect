@@ -32,8 +32,9 @@ function slashed(said) {
 
 function globOf(glob) {
   const said = String(glob ?? "")
-    .split(/(\*\*|\*|\?)/)
+    .split(/(\*\*\/|\*\*|\*|\?)/)
     .map((part) => {
+      if (part === "**/") return "(?:.*/)?";
       if (part === "**") return ".*";
       if (part === "*") return "[^/]*";
       if (part === "?") return "[^/]";

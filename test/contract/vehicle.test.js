@@ -74,7 +74,13 @@ test("a copy answers its own verbs, with no tree behind it", () => {
   try {
     produce(files, root, dest);
 
-    const said = outside.run([SHELL, "RUNME.sh", "vehicle"], { cwd: dest });
+    // [[spec/design_output/vehicle#a-vehicle-stands-alone]]
+    const home = join(where, "home");
+    files.makeDir(join(home, ".vscode", "extensions"));
+    const said = outside.run([SHELL, "RUNME.sh", "vehicle"], {
+      cwd: dest,
+      env: { HOME: home, USERPROFILE: home },
+    });
     assert.equal(said.exitCode, 0, said.stderr);
     assert.match(said.stdout, new RegExp(`method\\s+${either(dest)}`), "it names itself as method");
     assert.match(said.stdout, new RegExp(`work\\s+${either(dest)}`), "and as work");

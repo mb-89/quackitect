@@ -10,10 +10,14 @@ import {
   checkSpec,
   gateOf,
   lastSaid,
+  lengthFaults,
+  needsFaults,
   opensATurn,
+  questionsIn,
   reachesTheOwner,
   SAYS,
   scoreOf,
+  tableFaults,
   warns,
 } from "../lib/answer.js";
 import {
@@ -21,6 +25,7 @@ import {
   findings as readsCommand,
   skipsTheHook,
   verbLine,
+  withoutTrailers,
 } from "../lib/bash.js";
 import { CODE, formatText, lintText as lintCode } from "../lib/code.js";
 import { configOf, SCHEMA, TRACKED } from "../lib/config.js";
@@ -54,13 +59,14 @@ import {
   aimOf,
   appended,
   archiveOf,
+  answersTheOwner,
   LOG_TOOL,
   logSpec,
   rowOf,
   SESSION,
   writes,
 } from "../lib/log.js";
-import { isDraft, relativeTo } from "../lib/paths.js";
+import { isDraft, matches, relativeTo } from "../lib/paths.js";
 import { carriedFrom, NOTES, privateNow, refusedPrivate } from "../lib/private.js";
 import {
   entriesIn,
@@ -72,7 +78,6 @@ import {
 } from "../lib/projection.js";
 import {
   answerFindings,
-  carried,
   refusal,
   refusedCommand,
   refusedDelta,
@@ -93,20 +98,20 @@ import {
   schemasFrom,
   strangerFault,
 } from "../lib/schema.js";
+import { refusedTicket, ticketFaults } from "../lib/ticket.js";
 import { guesses, pathOf, surveyOf, TOOLS } from "../lib/tools.js";
 import {
-  askForLine,
-  challenge,
+  askForStop,
   decide,
   detail,
   pool,
   reprompt,
   RULES,
-  stopLineIn,
-  stopReasons,
+  STOP_CALL,
+  stopAnswer,
+  stopSpec,
   todos,
   toothOf,
-  withoutStopLine,
 } from "../lib/stop.js";
 import { saysGreen, STAMP, stampOf } from "../lib/runs.js";
 import { landsOnTrunk, touchesGit } from "../lib/trunk.js";
@@ -147,10 +152,13 @@ export function register(on, _options) {
   let rules = [];
   let onAHeldBranch = false;
   let owed = null;
+  let inFlight = 0;
+  // [[spec/design_output/level0#the-door-counts-the-questions]]
+  let asks = 0;
   // [[spec/design_output/level0#the-canary-owes-a-debt]]
   let owesCanary = null;
-  // [[spec/design_output/stop#the-line-ends-a-turn]]
-  let stopAsked = false;
+  // [[spec/design_output/stop#the-claim-rides-the-call]]
+  let claim = null;
   const seen = { ask: QUIET, hold: "running" };
   let root = "";
   let projections = [];
@@ -232,11 +240,14 @@ export function register(on, _options) {
     await $.tool.register(patchSpec());
     await $.tool.register(replaceSpec());
     await $.tool.register(undoSpec());
+    await $.tool.register(stopSpec(rules));
     return next(e);
   });
 
   // [[spec/design_output/log#the-log-tool]]
   on("tool.call", { tool: `mcp__level0__${LOG_TOOL}` }, async (_$, e, _next) => {
+    // [[spec/design_output/log#an-answer-rides-the-tool]]
+    if (answersTheOwner(e)) owed = null;
     const row = await logbook.say(
       String(e.level ?? "info"),
       String(e.kind ?? "note"),
@@ -250,21 +261,17 @@ export function register(on, _options) {
     const from = String(e.origin?.kind ?? "");
     tooth.sawPrompt(from === "plugin");
     gate.sawPrompt(from === "plugin");
-    if (opensATurn(e.origin)) owed = await owing($, "The owner sent a prompt");
-    // [[spec/design_output/stop#the-challenge-spends-one-allowance]]
-    if (opensATurn(e.origin)) stopAsked = false;
+    // [[spec/design_output/level0#a-prompt-mid-turn]]
+    if (opensATurn(e.origin)) {
+      owed = { ...(await owing($, "The owner sent a prompt")), skips: inFlight > 0 ? 1 : 0 };
+    }
+    // [[spec/design_output/stop#the-claim-rides-the-call]]
+    if (opensATurn(e.origin)) claim = null;
     const text = String(e.text ?? "");
+    // [[spec/design_output/level0#the-door-counts-the-questions]]
+    if (opensATurn(e.origin)) asks = questionsIn(text);
     await logbook.say("info", "prompt", text, { detail: from, text });
-
-    // [[spec/design_output/level0#the-carry-rides-a-prompt]]
-    const held = opensATurn(e.origin) ? gate.takeWaiting() : null;
-    if (!held) return next(e);
-    const line = carried(held.found, held.score);
-    // [[spec/design_output/log#a-row-carries-its-kind]]
-    await logbook.say("info", "gate", "the findings ride this prompt", {
-      detail: `score=${held.score} findings=${held.found.length}`,
-    });
-    return next({ ...e, text: [text, line].filter(Boolean).join("\n\n") });
+    return next(e);
   });
 
   // [[spec/design_output/log#what-a-tool-line-names]]
@@ -276,7 +283,10 @@ export function register(on, _options) {
     take();
 
     tooth.sawCall(String(e.tool ?? ""));
+    inFlight += 1;
     list.sawCall(e);
+    // [[spec/design_output/stop#the-claim-rides-the-call]]
+    if (String(e.tool ?? "") !== STOP_CALL) claim = null;
     await logbook.say("info", "tool", aimOf(e), { tool: e.tool });
 
     if (!well.ok && !repairs(e, asWrite(e))) {
@@ -359,7 +369,7 @@ export function register(on, _options) {
       }
 
       const schema = schemas.get(kind);
-      const found = schema ? checkNote(whole, schema, where) : [];
+      const found = schema ? checkNote(whole, schema, where, schemas) : [];
       if (found.length) {
         await logbook.say("warn", "schema", `refused ${found.length} line(s) in ${where}`, {
           file: where,
@@ -367,6 +377,19 @@ export function register(on, _options) {
           tool: e.tool,
         });
         return { deny: refusedNote(where, kind, found) };
+      }
+
+      // [[spec/design_output/schema#the-three-places]]
+      const held = schema
+        ? ticketFaults(await textAt($, writing.path), whole, schema, where)
+        : [];
+      if (held.length) {
+        await logbook.say("warn", "ticket", `refused ${held.length} line(s) in ${where}`, {
+          file: where,
+          rule: held[0]?.rule,
+          tool: e.tool,
+        });
+        return { deny: refusedTicket(where, kind, held) };
       }
     }
 
@@ -589,8 +612,7 @@ export function register(on, _options) {
 
   // [[spec/design_output/level0#the-tool-reads-a-draft]]
   on("tool.call", { tool: `mcp__level0__${CHECK}` }, async ($, e, _next) => {
-    // [[spec/design_output/stop#the-voice-skips-the-line]]
-    const text = withoutStopLine(String(e.text ?? ""));
+    const text = String(e.text ?? "");
     if (!text.trim()) return { result: `${CHECK} takes the text of one draft.` };
     if (!bin) return { result: "No vale stands here, so the draft goes unread." };
 
@@ -600,12 +622,37 @@ export function register(on, _options) {
     });
     if (!ran.ran) return { result: `Vale read nothing: ${ran.why}` };
 
-    const score = scoreOf(text, ran.found);
-    const band = ran.found.length ? bandOf(score, await bands(settings)) : "clean";
+    // [[spec/design_output/level0#the-table-answers-every-question]]
+    // [[spec/design_output/level0#the-owner-answers-by-number]]
+    const found = [
+      ...tableFaults(text, asks),
+      ...needsFaults(text, Boolean(e.stop)),
+      ...lengthFaults(text, await settings.ask("answer.words")),
+      ...ran.found,
+    ];
+    const score = scoreOf(text, found);
+    const band = found.length ? bandOf(score, await bands(settings), found) : "clean";
     await logbook.say("info", "answer", `a draft reads ${band}`, {
-      detail: `score=${score} findings=${ran.found.length}`,
+      detail: `score=${score} findings=${found.length}`,
     });
-    return { result: answerFindings(ANSWER, { found: ran.found, score, band }) };
+    return { result: answerFindings(ANSWER, { found, score, band }) };
+  });
+
+  // [[spec/design_output/stop#the-stop-is-one-call]]
+  on("tool.call", { tool: STOP_CALL }, async (_$, e, _next) => {
+    const off = (await settings.ask("stop.enabled")) === false;
+    const hold = await settings.ask("stop.hold");
+    const reason = String(e.reason ?? "");
+    const decision = decide(rules, {
+      claimed: reason,
+      ran: (name) => ranHere(name, off, hold),
+    });
+    const said = stopAnswer(rules, reason, decision);
+    if (said.known) claim = { reason, next: String(e.next ?? "") };
+    await logbook.say(said.known ? "info" : "warn", "stop", stopSaid(said, reason), {
+      detail: detail(decision, tooth.inARow()),
+    });
+    return { result: said.result };
   });
 
   // [[spec/design_output/level0#the-helper-takes-the-guidance]]
@@ -646,8 +693,19 @@ export function register(on, _options) {
   // [[spec/design_output/level0#a-step-streams]]
   on("turn.step", async function* (_$, e, next) {
     const said = yield* next(e);
+    inFlight = 0;
     if (!owed || (await settings.ask("answer.enabled")) === false) return said;
     const text = String(e.answer ?? "").trim();
+    // [[spec/design_output/level0#a-prompt-mid-turn]]
+    if (owed.skips > 0 || !text) {
+      await logbook.say("info", "step", `step ${e.index} carries ${text.length} character(s)`, {
+        detail: `skips=${owed.skips ?? 0} stepped=${Boolean(owed.stepped)}`,
+      });
+    }
+    if (owed.skips > 0) {
+      owed = { ...owed, skips: owed.skips - 1 };
+      return said;
+    }
     if (text) {
       await logbook.say("info", "answer", text, { text, detail: owed.why });
       owed = null;
@@ -660,6 +718,7 @@ export function register(on, _options) {
   on("turn.complete", async ($, e, next) => {
     const said = await next(e);
     owed = null;
+    inFlight = 0;
     // [[spec/design_output/log#a-reply-beside-its-prompt]]
     if (e.reason === "answer" && e.answer) {
       await logbook.say("info", "reply", e.answer, { text: String(e.answer) });
@@ -704,34 +763,41 @@ export function register(on, _options) {
           off,
           // [[spec/design_output/stop#the-canary-ends-turn-one]]
           saidCanary: canaryIn(e.answer, sentence).found === "same",
-          // [[spec/design_output/stop#the-challenge-spends-one-allowance]]
-          asked: () => stopAsked,
-          asks: () => {
-            stopAsked = true;
-          },
+          // [[spec/design_output/stop#the-claim-rides-the-call]]
+          claim,
         });
+    const stood = claim;
+    claim = null;
     await dropAsk(settings, logbook);
     if (!bin || !e.answer || e.reason !== "answer") return said;
 
-    // [[spec/design_output/stop#the-voice-skips-the-line]]
-    const spoken = withoutStopLine(e.answer);
+    const spoken = String(e.answer ?? "");
     const ran = await lintText(spoken, ANSWER, {
       bin,
       run: (argv, init) => $.process.run(argv, init),
     });
     if (!ran.ran) return said;
 
+    // [[spec/design_output/level0#the-table-answers-every-question]]
+    // [[spec/design_output/level0#the-owner-answers-by-number]]
+    const found = [
+      ...tableFaults(spoken, asks),
+      ...needsFaults(spoken, stood),
+      ...lengthFaults(spoken, await settings.ask("answer.words")),
+      ...ran.found,
+    ];
+
     // [[spec/design_output/level0#the-three-bands]]
     const read = gate.atTurnEnd({
       ...(await bands(settings)),
       text: spoken,
-      found: ran.found,
+      found,
       mostInARow,
       toothSpoke: Boolean(bit?.sent),
     });
     const level = read.band === "clean" ? "info" : "warn";
     await logbook.say(level, "answer", `the gate reads ${read.band}`, {
-      detail: `score=${read.score} findings=${ran.found.length} inARow=${gate.inARow()}`,
+      detail: `score=${read.score} findings=${found.length} inARow=${gate.inARow()}`,
     });
     if (!read.sends) return said;
 
@@ -1144,6 +1210,7 @@ async function commitVoice($, command, bin) {
       return [];
     }
   }
+  text = withoutTrailers(text);
   if (!text.trim()) return [];
 
   const ran = await lintText(text, COMMIT, {
@@ -1259,22 +1326,18 @@ async function forceCompaction($, logbook) {
 async function bite($, e, it) {
   if (e.reason !== "answer") return { sent: false };
 
-  // [[spec/design_output/stop#the-line-ends-a-turn]]
-  const line = stopLineIn(e.answer);
-  const known = line && stopReasons(it.rules).some((one) => one.id === line.reason);
-
-  if (it.off) return voteNow($, e, it, line?.reason);
-  if (!line && !it.saidCanary) return holdOpen($, it, askForLine(it.rules), "no line");
-  if (line && !known) {
-    return holdOpen($, it, askForLine(it.rules, line.reason), `${line.reason} is unknown`);
+  // [[spec/design_output/stop#a-turn-with-no-call]]
+  const reason = it.claim?.reason;
+  if (!reason && !it.saidCanary && !it.off) {
+    return holdOpen($, it, askForStop(it.rules), "no stop");
   }
-  // [[spec/design_output/stop#the-challenge-spends-one-allowance]]
-  if (line && !it.asked()) {
-    it.asks();
-    return holdOpen($, it, challenge(it.rules, line.reason), `${line.reason} meets the challenge`);
-  }
+  return voteNow($, e, it, reason);
+}
 
-  return voteNow($, e, it, line?.reason);
+// [[spec/design_output/stop#every-decision-writes-a-line]]
+function stopSaid(said, reason) {
+  if (!said.known) return `${reason} names no reason this tree holds`;
+  return said.ends ? "the stop stands" : "the stop falls";
 }
 
 // [[spec/design_output/stop#the-vote]]
@@ -1306,7 +1369,7 @@ async function voteNow($, e, it, reason) {
   return { sent: true };
 }
 
-// [[spec/design_output/stop#the-line-ends-a-turn]]
+// [[spec/design_output/stop#a-turn-with-no-call]]
 async function holdOpen($, it, text, why) {
   await it.logbook.say("info", "stop", "the turn goes on", { detail: why });
   try {
@@ -1742,9 +1805,8 @@ async function sweeps($, root, e) {
     method: "grep",
     params: { pattern, glob, limit: 0 },
   });
-  if (!answer) return { why: "the index answers nothing here, so the sweep has no list to work" };
-
-  const paths = (answer.files ?? []).map((one) => one.path);
+  // [[spec/design_output/apply#the-disk-stands-in]]
+  const paths = answer ? (answer.files ?? []).map((one) => one.path) : await treeFiles($, root, glob);
   if (!paths.length) return { why: "the pattern matches nothing under that glob" };
 
   const held = await readsFiles($, root, paths);
@@ -1766,6 +1828,24 @@ async function sweeps($, root, e) {
 }
 
 // [[spec/design_output/apply#validate-everything-then-write]]
+// [[spec/design_output/apply#the-disk-stands-in]]
+async function treeFiles($, root, glob) {
+  let ran;
+  try {
+    ran = await $.process.run(["git", "ls-files", "-co", "--exclude-standard"], {
+      cwd: root,
+      timeoutMs: 20000,
+    });
+  } catch {
+    return [];
+  }
+  if (ran?.exitCode !== 0) return [];
+  return String(ran.stdout ?? "")
+    .split(/\r?\n/)
+    .map((one) => one.trim())
+    .filter((one) => one && (!glob || matches(glob, one)));
+}
+
 function wouldLand(took) {
   const rows = took.files
     .map((one) => `  ${one.file} (${took.counts[one.file]} place(s))${one.born ? ", new" : ""}`)
@@ -1809,6 +1889,15 @@ async function stands($, path) {
     return true;
   } catch {
     return false;
+  }
+}
+
+// [[spec/design_output/schema#the-three-places]]
+async function textAt($, path) {
+  try {
+    return String(await $.fs.read(path));
+  } catch {
+    return "";
   }
 }
 

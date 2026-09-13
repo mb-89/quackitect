@@ -1,7 +1,6 @@
 # A fix small enough that the ask is the design. One step, and the ask
 # carries the criteria, so the mint refuses a thin one before anyone works it.
 # [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
-name: trivial
 for: a fix small enough that the ask is the design
 ask:
   - name: gain
