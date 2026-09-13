@@ -9,6 +9,10 @@ export const RULES = "spec/config/stop";
 export const OFF = "stop-hook-off";
 export const FRESH = 10;
 
+// [[spec/design_output/stop#the-stop-is-one-call]]
+export const STOP_TOOL = "stop";
+export const STOP_CALL = `mcp__level0__${STOP_TOOL}`;
+
 const NEEDS = ["id", "side", "priority", "decides"];
 const SIDES = ["stop", "continue"];
 const DECIDES = ["claimed", "mechanical"];
@@ -93,86 +97,72 @@ export function detail(decision, inARow) {
   return `stop=${named(decision.stop)} continue=${named(decision.go)} inARow=${inARow}`;
 }
 
-// [[spec/design_output/stop#what-the-re-prompt-says]]
-export function reprompt(decision) {
-  return [
-    decision.go?.says ?? "",
-    "",
-    "Where that reading falls, end your next answer with this line, last:",
-    "",
-    "  Stop requested. Reason [<id>]. <what the owner does next>",
-    "",
-    ...decision.unclaimed.map((one) => `  - ${one.id}: ${one.asks}`),
-  ]
-    .join("\n")
-    .trimStart();
-}
-
-// [[spec/design_output/stop#the-line-ends-a-turn]]
-export const LINE = /^Stop requested\. Reason \[([a-z0-9-]+)\]\.\s*(.*)$/;
-
-export function stopLineIn(answer) {
-  const rows = String(answer ?? "")
-    .split(/\r?\n/)
-    .map((one) => one.trim())
-    .filter(Boolean);
-  const found = LINE.exec(rows[rows.length - 1] ?? "");
-  if (!found) return null;
-  return { reason: found[1], context: found[2].trim() };
-}
-
-// [[spec/design_output/stop#the-voice-skips-the-line]]
-export function withoutStopLine(answer) {
-  const rows = String(answer ?? "").split(/\r?\n/);
-  while (rows.length && !rows[rows.length - 1].trim()) rows.pop();
-  if (rows.length && LINE.test(rows[rows.length - 1].trim())) {
-    rows.pop();
-    while (rows.length && !rows[rows.length - 1].trim()) rows.pop();
-  }
-  return rows.join("\n");
-}
-
 export function stopReasons(rules) {
   return (rules ?? []).filter(asks);
 }
 
-// [[spec/design_output/stop#what-the-challenge-says]]
-export function challenge(rules, reason) {
-  const named = stopReasons(rules).find((one) => one.id === reason);
-  const others = stopReasons(rules).filter((one) => one.id !== reason);
+// [[spec/design_output/stop#the-stop-is-one-call]]
+export function stopSpec(rules) {
+  const reasons = stopReasons(rules);
+  const reason = {
+    type: "string",
+    description: "The id of your reason, one of the stop rules this tree holds.",
+  };
+  if (reasons.length) reason.enum = reasons.map((one) => one.id);
+  return {
+    name: STOP_TOOL,
+    description: [
+      "Ends this turn. Call it last, once your answer stands, and write nothing",
+      "after it. The result says whether the stop stands. Where it falls, the",
+      "result names the fact, so carry on. The reasons:",
+      ...reasons.map((one) => `${one.id}: ${one.asks}`),
+    ].join("\n"),
+    inputSchema: {
+      type: "object",
+      properties: {
+        reason,
+        next: { type: "string", description: "What the owner does next, in one sentence." },
+      },
+      required: ["reason", "next"],
+    },
+  };
+}
+
+// [[spec/design_output/stop#the-claim-rides-the-call]]
+export function stopAnswer(rules, reason, decision) {
+  const known = stopReasons(rules).some((one) => one.id === reason);
+  if (!known) {
+    const ids = stopReasons(rules)
+      .map((one) => one.id)
+      .join(", ");
+    return { known, ends: false, result: `${reason} names no reason this tree holds. The ids: ${ids}.` };
+  }
+  if (decision.ends) {
+    const why = decision.stop?.says ?? "";
+    return { known, ends: true, result: `The stop stands. ${why} Write nothing more.`.replace(/\s+/g, " ") };
+  }
+  return { known, ends: false, result: `The stop falls. ${decision.go?.says ?? ""}`.trim() };
+}
+
+// [[spec/design_output/stop#what-the-re-prompt-says]]
+export function reprompt(decision) {
+  const why = decision.go?.says ?? "";
   return [
-    `You ask to stop for ${reason}. ${named?.says ?? named?.asks ?? ""}`.trim(),
-    "",
-    "Read this before your next step, and answer it to yourself.",
-    "",
-    "  - going on needs the owner, so the stop stands",
-    "  - the stop hands over an update the work carries past",
-    "",
-    "An update is a line in your next answer, and the work goes on under it.",
-    "",
-    "Where the stop stands, end your next answer with the same line and this",
-    "turn ends. Where it falls, carry on and say nothing of it.",
-    ...(others.length ? ["", "The other reasons this tree holds:"] : []),
-    ...others.map((one) => `  - ${one.id}: ${one.says ?? one.asks}`),
+    `${why} To stop, call ${STOP_CALL} last, with one reason:`.trim(),
+    ...askLines(decision.unclaimed),
   ].join("\n");
 }
 
-// [[spec/design_output/stop#a-turn-with-no-line]]
-export function askForLine(rules, said) {
-  const opens = said
-    ? `\`${said}\` names no rule this tree holds, so the turn holds open.`
-    : "This turn ends with no stop line, so level zero holds it open.";
+// [[spec/design_output/stop#a-turn-with-no-call]]
+export function askForStop(rules) {
   return [
-    opens,
-    "",
-    "Carry on where work stands. Where you mean to stop, end your answer with",
-    "one line, last, and exactly this shape:",
-    "",
-    "  Stop requested. Reason [<id>]. <what the owner does next>",
-    "",
-    "The ids:",
-    ...stopReasons(rules).map((one) => `  - ${one.id}: ${one.says ?? one.asks}`),
+    `This turn ends with no stop, so it holds open. Carry on, or call ${STOP_CALL} last, with one reason:`,
+    ...askLines(stopReasons(rules)),
   ].join("\n");
+}
+
+function askLines(rules) {
+  return (rules ?? []).map((one) => `  ${one.id}: ${one.asks}`);
 }
 
 // [[spec/design_output/stop#the-tooth-holds-its-state]]
