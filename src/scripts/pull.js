@@ -26,6 +26,7 @@ import {
   withField,
 } from "./group.js";
 import { NOTES, schemasHere } from "./ticket.js";
+import { changedIn } from "./work.js";
 
 export const HOLDS = ".se/hold";
 export const BOX = ".se/box.json";
@@ -824,18 +825,6 @@ function handBack(it, who, name, verdict) {
   one.text = it.disk.read(at);
   one.front = frontOf(one.text);
 
-  // [[spec/design_output/pull#the-fields-ride-the-payload]]
-  const payload = flagValue(it.argv ?? [], "--fields");
-  if (payload) {
-    const put = withPayload(one.text, held.step, payload);
-    if (put.why) {
-      say(REFUSED, [put.why]);
-      return 1;
-    }
-    one.text = put.text;
-    one.front = frontOf(one.text);
-    it.disk.write(at, one.text);
-  }
 
   // [[spec/design_output/pull#the-hand-back-matches-the-hold]]
   const done = recordIn(one.text).find(
@@ -879,6 +868,19 @@ function handBack(it, who, name, verdict) {
   if (!leaf) {
     say(REFUSED, [`${held.step} names no leaf of ${held.ticket}.`]);
     return 1;
+  }
+
+  // [[spec/design_output/pull#the-fields-ride-the-payload]]
+  const payload = flagValue(it.argv ?? [], "--fields");
+  if (payload) {
+    const put = withPayload(one.text, held.step, payload);
+    if (put.why) {
+      say(REFUSED, [put.why]);
+      return 1;
+    }
+    one.text = put.text;
+    one.front = frontOf(one.text);
+    it.disk.write(at, one.text);
   }
   const verdictField = leaf.evidence.find((field) => field.form === "verdict");
   if (verdictField && verdict.said) {
@@ -984,10 +986,10 @@ function withFieldText(text, path, name, said) {
     return { text: rows.join("\n") };
   }
   const start = sections[field].line;
-  const own = sections[field].own;
-  const kept = own.filter((row) => COMMENT.test(row));
+  const end = chapterEnd(sections, field, level, rows.length);
+  const kept = rows.slice(start, end).filter((row) => COMMENT.test(row));
   const gap = kept.length ? [""] : [];
-  rows.splice(start, own.length, "", ...kept, ...gap, ...said.split("\n"), "");
+  rows.splice(start, end - start, "", ...kept, ...gap, ...said.split("\n"), "");
   return { text: rows.join("\n") };
 }
 
@@ -1041,15 +1043,16 @@ export function chapterOf(text, path) {
   const level = parts.length;
   const own = lines(sections[found].own);
   const fields = new Map();
-  const raw = [...prose(sections[found].own)];
+  const rawOwn = prose(sections[found].own);
+  const rawFields = new Map();
   for (let i = found + 1; i < sections.length; i++) {
     if (sections[i].level <= level) break;
     if (sections[i].level === level + 1) {
       fields.set(sections[i].header, lines(sections[i].own));
-      raw.push("", ...prose(sections[i].own));
+      rawFields.set(sections[i].header, prose(sections[i].own));
     }
   }
-  return { stands: true, own, fields, raw };
+  return { stands: true, own, fields, rawOwn, rawFields };
 }
 
 function prose(own) {
@@ -1161,7 +1164,16 @@ export function verdictIn(rows) {
 // [[spec/design_output/pull#the-voice-reads-the-evidence]]
 function voiceFaults(it, one, leaf, chapter) {
   if (!it.vale) return [];
-  const rows = chapter.raw ?? [];
+  const prose = new Set([CHECKED]);
+  for (const field of leaf.evidence) {
+    if (["text", "list", "checklist", "verdict"].includes(String(field.form))) {
+      prose.add(String(field.name));
+    }
+  }
+  const rows = [...(chapter.rawOwn ?? [])];
+  for (const [name, held] of chapter.rawFields ?? []) {
+    if (prose.has(name)) rows.push("", ...held);
+  }
   const text = rows.join("\n");
   if (!text.trim()) return [];
   let ran;
@@ -1486,8 +1498,7 @@ function changedFiles(it, since) {
     }
   }
   for (const row of it.git.run(["status", "--porcelain"], true).out.split("\n")) {
-    const path = row.slice(3).trim();
-    if (path) out.add(path.replace(/^.* -> /, ""));
+    if (row.trim()) out.add(changedIn(row));
   }
   return [...out].sort();
 }
