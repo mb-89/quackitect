@@ -9,7 +9,7 @@
   "permissions": {
     "allow": [
       "mcp__level0",
-      "mcp__level0__claim_stop",
+      "mcp__level0__stop",
       "TaskCreate",
       "TaskUpdate",
       "TaskList",

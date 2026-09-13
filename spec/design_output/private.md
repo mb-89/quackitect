@@ -106,7 +106,7 @@ the judged question below is what reaches the rest.
 # The door reads the notes
 
 The write door reads every note under `.se/notes` at each tracked Write and
-Edit, and weighs the text the write would land:
+Edit, and weighs the text the write lands:
 
 1. Refuse a shared identifier, naming the token and the note.
 2. Refuse a shared run of six words or more, quoting the run.
@@ -242,7 +242,7 @@ Every rule here reads strings, so every case hands one in.
 
 - `test/level0/private.test.js` drives the two functions, the reader and the three checks over strings and a fixture diff.
 - `test/level0/precommit.test.js` drives the hook script over a fake disk and a fake git.
-- `test/level0/hooks.test.js` drives the write door over a fake note, and the Bash door over a fake engine answering a staged diff.
+- `test/level0/hooks.test.js` drives the write door over a fake note, and the Bash door over a staged diff.
 - `test/level0/bash.test.js` drives the escape and the second door over the command line alone.
 
 ## What it costs

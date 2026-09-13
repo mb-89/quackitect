@@ -85,7 +85,7 @@ whatever path a person names.
 
 # The script rule draws live
 
-`[formats]` in `.vale.ini` maps `.sh` and `.ps1` to `md`, so Vale reads a shell
+The `[formats]` section maps a shell ending to `md`, so Vale reads a shell
 script. `spec/config/styles/VoiceScript` holds one rule over those two endings,
 and `NoPathInScript` stands there.
 

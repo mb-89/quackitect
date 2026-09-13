@@ -1,5 +1,5 @@
 ---
-description: "config / answer / warnAt: sets answer.warnAt to what you type. The score where the findings start riding the next prompt."
+description: "config / answer / warnAt: sets answer.warnAt to what you type. The score where the gate starts writing a warn line to the log."
 argument-hint: "<value>"
 allowed-tools: Bash(./RUNME.sh config:*)
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"

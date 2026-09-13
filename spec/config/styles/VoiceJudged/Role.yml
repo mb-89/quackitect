@@ -1,7 +1,6 @@
-# A model holds this rule. A name passes every pattern: it is an ordinary word
-# of ordinary length carrying no separator, so the run and the token at the
-# write door reach it never. This question reads who a tracked note names.
-# Vale never reads this folder, because .vale.ini names no VoiceJudged.
+# GENERATED. Edit the source named below, not this file. It is written again
+# every time the tree is projected, so an edit here is lost. Source:
+# spec/schemas/paragraph.schema.yaml
 extends: judge
 message: "Name the role, and leave the person out. This tree holds the owner, the agent, the reader, the reviewer and the maintainer."
 link: spec/guidance/voice.md
@@ -11,10 +10,8 @@ labels:
   - role
   - person
 refuses: person
-# The tracked notes alone. A raw note under .se reaches git never, and the two
-# checks at the write door already stand between it and what git carries.
 reads:
   - "*.md"
-  - spec/**/*.md
+  - "spec/**/*.md"
 ignores:
-  - .se/*.md
+  - ".se/*.md"

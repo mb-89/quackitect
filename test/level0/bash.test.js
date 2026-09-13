@@ -1,5 +1,5 @@
 // The parse behind the bash door. It reads a command and answers what the
-// command would land, so every case here is a string and an assertion.
+// command lands, so every case here is a string and an assertion.
 // [[spec/design_output/bash#what-the-door-reads]]
 
 import assert from "node:assert/strict";

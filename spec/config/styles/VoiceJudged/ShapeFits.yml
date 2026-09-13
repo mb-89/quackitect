@@ -1,0 +1,15 @@
+# GENERATED. Edit the source named below, not this file. It is written again
+# every time the tree is projected, so an edit here is lost. Source:
+# spec/schemas/paragraph.schema.yaml
+extends: judge
+message: "Reach for a table or a diagram first, and write prose where neither fits."
+link: spec/guidance/voice.md
+level: error
+ask: "Do these sentences give the same fields for different things, or say what reaches what and what happens after what, or neither?"
+labels:
+  - prose
+  - table
+  - diagram
+refuses:
+  - table
+  - diagram

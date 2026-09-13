@@ -1,12 +1,12 @@
 ---
 kind: [[funnel]]
-about: a schema saying what a paragraph may hold, projected into Vale, read by every door and grown by the retro
+about: a schema saying what a paragraph can hold, projected into Vale, read by every door and grown by the retro
 ---
 
 # Scope
 
 Every paragraph the agent writes validates against one schema, in a file and in
-the chat alike. The schema is a whitelist: it names what a paragraph may hold,
+the chat alike. The schema is a whitelist: it names what a paragraph can hold,
 and a door refuses the rest. Nothing in it lists a bad word.
 
 The measurement behind this note stands in `.se/scripts/measure.sh`. It reads
@@ -81,10 +81,10 @@ holds one finite verb, and the tagger reads it:
 
 | refused | the reason |
 |---|---|
-| `be` + past participle | the passive, and the actor goes missing |
-| `have` + past participle | the perfect, and the time goes missing |
-| `be` + `-ing` | the progressive, where the simple tense says the same |
-| a modal + `be` + past participle | a stack, and nothing happens |
+| `be` and a past participle | the passive, and the actor goes missing |
+| `have` and a past participle | the perfect, and the time goes missing |
+| `be` and an `-ing` | the progressive, where the simple tense says the same |
+| a modal, `be` and a past participle | a stack, and nothing happens |
 
 The tagger misreads a heading, a table cell and a quoted command, so this row
 stays a blacklist inside the whitelist. `Passive` and `PastTense` already stand
@@ -258,7 +258,7 @@ measurement reports:
 | the verbs | `voice measure` scores a folder, and `voice refused` ranks the log's refusals | `src/scripts`, `RUNME.sh` | a fixture folder scores a known number |
 | the schema and the projector | one `shape` in `projection.js` reads the schema and writes a rule file per enumerable layer | `lib/projection.js`, `projections.json`, `VoiceParagraph` | each rule refuses a bad fixture, and the nine hand rules it replaces come out |
 | the vocabulary | the projection inlines `words.yml` into one rule, the refusal names the outside words and the swaps, and the cage reloads on a write to the list | `lib/vale.js`, `lib/refuse.js`, `words.yml` | a paragraph with one outside word meets a refusal naming it |
-| the answer gate | `turn.complete` re-prompts under the bands, `prompt.submit` carries a warning forward, and `check_answer` registers beside `claim_stop` | `hooks/level0.js`, `level0.json` | a fake session over the ceiling meets one re-prompt, and one alone |
+| the answer gate | `turn.complete` re-prompts under the bands, `prompt.submit` carries a warning forward, and `check_answer` registers at the session's start | `hooks/level0.js`, `level0.json` | a fake session over the ceiling meets one re-prompt, and one alone |
 | the question and the TL;DR | `prompt.submit` counts the questions, and the answer register demands the table and the list first | `lib/answer.js`, the schema | a prompt with two questions refuses an answer opening with prose |
 | the judged rows and the register | `BottomLineFirst` and `ShapeFits` join `VoiceJudged`, and `spec/requirements` takes its modals | `VoiceJudged`, `.vale.ini` | a fake judge labels a fixture, and the door refuses the refused label |
 
@@ -269,7 +269,7 @@ Each branch lands alone, and the measurement after each one reports the delta.
 | the question | what hangs on it |
 |---|---|
 | whether `.vale.ini` becomes a projection target | a register then lives in the schema alone, and one file fewer is hand-written |
-| where the rule card sits mid-turn | `prompt.section` may fire per request, and a probe on the client says whether the card and the last score live there |
+| where the rule card sits mid-turn | `prompt.section` can fire per request, and a probe on the client says whether the card and the last score live there |
 | the ceiling for the answer gate | how often the owner sees a second answer |
 | the judge on every paragraph | the cost of the table and diagram questions, with or without sampling |
 | when a word the session adds takes effect | the cage reloads the rule on the write, or the next session reads it |

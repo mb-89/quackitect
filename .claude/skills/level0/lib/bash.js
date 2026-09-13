@@ -1,5 +1,5 @@
 // The rules over a shell command. A shell reaches every file a Write reaches,
-// so the door parses the command line and reads what it would land.
+// so the door parses the command line and reads what it lands.
 // [[spec/design_output/bash#what-the-door-reads]]
 
 import { CODE } from "./code.js";
@@ -85,6 +85,16 @@ export function writesAPath(command) {
 }
 
 // [[spec/design_output/bash#a-commit-message-meets-voice]]
+export function withoutTrailers(text) {
+  const whole = String(text ?? "");
+  const paragraphs = whole.trimEnd().split(/\r?\n\s*\r?\n/);
+  if (paragraphs.length < 2) return whole;
+  const last = paragraphs[paragraphs.length - 1].split(/\r?\n/);
+  const trailer = /^[A-Za-z][A-Za-z-]*: \S/;
+  if (!last.every((line) => trailer.test(line.trim()))) return whole;
+  return paragraphs.slice(0, -1).join("\n\n");
+}
+
 export function commitIn(command) {
   const { segments, bodies } = partsOf(command);
   for (const one of segments) {

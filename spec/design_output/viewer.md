@@ -28,7 +28,7 @@ see [[spec/design_output/log#every-writer-appends]].
 | PgUp, PgDn | step a whole window up or down the log |
 | Home | go to the first row |
 | End | go to the newest row, and follow every row arriving |
-| `q`, Ctrl+C | leave |
+| `q`, `Ctrl+C` | leave |
 
 The log and the details each keep their own place. So a person reads a long
 reply with the arrows and steps to the next row with `s`, and both hold.
@@ -77,9 +77,9 @@ The language is KQL, the one Kibana uses, plus Lucene's `/pattern/`.
 `filter.go` reads it, ported from v4.
 
 - A bare word searches the level, the kind or tool, `said`, `text` and every field.
-- `name: value` searches one column: `time`, `level`, `kind`, `tool`, `said`, `text`, or any field a writer adds.
+- `name: value` searches one column, and a writer names any field the line carries.
 - `details: word` searches what the details show for the line.
-- `and`, `or`, `not`, `-word` and brackets combine terms, and terms side by side mean `and`.
+- A word joining two terms combines them, and terms side by side mean `and`.
 - `val*` is the wildcard, and `/pattern/` a regular expression.
 
 Matching ignores case. A half-typed filter answers `still typing` and keeps the

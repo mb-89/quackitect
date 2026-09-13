@@ -1,5 +1,6 @@
-# A model holds this rule. No pattern decides it.
-# Vale never reads this folder, because .vale.ini names VoiceQuackitect alone.
+# GENERATED. Edit the source named below, not this file. It is written again
+# every time the tree is projected, so an edit here is lost. Source:
+# spec/schemas/paragraph.schema.yaml
 extends: judge
 message: "Write what the reader does next. Put the background in spec/rationales."
 link: spec/guidance/guidance.md
@@ -9,15 +10,10 @@ labels:
   - actionable
   - background
 refuses: background
-# A guidance note stands for as long as the tree does, and a reader opens it to
-# learn what to do. A handover, a rationale and a design doc each carry
-# something else, so this question names the folder it reads.
 reads:
-  - spec/guidance/*.md
-# A runtime older than `reads` falls back to this list, so both stand until
-# every session loads the reader that takes `reads`.
+  - "spec/guidance/*.md"
 ignores:
-  - spec/rationales/*.md
-  - spec/design_output/*.md
-  - spec/funnel/*.md
-  - .se/*.md
+  - "spec/rationales/*.md"
+  - "spec/design_output/*.md"
+  - "spec/funnel/*.md"
+  - ".se/*.md"

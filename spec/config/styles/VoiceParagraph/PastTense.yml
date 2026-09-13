@@ -1,0 +1,27 @@
+# GENERATED. Edit the source named below, not this file. It is written again
+# every time the tree is projected, so an edit here is lost. Source:
+# spec/schemas/paragraph.schema.yaml
+extends: sequence
+message: "Write the present tense: '%s'. The past belongs in spec/rationales."
+link: spec/funnel/a-paragraph-has-a-schema.md
+level: error
+ignorecase: true
+exceptions:
+  - add
+  - approved
+  - bold
+  - bound
+  - buys
+  - complicated
+  - held
+  - missing
+  - numbered
+  - read
+  - red
+  - refused
+  - settled
+  - skips
+  - standing
+  - switched
+tokens:
+  - tag: VBD

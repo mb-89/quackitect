@@ -141,8 +141,8 @@ the others hold there. So the hook, the command line and the sidebar land in
 one file, in the order they happen.
 
 - The command line appends through the disk door's `append`.
-- `$.fs` offers `read`, `write`, `list`, `exists` and `stat`, and no append. So
-  the hook reads the file and writes it back one line longer.
+- `$.fs` offers no append, so the hook reads the file and writes it back one
+  line longer.
 - The editor's file system offers no append either, so the sidebar does the same.
 
 The hook and the sidebar each queue their lines, so one of them writes one line
@@ -166,6 +166,13 @@ Level zero registers `mcp__level0__log`. The agent calls it with a kind and one
 sentence, and `text` where one sentence runs short. The hook stamps the time and
 appends the line the way it appends its own. So a status or a note the agent
 means for the owner lands where the owner reads.
+
+# An answer rides the tool
+
+- Outcome: a log call of kind `answer` answers the owner's prompt, and the line lands in the log.
+- Cause: text written beside a tool call reaches the transcript as thinking, and the door reads text alone.
+- Door: the call clears the demand, so the next call passes.
+- Teacher: the warning and the refusal name the call.
 
 # Nothing here deletes a log
 
