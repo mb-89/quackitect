@@ -177,7 +177,7 @@ stands in a comment at the top.
 | sentence | `Sentence.yml` | the words one sentence holds |
 | sentence | `ListItem.yml`, `CodeSpans.yml` | the tighter cap in a list item, and the spans |
 | grammar | `Auxiliary.yml`, `Progressive.yml` | the chains the schema refuses |
-| grammar | `Modal.yml` | every modal the register leaves out |
+| grammar | `Modal.yml`, `ModalRequirement.yml` | every modal the register leaves out |
 | grammar | `Contraction.yml`, `Latin.yml`, `EtCetera.yml` | the short forms, with their swaps |
 | grammar | `PastTense.yml` | the tenses, with the exceptions the retro grows |
 
@@ -190,6 +190,7 @@ a layer writing two kinds of check writes two files:
 |---|---|
 | a raw scope reads a whole source file, so a shape check reaches prose alone | `Shape.yml` beside `Paragraph.yml` |
 | the answer register changes two caps | `ShapeAnswer.yml` beside `Shape.yml` |
+| the requirement register changes the modal set | `ModalRequirement.yml` beside `Modal.yml` |
 | the perfect reads `VBN` and the progressive reads `VBG` | `Progressive.yml` beside `Auxiliary.yml` |
 | a substitution carries one action, and `and so on` carries none | `EtCetera.yml` beside `Latin.yml` |
 
@@ -231,8 +232,39 @@ the projector holds all three. The schema says whether each rule stands.
 ## A shape says its ending
 
 A target folder holds the files its shape writes. The shape `config commands`
-writes markdown and `paragraph rules` writes YAML, so the compare reads the
-ending the shape names.
+writes markdown, and `paragraph rules` and `judged rules` write YAML, so the
+compare reads the ending the shape names.
+
+# The judged rules
+
+`VoiceJudged` is the third target, and the paragraph schema is its source too.
+
+    {
+      "name": "the judged rules",
+      "shape": "judged rules",
+      "target": "spec/config/styles/VoiceJudged",
+      "from": "spec/schemas/paragraph.schema.yaml",
+      "schema": "spec/schemas/paragraph.schema.schema.json",
+      "wrap": "none"
+    }
+
+The shape `judged rules` writes one file per entry under the meaning layer:
+
+| the key | what it says |
+|---|---|
+| `id` | the rule name, and the file name under it |
+| `asks` | the question the model answers |
+| `message` | what the refusal tells the writer |
+| `link` | the note arguing the rule, defaulting to the funnel note |
+| `labels` | the closed set the model picks from |
+| `refuses` | one label, or a list of them |
+| `span` | `paragraph` or `chapter`, saying what one question reads |
+| `reads` | the paths costing a call |
+| `ignores` | the paths costing none |
+
+Quote a glob, because a bare `*.md` opens a YAML alias. A `span` of `paragraph`
+writes no key, so a rule taking the default reads the way every rule reads
+today.
 
 # A missing layer fails
 

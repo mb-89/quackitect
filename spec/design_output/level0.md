@@ -447,6 +447,29 @@ nothing for a file those globs reach.
 List a folder there where the rule's question misreads its job. `Actionable`
 ignores `spec/rationales` and `spec/design_output`, and stands everywhere else.
 
+## A judged rule cuts
+
+Give a judged rule `span`, saying what one question reads. A rule leaving it
+out reads a paragraph, which is what every rule read before the key stood.
+
+| span | one question reads | who takes it |
+|---|---|---|
+| `paragraph` | a run of prose lines, with 12 words at least | `Actionable`, `Role`, `ShapeFits` |
+| `chapter` | a heading and the blocks under it, to the next heading | `BottomLineFirst` |
+
+A note with no heading is one chapter, so an answer arrives whole. The
+frontmatter stands outside both cuts, and so does a fenced block.
+
+A question about where the outcome stands wants the whole chapter, because a
+paragraph on its own says nothing about what comes before it. A question about
+one shape wants the paragraph, because the shape is the paragraph's own.
+
+## A rule refuses a list
+
+Give `refuses` one label, or a list of them. `ShapeFits` names three labels and
+refuses two, so the model picks the shape and the rule refuses every shape that
+is not prose.
+
 # The standing layer
 
 `prompt.context` computes the blocks a conversation's first message carries. It
@@ -808,7 +831,7 @@ answers that the rules pass.
 | `spec/config/styles/VoiceVale` | Vale reads it over prose and code |
 | `spec/config/styles/VoiceShape` | Vale reads it over the shape of a note or a rule file |
 | `spec/config/styles/VoiceScript` | Vale reads it over a shell script |
-| `spec/config/styles/VoiceJudged` | a model reads it, and no `BasedOnStyles` names it |
+| `spec/config/styles/VoiceJudged` | a model reads it, and the projection writes it |
 | `spec/config/biome.json` | Biome reads it |
 
 `[formats]` in `.vale.ini` maps `yml` to `md`, so Vale reads a rule file at all.
