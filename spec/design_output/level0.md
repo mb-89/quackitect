@@ -654,7 +654,7 @@ better than a refusal naming it.
 ## Where it must not bite
 
 - A turn nobody opens.
-- A turn the session has already answered, however briefly.
+- A turn the session has already answered, in one line or many.
 - A helper's call. A subagent's `tool.call` carries `agentId`, and a helper owes
   the owner no readback.
 - `AskUserQuestion`, which reaches the owner itself. A door refusing it stops a
@@ -777,7 +777,7 @@ carries the line that sends a session to it.
 
 # The question comes first
 
-A prompt carrying a question gets its answer first, in a table a reader skims.
+A prompt carrying a question gets its answer first, in a table a reader takes in at a glance.
 The count comes from the prompt, and the table check reads the answer against
 it. Both stand in `lib/answer.js`, beside the door, because Vale reads no
 session state.
@@ -884,7 +884,7 @@ Vale answers a broken rule file with an `E201`. It writes that to standard
 error and leaves standard output empty, so a reader parsing JSON alone finds no
 breach.
 
-One broken rule therefore turns every rule in the tree off, and the tree
+So one broken rule turns every rule in the tree off, and the tree
 answers that the rules pass.
 
 `faultIn` in `lib/vale.js` reads that answer, and `./RUNME.sh lint` stops on it.
@@ -943,7 +943,7 @@ short forms that read the same everywhere keep theirs.
 ## Vale refuses overlapping fixes
 
 Vale drops both fixes and names the overlap. A token reaching past its own word
-therefore costs the fix beside it, so every token here stops at its own edge.
+costs the fix beside it, so every token here stops at its own edge.
 
 # What the cage loads
 
@@ -971,19 +971,19 @@ thing still holds everything else it reads.
 `ensureCage` wraps that load in a `try`, and any door asks it. The first door to
 ask pays for the load, and the rest take the answer. A session the harness
 resumes carries no `session.start`, so the first `tool.call` loads the cage
-instead, and the session mends itself before it writes anything.
+instead, and the session repairs itself before it writes anything.
 
 The engine refuses `$` handed to a function nested inside `register`, so both
 stand at the top of the file and take the state as an argument.
 
 # God mode
 
-A cage holding nothing says so, and refuses the work until somebody mends it.
+A cage holding nothing says so, and refuses the work until somebody fixes it.
 `.se/level0.health` carries that answer:
 
     { "ok": false, "why": "no vale stands here", "at": "..." }
 
-While `ok` reads false, the door refuses every call except the ones that mend
+While `ok` reads false, the door refuses every call except the ones that fix
 the cage:
 
 | the call | god mode |
@@ -994,10 +994,10 @@ the cage:
 | every other write, and every other command | refuses |
 
 The refusal names the fault and the road out, so a session that meets it reads
-what to do. A door refusing everything shuts the road that mends it, and
+what to do. A door refusing everything shuts the road that fixes it, and
 the session stands there for good.
 
-The mend clears itself. `ensureCage` retries while the answer reads false, so
+The fix clears itself. `ensureCage` retries while the answer reads false, so
 the first call after a repair loads the rules again, writes `ok: true`, and says
 `the cage holds again` to the log. The install runs once, and a retry costs a
 read.

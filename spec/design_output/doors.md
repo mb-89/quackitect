@@ -32,7 +32,7 @@ because they reach nothing: `node:path`, `node:url`, `node:test`,
 # A door standing on another
 
 Git runs a program, and the log writes a file, so each takes the door beneath it
-and builds on that. A fake of the door beneath therefore stands in for the one
+and builds on that. A fake of the door beneath then stands in for the one
 above, and one file holds each pairing under one name.
 
 | door | stands on | its fake |

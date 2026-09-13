@@ -123,9 +123,12 @@
         },
         "vocabulary": {
           "type": "object",
-          "required": ["words", "outside", "growth", "exceptions"],
+          "required": ["core", "terms", "swaps", "outside", "growth", "exceptions"],
           "properties": {
-            "words": { "type": "string" },
+            "core": { "type": "string" },
+            "terms": { "type": "string" },
+            "swaps": { "type": "string" },
+            "stems": { "type": "string" },
             "outside": { "type": "array", "items": { "type": "string" } },
             "growth": { "type": "object" },
             "exceptions": { "type": "array" }

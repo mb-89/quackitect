@@ -96,7 +96,7 @@ needs, links the sidebar, opens the editor here, and shows the quackitect panel.
 - `./RUNME.sh` runs the install, then starts `code` where the path carries one.
 - A verb after either hands the verb to the command line, and opens nothing.
 
-The PowerShell doorway sets `SE_EDITOR_OPENS`, so `RUNME.sh` leaves the opening
+The PowerShell entry sets `SE_EDITOR_OPENS`, so `RUNME.sh` leaves the opening
 to it and the editor opens once. Before it opens, RUNME writes
 `.se/show-panel`. For details, see
 [[spec/design_output/extension#runme-opens-the-panel]].

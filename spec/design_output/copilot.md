@@ -55,7 +55,7 @@ apply. The local retry counter cannot override them.
 # Candidate reports
 
 Biome returns source text for stdin linting. Check a temporary candidate file
-with its JSON reporter instead. Copy the current rule settings and broaden
+with its JSON reporter instead. Copy the current rule settings and open
 file discovery only within that temporary tree. Remove it after each check.
 Keep Claude's existing checker caller unchanged.
 
@@ -70,12 +70,12 @@ Commit the hook and setup workflow to the default branch before cloud work.
 The cloud setup marker selects cloud response envelopes. A local session use
 VS Code envelopes. No Claude callback reaches this entry point.
 
-# Validate the installation
+# Check the installation
 
 The optional plugin validator catches an absent Claude executable inside
 level zero. Installed Claude keeps its existing validation command and result.
 
-Open a new Copilot chat and submit a prompt after setup. SessionStart supplies
+Open a new Copilot chat and submit a prompt after setup. `SessionStart` supplies
 the guidance and receipt request. Check agent hook logs for actual activation.
 The model's acknowledgement alone is not an enforcement test.
 
@@ -87,8 +87,8 @@ The dispatcher calls the unchanged `branch take` command. It pushes the synced
 claim, creates or reuses a draft pull request, and posts an `@copilot` request.
 It checks existing comments before retrying an ambiguous network failure.
 
-Save the claim commit as the attempt identity before contacting GitHub.
-Include both branch and attempt in the comment marker. A checkpoint before
+Save the claim commit as the identity of the try before contacting GitHub.
+Include both branch and try in the comment marker. A checkpoint before
 a retry keeps that identity. A release and a new claim produce another one.
 
 Inspect the GitHub job to confirm acceptance and its assigned head branch.
@@ -137,7 +137,7 @@ Run `node --test test/level0/copilot-dispatch.test.js` for dispatch attempts.
 Use `fakeProc`, `fakeDisk` and `fakeSession`. Reject unexpected process commands.
 
 Model branch, claim SHA, checkpoint SHA and comments as in-memory state.
-Test a lost response with the same attempt and a new claim with another one.
+Test a lost response with the same try and a new claim with another one.
 These tests check orchestration against door contracts, not Git or Biome again.
 Keep live host activation as an explicit acceptance exercise outside these suites.
 
@@ -150,7 +150,7 @@ This proposal adds no rule category and changes no harness behavior yet.
 | Guarantee | Current owner | Recommendation |
 | --- | --- | --- |
 | Preserve the brief until a result exists | `session.withState` and `handle` | Keep the session door contract and mock-based handover tests. |
-| Request each work attempt once | `dispatch` | Keep mock-based retry tests, and verify live job acceptance separately. |
+| Request each work try once | `dispatch` | Keep mock-based retry tests, and check live job acceptance separately. |
 | Keep the worker on its work branch | Level-zero guards and host credentials | Retain branch-specific credentials, and use repository rules to reserve merging for a person. |
 | Accept only a commit whose checks pass | Human review, and hooks check selected writes | Add a required CI status for the exact candidate commit. |
 
@@ -165,6 +165,6 @@ This proposal adds no rule category and changes no harness behavior yet.
 4. Test a shell-written defect and a push after a passing check.
 	The first must fail CI; the second must await its own check before merge.
 
-Keep hook feedback fast. Let CI verify the complete candidate, including files
+Keep hook feedback fast. Let CI check the complete candidate, including files
 outside the edit-tool list. Let the reviewer judge whether it solves the task.
 Confirm this proposal before adding the workflow or changing repository permissions.

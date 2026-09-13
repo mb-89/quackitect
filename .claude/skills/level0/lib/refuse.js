@@ -1,13 +1,54 @@
 // The wording of a refusal, written once and read by every door.
 // [[spec/design_output/level0#the-write-door]]
 
+import { TERMS } from "./vocabulary.js";
+
+// [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
+export const VOCABULARY = "Vocabulary";
+
 export function refusal(where, found) {
   return [
     `The voice rules refuse this write to ${where}.`,
     "",
     ...bodyOf(where, found),
     taught(found),
+    ...road(found),
   ].join("\n");
+}
+
+// A word off the list has two roads, and the refusal names both. [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
+export function grown(found) {
+  const words = outsideIn(found);
+  if (!words.length) return "";
+  return [
+    `A word outside the core is jargon until a note defines it. Write a core word, or`,
+    `add ${namesThe(words)} to ${TERMS} as`,
+    "`- {word: <the word>, defines: \"[[<the note>]]\"}` where that note defines it,",
+    "and write the line again. The next write reads the new rule.",
+  ].join("\n");
+}
+
+// [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
+function road(found) {
+  const said = grown(found);
+  return said ? ["", said] : [];
+}
+
+// [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
+function outsideIn(found) {
+  const out = new Set();
+  for (const one of found ?? []) {
+    if (!String(one?.rule ?? "").endsWith(VOCABULARY)) continue;
+    const said = String(one?.said ?? "").trim().toLowerCase();
+    if (said) out.add(said);
+  }
+  return [...out];
+}
+
+function namesThe(words) {
+  const shown = words.slice(0, 5).map((one) => `\`${one}\``);
+  const tail = words.length > 5 ? `, and ${words.length - 5} more` : "";
+  return `${shown.join(", ")}${tail}`;
 }
 
 // [[spec/design_output/level0#what-the-gate-says]]
@@ -28,6 +69,7 @@ export function answerFindings(where, it) {
     "",
     ...bodyOf(where, found),
     taught(found),
+    ...road(found),
   ].join("\n");
 }
 

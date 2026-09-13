@@ -95,7 +95,7 @@ A fresh copy takes two steps that any fresh clone takes: `git init`, and one
 run of `RUNME`, which surveys the tools and builds what it needs.
 
 The run bit travels with the scripts. A copy whose `RUNME.sh` arrives
-unrunnable answers `Permission denied`, and the vehicle stands there unable to
+a file nobody can run answers `Permission denied`, and the vehicle stands there unable to
 take its own first step.
 
 ## A project names its driver

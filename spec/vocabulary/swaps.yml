@@ -1,0 +1,41 @@
+# A swap: a word the core leaves out, and the core word to write in its place.
+# A refusal naming the word hands the writer the swap. A person adds an entry,
+# and the retro adds one where a refusal meets the same word twice.
+# [[spec/schemas/paragraph.schema.yaml]]
+
+swaps:
+  - {word: utilize, write: use}
+  - {word: utilise, write: use}
+  - {word: however, write: but}
+  - {word: therefore, write: so}
+  - {word: whilst, write: while}
+  - {word: amongst, write: among}
+  - {word: commence, write: start}
+  - {word: terminate, write: end}
+  - {word: facilitate, write: help}
+  - {word: demonstrate, write: show}
+  - {word: additionally, write: also}
+  - {word: furthermore, write: also}
+  - {word: subsequently, write: then}
+  - {word: prior, write: before}
+  - {word: approximately, write: about}
+  - {word: sufficient, write: enough}
+  - {word: numerous, write: many}
+  - {word: obtain, write: get}
+  - {word: purchase, write: buy}
+  - {word: regarding, write: about}
+  - {word: assist, write: help}
+  - {word: attempt, write: try}
+  - {word: ensure, write: make sure}
+  - {word: leverage, write: use}
+  - {word: implement, write: build}
+  - {word: invoke, write: call}
+  - {word: initiate, write: start}
+  - {word: modify, write: change}
+  - {word: verify, write: check}
+  - {word: validate, write: check}
+  - {word: mend, write: fix}
+  - {word: skim, write: read}
+  - {word: terse, write: short}
+  - {word: artefact, write: artifact}
+  - {word: wrongly, write: in error}

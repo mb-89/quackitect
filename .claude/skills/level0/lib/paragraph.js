@@ -3,6 +3,8 @@
 // files follow at the next projection.
 // [[spec/design_output/projection#the-second-target]]
 
+import { swapsOf, TERMS, wordsOf } from "./vocabulary.js";
+
 export const PARAGRAPH = "paragraph rules";
 export const JUDGED = "judged rules";
 export const RULES = ".yml";
@@ -132,7 +134,7 @@ function under(at, name) {
 }
 
 // [[spec/design_output/projection#the-second-target]]
-export function rulesFrom(said, banner = "") {
+export function rulesFrom(said, banner = "", lists = null) {
   const out = new Map();
   const layers = said?.layers ?? {};
   const answer = said?.registers?.answer ?? {};
@@ -155,6 +157,9 @@ export function rulesFrom(said, banner = "") {
   const binding = { ...(layers.grammar ?? {}), ...(said?.registers?.requirement?.grammar ?? {}) };
   const modals = modal(binding);
   if (modals) put("ModalRequirement.yml", modals);
+  // [[spec/funnel/a-paragraph-has-a-schema]]
+  const words = wordsOf(lists);
+  if (words.length) put("Vocabulary.yml", vocabulary(layers.vocabulary ?? {}, lists));
   return out;
 }
 
@@ -635,6 +640,187 @@ function codeSpans(layer) {
     "  }",
     "}",
   ]);
+}
+
+// The rule refuses a word the list leaves out. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+function vocabulary(layer, lists) {
+  const words = wordsOf(lists);
+  const swaps = swapsOf(lists);
+  const where = pathOf(layer);
+  const tail =
+    "stands outside the words this tree writes. Write a core word, or add it to " +
+    `${where} with the note that defines it.`;
+
+  return scripted(`A word ${tail}`, [
+    ...prelude([]),
+    // [[spec/funnel/a-paragraph-has-a-schema]]
+    // A map literal this long overruns the Tengo stack. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+    "list := `",
+    ...grouped(words),
+    "`",
+    "",
+    "inside := {}",
+    "for w in text.re_split(`\\s+`, list, -1) {",
+    "  if len(w) > 0 { inside[w] = 1 }",
+    "}",
+    "",
+    "roads := `",
+    ...grouped([...swaps].map(([from, to]) => `${from}=${to}`)),
+    "`",
+    "",
+    "swaps := {}",
+    "for one in text.re_split(`\\s+`, roads, -1) {",
+    '  pair := text.split(one, "=")',
+    "  if len(pair) == 2 { swaps[pair[0]] = pair[1] }",
+    "}",
+    "",
+    // A plural, a past form and an -ing form stand in. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+    "listed := func(w) {",
+    "  if inside[w] != undefined { return true }",
+    "  n := len(w)",
+    '  if n > 3 && text.has_suffix(w, "ies") {',
+    '    if inside[w[:n-3] + "y"] != undefined { return true }',
+    "  }",
+    '  if n > 2 && text.has_suffix(w, "es") {',
+    "    if inside[w[:n-2]] != undefined { return true }",
+    "    if inside[w[:n-1]] != undefined { return true }",
+    "  }",
+    '  if n > 1 && text.has_suffix(w, "s") {',
+    "    if inside[w[:n-1]] != undefined { return true }",
+    "  }",
+    '  if n > 3 && text.has_suffix(w, "ied") {',
+    '    if inside[w[:n-3] + "y"] != undefined { return true }',
+    "  }",
+    '  if n > 2 && text.has_suffix(w, "ed") {',
+    "    if inside[w[:n-2]] != undefined { return true }",
+    "    if inside[w[:n-1]] != undefined { return true }",
+    "    if inside[w[:n-3]] != undefined { return true }",
+    "  }",
+    '  if n > 3 && text.has_suffix(w, "ing") {',
+    "    if inside[w[:n-3]] != undefined { return true }",
+    '    if inside[w[:n-3] + "e"] != undefined { return true }',
+    "    if inside[w[:n-4]] != undefined { return true }",
+    "  }",
+    // An adverb, a comparative, an -able and a -less form stand in too. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+    '  if n > 3 && text.has_suffix(w, "ves") {',
+    '    if inside[w[:n-3] + "f"] != undefined { return true }',
+    '    if inside[w[:n-3] + "fe"] != undefined { return true }',
+    "  }",
+    '  if n > 4 && text.has_suffix(w, "ily") {',
+    '    if inside[w[:n-3] + "y"] != undefined { return true }',
+    "  }",
+    '  if n > 3 && text.has_suffix(w, "ly") {',
+    "    if inside[w[:n-2]] != undefined { return true }",
+    '    if inside[w[:n-2] + "e"] != undefined { return true }',
+    "  }",
+    '  if n > 3 && text.has_suffix(w, "er") {',
+    "    if inside[w[:n-2]] != undefined { return true }",
+    "    if inside[w[:n-1]] != undefined { return true }",
+    "  }",
+    '  if n > 4 && text.has_suffix(w, "est") {',
+    "    if inside[w[:n-3]] != undefined { return true }",
+    "    if inside[w[:n-2]] != undefined { return true }",
+    "  }",
+    '  if n > 5 && (text.has_suffix(w, "able") || text.has_suffix(w, "ible")) {',
+    "    if inside[w[:n-4]] != undefined { return true }",
+    '    if inside[w[:n-4] + "e"] != undefined { return true }',
+    "  }",
+    '  if n > 5 && (text.has_suffix(w, "less") || text.has_suffix(w, "most")) {',
+    "    if inside[w[:n-4]] != undefined { return true }",
+    "  }",
+    "  return false",
+    "}",
+    "",
+    // A prefix on a listed word stands too: unread, rerun, misread, outlive. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+    "known := func(w) {",
+    "  if listed(w) { return true }",
+    '  for pre in ["un", "re", "mis", "out", "over", "non", "pre", "sub"] {',
+    "    if len(w) > len(pre) + 2 && text.has_prefix(w, pre) && listed(w[len(pre):]) { return true }",
+    "  }",
+    "  return false",
+    "}",
+    "",
+    "said := plain(scope)",
+    "said = blanked(said, `(?m)^#{1,6} +`)",
+    "said = blanked(said, `(?m)^[ \\t]*(?:[-*+]|[0-9]+[.)]) +`)",
+    "said = blanked(said, `(?m)^[ \\t]*> ?`)",
+    "said = blanked(said, `\\|`)",
+    "said = blanked(said, `[*_]`)",
+    ...left(layer).map((one) => `said = blanked(said, ${quoted(pattern(one))})`),
+    "",
+    // A capital past the first word names a thing. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+    "opens := func(at) {",
+    "  i := at - 1",
+    "  for i >= 0 {",
+    "    c := said[i:i+1]",
+    '    if c == " " || c == "\\t" || c == "\\n" { i-- ; continue }',
+    '    if c == "." || c == "!" || c == "?" || c == ":" || c == ";" { return true }',
+    "    return false",
+    "  }",
+    "  return true",
+    "}",
+    "",
+    "found := text.re_find(`[A-Za-z][A-Za-z0-9'’-]*`, said, -1)",
+    "if is_undefined(found) { found = [] }",
+    "",
+    "for one in found {",
+    "  m := one[0]",
+    "  w := m.text",
+    "  if text.re_match(`[0-9_]`, w) { continue }",
+    "  head := w[0:1]",
+    "  if head != text.to_lower(head) && !opens(m.begin) { continue }",
+    // One letter names a key, a column or a label. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+    "  if len(w) == 1 { continue }",
+    "",
+    "  low := text.to_lower(w)",
+    '  low = text.trim_suffix(low, "\'s")',
+    '  low = text.trim_suffix(low, "’s")',
+    '  if text.contains(low, "\'") || text.contains(low, "’") { continue }',
+    "",
+    '  bad := ""',
+    '  for part in text.split(low, "-") {',
+    "    p := text.trim_space(part)",
+    // A prefix such as re- or co- stands on no list. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+    "    if len(p) < 3 { continue }",
+    "    if known(p) { continue }",
+    "    bad = p",
+    "    break",
+    "  }",
+    '  if bad == "" { continue }',
+    "",
+    "  road := swaps[bad]",
+    '  say := bad + " stands outside the words this tree writes. "',
+    "  if road != undefined {",
+    '    say += "Write " + road + " instead."',
+    "  } else {",
+    `    say += ${quoted("Write a core word, or add ")} + bad +`,
+    `      ${quoted(` to ${where} with the note that defines it.`)}`,
+    "  }",
+    "  matches = append(matches, {begin: m.begin, end: m.end, message: say})",
+    "}",
+  ]);
+}
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+function pathOf(layer) {
+  const said = String(layer?.terms ?? "").trim();
+  return said || TERMS;
+}
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+function grouped(said, at = 72) {
+  const out = [];
+  let row = "";
+  for (const one of said) {
+    if (row && `${row} ${one}`.length > at) {
+      out.push(row);
+      row = one;
+      continue;
+    }
+    row = row ? `${row} ${one}` : one;
+  }
+  if (row) out.push(row);
+  return out;
 }
 
 function counted(message, scope, token, most) {

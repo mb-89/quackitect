@@ -52,7 +52,7 @@ The call runs the vote at once, and its result says which way it goes:
 | what the call carries | what comes back | what the agent does |
 |---|---|---|
 | a reason that stands | the rule's sentence, and "write nothing more" | it ends the turn |
-| a reason a fact contradicts | the fact, in one line | it carries on |
+| a reason a fact denies | the fact, in one line | it carries on |
 | an id nobody holds | the ids | it carries on |
 
 A claim lives until the next tool call or the turn's end, whichever comes
@@ -185,7 +185,7 @@ beside it:
 | count | what it stands for |
 |---|---|
 | calls | the tool calls this session |
-| inARow | the turns the tooth carries one after another |
+| `inARow` | the turns the tooth carries one after another |
 | granted | whether the hook grants a stop already |
 | claim | the reason the last call names, until the next call or the turn's end |
 

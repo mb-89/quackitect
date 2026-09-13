@@ -266,10 +266,10 @@ The thoughts weighed the child's route against this box before a line of code st
 
 <!-- the form is list -->
 
-- agent-pulls-ticket stands open at design/review, which waits for a hand other than this box, and its verdict step waits the same way
-- the child's implement leaves carry no record, because the engine landed in the branch's commits before the route could take a hand, and the reviewer reads the branch diff
+- agent-pulls-ticket stands open at design/review, which waits for a hand other than this box. Its verdict step waits the same way.
+- the child's implement leaves carry no record, because the engine landed in the branch's commits first. The reviewer reads the branch diff.
 - no ticket stands minted with no group
-- this ticket is the handover: the group stays open at children until a person or another box answers the review on this branch, and `branch done` names the child
+- this ticket is the handover. The group stays open at children until another hand answers the review on this branch, and `branch done` names the child.
 
 # Discussion
 

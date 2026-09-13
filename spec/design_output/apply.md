@@ -15,14 +15,14 @@ Level zero registers three tools the agent calls: `patch` edits files,
 
 | tool | what it is for |
 |---|---|
-| `patch` | the scalpel: many ops on paths you hold, one atomic call |
+| `patch` | the knife: many ops on paths you hold, one atomic call |
 | `replace` | the sweep: one regex over every file a glob reaches |
 | `undo` | the way back, out of a journal the apply writes first |
 
 The pure half sits in `lib/apply.js` and `lib/undo.js`, which read no disk. The
 hooks module hands them the text and writes what they answer.
 
-## Validate everything, then write
+## Check everything, then write
 
 Every op reads the file as the ops before it leave it, so edits to one file
 compose in the order they arrive. One failure refuses the whole manifest, and
