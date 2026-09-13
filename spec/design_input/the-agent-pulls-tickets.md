@@ -1008,6 +1008,42 @@ a retro step. That is v4's rule that an empty queue drains the notes, with
 the retro as the moment. The tooth counts a private ticket in hand the way it
 counts a task today.
 
+# The to-do flag
+
+A hand parks work for later by tagging a note. The field is `todo`, a boolean
+in the frontmatter, and a note holding no field reads false.
+
+    todo: true
+
+The tag is a claim by the hand that writes it, and it holds on this box alone.
+So the owner says park this, the hand mints a note or tags one standing, and
+the next pull hands that note back first.
+
+| the rule | what it says |
+|---|---|
+| the mint takes the flag | the note verb writes the field, and an edit sets it later |
+| the tag reaches any kind | a note, a ticket or a group carries it, in any folder |
+| a ticket on a branch takes none | the branch speaks for that one already |
+| the push door refuses it | a push whose delta carries a tagged note comes back named |
+| the commit passes | a box holds whatever it wants, and the push is the one gate |
+| the pull hands it first | a tagged note stands ahead of every free ticket |
+| the close takes it off | the tag goes where the work closes |
+
+The push door carries v4's claim, and the branch keeps doing the rest. A cloud
+box pulls from its own branch alone, so a tagged note on one box reaches no
+other box. The tag holds until the owner takes it off, so a clock decides
+nothing here.
+
+## The tag survives the verbs
+
+A fresh to-do mints into `.se/tickets/`, which git ignores, so every verb
+leaves it standing. A tagged ticket on trunk stands as an edit nobody commits,
+and the take verb resets hard onto the remote branch.
+
+So the four branch verbs look past the tag, and the take saves every tagged
+file before its reset and writes it back after. The rest of the ticket meets
+the checks it meets today.
+
 # What a person sees
 
 Three surfaces draw the folder and the branches, and none keeps a second
