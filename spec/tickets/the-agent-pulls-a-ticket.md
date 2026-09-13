@@ -155,7 +155,15 @@ record:
     hand: box d49afdfe301a64
     skipped: true
     why: the box leaves it while agent-pulls-ticket stand open
-step: retro/notes
+  - step: retro/notes
+    hand: box d49afdfe301a64
+    hash_before: 184c2e340103b15b6c68887c62ed03db2090ca57
+    hash_after: 184c2e340103b15b6c68887c62ed03db2090ca57
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+step: retro/write
 ---
 
 # Ask
