@@ -7,76 +7,101 @@ depends_on: [the-schema-projects-vale]
 
 # Where it stands
 
-The funnel note `spec/funnel/a-paragraph-has-a-schema.md` names six branches,
-and this is the last. Read its chapters on the bottom line, on the list and on
-the registers first. The note stands on the branch `claude/friendly-brown-k6kohy`
-until the owner merges it, so take that branch in where `work sync` leaves the
-note absent.
+The last row of the funnel note closes here. Five things land:
 
-The judge in `lib/judge.js` asks a model one question per span and holds one
-rule today, `Actionable` in `spec/config/styles/VoiceJudged`. A judged rule
-carries `ask`, `message`, `labels`, `refuses` and `reads`, and `refuses` names
-one label. The schema's meaning layer names two more rules, and its requirement
-register names a modal set no path reads yet.
+- The projection writes `VoiceJudged` from the schema's meaning layer.
+- `BottomLineFirst` and `ShapeFits` stand there beside `Actionable` and `Role`.
+- A judged rule refuses a list of labels, not one alone.
+- A judged rule names the span one question reads.
+- The requirement register takes the modal rule in a second variant.
+
+| the piece | where | what proves it |
+|---|---|---|
+| the two rules | `VoiceJudged/BottomLineFirst.yml`, `VoiceJudged/ShapeFits.yml` | a fake judge labels a fixture, and the door refuses the refused label |
+| `refuses` as a list | `lib/judge.js`, `VoiceShape/JudgedRule.yml` | a rule refusing two labels refuses both, through Vale and through the judge |
+| the span | `lib/judge.js` | `ShapeFits` reads one paragraph a question, and `BottomLineFirst` one chapter |
+| the register | `.vale.ini`, `lib/paragraph.js` | `shall` passes under `spec/requirements` and meets a refusal outside it |
+| one requirement note | `spec/requirements/the-write-door.md` | the check stays green with it |
+
+The battery answers 796 cases green, and the projection answers three targets
+clean. Run `./RUNME.sh check` to read both.
+
+## What the projection carries
+
+`VoiceJudged` becomes the third projection target, so the schema is the one
+place a person edits a judged rule. `Role` moves into the meaning layer with
+the other three, because a target folder holds no hand-written file.
+
+A judged entry carries `id`, `asks` and `message`. It carries `link`, `labels`,
+`refuses`, `span`, `reads` and `ignores` beside them. For the shape of each
+key, see [[spec/design_output/projection#the-judged-rules]].
+
+## What the two rules cost
+
+`.se/scripts/measure-judge.js` counts the spans each rule reads over the tree.
+One span is one model call, before the sampling in `spec/config/level0.json`
+takes its cut:
+
+| rule | span | files it reads | calls a write |
+|---|---|---|---|
+| `Actionable` | paragraph | 4 | 0.5 |
+| `BottomLineFirst` | chapter | 49 | 10.7 |
+| `Role` | paragraph | 49 | 23.0 |
+| `ShapeFits` | paragraph | 84 | 14.3 |
+
+`judge.maxSpans` caps one rule at 24 spans a write, so the largest note costs
+that and no more. A whole pass over the tree costs 2854 calls at the four
+rules together.
 
 # What waits
 
-| the piece | where | proves it |
+| the question | who answers it | what hangs on it |
 |---|---|---|
-| the two rules for the judge | `VoiceJudged/BottomLineFirst.yml`, `VoiceJudged/ShapeFits.yml` | a fake judge labels a fixture, and the door refuses the refused label |
-| `refuses` as a list | `lib/judge.js`, and `VoiceShape/JudgedRule.yml` | a rule refusing two labels refuses both |
-| the judge over a paragraph | `lib/judge.js` | `ShapeFits` reads one paragraph per question |
-| the requirement register | `.vale.ini`, and the projection | `shall` passes under `spec/requirements` and refuses elsewhere |
-| one requirement note | `spec/requirements` | the check stays green with it |
+| the sampling for the two new rules | the owner, with a number | what a session pays for the meaning layer |
+| the refusal rate of `BottomLineFirst` on a chapter | the next session on a fresh box | whether the rule teaches or nags |
+| whether `ShapeFits` reads `.se` too | the owner | the rule names no `ignores` today |
 
-# The judge's two rules
+The refusal rate stays open, and the reason stands under the retro below. A
+session running this code from its start measures it in one pass, because the
+door writes a warn row per refusal already.
 
-The projection writes both from the schema's meaning layer, in the shape
-`Actionable.yml` holds:
+# Retro
 
-| rule | asks | labels | refuses | reads |
-|---|---|---|---|---|
-| `BottomLineFirst` | does the first block state the outcome, or does the outcome arrive late? | `first`, `late` | `late` | an answer, and a chapter of a note |
-| `ShapeFits` | do these sentences give the same fields for different things, say what reaches what, or neither? | `prose`, `table`, `diagram` | `table`, `diagram` | a paragraph, anywhere |
+The judge refuses the writes of this very branch, and the refusal teaches the
+design. Three things surprise me.
 
-`ShapeFits` refuses two labels, so `refuses` takes a list, and `JudgedRule.yml`
-admits one. The judge's sampling in `level0.json` holds, so a session pays for
-these the way it pays for `Actionable`.
+## The cage holds old code
 
-# The requirement register
+A session loads `lib/judge.js` once, at its start. So the judge running here
+holds the code from before this branch changes it, and two things follow:
 
-A requirement says `shall` where it binds and `should` where it advises, as
-RFC 2119 gives them. The schema's requirement register admits both on
-`spec/requirements/*.md`, and the prose register admits neither. The projector
-writes the modal rule in two variants, the way it writes `Shape.yml` in two,
-and `.vale.ini` names the requirement variant on that path.
+- `ShapeFits` stays quiet, because the old judge compares a list to a string.
+- `BottomLineFirst` fires per paragraph, because the old judge reads no `span`.
 
-Add one requirement note under that folder. Three of its lines use `shall`,
-`should` and `must`. Then the register has a reader on the day it lands.
+`BottomLineFirst` at the paragraph cut refuses 10 paragraphs out of the 10 it
+reads here. That is the argument for the chapter cut, measured by accident. A
+paragraph on its own says nothing about what stands before it, so the model
+answers `late` almost every time.
 
-# How to build it
+Working around it costs this branch its judge. `./RUNME.sh config judge.enabled
+false` holds the judge off in `.se/config.json`, which git ignores and which
+the box drops. The last step of this branch puts it back to `true`.
 
-Test the judge with a fake model answering a fixed label, the way the judge's
-tests do today. Test the register through Vale with one fixture under
-`spec/requirements` and one outside it. Count in the handback how many
-paragraphs the two rules read in one session, and how many they refuse. The
-owner then decides on the sampling with a number.
+## A fragment reaches the judge
 
-## How this branch runs
+The write door lints the fragment an edit hands it, leaving the file under it
+alone. So a lone table row reads as a paragraph, and the tagger calls the pipe
+a past tense. Widening the edit to the whole table answers it. The funnel note
+names this misread already, and it costs a round here.
 
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
+## The shell writes nothing
 
-1. Run `./RUNME.sh work sync` FIRST. It takes main into this branch, so
-   an old branch works against what the tree holds now. Resolve any conflict
-   before you start, because a conflict found later costs the work already
-   done.
-2. Commit and push each time you finish a thing. A cloud box dies and takes
-   its working tree with it.
-3. Write your result and your retro into `HANDOVER.md`, at the root, replacing
-   this brief. Say what surprises you and every dead end you walk into.
-4. Run `./RUNME.sh work done`, which sets the status and pushes.
-5. Run `./RUNME.sh work release` instead where you stop early, so the branch
-   goes back to `todo` for somebody else.
-6. Leave the merge into main to a person. A cloud box opens no pull
-   request, and trunk only ever comes towards you.
+`ShellWritesNothing` refuses a heredoc into a note, and the Bash door refuses a
+commit message carrying an angle bracket. So a commit message goes through a
+file under the scratchpad, with `git commit -F`.
+
+## What I leave alone
+
+The funnel note stands on a branch of its own, so its own table still reads
+that the judged rules wait. The owner merges that branch, and the row lands
+with it.
