@@ -134,7 +134,13 @@ record:
     hand: box d49afdfe301a64
     hash_before: 500fd9f9079ce5bf55a7071104930285a33b6870
     hash_after: 500fd9f9079ce5bf55a7071104930285a33b6870
-step: children
+  - step: retro/write
+    hand: box d49afdfe301a64
+    hash_before: fa0936e091ab0dd92d55e0be15b79a1604f8af96
+    hash_after: fa0936e091ab0dd92d55e0be15b79a1604f8af96
+    returns: 2
+    why: the hand takes it back
+step: retro/write
 ---
 
 # Ask
