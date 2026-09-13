@@ -116,7 +116,11 @@ record:
     hash_after: ae84900b95a2c902314c4875af2398e09f692e49
     returns: 1
     why: the hand takes it back
-step: split
+  - step: split
+    hand: box d49afdfe301a64
+    hash_before: 34cc24a5ae7f53e16687311770728e5c0bdb239b
+    hash_after: 34cc24a5ae7f53e16687311770728e5c0bdb239b
+step: children
 ---
 
 # Ask
@@ -154,8 +158,8 @@ Done is one of two things, and the retro over the box's own window with it:
 
 ## checked
 
-- the one child is the engine whole, and its diff is the branch, which one reviewer reads at the verdict step
-- the child's ask carries the brief's tables, so the pull, the test verb, the hold, the stop rule and the wrapper stand inside it
+- the one child is the engine whole. Its diff is the branch, and one reviewer reads it at the verdict step.
+- the child's ask carries the brief's tables. The pull, the test verb, the hold, the stop rule and the wrapper stand inside it.
 - the child waits on no other ticket, and the group's own dependencies stand on the group
 
 # children
