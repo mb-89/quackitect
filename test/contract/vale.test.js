@@ -55,13 +55,13 @@ ifVale("the passive is refused and the active passes", async () => {
 ifVale("a paragraph over six sentences is refused and six pass", async () => {
   const said = (n) =>
     Array.from({ length: n }, (_, i) => `Sentence number ${i} stands here.`).join(" ");
-  assert.ok((await ruled(said(7))).includes("LongParagraph"));
-  assert.ok(!(await ruled(said(6))).includes("LongParagraph"));
+  assert.ok((await ruled(said(7))).includes("Paragraph"));
+  assert.ok(!(await ruled(said(6))).includes("Paragraph"));
 });
 
 ifVale("a sentence over the word limit is refused", async () => {
   const long = `The engine ${"and the reader ".repeat(12)}meet here.`;
-  assert.ok((await ruled(long)).includes("LongSentence"));
+  assert.ok((await ruled(long)).includes("Sentence"));
 });
 
 ifVale("the past tense is refused, and the words this tree means pass", async () => {
@@ -99,7 +99,7 @@ ifVale("fenced code carries none of these rules", async () => {
 ifVale("a contraction and a Latin short form are refused", async () => {
   const said = await ruled("The engine doesn't stop, e.g. here.");
   assert.ok(said.includes("Contraction"));
-  assert.ok(said.includes("LatinAbbreviation"));
+  assert.ok(said.includes("Latin"));
 });
 
 const answered = async (text) => {
@@ -111,16 +111,40 @@ const answered = async (text) => {
 ifVale(
   "a heading opens a fresh prose budget, and a third paragraph breaks it",
   async () => {
-    const two = "# One\n\nA paragraph.\n\nA second paragraph.\n";
-    assert.ok(!(await answered(two)).includes("PreferStructureAnswer"));
+    const two = "- The bottom line.\n\n# One\n\nA paragraph.\n\nA second paragraph.\n";
+    assert.ok(!(await answered(two)).includes("ShapeAnswer"));
 
     const across = `${two}\n# Two\n\nA paragraph.\n\nA second paragraph.\n`;
-    assert.ok(!(await answered(across)).includes("PreferStructureAnswer"));
+    assert.ok(!(await answered(across)).includes("ShapeAnswer"));
 
     const three = `${two}\nA third paragraph.\n`;
-    assert.ok((await answered(three)).includes("PreferStructureAnswer"));
+    assert.ok((await answered(three)).includes("ShapeAnswer"));
   },
 );
+
+const inRegister = async (text, where) => {
+  const said = await lintText(text, where, { run, bin });
+  assert.ok(said.ran, `vale ran: ${said.why}`);
+  return said.found.map((f) => f.rule);
+};
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+ifVale("the requirement register takes shall and should, and no other does", async () => {
+  const binds = "- The door shall refuse the write, and it should name the rule.\n";
+  assert.deepEqual(await inRegister(binds, "spec/requirements/one.md"), []);
+
+  for (const where of ["notes.md", "spec/design_output/one.md"]) {
+    const found = await inRegister(binds, where);
+    assert.ok(found.includes("Modal"), `${where} refuses shall and should`);
+  }
+});
+
+ifVale("the register outside the set stands refused inside it too", async () => {
+  const loose = "- The door may refuse the write, and it would say why.\n";
+  const found = await inRegister(loose, "spec/requirements/one.md");
+  assert.ok(found.includes("ModalRequirement"));
+  assert.ok(!found.includes("Modal"), "one modal rule reads a path, and one alone");
+});
 
 // [[spec/design_output/private#a-fixture-carries-no-shape]]
 const SECRETS = ["/home", "fnordwick", "secrets"].join("/");

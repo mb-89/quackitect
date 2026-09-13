@@ -70,6 +70,17 @@ ifVale("a judged rule missing what the judge reads is refused", async () => {
   assert.ok(!(await ruled(good, JUDGED)).includes("VoiceShape.JudgedRule"));
 });
 
+ifVale("a judged rule refusing two labels it names passes", async () => {
+  const head = 'extends: judge\nmessage: "Say it."\nask: "Does it act?"\n';
+  const labels = "labels:\n  - one\n  - two\n  - three\n";
+
+  const good = `${head}${labels}refuses:\n  - two\n  - three\n`;
+  assert.ok(!(await ruled(good, JUDGED)).includes("VoiceShape.JudgedRule"));
+
+  const outside = `${head}${labels}refuses:\n  - two\n  - four\n`;
+  assert.ok((await ruled(outside, JUDGED)).includes("VoiceShape.JudgedRule"));
+});
+
 ifVale("a stop rule missing a field, or naming no side, is refused", async () => {
   const short = "- id: a-rule\n  side: stop\n  priority: 5\n";
   assert.ok((await ruled(short, STOP)).includes("VoiceShape.StopRule"));

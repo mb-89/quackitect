@@ -1,0 +1,19 @@
+# GENERATED. Edit the source named below, not this file. It is written again
+# every time the tree is projected, so an edit here is lost. Source:
+# spec/schemas/paragraph.schema.yaml
+extends: judge
+message: "Put the bottom line first, and the detail under it."
+link: spec/guidance/voice.md
+level: error
+ask: "Ignore a heading line. Where does this text state its main point? first means in its first block, late means only after other detail near the end, and even means every block carries equal weight."
+labels:
+  - first
+  - late
+  - even
+refuses: late
+span: chapter
+reads:
+  - "*.md"
+  - "spec/**/*.md"
+ignores:
+  - ".se/*.md"

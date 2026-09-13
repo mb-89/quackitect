@@ -1,0 +1,10 @@
+# GENERATED. Edit the source named below, not this file. It is written again
+# every time the tree is projected, so an edit here is lost. Source:
+# spec/schemas/paragraph.schema.yaml
+extends: occurrence
+message: "A paragraph holds 3 sentences in an answer. Break this one."
+link: spec/funnel/a-paragraph-has-a-schema.md
+level: error
+scope: paragraph
+max: 3
+token: '[.!?](?:\s|$)'

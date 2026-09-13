@@ -24,9 +24,9 @@ An acknowledgement does not prove comprehension or successful enforcement.
 
 Run the existing mechanical checkers before supported file mutations.
 Refuse violations with corrective feedback. Reject unknown edit shapes.
-Formatting may follow the edit. Limit it to the files the session touches.
+Formatting can follow the edit. Limit it to the files the session touches.
 
-Inject the judged rules as guidance; make no Copilot classification calls.
+Inject the judged rules as guidance. Make no Copilot classification calls.
 Do not change the shared judge configuration.
 
 # State outlives a callback
@@ -36,24 +36,24 @@ removing their originals. Isolate sessions and serialize state updates.
 Retain recoverable state after interruption. Keep incomplete work open.
 
 Allow ordinary reads and writes under `.se`, including handovers and runtime state.
-Apply the same content checks as elsewhere; impose no folder-specific access gate.
+Apply the same content checks as elsewhere. Impose no folder-specific access gate.
 Count validation progress separately from failures, so remaining files alone
 do not exhaust the failure retry budget.
 
-Cloud progress must reach the remote work branch; local cache is temporary.
+Cloud progress must reach the remote work branch. A local cache is temporary.
 
 # A cloud works one branch
 
 Keep `work/<name>` and `todo`, `held`, `done` as the work contract.
 Claim before dispatch. Use a draft pull request with that branch as its head.
 Invoke Copilot on that pull request, which authorizes that head branch.
-The dispatcher creates the pull request; the worker does not create one.
+The dispatcher creates the pull request. The worker does not create one.
 
 Leave merging to a person. Report dispatch failures for recovery.
 Do not give the worker broader credentials to evade branch restrictions.
 
 Give each claim its own dispatch identity. Reuse that identity for a request
-retry; issue a new request after release and a new claim on the same branch.
+retry. Issue a new request after release and a new claim on the same branch.
 
 # Installation reaches both harnesses
 
@@ -68,7 +68,8 @@ Claude must not import or invoke the Copilot runtime.
 Test event translation, denial feedback, rule counts, interrupted handovers,
 session isolation, formatting after edits and branch restrictions.
 Test each outside boundary once through its door contract. Use mocks for
-runtime and dispatch behavior; add no duplicate real-Git workflow tests.
+runtime and dispatch behavior. Add no duplicate real-Git workflow tests.
+
 Run the existing checks to detect Claude regressions.
 Verify VS Code startup and a real cloud branch round trip before claiming
 live compatibility. Unit tests alone cannot prove platform integration.
@@ -78,8 +79,9 @@ live compatibility. Unit tests alone cannot prove platform integration.
 Copilot does not expose Claude's prompt-block middleware or answer rewrite.
 Do not depend on transcript parsing for the initial implementation.
 Hook timeout can fail open in cloud: bound internal work below that timeout.
-This reduces risk; the host still permits tools after a timeout.
-Shell programs can mutate files outside edit tools; use a sandbox for filesystem isolation.
+
+This reduces risk. The host still permits tools after a timeout.
+Shell programs can mutate files outside edit tools. Use a sandbox for filesystem isolation.
 
 # Source contracts
 
