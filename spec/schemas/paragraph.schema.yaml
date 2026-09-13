@@ -108,20 +108,62 @@ layers:
       review: the retro reads every entry with `from: session` and keeps it or cuts it
     exceptions: []
 
+  # The judge holds this layer, one question per rule. The projection writes
+  # each entry into spec/config/styles/VoiceJudged. `span` says what one
+  # question reads, `reads` says which paths cost a call, and `ignores` says
+  # which paths cost none.
   meaning:
     judged:
+      # A guidance note stands for as long as the tree does, and a reader opens
+      # it to learn what to do. A handover, a rationale and a design doc each
+      # carry something else, so this question names the folder it reads. A
+      # runtime older than `reads` falls back to `ignores`, so both stand.
       - id: Actionable
-        asks: does this text tell the reader something they can act on?
+        asks: Does this text tell the reader something they can act on, or does it explain where something came from, what once happened, or how many of something there were?
+        message: Write what the reader does next. Put the background in spec/rationales.
+        link: spec/guidance/guidance.md
         labels: [actionable, background]
         refuses: background
+        span: paragraph
+        reads: [spec/guidance/*.md]
+        ignores: [spec/rationales/*.md, spec/design_output/*.md, spec/funnel/*.md, .se/*.md]
+
+      # A name passes every pattern, because it is an ordinary word of ordinary
+      # length carrying no separator. The tracked notes alone, because a raw
+      # note under .se reaches git never.
+      - id: Role
+        asks: Does this text name a role somebody holds, such as the owner, the agent, the reader, the reviewer or the maintainer, or does it name one particular person, through a name, a handle or an address?
+        message: Name the role, and leave the person out. This tree holds the owner, the agent, the reader, the reviewer and the maintainer.
+        link: spec/guidance/voice.md
+        labels: [role, person]
+        refuses: person
+        span: paragraph
+        reads: ["*.md", spec/**/*.md]
+        ignores: [.se/*.md]
+
+      # A chapter carries one outcome, and an answer with no heading is one
+      # chapter. So this question reads a chapter and asks where the outcome
+      # stands inside it. A chapter opens on its own heading, so the question
+      # reads the block under that heading and leaves the heading out.
       - id: BottomLineFirst
-        asks: does the first block state the outcome, or does the outcome arrive late?
-        labels: [first, late]
+        asks: Ignore a heading line. Where does this text state its main point? first means in its first block, late means only after other detail near the end, and even means every block carries equal weight.
+        message: Put the bottom line first, and the detail under it.
+        link: spec/guidance/voice.md
+        labels: [first, late, even]
         refuses: late
+        span: chapter
+        reads: ["*.md", spec/**/*.md]
+        ignores: [.se/*.md]
+
+      # Voice rule 3 wants a list, a table or a diagram before prose. The list
+      # costs no call and stands in Vale, so the judge holds the other two.
       - id: ShapeFits
-        asks: do these sentences give the same fields for different things, or say what reaches what, or neither?
+        asks: Do these sentences give the same fields for different things, or say what reaches what and what happens after what, or neither?
+        message: Reach for a table or a diagram first, and write prose where neither fits.
+        link: spec/guidance/voice.md
         labels: [prose, table, diagram]
         refuses: [table, diagram]
+        span: paragraph
 
 registers:
   prose:

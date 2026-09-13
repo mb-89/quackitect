@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+# The push door for a person in a terminal. Git runs it before a push and pipes
+# one line per ref, and a ref naming trunk reads the stamp the check wrote. The
+# Bash door holds the same rule for a session, and each stands without the other.
+# [[spec/design_output/work#the-battery-answers-first]]
+set -eu
+here=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+
+cd "$here" || exit 0
+command -v node >/dev/null 2>&1 || exit 0
+
+node src/scripts/prepush.js

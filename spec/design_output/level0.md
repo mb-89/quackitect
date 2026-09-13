@@ -447,6 +447,31 @@ nothing for a file those globs reach.
 List a folder there where the rule's question misreads its job. `Actionable`
 ignores `spec/rationales` and `spec/design_output`, and stands everywhere else.
 
+## A judged rule cuts
+
+Give a judged rule `span`, saying what one question reads. A rule leaving it
+out reads a paragraph, which is what every rule read before the key stood.
+
+| span | one question reads | who takes it |
+|---|---|---|
+| `paragraph` | a run of prose lines, with 12 words at least | `Actionable`, `Role`, `ShapeFits` |
+| `chapter` | a heading and the blocks under it, to the next heading | `BottomLineFirst` |
+
+A note with no heading is one chapter, so an answer arrives whole. The lines
+above a first heading make no chapter, because an edit hands the judge the tail
+of the chapter above it. The frontmatter stands outside both cuts, and so does a
+fenced block.
+
+A question about where the outcome stands wants the whole chapter, because a
+paragraph on its own says nothing about what comes before it. A question about
+one shape wants the paragraph, because the shape is the paragraph's own.
+
+## A rule refuses a list
+
+Give `refuses` one label, or a list of them. `ShapeFits` names three labels and
+refuses two, so the model picks the shape and the rule refuses every shape that
+is not prose.
+
 # The standing layer
 
 `prompt.context` computes the blocks a conversation's first message carries. It
@@ -571,6 +596,14 @@ call after that, until an answer stands.
 Each writes a `gate` line at `warn`: `warned Read before an answer`, then
 `refused Read before an answer`, with the demand in the detail.
 
+## A prompt mid-turn
+
+- Outcome: a prompt landing mid-response binds the next response, and the one in flight goes free.
+- Cause: the response in flight completes with no text, before the model reads the prompt.
+- Count: every tool call adds one, and every step sets the count to zero.
+- Skip: a prompt landing over a count above zero skips the next step.
+- Log: a silent step, or one the door skips, writes a `step` line.
+
 ## A step carries the answer
 
 `turn.step` hands the hook each response once its blocks stand, with its
@@ -688,7 +721,7 @@ edges, and the score falls in one of three bands:
 | the score | what happens |
 |---|---|
 | under `warnAt` | nothing |
-| from `warnAt` to the ceiling | the findings ride the next prompt as one line |
+| from `warnAt` to the ceiling | the `answer` line at `warn`, and nothing reaches the prompt |
 | at the ceiling or over it | one re-prompt saying rewrite, once per turn |
 
 An answer carrying no finding reads clean, whatever its length. Every band
@@ -711,15 +744,6 @@ already uses, because a refusal quoting the rule teaches it better than a
 refusal naming it. The door holding the owner's prompt first reads
 `e.origin.kind`, and a plugin prompt is a machine, so that door owes this one no
 readback.
-
-## The carry rides a prompt
-
-Under the ceiling the findings wait for the next prompt a person sends, and ride
-it as one line under the text. The line names the score and every rule behind
-it, and asks the session to hold those rules for the rest of the turn.
-
-The findings ride once. A prompt from a machine leaves them waiting, so the line
-reaches a person's turn and no other.
 
 ## The gate holds its state
 
@@ -750,6 +774,70 @@ refusing nothing leaves open.
 
 The tool registers at the session's start, and `spec/guidance/working.md`
 carries the line that sends a session to it.
+
+# The question comes first
+
+A prompt carrying a question gets its answer first, in a table a reader skims.
+The count comes from the prompt, and the table check reads the answer against
+it. Both stand in `lib/answer.js`, beside the door, because Vale reads no
+session state.
+
+For the argument, see [[spec/funnel/a-paragraph-has-a-schema]].
+
+## The door counts the questions
+
+`prompt.submit` counts the sentences of the prompt closing on `?` outside a
+fence, for the kinds `opensATurn` names. The count holds for the turn, and a
+prompt from a machine leaves it standing. So a re-prompt from the gate or the
+tooth leaves the count alone.
+
+## The table answers every question
+
+The gate and `check_answer` read the first block of the answer against the
+count. The block is a table, its header names `question` and `answer`, and its
+body holds one row a question.
+
+| the answer opens with | what the check says |
+|---|---|
+| a table naming the two columns, with rows enough | nothing |
+| prose, a heading or a list | the answer opens with no table |
+| a table naming other columns | the header reads the wrong names |
+| a table short of a row | the table holds too few rows |
+
+A count of zero demands no table. A question the session cannot answer still
+takes its row, and the answer cell says what blocks it. The finding reads
+`QuestionTable`, and it joins the findings of Vale, so one score weighs both.
+
+# The owner answers by number
+
+- Outcome: the owner answers a stop with numbers alone.
+- Holder: three shape checks in `lib/answer.js`, read by the gate and `check_answer`.
+
+## The needs table
+
+- Outcome: a numbered needs table closes every answer ending on a stop call.
+- Finding: `NeedsTable`.
+- Teacher: the stop texts in `lib/stop.js`.
+
+| the check reads | what it demands |
+|---|---|
+| the heading | `What the agent needs`, at any level |
+| the columns | `No.`, `question` and `proposed answer`, in order |
+| the first cell of a row | 1, 2, 3 in order |
+| every other cell | no code, and 12 words at most |
+| the body | one row at least, and one saying nothing waits where nothing does |
+
+## The cap counts the prose
+
+- Outcome: an answer past `answer.words` meets a rewrite.
+- Count: every word outside a fence and outside a table row.
+- Finding: `AnswerLength`. A missing value leaves the cap off.
+
+## A shape finding rewrites
+
+The gate asks for a rewrite on any shape finding, whatever the score. The shape
+findings read `QuestionTable`, `NeedsTable` and `AnswerLength`. A rate lets one
+finding in a long answer pass, and a shape finding holds no rate.
 
 # The rules past one buffer
 
@@ -808,7 +896,7 @@ answers that the rules pass.
 | `spec/config/styles/VoiceVale` | Vale reads it over prose and code |
 | `spec/config/styles/VoiceShape` | Vale reads it over the shape of a note or a rule file |
 | `spec/config/styles/VoiceScript` | Vale reads it over a shell script |
-| `spec/config/styles/VoiceJudged` | a model reads it, and no `BasedOnStyles` names it |
+| `spec/config/styles/VoiceJudged` | a model reads it, and the projection writes it |
 | `spec/config/biome.json` | Biome reads it |
 
 `[formats]` in `.vale.ini` maps `yml` to `md`, so Vale reads a rule file at all.

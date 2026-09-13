@@ -2,7 +2,6 @@
 # hand the engine spawns for it. The counts stand in the ask before a word
 # is read, and the four questions are the fields.
 # [[spec/design_input/the-agent-pulls-tickets#the-retro]]
-name: chapter
 for: one chapter of a retro's window, read by one hand
 ask:
   - name: window

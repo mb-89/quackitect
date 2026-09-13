@@ -1,7 +1,6 @@
 # The smallest ticket: a thing to look at later, with no work in it yet.
 # A hand mints one mid-work and carries on. A retro decides it.
 # [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
-name: note
 for: a thing to look at later, with no work in it yet
 ask:
   - name: line

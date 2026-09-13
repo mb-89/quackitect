@@ -96,6 +96,13 @@ Vale reads the message under the path `level0-commit.md`, so the same rules
 reach it that reach any other markdown in this tree. A breach comes back
 naming the rule, the line and the phrase.
 
+`withoutTrailers` reads the message's last paragraph before Vale does:
+
+| the last paragraph | what the door does |
+|---|---|
+| every line reads `Token: value` | takes it off, because git owns that shape and the harness writes it |
+| anything else | lints it with the rest |
+
 `git commit --amend` on its own opens an editor, so it meets the last row.
 `git commit --amend --no-edit` carries its message forward and passes.
 

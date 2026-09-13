@@ -16,6 +16,14 @@
       "from": "spec/schemas/paragraph.schema.yaml",
       "schema": "spec/schemas/paragraph.schema.schema.json",
       "wrap": "none"
+    },
+    {
+      "name": "the judged rules",
+      "shape": "judged rules",
+      "target": "spec/config/styles/VoiceJudged",
+      "from": "spec/schemas/paragraph.schema.yaml",
+      "schema": "spec/schemas/paragraph.schema.schema.json",
+      "wrap": "none"
     }
   ]
 }
