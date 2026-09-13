@@ -7,6 +7,9 @@ export const CONFIG = ".vale.ini";
 export const PROSE = /\.(md|markdown|txt)$/i;
 
 const MARKER = /<!--\s*vale\s+([A-Za-z0-9_.-]+)\s*=\s*(NO|off)\s*-->/i;
+
+// [[spec/design_output/projection#the-second-target]]
+const PROSE_STYLE = /^Voice(Vale|Paragraph)\./;
 const REASON = /<!--\s*because:\s*(.+?)\s*-->/i;
 
 export async function lintText(text, where, options = {}) {
@@ -67,7 +70,7 @@ export function fromJson(stdout) {
     for (const row of rows) {
       out.push({
         file,
-        rule: String(row.Check ?? "").replace(/^VoiceVale\./, ""),
+        rule: String(row.Check ?? "").replace(PROSE_STYLE, ""),
         line: row.Line ?? 1,
         column: row.Span?.[0] ?? 1,
         said: row.Match ?? "",

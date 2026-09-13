@@ -4,7 +4,12 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { judgeOf, spansIn } from "../../.claude/skills/level0/lib/judge.js";
+import {
+  chaptersIn,
+  judgeOf,
+  refusedBy,
+  spansIn,
+} from "../../.claude/skills/level0/lib/judge.js";
 import { readRule } from "../../.claude/skills/level0/lib/rulefile.js";
 
 const settings = {
@@ -141,6 +146,116 @@ test("a model naming no label passes the text", async () => {
     }),
     [],
   );
+});
+
+// [[spec/design_output/level0#a-judged-rule-cuts]]
+test("a rule refusing two labels refuses both, and passes the third", async () => {
+  const shape = [
+    'message: "Reach for a table first."',
+    'ask: "Do these sentences give the same fields for different things?"',
+    "labels:",
+    "  - prose",
+    "  - table",
+    "  - diagram",
+    "refuses:",
+    "  - table",
+    "  - diagram",
+  ].join("\n");
+  const rule = { ...readRule(shape), name: "ShapeFits" };
+  assert.deepEqual(rule.refuses, ["table", "diagram"]);
+
+  const judge = judgeOf(settings, [rule]);
+  const long =
+    "The first door takes a write, the second door takes a command, and the third takes an answer.";
+
+  for (const label of ["table", "diagram"]) {
+    const found = await judge.run(long, async () => label);
+    assert.equal(found.length, 1, `${label} refuses`);
+    assert.equal(found[0].rule, "ShapeFits");
+  }
+  assert.deepEqual(await judge.run(long, async () => "prose"), []);
+});
+
+test("a rule naming no label refuses nothing", () => {
+  assert.equal(refusedBy({}, "late"), false);
+  assert.equal(refusedBy({ refuses: "late" }, undefined), false);
+  assert.equal(refusedBy({ refuses: ["late"] }, "late"), true);
+});
+
+// [[spec/design_output/level0#a-judged-rule-cuts]]
+test("a chapter carries its heading, and the frontmatter carries none", () => {
+  const note = [
+    "---",
+    "kind: [[guidance]]",
+    "---",
+    "",
+    "# The first chapter",
+    "",
+    "A first chapter long enough to be worth a call from the judge here.",
+    "",
+    "# The second chapter",
+    "",
+    "A second chapter long enough to be worth a call from the judge here.",
+  ].join("\n");
+
+  const chapters = chaptersIn(note);
+  assert.equal(chapters.length, 2);
+  assert.match(chapters[0].text, /^# The first chapter/);
+  assert.match(chapters[1].text, /^# The second chapter/);
+  assert.equal(chapters[1].line, 9);
+  assert.ok(!chapters[0].text.includes("kind:"), "the frontmatter stands outside");
+});
+
+test("the lines above a first heading make no chapter, and a note with none makes one", () => {
+  const tail = "The tail of a chapter above, long enough for the judge to read it here.";
+  const next = "A chapter under its heading, long enough for the judge to read it here.";
+  const edit = `${tail}\n\n## The next chapter\n\n${next}\n`;
+
+  const chapters = chaptersIn(edit);
+  assert.equal(chapters.length, 1);
+  assert.match(chapters[0].text, /^## The next chapter/);
+  assert.equal(chapters[0].line, 3);
+
+  assert.equal(chaptersIn(tail).length, 1, "a note with no heading stands whole");
+});
+
+test("a heading inside a fence opens no chapter", () => {
+  const said = [
+    "# One chapter",
+    "",
+    "```",
+    "# a shell comment, and no heading at all, standing inside the fence here",
+    "```",
+    "",
+    "A line under the fence, long enough for the judge to read it as prose.",
+  ].join("\n");
+  assert.equal(chaptersIn(said).length, 1);
+});
+
+// [[spec/design_output/level0#a-judged-rule-cuts]]
+test("a rule reads one paragraph, and a rule reading a chapter takes both", async () => {
+  const text = [
+    "# A heading",
+    "",
+    "The first paragraph stands here, and it runs long enough to reach the judge.",
+    "",
+    "The second paragraph stands here, and it runs long enough to reach the judge.",
+  ].join("\n");
+
+  const asked = [];
+  const says = async (said) => {
+    asked.push(said);
+    return "clean";
+  };
+
+  await judgeOf(settings, [{ ...readRule(ACTIONABLE), name: "Actionable" }]).run(text, says);
+  assert.equal(asked.length, 2, "a paragraph rule asks once per paragraph");
+
+  asked.length = 0;
+  const chaptered = { ...readRule(`${ACTIONABLE}\nspan: chapter`), name: "BottomLineFirst" };
+  await judgeOf(settings, [chaptered]).run(text, says);
+  assert.equal(asked.length, 1, "a chapter rule asks once per chapter");
+  assert.match(asked[0], /A heading/);
 });
 
 test("the judge is off where the settings say so", () => {

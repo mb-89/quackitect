@@ -8,6 +8,13 @@ export const SESSION = `${FOLDER}/session.jsonl`;
 export const OLD = `${FOLDER}/old`;
 export const LOG_TOOL = "log";
 
+// [[spec/design_output/log#an-answer-rides-the-tool]]
+export const ANSWER_KIND = "answer";
+
+export function answersTheOwner(e) {
+  return String(e?.kind ?? "") === ANSWER_KIND && Boolean(String(e?.said ?? "").trim());
+}
+
 const LEVELS = ["info", "warn", "error"];
 const SAID = 80;
 const OWN = ["at", "level", "kind", "said"];
@@ -57,11 +64,13 @@ export function logSpec() {
       "Writes one line to this session's log, the one the owner reads in the",
       "viewer. The hook stamps the time. Name the kind, such as status or note,",
       "and say one sentence; text carries more where one sentence runs short.",
+      `Kind ${ANSWER_KIND} answers the owner's prompt: call it first after a prompt,`,
+      "with what you understood and what you do next, and the door lets the work on.",
     ].join(" "),
     inputSchema: {
       type: "object",
       properties: {
-        kind: { type: "string", description: "What the line is, such as status or note." },
+        kind: { type: "string", description: `What the line is, such as ${ANSWER_KIND}, status or note.` },
         said: { type: "string", description: "One sentence, 80 characters at most." },
         text: { type: "string", description: "The whole text, where said runs short." },
         level: { type: "string", enum: LEVELS, description: "info, warn or error." },
