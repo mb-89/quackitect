@@ -104,6 +104,7 @@ record:
   - step: retro/cloud
     skipped: true
     why: the box runs off the cloud
+    hash_after: e7acf2334fb8a94f6a5763c439b6aab721093496
 step: retro/write
 reason: done
 ---
