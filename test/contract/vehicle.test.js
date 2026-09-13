@@ -79,7 +79,7 @@ test("a copy answers its own verbs, with no tree behind it", () => {
     files.makeDir(join(home, ".vscode", "extensions"));
     const said = outside.run([SHELL, "RUNME.sh", "vehicle"], {
       cwd: dest,
-      env: { HOME: home, USERPROFILE: home },
+      env: { HOME: home, USERPROFILE: home, SE_INSTALL_SKIP: "index se-lsp editor-client" },
     });
     assert.equal(said.exitCode, 0, said.stderr);
     assert.match(said.stdout, new RegExp(`method\\s+${either(dest)}`), "it names itself as method");
