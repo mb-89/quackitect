@@ -90,7 +90,7 @@ counts as an identifier where it carries a separator inside it:
 | a dot between letters | `example.com` |
 | twelve characters with no separator at all | a key, a hash, a password |
 
-A token shorter than eight characters passes, because a short word collides by
+A token shorter than eight characters passes, because a short word matches by
 chance and a check refusing honest writing is a check nobody keeps.
 
 ## A bare name passes

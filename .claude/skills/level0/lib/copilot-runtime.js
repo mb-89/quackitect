@@ -119,7 +119,7 @@ export async function handle(event, it) {
               `# Handover: ${one.path}\n${one.text}\nWrite a fresh result at the same path before finishing.`,
           ),
           cloud
-            ? `This session already holds ${state.branch}. Run work sync, not work take. The dispatcher owns the existing pull request; open no new one.`
+            ? `This session already holds ${state.branch}. Run branch sync, not branch take. The dispatcher owns the existing pull request; open no new one.`
             : "",
           `In your FIRST reply acknowledge these rules and end with exactly: rules: ${count}. Write the receipt once.`,
         ]
@@ -146,13 +146,13 @@ export async function handle(event, it) {
         if (
           cloud &&
           (landsOnTrunk(command, state.branch) ||
-            /\bwork\s+(?:take|new|merge|close)\b/.test(command) ||
-            /\bwork\s+release\s+[^\s;&|]/.test(command) ||
+            /\bbranch\s+(?:take|new|merge|close)\b/.test(command) ||
+            /\bbranch\s+release\s+[^\s;&|]/.test(command) ||
             /\bgit\b[^\r\n;&|]*\b(?:switch|checkout)\b/.test(command) ||
             /\bgh\b[^\r\n;&|]*\bpr\s+(?:create|merge|close)\b/.test(command))
         ) {
           return {
-            deny: "This session works its assigned branch only. Use work sync, work done, or work release; leave main to a person.",
+            deny: "This session works its assigned branch only. Use branch sync, branch done, or branch release; leave main to a person.",
           };
         }
         return {};
@@ -223,7 +223,7 @@ export async function handle(event, it) {
           : "";
         if (branch() !== state.branch || !["done", "todo"].includes(statusOf(result)))
           issues.push(
-            "Run work done, or work release if incomplete, on the assigned branch.",
+            "Run branch done, or branch release if incomplete, on the assigned branch.",
           );
         const dirty = run(["git", "status", "--porcelain"]);
         const remote = run([

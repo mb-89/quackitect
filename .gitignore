@@ -9,6 +9,10 @@
 # writes it again, so each box keeps its own.
 .claude/types/
 
+# A helper's worktree stands here for one task, and git holds a worktree as a
+# folder of its own.
+.claude/worktrees/
+
 # Setup generates the Copilot registrations under .github, and this tree tracks
 # them on purpose. A cloud box reads its hooks and its setup job from the
 # default branch, so committing them is what keeps level zero active there.

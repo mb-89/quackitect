@@ -67,6 +67,13 @@ the main loop leaves out.
 So the write door already holds over a helper, and the guidance is the gap.
 `agent.spawn` closes it.
 
+## A helper ends no turn
+
+- Outcome: a helper's `turn.step` and `turn.complete` reach the session's hooks, and both return at once under an `agentId`.
+- Cause: the gate reads a helper's answer at its turn end and prompts the session after a standing stop.
+- Door: a helper gets no reply line, no canary, no stop vote and no gate. So nothing from level zero prompts after a standing stop.
+- Demand: a helper's step text answers no demand of the owner's, so the session's own text has to.
+
 ## The spawn carries a rewrite
 
 Measured the same day and the same way. `agent.spawn` fires once per subagent,
@@ -139,6 +146,39 @@ carries none.
 root, and it names the file. So the whole of level zero stands inside one
 folder. A shape holding `lib` under `src` and the hooks module elsewhere fails
 before a session starts.
+
+## A stub names its vehicle
+
+A stub runs the vehicle's level zero with no plugin folder of its own and no
+copy in the tree. The client loads the plugin from the vehicle's folder,
+because that folder is a marketplace: `.claude-plugin/marketplace.json` at the
+vehicle's root names `./.claude/skills/level0`. The stub names the marketplace
+under `extraKnownMarketplaces` with a directory source, and enables
+`level0@<brand>` under `enabledPlugins`. One `claude plugin install` at install
+time, and every session there carries the cage. Measured against client
+2.1.269 on a throwaway stub: the canary comes back, and the tools keep the
+name `level0`.
+
+The client keeps a cache of the plugin folder under the user's home, one per
+version, off every tree. `claude plugin update` refreshes it. The path to the
+vehicle differs per box, so the shim writes it into `.claude/settings.local.json`,
+which git ignores.
+
+Every road that runs the vehicle's code inside a plugin of the stub's own fails.
+One headless turn a road says so:
+
+| the road | what stops it |
+|---|---|
+| a dynamic import of a file URL outside the folder | the loader: a hooks module imports its own files by relative path, and nothing else |
+| a relative path climbing past the folder | the loader: outside the plugin's folder |
+| a link inside the folder pointing out | the loader: no such file under the folder |
+| the code read as text, built with `Function` | the sandbox refuses code built from a string |
+| a copy of `hooks` and `lib` inside the folder | nothing, and the owner refuses a copy in a tree |
+
+Two more things the probes answer. `claude plugin validate` follows `$` into
+a function declared at the top of the file alone, so a hook hands `$` nowhere
+else. A marketplace entry's `source` is a relative path under the marketplace
+root, so the vehicle is its own marketplace.
 
 ## The filesystem reads and writes
 
@@ -582,19 +622,20 @@ The hook reads the two keys at every `tool.call`, so a button pressed mid-turn
 reaches the next call. The latest demand replaces the one before it, and starts
 with a warning of its own.
 
-## One warning, then a refusal
+## A warning on every call
+
+The door refuses no call. A refused call fires no step, and the text of that
+step reaches nothing. So a refusal locks the session, the stop call with it.
+Every call while the demand stands carries a warning instead.
 
 The response in flight when a demand lands can carry the answer, and its text
 reaches the hook only once the response completes. So every call of that
-response passes.
+response passes with no warning. A response completing with no text leaves the
+demand open. Each call after it carries the warning, and the session reads it
+after the tool's result. The warning names what the person waits for.
 
-A response completing with no text leaves the demand open. The next call runs,
-and carries a warning the session reads after the tool's result. The warning
-names what the person waits for. The call after it stands refused, and every
-call after that, until an answer stands.
-
-Each writes a `gate` line at `warn`: `warned Read before an answer`, then
-`refused Read before an answer`, with the demand in the detail.
+Each such call writes a `gate` line at `warn`: `warned Read before an answer`,
+with the demand in the detail.
 
 ## A prompt mid-turn
 
@@ -606,10 +647,12 @@ Each writes a `gate` line at `warn`: `warned Read before an answer`, then
 
 ## A step carries the answer
 
-`turn.step` hands the hook each response once its blocks stand, with its
-visible text in `answer`. Text there answers the demand, and the hook writes it
-as the `answer` line. For details, see
-[[spec/design_output/log#the-answer-under-its-prompt]].
+The hook reads the answer off the transcript after each step, and off the
+turn's own text at the turn end. `turn.step` hands the hook each response once
+its blocks stand, with its visible text in `answer`. On client 2.1.269 that
+field stands empty, whatever the response says. Text found in either place
+answers the demand, and the hook writes it as the `answer` line. For details,
+see [[spec/design_output/log#the-answer-under-its-prompt]].
 
 The transcript stands behind the step. `$.session.messages()` answers its newest
 4096 messages alone, so the door remembers the last answer standing when the
@@ -654,7 +697,7 @@ better than a refusal naming it.
 ## Where it must not bite
 
 - A turn nobody opens.
-- A turn the session has already answered, however briefly.
+- A turn the session has already answered, in one line or many.
 - A helper's call. A subagent's `tool.call` carries `agentId`, and a helper owes
   the owner no readback.
 - `AskUserQuestion`, which reaches the owner itself. A door refusing it stops a
@@ -721,36 +764,19 @@ edges, and the score falls in one of three bands:
 | the score | what happens |
 |---|---|
 | under `warnAt` | nothing |
-| from `warnAt` to the ceiling | the `answer` line at `warn`, and nothing reaches the prompt |
-| at the ceiling or over it | one re-prompt saying rewrite, once per turn |
+| from `warnAt` up | the `answer` line at `warn`, and the findings ride the next tool call |
 
 An answer carrying no finding reads clean, whatever its length. Every band
-writes one `answer` line naming the score, the findings and the count.
+writes one `answer` line naming the score and the findings. The ceiling names
+the band `rewrite` in that line, and nothing more hangs on it.
 
-## The re-prompt over the ceiling
+## The findings ride the call
 
-A re-prompt is a `$.prompt.submit` from the hook, the way the tooth does it.
-Three things hold the count at one:
-
-- A lock per turn. A second turn end inside one turn submits nothing, and the
-  findings wait instead.
-- `stop.mostInARow`, which caps the re-prompts the way it caps the tooth. The
-  next prompt from a person drops the count.
-- The tooth itself. One prompt goes out per turn end, and where the tooth holds
-  the turn open that prompt belongs to it. The findings wait for the next one.
-
-The prompt carries the findings in the wording `refusal` in `lib/refuse.js`
-already uses, because a refusal quoting the rule teaches it better than a
-refusal naming it. The door holding the owner's prompt first reads
-`e.origin.kind`, and a plugin prompt is a machine, so that door owes this one no
-readback.
-
-## The gate holds its state
-
-`gateOf` in `lib/answer.js` holds the lock, the count and the findings waiting,
-and the hook hands it one reading per turn end. It mirrors the tooth. A prompt
-from a person drops the count, and a prompt of the hook's own leaves it standing.
-The turn's end answers what comes next.
+- Outcome: the gate submits no prompt, so no answer prints twice.
+- Cause: an answer in the chat is out the moment the session sends it.
+- Holder: `gateOf` in `lib/answer.js` keeps the findings of the last answer.
+- Ride: the session's next tool call carries them as context, once, in the wording `gateNote` writes.
+- Lint: `check_answer` reads a draft before it goes out, and the guidance sends every long draft there.
 
 ## What the gate says
 
@@ -777,7 +803,7 @@ carries the line that sends a session to it.
 
 # The question comes first
 
-A prompt carrying a question gets its answer first, in a table a reader skims.
+A prompt carrying a question gets its answer first, in a table a reader takes in at a glance.
 The count comes from the prompt, and the table check reads the answer against
 it. Both stand in `lib/answer.js`, beside the door, because Vale reads no
 session state.
@@ -870,7 +896,7 @@ most. Vale counts a heading, through `ShortHeading`, and refuses a dash or a
 colon inside one through `OneTitle`, because both turn one title into two.
 
 Vale reads what a file holds, and its path stays outside that. So
-`.claude/skills/level0/lib/names.js` counts a name instead. `work new` refuses a
+`.claude/skills/level0/lib/names.js` counts a name instead. `branch new` refuses a
 long branch, and `NameHoldsTheWords` holds every path git tracks.
 For details, see [[spec/design_output/tree#the-rules-over-two-files]].
 
@@ -884,7 +910,7 @@ Vale answers a broken rule file with an `E201`. It writes that to standard
 error and leaves standard output empty, so a reader parsing JSON alone finds no
 breach.
 
-One broken rule therefore turns every rule in the tree off, and the tree
+So one broken rule turns every rule in the tree off, and the tree
 answers that the rules pass.
 
 `faultIn` in `lib/vale.js` reads that answer, and `./RUNME.sh lint` stops on it.
@@ -943,7 +969,7 @@ short forms that read the same everywhere keep theirs.
 ## Vale refuses overlapping fixes
 
 Vale drops both fixes and names the overlap. A token reaching past its own word
-therefore costs the fix beside it, so every token here stops at its own edge.
+costs the fix beside it, so every token here stops at its own edge.
 
 # What the cage loads
 
@@ -971,19 +997,19 @@ thing still holds everything else it reads.
 `ensureCage` wraps that load in a `try`, and any door asks it. The first door to
 ask pays for the load, and the rest take the answer. A session the harness
 resumes carries no `session.start`, so the first `tool.call` loads the cage
-instead, and the session mends itself before it writes anything.
+instead, and the session repairs itself before it writes anything.
 
 The engine refuses `$` handed to a function nested inside `register`, so both
 stand at the top of the file and take the state as an argument.
 
 # God mode
 
-A cage holding nothing says so, and refuses the work until somebody mends it.
+A cage holding nothing says so, and refuses the work until somebody fixes it.
 `.se/level0.health` carries that answer:
 
     { "ok": false, "why": "no vale stands here", "at": "..." }
 
-While `ok` reads false, the door refuses every call except the ones that mend
+While `ok` reads false, the door refuses every call except the ones that fix
 the cage:
 
 | the call | god mode |
@@ -994,10 +1020,10 @@ the cage:
 | every other write, and every other command | refuses |
 
 The refusal names the fault and the road out, so a session that meets it reads
-what to do. A door refusing everything shuts the road that mends it, and
+what to do. A door refusing everything shuts the road that fixes it, and
 the session stands there for good.
 
-The mend clears itself. `ensureCage` retries while the answer reads false, so
+The fix clears itself. `ensureCage` retries while the answer reads false, so
 the first call after a repair loads the rules again, writes `ok: true`, and says
 `the cage holds again` to the log. The install runs once, and a retry costs a
 read.

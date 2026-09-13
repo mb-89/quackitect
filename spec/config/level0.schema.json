@@ -37,7 +37,7 @@
         "ceiling": {
           "type": "number",
           "unit": "findings a thousand words",
-          "help": "The score where the gate asks for one rewrite."
+          "help": "The score where the gate names the band rewrite in its log line."
         },
         "words": {
           "type": "number",
@@ -125,11 +125,13 @@
         "level": {
           "type": "string",
           "enum": [
+            "debug",
             "info",
             "warn",
-            "error"
+            "error",
+            "fatal"
           ],
-          "help": "The level this box writes at. info writes every line a door says."
+          "help": "The level this box writes at. info writes every line a door says, and debug writes what the hooks see too."
         },
         "open": {
           "help": "Open the log viewer, in a terminal beside the editor.",
@@ -217,6 +219,21 @@
           "type": "string",
           "unit": "a span, as 90m, 12h or 3d",
           "help": "The age of a held group's tip that puts it under yours."
+        },
+        "failsBeforePerson": {
+          "type": "number",
+          "unit": "returns",
+          "help": "The times a step fails back before the pull inserts a person step."
+        },
+        "refusalsBeforePerson": {
+          "type": "number",
+          "unit": "refusals",
+          "help": "The times one hand-back meets refused before the pull inserts a person step."
+        },
+        "stepsBeforeSplit": {
+          "type": "number",
+          "unit": "steps",
+          "help": "The person steps a ticket carries before the pull refuses another and asks for a split."
         }
       }
     },

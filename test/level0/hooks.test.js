@@ -89,7 +89,7 @@ function engine(seed = {}, taught = {}) {
           .filter((one) => one.startsWith(`${path}/`))
           .map((one) => ({ name: one.slice(path.length + 1), kind: "file" })),
       exists: async (path) =>
-        taught.exists ? Boolean(taught.exists(path)) : path === VALE,
+        taught.exists ? Boolean(taught.exists(path)) : path === VALE || path === INDEX,
     },
     process: {
       run: async (argv, init) => {
@@ -172,6 +172,7 @@ async function started(seed, taught) {
 }
 
 const VALE = ".se/bin/vale";
+const INDEX = ".se/bin/se-index";
 
 function valeSaying(found) {
   return {
@@ -238,6 +239,17 @@ const NEEDS = [
 async function endsATurn(it, answer = "done") {
   await stops(it);
   await it.raise("turn.complete", { ...answered, answer: `${answer}\n\n${NEEDS}` });
+}
+
+// The first turn ends on the canary, so a test of the call starts past it. [[spec/design_output/stop#the-canary-ends-turn-one]]
+async function startedPast(seed, taught) {
+  const it = await started(seed, taught);
+  await it.raise("turn.complete", { ...answered, answer: canary({ rules: 2, notes: 1, stop: true }) });
+  const mark = it.lines().length;
+  const prompts = it.prompts.length;
+  it.since = () => it.lines().slice(mark);
+  it.promptsSince = () => it.prompts.slice(prompts);
+  return it;
 }
 
 test("a session start writes one line, and registers every tool", async () => {
@@ -315,20 +327,20 @@ test("a turn ending with no answer writes no reply", async () => {
 
 // [[spec/design_output/stop#every-decision-writes-a-line]]
 test("a turn end writes one stop line", async () => {
-  const it = await started();
+  const it = await startedPast();
   await endsATurn(it);
 
-  const said = it.lines().filter((one) => one.kind === "stop");
+  const said = it.since().filter((one) => one.kind === "stop");
   assert.equal(said.length, 2, "the call writes one, and the vote the other");
   assert.equal(said[0].said, "the stop stands");
   assert.equal(said[1].said, "the turn ends");
-  assert.match(said[1].detail, /^stop=the-session-is-new@95 continue=none@0 inARow=0$/);
+  assert.match(said[1].detail, /^stop=the-work-stands-complete@45 continue=none@0 inARow=0$/);
   assert.equal(it.prompts.length, 0, "nothing reaches the agent");
 });
 
 // [[spec/design_output/stop#holding-a-turn-open]]
 test("a held branch carries the turn once the session stops being new", async () => {
-  const it = await started({
+  const it = await startedPast({
     "HANDOVER.md": "---\nstatus: held\n---\n\n# The brief\n",
   });
   for (let i = 0; i < 10; i++) {
@@ -336,7 +348,7 @@ test("a held branch carries the turn once the session stops being new", async ()
   }
   await endsATurn(it, "a step is done");
 
-  const said = it.lines().filter((one) => one.kind === "stop");
+  const said = it.since().filter((one) => one.kind === "stop");
   assert.equal(said[0].said, "the stop falls");
   assert.equal(said[1].said, "the turn goes on");
   assert.match(said[1].detail, /continue=work-still-stands@80 inARow=1$/);
@@ -346,16 +358,71 @@ test("a held branch carries the turn once the session stops being new", async ()
   assert.ok(it.prompts[0].text.split("\n").length <= 5, "five lines at most");
 });
 
+// [[spec/design_output/pull#the-private-queue]]
+test("an open private ticket carries the turn, and a note alone waits for the retro", async () => {
+  const rule = "- id: a-ticket-stands-in-hand\n  side: continue\n  priority: 81\n  decides: mechanical\n  runs: ticket-in-hand\n  says: A ticket stands in your hand.\n";
+  const piece = (process) =>
+    `---\nkind: [[ticket]]\nstate: open\nprocess: [[${process}]]\nsteps:\n  - name: do\n---\n\n# Ask\n\nOne.\n`;
+  const carried = await started(
+    { ".se/tickets/a-piece.md": piece("trivial"), "spec/config/stop/level1.yml": rule },
+    boxSaying("", { CLAUDE_CODE_REMOTE: "1" }),
+  );
+  await carried.raise("turn.complete", {
+    ...answered,
+    answer: `a leaf is done\n\n${canary({ rules: 2, notes: 1, stop: true })}`,
+  });
+  const said = carried.lines().filter((one) => one.kind === "stop");
+  assert.equal(said.at(-1).said, "the turn goes on");
+  assert.match(said.at(-1).detail, /continue=a-ticket-stands-in-hand@81/);
+
+  const waits = await started(
+    { ".se/tickets/a-note.md": piece("note"), "spec/config/stop/level1.yml": rule },
+    boxSaying("", { CLAUDE_CODE_REMOTE: "1" }),
+  );
+  await waits.raise("turn.complete", {
+    ...answered,
+    answer: `a leaf is done\n\n${canary({ rules: 2, notes: 1, stop: true })}`,
+  });
+  const quiet = waits.lines().filter((one) => one.kind === "stop");
+  assert.equal(quiet.at(-1).said, "the turn ends", "a note waits for a retro, and carries nothing");
+});
+
+// [[spec/design_output/pull#the-group-holds-the-turn]]
+test("a held group carries the turn on a cloud box, from turn one", async () => {
+  const group = "---\nkind: [[ticket]]\nstate: open\nstep: children\nrecord:\n  - step: sync\n    hand: box 3f9a\n    hash_before: a1b2c3\n---\n\n# Ask\n\nOne.\n";
+  const rule = "- id: the-group-stands-in-hand\n  side: continue\n  priority: 82\n  decides: mechanical\n  runs: group-in-hand\n  says: This box holds a group, so pull.\n";
+  const it = await started(
+    { "spec/tickets/one-group.md": group, "spec/config/stop/level1.yml": rule },
+    {
+      ...boxSaying("", { CLAUDE_CODE_REMOTE: "1" }),
+      run: (argv) => {
+        if (argv[0] === "node") return { exitCode: 0, stdout: JSON.stringify({ CLAUDE_CODE_REMOTE: "1" }), stderr: "" };
+        if (argv[0] === "git" && argv[1] === "rev-parse") return { exitCode: 0, stdout: "work/one-group\n", stderr: "" };
+        return { exitCode: 0, stdout: "", stderr: "" };
+      },
+    },
+  );
+  await it.raise("turn.complete", {
+    ...answered,
+    answer: `a leaf is done\n\n${canary({ rules: 2, notes: 1, stop: true })}`,
+  });
+
+  const said = it.lines().filter((one) => one.kind === "stop");
+  assert.equal(said.at(-1).said, "the turn goes on");
+  assert.match(said.at(-1).detail, /continue=the-group-stands-in-hand@82/);
+  assert.doesNotMatch(said.at(-1).detail, /the-session-is-new/, "a cloud box has nobody to ask");
+});
+
 // [[spec/design_output/extension#the-hold-is-one-rule]]
 test("the hold at stopped ends a turn the standing work would carry", async () => {
-  const it = await started({ "HANDOVER.md": "---\nstatus: held\n---\n\n# The brief\n" });
+  const it = await startedPast({ "HANDOVER.md": "---\nstatus: held\n---\n\n# The brief\n" });
   for (let i = 0; i < 10; i++) {
     await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   }
   it.files.set(".se/config.json", JSON.stringify({ stop: { hold: "stopped" } }));
   await endsATurn(it, "a step is done");
 
-  const said = it.lines().filter((one) => one.kind === "stop");
+  const said = it.since().filter((one) => one.kind === "stop");
   assert.equal(said[1].said, "the turn ends");
   assert.match(said[1].detail, /^stop=the-owner-holds-this-session@85/);
   assert.equal(it.prompts.length, 0, "nothing reaches the agent");
@@ -526,7 +593,7 @@ test("a session start says which field the config lacks", async () => {
 
 // [[spec/design_output/config#the-three-layers]]
 test("a write to the per-box file reaches the next turn end", async () => {
-  const it = await started({ "HANDOVER.md": "---\nstatus: held\n---\n\n# The brief\n" });
+  const it = await startedPast({ "HANDOVER.md": "---\nstatus: held\n---\n\n# The brief\n" });
   for (let i = 0; i < 10; i++) {
     await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   }
@@ -536,7 +603,7 @@ test("a write to the per-box file reaches the next turn end", async () => {
     await endsATurn(it, step);
   }
 
-  const said = it.lines().filter((one) => one.kind === "stop");
+  const said = it.since().filter((one) => one.kind === "stop");
   assert.deepEqual(
     said.map((one) => one.said),
     [
@@ -553,6 +620,19 @@ test("a write to the per-box file reaches the next turn end", async () => {
 });
 
 // [[spec/design_output/level0#the-canary]]
+// [[spec/design_output/stop#the-canary-ends-turn-one]]
+test("the stop call falls in the first turn, and names the canary as the one way out", async () => {
+  const it = await started();
+  const said = await stops(it);
+  assert.match(said.result, /^The stop falls\. The first turn ends on the canary line alone/);
+  assert.match(said.result, /level0 holds this session/);
+  assert.ok(it.lines().some((one) => one.kind === "stop" && one.level === "warn"));
+
+  await it.raise("turn.complete", { ...answered, answer: "done" });
+  const again = await stops(it);
+  assert.doesNotMatch(again.result, /first turn/, "the second turn takes the call");
+});
+
 test("the canary comes back whole, and a missing one writes a warning", async () => {
   const said = canary({ rules: 2, notes: 1, stop: true });
 
@@ -674,7 +754,7 @@ test("the call reaches the vote, and an answer without one ends nothing", async 
 });
 
 // [[spec/design_output/level0#one-warning-then-a-refusal]]
-test("a response with no answer earns one warning on the next call, then a refusal", async () => {
+test("a response with no answer earns a warning on every call after it, and no refusal", async () => {
   const it = await started();
   await it.raise("prompt.submit", { text: "build the door", origin: { kind: "composer" } });
   it.transcript.push({ role: "user", text: "build the door" });
@@ -688,13 +768,14 @@ test("a response with no answer earns one warning on the next call, then a refus
   assert.equal(warned.deny, undefined);
   assert.match(warned.context.at(-1), /^The owner sent a prompt, and nothing has answered it yet\./);
 
-  const refused = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
-  assert.match(refused.deny, /^The owner sent a prompt\. The owner asked something/);
+  const again = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.equal(again.deny, undefined, "the door refuses nothing");
+  assert.match(again.context.at(-1), /^The owner sent a prompt, and nothing has answered it yet\./);
 
   const found = it.lines().filter((one) => one.kind === "gate");
   assert.deepEqual(found.map((one) => [one.level, one.said]), [
     ["warn", "warned Read before an answer"],
-    ["warn", "refused Read before an answer"],
+    ["warn", "warned Read before an answer"],
   ]);
 });
 
@@ -715,50 +796,79 @@ test("a prompt landing mid-response skips that response's silent step", async ()
   assert.equal(after.deny, undefined);
 });
 
-// [[spec/design_output/apply#the-disk-stands-in]]
-test("replace sweeps the files git lists where no index stands", async () => {
-  const it = await started(
-    { "docs/a.md": "work reroute here", "docs/b.md": "nothing", "src/c.js": "work reroute" },
-    {
-      run: (argv) =>
-        argv[0] === "git" && argv[1] === "ls-files"
-          ? { exitCode: 0, stdout: "docs/a.md\ndocs/b.md\nsrc/c.js\n", stderr: "" }
-          : { exitCode: 0, stdout: "", stderr: "" },
-    },
-  );
-  const said = await it.raise(
+// [[spec/design_output/index#a-dead-index-speaks]]
+test("a session with no index writes a warn line and hands the agent the fix", async () => {
+  const it = await started({}, { exists: (path) => path === VALE });
+  const dead = it.lines().find((one) => one.kind === "index");
+  assert.equal(dead.level, "warn");
+  assert.match(dead.detail, /no \.se\/bin\/se-index stands/);
+
+  const said = await it.raise("prompt.context", { blocks: [] });
+  const block = said.blocks.find((one) => one.name === "level0-index");
+  assert.match(block.text, /^The index is dead/);
+  assert.match(block.text, /Run \.\/RUNME\.sh/);
+
+  const swept = await it.raise(
     "tool.call",
-    {
-      tool: "mcp__level0__replace",
-      glob: "docs/**/*.md",
-      pattern: "work reroute",
-      replacement: "ticket update",
-      preview: true,
-    },
+    { tool: "mcp__level0__replace", glob: "**/*.md", pattern: "x", replacement: "y" },
     "mcp__level0__replace",
   );
-  assert.match(said.result, /^1 file\(s\) would change/);
-  assert.match(said.result, /docs\/a\.md \(1 place\(s\)\)/);
+  assert.match(swept.result, /the index is dead/);
 });
 
-// [[spec/design_output/log#an-answer-rides-the-tool]]
-test("an answer through the log tool clears the demand, and lands in the log", async () => {
+// [[spec/design_output/index#a-dead-index-speaks]]
+test("a session with an index standing warms it and says nothing", async () => {
+  const it = await started();
+  assert.equal(it.lines().some((one) => one.kind === "index"), false);
+  const said = await it.raise("prompt.context", { blocks: [] });
+  assert.equal(said.blocks.some((one) => one.name === "level0-index"), false);
+});
+
+// [[spec/design_output/log#an-answer-stands-in-chat]]
+test("an answer through the log tool alone leaves the demand, and the chat text clears it", async () => {
   const it = await started();
   await it.raise("prompt.submit", { text: "and push it", origin: { kind: "composer" } });
   await it.raise("turn.step", { turnId: "t", index: 0, answer: "", toolUses: [], stopReason: "tool_use" });
-  await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
 
-  const answered = await it.raise(
+  const logged = await it.raise(
     "tool.call",
     { tool: "mcp__level0__log", kind: "answer", said: "You want it pushed. I push after the check." },
     "mcp__level0__log",
   );
-  assert.equal(answered.deny, undefined);
-  assert.ok(it.lines().some((one) => one.kind === "answer" && /pushed/.test(one.said)));
+  assert.equal(logged.deny, undefined);
+  await it.raise("turn.step", { turnId: "t", index: 1, answer: "", toolUses: [], stopReason: "tool_use" });
 
+  const warned = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.match(warned.context.at(-1), /Write the answer in the chat/);
+
+  await it.raise("turn.step", { turnId: "t", index: 2, answer: "You want it pushed. I push after the check.", toolUses: [], stopReason: "tool_use" });
   const after = await it.raise("tool.call", { tool: "Read", file_path: "b.md" });
   assert.equal(after.deny, undefined);
   assert.equal(after.context, undefined);
+});
+
+// [[spec/design_output/level0#a-helper-ends-no-turn]]
+test("a helper's turn end prompts nothing, logs no reply, and votes no stop", async () => {
+  const it = await startedPast();
+
+  await it.raise("turn.complete", { ...answered, agentId: "a1", answer: "Based on the docs, here is the answer." });
+
+  assert.deepEqual(it.promptsSince(), []);
+  assert.deepEqual(
+    it.since().filter((one) => ["reply", "stop", "answer", "level0"].includes(one.kind)),
+    [],
+  );
+});
+
+// [[spec/design_output/level0#a-helper-ends-no-turn]]
+test("a helper's step text answers no demand of the owner's", async () => {
+  const it = await started();
+  await it.raise("prompt.submit", { text: "and push it", origin: { kind: "composer" } });
+  await it.raise("turn.step", { turnId: "h", index: 0, agentId: "a1", answer: "The helper says plenty.", toolUses: [], stopReason: "end_turn" });
+  await it.raise("turn.step", { turnId: "t", index: 0, answer: "", toolUses: [], stopReason: "tool_use" });
+
+  const warned = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.match(warned.context.at(-1), /^The owner sent a prompt/);
 });
 
 // [[spec/design_output/level0#a-prompt-mid-turn]]
@@ -772,8 +882,36 @@ test("a prompt mid-turn still binds a response that ignores it", async () => {
 
   const warned = await it.raise("tool.call", { tool: "Read", file_path: "b.md" });
   assert.match(warned.context.at(-1), /^The owner sent a prompt/);
-  const refused = await it.raise("tool.call", { tool: "Read", file_path: "c.md" });
-  assert.match(refused.deny, /^The owner sent a prompt\./);
+  await it.raise("turn.step", { turnId: "t", index: 6, answer: "", toolUses: [], stopReason: "tool_use" });
+  const again = await it.raise("tool.call", { tool: "Read", file_path: "c.md" });
+  assert.equal(again.deny, undefined, "the door refuses nothing");
+  assert.match(again.context.at(-1), /^The owner sent a prompt/);
+  const stop = await it.raise("tool.call", { tool: STOP, reason: "the-owner-asks-to-talk", next: "Nothing waits." }, STOP);
+  assert.equal(stop.deny, undefined, "the stop call passes the door");
+});
+
+// [[spec/design_output/level0#a-step-carries-the-answer]]
+test("a step whose event holds no text reads the transcript, and the answer there clears the demand", async () => {
+  const it = await started();
+  await it.raise("prompt.submit", { text: "build the door", origin: { kind: "composer" } });
+  it.transcript.push({ role: "assistant", text: "You want the door. I read the brief first." });
+  await it.raise("turn.step", { turnId: "t", index: 0, answer: "", toolUses: [], stopReason: "tool_use" });
+
+  const after = await it.raise("tool.call", { tool: "Read", file_path: "b.md" });
+  assert.equal(after.context, undefined);
+  const answer = it.lines().find((one) => one.kind === "answer");
+  assert.equal(answer.text, "You want the door. I read the brief first.");
+});
+
+// [[spec/design_output/log#an-answer-stands-in-chat]]
+test("a turn ending with the demand standing logs the turn's text as the answer", async () => {
+  const it = await startedPast();
+  await it.raise("prompt.submit", { text: "build the door", origin: { kind: "composer" } });
+  await it.raise("turn.complete", { ...answered, answer: "You want the door. Nothing waits on you." });
+
+  const answer = it.since().find((one) => one.kind === "answer");
+  assert.equal(answer.text, "You want the door. Nothing waits on you.");
+  assert.equal(answer.detail, "The owner sent a prompt");
 });
 
 // [[spec/design_output/level0#a-step-carries-the-answer]]
@@ -833,7 +971,7 @@ test("an answer written before the prompt lands counts for nothing", async () =>
 });
 
 // [[spec/design_output/level0#what-counts-as-owed]]
-test("an update the sidebar asks for mid-turn warns once and then refuses", async () => {
+test("an update the sidebar asks for mid-turn warns on each call until it stands", async () => {
   const it = await started();
   await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   it.files.set(".se/config.json", JSON.stringify({ ask: { wanted: "short" } }));
@@ -842,8 +980,9 @@ test("an update the sidebar asks for mid-turn warns once and then refuses", asyn
 
   const warned = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   assert.match(warned.context.at(-1), /^The owner asks for a short update/);
-  const refused = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
-  assert.match(refused.deny, /^The owner asks for a short update\./);
+  const again = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.equal(again.deny, undefined);
+  assert.match(again.context.at(-1), /^The owner asks for a short update/);
 
   await it.raise("turn.step", { turnId: "t", index: 1, answer: "Short update: the door stands.", toolUses: [], stopReason: "tool_use" });
   const passed = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
@@ -866,26 +1005,34 @@ test("a hold at stopped owes an answer, and the later demand replaces the earlie
 
 // [[spec/design_output/level0#the-owner-binds-god]]
 test("god mode passes every refusal, and writes each one it passes", async () => {
-  const it = await started({ ".se/config.json": JSON.stringify({ engine: { binding: "god" } }) });
-  await it.raise("prompt.submit", { text: "build the door", origin: { kind: "composer" } });
-  await it.raise("turn.step", { turnId: "t", index: 0, answer: "", toolUses: [], stopReason: "tool_use" });
-  await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  const it = await started({
+    ".se/config.json": JSON.stringify({ engine: { binding: "god" } }),
+    ".se/notes/one.md": RAW_NOTE,
+  });
 
-  const said = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  const said = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/funnel/a.md",
+    content: "Noticed: it stalls badly whenever somebody starts it twice.\n",
+  });
   assert.equal(said.deny, undefined);
   const god = it.lines().filter((one) => one.kind === "god");
-  assert.deepEqual(god.map((one) => one.said), ["passed Read past a refusal"]);
-  assert.match(god[0].detail, /^The owner sent a prompt\./);
+  assert.deepEqual(god.map((one) => one.said), ["passed Write past a refusal"]);
+  assert.match(god[0].detail, /carries \d+ words straight from a note/);
 });
 
 test("out of god mode the same refusal stands", async () => {
-  const it = await started({ ".se/config.json": JSON.stringify({ engine: { binding: "queue" } }) });
-  await it.raise("prompt.submit", { text: "build the door", origin: { kind: "composer" } });
-  await it.raise("turn.step", { turnId: "t", index: 0, answer: "", toolUses: [], stopReason: "tool_use" });
-  await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  const it = await started({
+    ".se/config.json": JSON.stringify({ engine: { binding: "queue" } }),
+    ".se/notes/one.md": RAW_NOTE,
+  });
 
-  const said = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
-  assert.match(said.deny, /^The owner sent a prompt\./);
+  const said = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: "spec/funnel/a.md",
+    content: "Noticed: it stalls badly whenever somebody starts it twice.\n",
+  });
+  assert.match(said.deny, /carries \d+ words straight from a note/);
   assert.equal(it.lines().filter((one) => one.kind === "god").length, 0);
 });
 
@@ -1430,6 +1577,78 @@ test("a push to trunk takes a green battery, and a work branch takes none", asyn
   assert.equal(branch.deny, undefined, "a work branch meets no battery");
 });
 
+// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+const TAGGED_NOTE = `---\nkind: [[ticket]]\nstate: open\nurgency: whenever\ntodo: true\n---\n\n# Ask\n\nLook at the lint.\n\n# Discussion\n\nNothing yet.\n`;
+
+// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+function boxCarrying(notes, env = {}) {
+  const names = Object.keys(notes).join("\n");
+  return {
+    exists: (path) => path === VALE,
+    run: (argv) => {
+      if (argv[0] === "node") {
+        return { exitCode: 0, stdout: JSON.stringify(env), stderr: "" };
+      }
+      if (argv[0] === "git" && argv[1] === "log") {
+        return { exitCode: 0, stdout: `${names}\n`, stderr: "" };
+      }
+      if (argv[0] === "git" && argv[1] === "show") {
+        const text = notes[String(argv[2]).slice("HEAD:".length)];
+        return { exitCode: 0, stdout: text ?? "", stderr: "" };
+      }
+      return { exitCode: 0, stdout: "", stderr: "" };
+    },
+  };
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+test("a push carrying a tagged note is refused, and the refusal names the file", async () => {
+  const it = await started(
+    undefined,
+    boxCarrying({ "spec/tickets/slow-lint.md": TAGGED_NOTE, "src/x.js": "// code" }),
+  );
+  const said = await it.raise(
+    "tool.call",
+    { tool: "Bash", command: "git push -u origin work/a-thing" },
+    "Bash",
+  );
+
+  assert.match(String(said.deny), /spec\/tickets\/slow-lint\.md/);
+  assert.match(String(said.deny), /ticket todo <name> --off/);
+  assert.ok(
+    it.lines().some((one) => one.kind === "todo"),
+    "the door writes a todo row",
+  );
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+test("a commit carrying a tagged note passes, because the push is the one gate", async () => {
+  const it = await started(
+    undefined,
+    boxCarrying({ "spec/tickets/slow-lint.md": TAGGED_NOTE }),
+  );
+  const said = await it.raise(
+    "tool.call",
+    { tool: "Bash", command: 'git commit -m "the note parks the work"' },
+    "Bash",
+  );
+
+  assert.equal(said.deny, undefined);
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+test("a push carrying no tagged note lands", async () => {
+  const free = TAGGED_NOTE.replace("todo: true\n", "");
+  const it = await started(undefined, boxCarrying({ "spec/tickets/x.md": free }));
+  const said = await it.raise(
+    "tool.call",
+    { tool: "Bash", command: "git push -u origin work/a-thing" },
+    "Bash",
+  );
+
+  assert.equal(said.deny, undefined);
+});
+
 // [[spec/design_output/private#the-escape]]
 test("no-verify is refused on a cloud box, and the desk box writes a line", async () => {
   const cloud = await started(undefined, boxSaying("", { CLAUDE_CODE_REMOTE: "1" }));
@@ -1460,7 +1679,7 @@ test("the Bash description names the verbs, and answers the same string twice", 
   assert.equal(said.description, again.description);
   assert.match(said.description, /^Runs a shell command\./);
   assert.match(said.description, /\.\/RUNME\.sh check/);
-  assert.match(said.description, /\.\/RUNME\.sh work/);
+  assert.match(said.description, /\.\/RUNME\.sh branch/);
 });
 
 const NO_CAGE = { exists: () => false };
@@ -1578,7 +1797,7 @@ test("the review tool runs the verb, spawns a reader and answers the report", as
   assert.deepEqual(ran.argv, [
     "node",
     "src/scripts/cli.js",
-    "work",
+    "branch",
     "review",
     "the-config-holds-numbers",
     "--json",
@@ -1588,7 +1807,7 @@ test("the review tool runs the verb, spawns a reader and answers the report", as
   assert.match(said.result, /^check {6}passes$/m);
   assert.match(said.result, /^retro {6}present$/m);
   assert.match(said.result, /^brief {6}done$/m);
-  assert.match(said.result, /^1 thing to fix\. Run work merge once every fix lands\.$/m);
+  assert.match(said.result, /^1 thing to fix\. Run branch merge once every fix lands\.$/m);
 });
 
 // [[spec/design_output/review#where-the-spawn-refuses]]
@@ -1791,29 +2010,40 @@ const UNDER = "word ".repeat(100).trim();
 const CLEAN = "word ".repeat(400).trim();
 const DRAFT = "mcp__level0__check_answer";
 
-// [[spec/design_output/level0#the-re-prompt-over-the-ceiling]]
-test("an answer over the ceiling meets one re-prompt, and one alone", async () => {
+// [[spec/design_output/stop#a-standing-stop-ends-it]]
+test("a standing stop ends the turn, and the gate reads and writes nothing", async () => {
+  const it = await startedPast(BANDED, valeOnAnswer(PAST));
+  const said = await stops(it);
+  assert.match(said.result, /Write the words Ending my turn, and nothing more\.$/);
+  await it.raise("turn.complete", { ...answered, answer: "Ending my turn." });
+
+  assert.equal(it.promptsSince().length, 0, "nothing reaches the prompt");
+  assert.equal(
+    it.since().some((one) => one.kind === "answer" && /the gate reads/.test(one.said)),
+    false,
+    "no gate line",
+  );
+});
+
+test("an answer over the ceiling reaches no prompt, and rides the next call once", async () => {
   const it = await started(BANDED, valeOnAnswer(PAST));
   await it.raise("turn.complete", { ...answered, answer: OVER });
 
-  assert.equal(it.prompts.length, 1);
-  assert.match(
-    it.prompts[0].text,
-    /^The voice rules refuse this answer\. Write it again\./,
-  );
-  assert.match(it.prompts[0].text, /50 findings a thousand words/);
-  assert.match(it.prompts[0].text, /level0-answer\.md:1:7 {2}PastTense/);
-  assert.match(it.prompts[0].text, /Hold PastTense for the rest of this turn/);
-
-  await it.raise("turn.complete", { ...answered, answer: OVER });
-  assert.equal(it.prompts.length, 1, "a second turn end inside the turn submits nothing");
-
+  assert.equal(it.prompts.length, 0, "the answer stands as sent, and nothing prints twice");
   const gate = it.lines().filter((one) => one.kind === "answer");
-  assert.deepEqual(
-    gate.map((one) => one.said),
-    ["the gate reads rewrite", "the gate reads rewrite"],
-  );
-  assert.match(gate[0].detail, /^score=50 findings=1 inARow=1$/);
+  assert.deepEqual(gate.map((one) => one.said), ["the gate reads rewrite"]);
+  assert.match(gate[0].detail, /^score=50 findings=1$/);
+
+  const call = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.equal(call.deny, undefined);
+  const note = call.context.join("\n");
+  assert.match(note, /The gate read your last answer at rewrite, and it stands as sent\./);
+  assert.match(note, /50 findings a thousand words/);
+  assert.match(note, /level0-answer\.md:1:7 {2}PastTense/);
+  assert.match(note, /Hold PastTense for the rest of this turn/);
+
+  const again = await it.raise("tool.call", { tool: "Read", file_path: "b.md" });
+  assert.doesNotMatch((again.context ?? []).join("\n"), /The gate read/, "the findings ride once");
 });
 
 // [[spec/design_output/level0#the-three-bands]]
@@ -1874,15 +2104,17 @@ const TABLE = [
 ].join("\n");
 
 // [[spec/design_output/level0#the-table-answers-every-question]]
-test("a prompt with two questions refuses an answer opening with prose", async () => {
+test("a prompt with two questions reads an answer opening with prose as a rewrite", async () => {
   const it = await started(BANDED, valeOnAnswer([]));
   await it.raise("prompt.submit", { text: ASKS, origin: { kind: "composer" } });
+  await it.raise("turn.step", { turnId: "t", index: 0, answer: "You ask two things.", toolUses: [], stopReason: "tool_use" });
   await it.raise("turn.complete", { ...answered, answer: OVER });
 
-  assert.equal(it.prompts.length, 1);
-  assert.match(it.prompts[0].text, /QuestionTable/);
-  assert.match(it.prompts[0].text, /asks 2 questions/);
-  assert.match(it.prompts[0].text, /opens with no table/);
+  assert.equal(it.prompts.length, 0);
+  const call = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.match(call.context.at(-1), /QuestionTable/);
+  assert.match(call.context.at(-1), /asks 2 questions/);
+  assert.match(call.context.at(-1), /opens with no table/);
 });
 
 // [[spec/design_output/level0#the-table-answers-every-question]]
@@ -1892,10 +2124,7 @@ test("an answer opening with the table meets the gate clean", async () => {
   await it.raise("turn.complete", { ...answered, answer: `${TABLE}\n\n${OVER}` });
 
   assert.equal(it.prompts.length, 0);
-  assert.equal(
-    it.lines().find((one) => one.kind === "answer").said,
-    "the gate reads clean",
-  );
+  assert.ok(it.lines().some((one) => one.kind === "answer" && one.said === "the gate reads clean"));
 });
 
 // [[spec/design_output/level0#the-door-counts-the-questions]]
@@ -1905,20 +2134,11 @@ test("a prompt from a machine leaves the count standing", async () => {
   await it.raise("prompt.submit", { text: "carry on", origin: { kind: "plugin" } });
   await it.raise("turn.complete", { ...answered, answer: OVER });
 
-  assert.match(it.prompts[0].text, /asks 2 questions/);
+  const call = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  assert.match(call.context.join("\n"), /asks 2 questions/);
 });
 
 // [[spec/design_output/level0#the-owner-answers-by-number]]
-test("a stop with no needs table meets a rewrite, whatever the score", async () => {
-  const it = await started(BANDED, valeOnAnswer([]));
-  await stops(it);
-  await it.raise("turn.complete", { ...answered, answer: CLEAN });
-
-  assert.equal(it.prompts.length, 1);
-  assert.match(it.prompts[0].text, /Write it again/);
-  assert.match(it.prompts[0].text, /NeedsTable/);
-});
-
 // [[spec/design_output/level0#the-cap-counts-the-prose]]
 test("the draft tool refuses a draft over the word cap", async () => {
   const capped = { "spec/config/level0.json": JSON.stringify({
@@ -1958,4 +2178,87 @@ test("the draft tool reads the count the prompt sets", async () => {
     DRAFT,
   );
   assert.match(met.result, /meets the gate clean/);
+});
+const WORDS = "spec/vocabulary/terms.yml";
+const RULE = "spec/config/styles/VoiceParagraph/Vocabulary.yml";
+
+const PARAGRAPHS = JSON.stringify({
+  projections: [
+    {
+      name: "the paragraph rules",
+      shape: "paragraph rules",
+      target: "spec/config/styles/VoiceParagraph",
+      from: "spec/schemas/paragraph.schema.yaml",
+      wrap: "none",
+    },
+  ],
+});
+
+const PARAGRAPH_SCHEMA = `
+kind: paragraph
+layers:
+  vocabulary:
+    core: spec/vocabulary/core.yml
+    terms: ${WORDS}
+    swaps: spec/vocabulary/swaps.yml
+    exceptions: []
+`;
+
+const SEED = `terms:
+  - {word: door, defines: "[[spec/design_output/doors]]"}
+`;
+
+const listed = (seed = SEED) => ({
+  "spec/config/projections.json": PARAGRAPHS,
+  "spec/schemas/paragraph.schema.yaml": PARAGRAPH_SCHEMA,
+  "spec/vocabulary/core.yml": "words:\n  - {word: the, from: openste}\n",
+  "spec/vocabulary/swaps.yml": "swaps:\n  - {word: utilize, write: use}\n",
+  [WORDS]: seed,
+});
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+test("the word list reaches the rule at a session's start", async () => {
+  const it = await started(listed());
+  assert.match(it.files.get(RULE), /\bdoor\b/);
+  assert.ok(!/\bhandover\b/.test(it.files.get(RULE)), "a word nobody wrote stands nowhere");
+});
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+test("a write to the list re-projects, so the next write reads the new rule", async () => {
+  const it = await started(listed());
+  const before = it.files.get(RULE);
+  assert.ok(!/\bhandover\b/.test(before));
+
+  const grown = `${SEED}  - {word: handover, defines: "[[spec/design_output/work]]"}\n`;
+  const wrote = await it.raise("tool.call", {
+    tool: "Write",
+    file_path: WORDS,
+    content: grown,
+  });
+  assert.equal(wrote.deny, undefined, "the list is a source, so the door passes the write");
+
+  // The harness writes what the door passes. [[spec/funnel/a-paragraph-has-a-schema]]
+  it.files.set(WORDS, grown);
+  assert.equal(it.files.get(RULE), before, "the rule waits for the next call");
+
+  await it.raise("tool.call", { tool: "Read", file_path: "anything.md" });
+  assert.match(it.files.get(RULE), /\bhandover\b/, "the next call carries the new word");
+
+  const said = it.lines().filter((one) => one.kind === "project");
+  assert.match(said.at(-1).said, /^spec\/vocabulary\/terms\.yml moved/);
+});
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+test("a write to a file no projection reads leaves the rule alone", async () => {
+  const it = await started(listed());
+  const before = it.lines().filter((one) => one.kind === "project").length;
+
+  await it.raise("tool.call", { tool: "Write", file_path: "notes.md", content: "The door.\n" });
+  await it.raise("tool.call", { tool: "Read", file_path: "anything.md" });
+
+  assert.equal(
+    it.lines().filter((one) => one.kind === "project").length,
+    before,
+    "nothing re-projects, so no line lands",
+  );
 });

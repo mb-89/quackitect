@@ -15,7 +15,6 @@ import {
   opensATurn,
   questionsIn,
   reachesTheOwner,
-  SAYS,
   scoreOf,
   tableFaults,
   warns,
@@ -59,16 +58,16 @@ import {
   aimOf,
   appended,
   archiveOf,
-  answersTheOwner,
   LOG_TOOL,
   logSpec,
   rowOf,
   SESSION,
   writes,
 } from "../lib/log.js";
-import { isDraft, matches, relativeTo } from "../lib/paths.js";
+import { isDraft, relativeTo } from "../lib/paths.js";
 import { carriedFrom, NOTES, privateNow, refusedPrivate } from "../lib/private.js";
 import {
+  alsoReads,
   entriesIn,
   ownerOf,
   PROJECTIONS,
@@ -78,6 +77,7 @@ import {
 } from "../lib/projection.js";
 import {
   answerFindings,
+  gateNote,
   refusal,
   refusedCommand,
   refusedDelta,
@@ -98,7 +98,8 @@ import {
   schemasFrom,
   strangerFault,
 } from "../lib/schema.js";
-import { refusedTicket, ticketFaults } from "../lib/ticket.js";
+import { heldGroup, openPrivate, refusedTicket, ticketFaults } from "../lib/ticket.js";
+import { reaches, refusedTodo, taggedIn } from "../lib/todo.js";
 import { guesses, pathOf, surveyOf, TOOLS } from "../lib/tools.js";
 import {
   askForStop,
@@ -120,6 +121,8 @@ import { MARKER, pairOf } from "../lib/vehicle.js";
 import { lintText } from "../lib/vale.js";
 
 const SE = ".se";
+const HOLDS = `${SE}/hold`;
+const PRIVATE_TICKETS = `${SE}/tickets`;
 const GUIDANCE = "spec/guidance";
 const COMMIT = "level0-commit.md";
 const HANDOVER = `${SE}/HANDOVER.md`;
@@ -151,8 +154,12 @@ export function register(on, _options) {
   let logbook = logHere(null);
   let rules = [];
   let onAHeldBranch = false;
+  // [[spec/design_output/pull#the-hand-and-the-hold]]
+  let inHand = false;
+  let groupHeld = false;
   let owed = null;
   let inFlight = 0;
+  let indexDead = "";
   // [[spec/design_output/level0#the-door-counts-the-questions]]
   let asks = 0;
   // [[spec/design_output/level0#the-canary-owes-a-debt]]
@@ -173,6 +180,10 @@ export function register(on, _options) {
     wired: false,
     installed: false,
     told: "",
+    // [[spec/funnel/a-paragraph-has-a-schema]]
+    projections: [],
+    sources: [],
+    restale: "",
     logbook,
   };
 
@@ -219,8 +230,11 @@ export function register(on, _options) {
 
     // [[spec/design_output/projection#who-projects-and-when]]
     projections = entriesIn(await inherited($, cage.roots, PROJECTIONS));
+    // [[spec/funnel/a-paragraph-has-a-schema]]
+    cage.projections = projections;
     if (projections.length) {
       const drawn = await projectAll($, cage.roots, projections, settings);
+      cage.sources = drawn.sources;
       await logbook.say("info", "project", `${drawn.wrote} file(s) written`, {
         ms: drawn.ms,
         detail: `${projections.length} projection(s), ${drawn.size} target(s)`,
@@ -230,8 +244,12 @@ export function register(on, _options) {
       }
     }
 
-    // [[spec/design_output/index#the-door-answers-the-tools]]
-    warms($, root);
+    // [[spec/design_output/index#a-dead-index-speaks]]
+    indexDead = "";
+    await warms($, root, async (why) => {
+      indexDead = why;
+      await logbook.say("warn", "index", "the index is dead", { detail: why });
+    });
 
     await $.tool.register(checkSpec());
     await $.tool.register(mintSpec(schemas));
@@ -246,8 +264,7 @@ export function register(on, _options) {
 
   // [[spec/design_output/log#the-log-tool]]
   on("tool.call", { tool: `mcp__level0__${LOG_TOOL}` }, async (_$, e, _next) => {
-    // [[spec/design_output/log#an-answer-rides-the-tool]]
-    if (answersTheOwner(e)) owed = null;
+    // [[spec/design_output/log#an-answer-stands-in-chat]]
     const row = await logbook.say(
       String(e.level ?? "info"),
       String(e.kind ?? "note"),
@@ -260,7 +277,6 @@ export function register(on, _options) {
   on("prompt.submit", async ($, e, next) => {
     const from = String(e.origin?.kind ?? "");
     tooth.sawPrompt(from === "plugin");
-    gate.sawPrompt(from === "plugin");
     // [[spec/design_output/level0#a-prompt-mid-turn]]
     if (opensATurn(e.origin)) {
       owed = { ...(await owing($, "The owner sent a prompt")), skips: inFlight > 0 ? 1 : 0 };
@@ -313,12 +329,27 @@ export function register(on, _options) {
     if (canaries.deny) return canaries;
     owesCanary = canaries.owes;
 
-    const warning = [answers.warn, canaries.warn].filter(Boolean).join("\n\n");
-    const onward = warning
-      ? async (given) => withContext(await next(given), warning)
+    // [[spec/design_output/level0#the-findings-ride-the-next-call]]
+    const gateHeld = e.agentId ? null : gate.takeWaiting();
+    const warning = [answers.warn, canaries.warn, gateHeld ? gateNote(ANSWER, gateHeld) : ""]
+      .filter(Boolean)
+      .join("\n\n");
+    const writing = asWrite(e);
+
+    // [[spec/funnel/a-paragraph-has-a-schema]]
+    const feeds = writing ? feedsAProjection(cage.sources, relativeTo(root, writing.path)) : "";
+    const after = feeds
+      ? async (given) => {
+          const said = await next(given);
+          cage.restale = feeds;
+          return said;
+        }
       : next;
 
-    const writing = asWrite(e);
+    const onward = warning
+      ? async (given) => withContext(await after(given), warning)
+      : after;
+
     if (!writing) return onward(e);
 
     // [[spec/design_output/projection#the-write-door-refuses-one]]
@@ -483,8 +514,8 @@ export function register(on, _options) {
           ? `You stand on ${TRUNK}, so this commit would land there.`
           : `This pushes ${TRUNK}, which a cloud box may never move.`,
         "",
-        "Run `./RUNME.sh work take` to take a branch and move onto it. Push that",
-        "branch, run `work done`, and a box off the cloud takes it into trunk.",
+        "Run `./RUNME.sh branch take` to take a branch and move onto it. Push that",
+        "branch, run `branch done`, and a box off the cloud takes it into trunk.",
       ].join("\n"),
     };
     })();
@@ -517,6 +548,23 @@ export function register(on, _options) {
     return godPasses(logbook, settings, e, next, said);
   });
 
+  // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+  on("tool.call", { tool: "Bash" }, async ($, e, next) => {
+    const said = await (async () => {
+    if (!touchesGit(String(e.command ?? "")).pushes) return next(e);
+
+    const found = taggedIn(await theCarried($));
+    if (!found.length) return next(e);
+
+    await logbook.say("warn", "todo", `refused a push carrying ${found.length} note(s)`, {
+      tool: "Bash",
+      file: found[0],
+    });
+    return { deny: refusedTodo(found) };
+    })();
+    return godPasses(logbook, settings, e, next, said);
+  });
+
   // [[spec/design_output/private#two-doors-one-check]]
   on("tool.call", { tool: "Bash" }, async ($, e, next) => {
     const said = await (async () => {
@@ -536,7 +584,7 @@ export function register(on, _options) {
     return godPasses(logbook, settings, e, next, said);
   });
 
-  // [[spec/design_output/apply#validate-everything-then-write]]
+  // [[spec/design_output/apply#check-everything-then-write]]
   on("tool.call", { tool: "mcp__level0__patch" }, async ($, e, _next) => {
     const ops = Array.isArray(e.ops) ? e.ops : [];
     const took = applied(await readsFiles($, root, filesIn(ops)), ops);
@@ -639,16 +687,27 @@ export function register(on, _options) {
   });
 
   // [[spec/design_output/stop#the-stop-is-one-call]]
-  on("tool.call", { tool: STOP_CALL }, async (_$, e, _next) => {
+  on("tool.call", { tool: STOP_CALL }, async ($, e, _next) => {
     const off = (await settings.ask("stop.enabled")) === false;
     const hold = await settings.ask("stop.hold");
+    inHand = await holdStands($);
+    groupHeld = await groupInHand($);
     const reason = String(e.reason ?? "");
+    // [[spec/design_output/stop#the-canary-ends-turn-one]]
+    if (firstTurn) {
+      await logbook.say("warn", "stop", "the first turn ends on the canary, and on no call", {
+        detail: reason,
+      });
+      return {
+        result: `The stop falls. The first turn ends on the canary line alone, written last: ${sentence}`,
+      };
+    }
     const decision = decide(rules, {
       claimed: reason,
       ran: (name) => ranHere(name, off, hold),
     });
     const said = stopAnswer(rules, reason, decision);
-    if (said.known) claim = { reason, next: String(e.next ?? "") };
+    if (said.known) claim = { reason, next: String(e.next ?? ""), ends: said.ends };
     await logbook.say(said.known ? "info" : "warn", "stop", stopSaid(said, reason), {
       detail: detail(decision, tooth.inARow()),
     });
@@ -669,7 +728,7 @@ export function register(on, _options) {
     const name = String(e.branch ?? "").trim();
     if (!name) return { result: "review_branch takes one branch name." };
 
-    const ran = await $.process.run([...GATHER, "work", "review", name, "--json"], {
+    const ran = await $.process.run([...GATHER, "branch", "review", name, "--json"], {
       timeoutMs: GATHERING,
     });
     const material = materialOf(ran.stdout);
@@ -691,11 +750,14 @@ export function register(on, _options) {
 
   // [[spec/design_output/level0#a-step-carries-the-answer]]
   // [[spec/design_output/level0#a-step-streams]]
-  on("turn.step", async function* (_$, e, next) {
+  on("turn.step", async function* ($, e, next) {
+    // [[spec/design_output/level0#a-helper-ends-no-turn]]
+    if (e.agentId) return yield* next(e);
     const said = yield* next(e);
     inFlight = 0;
     if (!owed || (await settings.ask("answer.enabled")) === false) return said;
-    const text = String(e.answer ?? "").trim();
+    // The step's own text stands empty on the client of the day, so the transcript answers where the event holds nothing. [[spec/design_output/level0#a-step-carries-the-answer]]
+    const text = String(e.answer ?? "").trim() || (await spokenSince($, owed.seen));
     // [[spec/design_output/level0#a-prompt-mid-turn]]
     if (owed.skips > 0 || !text) {
       await logbook.say("info", "step", `step ${e.index} carries ${text.length} character(s)`, {
@@ -706,6 +768,7 @@ export function register(on, _options) {
       owed = { ...owed, skips: owed.skips - 1 };
       return said;
     }
+    // The answer to the owner's prompt lands in the log from the chat, and the agent calls nothing for it. [[spec/design_output/log#an-answer-stands-in-chat]]
     if (text) {
       await logbook.say("info", "answer", text, { text, detail: owed.why });
       owed = null;
@@ -717,6 +780,12 @@ export function register(on, _options) {
 
   on("turn.complete", async ($, e, next) => {
     const said = await next(e);
+    // [[spec/design_output/level0#a-helper-ends-no-turn]]
+    if (e.agentId) return said;
+    // The answer to the owner's prompt lands in the log at the latest here, off the turn's own text. [[spec/design_output/log#an-answer-stands-in-chat]]
+    if (owed && e.reason === "answer" && String(e.answer ?? "").trim()) {
+      await logbook.say("info", "answer", String(e.answer), { text: String(e.answer), detail: owed.why });
+    }
     owed = null;
     inFlight = 0;
     // [[spec/design_output/log#a-reply-beside-its-prompt]]
@@ -750,6 +819,8 @@ export function register(on, _options) {
     }
     const off = (await settings.ask("stop.enabled")) === false;
     const hold = await settings.ask("stop.hold");
+    inHand = await holdStands($);
+    groupHeld = await groupInHand($);
     const mostInARow = await settings.ask("stop.mostInARow");
     // [[spec/design_output/level0#what-the-probe-does]]
     const bit = probeDone
@@ -769,6 +840,8 @@ export function register(on, _options) {
     const stood = claim;
     claim = null;
     await dropAsk(settings, logbook);
+    // [[spec/design_output/stop#a-standing-stop-ends-it]]
+    if (stood?.ends) return said;
     if (!bin || !e.answer || e.reason !== "answer") return said;
 
     const spoken = String(e.answer ?? "");
@@ -788,23 +861,11 @@ export function register(on, _options) {
     ];
 
     // [[spec/design_output/level0#the-three-bands]]
-    const read = gate.atTurnEnd({
-      ...(await bands(settings)),
-      text: spoken,
-      found,
-      mostInARow,
-      toothSpoke: Boolean(bit?.sent),
-    });
+    const read = gate.atTurnEnd({ ...(await bands(settings)), text: spoken, found });
     const level = read.band === "clean" ? "info" : "warn";
     await logbook.say(level, "answer", `the gate reads ${read.band}`, {
-      detail: `score=${read.score} findings=${found.length} inARow=${gate.inARow()}`,
+      detail: `score=${read.score} findings=${found.length}`,
     });
-    if (!read.sends) return said;
-
-    // [[spec/design_output/level0#the-re-prompt-over-the-ceiling]]
-    try {
-      $.prompt.submit({ text: answerFindings(ANSWER, read) }).catch(() => {});
-    } catch {}
     return said;
   });
 
@@ -812,6 +873,9 @@ export function register(on, _options) {
     const said = await next(e);
     const blocks = [...said.blocks];
     reads += 1;
+
+    // [[spec/design_output/index#a-dead-index-speaks]]
+    if (indexDead) blocks.push({ name: "level0-index", text: deadIndexBlock(indexDead) });
 
     if (standing) {
       blocks.push({
@@ -843,7 +907,7 @@ export function register(on, _options) {
             ? `Before you finish: write your result and your retro into ${BRIEF}, at`
             : `Before you finish: write the next session a new ${HANDOVER}, at`,
           tracked
-            ? "that same path, then run ./RUNME.sh work done, which pushes it."
+            ? "that same path, then run ./RUNME.sh branch done, which pushes it."
             : "that same path. Say what stands, what is next, and what surprises you.",
           "",
           one.text.trim(),
@@ -862,7 +926,7 @@ export function register(on, _options) {
           "",
           "Run this first:",
           "",
-          "    ./RUNME.sh work take",
+          "    ./RUNME.sh branch take",
           "",
           "It takes the next branch nobody holds, moves you onto it, takes trunk",
           "into it, and prints the brief. Do what the brief says, and finish the",
@@ -933,12 +997,54 @@ export function register(on, _options) {
   // [[spec/design_output/stop#the-mechanical-checks]]
   function ranHere(name, off, hold) {
     if (name === "work-waiting") return list.standing() || onAHeldBranch;
-    if (name === "session-is-new") return tooth.isNew();
+    if (name === "ticket-in-hand") return inHand;
+    if (name === "group-in-hand") return groupHeld;
+    // [[spec/design_output/pull#the-group-holds-the-turn]]
+    if (name === "session-is-new") return !cloud && tooth.isNew();
     if (name === "stop-hook-off") return off;
     if (name === "owner-holds") return holds(hold);
     if (name === "never") return false;
     return undefined;
   }
+}
+
+// [[spec/design_output/pull#the-group-holds-the-turn]]
+async function groupInHand($) {
+  const branch = await branchNow($);
+  if (!branch.startsWith("work/")) return false;
+  try {
+    return heldGroup(await $.fs.read(`spec/tickets/${branch.slice(5)}.md`));
+  } catch {
+    return false;
+  }
+}
+
+// [[spec/design_output/pull#the-hand-and-the-hold]]
+async function holdStands($) {
+  if (await holdFileStands($)) return true;
+  return privateStands($);
+}
+
+async function holdFileStands($) {
+  try {
+    const entries = await $.fs.list(HOLDS);
+    return entries.some((one) => one.name.endsWith(".json"));
+  } catch {
+    return false;
+  }
+}
+
+// [[spec/design_output/pull#the-private-queue]]
+async function privateStands($) {
+  try {
+    for (const one of await $.fs.list(PRIVATE_TICKETS)) {
+      if (!one.name.endsWith(".md")) continue;
+      if (openPrivate(await $.fs.read(`${PRIVATE_TICKETS}/${one.name}`))) return true;
+    }
+  } catch {
+    return false;
+  }
+  return false;
 }
 
 // [[spec/design_output/extension#the-ask-is-a-line]]
@@ -1002,6 +1108,17 @@ async function loadCage($, cage) {
 
 // [[spec/design_output/level0#god-mode]]
 async function ensureCage($, cage) {
+  // [[spec/funnel/a-paragraph-has-a-schema]]
+  if (cage.health.ok && cage.restale) {
+    const said = cage.restale;
+    cage.restale = "";
+    const drawn = await projectAll($, cage.roots, cage.projections ?? [], cage.settings);
+    cage.sources = drawn.sources.length ? drawn.sources : cage.sources;
+    await cage.logbook.say("info", "project", `${said} moved, so ${drawn.wrote} file(s) follow`, {
+      file: said,
+      ms: drawn.ms,
+    });
+  }
   if (cage.health.ok) return cage.health;
 
   try {
@@ -1073,10 +1190,19 @@ async function rootHere($) {
   }
 }
 
+// A write to a source makes the rule it feeds stale. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
+function feedsAProjection(sources, where) {
+  const said = String(where ?? "")
+    .split("\\")
+    .join("/");
+  return said && (sources ?? []).includes(said) ? said : "";
+}
+
 // [[spec/design_output/projection#who-projects-and-when]]
 async function projectAll($, roots, entries, settings) {
   const began = Date.now();
   const refused = [];
+  const sources = new Set();
   let size = 0;
   let wrote = 0;
 
@@ -1085,6 +1211,11 @@ async function projectAll($, roots, entries, settings) {
     for (const path of readsOf(entry)) {
       texts.set(path, await projected($, roots, path, settings));
     }
+    // [[spec/funnel/a-paragraph-has-a-schema]]
+    for (const path of alsoReads(entry, texts)) {
+      texts.set(path, await projected($, roots, path, settings));
+    }
+    for (const path of texts.keys()) sources.add(path);
     for (const [path, text] of writesOf(entry, texts)) {
       size++;
       if ((await readIf($, path)) === text) continue;
@@ -1096,7 +1227,7 @@ async function projectAll($, roots, entries, settings) {
       }
     }
   }
-  return { ms: Date.now() - began, size, wrote, refused };
+  return { ms: Date.now() - began, size, wrote, refused, sources: [...sources] };
 }
 
 // [[spec/design_output/vehicle#the-work-root-inherits]]
@@ -1129,7 +1260,7 @@ async function readIf($, path) {
   }
 }
 
-// [[spec/design_output/level0#one-warning-then-a-refusal]]
+// [[spec/design_output/level0#a-warning-on-every-call]]
 async function answerDoor($, e, it) {
   const owed = it.owed;
   if (!owed || it.off) return { owed };
@@ -1148,18 +1279,21 @@ async function answerDoor($, e, it) {
   }
   if (!owed.stepped) return { owed };
 
-  if (!owed.warned) {
-    await it.logbook.say("warn", "gate", `warned ${e.tool} before an answer`, {
-      tool: e.tool,
-      detail: owed.why,
-    });
-    return { owed: { ...owed, warned: true }, warn: warns(owed.why) };
-  }
-  await it.logbook.say("warn", "gate", `refused ${e.tool} before an answer`, {
+  // The door warns on every call and refuses none, because a refused call fires no step and the text of that step reaches nothing. [[spec/design_output/level0#a-warning-on-every-call]]
+  await it.logbook.say("warn", "gate", `warned ${e.tool} before an answer`, {
     tool: e.tool,
     detail: owed.why,
   });
-  return { deny: `${owed.why}. ${SAYS}`, owed };
+  return { owed: { ...owed, warned: true }, warn: warns(owed.why) };
+}
+
+// [[spec/design_output/level0#a-step-carries-the-answer]]
+async function spokenSince($, seen) {
+  try {
+    return answerAfter(await $.session.messages(), seen);
+  } catch {
+    return "";
+  }
 }
 
 // [[spec/design_output/level0#what-counts-as-owed]]
@@ -1488,6 +1622,31 @@ function theDelta($) {
   };
 }
 
+// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+async function theCarried($) {
+  const said = await gitSays($, [
+    "log",
+    "--format=",
+    "--name-only",
+    "HEAD",
+    "--not",
+    "--remotes",
+  ]);
+  const names = new Set(
+    said
+      .split("\n")
+      .map((row) => row.trim())
+      .filter(reaches),
+  );
+
+  const out = [];
+  for (const name of names) {
+    const text = await gitSays($, ["show", `HEAD:${name}`]);
+    if (text) out.push({ name, text });
+  }
+  return out;
+}
+
 async function boxHere($) {
   const env = await readEnv($, ["USER", "USERNAME", "LOGNAME", "HOME", "USERPROFILE"]);
   return {
@@ -1643,7 +1802,8 @@ async function install($) {
 
 // [[spec/design_output/index#the-door-answers-the-tools]]
 async function whereIsIndex($, root) {
-  for (const at of [`${root}/${BIN}`, `${root}/${BIN}.exe`]) {
+  const base = root ? `${root}/${BIN}` : BIN;
+  for (const at of [base, `${base}.exe`]) {
     try {
       if (await $.fs.exists(at)) return at;
     } catch {
@@ -1672,13 +1832,26 @@ async function askIndex($, root, ask) {
 }
 
 // [[spec/design_output/index#the-door-answers-the-tools]]
-function warms($, root) {
-  if (!root) return;
-  whereIsIndex($, root)
-    .then((at) =>
-      at ? $.process.run([at, "standing"], { cwd: root, timeoutMs: 60000 }) : null,
-    )
-    .catch(() => {});
+// [[spec/design_output/index#a-dead-index-speaks]]
+async function warms($, root, dead) {
+  const at = await whereIsIndex($, root);
+  if (!at) {
+    await dead(`no ${BIN} stands on this box`);
+    return;
+  }
+  $.process
+    .run([at, "standing"], { cwd: root, timeoutMs: 60000 })
+    .then((ran) => (ran?.exitCode === 0 ? null : dead(`${BIN} standing answers ${ran?.exitCode}`)))
+    .catch((why) => dead(`${BIN} standing throws: ${String(why?.message ?? why)}`));
+}
+
+// [[spec/design_output/index#a-dead-index-speaks]]
+function deadIndexBlock(why) {
+  return [
+    `The index is dead: ${why}.`,
+    "Run ./RUNME.sh, which installs Zig and builds the index, then restart the",
+    "session. Until then Grep and Glob read the disk and replace refuses.",
+  ].join("\n");
 }
 
 // [[spec/design_output/apply#bytes-in-bytes-out]]
@@ -1805,8 +1978,10 @@ async function sweeps($, root, e) {
     method: "grep",
     params: { pattern, glob, limit: 0 },
   });
-  // [[spec/design_output/apply#the-disk-stands-in]]
-  const paths = answer ? (answer.files ?? []).map((one) => one.path) : await treeFiles($, root, glob);
+  // [[spec/design_output/index#a-dead-index-speaks]]
+  if (!answer) return { why: "the index is dead, so the sweep has no list. Run ./RUNME.sh, then restart" };
+
+  const paths = (answer.files ?? []).map((one) => one.path);
   if (!paths.length) return { why: "the pattern matches nothing under that glob" };
 
   const held = await readsFiles($, root, paths);
@@ -1827,25 +2002,7 @@ async function sweeps($, root, e) {
   return { held, ops };
 }
 
-// [[spec/design_output/apply#validate-everything-then-write]]
-// [[spec/design_output/apply#the-disk-stands-in]]
-async function treeFiles($, root, glob) {
-  let ran;
-  try {
-    ran = await $.process.run(["git", "ls-files", "-co", "--exclude-standard"], {
-      cwd: root,
-      timeoutMs: 20000,
-    });
-  } catch {
-    return [];
-  }
-  if (ran?.exitCode !== 0) return [];
-  return String(ran.stdout ?? "")
-    .split(/\r?\n/)
-    .map((one) => one.trim())
-    .filter((one) => one && (!glob || matches(glob, one)));
-}
-
+// [[spec/design_output/apply#check-everything-then-write]]
 function wouldLand(took) {
   const rows = took.files
     .map((one) => `  ${one.file} (${took.counts[one.file]} place(s))${one.born ? ", new" : ""}`)

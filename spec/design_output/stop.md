@@ -52,7 +52,7 @@ The call runs the vote at once, and its result says which way it goes:
 | what the call carries | what comes back | what the agent does |
 |---|---|---|
 | a reason that stands | the rule's sentence, and "write nothing more" | it ends the turn |
-| a reason a fact contradicts | the fact, in one line | it carries on |
+| a reason a fact denies | the fact, in one line | it carries on |
 | an id nobody holds | the ids | it carries on |
 
 A claim lives until the next tool call or the turn's end, whichever comes
@@ -74,9 +74,11 @@ feeds the vote, and the priorities decide the rest:
 
 ## The canary ends turn one
 
-The canary is a formatted line of its own, and turn one carries it. So an
-answer holding the canary reaches the vote with no call beside it. For
-details, see [[spec/design_output/level0#the-canary-owes-a-debt]].
+The canary is a formatted line of its own, and turn one ends on it, last. An
+answer holding the canary reaches the vote with no call beside it. The stop
+call falls in turn one, and its result names the canary as the one way out.
+From turn two on the call ends a turn. For details, see
+[[spec/design_output/level0#the-canary-owes-a-debt]].
 
 ## The off switch takes it
 
@@ -153,6 +155,13 @@ The free stop asks for both halves. The count alone hands out a free stop
 wherever it resets. The grant alone lets a session read for an hour and still
 call itself new.
 
+# A standing stop ends it
+
+- Outcome: a stop that stands ends the turn, and nothing from level zero reaches the prompt after it.
+- Order: the agent writes its answer, calls the stop, and writes only "Ending my turn" after it.
+- Close: the harness asks for text after a tool call, so that one generic line closes the turn.
+- Gate: the turn end reads nothing and writes nothing, because the call holds the verdict on the stop.
+
 # The claim rides the call
 
 The call carries the claim, and the hook hands the reason to `decide` as
@@ -178,7 +187,7 @@ beside it:
 | count | what it stands for |
 |---|---|
 | calls | the tool calls this session |
-| inARow | the turns the tooth carries one after another |
+| `inARow` | the turns the tooth carries one after another |
 | granted | whether the hook grants a stop already |
 | claim | the reason the last call names, until the next call or the turn's end |
 

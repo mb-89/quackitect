@@ -8,14 +8,12 @@ export const SESSION = `${FOLDER}/session.jsonl`;
 export const OLD = `${FOLDER}/old`;
 export const LOG_TOOL = "log";
 
-// [[spec/design_output/log#an-answer-rides-the-tool]]
+// [[spec/design_output/log#an-answer-stands-in-chat]]
 export const ANSWER_KIND = "answer";
 
-export function answersTheOwner(e) {
-  return String(e?.kind ?? "") === ANSWER_KIND && Boolean(String(e?.said ?? "").trim());
-}
-
-const LEVELS = ["info", "warn", "error"];
+// The ladder Python's logging climbs, and an empty or unknown level reads as info. [[spec/design_output/log#what-a-box-writes]]
+export const LEVELS = ["debug", "info", "warn", "error", "fatal"];
+const DEFAULT = "info";
 const SAID = 80;
 const OWN = ["at", "level", "kind", "said"];
 const NAME = /^(\d{4}-\d{2}-\d{2})T(\d{2})-(\d{2})-(\d{2})-[0-9a-z]+\.jsonl$/;
@@ -28,9 +26,13 @@ export function rowOf(at, level, kind, said, more = {}) {
   }
   return {
     at,
-    level: LEVELS.includes(level) ? level : "info",
+    level: LEVELS.includes(level) ? level : DEFAULT,
     kind: String(kind),
-    said: String(said).replace(/\s+/g, " ").trim().slice(0, SAID),
+    // An answer keeps its whole text, because the owner reads it there. [[spec/design_output/log#an-answer-stands-in-chat]]
+    said:
+      String(kind) === ANSWER_KIND
+        ? String(said).replace(/\s+/g, " ").trim()
+        : String(said).replace(/\s+/g, " ").trim().slice(0, SAID),
     ...rest,
   };
 }
@@ -64,16 +66,19 @@ export function logSpec() {
       "Writes one line to this session's log, the one the owner reads in the",
       "viewer. The hook stamps the time. Name the kind, such as status or note,",
       "and say one sentence; text carries more where one sentence runs short.",
-      `Kind ${ANSWER_KIND} answers the owner's prompt: call it first after a prompt,`,
-      "with what you understood and what you do next, and the door lets the work on.",
+      "An answer to the owner's prompt stands in the chat, as text, and the hook",
+      `logs it from there under kind ${ANSWER_KIND}. This tool answers no prompt.`,
     ].join(" "),
     inputSchema: {
       type: "object",
       properties: {
         kind: { type: "string", description: `What the line is, such as ${ANSWER_KIND}, status or note.` },
-        said: { type: "string", description: "One sentence, 80 characters at most." },
+        said: {
+          type: "string",
+          description: "One sentence, 80 characters at most. An answer carries its whole text here.",
+        },
         text: { type: "string", description: "The whole text, where said runs short." },
-        level: { type: "string", enum: LEVELS, description: "info, warn or error." },
+        level: { type: "string", enum: LEVELS, description: "debug, info, warn, error or fatal." },
       },
       required: ["kind", "said"],
     },
@@ -104,9 +109,9 @@ export function writes(at, level) {
   return rank(level) >= rank(at);
 }
 
-function rank(said) {
+export function rank(said) {
   const found = LEVELS.indexOf(String(said ?? "").toLowerCase());
-  return found < 0 ? 0 : found;
+  return found < 0 ? LEVELS.indexOf(DEFAULT) : found;
 }
 
 // [[spec/design_output/log#what-a-tool-line-names]]

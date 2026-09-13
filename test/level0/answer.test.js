@@ -92,7 +92,8 @@ test("a call reaching the owner passes, and every other call does not", () => {
 
 test("the refusal quotes the rule it holds", () => {
   assert.match(SAYS, /^The owner asked something and nothing has answered it\./);
-  assert.match(SAYS, /Call mcp__level0__log\n\s*with kind answer, saying what you understood and what you do next, then work\.$/);
+  assert.match(SAYS, /Write the answer in\nthe chat, as text: what you understood and what you do next\. Then work\./);
+  assert.doesNotMatch(SAYS, /Call mcp__level0__log/);
 });
 
 // [[spec/design_output/level0#the-score-is-a-rate]]
@@ -132,86 +133,39 @@ function over(words = 20) {
   return "word ".repeat(words).trim();
 }
 
-// [[spec/design_output/level0#the-re-prompt-over-the-ceiling]]
-test("a turn end over the ceiling sends one re-prompt, and a second sends none", () => {
+// [[spec/design_output/level0#the-findings-ride-the-call]]
+test("a turn end over the ceiling holds the findings for the next call, once", () => {
   const gate = gateOf();
-  const at = { warnAt: 5, ceiling: 15, mostInARow: 3, found: FOUND, text: over(20) };
+  const at = { warnAt: 5, ceiling: 15, found: FOUND, text: over(20) };
 
   const first = gate.atTurnEnd(at);
   assert.equal(first.band, "rewrite");
   assert.equal(first.score, 50);
-  assert.equal(first.sends, true);
-
-  const second = gate.atTurnEnd(at);
-  assert.equal(second.sends, false);
-  assert.equal(second.held, true);
+  assert.deepEqual(gate.waiting(), { found: FOUND, score: 50, band: "rewrite" });
+  assert.deepEqual(gate.takeWaiting(), { found: FOUND, score: 50, band: "rewrite" });
+  assert.equal(gate.takeWaiting(), null, "the findings ride once");
 });
 
-test("a turn end under the warning sends nothing, and holds nothing", () => {
+test("a turn end under the warning holds nothing", () => {
   const gate = gateOf();
-  const said = gate.atTurnEnd({
-    warnAt: 5,
-    ceiling: 15,
-    mostInARow: 3,
-    found: FOUND,
-    text: over(400),
-  });
+  const said = gate.atTurnEnd({ warnAt: 5, ceiling: 15, found: FOUND, text: over(400) });
   assert.equal(said.band, "clean");
-  assert.equal(said.sends, false);
+  assert.equal(gate.waiting(), null);
 });
 
 // [[spec/design_output/level0#the-three-bands]]
-test("a turn end in the middle band sends nothing", () => {
+test("a turn end in the middle band holds the findings at carry", () => {
   const gate = gateOf();
-  const said = gate.atTurnEnd({
-    warnAt: 5,
-    ceiling: 15,
-    mostInARow: 3,
-    found: FOUND,
-    text: over(100),
-  });
+  const said = gate.atTurnEnd({ warnAt: 5, ceiling: 15, found: FOUND, text: over(100) });
   assert.equal(said.band, "carry");
-  assert.equal(said.sends, false);
+  assert.equal(gate.waiting().band, "carry");
 });
 
 test("an answer carrying no finding reads clean, whatever its length", () => {
   const gate = gateOf();
   const said = gate.atTurnEnd({ warnAt: 0, ceiling: 0, found: [], text: "short" });
   assert.equal(said.band, "clean");
-  assert.equal(said.sends, false);
-});
-
-// [[spec/design_output/level0#the-re-prompt-over-the-ceiling]]
-test("mostInARow caps the re-prompts, and a prompt from a person lets go", () => {
-  const gate = gateOf();
-  const at = { warnAt: 5, ceiling: 15, mostInARow: 2, found: FOUND, text: over(20) };
-
-  for (const count of [1, 2]) {
-    gate.sawPrompt(true);
-    assert.equal(gate.atTurnEnd(at).sends, true, `re-prompt ${count}`);
-  }
-  gate.sawPrompt(true);
-  const third = gate.atTurnEnd(at);
-  assert.equal(third.sends, false);
-  assert.equal(third.runaway, true);
-
-  gate.sawPrompt(false);
-  assert.equal(gate.inARow(), 0);
-  assert.equal(gate.atTurnEnd(at).sends, true);
-});
-
-test("the gate holds its re-prompt where the tooth already spoke", () => {
-  const gate = gateOf();
-  const said = gate.atTurnEnd({
-    warnAt: 5,
-    ceiling: 15,
-    mostInARow: 3,
-    found: FOUND,
-    text: over(20),
-    toothSpoke: true,
-  });
-  assert.equal(said.sends, false);
-  assert.equal(said.held, true);
+  assert.equal(gate.waiting(), null);
 });
 
 // [[spec/design_output/level0#the-tool-reads-a-draft]]
@@ -342,7 +296,7 @@ test("a needs table numbers its rows in order", () => {
 });
 
 test("a needs table cell holds no code and few words", () => {
-  const code = NEEDS_ROWS.replace("No, hold it local.", "Run `work close`.");
+  const code = NEEDS_ROWS.replace("No, hold it local.", "Run `branch close`.");
   assert.match(needsFaults(code, {})[0].message, /holds no code/);
   const long = NEEDS_ROWS.replace("No, hold it local.", "word ".repeat(CELL_WORDS + 1).trim());
   assert.match(needsFaults(long, {})[0].message, new RegExp(`holds ${CELL_WORDS + 1}`));

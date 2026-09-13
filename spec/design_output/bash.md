@@ -64,7 +64,7 @@ So `cp` and `mv` refuse where a source stands outside what the rules reach:
 
 `xargs` and `find -exec` carry a command inside a command, and the parse reads
 the inner one under the same rules. A target the parse reads as `{}` names no
-path, so it passes. The enclosing `find` holds the real target, and a guess at
+path, so it passes. The outer `find` holds the real target, and a guess at
 it refuses honest work.
 
 A heredoc into `sh` runs the shell parse again over the body. A heredoc into an
@@ -112,14 +112,14 @@ The same parse answers whether the commit steps past the pre-commit hook, and
 
 # A branch name holds five
 
-`work new` refuses a long name, and `git checkout -b` reaches the same tree.
+`branch new` refuses a long name, and `git checkout -b` reaches the same tree.
 `overLong` in `lib/names.js` counts the words, and the door calls it on:
 
 - `git checkout -b <name>`, and `-B`
 - `git switch -c <name>`, `-C`, and `--create`
 
 `git branch <name>` cuts a branch too, and the door reads none of it today.
-The refusal names `./RUNME.sh work new <name>`, which cuts the branch and
+The refusal names `./RUNME.sh branch new <name>`, which cuts the branch and
 writes its brief in one act.
 
 # A test run points somewhere
@@ -171,7 +171,7 @@ you trust them:
 | the engine caches the rendered description | the same |
 
 `claude plugin validate` reads an event name it knows nothing about and passes.
-A probe registering `nonsense.event` validates green, so a typo in an event
+A probe registering `nonsense.event` checks green, so a typo in an event
 name costs a silent hook and no error.
 
 # What every refusal owes

@@ -37,7 +37,7 @@ from a box holding trunk, and close it there once the merge stands.
 
 ## 4. One branch, one job
 
-A session that widens its branch produces a change nobody asked for, sitting
+A session that goes past its branch produces a change nobody asked for, sitting
 beside the one somebody did. The reviewer then reads both to find the one.
 
 ## 5. Onto your own branch

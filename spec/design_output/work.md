@@ -34,8 +34,8 @@ shape.
 
 ## A brief drains first
 
-A branch carrying `HANDOVER.md` is a brief branch, whatever else stands on it,
-and `work adopt` dropping that file is what turns it into a group. `take` hands
+A branch carrying `HANDOVER.md` is a brief branch, whatever else stands on it.
+A group ticket in place of that file turns it into a group. `take` hands
 out every brief branch before it hands out a group, so the branches standing
 before the ticket system finish under the verbs they carry.
 
@@ -46,10 +46,10 @@ before the ticket system finish under the verbs they carry.
     record:
       - step: children
         hand: box d462e994b4cef
-        took: a1b2c3
+        hash_before: a1b2c3
 
 `step` is the leaf the group stands on, `hand` names the box out of
-`.se/copy.json`, and `took` is the branch tip at the claim. The push arbitrates:
+`.se/copy.json`, and `hash_before` is the branch tip at the claim. The push decides:
 two boxes reaching for one group means one of them meets a rejected push and
 takes the next.
 
@@ -58,19 +58,19 @@ The hand names the box and no person, because the ticket travels and
 
 ## Held derives from the record
 
-A group holds where its newest record entry carries `took` and no `gave`.
+A group holds where its newest record entry carries `hash_before` and no `hash_after`.
 Nothing writes a status beside it, so a branch nobody holds takes no write at
 all:
 
 | the record says | the group stands at |
 |---|---|
-| nothing, or a newest entry with `gave` | `todo` |
-| a newest entry with `took` and no `gave` | `held` |
+| nothing, or a newest entry with `hash_after` | `todo` |
+| a newest entry with `hash_before` and no `hash_after` | `held` |
 | `state: closed` on the ticket | `done` |
 
 # A row per group
 
-`work list` names one row per branch and one per loose ticket on trunk:
+`branch list` names one row per branch and one per loose ticket on trunk:
 
 | column | says |
 |---|---|
@@ -98,16 +98,16 @@ Under yours it carries three answers, and each is a verb:
 
 | the answer | the verb | what it does |
 |---|---|---|
-| release it | `work release <name>` | writes `gave`, so the group stands at `todo` |
-| take it over | `work take` | claims it again, with a record entry of its own |
-| close it | `work close <name> --force` | drops the branch, and the work on it |
+| release it | `branch release <name>` | writes `hash_after`, so the group stands at `todo` |
+| take it over | `branch take` | claims it again, with a record entry of its own |
+| close it | `branch close <name> --force` | drops the branch, and the work on it |
 
 `work.staleAfter` reads `12h` by default, and the rule derives from the tip, so
 nothing writes to a branch nobody holds.
 
 # A box leaves
 
-`work done` on a group branch writes `gave` into the newest record entry, which
+`branch done` on a group branch writes `hash_after` into the newest record entry, which
 is the box saying it leaves. Then it reads the children:
 
 | what stands | what the group becomes |
@@ -135,9 +135,9 @@ The handover carries frontmatter, and its `status` is the one field that moves:
 
 | status | means | who sets it |
 |---|---|---|
-| `todo` | waiting for somebody | `work new` |
-| `held` | a session has it | `work take`, by pushing |
-| `done` | the result is on the branch | `work done` |
+| `todo` | waiting for somebody | `branch new` |
+| `held` | a session has it | `branch take`, by pushing |
+| `done` | the result is on the branch | `branch done` |
 
 A claim is a push. Two sessions reaching for one branch means one of them meets
 a rejected push and takes the next.
@@ -145,51 +145,51 @@ a rejected push and takes the next.
 # The round trip
 
 1. Write the brief to `HANDOVER.md` on `main`.
-2. `./RUNME.sh work new <name>` cuts the branch, stamps `status: todo`, commits
+2. `./RUNME.sh branch new <name>` cuts the branch, stamps `status: todo`, commits
    and pushes. `main` loses the file in the same act.
 3. A session works the branch and pushes to it. A cloud session stops there,
    because the harness holds `main` shut and a cloud box opens no pull request.
 4. That session writes its result and its retro into `HANDOVER.md`, then runs
-   `./RUNME.sh work done`, which stamps `status: done` and pushes.
-5. `./RUNME.sh work collect` names every branch standing at `done`.
+   `./RUNME.sh branch done`, which stamps `status: done` and pushes.
+5. `./RUNME.sh branch list --done` names every branch standing at `done`.
 
 # Every brief carries the contract
 
-`work new` appends `## How this branch ends` to a brief that carries none, so
+`branch new` appends `## How this branch ends` to a brief that carries none, so
 every branch says how it closes. The append is idempotent, and a brief already
 carrying the section stays as it stands.
 
 The contract names six things:
 
-- run `work sync` first, which takes `main` in
+- run `branch sync` first, which takes `main` in
 - push each time a thing lands
 - write the result and the retro back into `HANDOVER.md`
-- run `work sync` again, so trunk comes in last too
-- run `work done`
-- run `work release` on stopping early
-- run `work merge` from trunk, which a cloud box leaves to a box off the cloud
+- run `branch sync` again, so trunk comes in last too
+- run `branch done`
+- run `branch release` on stopping early
+- run `branch merge` from trunk, which a cloud box leaves to a box off the cloud
 
 A brief depends on nothing outside itself, so a cloud session aiming at one
 branch reads it and knows how to finish.
 
 # Trunk comes in first
 
-`work sync` merges `origin/main` into the branch. `work take` runs it, so a
+`branch sync` merges `origin/main` into the branch. `branch take` runs it, so a
 routine pays nothing to remember it. A conflict then stops the take, while the
 work it costs still sits ahead.
 
 ## Trunk comes in last too
 
 A branch greens its own tip, and the merge result reads green nowhere. So a
-branch older than a rule passes `work done` and reddens trunk at the merge.
+branch older than a rule passes `branch done` and turns trunk red at the merge.
 This tree hits that twice in one day.
 
-`work done` fetches trunk and refuses a branch trunk stands ahead of:
+`branch done` fetches trunk and refuses a branch trunk stands ahead of:
 
 | what it finds | what it does |
 |---|---|
 | the branch carries every commit on trunk | it reads the battery next |
-| trunk holds a commit the branch lacks | it refuses, and names `work sync` |
+| trunk holds a commit the branch lacks | it refuses, and names `branch sync` |
 
 So the battery a branch claims stands over the tree the merge produces. The
 contract carries the same step, because a reader acts on it before the verb
@@ -198,7 +198,7 @@ ever runs.
 # A box landing on trunk
 
 A cloud session starting on `main` gets no brief, because trunk carries none.
-Level zero notices that and hands over a block naming `./RUNME.sh work take`.
+Level zero notices that and hands over a block naming `./RUNME.sh branch take`.
 
 So a box needs no prompt about work at all. Starting it on trunk is enough, and
 saying "take work" only agrees with what it already reads.
@@ -221,17 +221,17 @@ Level zero refuses, on a cloud box:
 - a `git commit` made while standing on `main`
 - a `git push` naming `main`, from any branch
 
-The refusal names `./RUNME.sh work take` as the way out. A desk box meets none
+The refusal names `./RUNME.sh branch take` as the way out. A desk box meets none
 of it, because a box off the cloud merges by choice. The harness is the whole
 of the reason a cloud box stops: it opens no pull request, so trunk reaches it
 one way.
 
-`work take` and `work done` reach git inside the command line, so the door sees
+`branch take` and `branch done` reach git inside the command line, so the door sees
 the verb and leaves the plumbing alone.
 
 # Urgency, and what waits
 
-The frontmatter carries two more fields, and `work take` reads both:
+The frontmatter carries two more fields, and `branch take` reads both:
 
     urgency: now
     depends_on:
@@ -255,13 +255,13 @@ itself in order, and each link starts from the one before it.
 `take` merges trunk in. A dependent taken before its dependency lands starts
 from a trunk carrying none of that work. It then builds that work a second time.
 
-`work list` shows what each branch waits for, in place of its urgency.
+`branch list` shows what each branch waits for, in place of its urgency.
 `setStatus` writes `urgency: soon` onto a brief carrying none, so every brief it
 mints holds to its schema. [[spec/schemas]]
 
 # The battery answers first
 
-`work done` reads a stamp before it claims anything. `./RUNME.sh check` writes
+`branch done` reads a stamp before it claims anything. `./RUNME.sh check` writes
 `.se/check.json` on every run, naming the commit it stands on:
 
     { "sha": "...", "ok": true, "clean": true, "at": "..." }
@@ -291,7 +291,7 @@ carries red.
 
 # A merged branch goes
 
-`work merge <name>` runs on `main` and takes a branch standing at `done`. A
+`branch merge <name>` runs on `main` and takes a branch standing at `done`. A
 group stands at `done` where its ticket reads `state: closed`. It merges with
 `--no-ff`, so the branch keeps its shape in the history, and drops
 `HANDOVER.md` inside the same commit: trunk carries no brief.
@@ -316,32 +316,18 @@ again, so `main` takes a branch only where the merged tree passes.
 ## The merge frees the tickets
 
 An open ticket of the group loses its `group` field inside the merge commit. So
-a ticket waiting on a person stands loose on trunk, where `work list` names it
+a ticket waiting on a person stands loose on trunk, where `branch list` names it
 and a person sorts it. A closed ticket keeps its `group`, because the pair is
 the history of one group and what it holds.
 
-# A brief becomes a group
-
-`work adopt` runs on a brief branch and writes two tickets in place of
-`HANDOVER.md`:
-
-| what it writes | from |
-|---|---|
-| `spec/tickets/<branch>.md`, the group | the `group` route, with the brief's ask |
-| `spec/tickets/<child>.md`, one ticket | the `standard` route, with the brief's body |
-
-The child takes its name from the brief's first heading, and `work adopt <name>
-<child>` names it instead. A name matching the group's, or one past
-`names.words`, stops the verb and asks for one.
-
 # A merged branch closes
 
-`work close [name]` deletes a branch git says is inside `main`, here and on
+`branch close [name]` deletes a branch git says is inside `main`, here and on
 origin. Naming no branch closes every one of them. It reaches two kinds:
 
 | branch | cut by | throwaway once |
 |---|---|---|
-| `work/<name>` | `work new` | trunk holds its commits |
+| `work/<name>` | `branch new` | trunk holds its commits |
 | `claude/<name>` | the platform, for a routine run | trunk holds its commits |
 
 Deleting a remote branch whose merge sits on this box alone loses the work. So
@@ -366,10 +352,10 @@ agent gets its brief and a routine gets none.
 Level zero reads its context at `session.start`, before any checkout. A hook
 sees nothing of a branch the session switches to afterwards.
 
-So `./RUNME.sh work take` prints the brief to standard output. The agent reads
+So `./RUNME.sh branch take` prints the brief to standard output. The agent reads
 it from the command, and one routine prompt then serves every branch:
 
-    ./RUNME.sh work take
+    ./RUNME.sh branch take
 
 That verb fetches, picks a branch carrying a brief, checks it out, claims it by
 pushing, and prints what to do. A session losing the race meets a rejected
@@ -378,13 +364,13 @@ push and takes the next one.
 # The routine a verb names
 
 One routine already works this queue. `do_work` holds the id
-`trig_01KCYQ2oxi7rnCuBZYJsnLnQ` and carries one prompt: `./RUNME.sh work take`.
+`trig_01EenLoDAB3NdmANnRM9mSh6` and carries one prompt: `./RUNME.sh branch take`.
 
 Firing it belongs to the session, because `RemoteTrigger` is a tool the client
 holds and the token stays inside that process. A shell verb reaches neither, so
-`work trigger` names what a session then fires:
+`cloud trigger` names what a session then fires:
 
-    ./RUNME.sh work trigger
+    ./RUNME.sh cloud trigger
 
 It prints the routine, the id, and every branch standing free. A branch on that
 list is one a box takes, so the length of the list says how many boxes to fire.

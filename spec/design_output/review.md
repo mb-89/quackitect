@@ -25,7 +25,7 @@ no switch holding a branch back.
 
 | half | who runs it | what it answers |
 |---|---|---|
-| the verb | `./RUNME.sh work review <name>` | the check and the retro |
+| the verb | `./RUNME.sh branch review <name>` | the check and the retro |
 | the reader | the `review_branch` tool | the brief, the diff and the tests |
 
 The verb stands alone. A person runs it, reads the diff themselves, and has the
@@ -41,7 +41,7 @@ mechanical answers in front of them while they do.
 | the whole diff | `git diff main...<ref>` |
 | the check | `./RUNME.sh check` on that branch |
 
-The brief and the handback are one file at two commits. `work new` writes the
+The brief and the handback are one file at two commits. `branch new` writes the
 brief in the branch's first commit, so `git rev-list --reverse main..<ref>`
 names the commit the brief lives in, and the tip carries the handback.
 
@@ -50,7 +50,7 @@ names the commit the brief lives in, and the tip carries the handback.
 ## Which ref it reads
 
 The verb fetches, then takes `origin/work/<name>` where origin carries it and
-the local branch otherwise. `work merge` merges from origin, so origin is what
+the local branch otherwise. `branch merge` merges from origin, so origin is what
 the merge takes and origin is what the reader reads.
 
 Trunk resolves the same way, and a branch carrying no commit beyond trunk stops

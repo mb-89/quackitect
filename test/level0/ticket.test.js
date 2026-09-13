@@ -147,6 +147,15 @@ test("a write to a phase's chapter is refused", () => {
 });
 
 // [[spec/design_output/schema#the-three-places]]
+test("two leaves naming one field alike stand apart, so a write beside them passes", () => {
+  const twice = open
+    .replace("# implement\n", "# implement\n\n## first\n\n### tests\n\n<!-- the first -->\n")
+    .replace("# Discussion", "## second\n\n### tests\n\n<!-- the second -->\n\n# Discussion");
+  assert.deepEqual(weighed(twice, twice), []);
+  assert.deepEqual(weighed(twice.replace("### lint\n", "### lint\n\nnpm test\n"), twice), []);
+});
+
+// [[spec/design_output/schema#the-three-places]]
 test("a write to the field of another leaf is refused", () => {
   const other = open.replace("step: implement/change", "step: design");
   const said = other.replace("### lint\n", "### lint\n\nnpm test\n");
@@ -203,8 +212,8 @@ const recorded = open.replace(
   `record:
   - step: implement/change
     hand: a box, a session and an agent
-    took: abc1234
-    gave: def5678
+    hash_before: abc1234
+    hash_after: def5678
     returns: 1
     answered:
       - name: lint

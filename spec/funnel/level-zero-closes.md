@@ -44,7 +44,7 @@ help` names the verbs, `./RUNME.sh rules` the mechanical rules, and
 | the schemas and `mint` | one schema per kind of note, checked at the door and on the sweep | `schema` |
 | the vehicle | a copy that drives another project, and the roots between them | `vehicle` |
 | the editor | one sidebar, two language servers, and settings that travel | `extension`, `editor` |
-| god mode and health | a cage holding nothing says so, and refuses the work until somebody mends it | `level0` |
+| god mode and health | a cage holding nothing says so, and refuses the work until somebody fixes it | `level0` |
 | the Copilot surface | one level zero over two harnesses, through a runtime of its own | `copilot` |
 
 # What the older lines carry
@@ -74,7 +74,7 @@ each piece lands on the ladder.
 
 # What the field puts here
 
-Two surveys read the harness engineering writeups, the guardrail
+Two surveys read the harness engineering reports, the guardrail
 frameworks, the Claude Code docs and the plugin ecosystem. The line every
 mature system draws is the one this tree draws:
 
@@ -113,7 +113,7 @@ what to do about it:
 | worktrees, which the client holds | the work branch | keep the brief and the handover, and let a worktree hold the isolation |
 | the `Concise` output style | `ask.wanted` | keep, because ours is one turn's state and theirs is a session's |
 | `security-guidance`, a judge that warns alone | the judge, which refuses | keep the refusal, and read their pattern for the cost |
-| managed settings guarding the hooks from the agent | the doors reading the cage's files like any file, the check validating the plugin, the loads test refusing a broken module | keep as it stands, because the owner works those files every day and the guard is for a fleet |
+| managed settings guarding the hooks from the agent | the doors reading the cage's files like any file, the check reading the plugin, the loads test refusing a broken module | keep as it stands, because the owner works those files every day and the guard is for a fleet |
 | function hooks, on their way as Claude Mods within weeks | the whole module | one migration branch on the day it lands |
 
 The function hooks are the ground level zero stands on, and their author says

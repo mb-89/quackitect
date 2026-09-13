@@ -116,8 +116,10 @@ export function stopSpec(rules) {
   return {
     name: STOP_TOOL,
     description: [
-      "Ends this turn. Call it last, once your answer stands, and write nothing",
-      "after it. The result says whether the stop stands. Where it falls, the",
+      "Ends this turn, from the second turn on. The first turn ends on the canary",
+      "line alone, written last, and this call falls there. Call it last, once",
+      "your answer stands, and write nothing after it. The result says whether",
+      "the stop stands. Where it falls, the",
       `result names the fact, so carry on. ${NEEDS_LINE} The reasons:`,
       ...reasons.map((one) => `${one.id}: ${one.asks}`),
     ].join("\n"),
@@ -143,7 +145,11 @@ export function stopAnswer(rules, reason, decision) {
   }
   if (decision.ends) {
     const why = decision.stop?.says ?? "";
-    return { known, ends: true, result: `The stop stands. ${why} Write nothing more.`.replace(/\s+/g, " ") };
+    return {
+      known,
+      ends: true,
+      result: `The stop stands. ${why} Write the words Ending my turn, and nothing more.`.replace(/\s+/g, " "),
+    };
   }
   return { known, ends: false, result: `The stop falls. ${decision.go?.says ?? ""}`.trim() };
 }

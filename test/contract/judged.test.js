@@ -91,8 +91,10 @@ test("BottomLineFirst reads a chapter, and refuses an outcome arriving late", as
   assert.match(found[0].message, /bottom line first/);
 });
 
-test("ShapeFits reads every path, and the two new rules cost nothing under .se", () => {
-  assert.equal(readsFor(ruleNamed("ShapeFits"), ".se/HANDOVER.md"), true);
+test("ShapeFits reads a note alone, and the two new rules cost nothing under .se", () => {
+  assert.equal(readsFor(ruleNamed("ShapeFits"), ".se/HANDOVER.md"), false);
+  assert.equal(readsFor(ruleNamed("ShapeFits"), "spec/schemas/paragraph.schema.yaml"), false);
+  assert.equal(readsFor(ruleNamed("ShapeFits"), "spec/guidance/voice.md"), true);
   assert.equal(readsFor(ruleNamed("BottomLineFirst"), ".se/HANDOVER.md"), false);
   assert.equal(readsFor(ruleNamed("BottomLineFirst"), "spec/guidance/voice.md"), true);
 });

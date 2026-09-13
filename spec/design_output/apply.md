@@ -15,14 +15,14 @@ Level zero registers three tools the agent calls: `patch` edits files,
 
 | tool | what it is for |
 |---|---|
-| `patch` | the scalpel: many ops on paths you hold, one atomic call |
+| `patch` | the knife: many ops on paths you hold, one atomic call |
 | `replace` | the sweep: one regex over every file a glob reaches |
 | `undo` | the way back, out of a journal the apply writes first |
 
 The pure half sits in `lib/apply.js` and `lib/undo.js`, which read no disk. The
 hooks module hands them the text and writes what they answer.
 
-## Validate everything, then write
+## Check everything, then write
 
 Every op reads the file as the ops before it leave it, so edits to one file
 compose in the order they arrive. One failure refuses the whole manifest, and
@@ -61,12 +61,6 @@ agent who counts first learns at once when the tree disagrees.
 `replace` asks the index which files carry the pattern, and the sweep costs no
 walk. It reads those files, keeps the ones a JavaScript regex agrees with, and
 hands the rest to the same manifest `patch` runs.
-
-## The disk stands in
-
-- Outcome: `replace` sweeps a tree where no index stands.
-- List: `git ls-files -co --exclude-standard`, cut to the glob.
-- Cause: the index needs a C compiler, and a box without one leaves it absent.
 
 ## The journal holds both halves
 

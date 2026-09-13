@@ -282,15 +282,15 @@ starts over at every press, and stands at one.
 `pressed` takes the press time as an argument, so a burst replays in a test:
 
 - a press within 800ms of the last one joins its burst, and a later one opens a new burst
-- the first press of a burst climbs one rung
+- the first press of a burst climbs one step
 - presses two to four stand by
-- a press away from rest falls back to rest, however far it stands
+- a press away from rest falls back to rest, at any distance
 - the fifth press of a burst sends the far value
 - the button stands dead for 600ms after the far value, so a sixth press stands by too
 
-Climbing goes one rung at a time, because handing over a whole ladder in one
+Climbing goes one step at a time, because handing over a whole ladder in one
 click is a move a person means. Releasing goes any distance at once, so a
-stray press always falls DOWN. That asymmetry is the safety, and it stands in
+stray press always falls DOWN. That one-way fall is the safety, and it stands in
 place of a dialog asking whether a person means it.
 
 ## A press writes a line
@@ -350,7 +350,7 @@ beside the editor. An action opening another program hands a person that
 program's keys. So the declaration carries them and the hover says them.
 For details, see [[spec/design_output/viewer#the-keys]].
 
-The rule generalises. Where an action starts another program, its hover names
+The rule holds for every action. Where an action starts another program, its hover names
 the keys that program needs, and the declaration carries them beside the
 `help`.
 
@@ -439,7 +439,7 @@ it, and the sidebar goes.
 
 The disk door reads such a link as a link, and reaches no folder behind it. So
 `linked` reads it as no link, `link` removes it the way it removes a copy, and
-the next `./RUNME.sh` mends it. The fake disk follows a link the same way, and
+the next `./RUNME.sh` fixes it. The fake disk follows a link the same way, and
 the contract test holds both doors to it. `./RUNME.sh doctor` says where the
 link stands, in a row named `sidebar`.
 
@@ -550,7 +550,7 @@ Where no log stands yet, the plain verb says so in one line and answers zero.
 
 A terminal opens on the shell the box prefers, which is PowerShell there, and
 that shell reads no `./RUNME.sh`. So the door hands it `.\RUNME.ps1` instead,
-which is the doorway a person there already takes.
+which is the entry a person there already takes.
 
 # What stands open
 

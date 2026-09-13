@@ -77,6 +77,11 @@ function listAt(rows, cursor, indent, path) {
     const at = `${path}[${out.length}]`;
     mark(cursor, at, one.line);
     const rest = one.said.slice(2).trim();
+    // [[spec/funnel/a-paragraph-has-a-schema]]
+    if (rest.startsWith("{")) {
+      out.push(scalar(rest));
+      continue;
+    }
     const pair = PAIR.exec(rest);
     if (!pair) {
       out.push(scalar(rest));
@@ -118,10 +123,10 @@ function under(rows, cursor, indent, path) {
 function scalar(said) {
   const flat = unquote(said);
   if (LINK.test(flat)) return flat;
+  // [[spec/funnel/a-paragraph-has-a-schema]]
+  if (flat.startsWith("{") && flat.endsWith("}")) return mapping(flat.slice(1, -1));
   if (flat.startsWith("[") && flat.endsWith("]")) {
-    return flat
-      .slice(1, -1)
-      .split(",")
+    return flowItems(flat.slice(1, -1))
       .map((one) => unquote(one.trim()))
       .filter((one) => one !== "");
   }
@@ -129,6 +134,63 @@ function scalar(said) {
   if (flat === "false") return false;
   if (/^-?\d+$/.test(flat)) return Number(flat);
   return flat;
+}
+
+// [[spec/design_output/pull#the-fields-hold-their-forms]]
+function flowItems(inside) {
+  const out = [];
+  let held = "";
+  let quote = "";
+  for (const char of inside) {
+    if (quote) {
+      held += char;
+      if (char === quote) quote = "";
+      continue;
+    }
+    if (char === '"' || char === "'") {
+      quote = char;
+      held += char;
+      continue;
+    }
+    if (char === ",") {
+      out.push(held);
+      held = "";
+      continue;
+    }
+    held += char;
+  }
+  out.push(held);
+  return out;
+}
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+function mapping(said) {
+  const out = {};
+  for (const one of parted(said)) {
+    const pair = PAIR.exec(one.trim());
+    if (!pair) continue;
+    out[pair[1].trim()] = scalar(pair[2].trim());
+  }
+  return out;
+}
+
+// A comma inside a bracket belongs to its own list. [[spec/funnel/a-paragraph-has-a-schema]]
+function parted(said) {
+  const out = [];
+  let depth = 0;
+  let held = "";
+  for (const one of String(said)) {
+    if (one === "[" || one === "{") depth += 1;
+    if (one === "]" || one === "}") depth -= 1;
+    if (one === "," && depth === 0) {
+      out.push(held);
+      held = "";
+      continue;
+    }
+    held += one;
+  }
+  out.push(held);
+  return out.filter((one) => one.trim() !== "");
 }
 
 function unquote(said) {
@@ -728,7 +790,7 @@ export function chaptersWanted(sections, front, level) {
   return out;
 }
 
-function chaptersOf(list, level, rule) {
+function chaptersOf(list, level, rule, listed = false) {
   const out = [];
   for (const one of [list ?? []].flat()) {
     if (!one || typeof one !== "object") continue;
@@ -743,14 +805,31 @@ function chaptersOf(list, level, rule) {
       form: String(one.form ?? ""),
       "x-fills": Boolean(one.form),
     });
+    const asks = listed || [one.checklist ?? []].flat().some((it) => String(it ?? "").trim());
+    let leaf = true;
     for (const value of Object.values(one)) {
       if (!Array.isArray(value)) continue;
       if (!value.some((it) => it && typeof it === "object" && it.name)) continue;
-      out.push(...chaptersOf(value, level + 1, rule));
+      out.push(...chaptersOf(value, level + 1, rule, asks));
+      if (value === one.steps) leaf = false;
+    }
+    // [[spec/design_output/pull#the-fields-hold-their-forms]]
+    if (asks && leaf && one.evidence) {
+      out.push({
+        ...rule,
+        header: CHECKED,
+        level: level + 1,
+        required: false,
+        description: "one line per item of the checklist, on how you take it into account",
+        form: "checklist",
+        "x-fills": true,
+      });
     }
   }
   return out;
 }
+
+export const CHECKED = "checked";
 
 // [[spec/design_output/schema#the-render-follows-the-tree]]
 function sayOf(one) {
@@ -1151,7 +1230,12 @@ function keyRows(key, said, pad) {
 
 function flatOf(said) {
   if (Array.isArray(said)) return `[${said.map((one) => `"${one}"`).join(", ")}]`;
-  return String(said ?? "");
+  const flat = String(said ?? "");
+  // [[spec/design_output/pull#a-person-step-goes-in]]
+  if (/: |^[\[{"'#&*!|>%@`]|: *$| #/.test(flat) && !/^\[\[.*\]\]$/.test(flat)) {
+    return `"${flat.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+  }
+  return flat;
 }
 
 // [[spec/design_output/schema#the-fields-a-caller-names]]

@@ -75,8 +75,9 @@ import { graphIn } from "./graph.js";
 import { withRoute } from "./process.js";
 import { probe } from "./probe.js";
 import { voice } from "./voice.js";
+import { retro } from "./retro.js";
 import { ticket } from "./ticket.js";
-import { work } from "./work.js";
+import { cloud, work } from "./work.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -117,6 +118,12 @@ async function doorsHere() {
     config: said,
     words: await said.ask("names.words"),
     stale: await said.ask("work.staleAfter"),
+    fails: await said.ask("work.failsBeforePerson"),
+    refusals: await said.ask("work.refusalsBeforePerson"),
+    splits: await said.ask("work.stepsBeforeSplit"),
+    // [[spec/design_output/pull#the-hand-rule]]
+    agent: Boolean(process.env.CLAUDECODE || process.env.CLAUDE_CODE_REMOTE || process.env.SE_CLOUD),
+    cloud: Boolean(process.env.CLAUDE_CODE_REMOTE || process.env.SE_CLOUD),
     node: process.execPath,
     join,
   };
@@ -128,6 +135,8 @@ const outside = it.proc;
 
 const known = readTools(files, root);
 const bin = whereIs(files, root, "vale", known);
+// [[spec/design_output/pull#the-voice-reads-the-evidence]]
+it.vale = bin;
 const go = whereIs(files, root, "go", known);
 const LOG = join(root, ".se", "log");
 const STYLES = join(root, "spec", "config", "styles", "VoiceVale");
@@ -139,9 +148,10 @@ const lsp = whereIs(files, root, "se-lsp", known);
 const GUIDANCE = join(root, "spec", "guidance");
 const DOORS = join(root, "src", "doors");
 const PLUGIN = join(".claude", "skills", "level0");
+const LEVEL1 = join(".claude", "skills", "level1");
 const CONTRACT = join(root, "test", "contract");
 const settings = it.config;
-const PARKED = ["{.se,node_modules,.git,.claude/types}/**", "**/_*"];
+const PARKED = ["{.se,node_modules,.git,.claude/types,.claude/worktrees}/**", "**/_*"];
 const OURS = `--glob=!{${PARKED.join(",")}}`;
 const TESTS = "test/level0/*.test.js";
 const CONTRACT_TESTS = "test/contract/*.test.js";
@@ -192,13 +202,21 @@ const verbs = {
     says: "every key, its value, and the layer answering it",
     run: async () => readConfig(rest),
   },
-  work: {
-    says: "work branches and groups: take, list, done, merge, adopt",
+  branch: {
+    says: "work branches and groups: new, take, sync, done, list, merge, close, pull, test",
     run: async () => work(root, rest, it),
   },
+  cloud: {
+    says: "the cloud routine: trigger",
+    run: async () => cloud(root, rest, it),
+  },
   ticket: {
-    says: "tickets that stay on this box: note, update",
+    says: "tickets that stay on this box: note, update, open, todo",
     run: async () => ticket(root, rest, it),
+  },
+  retro: {
+    says: "the retro a group's route runs: notes",
+    run: async () => retro(root, rest, it),
   },
   mint: {
     says: "write a new note of a kind, in the shape its schema names",
@@ -741,15 +759,18 @@ function drawing(argv) {
 
 // [[spec/design_output/level0#no-computed-engine-access]]
 function pluginHolds() {
-  const ran = validatePlugin(outside.run, PLUGIN, root);
-  if (ran.exitCode === 0) return 0;
-  if (!ran.stdout && !ran.stderr) {
-    console.log("claude stands nowhere, so the plugin goes unvalidated here.");
-    return 0;
+  for (const plugin of [PLUGIN, LEVEL1]) {
+    const ran = validatePlugin(outside.run, plugin, root);
+    if (ran.exitCode === 0) continue;
+    if (!ran.stdout && !ran.stderr) {
+      console.log("claude stands nowhere, so the plugin goes unvalidated here.");
+      return 0;
+    }
+    console.error(`${ran.stdout}${ran.stderr}`.trim());
+    console.error("The engine reads this module's source, and it refuses the above.");
+    return 1;
   }
-  console.error(`${ran.stdout}${ran.stderr}`.trim());
-  console.error("The engine reads this module's source, and it refuses the above.");
-  return 1;
+  return 0;
 }
 
 // [[spec/design_output/level0#god-mode]]

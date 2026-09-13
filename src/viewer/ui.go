@@ -51,6 +51,7 @@ type model struct {
 	input     textinput.Model
 	filter    Filter
 	filterBad string
+	floor     string
 	w, h      int
 	tailer    *tailer
 	err       error
@@ -67,6 +68,7 @@ func newModel(path string, zone *time.Location) model {
 		zone:   zone,
 		sel:    -1,
 		follow: true,
+		floor:  "info",
 		box:    viewport.New(40, 10),
 		input:  input,
 		tailer: newTailer(path),
@@ -97,7 +99,7 @@ func (m model) at() int {
 func (m *model) rebuild() {
 	m.view = m.view[:0]
 	for index, r := range m.all {
-		if m.filter.Match(r) {
+		if Rank(r.Level) >= Rank(m.floor) && m.filter.Match(r) {
 			m.view = append(m.view, index)
 		}
 	}
@@ -247,6 +249,8 @@ func (m model) key(name string) (tea.Model, tea.Cmd) {
 		m.open(paneFilter)
 	case "alt+F", "alt+ctrl+f":
 		m.quick(name)
+	case "alt+l":
+		m.raiseFloor()
 	case "e":
 		m.toError()
 	case "w", "W":
@@ -295,6 +299,9 @@ func (m model) typing(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case "alt+F", "alt+ctrl+f":
 		m.quick(msg.String())
 		return m, nil
+	case "alt+l":
+		m.raiseFloor()
+		return m, nil
 	case "up":
 		m.box.ScrollUp(1)
 		return m, nil
@@ -313,6 +320,13 @@ func (m model) typing(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	}
 	m.loadPane()
 	return m, cmd
+}
+
+// [[spec/design_output/viewer#alt-l-raises-the-floor]]
+func (m *model) raiseFloor() {
+	m.floor = ladder[(Rank(m.floor)+1)%len(ladder)]
+	m.rebuild()
+	m.loadPane()
 }
 
 // [[spec/design_output/viewer#e-finds-the-newest-error]]
@@ -388,7 +402,11 @@ func (m model) renderHeader() string {
 	if !m.filter.Empty() {
 		filterKey = levelStyle("error").Render("alt+f filter")
 	}
-	hints := keys + filterKey
+	floorKey := dimStyle.Render("  alt+L log lvl: " + strings.ToUpper(m.floor))
+	if !strings.EqualFold(m.floor, "info") {
+		floorKey = levelStyle("error").Render("  alt+L log lvl: " + strings.ToUpper(m.floor))
+	}
+	hints := keys + filterKey + floorKey
 	gap := w - ansi.StringWidth(names) - ansi.StringWidth(hints)
 	line := headStyle.Render(names)
 	if gap >= 2 {

@@ -60,7 +60,7 @@ land and the entry sets the folder.
 
 # The first target
 
-One slash command per settable value, under `.claude/commands`:
+One slash command per value a person sets, under `.claude/commands`:
 
 | the declaration says | the projection writes |
 |---|---|

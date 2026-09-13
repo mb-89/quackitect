@@ -133,7 +133,7 @@ export async function dispatch(it) {
         "--body",
         [
           marker,
-          "@copilot Work on this pull request's existing head branch. Read the held HANDOVER.md through level zero. Run work sync, not work take. Commit and push checkpoints, write your result and retro, then run work done or work release. Open no new pull request; leave merging to a person.",
+          "@copilot Work on this pull request's existing head branch. Read the held HANDOVER.md through level zero. Run branch sync, not branch take. Commit and push checkpoints, write your result and retro, then run branch done or branch release. Open no new pull request; leave merging to a person.",
         ].join("\n\n"),
       ]);
     }
