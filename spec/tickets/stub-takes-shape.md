@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 steps:
   - name: design
@@ -129,6 +129,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 36d4a566c587 · helper-7
+    hash_before: 59e288938c79e182e04e2c63a0c4e3f7cf96797d
+    hash_after: 59e288938c79e182e04e2c63a0c4e3f7cf96797d
+reason: done
 ---
 
 # Ask
@@ -302,11 +307,42 @@ A new verb, `stub into`, writes a bare project the vehicle drives from outside. 
 
 <!-- the form is files -->
 
+- spec/tickets/stub-takes-shape.md
+- spec/design_input/a-stub-takes-its-vehicle.md
+- spec/design_output/vehicle.md
+- spec/guidance/review/reviewing.md
+- spec/tickets/a-person-reads-the-pull.md
+- spec/tickets/the-stub-takes-shape.md
+- .claude/skills/level0/lib/vehicle.js
+- .claude/settings.json
+- src/scripts/stub.js
+- src/scripts/cli.js
+- src/scripts/vehicle.js
+- src/stub/RUNME.sh
+- src/stub/.claude/skills/bridgehead/.claude-plugin/plugin.json
+- src/stub/.claude/skills/bridgehead/hooks/hooks.json
+- src/stub/.claude/skills/bridgehead/hooks/bridgehead.js
+- test/level0/stub.test.js
+- test/contract/stub.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- the branch does every line of the ask: the verb, the record, the refusal, the contract test and the chapter
+- the record reads the identity off `.se/copy.json`, and the chapter says so, which settles the source
+- `./RUNME.sh check` answers exit 0 on the tip, with one test skipped and none failing
+- the diff reaches two tickets past the brief, and each hunk is a trivial fix or a verb's mark
+- the refusal on no remote has a unit test and a contract test, each with a repo lacking origin
+- the refusal on a stub landing in the vehicle has a test asserting it writes nothing
+- the command line refuses with no folder, and a contract case proves the exit and the message
+- the contract test walks the whole stub and finds every path in the list, and none of the method
+- the retro finds one lesson in the says chapter, the dropped first argument, and one doubt under Discussion
+- the bridgehead's import at session start stands unproven here, and the chapter hands it to a later group
+- the helper `same` stands in the pure module and again in the verb, which the retro reads
 
 # Discussion
 
