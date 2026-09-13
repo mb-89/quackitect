@@ -1433,6 +1433,78 @@ test("a push to trunk takes a green battery, and a work branch takes none", asyn
   assert.equal(branch.deny, undefined, "a work branch meets no battery");
 });
 
+// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+const TAGGED_NOTE = `---\nkind: [[ticket]]\nstate: open\nurgency: whenever\ntodo: true\n---\n\n# Ask\n\nLook at the lint.\n\n# Discussion\n\nNothing yet.\n`;
+
+// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+function boxCarrying(notes, env = {}) {
+  const names = Object.keys(notes).join("\n");
+  return {
+    exists: (path) => path === VALE,
+    run: (argv) => {
+      if (argv[0] === "node") {
+        return { exitCode: 0, stdout: JSON.stringify(env), stderr: "" };
+      }
+      if (argv[0] === "git" && argv[1] === "log") {
+        return { exitCode: 0, stdout: `${names}\n`, stderr: "" };
+      }
+      if (argv[0] === "git" && argv[1] === "show") {
+        const text = notes[String(argv[2]).slice("HEAD:".length)];
+        return { exitCode: 0, stdout: text ?? "", stderr: "" };
+      }
+      return { exitCode: 0, stdout: "", stderr: "" };
+    },
+  };
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+test("a push carrying a tagged note is refused, and the refusal names the file", async () => {
+  const it = await started(
+    undefined,
+    boxCarrying({ "spec/tickets/slow-lint.md": TAGGED_NOTE, "src/x.js": "// code" }),
+  );
+  const said = await it.raise(
+    "tool.call",
+    { tool: "Bash", command: "git push -u origin work/a-thing" },
+    "Bash",
+  );
+
+  assert.match(String(said.deny), /spec\/tickets\/slow-lint\.md/);
+  assert.match(String(said.deny), /ticket todo <name> --off/);
+  assert.ok(
+    it.lines().some((one) => one.kind === "todo"),
+    "the door writes a todo row",
+  );
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+test("a commit carrying a tagged note passes, because the push is the one gate", async () => {
+  const it = await started(
+    undefined,
+    boxCarrying({ "spec/tickets/slow-lint.md": TAGGED_NOTE }),
+  );
+  const said = await it.raise(
+    "tool.call",
+    { tool: "Bash", command: 'git commit -m "the note parks the work"' },
+    "Bash",
+  );
+
+  assert.equal(said.deny, undefined);
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+test("a push carrying no tagged note lands", async () => {
+  const free = TAGGED_NOTE.replace("todo: true\n", "");
+  const it = await started(undefined, boxCarrying({ "spec/tickets/x.md": free }));
+  const said = await it.raise(
+    "tool.call",
+    { tool: "Bash", command: "git push -u origin work/a-thing" },
+    "Bash",
+  );
+
+  assert.equal(said.deny, undefined);
+});
+
 // [[spec/design_output/private#the-escape]]
 test("no-verify is refused on a cloud box, and the desk box writes a line", async () => {
   const cloud = await started(undefined, boxSaying("", { CLAUDE_CODE_REMOTE: "1" }));

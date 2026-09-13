@@ -304,8 +304,9 @@ function standingIn(it) {
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
-function changedIn(row) {
-  const said = String(row).slice(3).trim();
+export function changedIn(row) {
+  const found = /^\s*\S{1,2}\s+(.*)$/.exec(String(row));
+  const said = (found ? found[1] : String(row)).trim();
   const moved = said.split(" -> ");
   return (moved.at(-1) ?? said).replace(/^"|"$/g, "");
 }
