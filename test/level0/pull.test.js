@@ -812,12 +812,28 @@ test("a step failing back twice inserts a person step, and a third insertion ask
   assert.equal(fieldOf(now, "step"), "design/person-1");
   assert.match(
     now,
-    /- name: person-1\n\s+does: answers the question the engine asks\n\s+by: person\n\s+to: engine\n\s+asks: design\/review failed back 2 times: still thin/,
+    /- name: person-1\n\s+does: answers the question the engine asks\n\s+by: person\n\s+to: engine\n\s+asks: "design\/review failed back 2 times: still thin"/,
   );
   const bare = now.replace("    to: engine\n", "");
   const rooted = { ...it, root: ROOT };
   assert.match(withEngineReader(rooted, { text: bare }), /to: engine/, "the hand-out repairs a person step with no reader");
   assert.equal(withEngineReader(rooted, { text: now }), "");
+
+  const colon = withEntry(CHILD("open", "design/review"), {
+    step: "design/review",
+    hand: "box other",
+    hash_before: "aaaa",
+    hash_after: "aaaa",
+    returns: 1,
+    why: "thin",
+  });
+  const asked = { name: "a-child", text: filled(colon, "### verdict", "fail\n- breaks Sentence at line 2: too long") };
+  const put = withPersonStep({ ...it, root: ROOT, fails: 2 }, asked, "design/draft", "the hand-back met refused: breaks Sentence at line 2: too long");
+  assert.equal(put.path, "design/person-1");
+  assert.match(asked.text, /^\s+asks: "the hand-back met refused: breaks Sentence at line 2: too long"$/m, "a colon takes quotes");
+  assert.equal(readNote(asked.text).front.said.steps[0].steps[0].asks, "the hand-back met refused: breaks Sentence at line 2: too long");
+  const unquoted = asked.text.replace(/asks: "(.*)"/, "asks: $1");
+  assert.match(withEngineReader(rooted, { text: unquoted }), /asks: "the hand-back met refused: breaks/, "the hand-out repairs a bare colon");
   assert.match(
     now,
     /^## person-1\n\n<!-- answers the question the engine asks -->\n\n### answer/m,

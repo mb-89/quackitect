@@ -1427,7 +1427,10 @@ export function withEngineReader(it, one) {
   const lacking = walkOf(front).filter(
     (held) => /^person(-\d+)?$/.test(held.name) && String(held.said.by) === "person" && !held.said.to,
   );
-  if (!lacking.length) return "";
+  const bare = String(one.text)
+    .split(/\r?\n/)
+    .some((row) => /^\s+asks: [^"'].*: /.test(row));
+  if (!lacking.length && !bare) return "";
   const steps = structuredClone(front.steps ?? []);
   for (const held of lacking) {
     let list = steps;

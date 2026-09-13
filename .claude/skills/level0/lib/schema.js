@@ -1230,7 +1230,12 @@ function keyRows(key, said, pad) {
 
 function flatOf(said) {
   if (Array.isArray(said)) return `[${said.map((one) => `"${one}"`).join(", ")}]`;
-  return String(said ?? "");
+  const flat = String(said ?? "");
+  // [[spec/design_output/pull#a-person-step-goes-in]]
+  if (/: |^[\[{"'#&*!|>%@`]|: *$| #/.test(flat) && !/^\[\[.*\]\]$/.test(flat)) {
+    return `"${flat.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+  }
+  return flat;
 }
 
 // [[spec/design_output/schema#the-fields-a-caller-names]]
