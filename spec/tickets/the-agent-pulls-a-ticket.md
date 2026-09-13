@@ -86,7 +86,11 @@ record:
       - name: sync
         exit: 0
         said: work/the-agent-pulls-a-ticket already carries every commit on main.
-step: split
+  - step: split
+    hand: box d49afdfe301a64
+    hash_before: ce2ed820d36e74a03d6ae66b2c09f5db55109d7e
+    hash_after: 91e407676de09781dcbc219c124cf719858c57d9
+step: children
 ---
 
 # Ask
@@ -119,6 +123,14 @@ Done is one of two things, and the retro over the box's own window with it:
 <!-- every child as a link, one a line, with its process -->
 
 <!-- the form is list -->
+
+- [[spec/tickets/agent-pulls-ticket]], under the standard process
+
+## checked
+
+- the one child is the engine whole, and its diff is the branch, which one reviewer reads at the verdict step
+- the child's ask carries the brief's tables, so the pull, the test verb, the hold, the stop rule and the wrapper stand inside it
+- the child waits on no other ticket, and the group's own dependencies stand on the group
 
 # children
 
