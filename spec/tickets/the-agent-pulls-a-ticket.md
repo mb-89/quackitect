@@ -148,6 +148,9 @@ record:
     hand: box d49afdfe301a64
     hash_before: 0666bf721e15413180332f74c30d6f154b53c604
     hash_after: 7b294effb503f70bb2ae2252ee5ad24eca2386ad
+  - step: children
+    hand: box d49afdfe301a64
+    hash_before: 7cdc1828f7c128a64e37bd45e7b6a1756e8187cb
 step: children
 ---
 
