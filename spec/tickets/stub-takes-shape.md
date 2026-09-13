@@ -89,7 +89,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-stub-takes-shape
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 36d4a566c587
@@ -116,6 +116,17 @@ record:
     hash_after: 627070e430f1f21a6c8681bd6df95dae5c3bab1b
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 36d4a566c587
+    hash_before: 9202a3441bb89ecaa01d0c707c710885cc211d13
+    hash_after: 9202a3441bb89ecaa01d0c707c710885cc211d13
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 15 test(s) pass in 2 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -246,17 +257,40 @@ Twelve tests fail on their own assertion, and one passes: the stub that lands in
 
 <!-- the form is command -->
 
+./RUNME.sh branch test
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
 
+./RUNME.sh check
+
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
 
 <!-- the form is text -->
+
+A new verb, `stub into`, writes a bare project the vehicle drives from outside. It copies nothing out of the method, and a contract test walks the stub to prove it.
+
+| piece | what changes |
+|---|---|
+| the vehicle module | names the stub's files and builds the record off the identity, the folder name and the upstream |
+| the verb | reads the upstream off git, and refuses a vehicle with no remote unless `--upstream` names one |
+| the template under `src/stub` | the shim and the bridgehead plugin, copied as they stand |
+| the shim | finds the vehicle through `SE_VEHICLE` or the folder a cloud box clones into, and hands every verb to it |
+| the bridgehead | finds the vehicle the same way at session start, and hands every hook to the vehicle's modules |
+
+- the register road and the import at session start stand unproven here, and two later groups prove them
+- a first run dropped the verb's first argument where no flag stood. A contract case now drives the command line.
+
+### checked
+
+- the change touches the vehicle module, the verb, its template, two tests and the vehicle chapter
+- the verb reaches disk, the clock and git through their doors. The unit test hands in the fake of each.
+- every new function points at a chapter of the vehicle design output
 
 # verdict
 
