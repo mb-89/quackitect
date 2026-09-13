@@ -88,14 +88,19 @@ steps:
         says: pass or fail, findings one a line
 process: [[standard]]
 group: a-step-changes-hands
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box b71bba5a7b0c
+    hash_before: 7cc6056895245ab2e0dc5945cfd609d6d51dfaae
+    hash_after: 7cc6056895245ab2e0dc5945cfd609d6d51dfaae
 ---
 
 # Ask
 
 The pull learns who holds a step: the hand carries the box, the session and the agent, a helper carries the session's hand, a person's step refuses an agent, and an escalation inserts a person step through a verb. The chapters below say where it stands, what waits and the rules to hold.
 
-## Where it stands
+**Where it stands.**
 
 The design input `spec/design_input/the-agent-pulls-tickets.md` says what the
 owner asks for, and the page beside it draws it. Read the note first. It
@@ -112,7 +117,7 @@ tickets.
 | the session id, read in one place | `.claude/skills/level0/lib/copilot.js` |
 | the pull, its hold and its record | the pull branch |
 
-## What waits
+**What waits.**
 
 | the piece | where | proves it |
 |---|---|---|
@@ -128,7 +133,7 @@ tickets.
 | the split refusal | `work.js` | past `work.stepsBeforeSplit` the pull answers the ask, and the close waits for the successors |
 | the group leaves | `work.js` | a box with nothing at an agent step leaves the group at `todo` |
 
-## The rules to hold
+**The rules to hold.**
 
 - A role is a property of a step, and no agent holds one for life.
 - An inserted step counts for no `not`.
@@ -146,6 +151,8 @@ tickets.
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The approach stands in [[spec/design_output/pull#the-hand-and-the-hold]].
 
 ## review
 

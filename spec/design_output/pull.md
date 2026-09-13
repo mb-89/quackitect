@@ -102,11 +102,30 @@ that off `CLAUDECODE`, `CLAUDE_CODE_REMOTE` or `SE_CLOUD`. A verdict comes from
 a hand that leaves the tip where it stands. So a hand-back on a verdict leaf
 refuses where the tip differs from the take.
 
+`work.personSigns` is the stronger door on a person's hand. Switched on, a
+person's hand-back on a tracked ticket meets a tip whose signature reads
+good or untrusted-good under `git log --format=%G?`, or the pull refuses it
+and names the tip. An agent's hand-back and a private ticket meet no
+signature check.
+
 ## The hand and the hold
 
-A hand is the box. `.se/box.json` carries its id, and the engine mints one
+A hand is the box, the session on it, and the agent inside it where the
+harness names one. `.se/box.json` carries the box id, and the engine mints one
 where none stands. It takes the random source as an argument, so a test
-replays.
+replays. `.se/session.json` carries the session id and the harness name, and
+the plugin wrapper writes it at `session.start`. The pull reads the two files
+into one hand.
+
+| the pull reads | the hand |
+|---|---|
+| the box file and the session file | `box <id> · session <id> · <agent>` |
+| the box file alone, on a harness | `box <id> · <agent>`, with the agent off the environment |
+| the box file alone, off a harness | `person <git author name>` |
+
+A helper the session spawns runs on the same box under the same session file,
+so it carries the session's hand, and a `not` that excludes the session
+excludes the helper. The hold slugs the hand into its file name.
 
 The hold stands at `.se/hold/<hand>.json`. It names the ticket, its path, the
 step, the group, the take hash, and the guidance notes by name and hash. The
@@ -137,10 +156,16 @@ that a session's helper reviews none of its work yields to that ruling.
 | `work` under `--as <helper>` | the spawned hand, which takes that one leaf |
 | `done` after its hand-back | the spawned hand stops, and the session pulls again |
 
-`--as <name>` makes the hand `box <id> · <name>`, with a hold of its own.
+`--as <name>` appends ` · <name>` to the hand, with a hold of its own.
 Such a hand works one step: its hand-back answers `done` and hands nothing
 out. The record names the helper on the leaf, so `not` reads the two hands
 apart.
+
+The wrapper tags every other spawn. Its `agent.spawn` hook reads the session
+file and puts one line at the head of the prompt: this helper is the
+session's own hand, and it pulls under no `--as`. A spawn the wrapper makes
+itself carries no tag, because that hand is its own. So the two kinds of
+helper read apart in the prompt and in the record.
 
 # The hand-back
 
@@ -178,7 +203,10 @@ The wrapper under `.claude/skills/level1` imports nothing past its own folder,
 because the plugin validator refuses an import that leaves it. So the shell
 hands it the material: `branch pull <ticket> --judge` prints the leaf's
 evidence and the rules its reads name, as JSON. The wrapper asks the model
-once over that, and a `breaks` answers `refused` before the shell runs.
+once over that, and a `breaks` answers `refused` before the shell runs. The
+judge run carries the `--fields` payload the hand-back carries, and the
+material lays the payload over the ticket before it reads the evidence, so
+the judge reads what the hand wrote and never the empty chapter.
 
 ## The fields hold their forms
 
@@ -254,6 +282,13 @@ hand-out repairs a standing person step that names no reader. The route
 re-renders through the reader the mint uses. So every chapter the hand fills
 stays, and the new one takes its comment. A ticket carrying
 `work.stepsBeforeSplit` person steps refuses another, and asks for a split.
+
+A hand that cannot go on without a person runs `branch escalate <question>`,
+and `--options a,b,c` makes the answer a choice. The verb reads the hold,
+puts the person step before the held leaf through the same function, drops
+the hold, commits by ticket and step, pushes, and hands out the next ticket.
+With no hold standing it refuses and names the pull. So the three inserters,
+the hand, the refusal count and the fail count, share one mechanism.
 
 # A leaf comes back
 
