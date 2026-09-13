@@ -74,6 +74,10 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[group]]
 depends_on: ["a-process-is-a-route", "a-group-is-a-branch"]
+record:
+  - step: sync
+    hand: an unnamed box
+    hash_before: b0eba19f17474e1b311a53564228e73f2db54852
 ---
 
 # Ask
