@@ -180,10 +180,10 @@ export function needsFaults(spoken, stopped) {
   const shape = `Close it with the heading ${NEEDS_HEADING} and a table headed No., question and proposed answer.`;
 
   if (end < 0 || !block.every((row) => row.startsWith("|"))) {
-    return [at(Math.max(start, 0) + 1, block[0] ?? "", `This answer ends on a stop line with no table above it. ${shape}`)];
+    return [at(Math.max(start, 0) + 1, block[0] ?? "", `This answer ends on a stop with no table above it. ${shape}`)];
   }
   if (!new RegExp(`^#{1,6}\\s+${NEEDS_HEADING}\\s*$`, "i").test(heading)) {
-    return [at(start + 1, block[0], `The table above the stop line stands under no heading ${NEEDS_HEADING}. ${shape}`)];
+    return [at(start + 1, block[0], `The table above the stop stands under no heading ${NEEDS_HEADING}. ${shape}`)];
   }
 
   const heads = cellsOf(block[0]).map((cell) => cell.toLowerCase());
@@ -346,11 +346,12 @@ export function checkSpec() {
       "Reads a draft answer through the voice rules and answers its findings,",
       "in the wording the gate uses at the turn's end. Check every draft over",
       `${DRAFT} words before you send it, because a draft checked here meets`,
-      "the gate clean. One field: the text of the draft.",
+      "the gate clean. Two fields: the text of the draft, and stop, true where",
+      "the answer ends on a stop call, so the check demands the needs table.",
     ].join(" "),
     inputSchema: {
       type: "object",
-      properties: { text: { type: "string" } },
+      properties: { text: { type: "string" }, stop: { type: "boolean" } },
       required: ["text"],
     },
   };
