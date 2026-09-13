@@ -4,6 +4,9 @@
 # [[spec/schemas/paragraph.schema.yaml]]
 
 terms:
+  - {word: bridgehead, defines: "[[spec/funnel/a-button-makes-a-vehicle#the-bridgehead]]"}
+  - {word: shim, defines: "[[spec/funnel/a-button-makes-a-vehicle#the-bridgehead]]"}
+  - {word: stub, defines: "[[spec/funnel/a-button-makes-a-vehicle#the-stub]]"}
   - {word: agent, defines: "[[spec/guidance/voice]]"}
   - {word: answer, defines: "[[spec/design_output/level0#the-gate-reads-the-answer]]"}
   - {word: apply, defines: "[[spec/design_output/apply]]"}
