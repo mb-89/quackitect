@@ -141,7 +141,7 @@ const DOORS = join(root, "src", "doors");
 const PLUGIN = join(".claude", "skills", "level0");
 const CONTRACT = join(root, "test", "contract");
 const settings = it.config;
-const PARKED = ["{.se,node_modules,.git,.claude/types}/**", "**/_*"];
+const PARKED = ["{.se,node_modules,.git,.claude/types,.claude/worktrees}/**", "**/_*"];
 const OURS = `--glob=!{${PARKED.join(",")}}`;
 const TESTS = "test/level0/*.test.js";
 const CONTRACT_TESTS = "test/contract/*.test.js";
