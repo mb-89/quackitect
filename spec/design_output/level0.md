@@ -596,13 +596,6 @@ call after that, until an answer stands.
 Each writes a `gate` line at `warn`: `warned Read before an answer`, then
 `refused Read before an answer`, with the demand in the detail.
 
-## A prompt mid-turn
-
-- Outcome: a prompt arriving mid-turn earns one warning at most, and no refusal.
-- Cause: the response in flight completes with no text, before the model reads the prompt.
-- Holder: `turn.start` and `turn.complete` set whether a turn runs, and `prompt.submit` marks the demand.
-- Backstop: the gate at the turn's end still reads the question table.
-
 ## A step carries the answer
 
 `turn.step` hands the hook each response once its blocks stand, with its
