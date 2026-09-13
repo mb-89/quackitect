@@ -94,7 +94,15 @@ record:
     hand: box d49afdfe301a64
     skipped: true
     why: the box leaves it while agent-pulls-ticket stand open
-step: retro/notes
+  - step: retro/notes
+    hand: box d49afdfe301a64
+    hash_before: e6135870e27174b63efb1ac8a050049eb28a17af
+    hash_after: e6135870e27174b63efb1ac8a050049eb28a17af
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+step: retro/write
 ---
 
 # Ask
@@ -149,6 +157,8 @@ Done is one of two things, and the retro over the box's own window with it:
 <!-- retro notes, which passes when the private folder is empty -->
 
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
