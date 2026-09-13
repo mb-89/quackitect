@@ -783,6 +783,19 @@ test("a need names a verb, and the box says which it holds", () => {
 });
 
 // [[spec/design_output/pull#a-need-is-a-verb]]
+test("a child waits for an open dependency, and the group's own dependencies are the take's", () => {
+  const waits = CHILD().replace("group: one-group\n", "group: one-group\ndepends_on: [\"a-loose-one\"]\n");
+  const group = GROUP_NOTE.replace("process: [[group]]\n", "process: [[group]]\ndepends_on: [\"a-loose-one\"]\n");
+  const { it } = doors(standing(waits, group, { [at("spec/tickets/a-loose-one.md")]: CHILD("open", "design/draft").replace("group: one-group\n", "") }));
+
+  const { said } = heard(() => work(ROOT, ["pull"], it));
+
+  assert.match(said, /^work {2}one-group at sync/, "the take arbitrates the group's dependencies");
+  const hold = JSON.parse(it.disk.read(HOLD));
+  assert.equal(hold.ticket, "one-group");
+});
+
+// [[spec/design_output/pull#a-need-is-a-verb]]
 test("a leaf needing a verb the box lacks answers wait, with the reason", () => {
   const child = CHILD("open", "design/draft").replace(
     "  - name: design\n",

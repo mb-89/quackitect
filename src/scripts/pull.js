@@ -345,7 +345,10 @@ function offer(it, who, one, all) {
   if (state === CLOSED) return {};
   if (state !== OPEN) return { why: `stands ${state || "with no state"}` };
 
-  const open = dependsOn(one.front).filter((dep) => !closedHere(it, all, dep));
+  const open =
+    one.name === who.group
+      ? []
+      : dependsOn(one.front).filter((dep) => !closedHere(it, all, dep));
   if (open.length) return { why: `waits for ${open.join(", ")}` };
 
   const moved = advanced(it, who, one, all);
