@@ -263,6 +263,10 @@ frontmatter:
       type: [array, string]
       description: the tickets this one became, on reason became
 
+    todo:
+      type: boolean
+      description: the tag a hand puts on a note it parks, which the pull hands out first on this box
+
 body:
   headingLevel: 1
   order: strict

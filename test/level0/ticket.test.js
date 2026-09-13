@@ -147,6 +147,15 @@ test("a write to a phase's chapter is refused", () => {
 });
 
 // [[spec/design_output/schema#the-three-places]]
+test("two leaves naming one field alike stand apart, so a write beside them passes", () => {
+  const twice = open
+    .replace("# implement\n", "# implement\n\n## first\n\n### tests\n\n<!-- the first -->\n")
+    .replace("# Discussion", "## second\n\n### tests\n\n<!-- the second -->\n\n# Discussion");
+  assert.deepEqual(weighed(twice, twice), []);
+  assert.deepEqual(weighed(twice.replace("### lint\n", "### lint\n\nnpm test\n"), twice), []);
+});
+
+// [[spec/design_output/schema#the-three-places]]
 test("a write to the field of another leaf is refused", () => {
   const other = open.replace("step: implement/change", "step: design");
   const said = other.replace("### lint\n", "### lint\n\nnpm test\n");
