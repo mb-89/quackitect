@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[standard]]
 group: the-agent-pulls-a-ticket
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d49afdfe301a64
@@ -115,6 +115,17 @@ record:
     hash_after: ef56e031e23add53823e98c64c8ea53c93f2f8ee
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box d49afdfe301a64
+    hash_before: 5fa31704f3f279214f37059fd33c9a6602bcb709
+    hash_after: 5fa31704f3f279214f37059fd33c9a6602bcb709
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 312 test(s) pass in 13 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -269,20 +280,29 @@ The verb runs the four test files the branch changes since the take, and one ass
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The stop hook now counts an open private ticket the way it counts a hold. A note alone carries nothing, because a note waits for a retro. The design names that count under what level zero changes, and the hook lacked it. So a hand that mints a breakdown on the box keeps its turn until the breakdown closes.
+
+### checked
+
+- the change touches the stop hook, its ticket lib and two notes, and no other file
+- the hook reaches the disk through the harness, and the hook tests carry its fake
+- the check points at the private queue chapter of the pull note
 
 # verdict
 
