@@ -106,7 +106,11 @@ record:
     hand: box d49afdfe301a64
     hash_before: ef1df47f4dda672fb0bf3b4d5af84f2bb00116de
     hash_after: 82185ef530b93547dad85b01c34449b207523688
-step: retro/cloud
+  - step: retro/cloud
+    hand: box d49afdfe301a64
+    hash_before: 4eb957b1313f06c4e69ab29a3e763b8ac34d160b
+    hash_after: 4eb957b1313f06c4e69ab29a3e763b8ac34d160b
+step: children
 ---
 
 # Ask
@@ -239,17 +243,33 @@ The thoughts weighed the child's route against this box before a line of code st
 
 <!-- the form is list -->
 
+- a second hand on the box, so the child's review and verdict steps under `not` park at the first hand-out after the draft passes
+- a nested session that answers inside a timeout: `claude -p` under the plugin folder ran into the canary gate and the stop, twice, at the tool line `select:mcp__level1__pull` in the log
+- a retro verb past `notes`, so the group's retro route carries a stub the retro branch replaces
+- no host, no right and no install stood in the way
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- the bash door, ShellWritesNothing, on a `sed -i` into the hook module and on a redirection into the scratchpad
+- the write door, on the child ticket's brief chapters and on the design note's sentences, tense and paragraphs
+- the bash door, on three commit messages past the sentence, paragraph and shape caps
+- the plugin validator, on the wrapper's import past its folder
+- no trunk guard, no conflict at sync, no cap, and no test that fails on the box alone
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- agent-pulls-ticket stands open at design/review, which waits for a hand other than this box, and its verdict step waits the same way
+- the child's implement leaves carry no record, because the engine landed in the branch's commits before the route could take a hand, and the reviewer reads the branch diff
+- no ticket stands minted with no group
+- this ticket is the handover: the group stays open at children until a person or another box answers the review on this branch, and `branch done` names the child
 
 # Discussion
 

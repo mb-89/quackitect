@@ -258,3 +258,5 @@ One module beside the work verbs holds the engine, and the branch verb hands it 
 # Discussion
 
 The review step and the verdict step each name `not`, so one box takes one side alone. On a box with no second hand the pull parks them, and a person or the next box answers on the branch.
+
+The engine, its tests and its design note landed in the branch's commits before this ticket's route reached `implement`, because the pull had to exist before a record could take a hand. So the implement leaves carry no record, and the review reads the branch's diff against the approach.
