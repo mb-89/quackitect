@@ -26,6 +26,7 @@ Biome holds.
 | `StopFolderIsData` | `spec/config/stop`, `lib/stop.js` |
 | `NoLogDeleted` | every source file git holds |
 | `NameHoldsTheWords` | every path git holds |
+| `NothingPrivateTravels` | every text file git holds, and the box it lints on |
 | `SurveyNamesInstalls` | `src/scripts/install.sh`, `lib/tools.js` |
 | `SurveyFindsNode` | `.se/tools.json`, the node running the sweep |
 
@@ -66,9 +67,12 @@ door and the root, and it answers relative paths:
 | `paths()` | every path git holds |
 | `words` | the cap `names.words` says |
 | `node` | the version of the node running the sweep |
+| `box` | the user, the home folder and the git name and address here |
 
 A rule reaches nothing else, so a test hands it a fake tree over `fakeDisk` and
-`fakeGit` and touches memory alone.
+`fakeGit` and touches memory alone. `boxOf` in `lib/private.js` reads the four
+names in `box`, and [[spec/design_output/private#the-box-names-the-owner]] says
+what the rule over them does.
 
 # When the sweep runs
 
@@ -81,7 +85,7 @@ whatever path a person names.
 
 # The script rule draws live
 
-`[formats]` in `.vale.ini` maps `.sh` and `.ps1` to `md`, so Vale reads a shell
+The `[formats]` section maps a shell ending to `md`, so Vale reads a shell
 script. `spec/config/styles/VoiceScript` holds one rule over those two endings,
 and `NoPathInScript` stands there.
 
@@ -93,7 +97,7 @@ For details, see [[spec/design_output/level0#the-rules-past-one-buffer]].
 
 # What stays outside
 
-Three of the ten weigh a config against a constant this tree holds in
+Three of these weigh a config against a constant this tree holds in
 JavaScript: the extension ids, the platform map and the binary paths. Moving
 one into Vale copies that constant into a rule file, and a second copy is a
 defect.

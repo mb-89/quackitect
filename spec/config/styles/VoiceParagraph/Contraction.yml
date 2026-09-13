@@ -1,0 +1,30 @@
+# GENERATED. Edit the source named below, not this file. It is written again
+# every time the tree is projected, so an edit here is lost. Source:
+# spec/schemas/paragraph.schema.yaml
+extends: substitution
+message: "Write both words: '%s' instead of '%s'."
+link: spec/funnel/a-paragraph-has-a-schema.md
+level: error
+ignorecase: true
+action:
+  name: replace
+swap:
+  '(c)an''t': "$1annot"
+  '(w)on''t': "$1ill not"
+  '(d)on''t': "$1o not"
+  '(d)oesn''t': "$1oes not"
+  '(d)idn''t': "$1id not"
+  '(i)sn''t': "$1s not"
+  '(a)ren''t': "$1re not"
+  '(w)asn''t': "$1as not"
+  '(h)asn''t': "$1as not"
+  '(h)aven''t': "$1ave not"
+  '(i)t''s': "$1t is"
+  '(t)hat''s': "$1hat is"
+  '(t)here''s': "$1here is"
+  '(y)ou''re': "$1ou are"
+  '(t)hey''re': "$1hey are"
+  '(w)e''ve': "$1e have"
+  '(i)''ve': "$1 have"
+  '(w)e''ll': "$1e will"
+  '(i)t''ll': "$1t will"

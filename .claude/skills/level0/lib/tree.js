@@ -5,6 +5,7 @@
 
 import { overLong } from "./names.js";
 import { isDraft } from "./paths.js";
+import { carriesTheName, namesAPerson } from "./private.js";
 import {
   EDITOR_EXTENSIONS,
   EDITOR_SETTINGS,
@@ -19,6 +20,7 @@ export const VALE_INI = ".vale.ini";
 
 const STOP_LIB = ".claude/skills/level0/lib/stop.js";
 const SOURCE = /^(?:src|\.claude)\/.*\.js$/;
+const TEXT = /\.(?:md|markdown|txt|ya?ml|json|js|ts|tsx|go|sh|ps1|ini|mod)$/i;
 const DELETES = /\bremove\(|\bunlink|\brm\b|\bprune\b/;
 const LOGGED = /log/i;
 
@@ -50,6 +52,7 @@ export function treeOf(it) {
   return {
     words: it.words ?? 0,
     node: it.node ?? "",
+    box: it.box ?? {},
     read(path) {
       try {
         return it.disk.read(at(path));
@@ -329,6 +332,45 @@ export function nameHoldsTheWords(tree) {
   return out;
 }
 
+// [[spec/design_output/private#the-box-names-the-owner]]
+export function nothingPrivateTravels(tree) {
+  const rule = "NothingPrivateTravels";
+  const box = tree.box ?? {};
+  const home = String(box.home ?? "").replace(/[/\\]+$/, "");
+
+  const wanted = [
+    ["the user this box runs as", box.user],
+    ["the home folder on this box", homeNames(home) ? home : ""],
+    ["the git name on this box", box.name],
+    ["the git address on this box", box.email],
+  ].filter(([, said]) => namesAPerson(said));
+  if (!wanted.length) return [];
+
+  const out = [];
+  for (const path of tree.paths().filter((one) => TEXT.test(one))) {
+    const lines = tree.read(path).split(/\r?\n/);
+    for (let i = 0; i < lines.length; i++) {
+      for (const [what, said] of wanted) {
+        if (!carriesTheName(lines[i], said)) continue;
+        out.push(
+          fault(
+            rule,
+            path,
+            `This line carries ${what}, and git carries this file everywhere. Say what the thing is, in words a reader outside this box acts on.`,
+            i + 1,
+          ),
+        );
+      }
+    }
+  }
+  return out;
+}
+
+function homeNames(home) {
+  const who = String(home).split(/[/\\]+/).filter(Boolean).pop() ?? "";
+  return namesAPerson(who);
+}
+
 // [[spec/design_output/tools#what-the-survey-names]]
 export function surveyNamesInstalls(tree) {
   const rule = "SurveyNamesInstalls";
@@ -388,6 +430,7 @@ export const RULES = [
   stopFolderIsData,
   noLogDeleted,
   nameHoldsTheWords,
+  nothingPrivateTravels,
   surveyNamesInstalls,
   surveyFindsNode,
 ];

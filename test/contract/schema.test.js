@@ -9,7 +9,12 @@ import { skip, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import {
   checkNote,
+  governorOf,
+  isNoteSchema,
+  kindOf,
+  LEFT,
   mintNote,
+  readYaml,
   schemaFaults,
   schemasIn,
   SEVERITY,
@@ -48,12 +53,28 @@ const ruled = async (text, where) => {
 const PAST =
   "---\nkind: [[guidance]]\n---\n\n# Nothing\n\nThe tree was installed here.\n";
 
-test("every schema in the folder reads, and names the kind its file names", () => {
+// [[spec/design_output/schema#a-schema-names-its-chapters]]
+test("every note schema reads, names a chapter, and names the kind its file names", () => {
   assert.ok(schemas.size >= 6, `${schemas.size} schemas read`);
   for (const name of here.names("spec/schemas", ".schema.yaml")) {
     const kind = name.slice(0, -".schema.yaml".length);
-    assert.ok(schemas.has(kind), `${name} names ${kind}`);
-    assert.ok(schemas.get(kind).body?.sections?.length, `${kind} names a chapter`);
+    const said = readYaml(here.read(`spec/schemas/${name}`));
+    assert.equal(String(said.kind ?? ""), kind, `${name} names ${kind}`);
+    assert.equal(schemas.has(kind), isNoteSchema(said), `${kind} reads as a note schema`);
+    if (isNoteSchema(said)) assert.ok(said.body.sections.length, `${kind} names a chapter`);
+  }
+});
+
+// [[spec/design_output/schema#a-folder-names-its-kind]]
+test("every schema names the paths it governs, and each note stands under its own", () => {
+  for (const [kind, schema] of schemas) {
+    assert.ok(schema.governs?.length, `${kind} names the paths it governs`);
+  }
+  for (const path of here.paths()) {
+    if (!path.endsWith(".md")) continue;
+    const governor = governorOf(schemas, path);
+    if (!governor) continue;
+    assert.equal(kindOf(here.read(path)), governor.kind, `${path} reads as a ${governor.kind}`);
   }
 });
 
@@ -71,14 +92,19 @@ test("mint writes one note per kind, and the checker passes each one", () => {
 });
 
 // [[spec/design_output/schema#warning-now-and-error-later]]
-test("every departure in this tree stands at warning, so check stays green", () => {
+test("every departure in this tree carries the shape the panel draws", () => {
   const found = schemaFaults(here);
   for (const one of found) {
-    assert.equal(one.severity, SEVERITY, `${one.file} stands at ${SEVERITY}`);
+    assert.ok([SEVERITY, LEFT].includes(one.severity), `${one.file} stands at a level`);
     assert.ok(files.exists(`${root}/${one.file}`), `${one.file} stands on disk`);
     assert.ok(one.line >= 1, `${one.file} points at a line`);
     assert.match(one.rule, /^Schema\./, "a finding names the schema and the section");
   }
+  assert.deepEqual(
+    found.filter((one) => one.severity === SEVERITY),
+    [],
+    "no note in this tree departs from the schema its kind names",
+  );
 });
 
 test("the guidance notes this tree ships hold the shape guidance names", () => {

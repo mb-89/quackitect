@@ -16,3 +16,5 @@ rationale: [[spec/rationales/voice]]
 8. Name the command that answers a count, and write no count a command answers. *
 9. List what a compression cut, each sentence surviving elsewhere or cut on purpose.
 10. Write three or more parallel things one to a line, each with its status. *
+11. A tracked file holds no name, no address, no date in prose and no disk path.
+12. Name the role, and leave the person out: the owner, the agent, the reader, the reviewer, the maintainer.

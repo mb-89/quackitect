@@ -5,15 +5,26 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
+  checkData,
   checkNote,
+  fieldsIn,
+  governorOf,
+  isDataSchema,
+  isNoteSchema,
   itemsIn,
   kindOf,
+  MINT_TOOL,
+  mintedNote,
   mintNote,
+  mintSpec,
+  placeholderFaults,
   readNote,
   readYaml,
+  refusedKind,
   schemaFaults,
   schemasIn,
   SEVERITY,
+  strangerFault,
 } from "../../.claude/skills/level0/lib/schema.js";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
@@ -357,4 +368,518 @@ test("a draft parked under an underscore reaches no rule in the sweep", () => {
 
   assert.deepEqual(schemaFaults(tree), []);
   assert.deepEqual(tree.paths(), ["spec/schemas/note.schema.yaml"]);
+});
+
+// [[spec/design_output/schema#a-folder-names-its-kind]]
+const GOVERNED = `kind: note
+
+governs:
+  - spec/notes/**
+
+frontmatter:
+  additionalProperties: false
+  required:
+    - kind
+  properties:
+    kind:
+      const: note
+      x-link: true
+
+body:
+  headingLevel: 1
+  extraSections: false
+  sections:
+    - header: Scope
+      required: true
+      description: what this note covers
+`;
+
+const governedTree = (seed) =>
+  treeWith({ "spec/schemas/note.schema.yaml": GOVERNED, ...seed });
+
+test("a schema answers which paths it governs, and a path outside reaches none", () => {
+  const schemas = schemasIn(governedTree({}));
+  assert.equal(governorOf(schemas, "spec/notes/one.md")?.kind, "note");
+  assert.equal(governorOf(schemas, "spec/notes/deep/one.md")?.kind, "note");
+  assert.equal(governorOf(schemas, "README.md"), null);
+});
+
+test("a schema describing no note reaches the reader nowhere", () => {
+  const tree = treeWith({
+    "spec/schemas/note.schema.yaml": GOVERNED,
+    "spec/schemas/paragraph.schema.yaml": "kind: paragraph\n\nlayers:\n  shape:\n    sentencesPerParagraph: 6\n",
+  });
+  assert.deepEqual([...schemasIn(tree).keys()], ["note"]);
+});
+
+test("the sweep names a file carrying no kind, where a schema governs its folder", () => {
+  const said = schemaFaults(
+    governedTree({ "spec/notes/bare.md": "# A file carrying no kind\n" }),
+  );
+  assert.equal(said.length, 1);
+  assert.equal(said[0].rule, "Schema.Kind");
+  assert.match(said[0].message, /names no kind, and the note schema governs this path/);
+});
+
+test("the sweep names a note of another kind standing in a governed folder", () => {
+  const tree = governedTree({
+    "spec/schemas/other.schema.yaml": GOVERNED.replace(/note/g, "other").replace(
+      "spec/other/**",
+      "spec/other/**",
+    ),
+    "spec/notes/wrong.md": "---\nkind: [[other]]\n---\n\n# Scope\n\nWhat it covers.\n",
+  });
+  const said = schemaFaults(tree).filter((one) => one.file === "spec/notes/wrong.md");
+  assert.equal(said.length, 1);
+  assert.match(said[0].message, /reads as a other, and the note schema governs this path/);
+});
+
+test("a note of the governed kind is weighed as it is today", () => {
+  const said = schemaFaults(
+    governedTree({
+      "spec/notes/good.md": "---\nkind: [[note]]\n---\n\n# Scope\n\nWhat it covers.\n",
+      "spec/notes/bad.md": "---\nkind: [[note]]\n---\n\n# Stranger\n\nA chapter.\n",
+    }),
+  );
+  assert.deepEqual([...new Set(said.map((one) => one.file))], ["spec/notes/bad.md"]);
+});
+
+// [[spec/design_output/schema#a-placeholder-stands-at-warning]]
+test("a placeholder still standing is a finding at warning, and a filled field is none", () => {
+  const text = mintNote(SCHEMA, { Scope: "What this note covers." });
+  const said = placeholderFaults(text, SCHEMA, NOTE);
+  assert.ok(said.length, "the chapters left out still carry their comment");
+  assert.deepEqual([...new Set(said.map((one) => one.severity))], ["warning"]);
+  assert.deepEqual([...new Set(said.map((one) => one.rule))], ["Schema.Placeholder"]);
+  assert.ok(
+    !said.some((one) => /^Scope /.test(one.message)),
+    "the chapter the fields name carries no placeholder",
+  );
+  assert.equal(text.split(/\n/)[said[0].line - 1].trim().startsWith("<!--"), true);
+});
+
+test("a field off an enum counts as no placeholder, because mint writes a real value", () => {
+  const said = placeholderFaults(mintNote(SCHEMA), SCHEMA, NOTE);
+  assert.ok(
+    !said.some((one) => /^status /.test(one.message)),
+    "status: todo is a value the schema allows, not a placeholder",
+  );
+});
+
+test("the sweep carries the placeholders a minted note still holds", () => {
+  const said = schemaFaults(
+    governedTree({ "spec/notes/fresh.md": "---\nkind: [[note]]\n---\n\n# Scope\n\n<!-- what this note covers -->\n" }),
+  );
+  assert.deepEqual(said.map((one) => one.rule), ["Schema.Placeholder"]);
+  assert.equal(said[0].severity, "warning");
+  assert.equal(said[0].line, 7);
+});
+
+// [[spec/design_output/schema#the-tool-writes-the-note]]
+test("the tool writes a note the checker passes, and names what stands empty", () => {
+  const schemas = schemasIn(governedTree({}));
+  const made = mintedNote(schemas, {
+    kind: "note",
+    path: "spec/notes/fresh.md",
+    fields: { Scope: "What this note covers." },
+  });
+  assert.equal(made.why, undefined);
+  assert.deepEqual(checkNote(made.text, schemas.get("note"), made.path), []);
+  assert.match(made.text, /# Scope\n\nWhat this note covers\./);
+  assert.deepEqual(made.left, []);
+});
+
+test("the tool leaves a placeholder where a field stands absent, and names it", () => {
+  const schemas = schemasIn(governedTree({}));
+  const made = mintedNote(schemas, { kind: "note", path: "spec/notes/fresh.md" });
+  assert.match(made.text, /<!-- what this note covers -->/);
+  assert.deepEqual(made.left.map((one) => one.rule), ["Schema.Placeholder"]);
+});
+
+test("the tool refuses a kind no schema holds, and a path another schema governs", () => {
+  const schemas = schemasIn(governedTree({}));
+  assert.match(
+    mintedNote(schemas, { kind: "stranger", path: "spec/notes/one.md" }).why,
+    /holds no stranger/,
+  );
+  assert.match(
+    mintedNote(schemas, { kind: "note", path: "spec/notes/one.txt" }).why,
+    /names no markdown file/,
+  );
+  assert.match(mintedNote(schemas, { kind: "note" }).why, /takes a kind and a path/);
+});
+
+test("a note the schema refuses comes back with the finding, and no text", () => {
+  const schemas = schemasIn(governedTree({}));
+  const made = mintedNote(schemas, {
+    kind: "note",
+    path: "spec/notes/fresh.md",
+    fields: { Scope: "# Stranger\n\nA chapter the schema never names." },
+  });
+  assert.equal(made.text, undefined);
+  assert.match(made.why, /refuses this write/);
+  assert.ok(made.found.length);
+});
+
+// [[spec/design_output/schema#the-fields-a-caller-names]]
+test("the fields read the same off the command line as out of a tool call", () => {
+  const handed = fieldsIn(
+    ["note", "spec/notes/one.md", "--status=done", "--what-stands-open=Nothing waits."],
+    SCHEMA,
+  );
+  assert.deepEqual(handed.fields, { status: "done", "What stands open": "Nothing waits." });
+
+  const text = mintNote(SCHEMA, handed.fields);
+  assert.match(text, /^---\nkind: \[\[note\]\]\nstatus: done\n---/);
+  assert.match(text, /# What stands open\n\nNothing waits\.\n/);
+});
+
+test("a field the schema never names is refused, and the refusal names what it takes", () => {
+  const handed = fieldsIn(["--stranger=a value"], SCHEMA);
+  assert.equal(handed.fields, undefined);
+  assert.match(handed.why, /stranger names no field of a note note/);
+  assert.match(handed.why, /status/);
+});
+
+test("mint writes a link and a list in the shape the schema names", () => {
+  const text = mintNote(SCHEMA, {
+    explains: "spec/guidance/voice",
+    scope: ["people", "agents"],
+  });
+  assert.match(text, /\nexplains: \[\[spec\/guidance\/voice\]\]\n/);
+  assert.match(text, /\nscope: \["people", "agents"\]\n/);
+  assert.deepEqual(
+    checkNote(text, SCHEMA, NOTE).filter((one) =>
+      ["Schema.explains", "Schema.scope"].includes(one.rule),
+    ),
+    [],
+  );
+});
+
+test("mint keeps the kind the schema names, whatever the fields hand in", () => {
+  assert.match(mintNote(SCHEMA, { kind: "other" }), /^---\nkind: \[\[note\]\]\n/);
+});
+
+// [[spec/design_output/schema#the-tool-writes-the-note]]
+test("the tool spec names every kind the folder holds", () => {
+  const spec = mintSpec(schemasIn(governedTree({})));
+  assert.equal(spec.name, MINT_TOOL);
+  assert.deepEqual(spec.inputSchema.properties.kind.enum, ["note"]);
+  assert.deepEqual(spec.inputSchema.required, ["kind", "path"]);
+});
+
+// [[spec/design_output/schema#a-folder-names-its-kind]]
+test("the refusal names the schema, the finding and mint_note as the road", () => {
+  const schemas = schemasIn(governedTree({}));
+  const governor = governorOf(schemas, "spec/notes/bare.md");
+  const said = refusedKind(
+    "spec/notes/bare.md",
+    governor,
+    strangerFault("# No kind here\n", governor, "spec/notes/bare.md"),
+  );
+  assert.match(said, /^spec\/schemas\/note\.schema\.yaml governs spec\/notes\/bare\.md/);
+  assert.match(said, /Schema\.Kind/);
+  assert.match(said, /mint_note/);
+  assert.match(said, /_name\.md/);
+});
+
+const ROUTED = readYaml(`
+kind: routed
+
+frontmatter:
+  type: object
+  additionalProperties: false
+  required:
+    - kind
+    - steps
+  properties:
+    kind:
+      const: routed
+      x-link: true
+      description: the schema this note is minted from
+
+    step:
+      type: string
+      x-names: steps
+      x-leaf: true
+      description: the leaf this note stands on
+
+    steps:
+      type: array
+      description: the route, as a tree of steps
+      default:
+        - name: do
+          does: makes the change
+          evidence:
+            - name: change
+              form: text
+              says: what you change
+      items:
+        type: object
+        additionalProperties: false
+        required:
+          - name
+        properties:
+          name:
+            type: string
+            description: one word, unique among its siblings
+          does:
+            type: string
+            description: what the hand does here
+          steps:
+            $ref: "#/frontmatter/properties/steps"
+            description: the steps under this phase
+          by:
+            type: string
+            x-names: steps
+            x-words: [anyone, person]
+            x-prefix: not
+            description: the hand this step admits
+          on_fail:
+            type: string
+            x-earlier: steps
+            description: the earlier step a failure sends this to
+          evidence:
+            type: array
+            description: the fields this leaf's hand fills
+            items:
+              type: object
+              additionalProperties: false
+              required:
+                - name
+                - form
+                - says
+              properties:
+                name:
+                  type: string
+                  description: one word
+                form:
+                  enum: [text, command]
+                  description: what the hand writes
+                says:
+                  type: string
+                  description: one line on what goes here
+
+body:
+  headingLevel: 1
+  order: strict
+  extraSections: false
+
+  sections:
+    - header: Ask
+      required: true
+      description: what this note asks for
+
+    - x-one-per: steps
+`);
+
+const ROUTE = "spec/routed/one.md";
+const routed = (text) => checkNote(text, ROUTED, ROUTE, new Map([["routed", ROUTED]]));
+
+const route = `---
+kind: [[routed]]
+step: design/review
+steps:
+  - name: design
+    steps:
+      - name: draft
+        does: writes the design
+      - name: review
+        does: reads the design
+        by: not draft
+        on_fail: draft
+  - name: ship
+    does: ships it
+    on_fail: design/review
+---
+
+# Ask
+
+What it asks for.
+
+# design
+
+## draft
+
+## review
+
+# ship
+`;
+
+// [[spec/design_output/schema#a-line-per-nested-key]]
+test("the reader keeps a line per key, at every depth of a nested list", () => {
+  const note = readNote(route);
+  assert.equal(note.front.lines.steps, 4, "a top-level key reads as it reads today");
+  assert.equal(note.front.lines["steps[0].name"], 5);
+  assert.equal(note.front.lines["steps[0].steps[1].by"], 11);
+  assert.equal(note.front.lines["steps[1].on_fail"], 15);
+});
+
+// [[spec/design_output/schema#the-checker-walks-every-key]]
+test("a route in the shape its schema names breaks no rule", () => {
+  assert.deepEqual(routed(route), []);
+});
+
+// [[spec/design_output/schema#the-checker-walks-every-key]]
+test("a field the schema never names under a step is refused, with its own line", () => {
+  const one = routed(route.replace("        does: reads the design", "        about: a thing"))[0];
+  assert.equal(one.rule, "Schema.about");
+  assert.equal(one.line, 10, "it points at the line the nested key stands on");
+  assert.match(one.message, /names no about under steps\[0\]\.steps\[1\]/);
+});
+
+// [[spec/design_output/schema#the-checker-walks-every-key]]
+test("a step short of the name every entry carries is refused", () => {
+  const bad = routed(route.replace("      - name: draft\n", "      - does: writes it\n"));
+  const one = bad.find((held) => held.rule === "Schema.name");
+  assert.ok(one, "the checker names the missing key");
+  assert.match(one.message, /steps\[0\]\.steps\[0\] names name/);
+});
+
+// [[spec/design_output/schema#the-checker-walks-every-key]]
+test("an evidence field off its enum is refused two lists deep", () => {
+  const said = `${route.replace(
+    "        does: reads the design",
+    `        does: reads the design
+        evidence:
+          - name: verdict
+            form: picture
+            says: pass or fail`,
+  )}\n### verdict\n`;
+  const one = routed(said).find((held) => held.rule === "Schema.form");
+  assert.ok(one, "the checker reaches the form of an evidence field");
+  assert.match(one.message, /text, command/);
+});
+
+// [[spec/design_output/schema#three-keywords-name-a-step]]
+test("a value naming no step is refused, and the refusal names every step", () => {
+  const one = routed(route.replace("on_fail: draft", "on_fail: nowhere"))[0];
+  assert.equal(one.rule, "Schema.OnFail");
+  assert.match(one.message, /names nowhere, and steps holds/);
+  assert.match(one.message, /design\/draft/);
+});
+
+// [[spec/design_output/schema#three-keywords-name-a-step]]
+test("a value naming a step at or after its own is refused", () => {
+  const one = routed(route.replace("on_fail: draft", "on_fail: ship"))[0];
+  assert.equal(one.rule, "Schema.OnFail");
+  assert.match(one.message, /standing before design\/review/);
+});
+
+// [[spec/design_output/schema#three-keywords-name-a-step]]
+test("a name reads a sibling first, and a path with a slash says exactly", () => {
+  assert.deepEqual(routed(route.replace("on_fail: draft", "on_fail: design/draft")), []);
+  assert.deepEqual(routed(route.replace("on_fail: design/review", "on_fail: design")), []);
+});
+
+// [[spec/design_output/schema#three-keywords-name-a-step]]
+test("a step naming a phase where the schema names a leaf is refused", () => {
+  const one = routed(route.replace("step: design/review", "step: design"))[0];
+  assert.equal(one.rule, "Schema.step");
+  assert.match(one.message, /names a leaf, and design holds steps/);
+});
+
+// [[spec/design_output/schema#three-keywords-name-a-step]]
+test("a word the rule passes over stands, and a prefix names the step after it", () => {
+  assert.deepEqual(routed(route.replace("by: not draft", "by: anyone")), []);
+  assert.ok(routed(route.replace("by: not draft", "by: not nowhere")).length);
+});
+
+// [[spec/design_output/schema#three-keywords-name-a-step]]
+test("a chapter missing for a step is refused, and a chapter naming none too", () => {
+  const gone = routed(route.replace("## review\n", ""));
+  assert.deepEqual(
+    gone.map((one) => one.rule),
+    ["Schema.review"],
+  );
+  assert.match(gone[0].message, /carries a review chapter/);
+
+  const extra = routed(`${route}\n## stranger\n`);
+  assert.deepEqual(
+    extra.map((one) => one.rule),
+    ["Schema.stranger"],
+  );
+  assert.match(extra[0].message, /names no stranger chapter/);
+});
+
+// [[spec/design_output/schema#the-render-follows-the-tree]]
+test("mint writes the route as a block, and a chapter per step under it", () => {
+  const text = mintNote(ROUTED);
+  assert.match(text, /steps:\n {2}- name: do\n {4}does: makes the change\n/);
+  assert.match(text, /# do\n\n<!-- makes the change -->\n/);
+  assert.match(text, /## change\n\n<!-- what you change -->\n\n<!-- the form is text -->/);
+  assert.deepEqual(routed(text), [], "the note mint writes passes the checker");
+});
+
+// [[spec/design_output/schema#a-placeholder-stands-at-warning]]
+test("a field stands at warning while it is empty, and a step's chapter never does", () => {
+  const left = placeholderFaults(mintNote(ROUTED), ROUTED, ROUTE);
+  assert.deepEqual(
+    left.map((one) => one.message.split(" ")[0]),
+    ["Ask", "change"],
+    "the hand fills the ask and the field, and a step's chapter holds its fields",
+  );
+});
+
+const PROCESS = readYaml(`
+kind: process
+
+governs:
+  - spec/processes/*.yaml
+
+data:
+  type: object
+  additionalProperties: false
+  required:
+    - steps
+  properties:
+    steps:
+      $ref: "routed#/frontmatter/properties/steps"
+      description: the route
+`);
+
+const every = new Map([
+  ["routed", ROUTED],
+  ["process", PROCESS],
+]);
+
+// [[spec/design_output/schema#a-data-schema-holds-yaml]]
+test("a data schema reads a bare yaml file, and names no note kind", () => {
+  assert.equal(isDataSchema(PROCESS), true);
+  assert.equal(isNoteSchema(PROCESS), false);
+  assert.equal(isDataSchema(ROUTED), false);
+  assert.deepEqual(
+    checkData("steps:\n  - name: do\n    does: makes it\n", PROCESS, "spec/processes/one.yaml", every),
+    [],
+  );
+});
+
+// [[spec/design_output/schema#a-data-schema-holds-yaml]]
+test("a bare yaml file short of a required key is refused, naming the file", () => {
+  const one = checkData("about: a thing\n", PROCESS, "spec/processes/one.yaml", every)[0];
+  assert.equal(one.rule, "Schema.steps");
+  assert.match(one.message, /A process names steps in its file/);
+});
+
+// [[spec/design_output/schema#one-home-for-a-shape]]
+test("a pointer across schemas resolves, and a fault in the route names its line", () => {
+  const text = "steps:\n  - name: do\n    on_fail: nowhere\n";
+  const one = checkData(text, PROCESS, "spec/processes/one.yaml", every)[0];
+  assert.equal(one.rule, "Schema.OnFail");
+  assert.equal(one.line, 3);
+});
+
+// [[spec/design_output/schema#a-data-schema-holds-yaml]]
+test("the sweep reads a yaml file under a data schema", () => {
+  const said = treeWith({
+    "spec/schemas/note.schema.yaml": GOVERNED,
+    "spec/schemas/process.schema.yaml":
+      "kind: process\n\ngoverns:\n  - spec/processes/*.yaml\n\ndata:\n  type: object\n  additionalProperties: false\n  required:\n    - steps\n  properties:\n    steps:\n      type: array\n",
+    "spec/processes/one.yaml": "about: a thing\n",
+  });
+  const out = schemaFaults(said).filter((one) => one.file === "spec/processes/one.yaml");
+  assert.deepEqual(
+    out.map((one) => one.rule),
+    ["Schema.steps", "Schema.about"],
+  );
 });

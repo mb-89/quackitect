@@ -15,8 +15,10 @@
     "wanted": "quiet"
   },
   "answer": {
-    "comment": "The door holding the owner's prompt first. It refuses a tool call in a turn a person opens where nothing has answered them yet. enabled false takes it out.",
-    "enabled": true
+    "comment": "The door holding the owner's prompt first, and the gate reading the answer at the turn's end. The door refuses a tool call in a turn a person opens where nothing has answered them yet, and enabled false takes it out. warnAt and ceiling cut the gate's score, the findings a thousand words, into three bands: under warnAt nothing happens, from warnAt to the ceiling the findings ride the next prompt as one line, and at the ceiling the gate asks for one rewrite.",
+    "enabled": true,
+    "warnAt": 5,
+    "ceiling": 15
   },
   "log": {
     "comment": "The level this box writes at. info writes everything, warn writes a refusal and a fault, error writes a fault.",

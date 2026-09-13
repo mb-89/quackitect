@@ -1,21 +1,24 @@
 // The parse behind the bash door. It reads a command and answers what the
-// command would land, so every case here is a string and an assertion.
+// command lands, so every case here is a string and an assertion.
 // [[spec/design_output/bash#what-the-door-reads]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
+  addsIn,
   branchIn,
   commitIn,
   findings,
   reaches,
+  skipsTheHook,
   testIn,
   VERBS,
   verbLine,
   writesAPath,
 } from "../../.claude/skills/level0/lib/bash.js";
 
-const rules = (command, most = 5) => findings(command, most).map((one) => one.rule);
+const rules = (command, most = 5, it = {}) =>
+  findings(command, most, it).map((one) => one.rule);
 const paths = (command) => writesAPath(command).map((one) => one.path);
 
 test("the rules reach a prose file and a code file, and stop at the ignored roots", () => {
@@ -179,6 +182,28 @@ test("a commit reading a file names the file, and one carrying neither is refuse
   assert.deepEqual(rules("git commit -a"), ["CommitCarriesItsMessage"]);
 });
 
+// [[spec/design_output/private#the-second-door]]
+test("a git add naming a path under .se refuses, with -f or without", () => {
+  assert.deepEqual(addsIn("git add -f .se/notes/one.md"), [".se/notes/one.md"]);
+  assert.deepEqual(addsIn("git add .se/notes/one.md"), [".se/notes/one.md"]);
+  assert.deepEqual(addsIn("git add --force .se/HANDOVER.md"), [".se/HANDOVER.md"]);
+  assert.deepEqual(addsIn("cd x && git stage .se/log/session.jsonl"), [".se/log/session.jsonl"]);
+  assert.deepEqual(rules("git add -f .se/notes/one.md"), ["PrivateStaysHome"]);
+});
+
+test("a git add reaching no .se path passes", () => {
+  for (const said of ["git add -A", "git add .", "git add spec/a.md", "git status"]) {
+    assert.deepEqual(addsIn(said), [], said);
+    assert.deepEqual(rules(said), [], said);
+  }
+});
+
+test("the refusal over .se names the folder and the road back", () => {
+  const [said] = findings("git add -f .se/notes/one.md", 5);
+  assert.match(said.message, /\.se is the private half, and git ignores it/);
+  assert.match(said.message, /\.se\/notes/);
+});
+
 test("a commit carrying a message from elsewhere passes unread", () => {
   assert.deepEqual(commitIn("git commit --amend --no-edit"), { form: "carried" });
   assert.deepEqual(commitIn("git commit --fixup=HEAD"), { form: "carried" });
@@ -246,6 +271,34 @@ test("every refusal names the rule, what it reads and the road that works", () =
     assert.match(one.message, /Write|Edit|RUNME|git commit -m|node --test/, said);
     assert.equal(one.severity, "error");
   }
+});
+
+// [[spec/design_output/private#the-escape]]
+test("the reader finds no-verify in every form the flag takes", () => {
+  for (const said of [
+    'git commit --no-verify -m "one"',
+    'git commit -n -m "one"',
+    'git commit -an -m "one"',
+    "git -C . commit --no-verify --amend --no-edit",
+    'git add -A && git commit -n -m "one"',
+  ]) {
+    assert.equal(skipsTheHook(said), true, said);
+  }
+  for (const said of [
+    'git commit -m "one"',
+    'git commit -m "no verify here"',
+    'git commit -am "nothing"',
+    "git push --no-verify",
+    "git commit --amend --no-edit",
+  ]) {
+    assert.equal(skipsTheHook(said), false, said);
+  }
+});
+
+test("a cloud box refuses the escape, and a desk box reads no rule in it", () => {
+  const said = 'git commit --no-verify -m "one"';
+  assert.deepEqual(rules(said, 5, { cloud: true }), ["CommitMeetsTheDoor"]);
+  assert.deepEqual(rules(said), []);
 });
 
 // [[spec/design_output/bash#the-description-names-verbs]]
