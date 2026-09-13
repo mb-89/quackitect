@@ -1,5 +1,6 @@
 ---
 kind: [[design_output]]
+refines: ["[[spec/design_input/a-stub-takes-its-vehicle]]"]
 ---
 
 # Scope
@@ -128,3 +129,61 @@ copy. Two copies make a question, and the project answers it with `attach`.
 
 A copy lands in a new folder. `vehicle into <folder>` writes into one that
 stands already, which is how a folder becomes a vehicle where it sits.
+
+# A stub takes its vehicle
+
+A stub is a bare project the method drives from outside. `./RUNME.sh stub into
+<folder>` writes it out of the vehicle it runs in, and copies nothing. The
+stub's files and who writes each stand in
+[[spec/design_input/a-stub-takes-its-vehicle#the-stubs-files]]. This chapter
+says what the verb puts into each.
+
+| file | the verb puts |
+|---|---|
+| `project/spec/tickets/`, `project/spec/guidance/`, `project/src/` | one `.gitkeep`, so the empty folder travels with git |
+| `vehicle.json` | the record below |
+| `RUNME.sh` | the shim, with its run bit |
+| `.claude/settings.json` | the vehicle's tracked settings, key by key, with none of its comments |
+| `.claude/skills/bridgehead/` | the bridgehead plugin: its manifest, its hooks file and one module |
+
+## The record names the vehicle
+
+| field | reads off |
+|---|---|
+| `vehicle` | the identity in `.se/copy.json`, made where it stands unmade |
+| `name` | the folder the vehicle stands in, which is the brand |
+| `upstream` | `git remote get-url origin` in the vehicle, or what `--upstream` names |
+| `version` | the vehicle's `package.json` |
+| `made` | the clock |
+
+A vehicle with no remote has no upstream a cloud box can clone, so the verb
+refuses until `--upstream` names one. A vehicle the button made has no git
+yet, and this is where that shows.
+
+## Two roads to the vehicle
+
+The shim and the bridgehead both read `vehicle.json` beside them, and take
+the same two roads in this order:
+
+| road | answers |
+|---|---|
+| `SE_VEHICLE` in the environment | that folder |
+| `~/.se/vehicles/<name>` | the folder a cloud box clones the upstream into |
+
+A shim finding the vehicle sets `SE_WORK` to the stub. It then hands every
+argument to the vehicle's `RUNME.sh`. A shim finding none says so and exits
+one. The bridgehead imports the vehicle's `level0` and `level1` hook modules
+from the folder it finds, and registers every hook they carry under its own.
+Where it finds none, the session starts with no cage, and the log says why.
+
+Two groups stand on this one. The register road of the shim belongs to
+`the-shim-resolves-the-vehicle`, and the import at session start to
+`the-bridgehead-imports-its-vehicle`. Until they land, the shim and the
+bridgehead carry the roads above and nothing more.
+
+## Nothing of the method travels
+
+`test/contract/stub.test.js` produces a stub into a folder it makes, reads
+every file back, and walks the whole folder. Every path it meets stands in
+the list the pure module names, and none of the method's files stands beside
+them. A refused vehicle leaves the folder as it stands.

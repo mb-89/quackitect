@@ -89,12 +89,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-stub-takes-shape
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 36d4a566c587
     hash_before: 023e4ccfaf9cd0f7f960cecb9dd70289d3ea5b10
     hash_after: 023e4ccfaf9cd0f7f960cecb9dd70289d3ea5b10
+  - step: design/review
+    hand: box 36d4a566c587 · helper-2
+    hash_before: 5e3755404c949ce7591a71c1f119365f9f13db3b
+    hash_after: 5e3755404c949ce7591a71c1f119365f9f13db3b
 ---
 
 # Ask
@@ -146,6 +150,14 @@ Read [[spec/design_input/a-stub-takes-its-vehicle]] first, the chapters The stub
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- the approach covers every row of the ask: the verb, the record, the contract test and the chapter
+- the ask says brand and the approach says name, and the chapter binds the two, so `name` stands
+- the ask reads the identity off the register and the chapter off `.se/copy.json`, so implement settles the source
+- the record carries `version` and `made` past what the ask names, so the contract test reads both back
+- the chapter names `test/contract/stub.test.js`, so the tests-red step writes the test there
+- the chapter hands the register road to the next group, so the shim stops at its two roads
 
 # implement
 
