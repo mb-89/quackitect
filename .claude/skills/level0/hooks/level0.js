@@ -99,6 +99,7 @@ import {
   strangerFault,
 } from "../lib/schema.js";
 import { refusedTicket, ticketFaults } from "../lib/ticket.js";
+import { reaches, refusedTodo, taggedIn } from "../lib/todo.js";
 import { guesses, pathOf, surveyOf, TOOLS } from "../lib/tools.js";
 import {
   askForStop,
@@ -518,6 +519,23 @@ export function register(on, _options) {
       detail: said.slice(0, 120),
     });
     return { deny: refusedCommand(said, found) };
+    })();
+    return godPasses(logbook, settings, e, next, said);
+  });
+
+  // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+  on("tool.call", { tool: "Bash" }, async ($, e, next) => {
+    const said = await (async () => {
+    if (!touchesGit(String(e.command ?? "")).pushes) return next(e);
+
+    const found = taggedIn(await theCarried($));
+    if (!found.length) return next(e);
+
+    await logbook.say("warn", "todo", `refused a push carrying ${found.length} note(s)`, {
+      tool: "Bash",
+      file: found[0],
+    });
+    return { deny: refusedTodo(found) };
     })();
     return godPasses(logbook, settings, e, next, said);
   });
@@ -1494,6 +1512,31 @@ function theDelta($) {
         name: `${NOTES}/${one.name}`,
       })),
   };
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+async function theCarried($) {
+  const said = await gitSays($, [
+    "log",
+    "--format=",
+    "--name-only",
+    "HEAD",
+    "--not",
+    "--remotes",
+  ]);
+  const names = new Set(
+    said
+      .split("\n")
+      .map((row) => row.trim())
+      .filter(reaches),
+  );
+
+  const out = [];
+  for (const name of names) {
+    const text = await gitSays($, ["show", `HEAD:${name}`]);
+    if (text) out.push({ name, text });
+  }
+  return out;
 }
 
 async function boxHere($) {

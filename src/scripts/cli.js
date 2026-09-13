@@ -201,7 +201,7 @@ const verbs = {
     run: async () => cloud(root, rest, it),
   },
   ticket: {
-    says: "tickets that stay on this box: note, update",
+    says: "tickets that stay on this box: note, update, todo",
     run: async () => ticket(root, rest, it),
   },
   mint: {
