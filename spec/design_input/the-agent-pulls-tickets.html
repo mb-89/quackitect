@@ -851,8 +851,8 @@ the same shape.</p>
     <text x="60" y="205" text-anchor="start" font-weight="700">main</text>
     <text x="140" y="222" text-anchor="middle" fill="var(--muted)" font-size="11.5">the group ticket, open, and its</text>
     <text x="140" y="236" text-anchor="middle" fill="var(--muted)" font-size="11.5">tickets land on trunk</text>
-    <text x="820" y="222" text-anchor="middle" fill="var(--muted)" font-size="11.5">work merge, no fast-forward</text>
-    <text x="820" y="236" text-anchor="middle" fill="var(--muted)" font-size="11.5">then work close drops the branch</text>
+    <text x="820" y="222" text-anchor="middle" fill="var(--muted)" font-size="11.5">branch merge, no fast-forward</text>
+    <text x="820" y="236" text-anchor="middle" fill="var(--muted)" font-size="11.5">then branch close drops the branch</text>
     <text x="200" y="62" text-anchor="start" fill="var(--accent)" font-weight="700">work/voice</text>
     <text x="230" y="105" text-anchor="middle" font-size="11.5">take</text>
     <text x="230" y="120" text-anchor="middle" fill="var(--muted)" font-size="11">hash_before, in the record</text>
@@ -868,10 +868,10 @@ the same shape.</p>
   <g fill="none" stroke="var(--muted)" stroke-width="1.2">
     <path d="M680,40 L680,30 L800,30 L800,40"/>
   </g>
-  <text x="740" y="22" text-anchor="middle" font-size="11.5" fill="var(--muted)">work list reads this tip's age · past work.staleAfter it is yours</text>
+  <text x="740" y="22" text-anchor="middle" font-size="11.5" fill="var(--muted)">branch list reads this tip's age · past work.staleAfter it is yours</text>
 </svg>
 <figcaption>The branch is the claim, and there is no lease. Every accepted hand-back is a push, so
-<code>work list</code> reads how long a held branch has stood still off its tip. Past
+<code>branch list</code> reads how long a held branch has stood still off its tip. Past
 <code>work.staleAfter</code> the group is implicitly a person's: it stands under yours with three answers,
 release, take over, or close, and no box takes it again before a person answers. Nothing on the ticket says
 who holds it or since when: git does.</figcaption>
@@ -880,7 +880,7 @@ who holds it or since when: git does.</figcaption>
 <div class="scroll"><table>
 <tr><th>rule</th><th>what it says</th></tr>
 <tr><td>the branch is the claim</td><td>the take writes the hand and <code>hash_before</code> into the group's record under <code>children</code> and pushes, and the push arbitrates two boxes</td></tr>
-<tr><td>held derives</td><td>a group holds where its newest record entry carries <code>hash_before</code> and no <code>hash_after</code>, and <code>work list</code> reads it so</td></tr>
+<tr><td>held derives</td><td>a group holds where its newest record entry carries <code>hash_before</code> and no <code>hash_after</code>, and <code>branch list</code> reads it so</td></tr>
 <tr><td>a group has a route</td><td>the ticket carries the <code>group</code> route, and the pull hands its leaves out around the children</td></tr>
 <tr><td>a stale group is yours</td><td>a held group whose tip is older than <code>work.staleAfter</code> stands under yours with three answers, and <code>release</code>, <code>take</code> and <code>close</code> are the verbs</td></tr>
 <tr><td>one box, one group</td><td>a box works one group at a time, and the group's children one at a time</td></tr>
@@ -889,8 +889,8 @@ who holds it or since when: git does.</figcaption>
 <tr><td>the branch holds the truth</td><td>while the branch stands, its copy of the group and of its children is the record</td></tr>
 <tr><td>a box leaves</td><td>when the group's last leaf passes, it writes <code>hash_after</code>, closes the group as <code>done</code> where every child stands closed, and leaves it open otherwise</td></tr>
 <tr><td>a group returns</td><td>an open group nobody holds comes back to the beat once a person answers on its branch</td></tr>
-<tr><td>the merge is a desk's</td><td><code>work merge</code> runs on a box off the cloud, an agent's or a person's, since a cloud box pushes no trunk, and <code>work close</code> drops the branch</td></tr>
-<tr><td>the merge lands the truth</td><td><code>work merge</code> runs the check on the merge commit and undoes it on red; it refuses where trunk's copy of the group or of a child differs from the branch point, and names the lines</td></tr>
+<tr><td>the merge is a desk's</td><td><code>branch merge</code> runs on a box off the cloud, an agent's or a person's, since a cloud box pushes no trunk, and <code>branch close</code> drops the branch</td></tr>
+<tr><td>the merge lands the truth</td><td><code>branch merge</code> runs the check on the merge commit and undoes it on red; it refuses where trunk's copy of the group or of a child differs from the branch point, and names the lines</td></tr>
 <tr><td>the merge frees the tickets</td><td>an open child of a merged group loses its <code>group</code>, so a ticket waiting on a person stands loose on trunk</td></tr>
 </table></div>
 
@@ -916,7 +916,7 @@ is the only retro that box ever runs.</p>
 A ticket the drain mints names this group, and then the box works it before the group ends, since
 <code>children</code> has two ends. Or it names no group, and then it rides the branch and lands on
 trunk at the merge, where a person sorts it. It is <code>open</code> where the drain fills its ask and
-<code>draft</code> where it cannot. The six lines <code>work new</code> appends to a brief today are this
+<code>draft</code> where it cannot. The six lines <code>branch new</code> appends to a brief today are this
 route one for one, so the first cloud run under the pull is the first process running as data.</p>
 
 <h3>The retro</h3>
@@ -1000,7 +1000,7 @@ branch. Now the two coincide, so one word stays: group.</p>
 <h2 id="s7"><span class="n">7</span>The pull</h2>
 
 <p>The agent holds three verbs: <code>pull</code>, <code>guidance</code> and <code>escalate</code>. Every
-other verb belongs to a person or the engine. The shell is the verb, under <code>./RUNME.sh work</code>,
+other verb belongs to a person or the engine. The shell is the verb, under <code>./RUNME.sh branch</code>,
 and a plugin tool wraps it for a session that holds the plugin. The engine is these verbs and the beat,
 and it runs with nobody on the box, which is why it stands in level one and outside level zero. A pull carries at most two things: the
 ticket it hands back and a verdict: <code>pass</code>, <code>fail</code> with a reason, or <code>became</code>
@@ -1151,7 +1151,7 @@ and rides the step.</p>
 <h2 id="s10"><span class="n">10</span>What a person sees</h2>
 
 <p>Three surfaces draw the folder and the branches, and none keeps a second record: the work editor, which
-a button in the sidebar opens; <code>work list</code> in a terminal; and the ticket file itself. The board
+a button in the sidebar opens; <code>branch list</code> in a terminal; and the ticket file itself. The board
 draws what the machine holds, and nothing more: a ticket in a held group shows its group's state and the
 age of the branch's tip, and no state of its own, since the branch is responsible for it and nobody on trunk
 touches it. The board fetches on the schedule the tree already has, so a tip nobody fetches yet stays
@@ -1191,7 +1191,7 @@ branches.</p>
 <div class="scroll"><table>
 <tr><th>surface</th><th>draws</th></tr>
 <tr><td>the work editor, which a button in the sidebar opens</td><td>every ticket, under yours, urgent, in work, open and done, and a ticket's route as a drawing a person works through</td></tr>
-<tr><td class="m">./RUNME.sh work list</td><td>the same rows in a terminal, with the age of each held branch</td></tr>
+<tr><td class="m">./RUNME.sh branch list</td><td>the same rows in a terminal, with the age of each held branch</td></tr>
 <tr><td>the ticket file itself</td><td>the ask, the route, the evidence, the discussion</td></tr>
 </table></div>
 
@@ -1236,7 +1236,7 @@ fact it meets is a route.</p>
 <tr><td>the folders</td><td class="m">spec/tickets/ · spec/processes/ · .se/tickets/ · .se/retro/</td></tr>
 <tr><td>the processes</td><td class="m">spec/processes/&lt;name&gt;.yaml</td></tr>
 <tr><td>the emitter</td><td>one module the editor reads, beside the verbs</td></tr>
-<tr><td>the verbs</td><td class="m">src/scripts/work.js, under ./RUNME.sh work</td></tr>
+<tr><td>the verbs</td><td class="m">src/scripts/work.js, under ./RUNME.sh branch</td></tr>
 <tr><td>the tool wrapper and the spawn</td><td class="m">.claude/skills/level1/</td></tr>
 <tr><td>the stop rule</td><td class="m">spec/config/stop/level1.yml</td></tr>
 <tr><td>the hold and the box id</td><td class="m">.se/hold/&lt;hand&gt;.json · .se/box.json</td></tr>
@@ -1264,7 +1264,7 @@ fact it meets is a route.</p>
 <tr><td>the pull is the one verb, and a submission rides it</td><td>v3, v4</td><td>stays whole</td></tr>
 <tr><td>one token in hand</td><td>v4</td><td>one ticket in hand per hand, under <code>.se/hold/</code></td></tr>
 <tr><td>the hold is engine state, and the claim travels</td><td>v4</td><td>the hold file, and the record's push on the group</td></tr>
-<tr><td>the token carries no time</td><td>v4</td><td>stays, and <code>work list</code> reads a branch's age off git</td></tr>
+<tr><td>the token carries no time</td><td>v4</td><td>stays, and <code>branch list</code> reads a branch's age off git</td></tr>
 <tr><td>a field stands because something reads it</td><td>v4</td><td>the field table in section 2</td></tr>
 <tr><td>a todo is a sub-token</td><td>v4</td><td>private sub-tickets, and the tooth counts them</td></tr>
 <tr><td>every token names its closer</td><td>v4</td><td>the route's last step</td></tr>
@@ -1289,8 +1289,8 @@ fact it meets is a route.</p>
 cloud run as a group, waits for the retro, since a group's retro phase runs the retro's notes command. The editor's live
 drawing, its block library and the evidence form wait for branch 2 and are desk work with the owner. The
 five work branches standing today finish under the verbs they carry. A brief branch is one whose tip carries <code>HANDOVER.md</code>, and
-<code>work list</code> tells the two kinds apart by that; <code>take</code> keeps serving a brief until
-<code>work list</code> names none; <code>adopt</code> turns a brief into a group ticket and one child for the
+<code>branch list</code> tells the two kinds apart by that; <code>take</code> keeps serving a brief until
+<code>branch list</code> names none; <code>adopt</code> turns a brief into a group ticket and one child for the
 ones a person wants moved, and the old verbs go once the last brief merges.</p>
 
 <figure>
@@ -1379,7 +1379,7 @@ says where it stands now.</p>
 <tr><td>an idempotent hand-back with a fence</td><td>Temporal, SQS, beads, Gas Town</td><td class="ok">answered</td><td>the take hash is the key: an answered hand-back gets its recorded answer, a stale one is refused</td></tr>
 <tr><td>a dead box told from a slow one</td><td>SQS, Temporal, Sidekiq, Symphony, Gas Town</td><td class="ok">answered</td><td>past <code>work.staleAfter</code> the group is implicitly yours; a heartbeat ref stays open if tip age proves too coarse</td></tr>
 <tr><td>a clock on a person step: due, reminder, default</td><td>Camunda, PagerDuty, Gas Town</td><td class="half">in part</td><td>yours sorts oldest first and the notification names each question with its age; no due date and no default answer, since a ticket carries no time</td></tr>
-<tr><td>a merge verified against current trunk</td><td>GitHub, Gas Town's Refinery</td><td class="ok">answered</td><td><code>work merge</code> runs the check on the merge commit and undoes it on red</td></tr>
+<tr><td>a merge verified against current trunk</td><td>GitHub, Gas Town's Refinery</td><td class="ok">answered</td><td><code>branch merge</code> runs the check on the merge commit and undoes it on red</td></tr>
 <tr><td>a bound on a fail loop</td><td>Argo, Temporal, GitHub Actions, Symphony</td><td class="ok">answered</td><td>the record counts returns, and <code>work.failsBeforePerson</code> inserts a person step</td></tr>
 <tr><td>an approval bound to the diff it saw</td><td>GitHub, Copilot, Backlog.md</td><td class="ok">answered</td><td>a verdict from a hand that moved the tip is refused, and the <code>read</code> list must cover the diff</td></tr>
 <tr><td>a lost update caught</td><td>Azure DevOps, beads, Backlog.md</td><td class="ok">answered</td><td>the merge refuses a trunk copy that moved since the branch point, and the pull fetches before every hand-out</td></tr>

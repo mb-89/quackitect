@@ -211,7 +211,7 @@ test("a commit carrying a message from elsewhere passes unread", () => {
 });
 
 test("a command touching no commit answers nothing", () => {
-  for (const said of ["git status", "./RUNME.sh work done", "git push origin HEAD"]) {
+  for (const said of ["git status", "./RUNME.sh branch done", "git push origin HEAD"]) {
     assert.equal(commitIn(said), null, said);
   }
 });

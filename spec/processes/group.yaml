@@ -14,12 +14,12 @@ steps:
     does: takes trunk into the branch, so the box works on the latest
     when: cloud
     by: agent
-    needs: [work sync]
+    needs: [branch sync]
     evidence:
       - name: sync
         form: command
         expects: 0
-        says: work sync, so the branch carries trunk
+        says: branch sync, so the branch carries trunk
   - name: split
     does: mints the children, or assigns standing tickets, each naming this group
     from: anyone

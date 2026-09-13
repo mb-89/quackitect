@@ -600,7 +600,7 @@ into the group goes to work before the retro's last leaf.
 | rule | what it says |
 |---|---|
 | the branch is the claim | the take writes the hand and `hash_before` into the group's record under `children` and pushes, and the push arbitrates two boxes |
-| held derives | a group holds where its newest record entry carries `hash_before` and no `hash_after`, and `work list` reads it so |
+| held derives | a group holds where its newest record entry carries `hash_before` and no `hash_after`, and `branch list` reads it so |
 | a stale group is yours | a held group whose tip is older than `work.staleAfter` stands under yours with three answers, and `release`, `take` and `close` are the verbs |
 | one box, one group | a box works one group at a time, and the group's children one at a time |
 | the branch is the filter | on a group's branch the pull sees that group alone, and widens nothing |
@@ -608,8 +608,8 @@ into the group goes to work before the retro's last leaf.
 | the branch holds the truth | while the branch stands, its copy of the group and of its children is the record |
 | a box leaves | when the group's last leaf passes, it writes `hash_after`, closes the group as `done` where every child stands closed, and leaves it open otherwise |
 | a group returns | an open group nobody holds comes back to the beat once a person answers on its branch |
-| the merge is a desk's | `work merge` runs on a box off the cloud, an agent's or a person's, since a cloud box pushes no trunk, and `work close` drops the branch |
-| the merge lands the truth | `work merge` runs the check on the merge commit and undoes it on red. It refuses where trunk's copy of the group or of a child differs from the branch point, and names the lines |
+| the merge is a desk's | `branch merge` runs on a box off the cloud, an agent's or a person's, since a cloud box pushes no trunk, and `branch close` drops the branch |
+| the merge lands the truth | `branch merge` runs the check on the merge commit and undoes it on red. It refuses where trunk's copy of the group or of a child differs from the branch point, and names the lines |
 | the merge frees the tickets | an open child of a merged group loses its `group`, so a ticket waiting on a person stands loose on trunk |
 
 A cloud box differs from a desk in one leaf, `sync`, which takes trunk into
@@ -655,7 +655,7 @@ branch, which v4 rules.
 
 There is no lease. A branch somebody holds stays held until a person looks. A
 branch held for a long time is something a person has to look at in any case.
-So `work list` names the age of each held branch's tip, and that age is the
+So `branch list` names the age of each held branch's tip, and that age is the
 signal.
 
 | the tip's age | means |
@@ -673,7 +673,7 @@ A hand mints where it means to work:
 - a ticket it leaves for others carries no group, and a person sorts it later
 - on a cloud box a ticket with no group rides the branch to the merge, since trunk refuses the box
 
-The six lines `work new` appends to a brief today are this route, one for
+The six lines `branch new` appends to a brief today are this route, one for
 one. So the first cloud run under the pull is the first process running as
 data, and the brief's contract retires with it.
 
@@ -813,7 +813,7 @@ mints one.
 
 The agent holds three verbs: `pull`, `guidance` and `escalate`. Every other
 verb belongs to a person or the engine. The shell is the verb, under
-`./RUNME.sh work`. A plugin tool wraps it for a session that holds the plugin,
+`./RUNME.sh branch`. A plugin tool wraps it for a session that holds the plugin,
 which is v4's ruling that one function runs under both doors.
 
 The engine is these verbs and the beat, and it runs with nobody on the box.
@@ -1016,7 +1016,7 @@ record:
 | surface | draws |
 |---|---|
 | the work editor, which a button in the sidebar opens | every ticket, under yours, urgent, in work, open and done, and a ticket's route as a drawing a person works through |
-| `./RUNME.sh work list` | the same rows in a terminal, with the age of each held branch |
+| `./RUNME.sh branch list` | the same rows in a terminal, with the age of each held branch |
 | the ticket file itself | the ask, the route, the evidence, the discussion |
 
 The board draws what the machine holds, and nothing more. A ticket in a held
@@ -1094,7 +1094,7 @@ the only fact it meets is a route.
 | the folders | `spec/tickets/`, `spec/processes/`, `.se/tickets/`, `.se/retro/` |
 | the processes | `spec/processes/<name>.yaml`, six of them, in the tree now |
 | the emitter | one module the editor reads, beside the verbs |
-| the verbs | `src/scripts/work.js`, under `./RUNME.sh work` |
+| the verbs | `src/scripts/work.js`, under `./RUNME.sh branch` |
 | the tool wrapper and the spawn | `.claude/skills/level1/`, beside level zero |
 | the stop rule | `spec/config/stop/level1.yml` |
 | the hold and the box id | `.se/hold/<hand>.json`, `.se/box.json` |
@@ -1119,7 +1119,7 @@ the only fact it meets is a route.
 | the pull is the one verb, and a submission rides it | v3, v4 | stays whole |
 | one token in hand | v4 | one ticket in hand per hand, under `.se/hold/` |
 | the hold is engine state, and the claim travels | v4 | the hold file, and the record's push on the group |
-| the token carries no time | v4 | stays, and `work list` reads a branch's age off git |
+| the token carries no time | v4 | stays, and `branch list` reads a branch's age off git |
 | a field stands because something reads it | v4 | the field table above |
 | a todo is a sub-token | v4 | private sub-tickets, and the tooth counts them |
 | every token names its closer | v4 | the route's last step |
@@ -1159,8 +1159,8 @@ library and the evidence form wait for branch 2. They are desk work with the
 owner, and no cloud brief carries them.
 
 The five work branches standing today finish under the verbs they carry. A
-brief branch is one whose tip carries `HANDOVER.md`, and `work list` tells the
-two kinds apart by that. `take` keeps serving a brief until `work list` names
+brief branch is one whose tip carries `HANDOVER.md`, and `branch list` tells the
+two kinds apart by that. `take` keeps serving a brief until `branch list` names
 none. `adopt` turns a brief into a group ticket and one child, for the
 ones a person wants moved. The old verbs go once the last brief merges.
 

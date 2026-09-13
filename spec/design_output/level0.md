@@ -598,10 +598,11 @@ Each writes a `gate` line at `warn`: `warned Read before an answer`, then
 
 ## A prompt mid-turn
 
-- Outcome: a prompt arriving mid-turn earns one warning at most, and no refusal.
+- Outcome: a prompt landing mid-response binds the next response, and the one in flight goes free.
 - Cause: the response in flight completes with no text, before the model reads the prompt.
-- Holder: `turn.start` and `turn.complete` set whether a turn runs, and `prompt.submit` marks the demand.
-- Backstop: the gate at the turn's end still reads the question table.
+- Count: every tool call adds one, and every step sets the count to zero.
+- Skip: a prompt landing over a count above zero skips the next step.
+- Log: a silent step, or one the door skips, writes a `step` line.
 
 ## A step carries the answer
 
@@ -720,7 +721,7 @@ edges, and the score falls in one of three bands:
 | the score | what happens |
 |---|---|
 | under `warnAt` | nothing |
-| from `warnAt` to the ceiling | the findings ride the next prompt as one line |
+| from `warnAt` to the ceiling | the `answer` line at `warn`, and nothing reaches the prompt |
 | at the ceiling or over it | one re-prompt saying rewrite, once per turn |
 
 An answer carrying no finding reads clean, whatever its length. Every band
@@ -743,15 +744,6 @@ already uses, because a refusal quoting the rule teaches it better than a
 refusal naming it. The door holding the owner's prompt first reads
 `e.origin.kind`, and a plugin prompt is a machine, so that door owes this one no
 readback.
-
-## The carry rides a prompt
-
-Under the ceiling the findings wait for the next prompt a person sends, and ride
-it as one line under the text. The line names the score and every rule behind
-it, and asks the session to hold those rules for the rest of the turn.
-
-The findings ride once. A prompt from a machine leaves them waiting, so the line
-reaches a person's turn and no other.
 
 ## The gate holds its state
 
@@ -878,7 +870,7 @@ most. Vale counts a heading, through `ShortHeading`, and refuses a dash or a
 colon inside one through `OneTitle`, because both turn one title into two.
 
 Vale reads what a file holds, and its path stays outside that. So
-`.claude/skills/level0/lib/names.js` counts a name instead. `work new` refuses a
+`.claude/skills/level0/lib/names.js` counts a name instead. `branch new` refuses a
 long branch, and `NameHoldsTheWords` holds every path git tracks.
 For details, see [[spec/design_output/tree#the-rules-over-two-files]].
 

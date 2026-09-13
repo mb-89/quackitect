@@ -7,7 +7,7 @@ import { overLong } from "./names.js";
 import { NOTES } from "./private.js";
 import { PROSE } from "./vale.js";
 
-export const VERBS = ["check", "work", "log", "doctor"];
+export const VERBS = ["check", "branch", "log", "doctor"];
 
 const HOME = NOTES.split("/")[0];
 
@@ -222,7 +222,7 @@ export function findings(command, most, it = {}) {
     out.push(
       row(said, "BranchNameHoldsFive", one, [
         `A name holds ${most} words, and ${part} holds more. Cut it, or run`,
-        "./RUNME.sh work new <name>, which cuts the branch and writes its brief.",
+        "./RUNME.sh branch new <name>, which cuts the branch and writes its brief.",
       ]),
     );
   }

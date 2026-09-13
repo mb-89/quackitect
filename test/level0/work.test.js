@@ -34,7 +34,6 @@ import {
 import {
   fieldOf,
   heldIn,
-  isGroup,
   recordIn,
   withEntry,
   withField,
@@ -80,8 +79,8 @@ const green = {
 test("every brief carries the contract, and adding it twice changes nothing", () => {
   const once = withContract("# A brief\n\nDo the thing.\n");
   assert.ok(once.includes(CONTRACT_HEADING), "the contract lands");
-  assert.ok(once.includes("./RUNME.sh work done"), "it names how to finish");
-  assert.ok(once.includes("./RUNME.sh work release"), "it names how to stop early");
+  assert.ok(once.includes("./RUNME.sh branch done"), "it names how to finish");
+  assert.ok(once.includes("./RUNME.sh branch release"), "it names how to stop early");
   assert.equal(withContract(once), once, "a second pass changes nothing");
 });
 
@@ -209,7 +208,7 @@ test("done off a work branch refuses, and reaches git no further", () => {
   const { code, said } = heard(() => work(ROOT, ["done"], it));
 
   assert.equal(code, 2);
-  assert.match(said, /work done runs on a work branch/);
+  assert.match(said, /branch done runs on a work branch/);
   assert.deepEqual(ranGit(outside), ["git rev-parse --abbrev-ref HEAD"]);
 });
 
@@ -242,7 +241,7 @@ test("list names every branch, its status and what it waits for", () => {
   assert.match(said, /work\/two\s+brief\s+todo\s+waits for one/);
 });
 
-test("collect names the branch standing at done, and no other", () => {
+test("list --done names the branch standing at done, and no other", () => {
   const { it } = doorsSaying({
     "git ls-remote --heads origin work/*": {
       stdout: "aaa\trefs/heads/work/one\nbbb\trefs/heads/work/two\n",
@@ -251,7 +250,7 @@ test("collect names the branch standing at done, and no other", () => {
     "git show origin/work/two:HANDOVER.md": { stdout: "---\nstatus: todo\n---\n" },
   });
 
-  const { said } = heard(() => work(ROOT, ["collect"], it));
+  const { said } = heard(() => work(ROOT, ["list", "", "--done"], it));
 
   assert.match(said, /work\/one/);
   assert.doesNotMatch(said, /work\/two/);
@@ -404,7 +403,7 @@ test("done refuses a branch trunk stands ahead of, and names the sync", () => {
   const { code, said } = heard(() => work(ROOT, ["done"], behind.it));
   assert.equal(code, 1);
   assert.match(said, /main holds 3 commit\(s\) work\/fix-lsp lacks/);
-  assert.match(said, /work sync/);
+  assert.match(said, /branch sync/);
   assert.equal(statusOf(behind.disk.read(HERE)), "held", "the status stands");
 });
 
@@ -807,63 +806,4 @@ test("close drops a group's branch once trunk holds it", () => {
   assert.ok(ranGit(outside).includes("git push origin --delete work/one-group"));
 });
 
-const SCHEMA_TEXT = `kind: ticket
-frontmatter:
-  required: [kind, state, urgency, steps]
-  properties:
-    kind:
-      const: ticket
-      x-link: true
-    state:
-      enum: [draft, open, closed]
-    urgency:
-      enum: [now, soon, whenever]
-    steps:
-      type: array
-    process:
-      x-link: true
-    group:
-      type: string
-body:
-  headingLevel: 1
-  sections:
-    - header: Ask
-      required: true
-    - header: Discussion
-      required: true
-`;
 
-const ROUTE = "name: group\nsteps:\n  - name: sync\n    does: takes trunk in\n";
-
-// [[spec/design_output/work#a-brief-becomes-a-group]]
-test("adopt turns a brief branch into a group ticket and one child", () => {
-  const brief = "---\nstatus: held\n---\n\n# Fix the lsp\n\nIt answers nothing.\n";
-  const { it, outside, disk } = doorsSaying(onBranch("work/one-group"), {
-    [HERE]: brief,
-    [join(ROOT, "spec/schemas/ticket.schema.yaml")]: SCHEMA_TEXT,
-    [join(ROOT, "spec/processes/group.yaml")]: ROUTE,
-    [join(ROOT, "spec/processes/standard.yaml")]: "name: standard\nsteps:\n  - name: do\n",
-  });
-
-  const { code, said } = heard(() => work(ROOT, ["adopt"], { ...it, words: 5 }));
-
-  assert.equal(code, 0);
-  assert.equal(disk.exists(HERE), false, "the brief goes with the adoption");
-  assert.equal(isGroup(disk.read(on("one-group"))), true);
-  assert.equal(fieldOf(disk.read(on("fix-the-lsp")), "group"), "one-group");
-  assert.match(disk.read(on("fix-the-lsp")), /It answers nothing/);
-  assert.ok(ranGit(outside).includes("git push origin work/one-group"));
-  assert.match(said, /spec\/tickets\/fix-the-lsp\.md/);
-});
-
-// [[spec/design_output/work#a-brief-becomes-a-group]]
-test("adopt asks for a name where the brief's heading answers none it can use", () => {
-  const { it } = doorsSaying(onBranch("work/one-group"), {
-    [HERE]: "---\nstatus: held\n---\n\n# One group\n",
-  });
-
-  const { code, said } = heard(() => work(ROOT, ["adopt"], { ...it, words: 5 }));
-
-  assert.equal(code, 2);
-  assert.match(said, /Name the one child this brief becomes/);
-});

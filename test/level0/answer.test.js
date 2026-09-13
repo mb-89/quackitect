@@ -25,10 +25,7 @@ import {
   tableFaults,
   wordsIn,
 } from "../../.claude/skills/level0/lib/answer.js";
-import {
-  answerFindings,
-  carried,
-} from "../../.claude/skills/level0/lib/refuse.js";
+import { answerFindings } from "../../.claude/skills/level0/lib/refuse.js";
 
 // [[spec/design_output/level0#the-owners-prompt-comes-first]]
 test("a person opens a turn, and a machine does not", () => {
@@ -95,7 +92,7 @@ test("a call reaching the owner passes, and every other call does not", () => {
 
 test("the refusal quotes the rule it holds", () => {
   assert.match(SAYS, /^The owner asked something and nothing has answered it\./);
-  assert.match(SAYS, /Say back what you\n\s*understood and what you do next, then work\.$/);
+  assert.match(SAYS, /Call mcp__level0__log\n\s*with kind answer, saying what you understood and what you do next, then work\.$/);
 });
 
 // [[spec/design_output/level0#the-score-is-a-rate]]
@@ -161,11 +158,10 @@ test("a turn end under the warning sends nothing, and holds nothing", () => {
   });
   assert.equal(said.band, "clean");
   assert.equal(said.sends, false);
-  assert.equal(gate.waiting(), null);
 });
 
-// [[spec/design_output/level0#the-carry-rides-a-prompt]]
-test("a turn end in the middle band holds the findings for the next prompt", () => {
+// [[spec/design_output/level0#the-three-bands]]
+test("a turn end in the middle band sends nothing", () => {
   const gate = gateOf();
   const said = gate.atTurnEnd({
     warnAt: 5,
@@ -176,9 +172,6 @@ test("a turn end in the middle band holds the findings for the next prompt", () 
   });
   assert.equal(said.band, "carry");
   assert.equal(said.sends, false);
-  assert.deepEqual(gate.waiting(), { found: FOUND, score: 10 });
-  assert.deepEqual(gate.takeWaiting(), { found: FOUND, score: 10 });
-  assert.equal(gate.takeWaiting(), null);
 });
 
 test("an answer carrying no finding reads clean, whatever its length", () => {
@@ -219,7 +212,6 @@ test("the gate holds its re-prompt where the tooth already spoke", () => {
   });
   assert.equal(said.sends, false);
   assert.equal(said.held, true);
-  assert.deepEqual(gate.waiting(), { found: FOUND, score: 50 });
 });
 
 // [[spec/design_output/level0#the-tool-reads-a-draft]]
@@ -251,14 +243,6 @@ test("the gate reads an answer clean where nothing stands", () => {
     band: "clean",
   });
   assert.match(said, /meets the gate clean/);
-});
-
-// [[spec/design_output/level0#the-carry-rides-a-prompt]]
-test("the carry is one line naming the findings", () => {
-  const said = carried(FOUND, 9.5);
-  assert.equal(said.includes("\n"), false);
-  assert.match(said, /scored 9\.5 findings a thousand words/);
-  assert.match(said, /Hold PastTense/);
 });
 
 // [[spec/design_output/level0#the-door-counts-the-questions]]
@@ -358,7 +342,7 @@ test("a needs table numbers its rows in order", () => {
 });
 
 test("a needs table cell holds no code and few words", () => {
-  const code = NEEDS_ROWS.replace("No, hold it local.", "Run `work close`.");
+  const code = NEEDS_ROWS.replace("No, hold it local.", "Run `branch close`.");
   assert.match(needsFaults(code, {})[0].message, /holds no code/);
   const long = NEEDS_ROWS.replace("No, hold it local.", "word ".repeat(CELL_WORDS + 1).trim());
   assert.match(needsFaults(long, {})[0].message, new RegExp(`holds ${CELL_WORDS + 1}`));

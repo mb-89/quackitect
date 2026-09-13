@@ -83,7 +83,7 @@ The model's acknowledgement alone is not an enforcement test.
 
 Run `node src/scripts/copilot.js dispatch` from a clean main checkout.
 Authenticate `gh` as the person dispatching work, outside the worker sandbox.
-The dispatcher calls the unchanged `work take` command. It pushes the synced
+The dispatcher calls the unchanged `branch take` command. It pushes the synced
 claim, creates or reuses a draft pull request, and posts an `@copilot` request.
 It checks existing comments before retrying an ambiguous network failure.
 
@@ -103,8 +103,8 @@ claim. Do not release a branch while its worker can still push to it.
 
 After a successful request, switch this checkout to main to dispatch another.
 A timeout leaves the remote brief held. Inspect its commits and stop the job.
-Then use the existing work release command before assigning it again.
-Only a person calls work merge after reviewing the durable result and retro.
+Then use the existing branch release command before assigning it again.
+Only a person calls branch merge after reviewing the durable result and retro.
 
 # Verification record
 

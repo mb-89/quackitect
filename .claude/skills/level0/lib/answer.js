@@ -20,16 +20,16 @@ const REACHES = new Set(["AskUserQuestion"]);
 
 // [[spec/design_output/level0#what-the-refusal-says]]
 export const SAYS = [
-  "The owner asked something and nothing has answered it. Say back what you",
-  "understood and what you do next, then work.",
+  "The owner asked something and nothing has answered it. Call mcp__level0__log",
+  "with kind answer, saying what you understood and what you do next, then work.",
 ].join("\n");
 
 // [[spec/design_output/level0#one-warning-then-a-refusal]]
 export function warns(why) {
   return [
-    `${why}, and nothing has answered it yet. Say back what you understood and`,
-    "what you do next before the next tool call. Level zero refuses that call",
-    "until an answer stands.",
+    `${why}, and nothing has answered it yet. Call mcp__level0__log with kind`,
+    "answer, saying what you understood and what you do next, before the next",
+    "tool call. Level zero refuses that call until an answer stands.",
   ].join(" ");
 }
 
@@ -295,22 +295,13 @@ export function bandOf(score, bands, found) {
 export function gateOf() {
   let sent = false;
   let inARow = 0;
-  let waiting = null;
 
   return {
     inARow: () => inARow,
-    waiting: () => waiting,
 
     sawPrompt(mine) {
       sent = false;
       if (!mine) inARow = 0;
-    },
-
-    // [[spec/design_output/level0#the-carry-rides-a-prompt]]
-    takeWaiting() {
-      const held = waiting;
-      waiting = null;
-      return held;
     },
 
     // [[spec/design_output/level0#the-three-bands]]
@@ -319,18 +310,11 @@ export function gateOf() {
       const score = scoreOf(it?.text, found);
       const band = found.length ? bandOf(score, it, found) : CLEAN;
       const said = { score, band, found, sends: false, runaway: false, held: false };
-      if (band === CLEAN) return said;
-      if (band === CARRY) {
-        waiting = { found, score };
-        return said;
-      }
+      if (band === CLEAN || band === CARRY) return said;
 
       const most = Number(it?.mostInARow ?? 0);
       const runaway = most > 0 && inARow >= most;
-      if (sent || runaway || it?.toothSpoke) {
-        waiting = { found, score };
-        return { ...said, runaway, held: true };
-      }
+      if (sent || runaway || it?.toothSpoke) return { ...said, runaway, held: true };
       sent = true;
       inARow += 1;
       return { ...said, sends: true };

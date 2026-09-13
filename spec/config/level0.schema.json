@@ -32,7 +32,7 @@
         "warnAt": {
           "type": "number",
           "unit": "findings a thousand words",
-          "help": "The score where the findings start riding the next prompt."
+          "help": "The score where the gate starts writing a warn line to the log."
         },
         "ceiling": {
           "type": "number",

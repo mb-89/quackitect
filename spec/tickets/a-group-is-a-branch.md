@@ -7,12 +7,12 @@ steps:
     does: takes trunk into the branch, so the box works on the latest
     when: cloud
     by: agent
-    needs: ["work sync"]
+    needs: ["branch sync"]
     evidence:
       - name: sync
         form: command
         expects: 0
-        says: work sync, so the branch carries trunk
+        says: branch sync, so the branch carries trunk
   - name: split
     does: mints the children, or assigns standing tickets, each naming this group
     from: anyone
@@ -80,7 +80,7 @@ process: [[group]]
 
 The verbs read a group off its ticket, claim it by pushing a record entry, and land it with the check on the merge commit.
 
-Done is a tree where no file names a group kind. `work list` then names a group, a brief and a loose ticket, each as its own kind.
+Done is a tree where no file names a group kind. `branch list` then names a group, a brief and a loose ticket, each as its own kind.
 
 # sync
 
@@ -88,7 +88,7 @@ Done is a tree where no file names a group kind. `work list` then names a group,
 
 ## sync
 
-<!-- work sync, so the branch carries trunk -->
+<!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
 
@@ -174,6 +174,6 @@ Done is a tree where no file names a group kind. `work list` then names a group,
 
 # Discussion
 
-This is the first group the tree carries, and it stands beside the brief that mints it. A brief wins while `HANDOVER.md` stands, so this note holds the shape and takes no hand until `work adopt` drops that file.
+This is the first group the tree carries, and it stands beside the brief that mints it. A brief wins while `HANDOVER.md` stands, so this note holds the shape and takes no hand until a group ticket takes the place of that file.
 
 The leaves below carry the placeholders the mint writes, because no hand walks this route yet. The pull fills them, one leaf at a time.

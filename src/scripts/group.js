@@ -3,7 +3,7 @@
 // where it stands. Everything here reads or writes that one note.
 // [[spec/design_output/work#a-group-is-a-ticket]]
 
-import { readNote, readYaml } from "../../.claude/skills/level0/lib/schema.js";
+import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 
 export const TICKETS = "spec/tickets";
 export const GROUP = "group";
@@ -67,7 +67,7 @@ export function stepOf(text) {
   return bare(front.step ?? "") || firstLeaf(front.steps);
 }
 
-// [[spec/design_output/work#a-brief-becomes-a-group]]
+// [[spec/design_output/work#a-group-is-a-ticket]]
 export function askOf(text) {
   const said = readNote(String(text ?? "")).sections.find(
     (one) => one.header.toLowerCase() === "ask",
@@ -138,12 +138,6 @@ export function withoutField(text, key) {
 
   rows.splice(at, blockEnd(rows, at, shut) - at);
   return rows.join("\n");
-}
-
-// [[spec/design_output/work#a-brief-becomes-a-group]]
-export function routeOf(text) {
-  const said = readYaml(String(text ?? ""));
-  return { steps: said?.steps ?? [], ask: said?.ask ?? [] };
 }
 
 // [[spec/design_output/work#a-stale-group-is-yours]]

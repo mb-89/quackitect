@@ -12,7 +12,6 @@ import {
   heldIn,
   isGroup,
   recordIn,
-  routeOf,
   spanOf,
   stepOf,
   ticketAt,
@@ -157,14 +156,6 @@ test("a ticket loses its group, and the route under it stands", () => {
     loose,
     "dropping it twice changes nothing",
   );
-});
-
-// [[spec/design_output/work#a-brief-becomes-a-group]]
-test("a route reads its steps and its ask off the process file", () => {
-  const said = routeOf("name: group\nask:\n  - name: goal\nsteps:\n  - name: sync\n");
-  assert.deepEqual(said.steps, [{ name: "sync" }]);
-  assert.deepEqual(said.ask, [{ name: "goal" }]);
-  assert.deepEqual(routeOf("").steps, []);
 });
 
 // [[spec/design_output/work#a-stale-group-is-yours]]
