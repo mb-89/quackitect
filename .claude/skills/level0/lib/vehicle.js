@@ -93,3 +93,31 @@ function parsed(read) {
     return null;
   }
 }
+
+// [[spec/design_output/vehicle#a-stub-takes-its-vehicle]]
+export const LINK = "vehicle.json";
+export const TEMPLATE = "src/stub";
+export const SETTINGS = ".claude/settings.json";
+export const KEEP = ".gitkeep";
+export const STUB_FOLDERS = ["project/spec/tickets", "project/spec/guidance", "project/src"];
+
+export function brandOf(_method) {
+  return "";
+}
+
+export function upstreamOf(_remote, _named) {
+  return "";
+}
+
+// [[spec/design_output/vehicle#the-record-names-the-vehicle]]
+export function linkOf(_id, _name, _upstream, _version, _at) {
+  return {};
+}
+
+export function settingsOf(_read) {
+  return {};
+}
+
+export function stubFiles(_template) {
+  return [];
+}

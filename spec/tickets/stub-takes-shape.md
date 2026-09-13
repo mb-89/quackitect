@@ -89,7 +89,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-stub-takes-shape
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 36d4a566c587
@@ -99,6 +99,17 @@ record:
     hand: box 36d4a566c587 · helper-2
     hash_before: 5e3755404c949ce7591a71c1f119365f9f13db3b
     hash_after: 5e3755404c949ce7591a71c1f119365f9f13db3b
+  - step: implement/tests-red
+    hand: box 36d4a566c587
+    hash_before: fafa539ce386e83bae87a83a4a1687af6a3ea1bd
+    hash_after: fafa539ce386e83bae87a83a4a1687af6a3ea1bd
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 12 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -171,11 +182,21 @@ pass
 
 <!-- the form is command -->
 
+./RUNME.sh branch test
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
+
+Twelve tests fail on their own assertion, and one passes: the stub that lands in the vehicle itself. The skeleton verb refuses everything, so that refusal reads green before the change. The unit tests drive a fake disk, a fake clock and a fake git. The contract test drives the real disk, the real git of this tree and a temp repo with no remote.
+
+### checked
+
+- the change touches the vehicle module, the stub verb, its template, two tests and one chapter. The ask names each.
+- the disk, the clock and git each have a fake under `src/doors/fake`, and the unit test reaches nothing else
+- every new function points at a chapter of the vehicle design output
 
 ## reflect
 
