@@ -156,8 +156,9 @@ call itself new.
 # A standing stop ends it
 
 - Outcome: a stop that stands ends the turn, and nothing from level zero reaches the prompt after it.
-- Close: the call answers "Write the one word Stopped", because the harness asks for text after a tool call.
-- Gate: the turn end still reads the answer, and its findings land in the log at `warn`.
+- Order: the agent writes its answer, calls the stop, and writes only "Ending my turn" after it.
+- Close: the harness asks for text after a tool call, so that one generic line closes the turn.
+- Gate: the turn end reads nothing and writes nothing, because the call already judged the stop.
 
 # The claim rides the call
 

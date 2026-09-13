@@ -1796,14 +1796,18 @@ const DRAFT = "mcp__level0__check_answer";
 
 // [[spec/design_output/level0#the-re-prompt-over-the-ceiling]]
 // [[spec/design_output/stop#a-standing-stop-ends-it]]
-test("a standing stop takes no re-prompt, and the findings land in the log alone", async () => {
+test("a standing stop ends the turn, and the gate reads and writes nothing", async () => {
   const it = await started(BANDED, valeOnAnswer(PAST));
   const said = await stops(it);
-  assert.match(said.result, /^The stop stands\./);
-  await it.raise("turn.complete", { ...answered, answer: "Stopped." });
+  assert.match(said.result, /Write the words Ending my turn, and nothing more\.$/);
+  await it.raise("turn.complete", { ...answered, answer: "Ending my turn." });
 
   assert.equal(it.prompts.length, 0, "nothing reaches the prompt");
-  assert.ok(it.lines().some((one) => one.kind === "answer" && /the gate reads/.test(one.said)));
+  assert.equal(
+    it.lines().some((one) => one.kind === "answer" && /the gate reads/.test(one.said)),
+    false,
+    "no gate line",
+  );
 });
 
 test("an answer over the ceiling meets one re-prompt, and one alone", async () => {
@@ -1923,16 +1927,6 @@ test("a prompt from a machine leaves the count standing", async () => {
 });
 
 // [[spec/design_output/level0#the-owner-answers-by-number]]
-test("a stop with no needs table reads rewrite, and the draft tool names the table", async () => {
-  const it = await started(BANDED, valeOnAnswer([]));
-  await stops(it);
-  await it.raise("turn.complete", { ...answered, answer: CLEAN });
-
-  assert.equal(it.prompts.length, 0, "a standing stop takes no re-prompt");
-  const gate = it.lines().find((one) => one.kind === "answer" && /the gate reads/.test(one.said));
-  assert.equal(gate.said, "the gate reads rewrite");
-});
-
 // [[spec/design_output/level0#the-cap-counts-the-prose]]
 test("the draft tool refuses a draft over the word cap", async () => {
   const capped = { "spec/config/level0.json": JSON.stringify({

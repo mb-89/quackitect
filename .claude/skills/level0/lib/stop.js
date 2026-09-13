@@ -146,7 +146,7 @@ export function stopAnswer(rules, reason, decision) {
     return {
       known,
       ends: true,
-      result: `The stop stands. ${why} Write the one word Stopped, and nothing more.`.replace(/\s+/g, " "),
+      result: `The stop stands. ${why} Write the words Ending my turn, and nothing more.`.replace(/\s+/g, " "),
     };
   }
   return { known, ends: false, result: `The stop falls. ${decision.go?.says ?? ""}`.trim() };

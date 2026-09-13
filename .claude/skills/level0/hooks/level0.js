@@ -774,6 +774,8 @@ export function register(on, _options) {
     const stood = claim;
     claim = null;
     await dropAsk(settings, logbook);
+    // [[spec/design_output/stop#a-standing-stop-ends-it]]
+    if (stood?.ends) return said;
     if (!bin || !e.answer || e.reason !== "answer") return said;
 
     const spoken = String(e.answer ?? "");
@@ -804,8 +806,7 @@ export function register(on, _options) {
     await logbook.say(level, "answer", `the gate reads ${read.band}`, {
       detail: `score=${read.score} findings=${found.length} inARow=${gate.inARow()}`,
     });
-    // [[spec/design_output/stop#a-standing-stop-ends-it]]
-    if (!read.sends || stood?.ends) return said;
+    if (!read.sends) return said;
 
     // [[spec/design_output/level0#the-re-prompt-over-the-ceiling]]
     try {
