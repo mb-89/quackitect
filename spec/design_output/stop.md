@@ -74,9 +74,11 @@ feeds the vote, and the priorities decide the rest:
 
 ## The canary ends turn one
 
-The canary is a formatted line of its own, and turn one carries it. So an
-answer holding the canary reaches the vote with no call beside it. For
-details, see [[spec/design_output/level0#the-canary-owes-a-debt]].
+The canary is a formatted line of its own, and turn one ends on it, last. An
+answer holding the canary reaches the vote with no call beside it. The stop
+call falls in turn one, and its result names the canary as the one way out.
+From turn two on the call ends a turn. For details, see
+[[spec/design_output/level0#the-canary-owes-a-debt]].
 
 ## The off switch takes it
 
