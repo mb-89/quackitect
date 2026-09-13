@@ -201,6 +201,20 @@
         }
       }
     },
+    "work": {
+      "comment": "Level one. The knobs the work verbs read over a group and its tickets.",
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "staleAfter": {
+          "type": "string",
+          "unit": "a span, as 90m, 12h or 3d",
+          "help": "The age of a held group's tip that puts it under yours."
+        }
+      }
+    },
     "engine": {
       "comment": "Level one. Each key here names a widget nothing draws yet, because an engine has to answer it first. Marking a group is what draws one.",
       "type": "object",

@@ -1,4 +1,4 @@
-// The three schemas level one ships, read off disk and driven through the real
+// The two schemas level one ships, read off disk and driven through the real
 // checker. One fixture per refusal, so a nested fault, a bad path and an orphan
 // field each come back with the line they stand on.
 // [[spec/design_output/schema#three-keywords-name-a-step]]
@@ -35,7 +35,6 @@ const schemas = schemasIn(here);
 const data = dataSchemasIn(here);
 const every = allSchemasIn(here);
 const ticket = schemas.get("ticket");
-const group = schemas.get("group");
 const process = data.get("process");
 
 const TICKET = "spec/tickets/a-name.md";
@@ -96,9 +95,8 @@ Nothing yet.
 `;
 
 // [[spec/design_output/schema#a-schema-names-its-chapters]]
-test("the ticket and the group read as note schemas, and the process reads as data", () => {
+test("the ticket reads as a note schema, and the process reads as data", () => {
   assert.ok(ticket, "spec/schemas holds a ticket schema");
-  assert.ok(group, "spec/schemas holds a group schema");
   assert.ok(process, "spec/schemas holds a process schema");
   assert.equal(
     schemas.has("process"),
@@ -113,34 +111,36 @@ test("the ticket and the group read as note schemas, and the process reads as da
 });
 
 // [[spec/design_output/schema#one-home-for-a-shape]]
-test("the route stands in one place, and the group and the process name it", () => {
+test("the route stands in one place, and the process names it", () => {
   const home = ticket.frontmatter.properties.steps;
   assert.ok(
     home.items?.properties?.evidence,
     "the ticket schema holds the route's fields",
   );
-  for (const [kind, said] of [
-    ["group", group.frontmatter.properties.steps],
-    ["process", process.data.properties.steps],
-  ]) {
-    assert.equal(
-      said.$ref,
-      "ticket#/frontmatter/properties/steps",
-      `${kind} names the route the ticket holds`,
-    );
-    assert.deepEqual(
-      Object.keys(refOf(said.$ref, null, every).items.properties).sort(),
-      Object.keys(home.items.properties).sort(),
-      `${kind} reads the same fields`,
-    );
-  }
+  const said = process.data.properties.steps;
+  assert.equal(
+    said.$ref,
+    "ticket#/frontmatter/properties/steps",
+    "the process names the route the ticket holds",
+  );
+  assert.deepEqual(
+    Object.keys(refOf(said.$ref, null, every).items.properties).sort(),
+    Object.keys(home.items.properties).sort(),
+    "the process reads the same fields",
+  );
+});
+
+// [[spec/design_output/work#a-group-is-a-ticket]]
+test("no schema names a group kind, because a group is a ticket", () => {
+  assert.equal(schemas.has("group"), false, "spec/schemas holds no group schema");
+  assert.equal(data.has("group"), false, "no data schema names a group either");
+  assert.equal(governorOf(schemas, "spec/groups/a-name.md"), null);
 });
 
 // [[spec/design_output/schema#a-folder-names-its-kind]]
 test("both ticket folders stand under one schema, and the private one travels nowhere", () => {
   assert.equal(governorOf(schemas, TICKET)?.kind, "ticket");
   assert.equal(governorOf(schemas, ".se/tickets/a-name.md")?.kind, "ticket");
-  assert.equal(governorOf(schemas, "spec/groups/a-name.md")?.kind, "group");
   assert.equal(governorOf(data, "spec/processes/standard.yaml")?.kind, "process");
 });
 
@@ -148,10 +148,6 @@ test("both ticket folders stand under one schema, and the private one travels no
 test("mint writes a ticket the checker passes, in either folder", () => {
   assert.deepEqual(weighed(good), []);
   assert.deepEqual(weighed(good, ".se/tickets/a-name.md"), []);
-  assert.deepEqual(
-    checkNote(mintNote(group), group, "spec/groups/a-name.md", every),
-    [],
-  );
 });
 
 // [[spec/design_output/schema#the-checker-walks-every-key]]

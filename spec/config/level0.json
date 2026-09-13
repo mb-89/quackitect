@@ -6,6 +6,10 @@
     "mostInARow": 3,
     "hold": "running"
   },
+  "work": {
+    "comment": "The knobs the work verbs read. staleAfter is the age of a held group's tip that puts the group under yours, with release, take and close as the three answers.",
+    "staleAfter": "12h"
+  },
   "engine": {
     "comment": "The engine level one brings. binding says what the agent answers to: the queue it takes work from, unbound, or god mode, which five presses reach and which draws a pulse while it stands.",
     "binding": "queue"
