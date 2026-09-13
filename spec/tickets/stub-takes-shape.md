@@ -89,7 +89,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-stub-takes-shape
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 36d4a566c587
@@ -110,6 +110,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 36d4a566c587
+    hash_before: 627070e430f1f21a6c8681bd6df95dae5c3bab1b
+    hash_after: 627070e430f1f21a6c8681bd6df95dae5c3bab1b
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -121,9 +129,10 @@ A bare folder becomes a project the method drives, with nothing copied in, in on
 The button has nothing to run, and a project starts by hand from a copy of this tree.
 
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
-- ./RUNME.sh stub into <folder> writes project/spec/tickets, project/spec/guidance, project/src, vehicle.json, RUNME.sh, .claude/settings.json and .claude/skills/bridgehead
-- vehicle.json carries the vehicle's identity, its brand and its upstream repo, read off the register and git remote get-url origin, and the verb refuses a vehicle with no remote unless --upstream names one
-- a contract test produces a stub into a temp folder and reads every file back, and the stub holds no file of the method
+- `./RUNME.sh stub into <folder>` writes the project folders, the record, the shim, the settings and the bridgehead
+- `vehicle.json` carries the vehicle's identity, its brand and its upstream repo, read off the register and `git remote get-url origin`
+- the verb refuses a vehicle with no remote unless `--upstream` names one
+- a contract test produces a stub into a temp folder and reads every file back. The stub holds no file of the method.
 - spec/design_output/vehicle.md carries a chapter on the stub and its files
 
 Read [[spec/design_input/a-stub-takes-its-vehicle]] first, the chapters The stub's files and The bridgehead step by step.
@@ -218,6 +227,15 @@ Twelve tests fail on their own assertion, and one passes: the stub that lands in
 
 <!-- the form is command -->
 
+./RUNME.sh lint .
+
+### checked
+
+- the change touches the vehicle module, the verb, its template, two tests and the vehicle chapter
+- the verb reaches disk, the clock and git through their doors. The unit test hands in the fake of each.
+- the bridgehead runs in the client, where the engine interface is its door. The import group proves it.
+- every new function points at a chapter of the vehicle design output
+
 ## tests-green
 
 <!-- makes the tests pass -->
@@ -258,4 +276,4 @@ Twelve tests fail on their own assertion, and one passes: the stub that lands in
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+The judge refused the draft four times on text the write door takes, and named no rule. The draft went in through the shell hand-back, and a private note carries the doubt to the retro.

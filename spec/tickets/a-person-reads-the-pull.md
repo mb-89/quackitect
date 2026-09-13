@@ -67,4 +67,4 @@ A person reads the pull as the owner meets it in a live session: the take, the h
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+Nothing stands here yet.

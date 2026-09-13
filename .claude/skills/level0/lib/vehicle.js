@@ -101,23 +101,32 @@ export const SETTINGS = ".claude/settings.json";
 export const KEEP = ".gitkeep";
 export const STUB_FOLDERS = ["project/spec/tickets", "project/spec/guidance", "project/src"];
 
-export function brandOf(_method) {
-  return "";
+export function brandOf(method) {
+  const parts = slashed(method).replace(/\/+$/, "").split("/");
+  return parts[parts.length - 1] ?? "";
 }
 
-export function upstreamOf(_remote, _named) {
-  return "";
+export function upstreamOf(remote, named) {
+  return String(named ?? "").trim() || String(remote ?? "").trim();
 }
 
 // [[spec/design_output/vehicle#the-record-names-the-vehicle]]
-export function linkOf(_id, _name, _upstream, _version, _at) {
-  return {};
+export function linkOf(id, name, upstream, version, at) {
+  return {
+    vehicle: String(id),
+    name: String(name),
+    upstream: String(upstream),
+    version: String(version),
+    made: String(at),
+  };
 }
 
-export function settingsOf(_read) {
-  return {};
+export function settingsOf(read) {
+  const held = parsed(read);
+  if (!held || typeof held !== "object" || Array.isArray(held)) return {};
+  return Object.fromEntries(Object.entries(held).filter(([key]) => !key.startsWith("$")));
 }
 
-export function stubFiles(_template) {
-  return [];
+export function stubFiles(template) {
+  return [...STUB_FOLDERS.map((one) => `${one}/${KEEP}`), LINK, SETTINGS, ...(template ?? [])];
 }

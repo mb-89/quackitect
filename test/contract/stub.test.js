@@ -100,3 +100,31 @@ test("a vehicle with no remote refuses, and the folder stands as it was", () => 
     files.remove(where);
   }
 });
+
+test("the command line writes a stub where it says, and refuses with no folder", () => {
+  const where = files.tempDir("stub-");
+  const dest = join(where, "stub");
+  const env = { SE_INSTALL_SKIP: "index se-lsp editor-client" };
+  try {
+    const bare = outside.run([process.execPath, "src/scripts/cli.js", "stub"], { cwd: root, env });
+    assert.equal(bare.exitCode, 2, "no folder, no stub");
+    assert.match(bare.stderr, /stub into/);
+
+    const said = outside.run([process.execPath, "src/scripts/cli.js", "stub", "into", dest], {
+      cwd: root,
+      env,
+    });
+    assert.equal(said.exitCode, 0, said.stderr);
+    assert.match(said.stdout, /file\(s\) written/);
+    assert.ok(files.exists(join(dest, "vehicle.json")), "the record stands where the verb says");
+
+    const named = outside.run(
+      [process.execPath, "src/scripts/cli.js", "stub", "into", `${dest}2`, "--upstream", "https://host/c/d.git"],
+      { cwd: root, env },
+    );
+    assert.equal(named.exitCode, 0, named.stderr);
+    assert.equal(JSON.parse(files.read(join(`${dest}2`, "vehicle.json"))).upstream, "https://host/c/d.git");
+  } finally {
+    files.remove(where);
+  }
+});

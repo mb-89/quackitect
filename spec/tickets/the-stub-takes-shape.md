@@ -83,7 +83,7 @@ step: sync
 
 # Ask
 
-One verb writes a stub: ./RUNME.sh stub into <folder> lays down the project folders, vehicle.json, the RUNME shim, the cage's settings and the bridgehead plugin folder.
+One verb writes a stub: `./RUNME.sh stub into <folder>` lays down the project folders, `vehicle.json`, the RUNME shim, the cage's settings and the bridgehead plugin folder.
 
 The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group, its proof and what it waits for. The funnel [[spec/funnel/a-button-makes-a-vehicle]] carries the owner's ask.
 
@@ -179,4 +179,4 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+The one child carries the verb, its proof and the chapter. The shim's register road and the bridgehead's import each belong to a group of their own, which the design input names.

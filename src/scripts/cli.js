@@ -70,6 +70,7 @@ import {
   readRegister,
   rootsHere,
 } from "./vehicle.js";
+import { stubInto } from "./stub.js";
 import { HOOKS } from "./precommit.js";
 import { graphIn } from "./graph.js";
 import { withRoute } from "./process.js";
@@ -246,6 +247,10 @@ const verbs = {
     says: "this copy, the project it drives, and a copy made elsewhere",
     run: async () => theVehicle(rest),
   },
+  stub: {
+    says: "a bare project this vehicle drives: into <folder> [--upstream <url>]",
+    run: async () => theStub(rest),
+  },
   notes: {
     says: "the notes the words belong to, ranked by name and body",
     run: async () => asksIndex(["notes", ...rest]),
@@ -319,6 +324,29 @@ function theVehicle(argv) {
   for (const one of readRegister(files, env)) {
     console.log(`  ${one.id}  ${one.version}  ${one.method_root}`);
   }
+  return 0;
+}
+
+// [[spec/design_output/vehicle#a-stub-takes-its-vehicle]]
+function theStub(argv) {
+  const flag = argv.indexOf("--upstream");
+  const upstream = flag >= 0 ? (argv[flag + 1] ?? "") : "";
+  const plain = flag < 0 ? argv : argv.filter((_one, i) => i !== flag && i !== flag + 1);
+  const dest = plain[1];
+  if (plain[0] !== "into" || !dest) {
+    console.error("se stub into <folder> [--upstream <url>]: say where the stub lands.");
+    return 2;
+  }
+  const pair = rootsHere(files, process.env, root);
+  const put = stubInto(files, git(outside, pair.method), it.clock, pair.method, atRoot(dest), {
+    upstream,
+  });
+  if (!put.ok) {
+    console.error(put.why);
+    return 1;
+  }
+  console.log(`${put.files.length} file(s) written into ${dest}.`);
+  console.log("Its shim and its bridgehead find the vehicle through SE_VEHICLE, or where a cloud box clones it.");
   return 0;
 }
 

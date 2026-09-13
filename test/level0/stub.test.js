@@ -16,6 +16,7 @@ import {
   upstreamOf,
 } from "../../.claude/skills/level0/lib/vehicle.js";
 import { stubInto } from "../../src/scripts/stub.js";
+import { roadsOf } from "../../src/stub/.claude/skills/bridgehead/hooks/bridgehead.js";
 
 const MARKER = ".claude/skills/level0/.claude-plugin/plugin.json";
 const BRIDGEHEAD = ".claude/skills/bridgehead";
@@ -145,4 +146,16 @@ test("a stub lands in the vehicle nowhere", () => {
   const said = stubInto(files, origin("git@host:a/b.git"), fakeClock(), "/tools", "/tools");
   assert.equal(said.ok, false);
   assert.equal(files.exists("/tools/vehicle.json"), false);
+});
+
+test("the bridgehead takes SE_VEHICLE first, then the folder a cloud box clones into", () => {
+  const link = { name: "acme" };
+  assert.deepEqual(roadsOf(link, { vehicle: "/desk/acme", home: "/home/agent" }), [
+    "/desk/acme",
+    "/home/agent/.se/vehicles/acme",
+  ]);
+  assert.deepEqual(roadsOf(link, { vehicle: "", home: "/home/agent" }), [
+    "/home/agent/.se/vehicles/acme",
+  ]);
+  assert.deepEqual(roadsOf({}, { home: "/home/agent" }), [], "no name, no cloned road");
 });
