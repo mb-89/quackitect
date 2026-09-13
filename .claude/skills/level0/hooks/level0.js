@@ -671,7 +671,7 @@ export function register(on, _options) {
       ran: (name) => ranHere(name, off, hold),
     });
     const said = stopAnswer(rules, reason, decision);
-    if (said.known) claim = { reason, next: String(e.next ?? "") };
+    if (said.known) claim = { reason, next: String(e.next ?? ""), ends: said.ends };
     await logbook.say(said.known ? "info" : "warn", "stop", stopSaid(said, reason), {
       detail: detail(decision, tooth.inARow()),
     });
@@ -792,6 +792,8 @@ export function register(on, _options) {
     const stood = claim;
     claim = null;
     await dropAsk(settings, logbook);
+    // [[spec/design_output/stop#a-standing-stop-ends-it]]
+    if (stood?.ends) return said;
     if (!bin || !e.answer || e.reason !== "answer") return said;
 
     const spoken = String(e.answer ?? "");

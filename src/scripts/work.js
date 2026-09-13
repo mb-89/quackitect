@@ -27,7 +27,7 @@ import {
   TICKETS,
   withEntry,
   withField,
-  withGave,
+  withHashAfter,
   withoutField,
 } from "./group.js";
 import { review } from "./review.js";
@@ -515,9 +515,9 @@ function claimGroup(it, one) {
   const path = it.join(it.root, at);
   const was = it.disk.read(path);
   const hand = handOf(it);
-  const took = it.git.run(["rev-parse", "HEAD"], true).out;
+  const before = it.git.run(["rev-parse", "HEAD"], true).out;
 
-  it.disk.write(path, withEntry(was, { step: stepOf(was), hand, took }));
+  it.disk.write(path, withEntry(was, { step: stepOf(was), hand, hash_before: before }));
   it.git.run(["add", at], true);
   it.git.run(["commit", "-m", `${one.branch}: ${hand} takes it`], true);
   if (!it.git.run(["push", "origin", one.branch]).ok) {
@@ -621,12 +621,12 @@ function ready(it, branch) {
 // [[spec/design_output/work#a-box-leaves]]
 function leaves(it, branch, at, path, says) {
   const name = branch.replace(/^work\//, "");
-  const gave = it.git.run(["rev-parse", "HEAD"], true).out;
+  const after = it.git.run(["rev-parse", "HEAD"], true).out;
   const open = childrenHere(it, name).filter(
     (one) => fieldOf(one.text, "state") !== CLOSED,
   );
 
-  let now = withGave(it.disk.read(path), gave);
+  let now = withHashAfter(it.disk.read(path), after);
   // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]] takes the tag off.
   if (!open.length) {
     now = withoutField(withField(withField(now, "state", CLOSED), "reason", DONE), PARKED);
@@ -636,7 +636,7 @@ function leaves(it, branch, at, path, says) {
   it.git.run(["commit", "-m", `${branch}: the box leaves`], true);
   if (!it.git.run(["push", "origin", branch]).ok) return 1;
 
-  console.log(`${branch} carries ${gave.slice(0, 8)}, and ${says}.`);
+  console.log(`${branch} carries ${after.slice(0, 8)}, and ${says}.`);
   if (open.length) {
     console.log(`${name} stays ${OPEN}, because ${open.length} ticket(s) stand open:`);
     for (const one of open) console.log(`  ${one.name}`);
@@ -707,7 +707,7 @@ function letGo(it, branch, name, here) {
     return 0;
   }
 
-  it.disk.write(path, withGave(it.disk.read(path), it.git.run(["rev-parse", "HEAD"], true).out));
+  it.disk.write(path, withHashAfter(it.disk.read(path), it.git.run(["rev-parse", "HEAD"], true).out));
   it.git.run(["add", at], true);
   it.git.run(["commit", "-m", `${branch}: ${held.hand} lets it go`], true);
   if (!it.git.run(["push", "origin", branch]).ok) return 1;

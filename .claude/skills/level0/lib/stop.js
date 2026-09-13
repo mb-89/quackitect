@@ -143,7 +143,11 @@ export function stopAnswer(rules, reason, decision) {
   }
   if (decision.ends) {
     const why = decision.stop?.says ?? "";
-    return { known, ends: true, result: `The stop stands. ${why} Write nothing more.`.replace(/\s+/g, " ") };
+    return {
+      known,
+      ends: true,
+      result: `The stop stands. ${why} Write the words Ending my turn, and nothing more.`.replace(/\s+/g, " "),
+    };
   }
   return { known, ends: false, result: `The stop falls. ${decision.go?.says ?? ""}`.trim() };
 }

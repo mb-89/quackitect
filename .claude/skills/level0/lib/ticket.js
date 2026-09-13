@@ -48,8 +48,8 @@ function leafRow(one) {
     return `The pull skips this leaf, because ${one.why ?? "its condition fails to hold"}.`;
   }
   const parts = [`The hand is \`${one.hand ?? "nobody"}\``];
-  if (one.took || one.gave) {
-    parts.push(`the branch runs \`${one.took ?? ""}\` to \`${one.gave ?? ""}\``);
+  if (one.hash_before || one.hash_after) {
+    parts.push(`the branch runs \`${one.hash_before ?? ""}\` to \`${one.hash_after ?? ""}\``);
   }
   parts.push(`this leaf returns ${one.returns ?? 0}`);
   return `${parts.join(", and ")}.`;

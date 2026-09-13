@@ -578,7 +578,7 @@ moves and one relation says where work lands.
     record:
       children:
         hand: box 3f9a · session 12
-        took: a1b2c3
+        hash_before: a1b2c3
     ---
 
     # Ask
@@ -599,14 +599,14 @@ into the group goes to work before the retro's last leaf.
 
 | rule | what it says |
 |---|---|
-| the branch is the claim | the take writes the hand and `took` into the group's record under `children` and pushes, and the push arbitrates two boxes |
-| held derives | a group holds where its newest record entry carries `took` and no `gave`, and `branch list` reads it so |
+| the branch is the claim | the take writes the hand and `hash_before` into the group's record under `children` and pushes, and the push arbitrates two boxes |
+| held derives | a group holds where its newest record entry carries `hash_before` and no `hash_after`, and `branch list` reads it so |
 | a stale group is yours | a held group whose tip is older than `work.staleAfter` stands under yours with three answers, and `release`, `take` and `close` are the verbs |
 | one box, one group | a box works one group at a time, and the group's children one at a time |
 | the branch is the filter | on a group's branch the pull sees that group alone, and widens nothing |
 | trunk hands out no group's child | on trunk the pull offers a box a group to take, and a person the tickets of no group |
 | the branch holds the truth | while the branch stands, its copy of the group and of its children is the record |
-| a box leaves | when the group's last leaf passes, it writes `gave`, closes the group as `done` where every child stands closed, and leaves it open otherwise |
+| a box leaves | when the group's last leaf passes, it writes `hash_after`, closes the group as `done` where every child stands closed, and leaves it open otherwise |
 | a group returns | an open group nobody holds comes back to the beat once a person answers on its branch |
 | the merge is a desk's | `branch merge` runs on a box off the cloud, an agent's or a person's, since a cloud box pushes no trunk, and `branch close` drops the branch |
 | the merge lands the truth | `branch merge` runs the check on the merge commit and undoes it on red. It refuses where trunk's copy of the group or of a child differs from the branch point, and names the lines |
