@@ -39,7 +39,7 @@ On a desk:
 |---|---|---|
 | 1 | `session.start` reads `vehicle.json` | a fixture stub with a fake register answers the vehicle's path |
 | 2 | asks the register for the vehicle's method root | the register test that stands, over a stub |
-| 3 | imports the vehicle's hooks module from that root, and registers its hooks under its own | a probe session in a stub answers the canary with the vehicle's numbers |
+| 3 | imports the copy of the vehicle's hooks inside its own folder | a probe session in a stub answers the canary through the bridgehead |
 | 4 | every later event reaches the vehicle's hook with the work root set to the stub | the write door refuses a bad write in the stub, and the ticket verbs read the stub's tickets |
 
 On a cloud box:
@@ -52,7 +52,7 @@ On a cloud box:
 | 8 | the vehicle registers itself and attaches to the stub | `.se/project.json` in the stub names the vehicle, and step 3 follows |
 | 9 | the routine's first session ends on the install, and the cage holds the second | a routine run against a stub repo, read off its log |
 
-Step 3 stands unproven: a hook that imports a module from outside its plugin at runtime. The validator refuses a static import past the plugin root, and a dynamic one stands untried. That probe comes first, because every branch below leans on its answer.
+The bridgehead carries a copy of the vehicle's hooks and lib. The client loads a hooks module from inside the plugin's folder alone, and an update refreshes the copy. For details, see [[spec/design_output/level0#a-bridgehead-imports-a-copy]].
 
 # The branches
 

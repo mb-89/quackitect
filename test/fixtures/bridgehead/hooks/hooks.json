@@ -1,0 +1,4 @@
+{
+  "description": "The bridgehead, as one module. It imports the vehicle's hooks module at session.start and forwards every event to it.",
+  "modules": ["./bridgehead.js"]
+}
