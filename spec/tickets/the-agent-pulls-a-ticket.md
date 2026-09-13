@@ -120,7 +120,13 @@ record:
     hand: box d49afdfe301a64
     hash_before: 34cc24a5ae7f53e16687311770728e5c0bdb239b
     hash_after: 34cc24a5ae7f53e16687311770728e5c0bdb239b
-step: children
+  - step: retro/write
+    hand: box d49afdfe301a64
+    hash_before: ccbdd6391427a70e1af8ea063f3a9bdd5e5ca3f0
+    hash_after: ccbdd6391427a70e1af8ea063f3a9bdd5e5ca3f0
+    returns: 1
+    why: the hand takes it back
+step: retro/write
 ---
 
 # Ask
