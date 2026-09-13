@@ -94,7 +94,15 @@ record:
     hand: box b71bba5a7b0c
     skipped: true
     why: the box leaves it while step-changes-hands stand open
-step: retro/notes
+  - step: retro/notes
+    hand: box b71bba5a7b0c
+    hash_before: 5a185b5a34d533dffe0d042e055ad00cd3ff3404
+    hash_after: 5a185b5a34d533dffe0d042e055ad00cd3ff3404
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+step: retro/write
 ---
 
 # Ask
@@ -143,6 +151,8 @@ The pull learns who holds a step. The group holds one child, [[spec/tickets/step
 <!-- retro notes, which passes when the private folder is empty -->
 
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
@@ -203,3 +213,5 @@ The pull learns who holds a step. The group holds one child, [[spec/tickets/step
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The judge refuses the one-line command under retro/notes against the working rules, twice in a row, and those rules govern a session's conduct and read nothing in a command. The hand-back takes the shell road there, which the design names as a person's road, and the judge reads it at the next agent pull.
