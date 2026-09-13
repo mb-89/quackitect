@@ -18,12 +18,15 @@ import {
   mintNote,
   mintSpec,
   placeholderFaults,
+  processHash,
   readNote,
   readYaml,
+  reRouted,
   refusedKind,
   schemaFaults,
   schemasIn,
   SEVERITY,
+  slotFaults,
   strangerFault,
 } from "../../.claude/skills/level0/lib/schema.js";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
@@ -610,6 +613,7 @@ frontmatter:
       default:
         - name: do
           does: makes the change
+          to: retro
           evidence:
             - name: change
               form: text
@@ -639,6 +643,15 @@ frontmatter:
             type: string
             x-earlier: steps
             description: the earlier step a failure sends this to
+          input:
+            type: [array, string]
+            x-earlier: steps
+            x-fields: evidence
+            x-words: [ask, diff]
+            description: what this step reads
+          to:
+            type: string
+            description: who takes the output
           evidence:
             type: array
             description: the fields this leaf's hand fills
@@ -882,4 +895,219 @@ test("the sweep reads a yaml file under a data schema", () => {
     out.map((one) => one.rule),
     ["Schema.steps", "Schema.about"],
   );
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#the-route]]
+const slotted = (steps) => slotFaults(readYaml(steps), "spec/processes/one.yaml");
+
+test("an output nothing reads is refused, and it names the field", () => {
+  const found = slotted(`
+steps:
+  - name: do
+    does: makes it
+    evidence:
+      - name: says
+        form: text
+        says: what you change
+`);
+  assert.equal(found.length, 1);
+  assert.equal(found[0].rule, "Schema.Output");
+  assert.match(found[0].message, /do writes says, and nothing reads it/);
+});
+
+test("an input nothing supplies is refused, and it names the token", () => {
+  const found = slotted(`
+steps:
+  - name: do
+    does: makes it
+    input: nowhere
+    to: retro
+`);
+  assert.equal(found.length, 1);
+  assert.equal(found[0].rule, "Schema.Input");
+  assert.match(found[0].message, /do reads nowhere/);
+});
+
+test("a route carrying both takes both findings", () => {
+  const found = slotted(`
+steps:
+  - name: do
+    does: makes it
+    input: later
+    evidence:
+      - name: says
+        form: text
+        says: what you change
+  - name: later
+    does: reads it
+    to: retro
+`);
+  assert.deepEqual(
+    found.map((one) => one.rule).sort(),
+    ["Schema.Input", "Schema.Output"],
+  );
+});
+
+test("a later step reading it, a to, or an engine form answers the output", () => {
+  assert.deepEqual(
+    slotted(`
+steps:
+  - name: first
+    does: writes it
+    evidence:
+      - name: says
+        form: text
+        says: what you change
+      - name: ran
+        form: command
+        expects: 0
+        says: the check is green
+  - name: second
+    does: reads it
+    input: says
+    to: retro
+`),
+    [],
+  );
+});
+
+test("an input reads ask, diff, an earlier step, or an earlier field", () => {
+  assert.deepEqual(
+    slotted(`
+steps:
+  - name: first
+    does: writes it
+    evidence:
+      - name: approach
+        form: text
+        says: the approach
+  - name: second
+    does: reads it
+    input: [ask, diff, first, approach]
+    to: retro
+`),
+    [],
+  );
+});
+
+test("a finding names the line the slot stands on", () => {
+  const text = "steps:\n  - name: do\n    does: makes it\n    input: nowhere\n    to: retro\n";
+  const lines = new Map();
+  const said = readYaml(text, lines);
+  const found = slotFaults(said, "spec/processes/one.yaml", Object.fromEntries(lines));
+  assert.equal(found[0].line, 4);
+});
+
+test("a note carrying no route answers no slot finding", () => {
+  assert.deepEqual(slotFaults({}, "spec/processes/one.yaml"), []);
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
+const PROCESS_FILE = `
+# A comment stands here.
+for: a fix small enough that the ask is the design
+ask:
+  - name: gain
+    form: text
+    says: what is gained
+steps:
+  - name: do
+    does: makes it
+    to: retro
+`;
+
+test("a comment in a process file moves no hash", () => {
+  const more = PROCESS_FILE.replace(
+    "# A comment stands here.",
+    "# Another comment, longer.\n# And a second line.",
+  );
+  assert.equal(processHash(more), processHash(PROCESS_FILE));
+});
+
+test("a reordered key in a process file moves no hash", () => {
+  const swapped = PROCESS_FILE.replace(
+    "  - name: do\n    does: makes it\n",
+    "  - does: makes it\n    name: do\n",
+  );
+  assert.equal(processHash(swapped), processHash(PROCESS_FILE));
+});
+
+test("a changed step moves the hash", () => {
+  const changed = PROCESS_FILE.replace("does: makes it", "does: makes it, with a test");
+  assert.notEqual(processHash(changed), processHash(PROCESS_FILE));
+});
+
+test("a reordered step moves the hash, because the order is the route", () => {
+  const two = `${PROCESS_FILE}  - name: check\n    does: reads it\n    to: retro\n`;
+  const back = `
+for: a fix small enough that the ask is the design
+ask:
+  - name: gain
+    form: text
+    says: what is gained
+steps:
+  - name: check
+    does: reads it
+    to: retro
+  - name: do
+    does: makes it
+    to: retro
+`;
+  assert.notEqual(processHash(two), processHash(back));
+});
+
+test("the hash reads the route and the ask, and nothing else the file holds", () => {
+  const said = PROCESS_FILE.replace(
+    "for: a fix small enough that the ask is the design",
+    "for: something else entirely",
+  );
+  assert.equal(processHash(said), processHash(PROCESS_FILE));
+});
+
+test("a route reads as a hash of its own, whichever way it arrives", () => {
+  assert.equal(processHash(readYaml(PROCESS_FILE)), processHash(PROCESS_FILE));
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
+test("a reroute keeps what a standing chapter holds, and writes the new one", () => {
+  const was = `---
+kind: [[routed]]
+step: design/review
+steps:
+  - name: design
+    steps:
+      - name: draft
+        does: writes the design
+      - name: review
+        does: reads the design
+---
+
+# Ask
+
+What it asks for.
+
+# design
+
+## draft
+
+The approach stands here.
+
+## review
+
+<!-- reads the design -->
+`;
+  const now = reRouted(was, ROUTED, [
+    {
+      name: "design",
+      steps: [
+        { name: "draft", does: "writes the design" },
+        { name: "review", does: "reads the design" },
+      ],
+    },
+    { name: "ship", does: "ships it" },
+  ]);
+  assert.match(now, /The approach stands here\./);
+  assert.match(now, /^# ship$/m);
+  assert.match(now, /<!-- ships it -->/);
+  assert.deepEqual(routed(now), []);
 });

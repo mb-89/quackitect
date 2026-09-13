@@ -83,7 +83,7 @@ reader:
 | `step` | the pull, as the row of the route the ticket stands on |
 | `steps` | the pull, the checks and the board |
 | `process` | the board and the retro, as the route the mint copies from |
-| `process_hash` | `work reroute` and the board, which flag a route older than its process |
+| `process_hash` | `ticket update` and the board, which flag a route older than its process |
 | `record` | the render, the checks and the retro, as the engine's entry per leaf handed back |
 | `group` | the pull, as the group this ticket lands in, and the branch where that group is the outermost |
 | `depends_on` | the pull, which holds a ticket until they close |
@@ -463,7 +463,7 @@ Each stands under `process.schema.yaml` and holds the ask's fields under
 
 A note is the smallest ticket, and it is where most work starts. A hand that
 meets an idea, a bug or a doubt mid-work writes a note and carries on. Its
-hold stays where it is. `work note` takes a name and a line, writes `from`
+hold stays where it is. `ticket note` takes a name and a line, writes `from`
 off the hold as the ticket and step in hand, and answers at once. The note is
 private and stays on the box. Its ask is one field, `line`, and the field's
 `says` carries three hints and nothing else:
@@ -486,7 +486,7 @@ A note also answers. The answer door holds every tool call until the owner's
 prompt has an answer. A prompt that says "make a note of this" wants one thing
 back: the note. So three things happen at once:
 
-- `work note` writes a `note` line to the log
+- `ticket note` writes a `note` line to the log
 - the answer door reads that line off the log, and counts it where the prompt names a note
 - the viewer draws it pink, right under the prompt
 
@@ -504,7 +504,7 @@ The mint takes `--process <name>`, copies the route, and writes the process
 file's hash beside it. So the ticket depends on nothing outside itself after
 that. A process file changes without reaching a ticket in flight, which is the
 frozen window v3 rules for an iteration. A fix to a process reaches a ticket
-through `work reroute`, which copies the current route over the leaves the
+through `ticket update`, which copies the current route over the leaves the
 ticket has yet to reach. It refuses where `step` names a leaf the new route
 lacks, and the board flags a ticket whose hash trails its process. A person
 can edit a route on a ticket by hand, and a machine at level two can write one

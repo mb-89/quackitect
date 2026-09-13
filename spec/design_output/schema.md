@@ -386,7 +386,7 @@ it stands refused. Four carry it on a ticket:
 |---|---|
 | `state` | the mint, the pull at every hand-off, and a person |
 | `step` | the pull, as the row of the route the ticket stands on |
-| `steps` | the mint, `work reroute`, and a person |
+| `steps` | the mint, `ticket update`, and a person |
 | `record` | the pull, at the hand-back |
 
 `verbFaults` compares the old value against the new one, so a write leaving a
