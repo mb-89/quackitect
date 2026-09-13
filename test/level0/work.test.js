@@ -13,6 +13,7 @@ import { fakeLog } from "../../src/doors/fake/log.js";
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import {
   BRIEF,
+  changedIn,
   CONTRACT_HEADING,
   DONE,
   dependsOn,
@@ -304,6 +305,88 @@ test("take stops on a tree carrying uncommitted work", () => {
   const { it, outside } = doorsSaying({
     "git status --porcelain": { stdout: " M a.md" },
   });
+
+  const { code, said } = heard(() => work(ROOT, ["take"], it));
+
+  assert.equal(code, 2);
+  assert.match(said, /uncommitted changes/);
+  assert.deepEqual(ranGit(outside), ["git status --porcelain"]);
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+const parked = `---\nkind: [[ticket]]\nstate: open\nurgency: whenever\ntodo: true\n---\n\n# Ask\n\nLook at the lint.\n\n# Discussion\n\nNothing yet.\n`;
+const PARKED_AT = join(ROOT, "spec", "tickets", "slow-lint.md");
+
+// [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+test("a porcelain row names its file, with the status gone and a rename at its end", () => {
+  assert.equal(changedIn(" M spec/tickets/slow-lint.md"), "spec/tickets/slow-lint.md");
+  assert.equal(changedIn("M spec/tickets/slow-lint.md"), "spec/tickets/slow-lint.md");
+  assert.equal(changedIn("?? .se/tickets/slow-lint.md"), ".se/tickets/slow-lint.md");
+  assert.equal(changedIn("R  old.md -> new.md"), "new.md");
+  assert.equal(changedIn('A  "spec/one two.md"'), "spec/one two.md");
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+test("the uncommitted check looks past a tagged ticket, and take carries on", () => {
+  const brief = "---\nstatus: todo\n---\n\n# Do the thing\n";
+  const { it, outside } = doorsSaying(
+    {
+      "git status --porcelain": { stdout: " M spec/tickets/slow-lint.md" },
+      "git ls-remote --heads origin work/*": {
+        stdout: "aaa\trefs/heads/work/one\n",
+      },
+      "git show origin/work/one:HANDOVER.md": { stdout: brief },
+      "git rev-parse --abbrev-ref HEAD": { stdout: "work/one\n" },
+      "git rev-list --count HEAD..origin/main": { stdout: "0\n" },
+    },
+    { [HERE]: brief, [PARKED_AT]: parked },
+  );
+
+  const { code, said } = heard(() => work(ROOT, ["take"], it));
+
+  assert.equal(code, 0);
+  assert.doesNotMatch(said, /uncommitted changes/);
+  assert.ok(ranGit(outside).includes("git switch work/one"));
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+test("take puts every tagged file back, so the reset leaves the tag standing", () => {
+  const brief = "---\nstatus: todo\n---\n\n# Do the thing\n";
+  const { it, outside, disk } = doorsSaying(
+    {
+      "git status --porcelain": { stdout: " M spec/tickets/slow-lint.md" },
+      "git ls-remote --heads origin work/*": {
+        stdout: "aaa\trefs/heads/work/one\n",
+      },
+      "git show origin/work/one:HANDOVER.md": { stdout: brief },
+      "git rev-parse --abbrev-ref HEAD": { stdout: "work/one\n" },
+      "git rev-list --count HEAD..origin/main": { stdout: "0\n" },
+    },
+    { [HERE]: brief, [PARKED_AT]: parked },
+  );
+
+  heard(() => work(ROOT, ["take"], it));
+
+  const ran = ranGit(outside);
+  assert.ok(ran.includes("git checkout -- spec/tickets/slow-lint.md"));
+  assert.ok(
+    ran.indexOf("git checkout -- spec/tickets/slow-lint.md") <
+      ran.indexOf("git reset --hard origin/work/one"),
+    "the save stands before the reset",
+  );
+  assert.equal(disk.read(PARKED_AT), parked, "the tag comes back after the reset");
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+test("an untagged change still stops a take, and the tagged one beside it changes nothing", () => {
+  const { it, outside } = doorsSaying(
+    {
+      "git status --porcelain": {
+        stdout: " M spec/tickets/slow-lint.md\n M src/scripts/work.js",
+      },
+    },
+    { [PARKED_AT]: parked },
+  );
 
   const { code, said } = heard(() => work(ROOT, ["take"], it));
 

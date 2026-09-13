@@ -49,6 +49,10 @@ frontmatter:
       enum: [now, soon, whenever]
       description: which ticket the pull hands out first
 
+    todo:
+      type: boolean
+      description: whether a hand parks this note here, and a note lacking it reads false
+
     step:
       type: string
       x-names: steps

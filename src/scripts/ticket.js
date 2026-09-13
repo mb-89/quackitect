@@ -12,6 +12,8 @@ import {
   reRouted,
   schemasFrom,
 } from "../../.claude/skills/level0/lib/schema.js";
+import { TODO } from "../../.claude/skills/level0/lib/todo.js";
+import { fieldOf, GROUP, withField, withoutField } from "./group.js";
 import { askRows, processAt } from "./process.js";
 
 export const NOTES = ".se/tickets";
@@ -24,7 +26,7 @@ export function ticket(root, argv, doors) {
   const it = { root, ...doors };
   const what = argv[0];
   const name = argv[1];
-  const doing = { note, update };
+  const doing = { note, update, todo };
   if (!doing[what]) {
     console.log("Usage: ./RUNME.sh ticket <verb>\n");
     console.log(
@@ -33,6 +35,9 @@ export function ticket(root, argv, doors) {
     console.log(
       "  update <ticket>     copy the ticket's process onto the steps it has yet to reach",
     );
+    console.log(
+      "  todo <ticket>       park it for the next pull, and --off takes the tag away",
+    );
     return what ? 2 : 0;
   }
   return doing[what](it, name, argv);
@@ -40,7 +45,12 @@ export function ticket(root, argv, doors) {
 
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 function note(it, name, argv) {
-  const line = (argv ?? []).slice(2).join(" ").trim();
+  const rest = (argv ?? []).slice(2);
+  const parks = rest.includes(`--${TODO}`);
+  const line = rest
+    .filter((one) => one !== `--${TODO}`)
+    .join(" ")
+    .trim();
   if (!name || !line) {
     console.error(
       'ticket note needs a name and a line: ./RUNME.sh ticket note slow-lint "..."',
@@ -71,6 +81,7 @@ function note(it, name, argv) {
     fields: {
       state: "open",
       urgency: "whenever",
+      ...(parks ? { [TODO]: true } : {}),
       process: held.link,
       process_hash: held.hash,
       steps: fromHold(held.route, holdOf(it)),
@@ -85,8 +96,42 @@ function note(it, name, argv) {
 
   it.disk.makeDir(it.join(it.root, ...NOTES.split("/")));
   it.disk.write(at, made.text);
-  console.log(`${path} stands, and it waits for a retro to decide it.`);
+  console.log(
+    parks
+      ? `${path} stands at ${TODO}, and the next pull hands it back first.`
+      : `${path} stands, and it waits for a retro to decide it.`,
+  );
   return said(it, NOTE, line, { ticket: name });
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+function todo(it, name, argv) {
+  if (!name) {
+    console.error(`ticket ${TODO} needs a ticket: ./RUNME.sh ticket ${TODO} slow-lint`);
+    return 2;
+  }
+  const at = ticketAt(it, name);
+  if (!at) {
+    console.error(`${name} names no ticket under ${NOTES} or ${TRAVELS}.`);
+    return 2;
+  }
+
+  const text = it.disk.read(at.path);
+  const off = (argv ?? []).includes("--off");
+  const rides = fieldOf(text, GROUP);
+  if (!off && rides) {
+    console.error(`${at.said} rides ${rides}, and that branch speaks for it already.`);
+    console.error(`A ${TODO} parks work no branch carries.`);
+    return 2;
+  }
+
+  it.disk.write(at.path, off ? withoutField(text, TODO) : withField(text, TODO, "true"));
+  console.log(
+    off
+      ? `${at.said} carries no ${TODO}, and a push takes it away from here.`
+      : `${at.said} stands at ${TODO}, and the next pull hands it back first.`,
+  );
+  return 0;
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
