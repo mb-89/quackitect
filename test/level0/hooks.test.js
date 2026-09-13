@@ -698,6 +698,38 @@ test("a response with no answer earns one warning on the next call, then a refus
   ]);
 });
 
+// [[spec/design_output/level0#a-prompt-mid-turn]]
+test("a prompt landing mid-response skips that response's silent step", async () => {
+  const it = await started();
+  await it.raise("tool.call", { tool: "Read", file_path: "before.md" });
+  await it.raise("prompt.submit", { text: "and push it", origin: { kind: "composer" } });
+  await it.raise("turn.step", { turnId: "t", index: 4, answer: "", toolUses: [], stopReason: "tool_use" });
+
+  for (let i = 0; i < 2; i++) {
+    const said = await it.raise("tool.call", { tool: "Read", file_path: `${i}.md` });
+    assert.equal(said.deny, undefined, "the response reading the prompt passes");
+    assert.equal(said.context, undefined, "and meets no warning");
+  }
+  await it.raise("turn.step", { turnId: "t", index: 5, answer: "You want it pushed. I push.", toolUses: [], stopReason: "tool_use" });
+  const after = await it.raise("tool.call", { tool: "Read", file_path: "c.md" });
+  assert.equal(after.deny, undefined);
+});
+
+// [[spec/design_output/level0#a-prompt-mid-turn]]
+test("a prompt mid-turn still binds a response that ignores it", async () => {
+  const it = await started();
+  await it.raise("tool.call", { tool: "Read", file_path: "before.md" });
+  await it.raise("prompt.submit", { text: "and push it", origin: { kind: "composer" } });
+  await it.raise("turn.step", { turnId: "t", index: 4, answer: "", toolUses: [], stopReason: "tool_use" });
+  await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
+  await it.raise("turn.step", { turnId: "t", index: 5, answer: "", toolUses: [], stopReason: "tool_use" });
+
+  const warned = await it.raise("tool.call", { tool: "Read", file_path: "b.md" });
+  assert.match(warned.context.at(-1), /^The owner sent a prompt/);
+  const refused = await it.raise("tool.call", { tool: "Read", file_path: "c.md" });
+  assert.match(refused.deny, /^The owner sent a prompt\./);
+});
+
 // [[spec/design_output/level0#a-step-carries-the-answer]]
 test("a step carrying text answers the prompt, and every call after it passes", async () => {
   const it = await started();

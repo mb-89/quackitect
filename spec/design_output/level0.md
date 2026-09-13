@@ -596,6 +596,14 @@ call after that, until an answer stands.
 Each writes a `gate` line at `warn`: `warned Read before an answer`, then
 `refused Read before an answer`, with the demand in the detail.
 
+## A prompt mid-turn
+
+- Outcome: a prompt landing mid-response binds the next response, and the one in flight goes free.
+- Cause: the response in flight completes with no text, before the model reads the prompt.
+- Count: every tool call adds one, and every step sets the count to zero.
+- Skip: a prompt landing over a count above zero skips the next step.
+- Log: a silent step, or one the door skips, writes a `step` line.
+
 ## A step carries the answer
 
 `turn.step` hands the hook each response once its blocks stand, with its

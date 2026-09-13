@@ -152,6 +152,7 @@ export function register(on, _options) {
   let rules = [];
   let onAHeldBranch = false;
   let owed = null;
+  let inFlight = 0;
   // [[spec/design_output/level0#the-door-counts-the-questions]]
   let asks = 0;
   // [[spec/design_output/level0#the-canary-owes-a-debt]]
@@ -258,7 +259,10 @@ export function register(on, _options) {
     const from = String(e.origin?.kind ?? "");
     tooth.sawPrompt(from === "plugin");
     gate.sawPrompt(from === "plugin");
-    if (opensATurn(e.origin)) owed = await owing($, "The owner sent a prompt");
+    // [[spec/design_output/level0#a-prompt-mid-turn]]
+    if (opensATurn(e.origin)) {
+      owed = { ...(await owing($, "The owner sent a prompt")), skips: inFlight > 0 ? 1 : 0 };
+    }
     // [[spec/design_output/stop#the-claim-rides-the-call]]
     if (opensATurn(e.origin)) claim = null;
     const text = String(e.text ?? "");
@@ -286,6 +290,7 @@ export function register(on, _options) {
     take();
 
     tooth.sawCall(String(e.tool ?? ""));
+    inFlight += 1;
     list.sawCall(e);
     // [[spec/design_output/stop#the-claim-rides-the-call]]
     if (String(e.tool ?? "") !== STOP_CALL) claim = null;
@@ -695,8 +700,19 @@ export function register(on, _options) {
   // [[spec/design_output/level0#a-step-streams]]
   on("turn.step", async function* (_$, e, next) {
     const said = yield* next(e);
+    inFlight = 0;
     if (!owed || (await settings.ask("answer.enabled")) === false) return said;
     const text = String(e.answer ?? "").trim();
+    // [[spec/design_output/level0#a-prompt-mid-turn]]
+    if (owed.skips > 0 || !text) {
+      await logbook.say("info", "step", `step ${e.index} carries ${text.length} character(s)`, {
+        detail: `skips=${owed.skips ?? 0} stepped=${Boolean(owed.stepped)}`,
+      });
+    }
+    if (owed.skips > 0) {
+      owed = { ...owed, skips: owed.skips - 1 };
+      return said;
+    }
     if (text) {
       await logbook.say("info", "answer", text, { text, detail: owed.why });
       owed = null;
@@ -709,6 +725,7 @@ export function register(on, _options) {
   on("turn.complete", async ($, e, next) => {
     const said = await next(e);
     owed = null;
+    inFlight = 0;
     // [[spec/design_output/log#a-reply-beside-its-prompt]]
     if (e.reason === "answer" && e.answer) {
       await logbook.say("info", "reply", e.answer, { text: String(e.answer) });
