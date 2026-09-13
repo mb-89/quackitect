@@ -106,7 +106,11 @@ layers:
       who: the session, on the refusal that names the word
       entry: word, meaning, from, and insteadOf where a better word exists
       review: the retro reads every entry with `from: session` and keeps it or cuts it
-    exceptions: []
+    exceptions:
+      - word: TL;DR
+        reason: a name the answer register uses, and its tail reads as a word
+      - word: isnt
+        reason: the voice rule against the negative writes it, and the apostrophe belongs to a contraction
 
   meaning:
     judged:
