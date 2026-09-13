@@ -1,6 +1,6 @@
 // A vehicle's hooks module, small: it registers one hook a door the bridgehead
 // forwards, and writes what reaches it through the hand it gets.
-// [[spec/design_output/level0#the-bridgehead-imports-inside-its-folder]]
+// [[spec/design_output/level0#a-bridgehead-imports-a-copy]]
 
 export function register(on, options) {
   on("session.start", async ($, e, next) => {

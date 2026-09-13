@@ -31,7 +31,7 @@ export function register(on, options) {
   });
 }
 
-// [[spec/design_output/level0#the-bridgehead-imports-past-its-folder]]
+// [[spec/design_output/level0#a-bridgehead-imports-a-copy]]
 function load($, held) {
   if (held.loading) return held.loading;
   held.loading = (async () => {

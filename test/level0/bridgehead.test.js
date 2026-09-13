@@ -1,7 +1,7 @@
 // The bridgehead forwards. It imports the module vehicle.json names at session
 // start, hands every event to the vehicle's hooks in the order they registered,
 // and gives the vehicle a hand that reaches the harness noun by noun.
-// [[spec/design_output/level0#the-bridgehead-imports-inside-its-folder]]
+// [[spec/design_output/level0#a-bridgehead-imports-a-copy]]
 
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
@@ -48,7 +48,7 @@ function harness() {
   return { on, $, wrote, fire, hooks };
 }
 
-// [[spec/design_output/level0#the-bridgehead-imports-inside-its-folder]]
+// [[spec/design_output/level0#a-bridgehead-imports-a-copy]]
 test("session.start imports the module vehicle.json names, and the vehicle's hook runs on it", async () => {
   const it = harness();
   register(it.on, { brand: "probe" });
@@ -107,7 +107,7 @@ test("every door the vehicle names stands on the bridgehead with a literal name"
   }
 });
 
-// [[spec/design_output/level0#the-bridgehead-imports-inside-its-folder]]
+// [[spec/design_output/level0#a-bridgehead-imports-a-copy]]
 test("a module the client cannot load leaves a fault on disk, and the session goes on", async () => {
   const it = harness();
   it.$.fs.read = async () =>

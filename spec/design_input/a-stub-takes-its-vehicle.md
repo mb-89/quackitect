@@ -39,7 +39,7 @@ On a desk:
 |---|---|---|
 | 1 | `session.start` reads `vehicle.json` | a fixture stub with a fake register answers the vehicle's path |
 | 2 | asks the register for the vehicle's method root | the register test that stands, over a stub |
-| 3 | imports the vehicle's hooks module from that root, and registers its hooks under its own | a probe session in a stub answers the canary with the vehicle's numbers |
+| 3 | imports the copy of the vehicle's hooks inside its own folder | a probe session in a stub answers the canary through the bridgehead |
 | 4 | every later event reaches the vehicle's hook with the work root set to the stub | the write door refuses a bad write in the stub, and the ticket verbs read the stub's tickets |
 
 On a cloud box:

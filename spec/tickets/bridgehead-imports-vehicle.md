@@ -89,12 +89,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-bridgehead-imports-its-vehicle
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d42624a67d18a8
     hash_before: 8284697262ac902b1d5a5fcf477be632e0b81c12
     hash_after: 8284697262ac902b1d5a5fcf477be632e0b81c12
+  - step: design/review
+    hand: box d42624a67d18a8 · helper-2
+    hash_before: fb943ac658bbd74dd0dd6316fc62b3e36bff576a
+    hash_after: fb943ac658bbd74dd0dd6316fc62b3e36bff576a
 ---
 
 # Ask
@@ -133,8 +137,15 @@ The probe stands under test/fixtures/bridgehead, a plugin of its own. Its one mo
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+- The approach covers every line of done_when.
+- The probe reads the vehicle file at session start and forwards session.start, tool.call and turn.complete.
+- The chapter names the shape that holds, a relative path to a copy, and three that fail.
+- The chapter says the plugin check passes on all four shapes, and the client admits one.
+- The test proves the forwarding on a fake harness, and its five tests pass.
+- The chapter notes a tool answers under the plugin name, which the stub design takes up.
 
 # implement
 
