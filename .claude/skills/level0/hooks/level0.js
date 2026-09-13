@@ -22,9 +22,19 @@ async function seen($, e, next) {
   if (event === "engine.create") return next(e);
   const answer = await ask($, event, e, next);
   if (!answer) return next(e);
+  if (Array.isArray(answer.register)) await registers($, answer.register);
   if (answer.result !== undefined) return answer.result;
   if (answer.event !== undefined) return next(answer.event);
   return next(e);
+}
+
+// The server names tools for the client to list, and the bridgehead registers each.
+async function registers($, specs) {
+  for (const spec of specs) {
+    try {
+      await $.tool.register(spec);
+    } catch {}
+  }
 }
 
 // One request an event. The answer is JSON, or nothing where the server is down.
