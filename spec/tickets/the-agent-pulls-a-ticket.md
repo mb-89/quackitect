@@ -126,7 +126,11 @@ record:
     hash_after: ccbdd6391427a70e1af8ea063f3a9bdd5e5ca3f0
     returns: 1
     why: the hand takes it back
-step: retro/write
+  - step: retro/write
+    hand: box d49afdfe301a64
+    hash_before: c9845dd6d407dd06c90cd5fb74dfaf37b4e81004
+    hash_after: 61e266b7dee01457ff9c6e91ab7078165002add6
+step: retro/cloud
 ---
 
 # Ask
@@ -194,15 +198,16 @@ Done is one of two things, and the retro over the box's own window with it:
 
 <!-- the form is list -->
 
-- agent-pulls-ticket: the pull, its five checks, its three answers, the record and the hold stand in `src/scripts/pull.js`, under twenty-six fake-door tests
+- agent-pulls-ticket: the pull, its checks, its answers, the record and the hold stand in `src/scripts/pull.js`
 - `branch test` answers green, assertion, build or missing over the delta from the take
+- `branch pull --back` puts a leaf back into the hand that holds its record entry
 - `ticket open` turns a draft into a pullable ticket, and `retro notes` drains the private folder
-- the schema renders a `checked` chapter under a leaf whose chain carries a checklist, and the ticket door lets the hand write it
+- the schema renders a `checked` chapter under a leaf with a checklist. The ticket door lets the hand write it.
 - the stop hook reads the hold folder, and the rule stands in `spec/config/stop/level1.yml`
-- the plugin wrapper under `.claude/skills/level1` registers the pull as a tool and asks the judge over the shell's JSON
-- a flow list keeps a comma inside its quotes, which the group's own checklist tripped over
-- this group walked its own route under the pull: sync, split, children left, notes, write and cloud each carry a record entry
-- the design output stands at `spec/design_output/pull.md`, and every function points at a chapter of it
+- the wrapper under `.claude/skills/level1` registers the pull as a tool. It asks the judge over the shell's JSON.
+- a flow list keeps a comma inside its quotes, which the group's own checklist trips over
+- this group walks its own route under the pull, and every leaf carries a record entry
+- the design output stands at `spec/design_output/pull.md`. Every function points at a chapter of it.
 
 ### well
 
@@ -210,10 +215,10 @@ Done is one of two things, and the retro over the box's own window with it:
 
 <!-- the form is list -->
 
-- the fakes carried every case, because git stands on the process door and a ticket is text in a map
-- the real pull walked the child's draft leaf and every leaf of this group on the first run, because the tests drove the same code
-- the write door caught the child ticket's brief chapters at the first edit, so the schema fault surfaced before the check did
-- the voice door held the design note and the commit message to the caps, and each rewrite read better than the draft
+- the fakes carry every case. Git stands on the process door, and a ticket stands as text in a map.
+- the real pull walks the child's draft leaf and every leaf of this group on the first run. The tests drive the same code.
+- the write door catches the child ticket's brief chapters at the first edit, before the check runs
+- the voice door holds the design note and the commit message to the caps, and each rewrite reads better
 
 ### badly
 
@@ -221,12 +226,13 @@ Done is one of two things, and the retro over the box's own window with it:
 
 <!-- the form is list -->
 
-- the first edits went through a shell heredoc past every rule, until the bash door refused a `sed -i` with ShellWritesNothing, and the formatter then moved bytes under the next patch
-- the test fixtures failed the slot check five times over, because a hand-written route names no reader for its outputs, and each round cost a full test run
-- the record was read off a front object in three places where the helper takes text, which the fake caught only once the group tests ran
-- the child ticket's chapters stood as level-one headings the schema names nowhere, which the contract test named after the first battery
-- the nested `claude -p` run under the plugin folder spent its turns on the canary gate and the stop, and timed out twice before the pull tool answered
-- the plugin validator refused the wrapper's import of the engine, so the judge's material moved into the shell as a `--judge` flag
+- the first edits go through a shell heredoc past every rule. The bash door then refuses a `sed -i` with ShellWritesNothing.
+- the test fixtures fail the slot check five times. A hand-written route names no reader for its outputs.
+- three places read the record off a front object where the helper takes text. The group tests catch it late.
+- the child ticket's chapters stand as level-one headings the schema names nowhere. The contract test names them after the first battery.
+- the nested `claude -p` run under the plugin folder spends its turns on the canary gate and the stop. It times out twice.
+- the plugin validator refuses the wrapper's import of the engine. So the judge's material moves into the shell as `--judge`.
+- the hand-back lets the retro's evidence through past the voice rules. The sweep names it once the leaf leaves the hand.
 
 ### improve
 
@@ -234,12 +240,13 @@ Done is one of two things, and the retro over the box's own window with it:
 
 <!-- the form is list -->
 
-- a refusal, level zero: the bash door refuses a heredoc or a script that writes a governed file, the way it refuses `sed -i`
-- a gate, a process file: the mint refuses a route whose output nothing reads, which stands, and the test fixture takes the route from the process file in place of a hand-written one
-- a check, the sweep: a lint rule names a `recordIn` or `fieldOf` call handed a front object, or the helpers take both
-- a prefill, the ticket schema: the mint writes the brief's tables under the ask as bold runs, so a cut brief lands in shape
-- a verb, level one: `branch pull --judge` stands, and the wrapper's end-to-end run waits for a desk with a live model and no stop hook in the way
-- a knob, the config: a nested session under `-p` takes `stop.enabled false` off an environment variable, so a probe answers inside its timeout
+- a refusal, level zero: the bash door refuses a heredoc or a script that writes a governed file
+- a gate, a test: a fixture takes its route from the process file. So the slot check reads the route the mint copies.
+- a check, the sweep: a lint rule names a `recordIn` or `fieldOf` call handed a front object
+- a prefill, the ticket schema: the mint writes the brief's tables under the ask as bold runs
+- a verb, level one: `branch pull --judge` stands. The wrapper's end-to-end run waits for a desk with a live model.
+- a knob, the config: a nested session under `-p` reads `stop.enabled false` off the environment. So a probe answers in time.
+- a gate, the pull: the hand-back runs the voice rules over the chapter now. `--back` reopens a leaf the sweep names.
 
 ### thoughts
 
@@ -247,7 +254,11 @@ Done is one of two things, and the retro over the box's own window with it:
 
 <!-- the form is text -->
 
-The thoughts weighed the child's route against this box before a line of code stood: the review and the verdict steps each name `not`, and one box holds one hand. So the child parks at review whatever the engine does, and the group stays open by design. The actions show a box that builds the engine, then walks its own group with it, and the thoughts show that order as a choice: the engine had to exist before the ticket could take a record. The thoughts also settled that the retro's `needs: ["retro"]` would answer `wait` forever on a box with no retro verb, which is why `retro notes` stands as a stub now and the design says so.
+The thoughts weigh the child's route against this box before a line of code stands. The review and the verdict steps each name `not`, and one box holds one hand. So the child parks at review whatever the engine does, and the group stays open by design.
+
+The actions show a box that builds the engine, then walks its own group with it. The thoughts show that order as a choice. The engine has to exist before a ticket can take a record.
+
+The thoughts also settle that `needs: ["retro"]` answers `wait` for good on a box with no retro verb. That is why `retro notes` stands as a stub now, and the design says so.
 
 ## cloud
 
