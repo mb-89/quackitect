@@ -70,7 +70,7 @@ test("ShapeFits refuses the table and the diagram, and passes prose", async () =
 test("BottomLineFirst reads a chapter, and refuses an outcome arriving late", async () => {
   const rule = ruleNamed("BottomLineFirst");
   assert.equal(rule.span, "chapter");
-  assert.deepEqual(rule.labels, ["first", "late"]);
+  assert.deepEqual(rule.labels, ["first", "late", "even"]);
   assert.equal(rule.refuses, "late");
 
   const note = `# One chapter\n\n${SPAN}\n\n# Another chapter\n\n${SPAN}\n`;

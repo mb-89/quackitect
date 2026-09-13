@@ -5,10 +5,11 @@ extends: judge
 message: "Put the bottom line first, and the detail under it."
 link: spec/guidance/voice.md
 level: error
-ask: "Does the first block of this text state the outcome, or does the outcome arrive late, under a heading or at the end?"
+ask: "Ignore a heading line. Where does this text state its main point? first means in its first block, late means only after other detail near the end, and even means every block carries equal weight."
 labels:
   - first
   - late
+  - even
 refuses: late
 span: chapter
 reads:

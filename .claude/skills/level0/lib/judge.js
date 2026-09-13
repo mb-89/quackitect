@@ -155,9 +155,10 @@ export function chaptersIn(text) {
   let held = [];
   let at = 1;
   let fenced = false;
+  let headed = false;
 
   const close = () => {
-    if (held.join(" ").trim()) out.push({ text: held.join("\n").trim(), line: at });
+    if (held.join(" ").trim()) out.push({ text: held.join("\n").trim(), line: at, headed });
     held = [];
   };
 
@@ -171,11 +172,17 @@ export function chaptersIn(text) {
     if (!fenced && /^#{1,6}\s/.test(line.trim())) {
       close();
       at = i + 1;
+      headed = true;
     }
     held.push(line);
   }
   close();
-  return out.filter((one) => one.text.split(/\s+/).length >= 12);
+  // [[spec/design_output/level0#a-judged-rule-cuts]] An edit hands the judge the
+  // tail of the chapter above it, and that tail carries no outcome of its own.
+  const kept = headed ? out.filter((one) => one.headed) : out;
+  return kept
+    .filter((one) => one.text.split(/\s+/).length >= 12)
+    .map(({ text, line }) => ({ text, line }));
 }
 
 // [[spec/design_output/level0#a-judged-rule-cuts]]

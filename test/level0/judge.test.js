@@ -206,6 +206,19 @@ test("a chapter carries its heading, and the frontmatter carries none", () => {
   assert.ok(!chapters[0].text.includes("kind:"), "the frontmatter stands outside");
 });
 
+test("the lines above a first heading make no chapter, and a note with none makes one", () => {
+  const tail = "The tail of a chapter above, long enough for the judge to read it here.";
+  const next = "A chapter under its heading, long enough for the judge to read it here.";
+  const edit = `${tail}\n\n## The next chapter\n\n${next}\n`;
+
+  const chapters = chaptersIn(edit);
+  assert.equal(chapters.length, 1);
+  assert.match(chapters[0].text, /^## The next chapter/);
+  assert.equal(chapters[0].line, 3);
+
+  assert.equal(chaptersIn(tail).length, 1, "a note with no heading stands whole");
+});
+
 test("a heading inside a fence opens no chapter", () => {
   const said = [
     "# One chapter",

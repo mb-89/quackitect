@@ -143,12 +143,13 @@ layers:
 
       # A chapter carries one outcome, and an answer with no heading is one
       # chapter. So this question reads a chapter and asks where the outcome
-      # stands inside it.
+      # stands inside it. A chapter opens on its own heading, so the question
+      # reads the block under that heading and leaves the heading out.
       - id: BottomLineFirst
-        asks: Does the first block of this text state the outcome, or does the outcome arrive late, under a heading or at the end?
+        asks: Ignore a heading line. Where does this text state its main point? first means in its first block, late means only after other detail near the end, and even means every block carries equal weight.
         message: Put the bottom line first, and the detail under it.
         link: spec/guidance/voice.md
-        labels: [first, late]
+        labels: [first, late, even]
         refuses: late
         span: chapter
         reads: ["*.md", spec/**/*.md]

@@ -457,8 +457,10 @@ out reads a paragraph, which is what every rule read before the key stood.
 | `paragraph` | a run of prose lines, with 12 words at least | `Actionable`, `Role`, `ShapeFits` |
 | `chapter` | a heading and the blocks under it, to the next heading | `BottomLineFirst` |
 
-A note with no heading is one chapter, so an answer arrives whole. The
-frontmatter stands outside both cuts, and so does a fenced block.
+A note with no heading is one chapter, so an answer arrives whole. The lines
+above a first heading make no chapter, because an edit hands the judge the tail
+of the chapter above it. The frontmatter stands outside both cuts, and so does a
+fenced block.
 
 A question about where the outcome stands wants the whole chapter, because a
 paragraph on its own says nothing about what comes before it. A question about
@@ -834,9 +836,9 @@ takes its row, and the answer cell says what blocks it. The finding reads
 
 ## A shape finding rewrites
 
-- Outcome: a shape finding asks for a rewrite, whatever the score.
-- Shape findings: `QuestionTable`, `NeedsTable`, `AnswerLength`.
-- Cause: a rate lets one finding in a long answer pass.
+The gate asks for a rewrite on any shape finding, whatever the score. The shape
+findings read `QuestionTable`, `NeedsTable` and `AnswerLength`. A rate lets one
+finding in a long answer pass, and a shape finding holds no rate.
 
 # The rules past one buffer
 
