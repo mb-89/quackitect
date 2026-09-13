@@ -728,7 +728,7 @@ export function chaptersWanted(sections, front, level) {
   return out;
 }
 
-function chaptersOf(list, level, rule) {
+function chaptersOf(list, level, rule, listed = false) {
   const out = [];
   for (const one of [list ?? []].flat()) {
     if (!one || typeof one !== "object") continue;
@@ -743,14 +743,31 @@ function chaptersOf(list, level, rule) {
       form: String(one.form ?? ""),
       "x-fills": Boolean(one.form),
     });
+    const asks = listed || [one.checklist ?? []].flat().some((it) => String(it ?? "").trim());
+    let leaf = true;
     for (const value of Object.values(one)) {
       if (!Array.isArray(value)) continue;
       if (!value.some((it) => it && typeof it === "object" && it.name)) continue;
-      out.push(...chaptersOf(value, level + 1, rule));
+      out.push(...chaptersOf(value, level + 1, rule, asks));
+      if (value === one.steps) leaf = false;
+    }
+    // [[spec/design_output/pull#the-fields-hold-their-forms]]
+    if (asks && leaf && one.evidence) {
+      out.push({
+        ...rule,
+        header: CHECKED,
+        level: level + 1,
+        required: false,
+        description: "one line per item of the checklist, on how you take it into account",
+        form: "checklist",
+        "x-fills": true,
+      });
     }
   }
   return out;
 }
+
+export const CHECKED = "checked";
 
 // [[spec/design_output/schema#the-render-follows-the-tree]]
 function sayOf(one) {

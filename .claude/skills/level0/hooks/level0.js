@@ -120,6 +120,7 @@ import { MARKER, pairOf } from "../lib/vehicle.js";
 import { lintText } from "../lib/vale.js";
 
 const SE = ".se";
+const HOLDS = `${SE}/hold`;
 const GUIDANCE = "spec/guidance";
 const COMMIT = "level0-commit.md";
 const HANDOVER = `${SE}/HANDOVER.md`;
@@ -151,6 +152,8 @@ export function register(on, _options) {
   let logbook = logHere(null);
   let rules = [];
   let onAHeldBranch = false;
+  // [[spec/design_output/pull#the-hand-and-the-hold]]
+  let inHand = false;
   let owed = null;
   let inFlight = 0;
   let indexDead = "";
@@ -644,9 +647,10 @@ export function register(on, _options) {
   });
 
   // [[spec/design_output/stop#the-stop-is-one-call]]
-  on("tool.call", { tool: STOP_CALL }, async (_$, e, _next) => {
+  on("tool.call", { tool: STOP_CALL }, async ($, e, _next) => {
     const off = (await settings.ask("stop.enabled")) === false;
     const hold = await settings.ask("stop.hold");
+    inHand = await holdStands($);
     const reason = String(e.reason ?? "");
     const decision = decide(rules, {
       claimed: reason,
@@ -755,6 +759,7 @@ export function register(on, _options) {
     }
     const off = (await settings.ask("stop.enabled")) === false;
     const hold = await settings.ask("stop.hold");
+    inHand = await holdStands($);
     const mostInARow = await settings.ask("stop.mostInARow");
     // [[spec/design_output/level0#what-the-probe-does]]
     const bit = probeDone
@@ -943,11 +948,22 @@ export function register(on, _options) {
   // [[spec/design_output/stop#the-mechanical-checks]]
   function ranHere(name, off, hold) {
     if (name === "work-waiting") return list.standing() || onAHeldBranch;
+    if (name === "ticket-in-hand") return inHand;
     if (name === "session-is-new") return tooth.isNew();
     if (name === "stop-hook-off") return off;
     if (name === "owner-holds") return holds(hold);
     if (name === "never") return false;
     return undefined;
+  }
+}
+
+// [[spec/design_output/pull#the-hand-and-the-hold]]
+async function holdStands($) {
+  try {
+    const entries = await $.fs.list(HOLDS);
+    return entries.some((one) => one.name.endsWith(".json"));
+  } catch {
+    return false;
   }
 }
 

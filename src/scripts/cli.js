@@ -75,6 +75,7 @@ import { graphIn } from "./graph.js";
 import { withRoute } from "./process.js";
 import { probe } from "./probe.js";
 import { voice } from "./voice.js";
+import { retro } from "./retro.js";
 import { ticket } from "./ticket.js";
 import { cloud, work } from "./work.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
@@ -117,6 +118,12 @@ async function doorsHere() {
     config: said,
     words: await said.ask("names.words"),
     stale: await said.ask("work.staleAfter"),
+    fails: await said.ask("work.failsBeforePerson"),
+    refusals: await said.ask("work.refusalsBeforePerson"),
+    splits: await said.ask("work.stepsBeforeSplit"),
+    // [[spec/design_output/pull#the-hand-rule]]
+    agent: Boolean(process.env.CLAUDECODE || process.env.CLAUDE_CODE_REMOTE || process.env.SE_CLOUD),
+    cloud: Boolean(process.env.CLAUDE_CODE_REMOTE || process.env.SE_CLOUD),
     node: process.execPath,
     join,
   };
@@ -193,7 +200,7 @@ const verbs = {
     run: async () => readConfig(rest),
   },
   branch: {
-    says: "work branches and groups: new, take, sync, done, list, merge, close",
+    says: "work branches and groups: new, take, sync, done, list, merge, close, pull, test",
     run: async () => work(root, rest, it),
   },
   cloud: {
@@ -201,8 +208,12 @@ const verbs = {
     run: async () => cloud(root, rest, it),
   },
   ticket: {
-    says: "tickets that stay on this box: note, update",
+    says: "tickets that stay on this box: note, update, open",
     run: async () => ticket(root, rest, it),
+  },
+  retro: {
+    says: "the retro a group's route runs: notes",
+    run: async () => retro(root, rest, it),
   },
   mint: {
     says: "write a new note of a kind, in the shape its schema names",

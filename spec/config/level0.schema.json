@@ -217,6 +217,21 @@
           "type": "string",
           "unit": "a span, as 90m, 12h or 3d",
           "help": "The age of a held group's tip that puts it under yours."
+        },
+        "failsBeforePerson": {
+          "type": "number",
+          "unit": "returns",
+          "help": "The times a step fails back before the pull inserts a person step."
+        },
+        "refusalsBeforePerson": {
+          "type": "number",
+          "unit": "refusals",
+          "help": "The times one hand-back meets refused before the pull inserts a person step."
+        },
+        "stepsBeforeSplit": {
+          "type": "number",
+          "unit": "steps",
+          "help": "The person steps a ticket carries before the pull refuses another and asks for a split."
         }
       }
     },

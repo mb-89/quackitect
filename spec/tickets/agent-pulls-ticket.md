@@ -92,9 +92,12 @@ group: the-agent-pulls-a-ticket
 
 # Ask
 
-# Where it stands
+The agent pulls: one verb hands it a leaf of a ticket, and the same verb takes the leaf back with a verdict. Done is two verbs standing under the fakes, with the record, the hold and the stop rule around them:
 
-The design input `spec/design_input/the-agent-pulls-tickets.md` says what the
+- `./RUNME.sh branch pull`
+- `./RUNME.sh branch test`
+
+**Where it stands.** The design input `spec/design_input/the-agent-pulls-tickets.md` says what the
 owner asks for, and the page beside it draws it. Read the note first. It
 stands on the branch `claude/relaxed-knuth-f0uk4d` until the owner merges it,
 so take that branch in where `work sync` leaves it absent.
@@ -110,7 +113,7 @@ per step, Children and private tickets, and the three rules at the top.
 | the stop rules, one file | `spec/config/stop/level0.yml` |
 | the box id v4 keeps | none here yet |
 
-# What waits
+**What waits.**
 
 | the piece | where | proves it |
 |---|---|---|
@@ -132,15 +135,15 @@ per step, Children and private tickets, and the three rules at the top.
 | the stop rule | `spec/config/stop/level1.yml` | `work-waiting` reads the session's hold |
 | the plugin wrapper | `.claude/skills/level1/` | the pull runs under the tool, and the judge check runs there alone |
 
-# The rules to hold
+**The rules to hold.**
 
 - The agent holds three verbs, and this branch lands one. The shell is the verb, and the tool wraps it.
 - A `work` answer hands the leaf, with its fields, its guidance and `does` first.
 - A leaf holding a `verdict` field takes the verdict from the field, and the pull refuses the flag there.
 - The pull fetches the branch before every hand-out and hand-back.
-- A person's hand-back from the shell meets the four mechanical checks, and the judge reads it at the next agent pull.
+- A person's hand-back from the shell meets the four mechanical checks. The judge reads it at the next agent pull.
 
-# The tests
+**The tests.**
 
 Every check and every answer takes a test under the fake doors, and the
 rejected push takes one of its own. Drive one real pull under
@@ -246,4 +249,4 @@ rejected push takes one of its own. Drive one real pull under
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+The review step and the verdict step each name `not`, so one box takes one side alone. On a box with no second hand the pull parks them, and a person or the next box answers on the branch.

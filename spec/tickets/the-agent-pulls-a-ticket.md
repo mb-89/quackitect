@@ -82,7 +82,12 @@ record:
 
 # Ask
 
-Where it stands
+The agent pulls a ticket. This group lands the pull, its checks, its answers, the record, a hold per hand and the stop rule. So a box works a group's tickets leaf by leaf with no brief.
+
+Done is one of two things, and the retro over the box's own window with it:
+
+- the child ticket closes
+- the child ticket parks at the one step this box lacks a hand for
 
 # sync
 
@@ -176,4 +181,4 @@ Where it stands
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+This is the first group a box works under the pull, so its own record is the first run of the group route as data. The child ticket carries the brief's tables, because the brief is where the owner wrote them.

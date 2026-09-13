@@ -3,7 +3,7 @@
 // this holds no list of its own.
 // [[spec/design_output/schema#the-three-places]]
 
-import { entriesIn, readNote } from "./schema.js";
+import { CHECKED, entriesIn, readNote } from "./schema.js";
 
 export const SEVERITY = "error";
 export const HAND = "hand";
@@ -158,6 +158,12 @@ function fieldsHeld(front, level) {
   for (const field of [holder.said?.evidence ?? []].flat()) {
     if (!field?.name) continue;
     out.push([`${deep} ${field.name}`, `${field.name}, under ${holder.path}`]);
+  }
+  // [[spec/design_output/pull#the-fields-hold-their-forms]]
+  const parts = holder.path.split("/");
+  const chain = parts.map((_, i) => walk.find((one) => one.path === parts.slice(0, i + 1).join("/")));
+  if (chain.some((one) => [one?.said?.checklist ?? []].flat().some((it) => String(it ?? "").trim()))) {
+    out.push([`${deep} ${CHECKED}`, `${CHECKED}, under ${holder.path}`]);
   }
   return out;
 }

@@ -12,10 +12,12 @@ import {
   reRouted,
   schemasFrom,
 } from "../../.claude/skills/level0/lib/schema.js";
+import { withField } from "./group.js";
 import { askRows, processAt } from "./process.js";
 
 export const NOTES = ".se/tickets";
 export const HOLD = ".se/hold.json";
+export const HOLDS = ".se/hold";
 export const NOTE = "note";
 const TRAVELS = "spec/tickets";
 const SCHEMAS = "spec/schemas";
@@ -24,7 +26,7 @@ export function ticket(root, argv, doors) {
   const it = { root, ...doors };
   const what = argv[0];
   const name = argv[1];
-  const doing = { note, update };
+  const doing = { note, update, open };
   if (!doing[what]) {
     console.log("Usage: ./RUNME.sh ticket <verb>\n");
     console.log(
@@ -33,6 +35,7 @@ export function ticket(root, argv, doors) {
     console.log(
       "  update <ticket>     copy the ticket's process onto the steps it has yet to reach",
     );
+    console.log("  open <ticket>       open a draft whose ask stands written, so a hand can pull it");
     return what ? 2 : 0;
   }
   return doing[what](it, name, argv);
@@ -102,14 +105,59 @@ export function fromHold(route, hold) {
   return [route ?? []].flat().map((one) => (one?.steps ? one : { ...one, from: said }));
 }
 
+// [[spec/design_output/pull#the-hand-and-the-hold]]
 function holdOf(it) {
-  const at = it.join(it.root, ...HOLD.split("/"));
-  if (!it.disk.exists(at)) return null;
+  const folder = it.join(it.root, ...HOLDS.split("/"));
+  const held = it.disk.exists(folder)
+    ? it.disk
+        .list(folder)
+        .filter((one) => one.kind === "file" && one.name.endsWith(".json"))
+        .map((one) => it.join(folder, one.name))
+    : [];
+  for (const at of [...held, it.join(it.root, ...HOLD.split("/"))]) {
+    if (!it.disk.exists(at)) continue;
+    const hold = parsedJson(it.disk.read(at));
+    if (hold) return hold;
+  }
+  return null;
+}
+
+function parsedJson(text) {
   try {
-    return JSON.parse(it.disk.read(at));
+    return JSON.parse(text);
   } catch {
     return null;
   }
+}
+
+// [[spec/design_output/pull#a-draft-opens]]
+function open(it, name) {
+  if (!name) {
+    console.error("ticket open needs a ticket: ./RUNME.sh ticket open slow-lint");
+    return 2;
+  }
+  const at = ticketAt(it, name);
+  if (!at) {
+    console.error(`${name} names no ticket under ${NOTES} or ${TRAVELS}.`);
+    return 2;
+  }
+  const text = it.disk.read(at.path);
+  const note = readNote(text);
+  const front = note.front.said ?? {};
+  if (String(front.state ?? "") !== "draft") {
+    console.log(`${at.said} stands ${front.state ?? "with no state"} already.`);
+    return 0;
+  }
+  const ask = note.sections.find((one) => one.header.toLowerCase() === "ask");
+  const rows = (ask?.own ?? []).filter((row) => row.trim() && !/^\s*<!--.*-->\s*$/.test(row));
+  if (!rows.length) {
+    console.error(`${at.said} holds an empty ask, and open waits for one. Write the ask first.`);
+    return 1;
+  }
+  const step = String(front.step ?? "").trim() || firstLeafOf(front.steps);
+  it.disk.write(at.path, withField(withField(text, "state", "open"), "step", step));
+  console.log(`${at.said} stands open at ${step}, and the pull hands it out.`);
+  return 0;
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
@@ -206,7 +254,7 @@ function firstLeafOf(route) {
   return found ? found.path : "";
 }
 
-function schemasHere(it) {
+export function schemasHere(it) {
   const at = it.join(it.root, ...SCHEMAS.split("/"));
   if (!it.disk.exists(at)) return new Map();
   return schemasFrom(
