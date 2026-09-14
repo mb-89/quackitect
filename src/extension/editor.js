@@ -5,7 +5,7 @@
 
 const vscode = require("vscode");
 const { spawn } = require("node:child_process");
-const { readFileSync } = require("node:fs");
+const { readFileSync, realpathSync } = require("node:fs");
 const http = require("node:http");
 const { join } = require("node:path");
 
@@ -294,7 +294,7 @@ function editorDoor(context) {
 // project of that vehicle here, with the one hook and the pointer.
 // [[spec/design_output/vehicle#the-register-holds-the-port]]
 async function settled(context, work) {
-  const home = join(context.extensionPath, "..", "..");
+  const home = join(realpathSync.native(context.extensionPath), "..", "..");
   try {
     const bridge = await import(vscode.Uri.file(join(home, "src", "bridge", "vehicle.js")).toString());
     const disk = (await import(vscode.Uri.file(join(home, "src", "doors", "disk.js")).toString())).disk();

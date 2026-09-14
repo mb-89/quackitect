@@ -8,6 +8,7 @@
 // session nothing.
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
+import { spawn } from "node:child_process";
 import { createServer } from "node:http";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -17,6 +18,7 @@ import { index } from "../doors/index.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { vale } from "../doors/vale.js";
+import { holdsForAnswer, onMessageDisplay, onPromptSubmit, onTurnEnd } from "./answer.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import {
   onAgentSpawn,
@@ -38,8 +40,10 @@ const PASS = { pass: true };
 const DOORS = {
   "session.start": opensSession,
   "prompt.context": onPromptContext,
+  "prompt.submit": onPromptSubmit,
+  "classic.MessageDisplay": onMessageDisplay,
   "session.compact": onSessionCompact,
-  "turn.complete": onTurnComplete,
+  "turn.complete": endsTurn,
   "agent.spawn": onAgentSpawn,
   "tool.call": onToolCall,
 };
@@ -75,11 +79,20 @@ function opensSession(e, box) {
   return { register: [findSpec(), ...applySpecs()], pass: true };
 }
 
-// A tool call meets its handler, and a call passing while the canary is owed carries the ask for it.
+// A tool call meets the answer door first, then its handler, and a call passing
+// while the canary is owed carries the ask for it.
 async function onToolCall(e, box) {
+  const held = holdsForAnswer(e, box);
+  if (held) return held;
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
   if (said !== PASS) return said;
   return owesCanary(e, box) ?? PASS;
+}
+
+// The turn end pays the answer door, then reads the canary.
+function endsTurn(e, box) {
+  onTurnEnd(e, box);
+  return onTurnComplete(e, box);
 }
 
 // The box of one work root: the two roots, the doors, and the state the doors keep. A test hands in fakes.
@@ -119,10 +132,31 @@ export function serve(method, port = PORT, say = console.log) {
     process.exit(0);
   };
 
+  // A restart: the server closes its port, starts a copy of itself with the same
+  // arguments, detached, and exits. So a code change reaches the running server in one call.
+  const restart = () => {
+    own.log.say("info", "bridge", `the server restarts at ${where}`);
+    server.close(() => {
+      const child = spawn(process.execPath, process.argv.slice(1), {
+        cwd: process.cwd(),
+        detached: true,
+        stdio: "ignore",
+        windowsHide: true,
+      });
+      child.unref();
+      process.exit(0);
+    });
+  };
+
   const server = createServer((request, response) => {
     if (request.method === "POST" && request.url === "/stop") {
       answer(response, 200, { ok: true });
       setTimeout(stop, 20);
+      return;
+    }
+    if (request.method === "POST" && request.url === "/restart") {
+      answer(response, 200, { ok: true });
+      setTimeout(restart, 20);
       return;
     }
     if (request.method !== "POST" || request.url !== "/event") {

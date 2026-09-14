@@ -42,6 +42,19 @@ function readNotes(disk, folder) {
   }
 }
 
+// A box made by any event but a session start stands past turn one, because a
+// server started again mid-session meets no first turn. It owes the canary
+// once, so the next answer says the bridge stands again.
+// [[spec/design_output/stop#the-mark-survives-a-reload]]
+function pastTurnOne() {
+  return { reads: 1, firstTurn: false, owes: true };
+}
+
+// The guidance, loaded on the first ask where no session start loaded it.
+function guidanceOf(box) {
+  return box.guidance ?? (box.guidance = guidanceHere(box.disk, box.method));
+}
+
 // A session opens: the guidance reads again, and the canary is owed again.
 export function onSessionStart(_e, box) {
   box.guidance = guidanceHere(box.disk, box.method);
@@ -52,7 +65,7 @@ export function onSessionStart(_e, box) {
 // [[spec/design_output/level0#the-guidance-stays-put]]
 export function onPromptContext(_e, box) {
   const held = box.guidance ?? (box.guidance = guidanceHere(box.disk, box.method));
-  const session = box.session ?? (box.session = { reads: 0, firstTurn: true });
+  const session = box.session ?? (box.session = pastTurnOne());
   session.reads += 1;
   const blocks = blocksOf(held, box.index.dead());
   box.log.say("info", "context", `${blocks.length} block(s) reach the session`, {
@@ -100,33 +113,33 @@ function canaryText(sentence) {
 // line pays it.
 // [[spec/design_output/level0#the-canary-owes-a-debt]]
 export function onTurnComplete(e, box) {
-  const session = box.session ?? (box.session = { reads: 0, firstTurn: true });
+  const session = box.session ?? (box.session = pastTurnOne());
   if (e?.reason !== "answer") return { pass: true };
-  const heard = canaryIn(e.answer, box.guidance?.sentence ?? "");
+  const sentence = guidanceOf(box).sentence;
+  const heard = canaryIn(e.answer, sentence);
   if (session.firstTurn) {
     session.firstTurn = false;
     session.owes = heard.found !== "same";
-    box.log.say(session.owes ? "warn" : "info", "level0", HEARD[heard.found], {
-      detail: box.guidance?.sentence ?? "",
-    });
+    box.log.say(session.owes ? "warn" : "info", "level0", HEARD[heard.found], { detail: sentence });
     return { pass: true };
   }
   if (session.owes && heard.found === "same") {
     session.owes = false;
-    box.log.say("info", "level0", HEARD.same, { detail: box.guidance?.sentence ?? "" });
+    box.log.say("info", "level0", HEARD.same, { detail: sentence });
   }
   return { pass: true };
 }
 
 // While the canary is owed, every tool call carries the ask for it, and none is refused.
 export function owesCanary(e, box) {
-  const session = box.session;
-  if (!session?.owes || e?.agentId) return null;
-  box.log.say("warn", "gate", `warned ${e?.tool ?? "a call"} before the canary`, {
+  const session = box.session ?? (box.session = pastTurnOne());
+  if (!session.owes || e?.agentId) return null;
+  const sentence = guidanceOf(box).sentence;
+  box.log.say("debug", "gate", `asked ${e?.tool ?? "a call"} for the canary`, {
     tool: String(e?.tool ?? ""),
-    detail: box.guidance?.sentence ?? "",
+    detail: sentence,
   });
-  return { after: { context: [OWES.warns(box.guidance?.sentence ?? "")] } };
+  return { after: { context: [OWES.warns(sentence)] } };
 }
 
 // A compaction: the client reads the context again after it, and the guidance
