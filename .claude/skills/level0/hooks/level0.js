@@ -28,10 +28,30 @@ async function seen($, e, next) {
   const answer = await ask($, event, e, next);
   if (!answer) return next(e);
   if (Array.isArray(answer.register)) await registers($, answer.register);
+  if (answer.spawn !== undefined) return spawns($, answer, next);
   if (answer.result !== undefined) return answer.result;
   if (answer.event !== undefined) return next(answer.event);
   if (answer.after !== undefined) return merged(await next(e), answer.after);
   return next(e);
+}
+
+// The server asks for a helper: the bridgehead spawns it, posts what it said
+// under the event the server names, and returns that answer as the result.
+async function spawns($, answer, next) {
+  let said;
+  try {
+    said = await $.agent.spawn(answer.spawn);
+  } catch (error) {
+    said = { deny: String(error?.message ?? error) };
+  }
+  const back = {
+    ...(answer.then ?? {}),
+    text: said?.text ?? "",
+    isError: Boolean(said?.isError),
+    deny: said?.deny ?? "",
+  };
+  const done = await ask($, String(answer.then?.event ?? "agent.answered"), back, next);
+  return done?.result ?? { result: "the helper answered, and the server said nothing" };
 }
 
 // A session opens: the root is the folder it works in, and the port comes off
@@ -78,11 +98,14 @@ async function registers($, specs) {
   }
 }
 
-// The server adds to what the chain beneath answers: a list grows, and any other field is set.
+// The server adds to what the chain beneath answers: a list grows, a text grows
+// by a paragraph, and any other field is set.
 function merged(said, after) {
   const out = said && typeof said === "object" ? { ...said } : {};
   for (const [key, value] of Object.entries(after ?? {})) {
-    out[key] = Array.isArray(value) && Array.isArray(out[key]) ? [...out[key], ...value] : value;
+    if (Array.isArray(value) && Array.isArray(out[key])) out[key] = [...out[key], ...value];
+    else if (typeof value === "string" && typeof out[key] === "string" && out[key]) out[key] = `${out[key]}\n\n${value}`;
+    else out[key] = value;
   }
   return out;
 }

@@ -8,6 +8,8 @@
 // untouched, and one kind, reply, names the message that answers the owner.
 // [[spec/design_output/level0#the-owners-prompt-comes-first]]
 
+import { questionsIn } from "../../.claude/skills/level0/lib/answer.js";
+
 const OWNER = new Set(["composer", "sdk"]);
 const REACHES = new Set(["AskUserQuestion"]);
 const WHY = "The owner sent a prompt";
@@ -29,6 +31,8 @@ export function onPromptSubmit(e, box) {
   if (!OWNER.has(from)) return { pass: true };
   const inFlight = box.turn ? box.turn.open : true;
   box.demand = { why: WHY, inFlight, warned: false, refused: 0 };
+  // The questions the prompt asks, which the draft check and the gate count.
+  box.asks = questionsIn(String(e?.text ?? ""));
   return { pass: true };
 }
 

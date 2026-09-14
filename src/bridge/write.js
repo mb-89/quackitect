@@ -22,6 +22,7 @@ import {
   strangerFault,
 } from "../../.claude/skills/level0/lib/schema.js";
 import { refusedTicket, ticketFaults } from "../../.claude/skills/level0/lib/ticket.js";
+import { codeDoor } from "./code.js";
 import { marksStale, ownerDoor } from "./projection.js";
 
 const PASS = { pass: true };
@@ -44,6 +45,8 @@ export async function onWrite(e, box) {
     if (found) return { result: { deny: found } };
   }
   marksStale(where, box);
+  // [[spec/design_output/level0#the-formatter-applies-itself]]
+  if (CODE.test(writing.path)) return codeDoor(e, writing, where, wholeAfter(e, writing, box.disk), box);
   return PASS;
 }
 

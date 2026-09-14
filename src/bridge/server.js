@@ -12,6 +12,7 @@ import { spawn } from "node:child_process";
 import { createServer } from "node:http";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { biome } from "../doors/biome.js";
 import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
 import { index } from "../doors/index.js";
@@ -20,6 +21,9 @@ import { proc } from "../doors/proc.js";
 import { vale } from "../doors/vale.js";
 import { holdsForAnswer, onMessageDisplay, onPromptSubmit, onTurnEnd, onTurnStart } from "./answer.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
+import { onBash, onDescribe } from "./bash.js";
+import { ANSWERED, onAgentAnswered, SPECS as reviewSpecs, TOOLS as reviewTools } from "./review.js";
+import { SPECS as toolSpecs, TOOLS as handTools } from "./tools.js";
 import {
   onAgentSpawn,
   onPromptContext,
@@ -46,7 +50,9 @@ const DOORS = {
   "session.compact": onSessionCompact,
   "turn.complete": endsTurn,
   "agent.spawn": onAgentSpawn,
+  "tool.describe": onDescribe,
   "tool.call": onToolCall,
+  [ANSWERED]: onAgentAnswered,
 };
 
 // One handler a tool. A tool with no handler passes.
@@ -56,8 +62,11 @@ const TOOLS = {
   Write: onWrite,
   Edit: onWrite,
   MultiEdit: onWrite,
+  Bash: onBash,
   [`mcp__level0__${FIND}`]: runsFind,
   ...applyTools,
+  ...handTools,
+  ...reviewTools,
 };
 
 // The one place an event is decided. Put a break on the return.
@@ -77,7 +86,7 @@ function opensSession(e, box) {
   box.projections = projectionsHere(box.disk, box.method);
   box.sources = sourcesOf(box.projections, box.disk, box.method);
   warmIndex(box);
-  return { register: [findSpec(), ...applySpecs()], pass: true };
+  return { register: [findSpec(), ...applySpecs(), ...toolSpecs(box), ...reviewSpecs()], pass: true };
 }
 
 // A tool call meets the answer door first, then its handler, and a call passing
@@ -107,8 +116,10 @@ export function boxOf(method, work = method, doors = {}) {
     root: work,
     disk: files,
     clock: time,
+    proc: outside,
     index: doors.index ?? index(files, outside, time, method, work),
     vale: doors.vale ?? vale(files, outside, method),
+    biome: doors.biome ?? biome(files, outside, method),
     log: doors.log ?? log(files, time, { folder: join(work, ".se", "log"), level: "debug" }),
   };
 }
