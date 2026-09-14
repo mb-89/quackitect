@@ -8,8 +8,10 @@ import { join } from "node:path";
 import { ASK, controlBlock, QUIET } from "../../.claude/skills/level0/lib/controls.js";
 import { demands } from "./answer.js";
 import { asks } from "./config.js";
+import { statusAsks, statusLacks, statusShape } from "./status.js";
 
 const LOCAL = ".se/config.json";
+const FULL = "full";
 
 // [[spec/design_output/extension#the-ask-is-a-line]]
 export function asksForUpdate(e, box) {
@@ -20,7 +22,10 @@ export function asksForUpdate(e, box) {
   box.log.say("debug", "ask", `the owner asks for a ${wanted} update`, {
     tool: String(e?.tool ?? ""),
   });
-  demands(box, `The owner asks for a ${wanted} update`, controlBlock({ wanted }), () => dropsAsk(null, box));
+  const chapters = wanted === FULL ? statusShape(box.disk, box.method) : [];
+  const block = [controlBlock({ wanted }), chapters.length ? statusAsks(chapters) : ""].filter(Boolean).join("\n\n");
+  demands(box, `The owner asks for a ${wanted} update`, block, () => dropsAsk(null, box));
+  if (chapters.length) box.demand.fits = (text) => statusLacks(text, chapters);
 }
 
 // The ask drops to quiet the moment its reply pays it, or at the turn's end at the latest.

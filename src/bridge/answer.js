@@ -42,7 +42,7 @@ export function onPromptSubmit(e, box) {
 export function onMessageDisplay(e, box) {
   const text = String(e?.delta ?? "").trim();
   if (text) box.spoken = text;
-  if (!box.demand || !text) return { pass: true };
+  if (!box.demand || !text || box.demand.fits?.(text)) return { pass: true };
   return paid(box, text);
 }
 
@@ -63,12 +63,13 @@ export function onAgentSpoke(e, box) {
   const demand = box.demand;
   const text = String(e?.text ?? "").trim();
   if (!demand) return { pass: true };
-  if (text && text !== demand.seen) return paid(box, text);
+  const lacks = text && text !== demand.seen ? (demand.fits?.(text) ?? "") : SAYS(demand.why);
+  if (!lacks) return paid(box, text);
   box.log.say("debug", "gate", `refused ${e?.tool ?? "a call"} before a reply`, {
     tool: String(e?.tool ?? ""),
-    detail: demand.why,
+    detail: lacks.slice(0, 120),
   });
-  return { result: { deny: SAYS(demand.why) } };
+  return { result: { deny: lacks } };
 }
 
 function paid(box, text) {

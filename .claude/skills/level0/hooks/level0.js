@@ -10,6 +10,9 @@
 const PORT = 6510;
 const POINTER = ".se/vehicle.json";
 const SESSION = ".se/log/session.jsonl";
+const COMPACT = "session.compact";
+const LIMIT = 4_000_000;
+const SHORT = 4000;
 let port = PORT;
 let root = "";
 let saidDown = false;
@@ -75,6 +78,7 @@ async function ask($, event, e, next) {
   } catch {
     body = JSON.stringify({ event, e: String(e), root });
   }
+  if (event === COMPACT || body.length > LIMIT) body = JSON.stringify({ event, e: slim(e), origin: next?.origin ?? null, root });
   try {
     const said = await $.http.fetch(url(), {
       method: "POST",
@@ -110,6 +114,19 @@ async function spoke($, e, next) {
   if (answer.result !== undefined) return answer.result;
   if (answer.after !== undefined) return merged(await next(e), answer.after);
   return next(e);
+}
+
+// The compaction hands the whole transcript as its event, megabytes the server
+// never reads. It goes on with its flat fields alone, each text cut to a page,
+// and so does any event over the wire's limit.
+function slim(e) {
+  if (!e || typeof e !== "object") return e ?? null;
+  const out = {};
+  for (const [key, value] of Object.entries(e)) {
+    if (typeof value === "string") out[key] = value.slice(0, SHORT);
+    else if (typeof value === "number" || typeof value === "boolean") out[key] = value;
+  }
+  return out;
 }
 
 // The server names tools for the client to list, and the bridgehead registers each.
