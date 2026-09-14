@@ -129,7 +129,11 @@ record:
     hand: box 73ef664c513a
     hash_before: ae85ce41965f2a03e90d150e985b05fd81566a3f
     hash_after: ae85ce41965f2a03e90d150e985b05fd81566a3f
-step: retro/cloud
+  - step: retro/cloud
+    hand: box 73ef664c513a
+    hash_before: ce0aca07a66280ab04c07a955d224b700887cfd7
+    hash_after: ce0aca07a66280ab04c07a955d224b700887cfd7
+step: children
 ---
 
 # Ask
@@ -241,8 +245,7 @@ The box holds nothing but the retro. The child waits for a person. Every box tha
 
 <!-- the form is list -->
 
-- the harness types under the types folder, at the plugin skill's read, so the hook's session id stays unread
-- no host the proxy refuses, no right the platform refuses, and no install
+- no tool, no host the proxy refuses, no right the platform refuses, and no install
 
 ### met
 
@@ -250,11 +253,10 @@ The box holds nothing but the retro. The child waits for a person. Every box tha
 
 <!-- the form is list -->
 
-- the canary hook refuses every tool call until the answer carries its line, at the first turn's end
-- the write door refuses a past tense in a commit message, at the commit of the pull note
-- the judge refuses five hand-backs and names no rule, at the draft leaf
-- the fail cap parks the child at design/person-1 after two reviews
-- no conflict at sync, and no test fails on the box alone
+- the judge refuses the one hand-back under retro/notes and names no rule, at the refused line
+- the write gate refuses four long lines under retro/write, at the first hand-back there
+- the child stands parked under the fail cap at design/person-1, from the box before this one
+- no trunk guard, no conflict at sync, no hook, and no test fails on the box alone
 
 ### left
 
@@ -265,6 +267,7 @@ The box holds nothing but the retro. The child waits for a person. Every box tha
 - design/person-1 on the child waits for a person, and the design already answers the finding it asks about
 - no ticket minted with no group
 - the group ticket is the handover, and it says the child's implement leaves wait on the person's answer
+- the group goes back to todo, and the next box meets the same person step until a person answers
 
 # Discussion
 
