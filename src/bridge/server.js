@@ -15,6 +15,7 @@ import { index } from "../doors/index.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { vale } from "../doors/vale.js";
+import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { onPromptContext, onSessionCompact, onSessionStart, onTurnComplete } from "./guidance.js";
 import { answersFromIndex, FIND, findSpec, runsFind, warmIndex } from "./search.js";
 import { onWrite, schemasHere } from "./write.js";
@@ -39,6 +40,7 @@ const TOOLS = {
   Edit: onWrite,
   MultiEdit: onWrite,
   [`mcp__level0__${FIND}`]: runsFind,
+  ...applyTools,
 };
 
 // The one place an event is decided. Put a break on the return.
@@ -55,7 +57,7 @@ function opensSession(e, box) {
   onSessionStart(e, box);
   box.schemas = schemasHere(box.disk, box.root);
   warmIndex(box);
-  return { register: [findSpec()], pass: true };
+  return { register: [findSpec(), ...applySpecs()], pass: true };
 }
 
 function onToolCall(e, box) {
