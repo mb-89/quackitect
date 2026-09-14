@@ -136,7 +136,11 @@ record:
   - step: children
     hand: box 15784e5eed30
     hash_before: 87799df2984bc42f941d16f2359b6903e3dfbf8d
-step: children
+  - step: children
+    hand: box 15784e5eed30
+    skipped: true
+    why: the box leaves it while step-changes-hands stand open
+step: retro/notes
 ---
 
 # Ask
