@@ -148,6 +148,9 @@ record:
     hand: box 60c5753592ba
     hash_before: c8eb7999eb63f315e900998e9b9e0d66e0558624
     hash_after: dff730fc5f57b6cae29accf2ef444b6871d68578
+  - step: retro/notes
+    hand: box e40902741515
+    hash_before: 929d931f59c7c2f7cec8fe236bb384f3bb5f89b1
 step: retro/notes
 ---
 
