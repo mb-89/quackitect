@@ -1,6 +1,7 @@
 // The index. The one place this tree runs the index binary: a question by
 // method and params, a find by words, and the warming that keeps it standing.
-// A dead index says why, and the door warms it again once a minute at most.
+// The binary stands at the method root, and it runs over the work root. A
+// dead index says why, and the door warms it again once a minute at most.
 // [[spec/design_output/index#the-door-answers-the-tools]]
 
 import { join } from "node:path";
@@ -8,12 +9,12 @@ import { BIN, readsAnswer } from "../../.claude/skills/level0/lib/index.js";
 
 const REWARM = 60000;
 
-export function index(disk, proc, clock, root) {
+export function index(disk, proc, clock, method, work = method) {
   let dead = "";
   let warmedAt = 0;
 
   const at = () => {
-    for (const one of [join(root, BIN), `${join(root, BIN)}.exe`]) {
+    for (const one of [join(method, BIN), `${join(method, BIN)}.exe`]) {
       if (disk.exists(one)) return one;
     }
     return "";
@@ -23,13 +24,13 @@ export function index(disk, proc, clock, root) {
     const binary = at();
     if (!binary) return { exitCode: 127, stdout: "", stderr: `no ${BIN} stands on this box` };
     try {
-      return proc.run([binary, ...argv], { cwd: root, timeoutMs });
+      return proc.run([binary, ...argv], { cwd: work, timeoutMs });
     } catch (error) {
       return { exitCode: 1, stdout: "", stderr: String(error?.message ?? error) };
     }
   };
 
-  // A failed run marks the index dead with why, and asks for a warm.
+  // A failed run marks the index dead with why.
   const failed = (ran, what) => {
     dead = ran.exitCode === 127 ? ran.stderr : `${BIN} ${what} answers ${ran.exitCode}`;
     return null;

@@ -60,7 +60,7 @@ function privateDoor(e, writing, where, box) {
 // [[spec/design_output/schema#the-door-refuses-a-departure]]
 function schemaDoor(e, writing, where, box) {
   if (!where.endsWith(".md")) return "";
-  const schemas = box.schemas ?? (box.schemas = schemasHere(box.disk, box.root));
+  const schemas = box.schemas ?? (box.schemas = schemasHere(box.disk, box.method));
   const whole = wholeAfter(e, writing, box.disk);
   const kind = kindOf(whole);
 

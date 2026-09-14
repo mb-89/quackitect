@@ -1,8 +1,10 @@
-// THE SERVER behind the bridgehead. Plain node on this box: it takes every
-// event the bridgehead posts, decides it through one door per event, and
-// answers what the bridgehead does with it. The doors live in the files
-// beside this one, the outside things behind the doors under src/doors, and
-// the state in one box. The debugger attaches here, and a restart loses the
+// THE SERVER behind the bridgehead. Plain node at the method root: it takes
+// every event a bridgehead posts, decides it through one door per event, and
+// answers what the bridgehead does with it. A bridgehead names the root it
+// works in, and the server keeps one box a work root: the rules, the schemas
+// and the tools come from the method root it runs from, the log, the notes
+// and the files from the work root. Quackitect itself is the case where both
+// are one folder. The debugger attaches here, and a restart loses the
 // session nothing.
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
@@ -55,7 +57,7 @@ function pass() {
 
 function opensSession(e, box) {
   onSessionStart(e, box);
-  box.schemas = schemasHere(box.disk, box.root);
+  box.schemas = schemasHere(box.disk, box.method);
   warmIndex(box);
   return { register: [findSpec(), ...applySpecs()], pass: true };
 }
@@ -64,25 +66,39 @@ function onToolCall(e, box) {
   return (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
 }
 
-// The box: the root, the doors, and the state the doors keep. A test hands in fakes.
-export function boxOf(root, doors = {}) {
+// The box of one work root: the two roots, the doors, and the state the doors keep. A test hands in fakes.
+export function boxOf(method, work = method, doors = {}) {
   const files = doors.disk ?? disk();
   const time = doors.clock ?? clock();
+  const outside = doors.proc ?? proc();
   return {
-    root,
+    method,
+    work,
+    root: work,
     disk: files,
     clock: time,
-    index: doors.index ?? index(files, doors.proc ?? proc(), time, root),
-    vale: doors.vale ?? vale(files, doors.proc ?? proc(), root),
-    log: doors.log ?? log(files, time, { folder: join(root, ".se", "log"), level: "debug" }),
+    index: doors.index ?? index(files, outside, time, method, work),
+    vale: doors.vale ?? vale(files, outside, method),
+    log: doors.log ?? log(files, time, { folder: join(work, ".se", "log"), level: "debug" }),
   };
 }
 
-export function serve(root, port = PORT, say = console.log) {
-  const box = boxOf(root);
+// One box a work root, made on the first event naming it.
+export function boxesOf(method, doors = {}) {
+  const held = new Map();
+  return (root) => {
+    const work = String(root || method);
+    if (!held.has(work)) held.set(work, boxOf(method, work, doors));
+    return held.get(work);
+  };
+}
+
+export function serve(method, port = PORT, say = console.log) {
+  const boxes = boxesOf(method);
+  const own = boxes(method);
   const where = `http://127.0.0.1:${port}`;
   const stop = async () => {
-    await box.log.say("info", "bridge", `the server stops at ${where}`);
+    await own.log.say("info", "bridge", `the server stops at ${where}`);
     server.close();
     process.exit(0);
   };
@@ -95,11 +111,12 @@ export function serve(root, port = PORT, say = console.log) {
     }
     if (request.method !== "POST" || request.url !== "/event") {
       const ok = request.url === "/health";
-      answer(response, ok ? 200 : 404, { ok, port, dead: box.index.dead() });
+      answer(response, ok ? 200 : 404, { ok, port, method, dead: own.index.dead() });
       return;
     }
     readBody(request, async (body) => {
       const said = parsed(body);
+      const box = boxes(said.root);
       const decided = await decide(said, box);
       await box.log.event(said, decided);
       answer(response, 200, decided);
@@ -107,8 +124,8 @@ export function serve(root, port = PORT, say = console.log) {
   });
 
   server.listen(port, "127.0.0.1", async () => {
-    await box.log.say("info", "bridge", `the server stands at ${where}`, { root });
-    say(`the server stands at ${where}, and writes its log under ${root}`);
+    await own.log.say("info", "bridge", `the server stands at ${where}`, { root: method });
+    say(`the server stands at ${where}, from ${method}`);
   });
   process.on("SIGINT", stop);
   process.on("SIGTERM", stop);

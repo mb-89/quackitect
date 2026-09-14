@@ -42,14 +42,14 @@ function readNotes(disk, folder) {
 
 // A session opens: the guidance reads again, and the canary is owed again.
 export function onSessionStart(_e, box) {
-  box.guidance = guidanceHere(box.disk, box.root);
+  box.guidance = guidanceHere(box.disk, box.method);
   box.session = { reads: 0, firstTurn: true };
   return { pass: true };
 }
 
 // [[spec/design_output/level0#the-guidance-stays-put]]
 export function onPromptContext(_e, box) {
-  const held = box.guidance ?? (box.guidance = guidanceHere(box.disk, box.root));
+  const held = box.guidance ?? (box.guidance = guidanceHere(box.disk, box.method));
   const session = box.session ?? (box.session = { reads: 0, firstTurn: true });
   session.reads += 1;
   const blocks = blocksOf(held, box.index.dead());
@@ -109,7 +109,7 @@ export function onTurnComplete(e, box) {
 // reads off the disk again first, so the re-read carries the notes as they stand.
 // [[spec/design_output/level0#the-layer-after-a-compaction]]
 export function onSessionCompact(e, box) {
-  box.guidance = guidanceHere(box.disk, box.root);
+  box.guidance = guidanceHere(box.disk, box.method);
   box.log.say("info", "compact", "a compaction runs, and the guidance reads again", {
     trigger: String(e?.trigger ?? "unknown"),
     messages: Array.isArray(e?.messages) ? e.messages.length : 0,

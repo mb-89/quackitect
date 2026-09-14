@@ -18,7 +18,7 @@ const built = files.exists(join(root, BIN)) || files.exists(join(root, `${BIN}.e
 const ifBuilt = built ? test : skip;
 
 ifBuilt("the door stands where the binary is built, and a glob comes out of the rows", () => {
-  const it = index(files, proc(), clock(), root);
+  const it = index(files, proc(), clock(), root, root);
   assert.equal(it.stands(), true);
   assert.deepEqual(it.warm(), { warmed: true, dead: "" });
   const answer = it.ask("glob", { pattern: "src/doors/*.js", path: "" });
@@ -27,7 +27,7 @@ ifBuilt("the door stands where the binary is built, and a glob comes out of the 
 });
 
 test("a box with no binary answers nothing, and says so", () => {
-  const it = index(files, proc(), clock(), files.tempDir("no-index-"));
+  const it = index(files, proc(), clock(), files.tempDir("no-index-"), files.tempDir("no-work-"));
   assert.equal(it.stands(), false);
   assert.equal(it.ask("glob", { pattern: "*" }), null);
   assert.equal(it.find("anything"), null);

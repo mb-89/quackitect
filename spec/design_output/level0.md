@@ -18,8 +18,16 @@ its first session with nothing typed.
 # The bridgehead and the server
 
 Level zero is two pieces. The bridgehead, `hooks/level0.js`, is the module the
-client loads: one door for every event, `*`, and one function behind it. It
-posts each event to the server on this box and does what the answer says.
+client loads, and the one hook a project carries: one door for every event,
+`*`, and one function behind it. It posts each event to the server at the
+port, with the root the session works in, and does what the answer says. It
+imports nothing, so a project carries the file alone. The project knows
+nothing of where the method stands on the disk.
+
+The server runs from the method root and keeps one box a work root. The
+rules, the schemas, the index binary and Vale come from the method root. The
+log, the notes and the files come from the work root. This tree is the case
+where both roots are one folder.
 
 | the answer | the bridgehead does |
 |---|---|
@@ -28,12 +36,20 @@ posts each event to the server on this box and does what the answer says.
 | `{ event }` | hands the changed event on |
 | nothing, the server down | hands the event on, and writes one `warn` line, once |
 
-The server is plain node under `src/bridge`, one file a topic: `server.js`
-holds the doors and the switch in `decide`, `log.js` the log, `index.js` the
-index behind the search tools, and `guidance.js` the rules, the canary and
-the compaction. It logs every event at `debug`, whole, and holds the state in
-one box. `./RUNME.sh serve` starts it, and `--inspect` on that verb opens it
-to the debugger. The launch config `the server` starts it under the editor's
+The server is plain node under `src/bridge`, one file a topic:
+
+| file | holds |
+|---|---|
+| `server.js` | the doors and the switch in `decide` |
+| `guidance.js` | the rules, the canary and the compaction |
+| `search.js` | the client's search tools |
+| `write.js` | the write door |
+| `apply.js` | the batch edit |
+
+The log, the index and Vale stand behind doors under `src/doors`. The server
+logs every event at `debug`, whole, and holds the state in one box a work
+root. `./RUNME.sh serve` starts it, and `--inspect` on that verb opens it to
+the debugger. The launch config `the server` starts it under the editor's
 debugger, so a break in `decide` binds, pauses, and takes new breaks while
 the agent runs.
 

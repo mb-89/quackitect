@@ -25,9 +25,9 @@ A stub is a bare folder plus the bridgehead. Every file in it travels with git, 
 | `vehicle.json` | the vehicle's identity, its brand, and its upstream repo | the stub verb, off the vehicle's register entry and its git remote |
 | `RUNME.sh` | a shim: resolves the vehicle and hands every argument to the vehicle's `RUNME.sh`, with the work root set to this folder | the stub verb, and the vehicle at an update |
 | `.claude/settings.json` | the cage's settings, the same on every box, and the vehicle's plugin enabled by name | the stub verb |
-| `.claude/settings.local.json` | the vehicle's folder on this box, as the marketplace the plugin loads from, off git | the shim at install |
+| `.claude/skills/level0/` | the bridgehead: one hook file that imports nothing, and its two manifests | the stub verb, and the vehicle at an update |
 
-The client loads a plugin from a folder a settings file names as a marketplace. So the stub carries no plugin folder, and the bridgehead is two settings lines and the shim. For details, see [[spec/design_output/level0#a-stub-names-its-vehicle]].
+The bridgehead posts every event to the vehicle's server at a port, with the stub's root. The server runs from the vehicle's folder. So the stub carries the one hook, and knows nothing of where the vehicle stands on the disk. For details, see [[spec/design_output/level0#the-bridgehead-and-the-server]].
 
 # The bridgehead step by step
 

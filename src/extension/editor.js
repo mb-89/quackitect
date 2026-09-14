@@ -54,8 +54,19 @@ function editorDoor(context) {
     processes: () => Object.fromEntries([...processes].map(([key, held]) => [key, held.how])),
     onProcess: (said) => watchers.push(said),
 
+    // A server running already, from a shell or a session before, is adopted rather than started twice.
+    async adoptsProcess(key) {
+      if (processes.has(key)) return true;
+      const alive = await healthOverTheWire().catch(() => false);
+      if (!alive) return false;
+      processes.set(key, { how: "on", adopted: true });
+      changed();
+      return true;
+    },
+
     async startProcess(key, how) {
       if (processes.has(key)) return;
+      if (how !== "debug" && (await this.adoptsProcess(key))) return;
       const root = folder.uri.fsPath;
       if (how === "debug") {
         await pauseAt(uriOf(SERVER), join(root, ...SERVER.split("/")), PAUSES);
@@ -91,10 +102,10 @@ function editorDoor(context) {
       const held = processes.get(key);
       if (!held) return;
       processes.delete(key);
-      if (held.child) {
+      if (held.child || held.adopted) {
         // The server writes its stop line on a stop over the wire, and the kill stands behind it.
         await stopOverTheWire().catch(() => {});
-        setTimeout(() => held.child.kill(), 300);
+        if (held.child) setTimeout(() => held.child.kill(), 300);
       } else {
         await vscode.debug.stopDebugging(held.session ?? undefined);
       }
@@ -264,6 +275,21 @@ function editorDoor(context) {
 }
 
 // [[spec/design_output/extension#the-hook-button]]
+function healthOverTheWire() {
+  return new Promise((resolve, reject) => {
+    const request = http.request(
+      { host: "127.0.0.1", port: PORT, path: "/health", method: "GET", timeout: 500 },
+      (response) => {
+        response.resume();
+        response.on("end", () => resolve(response.statusCode === 200));
+      },
+    );
+    request.on("error", reject);
+    request.on("timeout", () => request.destroy(new Error("timeout")));
+    request.end();
+  });
+}
+
 function stopOverTheWire() {
   return new Promise((resolve, reject) => {
     const request = http.request(

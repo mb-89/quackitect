@@ -47,6 +47,7 @@ async function activate(context, given) {
     door.watch(sidebar.watches, draw);
     // [[spec/design_output/extension#the-hook-button]]
     door.onProcess?.(draw);
+    await door.adoptsProcess?.("bridge.hook");
   });
 }
 

@@ -1,15 +1,16 @@
-// THE BRIDGEHEAD. One door for every event, "*", and one function behind it.
-// It posts the event to the server on this box and does what the answer says:
-// pass the event on, return a result, or pass a changed event on. The server
-// holds the doors, the log and the state, and a server killed and started
-// again takes the next event as if nothing happened. A dead server blocks
-// nothing: the event goes on, and one line says so.
+// THE BRIDGEHEAD. The one hook a project carries. One door for every event,
+// "*", and one function behind it: it posts the event to the server at the
+// port, with the root this session works in, and does what the answer says.
+// The server holds the doors, the log and the state, and runs wherever the
+// method stands. A server killed and started again takes the next event as
+// if nothing happened. A dead server blocks nothing: the event goes on, and
+// one line says so. This file imports nothing, so a project carries it alone.
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
-
-import { rowOf, SESSION } from "../lib/log.js";
 
 const PORT = 6510;
 const URL = `http://127.0.0.1:${PORT}/event`;
+const SESSION = ".se/log/session.jsonl";
+let root = "";
 let saidDown = false;
 
 export function register(on, _options) {
@@ -20,6 +21,7 @@ async function seen($, e, next) {
   // The first event of a session hands an empty table as $, and goes on untouched.
   const event = String(next?.event ?? "event");
   if (event === "engine.create") return next(e);
+  if (event === "session.start" && e?.cwd) root = String(e.cwd);
   const answer = await ask($, event, e, next);
   if (!answer) return next(e);
   if (Array.isArray(answer.register)) await registers($, answer.register);
@@ -29,31 +31,13 @@ async function seen($, e, next) {
   return next(e);
 }
 
-// The server adds to what the chain beneath answers: a list grows, and any other field is set.
-function merged(said, after) {
-  const out = said && typeof said === "object" ? { ...said } : {};
-  for (const [key, value] of Object.entries(after ?? {})) {
-    out[key] = Array.isArray(value) && Array.isArray(out[key]) ? [...out[key], ...value] : value;
-  }
-  return out;
-}
-
-// The server names tools for the client to list, and the bridgehead registers each.
-async function registers($, specs) {
-  for (const spec of specs) {
-    try {
-      await $.tool.register(spec);
-    } catch {}
-  }
-}
-
 // One request an event. The answer is JSON, or nothing where the server is down.
 async function ask($, event, e, next) {
   let body = "";
   try {
-    body = JSON.stringify({ event, e: e ?? null, origin: next?.origin ?? null });
+    body = JSON.stringify({ event, e: e ?? null, origin: next?.origin ?? null, root });
   } catch {
-    body = JSON.stringify({ event, e: String(e) });
+    body = JSON.stringify({ event, e: String(e), root });
   }
   try {
     const said = await $.http.fetch(URL, {
@@ -70,13 +54,35 @@ async function ask($, event, e, next) {
   }
 }
 
+// The server names tools for the client to list, and the bridgehead registers each.
+async function registers($, specs) {
+  for (const spec of specs) {
+    try {
+      await $.tool.register(spec);
+    } catch {}
+  }
+}
+
+// The server adds to what the chain beneath answers: a list grows, and any other field is set.
+function merged(said, after) {
+  const out = said && typeof said === "object" ? { ...said } : {};
+  for (const [key, value] of Object.entries(after ?? {})) {
+    out[key] = Array.isArray(value) && Array.isArray(out[key]) ? [...out[key], ...value] : value;
+  }
+  return out;
+}
+
 // The server is down: one line in the log, once, and the event goes on.
 async function down($, event, error) {
   if (saidDown) return;
-  const row = rowOf(new Date().toISOString(), "warn", "bridge", `the server answers nothing at ${URL}`, {
+  const row = {
+    at: new Date().toISOString(),
+    level: "warn",
+    kind: "bridge",
+    said: `the server answers nothing at ${URL}`,
     event,
     detail: String(error?.message ?? error),
-  });
+  };
   try {
     let held = "";
     try {
