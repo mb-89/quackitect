@@ -140,6 +140,9 @@ record:
     hand: box 15784e5eed30
     skipped: true
     why: the box leaves it while step-changes-hands stand open
+  - step: retro/notes
+    hand: box bf672c492027
+    hash_before: 2d8c3c83900bdda5de9331934489dff1098e1cee
 step: retro/notes
 ---
 
