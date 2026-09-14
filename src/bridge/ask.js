@@ -1,28 +1,29 @@
 // The ask. The owner sets ask.wanted to short or full from the sidebar, and
-// the next tool call carries what the owner asks for, once. The turn's end
-// writes the key back to quiet and says so, so the ask asks once and the
-// sidebar draws the answer as the widget falling back to rest.
+// it opens a demand like a prompt: the block rides on the next call, and the
+// reply stands before anything else. The turn's end writes the key back to
+// quiet, so the ask asks once and the widget falls back to rest.
 // [[spec/design_output/extension#the-ask-is-a-line]]
 
 import { join } from "node:path";
 import { ASK, controlBlock, QUIET } from "../../.claude/skills/level0/lib/controls.js";
+import { demands } from "./answer.js";
 import { asks } from "./config.js";
 
 const LOCAL = ".se/config.json";
 
 // [[spec/design_output/extension#the-ask-is-a-line]]
 export function asksForUpdate(e, box) {
-  if (e?.agentId) return null;
+  if (e?.agentId) return;
   const wanted = String(asks(box, ASK) ?? QUIET);
-  if (wanted === QUIET || box.asked === wanted) return null;
+  if (wanted === QUIET || box.asked === wanted) return;
   box.asked = wanted;
   box.log.say("debug", "ask", `the owner asks for a ${wanted} update`, {
     tool: String(e?.tool ?? ""),
   });
-  return { after: { context: [controlBlock({ wanted })] } };
+  demands(box, `The owner asks for a ${wanted} update`, controlBlock({ wanted }), () => dropsAsk(null, box));
 }
 
-// The turn ends: the ask drops to quiet, so it asks once.
+// The ask drops to quiet the moment its reply pays it, or at the turn's end at the latest.
 export function dropsAsk(_e, box) {
   box.asked = "";
   const wanted = String(asks(box, ASK) ?? QUIET);

@@ -28,6 +28,7 @@ async function seen($, e, next) {
   const answer = await ask($, event, e, next);
   if (!answer) return next(e);
   if (Array.isArray(answer.register)) await registers($, answer.register);
+  if (answer.needs === "reply") return spoke($, e, next);
   if (answer.spawn !== undefined) return spawns($, answer, next);
   if (answer.result !== undefined) return answer.result;
   if (answer.event !== undefined) return next(answer.event);
@@ -87,6 +88,28 @@ async function ask($, event, e, next) {
     await down($, event, error);
     return null;
   }
+}
+
+// The server wants the reply the owner is owed: the bridgehead reads the last
+// text the agent wrote off the transcript, posts it as an event of its own,
+// and does what that answer says with the call in hand.
+async function spoke($, e, next) {
+  let text = "";
+  try {
+    const rows = await $.session.messages();
+    for (let at = rows.length - 1; at >= 0; at--) {
+      const said = String(rows[at]?.text ?? "").trim();
+      if (rows[at]?.role === "assistant" && said) {
+        text = said;
+        break;
+      }
+    }
+  } catch {}
+  const answer = await ask($, "agent.spoke", { tool: e?.tool, agentId: e?.agentId, text }, next);
+  if (!answer) return next(e);
+  if (answer.result !== undefined) return answer.result;
+  if (answer.after !== undefined) return merged(await next(e), answer.after);
+  return next(e);
 }
 
 // The server names tools for the client to list, and the bridgehead registers each.

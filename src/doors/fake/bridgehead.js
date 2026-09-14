@@ -8,18 +8,24 @@ import { decide } from "../../bridge/server.js";
 
 export function fakeBridgehead(box) {
   const raised = [];
-  return {
+  const it = {
     raised,
+    // The last text the agent wrote, which the real one reads off the transcript.
+    spoken: "",
     // What the bridgehead does with the answer, in the order the real one reads it.
     async raise(event, e, origin = { kind: "test" }) {
       const said = { event, e, origin };
       const answer = await decide(said, box);
       await box.log.event(said, answer);
       raised.push({ said, answer });
+      if (answer.needs === "reply") {
+        return it.raise("agent.spoke", { tool: e?.tool, agentId: e?.agentId, text: it.spoken }, origin);
+      }
       if (answer.result !== undefined) return { result: answer.result };
       if (answer.event !== undefined) return { next: answer.event };
       if (answer.after !== undefined) return { next: e, after: answer.after };
       return { next: e, register: answer.register };
     },
   };
+  return it;
 }

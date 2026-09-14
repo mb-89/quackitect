@@ -19,7 +19,7 @@ import { index } from "../doors/index.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { vale } from "../doors/vale.js";
-import { holdsForAnswer, onMessageDisplay, onPromptSubmit, onTurnEnd, onTurnStart } from "./answer.js";
+import { holdsForAnswer, onAgentSpoke, onMessageDisplay, onPromptSubmit, onTurnEnd, SPOKE } from "./answer.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate, dropsAsk } from "./ask.js";
 import { SPECS as stopSpecs, TOOLS as stopTools } from "./stop.js";
@@ -47,8 +47,8 @@ const DOORS = {
   "session.start": opensSession,
   "prompt.context": onPromptContext,
   "prompt.submit": onPromptSubmit,
-  "turn.start": onTurnStart,
   "classic.MessageDisplay": onMessageDisplay,
+  [SPOKE]: onAgentSpoke,
   "session.compact": onSessionCompact,
   "turn.complete": endsTurn,
   "agent.spawn": onAgentSpawn,
@@ -105,11 +105,12 @@ function opensSession(e, box) {
 // A tool call meets the answer door first, then its handler, and a call passing
 // while the canary is owed carries the ask for it.
 async function onToolCall(e, box) {
+  asksForUpdate(e, box);
   const held = holdsForAnswer(e, box);
-  if (held?.result) return held;
+  if (held?.result || held?.needs) return held;
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
   if (said !== PASS) return said;
-  return held ?? asksForUpdate(e, box) ?? owesCanary(e, box) ?? PASS;
+  return held ?? owesCanary(e, box) ?? PASS;
 }
 
 // The turn end pays the answer door, drops the ask, then reads the canary.
