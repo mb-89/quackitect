@@ -36,6 +36,6 @@ export function dropsAsk(_e, box) {
   held[section] = { ...(held[section] ?? {}), [leaf]: QUIET };
   box.disk.makeDir(join(box.work, ".se"));
   box.disk.write(at, `${JSON.stringify(held, null, 2)}\n`);
-  box.log.say("info", "config", `the ask stood at ${wanted}, and drops to ${QUIET}`);
+  box.log.say("debug", "config", `the ask stood at ${wanted}, and drops to ${QUIET}`);
   return { pass: true };
 }
