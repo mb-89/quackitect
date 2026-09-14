@@ -16,7 +16,7 @@ export function asksForUpdate(e, box) {
   const wanted = String(asks(box, ASK) ?? QUIET);
   if (wanted === QUIET || box.asked === wanted) return null;
   box.asked = wanted;
-  box.log.say("info", "ask", `the owner asks for a ${wanted} update`, {
+  box.log.say("debug", "ask", `the owner asks for a ${wanted} update`, {
     tool: String(e?.tool ?? ""),
   });
   return { after: { context: [controlBlock({ wanted })] } };
