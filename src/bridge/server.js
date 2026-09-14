@@ -21,6 +21,8 @@ import { proc } from "../doors/proc.js";
 import { vale } from "../doors/vale.js";
 import { holdsForAnswer, onMessageDisplay, onPromptSubmit, onTurnEnd, onTurnStart } from "./answer.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
+import { asksForUpdate, dropsAsk } from "./ask.js";
+import { SPECS as stopSpecs, TOOLS as stopTools } from "./stop.js";
 import { onBash, onDescribe } from "./bash.js";
 import { ANSWERED, onAgentAnswered, SPECS as reviewSpecs, TOOLS as reviewTools } from "./review.js";
 import { SPECS as toolSpecs, TOOLS as handTools } from "./tools.js";
@@ -67,6 +69,7 @@ const TOOLS = {
   ...applyTools,
   ...handTools,
   ...reviewTools,
+  ...stopTools,
 };
 
 // The one place an event is decided. Put a break on the return.
@@ -86,7 +89,10 @@ function opensSession(e, box) {
   box.projections = projectionsHere(box.disk, box.method);
   box.sources = sourcesOf(box.projections, box.disk, box.method);
   warmIndex(box);
-  return { register: [findSpec(), ...applySpecs(), ...toolSpecs(box), ...reviewSpecs()], pass: true };
+  return {
+    register: [findSpec(), ...applySpecs(), ...toolSpecs(box), ...reviewSpecs(), ...stopSpecs(box)],
+    pass: true,
+  };
 }
 
 // A tool call meets the answer door first, then its handler, and a call passing
@@ -96,12 +102,13 @@ async function onToolCall(e, box) {
   if (held?.result) return held;
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
   if (said !== PASS) return said;
-  return held ?? owesCanary(e, box) ?? PASS;
+  return held ?? asksForUpdate(e, box) ?? owesCanary(e, box) ?? PASS;
 }
 
-// The turn end pays the answer door, then reads the canary.
+// The turn end pays the answer door, drops the ask, then reads the canary.
 function endsTurn(e, box) {
   onTurnEnd(e, box);
+  dropsAsk(e, box);
   return onTurnComplete(e, box);
 }
 

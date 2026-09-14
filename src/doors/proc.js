@@ -17,6 +17,8 @@ export function proc() {
         timeout: init.timeoutMs,
         maxBuffer: BUFFER,
         stdio: init.inherit ? "inherit" : undefined,
+        // A child of a windowless process opens no console of its own.
+        windowsHide: true,
       });
       if (ran.error) throw ran.error;
       return {
