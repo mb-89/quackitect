@@ -1,15 +1,21 @@
 // THE SERVER behind the bridgehead. Plain node on this box: it takes every
 // event the bridgehead posts, decides it through one door per event, and
 // answers what the bridgehead does with it. The doors live in the files
-// beside this one, the log in log.js, and the state in one box. The debugger
-// attaches here, and a restart loses the session nothing.
+// beside this one, the outside things behind the doors under src/doors, and
+// the state in one box. The debugger attaches here, and a restart loses the
+// session nothing.
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
 import { createServer } from "node:http";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { clock } from "../doors/clock.js";
+import { disk } from "../doors/disk.js";
+import { index } from "../doors/index.js";
+import { log } from "../doors/log.js";
+import { proc } from "../doors/proc.js";
 import { onPromptContext, onSessionCompact, onSessionStart, onTurnComplete } from "./guidance.js";
-import { answersFromIndex, FIND, findSpec, runsFind, warmIndex } from "./index.js";
-import { logHere } from "./log.js";
+import { answersFromIndex, FIND, findSpec, runsFind, warmIndex } from "./search.js";
 
 export const PORT = 6510;
 const PASS = { pass: true };
@@ -50,15 +56,26 @@ function onToolCall(e, box) {
   return (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
 }
 
-export function boxOf(root) {
-  return { root, dead: "", warmedAt: 0, now: () => Date.now(), log: logHere(root) };
+// The box: the root, the doors, and the state the doors keep. A test hands in fakes.
+export function boxOf(root, doors = {}) {
+  const files = doors.disk ?? disk();
+  const time = doors.clock ?? clock();
+  return {
+    root,
+    dead: "",
+    warmedAt: 0,
+    disk: files,
+    clock: time,
+    index: doors.index ?? index(files, doors.proc ?? proc(), root),
+    log: doors.log ?? log(files, time, { folder: join(root, ".se", "log"), level: "debug" }),
+  };
 }
 
 export function serve(root, port = PORT, say = console.log) {
   const box = boxOf(root);
   const where = `http://127.0.0.1:${port}`;
-  const stop = () => {
-    box.log.say("info", "bridge", `the server stops at ${where}`);
+  const stop = async () => {
+    await box.log.say("info", "bridge", `the server stops at ${where}`);
     server.close();
     process.exit(0);
   };
@@ -74,16 +91,16 @@ export function serve(root, port = PORT, say = console.log) {
       answer(response, ok ? 200 : 404, { ok, port, dead: box.dead });
       return;
     }
-    readBody(request, (body) => {
+    readBody(request, async (body) => {
       const said = parsed(body);
       const decided = decide(said, box);
-      box.log.event(said, decided);
+      await box.log.event(said, decided);
       answer(response, 200, decided);
     });
   });
 
-  server.listen(port, "127.0.0.1", () => {
-    box.log.say("info", "bridge", `the server stands at ${where}`, { root });
+  server.listen(port, "127.0.0.1", async () => {
+    await box.log.say("info", "bridge", `the server stands at ${where}`, { root });
     say(`the server stands at ${where}, and writes its log under ${root}`);
   });
   process.on("SIGINT", stop);

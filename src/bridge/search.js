@@ -1,13 +1,10 @@
-// The index behind the search tools. A Grep or a Glob the index can answer
+// The search tools behind the index. A Grep or a Glob the index can answer
 // comes from the rows, in the tool's own shape, and any other reads the disk.
 // The find tool ranks lines by the words. A dead index blocks nothing: it says
 // why, once, and the disk answers until it warms again.
 // [[spec/design_output/index#the-door-answers-the-tools]]
 
-import { spawnSync } from "node:child_process";
-import { existsSync } from "node:fs";
-import { join } from "node:path";
-import { asked, BIN, readsAnswer, said as saidOf } from "../../.claude/skills/level0/lib/index.js";
+import { asked, BIN, said as saidOf } from "../../.claude/skills/level0/lib/index.js";
 
 export const FIND = "find";
 const PASS = { pass: true };
@@ -30,8 +27,11 @@ export function findSpec() {
 export function answersFromIndex(e, box) {
   const ask = asked(e);
   if (!ask || /^([A-Za-z]:)?[\\/]/.test(String(e.path ?? ""))) return PASS;
-  const answer = askIndex(box, ask);
-  if (!answer) return PASS;
+  const answer = box.index.ask(ask.method, ask.params);
+  if (!answer) {
+    warmIndex(box);
+    return PASS;
+  }
   box.log.say("info", "index", `${ask.method} reads the rows`, {
     tool: String(e.tool),
     detail: String(e.pattern ?? "").slice(0, 120),
@@ -43,62 +43,36 @@ export function answersFromIndex(e, box) {
 export function runsFind(e, box) {
   const words = String(e?.words ?? "").trim();
   if (!words) return { result: { result: `${FIND} takes the words to look for.` } };
-  const at = indexAt(box);
-  if (!at) return { result: { result: deadIndexLine(box.dead) } };
-  const ran = spawnSync(at, [FIND, words], { cwd: box.root, encoding: "utf8", timeout: 20000 });
-  if (ran.status !== 0) {
-    box.dead = `${BIN} find answers ${ran.status}`;
-    return { result: { result: deadIndexLine(box.dead) } };
+  const rows = box.index.find(words);
+  if (!rows) {
+    warmIndex(box);
+    return { result: { result: deadIndexLine(box.dead || `${BIN} find answers nothing`) } };
   }
-  return { result: { result: findSaid(ran.stdout) } };
+  return { result: { result: findSaid(rows) } };
 }
 
 // The index warms at session start, and again after a failed question, once a minute at most.
 // [[spec/design_output/index#a-dead-index-speaks]]
 export function warmIndex(box) {
-  if (box.now() - (box.warmedAt ?? 0) < REWARM) return;
-  box.warmedAt = box.now();
-  const at = indexAt(box);
-  if (!at) {
+  if (box.clock.now().getTime() - (box.warmedAt ?? 0) < REWARM) return;
+  box.warmedAt = box.clock.now().getTime();
+  if (!box.index.stands()) {
     box.dead = `no ${BIN} stands on this box`;
     box.log.say("warn", "index", "the index is dead", { detail: box.dead });
     return;
   }
-  const ran = spawnSync(at, ["standing"], { cwd: box.root, encoding: "utf8", timeout: 60000 });
-  if (ran.status === 0) {
+  const ran = box.index.standing();
+  if (ran.exitCode === 0) {
     box.dead = "";
     box.log.say("info", "index", "the index is warm");
     return;
   }
-  box.dead = `${BIN} standing answers ${ran.status}`;
+  box.dead = `${BIN} standing answers ${ran.exitCode}`;
   box.log.say("warn", "index", "the index is dead", { detail: box.dead });
 }
 
 export function deadIndexLine(why) {
   return `The index is dead: ${why}. Run ./RUNME.sh, which builds it, and Grep reads the disk until then.`;
-}
-
-function indexAt(box) {
-  for (const at of [join(box.root, BIN), `${join(box.root, BIN)}.exe`]) {
-    if (existsSync(at)) return at;
-  }
-  return "";
-}
-
-function askIndex(box, ask) {
-  const at = indexAt(box);
-  if (!at) return null;
-  const ran = spawnSync(at, ["call", ask.method, JSON.stringify(ask.params)], {
-    cwd: box.root,
-    encoding: "utf8",
-    timeout: 20000,
-  });
-  if (ran.status !== 0) {
-    box.dead = `${BIN} call answers ${ran.status}`;
-    warmIndex(box);
-    return null;
-  }
-  return readsAnswer(ran.stdout);
 }
 
 // The client wants a hook's answer in the tool's own shape, and the text the
@@ -125,8 +99,7 @@ function grepShape(e, answer) {
 }
 
 // The index answers rows as JSON, and the agent reads them as path, line and text.
-function findSaid(stdout) {
-  const rows = readsAnswer(stdout);
+function findSaid(rows) {
   if (!Array.isArray(rows) || !rows.length) return "Nothing carries those words.";
   return rows.map((one) => `${one.path}:${one.line}: ${String(one.text ?? "").trim()}`).join("\n");
 }

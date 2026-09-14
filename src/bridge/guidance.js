@@ -5,7 +5,6 @@
 // back whole, so a compaction probe reads the log alone.
 // [[spec/design_output/level0#the-standing-layer]]
 
-import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   bindsHere,
@@ -16,25 +15,26 @@ import {
   HEARD,
   standingLayer,
 } from "../../.claude/skills/level0/lib/guidance.js";
-import { deadIndexLine } from "./index.js";
+import { deadIndexLine } from "./search.js";
 
 const GUIDANCE = "spec/guidance";
 
 // [[spec/design_output/level0#the-standing-layer]]
-export function guidanceHere(root) {
-  const notes = readNotes(join(root, GUIDANCE));
+export function guidanceHere(disk, root, env = process.env) {
+  const notes = readNotes(disk, join(root, GUIDANCE));
   const wanted = new Set(notes.flatMap((one) => envOf(one.text)));
-  const env = Object.fromEntries([...wanted].map((name) => [name, process.env[name] ?? ""]));
-  const here = notes.filter((one) => bindsHere(one.text, env));
+  const bound = Object.fromEntries([...wanted].map((name) => [name, env[name] ?? ""]));
+  const here = notes.filter((one) => bindsHere(one.text, bound));
   const counts = countsOf(here);
   return { standing: standingLayer(here), ...counts, sentence: canary({ ...counts, stop: false }) };
 }
 
-function readNotes(folder) {
+function readNotes(disk, folder) {
   try {
-    return readdirSync(folder, { withFileTypes: true })
-      .filter((one) => one.isFile() && one.name.endsWith(".md"))
-      .map((one) => ({ name: one.name, text: readFileSync(join(folder, one.name), "utf8") }));
+    return disk
+      .list(folder)
+      .filter((one) => one.kind === "file" && one.name.endsWith(".md"))
+      .map((one) => ({ name: one.name, text: disk.read(join(folder, one.name)) }));
   } catch {
     return [];
   }
@@ -42,14 +42,14 @@ function readNotes(folder) {
 
 // A session opens: the guidance reads again, and the canary is owed again.
 export function onSessionStart(_e, box) {
-  box.guidance = guidanceHere(box.root);
+  box.guidance = guidanceHere(box.disk, box.root);
   box.session = { reads: 0, firstTurn: true };
   return { pass: true };
 }
 
 // [[spec/design_output/level0#the-guidance-stays-put]]
 export function onPromptContext(_e, box) {
-  const held = box.guidance ?? guidanceHere(box.root);
+  const held = box.guidance ?? (box.guidance = guidanceHere(box.disk, box.root));
   const session = box.session ?? (box.session = { reads: 0, firstTurn: true });
   session.reads += 1;
   const blocks = blocksOf(held, box.dead);
@@ -105,11 +105,15 @@ export function onTurnComplete(e, box) {
   return { pass: true };
 }
 
+// A compaction: the client reads the context again after it, and the guidance
+// reads off the disk again first, so the re-read carries the notes as they stand.
 // [[spec/design_output/level0#the-layer-after-a-compaction]]
 export function onSessionCompact(e, box) {
-  box.log.say("info", "compact", "a compaction runs", {
+  box.guidance = guidanceHere(box.disk, box.root);
+  box.log.say("info", "compact", "a compaction runs, and the guidance reads again", {
     trigger: String(e?.trigger ?? "unknown"),
     messages: Array.isArray(e?.messages) ? e.messages.length : 0,
+    detail: box.guidance.sentence,
   });
   return { pass: true };
 }
