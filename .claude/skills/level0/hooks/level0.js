@@ -25,7 +25,17 @@ async function seen($, e, next) {
   if (Array.isArray(answer.register)) await registers($, answer.register);
   if (answer.result !== undefined) return answer.result;
   if (answer.event !== undefined) return next(answer.event);
+  if (answer.after !== undefined) return merged(await next(e), answer.after);
   return next(e);
+}
+
+// The server adds to what the chain beneath answers: a list grows, and any other field is set.
+function merged(said, after) {
+  const out = said && typeof said === "object" ? { ...said } : {};
+  for (const [key, value] of Object.entries(after ?? {})) {
+    out[key] = Array.isArray(value) && Array.isArray(out[key]) ? [...out[key], ...value] : value;
+  }
+  return out;
 }
 
 // The server names tools for the client to list, and the bridgehead registers each.

@@ -28,11 +28,14 @@ posts each event to the server on this box and does what the answer says.
 | `{ event }` | hands the changed event on |
 | nothing, the server down | hands the event on, and writes one `warn` line, once |
 
-The server, `src/doors/bridge.js`, is plain node. It logs every event at
-`debug`, whole, decides it in `decide`, and holds the state. `./RUNME.sh
-serve` starts it, and `--inspect` on that verb opens it to the debugger. The
-launch config `the server` starts it under the editor's debugger, so a break in
-`decide` binds, pauses, and takes new breaks while the agent runs.
+The server is plain node under `src/bridge`, one file a topic: `server.js`
+holds the doors and the switch in `decide`, `log.js` the log, `index.js` the
+index behind the search tools, and `guidance.js` the rules, the canary and
+the compaction. It logs every event at `debug`, whole, and holds the state in
+one box. `./RUNME.sh serve` starts it, and `--inspect` on that verb opens it
+to the debugger. The launch config `the server` starts it under the editor's
+debugger, so a break in `decide` binds, pauses, and takes new breaks while
+the agent runs.
 
 A server killed and running again takes the next event as its own, because
 the bridgehead holds no state and no connection. So the session goes on across

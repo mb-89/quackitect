@@ -11,7 +11,7 @@
       "name": "the server",
       "type": "node",
       "request": "launch",
-      "program": "${workspaceFolder}/src/doors/bridge.js",
+      "program": "${workspaceFolder}/src/bridge/server.js",
       "args": ["${workspaceFolder}"],
       "cwd": "${workspaceFolder}",
       "console": "integratedTerminal"

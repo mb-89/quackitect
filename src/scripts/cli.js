@@ -491,7 +491,7 @@ function gridFaults(where) {
 // The server runs as its own node process, so the debugger attaches to it and a restart loses the session nothing. [[spec/design_output/level0#the-bridgehead-and-the-server]]
 function serveBridge(argv) {
   const inspect = argv.filter((one) => one.startsWith("--inspect"));
-  const server = join(root, "src", "doors", "bridge.js");
+  const server = join(root, "src", "bridge", "server.js");
   return outside.run([process.execPath, ...inspect, server, root], { cwd: root, inherit: true }).exitCode;
 }
 

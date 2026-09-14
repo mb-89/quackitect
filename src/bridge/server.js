@@ -1,0 +1,117 @@
+// THE SERVER behind the bridgehead. Plain node on this box: it takes every
+// event the bridgehead posts, decides it through one door per event, and
+// answers what the bridgehead does with it. The doors live in the files
+// beside this one, the log in log.js, and the state in one box. The debugger
+// attaches here, and a restart loses the session nothing.
+// [[spec/design_output/level0#the-bridgehead-and-the-server]]
+
+import { createServer } from "node:http";
+import { fileURLToPath } from "node:url";
+import { onPromptContext, onSessionCompact, onSessionStart, onTurnComplete } from "./guidance.js";
+import { answersFromIndex, FIND, findSpec, runsFind, warmIndex } from "./index.js";
+import { logHere } from "./log.js";
+
+export const PORT = 6510;
+const PASS = { pass: true };
+
+// One door an event. An event with no door passes.
+const DOORS = {
+  "session.start": opensSession,
+  "prompt.context": onPromptContext,
+  "session.compact": onSessionCompact,
+  "turn.complete": onTurnComplete,
+  "tool.call": onToolCall,
+};
+
+// One handler a tool. A tool with no handler passes.
+const TOOLS = {
+  Grep: answersFromIndex,
+  Glob: answersFromIndex,
+  [`mcp__level0__${FIND}`]: runsFind,
+};
+
+// The one place an event is decided. Put a break on the return.
+export function decide(said, box) {
+  const door = DOORS[String(said?.event ?? "")] ?? pass;
+  return door(said?.e ?? {}, box) ?? PASS;
+}
+
+function pass() {
+  return PASS;
+}
+
+function opensSession(e, box) {
+  onSessionStart(e, box);
+  warmIndex(box);
+  return { register: [findSpec()], pass: true };
+}
+
+function onToolCall(e, box) {
+  return (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
+}
+
+export function boxOf(root) {
+  return { root, dead: "", warmedAt: 0, now: () => Date.now(), log: logHere(root) };
+}
+
+export function serve(root, port = PORT, say = console.log) {
+  const box = boxOf(root);
+  const where = `http://127.0.0.1:${port}`;
+  const stop = () => {
+    box.log.say("info", "bridge", `the server stops at ${where}`);
+    server.close();
+    process.exit(0);
+  };
+
+  const server = createServer((request, response) => {
+    if (request.method === "POST" && request.url === "/stop") {
+      answer(response, 200, { ok: true });
+      setTimeout(stop, 20);
+      return;
+    }
+    if (request.method !== "POST" || request.url !== "/event") {
+      const ok = request.url === "/health";
+      answer(response, ok ? 200 : 404, { ok, port, dead: box.dead });
+      return;
+    }
+    readBody(request, (body) => {
+      const said = parsed(body);
+      const decided = decide(said, box);
+      box.log.event(said, decided);
+      answer(response, 200, decided);
+    });
+  });
+
+  server.listen(port, "127.0.0.1", () => {
+    box.log.say("info", "bridge", `the server stands at ${where}`, { root });
+    say(`the server stands at ${where}, and writes its log under ${root}`);
+  });
+  process.on("SIGINT", stop);
+  process.on("SIGTERM", stop);
+  return server;
+}
+
+function readBody(request, then) {
+  let body = "";
+  request.on("data", (chunk) => {
+    body += chunk;
+  });
+  request.on("end", () => then(body));
+}
+
+function parsed(body) {
+  try {
+    return JSON.parse(body || "{}");
+  } catch {
+    return { event: "event", e: null };
+  }
+}
+
+function answer(response, status, said) {
+  response.writeHead(status, { "content-type": "application/json" });
+  response.end(JSON.stringify(said));
+}
+
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  serve(process.argv[2] ?? process.cwd(), Number(process.env.SE_BRIDGE_PORT ?? PORT));
+}

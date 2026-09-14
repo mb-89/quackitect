@@ -11,7 +11,7 @@ const { join } = require("node:path");
 
 const NAME = "quackitect";
 // [[spec/design_output/extension#the-hook-button]]
-const SERVER = "src/doors/bridge.js";
+const SERVER = "src/bridge/server.js";
 const PORT = 6510;
 const LAUNCH = "the server";
 const PAUSES = "decide";
