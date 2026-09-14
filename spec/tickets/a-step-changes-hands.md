@@ -117,7 +117,15 @@ record:
     hand: box 73ef664c513a
     skipped: true
     why: the box leaves it while step-changes-hands stand open
-step: retro/notes
+  - step: retro/notes
+    hand: box 73ef664c513a
+    hash_before: 5e8e21698db9ea15115f5ca81ed11f9bc109ab6a
+    hash_after: 5e8e21698db9ea15115f5ca81ed11f9bc109ab6a
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+step: retro/write
 ---
 
 # Ask
