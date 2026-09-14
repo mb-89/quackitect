@@ -18,7 +18,7 @@ import { index } from "../doors/index.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { vale } from "../doors/vale.js";
-import { holdsForAnswer, onMessageDisplay, onPromptSubmit, onTurnEnd } from "./answer.js";
+import { holdsForAnswer, onMessageDisplay, onPromptSubmit, onTurnEnd, onTurnStart } from "./answer.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import {
   onAgentSpawn,
@@ -41,6 +41,7 @@ const DOORS = {
   "session.start": opensSession,
   "prompt.context": onPromptContext,
   "prompt.submit": onPromptSubmit,
+  "turn.start": onTurnStart,
   "classic.MessageDisplay": onMessageDisplay,
   "session.compact": onSessionCompact,
   "turn.complete": endsTurn,
@@ -83,10 +84,10 @@ function opensSession(e, box) {
 // while the canary is owed carries the ask for it.
 async function onToolCall(e, box) {
   const held = holdsForAnswer(e, box);
-  if (held) return held;
+  if (held?.result) return held;
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
   if (said !== PASS) return said;
-  return owesCanary(e, box) ?? PASS;
+  return held ?? owesCanary(e, box) ?? PASS;
 }
 
 // The turn end pays the answer door, then reads the canary.
