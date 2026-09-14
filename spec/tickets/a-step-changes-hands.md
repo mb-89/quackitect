@@ -133,6 +133,9 @@ record:
     hand: box 73ef664c513a
     hash_before: ce0aca07a66280ab04c07a955d224b700887cfd7
     hash_after: ce0aca07a66280ab04c07a955d224b700887cfd7
+  - step: children
+    hand: box 15784e5eed30
+    hash_before: 87799df2984bc42f941d16f2359b6903e3dfbf8d
 step: children
 ---
 
