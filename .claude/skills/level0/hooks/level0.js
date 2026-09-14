@@ -8,10 +8,13 @@
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
 const PORT = 6510;
-const URL = `http://127.0.0.1:${PORT}/event`;
+const POINTER = ".se/vehicle.json";
 const SESSION = ".se/log/session.jsonl";
+let port = PORT;
 let root = "";
 let saidDown = false;
+
+const url = () => `http://127.0.0.1:${port}/event`;
 
 export function register(on, _options) {
   on("*", ($, e, next) => seen($, e, next));
@@ -21,7 +24,7 @@ async function seen($, e, next) {
   // The first event of a session hands an empty table as $, and goes on untouched.
   const event = String(next?.event ?? "event");
   if (event === "engine.create") return next(e);
-  if (event === "session.start" && e?.cwd) root = String(e.cwd);
+  if (event === "session.start") await opens($, e);
   const answer = await ask($, event, e, next);
   if (!answer) return next(e);
   if (Array.isArray(answer.register)) await registers($, answer.register);
@@ -29,6 +32,18 @@ async function seen($, e, next) {
   if (answer.event !== undefined) return next(answer.event);
   if (answer.after !== undefined) return merged(await next(e), answer.after);
   return next(e);
+}
+
+// A session opens: the root is the folder it works in, and the port comes off
+// the project's pointer, or stays at the base where none stands.
+async function opens($, e) {
+  if (e?.cwd) root = String(e.cwd);
+  try {
+    const said = JSON.parse(String(await $.fs.read(POINTER)));
+    port = Number(said?.port) || PORT;
+  } catch {
+    port = PORT;
+  }
 }
 
 // One request an event. The answer is JSON, or nothing where the server is down.
@@ -40,7 +55,7 @@ async function ask($, event, e, next) {
     body = JSON.stringify({ event, e: String(e), root });
   }
   try {
-    const said = await $.http.fetch(URL, {
+    const said = await $.http.fetch(url(), {
       method: "POST",
       headers: { "content-type": "application/json" },
       body,
@@ -79,7 +94,7 @@ async function down($, event, error) {
     at: new Date().toISOString(),
     level: "warn",
     kind: "bridge",
-    said: `the server answers nothing at ${URL}`,
+    said: `the server answers nothing at ${url()}`,
     event,
     detail: String(error?.message ?? error),
   };

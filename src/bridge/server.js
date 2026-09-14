@@ -20,6 +20,7 @@ import { vale } from "../doors/vale.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { onPromptContext, onSessionCompact, onSessionStart, onTurnComplete } from "./guidance.js";
 import { answersFromIndex, FIND, findSpec, runsFind, warmIndex } from "./search.js";
+import { registeredPort } from "./vehicle.js";
 import { onWrite, schemasHere } from "./write.js";
 
 export const PORT = 6510;
@@ -153,6 +154,13 @@ function answer(response, status, said) {
   response.end(JSON.stringify(said));
 }
 
+// The port: --port, the environment, or the one the register holds for this vehicle.
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
-  serve(process.argv[2] ?? process.cwd(), Number(process.env.SE_BRIDGE_PORT ?? PORT));
+  const args = process.argv.slice(2);
+  const at = args.indexOf("--port");
+  const method = args.find((one) => !one.startsWith("--") && args[args.indexOf(one) - 1] !== "--port") ?? process.cwd();
+  const port =
+    Number(at >= 0 ? args[at + 1] : process.env.SE_BRIDGE_PORT) ||
+    registeredPort(disk(), process.env, clock(), method);
+  serve(method, port);
 }

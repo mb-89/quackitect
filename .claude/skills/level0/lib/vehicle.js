@@ -54,6 +54,37 @@ export function resolves(list, driver) {
   return "";
 }
 
+// One vehicle, one port. The register holds the port each vehicle blocks, and
+// a vehicle with none takes the lowest free one from the base up.
+// [[spec/design_output/vehicle#the-register-holds-the-port]]
+export const PORT_BASE = 6510;
+export const POINTER = ".se/vehicle.json";
+
+export function portOf(list, method) {
+  for (const one of list ?? []) {
+    if (one?.method_root && same(one.method_root, method) && Number(one.port)) return Number(one.port);
+  }
+  return 0;
+}
+
+export function withPort(list, entry) {
+  const taken = new Set(
+    (list ?? [])
+      .filter((one) => one?.id !== entry.id && !same(one?.method_root ?? "", entry.method_root))
+      .map((one) => Number(one?.port) || 0),
+  );
+  let port = PORT_BASE;
+  while (taken.has(port)) port += 1;
+  return { ...entry, port };
+}
+
+// [[spec/design_output/vehicle#a-project-names-its-driver]]
+export function pointerOf(read) {
+  const held = parsed(read);
+  if (!held?.method) return null;
+  return { method: String(held.method), port: Number(held.port) || PORT_BASE };
+}
+
 // [[spec/design_output/vehicle#one-copy-is-no-question]]
 export function onlyCopy(list) {
   const roots = [];

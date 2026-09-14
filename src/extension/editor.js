@@ -55,24 +55,39 @@ function editorDoor(context) {
     onProcess: (said) => watchers.push(said),
 
     // A server running already, from a shell or a session before, is adopted rather than started twice.
-    async adoptsProcess(key) {
+    async adoptsProcess(key, port) {
       if (processes.has(key)) return true;
-      const alive = await healthOverTheWire().catch(() => false);
+      const at = port ?? (await settled(context, folder.uri.fsPath))?.port;
+      if (!at) return false;
+      const alive = await healthOverTheWire(at).catch(() => false);
       if (!alive) return false;
-      processes.set(key, { how: "on", adopted: true });
+      processes.set(key, { how: "on", adopted: true, port: at });
       changed();
       return true;
     },
 
+    // The button starts the server of the vehicle the open folder points at,
+    // from that vehicle, at that vehicle's port. A folder pointing nowhere
+    // becomes a project of the vehicle this extension came from, first.
     async startProcess(key, how) {
       if (processes.has(key)) return;
-      if (how !== "debug" && (await this.adoptsProcess(key))) return;
-      const root = folder.uri.fsPath;
+      const vehicle = await settled(context, folder.uri.fsPath);
+      if (!vehicle) return;
+      if (how !== "debug" && (await this.adoptsProcess(key, vehicle.port))) return;
+      const program = join(vehicle.method, ...SERVER.split("/"));
       if (how === "debug") {
-        await pauseAt(uriOf(SERVER), join(root, ...SERVER.split("/")), PAUSES);
-        processes.set(key, { how, session: null });
+        await pauseAt(vscode.Uri.file(program), program, PAUSES);
+        processes.set(key, { how, session: null, port: vehicle.port });
         changed();
-        const started = await vscode.debug.startDebugging(folder, LAUNCH);
+        const started = await vscode.debug.startDebugging(folder, {
+          type: "node",
+          request: "launch",
+          name: LAUNCH,
+          program,
+          args: [vehicle.method, "--port", String(vehicle.port)],
+          cwd: vehicle.method,
+          console: "integratedTerminal",
+        });
         if (!started) {
           processes.delete(key);
           changed();
@@ -82,12 +97,12 @@ function editorDoor(context) {
         if (held) held.session = vscode.debug.activeDebugSession;
         return;
       }
-      const child = spawn(process.execPath, [join(root, ...SERVER.split("/")), root], {
-        cwd: root,
+      const child = spawn(process.execPath, [program, vehicle.method, "--port", String(vehicle.port)], {
+        cwd: vehicle.method,
         stdio: "ignore",
         windowsHide: true,
       });
-      processes.set(key, { how, child });
+      processes.set(key, { how, child, port: vehicle.port });
       child.on("exit", () => {
         if (processes.get(key)?.child === child) {
           processes.delete(key);
@@ -104,7 +119,7 @@ function editorDoor(context) {
       processes.delete(key);
       if (held.child || held.adopted) {
         // The server writes its stop line on a stop over the wire, and the kill stands behind it.
-        await stopOverTheWire().catch(() => {});
+        await stopOverTheWire(held.port ?? PORT).catch(() => {});
         if (held.child) setTimeout(() => held.child.kill(), 300);
       } else {
         await vscode.debug.stopDebugging(held.session ?? undefined);
@@ -274,11 +289,28 @@ function editorDoor(context) {
   };
 }
 
+// The vehicle the open folder points at, or the one this extension came from,
+// which stands two folders above it. A folder pointing nowhere becomes a
+// project of that vehicle here, with the one hook and the pointer.
+// [[spec/design_output/vehicle#the-register-holds-the-port]]
+async function settled(context, work) {
+  const home = join(context.extensionPath, "..", "..");
+  try {
+    const bridge = await import(vscode.Uri.file(join(home, "src", "bridge", "vehicle.js")).toString());
+    const disk = (await import(vscode.Uri.file(join(home, "src", "doors", "disk.js")).toString())).disk();
+    const clock = (await import(vscode.Uri.file(join(home, "src", "doors", "clock.js")).toString())).clock();
+    return bridge.settles(disk, process.env, clock, work, home);
+  } catch (error) {
+    vscode.window.showWarningMessage(`the hook finds no vehicle: ${error?.message ?? error}`);
+    return null;
+  }
+}
+
 // [[spec/design_output/extension#the-hook-button]]
-function healthOverTheWire() {
+function healthOverTheWire(port) {
   return new Promise((resolve, reject) => {
     const request = http.request(
-      { host: "127.0.0.1", port: PORT, path: "/health", method: "GET", timeout: 500 },
+      { host: "127.0.0.1", port, path: "/health", method: "GET", timeout: 500 },
       (response) => {
         response.resume();
         response.on("end", () => resolve(response.statusCode === 200));
@@ -290,10 +322,10 @@ function healthOverTheWire() {
   });
 }
 
-function stopOverTheWire() {
+function stopOverTheWire(port) {
   return new Promise((resolve, reject) => {
     const request = http.request(
-      { host: "127.0.0.1", port: PORT, path: "/stop", method: "POST", timeout: 500 },
+      { host: "127.0.0.1", port, path: "/stop", method: "POST", timeout: 500 },
       (response) => {
         response.resume();
         response.on("end", resolve);

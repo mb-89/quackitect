@@ -110,6 +110,21 @@ Every copy writes itself into `~/.se/registry.json`, or into each folder
 `SE_REGISTRY` names. The reader drops an entry whose method root holds no
 marker. A folder that holds something else now answers about that something.
 
+## The register holds the port
+
+One vehicle, one port. The register's entry for a vehicle carries the port
+it blocks. A vehicle with none takes the lowest free one from 6510 up on its
+first start. So two vehicles on one box stand on two ports, and a project
+reaches the right one.
+
+A project points at its vehicle in `.se/vehicle.json`: the method root and
+the port. A folder with no pointer that carries the marker and the server is
+a vehicle, and points at itself. A folder with neither becomes a project on
+the first press of the hook. It gets the one hook under `.claude/skills/level0`
+and the pointer, and nothing else of the vehicle. The bridgehead reads the
+port off the pointer at session start. `.se` stays off git, so a clone gets
+the pointer back from the same press.
+
 ## One copy is no question
 
 A project naming no driver, on a machine holding exactly one copy, takes that
