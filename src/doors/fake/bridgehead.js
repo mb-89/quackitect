@@ -13,7 +13,7 @@ export function fakeBridgehead(box) {
     // What the bridgehead does with the answer, in the order the real one reads it.
     async raise(event, e, origin = { kind: "test" }) {
       const said = { event, e, origin };
-      const answer = decide(said, box);
+      const answer = await decide(said, box);
       await box.log.event(said, answer);
       raised.push({ said, answer });
       if (answer.result !== undefined) return { result: answer.result };

@@ -14,8 +14,10 @@ import { disk } from "../doors/disk.js";
 import { index } from "../doors/index.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
+import { vale } from "../doors/vale.js";
 import { onPromptContext, onSessionCompact, onSessionStart, onTurnComplete } from "./guidance.js";
 import { answersFromIndex, FIND, findSpec, runsFind, warmIndex } from "./search.js";
+import { onWrite, schemasHere } from "./write.js";
 
 export const PORT = 6510;
 const PASS = { pass: true };
@@ -33,13 +35,16 @@ const DOORS = {
 const TOOLS = {
   Grep: answersFromIndex,
   Glob: answersFromIndex,
+  Write: onWrite,
+  Edit: onWrite,
+  MultiEdit: onWrite,
   [`mcp__level0__${FIND}`]: runsFind,
 };
 
 // The one place an event is decided. Put a break on the return.
-export function decide(said, box) {
+export async function decide(said, box) {
   const door = DOORS[String(said?.event ?? "")] ?? pass;
-  return door(said?.e ?? {}, box) ?? PASS;
+  return (await door(said?.e ?? {}, box)) ?? PASS;
 }
 
 function pass() {
@@ -48,6 +53,7 @@ function pass() {
 
 function opensSession(e, box) {
   onSessionStart(e, box);
+  box.schemas = schemasHere(box.disk, box.root);
   warmIndex(box);
   return { register: [findSpec()], pass: true };
 }
@@ -65,6 +71,7 @@ export function boxOf(root, doors = {}) {
     disk: files,
     clock: time,
     index: doors.index ?? index(files, doors.proc ?? proc(), time, root),
+    vale: doors.vale ?? vale(files, doors.proc ?? proc(), root),
     log: doors.log ?? log(files, time, { folder: join(root, ".se", "log"), level: "debug" }),
   };
 }
@@ -91,7 +98,7 @@ export function serve(root, port = PORT, say = console.log) {
     }
     readBody(request, async (body) => {
       const said = parsed(body);
-      const decided = decide(said, box);
+      const decided = await decide(said, box);
       await box.log.event(said, decided);
       answer(response, 200, decided);
     });
