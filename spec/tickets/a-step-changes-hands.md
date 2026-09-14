@@ -278,4 +278,13 @@ The box holds nothing but the retro. The child waits for a person. Every box tha
 
 # Discussion
 
-The judge refuses the one-line command under retro/notes against the working rules, twice in a row. Those rules govern a session's conduct and read nothing in a command. The hand-back takes the shell road there, which the design names as a person's road. The judge reads it at the next agent pull.
+This group waits on one person's line, under design/person-1 on the child.
+
+- the design already answers the finding: [[spec/design_output/pull#the-five-answers]] names five in the heading, the Scope line and the table
+- the person writes one line under the child's answer field and hands the step back
+- the route then runs on to design/draft
+- a third box meets the same wall and writes no third retro, because a second copy is a defect
+- the judge refuses the one-line command under retro/notes against the working rules, twice in a row
+- those rules govern a session's conduct and read nothing in a command
+- that hand-back takes the shell road, which the design names as a person's road
+- the judge reads it at the next agent pull
