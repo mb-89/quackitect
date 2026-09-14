@@ -72,11 +72,20 @@ const TOOLS = {
   ...stopTools,
 };
 
-// The one place an event is decided. Put a break on the return.
+// The one place an event is decided. Put a break on the return. A fresh box
+// names its tools on its first event of any kind, so a server started again
+// brings its tools to a session already running.
 export async function decide(said, box) {
   freshens(box);
   const door = DOORS[String(said?.event ?? "")] ?? pass;
-  return (await door(said?.e ?? {}, box)) ?? PASS;
+  const answer = (await door(said?.e ?? {}, box)) ?? PASS;
+  if (box.registered || String(said?.event ?? "") === "engine.create") return answer;
+  box.registered = true;
+  return { ...answer, register: answer.register ?? specsOf(box) };
+}
+
+function specsOf(box) {
+  return [findSpec(), ...applySpecs(), ...toolSpecs(box), ...reviewSpecs(), ...stopSpecs(box)];
 }
 
 function pass() {
@@ -89,10 +98,8 @@ function opensSession(e, box) {
   box.projections = projectionsHere(box.disk, box.method);
   box.sources = sourcesOf(box.projections, box.disk, box.method);
   warmIndex(box);
-  return {
-    register: [findSpec(), ...applySpecs(), ...toolSpecs(box), ...reviewSpecs(), ...stopSpecs(box)],
-    pass: true,
-  };
+  box.registered = true;
+  return { register: specsOf(box), pass: true };
 }
 
 // A tool call meets the answer door first, then its handler, and a call passing
