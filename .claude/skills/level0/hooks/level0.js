@@ -16,11 +16,13 @@ const SHORT = 4000;
 let port = PORT;
 let root = "";
 let saidDown = false;
+let stepText = "";
 
 const url = () => `http://127.0.0.1:${port}/event`;
 
 export function register(on, _options) {
   on("*", ($, e, next) => seen($, e, next));
+  on("turn.step", streams);
 }
 
 async function seen($, e, next) {
@@ -94,21 +96,45 @@ async function ask($, event, e, next) {
   }
 }
 
-// The server wants the reply the owner is owed: the bridgehead reads the last
-// text the agent wrote off the transcript, posts it as an event of its own,
-// and does what that answer says with the call in hand.
-async function spoke($, e, next) {
+// A step streams: the bridgehead reads the text of the response as it comes,
+// keeps it for the calls the response makes, and posts it whole at the end.
+async function* streams($, e, next) {
   let text = "";
+  let keys = "";
+  let sample = "";
+  for await (const chunk of next(e)) {
+    if (!keys && chunk && typeof chunk === "object") keys = Object.keys(chunk).join(",");
+    if (sample.length < 600) sample += JSON.stringify(chunk).slice(0, 300) + " ";
+    text += textOf(chunk);
+    yield chunk;
+  }
+  stepText = text;
+  await ask($, "turn.said", { turnId: e?.turnId, index: e?.index, keys, sample, text }, next);
+}
+
+async function lastText($) {
   try {
     const rows = await $.session.messages();
     for (let at = rows.length - 1; at >= 0; at--) {
       const said = String(rows[at]?.text ?? "").trim();
-      if (rows[at]?.role === "assistant" && said) {
-        text = said;
-        break;
-      }
+      if (rows[at]?.role === "assistant" && said) return said;
     }
   } catch {}
+  return "";
+}
+
+function textOf(chunk) {
+  if (!chunk || typeof chunk !== "object") return "";
+  if (typeof chunk.text === "string") return chunk.text;
+  if (typeof chunk.delta?.text === "string") return chunk.delta.text;
+  return "";
+}
+
+// The server wants the reply the owner is owed: the text of the step in hand,
+// or the last text the agent wrote off the transcript. The bridgehead posts
+// it as an event of its own, and does what that answer says with the call.
+async function spoke($, e, next) {
+  const text = stepText || (await lastText($));
   const answer = await ask($, "agent.spoke", { tool: e?.tool, agentId: e?.agentId, text }, next);
   if (!answer) return next(e);
   if (answer.result !== undefined) return answer.result;
@@ -116,9 +142,9 @@ async function spoke($, e, next) {
   return next(e);
 }
 
-// The compaction hands the whole transcript as its event, megabytes the server
-// never reads. It goes on with its flat fields alone, each text cut to a page,
-// and so does any event over the wire's limit.
+// The compaction hands the whole transcript as its event, and the server reads
+// no line of it. It goes on with its flat fields alone, each text cut to a
+// page, and so does any event over the wire's limit.
 function slim(e) {
   if (!e || typeof e !== "object") return e ?? null;
   const out = {};

@@ -24,15 +24,21 @@ export function asksForUpdate(e, box) {
   });
   const chapters = wanted === FULL ? statusShape(box.disk, box.method) : [];
   const block = [controlBlock({ wanted }), chapters.length ? statusAsks(chapters) : ""].filter(Boolean).join("\n\n");
-  demands(box, `The owner asks for a ${wanted} update`, block, () => dropsAsk(null, box));
+  demands(box, `The owner asks for a ${wanted} update`, block, () => dropsAsk(box, wanted));
   if (chapters.length) box.demand.fits = (text) => statusLacks(text, chapters);
 }
 
-// The ask drops to quiet the moment its reply pays it, or at the turn's end at the latest.
-export function dropsAsk(_e, box) {
+// The ask drops to quiet the moment its reply pays it. The drop takes back the
+// value it answered alone: a fresh press of the button stands, and the next
+// call asks for it.
+export function dropsAsk(box, wanted) {
   box.asked = "";
-  const wanted = String(asks(box, ASK) ?? QUIET);
-  if (wanted === QUIET) return { pass: true };
+  const stands = String(asks(box, ASK) ?? QUIET);
+  if (stands === QUIET) return { pass: true };
+  if (stands !== wanted) {
+    box.log.say("debug", "config", `the ask stood at ${wanted}, and ${stands} stands pressed since`);
+    return { pass: true };
+  }
   const at = join(box.work, LOCAL);
   let held = {};
   try {

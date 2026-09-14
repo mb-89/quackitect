@@ -404,10 +404,24 @@ hook answers it.
 
 ## The ask is a line
 
-`ask.wanted` writes `quiet`, `short` or `full`. A value past `quiet` puts one
-block in front of the agent, and the turn's end writes the key back to `quiet`.
-So the ask asks once, and the sidebar draws the answer as the widget falling
-back to rest.
+`ask.wanted` writes `quiet`, `short` or `full`. A value past `quiet` opens a
+demand like a prompt: the block rides the next call, and the reply stands
+before the call after it. The reply pays the ask, and the pay writes the key
+back to `quiet`. So the ask asks once, the work goes on, and the sidebar draws
+the answer as the widget falling back to rest.
+
+| the ask | what pays it |
+|---|---|
+| `short` | any reply |
+| `full` | a reply in the shape of `spec/config/status.yaml` |
+
+The shape is four chapters, each a heading with text under it: Done, Now,
+Open, ETA. A reply lacking one is refused with the chapters it lacks, and a
+turn ending on such a reply holds: the stop door re-prompts with the same
+reason, and the ask stands until a reply fits.
+
+The pay takes back the value it answered alone. A press landing after the
+demand opened stands, and the next call asks for it.
 
 # What a cloud box proves
 

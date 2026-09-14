@@ -81,16 +81,28 @@ function paid(box, text) {
   return { pass: true };
 }
 
-// The turn ends: the reply lands in the log once, and a demand still standing is paid by it.
+// The turn ends: the reply lands in the log once, and a demand still standing
+// is paid by it, unless it asks for a shape the answer lacks. That demand stands
+// on into the next turn, and the stop door holds the turn where it can.
 export function onTurnEnd(e, box) {
   const text = String(e?.answer ?? "").trim();
-  if (e?.reason === "answer" && text) {
-    box.log.say("info", "reply", text, {
-      text,
-      ...(box.demand ? { detail: `answers: ${box.demand.why}` } : {}),
-    });
-    box.spoken = text;
-  }
-  box.demand = null;
+  const demand = box.demand;
+  const answered = e?.reason === "answer" && text;
+  if (answered && demand && !demand.fits?.(text)) return paid(box, text);
+  if (answered && text !== box.spoken) box.log.say("info", "reply", text, { text });
+  if (answered) box.spoken = text;
+  if (demand && !demand.fits) box.demand = null;
   return { pass: true };
+}
+
+// The stop: a turn whose last message lacks the shape a demand asks for holds,
+// and the reason re-prompts the agent. Any other turn ends.
+export function holdsTurn(e, box) {
+  if (e?.agentId) return { pass: true };
+  const demand = box.demand;
+  const text = String(e?.last_assistant_message ?? "").trim();
+  const lacks = demand?.fits ? demand.fits(text) : "";
+  if (!lacks) return { pass: true };
+  box.log.say("info", "stop", `the turn holds: ${lacks}`, { detail: demand.why });
+  return { result: { block: `${lacks} ${demand.why}, and the turn ends when it stands.` } };
 }

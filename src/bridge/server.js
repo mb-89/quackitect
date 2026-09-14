@@ -19,9 +19,18 @@ import { index } from "../doors/index.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { vale } from "../doors/vale.js";
-import { holdsForAnswer, onAgentSpoke, onMessageDisplay, onPromptSubmit, onTurnEnd, SPOKE } from "./answer.js";
+import {
+  holdsForAnswer,
+  holdsTurn,
+  onAgentSpoke,
+  onMessageDisplay,
+  onPromptSubmit,
+  onTurnEnd,
+  SPOKE,
+} from "./answer.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
-import { asksForUpdate, dropsAsk } from "./ask.js";
+import { asksForUpdate } from "./ask.js";
+import { asks } from "./config.js";
 import { SPECS as stopSpecs, TOOLS as stopTools } from "./stop.js";
 import { onBash, onDescribe } from "./bash.js";
 import { ANSWERED, onAgentAnswered, SPECS as reviewSpecs, TOOLS as reviewTools } from "./review.js";
@@ -41,6 +50,8 @@ import { onWrite, schemasHere } from "./write.js";
 
 export const PORT = 6510;
 const PASS = { pass: true };
+const GOD = "god";
+const BINDING = "engine.binding";
 
 // One door an event. An event with no door passes.
 const DOORS = {
@@ -51,6 +62,7 @@ const DOORS = {
   [SPOKE]: onAgentSpoke,
   "session.compact": onSessionCompact,
   "turn.complete": endsTurn,
+  "classic.Stop": holdsTurn,
   "agent.spawn": onAgentSpawn,
   "tool.describe": onDescribe,
   "tool.call": onToolCall,
@@ -78,7 +90,7 @@ const TOOLS = {
 export async function decide(said, box) {
   freshens(box);
   const door = DOORS[String(said?.event ?? "")] ?? pass;
-  const answer = (await door(said?.e ?? {}, box)) ?? PASS;
+  const answer = letsThrough((await door(said?.e ?? {}, box)) ?? PASS, said, box);
   if (box.registered || String(said?.event ?? "") === "engine.create") return answer;
   box.registered = true;
   return { ...answer, register: answer.register ?? specsOf(box) };
@@ -90,6 +102,21 @@ function specsOf(box) {
 
 function pass() {
   return PASS;
+}
+
+// God mode: a refusal, a hold or a block is let through with a debug line, and
+// every other answer stands, so the index, the context and the tools go on.
+// [[spec/design_output/level0#god-mode]]
+function letsThrough(answer, said, box) {
+  if (asks(box, BINDING) !== GOD) return answer;
+  const { needs, result, ...rest } = answer ?? {};
+  const held = needs ? "the hold" : result?.deny !== undefined ? "the refusal" : result?.block !== undefined ? "the block" : "";
+  if (!held) return answer;
+  box.log.say("debug", "god", `god mode lets ${held} of ${said?.e?.tool ?? said?.event ?? ""} through`, {
+    tool: String(said?.e?.tool ?? ""),
+    detail: String(result?.deny ?? result?.block ?? needs).replace(/\s+/g, " ").slice(0, 120),
+  });
+  return { ...rest, pass: true };
 }
 
 function opensSession(e, box) {
@@ -113,10 +140,9 @@ async function onToolCall(e, box) {
   return held ?? owesCanary(e, box) ?? PASS;
 }
 
-// The turn end pays the answer door, drops the ask, then reads the canary.
+// The turn end pays the answer door, then reads the canary.
 function endsTurn(e, box) {
   onTurnEnd(e, box);
-  dropsAsk(e, box);
   return onTurnComplete(e, box);
 }
 

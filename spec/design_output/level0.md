@@ -1054,6 +1054,24 @@ stand at the top of the file and take the state as an argument.
 
 # God mode
 
+`engine.binding` set to `god` lets every blocker through, and leaves every
+answer standing. The server decides it in one place, on the way out of
+`decide`, so no door knows about it:
+
+| the door answers | god mode |
+|---|---|
+| a refusal, `result.deny` | passes, one debug line |
+| a hold, `needs: reply` | passes, one debug line |
+| a block of the turn's end | passes, one debug line |
+| context, a rewrite, a tool's result, a register | stands |
+
+So the index still answers a search, the guidance still rides, and the tools
+still stand. What falls is the check on the agent. The line reads `god mode
+lets the refusal of Write through`, and names the reason it lets through. A
+demand paid by nothing stands until the turn's end, which pays it as ever.
+
+# A cage holding nothing
+
 A cage holding nothing says so, and refuses the work until somebody fixes it.
 `.se/level0.health` carries that answer:
 
