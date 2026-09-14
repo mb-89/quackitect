@@ -52,7 +52,7 @@ export function onPromptContext(_e, box) {
   const held = box.guidance ?? (box.guidance = guidanceHere(box.disk, box.root));
   const session = box.session ?? (box.session = { reads: 0, firstTurn: true });
   session.reads += 1;
-  const blocks = blocksOf(held, box.dead);
+  const blocks = blocksOf(held, box.index.dead());
   box.log.say("info", "context", `${blocks.length} block(s) reach the session`, {
     detail: blocks.map((one) => one.name).join(" "),
     reason: session.reads === 1 ? "first" : "re-read",

@@ -1,12 +1,17 @@
 // The index. The one place this tree runs the index binary: a question by
-// method and params, a find by words, and the standing that warms it. A box
-// with no binary answers nothing, and says so.
+// method and params, a find by words, and the warming that keeps it standing.
+// A dead index says why, and the door warms it again once a minute at most.
 // [[spec/design_output/index#the-door-answers-the-tools]]
 
 import { join } from "node:path";
 import { BIN, readsAnswer } from "../../.claude/skills/level0/lib/index.js";
 
-export function index(disk, proc, root) {
+const REWARM = 60000;
+
+export function index(disk, proc, clock, root) {
+  let dead = "";
+  let warmedAt = 0;
+
   const at = () => {
     for (const one of [join(root, BIN), `${join(root, BIN)}.exe`]) {
       if (disk.exists(one)) return one;
@@ -24,19 +29,33 @@ export function index(disk, proc, root) {
     }
   };
 
+  // A failed run marks the index dead with why, and asks for a warm.
+  const failed = (ran, what) => {
+    dead = ran.exitCode === 127 ? ran.stderr : `${BIN} ${what} answers ${ran.exitCode}`;
+    return null;
+  };
+
   return {
     stands: () => Boolean(at()),
+    dead: () => dead,
     // A question the search tools ask: grep or glob, with the tool's params.
     ask: (method, params) => {
       const ran = run(["call", method, JSON.stringify(params)], 20000);
-      return ran.exitCode === 0 ? readsAnswer(ran.stdout) : null;
+      return ran.exitCode === 0 ? readsAnswer(ran.stdout) : failed(ran, "call");
     },
     // The lines carrying the words, ranked.
     find: (words) => {
       const ran = run(["find", words], 20000);
-      return ran.exitCode === 0 ? readsAnswer(ran.stdout) : null;
+      return ran.exitCode === 0 ? readsAnswer(ran.stdout) : failed(ran, "find");
     },
-    // The standing of the index, which warms it: 0 where it stands.
-    standing: () => run(["standing"], 60000),
+    // [[spec/design_output/index#a-dead-index-speaks]]
+    warm: () => {
+      const now = clock.now().getTime();
+      if (now - warmedAt < REWARM) return { warmed: false, dead };
+      warmedAt = now;
+      const ran = run(["standing"], 60000);
+      dead = ran.exitCode === 0 ? "" : ran.exitCode === 127 ? ran.stderr : `${BIN} standing answers ${ran.exitCode}`;
+      return { warmed: true, dead };
+    },
   };
 }

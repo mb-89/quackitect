@@ -62,11 +62,9 @@ export function boxOf(root, doors = {}) {
   const time = doors.clock ?? clock();
   return {
     root,
-    dead: "",
-    warmedAt: 0,
     disk: files,
     clock: time,
-    index: doors.index ?? index(files, doors.proc ?? proc(), root),
+    index: doors.index ?? index(files, doors.proc ?? proc(), time, root),
     log: doors.log ?? log(files, time, { folder: join(root, ".se", "log"), level: "debug" }),
   };
 }
@@ -88,7 +86,7 @@ export function serve(root, port = PORT, say = console.log) {
     }
     if (request.method !== "POST" || request.url !== "/event") {
       const ok = request.url === "/health";
-      answer(response, ok ? 200 : 404, { ok, port, dead: box.dead });
+      answer(response, ok ? 200 : 404, { ok, port, dead: box.index.dead() });
       return;
     }
     readBody(request, async (body) => {

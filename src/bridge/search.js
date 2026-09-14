@@ -1,14 +1,13 @@
-// The search tools behind the index. A Grep or a Glob the index can answer
-// comes from the rows, in the tool's own shape, and any other reads the disk.
-// The find tool ranks lines by the words. A dead index blocks nothing: it says
-// why, once, and the disk answers until it warms again.
+// The client's search tools, answered by the index. A Grep or a Glob the
+// index can answer comes from the rows, in the tool's own shape, and any other
+// reads the disk. The find tool ranks lines by the words. What the index is
+// stays behind its door; this file knows the tools.
 // [[spec/design_output/index#the-door-answers-the-tools]]
 
-import { asked, BIN, said as saidOf } from "../../.claude/skills/level0/lib/index.js";
+import { asked, said as saidOf } from "../../.claude/skills/level0/lib/index.js";
 
 export const FIND = "find";
 const PASS = { pass: true };
-const REWARM = 60000;
 
 export function findSpec() {
   return {
@@ -46,29 +45,18 @@ export function runsFind(e, box) {
   const rows = box.index.find(words);
   if (!rows) {
     warmIndex(box);
-    return { result: { result: deadIndexLine(box.dead || `${BIN} find answers nothing`) } };
+    return { result: { result: deadIndexLine(box.index.dead()) } };
   }
   return { result: { result: findSaid(rows) } };
 }
 
-// The index warms at session start, and again after a failed question, once a minute at most.
+// The door warms itself once a minute at most, and the log says what it found.
 // [[spec/design_output/index#a-dead-index-speaks]]
 export function warmIndex(box) {
-  if (box.clock.now().getTime() - (box.warmedAt ?? 0) < REWARM) return;
-  box.warmedAt = box.clock.now().getTime();
-  if (!box.index.stands()) {
-    box.dead = `no ${BIN} stands on this box`;
-    box.log.say("warn", "index", "the index is dead", { detail: box.dead });
-    return;
-  }
-  const ran = box.index.standing();
-  if (ran.exitCode === 0) {
-    box.dead = "";
-    box.log.say("info", "index", "the index is warm");
-    return;
-  }
-  box.dead = `${BIN} standing answers ${ran.exitCode}`;
-  box.log.say("warn", "index", "the index is dead", { detail: box.dead });
+  const said = box.index.warm();
+  if (!said.warmed) return;
+  if (said.dead) box.log.say("warn", "index", "the index is dead", { detail: said.dead });
+  else box.log.say("info", "index", "the index is warm");
 }
 
 export function deadIndexLine(why) {
