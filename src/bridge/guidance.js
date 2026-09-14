@@ -12,7 +12,9 @@ import {
   canaryIn,
   countsOf,
   envOf,
+  forHelper,
   HEARD,
+  OWES,
   standingLayer,
 } from "../../.claude/skills/level0/lib/guidance.js";
 import { deadIndexLine } from "./search.js";
@@ -93,27 +95,62 @@ function canaryText(sentence) {
   ].join("\n");
 }
 
-// The first turn's answer carries the canary, and the log says whether it came back.
+// The first turn's answer carries the canary, and the log says whether it came
+// back. An answer without it leaves a debt, and any later answer carrying the
+// line pays it.
+// [[spec/design_output/level0#the-canary-owes-a-debt]]
 export function onTurnComplete(e, box) {
-  const session = box.session;
-  if (!session?.firstTurn || e?.reason !== "answer") return { pass: true };
-  session.firstTurn = false;
+  const session = box.session ?? (box.session = { reads: 0, firstTurn: true });
+  if (e?.reason !== "answer") return { pass: true };
   const heard = canaryIn(e.answer, box.guidance?.sentence ?? "");
-  box.log.say(heard.found === "same" ? "info" : "warn", "level0", HEARD[heard.found], {
-    detail: box.guidance?.sentence ?? "",
-  });
+  if (session.firstTurn) {
+    session.firstTurn = false;
+    session.owes = heard.found !== "same";
+    box.log.say(session.owes ? "warn" : "info", "level0", HEARD[heard.found], {
+      detail: box.guidance?.sentence ?? "",
+    });
+    return { pass: true };
+  }
+  if (session.owes && heard.found === "same") {
+    session.owes = false;
+    box.log.say("info", "level0", HEARD.same, { detail: box.guidance?.sentence ?? "" });
+  }
   return { pass: true };
 }
 
+// While the canary is owed, every tool call carries the ask for it, and none is refused.
+export function owesCanary(e, box) {
+  const session = box.session;
+  if (!session?.owes || e?.agentId) return null;
+  box.log.say("warn", "gate", `warned ${e?.tool ?? "a call"} before the canary`, {
+    tool: String(e?.tool ?? ""),
+    detail: box.guidance?.sentence ?? "",
+  });
+  return { after: { context: [OWES.warns(box.guidance?.sentence ?? "")] } };
+}
+
 // A compaction: the client reads the context again after it, and the guidance
-// reads off the disk again first, so the re-read carries the notes as they stand.
+// reads off the disk again first, so the re-read carries the notes as they
+// stand. The canary is owed again, so the next answer says the rules reached it.
 // [[spec/design_output/level0#the-layer-after-a-compaction]]
 export function onSessionCompact(e, box) {
   box.guidance = guidanceHere(box.disk, box.method);
+  if (box.session) box.session.owes = true;
   box.log.say("info", "compact", "a compaction runs, and the guidance reads again", {
     trigger: String(e?.trigger ?? "unknown"),
     messages: Array.isArray(e?.messages) ? e.messages.length : 0,
     detail: box.guidance.sentence,
   });
   return { pass: true };
+}
+
+// A helper takes the guidance in its prompt, because the client hands it no context blocks.
+// [[spec/design_output/level0#the-helper-takes-the-guidance]]
+export function onAgentSpawn(e, box) {
+  const standing = box.guidance?.standing ?? "";
+  if (!standing) return { pass: true };
+  box.log.say("info", "agent", `handed the guidance to ${e?.subagentType ?? "a helper"}`, {
+    detail: String(e?.description ?? "").slice(0, 120),
+  });
+  return { event: { ...e, prompt: forHelper(standing, e?.prompt) } };
 }

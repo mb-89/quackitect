@@ -18,7 +18,15 @@ import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { vale } from "../doors/vale.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
-import { onPromptContext, onSessionCompact, onSessionStart, onTurnComplete } from "./guidance.js";
+import {
+  onAgentSpawn,
+  onPromptContext,
+  onSessionCompact,
+  onSessionStart,
+  onTurnComplete,
+  owesCanary,
+} from "./guidance.js";
+import { freshens, projectionsHere, sourcesOf } from "./projection.js";
 import { answersFromIndex, FIND, findSpec, runsFind, warmIndex } from "./search.js";
 import { registeredPort } from "./vehicle.js";
 import { onWrite, schemasHere } from "./write.js";
@@ -32,6 +40,7 @@ const DOORS = {
   "prompt.context": onPromptContext,
   "session.compact": onSessionCompact,
   "turn.complete": onTurnComplete,
+  "agent.spawn": onAgentSpawn,
   "tool.call": onToolCall,
 };
 
@@ -48,6 +57,7 @@ const TOOLS = {
 
 // The one place an event is decided. Put a break on the return.
 export async function decide(said, box) {
+  freshens(box);
   const door = DOORS[String(said?.event ?? "")] ?? pass;
   return (await door(said?.e ?? {}, box)) ?? PASS;
 }
@@ -59,12 +69,17 @@ function pass() {
 function opensSession(e, box) {
   onSessionStart(e, box);
   box.schemas = schemasHere(box.disk, box.method);
+  box.projections = projectionsHere(box.disk, box.method);
+  box.sources = sourcesOf(box.projections, box.disk, box.method);
   warmIndex(box);
   return { register: [findSpec(), ...applySpecs()], pass: true };
 }
 
-function onToolCall(e, box) {
-  return (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
+// A tool call meets its handler, and a call passing while the canary is owed carries the ask for it.
+async function onToolCall(e, box) {
+  const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
+  if (said !== PASS) return said;
+  return owesCanary(e, box) ?? PASS;
 }
 
 // The box of one work root: the two roots, the doors, and the state the doors keep. A test hands in fakes.

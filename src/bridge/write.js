@@ -22,6 +22,7 @@ import {
   strangerFault,
 } from "../../.claude/skills/level0/lib/schema.js";
 import { refusedTicket, ticketFaults } from "../../.claude/skills/level0/lib/ticket.js";
+import { marksStale, ownerDoor } from "./projection.js";
 
 const PASS = { pass: true };
 
@@ -37,11 +38,12 @@ export async function onWrite(e, box) {
   // A file outside the tree is none of the tree's, and a draft passes every check.
   if (/^([A-Za-z]:)?[\\/]/.test(where) || isDraft(where)) return PASS;
 
-  const checks = [privateDoor, schemaDoor, voiceDoor];
+  const checks = [ownerDoor, privateDoor, schemaDoor, voiceDoor];
   for (const check of checks) {
     const found = await check(e, writing, where, box);
     if (found) return { result: { deny: found } };
   }
+  marksStale(where, box);
   return PASS;
 }
 
