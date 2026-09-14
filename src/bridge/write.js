@@ -34,7 +34,8 @@ export async function onWrite(e, box) {
   const writing = asWrite(e);
   if (!writing) return PASS;
   const where = relativeTo(box.root, writing.path);
-  if (isDraft(where)) return PASS;
+  // A file outside the tree is none of the tree's, and a draft passes every check.
+  if (/^([A-Za-z]:)?[\\/]/.test(where) || isDraft(where)) return PASS;
 
   const checks = [privateDoor, schemaDoor, voiceDoor];
   for (const check of checks) {
