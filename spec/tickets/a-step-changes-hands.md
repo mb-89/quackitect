@@ -180,7 +180,11 @@ record:
     hand: box af187ab9cab6
     hash_before: 4cfede419f04b6a94c80752c96f9a25cea870519
     hash_after: 4cfede419f04b6a94c80752c96f9a25cea870519
-step: children
+  - step: children
+    hand: box af187ab9cab6
+    skipped: true
+    why: the box leaves it while step-changes-hands stand open
+step: retro/notes
 ---
 
 # Ask
