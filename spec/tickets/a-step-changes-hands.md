@@ -188,6 +188,9 @@ record:
     hand: box c3e576d75a53
     hash_before: df545a2501362c8d243eebec0610beea2c328771
     hash_after: 98f3e758c6b67ff88279128d9bab6a964b1fcdaa
+  - step: retro/notes
+    hand: box 7a9db825650b
+    hash_before: 8af8d9386b310b425e46070c323b5dfc0cda1032
 step: retro/notes
 ---
 
