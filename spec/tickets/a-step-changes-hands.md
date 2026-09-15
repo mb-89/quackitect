@@ -208,7 +208,11 @@ record:
     hand: box 7a9db825650b
     hash_before: 66eebb826eff67f00e32c8e651e70f1143aa8823
     hash_after: 66eebb826eff67f00e32c8e651e70f1143aa8823
-step: children
+  - step: children
+    hand: box 7a9db825650b
+    skipped: true
+    why: the box leaves it while step-changes-hands stand open
+step: retro/notes
 ---
 
 # Ask
