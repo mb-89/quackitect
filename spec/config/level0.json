@@ -32,14 +32,6 @@
     "comment": "The level this box writes at, on the ladder debug, info, warn, error, fatal. info writes every line a door says, debug writes what the hooks see too, warn writes a refusal and a fault, error writes a fault, fatal writes what ends a session.",
     "level": "info"
   },
-  "judge": {
-    "comment": "Switch the model off where it costs more than it earns. The mechanical rules ignore this.",
-    "enabled": true,
-    "model": "haiku",
-    "maxSpans": 24,
-    "warmupWrites": 4,
-    "thenEveryNth": 3
-  },
   "names": {
     "comment": "The words a file, a folder and a branch name each hold at most. Vale counts a heading, and lib/names.js counts a path.",
     "words": 5

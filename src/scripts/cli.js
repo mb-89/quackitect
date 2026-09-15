@@ -9,8 +9,8 @@ import {
   countsOf,
   standingLayer,
 } from "../../.claude/skills/level0/lib/guidance.js";
-import { HEALTH, healthOf } from "../../.claude/skills/level0/lib/health.js";
 import { asRow, OLD, rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
+import { POINTER, PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
 import {
   entriesIn,
@@ -140,7 +140,6 @@ it.vale = bin;
 const go = whereIs(files, root, "go", known);
 const LOG = join(root, ".se", "log");
 const STYLES = join(root, "spec", "config", "styles", "VoiceVale");
-const JUDGED = join(root, "spec", "config", "styles", "VoiceJudged");
 const SHAPE = join(root, "spec", "config", "styles", "VoiceShape");
 const SCRIPTED = join(root, "spec", "config", "styles", "VoiceScript");
 const biome = whereIs(files, root, "biome", known);
@@ -162,7 +161,7 @@ const run = async (argv, init = {}) =>
 
 const verbs = {
   check: {
-    says: "the tests, the doors, the cage, then the rules over the tree",
+    says: "the tests, the doors, the server, then the rules over the tree",
     run: async (w) =>
       stamped(
         test() ||
@@ -170,7 +169,7 @@ const verbs = {
           doorsHold() ||
           projectionsHold() ||
           pluginHolds() ||
-          cageHolds() ||
+          (await serverHolds()) ||
           (await lint(w)),
       ),
   },
@@ -784,21 +783,36 @@ function pluginHolds() {
   return 0;
 }
 
-// [[spec/design_output/level0#god-mode]]
-function cageHolds() {
-  const at = join(root, HEALTH);
-  if (!files.exists(at)) {
-    console.log("Level zero loads in no session here yet, so it says nothing.");
-    return 0;
-  }
-  const said = healthOf(files.read(at));
+// The server answers for itself over the port, live, and no file stands between.
+// [[spec/design_output/level0#the-bridgehead-and-the-server]]
+async function serverHolds() {
+  const said = await serverSays();
   if (said.ok) {
-    console.log(`The cage holds, and it says so at ${said.at}.`);
+    console.log(`The server stands at ${said.where}.`);
     return 0;
   }
-  console.error(`The cage holds nothing: ${said.why}`);
-  console.error(`That session guards no write. Mend it, and ${HEALTH} turns green.`);
+  console.error(`No server answers at ${said.where}: ${said.why}`);
+  console.error("Start it with ./RUNME.sh serve, or the hook button in the sidebar.");
   return 1;
+}
+
+async function serverSays() {
+  const where = `http://127.0.0.1:${portHere()}/health`;
+  try {
+    const answer = await fetch(where, { signal: AbortSignal.timeout(2000) });
+    const body = await answer.json();
+    return { ok: Boolean(body?.ok), where, why: String(body?.dead ?? "") };
+  } catch (bad) {
+    return { ok: false, where, why: bad?.message ?? String(bad) };
+  }
+}
+
+function portHere() {
+  try {
+    return Number(JSON.parse(files.read(join(root, POINTER)))?.port) || PORT_BASE;
+  } catch {
+    return PORT_BASE;
+  }
 }
 
 // [[spec/design_output/work#the-battery-answers-first]]
@@ -932,13 +946,6 @@ async function doctor() {
         : "missing",
     ],
     [
-      "judged rules",
-      files.exists(JUDGED)
-        ? `${namesIn(JUDGED, ".yml").length} in VoiceJudged`
-        : "none",
-    ],
-    ["judge", await judgeStands()],
-    [
       "survey",
       files.exists(join(root, TOOLS)) ? TOOLS : "absent, run ./RUNME.sh tools",
     ],
@@ -949,7 +956,7 @@ async function doctor() {
         ? "tracked, one file"
         : "missing",
     ],
-    ["cage holds", cageSays()],
+    ["server", await serverLine()],
   ];
   for (const [what, said] of rows) {
     console.log(`${what.padEnd(18)} ${String(said).trim() || "missing"}`);
@@ -969,19 +976,9 @@ function hooksSay() {
   return `git reads ${said || "its own folder"}, so run ./RUNME.sh`;
 }
 
-function cageSays() {
-  const at = join(root, HEALTH);
-  if (!files.exists(at)) return "no session says yet";
-  const said = healthOf(files.read(at));
-  return said.ok ? `yes, at ${said.at}` : `no, ${said.why}`;
-}
-
-async function judgeStands() {
-  if ((await settings.ask("judge.enabled")) === false) {
-    return `off in ${await settings.layerOf("judge.enabled")}`;
-  }
-  const model = await settings.ask("judge.model");
-  return `on, model ${model} out of ${await settings.layerOf("judge.model")}`;
+async function serverLine() {
+  const said = await serverSays();
+  return said.ok ? `stands at ${said.where}` : `none at ${said.where}`;
 }
 
 function lspProxy() {

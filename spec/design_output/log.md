@@ -62,7 +62,6 @@ For details, see [[spec/design_output/level0#a-step-carries-the-answer]].
 | `answer` | the session's answer to a demand | `turn.step`, `tool.call` |
 | `write` | the code door refuses a write | `tool.call` |
 | `vale` | the rules refuse prose, and how long a lint takes | the hook, and `lint` |
-| `judge` | a model refuses prose | `tool.call` |
 | `bash` | a commit or a push aims at trunk | `tool.call` |
 | `work` | a branch verb answers, and the branch it stands on | `work.js` |
 | `context` | the blocks reaching the session, and whether a re-read brings them | `prompt.context` |

@@ -6,7 +6,6 @@
     "stop",
     "answer",
     "log",
-    "judge",
     "names",
     "ask"
   ],
@@ -172,44 +171,6 @@
             "q leave"
           ],
           "runs": "./RUNME.sh log"
-        }
-      }
-    },
-    "judge": {
-      "type": "object",
-      "required": [
-        "enabled",
-        "model",
-        "maxSpans",
-        "warmupWrites",
-        "thenEveryNth"
-      ],
-      "properties": {
-        "comment": {
-          "type": "string"
-        },
-        "enabled": {
-          "type": "boolean",
-          "help": "The model reading a write. false leaves the mechanical rules alone."
-        },
-        "model": {
-          "type": "string",
-          "help": "The model the judge asks."
-        },
-        "maxSpans": {
-          "type": "number",
-          "unit": "spans",
-          "help": "The spans one reading carries at most."
-        },
-        "warmupWrites": {
-          "type": "number",
-          "unit": "writes",
-          "help": "The writes a session judges before it starts skipping."
-        },
-        "thenEveryNth": {
-          "type": "number",
-          "unit": "writes",
-          "help": "After the warmup, the judge reads one write in this many."
         }
       }
     },

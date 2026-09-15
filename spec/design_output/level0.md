@@ -82,10 +82,9 @@ change of a door. Three headless turns say so, against client 2.1.269. The
 first posts 186 events. The second completes with the server down. The third
 lands on the server running again.
 
-The module before the bridgehead stands beside it as `hooks/level0-old.js`,
-with every door of this note, and the client loads it nowhere. The tests of
-those doors read that file. The chapters below describe the old module. The
-server takes a door over one at a time, each with its debug lines around it.
+The server holds every door of this note, and the module before the bridgehead
+stands nowhere. The chapters below describe the doors, and the file table
+above says which server file holds each.
 
 # The harness surface
 
@@ -495,7 +494,7 @@ naming the rule, the line and the phrase.
 | what the write carries | what reads it |
 |---|---|
 | a run or a token out of a note under `.se/notes` | [[spec/design_output/private#the-door-reads-the-notes]] |
-| prose | Vale, then the judge |
+| prose | Vale, then the prose reader |
 | code | Biome |
 | a shell command landing a file | [[spec/design_output/bash]] |
 
@@ -523,18 +522,9 @@ sends a code write through Biome and passes the formatted text on with
 The agent writes its own text and the tree stores what the formatter says, the
 way a save-time formatter works for a person.
 
-## The judge costs a call
-
-Vale and Biome run first, because they cost nothing. The judge asks a model one
-question per span, so it runs where the patterns already passed.
-
-It reads every span of the first writes in a session, then samples. A breach
-puts it back to reading everything.
-
 ## The path a rule reads
 
-Hand every rule the path the repo root holds. Vale scopes on it, and the judge
-scopes on it.
+Hand every rule the path the repo root holds. Vale scopes on it.
 
 | what the client sends | what the door hands on |
 |---|---|
@@ -547,36 +537,6 @@ Keep every folder in that path, so `[spec/rationales/*.md]` and each other
 Ask git for the root once a session, through `git rev-parse --show-toplevel`,
 and take it off the front with `relativeTo`. Leave the path whole where the box
 answers nothing.
-
-## A judged rule scopes
-
-Give a judged rule `ignores`, holding one glob a line. The judge asks the model
-nothing for a file those globs reach.
-
-    ignores:
-      - spec/rationales/*.md
-
-List a folder there where the rule's question misreads its job. `Actionable`
-ignores `spec/rationales` and `spec/design_output`, and stands everywhere else.
-
-## A judged rule cuts
-
-Give a judged rule `span`, saying what one question reads. A rule leaving it
-out reads a paragraph, which is what every rule read before the key stood.
-
-| span | one question reads | who takes it |
-|---|---|---|
-| `paragraph` | a run of prose lines, with 12 words at least | `Actionable`, `Role`, `ShapeFits` |
-| `chapter` | a heading and the blocks under it, to the next heading | `BottomLineFirst` |
-
-A note with no heading is one chapter, so an answer arrives whole. The lines
-above a first heading make no chapter, because an edit hands the judge the tail
-of the chapter above it. The frontmatter stands outside both cuts, and so does a
-fenced block.
-
-A question about where the outcome stands wants the whole chapter, because a
-paragraph on its own says nothing about what comes before it. A question about
-one shape wants the paragraph, because the shape is the paragraph's own.
 
 ## A rule refuses a list
 
@@ -979,7 +939,6 @@ answers that the rules pass.
 | `spec/config/styles/VoiceVale` | Vale reads it over prose and code |
 | `spec/config/styles/VoiceShape` | Vale reads it over the shape of a note or a rule file |
 | `spec/config/styles/VoiceScript` | Vale reads it over a shell script |
-| `spec/config/styles/VoiceJudged` | a model reads it, and the projection writes it |
 | `spec/config/biome.json` | Biome reads it |
 
 `[formats]` in `.vale.ini` maps `yml` to `md`, so Vale reads a rule file at all.
@@ -987,9 +946,6 @@ A path-scoped section names which shape rules reach which folder.
 
 The prose rules stay away from a rule file, because such a file lists the very
 words they refuse.
-
-Vale errors on a file carrying no `extends` key inside a style it reads. So the
-judged rules sit in a folder of their own.
 
 # The fixer calms a shout
 
@@ -1112,41 +1068,3 @@ still stand. What falls is the check on the agent. The line reads `god mode
 lets the refusal of Write through`, and names the reason it lets through. A
 demand paid by nothing stands until the turn's end, which pays it as ever.
 
-# A cage holding nothing
-
-A cage holding nothing says so, and refuses the work until somebody fixes it.
-`.se/level0.health` carries that answer:
-
-    { "ok": false, "why": "no vale stands here", "at": "..." }
-
-While `ok` reads false, the door refuses every call except the ones that fix
-the cage:
-
-| the call | god mode |
-|---|---|
-| a write under `.claude/skills/level0/` | passes |
-| a shell command landing no file | passes |
-| a read, a search, a question to the owner | passes |
-| every other write, and every other command | refuses |
-
-The refusal names the fault and the road out, so a session that meets it reads
-what to do. A door refusing everything shuts the road that fixes it, and
-the session stands there for good.
-
-The fix clears itself. `ensureCage` retries while the answer reads false, so
-the first call after a repair loads the rules again, writes `ok: true`, and says
-`the cage holds again` to the log. The install runs once, and a retry costs a
-read.
-
-## What stands outside
-
-A module failing to import registers no door at all, and every door inside it
-stays silent about that. Two things outside the process answer in their place:
-
-- `./RUNME.sh check` reads `.se/level0.health` and goes red where it reads
-  false. `doctor` prints the same line.
-- `test/contract/loads.test.js` imports the module, calls `register`, and names
-  every door it expects. A file carrying a conflict marker fails that test,
-  because a merge writes those into the very file the cage lives in.
-
-`.github/workflows/check.yml` runs both on a machine with no stake in it.

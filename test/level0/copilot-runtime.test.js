@@ -17,8 +17,6 @@ function fixture() {
     "/tree/.se/bin/biome": "",
     "/tree/spec/guidance/voice.md":
       "# Actionables\n\n1. Write clearly.\n2. Keep it short.\n",
-    "/tree/spec/config/styles/VoiceJudged/Actionable.yml":
-      'message: "Write the next action."',
     "/tree/HANDOVER.md": "Do the work.",
   });
   const proc = fakeProc({

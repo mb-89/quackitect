@@ -364,8 +364,8 @@ test("the schema passes the config this tree ships, and refuses one short a fiel
   assert.deepEqual(await settings.faults(), []);
 
   const short = flatten(read(TRACKED));
-  short.delete("judge.maxSpans");
-  assert.deepEqual(faultsIn(read(SCHEMA), short), ["judge.maxSpans is missing"]);
+  short.delete("stop.mostInARow");
+  assert.deepEqual(faultsIn(read(SCHEMA), short), ["stop.mostInARow is missing"]);
 });
 
 // [[spec/design_output/extension#the-grid-check]]

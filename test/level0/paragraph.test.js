@@ -6,7 +6,6 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
   faultsOf,
-  JUDGED,
   PARAGRAPH,
   rulesFrom,
 } from "../../.claude/skills/level0/lib/paragraph.js";
@@ -24,7 +23,6 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 const SOURCE = "spec/schemas/paragraph.schema.yaml";
 const SHAPE = "spec/schemas/paragraph.schema.schema.json";
 const TARGET = "spec/config/styles/VoiceParagraph";
-const JUDGED_TARGET = "spec/config/styles/VoiceJudged";
 
 const SCHEMA = `
 kind: paragraph
@@ -79,17 +77,6 @@ layers:
       entry: word, meaning, from
       review: the retro reads it
     exceptions: []
-  meaning:
-    judged:
-      - id: Actionable
-        asks: does this text tell the reader something they can act on?
-        message: Write what the reader does next.
-        link: spec/guidance/guidance.md
-        labels: [actionable, background]
-        refuses: background
-        span: paragraph
-        reads: ["*.md"]
-        ignores: [.se/*.md]
       - id: ShapeFits
         asks: do these sentences give the same fields for different things?
         message: Reach for a table first.
@@ -120,15 +107,6 @@ const ENTRY = {
   name: "the paragraph rules",
   shape: PARAGRAPH,
   target: TARGET,
-  from: SOURCE,
-  schema: SHAPE,
-  wrap: "none",
-};
-
-const JUDGED_ENTRY = {
-  name: "the judged rules",
-  shape: JUDGED,
-  target: JUDGED_TARGET,
   from: SOURCE,
   schema: SHAPE,
   wrap: "none",
@@ -190,37 +168,6 @@ test("every layer takes its rule file, and the answer register takes its own", (
     `${TARGET}/Shape.yml`,
     `${TARGET}/ShapeAnswer.yml`,
   ]);
-});
-
-// [[spec/design_output/projection#the-judged-rules]]
-test("the meaning layer writes one rule file per judged rule", () => {
-  const files = writesOf(
-    JUDGED_ENTRY,
-    new Map([
-      [SOURCE, SCHEMA],
-      [SHAPE, SHAPE_JSON],
-    ]),
-  );
-  assert.deepEqual([...files.keys()].sort(), [
-    `${JUDGED_TARGET}/Actionable.yml`,
-    `${JUDGED_TARGET}/ShapeFits.yml`,
-  ]);
-
-  const said = files.get(`${JUDGED_TARGET}/Actionable.yml`);
-  assert.match(said, /^extends: judge$/m);
-  assert.match(said, /^refuses: background$/m);
-  assert.match(said, /^ {2}- "\*\.md"$/m);
-  assert.match(said, /^link: spec\/guidance\/guidance\.md$/m);
-  assert.ok(!said.includes("span:"), "a paragraph is the span a rule takes by default");
-});
-
-// [[spec/design_output/projection#the-judged-rules]]
-test("a rule refusing two labels writes a list, and names its span", () => {
-  const files = writesOf(JUDGED_ENTRY, new Map([[SOURCE, SCHEMA]]));
-  const said = files.get(`${JUDGED_TARGET}/ShapeFits.yml`);
-  assert.match(said, /^refuses:\n {2}- table\n {2}- diagram$/m);
-  assert.match(said, /^span: chapter$/m);
-  assert.match(said, /^link: spec\/funnel\/a-paragraph-has-a-schema\.md$/m);
 });
 
 // [[spec/design_output/projection#a-layer-writes-two-files]]
