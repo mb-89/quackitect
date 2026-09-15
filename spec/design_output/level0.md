@@ -24,6 +24,12 @@ port, with the root the session works in, and does what the answer says. It
 imports nothing, so a project carries the file alone. The project knows
 nothing of where the method stands on the disk.
 
+A second hook stands beside the door, on `turn.step`, because a stream reaches
+a generator alone. It keeps the step's text as the chunks arrive, and posts it
+whole as `turn.said` at the stream's end. The compaction goes over the wire
+with its flat fields alone. The client hands the whole transcript as that
+event, and the server reads no line of it.
+
 The server runs from the method root and keeps one box a work root. The
 rules, the schemas, the index binary and Vale come from the method root. The
 log, the notes and the files come from the work root. This tree is the case
@@ -34,17 +40,33 @@ where both roots are one folder.
 | `{ pass: true }` | hands the event on |
 | `{ result }` | returns the result to the client |
 | `{ event }` | hands the changed event on |
+| `{ after }` | hands the event on, and adds to what comes back |
+| `{ register }` | registers the tools it names, one by one |
+| `{ needs: "reply" }` | posts the step's text and the last texts as `agent.spoke`, and does what that answer says |
+| `{ spawn, then }` | spawns the helper, and posts what it says under the event `then` names |
 | nothing, the server down | hands the event on, and writes one `warn` line, once |
 
 The server is plain node under `src/bridge`, one file a topic:
 
 | file | holds |
 |---|---|
-| `server.js` | the doors and the switch in `decide` |
+| `server.js` | the doors, god mode and the switch in `decide` |
 | `guidance.js` | the rules, the canary and the compaction |
+| `answer.js` | the demand for a reply, and the turn's end |
+| `ask.js` | the ask from the sidebar |
+| `status.js` | the shape of a full report |
+| `report.js` | the report tool |
+| `stop.js` | the hold and the tooth |
 | `search.js` | the client's search tools |
 | `write.js` | the write door |
+| `bash.js` | the command door |
+| `code.js` | the size ceiling of code |
 | `apply.js` | the batch edit |
+| `tools.js` | the draft check and the mint |
+| `review.js` | the review by a helper |
+| `projection.js` | the files the tree projects |
+| `config.js` | the config a door asks |
+| `vehicle.js` | the vehicle, the project and the port |
 
 The log, the index and Vale stand behind doors under `src/doors`. The server
 logs every event at `debug`, whole, and holds the state in one box a work

@@ -1,10 +1,12 @@
 // THE BRIDGEHEAD. The one hook a project carries. One door for every event,
 // "*", and one function behind it: it posts the event to the server at the
 // port, with the root this session works in, and does what the answer says.
-// The server holds the doors, the log and the state, and runs wherever the
-// method stands. A server killed and started again takes the next event as
-// if nothing happened. A dead server blocks nothing: the event goes on, and
-// one line says so. This file imports nothing, so a project carries it alone.
+// A second hook reads the step's stream, because a stream reaches a generator
+// alone, and keeps the step's text for the server. The server holds the
+// doors, the log and the state, and runs wherever the method stands. A server
+// killed and started again takes the next event as if nothing happened. A
+// dead server blocks nothing: the event goes on, and one line says so. This
+// file imports nothing, so a project carries it alone.
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
 const PORT = 6510;
