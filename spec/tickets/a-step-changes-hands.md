@@ -159,6 +159,7 @@ record:
   - step: retro/notes
     hand: box e192a0b5ebf0
     hash_before: 1d588724e029dbe14ce08a9ff94aadf08621d5e2
+    hash_after: aa9d9d0315577249ba0099cba1d01a61b245e9fa
 step: retro/notes
 ---
 
