@@ -15,6 +15,7 @@ import {
   STOP,
 } from "../../.claude/skills/level0/lib/controls.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
+import { heldGroup, openPrivate } from "../../.claude/skills/level0/lib/ticket.js";
 import {
   decide,
   detail,
@@ -168,8 +169,52 @@ function ranHere(name, held) {
   if (name === "owner-holds") return held.hold === STOP;
   if (name === "session-is-new") return toothOf_(held.box).isNew();
   if (name === "work-waiting") return todosOf(held.box).standing();
+  if (name === "group-in-hand") return groupInHand(held.box);
+  if (name === "ticket-in-hand") return holdStands(held.box) || privateStands(held.box);
   if (name === "no-stop-line") return !stopReasons(rulesOf(held.box)).some((one) => one.id === held.claimed);
   return undefined;
+}
+
+// Level one's checks, as the old hook held them. A work branch whose ticket
+// holds a group is a group in hand. A hold file under .se/hold, or an open
+// private ticket under .se/tickets, is a ticket in hand.
+// [[spec/design_output/pull#the-hand-and-the-hold]]
+function groupInHand(box) {
+  const branch = branchOf(box);
+  if (!branch.startsWith("work/")) return false;
+  try {
+    return heldGroup(String(box.disk.read(join(box.work, "spec", "tickets", `${branch.slice(5)}.md`))));
+  } catch {
+    return false;
+  }
+}
+
+function holdStands(box) {
+  try {
+    return box.disk.list(join(box.work, ".se", "hold")).some((one) => one.name.endsWith(".json"));
+  } catch {
+    return false;
+  }
+}
+
+function privateStands(box) {
+  try {
+    const folder = join(box.work, ".se", "tickets");
+    return box.disk
+      .list(folder)
+      .filter((one) => one.name.endsWith(".md"))
+      .some((one) => openPrivate(String(box.disk.read(join(folder, one.name)))));
+  } catch {
+    return false;
+  }
+}
+
+function branchOf(box) {
+  try {
+    return String(box.proc.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], { cwd: box.work }).stdout ?? "").trim();
+  } catch {
+    return "";
+  }
 }
 
 function rulesOf(box) {

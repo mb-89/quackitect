@@ -374,11 +374,11 @@ test("the schema this tree ships places every widget in a cell of its own", () =
 });
 
 // [[spec/design_output/extension#one-declaration-draws-it]]
-test("four controls draw, and the engine widgets stand declared and undrawn", () => {
+test("five controls draw, and the engine widgets stand declared and undrawn", () => {
   const schema = read(SCHEMA);
   assert.deepEqual(
     drawnIn(schema).map((one) => one.key),
-    ["stop.hold", "ask.wanted", "log.open", "engine.binding"],
+    ["stop.hold", "ask.wanted", "bridge.hook", "log.open", "engine.binding"],
   );
 
   const waiting = entriesIn(schema).filter((one) => one.widget && !one.group);
@@ -395,7 +395,7 @@ test("four controls draw, and the engine widgets stand declared and undrawn", ()
 test("every widget writing a key names one the declaration carries", () => {
   const said = flatten(read(TRACKED));
   for (const one of drawnIn(read(SCHEMA))) {
-    if (one.widget === "action") continue;
+    if (one.widget === "action" || one.widget === "process") continue;
     assert.ok(said.has(one.key), `${one.key} stands in ${TRACKED}`);
     assert.ok(one.options.includes(said.get(one.key)), `${one.key} rests on an option`);
   }
@@ -405,7 +405,7 @@ test("every widget writing a key names one the declaration carries", () => {
 test("every slash command a button's hover names stands in .claude/commands", () => {
   const standing = new Set(files.list(join(root, ".claude", "commands")).map((one) => one.name));
   const named = drawnIn(read(SCHEMA)).flatMap((one) => commandsOf(one));
-  assert.ok(named.includes("/se-agent-control-hold-stopped"), "the hold button names its far end");
+  assert.ok(named.includes("/se-agent-control-hold-stop"), "the hold button names its far end");
   for (const one of named) {
     assert.ok(standing.has(`${one.slice(1)}.md`), `${one} stands as a command`);
   }
@@ -413,7 +413,7 @@ test("every slash command a button's hover names stands in .claude/commands", ()
 });
 
 // [[spec/design_output/extension#the-sidebar-draws-the-tree]]
-test("npm reaches the extension alone, and the root of the tree stays bare", () => {
+test("npm reaches the extension and the tense reader, and nothing else at the root", () => {
   const said = proc().run(["git", "ls-files", "*package.json"], { cwd: root });
   const paths = said.stdout.split(/\r?\n/).filter(Boolean);
 
@@ -424,7 +424,7 @@ test("npm reaches the extension alone, and the root of the tree stays bare", () 
   }
 
   const bare = read("package.json");
-  assert.equal(bare.dependencies, undefined);
+  assert.deepEqual(Object.keys(bare.dependencies ?? {}).sort(), ["wink-eng-lite-web-model", "wink-nlp"]);
   assert.equal(bare.devDependencies, undefined);
 });
 
@@ -441,7 +441,7 @@ test("the extension imports the editor, its own folder, and what it declares", (
     const text = files.read(join(root, path));
     for (const hit of text.matchAll(/(?:from|require\()\s*["']([^"']+)["']/g)) {
       const said = hit[1];
-      if (said === "vscode" || named(said)) continue;
+      if (said === "vscode" || said.startsWith("node:") || named(said)) continue;
       assert.match(said, /^\.\.?\//, `${path} imports ${said} as a path of its own`);
       assert.ok(!said.includes("../../"), `${path} stays inside src/extension`);
     }
@@ -457,8 +457,8 @@ test("every package the extension declares carries an exact version", () => {
 });
 
 // [[spec/design_output/stop#the-mechanical-checks]]
-test("every mechanical check the stop table names stands in the hook", () => {
-  const hook = files.read(join(root, ".claude", "skills", "level0", "hooks", "level0.js"));
+test("every mechanical check the stop table names stands in the stop door", () => {
+  const hook = files.read(join(root, "src", "bridge", "stop.js"));
   const at = join(root, STOP);
   const named = pool(
     namesIn(at, ".yml").map((name) => ({ name, text: files.read(join(at, name)) })),

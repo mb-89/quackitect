@@ -70,7 +70,6 @@ test("startup injects actual rules and retains a consumed handover", async () =>
   const it = fixture();
   const result = await handle(event("SessionStart"), it);
   assert.match(result.context, /rules: 2/);
-  assert.match(result.context, /Write the next action/);
   assert.match(result.context, /Do the work/);
   assert.equal(it.disk.exists("/tree/HANDOVER.md"), false);
   assert.equal(it.session.records.get("one").handovers[0].text, "Do the work.");

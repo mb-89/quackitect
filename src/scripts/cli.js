@@ -949,13 +949,6 @@ async function doctor() {
       "survey",
       files.exists(join(root, TOOLS)) ? TOOLS : "absent, run ./RUNME.sh tools",
     ],
-    ["level zero stamp", readIf(join(root, ".se", "level0.stamp"))],
-    [
-      "cage",
-      files.exists(join(root, ".claude", "settings.json"))
-        ? "tracked, one file"
-        : "missing",
-    ],
     ["server", await serverLine()],
   ];
   for (const [what, said] of rows) {

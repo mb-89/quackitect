@@ -203,8 +203,8 @@ test("a press, a run and an edit each write a sidebar line naming what moved", a
   assert.deepEqual(
     sidebar.logbook.lines().map((one) => [one.kind, one.said, one.detail]),
     [
-      ["sidebar", "stop.hold is finishing", "one press"],
-      ["sidebar", "stop.hold is stopped", "5 presses"],
+      ["sidebar", "stop.hold is finish", "one press"],
+      ["sidebar", "stop.hold is stop", "5 presses"],
       ["sidebar", "log.open runs ./RUNME.sh log", undefined],
       ["sidebar", "stop.mostInARow is 5", "the config tree"],
     ],
@@ -219,7 +219,7 @@ test("a sidebar line lands after the lines the session holds, and keeps them", a
   const door = doorOf({ ".se/log/session.jsonl": held });
   await sidebarOf(door).took({ kind: "press", key: "stop.hold" });
   const rows = door.files.read(".se/log/session.jsonl").trim().split("\n").map((one) => JSON.parse(one));
-  assert.deepEqual(rows.map((one) => one.said), ["session start", "stop.hold is finishing"]);
+  assert.deepEqual(rows.map((one) => one.said), ["session start", "stop.hold is finish"]);
 });
 
 test("a box writing at warn keeps the sidebar lines out of the log", async () => {

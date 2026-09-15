@@ -77,12 +77,6 @@ layers:
       entry: word, meaning, from
       review: the retro reads it
     exceptions: []
-      - id: ShapeFits
-        asks: do these sentences give the same fields for different things?
-        message: Reach for a table first.
-        labels: [prose, table, diagram]
-        refuses: [table, diagram]
-        span: chapter
 
 registers:
   prose:

@@ -73,7 +73,6 @@ terms:
   - {word: hook, defines: "[[spec/design_output/level0#what-level-zero-is]]"}
   - {word: index, defines: "[[spec/design_output/index]]"}
   - {word: installer, defines: "[[spec/design_output/index#the-compiler-it-needs]]"}
-  - {word: judge, defines: "[[spec/design_output/level0#the-judge-costs-a-call]]"}
   - {word: leaf, defines: "[[spec/schemas/ticket.schema]]"}
   - {word: level zero, defines: "[[spec/design_output/level0#what-level-zero-is]]"}
   - {word: level one, defines: "[[spec/design_input/the-agent-pulls-tickets#three-rules-hold-level-one]]"}
@@ -124,7 +123,6 @@ terms:
   - {word: shell, defines: "[[spec/design_output/bash]]"}
   - {word: sidebar, defines: "[[spec/design_output/extension]]"}
   - {word: slash command, defines: "[[spec/design_output/config]]"}
-  - {word: span, defines: "[[spec/design_output/level0#a-judged-rule-cuts]]"}
   - {word: spawn, defines: "[[spec/design_output/level0#the-spawn-carries-a-rewrite]]"}
   - {word: stale, defines: "[[spec/design_output/work#a-stale-group-is-yours]]"}
   - {word: stamp, defines: "[[spec/design_output/work#the-battery-answers-first]]"}
@@ -178,7 +176,6 @@ terms:
   - {word: kebab, defines: "[[spec/design_output/config]]"}
   - {word: lexer, defines: "[[spec/design_output/bash]]"}
   - {word: lookahead, defines: "[[spec/design_output/bash]]"}
-  - {word: matcher, defines: "[[spec/design_output/level0#a-judged-rule-scopes]]"}
   - {word: millisecond, defines: "[[spec/design_output/log]]"}
   - {word: minter, defines: "[[spec/design_output/schema#the-tool-writes-the-note]]"}
   - {word: newline, defines: "[[spec/design_output/bash]]"}
