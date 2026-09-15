@@ -363,3 +363,4 @@ This group waits on one person's line, under design/person-1 on the child.
 - `branch release` puts the branch at todo and leaves the pull's hold on the box
 - the next pull on that box answers refused until the leaf goes back by hand
 - the release verb hands the held leaf back first, in the branch verbs
+- after retro/cloud the pull hands retro/notes to the same box, so the route cycles until a person answers
