@@ -140,8 +140,13 @@ async function onToolCall(e, box) {
   const held = letsThrough(holdsCall(e, box) ?? holdsForAnswer(e, box), { e }, box);
   if (held?.result || held?.needs) return held;
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
-  if (said !== PASS) return said;
+  if (!passes(said)) return said;
   return held ?? owesCanary(e, box) ?? PASS;
+}
+
+// A handler's plain pass, the constant or a fresh object alike, leaves the held context standing.
+function passes(said) {
+  return said === PASS || (said?.pass === true && Object.keys(said).length === 1);
 }
 
 // The turn end pays the answer door, then reads the canary.
