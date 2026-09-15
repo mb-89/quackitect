@@ -204,7 +204,11 @@ record:
     hand: box 7a9db825650b
     hash_before: 210492f55ab40a4931219919c13d92e4915fbaeb
     hash_after: 210492f55ab40a4931219919c13d92e4915fbaeb
-step: retro/cloud
+  - step: retro/cloud
+    hand: box 7a9db825650b
+    hash_before: 66eebb826eff67f00e32c8e651e70f1143aa8823
+    hash_after: 66eebb826eff67f00e32c8e651e70f1143aa8823
+step: children
 ---
 
 # Ask
