@@ -402,6 +402,10 @@ a list with something on it. `holds` answers the check `owner-holds`. A
 contract test reads every mechanical name the table carries, and asserts the
 hook answers it.
 
+The hold is one turn long. The turn's end drops it to `off`, so the widget
+falls back to rest the way the ask does. For details, see
+[[spec/design_output/stop#the-hold]].
+
 ## The ask is a line
 
 `ask.wanted` writes `quiet`, `short` or `full`. A value past `quiet` opens a
