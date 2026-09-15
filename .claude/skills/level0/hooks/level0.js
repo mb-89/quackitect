@@ -100,17 +100,15 @@ async function ask($, event, e, next) {
 // A step streams: the bridgehead reads the text of the response as it comes,
 // keeps it for the calls the response makes, and posts it whole at the end.
 async function* streams($, e, next) {
-  let text = "";
-  let keys = "";
-  let sample = "";
+  const kinds = {};
+  stepText = "";
   for await (const chunk of next(e)) {
-    if (!keys && chunk && typeof chunk === "object") keys = Object.keys(chunk).join(",");
-    if (sample.length < 600) sample += JSON.stringify(chunk).slice(0, 300) + " ";
-    text += textOf(chunk);
+    const kind = String(chunk?.kind ?? typeof chunk);
+    kinds[kind] = (kinds[kind] ?? 0) + 1;
+    stepText += textOf(chunk);
     yield chunk;
   }
-  stepText = text;
-  await ask($, "turn.said", { turnId: e?.turnId, index: e?.index, keys, sample, text }, next);
+  await ask($, "turn.said", { turnId: e?.turnId, index: e?.index, kinds, text: stepText }, next);
 }
 
 // The last few texts the agent wrote, oldest first, off the transcript.
@@ -126,11 +124,10 @@ async function lastTexts($) {
   return out;
 }
 
+// A chunk of kind text carries the visible words. Thinking and engine chunks carry none.
 function textOf(chunk) {
-  if (!chunk || typeof chunk !== "object") return "";
-  if (typeof chunk.text === "string") return chunk.text;
-  if (typeof chunk.delta?.text === "string") return chunk.delta.text;
-  return "";
+  if (!chunk || typeof chunk !== "object" || chunk.kind !== "text") return "";
+  return typeof chunk.text === "string" ? chunk.text : "";
 }
 
 // The server wants the reply the owner is owed: the text of the step in hand,

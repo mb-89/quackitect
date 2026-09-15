@@ -69,9 +69,9 @@
         "hold": {
           "type": "string",
           "enum": [
-            "running",
-            "finishing",
-            "stopped"
+            "off",
+            "finish",
+            "stop"
           ],
           "help": "What the session does when it reaches the end of a turn.",
           "widget": "toggle",

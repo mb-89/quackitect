@@ -46,7 +46,7 @@ function page(nodes) {
 const HOLD = {
   key: "stop.hold",
   widget: "toggle",
-  options: "running finishing stopped",
+  options: "off finish stop",
   gesture: "5",
   value: "off",
 };
