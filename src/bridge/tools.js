@@ -17,6 +17,7 @@ import {
 import { answerFindings } from "../../.claude/skills/level0/lib/refuse.js";
 import { MINT_TOOL, mintedNote, mintSpec } from "../../.claude/skills/level0/lib/schema.js";
 import { asks } from "./config.js";
+import { withContext, withoutFalsePast } from "./tense.js";
 import { onWrite } from "./write.js";
 
 // The name Vale reads an answer under, so the rules for an answer apply.
@@ -39,7 +40,7 @@ async function checksAnswer(e, box) {
     ...tableFaults(text, box.asks ?? 0),
     ...needsFaults(text, Boolean(e?.stop)),
     ...lengthFaults(text, asks(box, "answer.words")),
-    ...ran.found,
+    ...withContext(text, withoutFalsePast(text, ran.found)),
   ];
   const score = scoreOf(text, found);
   const bands = { warnAt: asks(box, "answer.warnAt"), ceiling: asks(box, "answer.ceiling") };

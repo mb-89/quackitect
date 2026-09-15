@@ -240,3 +240,5 @@ terms:
   - {word: tripwire, defines: "[[spec/funnel/level-zero-closes]]"}
   - {word: truncate, defines: "[[spec/design_output/level0]]"}
   - {word: vscode, defines: "[[spec/design_output/extension]]"}
+  - {word: wink-nlp, defines: "[[spec/design_output/level0#the-tense-reader]]"}
+  - {word: adjective, defines: "[[spec/design_output/level0#the-tense-reader]]"}

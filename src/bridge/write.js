@@ -24,6 +24,7 @@ import {
 import { refusedTicket, ticketFaults } from "../../.claude/skills/level0/lib/ticket.js";
 import { codeDoor } from "./code.js";
 import { marksStale, ownerDoor } from "./projection.js";
+import { withContext, withoutFalsePast } from "./tense.js";
 
 const PASS = { pass: true };
 
@@ -97,14 +98,20 @@ function schemaDoor(e, writing, where, box) {
 // [[spec/design_output/level0#the-write-door]]
 async function voiceDoor(e, writing, where, box) {
   if (CODE.test(writing.path) || !box.vale.stands()) return "";
-  const said = await box.vale.lint(wholeAfter(e, writing, box.disk), where);
-  if (!said.ran || !said.found.length) return "";
-  box.log.say("warn", "vale", `refused ${said.found.length} line(s) in ${where}`, {
+  const whole = wholeAfter(e, writing, box.disk);
+  const said = await box.vale.lint(whole, where);
+  if (!said.ran) return "";
+  const found = withContext(whole, withoutFalsePast(whole, said.found));
+  if (found.length < said.found.length) {
+    box.log.say("debug", "vale", `the tense reader lets ${said.found.length - found.length} line(s) in ${where} stand`, { file: where });
+  }
+  if (!found.length) return "";
+  box.log.say("warn", "vale", `refused ${found.length} line(s) in ${where}`, {
     file: where,
-    rule: said.found[0]?.rule,
+    rule: found[0]?.rule,
     tool: String(e.tool),
   });
-  return refusal(where, said.found);
+  return refusal(where, found);
 }
 
 function asWrite(e) {

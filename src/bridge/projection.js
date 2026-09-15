@@ -52,6 +52,11 @@ export function marksStale(where, box) {
 }
 
 export function freshens(box) {
+  if (!box.projections) {
+    box.projections = projectionsHere(box.disk, box.method);
+    box.sources = sourcesOf(box.projections, box.disk, box.method);
+    box.restale = "a fresh box";
+  }
   if (!box.restale) return;
   const moved = box.restale;
   box.restale = "";

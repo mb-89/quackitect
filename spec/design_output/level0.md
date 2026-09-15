@@ -1028,6 +1028,34 @@ short forms that read the same everywhere keep theirs.
 Vale drops both fixes and names the overlap. A token reaching past its own word
 costs the fix beside it, so every token here stops at its own edge.
 
+# The tense reader
+
+Vale tags a verb with a small tagger, and reads a present form like `set`,
+`put` or `straight` as past at a line start. Each of those costs a round of
+refusal, and a list of exceptions grows one word at a time. The tense reader
+stands behind Vale's finding with one general veto:
+
+| the form | the reader says |
+|---|---|
+| its own lemma, `set`, `put`, `read` | present on its face, and the finding falls |
+| its -s or -ing form, `skips`, `standing` | present on its face, and the finding falls |
+| another form, `wrote`, `did`, `failed` | past, and the finding stands |
+
+`src/bridge/tense.js` reads the line the finding stands in through wink-nlp,
+which hands a lemma a token. The veto sits behind the write door, the draft
+check and the commit message, and a `vale` line at debug counts what it lets
+stand.
+
+The tagger carries no more than that. It reads a participle standing as an
+adjective, `a refused call`, as a verb like any other. So those stay on the
+rule's exception list, eight words where sixteen stood. A bench under
+`.se/scripts` runs both readers over every note, and it is the way to read a
+change to either.
+
+The dependency is one node package and its English model, named in
+`package.json`. The install fetches them under `modules`, and the server
+loads them once.
+
 # What the cage loads
 
 Level zero fills its state once: the linter it runs, the config it reads, the

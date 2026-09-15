@@ -64,36 +64,21 @@ layers:
     exceptions:
       - word: bound
         reason: a status here, and the tagger reads a past tense
-      - word: buys
-        reason: the tagger reads a past tense, and the word carries none
       - word: complicated
         reason: an adjective here
       - word: held
         reason: a status here
       - word: numbered
         reason: an adjective here
-      - word: read
-        reason: a noun and a present tense here
-      - word: red
-        reason: a colour, and the tagger reads a past tense
       - word: refused
         reason: an adjective here
       - word: settled
         reason: an adjective here
-      - word: skips
-        reason: the tagger reads a past tense, and the word carries none
       - word: switched
         reason: an adjective here
-      - word: bold
-        reason: a markup word, and the tagger reads a past tense
-      - word: add
-        reason: an imperative here, and the tagger reads a past tense
       - word: approved
         reason: an adjective here, on a word list
-      - word: missing
-        reason: an adjective here, and the tagger reads a progressive
-      - word: standing
-        reason: a gerund here, and the tagger reads a progressive
+    presentOnItsFace: a form that is its own lemma, or its -s or -ing form, stands, and the tense reader vetoes the tagger
 
   vocabulary:
     core: spec/vocabulary/core.yml
