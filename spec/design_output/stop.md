@@ -36,37 +36,37 @@ A session torn down as the turn ends escapes the tooth, because the prompt
 reaches a session that has already gone. A cloud routine ending its run is that
 case.
 
-# The stop is one call
+# The stop is one line
 
-A turn ends where the agent asks for it, and the ask is one tool call, last:
+A turn ends where the agent asks for it, and the ask is the last line of the
+last message:
 
-    stop  reason=<id>  next=<what the owner does next>
+    stop: <id>
 
 The ids come from the stop side rules the agent claims, in
-`spec/config/stop/level0.yml`. The tool's schema lists them under `reason`.
-The call stands in the transcript where the owner reads it, so a stop is a
-thing spoken out loud. The answer above it carries prose alone.
+`spec/config/stop/level0.yml`. The line stands in the chat where the owner
+reads it, so a stop is a thing spoken out loud. The report above it carries
+prose alone, and the line comes last.
 
-The call runs the vote at once, and its result says which way it goes:
+The stop door reads the last line at the turn's end and runs the vote:
 
-| what the call carries | what comes back | what the agent does |
-|---|---|---|
-| a reason that stands | the rule's sentence, and "write nothing more" | it ends the turn |
-| a reason a fact denies | the fact, in one line | it carries on |
-| an id nobody holds | the ids | it carries on |
+| the last line | what the door does |
+|---|---|
+| a reason that stands | the turn ends, and the log names the rule |
+| a reason a fact denies | the turn holds, and the fact re-prompts |
+| an id nobody holds, or no line | the turn holds, and the re-prompt lists the ids |
 
-A claim lives until the next tool call or the turn's end, whichever comes
-first. So the stop is the last thing an agent does, and a call after it says
-the agent carries on.
+The tool `stop` stands beside the line. A call with a known reason claims it,
+and its result says to end the message with the line. A claim lives until the
+turn's end.
 
-## A turn with no call
+## A turn with no line
 
-The floor of zero ends a turn nobody votes on. So stopping is what happens
-where nothing speaks, and a session stops too often for that one reason.
-
-A turn end carries a claim or holds open. `askForStop` names the call, lists
-every id one to a line, and asks for the needs table in one line. The claim
-feeds the vote, and the priorities decide the rest:
+The rule `the-last-line-names-no-stop` fires where the last line names no
+reason the tree holds. It stands on the continue side at fifty, under the
+owner's hold and over the claimed reasons, so a turn without the line holds
+open. The re-prompt lists every id one to a line. The hold at stop and a fresh
+session end a turn over it, and the tooth off ends any turn.
 
 - the vote keeps deciding
 - `spec/config/stop/level0.yml` keeps every rule, side and priority
