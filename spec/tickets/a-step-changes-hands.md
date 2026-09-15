@@ -176,7 +176,11 @@ record:
     hand: box af187ab9cab6
     hash_before: 1339db97ba58baed3c26af770f1fc07783d1d534
     hash_after: 1339db97ba58baed3c26af770f1fc07783d1d534
-step: retro/cloud
+  - step: retro/cloud
+    hand: box af187ab9cab6
+    hash_before: 4cfede419f04b6a94c80752c96f9a25cea870519
+    hash_after: 4cfede419f04b6a94c80752c96f9a25cea870519
+step: children
 ---
 
 # Ask
