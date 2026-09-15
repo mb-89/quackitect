@@ -11,9 +11,11 @@ exceptions:
   - bound
   - complicated
   - held
+  - missing
   - numbered
   - refused
   - settled
+  - standing
   - switched
 tokens:
   - tag: VBD

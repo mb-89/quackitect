@@ -11,25 +11,31 @@ exceptions:
   - had bound
   - had complicated
   - had held
+  - had missing
   - had numbered
   - had refused
   - had settled
+  - had standing
   - had switched
   - has approved
   - has bound
   - has complicated
   - has held
+  - has missing
   - has numbered
   - has refused
   - has settled
+  - has standing
   - has switched
   - have approved
   - have bound
   - have complicated
   - have held
+  - have missing
   - have numbered
   - have refused
   - have settled
+  - have standing
   - have switched
 tokens:
   - pattern: '(?:have|has|had)'

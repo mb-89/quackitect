@@ -90,7 +90,7 @@ const TOOLS = {
 // names its tools on its first event of any kind, so a server started again
 // brings its tools to a session already running.
 export async function decide(said, box) {
-  freshens(box);
+  freshens(box, String(said?.event ?? ""));
   const door = DOORS[String(said?.event ?? "")] ?? pass;
   const answer = letsThrough((await door(said?.e ?? {}, box)) ?? PASS, said, box);
   if (box.registered || String(said?.event ?? "") === "engine.create") return answer;

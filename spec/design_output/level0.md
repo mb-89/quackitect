@@ -1048,7 +1048,7 @@ stand.
 
 The tagger carries no more than that. It reads a participle standing as an
 adjective, `a refused call`, as a verb like any other. So those stay on the
-rule's exception list, eight words where sixteen stood. A bench under
+rule's exception list, ten words where sixteen stood. A bench under
 `.se/scripts` runs both readers over every note, and it is the way to read a
 change to either.
 

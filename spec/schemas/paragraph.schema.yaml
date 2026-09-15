@@ -78,6 +78,10 @@ layers:
         reason: an adjective here
       - word: approved
         reason: an adjective here, on a word list
+      - word: missing
+        reason: an adjective here, and the progressive rule reads it after is
+      - word: standing
+        reason: a gerund here, and the progressive rule reads it after is
     presentOnItsFace: a form that is its own lemma, or its -s or -ing form, stands, and the tense reader vetoes the tagger
 
   vocabulary:

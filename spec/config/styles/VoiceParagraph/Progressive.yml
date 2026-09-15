@@ -11,65 +11,81 @@ exceptions:
   - am bound
   - am complicated
   - am held
+  - am missing
   - am numbered
   - am refused
   - am settled
+  - am standing
   - am switched
   - are approved
   - are bound
   - are complicated
   - are held
+  - are missing
   - are numbered
   - are refused
   - are settled
+  - are standing
   - are switched
   - be approved
   - be bound
   - be complicated
   - be held
+  - be missing
   - be numbered
   - be refused
   - be settled
+  - be standing
   - be switched
   - been approved
   - been bound
   - been complicated
   - been held
+  - been missing
   - been numbered
   - been refused
   - been settled
+  - been standing
   - been switched
   - being approved
   - being bound
   - being complicated
   - being held
+  - being missing
   - being numbered
   - being refused
   - being settled
+  - being standing
   - being switched
   - is approved
   - is bound
   - is complicated
   - is held
+  - is missing
   - is numbered
   - is refused
   - is settled
+  - is standing
   - is switched
   - was approved
   - was bound
   - was complicated
   - was held
+  - was missing
   - was numbered
   - was refused
   - was settled
+  - was standing
   - was switched
   - were approved
   - were bound
   - were complicated
   - were held
+  - were missing
   - were numbered
   - were refused
   - were settled
+  - were standing
   - were switched
 tokens:
   - pattern: '(?:am|are|is|was|were|be|been|being)'
