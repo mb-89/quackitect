@@ -24,7 +24,7 @@ import {
 import { refusedTicket, ticketFaults } from "../../.claude/skills/level0/lib/ticket.js";
 import { codeDoor } from "./code.js";
 import { marksStale, ownerDoor } from "./projection.js";
-import { withContext, withoutFalsePast } from "./tense.js";
+import { readsProse } from "./prose.js";
 
 const PASS = { pass: true };
 
@@ -101,10 +101,7 @@ async function voiceDoor(e, writing, where, box) {
   const whole = wholeAfter(e, writing, box.disk);
   const said = await box.vale.lint(whole, where);
   if (!said.ran) return "";
-  const found = withContext(whole, withoutFalsePast(whole, said.found));
-  if (found.length < said.found.length) {
-    box.log.say("debug", "vale", `the tense reader lets ${said.found.length - found.length} line(s) in ${where} stand`, { file: where });
-  }
+  const found = readsProse(box, whole, said.found);
   if (!found.length) return "";
   box.log.say("warn", "vale", `refused ${found.length} line(s) in ${where}`, {
     file: where,

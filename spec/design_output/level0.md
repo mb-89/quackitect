@@ -1042,9 +1042,16 @@ stands behind Vale's finding with one general veto:
 | another form, `wrote`, `did`, `failed` | past, and the finding stands |
 
 `src/bridge/tense.js` reads the line the finding stands in through wink-nlp,
-which hands a lemma a token. The veto sits behind the write door, the draft
-check and the commit message, and a `vale` line at debug counts what it lets
-stand.
+which hands a lemma a token. Two more vetoes ride the same reader, in
+`src/bridge/prose.js`. The three doors reading prose call that one entry: the
+write door, the draft check and the commit message. A `vale` line at debug
+counts what the reader lets stand.
+
+| Vale finds | the reader says |
+|---|---|
+| a past form | present on its face, where the form is its own lemma or its -s or -ing form |
+| a sentence or a list item past the cap | under the cap, counted with a code span and a link as one word each |
+| a word outside the lists | on a list, where its lemma stands there |
 
 The tagger carries no more than that. It reads a participle standing as an
 adjective, `a refused call`, as a verb like any other. So those stay on the

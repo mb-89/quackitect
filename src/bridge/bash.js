@@ -14,7 +14,7 @@ import { saysGreen, STAMP, stampOf } from "../../.claude/skills/level0/lib/runs.
 import { reaches, refusedTodo, taggedIn } from "../../.claude/skills/level0/lib/todo.js";
 import { landsOnTrunk, touchesGit } from "../../.claude/skills/level0/lib/trunk.js";
 import { asks } from "./config.js";
-import { withContext, withoutFalsePast } from "./tense.js";
+import { readsProse } from "./prose.js";
 
 const TRUNK = "main";
 // The name Vale reads a commit message under, so the rules for a message apply.
@@ -69,7 +69,7 @@ async function commitVoice(command, box) {
   text = withoutTrailers(text);
   if (!text.trim()) return [];
   const ran = await box.vale.lint(text, COMMIT);
-  return ran.ran ? withContext(text, withoutFalsePast(text, ran.found)) : [];
+  return ran.ran ? readsProse(box, text, ran.found) : [];
 }
 
 // [[spec/design_output/private#two-doors-one-check]]
