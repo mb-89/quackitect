@@ -48,7 +48,7 @@ const HOLD = {
   widget: "toggle",
   options: "running finishing stopped",
   gesture: "5",
-  value: "running",
+  value: "off",
 };
 
 // [[spec/design_output/extension#a-click-becomes-a-message]]

@@ -58,7 +58,7 @@ already carries the type and the options:
 
     "hold": {
       "type": "string",
-      "enum": ["running", "finishing", "stopped"],
+      "enum": ["off", "finish", "stop"],
       "help": "What the session does when it reaches the end of a turn.",
       "widget": "toggle",
       "gesture": 5,
@@ -197,7 +197,7 @@ The four buttons, and the one file naming them,
 | key | `icon` | what it does |
 |---|---|---|
 | `log.open` | `📜` | runs `./RUNME.sh log`, which opens the log viewer in a terminal |
-| `stop.hold` | `✋🤖` | running, then finishing, and stops at five presses |
+| `stop.hold` | `✋🤖` | off, then finish, and stop at five presses |
 | `ask.wanted` | `❓🤖` | quiet, then short, and the full report at five presses |
 | `engine.binding` | `❌🔗🤖` | the queue, then unbound, and god mode at five presses |
 
@@ -272,7 +272,7 @@ A click count picks which of three a control holds:
 
 | control | at rest | one click | five clicks |
 |---|---|---|---|
-| hold | running | finish this work | stop now |
+| hold | off | finish this work | stop now |
 | ask | quiet | a short update | a full report |
 
 The host counts the presses, and the page counts none. Every write draws the
@@ -299,8 +299,8 @@ Every press that writes, every run and every edit in the config tree writes a
 `sidebar` line to the door log. For details, see
 [[spec/design_output/log#which-door-says-what]].
 
-- One press writes `stop.hold is finishing`, with the detail `one press`.
-- Five presses write `stop.hold is stopped`, with the detail `5 presses`.
+- One press writes `stop.hold is finish`, with the detail `one press`.
+- Five presses write `stop.hold is stop`, with the detail `5 presses`.
 - The log button writes `log.open runs ./RUNME.sh log`.
 - An edit in the config tree writes `stop.mostInARow is 5`, with the detail `the config tree`.
 
@@ -312,7 +312,7 @@ line honours `log.level`, the same as every other door.
 
 A slash command and a button set the same key through the same file, so each
 shows what the other sets. The hover of a toggle names a command for each of its
-states down the widget path, as `/se-agent-control-hold-stopped`. The config
+states down the widget path, as `/se-agent-control-hold-stop`. The config
 tree answers the same key down the config path. The projection writes both. For
 details, see [[spec/design_output/projection#the-first-target]].
 
@@ -393,9 +393,9 @@ meet in the file and nowhere else.
 
 | value | what the tooth does |
 |---|---|
-| `running` | leaves the vote as it stands |
-| `finishing` | leaves the vote, and the block asks for nothing new |
-| `stopped` | ends the turn, over the rule carrying standing work |
+| `off` | leaves the vote as it stands |
+| `finish` | leaves the vote, and one context line asks for nothing new |
+| `stop` | refuses the next call, and ends the turn over the rule carrying standing work |
 
 The rule stands at priority 85, over `work-still-stands` at 80. So a hold beats
 a list with something on it. `holds` answers the check `owner-holds`. A
@@ -416,12 +416,12 @@ the answer as the widget falling back to rest.
 | `full` | a reply in the shape of `spec/config/status.yaml` |
 
 The shape is four chapters, each a heading with text under it: Done, Now,
-Open, ETA. A reply lacking one is refused with the chapters it lacks, and a
-turn ending on such a reply holds: the stop door re-prompts with the same
-reason, and the ask stands until a reply fits.
+Open, ETA. The door refuses a reply lacking one, and names the chapters it
+lacks. A turn ending on such a reply holds: the stop door re-prompts with the
+same reason, and the ask stands until a reply fits.
 
-The pay takes back the value it answered alone. A press landing after the
-demand opened stands, and the next call asks for it.
+The pay takes back the value it answers, and that value alone. A press landing
+after the demand opens stands, and the next call asks for it.
 
 # What a cloud box proves
 
@@ -522,7 +522,7 @@ already carries, and four of those make a panel read as a paragraph.
 | a red pulse | the value stands at the far end |
 
 The far end is the third option, which a gesture reaches. `stop.hold` takes two
-presses to `stopped`, and `ask.wanted` and `engine.binding` take five.
+presses to `stop`, and `ask.wanted` and `engine.binding` take five.
 
 ## The gear picks the sections
 
@@ -551,8 +551,8 @@ sees it with the panel shut. `lib/states.js` decides what stands:
 
 - `engine.binding` at `god` reads `level zero refuses nothing`, on the error colour.
 - `engine.binding` at `unbound` reads `unbound`, on the warning colour.
-- `stop.hold` at `finishing` reads `finishing`, on the warning colour.
-- `stop.hold` at `stopped` reads `stopped`, on the error colour.
+- `stop.hold` at `finish` reads `finish`, on the warning colour.
+- `stop.hold` at `stop` reads `stop`, on the error colour.
 
 A click on one puts its key back at rest, through the command `quackitect.rest`.
 A state arriving while the window runs raises a warning toast once, and the

@@ -31,7 +31,7 @@ import {
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
 import { asks } from "./config.js";
-import { SPECS as stopSpecs, TOOLS as stopTools } from "./stop.js";
+import { holdsCall, onStop, sawCall, SPECS as stopSpecs, TOOLS as stopTools } from "./stop.js";
 import { onBash, onDescribe } from "./bash.js";
 import { ANSWERED, onAgentAnswered, SPECS as reviewSpecs, TOOLS as reviewTools } from "./review.js";
 import { SPECS as toolSpecs, TOOLS as handTools } from "./tools.js";
@@ -62,7 +62,7 @@ const DOORS = {
   [SPOKE]: onAgentSpoke,
   "session.compact": onSessionCompact,
   "turn.complete": endsTurn,
-  "classic.Stop": holdsTurn,
+  "classic.Stop": onStop,
   "agent.spawn": onAgentSpawn,
   "tool.describe": onDescribe,
   "tool.call": onToolCall,
@@ -129,11 +129,12 @@ function opensSession(e, box) {
   return { register: specsOf(box), pass: true };
 }
 
-// A tool call meets the answer door first, then its handler, and a call passing
-// while the canary is owed carries the ask for it.
+// A tool call meets the hold, then the answer door, then its handler, and a
+// call passing while the canary is owed carries the ask for it.
 async function onToolCall(e, box) {
+  sawCall(e, box);
   asksForUpdate(e, box);
-  const held = holdsForAnswer(e, box);
+  const held = letsThrough(holdsCall(e, box) ?? holdsForAnswer(e, box), { e }, box);
   if (held?.result || held?.needs) return held;
   const said = await (TOOLS[String(e?.tool ?? "")] ?? pass)(e, box);
   if (said !== PASS) return said;

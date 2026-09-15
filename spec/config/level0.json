@@ -4,7 +4,7 @@
     "comment": "The tooth. enabled false takes it out, and mostInARow caps the turns it carries one after another. The rules it votes over live in spec/config/stop.",
     "enabled": true,
     "mostInARow": 3,
-    "hold": "running"
+    "hold": "off"
   },
   "work": {
     "comment": "The knobs the work verbs read. staleAfter is the age of a held group's tip that puts the group under yours, with release, take and close as the three answers. failsBeforePerson and refusalsBeforePerson say when the pull inserts a person step, and stepsBeforeSplit says how many of those a ticket carries before it splits.",

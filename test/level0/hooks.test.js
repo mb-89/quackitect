@@ -419,7 +419,7 @@ test("the hold at stopped ends a turn the standing work would carry", async () =
   for (let i = 0; i < 10; i++) {
     await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   }
-  it.files.set(".se/config.json", JSON.stringify({ stop: { hold: "stopped" } }));
+  it.files.set(".se/config.json", JSON.stringify({ stop: { hold: "stop" } }));
   await endsATurn(it, "a step is done");
 
   const said = it.since().filter((one) => one.kind === "stop");
@@ -433,7 +433,7 @@ test("the hold at running leaves the vote as it stands", async () => {
   for (let i = 0; i < 10; i++) {
     await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   }
-  it.files.set(".se/config.json", JSON.stringify({ stop: { hold: "running" } }));
+  it.files.set(".se/config.json", JSON.stringify({ stop: { hold: "off" } }));
   await it.raise("turn.complete", { ...answered, answer: "a step is done" });
 
   assert.equal(it.lines().filter((one) => one.kind === "stop")[0].said, "the turn goes on");
@@ -1013,7 +1013,7 @@ test("a hold at stopped owes an answer, and the later demand replaces the earlie
   await it.raise("prompt.submit", { text: "build the door", origin: { kind: "composer" } });
   await it.raise("turn.step", { turnId: "t", index: 0, answer: "", toolUses: [], stopReason: "tool_use" });
 
-  it.files.set(".se/config.json", JSON.stringify({ stop: { hold: "stopped" } }));
+  it.files.set(".se/config.json", JSON.stringify({ stop: { hold: "stop" } }));
   const fresh = await it.raise("tool.call", { tool: "Read", file_path: "a.md" });
   assert.equal(fresh.deny, undefined, "the new demand starts over");
   assert.equal(fresh.context, undefined, "the new demand waits for its own step");

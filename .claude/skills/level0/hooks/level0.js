@@ -13,6 +13,7 @@ const SESSION = ".se/log/session.jsonl";
 const COMPACT = "session.compact";
 const LIMIT = 4_000_000;
 const SHORT = 4000;
+const TEXTS = 4;
 let port = PORT;
 let root = "";
 let saidDown = false;
@@ -112,15 +113,17 @@ async function* streams($, e, next) {
   await ask($, "turn.said", { turnId: e?.turnId, index: e?.index, keys, sample, text }, next);
 }
 
-async function lastText($) {
+// The last few texts the agent wrote, oldest first, off the transcript.
+async function lastTexts($) {
+  const out = [];
   try {
     const rows = await $.session.messages();
-    for (let at = rows.length - 1; at >= 0; at--) {
+    for (let at = rows.length - 1; at >= 0 && out.length < TEXTS; at--) {
       const said = String(rows[at]?.text ?? "").trim();
-      if (rows[at]?.role === "assistant" && said) return said;
+      if (rows[at]?.role === "assistant" && said) out.unshift(said);
     }
   } catch {}
-  return "";
+  return out;
 }
 
 function textOf(chunk) {
@@ -134,8 +137,9 @@ function textOf(chunk) {
 // or the last text the agent wrote off the transcript. The bridgehead posts
 // it as an event of its own, and does what that answer says with the call.
 async function spoke($, e, next) {
-  const text = stepText || (await lastText($));
-  const answer = await ask($, "agent.spoke", { tool: e?.tool, agentId: e?.agentId, text }, next);
+  const texts = await lastTexts($);
+  const text = stepText || texts.at(-1) || "";
+  const answer = await ask($, "agent.spoke", { tool: e?.tool, agentId: e?.agentId, text, texts }, next);
   if (!answer) return next(e);
   if (answer.result !== undefined) return answer.result;
   if (answer.after !== undefined) return merged(await next(e), answer.after);

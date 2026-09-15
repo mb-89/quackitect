@@ -17,18 +17,25 @@ import {
   OWES,
   standingLayer,
 } from "../../.claude/skills/level0/lib/guidance.js";
+import { asks } from "./config.js";
 import { deadIndexLine } from "./search.js";
 
 const GUIDANCE = "spec/guidance";
+const TOOTH = "stop.enabled";
 
 // [[spec/design_output/level0#the-standing-layer]]
-export function guidanceHere(disk, root, env = process.env) {
+export function guidanceHere(disk, root, env = process.env, tooth = true) {
   const notes = readNotes(disk, join(root, GUIDANCE));
   const wanted = new Set(notes.flatMap((one) => envOf(one.text)));
   const bound = Object.fromEntries([...wanted].map((name) => [name, env[name] ?? ""]));
   const here = notes.filter((one) => bindsHere(one.text, bound));
   const counts = countsOf(here);
-  return { standing: standingLayer(here), ...counts, sentence: canary({ ...counts, stop: false }) };
+  return { standing: standingLayer(here), ...counts, sentence: canary({ ...counts, stop: tooth }) };
+}
+
+// The guidance of a box: its notes, and the tooth's switch for the canary.
+function readsGuidance(box) {
+  return guidanceHere(box.disk, box.method, process.env, asks(box, TOOTH) !== false);
 }
 
 function readNotes(disk, folder) {
@@ -52,19 +59,19 @@ function pastTurnOne() {
 
 // The guidance, loaded on the first ask where no session start loaded it.
 function guidanceOf(box) {
-  return box.guidance ?? (box.guidance = guidanceHere(box.disk, box.method));
+  return box.guidance ?? (box.guidance = readsGuidance(box));
 }
 
 // A session opens: the guidance reads again, and the canary is owed again.
 export function onSessionStart(_e, box) {
-  box.guidance = guidanceHere(box.disk, box.method);
+  box.guidance = readsGuidance(box);
   box.session = { reads: 0, firstTurn: true };
   return { pass: true };
 }
 
 // [[spec/design_output/level0#the-guidance-stays-put]]
 export function onPromptContext(_e, box) {
-  const held = box.guidance ?? (box.guidance = guidanceHere(box.disk, box.method));
+  const held = box.guidance ?? (box.guidance = readsGuidance(box));
   const session = box.session ?? (box.session = pastTurnOne());
   session.reads += 1;
   const blocks = blocksOf(held, box.index.dead());
@@ -147,7 +154,7 @@ export function owesCanary(e, box) {
 // stand. The canary is owed again, so the next answer says the rules reached it.
 // [[spec/design_output/level0#the-layer-after-a-compaction]]
 export function onSessionCompact(e, box) {
-  box.guidance = guidanceHere(box.disk, box.method);
+  box.guidance = readsGuidance(box);
   if (box.session) box.session.owes = true;
   box.log.say("info", "compact", "a compaction runs, and the guidance reads again", {
     trigger: String(e?.trigger ?? "unknown"),

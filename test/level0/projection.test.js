@@ -116,7 +116,7 @@ test("a toggle in a group takes a second command down the group's path", () => {
       stop: {
         type: "object",
         properties: {
-          hold: { enum: ["running", "stopped"], widget: "toggle", group: "agent control", help: "The hold." },
+          hold: { enum: ["off", "stop"], widget: "toggle", group: "agent control", help: "The hold." },
         },
       },
       log: {
@@ -128,7 +128,7 @@ test("a toggle in a group takes a second command down the group's path", () => {
   const files = writesOf(
     ENTRY,
     new Map([
-      [SOURCE, JSON.stringify({ stop: { hold: "running" } })],
+      [SOURCE, JSON.stringify({ stop: { hold: "off" } })],
       [SCHEMA, JSON.stringify(schema)],
     ]),
   );

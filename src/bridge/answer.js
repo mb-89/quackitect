@@ -58,18 +58,39 @@ export function holdsForAnswer(e, box) {
   return { needs: "reply" };
 }
 
-// The bridgehead posts the last text the agent wrote, and the demand is paid or the call refused.
+// The bridgehead posts the last texts the agent wrote, oldest first. Any text
+// since the demand that fits pays it, and the newest such text is the reply.
+// A refusal quotes the last text seen, so a stale read and a wrong reply read apart.
 export function onAgentSpoke(e, box) {
   const demand = box.demand;
-  const text = String(e?.text ?? "").trim();
   if (!demand) return { pass: true };
-  const lacks = text && text !== demand.seen ? (demand.fits?.(text) ?? "") : SAYS(demand.why);
-  if (!lacks) return paid(box, text);
+  const fresh = textsSince(e, demand.seen);
+  const fitting = fresh.filter((one) => !demand.fits?.(one));
+  if (fitting.length) return paid(box, fitting.at(-1));
+  const newest = fresh.at(-1) ?? "";
+  const lacks = newest
+    ? `${demand.fits(newest)} The last text seen (${newest.length} characters) reads: "${head(newest)}".`
+    : `${SAYS(demand.why)} The last text seen stands from before the ask, and reads: "${head(demand.seen)}".`;
   box.log.say("debug", "gate", `refused ${e?.tool ?? "a call"} before a reply`, {
     tool: String(e?.tool ?? ""),
     detail: lacks.slice(0, 120),
   });
   return { result: { deny: lacks } };
+}
+
+// The texts after the one seen, or every text but the one seen where it stands nowhere.
+function textsSince(e, seen) {
+  const texts = [...(Array.isArray(e?.texts) ? e.texts : []), e?.text ?? ""]
+    .map((one) => String(one).trim())
+    .filter(Boolean);
+  const at = texts.lastIndexOf(seen);
+  return (at >= 0 ? texts.slice(at + 1) : texts.filter((one) => one !== seen)).filter(
+    (one, where, all) => all.indexOf(one) === where,
+  );
+}
+
+function head(text) {
+  return String(text ?? "").replace(/\s+/g, " ").slice(0, 80);
 }
 
 function paid(box, text) {
