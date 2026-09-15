@@ -406,14 +406,19 @@ hook answers it.
 
 `ask.wanted` writes `quiet`, `short` or `full`. A value past `quiet` opens a
 demand like a prompt: the block rides the next call, and the reply stands
-before the call after it. The reply pays the ask, and the pay writes the key
-back to `quiet`. So the ask asks once, the work goes on, and the sidebar draws
-the answer as the widget falling back to rest.
+before the call after it. The agent hands the reply in through
+`mcp__level0__report`. The reply pays the ask, and the pay writes the key back
+to `quiet`. So the ask asks once, the work goes on, and the sidebar draws the
+answer as the widget falling back to rest.
 
 | the ask | what pays it |
 |---|---|
 | `short` | any reply |
 | `full` | a reply in the shape of `spec/config/status.yaml` |
+
+A reply written as chat text between calls reaches no hook until the turn
+ends, so the tool is the road. For details, see
+[[spec/design_output/level0#what-the-door-reads]].
 
 The shape is four chapters, each a heading with text under it: Done, Now,
 Open, ETA. The door refuses a reply lacking one, and names the chapters it

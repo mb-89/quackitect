@@ -653,61 +653,51 @@ instead.
 
 ## What the door reads
 
-The door marks what a person waits for, and holds every `tool.call` while
-nothing reaches them. Text the session writes after the mark answers it,
-and `turn.complete` clears the mark.
+The door opens a demand for what a person waits for. It holds every
+`tool.call` after the first while nothing pays it. Three things pay it:
 
-Whether an answer stands comes out of `$.session.messages()`. The mark notes how
-many messages stand when it goes down, and text from the session past that
-point answers it. Text from before the mark answers an older demand, and counts
-for nothing.
+| what pays | when |
+|---|---|
+| the first text of a turn | `classic.MessageDisplay` fires for it, before the first call |
+| a call to `mcp__level0__report` with the text | at once, between calls |
+| the turn's last text | at `turn.complete`, where the demand still stands |
+
+A text written between calls pays nothing on its own. The client hands it to
+no hook until the turn ends. The transcript behind `$.session.messages()`
+flushes late, sometimes a turn late. The step's stream carries text for the
+first step alone. The bridgehead still posts the last four texts of the
+transcript on a hold. The door pays on any text since the demand that fits,
+so a flush landing late pays too.
 
 ## What counts as owed
 
-- A prompt a person opens a turn with, at `prompt.submit`.
-- An update a person asks for: `ask.wanted` moving away from `quiet`.
-- A hold: `stop.hold` moving to `stopped`.
+- A prompt a person opens a turn with, or sends mid-turn, at `prompt.submit`.
+- An update a person asks for: `ask.wanted` moving away from `quiet`. A full
+  ask pays on a text in the shape of `spec/config/status.yaml` alone.
 
-The hook reads the two keys at every `tool.call`, so a button pressed mid-turn
-reaches the next call. The latest demand replaces the one before it, and starts
-with a warning of its own.
+The door reads the key at every `tool.call`, so a button pressed mid-turn
+reaches the next call. The latest demand replaces the one before it. The hold
+is no demand: it stands in the stop door. For details, see
+[[spec/design_output/stop#the-hold]].
 
-## A warning on every call
+## The first call is free
 
-The door refuses no call. A refused call fires no step, and the text of that
-step reaches nothing. So a refusal locks the session, the stop call with it.
-Every call while the demand stands carries a warning instead.
+The response in flight when a demand lands can carry the answer as its first
+text. So the first call after the demand passes, with the demand as context.
+Every call after it asks the bridgehead for the texts. A call with nothing new
+comes back refused. The refusal quotes the last text seen and its length, so a
+stale read and a wrong reply read apart. `AskUserQuestion` and the report tool
+pass the hold.
 
-The response in flight when a demand lands can carry the answer, and its text
-reaches the hook only once the response completes. So every call of that
-response passes with no warning. A response completing with no text leaves the
-demand open. Each call after it carries the warning, and the session reads it
-after the tool's result. The warning names what the person waits for.
+Each refusal writes a `gate` line at `debug`, because the agent reads the
+refusal itself.
 
-Each such call writes a `gate` line at `warn`: `warned Read before an answer`,
-with the demand in the detail.
+## The reply line
 
-## A prompt mid-turn
-
-- Outcome: a prompt landing mid-response binds the next response, and the one in flight goes free.
-- Cause: the response in flight completes with no text, before the model reads the prompt.
-- Count: every tool call adds one, and every step sets the count to zero.
-- Skip: a prompt landing over a count above zero skips the next step.
-- Log: a silent step, or one the door skips, writes a `step` line.
-
-## A step carries the answer
-
-The hook reads the answer off the transcript after each step, and off the
-turn's own text at the turn end. `turn.step` hands the hook each response once
-its blocks stand, with its visible text in `answer`. On client 2.1.269 that
-field stands empty, whatever the response says. Text found in either place
-answers the demand, and the hook writes it as the `answer` line. For details,
-see [[spec/design_output/log#the-answer-under-its-prompt]].
-
-The transcript stands behind the step. `$.session.messages()` answers its newest
-4096 messages alone, so the door remembers the last answer standing when the
-demand lands, and text after that one answers it. A position in the list shifts
-as the window slides, so the door counts none.
+The pay writes the text as the `reply` line at `info`, once, with `answers:
+<the demand>` in the detail. The turn's end writes the last text as a reply
+where no pay stands. For details, see
+[[spec/design_output/log#the-answer-under-its-prompt]].
 
 ## The owner binds god
 

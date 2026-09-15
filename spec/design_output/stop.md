@@ -64,13 +64,30 @@ turn's end.
 
 The rule `the-last-line-names-no-stop` fires where the last line names no
 reason the tree holds. It stands on the continue side at fifty, under the
-owner's hold and over the claimed reasons, so a turn without the line holds
+owner's hold and over the claimed reasons. So a turn without the line holds
 open. The re-prompt lists every id one to a line. The hold at stop and a fresh
 session end a turn over it, and the tooth off ends any turn.
 
 - the vote keeps deciding
 - `spec/config/stop/level0.yml` keeps every rule, side and priority
 - `stop.mostInARow` keeps capping a runaway
+
+## The hold
+
+`stop.hold` is what the owner picks from the sidebar, and it stays there
+until they click it back. The stop door reads it at every call and at the
+turn's end:
+
+| hold | at the next call | at the turn's end |
+|---|---|---|
+| `off` | nothing | the tooth votes |
+| `finish` | one context line: finish what stands, start nothing new | the tooth votes |
+| `stop` | the door refuses the call: say what stands, end the turn with the stop line | the turn ends over the standing work |
+
+The report tool passes the hold at `stop`, so the agent hands the last report
+in before the turn ends. The hold at `stop` fires the rule
+`the-owner-holds-this-session` on the stop side at 85, over every continue
+rule but the owner's own word. A `hold` line at `debug` says what the door does.
 
 ## The canary ends turn one
 
