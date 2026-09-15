@@ -1,7 +1,5 @@
-// The code door, the other half of the write door. A Write to code goes
-// through the formatter first and lands formatted, and the lint refuses an
-// error with the reason and the line. An Edit meets the lint over the file
-// as it stands after the edit. A box with no Biome lets code through.
+// The code door: the formatter applies itself, and a function or a file past
+// the size ceiling comes back refused.
 // [[spec/design_output/level0#the-formatter-applies-itself]]
 
 import { refusal } from "../../.claude/skills/level0/lib/refuse.js";

@@ -11,6 +11,7 @@ import {
 } from "../../.claude/skills/level0/lib/guidance.js";
 import { asRow, OLD, rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { POINTER, PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
+import { withoutFalsePast } from "../bridge/tense.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
 import {
   entriesIn,
@@ -346,6 +347,25 @@ function asksIndex(argv) {
   return said.exitCode;
 }
 
+// [[spec/design_output/level0#the-tense-reader]]
+function readThroughTheReader(found) {
+  const byFile = new Map();
+  for (const one of found) {
+    const list = byFile.get(one.file) ?? [];
+    list.push(one);
+    byFile.set(one.file, list);
+  }
+  const kept = [];
+  for (const [file, list] of byFile) {
+    let text = "";
+    try {
+      text = files.read(join(root, file));
+    } catch {}
+    kept.push(...withoutFalsePast(text, list));
+  }
+  return kept;
+}
+
 async function lint(where) {
   if (!files.exists(bin)) {
     console.error("Vale is missing. Run ./RUNME.sh once and it installs.");
@@ -367,7 +387,7 @@ async function lint(where) {
     console.error("Vale read no file, so every rule it holds stands unchecked.");
     return 1;
   }
-  const found = fromJson(ran.stdout);
+  const found = readThroughTheReader(fromJson(ran.stdout));
 
   for (const file of walk(where)) {
     for (const one of unreasoned(files.read(file))) {
@@ -783,7 +803,6 @@ function pluginHolds() {
   return 0;
 }
 
-// The server answers for itself over the port, live, and no file stands between.
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 async function serverHolds() {
   const said = await serverSays();
@@ -984,14 +1003,6 @@ function namesIn(at, end) {
     .list(at)
     .filter((one) => one.kind === "file" && one.name.endsWith(end))
     .map((one) => one.name);
-}
-
-function readIf(path) {
-  try {
-    return files.read(path);
-  } catch {
-    return "never loaded here";
-  }
 }
 
 function walk(where, wanted = /\.(md|markdown|txt)$/i) {

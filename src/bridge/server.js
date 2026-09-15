@@ -1,15 +1,7 @@
-// THE SERVER behind the bridgehead. Plain node at the method root: it takes
-// every event a bridgehead posts, decides it through one door per event, and
-// answers what the bridgehead does with it. A bridgehead names the root it
-// works in, and the server keeps one box a work root: the rules, the schemas
-// and the tools come from the method root it runs from, the log, the notes
-// and the files from the work root. Quackitect itself is the case where both
-// are one folder. The debugger attaches here, and a restart loses the
-// session nothing.
+// The server behind the bridgehead: plain node at the method root, one box a
+// work root, one door an event, god mode, and the switch in decide.
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
-import { spawn } from "node:child_process";
-import { createServer } from "node:http";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { biome } from "../doors/biome.js";
@@ -19,9 +11,9 @@ import { index } from "../doors/index.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { vale } from "../doors/vale.js";
+import { wire } from "../doors/wire.js";
 import {
   holdsForAnswer,
-  holdsTurn,
   onAgentSpoke,
   onMessageDisplay,
   onPromptSubmit,
@@ -54,7 +46,6 @@ const PASS = { pass: true };
 const GOD = "god";
 const BINDING = "engine.binding";
 
-// One door an event. An event with no door passes.
 const DOORS = {
   "session.start": opensSession,
   "prompt.context": onPromptContext,
@@ -70,7 +61,6 @@ const DOORS = {
   [ANSWERED]: onAgentAnswered,
 };
 
-// One handler a tool. A tool with no handler passes.
 const TOOLS = {
   Grep: answersFromIndex,
   Glob: answersFromIndex,
@@ -86,9 +76,6 @@ const TOOLS = {
   ...reportTools,
 };
 
-// The one place an event is decided. Put a break on the return. A fresh box
-// names its tools on its first event of any kind, so a server started again
-// brings its tools to a session already running.
 export async function decide(said, box) {
   freshens(box, String(said?.event ?? ""));
   const door = DOORS[String(said?.event ?? "")] ?? pass;
@@ -106,8 +93,6 @@ function pass() {
   return PASS;
 }
 
-// God mode: a refusal, a hold or a block is let through with a debug line, and
-// every other answer stands, so the index, the context and the tools go on.
 // [[spec/design_output/level0#god-mode]]
 function letsThrough(answer, said, box) {
   if (asks(box, BINDING) !== GOD) return answer;
@@ -132,8 +117,6 @@ function opensSession(e, box) {
   return { register: specsOf(box), pass: true };
 }
 
-// A tool call meets the hold, then the answer door, then its handler, and a
-// call passing while the canary is owed carries the ask for it.
 async function onToolCall(e, box) {
   sawCall(e, box);
   asksForUpdate(e, box);
@@ -144,19 +127,16 @@ async function onToolCall(e, box) {
   return held ?? owesCanary(e, box) ?? PASS;
 }
 
-// A handler's plain pass, the constant or a fresh object alike, leaves the held context standing.
 function passes(said) {
   return said === PASS || (said?.pass === true && Object.keys(said).length === 1);
 }
 
-// The turn end pays the answer door, then reads the canary.
 function endsTurn(e, box) {
   onTurnEnd(e, box);
   dropsHold(e, box);
   return onTurnComplete(e, box);
 }
 
-// The box of one work root: the two roots, the doors, and the state the doors keep. A test hands in fakes.
 export function boxOf(method, work = method, doors = {}) {
   const files = doors.disk ?? disk();
   const time = doors.clock ?? clock();
@@ -175,7 +155,6 @@ export function boxOf(method, work = method, doors = {}) {
   };
 }
 
-// One box a work root, made on the first event naming it.
 export function boxesOf(method, doors = {}) {
   const held = new Map();
   return (root) => {
@@ -195,23 +174,15 @@ export function serve(method, port = PORT, say = console.log) {
     process.exit(0);
   };
 
-  // A restart: the server closes its port, starts a copy of itself with the same
-  // arguments, detached, and exits. So a code change reaches the running server in one call.
   const restart = () => {
     own.log.say("info", "bridge", `the server restarts at ${where}`);
     server.close(() => {
-      const child = spawn(process.execPath, process.argv.slice(1), {
-        cwd: process.cwd(),
-        detached: true,
-        stdio: "ignore",
-        windowsHide: true,
-      });
-      child.unref();
+      wire().respawn(process.argv.slice(1));
       process.exit(0);
     });
   };
 
-  const server = createServer((request, response) => {
+  const onRequest = (request, response) => {
     if (request.method === "POST" && request.url === "/stop") {
       answer(response, 200, { ok: true });
       setTimeout(stop, 20);
@@ -234,9 +205,9 @@ export function serve(method, port = PORT, say = console.log) {
       await box.log.event(said, decided);
       answer(response, 200, decided);
     });
-  });
+  };
 
-  server.listen(port, "127.0.0.1", async () => {
+  const server = wire().listen(port, onRequest, async () => {
     await own.log.say("info", "bridge", `the server stands at ${where}`, { root: method });
     say(`the server stands at ${where}, from ${method}`);
   });
@@ -266,7 +237,6 @@ function answer(response, status, said) {
   response.end(JSON.stringify(said));
 }
 
-// The port: --port, the environment, or the one the register holds for this vehicle.
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const args = process.argv.slice(2);
   const at = args.indexOf("--port");

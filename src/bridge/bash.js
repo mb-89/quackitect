@@ -1,9 +1,5 @@
-// The bash door. A shell command meets four checks, and the first one failing
-// refuses it with the reason: no shell redirection into a file the rules
-// reach, a commit message under the voice rules, a commit whose delta carries
-// something private, and the trunk guard, which holds main for a green check
-// before a push and shuts it on a cloud box. The Bash description carries the
-// verb line, so the agent reaches for the verb before the raw command.
+// The command door: the rules over a shell command, the voice of a commit
+// message, the private delta, the todo on a push and the trunk guard.
 // [[spec/design_output/bash#what-the-door-reads]]
 
 import { commitIn, findings, skipsTheHook, verbLine, withoutTrailers } from "../../.claude/skills/level0/lib/bash.js";
@@ -17,7 +13,6 @@ import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
 
 const TRUNK = "main";
-// The name Vale reads a commit message under, so the rules for a message apply.
 const COMMIT = "level0-commit.md";
 const PASS = { pass: true };
 const CLOUD = "---\nenv:\n  - CLAUDE_CODE_REMOTE\n  - SE_CLOUD\n---\n";
@@ -39,7 +34,7 @@ export function onDescribe(e) {
 }
 
 // [[spec/design_output/bash#a-shell-writes-nothing]]
-async function commandRules(command, e, box) {
+async function commandRules(command, _e, box) {
   const found = findings(command, asks(box, "names.words") ?? 5, { cloud: onACloud() });
   found.push(...(await commitVoice(command, box)));
   if (!onACloud() && skipsTheHook(command)) {

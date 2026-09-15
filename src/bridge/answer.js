@@ -1,10 +1,6 @@
-// The answer door. A prompt from the owner, or an ask from the sidebar, opens
-// a demand for a reply in the chat before anything else. The first call after
-// it passes, because the reply may stand in that very step and the client
-// raises no event for it yet. Every call after that asks the bridgehead for
-// the last text the agent wrote, off the transcript: a text new since the
-// demand pays it and lands in the log as the reply, and no new text refuses
-// the call. A helper is untouched.
+// The answer door. A prompt or an ask opens a demand for a reply, the first
+// call after it passes, and every call after asks the bridgehead for the
+// texts until one pays. A helper is untouched.
 // [[spec/design_output/level0#the-owners-prompt-comes-first]]
 
 import { questionsIn } from "../../.claude/skills/level0/lib/answer.js";
@@ -20,8 +16,6 @@ export const SAYS = (why) =>
     "Say what you understood and what you do next. Then work.",
   ].join(" ");
 
-// A demand: why it stands, the text that stood before it, one free call, and
-// what happens the moment it is paid.
 export function demands(box, why, block = "", onPaid = null) {
   box.demand = { why, seen: box.spoken ?? "", skips: 1, block, onPaid };
 }
@@ -39,7 +33,6 @@ export function onPromptSubmit(e, box) {
   return { pass: true };
 }
 
-// The chat itself: a message shown after the demand is the reply.
 export function onMessageDisplay(e, box) {
   const text = String(e?.delta ?? "").trim();
   if (text) box.spoken = text;
@@ -47,7 +40,6 @@ export function onMessageDisplay(e, box) {
   return paid(box, text);
 }
 
-// The first call passes with the block, the rest ask the bridgehead for the text.
 // [[spec/design_output/level0#the-owners-prompt-comes-first]]
 export function holdsForAnswer(e, box) {
   const demand = box.demand;
@@ -59,9 +51,6 @@ export function holdsForAnswer(e, box) {
   return { needs: "reply" };
 }
 
-// The bridgehead posts the last texts the agent wrote, oldest first. Any text
-// since the demand that fits pays it, and the newest such text is the reply.
-// A refusal quotes the last text seen, so a stale read and a wrong reply read apart.
 export function onAgentSpoke(e, box) {
   const demand = box.demand;
   if (!demand) return { pass: true };
@@ -79,7 +68,6 @@ export function onAgentSpoke(e, box) {
   return { result: { deny: lacks } };
 }
 
-// The texts after the one seen, or every text but the one seen where it stands nowhere.
 function textsSince(e, seen) {
   const texts = [...(Array.isArray(e?.texts) ? e.texts : []), e?.text ?? ""]
     .map((one) => String(one).trim())
@@ -94,8 +82,6 @@ function head(text) {
   return String(text ?? "").replace(/\s+/g, " ").slice(0, 80);
 }
 
-// The report tool hands the reply in. It pays the demand standing, or lands in
-// the log as a reply where none stands, and the result says which.
 export function pays(box, text) {
   const demand = box.demand;
   if (!demand) {
@@ -118,9 +104,6 @@ function paid(box, text) {
   return { pass: true };
 }
 
-// The turn ends: the reply lands in the log once, and a demand still standing
-// is paid by it, unless it asks for a shape the answer lacks. That demand stands
-// on into the next turn, and the stop door holds the turn where it can.
 export function onTurnEnd(e, box) {
   const text = String(e?.answer ?? "").trim();
   const demand = box.demand;
@@ -132,8 +115,6 @@ export function onTurnEnd(e, box) {
   return { pass: true };
 }
 
-// The stop: a turn whose last message lacks the shape a demand asks for holds,
-// and the reason re-prompts the agent. Any other turn ends.
 export function holdsTurn(e, box) {
   if (e?.agentId) return { pass: true };
   const demand = box.demand;

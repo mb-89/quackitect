@@ -7,7 +7,6 @@
 
 import { rowOf, SESSION, writes } from "../../.claude/skills/level0/lib/log.js";
 
-// The fields of an event worth a glance on the row.
 const GLANCE = [
   "tool",
   "agentId",

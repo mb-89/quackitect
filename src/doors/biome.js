@@ -7,7 +7,8 @@ import { formatText, lintText } from "../../.claude/skills/level0/lib/code.js";
 import { readTools, whereIs } from "../scripts/tools.js";
 
 export function biome(disk, proc, root) {
-  const bin = whereIs(disk, root, "biome", readTools(disk, root));
+  const found = whereIs(disk, root, "biome", readTools(disk, root));
+  const bin = disk.exists(found) ? found : "";
   const run = async (argv, init) => proc.run(argv, { ...init, cwd: root });
   return {
     stands: () => Boolean(bin),

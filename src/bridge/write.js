@@ -1,8 +1,5 @@
-// The write door. A Write, an Edit or a MultiEdit meets four checks in turn,
-// and the first one failing refuses the write with the reason and the line: a
-// draft passes, a private note stays off the tree, a note stands in the shape
-// its schema names, and the voice rules hold over the text as the file would
-// stand after the write. Code passes here until the code door comes over.
+// The write door: the owner of a projected file, the private notes, the note
+// schemas and the voice rules, in that order, then the code door.
 // [[spec/design_output/level0#the-write-door]]
 
 import { join } from "node:path";
@@ -37,7 +34,6 @@ export async function onWrite(e, box) {
   const writing = asWrite(e);
   if (!writing) return PASS;
   const where = relativeTo(box.root, writing.path);
-  // A file outside the tree is none of the tree's, and a draft passes every check.
   if (/^([A-Za-z]:)?[\\/]/.test(where) || isDraft(where)) return PASS;
 
   const checks = [ownerDoor, privateDoor, schemaDoor, voiceDoor];
@@ -66,7 +62,8 @@ function privateDoor(e, writing, where, box) {
 // [[spec/design_output/schema#the-door-refuses-a-departure]]
 function schemaDoor(e, writing, where, box) {
   if (!where.endsWith(".md")) return "";
-  const schemas = box.schemas ?? (box.schemas = schemasHere(box.disk, box.method));
+  if (!box.schemas) box.schemas = schemasHere(box.disk, box.method);
+  const schemas = box.schemas;
   const whole = wholeAfter(e, writing, box.disk);
   const kind = kindOf(whole);
 
@@ -93,8 +90,6 @@ function schemaDoor(e, writing, where, box) {
   return "";
 }
 
-// The voice rules read the file as it stands after the write, so an edit far
-// from its header meets the same rules as the whole.
 // [[spec/design_output/level0#the-write-door]]
 async function voiceDoor(e, writing, where, box) {
   if (CODE.test(writing.path) || !box.vale.stands()) return "";
@@ -122,7 +117,6 @@ function asWrite(e) {
   return undefined;
 }
 
-// The file as it stands after the write: the content of a Write, or the edits laid over the file.
 function wholeAfter(e, writing, disk) {
   if (e.tool === "Write") return writing.text;
   const was = textAt(disk, writing.path);

@@ -1,9 +1,5 @@
-// The batch edit: patch, replace and undo. A patch lands a list of edits over
-// many files, a replace sweeps a pattern over the files the index names, and
-// an undo puts the newest batch of this name back. Every op is checked before
-// any byte moves, every file a batch lands meets the write door's checks, and
-// the journal writes before the files do, so a batch nobody can take back is
-// the one thing that cannot happen.
+// The batch edit: patch, replace and undo over the tree, one atomic call each,
+// with a journal that puts every file back.
 // [[spec/design_output/apply#the-write-tools]]
 
 import { join } from "node:path";
@@ -41,7 +37,6 @@ async function replaces(e, box) {
   return lands(e, took, box);
 }
 
-// The one road every batch takes: refused whole, previewed, or written after the journal.
 async function lands(e, took, box) {
   if (!took.ok) return { result: { result: took.why } };
   const refused = await checked(took, box);
@@ -50,7 +45,6 @@ async function lands(e, took, box) {
   return { result: { result: writes(took, String(e.on ?? ""), box) } };
 }
 
-// Every file the batch lands meets the write door, as a Write of the whole file would.
 async function checked(took, box) {
   for (const one of took.files) {
     const said = await onWrite({ tool: "Write", file_path: one.file, content: one.made }, box);
@@ -132,7 +126,6 @@ function said(box, ok, result, on) {
   return { result: { result } };
 }
 
-// The replace: the index names the files the pattern touches, and each becomes a regex op.
 function sweeps(e, box) {
   const pattern = String(e.pattern ?? "");
   const glob = String(e.glob ?? "");

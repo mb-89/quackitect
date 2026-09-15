@@ -54,8 +54,6 @@ export function resolves(list, driver) {
   return "";
 }
 
-// One vehicle, one port. The register holds the port each vehicle blocks, and
-// a vehicle with none takes the lowest free one from the base up.
 // [[spec/design_output/vehicle#the-register-holds-the-port]]
 export const PORT_BASE = 6510;
 export const POINTER = ".se/vehicle.json";

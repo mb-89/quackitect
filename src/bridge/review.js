@@ -1,7 +1,5 @@
-// The review. review_branch gathers a work branch through the verb, hands the
-// material and the rules to a reader the client spawns, and answers the
-// report. The spawn is the client's, so the server asks the bridgehead for it
-// and takes the reader's text back as a second event.
+// The review by a helper: the server asks the bridgehead to spawn one over a
+// branch, and reads what it says back under a token.
 // [[spec/design_output/review#the-tool-the-session-calls]]
 
 import { CALLED, readerAsks, readerSays, report, reviewSpec } from "../../.claude/skills/level0/lib/review.js";
@@ -27,7 +25,7 @@ async function reviewsBranch(e, box) {
     return { result: { result: `${name}: the verb gathered nothing.\n\n${why}` } };
   }
 
-  const token = `review-${Date.now().toString(16)}`;
+  const token = `review-${box.clock.now().getTime().toString(16)}`;
   box.reviews = box.reviews ?? new Map();
   box.reviews.set(token, material);
   return {
@@ -36,11 +34,10 @@ async function reviewsBranch(e, box) {
       description: `read ${material.branch}`,
       subagentType: "general-purpose",
     },
-    then: { event: ANSWERED, token },
+    back: { event: ANSWERED, token },
   };
 }
 
-// The reader's text comes back as an event of its own, and the report follows.
 // [[spec/design_output/review#what-the-report-looks-like]]
 export function onAgentAnswered(e, box) {
   const material = box.reviews?.get(String(e?.token ?? ""));

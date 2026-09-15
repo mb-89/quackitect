@@ -54,7 +54,6 @@ function editorDoor(context) {
     processes: () => Object.fromEntries([...processes].map(([key, held]) => [key, held.how])),
     onProcess: (said) => watchers.push(said),
 
-    // A server running already, from a shell or a session before, is adopted rather than started twice.
     async adoptsProcess(key, port) {
       if (processes.has(key)) return true;
       const at = port ?? (await settled(context, folder.uri.fsPath))?.port;
@@ -66,9 +65,6 @@ function editorDoor(context) {
       return true;
     },
 
-    // The button starts the server of the vehicle the open folder points at,
-    // from that vehicle, at that vehicle's port. A folder pointing nowhere
-    // becomes a project of the vehicle this extension came from, first.
     async startProcess(key, how) {
       if (processes.has(key)) return;
       const vehicle = await settled(context, folder.uri.fsPath);
@@ -118,7 +114,6 @@ function editorDoor(context) {
       if (!held) return;
       processes.delete(key);
       if (held.child || held.adopted) {
-        // The server writes its stop line on a stop over the wire, and the kill stands behind it.
         await stopOverTheWire(held.port ?? PORT).catch(() => {});
         if (held.child) setTimeout(() => held.child.kill(), 300);
       } else {
@@ -289,9 +284,6 @@ function editorDoor(context) {
   };
 }
 
-// The vehicle the open folder points at, or the one this extension came from,
-// which stands two folders above it. A folder pointing nowhere becomes a
-// project of that vehicle here, with the one hook and the pointer.
 // [[spec/design_output/vehicle#the-register-holds-the-port]]
 async function settled(context, work) {
   const home = join(realpathSync.native(context.extensionPath), "..", "..");
@@ -337,8 +329,6 @@ function stopOverTheWire(port) {
   });
 }
 
-// The pause goes on the return of the named function, found by reading the
-// file, so it moves with the function. A pause standing there already stays.
 // [[spec/design_output/extension#the-hook-button]]
 async function pauseAt(uri, path, name) {
   let text = "";

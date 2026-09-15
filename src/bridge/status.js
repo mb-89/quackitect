@@ -1,6 +1,5 @@
-// The status update the full ask demands. Its shape stands in a small file,
-// one chapter a heading, and a reply fits when every chapter stands with text
-// under it. What the reply lacks comes back as the reason it is refused.
+// The shape of a full report: four chapters read off spec/config/status.yaml,
+// the block that asks for them, and what a reply lacks.
 // [[spec/design_output/extension#the-ask-is-a-line]]
 
 import { join } from "node:path";
@@ -24,7 +23,6 @@ export function statusShape(disk, method) {
   return out;
 }
 
-// The block the full ask rides: the chapters, one a line, with what each says.
 export function statusAsks(chapters) {
   return [
     "Call mcp__level0__report with the status update under these headings, each with text under it:",
@@ -33,7 +31,6 @@ export function statusAsks(chapters) {
   ].join("\n");
 }
 
-// Empty where the reply fits, else the chapters it lacks.
 export function statusLacks(text, chapters) {
   const lacking = chapters.filter((one) => !carries(text, one.name)).map((one) => one.name);
   if (!lacking.length) return "";

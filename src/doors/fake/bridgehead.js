@@ -10,9 +10,7 @@ export function fakeBridgehead(box) {
   const raised = [];
   const it = {
     raised,
-    // The last text the agent wrote, which the real one reads off the transcript.
     spoken: "",
-    // What the bridgehead does with the answer, in the order the real one reads it.
     async raise(event, e, origin = { kind: "test" }) {
       const said = { event, e, origin };
       const answer = await decide(said, box);

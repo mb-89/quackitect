@@ -1,12 +1,6 @@
-// THE BRIDGEHEAD. The one hook a project carries. One door for every event,
-// "*", and one function behind it: it posts the event to the server at the
-// port, with the root this session works in, and does what the answer says.
-// A second hook reads the step's stream, because a stream reaches a generator
-// alone, and keeps the step's text for the server. The server holds the
-// doors, the log and the state, and runs wherever the method stands. A server
-// killed and started again takes the next event as if nothing happened. A
-// dead server blocks nothing: the event goes on, and one line says so. This
-// file imports nothing, so a project carries it alone.
+// THE BRIDGEHEAD. The one hook a project carries: it posts every event to the
+// server at the port and does what the answer says, and a second hook reads
+// the step's stream. It imports nothing, and a dead server blocks nothing.
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
 const PORT = 6510;
@@ -29,7 +23,6 @@ export function register(on, _options) {
 }
 
 async function seen($, e, next) {
-  // The first event of a session hands an empty table as $, and goes on untouched.
   const event = String(next?.event ?? "event");
   if (event === "engine.create") return next(e);
   if (event === "session.start") await opens($, e);
@@ -44,8 +37,6 @@ async function seen($, e, next) {
   return next(e);
 }
 
-// The server asks for a helper: the bridgehead spawns it, posts what it said
-// under the event the server names, and returns that answer as the result.
 async function spawns($, answer, next) {
   let said;
   try {
@@ -54,17 +45,15 @@ async function spawns($, answer, next) {
     said = { deny: String(error?.message ?? error) };
   }
   const back = {
-    ...(answer.then ?? {}),
+    ...(answer.back ?? {}),
     text: said?.text ?? "",
     isError: Boolean(said?.isError),
     deny: said?.deny ?? "",
   };
-  const done = await ask($, String(answer.then?.event ?? "agent.answered"), back, next);
+  const done = await ask($, String(answer.back?.event ?? "agent.answered"), back, next);
   return done?.result ?? { result: "the helper answered, and the server said nothing" };
 }
 
-// A session opens: the root is the folder it works in, and the port comes off
-// the project's pointer, or stays at the base where none stands.
 async function opens($, e) {
   if (e?.cwd) root = String(e.cwd);
   try {
@@ -75,7 +64,6 @@ async function opens($, e) {
   }
 }
 
-// One request an event. The answer is JSON, or nothing where the server is down.
 async function ask($, event, e, next) {
   let body = "";
   try {
@@ -99,8 +87,6 @@ async function ask($, event, e, next) {
   }
 }
 
-// A step streams: the bridgehead reads the text of the response as it comes,
-// keeps it for the calls the response makes, and posts it whole at the end.
 async function* streams($, e, next) {
   const kinds = {};
   stepText = "";
@@ -113,7 +99,6 @@ async function* streams($, e, next) {
   await ask($, "turn.said", { turnId: e?.turnId, index: e?.index, kinds, text: stepText }, next);
 }
 
-// The last few texts the agent wrote, oldest first, off the transcript.
 async function lastTexts($) {
   const out = [];
   try {
@@ -126,15 +111,11 @@ async function lastTexts($) {
   return out;
 }
 
-// A chunk of kind text carries the visible words. Thinking and engine chunks carry none.
 function textOf(chunk) {
   if (!chunk || typeof chunk !== "object" || chunk.kind !== "text") return "";
   return typeof chunk.text === "string" ? chunk.text : "";
 }
 
-// The server wants the reply the owner is owed: the text of the step in hand,
-// or the last text the agent wrote off the transcript. The bridgehead posts
-// it as an event of its own, and does what that answer says with the call.
 async function spoke($, e, next) {
   const texts = await lastTexts($);
   const text = stepText || texts.at(-1) || "";
@@ -145,9 +126,6 @@ async function spoke($, e, next) {
   return next(e);
 }
 
-// The compaction hands the whole transcript as its event, and the server reads
-// no line of it. It goes on with its flat fields alone, each text cut to a
-// page, and so does any event over the wire's limit.
 function slim(e) {
   if (!e || typeof e !== "object") return e ?? null;
   const out = {};
@@ -158,7 +136,6 @@ function slim(e) {
   return out;
 }
 
-// The server names tools for the client to list, and the bridgehead registers each.
 async function registers($, specs) {
   for (const spec of specs) {
     try {
@@ -167,8 +144,6 @@ async function registers($, specs) {
   }
 }
 
-// The server adds to what the chain beneath answers: a list grows, a text grows
-// by a paragraph, and any other field is set.
 function merged(said, after) {
   const out = said && typeof said === "object" ? { ...said } : {};
   for (const [key, value] of Object.entries(after ?? {})) {
@@ -179,7 +154,6 @@ function merged(said, after) {
   return out;
 }
 
-// The server is down: one line in the log, once, and the event goes on.
 async function down($, event, error) {
   if (saidDown) return;
   const row = {

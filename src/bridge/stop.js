@@ -1,9 +1,5 @@
-// The stop hook: the hold and the tooth. The hold is what the owner sets from
-// the sidebar. finish rides one context line, and stop refuses the next call
-// and ends the turn. The tooth votes at the turn's end over the rules under
-// spec/config/stop: a turn ends on a last line reading `stop: <reason>` with a
-// reason the rules hold, on the hold at stop, on a fresh session, or with the
-// tooth switched off. Any other turn holds, and the reason re-prompts.
+// The stop hook: the hold from the sidebar at every call, and the tooth at
+// the turn's end, which lets a turn end on the stop line alone.
 // [[spec/design_output/stop#the-vote]]
 
 import { join } from "node:path";
@@ -46,7 +42,6 @@ export function SPECS(box) {
   return [stopSpec(rulesOf(box))];
 }
 
-// The hold at a call: stop refuses it, finish rides one context line once.
 export function holdsCall(e, box) {
   if (e?.agentId) return null;
   const hold = String(asks(box, HOLD) ?? OFF);
@@ -76,7 +71,6 @@ export function holdsCall(e, box) {
   return { after: { context: [controlBlock({ hold })] } };
 }
 
-// The hold is one turn long: the turn's end drops it to off, by value.
 export function dropsHold(_e, box) {
   const hold = String(asks(box, HOLD) ?? OFF);
   box.held = "";
@@ -86,14 +80,12 @@ export function dropsHold(_e, box) {
   return { pass: true };
 }
 
-// Every call feeds the tooth its count and the todo list its state.
 export function sawCall(e, box) {
   if (e?.agentId) return;
   toothOf_(box).sawCall();
   todosOf(box).sawCall(e);
 }
 
-// The stop tool: the claim rides the call, and the line ends the turn.
 function claims(e, box) {
   const reason = String(e?.reason ?? "");
   const known = stopReasons(rulesOf(box)).some((one) => one.id === reason);
@@ -117,7 +109,6 @@ function claims(e, box) {
   };
 }
 
-// The turn's end: a shaped demand unmet holds first, then the tooth votes.
 export function onStop(e, box) {
   if (e?.agentId) return PASS;
   const shaped = holdsTurn(e, box);
@@ -163,7 +154,6 @@ function lastLineReason(text) {
   return found ? found[1] : "";
 }
 
-// The mechanical checks the rules name, by the name each rule holds them under.
 function ranHere(name, held) {
   if (name === "stop-hook-off") return held.off;
   if (name === "owner-holds") return held.hold === STOP;
@@ -175,9 +165,6 @@ function ranHere(name, held) {
   return undefined;
 }
 
-// Level one's checks, as the old hook held them. A work branch whose ticket
-// holds a group is a group in hand. A hold file under .se/hold, or an open
-// private ticket under .se/tickets, is a ticket in hand.
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 function groupInHand(box) {
   const branch = branchOf(box);
@@ -218,15 +205,18 @@ function branchOf(box) {
 }
 
 function rulesOf(box) {
-  return box.stopRules ?? (box.stopRules = rulesHere(box.disk, box.method));
+  if (!box.stopRules) box.stopRules = rulesHere(box.disk, box.method);
+  return box.stopRules;
 }
 
 function toothOf_(box) {
-  return box.tooth ?? (box.tooth = toothOf());
+  if (!box.tooth) box.tooth = toothOf();
+  return box.tooth;
 }
 
 function todosOf(box) {
-  return box.todos ?? (box.todos = todos());
+  if (!box.todos) box.todos = todos();
+  return box.todos;
 }
 
 function readFolder(disk, folder, end) {

@@ -1,7 +1,5 @@
-// The ask. The owner sets ask.wanted to short or full from the sidebar, and
-// it opens a demand like a prompt: the block rides on the next call, and the
-// reply stands before anything else. The turn's end writes the key back to
-// quiet, so the ask asks once and the widget falls back to rest.
+// The ask from the sidebar. A value past quiet opens a demand like a prompt,
+// the reply pays it, and the pay drops the key back to quiet by value.
 // [[spec/design_output/extension#the-ask-is-a-line]]
 
 import { ASK, controlBlock, QUIET } from "../../.claude/skills/level0/lib/controls.js";
@@ -26,9 +24,6 @@ export function asksForUpdate(e, box) {
   if (chapters.length) box.demand.fits = (text) => statusLacks(text, chapters);
 }
 
-// The ask drops to quiet the moment its reply pays it. The drop takes back the
-// value it answered alone: a fresh press of the button stands, and the next
-// call asks for it.
 export function dropsAsk(box, wanted) {
   box.asked = "";
   const stands = String(asks(box, ASK) ?? QUIET);

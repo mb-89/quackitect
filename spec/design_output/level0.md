@@ -43,7 +43,7 @@ where both roots are one folder.
 | `{ after }` | hands the event on, and adds to what comes back |
 | `{ register }` | registers the tools it names, one by one |
 | `{ needs: "reply" }` | posts the step's text and the last texts as `agent.spoke`, and does what that answer says |
-| `{ spawn, then }` | spawns the helper, and posts what it says under the event `then` names |
+| `{ spawn, back }` | spawns the helper, and posts what it says under the event `back` names |
 | nothing, the server down | hands the event on, and writes one `warn` line, once |
 
 The server is plain node under `src/bridge`, one file a topic:

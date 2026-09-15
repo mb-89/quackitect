@@ -1,7 +1,5 @@
-// The projections. A projected file is written from its source and by nothing
-// else, so the write door refuses a hand on it and names the source. A write
-// to a source marks the projection stale, and the next event projects again
-// before it is decided, so a rule changed in a schema reaches the next write.
+// The projection: the files the tree writes off its sources, the owner door
+// over a target, and the read after a tool ran that projects when a text moved.
 // [[spec/design_output/projection#the-write-door-refuses-one]]
 
 import { dirname, join } from "node:path";
@@ -22,7 +20,6 @@ export function projectionsHere(disk, method) {
   return disk.exists(at) ? entriesIn(disk.read(at)) : [];
 }
 
-// Every file a projection reads, so a write to one marks it stale.
 export function sourcesOf(entries, disk, method) {
   const out = new Set();
   for (const entry of entries) {
@@ -48,14 +45,10 @@ export function ownerDoor(e, _writing, where, box) {
   return refusedWrite(owner, where);
 }
 
-// A write to a source marks the projections stale, and the next event freshens them.
 export function marksStale(where, box) {
   if (box.sources?.has(where)) box.restale = where;
 }
 
-// After a tool ran, the sources are read again, and the first text that
-// differs from the last read names the move. A batch of calls fires every
-// hook before any tool runs, so a mark alone spends itself on the old file.
 function changedSource(box) {
   let moved = "";
   for (const path of box.sources ?? []) {

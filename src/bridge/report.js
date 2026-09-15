@@ -1,8 +1,6 @@
-// The report tool. A text between calls reaches no hook on this client until
-// the turn ends, so the agent answers an ask, or a prompt sent mid-turn, by
-// calling this with the text. The server logs it as the reply at once, pays
-// the demand standing, and the work goes on. A full ask takes the report in
-// its shape, and the result names what a report lacks.
+// The report tool. A text between calls reaches no hook until the turn ends,
+// so the agent answers an ask or a mid-turn prompt by calling this with the
+// text, which lands in the log as the reply at once.
 // [[spec/design_output/extension#the-ask-is-a-line]]
 
 import { pays } from "./answer.js";

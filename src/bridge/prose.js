@@ -1,9 +1,6 @@
-// The prose reader. Every veto over Vale's findings enters here, and the
-// three doors reading prose call this one function. The tense veto stands in
-// tense.js. Two more come from the same reader: a length rule counts the
-// words wink reads, with a code span and a link as one word each, and the
-// finding falls where the count meets the cap. A vocabulary rule reads the
-// lemma, so any form of a listed word stands.
+// The prose reader. Every veto over Vale's findings enters here: the tense
+// veto, a length counted with a code span as one word, and a word read by
+// its lemma. The three doors reading prose call this one function.
 // [[spec/design_output/level0#the-tense-reader]]
 
 import { join } from "node:path";
@@ -24,7 +21,6 @@ const LINK = /\[\[[^\]]*\]\]|\[[^\]]*\]\([^)]*\)/g;
 const MARKER = /^[ \t]*(?:[-*+]|[0-9]+[.)])\s+/;
 const SILENT = new Set(["PUNCT", "SYM", "SPACE"]);
 
-// Vale's findings, less the ones the reader vetoes, each with the line it stands in.
 export function readsProse(box, text, found) {
   const caps = capsOf(box);
   let kept = withoutFalsePast(text, found);
@@ -40,7 +36,6 @@ export function readsProse(box, text, found) {
   return withContext(text, kept);
 }
 
-// A sentence or a list item Vale counts past the cap, read again with a code span as one word.
 export function withoutFalseLength(text, found, caps) {
   const lines = String(text ?? "").split("\n");
   return (found ?? []).filter((one) => {
@@ -51,7 +46,6 @@ export function withoutFalseLength(text, found, caps) {
   });
 }
 
-// A word Vale reads as outside, whose lemma stands on a list.
 export function withoutFalseOutside(text, found, words) {
   const lines = String(text ?? "").split("\n");
   let listed = null;
@@ -63,7 +57,6 @@ export function withoutFalseOutside(text, found, words) {
   });
 }
 
-// The longest sentence of a text, in words, as wink reads it.
 export function longest(text) {
   let most = 0;
   nlp
@@ -79,7 +72,6 @@ export function longest(text) {
   return most;
 }
 
-// The sentence a finding names: from its line and column to the sentence's end.
 function sentenceAt(lines, one) {
   const from = Number(one.line) - 1;
   const rest = [String(lines[from] ?? "").slice(Math.max(0, Number(one.column) - 1))];
@@ -122,7 +114,6 @@ function capsOf(box) {
   return { sentence: Number(said.max ?? 25), listItem: Number(said.listItem ?? 20) };
 }
 
-// The listed words, read once a box. A term added lands on the next server start.
 function wordsHere(box) {
   if (box.words) return box.words;
   const paths = pathsOf(schemaOf(box));

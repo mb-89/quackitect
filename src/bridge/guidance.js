@@ -1,8 +1,5 @@
-// The guidance reaching the session. The rules of every note under the top of
-// spec/guidance go to the agent as context blocks, on the first read and again
-// after a compaction, with the canary line that says what reached it. The
-// first turn's answer carries the canary, and the log says whether it came
-// back whole, so a compaction probe reads the log alone.
+// The guidance reaching the session: the rules of every note under the top
+// of spec/guidance as context blocks, the canary line, and the compaction.
 // [[spec/design_output/level0#the-standing-layer]]
 
 import { join } from "node:path";
@@ -33,7 +30,6 @@ export function guidanceHere(disk, root, env = process.env, tooth = true) {
   return { standing: standingLayer(here), ...counts, sentence: canary({ ...counts, stop: tooth }) };
 }
 
-// The guidance of a box: its notes, and the tooth's switch for the canary.
 function readsGuidance(box) {
   return guidanceHere(box.disk, box.method, process.env, asks(box, TOOTH) !== false);
 }
@@ -49,20 +45,16 @@ function readNotes(disk, folder) {
   }
 }
 
-// A box made by any event but a session start stands past turn one, because a
-// server started again mid-session meets no first turn. It owes the canary
-// once, so the next answer says the bridge stands again.
 // [[spec/design_output/stop#the-mark-survives-a-reload]]
 function pastTurnOne() {
   return { reads: 1, firstTurn: false, owes: true };
 }
 
-// The guidance, loaded on the first ask where no session start loaded it.
 function guidanceOf(box) {
-  return box.guidance ?? (box.guidance = readsGuidance(box));
+  if (!box.guidance) box.guidance = readsGuidance(box);
+  return box.guidance;
 }
 
-// A session opens: the guidance reads again, and the canary is owed again.
 export function onSessionStart(_e, box) {
   box.guidance = readsGuidance(box);
   box.session = { reads: 0, firstTurn: true };
@@ -71,8 +63,9 @@ export function onSessionStart(_e, box) {
 
 // [[spec/design_output/level0#the-guidance-stays-put]]
 export function onPromptContext(_e, box) {
-  const held = box.guidance ?? (box.guidance = readsGuidance(box));
-  const session = box.session ?? (box.session = pastTurnOne());
+  const held = guidanceOf(box);
+  if (!box.session) box.session = pastTurnOne();
+  const session = box.session;
   session.reads += 1;
   const blocks = blocksOf(held, box.index.dead());
   box.log.say("info", "context", `${blocks.length} block(s) reach the session`, {
@@ -115,12 +108,10 @@ function canaryText(sentence) {
   ].join("\n");
 }
 
-// The first turn's answer carries the canary, and the log says whether it came
-// back. An answer without it leaves a debt, and any later answer carrying the
-// line pays it.
 // [[spec/design_output/level0#the-canary-owes-a-debt]]
 export function onTurnComplete(e, box) {
-  const session = box.session ?? (box.session = pastTurnOne());
+  if (!box.session) box.session = pastTurnOne();
+  const session = box.session;
   if (e?.reason !== "answer") return { pass: true };
   const sentence = guidanceOf(box).sentence;
   const heard = canaryIn(e.answer, sentence);
@@ -137,9 +128,9 @@ export function onTurnComplete(e, box) {
   return { pass: true };
 }
 
-// While the canary is owed, every tool call carries the ask for it, and none is refused.
 export function owesCanary(e, box) {
-  const session = box.session ?? (box.session = pastTurnOne());
+  if (!box.session) box.session = pastTurnOne();
+  const session = box.session;
   if (!session.owes || e?.agentId) return null;
   const sentence = guidanceOf(box).sentence;
   box.log.say("debug", "gate", `asked ${e?.tool ?? "a call"} for the canary`, {
@@ -149,9 +140,6 @@ export function owesCanary(e, box) {
   return { after: { context: [OWES.warns(sentence)] } };
 }
 
-// A compaction: the client reads the context again after it, and the guidance
-// reads off the disk again first, so the re-read carries the notes as they
-// stand. The canary is owed again, so the next answer says the rules reached it.
 // [[spec/design_output/level0#the-layer-after-a-compaction]]
 export function onSessionCompact(e, box) {
   box.guidance = readsGuidance(box);
@@ -164,7 +152,6 @@ export function onSessionCompact(e, box) {
   return { pass: true };
 }
 
-// A helper takes the guidance in its prompt, because the client hands it no context blocks.
 // [[spec/design_output/level0#the-helper-takes-the-guidance]]
 export function onAgentSpawn(e, box) {
   const standing = box.guidance?.standing ?? "";

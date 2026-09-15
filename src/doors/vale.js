@@ -7,11 +7,11 @@ import { lintText } from "../../.claude/skills/level0/lib/vale.js";
 import { readTools, whereIs } from "../scripts/tools.js";
 
 export function vale(disk, proc, root) {
-  const bin = whereIs(disk, root, "vale", readTools(disk, root));
+  const found = whereIs(disk, root, "vale", readTools(disk, root));
+  const bin = disk.exists(found) ? found : "";
   const run = async (argv, init) => proc.run(argv, { ...init, cwd: root });
   return {
     stands: () => Boolean(bin),
-    // The findings over one text, as if it stood at where in the tree.
     lint: (text, where) => lintText(text, where, { bin, run, cwd: root }),
   };
 }

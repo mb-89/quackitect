@@ -66,4 +66,4 @@ The Edit door lints the replaced text alone. So a shape rule over a whole file, 
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+Nothing stands here yet.

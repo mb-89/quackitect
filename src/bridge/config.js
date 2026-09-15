@@ -1,6 +1,5 @@
 // The config a door asks: the tracked file at the method root, and the local
-// file at the work root over it. A key reads as section.leaf, and a key
-// nobody names answers undefined.
+// file at the work root over it, one key as section.leaf.
 // [[spec/design_output/config#three-layers]]
 
 import { join } from "node:path";
@@ -16,7 +15,6 @@ export function asks(box, key) {
   return held !== undefined ? held : tracked?.[section]?.[leaf];
 }
 
-// A door writes one key into the local file, and leaves every other key as it stands.
 export function writes(box, key, value) {
   const [section, leaf] = String(key).split(".");
   const at = join(box.work, LOCAL);

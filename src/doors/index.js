@@ -30,7 +30,6 @@ export function index(disk, proc, clock, method, work = method) {
     }
   };
 
-  // A failed run marks the index dead with why.
   const failed = (ran, what) => {
     dead = ran.exitCode === 127 ? ran.stderr : `${BIN} ${what} answers ${ran.exitCode}`;
     return null;
@@ -39,12 +38,10 @@ export function index(disk, proc, clock, method, work = method) {
   return {
     stands: () => Boolean(at()),
     dead: () => dead,
-    // A question the search tools ask: grep or glob, with the tool's params.
     ask: (method, params) => {
       const ran = run(["call", method, JSON.stringify(params)], 20000);
       return ran.exitCode === 0 ? readsAnswer(ran.stdout) : failed(ran, "call");
     },
-    // The lines carrying the words, ranked.
     find: (words) => {
       const ran = run(["find", words], 20000);
       return ran.exitCode === 0 ? readsAnswer(ran.stdout) : failed(ran, "find");
@@ -54,7 +51,8 @@ export function index(disk, proc, clock, method, work = method) {
       const now = clock.now().getTime();
       if (now - warmedAt < REWARM) return { warmed: false, dead };
       warmedAt = now;
-      const ran = run(["standing"], 60000);
+      const first = run(["standing"], 60000);
+      const ran = first.exitCode === 0 || first.exitCode === 127 ? first : run(["standing"], 60000);
       dead = ran.exitCode === 0 ? "" : ran.exitCode === 127 ? ran.stderr : `${BIN} standing answers ${ran.exitCode}`;
       return { warmed: true, dead };
     },

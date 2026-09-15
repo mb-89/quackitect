@@ -1,7 +1,5 @@
-// Two tools the agent calls by hand. check_answer reads a draft answer through
-// the voice rules and the answer's own rules, in the wording the gate uses, so
-// a draft checked here meets the gate clean. mint_note writes a new note in
-// the shape its schema names, and the write door reads it before it lands.
+// The hand tools: the draft check over an answer, and the mint that writes a
+// note under its schema through the write door.
 // [[spec/design_output/level0#the-tool-reads-a-draft]]
 
 import { join } from "node:path";
@@ -20,7 +18,6 @@ import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
 import { onWrite } from "./write.js";
 
-// The name Vale reads an answer under, so the rules for an answer apply.
 const ANSWER = "level0-answer.md";
 
 export const SPECS = (box) => [checkSpec(), mintSpec(box.schemas)];

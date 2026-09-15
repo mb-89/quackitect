@@ -1,7 +1,5 @@
-// The client's search tools, answered by the index. A Grep or a Glob the
-// index can answer comes from the rows, in the tool's own shape, and any other
-// reads the disk. The find tool ranks lines by the words. What the index is
-// stays behind its door; this file knows the tools.
+// The client's search tools, answered off the warm index where it stands,
+// and the find tool over the same rows.
 // [[spec/design_output/index#the-door-answers-the-tools]]
 
 import { asked, said as saidOf } from "../../.claude/skills/level0/lib/index.js";
@@ -50,7 +48,6 @@ export function runsFind(e, box) {
   return { result: { result: findSaid(rows) } };
 }
 
-// The door warms itself once a minute at most, and the log says what it found.
 // [[spec/design_output/index#a-dead-index-speaks]]
 export function warmIndex(box) {
   const said = box.index.warm();
@@ -63,8 +60,6 @@ export function deadIndexLine(why) {
   return `The index is dead: ${why}. Run ./RUNME.sh, which builds it, and Grep reads the disk until then.`;
 }
 
-// The client wants a hook's answer in the tool's own shape, and the text the
-// index library writes fills the content of it.
 function globShape(answer) {
   const filenames = answer?.paths ?? [];
   return { durationMs: 0, numFiles: filenames.length, filenames, truncated: Boolean(answer?.cut) };
@@ -86,7 +81,6 @@ function grepShape(e, answer) {
   return shape;
 }
 
-// The index answers rows as JSON, and the agent reads them as path, line and text.
 function findSaid(rows) {
   if (!Array.isArray(rows) || !rows.length) return "Nothing carries those words.";
   return rows.map((one) => `${one.path}:${one.line}: ${String(one.text ?? "").trim()}`).join("\n");
