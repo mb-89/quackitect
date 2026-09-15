@@ -701,14 +701,9 @@ where no pay stands. For details, see
 
 ## The owner binds god
 
-`engine.binding` at `god` takes every refusal level zero holds out of the way.
-The hook wraps every `tool.call` it registers. Where a hook refuses and the
-binding reads `god`, the call goes on. A `god` line names the refusal it passes.
-The answer gate, the write door, the trunk guard and the cage all pass.
-
-The binding comes out of the config layers at the moment of the refusal, so a
-button press reaches the next call. The sidebar shows the binding in the status
-bar. For details, see [[spec/design_output/extension#the-status-bar-says-it]].
+`engine.binding` at `god` lets every hold of this door through, with a `god`
+line at `info` in its place. For details, see
+[[spec/design_output/level0#god-mode]].
 
 ## Which prompt opens a turn
 
