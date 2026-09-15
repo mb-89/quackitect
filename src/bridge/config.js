@@ -16,6 +16,16 @@ export function asks(box, key) {
   return held !== undefined ? held : tracked?.[section]?.[leaf];
 }
 
+// A door writes one key into the local file, and leaves every other key as it stands.
+export function writes(box, key, value) {
+  const [section, leaf] = String(key).split(".");
+  const at = join(box.work, LOCAL);
+  const held = parsed(box.disk, at) ?? {};
+  held[section] = { ...(held[section] ?? {}), [leaf]: value };
+  box.disk.makeDir(join(box.work, ".se"));
+  box.disk.write(at, `${JSON.stringify(held, null, 2)}\n`);
+}
+
 function parsed(disk, at) {
   try {
     return JSON.parse(String(disk.read(at)));

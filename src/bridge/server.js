@@ -31,7 +31,7 @@ import {
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
 import { asks } from "./config.js";
-import { holdsCall, onStop, sawCall, SPECS as stopSpecs, TOOLS as stopTools } from "./stop.js";
+import { dropsHold, holdsCall, onStop, sawCall, SPECS as stopSpecs, TOOLS as stopTools } from "./stop.js";
 import { onBash, onDescribe } from "./bash.js";
 import { SPECS as reportSpecs, TOOLS as reportTools } from "./report.js";
 import { ANSWERED, onAgentAnswered, SPECS as reviewSpecs, TOOLS as reviewTools } from "./review.js";
@@ -152,6 +152,7 @@ function passes(said) {
 // The turn end pays the answer door, then reads the canary.
 function endsTurn(e, box) {
   onTurnEnd(e, box);
+  dropsHold(e, box);
   return onTurnComplete(e, box);
 }
 

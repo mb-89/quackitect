@@ -4,13 +4,11 @@
 // quiet, so the ask asks once and the widget falls back to rest.
 // [[spec/design_output/extension#the-ask-is-a-line]]
 
-import { join } from "node:path";
 import { ASK, controlBlock, QUIET } from "../../.claude/skills/level0/lib/controls.js";
 import { demands } from "./answer.js";
-import { asks } from "./config.js";
+import { asks, writes } from "./config.js";
 import { statusAsks, statusLacks, statusShape } from "./status.js";
 
-const LOCAL = ".se/config.json";
 const FULL = "full";
 
 // [[spec/design_output/extension#the-ask-is-a-line]]
@@ -39,15 +37,7 @@ export function dropsAsk(box, wanted) {
     box.log.say("debug", "config", `the ask stood at ${wanted}, and ${stands} stands pressed since`);
     return { pass: true };
   }
-  const at = join(box.work, LOCAL);
-  let held = {};
-  try {
-    held = JSON.parse(String(box.disk.read(at)));
-  } catch {}
-  const [section, leaf] = ASK.split(".");
-  held[section] = { ...(held[section] ?? {}), [leaf]: QUIET };
-  box.disk.makeDir(join(box.work, ".se"));
-  box.disk.write(at, `${JSON.stringify(held, null, 2)}\n`);
+  writes(box, ASK, QUIET);
   box.log.say("debug", "config", `the ask stood at ${wanted}, and drops to ${QUIET}`);
   return { pass: true };
 }

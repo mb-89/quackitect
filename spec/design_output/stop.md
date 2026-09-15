@@ -74,9 +74,9 @@ session end a turn over it, and the tooth off ends any turn.
 
 ## The hold
 
-`stop.hold` is what the owner picks from the sidebar, and it stays there
-until they click it back. The stop door reads it at every call and at the
-turn's end:
+`stop.hold` is what the owner picks from the sidebar, and it is one turn
+long: the turn's end drops it to `off`. The stop door reads it at every call
+and at the turn's end:
 
 | hold | at the next call | at the turn's end |
 |---|---|---|

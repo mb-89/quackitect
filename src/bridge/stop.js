@@ -27,7 +27,7 @@ import {
   toothOf,
 } from "../../.claude/skills/level0/lib/stop.js";
 import { holdsTurn } from "./answer.js";
-import { asks } from "./config.js";
+import { asks, writes } from "./config.js";
 import { REPORT_CALL } from "./report.js";
 
 const ENABLED = "stop.enabled";
@@ -73,6 +73,16 @@ export function holdsCall(e, box) {
     tool: String(e?.tool ?? ""),
   });
   return { after: { context: [controlBlock({ hold })] } };
+}
+
+// The hold is one turn long: the turn's end drops it to off, by value.
+export function dropsHold(_e, box) {
+  const hold = String(asks(box, HOLD) ?? OFF);
+  box.held = "";
+  if (hold !== FINISH && hold !== STOP) return { pass: true };
+  writes(box, HOLD, OFF);
+  box.log.say("debug", "config", `the hold stood at ${hold}, and drops to ${OFF}`);
+  return { pass: true };
 }
 
 // Every call feeds the tooth its count and the todo list its state.
