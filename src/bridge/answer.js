@@ -10,13 +10,14 @@
 import { questionsIn } from "../../.claude/skills/level0/lib/answer.js";
 
 const OWNER = new Set(["composer", "sdk"]);
-const REACHES = new Set(["AskUserQuestion"]);
+const REACHES = new Set(["AskUserQuestion", "mcp__level0__report"]);
 export const SPOKE = "agent.spoke";
 
 export const SAYS = (why) =>
   [
-    `${why}, and nothing has answered it. Write the reply in the chat, as text,`,
-    "before the next tool call: what you understood and what you do next. Then work.",
+    `${why}, and nothing has answered it. Answer it before the next tool call: as the first`,
+    "text of a turn, or between calls through mcp__level0__report with the text.",
+    "Say what you understood and what you do next. Then work.",
   ].join(" ");
 
 // A demand: why it stands, the text that stood before it, one free call, and
@@ -91,6 +92,21 @@ function textsSince(e, seen) {
 
 function head(text) {
   return String(text ?? "").replace(/\s+/g, " ").slice(0, 80);
+}
+
+// The report tool hands the reply in. It pays the demand standing, or lands in
+// the log as a reply where none stands, and the result says which.
+export function pays(box, text) {
+  const demand = box.demand;
+  if (!demand) {
+    box.log.say("info", "reply", text, { text });
+    box.spoken = text;
+    return "The reply stands in the log. Nothing asked for one, so carry on.";
+  }
+  const lacks = demand.fits?.(text) ?? "";
+  if (lacks) return lacks;
+  paid(box, text);
+  return `The reply stands in the log, and it answers: ${demand.why}. Carry on.`;
 }
 
 function paid(box, text) {

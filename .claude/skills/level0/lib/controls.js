@@ -36,12 +36,12 @@ function askSays(wanted) {
   if (said === QUIET) return [];
   if (said === "short") {
     return [
-      "The owner asks what this session is doing. Say it in a line or two,",
-      "then carry on.",
+      "The owner asks what this session is doing. Say it in a line or two",
+      "through the tool mcp__level0__report, then carry on.",
     ];
   }
   return [
     "The owner asks for a full report: what stands done, what stands open, and",
-    "what you take next. Write it, then carry on.",
+    "what you take next. Hand it in through the tool mcp__level0__report, then carry on.",
   ];
 }

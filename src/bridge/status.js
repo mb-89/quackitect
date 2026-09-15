@@ -27,7 +27,7 @@ export function statusShape(disk, method) {
 // The block the full ask rides: the chapters, one a line, with what each says.
 export function statusAsks(chapters) {
   return [
-    "Write the status update under these headings, each with text under it:",
+    "Call mcp__level0__report with the status update under these headings, each with text under it:",
     "",
     ...chapters.map((one) => `# ${one.name}: ${one.says}`),
   ].join("\n");

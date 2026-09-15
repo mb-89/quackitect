@@ -28,6 +28,7 @@ import {
 } from "../../.claude/skills/level0/lib/stop.js";
 import { holdsTurn } from "./answer.js";
 import { asks } from "./config.js";
+import { REPORT_CALL } from "./report.js";
 
 const ENABLED = "stop.enabled";
 const MOST = "stop.mostInARow";
@@ -48,7 +49,7 @@ export function SPECS(box) {
 export function holdsCall(e, box) {
   if (e?.agentId) return null;
   const hold = String(asks(box, HOLD) ?? OFF);
-  if (hold === STOP) {
+  if (hold === STOP && e?.tool !== REPORT_CALL) {
     box.log.say(
       "debug",
       "hold",

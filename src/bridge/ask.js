@@ -17,7 +17,7 @@ const FULL = "full";
 export function asksForUpdate(e, box) {
   if (e?.agentId) return;
   const wanted = String(asks(box, ASK) ?? QUIET);
-  if (wanted === QUIET || box.asked === wanted) return;
+  if (wanted === QUIET || (box.asked === wanted && box.demand)) return;
   box.asked = wanted;
   box.log.say("debug", "ask", `the owner asks for a ${wanted} update`, {
     tool: String(e?.tool ?? ""),

@@ -33,6 +33,7 @@ import { asksForUpdate } from "./ask.js";
 import { asks } from "./config.js";
 import { holdsCall, onStop, sawCall, SPECS as stopSpecs, TOOLS as stopTools } from "./stop.js";
 import { onBash, onDescribe } from "./bash.js";
+import { SPECS as reportSpecs, TOOLS as reportTools } from "./report.js";
 import { ANSWERED, onAgentAnswered, SPECS as reviewSpecs, TOOLS as reviewTools } from "./review.js";
 import { SPECS as toolSpecs, TOOLS as handTools } from "./tools.js";
 import {
@@ -82,6 +83,7 @@ const TOOLS = {
   ...handTools,
   ...reviewTools,
   ...stopTools,
+  ...reportTools,
 };
 
 // The one place an event is decided. Put a break on the return. A fresh box
@@ -97,7 +99,7 @@ export async function decide(said, box) {
 }
 
 function specsOf(box) {
-  return [findSpec(), ...applySpecs(), ...toolSpecs(box), ...reviewSpecs(), ...stopSpecs(box)];
+  return [findSpec(), ...applySpecs(), ...toolSpecs(box), ...reviewSpecs(), ...stopSpecs(box), ...reportSpecs()];
 }
 
 function pass() {
@@ -112,7 +114,7 @@ function letsThrough(answer, said, box) {
   const { needs, result, ...rest } = answer ?? {};
   const held = needs ? "the hold" : result?.deny !== undefined ? "the refusal" : result?.block !== undefined ? "the block" : "";
   if (!held) return answer;
-  box.log.say("debug", "god", `god mode lets ${held} of ${said?.e?.tool ?? said?.event ?? ""} through`, {
+  box.log.say("info", "god", `god mode lets ${held} of ${said?.e?.tool ?? said?.event ?? ""} through`, {
     tool: String(said?.e?.tool ?? ""),
     detail: String(result?.deny ?? result?.block ?? needs).replace(/\s+/g, " ").slice(0, 120),
   });
