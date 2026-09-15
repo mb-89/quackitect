@@ -163,6 +163,7 @@ record:
   - step: retro/notes
     hand: box af187ab9cab6
     hash_before: 068dc1cbf08eb7e5c719387a02a91e111a604e78
+    hash_after: fe2e6f7523bc7a620742cfb989fe086d0a95d627
 step: retro/notes
 ---
 
