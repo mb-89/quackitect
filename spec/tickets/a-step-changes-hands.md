@@ -172,7 +172,11 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
-step: retro/write
+  - step: retro/write
+    hand: box af187ab9cab6
+    hash_before: 1339db97ba58baed3c26af770f1fc07783d1d534
+    hash_after: 1339db97ba58baed3c26af770f1fc07783d1d534
+step: retro/cloud
 ---
 
 # Ask
@@ -320,3 +324,6 @@ This group waits on one person's line, under design/person-1 on the child.
 - those rules govern a session's conduct and read nothing in a command
 - that hand-back takes the shell road, which the design names as a person's road
 - the judge reads it at the next agent pull
+- `branch release` puts the branch at todo and leaves the pull's hold on the box
+- the next pull on that box answers refused until the leaf goes back by hand
+- the release verb hands the held leaf back first, in the branch verbs
