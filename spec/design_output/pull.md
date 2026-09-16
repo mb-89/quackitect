@@ -303,6 +303,15 @@ says to push the branch and pull again. A hold past that point stands on a
 closed ticket, and the stop hook holds the turn open for a hand-back nobody
 owes.
 
+## The refused commit
+
+The pre-commit hook reads the commit a hand-back makes, and a private line
+in the tree refuses it. Then nothing lands. The ticket file goes back to
+what the hand writes, the index empties, and the hold stays. The pull answers
+`refused` with the hook's finding, so the hand fixes the line and hands back
+again. So a record's `hash_after` names a commit the branch holds, and a
+refused commit writes no record. `src/scripts/landed.js` holds the landing.
+
 # The fail
 
 `--fail "why"` writes an entry with the reason and `returns`, one past the

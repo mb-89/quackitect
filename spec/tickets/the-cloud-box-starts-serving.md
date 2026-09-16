@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
 urgency: now
 steps:
   - name: do
@@ -26,6 +26,20 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 62642eaf8f9c9c53
+step: do
+record:
+  - step: do
+    hand: box d42624a67d18a8
+    hash_before: e7f70164a51ce4d76d8e7ea27eaf86dd66a39b85
+    hash_after: e68a1de179d91112e9a13ce11583359938aa8c1d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 56 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: 64 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -51,11 +65,15 @@ Level zero holds no cloud session in this tree. The bridgehead posts to a port n
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/serve.test.js test/level0/work.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -63,14 +81,21 @@ Level zero holds no cloud session in this tree. The bridgehead posts to a port n
 
 <!-- the form is text -->
 
+On a cloud box the pull takes the branch, and that take now ends on the server. A new module probes the health answer at the pointer's port and starts the server detached where nothing answers. The pull's last line says whether the server answers, starts, or fails to start. The ask names `branch take`, and the pull is the road that runs it on a cloud box, so the start lives on the take's return.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
 
+- the change follows the ask on its first two lines. The third waits for a routine run, and the discussion says so
+- the cleanup the change reveals is in the change. The cloud pull test teaches the fake the probe and the start
+
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The third line of the ask reads a cloud session's log off one routine run. Nothing on a desk stands in for it, so that line waits for the next routine run against this tree.
 
 Nothing stands here yet.

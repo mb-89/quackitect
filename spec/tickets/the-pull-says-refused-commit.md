@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
 urgency: now
 steps:
   - name: do
@@ -26,6 +26,20 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 62642eaf8f9c9c53
+step: do
+record:
+  - step: do
+    hand: box d42624a67d18a8
+    hash_before: e2e985068b6e482098a6c9ff76337345a8545c6e
+    hash_after: 84bd1d308fd58187b3bd50cd9205e80492a9b86c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 42 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: 64 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -51,11 +65,15 @@ The pull stages, the pre-commit hook refuses, and the pull writes a pass with th
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/landed.test.js test/level0/pull.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -63,11 +81,16 @@ The pull stages, the pre-commit hook refuses, and the pull writes a pass with th
 
 <!-- the form is text -->
 
+The landing moves into its own module and reads the commit's answer. A commit the hook refuses puts the ticket file back, empties the index, keeps the hold and answers refused with the hook's finding. So no record carries a hash the branch has yet to hold. The git door answers the error text beside the output, so the finding reaches the pull. The test verb moves into its own module too, so the pull module shrinks.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: the three lines under it stand in the landing, its test and the record
+- the cleanup the change reveals is in the change. The test verb and the schema fixture move into their own files
 
 # Discussion
 
