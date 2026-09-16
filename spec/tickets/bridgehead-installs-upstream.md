@@ -89,7 +89,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-bridgehead-installs-upstream
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 99aa60a14c3f
@@ -105,6 +105,10 @@ record:
     hand: box 99aa60a14c3f
     hash_before: 1bba00eb080d9779d7239a08ec43a3dc53058bca
     hash_after: 1bba00eb080d9779d7239a08ec43a3dc53058bca
+  - step: design/review
+    hand: box 99aa60a14c3f · helper-4
+    hash_before: ef0baf994761d589c165d2e75d51a5341377371b
+    hash_after: ef0baf994761d589c165d2e75d51a5341377371b
 ---
 
 # Ask
@@ -162,12 +166,12 @@ Read [[spec/design_input/a-stub-takes-its-vehicle]] first, the chapters The stub
 
 <!-- the form is verdict -->
 
-fail
-- The approach names no start of the vehicle's server on the cloud box. `./RUNME.sh serve` starts it, and a down server answers no canary.
-- The test row says what the fakes do and names no assertion. The ask reads the clone URL from `vehicle.json` and `.se/project.json` afterwards.
-- The clone folder stands unnamed. The ask names `~/.se/vehicles/<brand>`.
-- Step 8 installs the plugin into the client, and the approach writes a hook into the stub instead. For details, see [[spec/design_output/level0#a-stub-names-its-vehicle]].
-- The word `pair` names three things: the register entry, the pointer and the hook. Name the set once.
+pass
+- The approach answers all four done_when lines, and agrees with the file table and the level0 chapter.
+- `settlement` stands in no note. Add the term with its note, or name the three files off the file table.
+- The file table puts the bridgehead in the stub before the first session. The attach rewrites the file it runs from, so the vehicle chapter says so.
+- The fourth line lands off the box. The retro names the run under left, with the stub repo and the routine's prompt.
+- The test row names a fake process where the ask names a fake git. The tests-red step names the fake once.
 
 # implement
 
