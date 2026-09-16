@@ -215,6 +215,21 @@ export function toothOf(init = {}) {
   };
 }
 
+// An answer names a next step where a paragraph after the tables opens on the agent's own next act. [[spec/design_output/stop#the-canary-ends-turn-one]]
+const NEXT = /^(?:next\b|then i\b|i (?:start|begin|read|run|pull|take|look|check|open|write|fix|merge|work|list|review)\b|i'll\b|i will\b)/i;
+
+export function namesNext(text) {
+  const paragraphs = String(text ?? "")
+    .split(/\r?\n\s*\r?\n/)
+    .map((one) => one.trim())
+    .filter((one) => one && !one.startsWith("|") && !one.startsWith("#") && !/^stop:/i.test(one) && !/^level0 holds this session/.test(one));
+  return paragraphs.some((one) =>
+    one
+      .split(/(?<=[.!?])\s+/)
+      .some((sentence) => NEXT.test(sentence.replace(/^[-*]\s+/, "").trim())),
+  );
+}
+
 // [[spec/design_output/stop#what-the-todo-list-says]]
 export function todos() {
   let list = null;

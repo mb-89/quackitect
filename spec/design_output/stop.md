@@ -97,6 +97,13 @@ call falls in turn one, and its result names the canary as the one way out.
 From turn two on the call ends a turn. For details, see
 [[spec/design_output/level0#the-canary-owes-a-debt]].
 
+The free stop of a new session takes one exception. Where the first answer
+names a next step, `namesNext` reads it, the session-is-new rule fires no
+more, and the turn holds open. So the canary rides that answer and closes no
+turn, and the agent does the step it names. A sentence opening on `Next`,
+`Then I` or `I` and a verb of the agent's own act names a step. A table, a
+heading and the stop line stand outside that reading.
+
 ## The off switch takes it
 
 `stop.enabled` at false skips the hold above and votes at once. The switch
@@ -153,7 +160,7 @@ a hole somebody walks through, so the name reaches a function alone.
 | `ticket-in-hand` | a hold stands under `.se/hold`, or an open private ticket stands |
 | `group-in-hand` | this branch's group carries a take with no hand-back |
 | `queue-waits` | a desk bound to the queue stands on trunk, and `queueHolds` reads a free open ticket or a group at `now` |
-| `session-is-new` | fewer tool calls than `FRESH` in `lib/stop.js` stand behind this session, and the hook grants no stop |
+| `session-is-new` | fewer tool calls than `FRESH` in `lib/stop.js` stand behind this session, the hook grants no stop, and the answer names no next step |
 | `stop-hook-off` | `spec/config/level0.json` says `stop.enabled` is false |
 | `never` | nothing, which is what an unbuilt rule takes |
 

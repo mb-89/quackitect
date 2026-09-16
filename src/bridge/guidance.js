@@ -7,6 +7,7 @@ import {
   bindsHere,
   canary,
   canaryIn,
+  canaryText,
   countsOf,
   envOf,
   forHelper,
@@ -101,18 +102,6 @@ function rulesText(standing) {
     "reason and the line.",
     "",
     standing,
-  ].join("\n");
-}
-
-// [[spec/design_output/level0#the-canary]]
-function canaryText(sentence) {
-  return [
-    "End your FIRST answer with this line, on its own, word for word:",
-    "",
-    `    ${sentence}`,
-    "",
-    "It says out loud that level zero holds this session, and the numbers",
-    "come from what it loaded. Write this line once and never again.",
   ].join("\n");
 }
 

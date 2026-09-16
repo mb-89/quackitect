@@ -16,6 +16,7 @@ import { heldGroup, openPrivate, queueHolds } from "../../.claude/skills/level0/
 import {
   decide,
   detail,
+  namesNext,
   pool,
   RULES,
   STOP_CALL,
@@ -122,7 +123,7 @@ export function onStop(e, box) {
   const off = asks(box, ENABLED) === false;
   const decision = decide(rules, {
     claimed,
-    ran: (name) => ranHere(name, { off, hold, box, claimed }),
+    ran: (name) => ranHere(name, { off, hold, box, claimed, text }),
   });
   const said = toothOf_(box).atTurnEnd(decision, Number(asks(box, MOST) ?? 0));
   const why = said.ends ? endsWhy(said) : (said.go?.says ?? "");
@@ -158,7 +159,8 @@ function lastLineReason(text) {
 function ranHere(name, held) {
   if (name === "stop-hook-off") return held.off;
   if (name === "owner-holds") return held.hold === STOP;
-  if (name === "session-is-new") return toothOf_(held.box).isNew();
+  // A first answer naming a next step takes no free stop, so the canary rides it and closes no turn. [[spec/design_output/stop#the-canary-ends-turn-one]]
+  if (name === "session-is-new") return toothOf_(held.box).isNew() && !namesNext(held.text);
   if (name === "work-waiting") return todosOf(held.box).standing();
   if (name === "group-in-hand") return groupInHand(held.box);
   if (name === "ticket-in-hand") return holdStands(held.box) || privateStands(held.box);

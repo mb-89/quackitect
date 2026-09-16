@@ -143,6 +143,20 @@ export function canary(counts) {
   return `level0 holds this session: ${rules} rules, ${notes} notes, the stop hook ${tooth}.`;
 }
 
+// The block the session reads with the canary in it. The line rides the answer and closes no turn. [[spec/design_output/level0#the-canary]]
+export function canaryText(sentence) {
+  return [
+    "End your FIRST answer with this line, on its own, word for word:",
+    "",
+    `    ${sentence}`,
+    "",
+    "It says out loud that level zero holds this session, and the numbers",
+    "come from what it loaded. Write this line once and never again. The line",
+    "rides the answer and closes no turn: where that answer names a next step,",
+    "do it in the same turn.",
+  ].join("\n");
+}
+
 export function canaryIn(answer, said) {
   const found = CANARY.exec(String(answer ?? ""));
   if (!found) return { found: "none", said: "" };

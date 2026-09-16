@@ -5,7 +5,7 @@ import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   bindsHere,
-  canary,
+  canary, canaryText,
   countsOf,
   standingLayer,
 } from "../../.claude/skills/level0/lib/guidance.js";
@@ -933,9 +933,7 @@ async function standing() {
     return 0;
   }
   console.log(said);
-  console.log("");
-  const stop = (await settings.ask("stop.enabled")) !== false;
-  console.log(canary({ ...countsOf(notes), stop }));
+  console.log(`\n${canaryText(canary({ ...countsOf(notes), stop: (await settings.ask("stop.enabled")) !== false }))}`);
   return 0;
 }
 
