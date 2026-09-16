@@ -162,6 +162,26 @@ to the group ticket it stands for. For details, see
 
 <!-- the form is verdict -->
 
+fail
+
+- The approach cuts the code and leaves the tree. A reader of the verbs learns the brief first, from the notes.
+- The work design output teaches the brief in six chapters, and the approach leaves all six standing:
+  - What a work branch is
+  - A brief drains first
+  - What the status says
+  - Two handovers
+  - The round trip
+  - Every brief carries the contract
+- Name each chapter, and what stands in its place.
+- The cloud guidance sends a cloud box's result into the brief file. Say what a cloud box writes instead.
+- The handover schema names the root brief as a path it governs. Say what stands there after.
+- Say that the box handover stays. The copilot lane reads both paths, and a session writes a fresh one at the finish.
+- The approach points for its details at the chapter A brief drains first, which goes with the change.
+- The rows hold against the code, verb by verb. The list names a kind, the new verb reads the root brief.
+- The take verb walks two roads, and the release verb falls through to the group record.
+- `./RUNME.sh check` answers 0 here, so the change carries that baseline.
+- The branch review verb finds the branch nowhere. This ticket reaches code at implement.
+
 # implement
 
 ## tests-red

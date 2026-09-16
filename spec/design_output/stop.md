@@ -74,20 +74,44 @@ session end a turn over it, and the tooth off ends any turn.
 
 ## The hold
 
-`stop.hold` is what the owner picks from the sidebar, and it is one turn
-long: the turn's end drops it to `off`. The stop door reads it at every call
-and at the turn's end:
+`stop.hold` is what the owner picks from the sidebar. The stop door reads it
+at every call and at the turn's end:
 
-| hold | at the next call | at the turn's end |
+| hold | at every call | at the turn's end |
 |---|---|---|
 | `off` | nothing | the tooth votes |
-| `finish` | one context line: finish what stands, start nothing new | the tooth votes |
-| `stop` | the door refuses the call: say what stands, end the turn with the stop line | the turn ends over the standing work |
+| `finish` | the block rides: put the work down, start nothing new | the tooth votes |
+| `stop` | every call but the three below meets a refusal | the turn ends over the standing work |
 
-The report tool passes the hold at `stop`, so the agent hands the last report
-in before the turn ends. The hold at `stop` fires the rule
-`the-owner-holds-this-session` on the stop side, over every continue
-rule but the owner's own word. A `hold` line at `debug` says what the door does.
+Three calls pass the hold at `stop`, because a turn ends through them: the
+report, the stop claim and the answer check. Each carries the block, so the
+line stands in the answer to every call a held session makes. The hold at
+`stop` fires the rule `the-owner-holds-this-session` on the stop side, over
+every continue rule but the owner's own word. A `hold` line at `debug` says
+what the door does.
+
+A hold is one turn long, and the turn that meets it ends it. The door marks
+the hold as met at the call it acts on, and the turn's end drops a met hold to
+`off`. A hold the owner sets between turns meets no call, so it stands into
+the next turn and holds that one. So a press that lands while a turn closes
+holds the work that follows it.
+
+## A prompt mid-turn holds
+
+The owner speaking into a running turn is a hold of its own. A prompt landing
+after the session's first tool call, from outside this plugin, writes
+`stop.hold` to `finish`. Every later call then carries the block, so the work
+goes down at the next call the session makes.
+
+| what stands | what the prompt does |
+|---|---|
+| a tool call stands this turn | the hold stands at `finish` |
+| the prompt opens the turn | nothing, the turn is its own |
+| a helper sends it | nothing, a helper holds no session |
+| the hold stands at `finish` or `stop` | nothing, the stronger word stands |
+
+The owner's own words come first, so a prompt naming new work outranks the
+block it sets. The block says so.
 
 ## The two lines stand apart
 

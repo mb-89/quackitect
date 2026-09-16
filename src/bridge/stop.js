@@ -10,6 +10,7 @@ import {
   OFF,
   STOP,
 } from "../../.claude/skills/level0/lib/controls.js";
+import { CHECK } from "../../.claude/skills/level0/lib/answer.js";
 import { rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { ticketAt, WORK_BRANCH } from "../scripts/group.js";
@@ -45,39 +46,52 @@ export function SPECS(box) {
   return [stopSpec(rulesOf(box))];
 }
 
+// The three calls a turn ends with, which the hold at stop lets through. [[spec/design_output/stop#the-hold]]
+export const ENDS_TURN = new Set([REPORT_CALL, STOP_CALL, `mcp__level0__${CHECK}`]);
+
 export function holdsCall(e, box) {
   if (e?.agentId) return null;
   const hold = String(asks(box, HOLD) ?? OFF);
-  if (hold === STOP && e?.tool !== REPORT_CALL) {
-    box.log.say(
-      "debug",
-      "hold",
-      `the owner holds stop, and ${e?.tool ?? "the call"} is refused`,
-      {
-        tool: String(e?.tool ?? ""),
-      },
-    );
-    return {
-      result: {
-        deny: "The owner holds this session at stop. Make no call: say what stands, and end the turn with the stop line.",
-      },
-    };
-  }
-  if (hold !== FINISH || box.held === hold) {
-    box.held = hold;
+  if (hold !== FINISH && hold !== STOP) {
+    box.held = "";
     return null;
   }
+  // The door meets the hold, so the turn's end drops it. A hold no call meets stands into the next turn. [[spec/design_output/stop#the-hold]]
   box.held = hold;
-  box.log.say("debug", "hold", "the owner holds finish, and the block rides", {
-    tool: String(e?.tool ?? ""),
-  });
+  const tool = String(e?.tool ?? "");
+  if (hold === STOP && !ENDS_TURN.has(tool)) {
+    box.log.say("debug", "hold", `the owner holds stop, and ${tool || "the call"} is refused`, { tool });
+    return { result: { deny: refusedByHold(tool) } };
+  }
+  box.log.say("debug", "hold", `the owner holds ${hold}, and the block rides`, { tool });
   return { after: { context: [controlBlock({ hold })] } };
+}
+
+// [[spec/design_output/stop#the-hold]]
+export function refusedByHold(tool) {
+  return [
+    `The owner holds this session at stop, so ${tool || "this call"} is refused.`,
+    "Put the work down where it stands. Make no other call.",
+    `Say what stands and what is left, hand the last word in through ${REPORT_CALL},`,
+    "and end the turn with the stop line.",
+  ].join(" ");
+}
+
+// A prompt landing while the agent runs tools puts the work down, because the owner speaks into a turn. [[spec/design_output/stop#a-prompt-mid-turn-holds]]
+export function holdsOnPrompt(e, box) {
+  if (e?.agentId || !box.working) return;
+  const hold = String(asks(box, HOLD) ?? OFF);
+  if (hold === STOP || hold === FINISH) return;
+  writes(box, HOLD, FINISH);
+  box.log.say("debug", "hold", `the owner speaks mid-turn, and the hold stands at ${FINISH}`);
 }
 
 export function dropsHold(_e, box) {
   const hold = String(asks(box, HOLD) ?? OFF);
+  const met = box.held === hold;
   box.held = "";
-  if (hold !== FINISH && hold !== STOP) return { pass: true };
+  box.working = false;
+  if ((hold !== FINISH && hold !== STOP) || !met) return { pass: true };
   writes(box, HOLD, OFF);
   box.log.say("debug", "config", `the hold stood at ${hold}, and drops to ${OFF}`);
   return { pass: true };
@@ -85,6 +99,7 @@ export function dropsHold(_e, box) {
 
 export function sawCall(e, box) {
   if (e?.agentId) return;
+  box.working = true;
   toothOf_(box).sawCall();
   todosOf(box).sawCall(e);
 }
@@ -92,6 +107,7 @@ export function sawCall(e, box) {
 // A prompt from outside this plugin opens a turn, and the tooth counts them. [[spec/design_output/stop#the-tooth-holds-its-state]]
 export function sawPrompt(e, box) {
   if (e?.agentId) return;
+  if (!e?.mine) holdsOnPrompt(e, box);
   toothOf_(box).sawPrompt(Boolean(e?.mine));
 }
 
