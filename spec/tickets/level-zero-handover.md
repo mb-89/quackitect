@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: soon
-step: design/review
+step: implement/tests-red
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -96,6 +96,10 @@ record:
     hand: box 747cff5c2f2a
     hash_before: 347b6637434a6a9e8b048964f1e9968e28e1821f
     hash_after: 347b6637434a6a9e8b048964f1e9968e28e1821f
+  - step: design/review
+    hand: box 747cff5c2f2a · helper-2
+    hash_before: f37ce609bbfc3d843a956d98c971ad9dfbb25435
+    hash_after: f37ce609bbfc3d843a956d98c971ad9dfbb25435
 ---
 
 # Ask
@@ -188,6 +192,14 @@ The brief's other rows, and where each stands on trunk:
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+- The approach answers the ask. A tools block rides beside the rules block at session start, one line per tool. `for` on every wanted entry says when to reach for it.
+- A registered tool's line comes off its description. `patch` opens with what it does, and the line says when only where the first sentence does.
+- `work-waiting` counts tasks still. `ticket-in-hand` in the level one rules reads the hold folder and the private tickets. The row stands done under that name.
+- The tools note's callers table names the hooks module reading the survey at session start. The hook reads no survey. The row goes where the guidance door takes its place.
+- The other rows read true. The hook carries no brief door, and the cloud block names the pull. A group name on trunk takes its branch. `note`, `unbound`, `engine.autonomy` and the old verbs stand open, as the table says.
 
 # implement
 
