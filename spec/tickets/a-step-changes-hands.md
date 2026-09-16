@@ -388,4 +388,4 @@ This group waits on one person's line, under design/person-1 on the child.
 - the release verb hands the held leaf back first, in the branch verbs
 - after retro/cloud the pull hands retro/notes to the same box, so the route cycles until a person answers
 - an eighth box takes the group, meets the same person step, and releases at retro/notes without a retro
-- `branch release` resets the tree hard to origin, so the merge of main that `branch take` makes and leaves unpushed goes with it, in the release verb's `onBranch`
+- `branch release` resets the tree hard to origin, in the release verb's `onBranch`. The merge of main that `branch take` makes and leaves unpushed goes with it.
