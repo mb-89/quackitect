@@ -23,8 +23,10 @@ takes the same requirements. Qt is where the shape comes from.
 - The filter panel shall offer presets, and a preset can carry a key of its own.
 - Each tab shall hold its own filter.
 - A person shall edit a value in the cell holding it.
+- An edit shall take Enter as its yes, and Escape shall put the old value back.
+- Shift with Enter shall write the value into every row of the view, where the field takes it.
 - The completion shall read the schema of a field, and the values standing in the data otherwise.
-- A declaration shall say what a view draws, and a tab shall name the view it takes.
+- A declaration shall say what a view draws.
 
 # The columns read the item
 
@@ -46,8 +48,9 @@ above binds nothing.
 
 # A declaration says the view
 
-A folder under `spec` holds the views, one file a view. A tab names a view, and
-the editor fills from that file. So a new view is a file and no code change.
+A folder under `spec` holds the views, one file a view, and the editor fills
+from that file. So a new view is a file and no code change. How a tab reaches
+a view waits for the design output.
 
 | what the file says | what it decides |
 |---|---|
@@ -59,6 +62,7 @@ the editor fills from that file. So a new view is a file and no code change.
 
 The third and the fourth tree hold a syntax for this already. Reading those
 decides the shape here, and this note asks for the same one where it fits.
+Those trees stand on another box, so a person brings them.
 
 # Enter opens the details
 
@@ -103,6 +107,17 @@ tab full of states is a tab where the states change, one click a change.
 
 The edit writes back to the thing the row comes out of, which is the note for a
 ticket.
+
+| the key | what the edit does |
+|---|---|
+| Enter | writes the value, and the cell stands as it reads |
+| Escape | puts the old value back |
+| Shift with Enter | writes the value into every row of the view |
+
+Qt calls that a delegate, and the two keys are what a person there expects. The
+fill reaches every row the view holds at that moment, so a filter decides how
+far it goes. A row whose schema refuses the value keeps the value it carries,
+and the view says which rows stay behind.
 
 # The completion knows the field
 
