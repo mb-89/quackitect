@@ -89,12 +89,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-sidebar-makes-both
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 1eeed4143ad0
     hash_before: 212a0a7ab9caac98ae47222084953409d432245f
     hash_after: 212a0a7ab9caac98ae47222084953409d432245f
+  - step: design/review
+    hand: box 1eeed4143ad0 · helper-2
+    hash_before: f203cc868ba1cee1e91a2bda28a3524e6c32bb41
+    hash_after: f203cc868ba1cee1e91a2bda28a3524e6c32bb41
 ---
 
 # Ask
@@ -148,6 +152,13 @@ Two action widgets in the schema, one field for the folder ask, and one door cal
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- Each line of the ask lands on one row of the table, and the row names its file.
+- The schema declares the two actions, and the sidebar reads `asks` off it by key.
+- `editor.js` alone reaches the folder dialog, and the fake door answers the folder in the tests.
+- The command runs through the terminal door the log button runs through.
+- A closed dialog ends the press, so nothing runs on an empty folder.
 
 # implement
 
