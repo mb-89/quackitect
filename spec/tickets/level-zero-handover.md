@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: soon
-step: implement/tests-green
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -117,6 +117,17 @@ record:
     hash_after: a582eb8874b6e45ddd04deccd5e32041df3a6fa2
     answered:
       - name: lint
+        exit: 0
+        said: 51 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box 747cff5c2f2a
+    hash_before: 00b817ac22fe3b1154d51577096dc40e8a31dc09
+    hash_after: 00b817ac22fe3b1154d51577096dc40e8a31dc09
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 24 test(s) pass in 3 file(s)
+      - name: check
         exit: 0
         said: 51 stand at warning, which the panel draws and check allows.
 ---
@@ -302,11 +313,15 @@ The surprise is the word the verb answers: a missing export reads as a build fau
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -314,11 +329,20 @@ The surprise is the word the verb answers: a missing export reads as a build fau
 
 <!-- the form is text -->
 
+The guidance door reads the survey when a session starts, and runs it first on a box that carries none. At the first context read a tools block rides beside the rules block.
+Each line names a tool the survey found, with its version and when to reach for it. Each registered tool takes the first sentence of its description. The wanted list carries the reason beside each name, so the survey file keeps its shape.
+The stop door's queue check reads the environment off the box, so its test runs in memory on a cloud box too.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the tools library, the guidance door, the server, the tools note and two test files
+- the stop door and its test take two lines more, so the queue check reads the environment off the box
+- the door reaches the disk and the process through the fakes, so the tests run in memory
+- the door test's header names the approach, and the code points at the tools note
 
 # verdict
 
