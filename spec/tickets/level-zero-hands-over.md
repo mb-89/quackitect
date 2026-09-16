@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: whenever
-step: children
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -92,6 +92,10 @@ record:
     hand: box 747cff5c2f2a
     hash_before: b5712b4c4c9a3b48b8ca143cba0f0f1d985b2184
     hash_after: b5712b4c4c9a3b48b8ca143cba0f0f1d985b2184
+  - step: children
+    hand: the engine
+    hash_before: 8a908358b7d14093a5b61d132a6476ea8347b50f
+    hash_after: 8a908358b7d14093a5b61d132a6476ea8347b50f
 depends_on: ["the-agent-pulls-a-ticket"]
 ---
 
