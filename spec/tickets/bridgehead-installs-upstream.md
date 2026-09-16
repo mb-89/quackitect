@@ -89,12 +89,18 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-bridgehead-installs-upstream
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 99aa60a14c3f
     hash_before: 1e8b66f5364a299fa242b7ff610448f4e3038381
     hash_after: 1e8b66f5364a299fa242b7ff610448f4e3038381
+  - step: design/review
+    hand: box 99aa60a14c3f · helper-2
+    hash_before: 1fccf435d2bb919fb6058cae46e671ac71eff8f4
+    hash_after: 1fccf435d2bb919fb6058cae46e671ac71eff8f4
+    returns: 1
+    why: The approach names no start of the vehicle's server on the cloud box. `./RUNME.sh serve` starts it, and a down server answers no canary.; The test row says what the fakes do and names no assertion. The ask reads the clone URL from `vehicle.json` and `.se/project.json` afterwards.; The clone folder stands unnamed. The ask names `~/.se/vehicles/<brand>`.; Step 8 installs the plugin into the client, and the approach writes a hook into the stub instead. For details, see [[spec/design_output/level0#a-stub-names-its-vehicle]].; The word `pair` names three things: the register entry, the pointer and the hook. Name the set once.
 ---
 
 # Ask
@@ -149,6 +155,13 @@ Read [[spec/design_input/a-stub-takes-its-vehicle]] first, the chapters The stub
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+- The approach names no start of the vehicle's server on the cloud box. `./RUNME.sh serve` starts it, and a down server answers no canary.
+- The test row says what the fakes do and names no assertion. The ask reads the clone URL from `vehicle.json` and `.se/project.json` afterwards.
+- The clone folder stands unnamed. The ask names `~/.se/vehicles/<brand>`.
+- Step 8 installs the plugin into the client, and the approach writes a hook into the stub instead. For details, see [[spec/design_output/level0#a-stub-names-its-vehicle]].
+- The word `pair` names three things: the register entry, the pointer and the hook. Name the set once.
 
 # implement
 
