@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-hand-carries-a-step
-step: design/draft
+step: design/review
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -102,6 +102,10 @@ record:
     hash_after: f4fcb63fca048701dadc93921f9a783e0759cb70
     returns: 1
     why: The approach chapter runs four paragraphs in a row, and the check answers 1.; Carry the approach as a table, the way the ask's table of pieces reads.; The ask puts the spawn hook under level zero, and the wrapper stands at level one.; Name the one folder holding the spawn hook, so the implement step writes in one place.; The five things the ask calls done stand in the approach, each with the design output behind it.; The check's other findings stand outside the brief, and this ticket leaves them alone.
+  - step: design/draft
+    hand: box ee33ce836a4d
+    hash_before: dd88b814f704835d13c6238f0a2aebe8bd7863da
+    hash_after: dd88b814f704835d13c6238f0a2aebe8bd7863da
 ---
 
 # Ask
@@ -132,9 +136,13 @@ The pull learns who holds a step, and the first piece is the hand id. Today a ha
 
 <!-- the form is text -->
 
-The hand grows from one piece to three, and the design output holds the shape. The plugin wrapper writes the session file at `session.start`, with the session id and the harness name. The pull reads it beside the box file into one hand. The record names the box, the session and the agent, and the hold slugs that hand into its file name.
-
-`--as <name>` appends a helper, which works one leaf under a hold of its own. The spawn hook puts one line at the head of every other helper's prompt. That line says the hand is the session's own, so `not` holds against it. For details, see [[spec/design_output/pull#the-hand-and-the-hold]] and [[spec/design_output/pull#a-hand-of-its-own]].
+| the piece | where it lands | the design output |
+|---|---|---|
+| the session file at `session.start`, with the session id and the harness name | `.claude/skills/level1/hooks` | [[spec/design_output/pull#the-hand-and-the-hold]] |
+| the box file and the session file, read into one hand | `src/scripts/pull.js` | [[spec/design_output/pull#the-hand-and-the-hold]] |
+| the record entry naming the box, the session and the agent, and the hold slugging it into a file name | `src/scripts/pull.js` | [[spec/design_output/pull#the-hand-and-the-hold]] |
+| `--as <name>`, appending the helper with a hold of its own | `src/scripts/pull.js` | [[spec/design_output/pull#a-hand-of-its-own]] |
+| the `agent.spawn` hook, one line at the head of a helper's prompt | `.claude/skills/level0/hooks` | [[spec/design_output/pull#a-hand-of-its-own]] |
 
 ## review
 
