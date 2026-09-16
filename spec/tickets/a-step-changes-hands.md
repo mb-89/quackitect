@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: whenever
 steps:
   - name: sync
@@ -247,7 +247,12 @@ record:
     hand: box d895042a7ea3
     hash_before: 6ce47c879e48922cbc773e0c62ce63315a745879
     hash_after: 6ce47c879e48922cbc773e0c62ce63315a745879
+  - step: retro/cloud
+    hand: box d895042a7ea3
+    hash_before: 79783fbe180bea57e8c81aad3b179942fe768a85
+    hash_after: 79783fbe180bea57e8c81aad3b179942fe768a85
 step: retro/cloud
+reason: done
 ---
 
 # Ask
