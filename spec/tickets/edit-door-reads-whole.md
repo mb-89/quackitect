@@ -2,6 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: whenever
+step: do
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -25,8 +26,7 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
-process_hash: 62642eaf8f9c9c53
-step: do
+process_hash: 568f402efe3adab7
 ---
 
 # Ask

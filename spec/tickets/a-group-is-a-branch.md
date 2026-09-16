@@ -2,6 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: soon
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -42,6 +43,7 @@ steps:
       - name: write
         does: writes the retro over the box's own window
         input: ["children", "notes"]
+        checklist: ["every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
         evidence:
           - name: done
             form: list
@@ -72,8 +74,8 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: children
 process: [[group]]
+process_hash: e655a1488d1ac788
 ---
 
 # Ask
@@ -101,6 +103,12 @@ Done is a tree where no file names a group kind. `branch list` then names a grou
 <!-- every child as a link, one a line, with its process -->
 
 <!-- the form is list -->
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 # children
 
@@ -149,6 +157,12 @@ Done is a tree where no file names a group kind. `branch list` then names a grou
 <!-- what the thoughts say that the actions do not, off the transcript -->
 
 <!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 ## cloud
 
