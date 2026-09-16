@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 steps:
   - name: design
@@ -139,6 +139,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 99aa60a14c3f · helper-9
+    hash_before: 2f3487ebd30f0592beeb53a6a84d7778d5a36cd4
+    hash_after: 2f3487ebd30f0592beeb53a6a84d7778d5a36cd4
+reason: done
 ---
 
 # Ask
@@ -332,11 +337,53 @@ The check names the lint's paths. The Ask as minted breaks the voice rules, and 
 
 <!-- the form is files -->
 
+- .vale.ini
+- spec/config/styles/VoiceParagraph/Vocabulary.yml
+- spec/design_output/vehicle.md
+- spec/tickets/bridgehead-installs-upstream.md
+- spec/tickets/the-bridgehead-installs-upstream.md
+- spec/vocabulary/terms.yml
+- src/bridge/vehicle.js
+- src/scripts/cli.js
+- src/scripts/vehicle.js
+- src/stub/.claude/skills/bridgehead/hooks/bridgehead.js
+- test/contract/stub.test.js
+- test/level0/bridgehead.test.js
+- test/level0/vehicle.test.js
+- spec/guidance/review/reviewing.md
+- spec/design_input/a-stub-takes-its-vehicle.md
+- spec/design_output/level0.md
+- src/stub/.claude/skills/bridgehead/hooks/hooks.json
+- src/stub/.claude/skills/bridgehead/.claude-plugin/plugin.json
+- src/stub/RUNME.sh
+- RUNME.sh
+- src/bridge/server.js
+- src/scripts/stub.js
+- src/doors/fake/git.js
+- src/doors/fake/proc.js
+- .claude/skills/level0/lib/vehicle.js
+- .claude/skills/level0/hooks/level0.js
+- .se/tickets/ask-holds-lint-shut.md
+- .se/tickets/cloud-box-starts-no-server.md
+- .se/tickets/pull-commit-swallows-refusal.md
+- .se/tickets/record-why-quotes.md
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- The branch does what the brief asks. The routine run stays with a person, as the approach says.
+- `./RUNME.sh branch test` exits 0, and `./RUNME.sh check` exits 0 over the branch's paths.
+- The slow contract test under `SE_SLOW` exits 0, and clones this tree into a temp home.
+- No retro stands in the handback yet. Four private notes under `.se/tickets` wait for it.
+- Everything beyond the brief is trivial: one Vale section, and the word `json` in two lists.
+- Every new road carries a test that fires: the pointer, the register, `SE_VEHICLE`, the clone, the attach.
+- Fix: `hooks.json` and `plugin.json` under `src/stub/.claude/skills/bridgehead` still describe the import road.
+- Fix: a failing attach or serve carries no test. The clone test proves `fails` once.
+- Fix: `starts` reads the register under `~/.se` alone, and `registerDirs` honors `SE_REGISTRY`.
 
 # Discussion
 
