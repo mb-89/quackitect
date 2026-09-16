@@ -89,7 +89,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-shim-resolves-the-vehicle
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -116,6 +116,17 @@ record:
     hash_after: b4c4c771a94064c1814cd0fd66d06a059ee5b50b
     answered:
       - name: lint
+        exit: 0
+        said: 6 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box d42624a67d18a8
+    hash_before: 6e481e8ed265450d3f3e50dca56c66c22b6f73a8
+    hash_after: 6e481e8ed265450d3f3e50dca56c66c22b6f73a8
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 34 test(s) pass in 3 file(s)
+      - name: check
         exit: 0
         said: 6 stand at warning, which the panel draws and check allows.
 ---
@@ -231,21 +242,23 @@ Three tests fail where the approach says they fail. The vehicle verb names the v
 
 ### tests
 
-<!-- the same tests pass -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test test/contract/stub.test.js test/level0/vehicle.test.js test/level0/ticket.test.js
 
 ### check
 
-<!-- the check is green on the commit -->
+    ./RUNME.sh check
 
-<!-- the form is command -->
+### checked
+
+- the change touches the shim, the roots function, the stub verb's line, the ticket schema and two design notes
+- the shim reaches the disk and a process, and the contract test drives both for real
+- the shim's header and the comment on the roots function name the three roads and the work root
 
 ### says
 
-<!-- what changes and why, for a reader who was not there -->
+The shim in a stub finds its vehicle on three roads. The environment comes first, the register by the vehicle id second, and the folder a cloud box clones into last. It hands every argument on with the stub as the work root, and the command line takes that root over its own. So every verb runs inside a stub, and the vehicle verb names both trees. A shim finding nothing says one line with the upstream and the install road.
 
-<!-- the form is text -->
+The ticket schema now lets anyone write the ask. The door kept a hand off two asks the rules refuse, and the check stayed red with nobody able to clear it.
 
 # verdict
 

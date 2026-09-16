@@ -295,6 +295,6 @@ test("the refusal names the finding and the three places", () => {
   assert.match(said, /Ticket\.state/);
   assert.match(
     said,
-    /the ask of a draft, the fields of the step it holds, and the discussion/,
+    /the ask, the fields of the step it holds, and the discussion/,
   );
 });
