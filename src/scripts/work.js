@@ -62,7 +62,7 @@ export function work(root, argv, doors) {
     review,
     list,
     // [[spec/design_output/pull#the-hand-out]]
-    pull: (it, _name, argv) => pull({ ...it, take: () => take(it) }, argv),
+    pull: (it, _name, argv) => pull({ ...it, take: (group) => take(it, group) }, argv),
     test: (it, _name, argv) => testVerb(it, argv),
   };
   if (doing[what] && LOUD.includes(what)) {
@@ -424,7 +424,8 @@ function newWork(it, name) {
 }
 
 // [[spec/design_output/work#why-a-routine-needs-this]]
-function take(it) {
+// A name picks one branch, which is the owner's road onto a group from a desk. [[spec/design_output/pull#the-engine-takes-the-branch]]
+function take(it, name = "") {
   if (dirty(it)) return 2;
 
   const stand = standOf(it);
@@ -436,7 +437,13 @@ function take(it) {
     return 0;
   }
 
-  const free = freeIn(stand, standing);
+  const free = name
+    ? freeIn(stand, standing).filter((one) => one.branch === `work/${name}`)
+    : freeIn(stand, standing);
+  if (name && !free.length) {
+    console.error(`work/${name} stands at no free ${TODO}. Run ./RUNME.sh branch list to read where it stands.`);
+    return 1;
+  }
   if (!free.length) {
     console.log(`Every branch at ${TODO} waits for another. Nothing to take.`);
     for (const one of open) {
@@ -548,7 +555,7 @@ function trigger(it) {
   const stand = standOf(it);
   const free = freeIn(stand, standingAll(stand, mergedHere(it))).map((one) => one.branch);
 
-  console.log(`${ROUTINE.name} runs ./RUNME.sh branch take on a cloud box.`);
+  console.log(`${ROUTINE.name} runs ./RUNME.sh branch pull on a cloud box, and the engine takes a branch there.`);
   console.log("Fire it with the RemoteTrigger tool, once for every box you want:\n");
   console.log(`    action=run  trigger_id=${ROUTINE.id}\n`);
 

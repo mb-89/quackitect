@@ -19,6 +19,7 @@ import {
   fieldOf,
   frontOf,
   GROUP,
+  isGroup,
   OPEN,
   recordIn,
   TICKETS,
@@ -201,15 +202,19 @@ export function pull(it, argv) {
   }
 
   const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
-  if (branch === TRUNK && it.take && !verdict.said && !name) return it.take();
-  if (!branch.startsWith("work/")) {
-    console.error(`branch pull runs on a work branch, and this is ${branch}.`);
-    console.error(
-      "Run ./RUNME.sh branch take first, which takes a group and moves you onto it.",
-    );
+  const onTrunk = branch === TRUNK;
+  // [[spec/design_output/pull#the-engine-takes-the-branch]]
+  if (onTrunk && it.take && !verdict.said) {
+    if (it.cloud && !name) return it.take();
+    const group = name ? namedGroup(it, name) : urgentGroup(it);
+    if (group) return it.take(group);
+  }
+  if (!onTrunk && !branch.startsWith("work/")) {
+    console.error(`branch pull runs on ${TRUNK} or a work branch, and this is ${branch}.`);
+    console.error(`Run ./RUNME.sh branch pull from ${TRUNK}, which hands out work there.`);
     return 2;
   }
-  const group = branch.replace(/^work\//, "");
+  const group = onTrunk ? "" : branch.replace(/^work\//, "");
   const hand = as ? `${handOf(it)} · ${as}` : handOf(it);
   const held = holdOf(it, hand);
   const who = { hand, branch, group, held, oneStep: Boolean(as) };
@@ -381,16 +386,16 @@ function handOut(it, who) {
   repairPersonSteps(it, who);
   const all = ticketsHere(it);
   const groupTicket = all.find((one) => !one.private && one.name === who.group);
-  const tagged = all.filter((one) => one.private && String(one.front.todo) === "true");
+  // The tag says the next pull hands it first, on a note and on a ticket alike. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+  const tagged = all.filter((one) => String(one.front.todo) === "true");
   const privates = all.filter(
     (one) => one.private && String(one.front.todo) !== "true",
   );
-  const pools = [
-    tagged,
-    sorted(childrenOf(all, who.group)),
-    groupTicket ? [groupTicket] : [],
-    sorted(privates),
-  ];
+  // [[spec/design_output/pull#the-engine-takes-the-branch]]
+  const pools = who.group
+    ? [tagged, sorted(childrenOf(all, who.group)), groupTicket ? [groupTicket] : [], sorted(privates)]
+    : [tagged, sorted(freeIn(all)), sorted(privates)];
+  if (!who.group) cutForGroups(it, all);
 
   const why = [];
   let other = null;
@@ -406,6 +411,49 @@ function handOut(it, who) {
 
   say(WAIT, why.length ? why : ["no ticket of this group stands open"]);
   return 0;
+}
+
+// A free ticket stands in no group and is no group, so a desk works it on trunk. [[spec/design_output/pull#the-engine-takes-the-branch]]
+export function freeIn(all) {
+  return all.filter(
+    (one) => !one.private && !fieldOf(one.text, GROUP) && !isGroup(one.text),
+  );
+}
+
+// An open group works on a branch, so a desk cuts one where none stands and leaves the group to the cloud. [[spec/design_output/pull#the-engine-takes-the-branch]]
+function cutForGroups(it, all) {
+  const stands = new Set(
+    it.git
+      .run(["ls-remote", "--heads", "origin", "work/*"], true)
+      .out.split("\n")
+      .filter(Boolean)
+      .map((row) => row.split("\t")[1]?.replace("refs/heads/", "") ?? ""),
+  );
+  for (const one of all) {
+    if (one.private || !isGroup(one.text) || fieldOf(one.text, "state") !== OPEN) continue;
+    const branch = `work/${one.name}`;
+    if (stands.has(branch)) continue;
+    if (!it.git.run(["branch", branch, TRUNK], true).ok) continue;
+    it.git.run(["push", "-u", "origin", branch], true);
+    console.log(`${branch} is cut and pushed, because a group works on a branch and the cloud takes it.`);
+  }
+}
+
+// A desk takes a group on two roads alone: the owner names it, or its urgency reads now. [[spec/design_output/pull#the-engine-takes-the-branch]]
+function namedGroup(it, name) {
+  const one = ticketsHere(it).find((held) => !held.private && held.name === name);
+  return one && isGroup(one.text) ? name : "";
+}
+
+function urgentGroup(it) {
+  const groups = ticketsHere(it).filter(
+    (one) =>
+      !one.private &&
+      isGroup(one.text) &&
+      fieldOf(one.text, "state") === OPEN &&
+      urgency(one.text) === "now",
+  );
+  return sorted(groups)[0]?.name ?? "";
 }
 
 // [[spec/design_output/pull#a-hand-of-its-own]]

@@ -455,7 +455,7 @@ const standing = (child = CHILD(), group = GROUP_NOTE, extra = {}) => ({
 });
 
 // [[spec/design_output/pull#the-hand-out]]
-test("a pull off a work branch refuses, and names the take", () => {
+test("a pull off trunk and off a work branch refuses, and names the pull from trunk", () => {
   const { it } = doors(
     {},
     { "git rev-parse --abbrev-ref HEAD": { stdout: "claude/roaming-hopper-ab12cd\n" } },
@@ -464,7 +464,63 @@ test("a pull off a work branch refuses, and names the take", () => {
   const { code, said } = heard(() => work(ROOT, ["pull"], it));
 
   assert.equal(code, 2);
-  assert.match(said, /branch take/);
+  assert.match(said, /branch pull from main/);
+  assert.ok(!said.includes("branch take"), "no hand takes a branch");
+});
+
+const FREE = CHILD().replace("group: one-group\n", "");
+const onTrunk = (extra = {}) => ({
+  "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
+  "git rev-list --count HEAD..origin/main": { stdout: "0\n" },
+  ...extra,
+});
+
+// [[spec/design_output/pull#the-engine-takes-the-branch]]
+test("on trunk a cloud box's pull takes a branch, and a desk's pull takes none", () => {
+  const cloud = doors(standing(), onTrunk(), { cloud: true });
+  const taken = heard(() => work(ROOT, ["pull"], cloud.it));
+  assert.equal(taken.code, 0);
+  assert.match(taken.said, /No work branch stands at todo|took|holds it/);
+
+  const desk = doors({ [at("spec/tickets/free-one.md")]: FREE }, onTrunk(), { cloud: false });
+  const { code, said } = heard(() => work(ROOT, ["pull"], desk.it));
+  assert.equal(code, 0, said);
+  assert.match(said, /^work {2}free-one at design\/draft/m, "the free ticket comes");
+  assert.ok(!ranGit(desk.outside).some((one) => one.startsWith("git switch")), "the box stays on trunk");
+});
+
+// [[spec/design_output/pull#the-engine-takes-the-branch]]
+test("on trunk a desk's pull hands out no group and no group's child, and cuts a branch for an open group standing without one", () => {
+  const { it, outside } = doors(standing(), onTrunk(), { cloud: false });
+  const { code, said } = heard(() => work(ROOT, ["pull"], it));
+  assert.equal(code, 0, said);
+  assert.match(said, /work\/one-group is cut and pushed/);
+  assert.ok(!said.includes("a-child at"), "the group's child stays with the group");
+  const ran = ranGit(outside);
+  assert.ok(ran.includes("git branch work/one-group main"), "the branch is cut from trunk");
+  assert.ok(ran.includes("git push -u origin work/one-group"), "and pushed for the cloud");
+
+  const stands = doors(standing(), onTrunk({
+    "git ls-remote --heads origin work/*": { stdout: `${SHA}\trefs/heads/work/one-group\n` },
+  }), { cloud: false });
+  const again = heard(() => work(ROOT, ["pull"], stands.it));
+  assert.ok(!again.said.includes("is cut"), "a group with a branch gets no second one");
+  assert.ok(!ranGit(stands.outside).some((one) => one.startsWith("git branch work/")));
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+test("a free ticket carrying the todo tag comes before the rest on trunk", () => {
+  const { it } = doors(
+    {
+      [at("spec/tickets/a-free.md")]: FREE,
+      [at("spec/tickets/b-free.md")]: FREE.replace("urgency: now", "urgency: now\ntodo: true"),
+    },
+    onTrunk(),
+    { cloud: false },
+  );
+  const { code, said } = heard(() => work(ROOT, ["pull"], it));
+  assert.equal(code, 0, said);
+  assert.match(said, /^work {2}b-free at/m, "the tag beats the name order");
 });
 
 // [[spec/design_output/pull#the-work-answer]]

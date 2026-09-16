@@ -32,9 +32,35 @@ there.
 
 # The hand-out
 
-The pull runs on a work branch. On trunk it runs `branch take`, which claims
-a group and moves the box onto its branch. That is the two-level rule. A box on trunk takes a group, and a box on a branch takes
-the group's leaves around its tickets.
+The pull runs on trunk or on a work branch, and the agent runs the pull and
+no other verb to get work. A box on a branch takes the group's leaves around
+its tickets. What a box on trunk gets depends on where it runs.
+
+## The engine takes the branch
+
+The agent pulls, and the engine decides whether a branch comes with it:
+
+| the box | the plain pull on trunk |
+|---|---|
+| a cloud box | runs `branch take`, which claims a group and moves the box onto its branch |
+| a desk | hands out the free tickets, and takes no branch |
+
+A free ticket stands in no group and is no group, so `freeIn` answers it. A
+group works on a branch, and the cloud takes that branch. So a desk pull
+meeting an open group standing without a branch cuts `work/<name>` from trunk.
+It pushes the branch, and the group leaves the desk's queue with that.
+
+A desk takes a group on two roads alone, and both run through the pull:
+
+| road | the desk types | the engine does |
+|---|---|---|
+| the owner names it | `branch pull <group>` | `take(group)`, which switches onto that branch alone |
+| its urgency reads `now` | `branch pull` | takes the first such group, by name order |
+
+`branch take` stays a verb the engine and a person run, and a name after it
+picks one branch. No hand runs it by itself. A free ticket carrying the `todo`
+tag comes before every other free ticket, so `ticket todo` orders a desk's
+queue the way it orders the notes.
 
 ## The pull fetches first
 

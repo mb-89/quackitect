@@ -123,8 +123,8 @@ function trunkGuard(command, _e, box) {
     "",
     how === "commit" ? `You stand on ${TRUNK}, so this commit would land there.` : `This pushes ${TRUNK}, which a cloud box may never move.`,
     "",
-    "Run `./RUNME.sh branch take` to take a branch and move onto it. Push that",
-    "branch, run `branch done`, and a box off the cloud takes it into trunk.",
+    "Run `./RUNME.sh branch pull`, which takes a branch for a cloud box and moves you onto it.",
+    "Push that branch, run `branch done`, and a box off the cloud takes it into trunk.",
   ].join("\n");
 }
 
