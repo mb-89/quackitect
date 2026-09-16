@@ -52,11 +52,15 @@ Level zero holds no cloud session in this tree. The bridgehead posts to a port n
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/serve.test.js test/level0/work.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -64,14 +68,21 @@ Level zero holds no cloud session in this tree. The bridgehead posts to a port n
 
 <!-- the form is text -->
 
+On a cloud box the pull takes the branch, and that take now ends on the server. A new module probes the health answer at the pointer's port and starts the server detached where nothing answers. The pull's last line says whether the server answers, starts, or fails to start. The ask names `branch take`, and the pull is the road that runs it on a cloud box, so the start lives on the take's return.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
 
+- the change follows the ask on its first two lines. The third waits for a routine run, and the discussion says so
+- the cleanup the change reveals is in the change. The cloud pull test teaches the fake the probe and the start
+
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The third line of the ask reads a cloud session's log off one routine run. Nothing on a desk stands in for it, so that line waits for the next routine run against this tree.
 
 Nothing stands here yet.

@@ -69,6 +69,22 @@ change of a door. Three headless turns say so, against client 2.1.269:
 | the second | completes with the server down |
 | the third | lands on the server running again |
 
+## The cloud starts the server
+
+Nobody presses the hook button on a cloud box. So the pull that takes a
+branch there ends on the server, through `src/scripts/serve.js`. It probes
+the health answer at the port the pointer names. Where nothing answers, it
+starts the server detached, the way the stub's bridgehead does. The pull's
+last line says which of the three stands:
+
+| what stands | the line says |
+|---|---|
+| the server answers | the port it answers at |
+| the start runs | that the server starts detached, and why |
+| the start fails | the shell's last line |
+
+A desk pull starts nothing, and a take that fails starts nothing.
+
 ## A fix reaches the session
 
 The server imports its doors and its libs once, so a fix to one reaches no

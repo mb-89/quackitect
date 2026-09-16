@@ -35,7 +35,7 @@ import {
 } from "./group.js";
 import { handOf, pull, takeable, testVerb } from "./pull.js";
 import { readyToMerge, review } from "./review.js";
-
+import { serving } from "./serve.js";
 export const BRIEF = "HANDOVER.md";
 const COL = { branch: 34, kind: 6, status: 6, why: 24 };
 const MS = 1000;
@@ -67,7 +67,7 @@ export function work(root, argv, doors) {
     review,
     list,
     // [[spec/design_output/pull#the-hand-out]]
-    pull: (it, _name, argv) => pull({ ...it, take: (group) => take(it, group), ready: () => readyToMerge(it) }, argv),
+    pull: (it, _name, argv) => pull({ ...it, take: (group) => serving(it, take(it, group)), ready: () => readyToMerge(it) }, argv),
     test: (it, _name, argv) => testVerb(it, argv),
   };
   if (doing[what] && LOUD.includes(what)) {
