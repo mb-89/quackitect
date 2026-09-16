@@ -2,10 +2,20 @@
 kind: [[ticket]]
 state: open
 urgency: soon
+step: design/person-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: "design/review failed back 2 times: Name the note beside the number in a label. A leaf reads several notes, and the material flattens them. So chapter numbering hands the classify call two labels under one number, and a refusal names two rules."
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -89,7 +99,6 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -100,11 +109,17 @@ record:
     hash_before: bbee3dab2891bec671a6779c41a8ed42173cc93a
     hash_after: bbee3dab2891bec671a6779c41a8ed42173cc93a
     returns: 1
-    why: "Carry each rule's chapter number through `forEvidence`. The hand-out numbers through `actionables`, so a refusal naming 13 names the chapter's 15.; Name the character the mark writes. Every reader strips it the way `actionables` strips the star.; Add `spec/schemas/guidance.schema.yaml` to the table of what changes. Name the second mark beside the `detailMarker` it carries.; Add [[spec/design_output/pull#the-checks]] to the table of what changes. It says a `breaks` answers `refused`, and the numbered labels replace that.; Say what the judge does over a leaf whose rules all carry the mark. Today it stands silent where the reads name no rule."
+    why: Carry each rule's chapter number through `forEvidence`. The hand-out numbers through `actionables`, so a refusal naming 13 names the chapter's 15.; Name the character the mark writes. Every reader strips it the way `actionables` strips the star.; Add `spec/schemas/guidance.schema.yaml` to the table of what changes. Name the second mark beside the `detailMarker` it carries.; Add [[spec/design_output/pull#the-checks]] to the table of what changes. It says a `breaks` answers `refused`, and the numbered labels replace that.; Say what the judge does over a leaf whose rules all carry the mark. Today it stands silent where the reads name no rule.
   - step: design/draft
     hand: box d42624a67d18a8
     hash_before: a8c792b794309a5f97e52f26644a33057d9a1980
     hash_after: 5727411a42b74034a29fcc054a42f749386edc09
+  - step: design/review
+    hand: box d42624a67d18a8 · helper-4
+    hash_before: 8ca072d847c565e5fadaea8b05ec7454957981e4
+    hash_after: 8ca072d847c565e5fadaea8b05ec7454957981e4
+    returns: 2
+    why: Name the note beside the number in a label. A leaf reads several notes, and the material flattens them. So chapter numbering hands the classify call two labels under one number, and a refusal names two rules.
 ---
 
 # Ask
@@ -122,6 +137,16 @@ Today the judge answers breaks over every hand-back on a cloud box. One run met 
 - `./RUNME.sh check` answers 0
 
 # design
+
+## person-1
+
+<!-- answers the question the engine asks -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
 
 ## draft
 
@@ -171,11 +196,7 @@ answer rules reach the answer gate alone, which holds them already.
 
 fail
 
-- Carry each rule's chapter number through `forEvidence`. The hand-out numbers through `actionables`, so a refusal naming 13 names the chapter's 15.
-- Name the character the mark writes. Every reader strips it the way `actionables` strips the star.
-- Add `spec/schemas/guidance.schema.yaml` to the table of what changes. Name the second mark beside the `detailMarker` it carries.
-- Add [[spec/design_output/pull#the-checks]] to the table of what changes. It says a `breaks` answers `refused`, and the numbered labels replace that.
-- Say what the judge does over a leaf whose rules all carry the mark. Today it stands silent where the reads name no rule.
+- Name the note beside the number in a label. A leaf reads several notes, and the material flattens them. So chapter numbering hands the classify call two labels under one number, and a refusal names two rules.
 
 # implement
 
@@ -185,7 +206,7 @@ fail
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+<!-- the same tests pass -->
 
 <!-- the form is command -->
 
