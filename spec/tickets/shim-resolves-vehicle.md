@@ -275,21 +275,21 @@ The ticket schema now lets anyone write the ask. The door kept a hand off two as
 
 <!-- the form is files -->
 
-spec/tickets/shim-resolves-vehicle.md
-spec/tickets/the-shim-resolves-the-vehicle.md
-spec/design_input/a-stub-takes-its-vehicle.md
-spec/guidance/review/reviewing.md
-src/stub/RUNME.sh
-src/scripts/vehicle.js
-src/scripts/cli.js
-src/scripts/review.js
-spec/schemas/ticket.schema.yaml
-.claude/skills/level0/lib/ticket.js
-test/contract/stub.test.js
-test/level0/vehicle.test.js
-test/level0/ticket.test.js
-spec/design_output/vehicle.md
-spec/design_output/schema.md
+- spec/tickets/shim-resolves-vehicle.md
+- spec/tickets/the-shim-resolves-the-vehicle.md
+- spec/design_input/a-stub-takes-its-vehicle.md
+- spec/guidance/review/reviewing.md
+- src/stub/RUNME.sh
+- src/scripts/vehicle.js
+- src/scripts/cli.js
+- src/scripts/review.js
+- spec/schemas/ticket.schema.yaml
+- .claude/skills/level0/lib/ticket.js
+- test/contract/stub.test.js
+- test/level0/vehicle.test.js
+- test/level0/ticket.test.js
+- spec/design_output/vehicle.md
+- spec/design_output/schema.md
 
 ## verdict
 

@@ -35,7 +35,7 @@ The canary rides the first answer, and the work the agent names as next follows 
 Without it the agent writes the canary line, ends the turn, and the owner types the same ask twice. The log of this box carries that moment at the first answer of the session.
 
 - the canary text says the line rides an answer and closes no turn, and `./RUNME.sh standing` prints that text
-- a stop after a first answer that names a next step meets the hold-open line, and a test in `test/level0` drives it
+- a stop after a first answer naming a next step meets the hold-open line, and a test drives it
 
 # do
 
