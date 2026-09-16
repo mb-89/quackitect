@@ -10,10 +10,11 @@ const OWNER = new Set(["composer", "sdk"]);
 const REACHES = new Set(["AskUserQuestion", "mcp__level0__report"]);
 export const SPOKE = "agent.spoke";
 
+// The owner reads the chat, and the log reads the report, so a mid-turn answer goes to both. [[spec/design_output/level0#the-reply-line]]
 export const SAYS = (why) =>
   [
-    `${why}, and nothing has answered it. Answer it before the next tool call: as the first`,
-    "text of a turn, or between calls through mcp__level0__report with the text.",
+    `${why}, and nothing has answered it. Answer it before the next tool call: write it in the`,
+    "chat as text, and call mcp__level0__report with the same text so the log carries it.",
     "Say what you understood and what you do next. Then work.",
   ].join(" ");
 
@@ -88,12 +89,12 @@ export function pays(box, text) {
   if (!demand) {
     box.log.say("info", "reply", text, { text });
     box.spoken = text;
-    return "The reply stands in the log. Nothing asked for one, so carry on.";
+    return "The reply stands in the log. Nothing asked for one, so carry on, and write it in the chat too where the owner reads it.";
   }
   const lacks = demand.fits?.(text) ?? "";
   if (lacks) return lacks;
   paid(box, text);
-  return `The reply stands in the log, and it answers: ${demand.why}. Carry on.`;
+  return `The reply stands in the log, and it answers: ${demand.why}. Write it in the chat too, as text, and carry on.`;
 }
 
 function paid(box, text) {

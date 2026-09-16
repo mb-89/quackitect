@@ -697,6 +697,11 @@ The pay writes the text as the `reply` line at `info`, once, with `answers:
 where no pay stands. For details, see
 [[spec/design_output/log#the-answer-under-its-prompt]].
 
+The owner reads the chat, and a hook writes no chat text. So a mid-turn answer
+goes to both places. The agent writes it in the chat as text, and calls the
+report with the same text for the log. The refusal and the report's result say
+so. The report pays the demand at once, so no call after it meets the door.
+
 ## The owner binds god
 
 `engine.binding` at `god` lets every hold of this door through, with a `god`
