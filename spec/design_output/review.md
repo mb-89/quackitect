@@ -5,7 +5,7 @@ kind: [[design_output]]
 # Scope
 
 `src/scripts/review.js` gathers what a reader wants off a branch. This note
-covers the verb, the worktree it runs in, and the five questions it answers.
+covers the verb, the worktree it runs in, and the questions it answers.
 
 # What the reader is
 
@@ -86,7 +86,7 @@ removing the worktree takes the whole of it away.
 A red check answers with the lines naming the break. It takes every `not ok`
 row the test runner writes, and the last lines of the run where it writes none.
 
-# The five questions
+# The questions
 
 They live in `spec/guidance/review/reviewing.md`, written as actionables the way every
 other guidance note is. Level zero hands them to every session, so the reader

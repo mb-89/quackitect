@@ -216,7 +216,7 @@ test("a command touching no commit answers nothing", () => {
   }
 });
 
-// [[spec/design_output/bash#a-branch-name-holds-five]]
+// [[spec/design_output/bash#a-branch-meets-the-cap]]
 test("a branch cut past the cap is refused, and one inside it passes", () => {
   assert.deepEqual(branchIn("git switch -c a-name-that-runs-past-the-cap"), [
     "a-name-that-runs-past-the-cap",

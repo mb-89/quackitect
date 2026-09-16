@@ -9,8 +9,8 @@ the fakes beside them, and the contract tests over both.
 
 # One door per outside thing
 
-A door is the one place this tree reaches a thing outside it. There are five,
-each a function answering an object of verbs:
+A door is the one place this tree reaches a thing outside it. Each is a
+function answering an object of verbs, and `./RUNME.sh doors` names every one:
 
 | door | reaches | file |
 |---|---|---|
@@ -20,14 +20,13 @@ each a function answering an object of verbs:
 | `clock` | the time now | `src/doors/clock.js` |
 | `log` | the log every door writes | `src/doors/log.js` |
 
-Everything above a door takes it as an argument. The command line builds all
-five once and hands them on, so a caller names what it reaches and a test hands
+Everything above a door takes it as an argument. The command line builds every
+door once and hands them on, so a caller names what it reaches and a test hands
 in something else.
 
 Vale holds the line: `DoorsOnly` refuses a `node:` import, a `Date.now`, a
-`new Date()` and a `Math.random` anywhere but `src/doors`. Five modules pass,
-because they reach nothing: `node:path`, `node:url`, `node:test`,
-`node:assert` and `node:assert/strict`.
+`new Date()` and a `Math.random` anywhere but `src/doors`. The modules reaching
+nothing pass, and `spec/config/styles/VoiceVale/DoorsOnly.yml` names them.
 
 # A door standing on another
 
@@ -84,6 +83,6 @@ No pattern holds a rule spanning two folders, so the command line holds this
 one. `./RUNME.sh doors` reads both folders and names every door standing
 without a contract test. `check` runs it after the tests, before the rules.
 
-Two more contract tests stand there, because they drive a real thing as well.
+Other contract tests stand there too, because they drive a real thing as well.
 `vale.test.js` runs the rules through Vale itself, and `tree.test.js` reads the
 files this tree tracks.

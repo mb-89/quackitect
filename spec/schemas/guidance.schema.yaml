@@ -9,8 +9,9 @@
 # The body half is this project's own, borrowed from https://document-schema.org.
 # A value written [[like this]] is a link, and the name inside is the value.
 #
-# A bound a rule already holds stays with that rule. VoiceVale/LongSentence
-# bounds every sentence here at 25 words, so this file names no word count.
+# A bound a rule already holds stays with that rule. The sentence layer of
+# spec/schemas/paragraph.schema.yaml bounds every sentence here, so this file
+# names no word count.
 
 kind: guidance
 

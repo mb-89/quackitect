@@ -102,7 +102,7 @@ whole entry.
 VS Code carries a JSON language service already, so `json.schemas` in
 `.vscode/settings.json` points the tracked file at the schema beside it. A
 person editing that file meets a missing key and a wrong type as they type,
-and the extensions this tree recommends stay at two.
+and `.vscode/extensions.json` names the extensions this tree recommends.
 
 # The resolver holds the layers
 
@@ -155,15 +155,15 @@ local file names resolves, and nothing knows its type.
 # The magic numbers stay
 
 Biome carries `noMagicNumbers`, and this tree holds it off in
-`spec/config/biome.json`. Turning it on names 63 lines under `src` and `test`,
-and 69 counting the plugin's own modules:
+`spec/config/biome.json`. Turning it on there and running `./RUNME.sh lint`
+names every line it reaches, and they fall in these kinds:
 
-| where | lines | what they are |
-|---|---|---|
-| a test | 43 | the numbers a case names out loud |
-| `padEnd` and `padStart` | 15 | the column widths of a printed table |
-| a `slice` or a `repeat` | 2 | the offsets of a timestamp |
-| `src/scripts/copilot.js` | 3 | a deadline and a timeout, in milliseconds |
+| where | what they are |
+|---|---|
+| a test | the numbers a case names out loud |
+| `padEnd` and `padStart` | the column widths of a printed table |
+| a `slice` or a `repeat` | the offsets of a timestamp |
+| `src/scripts/copilot.js` | a deadline and a timeout, in milliseconds |
 
 The rule takes no options in Biome 2.5.12, so a tree turning it on takes every
 line above with it. Its own exemptions are the whole of what a person gets:

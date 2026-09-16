@@ -170,7 +170,7 @@ test("a write to the field of another leaf is refused", () => {
   assert.deepEqual(rules(said, other), ["Ticket.lint"]);
 });
 
-// [[spec/design_output/schema#the-verbs-own-three-fields]]
+// [[spec/design_output/schema#the-verbs-own-their-fields]]
 test("an edit to a field the verbs own is refused, and the line points at it", () => {
   for (const [was, now, rule, line] of [
     ["state: open", "state: closed", "Ticket.state", 3],
@@ -187,7 +187,7 @@ test("an edit to a field the verbs own is refused, and the line points at it", (
   }
 });
 
-// [[spec/design_output/schema#the-verbs-own-three-fields]]
+// [[spec/design_output/schema#the-verbs-own-their-fields]]
 test("a field no rule marks stands, so a person's fields reach no door", () => {
   assert.deepEqual(weighed(open.replace("urgency: now", "urgency: soon")), []);
 });

@@ -142,7 +142,7 @@ export function skipsTheHook(command) {
   return false;
 }
 
-// [[spec/design_output/bash#a-branch-name-holds-five]]
+// [[spec/design_output/bash#a-branch-meets-the-cap]]
 export function branchIn(command) {
   const out = [];
   for (const one of partsOf(command).segments) {

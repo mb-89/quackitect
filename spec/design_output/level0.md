@@ -46,27 +46,10 @@ where both roots are one folder.
 | `{ spawn, back }` | spawns the helper, and posts what it says under the event `back` names |
 | nothing, the server down | hands the event on, and writes one `warn` line, once |
 
-The server is plain node under `src/bridge`, one file a topic:
-
-| file | holds |
-|---|---|
-| `server.js` | the doors, god mode and the switch in `decide` |
-| `guidance.js` | the rules, the canary and the compaction |
-| `answer.js` | the demand for a reply, and the turn's end |
-| `ask.js` | the ask from the sidebar |
-| `status.js` | the shape of a full report |
-| `report.js` | the report tool |
-| `stop.js` | the hold and the tooth |
-| `search.js` | the client's search tools |
-| `write.js` | the write door |
-| `bash.js` | the command door |
-| `code.js` | the size ceiling of code |
-| `apply.js` | the batch edit |
-| `tools.js` | the draft check and the mint |
-| `review.js` | the review by a helper |
-| `projection.js` | the files the tree projects |
-| `config.js` | the config a door asks |
-| `vehicle.js` | the vehicle, the project and the port |
+The server is plain node under `src/bridge`, one file a topic, and the header
+of each file says which door it holds. `server.js` holds the doors, god mode
+and the switch in `decide`. The server holds every door of this note, and the
+module before the bridgehead stands nowhere.
 
 The log, the index and Vale stand behind doors under `src/doors`. The server
 logs every event at `debug`, whole, and holds the state in one box a work
@@ -81,10 +64,6 @@ every restart of the server, and the client reloads the bridgehead for no
 change of a door. Three headless turns say so, against client 2.1.269. The
 first posts 186 events. The second completes with the server down. The third
 lands on the server running again.
-
-The server holds every door of this note, and the module before the bridgehead
-stands nowhere. The chapters below describe the doors, and the file table
-above says which server file holds each.
 
 # The harness surface
 
@@ -109,7 +88,7 @@ that hook, and the chain carries on without it.
 So on that client level zero writes no stamp, writes no log line, reads no
 guidance and holds no write door. The prompt says nothing about it.
 
-Three readings of the same module, and what each one tells you:
+The readings of the same module, and what each one tells you:
 
 | what you run | what it says about a moved method |
 |---|---|
@@ -174,7 +153,7 @@ validate`, and the client then loads none of the module:
 | no line in `./RUNME.sh log` | every door in the module stays silent |
 | the canary is absent from every answer | the standing layer reaches no session |
 
-So one hook of the wrong shape takes the whole cage off, and the four readings
+So one hook of the wrong shape takes the whole cage off, and the readings
 above are how a person catches it. Run `claude plugin validate
 .claude/skills/level0` on the client of the day, because the shape a hook takes
 moves with the build.
@@ -383,7 +362,7 @@ client 2.1.42, reads the box around it:
 | `hasTrustDialogAccepted`, per project | `false`, and the top level holds no key |
 | permission mode | auto, and no call there raises a prompt |
 
-Two things reach a cloud box today:
+What reaches a cloud box today:
 
 - `claude --plugin-dir .claude/skills/level0`, which loads the folder for that
   session and skips the scan.
@@ -621,7 +600,7 @@ The refusal carries the sentence itself, so the session reads what to say. Any
 later answer holding it clears the debt. That answer writes the `info` line the
 whole canary writes, and every call passes again.
 
-Two roads stay open, because this session's own debt reaches past both:
+These roads stay open, because this session's own debt reaches past them:
 
 - a subagent carries a canary of its own, so `e.agentId` passes
 - `AskUserQuestion` is the road to the owner, so `reachesTheOwner` passes
@@ -646,11 +625,8 @@ the two now say the same thing.
 
 # The owner's prompt comes first
 
-`spec/guidance/working.md` opens with two rules: answer the owner before the
-next tool call, and open that answer by saying back what you understood.
-
-Both hold exactly as well as a session remembers them. So a door holds them
-instead.
+The opening rules of `spec/guidance/working.md` hold exactly as well as a
+session remembers them. So a door holds them instead.
 
 ## What the door reads
 
@@ -708,13 +684,8 @@ line at `info` in its place. For details, see
 
 ## Which prompt opens a turn
 
-`e.origin.kind` says who asks. Seven kinds carry a person:
-
-- `composer`, `bridge` and `sdk`
-- `scheduled-trigger` and `slack-ping`
-- `channel` and `auto-continuation`
-
-A routine's prompt belongs to the person behind it.
+`e.origin.kind` says who asks. `opensATurn` in `lib/answer.js` names the kinds
+carrying a person. A routine's prompt belongs to the person behind it.
 
 Every other kind is a machine talking to the session, and a machine waits. The
 tooth submits prompts under `plugin`, and a session owes no readback to itself.
@@ -888,7 +859,7 @@ takes its row, and the answer cell says what blocks it. The finding reads
 | the heading | `What the agent needs`, at any level |
 | the columns | `No.`, `question` and `proposed answer`, in order |
 | the first cell of a row | 1, 2, 3 in order |
-| every other cell | no code, and 12 words at most |
+| every other cell | no code, and `CELL_WORDS` in `lib/answer.js` words at most |
 | the body | one row at least, and one saying nothing waits where nothing does |
 
 ## The cap counts the prose
@@ -927,10 +898,10 @@ root first and passing a relative path holds under either shell.
 That fault stands in this tree twice over: once from a cloud box, and once from
 a hand writing the same shape a week before.
 
-# A name holds five words
+# A name meets the cap
 
-A heading, a file name, a folder name and a branch name each hold five words at
-most. Vale counts a heading, through `ShortHeading`, and refuses a dash or a
+A heading, a file name, a folder name and a branch name each hold the words
+`names.words` caps. Vale counts a heading, through `ShortHeading`, and refuses a dash or a
 colon inside one through `OneTitle`, because both turn one title into two.
 
 Vale reads what a file holds, and its path stays outside that. So
@@ -957,13 +928,10 @@ answers that the rules pass.
 
 | folder | holder |
 |---|---|
-| `spec/config/styles/VoiceVale` | Vale reads it over prose and code |
-| `spec/config/styles/VoiceShape` | Vale reads it over the shape of a note or a rule file |
-| `spec/config/styles/VoiceScript` | Vale reads it over a shell script |
+| `spec/config/styles` | Vale reads it, and `.vale.ini` says which style reaches which path |
 | `spec/config/biome.json` | Biome reads it |
 
-`[formats]` in `.vale.ini` maps `yml` to `md`, so Vale reads a rule file at all.
-A path-scoped section names which shape rules reach which folder.
+The comments in `.vale.ini` say why each section stands.
 
 The prose rules stay away from a rule file, because such a file lists the
 words they refuse.
@@ -1032,7 +1000,7 @@ counts what the reader lets stand.
 
 The tagger carries no more than that. It reads a participle standing as an
 adjective, `a refused call`, as a verb like any other. So those stay on the
-rule's exception list, ten words where sixteen stood. A bench under
+rule's exception list in `spec/schemas/paragraph.schema.yaml`. A bench under
 `.se/scripts` runs both readers over every note, and it is the way to read a
 change to either.
 

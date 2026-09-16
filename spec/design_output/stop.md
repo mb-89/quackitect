@@ -63,7 +63,7 @@ turn's end.
 ## A turn with no line
 
 The rule `the-last-line-names-no-stop` fires where the last line names no
-reason the tree holds. It stands on the continue side at fifty, under the
+reason the tree holds. It stands on the continue side, under the
 owner's hold and over the claimed reasons. So a turn without the line holds
 open. The re-prompt lists every id one to a line. The hold at stop and a fresh
 session end a turn over it, and the tooth off ends any turn.
@@ -86,7 +86,7 @@ and at the turn's end:
 
 The report tool passes the hold at `stop`, so the agent hands the last report
 in before the turn ends. The hold at `stop` fires the rule
-`the-owner-holds-this-session` on the stop side at 85, over every continue
+`the-owner-holds-this-session` on the stop side, over every continue
 rule but the owner's own word. A `hold` line at `debug` says what the door does.
 
 ## The canary ends turn one
@@ -106,24 +106,13 @@ takes the whole tooth out, and the call stands as part of the tooth.
 
 Every rule carries a side, a priority and a way of firing. The turn ends where
 the reason to stop stands above every reason to continue that fires.
-
-| priority | side | rule | how |
-|---:|---|---|---|
-| 100 | stop | the owner asks to talk | claimed |
-| 99 | continue | the owner says carry on | claimed |
-| 95 | stop | the session is new | mechanical |
-| 90 | stop | blocked on what only the owner gives | claimed |
-| 80 | continue | work still stands | mechanical |
-| 45 | stop | the work stands complete | claimed |
-| 10 | stop | a wish to give an update | claimed |
-| 0 | continue | the tooth is out | mechanical |
+`spec/config/stop/level0.yml` holds every rule with its side and its priority.
 
 An unclaimed turn end carries the mechanical reasons to stop alone. A firing
-continue rule above them holds the turn open, and the hook re-prompts.
-
-A turn nothing fires over ends, because the stop side stands at a floor of
-zero. So a continue rule wins by standing above that floor, and a tie goes to
-the stop side.
+continue rule above them holds the turn open, and the hook re-prompts. A turn
+nothing fires over ends, because the stop side stands at a floor of zero. So a
+continue rule wins by standing above that floor, and a tie goes to the stop
+side.
 
 Four bands hold the numbers, so a later level lands without renumbering:
 
@@ -164,7 +153,7 @@ a hole somebody walks through, so the name reaches a function alone.
 | `ticket-in-hand` | a hold stands under `.se/hold`, or an open private ticket stands |
 | `group-in-hand` | this branch's group carries a take with no hand-back |
 | `queue-waits` | a desk bound to the queue stands on trunk, and `queueHolds` reads a free open ticket or a group at `now` |
-| `session-is-new` | under 10 tool calls stand behind this session, and the hook grants no stop |
+| `session-is-new` | fewer tool calls than `FRESH` in `lib/stop.js` stand behind this session, and the hook grants no stop |
 | `stop-hook-off` | `spec/config/level0.json` says `stop.enabled` is false |
 | `never` | nothing, which is what an unbuilt rule takes |
 
@@ -218,14 +207,8 @@ maintainer edits level zero mid-session.
 
 `spec/config/stop/level0.yml` holds one entry per rule. `stop.js` reads every
 file in that folder and pools the entries, so a later level drops `level1.yml`
-beside it and changes no code.
-
-    - id: the-owner-asks-to-talk
-      side: stop
-      priority: 100
-      decides: claimed
-      asks: Does the last thing the owner said open a discussion?
-      says: The owner opens a discussion, so this turn ends and waits.
+beside it and changes no code. The header of that file says what each key
+holds.
 
 A rule missing an id, a side, a priority or a way of deciding stands out of the
 vote. Its file comes back named on one `warn` line, and a broken rule file

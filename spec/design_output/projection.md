@@ -64,7 +64,7 @@ One slash command per value a person sets, under `.claude/commands`:
 
 | the declaration says | the projection writes |
 |---|---|
-| `log.level`, three options in the schema | three files, one per option |
+| `log.level`, an enum in the schema | one file per option |
 | `stop.enabled`, a boolean | two files, `true` and `false` |
 | `answer.words`, a number | one file, taking the value as an argument |
 | `stop.mostInARow`, a number | one file, taking the value as an argument |
@@ -166,21 +166,8 @@ writes one rule file per check:
 The schema holds the values and `lib/paragraph.js` holds the Tengo. So a cap
 moves in one file, and the rule file carrying it follows at the next
 projection. `wrap` reads `none`, because a rule file is YAML and its mark
-stands in a comment at the top.
-
-| layer | rule | what it reads |
-|---|---|---|
-| characters | `Characters.yml` | the punctuation set, by name |
-| markup | `Markup.yml` | the heading cap, the one title and the strong-lead cap |
-| shape | `Shape.yml`, `ShapeAnswer.yml` | the paragraphs one run holds |
-| shape | `Paragraph.yml`, `ParagraphAnswer.yml` | the sentences one paragraph holds |
-| sentence | `Sentence.yml` | the words one sentence holds |
-| sentence | `ListItem.yml`, `CodeSpans.yml` | the tighter cap in a list item, and the spans |
-| grammar | `Auxiliary.yml`, `Progressive.yml` | the chains the schema refuses |
-| grammar | `Modal.yml`, `ModalRequirement.yml` | every modal the register leaves out |
-| grammar | `Hedge.yml` | the hedges the schema lists, a phrase as one token |
-| grammar | `Contraction.yml`, `Latin.yml`, `EtCetera.yml` | the short forms, with their swaps |
-| grammar | `PastTense.yml` | the tenses, with the exceptions the retro grows |
+stands in a comment at the top. The folder `spec/config/styles/VoiceParagraph`
+holds one file per check, and the comment at the top of each names its layer.
 
 ## A layer writes two files
 

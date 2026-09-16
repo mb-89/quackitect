@@ -89,7 +89,7 @@ Proven against a real copy, in `test/contract/vehicle.test.js`:
 |---|---|
 | its identity | its own, and other than its origin's |
 | its roots | itself as method and as work |
-| its contract tests | 73 of 73, out of its own folder |
+| its contract tests | every one green, out of its own folder |
 | its answer to `vehicle` | no path naming its origin |
 
 A fresh copy takes two steps that any fresh clone takes: `git init`, and one
