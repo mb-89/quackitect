@@ -100,14 +100,14 @@ record:
 # Ask
 
 <!-- gain, as text: what is gained by doing it, and not only what it does -->
-Two brands in one editor get in each other's way nowhere, and a vehicle carries its own name from the day it is made.
+Two brands stand side by side in one editor, and a vehicle carries its own name from the day the button makes it.
 
 <!-- breaks, as text: what breaks if it is never done -->
 Every vehicle calls itself quackitect, and two of them fight over one extension id.
 
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
-- the editor link derives <brand>.<brand> and <brand>.sidebar from the folder name, and writes the manifest at link time
-- a vehicle draws its initials as its icon, in a file under spec/config the owner swaps, and this tree keeps its icon
+- the editor link derives `<brand>.<brand>` and `<brand>.sidebar` from the folder name, and writes the manifest at link time
+- a vehicle draws its initials as its icon, in a file under `spec/config` the owner swaps. This tree keeps its icon
 - the 30 places that write the name in read the brand instead, listed in the design output
 - two trees linked into one editor show two entries, proven in the editor test with two fake folders
 
