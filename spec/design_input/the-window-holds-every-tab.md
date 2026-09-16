@@ -14,9 +14,9 @@ costs more than it returns.
 
 # The header holds the tabs
 
-The header carries the tabs, in a row. The help key stands at its right end, as
-`alt+?` does today. Everything else standing in that header today moves into
-the help.
+The header carries the tabs, in a row, and `alt+?` at its right end. Those two
+are the whole header. Everything else standing there today moves into the help,
+`alt+L` and the log level among them.
 
 A tab carries a number, one to nine, and the number opens it. Nine tabs is the
 ceiling, and a tree wanting a tenth says so then.
@@ -38,17 +38,22 @@ Every key comes out of a registration, and no hand writes a second list. What
 the window knows about the open tab and the selected thing is what the help
 draws. A key nobody registers reaches the help nowhere, and works nowhere.
 
-# The right pane holds one
+# The window is a split
 
-The pane holds the help, the details or the filter, and one of them at a time:
+The left side holds the bigger picture, and the right side holds the details of
+whatever stands selected there. That split is the window, and every tab takes
+it.
 
-| the key | what the pane holds |
+The right side holds one thing at a time:
+
+| the key | what the right side holds |
 |---|---|
+| Enter | the details of the selection, as the log rows show today |
 | `alt+?` | the help |
-| Enter, on the log | the details of the selected row |
 | `alt+f` | the filter |
 
-The key opening a pane closes it again, and the pane stands shut after that.
+The key opening one closes it, and the right side goes back to the details. So
+one key opens and shuts one thing, and the details are the resting state.
 
 # The footer carries status
 
@@ -65,10 +70,15 @@ size, and the tab between them scrolls.
 
 # The keys and the mouse
 
-The arrows scroll the pane, and `w` and `s` move the log, the way they do
-today. The mouse is the open question. A click on a tab opens that tab, and the
-owner wants to read how well that holds in the editor's own terminal. The
-numbers on the tabs are the answer where the mouse falls short.
+The numbers one to nine open the tabs, wherever a field takes no letters. Tab
+and the arrows move inside the two sides of the split. A field taking letters
+holds every key it reads, and the numbers reach the tabs again once it lets go.
+
+`alt+?` is the one way to the help, and the question mark alone goes.
+
+The mouse is the open question. A click on a tab opens that tab, and the owner
+wants to read how well that holds in the editor's own terminal. The numbers on
+the tabs are the answer where the mouse falls short.
 
 # What the framework gives
 
@@ -91,6 +101,24 @@ What no library gives, and this tree writes:
 - the hit test taking a click to the tab under it
 - the registry naming the open tab and the selected thing
 - the footer, its fixed places, and each mark
+
+# Where a person watches it
+
+A cloud session shows messages, files and diffs. The docs name the ways in as a
+browser, a phone, a desktop app and a terminal, and each one opens on the
+conversation. A shell inside the session's own box stands outside that list, so
+a window built here reaches a person three ways:
+
+| the road | what a person gets |
+|---|---|
+| `claude --teleport` | the session and its branch land in their own terminal, where the window runs whole |
+| `--frame` | one drawing of the window, for a reader at a screen with no terminal |
+| the sidebar | the editor draws the same values, and the panel holds the local road |
+
+The browser road waits on a copy this tree writes twice. Bubble Tea builds for
+a terminal, and a build for the browser fails on the terminal it asks for. So
+the window stays a terminal window, and the frame is what a cloud session
+shows.
 
 # What waits
 
