@@ -52,11 +52,15 @@ An Ask minted with a tag, a bare path or a passive line opens as it stands. The 
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/ask-lint.test.js test/level0/ticket-verb.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -64,11 +68,16 @@ An Ask minted with a tag, a bare path or a passive line opens as it stands. The 
 
 <!-- the form is text -->
 
+The open verb runs the voice rules over the Ask before it writes the open state. An Ask breaking a rule at the error level refuses the open, and the refusal names the line and the rule. The draft stands as it is until a person rewrites it. A warning leaves the open alone, and a box with no Vale opens as it stands. A new module holds the run, so the ticket module stays one topic.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask. The child ticket it names lints clean at the error level now
+- the cleanup the change reveals is in the change. The Vale run stands in a module of its own
 
 # Discussion
 
