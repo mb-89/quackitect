@@ -155,8 +155,8 @@ A cloud routine fires into a bare stub repo, and the cage holds the second sessi
 A stub works on desks alone, and the cloud road stays closed.
 
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
-- session.start in the bridgehead takes the install road where the register holds no such vehicle: `git clone <upstream> ~/.se/vehicles/<brand>`, then its RUNME.sh, then register and attach
-- a test with a fake git and a fake disk records the clone with the URL from vehicle.json and reads .se/project.json in the stub afterwards
+- session.start in the bridgehead takes the install road where the register holds no such vehicle. It runs `git clone <upstream> ~/.se/vehicles/<brand>`, then its RUNME.sh, then register and attach
+- a test with a fake git and a fake disk records the clone with the URL from `vehicle.json`. It reads `.se/project.json` in the stub afterwards
 - the first session ends on one line saying the vehicle stands, and the second session answers the canary
 - one routine run against a stub repo proves it, read off the run's log
 
