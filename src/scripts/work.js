@@ -33,13 +33,13 @@ import {
   withoutField,
   WORK_BRANCH,
 } from "./group.js";
-import { handOf, pull, takeable, testVerb } from "./pull.js";
+import { handOf, pull, takeable } from "./pull.js";
 import { readyToMerge, review } from "./review.js";
 import { serving } from "./serve.js";
+import { testVerb } from "./test-verb.js";
 export const BRIEF = "HANDOVER.md";
 const COL = { branch: 34, kind: 6, status: 6, why: 24 };
 const MS = 1000;
-
 // [[spec/design_output/work#a-merged-branch-closes]]
 export const MINE = /^(work|claude)\//;
 
