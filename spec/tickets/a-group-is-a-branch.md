@@ -74,6 +74,10 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 step: children
 process: [[group]]
+record:
+  - step: children
+    hand: box b9be613824b0
+    hash_before: a8dab8fe4475b5f06e5e028a654b9131f90820d8
 ---
 
 # Ask
