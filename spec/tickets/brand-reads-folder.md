@@ -89,12 +89,18 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-brand-reads-the-folder
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 02ae9414623e
     hash_before: af9a78c7f10daebe7b393d747fc593eeb7757fd3
     hash_after: af9a78c7f10daebe7b393d747fc593eeb7757fd3
+  - step: design/review
+    hand: box 02ae9414623e · helper-2
+    hash_before: 78bc292e6b744b1ea0c20fbd6a829ef91d9a56d2
+    hash_after: 78bc292e6b744b1ea0c20fbd6a829ef91d9a56d2
+    returns: 1
+    why: The approach carries the manifest, the ids and the icon. The list and the; editor test wait on a second draft.; the design output holds a list of the places that write the name in, and the approach links it; the plugin manifests join the table, where each writes the name as the plugin name. So two vehicles hand the client one name twice; the approach plans a test for each pure function. The two fake folders the ask names wait on a test over the link verb; the stamp writes the name, the display name, the publisher, the container and the view. The `when` clause of the view carries the brand too; the manifest and the icon travel tracked, so the link dirties every vehicle past this brand. The stamp reads idempotent in this tree alone; the diff touches this ticket and its group ticket, each a trivial fix; `./RUNME.sh check` answers 1 on the branch, from a server absent at its port; the handback waits on a retro, which the branch review names
 ---
 
 # Ask
@@ -162,6 +168,18 @@ same bytes.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail. The approach carries the manifest, the ids and the icon. The list and the
+editor test wait on a second draft.
+
+- the design output holds a list of the places that write the name in, and the approach links it
+- the plugin manifests join the table, where each writes the name as the plugin name. So two vehicles hand the client one name twice
+- the approach plans a test for each pure function. The two fake folders the ask names wait on a test over the link verb
+- the stamp writes the name, the display name, the publisher, the container and the view. The `when` clause of the view carries the brand too
+- the manifest and the icon travel tracked, so the link dirties every vehicle past this brand. The stamp reads idempotent in this tree alone
+- the diff touches this ticket and its group ticket, each a trivial fix
+- `./RUNME.sh check` answers 1 on the branch, from a server absent at its port
+- the handback waits on a retro, which the branch review names
 
 # implement
 
