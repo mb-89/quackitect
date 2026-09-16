@@ -30,7 +30,9 @@ type Tree struct {
 	Cols   []Column
 	Items  []Item
 	Nests  bool
+	Schema Schema
 	filter Filter
+	edit   *Edit
 	shut   map[string]bool
 	flat   []twig
 	sel    int

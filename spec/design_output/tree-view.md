@@ -9,7 +9,8 @@ and a table at once. This note covers the items, the columns, the nesting and
 what the view draws. Every tab drawing rows with a shape takes this one view.
 [[spec/design_input/the-tree-view-editor]]
 
-The editing of a cell waits for a ticket of its own.
+Sorting by several columns, the presets panel, lazy loading and a page size
+each wait for a ticket of their own.
 
 # The view draws a tree
 
@@ -148,3 +149,52 @@ past them.
 `src/yaml` holds the reader, as a module of its own that takes no dependency.
 The server and the viewer both take it, so one subset stands and no module
 copies it. [[spec/design_output/schema#the-yaml-a-schema-reads]]
+
+# A cell takes an edit
+
+A person edits a value in the cell holding it, and the note stays shut. So a
+tab full of states is a tab where the states change, one key a change.
+
+| the key | what the edit does |
+|---|---|
+| open | the cell takes a line to type into, holding the value it carries |
+| Enter | the view writes the value, and the cell stands as it reads |
+| Escape | the view puts the old value back |
+| Enter with shift | the view writes the value into every row it holds |
+
+`Open` takes the column, and answers whether a cell stands under the cursor.
+`Take`, `Fill` and `Drop` each close the edit. The edit draws in the cell
+holding it, so a person reads the row while typing into it.
+
+An edit reaches the item through its address, so the row the view draws and the
+item the tree holds stay one thing.
+
+## The fill reaches the view
+
+The fill reaches every row the view holds at that moment, so a filter says how
+far it goes. A row the filter drops keeps the value it carries.
+
+## A schema refuses a value
+
+`Take` and `Fill` each answer the rows that keep the value they carry. So the
+view says which rows stay behind, and a person reads why the fill reaches fewer
+rows than the view draws. Nothing else marks them yet, and how the view draws
+the answer waits for the tab.
+
+# The completion knows the field
+
+A `Schema` says what values a field takes, and a view takes one or takes none:
+
+| what the field carries | what the completion offers |
+|---|---|
+| a schema naming values | those values, and the field takes nothing else |
+| no schema, or one naming none | every value standing in the data, and a new one a person types |
+
+The offer keeps every value holding what a person types, the way the filter
+matches, and it ignores case.
+
+A caller builds the `Schema` out of the schemas this tree already holds, and a
+view with none reads its own data. [[spec/design_output/schema]]
+
+The editor reading the type its schema names, and a mark carrying its editor
+open, each wait for the ticket that draws a tab.

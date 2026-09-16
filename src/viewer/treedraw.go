@@ -63,6 +63,10 @@ func (t Tree) Rows(w, rows int) string {
 func (t Tree) row(one twig, selected bool, wide []int) string {
 	cells := make([]string, 0, len(t.Cols))
 	for at, col := range t.Cols {
+		if t.edits(one, col) {
+			cells = append(cells, pad(cut(t.edit.input.View(), wide[at]), wide[at]))
+			continue
+		}
 		said := one.item.Keys[col.Key]
 		if at == 0 {
 			said = t.nameOf(one)
@@ -74,6 +78,11 @@ func (t Tree) row(one twig, selected bool, wide []int) string {
 		return barStyle.Render(line)
 	}
 	return line
+}
+
+// [[spec/design_output/tree-view#a-cell-takes-an-edit]]
+func (t Tree) edits(one twig, col Column) bool {
+	return t.edit != nil && t.edit.at == one.at && t.edit.key == col.Key
 }
 
 // [[spec/design_output/tree-view#the-name-column-nests]]
