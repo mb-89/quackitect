@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: whenever
 steps:
   - name: sync
@@ -78,6 +78,15 @@ record:
   - step: sync
     hand: box 02ae9414623e
     hash_before: c127f4766c77dbc293182e6abb41581329448a01
+  - step: sync
+    hand: box 02ae9414623e
+    hash_before: 7107ec3bb1f4d214cd685cd10803525932bd5e83
+    hash_after: 7107ec3bb1f4d214cd685cd10803525932bd5e83
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-brand-reads-the-folder already carries every commit on main.
+step: split
 ---
 
 # Ask
@@ -95,6 +104,8 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 <!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh branch sync
 
 # split
 
