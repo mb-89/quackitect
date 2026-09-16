@@ -69,6 +69,15 @@ change of a door. Three headless turns say so, against client 2.1.269:
 | the second | completes with the server down |
 | the third | lands on the server running again |
 
+## A fix reaches the session
+
+The server imports its doors and its libs once, so a fix to one reaches no
+running session by itself. So the server reads its own code at the first
+event, under the roots `src/bridge/reload.js` names, and reads it again after
+every tool run. A file that differs restarts the server through the road the
+`/restart` request takes, and the log names the file. The next event lands on
+the new code, and the session goes on as above.
+
 # The harness surface
 
 Every line here comes from running it against client 2.1.263. The

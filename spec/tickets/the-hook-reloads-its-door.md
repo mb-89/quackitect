@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 steps:
   - name: do
@@ -26,6 +26,19 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 568f402efe3adab7
+record:
+  - step: do
+    hand: box d42624a67d18a8
+    hash_before: c09c0b53954b3c40b357b9fab98d68a461fdd0d9
+    hash_after: c09c0b53954b3c40b357b9fab98d68a461fdd0d9
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 3 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: 49 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -38,27 +51,21 @@ A fix to a lib under the hook reaches the running session. Today the hook import
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test test/level0/reload.test.js
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
-
-<!-- the form is text -->
+The server imported its doors and libs once, so a fix to one reached no running session. Now the server reads its own code at the first event and again after every tool run. A file that differs restarts the server through its own restart road, and the log names the file. The next event lands on the new code, and the session goes on, because the bridgehead holds no state.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change follows the ask: the reload on a change stands, and the log line names the file
+- the cleanup the change reveals is none
+- the roots stand in one module, and the design chapter points at it
 
 # Discussion
 

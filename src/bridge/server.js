@@ -37,6 +37,7 @@ import {
   owesCanary,
 } from "./guidance.js";
 import { freshens, projectionsHere, sourcesOf } from "./projection.js";
+import { movedCode } from "./reload.js";
 import { answersFromIndex, FIND, findSpec, runsFind, warmIndex } from "./search.js";
 import { registeredPort } from "./vehicle.js";
 import { onWrite, schemasHere } from "./write.js";
@@ -207,6 +208,12 @@ export function serve(method, port = PORT_BASE, say = console.log) {
       const decided = await decide(said, box);
       await box.log.event(said, decided);
       answer(response, OK, decided);
+      // [[spec/design_output/level0#a-fix-reaches-the-session]]
+      const moved = movedCode(own, String(said?.event ?? ""));
+      if (moved) {
+        await own.log.say("info", "bridge", `${moved} moved, so the server restarts`, { file: moved });
+        setTimeout(restart, SOON);
+      }
     });
   };
 
