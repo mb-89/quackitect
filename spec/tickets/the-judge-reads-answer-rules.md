@@ -118,6 +118,19 @@ Today the judge answers breaks over every hand-back on a cloud box. One run met 
 
 <!-- the form is text -->
 
+| what changes | how |
+|---|---|
+| the guidance library | takes the mark, and answers `forEvidence` |
+| the material in the pull | reads the rules through `forEvidence` |
+| the wrapper under level one | asks by number, and names the rule it hears |
+| the voice note | marks its two answer rules |
+
+A rule that describes an answer carries a mark at the end of its line, the way a rule wanting argument carries a star. `actionables` strips the mark, as it strips the star, so every reader of the chapter reads the rule whole. A second reader, `forEvidence`, drops the marked rules. The judge material calls that one, so the two answer rules leave the ask.
+
+The judge then names what it finds. The classify call takes the labels `follows` and one number per rule it hands over. A number answers the first rule the evidence breaks. The refusal names that number and the rule's own line, so the hand reads which rule to fix. A label outside the set reads as `follows`, because a judge that names nothing refuses nothing.
+
+For details, see [[spec/design_output/pull#the-checks]].
+
 ## review
 
 <!-- reads the approach against the ask -->
