@@ -210,3 +210,9 @@ A hand carries one step. The hold names the session that took it, and a spawn ta
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- The clone on a cloud box is shallow, so `branch sync` at take dies on unrelated histories. `git fetch --unshallow` clears it, and the merge then takes trunk clean.
+- `branch done` refuses here: the engine writes a `record.why` and a person step `asks` joining every finding into one line. The `CodeSpans` rule then refuses that line, so the check stands red on lines the engine wrote.
+- The hand-back let a design draft through that the tree-wide sweep then named. The sweep and the write door read different scopes.
+- `branch take` run twice claims a second branch, so one box holds two at once.
+- The mint's placeholder comments count toward `Shape`. A text field under three of them takes a table or a list.
