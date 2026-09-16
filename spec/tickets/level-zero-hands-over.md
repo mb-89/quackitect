@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: whenever
-step: split
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -88,6 +88,10 @@ record:
       - name: sync
         exit: 0
         said: work/level-zero-hands-over already carries every commit on main.
+  - step: split
+    hand: box 747cff5c2f2a
+    hash_before: b5712b4c4c9a3b48b8ca143cba0f0f1d985b2184
+    hash_after: b5712b4c4c9a3b48b8ca143cba0f0f1d985b2184
 depends_on: ["the-agent-pulls-a-ticket"]
 ---
 
@@ -113,14 +117,18 @@ Where it stands
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/level-zero-handover]], under standard, closed
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the one child is small enough: two hands read it whole, and it closed at its verdict
+- the goal is the tool list the child's ask opens with. The brief's other rows stand as four loose drafts, and the retro names them
+- the one child waits on nothing
 
 # children
 
