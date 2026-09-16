@@ -13,6 +13,7 @@ import {
 } from "../../.claude/skills/level0/lib/review.js";
 import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
+import { DONE, mergedHere, standingAll, standOf } from "./work.js";
 
 const LOUD = 5;
 
@@ -44,6 +45,21 @@ export function review(it, name, argv) {
   }
   console.log(report(material));
   return 0;
+}
+
+// A done branch is work of the desk, and the pull hands it out as the review, the merge and the close. [[spec/design_output/review#the-queue-takes-done-branches]]
+export function readyToMerge(it) {
+  const stand = standOf(it);
+  const standing = standingAll(stand, mergedHere(it));
+  const done = stand.filter((one) => standing.get(one.branch) === DONE).map((one) => one.branch);
+  if (!done.length) return false;
+  const name = done[0].replace(/^work\//, "");
+  console.log(`work  ${done[0]} stands done, so the desk takes it in:`);
+  console.log(`  1. ./RUNME.sh branch review ${name}, and fix what it names`);
+  console.log(`  2. ./RUNME.sh branch merge ${name}, from ${TRUNK}`);
+  console.log(`  3. ./RUNME.sh branch close ${name}`);
+  if (done.length > 1) console.log(`${done.length - 1} more stand done behind it.`);
+  return true;
 }
 
 // [[spec/design_output/review#what-the-verb-gathers]]

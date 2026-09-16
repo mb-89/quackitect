@@ -233,7 +233,7 @@ export function pull(it, argv) {
   if (onTrunk && it.take) {
     if (it.cloud && !named) return it.take();
     const wanted = named || urgentGroup(it);
-    if (wanted) return it.take(wanted);
+    if (wanted || it.ready?.()) return wanted ? it.take(wanted) : 0;
   }
   if (!fetched(it, branch)) return 1;
   return handOut(it, who);

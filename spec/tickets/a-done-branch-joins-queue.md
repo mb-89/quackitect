@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: closed
 urgency: now
 steps:
   - name: do
@@ -26,6 +26,20 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 568f402efe3adab7
+step: do
+record:
+  - step: do
+    hand: box d42624a67d18a8
+    hash_before: 2a007880753fbe573ffb268e31ab6d65c4ebb3ec
+    hash_after: 2a007880753fbe573ffb268e31ab6d65c4ebb3ec
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 91 test(s) pass in 3 file(s)
+      - name: check
+        exit: 0
+        said: 49 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -44,27 +58,21 @@ Without it a done branch waits until a person remembers it, and the cloud's work
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test test/level0/ready.test.js test/level0/pull.test.js test/level0/work.test.js
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
-
-<!-- the form is text -->
+A desk's pull on trunk now reads the work branches before the free tickets. Where one stands done, the pull hands it out as three steps. The review and the fixes it names come first, then the merge from trunk, then the close. The merge is the hand-back, and the close takes the branch out of the queue. A cloud box's pull takes a branch instead, so a done branch is the desk's alone. The standing helpers of the work verbs stand exported for that reading.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change follows the ask: the done branch comes first, the steps stand named, and a cloud box gets none
+- the cleanup in it: the pull and the work verbs are past their ceilings, so the reading lives in review
+- the reading stands in one place, and the design chapter points at it
 
 # Discussion
 
