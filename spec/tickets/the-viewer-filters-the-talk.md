@@ -51,11 +51,15 @@ Without it the owner types the filter by hand each time, and the log verb loses 
 
 <!-- the form is command -->
 
+`go test ./...` in `src/viewer`
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+`./RUNME.sh check`
 
 ## says
 
@@ -63,11 +67,17 @@ Without it the owner types the filter by hand each time, and the log verb loses 
 
 <!-- the form is text -->
 
+Alt Q writes `kind: /^(prompt|reply)$/` into the filter line, and Alt Q again clears it. The filter reads red in the header the way a typed one does. The chord that kept one level went, because the floor under Alt L keeps a level. The filter help lists Alt Q and Alt Shift F as the shortcuts, and the header keeps its three keys.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: each of its five lines stands in the code, the help or a test
+- the cleanup the change reveals is in the change: the level chord and its test went with it
+- every fact stands in one place: the filter text is one constant in `ui.go`, and the note points at it
 
 # Discussion
 

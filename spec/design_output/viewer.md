@@ -104,13 +104,13 @@ one too.
 
 ## One key filters the line
 
+- `alt+q` keeps the prompts and the replies: the talk.
 - `alt+shift+f` keeps every line of the selected line's kind. On a tool line the kind is the tool, as `Read`.
-- `alt+ctrl+f` keeps every line of the selected line's level.
 
 The key writes its filter into the filter line, as `kind: /^prompt$/`, so it
-reads and edits like one a person types. The same key on a line of that kind
-again clears the filter. The filter pane names both keys, and the header stays
-at three.
+reads and edits like one a person types. The same key again clears the
+filter. The filter pane names each key, and the header stays at three. The
+floor under `alt+l` keeps a level, so no key filters by level.
 
 ## A name nobody knows
 
