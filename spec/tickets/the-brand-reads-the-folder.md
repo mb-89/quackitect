@@ -110,6 +110,9 @@ record:
     hand: box 02ae9414623e
     hash_before: 01d24a72655a023b8ddafa7a6cc8c223e57ab7cf
     hash_after: 12801a199b5952148bd274dff448b4cd07a13189
+  - step: children
+    hand: box ee33ce836a4d
+    hash_before: 9c4670bd162fa56f32d4e253b2e09ead376e4317
 step: children
 ---
 
