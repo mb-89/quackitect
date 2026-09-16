@@ -161,6 +161,9 @@ a hole somebody walks through, so the name reaches a function alone.
 | `runs` | answers true when |
 |---|---|
 | `work-waiting` | a todo stands unfinished, or this branch stands at `held` |
+| `ticket-in-hand` | a hold stands under `.se/hold`, or an open private ticket stands |
+| `group-in-hand` | this branch's group carries a take with no hand-back |
+| `queue-waits` | a desk bound to the queue stands on trunk, and `queueHolds` reads a free open ticket or a group at `now` |
 | `session-is-new` | under 10 tool calls stand behind this session, and the hook grants no stop |
 | `stop-hook-off` | `spec/config/level0.json` says `stop.enabled` is false |
 | `never` | nothing, which is what an unbuilt rule takes |

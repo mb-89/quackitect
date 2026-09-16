@@ -17,6 +17,22 @@ export function openPrivate(text) {
   return process !== "note" && !process.endsWith("/note");
 }
 
+// The queue holds work for a desk where a free open ticket has a leaf a hand takes, or a group reads now. [[spec/design_output/stop#the-mechanical-checks]]
+export function queueHolds(texts) {
+  return (texts ?? []).some((text) => {
+    const front = readNote(String(text ?? "")).front.said ?? {};
+    if (String(front.state ?? "") !== "open") return false;
+    const process = String(front.process ?? "").replace(/^\[\[|\]\]$/g, "");
+    if (process === "group" || process.endsWith("/group")) return String(front.urgency ?? "") === "now";
+    if (String(front.group ?? "").trim()) return false;
+    const walk = entriesIn(front.steps, "steps");
+    const step = String(front.step ?? "").trim();
+    const leaf = step ? walk.find((one) => one.path === step) : walk.find((one) => !one.said?.steps);
+    if (!leaf) return false;
+    return !["person", "children", "helper"].includes(String(leaf.said?.by ?? ""));
+  });
+}
+
 // [[spec/design_output/pull#the-group-holds-the-turn]]
 export function heldGroup(text) {
   const front = readNote(String(text ?? "")).front.said ?? {};

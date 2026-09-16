@@ -11,7 +11,7 @@ import {
   STOP,
 } from "../../.claude/skills/level0/lib/controls.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
-import { heldGroup, openPrivate } from "../../.claude/skills/level0/lib/ticket.js";
+import { heldGroup, openPrivate, queueHolds } from "../../.claude/skills/level0/lib/ticket.js";
 import {
   decide,
   detail,
@@ -161,6 +161,7 @@ function ranHere(name, held) {
   if (name === "work-waiting") return todosOf(held.box).standing();
   if (name === "group-in-hand") return groupInHand(held.box);
   if (name === "ticket-in-hand") return holdStands(held.box) || privateStands(held.box);
+  if (name === "queue-waits") return queueWaits(held.box);
   if (name === "no-stop-line") return !stopReasons(rulesOf(held.box)).some((one) => one.id === held.claimed);
   return undefined;
 }
@@ -194,6 +195,15 @@ function privateStands(box) {
   } catch {
     return false;
   }
+}
+
+// A desk bound to the queue on trunk has work while a free ticket stands, so a stop on completion waits. [[spec/design_output/stop#the-mechanical-checks]]
+function queueWaits(box) {
+  if (process.env.CLAUDE_CODE_REMOTE || process.env.SE_CLOUD) return false;
+  if (asks(box, "engine.binding") !== "queue") return false;
+  if (branchOf(box) !== "main") return false;
+  const texts = readFolder(box.disk, join(box.work, "spec", "tickets"), ".md").map((one) => one.text);
+  return queueHolds(texts);
 }
 
 function branchOf(box) {

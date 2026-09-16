@@ -9,6 +9,7 @@ import {
   engineRows,
   placesIn,
   refusedTicket,
+  queueHolds,
   ticketFaults,
 } from "../../.claude/skills/level0/lib/ticket.js";
 
@@ -297,4 +298,20 @@ test("the refusal names the finding and the three places", () => {
     said,
     /the ask, the fields of the step it holds, and the discussion/,
   );
+});
+
+// [[spec/design_output/stop#the-mechanical-checks]]
+test("the queue holds work where a free open ticket has a leaf a hand takes, or a group reads now", () => {
+  const free = (state, by = "anyone", more = "") =>
+    `---\nkind: [[ticket]]\nstate: ${state}\nurgency: soon\n${more}steps:\n  - name: do\n    by: ${by}\n---\n\n# Ask\n\nA thing.\n`;
+  assert.equal(queueHolds([free("open")]), true, "an open free ticket");
+  assert.equal(queueHolds([free("draft")]), false, "a draft waits for its open");
+  assert.equal(queueHolds([free("closed")]), false, "a closed one is done");
+  assert.equal(queueHolds([free("open", "person")]), false, "a person step is nobody's on this box");
+  assert.equal(queueHolds([free("open", "anyone", "group: some-group\n")]), false, "a child rides its group");
+  const group = (urgency) =>
+    `---\nkind: [[ticket]]\nstate: open\nurgency: ${urgency}\nprocess: [[spec/processes/group]]\nsteps:\n  - name: split\n---\n\n# Ask\n\nA group.\n`;
+  assert.equal(queueHolds([group("soon")]), false, "a group at soon is the cloud's");
+  assert.equal(queueHolds([group("now")]), true, "a group at now is the desk's");
+  assert.equal(queueHolds([]), false);
 });
