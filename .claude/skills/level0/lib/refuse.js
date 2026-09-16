@@ -51,26 +51,17 @@ function namesThe(words) {
   return `${shown.join(", ")}${tail}`;
 }
 
-// [[spec/design_output/level0#what-the-gate-says]]
+// The score reaches the log alone, because a number names nothing to fix. [[spec/design_output/level0#what-the-gate-says]]
 export function answerFindings(where, it) {
   const found = it?.found ?? [];
-  const score = it?.score ?? 0;
   if (!found.length) {
     return `No finding stands in this answer, so it meets the gate clean.`;
   }
   const head =
     it?.band === "rewrite"
       ? "The voice rules refuse this answer. Write it again."
-      : "The voice rules read this answer, and the score stands under the ceiling.";
-  return [
-    head,
-    "",
-    `  the score is ${score} findings a thousand words.`,
-    "",
-    ...bodyOf(where, found),
-    taught(found),
-    ...road(found),
-  ].join("\n");
+      : "The voice rules read this answer, and it stands under the ceiling.";
+  return [head, "", ...bodyOf(where, found), taught(found), ...road(found)].join("\n");
 }
 
 // The answer stands as sent, so the note teaches and asks for nothing. [[spec/design_output/level0#the-findings-ride-the-next-call]]
@@ -78,8 +69,6 @@ export function gateNote(where, it) {
   const found = it?.found ?? [];
   return [
     `The gate read your last answer at ${it?.band ?? "carry"}, and it stands as sent.`,
-    "",
-    `  the score is ${it?.score ?? 0} findings a thousand words.`,
     "",
     ...bodyOf(where, found),
     taught(found),
@@ -92,6 +81,7 @@ function bodyOf(where, found) {
   for (const one of found ?? []) {
     lines.push(`  ${where}:${one.line}:${one.column}  ${one.rule}`);
     if (one.said) lines.push(`    wrote: ${cut(one.said)}`);
+    if (one.context) lines.push(`    in: ${one.context}`);
     lines.push(`    ${one.message}`);
     lines.push("");
   }

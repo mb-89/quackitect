@@ -6,7 +6,6 @@
 import { swapsOf, TERMS, wordsOf } from "./vocabulary.js";
 
 export const PARAGRAPH = "paragraph rules";
-export const JUDGED = "judged rules";
 export const RULES = ".yml";
 export const LINK = "spec/funnel/a-paragraph-has-a-schema.md";
 
@@ -161,44 +160,6 @@ export function rulesFrom(said, banner = "", lists = null) {
   const words = wordsOf(lists);
   if (words.length) put("Vocabulary.yml", vocabulary(layers.vocabulary ?? {}, lists));
   return out;
-}
-
-// [[spec/design_output/projection#the-judged-rules]]
-export function judgedFrom(said, banner = "") {
-  const out = new Map();
-  for (const rule of said?.layers?.meaning?.judged ?? []) {
-    if (!rule?.id) continue;
-    out.set(`${rule.id}${RULES}`, file(banner, judged(rule)));
-  }
-  return out;
-}
-
-// [[spec/design_output/projection#the-judged-rules]]
-function judged(rule) {
-  const labels = [].concat(rule.labels ?? []);
-  const refuses = [].concat(rule.refuses ?? []);
-  const span = String(rule.span ?? "paragraph");
-
-  return [
-    "extends: judge",
-    `message: ${JSON.stringify(String(rule.message ?? ""))}`,
-    `link: ${rule.link ?? LINK}`,
-    "level: error",
-    `ask: ${JSON.stringify(String(rule.asks ?? ""))}`,
-    "labels:",
-    ...labels.map((one) => `  - ${one}`),
-    ...(refuses.length === 1 ? [`refuses: ${refuses[0]}`] : ["refuses:", ...refuses.map((one) => `  - ${one}`)]),
-    ...(span === "paragraph" ? [] : [`span: ${span}`]),
-    ...listed("reads", rule.reads),
-    ...listed("ignores", rule.ignores),
-    "",
-  ].join("\n");
-}
-
-function listed(key, said) {
-  const rows = [].concat(said ?? []).filter(Boolean);
-  if (!rows.length) return [];
-  return [`${key}:`, ...rows.map((one) => `  - ${JSON.stringify(String(one))}`)];
 }
 
 function file(banner, body) {
@@ -866,6 +827,9 @@ function grammar(layer) {
   const said = modal(layer);
   if (said) out.set("Modal.yml", said);
 
+  const hedged = hedge(layer);
+  if (hedged) out.set("Hedge.yml", hedged);
+
   if (layer.contractions === "refused") {
     out.set(
       "Contraction.yml",
@@ -931,6 +895,25 @@ function modal(layer) {
     "ignorecase: true",
     "tokens:",
     ...refused.map((one) => `  - '\\b${one}\\b'`),
+    "",
+  ].join("\n");
+}
+
+// A hedge softens a claim and names no measure, so the rule cuts it. [[spec/design_output/projection#the-grammar-rules]]
+function hedge(layer) {
+  const hedges = (layer?.hedges ?? []).map((one) => String(one).trim()).filter(Boolean);
+  if (!hedges.length) return undefined;
+  const token = (one) => `  - '\\b${one.split(" ").join(`\\s+`)}\\b'`;
+  return [
+    "extends: existence",
+    `message: ${JSON.stringify(
+      "Cut the hedge '%s'. Say the thing, or name the measure.",
+    )}`,
+    `link: ${LINK}`,
+    "level: error",
+    "ignorecase: true",
+    "tokens:",
+    ...hedges.map(token),
     "",
   ].join("\n");
 }

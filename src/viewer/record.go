@@ -41,6 +41,9 @@ func ParseRecord(line string) Record {
 		r.At = at
 	}
 	r.Level = textOf(fields["level"])
+	if r.Level == "" {
+		r.Level = "info"
+	}
 	r.Kind = textOf(fields["kind"])
 	if r.Kind == "" {
 		r.Kind = textOf(fields["door"])
@@ -70,6 +73,18 @@ func textOf(value any) string {
 		return string(out)
 	}
 	return fmt.Sprint(value)
+}
+
+// The ladder Python's logging climbs. A level nobody knows stands as info. [[spec/design_output/viewer#alt-l-raises-the-floor]]
+var ladder = []string{"debug", "info", "warn", "error", "fatal"}
+
+func Rank(level string) int {
+	for at, one := range ladder {
+		if strings.EqualFold(one, level) {
+			return at
+		}
+	}
+	return 1
 }
 
 // [[spec/design_output/viewer#one-row]]

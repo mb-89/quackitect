@@ -8,6 +8,7 @@ import { skip, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { NOBODY } from "../../.claude/skills/level0/lib/private.js";
 import { lintText } from "../../.claude/skills/level0/lib/vale.js";
+import { withoutFalsePast } from "../../src/bridge/tense.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
 import { readTools, whereIs } from "../../src/scripts/tools.js";
@@ -24,7 +25,7 @@ const run = async (argv, init = {}) =>
 const ruled = async (text) => {
   const said = await lintText(text, "notes.md", { run, bin });
   assert.ok(said.ran, `vale ran: ${said.why}`);
-  return said.found.map((f) => f.rule);
+  return withoutFalsePast(text, said.found).map((f) => f.rule);
 };
 
 // [[spec/funnel/a-paragraph-has-a-schema]]

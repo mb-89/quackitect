@@ -28,7 +28,6 @@ swaps:
   - {word: attempt, write: try}
   - {word: ensure, write: make sure}
   - {word: leverage, write: use}
-  - {word: implement, write: build}
   - {word: invoke, write: call}
   - {word: initiate, write: start}
   - {word: modify, write: change}

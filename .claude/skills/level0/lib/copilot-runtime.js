@@ -96,13 +96,6 @@ export async function handle(event, it) {
         0,
       );
       if (!count) throw new Error("No numbered guidance reaches this session.");
-      const judged = it.disk
-        .list(it.join(it.root, "spec/config/styles/VoiceJudged"))
-        .filter((one) => one.name.endsWith(".yml"))
-        .map(
-          (one) => readRule(read(`spec/config/styles/VoiceJudged/${one.name}`)).message,
-        )
-        .filter(Boolean);
       state.guidance = standingLayer(notes);
       state.count = count;
       state.ready = true;
@@ -112,8 +105,6 @@ export async function handle(event, it) {
           "Mechanical write gates are active. Formatting follows edits. Semantic rules are instructions, not model checks. Final answers are not linted.",
           "# How this tree is worked",
           state.guidance,
-          "# Semantic guidance",
-          ...judged,
           ...state.handovers.map(
             (one) =>
               `# Handover: ${one.path}\n${one.text}\nWrite a fresh result at the same path before finishing.`,

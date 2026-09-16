@@ -5,7 +5,7 @@
 
 const SAID = "comment";
 const WIDE = 5;
-const DRAWS = ["action", "toggle", "status", "count", "table"];
+const DRAWS = ["action", "toggle", "status", "count", "table", "process"];
 const TRACKED = "spec/config/level0.json";
 // [[spec/design_output/extension#the-tree-holds-config-alone]]
 const MACHINERY = ["session"];
@@ -58,8 +58,23 @@ function placed(one, values) {
     value: at?.value,
     layer: at?.layer ?? "",
     rest: one.options[0],
-    lit: one.widget === "status" ? "dark" : "",
+    lit: one.widget === "status" || one.widget === "process" ? "dark" : "",
   };
+}
+
+// A process widget shows what the extension runs: dark for nothing, green for the server, amber for the server under the debugger. [[spec/design_output/extension#the-hook-button]]
+function litBy(groups, states) {
+  for (const group of groups) {
+    for (const row of group.rows ?? []) {
+      for (const cell of row.cells) {
+        if (cell.widget !== "process") continue;
+        const state = String(states?.[cell.key] ?? "off");
+        cell.lit = state === "debug" ? "amber" : state === "on" ? "" : "dark";
+        cell.state = state;
+      }
+    }
+  }
+  return groups;
 }
 
 function rowsOf(cells) {
@@ -140,6 +155,7 @@ module.exports = {
   drawnIn,
   entriesIn,
   groupsIn,
+  litBy,
   treeIn,
   valuesOf,
 };

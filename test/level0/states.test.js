@@ -20,33 +20,33 @@ test("god mode shows on the error background, and a click puts the queue back", 
 
 test("unbound and a hold each show, and rest shows nothing", () => {
   const said = statesOf(
-    values({ "engine.binding": "unbound", "stop.hold": "stopped" }),
+    values({ "engine.binding": "unbound", "stop.hold": "stop" }),
   );
   assert.deepEqual(
     said.map((one) => [one.key, one.value, one.tone]),
     [
       ["engine.binding", "unbound", "warning"],
-      ["stop.hold", "stopped", "error"],
+      ["stop.hold", "stop", "error"],
     ],
   );
   assert.deepEqual(
-    statesOf(values({ "engine.binding": "queue", "stop.hold": "running" })),
+    statesOf(values({ "engine.binding": "queue", "stop.hold": "off" })),
     [],
   );
   assert.deepEqual(statesOf(new Map()), []);
 });
 
 test("a toast marks a state arriving, and a state standing still toasts once", () => {
-  const before = statesOf(values({ "stop.hold": "finishing" }));
-  const after = statesOf(values({ "stop.hold": "finishing", "engine.binding": "god" }));
+  const before = statesOf(values({ "stop.hold": "finish" }));
+  const after = statesOf(values({ "stop.hold": "finish", "engine.binding": "god" }));
   assert.deepEqual(
     toastsOf(before, after).map((one) => one.value),
     ["god"],
   );
   assert.deepEqual(toastsOf(after, after), []);
-  const moved = statesOf(values({ "stop.hold": "stopped", "engine.binding": "god" }));
+  const moved = statesOf(values({ "stop.hold": "stop", "engine.binding": "god" }));
   assert.deepEqual(
     toastsOf(after, moved).map((one) => one.value),
-    ["stopped"],
+    ["stop"],
   );
 });
