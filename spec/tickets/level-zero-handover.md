@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: soon
-step: design/draft
+step: design/review
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -91,6 +91,11 @@ steps:
 process: [[standard]]
 process_hash: d1fd9cd113889f29
 group: level-zero-hands-over
+record:
+  - step: design/draft
+    hand: box 747cff5c2f2a
+    hash_before: 347b6637434a6a9e8b048964f1e9968e28e1821f
+    hash_after: 347b6637434a6a9e8b048964f1e9968e28e1821f
 ---
 
 # Ask
@@ -143,6 +148,36 @@ The rules to hold:
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+| the ask asks | the answer |
+|---|---|
+| who reads the survey | the guidance door, at every session start |
+| what the standing layer carries | one line per tool, saying when to reach for it |
+| what a fresh box does | runs the survey first, then reads it |
+
+- The guidance door reads the survey at session start and hands the session a tools block beside the rules block.
+- Every entry of the wanted list carries when to reach for the tool, as data beside the name.
+- A registered tool's line comes off its description, so the text stands once.
+- The canary keeps its counts of rules and notes.
+
+| piece | where | does |
+|---|---|---|
+| `for` on every entry of the wanted list | the tools library | says when to reach for the tool |
+| `toolLines` | the tools library | one line per tool the survey finds, with its version and its `for`. One line per tool level zero registers, with the first sentence of its description |
+| the tools block | the guidance door | reads the survey at session start, runs it first on a fresh box, and rides beside the rules block |
+| the callers table | the tools note | gains the guidance door as a caller, and a chapter says what the tools block carries |
+
+The brief's other rows, and where each stands on trunk:
+
+| row | stands | next |
+|---|---|---|
+| the brief door goes | done | the hook leaves the brief alone, and the cloud block names the pull |
+| `work-waiting` reads the hold and the private tickets | done | the level one stop rules read them |
+| `pull <ticket>` takes a named group | done | a name on trunk takes its branch |
+| the answer door reads the `note` row | open | the group's split |
+| the viewer draws `note` in its own colour | open | the group's split |
+| `unbound` and `engine.autonomy` | open | the group's split |
+| the old verbs over a brief go | open | the group's split |
 
 ## review
 
@@ -263,3 +298,5 @@ The rules to hold:
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The design draft went back through the shell after the judge refused five rewrites and named no rule. The judge reads the voice rules over the evidence, and two of them describe an answer. A private note carries the finding for the retro.
