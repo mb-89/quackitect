@@ -56,6 +56,7 @@ every field in use.
 | `help` | the sentence a hover carries |
 | `unit` | the word standing beside an editor |
 | `runs` | what an action runs |
+| `asks` | what an action asks the owner for first, and `runs` carries it in angle brackets |
 | `keys` | the keys the program an action opens needs |
 | `sets`, `watches` | the two keys a status splits into |
 
@@ -338,6 +339,31 @@ function, and a dot standing on that line already stays.
 A dead server blocks nothing, so the agent runs the same with the light dark.
 The sidebar writes the start and the stop at `info`, and so does the server.
 For details, see [[spec/design_output/level0#the-bridgehead-and-the-server]].
+
+## Two buttons make both
+
+Two actions stand in the section `engine`, beside where the engine's play
+and stop marks land. Each carries `asks` set to `folder`, and its `runs`
+carries `<folder>` where the folder goes:
+
+| key | `icon` | runs |
+|---|---|---|
+| `engine.vehicle` | `🚚` | `./RUNME.sh vehicle into <folder>` |
+| `engine.stub` | `🌱` | `./RUNME.sh stub into <folder>` |
+
+A press on one goes this way:
+
+1. The sidebar reads `asks` off the schema by the key the message carries.
+2. The door opens the editor's folder dialog, and answers the folder or the empty string.
+3. The empty string ends the press, and the log takes no line.
+4. The folder lands in `runs` in place of `<folder>`, in double quotes, so a space in it holds.
+5. The line runs in a terminal, the way the log button runs, and the log takes the line.
+
+So the verbs behind the buttons stay the ones the shell runs. A refusal from
+a verb stands in the terminal, where the owner reads it. The marks are
+the owner's to swap in the schema. The fake door in the sidebar test answers
+the folder, and a contract test reads the two entries off the declaration on
+disk.
 
 # What level zero holds
 
