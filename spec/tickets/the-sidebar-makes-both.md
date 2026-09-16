@@ -114,7 +114,7 @@ record:
   - step: retro/cloud
     hand: box 1eeed4143ad0
     hash_before: 96666705d1535dd16aee3843d59002aaf1369c0e
-    hash_after: 96666705d1535dd16aee3843d59002aaf1369c0e
+    hash_after: 5f889c7c77c6a54e94af51fa17983effb96d3a10
 step: retro/cloud
 reason: done
 ---
