@@ -89,7 +89,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-sidebar-makes-both
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 1eeed4143ad0
@@ -99,6 +99,17 @@ record:
     hand: box 1eeed4143ad0 · helper-2
     hash_before: f203cc868ba1cee1e91a2bda28a3524e6c32bb41
     hash_after: f203cc868ba1cee1e91a2bda28a3524e6c32bb41
+  - step: implement/tests-red
+    hand: box 1eeed4143ad0
+    hash_before: 4bb61b1c8b1813113b8587ac3c5ddaea937a77ba
+    hash_after: 4bb61b1c8b1813113b8587ac3c5ddaea937a77ba
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -169,14 +180,22 @@ pass
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Five tests fail, and each fails on the line I expect. The three sidebar tests find the door asked for nothing, because the run message goes straight to the terminal. The two contract tests find no `engine.vehicle` in the declaration on disk. The fourth sidebar test passes at once, because the in-memory schema already draws the two buttons through the panel as it stands. That surprises me: the drawing needs no change, and the whole of the work sits in the sidebar, the door and the declaration.
+
+### checked
+
+- the tests touch the sidebar test and one contract test over the declaration. The change ahead touches the schema, the sidebar, the editor door and the design output
+- the folder dialog is one call on the editor door, and the fake door in the sidebar test answers it
+- each test carries a link to the chapter the design output takes on the two buttons
 
 ## reflect
 
