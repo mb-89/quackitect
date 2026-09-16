@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 steps:
   - name: design
@@ -129,6 +129,11 @@ record:
       - name: check
         exit: 0
         said: 15 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box 1eeed4143ad0 · helper-7
+    hash_before: 067ec406304dc1250d1bc397f9e7447ff2781248
+    hash_after: 067ec406304dc1250d1bc397f9e7447ff2781248
+reason: done
 ---
 
 # Ask
@@ -286,11 +291,39 @@ The verbs stay the ones the shell runs, in a terminal, so a refusal from a verb 
 
 <!-- the form is files -->
 
+spec/config/level0.schema.json
+spec/design_output/extension.md
+spec/tickets/sidebar-makes-both.md
+spec/tickets/the-sidebar-makes-both.md
+src/extension/editor.js
+src/extension/sidebar.js
+test/contract/sidebar.test.js
+test/contract/tree.test.js
+test/level0/sidebar.test.js
+spec/guidance/review/reviewing.md
+spec/design_input/a-stub-takes-its-vehicle.md
+src/extension/webview/clicks.js
+src/scripts/cli.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- The schema declares `engine.vehicle` and `engine.stub` as actions in the group `engine`. Each wears a mark, and `asks` set to `folder`.
+- A press asks the door for a folder, and runs the vehicle verb or the stub verb over it.
+- The line runs in a terminal, the way the log button runs, and both verbs stand in the cli.
+- The sidebar tests drive both buttons through the fake door, and read the command each runs.
+- A dialog closed on nothing runs nothing and writes no log line, and a test proves it.
+- The design output carries the `asks` field and the chapter Two buttons make both.
+- `./RUNME.sh branch test` answers green.
+- `./RUNME.sh check` exits 0, with placeholder warnings the check allows.
+- The group ticket's state and step change by the verbs at the take, and redesign nothing.
+- The tree contract test counts the two new drawn controls, a trivial follow of the schema.
+- The branch adds no rule, so it owes no rule test.
+- No retro stands in the handback yet, and the retro step follows this one.
 
 # Discussion
 
