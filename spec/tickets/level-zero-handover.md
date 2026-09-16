@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 step: verdict
 steps:
@@ -130,6 +130,11 @@ record:
       - name: check
         exit: 0
         said: 51 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box 747cff5c2f2a · helper-7
+    hash_before: 7f01d6f1d4fc0140334c9d7789f06a58b910eda6
+    hash_after: 7f01d6f1d4fc0140334c9d7789f06a58b910eda6
+reason: done
 ---
 
 # Ask
@@ -354,17 +359,40 @@ The stop door's queue check reads the environment off the box, so its test runs 
 
 <!-- the form is files -->
 
+- .claude/skills/level0/lib/tools.js
+- spec/design_output/tools.md
+- spec/tickets/level-zero-handover.md
+- src/bridge/guidance.js
+- src/bridge/server.js
+- src/bridge/stop.js
+- test/level0/stop-door.test.js
+- test/level0/tools-door.test.js
+- test/level0/tools.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- The branch does what the approach names: a tools block rides beside the rules block at every first context read.
+- Every entry of the wanted list carries `for`, and a test refuses an entry without one.
+- A registered tool's line takes the first sentence of its description, and a test proves the cut.
+- The door test runs the survey on a fresh box and reads the file on a surveyed one.
+- The stop door reads the environment off the box, a trivial fix the door test needs in memory.
+- `./RUNME.sh check` answers 0, and `./RUNME.sh branch test` answers 24 green tests in 3 files.
+- The tools note's callers table names the guidance door, where the hooks module read nothing.
+- The retro stands absent from the handback, and the retro step comes after this leaf.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- Each `for` stands once in the wanted list, and each description once on its spec. The note links the library.
 
 # Discussion
 
