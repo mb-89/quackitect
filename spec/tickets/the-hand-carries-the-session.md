@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-hand-carries-a-step
-step: implement/reflect
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -146,6 +146,10 @@ record:
     hash_after: 175929612a31d11a152154eed497f305d0153570
     returns: 1
     why: The hand names no agent on a harness, because `doorsHere` in `src/scripts/cli.js` hands `it` no `env`.; This step's own hold reads `box ee33ce836a4d · helper-9` under a set `CLAUDE_CODE_REMOTE`.; So `agentOf` runs dead on the pull's own path, and its test passes on a fake alone.; Hand one harness list to both `it.agent` and `agentOf`, so that set stands in one place.; `sessionOf` guesses the engine's field names, and `wrote` swallows the failure, so a wrong guess stays silent.; The box carries no `.se/session.json`, so the wrapper's write stands unproven outside the fake.; The spawn hook tags every spawn, and the design output exempts the spawn the wrapper makes itself.; The tag denies `--as`, and the prompt under it tells that helper to pull `--as`.; No test drives the registered `agent.spawn` hook, so nothing proves the line reaches a prompt.; The session file path stands in three files, and the bridgehead's copy carries no note beside it.; The design output puts the tag in the wrapper, and the change puts it under level zero.; `./RUNME.sh check` exits 0, the suite passes 1013 tests, and the sibling ticket's files redesign nothing here.
+  - step: implement/reflect
+    hand: box ee33ce836a4d
+    hash_before: 4cce2a432a50729f9b9e1eea101d8dc41ae70555
+    hash_after: 4cce2a432a50729f9b9e1eea101d8dc41ae70555
 ---
 
 # Ask
@@ -240,14 +244,20 @@ Six tests fail on their own assertion, and one passes: the hold already slugs a 
 ### class
 
 <!-- the class of error the findings describe, and the fix for the class -->
-
 <!-- the form is text -->
+
+- the class: the change lands the shape and leaves the wiring. A fake proves each piece, and the caller it runs under stands untouched.
+- the fix for the class: wire each piece to the caller it runs under, and prove it there. Every fact then stands in one place.
+- `doorsHere` builds `it` with the agent flag alone, so `agentOf` reads an empty environment on every real run. The hold this step took proves it.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the fix stays inside `src/scripts`, the two plugin folders and their tests, which the ask names.
+- the harness list and the session path each stand in one place, and a forced copy says so.
+- a test drives the registered hook and the command line, so each piece rests on a real run.
 
 ## change
 
