@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 steps:
   - name: do
@@ -13,6 +13,12 @@ steps:
 step: do
 process: [[trivial]]
 group: a-group-is-a-branch
+record:
+  - step: do
+    hand: box b9be613824b0
+    hash_before: cd3a1746c3e46e9987392c0d5397267ca8357c90
+    hash_after: 07e76fcb4d4de2f641b1ae92711360080ac19e34
+reason: done
 ---
 
 # Ask
