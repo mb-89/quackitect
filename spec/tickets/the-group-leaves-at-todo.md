@@ -2,6 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
+group: the-person-step-holds
 step: design/draft
 steps:
   - name: design

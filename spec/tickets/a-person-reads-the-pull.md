@@ -2,6 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: soon
+group: the-person-step-holds
 steps:
   - name: do
     does: makes the change, with the test that covers it

@@ -2,6 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: soon
+group: the-hand-carries-a-step
 step: do
 steps:
   - name: do
