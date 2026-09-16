@@ -149,7 +149,7 @@ registers:
     then: the detail, under headings
 
   requirement:
-    paths: ["spec/requirements/*.md"]
+    paths: ["spec/design_input/*.md"]
     grammar:
       modals: [can, must, will, shall, should]
       meaning: shall binds and should advises, as RFC 2119 gives them

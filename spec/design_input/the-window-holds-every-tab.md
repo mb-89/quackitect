@@ -131,7 +131,7 @@ wants it quick, and what takes the time waits for a look of its own.
 
 The work browser opens on one tree view, and every tab drawing rows with a
 shape takes the same one. It holds its requirements in a note of its own, and
-the window asks for that view whole. [[spec/requirements/the-tree-view]]
+the window asks for that view whole. [[spec/design_input/the-tree-view-editor]]
 
 The window adds one thing: `alt+f` opens the filter of the tab standing open,
 and the footer marks the tab holding one.
