@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: soon
 steps:
   - name: design
@@ -89,6 +89,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-shim-resolves-the-vehicle
+step: design/review
+record:
+  - step: design/draft
+    hand: box d42624a67d18a8
+    hash_before: 66d833b60fbfb8ba36127ea23f63a38a1007a20a
+    hash_after: 66d833b60fbfb8ba36127ea23f63a38a1007a20a
 ---
 
 # Ask
@@ -115,9 +121,24 @@ Read [[spec/design_input/a-stub-takes-its-vehicle]] first, the chapters The stub
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+The shim takes three roads in order, and the vehicle takes its work root from the shim.
 
-<!-- the form is text -->
+| road | answers | who writes it |
+|---|---|---|
+| `SE_VEHICLE` | that folder | a person, or a test |
+| the register, by the `vehicle` id in `vehicle.json` | the entry's `method_root` | the vehicle, at `vehicle register` |
+| `~/.se/vehicles/<name>` | the folder a cloud box clones the upstream into | the bridgehead's install |
+
+- The register stands in every folder `SE_REGISTRY` names, and in `~/.se` where it names none.
+- The shim stays POSIX sh and reads both JSON files with sed, because a stub holds no node yet.
+- A register path holds backslashes as JSON writes them, so the shim turns each into a slash.
+- The shim finding no vehicle prints one line naming the vehicle, its upstream and the install road. It exits 1.
+- The shim sets `SE_WORK_ROOT` to its own folder, and the design note takes that name in place of `SE_WORK`.
+- `rootsHere` in the command line takes `SE_WORK_ROOT` as the work root where it stands, and its own root otherwise.
+- So `./RUNME.sh vehicle` inside a stub names the vehicle as method and the stub as work.
+- One contract test drives the shim over a fixture: a fake vehicle, a register naming it, and a stub.
+- The fake vehicle's `RUNME.sh` echoes its argv and its work root, and the test reads both and the refusal line.
+- The bridgehead keeps its two roads. Its register road belongs to the install group, so this ticket leaves it.
 
 ## review
 
