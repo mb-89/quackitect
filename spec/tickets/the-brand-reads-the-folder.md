@@ -86,7 +86,11 @@ record:
       - name: sync
         exit: 0
         said: work/the-brand-reads-the-folder already carries every commit on main.
-step: split
+  - step: split
+    hand: box 02ae9414623e
+    hash_before: 8dcd4ae534815f24881f95895f4eea117620a1f7
+    hash_after: 8dcd4ae534815f24881f95895f4eea117620a1f7
+step: children
 ---
 
 # Ask
@@ -116,6 +120,14 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 <!-- every child as a link, one a line, with its process -->
 
 <!-- the form is list -->
+
+- [[spec/tickets/brand-reads-folder]], on [[spec/processes/standard]], which carries the whole ask
+
+## checked
+
+- small enough to review whole: the child touches the manifest, the keys the extension reads and the link verb. A reviewer reads that in one pass.
+- the children add up to the goal: the child's ask names the link, the icon and the editor test. It names every place writing the name in. It is this group's ask whole.
+- a child waiting on another names it under depends_on: the group holds one child, and it stands free.
 
 # children
 

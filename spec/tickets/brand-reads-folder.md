@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: whenever
 steps:
   - name: design
@@ -89,6 +89,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-brand-reads-the-folder
+step: design/draft
 ---
 
 # Ask
