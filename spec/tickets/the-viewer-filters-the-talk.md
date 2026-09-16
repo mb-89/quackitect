@@ -51,7 +51,7 @@ Without it the owner types the filter by hand each time, and the log verb loses 
 
 <!-- the form is command -->
 
-`go test ./...` in `src/viewer`
+    ./RUNME.sh test
 
 ## check
 
@@ -59,7 +59,7 @@ Without it the owner types the filter by hand each time, and the log verb loses 
 
 <!-- the form is command -->
 
-`./RUNME.sh check`
+    ./RUNME.sh check
 
 ## says
 
