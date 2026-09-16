@@ -12,10 +12,18 @@ takes the same requirements. Qt is where the shape comes from.
 # What it does
 
 - The view shall draw items in a tree, and a parent shall collapse and expand.
+- The declaration shall say whether a view nests or stands flat.
+- A button shall expand every row, and a button shall collapse every row.
 - The view shall take one key of an item a column, so one view serves many shapes.
 - The first column shall carry the name and the nesting.
 - The last column shall take the space the columns before it leave, and it shall cut its text there.
-- The view shall sort by a column.
+- The column headers shall stand still while the rows scroll.
+- A click on a header shall sort by that column, and a second click shall turn it around.
+- The view shall sort by several columns, in the order a person picks them.
+- The view shall load the rows it draws, and leave the rest until a person reaches them.
+- The view shall page, in a page size a person picks.
+- A person shall reorder, resize, pick and hide the columns.
+- The declaration shall hold the columns a view opens with, and what a person moves shall stay out of it.
 - The view shall open the details of the selected item on Enter.
 - The name shall carry a link, and a click on it shall open what the link names.
 - The view shall filter, in the language the log filter reads.
@@ -26,7 +34,10 @@ takes the same requirements. Qt is where the shape comes from.
 - An edit shall take Enter as its yes, and Escape shall put the old value back.
 - Shift with Enter shall write the value into every row of the view, where the field takes it.
 - The completion shall read the schema of a field, and the values standing in the data otherwise.
+- The editor of a cell shall read the type its schema names.
+- A cell holding a mark shall carry its editor open, so one click flips it.
 - A declaration shall say what a view draws.
+- The sort and the filter shall stand between the data and the view, and leave the data as it is.
 
 # The columns read the item
 
@@ -52,6 +63,24 @@ A folder under `spec` holds the views, one file a view, and the editor fills
 from that file. So a new view is a file and no code change. How a tab reaches
 a view waits for the design output.
 
+The third and the fourth tree write that file in Obsidian's own base format,
+and this tree takes the same one. `spec/views/work.base` on the fourth branch
+is the case to read.
+
+| what that file says | the key it uses |
+|---|---|
+| what a row is | `filters`, as a list of tests joined by `and` |
+| the columns, in order | `order` |
+| how wide a column opens | `columnSize` |
+| what opens the note | `properties`, with `opensNote` |
+| the named filters a reader picks | `groups`, and `pinned` for the one on top |
+| what a view counts | `counts`, each with its own filter |
+| the sort it opens with | `sort` |
+| what stands collapsed | `collapsed` |
+
+One file holds several views under `views`, each with a name. So the presets a
+person clicks are the groups, and the columns a view opens with are the order.
+
 | what the file says | what it decides |
 |---|---|
 | where the rows come from | the notes, the tickets or another answer |
@@ -60,9 +89,6 @@ a view waits for the design output.
 | the link | what a click on the name opens |
 | the presets | the filters the panel offers |
 
-The third and the fourth tree hold a syntax for this already. Reading those
-decides the shape here, and this note asks for the same one where it fits.
-Those trees stand on another box, so a person brings them.
 
 # Enter opens the details
 
@@ -118,6 +144,36 @@ Qt calls that a delegate, and the two keys are what a person there expects. The
 fill reaches every row the view holds at that moment, so a filter decides how
 far it goes. A row whose schema refuses the value keeps the value it carries,
 and the view says which rows stay behind.
+
+# Many rows, and the filter
+
+The view loads the rows it draws, and a person reaching further asks for more.
+A page size a person picks says how many stand at once. Both keep a long answer
+cheap.
+
+A filter reads every row, and lazy loading holds most of them back, so the two
+pull against each other. The filter goes to the source:
+
+| the source | where the filter runs |
+|---|---|
+| the index over the notes | the index answers the matching set |
+| a database | the query carries the filter |
+| a small answer already in hand | the view filters what it holds |
+
+So the source answers a narrowed set, and the view draws the first page of it.
+A source answering no filter hands its rows over, and the view says so while it
+reads them.
+
+# What waits
+
+Some parts of the shape wait, and the note names each one:
+
+| what waits | why |
+|---|---|
+| grouping by a column | the fourth tree draws it badly beside a frozen row, so it waits for a design that holds |
+| taking an edit back | the first copy runs without it, and the second one takes it |
+| copy and paste over a range | a terminal reads a paste as keys, so the road wants a look |
+| a menu on a row | the same question, and the keys carry the acts meanwhile |
 
 # The completion knows the field
 
