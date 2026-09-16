@@ -350,7 +350,7 @@ function theStub(argv) {
     return 1;
   }
   console.log(`${put.files.length} file(s) written into ${dest}.`);
-  console.log("Its shim and its bridgehead find the vehicle through SE_VEHICLE, or where a cloud box clones it.");
+  console.log("Its shim finds the vehicle through SE_VEHICLE, the register, or where a cloud box clones it.");
   return 0;
 }
 

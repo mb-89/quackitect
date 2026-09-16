@@ -132,6 +132,17 @@ test("a tree carrying the marker drives itself", () => {
   assert.equal(pairOf("", "/only").itself, true);
 });
 
+// [[spec/design_output/vehicle#two-roads-to-the-vehicle]]
+test("the shim's work root beats the tree the command line runs in", () => {
+  const files = tree();
+  const pair = rootsHere(files, { HOME: "/home", SE_WORK_ROOT: "/stub" }, "/tools");
+  assert.equal(pair.method, "/tools", "the marker names the method");
+  assert.equal(pair.work, "/stub", "the shim names the work");
+  assert.equal(pair.itself, false);
+  const blank = rootsHere(files, { HOME: "/home", SE_WORK_ROOT: "  " }, "/tools");
+  assert.equal(blank.work, "/tools", "a blank value names nothing");
+});
+
 test("the copy carries the method and nothing private", () => {
   const files = tree();
   const put = produce(files, "/tools", "/copy");

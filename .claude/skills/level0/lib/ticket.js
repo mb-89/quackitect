@@ -197,7 +197,7 @@ export function refusedTicket(where, kind, found) {
       (one) => `  ${where}:${one.line}:${one.column}  ${one.rule}\n    ${one.message}`,
     ),
     "",
-    "A hand writes the ask of a draft, the fields of the step it holds, and the discussion.",
+    "A hand writes the ask, the fields of the step it holds, and the discussion.",
     "Everything else on a ticket is the engine's, and the pull writes it at the hand-back.",
   ].join("\n");
 }

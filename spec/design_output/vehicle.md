@@ -177,24 +177,36 @@ yet, and this is where that shows.
 
 ## Two roads to the vehicle
 
-The shim and the bridgehead both read `vehicle.json` beside them, and take
-the same two roads in this order:
+The shim and the bridgehead both read `vehicle.json` beside them. The shim
+takes three roads in this order, and the bridgehead the first and the last:
 
-| road | answers |
-|---|---|
-| `SE_VEHICLE` in the environment | that folder |
-| `~/.se/vehicles/<name>` | the folder a cloud box clones the upstream into |
+| road | answers | who takes it |
+|---|---|---|
+| `SE_VEHICLE` in the environment | that folder | the shim, the bridgehead |
+| the register, by the `vehicle` id | the entry's `method_root` | the shim |
+| `~/.se/vehicles/<name>` | the folder a cloud box clones the upstream into | the shim, the bridgehead |
 
-A shim finding the vehicle sets `SE_WORK` to the stub. It then hands every
-argument to the vehicle's `RUNME.sh`. A shim finding none says so and exits
-one. The bridgehead imports the vehicle's `level0` and `level1` hook modules
-from the folder it finds, and registers every hook they carry under its own.
-Where it finds none, the session starts with no cage, and the log says why.
+The shim stays POSIX sh, because a stub holds no node before it finds the
+vehicle. So it reads its two records the plain way:
 
-Two groups stand on this one. The register road of the shim belongs to
-`the-shim-resolves-the-vehicle`, and the import at session start to
-`the-bridgehead-imports-its-vehicle`. Until they land, the shim and the
-bridgehead carry the roads above and nothing more.
+- the register stands in every folder `SE_REGISTRY` names, with `;` between them, and in `~/.se` where it names none
+- sed reads a field out of `vehicle.json` and out of the register, one key a line
+- a path in the register holds backslashes as JSON writes them, and the shim turns each into a slash
+
+A shim finding the vehicle sets `SE_WORK_ROOT` to the stub. It then hands
+every argument to the vehicle's `RUNME.sh`, and `rootsHere` in the command
+line takes that root as the work. So `./RUNME.sh vehicle` inside a stub names
+the vehicle as method and the stub as work. A shim finding none prints one
+line naming the vehicle, its upstream and the cloned road, and exits one.
+
+The bridgehead imports the vehicle's `level0` and `level1` hook modules from
+the folder it finds, and registers every hook they carry under its own. Where
+it finds none, the session starts with no cage, and the log says why. Its
+register road belongs to `the-bridgehead-installs-upstream`.
+
+`test/contract/stub.test.js` drives the shim over a fixture: a fake vehicle
+whose `RUNME.sh` echoes its argv and its work root, a register naming it, and
+a stub. It reads both, then empties the register and reads the refusal line.
 
 ## Nothing of the method travels
 
