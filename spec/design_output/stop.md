@@ -95,8 +95,12 @@ ends it, at two strengths:
 
 | strength | what the owner asks for | which rule ends it |
 |---|---|---|
-| `finish` | end this turn at the next place that suits the work | `the-owner-asks-to-finish`, at 84 |
+| `finish` | bring what stands to a point a hand picks up later, then end | `the-owner-asks-to-finish`, at 84 |
 | `stop` | end this turn now | `the-owner-holds-this-session`, at 85 |
+
+The agent judges where that point stands at `finish`, because the work in
+hand decides it. At `stop` the door decides, and the three calls above are
+what it leaves.
 
 Each stands over every continue rule but the owner's own word, the queue's
 firm rule among them. So a held turn ends with work still waiting.

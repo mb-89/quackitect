@@ -98,10 +98,10 @@ test("the hold at finish rides the block on every call, not on the first alone",
     const said = holdsCall({ tool }, it);
     assert.match(
       said.after.context[0],
-      /Put the work down/,
+      /Bring what you hold to a point/,
       `${tool} carries the line`,
     );
-    assert.match(said.after.context[0], /start nothing new/);
+    assert.match(said.after.context[0], /take nothing new out of the queue/);
   }
 });
 
