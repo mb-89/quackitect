@@ -281,7 +281,7 @@ The engine writes one entry into `record`: the step, the hand, the take hash,
 the tip now, and every command's answer. It moves `step` to the next leaf,
 skipping the ones whose condition fails, or closes the ticket `done` past the
 last. It sets `state: open`, stages everything, and commits as `<ticket>:
-<what changes>`. Then it pushes, drops the hold and hands out the next leaf.
+<what changes>`. Then it drops the hold, pushes, and hands out the next leaf.
 
 ## The record holds the answers
 
@@ -292,8 +292,12 @@ one level deeper, which is how `answered` lands.
 
 A push origin refuses fetches the branch, rebases once, and pushes again. A
 rebase that fails stops and puts the tree back, and the pull answers
-`refused` with the branch moving. The hold stays, so the next hand-back finds the record with its
-answer and pushes again.
+`refused` with the branch moving. The hand-back stands by then. The record
+carries its answer, the ticket stands at its next leaf or closed, and the
+commit stands on the box. So the hold drops before the push, and the refusal
+says to push the branch and pull again. A hold past that point stands on a
+closed ticket, and the stop hook holds the turn open for a hand-back nobody
+owes.
 
 # The fail
 

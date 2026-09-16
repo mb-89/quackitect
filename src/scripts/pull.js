@@ -1345,9 +1345,11 @@ function passed(it, who, one, leaf, held, answered) {
 
   one.text = text;
   landed(it, one, changes);
+  // The hand-back stands once it lands, so the hold drops before the push and outlives no closed ticket. [[spec/design_output/pull#the-rejected-push]]
+  dropHold(it, who.hand);
   if (!one.private && !pushed(it, who.branch)) {
     say(REFUSED, [
-      `${who.branch} moves under this hand-back, and one rebase fell short. Pull again.`,
+      `${who.branch} moves under this hand-back, and one rebase fell short. The hand-back stands here, so push ${who.branch} and pull again.`,
     ]);
     return 1;
   }
@@ -1391,9 +1393,11 @@ function failed(it, who, one, leaf, held, reason, answered) {
   }
 
   landed(it, one, changes);
+  // The hand-back stands once it lands, so the hold drops before the push and outlives no closed ticket. [[spec/design_output/pull#the-rejected-push]]
+  dropHold(it, who.hand);
   if (!one.private && !pushed(it, who.branch)) {
     say(REFUSED, [
-      `${who.branch} moves under this hand-back, and one rebase fell short. Pull again.`,
+      `${who.branch} moves under this hand-back, and one rebase fell short. The hand-back stands here, so push ${who.branch} and pull again.`,
     ]);
     return 1;
   }
@@ -1441,9 +1445,10 @@ function became(it, who, one, leaf, held, successor, answered) {
   text = withField(shut(text, frontOf(text), "became"), "successors", `[${successor}]`);
   one.text = text;
   landed(it, one, [`closes became ${successor}`]);
+  dropHold(it, who.hand);
   if (!one.private && !pushed(it, who.branch)) {
     say(REFUSED, [
-      `${who.branch} moves under this hand-back, and one rebase fell short. Pull again.`,
+      `${who.branch} moves under this hand-back, and one rebase fell short. The hand-back stands here, so push ${who.branch} and pull again.`,
     ]);
     return 1;
   }

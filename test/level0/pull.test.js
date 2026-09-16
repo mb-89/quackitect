@@ -1058,9 +1058,10 @@ test("a rejected push fetches, rebases the commit, tries once more, and then ans
   assert.ok(ranGit(stuck.outside).includes("git rebase --abort"));
   assert.equal(
     stuck.disk.exists(HOLD),
-    true,
-    "the hold stays, so the next pull pushes again",
+    false,
+    "the hand-back stands, so the hold drops and outlives no closed ticket",
   );
+  assert.match(refused.said, /push work\/one-group and pull again/);
 });
 
 // [[spec/design_output/pull#a-need-is-a-verb]]
