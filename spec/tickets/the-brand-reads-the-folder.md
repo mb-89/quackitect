@@ -102,7 +102,11 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
-step: retro/write
+  - step: retro/write
+    hand: box 02ae9414623e
+    hash_before: 90a72bdde5e25cfb3bfbdff21c00fba56bcd4ee2
+    hash_after: 90a72bdde5e25cfb3bfbdff21c00fba56bcd4ee2
+step: retro/cloud
 ---
 
 # Ask
@@ -167,11 +171,23 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 
 <!-- the form is list -->
 
+- the group passes sync, and the branch carries trunk
+- the split assigns [[spec/tickets/brand-reads-folder]] and mints no child
+- the child passes design/draft twice, and a hand of its own fails design/review twice
+- the child stands at design/person-1, where a person rules on the plugin name
+- the ask of the child and the group ticket meet the rules, which the write door refused before
+- the retro decides every private note, and mints two tickets in no group
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- a hand of its own reads harder than the hand that drafts. It catches the plugin name, the lock file and the raw folder name
+- the pull inserts a person step at the second return, so the box hands the design to a person
+- the `--fields` road lands a field the write door refuses, so a leaf closes anyway
+- the sketch runs the branded manifest against the tracked one, so the implement starts from a shape that answers
 
 ### badly
 
@@ -179,17 +195,43 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 
 <!-- the form is list -->
 
+- the box commits while a hand holds a verdict leaf, so the hand-back refuses and one review runs twice
+- the write door lints the whole file, so findings standing in the ask since the mint refuse every write
+- the choice field takes the word the tense rule refuses, so the hand-back reads a right answer as wrong
+- the check stops at the server probe, so the rules over the tree stay unread until the server starts
+- trunk answers findings at error, so `branch done` refuses this branch
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
 
+- [[spec/design_output/pull]] says at the hand-out that a commit under a verdict leaf voids the hand-back
+- [[spec/design_output/level0]] reads the lines a write touches, and leaves the rest of the file to the lint verb
+- [[spec/processes/note]] carries outcome words the voice rules admit, or the tense rule takes those three as exceptions
+- [[spec/tickets/the-check-starts-the-server]] carries the probe
+- [[spec/tickets/the-tense-rule-reads-present]] carries the findings on trunk
+
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
 
 <!-- the form is text -->
+
+Each door in this tree reads right on its own, and three of them meet a hand
+with no move the doors admit:
+
+- the write door refuses a file the mint writes
+- the choice field asks for a word the tense rule refuses
+- the battery asks for a green check that trunk denies
+
+A hand meeting one of these reads it as its own error, and looks for a smaller
+write. The `--fields` road answers two of the three, and no rule names it. That
+road belongs in the guidance.
+
+The group of one child gives its session to design alone, and no code moves. The
+review earns that, because each pass finds real holes.
 
 ## cloud
 
