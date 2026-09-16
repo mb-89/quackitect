@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-hand-carries-a-step
-step: design/draft
+step: design/review
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -91,6 +91,11 @@ steps:
         says: pass or fail, findings one a line
 process: [[standard]]
 process_hash: d1fd9cd113889f29
+record:
+  - step: design/draft
+    hand: box ee33ce836a4d
+    hash_before: 9dd9db35e66080faace6466f0132146d0b6188c4
+    hash_after: 9dd9db35e66080faace6466f0132146d0b6188c4
 ---
 
 # Ask
@@ -120,6 +125,10 @@ The pull learns who holds a step, and the first piece is the hand id. Today a ha
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The hand grows from one piece to three, and the design output holds the shape. The plugin wrapper writes the session file at `session.start`, with the session id and the harness name. The pull reads it beside the box file into one hand. The record names the box, the session and the agent, and the hold slugs that hand into its file name.
+
+`--as <name>` appends a helper, which works one leaf under a hold of its own. The spawn hook puts one line at the head of every other helper's prompt. That line says the hand is the session's own, so `not` holds against it. For details, see [[spec/design_output/pull#the-hand-and-the-hold]] and [[spec/design_output/pull#a-hand-of-its-own]].
 
 ## review
 
