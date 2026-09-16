@@ -80,6 +80,9 @@ record:
     hand: box d42624a67d18a8
     hash_before: 09860bacd8a43c5cad5d8f0e4e6e2f4a37023559
     hash_after: a02e060a83d63d945154a2f4c8de1f3a0c696181
+  - step: sync
+    hand: box 1eeed4143ad0
+    hash_before: fd6ff70d4fee2fea1b7c5946d0c91afb4c572934
 ---
 
 # Ask
