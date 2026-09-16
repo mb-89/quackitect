@@ -2,10 +2,20 @@
 kind: [[ticket]]
 state: open
 urgency: whenever
+step: design/person-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: "design/review failed back 2 times: The redraft answers the design output list, the `when` clause and the two; fake folders. The plugin name, the icon file and the lock file want a third draft.; the plugin name is the role, and the marketplace name is the brand. Stamping the plugin name renames every `mcp__level0` tool; the bridge modules and the cage settings write `mcp__level0` in, so a branded plugin name costs a prompt; the marketplace name alone parts two vehicles, because the client keys a plugin under its marketplace; the icon row names a config file, and the ask names a file under `spec/config`. Name that path, so the implement writes there; the ask says this tree keeps its icon. The icon row reads as the link writing initials over the mark this tree wears; `src/extension/package-lock.json` writes the name twice, and `npm install` rewrites it. The stamp leaves the two out of step; `src/extension/webview/package.json` writes the name, and wants a row in the table; `brandOf` answers the folder name raw. A folder carrying a dot or a space makes an id the editor refuses; `links(files, home, root)` drops the verb, so the `linked` query stands outside the test the ask asks for; the design output list names the command that counts the places, and carries a count from that command alone"
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -88,8 +98,6 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
-group: the-brand-reads-the-folder
-step: design/review
 record:
   - step: design/draft
     hand: box 02ae9414623e
@@ -105,6 +113,13 @@ record:
     hand: box 02ae9414623e
     hash_before: 9c208fa9d41f45a1d766e3635e327da3eb68b74f
     hash_after: 9c208fa9d41f45a1d766e3635e327da3eb68b74f
+  - step: design/review
+    hand: box 02ae9414623e · helper-4
+    hash_before: fa21422149f377d5a321ce893d85a7ef08f6b2de
+    hash_after: fa21422149f377d5a321ce893d85a7ef08f6b2de
+    returns: 2
+    why: The redraft answers the design output list, the `when` clause and the two; fake folders. The plugin name, the icon file and the lock file want a third draft.; the plugin name is the role, and the marketplace name is the brand. Stamping the plugin name renames every `mcp__level0` tool; the bridge modules and the cage settings write `mcp__level0` in, so a branded plugin name costs a prompt; the marketplace name alone parts two vehicles, because the client keys a plugin under its marketplace; the icon row names a config file, and the ask names a file under `spec/config`. Name that path, so the implement writes there; the ask says this tree keeps its icon. The icon row reads as the link writing initials over the mark this tree wears; `src/extension/package-lock.json` writes the name twice, and `npm install` rewrites it. The stamp leaves the two out of step; `src/extension/webview/package.json` writes the name, and wants a row in the table; `brandOf` answers the folder name raw. A folder carrying a dot or a space makes an id the editor refuses; `links(files, home, root)` drops the verb, so the `linked` query stands outside the test the ask asks for; the design output list names the command that counts the places, and carries a count from that command alone
+group: the-brand-reads-the-folder
 ---
 
 # Ask
@@ -124,6 +139,16 @@ Every vehicle calls itself quackitect, and two of them fight over one extension 
 Read [[spec/design_input/a-stub-takes-its-vehicle]] first, the chapters The stub's files and The bridgehead step by step.
 
 # design
+
+## person-1
+
+<!-- answers the question the engine asks -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
 
 ## draft
 
@@ -181,17 +206,19 @@ entries out of the list. That is the proof the ask names.
 
 <!-- the form is verdict -->
 
-fail. The approach carries the manifest, the ids and the icon. The list and the
-editor test wait on a second draft.
+fail. The redraft answers the design output list, the `when` clause and the two
+fake folders. The plugin name, the icon file and the lock file want a third draft.
 
-- the design output holds a list of the places that write the name in, and the approach links it
-- the plugin manifests join the table, where each writes the name as the plugin name. So two vehicles hand the client one name twice
-- the approach plans a test for each pure function. The two fake folders the ask names wait on a test over the link verb
-- the stamp writes the name, the display name, the publisher, the container and the view. The `when` clause of the view carries the brand too
-- the manifest and the icon travel tracked, so the link dirties every vehicle past this brand. The stamp reads idempotent in this tree alone
-- the diff touches this ticket and its group ticket, each a trivial fix
-- `./RUNME.sh check` answers 1 on the branch, from a server absent at its port
-- the handback waits on a retro, which the branch review names
+- the plugin name is the role, and the marketplace name is the brand. Stamping the plugin name renames every `mcp__level0` tool
+- the bridge modules and the cage settings write `mcp__level0` in, so a branded plugin name costs a prompt
+- the marketplace name alone parts two vehicles, because the client keys a plugin under its marketplace
+- the icon row names a config file, and the ask names a file under `spec/config`. Name that path, so the implement writes there
+- the ask says this tree keeps its icon. The icon row reads as the link writing initials over the mark this tree wears
+- `src/extension/package-lock.json` writes the name twice, and `npm install` rewrites it. The stamp leaves the two out of step
+- `src/extension/webview/package.json` writes the name, and wants a row in the table
+- `brandOf` answers the folder name raw. A folder carrying a dot or a space makes an id the editor refuses
+- `links(files, home, root)` drops the verb, so the `linked` query stands outside the test the ask asks for
+- the design output list names the command that counts the places, and carries a count from that command alone
 
 # implement
 
@@ -201,7 +228,7 @@ editor test wait on a second draft.
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+<!-- the same tests pass -->
 
 <!-- the form is command -->
 
@@ -210,6 +237,12 @@ editor test wait on a second draft.
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 ## reflect
 
@@ -221,6 +254,12 @@ editor test wait on a second draft.
 
 <!-- the form is text -->
 
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
 ## change
 
 <!-- makes the change -->
@@ -230,6 +269,12 @@ editor test wait on a second draft.
 <!-- the tree builds and lints -->
 
 <!-- the form is command -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 ## tests-green
 
@@ -252,6 +297,12 @@ editor test wait on a second draft.
 <!-- what changes and why, for a reader who was not there -->
 
 <!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 # verdict
 
