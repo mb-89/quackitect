@@ -3,10 +3,12 @@
 
 import { statusOf, work } from "../../../../src/scripts/work.js";
 
+const GIT_WAIT = 30000;
+
 export async function dispatch(it) {
   return it.session.withState("copilot-dispatch", async (state, save) => {
     const run = (argv) => {
-      const result = it.proc.run(argv, { cwd: it.root, timeoutMs: 30000 });
+      const result = it.proc.run(argv, { cwd: it.root, timeoutMs: GIT_WAIT });
       if (result.exitCode !== 0)
         throw new Error(
           `${argv[0]} ${argv[1]} failed. Keep the claim and retry dispatch after checking GitHub.`,

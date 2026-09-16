@@ -424,7 +424,7 @@ none of its own.
 `src/scripts/editor.js` makes the link through the disk door, and the shell asks
 it first:
 
-- `linked` answers 0 where the link reaches this tree and the list names the id, and prints nothing.
+- `linked` answers `0` where the link reaches this tree and the list names the id, and prints nothing.
 - `link` removes a copy, a stale link or a link pointing nowhere, links `src/extension`, and writes the entry.
 
 The link is a junction on Windows, which needs no administrator, and a symbolic

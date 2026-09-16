@@ -1,6 +1,5 @@
-// The reader that goes before trunk. This file holds what a review gathers,
-// the questions a model answers, and the shape of the report. The verb and the
-// hooks module both load it, so one report shape serves both.
+// The reader that goes before trunk. The verb and the hooks module both load
+// it, so one report shape serves both.
 // [[spec/design_output/review#what-the-report-looks-like]]
 
 export const TOOL = "review_branch";
@@ -8,6 +7,7 @@ export const CALLED = `mcp__level0__${TOOL}`;
 export const BRIEF = "HANDOVER.md";
 export const WORKTREE = ".se/review";
 export const DIFF_CAP = 120000;
+const NAME_WIDTH = 10;
 
 export const ASKED = ["brief", "beyond", "tests"];
 
@@ -155,12 +155,11 @@ export function report(said, read = {}) {
     ["reader", unread],
   ].filter(([, value]) => String(value ?? "").trim());
 
-  const pad = 10;
   const out = [said.branch, ""];
   for (const [name, value] of rows) {
     const lines = String(value).split("\n");
-    out.push(`${name.padEnd(pad)} ${lines[0]}`);
-    for (const rest of lines.slice(1)) out.push(`${" ".repeat(pad)} ${rest}`);
+    out.push(`${name.padEnd(NAME_WIDTH)} ${lines[0]}`);
+    for (const rest of lines.slice(1)) out.push(`${" ".repeat(NAME_WIDTH)} ${rest}`);
   }
   out.push("", closing(fix));
   return out.join("\n");

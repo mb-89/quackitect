@@ -1,8 +1,9 @@
 // The owner's prompt comes first, and the gate reads the answer at the turn's
-// end. This holds both rules: which prompts open a turn a person is waiting on,
-// what a refusal says, and the score, the bands and the state of the gate.
+// end. This holds the rules of both doors.
 // [[spec/design_output/level0#the-owners-prompt-comes-first]]
 // [[spec/design_output/level0#the-gate-reads-the-answer]]
+
+import { scoreOf as score } from "./voice.js";
 
 // [[spec/design_output/level0#which-prompt-opens-a-turn]]
 const OPENS = new Set([
@@ -276,10 +277,7 @@ export function wordsIn(text) {
 }
 
 export function scoreOf(text, found) {
-  const words = wordsIn(text);
-  const rows = found?.length ?? 0;
-  if (!words || !rows) return 0;
-  return Math.round((rows / words) * 10000) / 10;
+  return score(wordsIn(text), found?.length ?? 0);
 }
 
 // [[spec/design_output/level0#the-three-bands]]

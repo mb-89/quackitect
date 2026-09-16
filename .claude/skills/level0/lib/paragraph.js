@@ -8,6 +8,7 @@ import { swapsOf, TERMS, wordsOf } from "./vocabulary.js";
 export const PARAGRAPH = "paragraph rules";
 export const RULES = ".yml";
 export const LINK = "spec/funnel/a-paragraph-has-a-schema.md";
+const WIDTH = { banner: 76, row: 72 };
 
 // [[spec/design_output/projection#the-schema-names-a-mark]]
 const MARKS = new Map([
@@ -164,17 +165,7 @@ export function rulesFrom(said, banner = "", lists = null) {
 
 function file(banner, body) {
   if (!banner) return body;
-  const rows = [];
-  let row = "";
-  for (const word of String(banner).split(/\s+/).filter(Boolean)) {
-    if (row && `${row} ${word}`.length > 76) {
-      rows.push(row);
-      row = word;
-      continue;
-    }
-    row = row ? `${row} ${word}` : word;
-  }
-  if (row) rows.push(row);
+  const rows = grouped(String(banner).split(/\s+/).filter(Boolean), WIDTH.banner);
   return `${rows.map((one) => `# ${one}`).join("\n")}\n${body}`;
 }
 
@@ -340,8 +331,8 @@ function characters(layer) {
 
 // [[spec/design_output/projection#the-second-target]]
 function markup(layer) {
-  const cap = Number(layer.heading?.words ?? 5);
-  const lead = Number(layer.strongLead?.words ?? 4);
+  const cap = Number(layer.heading?.words);
+  const lead = Number(layer.strongLead?.words);
   const one = layer.heading?.oneTitle === true;
 
   return scripted("This markup stands outside what a paragraph admits.", [
@@ -458,7 +449,7 @@ function opening(opens) {
 
 // [[spec/design_output/projection#a-layer-writes-two-files]]
 function run(layer, where, opens = []) {
-  const most = Number(layer.paragraphsPerRun ?? 3);
+  const most = Number(layer.paragraphsPerRun);
 
   return scripted(`A run holds ${most} paragraphs${where}.`, [
     ...prelude(["rows", "structure"], false),
@@ -517,7 +508,7 @@ function run(layer, where, opens = []) {
 
 // [[spec/design_output/projection#a-layer-writes-two-files]]
 function paragraph(layer, where) {
-  const most = Number(layer.sentencesPerParagraph ?? 6);
+  const most = Number(layer.sentencesPerParagraph);
   return counted(
     `A paragraph holds ${most} sentences${where}. Break this one.`,
     "paragraph",
@@ -528,7 +519,7 @@ function paragraph(layer, where) {
 
 // [[spec/design_output/projection#a-layer-writes-two-files]]
 function sentence(layer) {
-  const most = Number(layer.words?.max ?? 25);
+  const most = Number(layer.words?.max);
   return counted(
     `A sentence holds ${most} words. Cut this one in two.`,
     "sentence",
@@ -539,7 +530,7 @@ function sentence(layer) {
 
 // [[spec/design_output/projection#a-layer-writes-two-files]]
 function listItem(layer) {
-  const most = Number(layer.words?.listItem ?? 20);
+  const most = Number(layer.words?.listItem);
 
   return scripted(`A sentence in a list item holds ${most} words.`, [
     ...prelude(["rows", "words"], false),
@@ -571,7 +562,7 @@ function listItem(layer) {
 
 // [[spec/design_output/projection#a-layer-writes-two-files]]
 function codeSpans(layer) {
-  const most = Number(layer.codeSpans ?? 4);
+  const most = Number(layer.codeSpans);
 
   return scripted(`A sentence holds ${most} code spans.`, [
     ...prelude(["rows"], false),
@@ -769,7 +760,7 @@ function pathOf(layer) {
 }
 
 // [[spec/funnel/a-paragraph-has-a-schema]]
-function grouped(said, at = 72) {
+export function grouped(said, at = WIDTH.row) {
   const out = [];
   let row = "";
   for (const one of said) {

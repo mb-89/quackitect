@@ -4,6 +4,7 @@
 // [[spec/design_output/level0#the-owners-prompt-comes-first]]
 
 import { questionsIn } from "../../.claude/skills/level0/lib/answer.js";
+import { SAID } from "../../.claude/skills/level0/lib/log.js";
 
 const OWNER = new Set(["composer", "sdk"]);
 const REACHES = new Set(["AskUserQuestion", "mcp__level0__report"]);
@@ -63,7 +64,7 @@ export function onAgentSpoke(e, box) {
     : `${SAYS(demand.why)} The last text seen stands from before the ask, and reads: "${head(demand.seen)}".`;
   box.log.say("debug", "gate", `refused ${e?.tool ?? "a call"} before a reply`, {
     tool: String(e?.tool ?? ""),
-    detail: lacks.slice(0, 120),
+    detail: lacks,
   });
   return { result: { deny: lacks } };
 }
@@ -79,7 +80,7 @@ function textsSince(e, seen) {
 }
 
 function head(text) {
-  return String(text ?? "").replace(/\s+/g, " ").slice(0, 80);
+  return String(text ?? "").replace(/\s+/g, " ").slice(0, SAID);
 }
 
 export function pays(box, text) {

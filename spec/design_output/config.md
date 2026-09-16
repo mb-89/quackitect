@@ -44,16 +44,15 @@ carries reaches the code from that file.
 The per-box file is the state, so the resolver reads it on every ask. The write
 door asks on every Write and Edit, which makes that the ask worth timing:
 
-| what | cost |
-|---|---|
-| one ask, reading the file | 0.0056 ms |
-| `stat` alone, the check a cache needs | 0.0017 ms |
-| Vale over one write | 88 ms |
-| Biome over one write | 101 ms |
+| what | cost | rounds |
+|---|---|---|
+| one ask, reading the file | 0.0056 ms | 10000 |
+| `stat` alone, the check a cache needs | 0.0017 ms | 10000 |
+| Vale over one write | 88 ms | 1 |
+| Biome over one write | 101 ms | 1 |
 
-The handover on this branch carries the script, which measures the first three
-over 10000 rounds and the last two once each. One ask costs one part in sixteen
-thousand of the cheapest door the write path already pays. So this tree holds
+The handover on this branch carries the script. One ask costs one part in
+sixteen thousand of the cheapest door the write path already pays. So this tree holds
 no cache and no `mtimeMs` check.
 Measure again where the per-box file grows past a few keys.
 
@@ -152,25 +151,28 @@ number `5`, which keeps `"5" > 3` a bug nobody files.
 Where the schema knows no such key, the text lands as given. A key only the
 local file names resolves, and nothing knows its type.
 
-# The magic numbers stay
+# The magic numbers take names
 
-Biome carries `noMagicNumbers`, and this tree holds it off in
-`spec/config/biome.json`. Turning it on there and running `./RUNME.sh lint`
-names every line it reaches, and they fall in these kinds:
+A number that carries a meaning stands in one place, and code reads it by name.
+`spec/config/biome.json` holds `noMagicNumbers` on, so the check refuses a bare
+number in JavaScript. An override keeps the rule off the tests, because a case
+names its numbers out loud.
 
-| where | what they are |
+| the number | where it lives |
 |---|---|
-| a test | the numbers a case names out loud |
-| `padEnd` and `padStart` | the column widths of a printed table |
-| a `slice` or a `repeat` | the offsets of a timestamp |
-| `src/scripts/copilot.js` | a deadline and a timeout, in milliseconds |
+| one a person sets | a key under `spec/config/level0.json`, with its entry in the schema |
+| one the module owns | the constants block at the top of that module |
+| one a formula or a format fixes | the same block, under a name saying what it is |
 
-The rule takes no options in Biome 2.5.12, so a tree turning it on takes every
-line above with it. Its own exemptions are the whole of what a person gets:
+The rule takes no options in Biome 2.5.12, so what it lets through stands bare:
 
-- the values 0, 1, 2, 10, 24 and 60, anywhere they stand
-- an array index
-- an initial value in a declaration, and a default in a parameter
+| what passes | why |
+|---|---|
+| `0`, `1`, `2`, `10`, `24` and `60` | the values Biome reads as plain |
+| an array index | a position, and no value |
+| an initial value in a declaration, and a default in a parameter | the declaration is the name |
 
-Every number the config owns reads from the resolver already, so the rule finds
-none of them. Turn it on where a later level pays those columns down.
+Biome reads no Go, so `lib/magic.js` reads every Go file under the check with
+the same rule, and `./RUNME.sh check` names what it finds as a warning. A number
+a module holds twice for a technical reason says so beside the second copy.
+[[spec/design_output/schema#warning-now-and-error-later]]

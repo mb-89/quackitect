@@ -4,6 +4,7 @@
 // [[spec/design_output/vehicle#two-roads-to-the-vehicle]]
 
 const LINK = "vehicle.json";
+const ASKING = 10000;
 const MODULES = [
   ".claude/skills/level0/hooks/level0.js",
   ".claude/skills/level1/hooks/level1.js",
@@ -62,7 +63,7 @@ function urlOf(at) {
 
 async function asked($, argv) {
   try {
-    const ran = await $.process.run(argv, { timeoutMs: 10000 });
+    const ran = await $.process.run(argv, { timeoutMs: ASKING });
     return ran.stdout ?? "";
   } catch {
     return "";

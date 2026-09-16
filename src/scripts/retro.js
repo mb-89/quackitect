@@ -3,7 +3,7 @@
 // before it leaves. The retro's own route lands on a later branch.
 // [[spec/design_output/pull#a-need-is-a-verb]]
 
-import { fieldOf } from "./group.js";
+import { fieldOf, NOTE_END, ticketNamed } from "./group.js";
 import { NOTES } from "./ticket.js";
 
 export function retro(root, argv, doors) {
@@ -25,9 +25,9 @@ function notes(it) {
   const open = it.disk.exists(at)
     ? it.disk
         .list(at)
-        .filter((one) => one.kind === "file" && one.name.endsWith(".md"))
+        .filter((one) => one.kind === "file" && one.name.endsWith(NOTE_END))
         .map((one) => ({
-          name: one.name.slice(0, -3),
+          name: ticketNamed(one.name),
           text: it.disk.read(it.join(at, one.name)),
         }))
         .filter((one) => fieldOf(one.text, "state") !== "closed")

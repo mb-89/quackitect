@@ -62,7 +62,7 @@ Three dots read the diff from where the branch leaves trunk. Two dots read it
 from trunk's tip, so a branch standing behind trunk shows every commit trunk
 holds since as a removal.
 
-One real review pays that price here. A branch 19 commits behind trunk answers
+One real review pays that price here. A branch far behind trunk answers
 "two entire subsystems, deleted and undisclosed", over code the branch leaves
 alone. `rev-list` keeps two dots, because it counts the branch's own commits.
 

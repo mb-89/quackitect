@@ -230,3 +230,22 @@ test("the shapes rule and the commit door pass one list of nobody users", () => 
   const names = listed[1].split(",").map((one) => one.trim().replace(/^"|"$/g, ""));
   assert.deepEqual(names.sort(), [...NOBODY].sort());
 });
+
+// [[spec/design_output/config#the-magic-numbers-take-names]]
+ifVale("a digit in a design note's prose is refused, and a version, a unit and a table pass", async () => {
+  const note = "spec/design_output/probe.md";
+  const bare = "The verb exits 0 on survives.\n";
+  assert.ok((await inRegister(bare, note)).includes("DigitInProse"));
+  const quiet = [
+    "Measured against client 2.1.267, a poll every 250 ms stands, and x86 ships.",
+    "",
+    "| what | count |",
+    "|---|---|",
+    "| events | 186 |",
+    "",
+    "1. The verb exits `0` on survives.",
+    "",
+  ].join("\n");
+  assert.deepEqual((await inRegister(quiet, note)).filter((one) => one === "DigitInProse"), []);
+  assert.ok(!(await inRegister(bare, "notes.md")).includes("DigitInProse"));
+});

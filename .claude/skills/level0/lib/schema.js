@@ -3,6 +3,7 @@
 // The caller hands the tree in, so a test drives both over a fake one.
 // [[spec/design_output/schema#the-reader-and-the-checker]]
 
+import { hashText } from "./hash.js";
 import { isDraft, matches } from "./paths.js";
 
 export const SCHEMAS = "spec/schemas";
@@ -12,6 +13,8 @@ export const LEFT = "warning";
 export const MINT_TOOL = "mint_note";
 
 const HEADING = /^(#{1,6})\s+(.+?)\s*$/;
+const SHOWN = 40;
+const ELLIPSIS = "...";
 const FENCE = /^\s*(```|~~~)/;
 const ITEM = /^\s*(?:\d+[.)]|[-*+])\s+\S/;
 const LINK = /^\[\[(.+)\]\]$/;
@@ -714,16 +717,7 @@ export function canonicalOf(said) {
 
 // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
 export function hashOf(said) {
-  const text = JSON.stringify(canonicalOf(said));
-  let low = 0x811c9dc5;
-  let high = 0x9e3779b9;
-  for (let i = 0; i < text.length; i++) {
-    const code = text.charCodeAt(i);
-    low = Math.imul(low ^ code, 0x01000193) >>> 0;
-    high = Math.imul(high + code + 1, 0x85ebca6b) >>> 0;
-    high = ((high << 13) | (high >>> 19)) >>> 0;
-  }
-  return `${low.toString(16).padStart(8, "0")}${high.toString(16).padStart(8, "0")}`;
+  return hashText(JSON.stringify(canonicalOf(said)));
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
@@ -1232,7 +1226,7 @@ function flatOf(said) {
   if (Array.isArray(said)) return `[${said.map((one) => `"${one}"`).join(", ")}]`;
   const flat = String(said ?? "");
   // [[spec/design_output/pull#a-person-step-goes-in]]
-  if (/: |^[\[{"'#&*!|>%@`]|: *$| #/.test(flat) && !/^\[\[.*\]\]$/.test(flat)) {
+  if (/: |^[[{"'#&*!|>%@`]|: *$| #/.test(flat) && !/^\[\[.*\]\]$/.test(flat)) {
     return `"${flat.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
   }
   return flat;
@@ -1251,13 +1245,6 @@ function handedIn(fields) {
   if (!fields || typeof fields !== "object" || Array.isArray(fields)) return out;
   for (const [key, value] of Object.entries(fields)) out.set(slugOf(key), value);
   return out;
-}
-
-function saidFor(key, rule, given) {
-  if (rule?.const !== undefined) return minted(rule);
-  const said = given.get(slugOf(key));
-  if (said === undefined || String(said).trim() === "") return minted(rule);
-  return written(said, rule);
 }
 
 function written(said, rule) {
@@ -1425,5 +1412,5 @@ function typeOf(value) {
 
 function show(said) {
   const flat = Array.isArray(said) ? said.join(", ") : String(said ?? "");
-  return flat.length > 40 ? `${flat.slice(0, 37)}...` : flat;
+  return flat.length > SHOWN ? `${flat.slice(0, SHOWN - ELLIPSIS.length)}${ELLIPSIS}` : flat;
 }

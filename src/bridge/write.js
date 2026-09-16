@@ -1,5 +1,5 @@
-// The write door: the owner of a projected file, the private notes, the note
-// schemas and the voice rules, in that order, then the code door.
+// The write door. Every rule over a written file runs here in the order the
+// design note names, and the code door follows.
 // [[spec/design_output/level0#the-write-door]]
 
 import { join } from "node:path";

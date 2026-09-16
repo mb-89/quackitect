@@ -391,5 +391,5 @@ The delta reads off `git diff` from the first `hash_before` on the ticket in
 hand, or from the branch point where no hold stands. The files git has yet to
 see count too.
 
-The run names the tap reporter, because node past 23 answers a pipe with the
-spec reporter too, and the count reads the tap lines.
+The run names the tap reporter. Node past version 23 answers a pipe with the
+spec reporter too, so the count reads the tap lines.

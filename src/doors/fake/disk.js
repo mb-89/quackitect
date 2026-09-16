@@ -1,6 +1,8 @@
 // A filesystem in memory. It behaves: what a test writes, it reads back.
 // [[spec/design_output/doors#a-fake-behaves]]
 
+const HOPS = 8;
+
 export function fakeDisk(seed = {}) {
   const files = new Map(Object.entries(seed).map(([at, said]) => [norm(at), said]));
   const folders = new Set();
@@ -10,7 +12,7 @@ export function fakeDisk(seed = {}) {
 
   // [[spec/design_output/extension#a-link-pointing-nowhere]]
   function exists(at, hops = 0) {
-    if (links.has(at)) return hops < 8 && exists(links.get(at), hops + 1);
+    if (links.has(at)) return hops < HOPS && exists(links.get(at), hops + 1);
     if (files.has(at) || folders.has(at)) return true;
     return [...files.keys(), ...folders].some((one) => one.startsWith(`${at}/`));
   }

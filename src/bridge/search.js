@@ -31,7 +31,7 @@ export function answersFromIndex(e, box) {
   }
   box.log.say("info", "index", `${ask.method} reads the rows`, {
     tool: String(e.tool),
-    detail: String(e.pattern ?? "").slice(0, 120),
+    detail: String(e.pattern ?? ""),
   });
   return { result: e.tool === "Glob" ? globShape(answer) : grepShape(e, answer) };
 }

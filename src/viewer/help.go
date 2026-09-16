@@ -1,5 +1,5 @@
 // What alt+? and alt+f open in the details pane: how the window works, and how
-// the filter reads. The header names the three keys, and these say the rest.
+// the filter reads. The header names the keys, and these say the rest.
 // [[spec/design_output/viewer#the-help]]
 
 package main

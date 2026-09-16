@@ -12,6 +12,8 @@ import {
   readNote,
   reRouted,
 } from "../../.claude/skills/level0/lib/schema.js";
+import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
+import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { CONFIG as VALE_CONFIG, faultIn, fromJson } from "../../.claude/skills/level0/lib/vale.js";
 import { COPY } from "../../.claude/skills/level0/lib/vehicle.js";
 import {
@@ -20,8 +22,10 @@ import {
   frontOf,
   GROUP,
   isGroup,
+  NOTE_END,
   OPEN,
   recordIn,
+  ticketNamed,
   TICKETS,
   withEntry,
   withField,
@@ -35,11 +39,9 @@ export const WORK = "work";
 export const REFUSED = "refused";
 export const WAIT = "wait";
 export const ENGINE = "the engine";
-export const FAILS = 2;
-export const REFUSALS = 5;
-export const SPLITS = 3;
-
-const TRUNK = "main";
+const BOX_ID = 12;
+const MOST_MOVES = 64;
+const CUT = { said: 120, error: 160 };
 const DONE = "done";
 const CHECKED = "checked";
 const COMMENT = /^\s*<!--.*-->\s*$/;
@@ -99,7 +101,7 @@ export function handOf(it) {
   }
   const id = it.random
     ? it.random()
-    : hashOf(`${it.clock ? it.clock.stamp() : ""} ${it.root}`).slice(0, 12);
+    : hashOf(`${it.clock ? it.clock.stamp() : ""} ${it.root}`).slice(0, BOX_ID);
   it.disk.makeDir(it.join(it.root, ".se"));
   it.disk.write(it.join(it.root, ...BOX.split("/")), `${JSON.stringify({ id })}\n`);
   return `box ${id}`;
@@ -335,10 +337,10 @@ function ticketsHere(it) {
     const at = it.join(it.root, ...folder.split("/"));
     if (!it.disk.exists(at)) continue;
     for (const one of it.disk.list(at)) {
-      if (one.kind !== "file" || !one.name.endsWith(".md")) continue;
+      if (one.kind !== "file" || !one.name.endsWith(NOTE_END)) continue;
       const text = it.disk.read(it.join(at, one.name));
       out.push({
-        name: one.name.slice(0, -3),
+        name: ticketNamed(one.name),
         path: `${folder}/${one.name}`,
         at: it.join(at, one.name),
         text,
@@ -551,7 +553,7 @@ function advanced(it, who, one, all) {
   let moved = false;
   const changes = [];
 
-  for (let guard = 0; guard < 64; guard++) {
+  for (let guard = 0; guard < MOST_MOVES; guard++) {
     const leaf = leafOf(front, path);
     if (!leaf) {
       return { why: `stands at ${path || "no step"}, which its route lacks` };
@@ -910,7 +912,7 @@ function handBack(it, who, name, verdict) {
   ) {
     dropHold(it, who.hand);
     say(REFUSED, [
-      `the take hash ${held.hash.slice(0, 8)} trails ${who.branch}, so the hold drops. Pull again.`,
+      `the take hash ${shortOf(held.hash)} trails ${who.branch}, so the hold drops. Pull again.`,
     ]);
     return 1;
   }
@@ -975,7 +977,7 @@ function handBack(it, who, name, verdict) {
 // [[spec/design_output/pull#the-hand-back-refused]]
 function refused(it, who, one, leaf, held, found) {
   const count = Number(held.refused ?? 0) + 1;
-  const most = Number(it.refusals ?? REFUSALS);
+  const most = Number(it.refusals);
   if (most > 0 && count >= most) {
     const put = withPersonStep(
       it,
@@ -1265,7 +1267,7 @@ function commandsRun(it, leaf, chapter, found) {
     }
     const rows = `${ran.stdout ?? ""}`.trim().split("\n").filter(Boolean);
     const last = rows.at(-1) ?? "";
-    out.push({ name: field.name, exit: ran.exitCode, said: last.slice(0, 120) });
+    out.push({ name: field.name, exit: ran.exitCode, said: last.slice(0, CUT.said) });
     const want = field.expects;
     if (want === undefined || want === null || want === "") continue;
     const asNumber = Number(want);
@@ -1298,15 +1300,11 @@ function handFaults(it, one, leaf, hand, held) {
     const tip = tipOf(it);
     if (held.hash && tip !== held.hash) {
       out.push(
-        `a verdict comes from a hand that leaves the tip where it stands, and ${who8(held.hash)} moved to ${who8(tip)}.`,
+        `a verdict comes from a hand that leaves the tip where it stands, and ${shortOf(held.hash)} moved to ${shortOf(tip)}.`,
       );
     }
   }
   return out;
-}
-
-function who8(hash) {
-  return String(hash ?? "").slice(0, 8);
 }
 
 // [[spec/design_output/pull#the-pass]]
@@ -1381,7 +1379,7 @@ function failed(it, who, one, leaf, held, reason, answered) {
   const changes = [`fails ${leaf.path} back to ${back}`];
   one.text = withField(withField(text, "step", back), "state", OPEN);
 
-  const most = Number(it.fails ?? FAILS);
+  const most = Number(it.fails);
   if (most > 0 && returns >= most) {
     const put = withPersonStep(
       it,
@@ -1509,7 +1507,7 @@ export function withPersonStep(it, one, before, asks, options) {
   const front = frontOf(one.text);
   const walk = walkOf(front);
   const standing = walk.filter((held) => /^person(-\d+)?$/.test(held.name)).length;
-  const most = Number(it.splits ?? SPLITS);
+  const most = Number(it.splits);
   if (most > 0 && standing >= most) {
     console.error(
       `${one.name} carries ${standing} person steps already, so split it: hand back --became <ticket>.`,
@@ -1612,7 +1610,7 @@ export function testVerb(it, argv) {
 
   if (!files.length) {
     console.log(
-      `missing, because the branch changes no test since ${since ? who8(since) : "the branch point"}`,
+      `missing, because the branch changes no test since ${since ? shortOf(since) : "the branch point"}`,
     );
     return 1;
   }
@@ -1651,13 +1649,13 @@ export function testSays(ran, files) {
     count("tests") === 0
   ) {
     const line = out.split("\n").find((row) => /Error/.test(row));
-    return `build, because a file loads no test: ${(line ?? "the run answers nothing").trim().slice(0, 160)}`;
+    return `build, because a file loads no test: ${(line ?? "the run answers nothing").trim().slice(0, CUT.error)}`;
   }
   if (/ERR_ASSERTION|AssertionError/.test(out)) {
     return `assertion, ${count("fail")} test(s) fail on their own assertion`;
   }
   const line = out.split("\n").find((row) => /Error/.test(row));
-  return `build, because ${count("fail")} test(s) fail outside an assertion: ${(line ?? "").trim().slice(0, 160)}`;
+  return `build, because ${count("fail")} test(s) fail outside an assertion: ${(line ?? "").trim().slice(0, CUT.error)}`;
 }
 
 // [[spec/design_output/pull#the-answers]]

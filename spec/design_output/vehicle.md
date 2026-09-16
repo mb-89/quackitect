@@ -114,8 +114,8 @@ marker. A folder that holds something else now answers about that something.
 ## The register holds the port
 
 One vehicle, one port. The register's entry for a vehicle carries the port
-it blocks. A vehicle with none takes the lowest free one from 6510 up on its
-first start. So two vehicles on one box stand on two ports, and a project
+it blocks. A vehicle with none takes the lowest free one from `PORT_BASE` in
+`lib/vehicle.js` up on its first start. So two vehicles on one box stand on two ports, and a project
 reaches the right one.
 
 A project points at its vehicle in `.se/vehicle.json`: the method root and

@@ -1,5 +1,4 @@
-// The vehicle: what a project carries, how a bare folder becomes one, and the
-// port the register hands each vehicle.
+// The vehicle a project carries, and the port the register hands it.
 // [[spec/design_output/vehicle#the-register-holds-the-port]]
 
 import { join } from "node:path";

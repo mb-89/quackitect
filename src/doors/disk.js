@@ -19,13 +19,15 @@ import {
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
+const RUNNABLE = 0o755;
+
 export function disk() {
   return {
     read: (path) => readFileSync(path, "utf8"),
     write: (path, text) => writeFileSync(path, text, { encoding: "utf8" }),
     append: (path, text) => appendFileSync(path, text, { encoding: "utf8" }),
     exists: (path) => existsSync(path),
-    runnable: (path) => chmodSync(path, 0o755),
+    runnable: (path) => chmodSync(path, RUNNABLE),
     list: (path) => readdirSync(path, { withFileTypes: true }).map(named),
     makeDir: (path) => mkdirSync(path, { recursive: true }),
     remove: (path) =>

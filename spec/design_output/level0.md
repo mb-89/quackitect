@@ -61,9 +61,13 @@ the agent runs.
 A server killed and running again takes the next event as its own, because
 the bridgehead holds no state and no connection. So the session goes on across
 every restart of the server, and the client reloads the bridgehead for no
-change of a door. Three headless turns say so, against client 2.1.269. The
-first posts 186 events. The second completes with the server down. The third
-lands on the server running again.
+change of a door. Three headless turns say so, against client 2.1.269:
+
+| turn | what it shows |
+|---|---|
+| the first | posts 186 events |
+| the second | completes with the server down |
+| the third | lands on the server running again |
 
 # The harness surface
 
@@ -163,9 +167,9 @@ moves with the build.
 `turn.step` fires at the step's first tool result, so its first call runs
 before it. It carries the step's visible text in `answer`.
 
-Measured against client 2.1.267, in a session past 4096 messages: at `tool.call`,
+Measured against client 2.1.267, in a session past `4096` messages: at `tool.call`,
 `$.session.messages()` carries no text from the response in flight. The list
-also answers its newest 4096 alone, so a position in it shifts.
+also answers its newest `4096` alone, so a position in it shifts.
 
 So the answer gate reads the step first and the transcript second, and lets the
 calls of a response in flight pass. For details, see
@@ -301,7 +305,7 @@ proves the block stands in front of the model past the compaction.
 | a `compact` line, and no `re-read` context line | `drops` |
 | no `compact` line at `info` | `no compaction`, and the road stands unproven |
 
-The verb exits 0 on `survives` and 1 on anything else.
+The verb exits `0` on `survives` and `1` on anything else.
 
 `test/contract/compact.test.js` drives the verb against the real client. One
 run costs ninety seconds and two model calls, so `SE_SLOW` switches it on and

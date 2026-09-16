@@ -11,8 +11,8 @@ import {
   WORKTREE,
 } from "../../.claude/skills/level0/lib/review.js";
 import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
+import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 
-const TRUNK = "main";
 const LOUD = 5;
 
 export function review(it, name, argv) {

@@ -1,7 +1,6 @@
 // The to-do flag. A hand parks work for later by tagging a note, and the tag
-// holds on this box alone: the push door refuses a delta carrying one, the
-// branch verbs look past it, and the pull hands a tagged note back first.
-// Every check reads strings alone, so a caller hands the texts in.
+// holds on this box alone. Every check reads strings alone, so a caller hands
+// the texts in.
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
 
 import { readNote } from "./schema.js";
@@ -12,7 +11,7 @@ const NOTE = ".md";
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
 export function isTagged(text) {
-  return (readNote(text).front.said ?? {})[TODO] === true;
+  return readNote(text).front.said?.[TODO] === true;
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]

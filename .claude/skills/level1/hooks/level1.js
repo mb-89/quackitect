@@ -1,7 +1,6 @@
-// Level one's hook module: the pull as a tool. It registers the tool, runs the
-// shell verb under it, reads a hand-back with the judge first, and spawns the
-// hand a spawn answer names, because a shell verb reaches no model and no
-// agent, and the hook process reaches both.
+// Level one's hook module: the pull as a tool. A shell verb reaches no model
+// and no agent, and the hook process reaches both, so the judge and the spawn
+// run here.
 // [[spec/design_output/pull#the-checks]]
 
 import {
@@ -20,6 +19,7 @@ const CONFIG = "spec/config/level0.json";
 const RUNNING = 600000;
 const JUDGE = "--judge";
 const SPAWNS = 3;
+const JUDGED_ARGS = 3;
 
 export function register(on, _options) {
   on("session.start", async ($, e, next) => {
@@ -74,7 +74,7 @@ async function judged($, argv) {
   const judge = settings?.judge ?? {};
   if (judge.enabled === false) return "";
 
-  const ran = await $.process.run([...CLI, ...argv.slice(0, 3), JUDGE], {
+  const ran = await $.process.run([...CLI, ...argv.slice(0, JUDGED_ARGS), JUDGE], {
     timeoutMs: RUNNING,
   });
   const material = parsed(ran.stdout);

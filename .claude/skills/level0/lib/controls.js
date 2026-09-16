@@ -1,4 +1,4 @@
-// The two controls the sidebar hands to level zero. The hold reaches the
+// The controls the sidebar hands to level zero. The hold reaches the
 // tooth as a mechanical check, and the ask reaches the standing block as a
 // line. Both read one key, and the sidebar writes it.
 // [[spec/design_output/extension#what-level-zero-holds]]

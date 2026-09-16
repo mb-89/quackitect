@@ -72,7 +72,7 @@ function writes(took, on, box) {
       return `${one.file} would not write: ${bad?.message ?? bad}\nThe tree stands part written. Run undo to put it back, out of ${where}.`;
     }
   }
-  box.log.say("info", "apply", `${wrote.length} file(s) written`, { detail: on.slice(0, 120), file: where });
+  box.log.say("info", "apply", `${wrote.length} file(s) written`, { detail: on, file: where });
   return [
     `${wrote.length} file(s) written, and ${relativeTo(box.root, where)} holds what they said before.`,
     ...wrote.map((one) => `  ${one} (${took.counts[one]} place(s))`),

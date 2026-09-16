@@ -3,6 +3,7 @@
 // the step's stream. It imports nothing, and a dead server blocks nothing.
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
+// The port base of [[spec/design_output/vehicle#the-register-holds-the-port]], held again here because this hook imports nothing.
 const PORT = 6510;
 const POINTER = ".se/vehicle.json";
 const SESSION = ".se/log/session.jsonl";

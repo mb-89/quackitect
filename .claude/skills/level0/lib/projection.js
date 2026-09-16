@@ -5,11 +5,12 @@
 
 import { flatten, keysOf, LOCAL, TRACKED } from "./config.js";
 import { actionables, styled } from "./guidance.js";
-import { faultsOf, PARAGRAPH, rulesFrom, RULES } from "./paragraph.js";
+import { faultsOf, grouped, PARAGRAPH, rulesFrom, RULES } from "./paragraph.js";
 import { readYaml } from "./schema.js";
 import { pathsOf } from "./vocabulary.js";
 
 export const PROJECTIONS = "spec/config/projections.json";
+const WIDTH = 84;
 
 // [[spec/design_output/projection#the-first-target]]
 export const COMMANDS = "config commands";
@@ -342,19 +343,8 @@ export function refusedWrite(entry, path) {
 }
 
 // [[spec/design_output/projection#each-file-says-so]]
-function wrapped(said, at = 84) {
-  const rows = [];
-  let row = "";
-  for (const word of String(said).split(/\s+/).filter(Boolean)) {
-    if (row && `${row} ${word}`.length > at) {
-      rows.push(row);
-      row = word;
-      continue;
-    }
-    row = row ? `${row} ${word}` : word;
-  }
-  if (row) rows.push(row);
-  return rows.join("\n");
+function wrapped(said, at = WIDTH) {
+  return grouped(String(said).split(/\s+/).filter(Boolean), at).join("\n");
 }
 
 function folderOf(target) {

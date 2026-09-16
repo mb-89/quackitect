@@ -6,6 +6,8 @@
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 
 export const TICKETS = "spec/tickets";
+export const NOTE_END = ".md";
+export const WORK_BRANCH = "work/";
 export const GROUP = "group";
 export const OPEN = "open";
 export const CLOSED = "closed";
@@ -16,8 +18,13 @@ export const STALE = "12h";
 const SPAN = /^(\d+)\s*([mhd])$/;
 const SPANS = { m: 60, h: 3600, d: 86400 };
 
+export function ticketNamed(path) {
+  const bare = path.endsWith(NOTE_END) ? path.slice(0, -NOTE_END.length) : path;
+  return bare.slice(bare.lastIndexOf("/") + 1);
+}
+
 export function ticketAt(name) {
-  return `${TICKETS}/${name}.md`;
+  return `${TICKETS}/${name}${NOTE_END}`;
 }
 
 // [[spec/design_output/work#a-group-is-a-ticket]]

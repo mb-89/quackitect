@@ -1,6 +1,5 @@
-// The ticket door. A ticket takes a hand's writing in three places, and the rest
-// of it belongs to the verbs. The schema says which field and which chapter, so
-// this holds no list of its own.
+// The ticket door. A ticket takes a hand's writing where its schema says, and
+// the rest of it belongs to the verbs, so this holds no list of its own.
 // [[spec/design_output/schema#the-three-places]]
 
 import { CHECKED, entriesIn, readNote } from "./schema.js";

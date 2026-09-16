@@ -1,5 +1,5 @@
-// The guidance reaching the session: the rules of every note under the top
-// of spec/guidance as context blocks, the canary line, and the compaction.
+// The guidance reaching the session as context blocks, and the compaction
+// that hands it over again.
 // [[spec/design_output/level0#the-standing-layer]]
 
 import { join } from "node:path";
@@ -165,7 +165,7 @@ export function onAgentSpawn(e, box) {
   const standing = box.guidance?.helper ?? box.guidance?.standing ?? "";
   if (!standing) return { pass: true };
   box.log.say("info", "agent", `handed the guidance to ${e?.subagentType ?? "a helper"}`, {
-    detail: String(e?.description ?? "").slice(0, 120),
+    detail: String(e?.description ?? ""),
   });
   return { event: { ...e, prompt: forHelper(standing, e?.prompt) } };
 }

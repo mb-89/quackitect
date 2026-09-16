@@ -14,10 +14,13 @@ import {
   failureOf,
   replyOf,
 } from "../../.claude/skills/level0/lib/copilot.js";
-import { handle } from "../../.claude/skills/level0/lib/copilot-runtime.js";
+import { handle, TOOL_WAIT } from "../../.claude/skills/level0/lib/copilot-runtime.js";
 import { setup } from "../../.claude/skills/level0/lib/copilot-setup.js";
 import { dispatch } from "../../.claude/skills/level0/lib/copilot-dispatch.js";
 
+const DEADLINE = 20000;
+const LEAST_LEFT = 100;
+const LIST_WAIT = 5000;
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
 const outside = proc();
@@ -54,7 +57,7 @@ const it = {
           process.platform === "win32"
             ? ["cmd", "/c", editor, "--list-extensions"]
             : [editor, "--list-extensions"];
-        const result = outside.run(argv, { cwd: root, timeoutMs: 5000 });
+        const result = outside.run(argv, { cwd: root, timeoutMs: LIST_WAIT });
         if (/github\.copilot/i.test(result.stdout)) return true;
       } catch {}
     }
@@ -74,17 +77,17 @@ try {
     const input = JSON.parse(files.read(0));
     const event = eventOf(input, name, surface);
     currentEvent = event;
-    const deadline = time.now().getTime() + 20000;
+    const deadline = time.now().getTime() + DEADLINE;
     it.proc = {
       run(argv, init = {}) {
         const left = deadline - time.now().getTime();
-        if (left < 100)
+        if (left < LEAST_LEFT)
           throw new Error(
             "The level-zero deadline expires. Retry with a smaller change.",
           );
         return outside.run(argv, {
           ...init,
-          timeoutMs: Math.min(init.timeoutMs ?? 4000, left),
+          timeoutMs: Math.min(init.timeoutMs ?? TOOL_WAIT, left),
         });
       },
     };

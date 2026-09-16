@@ -11,6 +11,7 @@ import {
   STOP,
 } from "../../.claude/skills/level0/lib/controls.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
+import { ticketAt, WORK_BRANCH } from "../scripts/group.js";
 import { heldGroup, openPrivate, queueHolds } from "../../.claude/skills/level0/lib/ticket.js";
 import {
   decide,
@@ -100,7 +101,7 @@ function claims(e, box) {
   }
   box.claim = reason;
   box.log.say("info", "stop", `the agent claims ${reason}`, {
-    detail: String(e?.next ?? "").slice(0, 120),
+    detail: String(e?.next ?? ""),
   });
   return {
     result: {
@@ -169,9 +170,9 @@ function ranHere(name, held) {
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 function groupInHand(box) {
   const branch = branchOf(box);
-  if (!branch.startsWith("work/")) return false;
+  if (!branch.startsWith(WORK_BRANCH)) return false;
   try {
-    return heldGroup(String(box.disk.read(join(box.work, "spec", "tickets", `${branch.slice(5)}.md`))));
+    return heldGroup(String(box.disk.read(join(box.work, ticketAt(branch.slice(WORK_BRANCH.length))))));
   } catch {
     return false;
   }
