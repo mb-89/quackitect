@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: soon
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -111,6 +111,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 747cff5c2f2a
+    hash_before: a582eb8874b6e45ddd04deccd5e32041df3a6fa2
+    hash_after: a582eb8874b6e45ddd04deccd5e32041df3a6fa2
+    answered:
+      - name: lint
+        exit: 0
+        said: 51 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
@@ -271,11 +279,18 @@ The surprise is the word the verb answers: a missing export reads as a build fau
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the tools library, the guidance door, the server, the tools note and two test files
+- the stop door and its test take two lines more, so the queue check reads the environment off the box
+- the door reaches the disk and the process through the fakes, so the tests run in memory
+- the door test's header names the approach, and the code points at the tools note
 
 ## tests-green
 

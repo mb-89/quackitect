@@ -62,6 +62,7 @@ function box(files = {}) {
       disk,
       work: ROOT,
       method: ROOT,
+      env: {},
       proc: fakeProc({ "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } }),
       log: { say: (...row) => said.push(row) },
     },
