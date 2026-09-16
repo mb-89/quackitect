@@ -95,7 +95,7 @@ step: children
 
 # Ask
 
-The extension id, the view id, the display name and the icon read the folder name, so a vehicle and this tree stand side by side in the editor.
+The extension id, the view id, the display name and the icon read the folder name. So a vehicle and this tree stand side by side in the editor.
 
 The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group, its proof and what it waits for. The funnel [[spec/funnel/a-button-makes-a-vehicle]] carries the owner's ask.
 
@@ -201,4 +201,8 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+The group holds one child, and the design input names it as one branch. So the
+split assigns the standing ticket and mints nothing.
+
+The rules verb answers findings at error on trunk, which `branch done` reads as
+a red battery. A private note carries that, and the retro decides it.
