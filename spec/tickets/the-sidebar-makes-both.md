@@ -83,7 +83,15 @@ record:
   - step: sync
     hand: box 1eeed4143ad0
     hash_before: fd6ff70d4fee2fea1b7c5946d0c91afb4c572934
-step: sync
+  - step: sync
+    hand: box 1eeed4143ad0
+    hash_before: 19fffa9cb5df008828a081ee38038791c51251b5
+    hash_after: 19fffa9cb5df008828a081ee38038791c51251b5
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-sidebar-makes-both already carries every commit on main.
+step: split
 ---
 
 # Ask
@@ -99,8 +107,9 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
