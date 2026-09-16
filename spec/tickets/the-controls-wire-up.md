@@ -124,6 +124,35 @@ Today the schema promises two knobs, and the pull reads the binding for the queu
 
 <!-- the form is text -->
 
+| control | who reads it today | who reads it after |
+|---|---|---|
+| `engine.binding` | the stop hook, for the queue rule | the pull's hand-out too |
+| `engine.autonomy` | nobody | the mint, over every kind it writes |
+
+The box the command line builds asks the config for each control, beside the
+words and the counts it asks for already. So the pull and the mint each read
+one field of `it`, and the config door stays the one reader of the file.
+
+| binding | the plain pull | `pull <ticket>` |
+|---|---|---|
+| `queue` | hands out the next leaf | hands out that ticket |
+| `unbound` | answers wait, and says the binding stands unbound | hands out that ticket |
+| `god` | hands out the next leaf | hands out that ticket |
+
+So a person at `unbound` still names the work, and the box stops handing
+itself more. The stop rule reads the same field, so a box at `unbound` ends
+its turn with no queue behind it.
+
+| autonomy | the mint writes |
+|---|---|
+| `finish` | a private note, and refuses a ticket with the line to write instead |
+| `start` | a ticket, and names the group it lands in |
+| `ideation` | a ticket standing loose, which a cloud box rides on the group's branch |
+
+The mint refuses a kind the autonomy leaves out, and the refusal names the
+control and what it allows. For details, see
+[[spec/design_output/pull#the-hand-out]].
+
 ## review
 
 <!-- reads the approach against the ask -->
