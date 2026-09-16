@@ -52,11 +52,15 @@ A finding carrying a colon and a space breaks the frontmatter. Vale then reads n
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/quoted.test.js test/level0/group.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -64,11 +68,16 @@ A finding carrying a colon and a space breaks the frontmatter. Vale then reads n
 
 <!-- the form is text -->
 
+Every value the record writer puts on a row now passes through `quoted`. It wraps a value in double quotes where a YAML reader takes it for a mapping, a comment, a collection or an anchor. It escapes the backslash and the quote inside. A reviewer's finding with a colon in it lands whole, and the frontmatter still reads. The ask names the `why` field, and the same fault reaches every other value, so the writer quotes them all.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask, and reaches every value the record holds
+- the cleanup the change reveals is in the change. The lint reads the ticket that met this first
 
 # Discussion
 

@@ -167,18 +167,25 @@ function entryRows(entry) {
     if (said === undefined || said === null || String(said) === "" || (Array.isArray(said) && !said.length)) continue;
     const lead = out.length ? "    " : "  - ";
     if (!Array.isArray(said)) {
-      out.push(`${lead}${key}: ${said}`);
+      out.push(`${lead}${key}: ${quoted(said)}`);
       continue;
     }
     out.push(`${lead}${key}:`);
     for (const one of said) {
       const pairs = Object.entries(one ?? {}).filter(([, value]) => value !== undefined && value !== null);
       for (const [at, [name, value]] of pairs.entries()) {
-        out.push(`${at ? "        " : "      - "}${name}: ${value}`);
+        out.push(`${at ? "        " : "      - "}${name}: ${quoted(value)}`);
       }
     }
   }
   return out;
+}
+
+// A value a reader would take for a mapping, a comment or a quote goes in quotes. [[spec/design_output/work#the-record-quotes-its-value]]
+export function quoted(said) {
+  const text = String(said);
+  if (!/: |^["'>|&*!%@`[{]|#| $|^$/.test(text)) return text;
+  return `"${text.split("\\").join("\\\\").split('"').join('\\"')}"`;
 }
 
 function frontShut(rows) {

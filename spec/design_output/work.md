@@ -56,6 +56,24 @@ takes the next.
 The hand names the box and no person, because the ticket travels and
 `spec/guidance/private` binds what a tracked file carries. [[spec/guidance]]
 
+## The record quotes its value
+
+A record's value comes off a hand, a hook or a reviewer, so it carries what
+it carries. A colon and a space in it opens a mapping to every YAML reader,
+and the frontmatter then reads as broken. Vale reads no line of such a file,
+and the lint over the tree exits one. The ticket door refuses the hand that
+repairs it, because the record is the engine's.
+
+So `quoted` in `src/scripts/group.js` wraps a value in double quotes where
+it carries any of these, and escapes the backslash and the quote inside:
+
+| what | why a reader trips |
+|---|---|
+| a colon and a space | it reads as a mapping |
+| a leading quote, bracket, brace or YAML mark | it reads as a collection or an anchor |
+| a hash | it opens a comment |
+| a trailing space, or nothing at all | it reads as another value |
+
 ## Held derives from the record
 
 A group holds where its newest record entry carries `hash_before` and no `hash_after`.
