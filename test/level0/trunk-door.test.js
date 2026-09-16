@@ -34,11 +34,12 @@ function box(branch, green = true) {
   };
 }
 
-function onACloud(what) {
+// The door reads the variable past an await, so the case holds it until the answer stands.
+async function onACloud(what) {
   const was = process.env.CLAUDE_CODE_REMOTE;
   process.env.CLAUDE_CODE_REMOTE = "true";
   try {
-    return what();
+    return await what();
   } finally {
     if (was === undefined) delete process.env.CLAUDE_CODE_REMOTE;
     else process.env.CLAUDE_CODE_REMOTE = was;
