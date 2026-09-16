@@ -63,14 +63,15 @@ import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { readTools, whereIs, writeSurvey } from "./tools.js";
 import { SOURCE as VIEWER, viewerOf } from "./viewer.js";
 import {
-  attach,
   detach,
   entryFor,
   produce,
   registerCopy,
   readRegister,
   rootsHere,
+  rootsUnder,
 } from "./vehicle.js";
+import { attachTo } from "../bridge/vehicle.js";
 import { stubInto } from "./stub.js";
 import { HOOKS } from "./precommit.js";
 import { graphIn } from "./graph.js";
@@ -288,7 +289,7 @@ process.exit((await verbs[verb].run(where.length ? where : ["."])) ?? 0);
 function theVehicle(argv) {
   const env = process.env;
   const said = argv[0] ?? "here";
-  const pair = rootsHere(files, env, root);
+  const pair = rootsUnder(files, env, root);
   const made = entryFor(files, it.clock, env, pair.method, version());
 
   if (said === "produce" || said === "into") {
@@ -307,8 +308,8 @@ function theVehicle(argv) {
     return 0;
   }
   if (said === "attach") {
-    attach(files, it.clock, pair.work, made.id);
-    console.log(`${pair.work} names ${made.id} as the copy driving it.`);
+    const settled = attachTo(files, env, it.clock, pair.work, pair.method);
+    console.log(`${pair.work} names ${made.id} as the copy driving it, at port ${settled.port}.`);
     return 0;
   }
   if (said === "detach") {

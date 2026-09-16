@@ -89,7 +89,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-bridgehead-installs-upstream
-step: implement/tests-red
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 99aa60a14c3f
@@ -109,6 +109,25 @@ record:
     hand: box 99aa60a14c3f · helper-4
     hash_before: ef0baf994761d589c165d2e75d51a5341377371b
     hash_after: ef0baf994761d589c165d2e75d51a5341377371b
+  - step: implement/tests-red
+    hand: box 99aa60a14c3f
+    hash_before: 4dcbd862f335d4aee40640cfe8e5646fd3ba3dc6
+    hash_after: 4dcbd862f335d4aee40640cfe8e5646fd3ba3dc6
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 10 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 99aa60a14c3f
+    hash_before: 4dcbd862f335d4aee40640cfe8e5646fd3ba3dc6
+    hash_after: 4dcbd862f335d4aee40640cfe8e5646fd3ba3dc6
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -185,11 +204,28 @@ pass
 
 <!-- the form is command -->
 
+./RUNME.sh branch test
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
+
+Ten tests stand red. Eight drive the bridgehead over a fake git and a fake disk, and two drive the attach verb and the work root.
+
+- The test verb answers build where an export stands nowhere, so an empty export goes in first. Then every test fails on its own assertion.
+- The flow tests trip on the missing context hook before their first assertion. A pass-through hook puts each on its own assertion.
+- The fake git records the clone with the upstream out of `vehicle.json`, and the fake attach writes the driver. So the hook's test reads `.se/project.json` back.
+- The contract test waits under `SE_SLOW`, because it clones this tree and runs its install.
+
+### checked
+
+<!-- one line per item of the checklist -->
+
+- The tests touch the bridgehead, the vehicle verb and the stub tests, which the ask and the approach name. No other file moves.
+- The hook reaches the disk, git and the process through a fake disk and a fake git. The harness hand is a mirror in the test.
+- Each test file opens with the section of the vehicle chapter the change lands under.
 
 ## reflect
 
@@ -210,6 +246,16 @@ pass
 <!-- the tree builds and lints -->
 
 <!-- the form is command -->
+
+./RUNME.sh lint src test spec/design_output spec/vocabulary .vale.ini
+
+### checked
+
+<!-- one line per item of the checklist -->
+
+- The change lands in the bridgehead, the vehicle verb, the attach, the stub tests and the vehicle chapter. The Vale config gains one section for the stub's hook. The vocabulary gains the one word the door asks for.
+- The hook reaches the disk, git and the process through the harness hand. The tests mirror that hand over a fake disk and a fake git.
+- Every new function points at the vehicle chapter's section on the install road.
 
 ## tests-green
 
@@ -252,3 +298,5 @@ pass
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+Nothing stands here yet.

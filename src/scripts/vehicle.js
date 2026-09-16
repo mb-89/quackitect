@@ -104,6 +104,12 @@ export function rootsHere(files, env, work) {
   return pairOf(named || onlyCopy(list), work);
 }
 
+// [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+export function rootsUnder(files, env, root) {
+  const work = String(env?.SE_WORK ?? "").trim();
+  return work ? pairOf(root, work) : rootsHere(files, env, root);
+}
+
 // [[spec/design_output/vehicle#what-travels-into-a-copy]]
 export function produce(files, method, dest, into) {
   if (!into && files.exists(dest)) {

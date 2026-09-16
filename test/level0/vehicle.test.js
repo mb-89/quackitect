@@ -25,7 +25,9 @@ import {
   readRegister,
   registerCopy,
   rootsHere,
+  rootsUnder,
 } from "../../src/scripts/vehicle.js";
+import { attachTo } from "../../src/bridge/vehicle.js";
 
 const MARKER = ".claude/skills/level0/.claude-plugin/plugin.json";
 
@@ -153,4 +155,41 @@ test("a copy lands in a new place, and never over its own method", () => {
   assert.equal(produce(files, "/tools", "/taken").ok, false);
   assert.equal(produce(files, "/tools", "/taken", true).ok, true);
   assert.equal(produce(files, "/tools", "/tools").ok, false);
+});
+
+// [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+test("the work root comes from SE_WORK where the shim sets it, and off the register otherwise", () => {
+  const files = tree();
+  const under = rootsUnder(files, { HOME: "/home", SE_WORK: "/stub" }, "/tools");
+  assert.deepEqual(under, { method: "/tools", work: "/stub", itself: false });
+  const plain = rootsUnder(files, { HOME: "/home", SE_WORK: "" }, "/tools");
+  assert.deepEqual(plain, rootsHere(files, { HOME: "/home" }, "/tools"));
+});
+
+test("attach writes the driver, the register entry with its port, the pointer and the hook", () => {
+  const files = tree({
+    "/tools/.claude/skills/level0/hooks/level0.js": "the hook",
+    "/tools/.claude/skills/level0/hooks/hooks.json": '{"modules":["./level0.js"]}',
+    "/tools/package.json": '{"version":"0.1.0"}',
+  });
+  const said = attachTo(files, { HOME: "/home/agent" }, fakeClock(), "/stub", "/tools");
+  assert.equal(said.method, "/tools");
+  assert.equal(said.port, 6510);
+  assert.equal(drivenOf(files.read("/stub/.se/project.json")).driver, "abc123", "the driver");
+  assert.deepEqual(
+    JSON.parse(files.read("/stub/.se/vehicle.json")),
+    { method: "/tools", port: 6510 },
+    "the pointer",
+  );
+  assert.equal(files.read("/stub/.claude/skills/level0/hooks/level0.js"), "the hook", "the hook");
+  assert.equal(files.read("/stub/.claude/skills/level0/hooks/hooks.json"), '{"modules":["./level0.js"]}');
+  assert.equal(files.read(`/stub/${MARKER}`), "{}", "the manifest");
+  const entry = JSON.parse(files.read("/home/agent/.se/registry.json")).find(
+    (one) => one.id === "abc123",
+  );
+  assert.equal(entry.method_root, "/tools", "the register entry");
+  assert.equal(entry.port, 6510);
+
+  const again = attachTo(files, { HOME: "/home/agent" }, fakeClock(), "/stub", "/tools");
+  assert.equal(again.port, 6510, "a second attach keeps the port");
 });

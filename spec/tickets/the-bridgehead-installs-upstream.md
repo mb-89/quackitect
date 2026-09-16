@@ -181,3 +181,5 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+Nothing stands here yet.

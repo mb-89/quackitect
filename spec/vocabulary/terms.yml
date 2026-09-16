@@ -206,6 +206,7 @@ terms:
   - {word: whitespace, defines: "[[spec/design_output/bash]]"}
   - {word: wildcard, defines: "[[spec/design_output/index#a-type-is-a-glob]]"}
   - {word: yaml, defines: "[[spec/design_output/schema]]"}
+  - {word: json, defines: "[[spec/design_output/vehicle#the-record-names-the-vehicle]]"}
   - {word: animate, defines: "[[spec/design_output/extension]]"}
   - {word: authenticate, defines: "[[spec/design_output/copilot]]"}
   - {word: backspace, defines: "[[spec/design_output/projection]]"}

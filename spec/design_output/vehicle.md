@@ -187,14 +187,66 @@ the same two roads in this order:
 
 A shim finding the vehicle sets `SE_WORK` to the stub. It then hands every
 argument to the vehicle's `RUNME.sh`. A shim finding none says so and exits
-one. The bridgehead imports the vehicle's `level0` and `level1` hook modules
-from the folder it finds, and registers every hook they carry under its own.
-Where it finds none, the session starts with no cage, and the log says why.
+one. The bridgehead takes a third road between the two, the register entry
+carrying the record's identity, and attaches through the vehicle's own verb.
+The next section says how.
 
-Two groups stand on this one. The register road of the shim belongs to
-`the-shim-resolves-the-vehicle`, and the import at session start to
-`the-bridgehead-imports-its-vehicle`. Until they land, the shim and the
-bridgehead carry the roads above and nothing more.
+The register road of the shim belongs to `the-shim-resolves-the-vehicle`.
+Until it lands, the shim carries the two roads above and nothing more.
+
+## The bridgehead installs the upstream
+
+The bridgehead runs the vehicle's code through the vehicle's own `RUNME.sh`.
+It imports none of it, because the client refuses a hook module importing
+past its folder. For details, see
+[[spec/design_output/level0#the-bridgehead-and-the-server]]. At session
+start it takes one road, in this order:
+
+| the stub holds | the bridgehead does |
+|---|---|
+| the pointer `.se/vehicle.json` | nothing. The hook the attach writes carries the session. |
+| a vehicle on one of the three roads | attaches to it |
+| no vehicle, and a record naming an upstream | clones the upstream into `~/.se/vehicles/<name>`, then attaches |
+| no vehicle, and a record naming no upstream | stops, and the log names the clone |
+
+The attach is one command: `env SE_WORK=<stub> sh <vehicle>/RUNME.sh vehicle
+attach`. The RUNME installs first. The verb then reads `SE_WORK` as the work
+root and writes the driver into `.se/project.json`. Then it settles the stub
+the way the sidebar's hook button does:
+
+| the verb writes | where |
+|---|---|
+| the register entry with its port | `~/.se/registry.json` |
+| the pointer | `.se/vehicle.json` in the stub |
+| the vehicle's hook and its two manifests | `.claude/skills/level0` in the stub |
+
+So the bridgehead rewrites the plugin folder beside its own. The client loads
+that hook at the next start, because it scans plugins once. The road then
+ends in three steps:
+
+| step | what happens |
+|---|---|
+| the server | where the pointer's port answers nothing, the last command starts the vehicle's server detached |
+| the line | the bridgehead writes one line to the stub's session log, and says it |
+| the block | one context block asks the session to say the vehicle stands and end the turn |
+
+A command failing stops the road, and the log line names the step and the
+command's last line.
+
+`test/level0/bridgehead.test.js` drives the hook over a fake git and a fake
+disk. The fakes behave: the clone writes the vehicle's RUNME, and the attach
+writes the driver. `test/contract/stub.test.js` clones this tree as the
+upstream into a temp home under `SE_SLOW`. It reads the register, the
+pointer, the driver and the hook back.
+
+One routine run against a stub repo proves the road on a cloud box, read off
+the run's log. It takes three things:
+
+- a stub repo
+- an environment carrying the trust setup the level zero chapter names
+- a routine whose prompt is `./RUNME.sh branch take`
+
+Nothing on a desk stands in for it.
 
 ## Nothing of the method travels
 
