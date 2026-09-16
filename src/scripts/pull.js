@@ -203,12 +203,6 @@ export function pull(it, argv) {
 
   const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
   const onTrunk = branch === TRUNK;
-  // [[spec/design_output/pull#the-engine-takes-the-branch]]
-  if (onTrunk && it.take && !verdict.said) {
-    if (it.cloud && !name) return it.take();
-    const group = name ? namedGroup(it, name) : urgentGroup(it);
-    if (group) return it.take(group);
-  }
   if (!onTrunk && !branch.startsWith("work/")) {
     console.error(`branch pull runs on ${TRUNK} or a work branch, and this is ${branch}.`);
     console.error(`Run ./RUNME.sh branch pull from ${TRUNK}, which hands out work there.`);
@@ -223,13 +217,21 @@ export function pull(it, argv) {
   if (rest.includes("--judge")) return judgeMaterial(it, held, name);
   if (rest.includes("--drop")) return dropped(it, who);
   if (verdict.said === "back") return takeBack(it, who, name, verdict.reason);
-  if (verdict.said || name) return handBack(it, who, name, verdict);
+  // A name on trunk that is a group takes its branch, and any other name hands a ticket back. [[spec/design_output/pull#the-engine-takes-the-branch]]
+  const named = onTrunk && name && !verdict.said ? namedGroup(it, name) : "";
+  if (!named && (verdict.said || name)) return handBack(it, who, name, verdict);
   if (held) {
     say(REFUSED, [
       `${held.ticket} stands in your hand at ${held.step}, and one hand holds one ticket.`,
       `Hand it back: ./RUNME.sh branch pull ${held.ticket} --pass, or --fail "why".`,
     ]);
     return 1;
+  }
+  // [[spec/design_output/pull#the-engine-takes-the-branch]]
+  if (onTrunk && it.take) {
+    if (it.cloud && !named) return it.take();
+    const wanted = named || urgentGroup(it);
+    if (wanted) return it.take(wanted);
   }
   if (!fetched(it, branch)) return 1;
   return handOut(it, who);

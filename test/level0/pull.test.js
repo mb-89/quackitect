@@ -523,6 +523,24 @@ test("a free ticket carrying the todo tag comes before the rest on trunk", () =>
   assert.match(said, /^work {2}b-free at/m, "the tag beats the name order");
 });
 
+// [[spec/design_output/pull#the-engine-takes-the-branch]]
+test("on trunk the drop and the hold come before the take, so a held hand takes no branch", () => {
+  const { it, outside } = doors(
+    { ...standing(), [HOLD]: JSON.stringify({ ticket: "a-free", path: "spec/tickets/a-free.md", step: "do", hand: HAND }) },
+    onTrunk(),
+    { cloud: true },
+  );
+  const held = heard(() => work(ROOT, ["pull"], it));
+  assert.equal(held.code, 1);
+  assert.match(held.said, /a-free stands in your hand/);
+  assert.ok(!ranGit(outside).some((one) => one.startsWith("git switch")), "a held hand takes no branch");
+
+  const dropped = heard(() => work(ROOT, ["pull", "--drop"], it));
+  assert.equal(dropped.code, 0);
+  assert.match(dropped.said, /the hold drops/);
+  assert.ok(!ranGit(outside).some((one) => one.startsWith("git switch")), "the drop takes no branch");
+});
+
 // [[spec/design_output/pull#the-work-answer]]
 test("the pull hands out the child's first leaf, writes the hold, and the answer says does, the fields and the guidance", () => {
   const { it, disk } = doors(standing());
