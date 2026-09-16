@@ -177,4 +177,17 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+Where the box left it: the child stands at design/draft with its approach written, and the judge refuses every hand-back there. The group's own leaves wait behind the child, so sync, split and the retro stand untouched. For the finding, see [[spec/tickets/guidance-rides-step#discussion]].
+
+What the box fixed on the way:
+
+- the child's brief carried three headings outside the ticket schema, and the schema test failed. They became lead lines.
+- both asks stood thin. Now the group's says the goal, and the child's carries the gain, what breaks and the done-when list.
+- both tickets stood draft, and the box opened them, because the take handed the branch out as work
+
+What a person decides:
+
+- what the judge reads against evidence, and whether its refusal names the rule and counts
+- whether the child's approach stands, so the review hand can read it
+
+The box holds the group, and the private folder held one note on the judge, which dies with the box.

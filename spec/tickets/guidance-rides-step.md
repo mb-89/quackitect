@@ -150,6 +150,49 @@ The rules to hold:
 
 <!-- the form is text -->
 
+| the ask asks | the approach answers |
+|---|---|
+| how a hand gets a step's notes once | the pull hands them, and a handed file remembers them per hand, step and session |
+| how they come again | a refusal prints them, a compaction empties the handed file, and a moved hash reads as new |
+| how the engine keeps the arrival | the hold names each note by name and hash, and the log gets one row per note |
+| how a hand asks for them | the verb `branch guidance`, named or unnamed |
+| what the standing layer keeps | the notes no step reads |
+
+TL;DR:
+
+- The handed file lives beside the hold, because the hold drops at the hand-back. For details, see [[spec/design_output/pull#the-hand-and-the-hold]].
+- A note prints whole where the handed file holds no such hash, and one line names the verb otherwise.
+- The wrapper judges every hand-back whole, and the material lays the payload over the ticket first. For details, see [[spec/design_output/pull#the-checks]].
+- The verb and the handed file get a module of their own, so every file stays under the ceiling. For details, see [[spec/design_output/config#the-magic-numbers-take-names]].
+- The terms here stand in the vocabulary, each with its note. For details, see [[spec/vocabulary/terms.yml]].
+
+| piece | home |
+|---|---|
+| the handed file and the verb | a new guidance script beside the pull script |
+| the hand-out, the refusal and the judge's material | the pull script |
+| the compaction hook | the level one wrapper |
+| the verb's dispatch | the work script |
+| the layer a named note leaves | the guidance library under level zero, read by the bridge and the standing verb |
+
+| test | claim |
+|---|---|
+| a new guidance verb test | the handed file, the verb and the log row hold, through the fake doors |
+| the guidance test | a note a step reads leaves the layer |
+| the pull test | the hand-out logs a row, the second hand-out prints the short line, and the material carries the payload |
+
+| words | where |
+|---|---|
+| the chapter Guidance rides the step | the pull's design output |
+| the layer a named note leaves | the level zero design output, under the standing layer |
+| one actionable naming the verb | the tickets guidance |
+
+What the agent needs:
+
+| number | need | status |
+|---|---|---|
+| 1 | the review hand reads this approach against the ask | open |
+| 2 | a pass moves the ticket to the implement phase | open |
+
 ## review
 
 <!-- reads the approach against the ask -->
@@ -238,4 +281,21 @@ The rules to hold:
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+The box wrote the approach under draft and handed it back five times, and the judge refused every one. The refusal names no rule, counts on no hold and writes no log line, so the person step at five refusals stays out.
+
+A helper read the judge's exact prompt and named what breaks:
+
+| rule | what the helper says |
+|---|---|
+| 4 | facts stand without a link, so it reads them as facts the hand owns |
+| 13 | the text opens with a table and follows with lists, and it wants the TL;DR list |
+| 14 | the text closes without the table What the agent needs |
+| 15 | the terms hold, pull, verb and wrapper read as jargon, because the vocabulary stands outside the prompt |
+
+The approach above meets all four on its face, and the judge refuses it still. So under this judge the voice rules on a chat answer bind ticket evidence. A person decides what the judge reads. Three ways stand:
+
+- the judge skips a rule on an answer, a stop call or a prompt
+- the judge asks per rule and quotes the rules it finds broken, so a hand fixes what it names
+- the judge's refusal counts on the hold and writes a log line, so the person step comes at five
+
+The judge's material reads the ticket as it stands and drops the payload. A hand-back with fields shows the judge an empty field. The approach names that fix.
