@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: whenever
-step: sync
+step: split
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -80,6 +80,14 @@ record:
   - step: sync
     hand: box 747cff5c2f2a
     hash_before: 351643baac99a8a434a3205d269828f05fd08f59
+  - step: sync
+    hand: box 747cff5c2f2a
+    hash_before: e964a774e97ddec14963424356ed019503f2d657
+    hash_after: e964a774e97ddec14963424356ed019503f2d657
+    answered:
+      - name: sync
+        exit: 0
+        said: work/level-zero-hands-over already carries every commit on main.
 depends_on: ["the-agent-pulls-a-ticket"]
 ---
 
@@ -94,8 +102,9 @@ Where it stands
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
