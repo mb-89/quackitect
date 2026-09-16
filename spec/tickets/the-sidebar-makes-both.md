@@ -91,7 +91,11 @@ record:
       - name: sync
         exit: 0
         said: work/the-sidebar-makes-both already carries every commit on main.
-step: split
+  - step: split
+    hand: box 1eeed4143ad0
+    hash_before: 30489c13808377aa6d82cde35b443a999802eefc
+    hash_after: 30489c13808377aa6d82cde35b443a999802eefc
+step: children
 ---
 
 # Ask
@@ -118,8 +122,15 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/sidebar-makes-both]], on the standard process, which stood minted with the group and closed done
+
+## checked
+
+- the one child is one change over the extension, and a hand reviewed its diff whole at the verdict step
+- the child carries every line of the ask: the two buttons, the folder ask, the tests and the design output
+- the child waits on nothing, and the group names the stub group under depends_on
 
 # children
 
