@@ -264,6 +264,18 @@ function editorDoor(context) {
       shell.sendText(said);
     },
 
+    // [[spec/design_output/extension#two-buttons-make-both]]
+    async asks(what) {
+      const picked = await vscode.window.showOpenDialog({
+        canSelectFolders: true,
+        canSelectFiles: false,
+        canSelectMany: false,
+        openLabel: `this ${what}`,
+        title: `Pick the ${what}`,
+      });
+      return picked?.[0]?.fsPath ?? "";
+    },
+
     registerView(id, resolve) {
       context.subscriptions.push(
         vscode.window.registerWebviewViewProvider(

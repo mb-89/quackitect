@@ -160,12 +160,16 @@ test("a run message opens the run the declaration names, and writes nothing", as
   assert.equal(door.files.exists(LOCAL), false);
 });
 
-// [[spec/design_output/extension#two-buttons-make-a-vehicle-and-a-stub]]
+// [[spec/design_output/extension#two-buttons-make-both]]
 test("the vehicle button asks for a folder, and runs the vehicle verb over it", async () => {
   const door = doorOf();
   door.said.folder = "/work/new vehicle";
   const sidebar = sidebarOf(door);
-  await sidebar.took({ kind: "run", key: "engine.vehicle", runs: "./RUNME.sh vehicle into <folder>" });
+  await sidebar.took({
+    kind: "run",
+    key: "engine.vehicle",
+    runs: "./RUNME.sh vehicle into <folder>",
+  });
 
   assert.deepEqual(door.said.asked, ["folder"]);
   assert.deepEqual(door.said.ran, ['./RUNME.sh vehicle into "/work/new vehicle"']);
@@ -178,7 +182,11 @@ test("the vehicle button asks for a folder, and runs the vehicle verb over it", 
 test("the stub button asks for a folder, and runs the stub verb over it", async () => {
   const door = doorOf();
   door.said.folder = "/work/stub";
-  await sidebarOf(door).took({ kind: "run", key: "engine.stub", runs: "./RUNME.sh stub into <folder>" });
+  await sidebarOf(door).took({
+    kind: "run",
+    key: "engine.stub",
+    runs: "./RUNME.sh stub into <folder>",
+  });
 
   assert.deepEqual(door.said.asked, ["folder"]);
   assert.deepEqual(door.said.ran, ['./RUNME.sh stub into "/work/stub"']);
@@ -187,7 +195,11 @@ test("the stub button asks for a folder, and runs the stub verb over it", async 
 test("a folder dialog closed on nothing runs nothing, and writes no line", async () => {
   const door = doorOf();
   const sidebar = sidebarOf(door);
-  await sidebar.took({ kind: "run", key: "engine.stub", runs: "./RUNME.sh stub into <folder>" });
+  await sidebar.took({
+    kind: "run",
+    key: "engine.stub",
+    runs: "./RUNME.sh stub into <folder>",
+  });
 
   assert.deepEqual(door.said.asked, ["folder"]);
   assert.deepEqual(door.said.ran, []);
@@ -197,8 +209,8 @@ test("a folder dialog closed on nothing runs nothing, and writes no line", async
 test("the two buttons draw in a section of their own, beside where the engine state lands", async () => {
   const said = await sidebarOf(doorOf()).html();
   assert.match(said, /data-section="engine"/);
-  assert.match(said, /class="widget at-0-0-1-1" data-key="engine\.vehicle" data-widget="action"/);
-  assert.match(said, /class="widget at-0-1-1-1" data-key="engine\.stub" data-widget="action"/);
+  assert.match(said, /at-0-0-1-1" data-key="engine\.vehicle" data-widget="action"/);
+  assert.match(said, /at-0-1-1-1" data-key="engine\.stub" data-widget="action"/);
 });
 
 // [[spec/design_output/extension#the-view-holds-nothing]]

@@ -89,7 +89,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-sidebar-makes-both
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 1eeed4143ad0
@@ -110,6 +110,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 1eeed4143ad0
+    hash_before: fbaf9af3e5dc517639101f0aab0e4ae1ca7ff9b4
+    hash_after: fbaf9af3e5dc517639101f0aab0e4ae1ca7ff9b4
+    answered:
+      - name: lint
+        exit: 0
+        said: 15 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
@@ -122,7 +130,7 @@ The system stays a shell affair, and the owner opens a terminal for the one thin
 
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 - spec/config/level0.schema.json names two buttons, each with an icon the owner picks, beside the engine state
-- a press asks for a folder and runs ./RUNME.sh vehicle into <folder> or ./RUNME.sh stub into <folder>
+- a press asks for a folder and runs `./RUNME.sh vehicle into <folder>` or `./RUNME.sh stub into <folder>`
 - the extension tests drive both buttons through the fake doors and read the command each runs
 - spec/design_output/extension.md carries the two buttons
 
@@ -214,8 +222,15 @@ Five tests fail, and each fails on the line I expect. The three sidebar tests fi
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
+
+### checked
+
+- the change touches the schema, the sidebar, the editor door, the design output and the two tests. The ask's own line took code spans around its two commands, so the rules pass
+- the folder dialog is one call on the editor door, `asks`, and the fake door answers it
+- the sidebar, the door and both tests each carry a link to the chapter Two buttons make both
 
 ## tests-green
 
