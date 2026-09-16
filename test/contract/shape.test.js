@@ -27,7 +27,6 @@ const ruled = async (text, where) => {
 };
 
 const NOTE = "spec/guidance/probe.md";
-const JUDGED = "spec/config/styles/VoiceJudged/Probe.yml";
 const STOP = "spec/config/stop/probe.yml";
 const SHELL = "src/scripts/probe.sh";
 const POWERSHELL = "src/scripts/probe.ps1";
@@ -59,26 +58,6 @@ ifVale("a variable named in lower case is refused", async () => {
 
   const good = front("env:\n  - SE_CLOUD\n") + chapter(1);
   assert.ok(!(await ruled(good, NOTE)).includes("VoiceShape.GuidanceEnv"));
-});
-
-ifVale("a judged rule missing what the judge reads is refused", async () => {
-  const bad = 'extends: judge\nmessage: "Say it."\nlabels:\n  - one\nrefuses: two\n';
-  assert.ok((await ruled(bad, JUDGED)).includes("VoiceShape.JudgedRule"));
-
-  const good =
-    'extends: judge\nmessage: "Say it."\nask: "Does it act?"\nlabels:\n  - one\n  - two\nrefuses: two\n';
-  assert.ok(!(await ruled(good, JUDGED)).includes("VoiceShape.JudgedRule"));
-});
-
-ifVale("a judged rule refusing two labels it names passes", async () => {
-  const head = 'extends: judge\nmessage: "Say it."\nask: "Does it act?"\n';
-  const labels = "labels:\n  - one\n  - two\n  - three\n";
-
-  const good = `${head}${labels}refuses:\n  - two\n  - three\n`;
-  assert.ok(!(await ruled(good, JUDGED)).includes("VoiceShape.JudgedRule"));
-
-  const outside = `${head}${labels}refuses:\n  - two\n  - four\n`;
-  assert.ok((await ruled(outside, JUDGED)).includes("VoiceShape.JudgedRule"));
 });
 
 ifVale("a stop rule missing a field, or naming no side, is refused", async () => {

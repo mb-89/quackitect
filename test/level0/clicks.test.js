@@ -46,9 +46,9 @@ function page(nodes) {
 const HOLD = {
   key: "stop.hold",
   widget: "toggle",
-  options: "running finishing stopped",
+  options: "off finish stop",
   gesture: "5",
-  value: "running",
+  value: "off",
 };
 
 // [[spec/design_output/extension#a-click-becomes-a-message]]

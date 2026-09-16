@@ -54,6 +54,16 @@ tests its own script, so no door here has a mock.
 The fake clock stands still until a test moves it with `tick`, so a case that
 reads the time replays.
 
+# The bridgehead stands under hooks
+
+The bridgehead is a door: it sits in the agent's path, and it is the outside
+thing a test of the server fakes. It stands under `.claude/skills/level0/hooks`
+and in no `src/doors`, because the client loads a hooks module from that
+folder alone. Its fake, `src/doors/fake/bridgehead.js`, raises an event
+straight into `decide`, so a test drives the server with no client, no wire
+and no port. For details, see
+[[spec/design_output/level0#the-bridgehead-and-the-server]].
+
 # Two folders, and their cost
 
 | folder | what stands there | what it touches |

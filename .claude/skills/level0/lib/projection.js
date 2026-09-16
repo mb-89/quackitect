@@ -4,7 +4,7 @@
 // [[spec/design_output/projection#what-goes-where-is-data]]
 
 import { flatten, keysOf, LOCAL, TRACKED } from "./config.js";
-import { faultsOf, JUDGED, judgedFrom, PARAGRAPH, rulesFrom, RULES } from "./paragraph.js";
+import { faultsOf, PARAGRAPH, rulesFrom, RULES } from "./paragraph.js";
 import { readYaml } from "./schema.js";
 import { pathsOf } from "./vocabulary.js";
 
@@ -16,14 +16,10 @@ export const COMMANDS = "config commands";
 // [[spec/design_output/projection#the-second-target]]
 export { PARAGRAPH } from "./paragraph.js";
 
-// [[spec/design_output/projection#the-judged-rules]]
-export { JUDGED } from "./paragraph.js";
-
 // [[spec/design_output/projection#a-shape-says-its-ending]]
 const HOLDS = new Map([
   [COMMANDS, ".md"],
   [PARAGRAPH, RULES],
-  [JUDGED, RULES],
 ]);
 
 const PREFIX = "se-";
@@ -70,7 +66,6 @@ function listsOf(said, texts) {
 export function writesOf(entry, texts) {
   const out = new Map();
   if (entry?.shape === PARAGRAPH) return schemaInto(entry, texts, rulesFrom);
-  if (entry?.shape === JUDGED) return schemaInto(entry, texts, judgedFrom);
   if (entry?.shape !== COMMANDS) return out;
 
   const said = flatten(parsed(texts.get(entry.from)));

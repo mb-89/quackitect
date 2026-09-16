@@ -1,0 +1,13 @@
+# The shape of a status update, which the full ask demands. A reply fits when
+# it carries every chapter as a heading with text under it. The order stands
+# free, and a chapter grows a field here when the owner wants one.
+# [[spec/design_output/extension#the-ask-is-a-line]]
+chapters:
+  - name: Done
+    says: what stands done since the last update, one line a thing
+  - name: Now
+    says: where the work stands this moment, in a line
+  - name: Open
+    says: what stays open, one line a thing, the to do list
+  - name: ETA
+    says: when the open items land, in a line

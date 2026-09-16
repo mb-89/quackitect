@@ -32,7 +32,7 @@ const SCHEMA = {
       properties: {
         hold: {
           type: "string",
-          enum: ["running", "finishing", "stopped"],
+          enum: ["off", "finish", "stop"],
           widget: "toggle",
           gesture: 5,
           at: "U+270B U+1F916",
@@ -49,7 +49,7 @@ const SCHEMA = {
       properties: {
         state: {
           type: "string",
-          enum: ["rest", "running"],
+          enum: ["rest", "off"],
           widget: "status",
           sets: "engine.state",
           watches: "engine.beat",
@@ -62,7 +62,7 @@ const SCHEMA = {
   },
 };
 
-const TRACKED = { log: { level: "info" }, stop: { hold: "running", mostInARow: 3 } };
+const TRACKED = { log: { level: "info" }, stop: { hold: "off", mostInARow: 3 } };
 
 function drawn(local = {}) {
   return panelHtml({
@@ -130,12 +130,12 @@ test("a widget centres its mark across and down, and a wrapped mark too", () => 
 
 test("a widget away from rest wears the mark saying so, and one at rest does not", () => {
   assert.ok(!/class="widget at-0-1-1-2 away/.test(drawn()));
-  assert.match(drawn({ stop: { hold: "finishing" } }), /class="widget at-0-1-1-2 away"/);
+  assert.match(drawn({ stop: { hold: "finish" } }), /class="widget at-0-1-1-2 away"/);
 });
 
 // [[spec/design_output/extension#a-mark-alone-says-it]]
 test("the far value pulses, and every widget draws its mark and no word", () => {
-  assert.match(drawn({ stop: { hold: "stopped" } }), /class="widget at-0-1-1-2 away held"/);
+  assert.match(drawn({ stop: { hold: "stop" } }), /class="widget at-0-1-1-2 away held"/);
   assert.ok(!/class="said"/.test(drawn()), "no word stands under a mark");
 });
 
