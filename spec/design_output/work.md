@@ -84,6 +84,21 @@ A loose ticket is one on trunk naming no group, which is backlog a person has
 yet to sort. A ticket in a group shows nowhere on trunk, because its branch is
 responsible for it.
 
+## A ticket under its group
+
+A group row carries a row per ticket naming it, indented under it, read off the
+branch tip `list` already fetches. So a reader on trunk sees the loose tickets
+and the held ones together, and runs no `git show` by hand:
+
+| column | says |
+|---|---|
+| the name | the ticket's file name |
+| the kind | `ticket` |
+| the status | `open` or `closed` |
+| the why | the step it stands at, or its urgency where it names no step |
+
+A brief carries no such row, because a brief names no tickets.
+
 ## A stale group is yours
 
 There is no lease. A branch somebody holds stays held until a person looks, and

@@ -744,7 +744,7 @@ function list(it, _name, argv) {
   const standing = standingAll(stand, mergedHere(it));
   if ((argv ?? []).includes("--done")) return doneOnly(stand, standing);
   const now = it.clock ? it.clock.now().getTime() : 0;
-  const rows = stand.map((one) => rowOf(it, one, standing, now));
+  const rows = stand.flatMap((one) => [rowOf(it, one, standing, now), ...childRows(it, one)]);
   const loose = looseRows(it);
 
   if (!rows.length && !loose.length) {
@@ -784,13 +784,34 @@ function rowOf(it, one, standing, now) {
   };
 }
 
+// [[spec/design_output/work#a-ticket-under-its-group]]
+function childRows(it, one) {
+  if (!one.ticket) return [];
+  return ticketsOn(it, `origin/${one.branch}`)
+    .filter((child) => fieldOf(child.text, GROUP) === one.name)
+    .map((child) => ({
+      stale: false,
+      said: `  ${child.name.padEnd(32)} ticket ${stateOf(child.text).padEnd(6)} ${whyOf(child.text)}`,
+    }));
+}
+
+// [[spec/design_output/work#a-ticket-under-its-group]]
+function stateOf(text) {
+  return fieldOf(text, "state") || OPEN;
+}
+
+// [[spec/design_output/work#a-ticket-under-its-group]]
+export function whyOf(text) {
+  return stepOf(text) || urgencyOf(text);
+}
+
 // [[spec/design_output/work#a-row-per-group]]
 function looseRows(it) {
   return ticketsOn(it, `origin/${TRUNK}`)
     .filter((one) => !fieldOf(one.text, GROUP) && !isGroup(one.text))
     .map((one) => ({
       stale: false,
-      said: `${one.name.padEnd(34)} ticket ${(fieldOf(one.text, "state") || OPEN).padEnd(6)} ${urgencyOf(one.text)}`,
+      said: `${one.name.padEnd(34)} ticket ${stateOf(one.text).padEnd(6)} ${urgencyOf(one.text)}`,
     }));
 }
 
