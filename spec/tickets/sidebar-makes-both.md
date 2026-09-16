@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: soon
 steps:
   - name: design
@@ -89,6 +89,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-sidebar-makes-both
+step: design/review
+record:
+  - step: design/draft
+    hand: box 1eeed4143ad0
+    hash_before: 212a0a7ab9caac98ae47222084953409d432245f
+    hash_after: 212a0a7ab9caac98ae47222084953409d432245f
 ---
 
 # Ask
@@ -116,8 +122,22 @@ Read [[spec/design_input/a-stub-takes-its-vehicle]] first, the chapters The stub
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Two action widgets in the schema, one field for the folder ask, and one door call behind it.
+
+| piece | what changes |
+|---|---|
+| `spec/config/level0.schema.json` | `engine.vehicle` and `engine.stub`, each an `action` in the group `engine` at row 0, columns 0 and 1, with `asks` set to `folder` and `runs` carrying `<folder>` |
+| `src/extension/sidebar.js` | a run message on an entry carrying `asks` asks the door for a folder first. The folder lands in `runs` in place of `<folder>`, in double quotes. A dialog closed on nothing ends the press there |
+| `src/extension/editor.js` | `asks` opens the editor's folder dialog and answers the path, or the empty string |
+| `test/level0/sidebar.test.js` | the fake door answers a folder, and the tests read the two commands and the closed dialog |
+| `spec/design_output/extension.md` | the `asks` field, and a chapter on the two buttons |
+
+- The group is `engine`, so the engine state lands beside the two buttons at column 2 when its mark arrives.
+- The marks are placeholders the owner swaps in the schema: a truck for the vehicle, a seedling for the stub.
+- The command runs in a terminal, the way the log button runs. So a refusal from the verb stands where the owner reads it.
+- The sidebar reads `asks` off the schema by the message's key. So the panel and the webview stay as they stand.
 
 ## review
 

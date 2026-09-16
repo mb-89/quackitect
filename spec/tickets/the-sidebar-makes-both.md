@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: soon
 depends_on: [the-stub-takes-shape]
 steps:
@@ -83,6 +83,7 @@ record:
   - step: sync
     hand: box 1eeed4143ad0
     hash_before: fd6ff70d4fee2fea1b7c5946d0c91afb4c572934
+step: sync
 ---
 
 # Ask
