@@ -15,6 +15,77 @@ for no server, so its rules hold on turn one of a clone nobody builds.
 `.claude/settings.json` turns it on and git tracks that file, so a clone guards
 its first session with nothing typed.
 
+# The bridgehead and the server
+
+Level zero is two pieces. The bridgehead, `hooks/level0.js`, is the module the
+client loads, and the one hook a project carries: one door for every event,
+`*`, and one function behind it. It posts each event to the server at the
+port, with the root the session works in, and does what the answer says. It
+imports nothing, so a project carries the file alone. The project knows
+nothing of where the method stands on the disk.
+
+A second hook stands beside the door, on `turn.step`, because a stream reaches
+a generator alone. It keeps the step's text as the chunks arrive, and posts it
+whole as `turn.said` at the stream's end. The compaction goes over the wire
+with its flat fields alone. The client hands the whole transcript as that
+event, and the server reads no line of it.
+
+The server runs from the method root and keeps one box a work root. The
+rules, the schemas, the index binary and Vale come from the method root. The
+log, the notes and the files come from the work root. This tree is the case
+where both roots are one folder.
+
+| the answer | the bridgehead does |
+|---|---|
+| `{ pass: true }` | hands the event on |
+| `{ result }` | returns the result to the client |
+| `{ event }` | hands the changed event on |
+| `{ after }` | hands the event on, and adds to what comes back |
+| `{ register }` | registers the tools it names, one by one |
+| `{ needs: "reply" }` | posts the step's text and the last texts as `agent.spoke`, and does what that answer says |
+| `{ spawn, back }` | spawns the helper, and posts what it says under the event `back` names |
+| nothing, the server down | hands the event on, and writes one `warn` line, once |
+
+The server is plain node under `src/bridge`, one file a topic:
+
+| file | holds |
+|---|---|
+| `server.js` | the doors, god mode and the switch in `decide` |
+| `guidance.js` | the rules, the canary and the compaction |
+| `answer.js` | the demand for a reply, and the turn's end |
+| `ask.js` | the ask from the sidebar |
+| `status.js` | the shape of a full report |
+| `report.js` | the report tool |
+| `stop.js` | the hold and the tooth |
+| `search.js` | the client's search tools |
+| `write.js` | the write door |
+| `bash.js` | the command door |
+| `code.js` | the size ceiling of code |
+| `apply.js` | the batch edit |
+| `tools.js` | the draft check and the mint |
+| `review.js` | the review by a helper |
+| `projection.js` | the files the tree projects |
+| `config.js` | the config a door asks |
+| `vehicle.js` | the vehicle, the project and the port |
+
+The log, the index and Vale stand behind doors under `src/doors`. The server
+logs every event at `debug`, whole, and holds the state in one box a work
+root. `./RUNME.sh serve` starts it, and `--inspect` on that verb opens it to
+the debugger. The launch config `the server` starts it under the editor's
+debugger, so a break in `decide` binds, pauses, and takes new breaks while
+the agent runs.
+
+A server killed and running again takes the next event as its own, because
+the bridgehead holds no state and no connection. So the session goes on across
+every restart of the server, and the client reloads the bridgehead for no
+change of a door. Three headless turns say so, against client 2.1.269. The
+first posts 186 events. The second completes with the server down. The third
+lands on the server running again.
+
+The server holds every door of this note, and the module before the bridgehead
+stands nowhere. The chapters below describe the doors, and the file table
+above says which server file holds each.
+
 # The harness surface
 
 Every line here comes from running it against client 2.1.263. The
@@ -423,7 +494,7 @@ naming the rule, the line and the phrase.
 | what the write carries | what reads it |
 |---|---|
 | a run or a token out of a note under `.se/notes` | [[spec/design_output/private#the-door-reads-the-notes]] |
-| prose | Vale, then the judge |
+| prose | Vale, then the prose reader |
 | code | Biome |
 | a shell command landing a file | [[spec/design_output/bash]] |
 
@@ -451,18 +522,9 @@ sends a code write through Biome and passes the formatted text on with
 The agent writes its own text and the tree stores what the formatter says, the
 way a save-time formatter works for a person.
 
-## The judge costs a call
-
-Vale and Biome run first, because they cost nothing. The judge asks a model one
-question per span, so it runs where the patterns already passed.
-
-It reads every span of the first writes in a session, then samples. A breach
-puts it back to reading everything.
-
 ## The path a rule reads
 
-Hand every rule the path the repo root holds. Vale scopes on it, and the judge
-scopes on it.
+Hand every rule the path the repo root holds. Vale scopes on it.
 
 | what the client sends | what the door hands on |
 |---|---|
@@ -475,36 +537,6 @@ Keep every folder in that path, so `[spec/rationales/*.md]` and each other
 Ask git for the root once a session, through `git rev-parse --show-toplevel`,
 and take it off the front with `relativeTo`. Leave the path whole where the box
 answers nothing.
-
-## A judged rule scopes
-
-Give a judged rule `ignores`, holding one glob a line. The judge asks the model
-nothing for a file those globs reach.
-
-    ignores:
-      - spec/rationales/*.md
-
-List a folder there where the rule's question misreads its job. `Actionable`
-ignores `spec/rationales` and `spec/design_output`, and stands everywhere else.
-
-## A judged rule cuts
-
-Give a judged rule `span`, saying what one question reads. A rule leaving it
-out reads a paragraph, which is what every rule read before the key stood.
-
-| span | one question reads | who takes it |
-|---|---|---|
-| `paragraph` | a run of prose lines, with 12 words at least | `Actionable`, `Role`, `ShapeFits` |
-| `chapter` | a heading and the blocks under it, to the next heading | `BottomLineFirst` |
-
-A note with no heading is one chapter, so an answer arrives whole. The lines
-above a first heading make no chapter, because an edit hands the judge the tail
-of the chapter above it. The frontmatter stands outside both cuts, and so does a
-fenced block.
-
-A question about where the outcome stands wants the whole chapter, because a
-paragraph on its own says nothing about what comes before it. A question about
-one shape wants the paragraph, because the shape is the paragraph's own.
 
 ## A rule refuses a list
 
@@ -603,72 +635,57 @@ instead.
 
 ## What the door reads
 
-The door marks what a person waits for, and holds every `tool.call` while
-nothing reaches them. Text the session writes after the mark answers it,
-and `turn.complete` clears the mark.
+The door opens a demand for what a person waits for. It holds every
+`tool.call` after the first while nothing pays it. Three things pay it:
 
-Whether an answer stands comes out of `$.session.messages()`. The mark notes how
-many messages stand when it goes down, and text from the session past that
-point answers it. Text from before the mark answers an older demand, and counts
-for nothing.
+| what pays | when |
+|---|---|
+| the first text of a turn | `classic.MessageDisplay` fires for it, before the first call |
+| a call to `mcp__level0__report` with the text | at once, between calls |
+| the turn's last text | at `turn.complete`, where the demand still stands |
+
+A text written between calls pays nothing on its own. The client hands it to
+no hook until the turn ends. The transcript behind `$.session.messages()`
+flushes late, sometimes a turn late. The step's stream carries text for the
+first step alone. The bridgehead still posts the last four texts of the
+transcript on a hold. The door pays on any text since the demand that fits,
+so a flush landing late pays too.
 
 ## What counts as owed
 
-- A prompt a person opens a turn with, at `prompt.submit`.
-- An update a person asks for: `ask.wanted` moving away from `quiet`.
-- A hold: `stop.hold` moving to `stopped`.
+- A prompt a person opens a turn with, or sends mid-turn, at `prompt.submit`.
+- An update a person asks for: `ask.wanted` moving away from `quiet`. A full
+  ask pays on a text in the shape of `spec/config/status.yaml` alone.
 
-The hook reads the two keys at every `tool.call`, so a button pressed mid-turn
-reaches the next call. The latest demand replaces the one before it, and starts
-with a warning of its own.
+The door reads the key at every `tool.call`, so a button pressed mid-turn
+reaches the next call. The latest demand replaces the one before it. The hold
+is no demand: it stands in the stop door. For details, see
+[[spec/design_output/stop#the-hold]].
 
-## A warning on every call
+## The first call is free
 
-The door refuses no call. A refused call fires no step, and the text of that
-step reaches nothing. So a refusal locks the session, the stop call with it.
-Every call while the demand stands carries a warning instead.
+The response in flight when a demand lands can carry the answer as its first
+text. So the first call after the demand passes, with the demand as context.
+Every call after it asks the bridgehead for the texts. A call with nothing new
+comes back refused. The refusal quotes the last text seen and its length, so a
+stale read and a wrong reply read apart. `AskUserQuestion` and the report tool
+pass the hold.
 
-The response in flight when a demand lands can carry the answer, and its text
-reaches the hook only once the response completes. So every call of that
-response passes with no warning. A response completing with no text leaves the
-demand open. Each call after it carries the warning, and the session reads it
-after the tool's result. The warning names what the person waits for.
+Each refusal writes a `gate` line at `debug`, because the agent reads the
+refusal itself.
 
-Each such call writes a `gate` line at `warn`: `warned Read before an answer`,
-with the demand in the detail.
+## The reply line
 
-## A prompt mid-turn
-
-- Outcome: a prompt landing mid-response binds the next response, and the one in flight goes free.
-- Cause: the response in flight completes with no text, before the model reads the prompt.
-- Count: every tool call adds one, and every step sets the count to zero.
-- Skip: a prompt landing over a count above zero skips the next step.
-- Log: a silent step, or one the door skips, writes a `step` line.
-
-## A step carries the answer
-
-The hook reads the answer off the transcript after each step, and off the
-turn's own text at the turn end. `turn.step` hands the hook each response once
-its blocks stand, with its visible text in `answer`. On client 2.1.269 that
-field stands empty, whatever the response says. Text found in either place
-answers the demand, and the hook writes it as the `answer` line. For details,
-see [[spec/design_output/log#the-answer-under-its-prompt]].
-
-The transcript stands behind the step. `$.session.messages()` answers its newest
-4096 messages alone, so the door remembers the last answer standing when the
-demand lands, and text after that one answers it. A position in the list shifts
-as the window slides, so the door counts none.
+The pay writes the text as the `reply` line at `info`, once, with `answers:
+<the demand>` in the detail. The turn's end writes the last text as a reply
+where no pay stands. For details, see
+[[spec/design_output/log#the-answer-under-its-prompt]].
 
 ## The owner binds god
 
-`engine.binding` at `god` takes every refusal level zero holds out of the way.
-The hook wraps every `tool.call` it registers. Where a hook refuses and the
-binding reads `god`, the call goes on. A `god` line names the refusal it passes.
-The answer gate, the write door, the trunk guard and the cage all pass.
-
-The binding comes out of the config layers at the moment of the refusal, so a
-button press reaches the next call. The sidebar shows the binding in the status
-bar. For details, see [[spec/design_output/extension#the-status-bar-says-it]].
+`engine.binding` at `god` lets every hold of this door through, with a `god`
+line at `info` in its place. For details, see
+[[spec/design_output/level0#god-mode]].
 
 ## Which prompt opens a turn
 
@@ -922,7 +939,6 @@ answers that the rules pass.
 | `spec/config/styles/VoiceVale` | Vale reads it over prose and code |
 | `spec/config/styles/VoiceShape` | Vale reads it over the shape of a note or a rule file |
 | `spec/config/styles/VoiceScript` | Vale reads it over a shell script |
-| `spec/config/styles/VoiceJudged` | a model reads it, and the projection writes it |
 | `spec/config/biome.json` | Biome reads it |
 
 `[formats]` in `.vale.ini` maps `yml` to `md`, so Vale reads a rule file at all.
@@ -930,9 +946,6 @@ A path-scoped section names which shape rules reach which folder.
 
 The prose rules stay away from a rule file, because such a file lists the very
 words they refuse.
-
-Vale errors on a file carrying no `extends` key inside a style it reads. So the
-judged rules sit in a folder of their own.
 
 # The fixer calms a shout
 
@@ -971,6 +984,41 @@ short forms that read the same everywhere keep theirs.
 Vale drops both fixes and names the overlap. A token reaching past its own word
 costs the fix beside it, so every token here stops at its own edge.
 
+# The tense reader
+
+Vale tags a verb with a small tagger, and reads a present form like `set`,
+`put` or `straight` as past at a line start. Each of those costs a round of
+refusal, and a list of exceptions grows one word at a time. The tense reader
+stands behind Vale's finding with one general veto:
+
+| the form | the reader says |
+|---|---|
+| its own lemma, `set`, `put`, `read` | present on its face, and the finding falls |
+| its -s or -ing form, `skips`, `standing` | present on its face, and the finding falls |
+| another form, `wrote`, `did`, `failed` | past, and the finding stands |
+
+`src/bridge/tense.js` reads the line the finding stands in through wink-nlp,
+which hands a lemma a token. Two more vetoes ride the same reader, in
+`src/bridge/prose.js`. The three doors reading prose call that one entry: the
+write door, the draft check and the commit message. A `vale` line at debug
+counts what the reader lets stand.
+
+| Vale finds | the reader says |
+|---|---|
+| a past form | present on its face, where the form is its own lemma or its -s or -ing form |
+| a sentence or a list item past the cap | under the cap, counted with a code span and a link as one word each |
+| a word outside the lists | on a list, where its lemma stands there |
+
+The tagger carries no more than that. It reads a participle standing as an
+adjective, `a refused call`, as a verb like any other. So those stay on the
+rule's exception list, ten words where sixteen stood. A bench under
+`.se/scripts` runs both readers over every note, and it is the way to read a
+change to either.
+
+The dependency is one node package and its English model, named in
+`package.json`. The install fetches them under `modules`, and the server
+loads them once.
+
 # What the cage loads
 
 Level zero fills its state once: the linter it runs, the config it reads, the
@@ -1004,39 +1052,19 @@ stand at the top of the file and take the state as an argument.
 
 # God mode
 
-A cage holding nothing says so, and refuses the work until somebody fixes it.
-`.se/level0.health` carries that answer:
+`engine.binding` set to `god` lets every blocker through, and leaves every
+answer standing. The server decides it in one place, on the way out of
+`decide`, so no door knows about it:
 
-    { "ok": false, "why": "no vale stands here", "at": "..." }
-
-While `ok` reads false, the door refuses every call except the ones that fix
-the cage:
-
-| the call | god mode |
+| the door answers | god mode |
 |---|---|
-| a write under `.claude/skills/level0/` | passes |
-| a shell command landing no file | passes |
-| a read, a search, a question to the owner | passes |
-| every other write, and every other command | refuses |
+| a refusal, `result.deny` | passes, one debug line |
+| a hold, `needs: reply` | passes, one debug line |
+| a block of the turn's end | passes, one debug line |
+| context, a rewrite, a tool's result, a register | stands |
 
-The refusal names the fault and the road out, so a session that meets it reads
-what to do. A door refusing everything shuts the road that fixes it, and
-the session stands there for good.
+So the index still answers a search, the guidance still rides, and the tools
+still stand. What falls is the check on the agent. The line reads `god mode
+lets the refusal of Write through`, and names the reason it lets through. A
+demand paid by nothing stands until the turn's end, which pays it as ever.
 
-The fix clears itself. `ensureCage` retries while the answer reads false, so
-the first call after a repair loads the rules again, writes `ok: true`, and says
-`the cage holds again` to the log. The install runs once, and a retry costs a
-read.
-
-## What stands outside
-
-A module failing to import registers no door at all, and every door inside it
-stays silent about that. Two things outside the process answer in their place:
-
-- `./RUNME.sh check` reads `.se/level0.health` and goes red where it reads
-  false. `doctor` prints the same line.
-- `test/contract/loads.test.js` imports the module, calls `register`, and names
-  every door it expects. A file carrying a conflict marker fails that test,
-  because a merge writes those into the very file the cage lives in.
-
-`.github/workflows/check.yml` runs both on a machine with no stake in it.

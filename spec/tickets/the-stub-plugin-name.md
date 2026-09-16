@@ -67,4 +67,4 @@ A tool registers under the plugin's name. Level zero under a bridgehead answers 
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+Nothing stands here yet.

@@ -116,7 +116,7 @@ test("a toggle in a group takes a second command down the group's path", () => {
       stop: {
         type: "object",
         properties: {
-          hold: { enum: ["running", "stopped"], widget: "toggle", group: "agent control", help: "The hold." },
+          hold: { enum: ["off", "stop"], widget: "toggle", group: "agent control", help: "The hold." },
         },
       },
       log: {
@@ -128,21 +128,21 @@ test("a toggle in a group takes a second command down the group's path", () => {
   const files = writesOf(
     ENTRY,
     new Map([
-      [SOURCE, JSON.stringify({ stop: { hold: "running" } })],
+      [SOURCE, JSON.stringify({ stop: { hold: "off" } })],
       [SCHEMA, JSON.stringify(schema)],
     ]),
   );
   assert.deepEqual([...files.keys()].sort(), [
-    ".claude/commands/se-agent-control-hold-running.md",
-    ".claude/commands/se-agent-control-hold-stopped.md",
-    ".claude/commands/se-config-stop-hold-running.md",
-    ".claude/commands/se-config-stop-hold-stopped.md",
+    ".claude/commands/se-agent-control-hold-off.md",
+    ".claude/commands/se-agent-control-hold-stop.md",
+    ".claude/commands/se-config-stop-hold-off.md",
+    ".claude/commands/se-config-stop-hold-stop.md",
   ]);
-  const widget = files.get(".claude/commands/se-agent-control-hold-stopped.md");
-  const config = files.get(".claude/commands/se-config-stop-hold-stopped.md");
+  const widget = files.get(".claude/commands/se-agent-control-hold-stop.md");
+  const config = files.get(".claude/commands/se-config-stop-hold-stop.md");
   assert.equal(widget.split("---\n")[2], config.split("---\n")[2], "both paths run the same verb");
-  assert.match(widget, /^description: "agent control \/ hold: sets stop\.hold to stopped\. The hold\."$/m);
-  assert.match(config, /^description: "config \/ stop \/ hold: sets stop\.hold to stopped\. The hold\."$/m);
+  assert.match(widget, /^description: "agent control \/ hold: sets stop\.hold to stop\. The hold\."$/m);
+  assert.match(config, /^description: "config \/ stop \/ hold: sets stop\.hold to stop\. The hold\."$/m);
 });
 
 test("two toggles sharing a leaf in one group each keep their section", () => {

@@ -5,9 +5,11 @@
 
 const GONE = "gone";
 
-export function messageFor(said) {
+export function messageFor(said, shift = false) {
   if (said?.widget === "action") return { kind: "run", key: said.key, runs: said.runs };
   if (!said?.key) return undefined;
+  // [[spec/design_output/extension#the-hook-button]]
+  if (said.widget === "process") return { kind: "hook", key: said.key, shift: Boolean(shift) };
   return { kind: "press", key: said.key };
 }
 
@@ -62,7 +64,7 @@ export function wire(root, post, view) {
 
     const at = event.target?.closest?.(".widget");
     if (!at) return;
-    const message = messageFor(at.dataset);
+    const message = messageFor(at.dataset, event.shiftKey);
     if (message) post(message);
   });
 

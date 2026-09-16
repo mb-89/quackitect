@@ -68,7 +68,7 @@ the same shape the tracked file holds.
 
 # A variable names a key
 
-One rule, both ways. `judge.maxSpans` reads `SE_JUDGE_MAX_SPANS`:
+One rule, both ways. `stop.mostInARow` reads `SE_STOP_MOST_IN_A_ROW`:
 
 - `varOf` cuts the camel case at each boundary, joins the parts with `_`, and
   shouts the result behind `SE_`.
@@ -125,7 +125,6 @@ the resolver and hands the value in:
 |---|---|
 | `overLong` in `lib/names.js` | the command line, out of `names.words` |
 | `atTurnEnd` in `lib/stop.js` | the write door at each turn end, out of `stop.mostInARow` |
-| `judgeOf` in `lib/judge.js` | the write door at each write, out of the `judge` keys |
 
 The tooth reads its cap at each turn end, so a write to the per-box file
 mid-session reaches the turn after it.
@@ -134,8 +133,8 @@ mid-session reaches the turn after it.
 
 `./RUNME.sh config` prints every key, its value, and the layer answering it:
 
-    judge.enabled          true      spec/config/level0.json
-    judge.model            sonnet    .se/config.json
+    stop.enabled           true      spec/config/level0.json
+    stop.hold              finish    .se/config.json
     stop.mostInARow        3         spec/config/level0.json
     log.level              warn      SE_LOG_LEVEL
 

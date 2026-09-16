@@ -35,7 +35,7 @@ still while lines arrive. end brings it back.
 THE COLUMNS
 
   time           when the line lands, on this box's clock
-  level          blank for info. debug stands dim, and warn, error and fatal in colour
+  level          info in grey, debug dim, and warn, error and fatal in colour
   kind           what it is. A tool line names its tool
   said           one sentence. The details hold the whole text
 

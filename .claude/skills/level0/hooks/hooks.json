@@ -1,5 +1,5 @@
 {
-  "description": "Level zero, as one module. Registers the voice tools at session.start and holds the write door.",
+  "description": "Level zero, small: one closure on every door, which logs what it gets at debug and hands the event on.",
   "modules": [
     "./level0.js"
   ]

@@ -446,8 +446,8 @@ func (m model) renderRow(r Record, selected bool, w int) string {
 		gutter = barStyle.Render("▌") + " "
 	}
 	level := r.Level
-	if strings.EqualFold(level, "info") {
-		level = ""
+	if level == "" {
+		level = "info"
 	}
 	room := max(1, w-2-stampWide-levelWide-kindWide-3)
 	stamp := pad(r.Stamp(m.zone), stampWide)

@@ -71,9 +71,12 @@ function widget(cell) {
     ` data-value="${escaped(cell.value ?? "")}"`,
     ` data-options="${escaped((cell.options ?? []).join(" "))}"`,
     ` data-gesture="${escaped(cell.gesture ?? "")}"`,
+    ` data-state="${escaped(cell.state ?? "")}"`,
     ` title="${escaped(hover(cell))}">`,
     `<span class="mark">${escaped(markOf(cell.icon))}</span>`,
-    cell.widget === "status" ? `<span class="light ${escaped(cell.lit)}"></span>` : "",
+    cell.widget === "status" || cell.widget === "process"
+      ? `<span class="light ${escaped(cell.lit)}"></span>`
+      : "",
     "</button>",
   ].join("");
 }
@@ -250,6 +253,7 @@ function style(groups) {
     ".light { width: 6px; height: 6px; border-radius: 50%;",
     "  background: var(--vscode-charts-green); }",
     ".light.dark { background: var(--vscode-disabledForeground); }",
+    ".light.amber { background: var(--vscode-charts-orange); }",
     ".filter { width: 100%; box-sizing: border-box; margin: 2px 0 6px 0;",
     "  color: var(--vscode-input-foreground); background: var(--vscode-input-background);",
     "  border: 1px solid var(--vscode-input-border, transparent); padding: 2px 4px; }",

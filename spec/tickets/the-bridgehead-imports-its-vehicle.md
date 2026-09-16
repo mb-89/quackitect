@@ -237,4 +237,4 @@ The thoughts circle the client longer than the actions show. Three failing shape
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+Nothing stands here yet.
