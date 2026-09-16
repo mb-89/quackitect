@@ -11,6 +11,7 @@ export const UNPROVEN = "no compaction";
 
 const SAYINGS = new Set(Object.values(HEARD));
 const WAIT = 900000;
+const KIND_WIDTH = 8;
 
 // [[spec/design_output/level0#what-the-probe-reads]]
 export function readsCompaction(rows) {
@@ -65,7 +66,7 @@ function compaction(root, it, client) {
   const read = readsCompaction(rows);
   for (const one of rows) {
     if (one.kind === "context" || one.kind === "compact") {
-      console.log(`  ${one.kind.padEnd(8)} ${one.reason ?? one.trigger ?? ""} ${one.said}`);
+      console.log(`  ${one.kind.padEnd(KIND_WIDTH)} ${one.reason ?? one.trigger ?? ""} ${one.said}`);
     }
   }
   console.log(`\n${read.answer}: ${read.why}`);

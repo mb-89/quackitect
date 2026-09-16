@@ -12,10 +12,13 @@ import {
   reRouted,
   schemasFrom,
 } from "../../.claude/skills/level0/lib/schema.js";
+import { TODO } from "../../.claude/skills/level0/lib/todo.js";
+import { fieldOf, GROUP, withField, withoutField } from "./group.js";
 import { askRows, processAt } from "./process.js";
 
 export const NOTES = ".se/tickets";
 export const HOLD = ".se/hold.json";
+export const HOLDS = ".se/hold";
 export const NOTE = "note";
 const TRAVELS = "spec/tickets";
 const SCHEMAS = "spec/schemas";
@@ -24,7 +27,7 @@ export function ticket(root, argv, doors) {
   const it = { root, ...doors };
   const what = argv[0];
   const name = argv[1];
-  const doing = { note, update };
+  const doing = { note, update, open, todo };
   if (!doing[what]) {
     console.log("Usage: ./RUNME.sh ticket <verb>\n");
     console.log(
@@ -33,6 +36,10 @@ export function ticket(root, argv, doors) {
     console.log(
       "  update <ticket>     copy the ticket's process onto the steps it has yet to reach",
     );
+    console.log("  open <ticket>       open a draft whose ask stands written, so a hand can pull it");
+    console.log(
+      "  todo <ticket>       park it for the next pull, and --off takes the tag away",
+    );
     return what ? 2 : 0;
   }
   return doing[what](it, name, argv);
@@ -40,7 +47,12 @@ export function ticket(root, argv, doors) {
 
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 function note(it, name, argv) {
-  const line = (argv ?? []).slice(2).join(" ").trim();
+  const rest = (argv ?? []).slice(2);
+  const parks = rest.includes(`--${TODO}`);
+  const line = rest
+    .filter((one) => one !== `--${TODO}`)
+    .join(" ")
+    .trim();
   if (!name || !line) {
     console.error(
       'ticket note needs a name and a line: ./RUNME.sh ticket note slow-lint "..."',
@@ -71,6 +83,7 @@ function note(it, name, argv) {
     fields: {
       state: "open",
       urgency: "whenever",
+      ...(parks ? { [TODO]: true } : {}),
       process: held.link,
       process_hash: held.hash,
       steps: fromHold(held.route, holdOf(it)),
@@ -85,8 +98,42 @@ function note(it, name, argv) {
 
   it.disk.makeDir(it.join(it.root, ...NOTES.split("/")));
   it.disk.write(at, made.text);
-  console.log(`${path} stands, and it waits for a retro to decide it.`);
+  console.log(
+    parks
+      ? `${path} stands at ${TODO}, and the next pull hands it back first.`
+      : `${path} stands, and it waits for a retro to decide it.`,
+  );
   return said(it, NOTE, line, { ticket: name });
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
+function todo(it, name, argv) {
+  if (!name) {
+    console.error(`ticket ${TODO} needs a ticket: ./RUNME.sh ticket ${TODO} slow-lint`);
+    return 2;
+  }
+  const at = ticketAt(it, name);
+  if (!at) {
+    console.error(`${name} names no ticket under ${NOTES} or ${TRAVELS}.`);
+    return 2;
+  }
+
+  const text = it.disk.read(at.path);
+  const off = (argv ?? []).includes("--off");
+  const rides = fieldOf(text, GROUP);
+  if (!off && rides) {
+    console.error(`${at.said} rides ${rides}, and that branch speaks for it already.`);
+    console.error(`A ${TODO} parks work no branch carries.`);
+    return 2;
+  }
+
+  it.disk.write(at.path, off ? withoutField(text, TODO) : withField(text, TODO, "true"));
+  console.log(
+    off
+      ? `${at.said} carries no ${TODO}, and a push takes it away from here.`
+      : `${at.said} stands at ${TODO}, and the next pull hands it back first.`,
+  );
+  return 0;
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
@@ -102,14 +149,59 @@ export function fromHold(route, hold) {
   return [route ?? []].flat().map((one) => (one?.steps ? one : { ...one, from: said }));
 }
 
+// [[spec/design_output/pull#the-hand-and-the-hold]]
 function holdOf(it) {
-  const at = it.join(it.root, ...HOLD.split("/"));
-  if (!it.disk.exists(at)) return null;
+  const folder = it.join(it.root, ...HOLDS.split("/"));
+  const held = it.disk.exists(folder)
+    ? it.disk
+        .list(folder)
+        .filter((one) => one.kind === "file" && one.name.endsWith(".json"))
+        .map((one) => it.join(folder, one.name))
+    : [];
+  for (const at of [...held, it.join(it.root, ...HOLD.split("/"))]) {
+    if (!it.disk.exists(at)) continue;
+    const hold = parsedJson(it.disk.read(at));
+    if (hold) return hold;
+  }
+  return null;
+}
+
+function parsedJson(text) {
   try {
-    return JSON.parse(it.disk.read(at));
+    return JSON.parse(text);
   } catch {
     return null;
   }
+}
+
+// [[spec/design_output/pull#a-draft-opens]]
+function open(it, name) {
+  if (!name) {
+    console.error("ticket open needs a ticket: ./RUNME.sh ticket open slow-lint");
+    return 2;
+  }
+  const at = ticketAt(it, name);
+  if (!at) {
+    console.error(`${name} names no ticket under ${NOTES} or ${TRAVELS}.`);
+    return 2;
+  }
+  const text = it.disk.read(at.path);
+  const note = readNote(text);
+  const front = note.front.said ?? {};
+  if (String(front.state ?? "") !== "draft") {
+    console.log(`${at.said} stands ${front.state ?? "with no state"} already.`);
+    return 0;
+  }
+  const ask = note.sections.find((one) => one.header.toLowerCase() === "ask");
+  const rows = (ask?.own ?? []).filter((row) => row.trim() && !/^\s*<!--.*-->\s*$/.test(row));
+  if (!rows.length) {
+    console.error(`${at.said} holds an empty ask, and open waits for one. Write the ask first.`);
+    return 1;
+  }
+  const step = String(front.step ?? "").trim() || firstLeafOf(front.steps);
+  it.disk.write(at.path, withField(withField(text, "state", "open"), "step", step));
+  console.log(`${at.said} stands open at ${step}, and the pull hands it out.`);
+  return 0;
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
@@ -191,12 +283,16 @@ function copied(list, parent, take) {
   });
 }
 
+// A closed note steps aside for the ticket of its name, because a note that became a ticket shares it. [[spec/design_output/pull#the-private-queue]]
 function ticketAt(it, name) {
   const said = String(name).replace(/\.md$/, "");
+  const standing = [];
   for (const folder of [NOTES, TRAVELS]) {
     const path = it.join(it.root, ...`${folder}/${said}.md`.split("/"));
-    if (it.disk.exists(path)) return { path, said: `${folder}/${said}.md` };
+    if (it.disk.exists(path)) standing.push({ path, said: `${folder}/${said}.md` });
   }
+  const live = standing.find((one) => fieldOf(it.disk.read(one.path), "state") !== "closed");
+  if (live || standing.length) return live ?? standing[0];
   const direct = it.join(it.root, ...String(name).split("/"));
   return it.disk.exists(direct) ? { path: direct, said: String(name) } : null;
 }
@@ -206,7 +302,7 @@ function firstLeafOf(route) {
   return found ? found.path : "";
 }
 
-function schemasHere(it) {
+export function schemasHere(it) {
   const at = it.join(it.root, ...SCHEMAS.split("/"));
   if (!it.disk.exists(at)) return new Map();
   return schemasFrom(

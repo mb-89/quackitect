@@ -1,5 +1,5 @@
 # One unit of work, as one markdown note. The file name is the id, and it holds
-# five words at most, the cap `names.words` already sets.
+# the words `names.words` caps.
 #
 # Two folders carry a ticket, and the folder says which kind stands there:
 # `spec/tickets/` travels and is a promise the tree keeps, and `.se/tickets/`
@@ -48,6 +48,10 @@ frontmatter:
     urgency:
       enum: [now, soon, whenever]
       description: which ticket the pull hands out first
+
+    todo:
+      type: boolean
+      description: whether a hand parks this note here, and a note lacking it reads false
 
     step:
       type: string
@@ -202,13 +206,13 @@ frontmatter:
             type: string
             description: the box, the session and the agent, where the harness names one
 
-          took:
+          hash_before:
             type: string
-            description: the branch tip at the take
+            description: the branch tip when the hand picks the step up
 
-          gave:
+          hash_after:
             type: string
-            description: the branch tip at the hand-back
+            description: the branch tip when the hand puts the step down
 
           returns:
             type: integer
@@ -259,6 +263,10 @@ frontmatter:
       type: [array, string]
       description: the tickets this one became, on reason became
 
+    todo:
+      type: boolean
+      description: the tag a hand puts on a note it parks, which the pull hands out first on this box
+
 body:
   headingLevel: 1
   order: strict
@@ -268,7 +276,7 @@ body:
   sections:
     - header: Ask
       required: true
-      x-written: draft
+      x-written: anyone
       description: what this ticket asks for, and what done looks like
 
     - x-one-per: steps

@@ -17,8 +17,6 @@ function fixture() {
     "/tree/.se/bin/biome": "",
     "/tree/spec/guidance/voice.md":
       "# Actionables\n\n1. Write clearly.\n2. Keep it short.\n",
-    "/tree/spec/config/styles/VoiceJudged/Actionable.yml":
-      'message: "Write the next action."',
     "/tree/HANDOVER.md": "Do the work.",
   });
   const proc = fakeProc({
@@ -72,7 +70,6 @@ test("startup injects actual rules and retains a consumed handover", async () =>
   const it = fixture();
   const result = await handle(event("SessionStart"), it);
   assert.match(result.context, /rules: 2/);
-  assert.match(result.context, /Write the next action/);
   assert.match(result.context, /Do the work/);
   assert.equal(it.disk.exists("/tree/HANDOVER.md"), false);
   assert.equal(it.session.records.get("one").handovers[0].text, "Do the work.");
@@ -239,7 +236,7 @@ test("cloud guards every tool and leaves PR operations to the dispatcher", async
     "git switch main",
     "gh pr create",
     "gh pr merge 7",
-    "node src/scripts/cli.js work release another",
+    "node src/scripts/cli.js branch release another",
   ]) {
     assert.ok(
       (

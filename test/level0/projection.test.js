@@ -12,10 +12,13 @@ import {
   optionsFor,
   ownerOf,
   readAll,
+  readsIn,
   readsOf,
   refusedWrite,
   saysGenerated,
   staleIn,
+  STYLE,
+  STYLE_NAME,
   widgetsIn,
   writesOf,
 } from "../../.claude/skills/level0/lib/projection.js";
@@ -116,7 +119,7 @@ test("a toggle in a group takes a second command down the group's path", () => {
       stop: {
         type: "object",
         properties: {
-          hold: { enum: ["running", "stopped"], widget: "toggle", group: "agent control", help: "The hold." },
+          hold: { enum: ["off", "stop"], widget: "toggle", group: "agent control", help: "The hold." },
         },
       },
       log: {
@@ -128,21 +131,21 @@ test("a toggle in a group takes a second command down the group's path", () => {
   const files = writesOf(
     ENTRY,
     new Map([
-      [SOURCE, JSON.stringify({ stop: { hold: "running" } })],
+      [SOURCE, JSON.stringify({ stop: { hold: "off" } })],
       [SCHEMA, JSON.stringify(schema)],
     ]),
   );
   assert.deepEqual([...files.keys()].sort(), [
-    ".claude/commands/se-agent-control-hold-running.md",
-    ".claude/commands/se-agent-control-hold-stopped.md",
-    ".claude/commands/se-config-stop-hold-running.md",
-    ".claude/commands/se-config-stop-hold-stopped.md",
+    ".claude/commands/se-agent-control-hold-off.md",
+    ".claude/commands/se-agent-control-hold-stop.md",
+    ".claude/commands/se-config-stop-hold-off.md",
+    ".claude/commands/se-config-stop-hold-stop.md",
   ]);
-  const widget = files.get(".claude/commands/se-agent-control-hold-stopped.md");
-  const config = files.get(".claude/commands/se-config-stop-hold-stopped.md");
+  const widget = files.get(".claude/commands/se-agent-control-hold-stop.md");
+  const config = files.get(".claude/commands/se-config-stop-hold-stop.md");
   assert.equal(widget.split("---\n")[2], config.split("---\n")[2], "both paths run the same verb");
-  assert.match(widget, /^description: "agent control \/ hold: sets stop\.hold to stopped\. The hold\."$/m);
-  assert.match(config, /^description: "config \/ stop \/ hold: sets stop\.hold to stopped\. The hold\."$/m);
+  assert.match(widget, /^description: "agent control \/ hold: sets stop\.hold to stop\. The hold\."$/m);
+  assert.match(config, /^description: "config \/ stop \/ hold: sets stop\.hold to stop\. The hold\."$/m);
 });
 
 test("two toggles sharing a leaf in one group each keep their section", () => {
@@ -324,4 +327,80 @@ test("a folder nobody made yet reads as empty, and the source may be missing", (
   const disk = fakeDisk({ [SOURCE]: CONFIG, [SCHEMA]: SAID });
   assert.equal(readAll([ENTRY], disk).standing.size, 0);
   assert.equal(readAll([ENTRY], fakeDisk({})).wanted.size, 0);
+});
+
+// [[spec/design_output/projection#the-third-target]]
+const STYLED = {
+  name: "the output style",
+  shape: STYLE,
+  target: ".claude/output-styles",
+  from: "spec/guidance",
+  wrap: "frontmatter",
+};
+
+const flagged = `---
+kind: [[guidance]]
+scope: ["everybody"]
+style: true
+---
+
+# Actionables
+
+1. Put the bottom line first.
+2. Say a thing once. *
+`;
+
+const plain = `---
+kind: [[guidance]]
+scope: ["everybody"]
+---
+
+# Actionables
+
+1. Work one ticket at a time.
+`;
+
+test("the style shape writes one file, from the flagged notes alone", () => {
+  const files = writesOf(
+    STYLED,
+    new Map([
+      ["spec/guidance/voice.md", flagged],
+      ["spec/guidance/tickets.md", plain],
+    ]),
+  );
+  assert.deepEqual([...files.keys()], [`.claude/output-styles/${STYLE_NAME}.md`]);
+  const said = files.get(`.claude/output-styles/${STYLE_NAME}.md`);
+  assert.match(said, /^---\nname: level0\n/);
+  assert.match(said, /keep-coding-instructions: true/);
+  assert.match(said, /## voice\n\n1\. Put the bottom line first\.\n2\. Say a thing once\.\n/);
+  assert.ok(!said.includes("Work one ticket"), "an unflagged note stays out");
+  assert.ok(said.includes(saysGenerated("spec/guidance")), "the file says it is generated");
+});
+
+test("no flagged note writes no style file", () => {
+  const files = writesOf(STYLED, new Map([["spec/guidance/tickets.md", plain]]));
+  assert.equal(files.size, 0);
+});
+
+test("the style reads every note in its folder, and the other shapes read their two files", () => {
+  const disk = fakeDisk({
+    "spec/guidance/voice.md": flagged,
+    "spec/guidance/tickets.md": plain,
+    "spec/guidance/code/code.md": plain,
+  });
+  assert.deepEqual(readsIn(STYLED, disk), ["spec/guidance/tickets.md", "spec/guidance/voice.md"]);
+  assert.deepEqual(readsIn(ENTRY, disk), readsOf(ENTRY));
+});
+
+test("readAll projects the style beside the commands", () => {
+  const disk = fakeDisk({
+    "spec/guidance/voice.md": flagged,
+    ".claude/output-styles/old.md": "stale",
+  });
+  const said = readAll([STYLED], disk);
+  assert.ok(said.wanted.has(`.claude/output-styles/${STYLE_NAME}.md`));
+  assert.deepEqual(staleIn(said.wanted, said.standing).map((one) => one.how).sort(), [
+    "extra",
+    "missing",
+  ]);
 });

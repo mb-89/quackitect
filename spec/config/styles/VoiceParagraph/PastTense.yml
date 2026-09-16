@@ -7,20 +7,14 @@ link: spec/funnel/a-paragraph-has-a-schema.md
 level: error
 ignorecase: true
 exceptions:
-  - add
   - approved
-  - bold
   - bound
-  - buys
   - complicated
   - held
   - missing
   - numbered
-  - read
-  - red
   - refused
   - settled
-  - skips
   - standing
   - switched
 tokens:

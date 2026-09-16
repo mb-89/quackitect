@@ -3,7 +3,10 @@
 
 import { spawnSync } from "node:child_process";
 
-const BUFFER = 64 * 1024 * 1024;
+const KIB = 1024;
+const MIB = KIB * KIB;
+const BUFFER_MIB = 64;
+const BUFFER = BUFFER_MIB * MIB;
 
 export function proc() {
   return {
@@ -17,6 +20,7 @@ export function proc() {
         timeout: init.timeoutMs,
         maxBuffer: BUFFER,
         stdio: init.inherit ? "inherit" : undefined,
+        windowsHide: true,
       });
       if (ran.error) throw ran.error;
       return {

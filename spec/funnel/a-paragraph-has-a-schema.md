@@ -5,7 +5,7 @@ about: a schema saying what a paragraph can hold, projected into Vale, read by e
 
 # Scope
 
-Every paragraph the agent writes validates against one schema, in a file and in
+Every paragraph the agent writes meets one schema, in a file and in
 the chat alike. The schema is a whitelist: it names what a paragraph can hold,
 and a door refuses the rest. Nothing in it lists a bad word.
 
@@ -90,40 +90,6 @@ The tagger misreads a heading, a table cell and a quoted command, so this row
 stays a blacklist inside the whitelist. `Passive` and `PastTense` already stand
 in that form, and they move under the schema as they are.
 
-# The vocabulary grows itself
-
-A word whitelist holds where its seed covers the writer, and the numbers say
-what the seed has to be. Against the OpenSTE list alone, 42 percent of the
-words in the uploaded answers stand outside. So does 39 percent of the owner's
-own prose in `spec/guidance`. This tree's voice runs on words of its own.
-
-So the seed takes three sources, and `spec/vocabulary/words.yml` holds them:
-
-| source | entries carry | what it adds |
-|---|---|---|
-| OpenSTE, MIT | `from: openste`, and a part of speech | the 900 words the standard admits |
-| the tree's own prose, words used twice or more | `from: tree` | the words this voice runs on |
-| the pronouns | `from: pronoun` | the words OpenSTE leaves to the writer |
-
-Against that seed, the answers stand 10 percent outside. The outside words are
-contractions, past-tense forms and words used once, and the grammar layer
-refuses the first two already. So the tail the vocabulary layer meets on its
-own is a few percent, and the session adds those on the fly:
-
-1. The door refuses a paragraph and names every word outside the list.
-2. Where an entry carries `insteadOf`, the refusal hands the writer the better
-   word, so a refusal teaches the swap.
-3. The session adds the missing word to `words.yml` with a meaning, under
-   `from: session`, and writes the paragraph again.
-4. The retro reads every `from: session` entry and keeps it or cuts it.
-
-The swaps seed from the standard's own list of the writer errors it meets most,
-which the video kit paraphrases under MIT. An entry the session adds carries
-its own `insteadOf` where it knows one.
-
-The word rules with a closed set stay beside it: no contraction, no Latin short
-form, and the modal set of the register.
-
 # The registers
 
 One schema, three registers. A register changes a limit and a set, and nothing
@@ -155,7 +121,7 @@ mechanism reads what the doors already read:
 | the count is zero | the answer gate | the table is not demanded |
 | a question stays open | the agent | the row's answer says what blocks it, and the turn ends on that |
 
-The table stands first because a reader skims an answer, and the question is
+The table stands first because a reader takes an answer in at a glance, and the question is
 why they read. The rest of the answer follows under it. The door that holds
 the owner's prompt first keeps its own rule, a readback before the first tool
 call. The table lands at the turn's end when the answer takes research.
@@ -200,7 +166,7 @@ list row costs no call, so it goes to Vale.
 
 So the chat reads the same rules as a file, with one limit the harness sets.
 The reply already stands on screen when `turn.complete` fires, and the hook
-refuses nothing there. A rejection is therefore a re-prompt, and a re-prompt
+refuses nothing there. So a rejection is a re-prompt, and a re-prompt
 puts a second answer under the first. Every project in the field meets this
 and lands on bands, and so does this note:
 
@@ -230,14 +196,14 @@ The loop has four parts, and three of them stand already:
 
 The projection carries an exception into the rule, so the schema stays the one
 place a person edits. `PastTense` already holds eleven exceptions inside its
-own file, and they move into the schema with it. The writes of this very note
+own file, and they move into the schema with it. The writes of this note
 meet five more. The tagger reads `bold`, `add`, `approved` and the word for
 ten tens as the past tense. And the door lints an edit's fragment on its own,
 so a lone table row reads as one too.
 
 A count guards the loop. A rule refusing the same phrase past a set number in
 one session writes a `warn` row naming itself. So a rule that misreads shows
-up on the day, and the twelfth misread has a place to land.
+up on the day, and misread number twelve has a place to land.
 
 # What it costs
 
@@ -256,7 +222,7 @@ measurement reports:
 | branch | does | touches | proves it |
 |---|---|---|---|
 | the verbs | `voice measure` scores a folder, and `voice refused` ranks the log's refusals | `src/scripts`, `RUNME.sh` | a fixture folder scores a known number |
-| the schema and the projector | one `shape` in `projection.js` reads the schema and writes a rule file per enumerable layer | `lib/projection.js`, `projections.json`, `VoiceParagraph` | each rule refuses a bad fixture, and the nine hand rules it replaces come out |
+| the schema and the projector | one `shape` in `projection.js` reads the schema and writes a rule file per layer with a closed set | `lib/projection.js`, `projections.json`, `VoiceParagraph` | each rule refuses a bad fixture, and the nine hand rules it replaces come out |
 | the vocabulary | the projection inlines `words.yml` into one rule, the refusal names the outside words and the swaps, and the cage reloads on a write to the list | `lib/vale.js`, `lib/refuse.js`, `words.yml` | a paragraph with one outside word meets a refusal naming it |
 | the answer gate | `turn.complete` re-prompts under the bands, `prompt.submit` carries a warning forward, and `check_answer` registers at the session's start | `hooks/level0.js`, `level0.json` | a fake session over the ceiling meets one re-prompt, and one alone |
 | the question and the TL;DR | `prompt.submit` counts the questions, and the answer register demands the table and the list first | `lib/answer.js`, the schema | a prompt with two questions refuses an answer opening with prose |

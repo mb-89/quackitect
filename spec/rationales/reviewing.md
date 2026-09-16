@@ -37,7 +37,7 @@ A program reading the diff alone answers neither half.
 ## 2. The trivial fix goes in
 
 `spec/guidance/working.md` rule nine sends a trivial fix in and a deeper one to
-a finding. A file outside the brief is therefore no fault by itself.
+a finding. A file outside the brief is then no fault by itself.
 
 The reader asks whether the extra is trivial, and stops there. The next
 question decides the rest.

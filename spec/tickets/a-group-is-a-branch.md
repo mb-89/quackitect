@@ -2,17 +2,18 @@
 kind: [[ticket]]
 state: open
 urgency: soon
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
     when: cloud
     by: agent
-    needs: ["work sync"]
+    needs: ["branch sync"]
     evidence:
       - name: sync
         form: command
         expects: 0
-        says: work sync, so the branch carries trunk
+        says: branch sync, so the branch carries trunk
   - name: split
     does: mints the children, or assigns standing tickets, each naming this group
     from: anyone
@@ -42,6 +43,7 @@ steps:
       - name: write
         does: writes the retro over the box's own window
         input: ["children", "notes"]
+        checklist: ["every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
         evidence:
           - name: done
             form: list
@@ -72,15 +74,15 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: children
 process: [[group]]
+process_hash: e655a1488d1ac788
 ---
 
 # Ask
 
 The verbs read a group off its ticket, claim it by pushing a record entry, and land it with the check on the merge commit.
 
-Done is a tree where no file names a group kind. `work list` then names a group, a brief and a loose ticket, each as its own kind.
+Done is a tree where no file names a group kind. `branch list` then names a group, a brief and a loose ticket, each as its own kind.
 
 # sync
 
@@ -88,7 +90,7 @@ Done is a tree where no file names a group kind. `work list` then names a group,
 
 ## sync
 
-<!-- work sync, so the branch carries trunk -->
+<!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
 
@@ -101,6 +103,12 @@ Done is a tree where no file names a group kind. `work list` then names a group,
 <!-- every child as a link, one a line, with its process -->
 
 <!-- the form is list -->
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 # children
 
@@ -150,6 +158,12 @@ Done is a tree where no file names a group kind. `work list` then names a group,
 
 <!-- the form is text -->
 
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
 ## cloud
 
 <!-- names what the box lacked, met and leaves for a person -->
@@ -174,6 +188,6 @@ Done is a tree where no file names a group kind. `work list` then names a group,
 
 # Discussion
 
-This is the first group the tree carries, and it stands beside the brief that mints it. A brief wins while `HANDOVER.md` stands, so this note holds the shape and takes no hand until `work adopt` drops that file.
+This is the first group the tree carries, and it stands beside the brief that mints it. A brief wins while `HANDOVER.md` stands, so this note holds the shape and takes no hand until a group ticket takes the place of that file.
 
 The leaves below carry the placeholders the mint writes, because no hand walks this route yet. The pull fills them, one leaf at a time.

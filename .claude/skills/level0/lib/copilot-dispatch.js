@@ -3,10 +3,12 @@
 
 import { statusOf, work } from "../../../../src/scripts/work.js";
 
+const GIT_WAIT = 30000;
+
 export async function dispatch(it) {
   return it.session.withState("copilot-dispatch", async (state, save) => {
     const run = (argv) => {
-      const result = it.proc.run(argv, { cwd: it.root, timeoutMs: 30000 });
+      const result = it.proc.run(argv, { cwd: it.root, timeoutMs: GIT_WAIT });
       if (result.exitCode !== 0)
         throw new Error(
           `${argv[0]} ${argv[1]} failed. Keep the claim and retry dispatch after checking GitHub.`,
@@ -133,7 +135,7 @@ export async function dispatch(it) {
         "--body",
         [
           marker,
-          "@copilot Work on this pull request's existing head branch. Read the held HANDOVER.md through level zero. Run work sync, not work take. Commit and push checkpoints, write your result and retro, then run work done or work release. Open no new pull request; leave merging to a person.",
+          "@copilot Work on this pull request's existing head branch. Read the held HANDOVER.md through level zero. Run branch sync, not branch take. Commit and push checkpoints, write your result and retro, then run branch done or branch release. Open no new pull request; leave merging to a person.",
         ].join("\n\n"),
       ]);
     }

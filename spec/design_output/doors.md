@@ -9,8 +9,8 @@ the fakes beside them, and the contract tests over both.
 
 # One door per outside thing
 
-A door is the one place this tree reaches a thing outside it. There are five,
-each a function answering an object of verbs:
+A door is the one place this tree reaches a thing outside it. Each is a
+function answering an object of verbs, and `./RUNME.sh doors` names every one:
 
 | door | reaches | file |
 |---|---|---|
@@ -20,19 +20,18 @@ each a function answering an object of verbs:
 | `clock` | the time now | `src/doors/clock.js` |
 | `log` | the log every door writes | `src/doors/log.js` |
 
-Everything above a door takes it as an argument. The command line builds all
-five once and hands them on, so a caller names what it reaches and a test hands
+Everything above a door takes it as an argument. The command line builds every
+door once and hands them on, so a caller names what it reaches and a test hands
 in something else.
 
 Vale holds the line: `DoorsOnly` refuses a `node:` import, a `Date.now`, a
-`new Date()` and a `Math.random` anywhere but `src/doors`. Five modules pass,
-because they reach nothing: `node:path`, `node:url`, `node:test`,
-`node:assert` and `node:assert/strict`.
+`new Date()` and a `Math.random` anywhere but `src/doors`. The modules reaching
+nothing pass, and `spec/config/styles/VoiceVale/DoorsOnly.yml` names them.
 
 # A door standing on another
 
 Git runs a program, and the log writes a file, so each takes the door beneath it
-and builds on that. A fake of the door beneath therefore stands in for the one
+and builds on that. A fake of the door beneath then stands in for the one
 above, and one file holds each pairing under one name.
 
 | door | stands on | its fake |
@@ -54,6 +53,16 @@ tests its own script, so no door here has a mock.
 The fake clock stands still until a test moves it with `tick`, so a case that
 reads the time replays.
 
+# The bridgehead stands under hooks
+
+The bridgehead is a door: it sits in the agent's path, and it is the outside
+thing a test of the server fakes. It stands under `.claude/skills/level0/hooks`
+and in no `src/doors`, because the client loads a hooks module from that
+folder alone. Its fake, `src/doors/fake/bridgehead.js`, raises an event
+straight into `decide`, so a test drives the server with no client, no wire
+and no port. For details, see
+[[spec/design_output/level0#the-bridgehead-and-the-server]].
+
 # Two folders, and their cost
 
 | folder | what stands there | what it touches |
@@ -74,6 +83,6 @@ No pattern holds a rule spanning two folders, so the command line holds this
 one. `./RUNME.sh doors` reads both folders and names every door standing
 without a contract test. `check` runs it after the tests, before the rules.
 
-Two more contract tests stand there, because they drive a real thing as well.
+Other contract tests stand there too, because they drive a real thing as well.
 `vale.test.js` runs the rules through Vale itself, and `tree.test.js` reads the
 files this tree tracks.

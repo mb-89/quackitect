@@ -1,5 +1,6 @@
 ---
 kind: [[design_output]]
+refines: ["[[spec/design_input/a-stub-takes-its-vehicle]]"]
 ---
 
 # Scope
@@ -88,14 +89,14 @@ Proven against a real copy, in `test/contract/vehicle.test.js`:
 |---|---|
 | its identity | its own, and other than its origin's |
 | its roots | itself as method and as work |
-| its contract tests | 73 of 73, out of its own folder |
+| its contract tests | every one green, out of its own folder |
 | its answer to `vehicle` | no path naming its origin |
 
 A fresh copy takes two steps that any fresh clone takes: `git init`, and one
 run of `RUNME`, which surveys the tools and builds what it needs.
 
 The run bit travels with the scripts. A copy whose `RUNME.sh` arrives
-unrunnable answers `Permission denied`, and the vehicle stands there unable to
+a file nobody can run answers `Permission denied`, and the vehicle stands there unable to
 take its own first step.
 
 ## A project names its driver
@@ -109,6 +110,21 @@ about this machine: the copy stands somewhere else.
 Every copy writes itself into `~/.se/registry.json`, or into each folder
 `SE_REGISTRY` names. The reader drops an entry whose method root holds no
 marker. A folder that holds something else now answers about that something.
+
+## The register holds the port
+
+One vehicle, one port. The register's entry for a vehicle carries the port
+it blocks. A vehicle with none takes the lowest free one from `PORT_BASE` in
+`lib/vehicle.js` up on its first start. So two vehicles on one box stand on two ports, and a project
+reaches the right one.
+
+A project points at its vehicle in `.se/vehicle.json`: the method root and
+the port. A folder with no pointer that carries the marker and the server is
+a vehicle, and points at itself. A folder with neither becomes a project on
+the first press of the hook. It gets the one hook under `.claude/skills/level0`
+and the pointer, and nothing else of the vehicle. The bridgehead reads the
+port off the pointer at session start. `.se` stays off git, so a clone gets
+the pointer back from the same press.
 
 ## One copy is no question
 
@@ -128,3 +144,73 @@ copy. Two copies make a question, and the project answers it with `attach`.
 
 A copy lands in a new folder. `vehicle into <folder>` writes into one that
 stands already, which is how a folder becomes a vehicle where it sits.
+
+# A stub takes its vehicle
+
+A stub is a bare project the method drives from outside. `./RUNME.sh stub into
+<folder>` writes it out of the vehicle it runs in, and copies nothing. The
+stub's files and who writes each stand in
+[[spec/design_input/a-stub-takes-its-vehicle#the-stubs-files]]. This chapter
+says what the verb puts into each.
+
+| file | the verb puts |
+|---|---|
+| `project/spec/tickets/`, `project/spec/guidance/`, `project/src/` | one `.gitkeep`, so the empty folder travels with git |
+| `vehicle.json` | the record below |
+| `RUNME.sh` | the shim, with its run bit |
+| `.claude/settings.json` | the vehicle's tracked settings, key by key, with none of its comments |
+| `.claude/skills/bridgehead/` | the bridgehead plugin: its manifest, its hooks file and one module |
+
+## The record names the vehicle
+
+| field | reads off |
+|---|---|
+| `vehicle` | the identity in `.se/copy.json`, made where it stands unmade |
+| `name` | the folder the vehicle stands in, which is the brand |
+| `upstream` | `git remote get-url origin` in the vehicle, or what `--upstream` names |
+| `version` | the vehicle's `package.json` |
+| `made` | the clock |
+
+A vehicle with no remote has no upstream a cloud box can clone, so the verb
+refuses until `--upstream` names one. A vehicle the button made has no git
+yet, and this is where that shows.
+
+## Two roads to the vehicle
+
+The shim and the bridgehead both read `vehicle.json` beside them. The shim
+takes three roads in this order, and the bridgehead the first and the last:
+
+| road | answers | who takes it |
+|---|---|---|
+| `SE_VEHICLE` in the environment | that folder | the shim, the bridgehead |
+| the register, by the `vehicle` id | the entry's `method_root` | the shim |
+| `~/.se/vehicles/<name>` | the folder a cloud box clones the upstream into | the shim, the bridgehead |
+
+The shim stays POSIX sh, because a stub holds no node before it finds the
+vehicle. So it reads its two records the plain way:
+
+- the register stands in every folder `SE_REGISTRY` names, with `;` between them, and in `~/.se` where it names none
+- sed reads a field out of `vehicle.json` and out of the register, one key a line
+- a path in the register holds backslashes as JSON writes them, and the shim turns each into a slash
+
+A shim finding the vehicle sets `SE_WORK_ROOT` to the stub. It then hands
+every argument to the vehicle's `RUNME.sh`, and `rootsHere` in the command
+line takes that root as the work. So `./RUNME.sh vehicle` inside a stub names
+the vehicle as method and the stub as work. A shim finding none prints one
+line naming the vehicle, its upstream and the cloned road, and exits one.
+
+The bridgehead imports the vehicle's `level0` and `level1` hook modules from
+the folder it finds, and registers every hook they carry under its own. Where
+it finds none, the session starts with no cage, and the log says why. Its
+register road belongs to `the-bridgehead-installs-upstream`.
+
+`test/contract/stub.test.js` drives the shim over a fixture: a fake vehicle
+whose `RUNME.sh` echoes its argv and its work root, a register naming it, and
+a stub. It reads both, then empties the register and reads the refusal line.
+
+## Nothing of the method travels
+
+`test/contract/stub.test.js` produces a stub into a folder it makes, reads
+every file back, and walks the whole folder. Every path it meets stands in
+the list the pure module names, and none of the method's files stands beside
+them. A refused vehicle leaves the folder as it stands.

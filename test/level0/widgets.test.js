@@ -25,7 +25,7 @@ const SCHEMA = {
         mostInARow: { type: "number", unit: "turns", help: "How many turns." },
         hold: {
           type: "string",
-          enum: ["running", "finishing", "stopped"],
+          enum: ["off", "finish", "stop"],
           help: "What the session does.",
           widget: "toggle",
           gesture: 5,
@@ -69,7 +69,7 @@ test("every leaf of the schema stands as one entry, and the comment stands as no
 
 test("an entry carries the options the schema names as an enum", () => {
   const one = entriesIn(SCHEMA).find((each) => each.key === "stop.hold");
-  assert.deepEqual(one.options, ["running", "finishing", "stopped"]);
+  assert.deepEqual(one.options, ["off", "finish", "stop"]);
   assert.equal(one.section, "stop");
   assert.equal(one.leaf, "hold");
 });
@@ -82,7 +82,7 @@ test("a widget naming no group draws no control, and one naming a group draws", 
 });
 
 test("a group holds its widgets in rows, each row in column order", () => {
-  const groups = groupsIn(SCHEMA, valuesOf({ stop: { hold: "running" } }, {}));
+  const groups = groupsIn(SCHEMA, valuesOf({ stop: { hold: "off" } }, {}));
   assert.equal(groups.length, 1);
   assert.equal(groups[0].name, "agent control");
   assert.equal(groups[0].wide, 5);
@@ -93,16 +93,16 @@ test("a group holds its widgets in rows, each row in column order", () => {
 });
 
 test("a widget carries the value the files answer, and the layer answering it", () => {
-  const values = valuesOf({ stop: { hold: "running" } }, { stop: { hold: "stopped" } });
+  const values = valuesOf({ stop: { hold: "off" } }, { stop: { hold: "stop" } });
   const cell = groupsIn(SCHEMA, values)[0].rows[0].cells[1];
-  assert.equal(cell.value, "stopped");
+  assert.equal(cell.value, "stop");
   assert.equal(cell.layer, LOCAL);
-  assert.equal(cell.rest, "running");
+  assert.equal(cell.rest, "off");
 });
 
 test("the tracked file answers a key the local file leaves alone", () => {
-  const values = valuesOf({ stop: { hold: "running" } }, { log: { level: "warn" } });
-  assert.deepEqual(values.get("stop.hold"), { value: "running", layer: TRACKED });
+  const values = valuesOf({ stop: { hold: "off" } }, { log: { level: "warn" } });
+  assert.deepEqual(values.get("stop.hold"), { value: "off", layer: TRACKED });
   assert.deepEqual(values.get("log.level"), { value: "warn", layer: LOCAL });
 });
 
@@ -111,9 +111,9 @@ test("the tree names one node per file, and a row per key under it", () => {
   const tree = treeIn(SCHEMA, [
     {
       path: TRACKED,
-      said: { comment: "words", stop: { mostInARow: 3, hold: "running" } },
+      said: { comment: "words", stop: { mostInARow: 3, hold: "off" } },
     },
-    { path: LOCAL, said: { stop: { hold: "stopped" } } },
+    { path: LOCAL, said: { stop: { hold: "stop" } } },
   ]);
   assert.deepEqual(
     tree.map((one) => one.file),

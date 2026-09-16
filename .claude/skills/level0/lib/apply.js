@@ -1,12 +1,12 @@
 // The manifest: many edits, many files, one atomic answer. Every op reads the
 // file as the ops before it leave it, and one failure refuses the whole batch.
-// [[spec/design_output/apply#validate-everything-then-write]]
+// [[spec/design_output/apply#check-everything-then-write]]
 
 export const OPS = ["", "exact", "create", "write", "append", "prepend", "regex"];
 export const PATCH = "patch";
 export const REPLACE = "replace";
 
-// [[spec/design_output/apply#validate-everything-then-write]]
+// [[spec/design_output/apply#check-everything-then-write]]
 export function patchSpec() {
   return {
     name: PATCH,
@@ -87,7 +87,7 @@ export function filesIn(ops) {
   return out;
 }
 
-// [[spec/design_output/apply#validate-everything-then-write]]
+// [[spec/design_output/apply#check-everything-then-write]]
 export function applied(held, ops) {
   const list = Array.isArray(ops) ? ops : [];
   if (!list.length) return refused("an apply with no edits: say what to change");
@@ -135,7 +135,7 @@ function refused(why) {
   return { ok: false, why };
 }
 
-// [[spec/design_output/apply#the-five-verbs]]
+// [[spec/design_output/apply#the-verbs]]
 function oneOp(one, text, absent, at) {
   const kind = String(one.op ?? "").trim() || "exact";
   const made = String(one.new ?? "");

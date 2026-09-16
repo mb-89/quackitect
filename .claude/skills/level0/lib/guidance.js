@@ -117,6 +117,11 @@ export function envOf(text) {
     .filter(Boolean);
 }
 
+// [[spec/design_output/level0#the-style-carries-a-note]]
+export function styled(text) {
+  return truthy(parse(text).front.style);
+}
+
 export function bindsHere(text, env) {
   const wants = envOf(text);
   if (!wants.length) return true;
@@ -136,6 +141,20 @@ export function canary(counts) {
   const notes = counts?.notes ?? 0;
   const tooth = counts?.stop === false ? "off" : "on";
   return `level0 holds this session: ${rules} rules, ${notes} notes, the stop hook ${tooth}.`;
+}
+
+// The block the session reads with the canary in it. The line rides the answer and closes no turn. [[spec/design_output/level0#the-canary]]
+export function canaryText(sentence) {
+  return [
+    "End your FIRST answer with this line, on its own, word for word:",
+    "",
+    `    ${sentence}`,
+    "",
+    "It says out loud that level zero holds this session, and the numbers",
+    "come from what it loaded. Write this line once and never again. The line",
+    "rides the answer and closes no turn: where that answer names a next step,",
+    "do it in the same turn.",
+  ].join("\n");
 }
 
 export function canaryIn(answer, said) {

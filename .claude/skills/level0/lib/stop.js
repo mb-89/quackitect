@@ -116,8 +116,10 @@ export function stopSpec(rules) {
   return {
     name: STOP_TOOL,
     description: [
-      "Ends this turn. Call it last, once your answer stands, and write nothing",
-      "after it. The result says whether the stop stands. Where it falls, the",
+      "Ends this turn, from the second turn on. The first turn ends on the canary",
+      "line alone, written last, and this call falls there. Call it last, once",
+      "your answer stands, and write nothing after it. The result says whether",
+      "the stop stands. Where it falls, the",
       `result names the fact, so carry on. ${NEEDS_LINE} The reasons:`,
       ...reasons.map((one) => `${one.id}: ${one.asks}`),
     ].join("\n"),
@@ -143,7 +145,11 @@ export function stopAnswer(rules, reason, decision) {
   }
   if (decision.ends) {
     const why = decision.stop?.says ?? "";
-    return { known, ends: true, result: `The stop stands. ${why} Write nothing more.`.replace(/\s+/g, " ") };
+    return {
+      known,
+      ends: true,
+      result: `The stop stands. ${why} Write the words Ending my turn, and nothing more.`.replace(/\s+/g, " "),
+    };
   }
   return { known, ends: false, result: `The stop falls. ${decision.go?.says ?? ""}`.trim() };
 }
@@ -194,7 +200,9 @@ export function toothOf(init = {}) {
 
     // [[spec/design_output/config#a-caller-hands-it-in]]
     atTurnEnd(decision, mostInARow) {
-      const runaway = !decision.ends && mostInARow > 0 && inARow >= mostInARow;
+      // A firm rule holds past the cap, because the cap frees a stuck session alone. [[spec/design_output/stop#three-in-a-row]]
+      const firm = Boolean(decision.go?.firm);
+      const runaway = !decision.ends && !firm && mostInARow > 0 && inARow >= mostInARow;
       const ends = decision.ends || runaway;
       if (ends) {
         granted = true;
@@ -205,6 +213,21 @@ export function toothOf(init = {}) {
       return { ...decision, ends, runaway, inARow };
     },
   };
+}
+
+// An answer names a next step where a paragraph after the tables opens on the agent's own next act. [[spec/design_output/stop#the-canary-ends-turn-one]]
+const NEXT = /^(?:next\b|then i\b|i (?:start|begin|read|run|pull|take|look|check|open|write|fix|merge|work|list|review)\b|i'll\b|i will\b)/i;
+
+export function namesNext(text) {
+  const paragraphs = String(text ?? "")
+    .split(/\r?\n\s*\r?\n/)
+    .map((one) => one.trim())
+    .filter((one) => one && !one.startsWith("|") && !one.startsWith("#") && !/^stop:/i.test(one) && !/^level0 holds this session/.test(one));
+  return paragraphs.some((one) =>
+    one
+      .split(/(?<=[.!?])\s+/)
+      .some((sentence) => NEXT.test(sentence.replace(/^[-*]\s+/, "").trim())),
+  );
 }
 
 // [[spec/design_output/stop#what-the-todo-list-says]]

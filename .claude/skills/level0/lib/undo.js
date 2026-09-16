@@ -4,6 +4,7 @@
 
 export const FOLDER = ".se/undo";
 export const UNDO = "undo";
+const STAMP_DIGITS = 20;
 
 // [[spec/design_output/apply#drift-refuses-the-restore]]
 export function undoSpec() {
@@ -43,7 +44,7 @@ export function journalOf(at, on, by, files) {
 // [[spec/design_output/apply#the-entry-names-its-time]]
 export function nameOf(at) {
   const said = String(at ?? "").replace(/[^0-9]/g, "");
-  return `${said.padEnd(20, "0").slice(0, 20)}.json`;
+  return `${said.padEnd(STAMP_DIGITS, "0").slice(0, STAMP_DIGITS)}.json`;
 }
 
 // [[spec/design_output/apply#an-entry-says-whose-apply]]

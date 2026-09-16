@@ -221,7 +221,7 @@ differs: its own reads, its own hand rule, and the form of its evidence.
 
 | field | holds |
 |---|---|
-| `name` | one word or a hyphenated pair, unique among its siblings |
+| `name` | one word or a pair with a hyphen, unique among its siblings |
 | `steps` | the steps under a phase, in order |
 | `by` | `anyone`, `person`, `agent`, `helper`, `retro`, or `children` |
 | `not` | a step whose hand this step's hand can not be, as `draft` or `implement` |
@@ -272,7 +272,7 @@ The route is a closed vocabulary, and the schema names every word of it:
 
 | key | takes |
 |---|---|
-| `name` | a word, or a hyphenated pair |
+| `name` | a word, or a pair with a hyphen |
 | `steps` | a list of steps |
 | `does`, `asks` | a line of text |
 | `by` | one word from its list |
@@ -318,7 +318,7 @@ The chapters follow the tree. A phase's chapter holds its steps' chapters and
 nothing else. A leaf's chapter holds its evidence and nothing else, so a
 sub-step costs a chapter and a ticket stays one file.
 
-The implement phase of the standard process shows how a step forces a way of
+The `implement` phase of the standard process shows how a step forces a way of
 working without a word of prose:
 
 | leaf | the hand does | the engine checks at the hand-back |
@@ -578,7 +578,7 @@ moves and one relation says where work lands.
     record:
       children:
         hand: box 3f9a · session 12
-        took: a1b2c3
+        hash_before: a1b2c3
     ---
 
     # Ask
@@ -599,17 +599,17 @@ into the group goes to work before the retro's last leaf.
 
 | rule | what it says |
 |---|---|
-| the branch is the claim | the take writes the hand and `took` into the group's record under `children` and pushes, and the push arbitrates two boxes |
-| held derives | a group holds where its newest record entry carries `took` and no `gave`, and `work list` reads it so |
+| the branch is the claim | the take writes the hand and `hash_before` into the group's record under `children` and pushes, and the push decides between two boxes |
+| held derives | a group holds where its newest record entry carries `hash_before` and no `hash_after`, and `branch list` reads it so |
 | a stale group is yours | a held group whose tip is older than `work.staleAfter` stands under yours with three answers, and `release`, `take` and `close` are the verbs |
 | one box, one group | a box works one group at a time, and the group's children one at a time |
-| the branch is the filter | on a group's branch the pull sees that group alone, and widens nothing |
+| the branch is the filter | on a group's branch the pull sees that group alone, and opens nothing wider |
 | trunk hands out no group's child | on trunk the pull offers a box a group to take, and a person the tickets of no group |
 | the branch holds the truth | while the branch stands, its copy of the group and of its children is the record |
-| a box leaves | when the group's last leaf passes, it writes `gave`, closes the group as `done` where every child stands closed, and leaves it open otherwise |
+| a box leaves | when the group's last leaf passes, it writes `hash_after`, closes the group as `done` where every child stands closed, and leaves it open otherwise |
 | a group returns | an open group nobody holds comes back to the beat once a person answers on its branch |
-| the merge is a desk's | `work merge` runs on a box off the cloud, an agent's or a person's, since a cloud box pushes no trunk, and `work close` drops the branch |
-| the merge lands the truth | `work merge` runs the check on the merge commit and undoes it on red. It refuses where trunk's copy of the group or of a child differs from the branch point, and names the lines |
+| the merge is a desk's | `branch merge` runs on a box off the cloud, an agent's or a person's, since a cloud box pushes no trunk, and `branch close` drops the branch |
+| the merge lands the truth | `branch merge` runs the check on the merge commit and undoes it on red. It refuses where trunk's copy of the group or of a child differs from the branch point, and names the lines |
 | the merge frees the tickets | an open child of a merged group loses its `group`, so a ticket waiting on a person stands loose on trunk |
 
 A cloud box differs from a desk in one leaf, `sync`, which takes trunk into
@@ -655,7 +655,7 @@ branch, which v4 rules.
 
 There is no lease. A branch somebody holds stays held until a person looks. A
 branch held for a long time is something a person has to look at in any case.
-So `work list` names the age of each held branch's tip, and that age is the
+So `branch list` names the age of each held branch's tip, and that age is the
 signal.
 
 | the tip's age | means |
@@ -673,7 +673,7 @@ A hand mints where it means to work:
 - a ticket it leaves for others carries no group, and a person sorts it later
 - on a cloud box a ticket with no group rides the branch to the merge, since trunk refuses the box
 
-The six lines `work new` appends to a brief today are this route, one for
+The six lines `branch new` appends to a brief today are this route, one for
 one. So the first cloud run under the pull is the first process running as
 data, and the brief's contract retires with it.
 
@@ -681,7 +681,7 @@ data, and the brief's contract retires with it.
 
 The tree's retro turns a window of the record into changes to the machinery.
 It is blameless, and it repairs the generator of a bad output: a prompt, a
-guidance line, a form, a refusal, a tool. Repairing the artefact is fine, and
+guidance line, a form, a refusal, a tool. Repairing the artifact is fine, and
 the finding is the generator. The route stands in `spec/processes/retro.yaml`,
 and a retro is a ticket, so its evidence is the report, in git.
 
@@ -781,7 +781,7 @@ its home by the order that asks the least of anybody:
 | a knob | a default | the config |
 | a sentence | works on whoever reads and remembers it | guidance, last |
 
-The kata card spans two retros:
+The `kata` card spans two retros:
 
 | the retro | writes |
 |---|---|
@@ -813,7 +813,7 @@ mints one.
 
 The agent holds three verbs: `pull`, `guidance` and `escalate`. Every other
 verb belongs to a person or the engine. The shell is the verb, under
-`./RUNME.sh work`. A plugin tool wraps it for a session that holds the plugin,
+`./RUNME.sh branch`. A plugin tool wraps it for a session that holds the plugin,
 which is v4's ruling that one function runs under both doors.
 
 The engine is these verbs and the beat, and it runs with nobody on the box.
@@ -1008,6 +1008,42 @@ a retro step. That is v4's rule that an empty queue drains the notes, with
 the retro as the moment. The tooth counts a private ticket in hand the way it
 counts a task today.
 
+# The to-do flag
+
+A hand parks work for later by tagging a note. The field is `todo`, a boolean
+in the frontmatter, and a note holding no field reads false.
+
+    todo: true
+
+The tag is a claim by the hand that writes it, and it holds on this box alone.
+So the owner says park this, the hand mints a note or tags one standing, and
+the next pull hands that note back first.
+
+| the rule | what it says |
+|---|---|
+| the mint takes the flag | the note verb writes the field, and an edit sets it later |
+| the tag reaches any kind | a note, a ticket or a group carries it, in any folder |
+| a ticket on a branch takes none | the branch speaks for that one already |
+| the push door refuses it | a push whose delta carries a tagged note comes back named |
+| the commit passes | a box holds whatever it wants, and the push is the one gate |
+| the pull hands it first | a tagged note stands ahead of every free ticket |
+| the close takes it off | the tag goes where the work closes |
+
+The push door carries v4's claim, and the branch keeps doing the rest. A cloud
+box pulls from its own branch alone, so a tagged note on one box reaches no
+other box. The tag holds until the owner takes it off, so a clock decides
+nothing here.
+
+## The tag survives the verbs
+
+A fresh to-do mints into `.se/tickets/`, which git ignores, so every verb
+leaves it standing. A tagged ticket on trunk stands as an edit nobody commits,
+and the take verb resets hard onto the remote branch.
+
+So the four branch verbs look past the tag, and the take saves every tagged
+file before its reset and writes it back after. The rest of the ticket meets
+the checks it meets today.
+
 # What a person sees
 
 Three surfaces draw the folder and the branches, and none keeps a second
@@ -1016,7 +1052,7 @@ record:
 | surface | draws |
 |---|---|
 | the work editor, which a button in the sidebar opens | every ticket, under yours, urgent, in work, open and done, and a ticket's route as a drawing a person works through |
-| `./RUNME.sh work list` | the same rows in a terminal, with the age of each held branch |
+| `./RUNME.sh branch list` | the same rows in a terminal, with the age of each held branch |
 | the ticket file itself | the ask, the route, the evidence, the discussion |
 
 The board draws what the machine holds, and nothing more. A ticket in a held
@@ -1094,7 +1130,7 @@ the only fact it meets is a route.
 | the folders | `spec/tickets/`, `spec/processes/`, `.se/tickets/`, `.se/retro/` |
 | the processes | `spec/processes/<name>.yaml`, six of them, in the tree now |
 | the emitter | one module the editor reads, beside the verbs |
-| the verbs | `src/scripts/work.js`, under `./RUNME.sh work` |
+| the verbs | `src/scripts/work.js`, under `./RUNME.sh branch` |
 | the tool wrapper and the spawn | `.claude/skills/level1/`, beside level zero |
 | the stop rule | `spec/config/stop/level1.yml` |
 | the hold and the box id | `.se/hold/<hand>.json`, `.se/box.json` |
@@ -1105,7 +1141,7 @@ the only fact it meets is a route.
 |---|---|---|
 | `work.refusalsBeforePerson` | 5 | when a refused hand-back becomes a person's step |
 | `work.failsBeforePerson` | 2 | when a step that keeps failing back becomes a person's step |
-| `work.stepsBeforeSplit` | 3 | when an escalating ticket must split |
+| `work.stepsBeforeSplit` | 3 | when a ticket on escalation must split |
 | `work.staleAfter` | `12h` | when the notification names a held group as stale |
 | `work.retroCap` | 7 | how many improvements one retro mints at most |
 | `work.retroReaders` | 4 | how many hands read a retro's chapters at once |
@@ -1119,7 +1155,7 @@ the only fact it meets is a route.
 | the pull is the one verb, and a submission rides it | v3, v4 | stays whole |
 | one token in hand | v4 | one ticket in hand per hand, under `.se/hold/` |
 | the hold is engine state, and the claim travels | v4 | the hold file, and the record's push on the group |
-| the token carries no time | v4 | stays, and `work list` reads a branch's age off git |
+| the token carries no time | v4 | stays, and `branch list` reads a branch's age off git |
 | a field stands because something reads it | v4 | the field table above |
 | a todo is a sub-token | v4 | private sub-tickets, and the tooth counts them |
 | every token names its closer | v4 | the route's last step |
@@ -1159,15 +1195,15 @@ library and the evidence form wait for branch 2. They are desk work with the
 owner, and no cloud brief carries them.
 
 The five work branches standing today finish under the verbs they carry. A
-brief branch is one whose tip carries `HANDOVER.md`, and `work list` tells the
-two kinds apart by that. `take` keeps serving a brief until `work list` names
+brief branch is one whose tip carries `HANDOVER.md`, and `branch list` tells the
+two kinds apart by that. `take` keeps serving a brief until `branch list` names
 none. `adopt` turns a brief into a group ticket and one child, for the
 ones a person wants moved. The old verbs go once the last brief merges.
 
 # What this leaves open
 
 - whether a person step can go to a spawned strong model at high autonomy
-- whether yours drowns in parked conditions, and a parked state returns
+- whether yours fills with parked conditions, and a parked state returns
 - a heartbeat ref per held group, if a tip's age proves too coarse a sign of a dead box
 - how the judge reads a checklist's lines against its items, once the first process shows the shape
 - a WIP limit per step, which is Kanban's one knob and stands outside this note

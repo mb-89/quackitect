@@ -1,0 +1,30 @@
+# Level one's rule, beside level zero's. The pull writes a hold per hand under
+# .se/hold, and a turn ending with a hold standing ends on a ticket half done.
+# The hook reads the folder, so the rule needs no claim from the agent.
+#
+# The queue rule reads spec/tickets on a desk bound to the queue and standing
+# on trunk. A free open ticket with a leaf a hand takes, or a group at now, is
+# work this box owes, so the claim that the work stands complete waits. It is
+# firm: the cap on holds in a row frees a stuck session, and not one with work.
+
+- id: the-queue-holds-work
+  side: continue
+  priority: 80
+  decides: mechanical
+  runs: queue-waits
+  firm: true
+  says: The queue holds work for this box, so run ./RUNME.sh branch pull and carry on.
+
+- id: the-group-stands-in-hand
+  side: continue
+  priority: 82
+  decides: mechanical
+  runs: group-in-hand
+  says: This box holds a group, so run ./RUNME.sh branch pull, spawn the hand a spawn answer names, and run branch done once the pull answers wait.
+
+- id: a-ticket-stands-in-hand
+  side: continue
+  priority: 81
+  decides: mechanical
+  runs: ticket-in-hand
+  says: A ticket stands in your hand, so work its step and hand it back with ./RUNME.sh branch pull.

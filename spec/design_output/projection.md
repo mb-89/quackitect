@@ -37,7 +37,7 @@ so adding one is an edit to data and no program changes:
 | field | says |
 |---|---|
 | `name` | what a refusal and a log line call this projection |
-| `shape` | which relation the projector holds, and the tree holds one |
+| `shape` | which relation the projector holds, and the tree holds three |
 | `target` | the folder every file of this projection lands in |
 | `from` | the declaration the files come from |
 | `schema` | the file saying the type of each key, and its options |
@@ -60,13 +60,13 @@ land and the entry sets the folder.
 
 # The first target
 
-One slash command per settable value, under `.claude/commands`:
+One slash command per value a person sets, under `.claude/commands`:
 
 | the declaration says | the projection writes |
 |---|---|
-| `log.level`, three options in the schema | three files, one per option |
+| `log.level`, an enum in the schema | one file per option |
 | `stop.enabled`, a boolean | two files, `true` and `false` |
-| `judge.model`, a string | one file, taking the value as an argument |
+| `answer.words`, a number | one file, taking the value as an argument |
 | `stop.mostInARow`, a number | one file, taking the value as an argument |
 
 The keys come from the declaration and the types come from the schema. A key
@@ -78,7 +78,7 @@ A command sits on the same path a person walks in the sidebar. `se-` holds the
 commands together in a menu nobody else fills, and the path follows:
 
     se-config-log-level-info.md
-    se-config-judge-model.md
+    se-config-answer-words.md
     se-agent-control-hold-stopped.md
 
 Every value the declaration carries takes the config path: `config`, then the
@@ -166,20 +166,8 @@ writes one rule file per check:
 The schema holds the values and `lib/paragraph.js` holds the Tengo. So a cap
 moves in one file, and the rule file carrying it follows at the next
 projection. `wrap` reads `none`, because a rule file is YAML and its mark
-stands in a comment at the top.
-
-| layer | rule | what it reads |
-|---|---|---|
-| characters | `Characters.yml` | the punctuation set, by name |
-| markup | `Markup.yml` | the heading cap, the one title and the strong-lead cap |
-| shape | `Shape.yml`, `ShapeAnswer.yml` | the paragraphs one run holds |
-| shape | `Paragraph.yml`, `ParagraphAnswer.yml` | the sentences one paragraph holds |
-| sentence | `Sentence.yml` | the words one sentence holds |
-| sentence | `ListItem.yml`, `CodeSpans.yml` | the tighter cap in a list item, and the spans |
-| grammar | `Auxiliary.yml`, `Progressive.yml` | the chains the schema refuses |
-| grammar | `Modal.yml`, `ModalRequirement.yml` | every modal the register leaves out |
-| grammar | `Contraction.yml`, `Latin.yml`, `EtCetera.yml` | the short forms, with their swaps |
-| grammar | `PastTense.yml` | the tenses, with the exceptions the retro grows |
+stands in a comment at the top. The folder `spec/config/styles/VoiceParagraph`
+holds one file per check, and the comment at the top of each names its layer.
 
 ## A layer writes two files
 
@@ -252,39 +240,35 @@ the projector holds all three. The schema says whether each rule stands.
 ## A shape says its ending
 
 A target folder holds the files its shape writes. The shape `config commands`
-writes markdown, and `paragraph rules` and `judged rules` write YAML, so the
-compare reads the ending the shape names.
+writes markdown, `paragraph rules` writes YAML and `output style` writes
+markdown, so the compare reads the ending the shape names.
 
-# The judged rules
+# The third target
 
-`VoiceJudged` is the third target, and the paragraph schema is its source too.
+A guidance note carrying `style: true` goes into the output style, and the
+client sends the style with every request. The shape `output style` reads
+the folder of notes and writes one file:
 
     {
-      "name": "the judged rules",
-      "shape": "judged rules",
-      "target": "spec/config/styles/VoiceJudged",
-      "from": "spec/schemas/paragraph.schema.yaml",
-      "schema": "spec/schemas/paragraph.schema.schema.json",
-      "wrap": "none"
+      "name": "the output style",
+      "shape": "output style",
+      "target": ".claude/output-styles",
+      "from": "spec/guidance",
+      "wrap": "frontmatter"
     }
 
-The shape `judged rules` writes one file per entry under the meaning layer:
-
-| the key | what it says |
+| piece | what it holds |
 |---|---|
-| `id` | the rule name, and the file name under it |
-| `asks` | the question the model answers |
-| `message` | what the refusal tells the writer |
-| `link` | the note arguing the rule, defaulting to the funnel note |
-| `labels` | the closed set the model picks from |
-| `refuses` | one label, or a list of them |
-| `span` | `paragraph` or `chapter`, saying what one question reads |
-| `reads` | the paths costing a call |
-| `ignores` | the paths costing none |
+| `from` | a folder, and the reads list every note at its top |
+| the flag | `style` in the note's frontmatter, and `guidance.schema.yaml` admits it |
+| the file | `level0.md`, with the name, a description and `keep-coding-instructions: true` |
+| the body | the Actionables of every note carrying the flag, under a heading naming the note |
 
-Quote a glob, because a bare `*.md` opens a YAML alias. A `span` of `paragraph`
-writes no key, so a rule taking the default reads the way every rule reads
-today.
+`.claude/settings.json` selects the style by name, so every clone reads it.
+The session's standing block drops a note carrying the flag, because the
+client carries it. A helper's prompt keeps every note, because a subagent
+reads no style. For details, see
+[[spec/design_output/level0#the-style-carries-a-note]].
 
 # A missing layer fails
 

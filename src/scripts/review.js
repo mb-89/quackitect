@@ -1,4 +1,4 @@
-// The verb behind `./RUNME.sh work review <name>`. It gathers what a reader
+// The verb behind `./RUNME.sh branch review <name>`. It gathers what a reader
 // needs, answers the two questions a program owns, and prints the report. No
 // model runs here.
 // [[spec/design_output/review#what-the-verb-gathers]]
@@ -8,16 +8,17 @@ import {
   DIFF_CAP,
   report,
   retroIn,
+  retroOnTicket,
   WORKTREE,
 } from "../../.claude/skills/level0/lib/review.js";
 import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
+import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 
-const TRUNK = "main";
 const LOUD = 5;
 
 export function review(it, name, argv) {
   if (!name) {
-    console.error("work review needs a name: ./RUNME.sh work review fix-lsp");
+    console.error("branch review needs a name: ./RUNME.sh branch review fix-lsp");
     return 2;
   }
   const branch = name.startsWith("work/") ? name : `work/${name}`;
@@ -26,7 +27,7 @@ export function review(it, name, argv) {
   const ref = refFor(it, branch);
   if (!ref) {
     console.error(`${branch} stands nowhere, here or on origin.`);
-    console.error("Run ./RUNME.sh work list to see every branch that does.");
+    console.error("Run ./RUNME.sh branch list to see every branch that does.");
     return 1;
   }
   const trunk = refFor(it, TRUNK) ?? TRUNK;
@@ -47,14 +48,18 @@ export function review(it, name, argv) {
 
 // [[spec/design_output/review#what-the-verb-gathers]]
 function gather(it, at) {
-  const handback = show(it, `${at.ref}:${BRIEF}`);
+  const brief = show(it, `${at.ref}:${BRIEF}`);
+  // A group branch carries no brief, so its ticket is the handback and its retro chapter the retro. [[spec/design_output/review#the-questions]]
+  const at_ticket = `spec/tickets/${at.branch.replace(/^work\//, "")}.md`;
+  const ticket = brief ? "" : show(it, `${at.ref}:${at_ticket}`);
+  const handback = brief || ticket;
   return {
     branch: at.branch,
     ref: at.ref,
     trunk: at.trunk,
-    brief: show(it, `${at.first}:${BRIEF}`),
+    brief: show(it, `${at.first}:${BRIEF}`) || show(it, `${at.first}:${at_ticket}`),
     handback,
-    retro: retroIn(handback),
+    retro: brief ? retroIn(brief) : retroOnTicket(ticket),
     stat: it.git.run(["diff", "--stat", `${at.trunk}...${at.ref}`], true).out,
     diff: capped(it.git.run(["diff", `${at.trunk}...${at.ref}`], true).out),
     check: checkOn(it, at),

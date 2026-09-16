@@ -5,12 +5,13 @@ import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   bindsHere,
-  canary,
+  canary, canaryText,
   countsOf,
   standingLayer,
 } from "../../.claude/skills/level0/lib/guidance.js";
-import { HEALTH, healthOf } from "../../.claude/skills/level0/lib/health.js";
 import { asRow, OLD, rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
+import { POINTER, PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
+import { withoutFalsePast } from "../bridge/tense.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
 import {
   entriesIn,
@@ -20,6 +21,7 @@ import {
 } from "../../.claude/skills/level0/lib/projection.js";
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
+import { CONFIG_DIR, fromJson as codeRows } from "../../.claude/skills/level0/lib/code.js";
 import { boxOf } from "../../.claude/skills/level0/lib/private.js";
 import {
   fieldsIn,
@@ -53,6 +55,8 @@ import {
   fromJson,
   unreasoned,
 } from "../../.claude/skills/level0/lib/vale.js";
+import { codeFaults } from "../../.claude/skills/level0/lib/magic.js";
+import { SIZED } from "../../.claude/skills/level0/lib/size.js";
 import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
@@ -70,13 +74,15 @@ import {
   readRegister,
   rootsHere,
 } from "./vehicle.js";
+import { stubInto } from "./stub.js";
 import { HOOKS } from "./precommit.js";
 import { graphIn } from "./graph.js";
 import { withRoute } from "./process.js";
 import { probe } from "./probe.js";
 import { voice } from "./voice.js";
+import { retro } from "./retro.js";
 import { ticket } from "./ticket.js";
-import { work } from "./work.js";
+import { cloud, work } from "./work.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -117,6 +123,12 @@ async function doorsHere() {
     config: said,
     words: await said.ask("names.words"),
     stale: await said.ask("work.staleAfter"),
+    fails: await said.ask("work.failsBeforePerson"),
+    refusals: await said.ask("work.refusalsBeforePerson"),
+    splits: await said.ask("work.stepsBeforeSplit"),
+    // [[spec/design_output/pull#the-hand-rule]]
+    agent: Boolean(process.env.CLAUDECODE || process.env.CLAUDE_CODE_REMOTE || process.env.SE_CLOUD),
+    cloud: Boolean(process.env.CLAUDE_CODE_REMOTE || process.env.SE_CLOUD),
     node: process.execPath,
     join,
   };
@@ -128,10 +140,11 @@ const outside = it.proc;
 
 const known = readTools(files, root);
 const bin = whereIs(files, root, "vale", known);
+// [[spec/design_output/pull#the-voice-reads-the-evidence]]
+it.vale = bin;
 const go = whereIs(files, root, "go", known);
 const LOG = join(root, ".se", "log");
 const STYLES = join(root, "spec", "config", "styles", "VoiceVale");
-const JUDGED = join(root, "spec", "config", "styles", "VoiceJudged");
 const SHAPE = join(root, "spec", "config", "styles", "VoiceShape");
 const SCRIPTED = join(root, "spec", "config", "styles", "VoiceScript");
 const biome = whereIs(files, root, "biome", known);
@@ -139,20 +152,24 @@ const lsp = whereIs(files, root, "se-lsp", known);
 const GUIDANCE = join(root, "spec", "guidance");
 const DOORS = join(root, "src", "doors");
 const PLUGIN = join(".claude", "skills", "level0");
+const LEVEL1 = join(".claude", "skills", "level1");
 const CONTRACT = join(root, "test", "contract");
 const settings = it.config;
-const PARKED = ["{.se,node_modules,.git,.claude/types}/**", "**/_*"];
+const PARKED = ["{.se,node_modules,.git,.claude/types,.claude/worktrees}/**", "**/_*"];
 const OURS = `--glob=!{${PARKED.join(",")}}`;
 const TESTS = "test/level0/*.test.js";
 const CONTRACT_TESTS = "test/contract/*.test.js";
 const ROUNDS = 5;
+const COL = { verb: 8, count: 6, key: 22, value: 9, rule: 20, tool: 18 };
+const SHOWN = 3;
+const HEALTH_WAIT = 2000;
 
 const run = async (argv, init = {}) =>
   outside.run(argv, { ...init, cwd: init.cwd ?? root });
 
 const verbs = {
   check: {
-    says: "the tests, the doors, the cage, then the rules over the tree",
+    says: "the tests, the doors, the server, then the rules over the tree",
     run: async (w) =>
       stamped(
         test() ||
@@ -160,7 +177,7 @@ const verbs = {
           doorsHold() ||
           projectionsHold() ||
           pluginHolds() ||
-          cageHolds() ||
+          (await serverHolds()) ||
           (await lint(w)),
       ),
   },
@@ -192,13 +209,21 @@ const verbs = {
     says: "every key, its value, and the layer answering it",
     run: async () => readConfig(rest),
   },
-  work: {
-    says: "work branches and groups: take, list, done, merge, adopt",
+  branch: {
+    says: "work branches and groups: new, take, sync, done, list, merge, close, pull, test",
     run: async () => work(root, rest, it),
   },
+  cloud: {
+    says: "the cloud routine: trigger",
+    run: async () => cloud(root, rest, it),
+  },
   ticket: {
-    says: "tickets that stay on this box: note, update",
+    says: "tickets that stay on this box: note, update, open, todo",
     run: async () => ticket(root, rest, it),
+  },
+  retro: {
+    says: "the retro a group's route runs: notes",
+    run: async () => retro(root, rest, it),
   },
   mint: {
     says: "write a new note of a kind, in the shape its schema names",
@@ -220,6 +245,10 @@ const verbs = {
     says: "what every door says, in the viewer this tree builds",
     run: async () => readLog(rest),
   },
+  serve: {
+    says: "the server behind the bridgehead, under the debugger with --inspect",
+    run: async () => serveBridge(rest),
+  },
   find: {
     says: "every line carrying the words, out of the index",
     run: async () => asksIndex(["find", ...rest]),
@@ -227,6 +256,10 @@ const verbs = {
   vehicle: {
     says: "this copy, the project it drives, and a copy made elsewhere",
     run: async () => theVehicle(rest),
+  },
+  stub: {
+    says: "a bare project this vehicle drives: into <folder> [--upstream <url>]",
+    run: async () => theStub(rest),
   },
   notes: {
     says: "the notes the words belong to, ranked by name and body",
@@ -251,7 +284,7 @@ if (verb === "help" || !verbs[verb]) {
   if (verb !== "help") console.error(`se: there is no verb called ${verb}\n`);
   console.log("Usage: ./RUNME.sh <verb> [path ...]\n");
   for (const [name, one] of Object.entries(verbs)) {
-    console.log(`  ${name.padEnd(8)} ${one.says}`);
+    console.log(`  ${name.padEnd(COL.verb)} ${one.says}`);
   }
   process.exit(verb === "help" ? 0 : 2);
 }
@@ -304,6 +337,29 @@ function theVehicle(argv) {
   return 0;
 }
 
+// [[spec/design_output/vehicle#a-stub-takes-its-vehicle]]
+function theStub(argv) {
+  const flag = argv.indexOf("--upstream");
+  const upstream = flag >= 0 ? (argv[flag + 1] ?? "") : "";
+  const plain = flag < 0 ? argv : argv.filter((_one, i) => i !== flag && i !== flag + 1);
+  const dest = plain[1];
+  if (plain[0] !== "into" || !dest) {
+    console.error("se stub into <folder> [--upstream <url>]: say where the stub lands.");
+    return 2;
+  }
+  const pair = rootsHere(files, process.env, root);
+  const put = stubInto(files, git(outside, pair.method), it.clock, pair.method, atRoot(dest), {
+    upstream,
+  });
+  if (!put.ok) {
+    console.error(put.why);
+    return 1;
+  }
+  console.log(`${put.files.length} file(s) written into ${dest}.`);
+  console.log("Its shim finds the vehicle through SE_VEHICLE, the register, or where a cloud box clones it.");
+  return 0;
+}
+
 function version() {
   try {
     return JSON.parse(files.read(join(root, "package.json"))).version ?? "0";
@@ -323,6 +379,25 @@ function asksIndex(argv) {
 
   const said = it.proc.run([at, ...argv], { cwd: root, inherit: true });
   return said.exitCode;
+}
+
+// [[spec/design_output/level0#the-tense-reader]]
+function readThroughTheReader(found) {
+  const byFile = new Map();
+  for (const one of found) {
+    const list = byFile.get(one.file) ?? [];
+    list.push(one);
+    byFile.set(one.file, list);
+  }
+  const kept = [];
+  for (const [file, list] of byFile) {
+    let text = "";
+    try {
+      text = files.read(join(root, file));
+    } catch {}
+    kept.push(...withoutFalsePast(text, list));
+  }
+  return kept;
 }
 
 async function lint(where) {
@@ -346,12 +421,21 @@ async function lint(where) {
     console.error("Vale read no file, so every rule it holds stands unchecked.");
     return 1;
   }
-  const found = fromJson(ran.stdout);
+  const found = readThroughTheReader(fromJson(ran.stdout));
 
   for (const file of walk(where)) {
     for (const one of unreasoned(files.read(file))) {
       found.push({ ...one, file: show(file) });
     }
+  }
+
+  // The check names what stands past a ceiling as a warning, and the write door refuses the growth. [[spec/design_output/level0#the-size-ceiling]]
+  const ceilings = {
+    function: await it.config.ask("code.functionLines"),
+    file: await it.config.ask("code.fileLines"),
+  };
+  for (const file of walk(where, SIZED)) {
+    found.push(...codeFaults(files.read(file), show(file), ceilings));
   }
 
   // [[spec/design_output/lsp#one-checker-every-front-asks]]
@@ -374,21 +458,10 @@ async function lint(where) {
 
   if (files.exists(biome)) {
     const code = outside.run(
-      [biome, "lint", "--config-path=spec/config", "--reporter=github", ...where],
+      [biome, "lint", `--config-path=${CONFIG_DIR}`, "--reporter=json", "--max-diagnostics=none", ...where],
       { cwd: root },
     );
-    for (const row of code.stdout.split("\n")) {
-      const hit = /^::(\w+) title=([^,]+),file=([^,]+),line=(\d+).*?::(.*)$/.exec(row);
-      if (!hit || isDraft(hit[3])) continue;
-      found.push({
-        file: hit[3],
-        rule: hit[2].replace(/^lint\//, ""),
-        line: Number(hit[4]),
-        column: 1,
-        message: hit[5],
-        severity: hit[1] === "warning" ? "warning" : "error",
-      });
-    }
+    found.push(...codeRows(code.stdout, where[0]).filter((one) => !isDraft(one.file)));
   }
 
   const ms = it.clock.now().getTime() - began;
@@ -400,7 +473,7 @@ async function lint(where) {
   await it.log.say("warn", "vale", `${found.length} line(s) break a rule`, {
     ms,
     detail: found
-      .slice(0, 3)
+      .slice(0, SHOWN)
       .map((one) => `${show(one.file ?? where[0])}:${one.line} ${one.rule}`)
       .join(", "),
   });
@@ -412,9 +485,9 @@ async function lint(where) {
   }
   console.log("");
   for (const [rule, count] of [...perRule].sort((a, b) => b[1] - a[1])) {
-    console.log(`${String(count).padStart(6)}  ${rule}`);
+    console.log(`${String(count).padStart(COL.count)}  ${rule}`);
   }
-  console.log(`${String(found.length).padStart(6)}  in all`);
+  console.log(`${String(found.length).padStart(COL.count)}  in all`);
 
   // [[spec/design_output/schema#warning-now-and-error-later]]
   const refused = found.filter((one) => one.severity !== "warning").length;
@@ -464,6 +537,13 @@ function gridFaults(where) {
     message: one.why,
     severity: "error",
   }));
+}
+
+// The server runs as its own node process, so the debugger attaches to it and a restart loses the session nothing. [[spec/design_output/level0#the-bridgehead-and-the-server]]
+function serveBridge(argv) {
+  const inspect = argv.filter((one) => one.startsWith("--inspect"));
+  const server = join(root, "src", "bridge", "server.js");
+  return outside.run([process.execPath, ...inspect, server, root], { cwd: root, inherit: true, env: inspect.length ? { SE_BREAK_ON_STOP: "1" } : undefined }).exitCode;
 }
 
 // [[spec/design_output/viewer#the-verb-builds-it]]
@@ -541,7 +621,7 @@ async function readConfig(argv) {
   }
   for (const one of wanted) {
     console.log(
-      `${one.key.padEnd(22)} ${String(one.value).padEnd(9)} ${one.layer}`,
+      `${one.key.padEnd(COL.key)} ${String(one.value).padEnd(COL.value)} ${one.layer}`,
     );
   }
   if (key) return 0;
@@ -570,7 +650,7 @@ async function fix(where) {
   }
 
   if (files.exists(biome)) {
-    outside.run([biome, "check", "--write", "--config-path=spec/config", ...where], {
+    outside.run([biome, "check", "--write", `--config-path=${CONFIG_DIR}`, ...where], {
       cwd: root,
       inherit: true,
     });
@@ -741,32 +821,49 @@ function drawing(argv) {
 
 // [[spec/design_output/level0#no-computed-engine-access]]
 function pluginHolds() {
-  const ran = validatePlugin(outside.run, PLUGIN, root);
-  if (ran.exitCode === 0) return 0;
-  if (!ran.stdout && !ran.stderr) {
-    console.log("claude stands nowhere, so the plugin goes unvalidated here.");
+  for (const plugin of [PLUGIN, LEVEL1]) {
+    const ran = validatePlugin(outside.run, plugin, root);
+    if (ran.exitCode === 0) continue;
+    if (!ran.stdout && !ran.stderr) {
+      console.log("claude stands nowhere, so the plugin goes unvalidated here.");
+      return 0;
+    }
+    console.error(`${ran.stdout}${ran.stderr}`.trim());
+    console.error("The engine reads this module's source, and it refuses the above.");
+    return 1;
+  }
+  return 0;
+}
+
+// [[spec/design_output/level0#the-bridgehead-and-the-server]]
+async function serverHolds() {
+  const said = await serverSays();
+  if (said.ok) {
+    console.log(`The server stands at ${said.where}.`);
     return 0;
   }
-  console.error(`${ran.stdout}${ran.stderr}`.trim());
-  console.error("The engine reads this module's source, and it refuses the above.");
+  console.error(`No server answers at ${said.where}: ${said.why}`);
+  console.error("Start it with ./RUNME.sh serve, or the hook button in the sidebar.");
   return 1;
 }
 
-// [[spec/design_output/level0#god-mode]]
-function cageHolds() {
-  const at = join(root, HEALTH);
-  if (!files.exists(at)) {
-    console.log("Level zero loads in no session here yet, so it says nothing.");
-    return 0;
+async function serverSays() {
+  const where = `http://127.0.0.1:${portHere()}/health`;
+  try {
+    const answer = await fetch(where, { signal: AbortSignal.timeout(HEALTH_WAIT) });
+    const body = await answer.json();
+    return { ok: Boolean(body?.ok), where, why: String(body?.dead ?? "") };
+  } catch (bad) {
+    return { ok: false, where, why: bad?.message ?? String(bad) };
   }
-  const said = healthOf(files.read(at));
-  if (said.ok) {
-    console.log(`The cage holds, and it says so at ${said.at}.`);
-    return 0;
+}
+
+function portHere() {
+  try {
+    return Number(JSON.parse(files.read(join(root, POINTER)))?.port) || PORT_BASE;
+  } catch {
+    return PORT_BASE;
   }
-  console.error(`The cage holds nothing: ${said.why}`);
-  console.error(`That session guards no write. Mend it, and ${HEALTH} turns green.`);
-  return 1;
 }
 
 // [[spec/design_output/work#the-battery-answers-first]]
@@ -815,7 +912,7 @@ function listRules() {
     for (const name of namesIn(at, ".yml")) {
       const text = files.read(join(at, name));
       const message = /^message:\s*"?(.*?)"?\s*$/m.exec(text)?.[1] ?? "";
-      console.log(`${name.replace(/\.yml$/, "").padEnd(20)} ${message}`);
+      console.log(`${name.replace(/\.yml$/, "").padEnd(COL.rule)} ${message}`);
     }
   }
   return 0;
@@ -836,9 +933,7 @@ async function standing() {
     return 0;
   }
   console.log(said);
-  console.log("");
-  const stop = (await settings.ask("stop.enabled")) !== false;
-  console.log(canary({ ...countsOf(notes), stop }));
+  console.log(`\n${canaryText(canary({ ...countsOf(notes), stop: (await settings.ask("stop.enabled")) !== false }))}`);
   return 0;
 }
 
@@ -846,7 +941,7 @@ async function standing() {
 function tools() {
   const found = writeSurvey(it, root, process.env);
   for (const one of WANTED)
-    console.log(`${one.name.padEnd(18)} ${standsAt(found[one.name])}`);
+    console.log(`${one.name.padEnd(COL.tool)} ${standsAt(found[one.name])}`);
   console.log(`\n${TOOLS} says this, and every caller reads it.`);
   return 0;
 }
@@ -900,27 +995,13 @@ async function doctor() {
         : "missing",
     ],
     [
-      "judged rules",
-      files.exists(JUDGED)
-        ? `${namesIn(JUDGED, ".yml").length} in VoiceJudged`
-        : "none",
-    ],
-    ["judge", await judgeStands()],
-    [
       "survey",
       files.exists(join(root, TOOLS)) ? TOOLS : "absent, run ./RUNME.sh tools",
     ],
-    ["level zero stamp", readIf(join(root, ".se", "level0.stamp"))],
-    [
-      "cage",
-      files.exists(join(root, ".claude", "settings.json"))
-        ? "tracked, one file"
-        : "missing",
-    ],
-    ["cage holds", cageSays()],
+    ["server", await serverLine()],
   ];
   for (const [what, said] of rows) {
-    console.log(`${what.padEnd(18)} ${String(said).trim() || "missing"}`);
+    console.log(`${what.padEnd(COL.tool)} ${String(said).trim() || "missing"}`);
   }
   return 0;
 }
@@ -937,19 +1018,9 @@ function hooksSay() {
   return `git reads ${said || "its own folder"}, so run ./RUNME.sh`;
 }
 
-function cageSays() {
-  const at = join(root, HEALTH);
-  if (!files.exists(at)) return "no session says yet";
-  const said = healthOf(files.read(at));
-  return said.ok ? `yes, at ${said.at}` : `no, ${said.why}`;
-}
-
-async function judgeStands() {
-  if ((await settings.ask("judge.enabled")) === false) {
-    return `off in ${await settings.layerOf("judge.enabled")}`;
-  }
-  const model = await settings.ask("judge.model");
-  return `on, model ${model} out of ${await settings.layerOf("judge.model")}`;
+async function serverLine() {
+  const said = await serverSays();
+  return said.ok ? `stands at ${said.where}` : `none at ${said.where}`;
 }
 
 function lspProxy() {
@@ -962,14 +1033,6 @@ function namesIn(at, end) {
     .list(at)
     .filter((one) => one.kind === "file" && one.name.endsWith(end))
     .map((one) => one.name);
-}
-
-function readIf(path) {
-  try {
-    return files.read(path);
-  } catch {
-    return "never loaded here";
-  }
 }
 
 function walk(where, wanted = /\.(md|markdown|txt)$/i) {

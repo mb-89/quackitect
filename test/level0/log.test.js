@@ -8,8 +8,10 @@ import {
   appended,
   archiveOf,
   asRow,
+  LEVELS,
   logSpec,
   nameOf,
+  rowOf,
   rowsOf,
   timeOf,
   writes,
@@ -135,19 +137,32 @@ test("a box at warn writes a refusal and a fault, and no info line", async () =>
   );
 });
 
-test("a box naming no level, and one naming a level nobody knows, write everything", () => {
+test("a box naming no level, and one naming a level nobody knows, write from info up", () => {
   for (const at of [undefined, "", "loud"]) {
-    for (const level of ["info", "warn", "error"]) {
+    for (const level of ["info", "warn", "error", "fatal"]) {
       assert.equal(writes(at, level), true, `${at} writes ${level}`);
     }
+    assert.equal(writes(at, "debug"), false, `${at} leaves debug out`);
   }
 });
 
 test("a box at error writes a fault alone", () => {
   assert.deepEqual(
-    ["info", "warn", "error"].map((level) => writes("error", level)),
-    [false, false, true],
+    ["debug", "info", "warn", "error", "fatal"].map((level) => writes("error", level)),
+    [false, false, false, true, true],
   );
+});
+
+// [[spec/design_output/log#what-a-box-writes]]
+test("the ladder climbs debug, info, warn, error, fatal, and a box at debug writes everything", () => {
+  assert.deepEqual(LEVELS, ["debug", "info", "warn", "error", "fatal"]);
+  assert.deepEqual(
+    LEVELS.map((level) => writes("debug", level)),
+    [true, true, true, true, true],
+  );
+  assert.equal(rowOf(AT, "debug", "hook", "the door sees a call").level, "debug");
+  assert.equal(rowOf(AT, "fatal", "hook", "the cage falls").level, "fatal");
+  assert.equal(rowOf(AT, "", "hook", "a line naming no level").level, "info");
 });
 
 test("a box writing nothing leaves no file behind", async () => {
