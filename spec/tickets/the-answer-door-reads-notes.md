@@ -258,11 +258,17 @@ Five cases stand, and three fail on their own assertion. The two readers answer 
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint .claude/skills/level0/lib/answer.js src/bridge/answer.js test/level0/note-answer.test.js spec/design_output/level0.md
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The library, the door, the test and the level zero note
+- every door the change reaches has a fake. The reader takes the disk door, and each case builds it fake
+- a comment names the approach the change implements. Each new function points at the note's new chapter
 
 ## tests-green
 
