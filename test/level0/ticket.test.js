@@ -12,7 +12,7 @@ import {
   ticketFaults,
 } from "../../.claude/skills/level0/lib/ticket.js";
 
-const SCHEMA = readYaml(`
+const SCHEMA_TEXT = `
 kind: ticket
 
 frontmatter:
@@ -50,7 +50,7 @@ body:
   sections:
     - header: Ask
       required: true
-      x-written: draft
+      x-written: anyone
       description: what this ticket asks for
 
     - x-one-per: steps
@@ -61,7 +61,8 @@ body:
       position: last
       x-written: anyone
       description: what anybody adds
-`);
+`;
+const SCHEMA = readYaml(SCHEMA_TEXT);
 
 const WHERE = "spec/tickets/a-name.md";
 
@@ -123,10 +124,8 @@ test("a write to the discussion stands, at any state", () => {
 });
 
 // [[spec/design_output/schema#the-three-places]]
-test("a write to the ask of an open ticket is refused, and a draft takes it", () => {
-  const said = open.replace("What it asks for.", "What it really asks for.");
-  assert.deepEqual(rules(said), ["Ticket.Ask"]);
-  assert.match(weighed(said)[0].message, /is the engine's to write/);
+test("a write to the ask stands at any state, so a hand fixes what the rules refuse", () => {
+  assert.deepEqual(weighed(open.replace("What it asks for.", "What it asks for now.")), []);
 
   const draft = open.replace("state: open", "state: draft");
   assert.deepEqual(
@@ -138,6 +137,14 @@ test("a write to the ask of an open ticket is refused, and a draft takes it", ()
     ),
     [],
   );
+});
+
+test("a section written by one state alone refuses the others", () => {
+  const drafted = readYaml(String(SCHEMA_TEXT).replace("x-written: anyone\n      description: what this ticket asks for", "x-written: draft\n      description: what this ticket asks for"));
+  const said = open.replace("What it asks for.", "What it really asks for.");
+  const found = ticketFaults(open, said, drafted, WHERE);
+  assert.deepEqual(found.map((one) => one.rule), ["Ticket.Ask"]);
+  assert.match(found[0].message, /is the engine's to write/);
 });
 
 // [[spec/design_output/schema#the-three-places]]
@@ -190,10 +197,10 @@ test("a file nothing stands in yet is a mint, and the door asks it nothing", () 
 });
 
 // [[spec/design_output/schema#the-three-places]]
-test("the places answer the ask of a draft, the step's fields and the discussion", () => {
+test("the places answer the ask, the step's fields and the discussion, at any state", () => {
   assert.deepEqual(
     [...placesIn(readNote(open), SCHEMA).keys()],
-    ["3 lint", "3 seen", "1 Discussion"],
+    ["1 Ask", "3 lint", "3 seen", "1 Discussion"],
   );
   assert.deepEqual(
     [...placesIn(readNote(open.replace("state: open", "state: draft")), SCHEMA).keys()],
@@ -204,7 +211,7 @@ test("the places answer the ask of a draft, the step's fields and the discussion
 // [[spec/design_output/schema#the-three-places]]
 test("a ticket standing at no leaf of its route offers a hand no field", () => {
   const said = open.replace("step: implement/change", "step: nowhere");
-  assert.deepEqual([...placesIn(readNote(said), SCHEMA).keys()], ["1 Discussion"]);
+  assert.deepEqual([...placesIn(readNote(said), SCHEMA).keys()], ["1 Ask", "1 Discussion"]);
 });
 
 const recorded = open.replace(

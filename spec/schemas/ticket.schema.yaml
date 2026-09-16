@@ -276,7 +276,7 @@ body:
   sections:
     - header: Ask
       required: true
-      x-written: draft
+      x-written: anyone
       description: what this ticket asks for, and what done looks like
 
     - x-one-per: steps

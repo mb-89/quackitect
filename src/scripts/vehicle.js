@@ -93,9 +93,10 @@ export function detach(files, work) {
   files.remove(join(work, PROJECT));
 }
 
-// [[spec/design_output/vehicle#one-tree-drives-itself]]
-export function rootsHere(files, env, work) {
-  const here = methodRootFrom(files, work);
+// The shim names the work root, and the tree the command line runs in is the fallback. [[spec/design_output/vehicle#two-roads-to-the-vehicle]]
+export function rootsHere(files, env, start) {
+  const work = String(env?.SE_WORK_ROOT ?? "").trim() || start;
+  const here = methodRootFrom(files, start);
   if (here) return pairOf(here, work);
 
   const list = readRegister(files, env);

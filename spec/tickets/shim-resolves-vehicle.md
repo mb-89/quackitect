@@ -89,7 +89,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-shim-resolves-the-vehicle
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -110,6 +110,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d42624a67d18a8
+    hash_before: b4c4c771a94064c1814cd0fd66d06a059ee5b50b
+    hash_after: b4c4c771a94064c1814cd0fd66d06a059ee5b50b
+    answered:
+      - name: lint
+        exit: 0
+        said: 6 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
@@ -121,8 +129,8 @@ Every verb the vehicle holds works inside a stub: check, lint, tickets, branches
 A stub is a folder of files and no tool reaches it, so nothing in it meets a rule.
 
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
-- the shim reads vehicle.json, asks ~/.se/registry.json for the vehicle's method root, and execs the vehicle's RUNME.sh with SE_WORK_ROOT set to the stub
-- a register holding no such vehicle answers one line naming vehicle.json's upstream and the install road, and exits 1
+- the shim reads `vehicle.json`, asks the register for the method root, and execs the vehicle with `SE_WORK_ROOT` at the stub
+- a register holding no such vehicle answers one line naming the upstream and the install road, and exits 1
 - a test drives the shim over a fixture stub with a fake register and reads the argv the vehicle receives
 - ./RUNME.sh vehicle inside a stub names the vehicle as method and the stub as work
 
@@ -209,9 +217,13 @@ Three tests fail where the approach says they fail. The vehicle verb names the v
 
 ### lint
 
-<!-- the tree builds and lints -->
+    ./RUNME.sh lint
 
-<!-- the form is command -->
+### checked
+
+- the change touches the shim, the roots function, the stub verb's closing line and the vehicle design note
+- the shim reaches the disk and a process, and the contract test drives both for real
+- the shim's header and the comment on the roots function name the three roads and the work root
 
 ## tests-green
 
@@ -253,4 +265,4 @@ Three tests fail where the approach says they fail. The vehicle verb names the v
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+The check read seven findings in this ask and one in the group's ask. The ticket door kept a hand off an open ask, so the ask now reads anyone in the ticket schema, and this hand fixed both. The engine took the new schema after a restart of the server, which the hook-reloads-its-door ticket names.
