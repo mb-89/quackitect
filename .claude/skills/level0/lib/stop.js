@@ -200,7 +200,9 @@ export function toothOf(init = {}) {
 
     // [[spec/design_output/config#a-caller-hands-it-in]]
     atTurnEnd(decision, mostInARow) {
-      const runaway = !decision.ends && mostInARow > 0 && inARow >= mostInARow;
+      // A firm rule holds past the cap, because the cap frees a stuck session alone. [[spec/design_output/stop#three-in-a-row]]
+      const firm = Boolean(decision.go?.firm);
+      const runaway = !decision.ends && !firm && mostInARow > 0 && inARow >= mostInARow;
       const ends = decision.ends || runaway;
       if (ends) {
         granted = true;

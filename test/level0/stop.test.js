@@ -214,6 +214,16 @@ test("mostInARow ends a runaway", () => {
   assert.equal(it.inARow(), 0, "the count starts again");
 });
 
+// [[spec/design_output/stop#three-in-a-row]]
+test("a firm continue rule holds past the cap, because the queue still holds work", () => {
+  const it = toothOf();
+  const firm = { ends: false, go: { id: "the-queue-holds-work", firm: true } };
+  const carried = [];
+  for (let i = 0; i < 5; i++) carried.push(it.atTurnEnd(firm, 3).ends);
+  assert.deepEqual(carried, [false, false, false, false, false]);
+  assert.equal(it.atTurnEnd({ ends: false, go: { id: "work-still-stands" } }, 3).ends, true, "a plain rule lets go at the cap");
+});
+
 test("a prompt from outside the plugin puts the count back", () => {
   const it = toothOf();
   it.atTurnEnd(voted(["work-waiting"]));

@@ -125,17 +125,17 @@ Four bands hold the numbers, so a later level lands without renumbering:
 
 Three numbers carry an argument, and they stay where they stand:
 
-- 99 over 90 puts "carry on" over the block. The owner saying carry on says
-  proceed on your best reading.
-- 45 under 80 keeps a finished piece from ending a session while a list still
-  holds something.
-- 95 over 80 frees a session that opens with an old list on it. 95 under 99
-  spends that free stop where the owner says get on with it.
+| priority | stands | so |
+|---|---|---|
+| 99 | over 90 | "carry on" beats the block, and the owner saying it says proceed on your best reading |
+| 45 | under 80 | a finished piece ends no session while a list still holds something |
+| 95 | over 80 | a session that opens with an old list on it comes free |
+| 95 | under 99 | that free stop goes where the owner says get on with it |
 
 ## The off switch answers alone
 
-`stop.enabled` set to false takes the tooth out, and the rule at priority 0
-records it. That rule wins no vote on its own, because a continue rule at 80
+`stop.enabled` set to false takes the tooth out, and the rule at priority `0`
+records it. That rule wins no vote on its own, because a continue rule at `80`
 stands above it. The tooth then carries the turn with the switch off.
 
 So a firing `stop-hook-off` ends the turn whatever else fires, and `decide`
@@ -243,6 +243,8 @@ The hook counts the turns it carries one after another.
 - Past `mostInARow`, it writes a `warn` line and lets the turn end.
 - A prompt from outside the plugin resets the count, because that is the owner
   taking the session back.
+- A continue rule carrying `firm` holds past the cap, because the cap frees a
+  stuck session alone. The queue rule in `level1.yml` carries it.
 
 The hook asks the resolver for `stop.mostInARow` and `stop.enabled` at each
 turn end, and `atTurnEnd` takes the cap as an argument. So the tooth carries no

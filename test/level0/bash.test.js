@@ -126,6 +126,36 @@ test("a heredoc writing through an interpreter is refused, and one writing nowhe
   assert.deepEqual(paths(elsewhere), []);
 });
 
+// [[spec/design_output/bash#a-shell-writes-nothing]]
+test("a script naming its path on one line and writing on another is refused, and names the program", () => {
+  const python = [
+    "python - <<'PY'",
+    "import io",
+    "p = 'spec/tickets/a-thing.md'",
+    "s = io.open(p, encoding='utf-8').read()",
+    "io.open(p, 'w', encoding='utf-8').write(s.replace('a', 'b'))",
+    "PY",
+  ].join("\n");
+  const found = writesAPath(python);
+  assert.deepEqual(found.map((one) => one.path), ["spec/tickets/a-thing.md"]);
+  assert.equal(found[0].how, "a heredoc into python");
+
+  const node = [
+    "node <<'JS'",
+    "const fs = require('fs');",
+    "const at = 'src/scripts/cli.js';",
+    "fs.writeFileSync(at, fs.readFileSync(at, 'utf8') + '\\n');",
+    "JS",
+  ].join("\n");
+  assert.deepEqual(paths(node), ["src/scripts/cli.js"]);
+
+  const reading = ["python - <<'PY'", "p = 'spec/guidance/voice.md'", "print(open(p).read())", "PY"].join("\n");
+  assert.deepEqual(paths(reading), [], "a read names no write");
+
+  const elsewhere = ["python - <<'PY'", "p = '/tmp/out.md'", "open(p, 'w').write('x')", "PY"].join("\n");
+  assert.deepEqual(paths(elsewhere), [], "a path the rules leave alone passes");
+});
+
 test("a redirection inside a quoted word writes nothing", () => {
   assert.deepEqual(paths('git commit -m "the door reads > README.md now"'), []);
 });

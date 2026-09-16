@@ -67,11 +67,20 @@ the inner one under the same rules. A target the parse reads as `{}` names no
 path, so it passes. The outer `find` holds the real target, and a guess at
 it refuses honest work.
 
-A heredoc into `sh` runs the shell parse again over the body. A heredoc into an
-interpreter reads each line for a write call
-beside a path the rules cover: `open(..., "w")`, `writeFileSync(...)`,
-`write_text(...)` and their kind. An inline script behind `-c` or `-e` meets
-the same two readings.
+A heredoc into `sh` runs the shell parse again over the body, and a heredoc
+into an interpreter takes the readings below. An inline script behind `-c` or
+`-e` meets the same two.
+
+| the body holds | the door reads |
+|---|---|
+| a write call beside a path the rules cover | that path, from that line |
+| a write call with no path beside it | every path the whole body names that the rules cover |
+| a read of such a path and no write call | nothing |
+| a write call beside a path outside the rules | nothing |
+
+The write calls are `open(..., "w")`, `writeFileSync(...)`, `write_text(...)`
+and their kind. The second row is the script that names its path on one line
+and writes on another, through a variable.
 
 That last row is the one that matters. A session reaches for a heredoc because
 a formatter reflows a file between a read and an edit, and a string replacement
