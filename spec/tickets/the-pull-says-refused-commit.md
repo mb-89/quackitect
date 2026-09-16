@@ -52,11 +52,15 @@ The pull stages, the pre-commit hook refuses, and the pull writes a pass with th
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/landed.test.js test/level0/pull.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -64,11 +68,16 @@ The pull stages, the pre-commit hook refuses, and the pull writes a pass with th
 
 <!-- the form is text -->
 
+The landing moves into its own module and reads the commit's answer. A commit the hook refuses puts the ticket file back, empties the index, keeps the hold and answers refused with the hook's finding. So no record carries a hash the branch has yet to hold. The git door answers the error text beside the output, so the finding reaches the pull. The test verb moves into its own module too, so the pull module shrinks.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: the three lines under it stand in the landing, its test and the record
+- the cleanup the change reveals is in the change. The test verb and the schema fixture move into their own files
 
 # Discussion
 
