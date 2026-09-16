@@ -215,6 +215,18 @@ test("a ticket standing at no leaf of its route offers a hand no field", () => {
   assert.deepEqual([...placesIn(readNote(said), SCHEMA).keys()], ["1 Ask", "1 Discussion"]);
 });
 
+// [[spec/design_output/schema#the-three-places]]
+test("a ticket with no step stands at its first leaf, so its fields open to the hand the pull gives it to", () => {
+  const said = open
+    .replace("step: implement/change\n", "")
+    .replace("  - name: design\n    does: writes the design\n", "");
+  assert.deepEqual(
+    [...placesIn(readNote(said), SCHEMA).keys()],
+    ["1 Ask", "3 lint", "3 seen", "1 Discussion"],
+    "the first leaf's fields stand open",
+  );
+});
+
 const recorded = open.replace(
   "steps:\n",
   `record:

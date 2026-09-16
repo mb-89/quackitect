@@ -9,23 +9,24 @@ const CANARY =
 
 // [[spec/design_output/level0#the-canary]]
 export const HEARD = {
-  same: "the canary comes back whole",
-  other: "the canary comes back with other counts",
-  none: "the canary is absent from the answer",
+  same: "the canary opens the answer whole",
+  other: "the canary opens the answer with other counts",
+  none: "the canary opens no answer",
 };
 
 // [[spec/design_output/level0#the-canary-owes-a-debt]]
 export const OWES = {
   warns: (sentence) =>
     [
-      "This session owes the canary. End your answer with this line, on its own,",
-      `word for word: ${sentence} The numbers come from what level zero loaded.`,
-      "Level zero refuses the next tool call until that line stands in an answer.",
+      "This session owes the canary. Open your answer with this line, first and",
+      `alone, word for word: ${sentence} The numbers come from what level zero`,
+      "loaded. Level zero refuses the next tool call until that line opens an",
+      "answer. The line ends no turn, so say what you do next under it and carry on.",
     ].join(" "),
   denies: (sentence) =>
     [
-      "This session owes the canary, and no answer carries it. End your next",
-      `answer with this line, on its own, word for word: ${sentence}`,
+      "This session owes the canary, and no answer opens with it. Open your next",
+      `answer with this line, first and alone, word for word: ${sentence}`,
       "Level zero refuses every tool call until it stands.",
     ].join(" "),
 };
@@ -143,8 +144,27 @@ export function canary(counts) {
   return `level0 holds this session: ${rules} rules, ${notes} notes, the stop hook ${tooth}.`;
 }
 
+// The block the session reads with the canary in it. The line opens the answer, and the stop line closes it. [[spec/design_output/level0#the-canary]]
+export function canaryText(sentence) {
+  return [
+    "Open your FIRST answer with this line, first and alone, word for word:",
+    "",
+    `    ${sentence}`,
+    "",
+    "It says out loud that level zero holds this session, and the numbers",
+    "come from what it loaded. Write this line once and never again. The line",
+    "opens an answer and ends no turn: a turn ends on the stop line, last and",
+    "alone, and the two stand at opposite ends of the same answer.",
+  ].join("\n");
+}
+
+// The line stands first, so an answer quoting it later proves nothing. [[spec/design_output/level0#the-canary-opens-an-answer]]
 export function canaryIn(answer, said) {
-  const found = CANARY.exec(String(answer ?? ""));
+  const first = String(answer ?? "")
+    .trim()
+    .split("\n")[0]
+    .trim();
+  const found = CANARY.exec(first);
   if (!found) return { found: "none", said: "" };
   return { found: found[0] === said ? "same" : "other", said: found[0] };
 }

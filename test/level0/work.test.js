@@ -40,7 +40,7 @@ import {
   withField,
   withHashAfter,
 } from "../../src/scripts/group.js";
-
+import { probeOf, startOf } from "../../src/scripts/serve.js";
 const ROOT = "/tree";
 const HERE = join(ROOT, BRIEF);
 
@@ -63,9 +63,7 @@ function heard(what) {
     console.error = wasError;
   }
 }
-
 const ranGit = (said) => said.ran.map((one) => one.argv.join(" "));
-
 const SHA = "b818c390c02737351bf1b73aba36a573d34d2ecc";
 
 const onBranch = (name) => ({
@@ -629,11 +627,11 @@ test("a pull on trunk takes a group for a cloud box, the way branch take does", 
     { [on("one-group")]: GROUP_NOTE, ...HAND },
   );
 
+  for (const [argv, code] of [[probeOf("node", 6510), 1], [startOf(ROOT), 0]]) outside.proc.teach(argv, { exitCode: code });
   const { code, said } = heard(() => work(ROOT, ["pull"], { ...it, cloud: true }));
-
   assert.equal(code, 0);
-  assert.ok(ranGit(outside).includes("git switch work/one-group"), "the pull takes the group");
-  assert.ok(ranGit(outside).includes("git push origin work/one-group"));
+  assert.match(said, /The server starts detached/, "a cloud take starts the server where nothing answers");
+  assert.ok(ranGit(outside).includes("git switch work/one-group") && ranGit(outside).includes("git push origin work/one-group"), "the pull takes the group and pushes it");
   assert.equal(heldIn(disk.read(on("one-group"))).hand, "box d462e994b4cef");
   assert.match(said, /Two tickets that land as one/);
 });

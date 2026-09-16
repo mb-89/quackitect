@@ -25,6 +25,8 @@ const (
 	levelWide = 5
 	kindWide  = 10
 	headWide  = 2
+	// [[spec/design_output/viewer#one-key-filters-the-line]]
+	talkFilter = "kind: /^(prompt|reply)$/"
 )
 
 type pane int
@@ -247,7 +249,7 @@ func (m model) key(name string) (tea.Model, tea.Cmd) {
 		m.open(paneHelp)
 	case "alt+f":
 		m.open(paneFilter)
-	case "alt+F", "alt+ctrl+f":
+	case "alt+F", "alt+q":
 		m.quick(name)
 	case "alt+l":
 		m.raiseFloor()
@@ -296,7 +298,7 @@ func (m model) typing(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case "enter", "esc", "alt+f":
 		m.open(paneFilter)
 		return m, nil
-	case "alt+F", "alt+ctrl+f":
+	case "alt+F", "alt+q":
 		m.quick(msg.String())
 		return m, nil
 	case "alt+l":
@@ -346,12 +348,12 @@ func (m *model) toError() {
 
 // [[spec/design_output/viewer#one-key-filters-the-line]]
 func (m *model) quick(name string) {
-	if m.sel < 0 || m.sel >= len(m.all) {
-		return
-	}
-	r := m.all[m.sel]
-	said := fmt.Sprintf("level: /^%s$/", regexp.QuoteMeta(r.Level))
+	said := talkFilter
 	if name == "alt+F" {
+		if m.sel < 0 || m.sel >= len(m.all) {
+			return
+		}
+		r := m.all[m.sel]
 		said = fmt.Sprintf("kind: /^%s$/", regexp.QuoteMeta(r.Kind))
 		if r.Label() != r.Kind {
 			said = fmt.Sprintf("tool: /^%s$/", regexp.QuoteMeta(r.Label()))

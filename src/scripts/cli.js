@@ -5,7 +5,7 @@ import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   bindsHere,
-  canary,
+  canary, canaryText,
   countsOf,
   standingLayer,
 } from "../../.claude/skills/level0/lib/guidance.js";
@@ -66,7 +66,6 @@ import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { readTools, whereIs, writeSurvey } from "./tools.js";
 import { SOURCE as VIEWER, viewerOf } from "./viewer.js";
 import {
-  attach,
   detach,
   entryFor,
   produce,
@@ -74,6 +73,7 @@ import {
   readRegister,
   rootsHere,
 } from "./vehicle.js";
+import { attachTo } from "../bridge/vehicle.js";
 import { stubInto } from "./stub.js";
 import { HOOKS } from "./precommit.js";
 import { graphIn } from "./graph.js";
@@ -313,8 +313,8 @@ function theVehicle(argv) {
     return 0;
   }
   if (said === "attach") {
-    attach(files, it.clock, pair.work, made.id);
-    console.log(`${pair.work} names ${made.id} as the copy driving it.`);
+    const settled = attachTo(files, env, it.clock, pair.work, pair.method);
+    console.log(`${pair.work} names ${made.id} as the copy driving it, at port ${settled.port}.`);
     return 0;
   }
   if (said === "detach") {
@@ -543,7 +543,7 @@ function gridFaults(where) {
 function serveBridge(argv) {
   const inspect = argv.filter((one) => one.startsWith("--inspect"));
   const server = join(root, "src", "bridge", "server.js");
-  return outside.run([process.execPath, ...inspect, server, root], { cwd: root, inherit: true }).exitCode;
+  return outside.run([process.execPath, ...inspect, server, root], { cwd: root, inherit: true, env: inspect.length ? { SE_BREAK_ON_STOP: "1" } : undefined }).exitCode;
 }
 
 // [[spec/design_output/viewer#the-verb-builds-it]]
@@ -933,9 +933,7 @@ async function standing() {
     return 0;
   }
   console.log(said);
-  console.log("");
-  const stop = (await settings.ask("stop.enabled")) !== false;
-  console.log(canary({ ...countsOf(notes), stop }));
+  console.log(`\n${canaryText(canary({ ...countsOf(notes), stop: (await settings.ask("stop.enabled")) !== false }))}`);
   return 0;
 }
 

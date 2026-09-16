@@ -23,10 +23,19 @@ export function controlBlock(said = {}) {
 }
 
 function heldSays(hold) {
-  if (String(hold ?? OFF) !== FINISH) return [];
+  const said = String(hold ?? OFF);
+  if (said === STOP) {
+    return [
+      "The owner holds this session at stop. Put the work down where it stands.",
+      "Say what stands and what is left, and end the turn with the stop line.",
+      "",
+    ];
+  }
+  if (said !== FINISH) return [];
   return [
-    "The owner holds this session at finish. Carry what stands to its end,",
-    "start nothing new, and say what is left where you stop.",
+    "The owner holds this session at finish. Bring what you hold to a point you",
+    "pick it up from later, take nothing new out of the queue, and end the turn.",
+    "You judge where that point stands. Say what stands and what is left.",
     "",
   ];
 }

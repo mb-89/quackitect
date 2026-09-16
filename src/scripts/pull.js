@@ -31,8 +31,8 @@ import {
   withField,
 } from "./group.js";
 import { NOTES, schemasHere } from "./ticket.js";
+import { landed, unlandedRows } from "./landed.js";
 import { changedIn } from "./work.js";
-
 export const HOLDS = ".se/hold";
 export const BOX = ".se/box.json";
 export const WORK = "work";
@@ -233,7 +233,7 @@ export function pull(it, argv) {
   if (onTrunk && it.take) {
     if (it.cloud && !named) return it.take();
     const wanted = named || urgentGroup(it);
-    if (wanted) return it.take(wanted);
+    if (wanted || it.ready?.()) return wanted ? it.take(wanted) : 0;
   }
   if (!fetched(it, branch)) return 1;
   return handOut(it, who);
@@ -898,7 +898,7 @@ function handBack(it, who, name, verdict) {
       `${held.ticket} at ${held.step} answered already, and the record holds it.`,
     ]);
   }
-  if (fieldOf(one.text, "step") !== held.step) {
+  if ((fieldOf(one.text, "step") || leavesOf(one.front)[0]?.path) !== held.step) {
     dropHold(it, who.hand);
     say(REFUSED, [
       `${held.ticket} stands at ${fieldOf(one.text, "step") || "no step"} now, and the hold names ${held.step}.`,
@@ -923,17 +923,17 @@ function handBack(it, who, name, verdict) {
     return 1;
   }
 
-  // [[spec/design_output/pull#the-fields-ride-the-payload]]
-  const payload = flagValue(it.argv ?? [], "--fields");
+  // A payload rides the hold until the checks pass, so a refused word reaches no disk. [[spec/design_output/pull#the-fields-ride-the-payload]]
+  const payload = flagValue(it.argv ?? [], "--fields") || held.payload || "";
   if (payload) {
     const put = withPayload(one.text, held.step, payload);
     if (put.why) {
       say(REFUSED, [put.why]);
       return 1;
     }
+    Object.assign(one, { stood: one.text, payload });
     one.text = put.text;
     one.front = frontOf(one.text);
-    it.disk.write(at, one.text);
   }
   const verdictField = leaf.evidence.find((field) => field.form === "verdict");
   if (verdictField && verdict.said) {
@@ -977,27 +977,24 @@ function handBack(it, who, name, verdict) {
 // [[spec/design_output/pull#the-hand-back-refused]]
 function refused(it, who, one, leaf, held, found) {
   const count = Number(held.refused ?? 0) + 1;
-  const most = Number(it.refusals);
-  if (most > 0 && count >= most) {
+  if (Number(it.refusals) > 0 && count >= Number(it.refusals)) {
+    if (one.stood) one.text = one.stood;
     const put = withPersonStep(
       it,
       one,
       leaf.path,
       `the hand-back met refused ${count} times: ${found[0]}`,
     );
-    if (put.path) {
+    const finding = put.path ? landed(it, one, [`${leaf.path} goes to a person at ${put.path}`]) : "";
+    if (finding) found.push(`the hook refuses the commit, so the person step lands not: ${finding}`);
+    if (put.path && !finding) {
       dropHold(it, who.hand);
-      landed(it, one, [`${leaf.path} goes to a person at ${put.path}`]);
       if (!one.private) pushed(it, who.branch);
-      say(REFUSED, [
-        ...found,
-        "",
-        `${count} refusals in a row, so ${put.path} now waits for a person.`,
-      ]);
+      say(REFUSED, [...found, "", `${count} refusals in a row, so ${put.path} now waits for a person.`]);
       return 1;
     }
   }
-  writeHold(it, who.hand, { ...held, refused: count });
+  writeHold(it, who.hand, { ...held, refused: count, payload: one.payload ?? held.payload });
   say(REFUSED, [
     ...found,
     "",
@@ -1342,8 +1339,8 @@ function passed(it, who, one, leaf, held, answered) {
   }
 
   one.text = text;
-  landed(it, one, changes);
-  // The hand-back stands once it lands, so the hold drops before the push and outlives no closed ticket. [[spec/design_output/pull#the-rejected-push]]
+  const finding = landed(it, one, changes);
+  if (finding) return unlanded(one, leaf, finding);
   dropHold(it, who.hand);
   if (!one.private && !pushed(it, who.branch)) {
     say(REFUSED, [
@@ -1390,8 +1387,8 @@ function failed(it, who, one, leaf, held, reason, answered) {
     if (put.path) changes.push(`${back} waits for a person at ${put.path}`);
   }
 
-  landed(it, one, changes);
-  // The hand-back stands once it lands, so the hold drops before the push and outlives no closed ticket. [[spec/design_output/pull#the-rejected-push]]
+  const finding = landed(it, one, changes);
+  if (finding) return unlanded(one, leaf, finding);
   dropHold(it, who.hand);
   if (!one.private && !pushed(it, who.branch)) {
     say(REFUSED, [
@@ -1433,16 +1430,16 @@ function became(it, who, one, leaf, held, successor, answered) {
     ]);
     return 1;
   }
-  let text = withEntry(one.text, {
+  const text = withEntry(one.text, {
     step: leaf.path,
     hand: who.hand,
     hash_before: held.hash,
     hash_after: one.private ? "" : tipOf(it),
     answered,
   });
-  text = withField(shut(text, frontOf(text), "became"), "successors", `[${successor}]`);
-  one.text = text;
-  landed(it, one, [`closes became ${successor}`]);
+  one.text = withField(shut(text, frontOf(text), "became"), "successors", `[${successor}]`);
+  const finding = landed(it, one, [`closes became ${successor}`]);
+  if (finding) return unlanded(one, leaf, finding);
   dropHold(it, who.hand);
   if (!one.private && !pushed(it, who.branch)) {
     say(REFUSED, [
@@ -1552,11 +1549,10 @@ export function withPersonStep(it, one, before, asks, options) {
 }
 
 // [[spec/design_output/pull#the-pass]]
-function landed(it, one, changes) {
-  it.disk.write(one.at, one.text);
-  if (one.private) return;
-  it.git.run(["add", "-A"], true);
-  it.git.run(["commit", "-m", `${one.name}: ${changes.join(", ")}`], true);
+// [[spec/design_output/pull#the-refused-commit]]
+function unlanded(one, leaf, finding) {
+  say(REFUSED, unlandedRows(one, leaf, finding));
+  return 1;
 }
 
 // [[spec/design_output/pull#the-rejected-push]]
@@ -1581,7 +1577,7 @@ function changedSince(it, one, held) {
   return changedFiles(it, first);
 }
 
-function changedFiles(it, since) {
+export function changedFiles(it, since) {
   const out = new Set();
   if (since) {
     for (const path of it.git
@@ -1596,67 +1592,6 @@ function changedFiles(it, since) {
   return [...out].sort();
 }
 
-// [[spec/design_output/pull#the-test-verb]]
-export function testVerb(it, argv) {
-  const named = (argv ?? []).slice(1).filter((one) => !one.startsWith("--"));
-  const hand = handOf(it);
-  const held = holdOf(it, hand);
-  const since = sinceOf(it, held);
-  const files = named.length
-    ? named
-    : changedFiles(it, since).filter(
-        (path) => /(^|\/)test\/.*\.test\.js$/.test(path) || /\.test\.js$/.test(path),
-      );
-
-  if (!files.length) {
-    console.log(
-      `missing, because the branch changes no test since ${since ? shortOf(since) : "the branch point"}`,
-    );
-    return 1;
-  }
-
-  // [[spec/design_output/pull#the-test-verb]]
-  const ran = it.proc.run([it.node ?? "node", "--test", "--test-reporter=tap", ...files], {
-    cwd: it.root,
-  });
-  const said = testSays(ran, files);
-  console.log(said);
-  return said.startsWith("green") ? 0 : 1;
-}
-
-function sinceOf(it, held) {
-  if (held?.path) {
-    const at = it.join(it.root, ...held.path.split("/"));
-    if (it.disk.exists(at)) {
-      const first = recordIn(it.disk.read(at)).find((entry) => entry.hash_before);
-      if (first) return String(first.hash_before);
-    }
-    if (held.hash) return held.hash;
-  }
-  return it.git.run(["merge-base", `origin/${TRUNK}`, "HEAD"], true).out;
-}
-
-// [[spec/design_output/pull#the-test-verb]]
-export function testSays(ran, files) {
-  const out = `${ran.stdout ?? ""}\n${ran.stderr ?? ""}`;
-  const count = (key) =>
-    Number((new RegExp(`^# ${key} (\\d+)`, "m").exec(out) ?? [])[1] ?? 0);
-  if (ran.exitCode === 0 && count("tests") > 0) {
-    return `green, ${count("pass")} test(s) pass in ${files.length} file(s)`;
-  }
-  if (
-    /ERR_MODULE_NOT_FOUND|SyntaxError|Cannot find module|ReferenceError/.test(out) ||
-    count("tests") === 0
-  ) {
-    const line = out.split("\n").find((row) => /Error/.test(row));
-    return `build, because a file loads no test: ${(line ?? "the run answers nothing").trim().slice(0, CUT.error)}`;
-  }
-  if (/ERR_ASSERTION|AssertionError/.test(out)) {
-    return `assertion, ${count("fail")} test(s) fail on their own assertion`;
-  }
-  const line = out.split("\n").find((row) => /Error/.test(row));
-  return `build, because ${count("fail")} test(s) fail outside an assertion: ${(line ?? "").trim().slice(0, CUT.error)}`;
-}
 
 // [[spec/design_output/pull#the-answers]]
 function say(word, rows) {

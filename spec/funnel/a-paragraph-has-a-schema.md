@@ -99,7 +99,7 @@ else, so the schema holds them as overrides:
 |---|---|---|
 | prose | every `.md` and every comment | the defaults above |
 | answer | the chat, as `*answer.md` | three sentences a paragraph, two paragraphs a run, the question table and the TL;DR list first |
-| requirement | `spec/requirements/*.md` | the modals `shall`, `should` and `must` join the set, each with the meaning RFC 2119 gives it |
+| requirement | `spec/design_input/*.md` | the modals `shall`, `should` and `must` join the set, each with the meaning RFC 2119 gives it |
 
 The modal set of the prose register is `can`, `must` and `will`. A
 requirement says `shall` where it binds and `should` where it advises, and no
@@ -226,7 +226,7 @@ measurement reports:
 | the vocabulary | the projection inlines `words.yml` into one rule, the refusal names the outside words and the swaps, and the cage reloads on a write to the list | `lib/vale.js`, `lib/refuse.js`, `words.yml` | a paragraph with one outside word meets a refusal naming it |
 | the answer gate | `turn.complete` re-prompts under the bands, `prompt.submit` carries a warning forward, and `check_answer` registers at the session's start | `hooks/level0.js`, `level0.json` | a fake session over the ceiling meets one re-prompt, and one alone |
 | the question and the TL;DR | `prompt.submit` counts the questions, and the answer register demands the table and the list first | `lib/answer.js`, the schema | a prompt with two questions refuses an answer opening with prose |
-| the judged rows and the register | `BottomLineFirst` and `ShapeFits` join `VoiceJudged`, and `spec/requirements` takes its modals | `VoiceJudged`, `.vale.ini` | a fake judge labels a fixture, and the door refuses the refused label |
+| the judged rows and the register | `BottomLineFirst` and `ShapeFits` join `VoiceJudged`, and `spec/design_input` takes its modals | `VoiceJudged`, `.vale.ini` | a fake judge labels a fixture, and the door refuses the refused label |
 
 Each branch lands alone, and the measurement after each one reports the delta.
 

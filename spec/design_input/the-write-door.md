@@ -1,3 +1,11 @@
+---
+kind: [[design_input]]
+---
+
+# Scope
+
+The door standing before every write, and what it refuses.
+
 # The write door
 
 - The door shall refuse a write breaking a rule the paragraph schema holds.

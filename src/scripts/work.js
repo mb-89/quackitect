@@ -33,13 +33,13 @@ import {
   withoutField,
   WORK_BRANCH,
 } from "./group.js";
-import { handOf, pull, takeable, testVerb } from "./pull.js";
-import { review } from "./review.js";
-
+import { handOf, pull, takeable } from "./pull.js";
+import { readyToMerge, review } from "./review.js";
+import { serving } from "./serve.js";
+import { testVerb } from "./test-verb.js";
 export const BRIEF = "HANDOVER.md";
 const COL = { branch: 34, kind: 6, status: 6, why: 24 };
 const MS = 1000;
-
 // [[spec/design_output/work#a-merged-branch-closes]]
 export const MINE = /^(work|claude)\//;
 
@@ -67,7 +67,7 @@ export function work(root, argv, doors) {
     review,
     list,
     // [[spec/design_output/pull#the-hand-out]]
-    pull: (it, _name, argv) => pull({ ...it, take: (group) => take(it, group) }, argv),
+    pull: (it, _name, argv) => pull({ ...it, take: (group) => serving(it, take(it, group)), ready: () => readyToMerge(it) }, argv),
     test: (it, _name, argv) => testVerb(it, argv),
   };
   if (doing[what] && LOUD.includes(what)) {
@@ -183,7 +183,7 @@ export function standingOf(briefs, merged = new Set()) {
   );
 }
 
-function mergedHere(it) {
+export function mergedHere(it) {
   return new Set(
     it.git
       .run(["branch", "-r", "--merged", `origin/${TRUNK}`], true)
@@ -201,7 +201,7 @@ export function groupStanding(text) {
 }
 
 // [[spec/design_output/work#a-group-is-a-ticket]]
-function standOf(it) {
+export function standOf(it) {
   return branches(it).map((branch) => {
     // [[spec/design_output/work#a-brief-drains-first]]
     const name = branch.replace(/^work\//, "");
@@ -212,7 +212,7 @@ function standOf(it) {
 }
 
 // [[spec/design_output/work#held-derives-from-the-record]]
-function standingAll(stand, merged) {
+export function standingAll(stand, merged) {
   return new Map(
     stand.map((one) => [
       one.branch,

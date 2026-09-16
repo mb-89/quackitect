@@ -7,7 +7,6 @@ import { readEntries } from "./rulefile.js";
 
 export const RULES = "spec/config/stop";
 export const OFF = "stop-hook-off";
-export const FRESH = 10;
 
 // [[spec/design_output/stop#the-stop-is-one-call]]
 export const STOP_TOOL = "stop";
@@ -75,8 +74,10 @@ export function decide(rules, held = {}) {
   };
 }
 
+// A claimed rule naming a check fires where the claim and the check both stand, so a reason belonging to one moment stays there. [[spec/design_output/stop#a-claim-a-check-holds]]
 function fires(one, held, unknown) {
-  if (one.decides === "claimed") return held.claimed === one.id;
+  if (one.decides === "claimed" && held.claimed !== one.id) return false;
+  if (one.decides === "claimed" && !one.runs) return true;
   const said = held.ran ? held.ran(one.runs) : undefined;
   if (said === undefined) {
     unknown.push(String(one.runs ?? ""));
@@ -116,9 +117,9 @@ export function stopSpec(rules) {
   return {
     name: STOP_TOOL,
     description: [
-      "Ends this turn, from the second turn on. The first turn ends on the canary",
-      "line alone, written last, and this call falls there. Call it last, once",
-      "your answer stands, and write nothing after it. The result says whether",
+      "Ends this turn, every turn of a session alike. Call it last, once your",
+      "answer stands, and write nothing after it. The canary opens an answer and",
+      "ends nothing, so a first turn ends here too. The result says whether",
       "the stop stands. Where it falls, the",
       `result names the fact, so carry on. ${NEEDS_LINE} The reasons:`,
       ...reasons.map((one) => `${one.id}: ${one.asks}`),
@@ -178,24 +179,25 @@ function askLines(rules) {
 }
 
 // [[spec/design_output/stop#the-tooth-holds-its-state]]
-export function toothOf(init = {}) {
-  const fresh = init.fresh ?? FRESH;
-
+export function toothOf() {
   let calls = 0;
-  let granted = false;
+  let turns = 0;
   let inARow = 0;
 
   return {
     calls: () => calls,
+    turns: () => turns,
     inARow: () => inARow,
-    isNew: () => calls < fresh && !granted,
 
     sawCall() {
       calls += 1;
     },
 
+    // A turn is a prompt the owner sends, and it puts the run of holds back. [[spec/design_output/stop#the-tooth-holds-its-state]]
     sawPrompt(mine) {
-      if (!mine) inARow = 0;
+      if (mine) return;
+      turns += 1;
+      inARow = 0;
     },
 
     // [[spec/design_output/config#a-caller-hands-it-in]]
@@ -205,7 +207,6 @@ export function toothOf(init = {}) {
       const runaway = !decision.ends && !firm && mostInARow > 0 && inARow >= mostInARow;
       const ends = decision.ends || runaway;
       if (ends) {
-        granted = true;
         inARow = 0;
       } else {
         inARow += 1;

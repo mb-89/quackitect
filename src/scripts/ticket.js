@@ -13,6 +13,7 @@ import {
   schemasFrom,
 } from "../../.claude/skills/level0/lib/schema.js";
 import { TODO } from "../../.claude/skills/level0/lib/todo.js";
+import { askFaults, askRefusal } from "./ask-lint.js";
 import { fieldOf, GROUP, withField, withoutField } from "./group.js";
 import { askRows, processAt } from "./process.js";
 
@@ -196,6 +197,11 @@ function open(it, name) {
   const rows = (ask?.own ?? []).filter((row) => row.trim() && !/^\s*<!--.*-->\s*$/.test(row));
   if (!rows.length) {
     console.error(`${at.said} holds an empty ask, and open waits for one. Write the ask first.`);
+    return 1;
+  }
+  const found = askFaults(it, at.path.split("\\").join("/").replace(`${it.root}/`, ""), rows);
+  if (found.length) {
+    console.error(askRefusal(at.said, found));
     return 1;
   }
   const step = String(front.step ?? "").trim() || firstLeafOf(front.steps);

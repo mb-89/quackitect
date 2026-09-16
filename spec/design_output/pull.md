@@ -215,9 +215,13 @@ hash is no ancestor of the tip. Then the hold drops, and the hand pulls again.
 A hand fills the slots through the write door, or hands the fields back as
 the pull's payload. `--fields '{"verdict": "pass"}'` carries one key per
 field of the leaf in hand, and `checked` where a checklist stands. The engine
-writes each text under its heading, past the mint's comments. Then it runs
-the checks over the file as it stands. The pull refuses a key naming no
-field of the leaf.
+puts each text under its heading in memory, past the mint's comments, and runs
+the checks over that text. The pull refuses a key naming no field of the leaf.
+
+A refused payload reaches no disk. It rides the hold, so the next hand-back
+with no `--fields` meets the same checks over the same text. A refusal at the
+cap inserts the person step on the ticket without the payload, so a word the
+rules refuse reaches no branch.
 
 ## The checks
 
@@ -299,6 +303,15 @@ says to push the branch and pull again. A hold past that point stands on a
 closed ticket, and the stop hook holds the turn open for a hand-back nobody
 owes.
 
+## The refused commit
+
+The pre-commit hook reads the commit a hand-back makes, and a private line
+in the tree refuses it. Then nothing lands. The ticket file goes back to
+what the hand writes, the index empties, and the hold stays. The pull answers
+`refused` with the hook's finding, so the hand fixes the line and hands back
+again. So a record's `hash_after` names a commit the branch holds, and a
+refused commit writes no record. `src/scripts/landed.js` holds the landing.
+
 # The fail
 
 `--fail "why"` writes an entry with the reason and `returns`, one past the
@@ -374,6 +387,13 @@ waits for a retro.
 `ticket open <name>` turns a draft into an open ticket at its first leaf, and
 refuses while the ask stands empty. So the pull hands out what a person
 writes, and nothing else.
+
+The verb reads the voice rules over the Ask too, and refuses one that breaks
+a rule at the error level. The Ask is the engine's from the open on, so the
+ticket door refuses every later hand there. A rule broken past the open
+stands in the lint over the tree until a person reaches for the door.
+`src/scripts/ask-lint.js` holds the run, and a box with no Vale opens as it
+stands.
 
 # The test verb
 

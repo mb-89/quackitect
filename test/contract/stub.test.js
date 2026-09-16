@@ -3,9 +3,9 @@
 // [[spec/design_output/vehicle#nothing-of-the-method-travels]]
 
 import assert from "node:assert/strict";
-import { basename, dirname, join } from "node:path";
+import { basename, dirname, isAbsolute, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { test } from "node:test";
+import { skip, test } from "node:test";
 import { clock } from "../../src/doors/clock.js";
 import { disk } from "../../src/doors/disk.js";
 import { git } from "../../src/doors/git.js";
@@ -173,3 +173,72 @@ test("the command line writes a stub where it says, and refuses with no folder",
     files.remove(where);
   }
 });
+
+// [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+const slow = String(process.env.SE_SLOW ?? "").trim() ? test : skip;
+
+slow(
+  "the bridgehead installs the upstream into an empty home, and the stub reads its driver, its pointer and its hook back",
+  { timeout: 600000 },
+  async () => {
+    const where = files.tempDir("stub-");
+    const home = join(where, "home");
+    const dest = join(where, "stub");
+    files.makeDir(home);
+    try {
+      const said = stubInto(files, git(outside, root), clock(), root, dest, { upstream: root });
+      assert.equal(said.ok, true, said.why);
+      const hooks = {};
+      const { register } = await import("../../src/stub/.claude/skills/bridgehead/hooks/bridgehead.js");
+      register((event, fn) => {
+        hooks[event] = fn;
+      }, {});
+      const logged = [];
+      const at = (rel) => (isAbsolute(rel) ? rel : join(dest, rel));
+      const env = {
+        HOME: home,
+        SE_VEHICLE: "",
+        SE_INSTALL_SKIP: "vale biome vale-ls go index se-lsp editor-client editor-link editor-extensions git-hooks",
+      };
+      const $ = {
+        fs: {
+          read: async (rel) => files.read(at(rel)),
+          exists: async (rel) => files.exists(at(rel)),
+          write: async (rel, text) => {
+            files.makeDir(dirname(at(rel)));
+            files.write(at(rel), text);
+          },
+        },
+        process: { run: async (argv, init = {}) => outside.run(argv, { ...init, cwd: dest, env }) },
+        http: { fetch: async () => ({ ok: true, status: 200, text: "{}" }) },
+        ui: { log: (text) => logged.push(text) },
+      };
+      await hooks["session.start"]($, { cwd: dest }, async (e) => e);
+
+      const cloned = join(home, ".se", "vehicles", basename(root));
+      assert.ok(files.exists(join(cloned, "RUNME.sh")), `the upstream stands at ${cloned}: ${logged.join(" ")}`);
+      const driver = JSON.parse(files.read(join(dest, ".se", "project.json"))).driver;
+      assert.equal(driver, copyHere(files, clock(), cloned), "the driver is the clone's identity");
+      const pointer = JSON.parse(files.read(join(dest, ".se", "vehicle.json")));
+      assert.equal(pointer.method, cloned, "the pointer names the clone");
+      assert.ok(pointer.port >= 6510, "the pointer carries a port");
+      assert.equal(
+        files.read(join(dest, ".claude", "skills", "level0", "hooks", "level0.js")),
+        files.read(join(cloned, ".claude", "skills", "level0", "hooks", "level0.js")),
+        "the hook is the clone's",
+      );
+      const entry = JSON.parse(files.read(join(home, ".se", "registry.json"))).find(
+        (one) => one.method_root === cloned,
+      );
+      assert.equal(entry.port, pointer.port, "the register holds the clone at the pointer's port");
+      assert.equal(logged.length, 1, "one line");
+      assert.match(logged[0], /stands/);
+
+      const shim = outside.run(["sh", "RUNME.sh", "vehicle"], { cwd: dest, env });
+      assert.equal(shim.exitCode, 0, shim.stderr);
+      assert.match(shim.stdout, new RegExp(`method\\s+${either(cloned)}`), "the shim finds the clone");
+    } finally {
+      files.remove(where);
+    }
+  },
+);

@@ -261,6 +261,30 @@
           "icon": "the owner picks one mark per state: play and stop",
           "gesture": 1
         },
+        "vehicle": {
+          "help": "Make a vehicle: a copy of this tree that works on itself, in the folder the press asks for.",
+          "widget": "action",
+          "icon": "🚚",
+          "group": "engine",
+          "row": 0,
+          "column": 0,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "asks": "folder",
+          "runs": "./RUNME.sh vehicle into <folder>"
+        },
+        "stub": {
+          "help": "Make a stub: a bare project this vehicle drives, in the folder the press asks for.",
+          "widget": "action",
+          "icon": "🌱",
+          "group": "engine",
+          "row": 0,
+          "column": 1,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "asks": "folder",
+          "runs": "./RUNME.sh stub into <folder>"
+        },
         "beat": {
           "type": "number",
           "unit": "seconds",

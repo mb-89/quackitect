@@ -36,10 +36,10 @@ export function rowOf(at, level, kind, said, more = {}) {
     at,
     level: LEVELS.includes(level) ? level : DEFAULT,
     kind: String(kind),
-    // An answer keeps its whole text, because the owner reads it there. [[spec/design_output/log#an-answer-stands-in-chat]]
+    // An answer keeps its whole text and its lines, because the owner reads it there and a list or a table stands on its lines. [[spec/design_output/log#an-answer-stands-in-chat]]
     said:
       String(kind) === ANSWER_KIND
-        ? String(said).replace(/\s+/g, " ").trim()
+        ? String(said).trim()
         : String(said).replace(/\s+/g, " ").trim().slice(0, SAID),
     ...rest,
   };
