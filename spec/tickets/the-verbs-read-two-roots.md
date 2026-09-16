@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: soon
 depends_on: [the-shim-resolves-the-vehicle]
 steps:
@@ -79,6 +79,7 @@ record:
   - step: sync
     hand: box ea4589862ac3
     hash_before: 75f601777c9ddf1b00e2b46f489160b2b36e31f9
+step: sync
 ---
 
 # Ask

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: soon
 steps:
   - name: design
@@ -89,6 +89,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-verbs-read-two-roots
+step: design/review
+record:
+  - step: design/draft
+    hand: box ea4589862ac3
+    hash_before: c2e318dea6e4eb5ef0298ff0f77aff5cdc039944
+    hash_after: c2e318dea6e4eb5ef0298ff0f77aff5cdc039944
 ---
 
 # Ask
@@ -118,6 +124,41 @@ Read [[spec/design_input/a-stub-takes-its-vehicle]] first, the chapters The stub
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The command line hands every verb both roots, and each read names the root it belongs to. The server's box carries the two already, so the doors take the same rule.
+
+| the read | the root |
+|---|---|
+| a ticket, a private note, a hold, the box id, the brief | the work root |
+| a schema, a process, the Vale config, the styles, the copy id | the method root |
+| a guidance note | the work root's file where it stands, else the method's |
+| a link a field names | the work root first, then the method root |
+| a projection's target | the work root |
+| a projection's source | the work root's file where it stands, else the method's, and a JSON source joins key by key |
+
+The verbs and the files each one keeps under the work root:
+
+| verb | keeps under the work root |
+|---|---|
+| `ticket note`, `retro notes` | `.se/tickets` |
+| `ticket update`, `ticket open` | `spec/tickets` |
+| `branch take`, `branch pull` | `spec/tickets`, `.se/hold`, `.se/box.json` |
+
+- `rootsHere` runs once in the command line. The verbs take `it.method` and `it.work`, and `it.root` is the work root.
+- Git runs at the work root, because a stub is its own repository.
+- `schemasHere` and `processAt` read the method root. So a stub's ticket meets the vehicle's schema and route.
+- The pull runs a command field and a test at the work root. It names the Vale config under the method root, so a relative config resolves in the stub.
+- One reader, `inherits`, stands beside `layered` in the layer module. It reads a relative path off the two roots, and the work root's file wins.
+- The reader lists a folder as the union of both, with the work root's name winning. A JSON file both roots hold joins key by key.
+- On a tree driving itself the reader reads the one root.
+- The standing layer reads `spec/guidance` through that reader, in the server and in `standing`. A stub's note joins the set, and one it names again replaces the vehicle's.
+- The helper's guidance and the canary count follow the standing layer.
+- The write door keeps its reads. The path is relative to the work root, and the schemas and Vale come off the method root.
+- A test drives the write door over two fake roots. A ticket under the stub breaking the vehicle's schema comes back refused, and one keeping it passes.
+- `readAll` takes two readers: the sources through `inherits`, and the targets in the work root alone. A target the method root holds counts for nothing in a stub.
+- The server's projection and the `project` and `check` verbs land every target under the work root. The owner door refuses a write to one there.
+- The stop rules and the judged styles stay on the method root, because the ask names guidance and nothing else.
+- The stub verb writes `project/spec/tickets`. This ticket reads `spec/tickets` under the work root, as the ask says. A private note carries that to the retro.
 
 ## review
 
