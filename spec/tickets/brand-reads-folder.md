@@ -89,7 +89,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-brand-reads-the-folder
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 02ae9414623e
+    hash_before: af9a78c7f10daebe7b393d747fc593eeb7757fd3
+    hash_after: af9a78c7f10daebe7b393d747fc593eeb7757fd3
 ---
 
 # Ask
@@ -119,6 +124,34 @@ Read [[spec/design_input/a-stub-takes-its-vehicle]] first, the chapters The stub
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The brand is the method root's folder name, and `brandOf` answers it today. One
+write carries it: the link verb stamps the manifest before it links. Every
+other piece reads the manifest it already loads.
+
+| piece | today | with the brand |
+|---|---|---|
+| the manifest | tracked, naming one brand | the link writes `name`, `displayName`, `publisher`, the container and the view from the brand |
+| the extension's three keys | constants | derived from the `name` the manifest beside them carries |
+| the output channel and the view command | a constant | the same manifest |
+| the language client's id | a constant | the same manifest |
+| the icon | one file in the extension folder | `spec/config/icon.svg`, which the link copies in |
+| a vehicle's icon | the duck it copied | its initials, which `produce` draws over the copy's file |
+
+Three pure functions carry the work, and each takes a test with no editor and no
+disk:
+
+- `brandedManifest(said, brand)` returns the manifest with every brand field set
+- `initialsIcon(brand)` returns the mark a vehicle wears until the owner swaps it
+- `idsOf(said)` returns the view id, the here key and the rest key off a manifest
+
+The link verb stays the one place that writes. It reads the manifest, stamps it,
+copies the icon in, then links and registers as it does today. So a tree linked
+twice under two names writes two entries, and the editor draws two.
+
+The manifest stays tracked, because the packaging script and the editor both
+read it before the link runs. The stamp is idempotent: a second link writes the
+same bytes.
 
 ## review
 
