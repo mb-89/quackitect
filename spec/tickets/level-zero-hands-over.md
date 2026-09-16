@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: whenever
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -104,6 +104,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box 747cff5c2f2a
+    hash_before: 453a37966734f1f915dd2fb547c8db222172d48f
+    hash_after: 453a37966734f1f915dd2fb547c8db222172d48f
 depends_on: ["the-agent-pulls-a-ticket"]
 ---
 
@@ -164,38 +168,62 @@ Where it stands
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- level-zero-handover closed: the guidance door reads the survey at session start and hands the session a tools block
+- the sync merge took a rebuilt trunk in, with its whole tree and this branch two tickets
+- the group and its child opened, and their routes name the branch verbs
+- four loose drafts carry the brief open rows: the answer door, the viewer, the controls, the brief verbs
+- one private note became the-judge-reads-answer-rules, a loose draft
+- the stop door queue check reads the environment off the box, so its test runs in memory
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the fakes under the doors folder carried every test in memory, so the red and the green came fast
+- the shell hand-back ran the commands and named each broken line, so one pass fixed a refusal
+- a helper hand took the review and the verdict, and the spawn prompt the pull printed was enough
 
 ### badly
 
 <!-- what did not, each with its moment in the log or the transcript -->
-
 <!-- the form is list -->
+
+- the judge refused every plugin hand-back, ten in a row, and named no rule, at every leaf of the child
+- the sync merge met unrelated histories, and the merge verb stopped at the first refusal
+- the route update dropped the child three extra chapters, and the ask took a rewrite by hand
+- the write door refused shell writes into the tree once the server stood, at the tests-green leaf
+- the platform refused three deletes in the sync merge, and the merge went through a scratch index
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the judge, in the level one hook: read the rules that fit evidence, and name the broken one
+- the sync verb, in the work module: say unrelated histories by name, and offer the trunk tree whole
+- the route update, in the ticket verb: keep a chapter the shape leaves out, or refuse and say which
+- the cloud guidance: say the write door holds once the server stands, so a box starts the server first
+- the sync merge on a cloud box: a delete goes through git plumbing, and the work note says so
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The judge is the one door on the plugin road, and it refused everything. So the cage held nothing this run, and the shell road carried every hand-back. The rules the judge reads describe an answer, and a leaf evidence is a fragment of a ticket.
+The group ask reads three words. The brief carried the goal, and the route update cut it. So the split read the brief and guessed at its edge.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the tools block lines come off the wanted list and the specs, and the tools note points at the library
+- the block heading and the block name each stand once, at the top of the guidance door
+- the door test header says what the file is for, and counts nothing
 
 ## cloud
 
