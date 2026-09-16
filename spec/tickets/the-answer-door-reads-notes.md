@@ -201,17 +201,25 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/note-answer.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Five cases stand, and three fail on their own assertion. The two readers answer a stub each, so the reading cases fail and the door cases follow. What surprises me is the fourth case: a prompt asking for no note already leaves the demand standing, so it passes green from the start. It holds the change honest, because a reader that pays every prompt turns that case red.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. One test file stands new, and the library takes two stubs
+- every door the change reaches has a fake. The case builds the box on `fakeDisk`, and the log door is a list
+- a comment names the approach the change implements. The test header points at the chapter the change writes
 
 ## reflect
 

@@ -81,6 +81,16 @@ export function spokeSince(messages) {
   return Boolean(answerAfter(messages, ""));
 }
 
+// [[spec/design_output/level0#a-note-answers-its-prompt]]
+export function namesNote(_text) {
+  return false;
+}
+
+// [[spec/design_output/level0#a-note-answers-its-prompt]]
+export function notesIn(_box) {
+  return 0;
+}
+
 // [[spec/design_output/level0#the-question-comes-first]]
 
 export const TABLE = "QuestionTable";
