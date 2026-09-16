@@ -89,7 +89,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-bridgehead-installs-upstream
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 99aa60a14c3f
@@ -126,6 +126,17 @@ record:
     hash_after: 4dcbd862f335d4aee40640cfe8e5646fd3ba3dc6
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 99aa60a14c3f
+    hash_before: 4dcbd862f335d4aee40640cfe8e5646fd3ba3dc6
+    hash_after: aff687a4db0ade54ad5668226f442429fb6db253
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 25 test(s) pass in 3 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -267,17 +278,49 @@ Ten tests stand red. Eight drive the bridgehead over a fake git and a fake disk,
 
 <!-- the form is command -->
 
+./RUNME.sh branch test
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
 
+./RUNME.sh check src test spec/design_output spec/vocabulary .vale.ini
+
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
 
 <!-- the form is text -->
+
+The stub's bridgehead takes the install road at session start, and the vehicle's own verb does the attach.
+
+| what changes | why |
+|---|---|
+| the bridgehead reads the record, the pointer and the register, and finds the vehicle on three roads | a stub on a desk and a stub on a cloud box take one code road |
+| where no vehicle stands, it clones the upstream into `~/.se/vehicles/<name>` | the ask names the folder, and the shim reads the same one |
+| one command attaches: the vehicle's `RUNME.sh vehicle attach`, with the work root set to the stub | the RUNME installs first, and the vehicle owns the register |
+| the vehicle verb reads `SE_WORK` for the work root | the shim sets it, and nothing read it before |
+| the attach writes the driver, the register entry with its port, the pointer, and the hook under `.claude/skills/level0` | the client loads that hook at the next start, because it scans plugins once |
+| where the pointer's port answers nothing, the road starts the server detached | the second session's hook needs a server to post to |
+| the hook writes one line to the session log, says it, and hands one context block | the first session ends on the install, as the design input says |
+
+The proof stands in three places:
+
+- eight unit tests drive the hook over a fake git and a fake disk. Two more drive the attach and the work root.
+- the slow contract test clones this tree as the upstream into a temp home. The stub reads the driver, the pointer, the hook and the register back.
+- one routine run against a stub repo stays for a person. The vehicle chapter names what it takes.
+
+The check names the lint's paths. The Ask as minted breaks the voice rules, and the first review's record carries a colon the YAML reader refuses. Both are the engine's once the ticket opens, and the door refuses a hand there. Four private notes carry that and two more findings to the retro.
+
+### checked
+
+<!-- one line per item of the checklist -->
+
+- The green tests are the red ones: the hook test, the two attach tests, and the slow contract test. No other file moves past the change leaf.
+- The hook reaches the disk, git and the process through the harness hand. The tests mirror that hand over a fake disk and a fake git.
+- Every new function points at the vehicle chapter's section on the install road.
 
 # verdict
 
