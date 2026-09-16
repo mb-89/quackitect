@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-hand-carries-a-step
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -121,6 +121,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box ee33ce836a4d
+    hash_before: 5cd9ab37961fc75318ddd3d4ca9d6d23961e08ba
+    hash_after: 5cd9ab37961fc75318ddd3d4ca9d6d23961e08ba
+    answered:
+      - name: lint
+        exit: 0
+        said: 42 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
@@ -234,11 +242,17 @@ Six tests fail on their own assertion, and one passes: the hold already slugs a 
 
 <!-- the form is command -->
 
+./RUNME.sh lint src test .claude
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `src/scripts` and the two plugin folders, which the ask's table names.
+- the hand reaches the disk and git, and `test/level0/hand.test.js` takes a fake for each.
+- each new function points at the design output section the approach names.
 
 ## tests-green
 

@@ -7,6 +7,7 @@
 const PORT = 6510;
 const POINTER = ".se/vehicle.json";
 const SESSION = ".se/log/session.jsonl";
+const HAND_FILE = ".se/session.json";
 const COMPACT = "session.compact";
 const LIMIT = 4_000_000;
 const SHORT = 4000;
@@ -46,10 +47,31 @@ export function reasonOf(code) {
   return REASONS[Number(code)] ?? ["warn", `the start answers ${code}, which nobody names`];
 }
 
+// [[spec/design_output/pull#a-hand-of-its-own]]
+export function spawnTagOf(held) {
+  const id = String(held?.id ?? "").trim();
+  if (!id) return "";
+  return `You are the hand of session ${id} on this box, so you pull under no --as.`;
+}
+
 export function register(on, options) {
   method = String(options?.method ?? "");
   on("*", ($, e, next) => seen($, e, next));
   on("turn.step", streams);
+  // [[spec/design_output/pull#a-hand-of-its-own]]
+  on("agent.spawn", async ($, e, next) => {
+    const line = spawnTagOf(await sessionHeld($));
+    if (!line) return next(e);
+    return next({ ...e, prompt: `${line}\n\n${String(e?.prompt ?? "")}` });
+  });
+}
+
+async function sessionHeld($) {
+  try {
+    return JSON.parse(String(await $.fs.read(HAND_FILE)));
+  } catch {
+    return null;
+  }
 }
 
 async function seen($, e, next) {

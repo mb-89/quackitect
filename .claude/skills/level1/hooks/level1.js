@@ -11,10 +11,12 @@ import {
   PULL_CALL,
   pullArgv,
   pullSpec,
+  sessionOf,
   spawnPromptIn,
 } from "../lib/pull.js";
 
 const CLI = ["node", "src/scripts/cli.js"];
+const SESSION = ".se/session.json";
 const CONFIG = "spec/config/level0.json";
 const RUNNING = 600000;
 const JUDGE = "--judge";
@@ -24,6 +26,8 @@ const JUDGED_ARGS = 3;
 export function register(on, _options) {
   on("session.start", async ($, e, next) => {
     await $.tool.register(pullSpec());
+    // [[spec/design_output/pull#the-hand-and-the-hold]]
+    await wrote($, sessionOf(e));
     return next(e);
   });
 
@@ -44,6 +48,13 @@ export function register(on, _options) {
     }
     return { result: answer };
   });
+}
+
+async function wrote($, held) {
+  if (!held.id) return;
+  try {
+    await $.fs.write(SESSION, `${JSON.stringify(held, null, 2)}\n`);
+  } catch {}
 }
 
 async function pulled($, argv) {

@@ -82,6 +82,14 @@ export function spawnPromptIn(answer) {
   return blank < 0 ? "" : rows.slice(blank + 1).join("\n").trim();
 }
 
+// [[spec/design_output/pull#the-hand-and-the-hold]]
+export function sessionOf(e) {
+  return {
+    id: String(e?.session?.id ?? e?.sessionId ?? "").trim(),
+    harness: String(e?.harness ?? e?.client ?? "").trim(),
+  };
+}
+
 export function judgeRefusal(said) {
   return [
     "refused",
