@@ -279,5 +279,20 @@ review earns that, because each pass finds real holes.
 The group holds one child, and the design input names it as one branch. So the
 split assigns the standing ticket and mints nothing.
 
-The rules verb answers findings at error on trunk, which `branch done` reads as
-a red battery. A private note carries that, and the retro decides it.
+A correction to the retro, which stands above and belongs to the engine. Two
+lines there say that trunk answers findings at error, and that the battery reads
+red for it. Both are wrong, and these lines carry what is true:
+
+- the check answers green on this branch, with every finding at warning
+- the check names the tense rule nowhere, in this run or the one before it
+- the ask of this ticket and of its child held the findings that made it red
+- fixing those two asks greens the check
+
+The box reached that wrong reading by running Vale by hand over the tree, past
+the scoping the rules verb applies. The verb answers `The rules pass` on every
+file the hand-run named. A reading off a tool the tree wraps carries less than
+the verb, and the verb decides.
+
+So [[spec/tickets/the-check-starts-the-server]] stays, because the probe stopped
+the check on this box for real. The ticket minted for the tense rule goes, since
+its ask rests on the wrong reading.
