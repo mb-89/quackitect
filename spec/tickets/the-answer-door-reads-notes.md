@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -105,6 +105,10 @@ record:
     hand: box d42624a67d18a8
     hash_before: 5b321a32db7820ab4e93b5c5c58a3822c25be3cf
     hash_after: 0f968e6f463d0daf6b7997dba237973161af09a1
+  - step: design/review
+    hand: box d42624a67d18a8 · helper-4
+    hash_before: 6853a76e6e4c0494805f7f84fda8691753db2091
+    hash_after: 6853a76e6e4c0494805f7f84fda8691753db2091
 ---
 
 # Ask
@@ -174,14 +178,16 @@ For details, see [[spec/design_output/level0#the-owners-prompt-comes-first]].
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- Name the word `namesNote` reads off the prompt. Both done_when cases wait on it, and neither stands decidable meanwhile.
-- `namesNext` stands nowhere in the tree. Point at `opensATurn` and `questionsIn` in `lib/answer.js`, which read a prompt the same way.
-- Say which `note` row pays. A growing count pays on any note, so a note on another matter clears the prompt.
-- Say what the `reply` line carries where a note pays. The demand after it reads `spoken` as the text it saw.
-- The disk read holds. The box carries the disk door, a fake stands beside it, and `ticket note` writes the row.
+- `namesNote` reads `note`, `notes` or `noted` as a word outside a fence, so both cases decide.
+- `questionsIn` and `opensATurn` stand in `lib/answer.js`, where the approach points.
+- The row that pays stands named: a `note` row past the count the prompt reads. The approach owns the consequence that any note pays.
+- The payment's reply line carries the note's text and names the prompt under `detail`. So the next demand reads `spoken` as that text.
+- The disk read holds: the box hands the door its disk and its root. A fake disk goes in beside them, and `ticket note` writes the row.
 - `./RUNME.sh check` answers 0.
+- `./RUNME.sh branch review` finds the branch nowhere, because this ticket reaches code at implement.
+- Carry into the change: the count lands at the prompt door, and the recount at the spoke door.
 
 # implement
 
