@@ -103,7 +103,11 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
-step: retro/write
+  - step: retro/write
+    hand: box 99aa60a14c3f
+    hash_before: c3dc2e0150c084830bba5d8886b87d7b229d29d3
+    hash_after: c3dc2e0150c084830bba5d8886b87d7b229d29d3
+step: retro/cloud
 ---
 
 # Ask
@@ -170,11 +174,25 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 
 <!-- the form is list -->
 
+- bridgehead-installs-upstream: the install road in the stub's bridgehead, its tests and its chapter, closed done
+- the bridgehead finds the vehicle on three roads, clones the upstream where none stands, and attaches through the vehicle's verb
+- the vehicle verb reads `SE_WORK`, and `attach` writes the driver, the register entry, the pointer and the hook
+- the road starts the vehicle's server where the port answers nothing, and hands one context block
+- eight unit tests over a fake git and a fake disk, two over the attach, and one slow contract test
+- the Vale config exempts the stub's hook from the door rule, and the vocabulary gains `json`
+- four private notes become four tree tickets, each under the trivial process
+- two reviewer hands read the draft, and one read the diff at the verdict
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- the first reviewer failed the draft on five findings, and the rewrite met every one. A second hand caught what the writer read past.
+- the fakes behave: the fake clone writes the RUNME, and the fake attach writes the driver. So the hook's test reads real files back.
+- the slow contract test caught the uncommitted verb at once, because it clones the tree's head and nothing else
+- the write door names each break with its line, so a refused write costs one rewrite
 
 ### badly
 
@@ -182,17 +200,36 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 
 <!-- the form is list -->
 
+- the pull's commit met the privacy door and said nothing, at the tests-red and change hand-backs. Two leaves passed on one hash.
+- the first review's reason landed in the record with a colon, at the first fail. Vale read no file of the ticket after it.
+- the Ask as minted breaks the voice rules, and the door refused every write once Vale could read the ticket
+- the stub's hook met the door rule on its clock, at the change lint. The switch-off comment reached no Vale rule.
+- the pull hands the group's retro leaf out before the notes, at retro/notes. The box dropped the hold and tagged each note.
+- the server answers nothing on this box, at session start. The box started one by hand for the check.
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
 
+- the pull, `src/scripts/pull.js`: a refused commit answers refused, under [[spec/tickets/the-pull-says-refused-commit]]
+- the record writer, `src/scripts/pull.js`: a reason with a colon takes quotes, under [[spec/tickets/the-record-quotes-its-why]]
+- the open verb, `src/scripts/ticket.js`: the Ask meets the voice rules before it opens, under [[spec/tickets/ticket-open-lints-the-ask]]
+- the Vale config: a hooks module folder takes its own section, which this branch adds
+- the pull, `src/scripts/pull.js`: a private note goes out before the group's retro leaf, as the earlier retro already names
+- the take, `src/scripts/work.js`: a cloud box starts its server, under [[spec/tickets/the-cloud-box-starts-serving]]
+
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
 
 <!-- the form is text -->
+
+The thoughts circled two things longer than the actions show.
+
+- the bridgehead's design: the stub verb wrote an import road, and the level zero chapter says the import fails. The design input's file table, written after that probe, names the one hook that posts to a server. So the road attaches through the vehicle's verb and imports nothing. The reviewer asked for that argument in the draft.
+- the check: the whole tree lints red on lines the engine owns. So the box named the lint's paths and wrote the reason on the ticket. The engine's faults went into tickets of their own.
 
 ## cloud
 
