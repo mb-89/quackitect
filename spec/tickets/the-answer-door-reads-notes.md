@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: whenever
 steps:
   - name: design
@@ -139,6 +139,11 @@ record:
       - name: check
         exit: 0
         said: 64 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box d42624a67d18a8 · helper-9
+    hash_before: 284df48d58d4d68a306c117f5d44c392585f0c74
+    hash_after: 284df48d58d4d68a306c117f5d44c392585f0c74
+reason: done
 ---
 
 # Ask
@@ -337,17 +342,59 @@ A prompt asking for a note now takes a parked note as its answer. Two readers st
 
 <!-- the form is files -->
 
+- .claude/skills/level0/lib/answer.js
+- src/bridge/answer.js
+- test/level0/note-answer.test.js
+- spec/design_output/level0.md
+- spec/tickets/the-answer-door-reads-notes.md
+- .claude/skills/level0/lib/log.js
+- src/doors/log.js
+- src/doors/fake/log.js
+- src/bridge/stop.js
+- src/bridge/server.js
+- src/scripts/ticket.js
+- src/scripts/pull.js
+- spec/processes/standard.yaml
+- spec/design_input/the-window-holds-every-tab.md
+- spec/design_output/work.md
+- src/bridge/bash.js
+- test/level0/trunk-door.test.js
+- spec/tickets/the-brief-verbs-go.md
+- spec/tickets/the-controls-wire-up.md
+- spec/tickets/the-judge-reads-answer-rules.md
+- spec/tickets/the-viewer-draws-the-note.md
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- The door pays a noted prompt off the log. Every other prompt still owes a text answer.
+- Five cases stand green, and they cover the two cases the ask names.
+- `./RUNME.sh check` answers 0. The change adds no warning line of its own.
+- A probe over the real log door counts the one `note` row this session carries.
+- The `ticket note` verb writes the row `notesIn` counts. So the rule meets the shell.
+- Each rule carries a case that refuses. A fenced word reads as none.
+- A note before the prompt pays nothing, and a prompt asking for none keeps its demand.
+- No retro stands in the handback. The tests-red step found nothing to reflect.
+- Every file the diff touches beyond the brief carries another ticket's commit.
+- None of those files redesigns what the brief leaves alone.
+- For the retro: `noteRows` parses the session log beside `promptsIn` in the stop door.
+- That door reads the same file over `rowsOf`. One reader serves both.
+- For the retro: `namesNote` reads the word `note` anywhere outside a fence.
+- So a prompt saying `note that` takes a note on another matter as its answer.
+- The approach owns the asking case, and the retro decides this one.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place. The rule stands once, in the level zero note's new chapter. Each new function links to that chapter. The one repeat is mechanical: two readers open the session log where one serves.
 
 # Discussion
 
