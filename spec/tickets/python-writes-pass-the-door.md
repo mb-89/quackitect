@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: now
 steps:
   - name: do
@@ -26,6 +26,7 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 62642eaf8f9c9c53
+step: do
 ---
 
 # Ask

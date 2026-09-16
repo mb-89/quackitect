@@ -364,6 +364,25 @@ test("ticket todo reaches a tracked ticket too, because the tag reaches any fold
   assert.match(said.disk.read(at("spec/tickets/a-thing.md")), /^todo: true$/m);
 });
 
+// [[spec/design_output/pull#the-private-queue]]
+test("a closed note steps aside for the tracked ticket of its name, and an open one stands first", () => {
+  const front = (state) => `---\nkind: [[ticket]]\nstate: ${state}\nurgency: soon\nsteps:\n  - name: do\n    does: makes the change\n---\n\n# Ask\n\nA thing.\n\n# do\n\nNothing yet.\n\n# Discussion\n\nNothing yet.\n`;
+  const shadowed = treeWithProcesses({
+    [at(".se/tickets/a-thing.md")]: front("closed"),
+    [at("spec/tickets/a-thing.md")]: front("open"),
+  });
+  heard(() => ticket(ROOT, ["todo", "a-thing"], shadowed.it));
+  assert.match(shadowed.disk.read(at("spec/tickets/a-thing.md")), /^todo: true$/m, "the ticket takes the tag");
+  assert.ok(!/^todo: true$/m.test(shadowed.disk.read(at(".se/tickets/a-thing.md"))), "the closed note takes none");
+
+  const live = treeWithProcesses({
+    [at(".se/tickets/a-thing.md")]: front("open"),
+    [at("spec/tickets/a-thing.md")]: front("open"),
+  });
+  heard(() => ticket(ROOT, ["todo", "a-thing"], live.it));
+  assert.match(live.disk.read(at(".se/tickets/a-thing.md")), /^todo: true$/m, "an open note stands first");
+});
+
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
 test("a ticket riding a branch takes no tag, and the refusal names the branch", () => {
   const front = `---\nkind: [[ticket]]\nstate: open\nurgency: soon\ngroup: the-flag-parks-work\nsteps:\n  - name: do\n    does: makes the change\n---\n\n# Ask\n\nA thing.\n\n# do\n\nNothing yet.\n\n# Discussion\n\nNothing yet.\n`;

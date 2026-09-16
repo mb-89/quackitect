@@ -283,12 +283,16 @@ function copied(list, parent, take) {
   });
 }
 
+// A closed note steps aside for the ticket of its name, because a note that became a ticket shares it. [[spec/design_output/pull#the-private-queue]]
 function ticketAt(it, name) {
   const said = String(name).replace(/\.md$/, "");
+  const standing = [];
   for (const folder of [NOTES, TRAVELS]) {
     const path = it.join(it.root, ...`${folder}/${said}.md`.split("/"));
-    if (it.disk.exists(path)) return { path, said: `${folder}/${said}.md` };
+    if (it.disk.exists(path)) standing.push({ path, said: `${folder}/${said}.md` });
   }
+  const live = standing.find((one) => fieldOf(it.disk.read(one.path), "state") !== "closed");
+  if (live || standing.length) return live ?? standing[0];
   const direct = it.join(it.root, ...String(name).split("/"));
   return it.disk.exists(direct) ? { path: direct, said: String(name) } : null;
 }
