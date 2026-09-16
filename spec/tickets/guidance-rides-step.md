@@ -92,9 +92,18 @@ group: guidance-rides-the-step
 
 # Ask
 
-# Where it stands
+The pull hands a leaf out with the notes its step reads. The hand holds the guidance the moment it holds the step, and the standing layer shrinks to the notes binding every session.
 
-The design input `spec/design_input/the-agent-pulls-tickets.md` says what the
+Without it every session carries every note on every turn. A refresher on every pull costs tokens, and the engine records nothing of what reaches a hand.
+
+- `./RUNME.sh branch guidance` answers the held step's notes and the always-on ones, and `branch guidance <note>` answers one note
+- one log line lands per note the pull hands over, and a test on the fake log drives it
+- the hold names every note by name and hash
+- a second hand-out at one step hands the notes again on a refusal, a compaction or a moved hash alone
+- a note a step names leaves the standing layer, and `./RUNME.sh standing` shows it
+- `./RUNME.sh check` exits 0 on the branch
+
+Where it stands today: the design input `spec/design_input/the-agent-pulls-tickets.md` says what the
 owner asks for, and the page beside it draws it. Read the note first. It
 stands on the branch `claude/relaxed-knuth-f0uk4d` until the owner merges it,
 so take that branch in where `work sync` leaves it absent.
@@ -109,20 +118,20 @@ Its chapter is Guidance rides the step.
 | the judge's sampling over the write door | `spec/config/level0.json`, `judge.warmupWrites` and `judge.thenEveryNth` |
 | the hold per hand | the pull branch |
 
-# What waits
+What waits, piece by piece:
 
 | the piece | where | proves it |
 |---|---|---|
 | the reads of a leaf | `work.js` | a leaf's reads and its phases' add up |
 | the `work` answer | `work.js` | it carries the notes' actionables inline, and the checklist |
-| `work guidance [note]` | `work.js` | named, it answers one note; unnamed, the current step's and the always-on ones |
+| `work guidance [note]` | `work.js` | named, it answers one note, and unnamed, the current step's and the always-on ones |
 | the log line | `lib/log.js` | one row per note handed over |
 | the arrival | the hold file | the notes this hand holds for this step, by name and hash |
 | the re-hand | `work.js` | a `refused` answer, a compaction, and a moved hash hand the notes again |
 | the standing layer shrinks | `lib/guidance.js` | a note a step names leaves the layer |
 | the judge on every hand-back | the plugin wrapper | no sampling reaches the pull's fifth check |
 
-# The rules to hold
+The rules to hold:
 
 - Level one carries no reading probe. The proof of application is the hand-back.
 - A refresher on every pull costs tokens and buys nothing the hold does not know.

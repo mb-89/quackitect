@@ -82,7 +82,7 @@ record:
 
 # Ask
 
-Where it stands
+The pull hands a leaf out already, and this branch hands the guidance with it. The notes a step reads ride the work answer, the hold and the log. The standing layer shrinks to the notes binding every session. The chapter Guidance rides the step in the design input says it whole.
 
 # sync
 
