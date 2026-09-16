@@ -224,6 +224,9 @@ record:
     hand: box 74bbe6e8128e
     hash_before: dee58c47263a19c551dc209efb739ff2a21ac8e1
     hash_after: 153dc9af0ce6423ab28dbee57ee43f77785b85a4
+  - step: retro/notes
+    hand: box 78d0b20c38ab
+    hash_before: b4e49c54f1faee2ce4bc1d133f9f9072499aa623
 step: retro/notes
 ---
 
