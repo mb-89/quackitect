@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-hand-carries-a-step
-step: implement/tests-red
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -110,6 +110,17 @@ record:
     hand: box ee33ce836a4d · helper-4
     hash_before: 374576ff3443046325122c431a556bcc0f5aed8a
     hash_after: 374576ff3443046325122c431a556bcc0f5aed8a
+  - step: implement/tests-red
+    hand: box ee33ce836a4d
+    hash_before: cd90ca7eeb6d28f8a3642e2b52d2e8790ae2fa27
+    hash_after: cd90ca7eeb6d28f8a3642e2b52d2e8790ae2fa27
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 6 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -177,17 +188,25 @@ pass
 
 <!-- the form is command -->
 
+./RUNME.sh branch test test/level0/hand.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Six tests fail on their own assertion, and one passes: the hold already slugs a helper into a file name of its own. The surprise is that the hand stops at the box today, so every shape the design output names reads the same. For details, see [[spec/design_output/pull#the-hand-and-the-hold]].
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the tests touch `src/scripts/pull.js`, the wrapper's lib and the level zero hook, and the ask names all three.
+- the hand reaches the disk and git, and the test takes a fake for each.
+- the file header names the hand and the hold, and each new test points at its design output.
 
 ## reflect
 
