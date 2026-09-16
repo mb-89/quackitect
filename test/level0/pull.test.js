@@ -599,7 +599,7 @@ test("the voice rules read the evidence at the hand-back, and an error refuses i
     "stdin.md": [{ Check: "VoiceParagraph.Sentence", Line: 2, Span: [1, 3], Message: "A sentence holds 25 words.", Severity: "error" }],
   });
   const { it, disk } = doors(standing(filled(CHILD(), "### approach", "A long approach.")), {
-    [`${vale} --config=.vale.ini --path=spec/tickets/a-child.md --output=JSON --no-exit`]: { stdout: long },
+    [`${vale} --config=/tree/.vale.ini --path=spec/tickets/a-child.md --output=JSON --no-exit`]: { stdout: long },
   });
   it.vale = vale;
   heard(() => work(ROOT, ["pull"], it));
@@ -754,7 +754,7 @@ test("the payload spans a fence, a porcelain row reads whole, and a files field 
   const body = route.replace("# Discussion\n", "# verdict\n\n## read\n\n## verdict\n\n# Discussion\n");
   const { it } = doors(standing(body, withField(GROUP_NOTE, "state", "closed")), {
     "git status --porcelain": { stdout: "M spec/tickets/a-child.md\n?? .vale.ini" },
-    [`${vale} --config=.vale.ini --path=spec/tickets/a-child.md --output=JSON --no-exit`]: (_argv, init) => {
+    [`${vale} --config=/tree/.vale.ini --path=spec/tickets/a-child.md --output=JSON --no-exit`]: (_argv, init) => {
       ranVale.push(init.stdin);
       return { stdout: "{}" };
     },

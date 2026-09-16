@@ -3,13 +3,9 @@
 
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import {
-  bindsHere,
-  canary,
-  countsOf,
-  standingLayer,
-} from "../../.claude/skills/level0/lib/guidance.js";
+import { inherits, rooted } from "../../.claude/skills/level0/lib/layer.js";
 import { asRow, OLD, rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
+import { guidanceHere } from "../bridge/guidance.js";
 import { POINTER, PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 import { withoutFalsePast } from "../bridge/tense.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
@@ -103,21 +99,25 @@ function configHere(files, pair) {
   });
 }
 
+// The verbs keep the files under the work root, and git runs there, because a stub is its own repository. [[spec/design_output/vehicle#the-work-root-inherits]]
 async function doorsHere() {
   const outside = proc();
   const files = disk();
   const time = clock();
-  const said = configHere(files, rootsHere(files, process.env, root));
+  const roots = rootsHere(files, process.env, root);
+  const said = configHere(files, roots);
   return {
     proc: outside,
     disk: files,
     clock: time,
-    git: git(outside, root),
+    git: git(outside, roots.work),
     log: log(files, time, {
-      folder: join(root, ".se", "log"),
+      folder: join(roots.work, ".se", "log"),
       level: await said.ask("log.level"),
     }),
     config: said,
+    method: roots.method,
+    work: roots.work,
     words: await said.ask("names.words"),
     stale: await said.ask("work.staleAfter"),
     fails: await said.ask("work.failsBeforePerson"),
@@ -205,19 +205,19 @@ const verbs = {
   },
   branch: {
     says: "work branches and groups: new, take, sync, done, list, merge, close, pull, test",
-    run: async () => work(root, rest, it),
+    run: async () => work(it.work, rest, it),
   },
   cloud: {
     says: "the cloud routine: trigger",
-    run: async () => cloud(root, rest, it),
+    run: async () => cloud(it.work, rest, it),
   },
   ticket: {
     says: "tickets that stay on this box: note, update, open, todo",
-    run: async () => ticket(root, rest, it),
+    run: async () => ticket(it.work, rest, it),
   },
   retro: {
     says: "the retro a group's route runs: notes",
-    run: async () => retro(root, rest, it),
+    run: async () => retro(it.work, rest, it),
   },
   mint: {
     says: "write a new note of a kind, in the shape its schema names",
@@ -699,8 +699,13 @@ function projections() {
   return files.exists(at) ? entriesIn(files.read(at)) : [];
 }
 
+// A target lands in the work root, and a source reads off both. [[spec/design_output/vehicle#the-work-root-inherits]]
 function under(path) {
-  return join(root, String(path).split("/").join(sep));
+  return join(it.work, String(path).split("/").join(sep));
+}
+
+function readsAll(entries) {
+  return readAll(entries, inherits(files, it.method, it.work), rooted(files, it.work));
 }
 
 // [[spec/design_output/projection#check-refuses-a-stale-one]]
@@ -711,7 +716,7 @@ function projectionsHold() {
     return 0;
   }
 
-  const said = readAll(entries, files, under);
+  const said = readsAll(entries);
   if (said.faults.length) {
     for (const one of said.faults) console.error(one);
     console.error("A source stands away from the shape beside it, so no target is written.");
@@ -731,7 +736,7 @@ function projectionsHold() {
 // [[spec/design_output/projection#who-projects-and-when]]
 function project() {
   const entries = projections();
-  const { wanted, standing } = readAll(entries, files, under);
+  const { wanted, standing } = readsAll(entries);
 
   for (const [path, text] of wanted) {
     files.makeDir(dirname(under(path)));
@@ -914,24 +919,21 @@ function listRules() {
   return 0;
 }
 
+// The standing layer joins the method's guidance with the work root's, file by file. [[spec/design_output/vehicle#the-work-root-inherits]]
 async function standing() {
   if (!files.exists(GUIDANCE)) {
     console.error("There is no spec/guidance, so nothing is handed over.");
     return 2;
   }
-  const notes = namesIn(GUIDANCE, ".md")
-    .filter((name) => !isDraft(name))
-    .map((n) => ({ name: n, text: files.read(join(GUIDANCE, n)) }))
-    .filter(({ text }) => bindsHere(text, process.env));
-  const said = standingLayer(notes);
-  if (!said) {
+  const stop = (await settings.ask("stop.enabled")) !== false;
+  const said = guidanceHere(files, it.method, it.work, process.env, stop);
+  if (!said.helper) {
     console.log("No guidance note carries an Actionables chapter.");
     return 0;
   }
-  console.log(said);
+  console.log(said.helper);
   console.log("");
-  const stop = (await settings.ask("stop.enabled")) !== false;
-  console.log(canary({ ...countsOf(notes), stop }));
+  console.log(said.sentence);
   return 0;
 }
 

@@ -24,7 +24,7 @@ const TRAVELS = "spec/tickets";
 const SCHEMAS = "spec/schemas";
 
 export function ticket(root, argv, doors) {
-  const it = { root, ...doors };
+  const it = { root, method: root, work: root, ...doors };
   const what = argv[0];
   const name = argv[1];
   const doing = { note, update, open, todo };
@@ -71,7 +71,7 @@ function note(it, name, argv) {
     return 2;
   }
 
-  const held = processAt(it.disk, it.root, it.join, NOTE);
+  const held = processAt(it.disk, it.method, it.join, NOTE);
   if (held.why) {
     console.error(held.why);
     return 1;
@@ -219,7 +219,7 @@ function update(it, name, argv) {
   const text = it.disk.read(at.path);
   const front = readNote(text).front.said ?? {};
   const asked = (argv ?? []).map((one) => /^--process=(.+)$/.exec(one)).find(Boolean);
-  const held = processAt(it.disk, it.root, it.join, asked ? asked[1] : front.process);
+  const held = processAt(it.disk, it.method, it.join, asked ? asked[1] : front.process);
   if (held.why) {
     console.error(held.why);
     return 2;
@@ -303,7 +303,7 @@ function firstLeafOf(route) {
 }
 
 export function schemasHere(it) {
-  const at = it.join(it.root, ...SCHEMAS.split("/"));
+  const at = it.join(it.method ?? it.root, ...SCHEMAS.split("/"));
   if (!it.disk.exists(at)) return new Map();
   return schemasFrom(
     it.disk

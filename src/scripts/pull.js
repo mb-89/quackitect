@@ -4,6 +4,7 @@
 // [[spec/design_output/pull#the-five-answers]]
 
 import { actionables } from "../../.claude/skills/level0/lib/guidance.js";
+import { inherits } from "../../.claude/skills/level0/lib/layer.js";
 import {
   checkNote,
   entriesIn,
@@ -91,8 +92,11 @@ export function holdsVerb(need, verbs = VERBS) {
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 export function handOf(it) {
-  for (const path of [BOX, COPY]) {
-    const at = it.join(it.root, ...path.split("/"));
+  for (const [root, path] of [
+    [it.root, BOX],
+    [it.method ?? it.root, COPY],
+  ]) {
+    const at = it.join(root, ...path.split("/"));
     if (!it.disk.exists(at)) continue;
     const id = parsed(it.disk.read(at))?.id;
     if (id) return `box ${id}`;
@@ -791,9 +795,10 @@ function askOf(text) {
     : "";
 }
 
+// A note the work root names again replaces the method's. [[spec/design_output/vehicle#the-work-root-inherits]]
 function guidanceText(it, path) {
-  const at = it.join(it.root, ...`${path}.md`.split("/"));
-  return it.disk.exists(at) ? it.disk.read(at) : "";
+  const reads = inherits(it.disk, it.method ?? it.root, it.root);
+  return reads.exists(`${path}.md`) ? reads.read(`${path}.md`) : "";
 }
 
 
@@ -1164,10 +1169,10 @@ function formFault(it, field, rows, where, one, held) {
   if (form === "link") {
     if (rows.length !== 1)
       return [`${where} holds ${rows.length} line(s), and a link is one.`];
+    // A link resolves in the work root first, then in the method root. [[spec/design_output/vehicle#the-work-root-inherits]]
     const said = bare(rows[0]);
-    const at = it.join(it.root, ...said.split("/"));
-    const note = it.join(it.root, ...`${said}.md`.split("/"));
-    return it.disk.exists(at) || it.disk.exists(note)
+    const reads = inherits(it.disk, it.method ?? it.root, it.root);
+    return reads.exists(said) || reads.exists(`${said}.md`)
       ? []
       : [`${where} names ${said}, which resolves nowhere.`];
   }
@@ -1234,7 +1239,7 @@ function voiceFaults(it, one, leaf, chapter) {
   let ran;
   try {
     ran = it.proc.run(
-      [it.vale, `--config=${VALE_CONFIG}`, `--path=${one.path}`, "--output=JSON", "--no-exit"],
+      [it.vale, `--config=${it.join(it.method, VALE_CONFIG)}`, `--path=${one.path}`, "--output=JSON", "--no-exit"],
       { stdin: text, cwd: it.root },
     );
   } catch {

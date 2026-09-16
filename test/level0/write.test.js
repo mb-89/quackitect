@@ -4,20 +4,15 @@
 // [[spec/design_output/level0#the-write-door]]
 
 import assert from "node:assert/strict";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
-import { disk } from "../../src/doors/disk.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import { onWrite } from "../../src/bridge/write.js";
+import { TICKET_SCHEMA as SCHEMA } from "./fixtures.js";
 
 const METHOD = "/tools";
 const WORK = "/stub";
-
-// The schema this tree ships, read once and never written. [[spec/guidance/code/testing]]
-const here = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
-const SCHEMA = disk().read(join(here, "spec", "schemas", "ticket.schema.yaml"));
 
 const GOOD = `---
 kind: [[ticket]]

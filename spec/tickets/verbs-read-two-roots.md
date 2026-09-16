@@ -89,7 +89,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-verbs-read-two-roots
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box ea4589862ac3
@@ -110,20 +110,28 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box ea4589862ac3
+    hash_before: 2fd2a0b4d2b8c8d7f0e1e186d8444361d3f66ec3
+    hash_after: 2fd2a0b4d2b8c8d7f0e1e186d8444361d3f66ec3
+    answered:
+      - name: lint
+        exit: 0
+        said: 14 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
 
 <!-- gain, as text: what is gained by doing it, and not only what it does -->
-A project keeps its own tickets, its own guidance notes and its own overrides, and the vehicle's rules hold over all of it.
+A project keeps its own tickets, its own guidance notes and its own overrides. The vehicle's rules hold over all of it.
 
 <!-- breaks, as text: what breaks if it is never done -->
-A stub's tickets land in the vehicle, or the rules read the stub's guidance as the vehicle's, and the two trees leak into each other.
+A stub's tickets land in the vehicle, or the rules read the stub's guidance as the vehicle's. The two trees leak into each other.
 
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 - ticket note, ticket update, branch take and the pull read and write spec/tickets under the work root
-- the standing layer joins the method's guidance with the work root's, file by file, as spec/design_output/vehicle.md rules under the work root inherits
-- the write door refuses a bad write inside the stub with the vehicle's rules, proven in a test over two fake roots
+- the standing layer joins the method's guidance with the work root's file by file, as [[spec/design_output/vehicle#the-work-root-inherits]] rules
+- the write door refuses a bad write inside the stub with the vehicle's rules, over two fake roots
 - the projections land in the work root and read the method's schema
 
 Read [[spec/design_input/a-stub-takes-its-vehicle]] first, the chapters The stub's files and The bridgehead step by step.
@@ -251,6 +259,14 @@ Eleven tests fail on their own assertion, across five files. Two files are new: 
 <!-- the tree builds and lints -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh lint
+
+### checked
+
+- the change touches the layer, the projection, the guidance door, the command line and the verbs. No stub file moves.
+- every door the change reaches is a fake in its test: the disk, git, the clock and the log. The fixtures stand in one shared module.
+- every changed function carries a comment naming the chapter The work root inherits
 
 ## tests-green
 

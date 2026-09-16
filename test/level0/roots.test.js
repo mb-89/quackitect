@@ -4,17 +4,16 @@
 // [[spec/design_output/vehicle#the-work-root-inherits]]
 
 import assert from "node:assert/strict";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
 import { processHash } from "../../.claude/skills/level0/lib/schema.js";
-import { disk } from "../../src/doors/disk.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { retro } from "../../src/scripts/retro.js";
 import { NOTES, ticket } from "../../src/scripts/ticket.js";
 import { work } from "../../src/scripts/work.js";
+import { NOTE_PROCESS, TICKET_SCHEMA as SCHEMA, TRIVIAL_PROCESS } from "./fixtures.js";
 
 const METHOD = "/tools";
 const WORK = "/stub";
@@ -22,13 +21,6 @@ const SHA = "b818c390c02737351bf1b73aba36a573d34d2ecc";
 const BRANCH = "work/one-group";
 const m = (path) => join(METHOD, ...path.split("/"));
 const w = (path) => join(WORK, ...path.split("/"));
-
-// The schema and the routes this tree ships, read once and never written. [[spec/guidance/code/testing]]
-const here = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
-const real = disk();
-const SCHEMA = real.read(join(here, "spec", "schemas", "ticket.schema.yaml"));
-const NOTE_PROCESS = real.read(join(here, "spec", "processes", "note.yaml"));
-const TRIVIAL_PROCESS = real.read(join(here, "spec", "processes", "trivial.yaml"));
 
 const note = (rule) => `---
 kind: [[guidance]]

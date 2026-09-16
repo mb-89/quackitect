@@ -7,7 +7,7 @@ import { fieldOf } from "./group.js";
 import { NOTES } from "./ticket.js";
 
 export function retro(root, argv, doors) {
-  const it = { root, ...doors };
+  const it = { root, method: root, work: root, ...doors };
   const what = argv[0];
   if (what !== "notes") {
     console.log("Usage: ./RUNME.sh retro <verb>\n");

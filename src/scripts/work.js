@@ -47,7 +47,7 @@ export const DONE = "done";
 export const MERGED = "merged";
 
 export function work(root, argv, doors) {
-  const it = { root, ...doors };
+  const it = { root, method: root, work: root, ...doors };
   const what = argv[0];
   const name = argv[1];
   const doing = {
@@ -89,7 +89,7 @@ export function work(root, argv, doors) {
 
 // [[spec/design_output/work#the-routine-a-verb-names]]
 export function cloud(root, argv, doors) {
-  const it = { root, ...doors };
+  const it = { root, method: root, work: root, ...doors };
   if (argv[0] === "trigger") return trigger(it);
   console.log("Usage: ./RUNME.sh cloud <verb>\n");
   console.log("  trigger       the routine that works a branch, and what stands free");
@@ -900,7 +900,7 @@ function freeChildren(it, name) {
 
 // [[spec/design_output/work#the-merge-lands-the-truth]]
 function checkSays(it) {
-  const ran = it.proc.run([it.node, it.join(it.root, "src", "scripts", "cli.js"), "check"], {
+  const ran = it.proc.run([it.node, it.join(it.method, "src", "scripts", "cli.js"), "check"], {
     cwd: it.root,
   });
   const rows = String(ran.stdout ?? "").trim().split("\n");
