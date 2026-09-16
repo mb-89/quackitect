@@ -67,13 +67,58 @@ test("the shim hands a verb to the vehicle it names", () => {
     });
     assert.equal(ran.exitCode, 0, ran.stderr);
     assert.match(ran.stdout, new RegExp(`method\\s+${either(root)}`), "the vehicle answers");
+    assert.match(ran.stdout, new RegExp(`work\\s+${either(dest)}`, "i"), "the stub is the work");
 
+    const record = JSON.parse(files.read(join(dest, "vehicle.json")));
     const lost = outside.run(["sh", "RUNME.sh", "vehicle"], {
       cwd: dest,
-      env: { SE_VEHICLE: join(where, "nowhere"), HOME: where },
+      env: { SE_VEHICLE: join(where, "nowhere"), SE_REGISTRY: join(where, "empty"), HOME: where },
     });
     assert.equal(lost.exitCode, 1, "a shim finding no vehicle exits one");
-    assert.match(lost.stderr, /vehicle/);
+    assert.equal(lost.stderr.trim().split("\n").length, 1, "one line");
+    assert.ok(lost.stderr.includes(record.upstream), "the line names the upstream");
+    assert.match(lost.stderr, new RegExp(`\\.se/vehicles/${record.name}`), "and the install road");
+  } finally {
+    files.remove(where);
+  }
+});
+
+// [[spec/design_output/vehicle#two-roads-to-the-vehicle]]
+test("the shim finds the vehicle through the register, and hands argv and the work root on", () => {
+  const where = files.tempDir("stub-");
+  const vehicle = join(where, "vehicle");
+  const register = join(where, "register");
+  const dest = join(where, "stub");
+  try {
+    files.makeDir(vehicle);
+    files.write(
+      join(vehicle, "RUNME.sh"),
+      '#!/usr/bin/env sh\nprintf "argv=%s\\n" "$*"\nprintf "work=%s\\n" "$SE_WORK_ROOT"\n',
+    );
+    files.makeDir(register);
+    files.write(
+      join(register, "registry.json"),
+      JSON.stringify([{ id: "abc123", version: "0", method_root: vehicle, registered: "now" }]),
+    );
+    files.makeDir(dest);
+    files.write(
+      join(dest, "vehicle.json"),
+      JSON.stringify({ vehicle: "abc123", name: "acme", upstream: "https://host/a/b.git" }),
+    );
+    files.write(join(dest, "RUNME.sh"), files.read(join(root, "src", "stub", "RUNME.sh")));
+    const env = { SE_VEHICLE: "", SE_REGISTRY: register, HOME: where };
+
+    const ran = outside.run(["sh", "RUNME.sh", "check", "one"], { cwd: dest, env });
+    assert.equal(ran.exitCode, 0, ran.stderr);
+    assert.match(ran.stdout, /argv=check one/, "every argument reaches the vehicle");
+    assert.match(ran.stdout, new RegExp(`work=${either(dest)}`, "i"), "the work root is the stub");
+
+    files.write(join(register, "registry.json"), "[]");
+    const lost = outside.run(["sh", "RUNME.sh", "check"], { cwd: dest, env });
+    assert.equal(lost.exitCode, 1, "an empty register refuses");
+    assert.equal(lost.stderr.trim().split("\n").length, 1, "one line");
+    assert.ok(lost.stderr.includes("https://host/a/b.git"), "the line names the upstream");
+    assert.match(lost.stderr, /\.se\/vehicles\/acme/, "and the install road");
   } finally {
     files.remove(where);
   }

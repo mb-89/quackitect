@@ -89,7 +89,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-shim-resolves-the-vehicle
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -99,6 +99,17 @@ record:
     hand: box d42624a67d18a8 · helper-2
     hash_before: fbab99b6e5e862dea1de4c6602235be3f5fb97b9
     hash_after: fbab99b6e5e862dea1de4c6602235be3f5fb97b9
+  - step: implement/tests-red
+    hand: box d42624a67d18a8
+    hash_before: 6697099e3bfc40b1f914f12560766a523a86e3da
+    hash_after: 6697099e3bfc40b1f914f12560766a523a86e3da
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -170,15 +181,17 @@ pass
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+    ./RUNME.sh branch test test/contract/stub.test.js test/level0/vehicle.test.js
 
-<!-- the form is command -->
+### checked
+
+- the tests touch the shim, the roots function and their two test files, and nothing the ask leaves out
+- the shim reaches the disk and a process, and the contract test drives both for real
+- the test names carry the approach: the register road, the work root, the one refusal line
 
 ### seen
 
-<!-- what you see, and what surprises you -->
-
-<!-- the form is text -->
+Three tests fail where the approach says they fail. The vehicle verb names the vehicle as work inside a stub, the shim exits 1 before it reads a register, and `rootsHere` ignores `SE_WORK_ROOT`. One surprise: the shim's `pwd` answers a slash path on this box, so the test compares paths without regard to the slash and the case.
 
 ## reflect
 
