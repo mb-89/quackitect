@@ -94,7 +94,15 @@ record:
     hand: box 02ae9414623e
     skipped: true
     why: the box leaves it while brand-reads-folder stand open
-step: retro/notes
+  - step: retro/notes
+    hand: box 02ae9414623e
+    hash_before: f23aaa66d1314e6038b873c728bc041ac3f70a4c
+    hash_after: f23aaa66d1314e6038b873c728bc041ac3f70a4c
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+step: retro/write
 ---
 
 # Ask
@@ -146,6 +154,8 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 <!-- retro notes, which passes when the private folder is empty -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh retro notes
 
 ## write
 
