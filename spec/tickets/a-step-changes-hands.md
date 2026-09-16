@@ -232,6 +232,9 @@ record:
     hand: box d895042a7ea3
     hash_before: a9ec355dabadb2e4696a6bdcd31e5ff291bb05f6
     hash_after: f6f38316adb9d2561618371f4841a455772fcc17
+  - step: retro/notes
+    hand: box d895042a7ea3
+    hash_before: 7ae76d292e1960461baeeda6cd6459329aea1e29
 step: retro/notes
 ---
 
