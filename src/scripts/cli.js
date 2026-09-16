@@ -83,6 +83,7 @@ import { voice } from "./voice.js";
 import { retro } from "./retro.js";
 import { ticket } from "./ticket.js";
 import { cloud, work } from "./work.js";
+import { handDoors } from "./hand.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -126,9 +127,7 @@ async function doorsHere() {
     fails: await said.ask("work.failsBeforePerson"),
     refusals: await said.ask("work.refusalsBeforePerson"),
     splits: await said.ask("work.stepsBeforeSplit"),
-    // [[spec/design_output/pull#the-hand-rule]]
-    agent: Boolean(process.env.CLAUDECODE || process.env.CLAUDE_CODE_REMOTE || process.env.SE_CLOUD),
-    cloud: Boolean(process.env.CLAUDE_CODE_REMOTE || process.env.SE_CLOUD),
+    ...handDoors(process.env),
     node: process.execPath,
     join,
   };

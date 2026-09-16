@@ -16,6 +16,7 @@ import {
 } from "../lib/pull.js";
 
 const CLI = ["node", "src/scripts/cli.js"];
+// The hand's session file of [[spec/design_output/pull#the-hand-and-the-hold]], spelled again here because a plugin imports nothing past its own folder.
 const SESSION = ".se/session.json";
 const CONFIG = "spec/config/level0.json";
 const RUNNING = 600000;
@@ -50,10 +51,19 @@ export function register(on, _options) {
   });
 }
 
+// [[spec/design_output/pull#the-hand-and-the-hold]]
 async function wrote($, held) {
-  if (!held.id) return;
+  if (!held.id) return says($, "the session start names no session id, so the hand stands at the box");
   try {
     await $.fs.write(SESSION, `${JSON.stringify(held, null, 2)}\n`);
+  } catch (bad) {
+    says($, `the session file stays unwritten: ${bad?.message ?? bad}`);
+  }
+}
+
+function says($, line) {
+  try {
+    $.ui?.log?.(line);
   } catch {}
 }
 
@@ -68,6 +78,7 @@ async function spawned($, prompt) {
   try {
     said = await $.agent.spawn({
       prompt,
+      own: true,
       description: "a hand of its own works one step",
       subagentType: "general-purpose",
     });

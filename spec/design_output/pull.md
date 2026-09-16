@@ -191,10 +191,10 @@ Such a hand works one step: its hand-back answers `done` and hands nothing
 out. The record names the helper on the leaf, so `not` reads the two hands
 apart.
 
-The wrapper tags every other spawn. Its `agent.spawn` hook reads the session
+Level zero tags every other spawn. Its `agent.spawn` hook reads the session
 file and puts one line at the head of the prompt. The line says this helper
 is the session's own hand, and it pulls under no `--as`. A spawn the wrapper makes
-itself carries no tag, because that hand is its own. So the two kinds of
+itself marks its payload `own`, and carries no tag, because that hand is its own. So the two kinds of
 helper read apart in the prompt and in the record.
 
 # The hand-back

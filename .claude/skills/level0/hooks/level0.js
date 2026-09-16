@@ -7,6 +7,7 @@
 const PORT = 6510;
 const POINTER = ".se/vehicle.json";
 const SESSION = ".se/log/session.jsonl";
+// The hand's session file of [[spec/design_output/pull#the-hand-and-the-hold]], spelled again here because this hook imports nothing.
 const HAND_FILE = ".se/session.json";
 const COMPACT = "session.compact";
 const LIMIT = 4_000_000;
@@ -60,6 +61,7 @@ export function register(on, options) {
   on("turn.step", streams);
   // [[spec/design_output/pull#a-hand-of-its-own]]
   on("agent.spawn", async ($, e, next) => {
+    if (e?.own) return next(e);
     const line = spawnTagOf(await sessionHeld($));
     if (!line) return next(e);
     return next({ ...e, prompt: `${line}\n\n${String(e?.prompt ?? "")}` });

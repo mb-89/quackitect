@@ -82,3 +82,39 @@ test("the spawn hook's line names a helper as the session's own hand", async () 
   assert.equal(line.split("\n").length, 1, "one line");
   assert.match(line, /s7/, "the line names the session");
 });
+
+// [[spec/design_output/pull#a-hand-of-its-own]]
+test("the registered spawn hook puts the line at the head of a helper's prompt", async () => {
+  const said = await spawnsWith({ prompt: "work one step" }, { id: "s7", harness: "claude-code" });
+  assert.match(said.prompt, /^You are the hand of session s7/, "the line opens the prompt");
+  assert.match(said.prompt, /work one step$/, "and the prompt stands under it");
+});
+
+// [[spec/design_output/pull#a-hand-of-its-own]]
+test("a spawn the wrapper makes itself carries no tag", async () => {
+  const said = await spawnsWith({ prompt: "the engine wrote this", own: true }, { id: "s7" });
+  assert.equal(said.prompt, "the engine wrote this", "its own hand reads the prompt as written");
+});
+
+// [[spec/design_output/pull#a-hand-of-its-own]]
+test("a box carrying no session file leaves every prompt as written", async () => {
+  const said = await spawnsWith({ prompt: "work one step" }, null);
+  assert.equal(said.prompt, "work one step");
+});
+
+async function spawnsWith(e, held) {
+  const { register } = await import("../../.claude/skills/level0/hooks/level0.js");
+  const hooks = {};
+  register((event, fn) => {
+    hooks[event] = fn;
+  }, {});
+  const $ = {
+    fs: {
+      read: async () => {
+        if (!held) throw new Error("no session file");
+        return JSON.stringify(held);
+      },
+    },
+  };
+  return hooks["agent.spawn"]($, e, async (said) => said);
+}

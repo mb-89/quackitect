@@ -11,11 +11,14 @@ export const SESSION = ".se/session.json";
 
 const BOX_ID = 12;
 const ANYBODY = "anybody";
-const HARNESS = [
+// [[spec/design_output/pull#the-hand-rule]]
+export const HARNESS = [
   ["CLAUDE_CODE_REMOTE", "claude-code-remote"],
   ["SE_CLOUD", "se-cloud"],
   ["CLAUDECODE", "claude-code"],
 ];
+
+const CLOUD = ["CLAUDE_CODE_REMOTE", "SE_CLOUD"];
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 export function agentOf(env) {
@@ -23,6 +26,15 @@ export function agentOf(env) {
     if (String(env?.[key] ?? "").trim()) return name;
   }
   return "";
+}
+
+// [[spec/design_output/pull#the-hand-rule]]
+export function handDoors(env) {
+  return {
+    env,
+    agent: Boolean(agentOf(env)),
+    cloud: CLOUD.some((key) => String(env?.[key] ?? "").trim()),
+  };
 }
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]

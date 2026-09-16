@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-hand-carries-a-step
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -150,6 +150,14 @@ record:
     hand: box ee33ce836a4d
     hash_before: 4cce2a432a50729f9b9e1eea101d8dc41ae70555
     hash_after: 4cce2a432a50729f9b9e1eea101d8dc41ae70555
+  - step: implement/change
+    hand: box ee33ce836a4d · claude-code-remote
+    hash_before: 6e2c30068b67d7535d9cee93a6f8d2b132e0bed5
+    hash_after: 6e2c30068b67d7535d9cee93a6f8d2b132e0bed5
+    answered:
+      - name: lint
+        exit: 0
+        said: 42 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
@@ -266,18 +274,16 @@ Six tests fail on their own assertion, and one passes: the hold already slugs a 
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
 
-./RUNME.sh lint src test .claude
+./RUNME.sh lint src test .claude spec/design_output
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
-- the change touches `src/scripts` and the two plugin folders, which the ask's table names.
+- the change stays in `src/scripts`, the two plugin folders and their tests, which the ask names.
 - the hand reaches the disk and git, and `test/level0/hand.test.js` takes a fake for each.
 - each new function points at the design output section the approach names.
 
