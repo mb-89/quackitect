@@ -89,7 +89,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-sidebar-makes-both
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 1eeed4143ad0
@@ -116,6 +116,17 @@ record:
     hash_after: fbaf9af3e5dc517639101f0aab0e4ae1ca7ff9b4
     answered:
       - name: lint
+        exit: 0
+        said: 15 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box 1eeed4143ad0
+    hash_before: b7b591624750d1df9f4241c023031128af30f9d4
+    hash_after: b7b591624750d1df9f4241c023031128af30f9d4
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 52 test(s) pass in 3 file(s)
+      - name: check
         exit: 0
         said: 15 stand at warning, which the panel draws and check allows.
 ---
@@ -239,20 +250,31 @@ Five tests fail, and each fails on the line I expect. The three sidebar tests fi
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+Two action buttons stand in a section named `engine` in the sidebar. One runs the vehicle verb, one the stub verb, each over a folder the owner picks in the editor dialog. The declaration grows one field, `asks`, and the sidebar reads it by the key a run message carries. The editor door grows one call, `asks`, which opens the dialog and answers the path or the empty string. An empty answer ends the press, and the log takes no line.
+
+The verbs stay the ones the shell runs, in a terminal, so a refusal from a verb stands where the owner reads it. The contract test over the tree now counts seven drawn controls, and a new contract test reads the two entries off the declaration. The second line of the ask took code spans around its two commands, so the rules pass over the tree.
+
+### checked
+
+- the change touches the schema, the sidebar, the editor door, the design output and three tests
+- the folder dialog is one call on the editor door, and the fake door answers it
+- the sidebar, the door and the tests each link the chapter Two buttons make both
 
 # verdict
 

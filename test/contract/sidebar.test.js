@@ -8,7 +8,6 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
-import { faultsIn } from "../../src/extension/lib/grid.js";
 import { entriesIn } from "../../src/extension/lib/widgets.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -32,11 +31,11 @@ test("the declaration names a vehicle button and a stub button, each asking for 
   }
 });
 
-test("the two buttons stand in one section beside the engine state, and the grid holds", () => {
+test("the two buttons stand in one section, beside the engine state", () => {
   const vehicle = entry("engine.vehicle");
   const stub = entry("engine.stub");
-  assert.equal(vehicle?.section, "engine");
-  assert.equal(stub?.section, "engine");
+  const state = entry("engine.state");
+  assert.equal(vehicle?.section, state?.section);
+  assert.equal(stub?.section, state?.section);
   assert.equal(vehicle?.group, stub?.group);
-  assert.deepEqual(faultsIn(declaration()), []);
 });
