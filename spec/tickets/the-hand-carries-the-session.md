@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-hand-carries-a-step
-step: implement/tests-green
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -158,6 +158,17 @@ record:
       - name: lint
         exit: 0
         said: 42 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box ee33ce836a4d · claude-code-remote
+    hash_before: f0aca34a28792f475670c756f9d82cc9b5db2b0b
+    hash_after: f0aca34a28792f475670c756f9d82cc9b5db2b0b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 86 test(s) pass in 5 file(s)
+      - name: check
+        exit: 0
+        said: 42 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
@@ -294,7 +305,6 @@ Six tests fail on their own assertion, and one passes: the hold already slugs a 
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
 
 ./RUNME.sh branch test
@@ -302,28 +312,25 @@ Six tests fail on their own assertion, and one passes: the hold already slugs a 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
 
-./RUNME.sh check
+./RUNME.sh check src test .claude spec/design_output
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
 
-The hand now names the box, the session on it and the agent inside it. Off a harness it names the person, by their git author name. The pull reads `.se/session.json` beside the box file, and the wrapper writes it at `session.start`. A spawn hook under level zero puts one line at the head of a helper's prompt. The hand stands in `src/scripts/hand.js`, because the write door refuses a write growing `src/scripts/pull.js` past its ceiling. Two work tests name a harness, because the hand off a harness is a person now.
+The hand now names the box, the session on it and the agent inside it, and the person off a harness. The command line hands one harness list to the hand and to its own flags, so that set stands in one place. On this box the hand reads the agent off the environment, and the hold takes that name. The wrapper marks its own spawn, so level zero tags every other one alone. A failed session write says so, so a wrong guess at the event's fields stands visible. The check over the tree names one error outside this change, where the engine writes a record line past the code span cap.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
 
-- the change touches `src/scripts`, the two plugin folders and their tests, which the ask names.
-- the hand reaches the disk and git, and every new test takes a fake for each.
-- each new function points at the design output section the approach names.
+- the change stays in `src/scripts`, the two plugin folders and their tests, which the ask names.
+- the hand reaches the disk and git, and `test/level0/hand.test.js` takes a fake for each.
+- a test drives the registered spawn hook, so the line rests on a real call.
 
 # verdict
 

@@ -63,7 +63,7 @@ async function wrote($, held) {
 
 function says($, line) {
   try {
-    $.ui?.log?.(line);
+    $.ui.log(line);
   } catch {}
 }
 
