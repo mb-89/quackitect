@@ -185,7 +185,9 @@ export function placesIn(note, schema) {
 // [[spec/design_output/schema#the-three-places]]
 function fieldsHeld(front, level) {
   const walk = entriesIn(front.steps, "steps");
-  const holder = walk.find((one) => one.path === String(front.step ?? ""));
+  // A ticket with no step stands at its first leaf, the way the pull reads it. [[spec/design_output/schema#the-three-places]]
+  const step = String(front.step ?? "").trim();
+  const holder = step ? walk.find((one) => one.path === step) : walk.find((one) => one.leaf);
   if (!holder) return [];
 
   const deep = level + holder.path.split("/").length;

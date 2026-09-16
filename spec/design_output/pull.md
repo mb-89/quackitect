@@ -215,9 +215,13 @@ hash is no ancestor of the tip. Then the hold drops, and the hand pulls again.
 A hand fills the slots through the write door, or hands the fields back as
 the pull's payload. `--fields '{"verdict": "pass"}'` carries one key per
 field of the leaf in hand, and `checked` where a checklist stands. The engine
-writes each text under its heading, past the mint's comments. Then it runs
-the checks over the file as it stands. The pull refuses a key naming no
-field of the leaf.
+puts each text under its heading in memory, past the mint's comments, and runs
+the checks over that text. The pull refuses a key naming no field of the leaf.
+
+A refused payload reaches no disk. It rides the hold, so the next hand-back
+with no `--fields` meets the same checks over the same text. A refusal at the
+cap inserts the person step on the ticket without the payload, so a word the
+rules refuse reaches no branch.
 
 ## The checks
 

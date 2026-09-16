@@ -898,7 +898,7 @@ function handBack(it, who, name, verdict) {
       `${held.ticket} at ${held.step} answered already, and the record holds it.`,
     ]);
   }
-  if (fieldOf(one.text, "step") !== held.step) {
+  if ((fieldOf(one.text, "step") || leavesOf(one.front)[0]?.path) !== held.step) {
     dropHold(it, who.hand);
     say(REFUSED, [
       `${held.ticket} stands at ${fieldOf(one.text, "step") || "no step"} now, and the hold names ${held.step}.`,
@@ -923,17 +923,17 @@ function handBack(it, who, name, verdict) {
     return 1;
   }
 
-  // [[spec/design_output/pull#the-fields-ride-the-payload]]
-  const payload = flagValue(it.argv ?? [], "--fields");
+  // A payload rides the hold until the checks pass, so a refused word reaches no disk. [[spec/design_output/pull#the-fields-ride-the-payload]]
+  const payload = flagValue(it.argv ?? [], "--fields") || held.payload || "";
   if (payload) {
     const put = withPayload(one.text, held.step, payload);
     if (put.why) {
       say(REFUSED, [put.why]);
       return 1;
     }
+    Object.assign(one, { stood: one.text, payload });
     one.text = put.text;
     one.front = frontOf(one.text);
-    it.disk.write(at, one.text);
   }
   const verdictField = leaf.evidence.find((field) => field.form === "verdict");
   if (verdictField && verdict.said) {
@@ -977,8 +977,8 @@ function handBack(it, who, name, verdict) {
 // [[spec/design_output/pull#the-hand-back-refused]]
 function refused(it, who, one, leaf, held, found) {
   const count = Number(held.refused ?? 0) + 1;
-  const most = Number(it.refusals);
-  if (most > 0 && count >= most) {
+  if (Number(it.refusals) > 0 && count >= Number(it.refusals)) {
+    if (one.stood) one.text = one.stood;
     const put = withPersonStep(
       it,
       one,
@@ -997,7 +997,7 @@ function refused(it, who, one, leaf, held, found) {
       return 1;
     }
   }
-  writeHold(it, who.hand, { ...held, refused: count });
+  writeHold(it, who.hand, { ...held, refused: count, payload: one.payload ?? held.payload });
   say(REFUSED, [
     ...found,
     "",
