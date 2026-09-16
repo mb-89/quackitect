@@ -1,17 +1,25 @@
-// What alt+? and alt+f open in the details pane: how the window works, and how
-// the filter reads. The header names the keys, and these say the rest.
+// What alt+? and alt+f open in the pane: how the window works, and how the
+// filter reads. The strip names the tabs, and these say every key.
 // [[spec/design_output/viewer#the-help]]
 
 package main
 
 const HelpText = `THE WINDOW
 
-The log stands on the left, one line per thing that happens. The pane on the
-right shows one of three things, and the key that opens it closes it again.
+A strip of tabs stands at the top, the open tab on the left, one pane on the
+right and the status marks at the foot. The pane shows one of three things, and
+the key that opens it closes it again.
 
   enter          the details of the selected line
   alt+?          this help
   alt+f          the filter
+
+THE TABS
+
+  1 to 9         open the tab at that place
+
+A number past the tabs leaves the open one alone. The filter line takes
+letters, so a number types into it while it stands open.
 
 KEYS
 
@@ -58,8 +66,8 @@ prompt, and a reply shows every prompt of its turn. Every other line shows the f
 
 THE FILTER
 
-alt+f opens a line to type the filter into. While a filter holds, alt+f in
-the header stands in bold red. Clear the line and every line comes back.`
+alt+f opens a line to type the filter into. While a filter holds, the funnel in
+the footer stands red. Clear the line and every line comes back.`
 
 const FilterHelp = `THE FILTER
 

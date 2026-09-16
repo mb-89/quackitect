@@ -18,3 +18,4 @@
 # default branch, so committing them is what keeps level zero active there.
 
 node_modules/
+src/viewer/viewer

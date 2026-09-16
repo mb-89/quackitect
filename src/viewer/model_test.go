@@ -10,7 +10,21 @@ import (
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/x/ansi"
 )
+
+// [[spec/design_output/viewer#the-window-is-a-split]]
+type stubTab struct{}
+
+func (stubTab) Name() string { return "work" }
+
+func (stubTab) Left(m *model, w, rows int) string {
+	return strings.TrimSuffix(strings.Repeat("the work stands here\n", rows+namesWide), "\n")
+}
+
+func (stubTab) Detail(m *model, w int) []part { return []part{{text: "the work details"}} }
+
+func (stubTab) Narrowed(m *model) bool { return false }
 
 func row(at int, door, said string) Record {
 	return Record{
@@ -23,7 +37,7 @@ func row(at int, door, said string) Record {
 
 func window(n int) model {
 	m := newModel("no/such/log.jsonl", time.UTC)
-	m.w, m.h = 120, 10+headWide
+	m.w, m.h = 120, 10+namesWide+headWide+footWide
 	for at := 1; at <= n; at++ {
 		m.all = append(m.all, row(at, "tool", fmt.Sprintf("line %d", at)))
 	}
@@ -210,20 +224,83 @@ func erase(m model, n int) model {
 	return m
 }
 
-// [[spec/design_output/viewer#the-header]]
-func TestTheHeaderNamesTheColumnsAndTheThreeKeysAboveARule(t *testing.T) {
+// [[spec/design_output/viewer#the-header-holds-the-tabs]]
+func TestTheStripNamesEveryTabAndTheHelpKeyAboveARule(t *testing.T) {
 	t.Parallel()
 	lines := strings.Split(window(3).View(), "\n")
-	for _, want := range []string{"time", "level", "kind", "said", "enter details", "alt+? help", "alt+f filter", "alt+L log lvl: INFO"} {
+	for _, want := range []string{"1 log", "alt+? help"} {
 		if !strings.Contains(lines[0], want) {
-			t.Fatalf("the first line names %q, and reads %q", want, lines[0])
+			t.Fatalf("the strip names %q, and reads %q", want, lines[0])
+		}
+	}
+	for _, gone := range []string{"enter details", "alt+f filter", "log lvl"} {
+		if strings.Contains(lines[0], gone) {
+			t.Fatalf("the strip names the tabs alone, and reads %q", lines[0])
 		}
 	}
 	if !strings.Contains(lines[1], "────") {
 		t.Fatalf("the second line is a rule, and reads %q", lines[1])
 	}
-	if !strings.Contains(lines[2], "line 1") {
-		t.Fatalf("the log starts under the rule, and the third line reads %q", lines[2])
+	for _, want := range []string{"time", "level", "kind", "said"} {
+		if !strings.Contains(lines[2], want) {
+			t.Fatalf("the tab names its columns under the rule, and the third line reads %q", want)
+		}
+	}
+	if !strings.Contains(lines[3], "line 1") {
+		t.Fatalf("the log starts under the column names, and the fourth line reads %q", lines[3])
+	}
+}
+
+// [[spec/design_output/viewer#a-number-opens-a-tab]]
+func TestANumberOpensTheTabAtThatPlaceAndAnyOtherLeavesTheOpenOne(t *testing.T) {
+	t.Parallel()
+	m := window(3)
+	m.tabs = append(m.tabs, stubTab{})
+	m = press(m, "2")
+	if m.open != 1 {
+		t.Fatalf("2 opens the second tab, and tab %d stands open", m.open)
+	}
+	strip := strings.Split(m.View(), "\n")[0]
+	if !strings.Contains(strip, "1 log") || !strings.Contains(strip, "2 work") {
+		t.Fatalf("the strip numbers every tab, and reads %q", strip)
+	}
+	if !strings.Contains(m.View(), "the work stands here") {
+		t.Fatalf("the open tab draws the left side, and the window reads:\n%s", m.View())
+	}
+	for _, name := range []string{"3", "9"} {
+		if m = press(m, name); m.open != 1 {
+			t.Fatalf("%s names no tab and leaves the open one, and tab %d stands open", name, m.open)
+		}
+	}
+	if m = press(m, "1"); m.open != 0 {
+		t.Fatalf("1 goes back to the log, and tab %d stands open", m.open)
+	}
+}
+
+// [[spec/design_output/viewer#the-footer-carries-status]]
+func TestTheFooterCarriesTheFloorAndAFunnelAtFixedPlaces(t *testing.T) {
+	t.Parallel()
+	m := window(5)
+	lines := strings.Split(m.View(), "\n")
+	if len(lines) != headWide+namesWide+m.rows()+footWide {
+		t.Fatalf("the window stands headWide, the tab and footWide high, and drew %d lines", len(lines))
+	}
+	rule, marks := lines[len(lines)-2], lines[len(lines)-1]
+	if !strings.Contains(rule, "────") {
+		t.Fatalf("a rule stands over the marks, and reads %q", rule)
+	}
+	if !strings.Contains(marks, "INFO") || !strings.Contains(marks, dimStyle.Render("▼")) {
+		t.Fatalf("the marks carry a dark funnel and the floor, and read %q", marks)
+	}
+	wide := ansi.StringWidth(marks)
+	m = typed(alt(m, 'f'), "line 3")
+	m = press(m, "enter")
+	marks = strings.Split(m.View(), "\n")[len(lines)-1]
+	if !strings.Contains(marks, levelStyle("error").Render("▼")) {
+		t.Fatalf("a held filter lights the funnel, and the marks read %q", marks)
+	}
+	if ansi.StringWidth(marks) != wide {
+		t.Fatalf("the marks stand at fixed places, and moved from %d to %d columns", wide, ansi.StringWidth(marks))
 	}
 }
 
@@ -231,7 +308,7 @@ func TestTheHeaderNamesTheColumnsAndTheThreeKeysAboveARule(t *testing.T) {
 func TestAltLRaisesTheFloorAndComesRoundAgain(t *testing.T) {
 	t.Parallel()
 	m := newModel("no/such/log.jsonl", time.UTC)
-	m.w, m.h = 120, 10+headWide
+	m.w, m.h = 120, 10+namesWide+headWide+footWide
 	for at, level := range []string{"debug", "info", "warn", "error", "fatal", ""} {
 		r := row(at+1, "hook", "a "+level+" line")
 		r.Level = level
@@ -243,8 +320,8 @@ func TestAltLRaisesTheFloorAndComesRoundAgain(t *testing.T) {
 	if shown() != 5 {
 		t.Fatalf("the floor opens at info and shows 5 rows, and it shows %d", shown())
 	}
-	if !strings.Contains(strings.Split(m.View(), "\n")[0], "alt+L log lvl: INFO") {
-		t.Fatalf("the header names the floor, and reads %q", strings.Split(m.View(), "\n")[0])
+	if !strings.Contains(m.renderMarks(), "INFO") {
+		t.Fatalf("the footer names the floor, and reads %q", m.renderMarks())
 	}
 	for _, want := range []struct {
 		floor string
@@ -254,8 +331,8 @@ func TestAltLRaisesTheFloorAndComesRoundAgain(t *testing.T) {
 		if m.floor != want.floor || shown() != want.rows {
 			t.Fatalf("alt+l brings the floor to %s with %d rows, and stands at %s with %d", want.floor, want.rows, m.floor, shown())
 		}
-		if !strings.Contains(strings.Split(m.View(), "\n")[0], "log lvl: "+strings.ToUpper(want.floor)) {
-			t.Fatalf("the header names %s, and reads %q", want.floor, strings.Split(m.View(), "\n")[0])
+		if !strings.Contains(m.renderMarks(), pad(strings.ToUpper(want.floor), floorWide)) {
+			t.Fatalf("the footer names %s, and reads %q", want.floor, m.renderMarks())
 		}
 	}
 }
@@ -304,9 +381,8 @@ func TestAHeldFilterWearsRedAltFAndAClearedLineBringsEveryRowBack(t *testing.T) 
 	if m.pane != paneShut || len(m.view) != 1 {
 		t.Fatalf("enter closes the filter pane and keeps the filter, and got pane %d view %v", m.pane, m.view)
 	}
-	head := strings.Split(m.renderHeader(), "\n")[0]
-	if !strings.Contains(head, levelStyle("error").Render("alt+f filter")) {
-		t.Fatalf("a held filter wears alt+f in bold red, and the header reads %q", head)
+	if !strings.Contains(m.renderMarks(), levelStyle("error").Render("▼")) {
+		t.Fatalf("a held filter lights the funnel, and the marks read %q", m.renderMarks())
 	}
 	m = erase(alt(m, 'f'), len("line 3"))
 	if !m.filter.Empty() || len(m.view) != 5 {
@@ -315,9 +391,8 @@ func TestAHeldFilterWearsRedAltFAndAClearedLineBringsEveryRowBack(t *testing.T) 
 	if m.pane != paneFilter {
 		t.Fatal("the filter pane stands open while the line clears")
 	}
-	head = strings.Split(m.renderHeader(), "\n")[0]
-	if !strings.Contains(head, dimStyle.Render("alt+f filter")) {
-		t.Fatalf("a dropped filter wears alt+f as it did, and the header reads %q", head)
+	if !strings.Contains(m.renderMarks(), dimStyle.Render("▼")) {
+		t.Fatalf("a dropped filter darkens the funnel, and the marks read %q", m.renderMarks())
 	}
 }
 
@@ -403,9 +478,8 @@ func TestAltQKeepsThePromptsAndTheRepliesAndTheSameChordClearsIt(t *testing.T) {
 	if m.input.Value() != talkFilter || len(m.view) != 3 || m.pane != paneShut {
 		t.Fatalf("alt+q keeps the two prompts and the reply and opens no pane, and got %q %v %d", m.input.Value(), m.view, m.pane)
 	}
-	head := strings.Split(m.renderHeader(), "\n")[0]
-	if !strings.Contains(head, levelStyle("error").Render("alt+f filter")) {
-		t.Fatalf("a filter alt+q sets wears alt+f in bold red, and the header reads %q", head)
+	if !strings.Contains(m.renderMarks(), levelStyle("error").Render("▼")) {
+		t.Fatalf("a filter alt+q sets lights the funnel, and the marks read %q", m.renderMarks())
 	}
 	m = chord(m, altQ)
 	if !m.filter.Empty() || len(m.view) != 6 || m.input.Value() != "" {
@@ -424,9 +498,9 @@ func TestAnotherChordReplacesTheFilterAndLeavesTheHeaderShort(t *testing.T) {
 	if m.input.Value() != talkFilter {
 		t.Fatalf("a second chord writes its own filter, and got %q", m.input.Value())
 	}
-	head := strings.Split(m.renderHeader(), "\n")[0]
-	if strings.Contains(head, "shift") || strings.Contains(head, "alt+q") {
-		t.Fatalf("the header names no chord, and reads %q", head)
+	strip := m.renderStrip()
+	if strings.Contains(strip, "shift") || strings.Contains(strip, "alt+q") {
+		t.Fatalf("the strip names no chord, and reads %q", strip)
 	}
 	if !strings.Contains(FilterHelp, "alt+shift+f") || !strings.Contains(FilterHelp, "alt+q") {
 		t.Fatal("the filter pane names both chords")

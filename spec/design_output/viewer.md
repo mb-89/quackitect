@@ -4,13 +4,14 @@ kind: [[design_output]]
 
 # Scope
 
-`src/viewer` holds the log viewer. This note covers the window, its keys, the
-filter, and how a line arrives.
+`src/viewer` holds the log viewer. This note covers the window, its tabs, its
+keys, the filter, and how a line arrives.
 
 # The viewer
 
-`./RUNME.sh log` opens the log viewer in the terminal it stands in. The log sits
-on the left, and the details of one row open on the right.
+`./RUNME.sh log` opens the viewer in the terminal it stands in. The window
+carries a strip of tabs, the open tab on the left, one pane on the right and a
+footer of status marks. The log is the first tab.
 
 It is a Go program on Bubble Tea, in `src/viewer`. It reads
 `.se/log/session.jsonl`, the one file every writer appends to. For details,
@@ -20,6 +21,7 @@ see [[spec/design_output/log#every-writer-appends]].
 
 | key | what it does |
 |---|---|
+| `1` to `9` | open the tab at that place |
 | `w`, `s` | move up and down the log |
 | up, down | scroll the details, and move the log while no details stand open |
 | Enter | open the details, and Enter again closes them |
@@ -58,24 +60,64 @@ hidden until the floor comes round to it. The filter narrows what the floor
 leaves. A row naming no level, or a level nobody knows, stands as `info`, so it
 shows at the opening floor.
 
-The header names the floor beside the key, as `alt+L log lvl: INFO`, and in
-red while the floor stands off `info`.
+The footer names the floor at its right end, and the help names the key.
 
-# The header
+# The header holds the tabs
 
-Two lines stand above the log at every size. The first names the columns and,
-at its right end, the three keys opening the pane, `enter details`, `alt+?
-help` and `alt+f filter`, then the floor as `alt+L log lvl: INFO`. The second
-is a rule. The header spans the whole window, so the pane opens under it too.
+One line stands at the top, and a rule under it. The line carries the tabs, in
+a row, and `alt+? help` at its right end. Those two are the whole header.
 
-While a filter holds, `alt+f filter` stands in bold red. A cleared line drops
-the filter, and the key goes back to grey.
+A tab draws as its number and its name, as `1 log`. The open tab stands in
+blue, and the rest stand grey. `alt+? help` stands in blue while the help is
+open.
+
+## A number opens a tab
+
+A number one to nine opens the tab at that place, wherever a field takes no
+letters. A number past the tabs leaves the open one alone. Nine tabs is the
+ceiling, and a tree wanting a tenth says so then.
+
+The filter line takes letters, so a number types into it, and the numbers reach
+the tabs again once it lets go.
+
+## The columns stand still
+
+The column names belong to the tab, not to the header, so each tab names its
+own. The log names `time`, `level`, `kind` and `said`, and the line stands
+still while the rows scroll under it.
+
+# The window is a split
+
+The left side holds the open tab, and the right side holds one pane: the
+details, the help or the filter. The key opening one closes it, and the details
+are the resting state. A shut pane gives the whole width to the tab.
+
+`tab` in `tabs.go` is what a tab carries: its name, the left side it draws,
+what the details hold, and whether a filter holds in it. So a tab after the log
+is a type and no change to the frame.
+
+# The footer carries status
+
+A rule stands under the split, and the marks under it. Each mark stands at a
+fixed place, so nothing shifts as one comes and goes, and a mark stands dark
+where its thing stands off.
+
+| where | the mark | it stands when |
+|---|---|---|
+| the right end | the floor, in four columns | always |
+| beside it | a funnel | a filter holds in the open tab |
+
+The floor reads as its first four letters in capitals, and wears the colour of
+the level it names, so `INFO` stands dark and `WARN` stands amber. The funnel
+stands red while a filter holds, and dark otherwise. The list grows as the tree
+grows.
 
 # The help
 
-`alt+?` shows the help in the pane, and `?` alone does the same. The help
-names every key, the columns, the colours, what the details show and how the
-filter opens. `help.go` holds it, beside the filter's own text.
+`alt+?` shows the help in the pane, and it is the one way there. The help names
+every key and the numbers opening the tabs. It names the floor under `alt+l`,
+the columns and the colours. It names what the details show and how the filter
+opens. `help.go` holds it, beside the filter's own text.
 
 # The filter pane takes letters
 
@@ -108,9 +150,9 @@ one too.
 - `alt+shift+f` keeps every line of the selected line's kind. On a tool line the kind is the tool, as `Read`.
 
 The key writes its filter into the filter line, as `kind: /^prompt$/`, so it
-reads and edits like one a person types. The same key again clears the
-filter. The filter pane names each key, and the header stays at three. The
-floor under `alt+l` keeps a level, so no key filters by level.
+reads and edits like one a person types. The same key again clears the filter.
+The filter pane names each key, and the strip names none. The floor under
+`alt+l` keeps a level, so no key filters by level.
 
 ## A name nobody knows
 
