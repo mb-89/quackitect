@@ -74,6 +74,10 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[group]]
 depends_on: ["the-agent-pulls-a-ticket"]
+record:
+  - step: sync
+    hand: box 747cff5c2f2a
+    hash_before: 351643baac99a8a434a3205d269828f05fd08f59
 ---
 
 # Ask
