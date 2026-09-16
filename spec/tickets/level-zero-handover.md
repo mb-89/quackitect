@@ -1,7 +1,8 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: soon
+step: design/draft
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -27,7 +28,7 @@ steps:
             says: pass or fail, with findings one a line
   - name: implement
     reads: [[spec/guidance/code/testing]]
-    needs: ["work test"]
+    needs: ["branch test"]
     input: design/draft
     checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements"]
     steps:
@@ -79,6 +80,7 @@ steps:
     reads: [[spec/guidance/review/reviewing]]
     input: ["diff", "implement"]
     to: retro
+    checklist: ["every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     evidence:
       - name: read
         form: files
@@ -87,26 +89,22 @@ steps:
         form: verdict
         says: pass or fail, findings one a line
 process: [[standard]]
+process_hash: d1fd9cd113889f29
 group: level-zero-hands-over
 ---
 
 # Ask
 
-The engine also hands the agent the tool list. At session start it surveys
+writes `.se/tools.json`, and no session reads it. So an agent reads the disk
 which tools stand on the box, the way v4 did, and the standing layer carries
 one line per tool saying when to reach for it. Today `./RUNME.sh tools`
 writes `.se/tools.json` and no session reads it, so an agent reads the disk
 with Grep and skips the index, patch and replace.
 
-# Where it stands
-
-The design input `spec/design_input/the-agent-pulls-tickets.md` says what the
-owner asks for, and the page beside it draws it. Read the note first. It
-stands on the branch `claude/relaxed-knuth-f0uk4d` until the owner merges it,
-so take that branch in where `work sync` leaves it absent.
-
-Level zero holds every door it holds today, and this branch wires the pull
-into them. Its chapter is What level zero changes.
+Where it stands: the design input `spec/design_input/the-agent-pulls-tickets.md`
+says what the owner asks for, and the page beside it draws it. Read the note
+first. Level zero holds every door it holds today, and this branch wires the
+pull into them. Its chapter is What level zero changes.
 
 | what stands today | where |
 |---|---|
@@ -116,11 +114,11 @@ into them. Its chapter is What level zero changes.
 | the viewer's colours | `src/extension/webview/` |
 | `engine.binding` and `engine.autonomy` | `spec/config/level0.schema.json` |
 
-# What waits
+What waits:
 
 | the piece | where | proves it |
 |---|---|---|
-| the brief door goes | the hooks | the block on a cloud box says to run the pull, once `work list` names no brief |
+| the brief door goes | the hooks | the block on a cloud box says to run the pull, once `branch list` names no brief |
 | `work-waiting` | the stop rule | it reads the session's hold file and counts private tickets |
 | the answer door | `lib/answer.js` | it reads the `note` row off the log, where the prompt names a note |
 | the viewer | the webview | `note` draws pink, under the prompt it answers |
@@ -128,7 +126,7 @@ into them. Its chapter is What level zero changes.
 | `engine.autonomy` | the pull | `finish` mints notes alone, `start` mints into its own group, `ideation` mints loose tickets |
 | the old verbs | `work.js` | `take`, `done` and `collect` over a brief go once the last brief merges |
 
-# The rules to hold
+The rules to hold:
 
 - A note answers no other prompt, so the readback stays owed everywhere else.
 - The trunk guard stays as it is.
@@ -164,7 +162,7 @@ into them. Its chapter is What level zero changes.
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+<!-- the same tests pass -->
 
 <!-- the form is command -->
 
@@ -173,6 +171,12 @@ into them. Its chapter is What level zero changes.
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 ## reflect
 
@@ -184,6 +188,12 @@ into them. Its chapter is What level zero changes.
 
 <!-- the form is text -->
 
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
 ## change
 
 <!-- makes the change -->
@@ -193,6 +203,12 @@ into them. Its chapter is What level zero changes.
 <!-- the tree builds and lints -->
 
 <!-- the form is command -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 ## tests-green
 
@@ -216,6 +232,12 @@ into them. Its chapter is What level zero changes.
 
 <!-- the form is text -->
 
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
 # verdict
 
 <!-- reads every hunk against the ask and the approach -->
@@ -231,6 +253,12 @@ into them. Its chapter is What level zero changes.
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 # Discussion
 

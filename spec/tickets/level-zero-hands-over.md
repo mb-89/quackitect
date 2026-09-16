@@ -1,18 +1,19 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: whenever
+step: sync
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
     when: cloud
     by: agent
-    needs: ["work sync"]
+    needs: ["branch sync"]
     evidence:
       - name: sync
         form: command
         expects: 0
-        says: work sync, so the branch carries trunk
+        says: branch sync, so the branch carries trunk
   - name: split
     does: mints the children, or assigns standing tickets, each naming this group
     from: anyone
@@ -42,6 +43,7 @@ steps:
       - name: write
         does: writes the retro over the box's own window
         input: ["children", "notes"]
+        checklist: ["every fact the change adds stands in one place, and a note points at the file instead of repeating it", "every number the change adds carries a name in one place, and a copy a technical reason forces says so beside it", "every header the change writes says what its file is for, and counts nothing"]
         evidence:
           - name: done
             form: list
@@ -73,11 +75,12 @@ steps:
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[group]]
-depends_on: ["the-agent-pulls-a-ticket"]
+process_hash: 3c35c048932fd579
 record:
   - step: sync
     hand: box 747cff5c2f2a
     hash_before: 351643baac99a8a434a3205d269828f05fd08f59
+depends_on: ["the-agent-pulls-a-ticket"]
 ---
 
 # Ask
@@ -90,7 +93,7 @@ Where it stands
 
 ## sync
 
-<!-- work sync, so the branch carries trunk -->
+<!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
 
@@ -103,6 +106,12 @@ Where it stands
 <!-- every child as a link, one a line, with its process -->
 
 <!-- the form is list -->
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 # children
 
@@ -151,6 +160,12 @@ Where it stands
 <!-- what the thoughts say that the actions do not, off the transcript -->
 
 <!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 ## cloud
 
