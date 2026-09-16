@@ -75,7 +75,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: split
+step: children
 record:
   - step: sync
     hand: box ee33ce836a4d
@@ -88,6 +88,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-hand-carries-a-step already carries every commit on main.
+  - step: split
+    hand: box ee33ce836a4d · claude-code-remote
+    hash_before: db8b2d5dc0c07d8847495b5d1607a875f5c5200c
+    hash_after: db8b2d5dc0c07d8847495b5d1607a875f5c5200c
 ---
 
 # Ask
@@ -112,14 +116,20 @@ A hand carries one step. The hold names the session that took it, and a spawn ta
 ## children
 
 <!-- every child as a link, one a line, with its process -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/the-hand-carries-the-session]], process [[standard]]
+- [[spec/tickets/the-spawn-takes-a-step]], process [[standard]]
+- [[spec/tickets/the-stub-plugin-name]], process [[spec/processes/trivial]]
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- each child reviews whole: one holds the hand and the hold, one the spawn, and one the stub plugin name.
+- the three cover the goal, and the hand, the spawn and the stub plugin name stand inside them.
+- the spawn child waits on the hand child, and names it under `depends_on`.
 
 # children
 
