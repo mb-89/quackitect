@@ -501,6 +501,23 @@ sends a code write through Biome and passes the formatted text on with
 The agent writes its own text and the tree stores what the formatter says, the
 way a save-time formatter works for a person.
 
+## The size ceiling
+
+A function holds one thing and a file one topic, and `spec/config/level0.json`
+names the ceiling of each in lines under `code`. `lib/size.js` counts both over
+a brace language. A function opens where a line names one and a brace opens,
+and it closes where the brace depth comes back. A brace in a string or a
+comment counts none.
+
+| who reads it | what it does |
+|---|---|
+| the code door | refuses a write that grows past a ceiling, and names the function or the file and its lines |
+| `./RUNME.sh check` | names what stands past a ceiling as a warning, so the panel draws it and the check allows it |
+
+The door reads the text before and after the write. A file already past its
+ceiling takes a cut and refuses a growth. So the tree's debt shrinks with every
+write and grows with none, and `./RUNME.sh lint src test` names it.
+
 ## The path a rule reads
 
 Hand every rule the path the repo root holds. Vale scopes on it.

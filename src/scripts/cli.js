@@ -54,6 +54,7 @@ import {
   fromJson,
   unreasoned,
 } from "../../.claude/skills/level0/lib/vale.js";
+import { SIZED, sizeFaults } from "../../.claude/skills/level0/lib/size.js";
 import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
@@ -420,6 +421,17 @@ async function lint(where) {
   for (const file of walk(where)) {
     for (const one of unreasoned(files.read(file))) {
       found.push({ ...one, file: show(file) });
+    }
+  }
+
+  // The check names what stands past a ceiling as a warning, and the write door refuses the growth. [[spec/design_output/level0#the-size-ceiling]]
+  const ceilings = {
+    function: await it.config.ask("code.functionLines"),
+    file: await it.config.ask("code.fileLines"),
+  };
+  for (const file of walk(where, SIZED)) {
+    for (const one of sizeFaults(files.read(file), show(file), ceilings)) {
+      found.push({ ...one, severity: "warning" });
     }
   }
 

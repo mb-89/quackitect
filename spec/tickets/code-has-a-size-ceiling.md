@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 step: do
 steps:
@@ -27,6 +27,19 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 568f402efe3adab7
+record:
+  - step: do
+    hand: box d42624a67d18a8
+    hash_before: fbd152dedce7c8e0da56c2280fd44ecfe53b77f1
+    hash_after: 069f9630b9638d1aff1506b62b92fa30e04c9545
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 7 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: 19 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -46,28 +59,22 @@ Without it a file grows past what a reader holds in one sitting. The rule lives 
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test test/level0/size.test.js test/level0/code-door.test.js
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
-
-<!-- the form is text -->
+The config names two ceilings under `code`: the lines a function holds and the lines a file holds. A size library counts both over a brace language, and two readers use it. The code door reads the text before and after a write. It refuses a write that grows past a ceiling, and names the function or the file and its lines. The check names what stands past a ceiling as a warning, so the panel draws the debt and the check passes on this tree.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change follows the ask, and the discussion says where it departs: the check warns, the door refuses
+- the cleanup the change reveals is a note: `walk` skips `.claude`, so the check counts no lib file yet
+- the two ceilings stand in the config alone, and the note points at it
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+The ask says the check names every function and file past its ceiling and passes on this tree. Seven files and one function stand past a ceiling today, so a check that refuses them stays red until they split. So the check warns, and the door refuses growth: a file past its ceiling takes a cut and refuses one more line. The debt shrinks with every write and grows with none.
