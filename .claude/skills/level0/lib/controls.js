@@ -33,10 +33,9 @@ function heldSays(hold) {
   }
   if (said !== FINISH) return [];
   return [
-    "The owner holds this session at finish. Put the work down: carry the piece",
-    "in hand to its end, start nothing new, take nothing new out of the queue,",
-    "and say what is left where you stop. The owner's own words come first,",
-    "and this line stands where they say nothing else.",
+    "The owner holds this session at finish. Bring what you hold to a point you",
+    "pick it up from later, take nothing new out of the queue, and end the turn.",
+    "You judge where that point stands. Say what stands and what is left.",
     "",
   ];
 }
