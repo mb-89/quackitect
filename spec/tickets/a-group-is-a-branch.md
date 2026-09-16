@@ -72,7 +72,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: retro/notes
+step: retro/write
 process: [[group]]
 record:
   - step: children
@@ -82,6 +82,14 @@ record:
     hand: the engine
     hash_before: 44de554119853e99236107f0a0856b5be961eaf5
     hash_after: 44de554119853e99236107f0a0856b5be961eaf5
+  - step: retro/notes
+    hand: box b9be613824b0
+    hash_before: 46640db8ea4734222178ef7dd1ab63f7f481c9e4
+    hash_after: 46640db8ea4734222178ef7dd1ab63f7f481c9e4
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
 ---
 
 # Ask
@@ -120,9 +128,7 @@ Done is a tree where no file names a group kind. `branch list` then names a grou
 
 ### drained
 
-<!-- retro notes, which passes when the private folder is empty -->
-
-<!-- the form is command -->
+    ./RUNME.sh retro notes
 
 ## write
 
