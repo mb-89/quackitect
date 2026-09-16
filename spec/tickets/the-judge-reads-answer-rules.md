@@ -131,16 +131,29 @@ Today the judge answers breaks over every hand-back on a cloud box. One run met 
 
 | what changes | how |
 |---|---|
-| the guidance library | takes the mark, and answers `forEvidence` |
-| the material in the pull | reads the rules through `forEvidence` |
+| the guidance schema | takes a second mark beside `detailMarker`, as `answerMarker: "^"` |
+| the guidance library | strips the mark in `actionables`, and answers `forEvidence` |
+| the material in the pull | reads the rules through `forEvidence`, each with its chapter number |
 | the wrapper under level one | asks by number, and names the rule it hears |
-| the voice note | marks its two answer rules |
+| the voice note | marks its two answer rules with a trailing `^` |
+| [[spec/design_output/pull#the-checks]] | says the judge answers a number, and what each answer does |
 
-A rule that describes an answer carries a mark at the end of its line, the way a rule wanting argument carries a star. `actionables` strips the mark, as it strips the star, so every reader of the chapter reads the rule whole. A second reader, `forEvidence`, drops the marked rules. The judge material calls that one, so the two answer rules leave the ask.
+A rule that describes an answer ends in `^`, the way a rule wanting argument
+ends in `*`. `actionables` strips both, so every reader of the chapter reads
+the rule whole and the output style shows no mark. A second reader,
+`forEvidence`, drops the marked rules and keeps each rule's number in the
+chapter. So a refusal naming rule 15 names line 15 of the note, and the
+hand-out's numbering stays the one numbering.
 
-The judge then names what it finds. The classify call takes the labels `follows` and one number per rule it hands over. A number answers the first rule the evidence breaks. The refusal names that number and the rule's own line, so the hand reads which rule to fix. A label outside the set reads as `follows`, because a judge that names nothing refuses nothing.
+The judge then names what it finds. The classify call takes the labels
+`follows` and one number per rule it hands over. A number answers the first
+rule the evidence breaks, and the refusal names that number with the rule's
+own line. A label outside the set reads as `follows`, because a judge naming
+nothing refuses nothing.
 
-For details, see [[spec/design_output/pull#the-checks]].
+A leaf whose rules all carry the mark hands the judge an empty list. The judge
+stands silent there, as it does today where the reads name no note. So the
+answer rules reach the answer gate alone, which holds them already.
 
 ## review
 
