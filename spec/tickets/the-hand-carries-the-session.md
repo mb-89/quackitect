@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-hand-carries-a-step
-step: verdict
+step: implement/reflect
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -140,6 +140,12 @@ record:
       - name: check
         exit: 0
         said: 66 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box ee33ce836a4d · helper-9
+    hash_before: 175929612a31d11a152154eed497f305d0153570
+    hash_after: 175929612a31d11a152154eed497f305d0153570
+    returns: 1
+    why: The hand names no agent on a harness, because `doorsHere` in `src/scripts/cli.js` hands `it` no `env`.; This step's own hold reads `box ee33ce836a4d · helper-9` under a set `CLAUDE_CODE_REMOTE`.; So `agentOf` runs dead on the pull's own path, and its test passes on a fake alone.; Hand one harness list to both `it.agent` and `agentOf`, so that set stands in one place.; `sessionOf` guesses the engine's field names, and `wrote` swallows the failure, so a wrong guess stays silent.; The box carries no `.se/session.json`, so the wrapper's write stands unproven outside the fake.; The spawn hook tags every spawn, and the design output exempts the spawn the wrapper makes itself.; The tag denies `--as`, and the prompt under it tells that helper to pull `--as`.; No test drives the registered `agent.spawn` hook, so nothing proves the line reaches a prompt.; The session file path stands in three files, and the bridgehead's copy carries no note beside it.; The design output puts the tag in the wrapper, and the change puts it under level zero.; `./RUNME.sh check` exits 0, the suite passes 1013 tests, and the sibling ticket's files redesign nothing here.
 ---
 
 # Ask
@@ -310,20 +316,59 @@ The hand now names the box, the session on it and the agent inside it. Off a har
 ## read
 
 <!-- every file you read, one a line -->
-
 <!-- the form is files -->
+
+- .claude/skills/level0/hooks/level0.js
+- .claude/skills/level1/hooks/level1.js
+- .claude/skills/level1/lib/pull.js
+- .vale.ini
+- spec/design_output/vehicle.md
+- spec/tickets/the-hand-carries-the-session.md
+- spec/tickets/the-stub-plugin-name.md
+- src/scripts/hand.js
+- src/scripts/pull.js
+- src/stub/.claude/skills/bridgehead/.claude-plugin/plugin.json
+- src/stub/.claude/skills/level0/.claude-plugin/plugin.json
+- src/stub/.claude/skills/level0/hooks/bridgehead.js
+- src/stub/.claude/skills/level0/hooks/hooks.json
+- test/contract/stub.test.js
+- test/level0/bridgehead.test.js
+- test/level0/hand.test.js
+- test/level0/stub.test.js
+- test/level0/work.test.js
+- src/scripts/cli.js
+- src/scripts/work.js
+- src/bridge/guidance.js
+- src/bridge/server.js
+- spec/design_output/pull.md
+- spec/design_output/level0.md
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+
+- The hand names no agent on a harness, because `doorsHere` in `src/scripts/cli.js` hands `it` no `env`.
+- This step's own hold reads `box ee33ce836a4d · helper-9` under a set `CLAUDE_CODE_REMOTE`.
+- So `agentOf` runs dead on the pull's own path, and its test passes on a fake alone.
+- Hand one harness list to both `it.agent` and `agentOf`, so that set stands in one place.
+- `sessionOf` guesses the engine's field names, and `wrote` swallows the failure, so a wrong guess stays silent.
+- The box carries no `.se/session.json`, so the wrapper's write stands unproven outside the fake.
+- The spawn hook tags every spawn, and the design output exempts the spawn the wrapper makes itself.
+- The tag denies `--as`, and the prompt under it tells that helper to pull `--as`.
+- No test drives the registered `agent.spawn` hook, so nothing proves the line reaches a prompt.
+- The session file path stands in three files, and the bridgehead's copy carries no note beside it.
+- The design output puts the tag in the wrapper, and the change puts it under level zero.
+- `./RUNME.sh check` exits 0, the suite passes 1013 tests, and the sibling ticket's files redesign nothing here.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- Two facts stand twice: the harness list against `src/scripts/cli.js`, and the session file path across three files.
 
 # Discussion
 
