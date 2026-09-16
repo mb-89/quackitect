@@ -7,9 +7,9 @@ import { test } from "node:test";
 import { BURST, DEAD, fresh, pressed } from "../../src/extension/lib/gesture.js";
 
 const HOLD = {
-  options: ["running", "finishing", "stopped"],
+  options: ["off", "finish", "stop"],
   gesture: 5,
-  value: "running",
+  value: "off",
 };
 
 function burst(times, one = HOLD) {
@@ -24,44 +24,44 @@ function burst(times, one = HOLD) {
 }
 
 test("the first press of a burst climbs one rung, and the next two stand by", () => {
-  assert.deepEqual(burst([0]), ["finishing"]);
-  assert.deepEqual(burst([0, 100, 200]), ["finishing"]);
+  assert.deepEqual(burst([0]), ["finish"]);
+  assert.deepEqual(burst([0, 100, 200]), ["finish"]);
 });
 
 test("a press past the burst starts a new one, and acts again", () => {
-  assert.deepEqual(burst([0, BURST + 1]), ["finishing", "finishing"]);
-  assert.deepEqual(burst([0, BURST]), ["finishing"]);
+  assert.deepEqual(burst([0, BURST + 1]), ["finish", "finish"]);
+  assert.deepEqual(burst([0, BURST]), ["finish"]);
 });
 
 test("the fifth press of a burst sends the far value", () => {
-  assert.deepEqual(burst([0, 200, 400, 600, 800]), ["finishing", "stopped"]);
+  assert.deepEqual(burst([0, 200, 400, 600, 800]), ["finish", "stop"]);
 });
 
 // [[spec/design_output/extension#a-gesture-picks-a-state]]
 test("a person clicking fast reaches the far value, at any speed they hold", () => {
-  assert.deepEqual(burst([0, 100, 200, 300, 400]), ["finishing", "stopped"]);
-  assert.deepEqual(burst([0, 700, 1400, 2100, 2800]), ["finishing", "stopped"]);
+  assert.deepEqual(burst([0, 100, 200, 300, 400]), ["finish", "stop"]);
+  assert.deepEqual(burst([0, 700, 1400, 2100, 2800]), ["finish", "stop"]);
 });
 
 test("the window runs from the last press, so a slow hand still counts", () => {
   assert.deepEqual(burst([0, 700, 1400, 2100, 2800 + BURST + 1]), [
-    "finishing",
-    "finishing",
+    "finish",
+    "finish",
   ]);
 });
 
 test("a sixth press inside the dead moment undoes nothing, and one after it acts", () => {
-  assert.deepEqual(burst([0, 100, 200, 300, 400, 500]), ["finishing", "stopped"]);
+  assert.deepEqual(burst([0, 100, 200, 300, 400, 500]), ["finish", "stop"]);
   assert.deepEqual(burst([0, 100, 200, 300, 400, 400 + DEAD]), [
-    "finishing",
-    "stopped",
-    "finishing",
+    "finish",
+    "stop",
+    "finish",
   ]);
 });
 
 test("a press away from rest falls back to rest, however far it stands", () => {
-  assert.deepEqual(burst([0], { ...HOLD, value: "finishing" }), ["running"]);
-  assert.deepEqual(burst([0], { ...HOLD, value: "stopped" }), ["running"]);
+  assert.deepEqual(burst([0], { ...HOLD, value: "finish" }), ["off"]);
+  assert.deepEqual(burst([0], { ...HOLD, value: "stop" }), ["off"]);
 });
 
 test("a control holding two options answers one press and never the fifth", () => {

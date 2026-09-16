@@ -1,0 +1,13 @@
+{
+  "name": "quackitect",
+  "owner": {
+    "name": "quackitect"
+  },
+  "plugins": [
+    {
+      "name": "level0",
+      "description": "Level zero, run from the vehicle's own folder. A stub names this folder as a marketplace and enables the plugin, and carries no copy.",
+      "source": "./.claude/skills/level0"
+    }
+  ]
+}

@@ -75,17 +75,21 @@ func kindStyle(kind string) lipgloss.Style {
 
 func levelStyle(level string) lipgloss.Style {
 	switch strings.ToLower(level) {
+	case "debug":
+		return lipgloss.NewStyle().Foreground(lipgloss.Color("240"))
 	case "warn":
 		return lipgloss.NewStyle().Foreground(lipgloss.Color("214")).Bold(true)
 	case "error":
 		return lipgloss.NewStyle().Foreground(lipgloss.Color("203")).Bold(true)
+	case "fatal":
+		return lipgloss.NewStyle().Foreground(lipgloss.Color("199")).Bold(true)
 	}
 	return dimStyle
 }
 
 func saidStyle(r Record) lipgloss.Style {
 	switch strings.ToLower(r.Level) {
-	case "warn", "error":
+	case "debug", "warn", "error", "fatal":
 		return levelStyle(r.Level).Bold(false)
 	}
 	switch r.Kind {

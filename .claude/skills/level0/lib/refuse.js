@@ -92,6 +92,7 @@ function bodyOf(where, found) {
   for (const one of found ?? []) {
     lines.push(`  ${where}:${one.line}:${one.column}  ${one.rule}`);
     if (one.said) lines.push(`    wrote: ${cut(one.said)}`);
+    if (one.context) lines.push(`    in: ${one.context}`);
     lines.push(`    ${one.message}`);
     lines.push("");
   }

@@ -1190,9 +1190,9 @@ A thing to look at.
 });
 
 // [[spec/design_output/pull#became]]
-test("became closes the ticket with its successor, and refuses a successor standing nowhere", () => {
+test("became closes the ticket with its successor, reads no field of the leaf, and refuses a successor standing nowhere", () => {
   const { it, disk } = doors(
-    standing(filled(CHILD(), "### approach", "Split it."), GROUP_NOTE, {
+    standing(CHILD(), GROUP_NOTE, {
       [at("spec/tickets/a-successor.md")]: CHILD("draft", ""),
     }),
   );
@@ -1309,7 +1309,7 @@ test("the test verb answers green, assertion, build or missing over the tests th
     "git diff --name-only base111..HEAD": {
       stdout: "test/level0/x.test.js\nsrc/x.js\n",
     },
-    "node --test test/level0/x.test.js": pass,
+    "node --test --test-reporter=tap test/level0/x.test.js": pass,
   });
   const green = heard(() => work(ROOT, ["test"], some.it));
   assert.equal(green.code, 0);

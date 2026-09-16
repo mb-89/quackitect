@@ -900,9 +900,13 @@ function handBack(it, who, name, verdict) {
     }
   }
   const chapter = chapterOf(one.text, leaf.path);
-  found.push(...formFaults(it, one, leaf, chapter, held));
-  if (!found.length) found.push(...voiceFaults(it, one, leaf, chapter));
-  const answered = found.length ? [] : commandsRun(it, leaf, chapter, found);
+  // A became leaves the leaf's fields to the successor, so the hold and the hand alone decide. [[spec/design_output/pull#became]]
+  const becomes = verdict.said === "became";
+  if (!becomes) {
+    found.push(...formFaults(it, one, leaf, chapter, held));
+    if (!found.length) found.push(...voiceFaults(it, one, leaf, chapter));
+  }
+  const answered = found.length || becomes ? [] : commandsRun(it, leaf, chapter, found);
   found.push(...handFaults(it, one, leaf, who.hand, held));
 
   if (found.length) return refused(it, who, one, leaf, held, found);
@@ -1558,7 +1562,10 @@ export function testVerb(it, argv) {
     return 1;
   }
 
-  const ran = it.proc.run([it.node ?? "node", "--test", ...files], { cwd: it.root });
+  // [[spec/design_output/pull#the-test-verb]]
+  const ran = it.proc.run([it.node ?? "node", "--test", "--test-reporter=tap", ...files], {
+    cwd: it.root,
+  });
   const said = testSays(ran, files);
   console.log(said);
   return said.startsWith("green") ? 0 : 1;

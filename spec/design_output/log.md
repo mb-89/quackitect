@@ -15,7 +15,7 @@ The viewer reads it. For details, see [[spec/design_output/viewer]].
 | field | holds | on the row |
 |---|---|---|
 | `at` | ISO 8601 UTC with milliseconds | yes |
-| `level` | `info`, `warn` or `error` | yes |
+| `level` | `debug`, `info`, `warn`, `error` or `fatal`, and every line carries one | yes |
 | `kind` | what the line is | yes |
 | `said` | one sentence, 80 characters at most | yes |
 | `text` | the whole text, where `said` clips it | no |
@@ -25,7 +25,7 @@ The viewer shows every field the row leaves out in the details. So a field earns
 the row only where a person scans for it.
 
 `rowOf` clips `said` to 80 characters and folds its whitespace, and a level
-outside the three reads as `info`. A line written before the rename carries
+outside the five, or none, reads as `info`. A line written before the rename carries
 `door` in place of `kind`, and the viewer reads either.
 
 # A reply beside its prompt
@@ -62,7 +62,6 @@ For details, see [[spec/design_output/level0#a-step-carries-the-answer]].
 | `answer` | the session's answer to a demand | `turn.step`, `tool.call` |
 | `write` | the code door refuses a write | `tool.call` |
 | `vale` | the rules refuse prose, and how long a lint takes | the hook, and `lint` |
-| `judge` | a model refuses prose | `tool.call` |
 | `bash` | a commit or a push aims at trunk | `tool.call` |
 | `work` | a branch verb answers, and the branch it stands on | `work.js` |
 | `context` | the blocks reaching the session, and whether a re-read brings them | `prompt.context` |
@@ -111,15 +110,23 @@ down first, and the door adds what it refuses beneath it.
       "level": "info"
     }
 
+The ladder is the one Python's logging climbs, and a box writes the lines at
+its level and above:
+
 | level | writes |
 |---|---|
-| `info` | everything, and this is the default |
+| `debug` | what the hooks see, and everything above |
+| `info` | every line a door says, and this is the default |
 | `warn` | a refusal and a fault |
 | `error` | a fault |
+| `fatal` | what ends a session |
 
 A level the reader does not know reads as `info`, and a missing object reads as
-`info`. So a box configuring nothing writes everything. `writes` decides, and
-every writer asks it before the line lands.
+`info`. So a box configuring nothing writes every line a door says, and a debug
+line stays off its disk until it asks for it. `writes` decides, and every
+writer asks it before the line lands. The viewer holds a floor of its own over
+what the disk carries. For details, see
+[[spec/design_output/viewer#alt-l-raises-the-floor]].
 
 # Where the writer stands
 
@@ -167,12 +174,12 @@ sentence, and `text` where one sentence runs short. The hook stamps the time and
 appends the line the way it appends its own. So a status or a note the agent
 means for the owner lands where the owner reads.
 
-# An answer rides the tool
+# An answer stands in chat
 
-- Outcome: a log call of kind `answer` answers the owner's prompt, and the line lands in the log.
-- Cause: text written beside a tool call reaches the transcript as thinking, and the door reads text alone.
-- Door: the call clears the demand, so the next call passes.
-- Teacher: the warning and the refusal name the call.
+- Outcome: the answer to the owner's prompt stands in the chat as text. The hook logs it whole under kind `answer`, and the agent calls nothing for it.
+- Cause: an answer through the log tool alone reaches no chat, and the owner reads the chat mid-turn.
+- Door: the step carrying the text clears the demand, and a log call of kind `answer` clears nothing.
+- Teacher: the warning and the refusal ask for text in the chat, and name no call.
 
 # Nothing here deletes a log
 

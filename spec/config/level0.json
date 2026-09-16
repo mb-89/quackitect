@@ -4,7 +4,7 @@
     "comment": "The tooth. enabled false takes it out, and mostInARow caps the turns it carries one after another. The rules it votes over live in spec/config/stop.",
     "enabled": true,
     "mostInARow": 3,
-    "hold": "running"
+    "hold": "off"
   },
   "work": {
     "comment": "The knobs the work verbs read. staleAfter is the age of a held group's tip that puts the group under yours, with release, take and close as the three answers. failsBeforePerson and refusalsBeforePerson say when the pull inserts a person step, and stepsBeforeSplit says how many of those a ticket carries before it splits.",
@@ -29,16 +29,8 @@
     "words": 150
   },
   "log": {
-    "comment": "The level this box writes at. info writes everything, warn writes a refusal and a fault, error writes a fault.",
+    "comment": "The level this box writes at, on the ladder debug, info, warn, error, fatal. info writes every line a door says, debug writes what the hooks see too, warn writes a refusal and a fault, error writes a fault, fatal writes what ends a session.",
     "level": "info"
-  },
-  "judge": {
-    "comment": "Switch the model off where it costs more than it earns. The mechanical rules ignore this.",
-    "enabled": true,
-    "model": "haiku",
-    "maxSpans": 24,
-    "warmupWrites": 4,
-    "thenEveryNth": 3
   },
   "names": {
     "comment": "The words a file, a folder and a branch name each hold at most. Vale counts a heading, and lib/names.js counts a path.",
