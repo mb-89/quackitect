@@ -25,7 +25,7 @@ import {
 } from "../../src/scripts/pull.js";
 import { ticket } from "../../src/scripts/ticket.js";
 import { work } from "../../src/scripts/work.js";
-
+import { probeOf, startOf } from "../../src/scripts/serve.js";
 const ROOT = "/tree";
 const SHA = "b818c390c02737351bf1b73aba36a573d34d2ecc";
 const BRANCH = "work/one-group";
@@ -474,14 +474,13 @@ const onTrunk = (extra = {}) => ({
   "git rev-list --count HEAD..origin/main": { stdout: "0\n" },
   ...extra,
 });
-
 // [[spec/design_output/pull#the-engine-takes-the-branch]]
 test("on trunk a cloud box's pull takes a branch, and a desk's pull takes none", () => {
   const cloud = doors(standing(), onTrunk(), { cloud: true });
+  for (const [argv, code] of [[probeOf("node", 6510), 1], [startOf(ROOT), 0]]) cloud.outside.proc.teach(argv, { exitCode: code });
   const taken = heard(() => work(ROOT, ["pull"], cloud.it));
   assert.equal(taken.code, 0);
   assert.match(taken.said, /No work branch stands at todo|took|holds it/);
-
   const desk = doors({ [at("spec/tickets/free-one.md")]: FREE }, onTrunk(), { cloud: false });
   const { code, said } = heard(() => work(ROOT, ["pull"], desk.it));
   assert.equal(code, 0, said);
