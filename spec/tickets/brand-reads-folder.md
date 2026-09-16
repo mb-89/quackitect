@@ -89,7 +89,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-brand-reads-the-folder
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 02ae9414623e
@@ -101,6 +101,10 @@ record:
     hash_after: 78bc292e6b744b1ea0c20fbd6a829ef91d9a56d2
     returns: 1
     why: The approach carries the manifest, the ids and the icon. The list and the; editor test wait on a second draft.; the design output holds a list of the places that write the name in, and the approach links it; the plugin manifests join the table, where each writes the name as the plugin name. So two vehicles hand the client one name twice; the approach plans a test for each pure function. The two fake folders the ask names wait on a test over the link verb; the stamp writes the name, the display name, the publisher, the container and the view. The `when` clause of the view carries the brand too; the manifest and the icon travel tracked, so the link dirties every vehicle past this brand. The stamp reads idempotent in this tree alone; the diff touches this ticket and its group ticket, each a trivial fix; `./RUNME.sh check` answers 1 on the branch, from a server absent at its port; the handback waits on a retro, which the branch review names
+  - step: design/draft
+    hand: box 02ae9414623e
+    hash_before: 9c208fa9d41f45a1d766e3635e327da3eb68b74f
+    hash_after: 9c208fa9d41f45a1d766e3635e327da3eb68b74f
 ---
 
 # Ask
@@ -131,33 +135,41 @@ Read [[spec/design_input/a-stub-takes-its-vehicle]] first, the chapters The stub
 
 <!-- the form is text -->
 
-The brand is the method root's folder name, and `brandOf` answers it today. One
-write carries it: the link verb stamps the manifest before it links. Every
-other piece reads the manifest it already loads.
+The brand is the method root's folder name, and `brandOf` answers it today. The
+link verb becomes the one writer: it stamps the manifests, writes the icon, then
+links and registers as it does today.
 
-| piece | today | with the brand |
+| kind | what carries the brand | with the brand |
 |---|---|---|
-| the manifest | tracked, naming one brand | the link writes `name`, `displayName`, `publisher`, the container and the view from the brand |
-| the extension's three keys | constants | derived from the `name` the manifest beside them carries |
-| the output channel and the view command | a constant | the same manifest |
-| the language client's id | a constant | the same manifest |
-| the icon | one file in the extension folder | `spec/config/icon.svg`, which the link copies in |
-| a vehicle's icon | the duck it copied | its initials, which `produce` draws over the copy's file |
+| the extension manifest | the name, the display name, the description, the publisher, the container, the view id, the view name, the `when` clause | the link stamps each from the brand |
+| the extension's modules | the view key, the here key, the rest key, the output channel, the view command, the language client's id | each derives from the `name` its own manifest carries |
+| the icon | the mark, and the title inside it | the link writes it from the config file the owner swaps |
+| the link script | the name it keeps the editor's list under | derives from the brand |
+| the plugin manifests | the plugin name the marketplace offers, and the name the skill declares | the link stamps both, so two vehicles hand the client two names |
 
-Three pure functions carry the work, and each takes a test with no editor and no
+The implement adds the chapter The brand reads the folder to
+[[spec/design_output/extension]], which holds that list one a line. The module
+path each Go build carries stays as it stands, because the editor reads the
+extension manifest alone.
+
+Four pure functions carry the work, and each takes a test with no editor and no
 disk:
 
-- `brandedManifest(said, brand)` returns the manifest with every brand field set
+- `brandedManifest(said, brand)` returns the manifest with every brand field set, the `when` clause among them
+- `brandedPlugin(said, brand)` returns a plugin manifest under the brand
 - `initialsIcon(brand)` returns the mark a vehicle wears until the owner swaps it
 - `idsOf(said)` returns the view id, the here key and the rest key off a manifest
 
-The link verb stays the one place that writes. It reads the manifest, stamps it,
-copies the icon in, then links and registers as it does today. So a tree linked
-twice under two names writes two entries, and the editor draws two.
+`main` in the link script stands unexported, behind a gate on the argument
+vector. So a test reaches the link path nowhere today. The change lifts its body
+into an exported `links(files, home, root)`, and the gate calls that.
 
-The manifest stays tracked, because the packaging script and the editor both
-read it before the link runs. The stamp is idempotent: a second link writes the
-same bytes.
+The editor test then drives two fake roots through one fake home, and reads two
+entries out of the list. That is the proof the ask names.
+
+- a second link writes the same bytes as the first
+- the manifest and the icon travel tracked, so the first link in a fresh vehicle writes them once
+- `produce` stamps the copy's manifests and writes its icon, so a vehicle lands under its own brand
 
 ## review
 
