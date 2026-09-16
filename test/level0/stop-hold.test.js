@@ -9,7 +9,7 @@ import { test } from "node:test";
 import { CHECK } from "../../.claude/skills/level0/lib/answer.js";
 import { STOP_CALL } from "../../.claude/skills/level0/lib/stop.js";
 import { REPORT_CALL } from "../../src/bridge/report.js";
-import { dropsHold, holdsCall, sawCall, sawPrompt } from "../../src/bridge/stop.js";
+import { dropsHold, holdsCall, onStop, sawCall, sawPrompt } from "../../src/bridge/stop.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 const ROOT = "/tree";
@@ -25,6 +25,45 @@ function box(hold) {
     method: ROOT,
     log: { say: (...row) => said.push(row) },
   };
+}
+
+const RULES = `
+- id: the-owner-holds-this-session
+  side: stop
+  priority: 85
+  decides: mechanical
+  runs: owner-holds
+  says: The owner holds this session at stop, so this turn ends here.
+
+- id: the-owner-asks-to-finish
+  side: stop
+  priority: 84
+  decides: mechanical
+  runs: owner-finishes
+  says: The owner holds this session at finish, so this turn ends with the piece in hand.
+
+- id: the-queue-holds-work
+  side: continue
+  priority: 80
+  decides: mechanical
+  runs: work-waiting
+  firm: true
+  says: The queue holds work for this box, so carry on.
+
+- id: the-tooth-is-out
+  side: continue
+  priority: 0
+  decides: mechanical
+  runs: stop-hook-off
+  says: The stop hook stands off.
+`;
+
+// A turn ending under the rules, with a list standing, so a hold has something to end. [[spec/design_output/stop#the-hold]]
+function ruled(hold) {
+  const it = box(hold);
+  it.disk.write(join(ROOT, "spec", "config", "stop", "level0.yml"), RULES);
+  it.todos = { standing: () => true, sawCall: () => {} };
+  return it;
 }
 
 // The sidebar writes the hold into the local config, and the tracked file carries the standing value. [[spec/design_output/config#the-three-layers]]
@@ -66,45 +105,40 @@ test("the hold at finish rides the block on every call, not on the first alone",
   }
 });
 
-test("a hold no call meets stands into the next turn, and one a call meets drops", () => {
-  const untouched = box("stop");
-  dropsHold({}, untouched);
-  assert.equal(held(untouched), "stop", "nothing met it, so it stands");
-
-  const met = box("stop");
-  holdsCall({ tool: "Bash" }, met);
-  dropsHold({}, met);
-  assert.equal(held(met), "off", "a call met it, so it drops");
+test("the hold ends the turn it lands in, and the turn's end puts it back", () => {
+  const it = box("stop");
+  holdsCall({ tool: "Bash" }, it);
+  dropsHold({}, it);
+  assert.equal(held(it), "off", "the turn ends, and the hold flips back");
+  assert.equal(holdsCall({ tool: "Bash" }, it), null, "the next turn runs free");
 });
 
 test("a helper's call meets no hold", () => {
   assert.equal(holdsCall({ tool: "Bash", agentId: "a1" }, box("stop")), null);
 });
 
-// [[spec/design_output/stop#a-prompt-mid-turn-holds]]
-test("a prompt landing while the agent runs tools holds the session at finish", () => {
+// [[spec/design_output/stop#the-hold]]
+test("either strength ends the turn, over a rule that would hold it open", () => {
+  for (const hold of ["finish", "stop"]) {
+    const it = ruled(hold);
+    assert.deepEqual(
+      onStop({ last_assistant_message: "Working on." }, it),
+      { pass: true },
+      `the hold at ${hold} ends the turn`,
+    );
+    assert.match(it.said.at(-1)[2], /the turn ends/);
+  }
+});
+
+test("a turn ends on its own rules while no hold stands", () => {
+  const said = onStop({ last_assistant_message: "Working on." }, ruled("off"));
+  assert.match(said.result.block, /holds work for this box|names no stop reason/);
+});
+
+test("a prompt writes no hold, because the owner's own press is the hold", () => {
   const it = box("off");
   sawCall({ tool: "Bash" }, it);
   sawPrompt({ text: "get to a point where you can push" }, it);
-  assert.equal(held(it), "finish");
-  assert.match(holdsCall({ tool: "Read" }, it).after.context[0], /Put the work down/);
-});
-
-test("a prompt opening a turn holds nothing, and a helper's prompt holds nothing", () => {
-  const fresh = box("off");
-  sawPrompt({ text: "merge the branches" }, fresh);
-  assert.equal(held(fresh), "off", "no call stands before it");
-
-  const helper = box("off");
-  sawCall({ tool: "Bash" }, helper);
-  sawPrompt({ text: "work one step", agentId: "a1" }, helper);
-  assert.equal(held(helper), "off");
-});
-
-test("a turn's end puts the working flag down, so the next prompt opens a turn", () => {
-  const it = box("off");
-  sawCall({ tool: "Bash" }, it);
-  dropsHold({}, it);
-  sawPrompt({ text: "carry on" }, it);
   assert.equal(held(it), "off");
+  assert.equal(holdsCall({ tool: "Read" }, it), null);
 });

@@ -90,28 +90,20 @@ line stands in the answer to every call a held session makes. The hold at
 every continue rule but the owner's own word. A `hold` line at `debug` says
 what the door does.
 
-A hold is one turn long, and the turn that meets it ends it. The door marks
-the hold as met at the call it acts on, and the turn's end drops a met hold to
-`off`. A hold the owner sets between turns meets no call, so it stands into
-the next turn and holds that one. So a press that lands while a turn closes
-holds the work that follows it.
+The hold is the stop hook's opposite. The hook holds a turn open, and the hold
+ends it, at two strengths:
 
-## A prompt mid-turn holds
+| strength | what the owner asks for | which rule ends it |
+|---|---|---|
+| `finish` | end this turn at the next place that suits the work | `the-owner-asks-to-finish`, at 84 |
+| `stop` | end this turn now | `the-owner-holds-this-session`, at 85 |
 
-The owner speaking into a running turn is a hold of its own. A prompt landing
-after the session's first tool call, from outside this plugin, writes
-`stop.hold` to `finish`. Every later call then carries the block, so the work
-goes down at the next call the session makes.
+Each stands over every continue rule but the owner's own word, the queue's
+firm rule among them. So a held turn ends with work still waiting.
 
-| what stands | what the prompt does |
-|---|---|
-| a tool call stands this turn | the hold stands at `finish` |
-| the prompt opens the turn | nothing, the turn is its own |
-| a helper sends it | nothing, a helper holds no session |
-| the hold stands at `finish` or `stop` | nothing, the stronger word stands |
-
-The owner's own words come first, so a prompt naming new work outranks the
-block it sets. The block says so.
+So a hold is one turn long. It ends the turn it lands in, the turn's end puts
+it back to `off`, and it reaches no later turn. A prompt writes no hold,
+because the press is the owner's word and the prompt carries its own.
 
 ## The two lines stand apart
 

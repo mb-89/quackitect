@@ -56,7 +56,6 @@ export function holdsCall(e, box) {
     box.held = "";
     return null;
   }
-  // The door meets the hold, so the turn's end drops it. A hold no call meets stands into the next turn. [[spec/design_output/stop#the-hold]]
   box.held = hold;
   const tool = String(e?.tool ?? "");
   if (hold === STOP && !ENDS_TURN.has(tool)) {
@@ -77,21 +76,11 @@ export function refusedByHold(tool) {
   ].join(" ");
 }
 
-// A prompt landing while the agent runs tools puts the work down, because the owner speaks into a turn. [[spec/design_output/stop#a-prompt-mid-turn-holds]]
-export function holdsOnPrompt(e, box) {
-  if (e?.agentId || !box.working) return;
-  const hold = String(asks(box, HOLD) ?? OFF);
-  if (hold === STOP || hold === FINISH) return;
-  writes(box, HOLD, FINISH);
-  box.log.say("debug", "hold", `the owner speaks mid-turn, and the hold stands at ${FINISH}`);
-}
-
+// The hold ends the turn it lands in, so the turn's end puts it back. [[spec/design_output/stop#the-hold]]
 export function dropsHold(_e, box) {
   const hold = String(asks(box, HOLD) ?? OFF);
-  const met = box.held === hold;
   box.held = "";
-  box.working = false;
-  if ((hold !== FINISH && hold !== STOP) || !met) return { pass: true };
+  if (hold !== FINISH && hold !== STOP) return { pass: true };
   writes(box, HOLD, OFF);
   box.log.say("debug", "config", `the hold stood at ${hold}, and drops to ${OFF}`);
   return { pass: true };
@@ -99,7 +88,6 @@ export function dropsHold(_e, box) {
 
 export function sawCall(e, box) {
   if (e?.agentId) return;
-  box.working = true;
   toothOf_(box).sawCall();
   todosOf(box).sawCall(e);
 }
@@ -107,7 +95,6 @@ export function sawCall(e, box) {
 // A prompt from outside this plugin opens a turn, and the tooth counts them. [[spec/design_output/stop#the-tooth-holds-its-state]]
 export function sawPrompt(e, box) {
   if (e?.agentId) return;
-  if (!e?.mine) holdsOnPrompt(e, box);
   toothOf_(box).sawPrompt(Boolean(e?.mine));
 }
 
@@ -191,6 +178,7 @@ function lastLineReason(text) {
 function ranHere(name, held) {
   if (name === "stop-hook-off") return held.off;
   if (name === "owner-holds") return held.hold === STOP;
+  if (name === "owner-finishes") return held.hold === FINISH;
   if (name === "chat-is-new") return chatIsNew(held.box);
   if (name === "work-waiting") return todosOf(held.box).standing();
   if (name === "group-in-hand") return groupInHand(held.box);

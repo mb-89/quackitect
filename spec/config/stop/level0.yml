@@ -45,6 +45,13 @@
   runs: owner-holds
   says: The owner holds this session at stop, so this turn ends here.
 
+- id: the-owner-asks-to-finish
+  side: stop
+  priority: 84
+  decides: mechanical
+  runs: owner-finishes
+  says: The owner holds this session at finish, so this turn ends with the piece in hand.
+
 - id: work-still-stands
   side: continue
   priority: 80
