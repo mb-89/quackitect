@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 depends_on: [the-bridgehead-imports-its-vehicle, the-stub-takes-shape]
 steps:
@@ -107,7 +107,12 @@ record:
     hand: box 99aa60a14c3f
     hash_before: c3dc2e0150c084830bba5d8886b87d7b229d29d3
     hash_after: c3dc2e0150c084830bba5d8886b87d7b229d29d3
+  - step: retro/cloud
+    hand: box 99aa60a14c3f
+    hash_before: f719505c0e947916212e65666680ab6538d49162
+    hash_after: f719505c0e947916212e65666680ab6538d49162
 step: retro/cloud
+reason: done
 ---
 
 # Ask
@@ -241,17 +246,39 @@ The thoughts circled two things longer than the actions show.
 
 <!-- the form is list -->
 
+- a server behind the bridgehead at session start. The box ran `./RUNME.sh serve` by hand before the first check.
+- a verb that decides a private note. The box dropped the group's hold, tagged each note, and pulled them one by one.
+- a stub repo and a routine for it, so the cloud proof of the road stays for a person
+- no tool, no host and no right stood in the way. The install of the clone ran under the proxy at the slow test.
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- the write door on every ticket chapter and the vehicle chapter, each naming its line, and one rewrite each
+- the ticket door on the Ask and the record, which the engine owns once the ticket opens
+- the privacy hook on one fake home path, at the change leaf. The pull said nothing, and the box committed by hand after the fix.
+- the door rule on the stub's hook, which a Vale section now exempts
+- the sync took trunk in clean, and every test stayed green after it
+- no trunk guard, no cap, and no test that fails on the box alone
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- no person step stands parked, and the child closes done
+- four tickets stand minted with no group, drafts under the trivial process, one a line below
+- [[spec/tickets/the-cloud-box-starts-serving]]: the take starts the server on a cloud box
+- [[spec/tickets/the-record-quotes-its-why]]: the record writer quotes a reason with a colon
+- [[spec/tickets/the-pull-says-refused-commit]]: a refused commit answers refused
+- [[spec/tickets/ticket-open-lints-the-ask]]: the open verb lints the Ask first
+- the cloud proof of the road: one routine run against a stub repo, read off its log. It takes a stub repo, an environment with the trust setup, and a routine whose prompt is `./RUNME.sh branch take`.
+- three findings of the verdict stay open. The stub plugin's two manifests describe the import road. The attach and serve failures carry no test. The hook reads the register under the home alone.
+- this ticket is the handover. The improve list names six fixes, each by its home, for the owner to rule on.
 
 # Discussion
 
