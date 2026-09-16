@@ -76,6 +76,10 @@ steps:
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
 step: sync
+record:
+  - step: sync
+    hand: box ee33ce836a4d
+    hash_before: cdb0cc9d5eca391c8b52b12ddcd132acdabb9c29
 ---
 
 # Ask
