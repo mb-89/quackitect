@@ -51,7 +51,7 @@ Without it the owner types the filter by hand each time, and the log verb loses 
 
 <!-- the form is command -->
 
-    ./RUNME.sh test
+    cd src/viewer && go test ./... && echo green
 
 ## check
 
