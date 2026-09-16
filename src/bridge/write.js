@@ -1,0 +1,152 @@
+// The write door: the owner of a projected file, the private notes, the note
+// schemas and the voice rules, in that order, then the code door.
+// [[spec/design_output/level0#the-write-door]]
+
+import { join } from "node:path";
+import { CODE } from "../../.claude/skills/level0/lib/code.js";
+import { isDraft, relativeTo } from "../../.claude/skills/level0/lib/paths.js";
+import { carriedFrom, NOTES, refusedPrivate } from "../../.claude/skills/level0/lib/private.js";
+import { refusal } from "../../.claude/skills/level0/lib/refuse.js";
+import {
+  checkNote,
+  END,
+  governorOf,
+  kindOf,
+  refusedKind,
+  refusedNote,
+  SCHEMAS,
+  schemasFrom,
+  strangerFault,
+} from "../../.claude/skills/level0/lib/schema.js";
+import { refusedTicket, ticketFaults } from "../../.claude/skills/level0/lib/ticket.js";
+import { codeDoor } from "./code.js";
+import { marksStale, ownerDoor } from "./projection.js";
+import { readsProse } from "./prose.js";
+
+const PASS = { pass: true };
+
+// [[spec/design_output/schema#the-door-refuses-a-departure]]
+export function schemasHere(disk, root) {
+  return schemasFrom(readFolder(disk, join(root, SCHEMAS), END));
+}
+
+export async function onWrite(e, box) {
+  const writing = asWrite(e);
+  if (!writing) return PASS;
+  const where = relativeTo(box.root, writing.path);
+  if (/^([A-Za-z]:)?[\\/]/.test(where) || isDraft(where)) return PASS;
+
+  const checks = [ownerDoor, privateDoor, schemaDoor, voiceDoor];
+  for (const check of checks) {
+    const found = await check(e, writing, where, box);
+    if (found) return { result: { deny: found } };
+  }
+  marksStale(where, box);
+  // [[spec/design_output/level0#the-formatter-applies-itself]]
+  if (CODE.test(writing.path)) return codeDoor(e, writing, where, wholeAfter(e, writing, box.disk), box);
+  return PASS;
+}
+
+// [[spec/design_output/private#the-door-reads-the-notes]]
+function privateDoor(e, writing, where, box) {
+  if (where.startsWith(".se/")) return "";
+  const carried = carriedFrom(writing.text, readFolder(box.disk, join(box.root, NOTES), ".md"));
+  if (!carried) return "";
+  box.log.say("warn", "private", `refused a ${carried.how} out of ${carried.note}`, {
+    file: where,
+    tool: String(e.tool),
+  });
+  return refusedPrivate(where, carried);
+}
+
+// [[spec/design_output/schema#the-door-refuses-a-departure]]
+function schemaDoor(e, writing, where, box) {
+  if (!where.endsWith(".md")) return "";
+  if (!box.schemas) box.schemas = schemasHere(box.disk, box.method);
+  const schemas = box.schemas;
+  const whole = wholeAfter(e, writing, box.disk);
+  const kind = kindOf(whole);
+
+  const governor = governorOf(schemas, where);
+  const stranger = governor ? strangerFault(whole, governor, where) : null;
+  if (stranger) {
+    box.log.say("warn", "schema", `refused a stranger in ${where}`, { file: where, rule: stranger.rule, tool: String(e.tool) });
+    return refusedKind(where, governor, stranger);
+  }
+
+  const schema = schemas.get(kind);
+  const found = schema ? checkNote(whole, schema, where, schemas) : [];
+  if (found.length) {
+    box.log.say("warn", "schema", `refused ${found.length} line(s) in ${where}`, { file: where, rule: found[0]?.rule, tool: String(e.tool) });
+    return refusedNote(where, kind, found);
+  }
+
+  // [[spec/design_output/schema#the-three-places]]
+  const held = schema ? ticketFaults(textAt(box.disk, writing.path), whole, schema, where) : [];
+  if (held.length) {
+    box.log.say("warn", "ticket", `refused ${held.length} line(s) in ${where}`, { file: where, rule: held[0]?.rule, tool: String(e.tool) });
+    return refusedTicket(where, kind, held);
+  }
+  return "";
+}
+
+// [[spec/design_output/level0#the-write-door]]
+async function voiceDoor(e, writing, where, box) {
+  if (CODE.test(writing.path) || !box.vale.stands()) return "";
+  const whole = wholeAfter(e, writing, box.disk);
+  const said = await box.vale.lint(whole, where);
+  if (!said.ran) return "";
+  const found = readsProse(box, whole, said.found);
+  if (!found.length) return "";
+  box.log.say("warn", "vale", `refused ${found.length} line(s) in ${where}`, {
+    file: where,
+    rule: found[0]?.rule,
+    tool: String(e.tool),
+  });
+  return refusal(where, found);
+}
+
+function asWrite(e) {
+  if (!e?.file_path) return undefined;
+  const path = String(e.file_path);
+  if (e.tool === "Write") return { path, text: String(e.content ?? "") };
+  if (e.tool === "Edit") return { path, text: String(e.new_string ?? "") };
+  if (e.tool === "MultiEdit" && Array.isArray(e.edits)) {
+    return { path, text: e.edits.map((one) => String(one?.new_string ?? "")).join("\n") };
+  }
+  return undefined;
+}
+
+function wholeAfter(e, writing, disk) {
+  if (e.tool === "Write") return writing.text;
+  const was = textAt(disk, writing.path);
+  if (was === null) return writing.text;
+  const edits = e.tool === "MultiEdit" && Array.isArray(e.edits) ? e.edits : [e];
+  let text = was;
+  for (const one of edits) {
+    const from = String(one?.old_string ?? "");
+    const to = String(one?.new_string ?? "");
+    if (!from) continue;
+    text = one?.replace_all ? text.split(from).join(to) : text.replace(from, () => to);
+  }
+  return text;
+}
+
+function textAt(disk, path) {
+  try {
+    return String(disk.read(path));
+  } catch {
+    return null;
+  }
+}
+
+function readFolder(disk, folder, end) {
+  try {
+    return disk
+      .list(folder)
+      .filter((one) => one.kind === "file" && one.name.endsWith(end) && !isDraft(one.name))
+      .map((one) => ({ name: one.name, text: disk.read(join(folder, one.name)) }));
+  } catch {
+    return [];
+  }
+}

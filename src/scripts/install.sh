@@ -349,6 +349,7 @@ missed() {
 here() {
   case $1 in
     node)    have node ;;
+    modules) [ -d "$root/node_modules/wink-nlp" ] ;;
     vale)    [ -x "$bin/vale${exe}" ] ;;
     biome)   [ -x "$bin/biome${exe}" ] ;;
     vale-ls) [ -x "$bin/vale-ls${exe}" ] ;;
@@ -365,6 +366,7 @@ here() {
 why() {
   case $1 in
     node) say "node: the command line and the level zero rules are JavaScript" ;;
+    modules) say "modules: the node packages package.json names, wink-nlp reads the tense behind the voice rules" ;;
     vale) say "vale: Vale holds the prose rules the write door and the linter read" ;;
     biome) say "biome: Biome formats and lints the JavaScript in this tree" ;;
     vale-ls) say "vale-ls: the Vale language server, so an editor draws the same rules" ;;
@@ -381,6 +383,7 @@ why() {
 get() {
   case $1 in
     node) get_node ;;
+    modules) (cd "$root" && npm install --omit=dev --no-audit --no-fund) ;;
     vale) get_vale ;;
     biome) get_biome ;;
     vale-ls) get_vale_ls ;;
@@ -397,7 +400,7 @@ get() {
 # SE_INSTALL_SKIP names the wants a caller leaves out, so a test vehicle builds
 # no index and links no editor while it proves the copy stands alone.
 missing=""
-for one in node vale biome vale-ls go index se-lsp editor-client editor-link \
+for one in node modules vale biome vale-ls go index se-lsp editor-client editor-link \
   editor-extensions git-hooks; do
   case " ${SE_INSTALL_SKIP:-} " in *" $one "*) continue ;; esac
   here "$one" || missing="$missing $one"

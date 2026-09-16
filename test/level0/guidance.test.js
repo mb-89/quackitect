@@ -13,6 +13,7 @@ import {
   envOf,
   parse,
   standingLayer,
+  styled,
 } from "../../.claude/skills/level0/lib/guidance.js";
 
 const note = `---
@@ -144,4 +145,12 @@ test("an answer saying nothing comes back absent", () => {
     found: "none",
     said: "",
   });
+});
+
+// [[spec/design_output/level0#the-style-carries-a-note]]
+test("a note flagged style true goes to the output style, and no flag keeps it in the session", () => {
+  const flagged = note.replace('scope: ["everybody"]', 'scope: ["everybody"]\nstyle: true');
+  assert.equal(styled(flagged), true);
+  assert.equal(styled(note), false);
+  assert.equal(styled(note.replace('scope: ["everybody"]', 'scope: ["everybody"]\nstyle: false')), false);
 });

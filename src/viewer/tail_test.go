@@ -119,7 +119,7 @@ func TestAFrameDrawsTheWindowWithNoTerminal(t *testing.T) {
 	t.Parallel()
 	path := filepath.Join(t.TempDir(), "a.jsonl")
 	put(t, path, one+two+three)
-	said, err := Frame(path, 100, 8, "details", "", time.UTC)
+	said, err := Frame(path, 100, 8, "details", "", "", time.UTC)
 	if err != nil {
 		t.Fatal(err)
 	}

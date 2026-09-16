@@ -401,14 +401,20 @@ reads that and nothing of its own:
 
 | `x-written` | the place | when a hand writes it |
 |---|---|---|
-| `draft` | the `Ask` chapter | while `state` reads `draft` |
+| `anyone` | the `Ask` and the `Discussion` chapters | always |
 | `hand` | the fields of the leaf `step` names | while the ticket stands there |
-| `anyone` | the `Discussion` chapter | always |
+| a state's name | a chapter that state alone writes | while `state` reads that name |
 
 `placesIn` reads the route, finds the leaf `step` names, and answers the heading
 of each of its evidence fields. A chapter outside that set stands refused where
-the write changes its lines. So a phase's chapter, another leaf's fields and the
-ask of an open ticket are the engine's.
+the write changes its lines. So a phase's chapter and another leaf's fields are
+the engine's, and the three fields stay with the verbs. The ask stays open to a
+hand at every state, because a hand fixes what the rules refuse in it.
+
+Two leaves name one field alike, as `tests` under `tests-red` and under
+`tests-green`. So the door names an old chapter by its level, its header and
+its place among the chapters of that name. Each one then reads against its
+own.
 
 A file the door finds empty is a mint, and the mint writes every place at once.
 So the rule reaches the second write and no first one.

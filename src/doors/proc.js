@@ -17,6 +17,7 @@ export function proc() {
         timeout: init.timeoutMs,
         maxBuffer: BUFFER,
         stdio: init.inherit ? "inherit" : undefined,
+        windowsHide: true,
       });
       if (ran.error) throw ran.error;
       return {
