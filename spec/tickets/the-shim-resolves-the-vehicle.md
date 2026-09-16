@@ -82,7 +82,11 @@ record:
   - step: sync
     skipped: true
     why: the box runs off the cloud
-step: split
+  - step: split
+    hand: box d42624a67d18a8
+    hash_before: 8b91f969050933ab127b17b006c29a3ef37fa811
+    hash_after: 8b91f969050933ab127b17b006c29a3ef37fa811
+step: children
 ---
 
 # Ask
@@ -107,9 +111,13 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 
 ## children
 
-<!-- every child as a link, one a line, with its process -->
+- [[spec/tickets/shim-resolves-vehicle]], on the standard process, closed done
 
-<!-- the form is list -->
+## checked
+
+- the one child reads whole: a shim, one function, two tests and two design chapters
+- the child carries every line of the group's ask, and the bridgehead's register road belongs to the install group
+- the child waits on nothing, and the group waits on the stub group under depends_on
 
 # children
 
