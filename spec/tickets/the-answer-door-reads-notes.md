@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -101,6 +101,10 @@ record:
     hash_after: b5beaec62548f3d5293fa7dfb7260476a7519109
     returns: 1
     why: Name the word `namesNote` reads off the prompt. Both done_when cases wait on it, and neither stands decidable meanwhile.; `namesNext` stands nowhere in the tree. Point at `opensATurn` and `questionsIn` in `lib/answer.js`, which read a prompt the same way.; Say which `note` row pays. A growing count pays on any note, so a note on another matter clears the prompt.; Say what the `reply` line carries where a note pays. The demand after it reads `spoken` as the text it saw.; The disk read holds. The box carries the disk door, a fake stands beside it, and `ticket note` writes the row.; `./RUNME.sh check` answers 0.
+  - step: design/draft
+    hand: box d42624a67d18a8
+    hash_before: 5b321a32db7820ab4e93b5c5c58a3822c25be3cf
+    hash_after: 0f968e6f463d0daf6b7997dba237973161af09a1
 ---
 
 # Ask
