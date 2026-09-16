@@ -85,6 +85,10 @@ last line says which of the three stands:
 
 A desk pull starts nothing, and a take that fails starts nothing.
 
+The line it runs is the bridgehead's own, imported from the hook. So one text
+starts the server on both roads, and one table names what each code says. The
+stub's bridgehead keeps a copy, because that file imports nothing.
+
 ## The bridgehead starts it too
 
 The take verb reaches a cloud box that pulls work. A cloud session opening on
