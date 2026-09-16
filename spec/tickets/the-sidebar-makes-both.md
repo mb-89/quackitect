@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 depends_on: [the-stub-takes-shape]
 steps:
@@ -111,7 +111,12 @@ record:
     hand: box 1eeed4143ad0
     hash_before: 18e60be12d7a1a5734c27f85d91d2c26dce6e217
     hash_after: 18e60be12d7a1a5734c27f85d91d2c26dce6e217
+  - step: retro/cloud
+    hand: box 1eeed4143ad0
+    hash_before: 96666705d1535dd16aee3843d59002aaf1369c0e
+    hash_after: 96666705d1535dd16aee3843d59002aaf1369c0e
 step: retro/cloud
+reason: done
 ---
 
 # Ask
@@ -223,20 +228,30 @@ The formatter and the committed files disagree on a few long lines, and a hand w
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- nothing: every tool installed at the take, the proxy refused no host, and the platform refused no right
+- an editor, so the two buttons stand proven through the fake door and the declaration alone
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- no trunk guard, and no conflict at sync
+- no cap on an answer
+- the write rule on shell redirection, once the server ran, at the check before tests-green
+- the tree test counting five drawn controls, which failed on the box until it counted seven
+- the check asking for the server, which failed on the box until the serve verb ran
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- no person step parked, and no ticket minted without a group
+- the marks on the two buttons are placeholders, and the owner picks the final ones in the schema
+- a press in a real window waits for a desk with the editor, as the retro says
 
 # Discussion
 
