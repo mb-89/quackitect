@@ -212,9 +212,39 @@ get_lsp() {
 
 index_here() { [ -x "$bin/se-index${exe}" ]; }
 
+# [[spec/design_output/index#the-compiler-it-needs]]
+get_zig() {
+  case "$os" in
+    Windows) platform=windows; ending=zip ;;
+    macOS)   platform=macos;   ending=tar.xz ;;
+    *)       platform=linux;   ending=tar.xz ;;
+  esac
+  case "$arch" in
+    arm64) machine=aarch64 ;;
+    *)     machine=x86_64 ;;
+  esac
+  name="zig-${machine}-${platform}-${zig_version}"
+  from="https://ziglang.org/download/${zig_version}/${name}.${ending}"
+
+  say "  downloading Zig ${zig_version}, the C compiler the index builds with"
+  mkdir -p "$bin"
+  tmp=$(mktemp -d)
+  if have curl; then curl -fsSL "$from" -o "$tmp/zig.$ending" || return 1
+  elif have wget; then wget -q "$from" -O "$tmp/zig.$ending" || return 1
+  else say "Neither curl nor wget downloads Zig here." >&2; return 1
+  fi
+  if [ "$ending" = zip ]; then unpack "$tmp/zig.$ending" "$tmp" || return 1
+  else tar -xJf "$tmp/zig.$ending" -C "$tmp" || return 1
+  fi
+  rm -rf "$bin/zig"
+  mv "$tmp/$name" "$bin/zig" || return 1
+  rm -rf "$tmp"
+  [ -x "$bin/zig/zig${exe}" ]
+}
+
 get_index() {
-  cc=$(compiler_here) || {
-    say "  no C compiler stands here, so the index waits." >&2
+  cc=$(compiler_here) || { get_zig && cc=$(compiler_here); } || {
+    say "  no C compiler stands here, and Zig failed to download, so the index waits." >&2
     return 1
   }
   say "  building the index with $cc"
@@ -319,11 +349,12 @@ missed() {
 here() {
   case $1 in
     node)    have node ;;
+    modules) [ -d "$root/node_modules/wink-nlp" ] ;;
     vale)    [ -x "$bin/vale${exe}" ] ;;
     biome)   [ -x "$bin/biome${exe}" ] ;;
     vale-ls) [ -x "$bin/vale-ls${exe}" ] ;;
     go)      have go ;;
-    index) index_here || ! compiler_here >/dev/null ;;
+    index) index_here ;;
     se-lsp) lsp_here || ! have go ;;
     editor-client) [ -d "$client_folder" ] ;;
     editor-link) editor_linked ;;
@@ -335,6 +366,7 @@ here() {
 why() {
   case $1 in
     node) say "node: the command line and the level zero rules are JavaScript" ;;
+    modules) say "modules: the node packages package.json names, wink-nlp reads the tense behind the voice rules" ;;
     vale) say "vale: Vale holds the prose rules the write door and the linter read" ;;
     biome) say "biome: Biome formats and lints the JavaScript in this tree" ;;
     vale-ls) say "vale-ls: the Vale language server, so an editor draws the same rules" ;;
@@ -351,6 +383,7 @@ why() {
 get() {
   case $1 in
     node) get_node ;;
+    modules) (cd "$root" && npm install --omit=dev --no-audit --no-fund) ;;
     vale) get_vale ;;
     biome) get_biome ;;
     vale-ls) get_vale_ls ;;
@@ -364,9 +397,12 @@ get() {
   esac
 }
 
+# SE_INSTALL_SKIP names the wants a caller leaves out, so a test vehicle builds
+# no index and links no editor while it proves the copy stands alone.
 missing=""
-for one in node vale biome vale-ls go index se-lsp editor-client editor-link \
+for one in node modules vale biome vale-ls go index se-lsp editor-client editor-link \
   editor-extensions git-hooks; do
+  case " ${SE_INSTALL_SKIP:-} " in *" $one "*) continue ;; esac
   here "$one" || missing="$missing $one"
 done
 

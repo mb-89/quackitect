@@ -151,7 +151,7 @@ test("the tool takes one reason out of the rules, and names each one", () => {
 test("a sound reason stands, a fact over it falls, and an unknown id says so", () => {
   const stands = stopAnswer(TABLE, "talk", voted([], "talk"));
   assert.equal(stands.ends, true);
-  assert.match(stands.result, /^The stop stands\. .*Write nothing more\.$/);
+  assert.match(stands.result, /^The stop stands\. .*Write the words Ending my turn, and nothing more\.$/);
 
   const falls = stopAnswer(TABLE, "done", voted(["work-waiting"], "done"));
   assert.deepEqual([falls.known, falls.ends], [true, false]);
@@ -212,6 +212,16 @@ test("mostInARow ends a runaway", () => {
   }
   assert.deepEqual(carried, [false, false, false, true]);
   assert.equal(it.inARow(), 0, "the count starts again");
+});
+
+// [[spec/design_output/stop#three-in-a-row]]
+test("a firm continue rule holds past the cap, because the queue still holds work", () => {
+  const it = toothOf();
+  const firm = { ends: false, go: { id: "the-queue-holds-work", firm: true } };
+  const carried = [];
+  for (let i = 0; i < 5; i++) carried.push(it.atTurnEnd(firm, 3).ends);
+  assert.deepEqual(carried, [false, false, false, false, false]);
+  assert.equal(it.atTurnEnd({ ends: false, go: { id: "work-still-stands" } }, 3).ends, true, "a plain rule lets go at the cap");
 });
 
 test("a prompt from outside the plugin puts the count back", () => {

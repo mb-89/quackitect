@@ -1,4 +1,4 @@
-// The verb behind `./RUNME.sh work review <name>`. It gathers what a reader
+// The verb behind `./RUNME.sh branch review <name>`. It gathers what a reader
 // needs, answers the two questions a program owns, and prints the report. No
 // model runs here.
 // [[spec/design_output/review#what-the-verb-gathers]]
@@ -11,13 +11,13 @@ import {
   WORKTREE,
 } from "../../.claude/skills/level0/lib/review.js";
 import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
+import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 
-const TRUNK = "main";
 const LOUD = 5;
 
 export function review(it, name, argv) {
   if (!name) {
-    console.error("work review needs a name: ./RUNME.sh work review fix-lsp");
+    console.error("branch review needs a name: ./RUNME.sh branch review fix-lsp");
     return 2;
   }
   const branch = name.startsWith("work/") ? name : `work/${name}`;
@@ -26,7 +26,7 @@ export function review(it, name, argv) {
   const ref = refFor(it, branch);
   if (!ref) {
     console.error(`${branch} stands nowhere, here or on origin.`);
-    console.error("Run ./RUNME.sh work list to see every branch that does.");
+    console.error("Run ./RUNME.sh branch list to see every branch that does.");
     return 1;
   }
   const trunk = refFor(it, TRUNK) ?? TRUNK;

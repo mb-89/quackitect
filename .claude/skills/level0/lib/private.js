@@ -1,8 +1,6 @@
 // The private half stays home. A raw note under .se carries anything a person
-// dumps into it, and two doors hold it there: the write door refuses a tracked
-// write carrying that note's own words or its own tokens, and the commit door
-// refuses a delta carrying a shape, the box's own name or a note's text. Every
-// check reads strings alone, so a caller hands the texts in.
+// dumps into it, and the doors refuse a tracked write or a delta carrying it.
+// Every check reads strings alone, so a caller hands the texts in.
 // [[spec/design_output/private#the-run-and-the-token]]
 
 import { PROSE } from "./vale.js";
@@ -192,6 +190,8 @@ const DATES = [
 ];
 const HOMES = /(?:\/home\/|\/Users\/|[A-Za-z]:\\Users\\)([A-Za-z0-9._-]+)/g;
 const DIGITS = /\d/g;
+const PHONE_DIGITS = 8;
+const ADDED = "+++ ";
 
 export const SHAPE = "ShapeStaysHome";
 export const BOX = "BoxNameStaysHome";
@@ -214,8 +214,8 @@ export function addedIn(diff) {
       binary = true;
       continue;
     }
-    if (line.startsWith("+++ ")) {
-      file = pathIn(line.slice(4));
+    if (line.startsWith(ADDED)) {
+      file = pathIn(line.slice(ADDED.length));
       continue;
     }
     const hunk = /^@@+ .*\+(\d+)(?:,\d+)? @@/.exec(line);
@@ -244,7 +244,7 @@ export function shapesIn(added) {
       );
     }
     for (const said of matched(one.text, CALLED)) {
-      if ((said.match(DIGITS) ?? []).length < 8) continue;
+      if ((said.match(DIGITS) ?? []).length < PHONE_DIGITS) continue;
       out.push(
         found(SHAPE, one, said, [
           "A phone number reaches one person, and a tracked file reaches the world.",

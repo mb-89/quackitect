@@ -17,7 +17,7 @@ group: a-group-is-a-branch
 
 # Ask
 
-`work list` reads a group's tickets off the branch that holds them, so a person on trunk sees the loose ones and nothing else.
+`branch list` reads a group's tickets off the branch that holds them, so a person on trunk sees the loose ones and nothing else.
 
 Done is a row per ticket of the held group, under the group's row, drawn off the branch tip that `list` already fetches.
 

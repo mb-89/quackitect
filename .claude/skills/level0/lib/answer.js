@@ -1,8 +1,9 @@
 // The owner's prompt comes first, and the gate reads the answer at the turn's
-// end. This holds both rules: which prompts open a turn a person is waiting on,
-// what a refusal says, and the score, the bands and the state of the gate.
+// end. This holds the rules of both doors.
 // [[spec/design_output/level0#the-owners-prompt-comes-first]]
 // [[spec/design_output/level0#the-gate-reads-the-answer]]
+
+import { scoreOf as score } from "./voice.js";
 
 // [[spec/design_output/level0#which-prompt-opens-a-turn]]
 const OPENS = new Set([
@@ -20,16 +21,17 @@ const REACHES = new Set(["AskUserQuestion"]);
 
 // [[spec/design_output/level0#what-the-refusal-says]]
 export const SAYS = [
-  "The owner asked something and nothing has answered it. Call mcp__level0__log",
-  "with kind answer, saying what you understood and what you do next, then work.",
+  "The owner asked something and nothing has answered it. Write the answer in",
+  "the chat, as text: what you understood and what you do next. Then work.",
+  "The log takes the answer from the chat, so the log tool answers nothing.",
 ].join("\n");
 
-// [[spec/design_output/level0#one-warning-then-a-refusal]]
+// [[spec/design_output/level0#a-warning-on-every-call]]
 export function warns(why) {
   return [
-    `${why}, and nothing has answered it yet. Call mcp__level0__log with kind`,
-    "answer, saying what you understood and what you do next, before the next",
-    "tool call. Level zero refuses that call until an answer stands.",
+    `${why}, and nothing has answered it yet. Write the answer in the chat, as`,
+    "text before the next tool call: what you understood and what you do next.",
+    "Level zero refuses that call until an answer stands in the chat.",
   ].join(" ");
 }
 
@@ -275,10 +277,7 @@ export function wordsIn(text) {
 }
 
 export function scoreOf(text, found) {
-  const words = wordsIn(text);
-  const rows = found?.length ?? 0;
-  if (!words || !rows) return 0;
-  return Math.round((rows / words) * 10000) / 10;
+  return score(wordsIn(text), found?.length ?? 0);
 }
 
 // [[spec/design_output/level0#the-three-bands]]
@@ -293,31 +292,25 @@ export function bandOf(score, bands, found) {
 
 // [[spec/design_output/level0#the-gate-holds-its-state]]
 export function gateOf() {
-  let sent = false;
-  let inARow = 0;
+  let waiting = null;
 
   return {
-    inARow: () => inARow,
-
-    sawPrompt(mine) {
-      sent = false;
-      if (!mine) inARow = 0;
-    },
+    waiting: () => waiting,
 
     // [[spec/design_output/level0#the-three-bands]]
     atTurnEnd(it) {
       const found = it?.found ?? [];
       const score = scoreOf(it?.text, found);
       const band = found.length ? bandOf(score, it, found) : CLEAN;
-      const said = { score, band, found, sends: false, runaway: false, held: false };
-      if (band === CLEAN || band === CARRY) return said;
+      if (band !== CLEAN) waiting = { found, score, band };
+      return { score, band, found };
+    },
 
-      const most = Number(it?.mostInARow ?? 0);
-      const runaway = most > 0 && inARow >= most;
-      if (sent || runaway || it?.toothSpoke) return { ...said, runaway, held: true };
-      sent = true;
-      inARow += 1;
-      return { ...said, sends: true };
+    // [[spec/design_output/level0#the-findings-ride-the-next-call]]
+    takeWaiting() {
+      const held = waiting;
+      waiting = null;
+      return held;
     },
   };
 }

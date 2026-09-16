@@ -1,6 +1,5 @@
-// The reader that goes before trunk. This file holds what a review gathers,
-// the questions a model answers, and the shape of the report. The verb and the
-// hooks module both load it, so one report shape serves both.
+// The reader that goes before trunk. The verb and the hooks module both load
+// it, so one report shape serves both.
 // [[spec/design_output/review#what-the-report-looks-like]]
 
 export const TOOL = "review_branch";
@@ -8,10 +7,11 @@ export const CALLED = `mcp__level0__${TOOL}`;
 export const BRIEF = "HANDOVER.md";
 export const WORKTREE = ".se/review";
 export const DIFF_CAP = 120000;
+const NAME_WIDTH = 10;
 
 export const ASKED = ["brief", "beyond", "tests"];
 
-// [[spec/design_output/review#the-five-questions]]
+// [[spec/design_output/review#the-questions]]
 // [[spec/design_output/work#every-brief-carries-the-contract]]
 export function retroIn(text) {
   const heading = /^#{1,6}[^\S\n]+[^\n]*\b(?:retro\w*|surprises?|dead ends?)\b/im;
@@ -143,7 +143,7 @@ export function report(said, read = {}) {
   const fix = mechanical + (read.fix ?? 0);
   const unread = String(read.unread ?? "").trim();
   if (!fix && !unread) {
-    return `${said.branch}   nothing to fix. Run work merge to take it in.`;
+    return `${said.branch}   nothing to fix. Run branch merge to take it in.`;
   }
 
   const rows = [
@@ -155,12 +155,11 @@ export function report(said, read = {}) {
     ["reader", unread],
   ].filter(([, value]) => String(value ?? "").trim());
 
-  const pad = 10;
   const out = [said.branch, ""];
   for (const [name, value] of rows) {
     const lines = String(value).split("\n");
-    out.push(`${name.padEnd(pad)} ${lines[0]}`);
-    for (const rest of lines.slice(1)) out.push(`${" ".repeat(pad)} ${rest}`);
+    out.push(`${name.padEnd(NAME_WIDTH)} ${lines[0]}`);
+    for (const rest of lines.slice(1)) out.push(`${" ".repeat(NAME_WIDTH)} ${rest}`);
   }
   out.push("", closing(fix));
   return out.join("\n");
@@ -174,5 +173,5 @@ function redly(check) {
 
 function closing(fix) {
   const many = `${fix} thing${fix === 1 ? "" : "s"} to fix`;
-  return `${fix ? many : "Nothing to fix"}. Run work merge once every fix lands.`;
+  return `${fix ? many : "Nothing to fix"}. Run branch merge once every fix lands.`;
 }

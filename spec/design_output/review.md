@@ -5,7 +5,7 @@ kind: [[design_output]]
 # Scope
 
 `src/scripts/review.js` gathers what a reader wants off a branch. This note
-covers the verb, the worktree it runs in, and the five questions it answers.
+covers the verb, the worktree it runs in, and the questions it answers.
 
 # What the reader is
 
@@ -25,7 +25,7 @@ no switch holding a branch back.
 
 | half | who runs it | what it answers |
 |---|---|---|
-| the verb | `./RUNME.sh work review <name>` | the check and the retro |
+| the verb | `./RUNME.sh branch review <name>` | the check and the retro |
 | the reader | the `review_branch` tool | the brief, the diff and the tests |
 
 The verb stands alone. A person runs it, reads the diff themselves, and has the
@@ -41,7 +41,7 @@ mechanical answers in front of them while they do.
 | the whole diff | `git diff main...<ref>` |
 | the check | `./RUNME.sh check` on that branch |
 
-The brief and the handback are one file at two commits. `work new` writes the
+The brief and the handback are one file at two commits. `branch new` writes the
 brief in the branch's first commit, so `git rev-list --reverse main..<ref>`
 names the commit the brief lives in, and the tip carries the handback.
 
@@ -50,7 +50,7 @@ names the commit the brief lives in, and the tip carries the handback.
 ## Which ref it reads
 
 The verb fetches, then takes `origin/work/<name>` where origin carries it and
-the local branch otherwise. `work merge` merges from origin, so origin is what
+the local branch otherwise. `branch merge` merges from origin, so origin is what
 the merge takes and origin is what the reader reads.
 
 Trunk resolves the same way, and a branch carrying no commit beyond trunk stops
@@ -62,7 +62,7 @@ Three dots read the diff from where the branch leaves trunk. Two dots read it
 from trunk's tip, so a branch standing behind trunk shows every commit trunk
 holds since as a removal.
 
-One real review pays that price here. A branch 19 commits behind trunk answers
+One real review pays that price here. A branch far behind trunk answers
 "two entire subsystems, deleted and undisclosed", over code the branch leaves
 alone. `rev-list` keeps two dots, because it counts the branch's own commits.
 
@@ -86,7 +86,7 @@ removing the worktree takes the whole of it away.
 A red check answers with the lines naming the break. It takes every `not ok`
 row the test runner writes, and the last lines of the run where it writes none.
 
-# The five questions
+# The questions
 
 They live in `spec/guidance/review/reviewing.md`, written as actionables the way every
 other guidance note is. Level zero hands them to every session, so the reader

@@ -214,7 +214,7 @@ func erase(m model, n int) model {
 func TestTheHeaderNamesTheColumnsAndTheThreeKeysAboveARule(t *testing.T) {
 	t.Parallel()
 	lines := strings.Split(window(3).View(), "\n")
-	for _, want := range []string{"time", "level", "kind", "said", "enter details", "alt+? help", "alt+f filter"} {
+	for _, want := range []string{"time", "level", "kind", "said", "enter details", "alt+? help", "alt+f filter", "alt+L log lvl: INFO"} {
 		if !strings.Contains(lines[0], want) {
 			t.Fatalf("the first line names %q, and reads %q", want, lines[0])
 		}
@@ -224,6 +224,39 @@ func TestTheHeaderNamesTheColumnsAndTheThreeKeysAboveARule(t *testing.T) {
 	}
 	if !strings.Contains(lines[2], "line 1") {
 		t.Fatalf("the log starts under the rule, and the third line reads %q", lines[2])
+	}
+}
+
+// [[spec/design_output/viewer#alt-l-raises-the-floor]]
+func TestAltLRaisesTheFloorAndComesRoundAgain(t *testing.T) {
+	t.Parallel()
+	m := newModel("no/such/log.jsonl", time.UTC)
+	m.w, m.h = 120, 10+headWide
+	for at, level := range []string{"debug", "info", "warn", "error", "fatal", ""} {
+		r := row(at+1, "hook", "a "+level+" line")
+		r.Level = level
+		m.all = append(m.all, r)
+	}
+	m.rebuild()
+
+	shown := func() int { return len(m.view) }
+	if shown() != 5 {
+		t.Fatalf("the floor opens at info and shows 5 rows, and it shows %d", shown())
+	}
+	if !strings.Contains(strings.Split(m.View(), "\n")[0], "alt+L log lvl: INFO") {
+		t.Fatalf("the header names the floor, and reads %q", strings.Split(m.View(), "\n")[0])
+	}
+	for _, want := range []struct {
+		floor string
+		rows  int
+	}{{"warn", 3}, {"error", 2}, {"fatal", 1}, {"debug", 6}, {"info", 5}} {
+		m = alt(m, 'l')
+		if m.floor != want.floor || shown() != want.rows {
+			t.Fatalf("alt+l brings the floor to %s with %d rows, and stands at %s with %d", want.floor, want.rows, m.floor, shown())
+		}
+		if !strings.Contains(strings.Split(m.View(), "\n")[0], "log lvl: "+strings.ToUpper(want.floor)) {
+			t.Fatalf("the header names %s, and reads %q", want.floor, strings.Split(m.View(), "\n")[0])
+		}
 	}
 }
 

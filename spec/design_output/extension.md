@@ -11,19 +11,8 @@ declaration behind it, the five widgets, and the grid holding them.
 
 `src/extension` is a VS Code extension drawing one sidebar. The declaration
 says what every value is and where it draws. The extension turns that into a
-page. It carries no dependency, and `./RUNME.sh` links the folder in.
-
-- `extension.js`: what the editor loads
-- `editor.js`: the one module reaching vscode
-- `sidebar.js`: the wiring under it
-- `lib/widgets.js`: the declaration as widgets
-- `lib/grid.js`: the grid check
-- `lib/panel.js`: declaration to HTML
-- `lib/values.js`: a key in the local file
-- `lib/session.js`: the session boundary
-- `lib/gesture.js`: a press count to a state, held in the host
-- `lib/logbook.js`: the sidebar's lines in the door log
-- `webview/clicks.js`: a click to a message
+page. It carries no dependency, and `./RUNME.sh` links the folder in. The
+header of each file under `src/extension` says what it holds.
 
 # It starts silent
 
@@ -54,18 +43,8 @@ files, draws once, and asks the editor to watch them.
 
 `spec/config/level0.json` holds the values. `spec/config/level0.schema.json`
 says what each key is. The draw fields land beside the type, because that file
-already carries the type and the options:
-
-    "hold": {
-      "type": "string",
-      "enum": ["running", "finishing", "stopped"],
-      "help": "What the session does when it reaches the end of a turn.",
-      "widget": "toggle",
-      "gesture": 5,
-      "icon": "✋🤖",
-      "group": "agent control",
-      "row": 0, "column": 1, "rowSpan": 1, "colSpan": 1
-    }
+already carries the type and the options. The entry `stop.hold` there shows
+every field in use.
 
 | field | says |
 |---|---|
@@ -191,15 +170,8 @@ theme moves the page with no redraw.
 fields for one mark are two things to keep in step. A mark written the old way,
 as `U+270B`, draws the same character.
 
-The four buttons, and the one file naming them,
-`spec/config/level0.schema.json`:
-
-| key | `icon` | what it does |
-|---|---|---|
-| `log.open` | `📜` | runs `./RUNME.sh log`, which opens the log viewer in a terminal |
-| `stop.hold` | `✋🤖` | running, then finishing, and stops at five presses |
-| `ask.wanted` | `❓🤖` | quiet, then short, and the full report at five presses |
-| `engine.binding` | `❌🔗🤖` | the queue, then unbound, and god mode at five presses |
+The buttons, their marks and their ladders stand in one file,
+`spec/config/level0.schema.json`, under the group `agent control`.
 
 A mark stands still. The button says the state by the colour it wears, and by
 the pulse it takes at the far end.
@@ -268,29 +240,23 @@ the open sections live in `setState`, so a redraw takes them back.
 
 ## A gesture picks a state
 
-A click count picks which of three a control holds:
-
-| control | at rest | one click | five clicks |
-|---|---|---|---|
-| hold | running | finish this work | stop now |
-| ask | quiet | a short update | a full report |
-
-The host counts the presses, and the page counts none. Every write draws the
+A click count picks which of a control's options it holds, and the schema's
+`enum` names them in order. The host counts the presses, and the page counts none. Every write draws the
 page again, and a new page carries a new script. So a count kept in the page
 starts over at every press, and stands at one.
 
 `pressed` takes the press time as an argument, so a burst replays in a test:
 
-- a press within 800ms of the last one joins its burst, and a later one opens a new burst
-- the first press of a burst climbs one rung
-- presses two to four stand by
-- a press away from rest falls back to rest, however far it stands
-- the fifth press of a burst sends the far value
-- the button stands dead for 600ms after the far value, so a sixth press stands by too
+- a press inside the burst window `lib/gesture.js` names joins its burst, and a later one opens a new burst
+- the first press of a burst climbs one step
+- the presses between stand by
+- a press away from rest falls back to rest, at any distance
+- the press `gesture` names in the schema sends the far value
+- the button stands dead for the rest `lib/gesture.js` names after the far value, so one more press stands by too
 
-Climbing goes one rung at a time, because handing over a whole ladder in one
+Climbing goes one step at a time, because handing over a whole ladder in one
 click is a move a person means. Releasing goes any distance at once, so a
-stray press always falls DOWN. That asymmetry is the safety, and it stands in
+stray press always falls DOWN. That one-way fall is the safety, and it stands in
 place of a dialog asking whether a person means it.
 
 ## A press writes a line
@@ -299,8 +265,8 @@ Every press that writes, every run and every edit in the config tree writes a
 `sidebar` line to the door log. For details, see
 [[spec/design_output/log#which-door-says-what]].
 
-- One press writes `stop.hold is finishing`, with the detail `one press`.
-- Five presses write `stop.hold is stopped`, with the detail `5 presses`.
+- One press writes `stop.hold is finish`, with the detail `one press`.
+- Five presses write `stop.hold is stop`, with the detail `5 presses`.
 - The log button writes `log.open runs ./RUNME.sh log`.
 - An edit in the config tree writes `stop.mostInARow is 5`, with the detail `the config tree`.
 
@@ -312,7 +278,7 @@ line honours `log.level`, the same as every other door.
 
 A slash command and a button set the same key through the same file, so each
 shows what the other sets. The hover of a toggle names a command for each of its
-states down the widget path, as `/se-agent-control-hold-stopped`. The config
+states down the widget path, as `/se-agent-control-hold-stop`. The config
 tree answers the same key down the config path. The projection writes both. For
 details, see [[spec/design_output/projection#the-first-target]].
 
@@ -350,9 +316,28 @@ beside the editor. An action opening another program hands a person that
 program's keys. So the declaration carries them and the hover says them.
 For details, see [[spec/design_output/viewer#the-keys]].
 
-The rule generalises. Where an action starts another program, its hover names
+The rule holds for every action. Where an action starts another program, its hover names
 the keys that program needs, and the declaration carries them beside the
 `help`.
+
+## The hook button
+
+The hook stands before the log in the agent control, and it is a `process`
+widget: a button for a program the extension itself runs. A click starts the
+server behind the bridgehead as a child of the extension, and a click on a
+running one kills it. Shift and click starts it under the editor's debugger,
+through the launch config the declaration names. The light says which: dark
+for nothing, green for the server, amber for the server under the debugger.
+
+Before the debugger starts, the extension reads the server's file and finds
+the function the declaration names under `pauses`. It puts a source break on
+the first `return` in it. So the break stands as a red dot in the file, and a
+person turns it into a log point or a condition. The dot moves with the
+function, and a dot standing on that line already stays.
+
+A dead server blocks nothing, so the agent runs the same with the light dark.
+The sidebar writes the start and the stop at `info`, and so does the server.
+For details, see [[spec/design_output/level0#the-bridgehead-and-the-server]].
 
 # What level zero holds
 
@@ -370,25 +355,41 @@ meet in the file and nowhere else.
 
 ## The hold is one rule
 
-`stop.hold` writes one of three values, and the table reads the last:
+`stop.hold` writes one of the values the schema names, and the table reads the
+last. The rule `the-owner-holds-this-session` in `spec/config/stop/level0.yml`
+stands over `work-still-stands`, so a hold beats a list with something on it.
+`holds` answers the check `owner-holds`. A contract test reads every mechanical
+name the table carries, and asserts the hook answers it.
 
-| value | what the tooth does |
-|---|---|
-| `running` | leaves the vote as it stands |
-| `finishing` | leaves the vote, and the block asks for nothing new |
-| `stopped` | ends the turn, over the rule carrying standing work |
-
-The rule stands at priority 85, over `work-still-stands` at 80. So a hold beats
-a list with something on it. `holds` answers the check `owner-holds`. A
-contract test reads every mechanical name the table carries, and asserts the
-hook answers it.
+The hold is one turn long. The turn's end drops it to `off`, so the widget
+falls back to rest the way the ask does. For what each value does, see
+[[spec/design_output/stop#the-hold]].
 
 ## The ask is a line
 
-`ask.wanted` writes `quiet`, `short` or `full`. A value past `quiet` puts one
-block in front of the agent, and the turn's end writes the key back to `quiet`.
-So the ask asks once, and the sidebar draws the answer as the widget falling
-back to rest.
+`ask.wanted` writes `quiet`, `short` or `full`. A value past `quiet` opens a
+demand like a prompt: the block rides the next call, and the reply stands
+before the call after it. The agent hands the reply in through
+`mcp__level0__report`. The reply pays the ask, and the pay writes the key back
+to `quiet`. So the ask asks once, the work goes on, and the sidebar draws the
+answer as the widget falling back to rest.
+
+| the ask | what pays it |
+|---|---|
+| `short` | any reply |
+| `full` | a reply in the shape of `spec/config/status.yaml` |
+
+A reply written as chat text between calls reaches no hook until the turn
+ends, so the tool is the road. For details, see
+[[spec/design_output/level0#what-the-door-reads]].
+
+The shape stands in `spec/config/status.yaml`: each chapter a heading with text
+under it. The door refuses a reply lacking one, and names the chapters it
+lacks. A turn ending on such a reply holds: the stop door re-prompts with the
+same reason, and the ask stands until a reply fits.
+
+The pay takes back the value it answers, and that value alone. A press landing
+after the demand opens stands, and the next call asks for it.
 
 # What a cloud box proves
 
@@ -423,7 +424,7 @@ none of its own.
 `src/scripts/editor.js` makes the link through the disk door, and the shell asks
 it first:
 
-- `linked` answers 0 where the link reaches this tree and the list names the id, and prints nothing.
+- `linked` answers `0` where the link reaches this tree and the list names the id, and prints nothing.
 - `link` removes a copy, a stale link or a link pointing nowhere, links `src/extension`, and writes the entry.
 
 The link is a junction on Windows, which needs no administrator, and a symbolic
@@ -439,7 +440,7 @@ it, and the sidebar goes.
 
 The disk door reads such a link as a link, and reaches no folder behind it. So
 `linked` reads it as no link, `link` removes it the way it removes a copy, and
-the next `./RUNME.sh` mends it. The fake disk follows a link the same way, and
+the next `./RUNME.sh` fixes it. The fake disk follows a link the same way, and
 the contract test holds both doors to it. `./RUNME.sh doctor` says where the
 link stands, in a row named `sidebar`.
 
@@ -488,8 +489,8 @@ already carries, and four of those make a panel read as a paragraph.
 | the `away` colour | the value stands off its rest |
 | a red pulse | the value stands at the far end |
 
-The far end is the third option, which a gesture reaches. `stop.hold` takes two
-presses to `stopped`, and `ask.wanted` and `engine.binding` take five.
+The far end is the last option, which a gesture reaches, and `gesture` in the
+schema says how many presses.
 
 ## The gear picks the sections
 
@@ -518,8 +519,8 @@ sees it with the panel shut. `lib/states.js` decides what stands:
 
 - `engine.binding` at `god` reads `level zero refuses nothing`, on the error colour.
 - `engine.binding` at `unbound` reads `unbound`, on the warning colour.
-- `stop.hold` at `finishing` reads `finishing`, on the warning colour.
-- `stop.hold` at `stopped` reads `stopped`, on the error colour.
+- `stop.hold` at `finish` reads `finish`, on the warning colour.
+- `stop.hold` at `stop` reads `stop`, on the error colour.
 
 A click on one puts its key back at rest, through the command `quackitect.rest`.
 A state arriving while the window runs raises a warning toast once, and the
@@ -550,7 +551,7 @@ Where no log stands yet, the plain verb says so in one line and answers zero.
 
 A terminal opens on the shell the box prefers, which is PowerShell there, and
 that shell reads no `./RUNME.sh`. So the door hands it `.\RUNME.ps1` instead,
-which is the doorway a person there already takes.
+which is the entry a person there already takes.
 
 # What stands open
 

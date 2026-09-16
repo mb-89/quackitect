@@ -182,7 +182,7 @@ test("the verb refuses a review naming no branch", () => {
   const { code, said } = heard(() => work(ROOT, ["review"], it));
 
   assert.equal(code, 2);
-  assert.match(said, /work review needs a name/);
+  assert.match(said, /branch review needs a name/);
   assert.deepEqual(ranGit(outside), [], "it reaches git no further");
 });
 
@@ -202,7 +202,7 @@ test("the report names the branch, every answer and the count", () => {
   assert.match(said, /^retro {6}present$/m);
   assert.match(said, /^tests {6}2 rules added, 1 carries no test:$/m);
   assert.match(said, /^ {11}StopRule fires on nothing$/m);
-  assert.match(said, /^2 things to fix\. Run work merge once every fix lands\.$/m);
+  assert.match(said, /^2 things to fix\. Run branch merge once every fix lands\.$/m);
 });
 
 test("a report with nothing to fix fits on one line", () => {
@@ -212,7 +212,7 @@ test("a report with nothing to fix fits on one line", () => {
   );
 
   assert.equal(said.split("\n").length, 1);
-  assert.match(said, /nothing to fix\. Run work merge to take it in\./);
+  assert.match(said, /nothing to fix\. Run branch merge to take it in\./);
 });
 
 test("a red check and an absent retro each count one thing to fix", () => {
@@ -232,7 +232,7 @@ test("the report holds no merge back, whatever it finds", () => {
     { brief: "the brief asks for two things, and one lands", fix: 4 },
   );
 
-  assert.match(bad, /Run work merge once every fix lands\./);
+  assert.match(bad, /Run branch merge once every fix lands\./);
   assert.equal(/\bblock|\brefus|\bdeny|\bgate\b/i.test(bad), false);
 });
 
@@ -328,7 +328,7 @@ test("the verb alone prints the two rows it owns, and no brief", () => {
   assert.match(said, /^check {6}passes$/m);
   assert.match(said, /^retro {6}absent from the handback$/m);
   assert.equal(said.includes("Hold the numbers"), false, "the brief stays out");
-  assert.match(said, /^1 thing to fix\. Run work merge once every fix lands\.$/m);
+  assert.match(said, /^1 thing to fix\. Run branch merge once every fix lands\.$/m);
 });
 
 // [[spec/design_output/review#three-dots-not-two]]

@@ -1,5 +1,5 @@
 // What alt+? and alt+f open in the details pane: how the window works, and how
-// the filter reads. The header names the three keys, and these say the rest.
+// the filter reads. The header names the keys, and these say the rest.
 // [[spec/design_output/viewer#the-help]]
 
 package main
@@ -21,6 +21,7 @@ KEYS
   home           the first line
   end            the newest line, and follow every line arriving
   e              the newest error, and e again the one before it
+  alt+l          raise the floor: info, warn, error, fatal, then debug, and round again
   q  ctrl+c      leave
 
 The log and the pane each keep their place, so a person reads a long reply
@@ -34,14 +35,21 @@ still while lines arrive. end brings it back.
 THE COLUMNS
 
   time           when the line lands, on this box's clock
-  level          blank for info, and warn or error in colour
+  level          info in grey, debug dim, and warn, error and fatal in colour
   kind           what it is. A tool line names its tool
   said           one sentence. The details hold the whole text
 
 COLOURS
 
 A prompt stands in yellow, and a reply in green. A warning stands in amber,
-and an error in red. Every other kind wears its own colour.
+an error in red, and a fatal line in magenta. Every other kind wears its own
+colour.
+
+THE FLOOR
+
+The window shows the lines at the floor and above. The floor opens at info,
+so debug lines stay hidden until alt+l brings the floor round to debug. The
+header names the floor beside alt+l, in red while it stands off info.
 
 THE DETAILS
 

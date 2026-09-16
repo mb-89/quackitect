@@ -2,8 +2,8 @@
 # outside these sets, so this file is a whitelist and names no bad word.
 #
 # The projection writes it into spec/config/styles/VoiceParagraph, one rule per
-# layer, and into VoiceJudged for the layers a model holds. A person edits this
-# file, and the write door refuses a hand edit to a target.
+# layer. A person edits this file, and the write door refuses a hand edit to a
+# target.
 # [[spec/funnel/a-paragraph-has-a-schema]]
 #
 # A register overrides a value for the paths it names, and keeps every value it
@@ -59,111 +59,76 @@ layers:
     tenses: [simple present, simple past, simple future, imperative, infinitive]
     auxiliaryChains: refused
     modals: [can, must, will]
+    hedges:
+      - just
+      - very
+      - really
+      - actually
+      - basically
+      - simply
+      - quite
+      - rather
+      - fairly
+      - somewhat
+      - perhaps
+      - maybe
+      - probably
+      - seems
+      - seem
+      - essentially
+      - clearly
+      - obviously
+      - certainly
+      - arguably
+      - importantly
+      - of course
+      - in order to
+      - it is worth
     contractions: refused
     latinShortForms: refused
     exceptions:
       - word: bound
         reason: a status here, and the tagger reads a past tense
-      - word: buys
-        reason: the tagger reads a past tense, and the word carries none
       - word: complicated
         reason: an adjective here
       - word: held
         reason: a status here
       - word: numbered
         reason: an adjective here
-      - word: read
-        reason: a noun and a present tense here
-      - word: red
-        reason: a colour, and the tagger reads a past tense
       - word: refused
         reason: an adjective here
       - word: settled
         reason: an adjective here
-      - word: skips
-        reason: the tagger reads a past tense, and the word carries none
       - word: switched
         reason: an adjective here
-      - word: bold
-        reason: a markup word, and the tagger reads a past tense
-      - word: add
-        reason: an imperative here, and the tagger reads a past tense
       - word: approved
         reason: an adjective here, on a word list
       - word: missing
-        reason: an adjective here, and the tagger reads a progressive
+        reason: an adjective here, and the progressive rule reads it after is
       - word: standing
-        reason: a gerund here, and the tagger reads a progressive
+        reason: a gerund here, and the progressive rule reads it after is
+    presentOnItsFace: a form that is its own lemma, or its -s or -ing form, stands, and the tense reader vetoes the tagger
 
   vocabulary:
-    words: spec/vocabulary/words.yml
+    core: spec/vocabulary/core.yml
+    terms: spec/vocabulary/terms.yml
+    swaps: spec/vocabulary/swaps.yml
+    stems: a plural, a past form and an -ing form of a listed word stand
     outside:
       - a code span
       - a link
       - a path
       - a word opening with a capital past the first word
     growth:
-      who: the session, on the refusal that names the word
-      entry: word, meaning, from, and insteadOf where a better word exists
-      review: the retro reads every entry with `from: session` and keeps it or cuts it
-    exceptions: []
-
-  # The judge holds this layer, one question per rule. The projection writes
-  # each entry into spec/config/styles/VoiceJudged. `span` says what one
-  # question reads, `reads` says which paths cost a call, and `ignores` says
-  # which paths cost none.
-  meaning:
-    judged:
-      # A guidance note stands for as long as the tree does, and a reader opens
-      # it to learn what to do. A handover, a rationale and a design doc each
-      # carry something else, so this question names the folder it reads. A
-      # runtime older than `reads` falls back to `ignores`, so both stand.
-      - id: Actionable
-        asks: Does this text tell the reader something they can act on, or does it explain where something came from, what once happened, or how many of something there were?
-        message: Write what the reader does next. Put the background in spec/rationales.
-        link: spec/guidance/guidance.md
-        labels: [actionable, background]
-        refuses: background
-        span: paragraph
-        reads: [spec/guidance/*.md]
-        ignores: [spec/rationales/*.md, spec/design_output/*.md, spec/funnel/*.md, .se/*.md]
-
-      # A name passes every pattern, because it is an ordinary word of ordinary
-      # length carrying no separator. The tracked notes alone, because a raw
-      # note under .se reaches git never.
-      - id: Role
-        asks: Does this text name a role somebody holds, such as the owner, the agent, the reader, the reviewer or the maintainer, or does it name one particular person, through a name, a handle or an address?
-        message: Name the role, and leave the person out. This tree holds the owner, the agent, the reader, the reviewer and the maintainer.
-        link: spec/guidance/voice.md
-        labels: [role, person]
-        refuses: person
-        span: paragraph
-        reads: ["*.md", spec/**/*.md]
-        ignores: [.se/*.md]
-
-      # A chapter carries one outcome, and an answer with no heading is one
-      # chapter. So this question reads a chapter and asks where the outcome
-      # stands inside it. A chapter opens on its own heading, so the question
-      # reads the block under that heading and leaves the heading out.
-      - id: BottomLineFirst
-        asks: Ignore a heading line. Where does this text state its main point? first means in its first block, late means only after other detail near the end, and even means every block carries equal weight.
-        message: Put the bottom line first, and the detail under it.
-        link: spec/guidance/voice.md
-        labels: [first, late, even]
-        refuses: late
-        span: chapter
-        reads: ["*.md", spec/**/*.md]
-        ignores: [.se/*.md]
-
-      # Voice rule 3 wants a list, a table or a diagram before prose. The list
-      # costs no call and stands in Vale, so the judge holds the other two.
-      - id: ShapeFits
-        asks: Do these sentences give the same fields for different things, or say what reaches what and what happens after what, or neither?
-        message: Reach for a table or a diagram first, and write prose where neither fits.
-        link: spec/guidance/voice.md
-        labels: [prose, table, diagram]
-        refuses: [table, diagram]
-        span: paragraph
+      who: a person, or a session together with the note that defines the word
+      entry: word and defines, a link to the note that defines it
+      review: the retro reads the terms added since, keeps each, or moves it to the swaps with the word to write
+      swap: a swap wins over every list, so a swapped word meets a refusal until the writer takes the word it names
+    exceptions:
+      - word: TL;DR
+        reason: a name the answer register uses, and its tail reads as a word
+      - word: isnt
+        reason: the voice rule against the negative writes it, and the apostrophe belongs to a contraction
 
 registers:
   prose:

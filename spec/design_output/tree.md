@@ -51,7 +51,7 @@ door in this tree already answers:
 answers the same shape.
 
 A finding names a file that stands on disk, so the panel opens it. A rule with
-no line to point at answers line 1, and a rule that finds the offending key
+no line to point at answers the first line. A rule that finds the key at fault
 answers the line holding it.
 
 # The tree handed in
@@ -85,9 +85,9 @@ whatever path a person names.
 
 # The script rule draws live
 
-The `[formats]` section maps a shell ending to `md`, so Vale reads a shell
-script. `spec/config/styles/VoiceScript` holds one rule over those two endings,
-and `NoPathInScript` stands there.
+`.vale.ini` maps a shell ending to `md`, so Vale reads a shell script.
+`spec/config/styles/VoiceScript` holds one rule over those endings, and
+`NoPathInScript` stands there.
 
 A person then meets the path fault under the line while typing, and the command
 line meets the same rule name. So `lib/scripts.js` goes, and the loop beside it

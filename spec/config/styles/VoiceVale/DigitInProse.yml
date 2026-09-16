@@ -1,0 +1,67 @@
+# A digit in a design note's prose is a count a command answers or a value a
+# file holds, so it belongs in a table, a heading, a link or a code span. A
+# version, a measurement with its unit, a token carrying letters and a list
+# number stand, because the notes need those where they are.
+extends: script
+message: "'%s' stands in prose. Put the number in a table, name the command that answers it, or point at the file holding it."
+link: spec/guidance/voice.md
+level: error
+scope: raw
+script: |
+  text := import("text")
+
+  fence := "``" + "`"
+  units := `^ ?(?:ms|s|MiB|KiB|MB|KB|GB|%)\b`
+  named := `(?:client|node|version)\s*$`
+
+  blanked := func(line) {
+    out := line
+    for shape in [`\[\[[^\]]*\]\]`, `\[[^\]]*\]\([^)]*\)`, "`[^`]*`"] {
+      found := text.re_find(shape, out, -1)
+      if is_error(found) || found == undefined { continue }
+      for hit in found {
+        span := hit[0]
+        out = out[:span.begin] + text.repeat(" ", span.end - span.begin) + out[span.end:]
+      }
+    }
+    return out
+  }
+
+  lines := text.split(scope, "\n")
+  matches := []
+  offset := 0
+  fenced := false
+  front := 0
+
+  for i := 0; i < len(lines); i++ {
+    line := lines[i]
+    at := offset
+    offset += len(line) + 1
+    trimmed := text.trim_space(line)
+
+    if trimmed == "---" && front < 2 { front++; continue }
+    if front == 1 { continue }
+    if text.has_prefix(trimmed, fence) || text.has_prefix(trimmed, "~~~") {
+      fenced = !fenced
+      continue
+    }
+    if fenced { continue }
+    if text.re_match(`^(?: {4,}|\t)`, line) { continue }
+    if text.has_prefix(trimmed, "#") || text.has_prefix(trimmed, "|") { continue }
+
+    read := blanked(line)
+    read = text.re_replace(`^(\s*)\d+[.)]\s`, read, "$1   ")
+
+    found := text.re_find(`\d+(?:\.\d+)*`, read, -1)
+    if is_error(found) || found == undefined { continue }
+    for hit in found {
+      span := hit[0]
+      before := read[:span.begin]
+      after := read[span.end:]
+      if text.re_match(`[A-Za-z0-9_-]$`, before) || text.re_match(`^[A-Za-z0-9_-]`, after) { continue }
+      if text.contains(span.text, ".") { continue }
+      if text.re_match(units, after) { continue }
+      if text.re_match(named, before) { continue }
+      matches = append(matches, {begin: at + span.begin, end: at + span.end})
+    }
+  }

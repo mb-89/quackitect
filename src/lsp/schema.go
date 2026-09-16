@@ -14,6 +14,8 @@ import (
 const (
 	Schemas   = "spec/schemas"
 	SchemaEnd = ".schema.yaml"
+	shown     = 40
+	ellipsis  = "..."
 )
 
 // [[spec/design_output/schema#the-schemas-read-once]]
@@ -636,8 +638,8 @@ func show(said any) string {
 	if one, held := said.([]any); held {
 		flatSaid = joined(one, ", ")
 	}
-	if len(flatSaid) > 40 {
-		return flatSaid[:37] + "..."
+	if len(flatSaid) > shown {
+		return flatSaid[:shown-len(ellipsis)] + ellipsis
 	}
 	return flatSaid
 }

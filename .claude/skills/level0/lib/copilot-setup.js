@@ -3,6 +3,7 @@
 
 const OWNER = "quackitect-level0";
 const RUNNER = "node src/scripts/copilot.js";
+const HOOK_SECONDS = 60;
 
 export function registrations() {
   const hooks = {};
@@ -16,8 +17,8 @@ export function registrations() {
       {
         type: "command",
         command: `${RUNNER} hook ${event}`,
-        timeout: 60,
-        timeoutSec: 60,
+        timeout: HOOK_SECONDS,
+        timeoutSec: HOOK_SECONDS,
       },
     ];
   }

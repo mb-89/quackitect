@@ -8,6 +8,7 @@ import { skip, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { NOBODY } from "../../.claude/skills/level0/lib/private.js";
 import { lintText } from "../../.claude/skills/level0/lib/vale.js";
+import { withoutFalsePast } from "../../src/bridge/tense.js";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
 import { readTools, whereIs } from "../../src/scripts/tools.js";
@@ -24,7 +25,14 @@ const run = async (argv, init = {}) =>
 const ruled = async (text) => {
   const said = await lintText(text, "notes.md", { run, bin });
   assert.ok(said.ran, `vale ran: ${said.why}`);
-  return said.found.map((f) => f.rule);
+  return withoutFalsePast(text, said.found).map((f) => f.rule);
+};
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+const saidOf = async (text, rule) => {
+  const said = await lintText(text, "notes.md", { run, bin });
+  assert.ok(said.ran, `vale ran: ${said.why}`);
+  return said.found.filter((one) => one.rule === rule).map((one) => one.message);
 };
 
 ifVale(
@@ -174,10 +182,70 @@ ifVale("a nobody user, a version and an example pass the shapes rule", async () 
   }
 });
 
+// [[spec/funnel/a-paragraph-has-a-schema]]
+ifVale("a word the list leaves out is refused, and the refusal names it", async () => {
+  const said = await saidOf("The door refuses a flibbertigibbet.", "Vocabulary");
+  assert.equal(said.length, 1);
+  assert.match(said[0], /^flibbertigibbet stands outside the words this tree writes/);
+  assert.match(said[0], /terms\.yml/);
+});
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+ifVale("a word the list swaps is refused, and the refusal names the swap", async () => {
+  assert.deepEqual(await saidOf("The door utilize the list.", "Vocabulary"), [
+    "utilize stands outside the words this tree writes. Write use instead.",
+  ]);
+});
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+ifVale("the words this tree writes pass, and so does what stands outside a layer", async () => {
+  for (const said of [
+    "The door refuses a write, and the writer reads the refusal.",
+    "A run of doors reads the rules, and the rules stand in one folder.",
+    "The tree writes `flibbertigibbet` in a code span, so the rule reads past it.",
+    "A path like spec/vocabulary/words.yml stands outside the layer.",
+    "The owner reads [[spec/funnel/a-paragraph-has-a-schema]] first.",
+    "A capital past the first word names Flibbertigibbet, so it stands.",
+    "The door reads 2048 bytes and the rule passes over a digit.",
+  ]) {
+    assert.deepEqual(await saidOf(said, "Vocabulary"), [], said);
+  }
+});
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+ifVale("a plural, a past form and an -ing form of a listed word stand", async () => {
+  for (const said of [
+    "The door refuses a write, and the doors refused it.",
+    "The door is refusing a write, and the writer stands waiting.",
+    "The rules carry the tries a session tried.",
+  ]) {
+    assert.deepEqual(await saidOf(said, "Vocabulary"), [], said);
+  }
+});
+
 test("the shapes rule and the commit door pass one list of nobody users", () => {
   const rule = files.read(join(root, "spec/config/styles/VoiceVale/Private.yml"));
   const listed = /nobody := \[([^\]]*)\]/.exec(rule);
   assert.ok(listed, "the rule names its nobody users");
   const names = listed[1].split(",").map((one) => one.trim().replace(/^"|"$/g, ""));
   assert.deepEqual(names.sort(), [...NOBODY].sort());
+});
+
+// [[spec/design_output/config#the-magic-numbers-take-names]]
+ifVale("a digit in a design note's prose is refused, and a version, a unit and a table pass", async () => {
+  const note = "spec/design_output/probe.md";
+  const bare = "The verb exits 0 on survives.\n";
+  assert.ok((await inRegister(bare, note)).includes("DigitInProse"));
+  const quiet = [
+    "Measured against client 2.1.267, a poll every 250 ms stands, and x86 ships.",
+    "",
+    "| what | count |",
+    "|---|---|",
+    "| events | 186 |",
+    "",
+    "1. The verb exits `0` on survives.",
+    "",
+  ].join("\n");
+  assert.deepEqual((await inRegister(quiet, note)).filter((one) => one === "DigitInProse"), []);
+  assert.ok(!(await inRegister(bare, "notes.md")).includes("DigitInProse"));
 });

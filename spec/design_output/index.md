@@ -12,16 +12,8 @@ watcher keeping it warm, and the questions it answers. For the argument, see
 
 `src/index` is a Go program holding a SQLite database over this tree. The files
 stay the truth, and the walk builds every row out of them. A reader meeting a
-stale index or none reads the files, which is what every reader here does.
-
-| piece | file |
-|---|---|
-| the shape, the walk and the rows | `index.go` |
-| the frontmatter and the links | `front.go` |
-| the questions | `find.go` |
-| the resident process | `door.go` |
-| the watch under it | `watch.go` |
-| the command line over it | `main.go` |
+stale index or none reads the files, which is what every reader here does. The
+header of each file under `src/index` says which piece it holds.
 
 It lives at `.se/index.db`, which stays on the box it stands on. The version
 and the root ride in a `meta` row, and either one disagreeing drops the file
@@ -42,9 +34,8 @@ transaction, so a reader meets the whole answer or the one before it.
 | `note_text` | the bodies, for ranking |
 | `line_text` | every line, for the word question |
 
-Four folders stay outside the walk: `.git`, `.se`, `node_modules` and
-`.claude-plugin`. The first two hold the machinery, and the rest hold what a
-tool writes on its own.
+`index.go` names the folders standing outside the walk. Each holds the
+machinery, or what a tool writes on its own.
 
 The file opens in WAL mode with a busy timeout, so a reader waits on no
 writer. The door writes while a verb reads, and the two meet on one file
@@ -53,7 +44,7 @@ without either one blocking.
 ## The door owns the database
 
 One process owns the file, keeps the tree and the rows in step, and answers
-every question, so one writer stands however many people ask. It listens on
+every question. One writer stands for any number of readers. It listens on
 loopback on a port the machine picks, and writes where it stands into
 `.se/index.json`.
 
@@ -195,8 +186,8 @@ offset over the files a sweep already counted.
 
 ## A type is a glob
 
-A `type` names a family of files, and this tree holds the twenty families the
-tools ask for. Each one turns into a glob before the question leaves.
+A `type` names a family of files, and this tree holds the families the tools
+ask for. Each one turns into a glob before the question leaves.
 
 | type | the files it names |
 |---|---|
@@ -244,11 +235,11 @@ than a walk. So a build needs a C compiler, and this tree takes them in order:
 
 | what stands | what the build uses |
 |---|---|
-| the pinned Zig | `CC=<zig> cc`, one download and no system compiler |
+| the pinned Zig in `.se/bin/zig` | `CC=<zig> cc` |
 | a working `cc`, `gcc` or `clang` | that one |
-| neither | no index, and every verb says so |
+| neither | the installer downloads the pinned Zig, and builds with it |
 
-The pin is Zig 0.16.0. The installer compiles a probe file, because a name on
+`src/scripts/install.sh` holds the pin. The installer compiles a probe file, because a name on
 the PATH answers `--version` from a wrapper carrying no backend. Such a wrapper
 fails on the first translation unit, deep inside the SQLite build, where the
 fault reads as anything but a missing compiler.
@@ -256,3 +247,11 @@ fault reads as anything but a missing compiler.
 `GOFLAGS=-tags=sqlite_fts5` rides with the compiler in one place. The driver
 compiles the full-text module in only when asked, so a build carrying the one
 carries the other.
+
+## A dead index speaks
+
+- Outcome: a session with no working index hears it on turn one, and nothing falls back in silence.
+- Check: `session.start` looks for the binary and runs `standing`.
+- Log: a missing binary or a failing `standing` writes one `index` line at `warn`.
+- Block: every read of the context carries `level0-index`, naming the cause and `./RUNME.sh`.
+- Sweep: `replace` refuses on a dead index, and names the same fix.

@@ -17,7 +17,12 @@ import (
 	"sync"
 )
 
-const Version = "0.1.0"
+const (
+	Version         = "0.1.0"
+	severityError   = 1
+	severityWarning = 2
+	driveColon      = 2
+)
 
 type message struct {
 	JSONRPC string          `json:"jsonrpc"`
@@ -201,9 +206,9 @@ func drawsAs(said Finding, rows []string) diagnostic {
 		end = len(rows[line])
 	}
 
-	severity := 1
+	severity := severityError
 	if said.Severity == SeverityWarning {
-		severity = 2
+		severity = severityWarning
 	}
 	return diagnostic{
 		Range:    span{Start: position{Line: line, Character: column}, End: position{Line: line, Character: end}},
@@ -280,7 +285,7 @@ func pathOf(uri string) string {
 		return ""
 	}
 	path := said.Path
-	if len(path) > 2 && path[0] == '/' && path[2] == ':' {
+	if len(path) > driveColon && path[0] == '/' && path[driveColon] == ':' {
 		path = path[1:] // a Windows drive letter wears no leading slash
 	}
 	return filepath.FromSlash(path)

@@ -22,8 +22,7 @@
         "shape",
         "sentence",
         "grammar",
-        "vocabulary",
-        "meaning"
+        "vocabulary"
       ],
       "properties": {
         "characters": {
@@ -106,6 +105,7 @@
             "tenses": { "type": "array", "items": { "type": "string" } },
             "auxiliaryChains": { "type": "string", "enum": ["refused", "admitted"] },
             "modals": { "type": "array", "items": { "type": "string" } },
+            "hedges": { "type": "array", "items": { "type": "string" } },
             "contractions": { "type": "string", "enum": ["refused", "admitted"] },
             "latinShortForms": { "type": "string", "enum": ["refused", "admitted"] },
             "exceptions": {
@@ -123,35 +123,15 @@
         },
         "vocabulary": {
           "type": "object",
-          "required": ["words", "outside", "growth", "exceptions"],
+          "required": ["core", "terms", "swaps", "outside", "growth", "exceptions"],
           "properties": {
-            "words": { "type": "string" },
+            "core": { "type": "string" },
+            "terms": { "type": "string" },
+            "swaps": { "type": "string" },
+            "stems": { "type": "string" },
             "outside": { "type": "array", "items": { "type": "string" } },
             "growth": { "type": "object" },
             "exceptions": { "type": "array" }
-          }
-        },
-        "meaning": {
-          "type": "object",
-          "required": ["judged"],
-          "properties": {
-            "judged": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "required": ["id", "asks", "message", "labels", "refuses", "span"],
-                "properties": {
-                  "id": { "type": "string" },
-                  "asks": { "type": "string" },
-                  "message": { "type": "string" },
-                  "link": { "type": "string" },
-                  "span": { "type": "string", "enum": ["paragraph", "chapter"] },
-                  "labels": { "type": "array", "items": { "type": "string" } },
-                  "reads": { "type": "array", "items": { "type": "string" } },
-                  "ignores": { "type": "array", "items": { "type": "string" } }
-                }
-              }
-            }
           }
         }
       }

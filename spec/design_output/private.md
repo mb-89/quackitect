@@ -90,7 +90,7 @@ counts as an identifier where it carries a separator inside it:
 | a dot between letters | `example.com` |
 | twelve characters with no separator at all | a key, a hash, a password |
 
-A token shorter than eight characters passes, because a short word collides by
+A token shorter than eight characters passes, because a short word matches by
 chance and a check refusing honest writing is a check nobody keeps.
 
 ## A bare name passes
@@ -312,9 +312,8 @@ on the tracked notes alone: does this text name a role, or one person?
 | `role` | passes |
 | `person` | refuses |
 
-The roles this tree uses are the owner, the agent, the reader, the reviewer and
-the maintainer. [[spec/guidance/voice]] says so, so an author reads the answer
-before the refusal.
+[[spec/guidance/voice]] names the roles this tree uses, so an author reads the
+answer before the refusal.
 
 The rule reads `*.md` at the root and every note under `spec`, and it ignores
 `.se`. A raw note costs no model call, because the two checks at the door

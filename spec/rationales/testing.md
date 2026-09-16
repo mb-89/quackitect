@@ -12,7 +12,7 @@ costs, so that is the thing to rule on.
 
 Measured in this tree at 41 tests: 8 tests that spawn a binary cost 862ms, and
 33 tests running in memory cost 43ms. So a fifth of the tests take 95 percent of the
-time, and that ratio worsens as the suite grows.
+time, and that ratio gets worse as the suite grows.
 
 An earlier line of this project measured the same shape at its own scale. The
 suite built one binary from every test that wanted it, and building it once took
@@ -66,7 +66,7 @@ wrong answer stays impossible.
 
 ## 5. The doc comes first
 
-Agents in this tree keep inverting the order. They build the thing, write the
+Agents in this tree keep turning the order around. They build the thing, write the
 design doc over what stands, then write tests against the code in front of them.
 Each artifact records the implementation and rules on nothing.
 

@@ -5,19 +5,19 @@ kind: [[design_output]]
 # Scope
 
 `.claude/skills/level0/lib/bash.js` reads every command the agent runs. This
-note covers the parse it makes and the five rules standing on that parse. The
+note covers the parse it makes and the rules standing on that parse. The
 delta a commit carries stands in [[spec/design_output/private]].
 
 # What the door reads
 
 `tool.call` with the matcher `{ tool: "Bash" }` hands the whole command line
-over. One parse splits it, and the five rules below read that one parse.
+over. One parse splits it, and the rules below read that one parse.
 
 | the parse answers | the rule it feeds |
 |---|---|
 | every path a segment writes | a shell writes nothing |
 | the message a commit carries | a commit message meets voice |
-| the name a checkout cuts | a branch name holds five |
+| the name a checkout cuts | a branch name meets the cap |
 | a test run naming no file | a test run points somewhere |
 | a commit stepping past the hook | the escape, in [[spec/design_output/private]] |
 
@@ -64,14 +64,23 @@ So `cp` and `mv` refuse where a source stands outside what the rules reach:
 
 `xargs` and `find -exec` carry a command inside a command, and the parse reads
 the inner one under the same rules. A target the parse reads as `{}` names no
-path, so it passes. The enclosing `find` holds the real target, and a guess at
+path, so it passes. The outer `find` holds the real target, and a guess at
 it refuses honest work.
 
-A heredoc into `sh` runs the shell parse again over the body. A heredoc into an
-interpreter reads each line for a write call
-beside a path the rules cover: `open(..., "w")`, `writeFileSync(...)`,
-`write_text(...)` and their kind. An inline script behind `-c` or `-e` meets
-the same two readings.
+A heredoc into `sh` runs the shell parse again over the body, and a heredoc
+into an interpreter takes the readings below. An inline script behind `-c` or
+`-e` meets the same two.
+
+| the body holds | the door reads |
+|---|---|
+| a write call beside a path the rules cover | that path, from that line |
+| a write call with no path beside it | every path the whole body names that the rules cover |
+| a read of such a path and no write call | nothing |
+| a write call beside a path outside the rules | nothing |
+
+The write calls are `open(..., "w")`, `writeFileSync(...)`, `write_text(...)`
+and their kind. The second row is the script that names its path on one line
+and writes on another, through a variable.
 
 That last row is the one that matters. A session reaches for a heredoc because
 a formatter reflows a file between a read and an edit, and a string replacement
@@ -110,16 +119,16 @@ The same parse answers whether the commit steps past the pre-commit hook, and
 `skipsTheHook` reads `--no-verify` and every form `-n` takes.
 [[spec/design_output/private#the-escape]] says which box refuses it.
 
-# A branch name holds five
+# A branch meets the cap
 
-`work new` refuses a long name, and `git checkout -b` reaches the same tree.
+`branch new` refuses a long name, and `git checkout -b` reaches the same tree.
 `overLong` in `lib/names.js` counts the words, and the door calls it on:
 
 - `git checkout -b <name>`, and `-B`
 - `git switch -c <name>`, `-C`, and `--create`
 
 `git branch <name>` cuts a branch too, and the door reads none of it today.
-The refusal names `./RUNME.sh work new <name>`, which cuts the branch and
+The refusal names `./RUNME.sh branch new <name>`, which cuts the branch and
 writes its brief in one act.
 
 # A test run points somewhere
@@ -150,7 +159,7 @@ road back. For details, see [[spec/design_output/private#the-second-door]].
 # The description names verbs
 
 `tool.describe` rewrites what the model reads before it reaches for a tool. It
-is the carrot to the five sticks above.
+is the carrot to the sticks above.
 
 Bash's description gains a paragraph naming the tree's verbs, and `VERBS` in
 `lib/bash.js` holds the list. A contract test reads `src/scripts/cli.js` and
@@ -171,7 +180,7 @@ you trust them:
 | the engine caches the rendered description | the same |
 
 `claude plugin validate` reads an event name it knows nothing about and passes.
-A probe registering `nonsense.event` validates green, so a typo in an event
+A probe registering `nonsense.event` checks green, so a typo in an event
 name costs a silent hook and no error.
 
 # What every refusal owes

@@ -20,6 +20,7 @@ func main() {
 	size := flag.String("size", "120x40", "with --frame: the window, as WxH")
 	opened := flag.String("pane", "", "with --frame: the pane to open, as details, help or filter")
 	narrow := flag.String("filter", "", "with --frame: the filter to hold")
+	floor := flag.String("floor", "", "with --frame: the floor to stand at, as debug, info, warn, error or fatal")
 	flag.Parse()
 	if flag.NArg() != 1 {
 		fmt.Fprintln(os.Stderr, "usage: logview [--frame --size WxH --pane details|help|filter --filter text] <session.jsonl>")
@@ -33,7 +34,7 @@ func main() {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(2)
 		}
-		out, err := Frame(path, w, h, *opened, *narrow, time.Local)
+		out, err := Frame(path, w, h, *opened, *narrow, *floor, time.Local)
 		if err != nil {
 			fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
@@ -49,7 +50,7 @@ func main() {
 }
 
 // [[spec/design_output/viewer#one-frame]]
-func Frame(path string, w, h int, opened, narrow string, zone *time.Location) (string, error) {
+func Frame(path string, w, h int, opened, narrow, floor string, zone *time.Location) (string, error) {
 	m := newModel(path, zone)
 	m.w, m.h = w, h
 	recs, _, err := m.tailer.read()
@@ -57,6 +58,9 @@ func Frame(path string, w, h int, opened, narrow string, zone *time.Location) (s
 		return "", err
 	}
 	m.all = recs
+	if floor != "" {
+		m.floor = floor
+	}
 	if narrow != "" {
 		f, err := ParseFilter(narrow)
 		if err != nil {

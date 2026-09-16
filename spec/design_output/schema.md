@@ -30,13 +30,13 @@ Two halves stand in one module:
 | `governorOf(schemas, path)` | the schema holding that path, or nothing |
 | `placeholderFaults(text, schema, where)` | every placeholder the note still carries |
 
-The caller hands the disk in through the tree, so a test drives all seven over
+The caller hands the disk in through the tree, so a test drives every one over
 `fakeDisk` and touches memory alone.
 
 # The yaml a schema reads
 
 A schema is YAML, and this tree carries no YAML library. The reader holds the
-subset the six files use, and nothing past it:
+subset the schema files use, and nothing past it:
 
 1. a map, by indent
 2. a list of scalars, and a list of maps
@@ -377,10 +377,10 @@ A departure stands refused, and the refusal names each finding and two ways on:
 A stranger in a governed folder takes its own refusal, `refusedKind`, which
 names the schema file, the finding and `mint_note` as the road.
 
-# The verbs own three fields
+# The verbs own their fields
 
 A property naming `x-engine: true` belongs to the verbs, and an agent's write to
-it stands refused. Four carry it on a ticket:
+it stands refused. These carry it on a ticket:
 
 | field | who writes it |
 |---|---|
@@ -401,14 +401,20 @@ reads that and nothing of its own:
 
 | `x-written` | the place | when a hand writes it |
 |---|---|---|
-| `draft` | the `Ask` chapter | while `state` reads `draft` |
+| `anyone` | the `Ask` and the `Discussion` chapters | always |
 | `hand` | the fields of the leaf `step` names | while the ticket stands there |
-| `anyone` | the `Discussion` chapter | always |
+| a state's name | a chapter that state alone writes | while `state` reads that name |
 
 `placesIn` reads the route, finds the leaf `step` names, and answers the heading
 of each of its evidence fields. A chapter outside that set stands refused where
-the write changes its lines. So a phase's chapter, another leaf's fields and the
-ask of an open ticket are the engine's.
+the write changes its lines. So a phase's chapter and another leaf's fields are
+the engine's, and the three fields stay with the verbs. The ask stays open to a
+hand at every state, because a hand fixes what the rules refuse in it.
+
+Two leaves name one field alike, as `tests` under `tests-red` and under
+`tests-green`. So the door names an old chapter by its level, its header and
+its place among the chapters of that name. Each one then reads against its
+own.
 
 A file the door finds empty is a mint, and the mint writes every place at once.
 So the rule reaches the second write and no first one.

@@ -41,7 +41,7 @@ v4 hands over four numbers, and the brief takes them whole:
 - the button stands dead for 600ms after it fires
 
 Two of those four disagree at the edge. A burst reaching its fifth press inside
-600ms meets a dead button, so a fast clicker sends the first rung alone.
+600ms meets a dead button, so a fast finger sends the first step alone.
 
 Three readings stood open:
 

@@ -59,8 +59,9 @@ export function fromJson(stdout, where) {
   const out = [];
   for (const row of read.diagnostics ?? []) {
     if (row.severity === "information") continue;
+    const path = row.location?.path;
     out.push({
-      file: row.location?.path?.file ?? where,
+      file: (typeof path === "string" ? path : path?.file) ?? where,
       rule: String(row.category ?? "biome").replace(/^lint\//, ""),
       line: lineOf(row),
       column: 1,
@@ -74,6 +75,8 @@ export function fromJson(stdout, where) {
 }
 
 function lineOf(row) {
+  const start = Number(row.location?.start?.line);
+  if (Number.isFinite(start) && start > 0) return start;
   const span = row.location?.span;
   const source = row.location?.sourceCode;
   if (!Array.isArray(span) || typeof source !== "string") return 1;
