@@ -135,9 +135,28 @@ Today a note answers a prompt on paper alone. The door sees the session's text, 
 | the answer door | counts at the prompt, counts again before it refuses, and pays on a new row |
 | the level zero note | says which prompt a note answers, under the owner's prompt chapter |
 
-A prompt naming a note opens a demand that a note row pays. `namesNote` reads the prompt for the word, the way `namesNext` reads it for the next step. A prompt naming none opens the demand it opens today, and a note row leaves it standing.
+A prompt naming a note opens a demand that a note row pays. `namesNote` in
+`lib/answer.js` reads the prompt for the word `note`, beside `questionsIn` and
+`opensATurn`, which read a prompt the same way. A prompt naming none opens the
+demand it opens today, and a note row leaves that one standing.
 
-The note row lands from the shell, so the server's own rows miss it. The door reads the session log off the disk instead, at the path the log door names, and counts the rows of kind `note`. The demand keeps the count it reads at the prompt. A count that grows pays the demand, and the reply line names the note.
+| what the prompt carries | whether the demand reads a note |
+|---|---|
+| `note`, `notes` or `noted`, as a word | yes |
+| the word inside a fenced block | no, the way `questionsIn` skips a fence |
+| no such word | no |
+
+The note row lands from the shell, so the server's own rows miss it. The door
+reads the session log off the disk instead, at the path the log door names,
+and counts the rows of kind `note`. The demand keeps the count it reads at the
+prompt, and a row past that count pays it. So a note on another matter pays
+the demand too, because a hand parking a note answers the prompt that asks for
+one.
+
+The reply line the payment writes carries the note's own text, off the row,
+and `detail` names the prompt it answers. So `spoken` reads the note, and the
+next demand sees what the log carries. The door's box carries the disk, and a
+fake disk stands beside it, so each case runs in memory.
 
 For details, see [[spec/design_output/level0#the-owners-prompt-comes-first]].
 
