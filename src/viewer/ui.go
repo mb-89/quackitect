@@ -192,7 +192,7 @@ func (m *model) loadPane() {
 	var parts []part
 	switch m.pane {
 	case paneHelp:
-		parts = []part{{text: HelpText}}
+		parts = m.helpParts(m.box.Width)
 	case paneFilter:
 		parts = []part{{text: m.input.View(), drawn: true}}
 		if m.filterBad != "" {
@@ -244,48 +244,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m.typing(msg)
 		}
 		return m.key(msg.String())
-	}
-	return m, nil
-}
-
-func (m model) key(name string) (tea.Model, tea.Cmd) {
-	switch name {
-	case "ctrl+c", "q":
-		return m, tea.Quit
-	case "enter":
-		m.openPane(paneDetails)
-	case "alt+?", "alt+/":
-		m.openPane(paneHelp)
-	case "alt+f":
-		m.openPane(paneFilter)
-	case "alt+F", "alt+q":
-		m.quick(name)
-	case "alt+l":
-		m.raiseFloor()
-	case "e":
-		m.toError()
-	case "w", "W":
-		m.moveTo(m.at() - 1)
-	case "s", "S":
-		m.moveTo(m.at() + 1)
-	case "up":
-		if m.pane != paneShut {
-			m.box.ScrollUp(1)
-		} else {
-			m.moveTo(m.at() - 1)
-		}
-	case "down":
-		if m.pane != paneShut {
-			m.box.ScrollDown(1)
-		} else {
-			m.moveTo(m.at() + 1)
-		}
-	default:
-		if len(name) == 1 && name[0] >= '1' && name[0] <= '9' {
-			m.openTab(int(name[0] - '0'))
-			return m, nil
-		}
-		m.jump(name)
 	}
 	return m, nil
 }

@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"strings"
 
+	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/x/ansi"
 )
@@ -22,6 +23,8 @@ type tab interface {
 	Left(m *model, w, rows int) string
 	Detail(m *model, w int) []part
 	Narrowed(m *model) bool
+	Keys(m *model) band
+	Selection(m *model) band
 }
 
 // [[spec/design_output/viewer#the-columns-stand-still]]
@@ -36,6 +39,44 @@ func (logTab) Left(m *model, w, rows int) string {
 func (logTab) Detail(m *model, w int) []part { return detailOf(m.all, m.sel, m.zone) }
 
 func (logTab) Narrowed(m *model) bool { return !m.filter.Empty() }
+
+// [[spec/design_output/viewer#the-help-reads-the-cursor]]
+func (logTab) Keys(m *model) band {
+	return band{name: "THE LOG", acts: []act{
+		{bind("w s", "one row up, one row down", "w", "s", "W", "S"), func(m *model, name string) tea.Cmd {
+			step := 1
+			if strings.EqualFold(name, "w") {
+				step = -1
+			}
+			m.moveTo(m.at() + step)
+			return nil
+		}},
+		{bind("e", "the newest error, and e again the one before it", "e"), func(m *model, _ string) tea.Cmd {
+			m.toError()
+			return nil
+		}},
+		{bind("alt+l", "raise the floor, and round again", "alt+l"), func(m *model, _ string) tea.Cmd {
+			m.raiseFloor()
+			return nil
+		}},
+		{bind("alt+q", "keep the prompts and the replies: the talk", "alt+q"), quicken},
+	}}
+}
+
+// [[spec/design_output/viewer#the-help-reads-the-cursor]]
+func (logTab) Selection(m *model) band {
+	if m.sel < 0 || m.sel >= len(m.all) {
+		return band{}
+	}
+	return band{name: "THE ROW", acts: []act{
+		{bind("alt+shift+f", "keep every row of this row's kind", "alt+F"), quicken},
+	}}
+}
+
+func quicken(m *model, name string) tea.Cmd {
+	m.quick(name)
+	return nil
+}
 
 // [[spec/design_output/viewer#a-number-opens-a-tab]]
 func (m *model) openTab(n int) {

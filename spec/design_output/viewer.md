@@ -112,12 +112,39 @@ the level it names, so `INFO` stands dark and `WARN` stands amber. The funnel
 stands red while a filter holds, and dark otherwise. The list grows as the tree
 grows.
 
-# The help
+# The help reads the cursor
 
-`alt+?` shows the help in the pane, and it is the one way there. The help names
-every key and the numbers opening the tabs. It names the floor under `alt+l`,
-the columns and the colours. It names what the details show and how the filter
-opens. `help.go` holds it, beside the filter's own text.
+`alt+?` shows the help in the pane, and it is the one way there. The help opens
+on three bands, in this order:
+
+| band | what it names |
+|---|---|
+| `GLOBAL` | every key the window holds, whatever stands open |
+| the tab | every key the open tab adds, under the tab's own name |
+| the selection | every key the selected thing adds |
+
+So a person pressing `alt+?` reads what to do next, wherever they stand. A band
+the window has nothing for goes, and an empty log names no selection band.
+
+Every key comes out of a registration, and no hand writes a second list. A tab
+says which bands it adds, so the keys follow the tab a person opens.
+
+| what | where it stands | what it holds |
+|---|---|---|
+| `act` | `keys.go` | a `key.Binding`, and what the key does |
+| `band` | `keys.go` | a name, and a run of acts |
+| `bands()` | `keys.go` | the three, out of the window and the open tab |
+| `key()` | `keys.go` | the press, over the same three bands |
+
+So a key nobody registers reaches the help nowhere and works nowhere.
+
+The help draws a key a line, its sentence starting at one column, and a long
+sentence wraps under itself the way a detail does. `FullHelpView` of the help
+bubble draws a group in columns, and it drops a group wider than the width it
+takes. The pane is half a window wide, so the window draws the bands itself.
+
+`help.go` holds what no key says: the columns, the colours, the floor, the
+details and how the filter reads. It stands under the bands.
 
 # The filter pane takes letters
 
