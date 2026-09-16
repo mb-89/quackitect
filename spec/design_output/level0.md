@@ -720,6 +720,26 @@ The probe after a compaction pays nothing. It reads the canary through
 `heardCanary` on a session holding the line already, so a second debt stays
 shut.
 
+## The line lands once
+
+A turn holds open while the agent works. A debt clearing at the turn's end
+alone asks again at every call inside that turn. The agent then writes the line
+into message after message, where the point of it is one line out loud.
+
+So the debt clears where the line lands. The bridgehead posts each step's text
+as `turn.said`, the door reads it, and the first step opening on the sentence
+pays:
+
+| what the door reads | what it does |
+|---|---|
+| a step opening on the line | pays the debt, and writes the `info` line |
+| a step without it | leaves the debt as it stands |
+| an answer at the turn's end | pays it, or opens it on the first turn |
+| a step from a helper | nothing, because a helper carries its own |
+
+The mark stays paid for the session. A later answer without the line opens no
+second debt, so the sentence stands once, wherever the turn ends.
+
 ## The helper takes the guidance
 
 A subagent reads no standing layer of its own, so `agent.spawn` hands it one.

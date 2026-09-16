@@ -42,6 +42,7 @@ import {
   onSessionCompact,
   onSessionStart,
   onTurnComplete,
+  onTurnSaid,
   owesCanary,
 } from "./guidance.js";
 import { freshens, projectionsHere, sourcesOf } from "./projection.js";
@@ -65,6 +66,7 @@ const DOORS = {
   "classic.MessageDisplay": onMessageDisplay,
   [SPOKE]: onAgentSpoke,
   "session.compact": onSessionCompact,
+  "turn.said": onTurnSaid,
   "turn.complete": endsTurn,
   "classic.Stop": onStop,
   "agent.spawn": onAgentSpawn,

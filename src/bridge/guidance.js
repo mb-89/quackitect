@@ -123,22 +123,40 @@ function rulesText(standing) {
   ].join("\n");
 }
 
+// A step of a turn carries its text, so the debt clears where the line lands and a turn holding open asks once. [[spec/design_output/level0#the-line-lands-once]]
+export function onTurnSaid(e, box) {
+  if (e?.agentId) return { pass: true };
+  paid(box, e?.text);
+  return { pass: true };
+}
+
+// The line pays once a session, so no later answer opens the debt again. [[spec/design_output/level0#the-line-lands-once]]
+function paid(box, answer) {
+  if (!box.session) box.session = pastTurnOne();
+  const session = box.session;
+  if (session.paid) return true;
+  const sentence = guidanceOf(box).sentence;
+  if (canaryIn(answer, sentence).found !== "same") return false;
+  session.paid = true;
+  session.owes = false;
+  box.log.say("info", "level0", HEARD.same, { detail: sentence });
+  return true;
+}
+
 // [[spec/design_output/level0#the-canary-owes-a-debt]]
 export function onTurnComplete(e, box) {
   if (!box.session) box.session = pastTurnOne();
   const session = box.session;
   if (e?.reason !== "answer") return { pass: true };
-  const sentence = guidanceOf(box).sentence;
-  const heard = canaryIn(e.answer, sentence);
-  if (session.firstTurn) {
+  if (paid(box, e.answer)) {
     session.firstTurn = false;
-    session.owes = heard.found !== "same";
-    box.log.say(session.owes ? "warn" : "info", "level0", HEARD[heard.found], { detail: sentence });
     return { pass: true };
   }
-  if (session.owes && heard.found === "same") {
-    session.owes = false;
-    box.log.say("info", "level0", HEARD.same, { detail: sentence });
+  if (session.firstTurn) {
+    const sentence = guidanceOf(box).sentence;
+    session.firstTurn = false;
+    session.owes = true;
+    box.log.say("warn", "level0", HEARD[canaryIn(e.answer, sentence).found], { detail: sentence });
   }
   return { pass: true };
 }
