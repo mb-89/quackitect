@@ -118,7 +118,8 @@ function opensSession(e, box) {
   box.restale = "the session start";
   warmIndex(box);
   box.registered = true;
-  return { register: specsOf(box), pass: true };
+  box.specs = specsOf(box);
+  return { register: box.specs, pass: true };
 }
 
 async function onToolCall(e, box) {

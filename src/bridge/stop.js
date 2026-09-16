@@ -212,7 +212,8 @@ function privateStands(box) {
 
 // A desk bound to the queue on trunk has work while a free ticket stands, so a stop on completion waits. [[spec/design_output/stop#the-mechanical-checks]]
 function queueWaits(box) {
-  if (process.env.CLAUDE_CODE_REMOTE || process.env.SE_CLOUD) return false;
+  const env = box.env ?? process.env;
+  if (env.CLAUDE_CODE_REMOTE || env.SE_CLOUD) return false;
   if (asks(box, "engine.binding") !== "queue") return false;
   if (branchOf(box) !== "main") return false;
   const texts = readFolder(box.disk, join(box.work, "spec", "tickets"), ".md").map((one) => one.text);

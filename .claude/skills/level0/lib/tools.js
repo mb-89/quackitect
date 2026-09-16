@@ -6,16 +6,16 @@ export const TOOLS = ".se/tools.json";
 export const BIN = ".se/bin";
 
 export const WANTED = [
-  { name: "node", asks: ["--version"] },
-  { name: "vale", asks: ["--version"] },
-  { name: "biome", asks: ["--version"] },
-  { name: "vale-ls", asks: ["--version"] },
-  { name: "se-lsp", asks: ["--version"] },
-  { name: "go", asks: ["version"] },
-  { name: "git", asks: ["--version"] },
-  { name: "claude", asks: ["--version"] },
-  { name: "sh", asks: [] },
-  { name: "python", asks: ["--version"], calls: ["python3", "python"] },
+  { name: "node", asks: ["--version"], for: "a helper script" },
+  { name: "vale", asks: ["--version"], for: "the prose rules" },
+  { name: "biome", asks: ["--version"], for: "formatting and linting the JavaScript" },
+  { name: "vale-ls", asks: ["--version"], for: "the prose rules inside an editor" },
+  { name: "se-lsp", asks: ["--version"], for: "the note shape and the names inside an editor" },
+  { name: "go", asks: ["version"], for: "building the index and the viewer" },
+  { name: "git", asks: ["--version"], for: "history and diffs" },
+  { name: "claude", asks: ["--version"], for: "a session of its own, and the probe" },
+  { name: "sh", asks: [], for: "a shell script" },
+  { name: "python", asks: ["--version"], calls: ["python3", "python"], for: "a helper script" },
 ];
 
 export function callsOf(one) {
@@ -74,4 +74,25 @@ export function installedTools(text) {
     if (found) out.push(found[1]);
   }
   return out;
+}
+
+// [[spec/design_output/tools#the-session-reads-the-survey]]
+export function toolLines(survey, wanted = WANTED, specs = []) {
+  const out = [];
+  for (const one of wanted) {
+    const found = survey?.[one.name];
+    if (!found) continue;
+    const version = found.version ? ` ${found.version}` : "";
+    out.push(`- \`${one.name}\`${version}, for ${one.for}`);
+  }
+  for (const spec of specs) {
+    out.push(`- \`${spec.name}\`: ${firstSentence(spec.description)}`);
+  }
+  return out;
+}
+
+export function firstSentence(text) {
+  const said = String(text ?? "").trim();
+  const end = said.search(/\.(\s|$)/);
+  return end < 0 ? `${said}.` : said.slice(0, end + 1);
 }

@@ -16,11 +16,15 @@ import {
   standingLayer,
   styled,
 } from "../../.claude/skills/level0/lib/guidance.js";
+import { toolLines, WANTED } from "../../.claude/skills/level0/lib/tools.js";
+import { readTools, writeSurvey } from "../scripts/tools.js";
 import { asks } from "./config.js";
 import { deadIndexLine } from "./search.js";
 
 const GUIDANCE = "spec/guidance";
 const TOOTH = "stop.enabled";
+export const TOOLS_BLOCK = "level0-tools";
+const TOOLS_HEADING = "# What this box has";
 
 // [[spec/design_output/level0#the-standing-layer]]
 export function guidanceHere(disk, root, env = process.env, tooth = true) {
@@ -66,6 +70,7 @@ function guidanceOf(box) {
 
 export function onSessionStart(_e, box) {
   box.guidance = readsGuidance(box);
+  box.tools = surveyHere(box);
   box.session = { reads: 0, firstTurn: true };
   return { pass: true };
 }
@@ -76,7 +81,7 @@ export function onPromptContext(_e, box) {
   if (!box.session) box.session = pastTurnOne();
   const session = box.session;
   session.reads += 1;
-  const blocks = blocksOf(held, box.index.dead());
+  const blocks = blocksOf(held, box.index.dead(), toolsText(box));
   box.log.say("info", "context", `${blocks.length} block(s) reach the session`, {
     detail: blocks.map((one) => one.name).join(" "),
     reason: session.reads === 1 ? "first" : "re-read",
@@ -84,13 +89,26 @@ export function onPromptContext(_e, box) {
   return { after: { blocks } };
 }
 
-function blocksOf(held, dead) {
+function blocksOf(held, dead, tools) {
   const blocks = [];
   if (dead) blocks.push({ name: "level0-index", text: deadIndexLine(dead) });
+  if (tools) blocks.push({ name: TOOLS_BLOCK, text: tools });
   if (!held.standing) return blocks;
   blocks.push({ name: "level0-rules", text: rulesText(held.standing) });
   blocks.push({ name: "level0-canary", text: canaryText(held.sentence) });
   return blocks;
+}
+
+// [[spec/design_output/tools#the-session-reads-the-survey]]
+function surveyHere(box) {
+  const found = readTools(box.disk, box.work);
+  if (Object.keys(found).length) return found;
+  return writeSurvey({ disk: box.disk, proc: box.proc }, box.work, box.env ?? process.env);
+}
+
+function toolsText(box) {
+  const lines = toolLines(box.tools ?? {}, WANTED, box.specs ?? []);
+  return lines.length ? [TOOLS_HEADING, "", ...lines].join("\n") : "";
 }
 
 function rulesText(standing) {
