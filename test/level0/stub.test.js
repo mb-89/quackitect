@@ -16,10 +16,10 @@ import {
   upstreamOf,
 } from "../../.claude/skills/level0/lib/vehicle.js";
 import { stubInto } from "../../src/scripts/stub.js";
-import { roadsOf } from "../../src/stub/.claude/skills/bridgehead/hooks/bridgehead.js";
+import { roadsOf } from "../../src/stub/.claude/skills/level0/hooks/bridgehead.js";
 
-const MARKER = ".claude/skills/level0/.claude-plugin/plugin.json";
-const BRIDGEHEAD = ".claude/skills/bridgehead";
+const PLUGIN = ".claude/skills/level0";
+const MARKER = `${PLUGIN}/.claude-plugin/plugin.json`;
 const REMOTE = "git remote get-url origin";
 const SETTINGS = JSON.stringify({
   $comment: "the cage",
@@ -37,9 +37,9 @@ function vehicle() {
     "/tools/.se/copy.json": '{"id":"abc123","made":"2026-01-01T00:00:00.000Z"}',
     "/tools/src/scripts/cli.js": "the verbs",
     "/tools/src/stub/RUNME.sh": "the shim",
-    [`/tools/src/stub/${BRIDGEHEAD}/.claude-plugin/plugin.json`]: '{"name":"bridgehead"}',
-    [`/tools/src/stub/${BRIDGEHEAD}/hooks/hooks.json`]: '{"modules":["./bridgehead.js"]}',
-    [`/tools/src/stub/${BRIDGEHEAD}/hooks/bridgehead.js`]: "export function register() {}",
+    [`/tools/src/stub/${PLUGIN}/.claude-plugin/plugin.json`]: '{"name":"level0"}',
+    [`/tools/src/stub/${PLUGIN}/hooks/hooks.json`]: '{"modules":["./bridgehead.js"]}',
+    [`/tools/src/stub/${PLUGIN}/hooks/bridgehead.js`]: "export function register() {}",
   });
 }
 
@@ -88,12 +88,12 @@ test("the settings keep every tracked key and drop every comment", () => {
 });
 
 test("the list names the folders, the record, the settings and the template", () => {
-  const said = stubFiles(["RUNME.sh", `${BRIDGEHEAD}/hooks/hooks.json`]);
+  const said = stubFiles(["RUNME.sh", `${PLUGIN}/hooks/hooks.json`]);
   for (const folder of STUB_FOLDERS) assert.ok(said.includes(`${folder}/.gitkeep`), folder);
   assert.ok(said.includes("vehicle.json"));
   assert.ok(said.includes(".claude/settings.json"));
   assert.ok(said.includes("RUNME.sh"));
-  assert.ok(said.includes(`${BRIDGEHEAD}/hooks/hooks.json`));
+  assert.ok(said.includes(`${PLUGIN}/hooks/hooks.json`));
   assert.equal(said.length, STUB_FOLDERS.length + 4);
 });
 
@@ -103,11 +103,12 @@ test("a stub holds every file the list names, and nothing else", () => {
   assert.equal(said.ok, true, said.why);
   assert.deepEqual(walk(files, "/stub"), [...said.files].sort());
   for (const one of said.files) assert.ok(files.exists(`/stub/${one}`), one);
-  assert.equal(files.exists(`/stub/${MARKER}`), false, "the method's marker stays behind");
+  assert.equal(files.read(`/stub/${MARKER}`), files.read(`/tools/src/stub/${MARKER}`), "the plugin is the template's");
+  assert.notEqual(files.read(`/stub/${MARKER}`), files.read(`/tools/${MARKER}`), "the method's marker stays behind");
   assert.equal(files.exists("/stub/src/scripts"), false, "the verbs stay behind");
   assert.ok(files.runs.has("/stub/RUNME.sh"), "the shim carries its run bit");
   assert.equal(files.read("/stub/RUNME.sh"), "the shim");
-  assert.equal(files.read(`/stub/${BRIDGEHEAD}/hooks/bridgehead.js`), "export function register() {}");
+  assert.equal(files.read(`/stub/${PLUGIN}/hooks/bridgehead.js`), "export function register() {}");
 });
 
 test("the record reads off the register and the remote", () => {

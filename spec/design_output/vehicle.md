@@ -159,7 +159,7 @@ says what the verb puts into each.
 | `vehicle.json` | the record below |
 | `RUNME.sh` | the shim, with its run bit |
 | `.claude/settings.json` | the vehicle's tracked settings, key by key, with none of its comments |
-| `.claude/skills/bridgehead/` | the bridgehead plugin: its manifest, its hooks file and one module |
+| `.claude/skills/level0/` | the bridgehead plugin: its manifest, its hooks file and one module. The folder names the plugin, so a tool in a stub answers to `mcp__level0__`, and the attach writes level zero itself over it |
 
 ## The record names the vehicle
 

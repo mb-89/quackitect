@@ -16,8 +16,9 @@ import { copyHere } from "../../src/scripts/vehicle.js";
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
 const outside = proc();
-const MARKER = ".claude/skills/level0/.claude-plugin/plugin.json";
-const METHOD = [MARKER, "package.json", "src/scripts/cli.js", "spec/guidance/voice.md", ".se"];
+const PLUGIN = ".claude/skills/level0";
+const MARKER = `${PLUGIN}/.claude-plugin/plugin.json`;
+const METHOD = ["package.json", "src/scripts/cli.js", "spec/guidance/voice.md", ".se"];
 const quoted = (said) => String(said).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 const either = (path) => `(?:${quoted(path)}|${quoted(path.split("\\").join("/"))})`;
 
@@ -41,6 +42,12 @@ test("a stub holds its files, reads every one back, and no file of the method", 
     assert.deepEqual(walk(dest), [...said.files].sort(), "every file the list names, and nothing else");
     for (const one of said.files) assert.ok(files.read(join(dest, one)) !== undefined, one);
     for (const one of METHOD) assert.equal(files.exists(join(dest, one)), false, `${one} stays behind`);
+    assert.equal(
+      files.read(join(dest, MARKER)),
+      files.read(join(root, "src", "stub", MARKER)),
+      "the plugin is the template's",
+    );
+    assert.notEqual(files.read(join(dest, MARKER)), files.read(join(root, MARKER)), "and not the method's");
 
     const record = JSON.parse(files.read(join(dest, "vehicle.json")));
     assert.equal(record.vehicle, copyHere(files, clock(), root), "the identity is this vehicle's");
@@ -50,6 +57,24 @@ test("a stub holds its files, reads every one back, and no file of the method", 
 
     const ran = outside.run(["sh", "-c", "test -x RUNME.sh"], { cwd: dest });
     assert.equal(ran.exitCode, 0, "the shim carries its run bit");
+  } finally {
+    files.remove(where);
+  }
+});
+
+// [[spec/design_output/vehicle#a-stub-takes-its-vehicle]]
+test("a stub's plugin carries the name its settings allow, so a tool answers to it", () => {
+  const where = files.tempDir("stub-");
+  const dest = join(where, "stub");
+  try {
+    const said = stubInto(files, git(outside, root), clock(), root, dest);
+    assert.equal(said.ok, true, said.why);
+    const name = basename(PLUGIN);
+    assert.equal(JSON.parse(files.read(join(dest, MARKER))).name, name, "the manifest names the folder");
+    const skills = files.list(join(dest, ".claude", "skills")).map((one) => one.name);
+    assert.deepEqual(skills, [name], "the stub carries the one plugin, under that name");
+    const allow = JSON.parse(files.read(join(dest, ".claude", "settings.json"))).permissions.allow;
+    assert.ok(allow.includes(`mcp__${name}`), `the settings allow mcp__${name}`);
   } finally {
     files.remove(where);
   }
@@ -189,7 +214,7 @@ slow(
       const said = stubInto(files, git(outside, root), clock(), root, dest, { upstream: root });
       assert.equal(said.ok, true, said.why);
       const hooks = {};
-      const { register } = await import("../../src/stub/.claude/skills/bridgehead/hooks/bridgehead.js");
+      const { register } = await import("../../src/stub/.claude/skills/level0/hooks/bridgehead.js");
       register((event, fn) => {
         hooks[event] = fn;
       }, {});
