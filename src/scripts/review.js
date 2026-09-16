@@ -8,6 +8,7 @@ import {
   DIFF_CAP,
   report,
   retroIn,
+  retroOnTicket,
   WORKTREE,
 } from "../../.claude/skills/level0/lib/review.js";
 import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
@@ -47,14 +48,18 @@ export function review(it, name, argv) {
 
 // [[spec/design_output/review#what-the-verb-gathers]]
 function gather(it, at) {
-  const handback = show(it, `${at.ref}:${BRIEF}`);
+  const brief = show(it, `${at.ref}:${BRIEF}`);
+  // A group branch carries no brief, so its ticket is the handback and its retro chapter the retro. [[spec/design_output/review#the-questions]]
+  const at_ticket = `spec/tickets/${at.branch.replace(/^work\//, "")}.md`;
+  const ticket = brief ? "" : show(it, `${at.ref}:${at_ticket}`);
+  const handback = brief || ticket;
   return {
     branch: at.branch,
     ref: at.ref,
     trunk: at.trunk,
-    brief: show(it, `${at.first}:${BRIEF}`),
+    brief: show(it, `${at.first}:${BRIEF}`) || show(it, `${at.first}:${at_ticket}`),
     handback,
-    retro: retroIn(handback),
+    retro: brief ? retroIn(brief) : retroOnTicket(ticket),
     stat: it.git.run(["diff", "--stat", `${at.trunk}...${at.ref}`], true).out,
     diff: capped(it.git.run(["diff", `${at.trunk}...${at.ref}`], true).out),
     check: checkOn(it, at),

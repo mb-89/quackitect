@@ -18,6 +18,19 @@ export function retroIn(text) {
   return heading.test(String(text ?? ""));
 }
 
+// A group carries its retro on its ticket, under the retro chapter, so a filled line there reads as present. [[spec/design_output/review#the-questions]]
+export function retroOnTicket(text) {
+  const lines = String(text ?? "").split(/\r?\n/);
+  const start = lines.findIndex((one) => /^#\s+retro\s*$/i.test(one));
+  if (start < 0) return false;
+  for (const line of lines.slice(start + 1)) {
+    if (/^#\s+/.test(line)) return false;
+    if (/^#{2,6}\s+/.test(line) || /^\s*<!--.*-->\s*$/.test(line) || !line.trim()) continue;
+    return true;
+  }
+  return false;
+}
+
 export function reviewSpec() {
   return {
     name: TOOL,

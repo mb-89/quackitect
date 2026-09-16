@@ -127,8 +127,10 @@ Short, and every line something to do:
     2 things to fix, and the merge is a desk's.
 
 The count adds the reader's `fix` to what the verb finds: a red check counts
-one, and an absent retro counts one. A report with nothing to fix fits on one
-line:
+one, and an absent retro counts one. A brief carries its retro under a heading
+naming it. A group branch carries no brief, so the verb reads the group ticket
+as the handback, and `retroOnTicket` reads a filled line under its retro
+chapter. A report with nothing to fix fits on one line:
 
     work/the-config-holds-numbers   nothing to fix, and the merge is a desk's.
 
