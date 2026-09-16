@@ -225,3 +225,17 @@ func TestAWrappedValueLinesUpUnderItself(t *testing.T) {
 		}
 	}
 }
+
+// [[spec/design_output/viewer#the-details]]
+func TestAWrapLinesUpUnderAValueACharacterWiderThanAByte(t *testing.T) {
+	t.Parallel()
+	said := "  1…9        open the tab at that place and the next one too"
+	lines := strings.Split(Wrap(said, 40), "\n")
+	if len(lines) < 2 {
+		t.Fatalf("a long line wraps, and reads %v", lines)
+	}
+	under := len([]rune(lines[0][:strings.Index(lines[0], "open")]))
+	if got := len([]rune(lines[1])) - len([]rune(strings.TrimLeft(lines[1], " "))); got != under {
+		t.Fatalf("the rest lines up under the value at %d, and stands at %d", under, got)
+	}
+}
