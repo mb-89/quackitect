@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 steps:
   - name: do
@@ -27,6 +27,19 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 62642eaf8f9c9c53
 step: do
+record:
+  - step: do
+    hand: box d42624a67d18a8
+    hash_before: 0c5f3f635aa9640059f96a3b51a5648df24b998a
+    hash_after: 3587acd3594b75bba1a4b552f93db18ffc82ce53
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 22 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: 64 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
