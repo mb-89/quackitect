@@ -89,7 +89,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d42624a67d18a8
+    hash_before: 7f2f38c1d7397225bbf9e1bc55e52515cac93a98
+    hash_after: 338a46b7dbf7570af05dd92a69b868d00ed053d1
 ---
 
 # Ask
