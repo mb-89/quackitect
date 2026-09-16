@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: soon
 depends_on: [the-bridgehead-imports-its-vehicle, the-stub-takes-shape]
 steps:
@@ -79,6 +79,7 @@ record:
   - step: sync
     hand: box 99aa60a14c3f
     hash_before: 272c26697052a4f9e4896160e12d148a2d499680
+step: sync
 ---
 
 # Ask
