@@ -72,12 +72,16 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: children
+step: retro/notes
 process: [[group]]
 record:
   - step: children
     hand: box b9be613824b0
     hash_before: a8dab8fe4475b5f06e5e028a654b9131f90820d8
+  - step: children
+    hand: the engine
+    hash_before: 44de554119853e99236107f0a0856b5be961eaf5
+    hash_after: 44de554119853e99236107f0a0856b5be961eaf5
 ---
 
 # Ask
