@@ -6,7 +6,6 @@
     "stop",
     "answer",
     "log",
-    "judge",
     "names",
     "ask"
   ],
@@ -69,9 +68,9 @@
         "hold": {
           "type": "string",
           "enum": [
-            "running",
-            "finishing",
-            "stopped"
+            "off",
+            "finish",
+            "stop"
           ],
           "help": "What the session does when it reaches the end of a turn.",
           "widget": "toggle",
@@ -79,7 +78,7 @@
           "icon": "✋🤖",
           "group": "agent control",
           "row": 0,
-          "column": 1,
+          "column": 2,
           "rowSpan": 1,
           "colSpan": 1
         }
@@ -107,9 +106,30 @@
           "icon": "❓🤖",
           "group": "agent control",
           "row": 0,
-          "column": 2,
+          "column": 3,
           "rowSpan": 1,
           "colSpan": 1
+        }
+      }
+    },
+    "bridge": {
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "hook": {
+          "help": "The hook: start the server behind the bridgehead, and click again to kill it. Shift and click starts it under the debugger, paused at the return of decide.",
+          "widget": "process",
+          "icon": "🎣",
+          "group": "agent control",
+          "row": 0,
+          "column": 0,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "runs": "src/bridge/server.js",
+          "launch": "the server",
+          "pauses": "decide"
         }
       }
     },
@@ -125,11 +145,13 @@
         "level": {
           "type": "string",
           "enum": [
+            "debug",
             "info",
             "warn",
-            "error"
+            "error",
+            "fatal"
           ],
-          "help": "The level this box writes at. info writes every line a door says."
+          "help": "The level this box writes at. info writes every line a door says, and debug writes what the hooks see too."
         },
         "open": {
           "help": "Open the log viewer, in a terminal beside the editor.",
@@ -137,7 +159,7 @@
           "icon": "📜",
           "group": "agent control",
           "row": 0,
-          "column": 0,
+          "column": 1,
           "rowSpan": 1,
           "colSpan": 1,
           "keys": [
@@ -152,41 +174,25 @@
         }
       }
     },
-    "judge": {
+    "code": {
       "type": "object",
       "required": [
-        "enabled",
-        "model",
-        "maxSpans",
-        "warmupWrites",
-        "thenEveryNth"
+        "functionLines",
+        "fileLines"
       ],
       "properties": {
         "comment": {
           "type": "string"
         },
-        "enabled": {
-          "type": "boolean",
-          "help": "The model reading a write. false leaves the mechanical rules alone."
-        },
-        "model": {
-          "type": "string",
-          "help": "The model the judge asks."
-        },
-        "maxSpans": {
+        "functionLines": {
           "type": "number",
-          "unit": "spans",
-          "help": "The spans one reading carries at most."
+          "unit": "lines",
+          "help": "The lines a function holds at most. The write door refuses a write that grows past it."
         },
-        "warmupWrites": {
+        "fileLines": {
           "type": "number",
-          "unit": "writes",
-          "help": "The writes a session judges before it starts skipping."
-        },
-        "thenEveryNth": {
-          "type": "number",
-          "unit": "writes",
-          "help": "After the warmup, the judge reads one write in this many."
+          "unit": "lines",
+          "help": "The lines a file holds at most. The write door refuses a write that grows past it."
         }
       }
     },
@@ -217,6 +223,21 @@
           "type": "string",
           "unit": "a span, as 90m, 12h or 3d",
           "help": "The age of a held group's tip that puts it under yours."
+        },
+        "failsBeforePerson": {
+          "type": "number",
+          "unit": "returns",
+          "help": "The times a step fails back before the pull inserts a person step."
+        },
+        "refusalsBeforePerson": {
+          "type": "number",
+          "unit": "refusals",
+          "help": "The times one hand-back meets refused before the pull inserts a person step."
+        },
+        "stepsBeforeSplit": {
+          "type": "number",
+          "unit": "steps",
+          "help": "The person steps a ticket carries before the pull refuses another and asks for a split."
         }
       }
     },
@@ -240,6 +261,30 @@
           "icon": "the owner picks one mark per state: play and stop",
           "gesture": 1
         },
+        "vehicle": {
+          "help": "Make a vehicle: a copy of this tree that works on itself, in the folder the press asks for.",
+          "widget": "action",
+          "icon": "🚚",
+          "group": "engine",
+          "row": 0,
+          "column": 0,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "asks": "folder",
+          "runs": "./RUNME.sh vehicle into <folder>"
+        },
+        "stub": {
+          "help": "Make a stub: a bare project this vehicle drives, in the folder the press asks for.",
+          "widget": "action",
+          "icon": "🌱",
+          "group": "engine",
+          "row": 0,
+          "column": 1,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "asks": "folder",
+          "runs": "./RUNME.sh stub into <folder>"
+        },
         "beat": {
           "type": "number",
           "unit": "seconds",
@@ -258,7 +303,7 @@
           "icon": "❌🔗🤖",
           "group": "agent control",
           "row": 0,
-          "column": 3,
+          "column": 4,
           "rowSpan": 1,
           "colSpan": 1
         },

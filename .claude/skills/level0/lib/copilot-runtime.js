@@ -5,13 +5,16 @@ import { CODE, formatText, lintText as lintCode } from "./code.js";
 import { actionables, bindsHere, standingLayer } from "./guidance.js";
 import { mutations } from "./mutations.js";
 import { refusal } from "./refuse.js";
-import { readRule } from "./rulefile.js";
 import { landsOnTrunk } from "./trunk.js";
 import { lintText } from "./vale.js";
 import { readTools, whereIs } from "../../../../src/scripts/tools.js";
 import { statusOf } from "../../../../src/scripts/work.js";
 import { candidateRun } from "./candidate-check.js";
 
+export const TOOL_WAIT = 4000;
+const FILES_A_CALL = 8;
+const BATCH = 4;
+const RETRIES = 3;
 const PROSE = /\.(md|markdown|txt)$/i;
 const SHELL = new Set([
   "Bash",
@@ -28,7 +31,7 @@ export async function handle(event, it) {
     const cloud = event.surface === "cloud";
     const read = (name) => it.disk.read(it.session.path(name));
     const run = (argv, options = {}) =>
-      it.proc.run(argv, { ...options, cwd: options.cwd ?? it.root, timeoutMs: 4000 });
+      it.proc.run(argv, { ...options, cwd: options.cwd ?? it.root, timeoutMs: TOOL_WAIT });
     const checker = candidateRun(it, run);
     const branch = () => {
       const result = run(["git", "rev-parse", "--abbrev-ref", "HEAD"]);
@@ -96,13 +99,6 @@ export async function handle(event, it) {
         0,
       );
       if (!count) throw new Error("No numbered guidance reaches this session.");
-      const judged = it.disk
-        .list(it.join(it.root, "spec/config/styles/VoiceJudged"))
-        .filter((one) => one.name.endsWith(".yml"))
-        .map(
-          (one) => readRule(read(`spec/config/styles/VoiceJudged/${one.name}`)).message,
-        )
-        .filter(Boolean);
       state.guidance = standingLayer(notes);
       state.count = count;
       state.ready = true;
@@ -112,8 +108,6 @@ export async function handle(event, it) {
           "Mechanical write gates are active. Formatting follows edits. Semantic rules are instructions, not model checks. Final answers are not linted.",
           "# How this tree is worked",
           state.guidance,
-          "# Semantic guidance",
-          ...judged,
           ...state.handovers.map(
             (one) =>
               `# Handover: ${one.path}\n${one.text}\nWrite a fresh result at the same path before finishing.`,
@@ -158,9 +152,9 @@ export async function handle(event, it) {
         return {};
       }
       const changes = mutations(event, read);
-      if (changes.length > 8)
+      if (changes.length > FILES_A_CALL)
         return {
-          deny: "Edit at most eight files per tool call so checks finish within the hook deadline.",
+          deny: `Edit at most ${FILES_A_CALL} files per tool call so checks finish within the hook deadline.`,
         };
       for (const change of changes) {
         const path = it.session.path(change.path);
@@ -194,7 +188,7 @@ export async function handle(event, it) {
         (path) =>
           it.disk.exists(it.session.path(path)) && state.checked?.[path] !== read(path),
       );
-      for (const path of pending.slice(0, 4)) {
+      for (const path of pending.slice(0, BATCH)) {
         if (!it.disk.exists(it.session.path(path))) continue;
         let text = read(path);
         if (CODE.test(path)) {
@@ -208,7 +202,7 @@ export async function handle(event, it) {
         }
         const failure = await check(text, path, { vale, biome, run: checker });
         if (failure) issues.push(failure);
-        else (state.checked ??= {})[path] = text;
+        else state.checked = { ...state.checked, [path]: text };
       }
       for (const handover of state.handovers) {
         if (
@@ -248,14 +242,14 @@ export async function handle(event, it) {
         state.retries++;
         state.failure = issues.join("\n");
         save();
-        if (state.retries <= 3) return { block: state.failure };
+        if (state.retries <= RETRIES) return { block: state.failure };
         return {
           failed: `Level zero cannot verify completion. Work is not accepted. ${state.failure}`,
         };
       }
       state.failure = "";
       state.retries = 0;
-      if (pending.length > 4) {
+      if (pending.length > BATCH) {
         return {
           block: "Validation continues in bounded batches. Attempt completion again.",
         };

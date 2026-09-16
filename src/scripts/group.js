@@ -6,6 +6,8 @@
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 
 export const TICKETS = "spec/tickets";
+export const NOTE_END = ".md";
+export const WORK_BRANCH = "work/";
 export const GROUP = "group";
 export const OPEN = "open";
 export const CLOSED = "closed";
@@ -16,8 +18,13 @@ export const STALE = "12h";
 const SPAN = /^(\d+)\s*([mhd])$/;
 const SPANS = { m: 60, h: 3600, d: 86400 };
 
+export function ticketNamed(path) {
+  const bare = path.endsWith(NOTE_END) ? path.slice(0, -NOTE_END.length) : path;
+  return bare.slice(bare.lastIndexOf("/") + 1);
+}
+
 export function ticketAt(name) {
-  return `${TICKETS}/${name}.md`;
+  return `${TICKETS}/${name}${NOTE_END}`;
 }
 
 // [[spec/design_output/work#a-group-is-a-ticket]]
@@ -32,7 +39,8 @@ export function fieldOf(text, key) {
 
 // [[spec/design_output/work#a-group-is-a-ticket]]
 export function isGroup(text) {
-  return Boolean(text) && fieldOf(text, "process") === GROUP;
+  // The mint links the process by its path, and a hand by its name. [[spec/design_output/work#a-group-is-a-ticket]]
+  return Boolean(text) && fieldOf(text, "process").split("/").pop() === GROUP;
 }
 
 // [[spec/design_output/work#the-take-writes-the-record]]
@@ -81,9 +89,7 @@ export function withEntry(text, entry) {
   const shut = frontShut(rows);
   if (shut < 0) return rows.join("\n");
 
-  const item = Object.entries(entry)
-    .filter(([, said]) => said !== undefined && String(said) !== "")
-    .map(([key, said], at) => `${at ? "    " : "  - "}${key}: ${said}`);
+  const item = entryRows(entry);
   if (!item.length) return rows.join("\n");
 
   const opens = keyAt(rows, shut, "record");
@@ -152,6 +158,27 @@ export function aged(seconds) {
   if (held >= SPANS.d) return `${Math.floor(held / SPANS.d)}d`;
   if (held >= SPANS.h) return `${Math.floor(held / SPANS.h)}h`;
   return `${Math.floor(held / SPANS.m)}m`;
+}
+
+// [[spec/design_output/pull#the-record-holds-the-answers]]
+function entryRows(entry) {
+  const out = [];
+  for (const [key, said] of Object.entries(entry)) {
+    if (said === undefined || said === null || String(said) === "" || (Array.isArray(said) && !said.length)) continue;
+    const lead = out.length ? "    " : "  - ";
+    if (!Array.isArray(said)) {
+      out.push(`${lead}${key}: ${said}`);
+      continue;
+    }
+    out.push(`${lead}${key}:`);
+    for (const one of said) {
+      const pairs = Object.entries(one ?? {}).filter(([, value]) => value !== undefined && value !== null);
+      for (const [at, [name, value]] of pairs.entries()) {
+        out.push(`${at ? "        " : "      - "}${name}: ${value}`);
+      }
+    }
+  }
+  return out;
 }
 
 function frontShut(rows) {

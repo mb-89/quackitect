@@ -16,6 +16,14 @@ import (
 	"time"
 )
 
+const (
+	headerWait = 5 * time.Second
+	stopDelay  = 100 * time.Millisecond
+	decimal    = 10
+	folderMode = 0o755
+	fileMode   = 0o644
+)
+
 type Standing struct {
 	Port  int    `json:"port"`
 	Pid   int    `json:"pid"`
@@ -54,14 +62,14 @@ func Serve(root string) (*http.Server, net.Listener, error) {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", one.took)
-	server := &http.Server{Handler: mux, ReadHeaderTimeout: 5 * time.Second}
+	server := &http.Server{Handler: mux, ReadHeaderTimeout: headerWait}
 	go server.Serve(listen)
 
 	return server, listen, stands(root, listen)
 }
 
 func stands(root string, listen net.Listener) error {
-	if err := os.MkdirAll(filepath.Dir(standingPath(root)), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(standingPath(root)), folderMode); err != nil {
 		return err
 	}
 	said, err := json.Marshal(Standing{
@@ -73,7 +81,7 @@ func stands(root string, listen net.Listener) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(standingPath(root), append(said, '\n'), 0o644)
+	return os.WriteFile(standingPath(root), append(said, '\n'), fileMode)
 }
 
 func (one *door) took(w http.ResponseWriter, r *http.Request) {
@@ -133,11 +141,11 @@ func stampHere() string {
 	if err != nil {
 		return ""
 	}
-	return said.ModTime().UTC().Format(time.RFC3339Nano) + ":" + strconv.FormatInt(said.Size(), 10)
+	return said.ModTime().UTC().Format(time.RFC3339Nano) + ":" + strconv.FormatInt(said.Size(), decimal)
 }
 
 func stopsSoon(root string) {
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(stopDelay)
 	os.Remove(standingPath(root))
 	os.Exit(0)
 }

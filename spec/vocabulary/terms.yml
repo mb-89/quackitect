@@ -4,6 +4,7 @@
 # [[spec/schemas/paragraph.schema.yaml]]
 
 terms:
+  - {word: splice, defines: "[[spec/design_input/the-agent-pulls-tickets]]"}
   - {word: bridgehead, defines: "[[spec/funnel/a-button-makes-a-vehicle#the-bridgehead]]"}
   - {word: shim, defines: "[[spec/funnel/a-button-makes-a-vehicle#the-bridgehead]]"}
   - {word: stub, defines: "[[spec/funnel/a-button-makes-a-vehicle#the-stub]]"}
@@ -72,7 +73,6 @@ terms:
   - {word: hook, defines: "[[spec/design_output/level0#what-level-zero-is]]"}
   - {word: index, defines: "[[spec/design_output/index]]"}
   - {word: installer, defines: "[[spec/design_output/index#the-compiler-it-needs]]"}
-  - {word: judge, defines: "[[spec/design_output/level0#the-judge-costs-a-call]]"}
   - {word: leaf, defines: "[[spec/schemas/ticket.schema]]"}
   - {word: level zero, defines: "[[spec/design_output/level0#what-level-zero-is]]"}
   - {word: level one, defines: "[[spec/design_input/the-agent-pulls-tickets#three-rules-hold-level-one]]"}
@@ -123,7 +123,6 @@ terms:
   - {word: shell, defines: "[[spec/design_output/bash]]"}
   - {word: sidebar, defines: "[[spec/design_output/extension]]"}
   - {word: slash command, defines: "[[spec/design_output/config]]"}
-  - {word: span, defines: "[[spec/design_output/level0#a-judged-rule-cuts]]"}
   - {word: spawn, defines: "[[spec/design_output/level0#the-spawn-carries-a-rewrite]]"}
   - {word: stale, defines: "[[spec/design_output/work#a-stale-group-is-yours]]"}
   - {word: stamp, defines: "[[spec/design_output/work#the-battery-answers-first]]"}
@@ -144,6 +143,7 @@ terms:
   - {word: trunk, defines: "[[spec/design_output/work#trunk-comes-in-first]]"}
   - {word: urgency, defines: "[[spec/design_output/work#urgency-and-what-waits]]"}
   - {word: vale, defines: "[[spec/design_output/level0#the-write-door]]"}
+  - {word: ini, defines: "[[spec/design_output/projection#a-layer-writes-two-files]]"}
   - {word: vehicle, defines: "[[spec/design_output/vehicle]]"}
   - {word: verb, defines: "[[spec/design_output/work]]"}
   - {word: verdict, defines: "[[spec/design_output/review]]"}
@@ -177,7 +177,6 @@ terms:
   - {word: kebab, defines: "[[spec/design_output/config]]"}
   - {word: lexer, defines: "[[spec/design_output/bash]]"}
   - {word: lookahead, defines: "[[spec/design_output/bash]]"}
-  - {word: matcher, defines: "[[spec/design_output/level0#a-judged-rule-scopes]]"}
   - {word: millisecond, defines: "[[spec/design_output/log]]"}
   - {word: minter, defines: "[[spec/design_output/schema#the-tool-writes-the-note]]"}
   - {word: newline, defines: "[[spec/design_output/bash]]"}
@@ -208,6 +207,7 @@ terms:
   - {word: whitespace, defines: "[[spec/design_output/bash]]"}
   - {word: wildcard, defines: "[[spec/design_output/index#a-type-is-a-glob]]"}
   - {word: yaml, defines: "[[spec/design_output/schema]]"}
+  - {word: json, defines: "[[spec/design_output/vehicle#the-record-names-the-vehicle]]"}
   - {word: animate, defines: "[[spec/design_output/extension]]"}
   - {word: authenticate, defines: "[[spec/design_output/copilot]]"}
   - {word: backspace, defines: "[[spec/design_output/projection]]"}
@@ -239,3 +239,5 @@ terms:
   - {word: tripwire, defines: "[[spec/funnel/level-zero-closes]]"}
   - {word: truncate, defines: "[[spec/design_output/level0]]"}
   - {word: vscode, defines: "[[spec/design_output/extension]]"}
+  - {word: wink-nlp, defines: "[[spec/design_output/level0#the-tense-reader]]"}
+  - {word: adjective, defines: "[[spec/design_output/level0#the-tense-reader]]"}

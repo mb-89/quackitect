@@ -41,7 +41,7 @@
   priority: 85
   decides: mechanical
   runs: owner-holds
-  says: The owner holds this session at stopped, so this turn ends here.
+  says: The owner holds this session at stop, so this turn ends here.
 
 - id: work-still-stands
   side: continue
@@ -49,6 +49,13 @@
   decides: mechanical
   runs: work-waiting
   says: Something on your list stands unfinished, so carry on with it.
+
+- id: the-last-line-names-no-stop
+  side: continue
+  priority: 50
+  decides: mechanical
+  runs: no-stop-line
+  says: The last line names no stop reason, so this turn holds open.
 
 - id: the-work-stands-complete
   side: stop

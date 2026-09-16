@@ -4,13 +4,13 @@
 // [[spec/design_output/work#the-round-trip]]
 
 import { overLong } from "../../.claude/skills/level0/lib/names.js";
-import { saysGreen, STAMP, stampOf } from "../../.claude/skills/level0/lib/runs.js";
+import { saysGreen, shortOf, STAMP, stampOf } from "../../.claude/skills/level0/lib/runs.js";
+import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import {
   isTagged,
   reaches,
   TODO as PARKED,
 } from "../../.claude/skills/level0/lib/todo.js";
-import { COPY } from "../../.claude/skills/level0/lib/vehicle.js";
 import {
   aged,
   askOf,
@@ -19,21 +19,26 @@ import {
   GROUP,
   heldIn,
   isGroup,
+  NOTE_END,
   OPEN,
   spanOf,
   STALE,
   stepOf,
   ticketAt,
+  ticketNamed,
   TICKETS,
   withEntry,
   withField,
   withHashAfter,
   withoutField,
+  WORK_BRANCH,
 } from "./group.js";
-import { review } from "./review.js";
+import { handOf, pull, takeable, testVerb } from "./pull.js";
+import { readyToMerge, review } from "./review.js";
 
 export const BRIEF = "HANDOVER.md";
-const TRUNK = "main";
+const COL = { branch: 34, kind: 6, status: 6, why: 24 };
+const MS = 1000;
 
 // [[spec/design_output/work#a-merged-branch-closes]]
 export const MINE = /^(work|claude)\//;
@@ -61,6 +66,9 @@ export function work(root, argv, doors) {
     read,
     review,
     list,
+    // [[spec/design_output/pull#the-hand-out]]
+    pull: (it, _name, argv) => pull({ ...it, take: (group) => take(it, group), ready: () => readyToMerge(it) }, argv),
+    test: (it, _name, argv) => testVerb(it, argv),
   };
   if (doing[what] && LOUD.includes(what)) {
     return tell(it, what, doing[what](it, name, argv));
@@ -77,6 +85,8 @@ export function work(root, argv, doors) {
     console.log("  list [--done] every work branch and its status, or the done ones alone");
     console.log("  merge <name>  take a done branch into main");
     console.log("  close [name]  delete a branch already inside main, or every one");
+    console.log("  pull [ticket] take the next leaf of this group, or hand one back with --pass, --fail, --became");
+    console.log("  test [file]   run the tests the branch changes since the take: green, assertion, build or missing");
     return what ? 2 : 0;
   }
   return doing[what](it, name, argv);
@@ -91,7 +101,7 @@ export function cloud(root, argv, doors) {
   return argv[0] ? 2 : 0;
 }
 
-const LOUD = ["new", "take", "done", "release", "merge", "close"];
+const LOUD = ["new", "take", "done", "release", "merge", "close", "pull"];
 
 // [[spec/design_output/log#which-door-says-what]]
 function tell(it, what, code) {
@@ -173,7 +183,7 @@ export function standingOf(briefs, merged = new Set()) {
   );
 }
 
-function mergedHere(it) {
+export function mergedHere(it) {
   return new Set(
     it.git
       .run(["branch", "-r", "--merged", `origin/${TRUNK}`], true)
@@ -191,7 +201,7 @@ export function groupStanding(text) {
 }
 
 // [[spec/design_output/work#a-group-is-a-ticket]]
-function standOf(it) {
+export function standOf(it) {
   return branches(it).map((branch) => {
     // [[spec/design_output/work#a-brief-drains-first]]
     const name = branch.replace(/^work\//, "");
@@ -202,7 +212,7 @@ function standOf(it) {
 }
 
 // [[spec/design_output/work#held-derives-from-the-record]]
-function standingAll(stand, merged) {
+export function standingAll(stand, merged) {
   return new Map(
     stand.map((one) => [
       one.branch,
@@ -224,15 +234,11 @@ function textAt(it, ref, path) {
   return said.ok ? `${said.out}\n` : "";
 }
 
-// [[spec/design_output/work#the-take-writes-the-record]]
-function handOf(it) {
-  const at = it.join(it.root, COPY);
-  if (!it.disk.exists(at)) return "an unnamed box";
-  try {
-    return `box ${JSON.parse(it.disk.read(at)).id}`;
-  } catch {
-    return "an unnamed box";
-  }
+function workBranchHere(it, verb) {
+  const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
+  if (branch.startsWith(WORK_BRANCH)) return branch;
+  console.error(`branch ${verb} runs on a work branch, and this is ${branch}.`);
+  return "";
 }
 
 // [[spec/design_output/work#the-merge-frees-the-tickets]]
@@ -241,20 +247,15 @@ function ticketsOn(it, ref) {
   if (!said.ok) return [];
   return said.out
     .split("\n")
-    .filter((path) => path.endsWith(".md"))
-    .map((path) => ({ path, name: path.slice(TICKETS.length + 1, -3), text: textAt(it, ref, path) }));
+    .filter((path) => path.endsWith(NOTE_END))
+    .map((path) => ({ path, name: ticketNamed(path), text: textAt(it, ref, path) }));
 }
 
 // [[spec/design_output/work#a-stale-group-is-yours]]
 function tipAge(it, branch, now) {
   const said = it.git.run(["log", "-1", "--format=%ct", `origin/${branch}`], true);
   if (!now || !said.ok || !said.out) return -1;
-  return Math.max(0, Math.floor(now / 1000) - Number(said.out));
-}
-
-// [[spec/design_output/work#a-stale-group-is-yours]]
-function staleAfter(it) {
-  return spanOf(it.stale || STALE) || spanOf(STALE);
+  return Math.max(0, Math.floor(now / MS) - Number(said.out));
 }
 
 export function setStatus(text, to) {
@@ -327,11 +328,8 @@ function push(it, branch, was, why) {
 
 // [[spec/design_output/work#trunk-comes-in-first]]
 function sync(it) {
-  const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
-  if (!branch.startsWith("work/")) {
-    console.error(`branch sync runs on a work branch, and this is ${branch}.`);
-    return 2;
-  }
+  const branch = workBranchHere(it, "sync");
+  if (!branch) return 2;
 
   it.git.run(["fetch", "origin", TRUNK], true);
   const behind = it.git.run(["rev-list", "--count", `HEAD..origin/${TRUNK}`], true).out;
@@ -430,7 +428,8 @@ function newWork(it, name) {
 }
 
 // [[spec/design_output/work#why-a-routine-needs-this]]
-function take(it) {
+// A name picks one branch, which is the owner's road onto a group from a desk. [[spec/design_output/pull#the-engine-takes-the-branch]]
+function take(it, name = "") {
   if (dirty(it)) return 2;
 
   const stand = standOf(it);
@@ -442,7 +441,13 @@ function take(it) {
     return 0;
   }
 
-  const free = freeIn(stand, standing);
+  const free = name
+    ? freeIn(stand, standing).filter((one) => one.branch === `work/${name}`)
+    : freeIn(stand, standing);
+  if (name && !free.length) {
+    console.error(`work/${name} stands at no free ${TODO}. Run ./RUNME.sh branch list to read where it stands.`);
+    return 1;
+  }
   if (!free.length) {
     console.log(`Every branch at ${TODO} waits for another. Nothing to take.`);
     for (const one of open) {
@@ -554,7 +559,7 @@ function trigger(it) {
   const stand = standOf(it);
   const free = freeIn(stand, standingAll(stand, mergedHere(it))).map((one) => one.branch);
 
-  console.log(`${ROUTINE.name} runs ./RUNME.sh branch take on a cloud box.`);
+  console.log(`${ROUTINE.name} runs ./RUNME.sh branch pull on a cloud box, and the engine takes a branch there.`);
   console.log("Fire it with the RemoteTrigger tool, once for every box you want:\n");
   console.log(`    action=run  trigger_id=${ROUTINE.id}\n`);
 
@@ -568,13 +573,10 @@ function trigger(it) {
 }
 
 function finish(it) {
-  const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
-  if (!branch.startsWith("work/")) {
-    console.error(`branch done runs on a work branch, and this is ${branch}.`);
-    return 2;
-  }
+  const branch = workBranchHere(it, "done");
+  if (!branch) return 2;
   // [[spec/design_output/work#a-brief-drains-first]]
-  const name = branch.replace(/^work\//, "");
+  const name = ticketNamed(branch);
   const at = ticketAt(name);
   const group = it.join(it.root, at);
   const brief = it.join(it.root, BRIEF);
@@ -626,6 +628,19 @@ function leaves(it, branch, at, path, says) {
     (one) => fieldOf(one.text, "state") !== CLOSED,
   );
 
+  // [[spec/design_output/pull#done-leaves-no-takeable-step]]
+  const busy = [...open, { name, text: it.disk.read(path) }]
+    .map((one) => ({ name: one.name, step: takeable(it, one) }))
+    .filter((one) => one.step);
+  if (busy.length) {
+    for (const one of busy) {
+      console.error(`${one.name} stands at ${one.step}, and a hand can take it.`);
+    }
+    console.error("Run ./RUNME.sh branch pull, and spawn the hand a spawn answer names.");
+    console.error("branch done leaves a group only when every open step waits for a person.");
+    return 1;
+  }
+
   let now = withHashAfter(it.disk.read(path), after);
   // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]] takes the tag off.
   if (!open.length) {
@@ -636,7 +651,7 @@ function leaves(it, branch, at, path, says) {
   it.git.run(["commit", "-m", `${branch}: the box leaves`], true);
   if (!it.git.run(["push", "origin", branch]).ok) return 1;
 
-  console.log(`${branch} carries ${after.slice(0, 8)}, and ${says}.`);
+  console.log(`${branch} carries ${shortOf(after)}, and ${says}.`);
   if (open.length) {
     console.log(`${name} stays ${OPEN}, because ${open.length} ticket(s) stand open:`);
     for (const one of open) console.log(`  ${one.name}`);
@@ -653,8 +668,8 @@ function childrenHere(it, name) {
   if (!it.disk.exists(at)) return [];
   return it.disk
     .list(at)
-    .filter((one) => one.kind === "file" && one.name.endsWith(".md"))
-    .map((one) => ({ name: one.name.slice(0, -3), text: it.disk.read(it.join(at, one.name)) }))
+    .filter((one) => one.kind === "file" && one.name.endsWith(NOTE_END))
+    .map((one) => ({ name: ticketNamed(one.name), text: it.disk.read(it.join(at, one.name)) }))
     .filter((one) => fieldOf(one.text, GROUP) === name);
 }
 
@@ -667,16 +682,10 @@ function batterySays(it) {
 
 function release(it, name) {
   const here = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
-  const branch = name ? `work/${name}` : here;
-  if (!branch.startsWith("work/")) {
-    console.error("branch release takes a name, or runs on a work branch.");
-    return 2;
-  }
-
-  if (dirty(it)) return 2;
-
+  const branch = name ? `${WORK_BRANCH}${name}` : workBranchHere(it, "release");
+  if (!branch || dirty(it)) return 2;
   const brief = briefOf(it, branch);
-  const named = branch.replace(/^work\//, "");
+  const named = ticketNamed(branch);
   const ticket = brief ? "" : textAt(it, `origin/${branch}`, ticketAt(named));
   if (!brief && !isGroup(ticket)) {
     console.error(`${branch} carries no ${BRIEF} and no group.`);
@@ -772,8 +781,8 @@ function rowOf(it, one, standing, now) {
   return {
     name: one.name,
     age,
-    stale: held >= 0 && held > staleAfter(it),
-    said: `${one.branch.padEnd(34)} ${kind.padEnd(6)} ${status.padEnd(6)} ${why.padEnd(24)} ${age}`,
+    stale: held >= 0 && held > (spanOf(it.stale || STALE) || spanOf(STALE)),
+    said: `${one.branch.padEnd(COL.branch)} ${kind.padEnd(COL.kind)} ${status.padEnd(COL.status)} ${why.padEnd(COL.why)} ${age}`,
   };
 }
 
@@ -783,7 +792,7 @@ function looseRows(it) {
     .filter((one) => !fieldOf(one.text, GROUP) && !isGroup(one.text))
     .map((one) => ({
       stale: false,
-      said: `${one.name.padEnd(34)} ticket ${(fieldOf(one.text, "state") || OPEN).padEnd(6)} ${urgencyOf(one.text)}`,
+      said: `${one.name.padEnd(COL.branch)} ticket ${(fieldOf(one.text, "state") || OPEN).padEnd(COL.status)} ${urgencyOf(one.text)}`,
     }));
 }
 
@@ -926,7 +935,7 @@ function close(it, name, argv) {
   for (const branch of wanted) {
     if (!inTrunk.has(branch) && !forced) {
       console.error(`${branch} is outside ${TRUNK}, so closing it drops its work.`);
-      console.error(`Merge it first, or run close ${branch.slice(5)} --force.`);
+      console.error(`Merge it first, or run close ${ticketNamed(branch)} --force.`);
       continue;
     }
     if (!it.git.run(["push", "origin", "--delete", branch]).ok) continue;
@@ -945,7 +954,7 @@ function doneOnly(stand, standing) {
     return 0;
   }
   for (const one of ready) {
-    console.log(`${one.branch.padEnd(34)} ./RUNME.sh branch read ${one.name}`);
+    console.log(`${one.branch.padEnd(COL.branch)} ./RUNME.sh branch read ${one.name}`);
   }
   return 0;
 }

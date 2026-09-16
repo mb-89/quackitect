@@ -53,7 +53,7 @@ prose takes it.
 
 # The retro moves a term
 
-The retro reads the terms added since the last one, keeps each, or moves it to
+The retro reads the terms new since the last one, keeps each, or moves it to
 the swaps with the word to write instead. So the lists settle: a term the tree
 keeps holds its note, and a term it drops turns into a swap nobody writes past.
 

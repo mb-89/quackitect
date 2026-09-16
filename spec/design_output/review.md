@@ -5,7 +5,7 @@ kind: [[design_output]]
 # Scope
 
 `src/scripts/review.js` gathers what a reader wants off a branch. This note
-covers the verb, the worktree it runs in, and the five questions it answers.
+covers the verb, the worktree it runs in, and the questions it answers.
 
 # What the reader is
 
@@ -62,7 +62,7 @@ Three dots read the diff from where the branch leaves trunk. Two dots read it
 from trunk's tip, so a branch standing behind trunk shows every commit trunk
 holds since as a removal.
 
-One real review pays that price here. A branch 19 commits behind trunk answers
+One real review pays that price here. A branch far behind trunk answers
 "two entire subsystems, deleted and undisclosed", over code the branch leaves
 alone. `rev-list` keeps two dots, because it counts the branch's own commits.
 
@@ -86,7 +86,7 @@ removing the worktree takes the whole of it away.
 A red check answers with the lines naming the break. It takes every `not ok`
 row the test runner writes, and the last lines of the run where it writes none.
 
-# The five questions
+# The questions
 
 They live in `spec/guidance/review/reviewing.md`, written as actionables the way every
 other guidance note is. Level zero hands them to every session, so the reader
@@ -127,10 +127,22 @@ Short, and every line something to do:
     2 things to fix, and the merge is a desk's.
 
 The count adds the reader's `fix` to what the verb finds: a red check counts
-one, and an absent retro counts one. A report with nothing to fix fits on one
-line:
+one, and an absent retro counts one. A brief carries its retro under a heading
+naming it. A group branch carries no brief, so the verb reads the group ticket
+as the handback, and `retroOnTicket` reads a filled line under its retro
+chapter. A report with nothing to fix fits on one line:
 
     work/the-config-holds-numbers   nothing to fix, and the merge is a desk's.
+
+# The queue takes done branches
+
+A work branch standing done waits for a review and a merge, and that wait is
+the desk's work. So a desk's pull on trunk reads the branches before the free
+tickets. It hands out the first done one as three steps: the review, and the
+fixes it names, the merge from trunk, and the close. `readyToMerge` in the
+review verb prints them, and the pull hands out no ticket beside them. The
+merge is the hand-back, and the close takes the branch out of the queue. A
+cloud box's pull takes a branch instead, so a done branch is the desk's alone.
 
 # The tool the session calls
 

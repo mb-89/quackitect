@@ -11,6 +11,12 @@ export const ANSWER = "answer.md";
 
 const WORD = /[A-Za-z0-9]+(?:['-][A-Za-z0-9]+)*/g;
 const TOP = 3;
+const PER = 1000;
+const TENTHS = 10;
+const ORDINAL = 3;
+const HEADS = ["file", "words", "findings", `per ${PER} words`, "top rules"];
+const TEXT_HEADS = new Set(["file", "top rules"]);
+const NUMERIC = HEADS.flatMap((name, at) => (TEXT_HEADS.has(name) ? [] : [at]));
 
 // [[spec/funnel/a-paragraph-has-a-schema]]
 export function wordsIn(said) {
@@ -57,7 +63,7 @@ function answerOf(row) {
 // [[spec/funnel/a-paragraph-has-a-schema]]
 export function answerFiles(session, answers) {
   return [answers].flat().map((said, i) => ({
-    path: `${MEASURED}/${session}/${String(i + 1).padStart(3, "0")}-${ANSWER}`,
+    path: `${MEASURED}/${session}/${String(i + 1).padStart(ORDINAL, "0")}-${ANSWER}`,
     text: `${String(said).trimEnd()}\n`,
   }));
 }
@@ -65,7 +71,7 @@ export function answerFiles(session, answers) {
 // [[spec/funnel/a-paragraph-has-a-schema]]
 export function scoreOf(words, findings) {
   if (!words) return 0;
-  return Math.round((findings / words) * 10000) / 10;
+  return Math.round((findings / words) * PER * TENTHS) / TENTHS;
 }
 
 // [[spec/funnel/a-paragraph-has-a-schema]]
@@ -163,7 +169,7 @@ export function measureTable(rows) {
     one.score.toFixed(1),
     one.top.map(([rule, n]) => `${rule} ${n}`).join(", "),
   ]);
-  return tabled(["file", "words", "findings", "per 1000 words", "top rules"], shown, [1, 2, 3]);
+  return tabled(HEADS, shown, NUMERIC);
 }
 
 // [[spec/funnel/a-paragraph-has-a-schema]]

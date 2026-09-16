@@ -9,8 +9,9 @@
 # The body half is this project's own, borrowed from https://document-schema.org.
 # A value written [[like this]] is a link, and the name inside is the value.
 #
-# A bound a rule already holds stays with that rule. VoiceVale/LongSentence
-# bounds every sentence here at 25 words, so this file names no word count.
+# A bound a rule already holds stays with that rule. The sentence layer of
+# spec/schemas/paragraph.schema.yaml bounds every sentence here, so this file
+# names no word count.
 
 kind: guidance
 
@@ -40,6 +41,10 @@ frontmatter:
     env:
       type: array
       description: the variables saying a session is in scope, where that scope is a machine
+
+    style:
+      type: boolean
+      description: true puts this note into the output style, which the client sends with every request
 
 body:
   headingLevel: 1

@@ -1,4 +1,4 @@
-// The one resolver. Three layers answer a key and the later beats the earlier,
+// The one resolver. The layers answer a key and the later beats the earlier,
 // so a caller asks and takes what comes back. The schema beside the tracked
 // file says every type, and a written text lands as its own kind.
 // [[spec/design_output/config#the-three-layers]]

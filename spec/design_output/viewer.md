@@ -25,6 +25,7 @@ see [[spec/design_output/log#every-writer-appends]].
 | Enter | open the details, and Enter again closes them |
 | `alt+?` | open the help in the pane |
 | `alt+f` | open the filter in the pane |
+| `alt+l` | raise the floor one level, and round again |
 | PgUp, PgDn | step a whole window up or down the log |
 | Home | go to the first row |
 | End | go to the newest row, and follow every row arriving |
@@ -45,12 +46,27 @@ and anywhere above it the window holds still while rows arrive.
 
 The window carries no status bar.
 
+## Alt L raises the floor
+
+The window shows the rows at the floor and above, and opens at `info`. The
+ladder is the one the log climbs. For what each level holds, see
+[[spec/design_output/log#what-a-box-writes]].
+
+`alt+l` raises the floor one level. From the top it comes round to the bottom,
+so the press after the top stands at the opening floor again. A debug row stays
+hidden until the floor comes round to it. The filter narrows what the floor
+leaves. A row naming no level, or a level nobody knows, stands as `info`, so it
+shows at the opening floor.
+
+The header names the floor beside the key, as `alt+L log lvl: INFO`, and in
+red while the floor stands off `info`.
+
 # The header
 
 Two lines stand above the log at every size. The first names the columns and,
-at its right end, the three keys opening the pane: `enter details`, `alt+?
-help` and `alt+f filter`. The second is a rule. The header spans the whole
-window, so the pane opens under it too.
+at its right end, the three keys opening the pane, `enter details`, `alt+?
+help` and `alt+f filter`, then the floor as `alt+L log lvl: INFO`. The second
+is a rule. The header spans the whole window, so the pane opens under it too.
 
 While a filter holds, `alt+f filter` stands in bold red. A cleared line drops
 the filter, and the key goes back to grey.
@@ -88,13 +104,13 @@ one too.
 
 ## One key filters the line
 
+- `alt+q` keeps the prompts and the replies: the talk.
 - `alt+shift+f` keeps every line of the selected line's kind. On a tool line the kind is the tool, as `Read`.
-- `alt+ctrl+f` keeps every line of the selected line's level.
 
 The key writes its filter into the filter line, as `kind: /^prompt$/`, so it
-reads and edits like one a person types. The same key on a line of that kind
-again clears the filter. The filter pane names both keys, and the header stays
-at three.
+reads and edits like one a person types. The same key again clears the
+filter. The filter pane names each key, and the header stays at three. The
+floor under `alt+l` keeps a level, so no key filters by level.
 
 ## A name nobody knows
 

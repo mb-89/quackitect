@@ -12,12 +12,12 @@ import {
   refusedTodo,
   taggedIn,
 } from "../../.claude/skills/level0/lib/todo.js";
+import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { proc } from "../doors/proc.js";
 
 export const STDIN = 0;
-export const TRUNK = "main";
 export const ZEROS = /^0+$/;
 
 export function refsIn(text) {

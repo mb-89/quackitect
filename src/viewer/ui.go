@@ -25,6 +25,8 @@ const (
 	levelWide = 5
 	kindWide  = 10
 	headWide  = 2
+	// [[spec/design_output/viewer#one-key-filters-the-line]]
+	talkFilter = "kind: /^(prompt|reply)$/"
 )
 
 type pane int
@@ -51,6 +53,7 @@ type model struct {
 	input     textinput.Model
 	filter    Filter
 	filterBad string
+	floor     string
 	w, h      int
 	tailer    *tailer
 	err       error
@@ -67,6 +70,7 @@ func newModel(path string, zone *time.Location) model {
 		zone:   zone,
 		sel:    -1,
 		follow: true,
+		floor:  "info",
 		box:    viewport.New(40, 10),
 		input:  input,
 		tailer: newTailer(path),
@@ -97,7 +101,7 @@ func (m model) at() int {
 func (m *model) rebuild() {
 	m.view = m.view[:0]
 	for index, r := range m.all {
-		if m.filter.Match(r) {
+		if Rank(r.Level) >= Rank(m.floor) && m.filter.Match(r) {
 			m.view = append(m.view, index)
 		}
 	}
@@ -245,8 +249,10 @@ func (m model) key(name string) (tea.Model, tea.Cmd) {
 		m.open(paneHelp)
 	case "alt+f":
 		m.open(paneFilter)
-	case "alt+F", "alt+ctrl+f":
+	case "alt+F", "alt+q":
 		m.quick(name)
+	case "alt+l":
+		m.raiseFloor()
 	case "e":
 		m.toError()
 	case "w", "W":
@@ -292,8 +298,11 @@ func (m model) typing(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case "enter", "esc", "alt+f":
 		m.open(paneFilter)
 		return m, nil
-	case "alt+F", "alt+ctrl+f":
+	case "alt+F", "alt+q":
 		m.quick(msg.String())
+		return m, nil
+	case "alt+l":
+		m.raiseFloor()
 		return m, nil
 	case "up":
 		m.box.ScrollUp(1)
@@ -315,6 +324,13 @@ func (m model) typing(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	return m, cmd
 }
 
+// [[spec/design_output/viewer#alt-l-raises-the-floor]]
+func (m *model) raiseFloor() {
+	m.floor = ladder[(Rank(m.floor)+1)%len(ladder)]
+	m.rebuild()
+	m.loadPane()
+}
+
 // [[spec/design_output/viewer#e-finds-the-newest-error]]
 func (m *model) toError() {
 	here := m.at()
@@ -332,12 +348,12 @@ func (m *model) toError() {
 
 // [[spec/design_output/viewer#one-key-filters-the-line]]
 func (m *model) quick(name string) {
-	if m.sel < 0 || m.sel >= len(m.all) {
-		return
-	}
-	r := m.all[m.sel]
-	said := fmt.Sprintf("level: /^%s$/", regexp.QuoteMeta(r.Level))
+	said := talkFilter
 	if name == "alt+F" {
+		if m.sel < 0 || m.sel >= len(m.all) {
+			return
+		}
+		r := m.all[m.sel]
 		said = fmt.Sprintf("kind: /^%s$/", regexp.QuoteMeta(r.Kind))
 		if r.Label() != r.Kind {
 			said = fmt.Sprintf("tool: /^%s$/", regexp.QuoteMeta(r.Label()))
@@ -388,7 +404,11 @@ func (m model) renderHeader() string {
 	if !m.filter.Empty() {
 		filterKey = levelStyle("error").Render("alt+f filter")
 	}
-	hints := keys + filterKey
+	floorKey := dimStyle.Render("  alt+L log lvl: " + strings.ToUpper(m.floor))
+	if !strings.EqualFold(m.floor, "info") {
+		floorKey = levelStyle("error").Render("  alt+L log lvl: " + strings.ToUpper(m.floor))
+	}
+	hints := keys + filterKey + floorKey
 	gap := w - ansi.StringWidth(names) - ansi.StringWidth(hints)
 	line := headStyle.Render(names)
 	if gap >= 2 {
@@ -428,8 +448,8 @@ func (m model) renderRow(r Record, selected bool, w int) string {
 		gutter = barStyle.Render("▌") + " "
 	}
 	level := r.Level
-	if strings.EqualFold(level, "info") {
-		level = ""
+	if level == "" {
+		level = "info"
 	}
 	room := max(1, w-2-stampWide-levelWide-kindWide-3)
 	stamp := pad(r.Stamp(m.zone), stampWide)

@@ -1,5 +1,5 @@
-// The command line over the server. One verb speaks to an editor, one stands on
-// a port, and one answers a path and exits.
+// The command line over the server. A verb speaks to an editor, stands on a
+// port, or answers a path and exits.
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
 package main
 
@@ -17,13 +17,20 @@ import (
 	"time"
 )
 
-const usage = "usage: se-lsp <lsp|serve|check [path...]|standing|stop|version>"
+const (
+	usage      = "usage: se-lsp <lsp|serve|check [path...]|standing|stop|version>"
+	misuse     = 2
+	tries      = 3
+	answerWait = 30 * time.Second
+	standPolls = 300
+	standPoll  = 100 * time.Millisecond
+)
 
 func main() {
 	argv := os.Args[1:]
 	if len(argv) == 0 {
 		fmt.Fprintln(os.Stderr, usage)
-		os.Exit(2)
+		os.Exit(misuse)
 	}
 
 	if argv[0] == "version" || argv[0] == "--version" || argv[0] == "-v" {
@@ -48,7 +55,7 @@ func main() {
 		os.Exit(asks(root, argv[0]))
 	}
 	fmt.Fprintln(os.Stderr, usage)
-	os.Exit(2)
+	os.Exit(misuse)
 }
 
 func rootHere() (string, error) {
@@ -132,7 +139,7 @@ func asks(root, method string) int {
 
 // [[spec/design_output/lsp#the-port-and-the-standing-file]]
 func reaches(root, method string) (answer, error) {
-	for try := 0; try < 3; try++ {
+	for try := 0; try < tries; try++ {
 		standing, err := standingOf(root)
 		if err == nil && current(standing, root) {
 			said, err := posts(standing, method)
@@ -183,7 +190,7 @@ func posts(standing Standing, method string) (answer, error) {
 		return answer{}, err
 	}
 
-	client := &http.Client{Timeout: 30 * time.Second}
+	client := &http.Client{Timeout: answerWait}
 	said, err := client.Post(
 		fmt.Sprintf("http://127.0.0.1:%d/", standing.Port), "application/json", bytes.NewReader(body))
 	if err != nil {
@@ -209,11 +216,11 @@ func starts(root string) error {
 	}
 	go one.Wait()
 
-	for waited := 0; waited < 300; waited++ {
+	for waited := 0; waited < standPolls; waited++ {
 		if _, err := standingOf(root); err == nil {
 			return nil
 		}
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(standPoll)
 	}
-	return errorOf("the server took longer than thirty seconds to stand")
+	return errorOf(fmt.Sprintf("the server took longer than %s to stand", time.Duration(standPolls)*standPoll))
 }

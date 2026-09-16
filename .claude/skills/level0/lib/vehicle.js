@@ -54,6 +54,35 @@ export function resolves(list, driver) {
   return "";
 }
 
+// [[spec/design_output/vehicle#the-register-holds-the-port]]
+export const PORT_BASE = 6510;
+export const POINTER = ".se/vehicle.json";
+
+export function portOf(list, method) {
+  for (const one of list ?? []) {
+    if (one?.method_root && same(one.method_root, method) && Number(one.port)) return Number(one.port);
+  }
+  return 0;
+}
+
+export function withPort(list, entry) {
+  const taken = new Set(
+    (list ?? [])
+      .filter((one) => one?.id !== entry.id && !same(one?.method_root ?? "", entry.method_root))
+      .map((one) => Number(one?.port) || 0),
+  );
+  let port = PORT_BASE;
+  while (taken.has(port)) port += 1;
+  return { ...entry, port };
+}
+
+// [[spec/design_output/vehicle#a-project-names-its-driver]]
+export function pointerOf(read) {
+  const held = parsed(read);
+  if (!held?.method) return null;
+  return { method: String(held.method), port: Number(held.port) || PORT_BASE };
+}
+
 // [[spec/design_output/vehicle#one-copy-is-no-question]]
 export function onlyCopy(list) {
   const roots = [];
@@ -78,7 +107,7 @@ export function pairOf(method, work) {
   return { ...held, itself: same(held.method, held.work) };
 }
 
-function same(one, other) {
+export function same(one, other) {
   return slashed(one).replace(/\/+$/, "") === slashed(other).replace(/\/+$/, "");
 }
 
@@ -92,4 +121,41 @@ function parsed(read) {
   } catch {
     return null;
   }
+}
+
+// [[spec/design_output/vehicle#a-stub-takes-its-vehicle]]
+export const LINK = "vehicle.json";
+export const TEMPLATE = "src/stub";
+export const SETTINGS = ".claude/settings.json";
+export const KEEP = ".gitkeep";
+export const STUB_FOLDERS = ["project/spec/tickets", "project/spec/guidance", "project/src"];
+
+export function brandOf(method) {
+  const parts = slashed(method).replace(/\/+$/, "").split("/");
+  return parts[parts.length - 1] ?? "";
+}
+
+export function upstreamOf(remote, named) {
+  return String(named ?? "").trim() || String(remote ?? "").trim();
+}
+
+// [[spec/design_output/vehicle#the-record-names-the-vehicle]]
+export function linkOf(id, name, upstream, version, at) {
+  return {
+    vehicle: String(id),
+    name: String(name),
+    upstream: String(upstream),
+    version: String(version),
+    made: String(at),
+  };
+}
+
+export function settingsOf(read) {
+  const held = parsed(read);
+  if (!held || typeof held !== "object" || Array.isArray(held)) return {};
+  return Object.fromEntries(Object.entries(held).filter(([key]) => !key.startsWith("$")));
+}
+
+export function stubFiles(template) {
+  return [...STUB_FOLDERS.map((one) => `${one}/${KEEP}`), LINK, SETTINGS, ...(template ?? [])];
 }

@@ -1,5 +1,5 @@
 # One unit of work, as one markdown note. The file name is the id, and it holds
-# five words at most, the cap `names.words` already sets.
+# the words `names.words` caps.
 #
 # Two folders carry a ticket, and the folder says which kind stands there:
 # `spec/tickets/` travels and is a promise the tree keeps, and `.se/tickets/`
@@ -263,6 +263,10 @@ frontmatter:
       type: [array, string]
       description: the tickets this one became, on reason became
 
+    todo:
+      type: boolean
+      description: the tag a hand puts on a note it parks, which the pull hands out first on this box
+
 body:
   headingLevel: 1
   order: strict
@@ -272,7 +276,7 @@ body:
   sections:
     - header: Ask
       required: true
-      x-written: draft
+      x-written: anyone
       description: what this ticket asks for, and what done looks like
 
     - x-one-per: steps

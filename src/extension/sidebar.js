@@ -15,6 +15,7 @@ const {
   TRACKED,
   entriesIn,
   groupsIn,
+  litBy,
   treeIn,
   valuesOf,
 } = require("./lib/widgets.js");
@@ -43,6 +44,18 @@ function sidebarOf(door) {
     const typed = asType(value, one?.type);
     await door.write(LOCAL, withValue(await door.read(LOCAL), key, typed));
     await logbook.say("info", "sidebar", `${key} is ${typed}`, { detail: how });
+  };
+
+  // [[spec/design_output/extension#two-buttons-make-both]]
+  const lineOf = async (message) => {
+    const runs = String(message.runs ?? "");
+    if (!message.key) return runs;
+    const schema = parsed(await door.read(SCHEMA));
+    const one = entriesIn(schema).find((each) => each.key === String(message.key));
+    if (!one?.asks) return runs;
+    const said = String((await door.asks(one.asks)) ?? "");
+    if (!said) return undefined;
+    return runs.split(`<${one.asks}>`).join(`"${said}"`);
   };
 
   // [[spec/design_output/extension#a-gesture-picks-a-state]]
@@ -74,7 +87,7 @@ function sidebarOf(door) {
       const said = await readAll();
       const values = valuesOf(said.tracked, said.local);
       return panelHtml({
-        groups: groupsIn(said.schema, values),
+        groups: litBy(groupsIn(said.schema, values), door.processes?.() ?? {}),
         tree: treeIn(said.schema, [
           { path: TRACKED, said: said.tracked },
           { path: LOCAL, said: said.local },
@@ -88,11 +101,24 @@ function sidebarOf(door) {
     // [[spec/design_output/extension#a-click-writes-the-file]]
     async took(message) {
       if (message?.kind === "run") {
-        const runs = String(message.runs ?? "");
+        const runs = await lineOf(message);
+        if (runs === undefined) return undefined;
         await logbook.say("info", "sidebar", `${message.key ?? "a button"} runs ${runs}`);
         return door.runs(runs);
       }
       if (message?.kind === "show") return shows(door, String(message.reads ?? ""));
+      // [[spec/design_output/extension#the-hook-button]]
+      if (message?.kind === "hook" && message.key) {
+        const key = String(message.key);
+        const state = String(door.processes?.()?.[key] ?? "off");
+        if (state !== "off") {
+          await logbook.say("info", "sidebar", `${key} stops`, { detail: state });
+          return door.stopProcess?.(key);
+        }
+        const how = message.shift ? "debug" : "on";
+        await logbook.say("info", "sidebar", `${key} starts`, { detail: how });
+        return door.startProcess?.(key, how);
+      }
       if (message?.kind === "press" && message.key) return press(String(message.key));
       if (message?.kind !== "set" || !message.key) return undefined;
       return set(String(message.key), message.value, "the config tree");

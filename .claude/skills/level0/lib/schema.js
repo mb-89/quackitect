@@ -3,6 +3,7 @@
 // The caller hands the tree in, so a test drives both over a fake one.
 // [[spec/design_output/schema#the-reader-and-the-checker]]
 
+import { hashText } from "./hash.js";
 import { isDraft, matches } from "./paths.js";
 
 export const SCHEMAS = "spec/schemas";
@@ -12,6 +13,8 @@ export const LEFT = "warning";
 export const MINT_TOOL = "mint_note";
 
 const HEADING = /^(#{1,6})\s+(.+?)\s*$/;
+const SHOWN = 40;
+const ELLIPSIS = "...";
 const FENCE = /^\s*(```|~~~)/;
 const ITEM = /^\s*(?:\d+[.)]|[-*+])\s+\S/;
 const LINK = /^\[\[(.+)\]\]$/;
@@ -126,9 +129,7 @@ function scalar(said) {
   // [[spec/funnel/a-paragraph-has-a-schema]]
   if (flat.startsWith("{") && flat.endsWith("}")) return mapping(flat.slice(1, -1));
   if (flat.startsWith("[") && flat.endsWith("]")) {
-    return flat
-      .slice(1, -1)
-      .split(",")
+    return flowItems(flat.slice(1, -1))
       .map((one) => unquote(one.trim()))
       .filter((one) => one !== "");
   }
@@ -136,6 +137,33 @@ function scalar(said) {
   if (flat === "false") return false;
   if (/^-?\d+$/.test(flat)) return Number(flat);
   return flat;
+}
+
+// [[spec/design_output/pull#the-fields-hold-their-forms]]
+function flowItems(inside) {
+  const out = [];
+  let held = "";
+  let quote = "";
+  for (const char of inside) {
+    if (quote) {
+      held += char;
+      if (char === quote) quote = "";
+      continue;
+    }
+    if (char === '"' || char === "'") {
+      quote = char;
+      held += char;
+      continue;
+    }
+    if (char === ",") {
+      out.push(held);
+      held = "";
+      continue;
+    }
+    held += char;
+  }
+  out.push(held);
+  return out;
 }
 
 // [[spec/funnel/a-paragraph-has-a-schema]]
@@ -689,16 +717,7 @@ export function canonicalOf(said) {
 
 // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
 export function hashOf(said) {
-  const text = JSON.stringify(canonicalOf(said));
-  let low = 0x811c9dc5;
-  let high = 0x9e3779b9;
-  for (let i = 0; i < text.length; i++) {
-    const code = text.charCodeAt(i);
-    low = Math.imul(low ^ code, 0x01000193) >>> 0;
-    high = Math.imul(high + code + 1, 0x85ebca6b) >>> 0;
-    high = ((high << 13) | (high >>> 19)) >>> 0;
-  }
-  return `${low.toString(16).padStart(8, "0")}${high.toString(16).padStart(8, "0")}`;
+  return hashText(JSON.stringify(canonicalOf(said)));
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
@@ -765,7 +784,7 @@ export function chaptersWanted(sections, front, level) {
   return out;
 }
 
-function chaptersOf(list, level, rule) {
+function chaptersOf(list, level, rule, listed = false) {
   const out = [];
   for (const one of [list ?? []].flat()) {
     if (!one || typeof one !== "object") continue;
@@ -780,14 +799,31 @@ function chaptersOf(list, level, rule) {
       form: String(one.form ?? ""),
       "x-fills": Boolean(one.form),
     });
+    const asks = listed || [one.checklist ?? []].flat().some((it) => String(it ?? "").trim());
+    let leaf = true;
     for (const value of Object.values(one)) {
       if (!Array.isArray(value)) continue;
       if (!value.some((it) => it && typeof it === "object" && it.name)) continue;
-      out.push(...chaptersOf(value, level + 1, rule));
+      out.push(...chaptersOf(value, level + 1, rule, asks));
+      if (value === one.steps) leaf = false;
+    }
+    // [[spec/design_output/pull#the-fields-hold-their-forms]]
+    if (asks && leaf && one.evidence) {
+      out.push({
+        ...rule,
+        header: CHECKED,
+        level: level + 1,
+        required: false,
+        description: "one line per item of the checklist, on how you take it into account",
+        form: "checklist",
+        "x-fills": true,
+      });
     }
   }
   return out;
 }
+
+export const CHECKED = "checked";
 
 // [[spec/design_output/schema#the-render-follows-the-tree]]
 function sayOf(one) {
@@ -1188,7 +1224,12 @@ function keyRows(key, said, pad) {
 
 function flatOf(said) {
   if (Array.isArray(said)) return `[${said.map((one) => `"${one}"`).join(", ")}]`;
-  return String(said ?? "");
+  const flat = String(said ?? "");
+  // [[spec/design_output/pull#a-person-step-goes-in]]
+  if (/: |^[[{"'#&*!|>%@`]|: *$| #/.test(flat) && !/^\[\[.*\]\]$/.test(flat)) {
+    return `"${flat.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+  }
+  return flat;
 }
 
 // [[spec/design_output/schema#the-fields-a-caller-names]]
@@ -1204,13 +1245,6 @@ function handedIn(fields) {
   if (!fields || typeof fields !== "object" || Array.isArray(fields)) return out;
   for (const [key, value] of Object.entries(fields)) out.set(slugOf(key), value);
   return out;
-}
-
-function saidFor(key, rule, given) {
-  if (rule?.const !== undefined) return minted(rule);
-  const said = given.get(slugOf(key));
-  if (said === undefined || String(said).trim() === "") return minted(rule);
-  return written(said, rule);
 }
 
 function written(said, rule) {
@@ -1378,5 +1412,5 @@ function typeOf(value) {
 
 function show(said) {
   const flat = Array.isArray(said) ? said.join(", ") : String(said ?? "");
-  return flat.length > 40 ? `${flat.slice(0, 37)}...` : flat;
+  return flat.length > SHOWN ? `${flat.slice(0, SHOWN - ELLIPSIS.length)}${ELLIPSIS}` : flat;
 }

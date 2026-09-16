@@ -1,0 +1,4 @@
+{
+  "description": "The bridgehead, as one module. Finds the vehicle at load and registers every hook the vehicle's modules carry.",
+  "modules": ["./bridgehead.js"]
+}

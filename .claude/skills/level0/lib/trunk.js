@@ -2,6 +2,8 @@
 // branch, so this decides what the write door refuses there.
 // [[spec/design_output/work#a-box-writes-its-branch]]
 
+export const TRUNK = "main";
+
 export function touchesGit(command) {
   const said = String(command ?? "");
   return {
@@ -10,7 +12,7 @@ export function touchesGit(command) {
   };
 }
 
-export function landsOnTrunk(command, branch, trunk = "main") {
+export function landsOnTrunk(command, branch, trunk = TRUNK) {
   const { commits, pushes } = touchesGit(command);
   if (!commits && !pushes) return "";
 

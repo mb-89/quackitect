@@ -371,7 +371,7 @@ func noLogDeleted(tree *Tree) []Finding {
 	return out
 }
 
-// [[spec/design_output/level0#a-name-holds-five-words]]
+// [[spec/design_output/level0#a-name-meets-the-cap]]
 func nameHoldsTheWords(tree *Tree) []Finding {
 	rule := "NameHoldsTheWords"
 	out := []Finding{}

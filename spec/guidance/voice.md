@@ -2,6 +2,7 @@
 kind: [[guidance]]
 scope: ["all output, agents and people"]
 rationale: [[spec/rationales/voice]]
+style: true
 ---
 
 # Actionables
@@ -12,7 +13,7 @@ rationale: [[spec/rationales/voice]]
 4. State a fact you own. Otherwise write "For details, see [[link]]". *
 5. Use the same word for the same thing every time.
 6. Write what the audience acts on.
-7. Say a thing once. A second copy is a defect. *
+7. Say a thing once. A second copy is a defect, and a copy a technical reason forces says so beside it. *
 8. Name the command that answers a count, and write no count a command answers. *
 9. List what a compression cut, each sentence surviving elsewhere or cut on purpose.
 10. Write three or more parallel things one to a line, each with its status. *

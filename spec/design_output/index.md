@@ -12,16 +12,8 @@ watcher keeping it warm, and the questions it answers. For the argument, see
 
 `src/index` is a Go program holding a SQLite database over this tree. The files
 stay the truth, and the walk builds every row out of them. A reader meeting a
-stale index or none reads the files, which is what every reader here does.
-
-| piece | file |
-|---|---|
-| the shape, the walk and the rows | `index.go` |
-| the frontmatter and the links | `front.go` |
-| the questions | `find.go` |
-| the resident process | `door.go` |
-| the watch under it | `watch.go` |
-| the command line over it | `main.go` |
+stale index or none reads the files, which is what every reader here does. The
+header of each file under `src/index` says which piece it holds.
 
 It lives at `.se/index.db`, which stays on the box it stands on. The version
 and the root ride in a `meta` row, and either one disagreeing drops the file
@@ -42,9 +34,8 @@ transaction, so a reader meets the whole answer or the one before it.
 | `note_text` | the bodies, for ranking |
 | `line_text` | every line, for the word question |
 
-Four folders stay outside the walk: `.git`, `.se`, `node_modules` and
-`.claude-plugin`. The first two hold the machinery, and the rest hold what a
-tool writes on its own.
+`index.go` names the folders standing outside the walk. Each holds the
+machinery, or what a tool writes on its own.
 
 The file opens in WAL mode with a busy timeout, so a reader waits on no
 writer. The door writes while a verb reads, and the two meet on one file
@@ -195,8 +186,8 @@ offset over the files a sweep already counted.
 
 ## A type is a glob
 
-A `type` names a family of files, and this tree holds the twenty families the
-tools ask for. Each one turns into a glob before the question leaves.
+A `type` names a family of files, and this tree holds the families the tools
+ask for. Each one turns into a glob before the question leaves.
 
 | type | the files it names |
 |---|---|
@@ -248,7 +239,7 @@ than a walk. So a build needs a C compiler, and this tree takes them in order:
 | a working `cc`, `gcc` or `clang` | that one |
 | neither | the installer downloads the pinned Zig, and builds with it |
 
-The pin is Zig 0.16.0. The installer compiles a probe file, because a name on
+`src/scripts/install.sh` holds the pin. The installer compiles a probe file, because a name on
 the PATH answers `--version` from a wrapper carrying no backend. Such a wrapper
 fails on the first translation unit, deep inside the SQLite build, where the
 fault reads as anything but a missing compiler.

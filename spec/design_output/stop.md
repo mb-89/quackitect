@@ -36,41 +36,58 @@ A session torn down as the turn ends escapes the tooth, because the prompt
 reaches a session that has already gone. A cloud routine ending its run is that
 case.
 
-# The stop is one call
+# The stop is one line
 
-A turn ends where the agent asks for it, and the ask is one tool call, last:
+A turn ends where the agent asks for it, and the ask is the last line of the
+last message:
 
-    stop  reason=<id>  next=<what the owner does next>
+    stop: <id>
 
 The ids come from the stop side rules the agent claims, in
-`spec/config/stop/level0.yml`. The tool's schema lists them under `reason`.
-The call stands in the transcript where the owner reads it, so a stop is a
-thing spoken out loud. The answer above it carries prose alone.
+`spec/config/stop/level0.yml`. The line stands in the chat where the owner
+reads it, so a stop is a thing spoken out loud. The report above it carries
+prose alone, and the line comes last.
 
-The call runs the vote at once, and its result says which way it goes:
+The stop door reads the last line at the turn's end and runs the vote:
 
-| what the call carries | what comes back | what the agent does |
-|---|---|---|
-| a reason that stands | the rule's sentence, and "write nothing more" | it ends the turn |
-| a reason a fact denies | the fact, in one line | it carries on |
-| an id nobody holds | the ids | it carries on |
+| the last line | what the door does |
+|---|---|
+| a reason that stands | the turn ends, and the log names the rule |
+| a reason a fact denies | the turn holds, and the fact re-prompts |
+| an id nobody holds, or no line | the turn holds, and the re-prompt lists the ids |
 
-A claim lives until the next tool call or the turn's end, whichever comes
-first. So the stop is the last thing an agent does, and a call after it says
-the agent carries on.
+The tool `stop` stands beside the line. A call with a known reason claims it,
+and its result says to end the message with the line. A claim lives until the
+turn's end.
 
-## A turn with no call
+## A turn with no line
 
-The floor of zero ends a turn nobody votes on. So stopping is what happens
-where nothing speaks, and a session stops too often for that one reason.
-
-A turn end carries a claim or holds open. `askForStop` names the call, lists
-every id one to a line, and asks for the needs table in one line. The claim
-feeds the vote, and the priorities decide the rest:
+The rule `the-last-line-names-no-stop` fires where the last line names no
+reason the tree holds. It stands on the continue side, under the
+owner's hold and over the claimed reasons. So a turn without the line holds
+open. The re-prompt lists every id one to a line. The hold at stop and a fresh
+session end a turn over it, and the tooth off ends any turn.
 
 - the vote keeps deciding
 - `spec/config/stop/level0.yml` keeps every rule, side and priority
 - `stop.mostInARow` keeps capping a runaway
+
+## The hold
+
+`stop.hold` is what the owner picks from the sidebar, and it is one turn
+long: the turn's end drops it to `off`. The stop door reads it at every call
+and at the turn's end:
+
+| hold | at the next call | at the turn's end |
+|---|---|---|
+| `off` | nothing | the tooth votes |
+| `finish` | one context line: finish what stands, start nothing new | the tooth votes |
+| `stop` | the door refuses the call: say what stands, end the turn with the stop line | the turn ends over the standing work |
+
+The report tool passes the hold at `stop`, so the agent hands the last report
+in before the turn ends. The hold at `stop` fires the rule
+`the-owner-holds-this-session` on the stop side, over every continue
+rule but the owner's own word. A `hold` line at `debug` says what the door does.
 
 ## The canary ends turn one
 
@@ -79,6 +96,13 @@ answer holding the canary reaches the vote with no call beside it. The stop
 call falls in turn one, and its result names the canary as the one way out.
 From turn two on the call ends a turn. For details, see
 [[spec/design_output/level0#the-canary-owes-a-debt]].
+
+The free stop of a new session takes one exception. Where the first answer
+names a next step, `namesNext` reads it, the session-is-new rule fires no
+more, and the turn holds open. So the canary rides that answer and closes no
+turn, and the agent does the step it names. A sentence opening on `Next`,
+`Then I` or `I` and a verb of the agent's own act names a step. A table, a
+heading and the stop line stand outside that reading.
 
 ## The off switch takes it
 
@@ -89,24 +113,13 @@ takes the whole tooth out, and the call stands as part of the tooth.
 
 Every rule carries a side, a priority and a way of firing. The turn ends where
 the reason to stop stands above every reason to continue that fires.
-
-| priority | side | rule | how |
-|---:|---|---|---|
-| 100 | stop | the owner asks to talk | claimed |
-| 99 | continue | the owner says carry on | claimed |
-| 95 | stop | the session is new | mechanical |
-| 90 | stop | blocked on what only the owner gives | claimed |
-| 80 | continue | work still stands | mechanical |
-| 45 | stop | the work stands complete | claimed |
-| 10 | stop | a wish to give an update | claimed |
-| 0 | continue | the tooth is out | mechanical |
+`spec/config/stop/level0.yml` holds every rule with its side and its priority.
 
 An unclaimed turn end carries the mechanical reasons to stop alone. A firing
-continue rule above them holds the turn open, and the hook re-prompts.
-
-A turn nothing fires over ends, because the stop side stands at a floor of
-zero. So a continue rule wins by standing above that floor, and a tie goes to
-the stop side.
+continue rule above them holds the turn open, and the hook re-prompts. A turn
+nothing fires over ends, because the stop side stands at a floor of zero. So a
+continue rule wins by standing above that floor, and a tie goes to the stop
+side.
 
 Four bands hold the numbers, so a later level lands without renumbering:
 
@@ -119,17 +132,17 @@ Four bands hold the numbers, so a later level lands without renumbering:
 
 Three numbers carry an argument, and they stay where they stand:
 
-- 99 over 90 puts "carry on" over the block. The owner saying carry on says
-  proceed on your best reading.
-- 45 under 80 keeps a finished piece from ending a session while a list still
-  holds something.
-- 95 over 80 frees a session that opens with an old list on it. 95 under 99
-  spends that free stop where the owner says get on with it.
+| priority | stands | so |
+|---|---|---|
+| 99 | over 90 | "carry on" beats the block, and the owner saying it says proceed on your best reading |
+| 45 | under 80 | a finished piece ends no session while a list still holds something |
+| 95 | over 80 | a session that opens with an old list on it comes free |
+| 95 | under 99 | that free stop goes where the owner says get on with it |
 
 ## The off switch answers alone
 
-`stop.enabled` set to false takes the tooth out, and the rule at priority 0
-records it. That rule wins no vote on its own, because a continue rule at 80
+`stop.enabled` set to false takes the tooth out, and the rule at priority `0`
+records it. That rule wins no vote on its own, because a continue rule at `80`
 stands above it. The tooth then carries the turn with the switch off.
 
 So a firing `stop-hook-off` ends the turn whatever else fires, and `decide`
@@ -144,7 +157,10 @@ a hole somebody walks through, so the name reaches a function alone.
 | `runs` | answers true when |
 |---|---|
 | `work-waiting` | a todo stands unfinished, or this branch stands at `held` |
-| `session-is-new` | under 10 tool calls stand behind this session, and the hook grants no stop |
+| `ticket-in-hand` | a hold stands under `.se/hold`, or an open private ticket stands |
+| `group-in-hand` | this branch's group carries a take with no hand-back |
+| `queue-waits` | a desk bound to the queue stands on trunk, and `queueHolds` reads a free open ticket or a group at `now` |
+| `session-is-new` | fewer tool calls than `FRESH` in `lib/stop.js` stand behind this session, the hook grants no stop, and the answer names no next step |
 | `stop-hook-off` | `spec/config/level0.json` says `stop.enabled` is false |
 | `never` | nothing, which is what an unbuilt rule takes |
 
@@ -161,6 +177,8 @@ call itself new.
 - Order: the agent writes its answer, calls the stop, and writes only "Ending my turn" after it.
 - Close: the harness asks for text after a tool call, so that one generic line closes the turn.
 - Gate: the turn end reads nothing and writes nothing, because the call holds the verdict on the stop.
+- Helper: a turn end carrying an agent id passes untouched, so a helper's refused answer reaches no owner turn.
+- Debugger: `./RUNME.sh serve --inspect` sets `SE_BREAK_ON_STOP`, and the hook pauses at every stop with the reason and what prompts after.
 
 # The claim rides the call
 
@@ -198,14 +216,8 @@ maintainer edits level zero mid-session.
 
 `spec/config/stop/level0.yml` holds one entry per rule. `stop.js` reads every
 file in that folder and pools the entries, so a later level drops `level1.yml`
-beside it and changes no code.
-
-    - id: the-owner-asks-to-talk
-      side: stop
-      priority: 100
-      decides: claimed
-      asks: Does the last thing the owner said open a discussion?
-      says: The owner opens a discussion, so this turn ends and waits.
+beside it and changes no code. The header of that file says what each key
+holds.
 
 A rule missing an id, a side, a priority or a way of deciding stands out of the
 vote. Its file comes back named on one `warn` line, and a broken rule file
@@ -240,6 +252,8 @@ The hook counts the turns it carries one after another.
 - Past `mostInARow`, it writes a `warn` line and lets the turn end.
 - A prompt from outside the plugin resets the count, because that is the owner
   taking the session back.
+- A continue rule carrying `firm` holds past the cap, because the cap frees a
+  stuck session alone. The queue rule in `level1.yml` carries it.
 
 The hook asks the resolver for `stop.mostInARow` and `stop.enabled` at each
 turn end, and `atTurnEnd` takes the cap as an argument. So the tooth carries no

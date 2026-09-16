@@ -1,8 +1,6 @@
-// The three word lists, read into the set a paragraph writes and the swaps a
-// refusal teaches. The core is the words the standard and the corpus admit,
-// the terms are this tree's own words with the note defining each, and the
-// swaps hand a refused word its core word. The projection inlines all three
-// into one rule, so a term lands on the list and the next write reads it.
+// The word lists, read into the set a paragraph writes and the swaps a refusal
+// teaches. The projection inlines them into one rule, so a term lands on the
+// list and the next write reads it.
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 
 export const CORE = "spec/vocabulary/core.yml";
