@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 depends_on: [the-stub-takes-shape]
 steps:
@@ -98,7 +98,15 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box d42624a67d18a8
+    hash_before: ba15944bc427031526813d6c4b76f5b68956501a
+    hash_after: ba15944bc427031526813d6c4b76f5b68956501a
+  - step: retro/cloud
+    skipped: true
+    why: the box runs off the cloud
 step: retro/write
+reason: done
 ---
 
 # Ask
@@ -149,33 +157,38 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 
 ### done
 
-<!-- what was done, one line a ticket or a thing -->
-
-<!-- the form is list -->
+- shim-resolves-vehicle: the shim takes the register road and sets the work root, closed done
+- the ask of a ticket reads anyone in the schema, so a hand fixes what the rules refuse
+- eleven private notes became seven draft tickets, and the box leaves none behind
+- two helper hands wrote the review and the verdict, and both passed
 
 ### well
 
-<!-- what went well, and what made it go well -->
-
-<!-- the form is list -->
+- the tests went red on their own assertions first, so the change had a target
+- the pull ran the tests and the check itself at each hand-back, so no evidence stood unread
+- a fresh helper hand read the approach and the diff with no stake in either
 
 ### badly
 
-<!-- what did not, each with its moment in the log or the transcript -->
-
-<!-- the form is list -->
+- the ticket door kept a hand off two asks the rules refuse, and the check stood red
+- the queue offered the held group before any note, so a hand at the retro reached no note
+- a second hand pulling plain took the same group leaf the box holds, so two hands held one leaf
+- this box took a group through `branch take` on a desk, where the owner rules the pull hands out work
+- the canary reminder fired on every call of one long turn, and the agent wrote the line each time
+- a python one-liner wrote seven files past the shell door, which reads sed and no other program
 
 ### improve
 
-<!-- how each bad line stops happening, named by its home -->
-
-<!-- the form is list -->
+- `spec/schemas/ticket.schema.yaml`: the ask reads anyone, done in this group
+- `src/scripts/pull.js`: a note reaches the retro hand ahead of its held group, the-pull-takes-the-branch names it
+- `src/scripts/pull.js`: a leaf one hand holds goes to no second hand on the same box
+- `spec/guidance/tickets.md`: the pull hands out work and no hand takes a branch, the-pull-takes-the-branch names it
+- `.claude/skills/level0/lib/guidance.js`: the canary reminder reads the turn's text, the-canary-ends-no-turn names it
+- `.claude/skills/level0/lib/`: the shell door reads python and node, python-writes-pass-the-door names it
 
 ### thoughts
 
-<!-- what the thoughts say that the actions do not, off the transcript -->
-
-<!-- the form is text -->
+The route runs a group's retro on the group's branch, and the retro drains the box's notes into tickets there. On a cloud box that fits, because the box dies with the branch. On a desk the notes belong to the desk and land on a branch about something else, which the owner reads as the wrong attribution. The tag road through `ticket todo` drained the notes, and a design road wants to say so.
 
 ## cloud
 
