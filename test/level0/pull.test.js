@@ -1,6 +1,6 @@
 // The pull, driven through fake doors. A ticket stands in a map, git answers
 // from a table, and every check and every answer runs in memory.
-// [[spec/design_output/pull#the-three-answers]]
+// [[spec/design_output/pull#the-five-answers]]
 
 import assert from "node:assert/strict";
 import { join } from "node:path";

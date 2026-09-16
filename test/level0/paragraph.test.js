@@ -63,6 +63,7 @@ layers:
     tenses: [simple present, simple past]
     auxiliaryChains: refused
     modals: [can, must, will]
+    hedges: [just, very, in order to]
     contractions: refused
     latinShortForms: refused
     exceptions:
@@ -149,6 +150,7 @@ test("every layer takes its rule file, and the answer register takes its own", (
     `${TARGET}/CodeSpans.yml`,
     `${TARGET}/Contraction.yml`,
     `${TARGET}/EtCetera.yml`,
+    `${TARGET}/Hedge.yml`,
     `${TARGET}/Latin.yml`,
     `${TARGET}/ListItem.yml`,
     `${TARGET}/Markup.yml`,
@@ -252,6 +254,28 @@ test("the modal rule refuses every modal the register leaves out", () => {
 });
 
 // [[spec/design_output/projection#the-grammar-rules]]
+test("the hedge rule refuses every hedge the schema lists, a phrase as one token", () => {
+  const said = drawn().get(`${TARGET}/Hedge.yml`);
+  assert.match(said, /extends: existence/);
+  assert.match(said, /ignorecase: true/);
+  assert.match(said, /- '\\bjust\\b'/);
+  assert.match(said, /- '\\bvery\\b'/);
+  assert.match(said, /- '\\bin\\s\+order\\s\+to\\b'/, "a phrase joins on whitespace");
+  assert.match(said, /Cut the hedge/);
+});
+
+test("no hedge list writes no hedge rule", () => {
+  const files = writesOf(
+    ENTRY,
+    new Map([
+      [SOURCE, SCHEMA.replace("hedges: [just, very, in order to]\n", "")],
+      [SHAPE, SHAPE_JSON],
+    ]),
+  );
+  assert.equal(files.get(`${TARGET}/Hedge.yml`), undefined);
+});
+
+// [[spec/design_output/projection#the-grammar-rules]]
 test("a swap key stands in single quotes, because a double quote eats a boundary", () => {
   const files = drawn();
   assert.match(files.get(`${TARGET}/Latin.yml`), /^ {2}'\\be\\\.g\\\.':/m);
@@ -309,7 +333,7 @@ test("the compare reads the ending this shape writes, and leaves the rest", () =
   disk.makeDir(TARGET);
 
   const first = readAll([ENTRY], disk);
-  assert.equal(first.wanted.size, 17);
+  assert.equal(first.wanted.size, 18);
   assert.deepEqual(first.faults, []);
   assert.deepEqual(
     [...new Set(staleIn(first.wanted, first.standing).map((one) => one.how))],

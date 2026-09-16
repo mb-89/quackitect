@@ -13,6 +13,7 @@ import {
   HEARD,
   OWES,
   standingLayer,
+  styled,
 } from "../../.claude/skills/level0/lib/guidance.js";
 import { asks } from "./config.js";
 import { deadIndexLine } from "./search.js";
@@ -27,7 +28,14 @@ export function guidanceHere(disk, root, env = process.env, tooth = true) {
   const bound = Object.fromEntries([...wanted].map((name) => [name, env[name] ?? ""]));
   const here = notes.filter((one) => bindsHere(one.text, bound));
   const counts = countsOf(here);
-  return { standing: standingLayer(here), ...counts, sentence: canary({ ...counts, stop: tooth }) };
+  // [[spec/design_output/level0#the-style-carries-a-note]]
+  const session = here.filter((one) => !styled(one.text));
+  return {
+    standing: standingLayer(session),
+    helper: standingLayer(here),
+    ...counts,
+    sentence: canary({ ...counts, stop: tooth }),
+  };
 }
 
 function readsGuidance(box) {
@@ -154,7 +162,7 @@ export function onSessionCompact(e, box) {
 
 // [[spec/design_output/level0#the-helper-takes-the-guidance]]
 export function onAgentSpawn(e, box) {
-  const standing = box.guidance?.standing ?? "";
+  const standing = box.guidance?.helper ?? box.guidance?.standing ?? "";
   if (!standing) return { pass: true };
   box.log.say("info", "agent", `handed the guidance to ${e?.subagentType ?? "a helper"}`, {
     detail: String(e?.description ?? "").slice(0, 120),

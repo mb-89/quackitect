@@ -105,6 +105,7 @@
             "tenses": { "type": "array", "items": { "type": "string" } },
             "auxiliaryChains": { "type": "string", "enum": ["refused", "admitted"] },
             "modals": { "type": "array", "items": { "type": "string" } },
+            "hedges": { "type": "array", "items": { "type": "string" } },
             "contractions": { "type": "string", "enum": ["refused", "admitted"] },
             "latinShortForms": { "type": "string", "enum": ["refused", "admitted"] },
             "exceptions": {
