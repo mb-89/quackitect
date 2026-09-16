@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: soon
-step: implement/tests-red
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -100,6 +100,17 @@ record:
     hand: box 747cff5c2f2a · helper-2
     hash_before: f37ce609bbfc3d843a956d98c971ad9dfbb25435
     hash_after: f37ce609bbfc3d843a956d98c971ad9dfbb25435
+  - step: implement/tests-red
+    hand: box 747cff5c2f2a
+    hash_before: 1faa9b14f661bd49749bc38ff442b499490b975f
+    hash_after: 1faa9b14f661bd49749bc38ff442b499490b975f
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -213,17 +224,26 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Five tests fail on their own assertion: two over the door and three over the library.
+The surprise is the word the verb answers: a missing export reads as a build fault. So a bare stub stands under each new name, and the assertion fails first.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the tools library, the guidance door, the server, the tools note and two test files
+- the door reaches the disk and the process through the fakes, so the tests run in memory
+- the header of the door test names the approach, and the code points at the tools note
 
 ## reflect
 
@@ -311,4 +331,4 @@ pass
 
 <!-- what anybody adds, at any time, on this ticket -->
 
-The design draft went back through the shell after the judge refused five rewrites and named no rule. The judge reads the voice rules over the evidence, and two of them describe an answer. A private note carries the finding for the retro.
+The design draft went back through the shell after the judge refused five rewrites and named no rule. The red tests went the same road after two refusals. The judge reads the voice rules over the evidence, and two of them describe an answer. A private note carries the finding for the retro.

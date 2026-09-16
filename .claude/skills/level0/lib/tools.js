@@ -75,3 +75,7 @@ export function installedTools(text) {
   }
   return out;
 }
+
+export function toolLines(_survey, _wanted = WANTED, _specs = []) {
+  return [];
+}

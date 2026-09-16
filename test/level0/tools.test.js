@@ -10,6 +10,7 @@ import {
   pathOf,
   placesFor,
   surveyOf,
+  toolLines,
   TOOLS,
   versionOf,
   WANTED,
@@ -157,4 +158,36 @@ test("the rule reads the tools the install script installs, and no link", () => 
   ].join("\n");
 
   assert.deepEqual(installedTools(said), ["node", "vale", "go"]);
+});
+
+test("every wanted tool says when to reach for it", () => {
+  for (const one of WANTED) {
+    assert.ok(String(one.for ?? "").trim(), `${one.name} carries no for`);
+  }
+});
+
+test("the tool lines name the tools that stand, each with its version and its for", () => {
+  const found = { node: { path: "/usr/bin/node", version: "22.0.0" }, sh: { path: "/bin/sh" }, go: null };
+  const wanted = [
+    { name: "node", for: "a helper script" },
+    { name: "sh", for: "a shell script" },
+    { name: "go", for: "building a program" },
+  ];
+
+  assert.deepEqual(toolLines(found, wanted), [
+    "- `node` 22.0.0, for a helper script",
+    "- `sh`, for a shell script",
+  ]);
+});
+
+test("a registered tool's line is the first sentence of its description", () => {
+  const specs = [
+    { name: "mcp__level0__find", description: "Finds the lines carrying the words. Ask it before a Grep." },
+    { name: "mcp__level0__mint_note", description: "Writes a note under its schema" },
+  ];
+
+  assert.deepEqual(toolLines({}, [], specs), [
+    "- `mcp__level0__find`: Finds the lines carrying the words.",
+    "- `mcp__level0__mint_note`: Writes a note under its schema.",
+  ]);
 });

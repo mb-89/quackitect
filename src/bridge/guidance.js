@@ -21,6 +21,7 @@ import { deadIndexLine } from "./search.js";
 
 const GUIDANCE = "spec/guidance";
 const TOOTH = "stop.enabled";
+export const TOOLS_BLOCK = "level0-tools";
 
 // [[spec/design_output/level0#the-standing-layer]]
 export function guidanceHere(disk, root, env = process.env, tooth = true) {
