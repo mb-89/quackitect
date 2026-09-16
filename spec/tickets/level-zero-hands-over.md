@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: whenever
 step: retro/cloud
 steps:
@@ -108,7 +108,12 @@ record:
     hand: box 747cff5c2f2a
     hash_before: 453a37966734f1f915dd2fb547c8db222172d48f
     hash_after: 453a37966734f1f915dd2fb547c8db222172d48f
+  - step: retro/cloud
+    hand: box 747cff5c2f2a
+    hash_before: 40ea5a403fe8be4d717059c67c022cae24e72ca5
+    hash_after: 40ea5a403fe8be4d717059c67c022cae24e72ca5
 depends_on: ["the-agent-pulls-a-ticket"]
+reason: done
 ---
 
 # Ask
@@ -232,20 +237,30 @@ The group ask reads three words. The brief carried the goal, and the route updat
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- a right the platform refused: three deletes in the sync merge, in the first minutes, before the first pull
+- the installs: every one landed at the first command, and the proxy let every host through
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- a conflict at sync: trunk came in as an unrelated history. The merge took its whole tree and the two tickets
+- a hook: the write door refused shell writes once the server stood, at the tests-green leaf
+- a test that fails on the box alone: the stop door queue test read the cloud variable off the process. Two lines fixed it
+- the trunk guard: every commit landed on the work branch, and the guard stayed quiet
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- four drafts with no group: the-answer-door-reads-notes, the-viewer-draws-the-note, the-controls-wire-up, the-brief-verbs-go
+- one draft with no group from the private note: the-judge-reads-answer-rules
+- person steps: every step closed by a hand, and the branch parks none
+- the handover: the branch carries the closed child, the closed group and five drafts. The merge into trunk belongs to a person
 
 # Discussion
 
