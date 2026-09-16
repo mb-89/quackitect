@@ -87,7 +87,11 @@ record:
       - name: sync
         exit: 0
         said: work/the-bridgehead-installs-upstream took 390 commit(s) from main.
-step: split
+  - step: split
+    hand: box 99aa60a14c3f
+    hash_before: a4ed2a5289e73a8ea625e37227d9c6a2edd9624f
+    hash_after: a4ed2a5289e73a8ea625e37227d9c6a2edd9624f
+step: children
 ---
 
 # Ask
@@ -117,6 +121,16 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 <!-- every child as a link, one a line, with its process -->
 
 <!-- the form is list -->
+
+- [[spec/tickets/bridgehead-installs-upstream]], under the standard process, which stands minted on trunk and names this group
+
+## checked
+
+<!-- one line per item of the checklist -->
+
+- The one child is the install road, its tests and its chapter. One reviewer reads its diff whole at the verdict.
+- The child's ask carries every line of the brief. The cloud run stays for a person, and the retro names it under left.
+- The child waits on no other ticket. The design input's two groups stand closed on trunk.
 
 # children
 
