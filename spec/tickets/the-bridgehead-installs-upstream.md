@@ -79,7 +79,15 @@ record:
   - step: sync
     hand: box 99aa60a14c3f
     hash_before: 272c26697052a4f9e4896160e12d148a2d499680
-step: sync
+  - step: sync
+    hand: box 99aa60a14c3f
+    hash_before: d6901e35952bf087fa5284905e47bbf912e04031
+    hash_after: 7970d1baeb22238a8615259c85e98016475b682a
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-bridgehead-installs-upstream took 390 commit(s) from main.
+step: split
 ---
 
 # Ask
@@ -97,6 +105,8 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 <!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
