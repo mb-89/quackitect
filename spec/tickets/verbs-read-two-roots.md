@@ -89,7 +89,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-verbs-read-two-roots
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box ea4589862ac3
@@ -99,6 +99,17 @@ record:
     hand: box ea4589862ac3 · helper-2
     hash_before: 1c265ac5ec45f318062c0aae815e5e50b2ecf79f
     hash_after: 1c265ac5ec45f318062c0aae815e5e50b2ecf79f
+  - step: implement/tests-red
+    hand: box ea4589862ac3
+    hash_before: fe69616f09d4ae995f02663de181a79a595fbdcd
+    hash_after: fe69616f09d4ae995f02663de181a79a595fbdcd
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 11 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -197,11 +208,29 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
+
+Eleven tests fail on their own assertion, across five files. Two files are new: the verbs over two roots, and the write door over two fake roots.
+
+- The verbs fail because the route and the schema stand under the method root. The verbs read the work root for both.
+- The pull hands out the stub's ticket already, because every file read goes through `it.root`. It misses the note the work root lacks.
+- The link check refuses a note the method root holds, so the second road stands unwritten.
+- The reader fails on the method's file, because it reads the work root alone until the change lands.
+- The projection lands its target in the method root, and the standing layer takes the work root for the environment.
+- The write door refuses the stub's bad ticket already, and passes the good one. The three places rule refuses a route whose last leaf names no reader, which the fixtures first missed.
+- The take on a cloud box passes already, because it writes the record under `it.root`. The command line alone decides which root that is.
+
+### checked
+
+- the change touches the layer module, the reader tests and the test files the ask names, and no stub file
+- every door the tests reach is a fake: the disk, git, the clock and the log
+- the reader carries a comment naming the chapter The work root inherits
 
 ## reflect
 

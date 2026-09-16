@@ -22,6 +22,26 @@ export function deeply(under, over) {
   return out;
 }
 
+// A reader over one root, answering relative paths. [[spec/design_output/vehicle#the-work-root-inherits]]
+export function rooted(disk, root) {
+  const at = (rel) => joined(root, rel);
+  return {
+    exists: (rel) => disk.exists(at(rel)),
+    read: (rel) => disk.read(at(rel)),
+    list: (rel) => (disk.exists(at(rel)) ? disk.list(at(rel)) : []),
+  };
+}
+
+// [[spec/design_output/vehicle#the-work-root-inherits]]
+export function inherits(disk, _method, work) {
+  return rooted(disk, work);
+}
+
+function joined(root, rel) {
+  const base = String(root ?? "").replace(/[\\/]+$/, "");
+  return base ? `${base}/${rel}` : String(rel);
+}
+
 function plain(said) {
   return Boolean(said) && typeof said === "object" && !Array.isArray(said);
 }

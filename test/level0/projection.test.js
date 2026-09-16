@@ -22,6 +22,8 @@ import {
   widgetsIn,
   writesOf,
 } from "../../.claude/skills/level0/lib/projection.js";
+import { inherits, rooted } from "../../.claude/skills/level0/lib/layer.js";
+import { freshens } from "../../src/bridge/projection.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 const SOURCE = "spec/config/level0.json";
@@ -403,4 +405,52 @@ test("readAll projects the style beside the commands", () => {
     "extra",
     "missing",
   ]);
+});
+
+// [[spec/design_output/vehicle#the-work-root-inherits]]
+test("readAll reads a source off the work root where it stands, else the method's, and lists the targets in the work root alone", () => {
+  const house = flagged.replace("Put the bottom line first.", "Keep the house rule.");
+  const disk = fakeDisk({
+    "/tools/spec/guidance/voice.md": flagged,
+    "/tools/spec/guidance/tickets.md": plain,
+    "/stub/spec/guidance/house.md": house,
+    "/tools/.claude/output-styles/level0.md": "the vehicle's own",
+  });
+  const said = readAll([STYLED], inherits(disk, "/tools", "/stub"), rooted(disk, "/stub"));
+
+  const style = said.wanted.get(`.claude/output-styles/${STYLE_NAME}.md`);
+  assert.match(style, /Keep the house rule/, "the stub's note joins");
+  assert.match(style, /Put the bottom line first/, "the vehicle's note comes down");
+  assert.equal(said.standing.size, 0, "a target the vehicle holds counts for nothing in the stub");
+});
+
+test("a JSON source both roots hold joins key by key, so every command of the vehicle's stands", () => {
+  const disk = fakeDisk({
+    [`/tools/${SOURCE}`]: CONFIG,
+    [`/tools/${SCHEMA}`]: SAID,
+    [`/stub/${SOURCE}`]: JSON.stringify({ log: { level: "warn" } }),
+  });
+  const said = readAll([ENTRY], inherits(disk, "/tools", "/stub"), rooted(disk, "/stub"));
+  assert.equal(said.wanted.size, 7);
+});
+
+// [[spec/design_output/projection#who-projects-and-when]]
+test("the server's projection lands every target under the work root, off the method's declaration", () => {
+  const disk = fakeDisk({
+    "/tools/spec/config/projections.json": JSON.stringify({ projections: [STYLED] }),
+    "/tools/spec/guidance/voice.md": flagged,
+  });
+  const rows = [];
+  const box = {
+    method: "/tools",
+    work: "/stub",
+    root: "/stub",
+    disk,
+    log: { say: (level, kind, line) => rows.push(`${level} ${kind} ${line}`) },
+  };
+  freshens(box);
+
+  assert.ok(disk.exists(`/stub/.claude/output-styles/${STYLE_NAME}.md`), "the target lands in the work root");
+  assert.ok(!disk.exists(`/tools/.claude/output-styles/${STYLE_NAME}.md`), "and none in the method root");
+  assert.ok(box.sources.has("spec/guidance/voice.md"), "the source stays a path the write door marks stale");
 });

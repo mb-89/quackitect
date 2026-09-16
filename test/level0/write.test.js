@@ -1,0 +1,96 @@
+// The write door over two fake roots. The path reads relative to the work
+// root, and the schema comes off the method root, so a stub's bad ticket
+// meets the vehicle's rules.
+// [[spec/design_output/level0#the-write-door]]
+
+import assert from "node:assert/strict";
+import { dirname, join } from "node:path";
+import { test } from "node:test";
+import { fileURLToPath } from "node:url";
+import { disk } from "../../src/doors/disk.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeLog } from "../../src/doors/fake/log.js";
+import { onWrite } from "../../src/bridge/write.js";
+
+const METHOD = "/tools";
+const WORK = "/stub";
+
+// The schema this tree ships, read once and never written. [[spec/guidance/code/testing]]
+const here = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
+const SCHEMA = disk().read(join(here, "spec", "schemas", "ticket.schema.yaml"));
+
+const GOOD = `---
+kind: [[ticket]]
+state: open
+urgency: soon
+step: do
+steps:
+  - name: do
+    does: makes the change the ask names
+    to: retro
+    evidence:
+      - name: change
+        form: text
+        says: what you change
+---
+
+# Ask
+
+A small thing.
+
+# do
+
+## change
+
+# Discussion
+`;
+
+const BAD = `---
+kind: [[ticket]]
+state: open
+---
+
+# Ask
+
+A ticket with no urgency and no route.
+
+# Discussion
+`;
+
+// The box the server keeps per work root, with the doors this test needs. [[spec/design_output/level0#the-bridgehead-and-the-server]]
+function box(files = {}) {
+  const files_ = fakeDisk({ [join(METHOD, "spec", "schemas", "ticket.schema.yaml")]: SCHEMA, ...files });
+  return {
+    method: METHOD,
+    work: WORK,
+    root: WORK,
+    disk: files_,
+    log: fakeLog(),
+    vale: { stands: () => false },
+    projections: [],
+  };
+}
+
+const write = (path, content) => ({ tool: "Write", file_path: path, content });
+
+test("a ticket under the stub breaking the vehicle's schema comes back refused", async () => {
+  const said = await onWrite(write(join(WORK, "spec", "tickets", "bad.md"), BAD), box());
+  assert.ok(said?.result?.deny, "the door refuses");
+  assert.match(said.result.deny, /urgency|steps/);
+});
+
+test("a ticket under the stub keeping the vehicle's schema passes, and the stub holds no schema", async () => {
+  const it = box();
+  assert.ok(!it.disk.exists(join(WORK, "spec", "schemas")), "the stub carries no schema of its own");
+  const said = await onWrite(write(join(WORK, "spec", "tickets", "good.md"), GOOD), it);
+  assert.deepEqual(said, { pass: true });
+});
+
+test("the same bad ticket written into the vehicle's own tree is refused the same way", async () => {
+  const said = await onWrite(write(join(METHOD, "spec", "tickets", "bad.md"), BAD), {
+    ...box(),
+    work: METHOD,
+    root: METHOD,
+  });
+  assert.match(said?.result?.deny ?? "", /urgency|steps/);
+});
