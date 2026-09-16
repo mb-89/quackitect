@@ -291,19 +291,19 @@ The verbs stay the ones the shell runs, in a terminal, so a refusal from a verb 
 
 <!-- the form is files -->
 
-spec/config/level0.schema.json
-spec/design_output/extension.md
-spec/tickets/sidebar-makes-both.md
-spec/tickets/the-sidebar-makes-both.md
-src/extension/editor.js
-src/extension/sidebar.js
-test/contract/sidebar.test.js
-test/contract/tree.test.js
-test/level0/sidebar.test.js
-spec/guidance/review/reviewing.md
-spec/design_input/a-stub-takes-its-vehicle.md
-src/extension/webview/clicks.js
-src/scripts/cli.js
+- spec/config/level0.schema.json
+- spec/design_output/extension.md
+- spec/tickets/sidebar-makes-both.md
+- spec/tickets/the-sidebar-makes-both.md
+- src/extension/editor.js
+- src/extension/sidebar.js
+- test/contract/sidebar.test.js
+- test/contract/tree.test.js
+- test/level0/sidebar.test.js
+- spec/guidance/review/reviewing.md
+- spec/design_input/a-stub-takes-its-vehicle.md
+- src/extension/webview/clicks.js
+- src/scripts/cli.js
 
 ## verdict
 
