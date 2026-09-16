@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-hand-carries-a-step
-step: design/review
+step: implement/tests-red
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -106,6 +106,10 @@ record:
     hand: box ee33ce836a4d
     hash_before: dd88b814f704835d13c6238f0a2aebe8bd7863da
     hash_after: dd88b814f704835d13c6238f0a2aebe8bd7863da
+  - step: design/review
+    hand: box ee33ce836a4d · helper-4
+    hash_before: 374576ff3443046325122c431a556bcc0f5aed8a
+    hash_after: 374576ff3443046325122c431a556bcc0f5aed8a
 ---
 
 # Ask
@@ -153,14 +157,13 @@ The pull learns who holds a step, and the first piece is the hand id. Today a ha
 <!-- pass or fail, with findings one a line -->
 <!-- the form is verdict -->
 
-fail
+pass
 
-- The approach chapter runs four paragraphs in a row, and the check answers 1.
-- Carry the approach as a table, the way the ask's table of pieces reads.
-- The ask puts the spawn hook under level zero, and the wrapper stands at level one.
-- Name the one folder holding the spawn hook, so the implement step writes in one place.
-- The five things the ask calls done stand in the approach, each with the design output behind it.
-- The check's other findings stand outside the brief, and this ticket leaves them alone.
+- The table names every thing the ask calls done, each with its landing and its design output.
+- The spawn hook stands under level zero, and the wrapper under level one, as the ask reads.
+- One folder holds the spawn hook, so the implement step writes in one place.
+- `./RUNME.sh check` answers 0, and the one warning stands outside the brief.
+- Every finding of the last round lands.
 
 # implement
 
