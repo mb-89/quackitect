@@ -126,6 +126,11 @@ A preset is a filter somebody writes down. The log holds one for prompts and
 replies, the work browser holds its own, and a preset carrying a key opens on
 that key.
 
+One filter line reaches every column, because the language already names a
+column: `state: open` narrows one field and a bare word searches them all. So
+the view carries one line to type into, and the columns carry no boxes of their
+own.
+
 # A cell takes an edit
 
 A person flips a state in the cell holding it, and the note stays shut. So a
@@ -163,6 +168,46 @@ pull against each other. The filter goes to the source:
 So the source answers a narrowed set, and the view draws the first page of it.
 A source answering no filter hands its rows over, and the view says so while it
 reads them.
+
+# What the terminal carries
+
+Measured against what this tree builds with today. Bubble Tea draws, `bubbles`
+carries a table of flat rows, a text input and a help, and `lipgloss` measures
+and cuts. Everything else below is this tree's own code.
+
+| what this note asks | what stands ready | the size |
+|---|---|---|
+| a tree with expand and collapse | nothing | small: a depth a row, and a set of the open ones |
+| columns reading keys of an item | a table of flat rows | small |
+| headers standing still | the table draws a header | small |
+| the last column cutting its text | `lipgloss` measures and cuts | small |
+| sorting by several columns | nothing, and the rows sit in memory | small |
+| the filter, and the parent of a match | the log filter reads the language today | small |
+| a preset panel | nothing | small |
+| the base file a view comes from | a YAML reader stands in the tree | medium |
+| an editor in a cell | a text input | small |
+| Enter, Escape and the fill | nothing | small |
+| the completion out of a schema | the schema reader stands in the tree | medium |
+| a mark editor standing open | nothing | small |
+| lazy loading, and a page size | nothing, and the source answers the page | medium |
+| a click on a header to sort | a mouse message carries its column and row | medium: the column edges are ours |
+| dragging a column wider, or aside | motion messages arrive while a button holds | medium |
+| picking and hiding columns | nothing | small |
+| a link on the name | this tree writes the escape itself | small, and the terminal decides the click |
+| pasting into a cell | a paste arrives as a message | medium |
+| copying a range out | the clipboard wants a door of its own | medium |
+| taking an edit back | nothing | medium |
+| a menu on a row | nothing | medium |
+
+So the terminal carries the whole of this note. The rows reading `medium` carry
+the risk, and three of them stand in the chapter below, which waits.
+
+Two questions a person settles by trying:
+
+| the question | what settles it |
+|---|---|
+| does the mouse reach a terminal inside the editor? | a spike, in that terminal |
+| does a click on a link open the note? | the same spike, on one row |
 
 # What waits
 
