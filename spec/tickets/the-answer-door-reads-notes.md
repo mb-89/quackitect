@@ -288,11 +288,15 @@ Five cases stand, and three fail on their own assertion. The two readers answer 
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/note-answer.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -300,11 +304,17 @@ Five cases stand, and three fail on their own assertion. The two readers answer 
 
 <!-- the form is text -->
 
+A prompt asking for a note now takes a parked note as its answer. Two readers stand in the answer library. One reads the prompt for the word `note` outside a fence. The other counts the `note` rows the session log carries. The door keeps that count on the demand, counts again at every call, and a new row pays with the note's own text. Every other prompt still owes a text answer, because the door counts nothing for it.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The library, the door, one test and the level zero note
+- every door the change reaches has a fake. The reader takes the disk door, and each case builds it fake
+- a comment names the approach the change implements. Each new function points at the note's new chapter
 
 # verdict
 
