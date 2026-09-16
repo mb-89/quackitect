@@ -89,12 +89,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-verbs-read-two-roots
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box ea4589862ac3
     hash_before: c2e318dea6e4eb5ef0298ff0f77aff5cdc039944
     hash_after: c2e318dea6e4eb5ef0298ff0f77aff5cdc039944
+  - step: design/review
+    hand: box ea4589862ac3 · helper-2
+    hash_before: 1c265ac5ec45f318062c0aae815e5e50b2ecf79f
+    hash_after: 1c265ac5ec45f318062c0aae815e5e50b2ecf79f
 ---
 
 # Ask
@@ -169,6 +173,17 @@ The verbs and the files each one keeps under the work root:
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- The approach answers each done_when line, and the two tables name the root of every read.
+- The reader `inherits` matches the chapter The work root inherits: silent, replaced, or joined, one file a unit.
+- The layer module holds `layered` and `deeply` already, so the reader builds on what stands.
+- The server's box carries `method`, `work` and `root` already, so the doors take the rule with no new field.
+- The write door test over two fake roots feeds a bad ticket and asserts a refusal, as reviewing asks.
+- The targets read the work root alone, so a target the vehicle holds stays out of the stub.
+- The chapter names the stop rules and the judged styles as inheriting too. The approach leaves them on the method root on purpose.
+- The stub verb writes `project/spec/tickets`, and the approach carries the mismatch with `spec/tickets` to the retro.
+- No branch stands yet, so `./RUNME.sh check` waits for implement.
 
 # implement
 
