@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-hand-carries-a-step
-step: design/review
+step: design/draft
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -96,6 +96,12 @@ record:
     hand: box ee33ce836a4d
     hash_before: 9dd9db35e66080faace6466f0132146d0b6188c4
     hash_after: 9dd9db35e66080faace6466f0132146d0b6188c4
+  - step: design/review
+    hand: box ee33ce836a4d · helper-2
+    hash_before: f4fcb63fca048701dadc93921f9a783e0759cb70
+    hash_after: f4fcb63fca048701dadc93921f9a783e0759cb70
+    returns: 1
+    why: The approach chapter runs four paragraphs in a row, and the check answers 1.; Carry the approach as a table, the way the ask's table of pieces reads.; The ask puts the spawn hook under level zero, and the wrapper stands at level one.; Name the one folder holding the spawn hook, so the implement step writes in one place.; The five things the ask calls done stand in the approach, each with the design output behind it.; The check's other findings stand outside the brief, and this ticket leaves them alone.
 ---
 
 # Ask
@@ -137,8 +143,16 @@ The hand grows from one piece to three, and the design output holds the shape. T
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+
+- The approach chapter runs four paragraphs in a row, and the check answers 1.
+- Carry the approach as a table, the way the ask's table of pieces reads.
+- The ask puts the spawn hook under level zero, and the wrapper stands at level one.
+- Name the one folder holding the spawn hook, so the implement step writes in one place.
+- The five things the ask calls done stand in the approach, each with the design output behind it.
+- The check's other findings stand outside the brief, and this ticket leaves them alone.
 
 # implement
 
