@@ -58,7 +58,7 @@ function readNotes(disk, folder) {
   }
 }
 
-// [[spec/design_output/stop#the-mark-survives-a-reload]]
+// [[spec/design_output/level0#the-canary-owes-a-debt]]
 function pastTurnOne() {
   return { reads: 1, firstTurn: false, owes: true };
 }

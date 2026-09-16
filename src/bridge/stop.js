@@ -10,13 +10,13 @@ import {
   OFF,
   STOP,
 } from "../../.claude/skills/level0/lib/controls.js";
+import { rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { ticketAt, WORK_BRANCH } from "../scripts/group.js";
 import { heldGroup, openPrivate, queueHolds } from "../../.claude/skills/level0/lib/ticket.js";
 import {
   decide,
   detail,
-  namesNext,
   pool,
   RULES,
   STOP_CALL,
@@ -87,6 +87,12 @@ export function sawCall(e, box) {
   if (e?.agentId) return;
   toothOf_(box).sawCall();
   todosOf(box).sawCall(e);
+}
+
+// A prompt from outside this plugin opens a turn, and the tooth counts them. [[spec/design_output/stop#the-tooth-holds-its-state]]
+export function sawPrompt(e, box) {
+  if (e?.agentId) return;
+  toothOf_(box).sawPrompt(Boolean(e?.mine));
 }
 
 function claims(e, box) {
@@ -169,8 +175,7 @@ function lastLineReason(text) {
 function ranHere(name, held) {
   if (name === "stop-hook-off") return held.off;
   if (name === "owner-holds") return held.hold === STOP;
-  // A first answer naming a next step takes no free stop, so the canary rides it and closes no turn. [[spec/design_output/stop#the-canary-ends-turn-one]]
-  if (name === "session-is-new") return toothOf_(held.box).isNew() && !namesNext(held.text);
+  if (name === "chat-is-new") return chatIsNew(held.box);
   if (name === "work-waiting") return todosOf(held.box).standing();
   if (name === "group-in-hand") return groupInHand(held.box);
   if (name === "ticket-in-hand") return holdStands(held.box) || privateStands(held.box);
@@ -207,6 +212,23 @@ function privateStands(box) {
       .some((one) => openPrivate(String(box.disk.read(join(folder, one.name)))));
   } catch {
     return false;
+  }
+}
+
+// THE CHAT IS NEW WHILE NOBODY HAS SAID WHAT TO DO IN IT. The session log holds one prompt row a turn and rotates at a session start, so the count survives a restart of the server and starts again with the next chat, and a cloud box carrying nobody to ask reads false. [[spec/design_output/stop#the-chat-is-new]]
+function chatIsNew(box) {
+  const env = box.env ?? process.env;
+  if (env.CLAUDE_CODE_REMOTE || env.SE_CLOUD) return false;
+  return promptsIn(box) <= 1;
+}
+
+function promptsIn(box) {
+  try {
+    return rowsOf(String(box.disk.read(join(box.work, SESSION)))).filter(
+      (one) => one.kind === "prompt",
+    ).length;
+  } catch {
+    return 0;
   }
 }
 

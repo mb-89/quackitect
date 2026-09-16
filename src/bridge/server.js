@@ -23,7 +23,15 @@ import {
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
 import { asks } from "./config.js";
-import { dropsHold, holdsCall, onStop, sawCall, SPECS as stopSpecs, TOOLS as stopTools } from "./stop.js";
+import {
+  dropsHold,
+  holdsCall,
+  onStop,
+  sawCall,
+  sawPrompt,
+  SPECS as stopSpecs,
+  TOOLS as stopTools,
+} from "./stop.js";
 import { onBash, onDescribe } from "./bash.js";
 import { SPECS as reportSpecs, TOOLS as reportTools } from "./report.js";
 import { ANSWERED, onAgentAnswered, SPECS as reviewSpecs, TOOLS as reviewTools } from "./review.js";
@@ -53,7 +61,7 @@ const BINDING = "engine.binding";
 const DOORS = {
   "session.start": opensSession,
   "prompt.context": onPromptContext,
-  "prompt.submit": onPromptSubmit,
+  "prompt.submit": submitsPrompt,
   "classic.MessageDisplay": onMessageDisplay,
   [SPOKE]: onAgentSpoke,
   "session.compact": onSessionCompact,
@@ -120,6 +128,11 @@ function opensSession(e, box) {
   box.registered = true;
   box.specs = specsOf(box);
   return { register: box.specs, pass: true };
+}
+
+function submitsPrompt(e, box) {
+  sawPrompt(e, box);
+  return onPromptSubmit(e, box);
 }
 
 async function onToolCall(e, box) {

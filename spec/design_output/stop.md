@@ -89,20 +89,20 @@ in before the turn ends. The hold at `stop` fires the rule
 `the-owner-holds-this-session` on the stop side, over every continue
 rule but the owner's own word. A `hold` line at `debug` says what the door does.
 
-## The canary ends turn one
+## The two lines stand apart
 
-The canary is a formatted line of its own, and turn one ends on it, last. An
-answer holding the canary reaches the vote with no call beside it. The stop
-call falls in turn one, and its result names the canary as the one way out.
-From turn two on the call ends a turn. For details, see
-[[spec/design_output/level0#the-canary-owes-a-debt]].
+The canary opens an answer and the stop line closes it. Each door reads its own
+end of the message, and one line stands for the other nowhere:
 
-The free stop of a new session takes one exception. Where the first answer
-names a next step, `namesNext` reads it, the session-is-new rule fires no
-more, and the turn holds open. So the canary rides that answer and closes no
-turn, and the agent does the step it names. A sentence opening on `Next`,
-`Then I` or `I` and a verb of the agent's own act names a step. A table, a
-heading and the stop line stand outside that reading.
+| the line | where it stands | what reads it |
+|---|---|---|
+| the canary | first, and alone | the canary door, at the turn's end |
+| `stop: <id>` | last, and alone | the stop door, at the turn's end |
+
+The canary ends no turn. A session says it because level zero holds the
+session, and a turn ends because a reason stands. An opening answer carries
+both: the canary at the top, what the agent sees under it, and the stop line
+last. For details, see [[spec/design_output/level0#the-canary-owes-a-debt]].
 
 ## The off switch takes it
 
@@ -136,8 +136,8 @@ Three numbers carry an argument, and they stay where they stand:
 |---|---|---|
 | 99 | over 90 | "carry on" beats the block, and the owner saying it says proceed on your best reading |
 | 45 | under 80 | a finished piece ends no session while a list still holds something |
-| 95 | over 80 | a session that opens with an old list on it comes free |
-| 95 | under 99 | that free stop goes where the owner says get on with it |
+| 95 | over 80 | a chat opening with an old list on it still asks what to do |
+| 95 | under 99 | that opening stop goes where the owner says get on with it |
 
 ## The off switch answers alone
 
@@ -160,16 +160,34 @@ a hole somebody walks through, so the name reaches a function alone.
 | `ticket-in-hand` | a hold stands under `.se/hold`, or an open private ticket stands |
 | `group-in-hand` | this branch's group carries a take with no hand-back |
 | `queue-waits` | a desk bound to the queue stands on trunk, and `queueHolds` reads a free open ticket or a group at `now` |
-| `session-is-new` | fewer tool calls than `FRESH` in `lib/stop.js` stand behind this session, the hook grants no stop, and the answer names no next step |
+| `chat-is-new` | the session log holds one prompt row at most, and the box is no cloud box |
 | `stop-hook-off` | `spec/config/level0.json` says `stop.enabled` is false |
 | `never` | nothing, which is what an unbuilt rule takes |
 
 A `runs` value the code does not know answers false, stands out of the vote,
 and writes one `warn` line.
 
-The free stop asks for both halves. The count alone hands out a free stop
-wherever it resets. The grant alone lets a session read for an hour and still
-call itself new.
+## A claim a check holds
+
+A rule deciding `claimed` names a check too, and then both halves answer before
+it fires. The agent claims the reason, the check says the moment stands, and a
+claim outside that moment fires nothing. `fires` in `lib/stop.js` holds it, and
+a claimed rule naming no check fires on the claim alone, as before.
+
+## The chat is new
+
+`the-chat-is-new` is the opening turn's reason. A person opens a chat, nobody
+names the work yet, and the agent answers with what it sees and asks. The check
+reads two things:
+
+| what it reads | it stands where |
+|---|---|
+| the prompt rows in the session log | one row at most stands, so the work stays unnamed |
+| `CLAUDE_CODE_REMOTE` and `SE_CLOUD` | both stay empty, so a person sits at this box |
+
+The log is the record, and it rotates at a session start. So the reason
+survives a restart of the server and dies with the chat, which is what a
+person means by a new chat.
 
 # A standing stop ends it
 
@@ -205,12 +223,15 @@ beside it:
 | count | what it stands for |
 |---|---|
 | calls | the tool calls this session |
+| turns | the prompts from outside this plugin |
 | `inARow` | the turns the tooth carries one after another |
-| granted | whether the hook grants a stop already |
 | claim | the reason the last call names, until the next call or the turn's end |
 
 The module reloads with the plugin, so every count starts again where the
-maintainer edits level zero mid-session.
+maintainer edits level zero mid-session. No stop rides those counts, because a
+restart that hands a session its reasons again hands out the turn ends with
+them. A rule over a session's own age reads the log instead, which rotates with
+the session and no sooner.
 
 # Where the rules live
 
