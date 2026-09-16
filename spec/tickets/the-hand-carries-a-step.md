@@ -75,11 +75,19 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: sync
+step: split
 record:
   - step: sync
     hand: box ee33ce836a4d
     hash_before: cdb0cc9d5eca391c8b52b12ddcd132acdabb9c29
+  - step: sync
+    hand: box ee33ce836a4d · claude-code-remote
+    hash_before: 16a4a2a5d2797a1374053c1d821850b14c97790a
+    hash_after: 16a4a2a5d2797a1374053c1d821850b14c97790a
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-hand-carries-a-step already carries every commit on main.
 ---
 
 # Ask
@@ -93,8 +101,9 @@ A hand carries one step. The hold names the session that took it, and a spawn ta
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
