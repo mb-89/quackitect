@@ -90,7 +90,11 @@ record:
     hand: box 02ae9414623e
     hash_before: 8dcd4ae534815f24881f95895f4eea117620a1f7
     hash_after: 8dcd4ae534815f24881f95895f4eea117620a1f7
-step: children
+  - step: children
+    hand: box 02ae9414623e
+    skipped: true
+    why: the box leaves it while brand-reads-folder stand open
+step: retro/notes
 ---
 
 # Ask
