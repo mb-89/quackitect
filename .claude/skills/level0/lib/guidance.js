@@ -117,6 +117,11 @@ export function envOf(text) {
     .filter(Boolean);
 }
 
+// [[spec/design_output/level0#the-style-carries-a-note]]
+export function styled(text) {
+  return truthy(parse(text).front.style);
+}
+
 export function bindsHere(text, env) {
   const wants = envOf(text);
   if (!wants.length) return true;

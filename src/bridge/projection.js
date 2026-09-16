@@ -11,7 +11,7 @@ import {
   ownerOf,
   PROJECTIONS,
   readAll,
-  readsOf,
+  readsIn,
   refusedWrite,
 } from "../../.claude/skills/level0/lib/projection.js";
 
@@ -24,7 +24,7 @@ export function sourcesOf(entries, disk, method) {
   const out = new Set();
   for (const entry of entries) {
     const texts = new Map();
-    for (const path of readsOf(entry)) {
+    for (const path of readsIn(entry, disk, (path) => join(method, path))) {
       out.add(path);
       if (disk.exists(join(method, path))) texts.set(path, disk.read(join(method, path)));
     }

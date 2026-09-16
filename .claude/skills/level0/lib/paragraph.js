@@ -827,6 +827,9 @@ function grammar(layer) {
   const said = modal(layer);
   if (said) out.set("Modal.yml", said);
 
+  const hedged = hedge(layer);
+  if (hedged) out.set("Hedge.yml", hedged);
+
   if (layer.contractions === "refused") {
     out.set(
       "Contraction.yml",
@@ -892,6 +895,25 @@ function modal(layer) {
     "ignorecase: true",
     "tokens:",
     ...refused.map((one) => `  - '\\b${one}\\b'`),
+    "",
+  ].join("\n");
+}
+
+// A hedge softens a claim and names no measure, so the rule cuts it. [[spec/design_output/projection#the-grammar-rules]]
+function hedge(layer) {
+  const hedges = (layer?.hedges ?? []).map((one) => String(one).trim()).filter(Boolean);
+  if (!hedges.length) return undefined;
+  const token = (one) => `  - '\\b${one.split(" ").join(`\\s+`)}\\b'`;
+  return [
+    "extends: existence",
+    `message: ${JSON.stringify(
+      "Cut the hedge '%s'. Say the thing, or name the measure.",
+    )}`,
+    `link: ${LINK}`,
+    "level: error",
+    "ignorecase: true",
+    "tokens:",
+    ...hedges.map(token),
     "",
   ].join("\n");
 }

@@ -4,6 +4,7 @@
 // [[spec/design_output/projection#what-goes-where-is-data]]
 
 import { flatten, keysOf, LOCAL, TRACKED } from "./config.js";
+import { actionables, styled } from "./guidance.js";
 import { faultsOf, PARAGRAPH, rulesFrom, RULES } from "./paragraph.js";
 import { readYaml } from "./schema.js";
 import { pathsOf } from "./vocabulary.js";
@@ -16,10 +17,15 @@ export const COMMANDS = "config commands";
 // [[spec/design_output/projection#the-second-target]]
 export { PARAGRAPH } from "./paragraph.js";
 
+// [[spec/design_output/projection#the-third-target]]
+export const STYLE = "output style";
+export const STYLE_NAME = "level0";
+
 // [[spec/design_output/projection#a-shape-says-its-ending]]
 const HOLDS = new Map([
   [COMMANDS, ".md"],
   [PARAGRAPH, RULES],
+  [STYLE, ".md"],
 ]);
 
 const PREFIX = "se-";
@@ -47,6 +53,18 @@ export function readsOf(entry) {
   return [entry?.from, entry?.schema].filter(Boolean);
 }
 
+// A style reads a folder of notes, so the reads need the disk. [[spec/design_output/projection#the-third-target]]
+export function readsIn(entry, disk, at = (path) => path) {
+  if (entry?.shape !== STYLE) return readsOf(entry);
+  const folder = folderOf(entry.from);
+  if (!disk.exists(at(folder))) return [];
+  return disk
+    .list(at(folder))
+    .filter((one) => one.kind === "file" && one.name.endsWith(".md"))
+    .map((one) => `${folder}/${one.name}`)
+    .sort();
+}
+
 // The schema names the word lists, so the reader takes a second pass over the disk. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
 export function alsoReads(entry, texts) {
   if (entry?.shape !== PARAGRAPH) return [];
@@ -66,6 +84,7 @@ function listsOf(said, texts) {
 export function writesOf(entry, texts) {
   const out = new Map();
   if (entry?.shape === PARAGRAPH) return schemaInto(entry, texts, rulesFrom);
+  if (entry?.shape === STYLE) return styleFrom(entry, texts);
   if (entry?.shape !== COMMANDS) return out;
 
   const said = flatten(parsed(texts.get(entry.from)));
@@ -90,6 +109,49 @@ export function writesOf(entry, texts) {
     put(commandsFor(widget.key, said.get(widget.key), declared(widget.key), entry, widget.path));
   }
   return out;
+}
+
+// [[spec/design_output/projection#the-third-target]]
+function styleFrom(entry, texts) {
+  const out = new Map();
+  const folder = folderOf(entry.from);
+  const notes = [...texts.entries()]
+    .filter(([path]) => path.startsWith(`${folder}/`) && path.endsWith(".md"))
+    .sort(([a], [b]) => (a < b ? -1 : 1))
+    .map(([path, text]) => ({ name: path.slice(folder.length + 1), text }))
+    .filter((one) => styled(one.text) && actionables(one.text).length);
+  if (!notes.length) return out;
+
+  const body = [];
+  for (const note of notes) {
+    body.push(`## ${note.name.replace(/[.]md$/, "").replace(/[-_]/g, " ")}`);
+    body.push("");
+    body.push(...actionables(note.text).map((one, i) => `${i + 1}. ${one}`));
+    body.push("");
+  }
+  const text = [
+    "---",
+    `name: ${STYLE_NAME}`,
+    `description: ${JSON.stringify(styleSays(notes))}`,
+    "keep-coding-instructions: true",
+    `generated: ${JSON.stringify(saysGenerated(entry.from))}`,
+    "---",
+    "",
+    "# How this tree works",
+    "",
+    "These rules hold over every answer you write. Vale holds the mechanical",
+    "ones at the write door, so a write breaking one comes back with the",
+    "reason and the line.",
+    "",
+    ...body,
+  ].join("\n");
+  out.set(`${folderOf(entry.target)}/${STYLE_NAME}.md`, text);
+  return out;
+}
+
+function styleSays(notes) {
+  const names = notes.map((one) => one.name.replace(/[.]md$/, ""));
+  return `The ${names.join(", ")} rules of this tree, sent with every request.`;
 }
 
 // [[spec/design_output/projection#the-second-target]]
@@ -218,7 +280,7 @@ export function readAll(entries, disk, at = (path) => path) {
 
   for (const entry of entries) {
     const texts = new Map();
-    for (const path of readsOf(entry)) {
+    for (const path of readsIn(entry, disk, at)) {
       if (disk.exists(at(path))) texts.set(path, disk.read(at(path)));
     }
     // [[spec/funnel/a-paragraph-has-a-schema]]
