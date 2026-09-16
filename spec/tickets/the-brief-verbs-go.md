@@ -123,6 +123,30 @@ Every brief has merged, so the verbs carry two roads and walk one. A reader of t
 
 <!-- the form is text -->
 
+| where the brief stands | what stands after |
+|---|---|
+| `take`, and the claim behind it | the group claim alone, so `freeIn` answers groups |
+| `done`, and the drop behind it | the group's leaves road alone |
+| `read` and `review` | the group ticket as the text they show |
+| `release`, and the status it writes | the group's record, which `letGo` already writes |
+| `list`, which names a kind | the one kind, so the column goes |
+| `new`, which takes a brief off trunk | the group ticket, which the mint writes and the pull cuts a branch for |
+| the copilot lane | the group ticket, at the path the ticket names |
+
+The brief is one file at the root, and a group ticket says the same in the
+tree. Every branch on this box carries a group, so each verb walks the group
+road and the other road stands dead. The change reads each verb, cuts the
+brief half, and leaves the group half as it stands.
+
+`withContract` writes the routine's steps into a brief, and the pull's
+hand-out says the same to a hand. So the contract goes with the brief, and the
+`branch new` verb takes a group name in place of a file.
+
+The constant and its readers go last: `BRIEF` in the work verbs, the review
+verb, the review library and the copilot lane. A test naming a handover moves
+to the group ticket it stands for. For details, see
+[[spec/design_output/work#a-brief-drains-first]].
+
 ## review
 
 <!-- reads the approach against the ask -->
