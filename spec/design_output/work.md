@@ -102,8 +102,8 @@ Under yours it carries three answers, and each is a verb:
 | take it over | `branch take` | claims it again, with a record entry of its own |
 | close it | `branch close <name> --force` | drops the branch, and the work on it |
 
-`work.staleAfter` reads `12h` by default, and the rule derives from the tip, so
-nothing writes to a branch nobody holds.
+`work.staleAfter` stands in `spec/config/level0.json`, and the rule derives from
+the tip, so nothing writes to a branch nobody holds.
 
 # A box leaves
 
@@ -159,7 +159,7 @@ a rejected push and takes the next.
 every branch says how it closes. The append is idempotent, and a brief already
 carrying the section stays as it stands.
 
-The contract names six things:
+The contract says what a branch does:
 
 - run `branch sync` first, which takes `main` in
 - push each time a thing lands

@@ -1,6 +1,6 @@
 // The pull tool's pure half. The argv it hands the shell and the question it
 // puts to the judge, read with no harness standing.
-// [[spec/design_output/pull#the-five-checks]]
+// [[spec/design_output/pull#the-checks]]
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
@@ -58,7 +58,7 @@ test("the tool hands the shell verb the same words a person types", () => {
   ]);
 });
 
-// [[spec/design_output/pull#the-five-checks]]
+// [[spec/design_output/pull#the-checks]]
 test("the judge's question carries every rule numbered and the evidence whole", () => {
   const ask = judgeAsk("The approach.\nchecked:\n- one", [
     "Say what is.",

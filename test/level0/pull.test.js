@@ -1,6 +1,6 @@
 // The pull, driven through fake doors. A ticket stands in a map, git answers
 // from a table, and every check and every answer runs in memory.
-// [[spec/design_output/pull#the-five-answers]]
+// [[spec/design_output/pull#the-answers]]
 
 import assert from "node:assert/strict";
 import { join } from "node:path";
@@ -1407,7 +1407,7 @@ test("ticket open turns a draft with an ask into an open ticket at its first lea
   assert.equal(heard(() => ticket(ROOT, ["open", "a-child"], empty.it)).code, 1);
 });
 
-// [[spec/design_output/pull#the-five-checks]]
+// [[spec/design_output/pull#the-checks]]
 test("the judge's material is the leaf's evidence and the rules its reads name, as JSON", () => {
   const { it } = doors(standing(filled(CHILD(), "### approach", "The approach.")));
   heard(() => work(ROOT, ["pull"], it));

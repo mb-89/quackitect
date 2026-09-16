@@ -93,6 +93,8 @@ steps:
     reads: [[spec/guidance/review/reviewing]]
     input: [diff, implement]
     to: retro
+    checklist:
+      - every fact the change adds stands in one place, and a note points at the file instead of repeating it
     evidence:
       - name: read
         form: files

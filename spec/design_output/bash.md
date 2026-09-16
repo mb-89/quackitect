@@ -5,19 +5,19 @@ kind: [[design_output]]
 # Scope
 
 `.claude/skills/level0/lib/bash.js` reads every command the agent runs. This
-note covers the parse it makes and the five rules standing on that parse. The
+note covers the parse it makes and the rules standing on that parse. The
 delta a commit carries stands in [[spec/design_output/private]].
 
 # What the door reads
 
 `tool.call` with the matcher `{ tool: "Bash" }` hands the whole command line
-over. One parse splits it, and the five rules below read that one parse.
+over. One parse splits it, and the rules below read that one parse.
 
 | the parse answers | the rule it feeds |
 |---|---|
 | every path a segment writes | a shell writes nothing |
 | the message a commit carries | a commit message meets voice |
-| the name a checkout cuts | a branch name holds five |
+| the name a checkout cuts | a branch name meets the cap |
 | a test run naming no file | a test run points somewhere |
 | a commit stepping past the hook | the escape, in [[spec/design_output/private]] |
 
@@ -110,7 +110,7 @@ The same parse answers whether the commit steps past the pre-commit hook, and
 `skipsTheHook` reads `--no-verify` and every form `-n` takes.
 [[spec/design_output/private#the-escape]] says which box refuses it.
 
-# A branch name holds five
+# A branch meets the cap
 
 `branch new` refuses a long name, and `git checkout -b` reaches the same tree.
 `overLong` in `lib/names.js` counts the words, and the door calls it on:
@@ -150,7 +150,7 @@ road back. For details, see [[spec/design_output/private#the-second-door]].
 # The description names verbs
 
 `tool.describe` rewrites what the model reads before it reaches for a tool. It
-is the carrot to the five sticks above.
+is the carrot to the sticks above.
 
 Bash's description gains a paragraph naming the tree's verbs, and `VERBS` in
 `lib/bash.js` holds the list. A contract test reads `src/scripts/cli.js` and

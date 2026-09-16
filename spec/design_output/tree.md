@@ -85,9 +85,9 @@ whatever path a person names.
 
 # The script rule draws live
 
-The `[formats]` section maps a shell ending to `md`, so Vale reads a shell
-script. `spec/config/styles/VoiceScript` holds one rule over those two endings,
-and `NoPathInScript` stands there.
+`.vale.ini` maps a shell ending to `md`, so Vale reads a shell script.
+`spec/config/styles/VoiceScript` holds one rule over those endings, and
+`NoPathInScript` stands there.
 
 A person then meets the path fault under the line while typing, and the command
 line meets the same rule name. So `lib/scripts.js` goes, and the loop beside it

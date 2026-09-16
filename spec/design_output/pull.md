@@ -7,15 +7,15 @@ refines:
 # Scope
 
 `src/scripts/pull.js` holds the pull and the test verb, under `./RUNME.sh
-branch`. This note covers the hand-out, the hand-back with its five checks,
-and the five answers. It covers the record, the hold per hand, and what the
+branch`. This note covers the hand-out, the hand-back with its checks,
+and the answers. It covers the record, the hold per hand, and what the
 stop hook reads off the hold. The verbs around the branch stand in
 [[spec/design_output/work]].
 
-# The five answers
+# The answers
 
-`branch pull` answers one of five words, first on its own line, with the
-detail under it:
+`branch pull` answers one word, first on its own line, with the detail under
+it:
 
 | answer | when | the hand does |
 |---|---|---|
@@ -71,7 +71,7 @@ commit the other lacks.
 ## What a hand-out reads
 
 The pull reads every ticket under `spec/tickets` and `.se/tickets`, and offers
-them in four pools, each in the order of urgency then name:
+them in pools, each in the order of urgency then name:
 
 1. a private ticket carrying `todo: true`
 2. the children of this group, and their children
@@ -219,7 +219,7 @@ writes each text under its heading, past the mint's comments. Then it runs
 the checks over the file as it stands. The pull refuses a key naming no
 field of the leaf.
 
-## The five checks
+## The checks
 
 1. the hold, as above
 2. the schema over the whole ticket, then every field of the leaf against its form
@@ -227,7 +227,7 @@ field of the leaf.
 4. the hand rule, and the tip on a verdict leaf
 5. the judge, which runs in the plugin wrapper alone
 
-The first four run in the shell, so a person's hand-back meets them too.
+Every check but the judge runs in the shell, so a person's hand-back meets them too.
 
 The wrapper under `.claude/skills/level1` imports nothing past its own folder,
 because the plugin validator refuses an import that leaves it. So the shell

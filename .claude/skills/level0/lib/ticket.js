@@ -118,7 +118,7 @@ function engineFaults(note, schema, where) {
   return out;
 }
 
-// [[spec/design_output/schema#the-verbs-own-three-fields]]
+// [[spec/design_output/schema#the-verbs-own-their-fields]]
 function verbFaults(old, note, schema, where) {
   const props = schema?.frontmatter?.properties ?? {};
   const kind = String(schema?.kind ?? "");

@@ -2,7 +2,7 @@
 // shell verb under it, reads a hand-back with the judge first, and spawns the
 // hand a spawn answer names, because a shell verb reaches no model and no
 // agent, and the hook process reaches both.
-// [[spec/design_output/pull#the-five-checks]]
+// [[spec/design_output/pull#the-checks]]
 
 import {
   BREAKS,
@@ -68,7 +68,7 @@ async function spawned($, prompt) {
   return "";
 }
 
-// [[spec/design_output/pull#the-five-checks]]
+// [[spec/design_output/pull#the-checks]]
 async function judged($, argv) {
   const settings = await readJson($, CONFIG);
   const judge = settings?.judge ?? {};

@@ -11,7 +11,7 @@ export const DIFF_CAP = 120000;
 
 export const ASKED = ["brief", "beyond", "tests"];
 
-// [[spec/design_output/review#the-five-questions]]
+// [[spec/design_output/review#the-questions]]
 // [[spec/design_output/work#every-brief-carries-the-contract]]
 export function retroIn(text) {
   const heading = /^#{1,6}[^\S\n]+[^\n]*\b(?:retro\w*|surprises?|dead ends?)\b/im;

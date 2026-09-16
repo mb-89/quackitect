@@ -48,23 +48,15 @@ The window carries no status bar.
 
 ## Alt L raises the floor
 
-The window shows the rows at the floor and above. The ladder is the one
-Python's logging climbs:
-
-| floor | shows |
-|---|---|
-| `debug` | every row |
-| `info` | every row a door says, and this is where the window opens |
-| `warn` | a refusal and a fault |
-| `error` | a fault |
-| `fatal` | what ends a session |
+The window shows the rows at the floor and above, and opens at `info`. The
+ladder is the one the log climbs. For what each level holds, see
+[[spec/design_output/log#what-a-box-writes]].
 
 `alt+l` raises the floor one level. From the top it comes round to the bottom,
-so the sixth press stands at the opening floor again. A debug row stays hidden
-until the floor comes round to it. The filter narrows what the floor leaves.
-
-A row naming no level, or a level nobody knows, stands as `info`, so it shows
-at the opening floor.
+so the press after the top stands at the opening floor again. A debug row stays
+hidden until the floor comes round to it. The filter narrows what the floor
+leaves. A row naming no level, or a level nobody knows, stands as `info`, so it
+shows at the opening floor.
 
 The header names the floor beside the key, as `alt+L log lvl: INFO`, and in
 red while the floor stands off `info`.
