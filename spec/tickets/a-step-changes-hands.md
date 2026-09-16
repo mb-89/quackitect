@@ -235,7 +235,15 @@ record:
   - step: retro/notes
     hand: box d895042a7ea3
     hash_before: 7ae76d292e1960461baeeda6cd6459329aea1e29
-step: retro/notes
+  - step: retro/notes
+    hand: box d895042a7ea3
+    hash_before: 7ac77b7e79a7a5232802b6f7316ecdf636e05aef
+    hash_after: 7ac77b7e79a7a5232802b6f7316ecdf636e05aef
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+step: retro/write
 ---
 
 # Ask
