@@ -107,7 +107,11 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
-step: retro/write
+  - step: retro/write
+    hand: box 1eeed4143ad0
+    hash_before: 18e60be12d7a1a5734c27f85d91d2c26dce6e217
+    hash_after: 18e60be12d7a1a5734c27f85d91d2c26dce6e217
+step: retro/cloud
 ---
 
 # Ask
@@ -166,32 +170,51 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- sidebar-makes-both: two action buttons in the section `engine`, a folder ask on the editor door, three tests touched, one chapter
+- the group: sync, split, the derived children step, and this retro
+- both tickets opened from draft, because the take left them at draft and the pull waited
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the design output named every module, so the approach took one read and the review passed first time
+- the tests went red for the reason expected, and one function on the sidebar turned them green
+- the voice checks at the hand-back caught long sentences before a reviewer read them
 
 ### badly
 
 <!-- what did not, each with its moment in the log or the transcript -->
-
 <!-- the form is list -->
+
+- the first pull answered wait, because both tickets stood draft after the take
+- the lint over the tree failed on the ask, whose done_when line held angle brackets outside a code span
+- the check failed once on the tree test, which counted five drawn controls
+- the check failed once for want of the server, and once when a shell redirection met the write rule
+- the formatter rewrites lines from main in the editor door, so a whole-file format widened the diff
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- the branch verb that cuts a group opens it where its ask stands written, in the work verbs
+- the mint puts the commands of a done_when line in code spans, in the ticket placeholder
+- the extension design output names the tree test beside the schema, so a new widget updates both
+- the check verb starts the server it asks for, or names the server step as skipped where none runs
+- the working guidance names the redirection rule beside the script folder line
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+The sidebar needs no new drawing for a new button, and the design output says so. The whole cost of the ask sat in one question: how a press picks a folder before it runs. Reading `asks` off the schema by key kept the page and the message untouched.
+
+The formatter and the committed files disagree on a few long lines, and a hand writing through the shell meets that at once. The rule holding the shell to no redirection came up only once the server ran. So the first check ran outside the cage, and the second inside it.
 
 ## cloud
 
