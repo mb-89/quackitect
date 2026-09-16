@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: whenever
-step: retro/notes
+step: retro/write
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -96,6 +96,14 @@ record:
     hand: the engine
     hash_before: 8a908358b7d14093a5b61d132a6476ea8347b50f
     hash_after: 8a908358b7d14093a5b61d132a6476ea8347b50f
+  - step: retro/notes
+    hand: box 747cff5c2f2a
+    hash_before: d33c212d3b74e3e52dfaf559db188f35f4234ed4
+    hash_after: d33c212d3b74e3e52dfaf559db188f35f4234ed4
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
 depends_on: ["the-agent-pulls-a-ticket"]
 ---
 
@@ -145,8 +153,9 @@ Where it stands
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
