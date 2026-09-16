@@ -3,7 +3,12 @@
 // texts until one pays. A helper is untouched.
 // [[spec/design_output/level0#the-owners-prompt-comes-first]]
 
-import { questionsIn } from "../../.claude/skills/level0/lib/answer.js";
+import {
+  namesNote,
+  newestNote,
+  notesIn,
+  questionsIn,
+} from "../../.claude/skills/level0/lib/answer.js";
 import { SAID } from "../../.claude/skills/level0/lib/log.js";
 
 const OWNER = new Set(["composer", "sdk"]);
@@ -31,6 +36,8 @@ export function onPromptSubmit(e, box) {
   });
   if (!OWNER.has(from)) return { pass: true };
   demands(box, "The owner sent a prompt");
+  // A prompt asking for a note takes a parked note as its answer. [[spec/design_output/level0#a-note-answers-its-prompt]]
+  if (namesNote(String(e?.text ?? ""))) box.demand.notes = notesIn(box);
   box.asks = questionsIn(String(e?.text ?? ""));
   return { pass: true };
 }
@@ -46,6 +53,11 @@ export function onMessageDisplay(e, box) {
 export function holdsForAnswer(e, box) {
   const demand = box.demand;
   if (!demand || e?.agentId || REACHES.has(String(e?.tool ?? ""))) return null;
+  // [[spec/design_output/level0#a-note-answers-its-prompt]]
+  if (demand.notes !== undefined && notesIn(box) > demand.notes) {
+    paid(box, newestNote(box));
+    return null;
+  }
   if (demand.skips > 0) {
     demand.skips -= 1;
     return demand.block ? { after: { context: [demand.block] } } : null;

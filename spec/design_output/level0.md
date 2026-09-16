@@ -787,6 +787,24 @@ reaches the next call. The latest demand replaces the one before it. The hold
 is no demand: it stands in the stop door. For details, see
 [[spec/design_output/stop#the-hold]].
 
+## A note answers its prompt
+
+A prompt asking for a note takes a parked note as its answer. `namesNote`
+reads the prompt for the word `note`, outside a fence, beside `questionsIn`
+and `opensATurn`, which read a prompt the same way. The demand then holds the
+count of `note` rows the log carries at that moment.
+
+The note lands from the shell, so the server's own rows carry none of it. The
+door reads the session log off the disk at every call and counts the rows of
+kind `note`. A count past the one the demand holds pays it. The reply line
+carries the newest note's own text, so the next demand sees what the log
+carries.
+
+| the prompt | what pays it |
+|---|---|
+| one asking for a note | a note row, or a text answer |
+| every other prompt | a text answer alone |
+
 ## The first call is free
 
 The response in flight when a demand lands can carry the answer as its first
