@@ -177,6 +177,8 @@ call itself new.
 - Order: the agent writes its answer, calls the stop, and writes only "Ending my turn" after it.
 - Close: the harness asks for text after a tool call, so that one generic line closes the turn.
 - Gate: the turn end reads nothing and writes nothing, because the call holds the verdict on the stop.
+- Helper: a turn end carrying an agent id passes untouched, so a helper's refused answer reaches no owner turn.
+- Debugger: `./RUNME.sh serve --inspect` sets `SE_BREAK_ON_STOP`, and the hook pauses at every stop with the reason and what prompts after.
 
 # The claim rides the call
 

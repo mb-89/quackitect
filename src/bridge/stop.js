@@ -31,6 +31,7 @@ import { REPORT_CALL } from "./report.js";
 
 const ENABLED = "stop.enabled";
 const MOST = "stop.mostInARow";
+const BREAK = "SE_BREAK_ON_STOP";
 const LINE = /^stop:\s*([a-z0-9-]+)\s*$/i;
 const PASS = { pass: true };
 
@@ -127,11 +128,20 @@ export function onStop(e, box) {
   });
   const said = toothOf_(box).atTurnEnd(decision, Number(asks(box, MOST) ?? 0));
   const why = said.ends ? endsWhy(said) : (said.go?.says ?? "");
+  const prompts = said.ends ? "" : asksForStop(rules, why);
   box.log.say("info", "stop", `the turn ${said.ends ? "ends" : "holds"}: ${why}`, {
     detail: `claimed=${claimed || "none"} ${detail(said, said.inARow)}`,
+    prompts: prompts.split("\n")[0],
   });
+  // The owner reads a stop under the debugger, so the server started with the break flag pauses here with the reason and what prompts after. [[spec/design_output/stop#a-standing-stop-ends-it]]
+  if (process.env[BREAK]) {
+    const paused = { why, prompts, claimed, decision: detail(said, said.inARow) };
+    // biome-ignore lint/suspicious/noDebugger: level0: NoDebugger - the owner asks the server to pause at every stop under the debugger
+    debugger;
+    box.log.say("debug", "stop", "the debugger read the stop", paused);
+  }
   if (said.ends) return PASS;
-  return { result: { block: asksForStop(rules, why) } };
+  return { result: { block: prompts } };
 }
 
 function endsWhy(said) {

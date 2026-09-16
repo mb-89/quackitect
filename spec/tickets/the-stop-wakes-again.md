@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 step: do
 steps:
@@ -27,6 +27,19 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 568f402efe3adab7
+record:
+  - step: do
+    hand: box d42624a67d18a8
+    hash_before: b7208dc09ad8eab430e341c81013c768c484aa3b
+    hash_after: b7208dc09ad8eab430e341c81013c768c484aa3b
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 4 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: 49 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -45,28 +58,21 @@ Today the plugin prompts again after a standing stop: a refused helper answer, o
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test test/level0/stop-door.test.js
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
-
-<!-- the form is text -->
+A test now drives the stop door over a fake box. A standing stop line ends the turn with no block, and a helper's turn end passes untouched. A turn with no stop line holds with the ask. The log line of every stop carries the first line of what prompts after. The serve verb under the debugger sets a break flag. The hook then pauses at every stop with the reason, the claim and what prompts after.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change follows the ask: the door tests stand, and the debugger pauses on the flag the serve verb sets
+- the cleanup the change reveals is none
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+The second end the owner saw came from the answer door and the tooth's cap, and both stand fixed in earlier tickets. This one pins the door's behavior in a test and gives the owner the debugger road.

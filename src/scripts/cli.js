@@ -543,7 +543,7 @@ function gridFaults(where) {
 function serveBridge(argv) {
   const inspect = argv.filter((one) => one.startsWith("--inspect"));
   const server = join(root, "src", "bridge", "server.js");
-  return outside.run([process.execPath, ...inspect, server, root], { cwd: root, inherit: true }).exitCode;
+  return outside.run([process.execPath, ...inspect, server, root], { cwd: root, inherit: true, env: inspect.length ? { SE_BREAK_ON_STOP: "1" } : undefined }).exitCode;
 }
 
 // [[spec/design_output/viewer#the-verb-builds-it]]
