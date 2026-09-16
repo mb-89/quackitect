@@ -89,12 +89,18 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8
     hash_before: 9aedaa83df601abf9fb9a8c1bd61f480aa3ac6ab
     hash_after: 9957d177f3a0e444e29956bf26ddd8eed26b6884
+  - step: design/review
+    hand: box d42624a67d18a8 · helper-2
+    hash_before: bbee3dab2891bec671a6779c41a8ed42173cc93a
+    hash_after: bbee3dab2891bec671a6779c41a8ed42173cc93a
+    returns: 1
+    why: "Carry each rule's chapter number through `forEvidence`. The hand-out numbers through `actionables`, so a refusal naming 13 names the chapter's 15.; Name the character the mark writes. Every reader strips it the way `actionables` strips the star.; Add `spec/schemas/guidance.schema.yaml` to the table of what changes. Name the second mark beside the `detailMarker` it carries.; Add [[spec/design_output/pull#the-checks]] to the table of what changes. It says a `breaks` answers `refused`, and the numbered labels replace that.; Say what the judge does over a leaf whose rules all carry the mark. Today it stands silent where the reads name no rule."
 ---
 
 # Ask
@@ -145,6 +151,14 @@ For details, see [[spec/design_output/pull#the-checks]].
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- Carry each rule's chapter number through `forEvidence`. The hand-out numbers through `actionables`, so a refusal naming 13 names the chapter's 15.
+- Name the character the mark writes. Every reader strips it the way `actionables` strips the star.
+- Add `spec/schemas/guidance.schema.yaml` to the table of what changes. Name the second mark beside the `detailMarker` it carries.
+- Add [[spec/design_output/pull#the-checks]] to the table of what changes. It says a `breaks` answers `refused`, and the numbered labels replace that.
+- Say what the judge does over a leaf whose rules all carry the mark. Today it stands silent where the reads name no rule.
 
 # implement
 
