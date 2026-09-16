@@ -184,7 +184,7 @@ test("the gate says rewrite over the ceiling, and names every finding", () => {
     band: "rewrite",
   });
   assert.match(said, /^The voice rules refuse this answer\. Write it again\./);
-  assert.match(said, /50 findings a thousand words/);
+  assert.ok(!said.includes("a thousand words"), "the score reaches the log alone");
   assert.match(said, /level0-answer\.md:1:7 {2}PastTense/);
   assert.match(said, /wrote: was/);
   assert.match(said, /Hold PastTense for the rest of this turn/);

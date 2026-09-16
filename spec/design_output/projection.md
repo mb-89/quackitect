@@ -37,7 +37,7 @@ so adding one is an edit to data and no program changes:
 | field | says |
 |---|---|
 | `name` | what a refusal and a log line call this projection |
-| `shape` | which relation the projector holds, and the tree holds one |
+| `shape` | which relation the projector holds, and the tree holds three |
 | `target` | the folder every file of this projection lands in |
 | `from` | the declaration the files come from |
 | `schema` | the file saying the type of each key, and its options |
@@ -178,6 +178,7 @@ stands in a comment at the top.
 | sentence | `ListItem.yml`, `CodeSpans.yml` | the tighter cap in a list item, and the spans |
 | grammar | `Auxiliary.yml`, `Progressive.yml` | the chains the schema refuses |
 | grammar | `Modal.yml`, `ModalRequirement.yml` | every modal the register leaves out |
+| grammar | `Hedge.yml` | the hedges the schema lists, a phrase as one token |
 | grammar | `Contraction.yml`, `Latin.yml`, `EtCetera.yml` | the short forms, with their swaps |
 | grammar | `PastTense.yml` | the tenses, with the exceptions the retro grows |
 
@@ -252,8 +253,35 @@ the projector holds all three. The schema says whether each rule stands.
 ## A shape says its ending
 
 A target folder holds the files its shape writes. The shape `config commands`
-writes markdown, and `paragraph rules` writes YAML, so the compare reads the
-ending the shape names.
+writes markdown, `paragraph rules` writes YAML and `output style` writes
+markdown, so the compare reads the ending the shape names.
+
+# The third target
+
+A guidance note carrying `style: true` goes into the output style, and the
+client sends the style with every request. The shape `output style` reads
+the folder of notes and writes one file:
+
+    {
+      "name": "the output style",
+      "shape": "output style",
+      "target": ".claude/output-styles",
+      "from": "spec/guidance",
+      "wrap": "frontmatter"
+    }
+
+| piece | what it holds |
+|---|---|
+| `from` | a folder, and the reads list every note at its top |
+| the flag | `style` in the note's frontmatter, and `guidance.schema.yaml` admits it |
+| the file | `level0.md`, with the name, a description and `keep-coding-instructions: true` |
+| the body | the Actionables of every note carrying the flag, under a heading naming the note |
+
+`.claude/settings.json` selects the style by name, so every clone reads it.
+The session's standing block drops a note carrying the flag, because the
+client carries it. A helper's prompt keeps every note, because a subagent
+reads no style. For details, see
+[[spec/design_output/level0#the-style-carries-a-note]].
 
 # A missing layer fails
 

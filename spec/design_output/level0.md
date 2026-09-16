@@ -553,6 +553,25 @@ handover and the canary arrive.
 The system prompt's sections stay free for guidance that depends on where the
 work stands.
 
+## The style carries a note
+
+The client sends an output style with every request and reminds the model of
+it during the conversation, where a context block arrives once. So a guidance
+note carrying `style: true` in its frontmatter goes into the style, and the
+projection writes `.claude/output-styles/level0.md` from every such note.
+
+| who reads | what it gets |
+|---|---|
+| the session | the standing block without the flagged notes, and the style beside it |
+| a helper | every note in its prompt, because a subagent reads no style |
+| the canary | the count of every note, because the style holds the session too |
+
+The style sits in the cached prefix, so the same text costs full price once a
+session. A line injected into a user turn sits behind the cache line, and it
+costs full price every turn. So the style carries the rules, and no hook does.
+`guidanceHere` in `src/bridge/guidance.js` splits the two standings, and
+`styled` in `lib/guidance.js` reads the flag.
+
 ## The canary
 
 A session says out loud that level zero holds it. A session saying nothing
@@ -771,7 +790,7 @@ counts for nothing on either side of that division.
 
 A short answer scores high on one finding. Twenty words and one finding read as
 fifty, which stands over the ceiling. So the owner tunes the two values against
-the answers a session really writes.
+the answers a session writes.
 
 ## The three bands
 
@@ -799,14 +818,16 @@ the band `rewrite` in that line, and nothing more hangs on it.
 
     The voice rules refuse this answer. Write it again.
 
-      the score is 50 findings a thousand words.
-
       level0-answer.md:1:7  PastTense
         wrote: was
         Write the present tense: 'was'.
 
     Hold PastTense for the rest of this turn: apply the same rule to every line
     you write next, and fix the lines you already wrote if they break it.
+
+The score reaches the log line alone. A finding names a rule and a line, and the
+agent fixes both. A rate names nothing to fix, so the refusal leaves it out and
+the retro reads it from the log.
 
 ## The tool reads a draft
 
@@ -944,7 +965,7 @@ answers that the rules pass.
 `[formats]` in `.vale.ini` maps `yml` to `md`, so Vale reads a rule file at all.
 A path-scoped section names which shape rules reach which folder.
 
-The prose rules stay away from a rule file, because such a file lists the very
+The prose rules stay away from a rule file, because such a file lists the
 words they refuse.
 
 # The fixer calms a shout

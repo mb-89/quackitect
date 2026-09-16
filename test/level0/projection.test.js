@@ -12,10 +12,13 @@ import {
   optionsFor,
   ownerOf,
   readAll,
+  readsIn,
   readsOf,
   refusedWrite,
   saysGenerated,
   staleIn,
+  STYLE,
+  STYLE_NAME,
   widgetsIn,
   writesOf,
 } from "../../.claude/skills/level0/lib/projection.js";
@@ -324,4 +327,80 @@ test("a folder nobody made yet reads as empty, and the source may be missing", (
   const disk = fakeDisk({ [SOURCE]: CONFIG, [SCHEMA]: SAID });
   assert.equal(readAll([ENTRY], disk).standing.size, 0);
   assert.equal(readAll([ENTRY], fakeDisk({})).wanted.size, 0);
+});
+
+// [[spec/design_output/projection#the-third-target]]
+const STYLED = {
+  name: "the output style",
+  shape: STYLE,
+  target: ".claude/output-styles",
+  from: "spec/guidance",
+  wrap: "frontmatter",
+};
+
+const flagged = `---
+kind: [[guidance]]
+scope: ["everybody"]
+style: true
+---
+
+# Actionables
+
+1. Put the bottom line first.
+2. Say a thing once. *
+`;
+
+const plain = `---
+kind: [[guidance]]
+scope: ["everybody"]
+---
+
+# Actionables
+
+1. Work one ticket at a time.
+`;
+
+test("the style shape writes one file, from the flagged notes alone", () => {
+  const files = writesOf(
+    STYLED,
+    new Map([
+      ["spec/guidance/voice.md", flagged],
+      ["spec/guidance/tickets.md", plain],
+    ]),
+  );
+  assert.deepEqual([...files.keys()], [`.claude/output-styles/${STYLE_NAME}.md`]);
+  const said = files.get(`.claude/output-styles/${STYLE_NAME}.md`);
+  assert.match(said, /^---\nname: level0\n/);
+  assert.match(said, /keep-coding-instructions: true/);
+  assert.match(said, /## voice\n\n1\. Put the bottom line first\.\n2\. Say a thing once\.\n/);
+  assert.ok(!said.includes("Work one ticket"), "an unflagged note stays out");
+  assert.ok(said.includes(saysGenerated("spec/guidance")), "the file says it is generated");
+});
+
+test("no flagged note writes no style file", () => {
+  const files = writesOf(STYLED, new Map([["spec/guidance/tickets.md", plain]]));
+  assert.equal(files.size, 0);
+});
+
+test("the style reads every note in its folder, and the other shapes read their two files", () => {
+  const disk = fakeDisk({
+    "spec/guidance/voice.md": flagged,
+    "spec/guidance/tickets.md": plain,
+    "spec/guidance/code/code.md": plain,
+  });
+  assert.deepEqual(readsIn(STYLED, disk), ["spec/guidance/tickets.md", "spec/guidance/voice.md"]);
+  assert.deepEqual(readsIn(ENTRY, disk), readsOf(ENTRY));
+});
+
+test("readAll projects the style beside the commands", () => {
+  const disk = fakeDisk({
+    "spec/guidance/voice.md": flagged,
+    ".claude/output-styles/old.md": "stale",
+  });
+  const said = readAll([STYLED], disk);
+  assert.ok(said.wanted.has(`.claude/output-styles/${STYLE_NAME}.md`));
+  assert.deepEqual(staleIn(said.wanted, said.standing).map((one) => one.how).sort(), [
+    "extra",
+    "missing",
+  ]);
 });

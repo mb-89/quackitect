@@ -59,6 +59,31 @@ layers:
     tenses: [simple present, simple past, simple future, imperative, infinitive]
     auxiliaryChains: refused
     modals: [can, must, will]
+    hedges:
+      - just
+      - very
+      - really
+      - actually
+      - basically
+      - simply
+      - quite
+      - rather
+      - fairly
+      - somewhat
+      - perhaps
+      - maybe
+      - probably
+      - seems
+      - seem
+      - essentially
+      - clearly
+      - obviously
+      - certainly
+      - arguably
+      - importantly
+      - of course
+      - in order to
+      - it is worth
     contractions: refused
     latinShortForms: refused
     exceptions:
