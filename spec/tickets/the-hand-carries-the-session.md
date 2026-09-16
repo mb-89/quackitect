@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-hand-carries-a-step
-step: implement/tests-green
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -129,6 +129,17 @@ record:
       - name: lint
         exit: 0
         said: 42 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box ee33ce836a4d
+    hash_before: 866dc5197348c5e2d173799b79656fa4ea2991ba
+    hash_after: 866dc5197348c5e2d173799b79656fa4ea2991ba
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 83 test(s) pass in 5 file(s)
+      - name: check
+        exit: 0
+        said: 66 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
@@ -264,11 +275,15 @@ Six tests fail on their own assertion, and one passes: the hold already slugs a 
 
 <!-- the form is command -->
 
+./RUNME.sh branch test
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
@@ -276,11 +291,17 @@ Six tests fail on their own assertion, and one passes: the hold already slugs a 
 
 <!-- the form is text -->
 
+The hand now names the box, the session on it and the agent inside it. Off a harness it names the person, by their git author name. The pull reads `.se/session.json` beside the box file, and the wrapper writes it at `session.start`. A spawn hook under level zero puts one line at the head of a helper's prompt. The hand stands in `src/scripts/hand.js`, because the write door refuses a write growing `src/scripts/pull.js` past its ceiling. Two work tests name a harness, because the hand off a harness is a person now.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `src/scripts`, the two plugin folders and their tests, which the ask names.
+- the hand reaches the disk and git, and every new test takes a fake for each.
+- each new function points at the design output section the approach names.
 
 # verdict
 
