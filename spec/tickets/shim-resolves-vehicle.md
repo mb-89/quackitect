@@ -89,12 +89,16 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-shim-resolves-the-vehicle
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d42624a67d18a8
     hash_before: 66d833b60fbfb8ba36127ea23f63a38a1007a20a
     hash_after: 66d833b60fbfb8ba36127ea23f63a38a1007a20a
+  - step: design/review
+    hand: box d42624a67d18a8 · helper-2
+    hash_before: fbab99b6e5e862dea1de4c6602235be3f5fb97b9
+    hash_after: fbab99b6e5e862dea1de4c6602235be3f5fb97b9
 ---
 
 # Ask
@@ -149,6 +153,14 @@ The shim takes three roads in order, and the vehicle takes its work root from th
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- The approach covers every line of done_when.
+- The register road matches the `vehicle` id in `vehicle.json` to the entry's `method_root`.
+- The shim sets `SE_WORK_ROOT`, and `rootsHere` takes it, so `vehicle` names the stub as work.
+- The refusal names the vehicle, its upstream and the install road, and exits 1.
+- One contract test drives the shim over a fake vehicle, a register and a stub, and reads argv.
+- The design note takes `SE_WORK_ROOT` in place of `SE_WORK`, and the bridgehead keeps its two roads.
 
 # implement
 
