@@ -25,7 +25,7 @@ takes the same requirements. Qt is where the shape comes from.
 - A person shall reorder, resize, pick and hide the columns.
 - The declaration shall hold the columns a view opens with, and what a person moves shall stay out of it.
 - The view shall open the details of the selected item on Enter.
-- The name shall carry a link, and a click on it shall open what the link names.
+- A value this tree resolves shall draw as a link, and a click shall open what it names.
 - The view shall filter, in the language the log filter reads.
 - A node shall stand while it matches, or while a child of it matches.
 - The filter panel shall offer presets, and a preset can carry a key of its own.
@@ -96,14 +96,20 @@ A column cutting its text costs a reader nothing, because Enter opens the whole
 item beside the tree. The details hold every field, the way the log rows do
 today. [[spec/design_output/viewer#the-details]]
 
-# The name is a link
+# A value carries a link
 
-The name carries a link, and what the link opens depends on what the item is:
+The view carries links, and the name is one case. A value reading as an address
+draws as a link, and a click on it opens what it names:
 
-| the item | what a click opens |
+| the value | what a click opens |
 |---|---|
-| a note | the note |
-| a work ticket | the note in the editor |
+| a web address | the page |
+| a path this tree resolves | the file it names |
+| the name of a note | the note |
+| the name of a work ticket | the note in the editor |
+
+A value resolving to nothing draws as text. So the rule reads once: a value
+this tree resolves is a link, and everything else is a word.
 
 A terminal draws a link as an escape a person clicks, and the editor's own
 terminal takes the click. The viewer of the third tree does something like it,
