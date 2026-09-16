@@ -19,3 +19,5 @@
 
 node_modules/
 src/viewer/viewer
+src/lsp/lsp
+src/yaml/yaml

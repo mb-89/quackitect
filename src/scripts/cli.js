@@ -64,7 +64,7 @@ import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { readTools, whereIs, writeSurvey } from "./tools.js";
-import { SOURCE as VIEWER, viewerOf } from "./viewer.js";
+import { SHARED, SOURCE as VIEWER, viewerOf } from "./viewer.js";
 import {
   detach,
   entryFor,
@@ -591,14 +591,20 @@ function viewerHere() {
 
 // [[spec/design_output/viewer#the-check-runs-its-tests]]
 function viewerHolds() {
-  let ran;
-  try {
-    ran = outside.run([go, "test", "./..."], { cwd: join(root, VIEWER), inherit: true });
-  } catch {
-    console.log("go stands nowhere, so the viewer's tests go unrun here.");
-    return 0;
+  const folders = [VIEWER];
+  for (let at = 1; at < SHARED.length; at += 2) folders.push(SHARED[at]);
+  let worst = 0;
+  for (const folder of folders) {
+    let ran;
+    try {
+      ran = outside.run([go, "test", "./..."], { cwd: join(root, folder), inherit: true });
+    } catch {
+      console.log("go stands nowhere, so the viewer's tests go unrun here.");
+      return 0;
+    }
+    worst = worst || ran.exitCode;
   }
-  return ran.exitCode;
+  return worst;
 }
 
 // [[spec/design_output/config#the-verb-names-the-layer]]

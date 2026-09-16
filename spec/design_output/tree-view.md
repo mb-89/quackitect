@@ -9,8 +9,7 @@ and a table at once. This note covers the items, the columns, the nesting and
 what the view draws. Every tab drawing rows with a shape takes this one view.
 [[spec/design_input/the-tree-view-editor]]
 
-The declaration a view comes from, and the editing of a cell, each wait for a
-ticket of their own.
+The editing of a cell waits for a ticket of its own.
 
 # The view draws a tree
 
@@ -110,3 +109,42 @@ in the tree stays reachable, and the road to it stands with it.
 A parent the filter empties of children carries no mark, because nothing stands
 under it. The filter reaches no row under a shut parent, because a shut
 parent draws no child at all.
+
+# A base file says it
+
+A view comes out of a file, in the base format the vaults write. So a new view
+is a file and no change to the code. One file holds several views under
+`views`, each with a name. The keys outside `views` stand for every view in it.
+
+| the key | what it says |
+|---|---|
+| `views` | the views, each a map with a `name` |
+| `order` | the columns, in order, each naming the key it reads |
+| `columnSize` | the room a column opens with, by key |
+| `filters` | the tests a row passes, as a list joined by `and` |
+| `nest` | the key a child reads to find its parent, and a view naming none stands flat |
+| `collapsed` | what stands collapsed |
+| `properties` | the fields, and the one with `opensNote` says what a click opens |
+
+A view's own key wins over the file's, but for `filters`, where the file's
+tests and the view's join with `and`. So the file says what a row is, and a
+view narrows it further.
+
+A test reads as a line of the filter language.
+[[spec/design_output/viewer#the-filter-language]]
+
+| how a test stands in the file | what the reader takes |
+|---|---|
+| a quoted line, as a vault writes it | the line |
+| a map of one key, as this tree's own language reads unquoted | `key: value`, the line again |
+
+`ReadBase` answers the views, or the one reason it reads none: no map, no
+`views`, a view naming itself nowhere, or a view naming no column. `groups`,
+`counts` and `sort` wait for the tickets that use them, and `ReadBase` reads
+past them.
+
+## One reader holds the yaml
+
+`src/yaml` holds the reader, as a module of its own that takes no dependency.
+The server and the viewer both take it, so one subset stands and no module
+copies it. [[spec/design_output/schema#the-yaml-a-schema-reads]]
