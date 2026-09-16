@@ -120,6 +120,22 @@ a terminal, and a build for the browser fails on the terminal it asks for. So
 the window stays a terminal window, and the frame is what a cloud session
 shows.
 
+# The work browser
+
+The tab after the log is a work browser, and it opens on a tree.
+
+The branch listing takes long enough today that a person waits on it. The tab
+wants it quick, and what takes the time waits for a look of its own.
+
+# The tree view
+
+The work browser opens on one tree view, and every tab drawing rows with a
+shape takes the same one. It holds its requirements in a note of its own, and
+the window asks for that view whole. [[spec/requirements/the-tree-view]]
+
+The window adds one thing: `alt+f` opens the filter of the tab standing open,
+and the footer marks the tab holding one.
+
 # What waits
 
 The tabs after the log wait for a note of their own. This one settles the
