@@ -9,8 +9,8 @@ and a table at once. This note covers the items, the columns, the nesting and
 what the view draws. Every tab drawing rows with a shape takes this one view.
 [[spec/design_input/the-tree-view-editor]]
 
-The declaration a view comes from, the filter over it and the editing of a cell
-each wait for a ticket of their own.
+The declaration a view comes from, and the editing of a cell, each wait for a
+ticket of their own.
 
 # The view draws a tree
 
@@ -78,3 +78,35 @@ carry by hand.
 A declaration saying flat draws every item as a row of its own, at the left,
 with no mark and no nesting. A parent there collapses nothing, because every
 item already stands.
+
+# The filter reads an item
+
+The view filters in the language the log filter reads, so a person learns one
+language and types it in every tab.
+[[spec/design_output/viewer#the-filter-language]]
+
+An item answers the three questions the language asks of a row:
+
+| the question | what an item answers |
+|---|---|
+| a bare word | the name, then every value, in the order of the keys |
+| `name: value` | the name for `name`, and the key of that name otherwise |
+| `details: word` | every key and its value, a line each |
+
+A key no item carries matches nothing, the way a column no row carries does.
+[[spec/design_output/viewer#a-name-nobody-knows]]
+
+## A parent stands for it
+
+A node stands while it matches, or while an item under it does. So a match deep
+in the tree stays reachable, and the road to it stands with it.
+
+| what stands | why |
+|---|---|
+| a matching item | it matches |
+| a parent of a match | the road to the match |
+| a child matching nothing | nothing, and it goes, even under a parent that matches |
+
+A parent the filter empties of children carries no mark, because nothing stands
+under it. The filter reaches no row under a shut parent, because a shut
+parent draws no child at all.

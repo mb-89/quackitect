@@ -27,13 +27,14 @@ type Column struct {
 
 // [[spec/design_output/tree-view#the-view-draws-a-tree]]
 type Tree struct {
-	Cols  []Column
-	Items []Item
-	Nests bool
-	shut  map[string]bool
-	flat  []twig
-	sel   int
-	top   int
+	Cols   []Column
+	Items  []Item
+	Nests  bool
+	filter Filter
+	shut   map[string]bool
+	flat   []twig
+	sel    int
+	top    int
 }
 
 type twig struct {
@@ -63,15 +64,29 @@ func (t *Tree) walk(items []Item, depth int, above string) {
 		if above != "" {
 			here = above + "/" + here
 		}
-		kids := t.Nests && len(one.Kids) > 0
+		if !t.keeps(one) {
+			continue
+		}
+		kids := t.Nests && t.kept(one.Kids)
 		t.flat = append(t.flat, twig{item: one, depth: depth, at: here, kids: kids})
 		switch {
 		case kids && !t.shut[here]:
 			t.walk(one.Kids, depth+1, here)
-		case !t.Nests && len(one.Kids) > 0:
+		case !t.Nests && t.kept(one.Kids):
 			t.walk(one.Kids, depth, here)
 		}
 	}
+}
+
+// [[spec/design_output/tree-view#a-parent-expands-and-collapses]]
+// [[spec/design_output/tree-view#a-parent-stands-for-it]]
+func (t Tree) kept(kids []Item) bool {
+	for _, one := range kids {
+		if t.keeps(one) {
+			return true
+		}
+	}
+	return false
 }
 
 // [[spec/design_output/tree-view#a-parent-expands-and-collapses]]

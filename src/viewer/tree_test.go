@@ -171,3 +171,75 @@ func TestTheRowsScrollAndTheColumnNamesHold(t *testing.T) {
 		t.Fatalf("the column names hold while the rows scroll, and read %q", view.Header(60))
 	}
 }
+
+// [[spec/design_output/tree-view#the-filter-reads-an-item]]
+func TestTheFilterReadsAnItemInTheLanguageTheLogReads(t *testing.T) {
+	t.Parallel()
+	narrow := func(said string) *Tree {
+		f, err := ParseFilter(said)
+		if err != nil {
+			t.Fatalf("%q reads as a filter, and answered %v", said, err)
+		}
+		view := tickets()
+		view.Narrow(f)
+		return view
+	}
+	if view := narrow("state: closed"); view.Len() != 3 {
+		t.Fatalf("one column narrows to the two closed rows and their parent, and %d stand", view.Len())
+	}
+	if view := narrow("bands"); view.Len() != 2 {
+		t.Fatalf("a bare word reaches every value, and %d rows stand", view.Len())
+	}
+	if view := narrow("name: /^the tree$/"); view.Len() != 1 {
+		t.Fatalf("a pattern over the name keeps one row, and %d stand", view.Len())
+	}
+	if view := narrow("nothing matches this"); view.Len() != 0 {
+		t.Fatalf("a filter nothing matches keeps no row, and %d stand", view.Len())
+	}
+	if !narrow("bands").Narrowed() || tickets().Narrowed() {
+		t.Fatal("a held filter says so, and an empty one says not")
+	}
+}
+
+// [[spec/design_output/tree-view#a-parent-stands-for-it]]
+func TestAParentStandsWhileAChildMatches(t *testing.T) {
+	t.Parallel()
+	f, err := ParseFilter("three bands")
+	if err != nil {
+		t.Fatal(err)
+	}
+	view := tickets()
+	view.Narrow(f)
+	drawn := view.Rows(60, 2)
+	if view.Len() != 2 {
+		t.Fatalf("the matching child and its parent stand, and %d rows do", view.Len())
+	}
+	for _, want := range []string{"the window", "the help"} {
+		if !strings.Contains(drawn, want) {
+			t.Fatalf("the rows hold %q, and draw:\n%s", want, drawn)
+		}
+	}
+	if strings.Contains(drawn, "the strip and the footer") {
+		t.Fatalf("a child matching nothing goes, and the rows draw:\n%s", drawn)
+	}
+	if !strings.Contains(drawn, "▾") {
+		t.Fatalf("the parent stands open over its match, and draws:\n%s", drawn)
+	}
+}
+
+// [[spec/design_output/tree-view#a-parent-stands-for-it]]
+func TestAParentOverNoMatchCarriesNoMark(t *testing.T) {
+	t.Parallel()
+	f, err := ParseFilter("name: /^the window$/")
+	if err != nil {
+		t.Fatal(err)
+	}
+	view := tickets()
+	view.Narrow(f)
+	if view.Len() != 1 {
+		t.Fatalf("the parent alone stands, and %d rows do", view.Len())
+	}
+	if strings.ContainsAny(view.Rows(60, 1), "▾▸") {
+		t.Fatalf("a parent the filter empties carries no mark, and draws:\n%s", view.Rows(60, 1))
+	}
+}
