@@ -1,0 +1,4 @@
+{
+  "description": "Level one, as one module. Registers the pull tool at session.start and runs the judge over a hand-back.",
+  "modules": ["./level1.js"]
+}

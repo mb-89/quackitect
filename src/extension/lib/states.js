@@ -20,17 +20,17 @@ const STATES = {
     },
   },
   "stop.hold": {
-    rest: "running",
-    finishing: {
-      text: "$(clock) finishing",
+    rest: "off",
+    finish: {
+      text: "$(clock) finish",
       tone: "warning",
-      tip: "Hold: the agent finishes this work, then stops. Click to let it run.",
+      tip: "Hold: the agent finishes this work, then stops. The turn's end lets it go.",
       toast: "Hold: the agent finishes this work, then stops.",
     },
-    stopped: {
-      text: "$(debug-pause) stopped",
+    stop: {
+      text: "$(debug-pause) stop",
       tone: "error",
-      tip: "Hold: the agent stops at the end of this turn. Click to let it run.",
+      tip: "Hold: the agent stops at the end of this turn. The turn's end lets it go.",
       toast: "Hold: the agent stops at the end of this turn.",
     },
   },

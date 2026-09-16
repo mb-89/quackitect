@@ -3,11 +3,46 @@
 // this holds no list of its own.
 // [[spec/design_output/schema#the-three-places]]
 
-import { entriesIn, readNote } from "./schema.js";
+import { CHECKED, entriesIn, readNote } from "./schema.js";
 
 export const SEVERITY = "error";
 export const HAND = "hand";
 export const ANSWERED = "answered:";
+
+// [[spec/design_output/pull#the-private-queue]]
+export function openPrivate(text) {
+  const front = readNote(String(text ?? "")).front.said ?? {};
+  if (String(front.state ?? "") !== "open") return false;
+  const process = String(front.process ?? "").replace(/^\[\[|\]\]$/g, "");
+  return process !== "note" && !process.endsWith("/note");
+}
+
+// The queue holds work for a desk where a free open ticket has a leaf a hand takes, or a group reads now. [[spec/design_output/stop#the-mechanical-checks]]
+export function queueHolds(texts) {
+  return (texts ?? []).some((text) => {
+    const front = readNote(String(text ?? "")).front.said ?? {};
+    if (String(front.state ?? "") !== "open") return false;
+    const process = String(front.process ?? "").replace(/^\[\[|\]\]$/g, "");
+    if (process === "group" || process.endsWith("/group")) return String(front.urgency ?? "") === "now";
+    if (String(front.group ?? "").trim()) return false;
+    const walk = entriesIn(front.steps, "steps");
+    const step = String(front.step ?? "").trim();
+    const leaf = step ? walk.find((one) => one.path === step) : walk.find((one) => !one.said?.steps);
+    if (!leaf) return false;
+    return !["person", "children", "helper"].includes(String(leaf.said?.by ?? ""));
+  });
+}
+
+// [[spec/design_output/pull#the-group-holds-the-turn]]
+export function heldGroup(text) {
+  const front = readNote(String(text ?? "")).front.said ?? {};
+  const last = [front.record ?? []]
+    .flat()
+    .filter((one) => one && typeof one === "object")
+    .at(-1);
+  if (String(front.state ?? "") === "closed") return false;
+  return Boolean(last?.hash_before) && !last?.hash_after;
+}
 
 // [[spec/design_output/schema#the-three-places]]
 export function ticketFaults(was, now, schema, where) {
@@ -109,13 +144,14 @@ function placeFaults(old, note, schema, where) {
   const places = placesIn(note, schema);
   if (!places.size) return [];
 
-  const held = new Map(old.sections.map((one) => [keyOf(one), one.own.join("\n")]));
+  // [[spec/design_output/schema#the-three-places]]
+  const held = new Map(old.sections.map((one, i) => [nthKey(old.sections, i), one.own.join("\n")]));
   const out = [];
 
-  for (const one of note.sections) {
+  for (const [i, one] of note.sections.entries()) {
     const key = keyOf(one);
     if (places.has(key)) continue;
-    if (held.get(key) === one.own.join("\n")) continue;
+    if (held.get(nthKey(note.sections, i)) === one.own.join("\n")) continue;
     out.push(
       fault(
         one.header,
@@ -159,6 +195,12 @@ function fieldsHeld(front, level) {
     if (!field?.name) continue;
     out.push([`${deep} ${field.name}`, `${field.name}, under ${holder.path}`]);
   }
+  // [[spec/design_output/pull#the-fields-hold-their-forms]]
+  const parts = holder.path.split("/");
+  const chain = parts.map((_, i) => walk.find((one) => one.path === parts.slice(0, i + 1).join("/")));
+  if (chain.some((one) => [one?.said?.checklist ?? []].flat().some((it) => String(it ?? "").trim()))) {
+    out.push([`${deep} ${CHECKED}`, `${CHECKED}, under ${holder.path}`]);
+  }
   return out;
 }
 
@@ -171,7 +213,7 @@ export function refusedTicket(where, kind, found) {
       (one) => `  ${where}:${one.line}:${one.column}  ${one.rule}\n    ${one.message}`,
     ),
     "",
-    "A hand writes the ask of a draft, the fields of the step it holds, and the discussion.",
+    "A hand writes the ask, the fields of the step it holds, and the discussion.",
     "Everything else on a ticket is the engine's, and the pull writes it at the hand-back.",
   ].join("\n");
 }
@@ -183,6 +225,12 @@ function said(places) {
 
 function keyOf(one) {
   return `${one.level} ${one.header}`;
+}
+
+function nthKey(sections, at) {
+  const key = keyOf(sections[at]);
+  const nth = sections.slice(0, at).filter((one) => keyOf(one) === key).length;
+  return `${key} #${nth}`;
 }
 
 function same(one, two) {

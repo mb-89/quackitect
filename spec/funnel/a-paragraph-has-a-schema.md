@@ -196,7 +196,7 @@ The loop has four parts, and three of them stand already:
 
 The projection carries an exception into the rule, so the schema stays the one
 place a person edits. `PastTense` already holds eleven exceptions inside its
-own file, and they move into the schema with it. The writes of this very note
+own file, and they move into the schema with it. The writes of this note
 meet five more. The tagger reads `bold`, `add`, `approved` and the word for
 ten tens as the past tense. And the door lints an edit's fragment on its own,
 so a lone table row reads as one too.
