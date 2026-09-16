@@ -388,7 +388,7 @@ The owner named the wait as the defect, and the split names what the retro named
 
 - no person step parked, because the child closed became five tickets
 - [[spec/tickets/the-hand-carries-the-session]], minted with no group, at design/draft
-- [[spec/tickets/a-person-step-refuses-an-agent]], minted with no group, at design/draft
+- [[spec/tickets/person-step-refuses-an-agent]], minted with no group, at design/draft
 - [[spec/tickets/escalate-inserts-a-person-step]], minted with no group, at design/draft
 - [[spec/tickets/the-spawn-takes-a-step]], minted with no group, at design/draft
 - [[spec/tickets/the-group-leaves-at-todo]], minted with no group, at design/draft

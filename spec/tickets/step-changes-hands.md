@@ -317,7 +317,7 @@ The box meets four defects on the way to the person step, each for the implement
 The ticket closes became five tickets, one a piece of the ask. Each stands in no group, so a person reads the design where it waits and no branch waits on it:
 
 - [[spec/tickets/the-hand-carries-the-session]], the hand id, the session file and the helper's tag
-- [[spec/tickets/a-person-step-refuses-an-agent]], the person's hand and `work.personSigns`
+- [[spec/tickets/person-step-refuses-an-agent]], the person's hand and `work.personSigns`
 - [[spec/tickets/escalate-inserts-a-person-step]], the verb, the options, the refusal count and the split refusal
 - [[spec/tickets/the-spawn-takes-a-step]], the spawn for a step, its road back and the shell off a plugin
 - [[spec/tickets/the-group-leaves-at-todo]], the group that leaves at `todo`
