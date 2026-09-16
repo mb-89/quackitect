@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -101,6 +101,10 @@ record:
     hash_after: bbee3dab2891bec671a6779c41a8ed42173cc93a
     returns: 1
     why: "Carry each rule's chapter number through `forEvidence`. The hand-out numbers through `actionables`, so a refusal naming 13 names the chapter's 15.; Name the character the mark writes. Every reader strips it the way `actionables` strips the star.; Add `spec/schemas/guidance.schema.yaml` to the table of what changes. Name the second mark beside the `detailMarker` it carries.; Add [[spec/design_output/pull#the-checks]] to the table of what changes. It says a `breaks` answers `refused`, and the numbered labels replace that.; Say what the judge does over a leaf whose rules all carry the mark. Today it stands silent where the reads name no rule."
+  - step: design/draft
+    hand: box d42624a67d18a8
+    hash_before: a8c792b794309a5f97e52f26644a33057d9a1980
+    hash_after: 5727411a42b74034a29fcc054a42f749386edc09
 ---
 
 # Ask
