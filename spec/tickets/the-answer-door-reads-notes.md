@@ -118,6 +118,18 @@ Today a note answers a prompt on paper alone. The door sees the session's text, 
 
 <!-- the form is text -->
 
+| what changes | how |
+|---|---|
+| the answer library | answers whether a prompt names a note, and counts the `note` rows a log holds |
+| the answer door | counts at the prompt, counts again before it refuses, and pays on a new row |
+| the level zero note | says which prompt a note answers, under the owner's prompt chapter |
+
+A prompt naming a note opens a demand that a note row pays. `namesNote` reads the prompt for the word, the way `namesNext` reads it for the next step. A prompt naming none opens the demand it opens today, and a note row leaves it standing.
+
+The note row lands from the shell, so the server's own rows miss it. The door reads the session log off the disk instead, at the path the log door names, and counts the rows of kind `note`. The demand keeps the count it reads at the prompt. A count that grows pays the demand, and the reply line names the note.
+
+For details, see [[spec/design_output/level0#the-owners-prompt-comes-first]].
+
 ## review
 
 <!-- reads the approach against the ask -->
