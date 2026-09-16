@@ -21,10 +21,17 @@ test("a running hold and a quiet ask put no block in front of the agent", () => 
   assert.equal(controlBlock({}), "");
 });
 
-test("the hold at finishing says to carry what stands and start nothing new", () => {
+test("the hold at finishing says to put the work down and start nothing new", () => {
   const said = controlBlock({ hold: "finish", wanted: "quiet" });
   assert.match(said, /# What the owner asks for/);
-  assert.match(said, /Carry what stands to its end,\nstart nothing new/);
+  assert.match(said, /Put the work down: carry the piece\nin hand to its end, start nothing new/);
+});
+
+// [[spec/design_output/stop#the-hold]]
+test("the hold at stop says to put the work down and end the turn", () => {
+  const said = controlBlock({ hold: "stop", wanted: "quiet" });
+  assert.match(said, /Put the work down where it stands/);
+  assert.match(said, /end the turn with the stop line/);
 });
 
 test("a short ask asks for a line or two, and a full one for the whole report", () => {

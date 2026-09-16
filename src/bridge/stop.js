@@ -10,6 +10,7 @@ import {
   OFF,
   STOP,
 } from "../../.claude/skills/level0/lib/controls.js";
+import { CHECK } from "../../.claude/skills/level0/lib/answer.js";
 import { rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { ticketAt, WORK_BRANCH } from "../scripts/group.js";
@@ -45,35 +46,37 @@ export function SPECS(box) {
   return [stopSpec(rulesOf(box))];
 }
 
+// The three calls a turn ends with, which the hold at stop lets through. [[spec/design_output/stop#the-hold]]
+export const ENDS_TURN = new Set([REPORT_CALL, STOP_CALL, `mcp__level0__${CHECK}`]);
+
 export function holdsCall(e, box) {
   if (e?.agentId) return null;
   const hold = String(asks(box, HOLD) ?? OFF);
-  if (hold === STOP && e?.tool !== REPORT_CALL) {
-    box.log.say(
-      "debug",
-      "hold",
-      `the owner holds stop, and ${e?.tool ?? "the call"} is refused`,
-      {
-        tool: String(e?.tool ?? ""),
-      },
-    );
-    return {
-      result: {
-        deny: "The owner holds this session at stop. Make no call: say what stands, and end the turn with the stop line.",
-      },
-    };
-  }
-  if (hold !== FINISH || box.held === hold) {
-    box.held = hold;
+  if (hold !== FINISH && hold !== STOP) {
+    box.held = "";
     return null;
   }
   box.held = hold;
-  box.log.say("debug", "hold", "the owner holds finish, and the block rides", {
-    tool: String(e?.tool ?? ""),
-  });
+  const tool = String(e?.tool ?? "");
+  if (hold === STOP && !ENDS_TURN.has(tool)) {
+    box.log.say("debug", "hold", `the owner holds stop, and ${tool || "the call"} is refused`, { tool });
+    return { result: { deny: refusedByHold(tool) } };
+  }
+  box.log.say("debug", "hold", `the owner holds ${hold}, and the block rides`, { tool });
   return { after: { context: [controlBlock({ hold })] } };
 }
 
+// [[spec/design_output/stop#the-hold]]
+export function refusedByHold(tool) {
+  return [
+    `The owner holds this session at stop, so ${tool || "this call"} is refused.`,
+    "Put the work down where it stands. Make no other call.",
+    `Say what stands and what is left, hand the last word in through ${REPORT_CALL},`,
+    "and end the turn with the stop line.",
+  ].join(" ");
+}
+
+// The hold ends the turn it lands in, so the turn's end puts it back. [[spec/design_output/stop#the-hold]]
 export function dropsHold(_e, box) {
   const hold = String(asks(box, HOLD) ?? OFF);
   box.held = "";
@@ -175,6 +178,7 @@ function lastLineReason(text) {
 function ranHere(name, held) {
   if (name === "stop-hook-off") return held.off;
   if (name === "owner-holds") return held.hold === STOP;
+  if (name === "owner-finishes") return held.hold === FINISH;
   if (name === "chat-is-new") return chatIsNew(held.box);
   if (name === "work-waiting") return todosOf(held.box).standing();
   if (name === "group-in-hand") return groupInHand(held.box);

@@ -74,20 +74,36 @@ session end a turn over it, and the tooth off ends any turn.
 
 ## The hold
 
-`stop.hold` is what the owner picks from the sidebar, and it is one turn
-long: the turn's end drops it to `off`. The stop door reads it at every call
-and at the turn's end:
+`stop.hold` is what the owner picks from the sidebar. The stop door reads it
+at every call and at the turn's end:
 
-| hold | at the next call | at the turn's end |
+| hold | at every call | at the turn's end |
 |---|---|---|
 | `off` | nothing | the tooth votes |
-| `finish` | one context line: finish what stands, start nothing new | the tooth votes |
-| `stop` | the door refuses the call: say what stands, end the turn with the stop line | the turn ends over the standing work |
+| `finish` | the block rides: put the work down, start nothing new | the tooth votes |
+| `stop` | every call but the three below meets a refusal | the turn ends over the standing work |
 
-The report tool passes the hold at `stop`, so the agent hands the last report
-in before the turn ends. The hold at `stop` fires the rule
-`the-owner-holds-this-session` on the stop side, over every continue
-rule but the owner's own word. A `hold` line at `debug` says what the door does.
+Three calls pass the hold at `stop`, because a turn ends through them: the
+report, the stop claim and the answer check. Each carries the block, so the
+line stands in the answer to every call a held session makes. The hold at
+`stop` fires the rule `the-owner-holds-this-session` on the stop side, over
+every continue rule but the owner's own word. A `hold` line at `debug` says
+what the door does.
+
+The hold is the stop hook's opposite. The hook holds a turn open, and the hold
+ends it, at two strengths:
+
+| strength | what the owner asks for | which rule ends it |
+|---|---|---|
+| `finish` | end this turn at the next place that suits the work | `the-owner-asks-to-finish`, at 84 |
+| `stop` | end this turn now | `the-owner-holds-this-session`, at 85 |
+
+Each stands over every continue rule but the owner's own word, the queue's
+firm rule among them. So a held turn ends with work still waiting.
+
+So a hold is one turn long. It ends the turn it lands in, the turn's end puts
+it back to `off`, and it reaches no later turn. A prompt writes no hold,
+because the press is the owner's word and the prompt carries its own.
 
 ## The two lines stand apart
 
