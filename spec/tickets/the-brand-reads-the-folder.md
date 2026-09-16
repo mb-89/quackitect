@@ -106,7 +106,11 @@ record:
     hand: box 02ae9414623e
     hash_before: 90a72bdde5e25cfb3bfbdff21c00fba56bcd4ee2
     hash_after: 90a72bdde5e25cfb3bfbdff21c00fba56bcd4ee2
-step: retro/cloud
+  - step: retro/cloud
+    hand: box 02ae9414623e
+    hash_before: 01d24a72655a023b8ddafa7a6cc8c223e57ab7cf
+    hash_after: 01d24a72655a023b8ddafa7a6cc8c223e57ab7cf
+step: children
 ---
 
 # Ask
@@ -243,17 +247,32 @@ review earns that, because each pass finds real holes.
 
 <!-- the form is list -->
 
+- the box starts no server, so the check stops at its health probe until the serve verb runs
+- the install answers every tool it names, and the proxy carries every host this session reaches
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- the write door refuses a shell write, and names the read tool then the edit tool
+- the write door refuses a commit message past the sentence rule and the tense rule
+- the write door refuses every write to the child ticket, until its ask meets the rules
+- the verdict guard refuses a hand-back, because the box commits under the hold
+- the cap inserts design/person-1 at the second return on one leaf
+- the battery reads red, because trunk answers findings at error
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- [[spec/tickets/brand-reads-folder]] stands at design/person-1, where a person rules on the plugin name
+- [[spec/tickets/the-tense-rule-reads-present]] stands in no group, and it holds this branch
+- [[spec/tickets/the-check-starts-the-server]] stands in no group
+- this ticket is the handover, because a group branch carries its retro here
 
 # Discussion
 
