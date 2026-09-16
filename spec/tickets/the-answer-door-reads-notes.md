@@ -89,12 +89,18 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8
     hash_before: 2b279908840f5dbc02099e199cae2c4d1cf702c4
     hash_after: ad8fa8964fcda9701c09020569303d2ffc2a4c68
+  - step: design/review
+    hand: box d42624a67d18a8 · helper-2
+    hash_before: b5beaec62548f3d5293fa7dfb7260476a7519109
+    hash_after: b5beaec62548f3d5293fa7dfb7260476a7519109
+    returns: 1
+    why: Name the word `namesNote` reads off the prompt. Both done_when cases wait on it, and neither stands decidable meanwhile.; `namesNext` stands nowhere in the tree. Point at `opensATurn` and `questionsIn` in `lib/answer.js`, which read a prompt the same way.; Say which `note` row pays. A growing count pays on any note, so a note on another matter clears the prompt.; Say what the `reply` line carries where a note pays. The demand after it reads `spoken` as the text it saw.; The disk read holds. The box carries the disk door, a fake stands beside it, and `ticket note` writes the row.; `./RUNME.sh check` answers 0.
 ---
 
 # Ask
@@ -144,6 +150,15 @@ For details, see [[spec/design_output/level0#the-owners-prompt-comes-first]].
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- Name the word `namesNote` reads off the prompt. Both done_when cases wait on it, and neither stands decidable meanwhile.
+- `namesNext` stands nowhere in the tree. Point at `opensATurn` and `questionsIn` in `lib/answer.js`, which read a prompt the same way.
+- Say which `note` row pays. A growing count pays on any note, so a note on another matter clears the prompt.
+- Say what the `reply` line carries where a note pays. The demand after it reads `spoken` as the text it saw.
+- The disk read holds. The box carries the disk door, a fake stands beside it, and `ticket note` writes the row.
+- `./RUNME.sh check` answers 0.
 
 # implement
 
