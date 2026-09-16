@@ -234,15 +234,19 @@ A desk session sees none of it.
 A box starts on trunk and leaves it in its first command. The window for a
 commit landing wrongly is the minute before that.
 
-Level zero refuses, on a cloud box:
+Level zero refuses, on a cloud box holding a work branch:
 
 - a `git commit` made while standing on `main`
 - a `git push` naming `main`, from any branch
 
 The refusal names `./RUNME.sh branch take` as the way out. A desk box meets none
-of it, because a box off the cloud merges by choice. The harness is the whole
-of the reason a cloud box stops: it opens no pull request, so trunk reaches it
-one way.
+of it, because a box off the cloud merges by choice.
+
+The branch in hand is the whole of the reason. A cloud box takes a work branch
+out of the queue and hands it back the same road. So trunk reaches that work
+through the hand-back alone. A cloud session outside that flow answers to the
+owner, and the green battery is the door it meets. The branch it stands on says
+which session it is.
 
 `branch take` and `branch done` reach git inside the command line, so the door sees
 the verb and leaves the plumbing alone.

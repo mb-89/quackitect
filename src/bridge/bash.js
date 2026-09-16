@@ -9,6 +9,7 @@ import { refusedCommand, refusedDelta } from "../../.claude/skills/level0/lib/re
 import { saysGreen, STAMP, stampOf } from "../../.claude/skills/level0/lib/runs.js";
 import { reaches, refusedTodo, taggedIn } from "../../.claude/skills/level0/lib/todo.js";
 import { landsOnTrunk, touchesGit, TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
+import { WORK_BRANCH } from "../scripts/group.js";
 import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
 
@@ -116,15 +117,21 @@ function trunkGuard(command, _e, box) {
     }
   }
   if (!onACloud()) return "";
+  if (!takesABranch(box)) return "";
   box.log.say("warn", "bash", `refused a ${how} landing on ${TRUNK}`, { tool: "Bash", detail: command });
   return [
-    `A cloud box works a branch, and the harness holds ${TRUNK} shut here.`,
+    `A cloud box holding a work branch hands it back, and ${TRUNK} stays shut here.`,
     "",
-    how === "commit" ? `You stand on ${TRUNK}, so this commit would land there.` : `This pushes ${TRUNK}, which a cloud box may never move.`,
+    how === "commit" ? `You stand on ${TRUNK}, so this commit would land there.` : `This pushes ${TRUNK}, and the branch in hand goes back to the queue instead.`,
     "",
     "Run `./RUNME.sh branch pull`, which takes a branch for a cloud box and moves you onto it.",
     "Push that branch, run `branch done`, and a box off the cloud takes it into trunk.",
   ].join("\n");
+}
+
+// A CLOUD BOX HOLDING A WORK BRANCH HANDS IT BACK, AND EVERY OTHER CLOUD SESSION LANDS ITS OWN WORK. The queue owns a work branch, so a cloud box taking one carries it to the hand-back and moves trunk nowhere. A session outside that flow answers to the owner alone, and the green battery is the door it meets. [[spec/design_output/work#a-red-battery-pushes-nothing]]
+function takesABranch(box) {
+  return git(box, ["rev-parse", "--abbrev-ref", "HEAD"]).startsWith(WORK_BRANCH);
 }
 
 function batteryHere(box) {
