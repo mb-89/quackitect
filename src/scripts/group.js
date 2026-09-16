@@ -181,7 +181,7 @@ function entryRows(entry) {
   return out;
 }
 
-// A value a reader would take for a mapping, a comment or a quote goes in quotes. [[spec/design_output/work#the-record-quotes-its-value]]
+// A value a reader takes for a mapping, a comment or a quote goes in quotes. [[spec/design_output/work#the-record-quotes-its-value]]
 export function quoted(said) {
   const text = String(said);
   if (!/: |^["'>|&*!%@`[{]|#| $|^$/.test(text)) return text;
