@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 steps:
   - name: sync
@@ -94,6 +94,11 @@ record:
     hand: box b9be613824b0
     hash_before: 8faabc244cb937c565bfdaa4f359ea69ff7c3603
     hash_after: 8faabc244cb937c565bfdaa4f359ea69ff7c3603
+  - step: retro/cloud
+    hand: box b9be613824b0
+    hash_before: a8f8a7f58197217e3bfa6b38259cb500c8a743b5
+    hash_after: a8f8a7f58197217e3bfa6b38259cb500c8a743b5
+reason: done
 ---
 
 # Ask
@@ -175,21 +180,21 @@ The tree carries two trunks. The remote `main` roots at a commit from today, and
 
 ### lacked
 
-<!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
-<!-- the form is list -->
+- nothing: the install ran whole, and every host the run reached answered
+- the server behind `check` stands down on this box. The rest of `check` passes
 
 ### met
 
-<!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
-<!-- the form is list -->
+- a conflict at sync: `branch take` claimed the group, and `branch sync` refused on unrelated roots
+- the sync refusal left the working tree clean, so the advice to read `git status` found nothing to read
+- the group stands at `children` in its record with its sync evidence empty, because the sync verb answers 1 here
 
 ### left
 
-<!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
-<!-- the form is list -->
+- `branch merge a-group-is-a-branch` waits for a person, because trunk and this branch share no root
+- the two roots are a person's call: local `main` roots at 581b2647, and `origin/main` roots at 84bd1d30
+- the retro names two fixes to `src/scripts/work.js` and one to [[spec/design_output/work#trunk-comes-in-first]], and no ticket carries them yet
+- the group holds one child, the-verbs-read-a-group, and that child closes done
 
 # Discussion
 
