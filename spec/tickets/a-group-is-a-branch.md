@@ -72,7 +72,7 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: retro/write
+step: retro/cloud
 process: [[group]]
 record:
   - step: children
@@ -90,6 +90,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box b9be613824b0
+    hash_before: 8faabc244cb937c565bfdaa4f359ea69ff7c3603
+    hash_after: 8faabc244cb937c565bfdaa4f359ea69ff7c3603
 ---
 
 # Ask
@@ -136,33 +140,34 @@ Done is a tree where no file names a group kind. `branch list` then names a grou
 
 ### done
 
-<!-- what was done, one line a ticket or a thing -->
-
-<!-- the form is list -->
+- the-verbs-read-a-group: `branch list` draws a row per ticket under its group, closed done
+- [[spec/design_output/work#a-ticket-under-its-group]] holds the shape of the new rows
+- two cases in `test/level0/work.test.js` hold the code, and one of them goes red without it
+- `retro notes` found no private note, so the box leaves none behind
 
 ### well
 
-<!-- what went well, and what made it go well -->
-
-<!-- the form is list -->
+- the pull handed one leaf at a time, so the ask stood small enough to read whole
+- `ticketsOn` already took any ref, so the read costs one call and no new door
+- the check ran 900 tests green, and the rules passed over every file this change touches
+- `branch list` drew the new rows on the real tree, and ten groups named their tickets
 
 ### badly
 
-<!-- what did not, each with its moment in the log or the transcript -->
-
-<!-- the form is list -->
+- `branch take` claimed the group, and `branch sync` then refused: trunk and the branch carry unrelated roots
+- the refusal said git status names the files, and git named none, because the merge stopped first
+- local `main` stands at a root the remote dropped, so a work branch reads a trunk the remote lost
+- the group took its own children step before its sync step, and the sync evidence stands empty
 
 ### improve
 
-<!-- how each bad line stops happening, named by its home -->
-
-<!-- the form is list -->
+- `src/scripts/work.js`: `sync` names the unrelated-roots case apart from a conflict, and says what a hand does
+- [[spec/design_output/work#trunk-comes-in-first]]: the trunk step says what an unrelated root means
+- `src/scripts/work.js`: the take stops at a sync it fails, and holds the next leaf back
 
 ### thoughts
 
-<!-- what the thoughts say that the actions do not, off the transcript -->
-
-<!-- the form is text -->
+The tree carries two trunks. The remote `main` roots at a commit from today, and every work branch roots at one from last week. So `branch sync` cannot run at all, and the contract opens on a step no hand completes here. The work still lands, because a group's children touch files trunk leaves alone. The next merge is where the two roots meet, and that meeting belongs to a person.
 
 ## cloud
 
