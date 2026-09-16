@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 steps:
   - name: design
@@ -129,6 +129,11 @@ record:
       - name: check
         exit: 0
         said: 6 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box d42624a67d18a8 · helper-7
+    hash_before: 1e9da3976337dc3b6e2c6fe405d45a56d94b82d2
+    hash_after: 1e9da3976337dc3b6e2c6fe405d45a56d94b82d2
+reason: done
 ---
 
 # Ask
@@ -270,11 +275,38 @@ The ticket schema now lets anyone write the ask. The door kept a hand off two as
 
 <!-- the form is files -->
 
+spec/tickets/shim-resolves-vehicle.md
+spec/tickets/the-shim-resolves-the-vehicle.md
+spec/design_input/a-stub-takes-its-vehicle.md
+spec/guidance/review/reviewing.md
+src/stub/RUNME.sh
+src/scripts/vehicle.js
+src/scripts/cli.js
+src/scripts/review.js
+spec/schemas/ticket.schema.yaml
+.claude/skills/level0/lib/ticket.js
+test/contract/stub.test.js
+test/level0/vehicle.test.js
+test/level0/ticket.test.js
+spec/design_output/vehicle.md
+spec/design_output/schema.md
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- The shim takes the three roads the approach names, and execs the vehicle with `SE_WORK_ROOT` at the stub.
+- A shim finding no vehicle prints one line naming the upstream and the install road, and exits 1.
+- The contract test drives the shim over a fixture stub with a fake register, and reads argv.
+- The vehicle verb inside a stub names the vehicle as method and the stub as work.
+- Every rule the branch adds meets something bad in a test: an empty register exits 1, a draft-scoped ask refuses.
+- The ticket schema, the ticket door and the schema note stand outside the ask, as a trivial fix.
+- `./RUNME.sh check` on the branch exits 0, with six warnings the check allows.
+- The handback holds no retro, and the route carries the retro step after this verdict.
+- The vehicle note keeps the heading Two roads to the vehicle over three roads, and the links anchor on it.
 
 # Discussion
 
