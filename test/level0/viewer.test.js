@@ -101,3 +101,17 @@ test("a Windows box builds logview.exe", () => {
   });
   assert.equal(viewerOf({ disk, proc, root: ROOT, windows: true }).exe, `${EXE}.exe`);
 });
+
+// [[spec/design_output/viewer#the-verb-builds-it]]
+test("a move in the shared module rebuilds the viewer", () => {
+  const disk = source();
+  const proc = goWrites(disk);
+  disk.write(`${ROOT}/src/yaml/yaml.go`, "package yaml");
+  viewerOf({ disk, proc, root: ROOT });
+  const ran = proc.ran.length;
+  viewerOf({ disk, proc, root: ROOT });
+  assert.equal(proc.ran.length, ran, "a tree standing still runs no second build");
+  disk.write(`${ROOT}/src/yaml/yaml.go`, "package yaml // moved");
+  viewerOf({ disk, proc, root: ROOT });
+  assert.equal(proc.ran.length, ran + 1, "a move in the shared module builds again");
+});

@@ -5,6 +5,8 @@
 package main
 
 import (
+	"quackitect/yaml"
+
 	"fmt"
 	"sort"
 	"strconv"
@@ -21,12 +23,12 @@ const (
 // [[spec/design_output/schema#the-schemas-read-once]]
 type Kinds struct {
 	order []string
-	at    map[string]*Doc
+	at    map[string]*yaml.Doc
 }
 
-func (one *Kinds) set(kind string, said *Doc) {
+func (one *Kinds) set(kind string, said *yaml.Doc) {
 	if one.at == nil {
-		one.at = map[string]*Doc{}
+		one.at = map[string]*yaml.Doc{}
 	}
 	if _, held := one.at[kind]; !held {
 		one.order = append(one.order, kind)
@@ -34,7 +36,7 @@ func (one *Kinds) set(kind string, said *Doc) {
 	one.at[kind] = said
 }
 
-func (one *Kinds) Get(kind string) *Doc {
+func (one *Kinds) Get(kind string) *yaml.Doc {
 	if one == nil {
 		return nil
 	}
@@ -55,32 +57,32 @@ func (one *Kinds) Names() []string {
 }
 
 // [[spec/design_output/schema#a-schema-names-its-chapters]]
-func isNoteSchema(said *Doc) bool {
-	if said == nil || asString(said.Get("kind")) == "" {
+func isNoteSchema(said *yaml.Doc) bool {
+	if said == nil || yaml.AsString(said.Get("kind")) == "" {
 		return false
 	}
-	body := asDoc(said.Get("body"))
-	return body != nil && len(asList(body.Get("sections"))) > 0
+	body := yaml.AsDoc(said.Get("body"))
+	return body != nil && len(yaml.AsList(body.Get("sections"))) > 0
 }
 
 // [[spec/design_output/schema#the-schemas-read-once]]
 func schemasIn(tree *Tree) *Kinds {
 	out := &Kinds{}
 	for _, name := range tree.Names(Schemas, SchemaEnd) {
-		said := asDoc(readYaml(tree.Read(Schemas + "/" + name)))
+		said := yaml.AsDoc(yaml.Read(tree.Read(Schemas + "/" + name)))
 		if isNoteSchema(said) {
-			out.set(asString(said.Get("kind")), said)
+			out.set(yaml.AsString(said.Get("kind")), said)
 		}
 	}
 	return out
 }
 
 // [[spec/design_output/schema#a-folder-names-its-kind]]
-func governorOf(schemas *Kinds, path string) *Doc {
+func governorOf(schemas *Kinds, path string) *yaml.Doc {
 	where := slashed(path)
 	for _, kind := range schemas.order {
 		schema := schemas.at[kind]
-		for _, glob := range stringsOf(schema.Get("governs")) {
+		for _, glob := range yaml.StringsOf(schema.Get("governs")) {
 			if matches(glob, where) {
 				return schema
 			}
@@ -90,8 +92,8 @@ func governorOf(schemas *Kinds, path string) *Doc {
 }
 
 // [[spec/design_output/schema#a-folder-names-its-kind]]
-func strangerFault(text string, schema *Doc, where string) (Finding, bool) {
-	held := asString(schema.Get("kind"))
+func strangerFault(text string, schema *yaml.Doc, where string) (Finding, bool) {
+	held := yaml.AsString(schema.Get("kind"))
 	kind := kindOf(text)
 	if held == "" || kind == held {
 		return Finding{}, false
@@ -105,14 +107,14 @@ func strangerFault(text string, schema *Doc, where string) (Finding, bool) {
 }
 
 // [[spec/design_output/schema#a-finding-names-the-section]]
-func checkNote(text string, schema *Doc, where string) []Finding {
+func checkNote(text string, schema *yaml.Doc, where string) []Finding {
 	note := readNote(text)
-	kind := asString(schema.Get("kind"))
-	out := frontFaults(note, asDoc(schema.Get("frontmatter")), kind, where)
-	return append(out, bodyFaults(note, asDoc(schema.Get("body")), kind, where)...)
+	kind := yaml.AsString(schema.Get("kind"))
+	out := frontFaults(note, yaml.AsDoc(schema.Get("frontmatter")), kind, where)
+	return append(out, bodyFaults(note, yaml.AsDoc(schema.Get("body")), kind, where)...)
 }
 
-func frontFaults(note Note, spec *Doc, kind, where string) []Finding {
+func frontFaults(note Note, spec *yaml.Doc, kind, where string) []Finding {
 	if !note.Front.Stands {
 		return []Finding{schemaFault("Frontmatter", where, 1,
 			fmt.Sprintf("A %s note opens with frontmatter.", kind))}
@@ -120,10 +122,10 @@ func frontFaults(note Note, spec *Doc, kind, where string) []Finding {
 
 	out := []Finding{}
 	said := note.Front.Said
-	props := asDoc(spec.Get("properties"))
+	props := yaml.AsDoc(spec.Get("properties"))
 
-	for _, key := range stringsOf(spec.Get("required")) {
-		if !empty(said.Get(key)) {
+	for _, key := range yaml.StringsOf(spec.Get("required")) {
+		if !yaml.Empty(said.Get(key)) {
 			continue
 		}
 		out = append(out, schemaFault(key, where, 1,
@@ -132,7 +134,7 @@ func frontFaults(note Note, spec *Doc, kind, where string) []Finding {
 
 	for _, key := range said.Keys() {
 		value := said.Get(key)
-		rule := asDoc(props.Get(key))
+		rule := yaml.AsDoc(props.Get(key))
 		line := note.Front.Lines[key]
 		if line == 0 {
 			line = 1
@@ -149,9 +151,9 @@ func frontFaults(note Note, spec *Doc, kind, where string) []Finding {
 	return out
 }
 
-func fieldFaults(key string, value any, rule *Doc, kind, where string, line int) []Finding {
+func fieldFaults(key string, value any, rule *yaml.Doc, kind, where string, line int) []Finding {
 	out := []Finding{}
-	isLink := asBool(rule.Get("x-link"))
+	isLink := yaml.AsBool(rule.Get("x-link"))
 	said := value
 	if isLink {
 		said = linkless(value)
@@ -163,7 +165,7 @@ func fieldFaults(key string, value any, rule *Doc, kind, where string, line int)
 	}
 	if rule.Has("const") && !same(said, rule.Get("const")) {
 		out = append(out, schemaFault(key, where, line,
-			fmt.Sprintf("%s reads %s, and a %s note names %s.", key, show(said), kind, asString(rule.Get("const")))))
+			fmt.Sprintf("%s reads %s, and a %s note names %s.", key, show(said), kind, yaml.AsString(rule.Get("const")))))
 	}
 	if allowed, held := rule.Get("enum").([]any); held {
 		if !holds(allowed, said) {
@@ -173,7 +175,7 @@ func fieldFaults(key string, value any, rule *Doc, kind, where string, line int)
 	}
 	if rule.Has("type") && !typed(value, rule.Get("type")) {
 		out = append(out, schemaFault(key, where, line,
-			fmt.Sprintf("%s takes %s, and this reads %s.", key, joined(flat(rule.Get("type")), " or "), typeOf(value))))
+			fmt.Sprintf("%s takes %s, and this reads %s.", key, joined(yaml.Flat(rule.Get("type")), " or "), typeOf(value))))
 	}
 	return out
 }
@@ -183,12 +185,12 @@ type standingAt struct {
 	at int
 }
 
-func bodyFaults(note Note, spec *Doc, kind, where string) []Finding {
+func bodyFaults(note Note, spec *yaml.Doc, kind, where string) []Finding {
 	level := 1
 	if spec.Has("headingLevel") {
-		level = asInt(spec.Get("headingLevel"))
+		level = yaml.AsInt(spec.Get("headingLevel"))
 	}
-	wanted := chaptersWanted(asList(spec.Get("sections")), note.Front.Said)
+	wanted := chaptersWanted(yaml.AsList(spec.Get("sections")), note.Front.Said)
 
 	standing := []standingAt{}
 	for i, one := range note.Sections {
@@ -197,20 +199,20 @@ func bodyFaults(note Note, spec *Doc, kind, where string) []Finding {
 		}
 	}
 
-	named := map[string]*Doc{}
+	named := map[string]*yaml.Doc{}
 	for _, one := range wanted {
-		if rule := asDoc(one); rule != nil {
-			named[asString(rule.Get("header"))] = rule
+		if rule := yaml.AsDoc(one); rule != nil {
+			named[yaml.AsString(rule.Get("header"))] = rule
 		}
 	}
 
 	out := []Finding{}
 	for _, one := range wanted {
-		rule := asDoc(one)
-		if rule == nil || !asBool(rule.Get("required")) {
+		rule := yaml.AsDoc(one)
+		if rule == nil || !yaml.AsBool(rule.Get("required")) {
 			continue
 		}
-		header := asString(rule.Get("header"))
+		header := yaml.AsString(rule.Get("header"))
 		if headed(standing, header) >= 0 {
 			continue
 		}
@@ -228,7 +230,7 @@ func bodyFaults(note Note, spec *Doc, kind, where string) []Finding {
 		}
 	}
 
-	if asString(spec.Get("order")) == "strict" {
+	if yaml.AsString(spec.Get("order")) == "strict" {
 		out = append(out, orderFaults(standing, wanted, kind, where)...)
 	}
 	out = append(out, lastFaults(standing, wanted, where)...)
@@ -242,13 +244,13 @@ func bodyFaults(note Note, spec *Doc, kind, where string) []Finding {
 }
 
 // [[spec/design_output/schema#three-keywords-name-a-step]]
-func chaptersWanted(sections []any, front *Doc) []any {
+func chaptersWanted(sections []any, front *yaml.Doc) []any {
 	out := []any{}
 	for _, one := range sections {
-		rule := asDoc(one)
+		rule := yaml.AsDoc(one)
 		list := ""
 		if rule != nil {
-			list = asString(rule.Get("x-one-per"))
+			list = yaml.AsString(rule.Get("x-one-per"))
 		}
 		if list == "" {
 			out = append(out, one)
@@ -257,16 +259,16 @@ func chaptersWanted(sections []any, front *Doc) []any {
 		if front == nil {
 			continue
 		}
-		for _, step := range asList(front.Get(list)) {
-			said := asDoc(step)
+		for _, step := range yaml.AsList(front.Get(list)) {
+			said := yaml.AsDoc(step)
 			if said == nil {
 				continue
 			}
-			header := strings.TrimSpace(asString(said.Get("name")))
+			header := strings.TrimSpace(yaml.AsString(said.Get("name")))
 			if header == "" {
 				continue
 			}
-			chapter := newDoc()
+			chapter := yaml.New()
 			chapter.Set("header", header)
 			chapter.Set("required", true)
 			out = append(out, chapter)
@@ -278,8 +280,8 @@ func chaptersWanted(sections []any, front *Doc) []any {
 func orderFaults(standing []standingAt, wanted []any, kind, where string) []Finding {
 	order := []string{}
 	for _, one := range wanted {
-		if rule := asDoc(one); rule != nil {
-			order = append(order, asString(rule.Get("header")))
+		if rule := yaml.AsDoc(one); rule != nil {
+			order = append(order, yaml.AsString(rule.Get("header")))
 		}
 	}
 
@@ -304,11 +306,11 @@ func orderFaults(standing []standingAt, wanted []any, kind, where string) []Find
 func lastFaults(standing []standingAt, wanted []any, where string) []Finding {
 	out := []Finding{}
 	for _, one := range wanted {
-		rule := asDoc(one)
-		if rule == nil || asString(rule.Get("position")) != "last" {
+		rule := yaml.AsDoc(one)
+		if rule == nil || yaml.AsString(rule.Get("position")) != "last" {
 			continue
 		}
-		header := asString(rule.Get("header"))
+		header := yaml.AsString(rule.Get("header"))
 		found := headed(standing, header)
 		if found < 0 || found == len(standing)-1 {
 			continue
@@ -319,23 +321,23 @@ func lastFaults(standing []standingAt, wanted []any, where string) []Finding {
 	return out
 }
 
-func sectionFaults(held standingAt, rule *Doc, note Note, where string) []Finding {
+func sectionFaults(held standingAt, rule *yaml.Doc, note Note, where string) []Finding {
 	out := []Finding{}
 	items := itemsIn(held.Own)
 
-	if asBool(rule.Get("list")) && len(items) == 0 {
+	if yaml.AsBool(rule.Get("list")) && len(items) == 0 {
 		out = append(out, schemaFault(held.Header, where, held.Line,
 			fmt.Sprintf("%s holds a list of items.", held.Header)))
 	}
-	if asBool(rule.Get("ordered")) && someUnnumbered(items) {
+	if yaml.AsBool(rule.Get("ordered")) && someUnnumbered(items) {
 		out = append(out, schemaFault(held.Header, where, held.Line,
 			fmt.Sprintf("%s numbers every item.", held.Header)))
 	}
-	if most := asInt(rule.Get("maxItems")); most > 0 && len(items) > most {
+	if most := yaml.AsInt(rule.Get("maxItems")); most > 0 && len(items) > most {
 		out = append(out, schemaFault(held.Header, where, held.Line+items[most].line,
 			fmt.Sprintf("A note holds %d items.", most)))
 	}
-	if spec := asDoc(rule.Get("subsections")); spec != nil {
+	if spec := yaml.AsDoc(rule.Get("subsections")); spec != nil {
 		out = append(out, underFaults(held, spec, note, where)...)
 	}
 	return out
@@ -347,10 +349,10 @@ type numberedSection struct {
 	header string
 }
 
-func underFaults(held standingAt, spec *Doc, note Note, where string) []Finding {
+func underFaults(held standingAt, spec *yaml.Doc, note Note, where string) []Finding {
 	level := held.Level + 1
 	if spec.Has("headingLevel") {
-		level = asInt(spec.Get("headingLevel"))
+		level = yaml.AsInt(spec.Get("headingLevel"))
 	}
 
 	out := []Finding{}
@@ -363,7 +365,7 @@ func underFaults(held standingAt, spec *Doc, note Note, where string) []Finding 
 			continue
 		}
 		found := numberedAt.FindStringSubmatch(one.Header)
-		if asBool(spec.Get("numbered")) && found == nil {
+		if yaml.AsBool(spec.Get("numbered")) && found == nil {
 			out = append(out, schemaFault(held.Header, where, one.Line,
 				fmt.Sprintf("A chapter under %s opens with the number of the item it argues.", held.Header)))
 			continue
@@ -374,7 +376,7 @@ func underFaults(held standingAt, spec *Doc, note Note, where string) []Finding 
 		}
 	}
 
-	if asString(spec.Get("order")) != "strict" {
+	if yaml.AsString(spec.Get("order")) != "strict" {
 		return out
 	}
 	for i := 1; i < len(numbers); i++ {
@@ -388,15 +390,15 @@ func underFaults(held standingAt, spec *Doc, note Note, where string) []Finding 
 }
 
 // [[spec/design_output/schema#a-placeholder-stands-at-warning]]
-func placeholderFaults(text string, schema *Doc, where string) []Finding {
-	rows := splitLines(text)
+func placeholderFaults(text string, schema *yaml.Doc, where string) []Finding {
+	rows := yaml.SplitLines(text)
 	note := readNote(text)
-	props := asDoc(asDoc(schema.Get("frontmatter")).Get("properties"))
+	props := yaml.AsDoc(yaml.AsDoc(schema.Get("frontmatter")).Get("properties"))
 	out := []Finding{}
 
 	for _, key := range note.Front.LineKeys {
 		line := note.Front.Lines[key]
-		rule := asDoc(props.Get(key))
+		rule := yaml.AsDoc(props.Get(key))
 		if rule == nil || rule.Has("const") {
 			continue
 		}
@@ -410,13 +412,13 @@ func placeholderFaults(text string, schema *Doc, where string) []Finding {
 	}
 
 	named := map[string]string{}
-	for _, one := range asList(asDoc(schema.Get("body")).Get("sections")) {
-		rule := asDoc(one)
+	for _, one := range yaml.AsList(yaml.AsDoc(schema.Get("body")).Get("sections")) {
+		rule := yaml.AsDoc(one)
 		if rule == nil {
 			continue
 		}
-		if said := asString(rule.Get("description")); said != "" {
-			named[asString(rule.Get("header"))] = fmt.Sprintf("<!-- %s -->", said)
+		if said := yaml.AsString(rule.Get("description")); said != "" {
+			named[yaml.AsString(rule.Get("header"))] = fmt.Sprintf("<!-- %s -->", said)
 		}
 	}
 	for _, held := range note.Sections {
@@ -470,7 +472,7 @@ func noteFaults(schemas *Kinds, path, text string) []Finding {
 	kind := kindOf(text)
 	governor := governorOf(schemas, path)
 
-	if governor != nil && asString(governor.Get("kind")) != kind {
+	if governor != nil && yaml.AsString(governor.Get("kind")) != kind {
 		if found, stands := strangerFault(text, governor, path); stands {
 			out = append(out, found)
 		}
@@ -489,27 +491,27 @@ func noteFaults(schemas *Kinds, path, text string) []Finding {
 	return append(out, placeholderFaults(text, schema, path)...)
 }
 
-func minted(rule *Doc) string {
+func minted(rule *yaml.Doc) string {
 	if rule.Has("const") {
-		if asBool(rule.Get("x-link")) {
-			return fmt.Sprintf("[[%s]]", asString(rule.Get("const")))
+		if yaml.AsBool(rule.Get("x-link")) {
+			return fmt.Sprintf("[[%s]]", yaml.AsString(rule.Get("const")))
 		}
-		return asString(rule.Get("const"))
+		return yaml.AsString(rule.Get("const"))
 	}
 	if allowed, listed := rule.Get("enum").([]any); listed && len(allowed) > 0 {
-		return asString(allowed[0])
+		return yaml.AsString(allowed[0])
 	}
 
-	said := asString(rule.Get("description"))
+	said := yaml.AsString(rule.Get("description"))
 	if said == "" {
 		said = "what goes here"
 	}
-	for _, one := range flat(rule.Get("type")) {
-		if asString(one) == "array" {
+	for _, one := range yaml.Flat(rule.Get("type")) {
+		if yaml.AsString(one) == "array" {
 			return fmt.Sprintf("[%q]", said)
 		}
 	}
-	if asBool(rule.Get("x-link")) {
+	if yaml.AsBool(rule.Get("x-link")) {
 		return fmt.Sprintf("[[%s]]", said)
 	}
 	return said
@@ -587,21 +589,21 @@ func same(a, b any) bool {
 		}
 		return true
 	}
-	if asDoc(a) != nil || asDoc(b) != nil {
+	if yaml.AsDoc(a) != nil || yaml.AsDoc(b) != nil {
 		return false
 	}
 	return fmt.Sprintf("%T:%v", a, a) == fmt.Sprintf("%T:%v", b, b)
 }
 
 func typed(value any, said any) bool {
-	for _, one := range flat(said) {
-		switch asString(one) {
+	for _, one := range yaml.Flat(said) {
+		switch yaml.AsString(one) {
 		case "array":
 			if _, held := value.([]any); held {
 				return true
 			}
 		case "object":
-			if asDoc(value) != nil {
+			if yaml.AsDoc(value) != nil {
 				return true
 			}
 		case "string":
@@ -627,14 +629,14 @@ func typeOf(value any) string {
 	if _, held := value.([]any); held {
 		return "a list"
 	}
-	if asDoc(value) != nil {
+	if yaml.AsDoc(value) != nil {
 		return "a map"
 	}
 	return "one line"
 }
 
 func show(said any) string {
-	flatSaid := asString(said)
+	flatSaid := yaml.AsString(said)
 	if one, held := said.([]any); held {
 		flatSaid = joined(one, ", ")
 	}
@@ -647,7 +649,7 @@ func show(said any) string {
 func joined(said []any, with string) string {
 	parts := make([]string, 0, len(said))
 	for _, one := range said {
-		parts = append(parts, asString(one))
+		parts = append(parts, yaml.AsString(one))
 	}
 	return strings.Join(parts, with)
 }

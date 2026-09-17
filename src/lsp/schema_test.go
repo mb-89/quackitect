@@ -1,6 +1,8 @@
 package main
 
 import (
+	"quackitect/yaml"
+
 	"strings"
 	"testing"
 )
@@ -41,9 +43,9 @@ body:
       description: what the next reader does
 `
 
-func schemaHere(t *testing.T) *Doc {
+func schemaHere(t *testing.T) *yaml.Doc {
 	t.Helper()
-	said := asDoc(readYaml(handoverSchema))
+	said := yaml.AsDoc(yaml.Read(handoverSchema))
 	if said == nil {
 		t.Fatal("the schema reads as nothing")
 	}
@@ -111,7 +113,7 @@ body:
 
 // [[spec/design_output/schema#three-keywords-name-a-step]]
 func TestAStepNamesItsOwnChapter(t *testing.T) {
-	schema := asDoc(readYaml(ticketSchema))
+	schema := yaml.AsDoc(yaml.Read(ticketSchema))
 	note := "---\nkind: [[ticket]]\nsteps:\n  - name: do\n    does: makes it\n---\n\n# Ask\n\nA thing.\n\n# do\n\nDone.\n\n# Discussion\n"
 	if found := checkNote(note, schema, "spec/tickets/a.md"); len(found) != 0 {
 		t.Fatalf("a chapter a step names answers %v", rules(found))
@@ -246,5 +248,18 @@ func TestTheSweepSkipsADraft(t *testing.T) {
 	})
 	if found := schemaFaults(tree); len(found) != 0 {
 		t.Fatalf("a parked draft answers %v", found)
+	}
+}
+
+// [[spec/design_output/schema#a-schema-names-its-chapters]]
+func TestASchemaNamingChaptersReadsAsANoteSchema(t *testing.T) {
+	if !isNoteSchema(schemaHere(t)) {
+		t.Error("a schema with a kind and sections names a note schema")
+	}
+	if isNoteSchema(yaml.AsDoc(yaml.Read("kind: handover\n"))) {
+		t.Error("a schema naming no chapter is no note schema")
+	}
+	if isNoteSchema(nil) {
+		t.Error("no schema is no note schema")
 	}
 }
