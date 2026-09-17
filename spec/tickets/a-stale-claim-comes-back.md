@@ -68,27 +68,50 @@ The tree measures the age already, and the pieces stand in three places:
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test test/level0/stand.test.js test/level0/work.test.js
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
+A claim older than the span comes back to the queue, so a box that runs out of session strands no branch.
 
-<!-- the form is text -->
+`src/scripts/stand.js` holds what stands free, and the stale reading stands in one place there:
+
+| what | what it answers |
+|---|---|
+| `staleSpan` | the span, out of `work.staleAfter`, and `STALE` where the config says nothing |
+| `staleClaim` | the age of a claim, and whether it stands past the span |
+| `freeIn` | a branch at `todo`, and a branch whose claim goes stale |
+
+`rowOf` in the work verbs read the span and the age itself. It reads `staleClaim` now, so the list and the take answer one reading.
+
+`freeIn` takes the box and the clock. A caller handing neither reads no claim as stale, so `freeNow` keeps its old answer, and `trigger` hands the clock in.
+
+The split the write door asks for lands with it:
+
+| what moves | where it lands |
+|---|---|
+| `tipAge`, `freeIn`, `freeNow`, `trigger` | `src/scripts/stand.js` |
+| the cases covering them | `test/level0/stand.test.js` |
+
+Seven cases stand, and each drives one reading:
+
+| the case | what it reads |
+|---|---|
+| the span, three ways | `work.staleAfter`, the default, and a value nobody parses |
+| a fresh claim, and a stale one | the age, and the answer over the span |
+| the take over each | the fresh one passed over, and the stale one handed out |
+| a stale claim a dependency holds | held, stale or no |
+| a take carrying no clock | no claim reads stale |
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change follows the ask. `freeIn` reads the stale claim, and the list and the take share one reading.
+- the cleanup stands in the change. `rowOf` gives up its own span and age, so the tree holds one.
+- every fact stands in one place. `staleSpan` and `staleClaim` answer for both callers.
 
 # Discussion
 

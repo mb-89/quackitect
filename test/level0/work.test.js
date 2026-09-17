@@ -17,12 +17,10 @@ import {
   CONTRACT_HEADING,
   DONE,
   dependsOn,
-  freeNow,
   groupStanding,
   HELD,
   MERGED,
   MINE,
-  standingOf,
   setStatus,
   statusOf,
   TODO,
@@ -126,20 +124,6 @@ test("a branch waits for a dependency until trunk holds it", () => {
     ["work/merged", MERGED],
   ]);
   assert.deepEqual(waitingOn(brief, standing), ["open", "busy", "ready"]);
-});
-
-test("a dependency done and unmerged holds its dependent, and merged frees it", () => {
-  const said = (status, waits) =>
-    `---\nstatus: ${status}\n${waits ? `depends_on: ${waits}\n` : ""}---\n\n# A brief\n`;
-  const briefs = new Map([
-    ["work/the-schema-reads", said(DONE)],
-    ["work/the-schema-refuses", said(TODO, "the-schema-reads")],
-  ]);
-  assert.deepEqual(freeNow(briefs), [], "done waits on a merge");
-  assert.deepEqual(freeNow(briefs, new Set(["work/the-schema-reads"])), [
-    "work/the-schema-refuses",
-  ]);
-  assert.equal(standingOf(briefs, new Set(["work/the-schema-reads"])).get("work/the-schema-reads"), MERGED);
 });
 
 test("urgency orders now before soon before whenever", () => {
@@ -518,28 +502,6 @@ test("done refuses where the battery answers nothing green", () => {
     [join(ROOT, STAMP)]: JSON.stringify({ sha: SHA, ok: true, clean: false, at: "now" }),
   });
   assert.match(heard(() => work(ROOT, ["done"], dirty.it)).said, /unclean tree/);
-});
-
-test("freeNow names a branch at todo waiting on nobody, and no other", () => {
-  const said = (status, waits) =>
-    `---\nstatus: ${status}\n${waits ? `depends_on: ${waits}\n` : ""}---\n\n# A brief\n`;
-
-  const free = freeNow(
-    new Map([
-      ["work/open", said(TODO)],
-      ["work/waiting", said(TODO, "open")],
-      ["work/holding", said(HELD)],
-      ["work/finished", said(DONE)],
-    ]),
-  );
-
-  assert.deepEqual(free, ["work/open"]);
-});
-
-test("freeNow frees a branch whose dependency left the queue", () => {
-  const waits = `---\nstatus: ${TODO}\ndepends_on: merged-already\n---\n\n# A brief\n`;
-
-  assert.deepEqual(freeNow(new Map([["work/late", waits]])), ["work/late"]);
 });
 
 // A branch carrying a group ticket is a group. [[spec/design_output/work#a-group-is-a-ticket]]

@@ -37,13 +37,13 @@ import { handOf, pull, takeable } from "./pull.js";
 import { readyToMerge, review } from "./review.js";
 import { serving } from "./serve.js";
 import { testVerb } from "./test-verb.js";
+import { freeIn, staleClaim, trigger } from "./stand.js";
 import { unblock } from "./unblock.js";
 export const BRIEF = "HANDOVER.md";
 const COL = { branch: 34, child: 32, kind: 6, status: 6, why: 24 };
-const MS = 1000;
+export const MS = 1000;
 // [[spec/design_output/work#a-merged-branch-closes]]
 export const MINE = /^(work|claude)\//;
-
 export const TODO = "todo";
 export const HELD = "held";
 
@@ -229,7 +229,7 @@ export function standingAll(stand, merged) {
   );
 }
 
-function noteOf(one) {
+export function noteOf(one) {
   return one.brief || one.ticket;
 }
 
@@ -255,12 +255,6 @@ function ticketsOn(it, ref) {
     .map((path) => ({ path, name: ticketNamed(path), text: textAt(it, ref, path) }));
 }
 
-// [[spec/design_output/work#a-stale-group-is-yours]]
-function tipAge(it, branch, now) {
-  const said = it.git.run(["log", "-1", "--format=%ct", `origin/${branch}`], true);
-  if (!now || !said.ok || !said.out) return -1;
-  return Math.max(0, Math.floor(now / MS) - Number(said.out));
-}
 
 export function setStatus(text, to) {
   const said = String(text ?? "");
@@ -548,34 +542,6 @@ function claimGroup(it, one) {
 }
 
 // [[spec/design_output/work#the-routine-a-verb-names]]
-function freeIn(stand, standing) {
-  return stand
-    .filter((one) => standing.get(one.branch) === TODO)
-    .filter((one) => !waitingOn(noteOf(one), standing).length);
-}
-
-// [[spec/design_output/work#the-routine-a-verb-names]]
-export function freeNow(briefs, merged = new Set()) {
-  const stand = [...briefs].map(([branch, brief]) => ({ branch, brief, ticket: "" }));
-  return freeIn(stand, standingAll(stand, merged)).map((one) => one.branch);
-}
-
-function trigger(it) {
-  const stand = standOf(it);
-  const free = freeIn(stand, standingAll(stand, mergedHere(it))).map((one) => one.branch);
-
-  console.log(`${ROUTINE.name} runs ./RUNME.sh branch pull on a cloud box, and the engine takes a branch there.`);
-  console.log("Fire it with the RemoteTrigger tool, once for every box you want:\n");
-  console.log(`    action=run  trigger_id=${ROUTINE.id}\n`);
-
-  if (!free.length) {
-    console.log("No branch stands free, so a box fired now takes nothing.");
-    return 0;
-  }
-  console.log("These branches stand free, and a box takes one each:");
-  for (const branch of free) console.log(`  ${branch}`);
-  return 0;
-}
 
 function finish(it) {
   const branch = workBranchHere(it, "done");
@@ -779,13 +745,13 @@ function rowOf(it, one, standing, now) {
   const status = standing.get(one.branch) || "no status";
   const waits = waitingOn(text, standing);
   const why = waits.length ? `waits for ${waits.join(", ")}` : urgencyOf(text);
-  const held = status === HELD ? tipAge(it, one.branch, now) : -1;
-  const age = held < 0 ? "" : aged(held);
+  // [[spec/design_output/work#a-stale-group-is-yours]]
+  const { age, stale } = status === HELD ? staleClaim(it, one.branch, now) : { age: "", stale: false };
 
   return {
     name: one.name,
     age,
-    stale: held >= 0 && held > (spanOf(it.stale || STALE) || spanOf(STALE)),
+    stale,
     said: `${one.branch.padEnd(COL.branch)} ${kind.padEnd(COL.kind)} ${status.padEnd(COL.status)} ${why.padEnd(COL.why)} ${age}`,
   };
 }
