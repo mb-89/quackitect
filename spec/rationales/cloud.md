@@ -59,7 +59,31 @@ session to collect it later.
 The box holds the only copy of anything uncommitted. There is no second chance
 to collect it, because nothing survives the session.
 
-## 9. One session, one branch
+## 6. A person blocks no branch
+
+A cloud box runs while nobody sits beside it. So a step whose `by` reads `person`
+waits the whole session, and the branch waits with it. Every step
+behind that one waits too, though an agent could take them.
+
+One group showed the cost: three children, one of them parked at a person step,
+and the box released the branch having finished nothing. The next box took the
+same branch, met the same step, and released it again.
+
+The person's work is real, and dropping it is the other failure. So it moves to
+a ticket of its own, outside the group, carrying the question and what stands
+open. The group then closes, the branch merges, and the ticket is the reminder.
+
+## 7. What a leaving branch owes
+
+A branch that merges half-done is honest only if what it left stands written
+somewhere a person reads. The successor ticket is that record, and `reason:
+became` with `successors` is the link back.
+
+The alternative is a branch held open until a person answers. That blocks the
+tickets depending on it, and a dependency reads a closed ticket, not a finished
+one. So closing is what frees the chain.
+
+## 11. One session, one branch
 
 A session reading this note from `take` to `done` finds no line saying it stops
 there. So it offers a second branch, having just closed its own, which is the
@@ -73,7 +97,7 @@ A branch listing also goes stale inside a session. `work list` reads origin at
 the moment of the call, and an hour of work later another session has moved
 what it named. So run it again before naming a status out loud.
 
-## 10. Saying the commit
+## 12. Saying the commit
 
 A cloud box clones the branch tip as it stood when the session began. Somebody
 pushing a minute later leaves the box behind while it reports itself current.

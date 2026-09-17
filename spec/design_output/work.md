@@ -136,6 +136,30 @@ is the box saying it leaves. Then it reads the children:
 So an open group nobody holds comes back to the queue, and a person answers on
 its branch.
 
+# A person step leaves
+
+A step whose `by` reads `person` stops no cloud box. `branch unblock <ticket>
+<successor>` takes the ticket standing at that step and hands its rest to a
+ticket outside the group:
+
+| what it reads | what it writes |
+|---|---|
+| the ticket stands open, in this group, at a step `by: person` | the ticket closes `state: closed`, `reason: became`, `successors: [<name>]` |
+| the successor stands open and names no group | the question that step asks, under the successor's `Discussion`, beside the ticket it comes from |
+
+So `branch done` meets no open child, the group closes, and one push carries the
+successor with it. The person answers on a ticket of their own, and every step
+behind them runs on.
+
+The verb refuses three things:
+
+- a ticket standing where a hand can take it
+- a successor standing inside the group it frees
+- a successor nobody holds yet
+
+The box mints that last one with `./RUNME.sh mint ticket`, and writes what
+stands open into its ask.
+
 # Two handovers
 
 | file | tracked | who reads it | where it can stand |

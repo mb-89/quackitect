@@ -1228,3 +1228,18 @@ test("the hold reads back what the pull writes, and a box with no id mints one",
   assert.equal(JSON.parse(disk.read(at(".se/box.json"))).id, "fresh1");
   assert.equal(holdOf(it, "box fresh1").ticket, "a-child");
 });
+
+// [[spec/design_output/pull#done-leaves-no-takeable-step]]
+test("takeable waits on an open dependency, so the pull and branch done name the same step", () => {
+  const waits = CHILD("open", "design/draft", "depends_on: [a-first]\n");
+  const { it } = doors(standing(waits));
+  const held = { name: "a-child", text: waits };
+  const withFirst = (state) => [held, { name: "a-first", text: CHILD(state) }];
+
+  assert.equal(takeable(it, held, withFirst("open")), "", "an open dependency holds it");
+  assert.equal(
+    takeable(it, held, withFirst("closed")),
+    "design/draft",
+    "a closed dependency frees it",
+  );
+});

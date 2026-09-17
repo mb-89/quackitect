@@ -1,32 +1,28 @@
 ---
 status: held
-kind: [[brief]]
+kind: [[handover]]
 urgency: now
 ---
 
 # Ask
 
-A cloud box stops when a step wants a person, and the whole branch stops with
-it. The owner wants the opposite: the box hands the person's work out of the
-branch, finishes everything an agent can take, and marks the branch done.
+A cloud box stops when a step wants a person, and the branch stops with it. The
+owner wants the opposite: the box hands the person's work out of the branch,
+finishes every step an agent can take, and marks the branch done. The ticket it
+mints carries what stands open, so the chain behind the person keeps moving.
 
-The ticket the box mints is the reminder that work stands open. So nothing is
-dropped, and the chain behind the person keeps moving.
+# Where it stands
 
-Done is four things:
+The branch carries the brief alone, and the work starts here.
 
-- a verb takes every open child standing at a person step, mints its successor
-  outside the group, and closes the child as `became`
-- `takeable` reads `depends_on`, so `branch done` and the pull agree on what a
-  hand can take
-- the cloud guidance says hand the person's work out, in place of stopping
-- the contract every brief carries says the same
+# What waits
 
 | the piece | where | proves it |
 |---|---|---|
 | the successor, minted outside the group | the engine | a group whose last step wants a person still closes |
-| `depends_on` in `takeable` | the engine | the pull and `branch done` name the same takeable step |
-| the rule | the cloud guidance and the brief contract | a box reads hand it out, not stop |
+| `depends_on` read by `takeable` | the engine | the pull and `branch done` name one takeable step |
+| the rule that replaces stopping | the cloud guidance | a box reads hand it out |
+| the same rule on every brief | the brief contract | a branch cut today carries it |
 
 ## How this branch runs
 
