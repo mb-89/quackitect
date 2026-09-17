@@ -287,7 +287,7 @@ func TestAHeldFilterWearsRedAltFAndAClearedLineBringsEveryRowBack(t *testing.T) 
 	if m.pane != paneShut || len(m.view) != 1 {
 		t.Fatalf("enter closes the filter pane and keeps the filter, and got pane %d view %v", m.pane, m.view)
 	}
-	if !strings.Contains(m.renderMarks(), levelStyle("error").Render("▼")) {
+	if !strings.Contains(m.renderMarks(), levelStyle("error").Render(filterMark)) {
 		t.Fatalf("a held filter lights the funnel, and the marks read %q", m.renderMarks())
 	}
 	m = erase(alt(m, 'f'), len("line 3"))
@@ -297,7 +297,7 @@ func TestAHeldFilterWearsRedAltFAndAClearedLineBringsEveryRowBack(t *testing.T) 
 	if m.pane != paneFilter {
 		t.Fatal("the filter pane stands open while the line clears")
 	}
-	if !strings.Contains(m.renderMarks(), dimStyle.Render("▼")) {
+	if !strings.Contains(m.renderMarks(), dimStyle.Render(filterMark)) {
 		t.Fatalf("a dropped filter darkens the funnel, and the marks read %q", m.renderMarks())
 	}
 }
@@ -384,7 +384,7 @@ func TestAltQKeepsThePromptsAndTheRepliesAndTheSameChordClearsIt(t *testing.T) {
 	if m.input.Value() != talkFilter || len(m.view) != 3 || m.pane != paneShut {
 		t.Fatalf("alt+q keeps the two prompts and the reply and opens no pane, and got %q %v %d", m.input.Value(), m.view, m.pane)
 	}
-	if !strings.Contains(m.renderMarks(), levelStyle("error").Render("▼")) {
+	if !strings.Contains(m.renderMarks(), levelStyle("error").Render(filterMark)) {
 		t.Fatalf("a filter alt+q sets lights the funnel, and the marks read %q", m.renderMarks())
 	}
 	m = chord(m, altQ)

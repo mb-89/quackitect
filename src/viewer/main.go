@@ -21,9 +21,10 @@ func main() {
 	opened := flag.String("pane", "", "with --frame: the pane to open, as details, help or filter")
 	narrow := flag.String("filter", "", "with --frame: the filter to hold")
 	floor := flag.String("floor", "", "with --frame: the floor to stand at, as debug, info, warn, error or fatal")
+	mouse := flag.Bool("mouse", true, "take the mouse, which costs the terminal's own text selection")
 	flag.Parse()
 	if flag.NArg() != 1 {
-		fmt.Fprintln(os.Stderr, "usage: logview [--frame --size WxH --pane details|help|filter --filter text] <session.jsonl>")
+		fmt.Fprintln(os.Stderr, "usage: logview [--frame --size WxH --pane details|help|filter --filter text] [--mouse=false] <session.jsonl>")
 		os.Exit(2)
 	}
 	path := flag.Arg(0)
@@ -43,10 +44,19 @@ func main() {
 		return
 	}
 
-	if _, err := tea.NewProgram(newModel(path, time.Local), tea.WithAltScreen()).Run(); err != nil {
+	if _, err := tea.NewProgram(newModel(path, time.Local), windowOpts(*mouse)...).Run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+}
+
+// What the window asks the terminal for. The mouse rides a switch, because a window taking it takes the terminal's text selection with it. [[spec/design_output/viewer#the-mouse-reaches-the-window]]
+func windowOpts(mouse bool) []tea.ProgramOption {
+	opts := []tea.ProgramOption{tea.WithAltScreen()}
+	if mouse {
+		opts = append(opts, tea.WithMouseCellMotion())
+	}
+	return opts
 }
 
 // [[spec/design_output/viewer#one-frame]]
