@@ -285,3 +285,22 @@ So the numbers stand in one file, and the reading stands in another. `grep -c` o
 The owner names this while [[spec/tickets/the-viewer-draws-the-note]] adds a colour for a note. That change puts the number in the kind list, and takes one copy out. `saidStyle` wrote the answer's number a second time, and it reads the list now.
 
 So the kind list stands as the one home for a kind's colour today, and this ticket moves that home out of Go.
+
+The owner reads the draft and rules against it twice. A reader takes this over the approach above, and the review reads both.
+
+| what the draft says | what the owner rules |
+|---|---|
+| a projection writes the Go | the reader asks the config for a key, and holds what it reads |
+| the values stand beside `level0.json` | the values stand under `spec/config/styles` |
+
+The tree bears the owner out, and the evidence stands in the tree:
+
+| what the draft claims | what stands |
+|---|---|
+| a Go program reads no config | `src/lsp/config.go` reads the three layers already, for the key `names.words` |
+| a shared Go module is new machinery | `SHARED` in `src/scripts/viewer.js` carries `quackitect/yaml` across programs already |
+| `spec/config/styles` holds a projection target | the entry names `spec/config/styles/VoiceParagraph`, so a file beside it stands free |
+
+So a projection buys nothing a reader gives. The shape the owner names is one reader, asked for a key, holding what it reads until the file moves. `src/lsp/config.go` answers one key today, so the work is to let that reader take any key, and to share it.
+
+A redraft takes this road, and names where the shared reader stands.
