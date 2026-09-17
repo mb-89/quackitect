@@ -18,6 +18,7 @@ import {
 } from "../../.claude/skills/level0/lib/guidance.js";
 import { toolLines, WANTED } from "../../.claude/skills/level0/lib/tools.js";
 import { readTools, writeSurvey } from "../scripts/tools.js";
+import { heldReadsIn } from "../scripts/guidance-hand.js";
 import { asks } from "./config.js";
 import { deadIndexLine } from "./search.js";
 
@@ -27,24 +28,35 @@ export const TOOLS_BLOCK = "level0-tools";
 const TOOLS_HEADING = "# What this box has";
 
 // [[spec/design_output/level0#the-standing-layer]]
-export function guidanceHere(disk, root, env = process.env, tooth = true) {
+export function guidanceHere(disk, root, env = process.env, tooth = true, work = root) {
   const notes = readNotes(disk, join(root, GUIDANCE));
   const wanted = new Set(notes.flatMap((one) => envOf(one.text)));
   const bound = Object.fromEntries([...wanted].map((name) => [name, env[name] ?? ""]));
   const here = notes.filter((one) => bindsHere(one.text, bound));
-  const counts = countsOf(here);
+  // A note the held step hands over rides the step, so the layer hands it no second time. [[spec/design_output/level0#the-standing-layer]]
+  const read = heldReadsIn(disk, join, work, env);
   // [[spec/design_output/level0#the-style-carries-a-note]]
   const session = here.filter((one) => !styled(one.text));
+  const counts = countsOf(carried(session, read));
   return {
-    standing: standingLayer(session),
+    standing: standingLayer(session, read),
     helper: standingLayer(here),
     ...counts,
     sentence: canary({ ...counts, stop: tooth }),
   };
 }
 
+// [[spec/design_output/level0#the-standing-layer]]
+export function carried(notes, read) {
+  return notes.filter((note) => {
+    const bare = String(note.name ?? "").replace(/\.md$/, "");
+    return !read.some((one) => one === bare || one.endsWith(`/${bare}`));
+  });
+}
+
 function readsGuidance(box) {
-  return guidanceHere(box.disk, box.method, process.env, asks(box, TOOTH) !== false);
+  const tooth = asks(box, TOOTH) !== false;
+  return guidanceHere(box.disk, box.method, process.env, tooth, box.work || box.method);
 }
 
 function readNotes(disk, folder) {

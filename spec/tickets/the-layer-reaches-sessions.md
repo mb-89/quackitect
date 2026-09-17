@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: guidance-rides-the-step
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 0fc2b4132f94 · claude-code-remote
@@ -121,6 +121,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 0fc2b4132f94 · claude-code-remote
+    hash_before: 073b5a643fc819053bb0be8f1a1b0cc46b12b3a2
+    hash_after: 073b5a643fc819053bb0be8f1a1b0cc46b12b3a2
+    answered:
+      - name: lint
+        exit: 0
+        said: 67 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
@@ -317,11 +325,17 @@ What surprises me:
 
 <!-- the form is command -->
 
+./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the two roads, the reader, and one new test file
+- every door the change reaches has a fake: the disk is the only door here, and it runs fake
+- a comment names the approach the change implements: each road heads its drop with the line saying why
 
 ## tests-green
 

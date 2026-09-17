@@ -9,6 +9,12 @@ import { landsOnTrunk } from "./trunk.js";
 import { lintText } from "./vale.js";
 import { readTools, whereIs } from "../../../../src/scripts/tools.js";
 import { statusOf } from "../../../../src/scripts/work.js";
+import { carried } from "../../../../src/bridge/guidance.js";
+import { heldReadsIn } from "../../../../src/scripts/guidance-hand.js";
+
+// [[spec/design_output/level0#the-standing-layer]]
+const rulesIn = (notes) =>
+  notes.reduce((total, one) => total + actionables(one.text).length, 0);
 import { candidateRun } from "./candidate-check.js";
 
 export const TOOL_WAIT = 4000;
@@ -94,12 +100,10 @@ export async function handle(event, it) {
         .sort((left, right) => left.name.localeCompare(right.name))
         .map((one) => ({ name: one.name, text: read(`spec/guidance/${one.name}`) }))
         .filter((one) => bindsHere(one.text, env));
-      const count = notes.reduce(
-        (total, one) => total + actionables(one.text).length,
-        0,
-      );
+      const handed = heldReadsIn(it.disk, it.join, it.root, env);
+      const count = rulesIn(carried(notes, handed));
       if (!count) throw new Error("No numbered guidance reaches this session.");
-      state.guidance = standingLayer(notes);
+      state.guidance = standingLayer(notes, handed);
       state.count = count;
       state.ready = true;
       return {
