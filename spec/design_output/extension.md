@@ -94,8 +94,11 @@ options and its mark, and each leaves the group open:
 | control | at rest | one click | five clicks |
 |---|---|---|---|
 | the engine | at rest | running | none |
-| binding | bound to the queue | unbound | god mode |
-| autonomy | finish your own token | start new tokens | ideation |
+| binding | `queue` | `unbound` | `god` |
+| autonomy | `finish` | `start` | `ideation` |
+
+The rows name the value each gesture writes. For what a value means, see
+[[spec/design_output/config#the-engine-controls]].
 
 Marking a group draws one, so an engine landing later takes an edit to the
 schema. The mark for the engine waits on the owner: play and stop, one per

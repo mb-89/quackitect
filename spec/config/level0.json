@@ -14,7 +14,7 @@
     "stepsBeforeSplit": 3
   },
   "engine": {
-    "comment": "The engine level one brings. binding says what the agent answers to.",
+    "comment": "The engine level one brings. spec/design_output/config.md, chapter The engine controls, says what each value means.",
     "binding": "queue"
   },
   "ask": {

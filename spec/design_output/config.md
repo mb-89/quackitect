@@ -151,6 +151,26 @@ number `5`, which keeps `"5" > 3` a bug nobody files.
 Where the schema knows no such key, the text lands as given. A key only the
 local file names resolves, and nothing knows its type.
 
+# The engine controls
+
+Two keys under `engine` say how a session takes work and how far it carries it.
+This chapter is the one place naming what each value means. The schema holds the
+enum, the sidebar draws the toggle, and the hooks read the field, and each of
+those points here.
+
+| key | value | what it means | who reads it |
+|---|---|---|---|
+| `engine.binding` | `queue` | the session takes the next leaf the pull hands out | `queueWaits` in `src/bridge/stop.js` |
+| `engine.binding` | `unbound` | the session takes a ticket a person names, and the pull hands out nothing on its own | nobody yet |
+| `engine.binding` | `god` | waits for the owner to say | nobody yet |
+| `engine.autonomy` | `finish` | waits for the owner to say | nobody yet |
+| `engine.autonomy` | `start` | waits for the owner to say | nobody yet |
+| `engine.autonomy` | `ideation` | waits for the owner to say | nobody yet |
+
+`engine.binding` stands at `queue` in `spec/config/level0.json`, and `engine.autonomy` carries no value there. So the second key is a promise the schema makes and no code keeps. [[spec/tickets/the-controls-wire-up]] carries the work that keeps it.
+
+A row reading "waits for the owner to say" is a value the enum admits and no note defines. A hand writing code for such a value reads this chapter first, and finds the answer here or nowhere.
+
 # The magic numbers take names
 
 A number that carries a meaning stands in one place, and code reads it by name.

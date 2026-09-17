@@ -1,5 +1,5 @@
 ---
-description: "config / engine / binding: sets engine.binding to unbound. Where the session takes its work from."
+description: "config / engine / binding: sets engine.binding to unbound. Where the session takes its work from. The chapter The engine controls, under spec/design_output/config.md, says what each value means."
 allowed-tools: Bash(./RUNME.sh config:*)
 generated: "GENERATED. Edit the source named below, not this file. It is written again every time the tree is projected, so an edit here is lost. Source: spec/config/level0.json"
 ---
