@@ -189,6 +189,12 @@ The tree carries two trunks. The remote `main` roots at a commit from today, and
 
 <!-- the form is checklist -->
 
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
 ## cloud
 
 <!-- names what the box lacked, met and leaves for a person -->

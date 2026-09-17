@@ -7,6 +7,7 @@ import {
   askForStop,
   decide,
   detail,
+  namesNext,
   pool,
   reprompt,
   rulesOf,
@@ -231,6 +232,16 @@ test("a firm continue rule holds past the cap, because the queue still holds wor
   assert.equal(it.atTurnEnd({ ends: false, go: { id: "work-still-stands" } }, 3).ends, true, "a plain rule lets go at the cap");
 });
 
+// [[spec/design_output/stop#the-chat-is-new]]
+test("an answer names a next step where a sentence opens on the agent's own next act, and a table or the canary names none", () => {
+  const canary = "level0 holds this session: 51 rules, 4 notes, the stop hook on.";
+  assert.equal(namesNext(`Understood. I read the branches first.\n\n${canary}`), true);
+  assert.equal(namesNext("Fifteen branches stand on origin. Next I run the reviewer."), true);
+  assert.equal(namesNext("- The merge stands complete.\n- Then I pull the next ticket."), true);
+  assert.equal(namesNext(`| Question | Answer |\n|---|---|\n| Next? | I read them |\n\n${canary}`), false, "a table names no step");
+  assert.equal(namesNext("The work stands complete.\n\nstop: the-work-stands-complete"), false);
+  assert.equal(namesNext(""), false);
+});
 
 test("a prompt from outside the plugin puts the count back", () => {
   const it = toothOf();

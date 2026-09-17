@@ -18,6 +18,7 @@ import { heldGroup, openPrivate, queueHolds } from "../../.claude/skills/level0/
 import {
   decide,
   detail,
+  namesNext,
   pool,
   RULES,
   STOP_CALL,
@@ -179,7 +180,8 @@ function ranHere(name, held) {
   if (name === "stop-hook-off") return held.off;
   if (name === "owner-holds") return held.hold === STOP;
   if (name === "owner-finishes") return held.hold === FINISH;
-  if (name === "chat-is-new") return chatIsNew(held.box);
+  // An answer naming a next step takes no free stop, so the turn holds open where the agent says what it does next. [[spec/design_output/stop#the-chat-is-new]]
+  if (name === "chat-is-new") return chatIsNew(held.box) && !namesNext(held.text);
   if (name === "work-waiting") return todosOf(held.box).standing();
   if (name === "group-in-hand") return groupInHand(held.box);
   if (name === "ticket-in-hand") return holdStands(held.box) || privateStands(held.box);
