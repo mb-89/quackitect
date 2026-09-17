@@ -89,12 +89,18 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8
     hash_before: d248ef965fa407e15019f6460dc42588001238c9
     hash_after: 95484c2790d805874cf2fa8b06113b661095578d
+  - step: design/review
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 8a76181190b5f8eb134bdc87e8df4d77d5925d84
+    hash_after: 8a76181190b5f8eb134bdc87e8df4d77d5925d84
+    returns: 1
+    why: The table holds. Each row names a verb, the code behind it, and what stands after, and the rows read true against `src/scripts/work.js`.; The redraft answers one finding of the last round and leaves five. The prose under the table reads as it read before.; The six chapters of the work design output stand unnamed. The last round asked for each, and what stands in its place.; The redraft points its details at `A brief drains first`. The last round named that chapter as one the change takes away.; The cloud guidance stands unanswered. Actionable 10 sends a box's result into `HANDOVER.md`, and no row says what a box writes instead.; The handover schema stands unanswered. It governs the root brief, and it says one kind covers two paths.; The box handover stands unanswered. `copilot-runtime.js` reads `.se/HANDOVER.md` and `HANDOVER.md` in one loop, and the redraft says the brief is one file.; An implementer reading this cuts both paths. Say that `.se/HANDOVER.md` stays, and say it where the copilot row stands.; The copilot row carries one line for seven references across two modules. `copilot-dispatch.js` holds three, and `copilot-runtime.js` holds four.; Two of those seven sit inside a prompt this tree writes for a person to read. Say what that prompt says after.; The first row of `done_when` decides nothing. `./RUNME.sh branch list` names every branch a group today, and 8 groups stand with no brief among them.; The evidence field carries the two comments mint writes, above the table. Cut them, so the field reads as what a hand wrote.
 ---
 
 # Ask
@@ -164,23 +170,18 @@ to the group ticket it stands for. For details, see
 
 fail
 
-- The approach cuts the code and leaves the tree. A reader of the verbs learns the brief first, from the notes.
-- The work design output teaches the brief in six chapters, and the approach leaves all six standing:
-  - What a work branch is
-  - A brief drains first
-  - What the status says
-  - Two handovers
-  - The round trip
-  - Every brief carries the contract
-- Name each chapter, and what stands in its place.
-- The cloud guidance sends a cloud box's result into the brief file. Say what a cloud box writes instead.
-- The handover schema names the root brief as a path it governs. Say what stands there after.
-- Say that the box handover stays. The copilot lane reads both paths, and a session writes a fresh one at the finish.
-- The approach points for its details at the chapter A brief drains first, which goes with the change.
-- The rows hold against the code, verb by verb. The list names a kind, the new verb reads the root brief.
-- The take verb walks two roads, and the release verb falls through to the group record.
-- `./RUNME.sh check` answers 0 here, so the change carries that baseline.
-- The branch review verb finds the branch nowhere. This ticket reaches code at implement.
+- The table holds. Each row names a verb, the code behind it, and what stands after, and the rows read true against `src/scripts/work.js`.
+- The redraft answers one finding of the last round and leaves five. The prose under the table reads as it read before.
+- The six chapters of the work design output stand unnamed. The last round asked for each, and what stands in its place.
+- The redraft points its details at `A brief drains first`. The last round named that chapter as one the change takes away.
+- The cloud guidance stands unanswered. Actionable 10 sends a box's result into `HANDOVER.md`, and no row says what a box writes instead.
+- The handover schema stands unanswered. It governs the root brief, and it says one kind covers two paths.
+- The box handover stands unanswered. `copilot-runtime.js` reads `.se/HANDOVER.md` and `HANDOVER.md` in one loop, and the redraft says the brief is one file.
+- An implementer reading this cuts both paths. Say that `.se/HANDOVER.md` stays, and say it where the copilot row stands.
+- The copilot row carries one line for seven references across two modules. `copilot-dispatch.js` holds three, and `copilot-runtime.js` holds four.
+- Two of those seven sit inside a prompt this tree writes for a person to read. Say what that prompt says after.
+- The first row of `done_when` decides nothing. `./RUNME.sh branch list` names every branch a group today, and 8 groups stand with no brief among them.
+- The evidence field carries the two comments mint writes, above the table. Cut them, so the field reads as what a hand wrote.
 
 # implement
 
@@ -290,4 +291,6 @@ fail
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+The two rounds agree on the code and part on the tree. The table says which verb loses which half, and the notes teaching the brief stand as they stand.
+
+The order the redraft takes is the safe one. `HANDOVER.md` at the root goes, and `.se/HANDOVER.md` stays, because the schema calls the second a session. A draft saying so in one line clears the largest risk this change carries.
