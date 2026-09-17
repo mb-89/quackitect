@@ -35,13 +35,13 @@ step: do
 A hand writes its ticket again after a failed review. The door reads the record as the verbs wrote it.
 
 <!-- breaks, as text: what breaks if it is never done -->
-A verdict joins its findings into one `why` line. Five code spans there lock the ticket. Every later write from a hand meets a refusal over a line the ticket door keeps for the verbs. The payload road carries the work, and the file stays shut.
+A verdict joins its findings into one `why` line, and a person step joins them into one `asks`. Code spans past the cap there lock the ticket and turn the check red. A hand meets a refusal over a line the ticket door keeps for the verbs. So the branch reaches `branch done` nowhere, and the payload road carries the work alone.
 
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
-- the door passes a ticket whose record joins findings past the code span cap
-- a case drives the door over a record holding seven code spans in one `why`
-- the fix names one home: the rule reading frontmatter, or the writer joining the findings
-- `./RUNME.sh lint spec/tickets/the-spawn-takes-a-step.md` reads that ticket clean
+- the prose rules read the body of a note, and leave its frontmatter to the schema
+- a case drives the rules over a record holding seven code spans in one `why`
+- the fix names one home: the rule that reads frontmatter, or the writer that joins the findings
+- `./RUNME.sh check` answers 0 on `work/the-hand-carries-a-step`, which four such lines hold red
 
 # do
 
