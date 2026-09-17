@@ -2,10 +2,20 @@
 kind: [[ticket]]
 state: open
 urgency: now
+step: design/person-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: "design/review failed back 2 times: Two findings of the last review stand open, and two new faults join them.; The count drift goes. The draft names `grep -rl mcp__level0` and carries a count nowhere.; The reader rows read true. `stop.js` reads `spec/config/stop`, and `vale.js` reads `spec/config/styles`.; The shape claim reads true. `projection.js` holds `COMMANDS`, `PARAGRAPH` and `STYLE`.; The `brandOf` row reads true. `stub.js` hands it to `linkOf`, which writes the `vehicle.json` name.; The anchor stands, the slug table follows its own rule, and the lint reads the ticket clean.; One reader a folder reads other than the tree. `cli.js` reads three folders under `spec/config/styles`.; A projection writes `spec/config/styles/VoiceParagraph`, so ground the brand folder on another reason.; The marketplace hand stays unnamed. Say who writes `.claude-plugin/marketplace.json`, and when it runs.; `stub.js` writes the stub's own files, so the reader lands on the wrong hand.; The brand folder's reader carries two names, the build and the install script. Use one.; The copy road lets `src/extension/icon.svg` drift. Name what holds it in step with its source."
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -89,7 +99,6 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -105,6 +114,12 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 26590a5e95246ff66192a37104991e9a7a9c976b
     hash_after: 26590a5e95246ff66192a37104991e9a7a9c976b
+  - step: design/review
+    hand: box d42624a67d18a8 · claude-code · helper-4
+    hash_before: a5eaededdfba7305152b8bec5f240d31067e48d8
+    hash_after: a5eaededdfba7305152b8bec5f240d31067e48d8
+    returns: 2
+    why: Two findings of the last review stand open, and two new faults join them.; The count drift goes. The draft names `grep -rl mcp__level0` and carries a count nowhere.; The reader rows read true. `stop.js` reads `spec/config/stop`, and `vale.js` reads `spec/config/styles`.; The shape claim reads true. `projection.js` holds `COMMANDS`, `PARAGRAPH` and `STYLE`.; The `brandOf` row reads true. `stub.js` hands it to `linkOf`, which writes the `vehicle.json` name.; The anchor stands, the slug table follows its own rule, and the lint reads the ticket clean.; One reader a folder reads other than the tree. `cli.js` reads three folders under `spec/config/styles`.; A projection writes `spec/config/styles/VoiceParagraph`, so ground the brand folder on another reason.; The marketplace hand stays unnamed. Say who writes `.claude-plugin/marketplace.json`, and when it runs.; `stub.js` writes the stub's own files, so the reader lands on the wrong hand.; The brand folder's reader carries two names, the build and the install script. Use one.; The copy road lets `src/extension/icon.svg` drift. Name what holds it in step with its source.
 ---
 
 # Ask
@@ -123,6 +138,16 @@ The brand design holds at its review. A draft stamping the plugin name renames e
 - `./RUNME.sh lint spec/tickets/the-brand-names-the-plugin.md` reads the ticket clean
 
 # design
+
+## person-1
+
+<!-- answers the question the engine asks -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
 
 ## draft
 
@@ -182,17 +207,18 @@ The rule is one line: lower the case, turn every run of characters outside `a-z0
 
 fail
 
-- The four asked answers stand: the marketplace name, the zero cost, the icon path, the dotted folder.
-- The cited anchor stands. `spec/design_output/level0.md` carries the heading, and it measures the tools keeping `level0`.
-- The count drifts. `grep -rl mcp__level0` answers 30 today, and the draft writes 29.
-- The draft's own file joined that list. Name the command, and drop both numbers.
-- The config claim reads other than the tree. The stop door reads `spec/config/stop`, and Vale reads `spec/config/styles`.
-- A projection writes `spec/config/styles/VoiceParagraph`, so that folder stands as a target too.
-- Ground `spec/config/brand` on the folder a door reads, and say which door reads it.
-- The icon projection wants a shape. `projection.js` holds three shapes, and a copy of an svg fits none.
-- The table names `brandOf` the writer of three fields. Today `brandOf` feeds the `vehicle.json` record name alone.
-- `.claude-plugin/marketplace.json` carries a literal name. Name who rewrites it, and when.
-- The lint reads the ticket clean.
+- Two findings of the last review stand open, and two new faults join them.
+- The count drift goes. The draft names `grep -rl mcp__level0` and carries a count nowhere.
+- The reader rows read true. `stop.js` reads `spec/config/stop`, and `vale.js` reads `spec/config/styles`.
+- The shape claim reads true. `projection.js` holds `COMMANDS`, `PARAGRAPH` and `STYLE`.
+- The `brandOf` row reads true. `stub.js` hands it to `linkOf`, which writes the `vehicle.json` name.
+- The anchor stands, the slug table follows its own rule, and the lint reads the ticket clean.
+- One reader a folder reads other than the tree. `cli.js` reads three folders under `spec/config/styles`.
+- A projection writes `spec/config/styles/VoiceParagraph`, so ground the brand folder on another reason.
+- The marketplace hand stays unnamed. Say who writes `.claude-plugin/marketplace.json`, and when it runs.
+- `stub.js` writes the stub's own files, so the reader lands on the wrong hand.
+- The brand folder's reader carries two names, the build and the install script. Use one.
+- The copy road lets `src/extension/icon.svg` drift. Name what holds it in step with its source.
 
 # implement
 
@@ -202,7 +228,7 @@ fail
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+<!-- the same tests pass -->
 
 <!-- the form is command -->
 
@@ -301,7 +327,6 @@ fail
 <!-- the form is checklist -->
 
 # Discussion
-
 
 - [[spec/tickets/brand-reads-folder]] hands this over at `design/person-1`, which waits for a person.
   - design/review failed back 2 times: The redraft answers the design output list, the `when` clause and the two
