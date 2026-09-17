@@ -219,3 +219,5 @@ A hand carries one step. The hold names the session that took it, and a spawn ta
 - The hand-back let a design draft through that the tree-wide sweep then named. The sweep and the write door read different scopes.
 - `branch take` run twice claims a second branch, so one box holds two at once.
 - The mint's placeholder comments count toward `Shape`. A text field under three of them takes a table or a list.
+- The check probes the server, so it exits 1 on a box that runs none. The battery stamp then stays red, and `branch done` refuses. A cloud box starts `./RUNME.sh serve` before the check.
+- `takeable` reads no `depends_on`, and `offer` reads it. So the pull answers wait while `branch done` names the same child takeable. The box leaves by `branch release` alone.
