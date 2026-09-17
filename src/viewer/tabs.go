@@ -18,6 +18,9 @@ import (
 // [[spec/design_output/viewer#a-number-opens-a-tab]]
 const mostTabs = 9
 
+// The strip's right end, which the key draws and a press reaches. [[spec/design_output/viewer#the-header-holds-the-tabs]]
+const helpKey = "alt+? help "
+
 type tab interface {
 	Name() string
 	Left(m *model, w, rows int) string
@@ -94,7 +97,7 @@ var openStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("111")).Bold(true)
 func (m model) renderStrip() string {
 	names := make([]string, 0, len(m.tabs))
 	for at, one := range m.tabs {
-		name := fmt.Sprintf(" %d %s ", at+1, one.Name())
+		name := tabName(at, one)
 		style := dimStyle
 		if at == m.open {
 			style = openStyle
@@ -102,13 +105,18 @@ func (m model) renderStrip() string {
 		names = append(names, style.Render(name))
 	}
 	strip := strings.Join(names, " ")
-	helpKey := dimStyle.Render("alt+? help ")
+	key := dimStyle.Render(helpKey)
 	if m.pane == paneHelp {
-		helpKey = openStyle.Render("alt+? help ")
+		key = openStyle.Render(helpKey)
 	}
-	gap := m.w - ansi.StringWidth(strip) - ansi.StringWidth(helpKey)
+	gap := m.w - ansi.StringWidth(strip) - ansi.StringWidth(key)
 	if gap < 1 {
 		return cut(strip, m.w)
 	}
-	return strip + strings.Repeat(" ", gap) + helpKey
+	return strip + strings.Repeat(" ", gap) + key
+}
+
+// The text one tab takes in the strip, which the strip draws and a press measures. [[spec/design_output/viewer#the-header-holds-the-tabs]]
+func tabName(at int, one tab) string {
+	return fmt.Sprintf(" %d %s ", at+1, one.Name())
 }

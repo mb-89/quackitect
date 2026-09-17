@@ -43,7 +43,12 @@ func main() {
 		return
 	}
 
-	if _, err := tea.NewProgram(newModel(path, time.Local), tea.WithAltScreen()).Run(); err != nil {
+	program := tea.NewProgram(
+		newModel(path, time.Local),
+		tea.WithAltScreen(),
+		tea.WithMouseCellMotion(),
+	)
+	if _, err := program.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}

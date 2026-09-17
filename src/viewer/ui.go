@@ -244,6 +244,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m.typing(msg)
 		}
 		return m.key(msg.String())
+
+	case tea.MouseMsg:
+		return m.mouse(msg)
 	}
 	return m, nil
 }
