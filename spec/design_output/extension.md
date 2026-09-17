@@ -312,9 +312,9 @@ widget: the verb writes the local file, and the watcher does the rest.
 
 ## The log opens a terminal
 
-The log action runs `./RUNME.sh tui`, which opens the log viewer in a terminal
-beside the editor. An action opening another program hands a person that
-program's keys. So the declaration carries them and the hover says them.
+The log action runs `./RUNME.sh tui`, which opens the window on its log tab, in
+a terminal beside the editor. An action opening another program hands a person
+that program's keys. So the declaration carries them and the hover says them.
 For details, see [[spec/design_output/viewer#the-keys]].
 
 The rule holds for every action. Where an action starts another program, its hover names

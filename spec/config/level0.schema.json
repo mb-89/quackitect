@@ -154,7 +154,7 @@
           "help": "The level this box writes at. info writes every line a door says, and debug writes what the hooks see too."
         },
         "open": {
-          "help": "Open the log viewer, in a terminal beside the editor.",
+          "help": "Open the window, on its log tab, in a terminal beside the editor.",
           "widget": "action",
           "icon": "📜",
           "group": "agent control",

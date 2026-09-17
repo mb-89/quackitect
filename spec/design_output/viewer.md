@@ -4,8 +4,8 @@ kind: [[design_output]]
 
 # Scope
 
-`src/viewer` holds the log viewer. This note covers the window, its tabs, its
-keys, the filter, and how a line arrives.
+`src/viewer` holds the window this tree draws in a terminal. This note covers
+the window, its tabs, its keys, the filter, and how a line arrives.
 
 # The viewer
 
