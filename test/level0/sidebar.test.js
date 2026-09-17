@@ -35,7 +35,7 @@ const schema = {
       properties: {
         open: {
           widget: "action",
-          runs: "./RUNME.sh log",
+          runs: "./RUNME.sh tui",
           group: "agent control",
           row: 0,
           column: 0,
@@ -155,8 +155,8 @@ test("a key the schema leaves alone lands as the text a person types", async () 
 // [[spec/design_output/extension#the-log-opens-a-terminal]]
 test("a run message opens the run the declaration names, and writes nothing", async () => {
   const door = doorOf();
-  await sidebarOf(door).took({ kind: "run", runs: "./RUNME.sh log" });
-  assert.deepEqual(door.said.ran, ["./RUNME.sh log"]);
+  await sidebarOf(door).took({ kind: "run", runs: "./RUNME.sh tui" });
+  assert.deepEqual(door.said.ran, ["./RUNME.sh tui"]);
   assert.equal(door.files.exists(LOCAL), false);
 });
 
@@ -277,7 +277,7 @@ test("a press, a run and an edit each write a sidebar line naming what moved", a
     door.said.at = at;
     await sidebar.took({ kind: "press", key: "stop.hold" });
   }
-  await sidebar.took({ kind: "run", key: "log.open", runs: "./RUNME.sh log" });
+  await sidebar.took({ kind: "run", key: "log.open", runs: "./RUNME.sh tui" });
   await sidebar.took({ kind: "set", key: "stop.mostInARow", value: "5" });
 
   assert.deepEqual(
@@ -285,7 +285,7 @@ test("a press, a run and an edit each write a sidebar line naming what moved", a
     [
       ["sidebar", "stop.hold is finish", "one press"],
       ["sidebar", "stop.hold is stop", "5 presses"],
-      ["sidebar", "log.open runs ./RUNME.sh log", undefined],
+      ["sidebar", "log.open runs ./RUNME.sh tui", undefined],
       ["sidebar", "stop.mostInARow is 5", "the config tree"],
     ],
   );

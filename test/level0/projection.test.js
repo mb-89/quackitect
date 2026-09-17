@@ -124,7 +124,7 @@ test("a toggle in a group takes a second command down the group's path", () => {
       },
       log: {
         type: "object",
-        properties: { open: { widget: "action", group: "agent control", runs: "./RUNME.sh log" } },
+        properties: { open: { widget: "action", group: "agent control", runs: "./RUNME.sh tui" } },
       },
     },
   };

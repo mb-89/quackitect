@@ -122,7 +122,7 @@ get_biome() {
   chmod +x "$bin/biome${exe}"
 }
 
-# Go builds the log viewer, and ./RUNME.sh log builds it the first time it runs.
+# Go builds the log viewer, and ./RUNME.sh tui builds it the first time it runs.
 get_go() {
   if [ "$os" = "Windows" ]; then
     have winget || return 1
@@ -336,7 +336,7 @@ wanted() {
 missed() {
   case $1 in
     vale-ls) say "  vale-ls stays missing, so the editor manages its own copy." >&2 ;;
-    go)      say "  go stays missing, so ./RUNME.sh log prints plain rows." >&2 ;;
+    go)      say "  go stays missing, so ./RUNME.sh tui prints plain rows." >&2 ;;
     index) say "  the index stays unbuilt, so find and links read the files." >&2 ;;
     se-lsp) say "  the language server stays unbuilt, so lint reads the node rules." >&2 ;;
     editor-client) say "  no language client here, so the editor draws no server line." >&2 ;;
@@ -370,7 +370,7 @@ why() {
     vale) say "vale: Vale holds the prose rules the write door and the linter read" ;;
     biome) say "biome: Biome formats and lints the JavaScript in this tree" ;;
     vale-ls) say "vale-ls: the Vale language server, so an editor draws the same rules" ;;
-    go) say "go: it builds the viewer ./RUNME.sh log opens the door log in, and the index" ;;
+    go) say "go: it builds the viewer ./RUNME.sh tui opens the door log in, and the index" ;;
     index) say "index: the warm model of this tree, which find and links ask" ;;
     se-lsp) say "se-lsp: this tree's own language server, which draws the note shape and the names" ;;
     editor-client) say "editor-client: the language client the extension starts the server through" ;;

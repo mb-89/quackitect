@@ -213,7 +213,7 @@ validate`, and the client then loads none of the module:
 |---|---|
 | `claude plugin list` says `√ loaded` | the client adopts the plugin, and refuses its hooks |
 | no `.se/level0.stamp` | `session.start` reaches no hook |
-| no line in `./RUNME.sh log` | every door in the module stays silent |
+| no line in `./RUNME.sh tui` | every door in the module stays silent |
 | the canary is absent from every answer | the standing layer reaches no session |
 
 So one hook of the wrong shape takes the whole cage off, and the readings
@@ -373,7 +373,7 @@ run costs ninety seconds and two model calls, so `SE_SLOW` switches it on and
 ## Without the verb
 
 The two log lines pay on their own. A session that compacts in the ordinary
-course writes a second `context` line in `./RUNME.sh log`, with `reason` at
+course writes a second `context` line in `./RUNME.sh tui`, with `reason` at
 `re-read`, and a `compact` line beside it. So a person reads a compaction out
 of the log with no probe running.
 

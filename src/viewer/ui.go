@@ -73,7 +73,7 @@ func newModel(path string, zone *time.Location) model {
 	input.Placeholder = "type to narrow the log"
 	input.Cursor.SetMode(cursor.CursorStatic)
 	return model{
-		tabs:   []tab{logTab{}},
+		tabs:   []tab{logTab{}, workTab{}},
 		path:   path,
 		zone:   zone,
 		sel:    -1,
@@ -251,6 +251,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case tea.MouseMsg:
 		return m.mouse(msg)
+
+	// [[spec/design_output/viewer#a-second-launch-hands-over]]
+	case tabMsg:
+		if n := m.tabNamed(msg.name); n > 0 {
+			m.openTab(n)
+		}
+		return m, nil
 	}
 	return m, nil
 }

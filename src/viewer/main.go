@@ -22,9 +22,10 @@ func main() {
 	narrow := flag.String("filter", "", "with --frame: the filter to hold")
 	floor := flag.String("floor", "", "with --frame: the floor to stand at, as debug, info, warn, error or fatal")
 	mouse := flag.Bool("mouse", true, "take the mouse, which costs the terminal's own text selection")
+	tab := flag.String("tab", "", "the tab the window opens on, as log or work")
 	flag.Parse()
 	if flag.NArg() != 1 {
-		fmt.Fprintln(os.Stderr, "usage: logview [--frame --size WxH --pane details|help|filter --filter text] [--mouse=false] <session.jsonl>")
+		fmt.Fprintln(os.Stderr, "usage: logview [--frame --size WxH --pane details|help|filter --filter text] [--mouse=false --tab log|work] <session.jsonl>")
 		os.Exit(2)
 	}
 	path := flag.Arg(0)
@@ -44,10 +45,34 @@ func main() {
 		return
 	}
 
-	if _, err := tea.NewProgram(newModel(path, time.Local), windowOpts(*mouse)...).Run(); err != nil {
+	if err := runWindow(path, *tab, *mouse); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
+}
+
+// The window, with its door open for as long as it stands. A port already held means a window already stands, so this one hands its tab over and ends. [[spec/design_output/viewer#a-second-launch-hands-over]]
+func runWindow(path, tab string, mouse bool) error {
+	start := newModel(path, time.Local)
+	if n := start.tabNamed(tab); n > 0 {
+		start.openTab(n)
+	}
+	program := tea.NewProgram(start, windowOpts(mouse)...)
+
+	door, err := openDoor(windowPort, func(msg any) { program.Send(msg) })
+	if err != nil {
+		if tellPort(windowPort, tab) {
+			fmt.Fprintln(os.Stderr, "A window already stands, and it takes the tab.")
+			return nil
+		}
+		fmt.Fprintf(os.Stderr, "the window's door stays shut: %v\n", err)
+	}
+	if door != nil {
+		defer func() { _ = door.Close() }()
+	}
+
+	_, err = program.Run()
+	return err
 }
 
 // What the window asks the terminal for. The mouse rides a switch, because a window taking it takes the terminal's text selection with it. [[spec/design_output/viewer#the-mouse-reaches-the-window]]

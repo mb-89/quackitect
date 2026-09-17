@@ -68,7 +68,7 @@ func TestTheStripNamesEveryTabAndTheHelpKeyAboveARule(t *testing.T) {
 func TestANumberOpensTheTabAtThatPlaceAndAnyOtherLeavesTheOpenOne(t *testing.T) {
 	t.Parallel()
 	m := window(3)
-	m.tabs = append(m.tabs, stubTab{})
+	m.tabs = []tab{logTab{}, stubTab{}}
 	m = press(m, "2")
 	if m.open != 1 {
 		t.Fatalf("2 opens the second tab, and tab %d stands open", m.open)
@@ -94,7 +94,7 @@ func TestANumberOpensTheTabAtThatPlaceAndAnyOtherLeavesTheOpenOne(t *testing.T) 
 func TestTheHelpNamesThreeBandsOutOfTheRegisteredKeys(t *testing.T) {
 	t.Parallel()
 	m := window(3)
-	m.tabs = append(m.tabs, stubTab{})
+	m.tabs = []tab{logTab{}, stubTab{}}
 	drawn := renderParts(m.helpParts(60), 60)
 	for _, want := range []string{"GLOBAL", "1…9", "open the tab at that place", "THE LOG", "alt+shift+f", "THE ROW"} {
 		if !strings.Contains(drawn, want) {
