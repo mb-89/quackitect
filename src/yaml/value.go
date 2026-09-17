@@ -1,21 +1,21 @@
 // Reading a loose value the way the JavaScript reads one. A schema field takes
 // one line or a list, so every caller asks these and reads the shape back.
 // [[spec/design_output/schema#the-yaml-a-schema-reads]]
-package main
+package yaml
 
 import (
 	"fmt"
 	"strings"
 )
 
-func asDoc(said any) *Doc {
+func AsDoc(said any) *Doc {
 	if one, held := said.(*Doc); held {
 		return one
 	}
 	return nil
 }
 
-func asList(said any) []any {
+func AsList(said any) []any {
 	if said == nil {
 		return nil
 	}
@@ -26,7 +26,7 @@ func asList(said any) []any {
 }
 
 // [[spec/design_output/schema#the-yaml-a-schema-reads]]
-func flat(said any) []any {
+func Flat(said any) []any {
 	if said == nil {
 		return []any{nil}
 	}
@@ -36,7 +36,7 @@ func flat(said any) []any {
 	return []any{said}
 }
 
-func asString(said any) string {
+func AsString(said any) string {
 	switch one := said.(type) {
 	case nil:
 		return ""
@@ -52,7 +52,7 @@ func asString(said any) string {
 	case []any:
 		parts := make([]string, 0, len(one))
 		for _, each := range one {
-			parts = append(parts, asString(each))
+			parts = append(parts, AsString(each))
 		}
 		return strings.Join(parts, ",")
 	case *Doc:
@@ -61,36 +61,36 @@ func asString(said any) string {
 	return fmt.Sprint(said)
 }
 
-func asInt(said any) int {
+func AsInt(said any) int {
 	if one, held := said.(int); held {
 		return one
 	}
 	return 0
 }
 
-func asBool(said any) bool {
+func AsBool(said any) bool {
 	one, held := said.(bool)
 	return held && one
 }
 
 // [[spec/design_output/schema#the-yaml-a-schema-reads]]
-func stringsOf(said any) []string {
+func StringsOf(said any) []string {
 	out := []string{}
-	for _, one := range flat(said) {
+	for _, one := range Flat(said) {
 		if one == nil {
 			continue
 		}
-		out = append(out, asString(one))
+		out = append(out, AsString(one))
 	}
 	return out
 }
 
-func empty(said any) bool {
+func Empty(said any) bool {
 	if said == nil {
 		return true
 	}
 	if one, held := said.([]any); held {
 		return len(one) == 0
 	}
-	return strings.TrimSpace(asString(said)) == ""
+	return strings.TrimSpace(AsString(said)) == ""
 }

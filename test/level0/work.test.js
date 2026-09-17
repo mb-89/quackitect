@@ -29,6 +29,7 @@ import {
   URGENCY,
   urgencyOf,
   waitingOn,
+  whyOf,
   withContract,
   work,
 } from "../../src/scripts/work.js";
@@ -79,7 +80,9 @@ test("every brief carries the contract, and adding it twice changes nothing", ()
   const once = withContract("# A brief\n\nDo the thing.\n");
   assert.ok(once.includes(CONTRACT_HEADING), "the contract lands");
   assert.ok(once.includes("./RUNME.sh branch done"), "it names how to finish");
-  assert.ok(once.includes("./RUNME.sh branch release"), "it names how to stop early");
+  // [[spec/design_output/work#a-box-hands-the-person-out]]
+  assert.ok(once.includes("Stop for no person"), "it refuses the wait");
+  assert.ok(once.includes("branch\n   unblock <ticket> <successor>"), "it names how to hand one out");
   assert.equal(withContract(once), once, "a second pass changes nothing");
 });
 
@@ -757,6 +760,56 @@ test("list names a group, a brief and a loose ticket, each as its own kind", () 
   assert.match(said, /work\/one-group\s+group\s+held\s+now\s+3h/);
   assert.match(said, /a-loose-one\s+ticket\s+open\s+soon/);
   assert.doesNotMatch(said, /^one-group\s+ticket/m, "a group is no loose ticket");
+});
+
+// [[spec/design_output/work#a-ticket-under-its-group]]
+test("a group row carries a row per ticket naming it, off the branch tip", () => {
+  const { it } = doorsSaying({
+    ...groupRemote(),
+    "git ls-tree -r --name-only origin/work/one-group spec/tickets/": {
+      stdout: "spec/tickets/one-group.md\nspec/tickets/a-child.md\nspec/tickets/other-work.md\n",
+    },
+    "git show origin/work/one-group:spec/tickets/a-child.md": {
+      stdout: CHILD("one-group", "open").replace("urgency: soon", "urgency: soon\nstep: do"),
+    },
+    "git show origin/work/one-group:spec/tickets/other-work.md": {
+      stdout: CHILD("another-group", "open"),
+    },
+    "git ls-tree -r --name-only origin/main spec/tickets/": { stdout: "" },
+  });
+
+  const { code, said } = heard(() => work(ROOT, ["list"], it));
+
+  assert.equal(code, 0);
+  assert.match(said, /work\/one-group\s+group\s+todo/);
+  assert.match(said, /^ {2}a-child\s+ticket\s+open\s+do$/m);
+  assert.doesNotMatch(said, /other-work/, "a ticket naming another group stays off this row");
+  assert.doesNotMatch(said, /^ {2}one-group\s+ticket/m, "the group itself is no child of itself");
+});
+
+// [[spec/design_output/work#a-ticket-under-its-group]]
+test("a brief carries no ticket row, and a child naming no step says its urgency", () => {
+  const brief = "---\nstatus: todo\nurgency: whenever\n---\n\n# Do the thing\n";
+  const { it } = doorsSaying({
+    ...groupRemote(),
+    "git ls-remote --heads origin work/*": { stdout: "aaa\trefs/heads/work/a-brief\n" },
+    "git show origin/work/a-brief:HANDOVER.md": { stdout: brief },
+    "git ls-tree -r --name-only origin/work/a-brief spec/tickets/": {
+      stdout: "spec/tickets/a-child.md\n",
+    },
+    "git ls-tree -r --name-only origin/main spec/tickets/": { stdout: "" },
+  });
+
+  const { said } = heard(() => work(ROOT, ["list"], it));
+
+  assert.match(said, /work\/a-brief\s+brief\s+todo/);
+  assert.doesNotMatch(said, /a-child/, "a brief names no tickets");
+  assert.equal(whyOf(CHILD("one-group", "open")), "do", "a ticket says the step it stands at");
+  assert.equal(
+    whyOf(CHILD("one-group", "open").replace(/steps:[\s\S]*?\n---/, "---")),
+    "soon",
+    "a ticket naming no step falls back to its urgency",
+  );
 });
 
 // [[spec/design_output/work#a-stale-group-is-yours]]

@@ -476,9 +476,11 @@ export function spawnPrompt(ticket, leaf, helper) {
 }
 
 // [[spec/design_output/pull#done-leaves-no-takeable-step]]
-export function takeable(it, one) {
+export function takeable(it, one, all = []) {
   const front = frontOf(one.text);
   if (String(front.state ?? "") !== OPEN) return "";
+  // The offer waits on a dependency, so this waits on it too. [[spec/design_output/work#a-dependency-waits-for-trunk]]
+  if (dependsOn(front).some((dep) => !closedHere(it, all, dep))) return "";
   const path = String(front.step ?? "").trim() || (leavesOf(front)[0]?.path ?? "");
   const leaf = leafOf(front, path);
   if (!leaf) return "";
@@ -566,7 +568,7 @@ function advanced(it, who, one, all) {
       if (said.open.length) {
         const busy = said.open.filter((name) => {
           const child = all.find((held) => !held.private && held.name === name);
-          return child && takeable(it, child);
+          return child && takeable(it, child, all);
         });
         if (busy.length) return { why: `waits for ${busy.join(", ")}, which a hand can take` };
         const left = entriesOf(front)

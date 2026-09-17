@@ -5,6 +5,8 @@
 package main
 
 import (
+	"quackitect/yaml"
+
 	"encoding/json"
 	"os"
 	"os/exec"
@@ -112,7 +114,7 @@ func gitHolds(root string) []string {
 		return nil
 	}
 	out := []string{}
-	for _, line := range splitLines(string(read)) {
+	for _, line := range yaml.SplitLines(string(read)) {
 		path := strings.TrimSpace(line)
 		if path != "" && !isDraft(path) {
 			out = append(out, path)
@@ -360,7 +362,7 @@ func noLogDeleted(tree *Tree) []Finding {
 		if !sourceFile(path) {
 			continue
 		}
-		for i, line := range splitLines(tree.Read(path)) {
+		for i, line := range yaml.SplitLines(tree.Read(path)) {
 			if !deletesAt.MatchString(line) || !loggedAt.MatchString(line) {
 				continue
 			}
@@ -418,7 +420,7 @@ func nothingPrivateTravels(tree *Tree) []Finding {
 		if !textFile(path) {
 			continue
 		}
-		for i, line := range splitLines(tree.Read(path)) {
+		for i, line := range yaml.SplitLines(tree.Read(path)) {
 			for _, one := range held {
 				if !carriesTheName(line, one.said) {
 					continue
@@ -558,7 +560,7 @@ func lineOf(text, needle string) int {
 	if needle == "" {
 		return 1
 	}
-	for i, line := range splitLines(text) {
+	for i, line := range yaml.SplitLines(text) {
 		if strings.Contains(line, needle) {
 			return i + 1
 		}

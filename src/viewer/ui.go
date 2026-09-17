@@ -1,6 +1,7 @@
-// The window: a header, the log on the left and one pane on the right. w and s
-// move the log, the arrows scroll the pane, and enter, alt+? and alt+f open the
-// details, the help and the filter in that pane.
+// The window: a strip of tabs, the open tab on the left, one pane on the right
+// and a footer of status marks. w and s move the log, the arrows scroll the
+// pane, a number opens a tab, and enter, alt+? and alt+f open the details, the
+// help and the filter in that pane.
 // [[spec/design_output/viewer#the-keys]]
 
 package main
@@ -25,6 +26,8 @@ const (
 	levelWide = 5
 	kindWide  = 10
 	headWide  = 2
+	footWide  = 2
+	namesWide = 1
 	// [[spec/design_output/viewer#one-key-filters-the-line]]
 	talkFilter = "kind: /^(prompt|reply)$/"
 )
@@ -39,6 +42,8 @@ const (
 )
 
 type model struct {
+	tabs      []tab
+	open      int
 	path      string
 	zone      *time.Location
 	all       []Record
@@ -66,6 +71,7 @@ func newModel(path string, zone *time.Location) model {
 	input.Placeholder = "type to narrow the log"
 	input.Cursor.SetMode(cursor.CursorStatic)
 	return model{
+		tabs:   []tab{logTab{}},
 		path:   path,
 		zone:   zone,
 		sel:    -1,
@@ -79,7 +85,10 @@ func newModel(path string, zone *time.Location) model {
 
 func (m model) Init() tea.Cmd { return m.tailer.cmd() }
 
-func (m model) rows() int { return max(1, m.h-headWide) }
+// [[spec/design_output/viewer#the-window-is-a-split]]
+func (m model) body() int { return max(2, m.h-headWide-footWide) }
+
+func (m model) rows() int { return max(1, m.body()-namesWide) }
 
 func (m model) listWidth() int {
 	if m.pane == paneShut {
@@ -152,7 +161,7 @@ func (m *model) moveTo(p int) {
 
 func (m *model) resize() {
 	m.box.Width = max(10, m.w-m.listWidth()-2)
-	m.box.Height = m.rows()
+	m.box.Height = m.body()
 	m.input.Width = max(10, m.box.Width-len(m.input.Prompt)-2)
 	m.shown = ""
 	at := m.box.YOffset
@@ -160,7 +169,7 @@ func (m *model) resize() {
 	m.box.SetYOffset(at)
 }
 
-func (m *model) open(want pane) {
+func (m *model) openPane(want pane) {
 	if m.pane == want {
 		m.pane = paneShut
 	} else {
@@ -183,7 +192,7 @@ func (m *model) loadPane() {
 	var parts []part
 	switch m.pane {
 	case paneHelp:
-		parts = []part{{text: HelpText}}
+		parts = m.helpParts(m.box.Width)
 	case paneFilter:
 		parts = []part{{text: m.input.View(), drawn: true}}
 		if m.filterBad != "" {
@@ -191,7 +200,7 @@ func (m *model) loadPane() {
 		}
 		parts = append(parts, part{}, part{text: FilterHelp})
 	default:
-		parts = detailOf(m.all, m.sel, m.zone)
+		parts = m.tabs[m.open].Detail(m, m.box.Width)
 	}
 	content := renderParts(parts, m.box.Width)
 	key := fmt.Sprintf("%d:%d", m.pane, m.sel)
@@ -239,44 +248,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return m, nil
 }
 
-func (m model) key(name string) (tea.Model, tea.Cmd) {
-	switch name {
-	case "ctrl+c", "q":
-		return m, tea.Quit
-	case "enter":
-		m.open(paneDetails)
-	case "alt+?", "alt+/", "?":
-		m.open(paneHelp)
-	case "alt+f":
-		m.open(paneFilter)
-	case "alt+F", "alt+q":
-		m.quick(name)
-	case "alt+l":
-		m.raiseFloor()
-	case "e":
-		m.toError()
-	case "w", "W":
-		m.moveTo(m.at() - 1)
-	case "s", "S":
-		m.moveTo(m.at() + 1)
-	case "up":
-		if m.pane != paneShut {
-			m.box.ScrollUp(1)
-		} else {
-			m.moveTo(m.at() - 1)
-		}
-	case "down":
-		if m.pane != paneShut {
-			m.box.ScrollDown(1)
-		} else {
-			m.moveTo(m.at() + 1)
-		}
-	default:
-		m.jump(name)
-	}
-	return m, nil
-}
-
 func (m *model) jump(name string) {
 	switch name {
 	case "pgup":
@@ -296,7 +267,7 @@ func (m model) typing(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 	case "ctrl+c":
 		return m, tea.Quit
 	case "enter", "esc", "alt+f":
-		m.open(paneFilter)
+		m.openPane(paneFilter)
 		return m, nil
 	case "alt+F", "alt+q":
 		m.quick(msg.String())
@@ -380,48 +351,31 @@ func (m *model) narrow(said string) {
 	}
 }
 
+// [[spec/design_output/viewer#the-window-is-a-split]]
 func (m model) View() string {
 	if m.h == 0 {
 		return ""
 	}
-	head := m.renderHeader()
-	if m.pane == paneShut {
-		return head + "\n" + m.renderList()
+	head := m.renderStrip() + "\n" + ruleStyle.Render(strings.Repeat("─", max(1, m.w)))
+	body := m.tabs[m.open].Left(&m, m.listWidth(), m.rows())
+	if m.pane != paneShut {
+		rule := ruleStyle.Render(strings.TrimSuffix(strings.Repeat("│ \n", m.body()), "\n"))
+		right := lipgloss.NewStyle().Width(m.box.Width).MaxHeight(m.body()).Render(m.box.View())
+		body = lipgloss.JoinHorizontal(lipgloss.Top, body, rule, right)
 	}
-	rule := ruleStyle.Render(strings.TrimSuffix(strings.Repeat("│ \n", m.rows()), "\n"))
-	right := lipgloss.NewStyle().Width(m.box.Width).MaxHeight(m.rows()).Render(m.box.View())
-	return head + "\n" + lipgloss.JoinHorizontal(lipgloss.Top, m.renderList(), rule, right)
+	return head + "\n" + body + "\n" + m.renderFooter()
 }
 
-// [[spec/design_output/viewer#the-header]]
-func (m model) renderHeader() string {
-	w := m.w
+// [[spec/design_output/viewer#the-columns-stand-still]]
+func (m model) renderNames(w int) string {
 	names := "  " + strings.Join([]string{
 		pad("time", stampWide), pad("level", levelWide), pad("kind", kindWide), "said",
 	}, " ")
-	keys := dimStyle.Render("enter details  alt+? help  ")
-	filterKey := dimStyle.Render("alt+f filter")
-	if !m.filter.Empty() {
-		filterKey = levelStyle("error").Render("alt+f filter")
-	}
-	floorKey := dimStyle.Render("  alt+L log lvl: " + strings.ToUpper(m.floor))
-	if !strings.EqualFold(m.floor, "info") {
-		floorKey = levelStyle("error").Render("  alt+L log lvl: " + strings.ToUpper(m.floor))
-	}
-	hints := keys + filterKey + floorKey
-	gap := w - ansi.StringWidth(names) - ansi.StringWidth(hints)
-	line := headStyle.Render(names)
-	if gap >= 2 {
-		line += strings.Repeat(" ", gap) + hints
-	} else {
-		line = headStyle.Render(cut(names, w))
-	}
-	return line + "\n" + ruleStyle.Render(strings.Repeat("─", max(1, w)))
+	return headStyle.Render(cut(names, w))
 }
 
-func (m model) renderList() string {
-	w := m.listWidth()
-	lines := make([]string, 0, m.rows())
+func (m model) renderRows(w, rows int) string {
+	lines := make([]string, 0, rows)
 	switch {
 	case m.err != nil:
 		lines = append(lines, levelStyle("error").Render(cut("the log does not read: "+m.err.Error(), w)))
@@ -430,7 +384,7 @@ func (m model) renderList() string {
 	case len(m.view) == 0:
 		lines = append(lines, dimStyle.Render(cut("no line matches the filter", w)))
 	}
-	for p := m.top; len(lines) < m.rows(); p++ {
+	for p := m.top; len(lines) < rows; p++ {
 		if p >= len(m.view) {
 			lines = append(lines, "")
 			continue

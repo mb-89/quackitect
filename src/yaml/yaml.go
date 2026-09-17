@@ -3,7 +3,7 @@
 // order its file writes, so a finding names the fields in the order a person
 // sees them.
 // [[spec/design_output/schema#the-yaml-a-schema-reads]]
-package main
+package yaml
 
 import (
 	"regexp"
@@ -17,7 +17,7 @@ type Doc struct {
 	at    map[string]any
 }
 
-func newDoc() *Doc { return &Doc{at: map[string]any{}} }
+func New() *Doc { return &Doc{at: map[string]any{}} }
 
 func (one *Doc) Set(key string, said any) {
 	if one.at == nil {
@@ -52,11 +52,11 @@ func (one *Doc) Keys() []string {
 }
 
 var (
-	pairAt    = regexp.MustCompile(`^([^:\s][^:]*):\s*(.*)$`)
-	linkAt    = regexp.MustCompile(`^\[\[(.+)\]\]$`)
+	PairAt    = regexp.MustCompile(`^([^:\s][^:]*):\s*(.*)$`)
+	LinkAt    = regexp.MustCompile(`^\[\[(.+)\]\]$`)
 	wholeAt   = regexp.MustCompile(`^-?\d+$`)
 	commentAt = regexp.MustCompile(`^\s*#`)
-	firstWord = regexp.MustCompile(`\S`)
+	FirstWord = regexp.MustCompile(`\S`)
 )
 
 type row struct {
@@ -67,18 +67,18 @@ type row struct {
 type cursor struct{ at int }
 
 // [[spec/design_output/schema#the-yaml-a-schema-reads]]
-func readYaml(text string) any {
+func Read(text string) any {
 	rows := []row{}
-	for _, raw := range splitLines(text) {
+	for _, raw := range SplitLines(text) {
 		line := strings.TrimRight(raw, " \t")
 		if strings.TrimSpace(line) == "" || commentAt.MatchString(line) {
 			continue
 		}
-		where := firstWord.FindStringIndex(line)
+		where := FirstWord.FindStringIndex(line)
 		rows = append(rows, row{indent: where[0], said: strings.TrimSpace(line)})
 	}
 	if len(rows) == 0 {
-		return newDoc()
+		return New()
 	}
 	one := &cursor{}
 	return block(rows, one, rows[0].indent)
@@ -92,13 +92,13 @@ func block(rows []row, one *cursor, indent int) any {
 }
 
 func mapAt(rows []row, one *cursor, indent int) any {
-	out := newDoc()
+	out := New()
 	for one.at < len(rows) {
 		held := rows[one.at]
 		if held.indent != indent {
 			break
 		}
-		pair := pairAt.FindStringSubmatch(held.said)
+		pair := PairAt.FindStringSubmatch(held.said)
 		if pair == nil {
 			break
 		}
@@ -123,13 +123,13 @@ func listAt(rows []row, one *cursor, indent int) any {
 		one.at++
 
 		rest := strings.TrimSpace(held.said[2:])
-		pair := pairAt.FindStringSubmatch(rest)
+		pair := PairAt.FindStringSubmatch(rest)
 		if pair == nil {
 			out = append(out, scalar(rest))
 			continue
 		}
 
-		item := newDoc()
+		item := New()
 		key := strings.TrimSpace(pair[1])
 		if said := strings.TrimSpace(pair[2]); said != "" {
 			item.Set(key, scalar(said))
@@ -138,7 +138,7 @@ func listAt(rows []row, one *cursor, indent int) any {
 		}
 		for one.at < len(rows) && rows[one.at].indent > held.indent {
 			next := rows[one.at]
-			more := pairAt.FindStringSubmatch(next.said)
+			more := PairAt.FindStringSubmatch(next.said)
 			if more == nil {
 				break
 			}
@@ -170,13 +170,13 @@ func under(rows []row, one *cursor, indent int) any {
 }
 
 func scalar(said string) any {
-	flat := unquote(said)
-	if linkAt.MatchString(flat) {
-		return flat
+	bare := unquote(said)
+	if LinkAt.MatchString(bare) {
+		return bare
 	}
-	if strings.HasPrefix(flat, "[") && strings.HasSuffix(flat, "]") {
+	if strings.HasPrefix(bare, "[") && strings.HasSuffix(bare, "]") {
 		out := []any{}
-		for _, part := range strings.Split(flat[1:len(flat)-1], ",") {
+		for _, part := range strings.Split(bare[1:len(bare)-1], ",") {
 			each := unquote(strings.TrimSpace(part))
 			if each != "" {
 				out = append(out, each)
@@ -184,29 +184,30 @@ func scalar(said string) any {
 		}
 		return out
 	}
-	if flat == "true" {
+	if bare == "true" {
 		return true
 	}
-	if flat == "false" {
+	if bare == "false" {
 		return false
 	}
-	if wholeAt.MatchString(flat) {
-		whole, _ := strconv.Atoi(flat)
+	if wholeAt.MatchString(bare) {
+		whole, _ := strconv.Atoi(bare)
 		return whole
 	}
-	return flat
+	return bare
 }
 
 func unquote(said string) string {
-	flat := strings.TrimSpace(said)
-	quoted := (strings.HasPrefix(flat, `"`) && strings.HasSuffix(flat, `"`)) ||
-		(strings.HasPrefix(flat, `'`) && strings.HasSuffix(flat, `'`))
-	if quoted && len(flat) > 1 {
-		return flat[1 : len(flat)-1]
+	bare := strings.TrimSpace(said)
+	quoted := (strings.HasPrefix(bare, `"`) && strings.HasSuffix(bare, `"`)) ||
+		(strings.HasPrefix(bare, `'`) && strings.HasSuffix(bare, `'`))
+	if quoted && len(bare) > 1 {
+		return bare[1 : len(bare)-1]
 	}
-	return flat
+	return bare
 }
 
-func splitLines(text string) []string {
+// [[spec/design_output/schema#the-yaml-a-schema-reads]]
+func SplitLines(text string) []string {
 	return strings.Split(strings.ReplaceAll(text, "\r\n", "\n"), "\n")
 }
