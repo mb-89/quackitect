@@ -3,12 +3,25 @@
 // files follow at the next projection.
 // [[spec/design_output/projection#the-second-target]]
 
-import { swapsOf, TERMS, wordsOf } from "./vocabulary.js";
+import {
+  counted,
+  escaped,
+  FRONT,
+  grouped,
+  LINK,
+  pattern,
+  prelude,
+  quoted,
+  scripted,
+  sequenced,
+  swapped,
+  WIDTH,
+} from "./snippets.js";
+import { vocabularyRule, wordsOf } from "./vocabulary.js";
 
 export const PARAGRAPH = "paragraph rules";
 export const RULES = ".yml";
-export const LINK = "spec/funnel/a-paragraph-has-a-schema.md";
-const WIDTH = { banner: 76, row: 72 };
+export { grouped, LINK };
 
 // [[spec/design_output/projection#the-schema-names-a-mark]]
 const MARKS = new Map([
@@ -159,7 +172,7 @@ export function rulesFrom(said, banner = "", lists = null) {
   if (modals) put("ModalRequirement.yml", modals);
   // [[spec/funnel/a-paragraph-has-a-schema]]
   const words = wordsOf(lists);
-  if (words.length) put("Vocabulary.yml", vocabulary(layers.vocabulary ?? {}, lists));
+  if (words.length) put("Vocabulary.yml", vocabularyRule(layers.vocabulary ?? {}, lists));
   return out;
 }
 
@@ -169,132 +182,10 @@ function file(banner, body) {
   return `${rows.map((one) => `# ${one}`).join("\n")}\n${body}`;
 }
 
-function head(message, level = "error") {
-  return [
-    "extends: script",
-    `message: ${JSON.stringify(message)}`,
-    `link: ${LINK}`,
-    `level: ${level}`,
-    "scope: raw",
-    "script: |",
-  ].join("\n");
-}
-
-function scripted(message, lines) {
-  return `${head(message)}\n${lines.map((one) => `  ${one}`.trimEnd()).join("\n")}\n`;
-}
-
-// [[spec/design_output/projection#what-stands-outside-a-layer]]
-function prelude(wanted, blanks = true) {
-  const held = new Map(HELPERS);
-  const names = blanks ? ["blanked", "plain", ...wanted] : wanted;
-  return [
-    'text := import("text")',
-    "",
-    "matches := []",
-    "",
-    ...names.flatMap((name) => [...(held.get(name) ?? []), ""]),
-  ];
-}
-
-const HELPERS = new Map([
-  [
-    "blanked",
-    [
-      "blanked := func(said, pattern) {",
-      "  found := text.re_find(pattern, said, -1)",
-      "  if is_undefined(found) { return said }",
-      "  parts := []",
-      "  at := 0",
-      "  for one in found {",
-      "    m := one[0]",
-      "    parts = append(parts, said[at:m.begin])",
-      '    parts = append(parts, text.repeat(" ", m.end - m.begin))',
-      "    at = m.end",
-      "  }",
-      "  parts = append(parts, said[at:])",
-      '  return text.join(parts, "")',
-      "}",
-    ],
-  ],
-  [
-    "plain",
-    [
-      "plain := func(said) {",
-      "  out := said",
-      "  out = blanked(out, `(?s)^---\\n.*?\\n---`)",
-      '  out = blanked(out, "(?s)```.*?```")',
-      "  out = blanked(out, `(?s)~~~.*?~~~`)",
-      "  out = blanked(out, `(?s)<!--.*?-->`)",
-      "  out = blanked(out, `(?m)^(?:\\t| {4,}).*$`)",
-      '  out = blanked(out, "(?s)`[^`]*`")',
-      "  out = blanked(out, `https?://[^\\s)]+`)",
-      "  out = blanked(out, `\\[\\[[^\\]]*\\]\\]`)",
-      "  out = blanked(out, `\\[[^\\]]*\\]\\([^)]*\\)`)",
-      "  out = blanked(out, `[A-Za-z0-9_.-]+/[A-Za-z0-9_./-]+`)",
-      "  return out",
-      "}",
-    ],
-  ],
-  [
-    "rows",
-    [
-      "rows := func(said) {",
-      "  out := []",
-      "  at := 0",
-      '  for line in text.split(said, "\\n") {',
-      "    out = append(out, {said: line, begin: at, end: at + len(line)})",
-      "    at += len(line) + 1",
-      "  }",
-      "  return out",
-      "}",
-    ],
-  ],
-  [
-    "structure",
-    [
-      "structure := func(line) {",
-      "  t := text.trim_space(line)",
-      '  if text.has_prefix(t, "#") { return true }',
-      '  if text.has_prefix(t, "|") { return true }',
-      '  if text.has_prefix(t, ">") { return true }',
-      '  if text.has_prefix(t, "- ") { return true }',
-      '  if text.has_prefix(t, "* ") { return true }',
-      '  if text.has_prefix(t, "+ ") { return true }',
-      '  if text.has_prefix(t, "---") { return true }',
-      "  if text.re_match(`^[0-9]+[.)] `, t) { return true }",
-      "  if text.re_match(`^ {4,}[^ ]`, line) { return true }",
-      "  return false",
-      "}",
-    ],
-  ],
-  [
-    "words",
-    [
-      "words := func(said) {",
-      "  n := 0",
-      '  for one in text.split(said, " ") {',
-      "    if len(text.trim_space(one)) > 0 { n = n + 1 }",
-      "  }",
-      "  return n",
-      "}",
-    ],
-  ],
-]);
-
-// [[spec/design_output/projection#the-second-target]]
-function quoted(said) {
-  return JSON.stringify(String(said));
-}
 
 // [[spec/design_output/projection#the-grammar-rules]]
 function left(layer) {
   return (layer?.exceptions ?? []).map((one) => String(one?.word ?? one)).filter(Boolean);
-}
-
-// [[spec/design_output/projection#the-grammar-rules]]
-function pattern(said) {
-  return said.replace(/[\\^$.|?*+()[\]{}]/g, "\\$&");
 }
 
 // [[spec/design_output/projection#the-second-target]]
@@ -452,8 +343,8 @@ function run(layer, where, opens = []) {
   const most = Number(layer.paragraphsPerRun);
 
   return scripted(`A run holds ${most} paragraphs${where}.`, [
-    ...prelude(["rows", "structure"], false),
-    "said := scope",
+    ...prelude(["rows", "structure"]),
+    FRONT,
     "",
     "fenced := false",
     "inPara := false",
@@ -533,10 +424,11 @@ function listItem(layer) {
   const most = Number(layer.words?.listItem);
 
   return scripted(`A sentence in a list item holds ${most} words.`, [
-    ...prelude(["rows", "words"], false),
+    ...prelude(["rows", "words"]),
+    FRONT,
     "fenced := false",
     "",
-    "for row in rows(scope) {",
+    "for row in rows(said) {",
     "  trimmed := text.trim_space(row.said)",
     '  if text.has_prefix(trimmed, "```") {',
     "    fenced = !fenced",
@@ -565,10 +457,11 @@ function codeSpans(layer) {
   const most = Number(layer.codeSpans);
 
   return scripted(`A sentence holds ${most} code spans.`, [
-    ...prelude(["rows"], false),
+    ...prelude(["rows"]),
+    FRONT,
     "fenced := false",
     "",
-    "for row in rows(scope) {",
+    "for row in rows(said) {",
     "  trimmed := text.trim_space(row.said)",
     '  if text.has_prefix(trimmed, "```") {',
     "    fenced = !fenced",
@@ -594,199 +487,7 @@ function codeSpans(layer) {
   ]);
 }
 
-// The rule refuses a word the list leaves out. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-function vocabulary(layer, lists) {
-  const words = wordsOf(lists);
-  const swaps = swapsOf(lists);
-  const where = pathOf(layer);
-  const tail =
-    "stands outside the words this tree writes. Write a core word, or add it to " +
-    `${where} with the note that defines it.`;
 
-  return scripted(`A word ${tail}`, [
-    ...prelude([]),
-    // [[spec/funnel/a-paragraph-has-a-schema]]
-    // A map literal this long overruns the Tengo stack. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-    "list := `",
-    ...grouped(words),
-    "`",
-    "",
-    "inside := {}",
-    "for w in text.re_split(`\\s+`, list, -1) {",
-    "  if len(w) > 0 { inside[w] = 1 }",
-    "}",
-    "",
-    "roads := `",
-    ...grouped([...swaps].map(([from, to]) => `${from}=${to}`)),
-    "`",
-    "",
-    "swaps := {}",
-    "for one in text.re_split(`\\s+`, roads, -1) {",
-    '  pair := text.split(one, "=")',
-    "  if len(pair) == 2 { swaps[pair[0]] = pair[1] }",
-    "}",
-    "",
-    // A plural, a past form and an -ing form stand in. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-    "listed := func(w) {",
-    "  if inside[w] != undefined { return true }",
-    "  n := len(w)",
-    '  if n > 3 && text.has_suffix(w, "ies") {',
-    '    if inside[w[:n-3] + "y"] != undefined { return true }',
-    "  }",
-    '  if n > 2 && text.has_suffix(w, "es") {',
-    "    if inside[w[:n-2]] != undefined { return true }",
-    "    if inside[w[:n-1]] != undefined { return true }",
-    "  }",
-    '  if n > 1 && text.has_suffix(w, "s") {',
-    "    if inside[w[:n-1]] != undefined { return true }",
-    "  }",
-    '  if n > 3 && text.has_suffix(w, "ied") {',
-    '    if inside[w[:n-3] + "y"] != undefined { return true }',
-    "  }",
-    '  if n > 2 && text.has_suffix(w, "ed") {',
-    "    if inside[w[:n-2]] != undefined { return true }",
-    "    if inside[w[:n-1]] != undefined { return true }",
-    "    if inside[w[:n-3]] != undefined { return true }",
-    "  }",
-    '  if n > 3 && text.has_suffix(w, "ing") {',
-    "    if inside[w[:n-3]] != undefined { return true }",
-    '    if inside[w[:n-3] + "e"] != undefined { return true }',
-    "    if inside[w[:n-4]] != undefined { return true }",
-    "  }",
-    // An adverb, a comparative, an -able and a -less form stand in too. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-    '  if n > 3 && text.has_suffix(w, "ves") {',
-    '    if inside[w[:n-3] + "f"] != undefined { return true }',
-    '    if inside[w[:n-3] + "fe"] != undefined { return true }',
-    "  }",
-    '  if n > 4 && text.has_suffix(w, "ily") {',
-    '    if inside[w[:n-3] + "y"] != undefined { return true }',
-    "  }",
-    '  if n > 3 && text.has_suffix(w, "ly") {',
-    "    if inside[w[:n-2]] != undefined { return true }",
-    '    if inside[w[:n-2] + "e"] != undefined { return true }',
-    "  }",
-    '  if n > 3 && text.has_suffix(w, "er") {',
-    "    if inside[w[:n-2]] != undefined { return true }",
-    "    if inside[w[:n-1]] != undefined { return true }",
-    "  }",
-    '  if n > 4 && text.has_suffix(w, "est") {',
-    "    if inside[w[:n-3]] != undefined { return true }",
-    "    if inside[w[:n-2]] != undefined { return true }",
-    "  }",
-    '  if n > 5 && (text.has_suffix(w, "able") || text.has_suffix(w, "ible")) {',
-    "    if inside[w[:n-4]] != undefined { return true }",
-    '    if inside[w[:n-4] + "e"] != undefined { return true }',
-    "  }",
-    '  if n > 5 && (text.has_suffix(w, "less") || text.has_suffix(w, "most")) {',
-    "    if inside[w[:n-4]] != undefined { return true }",
-    "  }",
-    "  return false",
-    "}",
-    "",
-    // A prefix on a listed word stands too: unread, rerun, misread, outlive. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-    "known := func(w) {",
-    "  if listed(w) { return true }",
-    '  for pre in ["un", "re", "mis", "out", "over", "non", "pre", "sub"] {',
-    "    if len(w) > len(pre) + 2 && text.has_prefix(w, pre) && listed(w[len(pre):]) { return true }",
-    "  }",
-    "  return false",
-    "}",
-    "",
-    "said := plain(scope)",
-    "said = blanked(said, `(?m)^#{1,6} +`)",
-    "said = blanked(said, `(?m)^[ \\t]*(?:[-*+]|[0-9]+[.)]) +`)",
-    "said = blanked(said, `(?m)^[ \\t]*> ?`)",
-    "said = blanked(said, `\\|`)",
-    "said = blanked(said, `[*_]`)",
-    ...left(layer).map((one) => `said = blanked(said, ${quoted(pattern(one))})`),
-    "",
-    // A capital past the first word names a thing. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-    "opens := func(at) {",
-    "  i := at - 1",
-    "  for i >= 0 {",
-    "    c := said[i:i+1]",
-    '    if c == " " || c == "\\t" || c == "\\n" { i-- ; continue }',
-    '    if c == "." || c == "!" || c == "?" || c == ":" || c == ";" { return true }',
-    "    return false",
-    "  }",
-    "  return true",
-    "}",
-    "",
-    "found := text.re_find(`[A-Za-z][A-Za-z0-9'’-]*`, said, -1)",
-    "if is_undefined(found) { found = [] }",
-    "",
-    "for one in found {",
-    "  m := one[0]",
-    "  w := m.text",
-    "  if text.re_match(`[0-9_]`, w) { continue }",
-    "  head := w[0:1]",
-    "  if head != text.to_lower(head) && !opens(m.begin) { continue }",
-    // One letter names a key, a column or a label. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-    "  if len(w) == 1 { continue }",
-    "",
-    "  low := text.to_lower(w)",
-    '  low = text.trim_suffix(low, "\'s")',
-    '  low = text.trim_suffix(low, "’s")',
-    '  if text.contains(low, "\'") || text.contains(low, "’") { continue }',
-    "",
-    '  bad := ""',
-    '  for part in text.split(low, "-") {',
-    "    p := text.trim_space(part)",
-    // A prefix such as re- or co- stands on no list. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
-    "    if len(p) < 3 { continue }",
-    "    if known(p) { continue }",
-    "    bad = p",
-    "    break",
-    "  }",
-    '  if bad == "" { continue }',
-    "",
-    "  road := swaps[bad]",
-    '  say := bad + " stands outside the words this tree writes. "',
-    "  if road != undefined {",
-    '    say += "Write " + road + " instead."',
-    "  } else {",
-    `    say += ${quoted("Write a core word, or add ")} + bad +`,
-    `      ${quoted(` to ${where} with the note that defines it.`)}`,
-    "  }",
-    "  matches = append(matches, {begin: m.begin, end: m.end, message: say})",
-    "}",
-  ]);
-}
-
-// [[spec/funnel/a-paragraph-has-a-schema]]
-function pathOf(layer) {
-  const said = String(layer?.terms ?? "").trim();
-  return said || TERMS;
-}
-
-// [[spec/funnel/a-paragraph-has-a-schema]]
-export function grouped(said, at = WIDTH.row) {
-  const out = [];
-  let row = "";
-  for (const one of said) {
-    if (row && `${row} ${one}`.length > at) {
-      out.push(row);
-      row = one;
-      continue;
-    }
-    row = row ? `${row} ${one}` : one;
-  }
-  if (row) out.push(row);
-  return out;
-}
-
-function counted(message, scope, token, most) {
-  return [
-    "extends: occurrence",
-    `message: ${JSON.stringify(message)}`,
-    `link: ${LINK}`,
-    "level: error",
-    `scope: ${scope}`,
-    `max: ${most}`,
-    `token: '${token}'`,
-    "",
-  ].join("\n");
-}
 
 
 // [[spec/design_output/projection#the-grammar-rules]]
@@ -909,47 +610,3 @@ function hedge(layer) {
   ].join("\n");
 }
 
-// [[spec/design_output/projection#the-grammar-rules]]
-function sequenced(message, heads, tag, left = []) {
-  const said = heads.flatMap((head) => left.map((one) => `${head} ${one}`)).sort();
-  return [
-    "extends: sequence",
-    `message: ${JSON.stringify(message)}`,
-    `link: ${LINK}`,
-    "level: error",
-    "ignorecase: true",
-    ...(said.length ? ["exceptions:", ...said.map((one) => `  - ${one}`)] : []),
-    "tokens:",
-    `  - pattern: '(?:${heads.join("|")})'`,
-    "    tag: VB*",
-    `  - tag: ${tag}`,
-    "",
-  ].join("\n");
-}
-
-function swapped(message, pairs, how) {
-  return [
-    "extends: substitution",
-    `message: ${JSON.stringify(message)}`,
-    `link: ${LINK}`,
-    "level: error",
-    ...(how.ignorecase ? ["ignorecase: true"] : []),
-    ...(how.nonword ? ["nonword: true"] : []),
-    ...(how.replace ? ["action:", "  name: replace"] : []),
-    "swap:",
-    ...pairs.map(([from, to]) => `  ${single(from)}: ${JSON.stringify(to)}`),
-    "",
-  ].join("\n");
-}
-
-// [[spec/design_output/projection#the-grammar-rules]]
-function single(said) {
-  return `'${String(said).split("'").join("''")}'`;
-}
-
-function escaped(set) {
-  return set
-    .split("")
-    .map((one) => `\\${one}`)
-    .join("");
-}

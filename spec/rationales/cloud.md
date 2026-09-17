@@ -83,6 +83,25 @@ The alternative is a branch held open until a person answers. That blocks the
 tickets depending on it, and a dependency reads a closed ticket, not a finished
 one. So closing is what frees the chain.
 
+## 8. The check greens first
+
+A box read the check red, named the four lines a verb wrote, and left them. Three
+of the four stood on the branch before that box took it. The reading went: a
+fault another hand wrote belongs to that hand.
+
+That reading costs the tree twice:
+
+- `branch done` asks for a green check, so a red branch reaches no mergeable status
+- the next box inherits the same lines, reads them the same way, and leaves them
+
+A fault with no owner outlives every hand that meets it. So the hand that meets
+it owns it. The box that stops there pays nothing, and every box after it pays.
+
+The fix here reached the rule itself. The prose rules read the whole file, and a
+verb writes the frontmatter. So a joined `why` line read as one sentence, past
+the code span cap. Blanking that block in the three rules that miss it costs
+four lines, and it greens every ticket the verbs write.
+
 ## 11. One session, one branch
 
 A session reading this note from `take` to `done` finds no line saying it stops
