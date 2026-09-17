@@ -88,7 +88,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[standard]]
 group: guidance-rides-the-step
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 0fc2b4132f94 · claude-code-remote
+    hash_before: daad33433eb3bbd269f48595ccb852dcc78f76ce
+    hash_after: daad33433eb3bbd269f48595ccb852dcc78f76ce
 ---
 
 # Ask
