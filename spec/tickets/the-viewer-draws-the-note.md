@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -110,6 +110,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 71635ad0f41bf12c21d67bb87834806ef43f50af
+    hash_after: 71635ad0f41bf12c21d67bb87834806ef43f50af
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
