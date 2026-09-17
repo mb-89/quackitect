@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 steps:
   - name: design
@@ -154,6 +154,11 @@ record:
     hash_after: d1a5dad0f59f82a1dbcfc769fa2589428ddaa328
     returns: 2
     why: the hand takes it back
+  - step: verdict
+    hand: box 0fc2b4132f94 · claude-code-remote · helper-9
+    hash_before: d6887de1fe71f8130670c609b7f3208956740d31
+    hash_after: d6887de1fe71f8130670c609b7f3208956740d31
+reason: done
 ---
 
 # Ask
@@ -492,18 +497,19 @@ Why each piece stands where it does:
 
 <!-- the form is files -->
 
-spec/tickets/guidance-rides-step.md
-src/scripts/guidance-hand.js
-src/scripts/guidance-verb.js
-src/scripts/branch-usage.js
-src/scripts/pull.js
-src/scripts/work.js
-src/scripts/cli.js
-src/scripts/hand.js
-src/bridge/guidance.js
-.claude/skills/level0/lib/guidance.js
-test/level0/guidance-hand.test.js
-spec/vocabulary/terms.yml
+- spec/tickets/guidance-rides-step.md
+- src/scripts/guidance-hand.js
+- src/scripts/guidance-verb.js
+- src/scripts/branch-usage.js
+- src/scripts/pull.js
+- src/scripts/work.js
+- src/scripts/cli.js
+- src/scripts/hand.js
+- src/bridge/guidance.js
+- .claude/skills/level0/lib/guidance.js
+- .claude/skills/level0/lib/copilot-runtime.js
+- test/level0/guidance-hand.test.js
+- spec/vocabulary/terms.yml
 
 ## verdict
 
@@ -511,44 +517,52 @@ spec/vocabulary/terms.yml
 
 <!-- the form is verdict -->
 
-fail
+pass
 
 | the question reviewing asks | the answer |
 |---|---|
-| does the branch do what the ask asks | no, the verb misses a helper's hand |
+| does the branch do what the ask asks | yes, every bullet of the ask stands |
 | is what the diff touches beyond the ask trivial | yes, the moved rows carry the same words |
 | what does `./RUNME.sh check` answer | 0 |
 | does a retro stand in the handback | no, and the route puts the retro after this phase |
-| does every rule the branch adds carry a test | no, the standing verb carries none |
+| does every rule the branch adds carry a test | yes, and a bad name meets a refusal |
 
 TL;DR:
 
-- The log row, the note hashes and the three re-hand rules stand, each with a test.
+- Every bullet of the ask stands, and each one carries a test.
 - `./RUNME.sh check` exits 0, and `./RUNME.sh branch test` answers green.
-- The verb and the standing layer miss a helper's hand, so a helper reads no note again.
-- Each fix below is small, and `implement/reflect` takes them.
+- The four findings of the last verdict all land, and I read each one live.
+- Three lines stand open below, and the retro takes them.
+
+What I read live, and what it answers:
+
+| what I ran | what it answers |
+|---|---|
+| `./RUNME.sh branch guidance --as helper-9` | the held step's note, and exit 0 |
+| `./RUNME.sh branch guidance` | nothing stands in your hand, and exit 1 |
+| `./RUNME.sh branch guidance spec/guidance/nowhere` | names no note, and exit 1 |
+| `./RUNME.sh branch pull --as helper-9` | the short line, now naming `--as helper-9` |
+| `./RUNME.sh standing --as helper-9` | the layer, and exit 0 |
 
 The findings, one a line:
 
-- `./RUNME.sh branch guidance` reads no `--as`, so a helper's hand reaches no note.
-- Run bare, the verb says nothing stands in your hand, while `branch pull --as` finds it.
-- Named `--as`, the verb reads the word as a note, and answers one bland line.
-- The second hand-out points a helper at `branch guidance`, which answers that helper no note.
-- `./RUNME.sh standing` reads the same hand, so a note a helper's step reads stays in the layer.
-- No test drives `./RUNME.sh standing`, and the ask names that verb.
-- A note name standing nowhere answers 0, so a typo reads as a note without actionables.
+- The session reads the layer through `src/bridge/guidance.js`, which names no read.
+- So a session still carries every note, and only the standing verb shrinks.
+- `.claude/skills/level0/lib/copilot-runtime.js` names no read either.
 - The split stands undone. `wc -l src/scripts/pull.js src/scripts/work.js` reads both past `code.fileLines`.
 - The sibling ticket the approach names stands unminted, and `depends_on` names nothing.
+- The short line names `--as` on its guidance row, and drops it on its hand-back row.
+- A helper running that hand-back row meets a refusal, because no hold stands under that hand.
+- The standing verb's own line carries no test, and `heldReads` carries one.
 
 What the agent needs:
 
 | number | need | status |
 |---|---|---|
-| 1 | the verb takes `--as`, so a helper's hand reaches its notes | open |
-| 2 | `./RUNME.sh standing` takes that same hand | open |
-| 3 | a test drives the standing verb after a note leaves the layer | open |
-| 4 | a note name standing nowhere meets a refusal | open |
-| 5 | the sibling ticket the approach names lands, and `depends_on` names it | open |
+| 1 | the retro takes the layer a session reads, so the bridge names the read | open |
+| 2 | the retro takes the split, and the sibling ticket the approach names | open |
+| 3 | the short line names `--as` on its hand-back row too | open |
+| 4 | the group merges, because every bullet of the ask stands | open |
 
 # Discussion
 
