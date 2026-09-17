@@ -114,6 +114,9 @@ record:
     hand: box ee33ce836a4d
     hash_before: 9c4670bd162fa56f32d4e253b2e09ead376e4317
     hash_after: 04efd43b43d64bac49c536765e630a8738a3201e
+  - step: children
+    hand: box 3d4c068755ec · claude-code-remote
+    hash_before: 0cbc9012b1badfdb62f285c323039f01a2791257
 step: children
 ---
 
