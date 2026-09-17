@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -101,6 +101,10 @@ record:
     hash_after: ed1616d0e2e213d38b6bc58d8c5cd95f11033dce
     returns: 1
     why: "The four asked answers stand: the marketplace name, the zero cost, the icon path, the dotted folder.; The cited anchor stands. `spec/design_output/level0.md` carries the heading, and it measures the tools keeping `level0`.; The count drifts. `grep -rl mcp__level0` answers 30 today, and the draft writes 29.; The draft's own file joined that list. Name the command, and drop both numbers.; The config claim reads other than the tree. The stop door reads `spec/config/stop`, and Vale reads `spec/config/styles`.; A projection writes `spec/config/styles/VoiceParagraph`, so that folder stands as a target too.; Ground `spec/config/brand` on the folder a door reads, and say which door reads it.; The icon projection wants a shape. `projection.js` holds three shapes, and a copy of an svg fits none.; The table names `brandOf` the writer of three fields. Today `brandOf` feeds the `vehicle.json` record name alone.; `.claude-plugin/marketplace.json` carries a literal name. Name who rewrites it, and when.; The lint reads the ticket clean."
+  - step: design/draft
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 26590a5e95246ff66192a37104991e9a7a9c976b
+    hash_after: 26590a5e95246ff66192a37104991e9a7a9c976b
 ---
 
 # Ask
@@ -130,17 +134,34 @@ The brand reaches the marketplace and leaves the plugin name alone.
 
 [[spec/design_output/level0#a-stub-names-its-vehicle]] already measured this road. A stub names the vehicle's folder as a marketplace, enables `level0@<brand>`, and the tools keep the name `level0`. So the brand parts two vehicles at the marketplace, and the plugin name carries no weight it already carries.
 
-| the name | what it reads | who writes it |
+| the name | what it reads after | who writes it today |
 |---|---|---|
-| `marketplace.json` name | the brand | `brandOf` |
-| `marketplace.json` owner name | the brand | `brandOf` |
-| `plugin.json` author name | the brand | `brandOf` |
+| `marketplace.json` name | the brand | nobody, and the file carries a literal |
+| `marketplace.json` owner name | the brand | nobody, and the file carries a literal |
+| `plugin.json` author name | the brand | nobody, and the file carries a literal |
 | `plugin.json` name | `level0` | nobody, and it stands |
-| the enabled id | `level0@<brand>` | the stub's settings |
+| the enabled id | `level0@<brand>` | nobody, and this ticket writes it |
 
-The cost for the tool names is nothing. `grep -rl mcp__level0` answers 29 files outside `node_modules` and `.se`, and every one of them stands as it is. A draft stamping the brand on the plugin name moves all 29, and buys a parting the marketplace already gives.
+`brandOf` in the vehicle library answers the folder name, and `stub.js` writes it into the vehicle record alone. So the change takes that one answer to the four rows above it, and the third column reads a hand where it reads nobody today.
 
-The icon stands at `spec/config/brand/icon.svg`. `spec/config` already holds a folder for each thing a projection reads, as `styles` and `stop` do, so the brand takes one of its own. `src/extension/icon.svg` is the target it projects into, and the extension build reads its own path as it does now.
+The cost for the tool names is nothing, and every file naming a tool stands as it is. `grep -rl mcp__level0` answers which, and a draft stamping the brand on the plugin name moves every one. It buys a parting the marketplace already gives.
+
+The icon stands at `spec/config/brand/icon.svg`. Each folder under `spec/config` answers to one reader, and the brand takes a folder of its own:
+
+| the folder | the reader |
+|---|---|
+| `stop` | `stop.js` |
+| `styles` | `vale.js` |
+| `brand` | the build, which carries the icon to the extension |
+
+`src/extension/icon.svg` stands as a tracked file today, and `package.json` names it. Two roads carry the brand's icon there:
+
+| the road | what it costs |
+|---|---|
+| the build copies the file | one line in the install script, and the target stays tracked |
+| a projection writes it | a fourth shape in `projection.js`, which handles three and copies no image |
+
+The first road takes this ticket, because the second asks for a shape the projection lacks.
 
 `brandOf` answers the folder name whole, so a folder carrying a dot answers a name carrying a dot. A marketplace name takes no dot, so `brandOf` slugs what it answers:
 
