@@ -90,12 +90,18 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: guidance-rides-the-step
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 0fc2b4132f94 · claude-code-remote
     hash_before: ce48a7b824a94ba3ffcd7ad9867f488112e28876
     hash_after: ce48a7b824a94ba3ffcd7ad9867f488112e28876
+  - step: design/review
+    hand: box 0fc2b4132f94 · claude-code-remote · helper-2
+    hash_before: dcc573eb0a7765e6d259cd5f5502223ee4b2180d
+    hash_after: dcc573eb0a7765e6d259cd5f5502223ee4b2180d
+    returns: 1
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | no, and the box claim breaks |; | is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 |; | does a retro stand in the handback | no, and no handback stands on the branch |; | does every claim the approach makes carry a test | no, one road carries none |; TL;DR:; The drop reads right. One helper answers the held step's notes, and both roads call it.; The ceiling claim holds. `wc -l` reads both roads under `code.fileLines`.; The helper mints a box and writes it, so the third test's claim breaks.; Each road hands the helper a box the helper does not read, and the approach names no fix.; The findings, one a line:; The box claim breaks. `handOf` mints a box id and writes it where none stands.; The third test asserts the box file stays absent, and the helper writes it. Name what the road does instead.; The bridge hands no `join` and no `git`, which the helper's path reaches. Name what each road passes.; The trees split. The bridge reads its notes off the vehicle tree, and the hold stands under the worked tree. Name the root each road passes.; The hand name finds the hold. Name the hand each road reads, because the pull keys the hold by that name.; The bridge builds two layers, `standing` and `helper`, and the approach names one. Say what a spawned helper carries.; The counts answer every note, and the sentence a session reads says those numbers. Say what they answer once a note leaves.; The runtime road carries no test. Say what claim stands there, and how a reader reads it.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the draft hand says what the box write does on a tree holding none | open |; | 2 | the draft hand names what each road passes, and off which root | open |; | 3 | the draft hand names the hand each road reads | open |; | 4 | the draft hand says what the helper layer and the counts carry | open |; | 5 | the review hand reads the approach again | open |"
 ---
 
 # Ask
@@ -168,6 +174,44 @@ What the agent needs:
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+| the question reviewing asks | the answer |
+|---|---|
+| does the approach answer the ask | no, and the box claim breaks |
+| is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |
+| what does `./RUNME.sh check` answer | 0 |
+| does a retro stand in the handback | no, and no handback stands on the branch |
+| does every claim the approach makes carry a test | no, one road carries none |
+
+TL;DR:
+
+- The drop reads right. One helper answers the held step's notes, and both roads call it.
+- The ceiling claim holds. `wc -l` reads both roads under `code.fileLines`.
+- The helper mints a box and writes it, so the third test's claim breaks.
+- Each road hands the helper a box the helper does not read, and the approach names no fix.
+
+The findings, one a line:
+
+- The box claim breaks. `handOf` mints a box id and writes it where none stands.
+- The third test asserts the box file stays absent, and the helper writes it. Name what the road does instead.
+- The bridge hands no `join` and no `git`, which the helper's path reaches. Name what each road passes.
+- The trees split. The bridge reads its notes off the vehicle tree, and the hold stands under the worked tree. Name the root each road passes.
+- The hand name finds the hold. Name the hand each road reads, because the pull keys the hold by that name.
+- The bridge builds two layers, `standing` and `helper`, and the approach names one. Say what a spawned helper carries.
+- The counts answer every note, and the sentence a session reads says those numbers. Say what they answer once a note leaves.
+- The runtime road carries no test. Say what claim stands there, and how a reader reads it.
+
+What the agent needs:
+
+| number | need | status |
+|---|---|---|
+| 1 | the draft hand says what the box write does on a tree holding none | open |
+| 2 | the draft hand names what each road passes, and off which root | open |
+| 3 | the draft hand names the hand each road reads | open |
+| 4 | the draft hand says what the helper layer and the counts carry | open |
+| 5 | the review hand reads the approach again | open |
 
 # implement
 
