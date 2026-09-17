@@ -89,7 +89,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: ad522192f4a8f0c4c092881fdaccd4ef723c3d93
+    hash_after: ad522192f4a8f0c4c092881fdaccd4ef723c3d93
 ---
 
 # Ask
@@ -115,9 +120,32 @@ The brand design holds at its review. A draft stamping the plugin name renames e
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+The brand reaches the marketplace and leaves the plugin name alone.
 
-<!-- the form is text -->
+[[spec/design_output/level0#a-stub-names-its-vehicle]] already measured this road. A stub names the vehicle's folder as a marketplace, enables `level0@<brand>`, and the tools keep the name `level0`. So the brand parts two vehicles at the marketplace, and the plugin name carries no weight it already carries.
+
+| the name | what it reads | who writes it |
+|---|---|---|
+| `marketplace.json` name | the brand | `brandOf` |
+| `marketplace.json` owner name | the brand | `brandOf` |
+| `plugin.json` author name | the brand | `brandOf` |
+| `plugin.json` name | `level0` | nobody, and it stands |
+| the enabled id | `level0@<brand>` | the stub's settings |
+
+The cost for the tool names is nothing. `grep -rl mcp__level0` answers 29 files outside `node_modules` and `.se`, and every one of them stands as it is. A draft stamping the brand on the plugin name moves all 29, and buys a parting the marketplace already gives.
+
+The icon stands at `spec/config/brand/icon.svg`. `spec/config` already holds a folder for each thing a projection reads, as `styles` and `stop` do, so the brand takes one of its own. `src/extension/icon.svg` is the target it projects into, and the extension build reads its own path as it does now.
+
+`brandOf` answers the folder name whole, so a folder carrying a dot answers a name carrying a dot. A marketplace name takes no dot, so `brandOf` slugs what it answers:
+
+| the folder | what `brandOf` answers |
+|---|---|
+| `quackitect` | `quackitect` |
+| `my.app` | `my-app` |
+| `Acme Tools` | `acme-tools` |
+| `.hidden` | `hidden` |
+
+The rule is one line: lower the case, turn every run of characters outside `a-z0-9` into one hyphen, and cut a hyphen off each end. A folder answering an empty name fails the stub, and says which folder it read.
 
 ## review
 
@@ -238,7 +266,6 @@ The brand design holds at its review. A draft stamping the plugin name renames e
 # Discussion
 
 
-<!-- what anybody adds, at any time, on this ticket -->
 - [[spec/tickets/brand-reads-folder]] hands this over at `design/person-1`, which waits for a person.
   - design/review failed back 2 times: The redraft answers the design output list, the `when` clause and the two
   - fake folders. The plugin name, the icon file and the lock file want a third draft.
