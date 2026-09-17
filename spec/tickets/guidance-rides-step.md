@@ -88,12 +88,18 @@ steps:
         says: pass or fail, findings one a line
 process: [[standard]]
 group: guidance-rides-the-step
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 0fc2b4132f94 · claude-code-remote
     hash_before: daad33433eb3bbd269f48595ccb852dcc78f76ce
     hash_after: daad33433eb3bbd269f48595ccb852dcc78f76ce
+  - step: design/review
+    hand: box 0fc2b4132f94 · claude-code-remote · helper-2
+    hash_before: 1671435b8e08c775f38f44257ff0d4f0e48d3931
+    hash_after: 1671435b8e08c775f38f44257ff0d4f0e48d3931
+    returns: 1
+    why: Four pieces of the ask go unanswered, and the ceiling claim breaks.; | the question reviewing asks | the answer |; |---|---|; | does the approach do what the ask asks | no, and four pieces of the ask go unanswered |; | is what the diff touches beyond the ask trivial | yes, and the commit touches this ticket alone |; | what does `./RUNME.sh check` answer | 1, on the health probe alone, and every test passes |; | does a retro stand in the handback | no, and the route puts the retro after the verdict phase |; | does every rule carry a test proving it fires | no, and the re-hand's compaction and moved hash carry none |; The findings, one a line:; The ceiling claim breaks. `wc -l src/scripts/pull.js src/scripts/work.js` answers past `code.fileLines`. The size rule refuses a growth on a file already past its ceiling. Name the split that takes the hand-out, the refusal, the material and the dispatch.; Two files hold one fact. The handed file and the hold both remember the notes. The ask names the hold alone, by name and hash. Say which one answers the ask.; The reads of a leaf go unanswered. Say that a leaf's reads and its phases' add up. Name the test claiming it.; The `work` answer goes unanswered. Say that it carries the notes' actionables inline, and the checklist with them.; The re-hand carries one test of three. The refusal stands, and the compaction and the moved hash stand untested.; The verb wears two names. The ask writes `branch guidance` in its bullet and `work guidance` in its table. The approach writes the first and places the second. Name one surface.; The judge's piece names work that stands. `./RUNME.sh config` answers no `judge.warmupWrites` and no `judge.thenEveryNth`. The level one wrapper judges every hand-back today. Say the piece stands.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the draft hand names the split keeping every file it writes under `code.fileLines` | open |; | 2 | the draft hand answers the four pieces this verdict names | open |; | 3 | the draft hand names a test per re-hand trigger | open |; | 4 | the review hand reads the approach again | open |
 ---
 
 # Ask
@@ -207,6 +213,35 @@ What the agent needs:
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail. Four pieces of the ask go unanswered, and the ceiling claim breaks.
+
+| the question reviewing asks | the answer |
+|---|---|
+| does the approach do what the ask asks | no, and four pieces of the ask go unanswered |
+| is what the diff touches beyond the ask trivial | yes, and the commit touches this ticket alone |
+| what does `./RUNME.sh check` answer | 1, on the health probe alone, and every test passes |
+| does a retro stand in the handback | no, and the route puts the retro after the verdict phase |
+| does every rule carry a test proving it fires | no, and the re-hand's compaction and moved hash carry none |
+
+The findings, one a line:
+
+- The ceiling claim breaks. `wc -l src/scripts/pull.js src/scripts/work.js` answers past `code.fileLines`. The size rule refuses a growth on a file already past its ceiling. Name the split that takes the hand-out, the refusal, the material and the dispatch.
+- Two files hold one fact. The handed file and the hold both remember the notes. The ask names the hold alone, by name and hash. Say which one answers the ask.
+- The reads of a leaf go unanswered. Say that a leaf's reads and its phases' add up. Name the test claiming it.
+- The `work` answer goes unanswered. Say that it carries the notes' actionables inline, and the checklist with them.
+- The re-hand carries one test of three. The refusal stands, and the compaction and the moved hash stand untested.
+- The verb wears two names. The ask writes `branch guidance` in its bullet and `work guidance` in its table. The approach writes the first and places the second. Name one surface.
+- The judge's piece names work that stands. `./RUNME.sh config` answers no `judge.warmupWrites` and no `judge.thenEveryNth`. The level one wrapper judges every hand-back today. Say the piece stands.
+
+What the agent needs:
+
+| number | need | status |
+|---|---|---|
+| 1 | the draft hand names the split keeping every file it writes under `code.fileLines` | open |
+| 2 | the draft hand answers the four pieces this verdict names | open |
+| 3 | the draft hand names a test per re-hand trigger | open |
+| 4 | the review hand reads the approach again | open |
 
 # implement
 
