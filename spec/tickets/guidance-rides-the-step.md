@@ -133,7 +133,11 @@ record:
     hand: box 0fc2b4132f94 · claude-code-remote
     hash_before: ba423c2bc7830838357ddf8ece02ee8dee907c6d
     hash_after: ba423c2bc7830838357ddf8ece02ee8dee907c6d
-step: retro/cloud
+  - step: retro/cloud
+    hand: box 0fc2b4132f94 · claude-code-remote
+    hash_before: ed340ee7c6bb38bef9b844c38c6d9b99e048223d
+    hash_after: ed340ee7c6bb38bef9b844c38c6d9b99e048223d
+step: children
 ---
 
 # Ask
@@ -283,6 +287,8 @@ The verdict on the split reads fail over two small findings, and the cap turned 
 - `./RUNME.sh check` came back refused to this hand, at the verdict read on the layer ticket
 - a shell write to a tracked file, refused at the mutation read, so that read ran through the paired rows
 - the install ran whole at the take, and the proxy refused no host
+- a whole clone, which the take lacked, so `branch sync` answered unrelated histories
+- a way for a hand to fix another hand's field, which the route shut on at the first verdict
 
 ### met
 
@@ -294,6 +300,10 @@ The verdict on the split reads fail over two small findings, and the cap turned 
 - the cap on [[spec/tickets/the-pull-splits-by-topic]], which turned a second fail into a person step
 - a branch holding commits this box lacked, at the first hand-back, which one rebase cleared
 - the server, which `./RUNME.sh check` wants standing, and `branch review` named it at the first read
+- a shallow clone at the take, which `git fetch --unshallow` cleared before the sync ran
+- the size ceiling on the pull and the work verb, which every write paid for with a larger cut
+- the lint over a verdict hand's files field, which turned the tree red until that hand rewrote it
+- a second box on this branch, which took it while this one held it
 
 ### left
 
@@ -305,6 +315,8 @@ The verdict on the split reads fail over two small findings, and the cap turned 
 - the count finding on [[spec/tickets/the-layer-reaches-sessions]] stands in that ticket's discussion
 - this box minted no ticket, so none stands here without a group
 - the branch owes its handover at done, and this retro is what it carries
+- the group's discussion names what a person decides, each with the moment it showed
+- the split of the pull and the work verb waits behind that person step
 
 # Discussion
 
