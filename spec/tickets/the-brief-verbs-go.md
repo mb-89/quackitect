@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -101,6 +101,10 @@ record:
     hash_after: 8a76181190b5f8eb134bdc87e8df4d77d5925d84
     returns: 1
     why: The table holds. Each row names a verb, the code behind it, and what stands after, and the rows read true against `src/scripts/work.js`.; The redraft answers one finding of the last round and leaves five. The prose under the table reads as it read before.; The six chapters of the work design output stand unnamed. The last round asked for each, and what stands in its place.; The redraft points its details at `A brief drains first`. The last round named that chapter as one the change takes away.; The cloud guidance stands unanswered. Actionable 10 sends a box's result into `HANDOVER.md`, and no row says what a box writes instead.; The handover schema stands unanswered. It governs the root brief, and it says one kind covers two paths.; The box handover stands unanswered. `copilot-runtime.js` reads `.se/HANDOVER.md` and `HANDOVER.md` in one loop, and the redraft says the brief is one file.; An implementer reading this cuts both paths. Say that `.se/HANDOVER.md` stays, and say it where the copilot row stands.; The copilot row carries one line for seven references across two modules. `copilot-dispatch.js` holds three, and `copilot-runtime.js` holds four.; Two of those seven sit inside a prompt this tree writes for a person to read. Say what that prompt says after.; The first row of `done_when` decides nothing. `./RUNME.sh branch list` names every branch a group today, and 8 groups stand with no brief among them.; The evidence field carries the two comments mint writes, above the table. Cut them, so the field reads as what a hand wrote.
+  - step: design/draft
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: d4031266a00984eae5060e8b6e705fc13b51a12f
+    hash_after: d4031266a00984eae5060e8b6e705fc13b51a12f
 ---
 
 # Ask
@@ -130,9 +134,16 @@ Every brief has merged, so the verbs carry two roads and walk one. A reader of t
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+`HANDOVER.md` at the root goes, `.se/HANDOVER.md` stays, and the group ticket takes the brief's work.
 
-<!-- the form is text -->
+The schema calls both files a handover, and the two carry different things. `HANDOVER.md` is the brief this ticket removes. `.se/HANDOVER.md` is a session one box hands the next, and it stands as it stands.
+
+| the file | what it carries | after |
+|---|---|---|
+| `HANDOVER.md`, tracked, on a work branch | the brief | goes |
+| `.se/HANDOVER.md`, untracked, on any box | the session | stays |
+
+The code reads the first in seven places under `work.js` and `review.js`, and the copilot lane reads both.
 
 | where the brief stands | what stands after |
 |---|---|
@@ -144,19 +155,39 @@ Every brief has merged, so the verbs carry two roads and walk one. A reader of t
 | `new`, which takes a brief off trunk | the group ticket, which the mint writes and the pull cuts a branch for |
 | the copilot lane | the group ticket, at the path the ticket names |
 
-The brief is one file at the root, and a group ticket says the same in the
-tree. Every branch on this box carries a group, so each verb walks the group
-road and the other road stands dead. The change reads each verb, cuts the
-brief half, and leaves the group half as it stands.
+Every branch on this box carries a group, so each verb walks the group road and the other road stands dead. The change reads each verb, cuts the brief half, and leaves the group half as it stands.
 
-`withContract` writes the routine's steps into a brief, and the pull's
-hand-out says the same to a hand. So the contract goes with the brief, and the
-`branch new` verb takes a group name in place of a file.
+**The copilot lane, row by row.** Two modules read the brief in seven places, and two of the seven sit inside a prompt a person reads:
 
-The constant and its readers go last: `BRIEF` in the work verbs, the review
-verb, the review library and the copilot lane. A test naming a handover moves
-to the group ticket it stands for. For details, see
-[[spec/design_output/work#a-brief-drains-first]].
+| where | how many | what stands after |
+|---|---|---|
+| `copilot-dispatch.js`, the read at the claim | 1 | the group ticket, at the path the ticket names |
+| `copilot-dispatch.js`, inside two prompts | 2 | the prompts name the group ticket, and drop `HANDOVER.md` |
+| `copilot-runtime.js`, the status read | 1 | the group's own state |
+| `copilot-runtime.js`, the loop over both paths | 1 | the loop reads `.se/HANDOVER.md` alone |
+| `copilot-runtime.js`, the result read | 2 | the group ticket |
+
+**The notes.** The work design output teaches the brief in six chapters, and each one answers:
+
+| the chapter | what stands after |
+|---|---|
+| What a work branch is | the group ticket names the branch, and the brief line goes |
+| A brief drains first | goes whole, because one road stands |
+| What the status says | the group's `state` and its record say it, and the status table goes |
+| Two handovers | one handover, `.se/HANDOVER.md`, and the table reads one row |
+| The round trip | the trip runs through the group ticket |
+| Every brief carries the contract | the contract goes, because the pull's hand-out says it to a hand |
+
+**The cloud guidance and the schema.** Two notes outside the design output name the brief, and each answers:
+
+| the note | what stands after |
+|---|---|
+| `spec/guidance/cloud.md`, actionable 10 | a box writes its result into the group's retro, which `branch done` reads |
+| `spec/schemas/handover.schema.yaml` | the kind keeps `.se/HANDOVER.md`, and drops the root file |
+
+`withContract` writes the routine's steps into a brief, and the pull's hand-out says the same to a hand. So the contract goes with the brief, and `branch new` takes a group name in place of a file.
+
+The constant and its readers go last: `BRIEF` in the work verbs, the review verb, the review library and the copilot lane. A test naming a handover moves to the group ticket it stands for.
 
 ## review
 
