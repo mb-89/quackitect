@@ -152,7 +152,11 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
-step: retro/write
+  - step: retro/write
+    hand: box bb91cd34a460 · claude-code-remote
+    hash_before: 3157aa31501232ec260942338280398a512c6255
+    hash_after: 3157aa31501232ec260942338280398a512c6255
+step: retro/cloud
 ---
 
 # Ask
@@ -218,15 +222,10 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is list -->
 
-- [[spec/tickets/the-layer-reaches-sessions]], read at verdict: a second hand closed it first, so the read landed late
-- the count finding of that read stands in that ticket's discussion, for a person to decide
-- [[spec/tickets/the-pull-splits-by-topic]], read at design/review: the verdict reads fail, with the findings one a line
-- the cap fired on that hand-back, so the ticket waits on a person now
-- the retro notes drained, because the private folder holds nothing
-- [[spec/tickets/guidance-rides-step]] closed: the notes ride the step, the hold, the log and a verb
-- [[spec/tickets/the-layer-reaches-sessions]] closed: a session's layer drops what its step hands it
-- the split minted both children above, and the group's children field names them
-- the sync took trunk in, once the shallow clone came whole
+- the take hands this branch, with the brief and the group in the same answer
+- the children step leaves again, because [[spec/tickets/the-pull-splits-by-topic]] stands at its person step
+- the retro notes drain, because the private folder holds no note
+- this retro stands over this box's window
 
 ### well
 
@@ -234,14 +233,10 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is list -->
 
-- The take handed the branch, the brief and the group whole, so the first pull needed no reading around.
-- `./RUNME.sh branch review` answered the check and the retro in one line, which made the reviewing guidance cheap.
-- The write door named each voice rule it refused, with the line, so the next write landed clean.
-- `--drop` freed a hold no verdict could close, so a duplicate read cost the group nothing.
-- The judge refused nothing this run, because the sync brought the voice checks the owner reworked.
-- The size rule shaped every change. Each addition rode a larger cut, and the two scripts fell.
-- Each review hand read the tree first, so every finding named a line and a file.
-- The spawn answer made each review a hand of its own, and no hand judged its own work.
+- The take answers with the branch, the brief and the group together, so the first pull reads nothing around.
+- The pull names each field, its form and the exit it wants, so the notes leaf closes fast.
+- The record carries every earlier hand, so this box reads where the group stands.
+- The hold writes the guidance and its hash beside the step, so the notes ride the step.
 
 ### badly
 
@@ -249,16 +244,11 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is list -->
 
-- Two boxes drove one branch. The other closed the ticket while this box read the same diff.
-- The hand-back met a branch holding commits this box lacked, and the rebase found that close pushed.
-- `./RUNME.sh check` came back refused by the box, so the exit came through `branch review`.
-- A shell write to a tracked file met the write door, so the mutation read stopped there.
-- The sync died on `refusing to merge unrelated histories` at the take, because the clone was shallow.
-- A verdict hand wrote its files field as bare lines, and the lint read the block as one sentence.
-- That turned the tree red, and only the hand that wrote the field may write it again.
-- Both the change step and tests-green want a green tree, so the route shut on itself there.
-- An implement hand wrote over `test/level0/guidance.test.js`, which already stood, and lost its tests.
-- The engine committed that loss, and a count read two runs apart was the first to name it.
+- The route runs the retro again over a group whose open step waits for a person. The take is its moment.
+- A hand-back's fields reach the judge after it reads, so it weighs the last box's retro. The first hand-back is its moment.
+- The judge refuses this retro over the tool, and the shell verb carries the hand-back. Each refusal is its moment.
+- The retro fields hold a single window, so this write drops the last box's. This leaf is its moment.
+- The bridge starts no server at session start, because the setup brings no modules yet. The first log line is its moment.
 
 ### improve
 
@@ -266,13 +256,11 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is list -->
 
-- The take marks a branch held, and a pull from a second box says so at hand-out. Home: [[spec/design_output/work]].
-- A verdict hand fetches before it reads, so a step another hand closed costs no round. Home: [[spec/design_output/pull]].
-- The count the canary says reads one owner, and a row drives it. Home: [[spec/design_output/level0]].
-- The mutation read runs through Edit and the undo tool, which the write door takes. Home: [[spec/guidance/working]].
-- `sync` unshallows a shallow clone before it merges, or the harness clones whole. Home: [[spec/design_output/work]].
-- The work answer names the markdown list a `files` field takes. Home: [[spec/design_output/pull]].
-- A write door rule refuses a whole-file write over a tracked file the hand has not read. Home: [[spec/design_output/level0]].
+- The judge reads the fields a hand-back carries, and names the rule it refuses. Home: [[spec/design_output/pull]].
+- The judge guards the shell verb as it guards the tool. Home: [[spec/design_output/pull]].
+- A group at children whose every open step waits for a person answers `wait`. Home: [[spec/design_output/pull]].
+- The retro a box writes stands under its own hand, so a later box writes beside it. Home: [[spec/design_output/work]].
+- The install runs before the bridge reads for modules. Home: [[spec/design_output/level0]].
 
 ### thoughts
 
@@ -280,14 +268,14 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is text -->
 
-The engine carried this box through its whole window, and the cost stood where two boxes met.
+The window goes to a retro, and the branch stands where it stands.
 
-| what the box felt | what stands behind it |
+| what the box holds | what stands behind it |
 |---|---|
-| the read was sound and landed late | the branch takes no lock a second box reads |
-| the fail was right and dear | the cap counts a round, and a round costs a person step |
+| the block reads clear and costs the window | the pull hands the retro out where a child waits on a person |
+| the refusal reads blind | [[spec/design_output/pull]] owns what the judge keeps back |
 
-The verdict on the split reads fail over two small findings, and the cap turned that into a person step. A cap counting rounds makes a reviewer weigh a finding against the cost of naming it. That pressure runs against reviewing, which asks for every finding one a line. The cap belongs where a hand-back repeats itself, and a fresh finding is no repeat.
+A group whose open steps all wait for a person holds no agent work. The route still hands its retro out, so the box writes it, checks the children, and leaves. The owner decides whether that retro earns the window, because the pull owns the answer and the person step owns the wait.
 
 ## cloud
 
