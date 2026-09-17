@@ -47,21 +47,32 @@ reader reads:
 | `check.json`, `check.log` | the battery |
 | `hold/`, `vehicle.json`, `show-panel` | the holds, the pointer, and the flag |
 | `bin/` | the binaries the install puts there |
+| `review/` | a git worktree, which is a second copy of the whole tree |
+| `measure/` | what the voice verb writes, one file a span |
 
 | what stays under `.se` | why a reader wants it |
 |---|---|
 | `tickets/` | the to-dos a box mints, which a board draws |
 | `scripts/` | what a hand writes, and a handover names |
-| `review/`, `retro/` | what a hand answers |
-| `notes/` | what a hand writes down |
+| `retro/` | what a hand answers at the end |
+| `notes/` | what a hand writes down, which the privacy door reads |
+
+`review/` earns its place in `runtime` on its own. `git worktree add --detach
+.se/review/<branch>` opens a whole checkout there. A walk over it reads the
+tree twice, so every row doubles and every search answers each line twice.
+[[spec/design_output/review#a-worktree-runs-the-check]]
+
+`~/.se/vehicles` sits in the home of the box, outside this tree, so nothing
+here reaches it.
 
 The index then skips `.se/runtime` alone, and walks the rest. Two faults go
 with that change:
 
-- The index walking `.se` today would read its own database, and a write to it
-  would mark its own rows dirty.
-- The session log grows a line a door call, so a walk over it would sweep on
-  every line.
+- The index walking `.se` reads its own database, and a write to it marks its
+  own rows dirty.
+- The session log grows a line a door call, so a walk over it sweeps on every
+  line.
+- `review/` holds a whole checkout, so a walk reads the tree a second time.
 
 Both live under `runtime` after this, so the skip is one path and the reason is
 one sentence.
