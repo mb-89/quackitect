@@ -89,7 +89,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 9a7324a8827986146b4246ec34746fc9cb12397d
+    hash_after: 9a7324a8827986146b4246ec34746fc9cb12397d
 ---
 
 # Ask
@@ -115,9 +120,36 @@ The payload builder stands tested and the hook stands untested. A harness spelli
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+Three changes, each in one place, and a test driving the hook the pull rests on.
 
-<!-- the form is text -->
+| what changes | where |
+|---|---|
+| `sessionOf` takes a third spelling | `.claude/skills/level1/lib/pull.js` |
+| `SESSION` moves to the library beside the hook | the same file, and the hook imports it |
+| a case drives the registered `session.start` | `test/level0/` |
+
+**The third spelling.** `sessionOf` reads `e?.session?.id` and `e?.sessionId`. `copilot.js` reads `input.session_id ?? input.sessionId`, so `session_id` is the one it misses. The read becomes `e?.session?.id ?? e?.sessionId ?? e?.session_id`, which takes every spelling this tree already meets.
+
+**The copy.** `.se/session.json` stands in three modules:
+
+| the module | what holds it |
+|---|---|
+| `.claude/skills/level0/hooks/level0.js` | its own plugin folder |
+| `.claude/skills/level1/hooks/level1.js` | its own plugin folder |
+| `src/scripts/hand.js` | the tree |
+
+A plugin imports nothing past its own folder, which is the reason each boundary keeps a copy. The hook and its library stand inside one folder, so that copy goes and the other two stay. Each remaining copy names the boundary forcing it, beside the line.
+
+**The test.** `spawnsWith` in `test/level0/hand.test.js` already drives a registered hook: it imports `register`, collects the hooks into a map, and hands the one it wants a fake `$`. The new case takes that shape over `session.start`, with a fake `$.fs` holding what the hook writes.
+
+Two events drive it:
+
+| the event | what the case reads |
+|---|---|
+| one naming a session | the file comes back, carrying the id and the harness |
+| one naming none | the fake holds no write, and the hook says the hand stands at the box |
+
+A third case drives each of the three spellings, so a harness spelling the id any of the three ways lands one hand.
 
 ## review
 
@@ -238,7 +270,6 @@ The payload builder stands tested and the hook stands untested. A harness spelli
 # Discussion
 
 
-<!-- what anybody adds, at any time, on this ticket -->
 - [[spec/tickets/the-hand-carries-the-session]] hands this over at `implement/person-1`, which waits for a person.
   - verdict failed back 2 times. No test drives the level one `session.start` hook. So nothing proves the wrapper writes the session file.
   - The ask wants a test reading that file back, and the payload builder alone stands tested.
