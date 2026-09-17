@@ -15,7 +15,7 @@ import {
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { CONFIG as VALE_CONFIG, faultIn, fromJson } from "../../.claude/skills/level0/lib/vale.js";
-import { COPY } from "../../.claude/skills/level0/lib/vehicle.js";
+import { agentOf, BOX, handOf } from "./hand.js";
 import {
   CLOSED,
   fieldOf,
@@ -34,12 +34,10 @@ import { NOTES, schemasHere } from "./ticket.js";
 import { landed, unlandedRows } from "./landed.js";
 import { changedIn } from "./work.js";
 export const HOLDS = ".se/hold";
-export const BOX = ".se/box.json";
 export const WORK = "work";
 export const REFUSED = "refused";
 export const WAIT = "wait";
 export const ENGINE = "the engine";
-const BOX_ID = 12;
 const MOST_MOVES = 64;
 const CUT = { said: 120, error: 160 };
 const DONE = "done";
@@ -91,21 +89,7 @@ export function holdsVerb(need, verbs = VERBS) {
   return !sub || verbs[verb].includes(sub);
 }
 
-// [[spec/design_output/pull#the-hand-and-the-hold]]
-export function handOf(it) {
-  for (const path of [BOX, COPY]) {
-    const at = it.join(it.root, ...path.split("/"));
-    if (!it.disk.exists(at)) continue;
-    const id = parsed(it.disk.read(at))?.id;
-    if (id) return `box ${id}`;
-  }
-  const id = it.random
-    ? it.random()
-    : hashOf(`${it.clock ? it.clock.stamp() : ""} ${it.root}`).slice(0, BOX_ID);
-  it.disk.makeDir(it.join(it.root, ".se"));
-  it.disk.write(it.join(it.root, ...BOX.split("/")), `${JSON.stringify({ id })}\n`);
-  return `box ${id}`;
-}
+export { agentOf, BOX, handOf };
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 export function holdAt(it, hand) {

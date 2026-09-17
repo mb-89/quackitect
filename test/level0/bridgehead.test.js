@@ -13,7 +13,7 @@ import {
   register,
   roadsOf,
   serveOf,
-} from "../../src/stub/.claude/skills/bridgehead/hooks/bridgehead.js";
+} from "../../src/stub/.claude/skills/level0/hooks/bridgehead.js";
 
 const STUB = "/stub";
 const HOME = "/home/agent";

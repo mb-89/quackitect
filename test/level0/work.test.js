@@ -611,7 +611,7 @@ test("take claims a group by writing the hand and hash_before into its record, a
     ...HAND,
   });
 
-  const { code, said } = heard(() => work(ROOT, ["take"], it));
+  const { code, said } = heard(() => work(ROOT, ["take"], { ...it, agent: true }));
 
   assert.equal(code, 0);
   assert.ok(ranGit(outside).includes("git switch work/one-group"));
@@ -631,7 +631,7 @@ test("a pull on trunk takes a group for a cloud box, the way branch take does", 
   );
 
   for (const [argv, code] of [[probeOf("node", 6510), 1], [startOf(ROOT), 0]]) outside.proc.teach(argv, { exitCode: code });
-  const { code, said } = heard(() => work(ROOT, ["pull"], { ...it, cloud: true }));
+  const { code, said } = heard(() => work(ROOT, ["pull"], { ...it, cloud: true, agent: true }));
   assert.equal(code, 0);
   assert.match(said, /The server starts detached/, "a cloud take starts the server where nothing answers");
   assert.ok(ranGit(outside).includes("git switch work/one-group") && ranGit(outside).includes("git push origin work/one-group"), "the pull takes the group and pushes it");
