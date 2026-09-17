@@ -1,20 +1,47 @@
 // The pane, proven where nothing draws: the kit renders the body over a
-// fixture tree, reads the rows back as text, and presses what the tree carries.
+// declaration, presses the marks it carries, and reads the rows back.
 import { expect, test } from "claude-code/testing";
 
+const ROOT = "/tree";
 const SCHEMA = JSON.stringify({
   properties: {
-    log: { type: "object", properties: { level: { type: "string", enum: ["info", "warn", "debug"] } } },
-    stop: { type: "object", properties: { enabled: { type: "boolean" }, mostInARow: { type: "number" } } },
+    stop: {
+      type: "object",
+      properties: {
+        hold: {
+          type: "string",
+          enum: ["off", "finish", "stop"],
+          widget: "toggle",
+          gesture: 5,
+          icon: "✋🤖",
+          group: "agent control",
+          row: 0,
+          column: 2,
+        },
+        enabled: { type: "boolean" },
+      },
+    },
+    log: {
+      type: "object",
+      properties: {
+        level: { type: "string", enum: ["info", "warn", "debug"] },
+        open: {
+          widget: "action",
+          icon: "📜",
+          group: "agent control",
+          row: 0,
+          column: 1,
+          runs: "./RUNME.sh tui",
+        },
+      },
+    },
   },
 });
 const TRACKED = JSON.stringify({
-  comment: "the tracked layer",
-  stop: { comment: "the tooth", enabled: true, mostInARow: 3 },
+  stop: { comment: "the tooth", enabled: true, hold: "off" },
   log: { comment: "the level", level: "info" },
 });
 
-const ROOT = "/tree";
 const FILES: Record<string, string> = {
   [`${ROOT}/spec/config/level0.schema.json`]: SCHEMA,
   [`${ROOT}/spec/config/level0.json`]: TRACKED,
@@ -33,11 +60,12 @@ const SITE = {
     scroll: { offset: 0, bodyRows: 24 },
     view: {},
   },
-  viewport: { columns: 110, rows: 30 },
 } as const;
 
 function fixture(on: any) {
   on("session.cwd", () => ({ value: ROOT }));
+  on("clock.now", () => ({ value: 1000 }));
+  on("ui.invalidate", () => ({ value: undefined }));
   on("fs.read", ($: any, e: any, next: any) =>
     FILES[e.path] === undefined ? next(e) : { value: FILES[e.path] });
   on("fs.write", ($: any, e: any) => {
@@ -60,34 +88,53 @@ function drawing(tree: unknown): string {
   return out.join("");
 }
 
-test("the pane draws a group for every section the tracked layer holds", async ($, on) => {
+async function press($: any, key: string) {
+  return $.ui.press({ plugin: "pane", key, requestId: "quackitect" });
+}
+
+test("the pane draws a mark for every widget the declaration names", async ($, on) => {
   fixture(on);
   const said = drawing(await $.ui.render(SITE as never));
   console.log(said);
-  expect(said).toContain("[- stop]");
-  expect(said).toContain("[- log]");
+  expect(said).toContain("[- agent control]");
+  expect(said).toContain("[📜]");
+  expect(said).toContain("[✋🤖]");
+  expect(said).toContain("[+ config]");
+});
+
+test("one press on a toggle moves one rung and the mark carries it", async ($, on) => {
+  fixture(on);
+  await $.ui.render(SITE as never);
+  await press($, "widget:stop.hold");
+  const said = drawing(await $.ui.render(SITE as never));
+  console.log(said);
+  expect(said).toContain("[✋🤖finish]");
+  expect(said).toContain("stop.hold is finish");
+  expect(JSON.parse(FILES[`${ROOT}/.se/config.json`])).toMatchObject({ stop: { hold: "finish" } });
+});
+
+test("the count the declaration names reaches the far rung", async ($, on) => {
+  fixture(on);
+  await $.ui.render(SITE as never);
+  for (let round = 0; round < 5; round++) {
+    await press($, "widget:stop.hold");
+    await $.ui.render(SITE as never);
+  }
+  const said = drawing(await $.ui.render(SITE as never));
+  console.log(said);
+  expect(said).toContain("[✋🤖stop]");
+  expect(JSON.parse(FILES[`${ROOT}/.se/config.json`])).toMatchObject({ stop: { hold: "stop" } });
+});
+
+test("an action names the command it carries, and the tree opens under a press", async ($, on) => {
+  fixture(on);
+  await $.ui.render(SITE as never);
+  await press($, "group:config");
+  await press($, "widget:log.open");
+  const said = drawing(await $.ui.render(SITE as never));
+  console.log(said);
+  expect(said).toContain("log.open carries ./RUNME.sh tui");
+  expect(said).toContain("[- config]");
   expect(said).toContain("level");
   expect(said).toContain("[info]");
-});
-
-test("a press on a group folds its rows away", async ($, on) => {
-  fixture(on);
-  await $.ui.render(SITE as never);
-  await $.ui.press({ plugin: "pane", key: "group:log", requestId: "quackitect" });
-  const said = drawing(await $.ui.render(SITE as never));
-  console.log(said);
-  expect(said).toContain("[+ log]");
-  expect(said).not.toContain("[info]");
-  expect(said).toContain("folded log");
-});
-
-test("a press on a value cycles it and the local layer takes the write", async ($, on) => {
-  fixture(on);
-  await $.ui.render(SITE as never);
-  await $.ui.press({ plugin: "pane", key: "value:log.level", requestId: "quackitect" });
-  const said = drawing(await $.ui.render(SITE as never));
-  console.log(said);
-  expect(said).toContain("[warn *]");
-  expect(said).toContain("log.level stands at warn");
-  expect(JSON.parse(FILES[`${ROOT}/.se/config.json`])).toMatchObject({ log: { level: "warn" } });
 });
