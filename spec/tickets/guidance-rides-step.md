@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[standard]]
 group: guidance-rides-the-step
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 0fc2b4132f94 · claude-code-remote
@@ -104,6 +104,10 @@ record:
     hand: box 0fc2b4132f94 · claude-code-remote
     hash_before: b3a754ecef8f358aeeb40e93e1d3fadf581c6af6
     hash_after: b3a754ecef8f358aeeb40e93e1d3fadf581c6af6
+  - step: design/review
+    hand: box 0fc2b4132f94 · claude-code-remote · helper-4
+    hash_before: cb30d57a7469f428507f5284843930076e841d85
+    hash_after: cb30d57a7469f428507f5284843930076e841d85
 ---
 
 # Ask
@@ -244,34 +248,48 @@ What the agent needs:
 
 <!-- the form is verdict -->
 
-fail. Four pieces of the ask go unanswered, and the ceiling claim breaks.
+pass
 
 | the question reviewing asks | the answer |
 |---|---|
-| does the approach do what the ask asks | no, and four pieces of the ask go unanswered |
+| does the approach do what the ask asks | yes, and every bullet of the ask carries a home and a test |
 | is what the diff touches beyond the ask trivial | yes, and the commit touches this ticket alone |
-| what does `./RUNME.sh check` answer | 1, on the health probe alone, and every test passes |
+| what does `./RUNME.sh check` answer | 0 |
 | does a retro stand in the handback | no, and the route puts the retro after the verdict phase |
-| does every rule carry a test proving it fires | no, and the re-hand's compaction and moved hash carry none |
+| does every rule carry a test proving it fires | yes, and the moved hash test asserts an unmoved note hands nothing |
+
+TL;DR:
+
+- The approach answers every bullet of the ask, and each finding the last verdict names lands.
+- `./RUNME.sh check` exits 0 on the branch tip.
+- The findings below stand open, and each one waits for the implement phase.
+
+Where the last verdict's findings land:
+
+| the finding | where it lands |
+|---|---|
+| the ceiling claim breaks | the split lands as a sibling ticket, and `wc -l` reads each file it names past `code.fileLines` |
+| two files hold one fact | the approach says the hold answers the ask, and no second store stands beside it |
+| the reads of a leaf go unanswered | the approach claims it stands, and the pull test on a leaf's inheritance backs it |
+| the `work` answer goes unanswered | the approach claims it stands, and the pull test on the answer's Reads chapter backs it |
+| the re-hand carries one test of three | a test stands per trigger, and the moved hash test asserts the unmoved note too |
+| the verb wears two names | one surface stands, `./RUNME.sh branch guidance`, named and unnamed |
+| the judge's piece names work that stands | the approach says the piece stands, and writes none of it |
 
 The findings, one a line:
 
-- The ceiling claim breaks. `wc -l src/scripts/pull.js src/scripts/work.js` answers past `code.fileLines`. The size rule refuses a growth on a file already past its ceiling. Name the split that takes the hand-out, the refusal, the material and the dispatch.
-- Two files hold one fact. The handed file and the hold both remember the notes. The ask names the hold alone, by name and hash. Say which one answers the ask.
-- The reads of a leaf go unanswered. Say that a leaf's reads and its phases' add up. Name the test claiming it.
-- The `work` answer goes unanswered. Say that it carries the notes' actionables inline, and the checklist with them.
-- The re-hand carries one test of three. The refusal stands, and the compaction and the moved hash stand untested.
-- The verb wears two names. The ask writes `branch guidance` in its bullet and `work guidance` in its table. The approach writes the first and places the second. Name one surface.
-- The judge's piece names work that stands. `./RUNME.sh config` answers no `judge.warmupWrites` and no `judge.thenEveryNth`. The level one wrapper judges every hand-back today. Say the piece stands.
+- The standing verb carries no test row. The layer test reads the library, and the verb reads that library too.
+- The log test names no fake log. The ask asks for a test the fake log drives.
+- The sibling ticket stands unminted. The `depends_on` link waits on that mint.
 
 What the agent needs:
 
 | number | need | status |
 |---|---|---|
-| 1 | the draft hand names the split keeping every file it writes under `code.fileLines` | open |
-| 2 | the draft hand answers the four pieces this verdict names | open |
-| 3 | the draft hand names a test per re-hand trigger | open |
-| 4 | the review hand reads the approach again | open |
+| 1 | the group's split mints the sibling ticket the approach names | open |
+| 2 | this ticket names that sibling under `depends_on` | open |
+| 3 | the implement hand drives the log test from the fake log | open |
+| 4 | the implement hand reads `./RUNME.sh standing` after a note leaves the layer | open |
 
 # implement
 
