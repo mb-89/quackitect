@@ -145,9 +145,18 @@ The brand design holds at its review. A draft stamping the plugin name renames e
 
 ### answer
 
-<!-- the answer, which the step behind this one reads -->
+The owner answers each open finding, and one of them turns a fault into the point.
 
-<!-- the form is text -->
+| the finding | the owner's answer |
+|---|---|
+| the folder claim reads other than the tree | ask whether the claim earns its place, and cut it where it does not |
+| the marketplace hand stays unnamed | name it where the reader acts on it, and leave it out where they do not |
+| the brand folder's reader carries two names | the install script, and the word build goes |
+| the copy lets the icon drift | a vehicle takes an icon of its own, so the drift is the point |
+
+The icon this tree ships stands as an initial, so a fresh vehicle draws something. A vehicle changes it, and nothing holds the two in step. So the copy road takes the ticket, and the redraft says the drift is what a vehicle wants.
+
+The owner rules on the voice besides. A reader wants what they act on, and a mechanism belongs in a rationale. So a draft states what a hand does next, points at the note holding the rest, and asserts nothing about a thing it leaves alone.
 
 ## draft
 
