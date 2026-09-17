@@ -312,3 +312,26 @@ test("twenty valid files finish in five batches without spending failure retries
   assert.deepEqual(await handle(event("Stop", { retry: true }), it), {});
   assert.equal(Object.keys(it.session.records.get("one").checked).length, 20);
 });
+
+// [[spec/design_output/level0#the-standing-layer]]
+test("a hold standing drops its step's note from the layer the runtime hands", async () => {
+  const it = fixture();
+  it.env = { CLAUDECODE: "1" };
+  it.disk.write("/tree/spec/guidance/working.md", "# Actionables\n\n1. Answer first.\n");
+  it.disk.write("/tree/.se/box.json", JSON.stringify({ id: "d462e994b4cef" }));
+  it.disk.write(
+    "/tree/.se/hold/box-d462e994b4cef-claude-code.json",
+    JSON.stringify({
+      ticket: "a-child",
+      step: "design/draft",
+      hand: "box d462e994b4cef · claude-code",
+      reads: [{ name: "spec/guidance/voice", hash: "aa" }],
+    }),
+  );
+
+  const result = await handle(event("SessionStart"), it);
+
+  assert.ok(!/Write clearly\./.test(result.context), "the held step's note leaves the layer");
+  assert.match(result.context, /Answer first\./);
+  assert.match(result.context, /rules: 1/);
+});

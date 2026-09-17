@@ -6,6 +6,7 @@ import { join } from "node:path";
 import {
   bindsHere,
   canary,
+  carried,
   canaryIn,
   canaryText,
   countsOf,
@@ -44,14 +45,6 @@ export function guidanceHere(disk, root, env = process.env, tooth = true, work =
     ...counts,
     sentence: canary({ ...counts, stop: tooth }),
   };
-}
-
-// [[spec/design_output/level0#the-standing-layer]]
-export function carried(notes, read) {
-  return notes.filter((note) => {
-    const bare = String(note.name ?? "").replace(/\.md$/, "");
-    return !read.some((one) => one === bare || one.endsWith(`/${bare}`));
-  });
 }
 
 function readsGuidance(box) {

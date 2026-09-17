@@ -179,10 +179,9 @@ export function countsOf(notes) {
 
 export function standingLayer(notes, read = []) {
   const said = [];
-  const dropped = new Set([read].flat().map((one) => String(one).replace(/\.md$/, "")));
-  for (const note of notes) {
+  for (const note of carried(notes, read)) {
     const rules = actionables(note.text);
-    if (!rules.length || dropsHere(note, dropped)) continue;
+    if (!rules.length) continue;
     said.push(`### ${titleOf(note)}`);
     said.push("");
     said.push(...rules.map((one, i) => `${i + 1}. ${one}`));
@@ -211,6 +210,15 @@ export function forHelper(standing, prompt) {
 }
 
 // A note a step reads leaves the layer, because the pull hands it with the step. [[spec/design_output/level0#the-standing-layer]]
+export function carried(notes, read = []) {
+  const dropped = droppedIn(read);
+  return [...notes].filter((note) => !dropsHere(note, dropped));
+}
+
+function droppedIn(read) {
+  return new Set([read].flat().map((one) => String(one).replace(/\.md$/, "")));
+}
+
 function dropsHere(note, dropped) {
   const bare = String(note.name ?? "").replace(/\.md$/, "");
   for (const one of dropped) {

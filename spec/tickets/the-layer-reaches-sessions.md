@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: guidance-rides-the-step
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 0fc2b4132f94 · claude-code-remote
@@ -150,6 +150,14 @@ record:
     hand: box 0fc2b4132f94 · claude-code-remote
     hash_before: ca04878eaef95ba7fd41d91410927887a9e8fe8a
     hash_after: ca04878eaef95ba7fd41d91410927887a9e8fe8a
+  - step: implement/change
+    hand: box 0fc2b4132f94 · claude-code-remote
+    hash_before: 2cf2edb74c668c8f0a13f586f312ad3b6d118b44
+    hash_after: 2cf2edb74c668c8f0a13f586f312ad3b6d118b44
+    answered:
+      - name: lint
+        exit: 0
+        said: 67 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
