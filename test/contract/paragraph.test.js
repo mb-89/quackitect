@@ -147,6 +147,25 @@ ifVale(
   },
 );
 
+// [[spec/tickets/voice-rules-skip-the-record]]
+const FRONT_SPANS = "It reads `a`, `b`, `c`, `d`, `e`, `f` and `g` here.";
+
+// [[spec/tickets/voice-rules-skip-the-record]]
+const noted = (key) =>
+  `---\nkind: ticket\nrecord:\n  - step: do\n    ${key}: ${FRONT_SPANS}\n---\n\nA body.\n`;
+
+// [[spec/tickets/voice-rules-skip-the-record]]
+ifVale(
+  "a record the verbs wrote passes, and a field the schema calls prose is read",
+  async () => {
+    await passes("CodeSpans", noted("why"));
+    await passes("CodeSpans", noted("asks"));
+    await refuses("CodeSpans", noted("says"));
+    await refuses("CodeSpans", noted("does"));
+    await refuses("CodeSpans", `---\nkind: ticket\n---\n\n${FRONT_SPANS}\n`);
+  },
+);
+
 // [[spec/design_output/projection#the-grammar-rules]]
 ifVale(
   "the perfect and the progressive are refused, and the simple tense passes",

@@ -49,28 +49,42 @@ A verdict joins its findings into one `why` line, and a person step joins them i
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    node --test test/contract/paragraph.test.js > /dev/null 2>&1 && echo green
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
+The schema says which frontmatter fields hold prose, and the rules read those alone.
 
-<!-- the form is text -->
+Two sessions met this defect at once. [[spec/tickets/voice-rules-skip-the-record]] carries the finding and the road the owner picked. That change landed on trunk before this ticket reached a hand, so what this ticket adds is the case the ask calls for.
+
+`test/contract/paragraph.test.js` drives Vale over a record, and holds both halves:
+
+| the field | what the rules do |
+|---|---|
+| `why` in a record entry, holding seven code spans | passes, because the verbs write it |
+| `asks` on a person step, holding seven | passes, for the same reason |
+| `says` holding seven | refused, because the schema calls it prose |
+| `does` holding seven | refused, for the same reason |
+| the body holding seven | refused, as it always did |
+
+The fix names one home: the rule that reads the frontmatter. The writer that joins findings stands as it was, so a judge writes what it saw and no rule over prose reads it.
+
+`work/the-hand-carries-a-step` merged on trunk, which is what the last line of the ask asks for.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change follows the ask. The ask wanted the case, and the rules already read the frontmatter the way it asks.
+- the cleanup stands as a note. The says above names the duplicate, so a reader meets one story.
+- every fact stands in one place. The other ticket holds the road, and this one holds the case.
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+A cloud box minted this ticket while a desk session met the same wall on `work/the-hand-carries-a-step`. Neither knew of the other, and both read the defect the same way.
+
+The branch itself carried a third reading. Its `snippets.js` held a `FRONT` constant blanking the whole frontmatter, with a comment naming the cause. So three hands found one defect, and each wrote its own answer.
+
+The owner picked the road: the frontmatter answers to its own schema, and the schema says which fields hold prose. `FRONT` now reads `frontless(scope)`, so the branch's shape stands and the blunt blanking goes.
