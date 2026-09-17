@@ -144,6 +144,11 @@ function said(it, kind, line, more) {
   return it.log.say("info", kind, line, { text: line, ...more }).then(() => 0);
 }
 
+// [[spec/design_output/pull#a-draft-opens]]
+export function askLines(ask) {
+  return (ask?.own ?? []).filter((row) => !/^\s*<!--.*-->\s*$/.test(row));
+}
+
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 export function fromHold(route, hold) {
   const said = hold?.ticket && hold?.step ? `${hold.ticket}/${hold.step}` : "";
@@ -195,8 +200,8 @@ function open(it, name) {
     return 0;
   }
   const ask = note.sections.find((one) => one.header.toLowerCase() === "ask");
-  const rows = (ask?.own ?? []).filter((row) => row.trim() && !/^\s*<!--.*-->\s*$/.test(row));
-  if (!rows.length) {
+  const rows = askLines(ask);
+  if (!rows.some((row) => row.trim())) {
     console.error(`${at.said} holds an empty ask, and open waits for one. Write the ask first.`);
     return 1;
   }

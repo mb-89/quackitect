@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: now
 steps:
   - name: do
@@ -27,6 +27,7 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: work/the-work-editor-draws
+step: do
 ---
 
 # Ask

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: now
 steps:
   - name: do
@@ -27,6 +27,7 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: work/the-work-editor-draws
+step: do
 ---
 
 # Ask
@@ -43,12 +44,12 @@ false.
 | B | it waits on a ticket still open |
 | T | a hand parks it for the next pull |
 
-The keys stay ordinary keys, so the filter reads `urgent: true` and `not
-urgent: true` with no word added to its language. `filter.go` already reads
-`not`.
+The keys stay ordinary keys. The filter needs no new word for them.
 
-Two things follow from keeping them apart:
+Three things follow:
 
+- a person names the key and its value, and the rows light up
+- the word `not` in front keeps the other rows, and the filter reads it today
 - a flag sorts like any column, because it is one
 - a new flag costs a line in the base file, because the key already stands
 
