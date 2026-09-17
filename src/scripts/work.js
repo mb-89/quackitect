@@ -38,7 +38,7 @@ import { readyToMerge, review } from "./review.js";
 import { serving } from "./serve.js";
 import { testVerb } from "./test-verb.js";
 export const BRIEF = "HANDOVER.md";
-const COL = { branch: 34, kind: 6, status: 6, why: 24 };
+const COL = { branch: 34, child: 32, kind: 6, status: 6, why: 24 };
 const MS = 1000;
 // [[spec/design_output/work#a-merged-branch-closes]]
 export const MINE = /^(work|claude)\//;
@@ -746,7 +746,7 @@ function list(it, _name, argv) {
   const standing = standingAll(stand, mergedHere(it));
   if ((argv ?? []).includes("--done")) return doneOnly(stand, standing);
   const now = it.clock ? it.clock.now().getTime() : 0;
-  const rows = stand.map((one) => rowOf(it, one, standing, now));
+  const rows = stand.flatMap((one) => [rowOf(it, one, standing, now), ...childRows(it, one)]);
   const loose = looseRows(it);
 
   if (!rows.length && !loose.length) {
@@ -784,6 +784,27 @@ function rowOf(it, one, standing, now) {
     stale: held >= 0 && held > (spanOf(it.stale || STALE) || spanOf(STALE)),
     said: `${one.branch.padEnd(COL.branch)} ${kind.padEnd(COL.kind)} ${status.padEnd(COL.status)} ${why.padEnd(COL.why)} ${age}`,
   };
+}
+
+// [[spec/design_output/work#a-ticket-under-its-group]]
+function childRows(it, one) {
+  if (!one.ticket) return [];
+  return ticketsOn(it, `origin/${one.branch}`)
+    .filter((child) => fieldOf(child.text, GROUP) === one.name)
+    .map((child) => ({
+      stale: false,
+      said: `  ${child.name.padEnd(COL.child)} ticket ${stateOf(child.text).padEnd(COL.status)} ${whyOf(child.text)}`,
+    }));
+}
+
+// [[spec/design_output/work#a-ticket-under-its-group]]
+function stateOf(text) {
+  return fieldOf(text, "state") || OPEN;
+}
+
+// [[spec/design_output/work#a-ticket-under-its-group]]
+export function whyOf(text) {
+  return stepOf(text) || urgencyOf(text);
 }
 
 // [[spec/design_output/work#a-row-per-group]]
