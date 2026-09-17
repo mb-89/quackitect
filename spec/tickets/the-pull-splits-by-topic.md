@@ -90,7 +90,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: guidance-rides-the-step
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 0fc2b4132f94 · claude-code-remote
+    hash_before: 4e539df340aeedf85645ff9bc65d83cd5bdf2519
+    hash_after: 4e539df340aeedf85645ff9bc65d83cd5bdf2519
 ---
 
 # Ask
@@ -119,6 +124,54 @@ For the change paying this toll, see [[spec/tickets/guidance-rides-step]].
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+| the ask asks | the approach answers |
+|---|---|
+| which files come down | the pull, the work verb, the command line, and the tests reading each |
+| what decides a cut | the topic a chapter of the design output already names |
+| what moves | whole functions, with the text they hold, and nothing else |
+| what proves the move | the tests standing today, which pass before and after each cut |
+
+TL;DR:
+
+- No behaviour changes. Every cut moves a function whole, and its callers import it back.
+- Each cut lands as its own write, because the door reads a file before and after.
+- The pull comes down first, because the work verb and the tests read it.
+- A module takes the name of the design output chapter it serves, so a reader finds it.
+
+The pull, by topic:
+
+| the module | what it takes |
+|---|---|
+| the leaf | the walk, the leaf and its chapter, and the sections under it |
+| the stand | which tickets stand, which are takeable, and which wait |
+| the hand-out | the offer, the hold, the work answer and the spawn prompt |
+| the checks | the forms, the voice, the commands and the hand rules |
+| the hand-back | passed, failed, became, refused, and the record each writes |
+| the verb | the flags, the roads the verb takes, and the material the judge reads |
+
+The work verb, by topic:
+
+| the module | what it takes |
+|---|---|
+| the round trip | new, take, sync, done and release |
+| the trunk | merge, close and what reads as merged |
+| the reading | read, review and list |
+
+The command line takes the same treatment, one module per verb group. Each test file follows its subject, so a test stands beside the module it drives.
+
+| test | claim |
+|---|---|
+| every test standing today | the tree answers the same before and after each cut |
+| the lint over the scripts | no `FileCeiling` stands |
+| the lint over the tests | no `FileCeiling` stands |
+
+What the agent needs:
+
+| number | need | status |
+|---|---|---|
+| 1 | the review hand reads this approach against the ask | open |
+| 2 | a pass moves this ticket to the implement phase | open |
 
 ## review
 
