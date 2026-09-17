@@ -126,7 +126,7 @@ record:
   - step: retro/cloud
     hand: box 3d4c068755ec · claude-code-remote
     hash_before: 757e5ea46333c6b4876e08ceb4b5ac1af3cac42a
-    hash_after: 757e5ea46333c6b4876e08ceb4b5ac1af3cac42a
+    hash_after: ef5f5ed8029220a4594f944c1ee6013480e0d0ec
 reason: done
 ---
 
