@@ -90,7 +90,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: guidance-rides-the-step
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 0fc2b4132f94 · claude-code-remote
+    hash_before: ce48a7b824a94ba3ffcd7ad9867f488112e28876
+    hash_after: ce48a7b824a94ba3ffcd7ad9867f488112e28876
 ---
 
 # Ask
@@ -120,6 +125,39 @@ For the library that already drops them, see [[spec/tickets/guidance-rides-step]
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+| the ask asks | the approach answers |
+|---|---|
+| what a session carries | the layer, without the notes its held step hands it |
+| where the drop happens | the two roads into a session, each of which calls the layer |
+| how each road reads the hold | the helper the standing verb already calls |
+| what a session with no hold carries | the layer whole, as it carries it today |
+
+TL;DR:
+
+- One helper already answers the held step's notes, and both roads call it.
+- Neither road's file stands past its ceiling, so no cut pays for this change.
+- A box standing nowhere answers an empty list, so a session start writes nothing.
+- Each road keeps the doors it already holds, and no new door reaches it.
+
+| piece | home |
+|---|---|
+| the layer the bridge hands a session | the bridge's guidance module |
+| the layer the runtime hands a session | the level zero copilot runtime |
+| the held step's notes | the guidance hand module, which both read |
+
+| test | claim |
+|---|---|
+| the bridge test, a hold standing | the note the held step reads leaves the layer |
+| the bridge test, no hold standing | the layer stands whole |
+| the bridge test, no box standing | the layer stands whole, and the box file stays absent |
+
+What the agent needs:
+
+| number | need | status |
+|---|---|---|
+| 1 | the review hand reads this approach against the ask | open |
+| 2 | a pass moves this ticket to the implement phase | open |
 
 ## review
 
