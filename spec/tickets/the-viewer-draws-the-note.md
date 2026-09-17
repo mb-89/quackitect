@@ -89,12 +89,16 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d42624a67d18a8
     hash_before: 7f2f38c1d7397225bbf9e1bc55e52515cac93a98
     hash_after: 338a46b7dbf7570af05dd92a69b868d00ed053d1
+  - step: design/review
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 47219c56615020b8d0f2c6f7c04f474f37ae6d0f
+    hash_after: 47219c56615020b8d0f2c6f7c04f474f37ae6d0f
 ---
 
 # Ask
@@ -147,10 +151,18 @@ reads the note's colour and its place. For details, see
 
 ### verdict
 
-<!-- pass or fail, with findings one a line -->
+pass
 
-<!-- the form is verdict -->
-
+- The three rows hold against the code. `kindColours` carries one entry a kind, and none for a note.
+- `saidStyle` switches on the kind, and `detail.go` pairs a prompt with the reply ending its turn.
+- The anchor holds. `Colours` stands at line 208 of the viewer design output.
+- One trap sits beside the change, and the draft walks past it. `answer` names its colour twice.
+- `kindColours` line 33 reads `121`, and `saidStyle` line 101 writes that number again.
+- So a hand following `answer` writes the note's colour twice over. Read it out of the table, and write the number once.
+- That copy is a cleanup this change reveals. Take it in the change, or write it down as a note of its own.
+- The whole line stands ready. `Body()` answers the `text` field where a row carries one.
+- `detail.go` draws through `Body()`, so a note past the row's width reads whole in the details.
+- The ask names `./RUNME.sh test`, and the draft names a Go case. The Go cases run under the check, which the second row of `done_when` covers.
 # implement
 
 ## tests-red
@@ -259,4 +271,4 @@ reads the note's colour and its place. For details, see
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+A note row carries its whole line under `text` now, and the row holds one sentence. [[spec/design_output/log#what-a-box-writes]] names the two fields. So this change draws a note that stands whole already, and the details need nothing added for the width.
