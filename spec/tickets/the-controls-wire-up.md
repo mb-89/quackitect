@@ -89,12 +89,18 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8
     hash_before: 1647c00af456caf124ee2fed93df96603c59514f
     hash_after: 759f94974cf0dcc94b87f77a42f67104f875acc4
+  - step: design/review
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 7b982e4f36e63a0e5076b054b970ac5ffcb2ad5d
+    hash_after: 7b982e4f36e63a0e5076b054b970ac5ffcb2ad5d
+    returns: 1
+    why: The binding table holds. The three values each get a row, and the `pull <ticket>` column reads true against the ask.; Three notes read `engine.autonomy` three ways, and the draft picks one without naming the other two.; The schema's own `help` reads "How far the session goes on its own". That says nothing about what a session mints.; `spec/design_output/extension.md` line 98 reads "finish your own token", "start new tokens", "ideation".; The ask and the draft read it as notes, a group ticket and a loose ticket. An implementer following the draft writes code the extension note refuses.; Name which of the three stands, and say what the other two become.; `god` stands undefined. The draft gives it the row `queue` takes, so three values carry two behaviours.; `src/bridge/stop.js` line 244 reads `engine.binding` against `queue` alone, so `god` already falls outside the queue rule there.; So the draft's pull and the standing stop rule read `god` two ways. Say which one moves.; The draft says the mint refuses a kind the autonomy leaves out, and names no file. The verb stands at `src/scripts/cli.js` line 225.; `engine.autonomy` has no reader today, and `grep -rn autonomy --include=*.js src .claude` answers that.; The evidence field carries the two comments mint writes, above the table. Cut them, so the field reads as what a hand wrote.; The anchor holds. `The hand-out` stands at line 33 of the pull design output.
 ---
 
 # Ask
@@ -164,9 +170,21 @@ control and what it allows. For details, see
 
 ### verdict
 
-<!-- pass or fail, with findings one a line -->
+fail
 
-<!-- the form is verdict -->
+- The binding table holds. The three values each get a row, and the `pull <ticket>` column reads true against the ask.
+- Three notes read `engine.autonomy` three ways, and the draft picks one without naming the other two.
+- The schema's own `help` reads "How far the session goes on its own". That says nothing about what a session mints.
+- `spec/design_output/extension.md` line 98 reads "finish your own token", "start new tokens", "ideation".
+- The ask and the draft read it as notes, a group ticket and a loose ticket. An implementer following the draft writes code the extension note refuses.
+- Name which of the three stands, and say what the other two become.
+- `god` stands undefined. The draft gives it the row `queue` takes, so three values carry two behaviours.
+- `src/bridge/stop.js` line 244 reads `engine.binding` against `queue` alone, so `god` already falls outside the queue rule there.
+- So the draft's pull and the standing stop rule read `god` two ways. Say which one moves.
+- The draft says the mint refuses a kind the autonomy leaves out, and names no file. The verb stands at `src/scripts/cli.js` line 225.
+- `engine.autonomy` has no reader today, and `grep -rn autonomy --include=*.js src .claude` answers that.
+- The evidence field carries the two comments mint writes, above the table. Cut them, so the field reads as what a hand wrote.
+- The anchor holds. `The hand-out` stands at line 33 of the pull design output.
 
 # implement
 
@@ -276,4 +294,6 @@ control and what it allows. For details, see
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+The binding half of this ticket stands ready. The autonomy half waits on one answer: which of the three readings the tree keeps.
+
+A session runs under `engine.binding` at `queue` today, and the stop rule hands it work while a free ticket stands. So the `unbound` row of the draft is the one a person reaches for, and it is the row the draft gets right.
