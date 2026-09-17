@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[standard]]
 group: guidance-rides-the-step
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 0fc2b4132f94 · claude-code-remote
@@ -144,6 +144,10 @@ record:
     hash_after: 7e588bd4310911df56dbf282e2f72992825ca7da
     returns: 1
     why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | no, the verb misses a helper's hand |; | is what the diff touches beyond the ask trivial | yes, the moved rows carry the same words |; | what does `./RUNME.sh check` answer | 0 |; | does a retro stand in the handback | no, and the route puts the retro after this phase |; | does every rule the branch adds carry a test | no, the standing verb carries none |; TL;DR:; The log row, the note hashes and the three re-hand rules stand, each with a test.; `./RUNME.sh check` exits 0, and `./RUNME.sh branch test` answers green.; The verb and the standing layer miss a helper's hand, so a helper reads no note again.; Each fix below is small, and `implement/reflect` takes them.; The findings, one a line:; `./RUNME.sh branch guidance` reads no `--as`, so a helper's hand reaches no note.; Run bare, the verb says nothing stands in your hand, while `branch pull --as` finds it.; Named `--as`, the verb reads the word as a note, and answers one bland line.; The second hand-out points a helper at `branch guidance`, which answers that helper no note.; `./RUNME.sh standing` reads the same hand, so a note a helper's step reads stays in the layer.; No test drives `./RUNME.sh standing`, and the ask names that verb.; A note name standing nowhere answers 0, so a typo reads as a note without actionables.; The split stands undone. `wc -l src/scripts/pull.js src/scripts/work.js` reads both past `code.fileLines`.; The sibling ticket the approach names stands unminted, and `depends_on` names nothing.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the verb takes `--as`, so a helper's hand reaches its notes | open |; | 2 | `./RUNME.sh standing` takes that same hand | open |; | 3 | a test drives the standing verb after a note leaves the layer | open |; | 4 | a note name standing nowhere meets a refusal | open |; | 5 | the sibling ticket the approach names lands, and `depends_on` names it | open |"
+  - step: implement/reflect
+    hand: box 0fc2b4132f94 · claude-code-remote
+    hash_before: 2bf71de26a7015c3c9e793cb482cb677ea65ab39
+    hash_after: 2bf71de26a7015c3c9e793cb482cb677ea65ab39
 ---
 
 # Ask
@@ -383,6 +387,26 @@ What surprises me:
 <!-- the class of error the findings describe, and the fix for the class -->
 
 <!-- the form is text -->
+
+Two classes carry every finding.
+
+| the class | what it is | the fix for the class |
+|---|---|---|
+| the hand reads one way | a new verb reads the box's hand, and the pull reads the named hand too | every verb reading the hold takes the same hand the pull takes |
+| a miss answers as a hit | a name reaching no note answers 0, so a typo reads as a note holding nothing | a name reaching no note refuses, and says what it looked for |
+
+Where each finding lands:
+
+- The verb missing `--as` is the first class, and so is the standing verb reading one hand.
+- The second hand-out pointing a helper at a verb it cannot use is the same class.
+- A note name standing nowhere answering 0 is the second class.
+- The untested standing verb and the unminted sibling stand outside both, and each takes its own fix.
+
+### checked
+
+- the change touches no file the ask leaves out: the two verbs, their modules, and the sibling ticket
+- every door the change reaches has a fake: the disk, git, the clock and the log all run fake
+- a comment names the approach the change implements: each file heads with what it does
 
 ## change
 
