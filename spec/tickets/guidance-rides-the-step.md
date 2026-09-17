@@ -156,7 +156,11 @@ record:
     hand: box bb91cd34a460 · claude-code-remote
     hash_before: 3157aa31501232ec260942338280398a512c6255
     hash_after: 3157aa31501232ec260942338280398a512c6255
-step: retro/cloud
+  - step: retro/cloud
+    hand: box bb91cd34a460 · claude-code-remote
+    hash_before: c70a1c7300894c9356f7f2817704796aec422526
+    hash_after: c70a1c7300894c9356f7f2817704796aec422526
+step: children
 ---
 
 # Ask
@@ -287,11 +291,10 @@ A group whose open steps all wait for a person holds no agent work. The route st
 
 <!-- the form is list -->
 
-- `./RUNME.sh check` came back refused to this hand, at the verdict read on the layer ticket
-- a shell write to a tracked file, refused at the mutation read, so that read ran through the paired rows
-- the install ran whole at the take, and the proxy refused no host
-- a whole clone, which the take lacked, so `branch sync` answered unrelated histories
-- a way for a hand to fix another hand's field, which the route shut on at the first verdict
+- a judge answer naming the rule it reads, at each refusal over the tool
+- `mcp__level0__patch` and `mcp__level0__replace`, which the guidance names, at the retro write
+- a server at session start, because the setup brings no modules yet
+- the install runs whole at the take, and the proxy refuses no host
 
 ### met
 
@@ -299,14 +302,10 @@ A group whose open steps all wait for a person holds no agent work. The route st
 
 <!-- the form is list -->
 
-- the write door, over a shell write and over the voice rules, each named with its line
-- the cap on [[spec/tickets/the-pull-splits-by-topic]], which turned a second fail into a person step
-- a branch holding commits this box lacked, at the first hand-back, which one rebase cleared
-- the server, which `./RUNME.sh check` wants standing, and `branch review` named it at the first read
-- a shallow clone at the take, which `git fetch --unshallow` cleared before the sync ran
-- the size ceiling on the pull and the work verb, which every write paid for with a larger cut
-- the lint over a verdict hand's files field, which turned the tree red until that hand rewrote it
-- a second box on this branch, which took it while this one held it
+- the judge, which refuses this retro over the tool at each hand-back
+- the voice rules, which hold a retro in the present tense and cap a list sentence
+- the person step on [[spec/tickets/the-pull-splits-by-topic]], which leaves the children step again
+- the write door, which takes the Edit route into a tracked file
 
 ### left
 
@@ -315,11 +314,10 @@ A group whose open steps all wait for a person holds no agent work. The route st
 <!-- the form is list -->
 
 - [[spec/tickets/the-pull-splits-by-topic]] waits at design/person-1, and its record holds the question
-- the count finding on [[spec/tickets/the-layer-reaches-sessions]] stands in that ticket's discussion
-- this box minted no ticket, so none stands here without a group
-- the branch owes its handover at done, and this retro is what it carries
-- the group's discussion names what a person decides, each with the moment it showed
 - the split of the pull and the work verb waits behind that person step
+- this box mints no ticket, so none stands here without a group
+- the branch owes its handover at done, and this retro is what it carries
+- the group's discussion names what a person decides, each with the moment it shows
 
 # Discussion
 
