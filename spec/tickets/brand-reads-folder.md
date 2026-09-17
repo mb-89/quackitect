@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: whenever
 step: design/person-1
 steps:
@@ -120,6 +120,8 @@ record:
     returns: 2
     why: The redraft answers the design output list, the `when` clause and the two; fake folders. The plugin name, the icon file and the lock file want a third draft.; the plugin name is the role, and the marketplace name is the brand. Stamping the plugin name renames every `mcp__level0` tool; the bridge modules and the cage settings write `mcp__level0` in, so a branded plugin name costs a prompt; the marketplace name alone parts two vehicles, because the client keys a plugin under its marketplace; the icon row names a config file, and the ask names a file under `spec/config`. Name that path, so the implement writes there; the ask says this tree keeps its icon. The icon row reads as the link writing initials over the mark this tree wears; `src/extension/package-lock.json` writes the name twice, and `npm install` rewrites it. The stamp leaves the two out of step; `src/extension/webview/package.json` writes the name, and wants a row in the table; `brandOf` answers the folder name raw. A folder carrying a dot or a space makes an id the editor refuses; `links(files, home, root)` drops the verb, so the `linked` query stands outside the test the ask asks for; the design output list names the command that counts the places, and carries a count from that command alone
 group: the-brand-reads-the-folder
+reason: became
+successors: [the-brand-names-the-plugin]
 ---
 
 # Ask
