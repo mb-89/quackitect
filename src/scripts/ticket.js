@@ -140,7 +140,8 @@ function todo(it, name, argv) {
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 function said(it, kind, line, more) {
   if (!it.log) return 0;
-  return it.log.say("info", kind, line, more).then(() => 0);
+  // The row holds one sentence under `said`, so `text` carries the line whole and the details show it. [[spec/design_output/log#what-a-box-writes]]
+  return it.log.say("info", kind, line, { text: line, ...more }).then(() => 0);
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
