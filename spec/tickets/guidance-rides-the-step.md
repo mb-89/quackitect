@@ -121,7 +121,15 @@ record:
     hand: box 0fc2b4132f94 · claude-code-remote
     skipped: true
     why: the box leaves it while the-pull-splits-by-topic stand open
-step: retro/notes
+  - step: retro/notes
+    hand: box 0fc2b4132f94 · claude-code-remote
+    hash_before: 7dbdca3cbaacd16c4554c06c93f99aaf2f541057
+    hash_after: 7dbdca3cbaacd16c4554c06c93f99aaf2f541057
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+step: retro/write
 ---
 
 # Ask
