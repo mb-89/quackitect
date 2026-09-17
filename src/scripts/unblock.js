@@ -8,7 +8,8 @@ import { landed } from "./landed.js";
 import { leafOf } from "./pull.js";
 
 const DISCUSSION = "# Discussion";
-const NOTHING = "Nothing stands here yet.";
+// What mint leaves in an empty chapter, in either spelling. A hand writing under Discussion drops it, so the chapter reads as what a hand wrote. [[spec/design_output/work#a-person-step-leaves]]
+const NOTHING = /Nothing stands here yet\.|<!--[\s\S]*?-->/g;
 
 // [[spec/design_output/work#a-person-step-leaves]]
 export function unblock(it, name, argv) {

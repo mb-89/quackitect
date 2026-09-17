@@ -180,6 +180,22 @@ test("the successor carries the question the person step asks, and the ticket it
   assert.match(successor, /no test drives the hook/, "the question rides along");
   assert.match(successor, /\[\[spec\/tickets\/a-child\]\]/, "the successor names where it comes from");
   assert.match(successor, /# Discussion/, "it lands under Discussion");
+  assert.doesNotMatch(successor, /Nothing stands here yet/, "the empty line goes");
+});
+
+// The mint writes the chapter's description as a comment, and a hand writing there drops it. [[spec/design_output/work#a-person-step-leaves]]
+test("the placeholder mint writes goes, so the chapter reads as what a hand wrote", () => {
+  const minted = SUCCESSOR.replace(
+    "Nothing stands here yet.",
+    "<!-- what anybody adds, at any time, on this ticket -->",
+  );
+  const { it, disk } = doors(standing(CHILD(), { [at("spec/tickets/a-successor.md")]: minted }));
+
+  heard(() => work(ROOT, ["unblock", "a-child", "a-successor"], it));
+
+  const successor = disk.read(at("spec/tickets/a-successor.md"));
+  assert.doesNotMatch(successor, /<!--/, "the comment goes");
+  assert.match(successor, /no test drives the hook/, "the question still rides along");
 });
 
 // [[spec/design_output/work#a-person-step-leaves]]
