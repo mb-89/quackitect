@@ -90,12 +90,18 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: guidance-rides-the-step
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 0fc2b4132f94 · claude-code-remote
     hash_before: 4e539df340aeedf85645ff9bc65d83cd5bdf2519
     hash_after: 4e539df340aeedf85645ff9bc65d83cd5bdf2519
+  - step: design/review
+    hand: box 0fc2b4132f94 · claude-code-remote · helper-2
+    hash_before: 3645f8ce7ee0777f9d5d33dd834fb12d4598cac8
+    hash_after: 3645f8ce7ee0777f9d5d33dd834fb12d4598cac8
+    returns: 1
+    why: "Cut `test/level0/schema.test.js` as well, because it stands past the ceiling and the approach leaves it out.; That test drives the schema reader, so the split of the three scripts hands it no subject.; Until it comes down, `./RUNME.sh lint test/level0` names `FileCeiling`, and the ask's second item stands open.; Name the head every minted module writes: a line on what it holds, then its design output link.; The approach answers that item with the module's name alone, and a name says less than a head.; Point each pull module at a chapter that stands: the leaf, the stand and the verb name none.; The work module the reading names no chapter of `spec/design_output/work` either.; Name `./RUNME.sh check` among the proofs, because the ask asks for its exit.; The cut list for the pull and the work verb holds, and each cut moves a function whole.; `./RUNME.sh check` exits 0 on this commit."
 ---
 
 # Ask
@@ -182,6 +188,19 @@ What the agent needs:
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- Cut `test/level0/schema.test.js` as well, because it stands past the ceiling and the approach leaves it out.
+- That test drives the schema reader, so the split of the three scripts hands it no subject.
+- Until it comes down, `./RUNME.sh lint test/level0` names `FileCeiling`, and the ask's second item stands open.
+- Name the head every minted module writes: a line on what it holds, then its design output link.
+- The approach answers that item with the module's name alone, and a name says less than a head.
+- Point each pull module at a chapter that stands: the leaf, the stand and the verb name none.
+- The work module the reading names no chapter of `spec/design_output/work` either.
+- Name `./RUNME.sh check` among the proofs, because the ask asks for its exit.
+- The cut list for the pull and the work verb holds, and each cut moves a function whole.
+- `./RUNME.sh check` exits 0 on this commit.
 
 # implement
 
