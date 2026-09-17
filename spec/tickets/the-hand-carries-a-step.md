@@ -104,6 +104,9 @@ record:
     hand: box 7cdf2102f8a5
     hash_before: ccfd84049234feb3cab41c0b1c9a7bad29f68db7
     hash_after: b6fc422e6b6e1c89d5e1b6b4ac03c78d025c3cad
+  - step: children
+    hand: box 3d4c068755ec
+    hash_before: 412a1a94c936e6012bdbad636d419b0e2235c887
 ---
 
 # Ask
