@@ -321,20 +321,28 @@ A group whose open steps all wait for a person holds no agent work. The route st
 
 # Discussion
 
-Where the group stands: two children closed, and [[spec/tickets/the-pull-splits-by-topic]] waits for a person at its design step. The judge named in the earlier note refuses nothing now, because the sync brought the voice checks the owner reworked.
+Where the group stands: two children close, and [[spec/tickets/the-pull-splits-by-topic]] waits for a person at its design step. The pull answers `wait` while that step stands, so the group takes no agent hand.
 
-What the branch met, each with its moment:
+What the branch meets, each with its moment:
 
-| what the box met | where it showed |
+| what the box meets | where it shows |
 |---|---|
-| a shallow clone | `branch take` answered `refusing to merge unrelated histories`, and `git fetch --unshallow` cleared it |
-| the size ceiling | every write to the pull or the work verb paid for itself with a larger cut |
-| a route that shut on itself | a verdict hand's files field turned the lint red, and no other hand may write that field |
-| a lost test file | an implement hand wrote over `test/level0/guidance.test.js`, which already stood |
-| two boxes on one branch | box `220c71584772` took this branch while box `0fc2b4132f94` held it |
+| a judge refusing the retro | each hand-back through the pull tool, so the shell verb carries it |
+| a hand-back's fields landing late | the judge reads the ticket on disk, and weighs the last box's retro |
+| a person step under the children | `branch pull` leaves the children step at every take |
+| a retro field holding a single window | each box writes its retro over the last box's |
+| the voice rules over a retro | the past tense a retro reaches for meets an error at the write |
+| a shallow clone | `branch take` answers `refusing to merge unrelated histories`, and `git fetch --unshallow` clears it |
+| the size ceiling | every write to the pull or the work verb pays for itself with a larger cut |
+| a route that shuts on itself | a verdict hand's files field turns the lint red, and no other hand may write that field |
+| a lost test file | an implement hand writes over a test file that already stands |
 
 What a person decides:
 
+- whether the judge names the rule it refuses, so a hand rewrites on a reason
+- whether the judge reads the fields a hand-back carries, and guards the shell verb too
+- whether a group whose every open step waits for a person answers `wait` at the take
+- whether a box's retro stands under its own hand, so a later box writes beside it
 - whether two boxes may hold one branch, because a verdict hand's hold breaks each time the tip moves
 - whether `branch sync` unshallows a clone itself, or the harness clones whole
 - whether the work answer names the markdown list a `files` field takes
