@@ -2,6 +2,8 @@
 kind: [[ticket]]
 state: open
 urgency: soon
+group: the-hand-carries-a-step
+step: design/draft
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -79,6 +81,7 @@ steps:
     reads: [[spec/guidance/review/reviewing]]
     input: ["diff", "implement"]
     to: retro
+    checklist: ["every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     evidence:
       - name: read
         form: files
@@ -87,9 +90,8 @@ steps:
         form: verdict
         says: pass or fail, findings one a line
 process: [[standard]]
-process_hash: 8cc8301e3ca3ba8d
+process_hash: d1fd9cd113889f29
 depends_on: ["the-hand-carries-the-session"]
-step: design/draft
 ---
 
 # Ask
@@ -137,7 +139,7 @@ When the next step's `by` excludes the hand that pulls, nobody takes it. The app
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+<!-- the same tests pass -->
 
 <!-- the form is command -->
 
@@ -228,6 +230,12 @@ When the next step's `by` excludes the hand that pulls, nobody takes it. The app
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 # Discussion
 

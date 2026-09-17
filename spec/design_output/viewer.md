@@ -48,23 +48,15 @@ The window carries no status bar.
 
 ## Alt L raises the floor
 
-The window shows the rows at the floor and above. The ladder is the one
-Python's logging climbs:
-
-| floor | shows |
-|---|---|
-| `debug` | every row |
-| `info` | every row a door says, and this is where the window opens |
-| `warn` | a refusal and a fault |
-| `error` | a fault |
-| `fatal` | what ends a session |
+The window shows the rows at the floor and above, and opens at `info`. The
+ladder is the one the log climbs. For what each level holds, see
+[[spec/design_output/log#what-a-box-writes]].
 
 `alt+l` raises the floor one level. From the top it comes round to the bottom,
-so the sixth press stands at the opening floor again. A debug row stays hidden
-until the floor comes round to it. The filter narrows what the floor leaves.
-
-A row naming no level, or a level nobody knows, stands as `info`, so it shows
-at the opening floor.
+so the press after the top stands at the opening floor again. A debug row stays
+hidden until the floor comes round to it. The filter narrows what the floor
+leaves. A row naming no level, or a level nobody knows, stands as `info`, so it
+shows at the opening floor.
 
 The header names the floor beside the key, as `alt+L log lvl: INFO`, and in
 red while the floor stands off `info`.
@@ -112,13 +104,13 @@ one too.
 
 ## One key filters the line
 
+- `alt+q` keeps the prompts and the replies: the talk.
 - `alt+shift+f` keeps every line of the selected line's kind. On a tool line the kind is the tool, as `Read`.
-- `alt+ctrl+f` keeps every line of the selected line's level.
 
 The key writes its filter into the filter line, as `kind: /^prompt$/`, so it
-reads and edits like one a person types. The same key on a line of that kind
-again clears the filter. The filter pane names both keys, and the header stays
-at three.
+reads and edits like one a person types. The same key again clears the
+filter. The filter pane names each key, and the header stays at three. The
+floor under `alt+l` keeps a level, so no key filters by level.
 
 ## A name nobody knows
 

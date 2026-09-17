@@ -1,6 +1,6 @@
 // The pull, driven through fake doors. A ticket stands in a map, git answers
 // from a table, and every check and every answer runs in memory.
-// [[spec/design_output/pull#the-five-answers]]
+// [[spec/design_output/pull#the-answers]]
 
 import assert from "node:assert/strict";
 import { join } from "node:path";
@@ -17,7 +17,6 @@ import {
   holdsVerb,
   leafOf,
   takeable,
-  testSays,
   verdictIn,
   withEngineReader,
   withPayload,
@@ -25,219 +24,13 @@ import {
 } from "../../src/scripts/pull.js";
 import { ticket } from "../../src/scripts/ticket.js";
 import { work } from "../../src/scripts/work.js";
-
-const ROOT = "/tree";
-const SHA = "b818c390c02737351bf1b73aba36a573d34d2ecc";
+import { probeOf, startOf } from "../../src/scripts/serve.js";
+import { testSays } from "../../src/scripts/test-verb.js";
+import { SCHEMA } from "./pull-schema.js";
+const ROOT = "/tree", SHA = "b818c390c02737351bf1b73aba36a573d34d2ecc";
 const BRANCH = "work/one-group";
 const HAND = "box d462e994b4cef";
 const HOLD = join(ROOT, ".se/hold/box-d462e994b4cef.json");
-// [[spec/design_output/doors#a-fake-behaves]]
-const SCHEMA = `kind: ticket
-
-governs:
-  - spec/tickets/**
-  - .se/tickets/**
-
-frontmatter:
-  type: object
-  additionalProperties: false
-  required: [kind, state, urgency, steps]
-  properties:
-    kind:
-      const: ticket
-      x-link: true
-      description: the schema this note is minted from
-    state:
-      enum: [draft, open, closed]
-      x-engine: true
-      description: whether anybody pulls it
-    reason:
-      enum: [done, dropped, became]
-      description: how the work stopped
-    urgency:
-      enum: [now, soon, whenever]
-      description: which ticket the pull hands out first
-    step:
-      type: string
-      x-names: steps
-      x-leaf: true
-      x-engine: true
-      description: the leaf of the route this ticket stands on
-    steps:
-      type: array
-      x-engine: true
-      description: the route, as a tree of steps
-      items:
-        type: object
-        additionalProperties: false
-        required: [name]
-        properties:
-          name:
-            type: string
-            description: one word, unique among its siblings
-          steps:
-            $ref: "#/frontmatter/properties/steps"
-            description: the steps under this phase
-          does:
-            type: string
-            description: what the hand does at this leaf
-          by:
-            type: string
-            x-names: steps
-            x-words: [anyone, person, agent, helper, retro, children]
-            x-prefix: not
-            description: the hand this step admits
-          not:
-            type: string
-            x-names: steps
-            description: a step whose hand this step's hand may not be
-          reads:
-            type: [array, string]
-            x-link: true
-            description: the guidance notes this step's hand reads
-          on_fail:
-            type: string
-            x-earlier: steps
-            description: the earlier step a failed hand-back sends the ticket to
-          asks:
-            type: string
-            description: the question a person answers
-          options:
-            type: array
-            description: the words that answer asks
-          when:
-            enum: [returned, cloud, desk]
-            description: the condition the pull reads
-          checklist:
-            type: array
-            description: what a hand has to do here
-          input:
-            type: [array, string]
-            x-earlier: steps
-            x-fields: evidence
-            x-words: [ask, diff]
-            description: what this step reads
-          needs:
-            type: array
-            description: the verbs and tools this step runs
-          from:
-            type: string
-            description: who hands this step its input
-          to:
-            type: string
-            description: who takes the output
-          evidence:
-            type: array
-            description: the fields this leaf's hand fills
-            items:
-              type: object
-              additionalProperties: false
-              required: [name, form, says]
-              properties:
-                name:
-                  type: string
-                  description: one word, unique among the fields of this leaf
-                form:
-                  enum: [text, list, command, link, files, choice, checklist, verdict]
-                  description: what the hand writes
-                says:
-                  type: string
-                  description: one line on what goes in this field
-                expects:
-                  type: [integer, string]
-                  description: the exit code or the word a command answers with
-                options:
-                  type: array
-                  description: the words a choice takes
-    process:
-      x-link: true
-      description: the route the mint copies from
-    process_hash:
-      type: string
-      description: the hash of the process file
-    record:
-      type: array
-      x-engine: true
-      description: the engine's entry per leaf
-      items:
-        type: object
-        additionalProperties: false
-        required: [step]
-        properties:
-          step:
-            type: string
-            x-names: steps
-            x-leaf: true
-            description: the leaf this entry stands for
-          hand:
-            type: string
-            description: the box
-          hash_before:
-            type: string
-            description: the branch tip at the take
-          hash_after:
-            type: string
-            description: the branch tip at the hand-back
-          returns:
-            type: integer
-            description: how often this leaf fails back
-          skipped:
-            type: boolean
-            description: whether the pull passes this leaf over
-          why:
-            type: string
-            description: the reason
-          answered:
-            type: array
-            description: one entry per command field
-            items:
-              type: object
-              additionalProperties: false
-              required: [name]
-              properties:
-                name:
-                  type: string
-                  description: the field
-                exit:
-                  type: integer
-                  description: the exit code
-                said:
-                  type: string
-                  description: the last line
-    group:
-      type: string
-      description: the branch this ticket lands on
-    parent:
-      type: string
-      description: the ticket whose children step waits for this one
-    depends_on:
-      type: [array, string]
-      description: the tickets this one waits for
-    successors:
-      type: [array, string]
-      description: the tickets this one became
-    todo:
-      type: boolean
-      description: the tag a hand puts on a note
-
-body:
-  headingLevel: 1
-  order: strict
-  extraSections: false
-  tense: present
-  sections:
-    - header: Ask
-      required: true
-      x-written: draft
-      description: what this ticket asks for
-    - x-one-per: steps
-      x-written: hand
-    - header: Discussion
-      required: true
-      position: last
-      x-written: anyone
-      description: what anybody adds
-`;
 const at = (path) => join(ROOT, ...path.split("/"));
 
 function heard(what) {
@@ -455,7 +248,7 @@ const standing = (child = CHILD(), group = GROUP_NOTE, extra = {}) => ({
 });
 
 // [[spec/design_output/pull#the-hand-out]]
-test("a pull off a work branch refuses, and names the take", () => {
+test("a pull off trunk and off a work branch refuses, and names the pull from trunk", () => {
   const { it } = doors(
     {},
     { "git rev-parse --abbrev-ref HEAD": { stdout: "claude/roaming-hopper-ab12cd\n" } },
@@ -464,7 +257,80 @@ test("a pull off a work branch refuses, and names the take", () => {
   const { code, said } = heard(() => work(ROOT, ["pull"], it));
 
   assert.equal(code, 2);
-  assert.match(said, /branch take/);
+  assert.match(said, /branch pull from main/);
+  assert.ok(!said.includes("branch take"), "no hand takes a branch");
+});
+
+const FREE = CHILD().replace("group: one-group\n", "");
+const onTrunk = (extra = {}) => ({
+  "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
+  "git rev-list --count HEAD..origin/main": { stdout: "0\n" },
+  ...extra,
+});
+// [[spec/design_output/pull#the-engine-takes-the-branch]]
+test("on trunk a cloud box's pull takes a branch, and a desk's pull takes none", () => {
+  const cloud = doors(standing(), onTrunk(), { cloud: true });
+  for (const [argv, code] of [[probeOf("node", 6510), 1], [startOf(ROOT), 0]]) cloud.outside.proc.teach(argv, { exitCode: code });
+  const taken = heard(() => work(ROOT, ["pull"], cloud.it));
+  assert.equal(taken.code, 0);
+  assert.match(taken.said, /No work branch stands at todo|took|holds it/);
+  const desk = doors({ [at("spec/tickets/free-one.md")]: FREE }, onTrunk(), { cloud: false });
+  const { code, said } = heard(() => work(ROOT, ["pull"], desk.it));
+  assert.equal(code, 0, said);
+  assert.match(said, /^work {2}free-one at design\/draft/m, "the free ticket comes");
+  assert.ok(!ranGit(desk.outside).some((one) => one.startsWith("git switch")), "the box stays on trunk");
+});
+
+// [[spec/design_output/pull#the-engine-takes-the-branch]]
+test("on trunk a desk's pull hands out no group and no group's child, and cuts a branch for an open group standing without one", () => {
+  const { it, outside } = doors(standing(), onTrunk(), { cloud: false });
+  const { code, said } = heard(() => work(ROOT, ["pull"], it));
+  assert.equal(code, 0, said);
+  assert.match(said, /work\/one-group is cut and pushed/);
+  assert.ok(!said.includes("a-child at"), "the group's child stays with the group");
+  const ran = ranGit(outside);
+  assert.ok(ran.includes("git branch work/one-group main"), "the branch is cut from trunk");
+  assert.ok(ran.includes("git push -u origin work/one-group"), "and pushed for the cloud");
+
+  const stands = doors(standing(), onTrunk({
+    "git ls-remote --heads origin work/*": { stdout: `${SHA}\trefs/heads/work/one-group\n` },
+  }), { cloud: false });
+  const again = heard(() => work(ROOT, ["pull"], stands.it));
+  assert.ok(!again.said.includes("is cut"), "a group with a branch gets no second one");
+  assert.ok(!ranGit(stands.outside).some((one) => one.startsWith("git branch work/")));
+});
+
+// [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+test("a free ticket carrying the todo tag comes before the rest on trunk", () => {
+  const { it } = doors(
+    {
+      [at("spec/tickets/a-free.md")]: FREE,
+      [at("spec/tickets/b-free.md")]: FREE.replace("urgency: now", "urgency: now\ntodo: true"),
+    },
+    onTrunk(),
+    { cloud: false },
+  );
+  const { code, said } = heard(() => work(ROOT, ["pull"], it));
+  assert.equal(code, 0, said);
+  assert.match(said, /^work {2}b-free at/m, "the tag beats the name order");
+});
+
+// [[spec/design_output/pull#the-engine-takes-the-branch]]
+test("on trunk the drop and the hold come before the take, so a held hand takes no branch", () => {
+  const { it, outside } = doors(
+    { ...standing(), [HOLD]: JSON.stringify({ ticket: "a-free", path: "spec/tickets/a-free.md", step: "do", hand: HAND }) },
+    onTrunk(),
+    { cloud: true },
+  );
+  const held = heard(() => work(ROOT, ["pull"], it));
+  assert.equal(held.code, 1);
+  assert.match(held.said, /a-free stands in your hand/);
+  assert.ok(!ranGit(outside).some((one) => one.startsWith("git switch")), "a held hand takes no branch");
+
+  const dropped = heard(() => work(ROOT, ["pull", "--drop"], it));
+  assert.equal(dropped.code, 0);
+  assert.match(dropped.said, /the hold drops/);
+  assert.ok(!ranGit(outside).some((one) => one.startsWith("git switch")), "the drop takes no branch");
 });
 
 // [[spec/design_output/pull#the-work-answer]]
@@ -984,9 +850,10 @@ test("a rejected push fetches, rebases the commit, tries once more, and then ans
   assert.ok(ranGit(stuck.outside).includes("git rebase --abort"));
   assert.equal(
     stuck.disk.exists(HOLD),
-    true,
-    "the hold stays, so the next pull pushes again",
+    false,
+    "the hand-back stands, so the hold drops and outlives no closed ticket",
   );
+  assert.match(refused.said, /push work\/one-group and pull again/);
 });
 
 // [[spec/design_output/pull#a-need-is-a-verb]]
@@ -1332,7 +1199,7 @@ test("ticket open turns a draft with an ask into an open ticket at its first lea
   assert.equal(heard(() => ticket(ROOT, ["open", "a-child"], empty.it)).code, 1);
 });
 
-// [[spec/design_output/pull#the-five-checks]]
+// [[spec/design_output/pull#the-checks]]
 test("the judge's material is the leaf's evidence and the rules its reads name, as JSON", () => {
   const { it } = doors(standing(filled(CHILD(), "### approach", "The approach.")));
   heard(() => work(ROOT, ["pull"], it));

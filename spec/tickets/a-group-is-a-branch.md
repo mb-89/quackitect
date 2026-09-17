@@ -2,6 +2,7 @@
 kind: [[ticket]]
 state: closed
 urgency: soon
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -42,6 +43,7 @@ steps:
       - name: write
         does: writes the retro over the box's own window
         input: ["children", "notes"]
+        checklist: ["every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
         evidence:
           - name: done
             form: list
@@ -74,6 +76,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 step: retro/cloud
 process: [[group]]
+process_hash: e655a1488d1ac788
 record:
   - step: children
     hand: box b9be613824b0
@@ -127,6 +130,12 @@ Done is a tree where no file names a group kind. `branch list` then names a grou
 
 <!-- the form is list -->
 
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
 # children
 
 # retro
@@ -173,6 +182,12 @@ Done is a tree where no file names a group kind. `branch list` then names a grou
 ### thoughts
 
 The tree carries two trunks. The remote `main` roots at a commit from today, and every work branch roots at one from last week. So `branch sync` cannot run at all, and the contract opens on a step no hand completes here. The work still lands, because a group's children touch files trunk leaves alone. The next merge is where the two roots meet, and that meeting belongs to a person.
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 ## cloud
 

@@ -312,9 +312,8 @@ on the tracked notes alone: does this text name a role, or one person?
 | `role` | passes |
 | `person` | refuses |
 
-The roles this tree uses are the owner, the agent, the reader, the reviewer and
-the maintainer. [[spec/guidance/voice]] says so, so an author reads the answer
-before the refusal.
+[[spec/guidance/voice]] names the roles this tree uses, so an author reads the
+answer before the refusal.
 
 The rule reads `*.md` at the root and every note under `spec`, and it ignores
 `.se`. A raw note costs no model call, because the two checks at the door

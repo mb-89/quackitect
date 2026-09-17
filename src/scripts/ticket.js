@@ -13,6 +13,7 @@ import {
   schemasFrom,
 } from "../../.claude/skills/level0/lib/schema.js";
 import { TODO } from "../../.claude/skills/level0/lib/todo.js";
+import { askFaults, askRefusal } from "./ask-lint.js";
 import { fieldOf, GROUP, withField, withoutField } from "./group.js";
 import { askRows, processAt } from "./process.js";
 
@@ -198,6 +199,11 @@ function open(it, name) {
     console.error(`${at.said} holds an empty ask, and open waits for one. Write the ask first.`);
     return 1;
   }
+  const found = askFaults(it, at.path.split("\\").join("/").replace(`${it.root}/`, ""), rows);
+  if (found.length) {
+    console.error(askRefusal(at.said, found));
+    return 1;
+  }
   const step = String(front.step ?? "").trim() || firstLeafOf(front.steps);
   it.disk.write(at.path, withField(withField(text, "state", "open"), "step", step));
   console.log(`${at.said} stands open at ${step}, and the pull hands it out.`);
@@ -283,12 +289,16 @@ function copied(list, parent, take) {
   });
 }
 
+// A closed note steps aside for the ticket of its name, because a note that became a ticket shares it. [[spec/design_output/pull#the-private-queue]]
 function ticketAt(it, name) {
   const said = String(name).replace(/\.md$/, "");
+  const standing = [];
   for (const folder of [NOTES, TRAVELS]) {
     const path = it.join(it.root, ...`${folder}/${said}.md`.split("/"));
-    if (it.disk.exists(path)) return { path, said: `${folder}/${said}.md` };
+    if (it.disk.exists(path)) standing.push({ path, said: `${folder}/${said}.md` });
   }
+  const live = standing.find((one) => fieldOf(it.disk.read(one.path), "state") !== "closed");
+  if (live || standing.length) return live ?? standing[0];
   const direct = it.join(it.root, ...String(name).split("/"));
   return it.disk.exists(direct) ? { path: direct, said: String(name) } : null;
 }

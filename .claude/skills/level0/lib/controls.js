@@ -1,4 +1,4 @@
-// The two controls the sidebar hands to level zero. The hold reaches the
+// The controls the sidebar hands to level zero. The hold reaches the
 // tooth as a mechanical check, and the ask reaches the standing block as a
 // line. Both read one key, and the sidebar writes it.
 // [[spec/design_output/extension#what-level-zero-holds]]
@@ -23,10 +23,19 @@ export function controlBlock(said = {}) {
 }
 
 function heldSays(hold) {
-  if (String(hold ?? OFF) !== FINISH) return [];
+  const said = String(hold ?? OFF);
+  if (said === STOP) {
+    return [
+      "The owner holds this session at stop. Put the work down where it stands.",
+      "Say what stands and what is left, and end the turn with the stop line.",
+      "",
+    ];
+  }
+  if (said !== FINISH) return [];
   return [
-    "The owner holds this session at finish. Carry what stands to its end,",
-    "start nothing new, and say what is left where you stop.",
+    "The owner holds this session at finish. Bring what you hold to a point you",
+    "pick it up from later, take nothing new out of the queue, and end the turn.",
+    "You judge where that point stands. Say what stands and what is left.",
     "",
   ];
 }

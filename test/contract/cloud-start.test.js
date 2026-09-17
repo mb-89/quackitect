@@ -1,0 +1,102 @@
+// The cloud starts its own server: the shell text the bridgehead runs, what it
+// answers where a piece is missing, and the line each code writes.
+// [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+
+import assert from "node:assert/strict";
+import { join } from "node:path";
+import test from "node:test";
+import { reasonOf, START } from "../../.claude/skills/level0/hooks/level0.js";
+import { disk } from "../../src/doors/disk.js";
+import { proc } from "../../src/doors/proc.js";
+
+const files = disk();
+
+const MARKER = "started.txt";
+const LOCAL = { CLAUDE_CODE_REMOTE: "", SE_CLOUD: "" };
+const CLOUD = { CLAUDE_CODE_REMOTE: "true", SE_CLOUD: "" };
+const SERVER =
+  "require('fs').writeFileSync(process.argv[2] + '/started.txt', 'up')\n";
+const WAITS = 40;
+
+const nodeHere = () =>
+  proc().run(["sh", "-c", "command -v node"], { timeoutMs: 5000 }).exitCode === 0;
+
+function runs(where, env) {
+  return proc().run(["sh", "-c", START, "level0", where, where], {
+    env,
+    timeoutMs: 10_000,
+  });
+}
+
+function tree(modules) {
+  const where = files.tempDir("level0-start-");
+  files.makeDir(join(where, "src", "bridge"));
+  files.write(join(where, "src", "bridge", "server.js"), SERVER);
+  if (modules) files.makeDir(join(where, "node_modules"));
+  return where;
+}
+
+function waitsFor(at) {
+  const held = new Int32Array(new SharedArrayBuffer(4));
+  for (let step = 0; step < WAITS; step++) {
+    if (files.exists(at)) return true;
+    Atomics.wait(held, 0, 0, 100);
+  }
+  return files.exists(at);
+}
+
+test("a box outside the cloud starts nothing, because a person stands beside it", () => {
+  const where = tree(true);
+  try {
+    const said = runs(where, LOCAL);
+    assert.equal(said.exitCode, 3);
+    assert.equal(files.exists(join(where, MARKER)), false, "no server stands");
+    assert.equal(reasonOf(said.exitCode)[0], "", "and no line lands in the log");
+  } finally {
+    files.remove(where);
+  }
+});
+
+test("a cloud box whose setup installed no modules says so and starts nothing", () => {
+  const where = tree(false);
+  try {
+    const said = runs(where, CLOUD);
+    assert.equal(said.exitCode, 6);
+    const [level, why] = reasonOf(said.exitCode);
+    assert.equal(level, "warn");
+    assert.match(why, /modules/);
+  } finally {
+    files.remove(where);
+  }
+});
+
+test("a root that stands nowhere says so", () => {
+  const said = runs(join(files.tempDir("level0-start-"), "absent"), CLOUD);
+  assert.equal(said.exitCode, 4);
+  assert.equal(reasonOf(said.exitCode)[0], "warn");
+});
+
+test("a cloud box starts the server, and the call comes back before it stands", {
+  skip: nodeHere() ? false : "this box carries no node on the PATH",
+}, () => {
+  const where = tree(true);
+  try {
+    const said = runs(where, CLOUD);
+    assert.equal(said.exitCode, 0);
+    assert.equal(reasonOf(said.exitCode)[0], "info");
+    assert.equal(waitsFor(join(where, MARKER)), true, "the server ran on its own");
+    assert.equal(
+      files.exists(join(where, ".se", "log")),
+      true,
+      "the log folder stands for the server to write into",
+    );
+  } finally {
+    files.remove(where);
+  }
+});
+
+test("a code nobody names reads as a warning", () => {
+  const [level, why] = reasonOf(9);
+  assert.equal(level, "warn");
+  assert.match(why, /9/);
+});

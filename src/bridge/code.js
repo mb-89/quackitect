@@ -3,8 +3,23 @@
 // [[spec/design_output/level0#the-formatter-applies-itself]]
 
 import { refusal } from "../../.claude/skills/level0/lib/refuse.js";
+import { grows } from "../../.claude/skills/level0/lib/size.js";
+import { asks } from "./config.js";
 
 export async function codeDoor(e, writing, where, whole, box) {
+  // [[spec/design_output/level0#the-size-ceiling]]
+  const grown = grows(textAt(box.disk, writing.path), whole, where, {
+    function: asks(box, "code.functionLines"),
+    file: asks(box, "code.fileLines"),
+  });
+  if (grown.length) {
+    box.log.say("warn", "write", `refused ${grown.length} ceiling(s) in ${where}`, {
+      file: where,
+      rule: grown[0]?.rule,
+      tool: String(e.tool),
+    });
+    return { result: { deny: refusal(where, grown) } };
+  }
   if (!box.biome.stands()) return { pass: true };
   let text = whole;
   if (e.tool === "Write") {
@@ -23,4 +38,12 @@ export async function codeDoor(e, writing, where, whole, box) {
   }
   if (e.tool === "Write" && text !== writing.text) return { event: { ...e, content: text } };
   return { pass: true };
+}
+
+function textAt(disk, path) {
+  try {
+    return disk.exists(path) ? String(disk.read(path)) : "";
+  } catch {
+    return "";
+  }
 }

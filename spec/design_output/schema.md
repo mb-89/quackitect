@@ -30,13 +30,13 @@ Two halves stand in one module:
 | `governorOf(schemas, path)` | the schema holding that path, or nothing |
 | `placeholderFaults(text, schema, where)` | every placeholder the note still carries |
 
-The caller hands the disk in through the tree, so a test drives all seven over
+The caller hands the disk in through the tree, so a test drives every one over
 `fakeDisk` and touches memory alone.
 
 # The yaml a schema reads
 
 A schema is YAML, and this tree carries no YAML library. The reader holds the
-subset the six files use, and nothing past it:
+subset the schema files use, and nothing past it:
 
 1. a map, by indent
 2. a list of scalars, and a list of maps
@@ -377,10 +377,10 @@ A departure stands refused, and the refusal names each finding and two ways on:
 A stranger in a governed folder takes its own refusal, `refusedKind`, which
 names the schema file, the finding and `mint_note` as the road.
 
-# The verbs own three fields
+# The verbs own their fields
 
 A property naming `x-engine: true` belongs to the verbs, and an agent's write to
-it stands refused. Four carry it on a ticket:
+it stands refused. These carry it on a ticket:
 
 | field | who writes it |
 |---|---|

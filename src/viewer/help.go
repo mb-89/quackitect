@@ -1,5 +1,5 @@
 // What alt+? and alt+f open in the details pane: how the window works, and how
-// the filter reads. The header names the three keys, and these say the rest.
+// the filter reads. The header names the keys, and these say the rest.
 // [[spec/design_output/viewer#the-help]]
 
 package main
@@ -68,13 +68,12 @@ this pane with the filter still holding. Clear the line to drop it.
 
 SHORTCUTS
 
+  alt+q                keep the prompts and the replies: the talk
   alt+shift+f          keep every line of the selected line's kind
-  alt+ctrl+f           keep every line of the selected line's level
 
-A tool line's kind is its tool, as Read or Bash. The shortcut writes the
+A tool line's kind is its tool, as Read or Bash. A shortcut writes the
 filter into the line above, so it reads and edits like one typed. The same
-shortcut on a line of that kind again clears the filter. Both work with this
-pane shut too.
+shortcut again clears the filter. Each works with this pane shut too.
 
 The language is KQL, the one Kibana uses.
 

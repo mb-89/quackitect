@@ -1,4 +1,4 @@
-// The shape of a full report: four chapters read off spec/config/status.yaml,
+// The shape of a full report: the chapters read off spec/config/status.yaml,
 // the block that asks for them, and what a reply lacks.
 // [[spec/design_output/extension#the-ask-is-a-line]]
 

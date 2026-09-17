@@ -1,0 +1,262 @@
+---
+kind: [[ticket]]
+state: open
+urgency: whenever
+steps:
+  - name: design
+    reads: [[spec/guidance/voice]]
+    steps:
+      - name: draft
+        does: writes the approach the ask calls for
+        from: anyone
+        by: anyone
+        input: ask
+        evidence:
+          - name: approach
+            form: text
+            says: the approach here where it takes minutes, or a link to the design output where it takes a note
+      - name: review
+        does: reads the approach against the ask
+        not: draft
+        on_fail: draft
+        reads: [[spec/guidance/review/reviewing]]
+        input: design/draft
+        evidence:
+          - name: verdict
+            form: verdict
+            says: pass or fail, with findings one a line
+  - name: implement
+    reads: [[spec/guidance/code/testing]]
+    needs: ["branch test"]
+    input: design/draft
+    checklist: ["the change touches no file the ask leaves out", "every door the change reaches has a fake", "a comment names the approach the change implements"]
+    steps:
+      - name: tests-red
+        does: writes the tests the ask calls for
+        evidence:
+          - name: tests
+            form: command
+            expects: assertion
+            says: the tests you write fail on their own assertion
+          - name: seen
+            form: text
+            says: what you see, and what surprises you
+      - name: reflect
+        does: names the class of error in the findings, and the fix for the class
+        when: returned
+        input: verdict
+        evidence:
+          - name: class
+            form: text
+            says: the class of error the findings describe, and the fix for the class
+      - name: change
+        does: makes the change
+        reads: [[spec/guidance/code/code]]
+        evidence:
+          - name: lint
+            form: command
+            expects: 0
+            says: the tree builds and lints
+      - name: tests-green
+        does: makes the tests pass
+        input: tests-red
+        evidence:
+          - name: tests
+            form: command
+            expects: green
+            says: the same tests pass
+          - name: check
+            form: command
+            expects: 0
+            says: the check is green on the commit
+          - name: says
+            form: text
+            says: what changes and why, for a reader who was not there
+  - name: verdict
+    does: reads every hunk against the ask and the approach
+    not: implement
+    on_fail: implement/reflect
+    reads: [[spec/guidance/review/reviewing]]
+    input: ["diff", "implement"]
+    to: retro
+    checklist: ["every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
+    evidence:
+      - name: read
+        form: files
+        says: every file you read, one a line
+      - name: verdict
+        form: verdict
+        says: pass or fail, findings one a line
+process: [[spec/processes/standard]]
+process_hash: 838dd6d003506639
+step: design/review
+record:
+  - step: design/draft
+    hand: box d42624a67d18a8
+    hash_before: 7f2f38c1d7397225bbf9e1bc55e52515cac93a98
+    hash_after: 338a46b7dbf7570af05dd92a69b868d00ed053d1
+---
+
+# Ask
+
+<!-- gain, as text: what is gained by doing it, and not only what it does -->
+<!-- breaks, as text: what breaks if it is never done -->
+<!-- done_when, as list: one line each, decidable, naming the command that decides it -->
+
+The viewer draws a `note` row in its own colour, under the prompt it answers. A person reads at a glance where a session parked a note.
+
+Today a note row draws like every other row. A person scans the log for the parked thoughts and reads each line to find them.
+
+- `./RUNME.sh test` passes a case where a `note` row takes its own colour under its prompt
+- `./RUNME.sh check` answers 0
+
+# design
+
+## draft
+
+<!-- writes the approach the ask calls for -->
+
+### approach
+
+<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+
+<!-- the form is text -->
+
+| what changes | how |
+|---|---|
+| `colour.go` | a `note` style, and `saidStyle` answers it for the said column too |
+| `detail.go` | a prompt shows the notes it carries, the way it shows its reply |
+| the viewer note | the colours list takes the note line, under the answer |
+
+A note answers a prompt, so it wears the answer's shape and a colour of its
+own. The kind colours hold one entry a kind, and the note takes one there. The
+said column reads the same style, because a prompt and a reply each colour
+their text and a note stands beside them.
+
+The details of a prompt show its reply today. A note between that prompt and
+its reply shows there too, under the reply, so a person opening the prompt
+reads what the session parked. The details of a note show the prompt above it.
+
+A test in `detail_test.go` drives a log of a prompt, a note and a reply, and
+reads the note's colour and its place. For details, see
+[[spec/design_output/viewer#colours]].
+
+## review
+
+<!-- reads the approach against the ask -->
+
+### verdict
+
+<!-- pass or fail, with findings one a line -->
+
+<!-- the form is verdict -->
+
+# implement
+
+## tests-red
+
+<!-- writes the tests the ask calls for -->
+
+### tests
+
+<!-- the tests you write fail on their own assertion -->
+
+<!-- the form is command -->
+
+### seen
+
+<!-- what you see, and what surprises you -->
+
+<!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+## reflect
+
+<!-- names the class of error in the findings, and the fix for the class -->
+
+### class
+
+<!-- the class of error the findings describe, and the fix for the class -->
+
+<!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+## change
+
+<!-- makes the change -->
+
+### lint
+
+<!-- the tree builds and lints -->
+
+<!-- the form is command -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+## tests-green
+
+<!-- makes the tests pass -->
+
+### tests
+
+<!-- the same tests pass -->
+
+<!-- the form is command -->
+
+### check
+
+<!-- the check is green on the commit -->
+
+<!-- the form is command -->
+
+### says
+
+<!-- what changes and why, for a reader who was not there -->
+
+<!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+# verdict
+
+<!-- reads every hunk against the ask and the approach -->
+
+## read
+
+<!-- every file you read, one a line -->
+
+<!-- the form is files -->
+
+## verdict
+
+<!-- pass or fail, findings one a line -->
+
+<!-- the form is verdict -->
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+# Discussion
+
+<!-- what anybody adds, at any time, on this ticket -->

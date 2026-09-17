@@ -9,6 +9,7 @@ import {
   engineRows,
   placesIn,
   refusedTicket,
+  queueHolds,
   ticketFaults,
 } from "../../.claude/skills/level0/lib/ticket.js";
 
@@ -169,7 +170,7 @@ test("a write to the field of another leaf is refused", () => {
   assert.deepEqual(rules(said, other), ["Ticket.lint"]);
 });
 
-// [[spec/design_output/schema#the-verbs-own-three-fields]]
+// [[spec/design_output/schema#the-verbs-own-their-fields]]
 test("an edit to a field the verbs own is refused, and the line points at it", () => {
   for (const [was, now, rule, line] of [
     ["state: open", "state: closed", "Ticket.state", 3],
@@ -186,7 +187,7 @@ test("an edit to a field the verbs own is refused, and the line points at it", (
   }
 });
 
-// [[spec/design_output/schema#the-verbs-own-three-fields]]
+// [[spec/design_output/schema#the-verbs-own-their-fields]]
 test("a field no rule marks stands, so a person's fields reach no door", () => {
   assert.deepEqual(weighed(open.replace("urgency: now", "urgency: soon")), []);
 });
@@ -212,6 +213,18 @@ test("the places answer the ask, the step's fields and the discussion, at any st
 test("a ticket standing at no leaf of its route offers a hand no field", () => {
   const said = open.replace("step: implement/change", "step: nowhere");
   assert.deepEqual([...placesIn(readNote(said), SCHEMA).keys()], ["1 Ask", "1 Discussion"]);
+});
+
+// [[spec/design_output/schema#the-three-places]]
+test("a ticket with no step stands at its first leaf, so its fields open to the hand the pull gives it to", () => {
+  const said = open
+    .replace("step: implement/change\n", "")
+    .replace("  - name: design\n    does: writes the design\n", "");
+  assert.deepEqual(
+    [...placesIn(readNote(said), SCHEMA).keys()],
+    ["1 Ask", "3 lint", "3 seen", "1 Discussion"],
+    "the first leaf's fields stand open",
+  );
 });
 
 const recorded = open.replace(
@@ -297,4 +310,20 @@ test("the refusal names the finding and the three places", () => {
     said,
     /the ask, the fields of the step it holds, and the discussion/,
   );
+});
+
+// [[spec/design_output/stop#the-mechanical-checks]]
+test("the queue holds work where a free open ticket has a leaf a hand takes, or a group reads now", () => {
+  const free = (state, by = "anyone", more = "") =>
+    `---\nkind: [[ticket]]\nstate: ${state}\nurgency: soon\n${more}steps:\n  - name: do\n    by: ${by}\n---\n\n# Ask\n\nA thing.\n`;
+  assert.equal(queueHolds([free("open")]), true, "an open free ticket");
+  assert.equal(queueHolds([free("draft")]), false, "a draft waits for its open");
+  assert.equal(queueHolds([free("closed")]), false, "a closed one is done");
+  assert.equal(queueHolds([free("open", "person")]), false, "a person step is nobody's on this box");
+  assert.equal(queueHolds([free("open", "anyone", "group: some-group\n")]), false, "a child rides its group");
+  const group = (urgency) =>
+    `---\nkind: [[ticket]]\nstate: open\nurgency: ${urgency}\nprocess: [[spec/processes/group]]\nsteps:\n  - name: split\n---\n\n# Ask\n\nA group.\n`;
+  assert.equal(queueHolds([group("soon")]), false, "a group at soon is the cloud's");
+  assert.equal(queueHolds([group("now")]), true, "a group at now is the desk's");
+  assert.equal(queueHolds([]), false);
 });

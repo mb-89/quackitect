@@ -1,6 +1,5 @@
-// The ticket door. A ticket takes a hand's writing in three places, and the rest
-// of it belongs to the verbs. The schema says which field and which chapter, so
-// this holds no list of its own.
+// The ticket door. A ticket takes a hand's writing where its schema says, and
+// the rest of it belongs to the verbs, so this holds no list of its own.
 // [[spec/design_output/schema#the-three-places]]
 
 import { CHECKED, entriesIn, readNote } from "./schema.js";
@@ -15,6 +14,22 @@ export function openPrivate(text) {
   if (String(front.state ?? "") !== "open") return false;
   const process = String(front.process ?? "").replace(/^\[\[|\]\]$/g, "");
   return process !== "note" && !process.endsWith("/note");
+}
+
+// The queue holds work for a desk where a free open ticket has a leaf a hand takes, or a group reads now. [[spec/design_output/stop#the-mechanical-checks]]
+export function queueHolds(texts) {
+  return (texts ?? []).some((text) => {
+    const front = readNote(String(text ?? "")).front.said ?? {};
+    if (String(front.state ?? "") !== "open") return false;
+    const process = String(front.process ?? "").replace(/^\[\[|\]\]$/g, "");
+    if (process === "group" || process.endsWith("/group")) return String(front.urgency ?? "") === "now";
+    if (String(front.group ?? "").trim()) return false;
+    const walk = entriesIn(front.steps, "steps");
+    const step = String(front.step ?? "").trim();
+    const leaf = step ? walk.find((one) => one.path === step) : walk.find((one) => !one.said?.steps);
+    if (!leaf) return false;
+    return !["person", "children", "helper"].includes(String(leaf.said?.by ?? ""));
+  });
 }
 
 // [[spec/design_output/pull#the-group-holds-the-turn]]
@@ -102,7 +117,7 @@ function engineFaults(note, schema, where) {
   return out;
 }
 
-// [[spec/design_output/schema#the-verbs-own-three-fields]]
+// [[spec/design_output/schema#the-verbs-own-their-fields]]
 function verbFaults(old, note, schema, where) {
   const props = schema?.frontmatter?.properties ?? {};
   const kind = String(schema?.kind ?? "");
@@ -170,7 +185,9 @@ export function placesIn(note, schema) {
 // [[spec/design_output/schema#the-three-places]]
 function fieldsHeld(front, level) {
   const walk = entriesIn(front.steps, "steps");
-  const holder = walk.find((one) => one.path === String(front.step ?? ""));
+  // A ticket with no step stands at its first leaf, the way the pull reads it. [[spec/design_output/schema#the-three-places]]
+  const step = String(front.step ?? "").trim();
+  const holder = step ? walk.find((one) => one.path === step) : walk.find((one) => one.leaf);
   if (!holder) return [];
 
   const deep = level + holder.path.split("/").length;

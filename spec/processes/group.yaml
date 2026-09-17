@@ -52,6 +52,10 @@ steps:
       - name: write
         does: writes the retro over the box's own window
         input: [children, notes]
+        checklist:
+          - every fact the change adds stands in one place, and a note points at the file instead of repeating it
+          - every number the change adds carries a name in one place, and a copy a technical reason forces says so beside it
+          - every header the change writes says what its file is for, and counts nothing
         evidence:
           - name: done
             form: list

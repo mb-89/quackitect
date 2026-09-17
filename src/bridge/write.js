@@ -1,5 +1,5 @@
-// The write door: the owner of a projected file, the private notes, the note
-// schemas and the voice rules, in that order, then the code door.
+// The write door. Every rule over a written file runs here in the order the
+// design note names, and the code door follows.
 // [[spec/design_output/level0#the-write-door]]
 
 import { join } from "node:path";
@@ -117,7 +117,8 @@ function asWrite(e) {
   return undefined;
 }
 
-function wholeAfter(e, writing, disk) {
+// The door reads the file as it stands after the edit, so a shape rule over the whole file reads the whole file. [[spec/design_output/level0#the-write-door]]
+export function wholeAfter(e, writing, disk) {
   if (e.tool === "Write") return writing.text;
   const was = textAt(disk, writing.path);
   if (was === null) return writing.text;

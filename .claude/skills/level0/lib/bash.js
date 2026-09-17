@@ -111,13 +111,13 @@ export function commitIn(command) {
       if (CARRIED.some((flag) => arg === flag || arg.startsWith(`${flag}=`))) {
         return { form: "carried" };
       }
-      const message = valueOf(arg, args[i + 1], ["-m", "--message"]);
+      const message = flagValue(arg, args[i + 1], ["-m", "--message"]);
       if (message.found) {
         said.push(message.value);
         if (message.took) i++;
         continue;
       }
-      const file = valueOf(arg, args[i + 1], ["-F", "--file"]);
+      const file = flagValue(arg, args[i + 1], ["-F", "--file"]);
       if (!file.found) continue;
       const body = bodiesIn(one, bodies)[0];
       if (file.value === "-" && body !== undefined) return { form: "message", text: body };
@@ -142,7 +142,7 @@ export function skipsTheHook(command) {
   return false;
 }
 
-// [[spec/design_output/bash#a-branch-name-holds-five]]
+// [[spec/design_output/bash#a-branch-meets-the-cap]]
 export function branchIn(command) {
   const out = [];
   for (const one of partsOf(command).segments) {
@@ -156,7 +156,7 @@ export function branchIn(command) {
 
     const args = rest.slice(1);
     for (let i = 0; i < args.length; i++) {
-      const said = valueOf(args[i], args[i + 1], [...flags, "--create"]);
+      const said = flagValue(args[i], args[i + 1], [...flags, "--create"]);
       if (said.found && said.value) out.push(said.value);
     }
   }
@@ -392,14 +392,14 @@ function bodiesIn(segment, bodies) {
 }
 
 function writesInScript(body) {
-  const out = [];
-  for (const line of String(body).split(/\r?\n/)) {
-    if (!WRITES.some((one) => one.test(line))) continue;
-    for (const path of pathsIn(line)) {
-      if (reaches(path)) out.push({ path: clean(path), how: "a heredoc" });
-    }
+  const lines = String(body).split(/\r?\n/);
+  const all = lines.flatMap(pathsIn).filter(reaches).map(clean);
+  const out = new Map();
+  for (const line of lines.filter((one) => WRITES.some((two) => two.test(one)))) {
+    const here = pathsIn(line).filter(reaches).map(clean);
+    for (const path of here.length ? here : all) out.set(path, { path, how: "a heredoc" });
   }
-  return out;
+  return [...out.values()];
 }
 
 function pathsIn(line) {
@@ -529,7 +529,7 @@ function afterGit(words) {
   return out;
 }
 
-function valueOf(arg, next, flags) {
+function flagValue(arg, next, flags) {
   for (const flag of flags) {
     if (arg === flag) return { found: true, value: next ?? "", took: true };
     if (arg.startsWith(`${flag}=`)) return { found: true, value: arg.slice(flag.length + 1) };

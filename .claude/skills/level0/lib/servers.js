@@ -1,4 +1,4 @@
-// The two language servers this tree pins, and where each binary comes from.
+// The language servers this tree pins, and where each binary comes from.
 // The write door and the editor read one set of rules, so a person meets a
 // breach as they type and the agent meets the same rule at the write.
 // [[spec/design_output/editor#what-the-editor-runs]]

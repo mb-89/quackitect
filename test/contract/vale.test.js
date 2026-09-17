@@ -139,7 +139,7 @@ const inRegister = async (text, where) => {
 // [[spec/funnel/a-paragraph-has-a-schema]]
 ifVale("the requirement register takes shall and should, and no other does", async () => {
   const binds = "- The door shall refuse the write, and it should name the rule.\n";
-  assert.deepEqual(await inRegister(binds, "spec/requirements/one.md"), []);
+  assert.deepEqual(await inRegister(binds, "spec/design_input/one.md"), []);
 
   for (const where of ["notes.md", "spec/design_output/one.md"]) {
     const found = await inRegister(binds, where);
@@ -149,7 +149,7 @@ ifVale("the requirement register takes shall and should, and no other does", asy
 
 ifVale("the register outside the set stands refused inside it too", async () => {
   const loose = "- The door may refuse the write, and it would say why.\n";
-  const found = await inRegister(loose, "spec/requirements/one.md");
+  const found = await inRegister(loose, "spec/design_input/one.md");
   assert.ok(found.includes("ModalRequirement"));
   assert.ok(!found.includes("Modal"), "one modal rule reads a path, and one alone");
 });
@@ -229,4 +229,23 @@ test("the shapes rule and the commit door pass one list of nobody users", () => 
   assert.ok(listed, "the rule names its nobody users");
   const names = listed[1].split(",").map((one) => one.trim().replace(/^"|"$/g, ""));
   assert.deepEqual(names.sort(), [...NOBODY].sort());
+});
+
+// [[spec/design_output/config#the-magic-numbers-take-names]]
+ifVale("a digit in a design note's prose is refused, and a version, a unit and a table pass", async () => {
+  const note = "spec/design_output/probe.md";
+  const bare = "The verb exits 0 on survives.\n";
+  assert.ok((await inRegister(bare, note)).includes("DigitInProse"));
+  const quiet = [
+    "Measured against client 2.1.267, a poll every 250 ms stands, and x86 ships.",
+    "",
+    "| what | count |",
+    "|---|---|",
+    "| events | 186 |",
+    "",
+    "1. The verb exits `0` on survives.",
+    "",
+  ].join("\n");
+  assert.deepEqual((await inRegister(quiet, note)).filter((one) => one === "DigitInProse"), []);
+  assert.ok(!(await inRegister(bare, "notes.md")).includes("DigitInProse"));
 });

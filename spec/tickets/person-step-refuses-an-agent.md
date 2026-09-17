@@ -2,6 +2,8 @@
 kind: [[ticket]]
 state: open
 urgency: soon
+group: the-person-step-holds
+step: design/draft
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -79,6 +81,7 @@ steps:
     reads: [[spec/guidance/review/reviewing]]
     input: ["diff", "implement"]
     to: retro
+    checklist: ["every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     evidence:
       - name: read
         form: files
@@ -87,9 +90,8 @@ steps:
         form: verdict
         says: pass or fail, findings one a line
 process: [[standard]]
-process_hash: 8cc8301e3ca3ba8d
+process_hash: d1fd9cd113889f29
 depends_on: ["the-hand-carries-the-session"]
-step: design/draft
 ---
 
 # Ask
@@ -135,7 +137,7 @@ A step whose `by` is `person` waits for a person. Today nothing stops an agent f
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+<!-- the same tests pass -->
 
 <!-- the form is command -->
 
@@ -226,6 +228,12 @@ A step whose `by` is `person` waits for a person. Today nothing stops an agent f
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 # Discussion
 

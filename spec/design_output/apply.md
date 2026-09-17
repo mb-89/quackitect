@@ -39,7 +39,7 @@ CRLF, because an edit names the bytes to replace and this replaces those bytes.
 A line-ending mismatch refuses. A correction nobody asks for is a write nobody
 asks for, and the agent reads the file to find the bytes it wants.
 
-## The five verbs
+## The verbs
 
 | op | what it takes |
 |---|---|

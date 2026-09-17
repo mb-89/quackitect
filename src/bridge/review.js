@@ -5,6 +5,7 @@
 import { CALLED, readerAsks, readerSays, report, reviewSpec } from "../../.claude/skills/level0/lib/review.js";
 
 const GATHERING = 300000;
+const HEX = 16;
 
 export const SPECS = () => [reviewSpec()];
 export const TOOLS = { [CALLED]: reviewsBranch };
@@ -21,11 +22,11 @@ async function reviewsBranch(e, box) {
   const material = materialOf(ran.stdout);
   if (!material) {
     const why = String(ran.stderr ?? "").trim() || String(ran.stdout ?? "").trim();
-    box.log.say("warn", "review", `the verb gathered nothing for ${name}`, { detail: why.slice(0, 200) });
+    box.log.say("warn", "review", `the verb gathered nothing for ${name}`, { detail: why });
     return { result: { result: `${name}: the verb gathered nothing.\n\n${why}` } };
   }
 
-  const token = `review-${box.clock.now().getTime().toString(16)}`;
+  const token = `review-${box.clock.now().getTime().toString(HEX)}`;
   box.reviews = box.reviews ?? new Map();
   box.reviews.set(token, material);
   return {

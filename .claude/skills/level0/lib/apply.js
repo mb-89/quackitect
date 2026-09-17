@@ -135,7 +135,7 @@ function refused(why) {
   return { ok: false, why };
 }
 
-// [[spec/design_output/apply#the-five-verbs]]
+// [[spec/design_output/apply#the-verbs]]
 function oneOp(one, text, absent, at) {
   const kind = String(one.op ?? "").trim() || "exact";
   const made = String(one.new ?? "");

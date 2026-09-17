@@ -5,7 +5,7 @@ import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   bindsHere,
-  canary,
+  canary, canaryText,
   countsOf,
   standingLayer,
 } from "../../.claude/skills/level0/lib/guidance.js";
@@ -21,6 +21,7 @@ import {
 } from "../../.claude/skills/level0/lib/projection.js";
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
+import { CONFIG_DIR, fromJson as codeRows } from "../../.claude/skills/level0/lib/code.js";
 import { boxOf } from "../../.claude/skills/level0/lib/private.js";
 import {
   fieldsIn,
@@ -54,6 +55,8 @@ import {
   fromJson,
   unreasoned,
 } from "../../.claude/skills/level0/lib/vale.js";
+import { codeFaults } from "../../.claude/skills/level0/lib/magic.js";
+import { SIZED } from "../../.claude/skills/level0/lib/size.js";
 import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
@@ -63,7 +66,6 @@ import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { readTools, whereIs, writeSurvey } from "./tools.js";
 import { SOURCE as VIEWER, viewerOf } from "./viewer.js";
 import {
-  attach,
   detach,
   entryFor,
   produce,
@@ -71,6 +73,7 @@ import {
   readRegister,
   rootsHere,
 } from "./vehicle.js";
+import { attachTo } from "../bridge/vehicle.js";
 import { stubInto } from "./stub.js";
 import { HOOKS } from "./precommit.js";
 import { graphIn } from "./graph.js";
@@ -157,6 +160,9 @@ const OURS = `--glob=!{${PARKED.join(",")}}`;
 const TESTS = "test/level0/*.test.js";
 const CONTRACT_TESTS = "test/contract/*.test.js";
 const ROUNDS = 5;
+const COL = { verb: 8, count: 6, key: 22, value: 9, rule: 20, tool: 18 };
+const SHOWN = 3;
+const HEALTH_WAIT = 2000;
 
 const run = async (argv, init = {}) =>
   outside.run(argv, { ...init, cwd: init.cwd ?? root });
@@ -278,7 +284,7 @@ if (verb === "help" || !verbs[verb]) {
   if (verb !== "help") console.error(`se: there is no verb called ${verb}\n`);
   console.log("Usage: ./RUNME.sh <verb> [path ...]\n");
   for (const [name, one] of Object.entries(verbs)) {
-    console.log(`  ${name.padEnd(8)} ${one.says}`);
+    console.log(`  ${name.padEnd(COL.verb)} ${one.says}`);
   }
   process.exit(verb === "help" ? 0 : 2);
 }
@@ -307,8 +313,8 @@ function theVehicle(argv) {
     return 0;
   }
   if (said === "attach") {
-    attach(files, it.clock, pair.work, made.id);
-    console.log(`${pair.work} names ${made.id} as the copy driving it.`);
+    const settled = attachTo(files, env, it.clock, pair.work, pair.method);
+    console.log(`${pair.work} names ${made.id} as the copy driving it, at port ${settled.port}.`);
     return 0;
   }
   if (said === "detach") {
@@ -423,6 +429,15 @@ async function lint(where) {
     }
   }
 
+  // The check names what stands past a ceiling as a warning, and the write door refuses the growth. [[spec/design_output/level0#the-size-ceiling]]
+  const ceilings = {
+    function: await it.config.ask("code.functionLines"),
+    file: await it.config.ask("code.fileLines"),
+  };
+  for (const file of walk(where, SIZED)) {
+    found.push(...codeFaults(files.read(file), show(file), ceilings));
+  }
+
   // [[spec/design_output/lsp#one-checker-every-front-asks]]
   const said = serverFaults(where);
   if (said) found.push(...said);
@@ -443,21 +458,10 @@ async function lint(where) {
 
   if (files.exists(biome)) {
     const code = outside.run(
-      [biome, "lint", "--config-path=spec/config", "--reporter=github", ...where],
+      [biome, "lint", `--config-path=${CONFIG_DIR}`, "--reporter=json", "--max-diagnostics=none", ...where],
       { cwd: root },
     );
-    for (const row of code.stdout.split("\n")) {
-      const hit = /^::(\w+) title=([^,]+),file=([^,]+),line=(\d+).*?::(.*)$/.exec(row);
-      if (!hit || isDraft(hit[3])) continue;
-      found.push({
-        file: hit[3],
-        rule: hit[2].replace(/^lint\//, ""),
-        line: Number(hit[4]),
-        column: 1,
-        message: hit[5],
-        severity: hit[1] === "warning" ? "warning" : "error",
-      });
-    }
+    found.push(...codeRows(code.stdout, where[0]).filter((one) => !isDraft(one.file)));
   }
 
   const ms = it.clock.now().getTime() - began;
@@ -469,7 +473,7 @@ async function lint(where) {
   await it.log.say("warn", "vale", `${found.length} line(s) break a rule`, {
     ms,
     detail: found
-      .slice(0, 3)
+      .slice(0, SHOWN)
       .map((one) => `${show(one.file ?? where[0])}:${one.line} ${one.rule}`)
       .join(", "),
   });
@@ -481,9 +485,9 @@ async function lint(where) {
   }
   console.log("");
   for (const [rule, count] of [...perRule].sort((a, b) => b[1] - a[1])) {
-    console.log(`${String(count).padStart(6)}  ${rule}`);
+    console.log(`${String(count).padStart(COL.count)}  ${rule}`);
   }
-  console.log(`${String(found.length).padStart(6)}  in all`);
+  console.log(`${String(found.length).padStart(COL.count)}  in all`);
 
   // [[spec/design_output/schema#warning-now-and-error-later]]
   const refused = found.filter((one) => one.severity !== "warning").length;
@@ -539,7 +543,7 @@ function gridFaults(where) {
 function serveBridge(argv) {
   const inspect = argv.filter((one) => one.startsWith("--inspect"));
   const server = join(root, "src", "bridge", "server.js");
-  return outside.run([process.execPath, ...inspect, server, root], { cwd: root, inherit: true }).exitCode;
+  return outside.run([process.execPath, ...inspect, server, root], { cwd: root, inherit: true, env: inspect.length ? { SE_BREAK_ON_STOP: "1" } : undefined }).exitCode;
 }
 
 // [[spec/design_output/viewer#the-verb-builds-it]]
@@ -617,7 +621,7 @@ async function readConfig(argv) {
   }
   for (const one of wanted) {
     console.log(
-      `${one.key.padEnd(22)} ${String(one.value).padEnd(9)} ${one.layer}`,
+      `${one.key.padEnd(COL.key)} ${String(one.value).padEnd(COL.value)} ${one.layer}`,
     );
   }
   if (key) return 0;
@@ -646,7 +650,7 @@ async function fix(where) {
   }
 
   if (files.exists(biome)) {
-    outside.run([biome, "check", "--write", "--config-path=spec/config", ...where], {
+    outside.run([biome, "check", "--write", `--config-path=${CONFIG_DIR}`, ...where], {
       cwd: root,
       inherit: true,
     });
@@ -846,7 +850,7 @@ async function serverHolds() {
 async function serverSays() {
   const where = `http://127.0.0.1:${portHere()}/health`;
   try {
-    const answer = await fetch(where, { signal: AbortSignal.timeout(2000) });
+    const answer = await fetch(where, { signal: AbortSignal.timeout(HEALTH_WAIT) });
     const body = await answer.json();
     return { ok: Boolean(body?.ok), where, why: String(body?.dead ?? "") };
   } catch (bad) {
@@ -908,7 +912,7 @@ function listRules() {
     for (const name of namesIn(at, ".yml")) {
       const text = files.read(join(at, name));
       const message = /^message:\s*"?(.*?)"?\s*$/m.exec(text)?.[1] ?? "";
-      console.log(`${name.replace(/\.yml$/, "").padEnd(20)} ${message}`);
+      console.log(`${name.replace(/\.yml$/, "").padEnd(COL.rule)} ${message}`);
     }
   }
   return 0;
@@ -929,9 +933,7 @@ async function standing() {
     return 0;
   }
   console.log(said);
-  console.log("");
-  const stop = (await settings.ask("stop.enabled")) !== false;
-  console.log(canary({ ...countsOf(notes), stop }));
+  console.log(`\n${canaryText(canary({ ...countsOf(notes), stop: (await settings.ask("stop.enabled")) !== false }))}`);
   return 0;
 }
 
@@ -939,7 +941,7 @@ async function standing() {
 function tools() {
   const found = writeSurvey(it, root, process.env);
   for (const one of WANTED)
-    console.log(`${one.name.padEnd(18)} ${standsAt(found[one.name])}`);
+    console.log(`${one.name.padEnd(COL.tool)} ${standsAt(found[one.name])}`);
   console.log(`\n${TOOLS} says this, and every caller reads it.`);
   return 0;
 }
@@ -999,7 +1001,7 @@ async function doctor() {
     ["server", await serverLine()],
   ];
   for (const [what, said] of rows) {
-    console.log(`${what.padEnd(18)} ${String(said).trim() || "missing"}`);
+    console.log(`${what.padEnd(COL.tool)} ${String(said).trim() || "missing"}`);
   }
   return 0;
 }

@@ -1,7 +1,7 @@
 // The pull. One verb hands a hand the next leaf of a ticket, and the same verb
 // takes the leaf back with a verdict. The engine checks the hand-back, writes
 // the record, moves the step, commits, pushes, and hands out the next leaf.
-// [[spec/design_output/pull#the-five-answers]]
+// [[spec/design_output/pull#the-answers]]
 
 import { actionables } from "../../.claude/skills/level0/lib/guidance.js";
 import {
@@ -12,6 +12,8 @@ import {
   readNote,
   reRouted,
 } from "../../.claude/skills/level0/lib/schema.js";
+import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
+import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { CONFIG as VALE_CONFIG, faultIn, fromJson } from "../../.claude/skills/level0/lib/vale.js";
 import { COPY } from "../../.claude/skills/level0/lib/vehicle.js";
 import {
@@ -19,26 +21,27 @@ import {
   fieldOf,
   frontOf,
   GROUP,
+  isGroup,
+  NOTE_END,
   OPEN,
   recordIn,
+  ticketNamed,
   TICKETS,
   withEntry,
   withField,
 } from "./group.js";
 import { NOTES, schemasHere } from "./ticket.js";
+import { landed, unlandedRows } from "./landed.js";
 import { changedIn } from "./work.js";
-
 export const HOLDS = ".se/hold";
 export const BOX = ".se/box.json";
 export const WORK = "work";
 export const REFUSED = "refused";
 export const WAIT = "wait";
 export const ENGINE = "the engine";
-export const FAILS = 2;
-export const REFUSALS = 5;
-export const SPLITS = 3;
-
-const TRUNK = "main";
+const BOX_ID = 12;
+const MOST_MOVES = 64;
+const CUT = { said: 120, error: 160 };
 const DONE = "done";
 const CHECKED = "checked";
 const COMMENT = /^\s*<!--.*-->\s*$/;
@@ -98,7 +101,7 @@ export function handOf(it) {
   }
   const id = it.random
     ? it.random()
-    : hashOf(`${it.clock ? it.clock.stamp() : ""} ${it.root}`).slice(0, 12);
+    : hashOf(`${it.clock ? it.clock.stamp() : ""} ${it.root}`).slice(0, BOX_ID);
   it.disk.makeDir(it.join(it.root, ".se"));
   it.disk.write(it.join(it.root, ...BOX.split("/")), `${JSON.stringify({ id })}\n`);
   return `box ${id}`;
@@ -201,15 +204,13 @@ export function pull(it, argv) {
   }
 
   const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
-  if (branch === TRUNK && it.take && !verdict.said && !name) return it.take();
-  if (!branch.startsWith("work/")) {
-    console.error(`branch pull runs on a work branch, and this is ${branch}.`);
-    console.error(
-      "Run ./RUNME.sh branch take first, which takes a group and moves you onto it.",
-    );
+  const onTrunk = branch === TRUNK;
+  if (!onTrunk && !branch.startsWith("work/")) {
+    console.error(`branch pull runs on ${TRUNK} or a work branch, and this is ${branch}.`);
+    console.error(`Run ./RUNME.sh branch pull from ${TRUNK}, which hands out work there.`);
     return 2;
   }
-  const group = branch.replace(/^work\//, "");
+  const group = onTrunk ? "" : branch.replace(/^work\//, "");
   const hand = as ? `${handOf(it)} · ${as}` : handOf(it);
   const held = holdOf(it, hand);
   const who = { hand, branch, group, held, oneStep: Boolean(as) };
@@ -218,13 +219,21 @@ export function pull(it, argv) {
   if (rest.includes("--judge")) return judgeMaterial(it, held, name);
   if (rest.includes("--drop")) return dropped(it, who);
   if (verdict.said === "back") return takeBack(it, who, name, verdict.reason);
-  if (verdict.said || name) return handBack(it, who, name, verdict);
+  // A name on trunk that is a group takes its branch, and any other name hands a ticket back. [[spec/design_output/pull#the-engine-takes-the-branch]]
+  const named = onTrunk && name && !verdict.said ? namedGroup(it, name) : "";
+  if (!named && (verdict.said || name)) return handBack(it, who, name, verdict);
   if (held) {
     say(REFUSED, [
       `${held.ticket} stands in your hand at ${held.step}, and one hand holds one ticket.`,
       `Hand it back: ./RUNME.sh branch pull ${held.ticket} --pass, or --fail "why".`,
     ]);
     return 1;
+  }
+  // [[spec/design_output/pull#the-engine-takes-the-branch]]
+  if (onTrunk && it.take) {
+    if (it.cloud && !named) return it.take();
+    const wanted = named || urgentGroup(it);
+    if (wanted || it.ready?.()) return wanted ? it.take(wanted) : 0;
   }
   if (!fetched(it, branch)) return 1;
   return handOut(it, who);
@@ -265,7 +274,7 @@ function dropped(it, who) {
   return 0;
 }
 
-// [[spec/design_output/pull#the-five-checks]]
+// [[spec/design_output/pull#the-checks]]
 function judgeMaterial(it, held, name) {
   if (!held || (name && name !== held.ticket)) {
     console.log("null");
@@ -328,10 +337,10 @@ function ticketsHere(it) {
     const at = it.join(it.root, ...folder.split("/"));
     if (!it.disk.exists(at)) continue;
     for (const one of it.disk.list(at)) {
-      if (one.kind !== "file" || !one.name.endsWith(".md")) continue;
+      if (one.kind !== "file" || !one.name.endsWith(NOTE_END)) continue;
       const text = it.disk.read(it.join(at, one.name));
       out.push({
-        name: one.name.slice(0, -3),
+        name: ticketNamed(one.name),
         path: `${folder}/${one.name}`,
         at: it.join(at, one.name),
         text,
@@ -381,16 +390,16 @@ function handOut(it, who) {
   repairPersonSteps(it, who);
   const all = ticketsHere(it);
   const groupTicket = all.find((one) => !one.private && one.name === who.group);
-  const tagged = all.filter((one) => one.private && String(one.front.todo) === "true");
+  // The tag says the next pull hands it first, on a note and on a ticket alike. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+  const tagged = all.filter((one) => String(one.front.todo) === "true");
   const privates = all.filter(
     (one) => one.private && String(one.front.todo) !== "true",
   );
-  const pools = [
-    tagged,
-    sorted(childrenOf(all, who.group)),
-    groupTicket ? [groupTicket] : [],
-    sorted(privates),
-  ];
+  // [[spec/design_output/pull#the-engine-takes-the-branch]]
+  const pools = who.group
+    ? [tagged, sorted(childrenOf(all, who.group)), groupTicket ? [groupTicket] : [], sorted(privates)]
+    : [tagged, sorted(freeIn(all)), sorted(privates)];
+  if (!who.group) cutForGroups(it, all);
 
   const why = [];
   let other = null;
@@ -406,6 +415,49 @@ function handOut(it, who) {
 
   say(WAIT, why.length ? why : ["no ticket of this group stands open"]);
   return 0;
+}
+
+// A free ticket stands in no group and is no group, so a desk works it on trunk. [[spec/design_output/pull#the-engine-takes-the-branch]]
+export function freeIn(all) {
+  return all.filter(
+    (one) => !one.private && !fieldOf(one.text, GROUP) && !isGroup(one.text),
+  );
+}
+
+// An open group works on a branch, so a desk cuts one where none stands and leaves the group to the cloud. [[spec/design_output/pull#the-engine-takes-the-branch]]
+function cutForGroups(it, all) {
+  const stands = new Set(
+    it.git
+      .run(["ls-remote", "--heads", "origin", "work/*"], true)
+      .out.split("\n")
+      .filter(Boolean)
+      .map((row) => row.split("\t")[1]?.replace("refs/heads/", "") ?? ""),
+  );
+  for (const one of all) {
+    if (one.private || !isGroup(one.text) || fieldOf(one.text, "state") !== OPEN) continue;
+    const branch = `work/${one.name}`;
+    if (stands.has(branch)) continue;
+    if (!it.git.run(["branch", branch, TRUNK], true).ok) continue;
+    it.git.run(["push", "-u", "origin", branch], true);
+    console.log(`${branch} is cut and pushed, because a group works on a branch and the cloud takes it.`);
+  }
+}
+
+// A desk takes a group on two roads alone: the owner names it, or its urgency reads now. [[spec/design_output/pull#the-engine-takes-the-branch]]
+function namedGroup(it, name) {
+  const one = ticketsHere(it).find((held) => !held.private && held.name === name);
+  return one && isGroup(one.text) ? name : "";
+}
+
+function urgentGroup(it) {
+  const groups = ticketsHere(it).filter(
+    (one) =>
+      !one.private &&
+      isGroup(one.text) &&
+      fieldOf(one.text, "state") === OPEN &&
+      urgency(one.text) === "now",
+  );
+  return sorted(groups)[0]?.name ?? "";
 }
 
 // [[spec/design_output/pull#a-hand-of-its-own]]
@@ -501,7 +553,7 @@ function advanced(it, who, one, all) {
   let moved = false;
   const changes = [];
 
-  for (let guard = 0; guard < 64; guard++) {
+  for (let guard = 0; guard < MOST_MOVES; guard++) {
     const leaf = leafOf(front, path);
     if (!leaf) {
       return { why: `stands at ${path || "no step"}, which its route lacks` };
@@ -846,7 +898,7 @@ function handBack(it, who, name, verdict) {
       `${held.ticket} at ${held.step} answered already, and the record holds it.`,
     ]);
   }
-  if (fieldOf(one.text, "step") !== held.step) {
+  if ((fieldOf(one.text, "step") || leavesOf(one.front)[0]?.path) !== held.step) {
     dropHold(it, who.hand);
     say(REFUSED, [
       `${held.ticket} stands at ${fieldOf(one.text, "step") || "no step"} now, and the hold names ${held.step}.`,
@@ -860,7 +912,7 @@ function handBack(it, who, name, verdict) {
   ) {
     dropHold(it, who.hand);
     say(REFUSED, [
-      `the take hash ${held.hash.slice(0, 8)} trails ${who.branch}, so the hold drops. Pull again.`,
+      `the take hash ${shortOf(held.hash)} trails ${who.branch}, so the hold drops. Pull again.`,
     ]);
     return 1;
   }
@@ -871,17 +923,17 @@ function handBack(it, who, name, verdict) {
     return 1;
   }
 
-  // [[spec/design_output/pull#the-fields-ride-the-payload]]
-  const payload = flagValue(it.argv ?? [], "--fields");
+  // A payload rides the hold until the checks pass, so a refused word reaches no disk. [[spec/design_output/pull#the-fields-ride-the-payload]]
+  const payload = flagValue(it.argv ?? [], "--fields") || held.payload || "";
   if (payload) {
     const put = withPayload(one.text, held.step, payload);
     if (put.why) {
       say(REFUSED, [put.why]);
       return 1;
     }
+    Object.assign(one, { stood: one.text, payload });
     one.text = put.text;
     one.front = frontOf(one.text);
-    it.disk.write(at, one.text);
   }
   const verdictField = leaf.evidence.find((field) => field.form === "verdict");
   if (verdictField && verdict.said) {
@@ -891,7 +943,7 @@ function handBack(it, who, name, verdict) {
     return 1;
   }
 
-  // [[spec/design_output/pull#the-five-checks]]
+  // [[spec/design_output/pull#the-checks]]
   const found = [];
   const schema = schemasHere(it).get("ticket");
   if (schema) {
@@ -925,27 +977,24 @@ function handBack(it, who, name, verdict) {
 // [[spec/design_output/pull#the-hand-back-refused]]
 function refused(it, who, one, leaf, held, found) {
   const count = Number(held.refused ?? 0) + 1;
-  const most = Number(it.refusals ?? REFUSALS);
-  if (most > 0 && count >= most) {
+  if (Number(it.refusals) > 0 && count >= Number(it.refusals)) {
+    if (one.stood) one.text = one.stood;
     const put = withPersonStep(
       it,
       one,
       leaf.path,
       `the hand-back met refused ${count} times: ${found[0]}`,
     );
-    if (put.path) {
+    const finding = put.path ? landed(it, one, [`${leaf.path} goes to a person at ${put.path}`]) : "";
+    if (finding) found.push(`the hook refuses the commit, so the person step lands not: ${finding}`);
+    if (put.path && !finding) {
       dropHold(it, who.hand);
-      landed(it, one, [`${leaf.path} goes to a person at ${put.path}`]);
       if (!one.private) pushed(it, who.branch);
-      say(REFUSED, [
-        ...found,
-        "",
-        `${count} refusals in a row, so ${put.path} now waits for a person.`,
-      ]);
+      say(REFUSED, [...found, "", `${count} refusals in a row, so ${put.path} now waits for a person.`]);
       return 1;
     }
   }
-  writeHold(it, who.hand, { ...held, refused: count });
+  writeHold(it, who.hand, { ...held, refused: count, payload: one.payload ?? held.payload });
   say(REFUSED, [
     ...found,
     "",
@@ -1215,7 +1264,7 @@ function commandsRun(it, leaf, chapter, found) {
     }
     const rows = `${ran.stdout ?? ""}`.trim().split("\n").filter(Boolean);
     const last = rows.at(-1) ?? "";
-    out.push({ name: field.name, exit: ran.exitCode, said: last.slice(0, 120) });
+    out.push({ name: field.name, exit: ran.exitCode, said: last.slice(0, CUT.said) });
     const want = field.expects;
     if (want === undefined || want === null || want === "") continue;
     const asNumber = Number(want);
@@ -1248,15 +1297,11 @@ function handFaults(it, one, leaf, hand, held) {
     const tip = tipOf(it);
     if (held.hash && tip !== held.hash) {
       out.push(
-        `a verdict comes from a hand that leaves the tip where it stands, and ${who8(held.hash)} moved to ${who8(tip)}.`,
+        `a verdict comes from a hand that leaves the tip where it stands, and ${shortOf(held.hash)} moved to ${shortOf(tip)}.`,
       );
     }
   }
   return out;
-}
-
-function who8(hash) {
-  return String(hash ?? "").slice(0, 8);
 }
 
 // [[spec/design_output/pull#the-pass]]
@@ -1294,10 +1339,12 @@ function passed(it, who, one, leaf, held, answered) {
   }
 
   one.text = text;
-  landed(it, one, changes);
+  const finding = landed(it, one, changes);
+  if (finding) return unlanded(one, leaf, finding);
+  dropHold(it, who.hand);
   if (!one.private && !pushed(it, who.branch)) {
     say(REFUSED, [
-      `${who.branch} moves under this hand-back, and one rebase fell short. Pull again.`,
+      `${who.branch} moves under this hand-back, and one rebase fell short. The hand-back stands here, so push ${who.branch} and pull again.`,
     ]);
     return 1;
   }
@@ -1329,7 +1376,7 @@ function failed(it, who, one, leaf, held, reason, answered) {
   const changes = [`fails ${leaf.path} back to ${back}`];
   one.text = withField(withField(text, "step", back), "state", OPEN);
 
-  const most = Number(it.fails ?? FAILS);
+  const most = Number(it.fails);
   if (most > 0 && returns >= most) {
     const put = withPersonStep(
       it,
@@ -1340,10 +1387,12 @@ function failed(it, who, one, leaf, held, reason, answered) {
     if (put.path) changes.push(`${back} waits for a person at ${put.path}`);
   }
 
-  landed(it, one, changes);
+  const finding = landed(it, one, changes);
+  if (finding) return unlanded(one, leaf, finding);
+  dropHold(it, who.hand);
   if (!one.private && !pushed(it, who.branch)) {
     say(REFUSED, [
-      `${who.branch} moves under this hand-back, and one rebase fell short. Pull again.`,
+      `${who.branch} moves under this hand-back, and one rebase fell short. The hand-back stands here, so push ${who.branch} and pull again.`,
     ]);
     return 1;
   }
@@ -1381,19 +1430,20 @@ function became(it, who, one, leaf, held, successor, answered) {
     ]);
     return 1;
   }
-  let text = withEntry(one.text, {
+  const text = withEntry(one.text, {
     step: leaf.path,
     hand: who.hand,
     hash_before: held.hash,
     hash_after: one.private ? "" : tipOf(it),
     answered,
   });
-  text = withField(shut(text, frontOf(text), "became"), "successors", `[${successor}]`);
-  one.text = text;
-  landed(it, one, [`closes became ${successor}`]);
+  one.text = withField(shut(text, frontOf(text), "became"), "successors", `[${successor}]`);
+  const finding = landed(it, one, [`closes became ${successor}`]);
+  if (finding) return unlanded(one, leaf, finding);
+  dropHold(it, who.hand);
   if (!one.private && !pushed(it, who.branch)) {
     say(REFUSED, [
-      `${who.branch} moves under this hand-back, and one rebase fell short. Pull again.`,
+      `${who.branch} moves under this hand-back, and one rebase fell short. The hand-back stands here, so push ${who.branch} and pull again.`,
     ]);
     return 1;
   }
@@ -1454,7 +1504,7 @@ export function withPersonStep(it, one, before, asks, options) {
   const front = frontOf(one.text);
   const walk = walkOf(front);
   const standing = walk.filter((held) => /^person(-\d+)?$/.test(held.name)).length;
-  const most = Number(it.splits ?? SPLITS);
+  const most = Number(it.splits);
   if (most > 0 && standing >= most) {
     console.error(
       `${one.name} carries ${standing} person steps already, so split it: hand back --became <ticket>.`,
@@ -1499,11 +1549,10 @@ export function withPersonStep(it, one, before, asks, options) {
 }
 
 // [[spec/design_output/pull#the-pass]]
-function landed(it, one, changes) {
-  it.disk.write(one.at, one.text);
-  if (one.private) return;
-  it.git.run(["add", "-A"], true);
-  it.git.run(["commit", "-m", `${one.name}: ${changes.join(", ")}`], true);
+// [[spec/design_output/pull#the-refused-commit]]
+function unlanded(one, leaf, finding) {
+  say(REFUSED, unlandedRows(one, leaf, finding));
+  return 1;
 }
 
 // [[spec/design_output/pull#the-rejected-push]]
@@ -1528,7 +1577,7 @@ function changedSince(it, one, held) {
   return changedFiles(it, first);
 }
 
-function changedFiles(it, since) {
+export function changedFiles(it, since) {
   const out = new Set();
   if (since) {
     for (const path of it.git
@@ -1543,69 +1592,8 @@ function changedFiles(it, since) {
   return [...out].sort();
 }
 
-// [[spec/design_output/pull#the-test-verb]]
-export function testVerb(it, argv) {
-  const named = (argv ?? []).slice(1).filter((one) => !one.startsWith("--"));
-  const hand = handOf(it);
-  const held = holdOf(it, hand);
-  const since = sinceOf(it, held);
-  const files = named.length
-    ? named
-    : changedFiles(it, since).filter(
-        (path) => /(^|\/)test\/.*\.test\.js$/.test(path) || /\.test\.js$/.test(path),
-      );
 
-  if (!files.length) {
-    console.log(
-      `missing, because the branch changes no test since ${since ? who8(since) : "the branch point"}`,
-    );
-    return 1;
-  }
-
-  // [[spec/design_output/pull#the-test-verb]]
-  const ran = it.proc.run([it.node ?? "node", "--test", "--test-reporter=tap", ...files], {
-    cwd: it.root,
-  });
-  const said = testSays(ran, files);
-  console.log(said);
-  return said.startsWith("green") ? 0 : 1;
-}
-
-function sinceOf(it, held) {
-  if (held?.path) {
-    const at = it.join(it.root, ...held.path.split("/"));
-    if (it.disk.exists(at)) {
-      const first = recordIn(it.disk.read(at)).find((entry) => entry.hash_before);
-      if (first) return String(first.hash_before);
-    }
-    if (held.hash) return held.hash;
-  }
-  return it.git.run(["merge-base", `origin/${TRUNK}`, "HEAD"], true).out;
-}
-
-// [[spec/design_output/pull#the-test-verb]]
-export function testSays(ran, files) {
-  const out = `${ran.stdout ?? ""}\n${ran.stderr ?? ""}`;
-  const count = (key) =>
-    Number((new RegExp(`^# ${key} (\\d+)`, "m").exec(out) ?? [])[1] ?? 0);
-  if (ran.exitCode === 0 && count("tests") > 0) {
-    return `green, ${count("pass")} test(s) pass in ${files.length} file(s)`;
-  }
-  if (
-    /ERR_MODULE_NOT_FOUND|SyntaxError|Cannot find module|ReferenceError/.test(out) ||
-    count("tests") === 0
-  ) {
-    const line = out.split("\n").find((row) => /Error/.test(row));
-    return `build, because a file loads no test: ${(line ?? "the run answers nothing").trim().slice(0, 160)}`;
-  }
-  if (/ERR_ASSERTION|AssertionError/.test(out)) {
-    return `assertion, ${count("fail")} test(s) fail on their own assertion`;
-  }
-  const line = out.split("\n").find((row) => /Error/.test(row));
-  return `build, because ${count("fail")} test(s) fail outside an assertion: ${(line ?? "").trim().slice(0, 160)}`;
-}
-
-// [[spec/design_output/pull#the-five-answers]]
+// [[spec/design_output/pull#the-answers]]
 function say(word, rows) {
   const out = [word, ...rows.map((row) => `  ${row}`)];
   if (word === REFUSED) console.error(out.join("\n"));

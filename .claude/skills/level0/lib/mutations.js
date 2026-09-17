@@ -108,7 +108,7 @@ export function patchChanges(patch, read) {
         flush();
         continue;
       }
-      if (!/^[ +\-]/.test(line))
+      if (!/^[ +-]/.test(line))
         throw new Error("Unsupported patch line. Use exact context.");
       if (line[0] !== "+") before.push(line.slice(1));
       if (line[0] !== "-") after.push(line.slice(1));

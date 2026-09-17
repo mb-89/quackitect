@@ -1,5 +1,5 @@
-// The server behind the bridgehead: plain node at the method root, one box a
-// work root, one door an event, god mode, and the switch in decide.
+// The server behind the bridgehead. Plain node at the method root, one box a
+// work root, and every event meets its door in decide.
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
 import { join } from "node:path";
@@ -23,7 +23,15 @@ import {
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
 import { asks } from "./config.js";
-import { dropsHold, holdsCall, onStop, sawCall, SPECS as stopSpecs, TOOLS as stopTools } from "./stop.js";
+import {
+  dropsHold,
+  holdsCall,
+  onStop,
+  sawCall,
+  sawPrompt,
+  SPECS as stopSpecs,
+  TOOLS as stopTools,
+} from "./stop.js";
 import { onBash, onDescribe } from "./bash.js";
 import { SPECS as reportSpecs, TOOLS as reportTools } from "./report.js";
 import { ANSWERED, onAgentAnswered, SPECS as reviewSpecs, TOOLS as reviewTools } from "./review.js";
@@ -34,14 +42,19 @@ import {
   onSessionCompact,
   onSessionStart,
   onTurnComplete,
+  onTurnSaid,
   owesCanary,
 } from "./guidance.js";
 import { freshens, projectionsHere, sourcesOf } from "./projection.js";
+import { movedCode } from "./reload.js";
 import { answersFromIndex, FIND, findSpec, runsFind, warmIndex } from "./search.js";
 import { registeredPort } from "./vehicle.js";
 import { onWrite, schemasHere } from "./write.js";
+import { PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 
-export const PORT = 6510;
+const OK = 200;
+const NOT_FOUND = 404;
+const SOON = 20;
 const PASS = { pass: true };
 const GOD = "god";
 const BINDING = "engine.binding";
@@ -49,10 +62,11 @@ const BINDING = "engine.binding";
 const DOORS = {
   "session.start": opensSession,
   "prompt.context": onPromptContext,
-  "prompt.submit": onPromptSubmit,
+  "prompt.submit": submitsPrompt,
   "classic.MessageDisplay": onMessageDisplay,
   [SPOKE]: onAgentSpoke,
   "session.compact": onSessionCompact,
+  "turn.said": onTurnSaid,
   "turn.complete": endsTurn,
   "classic.Stop": onStop,
   "agent.spawn": onAgentSpawn,
@@ -101,7 +115,7 @@ function letsThrough(answer, said, box) {
   if (!held) return answer;
   box.log.say("info", "god", `god mode lets ${held} of ${said?.e?.tool ?? said?.event ?? ""} through`, {
     tool: String(said?.e?.tool ?? ""),
-    detail: String(result?.deny ?? result?.block ?? needs).replace(/\s+/g, " ").slice(0, 120),
+    detail: String(result?.deny ?? result?.block ?? needs).replace(/\s+/g, " "),
   });
   return { ...rest, pass: true };
 }
@@ -114,7 +128,13 @@ function opensSession(e, box) {
   box.restale = "the session start";
   warmIndex(box);
   box.registered = true;
-  return { register: specsOf(box), pass: true };
+  box.specs = specsOf(box);
+  return { register: box.specs, pass: true };
+}
+
+function submitsPrompt(e, box) {
+  sawPrompt(e, box);
+  return onPromptSubmit(e, box);
 }
 
 async function onToolCall(e, box) {
@@ -164,7 +184,7 @@ export function boxesOf(method, doors = {}) {
   };
 }
 
-export function serve(method, port = PORT, say = console.log) {
+export function serve(method, port = PORT_BASE, say = console.log) {
   const boxes = boxesOf(method);
   const own = boxes(method);
   const where = `http://127.0.0.1:${port}`;
@@ -184,18 +204,18 @@ export function serve(method, port = PORT, say = console.log) {
 
   const onRequest = (request, response) => {
     if (request.method === "POST" && request.url === "/stop") {
-      answer(response, 200, { ok: true });
-      setTimeout(stop, 20);
+      answer(response, OK, { ok: true });
+      setTimeout(stop, SOON);
       return;
     }
     if (request.method === "POST" && request.url === "/restart") {
-      answer(response, 200, { ok: true });
-      setTimeout(restart, 20);
+      answer(response, OK, { ok: true });
+      setTimeout(restart, SOON);
       return;
     }
     if (request.method !== "POST" || request.url !== "/event") {
       const ok = request.url === "/health";
-      answer(response, ok ? 200 : 404, { ok, port, method, dead: own.index.dead() });
+      answer(response, ok ? OK : NOT_FOUND, { ok, port, method, dead: own.index.dead() });
       return;
     }
     readBody(request, async (body) => {
@@ -203,7 +223,13 @@ export function serve(method, port = PORT, say = console.log) {
       const box = boxes(said.root);
       const decided = await decide(said, box);
       await box.log.event(said, decided);
-      answer(response, 200, decided);
+      answer(response, OK, decided);
+      // [[spec/design_output/level0#a-fix-reaches-the-session]]
+      const moved = movedCode(own, String(said?.event ?? ""));
+      if (moved) {
+        await own.log.say("info", "bridge", `${moved} moved, so the server restarts`, { file: moved });
+        setTimeout(restart, SOON);
+      }
     });
   };
 

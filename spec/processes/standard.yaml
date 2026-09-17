@@ -38,7 +38,7 @@ steps:
             says: pass or fail, with findings one a line
   - name: implement
     reads: [[spec/guidance/code/testing]]
-    needs: [work test]
+    needs: [branch test]
     input: design/draft
     checklist:
       - the change touches no file the ask leaves out
@@ -93,6 +93,8 @@ steps:
     reads: [[spec/guidance/review/reviewing]]
     input: [diff, implement]
     to: retro
+    checklist:
+      - every fact the change adds stands in one place, and a note points at the file instead of repeating it
     evidence:
       - name: read
         form: files

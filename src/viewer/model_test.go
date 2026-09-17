@@ -358,14 +358,14 @@ func chord(m model, msg tea.KeyMsg) model {
 
 var (
 	altShiftF = tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'F'}, Alt: true}
-	altCtrlF  = tea.KeyMsg{Type: tea.KeyCtrlF, Alt: true}
+	altQ      = tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'q'}, Alt: true}
 )
 
 // [[spec/design_output/viewer#one-key-filters-the-line]]
 func TestAltShiftFKeepsTheSelectedKindAndTheSameChordClearsIt(t *testing.T) {
 	t.Parallel()
-	if altShiftF.String() != "alt+F" || altCtrlF.String() != "alt+ctrl+f" {
-		t.Fatalf("the chords read %q and %q", altShiftF.String(), altCtrlF.String())
+	if altShiftF.String() != "alt+F" || altQ.String() != "alt+q" {
+		t.Fatalf("the chords read %q and %q", altShiftF.String(), altQ.String())
 	}
 	m := press(mixed(), "home")
 	m = chord(m, altShiftF)
@@ -395,33 +395,44 @@ func TestAltShiftFOnAToolLineKeepsThatToolAlone(t *testing.T) {
 	}
 }
 
-func TestAltCtrlFKeepsTheSelectedLevelAndTheSameChordClearsIt(t *testing.T) {
+func TestAltQKeepsThePromptsAndTheRepliesAndTheSameChordClearsIt(t *testing.T) {
 	t.Parallel()
-	m := press(mixed(), "end")
-	m = chord(m, altCtrlF)
-	if m.input.Value() != "level: /^warn$/" || len(m.view) != 1 || m.pane != paneShut {
-		t.Fatalf("alt+ctrl+f on a warning keeps warnings alone and opens no pane, and got %q %v %d", m.input.Value(), m.view, m.pane)
+	m := arrive(mixed(), row(6, "reply", "hello"))
+	m = press(m, "end")
+	m = chord(m, altQ)
+	if m.input.Value() != talkFilter || len(m.view) != 3 || m.pane != paneShut {
+		t.Fatalf("alt+q keeps the two prompts and the reply and opens no pane, and got %q %v %d", m.input.Value(), m.view, m.pane)
 	}
-	m = chord(m, altCtrlF)
-	if !m.filter.Empty() || len(m.view) != 5 {
+	head := strings.Split(m.renderHeader(), "\n")[0]
+	if !strings.Contains(head, levelStyle("error").Render("alt+f filter")) {
+		t.Fatalf("a filter alt+q sets wears alt+f in bold red, and the header reads %q", head)
+	}
+	m = chord(m, altQ)
+	if !m.filter.Empty() || len(m.view) != 6 || m.input.Value() != "" {
 		t.Fatalf("the same chord clears the filter, and got %q %v", m.input.Value(), m.view)
+	}
+	m = chord(m, tea.KeyMsg{Type: tea.KeyCtrlF, Alt: true})
+	if !m.filter.Empty() || m.pane != paneShut {
+		t.Fatalf("alt+ctrl+f went, and it set %q", m.input.Value())
 	}
 }
 
-func TestAnotherKindReplacesTheFilterAndLeavesTheHeaderShort(t *testing.T) {
+func TestAnotherChordReplacesTheFilterAndLeavesTheHeaderShort(t *testing.T) {
 	t.Parallel()
 	m := chord(press(mixed(), "home"), altShiftF)
-	m = press(m, "end")
-	m = chord(m, altCtrlF)
-	if m.input.Value() != "level: /^info$/" {
-		t.Fatalf("a chord on another line writes its own filter, and got %q", m.input.Value())
+	m = chord(m, altQ)
+	if m.input.Value() != talkFilter {
+		t.Fatalf("a second chord writes its own filter, and got %q", m.input.Value())
 	}
 	head := strings.Split(m.renderHeader(), "\n")[0]
-	if strings.Contains(head, "shift") || strings.Contains(head, "ctrl") {
+	if strings.Contains(head, "shift") || strings.Contains(head, "alt+q") {
 		t.Fatalf("the header names no chord, and reads %q", head)
 	}
-	if !strings.Contains(FilterHelp, "alt+shift+f") || !strings.Contains(FilterHelp, "alt+ctrl+f") {
+	if !strings.Contains(FilterHelp, "alt+shift+f") || !strings.Contains(FilterHelp, "alt+q") {
 		t.Fatal("the filter pane names both chords")
+	}
+	if strings.Contains(FilterHelp, "ctrl+f") || strings.Contains(HelpText, "ctrl+f") {
+		t.Fatal("no help names the chord that went")
 	}
 }
 

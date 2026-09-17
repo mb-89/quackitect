@@ -1,6 +1,5 @@
-// Sentence case for a shouted lead. Vale carries five actions and none folds
-// case, so this tree makes the one fix Vale reports and refuses to apply.
-// A caller hands in the file text and the findings Vale already named.
+// Sentence case for a shouted lead. Vale reports the fix and applies none, so
+// this makes it. A caller hands in the file text and the findings Vale named.
 // [[spec/design_output/level0#the-fixer-calms-a-shout]]
 
 export const SHOUTED = "ShoutedLead";
