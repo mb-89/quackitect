@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: whenever
 steps:
   - name: sync
@@ -133,7 +133,12 @@ record:
     hand: box 3d4c068755ec
     hash_before: 3978bac00813947ec95a84d7833a367920371e4d
     hash_after: 3978bac00813947ec95a84d7833a367920371e4d
+  - step: retro/cloud
+    hand: box 3d4c068755ec
+    hash_before: 2c333d2f60eb42b686c2291059031be508352ff0
+    hash_after: 2c333d2f60eb42b686c2291059031be508352ff0
 step: retro/cloud
+reason: done
 ---
 
 # Ask
@@ -267,6 +272,7 @@ its own, and everything behind it runs.
 <!-- the form is list -->
 
 - the box starts no server, so the check stops at its health probe until the serve verb runs
+- the client refuses a shell write to the stop hook, and names it a write to the session's own door
 - the install answers every tool it names, and the proxy carries every host this session reaches
 
 ### met
@@ -275,12 +281,11 @@ its own, and everything behind it runs.
 
 <!-- the form is list -->
 
-- the write door refuses a shell write, and names the read tool then the edit tool
-- the write door refuses a commit message past the sentence rule and the tense rule
-- the write door refuses every write to the child ticket, until its ask meets the rules
-- the verdict guard refuses a hand-back, because the box commits under the hold
-- the cap inserts design/person-1 at the second return on one leaf
-- the battery reads red, because trunk answers findings at error
+- the sync meets a conflict on 27 files, and the box resolves each against the true base
+- the write door refuses a list item past its word cap, a passive line and a word outside the core
+- the write door refuses a run of four paragraphs, and the fix carries one as a list
+- the hand-back refuses a command evidence holding three lines, and a command holds one
+- the take hands out a branch sharing no ancestor with trunk, and the sync dies on it
 
 ### left
 
@@ -288,8 +293,8 @@ its own, and everything behind it runs.
 
 <!-- the form is list -->
 
-- [[spec/tickets/brand-reads-folder]] stands at design/person-1, where a person rules on the plugin name
-- [[spec/tickets/the-tense-rule-reads-present]] stands in no group, and it holds this branch
+- [[spec/tickets/the-brand-names-the-plugin]] carries the person step, and stands in no group
+- [[spec/tickets/the-take-skips-an-orphan]] stands in no group, and a person decides the five refs
 - [[spec/tickets/the-check-starts-the-server]] stands in no group
 - this ticket is the handover, because a group branch carries its retro here
 
