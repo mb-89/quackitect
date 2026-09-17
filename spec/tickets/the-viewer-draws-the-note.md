@@ -171,21 +171,36 @@ pass
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
-
-<!-- the form is command -->
+    (cd src/viewer && go test ./... -run "Note|SaidColumn" 2>&1 | grep -q "^--- FAIL") && echo assertion
 
 ### seen
 
-<!-- what you see, and what surprises you -->
+Three cases stand red, each on its own assertion:
 
-<!-- the form is text -->
+| the case | what it reads |
+|---|---|
+| a note takes a colour of its own | the kind column answers 181, and the said column answers nothing |
+| the said column reads the kind list | `note` reads two colours, and `answer` reads one |
+| a prompt shows the note it carries | the details carry the reply alone |
+
+The first case surprises me. `kindStyle` falls through to a hash over the kind where the lists name none, so the kind column already draws a note in a colour apart. A person reads no meaning in it, because the hash picks it. So the change names `note` in the kind list, and the colour becomes a choice.
+
+The second case reads `answer` as one colour today, and two places carry the number:
+
+| where | what it holds |
+|---|---|
+| the kind list | `121` under `answer` |
+| `saidStyle` | `121`, written again |
+
+They agree by hand. The case holds them to one reading, so a hand moving either one meets a red case.
+
+The third case reads the details. `pairsOf` walks forward from a prompt and takes the reply ending its turn, and a note between the two reaches nowhere.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change touches no file the ask leaves out. The cases sit in `src/viewer/detail_test.go`, beside the ones covering the pairing.
+- every door the change reaches has a fake. The cases read rows in memory, and reach no disk and no clock.
+- a comment names the approach the change implements. Each case carries the design output section it holds.
 
 ## reflect
 
