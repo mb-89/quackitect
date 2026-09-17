@@ -89,7 +89,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 6895aca948d260403eb59cc9325a61c45499a508
+    hash_after: 6895aca948d260403eb59cc9325a61c45499a508
 ---
 
 # Ask
@@ -115,9 +120,34 @@ A leaf `by: helper` parks today. The spawn answer passes it, a hand under `--as`
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+A helper leaf gates on the box, the way an agent step gates, and the helper is its one taker.
 
-<!-- the form is text -->
+| the finding | where it lands |
+|---|---|
+| the gate | `takeable` in `src/scripts/pull.js` |
+| the taker | the spawn row of [[spec/design_output/pull#a-hand-of-its-own]] |
+| the case | `test/level0/pull.test.js` |
+| the count | [[spec/tickets/the-spawn-takes-a-step]], which reads three |
+
+**The gate.** `takeable` parks a helper leaf on every box, because it names `helper` beside `person` and `children`. An agent step reads one line below it, and that line gates on the box. The helper leaf moves to that shape:
+
+| the box | what the leaf reads |
+|---|---|
+| carrying a harness | takeable, because the session spawns the hand |
+| off a harness | parked, because the shell moves nothing |
+
+`branch done` then holds the group open where a spawn stands, and closes it where none does. That is the wall the ask names, with one side answering on each box.
+
+**The taker.** The design row reads "parked for a person or a spawned hand". A leaf under `by: helper` admits one taker, so the row names the helper alone. `takeable` already refuses a person there, and the row now says the same.
+
+**The case.** The ask's third row wants the shell answer proven. Two cases in `pull.test.js` drive one group whose only open leaf reads `by: helper`:
+
+| the box the case builds | what it reads |
+|---|---|
+| carrying no harness | the shell's own answer, which moves nothing |
+| carrying a harness | `spawn`, the helper name, and the prompt |
+
+**The count.** The prompt `spawnPrompt` writes carries four steps, and two of them carry a command. `the-spawn-takes-a-step` reads three. That note takes the correction, and names `spawnPrompt` as what answers it.
 
 ## review
 
@@ -238,7 +268,6 @@ A leaf `by: helper` parks today. The spawn answer passes it, a hand under `--as`
 # Discussion
 
 
-<!-- what anybody adds, at any time, on this ticket -->
 - [[spec/tickets/the-spawn-takes-a-step]] hands this over at `design/person-1`, which waits for a person.
   - design/review failed back 2 times: takeable takes a leaf wanting a helper as work on every box. A box off a harness leaves that leaf parked, and branch done holds the group open. Gate it as a step for an agent gates on the box.
   - The change to the spawn answer carries no case. The ask third row wants the shell answer proven, so add a fifth case over it.
