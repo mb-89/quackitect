@@ -58,7 +58,7 @@ The order is what breaks:
 | what the setup writes | where it lands | what the clone does |
 |---|---|---|
 | the trust flag | the home of the box | leaves it standing |
-| the modules, and `.se/bin` | the tree | replaces the tree, and git ignores both |
+| the modules, and the installed binaries | the tree | replaces the tree, and git ignores both |
 
 A cloud box clones the repository fresh when the container starts. So the half
 of the setup writing outside the tree stands. The half writing inside it goes.

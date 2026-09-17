@@ -49,9 +49,9 @@ and nothing computes a second one.
 The gain is one road to the git truth. A board, a terminal and the pull all read
 the same answer, so none of the three drifts from the others.
 
-The index skips `.se` today. The file lands where a watcher reaches it, and the
-walk stops skipping that folder. For details, see
-[[spec/design_output/index#the-rows-the-walk-writes]].
+The file lands under `.se`, outside `.se/runtime`, because a reader reads it and
+the index has to see the write. The engine's own state stays in `runtime`, which
+the index skips. [[spec/tickets/the-runtime-folder-holds-state]]
 
 - one verb writes the answer, and the editor opens no git process
 - a flag on the verb writes the queue order into the same file

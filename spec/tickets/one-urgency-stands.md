@@ -37,7 +37,7 @@ puts it. So the field becomes one mark: urgent, or nothing.
 
 The score orders everything under the mark, and the mark overrides the score.
 So a ticket reads urgent or it does not, and the queue needs no middle word.
-[[spec/tickets/the-queue-place-is-a-score]]
+[[spec/tickets/the-queue-is-a-score]]
 
 The change reaches five places:
 

@@ -42,6 +42,7 @@ and the queue reads the sum:
 |---|---|
 | urgent | overrides every other term, so an urgent ticket goes first |
 | how many tickets wait on this one | raises it, and the more wait the higher |
+| the chain under it | the count walks the whole chain, so a blocker of a blocker counts |
 | how long it has stood | raises it, so nothing sits forever |
 | how often a hand failed on it | raises it |
 | waiting on a ticket still open | out of the queue, and the board still draws it |
@@ -50,6 +51,10 @@ and the queue reads the sum:
 Taskwarrior weighs urgency this way, and the term this tree lacks is the one
 for blocking others. `depends_on` and `successors` both stand in the schema, so
 the graph is there to walk.
+
+The walk reaches the whole chain. A ticket blocking one that blocks ten counts
+eleven, so the thing at the root of a stalled chain rises to the top. At the
+scale this tree carries the walk costs nothing worth naming.
 
 Two rules keep the number honest:
 

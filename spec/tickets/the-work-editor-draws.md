@@ -87,17 +87,18 @@ The tree view already draws a tree and a table at once. It filters in the log's
 language, reads a base file, and takes an edit in a cell. The work tab stands
 empty, and these tickets fill it.
 
-The order runs data first, then drawing, then the acts:
+The order runs data first, then drawing, then the acts. Eleven tickets stand:
 
 | the ticket | what it lands |
 |---|---|
 | `the-listing-opens-git-once` | the listing stops spawning a process per branch and per ticket |
-| `the-work-answer-lands-on-disk` | one verb writes what git knows, and the editor reads that file |
-| `the-work-tab-draws-the-tree` | the base file, the columns, and the tree in the tab |
-| `the-flags-condense-at-the-draw` | one boolean key a flag, one lettered column |
-| `the-tree-sorts-by-several-keys` | a sort of several keys, between the data and the view |
+| `the-work-answer-lands` | one verb writes what git knows, and the editor reads that file |
+| `the-work-tab-draws` | the base file, the columns, and the tree in the tab |
+| `the-flags-draw-as-letters` | one boolean key a flag, one lettered column |
+| `the-runtime-folder-holds-state` | `.se/runtime` takes the engine's state, and the index walks the rest |
+| `the-tree-sorts-several-keys` | a sort of several keys, between the data and the view |
 | `one-urgency-stands` | the three urgency words become one mark |
-| `the-queue-place-is-a-score` | the queue orders by a polynomial the config weighs |
+| `the-queue-is-a-score` | the queue orders by a polynomial the config weighs |
 | `a-preset-carries-its-sort` | presets and slices as buttons, carrying a filter and a sort |
 | `the-cell-fill-takes-marks` | marked rows, and a fill reaching those alone |
 
