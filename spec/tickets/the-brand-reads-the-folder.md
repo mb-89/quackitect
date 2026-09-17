@@ -129,7 +129,11 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
-step: retro/write
+  - step: retro/write
+    hand: box 3d4c068755ec
+    hash_before: 3978bac00813947ec95a84d7833a367920371e4d
+    hash_after: 3978bac00813947ec95a84d7833a367920371e4d
+step: retro/cloud
 ---
 
 # Ask
@@ -194,12 +198,12 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 
 <!-- the form is list -->
 
-- the group passes sync, and the branch carries trunk
-- the split assigns [[spec/tickets/brand-reads-folder]] and mints no child
-- the child passes design/draft twice, and a hand of its own fails design/review twice
-- the child stands at design/person-1, where a person rules on the plugin name
-- the ask of the child and the group ticket meet the rules, which the write door refused before
-- the retro decides every private note, and mints two tickets in no group
+- the branch takes trunk in, over a history that marks 27 files as conflicts
+- the check answers 0 on the merge, with every finding at warning
+- [[spec/tickets/brand-reads-folder]] closes became [[spec/tickets/the-brand-names-the-plugin]]
+- the successor stands outside the group, carrying the question the person step asks
+- [[spec/tickets/the-take-skips-an-orphan]] stands in no group, on a branch no sync reaches
+- the group runs on to its retro, because no open child stands in it
 
 ### well
 
@@ -207,10 +211,10 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 
 <!-- the form is list -->
 
-- a hand of its own reads harder than the hand that drafts. It catches the plugin name, the lock file and the raw folder name
-- the pull inserts a person step at the second return, so the box hands the design to a person
-- the `--fields` road lands a field the write door refuses, so a leaf closes anyway
-- the sketch runs the branded manifest against the tracked one, so the implement starts from a shape that answers
+- the merge reads each side against the true base, so a side standing still takes the other whole
+- trunk renames the free-stop rule, and the branch's own clause rides the new name
+- the unblock verb writes the question into the successor, so the box copies nothing by hand
+- the pull refuses a wrong shape by naming it, so the fix costs one line
 
 ### badly
 
@@ -218,11 +222,10 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 
 <!-- the form is list -->
 
-- the box commits while a hand holds a verdict leaf, so the hand-back refuses and one review runs twice
-- the write door lints the whole file, so findings standing in the ask since the mint refuse every write
-- the choice field takes the word the tense rule refuses, so the hand-back reads a right answer as wrong
-- the check stops at the server probe, so the rules over the tree stay unread until the server starts
-- trunk answers findings at error, so `branch done` refuses this branch
+- the box proposes to leave the person step standing, and the owner names the road the guidance holds
+- the check stops at the server probe, so the rules over the tree stay unread until the serve verb runs
+- the box writes three lines under a command evidence, and the hand-back refuses two of them
+- the take hands out a branch sharing no ancestor with trunk, and the sync dies on it
 
 ### improve
 
@@ -230,11 +233,10 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 
 <!-- the form is list -->
 
-- [[spec/design_output/pull]] says at the hand-out that a commit under a verdict leaf voids the hand-back
-- [[spec/design_output/level0]] reads the lines a write touches, and leaves the rest of the file to the lint verb
-- [[spec/processes/note]] carries outcome words the voice rules admit, or the tense rule takes those three as exceptions
+- [[spec/guidance/cloud]] holds the person step rule, and a box reads the guidance before it plans a branch
 - [[spec/tickets/the-check-starts-the-server]] carries the probe
-- [[spec/tickets/the-tense-rule-reads-present]] carries the findings on trunk
+- [[spec/design_output/work]] says a command evidence holds its one line, where the person step leaves
+- [[spec/tickets/the-take-skips-an-orphan]] carries the branch sharing no ancestor with trunk
 
 ### thoughts
 
@@ -242,19 +244,17 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 
 <!-- the form is text -->
 
-Each door in this tree reads right on its own, and three of them meet a hand
-with no move the doors admit:
+The merge is the whole job the take names, and it is smaller than it looks. Two
+merge bases mark a file as a conflict where one side stands still. So the
+resolution reads three things:
 
-- the write door refuses a file the mint writes
-- the choice field asks for a word the tense rule refuses
-- the battery asks for a green check that trunk denies
+- the true base of each file, which answers most of the set
+- the side that moves, which takes the file whole
+- the few real overlaps, which are worth a hand
 
-A hand meeting one of these reads it as its own error, and looks for a smaller
-write. The `--fields` road answers two of the three, and no rule names it. That
-road belongs in the guidance.
-
-The group of one child gives its session to design alone, and no code moves. The
-review earns that, because each pass finds real holes.
+The person step is the piece this box got wrong on its own. A blocked step reads
+as a wall, and the tree holds a door beside it. The step leaves on a ticket of
+its own, and everything behind it runs.
 
 ## cloud
 
