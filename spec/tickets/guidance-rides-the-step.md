@@ -78,6 +78,7 @@ record:
   - step: sync
     hand: box a57de3bd562b
     hash_before: 0648a6e60d9e14c4a7411dd9a2c0db90c85072e5
+    hash_after: 679f66a17614970a512fd0e3a471b4ed227b0f29
 step: sync
 ---
 
