@@ -158,14 +158,14 @@ func TestTheFooterCarriesTheFloorAndAFunnelAtFixedPlaces(t *testing.T) {
 	if !strings.Contains(rule, "────") {
 		t.Fatalf("a rule stands over the marks, and reads %q", rule)
 	}
-	if !strings.Contains(marks, "INFO") || !strings.Contains(marks, dimStyle.Render("▼")) {
+	if !strings.Contains(marks, "INFO") || !strings.Contains(marks, dimStyle.Render(filterMark)) {
 		t.Fatalf("the marks carry a dark funnel and the floor, and read %q", marks)
 	}
 	wide := ansi.StringWidth(marks)
 	m = typed(alt(m, 'f'), "line 3")
 	m = press(m, "enter")
 	marks = strings.Split(m.View(), "\n")[len(lines)-1]
-	if !strings.Contains(marks, levelStyle("error").Render("▼")) {
+	if !strings.Contains(marks, levelStyle("error").Render(filterMark)) {
 		t.Fatalf("a held filter lights the funnel, and the marks read %q", marks)
 	}
 	if ansi.StringWidth(marks) != wide {

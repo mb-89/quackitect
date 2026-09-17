@@ -19,5 +19,8 @@
 
 node_modules/
 src/viewer/viewer
+src/viewer/viewer.exe
 src/lsp/lsp
+src/lsp/lsp.exe
 src/yaml/yaml
+src/yaml/yaml.exe

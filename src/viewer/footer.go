@@ -14,6 +14,9 @@ import (
 // [[spec/design_output/viewer#the-footer-carries-status]]
 const floorWide = 4
 
+// The filter's mark. A letter says filter where a triangle said arrow. [[spec/design_output/viewer#the-footer-carries-status]]
+const filterMark = "F"
+
 // [[spec/design_output/viewer#the-footer-carries-status]]
 func (m model) renderFooter() string {
 	rule := ruleStyle.Render(strings.Repeat("─", max(1, m.w)))
@@ -27,10 +30,11 @@ func (m model) renderFooter() string {
 
 // [[spec/design_output/viewer#the-footer-carries-status]]
 func (m model) renderMarks() string {
-	funnel := dimStyle.Render("▼")
+	funnel := dimStyle.Render(filterMark)
 	if m.tabs[m.open].Narrowed(&m) {
-		funnel = levelStyle("error").Render("▼")
+		funnel = levelStyle("error").Render(filterMark)
 	}
+	order := dimStyle.Render(pad(m.sortSays(), sortWide))
 	floor := levelStyle(m.floor).Render(pad(strings.ToUpper(m.floor), floorWide))
-	return funnel + " " + floor
+	return order + " " + funnel + " " + floor
 }
