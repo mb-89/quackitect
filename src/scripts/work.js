@@ -33,16 +33,17 @@ import {
   withoutField,
   WORK_BRANCH,
 } from "./group.js";
-import { handOf, pull, takeable, testVerb } from "./pull.js";
-import { review } from "./review.js";
-
+import { handOf, pull, takeable } from "./pull.js";
+import { readyToMerge, review } from "./review.js";
+import { serving } from "./serve.js";
+import { testVerb } from "./test-verb.js";
+import { freeIn, staleClaim, trigger } from "./stand.js";
+import { unblock } from "./unblock.js";
 export const BRIEF = "HANDOVER.md";
-const COL = { branch: 34, kind: 6, status: 6, why: 24 };
-const MS = 1000;
-
+const COL = { branch: 34, child: 32, kind: 6, status: 6, why: 24 };
+export const MS = 1000;
 // [[spec/design_output/work#a-merged-branch-closes]]
 export const MINE = /^(work|claude)\//;
-
 export const TODO = "todo";
 export const HELD = "held";
 
@@ -67,7 +68,9 @@ export function work(root, argv, doors) {
     review,
     list,
     // [[spec/design_output/pull#the-hand-out]]
-    pull: (it, _name, argv) => pull({ ...it, take: (group) => take(it, group) }, argv),
+    pull: (it, _name, argv) => pull({ ...it, take: (group) => serving(it, take(it, group)), ready: () => readyToMerge(it) }, argv),
+    // [[spec/design_output/work#a-person-step-leaves]]
+    unblock,
     test: (it, _name, argv) => testVerb(it, argv),
   };
   if (doing[what] && LOUD.includes(what)) {
@@ -86,6 +89,7 @@ export function work(root, argv, doors) {
     console.log("  merge <name>  take a done branch into main");
     console.log("  close [name]  delete a branch already inside main, or every one");
     console.log("  pull [ticket] take the next leaf of this group, or hand one back with --pass, --fail, --became");
+    console.log("  unblock <t> <successor> close a ticket waiting on a person, and hand it to its successor");
     console.log("  test [file]   run the tests the branch changes since the take: green, assertion, build or missing");
     return what ? 2 : 0;
   }
@@ -101,7 +105,7 @@ export function cloud(root, argv, doors) {
   return argv[0] ? 2 : 0;
 }
 
-const LOUD = ["new", "take", "done", "release", "merge", "close", "pull"];
+const LOUD = ["new", "take", "done", "release", "merge", "close", "pull", "unblock"];
 
 // [[spec/design_output/log#which-door-says-what]]
 function tell(it, what, code) {
@@ -183,7 +187,7 @@ export function standingOf(briefs, merged = new Set()) {
   );
 }
 
-function mergedHere(it) {
+export function mergedHere(it) {
   return new Set(
     it.git
       .run(["branch", "-r", "--merged", `origin/${TRUNK}`], true)
@@ -201,7 +205,7 @@ export function groupStanding(text) {
 }
 
 // [[spec/design_output/work#a-group-is-a-ticket]]
-function standOf(it) {
+export function standOf(it) {
   return branches(it).map((branch) => {
     // [[spec/design_output/work#a-brief-drains-first]]
     const name = branch.replace(/^work\//, "");
@@ -212,7 +216,7 @@ function standOf(it) {
 }
 
 // [[spec/design_output/work#held-derives-from-the-record]]
-function standingAll(stand, merged) {
+export function standingAll(stand, merged) {
   return new Map(
     stand.map((one) => [
       one.branch,
@@ -225,7 +229,7 @@ function standingAll(stand, merged) {
   );
 }
 
-function noteOf(one) {
+export function noteOf(one) {
   return one.brief || one.ticket;
 }
 
@@ -251,12 +255,6 @@ function ticketsOn(it, ref) {
     .map((path) => ({ path, name: ticketNamed(path), text: textAt(it, ref, path) }));
 }
 
-// [[spec/design_output/work#a-stale-group-is-yours]]
-function tipAge(it, branch, now) {
-  const said = it.git.run(["log", "-1", "--format=%ct", `origin/${branch}`], true);
-  if (!now || !said.ok || !said.out) return -1;
-  return Math.max(0, Math.floor(now / MS) - Number(said.out));
-}
 
 export function setStatus(text, to) {
   const said = String(text ?? "");
@@ -381,8 +379,9 @@ export function withContract(brief) {
     `4. Run \`./RUNME.sh branch sync\` again, so ${TRUNK} comes in last too.`,
     "   Run `./RUNME.sh check` after it, and answer whatever the merge turns red.",
     "5. Run `./RUNME.sh branch done`, which sets the status and pushes.",
-    "6. Run `./RUNME.sh branch release` instead where you stop early, so the branch",
-    "   goes back to `todo` for somebody else.",
+    "6. Stop for no person. Where a step wants one, mint a ticket outside the",
+    "   group, write what stands open into its ask, and run `./RUNME.sh branch",
+    "   unblock <ticket> <successor>`. Then finish the rest and run `branch done`.",
     `7. Run \`./RUNME.sh branch merge <name>\` from ${TRUNK} to take it in, then`,
     "   `branch close`. A cloud box stops at step 4, because the harness holds",
     `   ${TRUNK} shut there and a cloud box opens no pull request.`,
@@ -543,34 +542,6 @@ function claimGroup(it, one) {
 }
 
 // [[spec/design_output/work#the-routine-a-verb-names]]
-function freeIn(stand, standing) {
-  return stand
-    .filter((one) => standing.get(one.branch) === TODO)
-    .filter((one) => !waitingOn(noteOf(one), standing).length);
-}
-
-// [[spec/design_output/work#the-routine-a-verb-names]]
-export function freeNow(briefs, merged = new Set()) {
-  const stand = [...briefs].map(([branch, brief]) => ({ branch, brief, ticket: "" }));
-  return freeIn(stand, standingAll(stand, merged)).map((one) => one.branch);
-}
-
-function trigger(it) {
-  const stand = standOf(it);
-  const free = freeIn(stand, standingAll(stand, mergedHere(it))).map((one) => one.branch);
-
-  console.log(`${ROUTINE.name} runs ./RUNME.sh branch pull on a cloud box, and the engine takes a branch there.`);
-  console.log("Fire it with the RemoteTrigger tool, once for every box you want:\n");
-  console.log(`    action=run  trigger_id=${ROUTINE.id}\n`);
-
-  if (!free.length) {
-    console.log("No branch stands free, so a box fired now takes nothing.");
-    return 0;
-  }
-  console.log("These branches stand free, and a box takes one each:");
-  for (const branch of free) console.log(`  ${branch}`);
-  return 0;
-}
 
 function finish(it) {
   const branch = workBranchHere(it, "done");
@@ -624,13 +595,12 @@ function ready(it, branch) {
 function leaves(it, branch, at, path, says) {
   const name = branch.replace(/^work\//, "");
   const after = it.git.run(["rev-parse", "HEAD"], true).out;
-  const open = childrenHere(it, name).filter(
-    (one) => fieldOf(one.text, "state") !== CLOSED,
-  );
+  const children = childrenHere(it, name);
+  const open = children.filter((one) => fieldOf(one.text, "state") !== CLOSED);
 
-  // [[spec/design_output/pull#done-leaves-no-takeable-step]]
+  // A closed sibling frees the one waiting on it, so takeable reads them all. [[spec/design_output/pull#done-leaves-no-takeable-step]]
   const busy = [...open, { name, text: it.disk.read(path) }]
-    .map((one) => ({ name: one.name, step: takeable(it, one) }))
+    .map((one) => ({ name: one.name, step: takeable(it, one, children) }))
     .filter((one) => one.step);
   if (busy.length) {
     for (const one of busy) {
@@ -746,7 +716,7 @@ function list(it, _name, argv) {
   const standing = standingAll(stand, mergedHere(it));
   if ((argv ?? []).includes("--done")) return doneOnly(stand, standing);
   const now = it.clock ? it.clock.now().getTime() : 0;
-  const rows = stand.map((one) => rowOf(it, one, standing, now));
+  const rows = stand.flatMap((one) => [rowOf(it, one, standing, now), ...childRows(it, one)]);
   const loose = looseRows(it);
 
   if (!rows.length && !loose.length) {
@@ -775,15 +745,36 @@ function rowOf(it, one, standing, now) {
   const status = standing.get(one.branch) || "no status";
   const waits = waitingOn(text, standing);
   const why = waits.length ? `waits for ${waits.join(", ")}` : urgencyOf(text);
-  const held = status === HELD ? tipAge(it, one.branch, now) : -1;
-  const age = held < 0 ? "" : aged(held);
+  // [[spec/design_output/work#a-stale-group-is-yours]]
+  const { age, stale } = status === HELD ? staleClaim(it, one.branch, now) : { age: "", stale: false };
 
   return {
     name: one.name,
     age,
-    stale: held >= 0 && held > (spanOf(it.stale || STALE) || spanOf(STALE)),
+    stale,
     said: `${one.branch.padEnd(COL.branch)} ${kind.padEnd(COL.kind)} ${status.padEnd(COL.status)} ${why.padEnd(COL.why)} ${age}`,
   };
+}
+
+// [[spec/design_output/work#a-ticket-under-its-group]]
+function childRows(it, one) {
+  if (!one.ticket) return [];
+  return ticketsOn(it, `origin/${one.branch}`)
+    .filter((child) => fieldOf(child.text, GROUP) === one.name)
+    .map((child) => ({
+      stale: false,
+      said: `  ${child.name.padEnd(COL.child)} ticket ${stateOf(child.text).padEnd(COL.status)} ${whyOf(child.text)}`,
+    }));
+}
+
+// [[spec/design_output/work#a-ticket-under-its-group]]
+function stateOf(text) {
+  return fieldOf(text, "state") || OPEN;
+}
+
+// [[spec/design_output/work#a-ticket-under-its-group]]
+export function whyOf(text) {
+  return stepOf(text) || urgencyOf(text);
 }
 
 // [[spec/design_output/work#a-row-per-group]]

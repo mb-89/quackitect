@@ -225,3 +225,64 @@ func TestAWrappedValueLinesUpUnderItself(t *testing.T) {
 		}
 	}
 }
+
+// [[spec/design_output/viewer#the-details]]
+// A note takes a colour of its own, and the said column wears it too. [[spec/design_output/viewer#colours]]
+func TestANoteTakesAColourOfItsOwnInBothColumns(t *testing.T) {
+	t.Parallel()
+	mark := kindStyle("note").GetForeground()
+	if mark == (lipgloss.NoColor{}) {
+		t.Fatal("a note row takes a colour of its own, and the kind list names none")
+	}
+	for _, other := range []string{"prompt", "reply", "answer", "tool"} {
+		if kindStyle(other).GetForeground() == mark {
+			t.Fatalf("a note reads apart from %s, and the two share a colour", other)
+		}
+	}
+	if got := saidStyle(row(1, "note", "the lint drags")).GetForeground(); got != mark {
+		t.Fatalf("the said column wears the note's colour %v, and wears %v", mark, got)
+	}
+}
+
+// The colour stands in the kind list alone, so the said column reads it there. [[spec/design_output/viewer#colours]]
+func TestTheSaidColumnReadsTheKindListAndNamesNoColourOfItsOwn(t *testing.T) {
+	t.Parallel()
+	for _, kind := range []string{"note", "answer"} {
+		if got := saidStyle(row(1, kind, "x")).GetForeground(); got != kindStyle(kind).GetForeground() {
+			t.Fatalf("%s reads one colour, and the two columns read %v and %v", kind, got, kindStyle(kind).GetForeground())
+		}
+	}
+}
+
+// A person opening the prompt reads what the session parked under it. [[spec/design_output/viewer#the-details]]
+func TestAPromptShowsTheNoteItCarriesAndTheNoteShowsItsPrompt(t *testing.T) {
+	t.Parallel()
+	all := []Record{
+		row(1, "prompt", "are you bound?"),
+		row(2, "note", "the lint drags"),
+		row(3, "reply", "yes, bound"),
+		row(4, "prompt", "and now?"),
+	}
+	if said := details(all, 0); !strings.Contains(said, "the lint drags") {
+		t.Fatalf("the prompt's details carry the note it holds, and read:\n%s", said)
+	}
+	if said := details(all, 1); !strings.Contains(said, "are you bound?") {
+		t.Fatalf("the note's details carry the prompt above it, and read:\n%s", said)
+	}
+	if said := details(all, 3); strings.Contains(said, "the lint drags") {
+		t.Fatalf("a prompt after the note borrows none, and read:\n%s", said)
+	}
+}
+
+func TestAWrapLinesUpUnderAValueACharacterWiderThanAByte(t *testing.T) {
+	t.Parallel()
+	said := "  1…9        open the tab at that place and the next one too"
+	lines := strings.Split(Wrap(said, 40), "\n")
+	if len(lines) < 2 {
+		t.Fatalf("a long line wraps, and reads %v", lines)
+	}
+	under := len([]rune(lines[0][:strings.Index(lines[0], "open")]))
+	if got := len([]rune(lines[1])) - len([]rune(strings.TrimLeft(lines[1], " "))); got != under {
+		t.Fatalf("the rest lines up under the value at %d, and stands at %d", under, got)
+	}
+}

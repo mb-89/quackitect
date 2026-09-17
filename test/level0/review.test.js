@@ -12,6 +12,7 @@ import {
   readerSays,
   report,
   retroIn,
+  retroOnTicket,
   reviewSpec,
   TOOL,
   WORKTREE,
@@ -85,6 +86,16 @@ test("a retro reads from a heading, and its absence reads as absent", () => {
   assert.equal(retroIn("# Where it stands\n\n# What surprises me\n\nA trap.\n"), true);
   assert.equal(retroIn("# Where it stands\n\n# The dead end I meet\n\nA wall.\n"), true);
   assert.equal(retroIn("# Where it stands\n\nA surprise stands in this line.\n"), false);
+});
+
+// [[spec/design_output/review#the-questions]]
+test("a group's retro reads off its ticket, and an empty retro chapter reads as absent", () => {
+  const empty = "# Ask\n\nA thing.\n\n# retro\n\n## write\n\n### done\n\n<!-- what was done -->\n\n<!-- the form is list -->\n\n# Discussion\n\nNothing.\n";
+  assert.equal(retroOnTicket(empty), false, "placeholders and headings say nothing");
+  const filled = empty.replace("<!-- what was done -->", "- the shim resolves the vehicle");
+  assert.equal(retroOnTicket(filled), true);
+  assert.equal(retroOnTicket("# Ask\n\nA thing.\n\n# Discussion\n\nA line.\n"), false, "no retro chapter");
+  assert.equal(retroIn(empty), true, "the heading alone fools the brief reader, so a ticket takes its own");
 });
 
 test("the verb gathers the brief, the handback and both diffs", () => {

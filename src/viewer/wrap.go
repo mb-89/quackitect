@@ -21,7 +21,7 @@ func hang(line string) string {
 	if gap := strings.Index(body, "  "); gap > 0 {
 		value := strings.TrimLeft(body[gap:], " ")
 		if value != "" {
-			return strings.Repeat(" ", len(line)-len(value))
+			return strings.Repeat(" ", len([]rune(line))-len([]rune(value)))
 		}
 	}
 	return lead

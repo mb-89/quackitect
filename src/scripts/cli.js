@@ -5,11 +5,10 @@ import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   bindsHere,
-  canary,
+  canary, canaryText,
   countsOf,
   standingLayer,
 } from "../../.claude/skills/level0/lib/guidance.js";
-import { asRow, OLD, rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { POINTER, PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 import { withoutFalsePast } from "../bridge/tense.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
@@ -64,9 +63,8 @@ import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { readTools, whereIs, writeSurvey } from "./tools.js";
-import { SOURCE as VIEWER, viewerOf } from "./viewer.js";
+import { SHARED, SOURCE as VIEWER, viewerOf } from "./viewer.js";
 import {
-  attach,
   detach,
   entryFor,
   produce,
@@ -74,6 +72,7 @@ import {
   readRegister,
   rootsHere,
 } from "./vehicle.js";
+import { attachTo } from "../bridge/vehicle.js";
 import { stubInto } from "./stub.js";
 import { HOOKS } from "./precommit.js";
 import { graphIn } from "./graph.js";
@@ -83,6 +82,7 @@ import { voice } from "./voice.js";
 import { retro } from "./retro.js";
 import { ticket } from "./ticket.js";
 import { cloud, work } from "./work.js";
+import { handDoors } from "./hand.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -126,9 +126,7 @@ async function doorsHere() {
     fails: await said.ask("work.failsBeforePerson"),
     refusals: await said.ask("work.refusalsBeforePerson"),
     splits: await said.ask("work.stepsBeforeSplit"),
-    // [[spec/design_output/pull#the-hand-rule]]
-    agent: Boolean(process.env.CLAUDECODE || process.env.CLAUDE_CODE_REMOTE || process.env.SE_CLOUD),
-    cloud: Boolean(process.env.CLAUDE_CODE_REMOTE || process.env.SE_CLOUD),
+    ...handDoors(process.env),
     node: process.execPath,
     join,
   };
@@ -143,7 +141,6 @@ const bin = whereIs(files, root, "vale", known);
 // [[spec/design_output/pull#the-voice-reads-the-evidence]]
 it.vale = bin;
 const go = whereIs(files, root, "go", known);
-const LOG = join(root, ".se", "log");
 const STYLES = join(root, "spec", "config", "styles", "VoiceVale");
 const SHAPE = join(root, "spec", "config", "styles", "VoiceShape");
 const SCRIPTED = join(root, "spec", "config", "styles", "VoiceScript");
@@ -241,9 +238,9 @@ const verbs = {
     says: "measure scores a folder, and refused ranks what the doors turn away",
     run: async () => voice(root, rest, it, bin),
   },
-  log: {
-    says: "what every door says, in the viewer this tree builds",
-    run: async () => readLog(rest),
+  tui: {
+    says: "the window this tree builds: the log, the work, and a tab it opens on",
+    run: async () => (await import("./tui.js")).openTui(tuiDoors(), rest),
   },
   serve: {
     says: "the server behind the bridgehead, under the debugger with --inspect",
@@ -313,8 +310,8 @@ function theVehicle(argv) {
     return 0;
   }
   if (said === "attach") {
-    attach(files, it.clock, pair.work, made.id);
-    console.log(`${pair.work} names ${made.id} as the copy driving it.`);
+    const settled = attachTo(files, env, it.clock, pair.work, pair.method);
+    console.log(`${pair.work} names ${made.id} as the copy driving it, at port ${settled.port}.`);
     return 0;
   }
   if (said === "detach") {
@@ -543,40 +540,20 @@ function gridFaults(where) {
 function serveBridge(argv) {
   const inspect = argv.filter((one) => one.startsWith("--inspect"));
   const server = join(root, "src", "bridge", "server.js");
-  return outside.run([process.execPath, ...inspect, server, root], { cwd: root, inherit: true }).exitCode;
+  return outside.run([process.execPath, ...inspect, server, root], { cwd: root, inherit: true, env: inspect.length ? { SE_BREAK_ON_STOP: "1" } : undefined }).exitCode;
 }
 
 // [[spec/design_output/viewer#the-verb-builds-it]]
-function readLog(argv) {
-  const plain = argv.includes("--plain");
-  const viewer = plain ? { exe: "", why: "" } : viewerHere();
-  if (viewer.why) console.error(viewer.why);
-  const session = join(root, SESSION);
-  if (viewer.exe) {
-    files.makeDir(LOG);
-    return outside.run([viewer.exe, session], { cwd: root, inherit: true }).exitCode;
-  }
-
-  const old = join(root, OLD);
-  const read = [
-    ...(argv.includes("--all") && files.exists(old)
-      ? namesIn(old, ".jsonl").sort().map((name) => join(old, name))
-      : []),
-    ...(files.exists(session) ? [session] : []),
-  ];
-  if (!read.length) {
-    console.log("No log stands yet. A writer starts one the next time it says a line.");
-    return 0;
-  }
-  for (const path of read) {
-    console.log(show(path));
-    for (const one of rowsOf(files.read(path))) console.log(asRow(one));
-  }
-  if (!plain) {
-    console.log("");
-    console.log("Go builds the viewer these rows open in. Install Go, and run this again.");
-  }
-  return 0;
+function tuiDoors() {
+  return {
+    root,
+    join,
+    disk: files,
+    proc: outside,
+    viewer: viewerHere,
+    names: namesIn,
+    show,
+  };
 }
 
 function viewerHere() {
@@ -591,14 +568,20 @@ function viewerHere() {
 
 // [[spec/design_output/viewer#the-check-runs-its-tests]]
 function viewerHolds() {
-  let ran;
-  try {
-    ran = outside.run([go, "test", "./..."], { cwd: join(root, VIEWER), inherit: true });
-  } catch {
-    console.log("go stands nowhere, so the viewer's tests go unrun here.");
-    return 0;
+  const folders = [VIEWER];
+  for (let at = 1; at < SHARED.length; at += 2) folders.push(SHARED[at]);
+  let worst = 0;
+  for (const folder of folders) {
+    let ran;
+    try {
+      ran = outside.run([go, "test", "./..."], { cwd: join(root, folder), inherit: true });
+    } catch {
+      console.log("go stands nowhere, so the viewer's tests go unrun here.");
+      return 0;
+    }
+    worst = worst || ran.exitCode;
   }
-  return ran.exitCode;
+  return worst;
 }
 
 // [[spec/design_output/config#the-verb-names-the-layer]]
@@ -933,9 +916,7 @@ async function standing() {
     return 0;
   }
   console.log(said);
-  console.log("");
-  const stop = (await settings.ask("stop.enabled")) !== false;
-  console.log(canary({ ...countsOf(notes), stop }));
+  console.log(`\n${canaryText(canary({ ...countsOf(notes), stop: (await settings.ask("stop.enabled")) !== false }))}`);
   return 0;
 }
 

@@ -1,0 +1,63 @@
+// The answer door over a fake box: a report pays the demand at once, every
+// call after passes, and the words name the chat first. The log keeps an
+// answer's lines.
+// [[spec/design_output/level0#the-reply-line]]
+
+import assert from "node:assert/strict";
+import { test } from "node:test";
+import { ANSWER_KIND, rowOf } from "../../.claude/skills/level0/lib/log.js";
+import { demands, holdsForAnswer, pays, SAYS } from "../../src/bridge/answer.js";
+
+function box() {
+  const said = [];
+  return { said, log: { say: (...row) => said.push(row) } };
+}
+
+test("a report pays the demand, and no call after it meets the door", () => {
+  const it = box();
+  demands(it, "The owner sent a prompt");
+  assert.deepEqual(
+    holdsForAnswer({ tool: "Read" }, it),
+    null,
+    "the first call after the prompt passes",
+  );
+  assert.deepEqual(
+    holdsForAnswer({ tool: "Read" }, it),
+    { needs: "reply" },
+    "the second asks for the reply",
+  );
+
+  const answer = pays(it, "Understood: the tests first, then the door.");
+  assert.match(answer, /answers: The owner sent a prompt/);
+  assert.match(answer, /Write it in the chat too/);
+  assert.equal(it.demand, null);
+  assert.deepEqual(
+    holdsForAnswer({ tool: "Read" }, it),
+    null,
+    "and nothing warns after",
+  );
+  assert.deepEqual(holdsForAnswer({ tool: "Edit" }, it), null);
+  assert.equal(it.said.at(-1)[1], "reply", "the log carries the reply");
+});
+
+test("a report with no demand lands in the log, and still asks for the chat", () => {
+  const it = box();
+  assert.match(pays(it, "An update."), /Nothing asked for one.*chat/);
+  assert.equal(it.said[0][1], "reply");
+});
+
+test("the door's words put the chat first and the report beside it", () => {
+  const said = SAYS("The owner sent a prompt");
+  assert.match(said, /write it in the chat as text/);
+  assert.match(said, /mcp__level0__report with the same text/);
+});
+
+// [[spec/design_output/log#an-answer-stands-in-chat]]
+test("an answer row keeps its lines, so a list and a table keep their shape, and any other row reads as one line", () => {
+  const text = "- one\n- two\n\n| a | b |\n|---|---|\n| 1 | 2 |";
+  assert.equal(rowOf("now", "info", ANSWER_KIND, text).said, text);
+  assert.equal(
+    rowOf("now", "info", "reply", text).said,
+    "- one - two | a | b | |---|---| | 1 | 2 |",
+  );
+});

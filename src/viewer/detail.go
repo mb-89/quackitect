@@ -36,12 +36,17 @@ func pairsOf(all []Record, at int) []Record {
 					out = append(out, all[next])
 					answered = true
 				}
+			// A note the session parks inside the turn shows under the prompt holding it. [[spec/design_output/viewer#the-details]]
+			case "note":
+				if !answered {
+					out = append(out, all[next])
+				}
 			case "reply":
 				return append(out, all[next])
 			}
 		}
 		return out
-	case "answer":
+	case "answer", "note":
 		for back := at - 1; back >= 0; back-- {
 			if all[back].Kind == "prompt" {
 				return []Record{all[back]}

@@ -17,18 +17,17 @@ import {
   CONTRACT_HEADING,
   DONE,
   dependsOn,
-  freeNow,
   groupStanding,
   HELD,
   MERGED,
   MINE,
-  standingOf,
   setStatus,
   statusOf,
   TODO,
   URGENCY,
   urgencyOf,
   waitingOn,
+  whyOf,
   withContract,
   work,
 } from "../../src/scripts/work.js";
@@ -40,7 +39,7 @@ import {
   withField,
   withHashAfter,
 } from "../../src/scripts/group.js";
-
+import { probeOf, startOf } from "../../src/scripts/serve.js";
 const ROOT = "/tree";
 const HERE = join(ROOT, BRIEF);
 
@@ -63,9 +62,7 @@ function heard(what) {
     console.error = wasError;
   }
 }
-
 const ranGit = (said) => said.ran.map((one) => one.argv.join(" "));
-
 const SHA = "b818c390c02737351bf1b73aba36a573d34d2ecc";
 
 const onBranch = (name) => ({
@@ -81,7 +78,9 @@ test("every brief carries the contract, and adding it twice changes nothing", ()
   const once = withContract("# A brief\n\nDo the thing.\n");
   assert.ok(once.includes(CONTRACT_HEADING), "the contract lands");
   assert.ok(once.includes("./RUNME.sh branch done"), "it names how to finish");
-  assert.ok(once.includes("./RUNME.sh branch release"), "it names how to stop early");
+  // [[spec/design_output/work#a-box-hands-the-person-out]]
+  assert.ok(once.includes("Stop for no person"), "it refuses the wait");
+  assert.ok(once.includes("branch\n   unblock <ticket> <successor>"), "it names how to hand one out");
   assert.equal(withContract(once), once, "a second pass changes nothing");
 });
 
@@ -125,20 +124,6 @@ test("a branch waits for a dependency until trunk holds it", () => {
     ["work/merged", MERGED],
   ]);
   assert.deepEqual(waitingOn(brief, standing), ["open", "busy", "ready"]);
-});
-
-test("a dependency done and unmerged holds its dependent, and merged frees it", () => {
-  const said = (status, waits) =>
-    `---\nstatus: ${status}\n${waits ? `depends_on: ${waits}\n` : ""}---\n\n# A brief\n`;
-  const briefs = new Map([
-    ["work/the-schema-reads", said(DONE)],
-    ["work/the-schema-refuses", said(TODO, "the-schema-reads")],
-  ]);
-  assert.deepEqual(freeNow(briefs), [], "done waits on a merge");
-  assert.deepEqual(freeNow(briefs, new Set(["work/the-schema-reads"])), [
-    "work/the-schema-refuses",
-  ]);
-  assert.equal(standingOf(briefs, new Set(["work/the-schema-reads"])).get("work/the-schema-reads"), MERGED);
 });
 
 test("urgency orders now before soon before whenever", () => {
@@ -519,28 +504,6 @@ test("done refuses where the battery answers nothing green", () => {
   assert.match(heard(() => work(ROOT, ["done"], dirty.it)).said, /unclean tree/);
 });
 
-test("freeNow names a branch at todo waiting on nobody, and no other", () => {
-  const said = (status, waits) =>
-    `---\nstatus: ${status}\n${waits ? `depends_on: ${waits}\n` : ""}---\n\n# A brief\n`;
-
-  const free = freeNow(
-    new Map([
-      ["work/open", said(TODO)],
-      ["work/waiting", said(TODO, "open")],
-      ["work/holding", said(HELD)],
-      ["work/finished", said(DONE)],
-    ]),
-  );
-
-  assert.deepEqual(free, ["work/open"]);
-});
-
-test("freeNow frees a branch whose dependency left the queue", () => {
-  const waits = `---\nstatus: ${TODO}\ndepends_on: merged-already\n---\n\n# A brief\n`;
-
-  assert.deepEqual(freeNow(new Map([["work/late", waits]])), ["work/late"]);
-});
-
 // A branch carrying a group ticket is a group. [[spec/design_output/work#a-group-is-a-ticket]]
 const GROUP_NOTE = `---
 kind: [[ticket]]
@@ -610,7 +573,7 @@ test("take claims a group by writing the hand and hash_before into its record, a
     ...HAND,
   });
 
-  const { code, said } = heard(() => work(ROOT, ["take"], it));
+  const { code, said } = heard(() => work(ROOT, ["take"], { ...it, agent: true }));
 
   assert.equal(code, 0);
   assert.ok(ranGit(outside).includes("git switch work/one-group"));
@@ -629,11 +592,11 @@ test("a pull on trunk takes a group for a cloud box, the way branch take does", 
     { [on("one-group")]: GROUP_NOTE, ...HAND },
   );
 
-  const { code, said } = heard(() => work(ROOT, ["pull"], { ...it, cloud: true }));
-
+  for (const [argv, code] of [[probeOf("node", 6510), 1], [startOf(ROOT), 0]]) outside.proc.teach(argv, { exitCode: code });
+  const { code, said } = heard(() => work(ROOT, ["pull"], { ...it, cloud: true, agent: true }));
   assert.equal(code, 0);
-  assert.ok(ranGit(outside).includes("git switch work/one-group"), "the pull takes the group");
-  assert.ok(ranGit(outside).includes("git push origin work/one-group"));
+  assert.match(said, /The server starts detached/, "a cloud take starts the server where nothing answers");
+  assert.ok(ranGit(outside).includes("git switch work/one-group") && ranGit(outside).includes("git push origin work/one-group"), "the pull takes the group and pushes it");
   assert.equal(heldIn(disk.read(on("one-group"))).hand, "box d462e994b4cef");
   assert.match(said, /Two tickets that land as one/);
 });
@@ -759,6 +722,56 @@ test("list names a group, a brief and a loose ticket, each as its own kind", () 
   assert.match(said, /work\/one-group\s+group\s+held\s+now\s+3h/);
   assert.match(said, /a-loose-one\s+ticket\s+open\s+soon/);
   assert.doesNotMatch(said, /^one-group\s+ticket/m, "a group is no loose ticket");
+});
+
+// [[spec/design_output/work#a-ticket-under-its-group]]
+test("a group row carries a row per ticket naming it, off the branch tip", () => {
+  const { it } = doorsSaying({
+    ...groupRemote(),
+    "git ls-tree -r --name-only origin/work/one-group spec/tickets/": {
+      stdout: "spec/tickets/one-group.md\nspec/tickets/a-child.md\nspec/tickets/other-work.md\n",
+    },
+    "git show origin/work/one-group:spec/tickets/a-child.md": {
+      stdout: CHILD("one-group", "open").replace("urgency: soon", "urgency: soon\nstep: do"),
+    },
+    "git show origin/work/one-group:spec/tickets/other-work.md": {
+      stdout: CHILD("another-group", "open"),
+    },
+    "git ls-tree -r --name-only origin/main spec/tickets/": { stdout: "" },
+  });
+
+  const { code, said } = heard(() => work(ROOT, ["list"], it));
+
+  assert.equal(code, 0);
+  assert.match(said, /work\/one-group\s+group\s+todo/);
+  assert.match(said, /^ {2}a-child\s+ticket\s+open\s+do$/m);
+  assert.doesNotMatch(said, /other-work/, "a ticket naming another group stays off this row");
+  assert.doesNotMatch(said, /^ {2}one-group\s+ticket/m, "the group itself is no child of itself");
+});
+
+// [[spec/design_output/work#a-ticket-under-its-group]]
+test("a brief carries no ticket row, and a child naming no step says its urgency", () => {
+  const brief = "---\nstatus: todo\nurgency: whenever\n---\n\n# Do the thing\n";
+  const { it } = doorsSaying({
+    ...groupRemote(),
+    "git ls-remote --heads origin work/*": { stdout: "aaa\trefs/heads/work/a-brief\n" },
+    "git show origin/work/a-brief:HANDOVER.md": { stdout: brief },
+    "git ls-tree -r --name-only origin/work/a-brief spec/tickets/": {
+      stdout: "spec/tickets/a-child.md\n",
+    },
+    "git ls-tree -r --name-only origin/main spec/tickets/": { stdout: "" },
+  });
+
+  const { said } = heard(() => work(ROOT, ["list"], it));
+
+  assert.match(said, /work\/a-brief\s+brief\s+todo/);
+  assert.doesNotMatch(said, /a-child/, "a brief names no tickets");
+  assert.equal(whyOf(CHILD("one-group", "open")), "do", "a ticket says the step it stands at");
+  assert.equal(
+    whyOf(CHILD("one-group", "open").replace(/steps:[\s\S]*?\n---/, "---")),
+    "soon",
+    "a ticket naming no step falls back to its urgency",
+  );
 });
 
 // [[spec/design_output/work#a-stale-group-is-yours]]

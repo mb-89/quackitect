@@ -3,6 +3,7 @@
 // [[spec/design_output/level0#the-owners-prompt-comes-first]]
 // [[spec/design_output/level0#the-gate-reads-the-answer]]
 
+import { SESSION } from "./log.js";
 import { scoreOf as score } from "./voice.js";
 
 // [[spec/design_output/level0#which-prompt-opens-a-turn]]
@@ -79,6 +80,57 @@ export function reachesTheOwner(tool) {
 // [[spec/design_output/level0#what-the-door-reads]]
 export function spokeSince(messages) {
   return Boolean(answerAfter(messages, ""));
+}
+
+// [[spec/design_output/level0#a-note-answers-its-prompt]]
+const NOTE_WORD = /\bnotes?\b|\bnoted\b/i;
+
+export function namesNote(text) {
+  let fenced = false;
+  for (const line of String(text ?? "").split(/\r?\n/)) {
+    if (/^\s*(```|~~~)/.test(line)) {
+      fenced = !fenced;
+      continue;
+    }
+    if (!fenced && NOTE_WORD.test(line)) return true;
+  }
+  return false;
+}
+
+// [[spec/design_output/level0#a-note-answers-its-prompt]]
+export function notesIn(box) {
+  return noteRows(box).length;
+}
+
+export function newestNote(box) {
+  return noteRows(box).at(-1) ?? "";
+}
+
+// [[spec/design_output/level0#a-note-answers-its-prompt]]
+function noteRows(box) {
+  let text = "";
+  try {
+    text = String(box.disk.read(joinIn(box)));
+  } catch {
+    return [];
+  }
+  const out = [];
+  for (const line of text.split(/\r?\n/)) {
+    if (!line.trim()) continue;
+    try {
+      const row = JSON.parse(line);
+      if (String(row?.kind ?? "") === "note") out.push(String(row.text ?? row.said ?? ""));
+    } catch {}
+  }
+  return out;
+}
+
+// A log door built on a root answers the whole path already, and one built on none answers the path under it. [[spec/design_output/level0#a-note-answers-its-prompt]]
+function joinIn(box) {
+  const path = String(box.log?.path ?? "").split("\\").join("/") || SESSION;
+  const root = String(box.work ?? "").split("\\").join("/");
+  if (!root || path.startsWith(root) || /^([A-Za-z]:)?\//.test(path)) return path;
+  return `${root}/${path}`;
 }
 
 // [[spec/design_output/level0#the-question-comes-first]]

@@ -16,7 +16,7 @@ const SCHEMA = {
       properties: {
         open: {
           widget: "action",
-          runs: "./RUNME.sh log",
+          runs: "./RUNME.sh tui",
           help: "Open the log viewer.",
           keys: ["q leave", "end follow the newest line"],
           at: "U+1F4DC",

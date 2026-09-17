@@ -93,7 +93,7 @@ registers:
         shape: a list
     then: the detail, under headings
   requirement:
-    paths: ["spec/requirements/*.md"]
+    paths: ["spec/design_input/*.md"]
     grammar:
       modals: [can, must, will, shall, should]
 `;

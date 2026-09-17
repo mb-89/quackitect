@@ -23,7 +23,7 @@ line and a key each stand there, and git carries none of them.
 |---|---|---|
 | a raw note | `.se/notes`, one file per note | the write door, the commit door, and a later level |
 | a handover for the next session on this box | `.se/HANDOVER.md` | a person, and the session after this one |
-| the log | `.se/log` | `./RUNME.sh log` |
+| the log | `.se/log` | `./RUNME.sh tui` |
 
 Private means a person's name, a handle, an address, a number, a date in prose
 and a path on a disk. Unstructured input somebody stores for later is private

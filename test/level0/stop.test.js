@@ -7,6 +7,7 @@ import {
   askForStop,
   decide,
   detail,
+  namesNext,
   pool,
   reprompt,
   rulesOf,
@@ -31,7 +32,14 @@ const TABLE = [
     side: "stop",
     priority: 95,
     decides: "mechanical",
-    runs: "session-is-new",
+    runs: "chat-is-new",
+  },
+  {
+    id: "opening",
+    side: "stop",
+    priority: 96,
+    decides: "claimed",
+    runs: "opening-check",
   },
   { id: "blocked", side: "stop", priority: 90, decides: "claimed", asks: "A person?" },
   {
@@ -53,13 +61,26 @@ const TABLE = [
 ];
 
 function ranOf(fired = []) {
-  const known = ["session-is-new", "work-waiting", "stop-hook-off", "never"];
+  const known = ["chat-is-new", "opening-check", "work-waiting", "stop-hook-off", "never"];
   return (name) => (known.includes(name) ? fired.includes(name) : undefined);
 }
 
 function voted(fired, claimed) {
   return decide(TABLE, { claimed, ran: ranOf(fired) });
 }
+
+// [[spec/design_output/stop#a-claim-a-check-holds]]
+test("a claimed rule naming a check waits for both", () => {
+  assert.equal(voted(["opening-check"], "opening").stop.id, "opening", "the claim and the check stand");
+  assert.equal(voted([], "opening").stop, undefined, "the claim alone fires nothing");
+  assert.equal(voted(["opening-check"]).stop, undefined, "the check alone fires nothing");
+});
+
+test("a claim the check refuses leaves the turn open", () => {
+  const said = voted(["work-waiting"], "opening");
+  assert.equal(said.ends, false);
+  assert.equal(said.go.id, "work");
+});
 
 test("a turn nothing fires over ends", () => {
   const said = voted([]);
@@ -75,13 +96,13 @@ test("work standing holds an unclaimed turn open", () => {
 });
 
 test("the free stop stands over work still standing", () => {
-  const said = voted(["work-waiting", "session-is-new"]);
+  const said = voted(["work-waiting", "chat-is-new"]);
   assert.equal(said.ends, true);
   assert.equal(said.stop.id, "new");
 });
 
 test("the owner saying carry on spends the free stop", () => {
-  const said = voted(["work-waiting", "session-is-new"], "carry-on");
+  const said = voted(["work-waiting", "chat-is-new"], "carry-on");
   assert.equal(said.ends, false);
   assert.equal(said.go.id, "carry-on");
 });
@@ -122,7 +143,7 @@ test("a runs value the code does not know fires nothing and is named", () => {
 
 test("the line names both sides and the count", () => {
   assert.equal(
-    detail(voted(["work-waiting", "session-is-new"]), 2),
+    detail(voted(["work-waiting", "chat-is-new"]), 2),
     "stop=new@95 continue=work@80 inARow=2",
   );
   assert.equal(detail(voted([]), 0), "stop=none@0 continue=none@0 inARow=0");
@@ -190,19 +211,6 @@ test("the claim lives as long as the call naming it, and no longer", () => {
   assert.equal(it.atTurnEnd(voted([])).stop, undefined, "the next turn opens with none");
 });
 
-test("the free stop fires one time in a session", () => {
-  const it = toothOf({ fresh: 10 });
-  assert.equal(it.isNew(), true);
-  it.atTurnEnd(voted(["session-is-new"]));
-  assert.equal(it.isNew(), false, "the hook granted a stop");
-});
-
-test("the free stop goes once ten tool calls stand behind the session", () => {
-  const it = toothOf({ fresh: 10 });
-  for (let i = 0; i < 10; i++) it.sawCall("Read");
-  assert.equal(it.isNew(), false);
-});
-
 // [[spec/design_output/stop#three-in-a-row]]
 test("mostInARow ends a runaway", () => {
   const it = toothOf();
@@ -222,6 +230,17 @@ test("a firm continue rule holds past the cap, because the queue still holds wor
   for (let i = 0; i < 5; i++) carried.push(it.atTurnEnd(firm, 3).ends);
   assert.deepEqual(carried, [false, false, false, false, false]);
   assert.equal(it.atTurnEnd({ ends: false, go: { id: "work-still-stands" } }, 3).ends, true, "a plain rule lets go at the cap");
+});
+
+// [[spec/design_output/stop#the-chat-is-new]]
+test("an answer names a next step where a sentence opens on the agent's own next act, and a table or the canary names none", () => {
+  const canary = "level0 holds this session: 51 rules, 4 notes, the stop hook on.";
+  assert.equal(namesNext(`Understood. I read the branches first.\n\n${canary}`), true);
+  assert.equal(namesNext("Fifteen branches stand on origin. Next I run the reviewer."), true);
+  assert.equal(namesNext("- The merge stands complete.\n- Then I pull the next ticket."), true);
+  assert.equal(namesNext(`| Question | Answer |\n|---|---|\n| Next? | I read them |\n\n${canary}`), false, "a table names no step");
+  assert.equal(namesNext("The work stands complete.\n\nstop: the-work-stands-complete"), false);
+  assert.equal(namesNext(""), false);
 });
 
 test("a prompt from outside the plugin puts the count back", () => {

@@ -41,7 +41,7 @@ const SCHEMA = {
       properties: {
         open: {
           widget: "action",
-          runs: "./RUNME.sh log",
+          runs: "./RUNME.sh tui",
           group: "agent control",
           row: 0,
           column: 0,

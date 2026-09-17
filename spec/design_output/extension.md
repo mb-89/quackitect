@@ -56,6 +56,7 @@ every field in use.
 | `help` | the sentence a hover carries |
 | `unit` | the word standing beside an editor |
 | `runs` | what an action runs |
+| `asks` | what an action asks the owner for first, and `runs` carries it in angle brackets |
 | `keys` | the keys the program an action opens needs |
 | `sets`, `watches` | the two keys a status splits into |
 
@@ -93,8 +94,10 @@ options and its mark, and each leaves the group open:
 | control | at rest | one click | five clicks |
 |---|---|---|---|
 | the engine | at rest | running | none |
-| binding | bound to the queue | unbound | god mode |
-| autonomy | finish your own token | start new tokens | ideation |
+| binding | `queue` | `unbound` | `god` |
+
+The rows name the value each gesture writes. For what a value means, see
+[[spec/design_output/config#the-engine-controls]].
 
 Marking a group draws one, so an engine landing later takes an edit to the
 schema. The mark for the engine waits on the owner: play and stop, one per
@@ -267,7 +270,7 @@ Every press that writes, every run and every edit in the config tree writes a
 
 - One press writes `stop.hold is finish`, with the detail `one press`.
 - Five presses write `stop.hold is stop`, with the detail `5 presses`.
-- The log button writes `log.open runs ./RUNME.sh log`.
+- The log button writes `log.open runs ./RUNME.sh tui`.
 - An edit in the config tree writes `stop.mostInARow is 5`, with the detail `the config tree`.
 
 A window writes one file, named by its first line, and writes it whole on every
@@ -311,9 +314,9 @@ widget: the verb writes the local file, and the watcher does the rest.
 
 ## The log opens a terminal
 
-The log action runs `./RUNME.sh log`, which opens the log viewer in a terminal
-beside the editor. An action opening another program hands a person that
-program's keys. So the declaration carries them and the hover says them.
+The log action runs `./RUNME.sh tui`, which opens the window on its log tab, in
+a terminal beside the editor. An action opening another program hands a person
+that program's keys. So the declaration carries them and the hover says them.
 For details, see [[spec/design_output/viewer#the-keys]].
 
 The rule holds for every action. Where an action starts another program, its hover names
@@ -338,6 +341,31 @@ function, and a dot standing on that line already stays.
 A dead server blocks nothing, so the agent runs the same with the light dark.
 The sidebar writes the start and the stop at `info`, and so does the server.
 For details, see [[spec/design_output/level0#the-bridgehead-and-the-server]].
+
+## Two buttons make both
+
+Two actions stand in the section `engine`, beside where the engine's play
+and stop marks land. Each carries `asks` set to `folder`, and its `runs`
+carries `<folder>` where the folder goes:
+
+| key | `icon` | runs |
+|---|---|---|
+| `engine.vehicle` | `🚚` | `./RUNME.sh vehicle into <folder>` |
+| `engine.stub` | `🌱` | `./RUNME.sh stub into <folder>` |
+
+A press on one goes this way:
+
+1. The sidebar reads `asks` off the schema by the key the message carries.
+2. The door opens the editor's folder dialog, and answers the folder or the empty string.
+3. The empty string ends the press, and the log takes no line.
+4. The folder lands in `runs` in place of `<folder>`, in double quotes, so a space in it holds.
+5. The line runs in a terminal, the way the log button runs, and the log takes the line.
+
+So the verbs behind the buttons stay the ones the shell runs. A refusal from
+a verb stands in the terminal, where the owner reads it. The marks are
+the owner's to swap in the schema. The fake door in the sidebar test answers
+the folder, and a contract test reads the two entries off the declaration on
+disk.
 
 # What level zero holds
 
@@ -541,7 +569,7 @@ nobody who reads it.
 
 ## The button prints the log
 
-The log button runs `./RUNME.sh log`, and the viewer takes the terminal it
+The log button runs `./RUNME.sh tui`, and the viewer takes the terminal it
 opens. `--plain` prints the rows into that terminal instead, and so does a box
 where Go builds no viewer.
 

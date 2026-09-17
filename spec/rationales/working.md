@@ -79,3 +79,44 @@ watches. One wrong line in it spends a box.
 
 So the owner reads a brief before it lands. That costs one reading, and it buys
 back every session the brief would misdirect.
+
+## 14. One place owns a thing
+
+A tree writes one concept in three places, and the three drift. Each reader
+meets one of them and works from it. Two of the three then teach something the
+tree stopped meaning, and nobody reads the disagreement, because nobody reads
+all three at once.
+
+The measurement stands in this tree. `engine.autonomy` reached five wordings
+across the schema, two design outputs and two tickets. It carried no value in
+`spec/config/level0.json` and no reader in any module. Five places described a
+thing that no code kept.
+
+A second wording costs more than a second copy. A copy of a line breaks a search
+for that line, and the search finds both. A rewording of an idea breaks nothing
+a search sees, so it survives and drifts.
+
+## 15. Assert nothing you leave alone
+
+Ownership and duplication are one thing seen twice. A place describing what it
+owns states a fact. A second place describing that same thing states a guess
+about somebody else's work, and it ages the moment the owner moves.
+
+The aside costs more than the copy, because nothing links it back. A hand
+changing a folder reads the notes that folder owns. It reads no ticket that
+described the folder in passing, to ground a choice about something else.
+
+This tree measured it twice in one session:
+
+| the sentence a draft wrote | what the review answered |
+|---|---|
+| `spec/config` holds a folder for each thing a projection reads | the stop door and Vale read two of them, and a projection writes a third |
+| each folder under `spec/config` answers to one reader | one of them answers to three |
+
+Neither sentence carried the ticket's own answer, which was the path an icon
+stands at. Both stood to ground a choice, and a reader acted on neither.
+
+So the rule reads as bounds, and it asks one question before a sentence lands:
+does a reader act on this? A reader wanting the mechanism reads the note owning
+it, and a rationale holds the argument. A hand writing what a reader acts on
+writes less, and ages none of it.

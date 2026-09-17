@@ -151,6 +151,35 @@ number `5`, which keeps `"5" > 3` a bug nobody files.
 Where the schema knows no such key, the text lands as given. A key only the
 local file names resolves, and nothing knows its type.
 
+# The engine controls
+
+`engine.binding` says how tightly the queue holds a session. This chapter is the
+one place naming what each value means. The schema holds the enum, the sidebar
+draws the toggle, and the stop hook reads the field, and each of those points
+here.
+
+| value | where the work comes from | what the stop hook refuses |
+|---|---|---|
+| `queue` | the queue hands out the next leaf, and hands another the moment one closes | a stop while the ticket stands open, and a stop while the queue holds anything at all |
+| `unbound` | a person names the ticket, and the pull hands out nothing on its own | a stop while the ticket stands open |
+| `god` | a person, and the engine stands aside | nothing |
+
+**`queue` is an endless loop.** A cloud box runs here, because it works with
+nobody beside it. It pulls until the queue holds nothing for it, and a finished
+ticket brings the next one. The stop hook refuses a stop on two grounds: the
+ticket stands open, or the queue holds more work.
+
+**`unbound` is the mode a person talks in.** A session here takes the one ticket
+a person names, and skips the chain behind it. The stop hook still refuses a
+stop while that ticket stands open. Once the ticket closes, the queue hands out
+nothing, and the session stops. Every other rule holds: a session works under a
+ticket, reads and writes through the doors, and keeps the voice rules.
+
+**`god` is the engine standing aside.** It stands where killing the hooks
+stands, with the tree still running. A person reaches into something broken and
+fixes it, and no hook argues. [[spec/design_output/stop]] holds what the hook
+does on the other two.
+
 # The magic numbers take names
 
 A number that carries a meaning stands in one place, and code reads it by name.

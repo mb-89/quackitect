@@ -207,9 +207,27 @@ test("ticket note writes a note row, so the answer door reads it off the log", (
       level: "info",
       kind: NOTE,
       line: "The lint drags.",
-      more: { ticket: "slow-lint" },
+      more: { text: "The lint drags.", ticket: "slow-lint" },
     },
   ]);
+});
+
+// The row holds one sentence under `said`, and the details read `text`. [[spec/design_output/log#what-a-box-writes]]
+test("a note past the row's width carries its whole line under text", () => {
+  const rows = [];
+  const said = treeWithProcesses();
+  said.it.log = {
+    say: (_level, _kind, line, more) => {
+      rows.push({ line, more });
+      return Promise.resolve();
+    },
+  };
+  const long = `The lint drags, ${"and it drags on ".repeat(8)}so the row clips it.`;
+  ticket(ROOT, ["note", "slow-lint", long], said.it);
+
+  assert.ok(long.length > 80, "the line runs past the width a row holds");
+  assert.equal(rows[0].more.text, long, "text carries the line whole");
+  assert.equal(rows[0].line, long, "the door reads the whole line, and clips its own row");
 });
 
 test("ticket note writes from off the hold, as the ticket and the step in hand", () => {

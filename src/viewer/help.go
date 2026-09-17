@@ -1,65 +1,51 @@
-// What alt+? and alt+f open in the details pane: how the window works, and how
-// the filter reads. The header names the keys, and these say the rest.
+// What alt+? and alt+f open in the pane, under the keys. The bands name every
+// key out of its registration, and this text says what no key says: the
+// columns, the colours, the floor, the details and how the filter reads.
 // [[spec/design_output/viewer#the-help]]
 
 package main
 
 const HelpText = `THE WINDOW
 
-The log stands on the left, one line per thing that happens. The pane on the
-right shows one of three things, and the key that opens it closes it again.
-
-  enter          the details of the selected line
-  alt+?          this help
-  alt+f          the filter
-
-KEYS
-
-  w s            one line up, one line down
-  up down        scroll the pane, or move the log while no pane stands open
-  pgup pgdn      a whole window up or down
-  home           the first line
-  end            the newest line, and follow every line arriving
-  e              the newest error, and e again the one before it
-  alt+l          raise the floor: info, warn, error, fatal, then debug, and round again
-  q  ctrl+c      leave
-
-The log and the pane each keep their place, so a person reads a long reply
-with the arrows and steps to the next line with s.
+A strip of tabs stands at the top, the open tab on the left, one pane on the
+right and the status marks at the foot. The pane shows one of three things, and
+the key that opens it closes it again. The tab and the pane each keep their
+place, so a person reads a long reply and steps to the next row, and both hold.
 
 FOLLOWING
 
-On the newest line the window follows. Anywhere above it, the window holds
-still while lines arrive. end brings it back.
+On the newest row the window follows. Anywhere above it, the window holds
+still while rows arrive. end brings it back.
 
 THE COLUMNS
 
-  time           when the line lands, on this box's clock
+  time           when the row lands, on this box's clock
   level          info in grey, debug dim, and warn, error and fatal in colour
-  kind           what it is. A tool line names its tool
+  kind           what it is. A tool row names its tool
   said           one sentence. The details hold the whole text
 
 COLOURS
 
 A prompt stands in yellow, and a reply in green. A warning stands in amber,
-an error in red, and a fatal line in magenta. Every other kind wears its own
+an error in red, and a fatal row in magenta. Every other kind wears its own
 colour.
 
 THE FLOOR
 
-The window shows the lines at the floor and above. The floor opens at info,
-so debug lines stay hidden until alt+l brings the floor round to debug. The
-header names the floor beside alt+l, in red while it stands off info.
+The window shows the rows at the floor and above. The floor opens at info, so
+debug rows stay hidden until the floor comes round to debug. The footer names
+the floor at its right end, in the colour of the level it names.
 
 THE DETAILS
 
 A prompt shows its answer and the reply ending its turn. An answer shows its
-prompt, and a reply shows every prompt of its turn. Every other line shows the fields its writer adds.
+prompt, and a reply shows every prompt of its turn. Every other row shows the
+fields its writer adds.
 
 THE FILTER
 
-alt+f opens a line to type the filter into. While a filter holds, alt+f in
-the header stands in bold red. Clear the line and every line comes back.`
+The filter is the open tab's own, and the funnel in the footer stands red
+while one holds. Clear the line and every row comes back.`
 
 const FilterHelp = `THE FILTER
 
@@ -68,13 +54,12 @@ this pane with the filter still holding. Clear the line to drop it.
 
 SHORTCUTS
 
+  alt+q                keep the prompts and the replies: the talk
   alt+shift+f          keep every line of the selected line's kind
-  alt+ctrl+f           keep every line of the selected line's level
 
-A tool line's kind is its tool, as Read or Bash. The shortcut writes the
+A tool line's kind is its tool, as Read or Bash. A shortcut writes the
 filter into the line above, so it reads and edits like one typed. The same
-shortcut on a line of that kind again clears the filter. Both work with this
-pane shut too.
+shortcut again clears the filter. Each works with this pane shut too.
 
 The language is KQL, the one Kibana uses.
 

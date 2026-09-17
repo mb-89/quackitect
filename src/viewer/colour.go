@@ -37,6 +37,7 @@ var kindColours = map[string]string{
 	"vale":     "150",
 	"judge":    "183",
 	"work":     "117",
+	"note":     "181",
 	"unparsed": "208",
 }
 
@@ -97,8 +98,9 @@ func saidStyle(r Record) lipgloss.Style {
 		return promptStyle
 	case "reply":
 		return replyStyle.Bold(false)
-	case "answer":
-		return lipgloss.NewStyle().Foreground(lipgloss.Color("121"))
+	// The kind list names the colour once, and the said column reads it there. [[spec/design_output/viewer#colours]]
+	case "answer", "note":
+		return lipgloss.NewStyle().Foreground(kindStyle(r.Kind).GetForeground())
 	}
 	return lipgloss.NewStyle()
 }
