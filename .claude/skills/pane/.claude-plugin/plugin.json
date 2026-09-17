@@ -1,0 +1,8 @@
+{
+  "name": "pane",
+  "description": "The tree as a pane. The editor draws this declaration in a sidebar, and this draws the same rows beside the transcript, so a session shows what it runs under and a press changes it.",
+  "version": "0.1.0",
+  "author": {
+    "name": "quackitect"
+  }
+}
