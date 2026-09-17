@@ -89,12 +89,18 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
     hash_before: ad522192f4a8f0c4c092881fdaccd4ef723c3d93
     hash_after: ad522192f4a8f0c4c092881fdaccd4ef723c3d93
+  - step: design/review
+    hand: box d42624a67d18a8 · claude-code · helper-2
+    hash_before: ed1616d0e2e213d38b6bc58d8c5cd95f11033dce
+    hash_after: ed1616d0e2e213d38b6bc58d8c5cd95f11033dce
+    returns: 1
+    why: "The four asked answers stand: the marketplace name, the zero cost, the icon path, the dotted folder.; The cited anchor stands. `spec/design_output/level0.md` carries the heading, and it measures the tools keeping `level0`.; The count drifts. `grep -rl mcp__level0` answers 30 today, and the draft writes 29.; The draft's own file joined that list. Name the command, and drop both numbers.; The config claim reads other than the tree. The stop door reads `spec/config/stop`, and Vale reads `spec/config/styles`.; A projection writes `spec/config/styles/VoiceParagraph`, so that folder stands as a target too.; Ground `spec/config/brand` on the folder a door reads, and say which door reads it.; The icon projection wants a shape. `projection.js` holds three shapes, and a copy of an svg fits none.; The table names `brandOf` the writer of three fields. Today `brandOf` feeds the `vehicle.json` record name alone.; `.claude-plugin/marketplace.json` carries a literal name. Name who rewrites it, and when.; The lint reads the ticket clean."
 ---
 
 # Ask
@@ -153,9 +159,19 @@ The rule is one line: lower the case, turn every run of characters outside `a-z0
 
 ### verdict
 
-<!-- pass or fail, with findings one a line -->
+fail
 
-<!-- the form is verdict -->
+- The four asked answers stand: the marketplace name, the zero cost, the icon path, the dotted folder.
+- The cited anchor stands. `spec/design_output/level0.md` carries the heading, and it measures the tools keeping `level0`.
+- The count drifts. `grep -rl mcp__level0` answers 30 today, and the draft writes 29.
+- The draft's own file joined that list. Name the command, and drop both numbers.
+- The config claim reads other than the tree. The stop door reads `spec/config/stop`, and Vale reads `spec/config/styles`.
+- A projection writes `spec/config/styles/VoiceParagraph`, so that folder stands as a target too.
+- Ground `spec/config/brand` on the folder a door reads, and say which door reads it.
+- The icon projection wants a shape. `projection.js` holds three shapes, and a copy of an svg fits none.
+- The table names `brandOf` the writer of three fields. Today `brandOf` feeds the `vehicle.json` record name alone.
+- `.claude-plugin/marketplace.json` carries a literal name. Name who rewrites it, and when.
+- The lint reads the ticket clean.
 
 # implement
 
