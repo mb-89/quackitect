@@ -19,3 +19,5 @@ rationale: [[spec/rationales/working]]
 11. Show a brief to the owner before it reaches the cloud, and push nothing they have yet to read. *
 12. Run `check_answer` over a draft answer past sixty words before you send it. A draft checked there meets the gate clean.
 13. Change many lines or files with `mcp__level0__patch` and `mcp__level0__replace`, and one spot with Edit.
+14. One place owns a thing, and every other place points at it. Search for the owner before you write, and where one stands, write the pointer. This holds over a note, a number, a rule, a name and a line of code alike. *
+15. Where two places describe one thing, one of them stands outside its bounds. Find the owner, cut the other, and leave a pointer in its place. *

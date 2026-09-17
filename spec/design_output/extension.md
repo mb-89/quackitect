@@ -95,7 +95,6 @@ options and its mark, and each leaves the group open:
 |---|---|---|---|
 | the engine | at rest | running | none |
 | binding | `queue` | `unbound` | `god` |
-| autonomy | `finish` | `start` | `ideation` |
 
 The rows name the value each gesture writes. For what a value means, see
 [[spec/design_output/config#the-engine-controls]].

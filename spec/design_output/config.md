@@ -153,23 +153,32 @@ local file names resolves, and nothing knows its type.
 
 # The engine controls
 
-Two keys under `engine` say how a session takes work and how far it carries it.
-This chapter is the one place naming what each value means. The schema holds the
-enum, the sidebar draws the toggle, and the hooks read the field, and each of
-those points here.
+`engine.binding` says how tightly the queue holds a session. This chapter is the
+one place naming what each value means. The schema holds the enum, the sidebar
+draws the toggle, and the stop hook reads the field, and each of those points
+here.
 
-| key | value | what it means | who reads it |
-|---|---|---|---|
-| `engine.binding` | `queue` | the session takes the next leaf the pull hands out | `queueWaits` in `src/bridge/stop.js` |
-| `engine.binding` | `unbound` | the session takes a ticket a person names, and the pull hands out nothing on its own | nobody yet |
-| `engine.binding` | `god` | waits for the owner to say | nobody yet |
-| `engine.autonomy` | `finish` | waits for the owner to say | nobody yet |
-| `engine.autonomy` | `start` | waits for the owner to say | nobody yet |
-| `engine.autonomy` | `ideation` | waits for the owner to say | nobody yet |
+| value | where the work comes from | what the stop hook refuses |
+|---|---|---|
+| `queue` | the queue hands out the next leaf, and hands another the moment one closes | a stop while the ticket stands open, and a stop while the queue holds anything at all |
+| `unbound` | a person names the ticket, and the pull hands out nothing on its own | a stop while the ticket stands open |
+| `god` | a person, and the engine stands aside | nothing |
 
-`engine.binding` stands at `queue` in `spec/config/level0.json`, and `engine.autonomy` carries no value there. So the second key is a promise the schema makes and no code keeps. [[spec/tickets/the-controls-wire-up]] carries the work that keeps it.
+**`queue` is an endless loop.** A cloud box runs here, because it works with
+nobody beside it. It pulls until the queue holds nothing for it, and a finished
+ticket brings the next one. The stop hook refuses a stop on two grounds: the
+ticket stands open, or the queue holds more work.
 
-A row reading "waits for the owner to say" is a value the enum admits and no note defines. A hand writing code for such a value reads this chapter first, and finds the answer here or nowhere.
+**`unbound` is the mode a person talks in.** A session here takes the one ticket
+a person names, and skips the chain behind it. The stop hook still refuses a
+stop while that ticket stands open. Once the ticket closes, the queue hands out
+nothing, and the session stops. Every other rule holds: a session works under a
+ticket, reads and writes through the doors, and keeps the voice rules.
+
+**`god` is the engine standing aside.** It stands where killing the hooks
+stands, with the tree still running. A person reaches into something broken and
+fixes it, and no hook argues. [[spec/design_output/stop]] holds what the hook
+does on the other two.
 
 # The magic numbers take names
 

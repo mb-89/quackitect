@@ -306,18 +306,6 @@
           "column": 4,
           "rowSpan": 1,
           "colSpan": 1
-        },
-        "autonomy": {
-          "type": "string",
-          "enum": [
-            "finish",
-            "start",
-            "ideation"
-          ],
-          "help": "How far the session goes on its own. The chapter The engine controls, under spec/design_output/config.md, says what each value means.",
-          "widget": "toggle",
-          "gesture": 5,
-          "icon": "U+1F680"
         }
       }
     }

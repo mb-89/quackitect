@@ -79,3 +79,29 @@ watches. One wrong line in it spends a box.
 
 So the owner reads a brief before it lands. That costs one reading, and it buys
 back every session the brief would misdirect.
+
+## 14. One place owns a thing
+
+A tree writes one concept in three places, and the three drift. Each reader
+meets one of them and works from it. Two of the three then teach something the
+tree stopped meaning, and nobody reads the disagreement, because nobody reads
+all three at once.
+
+The measurement stands in this tree. `engine.autonomy` reached five wordings
+across the schema, two design outputs and two tickets. It carried no value in
+`spec/config/level0.json` and no reader in any module. Five places described a
+thing that no code kept.
+
+A second wording costs more than a second copy. A copy of a line breaks a search
+for that line, and the search finds both. A rewording of an idea breaks nothing
+a search sees, so it survives and drifts.
+
+## 15. Two places, one owner
+
+Ownership and duplication are one thing seen twice. A place describing what it
+owns states a fact. A second place describing that same thing states a guess
+about somebody else's work, and it ages the moment the owner moves.
+
+So the rule reads as bounds. A hand writing about a thing asks first who owns
+it. Where the answer names somebody else, the hand writes the pointer, and adds
+no words of its own.
