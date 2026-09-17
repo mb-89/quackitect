@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 step: design/person-1
 steps:
@@ -122,6 +122,8 @@ record:
     why: takeable takes a leaf wanting a helper as work on every box. A box off a harness leaves that leaf parked, and branch done holds the group open. Gate it as a step for an agent gates on the box.; The change to the spawn answer carries no case. The ask third row wants the shell answer proven, so add a fifth case over it.; The prompt the engine writes carries two commands, not three. Say what stands.; The design output row for a spawn off a plugin parks the step for a person or a helper. A leaf wanting a helper admits one taker, the helper. Say which the row means.; ./RUNME.sh check answers 1 over faults the whole tree carries, and this leaf adds none.
 group: the-hand-carries-a-step
 depends_on: ["the-hand-carries-the-session"]
+reason: became
+successors: [the-spawn-answers-a-helper]
 ---
 
 # Ask
