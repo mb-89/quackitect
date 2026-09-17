@@ -9,7 +9,7 @@ keys, the filter, and how a line arrives.
 
 # The viewer
 
-`./RUNME.sh log` opens the viewer in the terminal it stands in. The window
+`./RUNME.sh tui` opens the viewer in the terminal it stands in. The window
 carries a strip of tabs, the open tab on the left, one pane on the right and a
 footer of status marks. The log is the first tab.
 
@@ -265,7 +265,7 @@ draws the window once and prints it. A reader with no terminal sees the same win
 
 # The verb builds it
 
-`./RUNME.sh log` builds the viewer into `.se/bin/logview`, and runs it over
+`./RUNME.sh tui` builds the viewer into `.se/bin/logview`, and runs it over
 `.se/log/session.jsonl`. `viewerOf` in `src/scripts/viewer.js` decides:
 
 | what stands | what the verb does |
@@ -284,6 +284,60 @@ imports nothing.
 
 Go is a want, and the installer offers it. A box without Go keeps every other
 rule.
+
+# The mouse reaches the window
+
+The window asks the terminal for the mouse, and `src/viewer/mouse.go` is the one
+place reading where an event lands:
+
+| the event | what it reaches |
+|---|---|
+| a press on row 0 | the tab under it, or the help at the strip's right end |
+| a press on the column names | the sort, which [[spec/design_output/viewer#the-columns-stand-still]] covers |
+| a press on a list row | that row, as the selection |
+| the wheel over the list | the log, three rows a notch |
+| the wheel over the open pane | the pane's own scroll |
+| any event while the filter takes letters | nothing, so typing stands undisturbed |
+
+`mouse.go` reads the geometry the window already holds, so a moving split
+carries the mouse with it. `firstRow()` names the row the list opens on, out of
+`headWide` and `namesWide`, and `overPane` reads `listWidth()`.
+
+`--mouse=false` leaves the mouse to the terminal. A window holding the mouse
+takes the terminal's own text selection. So the switch stands for a person who
+wants that selection back, and most terminals give it back under a held shift.
+
+# The work tab
+
+The strip carries the log and the work. The work tab stands empty and says so,
+so a person reads that the window holds two things. The number keys carry
+between them. The tree view, its base file and its source of items land in this
+tab next.
+
+# A tab the caller names
+
+`./RUNME.sh tui work` opens the window on that tab, and `--tab work` says the
+same. `TABS` in `src/scripts/tui.js` names which words stand, and the window
+answers `tabNamed` for the same words. A word no tab carries leaves the open tab
+where it is.
+
+# A second launch hands over
+
+The window holds a port of its own, one above the bridge's, so one window stands
+at a time:
+
+| what the launch meets | what it does |
+|---|---|
+| the port free | opens the door, and draws the window |
+| the port held | hands its tab to the window standing, says so, and ends |
+
+`src/viewer/door.go` holds both directions in one shape. `openDoor` takes a
+`POST /tab` carrying `{"tab":"work"}` and puts a `tabMsg` into the window, and
+`tellPort` sends that same shape to a port. So the window reads a tab from
+another process, and reaches another port with the words it takes.
+
+The verb calls the door first. `told` in `src/scripts/tui.js` posts the tab, and
+a door answering `ok` means a window already stands.
 
 # The check runs its tests
 

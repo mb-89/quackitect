@@ -141,6 +141,7 @@ terms:
   - {word: transcript, defines: "[[spec/design_output/level0#what-the-door-reads]]"}
   - {word: tree, defines: "[[spec/design_output/vehicle]]"}
   - {word: trunk, defines: "[[spec/design_output/work#trunk-comes-in-first]]"}
+  - {word: tui, defines: "[[spec/design_output/viewer#the-verb-builds-it]]"}
   - {word: urgency, defines: "[[spec/design_output/work#urgency-and-what-waits]]"}
   - {word: vale, defines: "[[spec/design_output/level0#the-write-door]]"}
   - {word: ini, defines: "[[spec/design_output/projection#a-layer-writes-two-files]]"}

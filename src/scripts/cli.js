@@ -9,7 +9,6 @@ import {
   countsOf,
   standingLayer,
 } from "../../.claude/skills/level0/lib/guidance.js";
-import { asRow, OLD, rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { POINTER, PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 import { withoutFalsePast } from "../bridge/tense.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
@@ -143,7 +142,6 @@ const bin = whereIs(files, root, "vale", known);
 // [[spec/design_output/pull#the-voice-reads-the-evidence]]
 it.vale = bin;
 const go = whereIs(files, root, "go", known);
-const LOG = join(root, ".se", "log");
 const STYLES = join(root, "spec", "config", "styles", "VoiceVale");
 const SHAPE = join(root, "spec", "config", "styles", "VoiceShape");
 const SCRIPTED = join(root, "spec", "config", "styles", "VoiceScript");
@@ -241,9 +239,9 @@ const verbs = {
     says: "measure scores a folder, and refused ranks what the doors turn away",
     run: async () => voice(root, rest, it, bin),
   },
-  log: {
-    says: "what every door says, in the viewer this tree builds",
-    run: async () => readLog(rest),
+  tui: {
+    says: "the window this tree builds: the log, the work, and a tab it opens on",
+    run: async () => (await import("./tui.js")).openTui(tuiDoors(), rest),
   },
   serve: {
     says: "the server behind the bridgehead, under the debugger with --inspect",
@@ -547,36 +545,16 @@ function serveBridge(argv) {
 }
 
 // [[spec/design_output/viewer#the-verb-builds-it]]
-function readLog(argv) {
-  const plain = argv.includes("--plain");
-  const viewer = plain ? { exe: "", why: "" } : viewerHere();
-  if (viewer.why) console.error(viewer.why);
-  const session = join(root, SESSION);
-  if (viewer.exe) {
-    files.makeDir(LOG);
-    return outside.run([viewer.exe, session], { cwd: root, inherit: true }).exitCode;
-  }
-
-  const old = join(root, OLD);
-  const read = [
-    ...(argv.includes("--all") && files.exists(old)
-      ? namesIn(old, ".jsonl").sort().map((name) => join(old, name))
-      : []),
-    ...(files.exists(session) ? [session] : []),
-  ];
-  if (!read.length) {
-    console.log("No log stands yet. A writer starts one the next time it says a line.");
-    return 0;
-  }
-  for (const path of read) {
-    console.log(show(path));
-    for (const one of rowsOf(files.read(path))) console.log(asRow(one));
-  }
-  if (!plain) {
-    console.log("");
-    console.log("Go builds the viewer these rows open in. Install Go, and run this again.");
-  }
-  return 0;
+function tuiDoors() {
+  return {
+    root,
+    join,
+    disk: files,
+    proc: outside,
+    viewer: viewerHere,
+    names: namesIn,
+    show,
+  };
 }
 
 function viewerHere() {

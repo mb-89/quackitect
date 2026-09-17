@@ -170,7 +170,7 @@
             "home the first line, end the newest, and it follows",
             "q leave"
           ],
-          "runs": "./RUNME.sh log"
+          "runs": "./RUNME.sh tui"
         }
       }
     },

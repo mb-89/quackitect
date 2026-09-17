@@ -7,7 +7,7 @@ import { overLong } from "./names.js";
 import { NOTES } from "./private.js";
 import { PROSE } from "./vale.js";
 
-export const VERBS = ["check", "branch", "log", "doctor"];
+export const VERBS = ["check", "branch", "tui", "doctor"];
 
 const HOME = NOTES.split("/")[0];
 

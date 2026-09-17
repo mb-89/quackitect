@@ -268,7 +268,7 @@ Every press that writes, every run and every edit in the config tree writes a
 
 - One press writes `stop.hold is finish`, with the detail `one press`.
 - Five presses write `stop.hold is stop`, with the detail `5 presses`.
-- The log button writes `log.open runs ./RUNME.sh log`.
+- The log button writes `log.open runs ./RUNME.sh tui`.
 - An edit in the config tree writes `stop.mostInARow is 5`, with the detail `the config tree`.
 
 A window writes one file, named by its first line, and writes it whole on every
@@ -312,7 +312,7 @@ widget: the verb writes the local file, and the watcher does the rest.
 
 ## The log opens a terminal
 
-The log action runs `./RUNME.sh log`, which opens the log viewer in a terminal
+The log action runs `./RUNME.sh tui`, which opens the log viewer in a terminal
 beside the editor. An action opening another program hands a person that
 program's keys. So the declaration carries them and the hover says them.
 For details, see [[spec/design_output/viewer#the-keys]].
@@ -567,7 +567,7 @@ nobody who reads it.
 
 ## The button prints the log
 
-The log button runs `./RUNME.sh log`, and the viewer takes the terminal it
+The log button runs `./RUNME.sh tui`, and the viewer takes the terminal it
 opens. `--plain` prints the rows into that terminal instead, and so does a box
 where Go builds no viewer.
 

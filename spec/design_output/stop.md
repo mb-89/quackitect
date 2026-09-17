@@ -331,4 +331,4 @@ One line per call, and one per turn end, at `info`, under the door `stop`:
     detail: stop=<id>@<priority> continue=<id>@<priority> inARow=<n>
 
 Those lines are the whole audit. The maintainer reads a misfiring tooth out of
-the log, and `./RUNME.sh log` opens it.
+the log, and `./RUNME.sh tui` opens it.
