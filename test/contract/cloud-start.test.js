@@ -45,6 +45,19 @@ function waitsFor(at) {
   return files.exists(at);
 }
 
+// The marker lands while the detached node still holds the folder as its cwd, and Windows answers EPERM to a remove under a live process, so the retry gives the child the moment it takes to exit. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+function gone(where) {
+  const held = new Int32Array(new SharedArrayBuffer(4));
+  for (let step = 0; step < WAITS; step++) {
+    try {
+      files.remove(where);
+      return;
+    } catch {
+      Atomics.wait(held, 0, 0, 100);
+    }
+  }
+}
+
 test("a box outside the cloud starts nothing, because a person stands beside it", () => {
   const where = tree(true);
   try {
@@ -91,7 +104,7 @@ test("a cloud box starts the server, and the call comes back before it stands", 
       "the log folder stands for the server to write into",
     );
   } finally {
-    files.remove(where);
+    gone(where);
   }
 });
 
