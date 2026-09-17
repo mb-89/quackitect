@@ -5,6 +5,10 @@ import { TERMS } from "./vocabulary.js";
 
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 export const VOCABULARY = "Vocabulary";
+const SHOWN = 5;
+const COMMAND = 120;
+const LINE = 72;
+const ELLIPSIS = "...";
 
 export function refusal(where, found) {
   return [
@@ -46,8 +50,8 @@ function outsideIn(found) {
 }
 
 function namesThe(words) {
-  const shown = words.slice(0, 5).map((one) => `\`${one}\``);
-  const tail = words.length > 5 ? `, and ${words.length - 5} more` : "";
+  const shown = words.slice(0, SHOWN).map((one) => `\`${one}\``);
+  const tail = words.length > SHOWN ? `, and ${words.length - SHOWN} more` : "";
   return `${shown.join(", ")}${tail}`;
 }
 
@@ -93,7 +97,7 @@ export function refusedCommand(command, found) {
   const lines = [];
   lines.push("Level zero refuses this command.");
   lines.push("");
-  lines.push(`  ran: ${cut(command, 120)}`);
+  lines.push(`  ran: ${cut(command, COMMAND)}`);
   lines.push("");
 
   for (const one of found) {
@@ -144,9 +148,9 @@ export function line(one, where) {
   return `${where}:${one.line}:${one.column}: ${one.rule}: ${one.message}`;
 }
 
-function cut(said, at = 72) {
+function cut(said, at = LINE) {
   const flat = String(said ?? "")
     .replace(/\s+/g, " ")
     .trim();
-  return flat.length > at ? `${flat.slice(0, at - 3)}...` : flat;
+  return flat.length > at ? `${flat.slice(0, at - ELLIPSIS.length)}${ELLIPSIS}` : flat;
 }

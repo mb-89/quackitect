@@ -7,15 +7,15 @@ refines:
 # Scope
 
 `src/scripts/pull.js` holds the pull and the test verb, under `./RUNME.sh
-branch`. This note covers the hand-out, the hand-back with its five checks,
-and the five answers. It covers the record, the hold per hand, and what the
+branch`. This note covers the hand-out, the hand-back with its checks,
+and the answers. It covers the record, the hold per hand, and what the
 stop hook reads off the hold. The verbs around the branch stand in
 [[spec/design_output/work]].
 
-# The five answers
+# The answers
 
-`branch pull` answers one of five words, first on its own line, with the
-detail under it:
+`branch pull` answers one word, first on its own line, with the detail under
+it:
 
 | answer | when | the hand does |
 |---|---|---|
@@ -71,7 +71,7 @@ commit the other lacks.
 ## What a hand-out reads
 
 The pull reads every ticket under `spec/tickets` and `.se/tickets`, and offers
-them in four pools, each in the order of urgency then name:
+them in pools, each in the order of urgency then name:
 
 1. a private ticket carrying `todo: true`
 2. the children of this group, and their children
@@ -191,10 +191,10 @@ Such a hand works one step: its hand-back answers `done` and hands nothing
 out. The record names the helper on the leaf, so `not` reads the two hands
 apart.
 
-The wrapper tags every other spawn. Its `agent.spawn` hook reads the session
+Level zero tags every other spawn. Its `agent.spawn` hook reads the session
 file and puts one line at the head of the prompt. The line says this helper
 is the session's own hand, and it pulls under no `--as`. A spawn the wrapper makes
-itself carries no tag, because that hand is its own. So the two kinds of
+itself marks its payload `own`, and carries no tag, because that hand is its own. So the two kinds of
 helper read apart in the prompt and in the record.
 
 # The hand-back
@@ -215,11 +215,15 @@ hash is no ancestor of the tip. Then the hold drops, and the hand pulls again.
 A hand fills the slots through the write door, or hands the fields back as
 the pull's payload. `--fields '{"verdict": "pass"}'` carries one key per
 field of the leaf in hand, and `checked` where a checklist stands. The engine
-writes each text under its heading, past the mint's comments. Then it runs
-the checks over the file as it stands. The pull refuses a key naming no
-field of the leaf.
+puts each text under its heading in memory, past the mint's comments, and runs
+the checks over that text. The pull refuses a key naming no field of the leaf.
 
-## The five checks
+A refused payload reaches no disk. It rides the hold, so the next hand-back
+with no `--fields` meets the same checks over the same text. A refusal at the
+cap inserts the person step on the ticket without the payload, so a word the
+rules refuse reaches no branch.
+
+## The checks
 
 1. the hold, as above
 2. the schema over the whole ticket, then every field of the leaf against its form
@@ -227,7 +231,7 @@ field of the leaf.
 4. the hand rule, and the tip on a verdict leaf
 5. the judge, which runs in the plugin wrapper alone
 
-The first four run in the shell, so a person's hand-back meets them too.
+Every check but the judge runs in the shell, so a person's hand-back meets them too.
 
 The wrapper under `.claude/skills/level1` imports nothing past its own folder,
 because the plugin validator refuses an import that leaves it. So the shell
@@ -298,6 +302,15 @@ commit stands on the box. So the hold drops before the push, and the refusal
 says to push the branch and pull again. A hold past that point stands on a
 closed ticket, and the stop hook holds the turn open for a hand-back nobody
 owes.
+
+## The refused commit
+
+The pre-commit hook reads the commit a hand-back makes, and a private line
+in the tree refuses it. Then nothing lands. The ticket file goes back to
+what the hand writes, the index empties, and the hold stays. The pull answers
+`refused` with the hook's finding, so the hand fixes the line and hands back
+again. So a record's `hash_after` names a commit the branch holds, and a
+refused commit writes no record. `src/scripts/landed.js` holds the landing.
 
 # The fail
 
@@ -375,6 +388,13 @@ waits for a retro.
 refuses while the ask stands empty. So the pull hands out what a person
 writes, and nothing else.
 
+The verb reads the voice rules over the Ask too, and refuses one that breaks
+a rule at the error level. The Ask is the engine's from the open on, so the
+ticket door refuses every later hand there. A rule broken past the open
+stands in the lint over the tree until a person reaches for the door.
+`src/scripts/ask-lint.js` holds the run, and a box with no Vale opens as it
+stands.
+
 # The test verb
 
 `branch test` runs the tests the branch adds or changes since the ticket's
@@ -391,5 +411,5 @@ The delta reads off `git diff` from the first `hash_before` on the ticket in
 hand, or from the branch point where no hold stands. The files git has yet to
 see count too.
 
-The run names the tap reporter, because node past 23 answers a pipe with the
-spec reporter too, and the count reads the tap lines.
+The run names the tap reporter. Node past version 23 answers a pipe with the
+spec reporter too, so the count reads the tap lines.

@@ -6,6 +6,8 @@
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 
 export const TICKETS = "spec/tickets";
+export const NOTE_END = ".md";
+export const WORK_BRANCH = "work/";
 export const GROUP = "group";
 export const OPEN = "open";
 export const CLOSED = "closed";
@@ -16,8 +18,13 @@ export const STALE = "12h";
 const SPAN = /^(\d+)\s*([mhd])$/;
 const SPANS = { m: 60, h: 3600, d: 86400 };
 
+export function ticketNamed(path) {
+  const bare = path.endsWith(NOTE_END) ? path.slice(0, -NOTE_END.length) : path;
+  return bare.slice(bare.lastIndexOf("/") + 1);
+}
+
 export function ticketAt(name) {
-  return `${TICKETS}/${name}.md`;
+  return `${TICKETS}/${name}${NOTE_END}`;
 }
 
 // [[spec/design_output/work#a-group-is-a-ticket]]
@@ -160,18 +167,25 @@ function entryRows(entry) {
     if (said === undefined || said === null || String(said) === "" || (Array.isArray(said) && !said.length)) continue;
     const lead = out.length ? "    " : "  - ";
     if (!Array.isArray(said)) {
-      out.push(`${lead}${key}: ${said}`);
+      out.push(`${lead}${key}: ${quoted(said)}`);
       continue;
     }
     out.push(`${lead}${key}:`);
     for (const one of said) {
       const pairs = Object.entries(one ?? {}).filter(([, value]) => value !== undefined && value !== null);
       for (const [at, [name, value]] of pairs.entries()) {
-        out.push(`${at ? "        " : "      - "}${name}: ${value}`);
+        out.push(`${at ? "        " : "      - "}${name}: ${quoted(value)}`);
       }
     }
   }
   return out;
+}
+
+// A value a reader takes for a mapping, a comment or a quote goes in quotes. [[spec/design_output/work#the-record-quotes-its-value]]
+export function quoted(said) {
+  const text = String(said);
+  if (!/: |^["'>|&*!%@`[{]|#| $|^$/.test(text)) return text;
+  return `"${text.split("\\").join("\\\\").split('"').join('\\"')}"`;
 }
 
 function frontShut(rows) {

@@ -1,5 +1,5 @@
-// The command door: the rules over a shell command, the voice of a commit
-// message, the private delta, the todo on a push and the trunk guard.
+// The command door. A shell reaches every file a Write reaches, so every rule
+// over a command line runs here before the command does.
 // [[spec/design_output/bash#what-the-door-reads]]
 
 import { commitIn, findings, skipsTheHook, verbLine, withoutTrailers } from "../../.claude/skills/level0/lib/bash.js";
@@ -8,11 +8,11 @@ import { NOTES, privateNow } from "../../.claude/skills/level0/lib/private.js";
 import { refusedCommand, refusedDelta } from "../../.claude/skills/level0/lib/refuse.js";
 import { saysGreen, STAMP, stampOf } from "../../.claude/skills/level0/lib/runs.js";
 import { reaches, refusedTodo, taggedIn } from "../../.claude/skills/level0/lib/todo.js";
-import { landsOnTrunk, touchesGit } from "../../.claude/skills/level0/lib/trunk.js";
+import { landsOnTrunk, touchesGit, TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
+import { WORK_BRANCH } from "../scripts/group.js";
 import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
 
-const TRUNK = "main";
 const COMMIT = "level0-commit.md";
 const PASS = { pass: true };
 const CLOUD = "---\nenv:\n  - CLAUDE_CODE_REMOTE\n  - SE_CLOUD\n---\n";
@@ -35,16 +35,16 @@ export function onDescribe(e) {
 
 // [[spec/design_output/bash#a-shell-writes-nothing]]
 async function commandRules(command, _e, box) {
-  const found = findings(command, asks(box, "names.words") ?? 5, { cloud: onACloud() });
+  const found = findings(command, asks(box, "names.words"), { cloud: onACloud() });
   found.push(...(await commitVoice(command, box)));
   if (!onACloud() && skipsTheHook(command)) {
-    box.log.say("warn", "private", "a commit steps past the hook", { tool: "Bash", detail: command.slice(0, 120) });
+    box.log.say("warn", "private", "a commit steps past the hook", { tool: "Bash", detail: command });
   }
   if (!found.length) return "";
   box.log.say("warn", "bash", `refused ${found.length} rule(s) in a command`, {
     tool: "Bash",
     rule: found[0].rule,
-    detail: command.slice(0, 120),
+    detail: command,
   });
   return refusedCommand(command, found);
 }
@@ -117,15 +117,21 @@ function trunkGuard(command, _e, box) {
     }
   }
   if (!onACloud()) return "";
-  box.log.say("warn", "bash", `refused a ${how} landing on ${TRUNK}`, { tool: "Bash", detail: command.slice(0, 120) });
+  if (!takesABranch(box)) return "";
+  box.log.say("warn", "bash", `refused a ${how} landing on ${TRUNK}`, { tool: "Bash", detail: command });
   return [
-    `A cloud box works a branch, and the harness holds ${TRUNK} shut here.`,
+    `A cloud box holding a work branch hands it back, and ${TRUNK} stays shut here.`,
     "",
-    how === "commit" ? `You stand on ${TRUNK}, so this commit would land there.` : `This pushes ${TRUNK}, which a cloud box may never move.`,
+    how === "commit" ? `You stand on ${TRUNK}, so this commit would land there.` : `This pushes ${TRUNK}, and the branch in hand goes back to the queue instead.`,
     "",
     "Run `./RUNME.sh branch pull`, which takes a branch for a cloud box and moves you onto it.",
     "Push that branch, run `branch done`, and a box off the cloud takes it into trunk.",
   ].join("\n");
+}
+
+// A CLOUD BOX HOLDING A WORK BRANCH HANDS IT BACK, AND EVERY OTHER CLOUD SESSION LANDS ITS OWN WORK. The queue owns a work branch, so a cloud box taking one carries it to the hand-back and moves trunk nowhere. A session outside that flow answers to the owner alone, and the green battery is the door it meets. [[spec/design_output/work#a-red-battery-pushes-nothing]]
+function takesABranch(box) {
+  return git(box, ["rev-parse", "--abbrev-ref", "HEAD"]).startsWith(WORK_BRANCH);
 }
 
 function batteryHere(box) {

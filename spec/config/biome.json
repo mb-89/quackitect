@@ -3,6 +3,7 @@
   "files": {
     "includes": [
       "src/**/*.js",
+      ".claude/skills/**/*.js",
       "test/**/*.js",
       "*.json",
       "!.se",
@@ -21,10 +22,22 @@
     "rules": {
       "recommended": true,
       "style": {
-        "noMagicNumbers": "off"
+        "noMagicNumbers": "error"
       }
     }
   },
+  "overrides": [
+    {
+      "includes": ["test/**/*.js"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noMagicNumbers": "off"
+          }
+        }
+      }
+    }
+  ],
   "javascript": {
     "formatter": {
       "quoteStyle": "double",

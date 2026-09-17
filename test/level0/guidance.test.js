@@ -129,13 +129,20 @@ test("the canary counts the notes carrying a rule", () => {
   );
 });
 
-test("an answer saying the line word for word comes back as the same", () => {
+test("an answer opening on the line word for word comes back as the same", () => {
   const said = canary({ rules: 14, notes: 5, stop: true });
-  const answer = `The work stands pushed.\n\n${said}\n`;
+  const answer = `${said}\n\nThe work stands pushed.\n`;
   assert.deepEqual(canaryIn(answer, said), { found: "same", said });
 });
 
-test("an answer saying other counts comes back with both", () => {
+// [[spec/design_output/level0#the-canary-opens-an-answer]]
+test("a line standing anywhere but first opens no answer, so it proves nothing", () => {
+  const said = canary({ rules: 14, notes: 5, stop: true });
+  const answer = `The work stands pushed.\n\n${said}\n`;
+  assert.deepEqual(canaryIn(answer, said), { found: "none", said: "" });
+});
+
+test("an answer opening on other counts comes back with both", () => {
   const said = canary({ rules: 14, notes: 5, stop: true });
   const other = canary({ rules: 9, notes: 5, stop: true });
   assert.deepEqual(canaryIn(`I read ${other}`, said), { found: "other", said: other });

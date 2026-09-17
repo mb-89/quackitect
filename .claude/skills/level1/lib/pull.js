@@ -1,7 +1,7 @@
 // The pull tool's pure half. The argv the tool hands the shell verb, and the
 // question the judge asks over a hand-back, so a test reads both with no
 // harness standing.
-// [[spec/design_output/pull#the-five-checks]]
+// [[spec/design_output/pull#the-checks]]
 
 export const PULL_TOOL = "pull";
 export const PULL_CALL = `mcp__level1__${PULL_TOOL}`;
@@ -58,7 +58,7 @@ export function pullArgv(said = {}) {
   return out;
 }
 
-// [[spec/design_output/pull#the-five-checks]]
+// [[spec/design_output/pull#the-checks]]
 export function judgeAsk(evidence, rules) {
   const listed = (rules ?? []).map((one, i) => `${i + 1}. ${one}`).join("\n");
   return [
@@ -80,6 +80,14 @@ export function spawnPromptIn(answer) {
   if (rows[0]?.trim() !== "spawn") return "";
   const blank = rows.indexOf("");
   return blank < 0 ? "" : rows.slice(blank + 1).join("\n").trim();
+}
+
+// [[spec/design_output/pull#the-hand-and-the-hold]]
+export function sessionOf(e) {
+  return {
+    id: String(e?.session?.id ?? e?.sessionId ?? "").trim(),
+    harness: String(e?.harness ?? e?.client ?? "").trim(),
+  };
 }
 
 export function judgeRefusal(said) {

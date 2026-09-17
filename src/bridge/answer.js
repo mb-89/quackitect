@@ -3,16 +3,23 @@
 // texts until one pays. A helper is untouched.
 // [[spec/design_output/level0#the-owners-prompt-comes-first]]
 
-import { questionsIn } from "../../.claude/skills/level0/lib/answer.js";
+import {
+  namesNote,
+  newestNote,
+  notesIn,
+  questionsIn,
+} from "../../.claude/skills/level0/lib/answer.js";
+import { SAID } from "../../.claude/skills/level0/lib/log.js";
 
 const OWNER = new Set(["composer", "sdk"]);
 const REACHES = new Set(["AskUserQuestion", "mcp__level0__report"]);
 export const SPOKE = "agent.spoke";
 
+// The owner reads the chat, and the log reads the report, so a mid-turn answer goes to both. [[spec/design_output/level0#the-reply-line]]
 export const SAYS = (why) =>
   [
-    `${why}, and nothing has answered it. Answer it before the next tool call: as the first`,
-    "text of a turn, or between calls through mcp__level0__report with the text.",
+    `${why}, and nothing has answered it. Answer it before the next tool call: write it in the`,
+    "chat as text, and call mcp__level0__report with the same text so the log carries it.",
     "Say what you understood and what you do next. Then work.",
   ].join(" ");
 
@@ -29,6 +36,8 @@ export function onPromptSubmit(e, box) {
   });
   if (!OWNER.has(from)) return { pass: true };
   demands(box, "The owner sent a prompt");
+  // A prompt asking for a note takes a parked note as its answer. [[spec/design_output/level0#a-note-answers-its-prompt]]
+  if (namesNote(String(e?.text ?? ""))) box.demand.notes = notesIn(box);
   box.asks = questionsIn(String(e?.text ?? ""));
   return { pass: true };
 }
@@ -44,6 +53,11 @@ export function onMessageDisplay(e, box) {
 export function holdsForAnswer(e, box) {
   const demand = box.demand;
   if (!demand || e?.agentId || REACHES.has(String(e?.tool ?? ""))) return null;
+  // [[spec/design_output/level0#a-note-answers-its-prompt]]
+  if (demand.notes !== undefined && notesIn(box) > demand.notes) {
+    paid(box, newestNote(box));
+    return null;
+  }
   if (demand.skips > 0) {
     demand.skips -= 1;
     return demand.block ? { after: { context: [demand.block] } } : null;
@@ -63,7 +77,7 @@ export function onAgentSpoke(e, box) {
     : `${SAYS(demand.why)} The last text seen stands from before the ask, and reads: "${head(demand.seen)}".`;
   box.log.say("debug", "gate", `refused ${e?.tool ?? "a call"} before a reply`, {
     tool: String(e?.tool ?? ""),
-    detail: lacks.slice(0, 120),
+    detail: lacks,
   });
   return { result: { deny: lacks } };
 }
@@ -79,7 +93,7 @@ function textsSince(e, seen) {
 }
 
 function head(text) {
-  return String(text ?? "").replace(/\s+/g, " ").slice(0, 80);
+  return String(text ?? "").replace(/\s+/g, " ").slice(0, SAID);
 }
 
 export function pays(box, text) {
@@ -87,12 +101,12 @@ export function pays(box, text) {
   if (!demand) {
     box.log.say("info", "reply", text, { text });
     box.spoken = text;
-    return "The reply stands in the log. Nothing asked for one, so carry on.";
+    return "The reply stands in the log. Nothing asked for one, so carry on, and write it in the chat too where the owner reads it.";
   }
   const lacks = demand.fits?.(text) ?? "";
   if (lacks) return lacks;
   paid(box, text);
-  return `The reply stands in the log, and it answers: ${demand.why}. Carry on.`;
+  return `The reply stands in the log, and it answers: ${demand.why}. Write it in the chat too, as text, and carry on.`;
 }
 
 function paid(box, text) {

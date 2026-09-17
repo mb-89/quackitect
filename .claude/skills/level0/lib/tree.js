@@ -313,7 +313,7 @@ export function noLogDeleted(tree) {
   return out;
 }
 
-// [[spec/design_output/level0#a-name-holds-five-words]]
+// [[spec/design_output/level0#a-name-meets-the-cap]]
 export function nameHoldsTheWords(tree) {
   const rule = "NameHoldsTheWords";
   const out = [];

@@ -4,7 +4,6 @@
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { inherits, rooted } from "../../.claude/skills/level0/lib/layer.js";
-import { asRow, OLD, rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { guidanceHere } from "../bridge/guidance.js";
 import { POINTER, PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 import { withoutFalsePast } from "../bridge/tense.js";
@@ -17,6 +16,7 @@ import {
 } from "../../.claude/skills/level0/lib/projection.js";
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
+import { CONFIG_DIR, fromJson as codeRows } from "../../.claude/skills/level0/lib/code.js";
 import { boxOf } from "../../.claude/skills/level0/lib/private.js";
 import {
   fieldsIn,
@@ -50,6 +50,8 @@ import {
   fromJson,
   unreasoned,
 } from "../../.claude/skills/level0/lib/vale.js";
+import { codeFaults } from "../../.claude/skills/level0/lib/magic.js";
+import { SIZED } from "../../.claude/skills/level0/lib/size.js";
 import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
@@ -57,9 +59,8 @@ import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { readTools, whereIs, writeSurvey } from "./tools.js";
-import { SOURCE as VIEWER, viewerOf } from "./viewer.js";
+import { SHARED, SOURCE as VIEWER, viewerOf } from "./viewer.js";
 import {
-  attach,
   detach,
   entryFor,
   produce,
@@ -67,6 +68,7 @@ import {
   readRegister,
   rootsHere,
 } from "./vehicle.js";
+import { attachTo } from "../bridge/vehicle.js";
 import { stubInto } from "./stub.js";
 import { HOOKS } from "./precommit.js";
 import { graphIn } from "./graph.js";
@@ -76,6 +78,7 @@ import { voice } from "./voice.js";
 import { retro } from "./retro.js";
 import { ticket } from "./ticket.js";
 import { cloud, work } from "./work.js";
+import { handDoors } from "./hand.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -123,9 +126,7 @@ async function doorsHere() {
     fails: await said.ask("work.failsBeforePerson"),
     refusals: await said.ask("work.refusalsBeforePerson"),
     splits: await said.ask("work.stepsBeforeSplit"),
-    // [[spec/design_output/pull#the-hand-rule]]
-    agent: Boolean(process.env.CLAUDECODE || process.env.CLAUDE_CODE_REMOTE || process.env.SE_CLOUD),
-    cloud: Boolean(process.env.CLAUDE_CODE_REMOTE || process.env.SE_CLOUD),
+    ...handDoors(process.env),
     node: process.execPath,
     join,
   };
@@ -140,7 +141,6 @@ const bin = whereIs(files, root, "vale", known);
 // [[spec/design_output/pull#the-voice-reads-the-evidence]]
 it.vale = bin;
 const go = whereIs(files, root, "go", known);
-const LOG = join(root, ".se", "log");
 const STYLES = join(root, "spec", "config", "styles", "VoiceVale");
 const SHAPE = join(root, "spec", "config", "styles", "VoiceShape");
 const SCRIPTED = join(root, "spec", "config", "styles", "VoiceScript");
@@ -157,6 +157,9 @@ const OURS = `--glob=!{${PARKED.join(",")}}`;
 const TESTS = "test/level0/*.test.js";
 const CONTRACT_TESTS = "test/contract/*.test.js";
 const ROUNDS = 5;
+const COL = { verb: 8, count: 6, key: 22, value: 9, rule: 20, tool: 18 };
+const SHOWN = 3;
+const HEALTH_WAIT = 2000;
 
 const run = async (argv, init = {}) =>
   outside.run(argv, { ...init, cwd: init.cwd ?? root });
@@ -235,9 +238,9 @@ const verbs = {
     says: "measure scores a folder, and refused ranks what the doors turn away",
     run: async () => voice(root, rest, it, bin),
   },
-  log: {
-    says: "what every door says, in the viewer this tree builds",
-    run: async () => readLog(rest),
+  tui: {
+    says: "the window this tree builds: the log, the work, and a tab it opens on",
+    run: async () => (await import("./tui.js")).openTui(tuiDoors(), rest),
   },
   serve: {
     says: "the server behind the bridgehead, under the debugger with --inspect",
@@ -278,7 +281,7 @@ if (verb === "help" || !verbs[verb]) {
   if (verb !== "help") console.error(`se: there is no verb called ${verb}\n`);
   console.log("Usage: ./RUNME.sh <verb> [path ...]\n");
   for (const [name, one] of Object.entries(verbs)) {
-    console.log(`  ${name.padEnd(8)} ${one.says}`);
+    console.log(`  ${name.padEnd(COL.verb)} ${one.says}`);
   }
   process.exit(verb === "help" ? 0 : 2);
 }
@@ -307,8 +310,8 @@ function theVehicle(argv) {
     return 0;
   }
   if (said === "attach") {
-    attach(files, it.clock, pair.work, made.id);
-    console.log(`${pair.work} names ${made.id} as the copy driving it.`);
+    const settled = attachTo(files, env, it.clock, pair.work, pair.method);
+    console.log(`${pair.work} names ${made.id} as the copy driving it, at port ${settled.port}.`);
     return 0;
   }
   if (said === "detach") {
@@ -423,6 +426,15 @@ async function lint(where) {
     }
   }
 
+  // The check names what stands past a ceiling as a warning, and the write door refuses the growth. [[spec/design_output/level0#the-size-ceiling]]
+  const ceilings = {
+    function: await it.config.ask("code.functionLines"),
+    file: await it.config.ask("code.fileLines"),
+  };
+  for (const file of walk(where, SIZED)) {
+    found.push(...codeFaults(files.read(file), show(file), ceilings));
+  }
+
   // [[spec/design_output/lsp#one-checker-every-front-asks]]
   const said = serverFaults(where);
   if (said) found.push(...said);
@@ -443,21 +455,10 @@ async function lint(where) {
 
   if (files.exists(biome)) {
     const code = outside.run(
-      [biome, "lint", "--config-path=spec/config", "--reporter=github", ...where],
+      [biome, "lint", `--config-path=${CONFIG_DIR}`, "--reporter=json", "--max-diagnostics=none", ...where],
       { cwd: root },
     );
-    for (const row of code.stdout.split("\n")) {
-      const hit = /^::(\w+) title=([^,]+),file=([^,]+),line=(\d+).*?::(.*)$/.exec(row);
-      if (!hit || isDraft(hit[3])) continue;
-      found.push({
-        file: hit[3],
-        rule: hit[2].replace(/^lint\//, ""),
-        line: Number(hit[4]),
-        column: 1,
-        message: hit[5],
-        severity: hit[1] === "warning" ? "warning" : "error",
-      });
-    }
+    found.push(...codeRows(code.stdout, where[0]).filter((one) => !isDraft(one.file)));
   }
 
   const ms = it.clock.now().getTime() - began;
@@ -469,7 +470,7 @@ async function lint(where) {
   await it.log.say("warn", "vale", `${found.length} line(s) break a rule`, {
     ms,
     detail: found
-      .slice(0, 3)
+      .slice(0, SHOWN)
       .map((one) => `${show(one.file ?? where[0])}:${one.line} ${one.rule}`)
       .join(", "),
   });
@@ -481,9 +482,9 @@ async function lint(where) {
   }
   console.log("");
   for (const [rule, count] of [...perRule].sort((a, b) => b[1] - a[1])) {
-    console.log(`${String(count).padStart(6)}  ${rule}`);
+    console.log(`${String(count).padStart(COL.count)}  ${rule}`);
   }
-  console.log(`${String(found.length).padStart(6)}  in all`);
+  console.log(`${String(found.length).padStart(COL.count)}  in all`);
 
   // [[spec/design_output/schema#warning-now-and-error-later]]
   const refused = found.filter((one) => one.severity !== "warning").length;
@@ -539,40 +540,20 @@ function gridFaults(where) {
 function serveBridge(argv) {
   const inspect = argv.filter((one) => one.startsWith("--inspect"));
   const server = join(root, "src", "bridge", "server.js");
-  return outside.run([process.execPath, ...inspect, server, root], { cwd: root, inherit: true }).exitCode;
+  return outside.run([process.execPath, ...inspect, server, root], { cwd: root, inherit: true, env: inspect.length ? { SE_BREAK_ON_STOP: "1" } : undefined }).exitCode;
 }
 
 // [[spec/design_output/viewer#the-verb-builds-it]]
-function readLog(argv) {
-  const plain = argv.includes("--plain");
-  const viewer = plain ? { exe: "", why: "" } : viewerHere();
-  if (viewer.why) console.error(viewer.why);
-  const session = join(root, SESSION);
-  if (viewer.exe) {
-    files.makeDir(LOG);
-    return outside.run([viewer.exe, session], { cwd: root, inherit: true }).exitCode;
-  }
-
-  const old = join(root, OLD);
-  const read = [
-    ...(argv.includes("--all") && files.exists(old)
-      ? namesIn(old, ".jsonl").sort().map((name) => join(old, name))
-      : []),
-    ...(files.exists(session) ? [session] : []),
-  ];
-  if (!read.length) {
-    console.log("No log stands yet. A writer starts one the next time it says a line.");
-    return 0;
-  }
-  for (const path of read) {
-    console.log(show(path));
-    for (const one of rowsOf(files.read(path))) console.log(asRow(one));
-  }
-  if (!plain) {
-    console.log("");
-    console.log("Go builds the viewer these rows open in. Install Go, and run this again.");
-  }
-  return 0;
+function tuiDoors() {
+  return {
+    root,
+    join,
+    disk: files,
+    proc: outside,
+    viewer: viewerHere,
+    names: namesIn,
+    show,
+  };
 }
 
 function viewerHere() {
@@ -587,14 +568,20 @@ function viewerHere() {
 
 // [[spec/design_output/viewer#the-check-runs-its-tests]]
 function viewerHolds() {
-  let ran;
-  try {
-    ran = outside.run([go, "test", "./..."], { cwd: join(root, VIEWER), inherit: true });
-  } catch {
-    console.log("go stands nowhere, so the viewer's tests go unrun here.");
-    return 0;
+  const folders = [VIEWER];
+  for (let at = 1; at < SHARED.length; at += 2) folders.push(SHARED[at]);
+  let worst = 0;
+  for (const folder of folders) {
+    let ran;
+    try {
+      ran = outside.run([go, "test", "./..."], { cwd: join(root, folder), inherit: true });
+    } catch {
+      console.log("go stands nowhere, so the viewer's tests go unrun here.");
+      return 0;
+    }
+    worst = worst || ran.exitCode;
   }
-  return ran.exitCode;
+  return worst;
 }
 
 // [[spec/design_output/config#the-verb-names-the-layer]]
@@ -617,7 +604,7 @@ async function readConfig(argv) {
   }
   for (const one of wanted) {
     console.log(
-      `${one.key.padEnd(22)} ${String(one.value).padEnd(9)} ${one.layer}`,
+      `${one.key.padEnd(COL.key)} ${String(one.value).padEnd(COL.value)} ${one.layer}`,
     );
   }
   if (key) return 0;
@@ -646,7 +633,7 @@ async function fix(where) {
   }
 
   if (files.exists(biome)) {
-    outside.run([biome, "check", "--write", "--config-path=spec/config", ...where], {
+    outside.run([biome, "check", "--write", `--config-path=${CONFIG_DIR}`, ...where], {
       cwd: root,
       inherit: true,
     });
@@ -851,7 +838,7 @@ async function serverHolds() {
 async function serverSays() {
   const where = `http://127.0.0.1:${portHere()}/health`;
   try {
-    const answer = await fetch(where, { signal: AbortSignal.timeout(2000) });
+    const answer = await fetch(where, { signal: AbortSignal.timeout(HEALTH_WAIT) });
     const body = await answer.json();
     return { ok: Boolean(body?.ok), where, why: String(body?.dead ?? "") };
   } catch (bad) {
@@ -913,7 +900,7 @@ function listRules() {
     for (const name of namesIn(at, ".yml")) {
       const text = files.read(join(at, name));
       const message = /^message:\s*"?(.*?)"?\s*$/m.exec(text)?.[1] ?? "";
-      console.log(`${name.replace(/\.yml$/, "").padEnd(20)} ${message}`);
+      console.log(`${name.replace(/\.yml$/, "").padEnd(COL.rule)} ${message}`);
     }
   }
   return 0;
@@ -941,7 +928,7 @@ async function standing() {
 function tools() {
   const found = writeSurvey(it, root, process.env);
   for (const one of WANTED)
-    console.log(`${one.name.padEnd(18)} ${standsAt(found[one.name])}`);
+    console.log(`${one.name.padEnd(COL.tool)} ${standsAt(found[one.name])}`);
   console.log(`\n${TOOLS} says this, and every caller reads it.`);
   return 0;
 }
@@ -1001,7 +988,7 @@ async function doctor() {
     ["server", await serverLine()],
   ];
   for (const [what, said] of rows) {
-    console.log(`${what.padEnd(18)} ${String(said).trim() || "missing"}`);
+    console.log(`${what.padEnd(COL.tool)} ${String(said).trim() || "missing"}`);
   }
   return 0;
 }

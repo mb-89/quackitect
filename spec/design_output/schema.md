@@ -22,7 +22,7 @@ Two halves stand in one module:
 
 | it takes | it answers |
 |---|---|
-| `readYaml(text)` | the schema, as a map |
+| `yaml.Read(text)` | the schema, as a map |
 | `readNote(text)` | the frontmatter and the chapters, each with its line |
 | `checkNote(text, schema, where)` | the findings, one per departure |
 | `schemaFaults(tree)` | the findings over every note git holds |
@@ -30,13 +30,17 @@ Two halves stand in one module:
 | `governorOf(schemas, path)` | the schema holding that path, or nothing |
 | `placeholderFaults(text, schema, where)` | every placeholder the note still carries |
 
-The caller hands the disk in through the tree, so a test drives all seven over
+The caller hands the disk in through the tree, so a test drives every one over
 `fakeDisk` and touches memory alone.
 
 # The yaml a schema reads
 
-A schema is YAML, and this tree carries no YAML library. The reader holds the
-subset the six files use, and nothing past it:
+A schema is YAML, and this tree carries no YAML library. `src/yaml` holds the
+reader, as a module of its own, so the server and the viewer read one subset
+and no module copies it. It takes no dependency, the way the server's own
+module takes none.
+
+The reader holds the subset the schema files use, and nothing past it:
 
 1. a map, by indent
 2. a list of scalars, and a list of maps
@@ -64,7 +68,7 @@ over what stands between them.
 
 # A line per nested key
 
-`readYaml(text, lines)` takes a `Map` and writes the line of every key into it.
+`yaml.Read(text, lines)` takes a `Map` and writes the line of every key into it.
 The key's own path is the entry, and the reader builds it as it walks:
 
 | the key | its path |
@@ -377,10 +381,10 @@ A departure stands refused, and the refusal names each finding and two ways on:
 A stranger in a governed folder takes its own refusal, `refusedKind`, which
 names the schema file, the finding and `mint_note` as the road.
 
-# The verbs own three fields
+# The verbs own their fields
 
 A property naming `x-engine: true` belongs to the verbs, and an agent's write to
-it stands refused. Four carry it on a ticket:
+it stands refused. These carry it on a ticket:
 
 | field | who writes it |
 |---|---|

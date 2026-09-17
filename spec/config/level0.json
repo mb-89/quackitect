@@ -1,20 +1,20 @@
 {
-  "comment": "The controls for level zero, and the defaults every box starts from. spec/config/level0.schema.json says the type of each one, the environment beats this file, and .se/config.json beats both. Ask ./RUNME.sh config which layer answers. Every rule lives in spec/config/styles, one file each: VoiceVale for the rules Vale holds, VoiceJudged for the rules a model holds.",
+  "comment": "The controls for level zero, and the defaults every box starts from. spec/config/level0.schema.json says the type of each one and what it does, the environment beats this file, and .se/config.json beats both. Ask ./RUNME.sh config which layer answers.",
   "stop": {
-    "comment": "The tooth. enabled false takes it out, and mostInARow caps the turns it carries one after another. The rules it votes over live in spec/config/stop.",
+    "comment": "The tooth. The rules it votes over live in spec/config/stop.",
     "enabled": true,
     "mostInARow": 3,
     "hold": "off"
   },
   "work": {
-    "comment": "The knobs the work verbs read. staleAfter is the age of a held group's tip that puts the group under yours, with release, take and close as the three answers. failsBeforePerson and refusalsBeforePerson say when the pull inserts a person step, and stepsBeforeSplit says how many of those a ticket carries before it splits.",
+    "comment": "The knobs the work verbs read. For a stale group, see spec/design_output/work.md.",
     "staleAfter": "12h",
     "failsBeforePerson": 2,
     "refusalsBeforePerson": 5,
     "stepsBeforeSplit": 3
   },
   "engine": {
-    "comment": "The engine level one brings. binding says what the agent answers to: the queue it takes work from, unbound, or god mode, which five presses reach and which draws a pulse while it stands.",
+    "comment": "The engine level one brings. spec/design_output/config.md, chapter The engine controls, says what each value means.",
     "binding": "queue"
   },
   "ask": {
@@ -22,7 +22,7 @@
     "wanted": "quiet"
   },
   "answer": {
-    "comment": "The door holding the owner's prompt first, and the gate reading the answer at the turn's end. The door refuses a tool call in a turn a person opens where nothing has answered them yet, and enabled false takes it out. warnAt and ceiling cut the gate's score, the findings a thousand words, into bands: under warnAt nothing happens, and from warnAt up the gate writes a warn line to the log and hands the findings to the session's next tool call, once. The ceiling names the band rewrite in that line. words caps an answer outside its code and tables, and a shape finding asks for the rewrite whatever the score.",
+    "comment": "The door holding the owner's prompt first, and the gate reading the answer at the turn's end. The score is the findings a thousand words. For the bands, see spec/design_output/level0.md.",
     "enabled": true,
     "warnAt": 5,
     "ceiling": 15,
@@ -31,6 +31,11 @@
   "log": {
     "comment": "The level this box writes at, on the ladder debug, info, warn, error, fatal. info writes every line a door says, debug writes what the hooks see too, warn writes a refusal and a fault, error writes a fault, fatal writes what ends a session.",
     "level": "info"
+  },
+  "code": {
+    "comment": "The ceilings a function and a file hold, in lines. The write door refuses a write that grows past one, and the check names what stands past one.",
+    "functionLines": 150,
+    "fileLines": 600
   },
   "names": {
     "comment": "The words a file, a folder and a branch name each hold at most. Vale counts a heading, and lib/names.js counts a path.",

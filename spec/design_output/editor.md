@@ -36,7 +36,7 @@ relative to the workspace folder:
 |---|---|---|
 | `vale.valeCLI.path` | `.se/bin/vale` | vale-ls spawns Vale with the workspace folder as its working directory |
 | `vale.valeCLI.config` | `.vale.ini` | the extension joins a relative path to the workspace root |
-| `vale.valeCLI.installVale` | `false` | the pinned 3.20.0 answers, so no second copy arrives |
+| `vale.valeCLI.installVale` | `false` | the Vale the installer pins answers, so no second copy arrives |
 | `vale.enableSpellcheck` | `false` | spelling sits outside VoiceVale, so the panel matches the door |
 | `vale.valeCLI.lintOnChange` | `true` | a rule that draws while typing costs less than one that waits for a save |
 | `biome.lsp.bin` | a path per platform | Windows takes `biome.exe`, and the rest take `biome` |
@@ -57,15 +57,6 @@ and the tracked values apply.
 `.claude/skills/level0/lib/servers.js` pins the version and names one release asset per
 platform. The install scripts ask node for the URL, so the matrix lives in one
 place and a test drives it.
-
-| platform | asset |
-|---|---|
-| Linux x86 | `vale-ls-x86_64-unknown-linux-gnu.zip` |
-| Linux arm64 | `vale-ls-aarch64-unknown-linux-gnu.zip` |
-| macOS x86 | `vale-ls-x86_64-apple-darwin.zip` |
-| macOS arm64 | `vale-ls-aarch64-apple-darwin.zip` |
-| Windows x86 | `vale-ls-x86_64-pc-windows-gnu.zip` |
-| Windows arm64 | `vale-ls-aarch64-pc-windows-msvc.zip` |
 
 Windows breaks the pattern: x86 ships a gnu target and arm64 an msvc one. A
 test holds both, because a guess costs a person one install that fails.

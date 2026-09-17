@@ -24,7 +24,7 @@ The viewer reads it. For details, see [[spec/design_output/viewer]].
 The viewer shows every field the row leaves out in the details. So a field earns
 the row only where a person scans for it.
 
-`rowOf` clips `said` to 80 characters and folds its whitespace, and a level
+`rowOf` clips `said` to that length and folds its whitespace, and a level
 outside the five, or none, reads as `info`. A line written before the rename carries
 `door` in place of `kind`, and the viewer reads either.
 
@@ -111,15 +111,8 @@ down first, and the door adds what it refuses beneath it.
     }
 
 The ladder is the one Python's logging climbs, and a box writes the lines at
-its level and above:
-
-| level | writes |
-|---|---|
-| `debug` | what the hooks see, and everything above |
-| `info` | every line a door says, and this is the default |
-| `warn` | a refusal and a fault |
-| `error` | a fault |
-| `fatal` | what ends a session |
+its level and above. The comment on `log` in `spec/config/level0.json` says
+what each level writes.
 
 A level the reader does not know reads as `info`, and a missing object reads as
 `info`. So a box configuring nothing writes every line a door says, and a debug

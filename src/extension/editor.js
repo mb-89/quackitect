@@ -12,7 +12,11 @@ const { join } = require("node:path");
 const NAME = "quackitect";
 // [[spec/design_output/extension#the-hook-button]]
 const SERVER = "src/bridge/server.js";
+// The port base of [[spec/design_output/vehicle#the-register-holds-the-port]], held again here because this module loads as CommonJS and imports no lib.
 const PORT = 6510;
+const OK = 200;
+const WIRE_WAIT = 500;
+const KILL_AFTER = 300;
 const LAUNCH = "the server";
 const PAUSES = "decide";
 const FAR_LEFT = Number.MAX_SAFE_INTEGER;
@@ -115,7 +119,7 @@ function editorDoor(context) {
       processes.delete(key);
       if (held.child || held.adopted) {
         await stopOverTheWire(held.port ?? PORT).catch(() => {});
-        if (held.child) setTimeout(() => held.child.kill(), 300);
+        if (held.child) setTimeout(() => held.child.kill(), KILL_AFTER);
       } else {
         await vscode.debug.stopDebugging(held.session ?? undefined);
       }
@@ -264,6 +268,18 @@ function editorDoor(context) {
       shell.sendText(said);
     },
 
+    // [[spec/design_output/extension#two-buttons-make-both]]
+    async asks(what) {
+      const picked = await vscode.window.showOpenDialog({
+        canSelectFolders: true,
+        canSelectFiles: false,
+        canSelectMany: false,
+        openLabel: `this ${what}`,
+        title: `Pick the ${what}`,
+      });
+      return picked?.[0]?.fsPath ?? "";
+    },
+
     registerView(id, resolve) {
       context.subscriptions.push(
         vscode.window.registerWebviewViewProvider(
@@ -302,10 +318,10 @@ async function settled(context, work) {
 function healthOverTheWire(port) {
   return new Promise((resolve, reject) => {
     const request = http.request(
-      { host: "127.0.0.1", port, path: "/health", method: "GET", timeout: 500 },
+      { host: "127.0.0.1", port, path: "/health", method: "GET", timeout: WIRE_WAIT },
       (response) => {
         response.resume();
-        response.on("end", () => resolve(response.statusCode === 200));
+        response.on("end", () => resolve(response.statusCode === OK));
       },
     );
     request.on("error", reject);
@@ -317,7 +333,7 @@ function healthOverTheWire(port) {
 function stopOverTheWire(port) {
   return new Promise((resolve, reject) => {
     const request = http.request(
-      { host: "127.0.0.1", port, path: "/stop", method: "POST", timeout: 500 },
+      { host: "127.0.0.1", port, path: "/stop", method: "POST", timeout: WIRE_WAIT },
       (response) => {
         response.resume();
         response.on("end", resolve);

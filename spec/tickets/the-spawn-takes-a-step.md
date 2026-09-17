@@ -1,11 +1,21 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
+step: design/person-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: "design/review failed back 2 times: takeable takes a leaf wanting a helper as work on every box. A box off a harness leaves that leaf parked, and branch done holds the group open. Gate it as a step for an agent gates on the box.; The change to the spawn answer carries no case. The ask third row wants the shell answer proven, so add a fifth case over it.; The prompt the engine writes carries two commands, not three. Say what stands.; The design output row for a spawn off a plugin parks the step for a person or a helper. A leaf wanting a helper admits one taker, the helper. Say which the row means.; ./RUNME.sh check answers 1 over faults the whole tree carries, and this leaf adds none."
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -79,6 +89,7 @@ steps:
     reads: [[spec/guidance/review/reviewing]]
     input: ["diff", "implement"]
     to: retro
+    checklist: ["every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     evidence:
       - name: read
         form: files
@@ -87,9 +98,32 @@ steps:
         form: verdict
         says: pass or fail, findings one a line
 process: [[standard]]
-process_hash: 8cc8301e3ca3ba8d
+process_hash: d1fd9cd113889f29
+record:
+  - step: design/draft
+    hand: box 3d4c068755ec · claude-code-remote
+    hash_before: 0136ef0a04d0a335b1fe7ab2daf81192844f227b
+    hash_after: 0136ef0a04d0a335b1fe7ab2daf81192844f227b
+  - step: design/review
+    hand: box 3d4c068755ec · claude-code-remote · helper-2
+    hash_before: 2634a66b131692e6427ba61c539952d2478797fa
+    hash_after: 2634a66b131692e6427ba61c539952d2478797fa
+    returns: 1
+    why: "A leaf under `by: helper` reaches no spawn. `admits` answers a why and no `other`, so the leaf parks.; A hand under `--as` reads that same leaf as untakeable, because `takeable` refuses the word `helper`.; The ask names the excluding field `by`, and the design output names it `not`. Name one, and make the other follow.; The spawn answer names one taker, the hand it asks for. The ask's fourth line names a person too.; The helper's hand-back stands as a case already. Add the assertion it lacks, that another hold stands untouched.; The wrapper's spawn wants the case the draft names, and the guidance rides the helper's pull.; `./RUNME.sh check` answers 1 over faults the whole tree carries, and this leaf adds none."
+  - step: design/draft
+    hand: box 3d4c068755ec · claude-code-remote
+    hash_before: 87c3c7e8706c0f9225bc787c5e415f1ecdabf237
+    hash_after: 87c3c7e8706c0f9225bc787c5e415f1ecdabf237
+  - step: design/review
+    hand: box 3d4c068755ec · claude-code-remote · helper-4
+    hash_before: 083e4ffbc2decad91228565e6a19fc1898f79c33
+    hash_after: 083e4ffbc2decad91228565e6a19fc1898f79c33
+    returns: 2
+    why: takeable takes a leaf wanting a helper as work on every box. A box off a harness leaves that leaf parked, and branch done holds the group open. Gate it as a step for an agent gates on the box.; The change to the spawn answer carries no case. The ask third row wants the shell answer proven, so add a fifth case over it.; The prompt the engine writes carries two commands, not three. Say what stands.; The design output row for a spawn off a plugin parks the step for a person or a helper. A leaf wanting a helper admits one taker, the helper. Say which the row means.; ./RUNME.sh check answers 1 over faults the whole tree carries, and this leaf adds none.
+group: the-hand-carries-a-step
 depends_on: ["the-hand-carries-the-session"]
-step: design/draft
+reason: became
+successors: [the-spawn-answers-a-helper]
 ---
 
 # Ask
@@ -109,6 +143,16 @@ When the next step's `by` excludes the hand that pulls, nobody takes it. The app
 
 # design
 
+## person-1
+
+<!-- answers the question the engine asks -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
+
 ## draft
 
 <!-- writes the approach the ask calls for -->
@@ -116,8 +160,37 @@ When the next step's `by` excludes the hand that pulls, nobody takes it. The app
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+Two fields keep a hand off a step, and both reach the spawn:
+
+| the field | what it says | who takes the step |
+|---|---|---|
+| `by: helper` | the step wants a hand the engine makes | a spawned hand, under `--as` |
+| `not: <step>` | the hand that wrote that step stands out | any other hand, spawned or not |
+
+One half works today. `excludes` answers `other` for `not`, so the spawn answer
+fires. `admits` answers a why alone for `by: helper`, so that leaf parks. A hand
+under `--as` reaches it nowhere, because `takeable` reads `helper` as no work.
+
+| what changes | how |
+|---|---|
+| `admits` | a leaf `by: helper` answers `other`, so the spawn answer fires for it |
+| `admits` under `--as` | the same leaf answers `leaf`, so the spawned hand takes it |
+| `takeable` | `helper` leaves the refused list, and `branch done` reads the leaf as work |
+| the spawn answer | names a person beside the hand, where the leaf admits one |
+| [[spec/design_output/pull#a-hand-of-its-own]] | takes a row for `by`, beside the row `not` holds |
+
+The guidance stays where it stands. `spawnPrompt` writes the ticket, the leaf
+and three commands, and the helper's own pull hands it the rules. A copy in the
+prompt is a second copy, and a rule read twice drifts.
+
+Four cases carry it, each in the file its subject lives in:
+
+- a leaf `by: helper` answers spawn, and the prompt names that leaf
+- the same leaf under `--as` hands the helper its work
+- the helper's hand-back leaves another hold standing, which the case asserts
+- the wrapper makes a hand from a spawn answer, over a fake harness
 
 ## review
 
@@ -126,8 +199,15 @@ When the next step's `by` excludes the hand that pulls, nobody takes it. The app
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+
+- takeable takes a leaf wanting a helper as work on every box. A box off a harness leaves that leaf parked, and branch done holds the group open. Gate it as a step for an agent gates on the box.
+- The change to the spawn answer carries no case. The ask third row wants the shell answer proven, so add a fifth case over it.
+- The prompt the engine writes carries two commands, not three. Say what stands.
+- The design output row for a spawn off a plugin parks the step for a person or a helper. A leaf wanting a helper admits one taker, the helper. Say which the row means.
+- ./RUNME.sh check answers 1 over faults the whole tree carries, and this leaf adds none.
 
 # implement
 
@@ -137,7 +217,7 @@ When the next step's `by` excludes the hand that pulls, nobody takes it. The app
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+<!-- the same tests pass -->
 
 <!-- the form is command -->
 
@@ -228,6 +308,12 @@ When the next step's `by` excludes the hand that pulls, nobody takes it. The app
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
+
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 # Discussion
 

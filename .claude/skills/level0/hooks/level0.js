@@ -3,23 +3,77 @@
 // the step's stream. It imports nothing, and a dead server blocks nothing.
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
+// The port base of [[spec/design_output/vehicle#the-register-holds-the-port]], held again here because this hook imports nothing.
 const PORT = 6510;
 const POINTER = ".se/vehicle.json";
 const SESSION = ".se/log/session.jsonl";
+// The hand's session file of [[spec/design_output/pull#the-hand-and-the-hold]], spelled again here because this hook imports nothing.
+const HAND_FILE = ".se/session.json";
 const COMPACT = "session.compact";
 const LIMIT = 4_000_000;
 const SHORT = 4000;
 const TEXTS = 4;
+const STARTING = 10_000;
 let port = PORT;
 let root = "";
+let method = "";
 let saidDown = false;
+let started = false;
 let stepText = "";
 
 const url = () => `http://127.0.0.1:${port}/event`;
 
-export function register(on, _options) {
+// THE CLOUD STARTS ITS OWN SERVER. A cloud box carries nobody to press the sidebar button, so the bridgehead starts what the first event finds missing, and the shell reads the environment because this hook imports nothing. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+export const START = [
+  // biome-ignore lint/suspicious/noTemplateCurlyInString: level0: the shell reads these two variables, and this line is shell text
+  'test -n "${CLAUDE_CODE_REMOTE:-}${SE_CLOUD:-}" || exit 3',
+  'cd "$2" || exit 4',
+  'command -v node >/dev/null 2>&1 || exit 5',
+  "test -d node_modules || exit 6",
+  'mkdir -p "$1/.se/log"',
+  'nohup node src/bridge/server.js "$2" >> "$1/.se/log/serve.log" 2>&1 </dev/null &',
+  "exit 0",
+].join("\n");
+
+const REASONS = {
+  0: ["info", "no server answered, so the bridgehead starts one"],
+  3: ["", "a person starts the server here"],
+  4: ["warn", "the method root is absent, so no server starts"],
+  5: ["warn", "this box carries no node, so no server starts"],
+  6: ["warn", "the setup brings no modules, so no server starts"],
+};
+
+// [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+export function reasonOf(code) {
+  return REASONS[Number(code)] ?? ["warn", `the start answers ${code}, which nobody names`];
+}
+
+// [[spec/design_output/pull#a-hand-of-its-own]]
+export function spawnTagOf(held) {
+  const id = String(held?.id ?? "").trim();
+  if (!id) return "";
+  return `You are the hand of session ${id} on this box, so you pull under no --as.`;
+}
+
+export function register(on, options) {
+  method = String(options?.method ?? "");
   on("*", ($, e, next) => seen($, e, next));
   on("turn.step", streams);
+  // [[spec/design_output/pull#a-hand-of-its-own]]
+  on("agent.spawn", async ($, e, next) => {
+    if (e?.own) return next(e);
+    const line = spawnTagOf(await sessionHeld($));
+    if (!line) return next(e);
+    return next({ ...e, prompt: `${line}\n\n${String(e?.prompt ?? "")}` });
+  });
+}
+
+async function sessionHeld($) {
+  try {
+    return JSON.parse(String(await $.fs.read(HAND_FILE)));
+  } catch {
+    return null;
+  }
 }
 
 async function seen($, e, next) {
@@ -27,7 +81,10 @@ async function seen($, e, next) {
   if (event === "engine.create") return next(e);
   if (event === "session.start") await opens($, e);
   const answer = await ask($, event, e, next);
-  if (!answer) return next(e);
+  if (!answer) {
+    if (event === "session.start") await starts($);
+    return next(e);
+  }
   if (Array.isArray(answer.register)) await registers($, answer.register);
   if (answer.needs === "reply") return spoke($, e, next);
   if (answer.spawn !== undefined) return spawns($, answer, next);
@@ -156,14 +213,46 @@ function merged(said, after) {
 
 async function down($, event, error) {
   if (saidDown) return;
-  const row = {
-    at: new Date().toISOString(),
+  saidDown = await wrote($, {
     level: "warn",
-    kind: "bridge",
     said: `the server answers nothing at ${url()}`,
     event,
     detail: String(error?.message ?? error),
-  };
+  });
+}
+
+// [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+async function starts($) {
+  if (started) return;
+  started = true;
+  let ran;
+  try {
+    ran = await $.process.run(["sh", "-c", START, "level0", root, method || root], {
+      timeoutMs: STARTING,
+    });
+  } catch (error) {
+    await wrote($, {
+      level: "warn",
+      said: "the start of the server fails",
+      event: "session.start",
+      detail: String(error?.message ?? error),
+    });
+    return;
+  }
+  const code = Number(ran?.exitCode ?? 1);
+  const [level, said] = reasonOf(code);
+  if (!level) return;
+  await wrote($, {
+    level,
+    said,
+    event: "session.start",
+    detail: String(ran?.stderr ?? "").trim() || `exit ${code}`,
+  });
+}
+
+// One row into the session log, written by the bridgehead itself, because the log door stands behind the server the row is about. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+async function wrote($, said) {
+  const row = { at: new Date().toISOString(), kind: "bridge", ...said };
   try {
     let held = "";
     try {
@@ -171,6 +260,8 @@ async function down($, event, error) {
     } catch {}
     if (held && !held.endsWith("\n")) held += "\n";
     await $.fs.write(SESSION, `${held}${JSON.stringify(row)}\n`);
-    saidDown = true;
-  } catch {}
+    return true;
+  } catch {
+    return false;
+  }
 }

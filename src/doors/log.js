@@ -1,8 +1,5 @@
-// The log. One file, .se/log/session.jsonl, holds the session, one JSON object
-// per line, and this door appends to it. The level this box writes at decides
-// which line reaches the file. The log stamps its own time, and it understands
-// the foreign objects a writer hands it: an event and its answer become one
-// line with the fields worth a glance beside the whole event.
+// The log. This door appends one JSON object per line to the session file,
+// and the level this box writes at decides which line reaches it.
 // [[spec/design_output/log#every-writer-appends]]
 
 import { rowOf, SESSION, writes } from "../../.claude/skills/level0/lib/log.js";

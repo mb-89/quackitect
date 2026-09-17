@@ -26,9 +26,46 @@ script: |
     return text.join(parts, "")
   }
 
+  prose := ["does", "says", "checklist", "comment", "help", "ask"]
+
+  frontless := func(said) {
+    lines := text.split(said, "\n")
+    if len(lines) < 2 || text.trim_space(lines[0]) != "---" { return said }
+    out := []
+    inside := true
+    keep := false
+    for at, line in lines {
+      if at == 0 {
+        out = append(out, line)
+        continue
+      }
+      if inside && text.trim_space(line) == "---" {
+        inside = false
+        out = append(out, line)
+        continue
+      }
+      if !inside {
+        out = append(out, line)
+        continue
+      }
+      found := text.re_find(`^[ \t]*-?[ \t]*([A-Za-z_][A-Za-z0-9_]*):`, line, 1)
+      if !is_undefined(found) {
+        keep = false
+        for one in prose {
+          if one == found[0][1].text { keep = true }
+        }
+      }
+      if keep {
+        out = append(out, line)
+      } else {
+        out = append(out, text.repeat(" ", len(line)))
+      }
+    }
+    return text.join(out, "\n")
+  }
+
   plain := func(said) {
-    out := said
-    out = blanked(out, `(?s)^---\n.*?\n---`)
+    out := frontless(said)
     out = blanked(out, "(?s)```.*?```")
     out = blanked(out, `(?s)~~~.*?~~~`)
     out = blanked(out, `(?s)<!--.*?-->`)
@@ -1079,7 +1116,7 @@ script: |
   informed informing informs infos infospace infousa infoworld infrared
   infrastructure infringement infusion ing ingram ingredient ingredients
   inhabitants inhalation inherent inherently inherit inheritance inherited
-  inhibit inhibition inhibitor inhibitors init initial initialization
+  inhibit inhibition inhibitor inhibitors ini init initial initialization
   initialize initially initials initiated initiating initiation initiative
   initiatives inject injected injection injections injunction injured
   injuries injury injustice ink inkjet inks inland inlet inline inlog
@@ -1148,11 +1185,11 @@ script: |
   jointly joints jojo joke jokes jolie jolla jolly jon jonah jonas
   jonathan jones jong joomla joplin jordan jorge jose josef joseph
   josephine josh joshua jour journal journalism journalist journalists
-  journals journey journeys jovi joy joyce joystick jpeg jpg jpy jsp juan
-  jubilee judaism judd jude judge judged judgement judges judging judgment
-  judgments judicial judiciary judith judy juice juices juicy jukebox jul
-  jules julia julian julie juliet julio julius july jumbo jump jumped
-  jumper jumping jumps jun junction june jung jungle junior juniors
+  journals journey journeys jovi joy joyce joystick jpeg jpg jpy json jsp
+  juan jubilee judaism judd jude judge judged judgement judges judging
+  judgment judgments judicial judiciary judith judy juice juices juicy
+  jukebox jul jules julia julian julie juliet julio julius july jumbo jump
+  jumped jumper jumping jumps jun junction june jung jungle junior juniors
   juniper junk jupiter jurisdiction jurisdictions jury just justice
   justification justified justify justin juvenile jvc kai kaiser kalamazoo
   kan kane kangaroo kansas kanye kaplan kappa kara karaoke karate karen
@@ -2135,8 +2172,8 @@ script: |
   truck trucking trucks true truly truman trump trumpet truncate trunk
   trust truste trusted trustee trustees trustpass trusts truth truths try
   trying tsn tsp tsunami ttf ttl tty tub tube tuberculosis tubes tubing
-  tubs tubular tuck tucker tucson tue tues tuesday tuesdays tuition tulip
-  tulsa tumble tummy tumor tumors tuna tune tuned tuner tuners tunes
+  tubs tubular tuck tucker tucson tue tues tuesday tuesdays tui tuition
+  tulip tulsa tumble tummy tumor tumors tuna tune tuned tuner tuners tunes
   tungsten tuning tunisia tunnel tunnels turbine turbo turbulence turf
   turin turismo turkey turkish turkmenistan turks turn turnaround turned
   turner turning turnout turnover turns turquoise turtle turtles tuscany

@@ -5,7 +5,7 @@ export function git(proc, root) {
   const run = (args, quiet) => {
     const ran = proc.run(["git", ...args], { cwd: root });
     if (!quiet && ran.exitCode !== 0 && ran.stderr) console.error(ran.stderr.trim());
-    return { ok: ran.exitCode === 0, out: (ran.stdout ?? "").trim() };
+    return { ok: ran.exitCode === 0, out: (ran.stdout ?? "").trim(), err: (ran.stderr ?? "").trim() };
   };
 
   return {

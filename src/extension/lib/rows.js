@@ -3,6 +3,10 @@
 // [[spec/design_output/extension#the-button-prints-the-log]]
 
 const OWN = ["at", "level", "kind", "said"];
+const STAMP = { from: 11, to: 23 };
+const LEVEL_WIDTH = 5;
+const KIND_WIDTH = 6;
+const INDENT = STAMP.to - STAMP.from + 1;
 
 function newestIn(names) {
   return [...(names ?? [])].filter((one) => one.endsWith(".jsonl")).sort().pop() ?? "";
@@ -26,15 +30,15 @@ function rowOf(line) {
   }
 
   const head = [
-    String(said.at ?? "").slice(11, 23),
-    String(said.level ?? "").padEnd(5),
-    String(said.kind ?? "").padEnd(6),
+    String(said.at ?? "").slice(STAMP.from, STAMP.to),
+    String(said.level ?? "").padEnd(LEVEL_WIDTH),
+    String(said.kind ?? "").padEnd(KIND_WIDTH),
     said.said ?? "",
   ].join(" ");
 
   const rest = Object.entries(said).filter(([key]) => !OWN.includes(key));
   return rest.length
-    ? `${head}\n${" ".repeat(13)}${rest.map(([key, value]) => `${key}=${value}`).join(" ")}`
+    ? `${head}\n${" ".repeat(INDENT)}${rest.map(([key, value]) => `${key}=${value}`).join(" ")}`
     : head;
 }
 

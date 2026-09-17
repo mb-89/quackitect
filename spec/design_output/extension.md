@@ -11,19 +11,8 @@ declaration behind it, the five widgets, and the grid holding them.
 
 `src/extension` is a VS Code extension drawing one sidebar. The declaration
 says what every value is and where it draws. The extension turns that into a
-page. It carries no dependency, and `./RUNME.sh` links the folder in.
-
-- `extension.js`: what the editor loads
-- `editor.js`: the one module reaching vscode
-- `sidebar.js`: the wiring under it
-- `lib/widgets.js`: the declaration as widgets
-- `lib/grid.js`: the grid check
-- `lib/panel.js`: declaration to HTML
-- `lib/values.js`: a key in the local file
-- `lib/session.js`: the session boundary
-- `lib/gesture.js`: a press count to a state, held in the host
-- `lib/logbook.js`: the sidebar's lines in the door log
-- `webview/clicks.js`: a click to a message
+page. It carries no dependency, and `./RUNME.sh` links the folder in. The
+header of each file under `src/extension` says what it holds.
 
 # It starts silent
 
@@ -54,18 +43,8 @@ files, draws once, and asks the editor to watch them.
 
 `spec/config/level0.json` holds the values. `spec/config/level0.schema.json`
 says what each key is. The draw fields land beside the type, because that file
-already carries the type and the options:
-
-    "hold": {
-      "type": "string",
-      "enum": ["off", "finish", "stop"],
-      "help": "What the session does when it reaches the end of a turn.",
-      "widget": "toggle",
-      "gesture": 5,
-      "icon": "✋🤖",
-      "group": "agent control",
-      "row": 0, "column": 1, "rowSpan": 1, "colSpan": 1
-    }
+already carries the type and the options. The entry `stop.hold` there shows
+every field in use.
 
 | field | says |
 |---|---|
@@ -77,6 +56,7 @@ already carries the type and the options:
 | `help` | the sentence a hover carries |
 | `unit` | the word standing beside an editor |
 | `runs` | what an action runs |
+| `asks` | what an action asks the owner for first, and `runs` carries it in angle brackets |
 | `keys` | the keys the program an action opens needs |
 | `sets`, `watches` | the two keys a status splits into |
 
@@ -114,8 +94,10 @@ options and its mark, and each leaves the group open:
 | control | at rest | one click | five clicks |
 |---|---|---|---|
 | the engine | at rest | running | none |
-| binding | bound to the queue | unbound | god mode |
-| autonomy | finish your own token | start new tokens | ideation |
+| binding | `queue` | `unbound` | `god` |
+
+The rows name the value each gesture writes. For what a value means, see
+[[spec/design_output/config#the-engine-controls]].
 
 Marking a group draws one, so an engine landing later takes an edit to the
 schema. The mark for the engine waits on the owner: play and stop, one per
@@ -191,15 +173,8 @@ theme moves the page with no redraw.
 fields for one mark are two things to keep in step. A mark written the old way,
 as `U+270B`, draws the same character.
 
-The four buttons, and the one file naming them,
-`spec/config/level0.schema.json`:
-
-| key | `icon` | what it does |
-|---|---|---|
-| `log.open` | `📜` | runs `./RUNME.sh log`, which opens the log viewer in a terminal |
-| `stop.hold` | `✋🤖` | off, then finish, and stop at five presses |
-| `ask.wanted` | `❓🤖` | quiet, then short, and the full report at five presses |
-| `engine.binding` | `❌🔗🤖` | the queue, then unbound, and god mode at five presses |
+The buttons, their marks and their ladders stand in one file,
+`spec/config/level0.schema.json`, under the group `agent control`.
 
 A mark stands still. The button says the state by the colour it wears, and by
 the pulse it takes at the far end.
@@ -268,25 +243,19 @@ the open sections live in `setState`, so a redraw takes them back.
 
 ## A gesture picks a state
 
-A click count picks which of three a control holds:
-
-| control | at rest | one click | five clicks |
-|---|---|---|---|
-| hold | off | finish this work | stop now |
-| ask | quiet | a short update | a full report |
-
-The host counts the presses, and the page counts none. Every write draws the
+A click count picks which of a control's options it holds, and the schema's
+`enum` names them in order. The host counts the presses, and the page counts none. Every write draws the
 page again, and a new page carries a new script. So a count kept in the page
 starts over at every press, and stands at one.
 
 `pressed` takes the press time as an argument, so a burst replays in a test:
 
-- a press within 800ms of the last one joins its burst, and a later one opens a new burst
+- a press inside the burst window `lib/gesture.js` names joins its burst, and a later one opens a new burst
 - the first press of a burst climbs one step
-- presses two to four stand by
+- the presses between stand by
 - a press away from rest falls back to rest, at any distance
-- the fifth press of a burst sends the far value
-- the button stands dead for 600ms after the far value, so a sixth press stands by too
+- the press `gesture` names in the schema sends the far value
+- the button stands dead for the rest `lib/gesture.js` names after the far value, so one more press stands by too
 
 Climbing goes one step at a time, because handing over a whole ladder in one
 click is a move a person means. Releasing goes any distance at once, so a
@@ -301,7 +270,7 @@ Every press that writes, every run and every edit in the config tree writes a
 
 - One press writes `stop.hold is finish`, with the detail `one press`.
 - Five presses write `stop.hold is stop`, with the detail `5 presses`.
-- The log button writes `log.open runs ./RUNME.sh log`.
+- The log button writes `log.open runs ./RUNME.sh tui`.
 - An edit in the config tree writes `stop.mostInARow is 5`, with the detail `the config tree`.
 
 A window writes one file, named by its first line, and writes it whole on every
@@ -345,9 +314,9 @@ widget: the verb writes the local file, and the watcher does the rest.
 
 ## The log opens a terminal
 
-The log action runs `./RUNME.sh log`, which opens the log viewer in a terminal
-beside the editor. An action opening another program hands a person that
-program's keys. So the declaration carries them and the hover says them.
+The log action runs `./RUNME.sh tui`, which opens the window on its log tab, in
+a terminal beside the editor. An action opening another program hands a person
+that program's keys. So the declaration carries them and the hover says them.
 For details, see [[spec/design_output/viewer#the-keys]].
 
 The rule holds for every action. Where an action starts another program, its hover names
@@ -373,6 +342,31 @@ A dead server blocks nothing, so the agent runs the same with the light dark.
 The sidebar writes the start and the stop at `info`, and so does the server.
 For details, see [[spec/design_output/level0#the-bridgehead-and-the-server]].
 
+## Two buttons make both
+
+Two actions stand in the section `engine`, beside where the engine's play
+and stop marks land. Each carries `asks` set to `folder`, and its `runs`
+carries `<folder>` where the folder goes:
+
+| key | `icon` | runs |
+|---|---|---|
+| `engine.vehicle` | `🚚` | `./RUNME.sh vehicle into <folder>` |
+| `engine.stub` | `🌱` | `./RUNME.sh stub into <folder>` |
+
+A press on one goes this way:
+
+1. The sidebar reads `asks` off the schema by the key the message carries.
+2. The door opens the editor's folder dialog, and answers the folder or the empty string.
+3. The empty string ends the press, and the log takes no line.
+4. The folder lands in `runs` in place of `<folder>`, in double quotes, so a space in it holds.
+5. The line runs in a terminal, the way the log button runs, and the log takes the line.
+
+So the verbs behind the buttons stay the ones the shell runs. A refusal from
+a verb stands in the terminal, where the owner reads it. The marks are
+the owner's to swap in the schema. The fake door in the sidebar test answers
+the folder, and a contract test reads the two entries off the declaration on
+disk.
+
 # What level zero holds
 
 Three controls work with no engine, because the stop table and the standing
@@ -389,21 +383,14 @@ meet in the file and nowhere else.
 
 ## The hold is one rule
 
-`stop.hold` writes one of three values, and the table reads the last:
-
-| value | what the tooth does |
-|---|---|
-| `off` | leaves the vote as it stands |
-| `finish` | leaves the vote, and one context line asks for nothing new |
-| `stop` | refuses the next call, and ends the turn over the rule carrying standing work |
-
-The rule stands at priority 85, over `work-still-stands` at 80. So a hold beats
-a list with something on it. `holds` answers the check `owner-holds`. A
-contract test reads every mechanical name the table carries, and asserts the
-hook answers it.
+`stop.hold` writes one of the values the schema names, and the table reads the
+last. The rule `the-owner-holds-this-session` in `spec/config/stop/level0.yml`
+stands over `work-still-stands`, so a hold beats a list with something on it.
+`holds` answers the check `owner-holds`. A contract test reads every mechanical
+name the table carries, and asserts the hook answers it.
 
 The hold is one turn long. The turn's end drops it to `off`, so the widget
-falls back to rest the way the ask does. For details, see
+falls back to rest the way the ask does. For what each value does, see
 [[spec/design_output/stop#the-hold]].
 
 ## The ask is a line
@@ -424,8 +411,8 @@ A reply written as chat text between calls reaches no hook until the turn
 ends, so the tool is the road. For details, see
 [[spec/design_output/level0#what-the-door-reads]].
 
-The shape is four chapters, each a heading with text under it: Done, Now,
-Open, ETA. The door refuses a reply lacking one, and names the chapters it
+The shape stands in `spec/config/status.yaml`: each chapter a heading with text
+under it. The door refuses a reply lacking one, and names the chapters it
 lacks. A turn ending on such a reply holds: the stop door re-prompts with the
 same reason, and the ask stands until a reply fits.
 
@@ -465,7 +452,7 @@ none of its own.
 `src/scripts/editor.js` makes the link through the disk door, and the shell asks
 it first:
 
-- `linked` answers 0 where the link reaches this tree and the list names the id, and prints nothing.
+- `linked` answers `0` where the link reaches this tree and the list names the id, and prints nothing.
 - `link` removes a copy, a stale link or a link pointing nowhere, links `src/extension`, and writes the entry.
 
 The link is a junction on Windows, which needs no administrator, and a symbolic
@@ -530,8 +517,8 @@ already carries, and four of those make a panel read as a paragraph.
 | the `away` colour | the value stands off its rest |
 | a red pulse | the value stands at the far end |
 
-The far end is the third option, which a gesture reaches. `stop.hold` takes two
-presses to `stop`, and `ask.wanted` and `engine.binding` take five.
+The far end is the last option, which a gesture reaches, and `gesture` in the
+schema says how many presses.
 
 ## The gear picks the sections
 
@@ -582,7 +569,7 @@ nobody who reads it.
 
 ## The button prints the log
 
-The log button runs `./RUNME.sh log`, and the viewer takes the terminal it
+The log button runs `./RUNME.sh tui`, and the viewer takes the terminal it
 opens. `--plain` prints the rows into that terminal instead, and so does a box
 where Go builds no viewer.
 

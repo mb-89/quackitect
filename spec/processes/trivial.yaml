@@ -20,10 +20,11 @@ steps:
     to: retro
     input: ask
     reads: [[spec/guidance/working]]
-    needs: [work test]
+    needs: [branch test]
     checklist:
       - the change follows the ask, or the discussion says why it departs
       - the cleanup the change reveals is in the change, or is a note of its own
+      - every fact the change adds stands in one place, and a note points at the file instead of repeating it
     evidence:
       - name: tests
         form: command

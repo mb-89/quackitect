@@ -21,6 +21,9 @@ import {
 import { homeIn } from "./editor.js";
 
 // [[spec/design_output/vehicle#a-marker-names-the-root]]
+const STAMP_TAIL = 12;
+const HEX = 16;
+
 export function methodRootFrom(files, start) {
   let here = String(start ?? "").split("\\").join("/").replace(/\/+$/, "");
   while (here) {
@@ -45,7 +48,7 @@ export function copyHere(files, time, method) {
 
 function idOf(time) {
   const digits = time.stamp().replace(/[^0-9]/g, "");
-  return `${Number(digits.slice(-12)).toString(16)}${process.pid.toString(16)}`;
+  return `${Number(digits.slice(-STAMP_TAIL)).toString(HEX)}${process.pid.toString(HEX)}`;
 }
 
 // [[spec/design_output/vehicle#the-register-places-an-identity]]

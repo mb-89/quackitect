@@ -2,6 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: soon
+group: the-person-step-holds
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -11,7 +12,7 @@ steps:
     input: ask
     reads: [[spec/guidance/working]]
     needs: ["work test"]
-    checklist: ["the change follows the ask, or the discussion says why it departs", "the cleanup the change reveals is in the change, or is a note of its own"]
+    checklist: ["the change follows the ask, or the discussion says why it departs", "the cleanup the change reveals is in the change, or is a note of its own", "every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
     evidence:
       - name: tests
         form: command
@@ -25,7 +26,7 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
-process_hash: 62642eaf8f9c9c53
+process_hash: 568f402efe3adab7
 ---
 
 # Ask

@@ -1,5 +1,0 @@
-{
-  "name": "bridgehead",
-  "description": "The bridgehead: the one plugin a stub carries. It reads vehicle.json at load, finds the vehicle, and hands every hook to the vehicle's own modules.",
-  "version": "0.1.0"
-}

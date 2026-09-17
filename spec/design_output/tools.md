@@ -45,12 +45,34 @@ the file is absent:
 | caller | reads |
 |---|---|
 | the command line | `readTools`, then `whereIs` per tool |
-| the hooks module | `.se/tools.json` through `$.fs`, at `session.start` |
+| the guidance door | the survey at `session.start`, and it runs the survey where the file is absent |
 | `./RUNME.sh doctor` | the survey, and it probes nothing twice |
 
 `whereIs` takes the surveyed path first. It falls back to `.se/bin/<name>.exe`,
 then `.se/bin/<name>`, then the bare name. So a clone nobody surveys still
 finds a tool in `.se/bin`.
+
+# The session reads the survey
+
+The guidance door reads the survey when a session starts, and runs it first
+where the box carries none. At `prompt.context` the block `level0-tools`
+rides beside the rules block, one line per tool:
+
+    # What this box has
+
+    - `node` 22.19.0, for a helper script
+    - `sh`, for a shell script
+    - `mcp__level0__find`: Finds the lines in this tree carrying the words, ranked by the index.
+
+| line | comes from |
+|---|---|
+| a tool the survey finds | its name, its version, and the `for` its entry in `WANTED` carries |
+| a tool level zero registers | its name, and the first sentence of its description |
+
+A tool the box lacks earns no line, so the session reads what stands. The
+`for` stands beside the name as data, the way the description stands on the
+spec, so each reason lives in one place. The canary counts rules and notes,
+and the block changes neither count.
 
 # What the survey names
 

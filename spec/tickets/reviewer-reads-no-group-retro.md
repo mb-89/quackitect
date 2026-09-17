@@ -1,7 +1,8 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
+step: do
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -25,8 +26,20 @@ steps:
         form: text
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
-process_hash: 62642eaf8f9c9c53
-step: do
+process_hash: 568f402efe3adab7
+record:
+  - step: do
+    hand: box d42624a67d18a8
+    hash_before: cdb0cc9d5eca391c8b52b12ddcd132acdabb9c29
+    hash_after: cdb0cc9d5eca391c8b52b12ddcd132acdabb9c29
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 24 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: 49 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -45,27 +58,21 @@ Today the reviewer reads the retro off the handover file alone, and a group bran
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test test/level0/review.test.js
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
-
-<!-- the form is text -->
+The review verb read the retro off the handover file alone, and a group branch carries none. So every done group read retro absent. Now a branch with no brief takes its group ticket as the handback, and the retro reads off that ticket. A filled line under the retro chapter reads as present, and placeholders and headings say nothing. A branch with a brief keeps its reading.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change follows the ask: the verb reads the group ticket, and a test drives both readers
+- the cleanup the change reveals is none: the report and its count stand as they were
+- the reading stands in the review library alone, and the design chapter points at it
 
 # Discussion
 

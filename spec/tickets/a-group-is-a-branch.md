@@ -1,7 +1,8 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
+step: children
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -42,6 +43,7 @@ steps:
       - name: write
         does: writes the retro over the box's own window
         input: ["children", "notes"]
+        checklist: ["every fact the change adds stands in one place, and a note points at the file instead of repeating it"]
         evidence:
           - name: done
             form: list
@@ -72,8 +74,34 @@ steps:
           - name: left
             form: list
             says: every person step parked, every ticket minted with no group, and what the handover says
-step: children
+step: retro/cloud
 process: [[group]]
+process_hash: e655a1488d1ac788
+record:
+  - step: children
+    hand: box b9be613824b0
+    hash_before: a8dab8fe4475b5f06e5e028a654b9131f90820d8
+  - step: children
+    hand: the engine
+    hash_before: 44de554119853e99236107f0a0856b5be961eaf5
+    hash_after: 44de554119853e99236107f0a0856b5be961eaf5
+  - step: retro/notes
+    hand: box b9be613824b0
+    hash_before: 46640db8ea4734222178ef7dd1ab63f7f481c9e4
+    hash_after: 46640db8ea4734222178ef7dd1ab63f7f481c9e4
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box b9be613824b0
+    hash_before: 8faabc244cb937c565bfdaa4f359ea69ff7c3603
+    hash_after: 8faabc244cb937c565bfdaa4f359ea69ff7c3603
+  - step: retro/cloud
+    hand: box b9be613824b0
+    hash_before: a8f8a7f58197217e3bfa6b38259cb500c8a743b5
+    hash_after: a8f8a7f58197217e3bfa6b38259cb500c8a743b5
+reason: done
 ---
 
 # Ask
@@ -102,6 +130,12 @@ Done is a tree where no file names a group kind. `branch list` then names a grou
 
 <!-- the form is list -->
 
+## checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
 # children
 
 # retro
@@ -112,9 +146,7 @@ Done is a tree where no file names a group kind. `branch list` then names a grou
 
 ### drained
 
-<!-- retro notes, which passes when the private folder is empty -->
-
-<!-- the form is command -->
+    ./RUNME.sh retro notes
 
 ## write
 
@@ -122,33 +154,40 @@ Done is a tree where no file names a group kind. `branch list` then names a grou
 
 ### done
 
-<!-- what was done, one line a ticket or a thing -->
-
-<!-- the form is list -->
+- the-verbs-read-a-group: `branch list` draws a row per ticket under its group, closed done
+- [[spec/design_output/work#a-ticket-under-its-group]] holds the shape of the new rows
+- two cases in `test/level0/work.test.js` hold the code, and one of them goes red without it
+- `retro notes` found no private note, so the box leaves none behind
 
 ### well
 
-<!-- what went well, and what made it go well -->
-
-<!-- the form is list -->
+- the pull handed one leaf at a time, so the ask stood small enough to read whole
+- `ticketsOn` already took any ref, so the read costs one call and no new door
+- the check ran 900 tests green, and the rules passed over every file this change touches
+- `branch list` drew the new rows on the real tree, and ten groups named their tickets
 
 ### badly
 
-<!-- what did not, each with its moment in the log or the transcript -->
-
-<!-- the form is list -->
+- `branch take` claimed the group, and `branch sync` then refused: trunk and the branch carry unrelated roots
+- the refusal said git status names the files, and git named none, because the merge stopped first
+- local `main` stands at a root the remote dropped, so a work branch reads a trunk the remote lost
+- the group took its own children step before its sync step, and the sync evidence stands empty
 
 ### improve
 
-<!-- how each bad line stops happening, named by its home -->
-
-<!-- the form is list -->
+- `src/scripts/work.js`: `sync` names the unrelated-roots case apart from a conflict, and says what a hand does
+- [[spec/design_output/work#trunk-comes-in-first]]: the trunk step says what an unrelated root means
+- `src/scripts/work.js`: the take stops at a sync it fails, and holds the next leaf back
 
 ### thoughts
 
-<!-- what the thoughts say that the actions do not, off the transcript -->
+The tree carries two trunks. The remote `main` roots at a commit from today, and every work branch roots at one from last week. So `branch sync` cannot run at all, and the contract opens on a step no hand completes here. The work still lands, because a group's children touch files trunk leaves alone. The next merge is where the two roots meet, and that meeting belongs to a person.
 
-<!-- the form is text -->
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
 
 ## cloud
 
@@ -156,21 +195,21 @@ Done is a tree where no file names a group kind. `branch list` then names a grou
 
 ### lacked
 
-<!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
-<!-- the form is list -->
+- nothing: the install ran whole, and every host the run reached answered
+- the server behind `check` stands down on this box. The rest of `check` passes
 
 ### met
 
-<!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
-<!-- the form is list -->
+- a conflict at sync: `branch take` claimed the group, and `branch sync` refused on unrelated roots
+- the sync refusal left the working tree clean, so the advice to read `git status` found nothing to read
+- the group stands at `children` in its record with its sync evidence empty, because the sync verb answers 1 here
 
 ### left
 
-<!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
-<!-- the form is list -->
+- `branch merge a-group-is-a-branch` waits for a person, because trunk and this branch share no root
+- the two roots are a person's call: local `main` roots at 581b2647, and `origin/main` roots at 84bd1d30
+- the retro names two fixes to `src/scripts/work.js` and one to [[spec/design_output/work#trunk-comes-in-first]], and no ticket carries them yet
+- the group holds one child, the-verbs-read-a-group, and that child closes done
 
 # Discussion
 

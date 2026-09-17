@@ -154,7 +154,7 @@
           "help": "The level this box writes at. info writes every line a door says, and debug writes what the hooks see too."
         },
         "open": {
-          "help": "Open the log viewer, in a terminal beside the editor.",
+          "help": "Open the window, on its log tab, in a terminal beside the editor.",
           "widget": "action",
           "icon": "📜",
           "group": "agent control",
@@ -170,7 +170,29 @@
             "home the first line, end the newest, and it follows",
             "q leave"
           ],
-          "runs": "./RUNME.sh log"
+          "runs": "./RUNME.sh tui"
+        }
+      }
+    },
+    "code": {
+      "type": "object",
+      "required": [
+        "functionLines",
+        "fileLines"
+      ],
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "functionLines": {
+          "type": "number",
+          "unit": "lines",
+          "help": "The lines a function holds at most. The write door refuses a write that grows past it."
+        },
+        "fileLines": {
+          "type": "number",
+          "unit": "lines",
+          "help": "The lines a file holds at most. The write door refuses a write that grows past it."
         }
       }
     },
@@ -239,6 +261,30 @@
           "icon": "the owner picks one mark per state: play and stop",
           "gesture": 1
         },
+        "vehicle": {
+          "help": "Make a vehicle: a copy of this tree that works on itself, in the folder the press asks for.",
+          "widget": "action",
+          "icon": "🚚",
+          "group": "engine",
+          "row": 0,
+          "column": 0,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "asks": "folder",
+          "runs": "./RUNME.sh vehicle into <folder>"
+        },
+        "stub": {
+          "help": "Make a stub: a bare project this vehicle drives, in the folder the press asks for.",
+          "widget": "action",
+          "icon": "🌱",
+          "group": "engine",
+          "row": 0,
+          "column": 1,
+          "rowSpan": 1,
+          "colSpan": 1,
+          "asks": "folder",
+          "runs": "./RUNME.sh stub into <folder>"
+        },
         "beat": {
           "type": "number",
           "unit": "seconds",
@@ -251,7 +297,7 @@
             "unbound",
             "god"
           ],
-          "help": "Where the session takes its work from.",
+          "help": "Where the session takes its work from. The chapter The engine controls, under spec/design_output/config.md, says what each value means.",
           "widget": "toggle",
           "gesture": 5,
           "icon": "❌🔗🤖",
@@ -260,18 +306,6 @@
           "column": 4,
           "rowSpan": 1,
           "colSpan": 1
-        },
-        "autonomy": {
-          "type": "string",
-          "enum": [
-            "finish",
-            "start",
-            "ideation"
-          ],
-          "help": "How far the session goes on its own.",
-          "widget": "toggle",
-          "gesture": 5,
-          "icon": "U+1F680"
         }
       }
     }

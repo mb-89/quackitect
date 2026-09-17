@@ -170,7 +170,7 @@ test("a write to the field of another leaf is refused", () => {
   assert.deepEqual(rules(said, other), ["Ticket.lint"]);
 });
 
-// [[spec/design_output/schema#the-verbs-own-three-fields]]
+// [[spec/design_output/schema#the-verbs-own-their-fields]]
 test("an edit to a field the verbs own is refused, and the line points at it", () => {
   for (const [was, now, rule, line] of [
     ["state: open", "state: closed", "Ticket.state", 3],
@@ -187,7 +187,7 @@ test("an edit to a field the verbs own is refused, and the line points at it", (
   }
 });
 
-// [[spec/design_output/schema#the-verbs-own-three-fields]]
+// [[spec/design_output/schema#the-verbs-own-their-fields]]
 test("a field no rule marks stands, so a person's fields reach no door", () => {
   assert.deepEqual(weighed(open.replace("urgency: now", "urgency: soon")), []);
 });
@@ -213,6 +213,18 @@ test("the places answer the ask, the step's fields and the discussion, at any st
 test("a ticket standing at no leaf of its route offers a hand no field", () => {
   const said = open.replace("step: implement/change", "step: nowhere");
   assert.deepEqual([...placesIn(readNote(said), SCHEMA).keys()], ["1 Ask", "1 Discussion"]);
+});
+
+// [[spec/design_output/schema#the-three-places]]
+test("a ticket with no step stands at its first leaf, so its fields open to the hand the pull gives it to", () => {
+  const said = open
+    .replace("step: implement/change\n", "")
+    .replace("  - name: design\n    does: writes the design\n", "");
+  assert.deepEqual(
+    [...placesIn(readNote(said), SCHEMA).keys()],
+    ["1 Ask", "3 lint", "3 seen", "1 Discussion"],
+    "the first leaf's fields stand open",
+  );
 });
 
 const recorded = open.replace(

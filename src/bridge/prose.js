@@ -1,6 +1,5 @@
-// The prose reader. Every veto over Vale's findings enters here: the tense
-// veto, a length counted with a code span as one word, and a word read by
-// its lemma. The three doors reading prose call this one function.
+// The prose reader. Every veto over Vale's findings enters here, so each door
+// reading prose calls this one function.
 // [[spec/design_output/level0#the-tense-reader]]
 
 import { join } from "node:path";
@@ -111,7 +110,7 @@ function blanked(text) {
 
 function capsOf(box) {
   const said = schemaOf(box)?.layers?.sentence?.words ?? {};
-  return { sentence: Number(said.max ?? 25), listItem: Number(said.listItem ?? 20) };
+  return { sentence: Number(said.max), listItem: Number(said.listItem) };
 }
 
 function wordsHere(box) {

@@ -1,5 +1,4 @@
-// The vehicle: what a project carries, how a bare folder becomes one, and the
-// port the register hands each vehicle.
+// The vehicle a project carries, and the port the register hands it.
 // [[spec/design_output/vehicle#the-register-holds-the-port]]
 
 import { join } from "node:path";
@@ -11,7 +10,7 @@ import {
   portOf,
   withPort,
 } from "../../.claude/skills/level0/lib/vehicle.js";
-import { copyHere, readRegister, registerCopy } from "../scripts/vehicle.js";
+import { attach, copyHere, readRegister, registerCopy } from "../scripts/vehicle.js";
 
 const HOOK = ".claude/skills/level0";
 const FILES = ["hooks/level0.js", "hooks/hooks.json", ".claude-plugin/plugin.json"];
@@ -37,6 +36,12 @@ export function makesProject(disk, env, time, work, vehicle) {
 
 export function settles(disk, env, time, work, vehicle) {
   return vehicleOf(disk, env, time, work) ?? makesProject(disk, env, time, work, vehicle);
+}
+
+// [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+export function attachTo(disk, env, time, work, vehicle) {
+  attach(disk, time, work, copyHere(disk, time, vehicle));
+  return settles(disk, env, time, work, vehicle);
 }
 
 export function isVehicle(disk, folder) {

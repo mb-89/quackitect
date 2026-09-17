@@ -4,13 +4,14 @@ kind: [[design_output]]
 
 # Scope
 
-`src/viewer` holds the log viewer. This note covers the window, its keys, the
-filter, and how a line arrives.
+`src/viewer` holds the window this tree draws in a terminal. This note covers
+the window, its tabs, its keys, the filter, and how a line arrives.
 
 # The viewer
 
-`./RUNME.sh log` opens the log viewer in the terminal it stands in. The log sits
-on the left, and the details of one row open on the right.
+`./RUNME.sh tui` opens the viewer in the terminal it stands in. The window
+carries a strip of tabs, the open tab on the left, one pane on the right and a
+footer of status marks. The log is the first tab.
 
 It is a Go program on Bubble Tea, in `src/viewer`. It reads
 `.se/log/session.jsonl`, the one file every writer appends to. For details,
@@ -20,6 +21,7 @@ see [[spec/design_output/log#every-writer-appends]].
 
 | key | what it does |
 |---|---|
+| `1` to `9` | open the tab at that place |
 | `w`, `s` | move up and down the log |
 | up, down | scroll the details, and move the log while no details stand open |
 | Enter | open the details, and Enter again closes them |
@@ -48,42 +50,101 @@ The window carries no status bar.
 
 ## Alt L raises the floor
 
-The window shows the rows at the floor and above. The ladder is the one
-Python's logging climbs:
-
-| floor | shows |
-|---|---|
-| `debug` | every row |
-| `info` | every row a door says, and this is where the window opens |
-| `warn` | a refusal and a fault |
-| `error` | a fault |
-| `fatal` | what ends a session |
+The window shows the rows at the floor and above, and opens at `info`. The
+ladder is the one the log climbs. For what each level holds, see
+[[spec/design_output/log#what-a-box-writes]].
 
 `alt+l` raises the floor one level. From the top it comes round to the bottom,
-so the sixth press stands at the opening floor again. A debug row stays hidden
-until the floor comes round to it. The filter narrows what the floor leaves.
+so the press after the top stands at the opening floor again. A debug row stays
+hidden until the floor comes round to it. The filter narrows what the floor
+leaves. A row naming no level, or a level nobody knows, stands as `info`, so it
+shows at the opening floor.
 
-A row naming no level, or a level nobody knows, stands as `info`, so it shows
-at the opening floor.
+The footer names the floor at its right end, and the help names the key.
 
-The header names the floor beside the key, as `alt+L log lvl: INFO`, and in
-red while the floor stands off `info`.
+# The header holds the tabs
 
-# The header
+One line stands at the top, and a rule under it. The line carries the tabs, in
+a row, and `alt+? help` at its right end. Those two are the whole header.
 
-Two lines stand above the log at every size. The first names the columns and,
-at its right end, the three keys opening the pane, `enter details`, `alt+?
-help` and `alt+f filter`, then the floor as `alt+L log lvl: INFO`. The second
-is a rule. The header spans the whole window, so the pane opens under it too.
+A tab draws as its number and its name, as `1 log`. The open tab stands in
+blue, and the rest stand grey. `alt+? help` stands in blue while the help is
+open.
 
-While a filter holds, `alt+f filter` stands in bold red. A cleared line drops
-the filter, and the key goes back to grey.
+## A number opens a tab
 
-# The help
+A number one to nine opens the tab at that place, wherever a field takes no
+letters. A number past the tabs leaves the open one alone. Nine tabs is the
+ceiling, and a tree wanting a tenth says so then.
 
-`alt+?` shows the help in the pane, and `?` alone does the same. The help
-names every key, the columns, the colours, what the details show and how the
-filter opens. `help.go` holds it, beside the filter's own text.
+The filter line takes letters, so a number types into it, and the numbers reach
+the tabs again once it lets go.
+
+## The columns stand still
+
+The column names belong to the tab, not to the header, so each tab names its
+own. The log names `time`, `level`, `kind` and `said`, and the line stands
+still while the rows scroll under it.
+
+# The window is a split
+
+The left side holds the open tab, and the right side holds one pane: the
+details, the help or the filter. The key opening one closes it, and the details
+are the resting state. A shut pane gives the whole width to the tab.
+
+`tab` in `tabs.go` is what a tab carries: its name, the left side it draws,
+what the details hold, and whether a filter holds in it. So a tab after the log
+is a type and no change to the frame.
+
+# The footer carries status
+
+A rule stands under the split, and the marks under it. Each mark stands at a
+fixed place, so nothing shifts as one comes and goes, and a mark stands dark
+where its thing stands off.
+
+| where | the mark | it stands when |
+|---|---|---|
+| the right end | the floor, in four columns | always |
+| beside it | a funnel | a filter holds in the open tab |
+
+The floor reads as its first four letters in capitals, and wears the colour of
+the level it names, so `INFO` stands dark and `WARN` stands amber. The funnel
+stands red while a filter holds, and dark otherwise. The list grows as the tree
+grows.
+
+# The help reads the cursor
+
+`alt+?` shows the help in the pane, and it is the one way there. The help opens
+on three bands, in this order:
+
+| band | what it names |
+|---|---|
+| `GLOBAL` | every key the window holds, whatever stands open |
+| the tab | every key the open tab adds, under the tab's own name |
+| the selection | every key the selected thing adds |
+
+So a person pressing `alt+?` reads what to do next, wherever they stand. A band
+the window has nothing for goes, and an empty log names no selection band.
+
+Every key comes out of a registration, and no hand writes a second list. A tab
+says which bands it adds, so the keys follow the tab a person opens.
+
+| what | where it stands | what it holds |
+|---|---|---|
+| `act` | `keys.go` | a `key.Binding`, and what the key does |
+| `band` | `keys.go` | a name, and a run of acts |
+| `bands()` | `keys.go` | the three, out of the window and the open tab |
+| `key()` | `keys.go` | the press, over the same three bands |
+
+So a key nobody registers reaches the help nowhere and works nowhere.
+
+The help draws a key a line, its sentence starting at one column, and a long
+sentence wraps under itself the way a detail does. `FullHelpView` of the help
+bubble draws a group in columns, and it drops a group wider than the width it
+takes. The pane is half a window wide, so the window draws the bands itself.
+
+`help.go` holds what no key says: the columns, the colours, the floor, the
+details and how the filter reads. It stands under the bands.
 
 # The filter pane takes letters
 
@@ -112,13 +173,13 @@ one too.
 
 ## One key filters the line
 
+- `alt+q` keeps the prompts and the replies: the talk.
 - `alt+shift+f` keeps every line of the selected line's kind. On a tool line the kind is the tool, as `Read`.
-- `alt+ctrl+f` keeps every line of the selected line's level.
 
 The key writes its filter into the filter line, as `kind: /^prompt$/`, so it
-reads and edits like one a person types. The same key on a line of that kind
-again clears the filter. The filter pane names both keys, and the header stays
-at three.
+reads and edits like one a person types. The same key again clears the filter.
+The filter pane names each key, and the strip names none. The floor under
+`alt+l` keeps a level, so no key filters by level.
 
 ## A name nobody knows
 
@@ -204,7 +265,7 @@ draws the window once and prints it. A reader with no terminal sees the same win
 
 # The verb builds it
 
-`./RUNME.sh log` builds the viewer into `.se/bin/logview`, and runs it over
+`./RUNME.sh tui` builds the viewer into `.se/bin/logview`, and runs it over
 `.se/log/session.jsonl`. `viewerOf` in `src/scripts/viewer.js` decides:
 
 | what stands | what the verb does |
@@ -223,6 +284,60 @@ imports nothing.
 
 Go is a want, and the installer offers it. A box without Go keeps every other
 rule.
+
+# The mouse reaches the window
+
+The window asks the terminal for the mouse, and `src/viewer/mouse.go` is the one
+place reading where an event lands:
+
+| the event | what it reaches |
+|---|---|
+| a press on row 0 | the tab under it, or the help at the strip's right end |
+| a press on the column names | the sort, which [[spec/design_output/viewer#the-columns-stand-still]] covers |
+| a press on a list row | that row, as the selection |
+| the wheel over the list | the log, three rows a notch |
+| the wheel over the open pane | the pane's own scroll |
+| any event while the filter takes letters | nothing, so typing stands undisturbed |
+
+`mouse.go` reads the geometry the window already holds, so a moving split
+carries the mouse with it. `firstRow()` names the row the list opens on, out of
+`headWide` and `namesWide`, and `overPane` reads `listWidth()`.
+
+`--mouse=false` leaves the mouse to the terminal. A window holding the mouse
+takes the terminal's own text selection. So the switch stands for a person who
+wants that selection back, and most terminals give it back under a held shift.
+
+# The work tab
+
+The strip carries the log and the work. The work tab stands empty and says so,
+so a person reads that the window holds two things. The number keys carry
+between them. The tree view, its base file and its source of items land in this
+tab next.
+
+# A tab the caller names
+
+`./RUNME.sh tui work` opens the window on that tab, and `--tab work` says the
+same. `TABS` in `src/scripts/tui.js` names which words stand, and the window
+answers `tabNamed` for the same words. A word no tab carries leaves the open tab
+where it is.
+
+# A second launch hands over
+
+The window holds a port of its own, one above the bridge's, so one window stands
+at a time:
+
+| what the launch meets | what it does |
+|---|---|
+| the port free | opens the door, and draws the window |
+| the port held | hands its tab to the window standing, says so, and ends |
+
+`src/viewer/door.go` holds both directions in one shape. `openDoor` takes a
+`POST /tab` carrying `{"tab":"work"}` and puts a `tabMsg` into the window, and
+`tellPort` sends that same shape to a port. So the window reads a tab from
+another process, and reaches another port with the words it takes.
+
+The verb calls the door first. `told` in `src/scripts/tui.js` posts the tab, and
+a door answering `ok` means a window already stands.
 
 # The check runs its tests
 

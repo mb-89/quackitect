@@ -5,6 +5,8 @@
 package main
 
 import (
+	"quackitect/yaml"
+
 	"bufio"
 	"encoding/json"
 	"fmt"
@@ -17,7 +19,12 @@ import (
 	"sync"
 )
 
-const Version = "0.1.0"
+const (
+	Version         = "0.1.0"
+	severityError   = 1
+	severityWarning = 2
+	driveColon      = 2
+)
 
 type message struct {
 	JSONRPC string          `json:"jsonrpc"`
@@ -146,7 +153,7 @@ func (one *server) draws(where, text string) {
 	for _, said := range one.checker.Over(at) {
 		found[said.File] = append(found[said.File], said)
 	}
-	found[at] = found[at] // an empty list clears the panel for the open file
+	found[at] = found[at] // an yaml.Empty list clears the panel for the open file
 
 	one.guard.Lock()
 	defer one.guard.Unlock()
@@ -172,7 +179,7 @@ func (one *server) clears() {
 }
 
 func (one *server) publishes(tree *Tree, path string, found []Finding) {
-	rows := splitLines(tree.Read(path))
+	rows := yaml.SplitLines(tree.Read(path))
 	drawn := make([]diagnostic, 0, len(found))
 	for _, said := range found {
 		drawn = append(drawn, drawsAs(said, rows))
@@ -201,9 +208,9 @@ func drawsAs(said Finding, rows []string) diagnostic {
 		end = len(rows[line])
 	}
 
-	severity := 1
+	severity := severityError
 	if said.Severity == SeverityWarning {
-		severity = 2
+		severity = severityWarning
 	}
 	return diagnostic{
 		Range:    span{Start: position{Line: line, Character: column}, End: position{Line: line, Character: end}},
@@ -280,7 +287,7 @@ func pathOf(uri string) string {
 		return ""
 	}
 	path := said.Path
-	if len(path) > 2 && path[0] == '/' && path[2] == ':' {
+	if len(path) > driveColon && path[0] == '/' && path[driveColon] == ':' {
 		path = path[1:] // a Windows drive letter wears no leading slash
 	}
 	return filepath.FromSlash(path)

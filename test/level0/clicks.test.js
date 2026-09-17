@@ -53,10 +53,10 @@ const HOLD = {
 
 // [[spec/design_output/extension#a-click-becomes-a-message]]
 test("a click on an action asks for the run the declaration names", () => {
-  assert.deepEqual(messageFor({ key: "log.open", widget: "action", runs: "./RUNME.sh log" }), {
+  assert.deepEqual(messageFor({ key: "log.open", widget: "action", runs: "./RUNME.sh tui" }), {
     kind: "run",
     key: "log.open",
-    runs: "./RUNME.sh log",
+    runs: "./RUNME.sh tui",
   });
 });
 
