@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 steps:
   - name: sync
@@ -123,6 +123,11 @@ record:
     hand: box 3d4c068755ec · claude-code-remote
     hash_before: eb804b8ea6971b104419709d068989be87a7617b
     hash_after: eb804b8ea6971b104419709d068989be87a7617b
+  - step: retro/cloud
+    hand: box 3d4c068755ec · claude-code-remote
+    hash_before: 757e5ea46333c6b4876e08ceb4b5ac1af3cac42a
+    hash_after: 757e5ea46333c6b4876e08ceb4b5ac1af3cac42a
+reason: done
 ---
 
 # Ask
@@ -254,20 +259,32 @@ is the whole point of the road.
 ### lacked
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
 <!-- the form is list -->
+
+- the box starts no server, so the check stops at its health probe until the serve verb runs
+- the client refuses a shell write to the stop hook, and names it a write to the session own door
+- the install answers every tool it names, and the proxy carries every host this session reaches
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
 <!-- the form is list -->
+
+- the sync meets a conflict on ten files, and the box resolves each against the true base
+- the write door refuses a hand write to one ticket, over a record line the verbs own
+- the write door refuses the word the choice field asks for, because the tense rule reads it as past
+- the payload road answers both, and the pull checks the same text in memory
+- the cap inserts design/person-1 after the second return on one leaf
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/the-session-file-proves-itself]] carries the first person step, and stands in no group
+- [[spec/tickets/the-spawn-answers-a-helper]] carries the second, and stands in no group
+- [[spec/tickets/the-record-why-holds-spans]] carries the door the record shuts
+- this ticket is the handover, because a group branch carries its retro here
 
 # Discussion
 
