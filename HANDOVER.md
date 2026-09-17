@@ -1,5 +1,5 @@
 ---
-status: held
+status: done
 kind: [[handover]]
 urgency: now
 ---
