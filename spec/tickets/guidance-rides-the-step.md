@@ -109,7 +109,11 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
-step: retro/write
+  - step: retro/write
+    hand: box 220c71584772 · claude-code-remote
+    hash_before: 10f559386a6b1ac10413fcb3aee2f44ea3fbbb60
+    hash_after: 10f559386a6b1ac10413fcb3aee2f44ea3fbbb60
+step: retro/cloud
 ---
 
 # Ask
@@ -175,11 +179,22 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is list -->
 
+- [[spec/tickets/the-layer-reaches-sessions]], read at verdict: a second hand closed it first, so the read landed late
+- the count finding of that read stands in that ticket's discussion, for a person to decide
+- [[spec/tickets/the-pull-splits-by-topic]], read at design/review: the verdict reads fail, with the findings one a line
+- the cap fired on that hand-back, so the ticket waits on a person now
+- the retro notes drained, because the private folder holds nothing
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- The take handed the branch, the brief and the group whole, so the first pull needed no reading around.
+- `./RUNME.sh branch review` answered the check and the retro in one line, which made the reviewing guidance cheap.
+- The write door named each voice rule it refused, with the line, so the next write landed clean.
+- `--drop` freed a hold no verdict could close, so a duplicate read cost the group nothing.
 
 ### badly
 
@@ -187,17 +202,36 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is list -->
 
+- Two boxes drove one branch. The other closed the ticket while this box read the same diff.
+- The hand-back met a branch holding commits this box lacked, and the rebase found that close pushed.
+- `./RUNME.sh check` came back refused by the box, so the exit came through `branch review`.
+- A shell write to a tracked file met the write door, so the mutation read stopped there.
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
 
+- The take marks a branch held, and a pull from a second box says so at hand-out. Home: [[spec/design_output/work]].
+- A verdict hand fetches before it reads, so a step another hand closed costs no round. Home: [[spec/design_output/pull]].
+- The count the canary says reads one owner, and a row drives it. Home: [[spec/design_output/level0]].
+- The mutation read runs through Edit and the undo tool, which the write door takes. Home: [[spec/guidance/working]].
+
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
 
 <!-- the form is text -->
+
+The engine carried this box through its whole window, and the cost stood where two boxes met.
+
+| what the box felt | what stands behind it |
+|---|---|
+| the read was sound and landed late | the branch takes no lock a second box reads |
+| the fail was right and dear | the cap counts a round, and a round costs a person step |
+
+The verdict on the split reads fail over two small findings, and the cap turned that into a person step. A cap counting rounds makes a reviewer weigh a finding against the cost of naming it. That pressure runs against reviewing, which asks for every finding one a line. The cap belongs where a hand-back repeats itself, and a fresh finding is no repeat.
 
 ## cloud
 
