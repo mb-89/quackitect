@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: guidance-rides-the-step
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 0fc2b4132f94 · claude-code-remote
@@ -106,6 +106,10 @@ record:
     hand: box 0fc2b4132f94 · claude-code-remote
     hash_before: 8bb611210d85d2bdba305a86bde78a04158fced1
     hash_after: 8bb611210d85d2bdba305a86bde78a04158fced1
+  - step: design/review
+    hand: box 0fc2b4132f94 · claude-code-remote · helper-4
+    hash_before: daa9099594b03d038576790c4310a27437faa6cc
+    hash_after: daa9099594b03d038576790c4310a27437faa6cc
 ---
 
 # Ask
@@ -196,43 +200,38 @@ What the agent needs:
 
 <!-- the form is verdict -->
 
-fail
+pass
 
 | the question reviewing asks | the answer |
 |---|---|
-| does the approach answer the ask | no, and the box claim breaks |
+| does the approach answer the ask | yes, and every finding of the last round closes |
 | is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |
 | what does `./RUNME.sh check` answer | 0 |
-| does a retro stand in the handback | no, and no handback stands on the branch |
-| does every claim the approach makes carry a test | no, one road carries none |
+| does a retro stand in the handback | no, and the branch hand owes one at done |
+| does every claim the approach makes carry a test | no, the helper layer claim carries none |
 
 TL;DR:
 
-- The drop reads right. One helper answers the held step's notes, and both roads call it.
-- The ceiling claim holds. `wc -l` reads both roads under `code.fileLines`.
-- The helper mints a box and writes it, so the third test's claim breaks.
-- Each road hands the helper a box the helper does not read, and the approach names no fix.
+- The approach answers the ask. The drop reaches both roads, and a session with no hold keeps the layer.
+- The new reader mints nothing, so the box finding of the last round closes.
+- Each road passes a tree, a disk and a path joiner, and names the worked tree.
+- The counts and the helper layer each get a line, so every need of the last round closes.
 
 The findings, one a line:
 
-- The box claim breaks. `handOf` mints a box id and writes it where none stands.
-- The third test asserts the box file stays absent, and the helper writes it. Name what the road does instead.
-- The bridge hands no `join` and no `git`, which the helper's path reaches. Name what each road passes.
-- The trees split. The bridge reads its notes off the vehicle tree, and the hold stands under the worked tree. Name the root each road passes.
-- The hand name finds the hold. Name the hand each road reads, because the pull keys the hold by that name.
-- The bridge builds two layers, `standing` and `helper`, and the approach names one. Say what a spawned helper carries.
-- The counts answer every note, and the sentence a session reads says those numbers. Say what they answer once a note leaves.
-- The runtime road carries no test. Say what claim stands there, and how a reader reads it.
+- The reader claim reads true. `heldReads` mints a box through `handOf`, and the standing verb alone calls it.
+- The tree claim reads true. The bridge reads its notes off the vehicle tree, and the box names the worked one beside it.
+- The door claim reads true. Both roads already hold a disk, a tree and a path joiner.
+- The helper line stands without a test. Add a row: the helper layer keeps the note the session layer drops.
+- The hand column names the pull's name. Say that a session reads the hold its own pull writes, and a helper reads its own.
 
 What the agent needs:
 
 | number | need | status |
 |---|---|---|
-| 1 | the draft hand says what the box write does on a tree holding none | open |
-| 2 | the draft hand names what each road passes, and off which root | open |
-| 3 | the draft hand names the hand each road reads | open |
-| 4 | the draft hand says what the helper layer and the counts carry | open |
-| 5 | the review hand reads the approach again | open |
+| 1 | the implement hand tests the helper layer beside the session one | open |
+| 2 | the implement hand reads the hold the session's own pull writes | open |
+| 3 | the branch hand writes a retro into the handover before done | open |
 
 # implement
 
