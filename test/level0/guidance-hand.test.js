@@ -11,6 +11,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import { standingLayer } from "../../.claude/skills/level0/lib/guidance.js";
+import { heldReads } from "../../src/scripts/guidance-hand.js";
 import { work } from "../../src/scripts/work.js";
 import { SCHEMA } from "./pull-schema.js";
 
@@ -252,5 +253,46 @@ test("a note a step reads leaves the standing layer, and the rest of the layer s
   const said = standingLayer(notes, ["spec/guidance/voice"]);
 
   assert.ok(!/Say what is\./.test(said), "the note the step reads leaves the layer");
+  assert.match(said, /Answer the owner first\./);
+});
+
+// [[spec/design_output/pull#the-hand-and-the-hold]]
+test("the verb reads the hand --as names, and answers that hand's notes", async () => {
+  const { it } = doors(standing());
+  await heard(() => work(ROOT, ["pull", "--as", "helper-2"], it));
+
+  const { code, said } = await heard(() =>
+    work(ROOT, ["guidance", "--as", "helper-2"], it),
+  );
+
+  assert.equal(code, 0);
+  assert.match(said, /Say what is\./);
+});
+
+// [[spec/design_output/pull#the-work-answer]]
+test("a name reaching no note refuses, and says what it looked for", async () => {
+  const { it } = doors(standing());
+  await heard(() => work(ROOT, ["pull"], it));
+
+  const { code, said } = await heard(() =>
+    work(ROOT, ["guidance", "spec/guidance/nowhere"], it),
+  );
+
+  assert.equal(code, 1);
+  assert.match(said, /spec\/guidance\/nowhere names no note/);
+});
+
+// [[spec/design_output/level0#the-standing-layer]]
+test("the standing verb drops the note the hand --as names already reads", async () => {
+  const { it } = doors(standing());
+  await heard(() => work(ROOT, ["pull", "--as", "helper-2"], it));
+  const notes = [
+    { name: "voice.md", text: VOICE },
+    { name: "working.md", text: WORKING },
+  ];
+
+  const said = standingLayer(notes, heldReads({ ...it, root: ROOT }, ["--as", "helper-2"]));
+
+  assert.ok(!/Say what is\./.test(said), "the held step's note leaves the layer");
   assert.match(said, /Answer the owner first\./);
 });

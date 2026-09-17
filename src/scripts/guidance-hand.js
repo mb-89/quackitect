@@ -78,9 +78,31 @@ export function handsAgain(held, now) {
   return moved ? "moved" : "";
 }
 
+// A hand names itself with --as, and every verb reading the hold reads it the same way. [[spec/design_output/pull#the-hand-and-the-hold]]
+export function asIn(argv) {
+  const rest = [...(argv ?? [])].map(String);
+  const at = rest.indexOf("--as");
+  if (at >= 0) return String(rest[at + 1] ?? "").trim();
+  const inline = rest.find((one) => one.startsWith("--as="));
+  return inline ? inline.slice("--as=".length).trim() : "";
+}
+
+// [[spec/design_output/pull#the-hand-and-the-hold]]
+export function handHere(it, argv = []) {
+  const as = asIn(argv);
+  return as ? `${handOf(it)} · ${as}` : handOf(it);
+}
+
+// The as a hold was taken under, read back off the hand it names. [[spec/design_output/pull#the-hand-and-the-hold]]
+export function asOf(it, held) {
+  const mine = `${handOf(it)} · `;
+  const hand = String(held?.hand ?? "");
+  return hand.startsWith(mine) ? hand.slice(mine.length) : "";
+}
+
 // A note the held step reads leaves the standing layer. [[spec/design_output/level0#the-standing-layer]]
-export function heldReads(it) {
-  const held = holdOf(it, handOf(it));
+export function heldReads(it, argv = []) {
+  const held = holdOf(it, handHere(it, argv));
   return (held?.reads ?? []).map((one) => one.name);
 }
 

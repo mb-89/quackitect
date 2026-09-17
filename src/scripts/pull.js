@@ -30,7 +30,7 @@ import {
   withField,
 } from "./group.js";
 import { NOTES, schemasHere } from "./ticket.js";
-import { dropHold, guidanceText, handsAgain, holdAt, holdOf, noteRows, notesSaid, parsed, readsOf, writeHold } from "./guidance-hand.js";
+import { asOf, dropHold, guidanceText, handsAgain, holdAt, holdOf, noteRows, notesSaid, parsed, readsOf, writeHold } from "./guidance-hand.js";
 import { landed, unlandedRows } from "./landed.js";
 import { changedIn } from "./work.js";
 export const HOLDS = ".se/hold";
@@ -92,7 +92,7 @@ function stillHeld(it, held) {
   say(REFUSED, [
     `${held.ticket} stands in your hand at ${held.step}, and one hand holds one ticket.`,
     `Hand it back: ./RUNME.sh branch pull ${held.ticket} --pass, or --fail "why".`,
-    ...(why ? notesSaid(it, now.map((one) => one.name)) : ["", "Read them again with ./RUNME.sh branch guidance."]),
+    ...(why ? notesSaid(it, now.map((one) => one.name)) : ["", `Read them again with ./RUNME.sh branch guidance${asOf(it, held) ? ` --as ${asOf(it, held)}` : ""}.`]),
   ]);
   return 1;
 }

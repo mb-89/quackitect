@@ -185,7 +185,7 @@ const verbs = {
   rules: { says: "the mechanical rules Vale holds", run: async () => listRules() },
   standing: {
     says: "what level zero hands the agent every session",
-    run: () => standing(),
+    run: () => standing(rest),
   },
   doctor: {
     says: "what is installed, and what level zero found",
@@ -902,7 +902,7 @@ function listRules() {
   return 0;
 }
 
-async function standing() {
+async function standing(argv = []) {
   if (!files.exists(GUIDANCE)) {
     console.error("There is no spec/guidance, so nothing is handed over.");
     return 2;
@@ -911,7 +911,7 @@ async function standing() {
     .filter((name) => !isDraft(name))
     .map((n) => ({ name: n, text: files.read(join(GUIDANCE, n)) }))
     .filter(({ text }) => bindsHere(text, process.env));
-  const said = standingLayer(notes, heldReads({ ...it, root }));
+  const said = standingLayer(notes, heldReads({ ...it, root }, argv));
   if (!said) {
     console.log("No guidance note carries an Actionables chapter.");
     return 0;

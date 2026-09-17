@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[standard]]
 group: guidance-rides-the-step
-step: implement/change
+step: verdict
 record:
   - step: design/draft
     hand: box 0fc2b4132f94 · claude-code-remote
@@ -148,6 +148,12 @@ record:
     hand: box 0fc2b4132f94 · claude-code-remote
     hash_before: 2bf71de26a7015c3c9e793cb482cb677ea65ab39
     hash_after: 2bf71de26a7015c3c9e793cb482cb677ea65ab39
+  - step: verdict
+    hand: box 0fc2b4132f94 · claude-code-remote · helper-9
+    hash_before: d1a5dad0f59f82a1dbcfc769fa2589428ddaa328
+    hash_after: d1a5dad0f59f82a1dbcfc769fa2589428ddaa328
+    returns: 2
+    why: the hand takes it back
 ---
 
 # Ask
