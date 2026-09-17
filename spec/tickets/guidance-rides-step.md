@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[standard]]
 group: guidance-rides-the-step
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 0fc2b4132f94 · claude-code-remote
@@ -108,6 +108,17 @@ record:
     hand: box 0fc2b4132f94 · claude-code-remote · helper-4
     hash_before: cb30d57a7469f428507f5284843930076e841d85
     hash_after: cb30d57a7469f428507f5284843930076e841d85
+  - step: implement/tests-red
+    hand: box 0fc2b4132f94 · claude-code-remote
+    hash_before: 765a99d1820faae2c12dc3ab598eb70f7c4bfaae
+    hash_after: 765a99d1820faae2c12dc3ab598eb70f7c4bfaae
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 9 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -303,11 +314,40 @@ What the agent needs:
 
 <!-- the form is command -->
 
+./RUNME.sh branch test
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
+
+The tests stand in a new file, `test/level0/guidance.test.js`, so no file past its ceiling grows.
+
+| what the test drives | how it fails today |
+|---|---|
+| a log row per note the pull hands over | no row carries a note |
+| the verb, unnamed, answering the step's notes and the always-on ones | the usage text answers instead |
+| the verb, named, answering one note | the usage text answers instead |
+| the verb with no hold standing | the usage text answers instead |
+| a second hand-out naming the verb, handing no note again | the short line names the verb nowhere |
+| a refusal on the hold handing the notes again | the short line answers instead |
+| a compaction, which empties the hold's reads, handing them again | the short line answers instead |
+| a moved hash handing that note again | the short line answers instead |
+| the standing layer dropping a note the step reads | the layer takes no second argument |
+
+What surprises me:
+
+- The hold already names every note by hash. That piece of the ask stands, and its test passes today.
+- The log door answers a promise, so a verb carrying a log answers one too.
+- The older pull tests set no log, which is why they read as plain numbers.
+- The write door refuses a shell heredoc into a tracked file, so every write here goes through an editing tool.
+
+### checked
+
+- the change touches no file the ask leaves out: the tests stand in one new file
+- every door the change reaches has a fake: the disk, git, the clock and the log all run fake
+- a comment names the approach the change implements: the file heads with what it drives
 
 ## reflect
 
