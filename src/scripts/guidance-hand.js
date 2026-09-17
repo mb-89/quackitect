@@ -5,7 +5,7 @@
 
 import { actionables, bindsHere } from "../../.claude/skills/level0/lib/guidance.js";
 import { hashOf } from "../../.claude/skills/level0/lib/schema.js";
-import { handOf } from "./hand.js";
+import { agentOf, BOX, handOf } from "./hand.js";
 
 export const HOLDS = ".se/hold";
 export const GUIDANCE = "spec/guidance";
@@ -98,6 +98,17 @@ export function asOf(it, held) {
   const mine = `${handOf(it)} · `;
   const hand = String(held?.hand ?? "");
   return hand.startsWith(mine) ? hand.slice(mine.length) : "";
+}
+
+// The same answer for a road holding no doors of its own: a box standing nowhere answers an empty list, so a session start mints nothing. [[spec/design_output/level0#the-standing-layer]]
+export function heldReadsIn(disk, join, root, env = {}) {
+  const it = { disk, join, root, env, agent: Boolean(agentOf(env)) };
+  if (!disk.exists(join(root, ...BOX.split("/")))) return [];
+  try {
+    return heldReads(it);
+  } catch {
+    return [];
+  }
 }
 
 // A note the held step reads leaves the standing layer. [[spec/design_output/level0#the-standing-layer]]

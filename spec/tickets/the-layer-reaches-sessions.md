@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: guidance-rides-the-step
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 0fc2b4132f94 · claude-code-remote
@@ -110,6 +110,17 @@ record:
     hand: box 0fc2b4132f94 · claude-code-remote · helper-4
     hash_before: daa9099594b03d038576790c4310a27437faa6cc
     hash_after: daa9099594b03d038576790c4310a27437faa6cc
+  - step: implement/tests-red
+    hand: box 0fc2b4132f94 · claude-code-remote
+    hash_before: 37c5ef1b2aa59abbf8c7f6744906b264313db543
+    hash_after: 37c5ef1b2aa59abbf8c7f6744906b264313db543
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -245,15 +256,38 @@ What the agent needs:
 
 <!-- the form is command -->
 
+./RUNME.sh branch test
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The tests stand in a new file, `test/level0/session-layer.test.js`, over a fake disk alone.
+
+| what the test drives | how it stands today |
+|---|---|
+| a hold standing drops its step's note from the layer | fails, the layer carries the note |
+| the counts read the notes the layer carries | fails, the counts read every note |
+| no hold standing leaves the layer whole | passes, and it must go on passing |
+| no box file leaves the layer whole, and mints none | passes, and it must go on passing |
+| a spawned helper carries the layer whole | passes, and it must go on passing |
+| the reader answers the held step's notes | passes, because the reader lands with these tests |
+
+What surprises me:
+
+- The reader had to land with the tests. Without its export the file breaks on load, and a load break is no assertion.
+- The two trees split further than the approach said. The notes come off the vehicle tree, and the box and the hold off the worked one.
+- The bridge takes the worked tree as a new argument, because nothing it holds names that tree.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
+
+- the change touches no file the ask leaves out: the two roads, the reader, and one new test file
+- every door the change reaches has a fake: the disk is the only door here, and it runs fake
+- a comment names the approach the change implements: the reader and the test file each head with what they do
 
 <!-- the form is checklist -->
 
