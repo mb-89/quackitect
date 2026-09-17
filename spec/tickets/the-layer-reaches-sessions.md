@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: guidance-rides-the-step
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 0fc2b4132f94 · claude-code-remote
@@ -127,6 +127,17 @@ record:
     hash_after: 073b5a643fc819053bb0be8f1a1b0cc46b12b3a2
     answered:
       - name: lint
+        exit: 0
+        said: 67 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box 0fc2b4132f94 · claude-code-remote
+    hash_before: 2b01c6ae60938fb319287c70c6eb8fbc678f6b4a
+    hash_after: 2b01c6ae60938fb319287c70c6eb8fbc678f6b4a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: 67 stand at warning, which the panel draws and check allows.
 ---
@@ -347,11 +358,15 @@ What surprises me:
 
 <!-- the form is command -->
 
+./RUNME.sh branch test
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
@@ -359,11 +374,32 @@ What surprises me:
 
 <!-- the form is text -->
 
+A session now opens with the layer minus the notes its held step already hands it.
+
+| what changed | where |
+|---|---|
+| a reader minting no box, which answers the held step's notes | the guidance hand module |
+| the layer and the counts a session opens with | the bridge's guidance module |
+| the layer and the count the copilot runtime hands | the level zero copilot runtime |
+| the claims, over a fake disk | a new session layer test |
+
+Why it reads as it does:
+
+- The reader answers an empty list where the box file stands nowhere, so a session start mints nothing.
+- The notes come off the vehicle tree, and the box and the hold off the worked one. Each road passes both.
+- The counts read the notes the layer carries, so the sentence a session opens with reads true.
+- A spawned helper keeps the layer whole, because it reads a hold of its own.
+- The runtime already held a name `read`, so the list here takes the name `handed`.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the two roads, the reader, and one new test file
+- every door the change reaches has a fake: the disk is the only door here, and it runs fake
+- a comment names the approach the change implements: each road heads its drop with the line saying why
 
 # verdict
 
