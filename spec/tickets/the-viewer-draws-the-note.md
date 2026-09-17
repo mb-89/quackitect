@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -99,6 +99,17 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 47219c56615020b8d0f2c6f7c04f474f37ae6d0f
     hash_after: 47219c56615020b8d0f2c6f7c04f474f37ae6d0f
+  - step: implement/tests-red
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 9e531c2913a4134edb7725d1936160de2b6d2585
+    hash_after: ad0b141f5c632cb7ce5770a683e8467ec8d7713e
+    answered:
+      - name: tests
+        exit: 0
+        said: assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
