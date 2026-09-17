@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: guidance-rides-the-step
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 0fc2b4132f94 · claude-code-remote
@@ -146,6 +146,10 @@ record:
     hash_after: d086c3e3a78042dfa23110b47a86bdf6181c6a6f
     returns: 1
     why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask calls for | yes, both roads drop the note the held step hands |; | is what the diff touches beyond the ask trivial | yes, one sibling ticket's own commit rides along |; | what does `./RUNME.sh check` answer | 0 |; | does a retro stand in the handback | no, the handover stands nowhere yet |; | does every rule the branch adds carry a test | the branch adds no door rule, and six rows drive the bridge |; TL;DR:; Both roads drop the held step's note, and the counts follow the layer they draw.; The rows cover a hold standing, no hold, no box, the counts and the helper layer.; One fact stands twice: the drop test reads the same in the bridge and in the library.; The checklist asks each fact to stand in one place, so this verdict reads fail.; The findings, one a line:; `carried` in the bridge says again what `dropsHere` in the library already says. Hand the library one out, and call it.; The library cuts a markdown tail off each name it reads, and the bridge one leaves it. The two drift the day a name carries one.; `rulesIn` in the copilot road counts what `countsOf` in the library already counts. Call `countsOf` and read its rules.; `rulesIn` stands between two imports. Move it under the last one.; The copilot road carries the drop and no row drives it. Add one with a hold standing.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the drop test stands in the library alone, and both roads call it | open |; | 2 | the count reads `countsOf`, and `rulesIn` leaves the copilot road | open |; | 3 | a row drives the copilot road with a hold standing | open |; | 4 | the branch hand writes a retro into the handover before done | open |"
+  - step: implement/reflect
+    hand: box 0fc2b4132f94 · claude-code-remote
+    hash_before: ca04878eaef95ba7fd41d91410927887a9e8fe8a
+    hash_after: ca04878eaef95ba7fd41d91410927887a9e8fe8a
 ---
 
 # Ask
@@ -326,11 +330,28 @@ What surprises me:
 
 <!-- the form is text -->
 
+One class carries every finding: the caller rewrote what the library already says.
+
+| the class | what it is | the fix for the class |
+|---|---|---|
+| a caller says it again | a road writes its own copy of a rule the library owns | the library exports the rule, and every road calls it |
+
+Where each finding lands:
+
+- The drop test standing twice is the class, and the library owns that rule.
+- The name each side cuts drifts for the same reason, and one owner ends the drift.
+- The rule counting the rules is the class again, and the library counts them.
+- The untested road and the import out of order each take their own fix.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the two roads, the library, the reader and one test file
+- every door the change reaches has a fake: the disk is the only door here, and it runs fake
+- a comment names the approach the change implements: the library heads the rule it now owns alone
 
 ## change
 
