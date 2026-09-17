@@ -124,6 +124,13 @@ session, and a turn ends because a reason stands. An opening answer carries
 both: the canary at the top, what the agent sees under it, and the stop line
 last. For details, see [[spec/design_output/level0#the-canary-owes-a-debt]].
 
+The free stop of a new chat takes one exception. Where the first answer
+names a next step, `namesNext` reads it, the chat-is-new rule fires no
+more, and the turn holds open. So the canary rides that answer and closes no
+turn, and the agent does the step it names. A sentence opening on `Next`,
+`Then I` or `I` and a verb of the agent's own act names a step. A table, a
+heading and the stop line stand outside that reading.
+
 ## The off switch takes it
 
 `stop.enabled` at false skips the hold above and votes at once. The switch
@@ -180,7 +187,7 @@ a hole somebody walks through, so the name reaches a function alone.
 | `ticket-in-hand` | a hold stands under `.se/hold`, or an open private ticket stands |
 | `group-in-hand` | this branch's group carries a take with no hand-back |
 | `queue-waits` | a desk bound to the queue stands on trunk, and `queueHolds` reads a free open ticket or a group at `now` |
-| `chat-is-new` | the session log holds one prompt row at most, and the box is no cloud box |
+| `chat-is-new` | the session log holds one prompt row at most, the box is no cloud box, and the answer names no next step |
 | `stop-hook-off` | `spec/config/level0.json` says `stop.enabled` is false |
 | `never` | nothing, which is what an unbuilt rule takes |
 
@@ -204,6 +211,7 @@ reads two things:
 |---|---|
 | the prompt rows in the session log | one row at most stands, so the work stays unnamed |
 | `CLAUDE_CODE_REMOTE` and `SE_CLOUD` | both stay empty, so a person sits at this box |
+| the answer itself, through `namesNext` | it names no next step, so nothing stands half done |
 
 The log is the record, and it rotates at a session start. So the reason
 survives a restart of the server and dies with the chat, which is what a
