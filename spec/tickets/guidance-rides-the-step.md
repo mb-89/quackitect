@@ -117,7 +117,11 @@ record:
     hand: box 220c71584772 · claude-code-remote
     hash_before: 4f77f84dbd10523e18281fe22463820f5432faa4
     hash_after: 4f77f84dbd10523e18281fe22463820f5432faa4
-step: children
+  - step: children
+    hand: box 0fc2b4132f94 · claude-code-remote
+    skipped: true
+    why: the box leaves it while the-pull-splits-by-topic stand open
+step: retro/notes
 ---
 
 # Ask
