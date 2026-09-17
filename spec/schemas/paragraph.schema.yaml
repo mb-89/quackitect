@@ -14,6 +14,18 @@
 kind: paragraph
 misreads: 3
 
+# The frontmatter answers to its own schema, so these rules leave it alone. A
+# key below names a field a person writes prose into, and the rules read the
+# value of that field alone. Every other field is the engine's or the shape's,
+# and a rule over prose says nothing true about it.
+#
+# A key here holds one scalar of prose. The rules read a raw line, so a field
+# holding a sequence carries its own brackets and quotes into the reading, and
+# `scope` stands out for that reason.
+# [[spec/tickets/voice-rules-skip-the-record]]
+frontmatter:
+  prose: [does, says, checklist, comment, help, ask]
+
 layers:
   characters:
     admits: letters, digits, space, and the punctuation below

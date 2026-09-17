@@ -16,7 +16,7 @@ steps:
 
 The voice rules read a note's prose, and leave the fields the engine writes alone.
 
-Four rules walk a note line by line: `Sentence`, `ListItem`, `Markup` and `CodeSpans`. Each skips a fence, a table row, a heading and a quote. None skips the frontmatter, so each reads the YAML the engine writes as though a person wrote it.
+Four rules walk a note line by line: `Markup`, `Shape`, `ListItem` and `CodeSpans`. Each skips a fence, a table row, a heading and a quote. None skips the frontmatter, so each reads the YAML the engine writes as though a person wrote it. `Sentence` stands outside this, because it runs on Vale's own scoping, which reads the frontmatter as no prose.
 
 `work/the-hand-carries-a-step` stands `done` and merges nowhere, because its check answers 1 on four lines the engine wrote:
 
@@ -45,9 +45,26 @@ Done is a tree where a record merges. The trade stands open, and this ticket pic
 
 ## change
 
-<!-- what you change, and what surprises you -->
+The owner picked the second road, and named the seam: the schema says which fields hold prose.
 
-<!-- the form is text -->
+`paragraph.schema.yaml` grows a `frontmatter` key naming them, and the projection carries that list into every rule it writes:
+
+| what stands | where |
+|---|---|
+| the list of prose fields | `spec/schemas/paragraph.schema.yaml` |
+| the Tengo that blanks the rest | `.claude/skills/level0/lib/helpers.js` |
+| the list reaching each rule | `prelude` in `paragraph.js`, through the layer |
+
+`frontless` blanks each frontmatter line outside the list, and keeps its length, so a match still names its place. A line carrying no key rides the key above it, so a value running over several lines holds together. `plain` and `rows` both open with it, so every rule inherits the guard.
+
+Two things surprised me:
+
+| the surprise | what it cost |
+|---|---|
+| `Sentence` stands outside this, on Vale's own scoping, which reads the frontmatter as no prose | one row of the ask, corrected |
+| `scope` left the list, because a YAML sequence carries brackets into a raw line | sixteen guidance notes read red until it went |
+
+The reading proves both halves. The rules refuse a `does` field holding seven code spans, and they leave a `hand` field holding seven alone.
 
 # Discussion
 

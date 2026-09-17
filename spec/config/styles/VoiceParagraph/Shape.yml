@@ -11,10 +11,48 @@ script: |
 
   matches := []
 
+  prose := ["does", "says", "checklist", "comment", "help", "ask"]
+
+  frontless := func(said) {
+    lines := text.split(said, "\n")
+    if len(lines) < 2 || text.trim_space(lines[0]) != "---" { return said }
+    out := []
+    inside := true
+    keep := false
+    for at, line in lines {
+      if at == 0 {
+        out = append(out, line)
+        continue
+      }
+      if inside && text.trim_space(line) == "---" {
+        inside = false
+        out = append(out, line)
+        continue
+      }
+      if !inside {
+        out = append(out, line)
+        continue
+      }
+      found := text.re_find(`^[ \t]*-?[ \t]*([A-Za-z_][A-Za-z0-9_]*):`, line, 1)
+      if !is_undefined(found) {
+        keep = false
+        for one in prose {
+          if one == found[0][1].text { keep = true }
+        }
+      }
+      if keep {
+        out = append(out, line)
+      } else {
+        out = append(out, text.repeat(" ", len(line)))
+      }
+    }
+    return text.join(out, "\n")
+  }
+
   rows := func(said) {
     out := []
     at := 0
-    for line in text.split(said, "\n") {
+    for line in text.split(frontless(said), "\n") {
       out = append(out, {said: line, begin: at, end: at + len(line)})
       at += len(line) + 1
     }

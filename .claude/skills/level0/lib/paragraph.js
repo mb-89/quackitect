@@ -3,6 +3,7 @@
 // files follow at the next projection.
 // [[spec/design_output/projection#the-second-target]]
 
+import { frontless } from "./helpers.js";
 import { swapsOf, TERMS, wordsOf } from "./vocabulary.js";
 
 export const PARAGRAPH = "paragraph rules";
@@ -140,17 +141,20 @@ export function rulesFrom(said, banner = "", lists = null) {
   const answer = said?.registers?.answer ?? {};
   const put = (name, body) => out.set(name, file(banner, body));
 
-  const held = { ...(layers.shape ?? {}), ...(answer.shape ?? {}) };
+  // [[spec/tickets/voice-rules-skip-the-record]]
+  const prose = said?.frontmatter?.prose ?? [];
+  const layer = (name) => ({ ...(layers[name] ?? {}), prose });
+  const held = { ...layer("shape"), ...(answer.shape ?? {}), prose };
 
-  put("Characters.yml", characters(layers.characters ?? {}));
-  put("Markup.yml", markup(layers.markup ?? {}));
-  put("Shape.yml", run(layers.shape ?? {}, "", []));
+  put("Characters.yml", characters(layer("characters")));
+  put("Markup.yml", markup(layer("markup")));
+  put("Shape.yml", run(layer("shape"), "", []));
   put("ShapeAnswer.yml", run(held, " in an answer", answer.opens ?? []));
-  put("Paragraph.yml", paragraph(layers.shape ?? {}, ""));
+  put("Paragraph.yml", paragraph(layer("shape"), ""));
   put("ParagraphAnswer.yml", paragraph(held, " in an answer"));
-  put("Sentence.yml", sentence(layers.sentence ?? {}));
-  put("ListItem.yml", listItem(layers.sentence ?? {}));
-  put("CodeSpans.yml", codeSpans(layers.sentence ?? {}));
+  put("Sentence.yml", sentence(layer("sentence")));
+  put("ListItem.yml", listItem(layer("sentence")));
+  put("CodeSpans.yml", codeSpans(layer("sentence")));
   for (const [name, body] of grammar(layers.grammar ?? {})) put(name, body);
 
   // [[spec/design_output/projection#a-layer-writes-two-files]]
@@ -159,7 +163,7 @@ export function rulesFrom(said, banner = "", lists = null) {
   if (modals) put("ModalRequirement.yml", modals);
   // [[spec/funnel/a-paragraph-has-a-schema]]
   const words = wordsOf(lists);
-  if (words.length) put("Vocabulary.yml", vocabulary(layers.vocabulary ?? {}, lists));
+  if (words.length) put("Vocabulary.yml", vocabulary(layer("vocabulary"), lists));
   return out;
 }
 
@@ -185,9 +189,9 @@ function scripted(message, lines) {
 }
 
 // [[spec/design_output/projection#what-stands-outside-a-layer]]
-function prelude(wanted, blanks = true) {
-  const held = new Map(HELPERS);
-  const names = blanks ? ["blanked", "plain", ...wanted] : wanted;
+function prelude(wanted, blanks = true, prose = []) {
+  const held = new Map([...HELPERS, ["frontless", frontless(prose)]]);
+  const names = blanks ? ["blanked", "frontless", "plain", ...wanted] : ["frontless", ...wanted];
   return [
     'text := import("text")',
     "",
@@ -221,8 +225,7 @@ const HELPERS = new Map([
     "plain",
     [
       "plain := func(said) {",
-      "  out := said",
-      "  out = blanked(out, `(?s)^---\\n.*?\\n---`)",
+      "  out := frontless(said)",
       '  out = blanked(out, "(?s)```.*?```")',
       "  out = blanked(out, `(?s)~~~.*?~~~`)",
       "  out = blanked(out, `(?s)<!--.*?-->`)",
@@ -242,7 +245,7 @@ const HELPERS = new Map([
       "rows := func(said) {",
       "  out := []",
       "  at := 0",
-      '  for line in text.split(said, "\\n") {',
+      '  for line in text.split(frontless(said), "\\n") {',
       "    out = append(out, {said: line, begin: at, end: at + len(line)})",
       "    at += len(line) + 1",
       "  }",
@@ -306,7 +309,7 @@ function characters(layer) {
   const message = `A character ${tail}`;
 
   return scripted(message, [
-    ...prelude([]),
+    ...prelude([], true, layer.prose),
     "said := plain(scope)",
     "said = blanked(said, `(?m)^#{1,6} +`)",
     "said = blanked(said, `(?m)^[ \\t]*(?:[-*+]|[0-9]+[.)]) +`)",
@@ -336,7 +339,7 @@ function markup(layer) {
   const one = layer.heading?.oneTitle === true;
 
   return scripted("This markup stands outside what a paragraph admits.", [
-    ...prelude(["rows", "words"]),
+    ...prelude(["rows", "words"], true, layer.prose),
     "said := plain(scope)",
     "",
     "for row in rows(said) {",
@@ -452,7 +455,7 @@ function run(layer, where, opens = []) {
   const most = Number(layer.paragraphsPerRun);
 
   return scripted(`A run holds ${most} paragraphs${where}.`, [
-    ...prelude(["rows", "structure"], false),
+    ...prelude(["rows", "structure"], false, layer.prose),
     "said := scope",
     "",
     "fenced := false",
@@ -533,7 +536,7 @@ function listItem(layer) {
   const most = Number(layer.words?.listItem);
 
   return scripted(`A sentence in a list item holds ${most} words.`, [
-    ...prelude(["rows", "words"], false),
+    ...prelude(["rows", "words"], false, layer.prose),
     "fenced := false",
     "",
     "for row in rows(scope) {",
@@ -565,7 +568,7 @@ function codeSpans(layer) {
   const most = Number(layer.codeSpans);
 
   return scripted(`A sentence holds ${most} code spans.`, [
-    ...prelude(["rows"], false),
+    ...prelude(["rows"], false, layer.prose),
     "fenced := false",
     "",
     "for row in rows(scope) {",
@@ -604,7 +607,7 @@ function vocabulary(layer, lists) {
     `${where} with the note that defines it.`;
 
   return scripted(`A word ${tail}`, [
-    ...prelude([]),
+    ...prelude([], true, layer.prose),
     // [[spec/funnel/a-paragraph-has-a-schema]]
     // A map literal this long overruns the Tengo stack. [[spec/design_output/vocabulary#the-rule-matches-a-stem]]
     "list := `",
