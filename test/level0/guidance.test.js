@@ -1,256 +1,163 @@
-// The guidance a hand holds with its step, driven through fake doors. The pull
-// logs what it hands over, the verb answers it again, and the standing layer
-// drops what a step already reads.
-// [[spec/design_output/pull#the-work-answer]]
+// The guidance parser, tested. Level zero hands the agent the Actionables
+// chapter of every note, so what that chapter parses to is worth a test. The
+// cases reading the notes this tree ships stand in test/contract.
 
 import assert from "node:assert/strict";
-import { join } from "node:path";
 import { test } from "node:test";
-import { fakeClock } from "../../src/doors/fake/clock.js";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { fakeGit } from "../../src/doors/fake/git.js";
-import { fakeLog } from "../../src/doors/fake/log.js";
-import { standingLayer } from "../../.claude/skills/level0/lib/guidance.js";
-import { work } from "../../src/scripts/work.js";
-import { SCHEMA } from "./pull-schema.js";
+import {
+  actionables,
+  bindsHere,
+  canary,
+  canaryIn,
+  countsOf,
+  envOf,
+  parse,
+  standingLayer,
+  styled,
+} from "../../.claude/skills/level0/lib/guidance.js";
 
-const ROOT = "/tree",
-  SHA = "b818c390c02737351bf1b73aba36a573d34d2ecc";
-const BRANCH = "work/one-group";
-const HOLD = join(ROOT, ".se/hold/box-d462e994b4cef.json");
-const at = (path) => join(ROOT, ...path.split("/"));
-const VOICE =
-  "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Say what is. *\n2. Put the bottom line first.\n";
-const WORKING =
-  '---\nkind: [[guidance]]\nscope: ["every session"]\n---\n\n# Actionables\n\n1. Answer the owner first. *\n';
-
-async function heard(what) {
-  const lines = [];
-  const wasLog = console.log;
-  const wasError = console.error;
-  console.log = (...said) => lines.push(said.join(" "));
-  console.error = (...said) => lines.push(said.join(" "));
-  try {
-    return { code: await what(), said: lines.join("\n") };
-  } finally {
-    console.log = wasLog;
-    console.error = wasError;
-  }
-}
-
-const onBranch = (extra = {}) => ({
-  "git rev-parse --abbrev-ref HEAD": { stdout: `${BRANCH}\n` },
-  "git rev-parse HEAD": { stdout: `${SHA}\n` },
-  [`git rev-list --count HEAD..origin/${BRANCH}`]: { stdout: "0\n" },
-  "git status --porcelain": { stdout: "" },
-  sh: { exitCode: 0, stdout: "" },
-  ...extra,
-});
-
-function doors(files, answers = {}, more = {}) {
-  const said = fakeGit(onBranch(answers), ROOT);
-  const disk = fakeDisk({
-    [at("spec/schemas/ticket.schema.yaml")]: SCHEMA,
-    [at(".se/box.json")]: JSON.stringify({ id: "d462e994b4cef" }),
-    [at("spec/guidance/voice.md")]: VOICE,
-    [at("spec/guidance/working.md")]: WORKING,
-    ...files,
-  });
-  const it = {
-    proc: said.proc,
-    disk,
-    git: said,
-    join,
-    clock: fakeClock(),
-    agent: true,
-    cloud: true,
-    node: "node",
-    log: fakeLog(fakeClock(), { folder: "/log", id: "a6f8c43b" }),
-    ...more,
-  };
-  return { it, outside: said, disk };
-}
-
-const GROUP_NOTE = `---
-kind: [[ticket]]
-state: open
-urgency: soon
-process: [[group]]
-steps:
-  - name: children
-    by: children
-    on_fail: split
+const note = `---
+kind: [[guidance]]
+scope: ["everybody"]
 ---
 
-# Ask
+# Motivation
 
-One group.
-`;
+Why this note exists.
 
-const CHILD = `---
-kind: [[ticket]]
-state: open
-urgency: now
-step: design/draft
-steps:
-  - name: design
-    reads: [[spec/guidance/voice]]
-    steps:
-      - name: draft
-        does: writes the approach the ask calls for
-        evidence:
-          - name: approach
-            form: text
-            says: the approach
-      - name: review
-        does: reads the approach against the ask
-        not: draft
-        on_fail: draft
-        input: draft
-        evidence:
-          - name: verdict
-            form: verdict
-            says: pass or fail
-group: one-group
----
+# Actionables
 
-# Ask
-
-One piece of it.
-
-# design
-
-## draft
-
-### approach
-
-<!-- the approach -->
-
-## review
-
-### verdict
-
-<!-- pass or fail -->
+1. The first rule, which a person applies.
+2. The second rule, which needs an argument. *
 
 # Discussion
+
+## 2. The second rule
+
+Because of a thing that happened.
 `;
 
-const standing = (extra = {}) => ({
-  [at("spec/tickets/one-group.md")]: GROUP_NOTE,
-  [at("spec/tickets/a-child.md")]: CHILD,
-  ...extra,
+test("a note parses into its three chapters", () => {
+  const read = parse(note);
+  assert.deepEqual(Object.keys(read.chapters), [
+    "Motivation",
+    "Actionables",
+    "Discussion",
+  ]);
+  assert.match(read.chapters.Motivation, /Why this note exists/);
+  assert.equal(read.front.kind, "[[guidance]]");
 });
 
-const holdIn = (disk) => JSON.parse(disk.read(HOLD));
-const putHold = (disk, hold) => disk.write(HOLD, `${JSON.stringify(hold, null, 2)}\n`);
-
-// [[spec/design_output/pull#the-work-answer]]
-test("the hand-out writes one log row per note it hands over, naming the note and its hash", async () => {
-  const { it, disk } = doors(standing());
-
-  const { code } = await heard(() => work(ROOT, ["pull"], it));
-
-  assert.equal(code, 0);
-  const rows = it.log.lines().filter((one) => one.note);
-  assert.equal(rows.length, 1, "one row lands per note the pull hands over");
-  assert.equal(rows[0].note, "spec/guidance/voice");
-  assert.equal(rows[0].hash, holdIn(disk).reads[0].hash);
-  assert.equal(rows[0].step, "design/draft");
+test("the actionables come out one per item, with the marker stripped", () => {
+  assert.deepEqual(actionables(note), [
+    "The first rule, which a person applies.",
+    "The second rule, which needs an argument.",
+  ]);
 });
 
-// [[spec/design_output/pull#the-work-answer]]
-test("branch guidance answers the held step's notes and the always-on ones", async () => {
-  const { it } = doors(standing());
-  await heard(() => work(ROOT, ["pull"], it));
-
-  const { code, said } = await heard(() => work(ROOT, ["guidance"], it));
-
-  assert.equal(code, 0);
-  assert.match(said, /spec\/guidance\/voice/);
-  assert.match(said, /Say what is\./);
-  assert.match(said, /spec\/guidance\/working/);
-  assert.match(said, /Answer the owner first\./);
+test("a note carrying no actionables answers none", () => {
+  assert.deepEqual(actionables("# Motivation\n\nNothing else.\n"), []);
 });
 
-// [[spec/design_output/pull#the-work-answer]]
-test("branch guidance names one note and answers that note alone", async () => {
-  const { it } = doors(standing());
-  await heard(() => work(ROOT, ["pull"], it));
+test("the standing layer carries every note under its own title", () => {
+  const said = standingLayer([
+    { name: "voice.md", text: note },
+    { name: "empty.md", text: "# Motivation\n\nNothing.\n" },
+  ]);
+  assert.match(said, /### voice/);
+  assert.match(said, /1\. The first rule/);
+  assert.doesNotMatch(said, /### empty/, "a note with no rules adds no heading");
+});
 
-  const { code, said } = heard(() =>
-    work(ROOT, ["guidance", "spec/guidance/voice"], it),
+test("the standing layer carries no Discussion chapter", () => {
+  const said = standingLayer([{ name: "voice.md", text: note }]);
+  assert.doesNotMatch(said, /Because of a thing that happened/);
+});
+
+test("a note naming no variable binds every box", () => {
+  assert.equal(bindsHere(note, {}), true);
+  assert.deepEqual(envOf(note), []);
+});
+
+test("a note names the variables it waits for", () => {
+  const waits = `---\nkind: [[guidance]]\nenv:\n  - ONE\n  - TWO\n---\n\n# Actionables\n\n1. Do it.\n`;
+  assert.deepEqual(envOf(waits), ["ONE", "TWO"]);
+  assert.equal(bindsHere(waits, {}), false, "no variable set");
+  assert.equal(bindsHere(waits, { TWO: "1" }), true, "one of them is enough");
+});
+
+test("an empty, zero or false value switches nothing on", () => {
+  const waits = `---\nkind: [[guidance]]\nenv: ONE\n---\n\n# Actionables\n\n1. Do it.\n`;
+  for (const said of ["", "0", "false", "FALSE", "  "]) {
+    assert.equal(
+      bindsHere(waits, { ONE: said }),
+      false,
+      `${JSON.stringify(said)} is no value`,
+    );
+  }
+  for (const said of ["1", "true", "yes"]) {
+    assert.equal(
+      bindsHere(waits, { ONE: said }),
+      true,
+      `${JSON.stringify(said)} is a value`,
+    );
+  }
+});
+
+// [[spec/design_output/level0#the-canary]]
+test("the canary carries the counts level zero loaded", () => {
+  assert.equal(
+    canary({ rules: 14, notes: 5, stop: true }),
+    "level0 holds this session: 14 rules, 5 notes, the stop hook on.",
   );
-
-  assert.equal(code, 0);
-  assert.match(said, /Say what is\./);
-  assert.ok(!/Answer the owner first\./.test(said), "a named note answers alone");
+  assert.match(canary({ rules: 1, notes: 1, stop: false }), /the stop hook off\.$/);
 });
 
-// [[spec/design_output/pull#the-work-answer]]
-test("branch guidance with no hold standing says so, and names the pull", async () => {
-  const { it } = doors(standing());
-
-  const { code, said } = await heard(() => work(ROOT, ["guidance"], it));
-
-  assert.equal(code, 1);
-  assert.match(said, /branch pull/);
+test("the canary counts the notes carrying a rule", () => {
+  const empty = `---\nkind: [[guidance]]\n---\n\n# Motivation\n\nNothing to do.\n`;
+  assert.deepEqual(
+    countsOf([
+      { name: "a.md", text: note },
+      { name: "b.md", text: empty },
+    ]),
+    {
+      notes: 1,
+      rules: 2,
+    },
+  );
 });
 
-// [[spec/design_output/pull#the-hand-and-the-hold]]
-test("a second hand-out at one step says the short line, and hands no note again", async () => {
-  const { it } = doors(standing());
-  await heard(() => work(ROOT, ["pull"], it));
-
-  const { code, said } = await heard(() => work(ROOT, ["pull"], it));
-
-  assert.equal(code, 1);
-  assert.match(said, /branch guidance/);
-  assert.ok(!/Say what is\./.test(said), "an unmoved hash hands no note again");
+test("an answer opening on the line word for word comes back as the same", () => {
+  const said = canary({ rules: 14, notes: 5, stop: true });
+  const answer = `${said}\n\nThe work stands pushed.\n`;
+  assert.deepEqual(canaryIn(answer, said), { found: "same", said });
 });
 
-// [[spec/design_output/pull#the-hand-and-the-hold]]
-test("a refusal standing on the hold hands the notes again", async () => {
-  const { it, disk } = doors(standing());
-  await heard(() => work(ROOT, ["pull"], it));
-  putHold(disk, { ...holdIn(disk), refused: 1 });
-
-  const { said } = await heard(() => work(ROOT, ["pull"], it));
-
-  assert.match(said, /Say what is\./);
+// [[spec/design_output/level0#the-canary-opens-an-answer]]
+test("a line standing anywhere but first opens no answer, so it proves nothing", () => {
+  const said = canary({ rules: 14, notes: 5, stop: true });
+  const answer = `The work stands pushed.\n\n${said}\n`;
+  assert.deepEqual(canaryIn(answer, said), { found: "none", said: "" });
 });
 
-// [[spec/design_output/pull#the-hand-and-the-hold]]
-test("a compaction, which empties the hold's reads, hands the notes again", async () => {
-  const { it, disk } = doors(standing());
-  await heard(() => work(ROOT, ["pull"], it));
-  putHold(disk, { ...holdIn(disk), reads: [] });
-
-  const { said } = await heard(() => work(ROOT, ["pull"], it));
-
-  assert.match(said, /Say what is\./);
+test("an answer opening on other counts comes back with both", () => {
+  const said = canary({ rules: 14, notes: 5, stop: true });
+  const other = canary({ rules: 9, notes: 5, stop: true });
+  assert.deepEqual(canaryIn(`I read ${other}`, said), { found: "other", said: other });
 });
 
-// [[spec/design_output/pull#the-hand-and-the-hold]]
-test("a note whose hash moved hands again, and the row says the hash moved", async () => {
-  const { it, disk } = doors(standing());
-  await heard(() => work(ROOT, ["pull"], it));
-  const hold = holdIn(disk);
-  putHold(disk, { ...hold, reads: [{ ...hold.reads[0], hash: "0000000000000000" }] });
-
-  const { said } = await heard(() => work(ROOT, ["pull"], it));
-
-  assert.match(said, /Say what is\./);
+test("an answer saying nothing comes back absent", () => {
+  const said = canary({ rules: 14, notes: 5, stop: true });
+  assert.deepEqual(canaryIn("The work stands pushed.", said), {
+    found: "none",
+    said: "",
+  });
 });
 
-// [[spec/design_output/level0#the-standing-layer]]
-test("a note a step reads leaves the standing layer, and the rest of the layer stands", async () => {
-  const notes = [
-    { name: "voice.md", text: VOICE },
-    { name: "working.md", text: WORKING },
-  ];
-
-  const said = standingLayer(notes, ["spec/guidance/voice"]);
-
-  assert.ok(!/Say what is\./.test(said), "the note the step reads leaves the layer");
-  assert.match(said, /Answer the owner first\./);
+// [[spec/design_output/level0#the-style-carries-a-note]]
+test("a note flagged style true goes to the output style, and no flag keeps it in the session", () => {
+  const flagged = note.replace('scope: ["everybody"]', 'scope: ["everybody"]\nstyle: true');
+  assert.equal(styled(flagged), true);
+  assert.equal(styled(note), false);
+  assert.equal(styled(note.replace('scope: ["everybody"]', 'scope: ["everybody"]\nstyle: false')), false);
 });

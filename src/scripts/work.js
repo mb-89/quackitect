@@ -39,6 +39,8 @@ import { serving } from "./serve.js";
 import { testVerb } from "./test-verb.js";
 import { freeIn, staleClaim, trigger } from "./stand.js";
 import { unblock } from "./unblock.js";
+import { CONTRACT_HEADING, contractRows, USAGE } from "./branch-usage.js";
+import { guidance } from "./guidance-verb.js";
 export const BRIEF = "HANDOVER.md";
 const COL = { branch: 34, child: 32, kind: 6, status: 6, why: 24 };
 export const MS = 1000;
@@ -69,6 +71,8 @@ export function work(root, argv, doors) {
     list,
     // [[spec/design_output/pull#the-hand-out]]
     pull: (it, _name, argv) => pull({ ...it, take: (group) => serving(it, take(it, group)), ready: () => readyToMerge(it) }, argv),
+    // [[spec/design_output/pull#the-work-answer]]
+    guidance: (it, name) => guidance(it, name, process.env),
     // [[spec/design_output/work#a-person-step-leaves]]
     unblock,
     test: (it, _name, argv) => testVerb(it, argv),
@@ -77,20 +81,7 @@ export function work(root, argv, doors) {
     return tell(it, what, doing[what](it, name, argv));
   }
   if (!doing[what]) {
-    console.log("Usage: ./RUNME.sh branch <verb>\n");
-    console.log("  new <name>    cut work/<name> from main with the brief, and push");
-    console.log("  take          take the next branch marked todo, and print its brief");
-    console.log("  sync          take main into this branch before you start");
-    console.log("  done          mark this branch done, commit and push");
-    console.log("  release       put this branch, or the one you name, back to todo");
-    console.log("  read <name>   print what stands on work/<name>");
-    console.log("  review <name> gather what a reader needs, and answer the report");
-    console.log("  list [--done] every work branch and its status, or the done ones alone");
-    console.log("  merge <name>  take a done branch into main");
-    console.log("  close [name]  delete a branch already inside main, or every one");
-    console.log("  pull [ticket] take the next leaf of this group, or hand one back with --pass, --fail, --became");
-    console.log("  unblock <t> <successor> close a ticket waiting on a person, and hand it to its successor");
-    console.log("  test [file]   run the tests the branch changes since the take: green, assertion, build or missing");
+    for (const row of USAGE) console.log(row);
     return what ? 2 : 0;
   }
   return doing[what](it, name, argv);
@@ -353,40 +344,13 @@ function sync(it) {
   return 0;
 }
 
-export const CONTRACT_HEADING = "## How this branch runs";
+export { CONTRACT_HEADING };
 
 // [[spec/design_output/work#every-brief-carries-the-contract]]
 export function withContract(brief) {
   const said = String(brief ?? "").trimEnd();
   if (said.includes(CONTRACT_HEADING)) return `${said}\n`;
-  return [
-    said,
-    "",
-    CONTRACT_HEADING,
-    "",
-    "Level zero deletes this file when it reads it, so the copy in your context",
-    "is the only one left. These steps write it back.",
-    "",
-    `1. Run \`./RUNME.sh branch sync\` FIRST. It takes ${TRUNK} into this branch, so`,
-    "   an old branch works against what the tree holds now. Resolve any conflict",
-    "   before you start, because a conflict found later costs the work already",
-    "   done.",
-    "2. Commit and push each time you finish a thing. A cloud box dies and takes",
-    "   its working tree with it.",
-    `3. Write your result and your retro into \`${BRIEF}\`, at the root, replacing`,
-    "   this brief. Head the retro `What surprises me`, and name every dead end",
-    "   you walk into.",
-    `4. Run \`./RUNME.sh branch sync\` again, so ${TRUNK} comes in last too.`,
-    "   Run `./RUNME.sh check` after it, and answer whatever the merge turns red.",
-    "5. Run `./RUNME.sh branch done`, which sets the status and pushes.",
-    "6. Stop for no person. Where a step wants one, mint a ticket outside the",
-    "   group, write what stands open into its ask, and run `./RUNME.sh branch",
-    "   unblock <ticket> <successor>`. Then finish the rest and run `branch done`.",
-    `7. Run \`./RUNME.sh branch merge <name>\` from ${TRUNK} to take it in, then`,
-    "   `branch close`. A cloud box stops at step 4, because the harness holds",
-    `   ${TRUNK} shut there and a cloud box opens no pull request.`,
-    "",
-  ].join("\n");
+  return contractRows(said, TRUNK, BRIEF);
 }
 
 function newWork(it, name) {

@@ -74,6 +74,7 @@ import {
 } from "./vehicle.js";
 import { attachTo } from "../bridge/vehicle.js";
 import { stubInto } from "./stub.js";
+import { heldReads } from "./guidance-hand.js";
 import { HOOKS } from "./precommit.js";
 import { graphIn } from "./graph.js";
 import { withRoute } from "./process.js";
@@ -910,13 +911,12 @@ async function standing() {
     .filter((name) => !isDraft(name))
     .map((n) => ({ name: n, text: files.read(join(GUIDANCE, n)) }))
     .filter(({ text }) => bindsHere(text, process.env));
-  const said = standingLayer(notes);
+  const said = standingLayer(notes, heldReads({ ...it, root }));
   if (!said) {
     console.log("No guidance note carries an Actionables chapter.");
     return 0;
   }
-  console.log(said);
-  console.log(`\n${canaryText(canary({ ...countsOf(notes), stop: (await settings.ask("stop.enabled")) !== false }))}`);
+  console.log(`${said}\n\n${canaryText(canary({ ...countsOf(notes), stop: (await settings.ask("stop.enabled")) !== false }))}`);
   return 0;
 }
 

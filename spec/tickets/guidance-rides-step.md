@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[standard]]
 group: guidance-rides-the-step
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 0fc2b4132f94 · claude-code-remote
@@ -119,6 +119,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 0fc2b4132f94 · claude-code-remote
+    hash_before: 19065b18e8c89df14d2130ff14aaee28ff2674a7
+    hash_after: 19065b18e8c89df14d2130ff14aaee28ff2674a7
+    answered:
+      - name: lint
+        exit: 0
+        said: 65 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
@@ -368,6 +376,14 @@ What surprises me:
 <!-- the tree builds and lints -->
 
 <!-- the form is command -->
+
+./RUNME.sh lint
+
+### checked
+
+- the change touches no file the ask leaves out: the pull, the work verb, the layer and three new modules
+- every door the change reaches has a fake: the disk, git, the clock and the log all run fake
+- a comment names the approach the change implements: each new file heads with what it does
 
 ## tests-green
 
