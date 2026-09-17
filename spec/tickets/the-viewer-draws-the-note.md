@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -118,6 +118,17 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 1d8758fd377900301ec6ed3591a2ca0267d89d0c
+    hash_after: a609cfcb5436c0a86ce3e981ccef99315913178f
+    answered:
+      - name: tests
+        exit: 0
+        said: green
+      - name: check
+        exit: 0
+        said: 65 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
