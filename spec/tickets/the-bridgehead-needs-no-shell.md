@@ -50,6 +50,6 @@ Done is a bridgehead reaching the same answers with no shell:
 
 The owner reads `the start of the server fails` in the session log, and asks for the note and the fix later.
 
-The same log carries `the server answers nothing at http://127.0.0.1:6510/event` three times, each with its own cause: `remote-cancel`, `Unable to connect`, and `The socket connection was closed unexpectedly`. The middle one follows from this defect, and the other two stand on their own.
+The same log carries `the server answers nothing at http://127.0.0.1:6510/event` three times, each with its own cause: `remote-cancel`, `Unable to connect`, and `The socket connection was closed unexpectedly`. The middle one follows from this defect, the last one belongs to [[spec/tickets/the-server-holds-its-socket]], and `remote-cancel` stands on its own.
 
 `./RUNME.sh check` runs `serverHolds()` with a 2 second timeout, and answered red once inside `branch merge` while the tree read green a minute either side. A merge turning red on a health probe costs a person the merge, so the check's wait belongs in the same pass.
