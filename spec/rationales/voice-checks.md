@@ -24,31 +24,31 @@ guidance schema holds a note to fifteen items. The voice note stands full, so a
 check joining it pushes a rule out. A note of its own costs one section in the
 style, and the style reaches a hand at every turn.
 
-## 1. What a reader does
+## 1. The reader acts on it
 
 A sentence a reader acts on nowhere still costs them the reading. It also costs
-whoever keeps it true. The check asks the one question sorting the two, and a
-hand answering it cuts more than it keeps.
+whoever keeps it true. The check sorts the two, and a hand answering it cuts
+more than it keeps.
 
-## 2. A thing you leave alone
+## 2. Inside your authority
 
 An aside about another's mechanism ages where nobody looks. A hand changing that
 mechanism reads the notes it owns, and reads no note that mentioned it in
 passing. So the aside stands wrong, and the hand who wrote it moved on.
 
-## 3. Read it, or carry it
+## 3. No assertion from memory
 
 A claim from memory reads right to the hand writing it. This tree refused two
-such claims in one session, and one grep answered each. The check names the
-difference, so the hand runs the grep.
+such claims in one session, and one grep answered each. So the cost of checking
+stands under the cost of a review.
 
-## 4. A count a command answers
+## 4. No number in prose
 
 A number lands stale. One draft wrote the count of files naming a tool, and the
-draft's own file joined that list as it landed. The command stays true, so the
-check asks for the command.
+draft's own file joined that list as it landed. A command stays true, and a
+rationale holds the number an argument needs.
 
-## 5. The tree says it already
+## 5. It stands nowhere already
 
 A second wording drifts faster than a second copy, because a search finds a copy
 and misses a wording. The check asks before the words, where the finding costs
