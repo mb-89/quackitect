@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: guidance-rides-the-step
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 0fc2b4132f94 · claude-code-remote
@@ -102,6 +102,10 @@ record:
     hash_after: dcc573eb0a7765e6d259cd5f5502223ee4b2180d
     returns: 1
     why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | no, and the box claim breaks |; | is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 |; | does a retro stand in the handback | no, and no handback stands on the branch |; | does every claim the approach makes carry a test | no, one road carries none |; TL;DR:; The drop reads right. One helper answers the held step's notes, and both roads call it.; The ceiling claim holds. `wc -l` reads both roads under `code.fileLines`.; The helper mints a box and writes it, so the third test's claim breaks.; Each road hands the helper a box the helper does not read, and the approach names no fix.; The findings, one a line:; The box claim breaks. `handOf` mints a box id and writes it where none stands.; The third test asserts the box file stays absent, and the helper writes it. Name what the road does instead.; The bridge hands no `join` and no `git`, which the helper's path reaches. Name what each road passes.; The trees split. The bridge reads its notes off the vehicle tree, and the hold stands under the worked tree. Name the root each road passes.; The hand name finds the hold. Name the hand each road reads, because the pull keys the hold by that name.; The bridge builds two layers, `standing` and `helper`, and the approach names one. Say what a spawned helper carries.; The counts answer every note, and the sentence a session reads says those numbers. Say what they answer once a note leaves.; The runtime road carries no test. Say what claim stands there, and how a reader reads it.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the draft hand says what the box write does on a tree holding none | open |; | 2 | the draft hand names what each road passes, and off which root | open |; | 3 | the draft hand names the hand each road reads | open |; | 4 | the draft hand says what the helper layer and the counts carry | open |; | 5 | the review hand reads the approach again | open |"
+  - step: design/draft
+    hand: box 0fc2b4132f94 · claude-code-remote
+    hash_before: 8bb611210d85d2bdba305a86bde78a04158fced1
+    hash_after: 8bb611210d85d2bdba305a86bde78a04158fced1
 ---
 
 # Ask
@@ -136,27 +140,44 @@ For the library that already drops them, see [[spec/tickets/guidance-rides-step]
 |---|---|
 | what a session carries | the layer, without the notes its held step hands it |
 | where the drop happens | the two roads into a session, each of which calls the layer |
-| how each road reads the hold | the helper the standing verb already calls |
+| how each road reads the hold | a reader minting nothing, which takes the doors a road holds |
+| which tree holds the hold | the worked tree, which the box names beside the vehicle one |
 | what a session with no hold carries | the layer whole, as it carries it today |
+| what the counts answer | the notes the layer carries, so the sentence reads true |
 
 TL;DR:
 
-- One helper already answers the held step's notes, and both roads call it.
-- Neither road's file stands past its ceiling, so no cut pays for this change.
-- A box standing nowhere answers an empty list, so a session start writes nothing.
-- Each road keeps the doors it already holds, and no new door reaches it.
+- The reader mints no box. Where the box file stands nowhere, it answers an empty list.
+- So this ticket adds a reader beside the one the standing verb calls, and that one keeps minting.
+- Each road passes the worked tree, the disk it holds, and a path joiner, and takes no new door.
+- A spawned helper keeps the layer whole, because its own hold stands elsewhere.
 
 | piece | home |
 |---|---|
+| the reader minting nothing | the guidance hand module, beside the reader the verb calls |
 | the layer the bridge hands a session | the bridge's guidance module |
 | the layer the runtime hands a session | the level zero copilot runtime |
-| the held step's notes | the guidance hand module, which both read |
+
+What each road passes the reader:
+
+| the road | the tree | the disk | the hand |
+|---|---|---|---|
+| the bridge | the worked tree the box names | the box's own disk | the same name the pull writes |
+| the runtime | the same tree, off the same box | the disk it already reads with | the same name |
+
+What stays as it stands:
+
+- The helper layer stays whole, because a spawned hand reads its own hold, not this one.
+- The counts read the notes the layer carries, so the sentence a session opens with reads true.
+- A session off a work branch holds nothing, so it carries the layer whole.
 
 | test | claim |
 |---|---|
 | the bridge test, a hold standing | the note the held step reads leaves the layer |
 | the bridge test, no hold standing | the layer stands whole |
-| the bridge test, no box standing | the layer stands whole, and the box file stays absent |
+| the bridge test, no box file | the layer stands whole, and the reader mints nothing |
+| the bridge test, a hold standing | the counts read the notes the layer carries |
+| the runtime test | the same drop reaches the context a session opens with |
 
 What the agent needs:
 
