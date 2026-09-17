@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-hand-carries-a-step
-step: design/draft
+step: design/review
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -103,6 +103,10 @@ record:
     hash_after: 2634a66b131692e6427ba61c539952d2478797fa
     returns: 1
     why: "A leaf under `by: helper` reaches no spawn. `admits` answers a why and no `other`, so the leaf parks.; A hand under `--as` reads that same leaf as untakeable, because `takeable` refuses the word `helper`.; The ask names the excluding field `by`, and the design output names it `not`. Name one, and make the other follow.; The spawn answer names one taker, the hand it asks for. The ask's fourth line names a person too.; The helper's hand-back stands as a case already. Add the assertion it lacks, that another hold stands untouched.; The wrapper's spawn wants the case the draft names, and the guidance rides the helper's pull.; `./RUNME.sh check` answers 1 over faults the whole tree carries, and this leaf adds none."
+  - step: design/draft
+    hand: box 3d4c068755ec · claude-code-remote
+    hash_before: 87c3c7e8706c0f9225bc787c5e415f1ecdabf237
+    hash_after: 87c3c7e8706c0f9225bc787c5e415f1ecdabf237
 ---
 
 # Ask
@@ -129,35 +133,38 @@ When the next step's `by` excludes the hand that pulls, nobody takes it. The app
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
 
-The road stands, and the note that holds it is
-[[spec/design_output/pull#a-hand-of-its-own]]. Four of the ask's lines answer in
-the tree today:
+Two fields keep a hand off a step, and both reach the spawn:
 
-| the ask's line | where it stands | what proves it |
+| the field | what it says | who takes the step |
 |---|---|---|
-| a `by` outside the hand answers `spawn` | `spawnAnswer` in `src/scripts/pull.js` | `test/level0/pull.test.js` drives a leaf the only hand stands outside |
-| the wrapper spawns the hand | the hook under `.claude/skills/level1` | `test/level0/level1.test.js` reads the prompt out of a spawn answer |
-| a hand under `--as` takes one leaf | `onward` in `src/scripts/pull.js` | `test/level0/pull.test.js` answers done after that hand-back |
-| off a plugin the shell moves nothing | the lines the spawn answer prints | the same case reads them back |
+| `by: helper` | the step wants a hand the engine makes | a spawned hand, under `--as` |
+| `not: <step>` | the hand that wrote that step stands out | any other hand, spawned or not |
 
-So one difference stands between the ask and the tree, and it is the guidance.
-`spawnPrompt` writes the ticket, the leaf and three commands. The guidance
-reaches the helper at its own pull, under its own hand.
+One half works today. `excludes` answers `other` for `not`, so the spawn answer
+fires. `admits` answers a why alone for `by: helper`, so that leaf parks. A hand
+under `--as` reaches it nowhere, because `takeable` reads `helper` as no work.
 
-| the road | what the helper reads | what it costs |
-|---|---|---|
-| the prompt carries the guidance | the rules twice, once in the prompt and once at the pull | a second copy of every rule |
-| the pull carries it, as today | the rules once, with the fields beside them | one more call before the work |
+| what changes | how |
+|---|---|
+| `admits` | a leaf `by: helper` answers `other`, so the spawn answer fires for it |
+| `admits` under `--as` | the same leaf answers `leaf`, so the spawned hand takes it |
+| `takeable` | `helper` leaves the refused list, and `branch done` reads the leaf as work |
+| the spawn answer | names a person beside the hand, where the leaf admits one |
+| [[spec/design_output/pull#a-hand-of-its-own]] | takes a row for `by`, beside the row `not` holds |
 
-This ticket takes the second road, because a rule read twice is a rule that
-drifts. So the change is the proof, and no line of the pull moves:
+The guidance stays where it stands. `spawnPrompt` writes the ticket, the leaf
+and three commands, and the helper's own pull hands it the rules. A copy in the
+prompt is a second copy, and a rule read twice drifts.
 
-- a case drives the wrapper over a spawn answer, and reads the hand it makes
-- a case drives a helper's hand-back, and reads `done` with no other hold touched
-- the note takes one line saying the guidance rides the helper's pull
+Four cases carry it, each in the file its subject lives in:
+
+- a leaf `by: helper` answers spawn, and the prompt names that leaf
+- the same leaf under `--as` hands the helper its work
+- the helper's hand-back leaves another hold standing, which the case asserts
+- the wrapper makes a hand from a spawn answer, over a fake harness
+
 
 ## review
 
