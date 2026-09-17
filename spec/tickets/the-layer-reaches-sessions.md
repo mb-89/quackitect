@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: guidance-rides-the-step
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 0fc2b4132f94 · claude-code-remote
@@ -140,6 +140,12 @@ record:
       - name: check
         exit: 0
         said: 67 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box 0fc2b4132f94 · claude-code-remote · helper-9
+    hash_before: d086c3e3a78042dfa23110b47a86bdf6181c6a6f
+    hash_after: d086c3e3a78042dfa23110b47a86bdf6181c6a6f
+    returns: 1
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask calls for | yes, both roads drop the note the held step hands |; | is what the diff touches beyond the ask trivial | yes, one sibling ticket's own commit rides along |; | what does `./RUNME.sh check` answer | 0 |; | does a retro stand in the handback | no, the handover stands nowhere yet |; | does every rule the branch adds carry a test | the branch adds no door rule, and six rows drive the bridge |; TL;DR:; Both roads drop the held step's note, and the counts follow the layer they draw.; The rows cover a hold standing, no hold, no box, the counts and the helper layer.; One fact stands twice: the drop test reads the same in the bridge and in the library.; The checklist asks each fact to stand in one place, so this verdict reads fail.; The findings, one a line:; `carried` in the bridge says again what `dropsHere` in the library already says. Hand the library one out, and call it.; The library cuts a markdown tail off each name it reads, and the bridge one leaves it. The two drift the day a name carries one.; `rulesIn` in the copilot road counts what `countsOf` in the library already counts. Call `countsOf` and read its rules.; `rulesIn` stands between two imports. Move it under the last one.; The copilot road carries the drop and no row drives it. Add one with a hold standing.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the drop test stands in the library alone, and both roads call it | open |; | 2 | the count reads `countsOf`, and `rulesIn` leaves the copilot road | open |; | 3 | a row drives the copilot road with a hold standing | open |; | 4 | the branch hand writes a retro into the handover before done | open |"
 ---
 
 # Ask
@@ -411,17 +417,64 @@ Why it reads as it does:
 
 <!-- the form is files -->
 
+- src/scripts/guidance-hand.js
+- src/bridge/guidance.js
+- .claude/skills/level0/lib/copilot-runtime.js
+- .claude/skills/level0/lib/guidance.js
+- src/scripts/hand.js
+- src/scripts/pull.js
+- test/level0/session-layer.test.js
+- test/level0/copilot-runtime.test.js
+- spec/tickets/the-layer-reaches-sessions.md
+- spec/tickets/the-pull-splits-by-topic.md
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+
+| the question reviewing asks | the answer |
+|---|---|
+| does the branch do what the ask calls for | yes, both roads drop the note the held step hands |
+| is what the diff touches beyond the ask trivial | yes, one sibling ticket's own commit rides along |
+| what does `./RUNME.sh check` answer | 0 |
+| does a retro stand in the handback | no, the handover stands nowhere yet |
+| does every rule the branch adds carry a test | the branch adds no door rule, and six rows drive the bridge |
+
+TL;DR:
+
+- Both roads drop the held step's note, and the counts follow the layer they draw.
+- The rows cover a hold standing, no hold, no box, the counts and the helper layer.
+- One fact stands twice: the drop test reads the same in the bridge and in the library.
+- The checklist asks each fact to stand in one place, so this verdict reads fail.
+
+The findings, one a line:
+
+- `carried` in the bridge says again what `dropsHere` in the library already says. Hand the library one out, and call it.
+- The library cuts a markdown tail off each name it reads, and the bridge one leaves it. The two drift the day a name carries one.
+- `rulesIn` in the copilot road counts what `countsOf` in the library already counts. Call `countsOf` and read its rules.
+- `rulesIn` stands between two imports. Move it under the last one.
+- The copilot road carries the drop and no row drives it. Add one with a hold standing.
+
+What the agent needs:
+
+| number | need | status |
+|---|---|---|
+| 1 | the drop test stands in the library alone, and both roads call it | open |
+| 2 | the count reads `countsOf`, and `rulesIn` leaves the copilot road | open |
+| 3 | a row drives the copilot road with a hold standing | open |
+| 4 | the branch hand writes a retro into the handover before done | open |
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- each fact the change adds in one place: the drop test stands twice. The bridge and the library each carry it, so this item fails.
 
 # Discussion
 
