@@ -240,7 +240,7 @@ The payload builder stands tested and the hook stands untested. A harness spelli
 
 <!-- what anybody adds, at any time, on this ticket -->
 - [[spec/tickets/the-hand-carries-the-session]] hands this over at `implement/person-1`, which waits for a person.
-  - verdict failed back 2 times: No test drives the level one `session.start` hook, so nothing proves the wrapper writes the session file.
+  - verdict failed back 2 times. No test drives the level one `session.start` hook. So nothing proves the wrapper writes the session file.
   - The ask wants a test reading that file back, and the payload builder alone stands tested.
   - Drive the registered hook with a fake `$.fs`, over an event naming a session and one naming none.
   - `sessionOf` reads two spellings of the id, and the `session_id` this tree already reads is neither.
