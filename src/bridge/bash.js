@@ -100,8 +100,7 @@ function todoOnPush(command, _e, box) {
   return refusedTodo(found);
 }
 
-// A version branch holds a whole earlier tree, and an agent deleting one loses
-// it. [[spec/design_output/work#a-version-branch-stands]]
+// [[spec/design_output/work#a-version-branch-stands]]
 function versionGuard(command, _e, box) {
   const found = versionRefs(command);
   if (!found.length) return "";

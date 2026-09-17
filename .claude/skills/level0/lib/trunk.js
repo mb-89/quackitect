@@ -23,13 +23,10 @@ export function landsOnTrunk(command, branch, trunk = TRUNK) {
   return "";
 }
 
-// A version branch holds a whole earlier tree, and no other ref carries what it
-// carries. A delete loses that tree, so both push doors refuse the command
-// before git runs it. [[spec/design_output/work#a-version-branch-stands]]
+// [[spec/design_output/work#a-version-branch-stands]]
 export const VERSION = /^v\d+$/;
 
-// The branch one word of a git command line names, with the plus and the
-// refspec read off it. [[spec/design_output/work#a-version-branch-stands]]
+// [[spec/design_output/work#a-version-branch-stands]]
 export function refIn(word) {
   const said = String(word ?? "");
   const plus = said.startsWith("+");
@@ -41,7 +38,6 @@ export function refIn(word) {
   return { name: VERSION.test(name) ? name : "", empty: at >= 0 && from === "", plus };
 }
 
-// Every version branch a command would delete or force, one entry each.
 // [[spec/design_output/work#a-version-branch-stands]]
 export function versionRefs(command) {
   const found = [];
