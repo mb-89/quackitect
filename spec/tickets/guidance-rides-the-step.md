@@ -129,7 +129,11 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
-step: retro/write
+  - step: retro/write
+    hand: box 0fc2b4132f94 · claude-code-remote
+    hash_before: ba423c2bc7830838357ddf8ece02ee8dee907c6d
+    hash_after: ba423c2bc7830838357ddf8ece02ee8dee907c6d
+step: retro/cloud
 ---
 
 # Ask
@@ -200,6 +204,10 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 - [[spec/tickets/the-pull-splits-by-topic]], read at design/review: the verdict reads fail, with the findings one a line
 - the cap fired on that hand-back, so the ticket waits on a person now
 - the retro notes drained, because the private folder holds nothing
+- [[spec/tickets/guidance-rides-step]] closed: the notes ride the step, the hold, the log and a verb
+- [[spec/tickets/the-layer-reaches-sessions]] closed: a session's layer drops what its step hands it
+- the split minted both children above, and the group's children field names them
+- the sync took trunk in, once the shallow clone came whole
 
 ### well
 
@@ -211,6 +219,10 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 - `./RUNME.sh branch review` answered the check and the retro in one line, which made the reviewing guidance cheap.
 - The write door named each voice rule it refused, with the line, so the next write landed clean.
 - `--drop` freed a hold no verdict could close, so a duplicate read cost the group nothing.
+- The judge refused nothing this run, because the sync brought the voice checks the owner reworked.
+- The size rule shaped every change. Each addition rode a larger cut, and the two scripts fell.
+- Each review hand read the tree first, so every finding named a line and a file.
+- The spawn answer made each review a hand of its own, and no hand judged its own work.
 
 ### badly
 
@@ -222,6 +234,12 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 - The hand-back met a branch holding commits this box lacked, and the rebase found that close pushed.
 - `./RUNME.sh check` came back refused by the box, so the exit came through `branch review`.
 - A shell write to a tracked file met the write door, so the mutation read stopped there.
+- The sync died on `refusing to merge unrelated histories` at the take, because the clone was shallow.
+- A verdict hand wrote its files field as bare lines, and the lint read the block as one sentence.
+- That turned the tree red, and only the hand that wrote the field may write it again.
+- Both the change step and tests-green want a green tree, so the route shut on itself there.
+- An implement hand wrote over `test/level0/guidance.test.js`, which already stood, and lost its tests.
+- The engine committed that loss, and a count read two runs apart was the first to name it.
 
 ### improve
 
@@ -233,6 +251,9 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 - A verdict hand fetches before it reads, so a step another hand closed costs no round. Home: [[spec/design_output/pull]].
 - The count the canary says reads one owner, and a row drives it. Home: [[spec/design_output/level0]].
 - The mutation read runs through Edit and the undo tool, which the write door takes. Home: [[spec/guidance/working]].
+- `sync` unshallows a shallow clone before it merges, or the harness clones whole. Home: [[spec/design_output/work]].
+- The work answer names the markdown list a `files` field takes. Home: [[spec/design_output/pull]].
+- A write door rule refuses a whole-file write over a tracked file the hand has not read. Home: [[spec/design_output/level0]].
 
 ### thoughts
 
