@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[standard]]
 group: guidance-rides-the-step
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 0fc2b4132f94 · claude-code-remote
@@ -100,6 +100,10 @@ record:
     hash_after: 1671435b8e08c775f38f44257ff0d4f0e48d3931
     returns: 1
     why: Four pieces of the ask go unanswered, and the ceiling claim breaks.; | the question reviewing asks | the answer |; |---|---|; | does the approach do what the ask asks | no, and four pieces of the ask go unanswered |; | is what the diff touches beyond the ask trivial | yes, and the commit touches this ticket alone |; | what does `./RUNME.sh check` answer | 1, on the health probe alone, and every test passes |; | does a retro stand in the handback | no, and the route puts the retro after the verdict phase |; | does every rule carry a test proving it fires | no, and the re-hand's compaction and moved hash carry none |; The findings, one a line:; The ceiling claim breaks. `wc -l src/scripts/pull.js src/scripts/work.js` answers past `code.fileLines`. The size rule refuses a growth on a file already past its ceiling. Name the split that takes the hand-out, the refusal, the material and the dispatch.; Two files hold one fact. The handed file and the hold both remember the notes. The ask names the hold alone, by name and hash. Say which one answers the ask.; The reads of a leaf go unanswered. Say that a leaf's reads and its phases' add up. Name the test claiming it.; The `work` answer goes unanswered. Say that it carries the notes' actionables inline, and the checklist with them.; The re-hand carries one test of three. The refusal stands, and the compaction and the moved hash stand untested.; The verb wears two names. The ask writes `branch guidance` in its bullet and `work guidance` in its table. The approach writes the first and places the second. Name one surface.; The judge's piece names work that stands. `./RUNME.sh config` answers no `judge.warmupWrites` and no `judge.thenEveryNth`. The level one wrapper judges every hand-back today. Say the piece stands.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the draft hand names the split keeping every file it writes under `code.fileLines` | open |; | 2 | the draft hand answers the four pieces this verdict names | open |; | 3 | the draft hand names a test per re-hand trigger | open |; | 4 | the review hand reads the approach again | open |
+  - step: design/draft
+    hand: box 0fc2b4132f94 · claude-code-remote
+    hash_before: b3a754ecef8f358aeeb40e93e1d3fadf581c6af6
+    hash_after: b3a754ecef8f358aeeb40e93e1d3fadf581c6af6
 ---
 
 # Ask
@@ -163,33 +167,57 @@ The rules to hold:
 
 | the ask asks | the approach answers |
 |---|---|
-| how a hand gets a step's notes once | the pull hands them, and a handed file remembers them per hand, step and session |
-| how they come again | a refusal prints them, a compaction empties the handed file, and a moved hash reads as new |
-| how the engine keeps the arrival | the hold names each note by name and hash, and the log gets one row per note |
-| how a hand asks for them | the verb `branch guidance`, named or unnamed |
+| how a hand gets a step's notes once | the pull hands them, and the hold remembers them per hand and step |
+| how they come again | a refusal, a compaction and a moved hash each hand them again |
+| how the engine keeps the arrival | the hold names each note by name and hash, and the log takes a row per note |
+| how a hand asks for them | one verb, `./RUNME.sh branch guidance`, named or unnamed |
 | what the standing layer keeps | the notes no step reads |
+| where the change lands | new modules, because the write door refuses a growth on a file past its ceiling |
 
 TL;DR:
 
-- The handed file lives beside the hold, because the hold drops at the hand-back. For details, see [[spec/design_output/pull#the-hand-and-the-hold]].
-- A note prints whole where the handed file holds no such hash, and one line names the verb otherwise.
-- The wrapper judges every hand-back whole, and the material lays the payload over the ticket first. For details, see [[spec/design_output/pull#the-checks]].
-- The verb and the handed file get a module of their own, so every file stays under the ceiling. For details, see [[spec/design_output/config#the-magic-numbers-take-names]].
-- The terms here stand in the vocabulary, each with its note. For details, see [[spec/vocabulary/terms.yml]].
+- The hold answers the ask alone, and no second store stands beside it. For details, see [[spec/design_output/pull#the-hand-and-the-hold]].
+- Part of the hand-out stands already, and the table below splits that part from what waits.
+- A file split lands first, as a sibling ticket, because three files this change touches stand past `code.fileLines`.
+- One surface carries the verb, and the ask's second wording for it drops.
+- The judge reads every hand-back unsampled today, so this ticket writes none of that piece.
 
-| piece | home |
+What stands, and the test claiming it:
+
+| the piece the ask names | stands | the test claiming it |
+|---|---|---|
+| a leaf's reads and its phases' add up | yes | the pull test on a leaf inheriting from its phases |
+| the work answer carries the actionables inline, with the checklist | yes | the pull test on the answer's Reads chapter |
+| the hold names every note by name and hash | yes | the pull test reading the hold's reads |
+| the judge reads every hand-back, unsampled | yes | the wrapper's own test |
+| the verb `branch guidance` | no | none |
+| a log row per note handed over | no | none |
+| the re-hand on a refusal, a compaction or a moved hash | no | none |
+| the standing layer drops a note a step reads | no | none |
+
+The sibling ticket the split needs, which lands before this one:
+
+| the file | what leaves it | why |
+|---|---|---|
+| the pull script | the hand-back's checks | it stands past the ceiling, so the door refuses a growth |
+| the work script | the branch verbs and their table | the verb's dispatch grows it |
+| the pull test | the hand-out's cases | the new cases grow it |
+
+| the piece that waits | its home after the split |
 |---|---|
-| the handed file and the verb | a new guidance script beside the pull script |
-| the hand-out, the refusal and the judge's material | the pull script |
-| the compaction hook | the level one wrapper |
-| the verb's dispatch | the work script |
-| the layer a named note leaves | the guidance library under level zero, read by the bridge and the standing verb |
+| the verb, the re-hand and the note hashes | a new guidance script |
+| the log row | the log library under level zero |
+| the compaction | the level one wrapper |
+| the layer a named note leaves | the guidance library under level zero |
 
 | test | claim |
 |---|---|
-| a new guidance verb test | the handed file, the verb and the log row hold, through the fake doors |
-| the guidance test | a note a step reads leaves the layer |
-| the pull test | the hand-out logs a row, the second hand-out prints the short line, and the material carries the payload |
+| the guidance verb test | named and unnamed, the verb answers through the fake doors |
+| the log test | a row lands per note the pull hands over |
+| the refusal test | a refusal hands the notes again |
+| the compaction test | a compaction hands the notes again |
+| the moved hash test | a note whose hash moved hands again, and an unmoved one does not |
+| the layer test | a note a step reads leaves the standing layer |
 
 | words | where |
 |---|---|
@@ -201,8 +229,10 @@ What the agent needs:
 
 | number | need | status |
 |---|---|---|
-| 1 | the review hand reads this approach against the ask | open |
-| 2 | a pass moves the ticket to the implement phase | open |
+| 1 | the group's split mints the sibling ticket carrying the file split | open |
+| 2 | this ticket names that sibling under depends_on | open |
+| 3 | the review hand reads this approach against the ask | open |
+| 4 | a pass moves this ticket to the implement phase | open |
 
 ## review
 
