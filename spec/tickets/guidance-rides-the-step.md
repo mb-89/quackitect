@@ -113,7 +113,11 @@ record:
     hand: box 220c71584772 · claude-code-remote
     hash_before: 10f559386a6b1ac10413fcb3aee2f44ea3fbbb60
     hash_after: 10f559386a6b1ac10413fcb3aee2f44ea3fbbb60
-step: retro/cloud
+  - step: retro/cloud
+    hand: box 220c71584772 · claude-code-remote
+    hash_before: 4f77f84dbd10523e18281fe22463820f5432faa4
+    hash_after: 4f77f84dbd10523e18281fe22463820f5432faa4
+step: children
 ---
 
 # Ask
@@ -243,17 +247,31 @@ The verdict on the split reads fail over two small findings, and the cap turned 
 
 <!-- the form is list -->
 
+- `./RUNME.sh check` came back refused to this hand, at the verdict read on the layer ticket
+- a shell write to a tracked file, refused at the mutation read, so that read ran through the paired rows
+- the install ran whole at the take, and the proxy refused no host
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- the write door, over a shell write and over the voice rules, each named with its line
+- the cap on [[spec/tickets/the-pull-splits-by-topic]], which turned a second fail into a person step
+- a branch holding commits this box lacked, at the first hand-back, which one rebase cleared
+- the server, which `./RUNME.sh check` wants standing, and `branch review` named it at the first read
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- [[spec/tickets/the-pull-splits-by-topic]] waits at design/person-1, and its record holds the question
+- the count finding on [[spec/tickets/the-layer-reaches-sessions]] stands in that ticket's discussion
+- this box minted no ticket, so none stands here without a group
+- the branch owes its handover at done, and this retro is what it carries
 
 # Discussion
 
