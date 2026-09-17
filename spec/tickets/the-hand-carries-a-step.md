@@ -75,7 +75,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box ee33ce836a4d
@@ -119,6 +119,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box 3d4c068755ec · claude-code-remote
+    hash_before: eb804b8ea6971b104419709d068989be87a7617b
+    hash_after: eb804b8ea6971b104419709d068989be87a7617b
 ---
 
 # Ask
@@ -180,38 +184,68 @@ A hand carries one step. The hold names the session that took it, and a spawn ta
 ### done
 
 <!-- what was done, one line a ticket or a thing -->
-
 <!-- the form is list -->
+
+- the branch takes trunk in, over the files the merge marks as conflicts
+- the check answers 0 on the merge, with every finding at warning
+- [[spec/tickets/the-hand-carries-the-session]] closes became [[spec/tickets/the-session-file-proves-itself]]
+- [[spec/tickets/the-spawn-takes-a-step]] passes design/draft twice, and two hands of its own fail it
+- that child closes became [[spec/tickets/the-spawn-answers-a-helper]], where a person rules
+- the retro decides one private note, which becomes [[spec/tickets/the-record-why-holds-spans]]
 
 ### well
 
 <!-- what went well, and what made it go well -->
-
 <!-- the form is list -->
+
+- the payload road carries a field the write door refuses, so a leaf closes anyway
+- a hand of its own reads harder than the hand that drafts, and it finds a real hole twice
+- the todo tag hands a private note out first, so the retro reaches it on a work branch
+- the unblock verb writes the question into each successor, so the box copies nothing by hand
 
 ### badly
 
 <!-- what did not, each with its moment in the log or the transcript -->
-
 <!-- the form is list -->
+
+- the box drafts an approach claiming the road stands, and the review names four holes in it
+- the write door refuses every hand write to one ticket, over a record line the verbs own
+- the box drops its hold twice to reach a private note, because the group stands first
 
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
-
 <!-- the form is list -->
+
+- [[spec/tickets/the-record-why-holds-spans]] carries the record line the door refuses
+- [[spec/guidance/review/reviewing]] asks a draft to read every field the ask names
+- [[spec/design_output/pull]] says the todo tag reaches a private note on a work branch
 
 ### thoughts
 
 <!-- what the thoughts say that the actions do not, off the transcript -->
-
 <!-- the form is text -->
+
+Two hands read this group's one open ticket, and each found a hole the drafting
+hand stood past. The first said the spawn road reaches a leaf under `by` nowhere.
+The second said the fix opens the same wall on a box that spawns no hand.
+
+- the drafting hand reads the code it names, and believes what it reads
+- the reading hand reads the code the draft leaves out
+- the cap ends the loop, and a person rules on the third round
+
+So the review earns its cost here. The person step then leaves the branch, and
+the group closes behind it. The branch lands with its question standing, which
+is the whole point of the road.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- every fact stands in one place: the retro names each successor once, and that ticket holds the detail
+- every number carries a name: the retro writes no count, and the merge answers its own
+- every header says what its file is for: the retro writes ticket chapters, and no file header
 
 ## cloud
 
