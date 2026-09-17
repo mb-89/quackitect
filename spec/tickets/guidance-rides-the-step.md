@@ -101,7 +101,15 @@ record:
     hand: box 220c71584772 · claude-code-remote
     skipped: true
     why: the box leaves it while the-pull-splits-by-topic stand open
-step: retro/notes
+  - step: retro/notes
+    hand: box 220c71584772 · claude-code-remote
+    hash_before: 25a38cc62178438406b64144453bccb4d671de3d
+    hash_after: 25a38cc62178438406b64144453bccb4d671de3d
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+step: retro/write
 ---
 
 # Ask
@@ -154,6 +162,8 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 <!-- retro notes, which passes when the private folder is empty -->
 
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
