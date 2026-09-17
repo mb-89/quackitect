@@ -88,7 +88,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[standard]]
 group: guidance-rides-the-step
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 0fc2b4132f94 · claude-code-remote
@@ -125,6 +125,17 @@ record:
     hash_after: 19065b18e8c89df14d2130ff14aaee28ff2674a7
     answered:
       - name: lint
+        exit: 0
+        said: 65 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box 0fc2b4132f94 · claude-code-remote
+    hash_before: ceec25a1cab2d5517a5f7d46390a3d2607ae97dc
+    hash_after: ceec25a1cab2d5517a5f7d46390a3d2607ae97dc
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 9 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: 65 stand at warning, which the panel draws and check allows.
 ---
@@ -395,17 +406,45 @@ What surprises me:
 
 <!-- the form is command -->
 
+./RUNME.sh branch test
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
 
+./RUNME.sh check
+
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
 
 <!-- the form is text -->
+
+The pull now hands a hand the notes its step reads, remembers them, and hands them again where the hand lost them.
+
+| what changed | where |
+|---|---|
+| the hold IO, the note hashes, the log rows and the re-hand rule | a new guidance hand module |
+| the verb answering the notes again | a new guidance verb module |
+| the usage rows and the contract rows | a new branch usage module |
+| the hand-out logging a row per note, and the second hand-out | the pull script |
+| the verb's dispatch, and the verbs a need may name | the work script and the pull script |
+| the layer dropping a note the held step reads | the guidance library, and the standing verb |
+
+Why each piece stands where it does:
+
+- The write door refuses a growth on a file past its ceiling, so every addition rides a larger cut.
+- The pull and the work script each hold fewer lines now, and the new code lives under the ceiling.
+- The hold alone remembers the notes, so no second store drifts from it.
+- A refusal, a compaction and a moved hash each hand the notes again, and nothing else does.
+
+### checked
+
+- the change touches no file the ask leaves out: the pull, the work verb, the layer and three new modules
+- every door the change reaches has a fake: the disk, git, the clock and the log all run fake
+- a comment names the approach the change implements: each new file heads with what it does
 
 # verdict
 
