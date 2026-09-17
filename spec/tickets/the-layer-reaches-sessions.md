@@ -524,3 +524,18 @@ What the agent needs:
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+A second verdict hand read the same diff, and the close landed first. One finding of that read stands open here.
+
+| what the branch does | what the note owning it says |
+|---|---|
+| the bridge counts `carried(session, read)`, so a styled note leaves the sentence | the canary counts every note, because the style holds the session too |
+
+Where it stands:
+
+- `guidanceHere` in `src/bridge/guidance.js` counted the notes binding here before this branch.
+- The chapter The style carries a note, under [[spec/design_output/level0]], carries the row.
+- No row drives the count over a styled note, so the change fires untested.
+- A reader sees it live: the example sentence under that chapter and the one this tree hands disagree.
+
+What a person decides: whether the count reads every note binding here, or the design note drops that row.
