@@ -38,7 +38,7 @@ import { readyToMerge, review } from "./review.js";
 import { serving } from "./serve.js";
 import { testVerb } from "./test-verb.js";
 export const BRIEF = "HANDOVER.md";
-const COL = { branch: 34, kind: 6, status: 6, why: 24 };
+const COL = { branch: 34, child: 32, kind: 6, status: 6, why: 24 };
 const MS = 1000;
 // [[spec/design_output/work#a-merged-branch-closes]]
 export const MINE = /^(work|claude)\//;
@@ -793,7 +793,7 @@ function childRows(it, one) {
     .filter((child) => fieldOf(child.text, GROUP) === one.name)
     .map((child) => ({
       stale: false,
-      said: `  ${child.name.padEnd(32)} ticket ${stateOf(child.text).padEnd(6)} ${whyOf(child.text)}`,
+      said: `  ${child.name.padEnd(COL.child)} ticket ${stateOf(child.text).padEnd(COL.status)} ${whyOf(child.text)}`,
     }));
 }
 
