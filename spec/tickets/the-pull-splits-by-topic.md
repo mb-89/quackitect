@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: guidance-rides-the-step
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 0fc2b4132f94 · claude-code-remote
@@ -102,6 +102,10 @@ record:
     hash_after: 3645f8ce7ee0777f9d5d33dd834fb12d4598cac8
     returns: 1
     why: "Cut `test/level0/schema.test.js` as well, because it stands past the ceiling and the approach leaves it out.; That test drives the schema reader, so the split of the three scripts hands it no subject.; Until it comes down, `./RUNME.sh lint test/level0` names `FileCeiling`, and the ask's second item stands open.; Name the head every minted module writes: a line on what it holds, then its design output link.; The approach answers that item with the module's name alone, and a name says less than a head.; Point each pull module at a chapter that stands: the leaf, the stand and the verb name none.; The work module the reading names no chapter of `spec/design_output/work` either.; Name `./RUNME.sh check` among the proofs, because the ask asks for its exit.; The cut list for the pull and the work verb holds, and each cut moves a function whole.; `./RUNME.sh check` exits 0 on this commit."
+  - step: design/draft
+    hand: box 0fc2b4132f94 · claude-code-remote
+    hash_before: e2019e2997f16ecc93a3a9785911b6b35208dbeb
+    hash_after: e2019e2997f16ecc93a3a9785911b6b35208dbeb
 ---
 
 # Ask
@@ -133,44 +137,56 @@ For the change paying this toll, see [[spec/tickets/guidance-rides-step]].
 
 | the ask asks | the approach answers |
 |---|---|
-| which files come down | the pull, the work verb, the command line, and the tests reading each |
-| what decides a cut | the topic a chapter of the design output already names |
+| which files come down | the pull, the work verb, the command line, and four test files |
+| what decides a cut | a chapter that already stands in the design output |
 | what moves | whole functions, with the text they hold, and nothing else |
-| what proves the move | the tests standing today, which pass before and after each cut |
+| what each module heads with | a line on what it holds, then the link to that chapter |
+| what proves the move | the tests standing today, and the lint and the check after each cut |
 
 TL;DR:
 
 - No behaviour changes. Every cut moves a function whole, and its callers import it back.
 - Each cut lands as its own write, because the door reads a file before and after.
 - The pull comes down first, because the work verb and the tests read it.
-- A module takes the name of the design output chapter it serves, so a reader finds it.
+- Each module points at a chapter standing in the design output today, and names no new one.
 
 The pull, by topic:
 
-| the module | what it takes |
-|---|---|
-| the leaf | the walk, the leaf and its chapter, and the sections under it |
-| the stand | which tickets stand, which are takeable, and which wait |
-| the hand-out | the offer, the hold, the work answer and the spawn prompt |
-| the checks | the forms, the voice, the commands and the hand rules |
-| the hand-back | passed, failed, became, refused, and the record each writes |
-| the verb | the flags, the roads the verb takes, and the material the judge reads |
+| the module | what it takes | the chapter it heads with |
+|---|---|---|
+| the verb | the flags, the roads the verb takes, and the judge's material | [[spec/design_output/pull#the-answers]] |
+| the stand | which tickets stand, which are takeable, and which wait | [[spec/design_output/pull#children-before-their-group]] |
+| the hand-out | the offer, the hold and the spawn prompt | [[spec/design_output/pull#the-hand-and-the-hold]] |
+| the answer | the work answer, the leaf's chapter and its fields | [[spec/design_output/pull#the-work-answer]] |
+| the checks | the forms, the voice, the commands and the hand rules | [[spec/design_output/pull#the-checks]] |
+| the hand-back | passed, failed, became, refused, and the record each writes | [[spec/design_output/pull#the-hand-back]] |
 
 The work verb, by topic:
 
-| the module | what it takes |
+| the module | what it takes | the chapter it heads with |
+|---|---|---|
+| the round trip | new, take, sync, done and release | [[spec/design_output/work#the-round-trip]] |
+| the trunk | merge, close and what reads as merged | [[spec/design_output/work#a-merged-branch-closes]] |
+| the reading | read, review and list | [[spec/design_output/work#what-the-status-says]] |
+
+The command line comes down the same way, one module per verb group, each heading with the chapter its verbs serve.
+
+The tests, by subject:
+
+| the test file | what it drives |
 |---|---|
-| the round trip | new, take, sync, done and release |
-| the trunk | merge, close and what reads as merged |
-| the reading | read, review and list |
+| the pull test | one file per pull module, each beside its subject |
+| the work test | one file per work module |
+| the schema test | the schema reader, cut along the readers it drives |
 
-The command line takes the same treatment, one module per verb group. Each test file follows its subject, so a test stands beside the module it drives.
+Every module heads with a line saying what it holds, then the link above. It counts nothing and lists no section, as the code guidance asks.
 
-| test | claim |
+| proof | claim |
 |---|---|
 | every test standing today | the tree answers the same before and after each cut |
-| the lint over the scripts | no `FileCeiling` stands |
-| the lint over the tests | no `FileCeiling` stands |
+| `./RUNME.sh lint src/scripts` | no `FileCeiling` stands |
+| `./RUNME.sh lint test/level0` | no `FileCeiling` stands |
+| `./RUNME.sh check` | it exits 0 on the branch |
 
 What the agent needs:
 
