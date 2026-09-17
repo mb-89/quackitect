@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: whenever
 steps:
   - name: design
@@ -89,7 +89,61 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: verdict
+record:
+  - step: design/draft
+    hand: box d42624a67d18a8
+    hash_before: 2b279908840f5dbc02099e199cae2c4d1cf702c4
+    hash_after: ad8fa8964fcda9701c09020569303d2ffc2a4c68
+  - step: design/review
+    hand: box d42624a67d18a8 · helper-2
+    hash_before: b5beaec62548f3d5293fa7dfb7260476a7519109
+    hash_after: b5beaec62548f3d5293fa7dfb7260476a7519109
+    returns: 1
+    why: Name the word `namesNote` reads off the prompt. Both done_when cases wait on it, and neither stands decidable meanwhile.; `namesNext` stands nowhere in the tree. Point at `opensATurn` and `questionsIn` in `lib/answer.js`, which read a prompt the same way.; Say which `note` row pays. A growing count pays on any note, so a note on another matter clears the prompt.; Say what the `reply` line carries where a note pays. The demand after it reads `spoken` as the text it saw.; The disk read holds. The box carries the disk door, a fake stands beside it, and `ticket note` writes the row.; `./RUNME.sh check` answers 0.
+  - step: design/draft
+    hand: box d42624a67d18a8
+    hash_before: 5b321a32db7820ab4e93b5c5c58a3822c25be3cf
+    hash_after: 0f968e6f463d0daf6b7997dba237973161af09a1
+  - step: design/review
+    hand: box d42624a67d18a8 · helper-4
+    hash_before: 6853a76e6e4c0494805f7f84fda8691753db2091
+    hash_after: 6853a76e6e4c0494805f7f84fda8691753db2091
+  - step: implement/tests-red
+    hand: box d42624a67d18a8
+    hash_before: 655c1a96a49b95167e9862e0cf8c3a083fe47400
+    hash_after: 4b5637c3a298f441b08b10fafce582e2e6112969
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d42624a67d18a8
+    hash_before: f907cdf6f00146b86b5d0843ff5bf7dceacf0da9
+    hash_after: 87f26a61c37275f722adfa03bb3f07b49490d96b
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box d42624a67d18a8
+    hash_before: 136662ac66923e8145bc4ef070e7e06a27efd304
+    hash_after: 2c2789787206d1d15fabacb5f242e371b4c2377d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: 64 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box d42624a67d18a8 · helper-9
+    hash_before: 284df48d58d4d68a306c117f5d44c392585f0c74
+    hash_after: 284df48d58d4d68a306c117f5d44c392585f0c74
+reason: done
 ---
 
 # Ask
@@ -118,6 +172,37 @@ Today a note answers a prompt on paper alone. The door sees the session's text, 
 
 <!-- the form is text -->
 
+| what changes | how |
+|---|---|
+| the answer library | answers whether a prompt names a note, and counts the `note` rows a log holds |
+| the answer door | counts at the prompt, counts again before it refuses, and pays on a new row |
+| the level zero note | says which prompt a note answers, under the owner's prompt chapter |
+
+A prompt naming a note opens a demand that a note row pays. `namesNote` in
+`lib/answer.js` reads the prompt for the word `note`, beside `questionsIn` and
+`opensATurn`, which read a prompt the same way. A prompt naming none opens the
+demand it opens today, and a note row leaves that one standing.
+
+| what the prompt carries | whether the demand reads a note |
+|---|---|
+| `note`, `notes` or `noted`, as a word | yes |
+| the word inside a fenced block | no, the way `questionsIn` skips a fence |
+| no such word | no |
+
+The note row lands from the shell, so the server's own rows miss it. The door
+reads the session log off the disk instead, at the path the log door names,
+and counts the rows of kind `note`. The demand keeps the count it reads at the
+prompt, and a row past that count pays it. So a note on another matter pays
+the demand too, because a hand parking a note answers the prompt that asks for
+one.
+
+The reply line the payment writes carries the note's own text, off the row,
+and `detail` names the prompt it answers. So `spoken` reads the note, and the
+next demand sees what the log carries. The door's box carries the disk, and a
+fake disk stands beside it, so each case runs in memory.
+
+For details, see [[spec/design_output/level0#the-owners-prompt-comes-first]].
+
 ## review
 
 <!-- reads the approach against the ask -->
@@ -127,6 +212,17 @@ Today a note answers a prompt on paper alone. The door sees the session's text, 
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+- `namesNote` reads `note`, `notes` or `noted` as a word outside a fence, so both cases decide.
+- `questionsIn` and `opensATurn` stand in `lib/answer.js`, where the approach points.
+- The row that pays stands named: a `note` row past the count the prompt reads. The approach owns the consequence that any note pays.
+- The payment's reply line carries the note's text and names the prompt under `detail`. So the next demand reads `spoken` as that text.
+- The disk read holds: the box hands the door its disk and its root. A fake disk goes in beside them, and `ticket note` writes the row.
+- `./RUNME.sh check` answers 0.
+- `./RUNME.sh branch review` finds the branch nowhere, because this ticket reaches code at implement.
+- Carry into the change: the count lands at the prompt door, and the recount at the spoke door.
 
 # implement
 
@@ -140,17 +236,25 @@ Today a note answers a prompt on paper alone. The door sees the session's text, 
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/note-answer.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Five cases stand, and three fail on their own assertion. The two readers answer a stub each, so the reading cases fail and the door cases follow. What surprises me is the fourth case: a prompt asking for no note already leaves the demand standing, so it passes green from the start. It holds the change honest, because a reader that pays every prompt turns that case red.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. One test file stands new, and the library takes two stubs
+- every door the change reaches has a fake. The case builds the box on `fakeDisk`, and the log door is a list
+- a comment names the approach the change implements. The test header points at the chapter the change writes
 
 ## reflect
 
@@ -178,11 +282,17 @@ Today a note answers a prompt on paper alone. The door sees the session's text, 
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint .claude/skills/level0/lib/answer.js src/bridge/answer.js test/level0/note-answer.test.js spec/design_output/level0.md
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The library, the door, the test and the level zero note
+- every door the change reaches has a fake. The reader takes the disk door, and each case builds it fake
+- a comment names the approach the change implements. Each new function points at the note's new chapter
 
 ## tests-green
 
@@ -194,11 +304,15 @@ Today a note answers a prompt on paper alone. The door sees the session's text, 
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/note-answer.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -206,11 +320,17 @@ Today a note answers a prompt on paper alone. The door sees the session's text, 
 
 <!-- the form is text -->
 
+A prompt asking for a note now takes a parked note as its answer. Two readers stand in the answer library. One reads the prompt for the word `note` outside a fence. The other counts the `note` rows the session log carries. The door keeps that count on the demand, counts again at every call, and a new row pays with the note's own text. Every other prompt still owes a text answer, because the door counts nothing for it.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The library, the door, one test and the level zero note
+- every door the change reaches has a fake. The reader takes the disk door, and each case builds it fake
+- a comment names the approach the change implements. Each new function points at the note's new chapter
 
 # verdict
 
@@ -222,17 +342,59 @@ Today a note answers a prompt on paper alone. The door sees the session's text, 
 
 <!-- the form is files -->
 
+- .claude/skills/level0/lib/answer.js
+- src/bridge/answer.js
+- test/level0/note-answer.test.js
+- spec/design_output/level0.md
+- spec/tickets/the-answer-door-reads-notes.md
+- .claude/skills/level0/lib/log.js
+- src/doors/log.js
+- src/doors/fake/log.js
+- src/bridge/stop.js
+- src/bridge/server.js
+- src/scripts/ticket.js
+- src/scripts/pull.js
+- spec/processes/standard.yaml
+- spec/design_input/the-window-holds-every-tab.md
+- spec/design_output/work.md
+- src/bridge/bash.js
+- test/level0/trunk-door.test.js
+- spec/tickets/the-brief-verbs-go.md
+- spec/tickets/the-controls-wire-up.md
+- spec/tickets/the-judge-reads-answer-rules.md
+- spec/tickets/the-viewer-draws-the-note.md
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- The door pays a noted prompt off the log. Every other prompt still owes a text answer.
+- Five cases stand green, and they cover the two cases the ask names.
+- `./RUNME.sh check` answers 0. The change adds no warning line of its own.
+- A probe over the real log door counts the one `note` row this session carries.
+- The `ticket note` verb writes the row `notesIn` counts. So the rule meets the shell.
+- Each rule carries a case that refuses. A fenced word reads as none.
+- A note before the prompt pays nothing, and a prompt asking for none keeps its demand.
+- No retro stands in the handback. The tests-red step found nothing to reflect.
+- Every file the diff touches beyond the brief carries another ticket's commit.
+- None of those files redesigns what the brief leaves alone.
+- For the retro: `noteRows` parses the session log beside `promptsIn` in the stop door.
+- That door reads the same file over `rowsOf`. One reader serves both.
+- For the retro: `namesNote` reads the word `note` anywhere outside a fence.
+- So a prompt saying `note that` takes a note on another matter as its answer.
+- The approach owns the asking case, and the retro decides this one.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact the change adds stands in one place. The rule stands once, in the level zero note's new chapter. Each new function links to that chapter. The one repeat is mechanical: two readers open the session log where one serves.
 
 # Discussion
 

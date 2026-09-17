@@ -5,3 +5,7 @@
 module quackitect/lsp
 
 go 1.24
+
+require quackitect/yaml v0.0.0
+
+replace quackitect/yaml => ../yaml

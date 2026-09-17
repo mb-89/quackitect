@@ -388,6 +388,13 @@ waits for a retro.
 refuses while the ask stands empty. So the pull hands out what a person
 writes, and nothing else.
 
+The verb reads the voice rules over the Ask too, and refuses one that breaks
+a rule at the error level. The Ask is the engine's from the open on, so the
+ticket door refuses every later hand there. A rule broken past the open
+stands in the lint over the tree until a person reaches for the door.
+`src/scripts/ask-lint.js` holds the run, and a box with no Vale opens as it
+stands.
+
 # The test verb
 
 `branch test` runs the tests the branch adds or changes since the ticket's

@@ -85,6 +85,40 @@ last line says which of the three stands:
 
 A desk pull starts nothing, and a take that fails starts nothing.
 
+The line it runs is the bridgehead's own, imported from the hook. So one text
+starts the server on both roads, and one table names what each code says. The
+stub's bridgehead keeps a copy, because that file imports nothing.
+
+## The bridgehead starts it too
+
+The take verb reaches a cloud box that pulls work. A cloud session opening on
+a prompt reaches no verb at all, so the bridgehead carries the same start. The
+session's first event answers nothing, the `warn` line lands, and the start
+road runs once.
+
+The road is one shell line, because the hook imports nothing and stands outside
+node. The shell reads the environment itself and answers a code:
+
+| the code | what stands | what the log carries |
+|---|---|---|
+| 3 | no cloud variable, so a person starts it | nothing |
+| 4 | the method root stands nowhere | one `warn` line |
+| 5 | the box carries no node | one `warn` line |
+| 6 | the setup brings no modules | one `warn` line |
+| 0 | the server starts behind the session | one `info` line |
+
+`CLAUDE_CODE_REMOTE` and `SE_CLOUD` say a box is a cloud box, the same pair the
+cloud guidance binds on. The operating system decides nothing here, because a
+person at a local box wants the button and a cloud box wants the server.
+
+The call comes back in milliseconds: the line backgrounds the server and sends
+its output to `.se/log/serve.log`, so a session start waits for nothing. The
+server answers the next event in about a second. A first event landing before
+it stands reads no rules, and the log names the piece that misses.
+
+The bridgehead installs nothing. The setup installs, and a box whose setup runs
+nowhere says so on the line the table above names.
+
 ## A fix reaches the session
 
 The server imports its doors and its libs once, so a fix to one reaches no
@@ -451,12 +485,32 @@ the one an environment carries leans on nothing:
     print("trusted", folder, "in", merge(os.path.expanduser("~/.claude.json"), trust))
     print("auto mode in", merge(os.path.expanduser("~/.claude/settings.json"), auto))
     PY
+    SE_INSTALL_SKIP="editor-link editor-extensions editor-client go index se-lsp" \
+      sh "$repo/src/scripts/install.sh" || true
     exit 0
 
 Both readers mark this folder one the client trusts, and both leave every other
 key and every other project alone. The `exit 0` holds a session up where the
 write fails. Nothing races either one, because the setup runs before a session
 holds the file.
+
+## The setup installs the cage
+
+The install line is what makes the trust worth anything: a trusted tree whose
+server cannot boot holds nobody. `src/scripts/install.sh` is `sh` and installs
+node itself, so the setup leans on nothing again.
+
+| what the setup installs | why the cage needs it |
+|---|---|
+| node | the command line and the server are JavaScript |
+| the modules | the server dies at import without them |
+| Vale | the prose rules the write door reads |
+| Biome | the JavaScript rules beside them |
+| the git hooks | the commit and the push doors |
+
+`SE_INSTALL_SKIP` leaves out what a box nobody looks at uses nowhere. That is
+the editor link, the editor extensions, the language client, Go, the index and
+the language server. Those stay wants, and every rule holds without them.
 
 ## Where the mode stands
 
@@ -610,18 +664,27 @@ only where the block reaches it. That is the whole of the proof. Where the stop
 hook stands off, the line ends `the stop hook off`, so the sentence says which
 cage this is.
 
-On the first `turn.complete` of a session, level zero looks for that sentence
-in the answer:
+On the first `turn.complete` of a session, level zero reads the answer's first
+line for that sentence:
 
 | what it finds | what it does |
 |---|---|
 | the sentence, with its own numbers | one `info` line, door `level0` |
 | a sentence with other numbers | one `warn` line carrying both |
-| no sentence | one `warn` line saying the canary is absent |
+| no sentence | one `warn` line saying the canary opens no answer |
 
 So the log carries the canary as well, and a person reads it later without
 watching the session run. `./RUNME.sh standing` ends with the same sentence,
 because `canary` builds it in `lib/guidance.js` and both callers read it there.
+
+## The canary opens an answer
+
+The line stands first in the answer, and the stop line stands last. A line
+quoted further down proves nothing, because an agent repeats the words of an
+older answer anywhere. The two ends keep the two doors apart. The canary says
+level zero holds this session, and the stop line says a reason to end the turn
+stands. One line stands for the other nowhere. For details, see
+[[spec/design_output/stop#the-two-lines-stand-apart]].
 
 ## The canary owes a debt
 
@@ -629,10 +692,10 @@ The log alone holds nobody. A session skipping the line runs free to the end,
 and the owner reads the failure long afterwards. So the sentence carries a
 debt, and the cage holds the session to it.
 
-The debt opens where the first `turn.complete` carries an answer the canary is
-absent from. `canaryIn` answers `same`, `other` or `none`. The first one alone
-pays. A line with other counts comes out of a block the session lacks, so it
-owes what silence owes.
+The debt opens where the first `turn.complete` carries an answer the canary
+opens no line of. `canaryIn` reads the first line and answers `same`, `other`
+or `none`. The first one alone pays. A line with other counts comes out of a
+block the session lacks, so it owes what silence owes.
 
 While the debt stands, `tool.call` behaves the way the owner's prompt door
 behaves. For details, see [[spec/design_output/level0#one-warning-then-a-refusal]].
@@ -643,8 +706,9 @@ behaves. For details, see [[spec/design_output/level0#one-warning-then-a-refusal
 | every one after | a refusal naming the debt | `refused <tool> before the canary` |
 
 The refusal carries the sentence itself, so the session reads what to say. Any
-later answer holding it clears the debt. That answer writes the `info` line the
-whole canary writes, and every call passes again.
+later answer opening on it clears the debt. That answer writes the `info` line
+the whole canary writes, and every call passes again. The debt ends no turn:
+the answer paying it says what the agent does next and the work goes on.
 
 These roads stay open, because this session's own debt reaches past them:
 
@@ -655,6 +719,26 @@ These roads stay open, because this session's own debt reaches past them:
 The probe after a compaction pays nothing. It reads the canary through
 `heardCanary` on a session holding the line already, so a second debt stays
 shut.
+
+## The line lands once
+
+A turn holds open while the agent works. A debt clearing at the turn's end
+alone asks again at every call inside that turn. The agent then writes the line
+into message after message, where the point of it is one line out loud.
+
+So the debt clears where the line lands. The bridgehead posts each step's text
+as `turn.said`, the door reads it, and the first step opening on the sentence
+pays:
+
+| what the door reads | what it does |
+|---|---|
+| a step opening on the line | pays the debt, and writes the `info` line |
+| a step without it | leaves the debt as it stands |
+| an answer at the turn's end | pays it, or opens it on the first turn |
+| a step from a helper | nothing, because a helper carries its own |
+
+The mark stays paid for the session. A later answer without the line opens no
+second debt, so the sentence stands once, wherever the turn ends.
 
 ## The helper takes the guidance
 
@@ -702,6 +786,24 @@ The door reads the key at every `tool.call`, so a button pressed mid-turn
 reaches the next call. The latest demand replaces the one before it. The hold
 is no demand: it stands in the stop door. For details, see
 [[spec/design_output/stop#the-hold]].
+
+## A note answers its prompt
+
+A prompt asking for a note takes a parked note as its answer. `namesNote`
+reads the prompt for the word `note`, outside a fence, beside `questionsIn`
+and `opensATurn`, which read a prompt the same way. The demand then holds the
+count of `note` rows the log carries at that moment.
+
+The note lands from the shell, so the server's own rows carry none of it. The
+door reads the session log off the disk at every call and counts the rows of
+kind `note`. A count past the one the demand holds pays it. The reply line
+carries the newest note's own text, so the next demand sees what the log
+carries.
+
+| the prompt | what pays it |
+|---|---|
+| one asking for a note | a note row, or a text answer |
+| every other prompt | a text answer alone |
 
 ## The first call is free
 

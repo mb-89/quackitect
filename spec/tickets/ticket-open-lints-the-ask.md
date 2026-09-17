@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 steps:
   - name: do
@@ -27,6 +27,19 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 62642eaf8f9c9c53
 step: do
+record:
+  - step: do
+    hand: box d42624a67d18a8
+    hash_before: 0c5f3f635aa9640059f96a3b51a5648df24b998a
+    hash_after: 3587acd3594b75bba1a4b552f93db18ffc82ce53
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 22 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: 64 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -52,11 +65,15 @@ An Ask minted with a tag, a bare path or a passive line opens as it stands. The 
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/ask-lint.test.js test/level0/ticket-verb.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -64,11 +81,16 @@ An Ask minted with a tag, a bare path or a passive line opens as it stands. The 
 
 <!-- the form is text -->
 
+The open verb runs the voice rules over the Ask before it writes the open state. An Ask breaking a rule at the error level refuses the open, and the refusal names the line and the rule. The draft stands as it is until a person rewrites it. A warning leaves the open alone, and a box with no Vale opens as it stands. A new module holds the run, so the ticket module stays one topic.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask. The child ticket it names lints clean at the error level now
+- the cleanup the change reveals is in the change. The Vale run stands in a module of its own
 
 # Discussion
 

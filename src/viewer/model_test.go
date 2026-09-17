@@ -23,7 +23,7 @@ func row(at int, door, said string) Record {
 
 func window(n int) model {
 	m := newModel("no/such/log.jsonl", time.UTC)
-	m.w, m.h = 120, 10+headWide
+	m.w, m.h = 120, 10+namesWide+headWide+footWide
 	for at := 1; at <= n; at++ {
 		m.all = append(m.all, row(at, "tool", fmt.Sprintf("line %d", at)))
 	}
@@ -210,28 +210,11 @@ func erase(m model, n int) model {
 	return m
 }
 
-// [[spec/design_output/viewer#the-header]]
-func TestTheHeaderNamesTheColumnsAndTheThreeKeysAboveARule(t *testing.T) {
-	t.Parallel()
-	lines := strings.Split(window(3).View(), "\n")
-	for _, want := range []string{"time", "level", "kind", "said", "enter details", "alt+? help", "alt+f filter", "alt+L log lvl: INFO"} {
-		if !strings.Contains(lines[0], want) {
-			t.Fatalf("the first line names %q, and reads %q", want, lines[0])
-		}
-	}
-	if !strings.Contains(lines[1], "────") {
-		t.Fatalf("the second line is a rule, and reads %q", lines[1])
-	}
-	if !strings.Contains(lines[2], "line 1") {
-		t.Fatalf("the log starts under the rule, and the third line reads %q", lines[2])
-	}
-}
-
 // [[spec/design_output/viewer#alt-l-raises-the-floor]]
 func TestAltLRaisesTheFloorAndComesRoundAgain(t *testing.T) {
 	t.Parallel()
 	m := newModel("no/such/log.jsonl", time.UTC)
-	m.w, m.h = 120, 10+headWide
+	m.w, m.h = 120, 10+namesWide+headWide+footWide
 	for at, level := range []string{"debug", "info", "warn", "error", "fatal", ""} {
 		r := row(at+1, "hook", "a "+level+" line")
 		r.Level = level
@@ -243,8 +226,8 @@ func TestAltLRaisesTheFloorAndComesRoundAgain(t *testing.T) {
 	if shown() != 5 {
 		t.Fatalf("the floor opens at info and shows 5 rows, and it shows %d", shown())
 	}
-	if !strings.Contains(strings.Split(m.View(), "\n")[0], "alt+L log lvl: INFO") {
-		t.Fatalf("the header names the floor, and reads %q", strings.Split(m.View(), "\n")[0])
+	if !strings.Contains(m.renderMarks(), "INFO") {
+		t.Fatalf("the footer names the floor, and reads %q", m.renderMarks())
 	}
 	for _, want := range []struct {
 		floor string
@@ -254,8 +237,8 @@ func TestAltLRaisesTheFloorAndComesRoundAgain(t *testing.T) {
 		if m.floor != want.floor || shown() != want.rows {
 			t.Fatalf("alt+l brings the floor to %s with %d rows, and stands at %s with %d", want.floor, want.rows, m.floor, shown())
 		}
-		if !strings.Contains(strings.Split(m.View(), "\n")[0], "log lvl: "+strings.ToUpper(want.floor)) {
-			t.Fatalf("the header names %s, and reads %q", want.floor, strings.Split(m.View(), "\n")[0])
+		if !strings.Contains(m.renderMarks(), pad(strings.ToUpper(want.floor), floorWide)) {
+			t.Fatalf("the footer names %s, and reads %q", want.floor, m.renderMarks())
 		}
 	}
 }
@@ -263,7 +246,7 @@ func TestAltLRaisesTheFloorAndComesRoundAgain(t *testing.T) {
 func TestAltQuestionMarkOpensTheHelpAndClosesItAgain(t *testing.T) {
 	t.Parallel()
 	m := alt(window(3), '?')
-	if m.pane != paneHelp || !strings.Contains(m.box.View(), "THE WINDOW") {
+	if m.pane != paneHelp || !strings.Contains(m.box.View(), "GLOBAL") {
 		t.Fatalf("alt+? opens the help, and the pane shows:\n%s", m.box.View())
 	}
 	m = press(m, "enter")
@@ -304,9 +287,8 @@ func TestAHeldFilterWearsRedAltFAndAClearedLineBringsEveryRowBack(t *testing.T) 
 	if m.pane != paneShut || len(m.view) != 1 {
 		t.Fatalf("enter closes the filter pane and keeps the filter, and got pane %d view %v", m.pane, m.view)
 	}
-	head := strings.Split(m.renderHeader(), "\n")[0]
-	if !strings.Contains(head, levelStyle("error").Render("alt+f filter")) {
-		t.Fatalf("a held filter wears alt+f in bold red, and the header reads %q", head)
+	if !strings.Contains(m.renderMarks(), levelStyle("error").Render("▼")) {
+		t.Fatalf("a held filter lights the funnel, and the marks read %q", m.renderMarks())
 	}
 	m = erase(alt(m, 'f'), len("line 3"))
 	if !m.filter.Empty() || len(m.view) != 5 {
@@ -315,9 +297,8 @@ func TestAHeldFilterWearsRedAltFAndAClearedLineBringsEveryRowBack(t *testing.T) 
 	if m.pane != paneFilter {
 		t.Fatal("the filter pane stands open while the line clears")
 	}
-	head = strings.Split(m.renderHeader(), "\n")[0]
-	if !strings.Contains(head, dimStyle.Render("alt+f filter")) {
-		t.Fatalf("a dropped filter wears alt+f as it did, and the header reads %q", head)
+	if !strings.Contains(m.renderMarks(), dimStyle.Render("▼")) {
+		t.Fatalf("a dropped filter darkens the funnel, and the marks read %q", m.renderMarks())
 	}
 }
 
@@ -403,9 +384,8 @@ func TestAltQKeepsThePromptsAndTheRepliesAndTheSameChordClearsIt(t *testing.T) {
 	if m.input.Value() != talkFilter || len(m.view) != 3 || m.pane != paneShut {
 		t.Fatalf("alt+q keeps the two prompts and the reply and opens no pane, and got %q %v %d", m.input.Value(), m.view, m.pane)
 	}
-	head := strings.Split(m.renderHeader(), "\n")[0]
-	if !strings.Contains(head, levelStyle("error").Render("alt+f filter")) {
-		t.Fatalf("a filter alt+q sets wears alt+f in bold red, and the header reads %q", head)
+	if !strings.Contains(m.renderMarks(), levelStyle("error").Render("▼")) {
+		t.Fatalf("a filter alt+q sets lights the funnel, and the marks read %q", m.renderMarks())
 	}
 	m = chord(m, altQ)
 	if !m.filter.Empty() || len(m.view) != 6 || m.input.Value() != "" {
@@ -424,9 +404,9 @@ func TestAnotherChordReplacesTheFilterAndLeavesTheHeaderShort(t *testing.T) {
 	if m.input.Value() != talkFilter {
 		t.Fatalf("a second chord writes its own filter, and got %q", m.input.Value())
 	}
-	head := strings.Split(m.renderHeader(), "\n")[0]
-	if strings.Contains(head, "shift") || strings.Contains(head, "alt+q") {
-		t.Fatalf("the header names no chord, and reads %q", head)
+	strip := m.renderStrip()
+	if strings.Contains(strip, "shift") || strings.Contains(strip, "alt+q") {
+		t.Fatalf("the strip names no chord, and reads %q", strip)
 	}
 	if !strings.Contains(FilterHelp, "alt+shift+f") || !strings.Contains(FilterHelp, "alt+q") {
 		t.Fatal("the filter pane names both chords")

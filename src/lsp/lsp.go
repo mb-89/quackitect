@@ -5,6 +5,8 @@
 package main
 
 import (
+	"quackitect/yaml"
+
 	"bufio"
 	"encoding/json"
 	"fmt"
@@ -151,7 +153,7 @@ func (one *server) draws(where, text string) {
 	for _, said := range one.checker.Over(at) {
 		found[said.File] = append(found[said.File], said)
 	}
-	found[at] = found[at] // an empty list clears the panel for the open file
+	found[at] = found[at] // an yaml.Empty list clears the panel for the open file
 
 	one.guard.Lock()
 	defer one.guard.Unlock()
@@ -177,7 +179,7 @@ func (one *server) clears() {
 }
 
 func (one *server) publishes(tree *Tree, path string, found []Finding) {
-	rows := splitLines(tree.Read(path))
+	rows := yaml.SplitLines(tree.Read(path))
 	drawn := make([]diagnostic, 0, len(found))
 	for _, said := range found {
 		drawn = append(drawn, drawsAs(said, rows))

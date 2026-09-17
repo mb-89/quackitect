@@ -89,7 +89,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d42624a67d18a8
+    hash_before: 7f2f38c1d7397225bbf9e1bc55e52515cac93a98
+    hash_after: 338a46b7dbf7570af05dd92a69b868d00ed053d1
 ---
 
 # Ask
@@ -116,6 +121,25 @@ Today a note row draws like every other row. A person scans the log for the park
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+| what changes | how |
+|---|---|
+| `colour.go` | a `note` style, and `saidStyle` answers it for the said column too |
+| `detail.go` | a prompt shows the notes it carries, the way it shows its reply |
+| the viewer note | the colours list takes the note line, under the answer |
+
+A note answers a prompt, so it wears the answer's shape and a colour of its
+own. The kind colours hold one entry a kind, and the note takes one there. The
+said column reads the same style, because a prompt and a reply each colour
+their text and a note stands beside them.
+
+The details of a prompt show its reply today. A note between that prompt and
+its reply shows there too, under the reply, so a person opening the prompt
+reads what the session parked. The details of a note show the prompt above it.
+
+A test in `detail_test.go` drives a log of a prompt, a note and a reply, and
+reads the note's colour and its place. For details, see
+[[spec/design_output/viewer#colours]].
 
 ## review
 

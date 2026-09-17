@@ -5,7 +5,8 @@
 # side     stop ends the turn, continue holds it open and re-prompts.
 # priority the higher number wins, and a tie goes to stop.
 # decides  claimed means the agent says so, mechanical means a check answers.
-# runs     the mechanical check, by the name the hook holds it under.
+# runs     the check, by the name the hook holds it under. A claimed rule naming
+#          one fires where the agent claims it and the check stands.
 # asks     the question the re-prompt puts to the agent.
 # says     the sentence a person or an agent reads.
 
@@ -22,12 +23,13 @@
   decides: claimed
   says: The owner says carry on, so carry on to the end of the work.
 
-- id: the-session-is-new
+- id: the-chat-is-new
   side: stop
   priority: 95
-  decides: mechanical
-  runs: session-is-new
-  says: This session has barely started, so it may ask before it acts.
+  decides: claimed
+  runs: chat-is-new
+  asks: Is this the opening turn of a chat where nobody has said what to do yet?
+  says: The chat is new and a person stands at this box, so this turn ends and asks.
 
 - id: a-person-holds-the-answer
   side: stop
@@ -42,6 +44,13 @@
   decides: mechanical
   runs: owner-holds
   says: The owner holds this session at stop, so this turn ends here.
+
+- id: the-owner-asks-to-finish
+  side: stop
+  priority: 84
+  decides: mechanical
+  runs: owner-finishes
+  says: The owner holds this session at finish, so this turn ends with the piece in hand.
 
 - id: work-still-stands
   side: continue
@@ -66,10 +75,10 @@
 
 - id: an-update-is-worth-giving
   side: stop
-  priority: 10
+  priority: 0
   decides: claimed
-  asks: Is there an update the owner wants before you go on?
-  says: An update stands worth giving, so this turn ends.
+  asks: Is there an update the owner wants before you go on, and does no work stand?
+  says: An update stands worth giving, and nothing else holds, so this turn ends.
 
 - id: the-tooth-is-out
   side: continue

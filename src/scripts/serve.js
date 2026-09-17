@@ -3,10 +3,10 @@
 // branch there starts it detached and says so.
 // [[spec/design_output/level0#the-cloud-starts-the-server]]
 
+import { reasonOf, START } from "../../.claude/skills/level0/hooks/level0.js";
 import { POINTER, pointerOf } from "../../.claude/skills/level0/lib/vehicle.js";
 
 const HEALTH_WAIT = 2000;
-const SERVER = "src/bridge/server.js";
 
 export function portIn(it) {
   try {
@@ -22,9 +22,9 @@ export function probeOf(node, port) {
   return [node, "-e", asks];
 }
 
-// The stub's bridgehead carries a copy of this line, because it imports nothing. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+// One line starts the server on both roads, and the bridgehead holds it, because that hook imports nothing and every other caller imports it there. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export function startOf(root) {
-  return ["sh", "-c", `nohup node "$1/${SERVER}" "$1" >/dev/null 2>&1 &`, "sh", root];
+  return ["sh", "-c", START, "level0", root, root];
 }
 
 // [[spec/design_output/level0#the-cloud-starts-the-server]]
@@ -34,9 +34,10 @@ export function servesHere(it) {
     return `The server answers at port ${port}.`;
   }
   const started = it.proc.run(startOf(it.root), { cwd: it.root });
+  const [, why] = reasonOf(started.exitCode);
   return started.exitCode === 0
     ? `The server starts detached at port ${port}, because nothing answered there.`
-    : `No server answers at port ${port}, and the start fails: ${started.stderr.trim() || `exit ${started.exitCode}`}`;
+    : `No server answers at port ${port}, and the start fails: ${started.stderr.trim() || why}`;
 }
 
 // [[spec/design_output/pull#the-engine-takes-the-branch]]

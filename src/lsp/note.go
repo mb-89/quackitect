@@ -5,6 +5,8 @@
 package main
 
 import (
+	"quackitect/yaml"
+
 	"regexp"
 	"strings"
 )
@@ -26,7 +28,7 @@ type Section struct {
 
 type Front struct {
 	Stands   bool
-	Said     *Doc
+	Said     *yaml.Doc
 	Lines    map[string]int
 	LineKeys []string
 }
@@ -37,12 +39,12 @@ type Note struct {
 }
 
 func readNote(text string) Note {
-	rows := splitLines(text)
+	rows := yaml.SplitLines(text)
 	return Note{Front: frontOf(rows), Sections: sectionsOf(rows)}
 }
 
 func frontOf(rows []string) Front {
-	blank := Front{Said: newDoc(), Lines: map[string]int{}}
+	blank := Front{Said: yaml.New(), Lines: map[string]int{}}
 	if len(rows) == 0 || strings.TrimSpace(rows[0]) != "---" {
 		return blank
 	}
@@ -61,11 +63,11 @@ func frontOf(rows []string) Front {
 	lines := map[string]int{}
 	order := []string{}
 	for i, line := range held {
-		pair := pairAt.FindStringSubmatch(line)
+		pair := yaml.PairAt.FindStringSubmatch(line)
 		if pair == nil {
 			continue
 		}
-		if where := firstWord.FindStringIndex(line); where == nil || where[0] != 0 {
+		if where := yaml.FirstWord.FindStringIndex(line); where == nil || where[0] != 0 {
 			continue
 		}
 		key := strings.TrimSpace(pair[1])
@@ -75,9 +77,9 @@ func frontOf(rows []string) Front {
 		lines[key] = i + 2
 	}
 
-	said := asDoc(readYaml(strings.Join(held, "\n")))
+	said := yaml.AsDoc(yaml.Read(strings.Join(held, "\n")))
 	if said == nil {
-		said = newDoc()
+		said = yaml.New()
 	}
 	return Front{Stands: true, Said: said, Lines: lines, LineKeys: order}
 }
@@ -106,11 +108,11 @@ func sectionsOf(rows []string) []Section {
 
 // [[spec/design_output/schema#what-a-note-reads-as]]
 func kindOf(text string) string {
-	said := frontOf(splitLines(text)).Said.Get("kind")
+	said := frontOf(yaml.SplitLines(text)).Said.Get("kind")
 	if said == nil {
 		return ""
 	}
-	return asString(linkless(said))
+	return yaml.AsString(linkless(said))
 }
 
 type item struct {
@@ -146,7 +148,7 @@ func linkless(said any) any {
 		}
 		return out
 	}
-	return linkAt.ReplaceAllString(asString(said), "$1")
+	return yaml.LinkAt.ReplaceAllString(yaml.AsString(said), "$1")
 }
 
 func linked(said any) bool {
@@ -155,11 +157,11 @@ func linked(said any) bool {
 			return false
 		}
 		for _, each := range one {
-			if !linkAt.MatchString(asString(each)) {
+			if !yaml.LinkAt.MatchString(yaml.AsString(each)) {
 				return false
 			}
 		}
 		return true
 	}
-	return linkAt.MatchString(asString(said))
+	return yaml.LinkAt.MatchString(yaml.AsString(said))
 }

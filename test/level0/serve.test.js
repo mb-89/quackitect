@@ -7,6 +7,7 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
+import { START } from "../../.claude/skills/level0/hooks/level0.js";
 import { portIn, probeOf, serving, startOf } from "../../src/scripts/serve.js";
 
 const ROOT = "/tree";
@@ -65,6 +66,11 @@ test("a desk and a failed take start nothing", () => {
 test("a failed start names the last thing the shell said", () => {
   const { it } = box({ probe: 1, start: 127, stderr: "sh: nohup: not found\n" });
   assert.match(heard(() => serving(it, 0)).said, /start fails: sh: nohup: not found/);
+});
+
+// [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+test("the take runs the line the bridgehead runs, and no copy of it", () => {
+  assert.deepEqual(startOf(ROOT), ["sh", "-c", START, "level0", ROOT, ROOT]);
 });
 
 test("the port reads off the pointer, and stands at the base without one", () => {

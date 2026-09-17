@@ -4,6 +4,8 @@
 package main
 
 import (
+	"quackitect/yaml"
+
 	"regexp"
 )
 
@@ -20,7 +22,7 @@ var (
 // [[spec/design_output/tools#what-the-survey-names]]
 func installedTools(text string) []string {
 	out := []string{}
-	for _, line := range splitLines(text) {
+	for _, line := range yaml.SplitLines(text) {
 		if found := installsAt.FindStringSubmatch(line); found != nil {
 			out = append(out, found[1])
 		}

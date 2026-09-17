@@ -72,11 +72,11 @@ func Frame(path string, w, h int, opened, narrow, floor string, zone *time.Locat
 	m.rebuild()
 	switch opened {
 	case "details":
-		m.open(paneDetails)
+		m.openPane(paneDetails)
 	case "help":
-		m.open(paneHelp)
+		m.openPane(paneHelp)
 	case "filter":
-		m.open(paneFilter)
+		m.openPane(paneFilter)
 	}
 	m.resize()
 	return settle(m.View()), nil

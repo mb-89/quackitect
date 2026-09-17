@@ -89,7 +89,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d42624a67d18a8
+    hash_before: 1647c00af456caf124ee2fed93df96603c59514f
+    hash_after: 759f94974cf0dcc94b87f77a42f67104f875acc4
 ---
 
 # Ask
@@ -123,6 +128,35 @@ Today the schema promises two knobs, and the pull reads the binding for the queu
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+| control | who reads it today | who reads it after |
+|---|---|---|
+| `engine.binding` | the stop hook, for the queue rule | the pull's hand-out too |
+| `engine.autonomy` | nobody | the mint, over every kind it writes |
+
+The box the command line builds asks the config for each control, beside the
+words and the counts it asks for already. So the pull and the mint each read
+one field of `it`, and the config door stays the one reader of the file.
+
+| binding | the plain pull | `pull <ticket>` |
+|---|---|---|
+| `queue` | hands out the next leaf | hands out that ticket |
+| `unbound` | answers wait, and says the binding stands unbound | hands out that ticket |
+| `god` | hands out the next leaf | hands out that ticket |
+
+So a person at `unbound` still names the work, and the box stops handing
+itself more. The stop rule reads the same field, so a box at `unbound` ends
+its turn with no queue behind it.
+
+| autonomy | the mint writes |
+|---|---|
+| `finish` | a private note, and refuses a ticket with the line to write instead |
+| `start` | a ticket, and names the group it lands in |
+| `ideation` | a ticket standing loose, which a cloud box rides on the group's branch |
+
+The mint refuses a kind the autonomy leaves out, and the refusal names the
+control and what it allows. For details, see
+[[spec/design_output/pull#the-hand-out]].
 
 ## review
 

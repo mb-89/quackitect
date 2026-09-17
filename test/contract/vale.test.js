@@ -139,7 +139,7 @@ const inRegister = async (text, where) => {
 // [[spec/funnel/a-paragraph-has-a-schema]]
 ifVale("the requirement register takes shall and should, and no other does", async () => {
   const binds = "- The door shall refuse the write, and it should name the rule.\n";
-  assert.deepEqual(await inRegister(binds, "spec/requirements/one.md"), []);
+  assert.deepEqual(await inRegister(binds, "spec/design_input/one.md"), []);
 
   for (const where of ["notes.md", "spec/design_output/one.md"]) {
     const found = await inRegister(binds, where);
@@ -149,7 +149,7 @@ ifVale("the requirement register takes shall and should, and no other does", asy
 
 ifVale("the register outside the set stands refused inside it too", async () => {
   const loose = "- The door may refuse the write, and it would say why.\n";
-  const found = await inRegister(loose, "spec/requirements/one.md");
+  const found = await inRegister(loose, "spec/design_input/one.md");
   assert.ok(found.includes("ModalRequirement"));
   assert.ok(!found.includes("Modal"), "one modal rule reads a path, and one alone");
 });

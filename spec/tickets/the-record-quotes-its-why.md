@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 steps:
   - name: do
@@ -27,6 +27,19 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 62642eaf8f9c9c53
 step: do
+record:
+  - step: do
+    hand: box d42624a67d18a8
+    hash_before: 7ab41b1f07e43929b1091f97d216660f115014c7
+    hash_after: 1ba9cbafb018af43383204d6ab590fab9d73bb84
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 12 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: 64 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -52,11 +65,15 @@ A finding carrying a colon and a space breaks the frontmatter. Vale then reads n
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/quoted.test.js test/level0/group.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -64,11 +81,16 @@ A finding carrying a colon and a space breaks the frontmatter. Vale then reads n
 
 <!-- the form is text -->
 
+Every value the record writer puts on a row now passes through `quoted`. It wraps a value in double quotes where a YAML reader takes it for a mapping, a comment, a collection or an anchor. It escapes the backslash and the quote inside. A reviewer's finding with a colon in it lands whole, and the frontmatter still reads. The ask names the `why` field, and the same fault reaches every other value, so the writer quotes them all.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask, and reaches every value the record holds
+- the cleanup the change reveals is in the change. The lint reads the ticket that met this first
 
 # Discussion
 

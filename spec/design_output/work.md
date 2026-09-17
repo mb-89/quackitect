@@ -56,6 +56,24 @@ takes the next.
 The hand names the box and no person, because the ticket travels and
 `spec/guidance/private` binds what a tracked file carries. [[spec/guidance]]
 
+## The record quotes its value
+
+A record's value comes off a hand, a hook or a reviewer, so it carries what
+it carries. A colon and a space in it opens a mapping to every YAML reader,
+and the frontmatter then reads as broken. Vale reads no line of such a file,
+and the lint over the tree exits one. The ticket door refuses the hand that
+repairs it, because the record is the engine's.
+
+So `quoted` in `src/scripts/group.js` wraps a value in double quotes where
+it carries any of these, and escapes the backslash and the quote inside:
+
+| what | why a reader trips |
+|---|---|
+| a colon and a space | it reads as a mapping |
+| a leading quote, bracket, brace or YAML mark | it reads as a collection or an anchor |
+| a hash | it opens a comment |
+| a trailing space, or nothing at all | it reads as another value |
+
 ## Held derives from the record
 
 A group holds where its newest record entry carries `hash_before` and no `hash_after`.
@@ -83,6 +101,21 @@ all:
 A loose ticket is one on trunk naming no group, which is backlog a person has
 yet to sort. A ticket in a group shows nowhere on trunk, because its branch is
 responsible for it.
+
+## A ticket under its group
+
+A group row carries a row per ticket naming it, indented under it, read off the
+branch tip `list` already fetches. So a reader on trunk sees the loose tickets
+and the held ones together, and runs no `git show` by hand:
+
+| column | says |
+|---|---|
+| the name | the ticket's file name |
+| the kind | `ticket` |
+| the status | `open` or `closed` |
+| the why | the step it stands at, or its urgency where it names no step |
+
+A brief carries no such row, because a brief names no tickets.
 
 ## A stale group is yours
 
@@ -117,6 +150,30 @@ is the box saying it leaves. Then it reads the children:
 
 So an open group nobody holds comes back to the queue, and a person answers on
 its branch.
+
+# A person step leaves
+
+A step whose `by` reads `person` stops no cloud box. `branch unblock <ticket>
+<successor>` takes the ticket standing at that step and hands its rest to a
+ticket outside the group:
+
+| what it reads | what it writes |
+|---|---|
+| the ticket stands open, in this group, at a step `by: person` | the ticket closes `state: closed`, `reason: became`, `successors: [<name>]` |
+| the successor stands open and names no group | the question that step asks, under the successor's `Discussion`, beside the ticket it comes from |
+
+So `branch done` meets no open child, the group closes, and one push carries the
+successor with it. The person answers on a ticket of their own, and every step
+behind them runs on.
+
+The verb refuses three things:
+
+- a ticket standing where a hand can take it
+- a successor standing inside the group it frees
+- a successor nobody holds yet
+
+The box mints that last one with `./RUNME.sh mint ticket`, and writes what
+stands open into its ask.
 
 # Two handovers
 
@@ -216,15 +273,19 @@ A desk session sees none of it.
 A box starts on trunk and leaves it in its first command. The window for a
 commit landing wrongly is the minute before that.
 
-Level zero refuses, on a cloud box:
+Level zero refuses, on a cloud box holding a work branch:
 
 - a `git commit` made while standing on `main`
 - a `git push` naming `main`, from any branch
 
 The refusal names `./RUNME.sh branch take` as the way out. A desk box meets none
-of it, because a box off the cloud merges by choice. The harness is the whole
-of the reason a cloud box stops: it opens no pull request, so trunk reaches it
-one way.
+of it, because a box off the cloud merges by choice.
+
+The branch in hand is the whole of the reason. A cloud box takes a work branch
+out of the queue and hands it back the same road. So trunk reaches that work
+through the hand-back alone. A cloud session outside that flow answers to the
+owner, and the green battery is the door it meets. The branch it stands on says
+which session it is.
 
 `branch take` and `branch done` reach git inside the command line, so the door sees
 the verb and leaves the plumbing alone.

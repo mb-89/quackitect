@@ -10,6 +10,8 @@ import {
   OFF,
   STOP,
 } from "../../.claude/skills/level0/lib/controls.js";
+import { CHECK } from "../../.claude/skills/level0/lib/answer.js";
+import { rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { ticketAt, WORK_BRANCH } from "../scripts/group.js";
 import { heldGroup, openPrivate, queueHolds } from "../../.claude/skills/level0/lib/ticket.js";
@@ -45,35 +47,37 @@ export function SPECS(box) {
   return [stopSpec(rulesOf(box))];
 }
 
+// The three calls a turn ends with, which the hold at stop lets through. [[spec/design_output/stop#the-hold]]
+export const ENDS_TURN = new Set([REPORT_CALL, STOP_CALL, `mcp__level0__${CHECK}`]);
+
 export function holdsCall(e, box) {
   if (e?.agentId) return null;
   const hold = String(asks(box, HOLD) ?? OFF);
-  if (hold === STOP && e?.tool !== REPORT_CALL) {
-    box.log.say(
-      "debug",
-      "hold",
-      `the owner holds stop, and ${e?.tool ?? "the call"} is refused`,
-      {
-        tool: String(e?.tool ?? ""),
-      },
-    );
-    return {
-      result: {
-        deny: "The owner holds this session at stop. Make no call: say what stands, and end the turn with the stop line.",
-      },
-    };
-  }
-  if (hold !== FINISH || box.held === hold) {
-    box.held = hold;
+  if (hold !== FINISH && hold !== STOP) {
+    box.held = "";
     return null;
   }
   box.held = hold;
-  box.log.say("debug", "hold", "the owner holds finish, and the block rides", {
-    tool: String(e?.tool ?? ""),
-  });
+  const tool = String(e?.tool ?? "");
+  if (hold === STOP && !ENDS_TURN.has(tool)) {
+    box.log.say("debug", "hold", `the owner holds stop, and ${tool || "the call"} is refused`, { tool });
+    return { result: { deny: refusedByHold(tool) } };
+  }
+  box.log.say("debug", "hold", `the owner holds ${hold}, and the block rides`, { tool });
   return { after: { context: [controlBlock({ hold })] } };
 }
 
+// [[spec/design_output/stop#the-hold]]
+export function refusedByHold(tool) {
+  return [
+    `The owner holds this session at stop, so ${tool || "this call"} is refused.`,
+    "Put the work down where it stands. Make no other call.",
+    `Say what stands and what is left, hand the last word in through ${REPORT_CALL},`,
+    "and end the turn with the stop line.",
+  ].join(" ");
+}
+
+// The hold ends the turn it lands in, so the turn's end puts it back. [[spec/design_output/stop#the-hold]]
 export function dropsHold(_e, box) {
   const hold = String(asks(box, HOLD) ?? OFF);
   box.held = "";
@@ -87,6 +91,12 @@ export function sawCall(e, box) {
   if (e?.agentId) return;
   toothOf_(box).sawCall();
   todosOf(box).sawCall(e);
+}
+
+// A prompt from outside this plugin opens a turn, and the tooth counts them. [[spec/design_output/stop#the-tooth-holds-its-state]]
+export function sawPrompt(e, box) {
+  if (e?.agentId) return;
+  toothOf_(box).sawPrompt(Boolean(e?.mine));
 }
 
 function claims(e, box) {
@@ -169,8 +179,9 @@ function lastLineReason(text) {
 function ranHere(name, held) {
   if (name === "stop-hook-off") return held.off;
   if (name === "owner-holds") return held.hold === STOP;
-  // A first answer naming a next step takes no free stop, so the canary rides it and closes no turn. [[spec/design_output/stop#the-canary-ends-turn-one]]
-  if (name === "session-is-new") return toothOf_(held.box).isNew() && !namesNext(held.text);
+  if (name === "owner-finishes") return held.hold === FINISH;
+  // An answer naming a next step takes no free stop, so the turn holds open where the agent says what it does next. [[spec/design_output/stop#the-chat-is-new]]
+  if (name === "chat-is-new") return chatIsNew(held.box) && !namesNext(held.text);
   if (name === "work-waiting") return todosOf(held.box).standing();
   if (name === "group-in-hand") return groupInHand(held.box);
   if (name === "ticket-in-hand") return holdStands(held.box) || privateStands(held.box);
@@ -207,6 +218,23 @@ function privateStands(box) {
       .some((one) => openPrivate(String(box.disk.read(join(folder, one.name)))));
   } catch {
     return false;
+  }
+}
+
+// THE CHAT IS NEW WHILE NOBODY HAS SAID WHAT TO DO IN IT. The session log holds one prompt row a turn and rotates at a session start, so the count survives a restart of the server and starts again with the next chat, and a cloud box carrying nobody to ask reads false. [[spec/design_output/stop#the-chat-is-new]]
+function chatIsNew(box) {
+  const env = box.env ?? process.env;
+  if (env.CLAUDE_CODE_REMOTE || env.SE_CLOUD) return false;
+  return promptsIn(box) <= 1;
+}
+
+function promptsIn(box) {
+  try {
+    return rowsOf(String(box.disk.read(join(box.work, SESSION)))).filter(
+      (one) => one.kind === "prompt",
+    ).length;
+  } catch {
+    return 0;
   }
 }
 
