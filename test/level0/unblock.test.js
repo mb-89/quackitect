@@ -91,7 +91,8 @@ state: open
 urgency: soon
 steps:
   - name: do
-    does: makes the change
+    does: answers the question the person step asks
+    by: person
     evidence:
       - name: lint
         form: command
@@ -181,6 +182,21 @@ test("the successor carries the question the person step asks, and the ticket it
   assert.match(successor, /\[\[spec\/tickets\/a-child\]\]/, "the successor names where it comes from");
   assert.match(successor, /# Discussion/, "it lands under Discussion");
   assert.doesNotMatch(successor, /Nothing stands here yet/, "the empty line goes");
+});
+
+// A successor minted off trivial opens under by: anyone, so the pull hands a person's question to an agent. [[spec/design_output/work#a-person-step-leaves]]
+test("unblock refuses a successor whose first step admits an agent", () => {
+  for (const [by, shown] of [["", "anyone"], ["anyone", "anyone"], ["agent", "agent"]]) {
+    const open = SUCCESSOR.replace("    by: person\n", by ? `    by: ${by}\n` : "");
+    const { it, disk } = doors(standing(CHILD(), { [at("spec/tickets/a-successor.md")]: open }));
+
+    const { code, said } = heard(() => work(ROOT, ["unblock", "a-child", "a-successor"], it));
+
+    assert.equal(code, 2, `by: ${shown} refuses`);
+    assert.match(said, /waits for a person/, `by: ${shown} says why`);
+    assert.match(said, new RegExp(shown), `by: ${shown} names what it read`);
+    assert.equal(fieldOf(disk.read(at("spec/tickets/a-child.md")), "state"), "open");
+  }
 });
 
 // The mint writes the chapter's description as a comment, and a hand writing there drops it. [[spec/design_output/work#a-person-step-leaves]]

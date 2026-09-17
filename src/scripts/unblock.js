@@ -5,7 +5,7 @@
 
 import { CLOSED, fieldOf, frontOf, GROUP, OPEN, stepOf, ticketAt, withField } from "./group.js";
 import { landed } from "./landed.js";
-import { leafOf } from "./pull.js";
+import { leafOf, leavesOf } from "./pull.js";
 
 const DISCUSSION = "# Discussion";
 // What mint leaves in an empty chapter, in either spelling. A hand writing under Discussion drops it, so the chapter reads as what a hand wrote. [[spec/design_output/work#a-person-step-leaves]]
@@ -85,7 +85,22 @@ function refuses(child, successor, group, nextName) {
     return `${nextName} stands ${fieldOf(successor.text, "state")}, and a successor stands open.`;
   if (String(successor.front[GROUP] ?? "") === group)
     return `${nextName} stands in ${group}, and a successor stands outside the group it frees.`;
-  return "";
+  return admits(successor, nextName);
+}
+
+// A successor carries a person's question, so its first step waits for a person. A step under any other `by` hands that question to an agent, and the wall stands again one ticket along. [[spec/design_output/work#a-person-step-leaves]]
+function admits(successor, nextName) {
+  const opens = openLeaf(successor.front);
+  if (!opens) return `${nextName} names no step, and a successor opens at one waiting for a person.`;
+  if (opens.by === "person") return "";
+  const by = opens.by || "anyone";
+  return `${nextName} opens at ${opens.path} under by: ${by}, and a successor waits for a person.`;
+}
+
+// [[spec/design_output/work#a-person-step-leaves]]
+function openLeaf(front) {
+  const path = String(front.step ?? "").trim() || (leavesOf(front)[0]?.path ?? "");
+  return path ? leafOf(front, path) : null;
 }
 
 // Discussion is the one chapter a hand writes on a ticket it holds no step of. [[spec/design_output/work#a-person-step-leaves]]

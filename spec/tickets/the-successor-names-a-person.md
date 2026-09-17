@@ -56,27 +56,36 @@ A person's work reaches a person.
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test test/level0/unblock.test.js
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
+`branch unblock` refuses a successor whose first step admits an agent.
 
-<!-- the form is text -->
+A successor carries a person's question. A hand minting one off `trivial` gets a first step under `by: anyone`. The pull then hands that question to an agent, and the wall stands again one ticket along. The verb now reads the successor's first step, and refuses every `by` outside `person`:
+
+| the first step reads | what the verb answers |
+|---|---|
+| `by: person` | it runs, and the child closes `became` |
+| `by: anyone`, or no `by` | refused, naming `anyone` |
+| `by: agent` | refused, naming `agent` |
+| no step at all | refused, because a successor opens at one |
+
+`admits` in `src/scripts/unblock.js` holds the rule, and `openLeaf` reads the first step the way `takeable` reads it. So the two verbs read one shape.
+
+The case drives all three spellings, and reads the child still open after each refusal. The successor fixture takes `by: person`, because the old fixture was the ticket this change refuses.
+
+`spec/guidance/cloud.md` grows a line beside the `unblock` one, so a box mints the successor right the first time.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change follows the ask. The verb refuses, a case covers it, and the cloud guidance names what a successor carries.
+- the cleanup stands in the change. `openLeaf` reads the first step the way `takeable` does, so one shape serves both.
+- every fact stands in one place. The rule sits in `admits`, and the guidance points a box at the verb.
 
 # Discussion
 
