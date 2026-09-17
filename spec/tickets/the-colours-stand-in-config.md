@@ -89,7 +89,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: ed0af70d163e60af84f6268f93ad4cbfca22d075
+    hash_after: ed0af70d163e60af84f6268f93ad4cbfca22d075
 ---
 
 # Ask
@@ -127,9 +132,37 @@ Where the values land wants a word too. `spec/config/styles` holds the Vale styl
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+The config projects into a Go file, the way the paragraph schema projects into the Vale rules.
 
-<!-- the form is text -->
+The ask names two roads, and this draft takes the second. A run time read asks the binary to find the root off the session path, and it reads a file on every start. A projection keeps the binary whole, and the write door guards the target for free.
+
+| what lands | where |
+|---|---|
+| the values a person sets | `spec/config/colours.json` |
+| the shape a checker holds them to | `spec/config/colours.schema.json` |
+| the Go the projection writes | `src/viewer/colours.go`, generated |
+| the entry naming the three | `spec/config/projections.json` |
+
+The values stand beside `level0.json` and outside `spec/config/styles`. That folder holds the Vale styles, and one of its four is a projection target already. So a reader meeting `styles` meets prose rules there, and meets the window's colours under a name of their own.
+
+**The shape.** `projection.js` names a shape a constant, and maps it to the ending its files take. A fourth shape joins `config commands`, `paragraph rules` and `output style`:
+
+| what the shape does | where |
+|---|---|
+| reads the JSON, and writes one Go file | a writer beside `rulesFrom` |
+| says the ending | the endings map |
+| refuses a hand edit to the target | the write door, which reads the entry already |
+
+**What moves.** `colour.go` keeps what it decides, and gives up what it names:
+
+| what | after |
+|---|---|
+| `kindColours`, `toolColours`, the level colours, the four styles a name carries | the config |
+| `kindStyle`, `levelStyle`, `saidStyle`, the hash over an unknown kind | `colour.go`, reading the generated values |
+
+So the numbers stand in one file, and the reading stands in another. `grep -c` over `src/viewer` outside the generated file answers 0, which the first row of `done_when` asks for.
+
+**The check.** `./RUNME.sh check` reads every projection against its source already, so a value a hand edits in the target turns the check red. The case covering it drives the projection over a small config, and reads the Go it writes.
 
 ## review
 
