@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 step: implement/person-1
 steps:
@@ -184,6 +184,8 @@ record:
     returns: 2
     why: No test drives the level one `session.start` hook, so nothing proves the wrapper writes the session file.; The ask wants a test reading that file back, and the payload builder alone stands tested.; Drive the registered hook with a fake `$.fs`, over an event naming a session and one naming none.; `sessionOf` reads two spellings of the id, and the `session_id` this tree already reads is neither.; Take that third spelling, the way `.claude/skills/level0/lib/copilot.js` takes it.; The level one hook spells the session path again, beside the lib it already imports, so one copy goes.; Every other finding of the last round lands, and the hold here names the agent.; The `own` mark rests on the harness carrying an unknown key, which no type in this tree proves.; `./RUNME.sh check src test .claude spec/design_output` exits 0, and the suite passes 1016 of 1018.; The stub rename belongs to the sibling ticket, and it redesigns nothing here.
 group: the-hand-carries-a-step
+reason: became
+successors: [the-session-file-proves-itself]
 ---
 
 # Ask
