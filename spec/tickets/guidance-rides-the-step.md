@@ -82,7 +82,15 @@ record:
   - step: sync
     hand: box 0fc2b4132f94 · claude-code-remote
     hash_before: 3701b70daf5fd2570008e3bb6daeabcca35670ea
-step: sync
+  - step: sync
+    hand: box 0fc2b4132f94 · claude-code-remote
+    hash_before: fa10b6feae49ac46e777efbe1b5ef753e121b0f3
+    hash_after: fa10b6feae49ac46e777efbe1b5ef753e121b0f3
+    answered:
+      - name: sync
+        exit: 0
+        said: work/guidance-rides-the-step already carries every commit on main.
+step: split
 ---
 
 # Ask
@@ -98,6 +106,8 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 <!-- work sync, so the branch carries trunk -->
 
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
