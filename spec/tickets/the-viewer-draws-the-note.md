@@ -257,27 +257,35 @@ The third case reads the details. `pairsOf` walks forward from a prompt and take
 
 ### tests
 
-<!-- the same tests pass -->
-
-<!-- the form is command -->
+    (cd src/viewer && go test ./... > /dev/null 2>&1) && echo green
 
 ### check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ### says
 
-<!-- what changes and why, for a reader who was not there -->
+A note wears a colour a person chooses, and the prompt holding it shows it.
 
-<!-- the form is text -->
+Three hunks carry the change, and each answers one case:
+
+| where | what it does |
+|---|---|
+| the kind list | takes `note` at 181, the shade the hash picked before |
+| `saidStyle` | reads the kind list for a note and an answer alike |
+| `pairsOf` | gives a prompt the notes standing inside its turn, and gives a note the prompt above it |
+
+The second hunk takes a copy out. `saidStyle` wrote the answer's number a second time, and the two agreed by hand. Both read the kind list now, so the number stands in one place.
+
+The first hunk changes no colour a person sees. `kindStyle` falls through to a hash over the kind where the lists name none, and that hash answered 181 for a note already. The list names the same number, so the shade becomes a choice a person reads and moves.
+
+`Body()` answers the `text` field where a row carries one, so a note past the row's width reads whole in the details. That needed nothing here.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change touches no file the ask leaves out. `colour.go` and `detail.go` carry it, and the ask names both.
+- every door the change reaches has a fake. The change reaches no door, and reads rows the caller hands it.
+- a comment names the approach the change implements. Each hunk carries the design output section it holds.
 
 # verdict
 
