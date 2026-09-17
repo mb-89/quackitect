@@ -275,17 +275,22 @@ The verdict on the split reads fail over two small findings, and the cap turned 
 
 # Discussion
 
-Where the box left it: the child stands at design/draft with its approach written, and the judge refuses every hand-back there. The group's own leaves wait behind the child, so sync, split and the retro stand untouched. For the finding, see [[spec/tickets/guidance-rides-step#discussion]].
+Where the group stands: two children closed, and [[spec/tickets/the-pull-splits-by-topic]] waits for a person at its design step. The judge named in the earlier note refuses nothing now, because the sync brought the voice checks the owner reworked.
 
-What the box fixed on the way:
+What the branch met, each with its moment:
 
-- the child's brief carried three headings outside the ticket schema, and the schema test failed. They became lead lines.
-- both asks stood thin. Now the group's says the goal, and the child's carries the gain, what breaks and the done-when list.
-- both tickets stood draft, and the box opened them, because the take handed the branch out as work
+| what the box met | where it showed |
+|---|---|
+| a shallow clone | `branch take` answered `refusing to merge unrelated histories`, and `git fetch --unshallow` cleared it |
+| the size ceiling | every write to the pull or the work verb paid for itself with a larger cut |
+| a route that shut on itself | a verdict hand's files field turned the lint red, and no other hand may write that field |
+| a lost test file | an implement hand wrote over `test/level0/guidance.test.js`, which already stood |
+| two boxes on one branch | box `220c71584772` took this branch while box `0fc2b4132f94` held it |
 
 What a person decides:
 
-- what the judge reads against evidence, and whether its refusal names the rule and counts
-- whether the child's approach stands, so the review hand can read it
-
-The box holds the group, and the private folder held one note on the judge, which dies with the box.
+- whether two boxes may hold one branch, because a verdict hand's hold breaks each time the tip moves
+- whether `branch sync` unshallows a clone itself, or the harness clones whole
+- whether the work answer names the markdown list a `files` field takes
+- whether a write door rule refuses a whole-file write over a tracked file the hand has not read
+- the approach of [[spec/tickets/the-pull-splits-by-topic]], which stands at its person step
