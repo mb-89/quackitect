@@ -2,10 +2,20 @@
 kind: [[ticket]]
 state: open
 urgency: now
+step: design/person-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: "design/review failed back 2 times: | the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | yes for the two scripts, and the command line stands open |; | is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does a retro stand in the handback | no, and `branch review` names it as the last fix the branch owes |; | does every claim the approach makes carry a proof | yes, the lint and the check answer each one |; TL;DR:; Every finding of the last round closes for the pull and the work verb.; Each chapter the two tables name stands in the design output today.; The command line keeps its modules in prose, and names a chapter for none of them.; The file row counts the test files, and the table under it lists fewer.; The findings, one a line:; The command line's modules name no chapter. Name one a module, as the pull and work tables do.; The file row writes a count of test files, and the table under it lists fewer.; The voice asks for the command answering a count. Cut that number, and name `./RUNME.sh lint test/level0`.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the draft names a chapter for each command line module | open |; | 2 | the file row drops its count and names the lint | open |; | 3 | the review hand reads the approach again | open |"
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -89,8 +99,6 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-group: guidance-rides-the-step
-step: design/review
 record:
   - step: design/draft
     hand: box 0fc2b4132f94 · claude-code-remote
@@ -106,6 +114,13 @@ record:
     hand: box 0fc2b4132f94 · claude-code-remote
     hash_before: e2019e2997f16ecc93a3a9785911b6b35208dbeb
     hash_after: e2019e2997f16ecc93a3a9785911b6b35208dbeb
+  - step: design/review
+    hand: box 220c71584772 · claude-code-remote
+    hash_before: eea1f6bc300d1a5881096fbfff9654e4e4620402
+    hash_after: eea1f6bc300d1a5881096fbfff9654e4e4620402
+    returns: 2
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | yes for the two scripts, and the command line stands open |; | is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does a retro stand in the handback | no, and `branch review` names it as the last fix the branch owes |; | does every claim the approach makes carry a proof | yes, the lint and the check answer each one |; TL;DR:; Every finding of the last round closes for the pull and the work verb.; Each chapter the two tables name stands in the design output today.; The command line keeps its modules in prose, and names a chapter for none of them.; The file row counts the test files, and the table under it lists fewer.; The findings, one a line:; The command line's modules name no chapter. Name one a module, as the pull and work tables do.; The file row writes a count of test files, and the table under it lists fewer.; The voice asks for the command answering a count. Cut that number, and name `./RUNME.sh lint test/level0`.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the draft names a chapter for each command line module | open |; | 2 | the file row drops its count and names the lint | open |; | 3 | the review hand reads the approach again | open |"
+group: guidance-rides-the-step
 ---
 
 # Ask
@@ -124,6 +139,16 @@ What breaks where nobody does it: each change to these files pays the same toll 
 For the change paying this toll, see [[spec/tickets/guidance-rides-step]].
 
 # design
+
+## person-1
+
+<!-- answers the question the engine asks -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
 
 ## draft
 
@@ -207,16 +232,34 @@ What the agent needs:
 
 fail
 
-- Cut `test/level0/schema.test.js` as well, because it stands past the ceiling and the approach leaves it out.
-- That test drives the schema reader, so the split of the three scripts hands it no subject.
-- Until it comes down, `./RUNME.sh lint test/level0` names `FileCeiling`, and the ask's second item stands open.
-- Name the head every minted module writes: a line on what it holds, then its design output link.
-- The approach answers that item with the module's name alone, and a name says less than a head.
-- Point each pull module at a chapter that stands: the leaf, the stand and the verb name none.
-- The work module the reading names no chapter of `spec/design_output/work` either.
-- Name `./RUNME.sh check` among the proofs, because the ask asks for its exit.
-- The cut list for the pull and the work verb holds, and each cut moves a function whole.
-- `./RUNME.sh check` exits 0 on this commit.
+| the question reviewing asks | the answer |
+|---|---|
+| does the approach answer the ask | yes for the two scripts, and the command line stands open |
+| is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |
+| what does `./RUNME.sh check` answer | 0, with the server standing |
+| does a retro stand in the handback | no, and `branch review` names it as the last fix the branch owes |
+| does every claim the approach makes carry a proof | yes, the lint and the check answer each one |
+
+TL;DR:
+
+- Every finding of the last round closes for the pull and the work verb.
+- Each chapter the two tables name stands in the design output today.
+- The command line keeps its modules in prose, and names a chapter for none of them.
+- The file row counts the test files, and the table under it lists fewer.
+
+The findings, one a line:
+
+- The command line's modules name no chapter. Name one a module, as the pull and work tables do.
+- The file row writes a count of test files, and the table under it lists fewer.
+- The voice asks for the command answering a count. Cut that number, and name `./RUNME.sh lint test/level0`.
+
+What the agent needs:
+
+| number | need | status |
+|---|---|---|
+| 1 | the draft names a chapter for each command line module | open |
+| 2 | the file row drops its count and names the lint | open |
+| 3 | the review hand reads the approach again | open |
 
 # implement
 
@@ -226,7 +269,7 @@ fail
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+<!-- the same tests pass -->
 
 <!-- the form is command -->
 
