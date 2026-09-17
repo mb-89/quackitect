@@ -235,15 +235,13 @@ The third case reads the details. `pairsOf` walks forward from a prompt and take
 
 ### lint
 
-<!-- the tree builds and lints -->
-
-<!-- the form is command -->
+    ./RUNME.sh lint src/viewer/colour.go src/viewer/detail.go
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change touches no file the ask leaves out. `colour.go` and `detail.go` carry it, and the ask names both.
+- every door the change reaches has a fake. The change reaches no door, and reads rows the caller hands it.
+- a comment names the approach the change implements. Each hunk carries the design output section it holds.
 
 ## tests-green
 
