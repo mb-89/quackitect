@@ -96,12 +96,27 @@ A second wording costs more than a second copy. A copy of a line breaks a search
 for that line, and the search finds both. A rewording of an idea breaks nothing
 a search sees, so it survives and drifts.
 
-## 15. Two places, one owner
+## 15. Assert nothing you leave alone
 
 Ownership and duplication are one thing seen twice. A place describing what it
 owns states a fact. A second place describing that same thing states a guess
 about somebody else's work, and it ages the moment the owner moves.
 
-So the rule reads as bounds. A hand writing about a thing asks first who owns
-it. Where the answer names somebody else, the hand writes the pointer, and adds
-no words of its own.
+The aside costs more than the copy, because nothing links it back. A hand
+changing a folder reads the notes that folder owns. It reads no ticket that
+described the folder in passing, to ground a choice about something else.
+
+This tree measured it twice in one session:
+
+| the sentence a draft wrote | what the review answered |
+|---|---|
+| `spec/config` holds a folder for each thing a projection reads | the stop door and Vale read two of them, and a projection writes a third |
+| each folder under `spec/config` answers to one reader | one of them answers to three |
+
+Neither sentence carried the ticket's own answer, which was the path an icon
+stands at. Both stood to ground a choice, and a reader acted on neither.
+
+So the rule reads as bounds, and it asks one question before a sentence lands:
+does a reader act on this? A reader wanting the mechanism reads the note owning
+it, and a rationale holds the argument. A hand writing what a reader acts on
+writes less, and ages none of it.
