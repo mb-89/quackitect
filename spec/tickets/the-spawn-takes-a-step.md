@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-hand-carries-a-step
-step: design/review
+step: design/draft
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -97,6 +97,12 @@ record:
     hand: box 3d4c068755ec · claude-code-remote
     hash_before: 0136ef0a04d0a335b1fe7ab2daf81192844f227b
     hash_after: 0136ef0a04d0a335b1fe7ab2daf81192844f227b
+  - step: design/review
+    hand: box 3d4c068755ec · claude-code-remote · helper-2
+    hash_before: 2634a66b131692e6427ba61c539952d2478797fa
+    hash_after: 2634a66b131692e6427ba61c539952d2478797fa
+    returns: 1
+    why: "A leaf under `by: helper` reaches no spawn. `admits` answers a why and no `other`, so the leaf parks.; A hand under `--as` reads that same leaf as untakeable, because `takeable` refuses the word `helper`.; The ask names the excluding field `by`, and the design output names it `not`. Name one, and make the other follow.; The spawn answer names one taker, the hand it asks for. The ask's fourth line names a person too.; The helper's hand-back stands as a case already. Add the assertion it lacks, that another hold stands untouched.; The wrapper's spawn wants the case the draft names, and the guidance rides the helper's pull.; `./RUNME.sh check` answers 1 over faults the whole tree carries, and this leaf adds none."
 ---
 
 # Ask
@@ -162,6 +168,16 @@ drifts. So the change is the proof, and no line of the pull moves:
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- A leaf under `by: helper` reaches no spawn. `admits` answers a why and no `other`, so the leaf parks.
+- A hand under `--as` reads that same leaf as untakeable, because `takeable` refuses the word `helper`.
+- The ask names the excluding field `by`, and the design output names it `not`. Name one, and make the other follow.
+- The spawn answer names one taker, the hand it asks for. The ask's fourth line names a person too.
+- The helper's hand-back stands as a case already. Add the assertion it lacks, that another hold stands untouched.
+- The wrapper's spawn wants the case the draft names, and the guidance rides the helper's pull.
+- `./RUNME.sh check` answers 1 over faults the whole tree carries, and this leaf adds none.
 
 # implement
 
