@@ -9,6 +9,7 @@ import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { fieldOf } from "../../src/scripts/group.js";
+import { takeable } from "../../src/scripts/pull.js";
 import { work } from "../../src/scripts/work.js";
 
 const ROOT = "/tree", SHA = "b818c390c02737351bf1b73aba36a573d34d2ecc";
@@ -213,4 +214,21 @@ test("unblock names the successor it needs, and mints none of its own", () => {
   assert.equal(code, 2);
   assert.match(said, /no-such-next stands nowhere yet/);
   assert.match(said, /mint ticket/);
+});
+
+// [[spec/design_output/work#a-person-step-leaves]]
+test("a sibling waiting on the child it unblocks becomes takeable, so the chain runs on", () => {
+  const waits = CHILD("design", "depends_on: [a-child]\n");
+  const { it, disk } = doors(standing(CHILD(), { [at("spec/tickets/a-next.md")]: waits }));
+  const siblings = () => [
+    { name: "a-child", text: disk.read(at("spec/tickets/a-child.md")) },
+    { name: "a-next", text: disk.read(at("spec/tickets/a-next.md")) },
+  ];
+
+  assert.equal(takeable(it, siblings()[1], siblings()), "", "the open child holds it");
+
+  const { code } = heard(() => work(ROOT, ["unblock", "a-child", "a-successor"], it));
+
+  assert.equal(code, 0);
+  assert.equal(takeable(it, siblings()[1], siblings()), "design", "the closed child frees it");
 });
