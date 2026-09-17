@@ -90,7 +90,11 @@ record:
       - name: sync
         exit: 0
         said: work/guidance-rides-the-step already carries every commit on main.
-step: split
+  - step: split
+    hand: box 0fc2b4132f94 · claude-code-remote
+    hash_before: 7e7f9c3089581a8d7ba7147e3efcfb1f806c2cd9
+    hash_after: 7e7f9c3089581a8d7ba7147e3efcfb1f806c2cd9
+step: children
 ---
 
 # Ask
@@ -118,6 +122,17 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 <!-- every child as a link, one a line, with its process -->
 
 <!-- the form is list -->
+
+- [[spec/tickets/guidance-rides-step]], process standard, closed: the notes ride the step, the hold, the log and the verb
+- [[spec/tickets/the-layer-reaches-sessions]], process standard: the layer drops what a session's step hands it
+- [[spec/tickets/the-pull-splits-by-topic]], process standard: every script comes under its ceiling
+
+## checked
+
+- small enough to review whole: each child names one outcome and one set of files
+- the children add up to the goal: the first carries the ask, and the second its last mile
+- the third carries the ceiling the first paid for, and nothing of the goal stands outside them
+- a child waiting on another names it: none waits, because the first stands closed
 
 # children
 
