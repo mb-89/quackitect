@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-hand-carries-a-step
-step: design/draft
+step: design/review
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -92,6 +92,11 @@ steps:
 process: [[standard]]
 process_hash: d1fd9cd113889f29
 depends_on: ["the-hand-carries-the-session"]
+record:
+  - step: design/draft
+    hand: box 3d4c068755ec · claude-code-remote
+    hash_before: 0136ef0a04d0a335b1fe7ab2daf81192844f227b
+    hash_after: 0136ef0a04d0a335b1fe7ab2daf81192844f227b
 ---
 
 # Ask
@@ -120,6 +125,33 @@ When the next step's `by` excludes the hand that pulls, nobody takes it. The app
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The road stands, and the note that holds it is
+[[spec/design_output/pull#a-hand-of-its-own]]. Four of the ask's lines answer in
+the tree today:
+
+| the ask's line | where it stands | what proves it |
+|---|---|---|
+| a `by` outside the hand answers `spawn` | `spawnAnswer` in `src/scripts/pull.js` | `test/level0/pull.test.js` drives a leaf the only hand stands outside |
+| the wrapper spawns the hand | the hook under `.claude/skills/level1` | `test/level0/level1.test.js` reads the prompt out of a spawn answer |
+| a hand under `--as` takes one leaf | `onward` in `src/scripts/pull.js` | `test/level0/pull.test.js` answers done after that hand-back |
+| off a plugin the shell moves nothing | the lines the spawn answer prints | the same case reads them back |
+
+So one difference stands between the ask and the tree, and it is the guidance.
+`spawnPrompt` writes the ticket, the leaf and three commands. The guidance
+reaches the helper at its own pull, under its own hand.
+
+| the road | what the helper reads | what it costs |
+|---|---|---|
+| the prompt carries the guidance | the rules twice, once in the prompt and once at the pull | a second copy of every rule |
+| the pull carries it, as today | the rules once, with the fields beside them | one more call before the work |
+
+This ticket takes the second road, because a rule read twice is a rule that
+drifts. So the change is the proof, and no line of the pull moves:
+
+- a case drives the wrapper over a spawn answer, and reads the hand it makes
+- a case drives a helper's hand-back, and reads `done` with no other hold touched
+- the note takes one line saying the guidance rides the helper's pull
 
 ## review
 
