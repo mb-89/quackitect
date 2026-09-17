@@ -89,7 +89,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 372edf2ccc0e7222883028c2a1b2b2ebeebf03c2
+    hash_after: 372edf2ccc0e7222883028c2a1b2b2ebeebf03c2
 ---
 
 # Ask
@@ -114,9 +119,39 @@ A rewrite of trunk leaves five refs sharing no ancestor with it. The take picks 
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+One question answers it: does the branch share an ancestor with trunk?
 
-<!-- the form is text -->
+`git merge-base origin/main origin/<branch>` answers 0 where one stands, and non-zero where none does. `movedOnTrunk` in `src/scripts/work.js` already asks git that question, so the verbs read one shape.
+
+| what changes | where |
+|---|---|
+| the standing reads `orphan` | `standingAll` in `src/scripts/work.js` |
+| the take passes over it, and names it | `take` in the same file |
+| the row marks it | the list's row builder |
+| the case drives one orphan and one branch | `test/level0/work.test.js` |
+
+**The standing.** `standingAll` maps a branch to one of four words today. An orphan reads ahead of all four, because a branch no sync reaches takes no work whatever its brief says:
+
+| what git answers | the standing |
+|---|---|
+| `merge-base` non-zero | `orphan` |
+| anything else | the four words it reads today |
+
+**The take.** `take` walks the branches at `todo` and picks the first. An orphan stands outside `todo` once the standing names it, so the take passes it over. The take then says which branches it skipped, and why, so a box reads the reason.
+
+**The case.** `fakeGit` answers a command by name, so a case answers `merge-base` non-zero for one branch and 0 for another. The take then answers the second, and the said names the first as skipped.
+
+**The count.** Seven refs stand orphaned today, and `git merge-base origin/main <ref>` answers which:
+
+| the refs | what they are |
+|---|---|
+| `v1`, `v2`, `v3`, `v4` | four trunks this tree stood on before |
+| `group/level0`, `group/voice` | two group branches off an older trunk |
+| `se/claims` | one branch off an older trunk |
+
+The ask reads five, and it names none under `work/`. `branches` reads `work/*` alone, so the take reaches none of these seven today. The guard holds for the next rewrite, where a `work/` branch falls the same way.
+
+So the owner's row stands on its own: these seven wait for a person to close them or cut them again.
 
 ## review
 
@@ -236,4 +271,6 @@ A rewrite of trunk leaves five refs sharing no ancestor with it. The take picks 
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+The ask reads five orphaned refs, and `git merge-base origin/main <ref>` answers seven. The draft names each.
+
+None of the seven stands under `work/`, and `branches` reads `work/*` alone. So the take reaches none of them today, and the last row of the ask waits for a person on its own account.
