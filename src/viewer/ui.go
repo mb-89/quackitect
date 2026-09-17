@@ -59,6 +59,8 @@ type model struct {
 	filter    Filter
 	filterBad string
 	floor     string
+	sortAt    int
+	sortDown  bool
 	w, h      int
 	tailer    *tailer
 	err       error
@@ -77,6 +79,7 @@ func newModel(path string, zone *time.Location) model {
 		sel:    -1,
 		follow: true,
 		floor:  "info",
+		sortAt: sortNone,
 		box:    viewport.New(40, 10),
 		input:  input,
 		tailer: newTailer(path),
@@ -114,6 +117,7 @@ func (m *model) rebuild() {
 			m.view = append(m.view, index)
 		}
 	}
+	m.applySort()
 	switch {
 	case len(m.view) == 0:
 	case m.follow || m.sel < 0:
@@ -371,10 +375,19 @@ func (m model) View() string {
 
 // [[spec/design_output/viewer#the-columns-stand-still]]
 func (m model) renderNames(w int) string {
-	names := "  " + strings.Join([]string{
-		pad("time", stampWide), pad("level", levelWide), pad("kind", kindWide), "said",
-	}, " ")
-	return headStyle.Render(cut(names, w))
+	cells := make([]string, 0, len(logColumns))
+	for i, one := range logColumns {
+		name := one.name
+		if one.wide > 0 {
+			name = pad(name, one.wide)
+		}
+		style := headStyle
+		if i == m.sortAt {
+			style = barStyle
+		}
+		cells = append(cells, style.Render(name))
+	}
+	return headStyle.Render(strings.Repeat(" ", gutterWide)) + cut(strings.Join(cells, " "), w-gutterWide)
 }
 
 func (m model) renderRows(w, rows int) string {

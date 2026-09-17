@@ -42,11 +42,11 @@ func TestAPressOnARowSelectsThatRowAndAPressBelowTheLastOneHoldsIt(t *testing.T)
 	}
 }
 
-func TestAPressOnTheNamesRowAndOnTheRuleHoldsTheCursor(t *testing.T) {
+func TestAPressOnTheNamesRowSortsAndOpensNoPane(t *testing.T) {
 	t.Parallel()
-	m := click(window(5), 10, firstRow()-1)
-	if m.at() != 4 {
-		t.Fatalf("a press on the names row holds the cursor, and it stands at %d", m.at())
+	m := click(window(5), gutterWide, namesRow)
+	if m.sortAt != 0 {
+		t.Fatalf("a press on the first name sorts by it, and the sort stands at %d", m.sortAt)
 	}
 	if m.pane != paneShut {
 		t.Fatalf("a press on the names row opens no pane, and the pane reads %d", m.pane)

@@ -11,9 +11,10 @@ import (
 	"github.com/charmbracelet/x/ansi"
 )
 
-// The row the strip stands on, and the rows one wheel notch carries. [[spec/design_output/viewer#the-mouse-reaches-the-window]]
+// The row the strip stands on, the row the column names stand on, and the rows one wheel notch carries. [[spec/design_output/viewer#the-mouse-reaches-the-window]]
 const (
 	stripRow  = 0
+	namesRow  = headWide
 	wheelStep = 3
 )
 
@@ -58,6 +59,10 @@ func (m *model) press(x, y int) {
 		return
 	}
 	if m.overPane(x) {
+		return
+	}
+	if y == namesRow {
+		m.sortOn(columnAt(x, m.listWidth()))
 		return
 	}
 	at := m.top + y - firstRow()
