@@ -14,6 +14,33 @@ One piece of work, held by one branch named `work/<name>`. The branch carries a
 group ticket, or the brief the last of the old branches still carries. The
 branch is the unit, and a session works it whole.
 
+# A version branch stands
+
+A branch named `v` and a number holds a whole earlier tree. Each one is an
+orphan, so no other ref carries what it carries and a delete loses it whole.
+One such delete already cost this tree a branch, and the recovery ran off the
+forge's activity log.
+
+So both push doors refuse the command before git runs it:
+
+| door | reads |
+|---|---|
+| the Bash door, which an agent meets | the command line, in `versionRefs` |
+| the pre-push hook, which a terminal meets | the refs git pipes in, and the zero that means a delete |
+
+| what a command does | what a door says |
+|---|---|
+| `--delete`, `-d`, `-D`, or a refspec with an empty left side | refused, as a delete |
+| `--force`, `-f`, `--force-with-lease`, or a refspec opening with a plus | refused, as a rewrite |
+| a push that moves the branch forward | nothing, and it stands |
+
+`VERSION` in `.claude/skills/level0/lib/trunk.js` says what a version branch
+is, and both doors read that one name. A branch merely opening with `v` stands
+outside it, so `v4-recovered` pushes and deletes the way any branch does.
+
+The doors run on this box alone. A branch rule on the forge is what holds for a
+clone nobody here controls, and the owner sets that.
+
 # A group is a ticket
 
 A group is a ticket whose work is other tickets. It stands at
