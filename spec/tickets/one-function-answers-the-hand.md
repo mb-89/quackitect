@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 step: design/person-1
 steps:
@@ -121,6 +121,8 @@ record:
     returns: 2
     why: "Say where the door reads `ownerSays`, because the flag stands on the pull's command line.; Say where the door reads `atRetro`, because that answer reads every ticket in the group.; `handFaults` holds the `by: person` rule inline, and the caller table leaves that site out.; `schemaDoor` stands unexported, so say which exported function the case drives.; The named case file drives `wholeAfter` alone, and the ticket cases stand beside `ticketFaults`.; The move takes `walkOf` too, because `leafOf` calls it.; `entriesIn` stands inside the plugin already, so the move leaves it where it stands.; `leafOf` names another function in the plugin's voice module, so name the moved one apart.; `./RUNME.sh check` answers 0 on this commit."
 group: the-warnings-feed-a-refactorer
+reason: became
+successors: [the-one-answer-takes-shape]
 ---
 
 # Ask
