@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/tests-green
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -188,6 +188,17 @@ record:
     hash_after: dfa2ff60e0cdb20f14d9a827387e347e10467007
     answered:
       - name: lint
+        exit: 0
+        said: 75 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 843927ec352ad1fcc9b0d8cbeff57676e1f4d456
+    hash_after: 843927ec352ad1fcc9b0d8cbeff57676e1f4d456
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: 75 stand at warning, which the panel draws and check allows.
 group: the-retro-runs
@@ -434,8 +445,14 @@ Each chapter mints a private ticket off the chapter route, naming the retro as i
 | what a count reads | the row that answers it |
 |---|---|
 | the prompts, the tools and the shell lines | the kind each log row carries |
-| the refusals | a write row, which a door writes when it turns a write away |
+| the tickets a hand moves, and the notes it writes | the same field, by the verb writing the row |
+| the refusals, by kind | the rule a write row opens with, each with its own count |
 | the errors | the level the row carries |
+| the median length of a thought | the transcripts, which answer zero on a box naming none |
+
+The cut reads both sources the design names, so a copied transcript row carries its time into a chapter beside the log.
+
+The drain passes a chapter now. It reads the process each note links, so a chapter closes at the readers step and holds the retro open nowhere.
 
 One thing the cases teach me. A chapter the mint refuses stood nowhere and said nothing, so the verb now names which chapter mints nowhere and why. My own fixture broke the route's own rule, and that silence hid it.
 
