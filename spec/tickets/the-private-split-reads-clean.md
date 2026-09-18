@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 steps:
   - name: answer
@@ -42,6 +42,18 @@ record:
     hand: box dd2a59294365 · claude-code-remote · the owner says so
     hash_before: 215052ad47efea9a8c1e94671b3be778fb0cc2c6
     hash_after: 215052ad47efea9a8c1e94671b3be778fb0cc2c6
+  - step: do
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: d54b092f6b9932a5e12a0ce438d78050421bbe18
+    hash_after: d54b092f6b9932a5e12a0ce438d78050421bbe18
+    answered:
+      - name: tests
+        exit: 0
+        said: green, the check passes where the change touches no code
+      - name: check
+        exit: 0
+        said: 82 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -117,11 +129,15 @@ The `do` step closes this ticket and carries the two lines the split leaves stan
 
 <!-- the form is command -->
 
+    ./RUNME.sh check >/dev/null 2>&1 && echo "green, the check passes where the change touches no code"
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
@@ -129,11 +145,25 @@ The `do` step closes this ticket and carries the two lines the split leaves stan
 
 <!-- the form is text -->
 
+This ticket touches no code. It carries one decision: the private folder split stands done, and no third reading runs.
+
+| what a reader asks | where the answer stands |
+|---|---|
+| does a reader the move left behind still ship | `PrivateFolderOwned` refuses one, and a case drives it |
+| does every writer land in the right half | one case a writer, in `test/level0/folders.test.js` |
+| does the walk cover the private folder | two Go cases, over a tree each one writes |
+
+The two lines the split leaves standing each have a home. `RETRO` waits on the retro verb, which a later ticket carries. The guard finding stands on [[spec/tickets/the-verdict-guard-reads-tips]], which this group now holds.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the answer: the answer says close, and this closes with no code change
+- the cleanup the change reveals is in the change: it reveals none, and the guard stands on its own ticket
+- every fact stands in one place: the split's own facts stand in the design note, and this points at it
 
 # Discussion
 
