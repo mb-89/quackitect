@@ -92,7 +92,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box dd2a59294365 · claude-code-remote
@@ -104,6 +104,10 @@ record:
     hash_after: 54d82d57208875fea628af1abfe7eedd4436a54c
     returns: 1
     why: "`draws` publishes nil for every `drawn` path its `found` map leaves out.; So the first `didOpen` clears the sweep's drawing, and the open file stays alone.; `clears` empties every `drawn` path on `didClose`, and nothing runs the sweep again.; Name what holds a swept file drawn, so the clear loop reaches the open file alone.; `Sweep` covers what `Over` reads, through `nameHoldsTheWords` and `schemaFaults`.; `Forgets` drops the path list alone, so an open buffer answers ahead of the disk.; `Paths` drops a parked file through `isDraft`, so a parked file draws nothing.; `./RUNME.sh check` exits 1 here, on faults standing outside this ask."
+  - step: design/draft
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: f9ca509ef7aac9f8d928ced5b11e8c2a97bb16c3
+    hash_after: f9ca509ef7aac9f8d928ced5b11e8c2a97bb16c3
 ---
 
 # Ask
@@ -148,25 +152,42 @@ The sweep stands, and the server calls it from two places already. This adds one
 | step | what it does |
 |---|---|
 | group | one entry a file, off `said.File` |
-| publish | `publishes` a file, which fills `one.drawn` |
+| publish | `publishes` a file, which marks the path drawn |
 | clear | nothing, because the panel holds nothing at this point |
+
+**What the clear loops would take.** Two loops empty a drawn path today, and each would wipe the sweep's own drawing:
+
+| loop | what it does today | what it would take |
+|---|---|---|
+| `draws`, after it publishes | nil for every drawn path its `found` map leaves out | the first `didOpen` clears every file the sweep drew |
+| `clears`, on `didClose` | nil for every drawn path | one close empties the panel, and nothing sweeps again |
+
+**So a drawn path names who drew it.** `one.drawn` holds a source a path in place of a boolean:
+
+| source | who writes it | who clears it |
+|---|---|---|
+| the sweep | the `initialized` case | the next sweep |
+| an open file | `draws` | the loops above |
+
+Each loop walks the paths its own source holds. So a swept file keeps its findings while the editor stands, and an open file's drawing clears the way it clears today.
 
 **An open buffer answers first.** `Holds` writes the buffer into the overlay, and `Read` answers the overlay before the disk.
 
 - `Forgets` drops the cached path list alone, so an open buffer survives a sweep
 - that holds today, and a case pins it
 
-**A parked file draws nothing.** `Paths` answers what git tracks, and the underscore skip of [[spec/design_output/schema#the-underscore-parks-a-draft]] drops a parked file from that list. So the sweep walks past it, and the panel stays empty for it.
+**A parked file draws nothing.** `Paths` answers what git tracks, and the underscore skip of [[spec/design_output/schema#the-underscore-parks-a-draft]] drops a parked file through `isDraft`. So the sweep walks past it, and the panel stays empty for it.
 
-**What the panel holds after.** `one.drawn` carries every file the sweep drew. So `didClose` and the next `draws` clear what stands stale, the way they clear the drawing an open file leaves.
+**The sweep covers what one file's read covers.** `Sweep` runs `treeFaults` and `schemaFaults`, and `Over` runs the note faults, the name cap and the readers a path names. A file the sweep draws carries the findings its own open would draw.
 
 **The cases.**
 
 - `initialized` publishes one message a file the sweep finds
 - a file no editor opens carries its findings in the panel
+- an open after the sweep keeps every swept file drawn, and redraws its own
+- a close clears the file it closes, and keeps the swept drawings
 - a file an editor holds answers off the buffer, and the disk copy stands unread
 - a parked file draws nothing
-- the map names every file the sweep drew, so a later close clears it
 
 ## review
 
