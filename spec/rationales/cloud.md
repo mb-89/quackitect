@@ -91,14 +91,15 @@ A box read it as a question about authority, and handed out calls it owned:
 Two children of one group left that way in a single session. Neither question
 carried a wrong answer costing more than a commit.
 
-The engine made it worse. `withPersonStep` stamps `by: person` on a count of
-returns. So two disagreements between agent hands minted a question for a human.
+The engine made it worse. `withPersonStep` stamped `by: person` on a count of
+returns, so two disagreements between agent hands minted a question for a human.
 
-The stamp said `person`, rule 9 said a step a person owns waits, and the box
-obeyed the stamp. The fix stands in two places:
+The stamp said `person`, and the rule then said a step a person owns waits. The
+box obeyed the stamp over the test. So the fix stands in three places:
 
 - the guidance asks the blast radius, which a reader decides
 - the stop rule carries `yields`, so a claim loses to a check that fires
+- the count asks another agent hand, and a person answers past the split cap
 
 A claim reads the agent, and a check reads the tree. So the agent's own reading
 of its own work stops ending a turn while work stands.
