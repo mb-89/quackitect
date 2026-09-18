@@ -175,7 +175,11 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
-step: retro/write
+  - step: retro/write
+    hand: box 16e341806abd · claude-code-remote
+    hash_before: 6fa5ff9d90aaa9bc4434b3304de075d96e5b94e4
+    hash_after: 6fa5ff9d90aaa9bc4434b3304de075d96e5b94e4
+step: retro/cloud
 ---
 
 # Ask
@@ -241,7 +245,7 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is list -->
 
-- the take hands this branch, with the brief and the group in the same answer
+- the take hands this branch, its brief and its group in one answer
 - the children step leaves again, because [[spec/tickets/the-pull-splits-by-topic]] stands at its person step
 - the retro notes drain, because the private folder holds no note
 - this retro stands over this box's window
@@ -263,11 +267,10 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is list -->
 
-- The route runs the retro again over a group whose open step waits for a person. The take is its moment.
-- A hand-back's fields reach the judge after it reads, so it weighs the last box's retro. The first hand-back is its moment.
-- The judge refuses this retro over the tool, and the shell verb carries the hand-back. Each refusal is its moment.
+- The route hands the retro out again over a group whose every open step waits for a person. The take is its moment.
 - The retro fields hold a single window, so this write drops the last box's. This leaf is its moment.
-- The bridge starts no server at session start, because the setup brings no modules yet. The first log line is its moment.
+- The children step reads the same block and the record grows another skip line. The children hand is its moment.
+- The install downloads every tool again at the take, so the window pays for it before the first pull. The take is its moment.
 
 ### improve
 
@@ -275,11 +278,10 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is list -->
 
-- The judge reads the fields a hand-back carries, and names the rule it refuses. Home: [[spec/design_output/pull]].
-- The judge guards the shell verb as it guards the tool. Home: [[spec/design_output/pull]].
 - A group at children whose every open step waits for a person answers `wait`. Home: [[spec/design_output/pull]].
 - The retro a box writes stands under its own hand, so a later box writes beside it. Home: [[spec/design_output/work]].
-- The install runs before the bridge reads for modules. Home: [[spec/design_output/level0]].
+- The record folds a repeated skip under the line already carrying it, and names the hands beside it. Home: [[spec/design_output/work]].
+- The install skips a tool the box already holds. Home: [[spec/design_output/tools]].
 
 ### thoughts
 
@@ -287,14 +289,15 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is text -->
 
-The window goes to a retro, and the branch stands where it stands.
+The route reaches the retro because the children step cannot run, and the retro it reaches is the one the last box wrote.
 
 | what the box holds | what stands behind it |
 |---|---|
-| the block reads clear and costs the window | the pull hands the retro out where a child waits on a person |
-| the refusal reads blind | [[spec/design_output/pull]] owns what the judge keeps back |
+| the window buys a retro the last box already wrote | the pull hands the retro out where a child waits on a person |
+| the record reads as work, and the group stands still | [[spec/design_output/work]] owns what a hand writes down |
 
-A group whose open steps all wait for a person holds no agent work. The route still hands its retro out, so the box writes it, checks the children, and leaves. The owner decides whether that retro earns the window, because the pull owns the answer and the person step owns the wait.
+The group's whole remaining work sits behind one person step. Every box the schedule starts walks the same three leaves, writes the same window over the last, and leaves. The owner decides whether the route answers `wait` there, because the pull owns the answer and the person step owns the wait.
+
 
 ## cloud
 
