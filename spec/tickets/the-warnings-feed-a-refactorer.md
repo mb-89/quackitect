@@ -75,7 +75,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/notes
+step: retro/write
 record:
   - step: sync
     hand: box a5e189c39e1d · claude-code-remote
@@ -96,6 +96,14 @@ record:
     hand: the engine
     hash_before: 3f1eaa05c35efb1d5db546d742107319f3737010
     hash_after: 3f1eaa05c35efb1d5db546d742107319f3737010
+  - step: retro/notes
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 117f292ecafa88589d975cfa77c70c2a7ca9935c
+    hash_after: 117f292ecafa88589d975cfa77c70c2a7ca9935c
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
 ---
 
 # Ask
@@ -157,6 +165,8 @@ A rule a refactoring hand fixes becomes a warning in place of a refusal. One lis
 <!-- retro notes, which passes when the private folder is empty -->
 
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
