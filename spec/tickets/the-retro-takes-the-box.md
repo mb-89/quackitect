@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -166,6 +166,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 48e66d02651218cc7b798e2fb6c4c7d5fa3f4042
+    hash_after: 48e66d02651218cc7b798e2fb6c4c7d5fa3f4042
+    answered:
+      - name: lint
+        exit: 0
+        said: 73 stand at warning, which the panel draws and check allows.
 group: the-retro-runs
 ---
 
@@ -371,13 +379,15 @@ The scratchpad reaches the verb as a door, off `it.scratch`. The command line fi
 
 ### lint
 
-<!-- the tree builds and lints -->
+    ./RUNME.sh lint
 
 <!-- the form is command -->
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change touches no file the ask leaves out. One file lands, and the verb table and the need list each take a line.
+- every door the change reaches has a fake. The verb reads the disk through the door alone, and the cases drive the fake.
+- a comment names the approach the change implements. Each function points at the chapter ruling it.
 
 <!-- the form is checklist -->
 
