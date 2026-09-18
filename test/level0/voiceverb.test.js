@@ -129,7 +129,7 @@ test("a fixture log ranks its rows in the order this case names", async () => {
     row("2026-09-11T00:00:00.000Z", { said: "this row names no rule" }),
   ].join("\n");
 
-  const disk = fakeDisk({ [`${ROOT}/.se/run/log/session.jsonl`]: rows });
+  const disk = fakeDisk({ [`${ROOT}/.se/log/session.jsonl`]: rows });
   const clock = fakeClock("2026-09-12T00:00:00.000Z");
 
   const out = await said(() =>
@@ -151,7 +151,7 @@ test("a wider day count reaches the row the week leaves out", async () => {
     rule: "VoiceVale.Passive",
     phrase: "old",
   });
-  const disk = fakeDisk({ [`${ROOT}/.se/run/log/old/one.jsonl`]: rows });
+  const disk = fakeDisk({ [`${ROOT}/.se/log/old/one.jsonl`]: rows });
   const clock = fakeClock("2026-09-12T00:00:00.000Z");
   const doors = { disk, clock, proc: fakeProc({}) };
 

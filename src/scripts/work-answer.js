@@ -4,8 +4,9 @@
 // [[spec/design_output/work#one-verb-answers-git]]
 
 import { ANSWER } from "../../.claude/skills/level0/lib/folders.js";
-import { fieldOf, frontOf, GROUP, isGroup, OPEN, stepOf, urgent } from "./group.js";
+import { askOf, fieldOf, frontOf, GROUP, isGroup, OPEN, stepOf, urgent } from "./group.js";
 import { weighing } from "./pull-hand.js";
+import { leavesOf } from "./pull-route.js";
 import { takeable } from "./pull.js";
 import { queued } from "./queue.js";
 import { staleClaim } from "./stand.js";
@@ -17,11 +18,34 @@ export function rowOfTicket(one, places) {
     name: one.name,
     state: fieldOf(one.text, "state") || OPEN,
     step: stepOf(one.text),
+    progress: progressOf(one.text),
     group: fieldOf(one.text, GROUP),
     urgent: urgent(one.text),
+    says: firstLine(askOf(one.text)),
   };
   const place = places.get(one.name);
   return place === undefined ? said : { ...said, queue: place };
+}
+
+// The leaf a ticket stands on, of the leaves its route holds. [[spec/design_output/work#one-verb-answers-git]]
+export function progressOf(text) {
+  const front = frontOf(text);
+  const leaves = leavesOf(front);
+  if (!leaves.length) return "";
+  const at = leaves.findIndex((one) => one.path === stepOf(text));
+  return `${at < 0 ? leaves.length : at + 1}/${leaves.length}`;
+}
+
+// The last column takes what it fits, so the answer carries this much of a line. [[spec/design_output/work#one-verb-answers-git]]
+const SAYS_CUT = 160;
+
+// The ask's first line, which the last column carries. [[spec/design_output/work#one-verb-answers-git]]
+export function firstLine(said) {
+  const row = String(said ?? "")
+    .split("\n")
+    .map((one) => one.trim())
+    .find(Boolean);
+  return (row ?? "").slice(0, SAYS_CUT);
 }
 
 // Every ticket the answer names, each once, with a branch's copy first. [[spec/design_output/work#one-verb-answers-git]]
@@ -64,6 +88,8 @@ export function answerOf(it, queue = false) {
         status: standing.get(one.branch) ?? "",
         kind: one.brief ? "brief" : GROUP,
         step: one.ticket ? stepOf(one.ticket) : "",
+        progress: one.ticket ? progressOf(one.ticket) : "",
+        says: firstLine(askOf(one.ticket || one.brief)),
         age,
         stale,
         ...(place === undefined ? {} : { queue: place }),

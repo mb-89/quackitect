@@ -1,0 +1,24 @@
+filters:
+  - kind: ticket
+properties:
+  name:
+    opensNote: true
+columnSize:
+  name: 34
+  state: 8
+  urgent: 7
+  progress: 9
+  queue: 6
+views:
+  - type: table
+    name: every ticket
+    order:
+      - name
+      - state
+      - urgent
+      - progress
+      - queue
+      - says
+    nest: group
+    collapsed:
+      - closed

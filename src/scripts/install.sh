@@ -29,6 +29,14 @@ for one in bin hold review undo measure copilot box.json session.json \
   mv "$old" "$new" 2>/dev/null || true
 done
 
+# The owner rules the log outside the runtime half, because the retro collects
+# it. A box carrying it inside gets it back, and a box holding both keeps both.
+was="$root/.se/run/log"
+now="$root/.se/log"
+if [ -d "$was" ] && [ ! -e "$now" ]; then
+  mv "$was" "$now" 2>/dev/null || true
+fi
+
 # Pinned, so every box builds the same tree. Vale ships a binary for each
 # platform, so nothing here compiles and no C toolchain is needed.
 vale_version=3.20.0

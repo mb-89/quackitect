@@ -3,9 +3,10 @@
 // door, the sidebar.
 // [[spec/design_output/log#what-one-line-looks-like]]
 
-import { inRun } from "./folders.js";
+import { PRIVATE } from "./folders.js";
 
-export const FOLDER = inRun("log");
+// The retro collects the log, so it stands outside the runtime half. [[spec/design_input/the-runtime-files-stand-apart]]
+export const FOLDER = `${PRIVATE}/log`;
 export const SESSION = `${FOLDER}/session.jsonl`;
 export const OLD = `${FOLDER}/old`;
 export const LOG_TOOL = "log";

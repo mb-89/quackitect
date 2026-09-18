@@ -159,3 +159,6 @@ private tickets. A live hook and the editor both spell those names.
 - The runtime folder holds what dies with the box. A record a reader reads later stands outside it.
 - So the hand taking this ticket moves every other row, and leaves `log/` where it stands.
 - [[spec/tickets/the-retro-takes-the-box]] copies the private folder, and it skips the runtime folder whole.
+- The hand closing this ticket found the log inside the runtime half, against the ruling above.
+- The retro's collect skips that half, so every retro read no log at all.
+- The move back lands under [[spec/tickets/the-work-tab-draws]], because this ticket stood closed by then.

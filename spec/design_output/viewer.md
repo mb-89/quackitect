@@ -14,7 +14,7 @@ carries a strip of tabs, the open tab on the left, one pane on the right and a
 footer of status marks. The log is the first tab.
 
 It is a Go program on Bubble Tea, in `src/viewer`. It reads
-`.se/run/log/session.jsonl`, the one file every writer appends to. For details,
+`.se/log/session.jsonl`, the one file every writer appends to. For details,
 see [[spec/design_output/log#every-writer-appends]].
 
 # The keys
@@ -266,7 +266,7 @@ draws the window once and prints it. A reader with no terminal sees the same win
 # The verb builds it
 
 `./RUNME.sh tui` builds the viewer into `.se/run/bin/logview`, and runs it over
-`.se/run/log/session.jsonl`. `viewerOf` in `src/scripts/viewer.js` decides:
+`.se/log/session.jsonl`. `viewerOf` in `src/scripts/viewer.js` decides:
 
 | what stands | what the verb does |
 |---|---|

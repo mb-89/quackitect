@@ -54,7 +54,6 @@ test("every runtime writer names its folder under the runtime half", () => {
       undo: UNDO,
       bin: BIN,
       tools: TOOLS,
-      log: LOG,
       box: BOX,
       session: SESSION,
       hold: HOLDS,
@@ -64,7 +63,6 @@ test("every runtime writer names its folder under the runtime half", () => {
       undo: inRun("undo"),
       bin: inRun("bin"),
       tools: inRun("tools.json"),
-      log: inRun("log"),
       box: inRun("box.json"),
       session: inRun("session.json"),
       hold: inRun("hold"),
@@ -73,9 +71,15 @@ test("every runtime writer names its folder under the runtime half", () => {
 });
 
 test("every runtime writer stands inside the half the skip reads", () => {
-  for (const one of [WORKTREE, UNDO, BIN, TOOLS, LOG, BOX, SESSION, HOLDS]) {
+  for (const one of [WORKTREE, UNDO, BIN, TOOLS, BOX, SESSION, HOLDS]) {
     assert.equal(runs(one), true, one);
   }
+});
+
+// The retro's collect skips the runtime half whole, and a retro reads the log. [[spec/tickets/the-runtime-folder-holds-state]]
+test("the log stands outside the half the retro skips", () => {
+  assert.equal(LOG, `${PRIVATE}/log`);
+  assert.equal(runs(LOG), false);
 });
 
 test("one hold folder stands, and the three modules naming it answer one path", () => {
