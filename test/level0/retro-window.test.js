@@ -22,6 +22,8 @@ const chapterAt = (n) => at(`.se/tickets/${TICKET}-chapter-${n}.md`);
 const LOG = [
   '{"at":"2026-09-18T08:00:00.000Z","kind":"bash","said":"git status"}',
   '{"at":"2026-09-18T09:00:00.000Z","kind":"prompt","said":"the owner asks"}',
+  '{"at":"2026-09-18T09:10:00.000Z","kind":"work","said":"pull answered 0"}',
+  '{"at":"2026-09-18T09:20:00.000Z","kind":"note","said":"a note stands"}',
   '{"at":"2026-09-18T09:30:00.000Z","kind":"write","level":"warn","said":"Sentence refuses a line"}',
   '{"at":"2026-09-18T20:00:00.000Z","kind":"tool","said":"a tool answers"}',
   '{"at":"2026-09-18T21:00:00.000Z","level":"error","kind":"bridge","said":"the start fails"}',
@@ -118,8 +120,22 @@ test("a chapter carries its window and its counts in the ask", () => {
   assert.match(said, /2026-09-18T06:00/, "the window names its first moment");
   assert.match(said, /prompts: 1/);
   assert.match(said, /shell: 1/);
-  assert.match(said, /refusals: 1/);
+  assert.match(said, /tickets: 1/);
+  assert.match(said, /notes: 1/);
   assert.match(said, /errors: 0/);
+  assert.match(said, /refusals: Sentence 1/, "the ask names a refusal by its rule");
+  assert.match(said, /thought: 0/, "a box naming no transcript reads none");
+});
+
+// The drain decides what a hand parks, and a chapter closes at its own step. [[spec/tickets/the-retro-cuts-its-window]]
+test("the note drain passes a chapter, and answers zero once the chapters stand", () => {
+  const it = doors();
+
+  heard(() => retro(ROOT, ["collect", TICKET], it));
+  const { code, said } = heard(() => retro(ROOT, ["notes"], it));
+
+  assert.equal(code, 0, "the chapters hold the drain open nowhere");
+  assert.match(said, /holds no open note/);
 });
 
 // [[spec/tickets/the-retro-cuts-its-window]]

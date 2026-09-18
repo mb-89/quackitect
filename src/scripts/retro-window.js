@@ -17,7 +17,14 @@ const SECONDS = 60;
 const MILLIS = 1000;
 const SPAN = HOURS * MINUTES * SECONDS * MILLIS;
 // What a log row's kind reads for each count the ask carries. [[spec/design_input/the-agent-pulls-tickets]]
-const KINDS = { prompt: "prompts", tool: "tools", bash: "shell", write: "refusals" };
+const KINDS = { prompt: "prompts", tool: "tools", bash: "shell", work: "tickets", note: "notes" };
+// A refusal row opens with the rule that fires, so the count reads it by kind. [[spec/tickets/the-retro-cuts-its-window]]
+const RULE = /^([A-Za-z][\w.]*) /;
+const WRITE = "write";
+const THOUGHT = "thought";
+const HALF = 2;
+// The two folders a row's time comes off, inside the copy. [[spec/tickets/the-retro-cuts-its-window]]
+const SOURCES = ["log/", "transcripts/"];
 
 // [[spec/design_input/the-agent-pulls-tickets]]
 export function windowOut(it, into, name, rows) {
@@ -116,17 +123,44 @@ function minted(it, retro, n, span) {
 
 // The counts stand before anybody reads a word. [[spec/design_input/the-agent-pulls-tickets]]
 function asked(span) {
-  const held = { prompts: 0, tools: 0, shell: 0, refusals: 0, errors: 0 };
+  const held = { prompts: 0, tools: 0, shell: 0, tickets: 0, notes: 0, errors: 0 };
+  const rules = new Map();
+  const thoughts = [];
   for (const one of span.rows) {
     const key = KINDS[String(one.kind ?? "")];
     if (key) held[key] += 1;
     if (String(one.level ?? "") === "error") held.errors += 1;
+    if (String(one.kind ?? "") === THOUGHT) thoughts.push(String(one.said ?? "").length);
+    if (String(one.kind ?? "") !== WRITE) continue;
+    const found = RULE.exec(String(one.said ?? "").trim());
+    const rule = found ? found[1] : "a rule nobody names";
+    rules.set(rule, (rules.get(rule) ?? 0) + 1);
   }
+
   return [
     `The window runs from ${stamp(span.opens)} to ${stamp(span.shuts)}.`,
     "",
     ...Object.entries(held).map(([key, count]) => `- ${key}: ${count}`),
+    `- refusals: ${byKind(rules)}`,
+    `- thought: ${median(thoughts)}`,
   ].join("\n");
+}
+
+// The ask asks for the refusals by kind, so each rule stands with its own count. [[spec/tickets/the-retro-cuts-its-window]]
+function byKind(rules) {
+  if (!rules.size) return "0";
+  return [...rules.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([rule, count]) => `${rule} ${count}`)
+    .join(", ");
+}
+
+// A box naming no transcript folder reads no thought, and the count says zero. [[spec/tickets/the-retro-cuts-its-window]]
+function median(rows) {
+  if (!rows.length) return 0;
+  const sorted = [...rows].sort((a, b) => a - b);
+  const at = Math.floor(sorted.length / HALF);
+  return sorted.length % HALF ? sorted[at] : Math.round((sorted[at - 1] + sorted[at]) / HALF);
 }
 
 function stamp(ms) {
@@ -136,7 +170,7 @@ function stamp(ms) {
 function loggedIn(it, into, rows) {
   const out = [];
   for (const one of rows) {
-    if (!String(one.path ?? "").startsWith("log/")) continue;
+    if (!SOURCES.some((where) => String(one.path ?? "").startsWith(where))) continue;
     for (const line of read(it, it.join(into, ...String(one.path).split("/"))).split(
       "\n",
     )) {

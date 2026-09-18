@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/reflect
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -178,6 +178,10 @@ record:
     hash_after: 9bd337af9a4f6c6f67d4a584584dcadeddf6ffc1
     returns: 1
     why: Four gaps stand, and the cut itself answers the ask.; | the gap | the fix |; |---|---|; | the ask of a chapter carries prompts, tools, shell, refusals and errors alone | add the tickets a hand moves, the notes it writes, and the median length of a thought |; | the refusals count reads one number, and the ask asks for them by kind | group the write rows by the rule each names, as the counts table says |; | the cut reads the copied log alone, and the approach reads both sources | take the transcripts' times too, and say in the ask which sources the chapter reads |; | `retro notes` meets a chapter as an open note, so the drain holds the retro shut | pass a note whose `process` links the chapter route, which `design/settle-1` decides |; | what answers the ask | where |; |---|---|; | the window opens at the last retro's close, or at the first commit | `openedAt` in `src/scripts/retro-window.js` |; | a chapter is six hours holding rows, and an empty span stands nowhere | `cutInto`, and the case reading the three chapter paths |; | a chapter mints off the chapter route, under the private tickets folder | `minted`, and the case matching `process` and `group` |; | a case drives a window with no retro behind it | the first-commit case, which reads `window.json` back |; | the window takes a line the manifest names | the row `windowOut` pushes, which that case finds |; | what the reviewing guidance asks | what stands |; |---|---|; | the branch does what the brief asks | two lines of the counts go missing, and the drain stands open |; | the diff beyond the brief | the siblings' work, which this shared branch carries alongside |; | every rule carries a case that fires | four cases drive the cut, the mint, the counts and the first window |; | a case feeds something bad | the empty span case, which asserts the third chapter stands nowhere |; | a retro handback | none stands, because this ticket runs at the desk |; `./RUNME.sh check` exits 0 on this branch, and the window cases answer green over four.
+  - step: implement/reflect
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 40f2215c83ed5ae25c3883c88ea6c2178fb4d940
+    hash_after: 40f2215c83ed5ae25c3883c88ea6c2178fb4d940
 group: the-retro-runs
 depends_on: ["the-retro-takes-the-box"]
 ---
@@ -348,13 +352,26 @@ The counts read off the log's own kinds. A row names a prompt, a shell line, a t
 
 ### class
 
-<!-- the class of error the findings describe, and the fix for the class -->
+The class is one: the code answers the ask in part, and stops at the part the first case reaches.
 
-<!-- the form is text -->
+| the finding | what the ask asks |
+|---|---|
+| five counts stand, and three stand nowhere | the tickets moved, the notes written, and the median thought |
+| the refusals read one number | the refusals by kind, so a reader sees which rule fires |
+| the cut reads the log alone | the times the log and the transcripts carry |
+| the drain meets a chapter as an open note | the settle step names the field that tells them apart |
+
+Each line is the same move. The ask lists what it wants, and the code answers the rows a case already asks for.
+
+The fix for the class is to read the ask as a list and answer every row. Then write a case a row at a time, and let a row with no source answer zero.
+
+The drain is the sharper lesson. This ticket's own settle step names the field, and the draft says it, and the code reaches it nowhere. A decision a hand writes down is a line of code somebody owes.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change touches no file the ask leaves out. The window module, the note drain, and the cases over both.
+- every door the change reaches has a fake. The cases drive the fake disk, the fake git and the fake clock.
+- a comment names the approach the change implements. The drain says why a chapter stands outside it.
 
 <!-- the form is checklist -->
 
