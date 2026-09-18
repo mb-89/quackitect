@@ -91,7 +91,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -128,6 +128,17 @@ record:
     hash_after: f1f500f0fce809c20bf5e5a5f8e3ad482a9f8b9b
     answered:
       - name: lint
+        exit: 0
+        said: 75 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 4bc7ca556daef3c3f80151ddd06309fd45c46d35
+    hash_after: 4bc7ca556daef3c3f80151ddd06309fd45c46d35
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: 75 stand at warning, which the panel draws and check allows.
 ---
@@ -307,25 +318,41 @@ The takes off git reach the retro folder as rows, so no leaf runs git itself. A 
 
 ### tests
 
-<!-- the same tests pass -->
+    ./RUNME.sh branch test test/level0/retro-leaves.test.js
 
 <!-- the form is command -->
 
 ### check
 
-<!-- the check is green on the commit -->
+    ./RUNME.sh check
 
 <!-- the form is command -->
 
 ### says
 
-<!-- what changes and why, for a reader who was not there -->
+Collect lays out one file a leaf, under a folder of their own beside the copies.
 
-<!-- the form is text -->
+| the leaf | what its file holds |
+|---|---|
+| `shell` | a job a row, with its count and one example |
+| `refusals` | a rule a row, with how often it fires |
+| `tickets` | a ticket closing in the window, as that commit leaves it |
+| `scripts` | every script the copies carry |
+| `runs` | the groups closing in the window, off the same commits |
+| `retros` | the retro tickets standing, so the score step reads a file |
+| `unread` | every line the manifest names, for the leaf reading the rest |
+
+The shell and the refusals leaves read the log the copies carry. A row names its kind and its level, so one file answers both without a transcript.
+
+The takes off git read the commits touching the tickets folder since the window opens. Each one answers as that commit leaves it, so a reader repeats the reading with no tree beside them.
+
+The route's collect step moves with the owner's ruling. It reads as the folders it skips now, and the open retro takes the new route through `ticket update`.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change touches no file the ask leaves out. The leaves module, the call inside collect, the route, and the open retro the update reaches.
+- every door the change reaches has a fake. The module reads the disk and git through their doors alone.
+- a comment names the approach the change implements. The module's header says why a leaf reads one file and runs nothing.
 
 <!-- the form is checklist -->
 
