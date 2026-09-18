@@ -182,7 +182,7 @@ steps:
       - name: groups
         form: list
         says: one line per ticket, with its group and its urgency
-step: mine/refusals
+step: mine/words
 process: [[spec/processes/retro]]
 process_hash: 61a2bb140f0b4632
 record:
@@ -226,6 +226,10 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 1db24efe5e0cd8fb6cc59bf50c082e3fd9bda315
     hash_after: 1db24efe5e0cd8fb6cc59bf50c082e3fd9bda315
+  - step: mine/refusals
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 54c325ddc5fb6aa92351a04c9f892df796e40aa4
+    hash_after: 54c325ddc5fb6aa92351a04c9f892df796e40aa4
 ---
 
 # Ask
@@ -349,13 +353,16 @@ So the leaf reads the door's answer as the job. The tree lacks the command itsel
 
 ### rules
 
-<!-- one line per rule, with its count, and whether the rule or the hand is wrong -->
+- the refusals leaf holds no row, so no rule carries a count in this window.
+- the leaf reads a row of kind write at level warn, and the log carries that pair nowhere.
+- this session alone meets PastTense, Sentence, Shape, Vocabulary, Antithesis, Modal and ShellWritesNothing.
+- so the hand is wrong seven times in one session, and the leaf reads zero. The leaf is wrong.
 
 <!-- the form is list -->
 
 ### noise
 
-<!-- the rules that fire and teach nothing, each with the fix -->
+- the leaf reads no rule, so a rule firing here teaches nothing by standing unread.
 
 <!-- the form is list -->
 
