@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box a5e189c39e1d · claude-code-remote
@@ -146,6 +146,10 @@ record:
     hash_after: f36c7a1f0a1ae5def21f886694b82109bf505d85
     returns: 1
     why: "`src/scripts/review.js` makes `.se`, then writes the survey under the runtime folder. `branch review` dies there.; `copilot-setup.js` makes `.se`, then writes the cloud mark under the runtime folder. The same class of error.; `level1.js` writes the hand's session file at the old path, and its two readers read the new one.; The change commit tracks the built binary `src/index/index`. The walk reads and hashes it on every pass.; `RETRO` stands exported and tested, and the branch writes under it nowhere. The retro verb takes it up later.; `src/lsp/serve.go`, `src/lsp/tree.go` and `src/doors/session.js` spell the runtime folder, and point at no owner.; `test/level0/folders.test.js` holds no case over the session file, so that drift passes green.; `./RUNME.sh check` answers 0 in the tree. The review verb dies before the worktree check runs.; The handover carries a surprises chapter, and a retro chapter waits on the group.; The walk, the skip rule and the placement rule each carry a case asserting a refusal.; The installer's move of a box's old places carries no case.; The rest of the branch splits files by topic for other tickets, and redesigns what this ask holds nowhere.; The fixes:; Make the runtime folder before each write into it, in `review.js` and in `copilot-setup.js`.; Bring the session path under the module's reach, and hold `level1.js` against it in a case.; Drop the built binary from git, and let the build write under the runtime bin.; Point `serve.go`, `tree.go`, `session.js` and `install.sh` at the module owning the name."
+  - step: implement/reflect
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 9ed9a571455d046499ecbd86f0c56c5338f546a1
+    hash_after: 9ed9a571455d046499ecbd86f0c56c5338f546a1
 ---
 
 # Ask
@@ -301,11 +305,28 @@ What surprises me:
 
 <!-- the form is text -->
 
+The class: a path moved one level deeper, and the line beside it stayed. Each finding is a caller that spells the private folder itself in place of taking it from the module.
+
+| the shape | where it shows |
+|---|---|
+| a write takes the new path, and the `makeDir` beside it takes the old one | the review worktree, the cloud mark |
+| a copy spelled in a plugin keeps the old path, and its readers take the new one | the hand's session file |
+| a spelling in Go or in a door names the folder, and points at no owner | the language server, the index door, the session door |
+| a case covers each moved writer but one, so the one that drifts passes green | the session file |
+
+The fix for the class: no caller spells the folder. A module that imports takes the name from `folders.js`. A module that imports none of it carries the name with a comment naming that module, the way this tree already marks a forced copy. Every name the module owns then carries a case, so the next drift fails the check.
+
+One finding stands outside the class: the change commit tracks a built binary. The fix is the ignore rule beside the one the language server's binary already carries.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: each fix lands in a file already naming the private folder
+- every door the change reaches has a fake: the review and setup fixes run against the disk fake
+- a comment names the approach: each forced copy names the module owning the name beside it
 
 ## change
 
