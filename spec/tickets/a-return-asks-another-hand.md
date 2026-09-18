@@ -90,7 +90,6 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 step: design/draft
-todo: true
 ---
 
 # Ask
