@@ -90,7 +90,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box a5e189c39e1d · claude-code-remote
+    hash_before: 09ca2410b204c55f5c502c780c0ecc03caffcc1b
+    hash_after: 5b5cc69fb9db050d50b9809cb4b4de470f3e6f85
 ---
 
 # Ask
