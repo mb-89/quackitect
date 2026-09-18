@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box a5e189c39e1d · claude-code-remote
@@ -121,6 +121,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 3c6b9c99216796a520ae1ea963e73909db60a5cf
+    hash_after: 743c41ef573861fd0fe86730f01cdc1b5b6d7ab8
+    answered:
+      - name: lint
+        exit: 0
+        said: 78 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
