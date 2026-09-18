@@ -91,7 +91,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -113,6 +113,10 @@ record:
     hash_after: 3d95552732299a51787f22c4ea8eb5a03f9a8912
     returns: 1
     why: the hand takes it back
+  - step: design/draft
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 8b8d7a25f687e2f549d9fb01f750e803dade1a08
+    hash_after: 8b8d7a25f687e2f549d9fb01f750e803dade1a08
 ---
 
 # Ask
@@ -151,10 +155,12 @@ Collect cuts the window after it copies, because the cut reads the log it copies
 | the step | what it does |
 |---|---|
 | opens the window | the newest closed retro's last hash, or the tree's first commit |
-| reads the times | every log row under the retro folder carries the moment it lands |
+| reads the times | every row the log and the transcripts carry under the retro folder |
 | cuts | six hours a chapter, and a span holding no row stands nowhere |
 | counts | one row a chapter, off the kinds the log writes |
 | mints | one private ticket a chapter, off the chapter route, naming the retro |
+
+The times come off both sources the design names. The log rows carry the moment each door answers, and a transcript line carries the moment a hand speaks. A box naming no transcript folder cuts off the log alone, and the chapter's ask says which sources it reads.
 
 The window opens where the last retro closes. The verb reads the closed retro tickets, takes the newest, and reads the last hash its record holds. A tree with no closed retro opens at its first commit, because nothing stands before it.
 
@@ -172,8 +178,17 @@ Each chapter lands as a private ticket under the private folder, off the chapter
 
 | what the chapter's name reads | `<retro>-chapter-<n>` |
 |---|---|
-| where it stands | the private folder, because a chapter dies with the box |
+| where it stands | the private tickets folder, because a chapter dies with the box |
 | what opens it | the mint, and the retro's own `readers` step hands it out |
+
+A chapter stands where the pull finds it, which is the private tickets folder. So `retro notes` meets it there, and the retro's `notes` step runs before `readers`.
+
+| what `retro notes` reads today | what it reads after this |
+|---|---|
+| every open note in the folder | every open note a hand parks there |
+| a chapter among them | a chapter passed over, because its own step closes it |
+
+The drain decides what a hand parks. A chapter closes at `readers`, so no retro decides it and the drain passes it by.
 
 The span stands as a constant beside the verb, because the design fixes it and no box moves it.
 
