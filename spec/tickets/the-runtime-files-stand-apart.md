@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box a5e189c39e1d · claude-code-remote
@@ -156,6 +156,17 @@ record:
     hash_after: 324864c7ee28463668d4bf94f25f743549b09162
     answered:
       - name: lint
+        exit: 0
+        said: 79 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 80d9a3936a6642ac28582ea1b91c04139c158c33
+    hash_after: 377f7bdb7e6462e09b37743114e47b19a40c7477
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 806 test(s) pass in 65 file(s)
+      - name: check
         exit: 0
         said: 79 stand at warning, which the panel draws and check allows.
 ---
