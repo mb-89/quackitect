@@ -182,7 +182,7 @@ steps:
       - name: groups
         form: list
         says: one line per ticket, with its group and its urgency
-step: report
+step: improve
 process: [[spec/processes/retro]]
 process_hash: 61a2bb140f0b4632
 record:
@@ -266,6 +266,12 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 445e68523341e9d8e5d7091fff5399a5966265f7
     hash_after: 445e68523341e9d8e5d7091fff5399a5966265f7
+  - step: improve
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 428ef819c0099f4bd7cb3230711dc762d1aea051
+    hash_after: 428ef819c0099f4bd7cb3230711dc762d1aea051
+    returns: 1
+    why: the hand takes it back
 ---
 
 # Ask
