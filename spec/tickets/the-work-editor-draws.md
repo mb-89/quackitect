@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgent: true
-step: retro/settle-1
+step: retro/notes
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -125,6 +125,10 @@ record:
       - name: drained
         exit: 1
         said: group-key-names-a-ticket
+  - step: retro/settle-1
+    hand: box 4089f1b3b6bc · claude-code-remote
+    hash_before: 0e95080bf77674f3807b5197a29039683cd813b6
+    hash_after: 0e95080bf77674f3807b5197a29039683cd813b6
 ---
 
 # Ask
@@ -224,6 +228,13 @@ at a time, and reaches no row to change it.
 <!-- the decision, and why it stands -->
 
 <!-- the form is text -->
+
+The step stands, and the notes get decided. The fails stand with the route, not
+with the step:
+
+- a hand holding this group takes no other ticket, so its notes reach no hand
+- the tag answers that, because a parked note stands first in the next hand-out
+- this hand decides both notes, then comes back to the drain
 
 ## notes
 
