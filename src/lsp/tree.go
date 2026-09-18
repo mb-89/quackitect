@@ -160,8 +160,9 @@ const (
 	ValeIni  = ".vale.ini"
 	Settings = ".vscode/settings.json"
 	Offered  = ".vscode/extensions.json"
-	ToolsAt  = ".se/tools.json"
-	Bin      = ".se/bin"
+	// The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because a Go module imports no JavaScript.
+	ToolsAt = ".se/run/tools.json"
+	Bin     = ".se/run/bin"
 )
 
 // [[spec/design_output/editor#what-the-editor-runs]]

@@ -23,7 +23,28 @@ line and a key each stand there, and git carries none of them.
 |---|---|---|
 | a raw note | `.se/notes`, one file per note | the write door, the commit door, and a later level |
 | a handover for the next session on this box | `.se/HANDOVER.md` | a person, and the session after this one |
-| the log | `.se/log` | `./RUNME.sh tui` |
+| the log | `.se/run/log` | `./RUNME.sh tui` |
+
+## Three kinds stand apart
+
+Two named folders stand under the private one, and the folder a file stands in
+says which kind it is. `.claude/skills/level0/lib/folders.js` owns both names,
+and every writer takes its folder from there.
+
+| kind | where it stands | who reads it |
+|---|---|---|
+| retro | `.se/retro` | the retro, as its own |
+| runtime | `.se/run` | the box holding it |
+| the rest | `.se` itself | the retro, and a question over the index |
+
+One question places a file: does a reader ask after it once the box dies? A yes
+puts it in the rest, and a no puts it in the runtime folder.
+
+- the index walk covers the private folder and stands outside the runtime half
+- a word standing in a private note alone comes back from a `find`
+- a module that imports takes the name from the owner
+- a module importing none of it names the owner in a comment beside the copy
+- `PrivateFolderOwned` refuses a spelling naming neither
 
 Private means a person's name, a handle, an address, a number, a date in prose
 and a path on a disk. Unstructured input somebody stores for later is private

@@ -11,7 +11,9 @@
     "staleAfter": "12h",
     "failsBeforePerson": 2,
     "refusalsBeforePerson": 5,
-    "stepsBeforeSplit": 3
+    "stepsBeforeSplit": 3,
+    "retroReaders": 4,
+    "retroCap": 8
   },
   "engine": {
     "comment": "The engine level one brings. spec/design_output/config.md, chapter The engine controls, says what each value means.",

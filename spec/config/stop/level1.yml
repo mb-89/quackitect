@@ -1,5 +1,5 @@
 # Level one's rule, beside level zero's. The pull writes a hold per hand under
-# .se/hold, and a turn ending with a hold standing ends on a ticket half done.
+# .se/run/hold, and a turn ending with a hold standing ends on a ticket half done.
 # The hook reads the folder, so the rule needs no claim from the agent.
 #
 # The queue rule reads spec/tickets on a desk bound to the queue and standing

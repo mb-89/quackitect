@@ -75,8 +75,8 @@ func TestGlobNamesTheFilesAndSkipsTheRest(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(said.Paths) != 2 {
-		t.Fatalf("two notes stand outside the skipped folders, and this answers %v", said.Paths)
+	if len(said.Paths) != 3 {
+		t.Fatalf("three notes stand outside the runtime half, and this answers %v", said.Paths)
 	}
 
 	said, err = Glob(db, GlobAsk{Pattern: "*.js"})

@@ -118,4 +118,8 @@ a reader needs no list to know what the index passes.
 
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+- The owner rules the `log/` row wrong. The log stays outside the runtime folder.
+- The retro collects the log, and a retro reads it more than anything else.
+- The runtime folder holds what dies with the box. A record a reader reads later stands outside it.
+- So the hand taking this ticket moves every other row, and leaves `log/` where it stands.
+- [[spec/tickets/the-retro-takes-the-box]] copies the private folder, and it skips the runtime folder whole.

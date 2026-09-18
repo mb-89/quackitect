@@ -3,12 +3,18 @@
 // a moved hash hands them again.
 // [[spec/design_output/pull#the-work-answer]]
 
+import {
+  HOLD as OWNED_HOLD,
+  HOLDS as OWNED_HOLDS,
+} from "../../.claude/skills/level0/lib/folders.js";
+
 import { actionables, bindsHere } from "../../.claude/skills/level0/lib/guidance.js";
 import { inherits } from "../../.claude/skills/level0/lib/layer.js";
 import { hashOf } from "../../.claude/skills/level0/lib/schema.js";
 import { agentOf, BOX, handOf } from "./hand.js";
 
-export const HOLDS = ".se/hold";
+export const HOLDS = OWNED_HOLDS;
+export const HOLD = OWNED_HOLD;
 export const GUIDANCE = "spec/guidance";
 const MARKDOWN = /\.md$/;
 const DRAFT = /^_/;
@@ -22,6 +28,23 @@ export function holdAt(it, hand) {
 export function holdOf(it, hand) {
   const at = holdAt(it, hand);
   return it.disk.exists(at) ? parsed(it.disk.read(at)) : null;
+}
+
+// Whether any hand holds a step on this box, out of the folder and the older file alike. [[spec/design_output/pull#the-hand-and-the-hold]]
+export function holdsAnywhere(it) {
+  const folder = it.join(it.root, ...HOLDS.split("/"));
+  const rows = it.disk.exists(folder)
+    ? it.disk
+        .list(folder)
+        .filter((one) => one.kind === "file" && one.name.endsWith(".json"))
+        .map((one) => it.join(folder, one.name))
+    : [];
+  for (const at of [...rows, it.join(it.root, ...HOLD.split("/"))]) {
+    if (!it.disk.exists(at)) continue;
+    const held = parsed(it.disk.read(at));
+    if (held) return { at, held };
+  }
+  return null;
 }
 
 export function parsed(text) {

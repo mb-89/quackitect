@@ -105,6 +105,9 @@ terms:
   - {word: rationale, defines: "[[spec/guidance/guidance]]"}
   - {word: readback, defines: "[[spec/design_output/level0#the-owners-prompt-comes-first]]"}
   - {word: record, defines: "[[spec/design_output/work#the-take-writes-the-record]]"}
+  - {word: refactor, defines: "[[spec/design_input/the-warnings-feed-a-refactorer]]"}
+  - {word: refactorer, defines: "[[spec/design_input/the-warnings-feed-a-refactorer]]"}
+  - {word: refactoring, defines: "[[spec/design_input/the-warnings-feed-a-refactorer]]"}
   - {word: refusal, defines: "[[spec/design_output/level0#the-write-door]]"}
   - {word: refuse, defines: "[[spec/design_output/level0#the-write-door]]"}
   - {word: register, defines: "[[spec/schemas/paragraph.schema]]"}

@@ -16,7 +16,8 @@ func tree(t *testing.T) string {
 	write(t, root, "spec/one.md", "---\nkind: note\nid: one\n---\n\nThe first note says [[two]] out loud.\n")
 	write(t, root, "spec/two.md", "---\nkind: note\nid: two\n---\n\nThe second note names [[nobody]] at all.\n")
 	write(t, root, "src/plain.js", "// a line the search finds\nconst said = 1;\n")
-	write(t, root, ".se/skipped.md", "---\nid: skipped\n---\n\nThis never reaches the index.\n")
+	write(t, root, ".se/run/skipped.md", "---\nid: skipped\n---\n\nThis never reaches the index.\n")
+	write(t, root, ".se/tickets/parked.md", "---\nid: parked\n---\n\nA word standing under the private folder alone: marzipan.\n")
 	return root
 }
 
@@ -44,16 +45,37 @@ func opened(t *testing.T, root string) *sql.DB {
 	return db
 }
 
-func TestTheWalkSkipsWhatNobodyWrote(t *testing.T) {
+func TestTheWalkSkipsTheRuntimeHalfAndNothingElseUnderThePrivateFolder(t *testing.T) {
 	root := tree(t)
 	db := opened(t, root)
 
 	var count int
-	if err := db.QueryRow(`SELECT count(*) FROM file WHERE path LIKE '.se/%'`).Scan(&count); err != nil {
+	if err := db.QueryRow(`SELECT count(*) FROM file WHERE path LIKE '.se/run/%'`).Scan(&count); err != nil {
 		t.Fatal(err)
 	}
 	if count != 0 {
-		t.Fatalf("the walk reached .se: %d file(s)", count)
+		t.Fatalf("the walk reached the runtime half: %d file(s)", count)
+	}
+
+	if err := db.QueryRow(
+		`SELECT count(*) FROM file WHERE path = '.se/tickets/parked.md'`).Scan(&count); err != nil {
+		t.Fatal(err)
+	}
+	if count != 1 {
+		t.Fatalf("the walk answers %d row(s) for the private note", count)
+	}
+}
+
+func TestAWordStandingInAPrivateNoteAloneComesBackFromAFind(t *testing.T) {
+	root := tree(t)
+	db := opened(t, root)
+
+	rows, err := Find(db, "marzipan", 10)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rows) != 1 || rows[0].Path != ".se/tickets/parked.md" {
+		t.Fatalf("the search answers %+v", rows)
 	}
 }
 

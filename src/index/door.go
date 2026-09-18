@@ -49,7 +49,7 @@ type door struct {
 }
 
 func standingPath(root string) string {
-	return filepath.Join(root, ".se", "index.json")
+	return filepath.Join(root, Runtime, "index.json")
 }
 
 func Serve(root, at string) (*http.Server, net.Listener, error) {

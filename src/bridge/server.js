@@ -3,6 +3,7 @@
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
 import { join } from "node:path";
+import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
 import { fileURLToPath } from "node:url";
 import { biome } from "../doors/biome.js";
 import { clock } from "../doors/clock.js";
@@ -171,7 +172,7 @@ export function boxOf(method, work = method, doors = {}) {
     index: doors.index ?? index(files, outside, time, method, work),
     vale: doors.vale ?? vale(files, outside, method),
     biome: doors.biome ?? biome(files, outside, method),
-    log: doors.log ?? log(files, time, { folder: join(work, ".se", "log"), level: "debug" }),
+    log: doors.log ?? log(files, time, { folder: join(work, LOG_FOLDER), level: "debug" }),
   };
 }
 

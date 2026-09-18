@@ -47,6 +47,13 @@ export function fakeDisk(seed = {}) {
       return said;
     },
     write: (path, text) => void files.set(norm(path), String(text)),
+    // [[spec/design_output/doors#a-fake-behaves]]
+    copy(from, to) {
+      files.set(norm(to), this.read(from));
+    },
+    size(path) {
+      return String(this.read(path)).length;
+    },
     append: (path, text) => void files.set(norm(path), `${files.get(norm(path)) ?? ""}${text}`),
     exists: (path) => exists(norm(path)),
     remove(path) {

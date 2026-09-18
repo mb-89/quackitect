@@ -3,11 +3,13 @@
 // carries who that is.
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 
+import { inRun } from "../../.claude/skills/level0/lib/folders.js";
+
 import { hashOf } from "../../.claude/skills/level0/lib/schema.js";
 import { COPY } from "../../.claude/skills/level0/lib/vehicle.js";
 
-export const BOX = ".se/box.json";
-export const SESSION = ".se/session.json";
+export const BOX = inRun("box.json");
+export const SESSION = inRun("session.json");
 
 const BOX_ID = 12;
 // A tracked file holds no person's name, and git carries who wrote the commit. [[spec/guidance/voice]]

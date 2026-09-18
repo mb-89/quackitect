@@ -1,8 +1,9 @@
 // The survey. It asks this box where each tool stands and writes
-// .se/tools.json, which every caller reads in place of a guess.
+// the survey file, which every caller reads in place of a guess.
 // [[spec/design_output/tools#what-the-survey-writes]]
 
 import {
+  BIN,
   callsOf,
   guesses,
   pathOf,
@@ -12,11 +13,12 @@ import {
   versionOf,
   WANTED,
 } from "../../.claude/skills/level0/lib/tools.js";
+import { RUN } from "../../.claude/skills/level0/lib/folders.js";
 
 const ASKING = 10000;
 
 export function survey(doors, root, env) {
-  const bin = `${root}/.se/bin`;
+  const bin = `${root}/${BIN}`;
   const found = {};
   for (const one of WANTED) found[one.name] = standing(doors, one, env, bin);
   return found;
@@ -24,7 +26,7 @@ export function survey(doors, root, env) {
 
 export function writeSurvey(doors, root, env) {
   const found = survey(doors, root, env);
-  doors.disk.makeDir(`${root}/.se`);
+  doors.disk.makeDir(`${root}/${RUN}`);
   doors.disk.write(`${root}/${TOOLS}`, `${JSON.stringify(found, null, 2)}\n`);
   return found;
 }

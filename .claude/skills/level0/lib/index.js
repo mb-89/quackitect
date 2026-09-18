@@ -2,7 +2,9 @@
 // a question the door answers, and the answer back into what the tool prints.
 // [[spec/design_output/index#the-door-answers-the-tools]]
 
-export const BIN = ".se/bin/se-index";
+import { BIN as TOOLS_BIN } from "./tools.js";
+
+export const BIN = `${TOOLS_BIN}/se-index`;
 
 const CONTENT = "content";
 const COUNT = "count";

@@ -202,7 +202,7 @@ test("a hand-back with a field empty answers refused, keeps the hold, and counts
 
 // [[spec/design_output/pull#the-pass]]
 test("the voice rules read the evidence at the hand-back, and an error refuses it", () => {
-  const vale = "/tree/.se/bin/vale";
+  const vale = "/tree/.se/run/bin/vale";
   const long = JSON.stringify({
     "stdin.md": [
       {
@@ -421,7 +421,7 @@ test("the payload spans a fence, a porcelain row reads whole, and a files field 
     "the fence goes with the old text",
   );
 
-  const vale = "/tree/.se/bin/vale";
+  const vale = "/tree/.se/run/bin/vale";
   const ranVale = [];
   const route = CHILD("open", "verdict").replace(
     "group: one-group\n",
@@ -499,7 +499,7 @@ test("a hand under --as works one step under its own name, and the pull answers 
     hash_after: SHA,
   });
   const { it, disk } = doors(standing(took));
-  const helper = join(ROOT, ".se/hold/box-d462e994b4cef-helper-2.json");
+  const helper = join(ROOT, ".se/run/hold/box-d462e994b4cef-helper-2.json");
 
   const out = heard(() => work(ROOT, ["pull", "--as", "helper-2"], it));
   assert.equal(out.code, 0);

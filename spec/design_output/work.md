@@ -372,7 +372,7 @@ mints holds to its schema. [[spec/schemas]]
 # The battery answers first
 
 `branch done` reads a stamp before it claims anything. `./RUNME.sh check` writes
-`.se/check.json` on every run, naming the commit it stands on:
+`.se/run/check.json` on every run, naming the commit it stands on:
 
     { "sha": "...", "ok": true, "clean": true, "at": "..." }
 

@@ -1,9 +1,11 @@
-// Where each tool stands on this box. The survey writes .se/tools.json, and a
-// caller reads a path out of it in place of building one.
+// Where each tool stands on this box. The survey writes the file this names,
+// and a caller reads a path out of it in place of building one.
 // [[spec/design_output/tools#what-the-survey-writes]]
 
-export const TOOLS = ".se/tools.json";
-export const BIN = ".se/bin";
+import { inRun } from "./folders.js";
+
+export const TOOLS = inRun("tools.json");
+export const BIN = inRun("bin");
 
 export const WANTED = [
   { name: "node", asks: ["--version"], for: "a helper script" },

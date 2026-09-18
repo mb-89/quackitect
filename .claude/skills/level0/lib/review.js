@@ -2,10 +2,12 @@
 // it, so one report shape serves both.
 // [[spec/design_output/review#what-the-report-looks-like]]
 
+import { inRun } from "./folders.js";
+
 export const TOOL = "review_branch";
 export const CALLED = `mcp__level0__${TOOL}`;
 export const BRIEF = "HANDOVER.md";
-export const WORKTREE = ".se/review";
+export const WORKTREE = inRun("review");
 export const DIFF_CAP = 120000;
 const NAME_WIDTH = 10;
 

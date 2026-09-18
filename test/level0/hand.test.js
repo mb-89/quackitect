@@ -20,14 +20,14 @@ function box(files = {}, more = {}) {
   return {
     root: ROOT,
     join,
-    disk: fakeDisk({ [at(".se/box.json")]: JSON.stringify({ id: ID }), ...files }),
+    disk: fakeDisk({ [at(".se/run/box.json")]: JSON.stringify({ id: ID }), ...files }),
     git: fakeGit({ [AUTHOR]: { stdout: "Ada\n" } }, ROOT),
     clock: fakeClock(),
     ...more,
   };
 }
 
-const session = (held) => ({ [at(".se/session.json")]: JSON.stringify(held) });
+const session = (held) => ({ [at(".se/run/session.json")]: JSON.stringify(held) });
 
 test("the hand names the box, the session on it and the agent inside it", () => {
   const it = box(session({ id: "s7", harness: "claude-code" }), { agent: true });

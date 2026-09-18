@@ -1,3 +1,5 @@
+import { HOLDS as OWNED_HOLDS } from "../../.claude/skills/level0/lib/folders.js";
+
 import { entriesIn } from "../../.claude/skills/level0/lib/schema.js";
 
 export { HELPER, SPAWN, spawnPrompt } from "./spawn.js";
@@ -15,7 +17,7 @@ import {
 } from "./guidance-hand.js";
 import { agentOf, BOX, handOf } from "./hand.js";
 
-export const HOLDS = ".se/hold";
+export const HOLDS = OWNED_HOLDS;
 export const WORK = "work";
 export const REFUSED = "refused";
 export const WAIT = "wait";
@@ -50,7 +52,7 @@ export const VERBS = {
   branch: BRANCH,
   work: BRANCH,
   ticket: ["note", "update", "open"],
-  retro: ["notes"],
+  retro: ["notes", "collect", "new"],
 };
 
 // [[spec/design_output/pull#a-need-is-a-verb]]

@@ -9,7 +9,7 @@ import { fakeProc } from "../../src/doors/fake/proc.js";
 import { SOURCE, STAMP, viewerOf } from "../../src/scripts/viewer.js";
 
 const ROOT = "/box";
-const EXE = `${ROOT}/.se/bin/logview`;
+const EXE = `${ROOT}/.se/run/bin/logview`;
 const BUILD = `go build -o ${EXE} .`;
 
 const source = () =>

@@ -1,19 +1,19 @@
 {
   "vale.valeCLI.installVale": false,
-  "vale.valeCLI.path": ".se/bin/vale",
+  "vale.valeCLI.path": ".se/run/bin/vale",
   "vale.valeCLI.config": ".vale.ini",
   "vale.valeCLI.minAlertLevel": "inherited",
   "vale.valeCLI.lintOnChange": true,
   "vale.enableSpellcheck": false,
   "biome.lsp.bin": {
-    "linux-x64": ".se/bin/biome",
-    "linux-arm64": ".se/bin/biome",
-    "linux-x64-musl": ".se/bin/biome",
-    "linux-arm64-musl": ".se/bin/biome",
-    "darwin-x64": ".se/bin/biome",
-    "darwin-arm64": ".se/bin/biome",
-    "win32-x64": ".se/bin/biome.exe",
-    "win32-arm64": ".se/bin/biome.exe"
+    "linux-x64": ".se/run/bin/biome",
+    "linux-arm64": ".se/run/bin/biome",
+    "linux-x64-musl": ".se/run/bin/biome",
+    "linux-arm64-musl": ".se/run/bin/biome",
+    "darwin-x64": ".se/run/bin/biome",
+    "darwin-arm64": ".se/run/bin/biome",
+    "win32-x64": ".se/run/bin/biome.exe",
+    "win32-arm64": ".se/run/bin/biome.exe"
   },
   "biome.configurationPath": "spec/config/biome.json",
   "json.schemas": [

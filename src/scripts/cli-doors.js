@@ -5,6 +5,7 @@
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { configOf, SCHEMA, TRACKED } from "../../.claude/skills/level0/lib/config.js";
+import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
 import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
@@ -48,7 +49,7 @@ export async function doorsHere() {
     clock: time,
     git: git(outside, roots.work),
     log: log(files, time, {
-      folder: join(roots.work, ".se", "log"),
+      folder: join(roots.work, LOG_FOLDER),
       level: await said.ask("log.level"),
     }),
     config: said,

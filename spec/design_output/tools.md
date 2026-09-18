@@ -9,12 +9,12 @@ the survey it writes, who reads it, and where a session puts a script.
 
 # What the survey writes
 
-The install writes `.se/tools.json`, and that file says where every tool this
+The install writes `.se/run/tools.json`, and that file says where every tool this
 tree calls stands on this box:
 
     {
       "node": { "path": "/usr/bin/node", "version": "24.19.0" },
-      "vale": { "path": "/home/one/quackitect/.se/bin/vale", "version": "3.20.0" },
+      "vale": { "path": "/home/one/quackitect/.se/run/bin/vale", "version": "3.20.0" },
       "sh":   { "path": "/bin/sh" },
       "go":   null
     }
@@ -26,7 +26,7 @@ without it. A tool this tree asks no version of carries its path alone.
 
 # Reading the path variable
 
-The survey looks in `.se/bin` first, then in each folder the path variable
+The survey looks in `.se/run/bin` first, then in each folder the path variable
 names. Two variables shape that walk, and neither names a platform:
 
 | variable | says |
@@ -48,9 +48,9 @@ the file is absent:
 | the guidance door | the survey at `session.start`, and it runs the survey where the file is absent |
 | `./RUNME.sh doctor` | the survey, and it probes nothing twice |
 
-`whereIs` takes the surveyed path first. It falls back to `.se/bin/<name>.exe`,
-then `.se/bin/<name>`, then the bare name. So a clone nobody surveys still
-finds a tool in `.se/bin`.
+`whereIs` takes the surveyed path first. It falls back to `.se/run/bin/<name>.exe`,
+then `.se/run/bin/<name>`, then the bare name. So a clone nobody surveys still
+finds a tool in `.se/run/bin`.
 
 # The session reads the survey
 
@@ -88,6 +88,6 @@ out of it. A link is no tool.
 A session writing a script of its own puts it under `.se/scripts`. Git ignores
 that folder, so the script lives on the box and travels nowhere.
 
-`.se/tools.json` says what such a script can call. A cloud session lists every
+`.se/run/tools.json` says what such a script can call. A cloud session lists every
 script it leaves there in its handover, so a person decides whether one earns a
 place in `src/scripts`.
