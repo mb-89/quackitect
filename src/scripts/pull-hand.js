@@ -111,11 +111,15 @@ export function handOut(it, who) {
       ]
     : [tagged, sorted(freeIn(all)), sorted(privates)];
   if (!who.group) cutForGroups(it, all);
+  // A name on the pull asks for one ticket, so the pools carry that one alone. [[spec/design_output/pull#the-hand-out]]
+  const asked = who.wanted
+    ? pools.map((pool) => pool.filter((one) => one.name === who.wanted))
+    : pools;
 
   const why = [];
   let other = null;
   let person = null;
-  for (const pool of pools) {
+  for (const pool of asked) {
     for (const one of pool) {
       const said = offer(it, who, one, all);
       if (said.leaf) return handed(it, who, one, said.leaf);
@@ -126,10 +130,16 @@ export function handOut(it, who) {
     if (other && !who.oneStep) return spawnAnswer(other);
   }
 
-  say(WAIT, why.length ? why : ["no ticket of this group stands open"]);
+  say(WAIT, why.length ? why : [nothingFor(who)]);
   // A person's question leaves the branch, so the group lands. [[spec/design_output/work#a-person-step-leaves]]
   if (person) console.log(`\n${unblockPrompt(person.name, person.leaf)}`);
   return 0;
+}
+
+// What the wait answer says where no ticket at all offers a leaf. [[spec/design_output/pull#the-hand-out]]
+function nothingFor(who) {
+  if (!who.wanted) return "no ticket of this group stands open";
+  return `${who.wanted} stands nowhere here, or it stands closed`;
 }
 
 // A free ticket stands in no group and is no group, so a desk works it on trunk. [[spec/design_output/pull#the-engine-takes-the-branch]]

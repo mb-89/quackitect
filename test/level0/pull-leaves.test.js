@@ -209,6 +209,23 @@ test("the hold reads back what the pull writes, and a box with no id mints one",
   assert.equal(holdOf(it, "box fresh1").ticket, "a-child");
 });
 
+// [[spec/design_output/pull#the-hand-out]]
+test("a name with nothing in hand asks for that ticket, and a name nobody writes says so", () => {
+  const here = doors(standing());
+  const mine = heard(() => work(ROOT, ["pull", "a-child"], here.it));
+  assert.match(mine.said, /a-child at design\/draft/, "the name hands that ticket out");
+
+  const away = doors(standing());
+  const none = heard(() => work(ROOT, ["pull", "nobody-writes-this"], away.it));
+  assert.match(none.said, /nobody-writes-this stands nowhere here/);
+  assert.doesNotMatch(none.said, /a-child/, "a name asks for one ticket alone");
+
+  const bound = doors(standing(), {}, { binding: "queue" });
+  const shut = heard(() => work(ROOT, ["pull", "a-child"], bound.it));
+  assert.equal(shut.code, 2);
+  assert.match(shut.said, /a-child stands behind the queue/);
+});
+
 // [[spec/design_output/pull#done-leaves-no-takeable-step]]
 test("takeable waits on an open dependency, so the pull and branch done name the same step", () => {
   const waits = CHILD("open", "design/draft", "depends_on: [a-first]\n");
