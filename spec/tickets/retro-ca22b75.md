@@ -182,7 +182,7 @@ steps:
       - name: groups
         form: list
         says: one line per ticket, with its group and its urgency
-step: mine/words
+step: mine/memory
 process: [[spec/processes/retro]]
 process_hash: 61a2bb140f0b4632
 record:
@@ -230,6 +230,10 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 54c325ddc5fb6aa92351a04c9f892df796e40aa4
     hash_after: 54c325ddc5fb6aa92351a04c9f892df796e40aa4
+  - step: mine/words
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: afc8263bbe84fa32a71c917f68fe6be336e5f421
+    hash_after: afc8263bbe84fa32a71c917f68fe6be336e5f421
 ---
 
 # Ask
@@ -372,13 +376,14 @@ So the leaf reads the door's answer as the job. The tree lacks the command itsel
 
 ### kept
 
-<!-- one line per term kept, with the note that defines it -->
+- every term in spec/vocabulary/terms.yml stands, because no earlier retro closes and the window opens at the first commit.
+- this window adds no term. The door refuses two words this session, and the hand rewrites the line each time.
 
 <!-- the form is list -->
 
 ### swapped
 
-<!-- one line per term moved to the swaps, with the word to write instead -->
+- none. A word the door refuses meets a rewrite here, so it reaches the file nowhere.
 
 <!-- the form is list -->
 
