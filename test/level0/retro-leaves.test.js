@@ -33,6 +33,16 @@ reason: done
 # Ask
 `;
 
+const GROUP = `---
+kind: [[ticket]]
+state: closed
+reason: done
+process: [[spec/processes/group]]
+---
+
+# Ask
+`;
+
 const FILES = {
   [at(".se/log/one.jsonl")]: `${LOG}\n`,
   [at(".se/scripts/one.mjs")]: "// a script a hand writes\n",
@@ -43,8 +53,11 @@ const SAYS = {
   "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
   "git rev-list --max-parents=0 HEAD": { stdout: `${FIRST}\n` },
   [`git log --format=%H ${FIRST}..HEAD -- spec/tickets`]: { stdout: "cafe01\n" },
-  "git show cafe01 --name-only --format=": { stdout: "spec/tickets/a-child.md\n" },
+  "git show cafe01 --name-only --format=": {
+    stdout: "spec/tickets/a-child.md\nspec/tickets/one-group.md\n",
+  },
   "git show cafe01:spec/tickets/a-child.md": { stdout: CLOSED },
+  "git show cafe01:spec/tickets/one-group.md": { stdout: GROUP },
 };
 
 function doors(files = FILES, answers = SAYS, more = {}) {
@@ -95,10 +108,25 @@ test("collect writes one file a leaf, and an empty window leaves an empty file",
     "scripts",
     "runs",
     "unread",
-    "retros",
+    "score",
+    "method",
   ]) {
     assert.equal(it.disk.exists(leafAt(name)), true, `${name} takes a file`);
   }
+});
+
+// The runs leaf reads the groups closing in the window, beside the tickets. [[spec/tickets/the-retro-lays-its-leaves]]
+test("the runs leaf holds each group closing in the window, and the tickets leaf holds both", () => {
+  const it = doors();
+
+  heard(() => retro(ROOT, ["collect", TICKET], it));
+
+  const runs = rowsOf(it, "runs");
+  assert.equal(runs.length, 1, "the group takes a row, and the child takes none");
+  assert.equal(String(runs[0].group), "one-group");
+
+  const rows = rowsOf(it, "tickets").map((one) => String(one.ticket)).sort();
+  assert.deepEqual(rows, ["a-child", "one-group"], "both close in the window");
 });
 
 // [[spec/design_input/the-agent-pulls-tickets]]

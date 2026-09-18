@@ -336,8 +336,6 @@ export function readAll(entries, disk, at = (path) => path) {
   return { wanted, standing, faults };
 }
 
-// [[spec/design_output/projection#the-write-door-refuses-one]]
-// [[spec/design_output/projection#the-write-door-refuses-one]]
 // [[spec/design_output/projection#check-refuses-a-stale-one]]
 export function staleIn(wanted, found) {
   const out = [];

@@ -91,7 +91,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -147,6 +147,10 @@ record:
     hash_after: 5aad3cd4a056b75d89eb0ab1e2e57eef07e9e1cb
     returns: 1
     why: Three gaps stand, and the rest of the change answers the ask.; | the gap | the fix |; |---|---|; | no case drives a merged group, so the `runs` filter fires nowhere and the file reads empty | give the fake git a closed group ticket, and read the `runs` file back |; | the `method` leaf takes a row in the approach, and collect writes it no file | write the file, or say in the approach why that leaf takes none |; | the file the `score` step reads lands as `retros`, and the ask asks for the leaf's name | name it for the leaf that reads it |; | what answers the ask | where |; |---|---|; | the takes off git land in the folder | `closedIn`, `mergedIn` and `standingRetros` in `src/scripts/retro-leaves.js` |; | the manifest names each layout | the row each leaf file pushes, which the case reads back |; | the collect step reads as the folders it skips | `spec/processes/retro.yaml`, and the hash moves on the open retro |; | a case reads the closed ticket back | the tickets leaf case, which finds the ticket as its commit leaves it |; | what the reviewing guidance asks | what stands |; |---|---|; | the diff beyond the brief | the siblings' own work, which this branch carries alongside |; | a retro handback | none stands, because this ticket runs at the desk |; `./RUNME.sh check` exits 0 on this branch, and `node --test` passes over the two test files.
+  - step: implement/reflect
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 4d479861946774706368d40d790c568ae4c7585a
+    hash_after: 4d479861946774706368d40d790c568ae4c7585a
 ---
 
 # Ask
@@ -290,13 +294,25 @@ The takes off git reach the retro folder as rows, so no leaf runs git itself. A 
 
 ### class
 
-<!-- the class of error the findings describe, and the fix for the class -->
+The class is one: the code answers the approach in part, and the cases cover the part it answers.
 
-<!-- the form is text -->
+| the finding | what the approach says |
+|---|---|
+| no case drives a merged group | the `runs` leaf reads the groups closing in the window |
+| the `method` leaf takes no file | every leaf of the retro's own reading opens a file |
+| the file reads `retros` | each file takes the name of the leaf reading it |
+
+Each line is the same move. The approach lists the leaves, and the code writes the ones with a reader already and passes the rest.
+
+The fix for the class is to read the approach as a list and answer every row. A leaf with nothing to hold opens an empty file, because an empty file says the window holds none of that thing.
+
+The name is the same move once more. A reader opens the file named for the leaf they stand on, so the name follows the step and no other word.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change touches no file the ask leaves out. The leaves module and its cases, and one stale pointer the earlier move leaves behind.
+- every door the change reaches has a fake. The cases drive the fake disk and the fake git alone.
+- a comment names the approach the change implements. The empty leaf says why collect opens it and writes nothing.
 
 <!-- the form is checklist -->
 

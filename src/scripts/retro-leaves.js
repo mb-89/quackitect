@@ -28,7 +28,9 @@ export function leavesOut(it, into, rows) {
     tickets: closedIn(it),
     scripts: rows.filter((one) => String(one.path).startsWith("scripts/")),
     runs: mergedIn(it),
-    retros: standingRetros(it),
+    score: standingRetros(it),
+    // The retro's own hand fills this one as it goes, so collect opens it empty. [[spec/tickets/the-retro-lays-its-leaves]]
+    method: [],
     unread: rows,
   };
 
@@ -104,7 +106,7 @@ function mergedIn(it) {
     .map((one) => ({ group: one.ticket, commit: one.commit, text: one.text }));
 }
 
-// The score step reads what stands, so no leaf runs git for it. [[spec/tickets/the-retro-lays-its-leaves]]
+// The score step reads the retros standing, so no leaf runs git for it. [[spec/tickets/the-retro-lays-its-leaves]]
 function standingRetros(it) {
   const at = it.join(it.root, ...TICKETS.split("/"));
   const rows = listed(it, at).filter(
