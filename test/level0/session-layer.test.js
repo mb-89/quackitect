@@ -5,8 +5,8 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { guidanceHere } from "../../src/bridge/guidance.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { heldReadsIn } from "../../src/scripts/guidance-hand.js";
 
 const METHOD = "/vehicle";

@@ -4,10 +4,10 @@
 import assert from "node:assert/strict";
 import { posix } from "node:path";
 import { test } from "node:test";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { fakeSession } from "../../src/doors/fake/session.js";
-import { fakeProc } from "../../src/doors/fake/proc.js";
 import { handle } from "../../.claude/skills/level0/lib/copilot-runtime.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeProc } from "../../src/doors/fake/proc.js";
+import { fakeSession } from "../../src/doors/fake/session.js";
 
 function fixture() {
   const root = "/tree";
@@ -317,7 +317,10 @@ test("twenty valid files finish in five batches without spending failure retries
 test("a hold standing drops its step's note from the layer the runtime hands", async () => {
   const it = fixture();
   it.env = { CLAUDECODE: "1" };
-  it.disk.write("/tree/spec/guidance/working.md", "# Actionables\n\n1. Answer first.\n");
+  it.disk.write(
+    "/tree/spec/guidance/working.md",
+    "# Actionables\n\n1. Answer first.\n",
+  );
   it.disk.write("/tree/.se/box.json", JSON.stringify({ id: "d462e994b4cef" }));
   it.disk.write(
     "/tree/.se/hold/box-d462e994b4cef-claude-code.json",
@@ -331,7 +334,10 @@ test("a hold standing drops its step's note from the layer the runtime hands", a
 
   const result = await handle(event("SessionStart"), it);
 
-  assert.ok(!/Write clearly\./.test(result.context), "the held step's note leaves the layer");
+  assert.ok(
+    !/Write clearly\./.test(result.context),
+    "the held step's note leaves the layer",
+  );
   assert.match(result.context, /Answer first\./);
   assert.match(result.context, /rules: 1/);
 });

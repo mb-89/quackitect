@@ -6,8 +6,8 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { codeDoor } from "../../src/bridge/code.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 const ROOT = "/tree";
 const at = (path) => join(ROOT, ...path.split("/"));

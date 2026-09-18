@@ -1,6 +1,6 @@
 // The hand a step stands in: the box, the session on it, and the agent inside
-// it where the harness names one. Off a harness the hand is a person, by their
-// git author name.
+// it where the harness names one. Off a harness the hand reads person, and git
+// carries who that is.
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 
 import { hashOf } from "../../.claude/skills/level0/lib/schema.js";
@@ -10,7 +10,10 @@ export const BOX = ".se/box.json";
 export const SESSION = ".se/session.json";
 
 const BOX_ID = 12;
-const ANYBODY = "anybody";
+// A tracked file holds no person's name, and git carries who wrote the commit. [[spec/guidance/voice]]
+export const PERSON = "person";
+// What a hand reads where the owner sends it into a person's step. [[spec/design_output/pull#the-hand-rule]]
+export const SAYS = "the owner says so";
 // [[spec/design_output/pull#the-hand-rule]]
 export const HARNESS = [
   ["CLAUDE_CODE_REMOTE", "claude-code-remote"],
@@ -44,7 +47,8 @@ export function handOf(it) {
   const parts = [`box ${boxOf(it)}`];
   if (held.id) parts.push(`session ${held.id}`);
   if (agent) parts.push(agent);
-  if (parts.length === 1 && !it.agent) return `person ${personOf(it)}`;
+  // The record names the role, and git names who. [[spec/guidance/voice]]
+  if (parts.length === 1 && !it.agent) return PERSON;
   return parts.join(" · ");
 }
 
@@ -59,11 +63,6 @@ function boxOf(it) {
   it.disk.makeDir(it.join(it.root, ".se"));
   it.disk.write(it.join(it.root, ...BOX.split("/")), `${JSON.stringify({ id })}\n`);
   return id;
-}
-
-function personOf(it) {
-  const said = it.git?.run(["config", "user.name"], true);
-  return (said?.ok ? String(said.out ?? "").trim() : "") || ANYBODY;
 }
 
 function readIf(it, path) {

@@ -5,11 +5,11 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { activate } from "../../src/extension/extension.js";
 import { KEY } from "../../src/extension/lib/session.js";
-import { sidebarOf } from "../../src/extension/sidebar.js";
 import { LOCAL, TRACKED } from "../../src/extension/lib/widgets.js";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { sidebarOf } from "../../src/extension/sidebar.js";
 
 const SCHEMA = "spec/config/level0.schema.json";
 
@@ -289,7 +289,9 @@ test("a press, a run and an edit each write a sidebar line naming what moved", a
       ["sidebar", "stop.mostInARow is 5", "the config tree"],
     ],
   );
-  const written = [...door.files.files.keys()].filter((one) => one.startsWith(".se/log/"));
+  const written = [...door.files.files.keys()].filter((one) =>
+    one.startsWith(".se/log/"),
+  );
   assert.deepEqual(written, [".se/log/session.jsonl"]);
   assert.equal(door.files.read(written[0]).trim().split("\n").length, 4);
 });
@@ -298,14 +300,24 @@ test("a sidebar line lands after the lines the session holds, and keeps them", a
   const held = `${JSON.stringify({ at: "x", level: "info", kind: "level0", said: "session start" })}\n`;
   const door = doorOf({ ".se/log/session.jsonl": held });
   await sidebarOf(door).took({ kind: "press", key: "stop.hold" });
-  const rows = door.files.read(".se/log/session.jsonl").trim().split("\n").map((one) => JSON.parse(one));
-  assert.deepEqual(rows.map((one) => one.said), ["session start", "stop.hold is finish"]);
+  const rows = door.files
+    .read(".se/log/session.jsonl")
+    .trim()
+    .split("\n")
+    .map((one) => JSON.parse(one));
+  assert.deepEqual(
+    rows.map((one) => one.said),
+    ["session start", "stop.hold is finish"],
+  );
 });
 
 test("a box writing at warn keeps the sidebar lines out of the log", async () => {
   const door = doorOf({ [LOCAL]: JSON.stringify({ log: { level: "warn" } }) });
   await sidebarOf(door).took({ kind: "press", key: "stop.hold" });
-  assert.equal([...door.files.files.keys()].some((one) => one.startsWith(".se/log/")), false);
+  assert.equal(
+    [...door.files.files.keys()].some((one) => one.startsWith(".se/log/")),
+    false,
+  );
 });
 
 // [[spec/design_output/extension#it-starts-silent]]
@@ -317,8 +329,16 @@ test("the extension starts nothing, and registers the view a person opens", asyn
   assert.deepEqual(door.said.marked, [["quackitect.here", true]]);
   assert.equal(door.said.quiet, 1);
   assert.deepEqual(door.said.ran, []);
-  assert.equal(door.said.watched.length, 1, "the status bar alone watches before a view opens");
-  assert.deepEqual(door.said.shown, [[]], "a tree at rest shows nothing in the status bar");
+  assert.equal(
+    door.said.watched.length,
+    1,
+    "the status bar alone watches before a view opens",
+  );
+  assert.deepEqual(
+    door.said.shown,
+    [[]],
+    "a tree at rest shows nothing in the status bar",
+  );
   assert.equal(door.said.revealed, 0, "an ordinary start reveals nothing");
 });
 
@@ -327,9 +347,16 @@ test("god mode stands in the status bar from the start, and a new hold toasts", 
   const door = doorOf({ [LOCAL]: JSON.stringify({ engine: { binding: "god" } }) });
   await activate({}, door);
   assert.deepEqual(door.said.shown, [["god"]]);
-  assert.deepEqual(door.said.toasted, [], "a state standing at the start toasts nothing");
+  assert.deepEqual(
+    door.said.toasted,
+    [],
+    "a state standing at the start toasts nothing",
+  );
 
-  door.files.write(LOCAL, JSON.stringify({ engine: { binding: "god" }, stop: { hold: "stop" } }));
+  door.files.write(
+    LOCAL,
+    JSON.stringify({ engine: { binding: "god" }, stop: { hold: "stop" } }),
+  );
   await door.said.watched[0].draw();
   assert.deepEqual(door.said.shown.at(-1), ["god", "stop"]);
   assert.deepEqual(door.said.toasted, ["stop"]);

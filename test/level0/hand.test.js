@@ -44,9 +44,10 @@ test("the box file alone on a harness names the agent off the environment", () =
   assert.equal(handOf(it), `box ${ID} · claude-code-remote`);
 });
 
-test("the box file alone off a harness names the person by their git author name", () => {
+// A tracked file holds no person's name, and git carries who wrote the commit. [[spec/guidance/voice]]
+test("the box file alone off a harness names the role, and no person", () => {
   const it = box({}, { agent: false, env: {} });
-  assert.equal(handOf(it), "person Ada");
+  assert.equal(handOf(it), "person");
 });
 
 test("a helper's hold takes a file name of its own, beside the session's", () => {
@@ -85,15 +86,29 @@ test("the spawn hook's line names a helper as the session's own hand", async () 
 
 // [[spec/design_output/pull#a-hand-of-its-own]]
 test("the registered spawn hook puts the line at the head of a helper's prompt", async () => {
-  const said = await spawnsWith({ prompt: "work one step" }, { id: "s7", harness: "claude-code" });
-  assert.match(said.prompt, /^You are the hand of session s7/, "the line opens the prompt");
+  const said = await spawnsWith(
+    { prompt: "work one step" },
+    { id: "s7", harness: "claude-code" },
+  );
+  assert.match(
+    said.prompt,
+    /^You are the hand of session s7/,
+    "the line opens the prompt",
+  );
   assert.match(said.prompt, /work one step$/, "and the prompt stands under it");
 });
 
 // [[spec/design_output/pull#a-hand-of-its-own]]
 test("a spawn the wrapper makes itself carries no tag", async () => {
-  const said = await spawnsWith({ prompt: "the engine wrote this", own: true }, { id: "s7" });
-  assert.equal(said.prompt, "the engine wrote this", "its own hand reads the prompt as written");
+  const said = await spawnsWith(
+    { prompt: "the engine wrote this", own: true },
+    { id: "s7" },
+  );
+  assert.equal(
+    said.prompt,
+    "the engine wrote this",
+    "its own hand reads the prompt as written",
+  );
 });
 
 // [[spec/design_output/pull#a-hand-of-its-own]]

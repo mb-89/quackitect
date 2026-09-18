@@ -23,7 +23,9 @@ test("an exact edit lands where the text stands once", () => {
 });
 
 test("text standing twice refuses the whole manifest", () => {
-  const took = applied(held("beta and beta\n"), [{ file: "one.md", old: "beta", new: "x" }]);
+  const took = applied(held("beta and beta\n"), [
+    { file: "one.md", old: "beta", new: "x" },
+  ]);
   assert.equal(took.ok, false);
   assert.match(took.why, /stands 2 times/);
 
@@ -64,7 +66,10 @@ test("bytes stand as they arrive", () => {
 });
 
 test("create refuses a file that stands, and write takes it", () => {
-  assert.equal(applied(held("alpha\n"), [{ file: "one.md", op: "create", new: "x" }]).ok, false);
+  assert.equal(
+    applied(held("alpha\n"), [{ file: "one.md", op: "create", new: "x" }]).ok,
+    false,
+  );
   const wrote = applied(held("alpha\n"), [{ file: "one.md", op: "write", new: "x" }]);
   assert.equal(wrote.files[0].made, "x");
 });
@@ -90,11 +95,13 @@ test("a pattern matching nothing refuses, and expect_count holds", () => {
 
 test("append and prepend leave the rest alone", () => {
   assert.equal(
-    applied(held("body\n"), [{ file: "one.md", op: "append", new: "end\n" }]).files[0].made,
+    applied(held("body\n"), [{ file: "one.md", op: "append", new: "end\n" }]).files[0]
+      .made,
     "body\nend\n",
   );
   assert.equal(
-    applied(held("body\n"), [{ file: "one.md", op: "prepend", new: "top\n" }]).files[0].made,
+    applied(held("body\n"), [{ file: "one.md", op: "prepend", new: "top\n" }]).files[0]
+      .made,
     "top\nbody\n",
   );
 });
@@ -103,10 +110,17 @@ test("the files a manifest names come back once each", () => {
   assert.deepEqual(filesIn([{ file: "a" }, { file: "b" }, { file: "a" }]), ["a", "b"]);
 });
 
-const LANDED = applied(held("alpha\n"), [{ file: "one.md", old: "alpha", new: "beta" }]);
+const LANDED = applied(held("alpha\n"), [
+  { file: "one.md", old: "alpha", new: "beta" },
+]);
 
 test("the journal holds both halves", () => {
-  const entry = journalOf("2026-09-11T10:00:00.000Z", "a rename", "level0", LANDED.files);
+  const entry = journalOf(
+    "2026-09-11T10:00:00.000Z",
+    "a rename",
+    "level0",
+    LANDED.files,
+  );
   assert.equal(entry.files[0].was, "alpha\n");
   assert.equal(entry.files[0].made, "beta\n");
   assert.equal(entry.on, "a rename");
@@ -125,8 +139,15 @@ test("an entry names its time, and the newest sorts last", () => {
 });
 
 test("drift refuses the whole restore", () => {
-  const entry = journalOf("2026-09-11T10:00:00.000Z", "a rename", "level0", LANDED.files);
-  const moved = restores(entry, { "one.md": { exists: true, text: "somebody else\n" } });
+  const entry = journalOf(
+    "2026-09-11T10:00:00.000Z",
+    "a rename",
+    "level0",
+    LANDED.files,
+  );
+  const moved = restores(entry, {
+    "one.md": { exists: true, text: "somebody else\n" },
+  });
   assert.equal(moved.ok, false);
   assert.match(moved.why, /moves since the apply/);
 
@@ -137,7 +158,12 @@ test("drift refuses the whole restore", () => {
 
 test("a file the apply made comes out rather than back", () => {
   const born = applied({}, [{ file: "new.md", op: "create", new: "hello\n" }]);
-  const entry = journalOf("2026-09-11T10:00:00.000Z", "a new note", "level0", born.files);
+  const entry = journalOf(
+    "2026-09-11T10:00:00.000Z",
+    "a new note",
+    "level0",
+    born.files,
+  );
   const said = restores(entry, { "new.md": { exists: true, text: "hello\n" } });
   assert.deepEqual(said.removes, ["new.md"]);
   assert.equal(said.writes.length, 0);

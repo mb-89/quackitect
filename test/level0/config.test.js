@@ -207,9 +207,12 @@ test("a text coerces to the type the schema says", () => {
 });
 
 test("a flat reading skips a comment and holds every leaf", () => {
-  assert.deepEqual([...flatten(TREE)], [
-    ["stop.enabled", true],
-    ["stop.mostInARow", 3],
-    ["log.level", "info"],
-  ]);
+  assert.deepEqual(
+    [...flatten(TREE)],
+    [
+      ["stop.enabled", true],
+      ["stop.mostInARow", 3],
+      ["log.level", "info"],
+    ],
+  );
 });

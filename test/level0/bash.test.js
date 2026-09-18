@@ -137,7 +137,10 @@ test("a script naming its path on one line and writing on another is refused, an
     "PY",
   ].join("\n");
   const found = writesAPath(python);
-  assert.deepEqual(found.map((one) => one.path), ["spec/tickets/a-thing.md"]);
+  assert.deepEqual(
+    found.map((one) => one.path),
+    ["spec/tickets/a-thing.md"],
+  );
   assert.equal(found[0].how, "a heredoc into python");
 
   const node = [
@@ -149,10 +152,20 @@ test("a script naming its path on one line and writing on another is refused, an
   ].join("\n");
   assert.deepEqual(paths(node), ["src/scripts/cli.js"]);
 
-  const reading = ["python - <<'PY'", "p = 'spec/guidance/voice.md'", "print(open(p).read())", "PY"].join("\n");
+  const reading = [
+    "python - <<'PY'",
+    "p = 'spec/guidance/voice.md'",
+    "print(open(p).read())",
+    "PY",
+  ].join("\n");
   assert.deepEqual(paths(reading), [], "a read names no write");
 
-  const elsewhere = ["python - <<'PY'", "p = '/tmp/out.md'", "open(p, 'w').write('x')", "PY"].join("\n");
+  const elsewhere = [
+    "python - <<'PY'",
+    "p = '/tmp/out.md'",
+    "open(p, 'w').write('x')",
+    "PY",
+  ].join("\n");
   assert.deepEqual(paths(elsewhere), [], "a path the rules leave alone passes");
 });
 
@@ -217,7 +230,9 @@ test("a git add naming a path under .se refuses, with -f or without", () => {
   assert.deepEqual(addsIn("git add -f .se/notes/one.md"), [".se/notes/one.md"]);
   assert.deepEqual(addsIn("git add .se/notes/one.md"), [".se/notes/one.md"]);
   assert.deepEqual(addsIn("git add --force .se/HANDOVER.md"), [".se/HANDOVER.md"]);
-  assert.deepEqual(addsIn("cd x && git stage .se/log/session.jsonl"), [".se/log/session.jsonl"]);
+  assert.deepEqual(addsIn("cd x && git stage .se/log/session.jsonl"), [
+    ".se/log/session.jsonl",
+  ]);
   assert.deepEqual(rules("git add -f .se/notes/one.md"), ["PrivateStaysHome"]);
 });
 

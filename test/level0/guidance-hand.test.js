@@ -6,11 +6,11 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { standingLayer } from "../../.claude/skills/level0/lib/guidance.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
-import { standingLayer } from "../../.claude/skills/level0/lib/guidance.js";
 import { heldReads } from "../../src/scripts/guidance-hand.js";
 import { work } from "../../src/scripts/work.js";
 import { SCHEMA } from "./pull-schema.js";
@@ -291,7 +291,10 @@ test("the standing verb drops the note the hand --as names already reads", async
     { name: "working.md", text: WORKING },
   ];
 
-  const said = standingLayer(notes, heldReads({ ...it, root: ROOT }, ["--as", "helper-2"]));
+  const said = standingLayer(
+    notes,
+    heldReads({ ...it, root: ROOT }, ["--as", "helper-2"]),
+  );
 
   assert.ok(!/Say what is\./.test(said), "the held step's note leaves the layer");
   assert.match(said, /Answer the owner first\./);

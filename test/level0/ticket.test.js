@@ -8,8 +8,8 @@ import { readNote, readYaml } from "../../.claude/skills/level0/lib/schema.js";
 import {
   engineRows,
   placesIn,
-  refusedTicket,
   queueHolds,
+  refusedTicket,
   ticketFaults,
 } from "../../.claude/skills/level0/lib/ticket.js";
 
@@ -126,7 +126,10 @@ test("a write to the discussion stands, at any state", () => {
 
 // [[spec/design_output/schema#the-three-places]]
 test("a write to the ask stands at any state, so a hand fixes what the rules refuse", () => {
-  assert.deepEqual(weighed(open.replace("What it asks for.", "What it asks for now.")), []);
+  assert.deepEqual(
+    weighed(open.replace("What it asks for.", "What it asks for now.")),
+    [],
+  );
 
   const draft = open.replace("state: open", "state: draft");
   assert.deepEqual(
@@ -141,10 +144,18 @@ test("a write to the ask stands at any state, so a hand fixes what the rules ref
 });
 
 test("a section written by one state alone refuses the others", () => {
-  const drafted = readYaml(String(SCHEMA_TEXT).replace("x-written: anyone\n      description: what this ticket asks for", "x-written: draft\n      description: what this ticket asks for"));
+  const drafted = readYaml(
+    String(SCHEMA_TEXT).replace(
+      "x-written: anyone\n      description: what this ticket asks for",
+      "x-written: draft\n      description: what this ticket asks for",
+    ),
+  );
   const said = open.replace("What it asks for.", "What it really asks for.");
   const found = ticketFaults(open, said, drafted, WHERE);
-  assert.deepEqual(found.map((one) => one.rule), ["Ticket.Ask"]);
+  assert.deepEqual(
+    found.map((one) => one.rule),
+    ["Ticket.Ask"],
+  );
   assert.match(found[0].message, /is the engine's to write/);
 });
 
@@ -157,10 +168,19 @@ test("a write to a phase's chapter is refused", () => {
 // [[spec/design_output/schema#the-three-places]]
 test("two leaves naming one field alike stand apart, so a write beside them passes", () => {
   const twice = open
-    .replace("# implement\n", "# implement\n\n## first\n\n### tests\n\n<!-- the first -->\n")
-    .replace("# Discussion", "## second\n\n### tests\n\n<!-- the second -->\n\n# Discussion");
+    .replace(
+      "# implement\n",
+      "# implement\n\n## first\n\n### tests\n\n<!-- the first -->\n",
+    )
+    .replace(
+      "# Discussion",
+      "## second\n\n### tests\n\n<!-- the second -->\n\n# Discussion",
+    );
   assert.deepEqual(weighed(twice, twice), []);
-  assert.deepEqual(weighed(twice.replace("### lint\n", "### lint\n\nnpm test\n"), twice), []);
+  assert.deepEqual(
+    weighed(twice.replace("### lint\n", "### lint\n\nnpm test\n"), twice),
+    [],
+  );
 });
 
 // [[spec/design_output/schema#the-three-places]]
@@ -212,7 +232,10 @@ test("the places answer the ask, the step's fields and the discussion, at any st
 // [[spec/design_output/schema#the-three-places]]
 test("a ticket standing at no leaf of its route offers a hand no field", () => {
   const said = open.replace("step: implement/change", "step: nowhere");
-  assert.deepEqual([...placesIn(readNote(said), SCHEMA).keys()], ["1 Ask", "1 Discussion"]);
+  assert.deepEqual(
+    [...placesIn(readNote(said), SCHEMA).keys()],
+    ["1 Ask", "1 Discussion"],
+  );
 });
 
 // [[spec/design_output/schema#the-three-places]]
@@ -248,8 +271,7 @@ test("the record draws a line under its leaf, and one under a command field", ()
   assert.deepEqual(engineRows(readNote(recorded), SCHEMA), [
     {
       key: "2 change",
-      said:
-        "The hand is `a box, a session and an agent`, and the branch runs `abc1234` to `def5678`, and this leaf returns 1.",
+      said: "The hand is `a box, a session and an agent`, and the branch runs `abc1234` to `def5678`, and this leaf returns 1.",
     },
     {
       key: "3 lint",
@@ -264,7 +286,10 @@ test("a skipped leaf draws the reason the pull passes it over", () => {
     .replace("    returns: 1", "    skipped: true\n    why: the box runs on a desk")
     .replace(/ {4}answered:\n(?: {6}.*\n| {8}.*\n)+/, "");
   assert.deepEqual(engineRows(readNote(said), SCHEMA), [
-    { key: "2 change", said: "The pull skips this leaf, because the box runs on a desk." },
+    {
+      key: "2 change",
+      said: "The pull skips this leaf, because the box runs on a desk.",
+    },
   ]);
 });
 
@@ -306,10 +331,7 @@ test("the refusal names the finding and the three places", () => {
     /^The ticket door refuses this write to spec\/tickets\/a-name\.md\./,
   );
   assert.match(said, /Ticket\.state/);
-  assert.match(
-    said,
-    /the ask, the fields of the step it holds, and the discussion/,
-  );
+  assert.match(said, /the ask, the fields of the step it holds, and the discussion/);
 });
 
 // [[spec/design_output/stop#the-mechanical-checks]]
@@ -319,8 +341,16 @@ test("the queue holds work where a free open ticket has a leaf a hand takes, or 
   assert.equal(queueHolds([free("open")]), true, "an open free ticket");
   assert.equal(queueHolds([free("draft")]), false, "a draft waits for its open");
   assert.equal(queueHolds([free("closed")]), false, "a closed one is done");
-  assert.equal(queueHolds([free("open", "person")]), false, "a person step is nobody's on this box");
-  assert.equal(queueHolds([free("open", "anyone", "group: some-group\n")]), false, "a child rides its group");
+  assert.equal(
+    queueHolds([free("open", "person")]),
+    false,
+    "a person step is nobody's on this box",
+  );
+  assert.equal(
+    queueHolds([free("open", "anyone", "group: some-group\n")]),
+    false,
+    "a child rides its group",
+  );
   const group = (urgency) =>
     `---\nkind: [[ticket]]\nstate: open\nurgency: ${urgency}\nprocess: [[spec/processes/group]]\nsteps:\n  - name: split\n---\n\n# Ask\n\nA group.\n`;
   assert.equal(queueHolds([group("soon")]), false, "a group at soon is the cloud's");

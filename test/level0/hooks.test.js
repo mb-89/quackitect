@@ -5,8 +5,8 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { wholeAfter } from "../../src/bridge/write.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 const PATH = "/tree/spec/vocabulary/terms.yml";
 const WAS = [

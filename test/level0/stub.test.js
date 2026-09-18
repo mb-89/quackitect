@@ -4,17 +4,17 @@
 
 import assert from "node:assert/strict";
 import test from "node:test";
-import { fakeClock } from "../../src/doors/fake/clock.js";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { fakeGit } from "../../src/doors/fake/git.js";
 import {
   brandOf,
   linkOf,
-  settingsOf,
   STUB_FOLDERS,
+  settingsOf,
   stubFiles,
   upstreamOf,
 } from "../../.claude/skills/level0/lib/vehicle.js";
+import { fakeClock } from "../../src/doors/fake/clock.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeGit } from "../../src/doors/fake/git.js";
 import { stubInto } from "../../src/scripts/stub.js";
 import { roadsOf } from "../../src/stub/.claude/skills/level0/hooks/bridgehead.js";
 
@@ -44,7 +44,14 @@ function vehicle() {
 }
 
 function origin(url) {
-  return fakeGit({ [REMOTE]: url ? { stdout: `${url}\n` } : { exitCode: 2, stderr: "error: No such remote 'origin'" } }, "/tools");
+  return fakeGit(
+    {
+      [REMOTE]: url
+        ? { stdout: `${url}\n` }
+        : { exitCode: 2, stderr: "error: No such remote 'origin'" },
+    },
+    "/tools",
+  );
 }
 
 function walk(files, at, rel = "") {
@@ -64,13 +71,22 @@ test("the brand is the folder the vehicle stands in", () => {
 });
 
 test("the upstream is what --upstream names, else the remote, else nothing", () => {
-  assert.equal(upstreamOf("git@host:a/b.git\n", "https://host/c/d"), "https://host/c/d");
+  assert.equal(
+    upstreamOf("git@host:a/b.git\n", "https://host/c/d"),
+    "https://host/c/d",
+  );
   assert.equal(upstreamOf("git@host:a/b.git\n", ""), "git@host:a/b.git");
   assert.equal(upstreamOf("", undefined), "");
 });
 
 test("the record carries the identity, the name, the upstream, the version and when", () => {
-  const said = linkOf("abc123", "acme", "git@host:a/b.git", "0.1.0", "2026-01-01T00:00:00.000Z");
+  const said = linkOf(
+    "abc123",
+    "acme",
+    "git@host:a/b.git",
+    "0.1.0",
+    "2026-01-01T00:00:00.000Z",
+  );
   assert.deepEqual(said, {
     vehicle: "abc123",
     name: "acme",
@@ -82,14 +98,19 @@ test("the record carries the identity, the name, the upstream, the version and w
 
 test("the settings keep every tracked key and drop every comment", () => {
   const said = settingsOf(SETTINGS);
-  assert.deepEqual(Object.keys(said).sort(), ["env", "permissions", "skipAutoPermissionPrompt"]);
+  assert.deepEqual(Object.keys(said).sort(), [
+    "env",
+    "permissions",
+    "skipAutoPermissionPrompt",
+  ]);
   assert.deepEqual(said.env, { CLAUDE_CODE_ENABLE_FUNCTION_HOOKS: "1" });
   assert.deepEqual(settingsOf("not json"), {});
 });
 
 test("the list names the folders, the record, the settings and the template", () => {
   const said = stubFiles(["RUNME.sh", `${PLUGIN}/hooks/hooks.json`]);
-  for (const folder of STUB_FOLDERS) assert.ok(said.includes(`${folder}/.gitkeep`), folder);
+  for (const folder of STUB_FOLDERS)
+    assert.ok(said.includes(`${folder}/.gitkeep`), folder);
   assert.ok(said.includes("vehicle.json"));
   assert.ok(said.includes(".claude/settings.json"));
   assert.ok(said.includes("RUNME.sh"));
@@ -99,21 +120,44 @@ test("the list names the folders, the record, the settings and the template", ()
 
 test("a stub holds every file the list names, and nothing else", () => {
   const files = vehicle();
-  const said = stubInto(files, origin("git@host:a/b.git"), fakeClock(), "/tools", "/stub");
+  const said = stubInto(
+    files,
+    origin("git@host:a/b.git"),
+    fakeClock(),
+    "/tools",
+    "/stub",
+  );
   assert.equal(said.ok, true, said.why);
   assert.deepEqual(walk(files, "/stub"), [...said.files].sort());
   for (const one of said.files) assert.ok(files.exists(`/stub/${one}`), one);
-  assert.equal(files.read(`/stub/${MARKER}`), files.read(`/tools/src/stub/${MARKER}`), "the plugin is the template's");
-  assert.notEqual(files.read(`/stub/${MARKER}`), files.read(`/tools/${MARKER}`), "the method's marker stays behind");
+  assert.equal(
+    files.read(`/stub/${MARKER}`),
+    files.read(`/tools/src/stub/${MARKER}`),
+    "the plugin is the template's",
+  );
+  assert.notEqual(
+    files.read(`/stub/${MARKER}`),
+    files.read(`/tools/${MARKER}`),
+    "the method's marker stays behind",
+  );
   assert.equal(files.exists("/stub/src/scripts"), false, "the verbs stay behind");
   assert.ok(files.runs.has("/stub/RUNME.sh"), "the shim carries its run bit");
   assert.equal(files.read("/stub/RUNME.sh"), "the shim");
-  assert.equal(files.read(`/stub/${PLUGIN}/hooks/bridgehead.js`), "export function register() {}");
+  assert.equal(
+    files.read(`/stub/${PLUGIN}/hooks/bridgehead.js`),
+    "export function register() {}",
+  );
 });
 
 test("the record reads off the register and the remote", () => {
   const files = vehicle();
-  const said = stubInto(files, origin("git@host:a/b.git"), fakeClock(), "/tools", "/stub");
+  const said = stubInto(
+    files,
+    origin("git@host:a/b.git"),
+    fakeClock(),
+    "/tools",
+    "/stub",
+  );
   assert.equal(said.ok, true, said.why);
   const record = JSON.parse(files.read("/stub/vehicle.json"));
   assert.equal(record.vehicle, "abc123", "the identity off the register entry");
@@ -139,12 +183,21 @@ test("--upstream goes past the refusal, and the record carries it", () => {
     upstream: "https://host/c/d.git",
   });
   assert.equal(said.ok, true, said.why);
-  assert.equal(JSON.parse(files.read("/stub/vehicle.json")).upstream, "https://host/c/d.git");
+  assert.equal(
+    JSON.parse(files.read("/stub/vehicle.json")).upstream,
+    "https://host/c/d.git",
+  );
 });
 
 test("a stub lands in the vehicle nowhere", () => {
   const files = vehicle();
-  const said = stubInto(files, origin("git@host:a/b.git"), fakeClock(), "/tools", "/tools");
+  const said = stubInto(
+    files,
+    origin("git@host:a/b.git"),
+    fakeClock(),
+    "/tools",
+    "/tools",
+  );
   assert.equal(said.ok, false);
   assert.equal(files.exists("/tools/vehicle.json"), false);
 });

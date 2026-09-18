@@ -64,7 +64,9 @@ test("a changed test file leaves the binary standing", () => {
 
 test("a failed build with no binary answers no viewer and says why", () => {
   const disk = source();
-  const proc = fakeProc({ [BUILD]: { exitCode: 1, stderr: "main.go:1: syntax error\n" } });
+  const proc = fakeProc({
+    [BUILD]: { exitCode: 1, stderr: "main.go:1: syntax error\n" },
+  });
   assert.deepEqual(viewerOf({ disk, proc, root: ROOT }), {
     exe: "",
     why: "main.go:1: syntax error",
@@ -75,10 +77,15 @@ test("a failed build with no binary answers no viewer and says why", () => {
 test("a failed build over an old binary runs the old one and says why", () => {
   const disk = source();
   disk.write(EXE, "old binary");
-  const proc = fakeProc({ [BUILD]: { exitCode: 1, stderr: "main.go:1: syntax error" } });
+  const proc = fakeProc({
+    [BUILD]: { exitCode: 1, stderr: "main.go:1: syntax error" },
+  });
   const said = viewerOf({ disk, proc, root: ROOT });
   assert.equal(said.exe, EXE);
-  assert.match(said.why, /^the build fails, so the last one runs: main\.go:1: syntax error$/);
+  assert.match(
+    said.why,
+    /^the build fails, so the last one runs: main\.go:1: syntax error$/,
+  );
 });
 
 test("a box with no go answers no viewer and names the missing program", () => {
@@ -88,7 +95,10 @@ test("a box with no go answers no viewer and names the missing program", () => {
       throw new Error("spawnSync go ENOENT");
     },
   });
-  assert.deepEqual(viewerOf({ disk, proc, root: ROOT }), { exe: "", why: "spawnSync go ENOENT" });
+  assert.deepEqual(viewerOf({ disk, proc, root: ROOT }), {
+    exe: "",
+    why: "spawnSync go ENOENT",
+  });
 });
 
 test("a Windows box builds logview.exe", () => {

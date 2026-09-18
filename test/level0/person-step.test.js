@@ -9,6 +9,7 @@ import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
+import { onward } from "../../src/scripts/pull-writes.js";
 import { unblockPrompt } from "../../src/scripts/spawn.js";
 import { work } from "../../src/scripts/work.js";
 import { SCHEMA } from "./pull-schema.js";
@@ -144,6 +145,38 @@ test("the pull names the mint, the open and the unblock where a person's step is
     "the answer hands the question out",
   );
   assert.match(said, /branch done/, "the answer lands the rest of the group");
+});
+
+// [[spec/design_output/pull#the-hand-rule]]
+test("a hand the owner sends takes a person's step, and the record names both", () => {
+  const it = doors();
+  const { said } = heard(() => work(ROOT, ["pull", "--owner-says"], it));
+
+  assert.match(said, /a-child at design\/person-1/, "the hand the owner sends takes the step");
+  assert.doesNotMatch(said, /waits for a person/);
+
+  const folder = join(ROOT, ".se", "hold");
+  const held = it.disk
+    .list(folder)
+    .map((one) => it.disk.read(join(folder, one.name)))
+    .join("\n");
+  assert.match(held, /the owner says so/, "the record names the hand and the word behind it");
+});
+
+// The hold a hand writes carries its name, so a word that outlives its step leaves an orphan. [[spec/design_output/pull#the-hand-rule]]
+test("the owner's word covers one step, and the hand after it reads plain", () => {
+  const it = { ...doors(), root: ROOT };
+  it.ownerSays = true;
+  const who = {
+    hand: "box one · the owner says so",
+    plainHand: "box one",
+    oneStep: true,
+  };
+
+  heard(() => onward(it, who, ["a-child passes design/person-1."]));
+
+  assert.equal(who.hand, "box one", "the hand after it reads plain");
+  assert.equal(it.ownerSays, false, "the word reaches no leaf past its own");
 });
 
 // The verb refuses a successor opening under any other hand, so the route it names opens under a person. [[spec/design_output/work#a-person-step-leaves]]

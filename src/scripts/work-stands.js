@@ -1,0 +1,297 @@
+// What every work verb reads before it moves a thing: the status a note
+// carries, the branches standing, and the trunk coming in. The verbs stand in
+// work.js and work-merge.js beside this file.
+// [[spec/design_output/work#a-group-is-a-ticket]]
+
+import { isTagged, reaches } from "../../.claude/skills/level0/lib/todo.js";
+import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
+import { CONTRACT_HEADING, contractRows } from "./branch-usage.js";
+import {
+  CLOSED,
+  fieldOf,
+  GROUP,
+  heldIn,
+  isGroup,
+  NOTE_END,
+  TICKETS,
+  ticketAt,
+  ticketNamed,
+  WORK_BRANCH,
+} from "./group.js";
+
+export const BRIEF = "HANDOVER.md";
+export const COL = { branch: 34, child: 32, kind: 6, status: 6, why: 24 };
+export const MS = 1000;
+// [[spec/design_output/work#a-merged-branch-closes]]
+export const MINE = /^(work|claude)\//;
+export const TODO = "todo";
+export const HELD = "held";
+
+// [[spec/design_output/work#the-routine-a-verb-names]]
+export const ROUTINE = { name: "do_work", id: "trig_01EenLoDAB3NdmANnRM9mSh6" };
+export const DONE = "done";
+export const MERGED = "merged";
+
+export function statusOf(text) {
+  const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(String(text ?? ""));
+  if (!front) return "";
+  const said = /^status:\s*(\S+)\s*$/m.exec(front[1]);
+  return said ? said[1].toLowerCase() : "";
+}
+
+export const URGENCY = ["now", "soon", "whenever"];
+
+// [[spec/design_output/work#urgency-and-what-waits]]
+export function urgencyOf(text) {
+  const said = frontField(text, "urgency").toLowerCase();
+  return URGENCY.includes(said) ? said : "soon";
+}
+
+export function dependsOn(text) {
+  const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(String(text ?? ""));
+  if (!front) return [];
+
+  const out = [];
+  let reading = false;
+  for (const row of front[1].split(/\r?\n/)) {
+    const opens = /^depends_on:\s*(.*)$/.exec(row);
+    if (opens) {
+      reading = true;
+      for (const one of opens[1].split(",")) out.push(one);
+      continue;
+    }
+    if (!reading) continue;
+    const item = /^\s*-\s+(.*)$/.exec(row);
+    if (item) {
+      out.push(item[1]);
+      continue;
+    }
+    if (row.trim()) reading = false;
+  }
+  return out.map(named).filter(Boolean);
+}
+
+// [[spec/design_output/work#urgency-and-what-waits]]
+export function named(said) {
+  return String(said)
+    .trim()
+    .replace(/^\[|\]$/g, "")
+    .trim()
+    .replace(/^["']|["']$/g, "")
+    .trim()
+    .replace(/^work\//, "");
+}
+
+export function frontField(text, key) {
+  const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(String(text ?? ""));
+  if (!front) return "";
+  const said = new RegExp(`^${key}:\\s*(.+?)\\s*$`, "m").exec(front[1]);
+  return said ? said[1] : "";
+}
+
+// [[spec/design_output/work#a-dependency-waits-for-trunk]]
+export function waitingOn(text, standing) {
+  return dependsOn(text).filter((name) => {
+    const status = standing.get(`work/${name}`);
+    return status === TODO || status === HELD || status === DONE;
+  });
+}
+
+export function standingOf(briefs, merged = new Set()) {
+  return new Map(
+    [...briefs].map(([branch, text]) => [
+      branch,
+      merged.has(branch) ? MERGED : statusOf(text),
+    ]),
+  );
+}
+
+export function mergedHere(it) {
+  return new Set(
+    it.git
+      .run(["branch", "-r", "--merged", `origin/${TRUNK}`], true)
+      .out.split("\n")
+      .map((row) => row.trim().replace("origin/", ""))
+      .filter((row) => MINE.test(row)),
+  );
+}
+
+// [[spec/design_output/work#held-derives-from-the-record]]
+export function groupStanding(text) {
+  if (!text) return "";
+  if (fieldOf(text, "state") === CLOSED) return DONE;
+  return heldIn(text) ? HELD : TODO;
+}
+
+// [[spec/design_output/work#a-group-is-a-ticket]]
+export function standOf(it) {
+  return branches(it).map((branch) => {
+    // [[spec/design_output/work#a-brief-drains-first]]
+    const name = branch.replace(/^work\//, "");
+    const brief = briefOf(it, branch);
+    const ticket = brief ? "" : textAt(it, `origin/${branch}`, ticketAt(name));
+    return { branch, name, brief, ticket: isGroup(ticket) ? ticket : "" };
+  });
+}
+
+// [[spec/design_output/work#held-derives-from-the-record]]
+export function standingAll(stand, merged) {
+  return new Map(
+    stand.map((one) => [
+      one.branch,
+      merged.has(one.branch)
+        ? MERGED
+        : one.brief
+          ? statusOf(one.brief)
+          : groupStanding(one.ticket),
+    ]),
+  );
+}
+
+export function noteOf(one) {
+  return one.brief || one.ticket;
+}
+
+export function textAt(it, ref, path) {
+  const said = it.git.run(["show", `${ref}:${path}`], true);
+  return said.ok ? `${said.out}\n` : "";
+}
+
+export function workBranchHere(it, verb) {
+  const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
+  if (branch.startsWith(WORK_BRANCH)) return branch;
+  console.error(`branch ${verb} runs on a work branch, and this is ${branch}.`);
+  return "";
+}
+
+// [[spec/design_output/work#the-merge-frees-the-tickets]]
+export function ticketsOn(it, ref) {
+  const said = it.git.run(["ls-tree", "-r", "--name-only", ref, `${TICKETS}/`], true);
+  if (!said.ok) return [];
+  return said.out
+    .split("\n")
+    .filter((path) => path.endsWith(NOTE_END))
+    .map((path) => ({ path, name: ticketNamed(path), text: textAt(it, ref, path) }));
+}
+
+export function setStatus(text, to) {
+  const said = String(text ?? "");
+  if (/^---\r?\n[\s\S]*?\r?\n---/.test(said)) {
+    if (/^status:\s*\S+\s*$/m.test(said)) {
+      return said.replace(/^status:\s*\S+\s*$/m, `status: ${to}`);
+    }
+    return said.replace(/^---\r?\n/, `---\nstatus: ${to}\n`);
+  }
+  return `---\nkind: [[handover]]\nstatus: ${to}\n---\n\n${said.trimStart()}`;
+}
+
+export function branches(it) {
+  it.git.run(["fetch", "--prune", "origin"], true);
+  const said = it.git.run(["ls-remote", "--heads", "origin", "work/*"], true);
+  return said.out
+    .split("\n")
+    .filter(Boolean)
+    .map((row) => row.split("\t")[1].replace("refs/heads/", ""));
+}
+
+export function briefOf(it, branch) {
+  const said = it.git.run(["show", `origin/${branch}:${BRIEF}`], true);
+  return said.ok ? said.out : "";
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+export function dirty(it) {
+  const left = standingIn(it).filter((one) => !one.parked);
+  if (!left.length) return false;
+  console.error("This tree carries uncommitted changes, so no branch may move.");
+  console.error("Commit them, or stash them, and run this again.");
+  return true;
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+export function standingIn(it) {
+  const said = it.git.run(["status", "--porcelain"], true).out;
+  return said
+    .split("\n")
+    .filter(Boolean)
+    .map((row) => {
+      const name = changedIn(row);
+      return { name, parked: parkedHere(it, name) };
+    });
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+export function changedIn(row) {
+  const found = /^\s*\S{1,2}\s+(.*)$/.exec(String(row));
+  const said = (found ? found[1] : String(row)).trim();
+  const moved = said.split(" -> ");
+  return (moved.at(-1) ?? said).replace(/^"|"$/g, "");
+}
+
+// [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+export function parkedHere(it, name) {
+  if (!reaches(name)) return false;
+  const at = it.join(it.root, ...name.split("/"));
+  return it.disk.exists(at) && isTagged(it.disk.read(at));
+}
+
+export function push(it, branch, was, why) {
+  it.disk.write(it.join(it.root, BRIEF), was);
+  it.git.run(["add", BRIEF], true);
+  it.git.run(["commit", "-m", `${branch}: ${why}`], true);
+  return it.git.run(["push", "origin", branch]).ok;
+}
+
+// [[spec/design_output/work#trunk-comes-in-first]]
+export function sync(it) {
+  const branch = workBranchHere(it, "sync");
+  if (!branch) return 2;
+
+  it.git.run(["fetch", "origin", TRUNK], true);
+  const behind = it.git.run(["rev-list", "--count", `HEAD..origin/${TRUNK}`], true).out;
+  if (behind === "0") {
+    console.log(`${branch} already carries every commit on ${TRUNK}.`);
+    return 0;
+  }
+
+  const merged = it.git.run([
+    "merge",
+    `origin/${TRUNK}`,
+    "--no-edit",
+    "-m",
+    `${branch}: take ${TRUNK} in`,
+  ]);
+  if (!merged.ok) {
+    console.error(`${TRUNK} conflicts with ${branch}. Resolve it, commit, and go on.`);
+    console.error("git status names the files. The merge belongs to you here.");
+    return 1;
+  }
+
+  console.log(`${branch} took ${behind} commit(s) from ${TRUNK}.`);
+  return 0;
+}
+
+export { CONTRACT_HEADING };
+
+// [[spec/design_output/work#every-brief-carries-the-contract]]
+export function withContract(brief) {
+  const said = String(brief ?? "").trimEnd();
+  if (said.includes(CONTRACT_HEADING)) return `${said}\n`;
+  return contractRows(said, TRUNK, BRIEF);
+}
+
+// [[spec/design_output/work#a-box-leaves]]
+export function childrenHere(it, name) {
+  const at = it.join(it.root, TICKETS);
+  if (!it.disk.exists(at)) return [];
+  return it.disk
+    .list(at)
+    .filter((one) => one.kind === "file" && one.name.endsWith(NOTE_END))
+    .map((one) => ({
+      name: ticketNamed(one.name),
+      text: it.disk.read(it.join(at, one.name)),
+    }))
+    .filter((one) => fieldOf(one.text, GROUP) === name);
+}
+
+// [[spec/design_output/work#the-battery-answers-first]]
