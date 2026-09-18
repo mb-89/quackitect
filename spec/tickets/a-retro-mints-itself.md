@@ -90,12 +90,18 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
     hash_before: ed8bb2787df33550776b3a688995e52fb3272c23
     hash_after: ed8bb2787df33550776b3a688995e52fb3272c23
+  - step: design/review
+    hand: box d42624a67d18a8 · claude-code · helper-2
+    hash_before: 2daddc687fe72a63a9e2ed398e3fce4dffb53ef9
+    hash_after: 2daddc687fe72a63a9e2ed398e3fce4dffb53ef9
+    returns: 1
+    why: the entry names no source, so the generated banner points at nothing; the command folder already carries a projection, so a refusal names the wrong source; `--as` names the hand at every other verb, so the ticket name wants its own flag; the mint prints the leaf itself, so name the pull it calls and copy no printing; the first leaf calls for `retro collect`, which stands nowhere, so say what the hand runs there; the two knobs mint two config commands, so the change carries them as well
 ---
 
 # Ask
@@ -158,6 +164,15 @@ The two knobs stand in the config as numbers, beside the other work knobs. `retr
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
+
+fail
+
+- the entry names no source, so the generated banner points at nothing
+- the command folder already carries a projection, so a refusal names the wrong source
+- `--as` names the hand at every other verb, so the ticket name wants its own flag
+- the mint prints the leaf itself, so name the pull it calls and copy no printing
+- the first leaf calls for `retro collect`, which stands nowhere, so say what the hand runs there
+- the two knobs mint two config commands, so the change carries them as well
 
 <!-- the form is verdict -->
 
