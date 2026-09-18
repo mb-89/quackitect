@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: closed
-urgency: now
+urgent: true
 steps:
   - name: answer
     does: answers the question the ask carries

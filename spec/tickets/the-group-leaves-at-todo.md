@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-urgency: now
+urgent: true
 group: the-person-step-holds
 step: design/draft
 steps:

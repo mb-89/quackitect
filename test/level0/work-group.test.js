@@ -90,7 +90,7 @@ test("a pull on trunk takes a group for a cloud box, the way branch take does", 
 });
 
 // [[spec/design_output/pull#the-engine-takes-the-branch]]
-test("a desk's pull on trunk takes a group at urgency now, and leaves one at soon to the cloud", () => {
+test("a desk's pull on trunk takes a marked group, and leaves an unmarked one to the cloud", () => {
   const urgent = doorsSaying(
     { ...groupRemote(), "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } },
     { [on("one-group")]: GROUP_NOTE, ...HAND },
@@ -99,10 +99,10 @@ test("a desk's pull on trunk takes a group at urgency now, and leaves one at soo
   assert.equal(took.code, 0, took.said);
   assert.ok(
     ranGit(urgent.outside).includes("git switch work/one-group"),
-    "urgency now takes the group",
+    "the mark takes the group",
   );
 
-  const soon = GROUP_NOTE.replace("urgency: now", "urgency: soon");
+  const soon = GROUP_NOTE.replace("urgent: true\n", "");
   const calm = doorsSaying(
     { ...groupRemote(soon), "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } },
     { [on("one-group")]: soon, ...HAND },
@@ -227,8 +227,8 @@ test("list names a group, a brief and a loose ticket, each as its own kind", () 
   const { code, said } = heard(() => work(ROOT, ["list"], it));
 
   assert.equal(code, 0);
-  assert.match(said, /work\/one-group\s+group\s+held\s+now\s+3h/);
-  assert.match(said, /a-loose-one\s+ticket\s+open\s+soon/);
+  assert.match(said, /work\/one-group\s+group\s+held\s+urgent\s+3h/);
+  assert.match(said, /a-loose-one\s+ticket\s+open/);
   assert.doesNotMatch(said, /^one-group\s+ticket/m, "a group is no loose ticket");
 });
 
@@ -270,8 +270,8 @@ test("a group row carries a row per ticket naming it, off the branch tip", () =>
 });
 
 // [[spec/design_output/work#a-ticket-under-its-group]]
-test("a brief carries no ticket row, and a child naming no step says its urgency", () => {
-  const brief = "---\nstatus: todo\nurgency: whenever\n---\n\n# Do the thing\n";
+test("a brief carries no ticket row, and a child naming no step says its mark", () => {
+  const brief = "---\nstatus: todo\n---\n\n# Do the thing\n";
   const { it } = doorsSaying({
     ...groupRemote(),
     "git ls-remote --heads origin work/*": { stdout: "aaa\trefs/heads/work/a-brief\n" },
@@ -293,8 +293,8 @@ test("a brief carries no ticket row, and a child naming no step says its urgency
   );
   assert.equal(
     whyOf(CHILD("one-group", "open").replace(/steps:[\s\S]*?\n---/, "---")),
-    "soon",
-    "a ticket naming no step falls back to its urgency",
+    "",
+    "a ticket naming no step and carrying no mark says nothing",
   );
 });
 

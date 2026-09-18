@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-urgency: now
+urgent: true
 step: field
 steps:
   - name: collect

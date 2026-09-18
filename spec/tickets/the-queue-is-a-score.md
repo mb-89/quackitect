@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-urgency: now
+urgent: true
 depends_on: [one-urgency-stands]
 steps:
   - name: do

@@ -25,6 +25,8 @@ import {
   TICKETS,
   ticketAt,
   ticketNamed,
+  urgent,
+  URGENT,
   WORK_BRANCH,
   withEntry,
   withField,
@@ -60,8 +62,6 @@ import {
   TODO,
   textAt,
   ticketsOn,
-  URGENCY,
-  urgencyOf,
   waitingOn,
   withContract,
   workBranchHere,
@@ -205,7 +205,7 @@ function take(it, name = "") {
   const wanted = held.length ? held : free;
   wanted.sort(
     (a, b) =>
-      URGENCY.indexOf(urgencyOf(noteOf(a))) - URGENCY.indexOf(urgencyOf(noteOf(b))) ||
+      Number(urgent(noteOf(b))) - Number(urgent(noteOf(a))) ||
       a.branch.localeCompare(b.branch),
   );
 
@@ -494,7 +494,7 @@ function rowOf(it, one, standing, now) {
   const kind = one.brief ? "brief" : GROUP;
   const status = standing.get(one.branch) || "no status";
   const waits = waitingOn(text, standing);
-  const why = waits.length ? `waits for ${waits.join(", ")}` : urgencyOf(text);
+  const why = waits.length ? `waits for ${waits.join(", ")}` : markOf(text);
   // [[spec/design_output/work#a-stale-group-is-yours]]
   const { age, stale } =
     status === HELD ? staleClaim(it, one.branch, now) : { age: "", stale: false };
@@ -523,9 +523,14 @@ function stateOf(text) {
   return fieldOf(text, "state") || OPEN;
 }
 
+// The why column carries the mark where nothing waits. [[spec/design_output/work#a-row-per-group]]
+function markOf(text) {
+  return urgent(text) ? URGENT : "";
+}
+
 // [[spec/design_output/work#a-ticket-under-its-group]]
 export function whyOf(text) {
-  return stepOf(text) || urgencyOf(text);
+  return stepOf(text) || markOf(text);
 }
 
 // [[spec/design_output/work#a-row-per-group]]
@@ -534,7 +539,7 @@ function looseRows(it) {
     .filter((one) => !fieldOf(one.text, GROUP) && !isGroup(one.text))
     .map((one) => ({
       stale: false,
-      said: `${one.name.padEnd(COL.branch)} ticket ${(fieldOf(one.text, "state") || OPEN).padEnd(COL.status)} ${urgencyOf(one.text)}`,
+      said: `${one.name.padEnd(COL.branch)} ticket ${(fieldOf(one.text, "state") || OPEN).padEnd(COL.status)} ${markOf(one.text)}`,
     }));
 }
 

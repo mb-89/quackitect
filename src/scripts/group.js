@@ -11,6 +11,8 @@ export const WORK_BRANCH = "work/";
 export const GROUP = "group";
 export const OPEN = "open";
 export const CLOSED = "closed";
+// The one mark a hand reads before it takes the next thing. [[spec/design_output/work#the-mark-and-what-waits]]
+export const URGENT = "urgent";
 
 // [[spec/design_output/work#a-stale-group-is-yours]]
 export const STALE = "12h";
@@ -35,6 +37,11 @@ export function frontOf(text) {
 export function fieldOf(text, key) {
   const said = frontOf(text)[key];
   return said === undefined || said === null ? "" : bare(said);
+}
+
+// [[spec/design_output/work#the-mark-and-what-waits]]
+export function urgent(text) {
+  return fieldOf(text, URGENT) === "true";
 }
 
 // [[spec/design_output/work#a-group-is-a-ticket]]

@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-urgency: now
+urgent: true
 depends_on: [the-listing-opens-git-once, the-runtime-folder-holds-state]
 steps:
   - name: do

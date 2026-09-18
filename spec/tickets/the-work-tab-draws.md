@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-urgency: now
+urgent: true
 depends_on: [the-work-answer-lands]
 steps:
   - name: do

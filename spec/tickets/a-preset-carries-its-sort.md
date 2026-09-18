@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-urgency: now
+urgent: true
 depends_on: [the-tree-sorts-several-keys, the-queue-is-a-score]
 steps:
   - name: do

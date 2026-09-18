@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
-state: open
-urgency: now
+state: closed
+urgent: true
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-work-editor-draws
 step: do
+record:
+  - step: do
+    hand: box 4089f1b3b6bc · claude-code-remote
+    hash_before: 3929e94e5b95e74a4feae86e825aa308cef6ae5c
+    hash_after: 3929e94e5b95e74a4feae86e825aa308cef6ae5c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 96 test(s) pass in 6 file(s)
+      - name: check
+        exit: 0
+        said: 87 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -74,11 +87,15 @@ nothing.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -86,11 +103,26 @@ nothing.
 
 <!-- the form is text -->
 
+`urgency` carries a scale of words, and its middle answers order nothing. The
+field becomes one boolean mark, `urgent`, and a note carrying none reads
+unmarked. `src/scripts/group.js` owns that name, and every other place reads it:
+
+| what moves | how it reads |
+|---|---|
+| `work.js` and `pull-hand.js` | each sorts a marked note over an unmarked one |
+| the ticket schema and the handover schema | the mark stands in place of the enum, and neither asks for it |
+| every standing note | a note at `now` takes the mark, and a note under it takes nothing |
+| the `why` column of `branch list` | it prints the mark where nothing waits |
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: one mark stands, one module owns it, and every note takes it
+- the cleanup it reveals: the design chapter and the vocabulary term move to the mark
+- the mark stands in `group.js`, and every other place points at it
 
 # Discussion
 

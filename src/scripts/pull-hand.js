@@ -13,6 +13,7 @@ import {
   OPEN,
   TICKETS,
   ticketNamed,
+  urgent,
   withEntry,
   withField,
 } from "./group.js";
@@ -76,19 +77,11 @@ export function childrenOf(all, group) {
   return all.filter((one) => names.has(one.name));
 }
 
-export const URGENCY = ["now", "soon", "whenever"];
-
 export function sorted(list) {
   return [...list].sort(
     (a, b) =>
-      URGENCY.indexOf(urgency(a.text)) - URGENCY.indexOf(urgency(b.text)) ||
-      a.name.localeCompare(b.name),
+      Number(urgent(b.text)) - Number(urgent(a.text)) || a.name.localeCompare(b.name),
   );
-}
-
-export function urgency(text) {
-  const said = fieldOf(text, "urgency");
-  return URGENCY.includes(said) ? said : "soon";
 }
 
 // [[spec/design_output/pull#what-a-hand-out-reads]]
@@ -171,7 +164,7 @@ export function cutForGroups(it, all) {
   }
 }
 
-// A desk takes a group on two roads alone: the owner names it, or its urgency reads now. [[spec/design_output/pull#the-engine-takes-the-branch]]
+// A desk takes a group on two roads alone: the owner names it, or it carries the mark. [[spec/design_output/pull#the-engine-takes-the-branch]]
 export function namedGroup(it, name) {
   const one = ticketsHere(it).find((held) => !held.private && held.name === name);
   return one && isGroup(one.text) ? name : "";
@@ -183,7 +176,7 @@ export function urgentGroup(it) {
       !one.private &&
       isGroup(one.text) &&
       fieldOf(one.text, "state") === OPEN &&
-      urgency(one.text) === "now",
+      urgent(one.text),
   );
   return sorted(groups)[0]?.name ?? "";
 }

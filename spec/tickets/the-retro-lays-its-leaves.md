@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: closed
-urgency: now
+urgent: true
 depends_on: [the-retro-takes-the-box]
 steps:
   - name: design

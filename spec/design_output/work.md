@@ -122,7 +122,7 @@ all:
 | the name | the branch, or the ticket's file name |
 | the kind | `group`, `brief` or `ticket` |
 | the status | `todo`, `held`, `done` or `merged` |
-| the why | the urgency, or what it waits for |
+| the why | the mark, or what it waits for |
 | the age | the age of the tip, on a held branch |
 
 A loose ticket is one on trunk naming no group, which is backlog a person has
@@ -140,7 +140,7 @@ and the held ones together, and runs no `git show` by hand:
 | the name | the ticket's file name |
 | the kind | `ticket` |
 | the status | `open` or `closed` |
-| the why | the step it stands at, or its urgency where it names no step |
+| the why | the step it stands at, or its mark where it names no step |
 
 A brief carries no such row, because a brief names no tickets.
 
@@ -339,11 +339,11 @@ which session it is.
 `branch take` and `branch done` reach git inside the command line, so the door sees
 the verb and leaves the plumbing alone.
 
-# Urgency, and what waits
+# The mark, and what waits
 
 The frontmatter carries two more fields, and `branch take` reads both:
 
-    urgency: now
+    urgent: true
     depends_on:
       - doors-and-fakes
 
@@ -351,8 +351,8 @@ A flow list on one line, `depends_on: [a, b]`, says the same as the block
 list, with or without quotes around a name.
 
 `take` drops every branch waiting on one still at `todo`, `held` or `done`,
-then sorts the rest by urgency: `now`, `soon`, `whenever`. A branch naming no
-urgency reads as `soon`.
+then puts the marked branches first. A branch carrying no mark stands under
+them, in the order the score sets. [[spec/tickets/the-queue-is-a-score]]
 
 ## A dependency waits for trunk
 
@@ -365,9 +365,7 @@ itself in order, and each link starts from the one before it.
 `take` merges trunk in. A dependent taken before its dependency lands starts
 from a trunk carrying none of that work. It then builds that work a second time.
 
-`branch list` shows what each branch waits for, in place of its urgency.
-`setStatus` writes `urgency: soon` onto a brief carrying none, so every brief it
-mints holds to its schema. [[spec/schemas]]
+`branch list` shows what each branch waits for, in place of its mark.
 
 # The battery answers first
 

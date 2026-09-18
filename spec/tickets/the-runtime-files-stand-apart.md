@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: closed
-urgency: now
+urgent: true
 step: implement/person-1
 steps:
   - name: design

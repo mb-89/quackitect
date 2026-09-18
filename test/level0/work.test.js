@@ -19,12 +19,11 @@ import {
   setStatus,
   statusOf,
   TODO,
-  URGENCY,
-  urgencyOf,
   waitingOn,
   withContract,
   work,
 } from "../../src/scripts/work.js";
+import { urgent } from "../../src/scripts/group.js";
 import {
   doorsSaying,
   green,
@@ -57,11 +56,11 @@ test("the status moves through todo, held and done", () => {
   assert.equal(statusOf("# No frontmatter\n"), "");
 });
 
-test("urgency reads from the frontmatter, and soon is the default", () => {
-  assert.equal(urgencyOf("---\nstatus: todo\nurgency: now\n---\n"), "now");
-  assert.equal(urgencyOf("---\nstatus: todo\nurgency: whenever\n---\n"), "whenever");
-  assert.equal(urgencyOf("---\nstatus: todo\n---\n"), "soon");
-  assert.equal(urgencyOf("---\nstatus: todo\nurgency: yesterday\n---\n"), "soon");
+// [[spec/design_output/work#the-mark-and-what-waits]]
+test("the mark reads from the frontmatter, and a note carrying none reads unmarked", () => {
+  assert.equal(urgent("---\nstatus: todo\nurgent: true\n---\n"), true);
+  assert.equal(urgent("---\nstatus: todo\nurgent: false\n---\n"), false);
+  assert.equal(urgent("---\nstatus: todo\n---\n"), false);
 });
 
 test("a dependency reads as a list or on one line, with the prefix dropped", () => {
@@ -71,7 +70,7 @@ test("a dependency reads as a list or on one line, with the prefix dropped", () 
   assert.deepEqual(dependsOn("---\nstatus: todo\n---\n"), []);
 });
 
-// [[spec/design_output/work#urgency-and-what-waits]]
+// [[spec/design_output/work#the-mark-and-what-waits]]
 test("a dependency in a flow list reads without its brackets or its quotes", () => {
   assert.deepEqual(dependsOn("---\ndepends_on: [one, work/two]\n---\n"), [
     "one",
@@ -98,11 +97,12 @@ test("a branch waits for a dependency until trunk holds it", () => {
   assert.deepEqual(waitingOn(brief, standing), ["open", "busy", "ready"]);
 });
 
-test("urgency orders now before soon before whenever", () => {
-  const order = ["whenever", "now", "soon"].sort(
-    (a, b) => URGENCY.indexOf(a) - URGENCY.indexOf(b),
-  );
-  assert.deepEqual(order, ["now", "soon", "whenever"]);
+// [[spec/design_output/work#the-mark-and-what-waits]]
+test("the mark orders a marked note over an unmarked one", () => {
+  const marked = "---\nstatus: todo\nurgent: true\n---\n";
+  const bare = "---\nstatus: todo\n---\n";
+  const order = [bare, marked].sort((a, b) => Number(urgent(b)) - Number(urgent(a)));
+  assert.deepEqual(order, [marked, bare]);
 });
 
 test("close reaches a work branch and a branch the platform cut", () => {
@@ -185,7 +185,7 @@ test("list names every branch, its status and what it waits for", () => {
       stdout: "aaa\trefs/heads/work/one\nbbb\trefs/heads/work/two\n",
     },
     "git show origin/work/one:HANDOVER.md": {
-      stdout: "---\nstatus: held\nurgency: now\n---\n",
+      stdout: "---\nstatus: held\nurgent: true\n---\n",
     },
     "git show origin/work/two:HANDOVER.md": {
       stdout: "---\nstatus: todo\ndepends_on:\n  - one\n---\n",
@@ -195,7 +195,7 @@ test("list names every branch, its status and what it waits for", () => {
   const { code, said } = heard(() => work(ROOT, ["list"], it));
 
   assert.equal(code, 0);
-  assert.match(said, /work\/one\s+brief\s+held\s+now/);
+  assert.match(said, /work\/one\s+brief\s+held\s+urgent/);
   assert.match(said, /work\/two\s+brief\s+todo\s+waits for one/);
 });
 
@@ -215,14 +215,14 @@ test("list --done names the branch standing at done, and no other", () => {
 });
 
 test("take claims the urgent branch, holds it, and prints the brief", () => {
-  const brief = "---\nstatus: todo\nurgency: now\n---\n\n# Do the thing\n";
+  const brief = "---\nstatus: todo\nurgent: true\n---\n\n# Do the thing\n";
   const { it, outside, disk } = doorsSaying(
     {
       "git ls-remote --heads origin work/*": {
         stdout: "aaa\trefs/heads/work/calm\nbbb\trefs/heads/work/urgent\n",
       },
       "git show origin/work/calm:HANDOVER.md": {
-        stdout: "---\nstatus: todo\nurgency: whenever\n---\n",
+        stdout: "---\nstatus: todo\n---\n",
       },
       "git show origin/work/urgent:HANDOVER.md": { stdout: brief },
       "git rev-parse --abbrev-ref HEAD": { stdout: "work/urgent\n" },

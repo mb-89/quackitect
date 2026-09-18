@@ -1,7 +1,6 @@
 ---
 kind: [[ticket]]
 state: open
-urgency: soon
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest

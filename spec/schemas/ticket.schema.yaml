@@ -28,7 +28,6 @@ frontmatter:
   required:
     - kind
     - state
-    - urgency
     - steps
   properties:
     kind:
@@ -45,9 +44,9 @@ frontmatter:
       enum: [done, dropped, became]
       description: how the work stopped, on a closed ticket alone
 
-    urgency:
-      enum: [now, soon, whenever]
-      description: which ticket the pull hands out first
+    urgent:
+      type: boolean
+      description: whether the pull hands this out first, over the order the score sets
 
     todo:
       type: boolean

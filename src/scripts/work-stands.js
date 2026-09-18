@@ -39,14 +39,6 @@ export function statusOf(text) {
   return said ? said[1].toLowerCase() : "";
 }
 
-export const URGENCY = ["now", "soon", "whenever"];
-
-// [[spec/design_output/work#urgency-and-what-waits]]
-export function urgencyOf(text) {
-  const said = frontField(text, "urgency").toLowerCase();
-  return URGENCY.includes(said) ? said : "soon";
-}
-
 export function dependsOn(text) {
   const front = /^---\r?\n([\s\S]*?)\r?\n---/.exec(String(text ?? ""));
   if (!front) return [];
@@ -71,7 +63,7 @@ export function dependsOn(text) {
   return out.map(named).filter(Boolean);
 }
 
-// [[spec/design_output/work#urgency-and-what-waits]]
+// [[spec/design_output/work#the-mark-and-what-waits]]
 export function named(said) {
   return String(said)
     .trim()

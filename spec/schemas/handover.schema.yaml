@@ -5,8 +5,8 @@
 # A handover reaches one reader once, and level zero deletes the copy it reads.
 # So it carries a message, and the rules that hold documentation stand off it.
 #
-# `work.js` reads status and urgency already. An unknown urgency reads as
-# `soon` there, so a typo goes quiet. The enums below refuse it instead.
+# `work.js` reads status already, and a typo in it goes quiet. The enum below
+# refuses it instead.
 #
 # The frontmatter half is JSON Schema 2020-12, https://json-schema.org/draft/2020-12.
 # The body half is this project's own, borrowed from https://document-schema.org.
@@ -23,7 +23,6 @@ frontmatter:
   required:
     - kind
     - status
-    - urgency
   properties:
     kind:
       const: handover
@@ -34,9 +33,9 @@ frontmatter:
       enum: [todo, held, done]
       description: where the work stands, and the verbs move it
 
-    urgency:
-      enum: [now, soon, whenever]
-      description: which branch a session takes first
+    urgent:
+      type: boolean
+      description: whether a session takes this branch first
 
     depends_on:
       type: [array, string]

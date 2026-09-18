@@ -46,7 +46,7 @@ export const green = {
 export const GROUP_NOTE = `---
 kind: [[ticket]]
 state: open
-urgency: now
+urgent: true
 process: [[group]]
 steps:
   - name: sync
@@ -71,7 +71,6 @@ Nothing yet.
 export const CHILD = (group, state) => `---
 kind: [[ticket]]
 state: ${state}
-urgency: soon
 group: ${group}
 steps:
   - name: do
