@@ -172,6 +172,9 @@ export function became(it, who, one, leaf, held, successor, answered) {
 export function onward(it, who, rows) {
   dropHold(it, who.hand);
   say(WORK, rows);
+  // The owner's word covers the step it sends the hand into, and no leaf after it. [[spec/design_output/pull#the-hand-rule]]
+  who.hand = who.plainHand ?? who.hand;
+  it.ownerSays = false;
   if (!who.oneStep) return handOut(it, who);
   say(DONE, [`${who.hand} works one step, and it is done. Stop here.`]);
   return 0;
