@@ -206,6 +206,9 @@ record:
     hand: box 596a811abe2e · claude-code-remote
     hash_before: 8e994690f988cfb00bc9ee371f39dbcb9f4510f3
     hash_after: 8e994690f988cfb00bc9ee371f39dbcb9f4510f3
+  - step: children
+    hand: box d5700e16c529 · claude-code-remote
+    hash_before: 921bc1c4caae7d89d0318c2461111b1119800431
 step: children
 ---
 
