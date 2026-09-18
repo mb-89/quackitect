@@ -92,7 +92,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box dd2a59294365 · claude-code-remote
@@ -112,6 +112,17 @@ record:
     hand: box dd2a59294365 · claude-code-remote · helper-4
     hash_before: b71069667513458198ee5b6e61a3cce4de00b787
     hash_after: b71069667513458198ee5b6e61a3cce4de00b787
+  - step: implement/tests-red
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 53d90cea2774020b939a84ecf215c40c31f3d509
+    hash_after: 53d90cea2774020b939a84ecf215c40c31f3d509
+    answered:
+      - name: tests
+        exit: 0
+        said: assertion, that many tests fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -226,17 +237,46 @@ pass
 
 <!-- the form is command -->
 
+    cd src/lsp && go test ./... 2>&1 | grep -c '^--- FAIL' | sed -e 's/^0$/green, every test passes/' -e 's/^[1-9].*/assertion, that many tests fail on their own assertion/'
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The tests stand in a new file, `src/lsp/sweep_test.go`. Each drives the server through its own frames, over a tree the case writes under a temporary root.
+
+| what the test drives | how it fails today |
+|---|---|
+| a file no editor opens, after the sweep | the server drops that notification, so the panel draws nothing |
+| the swept drawing, after one open | the clear loop in `draws` publishes nil for it |
+| the swept drawing, after one close | `clears` empties every drawn path |
+
+These stand green already, and they hold the claim the change must keep:
+
+| what the test drives | why it passes today |
+|---|---|
+| a parked file, which draws nothing | `Paths` drops it through `isDraft` |
+| a sweep after an open, reading the buffer | `Forgets` drops the path list and keeps the overlay |
+
+What surprises me:
+
+- `./RUNME.sh branch test` runs the JavaScript tests alone, and this change carries Go alone.
+- So the evidence command runs the Go tests, and maps their answer onto the word this step reads.
+- The command stands indented, because the prose rules refuse a pipeline standing as a paragraph.
+- The two green cases cost nothing to write, and each pins a claim the change could quietly drop.
+- `wholeTree` writes the survey file at the name `tree.go` owns, so the fixture followed the split for free.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: one test file, under the server the ask names
+- every door the change reaches has a fake: each case writes a tree under a temporary root
+- a comment names the approach: the file's header and each case point at this ticket
 
 ## reflect
 
