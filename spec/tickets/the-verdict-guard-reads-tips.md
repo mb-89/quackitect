@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/reflect
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -168,6 +168,10 @@ record:
     hash_after: 43ddb3d4addd086171a0226ea74160cdef409248
     returns: 1
     why: "`spec/design_output/pull.md`, under The hand rule, still says a verdict hand-back refuses where the tip moves. Write what `handFaults` reads.; `spec/design_output/pull.md`, the `files` row, still says the field holds every file the branch changes. Write the span `changedSince` answers.; Both rows point at `commitsFor`, under `src/scripts/pull-writes.js`, which owns the split.; What holds:; `handFaults` refuses this ticket's own commit, and takes a sibling's; the diff touches the files the ask names, a test file, and one prose line; `./RUNME.sh check` answers exit 0 on this commit; each rule the branch adds carries a case; a case feeds each rule something bad: this ticket's commit, and a failed log; `HANDOVER.md` carries no retro, and the `says` field carries what changes"
+  - step: implement/reflect
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: ba6a8f07b520fe7d4846863666927e23d6bb15b4
+    hash_after: ba6a8f07b520fe7d4846863666927e23d6bb15b4
 group: the-warnings-feed-a-refactorer
 ---
 
@@ -366,11 +370,29 @@ drives the exit code.
 
 <!-- the form is text -->
 
+The class: a rule moves in the code, and the note stating that rule stays where
+it stood. A reader then acts on the note and meets the code.
+
+| where the rule stands | what it says |
+|---|---|
+| `handFaults` | a commit naming this ticket refuses the hand-back |
+| `spec/design_output/pull.md`, under The hand rule | a moved tip refuses it |
+| `changedSince` | the span takes this ticket's commits, and the tree beside them |
+| the same note, at the `files` row | the span takes every file the branch changes |
+
+The fix for the class: a change to a rule reads the note owning it first, and
+the change carries both. So this one rewrites the two rows, and each points at
+`commitsFor` as the function answering the split.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the fix touches the note the findings name, and no file the ask leaves out
+- the note reaches no door, so no fake stands behind this step
+- the two rows point at `commitsFor`, which is the approach they state
 
 ## change
 

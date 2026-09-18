@@ -147,7 +147,10 @@ holds no open note.
 An agent is a hand whose environment names a harness. The command line reads
 that off `CLAUDECODE`, `CLAUDE_CODE_REMOTE` or `SE_CLOUD`. A verdict comes from
 a hand that leaves the tip where it stands. So a hand-back on a verdict leaf
-refuses where the tip differs from the take.
+reads the commits between the take and the tip, and refuses where one names
+this ticket. A sibling hand's commit costs the reading nothing. `commitsFor`,
+under `src/scripts/pull-writes.js`, answers that split off the name `landed`
+writes before the first colon.
 
 | what the flag says | what the record holds |
 |---|---|
@@ -279,7 +282,7 @@ nests, and each field is the heading one level under it. A comment, an
 | `text`, `list`, `checklist` | one line at least |
 | `command` | exactly one line |
 | `link` | one line, resolving to a file or a note in the tree |
-| `files` | every file the branch changes since the first take stands in it |
+| `files` | the files under this ticket's commits since the first take, and the working tree while the tip stands at the hold's. `commitsFor` answers whose commit is whose |
 | `choice` | one line, among the options |
 | `verdict` | opens with `pass` or `fail`, and a fail carries a finding |
 | `checked` | one line per item of the checklist, where the leaf or a phase above carries one |
