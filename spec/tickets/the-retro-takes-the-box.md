@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: design/draft
+step: design/review
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -147,6 +147,10 @@ record:
     hand: box d42624a67d18a8 · claude-code · the owner says so
     hash_before: a1ce0cf0d6e9f8836af5c716406369d4ee4d963c
     hash_after: a1ce0cf0d6e9f8836af5c716406369d4ee4d963c
+  - step: design/draft
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 54f61c4bd478405246131a56d3f14c73b690abbd
+    hash_after: 54f61c4bd478405246131a56d3f14c73b690abbd
 group: the-retro-runs
 ---
 
@@ -245,12 +249,20 @@ The owner rules the skip a folder and no list. A folder says what its files are 
 |---|---|
 | the runtime folder | it holds the state a box keeps while it works, which dies with the box |
 | the retro folder | it holds a copy already, and a copy of a copy doubles it |
+| the log, which the owner rules out of the runtime folder | a retro reads it most, so collect copies it |
 
 Everything else comes across. A file of a kind nobody plans for lands in the retro that way. The `unread` leaf reads the manifest against what the other leaves read.
 
 The verb copies and removes nothing. A drain that deletes leaves a box with no record where the retro fails half way. The order of the copies carries no meaning.
 
-The transcripts stand outside the private folder, in the harness's own files. The verb reads their folder off the environment the harness sets. It copies every session file, and names each in the manifest.
+Two things a retro reads stand outside the private folder:
+
+| what stands outside | where the verb reads it |
+|---|---|
+| the transcripts, thoughts and all | the harness's own folder, off the environment it sets |
+| the scripts a hand writes there | the scratchpad, beside the scripts folder inside |
+
+The verb copies each of the two, and names each line in the manifest. A hand still writes scripts under the scripts folder, so collect searches both.
 
 | what the folder reads | `.se/retro/<ticket>/` |
 |---|---|
