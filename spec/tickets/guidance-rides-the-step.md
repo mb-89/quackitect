@@ -264,7 +264,11 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
-step: retro/write
+  - step: retro/write
+    hand: box d5700e16c529 · claude-code-remote
+    hash_before: d96eb030c45ec68da08ecb37448cdaaf99c2ce1a
+    hash_after: d96eb030c45ec68da08ecb37448cdaaf99c2ce1a
+step: retro/cloud
 ---
 
 # Ask
@@ -330,12 +334,14 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is list -->
 
-- the install comes up whole, and every tool it names comes down
 - the take hands this branch, its brief and its group in one answer
-- the pull skips the children step, because [[spec/tickets/the-pull-splits-by-topic]] stands at its person step
-- the retro notes drain, because the private folder holds no note
-- this retro stands over this box's window
-- the person step's question reaches the owner, because the schedule carries a notification out
+- the owner names the rule again: a cloud box waits for no person
+- `spec/processes/question.yaml` stands, because no process opened at a person step
+- [[spec/tickets/a-person-reads-the-split]] stands open, and carries the question a person answers
+- `branch unblock` closes [[spec/tickets/the-pull-splits-by-topic]] into it
+- the children step passes, because every child closes
+- three tickets stand in the pool for what this walk turns up
+- `./RUNME.sh check` exits 0, and the branch pushes
 
 ### well
 
@@ -343,11 +349,11 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is list -->
 
-- The install comes up clean, so every door, the index and the language server stand from the first verb.
-- The pull skips the children step itself, and hands the leaf behind it. The hand reads nothing around it.
-- The person step carries its question whole under `asks`, so the notification names what the owner decides on.
-- The record carries every earlier hand, so this box reads the same skip every box before it writes.
-- The design names what the children step does with an open child, so the skip surprises no hand. [[spec/design_output/pull]]
+- The cloud guidance names the whole road: mint the successor, then run `branch unblock`.
+- The write door refuses a shell write, so every write this turn meets the voice rules.
+- A refused write names the line, the rule and the count, so the rewrite lands at once.
+- `branch unblock` names what it refuses, so the missing process shows at its first run.
+- The ticket door refuses a hand writing `record`, so the rebase hands that field back to the verbs.
 
 ### badly
 
@@ -355,10 +361,10 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is list -->
 
-- The route hands the retro out again over a group whose every open step waits for a person. The take is its moment.
-- The retro fields hold a single window, so this write drops the last box's. This leaf is its moment.
-- The branch grows a commit a box writes with no work behind it. Each take is its moment.
-- The person step's question carries findings a hand closes, beside the decision a person owns. Its `asks` field is its moment.
+- No process opens at a person step, so the verb refuses every successor. The first unblock run is its moment.
+- `branch unblock` cuts its question on the semicolon. The lint after that run is its moment.
+- A second box takes this branch while this box holds it. The rejected hand-back is its moment.
+- The pull answers `wait` where the cloud rule names the verb. This turn's first walk is its moment.
 
 ### improve
 
@@ -366,10 +372,10 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is list -->
 
-- A group at children whose every open step waits for a person answers `wait`. Home: [[spec/design_output/pull]].
-- The retro a box writes stands under its own hand, so a later box writes beside it. Home: [[spec/design_output/work]].
-- The person step a group waits on reaches its owner where the schedule starts the box. Home: [[spec/design_output/pull]].
-- The person step the fail cap inserts asks what a person decides, and leaves the findings to a hand. Home: [[spec/design_output/pull]].
+- A process opens at a person step, and a test holds it open. Home: [[spec/tickets/the-question-process-gets-tests]].
+- The unblock writes its question in the shape its author gives it. Home: [[spec/tickets/the-unblock-keeps-its-shape]].
+- The pull names `branch unblock` at that wall. Home: [[spec/tickets/the-pull-names-the-unblock]].
+- A branch one box holds refuses a second box's take. Home: [[spec/design_output/work]].
 
 ### thoughts
 
@@ -377,19 +383,19 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is text -->
 
-The group's remaining work stands behind one person step, so this box spends its answer on the owner. Reading that step's question shows a second thing:
+Five boxes walk this group and leave the wall standing. The rule they need stands in the cloud guidance the whole time, and the verb it names stands too. What fails is smaller than either:
 
-- The fail cap inserts a person step where a review fails back.
-- So the question it asks carries the review's own findings.
-- Those findings name a chapter to write, a count to cut and a lint to name.
-- A hand closes each, and the decision a person owns stands beside them.
+- `branch unblock` takes a successor whose first step reads `by: person`.
+- Every process a box could name opens at a step admitting an agent.
+- So the verb refuses each successor, and a box reads the refusal as the road's end.
+- One process file opens the road, and the group closes the same hour.
 
 | what this box holds | what stands behind it |
 |---|---|
-| the children step skips while a child stands open | [[spec/design_output/pull]] owns what the children step does |
-| the window buys a retro the last box already writes | [[spec/design_output/work]] owns what a hand writes down |
-| the group's own work waits on a person | [[spec/tickets/the-pull-splits-by-topic]] holds the question it asks |
-| the question mixes a decision with findings | [[spec/design_output/pull]] owns what the fail cap writes |
+| the guidance says it, and nothing carries it out | [[spec/tickets/the-pull-names-the-unblock]] |
+| a rule with no road is a rule nobody keeps | [[spec/tickets/the-question-process-gets-tests]] |
+| a question loses its shape on the way out | [[spec/tickets/the-unblock-keeps-its-shape]] |
+| two boxes hold one branch at one moment | [[spec/design_output/work]] owns the claim |
 
 ## cloud
 
