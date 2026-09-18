@@ -90,12 +90,18 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box dd2a59294365 · claude-code-remote
     hash_before: b743c4264990c3b6ed50c9fcc7ded1f61fad972b
     hash_after: b743c4264990c3b6ed50c9fcc7ded1f61fad972b
+  - step: design/review
+    hand: box dd2a59294365 · claude-code-remote · helper-2
+    hash_before: 425880b7dac0cbd15209f1c0c640a89a29f14f89
+    hash_after: 425880b7dac0cbd15209f1c0c640a89a29f14f89
+    returns: 1
+    why: "`landed` stages `add -A`, so a sibling's hand-back commits the write this hand leaves in the tree. The range then touches the ticket in hand, and the approach refuses the case the ask passes. Say what the guard does with a hunk this hand wrote.; The verdict leaf takes `read` as form `files`, and `changedSince` spans the first `hash_before` to the tip. A sibling's commit puts its files in that span. Then `formFault` refuses the hand-back for leaving them out. Carry the approach to that guard too.; An empty range and a failed git call both answer no line. The approach gives the two opposite verdicts. Name the `ok` the git door answers as what tells them apart.; The approach refuses a range touching the ticket in hand alone. So this hand's commit under another path passes. The ask refuses this hand's own write, and names no path."
 ---
 
 # Ask
@@ -170,6 +176,13 @@ passes where a sibling's commit touches other files.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- `landed` stages `add -A`, so a sibling's hand-back commits the write this hand leaves in the tree. The range then touches the ticket in hand, and the approach refuses the case the ask passes. Say what the guard does with a hunk this hand wrote.
+- The verdict leaf takes `read` as form `files`, and `changedSince` spans the first `hash_before` to the tip. A sibling's commit puts its files in that span. Then `formFault` refuses the hand-back for leaving them out. Carry the approach to that guard too.
+- An empty range and a failed git call both answer no line. The approach gives the two opposite verdicts. Name the `ok` the git door answers as what tells them apart.
+- The approach refuses a range touching the ticket in hand alone. So this hand's commit under another path passes. The ask refuses this hand's own write, and names no path.
 
 # implement
 

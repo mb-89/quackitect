@@ -137,7 +137,7 @@ holds no open note.
 
 | the route says | the pull admits |
 |---|---|
-| `by: person` | a hand off a harness. An agent waits, or takes it under `--owner-says` |
+| `by: person` | a hand off a harness, a hand on a cloud box, or one under `--owner-says`. An agent at a desk waits |
 | `by: agent` | a hand on a harness |
 | `by: helper` | nobody yet, until the spawn lands |
 | `by: retro` | a hand while its group stands at a retro step, or a note with the tag |
@@ -352,6 +352,9 @@ before the target.
 person`, `to: engine`, with the question under `asks` and one `answer`
 field. It points `step` at the inserted row and leaves the state at `open`,
 so the ticket is a person's to pull.
+
+- a desk writes `by: person` there
+- a cloud box writes `by: anyone`, because it answers every question this branch meets, as [[spec/guidance/cloud]] says
 
 The engine reads the answer, so the slot check finds a reader. A
 hand-out repairs a standing person step that names no reader. The route
