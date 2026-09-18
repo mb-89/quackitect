@@ -91,7 +91,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 5fa1e2fec704611d5375b260d9342d4ea9731a72
+    hash_after: 5fa1e2fec704611d5375b260d9342d4ea9731a72
 ---
 
 # Ask
@@ -124,7 +129,34 @@ The route stalls at its own reading. A leaf asks a question, the material stands
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+Collect writes one file a leaf under the retro folder, holding what that leaf reads.
+
+| the leaf | what its file holds |
+|---|---|
+| `shell` | every shell command the log carries, grouped by the job, with a count and one example |
+| `refusals` | every refusal row, by the rule that fires it |
+| `tickets` | the record of each ticket closing in the window, off git |
+| `scripts` | every script the copy takes, with where it comes from |
+| `runs` | the retro leaves of the groups merging in the window, off git |
+| `unread` | the manifest itself, which the leaf reads against the others |
+| `method` | this retro's own run, which the hand fills as it goes |
+
+Three of the takes come off git and no box:
+
+| what it reads | how |
+|---|---|
+| the tickets closing in the window | the commits touching the tickets folder, and each ticket as that commit leaves it |
+| the retro leaves of merged groups | the group tickets those commits close, and the chapters under their retro |
+| the earlier retros | the closed retro tickets standing in the tree |
+
+Two leaves read what stands only later. `chapters` reads the closed readers, and `worker` reads their counts. Both stand once the `readers` step closes, so each reads the chapter tickets live at its own turn.
+
+Collect names every file it lays out in the manifest, beside the copies. So the `unread` leaf reads one list and finds every line, whether a copy or a layout puts it there.
+
+| what a leaf's file reads | `.se/retro/<ticket>/leaves/<leaf>.jsonl` |
+|---|---|
+| what a row holds | one thing the leaf reads, as the leaf wants it |
+| what an empty file says | the window holds none of that thing, and the leaf says so |
 
 <!-- the form is text -->
 
