@@ -2,10 +2,20 @@
 kind: [[ticket]]
 state: open
 urgency: now
+step: design/person-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: "design/review failed back 2 times: The three moves turn `owner's` into `owner-s`, so they answer the anchor `the-owner-s-prompt-comes-first`.; Say instead that the slug matches the one that stands, which turns `owner's` into `owners` before it dashes the rest.; A slug stands already in `test/contract/vocabulary.test.js`. Name it as the one the rule matches, so the copy carries its reason.; The list names [[spec/design_input/a-stub-takes-its-vehicle]], whose heading `The stub's files` answers the anchor its pointer names.; Drop that note, because the slug that stands resolves it. Ten notes stay.; The check answers 0 on this commit."
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -89,8 +99,6 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-group: the-warnings-feed-a-refactorer
-step: design/review
 record:
   - step: design/draft
     hand: box a5e189c39e1d · claude-code-remote
@@ -106,6 +114,13 @@ record:
     hand: box a5e189c39e1d · claude-code-remote
     hash_before: 5398f32d8e871205c777628b98b50f26ded56c8c
     hash_after: 5398f32d8e871205c777628b98b50f26ded56c8c
+  - step: design/review
+    hand: box a5e189c39e1d · claude-code-remote · helper-4
+    hash_before: 93816d6cf10ea165a8721c7b4a95128295d32d49
+    hash_after: 93816d6cf10ea165a8721c7b4a95128295d32d49
+    returns: 2
+    why: The three moves turn `owner's` into `owner-s`, so they answer the anchor `the-owner-s-prompt-comes-first`.; Say instead that the slug matches the one that stands, which turns `owner's` into `owners` before it dashes the rest.; A slug stands already in `test/contract/vocabulary.test.js`. Name it as the one the rule matches, so the copy carries its reason.; The list names [[spec/design_input/a-stub-takes-its-vehicle]], whose heading `The stub's files` answers the anchor its pointer names.; Drop that note, because the slug that stands resolves it. Ten notes stay.; The check answers 0 on this commit.
+group: the-warnings-feed-a-refactorer
 ---
 
 # Ask
@@ -119,6 +134,16 @@ record:
 - `./RUNME.sh check` answers 0
 
 # design
+
+## person-1
+
+<!-- answers the question the engine asks -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
 
 ## draft
 
@@ -196,11 +221,12 @@ nothing further.
 
 fail
 
-- `./RUNME.sh check` hands `.` to `se-lsp check`, and that takes `Sweep`. A rule under `Checker.Over` draws nothing in the lint.
-- Carry the rule in `Rules` instead, so it walks `Tree.Paths`. The pointers the Go, the JavaScript and the shell hold draw too.
-- Say which characters the slug drops. The heading `The owner's prompt comes first` answers the anchor `the-owners-prompt-comes-first`.
-- Name where a pointer's target resolves to a path. `pointsAt` stands in the index alone, so say which side the checker asks.
-- More notes than `spec/design_output/lsp` lack a heading a pointer names. Run the new rule over the tree, and name every note it draws.
+- The three moves turn `owner's` into `owner-s`, so they answer the anchor `the-owner-s-prompt-comes-first`.
+- Say instead that the slug matches the one that stands, which turns `owner's` into `owners` before it dashes the rest.
+- A slug stands already in `test/contract/vocabulary.test.js`. Name it as the one the rule matches, so the copy carries its reason.
+- The list names [[spec/design_input/a-stub-takes-its-vehicle]], whose heading `The stub's files` answers the anchor its pointer names.
+- Drop that note, because the slug that stands resolves it. Ten notes stay.
+- The check answers 0 on this commit.
 
 # implement
 
@@ -210,7 +236,7 @@ fail
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+<!-- the same tests pass -->
 
 <!-- the form is command -->
 
