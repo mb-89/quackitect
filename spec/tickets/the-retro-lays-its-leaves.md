@@ -91,7 +91,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -157,6 +157,17 @@ record:
     hash_after: 87bd596646f07ccbfca684d81235f35a546150d4
     answered:
       - name: lint
+        exit: 0
+        said: 75 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 55f4d825fa2a0ba0885a973b2893d81a403cc612
+    hash_after: 55f4d825fa2a0ba0885a973b2893d81a403cc612
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: 75 stand at warning, which the panel draws and check allows.
 ---
@@ -369,12 +380,21 @@ Collect lays out one file a leaf, under a folder of their own beside the copies.
 | `tickets` | a ticket closing in the window, as that commit leaves it |
 | `scripts` | every script the copies carry |
 | `runs` | the groups closing in the window, off the same commits |
-| `retros` | the retro tickets standing, so the score step reads a file |
+| `score` | the retro tickets standing, so the step scoring them reads a file |
+| `method` | empty, because the retro's own hand fills it as the run goes |
 | `unread` | every line the manifest names, for the leaf reading the rest |
 
 The shell and the refusals leaves read the log the copies carry. A row names its kind and its level, so one file answers both without a transcript.
 
 The takes off git read the commits touching the tickets folder since the window opens. Each one answers as that commit leaves it, so a reader repeats the reading with no tree beside them.
+
+The verdict sends the first cut back for three gaps, and each one closes:
+
+| the gap | what closes it |
+|---|---|
+| no case drives a merged group | a case reads the group's row and the two tickets beside it |
+| the `method` leaf takes no file | it opens empty, because the hand fills it as the run goes |
+| the file reads `retros` | it reads `score`, which is the step reading it |
 
 The route's collect step moves with the owner's ruling. It reads as the folders it skips now, and the open retro takes the new route through `ticket update`.
 
