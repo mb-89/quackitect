@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/tests-red
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -155,6 +155,17 @@ record:
     hand: box d42624a67d18a8 · claude-code · helper-10
     hash_before: 171638bd5de07979e10a3830d238fc5cb0cde336
     hash_after: 171638bd5de07979e10a3830d238fc5cb0cde336
+  - step: implement/tests-red
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 8a44665ca2f54928ba288083442591b5b0f61455
+    hash_after: 8a44665ca2f54928ba288083442591b5b0f61455
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 6 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 group: the-retro-runs
 ---
 
@@ -309,19 +320,32 @@ One caution for the implement hand: the log's row stands in the table of folders
 
 ### tests
 
-<!-- the same tests pass -->
+    ./RUNME.sh branch test test/level0/retro-collect.test.js
 
 <!-- the form is command -->
 
 ### seen
 
-<!-- what you see, and what surprises you -->
+Six cases stand, and each one fails on its own assertion.
 
-<!-- the form is text -->
+| the case | what it asks of the verb |
+|---|---|
+| a hold stands | it answers one, writes nothing, and names the hand holding a ticket |
+| the copy | a note and a probe come across, and the runtime folder and its own stay |
+| the log | it comes across whole, because the owner rules it outside the runtime folder |
+| the scripts | the folder inside and the scratchpad outside both come across |
+| the manifest | a line a path, with a size and where it comes from, and no skipped folder |
+| the second run | it refuses where a manifest stands, and goes again where none does |
+
+What surprises me is the shape of the refusal. The verb answers usage today and returns two, so every case reads its own assertion and no crash.
+
+The scratchpad reaches the verb as a door, off `it.scratch`. The command line fills it from the environment, so a case hands it a path and touches no real folder.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change touches no file the ask leaves out. One case file lands, and nothing else moves.
+- every door the change reaches has a fake. The cases drive the fake disk, the fake git and the fake clock.
+- a comment names the approach the change implements. The header points at the retro chapter of the design input.
 
 <!-- the form is checklist -->
 
