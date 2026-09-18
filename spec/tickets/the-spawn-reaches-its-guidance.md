@@ -113,7 +113,7 @@ One name clashes beside all this: `refactor.mostInARow` counts hands, and `stop.
 # Discussion
 
 - [[spec/tickets/the-hook-spawns-a-refactorer]] hands this over at `design/person-1`, which waits for a person.
-  - design/review failed back 2 times: One answer leaves the stop door: `seen` takes the `spawn` branch and drops `result` beside it.
+  - design/review failed back 2 times. One answer leaves the stop door: `seen` takes the `spawn` branch, dropping `result`.
   - So the `continue` side hands back no block, and the turn ends where the rule holds it open.
   - `spawns` awaits `$.agent.spawn`, so the session waits on the hand the ask says costs no turns.
   - Name the door that starts the hand beside the stop door, since one answer carries both nowhere.
