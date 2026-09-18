@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -172,6 +172,14 @@ record:
     hand: box dd2a59294365 · claude-code-remote
     hash_before: ba6a8f07b520fe7d4846863666927e23d6bb15b4
     hash_after: ba6a8f07b520fe7d4846863666927e23d6bb15b4
+  - step: implement/change
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 08f1cac455578c11c66bc3513d1a58fcbe57bbf1
+    hash_after: 08f1cac455578c11c66bc3513d1a58fcbe57bbf1
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 group: the-warnings-feed-a-refactorer
 ---
 
@@ -404,7 +412,7 @@ the change carries both. So this one rewrites the two rows, and each points at
 
 <!-- the form is command -->
 
-./RUNME.sh lint src/scripts/pull-writes.js src/scripts/pull-chapter.js
+./RUNME.sh lint src/scripts/pull-writes.js src/scripts/pull-chapter.js spec/design_output/pull.md
 
 ### checked
 
