@@ -74,6 +74,7 @@ import {
 } from "./vehicle.js";
 import { attachTo } from "../bridge/vehicle.js";
 import { stubInto } from "./stub.js";
+import { heldReads } from "./guidance-hand.js";
 import { HOOKS } from "./precommit.js";
 import { graphIn } from "./graph.js";
 import { withRoute } from "./process.js";
@@ -184,7 +185,7 @@ const verbs = {
   rules: { says: "the mechanical rules Vale holds", run: async () => listRules() },
   standing: {
     says: "what level zero hands the agent every session",
-    run: () => standing(),
+    run: () => standing(rest),
   },
   doctor: {
     says: "what is installed, and what level zero found",
@@ -901,7 +902,7 @@ function listRules() {
   return 0;
 }
 
-async function standing() {
+async function standing(argv = []) {
   if (!files.exists(GUIDANCE)) {
     console.error("There is no spec/guidance, so nothing is handed over.");
     return 2;
@@ -910,13 +911,12 @@ async function standing() {
     .filter((name) => !isDraft(name))
     .map((n) => ({ name: n, text: files.read(join(GUIDANCE, n)) }))
     .filter(({ text }) => bindsHere(text, process.env));
-  const said = standingLayer(notes);
+  const said = standingLayer(notes, heldReads({ ...it, root }, argv));
   if (!said) {
     console.log("No guidance note carries an Actionables chapter.");
     return 0;
   }
-  console.log(said);
-  console.log(`\n${canaryText(canary({ ...countsOf(notes), stop: (await settings.ask("stop.enabled")) !== false }))}`);
+  console.log(`${said}\n\n${canaryText(canary({ ...countsOf(notes), stop: (await settings.ask("stop.enabled")) !== false }))}`);
   return 0;
 }
 
