@@ -6,63 +6,71 @@ urgency: now
 
 # Where it stands
 
-The group [[spec/tickets/the-warnings-feed-a-refactorer]] closes done, and its retro stands written on the ticket. Two children land whole, and the rest leave their questions on tickets a person answers.
+The group [[spec/tickets/the-warnings-feed-a-refactorer]] closes done, and the owner's rule lands beside it: a cloud box answers every question it meets, and hands none out.
 
 | child | how it closes |
 |---|---|
 | [[spec/tickets/the-runtime-files-stand-apart]] | its successor carries a third reading |
 | [[spec/tickets/the-panel-draws-every-file]] | done, and its verdict passes |
-| [[spec/tickets/a-rule-carries-its-side]] | its successor carries the question |
-| [[spec/tickets/one-function-answers-the-hand]] | its successor carries the question |
-| [[spec/tickets/the-hook-spawns-a-refactorer]] | its successor carries the question |
+| [[spec/tickets/a-rule-carries-its-side]] | its successor closes done |
+| [[spec/tickets/one-function-answers-the-hand]] | its successor closes done |
+| [[spec/tickets/the-hook-spawns-a-refactorer]] | its successor closes done |
 | [[spec/tickets/a-pointer-names-its-heading]] | a question carries it |
 | [[spec/tickets/a-write-meets-its-hash]] | a question carries it |
 
-Every ticket below stands outside a group, waiting for a person at its first step:
+Every question this box hands out stands answered, under `--owner-says`, and four of them close done:
 
 | question | what it decides |
 |---|---|
-| [[spec/tickets/the-private-split-reads-clean]] | whether the split stands done, or a third reading finds more |
-| [[spec/tickets/one-list-holds-the-warnings]] | what the one list is, and what the push door reads |
-| [[spec/tickets/the-one-answer-takes-shape]] | how far the one hand answer reaches |
-| [[spec/tickets/the-spawn-reaches-its-guidance]] | which door starts the refactoring hand, and what reaches it |
-| [[spec/tickets/the-verdict-guard-reads-tips]] | the guard refusing a hand-back beside a sibling commit |
-| [[spec/tickets/the-rule-shares-one-slug]] | its answer stands written, and its step waits for a person |
-| [[spec/tickets/apply-lane-carries-a-hand]] | its answer stands written, and its step waits for a person |
+| [[spec/tickets/the-private-split-reads-clean]] | the split stands done, and a rule guards the drift |
+| [[spec/tickets/one-list-holds-the-warnings]] | one list, one side map, and both push doors reading it |
+| [[spec/tickets/the-one-answer-takes-shape]] | `writesHere` answers the leaf, and the door reads the hold |
+| [[spec/tickets/the-spawn-reaches-its-guidance]] | the stop door starts the hand, and a note's scope builds its layer |
+| [[spec/tickets/the-verdict-guard-reads-tips]] | the guard reads the commits, in place of the tip |
 
 `./RUNME.sh check` answers 0 on this commit. The check asks the server, so run `./RUNME.sh serve` before it.
+
+# What the cloud rule changes
+
+A cloud box decides for itself and stops when the work stands complete. The merge is where a person judges each call.
+
+| what lands | where |
+|---|---|
+| rules 6 to 9, and the argument under them | `spec/guidance/cloud.md`, `spec/rationales/cloud.md` |
+| the refusal on a cloud box | `src/scripts/unblock.js` |
+| the inserted step reading `by: anyone` | `withPersonStep`, in `src/scripts/pull-hand.js` |
+| the check the two asking rules name | `a-person-sits-here`, in `src/bridge/stop.js` |
+| the same rule on every brief | `contractRows`, in `src/scripts/branch-usage.js` |
+
+`.claude/skills/level0/lib/cloud.js` owns the cloud test, and `src/scripts/hand.js` takes it from there in place of its own copy.
+
+# What the refactoring hand changes
+
+The stop door starts a hand beside its vote, and that hand drains the warnings on one file.
+
+| what lands | where |
+|---|---|
+| the rule the tooth votes over | `warnings-stand-past-the-number`, in `spec/config/stop/level0.yml` |
+| the hand, the check and the file it takes | `src/bridge/stop.js` |
+| one answer carrying a vote and a spawn | `besides`, in `.claude/skills/level0/hooks/level0.js` |
+| one layer a kind, off a note's scope | `src/bridge/guidance.js` |
+| the four keys | `refactor`, in `spec/config/level0.json` |
+| the note that hand alone reads | `spec/guidance/refactoring.md` |
+
+The check writes what the lint leaves standing into `.se/run/check.json`, so the door counts the list and lints nothing. A box whose check has yet to run starts no hand.
 
 # What waits
 
 | what | who does it |
 |---|---|
 | run `./RUNME.sh branch merge the-warnings-feed-a-refactorer` from main | a hand on a desk |
-| move the person tickets off their first step, then work each `do` | a hand on a desk |
-
-Nothing of this group waits on an agent. The group ticket carries the retro, which names what this box wants, what it meets and what it leaves.
-
-# What the runtime split changes
-
-The private folder holds two named folders, and `.claude/skills/level0/lib/folders.js` owns both names:
-
-- the runtime folder takes what the box alone reads, and dies with the box
-- the retro folder takes what a retro writes and reads back
-- the rest keeps the notes, the handover, the private tickets and the vehicle records
-
-The index walk drops the private folder from its skip list. It skips the runtime folder on the path the root holds, because a folder of that name stands elsewhere in the tree. So a word standing in a private note alone comes back from a `find`.
-
-Every reader either takes the name from the module, or names the module in a comment beside its copy. `PrivateFolderOwned` refuses a spelling naming neither. It reads the names the runtime half holds, so a reader the move leaves behind fails the check.
-
-The installer moves a box's old places over once. Without it, a box built before this change hands the walk the binaries and the journal it skips today.
+| judge every call this box takes under `--owner-says`, at that merge | a hand on a desk |
 
 # What surprises me
 
-- The lint names 79 findings on this branch's base, all at warning, and the check allows them.
-- The check runs its stages in order, stopping at the first red one. A failing test hides the lint.
-- A verdict hand's hold refuses where the tip moves under it, so a sibling commit costs that hand its pass.
-- The install sweep mints a second box record, and the hold reads the first. The box id goes back by hand.
-- A design review failing twice buys a person step. A cloud box then mints a ticket and hands it out.
-- Three of four design drafts meet that wall, so the group leaves more questions than children.
-- The unblock verb copies a review's findings into the successor, and one line stands past the list cap.
-- The write door refuses a shell write into a tracked file while the server stands.
-- A rule reading `-e` as a flag fires on `[ -e path ]`. The installer's sweep tests `-d` and `-f` instead.
+- The owner reads five tickets handed to a person as five failures. The rule now stands in the guidance and in three verbs.
+- A fixture leaving `env` out reads the box running the suite. So a cloud box turns green cases red, and every fake now names its own environment.
+- `spec/design_output/pull.md` names `branch escalate`, which stands in no code. A later branch builds it, or the note drops it.
+- The write door refuses the attribution trailer a harness asks for, because the address is private. The commits carry none.
+- `refactor.parallel` stands false in this box's own config, so no hand starts while this branch works.
+- The stamp carries the warning list. So the panel, both push doors and the stop door read one thing.

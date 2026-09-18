@@ -2,10 +2,20 @@
 kind: [[ticket]]
 state: open
 urgency: now
+step: design/settle-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: settle-1
+        does: decides between the step and the findings, and writes why
+        by: anyone
+        to: engine
+        asks: "design/review failed back 2 times: A subject carries other ticket names past its prefix. `childrenWaiting` writes `because <children> stand open`, and `became` writes its successor. A guard reading the whole subject refuses a parent's commit. Name the prefix before the colon as what the guard reads.; `changedSince` reads `git status --porcelain` too. A sibling hand writes into the tree this hand shares. Those files stand under no subject, so the span keeps them. Then `formFault` refuses the hand-back for leaving them out. Say what the `read` field does with a file no commit carries yet."
+        evidence:
+          - name: answer
+            form: text
+            says: the decision, and why it stands
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -89,8 +99,6 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-group: the-warnings-feed-a-refactorer
-step: design/review
 record:
   - step: design/draft
     hand: box dd2a59294365 · claude-code-remote
@@ -106,6 +114,13 @@ record:
     hand: box dd2a59294365 · claude-code-remote
     hash_before: 0b8adcd0d15827b6bd51c84bba35c2a9198ba457
     hash_after: 0b8adcd0d15827b6bd51c84bba35c2a9198ba457
+  - step: design/review
+    hand: box dd2a59294365 · claude-code-remote · helper-4
+    hash_before: f06612771bcc7303a27924495f95ec84c101c52a
+    hash_after: f06612771bcc7303a27924495f95ec84c101c52a
+    returns: 2
+    why: A subject carries other ticket names past its prefix. `childrenWaiting` writes `because <children> stand open`, and `became` writes its successor. A guard reading the whole subject refuses a parent's commit. Name the prefix before the colon as what the guard reads.; `changedSince` reads `git status --porcelain` too. A sibling hand writes into the tree this hand shares. Those files stand under no subject, so the span keeps them. Then `formFault` refuses the hand-back for leaving them out. Say what the `read` field does with a file no commit carries yet.
+group: the-warnings-feed-a-refactorer
 ---
 
 # Ask
@@ -135,6 +150,16 @@ The box then drops the hold, spawns a second hand, and pays the reading twice. T
 - `./RUNME.sh check` answers 0
 
 # design
+
+## settle-1
+
+<!-- decides between the step and the findings, and writes why -->
+
+### answer
+
+<!-- the decision, and why it stands -->
+
+<!-- the form is text -->
 
 ## draft
 
@@ -190,10 +215,8 @@ names, and a hand off them stands outside this guard.
 
 fail
 
-- `landed` stages `add -A`, so a sibling's hand-back commits the write this hand leaves in the tree. The range then touches the ticket in hand, and the approach refuses the case the ask passes. Say what the guard does with a hunk this hand wrote.
-- The verdict leaf takes `read` as form `files`, and `changedSince` spans the first `hash_before` to the tip. A sibling's commit puts its files in that span. Then `formFault` refuses the hand-back for leaving them out. Carry the approach to that guard too.
-- An empty range and a failed git call both answer no line. The approach gives the two opposite verdicts. Name the `ok` the git door answers as what tells them apart.
-- The approach refuses a range touching the ticket in hand alone. So this hand's commit under another path passes. The ask refuses this hand's own write, and names no path.
+- A subject carries other ticket names past its prefix. `childrenWaiting` writes `because <children> stand open`, and `became` writes its successor. A guard reading the whole subject refuses a parent's commit. Name the prefix before the colon as what the guard reads.
+- `changedSince` reads `git status --porcelain` too. A sibling hand writes into the tree this hand shares. Those files stand under no subject, so the span keeps them. Then `formFault` refuses the hand-back for leaving them out. Say what the `read` field does with a file no commit carries yet.
 
 # implement
 
@@ -203,7 +226,7 @@ fail
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+<!-- the same tests pass -->
 
 <!-- the form is command -->
 
