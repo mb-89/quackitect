@@ -90,7 +90,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box a5e189c39e1d · claude-code-remote
+    hash_before: 9c88da1bf3b10754ac711f81c7505a5a77b404b6
+    hash_after: 9c88da1bf3b10754ac711f81c7505a5a77b404b6
 ---
 
 # Ask
@@ -114,6 +119,26 @@ step: design/draft
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+One rule in the checker reads the heading half of every pointer, and faults the
+pointer whose heading stands nowhere. The panel and the lint both ask that
+checker, so one rule feeds both.
+
+| piece | what it does |
+|---|---|
+| the rule | reads every pointer in a file, and faults where the target holds no such heading |
+| the slug | lowercases the heading and joins its words with a dash, as the anchor a reader clicks |
+| `Tree.Read` | answers the target's text, so an open buffer stands ahead of the copy on the disk |
+| `Checker.Over` | carries the rule, so the finding draws per file, in the panel and in the lint alike |
+
+The rule walks past a fence, so an example pointer inside one draws nothing.
+
+[[spec/design_output/lsp]] regains the chapters its pointers name, because it
+holds its scope alone today. Every other pointer naming a heading that stands
+nowhere either gets that heading back or names the heading that stands.
+
+The index keeps its own resolution. `pointsAt` answers which note a pointer
+reaches, and the heading half decides nothing there.
 
 ## review
 
