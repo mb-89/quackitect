@@ -2,6 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
+depends_on: [the-retro-takes-the-box]
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -90,7 +91,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -102,6 +103,10 @@ record:
     hash_after: 2daddc687fe72a63a9e2ed398e3fce4dffb53ef9
     returns: 1
     why: the entry names no source, so the generated banner points at nothing; the command folder already carries a projection, so a refusal names the wrong source; `--as` names the hand at every other verb, so the ticket name wants its own flag; the mint prints the leaf itself, so name the pull it calls and copy no printing; the first leaf calls for `retro collect`, which stands nowhere, so say what the hand runs there; the two knobs mint two config commands, so the change carries them as well
+  - step: design/draft
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 15fb5a5a0ff7cf3cca68896bfaca8cd04e26e5ec
+    hash_after: 15fb5a5a0ff7cf3cca68896bfaca8cd04e26e5ec
 ---
 
 # Ask
@@ -133,25 +138,39 @@ A retro takes a hand-written ticket. The route on it drifts from the process fil
 
 ### approach
 
-One sub-verb mints the ticket, and one projection writes the command that calls it.
+One sub-verb mints the ticket, and one projection writes the command calling it. The review names six faults in the first draft, and each row below answers one.
 
 | what lands | where |
 |---|---|
 | `retro new`, a sub-verb beside `retro notes` | `src/scripts/retro.js` |
+| `new` and `collect`, beside `notes` in the verb list | `src/scripts/pull-route.js` |
 | the shape writing one command file | `.claude/skills/level0/lib/projection.js` |
-| the entry naming that shape, its source and its target | `spec/config/projections.json` |
+| `writes`, a glob an entry owns under its target | `.claude/skills/level0/lib/projection.js` |
+| the entry, naming the retro process as its source | `spec/config/projections.json` |
 | `retroReaders` and `retroCap`, with their defaults | `spec/config/level0.json` and its schema |
+| the two command files those keys project | `.claude/commands` |
 
-`retro new` mints a ticket off the retro process, names it for the tip it stands on, writes the reason into its ask, and opens it. It prints what a pull prints, so the hand reads the first leaf without a second command.
+The source is `spec/processes/retro.yaml`. The command stands because the route stands, so the generated line names that route as the file to edit.
 
-The ticket's name reads `retro-<short>`, off the commit the window ends at. A name holds five words, and two of them stand here. A hand naming its own takes `--as <name>`.
+| the fault | what answers it |
+|---|---|
+| the entry names no source | the retro process is the source, and the generated line says so |
+| two entries tie on one folder | an entry declares `writes`, and the owner lookup prefers the entry matching the path |
+| `--as` carries a hand's name already | the flag reads `--name` here |
+| the mint copies what a pull prints | `retro new` calls the mint and the pull, and prints nothing of its own |
+| `retro collect` stands nowhere | this ticket waits for [[spec/tickets/the-retro-takes-the-box]] under depends_on |
+| the knobs project two more commands | the change carries both files |
+
+`retro new` mints a ticket off the retro process, writes the reason into its ask, opens it, and hands out its first leaf. Each of the four is a call into the verb owning it.
+
+The ticket's name reads `retro-<short>`, off the commit the window ends at. A name holds five words, and two of them stand here. A hand naming its own takes `--name <name>`.
 
 | the field | what it takes |
 |---|---|
 | `why` | what calls for it, off `--why`, or the standing line where nobody says |
-| `state` | open, because the mint writes an ask a hand fills nowhere |
+| `state` | open, because `ticket open` runs inside the verb |
 
-The command file reads like a config command and runs `./RUNME.sh retro new` ahead of the turn. The projection owns it, so the write door refuses a hand editing it, and `./RUNME.sh check` names it stale where the shape moves.
+The config-commands entry declares `se-config-*.md`, and the retro entry declares `se-retro.md`. A tie on the command folder reads one owner now, so the write door names the file a hand edits.
 
 The two knobs stand in the config as numbers, beside the other work knobs. `retroReaders` caps the hands a collect spawns, and `retroCap` caps the tickets the improve step mints.
 
