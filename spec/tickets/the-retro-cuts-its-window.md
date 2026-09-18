@@ -91,12 +91,18 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
     hash_before: 62e52ab6d57707898525a20853db2af6545e6e7f
     hash_after: 62e52ab6d57707898525a20853db2af6545e6e7f
+  - step: design/review
+    hand: box d42624a67d18a8 · claude-code · helper-21
+    hash_before: 37ab51bd3baa40c4f2fa70c1989b2502440cdf86
+    hash_after: 37ab51bd3baa40c4f2fa70c1989b2502440cdf86
+    returns: 1
+    why: Two gaps stand, and the rest of the approach answers the ask:; | the gap | the fix |; |---|---|; | a chapter opens under `.se/tickets`, where `retro notes` reads it as an open note | name the folder a chapter stands in, and say how the drain passes it |; | the cut reads the log alone | say how the transcripts' times reach the cut, which the design names beside the log |; | what answers the ask | where |; |---|---|; | the window opens at the last retro's close, or at the first commit | the opens row |; | a chapter is six hours, and a span holding no row stands nowhere | the cuts row |; | the counts carry every kind the ask names, and a missing source reads zero | the counts table |; | a chapter mints off the chapter route, with its window and counts written first | the mints row |; `./RUNME.sh check` exits 0 on this branch.
 ---
 
 # Ask
@@ -170,6 +176,24 @@ The span stands as a constant beside the verb, because the design fixes it and n
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
+
+fail
+
+Two gaps stand, and the rest of the approach answers the ask:
+
+| the gap | the fix |
+|---|---|
+| a chapter opens under `.se/tickets`, where `retro notes` reads it as an open note | name the folder a chapter stands in, and say how the drain passes it |
+| the cut reads the log alone | say how the transcripts' times reach the cut, which the design names beside the log |
+
+| what answers the ask | where |
+|---|---|
+| the window opens at the last retro's close, or at the first commit | the opens row |
+| a chapter is six hours, and a span holding no row stands nowhere | the cuts row |
+| the counts carry every kind the ask names, and a missing source reads zero | the counts table |
+| a chapter mints off the chapter route, with its window and counts written first | the mints row |
+
+`./RUNME.sh check` exits 0 on this branch.
 
 <!-- the form is verdict -->
 
