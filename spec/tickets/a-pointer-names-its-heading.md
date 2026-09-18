@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box a5e189c39e1d · claude-code-remote
@@ -102,6 +102,10 @@ record:
     hash_after: 26e21ce695f0ee858694c9a37d2a525097a150c9
     returns: 1
     why: "`./RUNME.sh check` hands `.` to `se-lsp check`, and that takes `Sweep`. A rule under `Checker.Over` draws nothing in the lint.; Carry the rule in `Rules` instead, so it walks `Tree.Paths`. The pointers the Go, the JavaScript and the shell hold draw too.; Say which characters the slug drops. The heading `The owner's prompt comes first` answers the anchor `the-owners-prompt-comes-first`.; Name where a pointer's target resolves to a path. `pointsAt` stands in the index alone, so say which side the checker asks.; More notes than `spec/design_output/lsp` lack a heading a pointer names. Run the new rule over the tree, and name every note it draws."
+  - step: design/draft
+    hand: box a5e189c39e1d · claude-code-remote
+    hash_before: 5398f32d8e871205c777628b98b50f26ded56c8c
+    hash_after: 5398f32d8e871205c777628b98b50f26ded56c8c
 ---
 
 # Ask
@@ -126,25 +130,59 @@ record:
 
 <!-- the form is text -->
 
-One rule in the checker reads the heading half of every pointer, and faults the
-pointer whose heading stands nowhere. The panel and the lint both ask that
-checker, so one rule feeds both.
+One rule joins `Rules` in the language server, so the sweep runs it. A bare
+`./RUNME.sh check` hands `.` to the checker, and that takes `Sweep`. So the lint
+draws the finding over every tracked file, whatever its language.
 
 | piece | what it does |
 |---|---|
-| the rule | reads every pointer in a file, and faults where the target holds no such heading |
-| the slug | lowercases the heading and joins its words with a dash, as the anchor a reader clicks |
-| `Tree.Read` | answers the target's text, so an open buffer stands ahead of the copy on the disk |
-| `Checker.Over` | carries the rule, so the finding draws per file, in the panel and in the lint alike |
+| the rule | walks `Tree.Paths`, reads every pointer, and faults a heading standing nowhere |
+| the target | resolves off `Tree.Paths`, by the name and by the name with `.md` |
+| the headings | come from `Tree.Read` on the target, so an open buffer answers ahead of the disk |
+| the slug | turns a heading into the anchor a reader clicks |
 
-The rule walks past a fence, so an example pointer inside one draws nothing.
+The slug drops every character outside a letter and a digit, in three moves:
 
-[[spec/design_output/lsp]] regains the chapters its pointers name, because it
-holds its scope alone today. Every other pointer naming a heading that stands
-nowhere either gets that heading back or names the heading that stands.
+1. lowercase the heading
+2. run every other character together into one dash
+3. trim a dash off each end
 
-The index keeps its own resolution. `pointsAt` answers which note a pointer
-reaches, and the heading half decides nothing there.
+So the heading `The owner's prompt comes first` answers the anchor
+`the-owners-prompt-comes-first`.
+
+`pointsAt` stands in the index, and answers which note a pointer reaches for a
+`find`. The checker resolves the path itself, because the two modules share no
+code.
+
+Three pointers draw nothing, and each one stands outside this rule:
+
+- a path half resolving to nothing, because the link check owns that half
+- `[[note#heading]]` and `[[spec/design_output/<file>#<section>]]`, which name no note
+- a pointer inside a fence, because the rule reads the text outside one
+
+`./RUNME.sh check` answers 0 once every note below regains the heading its
+pointers name. A pointer naming the heading that stands answers as well.
+
+The scan under `.se/scripts` lists the notes:
+
+- [[spec/design_input/a-stub-takes-its-vehicle]]
+- [[spec/design_output/level0]]
+- [[spec/design_output/log]]
+- [[spec/design_output/lsp]]
+- [[spec/design_output/projection]]
+- [[spec/design_output/pull]]
+- [[spec/design_output/schema]]
+- [[spec/design_output/stop]]
+- [[spec/design_output/tree-view]]
+- [[spec/design_output/viewer]]
+- [[spec/design_output/work]]
+
+[[spec/design_output/lsp]] carries most of them, because it holds its scope
+alone today.
+
+The panel draws this finding once the sweep reaches it.
+[[spec/tickets/the-panel-draws-every-file]] lands that sweep, and this rule needs
+nothing further.
 
 ## review
 
