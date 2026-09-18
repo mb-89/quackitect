@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: whenever
 steps:
   - name: sync
@@ -268,7 +268,12 @@ record:
     hand: box d5700e16c529 · claude-code-remote
     hash_before: d96eb030c45ec68da08ecb37448cdaaf99c2ce1a
     hash_after: d96eb030c45ec68da08ecb37448cdaaf99c2ce1a
+  - step: retro/cloud
+    hand: box d5700e16c529 · claude-code-remote
+    hash_before: 837de4dfc6dac4a77e5bd2fd032401b023c3a28c
+    hash_after: 837de4dfc6dac4a77e5bd2fd032401b023c3a28c
 step: retro/cloud
+reason: done
 ---
 
 # Ask
@@ -407,7 +412,7 @@ Five boxes walk this group and leave the wall standing. The rule they need stand
 
 <!-- the form is list -->
 
-- `mcp__level0__patch` and `mcp__level0__replace`, which the guidance names for a many-line write, at the retro write
+- a process opening at a person step, which `branch unblock` takes, at its first run
 - `check_answer`, which the guidance names over a long draft, at this answer
 
 ### met
@@ -416,9 +421,11 @@ Five boxes walk this group and leave the wall standing. The rule they need stand
 
 <!-- the form is list -->
 
-- the person step on [[spec/tickets/the-pull-splits-by-topic]], which leaves the children step again
-- the voice rules over a retro, which the lint names and this box cuts to
-- the write door, which a shell write walks past, so the lint alone carries the check
+- the write door, which refuses a shell write into a ticket, at the successor's ask
+- the voice rules, which refuse the passive, a long sentence and a word outside the core, at each ticket
+- the ticket door, which refuses a hand writing `record`, at the rebase
+- a second box holding this branch, which rejects the hand-back, at the retro notes
+- the stale hold, which drops at the next pull, right after that rejection
 
 ### left
 
@@ -426,15 +433,16 @@ Five boxes walk this group and leave the wall standing. The rule they need stand
 
 <!-- the form is list -->
 
-- [[spec/tickets/the-pull-splits-by-topic]] waits at its person step, and its record holds the question the engine asks
-- the split of the pull and the work verb waits behind that person step
-- this box mints no ticket, so none stands here without a group
+- [[spec/tickets/a-person-reads-the-split]] waits for a person, and carries the question whole
+- [[spec/tickets/the-unblock-keeps-its-shape]] stands in the pool, naming the flattened question
+- [[spec/tickets/the-pull-names-the-unblock]] stands in the pool, naming what the pull says at that wall
+- [[spec/tickets/the-question-process-gets-tests]] stands in the pool, naming the test the new process owes
+- every one of those four names no group, so each stands in the pool on trunk
 - the branch owes its handover at done, and this retro is what it carries
-- the owner carries a notification naming that person step, and the findings its question holds
 
 # Discussion
 
-Where the group stands: two children close, and [[spec/tickets/the-pull-splits-by-topic]] waits for a person at its design step. The pull answers `wait` while that step stands, so the group takes no agent hand.
+Where the group stands: every child closes, and the children step passes. [[spec/tickets/the-pull-splits-by-topic]] closes `became` into [[spec/tickets/a-person-reads-the-split]]. That ticket stands outside this group, and waits for a person.
 
 What the branch meets, each with its moment:
 
@@ -454,10 +462,11 @@ What a person decides:
 
 - whether the judge names the rule it refuses, so a hand rewrites on a reason
 - whether the judge reads the fields a hand-back carries, and guards the shell verb too
-- whether a group whose every open step waits for a person answers `wait` at the take
+- whether a group whose every open step waits for a person names `branch unblock` at the take
 - whether a box's retro stands under its own hand, so a later box writes beside it
 - whether two boxes may hold one branch, because a verdict hand's hold breaks each time the tip moves
 - whether `branch sync` unshallows a clone itself, or the harness clones whole
 - whether the work answer names the markdown list a `files` field takes
 - whether a write door rule refuses a whole-file write over a tracked file the hand has not read
-- the approach of [[spec/tickets/the-pull-splits-by-topic]], which stands at its person step
+- the approach of [[spec/tickets/the-pull-splits-by-topic]], which [[spec/tickets/a-person-reads-the-split]] now carries
+- whether `spec/processes/question.yaml` is the shape every successor takes, which [[spec/tickets/the-question-process-gets-tests]] holds
