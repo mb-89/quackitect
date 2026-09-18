@@ -35,7 +35,13 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
 process_hash: 1f3006ec4b044a89
-step: answer
+group: the-warnings-feed-a-refactorer
+step: do
+record:
+  - step: answer
+    hand: box dd2a59294365 · claude-code-remote · the owner says so
+    hash_before: 215052ad47efea9a8c1e94671b3be778fb0cc2c6
+    hash_after: 215052ad47efea9a8c1e94671b3be778fb0cc2c6
 ---
 
 # Ask
@@ -84,6 +90,22 @@ Two things the split leaves standing, either way:
 <!-- the answer, which the step behind this one reads -->
 
 <!-- the form is text -->
+
+The split stands done. Close it, and run no third reading.
+
+| what a third reading would add | what already holds it |
+|---|---|
+| a reader the move leaves behind | `PrivateFolderOwned`, which refuses a spelling naming no owner |
+| a writer landing at the wrong place | a case a writer, in `test/level0/folders.test.js` |
+| a note sending a reader to an old place | a grep over the moved names, which answers nothing |
+| the walk covering the wrong half | two Go cases, over a tree each one writes |
+
+Two readings already ran, and the second found every fault the first left. A third reads the same green tree, and the rule is what catches the next drift. A wrong answer here costs one reading, which the next hand runs on the merge.
+
+The `do` step closes this ticket and carries the two lines the split leaves standing:
+
+- `RETRO` stands named and covered, and the retro verb writes under it later
+- the guard finding stands on [[spec/tickets/the-verdict-guard-reads-tips]], which this group now carries
 
 # do
 

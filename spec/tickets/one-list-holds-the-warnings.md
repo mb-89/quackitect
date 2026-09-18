@@ -35,6 +35,7 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/question]]
 process_hash: 1f3006ec4b044a89
+group: the-warnings-feed-a-refactorer
 step: answer
 ---
 

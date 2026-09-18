@@ -89,6 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
+group: the-warnings-feed-a-refactorer
 ---
 
 # Ask
