@@ -82,8 +82,9 @@ export function pull(it, argv) {
   it.ownerSays = rest.includes("--owner-says");
   const took = as ? `${handOf(it)} · ${as}` : handOf(it);
   const hand = it.ownerSays ? `${took} · ${SAYS}` : took;
+  const plainHand = took;
   const held = holdOf(it, hand);
-  const who = { hand, branch, group, held, oneStep: Boolean(as) };
+  const who = { hand, plainHand, branch, group, held, oneStep: Boolean(as) };
   it.argv = rest;
 
   if (rest.includes("--judge")) return judgeMaterial(it, held, name);
