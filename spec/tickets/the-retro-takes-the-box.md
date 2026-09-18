@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -102,6 +102,10 @@ record:
     hash_after: 84e30870a745232f06e9ff8631995d88f33a8fde
     returns: 1
     why: name every line of the default deny list, because a hand takes an abstract default by guess; add the handover to that default, which [[spec/design_input/the-agent-pulls-tickets]] names beside the bin; keep the log archive under the private folder, because a rule over binaries drops the record; say which path the deny globs read for the transcripts, which stand outside the private folder; add `retro.deny` to `spec/config/level0.schema.json`, where every knob carries its type and its help; say where the retro folder stands, because the ask names a folder git keeps and git ignores `.se/`; name what lets a second collect run, because a half run leaves a folder standing; drop the deepest-first walk, or say what it serves, because the verb removes nothing
+  - step: design/draft
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: bc9ed22234501c5c8406e075ea65a5addbc5ecab
+    hash_after: bc9ed22234501c5c8406e075ea65a5addbc5ecab
 ---
 
 # Ask
@@ -145,22 +149,38 @@ The record dies with the box. A retro then reads what a hand remembers, and the 
 | copies | that path into the retro folder, at the same relative place |
 | writes | one manifest line a path, with its size and where it comes from |
 
-The verb copies and removes nothing. A drain that deletes leaves a box with no record where the retro fails half way, and the retro folder is the copy git keeps.
+The verb copies and removes nothing. A drain that deletes leaves a box with no record where the retro fails half way. The walk takes any order, because nothing moves.
 
-| where the deny list stands | `retro.deny` under the config |
+| where the deny list stands | `retro.deny` under the config, with its type and its help in the schema |
 |---|---|
 | what it holds | a glob a line, read against the path relative to the private folder |
-| what the default names | the retro's own folders, the runtime half, and the binaries |
 | who adds to it | the owner, in the config, and a box through its own layer |
+
+The default names every line, so a hand reads what it takes without guessing:
+
+| the glob | why it stands outside the take |
+|---|---|
+| `retro/**` | the retro's own folders, which a take of a take doubles |
+| `bin/**`, `lnav/**`, `*.pdf` | tools and reference, which no hand writes here |
+| `hold/**` | the hold a hand writes as it works |
+| `index.db*` | the index, which a copy tears while a writer holds it |
+| `tmp/**`, `undo/**` | scratch and the write journal, which the tree derives again |
+| `config.json`, `copy.json`, `box.json` | the box's own identity and its config layer |
+| `show-panel` | a flag the editor reads and drops |
+| `HANDOVER.md` | the brief, which git carries on the branch already |
+
+The log archive stays inside the take. It carries the record of earlier runs, and a rule over binaries drops exactly what a retro reads.
 
 A deny list takes a file of a kind nobody plans for. The `unread` leaf reads the manifest against what every other leaf reads, so a file nobody reads stands as a finding.
 
-The transcripts stand outside the private folder, in the harness's own files. The verb takes them by their own path, and the manifest names them as it names the rest.
+The transcripts stand outside the private folder, in the harness's own files. The verb reads their folder off the environment the harness sets, takes every session file, and names each in the manifest. The deny list covers the private folder alone.
 
 | what the folder reads | `.se/retro/<ticket>/` |
 |---|---|
+| what git does with it | it ignores the whole private folder, and the retro ticket is what git keeps |
 | what stands inside | the copies, at their relative paths, and the manifest |
-| what a second run does | it refuses, because a folder standing there holds a run already |
+| what a second run does | it refuses where a manifest stands, because that folder holds a whole run |
+| what a torn run does | the verb replaces a folder carrying no manifest, because nothing finished there |
 
 <!-- the form is text -->
 
