@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: design/person-2
+step: design/draft
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -143,6 +143,10 @@ record:
     hash_after: ceb222f5e7e499abef1471ce06e4e2adf9706a3f
     returns: 3
     why: "The owner's ruling closes every earlier finding. One gap stands, and a second beside it:; the log moves to `.se/runtime` [[spec/tickets/the-runtime-folder-holds-state]], and the skips row passes that folder; say how the log reaches the retro, because the rotates row prepares a file collect leaves standing; name the scratchpad, which [[spec/design_input/the-agent-pulls-tickets]] gives as the second source the `scripts` leaf reads; The rest answers the ask: the two skips, the manifest, the hold refusal, the transcripts, the second run.; `./RUNME.sh check` exits 0 on this branch."
+  - step: design/person-2
+    hand: box d42624a67d18a8 · claude-code · the owner says so
+    hash_before: a1ce0cf0d6e9f8836af5c716406369d4ee4d963c
+    hash_after: a1ce0cf0d6e9f8836af5c716406369d4ee4d963c
 group: the-retro-runs
 ---
 
@@ -202,21 +206,18 @@ This ticket waits on [[spec/tickets/the-runtime-files-stand-apart]], which cuts 
 
 ### answer
 
-The owner rules the whole question away. A runtime folder holds the state a box keeps while it works, and collect skips that folder.
+The owner rules the log out of the runtime folder, because the retro collects it.
 
 | what the owner says | what it settles |
 |---|---|
-| the index, the stamp, the health and the lint output stand in the runtime folder | the list of runtime files goes |
-| collect skips the runtime folder and the retro's own | the glob list goes, and the config knob with it |
-| a folder says what its files are for | a reader tells the kinds apart by where they stand |
+| the log stands outside the runtime folder | collect copies it, because the skip passes it by |
+| the runtime folder holds what dies with the box | a record a reader reads later stands outside it |
+| a hand writes scripts in two places | collect searches the scripts folder and the scratchpad |
 
-So three of the four questions fall away:
+The owner wants the scripts read, and a hand still writes them under the scripts folder.
 
-- the order files copy in carries no meaning, because collect removes nothing
-- the handover needs no line of its own, because its folder decides it
-- a glob list reaches the config nowhere, because no glob list stands
-
-This ticket waits on [[spec/tickets/the-runtime-files-stand-apart]], which cuts that folder.
+- [[spec/tickets/the-runtime-folder-holds-state]] moves the log into the runtime folder
+- The owner rules that wrong, and this session corrects that ticket
 
 <!-- the answer, which the step behind this one reads -->
 
