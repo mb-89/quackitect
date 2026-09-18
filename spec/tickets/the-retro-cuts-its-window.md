@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/tests-green
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -159,6 +159,17 @@ record:
     hash_after: 383d0e55a4cee54ba36f68856e2704f18483f0da
     answered:
       - name: lint
+        exit: 0
+        said: 75 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: a5efb70a84af2c58c8d78f58466ef186a1659fae
+    hash_after: a5efb70a84af2c58c8d78f58466ef186a1659fae
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 4 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: 75 stand at warning, which the panel draws and check allows.
 group: the-retro-runs
@@ -365,25 +376,43 @@ The counts read off the log's own kinds. A row names a prompt, a shell line, a t
 
 ### tests
 
-<!-- the same tests pass -->
+    ./RUNME.sh branch test test/level0/retro-window.test.js
 
 <!-- the form is command -->
 
 ### check
 
-<!-- the check is green on the commit -->
+    ./RUNME.sh check
 
 <!-- the form is command -->
 
 ### says
 
-<!-- what changes and why, for a reader who was not there -->
+Collect cuts the window after it copies, because the cut reads the log it copies.
 
-<!-- the form is text -->
+| what lands | where |
+|---|---|
+| the cut, the counts and the chapter mint | `src/scripts/retro-window.js` |
+| the one call, after the copy | `src/scripts/retro-collect.js` |
+| the window itself, as a file the manifest names | `window.json` under the retro folder |
+
+A window opens where the last closed retro leaves the tip, and at the tree's first commit where none stands. A span of six hours holding rows becomes a chapter, and a span holding none stands nowhere.
+
+Each chapter mints a private ticket off the chapter route, naming the retro as its group. So the retro's `readers` step finds its children where the pull looks for them.
+
+| what a count reads | the row that answers it |
+|---|---|
+| the prompts, the tools and the shell lines | the kind each log row carries |
+| the refusals | a write row, which a door writes when it turns a write away |
+| the errors | the level the row carries |
+
+One thing the cases teach me. A chapter the mint refuses stood nowhere and said nothing, so the verb now names which chapter mints nowhere and why. My own fixture broke the route's own rule, and that silence hid it.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change touches no file the ask leaves out. The window module, the call inside collect, and the cases over both.
+- every door the change reaches has a fake. The cases drive the fake disk, the fake git and the fake clock.
+- a comment names the approach the change implements. The span says the design fixes it, and no box moves it.
 
 <!-- the form is checklist -->
 
