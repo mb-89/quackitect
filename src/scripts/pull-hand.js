@@ -396,7 +396,7 @@ export function handRule(it, front, all, group) {
   return {
     agent: Boolean(it.agent),
     ownerSays: Boolean(it.ownerSays),
-    cloud: inCloud(it.env ?? process.env),
+    cloud: Boolean(it.cloud ?? inCloud(it.env ?? process.env)),
     atRetro: String(front?.todo) === "true" || atRetro(all ?? [], group),
   };
 }
@@ -513,7 +513,8 @@ export function withPersonStep(it, one, before, asks, options) {
   }
   return inserted(it, one, before, `person-${standing + 1}`, {
     does: "answers the question the engine asks",
-    by: "person",
+    // A cloud box answers its own questions, so the step it inserts waits for nobody. [[spec/guidance/cloud]]
+    by: it.cloud ? "anyone" : "person",
     to: "engine",
     asks,
     evidence: [

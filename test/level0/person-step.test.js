@@ -131,9 +131,9 @@ function heard(run) {
   }
 }
 
-// [[spec/design_output/work#a-person-step-leaves]]
+// The road out of the branch is a desk's, so this case sits at one. [[spec/design_output/work#a-person-step-leaves]]
 test("the pull names the mint, the open and the unblock where a person's step is all that stands", () => {
-  const { said } = heard(() => work(ROOT, ["pull"], doors()));
+  const { said } = heard(() => work(ROOT, ["pull"], doors({ cloud: false })));
 
   assert.match(said, /a-child waits for a person at design\/person-1/);
   assert.match(
@@ -153,7 +153,7 @@ test("the pull names the mint, the open and the unblock where a person's step is
 // A cloud box answers every question it meets, so that step stands open to it. [[spec/guidance/cloud]]
 test("a cloud box takes the person's step, and the answer names no unblock", () => {
   const { said } = heard(() =>
-    work(ROOT, ["pull"], doors({ env: { CLAUDE_CODE_REMOTE: "1" } })),
+    work(ROOT, ["pull"], doors({ cloud: undefined, env: { CLAUDE_CODE_REMOTE: "1" } })),
   );
 
   assert.match(said, /a-child at design\/person-1/);

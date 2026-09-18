@@ -14,10 +14,10 @@ rationale: [[spec/rationales/cloud]]
 3. Take `main` in first, with `./RUNME.sh branch sync`. A late conflict costs the work standing behind it. *
 4. Work the branch you hold, and stop at its edge. A change nobody wants buries the one somebody wants. *
 5. Commit and push each time you finish a thing. This box dies and takes its working tree with it. *
-6. Decide every question whose wrong answer a later commit undoes. A box that waits on its own answer costs the owner a session. *
-7. Hand out a question whose wrong answer spends, sends, or loses work nobody rebuilds. A commit puts none of those back. *
-8. Read a step under `by: person` as a question, and weigh its cost. That stamp counts returns and knows nothing of the cost. *
-9. Mint a question you hand out with `./RUNME.sh mint ticket <path> --process=question`. Run `ticket open`, then `branch unblock <ticket> <name>`. The group lands without it. *
+6. Decide every question this branch meets, and hand none of them out. The merge is where a person reads your call. *
+7. Take a step under `by: person` as your own, and answer it. A cloud box carries nobody to wait for. *
+8. Say beside each answer what you weigh and what you assume. The hand at the merge judges the call on that. *
+9. Carry the branch to done, and stop for no answer you can write yourself. A branch standing mid-step costs the next box a session. *
 10. Finish every step an agent takes before you leave. A step you leave meets the next box and waits again. *
 11. Green the check before you hand the branch back, whatever hand puts the fault there. A fault with no owner outlives every hand that meets it. *
 12. Write your result, your retro and every script under `.se/scripts` into `HANDOVER.md`. Git carries what this box learns, and nothing else does.

@@ -3,6 +3,7 @@
 // carries who that is.
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 
+import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
 import { inRun } from "../../.claude/skills/level0/lib/folders.js";
 
 import { hashOf } from "../../.claude/skills/level0/lib/schema.js";
@@ -23,7 +24,7 @@ export const HARNESS = [
   ["CLAUDECODE", "claude-code"],
 ];
 
-const CLOUD = ["CLAUDE_CODE_REMOTE", "SE_CLOUD"];
+
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 export function agentOf(env) {
@@ -38,7 +39,7 @@ export function handDoors(env) {
   return {
     env,
     agent: Boolean(agentOf(env)),
-    cloud: CLOUD.some((key) => String(env?.[key] ?? "").trim()),
+    cloud: inCloud(env),
   };
 }
 

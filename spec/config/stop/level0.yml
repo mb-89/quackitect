@@ -38,8 +38,9 @@
   side: stop
   priority: 90
   decides: claimed
+  runs: a-person-sits-here
   yields: true
-  asks: Would a wrong answer here reach past this branch, so no later commit undoes it?
+  asks: Would a wrong answer here reach past this branch, so no later commit undoes it? A cloud box answers it instead, so claim this from a desk alone.
   says: A wrong answer here outlives this branch, so this turn ends and asks.
 
 - id: the-owner-holds-this-session
@@ -89,8 +90,9 @@
   side: stop
   priority: 0
   decides: claimed
+  runs: a-person-sits-here
   yields: true
-  asks: Is there an update the owner wants before you go on, and does no work stand?
+  asks: Is there an update the owner wants before you go on, and does no work stand? A cloud box gives its update at the merge, so claim this from a desk alone.
   says: An update stands worth giving, and nothing else holds, so this turn ends.
 
 - id: the-tooth-is-out

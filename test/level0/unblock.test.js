@@ -139,7 +139,7 @@ const onBranch = (extra = {}) => ({
   ...extra,
 });
 
-function doors(files, answers = {}) {
+function doors(files, answers = {}, more = {}) {
   const said = fakeGit(onBranch(answers), ROOT);
   const disk = fakeDisk({
     [at(".se/run/box.json")]: JSON.stringify({ id: "d462e994b4cef" }),
@@ -153,7 +153,10 @@ function doors(files, answers = {}) {
       join,
       clock: fakeClock(),
       agent: true,
-      cloud: true,
+      // This verb is a desk's, and a case driving the cloud road says so. [[spec/guidance/cloud]]
+      cloud: false,
+      env: {},
+      ...more,
     },
     disk,
   };
@@ -164,6 +167,20 @@ const standing = (child = CHILD(), extra = {}) => ({
   [at("spec/tickets/a-child.md")]: child,
   [at("spec/tickets/a-successor.md")]: SUCCESSOR,
   ...extra,
+});
+
+// A cloud box answers the step itself, so it hands nothing out. [[spec/guidance/cloud]]
+test("unblock refuses a cloud box, and names the pull instead", () => {
+  const { it, disk } = doors(standing(), {}, { cloud: true });
+
+  const { code, said } = heard(() =>
+    work(ROOT, ["unblock", "a-child", "a-successor"], it),
+  );
+
+  assert.equal(code, 2);
+  assert.match(said, /hands no question out/);
+  assert.match(said, /branch pull a-child/);
+  assert.equal(fieldOf(disk.read(at("spec/tickets/a-child.md")), "state"), "open");
 });
 
 // [[spec/design_output/work#a-person-step-leaves]]
