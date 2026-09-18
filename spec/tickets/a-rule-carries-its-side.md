@@ -92,7 +92,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box dd2a59294365 · claude-code-remote
@@ -104,6 +104,10 @@ record:
     hash_after: 9f5de1e36173176d7bf67664279cadd59b1e4564
     returns: 1
     why: "`MagicNumber` and `Schema.Placeholder` read `warning` today, so the claim that every rule reads `error` fails.; Warnings stand today under `./RUNME.sh check`, so a push door refusing on one refuses every push.; The approach names `src/scripts/prepush.js` alone, and the session push door in `src/bridge/bash.js` stands unnamed.; The generated `level` line comes from `.claude/skills/level0/lib/paragraph.js` and `snippets.js`, which the approach leaves out.; `spec/schemas/paragraph.schema.yaml` holds layers, and the projection writes many rules a layer, so a field a rule needs a new key.; Rules under `VoiceVale`, `VoiceShape` and `VoiceScript` carry no `level` line today, so Vale reads them at its default.; The approach writes `lib/tree.js`, and the file stands at `.claude/skills/level0/lib/tree.js`.; A write the door refuses at `error` still records its warnings, so the record describes text no file holds.; `voiceDoor` stands last in `src/bridge/write.js`, so an earlier door's refusal records nothing."
+  - step: design/draft
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 1fe3fc16e9f5288028759a8f3ce518b61c2bdf40
+    hash_after: 1fe3fc16e9f5288028759a8f3ce518b61c2bdf40
 ---
 
 # Ask
@@ -131,52 +135,58 @@ Every rule stands at error when this lands, so the tree behaves as it behaves to
 
 <!-- the form is text -->
 
-The side is the word a finding already carries: `severity`, reading `error` or `warning`. This change adds no word. It gives every rule one, and makes the two doors read it.
+The side is the word a finding already carries: `severity`, reading `error` or `warning`. This change adds no word. It gives every Vale rule one, and makes the doors read it.
 
 | what stands today | where |
 |---|---|
 | the split on the word | `./RUNME.sh lint`, in `src/scripts/cli-read.js` |
 | the ruling on what each side means | [[spec/design_output/schema#warning-now-and-error-later]] |
+| two rules already at `warning` | `MagicNumber` in `lib/magic.js`, `Schema.Placeholder` in `lib/schema.js` |
 
-**Where a side stands.** Every rule names its side in the file a reader edits:
+**Which rules this touches.** The Vale rules alone. The two above carry a side today, and they keep it. So "each one reads error" holds for the rules this change reaches, and the tree behaves as it behaves today.
 
-| rule family | where the side stands | who writes the finding |
+| rule family | where the side stands after | who writes the finding |
 |---|---|---|
-| the paragraph rules | `spec/schemas/paragraph.schema.yaml`, one field a rule | Vale, off the projected `level` |
-| the hand-written rules under `VoiceScript`, `VoiceShape` and `VoiceVale` | the rule's own `level` | Vale |
-| the rules over two files | the `fault` call in `lib/tree.js` | the check and the panel |
-| the shape rules | the Go rules under `src/lsp` | the language server |
+| the paragraph rules | a `side` key a rule, under a new `rules:` map in `spec/schemas/paragraph.schema.yaml` | Vale, off the projected `level` |
+| the hand-written rules under `VoiceScript`, `VoiceShape` and `VoiceVale` | the rule's own `level`, which each gains | Vale |
+| the rules over two files | the `fault` call in `.claude/skills/level0/lib/tree.js` | the check and the panel |
+| the shape rules | the Go rules under `src/lsp`, unchanged | the language server |
 
-Vale's `level` is the side for a Vale rule, so no second field stands beside it. The projection carries the schema's field into the generated `level`, and a rule naming none reads `error`.
+**The schema holds layers, and the projection writes rules.** A layer carries many rules, so a side beside a layer names none of them. The new `rules:` map takes the rule name the projection writes as its key, and holds a `side` a rule. A rule the map leaves out reads `error`.
 
-**Every rule reads error when this lands.** The projection writes `error` where the schema names nothing, and `fault` stamps `error` today. So the tree behaves as it behaves today, and a later ruling moves one rule by editing one field.
+**Where the generated line comes from.** `.claude/skills/level0/lib/paragraph.js` and `.claude/skills/level0/lib/snippets.js` write `level: error` into each generated file. Each takes the word from the map in its place. The hand-written rules under the other three folders carry no `level` line today, so each gains one reading `error`.
 
-**The write door.** `voiceDoor` in `src/bridge/write.js` refuses on any finding Vale keeps. It splits:
+**The write door.** `voiceDoor` stands last in the `checks` array of `src/bridge/write.js`, and it refuses on any finding Vale keeps. It splits:
 
 | what the door reads | what it does |
 |---|---|
-| a finding at `error` | refuses the write, as today |
-| a finding at `warning` | lets the write land, and records the finding |
-| both | refuses, and records the warning beside it |
+| a finding at `error` | refuses the write, and records nothing |
+| a finding at `warning` alone | lets the write land, and records the finding |
+| both | refuses, and records nothing |
 
-**The record.** The warnings stand in one file under the runtime folder, whose name `.claude/skills/level0/lib/folders.js` owns. It holds one entry a finding: the file, the line, the rule and the message. A write to a file rewrites that file's entries, so the record says what stands now.
+A refusal records nothing, because the record describes a file as it stands. An earlier door refusing first stops the chain, and records nothing for the same reason.
 
-**The two readers.**
+**The record.** The warnings stand in one file under the runtime folder, whose name `.claude/skills/level0/lib/folders.js` owns. It holds one entry a finding: the file, the line, the rule and the message. A write that lands rewrites that file's entries.
 
-| reader | what it does with the record |
+**The two push doors.** Both hold the same rule, the way they hold the battery rule today:
+
+| door | when it reads |
 |---|---|
-| the push door, `src/scripts/prepush.js` | refuses the push while an entry stands, and names the files |
-| the problems panel | draws the entries beside the doors' own findings |
+| `src/scripts/prepush.js` | a push from a shell outside a session |
+| `src/bridge/bash.js`, at `touchesGit(command).pushes` | a push a session runs |
 
-**What the refactoring hand reads.** The same record. [[spec/tickets/the-hook-spawns-a-refactorer]] takes the spawn, and this ticket writes the list it reads. So one list feeds the panel, the hand and the push door, and every reader counts off it.
+Each refuses while the record holds an entry, and names the files. The record holds what a write in this tree records, so a tree nobody writes to pushes today. A hand meeting a refusal runs `./RUNME.sh lint` to see what stands.
+
+**What the refactoring hand reads.** The same record. [[spec/tickets/the-hook-spawns-a-refactorer]] takes the spawn, and this ticket writes the list it reads. So one list feeds the panel, the hand and both push doors.
 
 **The cases.**
 
 - a finding at `warning` alone lets a write land, and the record holds it
-- a finding at `error` refuses, whatever the warnings beside it say
+- a finding at `error` refuses, and the record stays as it stands
 - a second write to one file replaces that file's entries
-- the push door refuses while an entry stands, and passes on an empty record
-- the projection writes `error` for a rule naming no side, and the named side otherwise
+- each push door refuses while an entry stands, and passes on an empty record
+- the projection writes `error` for a rule the map leaves out, and the named side otherwise
+- every generated rule file carries a `level` line, and so does every hand-written one
 
 ## review
 
