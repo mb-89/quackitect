@@ -7,6 +7,9 @@
 # decides  claimed means the agent says so, mechanical means a check answers.
 # runs     the check, by the name the hook holds it under. A claimed rule naming
 #          one fires where the agent claims it and the check stands.
+# yields   the claim loses to any mechanical continue that fires, whatever the
+#          priorities say. It marks a stop the agent claims over its own work,
+#          where the check reads the tree and the claim reads the agent.
 # asks     the question the re-prompt puts to the agent.
 # says     the sentence a person or an agent reads.
 
@@ -31,12 +34,13 @@
   asks: Is this the opening turn of a chat where nobody has said what to do yet?
   says: The chat is new and a person stands at this box, so this turn ends and asks.
 
-- id: a-person-holds-the-answer
+- id: a-wrong-answer-leaves-the-box
   side: stop
   priority: 90
   decides: claimed
-  asks: Does going on need what only a person can give?
-  says: Going on needs what only a person gives, so this turn ends.
+  yields: true
+  asks: Would a wrong answer here reach past this branch, so no later commit undoes it?
+  says: A wrong answer here outlives this branch, so this turn ends and asks.
 
 - id: the-owner-holds-this-session
   side: stop
@@ -70,6 +74,7 @@
   side: stop
   priority: 45
   decides: claimed
+  yields: true
   asks: Does the work stand complete?
   says: The work stands complete, so this turn ends.
 
@@ -77,6 +82,7 @@
   side: stop
   priority: 0
   decides: claimed
+  yields: true
   asks: Is there an update the owner wants before you go on, and does no work stand?
   says: An update stands worth giving, and nothing else holds, so this turn ends.
 

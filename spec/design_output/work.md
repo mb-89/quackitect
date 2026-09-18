@@ -256,6 +256,28 @@ The contract says what a branch does:
 A brief depends on nothing outside itself, so a cloud session aiming at one
 branch reads it and knows how to finish.
 
+# A branch moves clean
+
+`branch take` and `branch release` both switch onto a branch and reset it hard
+onto origin. That reset makes the checkout match what the queue holds, and it
+drops whatever the box holds past it.
+
+So `dirty` guards every branch move, and work stands two ways:
+
+| what stands | what reads it | the way out |
+|---|---|---|
+| a change nobody commits | `git status --porcelain` | commit it, or put it aside |
+| a commit origin lacks | `rev-list origin/<branch>..<branch>` | push it |
+
+Either reading refuses the move and names its way out. A hand wanting the work
+gone resets by hand, which says so out loud.
+
+One reading alone leaves a hole. A commit stands outside the working tree. So a
+box committing its work moves it into the reset's path.
+
+The guard reads a `work/` branch alone. Trunk takes a merge a desk pushes later,
+and `onBranch` resets no trunk.
+
 # Trunk comes in first
 
 `branch sync` merges `origin/main` into the branch. `branch take` runs it, so a

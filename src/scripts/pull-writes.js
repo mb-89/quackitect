@@ -14,7 +14,7 @@ import {
   handOut,
   holdsHere,
   ticketsHere,
-  withPersonStep,
+  withSettleStep,
 } from "./pull-hand.js";
 import { DONE, REFUSED, say, WORK, walkOf } from "./pull-route.js";
 import { changedIn } from "./work.js";
@@ -92,13 +92,13 @@ export function failed(it, who, one, leaf, held, reason, answered) {
 
   const most = Number(it.fails);
   if (most > 0 && returns >= most) {
-    const put = withPersonStep(
+    const put = withSettleStep(
       it,
       one,
       back,
       `${leaf.path} failed back ${returns} times: ${reason}`,
     );
-    if (put.path) changes.push(`${back} waits for a person at ${put.path}`);
+    if (put.path) changes.push(`${back} waits for a hand at ${put.path}`);
   }
 
   const finding = landed(it, one, changes);

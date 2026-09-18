@@ -253,6 +253,70 @@ test("mostInARow ends a runaway", () => {
   assert.equal(it.inARow(), 0, "the count starts again");
 });
 
+// A claim reads the agent, and a check reads the tree, so the check wins. [[spec/design_output/stop#a-check-beats-a-claim]]
+const YIELDING = [
+  {
+    id: "own-judgment",
+    side: "stop",
+    priority: 90,
+    decides: "claimed",
+    yields: true,
+    asks: "Would a wrong answer here reach past this branch?",
+    says: "a wrong answer outlives this branch",
+  },
+  {
+    id: "owner-spoke",
+    side: "stop",
+    priority: 100,
+    decides: "claimed",
+    asks: "Does the owner open a discussion?",
+    says: "the owner opens a discussion",
+  },
+  {
+    id: "work-stands",
+    side: "continue",
+    priority: 10,
+    decides: "mechanical",
+    runs: "work-waiting",
+    says: "work stands",
+  },
+  {
+    id: "owner-carries-on",
+    side: "continue",
+    priority: 99,
+    decides: "claimed",
+    says: "the owner says carry on",
+  },
+];
+
+function yielded(fired, claimed) {
+  return decide(YIELDING, { claimed, ran: ranOf(fired) });
+}
+
+test("a yielding stop loses to a check, whatever the priorities say", () => {
+  const said = yielded(["work-waiting"], "own-judgment");
+  assert.equal(said.ends, false, "the turn holds open");
+  assert.equal(said.yields, true, "the vote says the claim yielded");
+  assert.equal(said.go.id, "work-stands", "the re-prompt names the check");
+});
+
+test("a yielding stop stands where no check fires", () => {
+  const said = yielded([], "own-judgment");
+  assert.equal(said.ends, true, "nothing reads the tree, so the claim holds");
+  assert.equal(said.yields, false);
+});
+
+test("a yielding stop stands over a continue the agent also claims", () => {
+  const said = yielded([], "own-judgment");
+  assert.equal(said.ends, true, "one claim beats another on priority alone");
+});
+
+test("a stop outside the agent's own work beats a check", () => {
+  const said = yielded(["work-waiting"], "owner-spoke");
+  assert.equal(said.ends, true, "the owner speaking ends the turn");
+  assert.equal(said.yields, false);
+});
+
 // [[spec/design_output/stop#three-in-a-row]]
 test("a firm continue rule holds past the cap, because the queue still holds work", () => {
   const it = toothOf();

@@ -201,6 +201,44 @@ it fires. The agent claims the reason, the check says the moment stands, and a
 claim outside that moment fires nothing. `fires` in `lib/stop.js` holds it, and
 a claimed rule naming no check fires on the claim alone, as before.
 
+## A check beats a claim
+
+A rule carrying `yields` loses to any mechanical continue that fires, whatever
+the priorities say. `decide` in `lib/stop.js` holds it, and the vote reports the
+yield under `yields`.
+
+The flag marks a stop the agent claims over its own work. Such a claim reads the
+agent, and a check reads the tree. So the tree wins:
+
+| rule | what it reads |
+|---|---|
+| `a-wrong-answer-leaves-the-box` | what the agent takes a wrong answer to cost |
+| `the-work-stands-complete` | what the agent takes for a finish |
+| `an-update-is-worth-giving` | what the agent takes the owner to want |
+
+A stop the owner drives carries no flag. `the-owner-asks-to-talk` reads the
+owner's own words, so it stands over every check.
+
+The band table puts `90` to `100` in the owner's hands. A claim about the agent's
+own work stands there today, and it overrides every check reading the branch. The
+flag takes that override away and leaves the number alone.
+
+## The blast radius decides
+
+`a-wrong-answer-leaves-the-box` asks what a wrong answer costs, and who undoes
+it. A box answers a question whose wrong answer a commit undoes. It hands out a
+question whose wrong answer reaches past the branch.
+
+A wrong answer leaves the box where it does one of these:
+
+- it spends, sends or opens a door: money, a message to somebody outside, a secret
+- it loses work nobody rebuilds: a dropped commit, a deleted row, a release
+- it stands outside the brief: a product call the brief leaves open
+
+The reason this replaces asks whether a person answers, and a person answers
+anything. That test lets every hard call out of the box, so a cloud box ends its
+turn on a question it owns.
+
 ## The chat is new
 
 `the-chat-is-new` is the opening turn's reason. A person opens a chat, nobody
@@ -289,7 +327,7 @@ room that knows. For the table, see [[spec/design_output/level0#the-needs-table]
 
     Something on your list stands unfinished, so carry on with it. To stop, call mcp__level0__stop last, with one reason:
       the-owner-asks-to-talk: Does the last thing the owner said open a discussion?
-      a-person-holds-the-answer: Does going on need what only a person can give?
+      a-wrong-answer-leaves-the-box: Would a wrong answer here reach past this branch?
       the-work-stands-complete: Does the work stand complete?
       an-update-is-worth-giving: Is there an update the owner wants before you go on?
     Before the call, close the answer with the heading What the agent needs and a table headed No., question and proposed answer, one numbered row a need.
