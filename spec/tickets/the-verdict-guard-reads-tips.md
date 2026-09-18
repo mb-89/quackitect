@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: design/review
+step: implement/tests-red
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -128,6 +128,10 @@ record:
     hand: box dd2a59294365 · claude-code-remote
     hash_before: 4cf8b6e8a2082e2a3240ccf1e98e828d845298b9
     hash_after: 4cf8b6e8a2082e2a3240ccf1e98e828d845298b9
+  - step: design/review
+    hand: box dd2a59294365 · claude-code-remote · helper-7
+    hash_before: 914b6b999696d41682792fa1f64f979b656a38fb
+    hash_after: 914b6b999696d41682792fa1f64f979b656a38fb
 group: the-warnings-feed-a-refactorer
 ---
 
@@ -256,10 +260,17 @@ names, and a hand off them stands outside this guard.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- A subject carries other ticket names past its prefix. `childrenWaiting` writes `because <children> stand open`, and `became` writes its successor. A guard reading the whole subject refuses a parent's commit. Name the prefix before the colon as what the guard reads.
-- `changedSince` reads `git status --porcelain` too. A sibling hand writes into the tree this hand shares. Those files stand under no subject, so the span keeps them. Then `formFault` refuses the hand-back for leaving them out. Say what the `read` field does with a file no commit carries yet.
+- The guard reads the prefix before the first colon, which is the name `landed` writes.
+- A subject naming a child or a successor past the prefix reads as this hand's commit.
+- The `read` field spans the commits whose prefix names this ticket.
+- It holds the working tree where the hold's tip stands at the branch tip, as design/settle-1 decides.
+- A sibling's `add -A` lands under the sibling's prefix, so the range names this ticket nowhere.
+- The git door answers `ok`, which tells an empty range from a failed call.
+- The prefix names the ticket whatever path a commit carries, so this hand's own write refuses.
+- Each done_when case stands in the case list, so the implement leaf has a test for each.
+- The approach puts a commit made past the verbs outside the guard, and says so.
 
 # implement
 
