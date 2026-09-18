@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 step: verdict
 steps:
@@ -162,8 +162,13 @@ record:
       - name: check
         exit: 0
         said: 75 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box d42624a67d18a8 · claude-code · helper-30
+    hash_before: 88796e7db9d81d21447c959d930135ae3cadef17
+    hash_after: 88796e7db9d81d21447c959d930135ae3cadef17
 group: the-retro-runs
 depends_on: ["the-retro-takes-the-box"]
+reason: done
 ---
 
 # Ask
@@ -415,17 +420,107 @@ The owner lookup moves to a file of its own, because the projector stands past t
 
 <!-- every file you read, one a line -->
 
+- .claude/commands/se-config-work-retroCap.md
+- .claude/commands/se-config-work-retroReaders.md
+- .claude/commands/se-retro.md
+- .claude/skills/level0/lib/projection-owner.js
+- .claude/skills/level0/lib/projection.js
+- .claude/skills/level0/lib/stop.js
+- spec/config/level0.json
+- spec/config/level0.schema.json
+- spec/config/projections.json
+- spec/config/stop/level0.yml
+- spec/design_input/the-agent-pulls-tickets.md
+- spec/design_output/projection.md
+- spec/design_output/pull.md
+- spec/design_output/stop.md
+- spec/design_output/work.md
+- spec/guidance/cloud.md
+- spec/guidance/guidance.md
+- spec/guidance/working.md
+- spec/processes/retro.yaml
+- spec/rationales/cloud.md
+- spec/rationales/guidance.md
+- spec/rationales/working.md
+- spec/tickets/a-retro-mints-itself.md
+- spec/tickets/a-return-asks-another-hand.md
+- spec/tickets/retro-018ba26.md
+- spec/tickets/the-retro-cuts-its-window.md
+- spec/tickets/the-retro-lays-its-leaves.md
+- spec/tickets/the-retro-runs.md
+- spec/tickets/the-retro-takes-the-box.md
+- spec/tickets/the-runtime-folder-holds-state.md
+- src/doors/disk.js
+- src/doors/fake/disk.js
+- src/scripts/cli-doors.js
+- src/scripts/guidance-hand.js
+- src/scripts/hand.js
+- src/scripts/pull-chapter.js
+- src/scripts/pull-hand.js
+- src/scripts/pull-route.js
+- src/scripts/pull-writes.js
+- src/scripts/pull.js
+- src/scripts/retro-collect.js
+- src/scripts/retro-leaves.js
+- src/scripts/retro-new.js
+- src/scripts/retro.js
+- src/scripts/ticket.js
+- src/scripts/work-stands.js
+- src/scripts/work.js
+- test/contract/disk.test.js
+- test/contract/pull-payload.test.js
+- test/contract/stop-rules.test.js
+- test/level0/hand.test.js
+- test/level0/person-step.test.js
+- test/level0/projection.test.js
+- test/level0/pull-leaves.test.js
+- test/level0/pull-steps.test.js
+- test/level0/retro-collect.test.js
+- test/level0/retro-leaves.test.js
+- test/level0/retro-new.test.js
+- test/level0/stop.test.js
+- test/level0/work.test.js
+
 <!-- the form is files -->
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
+pass
+
+The change answers every line of the ask, and each rule it adds carries a test.
+
+| what the ask asks | where it lands |
+|---|---|
+| one command mints, opens, and hands out the first leaf | `src/scripts/retro-new.js`, which calls the mint and the pull |
+| the two knobs stand with their defaults | `spec/config/level0.json` and its schema |
+| the projection writes the command | the retro entry in `spec/config/projections.json` |
+| the tree stays clean | `git status --porcelain` answers empty, and check exits 0 |
+
+| what the reviewing guidance asks | what stands |
+|---|---|
+| the branch does what the brief asks | the three command files, the sub-verb, and the owner lookup |
+| the diff beyond the brief | the siblings' own work, which this branch carries alongside |
+| a rule with a test proving it fires | the owner lookup takes each family and answers the right entry |
+| a bad input meets a refusal | `retro new` on a name a ticket holds writes nothing and exits 1 |
+| a retro handback | none stands, because this ticket runs at the desk |
+
+One fault stands, too small to hold the ticket, and a private note carries it.
+
+| the fault | where |
+|---|---|
+| the moved lookup leaves two pointers above `staleIn`, which names another chapter | `.claude/skills/level0/lib/projection.js` |
+
+`./RUNME.sh check` exits 0 on this branch, and `node --test` passes over the two test files.
+
 <!-- the form is verdict -->
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
+
+- the `writes` key stands once in [[spec/design_output/projection]], and the code points at that chapter
 
 <!-- the form is checklist -->
 
