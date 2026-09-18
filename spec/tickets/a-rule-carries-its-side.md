@@ -1,13 +1,21 @@
 ---
 kind: [[ticket]]
 state: open
-depends_on:
-  - the-runtime-files-stand-apart
 urgency: now
+step: design/person-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: "design/review failed back 2 times: Every rule under `VoiceScript`, `VoiceShape` and `VoiceVale` reads `level: error` today, so that work stands done.; The scope line says the Vale rules alone, and the table beside it names `tree.js` and the Go rules.; The gain asks for one list, and the record a write fills stands apart from the list the panel draws.; The push doors read that record alone, so every warning `./RUNME.sh check` names today passes them.; `size.js`, `ticket.js` and `schema.js` each build a finding carrying `severity`, and the table leaves all three out."
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -91,8 +99,6 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-group: the-warnings-feed-a-refactorer
-step: design/review
 record:
   - step: design/draft
     hand: box dd2a59294365 · claude-code-remote
@@ -108,6 +114,14 @@ record:
     hand: box dd2a59294365 · claude-code-remote
     hash_before: 1fe3fc16e9f5288028759a8f3ce518b61c2bdf40
     hash_after: 1fe3fc16e9f5288028759a8f3ce518b61c2bdf40
+  - step: design/review
+    hand: box dd2a59294365 · claude-code-remote · helper-4
+    hash_before: a26a850f2eb6b762e99698ae80c59d24e4256b45
+    hash_after: a26a850f2eb6b762e99698ae80c59d24e4256b45
+    returns: 2
+    why: "Every rule under `VoiceScript`, `VoiceShape` and `VoiceVale` reads `level: error` today, so that work stands done.; The scope line says the Vale rules alone, and the table beside it names `tree.js` and the Go rules.; The gain asks for one list, and the record a write fills stands apart from the list the panel draws.; The push doors read that record alone, so every warning `./RUNME.sh check` names today passes them.; `size.js`, `ticket.js` and `schema.js` each build a finding carrying `severity`, and the table leaves all three out."
+group: the-warnings-feed-a-refactorer
+depends_on: ["the-runtime-files-stand-apart"]
 ---
 
 # Ask
@@ -124,6 +138,16 @@ Every rule stands at error when this lands, so the tree behaves as it behaves to
 - `./RUNME.sh check` answers 0
 
 # design
+
+## person-1
+
+<!-- answers the question the engine asks -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
 
 ## draft
 
@@ -200,15 +224,11 @@ Each refuses while the record holds an entry, and names the files. The record ho
 
 fail
 
-- `MagicNumber` and `Schema.Placeholder` read `warning` today, so the claim that every rule reads `error` fails.
-- Warnings stand today under `./RUNME.sh check`, so a push door refusing on one refuses every push.
-- The approach names `src/scripts/prepush.js` alone, and the session push door in `src/bridge/bash.js` stands unnamed.
-- The generated `level` line comes from `.claude/skills/level0/lib/paragraph.js` and `snippets.js`, which the approach leaves out.
-- `spec/schemas/paragraph.schema.yaml` holds layers, and the projection writes many rules a layer, so a field a rule needs a new key.
-- Rules under `VoiceVale`, `VoiceShape` and `VoiceScript` carry no `level` line today, so Vale reads them at its default.
-- The approach writes `lib/tree.js`, and the file stands at `.claude/skills/level0/lib/tree.js`.
-- A write the door refuses at `error` still records its warnings, so the record describes text no file holds.
-- `voiceDoor` stands last in `src/bridge/write.js`, so an earlier door's refusal records nothing.
+- Every rule under `VoiceScript`, `VoiceShape` and `VoiceVale` reads `level: error` today, so that work stands done.
+- The scope line says the Vale rules alone, and the table beside it names `tree.js` and the Go rules.
+- The gain asks for one list, and the record a write fills stands apart from the list the panel draws.
+- The push doors read that record alone, so every warning `./RUNME.sh check` names today passes them.
+- `size.js`, `ticket.js` and `schema.js` each build a finding carrying `severity`, and the table leaves all three out.
 
 # implement
 
@@ -218,7 +238,7 @@ fail
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+<!-- the same tests pass -->
 
 <!-- the form is command -->
 
