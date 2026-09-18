@@ -225,7 +225,11 @@ record:
     hand: box d5700e16c529 · claude-code-remote
     hash_before: 9d8d4f17a54fe0c91a9e088fc78f723700f203a6
     hash_after: 9d8d4f17a54fe0c91a9e088fc78f723700f203a6
-step: retro/cloud
+  - step: retro/cloud
+    hand: box d5700e16c529 · claude-code-remote
+    hash_before: 3672d84faee2997dd590ec3b927ff9a681a7746f
+    hash_after: 3672d84faee2997dd590ec3b927ff9a681a7746f
+step: children
 ---
 
 # Ask
@@ -355,8 +359,6 @@ So this box spends its walk on the route and its answer on the owner, because th
 
 <!-- the form is list -->
 
-- the node registry, which answers a gateway error, so the box points the install at a mirror, at the install
-- the module proxy the index build reads, which answers the same, so the index stays unbuilt, at the install
 - `mcp__level0__patch` and `mcp__level0__replace`, which the guidance names for a many-line write, at the retro write
 - `check_answer`, which the guidance names over a long draft, at this answer
 
@@ -366,9 +368,8 @@ So this box spends its walk on the route and its answer on the owner, because th
 
 <!-- the form is list -->
 
-- the install door, which holds the modules as a need, so one refusing host stops every verb
 - the person step on [[spec/tickets/the-pull-splits-by-topic]], which leaves the children step again
-- the voice rules, which hold a retro in the present tense, and which the lint answers clean
+- the voice rules over a retro, which the lint names and this box cuts to
 - the write door, which a shell write walks past, so the lint alone carries the check
 
 ### left
@@ -377,12 +378,12 @@ So this box spends its walk on the route and its answer on the owner, because th
 
 <!-- the form is list -->
 
-- [[spec/tickets/the-pull-splits-by-topic]] waits at design/person-1, and its record holds the question the engine asks
+- [[spec/tickets/the-pull-splits-by-topic]] waits at its person step, and its record holds the question the engine asks
 - the split of the pull and the work verb waits behind that person step
-- the mirror this box names stands in its own home folder, and the tree carries no pointer to it
 - this box mints no ticket, so none stands here without a group
 - the branch owes its handover at done, and this retro is what it carries
 - the group's discussion names what a person decides, each with the moment it shows
+- the owner carries a notification naming that person step, so the decision reaches them off the branch
 
 # Discussion
 
