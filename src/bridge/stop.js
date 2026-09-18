@@ -173,13 +173,18 @@ export function onStop(e, box) {
   return { ...answer, spawn: hand, back: { event: REFACTOR_ANSWERED, file: hand.file } };
 }
 
-// The hand the rule starts: the flag holds it back, the list says whether it goes, and the count bounds a session. [[spec/tickets/the-spawn-reaches-its-guidance]]
-export function refactorHand(box) {
-  if (asks(box, REFACTOR.on) === false) return null;
-  const stamp = stampHere(box);
-  if (!standsPast(stamp.warnings, asks(box, REFACTOR.most))) return null;
+// Whether a hand still wants to go: the flag on, the list past the number, and this session's count unspent. The vote reads this, because a rule reading the list alone holds every turn open on a tree carrying warnings. [[spec/tickets/the-spawn-reaches-its-guidance]]
+export function handWanted(box) {
+  if (asks(box, REFACTOR.on) === false) return false;
+  if (!standsPast(stampHere(box).warnings, asks(box, REFACTOR.most))) return false;
   const most = Number(asks(box, REFACTOR.atOnce) ?? 0);
-  if (most > 0 && (box.refactors ?? 0) >= most) return null;
+  return !(most > 0 && (box.refactors ?? 0) >= most);
+}
+
+// The hand the rule starts: the file it takes, and the count it spends. [[spec/tickets/the-spawn-reaches-its-guidance]]
+export function refactorHand(box) {
+  if (!handWanted(box)) return null;
+  const stamp = stampHere(box);
   const now = Math.floor(box.clock.now().getTime() / MS);
   const file = takesFile(stamp.files, wroteIn(box, stamp.files), now, spanOf(asks(box, REFACTOR.untouched)));
   if (!file) return null;
@@ -256,8 +261,7 @@ function ranHere(name, held) {
   // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud]]
   if (name === "a-person-sits-here") return !inCloud(held.box.env ?? process.env);
   // [[spec/tickets/the-spawn-reaches-its-guidance]]
-  if (name === "warnings-standing")
-    return standsPast(stampHere(held.box).warnings, asks(held.box, REFACTOR.most));
+  if (name === "warnings-standing") return handWanted(held.box);
   return undefined;
 }
 

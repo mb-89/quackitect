@@ -33,6 +33,7 @@ const RULES = `
   side: stop
   priority: 45
   decides: claimed
+  yields: true
   asks: Does the work stand complete?
   says: The work stands complete, so this turn ends.
 
@@ -163,6 +164,18 @@ test("the hand goes once a session, and the flag off starts none", () => {
 
   const off = box(stamped(9, ["old.md"]), { ...REFACTOR, parallel: false });
   assert.equal(onStop(turn, off.box).spawn, undefined);
+});
+
+// A rule reading the list alone holds every turn open on a tree carrying warnings. [[spec/tickets/the-spawn-reaches-its-guidance]]
+test("the vote holds the turn open while a hand wants to go, and lets it end after", () => {
+  const it = box(stamped(9, ["old.md"]));
+  const done = { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" };
+
+  assert.match(onStop(done, it.box).result.block, /warnings stand past the number/);
+  assert.deepEqual(onStop(done, it.box), { pass: true }, "the count spends, and the turn ends");
+
+  const off = box(stamped(9, ["old.md"]), { ...REFACTOR, parallel: false });
+  assert.deepEqual(onStop(done, off.box), { pass: true }, "the flag off holds no turn");
 });
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]

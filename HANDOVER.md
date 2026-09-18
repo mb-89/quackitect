@@ -70,6 +70,8 @@ The stop door starts a hand beside its vote, and that hand drains the warnings o
 
 The check writes what the lint leaves standing into `.se/run/check.json`, so the door counts the list and lints nothing. A box whose check has yet to run starts no hand.
 
+The rule holds a turn open while a hand still wants to go, and `handWanted` answers that. It reads three things: the flag on, the list past the number, and this session's count unspent. A rule reading the list alone beats a completion claim, which carries `yields`. It then holds the session at that turn while the list stands.
+
 # What waits
 
 | what | who does it |
@@ -88,3 +90,4 @@ The check writes what the lint leaves standing into `.se/run/check.json`, so the
 - A design review returning twice buys a settle step, which another agent hand takes. Three readings settled one approach here.
 - A verdict hand reads the note owning a rule the change moves. Two rows of `spec/design_output/pull.md` cost this ticket a round.
 - The fake process door keys its table on the whole argv, `git` and all. A key leaving it out answers an empty string.
+- A `continue` rule beats every claim carrying `yields`, whatever its priority. The first shape of the warnings rule holds this session at its own stop, and the hook says so.
