@@ -90,12 +90,18 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box a5e189c39e1d · claude-code-remote
     hash_before: 9c88da1bf3b10754ac711f81c7505a5a77b404b6
     hash_after: 9c88da1bf3b10754ac711f81c7505a5a77b404b6
+  - step: design/review
+    hand: box a5e189c39e1d · claude-code-remote · helper-2
+    hash_before: 26e21ce695f0ee858694c9a37d2a525097a150c9
+    hash_after: 26e21ce695f0ee858694c9a37d2a525097a150c9
+    returns: 1
+    why: "`./RUNME.sh check` hands `.` to `se-lsp check`, and that takes `Sweep`. A rule under `Checker.Over` draws nothing in the lint.; Carry the rule in `Rules` instead, so it walks `Tree.Paths`. The pointers the Go, the JavaScript and the shell hold draw too.; Say which characters the slug drops. The heading `The owner's prompt comes first` answers the anchor `the-owners-prompt-comes-first`.; Name where a pointer's target resolves to a path. `pointsAt` stands in the index alone, so say which side the checker asks.; More notes than `spec/design_output/lsp` lack a heading a pointer names. Run the new rule over the tree, and name every note it draws."
 ---
 
 # Ask
@@ -149,6 +155,14 @@ reaches, and the heading half decides nothing there.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- `./RUNME.sh check` hands `.` to `se-lsp check`, and that takes `Sweep`. A rule under `Checker.Over` draws nothing in the lint.
+- Carry the rule in `Rules` instead, so it walks `Tree.Paths`. The pointers the Go, the JavaScript and the shell hold draw too.
+- Say which characters the slug drops. The heading `The owner's prompt comes first` answers the anchor `the-owners-prompt-comes-first`.
+- Name where a pointer's target resolves to a path. `pointsAt` stands in the index alone, so say which side the checker asks.
+- More notes than `spec/design_output/lsp` lack a heading a pointer names. Run the new rule over the tree, and name every note it draws.
 
 # implement
 
