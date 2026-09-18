@@ -182,7 +182,7 @@ steps:
       - name: groups
         form: list
         says: one line per ticket, with its group and its urgency
-step: mine/runs
+step: mine/unread
 process: [[spec/processes/retro]]
 process_hash: 61a2bb140f0b4632
 record:
@@ -250,6 +250,10 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: d4db13db9644c8f1be9bf721c6628bf7370bdf51
     hash_after: d4db13db9644c8f1be9bf721c6628bf7370bdf51
+  - step: mine/runs
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 0aeab287fb637d29b03106372458c4fae3dbe5f2
+    hash_after: 0aeab287fb637d29b03106372458c4fae3dbe5f2
 ---
 
 # Ask
@@ -506,13 +510,20 @@ The thought length reads zero in every chapter, so the curve carries one axis al
 
 ### lacked
 
-<!-- what the boxes lacked and met, with what repeats across runs -->
+- thirty groups merge in the window, and their cloud leaves carry the same shape each run.
+- the road off a person step is what repeats. A box reaches one, finds no successor, and leaves.
+- the trunk guard meets a box whose sync reads the pushed trunk while the desk stands ahead.
+- a branch a box holds stays held after the box leaves, and the next hand waits on it.
 
 <!-- the form is list -->
 
 ### left
 
-<!-- what the boxes left for a person that still stands -->
+- the guidance now says a box mints a ticket for a person and closes its branch.
+- three branches this session stand merged, and one of them waits six hours on a hold nobody frees.
+- the person steps of the closed tickets number 33, and the record names a wait on each.
+
+<!-- the form is list -->
 
 <!-- the form is list -->
 
