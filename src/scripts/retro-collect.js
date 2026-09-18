@@ -24,8 +24,9 @@ export function collect(it, name) {
     return 2;
   }
 
+  // The retro's own first leaf is a hold, so collect passes that one and refuses the rest. [[spec/tickets/the-retro-takes-the-box]]
   const holding = holdsAnywhere(it);
-  if (holding) {
+  if (holding && String(holding.held?.ticket ?? "") !== name) {
     console.error(`${holding.at} stands, and a hand holds a ticket while it works.`);
     console.error("Hand that step back, then run collect again.");
     return 1;
@@ -33,12 +34,12 @@ export function collect(it, name) {
 
   const from = it.join(it.root, PRIVATE);
   const into = it.join(from, RETRO, name);
+  // A step names this verb as its evidence, and a gate runs that evidence again. So a second run answers the first. [[spec/tickets/the-retro-takes-the-box]]
   if (it.disk.exists(it.join(into, MANIFEST))) {
-    console.error(
-      `${PRIVATE}/${RETRO}/${name} stands already, and its manifest holds a whole run.`,
+    console.log(
+      `${PRIVATE}/${RETRO}/${name} holds a whole run already, and this one changes nothing.`,
     );
-    console.error("Read that run, or collect for a retro of its own.");
-    return 1;
+    return 0;
   }
 
   // A folder carrying no manifest holds a torn run, so nothing of it survives this one. [[spec/tickets/the-retro-takes-the-box]]

@@ -184,7 +184,16 @@ steps:
         says: one line per ticket, with its group and its urgency
 process: [[spec/processes/retro]]
 process_hash: 914c0c3b4ac15753
-step: collect
+step: field
+record:
+  - step: collect
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 1bf42886c66718580c0fa7258134997a1f09f676
+    hash_after: 8f4ac3b26f144c9d3c0b2b8af7954145d6896265
+    answered:
+      - name: run
+        exit: 0
+        said: .se/retro/retro-018ba26 holds a whole run already, and this one changes nothing.
 ---
 
 # Ask
@@ -207,7 +216,7 @@ This is the first retro, so its window opens at the tree's first commit. No earl
 
 ## run
 
-<!-- retro collect, which refuses while a hand holds a ticket, and takes nothing it does not name -->
+    ./RUNME.sh retro collect retro-018ba26
 
 <!-- the form is command -->
 

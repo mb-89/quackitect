@@ -77,6 +77,19 @@ test("collect refuses while a hold stands under the private folder", () => {
   assert.equal(it.disk.exists(inRetro("manifest.jsonl")), false, "it writes nothing");
 });
 
+// The retro's own first leaf is a hold, so collect passes that one. [[spec/tickets/the-retro-takes-the-box]]
+test("collect passes over the hold for the retro it collects for", () => {
+  const it = doors({
+    ...FILES,
+    [at(".se/hold/box-one-claude-code.json")]: `{"ticket":"${TICKET}"}\n`,
+  });
+
+  const { code } = heard(() => retro(ROOT, ["collect", TICKET], it));
+
+  assert.equal(code, 0, "its own hold stops it nowhere");
+  assert.equal(it.disk.exists(inRetro("manifest.jsonl")), true);
+});
+
 // [[spec/design_input/the-agent-pulls-tickets]]
 test("collect copies the private folder, and skips the runtime folder and its own", () => {
   const it = doors();
@@ -189,8 +202,8 @@ test("a second run refuses, and a run carrying no manifest goes again", () => {
   heard(() => retro(ROOT, ["collect", TICKET], it));
 
   const again = heard(() => retro(ROOT, ["collect", TICKET], it));
-  assert.equal(again.code, 1, "a manifest standing says the run finished");
-  assert.match(again.said, /stands already/);
+  assert.equal(again.code, 0, "a gate runs this verb again, and reads the first answer");
+  assert.match(again.said, /holds a whole run already/);
 
   it.disk.remove(inRetro("manifest.jsonl"));
   const torn = heard(() => retro(ROOT, ["collect", TICKET], it));
