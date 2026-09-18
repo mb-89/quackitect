@@ -86,7 +86,11 @@ record:
   - step: sync
     skipped: true
     why: the box runs off the cloud
-step: split
+  - step: split
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 7aff05c0ab0786a967d21e2794fa2e5f747b89e4
+    hash_after: 7aff05c0ab0786a967d21e2794fa2e5f747b89e4
+step: children
 ---
 
 # Ask
@@ -111,9 +115,15 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 
 ## children
 
-<!-- every child as a link, one a line, with its process -->
+- [[spec/tickets/verbs-read-two-roots]], off [[spec/processes/standard]]
 
 <!-- the form is list -->
+
+## checked
+
+- every child is small enough to review whole. The one child lands in a diff a reader reads whole.
+- the children add up to the goal. The four done_when lines of the child carry the whole ask.
+- a child that waits on another names it under depends_on. One child stands here, and it waits on none.
 
 # children
 
