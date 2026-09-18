@@ -12,10 +12,11 @@ import {
   existsSync,
 } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve } from "node:path";
+import { inRun } from "../../.claude/skills/level0/lib/folders.js";
 
 export function session(root) {
   const base = realpathSync(root);
-  const folder = join(base, ".se", "run", "copilot");
+  const folder = join(base, ...inRun("copilot").split("/"));
   const hash = (text) => createHash("sha256").update(text).digest("hex");
   const path = (name) => {
     if (typeof name !== "string" || !name) throw new Error("Missing file path.");
@@ -35,14 +36,14 @@ export function session(root) {
     async withState(id, use) {
       if (typeof id !== "string" || !id)
         throw new Error("The hook needs a session ID.");
-      path(".se/run/copilot");
+      path(inRun("copilot"));
       mkdirSync(folder, { recursive: true });
       const lock = join(folder, "lock");
       try {
         mkdirSync(lock);
       } catch {
         throw new Error(
-          "Level zero is busy. Retry; inspect .se/run/copilot/lock after a crashed process.",
+          `Level zero is busy. Retry; inspect ${inRun("copilot")}/lock after a crashed process.`,
         );
       }
       const at = join(folder, `${hash(id)}.json`);

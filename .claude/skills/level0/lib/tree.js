@@ -19,6 +19,11 @@ export const INSTALL = "src/scripts/install.sh";
 export const VALE_INI = ".vale.ini";
 
 const STOP_LIB = ".claude/skills/level0/lib/stop.js";
+export const FOLDERS = ".claude/skills/level0/lib/folders.js";
+const OWNER = "folders.js";
+const OWNED = /^(?:src|\.claude)\/.*\.(?:js|go|sh)$/;
+const A_TEST = /_test\.go$|\.test\.js$/;
+const SPELLS = [/\.se\/(?:run|retro)\b/, /"\.se",\s*"(?:run|retro)"/];
 const SOURCE = /^(?:src|\.claude)\/.*\.js$/;
 const TEXT = /\.(?:md|markdown|txt|ya?ml|json|js|ts|tsx|go|sh|ps1|ini|mod)$/i;
 const DELETES = /\bremove\(|\bunlink|\brm\b|\bprune\b/;
@@ -313,6 +318,29 @@ export function noLogDeleted(tree) {
   return out;
 }
 
+// [[spec/design_input/the-runtime-files-stand-apart]]
+export function privateFolderOwned(tree) {
+  const rule = "PrivateFolderOwned";
+  const out = [];
+  const mine = tree
+    .paths()
+    .filter((one) => OWNED.test(one) && !A_TEST.test(one) && one !== FOLDERS);
+  for (const path of mine) {
+    const lines = tree.read(path).split(/\r?\n/);
+    const at = lines.findIndex((one) => SPELLS.some((what) => what.test(one)));
+    if (at < 0 || lines.some((one) => one.includes(OWNER))) continue;
+    out.push(
+      fault(
+        rule,
+        path,
+        `This line spells a folder ${FOLDERS} owns. Take the name from there, or name that file in a comment beside the copy.`,
+        at + 1,
+      ),
+    );
+  }
+  return out;
+}
+
 // [[spec/design_output/level0#a-name-meets-the-cap]]
 export function nameHoldsTheWords(tree) {
   const rule = "NameHoldsTheWords";
@@ -429,6 +457,7 @@ export const RULES = [
   extensionsOnOffer,
   stopFolderIsData,
   noLogDeleted,
+  privateFolderOwned,
   nameHoldsTheWords,
   nothingPrivateTravels,
   surveyNamesInstalls,

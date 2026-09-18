@@ -16,8 +16,8 @@ import {
 } from "../lib/pull.js";
 
 const CLI = ["node", "src/scripts/cli.js"];
-// The hand's session file of [[spec/design_output/pull#the-hand-and-the-hold]], spelled again here because a plugin imports nothing past its own folder.
-const SESSION = ".se/session.json";
+// The hand's session file of [[spec/design_output/pull#the-hand-and-the-hold]], whose folder folders.js owns, spelled again here because a plugin imports nothing past its own folder.
+const SESSION = ".se/run/session.json";
 const CONFIG = "spec/config/level0.json";
 const RUNNING = 600000;
 const JUDGE = "--judge";

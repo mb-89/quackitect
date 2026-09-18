@@ -1,7 +1,7 @@
 // Copilot registrations, generated only at the level-zero boundary.
 // [[spec/design_output/copilot#setup-and-discovery]]
 
-import { inRun } from "./folders.js";
+import { inRun, RUN } from "./folders.js";
 
 const OWNER = "quackitect-level0";
 const RUNNER = "node src/scripts/copilot.js";
@@ -74,7 +74,7 @@ export function setup(it, target = "auto") {
     written.push(name);
   }
   if (target === "cloud") {
-    it.disk.makeDir(it.join(it.root, ".se"));
+    it.disk.makeDir(it.join(it.root, RUN));
     it.disk.write(it.join(it.root, inRun("copilot-cloud")), "cloud\n");
   }
   return written;

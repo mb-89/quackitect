@@ -53,7 +53,7 @@ var skipped = map[string]bool{
 	".git": true, "node_modules": true, ".claude-plugin": true,
 }
 
-// [[spec/design_input/the-runtime-files-stand-apart]]
+// The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because a Go module imports no JavaScript.
 const Runtime = ".se/run"
 
 func skips(root, abs string, info os.FileInfo) bool {

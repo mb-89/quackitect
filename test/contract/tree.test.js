@@ -33,6 +33,7 @@ import {
   nothingPrivateTravels,
   settingsNameBinaries,
   stopFolderIsData,
+  privateFolderOwned,
   surveyFindsNode,
   surveyNamesInstalls,
   treeFaults,
@@ -306,6 +307,40 @@ test("a line deleting a log file is refused", () => {
   assert.equal(found[0].rule, "NoLogDeleted");
   assert.equal(found[0].line, 2);
   assert.deepEqual(noLogDeleted(here), []);
+});
+
+// [[spec/design_input/the-runtime-files-stand-apart]]
+test("a file spelling the runtime folder without naming its owner is refused", () => {
+  const found = privateFolderOwned(
+    fakeTree(
+      {
+        "src/scripts/stray.js": 'const at = "x";\nconst hold = ".se/run/hold";\n',
+        "src/index/split.go": 'const at = ".se", "run"\n',
+      },
+      ["src/scripts/stray.js", "src/index/split.go"],
+    ),
+  );
+
+  assert.deepEqual(
+    found.map((one) => [one.rule, one.file, one.line]),
+    [
+      ["PrivateFolderOwned", "src/scripts/stray.js", 2],
+      ["PrivateFolderOwned", "src/index/split.go", 1],
+    ],
+  );
+});
+
+test("a file naming the owner beside the copy passes, and a test file passes", () => {
+  const owned = {
+    "src/scripts/imports.js":
+      'import { inRun } from "../../.claude/skills/level0/lib/folders.js";\nconst hold = inRun("hold");\nconst said = ".se/run/hold";\n',
+    "src/extension/copy.js":
+      "// The folder folders.js owns, spelled again here.\nconst BIN = \".se/run/bin\";\n",
+    "test/level0/folders.test.js": 'const at = ".se/run/bin";\n',
+    ".claude/skills/level0/lib/folders.js": 'export const RUN = ".se/run";\n',
+  };
+  assert.deepEqual(privateFolderOwned(fakeTree(owned, Object.keys(owned))), []);
+  assert.deepEqual(privateFolderOwned(here), []);
 });
 
 // [[spec/design_output/level0#a-name-meets-the-cap]]

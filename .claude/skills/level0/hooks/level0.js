@@ -6,8 +6,9 @@
 // The port base of [[spec/design_output/vehicle#the-register-holds-the-port]], held again here because this hook imports nothing.
 const PORT = 6510;
 const POINTER = ".se/vehicle.json";
+// The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because this hook imports nothing.
 const SESSION = ".se/run/log/session.jsonl";
-// The hand's session file of [[spec/design_output/pull#the-hand-and-the-hold]], spelled again here because this hook imports nothing.
+// The hand's session file of [[spec/design_output/pull#the-hand-and-the-hold]].
 const HAND_FILE = ".se/run/session.json";
 const COMPACT = "session.compact";
 const LIMIT = 4_000_000;

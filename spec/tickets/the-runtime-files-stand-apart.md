@@ -347,8 +347,19 @@ One finding stands outside the class: the change commit tracks a built binary. T
 <!-- the form is checklist -->
 
 - the change touches no file the ask leaves out: each one names a path under the private folder
-- every door the change reaches has a fake: the change moves constants, and each door keeps its own
-- a comment names the approach: every moved constant reads the module, whose header points at the design input
+- every door the change reaches has a fake: the tree rule runs over a fake tree
+- a comment names the approach: every forced copy names the module owning it, beside the copy
+
+The second pass answers the verdict:
+
+| finding | what it takes |
+|---|---|
+| the review verb and the cloud setup make the old folder | each makes the runtime folder it writes into |
+| the level1 hook writes the session file at the old path | it takes the new one, and names the owner beside it |
+| the commit tracks a built binary | the ignore rule takes it, beside the language server's own |
+| the Go files, the doors and the installer spell the folder | each names the owner, and the session door imports it |
+| a spelling drifts and passes green | `PrivateFolderOwned` refuses a spelling naming no owner |
+| no case covers the session file | the runtime writers case reads it |
 
 ## tests-green
 

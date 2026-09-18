@@ -19,7 +19,7 @@ import { WORKTREE } from "../../.claude/skills/level0/lib/review.js";
 import { BIN, TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import { FOLDER as UNDO } from "../../.claude/skills/level0/lib/undo.js";
 import { HOLDS as GUIDANCE_HOLDS } from "../../src/scripts/guidance-hand.js";
-import { BOX } from "../../src/scripts/hand.js";
+import { BOX, SESSION } from "../../src/scripts/hand.js";
 import { HOLDS as ROUTE_HOLDS } from "../../src/scripts/pull-route.js";
 import { HOLDS, NOTES } from "../../src/scripts/ticket.js";
 
@@ -56,6 +56,7 @@ test("every runtime writer names its folder under the runtime half", () => {
       tools: TOOLS,
       log: LOG,
       box: BOX,
+      session: SESSION,
       hold: HOLDS,
     },
     {
@@ -65,13 +66,14 @@ test("every runtime writer names its folder under the runtime half", () => {
       tools: inRun("tools.json"),
       log: inRun("log"),
       box: inRun("box.json"),
+      session: inRun("session.json"),
       hold: inRun("hold"),
     },
   );
 });
 
 test("every runtime writer stands inside the half the skip reads", () => {
-  for (const one of [WORKTREE, UNDO, BIN, TOOLS, LOG, BOX, HOLDS]) {
+  for (const one of [WORKTREE, UNDO, BIN, TOOLS, LOG, BOX, SESSION, HOLDS]) {
     assert.equal(runs(one), true, one);
   }
 });

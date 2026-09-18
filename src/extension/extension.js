@@ -10,6 +10,7 @@ const { toastsOf } = require("./lib/states.js");
 const VIEW = "quackitect.sidebar";
 const HERE = "quackitect.here";
 const REST = "quackitect.rest";
+// The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because the extension bundles alone.
 const SHOW = ".se/run/show-panel";
 
 async function activate(context, given) {

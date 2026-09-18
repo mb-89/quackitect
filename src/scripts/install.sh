@@ -11,8 +11,9 @@ set -eu
 root=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
 bin="$root/.se/run/bin"
 
-# The runtime files moved under their own folder, and a box carrying the old
-# places would hand them to the index walk. [[spec/design_input/the-runtime-files-stand-apart]]
+# The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned
+# by folders.js and spelled again here because a shell script imports nothing. A
+# box carrying the old places hands them to the index walk, so this moves them.
 mkdir -p "$root/.se/run"
 for one in bin log hold review undo measure copilot box.json session.json \
   tools.json hold.json check.json index.db index.json lsp.json copilot-cloud \
