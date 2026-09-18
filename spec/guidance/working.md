@@ -10,7 +10,7 @@ rationale: [[spec/rationales/working]]
 2. Open that answer by saying back what you understood and what you do next. Then work. *
 3. Do next what you say you do next. A step you name as next ends no turn. *
 4. Carry on to the end of the work. A finished piece opens the next one. *
-5. Stop on three grounds: the owner opens a discussion, going on needs a person, or the work stands complete. *
+5. Stop on three grounds: a discussion opens, a mistake is dear to undo, or the work stands complete. Where undoing is cheap, decide and move. *
 6. Put your work into the answer you already owe. *
 7. Name the assumption you take where the owner says to carry on, and take it.
 8. Put a script of your own under `.se/scripts`, which git ignores.
