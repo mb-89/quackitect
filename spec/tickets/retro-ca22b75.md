@@ -182,7 +182,7 @@ steps:
       - name: groups
         form: list
         says: one line per ticket, with its group and its urgency
-step: mine/shell
+step: mine/refusals
 process: [[spec/processes/retro]]
 process_hash: 61a2bb140f0b4632
 record:
@@ -222,6 +222,10 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 9428f2eea28f893d4732edc57b1a3716d65cf4d5
     hash_after: 9428f2eea28f893d4732edc57b1a3716d65cf4d5
+  - step: mine/shell
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 1db24efe5e0cd8fb6cc59bf50c082e3fd9bda315
+    hash_after: 1db24efe5e0cd8fb6cc59bf50c082e3fd9bda315
 ---
 
 # Ask
@@ -315,25 +319,27 @@ So the chapter ask promises a reader the numbers before a word, and hands them a
 
 ### learn
 
-<!-- what the groups say about what the tree lacks -->
+The shell leaf holds one row for the whole window: a job named refused, counting 37. The job reads the first word of the line, and every line opens with that word.
+
+So the leaf reads the door's answer as the job. The tree lacks the command itself in the row, which is the one thing this leaf exists to read.
 
 <!-- the form is text -->
 
 ### tools
 
-<!-- which groups become a verb or a flag, and which stay shell -->
+- the shell leaf stays shell until the log row carries the command beside the refusal.
 
 <!-- the form is list -->
 
 ### guidance
 
-<!-- which groups want a sentence, and where -->
+- a leaf reading one field wrongly wants code, so this leaf wants no sentence.
 
 <!-- the form is list -->
 
 ### block
 
-<!-- which groups a door refuses from now on, and why -->
+- the door refuses 37 lines already, and the leaf reads that refusal as the job.
 
 <!-- the form is list -->
 
