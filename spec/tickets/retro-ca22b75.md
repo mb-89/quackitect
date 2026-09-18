@@ -182,7 +182,7 @@ steps:
       - name: groups
         form: list
         says: one line per ticket, with its group and its urgency
-step: mine/worker
+step: mine/scripts
 process: [[spec/processes/retro]]
 process_hash: 61a2bb140f0b4632
 record:
@@ -242,6 +242,10 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: dea6b8b4ea7338a51a32621b3ea84bf69d47f1e4
     hash_after: dea6b8b4ea7338a51a32621b3ea84bf69d47f1e4
+  - step: mine/worker
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 58f989652182376f8fa17c7c938bb759fc2b5f29
+    hash_after: 58f989652182376f8fa17c7c938bb759fc2b5f29
 ---
 
 # Ask
@@ -454,13 +458,17 @@ That reads rightly: both steps name work a cloud box does. A desk hand skipping 
 
 ### curve
 
-<!-- errors and the length of a thought per chapter, and where they turn -->
+The curve rises to chapter 11, which holds 75 prompts and 773 tool calls, then falls to nothing. Errors stand at three across the window, two of them in chapter 6.
+
+The thought length reads zero in every chapter, so the curve carries one axis alone. A reader asking where the work turns hard gets the volume and no strain.
 
 <!-- the form is text -->
 
 ### cuts
 
-<!-- where the worker cuts scope and calls it something else, each with its moment -->
+- the readers step passes with thirteen chapters unread, and the route calls that a pass.
+- the shell leaf answers one row and the step calls it read.
+- this leaf names a curve and reads a count, because the transcript reaches the window nowhere.
 
 <!-- the form is list -->
 
