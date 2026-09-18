@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box dd2a59294365 · claude-code-remote
@@ -102,6 +102,10 @@ record:
     hash_after: eac3bf933183e533094a696430e359148d343985
     returns: 1
     why: "Say which refusals the function answers, because `admits` refuses on `by`, `needs` and `excludes`.; `takeable` walks past a `by: children` leaf and `admits` admits one, so name the one answer.; `admits` lets a `by: person` leaf through on `ownerSays`, and `takeable` walks past it.; `takeable` offers a `by: retro` leaf, and `admits` refuses it away from a retro.; Say how `writesHere` and `placesIn` divide the question, because both walk `steps` in one file.; Take the leaf `admits` resolves already, or say why the function walks the ticket again.; Name the file holding the case, and the refusal that case asserts.; The move's reason is that nothing imports past the plugin root. [[spec/design_output/level0#nothing-imports-past-the-plugin]]; `./RUNME.sh check` answers 0 on this commit."
+  - step: design/draft
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 3318e1a9080119aa8973f42f85c83e6b3fdfc999
+    hash_after: 3318e1a9080119aa8973f42f85c83e6b3fdfc999
 ---
 
 # Ask
@@ -144,19 +148,49 @@ in its hands.
 
 One function stands in `.claude/skills/level0/lib/ticket.js`, which the write door already imports:
 
-    writesHere(front, path, hand) -> { writes, why }
+    writesHere(leaf, hand) -> { writes, why }
 
-It takes a ticket's frontmatter, a leaf path and a hand, and answers whether that hand writes there. The hand is the shape the pull already builds: `{ agent, ownerSays }`.
+It takes a resolved leaf and a hand, and answers whether that hand works there. The hand is `{ agent, ownerSays, atRetro }`, which the pull builds at the hand-out already.
 
-The leaf's `by` comes from the walk, because a leaf takes the field off its nearest ancestor. That walk stands in `src/scripts/pull-route.js` today, and the door reaches no module under `src/scripts`. So the walk moves beside the function, and `pull-route.js` takes it from there. Its callers change nothing, because the module keeps its exports.
+**What it answers.** The leaf's `by` alone. `admits` refuses on three counts, and the other two stay where they stand:
+
+| what refuses | where it lives after | why |
+|---|---|---|
+| `by` | `writesHere` | both sides work it out, and they land apart |
+| `needs` | `admits` | it reads the verbs this box carries, not the leaf |
+| `excludes` | `admits` | it reads the record naming the hands before this one |
+
+**The drift it closes.** `takeable` and `admits` disagree on three values today, and one answer settles each:
+
+| leaf | `takeable` today | `admits` today | the one answer |
+|---|---|---|---|
+| `by: children` | walks past | admits | no hand works there, because the children do |
+| `by: person`, the owner sending the hand | walks past | admits | the hand works there, and the record names both |
+| `by: retro`, away from a retro | offers | refuses | no hand works there |
+| `by: retro`, at a retro or under a tagged note | offers | admits | the hand works there |
+
+The three moves the function takes:
+
+- `admits` holds the leaf `leafOf` resolved for it, hands that in, and the function walks nothing again
+- `leafOf` moves beside the function, because a plugin imports nothing past its own root [[spec/design_output/level0#nothing-imports-past-the-plugin]]
+- `pull-route.js` re-exports `leafOf`, so its callers change nothing, and the move takes `entriesIn` alone
+
+**Beside `placesIn`.** `placesIn` answers which chapters a hand writes, off the schema's `x-written` and the ticket's `state`. `writesHere` answers whether this hand works the leaf at all. The two share the `steps` walk, so they read one walk in one file.
+
+**The callers.** A caller holding the front alone calls `leafOf(front, path)` first, and the door is that caller.
 
 | caller | where it calls | what it does with the answer |
 |---|---|---|
 | `admits` in `src/scripts/pull-hand.js` | at the hand-out | hands the leaf on, or names the wait |
-| `takeable` in `src/scripts/pull-hand.js` | while it picks a ticket | walks past a ticket this hand writes nowhere |
+| `takeable` in `src/scripts/pull-hand.js` | while it picks a ticket | walks past a ticket this hand works nowhere |
 | a new check in `src/bridge/write.js` | before a chapter lands | refuses the write, naming the leaf and its `by` |
 
-The door reads the ticket's `step` and `steps` for the schema check already. So it hands the same frontmatter in. The check runs on a write to a ticket alone, and the chapter the write lands under names the leaf.
+The door reads the ticket's `step` and `steps` for the schema check already. So it runs the new check on a write to a ticket alone, off the same front.
+
+**The case.** `test/level0/hooks.test.js` drives the write door, and two cases land there:
+
+- an agent writes a chapter at a step reading `by: person`, and the door answers the refusal `writesHere` writes
+- the same write carries the owner's word, and the door passes it
 
 The refusal says the same words at both doors, because one function writes them. A hand meeting it at the write meets it before the work, in place of after.
 
