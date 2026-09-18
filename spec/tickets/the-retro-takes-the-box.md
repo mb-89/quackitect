@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: design/review
+step: design/person-2
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -12,6 +12,15 @@ steps:
         by: person
         to: engine
         asks: "design/review failed back 2 times: The earlier findings close, apart from the walk's order. These stand:; close the walk's order: the table says deepest first, and the prose says any order; name the runtime files the default leaves standing: `index.json`, `level0.stamp`, `level0.health`; say how a list knob passes `./RUNME.sh config`, which writes one command a knob taking one typed value; fix the handover's reason: the glob matches the private handover, which stands outside git [[spec/design_output/work]]; `./RUNME.sh check` exits 0 on this branch."
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
+      - name: person-2
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: "design/review failed back 3 times: The owner's ruling closes every earlier finding. One gap stands, and a second beside it:; the log moves to `.se/runtime` [[spec/tickets/the-runtime-folder-holds-state]], and the skips row passes that folder; say how the log reaches the retro, because the rotates row prepares a file collect leaves standing; name the scratchpad, which [[spec/design_input/the-agent-pulls-tickets]] gives as the second source the `scripts` leaf reads; The rest answers the ask: the two skips, the manifest, the hold refusal, the transcripts, the second run.; `./RUNME.sh check` exits 0 on this branch."
         evidence:
           - name: answer
             form: text
@@ -128,6 +137,12 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 364774fdc247f3c43e5a79d65f518880ad65696f
     hash_after: 364774fdc247f3c43e5a79d65f518880ad65696f
+  - step: design/review
+    hand: box d42624a67d18a8 · claude-code · helper-7
+    hash_before: ceb222f5e7e499abef1471ce06e4e2adf9706a3f
+    hash_after: ceb222f5e7e499abef1471ce06e4e2adf9706a3f
+    returns: 3
+    why: "The owner's ruling closes every earlier finding. One gap stands, and a second beside it:; the log moves to `.se/runtime` [[spec/tickets/the-runtime-folder-holds-state]], and the skips row passes that folder; say how the log reaches the retro, because the rotates row prepares a file collect leaves standing; name the scratchpad, which [[spec/design_input/the-agent-pulls-tickets]] gives as the second source the `scripts` leaf reads; The rest answers the ask: the two skips, the manifest, the hold refusal, the transcripts, the second run.; `./RUNME.sh check` exits 0 on this branch."
 group: the-retro-runs
 ---
 
@@ -156,6 +171,32 @@ The record dies with the box. A retro then reads what a hand remembers, and the 
 # design
 
 ## person-1
+
+<!-- answers the question the engine asks -->
+
+### answer
+
+The owner rules the whole question away. A runtime folder holds the state a box keeps while it works, and collect skips that folder.
+
+| what the owner says | what it settles |
+|---|---|
+| the index, the stamp, the health and the lint output stand in the runtime folder | the list of runtime files goes |
+| collect skips the runtime folder and the retro's own | the glob list goes, and the config knob with it |
+| a folder says what its files are for | a reader tells the kinds apart by where they stand |
+
+So three of the four questions fall away:
+
+- the order files copy in carries no meaning, because collect removes nothing
+- the handover needs no line of its own, because its folder decides it
+- a glob list reaches the config nowhere, because no glob list stands
+
+This ticket waits on [[spec/tickets/the-runtime-files-stand-apart]], which cuts that folder.
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
+
+## person-2
 
 <!-- answers the question the engine asks -->
 
@@ -229,12 +270,13 @@ The transcripts stand outside the private folder, in the harness's own files. Th
 
 fail
 
-The earlier findings close, apart from the walk's order. These stand:
+The owner's ruling closes every earlier finding. One gap stands, and a second beside it:
 
-- close the walk's order: the table says deepest first, and the prose says any order
-- name the runtime files the default leaves standing: `index.json`, `level0.stamp`, `level0.health`
-- say how a list knob passes `./RUNME.sh config`, which writes one command a knob taking one typed value
-- fix the handover's reason: the glob matches the private handover, which stands outside git [[spec/design_output/work]]
+- the log moves to `.se/runtime` [[spec/tickets/the-runtime-folder-holds-state]], and the skips row passes that folder
+- say how the log reaches the retro, because the rotates row prepares a file collect leaves standing
+- name the scratchpad, which [[spec/design_input/the-agent-pulls-tickets]] gives as the second source the `scripts` leaf reads
+
+The rest answers the ask: the two skips, the manifest, the hold refusal, the transcripts, the second run.
 
 `./RUNME.sh check` exits 0 on this branch.
 
