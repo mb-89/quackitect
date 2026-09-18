@@ -182,7 +182,7 @@ steps:
       - name: groups
         form: list
         says: one line per ticket, with its group and its urgency
-step: field
+step: score
 process: [[spec/processes/retro]]
 process_hash: 61a2bb140f0b4632
 record:
@@ -194,6 +194,10 @@ record:
       - name: run
         exit: 0
         said: .se/retro/retro-ca22b75 holds a whole run already, and this one changes nothing.
+  - step: field
+    hand: box d42624a67d18a8 · claude-code · the owner says so
+    hash_before: dffce1bd11edfb45add20fbc27a5008c2c9e0c06
+    hash_after: dffce1bd11edfb45add20fbc27a5008c2c9e0c06
 ---
 
 # Ask
@@ -218,7 +222,7 @@ the three branches land on trunk, and this reads the window they close
 
 ## answers
 
-<!-- one line each, and each becomes a note -->
+- nothing comes back from real use in this window, and the owner says so.
 
 <!-- the form is list -->
 
