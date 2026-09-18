@@ -49,12 +49,38 @@ sensible on its own day. So the list closes at three.
 
 | the ground | who opens it |
 |---|---|
-| the owner opens a discussion | the owner |
-| going on needs what only a person gives | the work |
+| a discussion opens | the owner |
+| a mistake here is dear to undo | the work |
 | the work stands complete | the brief |
 
 The stop table under [[spec/design_output/stop]] holds the same three
 mechanically, so the hook and this note answer alike.
+
+The middle ground read "going on needs what only a person gives" until a box
+took it at its word. A person gives anything, so that ground admitted anything.
+Two sessions handed out calls they owned, and [[spec/rationales/cloud]] carries
+what that cost.
+
+Version four wrote the test this ground wants, and `spec/guidance/behaviour.md`
+on the `v4` branch holds it:
+
+- Spend your thinking where a mistake is dear to undo. Where it is cheap, decide and move.
+- Disagree and commit. Write the concern where a reader decides it, and continue.
+
+The second names the move a stop stands in for. A concern is a note, and a note
+survives the turn. An argument inside the turn reaches nobody.
+
+Version three split the question into two dials, and `deliverable/machines`
+on the `v3` branch holds both:
+
+| the dial | what it answers |
+|---|---|
+| autonomy | what the agent decides alone |
+| stop-at | how far the agent walks before it hands back |
+
+That note names why one rule struggles here. A stop hook reads where the walk
+stands and sees no reason, so a stop the contract wants reads like an
+overcautious one. The cost of a wrong answer is the reading a hook can share.
 
 ## 5. The answer already owed
 
