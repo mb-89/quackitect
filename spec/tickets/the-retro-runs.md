@@ -75,7 +75,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/notes
+step: retro/write
 record:
   - step: sync
     skipped: true
@@ -95,6 +95,14 @@ record:
   - step: retro/notes
     hand: box d42624a67d18a8 · claude-code
     hash_before: bf6e192ba30b8f39a8c0bafc2eef1eb561750907
+  - step: retro/notes
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 9d6f5afd1e004f7c33355cb49063ebb9c4f61336
+    hash_after: 9d6f5afd1e004f7c33355cb49063ebb9c4f61336
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
 ---
 
 # Ask
@@ -152,7 +160,7 @@ Read [[spec/design_input/the-agent-pulls-tickets]] first, the chapter The retro.
 
 ### drained
 
-<!-- retro notes, which passes when the private folder is empty -->
+    ./RUNME.sh retro notes
 
 <!-- the form is command -->
 
