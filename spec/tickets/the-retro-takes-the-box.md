@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/reflect
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -191,6 +191,10 @@ record:
     hash_after: 2fe6b8362f1aaa782e7b813ae618d5fc39c41d9c
     returns: 1
     why: "| the finding | the fix |; |---|---|; | the new file spells the hold path a fourth time | import `HOLDS` from `src/scripts/ticket.js` |; | collect reads the hold folder alone, and passes `.se/hold.json`, which `holdOf` reads | read the hold the way `ticket.js` reads it |; | collect takes any file in the hold folder as a hold, where `stop.js` takes a `.json` | filter the name the same way |; | the copy reads and writes text, so `.se/log.7z` lands corrupt, and `size` counts characters | copy the bytes, and count the bytes |; | `copied` drops a file whose read throws, and the manifest holds no line for it | write a line saying what the read refuses |; | a stale file from a torn run survives the second run, and the manifest names it nowhere | clear a folder carrying no manifest first |; | what else the diff carries | what it reads as |; |---|---|; | the hunks in `pull.js`, `hand.js` and their cases | the group's other tickets, reaching the retro's verb nowhere |; | `./RUNME.sh check` | exits 0 on this box |; | `./RUNME.sh branch review the-retro-runs` | answers 1 in its own checkout, on `test/level0/hooks.test.js`, which passes here |; The rest answers the ask and the approach: the two skips, the log, the two script sources, the manifest, the second run."
+  - step: implement/reflect
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 097295bfd907fea78e696c0fbb6fcd57621959e3
+    hash_after: 097295bfd907fea78e696c0fbb6fcd57621959e3
 group: the-retro-runs
 ---
 
@@ -380,13 +384,28 @@ The scratchpad reaches the verb as a door, off `it.scratch`. The command line fi
 
 ### class
 
-<!-- the class of error the findings describe, and the fix for the class -->
+The class is one: the change works beside the tree where it belongs inside it.
 
-<!-- the form is text -->
+| the finding | what already stands |
+|---|---|
+| the hold path spelled a fourth time | `HOLDS` exports from three files |
+| the hold read a way of its own | `holdOf` under `src/scripts/ticket.js` reads it |
+| a hold taken as any file | the same reader filters the JSON ending |
+| the copy run through a text door | the door offers text alone, and bytes want a door |
+| a read that throws swallowed | the manifest is the record, and a drop belongs in it |
+| a torn folder written over | the approach says the verb replaces it |
+
+Each line is the same move. A rule or a reader stands already, and the new code writes its own beside it.
+
+The fix for the class is the tree's own rule. Search for the owner before writing a constant, a reader or a door call, and point at the owner where one stands. Where no door does the job, the door grows one.
+
+The binary fault is the same move one layer down. The disk door reads and writes text, so a copy through it corrupts an archive. The door takes a copy of its own, and that copy carries bytes.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change touches no file the ask leaves out. The door and its fake join the list, because the copy wants bytes.
+- every door the change reaches has a fake. The copy lands on the real door, the fake and the contract case together.
+- a comment names the approach the change implements. The door's own line says why a copy stands beside a read.
 
 <!-- the form is checklist -->
 
