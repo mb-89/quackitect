@@ -369,7 +369,7 @@ export function commandsRun(it, leaf, chapter, found) {
 // [[spec/design_output/pull#the-hand-rule]]
 export function handFaults(it, one, leaf, hand, held) {
   const out = [];
-  if (leaf.by === "person" && it.agent)
+  if (leaf.by === "person" && it.agent && !it.ownerSays)
     out.push(`${leaf.path} is a person's step, and this hand is an agent.`);
   const other = excludes(one.front, leaf, hand);
   if (other) out.push(`${leaf.path} ${other}.`);

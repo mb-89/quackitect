@@ -146,6 +146,22 @@ test("the pull names the mint, the open and the unblock where a person's step is
   assert.match(said, /branch done/, "the answer lands the rest of the group");
 });
 
+// [[spec/design_output/pull#the-hand-rule]]
+test("a hand the owner sends takes a person's step, and the record names both", () => {
+  const it = doors();
+  const { said } = heard(() => work(ROOT, ["pull", "--owner-says"], it));
+
+  assert.match(said, /a-child at design\/person-1/, "the hand the owner sends takes the step");
+  assert.doesNotMatch(said, /waits for a person/);
+
+  const folder = join(ROOT, ".se", "hold");
+  const held = it.disk
+    .list(folder)
+    .map((one) => it.disk.read(join(folder, one.name)))
+    .join("\n");
+  assert.match(held, /the owner says so/, "the record names the hand and the word behind it");
+});
+
 // The verb refuses a successor opening under any other hand, so the route it names opens under a person. [[spec/design_output/work#a-person-step-leaves]]
 test("the prompt names one route, and that route opens under a person", () => {
   const said = unblockPrompt("a-child", { path: "design/person-1" });

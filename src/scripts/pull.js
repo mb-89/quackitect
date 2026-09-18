@@ -20,7 +20,7 @@ import {
   withField,
 } from "./group.js";
 import { dropHold, guidanceText, holdOf, writeHold } from "./guidance-hand.js";
-import { handOf } from "./hand.js";
+import { handOf, SAYS } from "./hand.js";
 import { landed } from "./landed.js";
 import {
   chapterOf,
@@ -78,7 +78,10 @@ export function pull(it, argv) {
     return 2;
   }
   const group = onTrunk ? "" : branch.replace(/^work\//, "");
-  const hand = as ? `${handOf(it)} · ${as}` : handOf(it);
+  // The owner sends a hand into a person's step, and the record names both. [[spec/design_output/pull#the-hand-rule]]
+  it.ownerSays = rest.includes("--owner-says");
+  const took = as ? `${handOf(it)} · ${as}` : handOf(it);
+  const hand = it.ownerSays ? `${took} · ${SAYS}` : took;
   const held = holdOf(it, hand);
   const who = { hand, branch, group, held, oneStep: Boolean(as) };
   it.argv = rest;

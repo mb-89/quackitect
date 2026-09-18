@@ -137,7 +137,7 @@ holds no open note.
 
 | the route says | the pull admits |
 |---|---|
-| `by: person` | a hand off a harness, and an agent waits |
+| `by: person` | a hand off a harness. An agent waits, or takes it under `--owner-says` |
 | `by: agent` | a hand on a harness |
 | `by: helper` | nobody yet, until the spawn lands |
 | `by: retro` | a hand while its group stands at a retro step, or a note with the tag |
@@ -148,6 +148,14 @@ An agent is a hand whose environment names a harness. The command line reads
 that off `CLAUDECODE`, `CLAUDE_CODE_REMOTE` or `SE_CLOUD`. A verdict comes from
 a hand that leaves the tip where it stands. So a hand-back on a verdict leaf
 refuses where the tip differs from the take.
+
+| what the flag says | what the record holds |
+|---|---|
+| the owner sends this hand into a person's step | the hand, and `the owner says so` beside it |
+| the owner answers that step in the chat | the hand writes those words into the step |
+| a hand off a harness takes it | `person`, and no name beside it |
+
+A tracked file holds no person's name, and git carries who writes the commit.
 
 `work.personSigns` is the stronger door on a person's hand. Switched on, a
 person's hand-back on a tracked ticket meets a signed tip. The signature
