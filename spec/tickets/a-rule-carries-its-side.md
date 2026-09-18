@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 step: design/person-1
 steps:
@@ -122,6 +122,8 @@ record:
     why: "Every rule under `VoiceScript`, `VoiceShape` and `VoiceVale` reads `level: error` today, so that work stands done.; The scope line says the Vale rules alone, and the table beside it names `tree.js` and the Go rules.; The gain asks for one list, and the record a write fills stands apart from the list the panel draws.; The push doors read that record alone, so every warning `./RUNME.sh check` names today passes them.; `size.js`, `ticket.js` and `schema.js` each build a finding carrying `severity`, and the table leaves all three out."
 group: the-warnings-feed-a-refactorer
 depends_on: ["the-runtime-files-stand-apart"]
+reason: became
+successors: [one-list-holds-the-warnings]
 ---
 
 # Ask
