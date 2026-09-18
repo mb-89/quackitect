@@ -63,11 +63,16 @@ export function decide(rules, held = {}) {
   const off = firing.find((one) => one.runs === OFF);
   const stop = highest(firing, "stop");
   const go = highest(firing, "continue");
+  // A claim reads the agent, and a check reads the tree, so the check wins. [[spec/design_output/stop#a-check-beats-a-claim]]
+  const yields = Boolean(stop?.yields) && go?.decides === "mechanical";
 
   return {
-    ends: Boolean(off) || (go ? go.priority : -1) <= (stop ? stop.priority : FLOOR),
+    ends:
+      Boolean(off) ||
+      (!yields && (go ? go.priority : -1) <= (stop ? stop.priority : FLOOR)),
     stop: off ?? stop,
     go,
+    yields,
     off: Boolean(off),
     unclaimed: all.filter((one) => asks(one) && held.claimed !== one.id),
     unknown,
