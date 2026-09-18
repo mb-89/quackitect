@@ -73,7 +73,19 @@ The person's work is real, and dropping it is the other failure. So it moves to
 a ticket of its own, outside the group, carrying the question and what stands
 open. The group then closes, the branch merges, and the ticket is the reminder.
 
-## 7. What a leaving branch owes
+## 7. The route a successor takes
+
+`branch unblock` reads the successor's first step and demands `by: person`. No
+process under `spec/processes` opened one, so every successor a hand could mint
+met a refusal. A box that followed the guidance to the letter got that refusal,
+released the branch, and the loop closed again.
+
+`spec/processes/person.yaml` is that route. A hand mints the successor off it,
+and the first step reads `by: person` with nobody assigning it. The pull says so
+too. Where a person's step is the only thing standing, the wait answer names the
+mint, the open and the unblock in order.
+
+## 8. What a leaving branch owes
 
 A branch that merges half-done is honest only if what it left stands written
 somewhere a person reads. The successor ticket is that record, and `reason:
@@ -83,7 +95,7 @@ The alternative is a branch held open until a person answers. That blocks the
 tickets depending on it, and a dependency reads a closed ticket, not a finished
 one. So closing is what frees the chain.
 
-## 8. The check greens first
+## 9. The check greens first
 
 A box read the check red, named the four lines a verb wrote, and left them. Three
 of the four stood on the branch before that box took it. The reading went: a

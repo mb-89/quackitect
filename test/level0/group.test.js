@@ -126,6 +126,25 @@ test("a group holds where its newest entry carries hash_before and no hash_after
   assert.equal(heldIn(again).hand, "box 7c1d", "the newest entry answers");
 });
 
+// [[spec/design_output/work#held-derives-from-the-record]]
+test("a hand-back after the take leaves the claim standing, and the release closes that entry", () => {
+  const took = withEntry(NOTE, { step: "sync", hand: "box 3f9a", hash_before: "a1b2c3" });
+  const ran = withEntry(took, {
+    step: "split",
+    hand: "box 3f9a",
+    hash_before: "a1b2c3",
+    hash_after: "d4e5f6",
+  });
+
+  assert.equal(heldIn(ran).hand, "box 3f9a", "the box holds what it took");
+  assert.equal(heldIn(ran).step, "sync", "the claim is the entry the take opens");
+
+  const gave = withHashAfter(ran, "99a888");
+  assert.equal(heldIn(gave), null, "the release closes the take");
+  assert.equal(recordIn(gave)[0].hash_after, "99a888");
+  assert.equal(recordIn(gave)[1].hash_after, "d4e5f6", "the hand-back keeps its own hash");
+});
+
 // [[spec/design_output/work#a-box-leaves]]
 test("a second hash_after on one entry replaces the first, and writes no other line", () => {
   const took = withEntry(NOTE, { step: "sync", hand: "box 3f9a", hash_before: "a1b2c3" });

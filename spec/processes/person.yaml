@@ -1,0 +1,35 @@
+# A question only a person answers. `branch unblock` hands a person's step out
+# of a group onto a ticket off this route, so the group lands and the question
+# waits on a desk. The first step reads `by: person`, which is what the verb
+# demands of a successor.
+# [[spec/design_output/work#a-person-step-leaves]]
+for: a question only a person answers, carried out of a group so the group lands
+ask:
+  - name: question
+    form: text
+    says: what the person decides, and what waits on the answer
+  - name: from
+    form: text
+    says: the ticket and the step handing this over, and where the group stands
+steps:
+  - name: answer
+    does: answers the question the group hands over
+    by: person
+    to: engine
+    input: ask
+    asks: what does the group behind this ticket need you to decide?
+    evidence:
+      - name: answer
+        form: text
+        says: the answer, which the step behind this one reads
+  - name: act
+    does: works what the answer names, or says why the answer needs no work
+    from: anyone
+    by: anyone
+    input: answer
+    reads: [[spec/guidance/working]]
+    to: retro
+    evidence:
+      - name: says
+        form: text
+        says: what the answer changes and where, or why it changes nothing

@@ -15,6 +15,8 @@ import {
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { CONFIG as VALE_CONFIG, faultIn, fromJson } from "../../.claude/skills/level0/lib/vale.js";
+export { HELPER, SPAWN, spawnPrompt } from "./spawn.js";
+import { HELPER, SPAWN, spawnPrompt, unblockPrompt } from "./spawn.js";
 import { agentOf, BOX, handOf } from "./hand.js";
 import {
   CLOSED,
@@ -387,17 +389,21 @@ function handOut(it, who) {
 
   const why = [];
   let other = null;
+  let person = null;
   for (const pool of pools) {
     for (const one of pool) {
       const said = offer(it, who, one, all);
       if (said.leaf) return handed(it, who, one, said.leaf);
       if (said.why) why.push(`${one.name} ${said.why}`);
+      if (said.person && !person) person = { name: one.name, leaf: said.person };
       if (said.other && !other) other = { one, leaf: said.other, why: said.why };
     }
     if (other && !who.oneStep) return spawnAnswer(other);
   }
 
   say(WAIT, why.length ? why : ["no ticket of this group stands open"]);
+  // A person's question leaves the branch, so the group lands. [[spec/design_output/work#a-person-step-leaves]]
+  if (person) console.log(`\n${unblockPrompt(person.name, person.leaf)}`);
   return 0;
 }
 
@@ -444,10 +450,6 @@ function urgentGroup(it) {
   return sorted(groups)[0]?.name ?? "";
 }
 
-// [[spec/design_output/pull#a-hand-of-its-own]]
-export const SPAWN = "spawn";
-export const HELPER = "helper";
-
 function spawnAnswer(other) {
   const helper = `${HELPER}-${entriesOf(other.one.front).length + 1}`;
   say(SPAWN, [
@@ -457,22 +459,6 @@ function spawnAnswer(other) {
   console.log("");
   console.log(spawnPrompt(other.one.name, other.leaf, helper));
   return 0;
-}
-
-// [[spec/design_output/pull#a-hand-of-its-own]]
-export function spawnPrompt(ticket, leaf, helper) {
-  const verdict = leaf.evidence.some((field) => field.form === "verdict");
-  const back = verdict
-    ? `./RUNME.sh branch pull ${ticket} --as ${helper}`
-    : `./RUNME.sh branch pull ${ticket} --as ${helper} --pass, or --fail "why"`;
-  return [
-    `You are a hand of your own on this box, named ${helper}, and you work one step of one ticket.`,
-    "",
-    `1. Run \`./RUNME.sh branch pull --as ${helper}\` from the root. It hands you ${ticket} at ${leaf.path}, with its fields and its guidance.`,
-    "2. Write the fields into the ticket where the answer says, under the headings it names, and change nothing else.",
-    `3. Run \`${back}\`. It checks the hand-back and answers done, or refused with what to fix.`,
-    "4. Answer with what the last pull said, word for word.",
-  ].join("\n");
 }
 
 // [[spec/design_output/pull#done-leaves-no-takeable-step]]
@@ -655,7 +641,7 @@ export function childrenSay(all, name) {
 // [[spec/design_output/pull#the-hand-rule]]
 function admits(it, who, one, leaf, all) {
   if (leaf.by === "person" && it.agent)
-    return { why: `waits for a person at ${leaf.path}` };
+    return { why: `waits for a person at ${leaf.path}`, person: leaf };
   if (leaf.by === "agent" && !it.agent)
     return { why: `waits for an agent at ${leaf.path}` };
   if (leaf.by === "helper")
