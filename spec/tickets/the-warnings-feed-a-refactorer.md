@@ -75,7 +75,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: split
+step: children
 record:
   - step: sync
     hand: box a5e189c39e1d · claude-code-remote
@@ -88,6 +88,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-warnings-feed-a-refactorer already carries every commit on main.
+  - step: split
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 861c27e54700ee4201fc9a2aa4edd8ad1836dffe
+    hash_after: 861c27e54700ee4201fc9a2aa4edd8ad1836dffe
 ---
 
 # Ask
@@ -118,11 +122,23 @@ A rule a refactoring hand fixes becomes a warning in place of a refusal. One lis
 
 <!-- the form is list -->
 
+- [[spec/tickets/the-runtime-files-stand-apart]], standard, which splits the private folder
+- [[spec/tickets/a-rule-carries-its-side]], standard, which gives each rule its side
+- [[spec/tickets/the-hook-spawns-a-refactorer]], standard, which spawns the draining hand
+- [[spec/tickets/the-panel-draws-every-file]], standard, which draws every file in the panel
+- [[spec/tickets/a-pointer-names-its-heading]], standard, which holds a pointer to a heading
+- [[spec/tickets/a-write-meets-its-hash]], standard, which holds a write against its hash
+- [[spec/tickets/one-function-answers-the-hand]], standard, which gives the hand rule one owner
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every child is small enough to review whole: each carries a standard route, and a reader reads its diff whole
+- the children add up to the goal: the side, the spawn and the panel cover the first ask. The split covers the second
+- a child that waits on another names it: the three after the split name it, or the side, under depends_on
 
 # children
 
