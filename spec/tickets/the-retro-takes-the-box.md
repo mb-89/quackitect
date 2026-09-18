@@ -90,12 +90,18 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
     hash_before: 008a818f05e194cce9e1d41591390bf35caa5a4a
     hash_after: 008a818f05e194cce9e1d41591390bf35caa5a4a
+  - step: design/review
+    hand: box d42624a67d18a8 · claude-code · helper-2
+    hash_before: 84e30870a745232f06e9ff8631995d88f33a8fde
+    hash_after: 84e30870a745232f06e9ff8631995d88f33a8fde
+    returns: 1
+    why: name every line of the default deny list, because a hand takes an abstract default by guess; add the handover to that default, which [[spec/design_input/the-agent-pulls-tickets]] names beside the bin; keep the log archive under the private folder, because a rule over binaries drops the record; say which path the deny globs read for the transcripts, which stand outside the private folder; add `retro.deny` to `spec/config/level0.schema.json`, where every knob carries its type and its help; say where the retro folder stands, because the ask names a folder git keeps and git ignores `.se/`; name what lets a second collect run, because a half run leaves a folder standing; drop the deepest-first walk, or say what it serves, because the verb removes nothing
 ---
 
 # Ask
@@ -165,6 +171,17 @@ The transcripts stand outside the private folder, in the harness's own files. Th
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
+
+fail
+
+- name every line of the default deny list, because a hand takes an abstract default by guess
+- add the handover to that default, which [[spec/design_input/the-agent-pulls-tickets]] names beside the bin
+- keep the log archive under the private folder, because a rule over binaries drops the record
+- say which path the deny globs read for the transcripts, which stand outside the private folder
+- add `retro.deny` to `spec/config/level0.schema.json`, where every knob carries its type and its help
+- say where the retro folder stands, because the ask names a folder git keeps and git ignores `.se/`
+- name what lets a second collect run, because a half run leaves a folder standing
+- drop the deepest-first walk, or say what it serves, because the verb removes nothing
 
 <!-- the form is verdict -->
 
