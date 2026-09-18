@@ -95,7 +95,15 @@ record:
     hand: the engine
     hash_before: 5231223aa4086eb08000696e99fd6c35056fccf8
     hash_after: 5231223aa4086eb08000696e99fd6c35056fccf8
-step: retro/notes
+  - step: retro/notes
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: d2b90b1db6ddd416679ac850eae0e09e9b76f3c2
+    hash_after: d2b90b1db6ddd416679ac850eae0e09e9b76f3c2
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+step: retro/write
 ---
 
 # Ask
