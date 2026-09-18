@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/tests-red
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -132,6 +132,17 @@ record:
     hand: box dd2a59294365 · claude-code-remote · helper-7
     hash_before: 914b6b999696d41682792fa1f64f979b656a38fb
     hash_after: 914b6b999696d41682792fa1f64f979b656a38fb
+  - step: implement/tests-red
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: b9ad397db3b576b5ce3492f47cfb6cf85c20de0a
+    hash_after: b9ad397db3b576b5ce3492f47cfb6cf85c20de0a
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 group: the-warnings-feed-a-refactorer
 ---
 
@@ -284,17 +295,41 @@ pass
 
 <!-- the form is command -->
 
+./RUNME.sh branch test
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Eight cases stand in `test/level0/verdict-guard.test.js`, and four fail on their
+own assertion. The four that pass read what the guard does today.
+
+| the case | why it fails |
+|---|---|
+| the prefix names the ticket | `commitsFor` answers a stub, so the split reads empty |
+| a sibling's commit moves the tip | the guard refuses, which is the bug |
+| the span leaves a sibling's files | the span keeps them |
+| the span takes the tree where the tip stands still | the span answers the old list |
+
+**What surprises me.** The fake process door keys its table on the whole argv,
+`git` and all. A key leaving it out falls back to the `git` row, so every call
+answers an empty string and a case fails for the wrong reason.
+
+The git door trims what it answers, so a log of one line and a log of none read
+alike. The `ok` flag tells them apart, which is why the case for a failed call
+drives the exit code.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases touch the two files the ask names, and one test file of their own
+- the git door has a fake, and every case teaches it the calls the guard runs
+- the file's own comment names the approach, and each case points at this ticket
 
 ## reflect
 

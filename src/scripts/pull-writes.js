@@ -208,6 +208,11 @@ export function tipOf(it) {
   return it.git.run(["rev-parse", "HEAD"], true).out;
 }
 
+// The commits between a hold's tip and the branch tip, split by the ticket each one names. [[spec/tickets/the-verdict-guard-reads-tips]]
+export function commitsFor(_it, _name, _since) {
+  return { read: false, own: [], other: [] };
+}
+
 // [[spec/design_output/pull#the-test-verb]]
 export function changedSince(it, one, held) {
   const first =
