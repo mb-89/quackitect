@@ -89,7 +89,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 8cc8301e3ca3ba8d
 group: the-verbs-read-two-roots
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box ea4589862ac3
@@ -118,6 +118,17 @@ record:
       - name: lint
         exit: 0
         said: 14 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: c5e8270659b5ba232d854fcd568cb22905e84715
+    hash_after: c5e8270659b5ba232d854fcd568cb22905e84715
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 575 test(s) pass in 52 file(s)
+      - name: check
+        exit: 0
+        said: 67 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
@@ -274,21 +285,35 @@ Eleven tests fail on their own assertion, across five files. Two files are new: 
 
 ### tests
 
-<!-- the same tests pass -->
+    ./RUNME.sh branch test
 
 <!-- the form is command -->
 
 ### check
 
-<!-- the check is green on the commit -->
+    ./RUNME.sh check
 
 <!-- the form is command -->
 
 ### says
 
-<!-- what changes and why, for a reader who was not there -->
+The fixture the pull tests drive now names both roots.
+
+| what stands | what it becomes |
+|---|---|
+| `handFaults` joins the Vale config onto `it.method`, and the fixture names no root | the fixture names the method root and the work root |
+| the answer key spells that path with a forward slash | the key builds its path with `join`, so either separator reads |
+| a pointer stands on the second line of a comment | each pointer stands on the line the rule reads |
+
+A stub lints under the vehicle's rules, so the config comes off the method root. Where that join throws, the try swallows it and the voice reads nothing back. The two cases over the hand-back then read green where the rules refuse.
 
 <!-- the form is text -->
+
+### checked
+
+- the change touches no file the ask leaves out. The commit holds two fixtures and one comment.
+- every door the change reaches has a fake. The cases drive the fake disk, git and process.
+- a comment names the approach. The one in `hand.js` points at the work root chapter.
 
 # verdict
 
