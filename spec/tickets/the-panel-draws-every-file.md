@@ -92,7 +92,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box dd2a59294365 · claude-code-remote
@@ -108,6 +108,10 @@ record:
     hand: box dd2a59294365 · claude-code-remote
     hash_before: f9ca509ef7aac9f8d928ced5b11e8c2a97bb16c3
     hash_after: f9ca509ef7aac9f8d928ced5b11e8c2a97bb16c3
+  - step: design/review
+    hand: box dd2a59294365 · claude-code-remote · helper-4
+    hash_before: b71069667513458198ee5b6e61a3cce4de00b787
+    hash_after: b71069667513458198ee5b6e61a3cce4de00b787
 ---
 
 # Ask
@@ -199,16 +203,16 @@ Each loop walks the paths its own source holds. So a swept file keeps its findin
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- `draws` publishes nil for every `drawn` path its `found` map leaves out.
-- So the first `didOpen` clears the sweep's drawing, and the open file stays alone.
-- `clears` empties every `drawn` path on `didClose`, and nothing runs the sweep again.
-- Name what holds a swept file drawn, so the clear loop reaches the open file alone.
-- `Sweep` covers what `Over` reads, through `nameHoldsTheWords` and `schemaFaults`.
-- `Forgets` drops the path list alone, so an open buffer answers ahead of the disk.
-- `Paths` drops a parked file through `isDraft`, so a parked file draws nothing.
-- `./RUNME.sh check` exits 1 here, on faults standing outside this ask.
+- The draft answers every case the ask names, one a line.
+- A source a drawn path keeps the sweep's drawing past the first `didOpen` and the first `didClose`.
+- `schemaFaults` reads every tracked note, and `Rules` holds the name cap and the readers `Over` runs.
+- So `Sweep` covers what one file's open draws.
+- `Forgets` drops the path list and keeps the overlay, so a buffer answers ahead of the disk.
+- `gitHolds` drops a parked path through `isDraft`, so a parked file draws nothing.
+- `./RUNME.sh check` exits 1 here, on placeholder, magic number and list item faults outside this ask.
+- The implement step greens that check.
 
 # implement
 
