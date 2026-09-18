@@ -90,7 +90,11 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 7aff05c0ab0786a967d21e2794fa2e5f747b89e4
     hash_after: 7aff05c0ab0786a967d21e2794fa2e5f747b89e4
-step: children
+  - step: children
+    hand: the engine
+    hash_before: 5231223aa4086eb08000696e99fd6c35056fccf8
+    hash_after: 5231223aa4086eb08000696e99fd6c35056fccf8
+step: retro/notes
 ---
 
 # Ask
