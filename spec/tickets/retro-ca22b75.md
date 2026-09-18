@@ -182,7 +182,7 @@ steps:
       - name: groups
         form: list
         says: one line per ticket, with its group and its urgency
-step: readers
+step: mine/chapters
 process: [[spec/processes/retro]]
 process_hash: 61a2bb140f0b4632
 record:
@@ -214,6 +214,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: readers
+    hand: the engine
+    hash_before: 71391e3439684b2ebffba5c3803203c388a964bc
+    hash_after: 71391e3439684b2ebffba5c3803203c388a964bc
 ---
 
 # Ask
