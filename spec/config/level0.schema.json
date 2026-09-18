@@ -248,6 +248,21 @@
           "type": "number",
           "unit": "tickets",
           "help": "The tickets a retro's improve step mints, so the list holds what gets done."
+        },
+        "blockScore": {
+          "type": "number",
+          "unit": "score",
+          "help": "The score a ticket takes for each one waiting under it, down the whole chain."
+        },
+        "dayScore": {
+          "type": "number",
+          "unit": "score",
+          "help": "The score a ticket takes for each day it stands."
+        },
+        "failScore": {
+          "type": "number",
+          "unit": "score",
+          "help": "The score a ticket takes for each hand-back that comes back refused."
         }
       }
     },

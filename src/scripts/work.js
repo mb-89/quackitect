@@ -34,7 +34,9 @@ import {
   withoutField,
 } from "./group.js";
 import { guidance } from "./guidance-verb.js";
+import { ticketsHere, weighing } from "./pull-hand.js";
 import { handOf, pull, takeable } from "./pull.js";
+import { queued } from "./queue.js";
 import { readyToMerge, review } from "./review.js";
 import { serving } from "./serve.js";
 import { freeIn, staleClaim, trigger } from "./stand.js";
@@ -461,6 +463,8 @@ function list(it, _name, argv) {
   const said = argv ?? [];
   // The read stands off the network, and a flag asks for the refresh. [[spec/design_output/work#the-listing-reads-git-once]]
   if (said.includes("--fetch")) it.git.fetch();
+  // [[spec/design_output/pull#the-queue-is-a-score]]
+  if (said.includes("--queue")) return queueOnly(it);
   const read = readWork(it, true);
   const stand = read.stand;
   const standing = standingAll(stand);
@@ -523,6 +527,24 @@ function childRows(one) {
 // [[spec/design_output/work#a-ticket-under-its-group]]
 function stateOf(text) {
   return fieldOf(text, "state") || OPEN;
+}
+
+// The order the pull hands out, off the one decider the board reads too. [[spec/design_output/pull#the-queue-is-a-score]]
+function queueOnly(it) {
+  const all = ticketsHere(it);
+  const open = all.filter(
+    (one) => !one.private && fieldOf(one.text, "state") === OPEN && takeable(it, one, all),
+  );
+  const order = queued(open, all, weighing(it, all));
+  if (!order.length) {
+    console.log("No ticket stands in the queue.");
+    return 0;
+  }
+  for (const [at, one] of order.entries()) {
+    const place = String(at + 1).padStart(COL.kind);
+    console.log(`${place}  ${one.name.padEnd(COL.branch)} ${whyOf(one.text)}`);
+  }
+  return 0;
 }
 
 // The why column carries the mark where nothing waits. [[spec/design_output/work#a-row-per-group]]

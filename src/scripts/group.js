@@ -44,6 +44,21 @@ export function urgent(text) {
   return fieldOf(text, URGENT) === "true";
 }
 
+// The tickets one waits for, a list or one line, with the branch prefix dropped. [[spec/design_output/work#the-mark-and-what-waits]]
+export function dependsOn(front) {
+  return [front?.depends_on ?? []]
+    .flat()
+    .flatMap((one) => String(one).split(","))
+    .map((one) =>
+      one
+        .trim()
+        .replace(/^\[|\]$/g, "")
+        .replace(/^["']|["']$/g, "")
+        .trim(),
+    )
+    .filter(Boolean);
+}
+
 // [[spec/design_output/work#a-group-is-a-ticket]]
 export function isGroup(text) {
   // The mint links the process by its path, and a hand by its name. [[spec/design_output/work#a-group-is-a-ticket]]

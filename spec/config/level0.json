@@ -13,7 +13,10 @@
     "refusalsBeforePerson": 5,
     "stepsBeforeSplit": 3,
     "retroReaders": 4,
-    "retroCap": 8
+    "retroCap": 8,
+    "blockScore": 10,
+    "dayScore": 1,
+    "failScore": 5
   },
   "engine": {
     "comment": "The engine level one brings. spec/design_output/config.md, chapter The engine controls, says what each value means.",

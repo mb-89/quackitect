@@ -196,6 +196,30 @@ under. A checklist on the leaf or a phase above it adds the `checked` field,
 one line per item. Then come the actionables of every note the leaf reads,
 and the line that hands it back.
 
+# The queue is a score
+
+One decider orders the queue, and every column naming an order reads that one
+answer. The mark stands over the score, and the score orders everything under
+it:
+
+| the term | what it does | its weight |
+|---|---|---|
+| the mark | puts a ticket over every unmarked one | none, because it overrides |
+| what waits under it | raises it, down the whole chain | `work.blockScore` |
+| how long it stands | raises it, so nothing sits forever | `work.dayScore` |
+| how often a hand-back comes back refused | raises it | `work.failScore` |
+
+The walk reaches the whole chain, so a ticket blocking one that blocks ten
+counts eleven. A ticket waiting on one still open leaves the queue before the
+score reads it, and the board draws it anyway.
+
+The weights stand in `spec/config/level0.json`, beside `failsBeforePerson`, so
+tuning the queue costs an edit. `branch list --queue` writes the order the pull
+hands out, and the column a board draws reads that answer.
+
+A ticket's age comes off one `git log` over the folder holding the tickets, so
+the cost stands beside the pull, once a pull.
+
 # A hand of its own
 
 A step under `not` excludes the hand the record names on the step it names,
