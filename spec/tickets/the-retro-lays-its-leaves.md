@@ -91,7 +91,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -151,6 +151,14 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 4d479861946774706368d40d790c568ae4c7585a
     hash_after: 4d479861946774706368d40d790c568ae4c7585a
+  - step: implement/change
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 87bd596646f07ccbfca684d81235f35a546150d4
+    hash_after: 87bd596646f07ccbfca684d81235f35a546150d4
+    answered:
+      - name: lint
+        exit: 0
+        said: 75 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
@@ -328,9 +336,9 @@ The name is the same move once more. A reader opens the file named for the leaf 
 
 ### checked
 
-- the change touches no file the ask leaves out. The leaves module, the call inside collect, and the route's own collect step.
-- every door the change reaches has a fake. The module reads the disk and git through their doors, and the cases drive the fakes.
-- a comment names the approach the change implements. Each reader points at the chapter ruling it.
+- the change touches no file the ask leaves out. The leaves module, its cases, and one stale pointer the earlier move leaves behind.
+- every door the change reaches has a fake. The module reads the disk and git through their doors alone.
+- a comment names the approach the change implements. The empty leaf says why collect opens it and writes nothing.
 
 <!-- the form is checklist -->
 
