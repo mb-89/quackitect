@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: design/draft
+step: design/review
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -134,6 +134,10 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: b5afe14aac6e19e0cd0474251e4d04e78733765c
     hash_after: b5afe14aac6e19e0cd0474251e4d04e78733765c
+  - step: design/draft
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 5125500c620f403e7cf116cc503a9514d2071fd7
+    hash_after: 5125500c620f403e7cf116cc503a9514d2071fd7
 group: the-retro-runs
 depends_on: ["the-retro-takes-the-box"]
 ---
@@ -223,9 +227,9 @@ A chapter stands where the pull finds it, which is the private tickets folder. S
 | what `retro notes` reads today | what it reads after this |
 |---|---|
 | every open note in the folder | every open note a hand parks there |
-| a chapter among them | a chapter passed over, because its own step closes it |
+| a chapter among them | a chapter passed over, by the process its frontmatter links |
 
-The drain decides what a hand parks. A chapter closes at `readers`, so no retro decides it and the drain passes it by.
+The field is the `process` link the mint writes. A chapter carries the chapter route, and a note a hand parks carries the note route. So the drain tells the two apart by the one field the mint fills, and no chapter holds the drain open.
 
 The span stands as a constant beside the verb, because the design fixes it and no box moves it.
 
