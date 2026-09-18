@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: design/review
+step: implement/tests-red
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -151,6 +151,10 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 54f61c4bd478405246131a56d3f14c73b690abbd
     hash_after: 54f61c4bd478405246131a56d3f14c73b690abbd
+  - step: design/review
+    hand: box d42624a67d18a8 · claude-code · helper-10
+    hash_before: 171638bd5de07979e10a3830d238fc5cb0cde336
+    hash_after: 171638bd5de07979e10a3830d238fc5cb0cde336
 group: the-retro-runs
 ---
 
@@ -281,15 +285,17 @@ The verb copies each of the two, and names each line in the manifest. A hand sti
 
 <!-- pass or fail, with findings one a line -->
 
-fail
+pass
 
-The owner's ruling closes every earlier finding. One gap stands, and a second beside it:
+The approach answers the ask, and the owner's three rulings close every earlier finding:
 
-- the log moves to `.se/runtime` [[spec/tickets/the-runtime-folder-holds-state]], and the skips row passes that folder
-- say how the log reaches the retro, because the rotates row prepares a file collect leaves standing
-- name the scratchpad, which [[spec/design_input/the-agent-pulls-tickets]] gives as the second source the `scripts` leaf reads
+- the skip is two folders, the runtime one and the retro's own, and no glob list stands
+- the log stands outside the runtime folder, so collect copies it
+- the `scripts` leaf reads two sources, the scripts folder and the scratchpad
+- the manifest holds one line a path, and the `unread` leaf reads it back
+- a hold under the private folder stops the verb, and a torn run replaces itself
 
-The rest answers the ask: the two skips, the manifest, the hold refusal, the transcripts, the second run.
+One caution for the implement hand: the log's row stands in the table of folders collect passes, and that row says collect copies it.
 
 `./RUNME.sh check` exits 0 on this branch.
 
