@@ -107,16 +107,26 @@ test("the log button's hover carries the viewer keys the declaration names", () 
 // [[spec/design_output/extension#the-gear-picks-the-sections]]
 test("the gear stands on top, and config stands at the foot of the window", () => {
   const said = drawn();
-  assert.ok(said.indexOf('class="gear"') < said.indexOf('data-section="agent control"'));
-  assert.ok(said.indexOf('data-section="config"') > said.indexOf('data-section="agent control"'));
+  assert.ok(
+    said.indexOf('class="gear"') < said.indexOf('data-section="agent control"'),
+  );
+  assert.ok(
+    said.indexOf('data-section="config"') >
+      said.indexOf('data-section="agent control"'),
+  );
   assert.match(said, /body \{ display: flex; flex-direction: column;/);
-  assert.match(said, /details\.section\[data-section='config'\] \{ margin-top: auto; flex: 0 1 auto;/);
+  assert.match(
+    said,
+    /details\.section\[data-section='config'\] \{ margin-top: auto; flex: 0 1 auto;/,
+  );
   assert.match(said, /\.chooser \{[^}]*top: 100%;/);
 });
 
 test("the controls take the scroll bar first, and config keeps its room longest", () => {
   const said = drawn();
-  assert.ok(said.indexOf('<div class="top">') < said.indexOf('data-section="agent control"'));
+  assert.ok(
+    said.indexOf('<div class="top">') < said.indexOf('data-section="agent control"'),
+  );
   assert.match(said, /\.top \{ flex: 1 1000 auto; min-height: 0; overflow-y: auto; \}/);
 });
 
@@ -135,7 +145,10 @@ test("a widget away from rest wears the mark saying so, and one at rest does not
 
 // [[spec/design_output/extension#a-mark-alone-says-it]]
 test("the far value pulses, and every widget draws its mark and no word", () => {
-  assert.match(drawn({ stop: { hold: "stop" } }), /class="widget at-0-1-1-2 away held"/);
+  assert.match(
+    drawn({ stop: { hold: "stop" } }),
+    /class="widget at-0-1-1-2 away held"/,
+  );
   assert.ok(!/class="said"/.test(drawn()), "no word stands under a mark");
 });
 
@@ -171,9 +184,14 @@ test("the bottom section comes last and starts collapsed, and every other opens"
   const sections = said.match(
     /<details class="section" data-section="([^"]+)"( open)?>/g,
   );
-  assert.deepEqual(sections, ['<details class="section" data-section="agent control" open>']);
+  assert.deepEqual(sections, [
+    '<details class="section" data-section="agent control" open>',
+  ]);
   assert.match(said, /<details class="section gone" data-section="config">/);
-  assert.ok(said.indexOf('data-section="config"') > said.indexOf('data-section="agent control"'));
+  assert.ok(
+    said.indexOf('data-section="config"') >
+      said.indexOf('data-section="agent control"'),
+  );
 });
 
 test("the bottom section draws an editor matching the type, and the unit beside it", () => {

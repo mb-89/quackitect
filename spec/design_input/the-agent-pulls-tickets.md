@@ -703,9 +703,9 @@ what `collect` lays out.
 | `report` | person | `misses`, what the retro skips, and the reading itself is the gate |
 | `distribute` | anyone | `groups`, one line per ticket with its group and urgency |
 
-`retro collect` takes what it names into the retro folder, and every line it
-takes has a reader. Nothing it takes goes unread, and the `unread` leaf
-checks the manifest against the leaves to say so:
+`retro collect` takes everything under `.se` the deny list leaves standing,
+into the retro folder. A reader stands for most of it, and the `unread` leaf
+checks the manifest against the leaves to name the rest:
 
 | what collect takes | from | who reads it |
 |---|---|---|
@@ -718,11 +718,11 @@ checks the manifest against the leaves to say so:
 | the earlier retros | the retro tickets in git | the `score` step, and the `chapters` leaf for repeats |
 | the manifest, one line per thing taken | the verb itself | the `unread` leaf |
 
-The verb takes by a list of what it names and by nothing else, so a keep list
-that goes stale is no risk. The retro folders themselves, under `.se/retro/`,
-stand outside that list, and so do the hold, the box id, the config, the bin
-and the handover. A drain has no undo, so the verb refuses while a hand holds
-a ticket. `/se-retro` is the slash command that mints a retro and pulls it,
+The owner rules the take a deny list. A file of a kind nobody plans for reaches
+the retro that way. A keep list drops that file, and nobody learns of the drop.
+The list names the retro's own folders under `.se/retro/`, the runtime half,
+the bin and the handover. A drain has no undo, so the verb refuses while a
+hand holds a ticket. `/se-retro` is the slash command that mints a retro and pulls it,
 and the projection writes it beside the config commands.
 
 The window runs from the last retro's close commit to now, and for the first

@@ -1,24 +1,15 @@
-// The one module reaching the editor. Every call into vscode stands here, so
-// every other file in this folder answers a test with no editor running and
-// the extension holds no door of its own.
+// The editor door: the marks, the commands, the status bar and the webview.
+// The server behind the hook button stands in editor-process.js, and the files
+// in editor-files.js. Every other file in this folder answers a test with no
+// editor running, because the three of these hold every call into vscode.
 // [[spec/design_output/extension#the-editor-is-a-door]]
 
 const vscode = require("vscode");
-const { spawn } = require("node:child_process");
-const { readFileSync, realpathSync } = require("node:fs");
-const http = require("node:http");
-const { join } = require("node:path");
+
+const { processDoor } = require("./editor-process.js");
+const { fileDoor } = require("./editor-files.js");
 
 const NAME = "quackitect";
-// [[spec/design_output/extension#the-hook-button]]
-const SERVER = "src/bridge/server.js";
-// The port base of [[spec/design_output/vehicle#the-register-holds-the-port]], held again here because this module loads as CommonJS and imports no lib.
-const PORT = 6510;
-const OK = 200;
-const WIRE_WAIT = 500;
-const KILL_AFTER = 300;
-const LAUNCH = "the server";
-const PAUSES = "decide";
 const FAR_LEFT = Number.MAX_SAFE_INTEGER;
 const PUT_BACK = "Put it back";
 const QUIET = [
@@ -26,105 +17,17 @@ const QUIET = [
   ["suggestInstallingGlobally", false],
 ];
 
+// [[spec/design_output/extension#the-editor-is-a-door]]
 function editorDoor(context) {
   const folder = vscode.workspace.workspaceFolders?.[0];
-  const decoder = new TextDecoder();
-  const encoder = new TextEncoder();
   let page = null;
   const bars = new Map();
 
   const uriOf = (path) => vscode.Uri.joinPath(folder.uri, ...String(path).split("/"));
-  let console_ = null;
-
-  // [[spec/design_output/extension#the-hook-button]]
-  const processes = new Map();
-  const watchers = [];
-  const changed = () => {
-    for (const one of watchers) Promise.resolve(one()).catch(() => {});
-  };
-  context.subscriptions.push(
-    vscode.debug.onDidTerminateDebugSession((session) => {
-      for (const [key, held] of processes) {
-        if (held.session === session || held.session?.id === session.id) {
-          processes.delete(key);
-          changed();
-        }
-      }
-    }),
-  );
 
   return {
-    // [[spec/design_output/extension#the-hook-button]]
-    processes: () => Object.fromEntries([...processes].map(([key, held]) => [key, held.how])),
-    onProcess: (said) => watchers.push(said),
-
-    async adoptsProcess(key, port) {
-      if (processes.has(key)) return true;
-      const at = port ?? (await settled(context, folder.uri.fsPath))?.port;
-      if (!at) return false;
-      const alive = await healthOverTheWire(at).catch(() => false);
-      if (!alive) return false;
-      processes.set(key, { how: "on", adopted: true, port: at });
-      changed();
-      return true;
-    },
-
-    async startProcess(key, how) {
-      if (processes.has(key)) return;
-      const vehicle = await settled(context, folder.uri.fsPath);
-      if (!vehicle) return;
-      if (how !== "debug" && (await this.adoptsProcess(key, vehicle.port))) return;
-      const program = join(vehicle.method, ...SERVER.split("/"));
-      if (how === "debug") {
-        await pauseAt(vscode.Uri.file(program), program, PAUSES);
-        processes.set(key, { how, session: null, port: vehicle.port });
-        changed();
-        const started = await vscode.debug.startDebugging(folder, {
-          type: "node",
-          request: "launch",
-          name: LAUNCH,
-          program,
-          args: [vehicle.method, "--port", String(vehicle.port)],
-          cwd: vehicle.method,
-          console: "integratedTerminal",
-        });
-        if (!started) {
-          processes.delete(key);
-          changed();
-          return;
-        }
-        const held = processes.get(key);
-        if (held) held.session = vscode.debug.activeDebugSession;
-        return;
-      }
-      const child = spawn(process.execPath, [program, vehicle.method, "--port", String(vehicle.port)], {
-        cwd: vehicle.method,
-        stdio: "ignore",
-        windowsHide: true,
-      });
-      processes.set(key, { how, child, port: vehicle.port });
-      child.on("exit", () => {
-        if (processes.get(key)?.child === child) {
-          processes.delete(key);
-          changed();
-        }
-      });
-      context.subscriptions.push({ dispose: () => child.kill() });
-      changed();
-    },
-
-    async stopProcess(key) {
-      const held = processes.get(key);
-      if (!held) return;
-      processes.delete(key);
-      if (held.child || held.adopted) {
-        await stopOverTheWire(held.port ?? PORT).catch(() => {});
-        if (held.child) setTimeout(() => held.child.kill(), KILL_AFTER);
-      } else {
-        await vscode.debug.stopDebugging(held.session ?? undefined);
-      }
-      changed();
-    },
+    ...processDoor(context, folder),
+    ...fileDoor(context, folder, uriOf),
 
     holds: () => Boolean(folder),
     root: () => folder?.uri?.fsPath ?? "",
@@ -167,22 +70,30 @@ function editorDoor(context) {
       states.forEach((one, at) => {
         let item = bars.get(one.key);
         if (!item) {
-          item = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left, FAR_LEFT - at);
+          item = vscode.window.createStatusBarItem(
+            vscode.StatusBarAlignment.Left,
+            FAR_LEFT - at,
+          );
           context.subscriptions.push(item);
           bars.set(one.key, item);
         }
         item.text = one.text;
         item.tooltip = one.tip;
-        item.backgroundColor = new vscode.ThemeColor(`statusBarItem.${one.tone}Background`);
+        item.backgroundColor = new vscode.ThemeColor(
+          `statusBarItem.${one.tone}Background`,
+        );
         item.command = { command, title: one.tip, arguments: [one.key, one.rest] };
         item.show();
       });
     },
 
     toasts(one, command) {
-      Promise.resolve(vscode.window.showWarningMessage(one.toast, PUT_BACK)).then((picked) => {
-        if (picked === PUT_BACK) vscode.commands.executeCommand(command, one.key, one.rest);
-      });
+      Promise.resolve(vscode.window.showWarningMessage(one.toast, PUT_BACK)).then(
+        (picked) => {
+          if (picked === PUT_BACK)
+            vscode.commands.executeCommand(command, one.key, one.rest);
+        },
+      );
     },
 
     // [[spec/design_output/extension#runme-opens-the-panel]]
@@ -195,7 +106,9 @@ function editorDoor(context) {
       const biome = vscode.workspace.getConfiguration("biome");
       for (const [key, value] of QUIET) {
         if (biome.inspect(key)?.globalValue !== undefined) continue;
-        Promise.resolve(biome.update(key, value, vscode.ConfigurationTarget.Global)).catch(() => {});
+        Promise.resolve(
+          biome.update(key, value, vscode.ConfigurationTarget.Global),
+        ).catch(() => {});
       }
     },
     nonce: () => globalThis.crypto.randomUUID().split("-").join(""),
@@ -207,78 +120,6 @@ function editorDoor(context) {
           vscode.Uri.joinPath(context.extensionUri, "webview", "clicks.js"),
         ) ?? "",
       ),
-
-    async read(path) {
-      try {
-        return decoder.decode(await vscode.workspace.fs.readFile(uriOf(path)));
-      } catch {
-        return "";
-      }
-    },
-
-    async list(path) {
-      try {
-        return (await vscode.workspace.fs.readDirectory(uriOf(path))).map(([name]) => name);
-      } catch {
-        return [];
-      }
-    },
-
-    // [[spec/design_output/extension#the-button-prints-the-log]]
-    says(lines) {
-      console_ = console_ ?? vscode.window.createOutputChannel(NAME);
-      console_.clear();
-      for (const one of lines) console_.appendLine(String(one));
-      console_.show(true);
-    },
-
-    async write(path, text) {
-      await vscode.workspace.fs.writeFile(uriOf(path), encoder.encode(String(text)));
-    },
-
-    // [[spec/design_output/extension#the-watcher-draws-it-again]]
-    watch(paths, said) {
-      for (const path of paths) {
-        const one = vscode.workspace.createFileSystemWatcher(
-          new vscode.RelativePattern(folder, path),
-        );
-        one.onDidChange(said);
-        one.onDidCreate(said);
-        one.onDidDelete(said);
-        context.subscriptions.push(one);
-      }
-    },
-
-    // [[spec/design_input/the-agent-pulls-tickets#the-drawing-is-a-projection]]
-    imports(path) {
-      return import(uriOf(path).fsPath);
-    },
-
-    // [[spec/design_output/extension#the-log-opens-a-terminal]]
-    runs(line) {
-      if (!line) return;
-      // [[spec/design_output/extension#a-terminal-opens-on-windows]]
-      const said =
-        process.platform === "win32" ? line.replace(/^\.\/RUNME\.sh/, ".\\RUNME.ps1") : line;
-      const shell = vscode.window.createTerminal({
-        name: NAME,
-        cwd: folder.uri.fsPath,
-      });
-      shell.show();
-      shell.sendText(said);
-    },
-
-    // [[spec/design_output/extension#two-buttons-make-both]]
-    async asks(what) {
-      const picked = await vscode.window.showOpenDialog({
-        canSelectFolders: true,
-        canSelectFiles: false,
-        canSelectMany: false,
-        openLabel: `this ${what}`,
-        title: `Pick the ${what}`,
-      });
-      return picked?.[0]?.fsPath ?? "";
-    },
 
     registerView(id, resolve) {
       context.subscriptions.push(
@@ -298,74 +139,6 @@ function editorDoor(context) {
       );
     },
   };
-}
-
-// [[spec/design_output/vehicle#the-register-holds-the-port]]
-async function settled(context, work) {
-  const home = join(realpathSync.native(context.extensionPath), "..", "..");
-  try {
-    const bridge = await import(vscode.Uri.file(join(home, "src", "bridge", "vehicle.js")).toString());
-    const disk = (await import(vscode.Uri.file(join(home, "src", "doors", "disk.js")).toString())).disk();
-    const clock = (await import(vscode.Uri.file(join(home, "src", "doors", "clock.js")).toString())).clock();
-    return bridge.settles(disk, process.env, clock, work, home);
-  } catch (error) {
-    vscode.window.showWarningMessage(`the hook finds no vehicle: ${error?.message ?? error}`);
-    return null;
-  }
-}
-
-// [[spec/design_output/extension#the-hook-button]]
-function healthOverTheWire(port) {
-  return new Promise((resolve, reject) => {
-    const request = http.request(
-      { host: "127.0.0.1", port, path: "/health", method: "GET", timeout: WIRE_WAIT },
-      (response) => {
-        response.resume();
-        response.on("end", () => resolve(response.statusCode === OK));
-      },
-    );
-    request.on("error", reject);
-    request.on("timeout", () => request.destroy(new Error("timeout")));
-    request.end();
-  });
-}
-
-function stopOverTheWire(port) {
-  return new Promise((resolve, reject) => {
-    const request = http.request(
-      { host: "127.0.0.1", port, path: "/stop", method: "POST", timeout: WIRE_WAIT },
-      (response) => {
-        response.resume();
-        response.on("end", resolve);
-      },
-    );
-    request.on("error", reject);
-    request.on("timeout", () => request.destroy(new Error("timeout")));
-    request.end();
-  });
-}
-
-// [[spec/design_output/extension#the-hook-button]]
-async function pauseAt(uri, path, name) {
-  let text = "";
-  try {
-    text = readFileSync(path, "utf8");
-  } catch {
-    return;
-  }
-  const lines = text.split("\n");
-  const opens = lines.findIndex((one) => new RegExp(`function ${name}\\(`).test(one));
-  if (opens < 0) return;
-  let at = lines.findIndex((one, index) => index > opens && /^\s*return\b/.test(one));
-  if (at < 0) at = opens;
-  const held = vscode.debug.breakpoints.some(
-    (one) =>
-      one.location?.uri?.fsPath === uri.fsPath && one.location?.range?.start?.line === at,
-  );
-  if (held) return;
-  vscode.debug.addBreakpoints([
-    new vscode.SourceBreakpoint(new vscode.Location(uri, new vscode.Position(at, 0)), true),
-  ]);
 }
 
 function pageOf(view) {

@@ -2,11 +2,13 @@
 // that hands it over again.
 // [[spec/design_output/level0#the-standing-layer]]
 
+import { join } from "node:path";
 import { inherits } from "../../.claude/skills/level0/lib/layer.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import {
   bindsHere,
   canary,
+  carried,
   canaryIn,
   canaryText,
   countsOf,
@@ -19,6 +21,7 @@ import {
 } from "../../.claude/skills/level0/lib/guidance.js";
 import { toolLines, WANTED } from "../../.claude/skills/level0/lib/tools.js";
 import { readTools, writeSurvey } from "../scripts/tools.js";
+import { heldReadsIn } from "../scripts/guidance-hand.js";
 import { asks } from "./config.js";
 import { deadIndexLine } from "./search.js";
 
@@ -28,16 +31,25 @@ export const TOOLS_BLOCK = "level0-tools";
 const TOOLS_HEADING = "# What this box has";
 
 // The notes come off both roots, file by file, the work root's winning. [[spec/design_output/vehicle#the-work-root-inherits]]
-export function guidanceHere(disk, method, work = method, env = process.env, tooth = true) {
+export function guidanceHere(
+  disk,
+  method,
+  work = method,
+  env = process.env,
+  tooth = true,
+  argv = [],
+) {
   const notes = readNotes(inherits(disk, method, work), GUIDANCE);
   const wanted = new Set(notes.flatMap((one) => envOf(one.text)));
   const bound = Object.fromEntries([...wanted].map((name) => [name, env[name] ?? ""]));
   const here = notes.filter((one) => bindsHere(one.text, bound));
-  const counts = countsOf(here);
+  // A note the held step hands over rides the step, so the layer hands it no second time. [[spec/design_output/level0#the-standing-layer]]
+  const read = heldReadsIn(disk, join, work, env, argv);
   // [[spec/design_output/level0#the-style-carries-a-note]]
   const session = here.filter((one) => !styled(one.text));
+  const counts = countsOf(carried(session, read));
   return {
-    standing: standingLayer(session),
+    standing: standingLayer(session, read),
     helper: standingLayer(here),
     ...counts,
     sentence: canary({ ...counts, stop: tooth }),

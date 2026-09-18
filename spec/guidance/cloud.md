@@ -9,17 +9,18 @@ rationale: [[spec/rationales/cloud]]
 
 # Actionables
 
-1. Run `./RUNME.sh branch pull` first where you start on `main` or on a branch the platform cut. The engine takes a branch for you and hands you its brief. The branch you start on carries no work. *
-2. Read the brief level zero hands you where you start on a `work/` branch already. *
-3. Take `main` into your branch before you start: `./RUNME.sh branch sync`. *
-4. Work the branch you hold and stop at its edge. The brief is the whole job. *
-5. Commit and push each time you finish a thing, onto the branch you hold. *
-6. Hand a step wanting a person out of your branch, and stop for none. Mint a ticket outside the group, write what stands open into its ask, and run `./RUNME.sh branch unblock <ticket> <successor>`. *
-7. Mint that successor with a first step under `by: person`, because it carries a person's question. A successor opening under any other `by` meets a refusal, and the pull hands that question to an agent. *
-8. Finish every step an agent can take before you leave. A step a person owns waits on its own ticket, and it holds up nothing behind it. *
-9. Green the check before you hand the branch back, whatever hand puts the fault there. A fault you inherit is no fault of yours, and a fault you hand on is. *
-10. Write your result, your retro and every script you write under `.se/scripts` into `HANDOVER.md`, replacing the brief.
-11. Run `./RUNME.sh branch done` last. It sets the status and pushes. The next box reads that status, and it merges nothing a box still holds.
-12. Stop at the push. The merge into `main` and the branch's delete happen off this box.
-13. Stop after `branch done`. One session works one branch, and the next branch belongs to the next session. *
-14. Say in your answer which commit you are on, and whether it matches origin. *
+1. Run `./RUNME.sh branch pull` first where you start on `main`. The branch you start on carries no work. *
+2. Read the brief level zero hands you on a `work/` branch. Level zero deletes the copy it reads. *
+3. Take `main` in first, with `./RUNME.sh branch sync`. A late conflict costs the work standing behind it. *
+4. Work the branch you hold, and stop at its edge. A change nobody wants buries the one somebody wants. *
+5. Commit and push each time you finish a thing. This box dies and takes its working tree with it. *
+6. Decide every question whose wrong answer a later commit undoes. A box that waits on its own answer costs the owner a session. *
+7. Hand out a question whose wrong answer spends, sends, or loses work nobody rebuilds. A commit puts none of those back. *
+8. Read a step under `by: person` as a question, and weigh its cost. That stamp counts returns and knows nothing of the cost. *
+9. Mint a question you hand out with `./RUNME.sh mint ticket <path> --process=question`. Run `ticket open`, then `branch unblock <ticket> <name>`. The group lands without it. *
+10. Finish every step an agent takes before you leave. A step you leave meets the next box and waits again. *
+11. Green the check before you hand the branch back, whatever hand puts the fault there. A fault with no owner outlives every hand that meets it. *
+12. Write your result, your retro and every script under `.se/scripts` into `HANDOVER.md`. Git carries what this box learns, and nothing else does.
+13. Run `./RUNME.sh branch done` last, and stop at the push. It sets the status the next box reads.
+14. Work one branch a session, and leave the next branch to the next session. A second branch buries the first in one review. *
+15. Say which commit you stand on, and whether it matches origin. This box reports itself current while somebody pushes past it. *

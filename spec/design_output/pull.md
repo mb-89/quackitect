@@ -36,6 +36,24 @@ The pull runs on trunk or on a work branch, and the agent runs the pull and
 no other verb to get work. A box on a branch takes the group's leaves around
 its tickets. What a box on trunk gets depends on where it runs.
 
+## A name asks for one
+
+A hand names a ticket on the pull, and the pull hands out that ticket's leaf.
+The binding decides whether the ask stands:
+
+| the binding | what a name gets |
+|---|---|
+| `queue` | a refusal, because the queue decides what a session takes |
+| `unbound` | that ticket's leaf, where the pools reach it |
+| `god` | that ticket's leaf, where the pools reach it |
+
+The pools are the reservation. A ticket naming a group stands in that group's
+branch, and a pull on trunk reads the free tickets alone. So a name reaches
+what the session already stands beside, and nothing another branch holds.
+
+A name means the hand-back where a leaf stands in hand already, and the hold
+is what tells the two apart.
+
 ## The engine takes the branch
 
 The agent pulls, and the engine decides whether a branch comes with it:
@@ -119,7 +137,7 @@ holds no open note.
 
 | the route says | the pull admits |
 |---|---|
-| `by: person` | a hand off a harness, and an agent waits |
+| `by: person` | a hand off a harness. An agent waits, or takes it under `--owner-says` |
 | `by: agent` | a hand on a harness |
 | `by: helper` | nobody yet, until the spawn lands |
 | `by: retro` | a hand while its group stands at a retro step, or a note with the tag |
@@ -130,6 +148,14 @@ An agent is a hand whose environment names a harness. The command line reads
 that off `CLAUDECODE`, `CLAUDE_CODE_REMOTE` or `SE_CLOUD`. A verdict comes from
 a hand that leaves the tip where it stands. So a hand-back on a verdict leaf
 refuses where the tip differs from the take.
+
+| what the flag says | what the record holds |
+|---|---|
+| the owner sends this hand into a person's step | the hand, and `the owner says so` beside it |
+| the owner answers that step in the chat | the hand writes those words into the step |
+| a hand off a harness takes it | `person`, and no name beside it |
+
+A tracked file holds no person's name, and git carries who writes the commit.
 
 `work.personSigns` is the stronger door on a person's hand. Switched on, a
 person's hand-back on a tracked ticket meets a signed tip. The signature
@@ -337,8 +363,31 @@ A hand that cannot go on without a person runs `branch escalate <question>`,
 and `--options a,b,c` makes the answer a choice. The verb reads the hold
 and puts the person step before the held leaf through the same function.
 Then it drops the hold, commits by ticket and step, pushes, and hands out
-the next ticket. With no hold standing it refuses and names the pull. So the
-hand, the refusal count and the fail count insert through one mechanism.
+the next ticket. With no hold standing it refuses and names the pull. So a
+hand reaches the person step, and one mechanism inserts every kind.
+
+## A settle step goes in
+
+A count of returns says two agent hands disagree. It says nothing about who
+settles that, so the count inserts a step another agent takes:
+
+| the step | what it reads |
+|---|---|
+| `settle-<n>` | `by: anyone`, `to: engine`, the findings under `asks` |
+| the answer | the decision, and why it stands |
+
+`withSettleStep` puts it in through the same inserter the person step uses.
+Two counts reach it:
+
+- a step failing back, at `work.failsBeforePerson`
+- a hand-back meeting refused, at `work.refusalsBeforePerson`
+
+A ticket carrying `work.stepsBeforeSplit` settle steps hands the question to a
+person instead. So the agents settle first, and a person answers where they
+reach no answer.
+
+[[spec/rationales/cloud]] carries what a count costs where it reaches a person
+first.
 
 # A leaf comes back
 
@@ -394,6 +443,17 @@ ticket door refuses every later hand there. A rule broken past the open
 stands in the lint over the tree until a person reaches for the door.
 `src/scripts/ask-lint.js` holds the run, and a box with no Vale opens as it
 stands.
+
+## The blank lines stand
+
+`askLines` hands Vale the Ask with every blank line in it, and drops the
+placeholder comments alone. A blank line is what parts a paragraph from a
+table, so Vale reads the parts the writer means.
+
+Rows that drop the blanks run a table into the prose around it. Vale then reads
+the run as one paragraph, and the sentence rule counts the whole of it as one
+sentence. An Ask passing the lint over the tree comes back refused at the open,
+and the line it names holds no words at all.
 
 # The test verb
 

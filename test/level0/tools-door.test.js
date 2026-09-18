@@ -7,7 +7,11 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
-import { onPromptContext, onSessionStart, TOOLS_BLOCK } from "../../src/bridge/guidance.js";
+import {
+  onPromptContext,
+  onSessionStart,
+  TOOLS_BLOCK,
+} from "../../src/bridge/guidance.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
@@ -15,7 +19,8 @@ const ROOT = "/tree";
 const at = (path) => join(ROOT, ...path.split("/"));
 const FIND = {
   name: "mcp__level0__find",
-  description: "Finds the lines in this tree carrying the words, ranked by the index. Ask it first.",
+  description:
+    "Finds the lines in this tree carrying the words, ranked by the index. Ask it first.",
 };
 
 function box(files = {}, answers = {}) {
@@ -39,18 +44,27 @@ function blocksOf(it) {
 }
 
 test("a fresh box runs the survey at session start, and the block names what it found", () => {
-  const it = box({ "/usr/bin/node": "" }, { "/usr/bin/node --version": { stdout: "v22.0.0" } });
+  const it = box(
+    { "/usr/bin/node": "" },
+    { "/usr/bin/node --version": { stdout: "v22.0.0" } },
+  );
 
   const blocks = blocksOf(it);
   const tools = blocks.find((one) => one.name === TOOLS_BLOCK);
 
   assert.ok(it.disk.exists(at(TOOLS)), "the survey file stands after the start");
   assert.match(tools.text, /- `node` 22\.0\.0, for a helper script/);
-  assert.match(tools.text, /- `mcp__level0__find`: Finds the lines in this tree carrying the words, ranked by the index\./);
+  assert.match(
+    tools.text,
+    /- `mcp__level0__find`: Finds the lines in this tree carrying the words, ranked by the index\./,
+  );
 });
 
 test("a surveyed box reads the file and runs nothing", () => {
-  const survey = JSON.stringify({ vale: { path: "/usr/bin/vale", version: "3.20.0" }, node: null });
+  const survey = JSON.stringify({
+    vale: { path: "/usr/bin/vale", version: "3.20.0" },
+    node: null,
+  });
   const it = box({ [at(TOOLS)]: survey });
 
   const tools = blocksOf(it).find((one) => one.name === TOOLS_BLOCK);

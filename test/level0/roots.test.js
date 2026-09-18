@@ -161,8 +161,9 @@ const onBranch = (extra = {}) => ({
   "git rev-parse HEAD": { stdout: `${SHA}\n` },
   [`git rev-list --count HEAD..origin/${BRANCH}`]: { stdout: "0\n" },
   "git status --porcelain": { stdout: "" },
-  // Nothing answers the port, so a cloud take starts the server over sh. [[spec/design_output/level0#the-cloud-starts-the-server]]
+  // Nothing answers the port, so a cloud take starts the server detached. [[spec/design_output/level0#the-cloud-starts-the-server]]
   [probeOf("node", 6510).join(" ")]: { exitCode: 1 },
+  node: { exitCode: 0, stdout: "" },
   sh: { exitCode: 0, stdout: "" },
   ...extra,
 });

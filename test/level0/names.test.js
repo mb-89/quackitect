@@ -27,6 +27,9 @@ test("a path answers the segment that runs long, and nothing where none does", (
 
 test("the cap is the one the caller hands in", () => {
   assert.equal(overLong("one-two-three-four-five-six", 6), "");
-  assert.equal(overLong("one-two-three-four-five-six", 5), "one-two-three-four-five-six");
+  assert.equal(
+    overLong("one-two-three-four-five-six", 5),
+    "one-two-three-four-five-six",
+  );
   assert.equal(overLong("one-two-three-four-five-six"), "", "no cap refuses nothing");
 });

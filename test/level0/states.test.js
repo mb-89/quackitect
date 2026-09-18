@@ -19,9 +19,7 @@ test("god mode shows on the error background, and a click puts the queue back", 
 });
 
 test("unbound and a hold each show, and rest shows nothing", () => {
-  const said = statesOf(
-    values({ "engine.binding": "unbound", "stop.hold": "stop" }),
-  );
+  const said = statesOf(values({ "engine.binding": "unbound", "stop.hold": "stop" }));
   assert.deepEqual(
     said.map((one) => [one.key, one.value, one.tone]),
     [

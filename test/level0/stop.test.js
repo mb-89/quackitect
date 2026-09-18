@@ -61,7 +61,13 @@ const TABLE = [
 ];
 
 function ranOf(fired = []) {
-  const known = ["chat-is-new", "opening-check", "work-waiting", "stop-hook-off", "never"];
+  const known = [
+    "chat-is-new",
+    "opening-check",
+    "work-waiting",
+    "stop-hook-off",
+    "never",
+  ];
   return (name) => (known.includes(name) ? fired.includes(name) : undefined);
 }
 
@@ -71,9 +77,17 @@ function voted(fired, claimed) {
 
 // [[spec/design_output/stop#a-claim-a-check-holds]]
 test("a claimed rule naming a check waits for both", () => {
-  assert.equal(voted(["opening-check"], "opening").stop.id, "opening", "the claim and the check stand");
+  assert.equal(
+    voted(["opening-check"], "opening").stop.id,
+    "opening",
+    "the claim and the check stand",
+  );
   assert.equal(voted([], "opening").stop, undefined, "the claim alone fires nothing");
-  assert.equal(voted(["opening-check"]).stop, undefined, "the check alone fires nothing");
+  assert.equal(
+    voted(["opening-check"]).stop,
+    undefined,
+    "the check alone fires nothing",
+  );
 });
 
 test("a claim the check refuses leaves the turn open", () => {
@@ -151,7 +165,10 @@ test("the line names both sides and the count", () => {
 
 test("the re-prompt says why it carries on, then asks every unclaimed stop, in five lines", () => {
   const said = reprompt(voted(["work-waiting"]));
-  assert.match(said, /^Something stands unfinished\. To stop, call mcp__level0__stop last/);
+  assert.match(
+    said,
+    /^Something stands unfinished\. To stop, call mcp__level0__stop last/,
+  );
   for (const asked of ["Talk?", "A person?", "Complete?"]) {
     assert.ok(said.includes(`: ${asked}`), `it asks ${asked}`);
   }
@@ -163,7 +180,11 @@ test("the tool takes one reason out of the rules, and names each one", () => {
   const spec = stopSpec(TABLE);
   assert.equal(spec.name, "stop");
   assert.deepEqual(spec.inputSchema.required, ["reason", "next"]);
-  assert.deepEqual(spec.inputSchema.properties.reason.enum, ["talk", "blocked", "done"]);
+  assert.deepEqual(spec.inputSchema.properties.reason.enum, [
+    "talk",
+    "blocked",
+    "done",
+  ]);
   assert.ok(spec.description.includes("done: Complete?"), "it names the question");
   assert.equal(stopSpec([]).inputSchema.properties.reason.enum, undefined);
 });
@@ -172,7 +193,10 @@ test("the tool takes one reason out of the rules, and names each one", () => {
 test("a sound reason stands, a fact over it falls, and an unknown id says so", () => {
   const stands = stopAnswer(TABLE, "talk", voted([], "talk"));
   assert.equal(stands.ends, true);
-  assert.match(stands.result, /^The stop stands\. .*Write the words Ending my turn, and nothing more\.$/);
+  assert.match(
+    stands.result,
+    /^The stop stands\. .*Write the words Ending my turn, and nothing more\.$/,
+  );
 
   const falls = stopAnswer(TABLE, "done", voted(["work-waiting"], "done"));
   assert.deepEqual([falls.known, falls.ends], [true, false]);
@@ -180,7 +204,10 @@ test("a sound reason stands, a fact over it falls, and an unknown id says so", (
 
   const wrong = stopAnswer(TABLE, "tired", voted([], "tired"));
   assert.equal(wrong.known, false);
-  assert.equal(wrong.result, "tired names no reason this tree holds. The ids: talk, blocked, done.");
+  assert.equal(
+    wrong.result,
+    "tired names no reason this tree holds. The ids: talk, blocked, done.",
+  );
 });
 
 // [[spec/design_output/stop#a-turn-with-no-call]]
@@ -208,7 +235,11 @@ test("the claim lives as long as the call naming it, and no longer", () => {
   const it = toothOf();
   const said = it.atTurnEnd(voted([], "talk"));
   assert.equal(said.stop.id, "talk", "the call's reason reaches the vote");
-  assert.equal(it.atTurnEnd(voted([])).stop, undefined, "the next turn opens with none");
+  assert.equal(
+    it.atTurnEnd(voted([])).stop,
+    undefined,
+    "the next turn opens with none",
+  );
 });
 
 // [[spec/design_output/stop#three-in-a-row]]
@@ -222,6 +253,70 @@ test("mostInARow ends a runaway", () => {
   assert.equal(it.inARow(), 0, "the count starts again");
 });
 
+// A claim reads the agent, and a check reads the tree, so the check wins. [[spec/design_output/stop#a-check-beats-a-claim]]
+const YIELDING = [
+  {
+    id: "own-judgment",
+    side: "stop",
+    priority: 90,
+    decides: "claimed",
+    yields: true,
+    asks: "Would a wrong answer here reach past this branch?",
+    says: "a wrong answer outlives this branch",
+  },
+  {
+    id: "owner-spoke",
+    side: "stop",
+    priority: 100,
+    decides: "claimed",
+    asks: "Does the owner open a discussion?",
+    says: "the owner opens a discussion",
+  },
+  {
+    id: "work-stands",
+    side: "continue",
+    priority: 10,
+    decides: "mechanical",
+    runs: "work-waiting",
+    says: "work stands",
+  },
+  {
+    id: "owner-carries-on",
+    side: "continue",
+    priority: 99,
+    decides: "claimed",
+    says: "the owner says carry on",
+  },
+];
+
+function yielded(fired, claimed) {
+  return decide(YIELDING, { claimed, ran: ranOf(fired) });
+}
+
+test("a yielding stop loses to a check, whatever the priorities say", () => {
+  const said = yielded(["work-waiting"], "own-judgment");
+  assert.equal(said.ends, false, "the turn holds open");
+  assert.equal(said.yields, true, "the vote says the claim yielded");
+  assert.equal(said.go.id, "work-stands", "the re-prompt names the check");
+});
+
+test("a yielding stop stands where no check fires", () => {
+  const said = yielded([], "own-judgment");
+  assert.equal(said.ends, true, "nothing reads the tree, so the claim holds");
+  assert.equal(said.yields, false);
+});
+
+test("a yielding stop stands over a continue the agent also claims", () => {
+  const said = yielded([], "own-judgment");
+  assert.equal(said.ends, true, "one claim beats another on priority alone");
+});
+
+test("a stop outside the agent's own work beats a check", () => {
+  const said = yielded(["work-waiting"], "owner-spoke");
+  assert.equal(said.ends, true, "the owner speaking ends the turn");
+  assert.equal(said.yields, false);
+});
+
 // [[spec/design_output/stop#three-in-a-row]]
 test("a firm continue rule holds past the cap, because the queue still holds work", () => {
   const it = toothOf();
@@ -229,17 +324,34 @@ test("a firm continue rule holds past the cap, because the queue still holds wor
   const carried = [];
   for (let i = 0; i < 5; i++) carried.push(it.atTurnEnd(firm, 3).ends);
   assert.deepEqual(carried, [false, false, false, false, false]);
-  assert.equal(it.atTurnEnd({ ends: false, go: { id: "work-still-stands" } }, 3).ends, true, "a plain rule lets go at the cap");
+  assert.equal(
+    it.atTurnEnd({ ends: false, go: { id: "work-still-stands" } }, 3).ends,
+    true,
+    "a plain rule lets go at the cap",
+  );
 });
 
 // [[spec/design_output/stop#the-chat-is-new]]
 test("an answer names a next step where a sentence opens on the agent's own next act, and a table or the canary names none", () => {
   const canary = "level0 holds this session: 51 rules, 4 notes, the stop hook on.";
   assert.equal(namesNext(`Understood. I read the branches first.\n\n${canary}`), true);
-  assert.equal(namesNext("Fifteen branches stand on origin. Next I run the reviewer."), true);
-  assert.equal(namesNext("- The merge stands complete.\n- Then I pull the next ticket."), true);
-  assert.equal(namesNext(`| Question | Answer |\n|---|---|\n| Next? | I read them |\n\n${canary}`), false, "a table names no step");
-  assert.equal(namesNext("The work stands complete.\n\nstop: the-work-stands-complete"), false);
+  assert.equal(
+    namesNext("Fifteen branches stand on origin. Next I run the reviewer."),
+    true,
+  );
+  assert.equal(
+    namesNext("- The merge stands complete.\n- Then I pull the next ticket."),
+    true,
+  );
+  assert.equal(
+    namesNext(`| Question | Answer |\n|---|---|\n| Next? | I read them |\n\n${canary}`),
+    false,
+    "a table names no step",
+  );
+  assert.equal(
+    namesNext("The work stands complete.\n\nstop: the-work-stands-complete"),
+    false,
+  );
   assert.equal(namesNext(""), false);
 });
 

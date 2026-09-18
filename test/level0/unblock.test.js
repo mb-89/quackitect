@@ -12,7 +12,8 @@ import { fieldOf } from "../../src/scripts/group.js";
 import { takeable } from "../../src/scripts/pull.js";
 import { work } from "../../src/scripts/work.js";
 
-const ROOT = "/tree", SHA = "b818c390c02737351bf1b73aba36a573d34d2ecc";
+const ROOT = "/tree",
+  SHA = "b818c390c02737351bf1b73aba36a573d34d2ecc";
 const BRANCH = "work/one-group";
 const at = (path) => join(ROOT, ...path.split("/"));
 
@@ -145,7 +146,15 @@ function doors(files, answers = {}) {
     ...files,
   });
   return {
-    it: { proc: said.proc, disk, git: said, join, clock: fakeClock(), agent: true, cloud: true },
+    it: {
+      proc: said.proc,
+      disk,
+      git: said,
+      join,
+      clock: fakeClock(),
+      agent: true,
+      cloud: true,
+    },
     disk,
   };
 }
@@ -161,7 +170,9 @@ const standing = (child = CHILD(), extra = {}) => ({
 test("unblock closes a child waiting on a person, and names its successor", () => {
   const { it, disk } = doors(standing());
 
-  const { code, said } = heard(() => work(ROOT, ["unblock", "a-child", "a-successor"], it));
+  const { code, said } = heard(() =>
+    work(ROOT, ["unblock", "a-child", "a-successor"], it),
+  );
 
   assert.equal(code, 0);
   const now = disk.read(at("spec/tickets/a-child.md"));
@@ -179,18 +190,30 @@ test("the successor carries the question the person step asks, and the ticket it
 
   const successor = disk.read(at("spec/tickets/a-successor.md"));
   assert.match(successor, /no test drives the hook/, "the question rides along");
-  assert.match(successor, /\[\[spec\/tickets\/a-child\]\]/, "the successor names where it comes from");
+  assert.match(
+    successor,
+    /\[\[spec\/tickets\/a-child\]\]/,
+    "the successor names where it comes from",
+  );
   assert.match(successor, /# Discussion/, "it lands under Discussion");
   assert.doesNotMatch(successor, /Nothing stands here yet/, "the empty line goes");
 });
 
 // A successor minted off trivial opens under by: anyone, so the pull hands a person's question to an agent. [[spec/design_output/work#a-person-step-leaves]]
 test("unblock refuses a successor whose first step admits an agent", () => {
-  for (const [by, shown] of [["", "anyone"], ["anyone", "anyone"], ["agent", "agent"]]) {
+  for (const [by, shown] of [
+    ["", "anyone"],
+    ["anyone", "anyone"],
+    ["agent", "agent"],
+  ]) {
     const open = SUCCESSOR.replace("    by: person\n", by ? `    by: ${by}\n` : "");
-    const { it, disk } = doors(standing(CHILD(), { [at("spec/tickets/a-successor.md")]: open }));
+    const { it, disk } = doors(
+      standing(CHILD(), { [at("spec/tickets/a-successor.md")]: open }),
+    );
 
-    const { code, said } = heard(() => work(ROOT, ["unblock", "a-child", "a-successor"], it));
+    const { code, said } = heard(() =>
+      work(ROOT, ["unblock", "a-child", "a-successor"], it),
+    );
 
     assert.equal(code, 2, `by: ${shown} refuses`);
     assert.match(said, /waits for a person/, `by: ${shown} says why`);
@@ -205,7 +228,9 @@ test("the placeholder mint writes goes, so the chapter reads as what a hand wrot
     "Nothing stands here yet.",
     "<!-- what anybody adds, at any time, on this ticket -->",
   );
-  const { it, disk } = doors(standing(CHILD(), { [at("spec/tickets/a-successor.md")]: minted }));
+  const { it, disk } = doors(
+    standing(CHILD(), { [at("spec/tickets/a-successor.md")]: minted }),
+  );
 
   heard(() => work(ROOT, ["unblock", "a-child", "a-successor"], it));
 
@@ -218,7 +243,9 @@ test("the placeholder mint writes goes, so the chapter reads as what a hand wrot
 test("unblock refuses a child standing at a step an agent can take", () => {
   const { it, disk } = doors(standing(CHILD("implement/change")));
 
-  const { code, said } = heard(() => work(ROOT, ["unblock", "a-child", "a-successor"], it));
+  const { code, said } = heard(() =>
+    work(ROOT, ["unblock", "a-child", "a-successor"], it),
+  );
 
   assert.equal(code, 2);
   assert.match(said, /implement\/change/);
@@ -228,10 +255,17 @@ test("unblock refuses a child standing at a step an agent can take", () => {
 
 // [[spec/design_output/work#a-person-step-leaves]]
 test("unblock refuses a successor standing inside the group it leaves", () => {
-  const successor = SUCCESSOR.replace("urgency: soon\n", "urgency: soon\ngroup: one-group\n");
-  const { it } = doors(standing(CHILD(), { [at("spec/tickets/a-successor.md")]: successor }));
+  const successor = SUCCESSOR.replace(
+    "urgency: soon\n",
+    "urgency: soon\ngroup: one-group\n",
+  );
+  const { it } = doors(
+    standing(CHILD(), { [at("spec/tickets/a-successor.md")]: successor }),
+  );
 
-  const { code, said } = heard(() => work(ROOT, ["unblock", "a-child", "a-successor"], it));
+  const { code, said } = heard(() =>
+    work(ROOT, ["unblock", "a-child", "a-successor"], it),
+  );
 
   assert.equal(code, 2);
   assert.match(said, /a-successor stands in one-group/);
@@ -241,7 +275,9 @@ test("unblock refuses a successor standing inside the group it leaves", () => {
 test("unblock names the successor it needs, and mints none of its own", () => {
   const { it } = doors(standing());
 
-  const { code, said } = heard(() => work(ROOT, ["unblock", "a-child", "no-such-next"], it));
+  const { code, said } = heard(() =>
+    work(ROOT, ["unblock", "a-child", "no-such-next"], it),
+  );
 
   assert.equal(code, 2);
   assert.match(said, /no-such-next stands nowhere yet/);
@@ -251,7 +287,9 @@ test("unblock names the successor it needs, and mints none of its own", () => {
 // [[spec/design_output/work#a-person-step-leaves]]
 test("a sibling waiting on the child it unblocks becomes takeable, so the chain runs on", () => {
   const waits = CHILD("design", "depends_on: [a-child]\n");
-  const { it, disk } = doors(standing(CHILD(), { [at("spec/tickets/a-next.md")]: waits }));
+  const { it, disk } = doors(
+    standing(CHILD(), { [at("spec/tickets/a-next.md")]: waits }),
+  );
   const siblings = () => [
     { name: "a-child", text: disk.read(at("spec/tickets/a-child.md")) },
     { name: "a-next", text: disk.read(at("spec/tickets/a-next.md")) },
@@ -262,5 +300,9 @@ test("a sibling waiting on the child it unblocks becomes takeable, so the chain 
   const { code } = heard(() => work(ROOT, ["unblock", "a-child", "a-successor"], it));
 
   assert.equal(code, 0);
-  assert.equal(takeable(it, siblings()[1], siblings()), "design", "the closed child frees it");
+  assert.equal(
+    takeable(it, siblings()[1], siblings()),
+    "design",
+    "the closed child frees it",
+  );
 });

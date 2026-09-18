@@ -44,10 +44,7 @@ test("a person clicking fast reaches the far value, at any speed they hold", () 
 });
 
 test("the window runs from the last press, so a slow hand still counts", () => {
-  assert.deepEqual(burst([0, 700, 1400, 2100, 2800 + BURST + 1]), [
-    "finish",
-    "finish",
-  ]);
+  assert.deepEqual(burst([0, 700, 1400, 2100, 2800 + BURST + 1]), ["finish", "finish"]);
 });
 
 test("a sixth press inside the dead moment undoes nothing, and one after it acts", () => {

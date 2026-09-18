@@ -37,7 +37,10 @@ test("a match spanning lines and a bare match both go to the rows", () => {
 });
 
 test("a type names the files a glob would name", () => {
-  assert.equal(asked({ tool: "Grep", pattern: "one", type: "js" }).params.glob, "*.{js,jsx,mjs,cjs}");
+  assert.equal(
+    asked({ tool: "Grep", pattern: "one", type: "js" }).params.glob,
+    "*.{js,jsx,mjs,cjs}",
+  );
   assert.equal(asked({ tool: "Grep", pattern: "one", type: "go" }).params.glob, "*.go");
 });
 

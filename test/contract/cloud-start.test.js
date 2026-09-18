@@ -1,4 +1,4 @@
-// The cloud starts its own server: the shell text the bridgehead runs, what it
+// The cloud starts its own server: the node script the bridgehead runs, what it
 // answers where a piece is missing, and the line each code writes.
 // [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 
@@ -19,10 +19,10 @@ const SERVER =
 const WAITS = 40;
 
 const nodeHere = () =>
-  proc().run(["sh", "-c", "command -v node"], { timeoutMs: 5000 }).exitCode === 0;
+  proc().run(["node", "-e", "process.exit(0)"], { timeoutMs: 5000 }).exitCode === 0;
 
 function runs(where, env) {
-  return proc().run(["sh", "-c", START, "level0", where, where], {
+  return proc().run(["node", "-e", START, where, where], {
     env,
     timeoutMs: 10_000,
   });

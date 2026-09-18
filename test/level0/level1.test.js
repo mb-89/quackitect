@@ -15,8 +15,12 @@ import {
 
 // [[spec/design_output/pull#a-hand-of-its-own]]
 test("the wrapper reads the prompt out of a spawn answer, and nothing out of any other", () => {
-  const said = "spawn\n  a-child at design/review waits for a hand other than box 1.\n  Spawn a hand.\n\nYou are a hand of your own, named helper-2.\n1. Run it.";
-  assert.equal(spawnPromptIn(said), "You are a hand of your own, named helper-2.\n1. Run it.");
+  const said =
+    "spawn\n  a-child at design/review waits for a hand other than box 1.\n  Spawn a hand.\n\nYou are a hand of your own, named helper-2.\n1. Run it.";
+  assert.equal(
+    spawnPromptIn(said),
+    "You are a hand of your own, named helper-2.\n1. Run it.",
+  );
   assert.equal(spawnPromptIn("work  a-child at design/draft\n\nprose"), "");
   assert.equal(spawnPromptIn(""), "");
 });
@@ -41,14 +45,10 @@ test("the tool hands the shell verb the same words a person types", () => {
     pullArgv({ ticket: "a-child", verdict: "became", reason: "a-group" }),
     ["branch", "pull", "a-child", "--became", "a-group"],
   );
-  assert.deepEqual(pullArgv({ ticket: "a-child", verdict: "pass", fields: { approach: "x" } }), [
-    "branch",
-    "pull",
-    "a-child",
-    "--pass",
-    "--fields",
-    '{"approach":"x"}',
-  ]);
+  assert.deepEqual(
+    pullArgv({ ticket: "a-child", verdict: "pass", fields: { approach: "x" } }),
+    ["branch", "pull", "a-child", "--pass", "--fields", '{"approach":"x"}'],
+  );
   assert.equal(PULL_CALL, "mcp__level1__pull");
   assert.equal(pullSpec().name, "pull");
   assert.deepEqual(pullSpec().inputSchema.properties.verdict.enum, [

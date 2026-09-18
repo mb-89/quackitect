@@ -9,7 +9,13 @@ import { test } from "node:test";
 import { CHECK } from "../../.claude/skills/level0/lib/answer.js";
 import { STOP_CALL } from "../../.claude/skills/level0/lib/stop.js";
 import { REPORT_CALL } from "../../src/bridge/report.js";
-import { dropsHold, holdsCall, onStop, sawCall, sawPrompt } from "../../src/bridge/stop.js";
+import {
+  dropsHold,
+  holdsCall,
+  onStop,
+  sawCall,
+  sawPrompt,
+} from "../../src/bridge/stop.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 const ROOT = "/tree";
@@ -88,7 +94,11 @@ test("the hold at stop lets the three calls a turn ends with through", () => {
   for (const tool of [REPORT_CALL, STOP_CALL, `mcp__level0__${CHECK}`]) {
     const said = holdsCall({ tool }, box("stop"));
     assert.equal(said.result, undefined, `${tool} passes`);
-    assert.match(said.after.context[0], /holds this session at stop/, "and it carries the line");
+    assert.match(
+      said.after.context[0],
+      /holds this session at stop/,
+      "and it carries the line",
+    );
   }
 });
 

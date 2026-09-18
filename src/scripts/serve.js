@@ -23,8 +23,8 @@ export function probeOf(node, port) {
 }
 
 // One line starts the server on both roads, and the bridgehead holds it, because that hook imports nothing and every other caller imports it there. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
-export function startOf(root) {
-  return ["sh", "-c", START, "level0", root, root];
+export function startOf(root, node = "node") {
+  return [node, "-e", START, root, root];
 }
 
 // [[spec/design_output/level0#the-cloud-starts-the-server]]
@@ -33,7 +33,7 @@ export function servesHere(it) {
   if (it.proc.run(probeOf(it.node ?? "node", port), { cwd: it.root }).exitCode === 0) {
     return `The server answers at port ${port}.`;
   }
-  const started = it.proc.run(startOf(it.root), { cwd: it.root });
+  const started = it.proc.run(startOf(it.root, it.node ?? "node"), { cwd: it.root });
   const [, why] = reasonOf(started.exitCode);
   return started.exitCode === 0
     ? `The server starts detached at port ${port}, because nothing answered there.`

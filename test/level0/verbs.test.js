@@ -17,8 +17,8 @@ import {
   refusedTable,
   rowsIn,
   ruleCounts,
-  scoreOf,
   SHORTEST,
+  scoreOf,
   sinceOf,
   tabled,
   totalOf,
@@ -54,7 +54,10 @@ test("an answer comes out of a transcript, and a helper stays behind", () => {
     spoke(long(SHORTEST), { isSidechain: true }),
     spoke(long(SHORTEST), { agentId: "one" }),
     spoke(long(SHORTEST - 1)),
-    JSON.stringify({ type: "user", message: { content: [{ type: "text", text: long(40) }] } }),
+    JSON.stringify({
+      type: "user",
+      message: { content: [{ type: "text", text: long(40) }] },
+    }),
   ].join("\n");
 
   const found = answersIn(text);
@@ -161,7 +164,9 @@ test("a fixture log ranks its rows in the order the test names", () => {
   const one = (name, more) => ({ level: "warn", rule: name, ...more });
   const ranked = rankedRefusals([
     ...new Array(14).fill(0).map(() => one("VoiceVale.PastTense", { phrase: "bold" })),
-    ...new Array(11).fill(0).map(() => one("VoiceVale.LongSentence", { phrase: "..." })),
+    ...new Array(11)
+      .fill(0)
+      .map(() => one("VoiceVale.LongSentence", { phrase: "..." })),
     ...new Array(3).fill(0).map(() => one("ShellWritesNothing", { tool: "Bash" })),
   ]);
 
@@ -213,9 +218,14 @@ test("the two tables read the way the brief draws them", () => {
   ]);
   const drawn = measureTable(rows).split("\n");
   assert.match(drawn[0], /^file\s+words\s+findings\s+per 1000 words\s+top rules$/);
-  assert.match(drawn[1], /^003-answer\.md\s+517\s+6\s+11\.6\s+LongSentence 4, Passive 2$/);
+  assert.match(
+    drawn[1],
+    /^003-answer\.md\s+517\s+6\s+11\.6\s+LongSentence 4, Passive 2$/,
+  );
 
-  const ranked = refusedTable(rankedRefusals([{ level: "warn", rule: "A.B", phrase: "x" }]));
+  const ranked = refusedTable(
+    rankedRefusals([{ level: "warn", rule: "A.B", phrase: "x" }]),
+  );
   assert.match(ranked.split("\n")[0], /^rule\s+fires\s+phrase$/);
   assert.match(ranked.split("\n")[1], /^B\s+1\s+x$/);
 });

@@ -227,7 +227,11 @@ test("a note past the row's width carries its whole line under text", () => {
 
   assert.ok(long.length > 80, "the line runs past the width a row holds");
   assert.equal(rows[0].more.text, long, "text carries the line whole");
-  assert.equal(rows[0].line, long, "the door reads the whole line, and clips its own row");
+  assert.equal(
+    rows[0].line,
+    long,
+    "the door reads the whole line, and clips its own row",
+  );
 });
 
 test("ticket note writes from off the hold, as the ticket and the step in hand", () => {
@@ -384,21 +388,33 @@ test("ticket todo reaches a tracked ticket too, because the tag reaches any fold
 
 // [[spec/design_output/pull#the-private-queue]]
 test("a closed note steps aside for the tracked ticket of its name, and an open one stands first", () => {
-  const front = (state) => `---\nkind: [[ticket]]\nstate: ${state}\nurgency: soon\nsteps:\n  - name: do\n    does: makes the change\n---\n\n# Ask\n\nA thing.\n\n# do\n\nNothing yet.\n\n# Discussion\n\nNothing yet.\n`;
+  const front = (state) =>
+    `---\nkind: [[ticket]]\nstate: ${state}\nurgency: soon\nsteps:\n  - name: do\n    does: makes the change\n---\n\n# Ask\n\nA thing.\n\n# do\n\nNothing yet.\n\n# Discussion\n\nNothing yet.\n`;
   const shadowed = treeWithProcesses({
     [at(".se/tickets/a-thing.md")]: front("closed"),
     [at("spec/tickets/a-thing.md")]: front("open"),
   });
   heard(() => ticket(ROOT, ["todo", "a-thing"], shadowed.it));
-  assert.match(shadowed.disk.read(at("spec/tickets/a-thing.md")), /^todo: true$/m, "the ticket takes the tag");
-  assert.ok(!/^todo: true$/m.test(shadowed.disk.read(at(".se/tickets/a-thing.md"))), "the closed note takes none");
+  assert.match(
+    shadowed.disk.read(at("spec/tickets/a-thing.md")),
+    /^todo: true$/m,
+    "the ticket takes the tag",
+  );
+  assert.ok(
+    !/^todo: true$/m.test(shadowed.disk.read(at(".se/tickets/a-thing.md"))),
+    "the closed note takes none",
+  );
 
   const live = treeWithProcesses({
     [at(".se/tickets/a-thing.md")]: front("open"),
     [at("spec/tickets/a-thing.md")]: front("open"),
   });
   heard(() => ticket(ROOT, ["todo", "a-thing"], live.it));
-  assert.match(live.disk.read(at(".se/tickets/a-thing.md")), /^todo: true$/m, "an open note stands first");
+  assert.match(
+    live.disk.read(at(".se/tickets/a-thing.md")),
+    /^todo: true$/m,
+    "an open note stands first",
+  );
 });
 
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]

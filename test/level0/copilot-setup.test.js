@@ -4,8 +4,8 @@
 import assert from "node:assert/strict";
 import { posix } from "node:path";
 import { test } from "node:test";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { registrations, setup } from "../../.claude/skills/level0/lib/copilot-setup.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 const fixture = () => ({
   root: "/tree",

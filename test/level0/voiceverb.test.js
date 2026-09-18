@@ -13,13 +13,8 @@ const ROOT = "/tree";
 const BIN = "/tree/.se/bin/vale";
 const TEN = "one two three four five six seven eight nine ten";
 
-const valeArgv = (folder) => [
-  BIN,
-  "--config=.vale.ini",
-  "--output=JSON",
-  "--no-exit",
-  folder,
-].join(" ");
+const valeArgv = (folder) =>
+  [BIN, "--config=.vale.ini", "--output=JSON", "--no-exit", folder].join(" ");
 
 const finding = (rule) => ({
   Check: rule,
@@ -61,7 +56,11 @@ test("a fixture folder scores the number this case names", async () => {
   assert.equal(out.code, 0);
   assert.match(out.text, /^docs\/a\.md\s+10\s+1\s+100\.0\s+LongSentence 1$/m);
   assert.match(out.text, /^docs\/b\.md\s+10\s+0\s+0\.0$/m);
-  assert.match(out.text, /^TOTAL\s+20\s+1\s+50\.0$/m, "one finding in 20 words reads as 50");
+  assert.match(
+    out.text,
+    /^TOTAL\s+20\s+1\s+50\.0$/m,
+    "one finding in 20 words reads as 50",
+  );
   assert.match(out.text, /^LongSentence\s+1$/m, "the rule counts close the report");
 });
 
@@ -76,14 +75,22 @@ test("a fixture transcript yields its answers as files", async () => {
       isSidechain: true,
       message: { content: [{ type: "text", text: `${TEN} ${TEN} ${TEN}` }] },
     }),
-    JSON.stringify({ type: "user", message: { content: [{ type: "text", text: TEN }] } }),
+    JSON.stringify({
+      type: "user",
+      message: { content: [{ type: "text", text: TEN }] },
+    }),
   ].join("\n");
 
   const disk = fakeDisk({ [`${ROOT}/logs/sess.jsonl`]: rows, [BIN]: "" });
   const proc = fakeProc({ [valeArgv(".se/measure")]: { stdout: "{}" } });
 
   const out = await said(() =>
-    voice(ROOT, ["measure", "--transcripts", "logs"], { disk, proc, clock: fakeClock() }, BIN),
+    voice(
+      ROOT,
+      ["measure", "--transcripts", "logs"],
+      { disk, proc, clock: fakeClock() },
+      BIN,
+    ),
   );
 
   assert.equal(out.code, 0);
@@ -102,10 +109,22 @@ test("a fixture transcript yields its answers as files", async () => {
 });
 
 test("a fixture log ranks its rows in the order this case names", async () => {
-  const row = (at, more) => JSON.stringify({ at, level: "warn", kind: "write", ...more });
+  const row = (at, more) =>
+    JSON.stringify({ at, level: "warn", kind: "write", ...more });
   const rows = [
-    ...new Array(3).fill(0).map(() => row("2026-09-11T00:00:00.000Z", { rule: "VoiceVale.PastTense", phrase: "bold" })),
-    ...new Array(2).fill(0).map(() => row("2026-09-10T00:00:00.000Z", { rule: "Shell.WritesNothing", tool: "Bash" })),
+    ...new Array(3)
+      .fill(0)
+      .map(() =>
+        row("2026-09-11T00:00:00.000Z", {
+          rule: "VoiceVale.PastTense",
+          phrase: "bold",
+        }),
+      ),
+    ...new Array(2)
+      .fill(0)
+      .map(() =>
+        row("2026-09-10T00:00:00.000Z", { rule: "Shell.WritesNothing", tool: "Bash" }),
+      ),
     row("2026-08-01T00:00:00.000Z", { rule: "VoiceVale.Passive", phrase: "old" }),
     row("2026-09-11T00:00:00.000Z", { said: "this row names no rule" }),
   ].join("\n");
@@ -140,7 +159,11 @@ test("a wider day count reaches the row the week leaves out", async () => {
   assert.match(week.text, /^No door refuses anything in 7 day\(s\)\.$/m);
 
   const year = await said(() => voice(ROOT, ["refused", "365"], doors, BIN));
-  assert.match(year.text, /^Passive\s+1\s+old$/m, "the old file under log\\/old counts too");
+  assert.match(
+    year.text,
+    /^Passive\s+1\s+old$/m,
+    "the old file under log\\/old counts too",
+  );
 });
 
 test("the help names both verbs, and an unknown one is refused", async () => {
@@ -160,7 +183,9 @@ test("measure says so where Vale is absent, and where no file stands", async () 
   const disk = fakeDisk({ [`${ROOT}/docs/a.md`]: TEN, [BIN]: "" });
   const doors = { disk, clock: fakeClock(), proc: fakeProc({}) };
 
-  const gone = await said(() => voice(ROOT, ["measure", "docs"], doors, "/nowhere/vale"));
+  const gone = await said(() =>
+    voice(ROOT, ["measure", "docs"], doors, "/nowhere/vale"),
+  );
   assert.equal(gone.code, 2, "no Vale means nothing is measured");
 
   const empty = await said(() => voice(ROOT, ["measure", "nothing"], doors, BIN));

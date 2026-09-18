@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: soon
 steps:
   - name: do
@@ -10,6 +10,7 @@ steps:
       - name: change
         form: text
         says: what you change, and what surprises you
+step: do
 ---
 
 # Ask
@@ -28,11 +29,11 @@ Done is a bridgehead reaching the same answers with no shell:
 
 | what the shell does now | what stands instead |
 |---|---|
-| reads `CLAUDE_CODE_REMOTE` and `SE_CLOUD`, exits 3 | the hook reads the two off the environment, and returns before it spawns |
+| reads `CLAUDE_CODE_REMOTE` and `SE_CLOUD`, exits 3 | the script reads the two off the environment, and exits before any start |
 | `cd "$2"`, exits 4 where the root is absent | the hook stats the method root |
-| `command -v node`, exits 5 | the hook spawns `node` and reads the spawn's own answer |
+| `command -v node`, exits 5 | the hook runs `node` and reads the answer that run gives |
 | `test -d node_modules`, exits 6 | the hook stats `node_modules` |
-| `nohup node src/bridge/server.js ... &` | the hook spawns `node` detached, with the log file as its output |
+| `nohup node src/bridge/server.js ... &` | the script puts `node` behind it, with the log file as its output |
 
 `the start of the server fails` then stands for a node that refuses to spawn, and for that alone.
 
@@ -53,3 +54,12 @@ The owner reads `the start of the server fails` in the session log, and asks for
 The same log carries `the server answers nothing at http://127.0.0.1:6510/event` three times, each with its own cause: `remote-cancel`, `Unable to connect`, and `The socket connection was closed unexpectedly`. The middle one follows from this defect, the last one belongs to [[spec/tickets/the-server-holds-its-socket]], and `remote-cancel` stands on its own.
 
 `./RUNME.sh check` runs `serverHolds()` with a 2 second timeout, and answered red once inside `branch merge` while the tree read green a minute either side. A merge turning red on a health probe costs a person the merge, so the check's wait belongs in the same pass.
+
+| what trunk carries | where it stands |
+|---|---|
+| the start as a node script, holding the guards the shell held | the bridgehead hook |
+| one script for the bridgehead and for the cloud take | `src/scripts/serve.js` |
+| a refused run of node reading as a box carrying none | the hook's catch |
+| the cases driving the start with no shell | `test/contract/cloud-start.test.js` |
+
+A hand taking this ticket reads the diff and closes it, or names what it misses.

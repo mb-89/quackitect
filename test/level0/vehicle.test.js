@@ -3,8 +3,6 @@
 
 import assert from "node:assert/strict";
 import test from "node:test";
-import { fakeClock } from "../../src/doors/fake/clock.js";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
 import {
   attaches,
   copyOf,
@@ -16,6 +14,9 @@ import {
   resolves,
   travels,
 } from "../../.claude/skills/level0/lib/vehicle.js";
+import { attachTo } from "../../src/bridge/vehicle.js";
+import { fakeClock } from "../../src/doors/fake/clock.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 import {
   attach,
   copyHere,
@@ -26,7 +27,6 @@ import {
   registerCopy,
   rootsHere,
 } from "../../src/scripts/vehicle.js";
-import { attachTo } from "../../src/bridge/vehicle.js";
 
 const MARKER = ".claude/skills/level0/.claude-plugin/plugin.json";
 
@@ -85,7 +85,10 @@ test("the register turns an identity into a place", () => {
   assert.equal(resolves(list, "abc123"), "/tools");
   assert.equal(resolves(list, "nobody"), "");
 
-  const again = registers(JSON.stringify(list), entryOf("abc123", "0.2.0", "/tools", "later"));
+  const again = registers(
+    JSON.stringify(list),
+    entryOf("abc123", "0.2.0", "/tools", "later"),
+  );
   assert.equal(again.length, 1);
   assert.equal(again[0].version, "0.2.0");
 });
@@ -185,14 +188,25 @@ test("attach writes the driver, the register entry with its port, the pointer an
   const said = attachTo(files, { HOME: "/home/agent" }, fakeClock(), "/stub", "/tools");
   assert.equal(said.method, "/tools");
   assert.equal(said.port, 6510);
-  assert.equal(drivenOf(files.read("/stub/.se/project.json")).driver, "abc123", "the driver");
+  assert.equal(
+    drivenOf(files.read("/stub/.se/project.json")).driver,
+    "abc123",
+    "the driver",
+  );
   assert.deepEqual(
     JSON.parse(files.read("/stub/.se/vehicle.json")),
     { method: "/tools", port: 6510 },
     "the pointer",
   );
-  assert.equal(files.read("/stub/.claude/skills/level0/hooks/level0.js"), "the hook", "the hook");
-  assert.equal(files.read("/stub/.claude/skills/level0/hooks/hooks.json"), '{"modules":["./level0.js"]}');
+  assert.equal(
+    files.read("/stub/.claude/skills/level0/hooks/level0.js"),
+    "the hook",
+    "the hook",
+  );
+  assert.equal(
+    files.read("/stub/.claude/skills/level0/hooks/hooks.json"),
+    '{"modules":["./level0.js"]}',
+  );
   assert.equal(files.read(`/stub/${MARKER}`), "{}", "the manifest");
   const entry = JSON.parse(files.read("/home/agent/.se/registry.json")).find(
     (one) => one.id === "abc123",
@@ -200,6 +214,12 @@ test("attach writes the driver, the register entry with its port, the pointer an
   assert.equal(entry.method_root, "/tools", "the register entry");
   assert.equal(entry.port, 6510);
 
-  const again = attachTo(files, { HOME: "/home/agent" }, fakeClock(), "/stub", "/tools");
+  const again = attachTo(
+    files,
+    { HOME: "/home/agent" },
+    fakeClock(),
+    "/stub",
+    "/tools",
+  );
   assert.equal(again.port, 6510, "a second attach keeps the port");
 });

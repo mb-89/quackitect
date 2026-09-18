@@ -5,7 +5,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { wire } from "../../src/doors/wire.js";
+import { HEADERS, IDLE, wire } from "../../src/doors/wire.js";
 
 test("the door listens on a port, hands a request over, and closes", async () => {
   const it = wire();
@@ -21,6 +21,9 @@ test("the door listens on a port, hands a request over, and closes", async () =>
   });
   const port = server.address().port;
   assert.ok(port > 0, "an ephemeral port stands");
+  assert.equal(server.keepAliveTimeout, IDLE, "the socket outlives the hook's idle gap");
+  assert.equal(server.headersTimeout, HEADERS);
+  assert.ok(HEADERS > IDLE, "a kept socket reads the request that follows it");
   const answer = await fetch(`http://127.0.0.1:${port}/health`);
   assert.deepEqual(await answer.json(), { ok: true, url: "/health" });
   await new Promise((resolve) => server.close(resolve));

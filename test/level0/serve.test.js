@@ -5,9 +5,9 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { START } from "../../.claude/skills/level0/hooks/level0.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { START } from "../../.claude/skills/level0/hooks/level0.js";
 import { portIn, probeOf, serving, startOf } from "../../src/scripts/serve.js";
 
 const ROOT = "/tree";
@@ -37,7 +37,8 @@ function heard(what) {
   }
 }
 
-const started = (proc) => proc.ran.filter((one) => one.argv[0] === "sh").length;
+// The probe runs node too, so the start is the run carrying the script. [[spec/design_output/level0#the-cloud-starts-the-server]]
+const started = (proc) => proc.ran.filter((one) => one.argv.includes(START)).length;
 
 test("a silent port starts the server once, and the line says so", () => {
   const { it, proc } = box({ probe: 1 });
@@ -63,14 +64,17 @@ test("a desk and a failed take start nothing", () => {
   assert.equal(failed.proc.ran.length, 0);
 });
 
-test("a failed start names the last thing the shell said", () => {
-  const { it } = box({ probe: 1, start: 127, stderr: "sh: nohup: not found\n" });
-  assert.match(heard(() => serving(it, 0)).said, /start fails: sh: nohup: not found/);
+test("a failed start names the last thing the start said", () => {
+  const { it } = box({ probe: 1, start: 1, stderr: "Error: EACCES, open serve.log\n" });
+  assert.match(
+    heard(() => serving(it, 0)).said,
+    /start fails: Error: EACCES, open serve.log/,
+  );
 });
 
 // [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 test("the take runs the line the bridgehead runs, and no copy of it", () => {
-  assert.deepEqual(startOf(ROOT), ["sh", "-c", START, "level0", ROOT, ROOT]);
+  assert.deepEqual(startOf(ROOT), ["node", "-e", START, ROOT, ROOT]);
 });
 
 test("the port reads off the pointer, and stands at the base without one", () => {

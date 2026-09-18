@@ -52,8 +52,10 @@ export function recordIn(text) {
 
 // [[spec/design_output/work#held-derives-from-the-record]]
 export function heldIn(text) {
-  const held = recordIn(text).at(-1);
-  if (!held?.hash_before || held.hash_after) return null;
+  const held = recordIn(text)
+    .filter((one) => one.hash_before && !one.hash_after)
+    .at(-1);
+  if (!held) return null;
   return {
     step: bare(held.step ?? ""),
     hand: bare(held.hand ?? ""),
@@ -109,18 +111,37 @@ export function withHashAfter(text, after) {
   if (opens < 0) return rows.join("\n");
 
   const ends = blockEnd(rows, opens, shut);
-  let last = -1;
-  for (let at = opens + 1; at < ends; at++) if (rows[at].startsWith("  - ")) last = at;
-  if (last < 0) return rows.join("\n");
+  const spans = entrySpans(rows, opens, ends);
+  if (!spans.length) return rows.join("\n");
 
-  for (let at = last; at < ends; at++) {
-    if (/^\s+hash_after:/.test(rows[at])) {
-      rows[at] = `    hash_after: ${after}`;
-      return rows.join("\n");
-    }
+  const open = spans.filter((one) => !hasAfter(rows, one)).at(-1);
+  if (open) {
+    rows.splice(open.ends, 0, `    hash_after: ${after}`);
+    return rows.join("\n");
   }
-  rows.splice(ends, 0, `    hash_after: ${after}`);
+
+  const last = spans.at(-1);
+  for (let at = last.opens; at < last.ends; at++) {
+    if (/^\s+hash_after:/.test(rows[at])) rows[at] = `    hash_after: ${after}`;
+  }
   return rows.join("\n");
+}
+
+// Where each row of the record opens and ends, so a caller reaches one entry. [[spec/design_output/work#held-derives-from-the-record]]
+function entrySpans(rows, opens, ends) {
+  const starts = [];
+  for (let at = opens + 1; at < ends; at++) if (rows[at].startsWith("  - ")) starts.push(at);
+  return starts.map((one, which) => ({
+    opens: one,
+    ends: which + 1 < starts.length ? starts[which + 1] : ends,
+  }));
+}
+
+function hasAfter(rows, span) {
+  for (let at = span.opens; at < span.ends; at++) {
+    if (/^\s+hash_after:/.test(rows[at])) return true;
+  }
+  return false;
 }
 
 // [[spec/design_output/work#a-box-leaves]]

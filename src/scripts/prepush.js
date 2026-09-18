@@ -12,7 +12,7 @@ import {
   refusedTodo,
   taggedIn,
 } from "../../.claude/skills/level0/lib/todo.js";
-import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
+import { refusedVersion, TRUNK, VERSION } from "../../.claude/skills/level0/lib/trunk.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { proc } from "../doors/proc.js";
@@ -32,6 +32,13 @@ export function refsIn(text) {
 }
 
 export function holds(refs, stampText, carried = () => []) {
+  // [[spec/design_output/work#a-version-branch-stands]]
+  const versions = refs
+    .filter((one) => VERSION.test(String(one.remote ?? "").replace(/^refs\/heads\//, "")))
+    .filter((one) => ZEROS.test(String(one.sha ?? "")))
+    .map((one) => ({ name: one.remote.replace(/^refs\/heads\//, ""), how: "delete" }));
+  if (versions.length) return { code: 1, said: refusedVersion(versions) };
+
   const trunk = refs.filter((one) => one.remote === `refs/heads/${TRUNK}`);
   for (const one of trunk) {
     const battery = saysGreen(stampOf(stampText), one.sha);

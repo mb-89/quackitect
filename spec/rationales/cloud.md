@@ -73,7 +73,50 @@ The person's work is real, and dropping it is the other failure. So it moves to
 a ticket of its own, outside the group, carrying the question and what stands
 open. The group then closes, the branch merges, and the ticket is the reminder.
 
-## 7. What a leaving branch owes
+| a wrong answer | who owns it |
+|---|---|
+| a later commit undoes it | the box |
+| it spends, sends or opens a door | the owner |
+| it loses work nobody rebuilds | the owner |
+| it stands outside the brief | the owner |
+
+That table is the second wording. The first asked what only a person could
+answer, and it failed, because a person can answer anything.
+
+A box read it as a question about authority, and handed out calls it owned:
+
+- where a slug lives, with four copies standing already
+- which of two sound designs to take on the apply lane
+
+Two children of one group left that way in a single session. Neither question
+carried a wrong answer costing more than a commit.
+
+The engine made it worse. `withPersonStep` stamped `by: person` on a count of
+returns, so two disagreements between agent hands minted a question for a human.
+
+The stamp said `person`, and the rule then said a step a person owns waits. The
+box obeyed the stamp over the test. So the fix stands in three places:
+
+- the guidance asks the blast radius, which a reader decides
+- the stop rule carries `yields`, so a claim loses to a check that fires
+- the count asks another agent hand, and a person answers past the split cap
+
+A claim reads the agent, and a check reads the tree. So the agent's own reading
+of its own work stops ending a turn while work stands.
+
+## 7. The route a successor takes
+
+`branch unblock` reads the successor's first step and demands `by: person`. No
+process under `spec/processes` opened one, so every successor a hand could mint
+met a refusal. A box that followed the guidance to the letter got that refusal,
+released the branch, and the loop closed again.
+
+`spec/processes/question.yaml` is that route. A hand mints the successor off it,
+and the first step reads `by: person` with nobody assigning it. The pull says so
+too. Where a person's step is the only thing standing, the wait answer names the
+mint, the open and the unblock in order.
+
+## 8. What a leaving branch owes
 
 A branch that merges half-done is honest only if what it left stands written
 somewhere a person reads. The successor ticket is that record, and `reason:
@@ -83,7 +126,7 @@ The alternative is a branch held open until a person answers. That blocks the
 tickets depending on it, and a dependency reads a closed ticket, not a finished
 one. So closing is what frees the chain.
 
-## 8. The check greens first
+## 9. The check greens first
 
 A box read the check red, named the four lines a verb wrote, and left them. Three
 of the four stood on the branch before that box took it. The reading went: a

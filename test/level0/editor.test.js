@@ -23,10 +23,16 @@ const DEST = "/home/user/.vscode/extensions/quackitect.quackitect-0.1.0";
 
 // [[spec/design_output/extension#the-link-stands]]
 test("a copy standing where the link belongs goes, and the link takes its place", () => {
-  const files = fakeDisk({ [`${DEST}/stale.js`]: "old", [`${SOURCE}/package.json`]: "{}" });
+  const files = fakeDisk({
+    [`${DEST}/stale.js`]: "old",
+    [`${SOURCE}/package.json`]: "{}",
+  });
   assert.equal(linkedAt(files, DEST, SOURCE), false);
 
-  assert.deepEqual(linkAt(files, DEST, SOURCE), { linked: true, why: "the link went in" });
+  assert.deepEqual(linkAt(files, DEST, SOURCE), {
+    linked: true,
+    why: "the link went in",
+  });
   assert.equal(linkedAt(files, DEST, SOURCE), true);
   assert.equal(files.exists(`${DEST}/stale.js`), false, "the copy is gone");
 });
@@ -34,7 +40,10 @@ test("a copy standing where the link belongs goes, and the link takes its place"
 test("a link standing already stays, and a second run touches nothing", () => {
   const files = fakeDisk({ [`${SOURCE}/package.json`]: "{}" });
   files.link(SOURCE, DEST);
-  assert.deepEqual(linkAt(files, DEST, SOURCE), { linked: true, why: "the link stands already" });
+  assert.deepEqual(linkAt(files, DEST, SOURCE), {
+    linked: true,
+    why: "the link stands already",
+  });
 });
 
 test("a link pointing at another tree goes, and this tree's link goes in", () => {
@@ -44,7 +53,10 @@ test("a link pointing at another tree goes, and this tree's link goes in", () =>
   });
   files.link("/other/tree/src/extension", DEST);
   assert.equal(linkedAt(files, DEST, SOURCE), false);
-  assert.deepEqual(linkAt(files, DEST, SOURCE), { linked: true, why: "the link went in" });
+  assert.deepEqual(linkAt(files, DEST, SOURCE), {
+    linked: true,
+    why: "the link went in",
+  });
   assert.equal(linkedAt(files, DEST, SOURCE), true);
 });
 
@@ -81,7 +93,11 @@ test("the list names the id, or the extension stands unregistered", () => {
 const ID = "quackitect.quackitect";
 const FOLDER = "/home/user/.vscode/extensions";
 const mine = () => entryFor(ID, "0.1.0", `${FOLDER}/${ID}-0.1.0`, 1000);
-const other = (id) => ({ identifier: { id }, version: "1.0.0", metadata: { source: "gallery" } });
+const other = (id) => ({
+  identifier: { id },
+  version: "1.0.0",
+  metadata: { source: "gallery" },
+});
 
 test("an element nothing can identify is dropped, never carried", () => {
   const said = readEntries(JSON.stringify([other("a.b"), { version: "2" }, null]));
@@ -110,7 +126,11 @@ test("a list that reads as no JSON leaves the file alone", () => {
 });
 
 test("every key the editor owns is carried verbatim", () => {
-  const was = { identifier: { id: "a.b", uuid: "u" }, version: "1", odd: { deep: true } };
+  const was = {
+    identifier: { id: "a.b", uuid: "u" },
+    version: "1",
+    odd: { deep: true },
+  };
   const files = fakeDisk({ [`${FOLDER}/${LIST}`]: JSON.stringify([was]) });
   register(files, FOLDER, mine());
 
@@ -129,7 +149,10 @@ test("the file it writes is always an array, even holding one entry", () => {
 
 test("ours stands once where the list already names it", () => {
   const files = fakeDisk({
-    [`${FOLDER}/${LIST}`]: JSON.stringify([other("a.b"), { identifier: { id: ID }, version: "0.0.1" }]),
+    [`${FOLDER}/${LIST}`]: JSON.stringify([
+      other("a.b"),
+      { identifier: { id: ID }, version: "0.0.1" },
+    ]),
   });
   const found = register(files, FOLDER, mine());
 
@@ -169,6 +192,9 @@ test("the home folder comes from either name a box uses", () => {
   assert.equal(homeIn({ HOME: "/home/user" }), "/home/user");
   assert.equal(homeIn({ USERPROFILE: "C:\\Users\\one" }), "C:\\Users\\one");
   assert.equal(homeIn({ HOME: "", USERPROFILE: "C:\\Users\\one" }), "C:\\Users\\one");
-  assert.equal(homeIn({ HOME: "/c/Users/one", USERPROFILE: "C:\\Users\\one" }), "C:\\Users\\one");
+  assert.equal(
+    homeIn({ HOME: "/c/Users/one", USERPROFILE: "C:\\Users\\one" }),
+    "C:\\Users\\one",
+  );
   assert.equal(homeIn({}), "");
 });

@@ -158,10 +158,16 @@ test("an answer saying nothing comes back absent", () => {
 
 // [[spec/design_output/level0#the-style-carries-a-note]]
 test("a note flagged style true goes to the output style, and no flag keeps it in the session", () => {
-  const flagged = note.replace('scope: ["everybody"]', 'scope: ["everybody"]\nstyle: true');
+  const flagged = note.replace(
+    'scope: ["everybody"]',
+    'scope: ["everybody"]\nstyle: true',
+  );
   assert.equal(styled(flagged), true);
   assert.equal(styled(note), false);
-  assert.equal(styled(note.replace('scope: ["everybody"]', 'scope: ["everybody"]\nstyle: false')), false);
+  assert.equal(
+    styled(note.replace('scope: ["everybody"]', 'scope: ["everybody"]\nstyle: false')),
+    false,
+  );
 });
 
 // [[spec/design_output/vehicle#the-work-root-inherits]]
