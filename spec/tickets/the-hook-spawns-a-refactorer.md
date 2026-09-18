@@ -92,12 +92,18 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box dd2a59294365 · claude-code-remote
     hash_before: 95e62b529fbf4630939a7c7126594dd40f959748
     hash_after: 95e62b529fbf4630939a7c7126594dd40f959748
+  - step: design/review
+    hand: box dd2a59294365 · claude-code-remote · helper-2
+    hash_before: 010c618d7665b207550853778c522bd67d994025
+    hash_after: 010c618d7665b207550853778c522bd67d994025
+    returns: 1
+    why: The spawned hand takes the helper layer, which the working box builds from its own `process.env`.; So the variable the spawn sets reaches that layer nowhere, and the note stands off the hand.; Name how the note reaches the spawned hand alone, where `onAgentSpawn` hands that layer over.; The resolver beside `work-waiting` answers a boolean alone, so the check spawns nothing.; Name the hook that returns the spawn, as the review tool returns one off a tool call.; The pointer for the push door names a ticket closed as `became`, so point at its successor.; `untouchedFor` names no source for a file's last write, so say whether git answers it.; The guidance note carries `env` alone, and its schema requires `scope` beside it.; `./RUNME.sh check` answers 1, on warnings standing across the tree before this branch.; The stop rule, the four keys and the flag answer the rest of the ask.
 ---
 
 # Ask
@@ -190,6 +196,19 @@ The check answers true where the list runs past the number. The hook spawns the 
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- The spawned hand takes the helper layer, which the working box builds from its own `process.env`.
+- So the variable the spawn sets reaches that layer nowhere, and the note stands off the hand.
+- Name how the note reaches the spawned hand alone, where `onAgentSpawn` hands that layer over.
+- The resolver beside `work-waiting` answers a boolean alone, so the check spawns nothing.
+- Name the hook that returns the spawn, as the review tool returns one off a tool call.
+- The pointer for the push door names a ticket closed as `became`, so point at its successor.
+- `untouchedFor` names no source for a file's last write, so say whether git answers it.
+- The guidance note carries `env` alone, and its schema requires `scope` beside it.
+- `./RUNME.sh check` answers 1, on warnings standing across the tree before this branch.
+- The stop rule, the four keys and the flag answer the rest of the ask.
 
 # implement
 
