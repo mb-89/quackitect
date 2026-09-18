@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box a5e189c39e1d · claude-code-remote
@@ -110,6 +110,17 @@ record:
     hand: box a5e189c39e1d · claude-code-remote · helper-8
     hash_before: 8428ab77ad155b61fe810900a6db6445a9c38c9b
     hash_after: 8428ab77ad155b61fe810900a6db6445a9c38c9b
+  - step: implement/tests-red
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 036f308628588ccaff42ad5beb62a3f1dd0aacfb
+    hash_after: 169b90378f249f6b1c08902a201fe2c1e631684f
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -240,9 +251,9 @@ These stand green already, and they hold the claim the change must keep:
 
 What surprises me:
 
-- `./RUNME.sh branch test` runs the JavaScript tests alone, so the Go half of the red answers through `go test` and lands in the check.
-- The Go tests want `CGO_ENABLED=1` and the `sqlite_fts5` tag, which `src/scripts/install.sh` carries for the build and no test command carries on its own.
-- The hold folder stands spelled in three modules, so the move touches each one. The tests hold the three against one path, so a later drift fails.
+- `./RUNME.sh branch test` runs the JavaScript tests alone. The Go half of the red answers through `go test`, and lands in the check.
+- The Go tests want `CGO_ENABLED=1` and the `sqlite_fts5` tag. `src/scripts/install.sh` carries both for the build, and no test command carries them.
+- The hold folder stands spelled in a module of its own, so the move touches each. The tests hold them against one path, so a drift fails.
 - The glob test counts the notes the fixture writes, so the fixture and that count move together.
 
 ### checked
@@ -251,9 +262,9 @@ What surprises me:
 
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out: the tests, the module the ask names, and the index's own tests, and nothing else
-- every door the change reaches has a fake: the cases read exported strings and the Go cases write a tree under a temporary root, so no door runs
-- a comment names the approach the change implements: the module's header and each test file's header point at the design input
+- the change touches no file the ask leaves out: the tests, the module the ask names, the index's tests
+- every door the change reaches has a fake: the cases read exported strings. The Go cases write under a temporary root.
+- a comment names the approach: the module's header and each test file's header point at the design input
 
 ## reflect
 
