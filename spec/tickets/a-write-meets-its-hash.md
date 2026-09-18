@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box a5e189c39e1d · claude-code-remote
@@ -102,6 +102,10 @@ record:
     hash_after: 8e69a0d6b0cf5a9e2d1a753357dd32e722cf20b8
     returns: 1
     why: The stamp table one box shares reads the same for every hand, so a stale write still lands.; the shared table holds one stamp a path, so one hand writing refreshes the stamp the other hand reads; the second hand then agrees with the disk and lands its stale write, which is the loss the ask names; key the stamp by hand and by path, and name the token a hand carries. The bridge reads `e.agentId` alone; a path holding no stamp passes, so refuse an unstamped write where the disk holds the file; the door runs ahead of the write, so a stamp written there outlives a write `codeDoor` refuses; the formatter rewrites a `Write` inside `codeDoor`, so a stamp of the raw text refuses the next edit; `refusal` opens on the voice rules, so this door owes its own wording beside `refusedTicket` and `refusedPrivate`; the box holds the table in memory, and a server restart empties it. Say what the door does there; `hashText` serves the process hash in the schema lane, and the projection lane compares whole texts
+  - step: design/draft
+    hand: box a5e189c39e1d · claude-code-remote
+    hash_before: 7270e19ac2b4d1c28e2997d11b82081459bbdd4c
+    hash_after: 7270e19ac2b4d1c28e2997d11b82081459bbdd4c
 ---
 
 # Ask
@@ -128,25 +132,44 @@ Version three rules it in one line, under its file lane: a write lands only agai
 
 <!-- the form is text -->
 
-The box holds the hash of every file a hand reads, and the write door refuses a
-write whose file has moved since that read. The stamp lives in the box, so this
-asks for no lock, no lease and no file.
+Each hand carries its own stamp of each file it reads. The write door refuses a
+write where the disk disagrees with that hand's own stamp. A stamp one hand
+refreshes reaches no other hand, so a stale write finds nothing to agree with.
 
-| piece | what it does |
+| key | what the box holds |
 |---|---|
-| the read door | hashes the file a hand reads, and stamps the hash on the box under the path |
-| the write door | hashes the file on the disk, and refuses where the stamp disagrees |
-| the write door, after | stamps the text the write leaves, so the next edit from the same hand lands |
-| `hashText` | answers the hash, because one hash already serves the projections |
+| the hand and the path | the hash that hand last saw on that file |
+| the hand | the session id the hook reads out of its own session file, with `agentId` beside it |
 
-The door refuses on disagreement alone. A path carrying no stamp passes, so a
-hand writing a new file meets nothing.
+The hook posts the token today on no event. It carries `agentId` alone, which
+parts a subagent from its session. So the hook adds the session id, and the door
+keys on the pair.
 
-The refusal names the file and tells the hand to read it again. It stands with
-the other refusals, so one shape serves every door.
+| the door | what it does |
+|---|---|
+| the read door | hashes the file the hand reads, and stamps it under that hand |
+| the write door | hashes the file on the disk, and refuses where the hand's stamp disagrees |
+| the write door | refuses an unstamped write where the disk holds the file, so a hand reads first |
+| the write door | stamps the text the write leaves, once every door ahead of it passes |
 
-One box serves one work root, and both hands reach the same box through the
-server. So the session and the refactoring hand read one map of stamps.
+The stamp lands last, after `codeDoor`. That door formats a write and answers
+the formatted text, so the stamp reads that text.
+
+Three cases the door answers with no stamp in hand:
+
+- a path the disk holds nowhere, which needs none, so a new file passes
+- a write `codeDoor` refuses, which leaves the stamp the hand already carries
+- a table a restart emptied, where every hand reads again before it writes
+
+A restart costs a read and loses nothing, because the unstamped rule already
+asks for that read.
+
+`hashText` answers the hash. It serves the process hash in the schema lane
+today, and one hash over a text serves this the same way.
+
+This door writes its own refusal beside `refusedTicket` and `refusedPrivate`.
+`refusal` opens on the voice rules, so it says the wrong thing here. The new
+wording names the file and asks the hand to read it again.
 
 ## review
 
