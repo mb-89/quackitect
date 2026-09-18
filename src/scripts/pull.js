@@ -103,7 +103,8 @@ export function pull(it, argv) {
   if (!named && (verdict.said || (name && held))) return handBack(it, who, name, verdict);
   if (held) return stillHeld(it, held);
   // [[spec/design_output/pull#the-engine-takes-the-branch]]
-  if (onTrunk && it.take) {
+  // A hand asking for one ticket takes no branch, because the queue answers neither. [[spec/design_output/pull#the-hand-out]]
+  if (onTrunk && it.take && !asking) {
     if (it.cloud && !named) return it.take();
     const wanted = named || urgentGroup(it);
     if (wanted || it.ready?.()) return wanted ? it.take(wanted) : 0;
