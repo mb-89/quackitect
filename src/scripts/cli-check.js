@@ -54,7 +54,6 @@ import {
 } from "./cli-doors.js";
 import { namesIn, show, walk } from "./cli-read.js";
 import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
-import { heldReads } from "./guidance-hand.js";
 import { HOOKS } from "./precommit.js";
 import { writeSurvey } from "./tools.js";
 import { SHARED, SOURCE as VIEWER, viewerOf } from "./viewer.js";
