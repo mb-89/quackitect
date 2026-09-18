@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: now
 steps:
   - name: design
@@ -90,6 +90,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
+step: design/review
+record:
+  - step: design/draft
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: b743c4264990c3b6ed50c9fcc7ded1f61fad972b
+    hash_after: b743c4264990c3b6ed50c9fcc7ded1f61fad972b
 ---
 
 # Ask
@@ -129,6 +135,31 @@ The box then drops the hold, spawns a second hand, and pays the reading twice. T
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The guard asks git what moved, in place of whether anything moved.
+
+| what the guard reads today | what it reads |
+|---|---|
+| the hold's tip against the branch tip | the files the commits between the two touch |
+
+So a verdict hand-back refuses where that range touches the ticket in hand, and
+passes where a sibling's commit touches other files.
+
+| the question | the answer |
+|---|---|
+| why the ticket file | a reader writes its verdict there, and that write is what the rule guards |
+| what a sibling touches | its own ticket, and the files its change carries |
+| where the guard stands | `handFaults`, under `src/scripts/pull-chapter.js` |
+| what answers the range | the git door, at `log --format= --name-only <hold>..<tip>` |
+| what it costs | one git call a verdict hand-back, over a commit or two |
+| a range git reads nowhere | it answers as a move, which keeps today's refusal |
+
+**The cases.**
+
+- a sibling's commit moves the tip, and the pull takes the verdict
+- a commit touching the ticket in hand moves it, and the pull refuses
+- the tip stands where the hold left it, and the pull takes the verdict
+- git answers nothing for the range, and the pull refuses
 
 ## review
 
