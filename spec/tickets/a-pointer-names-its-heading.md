@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 step: design/person-1
 steps:
@@ -121,6 +121,8 @@ record:
     returns: 2
     why: The three moves turn `owner's` into `owner-s`, so they answer the anchor `the-owner-s-prompt-comes-first`.; Say instead that the slug matches the one that stands, which turns `owner's` into `owners` before it dashes the rest.; A slug stands already in `test/contract/vocabulary.test.js`. Name it as the one the rule matches, so the copy carries its reason.; The list names [[spec/design_input/a-stub-takes-its-vehicle]], whose heading `The stub's files` answers the anchor its pointer names.; Drop that note, because the slug that stands resolves it. Ten notes stay.; The check answers 0 on this commit.
 group: the-warnings-feed-a-refactorer
+reason: became
+successors: [the-rule-shares-one-slug]
 ---
 
 # Ask
