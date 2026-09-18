@@ -322,11 +322,15 @@ What surprises me:
 
 <!-- the form is command -->
 
+./RUNME.sh branch test
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
@@ -334,11 +338,27 @@ What surprises me:
 
 <!-- the form is text -->
 
+The private folder held three kinds of file under one name. It now holds two named folders, and `.claude/skills/level0/lib/folders.js` owns both names. Every writer of a file the box alone reads takes its folder from there.
+
+| what moves | where it stands |
+|---|---|
+| the worktree, the journal, the binaries, the survey, the log, the box record, the hold | under the runtime folder |
+| the pulled answers, the check's stamp, the rows, the standing files, the session | under the runtime folder |
+| the notes, the handover, the private tickets, the vehicle records, the local config | where they stand |
+
+The index walk drops the private folder from its skip list. It skips the runtime folder in its place. The skip reads the path the root holds, because a folder of that name stands elsewhere in the tree. A word standing in a private note alone now comes back from a `find`. The rows carry no binary, and no second copy of a tracked file.
+
+The installer moves a box's old places over once, and drops what already stands in the new one. Without it, a box built before this change hands the walk the binaries and the journal it skips today.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: each one names a path under the private folder
+- every door the change reaches has a fake: the change moves constants, and each door keeps its own
+- a comment names the approach: every moved constant reads the module, whose header points at the design input
 
 # verdict
 
