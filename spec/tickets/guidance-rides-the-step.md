@@ -252,7 +252,11 @@ record:
     hand: box 7ba446c2fed1 · claude-code-remote
     hash_before: 1f1613c87a1e3bdb397cdf2a0df85368f3aec4c6
     hash_after: 1f1613c87a1e3bdb397cdf2a0df85368f3aec4c6
-step: children
+  - step: children
+    hand: the engine
+    hash_before: 9fda0f3308002977a473a06dba968ed4145759e8
+    hash_after: 9fda0f3308002977a473a06dba968ed4145759e8
+step: retro/notes
 ---
 
 # Ask
