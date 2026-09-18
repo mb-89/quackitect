@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/tests-green
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -172,6 +172,17 @@ record:
     hash_after: 48e66d02651218cc7b798e2fb6c4c7d5fa3f4042
     answered:
       - name: lint
+        exit: 0
+        said: 73 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 2980e46d8778e98048c28096640c45beacb829fa
+    hash_after: 2980e46d8778e98048c28096640c45beacb829fa
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: 73 stand at warning, which the panel draws and check allows.
 group: the-retro-runs
@@ -397,25 +408,42 @@ The scratchpad reaches the verb as a door, off `it.scratch`. The command line fi
 
 ### tests
 
-<!-- the same tests pass -->
+    ./RUNME.sh branch test test/level0/retro-collect.test.js
 
 <!-- the form is command -->
 
 ### check
 
-<!-- the check is green on the commit -->
+    ./RUNME.sh check
 
 <!-- the form is command -->
 
 ### says
 
-<!-- what changes and why, for a reader who was not there -->
+`./RUNME.sh retro collect <ticket>` stands, and the six cases over it pass.
 
-<!-- the form is text -->
+| what lands | where |
+|---|---|
+| the verb itself | `src/scripts/retro-collect.js` |
+| the verb table, so the retro route reads the need | `src/scripts/pull-route.js` |
+| the dispatch beside the note drain | `src/scripts/retro.js` |
+
+The verb reads the disk through its door alone, so a case drives it in memory. It copies and removes nothing, and it writes the manifest last. A run that stops half way leaves a folder carrying no manifest, and the next run replaces that folder.
+
+One case moves beside the change. `holdsVerb` reads `retro collect` as absent, and the verb table now names it, so that line reads the verb standing.
+
+| what the verb reaches on this box | what it does |
+|---|---|
+| the private folder | it copies every path the two skips leave standing |
+| the scratchpad and the transcripts | it reads each off a door, and passes where the door stands empty |
+
+No variable on this box names the scratchpad or the transcript folder. The verb takes each as a door and skips a door standing empty, so the two wait on the ticket that finds their paths.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change touches no file the ask leaves out. The verb, its dispatch, its need, and the one case the verb table moves.
+- every door the change reaches has a fake. The verb reads and writes through the disk door, and the cases drive the fake.
+- a comment names the approach the change implements. Each function points at the chapter ruling it.
 
 <!-- the form is checklist -->
 
