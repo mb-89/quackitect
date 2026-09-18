@@ -26,6 +26,13 @@ type View struct {
 	Opens     string
 	Sorts     []Sort
 	Presets   []Preset
+	Flags     []Flag
+}
+
+// A boolean key and the letter standing for it in the flags column. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+type Flag struct {
+	Letter string
+	Key    string
 }
 
 // [[spec/design_output/tree-view#a-base-file-says-it]]
@@ -78,7 +85,36 @@ func viewOf(at int, said, whole *yaml.Doc) (View, error) {
 		Opens:     opensOf(whole),
 		Sorts:     sortsOf(said, whole),
 		Presets:   presetsOf(said, whole),
+		Flags:     flagsIn(said, whole),
 	}, nil
+}
+
+// The letters the flags column draws, in the fixed places the file names. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+func flagsIn(said, whole *yaml.Doc) []Flag {
+	for _, held := range []*yaml.Doc{said, whole} {
+		if held == nil {
+			continue
+		}
+		rows := yaml.Flat(held.Get("flags"))
+		out := make([]Flag, 0, len(rows))
+		for _, each := range rows {
+			one := yaml.AsDoc(each)
+			if one == nil {
+				continue
+			}
+			letter := yaml.AsString(one.Get("letter"))
+			key := yaml.AsString(one.Get("key"))
+			if letter == "" || key == "" {
+				continue
+			}
+			out = append(out, Flag{Letter: letter, Key: key})
+		}
+		// A view naming none falls through to the file, which names them once. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+		if len(out) > 0 {
+			return out
+		}
+	}
+	return nil
 }
 
 // A preset a file writes down stands under `groups`, with its filter and its sort. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
@@ -115,9 +151,6 @@ func sortsOf(said, whole *yaml.Doc) []Sort {
 			continue
 		}
 		rows := yaml.Flat(held.Get("sort"))
-		if len(rows) == 0 {
-			continue
-		}
 		out := make([]Sort, 0, len(rows))
 		for _, each := range rows {
 			if one := yaml.AsDoc(each); one != nil {
@@ -131,7 +164,10 @@ func sortsOf(said, whole *yaml.Doc) []Sort {
 				out = append(out, Sort{Key: key})
 			}
 		}
-		return out
+		// A view naming no order falls through to the file. [[spec/design_output/tree-view#a-sort-holds-several-keys]]
+		if len(out) > 0 {
+			return out
+		}
 	}
 	return nil
 }

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 depends_on: [the-work-tab-draws]
 steps:
@@ -29,6 +29,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-work-editor-draws
 step: do
+record:
+  - step: do
+    hand: box 4089f1b3b6bc · claude-code-remote
+    hash_before: c8ab6c68bb7bffd04a6ea658b2eb7bf9d36ed3e1
+    hash_after: c8ab6c68bb7bffd04a6ea658b2eb7bf9d36ed3e1
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/viewer passes
+      - name: check
+        exit: 0
+        said: 81 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -78,11 +91,15 @@ in five characters, and filters on any one of them.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -90,12 +107,32 @@ in five characters, and filters on any one of them.
 
 <!-- the form is text -->
 
+One column draws the flags as letters, each in a fixed place. A letter stands
+upper where its key reads true, and lower where it reads false:
+
+| the letter | the key the answer writes |
+|---|---|
+| U | the ticket carries the urgent mark |
+| Y | a person owns the step it stands on |
+| W | a hand holds it, off the record |
+| B | it waits on a ticket still open |
+| T | a hand parks it for the next pull |
+
+`spec/views/work.base` names each letter beside its key, so a new flag costs one
+line there. The keys stay ordinary keys, so `urgent: true` keeps the lit rows
+and `not urgent: true` keeps the rest.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
 
+- the change follows the ask: one column draws every declared letter, in its own place
+- the cleanup it reveals: a view naming no order or letters falls through to the file
+- the letters stand in the base file, and the drawing and the filter both read the keys
+
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+- The ask names a lit letter and a dim one, and the column draws upper and lower
+- `yaml.Flat` answers one row for a key nobody names, so a reader counts its own result

@@ -21,7 +21,10 @@ type workTicket struct {
 	Progress string `json:"progress"`
 	Group    string `json:"group"`
 	Urgent   bool   `json:"urgent"`
-	Person   string `json:"person"`
+	Person   bool   `json:"person"`
+	Held     bool   `json:"held"`
+	Waits    bool   `json:"waits"`
+	Todo     bool   `json:"todo"`
 	Stood    int    `json:"stood"`
 	Queue    int    `json:"queue"`
 	Says     string `json:"says"`
@@ -34,7 +37,9 @@ type workBranch struct {
 	Kind     string       `json:"kind"`
 	Step     string       `json:"step"`
 	Progress string       `json:"progress"`
-	Person   string       `json:"person"`
+	Person   bool         `json:"person"`
+	Urgent   bool         `json:"urgent"`
+	Held     bool         `json:"held"`
 	Age      string       `json:"age"`
 	Queue    int          `json:"queue"`
 	Says     string       `json:"says"`
@@ -66,8 +71,11 @@ func ReadWorkItems(text string) ([]Item, error) {
 			"queue":    placeOf(one.Queue),
 			"age":      one.Age,
 			"group":    "",
-			"urgent":   "",
-			"person":   one.Person,
+			"urgent":   flagOf(one.Urgent),
+			"person":   flagOf(one.Person),
+			"held":     flagOf(one.Held),
+			"waits":    flagOf(false),
+			"todo":     flagOf(false),
 			"stood":    "",
 			"says":     one.Says,
 		}, Kids: kids})
@@ -80,10 +88,6 @@ func ReadWorkItems(text string) ([]Item, error) {
 
 // [[spec/design_output/work#one-verb-answers-git]]
 func itemOfTicket(one workTicket) Item {
-	mark := ""
-	if one.Urgent {
-		mark = "urgent"
-	}
 	return Item{Name: one.Name, Keys: map[string]string{
 		"kind":     workKind,
 		"state":    one.State,
@@ -92,11 +96,22 @@ func itemOfTicket(one workTicket) Item {
 		"queue":    placeOf(one.Queue),
 		"age":      "",
 		"group":    one.Group,
-		"urgent":   mark,
-		"person":   one.Person,
+		"urgent":   flagOf(one.Urgent),
+		"person":   flagOf(one.Person),
+		"held":     flagOf(one.Held),
+		"waits":    flagOf(one.Waits),
+		"todo":     flagOf(one.Todo),
 		"stood":    placeOf(one.Stood),
 		"says":     one.Says,
 	}}
+}
+
+// A flag stays an ordinary key, so the filter reads `urgent: true` and no new word. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+func flagOf(yes bool) string {
+	if yes {
+		return "true"
+	}
+	return "false"
 }
 
 // A ticket the queue leaves out carries no place, and the column stands empty. [[spec/design_output/pull#the-queue-is-a-score]]

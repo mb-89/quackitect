@@ -4,7 +4,18 @@
 // [[spec/design_output/work#one-verb-answers-git]]
 
 import { ANSWER } from "../../.claude/skills/level0/lib/folders.js";
-import { askOf, fieldOf, frontOf, GROUP, isGroup, OPEN, stepOf, urgent } from "./group.js";
+import {
+  askOf,
+  dependsOn,
+  fieldOf,
+  frontOf,
+  GROUP,
+  heldIn,
+  isGroup,
+  OPEN,
+  stepOf,
+  urgent,
+} from "./group.js";
 import { leafOf, leavesOf } from "./pull-route.js";
 import { takeable } from "./pull.js";
 import { queued, stoodHere } from "./queue.js";
@@ -12,15 +23,19 @@ import { staleClaim } from "./stand.js";
 import { readWork, standingAll } from "./work-stands.js";
 
 // [[spec/design_output/work#one-verb-answers-git]]
-export function rowOfTicket(one, places, stood = new Map()) {
+export function rowOfTicket(one, places, stood = new Map(), open = new Set()) {
   const said = {
     name: one.name,
     state: fieldOf(one.text, "state") || OPEN,
     step: stepOf(one.text),
     progress: progressOf(one.text),
     group: fieldOf(one.text, GROUP),
+    // The flags a row carries, each an ordinary key the filter reads. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
     urgent: urgent(one.text),
     person: personStep(one.text),
+    held: Boolean(heldIn(one.text)),
+    waits: dependsOn(frontOf(one.text)).some((dep) => open.has(dep)),
+    todo: fieldOf(one.text, "todo") === "true",
     says: firstLine(askOf(one.text)),
   };
   // The time a ticket came in orders the oldest first. [[spec/design_output/pull#the-queue-is-a-score]]
@@ -42,7 +57,7 @@ export function progressOf(text) {
 // A step a person owns leaves the agent's queue and stands first in the person's. [[spec/design_output/pull#the-queue-is-a-score]]
 export function personStep(text) {
   const leaf = leafOf(frontOf(text), stepOf(text));
-  return String(leaf?.by ?? "") === "person" ? "person" : "";
+  return String(leaf?.by ?? "") === "person";
 }
 
 // The last column takes what it fits, so the answer carries this much of a line. [[spec/design_output/work#one-verb-answers-git]]
@@ -83,6 +98,12 @@ export function answerOf(it, queue = false) {
   const now = it.clock ? it.clock.now().getTime() : 0;
   const stood = queue ? stoodHere(it) : new Map();
   const places = queue ? placesIn(it, read, stood) : new Map();
+  // A ticket waiting on one still open carries the flag saying so. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+  const open = new Set(
+    ticketsIn(read)
+      .filter((one) => fieldOf(one.text, "state") === OPEN)
+      .map((one) => one.name),
+  );
 
   return {
     branches: read.stand.map((one) => {
@@ -98,19 +119,21 @@ export function answerOf(it, queue = false) {
         kind: one.brief ? "brief" : GROUP,
         step: one.ticket ? stepOf(one.ticket) : "",
         progress: one.ticket ? progressOf(one.ticket) : "",
-        person: one.ticket ? personStep(one.ticket) : "",
+        person: Boolean(one.ticket) && personStep(one.ticket),
+        urgent: Boolean(one.ticket) && urgent(one.ticket),
+        held: Boolean(one.ticket) && Boolean(heldIn(one.ticket)),
         says: firstLine(askOf(one.ticket || one.brief)),
         age,
         stale,
         ...(place === undefined ? {} : { queue: place }),
         tickets: one.tickets
           .filter((child) => fieldOf(child.text, GROUP) === one.name)
-          .map((child) => rowOfTicket(child, places, stood)),
+          .map((child) => rowOfTicket(child, places, stood, open)),
       };
     }),
     loose: read.loose
       .filter((one) => !fieldOf(one.text, GROUP) && !isGroup(one.text))
-      .map((one) => rowOfTicket(one, places, stood)),
+      .map((one) => rowOfTicket(one, places, stood, open)),
   };
 }
 

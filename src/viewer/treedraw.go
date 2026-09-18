@@ -68,8 +68,12 @@ func (t Tree) row(one twig, selected bool, wide []int) string {
 			continue
 		}
 		said := one.item.Keys[col.Key]
-		if at == 0 {
+		switch {
+		case at == 0:
 			said = t.nameOf(one)
+		// [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+		case col.Key == flagsKey:
+			said = t.Letters(one.item)
 		}
 		cells = append(cells, pad(cut(said, wide[at]), wide[at]))
 	}

@@ -68,6 +68,8 @@ func loadWork(path string) (*Tree, error) {
 	one := views[0]
 	tree := NewTree(one.Cols, items, one.Nests)
 	tree.Sorted(one.Sorts)
+	// [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+	tree.Flagged(one.Flags)
 	// A preset pressed in the file stands pressed when the tab opens. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
 	tree.Presets(one.Presets)
 	return tree, nil

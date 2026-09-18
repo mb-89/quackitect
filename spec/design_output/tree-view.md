@@ -131,6 +131,26 @@ the rows that carry one.
 A view opens on the order its base file names, under `sort`. The work view
 opens on the rows a person owns, then the place the queue gives.
 
+# A flag draws a letter
+
+A row carries one boolean key a flag, and one column draws them as letters. A
+letter stands lit where its key reads true, and dim where it reads false:
+
+| the letter | the key it reads |
+|---|---|
+| U | the ticket carries the urgent mark |
+| Y | a person owns the step it stands on |
+| W | a hand holds it |
+| B | it waits on a ticket still open |
+| T | a hand parks it for the next pull |
+
+The letters hold fixed places, so nothing shifts as one lights. The keys stay
+ordinary keys, so a person filters on `urgent: true`, and `not urgent: true`
+keeps the rest.
+
+A letter and its key stand under `flags` in the base file. So a new flag costs
+one line there, because the key already stands.
+
 # A preset carries its sort
 
 A preset is a filter a person writes down, and it carries a sort beside it. A

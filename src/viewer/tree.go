@@ -34,6 +34,7 @@ type Tree struct {
 	filter  Filter
 	sorts   []Sort
 	presets []Preset
+	flags   []Flag
 	typed   string
 	marks   map[string]bool
 	last    string

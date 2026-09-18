@@ -75,13 +75,13 @@ func TestAGroupCarriesItsTicketsAndALooseOneStandsAtTheLeft(t *testing.T) {
 	if items[0].Name != "one-group" || len(items[0].Kids) != 1 {
 		t.Fatalf("the group carries its one ticket, and read %d", len(items[0].Kids))
 	}
-	if items[0].Kids[0].Keys["urgent"] != "urgent" {
+	if items[0].Kids[0].Keys["urgent"] != "true" {
 		t.Fatal("a marked ticket carries the mark")
 	}
 	if items[1].Name != "a-loose-one" || items[1].Keys["group"] != "" {
 		t.Fatal("a ticket naming no group stands at the left, with no mark")
 	}
-	if items[1].Keys["urgent"] != "" {
+	if items[1].Keys["urgent"] != "false" {
 		t.Fatal("an unmarked ticket carries no mark")
 	}
 	if items[1].Keys["queue"] != "" {
@@ -101,7 +101,7 @@ func TestTheTabReadsTheBaseFileAndTheAnswerOffTheLogsOwnPath(t *testing.T) {
 		t.Fatalf("the group, its ticket and the loose one stand, and %d rows do", tree.Len())
 	}
 	head := tree.Header(80)
-	for _, one := range []string{"name", "state", "urgent", "progress", "queue", "says"} {
+	for _, one := range []string{"name", "state", "flags", "progress", "queue", "says"} {
 		if !strings.Contains(head, one) {
 			t.Fatalf("the column %s stands in the names, and they read %q", one, head)
 		}

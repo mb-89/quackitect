@@ -6,9 +6,20 @@ properties:
 columnSize:
   name: 34
   state: 8
-  urgent: 7
+  flags: 7
   progress: 9
   queue: 6
+flags:
+  - letter: U
+    key: urgent
+  - letter: "Y"
+    key: person
+  - letter: W
+    key: held
+  - letter: B
+    key: waits
+  - letter: T
+    key: todo
 groups:
   - name: not done
     pressed: true
@@ -21,7 +32,7 @@ groups:
       - key: queue
   - name: yours
     filters:
-      - person: person
+      - person: true
     sort:
       - key: stood
   - name: unsorted
@@ -35,13 +46,14 @@ views:
     order:
       - name
       - state
-      - urgent
+      - flags
       - progress
       - queue
       - says
     nest: group
     sort:
       - key: person
+        down: true
       - key: queue
     collapsed:
       - closed
