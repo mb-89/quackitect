@@ -6,9 +6,9 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { onStop } from "../../src/bridge/stop.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { onStop } from "../../src/bridge/stop.js";
 
 const ROOT = "/tree";
 const at = (path) => join(ROOT, ...path.split("/"));

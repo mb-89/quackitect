@@ -21,7 +21,10 @@ test("a name the work root repeats replaces the method's", () => {
 });
 
 test("a name the work root alone holds joins the set", () => {
-  const said = layered([{ name: "voice.md", text: "a" }], [{ name: "house.md", text: "b" }]);
+  const said = layered(
+    [{ name: "voice.md", text: "a" }],
+    [{ name: "house.md", text: "b" }],
+  );
   assert.deepEqual(
     said.map((one) => one.name),
     ["voice.md", "house.md"],
@@ -34,7 +37,10 @@ test("a method root standing alone hands its own down", () => {
 });
 
 test("a key the work root names wins, and the rest come down", () => {
-  const said = deeply({ log: { level: "info" }, stop: { enabled: true } }, { log: { level: "warn" } });
+  const said = deeply(
+    { log: { level: "info" }, stop: { enabled: true } },
+    { log: { level: "warn" } },
+  );
   assert.deepEqual(said, { log: { level: "warn" }, stop: { enabled: true } });
 });
 
@@ -60,7 +66,8 @@ function configFor(files) {
 test("the work root's config inherits the method's, key by key", async () => {
   const said = configFor({
     "/tools/spec/config/level0.schema.json": SCHEMA,
-    "/tools/spec/config/level0.json": '{"log":{"level":"info"},"stop":{"enabled":true}}',
+    "/tools/spec/config/level0.json":
+      '{"log":{"level":"info"},"stop":{"enabled":true}}',
     "spec/config/level0.json": '{"log":{"level":"warn"}}',
   });
 

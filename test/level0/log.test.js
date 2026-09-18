@@ -69,7 +69,10 @@ test("an old session's name carries the day and the time", () => {
 // [[spec/design_output/log#a-session-rotates-its-file]]
 test("an old session takes the name of its first line's time, or of now", () => {
   const text = `${JSON.stringify({ at: AT, level: "info", kind: "level0", said: "session start" })}\n`;
-  assert.equal(archiveOf(text, "2026-09-09T00:00:00.000Z", ID), `.se/log/old/${nameOf(AT, ID)}`);
+  assert.equal(
+    archiveOf(text, "2026-09-09T00:00:00.000Z", ID),
+    `.se/log/old/${nameOf(AT, ID)}`,
+  );
   assert.equal(
     archiveOf("not json\n", "2026-09-09T00:00:00.000Z", ID),
     `.se/log/old/${nameOf("2026-09-09T00:00:00.000Z", ID)}`,

@@ -10,8 +10,8 @@ import { test } from "node:test";
 import {
   addedIn,
   boxNamesIn,
-  carriedFrom,
   COPY_RUN,
+  carriedFrom,
   isIdentifier,
   longestSharedRun,
   noteTextIn,
@@ -24,10 +24,8 @@ import {
   wordsOf,
 } from "../../.claude/skills/level0/lib/private.js";
 
-const PRIVATE =
-  "the box at /home/somebody/secrets stalls when Fnordwick runs it twice";
-const WORDY =
-  "the box stalls badly whenever somebody starts it a second time in a row";
+const PRIVATE = "the box at /home/somebody/secrets stalls when Fnordwick runs it twice";
+const WORDY = "the box stalls badly whenever somebody starts it a second time in a row";
 
 const noted = (text, name = "one.md") => [{ name, text }];
 
@@ -129,7 +127,10 @@ test("the door names the note a write shares a run with", () => {
 });
 
 test("the door names the token a write carries alone", () => {
-  const said = carriedFrom("look under /home/somebody/secrets sometime", noted(PRIVATE));
+  const said = carriedFrom(
+    "look under /home/somebody/secrets sometime",
+    noted(PRIVATE),
+  );
   assert.equal(said.how, "token");
   assert.equal(said.said, "/home/somebody/secrets");
 });

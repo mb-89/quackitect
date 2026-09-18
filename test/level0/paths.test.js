@@ -17,7 +17,10 @@ test("a path under the root reads as the root holds it", () => {
 
 test("a windows separator answers the one vale reads", () => {
   assert.equal(
-    relativeTo(ROOT, "C:\\Users\\one\\Desktop\\ai\\quackitect-v5\\spec\\guidance\\a.md"),
+    relativeTo(
+      ROOT,
+      "C:\\Users\\one\\Desktop\\ai\\quackitect-v5\\spec\\guidance\\a.md",
+    ),
     "spec/guidance/a.md",
   );
 });
@@ -54,7 +57,11 @@ test("a glob reads one folder deep, and a double star reads past it", () => {
   assert.equal(matches("spec/rationales/*.md", "spec/rationales/deep/a.md"), false);
   assert.equal(matches("spec/rationales/**", "spec/rationales/deep/a.md"), true);
   assert.equal(matches("spec/rationales/*.md", "spec/guidance/a.md"), false);
-  assert.equal(matches("spec/**/*.md", "spec/a.md"), true, "a globstar takes zero folders");
+  assert.equal(
+    matches("spec/**/*.md", "spec/a.md"),
+    true,
+    "a globstar takes zero folders",
+  );
   assert.equal(matches("spec/**/*.md", "spec/deep/down/a.md"), true);
   assert.equal(matches("spec/**/*.md", "other/a.md"), false);
   assert.equal(matches("*answer.md", "level0-answer.md"), true);

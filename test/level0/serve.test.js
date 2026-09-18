@@ -5,9 +5,9 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { START } from "../../.claude/skills/level0/hooks/level0.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
-import { START } from "../../.claude/skills/level0/hooks/level0.js";
 import { portIn, probeOf, serving, startOf } from "../../src/scripts/serve.js";
 
 const ROOT = "/tree";
@@ -66,7 +66,10 @@ test("a desk and a failed take start nothing", () => {
 
 test("a failed start names the last thing the start said", () => {
   const { it } = box({ probe: 1, start: 1, stderr: "Error: EACCES, open serve.log\n" });
-  assert.match(heard(() => serving(it, 0)).said, /start fails: Error: EACCES, open serve.log/);
+  assert.match(
+    heard(() => serving(it, 0)).said,
+    /start fails: Error: EACCES, open serve.log/,
+  );
 });
 
 // [[spec/design_output/level0#the-bridgehead-starts-it-too]]

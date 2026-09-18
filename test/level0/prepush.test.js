@@ -4,7 +4,13 @@
 
 import assert from "node:assert/strict";
 import test from "node:test";
-import { carriedBy, holds, namesIn, rangeOf, refsIn } from "../../src/scripts/prepush.js";
+import {
+  carriedBy,
+  holds,
+  namesIn,
+  rangeOf,
+  refsIn,
+} from "../../src/scripts/prepush.js";
 
 const SHA = "a1b2c3d4e5f6a7b8";
 const WAS = "b7a6f5e4d3c2b1a0";
@@ -102,10 +108,5 @@ test("carriedBy reads every note the range names, and passes a file git lost", (
   });
   const out = carriedBy(repo)({ sha: SHA, was: WAS });
   assert.deepEqual(out, [{ name: "spec/tickets/slow-lint.md", text: TAGGED }]);
-  assert.deepEqual(repo.runs[0], [
-    "log",
-    "--format=",
-    "--name-only",
-    `${WAS}..${SHA}`,
-  ]);
+  assert.deepEqual(repo.runs[0], ["log", "--format=", "--name-only", `${WAS}..${SHA}`]);
 });

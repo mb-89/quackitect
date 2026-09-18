@@ -92,7 +92,10 @@ test("a call reaching the owner passes, and every other call does not", () => {
 
 test("the refusal quotes the rule it holds", () => {
   assert.match(SAYS, /^The owner asked something and nothing has answered it\./);
-  assert.match(SAYS, /Write the answer in\nthe chat, as text: what you understood and what you do next\. Then work\./);
+  assert.match(
+    SAYS,
+    /Write the answer in\nthe chat, as text: what you understood and what you do next\. Then work\./,
+  );
   assert.doesNotMatch(SAYS, /Call mcp__level0__log/);
 });
 
@@ -148,7 +151,12 @@ test("a turn end over the ceiling holds the findings for the next call, once", (
 
 test("a turn end under the warning holds nothing", () => {
   const gate = gateOf();
-  const said = gate.atTurnEnd({ warnAt: 5, ceiling: 15, found: FOUND, text: over(400) });
+  const said = gate.atTurnEnd({
+    warnAt: 5,
+    ceiling: 15,
+    found: FOUND,
+    text: over(400),
+  });
   assert.equal(said.band, "clean");
   assert.equal(gate.waiting(), null);
 });
@@ -156,7 +164,12 @@ test("a turn end under the warning holds nothing", () => {
 // [[spec/design_output/level0#the-three-bands]]
 test("a turn end in the middle band holds the findings at carry", () => {
   const gate = gateOf();
-  const said = gate.atTurnEnd({ warnAt: 5, ceiling: 15, found: FOUND, text: over(100) });
+  const said = gate.atTurnEnd({
+    warnAt: 5,
+    ceiling: 15,
+    found: FOUND,
+    text: over(100),
+  });
   assert.equal(said.band, "carry");
   assert.equal(gate.waiting().band, "carry");
 });
@@ -269,7 +282,10 @@ test("an answer with no stop line demands no needs table", () => {
 });
 
 test("a needs table under its heading passes", () => {
-  assert.deepEqual(needsFaults(`The door stands.\n\n${NEEDS_ROWS}\n`, { reason: "x" }), []);
+  assert.deepEqual(
+    needsFaults(`The door stands.\n\n${NEEDS_ROWS}\n`, { reason: "x" }),
+    [],
+  );
 });
 
 test("a stop line with prose above it refuses", () => {
@@ -298,7 +314,10 @@ test("a needs table numbers its rows in order", () => {
 test("a needs table cell holds no code and few words", () => {
   const code = NEEDS_ROWS.replace("No, hold it local.", "Run `branch close`.");
   assert.match(needsFaults(code, {})[0].message, /holds no code/);
-  const long = NEEDS_ROWS.replace("No, hold it local.", "word ".repeat(CELL_WORDS + 1).trim());
+  const long = NEEDS_ROWS.replace(
+    "No, hold it local.",
+    "word ".repeat(CELL_WORDS + 1).trim(),
+  );
   assert.match(needsFaults(long, {})[0].message, new RegExp(`holds ${CELL_WORDS + 1}`));
 });
 

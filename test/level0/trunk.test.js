@@ -3,7 +3,12 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { landsOnTrunk, refusedVersion, touchesGit, versionRefs } from "../../.claude/skills/level0/lib/trunk.js";
+import {
+  landsOnTrunk,
+  refusedVersion,
+  touchesGit,
+  versionRefs,
+} from "../../.claude/skills/level0/lib/trunk.js";
 
 test("a command touching no git passes", () => {
   for (const said of ["ls -la", "node --test", "./RUNME.sh check", "npm run digit"]) {

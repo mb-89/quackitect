@@ -5,8 +5,8 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { codeOf, movedCode, movedIn } from "../../src/bridge/reload.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 const ROOT = "/tree";
 const at = (path) => join(ROOT, ...path.split("/"));
@@ -21,7 +21,10 @@ function tree() {
 
 test("the code of the server is every script under its roots, and a note is none", () => {
   const code = codeOf(tree(), ROOT);
-  assert.deepEqual([...code.keys()].sort(), [".claude/skills/level0/lib/ticket.js", "src/bridge/stop.js"]);
+  assert.deepEqual([...code.keys()].sort(), [
+    ".claude/skills/level0/lib/ticket.js",
+    "src/bridge/stop.js",
+  ]);
   assert.equal(code.get("src/bridge/stop.js"), "export const a = 1;\n");
 });
 

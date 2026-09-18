@@ -10,8 +10,8 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import {
   askRows,
   nameOf,
-  processAt,
   PROCESSES,
+  processAt,
   standingIn,
   withRoute,
 } from "../../src/scripts/process.js";

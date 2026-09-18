@@ -6,7 +6,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { startsServer } from "../../src/extension/extension.js";
-import { BIN, NAME, binaryOf, serverAsk } from "../../src/extension/lib/lsp.js";
+import { BIN, binaryOf, NAME, serverAsk } from "../../src/extension/lib/lsp.js";
 
 const doorOf = (held) => {
   const asked = [];
