@@ -238,6 +238,16 @@
           "type": "number",
           "unit": "steps",
           "help": "The person steps a ticket carries before the pull refuses another and asks for a split."
+        },
+        "retroReaders": {
+          "type": "number",
+          "unit": "hands",
+          "help": "The hands a retro's collect spawns, each taking the next chapter until none stands."
+        },
+        "retroCap": {
+          "type": "number",
+          "unit": "tickets",
+          "help": "The tickets a retro's improve step mints, so the list holds what gets done."
         }
       }
     },

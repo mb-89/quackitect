@@ -5,6 +5,7 @@
 
 import { fieldOf, NOTE_END, ticketNamed } from "./group.js";
 import { collect } from "./retro-collect.js";
+import { newRetro } from "./retro-new.js";
 import { NOTES } from "./ticket.js";
 
 export function retro(root, argv, doors) {
@@ -13,12 +14,17 @@ export function retro(root, argv, doors) {
   if (what === "notes") return notes(it);
   // [[spec/design_input/the-agent-pulls-tickets]]
   if (what === "collect") return collect(it, argv[1]);
+  // [[spec/design_input/the-agent-pulls-tickets]]
+  if (what === "new") return newRetro(it, argv);
   console.log("Usage: ./RUNME.sh retro <verb>\n");
   console.log(
     "  notes            the private notes still open on this box, and 0 when none stands",
   );
   console.log(
     "  collect <ticket> copies this box into the retro's folder, and writes its manifest",
+  );
+  console.log(
+    "  new              mints a retro off its route, opens it, and hands out its first leaf",
   );
   return what ? 2 : 0;
 }

@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -143,6 +143,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 0375730202004712f98a85af9c0b5bf786bb7c3c
+    hash_after: 0375730202004712f98a85af9c0b5bf786bb7c3c
+    answered:
+      - name: lint
+        exit: 0
+        said: 75 stand at warning, which the panel draws and check allows.
 group: the-retro-runs
 depends_on: ["the-retro-takes-the-box"]
 ---
@@ -329,13 +337,15 @@ The owner lookup takes the harder half. An entry naming no `writes` owns its who
 
 ### lint
 
-<!-- the tree builds and lints -->
+    ./RUNME.sh lint
 
 <!-- the form is command -->
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change touches no file the ask leaves out. The verb, its dispatch, the shape, the entry, the two knobs and the design row.
+- every door the change reaches has a fake. The verb reads the disk and git through their doors, and the cases drive the fakes.
+- a comment names the approach the change implements. Each function points at the chapter ruling it.
 
 <!-- the form is checklist -->
 
