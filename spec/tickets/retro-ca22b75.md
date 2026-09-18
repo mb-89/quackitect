@@ -182,7 +182,7 @@ steps:
       - name: groups
         form: list
         says: one line per ticket, with its group and its urgency
-step: improve
+step: report
 process: [[spec/processes/retro]]
 process_hash: 61a2bb140f0b4632
 record:
@@ -262,6 +262,10 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 772ea91ddf6815317813f140644c2b17ee85cb25
     hash_after: 772ea91ddf6815317813f140644c2b17ee85cb25
+  - step: improve
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 445e68523341e9d8e5d7091fff5399a5966265f7
+    hash_after: 445e68523341e9d8e5d7091fff5399a5966265f7
 ---
 
 # Ask
@@ -582,13 +586,22 @@ The manifest holds 394 lines, and the log, the scripts, the private tickets and 
 
 ## tickets
 
-<!-- one link per ticket, with its class, its home, the plan, and what the next numbers show if it works -->
+- [[spec/tickets/the-log-row-carries-its-command]], class blind instrument, home log.js. The next shell leaf holds a row a job, and the refusals leaf a row a rule.
+- [[spec/tickets/collect-copies-the-transcripts]], class blind instrument, home retro-collect.js. The next chapters carry a median thought above zero.
+- [[spec/tickets/the-readers-step-holds-open]], class a false pass, home the retro process. The next retro reaches mining with every chapter read.
+- [[spec/tickets/a-review-passes-open-points]], class a gate too tight, home the reviewing note. The next reviews send back only what needs a decision.
+- [[spec/tickets/a-stale-hold-frees-its-branch]], class a hold nobody frees, home work.js. The next list shows no branch held past the window.
+- [[spec/tickets/the-runtime-list-takes-the-rest]], class state among history, home folders.js. The next manifest names runtime state nowhere.
 
 <!-- the form is list -->
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- one class, one ticket, and no more than the cap. Six classes stand, and the cap allows eight.
+- the home is the earliest that removes the waste. Each ticket names the module writing the thing, and no reader of it.
+- this retro counts a keep rule over the tree first. The scripts leaf counts the split, the vocabulary and the rename families before it keeps them.
+- a route edited on a ticket goes back into its process file. The readers ticket names the retro process as its home.
+- this retro reads the process against what the field does now. The field answers nothing this window, so the route stands unchanged there.
 
 <!-- the form is checklist -->
 
