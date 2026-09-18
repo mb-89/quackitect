@@ -2,11 +2,20 @@
 kind: [[ticket]]
 state: open
 urgency: now
-depends_on: [the-retro-takes-the-box]
+step: design/settle-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: settle-1
+        does: decides between the step and the findings, and writes why
+        by: anyone
+        to: engine
+        asks: "design/review failed back 2 times: Five of the six findings close, and two gaps stand:; | the gap | the fix |; |---|---|; | the config glob names `se-config-*.md`, and `se-agent-control-*.md` finds no owner | name a glob covering every file that entry writes |; | `writes` reaches the entry table nowhere | add its row to [[spec/design_output/projection]], which owns the keys |; | the earlier finding | what closes it |; |---|---|; | the entry names no source | the retro process is the source, and the banner names it |; | two entries tie on one folder | an entry declares `writes`, and the lookup prefers the match |; | `--as` carries a hand's name | the flag reads `--name` here |; | the mint copies what a pull prints | `retro new` calls the mint and the pull, and prints nothing |; | `retro collect` stands nowhere | the sibling lands it, and `depends_on` names that sibling |; | the two knobs project two commands | the change carries both command files |; One caution for the draft hand: the verb list carries `collect` already, so `new` is the row that lands there.; `./RUNME.sh check` exits 0 on this branch."
+        evidence:
+          - name: answer
+            form: text
+            says: the decision, and why it stands
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -90,8 +99,6 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-group: the-retro-runs
-step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -107,6 +114,14 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 15fb5a5a0ff7cf3cca68896bfaca8cd04e26e5ec
     hash_after: 15fb5a5a0ff7cf3cca68896bfaca8cd04e26e5ec
+  - step: design/review
+    hand: box d42624a67d18a8 · claude-code · helper-21
+    hash_before: 770861465afe3337da194a627f59a2c3936e4ab1
+    hash_after: 770861465afe3337da194a627f59a2c3936e4ab1
+    returns: 2
+    why: "Five of the six findings close, and two gaps stand:; | the gap | the fix |; |---|---|; | the config glob names `se-config-*.md`, and `se-agent-control-*.md` finds no owner | name a glob covering every file that entry writes |; | `writes` reaches the entry table nowhere | add its row to [[spec/design_output/projection]], which owns the keys |; | the earlier finding | what closes it |; |---|---|; | the entry names no source | the retro process is the source, and the banner names it |; | two entries tie on one folder | an entry declares `writes`, and the lookup prefers the match |; | `--as` carries a hand's name | the flag reads `--name` here |; | the mint copies what a pull prints | `retro new` calls the mint and the pull, and prints nothing |; | `retro collect` stands nowhere | the sibling lands it, and `depends_on` names that sibling |; | the two knobs project two commands | the change carries both command files |; One caution for the draft hand: the verb list carries `collect` already, so `new` is the row that lands there.; `./RUNME.sh check` exits 0 on this branch."
+group: the-retro-runs
+depends_on: ["the-retro-takes-the-box"]
 ---
 
 # Ask
@@ -131,6 +146,16 @@ A retro takes a hand-written ticket. The route on it drifts from the process fil
 - `./RUNME.sh check` exits 0
 
 # design
+
+## settle-1
+
+<!-- decides between the step and the findings, and writes why -->
+
+### answer
+
+<!-- the decision, and why it stands -->
+
+<!-- the form is text -->
 
 ## draft
 
@@ -186,12 +211,25 @@ The two knobs stand in the config as numbers, beside the other work knobs. `retr
 
 fail
 
-- the entry names no source, so the generated banner points at nothing
-- the command folder already carries a projection, so a refusal names the wrong source
-- `--as` names the hand at every other verb, so the ticket name wants its own flag
-- the mint prints the leaf itself, so name the pull it calls and copy no printing
-- the first leaf calls for `retro collect`, which stands nowhere, so say what the hand runs there
-- the two knobs mint two config commands, so the change carries them as well
+Five of the six findings close, and two gaps stand:
+
+| the gap | the fix |
+|---|---|
+| the config glob names `se-config-*.md`, and `se-agent-control-*.md` finds no owner | name a glob covering every file that entry writes |
+| `writes` reaches the entry table nowhere | add its row to [[spec/design_output/projection]], which owns the keys |
+
+| the earlier finding | what closes it |
+|---|---|
+| the entry names no source | the retro process is the source, and the banner names it |
+| two entries tie on one folder | an entry declares `writes`, and the lookup prefers the match |
+| `--as` carries a hand's name | the flag reads `--name` here |
+| the mint copies what a pull prints | `retro new` calls the mint and the pull, and prints nothing |
+| `retro collect` stands nowhere | the sibling lands it, and `depends_on` names that sibling |
+| the two knobs project two commands | the change carries both command files |
+
+One caution for the draft hand: the verb list carries `collect` already, so `new` is the row that lands there.
+
+`./RUNME.sh check` exits 0 on this branch.
 
 <!-- the form is verdict -->
 
@@ -203,7 +241,7 @@ fail
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+<!-- the same tests pass -->
 
 <!-- the form is command -->
 
