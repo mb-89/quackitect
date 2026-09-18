@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 step: design/person-1
 steps:
@@ -121,6 +121,8 @@ record:
     returns: 2
     why: The unstamped rule refuses `mcp__level0__patch` and `mcp__level0__replace` over a file the disk holds.; the apply lane calls `onWrite` with an event it builds itself, and that event carries no hand; so a batch edit reads as unstamped, and the door refuses the tree its own way to change many files; the batch reads each file at the call, so it stands stale nowhere. Pass it as a case the rule names; a batch that lands leaves the hand behind the disk, so stamp every file the batch writes; `mintsNote` refuses a path the disk holds, so the new file case already carries that lane; the door answers ahead of the write, and a write the engine drops leaves a stamp ahead of the disk; that next write refuses and asks for a read, which costs a read and loses nothing. Say so; every earlier finding stands answered, and the code bears out the claims on `hashText`, `refusal` and `codeDoor`
 group: the-warnings-feed-a-refactorer
+reason: became
+successors: [apply-lane-carries-a-hand]
 ---
 
 # Ask
