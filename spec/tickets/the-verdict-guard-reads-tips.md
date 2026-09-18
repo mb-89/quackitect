@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: verdict
+step: implement/reflect
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -162,6 +162,12 @@ record:
       - name: check
         exit: 0
         said: 83 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box dd2a59294365 · claude-code-remote · helper-12
+    hash_before: 43ddb3d4addd086171a0226ea74160cdef409248
+    hash_after: 43ddb3d4addd086171a0226ea74160cdef409248
+    returns: 1
+    why: "`spec/design_output/pull.md`, under The hand rule, still says a verdict hand-back refuses where the tip moves. Write what `handFaults` reads.; `spec/design_output/pull.md`, the `files` row, still says the field holds every file the branch changes. Write the span `changedSince` answers.; Both rows point at `commitsFor`, under `src/scripts/pull-writes.js`, which owns the split.; What holds:; `handFaults` refuses this ticket's own commit, and takes a sibling's; the diff touches the files the ask names, a test file, and one prose line; `./RUNME.sh check` answers exit 0 on this commit; each rule the branch adds carries a case; a case feeds each rule something bad: this ticket's commit, and a failed log; `HANDOVER.md` carries no retro, and the `says` field carries what changes"
 group: the-warnings-feed-a-refactorer
 ---
 
@@ -460,17 +466,44 @@ as it does today.
 
 <!-- the form is files -->
 
+- HANDOVER.md
+- spec/design_input/the-agent-pulls-tickets.md
+- spec/design_output/pull.md
+- spec/guidance/review/reviewing.md
+- spec/tickets/the-verdict-guard-reads-tips.md
+- src/scripts/pull-chapter.js
+- src/scripts/pull-writes.js
+- src/scripts/test-verb.js
+- test/level0/verdict-guard.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+
+- `spec/design_output/pull.md`, under The hand rule, still says a verdict hand-back refuses where the tip moves. Write what `handFaults` reads.
+- `spec/design_output/pull.md`, the `files` row, still says the field holds every file the branch changes. Write the span `changedSince` answers.
+- Both rows point at `commitsFor`, under `src/scripts/pull-writes.js`, which owns the split.
+
+What holds:
+
+- `handFaults` refuses this ticket's own commit, and takes a sibling's
+- the diff touches the files the ask names, a test file, and one prose line
+- `./RUNME.sh check` answers exit 0 on this commit
+- each rule the branch adds carries a case
+- a case feeds each rule something bad: this ticket's commit, and a failed log
+- `HANDOVER.md` carries no retro, and the `says` field carries what changes
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the code states the fact once, beside `commitsFor`, and each comment points here. The rows the findings name still state the fact it replaces.
 
 # Discussion
 
