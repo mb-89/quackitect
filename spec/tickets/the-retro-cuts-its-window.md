@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: verdict
+step: implement/reflect
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -172,6 +172,12 @@ record:
       - name: check
         exit: 0
         said: 75 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box d42624a67d18a8 · claude-code · helper-34
+    hash_before: 9bd337af9a4f6c6f67d4a584584dcadeddf6ffc1
+    hash_after: 9bd337af9a4f6c6f67d4a584584dcadeddf6ffc1
+    returns: 1
+    why: Four gaps stand, and the cut itself answers the ask.; | the gap | the fix |; |---|---|; | the ask of a chapter carries prompts, tools, shell, refusals and errors alone | add the tickets a hand moves, the notes it writes, and the median length of a thought |; | the refusals count reads one number, and the ask asks for them by kind | group the write rows by the rule each names, as the counts table says |; | the cut reads the copied log alone, and the approach reads both sources | take the transcripts' times too, and say in the ask which sources the chapter reads |; | `retro notes` meets a chapter as an open note, so the drain holds the retro shut | pass a note whose `process` links the chapter route, which `design/settle-1` decides |; | what answers the ask | where |; |---|---|; | the window opens at the last retro's close, or at the first commit | `openedAt` in `src/scripts/retro-window.js` |; | a chapter is six hours holding rows, and an empty span stands nowhere | `cutInto`, and the case reading the three chapter paths |; | a chapter mints off the chapter route, under the private tickets folder | `minted`, and the case matching `process` and `group` |; | a case drives a window with no retro behind it | the first-commit case, which reads `window.json` back |; | the window takes a line the manifest names | the row `windowOut` pushes, which that case finds |; | what the reviewing guidance asks | what stands |; |---|---|; | the branch does what the brief asks | two lines of the counts go missing, and the drain stands open |; | the diff beyond the brief | the siblings' work, which this shared branch carries alongside |; | every rule carries a case that fires | four cases drive the cut, the mint, the counts and the first window |; | a case feeds something bad | the empty span case, which asserts the third chapter stands nowhere |; | a retro handback | none stands, because this ticket runs at the desk |; `./RUNME.sh check` exits 0 on this branch, and the window cases answer green over four.
 group: the-retro-runs
 depends_on: ["the-retro-takes-the-box"]
 ---
@@ -424,17 +430,74 @@ One thing the cases teach me. A chapter the mint refuses stood nowhere and said 
 
 <!-- every file you read, one a line -->
 
+- .claude/commands/se-config-work-retroCap.md
+- .claude/commands/se-config-work-retroReaders.md
+- .claude/commands/se-retro.md
+- .claude/skills/level0/lib/projection-owner.js
+- .claude/skills/level0/lib/projection.js
+- HANDOVER.md
+- spec/config/level0.json
+- spec/config/level0.schema.json
+- spec/config/projections.json
+- spec/design_output/projection.md
+- spec/processes/retro.yaml
+- spec/tickets/a-retro-mints-itself.md
+- spec/tickets/retro-018ba26.md
+- spec/tickets/the-retro-cuts-its-window.md
+- spec/tickets/the-retro-lays-its-leaves.md
+- src/scripts/pull-route.js
+- src/scripts/retro-collect.js
+- src/scripts/retro-leaves.js
+- src/scripts/retro-new.js
+- src/scripts/retro-window.js
+- src/scripts/retro.js
+- test/level0/projection.test.js
+- test/level0/retro-leaves.test.js
+- test/level0/retro-new.test.js
+- test/level0/retro-window.test.js
+
 <!-- the form is files -->
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
+fail
+
+Four gaps stand, and the cut itself answers the ask.
+
+| the gap | the fix |
+|---|---|
+| the ask of a chapter carries prompts, tools, shell, refusals and errors alone | add the tickets a hand moves, the notes it writes, and the median length of a thought |
+| the refusals count reads one number, and the ask asks for them by kind | group the write rows by the rule each names, as the counts table says |
+| the cut reads the copied log alone, and the approach reads both sources | take the transcripts' times too, and say in the ask which sources the chapter reads |
+| `retro notes` meets a chapter as an open note, so the drain holds the retro shut | pass a note whose `process` links the chapter route, which `design/settle-1` decides |
+
+| what answers the ask | where |
+|---|---|
+| the window opens at the last retro's close, or at the first commit | `openedAt` in `src/scripts/retro-window.js` |
+| a chapter is six hours holding rows, and an empty span stands nowhere | `cutInto`, and the case reading the three chapter paths |
+| a chapter mints off the chapter route, under the private tickets folder | `minted`, and the case matching `process` and `group` |
+| a case drives a window with no retro behind it | the first-commit case, which reads `window.json` back |
+| the window takes a line the manifest names | the row `windowOut` pushes, which that case finds |
+
+| what the reviewing guidance asks | what stands |
+|---|---|
+| the branch does what the brief asks | two lines of the counts go missing, and the drain stands open |
+| the diff beyond the brief | the siblings' work, which this shared branch carries alongside |
+| every rule carries a case that fires | four cases drive the cut, the mint, the counts and the first window |
+| a case feeds something bad | the empty span case, which asserts the third chapter stands nowhere |
+| a retro handback | none stands, because this ticket runs at the desk |
+
+`./RUNME.sh check` exits 0 on this branch, and the window cases answer green over four.
+
 <!-- the form is verdict -->
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
+
+- the span and the kinds stand once in the module, and the comments point at the design chapter
 
 <!-- the form is checklist -->
 
