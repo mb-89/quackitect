@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/tests-green
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -180,6 +180,17 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: ddef7c408e9ceb6c110eee890149acb70f1ca860
+    hash_after: ddef7c408e9ceb6c110eee890149acb70f1ca860
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 8 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: 83 stand at warning, which the panel draws and check allows.
 group: the-warnings-feed-a-refactorer
 ---
 
@@ -475,6 +486,10 @@ the one this hand shares.
 subject, and the guard reads the subject alone. A log the git door fails to read
 answers `read: false`, which every caller takes as a move, so a failure refuses
 as it does today.
+
+**Where the rule stands written.** `spec/design_output/pull.md` carries both
+rows: the hand rule, and the `files` form. Each names `commitsFor` as the
+function answering the split.
 
 ### checked
 
