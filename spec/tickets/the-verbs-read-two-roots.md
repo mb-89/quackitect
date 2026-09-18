@@ -83,7 +83,10 @@ record:
   - step: sync
     hand: box 74baae5b0b11 · claude-code-remote
     hash_before: 70940a6fd73809a2e8d9f5f7ec5bd8fffde4da6a
-step: sync
+  - step: sync
+    skipped: true
+    why: the box runs off the cloud
+step: split
 ---
 
 # Ask
