@@ -113,6 +113,23 @@ all:
 | a newest entry with `hash_before` and no `hash_after` | `held` |
 | `state: closed` on the ticket | `done` |
 
+# One verb answers git
+
+`branch answer` writes what git knows into one file, and a board, a terminal and
+the pull all read that one answer:
+
+| the key | what it carries |
+|---|---|
+| `branches` | every work branch, its tip, the time on it, its status and its kind |
+| `branches[].tickets` | the tickets on that branch, each with its state and its step |
+| `loose` | the tickets on trunk naming no group |
+| `queue` on a ticket | the place the pull hands it out, which `--queue` writes |
+
+The file stands beside the work a reader reads, so the index walks it and a
+write wakes a reader. The engine's own state stays in the runtime half, which
+the index skips. A reader meeting no file says so, and the board draws what the
+notes hold.
+
 # The listing reads git once
 
 `branch list` asks git three times, whatever stands on the remote:

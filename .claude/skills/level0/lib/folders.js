@@ -32,6 +32,8 @@ export const HOLDS = `${RUN}/hold`;
 export const HOLD = `${RUN}/hold.json`;
 export const NOTES = `${PRIVATE}/notes`;
 export const TICKETS = `${PRIVATE}/tickets`;
+// The work answer stands beside the work a reader reads, so the index walks it. [[spec/design_output/work#one-verb-answers-git]]
+export const ANSWER = `${PRIVATE}/work.json`;
 
 // [[spec/design_input/the-runtime-files-stand-apart]]
 export function inRetro(name) {

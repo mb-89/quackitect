@@ -34,14 +34,13 @@ import {
   withoutField,
 } from "./group.js";
 import { guidance } from "./guidance-verb.js";
-import { ticketsHere, weighing } from "./pull-hand.js";
 import { handOf, pull, takeable } from "./pull.js";
-import { queued } from "./queue.js";
 import { readyToMerge, review } from "./review.js";
 import { serving } from "./serve.js";
 import { freeIn, staleClaim, trigger } from "./stand.js";
 import { testVerb } from "./test-verb.js";
 import { unblock } from "./unblock.js";
+import { answer, answerOf } from "./work-answer.js";
 import { close, merge } from "./work-merge.js";
 import {
   BRIEF,
@@ -85,6 +84,8 @@ export function work(root, argv, doors) {
     read,
     review,
     list,
+    // [[spec/design_output/work#one-verb-answers-git]]
+    answer: (it, _name, argv) => answer(it, (argv ?? []).slice(1)),
     // [[spec/design_output/pull#the-hand-out]]
     pull: (it, _name, argv) =>
       pull(
@@ -529,20 +530,25 @@ function stateOf(text) {
   return fieldOf(text, "state") || OPEN;
 }
 
-// The order the pull hands out, off the one decider the board reads too. [[spec/design_output/pull#the-queue-is-a-score]]
+// The order the pull hands out, off the one answer a board reads too. [[spec/design_output/work#one-verb-answers-git]]
 function queueOnly(it) {
-  const all = ticketsHere(it);
-  const open = all.filter(
-    (one) => !one.private && fieldOf(one.text, "state") === OPEN && takeable(it, one, all),
-  );
-  const order = queued(open, all, weighing(it, all));
-  if (!order.length) {
+  const said = answerOf(it, true);
+  const held = new Map();
+  for (const one of [
+    ...said.branches,
+    ...said.branches.flatMap((row) => row.tickets),
+    ...said.loose,
+  ]) {
+    if (typeof one.queue === "number" && !held.has(one.name)) held.set(one.name, one);
+  }
+  const rows = [...held.values()].sort((a, b) => a.queue - b.queue);
+  if (!rows.length) {
     console.log("No ticket stands in the queue.");
     return 0;
   }
-  for (const [at, one] of order.entries()) {
-    const place = String(at + 1).padStart(COL.kind);
-    console.log(`${place}  ${one.name.padEnd(COL.branch)} ${whyOf(one.text)}`);
+  for (const one of rows) {
+    const place = String(one.queue).padStart(COL.kind);
+    console.log(`${place}  ${one.name.padEnd(COL.branch)} ${one.step}`);
   }
   return 0;
 }
