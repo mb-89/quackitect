@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/tests-green
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -229,6 +229,17 @@ record:
     hash_after: b33dcd31ea6d677a73f0a647121cf0dfa3b66298
     answered:
       - name: lint
+        exit: 0
+        said: 75 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 284622cfe8668ae95956bbd34732eff2e2e3f220
+    hash_after: 284622cfe8668ae95956bbd34732eff2e2e3f220
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: 75 stand at warning, which the panel draws and check allows.
 group: the-retro-runs
@@ -524,7 +535,14 @@ Each chapter mints a private ticket off the chapter route, naming the retro as i
 | the errors | the level the row carries |
 | the median length of a thought | the transcripts, which answer zero on a box naming none |
 
-The cut reads both sources the design names, so a copied transcript row carries its time into a chapter beside the log.
+The cut reads both sources the design names. A private row opens at the folder it sits in, and an outside row opens at its file name. So the cut reads the field naming where a row comes from.
+
+| the row | where the cut finds it |
+|---|---|
+| a log row | under the retro folder, at the path the manifest names |
+| a transcript row | under the transcripts folder, at that same path |
+
+A case drives a transcripts folder holding three thoughts, and the chapter answers their median. The chapter's ask names both sources, so a reader knows what the silence covers.
 
 The drain passes a chapter now. It reads the process each note links, so a chapter closes at the readers step and holds the retro open nowhere.
 
