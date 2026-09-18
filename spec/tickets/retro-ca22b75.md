@@ -182,7 +182,7 @@ steps:
       - name: groups
         form: list
         says: one line per ticket, with its group and its urgency
-step: mine/scripts
+step: mine/runs
 process: [[spec/processes/retro]]
 process_hash: 61a2bb140f0b4632
 record:
@@ -246,6 +246,10 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 58f989652182376f8fa17c7c938bb759fc2b5f29
     hash_after: 58f989652182376f8fa17c7c938bb759fc2b5f29
+  - step: mine/scripts
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: d4db13db9644c8f1be9bf721c6628bf7370bdf51
+    hash_after: d4db13db9644c8f1be9bf721c6628bf7370bdf51
 ---
 
 # Ask
@@ -478,13 +482,21 @@ The thought length reads zero in every chapter, so the curve carries one axis al
 
 ### kept
 
-<!-- each script that becomes a check, a flag or a verb, with its home -->
+- the eight split scripts become one verb, because the ceiling splits a file every week here.
+- the four vocabulary scripts become a flag on the lint, since the tree measures its words often.
+- the three rename scripts become one verb, because a rename runs through the whole tree.
+- the extract script and the tense bench feed the voice rules, so they belong beside the styles.
 
 <!-- the form is list -->
 
 ### dropped
 
-<!-- each script that dies, with the reason -->
+- the six backup copies carry what git already holds, so they die.
+- the nine probe scripts answer a question each of their own runs answers once.
+- the seed, fill, fix, trust and close scripts each repair one ticket, and that ticket closes.
+- the commit message and the tense data hold what a run leaves behind, and no script reads them.
+
+<!-- the form is list -->
 
 <!-- the form is list -->
 
