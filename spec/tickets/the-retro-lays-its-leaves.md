@@ -91,12 +91,18 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
     hash_before: 5fa1e2fec704611d5375b260d9342d4ea9731a72
     hash_after: 5fa1e2fec704611d5375b260d9342d4ea9731a72
+  - step: design/review
+    hand: box d42624a67d18a8 · claude-code · helper-21
+    hash_before: dee2aea25f40ed5727268f1b7c2f502381ca8e81
+    hash_after: dee2aea25f40ed5727268f1b7c2f502381ca8e81
+    returns: 1
+    why: Two gaps stand, and the rest of the approach answers the ask:; | the gap | the fix |; |---|---|; | the collect step of [[spec/processes/retro]] reads as a keep list today | write the deny list into that step, and move the hash with it |; | the earlier retros reach no file, and the `score` step reads them | name the file they land in, beside the leaves' own |; | what answers the ask | where |; |---|---|; | one file a leaf under the retro folder, named for the leaf | the leaves table |; | the nine leaves, with `chapters` and `worker` reading live | the leaves table and the two-leaf line |; | the three takes off git, with the tickets and their records | the git table |; | the manifest naming a layout beside a copy, which `unread` reads | the manifest line |; `./RUNME.sh check` exits 0 on this branch.
 ---
 
 # Ask
@@ -167,6 +173,24 @@ Collect names every file it lays out in the manifest, beside the copies. So the 
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
+
+fail
+
+Two gaps stand, and the rest of the approach answers the ask:
+
+| the gap | the fix |
+|---|---|
+| the collect step of [[spec/processes/retro]] reads as a keep list today | write the deny list into that step, and move the hash with it |
+| the earlier retros reach no file, and the `score` step reads them | name the file they land in, beside the leaves' own |
+
+| what answers the ask | where |
+|---|---|
+| one file a leaf under the retro folder, named for the leaf | the leaves table |
+| the nine leaves, with `chapters` and `worker` reading live | the leaves table and the two-leaf line |
+| the three takes off git, with the tickets and their records | the git table |
+| the manifest naming a layout beside a copy, which `unread` reads | the manifest line |
+
+`./RUNME.sh check` exits 0 on this branch.
 
 <!-- the form is verdict -->
 
