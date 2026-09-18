@@ -2,6 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
+depends_on: [the-listing-opens-git-once, the-runtime-folder-holds-state]
 steps:
   - name: do
     does: makes the change, with the test that covers it

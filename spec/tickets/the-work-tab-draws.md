@@ -2,6 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
+depends_on: [the-work-answer-lands]
 steps:
   - name: do
     does: makes the change, with the test that covers it

@@ -2,8 +2,6 @@
 kind: [[ticket]]
 state: open
 urgency: now
-depends_on:
-  - the-runtime-folder-holds-state
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -77,7 +75,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: split
+step: children
 record:
   - step: sync
     hand: box 4089f1b3b6bc · claude-code-remote
@@ -90,6 +88,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-work-editor-draws already carries every commit on main.
+  - step: split
+    hand: box 4089f1b3b6bc · claude-code-remote
+    hash_before: 515f0f5e80f49e0eb8dffa7d18978e3f45a9ad02
+    hash_after: 515f0f5e80f49e0eb8dffa7d18978e3f45a9ad02
 ---
 
 # Ask
@@ -102,7 +104,7 @@ The tree view already draws a tree and a table at once. It filters in the log's
 language, reads a base file, and takes an edit in a cell. The work tab stands
 empty, and these tickets fill it.
 
-The order runs data first, then drawing, then the acts. Eleven tickets stand:
+The order runs data first, then drawing, then the acts. These tickets stand:
 
 | the ticket | what it lands |
 |---|---|
@@ -155,11 +157,26 @@ at a time, and reaches no row to change it.
 
 <!-- the form is list -->
 
+- [[spec/tickets/the-listing-opens-git-once]], trivial, which reads git in one process
+- [[spec/tickets/the-runtime-folder-holds-state]], trivial, which gives the engine's state its own folder
+- [[spec/tickets/the-work-answer-lands]], trivial, which writes what git knows into a file
+- [[spec/tickets/the-work-tab-draws]], trivial, which draws the tree in the work tab
+- [[spec/tickets/the-flags-draw-as-letters]], trivial, which draws the boolean keys as one lettered column
+- [[spec/tickets/the-tree-sorts-several-keys]], trivial, which sorts the tree on several keys
+- [[spec/tickets/one-urgency-stands]], trivial, which turns urgency into one mark
+- [[spec/tickets/the-queue-is-a-score]], trivial, which orders the queue by a score the config weighs
+- [[spec/tickets/a-preset-carries-its-sort]], trivial, which draws presets carrying a filter and a sort
+- [[spec/tickets/the-cell-fill-takes-marks]], trivial, which reaches a fill to the marked rows
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every child is small enough to review whole: each carries the trivial route, so a reader reads its diff whole
+- the children add up to the goal: the listing, the answer and the tab land the board. Every later child adds to it
+- a child that waits on another names it: each waiting child names it under depends_on
 
 # children
 
