@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 urgency: soon
 steps:
   - name: do
@@ -10,6 +10,7 @@ steps:
       - name: change
         form: text
         says: what you change, and what surprises you
+step: do
 ---
 
 # Ask
