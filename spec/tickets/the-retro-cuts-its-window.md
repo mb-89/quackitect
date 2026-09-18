@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/settle-2
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -216,6 +216,13 @@ record:
     hash_after: 0ddaeaa5f06a9508b31c79d524aebbfb23e175e4
     returns: 2
     why: "The cut reads the copied log alone, and the rest of the findings close.; | the gap | the fix |; |---|---|; | a transcript row's manifest path opens at its file name, so `SOURCES` matches none | read a row by the `from` field the copy writes |; | no case drives a transcript, so `thought: 0` passes over the log alone | seed a transcripts folder, and assert a thought lands in its chapter |; | the chapter's ask names no source, which the approach calls for | name the sources the chapter reads, beside the counts |; A run over a transcripts folder holding thought rows answers `thought: 0`, and the later rows reach no chapter.; | the finding the last verdict names | what stands |; |---|---|; | three counts stand nowhere | `asked` writes the tickets, the notes and the median thought |; | the refusals read one number | `byKind` names each rule with its own count |; | the cut reads the log alone | `SOURCES` names both folders, and a transcript reaches it nowhere |; | the drain meets a chapter as an open note | `isChapter` reads the process each note links, and a case drives it |; | what answers the ask | where |; |---|---|; | the window opens at the last retro's close, or at the first commit | `openedAt` in `src/scripts/retro-window.js` |; | a chapter is six hours holding rows, and an empty span stands nowhere | `cutInto`, and the case reading the chapter paths |; | a chapter mints off the chapter route, under the private tickets folder | `minted`, and the case matching `process` and `group` |; | a case drives a window with no retro behind it | the first-commit case, which reads `window.json` back |; | the window takes a line the manifest names | the row `windowOut` pushes, which that case finds |; | what the reviewing guidance asks | what stands |; |---|---|; | the branch does what the brief asks | the counts land, and the transcripts reach the cut nowhere |; | the diff beyond the brief | the siblings' work, which this shared branch carries alongside |; | every rule carries a case that fires | the cut, the mint, the counts, the drain and the first window |; | a case feeds something bad | the empty span case, which asserts the third chapter stands nowhere |; | a retro handback | none stands, because this ticket runs at the desk |; `./RUNME.sh check` exits 0 on this branch, and the window cases answer green."
+  - step: implement/settle-2
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 0a23e1edfc39f12b68460b33bc222b72bb6c39dc
+    hash_after: 0a23e1edfc39f12b68460b33bc222b72bb6c39dc
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 group: the-retro-runs
 depends_on: ["the-retro-takes-the-box"]
 ---
@@ -385,6 +392,24 @@ The counts read off the log's own kinds. A row names a prompt, a shell line, a t
 <!-- decides between the step and the findings, and writes why -->
 
 ### answer
+
+The finding stands, and a probe proves it. The cut reads the copied log alone.
+
+| what stands | why the match fires nowhere |
+|---|---|
+| a private row's path opens at the folder it sits in | so a log row reads `log/one.jsonl` |
+| an outside row's path opens at its own file name | so a transcript row reads `one.jsonl` and no folder |
+| the cut matches a path by its opening | so it meets a transcript row nowhere |
+
+The fix reads the field naming where a row comes from, which the manifest carries already.
+
+| what the fix answers | how |
+|---|---|
+| a transcript row reaches the cut | the row reads off the folder it lands in, beside the log |
+| a case drives a transcript | a fixture holds one, and the chapter counts its thought |
+| the ask names its sources | the chapter says which two it reads |
+
+A wrong answer here costs a commit inside this branch, so this hand settles it and hands nothing out.
 
 The finding stands. The draft says the drain passes a chapter by, and names nothing it reads to tell one.
 
