@@ -91,7 +91,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -141,6 +141,12 @@ record:
       - name: check
         exit: 0
         said: 75 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box d42624a67d18a8 · claude-code · helper-30
+    hash_before: 5aad3cd4a056b75d89eb0ab1e2e57eef07e9e1cb
+    hash_after: 5aad3cd4a056b75d89eb0ab1e2e57eef07e9e1cb
+    returns: 1
+    why: Three gaps stand, and the rest of the change answers the ask.; | the gap | the fix |; |---|---|; | no case drives a merged group, so the `runs` filter fires nowhere and the file reads empty | give the fake git a closed group ticket, and read the `runs` file back |; | the `method` leaf takes a row in the approach, and collect writes it no file | write the file, or say in the approach why that leaf takes none |; | the file the `score` step reads lands as `retros`, and the ask asks for the leaf's name | name it for the leaf that reads it |; | what answers the ask | where |; |---|---|; | the takes off git land in the folder | `closedIn`, `mergedIn` and `standingRetros` in `src/scripts/retro-leaves.js` |; | the manifest names each layout | the row each leaf file pushes, which the case reads back |; | the collect step reads as the folders it skips | `spec/processes/retro.yaml`, and the hash moves on the open retro |; | a case reads the closed ticket back | the tickets leaf case, which finds the ticket as its commit leaves it |; | what the reviewing guidance asks | what stands |; |---|---|; | the diff beyond the brief | the siblings' own work, which this branch carries alongside |; | a retro handback | none stands, because this ticket runs at the desk |; `./RUNME.sh check` exits 0 on this branch, and `node --test` passes over the two test files.
 ---
 
 # Ask
@@ -364,17 +370,67 @@ The route's collect step moves with the owner's ruling. It reads as the folders 
 
 <!-- every file you read, one a line -->
 
+- .claude/commands/se-config-work-retroCap.md
+- .claude/commands/se-config-work-retroReaders.md
+- .claude/commands/se-retro.md
+- .claude/skills/level0/lib/projection-owner.js
+- .claude/skills/level0/lib/projection.js
+- HANDOVER.md
+- spec/config/level0.json
+- spec/config/level0.schema.json
+- spec/config/projections.json
+- spec/design_output/projection.md
+- spec/processes/retro.yaml
+- spec/tickets/a-retro-mints-itself.md
+- spec/tickets/retro-018ba26.md
+- spec/tickets/the-retro-cuts-its-window.md
+- spec/tickets/the-retro-lays-its-leaves.md
+- src/scripts/pull-route.js
+- src/scripts/retro-collect.js
+- src/scripts/retro-leaves.js
+- src/scripts/retro-new.js
+- src/scripts/retro.js
+- test/level0/projection.test.js
+- test/level0/retro-leaves.test.js
+- test/level0/retro-new.test.js
+
 <!-- the form is files -->
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
+fail
+
+Three gaps stand, and the rest of the change answers the ask.
+
+| the gap | the fix |
+|---|---|
+| no case drives a merged group, so the `runs` filter fires nowhere and the file reads empty | give the fake git a closed group ticket, and read the `runs` file back |
+| the `method` leaf takes a row in the approach, and collect writes it no file | write the file, or say in the approach why that leaf takes none |
+| the file the `score` step reads lands as `retros`, and the ask asks for the leaf's name | name it for the leaf that reads it |
+
+| what answers the ask | where |
+|---|---|
+| the takes off git land in the folder | `closedIn`, `mergedIn` and `standingRetros` in `src/scripts/retro-leaves.js` |
+| the manifest names each layout | the row each leaf file pushes, which the case reads back |
+| the collect step reads as the folders it skips | `spec/processes/retro.yaml`, and the hash moves on the open retro |
+| a case reads the closed ticket back | the tickets leaf case, which finds the ticket as its commit leaves it |
+
+| what the reviewing guidance asks | what stands |
+|---|---|
+| the diff beyond the brief | the siblings' own work, which this branch carries alongside |
+| a retro handback | none stands, because this ticket runs at the desk |
+
+`./RUNME.sh check` exits 0 on this branch, and `node --test` passes over the two test files.
+
 <!-- the form is verdict -->
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
+
+- the leaves table stands once in the ticket, and the module's comments point at the design chapter
 
 <!-- the form is checklist -->
 
