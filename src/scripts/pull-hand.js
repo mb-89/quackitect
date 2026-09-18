@@ -379,7 +379,7 @@ export function childrenSay(all, name) {
 
 // [[spec/design_output/pull#the-hand-rule]]
 export function admits(it, who, one, leaf, all) {
-  if (leaf.by === "person" && it.agent)
+  if (leaf.by === "person" && it.agent && !it.ownerSays)
     return { why: `waits for a person at ${leaf.path}`, person: leaf };
   if (leaf.by === "agent" && !it.agent)
     return { why: `waits for an agent at ${leaf.path}` };

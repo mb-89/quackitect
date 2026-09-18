@@ -44,9 +44,10 @@ test("the box file alone on a harness names the agent off the environment", () =
   assert.equal(handOf(it), `box ${ID} · claude-code-remote`);
 });
 
-test("the box file alone off a harness names the person by their git author name", () => {
+// A tracked file holds no person's name, and git carries who wrote the commit. [[spec/guidance/voice]]
+test("the box file alone off a harness names the role, and no person", () => {
   const it = box({}, { agent: false, env: {} });
-  assert.equal(handOf(it), "person Ada");
+  assert.equal(handOf(it), "person");
 });
 
 test("a helper's hold takes a file name of its own, beside the session's", () => {
