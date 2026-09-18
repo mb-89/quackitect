@@ -182,7 +182,7 @@ steps:
       - name: groups
         form: list
         says: one line per ticket, with its group and its urgency
-step: improve
+step: report
 process: [[spec/processes/retro]]
 process_hash: 61a2bb140f0b4632
 record:
@@ -282,6 +282,10 @@ record:
     hash_after: 12472138307a5a8a3e893dbbbedae9ccb956681f
     returns: 2
     why: the hand takes it back
+  - step: improve
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 3ecbf1856bad0457638906148a40fdb9e70e109e
+    hash_after: 3ecbf1856bad0457638906148a40fdb9e70e109e
 ---
 
 # Ask
@@ -602,12 +606,12 @@ The manifest holds 394 lines, and the log, the scripts, the private tickets and 
 
 ## tickets
 
-- [[spec/tickets/the-log-row-carries-its-command]], class blind instrument, home log.js. The next shell leaf holds a row a job, and the refusals leaf a row a rule.
+- [[spec/tickets/the-log-row-carries-commands]], class blind instrument, home log.js. The next shell leaf holds a row a job, and the refusals leaf a row a rule.
 - [[spec/tickets/collect-copies-the-transcripts]], class blind instrument, home retro-collect.js. The next chapters carry a median thought above zero.
 - [[spec/tickets/the-readers-step-holds-open]], class a false pass, home the retro process. The next retro reaches mining with every chapter read.
 - [[spec/tickets/a-review-passes-open-points]], class a gate too tight, home the reviewing note. The next reviews send back only what needs a decision.
 - [[spec/tickets/a-stale-hold-frees-branch]], class a hold nobody frees, home work.js. The next list shows no branch held past the window.
-- [[spec/tickets/the-runtime-list-takes-the-rest]], class state among history, home folders.js. The next manifest names runtime state nowhere.
+- [[spec/tickets/the-runtime-list-takes-rest]], class state among history, home folders.js. The next manifest names runtime state nowhere.
 
 <!-- the form is list -->
 
