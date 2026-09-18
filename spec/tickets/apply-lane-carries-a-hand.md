@@ -88,6 +88,20 @@ on that ticket. [[spec/tickets/a-write-meets-its-hash]] carries the record.
 
 <!-- the form is text -->
 
+The lane stamps as it reads, so the rule holds over it and the callers change
+nothing.
+
+| way | why it stands aside |
+|---|---|
+| the lane carries the hand | two callers thread a token the event lacks, for a lane that reads each file at the call |
+| the lane stands outside the rule | a batch then drops another hand's change, which is the loss the ask names |
+
+The lane reads each file at the moment it writes, so its read is the freshest
+one standing. Stamping there tells the truth about what it read.
+
+A wrong answer here refuses one batch edit, and the hand reads again. A later
+commit undoes it, so this box decides it.
+
 # do
 
 <!-- carries the answer out, with the test that covers it -->

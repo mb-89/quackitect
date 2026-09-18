@@ -86,6 +86,22 @@ on that ticket. [[spec/tickets/a-pointer-names-its-heading]] carries the record.
 
 <!-- the form is text -->
 
+The rule carries its own slug in Go, with the reason beside it.
+
+| way | why it stands aside |
+|---|---|
+| the checker asks the index | a call a note, and a second module in the rule's path |
+| one owner in Go | every reader in JavaScript then reaches a binary to slug a heading |
+
+Voice rule 7 takes a copy a technical reason forces, where that reason stands
+beside it. A Go module imports no JavaScript, and that is the reason.
+
+So the Go slug names the four copies in its comment, and a contract test holds
+the five to one answer. A copy drifting then fails the check.
+
+A wrong answer here moves one function. A later commit undoes it, so this box
+decides it.
+
 # do
 
 <!-- carries the answer out, with the test that covers it -->
