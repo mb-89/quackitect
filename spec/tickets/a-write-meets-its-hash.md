@@ -90,7 +90,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box a5e189c39e1d · claude-code-remote
+    hash_before: fbf290dec7c5a1237d581ad2f9425659877475b7
+    hash_after: fbf290dec7c5a1237d581ad2f9425659877475b7
 ---
 
 # Ask
@@ -116,6 +121,26 @@ Version three rules it in one line, under its file lane: a write lands only agai
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The box holds the hash of every file a hand reads, and the write door refuses a
+write whose file has moved since that read. The stamp lives in the box, so this
+asks for no lock, no lease and no file.
+
+| piece | what it does |
+|---|---|
+| the read door | hashes the file a hand reads, and stamps the hash on the box under the path |
+| the write door | hashes the file on the disk, and refuses where the stamp disagrees |
+| the write door, after | stamps the text the write leaves, so the next edit from the same hand lands |
+| `hashText` | answers the hash, because one hash already serves the projections |
+
+The door refuses on disagreement alone. A path carrying no stamp passes, so a
+hand writing a new file meets nothing.
+
+The refusal names the file and tells the hand to read it again. It stands with
+the other refusals, so one shape serves every door.
+
+One box serves one work root, and both hands reach the same box through the
+server. So the session and the refactoring hand read one map of stamps.
 
 ## review
 
