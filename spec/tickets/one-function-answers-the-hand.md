@@ -325,3 +325,12 @@ fail
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+A hand reading the tree beside the review left four notes the approach leaves out. The implement step takes them:
+
+| what stands | where |
+|---|---|
+| a third site holds the rule inline, beside the two the approach names | `handFaults` in `src/scripts/pull-chapter.js` |
+| `excludes` runs at that site and at `admits` alike | `src/scripts/pull-hand.js` |
+| `admits` answers `person` and `other` fields a caller reads, and the one answer keeps them | `handOut` in `src/scripts/pull-hand.js` |
+| the pull builds the hand as `who`, and the agent flag sits on the box | `src/scripts/pull.js` |
