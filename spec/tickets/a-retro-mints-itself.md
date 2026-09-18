@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: design/settle-1
+step: design/draft
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -120,6 +120,10 @@ record:
     hash_after: 770861465afe3337da194a627f59a2c3936e4ab1
     returns: 2
     why: "Five of the six findings close, and two gaps stand:; | the gap | the fix |; |---|---|; | the config glob names `se-config-*.md`, and `se-agent-control-*.md` finds no owner | name a glob covering every file that entry writes |; | `writes` reaches the entry table nowhere | add its row to [[spec/design_output/projection]], which owns the keys |; | the earlier finding | what closes it |; |---|---|; | the entry names no source | the retro process is the source, and the banner names it |; | two entries tie on one folder | an entry declares `writes`, and the lookup prefers the match |; | `--as` carries a hand's name | the flag reads `--name` here |; | the mint copies what a pull prints | `retro new` calls the mint and the pull, and prints nothing |; | `retro collect` stands nowhere | the sibling lands it, and `depends_on` names that sibling |; | the two knobs project two commands | the change carries both command files |; One caution for the draft hand: the verb list carries `collect` already, so `new` is the row that lands there.; `./RUNME.sh check` exits 0 on this branch."
+  - step: design/settle-1
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 37ab51bd3baa40c4f2fa70c1989b2502440cdf86
+    hash_after: b96685f67b77fc6bf566fb972ef7963c8810e803
 group: the-retro-runs
 depends_on: ["the-retro-takes-the-box"]
 ---
@@ -153,7 +157,16 @@ A retro takes a hand-written ticket. The route on it drifts from the process fil
 
 ### answer
 
-<!-- the decision, and why it stands -->
+The findings stand, and the draft takes both.
+
+| the finding | why it stands |
+|---|---|
+| the glob names one family, and another family finds no owner | the write door names the source a hand edits, and a file with no owner takes the wrong name |
+| `writes` reaches the entry table nowhere | one place owns the keys an entry carries, and a key nobody writes down drifts |
+
+Neither finding costs anything past this branch. A wrong glob names the wrong source in a refusal, and a later commit puts it right. So this hand settles both and hands nothing out.
+
+The caution stands too. The verb list carries `collect` already, so `new` is the one row landing there.
 
 <!-- the form is text -->
 
