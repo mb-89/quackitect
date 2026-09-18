@@ -88,6 +88,9 @@ record:
     hand: box d42624a67d18a8 · claude-code
     skipped: true
     why: the box leaves it while a-retro-mints-itself, the-retro-cuts-its-window, the-retro-lays-its-leaves, the-retro-takes-the-box stand open
+  - step: retro/notes
+    hand: box aa95965bf4e2 · claude-code-remote
+    hash_before: 17baa5dd4d8d8e19c745933d759033a9dcb4e5d3
 ---
 
 # Ask
