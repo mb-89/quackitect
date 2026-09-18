@@ -73,6 +73,36 @@ The person's work is real, and dropping it is the other failure. So it moves to
 a ticket of its own, outside the group, carrying the question and what stands
 open. The group then closes, the branch merges, and the ticket is the reminder.
 
+| a wrong answer | who owns it |
+|---|---|
+| a later commit undoes it | the box |
+| it spends, sends or opens a door | the owner |
+| it loses work nobody rebuilds | the owner |
+| it stands outside the brief | the owner |
+
+That table is the second wording. The first asked what only a person could
+answer, and it failed, because a person can answer anything.
+
+A box read it as a question about authority, and handed out calls it owned:
+
+- where a slug lives, with four copies standing already
+- which of two sound designs to take on the apply lane
+
+Two children of one group left that way in a single session. Neither question
+carried a wrong answer costing more than a commit.
+
+The engine made it worse. `withPersonStep` stamps `by: person` on a count of
+returns. So two disagreements between agent hands minted a question for a human.
+
+The stamp said `person`, rule 9 said a step a person owns waits, and the box
+obeyed the stamp. The fix stands in two places:
+
+- the guidance asks the blast radius, which a reader decides
+- the stop rule carries `yields`, so a claim loses to a check that fires
+
+A claim reads the agent, and a check reads the tree. So the agent's own reading
+of its own work stops ending a turn while work stands.
+
 ## 7. The route a successor takes
 
 `branch unblock` reads the successor's first step and demands `by: person`. No

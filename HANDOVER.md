@@ -1,6 +1,6 @@
 ---
 kind: [[handover]]
-status: held
+status: done
 urgency: now
 ---
 
@@ -10,28 +10,46 @@ A cloud box ends its turn on a question an agent answers. The stop rule asks
 whether a person can answer, and a person can answer anything. So the test lets
 every hard call out of the box.
 
-The owner rules that wrong. The test is what a wrong answer costs, and who
-undoes it. A wrong answer a later commit moves belongs to the box.
+This branch replaces that test with the blast radius of a wrong answer, and
+stops a claim overriding a check.
 
-Three places carry the fault:
-
-| where | what it does today |
+| what changes | where |
 |---|---|
-| `spec/config/stop/level0.yml` | `a-person-holds-the-answer` asks whether a person can answer |
-| `spec/config/stop/level0.yml` | a claimed stop outranks the one mechanical rule saying carry on |
-| `src/scripts/pull.js` | the fail count stamps a step `by: person`, whatever the question is |
-| `spec/guidance` | the standing says a step a person owns waits, so a stamp reads as an owner |
+| `a-person-holds-the-answer` becomes `a-wrong-answer-leaves-the-box` | `spec/config/stop/level0.yml` |
+| a stop carrying `yields` loses to any mechanical continue | `.claude/skills/level0/lib/stop.js` |
+| the three stops the agent claims over its own work carry `yields` | `spec/config/stop/level0.yml` |
+| the cloud guidance asks the blast radius, in rules six and nine | `spec/guidance/cloud.md` |
+| the argument, and the failure driving it | `spec/rationales/cloud.md` |
+| the chapters a check beats a claim, and the blast radius decides | `spec/design_output/stop.md` |
+
+`./RUNME.sh check` answers 0 on this commit, and the suite answers green.
 
 # What waits
 
 | what | who does it |
 |---|---|
-| put the blast radius test in the stop rule, in place of the person test | the next hand |
-| add a mechanical rule holding a cloud box open while an agent-takeable leaf stands | the next hand |
-| stop the fail count stamping `by: person`, and hand the return to another agent hand | the next hand |
-| write the blast radius test into the standing, so a box reads it every session | the next hand |
+| [[spec/tickets/a-return-asks-another-hand]], standing at todo | the next hand |
 
-# The test the owner asks
+The engine still stamps `by: person` on a count of returns. That rename reaches
+`withEngineReader`, `branch unblock` and the step name, so it stands on its own
+ticket.
+
+# What the flag does
+
+A claim reads the agent, and a check reads the tree. A stop the agent claims
+over its own work now loses to any mechanical continue that fires, whatever the
+priorities say.
+
+A stop the owner drives carries no flag:
+
+- `the-owner-asks-to-talk` reads the owner's own words
+- `the-chat-is-new` reads the session log
+
+The band table puts `90` to `100` in the owner's hands. The rule this replaces
+sits there while reading the agent, so it overrides every check reading the
+branch.
+
+# The test the guidance asks
 
 A box answers a question whose wrong answer a commit undoes. It hands out a
 question whose wrong answer reaches past the branch.
@@ -43,29 +61,4 @@ The wrong answer leaves the box where it does one of these:
 - it stands outside the brief: a product call the brief leaves open
 
 Everything else the box answers. It names the assumption under the ticket's
-discussion and carries on. Where two answers both stand, it takes the one a
-later hand undoes cheaper.
-
-## How this branch runs
-
-Level zero deletes this file when it reads it, so the copy in your context
-is the only one left. These steps write it back.
-
-1. Run `./RUNME.sh branch sync` FIRST. It takes main into this branch, so
-   an old branch works against what the tree holds now. Resolve any conflict
-   before you start, because a conflict found later costs the work already
-   done.
-2. Commit and push each time you finish a thing. A cloud box dies and takes
-   its working tree with it.
-3. Write your result and your retro into `HANDOVER.md`, at the root, replacing
-   this brief. Head the retro `What surprises me`, and name every dead end
-   you walk into.
-4. Run `./RUNME.sh branch sync` again, so main comes in last too.
-   Run `./RUNME.sh check` after it, and answer whatever the merge turns red.
-5. Run `./RUNME.sh branch done`, which sets the status and pushes.
-6. Stop for no person. Where a step wants one, mint a ticket outside the
-   group, write what stands open into its ask, and run `./RUNME.sh branch
-   unblock <ticket> <successor>`. Then finish the rest and run `branch done`.
-7. Run `./RUNME.sh branch merge <name>` from main to take it in, then
-   `branch close`. A cloud box stops at step 4, because the harness holds
-   main shut there and a cloud box opens no pull request.
+discussion and carries on.
