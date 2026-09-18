@@ -91,7 +91,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -107,6 +107,10 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: a31ca19ab697013c347bdfe3c3d7a4396cf2e4c6
     hash_after: a31ca19ab697013c347bdfe3c3d7a4396cf2e4c6
+  - step: design/review
+    hand: box d42624a67d18a8 · claude-code · helper-24
+    hash_before: f03adf352b9473f944a583dbcde10dbeb5dcf89c
+    hash_after: f03adf352b9473f944a583dbcde10dbeb5dcf89c
 ---
 
 # Ask
@@ -188,21 +192,21 @@ The process hash moves with those words. No retro ticket stands open past this b
 
 <!-- pass or fail, with findings one a line -->
 
-fail
+pass
 
-Two gaps stand, and the rest of the approach answers the ask:
+Both gaps close, and the approach answers the ask.
 
-| the gap | the fix |
+| the gap the first round names | what closes it |
 |---|---|
-| the collect step of [[spec/processes/retro]] reads as a keep list today | write the deny list into that step, and move the hash with it |
-| the earlier retros reach no file, and the `score` step reads them | name the file they land in, beside the leaves' own |
+| the collect step reads as a keep list | the step's two lines move to the skip, and the hash moves with them |
+| the earlier retros reach no file | `score` takes a row in the leaves table, and a file beside the rest |
 
-| what answers the ask | where |
+| what the ask asks | what the approach answers |
 |---|---|
-| one file a leaf under the retro folder, named for the leaf | the leaves table |
-| the nine leaves, with `chapters` and `worker` reading live | the leaves table and the two-leaf line |
-| the three takes off git, with the tickets and their records | the git table |
-| the manifest naming a layout beside a copy, which `unread` reads | the manifest line |
+| one file a leaf, named for the leaf | the leaves table, and the path holding each |
+| the takes off git land in the folder | the git table, with the tickets, the merged groups and the earlier retros |
+| the manifest names each one | a layout takes a line beside a copy, so `unread` reads one list |
+| the nine leaves stand answered | seven take a file, and `chapters` and `worker` read the closed readers live |
 
 `./RUNME.sh check` exits 0 on this branch.
 
