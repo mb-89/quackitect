@@ -2,10 +2,20 @@
 kind: [[ticket]]
 state: open
 urgency: now
+step: design/person-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: "design/review failed back 2 times: The earlier findings close, apart from the walk's order. These stand:; close the walk's order: the table says deepest first, and the prose says any order; name the runtime files the default leaves standing: `index.json`, `level0.stamp`, `level0.health`; say how a list knob passes `./RUNME.sh config`, which writes one command a knob taking one typed value; fix the handover's reason: the glob matches the private handover, which stands outside git [[spec/design_output/work]]; `./RUNME.sh check` exits 0 on this branch."
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -89,8 +99,6 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-group: the-retro-runs
-step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -106,6 +114,13 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: bc9ed22234501c5c8406e075ea65a5addbc5ecab
     hash_after: bc9ed22234501c5c8406e075ea65a5addbc5ecab
+  - step: design/review
+    hand: box d42624a67d18a8 · claude-code · helper-4
+    hash_before: 30da2f2da97abe3d0bd07bb579a3a7f59a5eea6b
+    hash_after: 30da2f2da97abe3d0bd07bb579a3a7f59a5eea6b
+    returns: 2
+    why: "The earlier findings close, apart from the walk's order. These stand:; close the walk's order: the table says deepest first, and the prose says any order; name the runtime files the default leaves standing: `index.json`, `level0.stamp`, `level0.health`; say how a list knob passes `./RUNME.sh config`, which writes one command a knob taking one typed value; fix the handover's reason: the glob matches the private handover, which stands outside git [[spec/design_output/work]]; `./RUNME.sh check` exits 0 on this branch."
+group: the-retro-runs
 ---
 
 # Ask
@@ -131,6 +146,16 @@ The record dies with the box. A retro then reads what a hand remembers, and the 
 - `./RUNME.sh check` exits 0
 
 # design
+
+## person-1
+
+<!-- answers the question the engine asks -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
 
 ## draft
 
@@ -194,14 +219,14 @@ The transcripts stand outside the private folder, in the harness's own files. Th
 
 fail
 
-- name every line of the default deny list, because a hand takes an abstract default by guess
-- add the handover to that default, which [[spec/design_input/the-agent-pulls-tickets]] names beside the bin
-- keep the log archive under the private folder, because a rule over binaries drops the record
-- say which path the deny globs read for the transcripts, which stand outside the private folder
-- add `retro.deny` to `spec/config/level0.schema.json`, where every knob carries its type and its help
-- say where the retro folder stands, because the ask names a folder git keeps and git ignores `.se/`
-- name what lets a second collect run, because a half run leaves a folder standing
-- drop the deepest-first walk, or say what it serves, because the verb removes nothing
+The earlier findings close, apart from the walk's order. These stand:
+
+- close the walk's order: the table says deepest first, and the prose says any order
+- name the runtime files the default leaves standing: `index.json`, `level0.stamp`, `level0.health`
+- say how a list knob passes `./RUNME.sh config`, which writes one command a knob taking one typed value
+- fix the handover's reason: the glob matches the private handover, which stands outside git [[spec/design_output/work]]
+
+`./RUNME.sh check` exits 0 on this branch.
 
 <!-- the form is verdict -->
 
@@ -213,7 +238,7 @@ fail
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+<!-- the same tests pass -->
 
 <!-- the form is command -->
 
