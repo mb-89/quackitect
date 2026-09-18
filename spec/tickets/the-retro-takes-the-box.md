@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: design/person-1
+step: design/draft
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -120,6 +120,10 @@ record:
     hash_after: 30da2f2da97abe3d0bd07bb579a3a7f59a5eea6b
     returns: 2
     why: "The earlier findings close, apart from the walk's order. These stand:; close the walk's order: the table says deepest first, and the prose says any order; name the runtime files the default leaves standing: `index.json`, `level0.stamp`, `level0.health`; say how a list knob passes `./RUNME.sh config`, which writes one command a knob taking one typed value; fix the handover's reason: the glob matches the private handover, which stands outside git [[spec/design_output/work]]; `./RUNME.sh check` exits 0 on this branch."
+  - step: design/person-1
+    hand: box d42624a67d18a8 · claude-code · the owner says so
+    hash_before: 28011a9a0b2a4bd1951288fe25d94d2e17c784e0
+    hash_after: 28011a9a0b2a4bd1951288fe25d94d2e17c784e0
 group: the-retro-runs
 ---
 
