@@ -92,12 +92,18 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box dd2a59294365 · claude-code-remote
     hash_before: 542e434bb133ac3969b905dc7c6290691b893c94
     hash_after: 542e434bb133ac3969b905dc7c6290691b893c94
+  - step: design/review
+    hand: box dd2a59294365 · claude-code-remote · helper-2
+    hash_before: 54d82d57208875fea628af1abfe7eedd4436a54c
+    hash_after: 54d82d57208875fea628af1abfe7eedd4436a54c
+    returns: 1
+    why: "`draws` publishes nil for every `drawn` path its `found` map leaves out.; So the first `didOpen` clears the sweep's drawing, and the open file stays alone.; `clears` empties every `drawn` path on `didClose`, and nothing runs the sweep again.; Name what holds a swept file drawn, so the clear loop reaches the open file alone.; `Sweep` covers what `Over` reads, through `nameHoldsTheWords` and `schemaFaults`.; `Forgets` drops the path list alone, so an open buffer answers ahead of the disk.; `Paths` drops a parked file through `isDraft`, so a parked file draws nothing.; `./RUNME.sh check` exits 1 here, on faults standing outside this ask."
 ---
 
 # Ask
@@ -171,6 +177,17 @@ The sweep stands, and the server calls it from two places already. This adds one
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- `draws` publishes nil for every `drawn` path its `found` map leaves out.
+- So the first `didOpen` clears the sweep's drawing, and the open file stays alone.
+- `clears` empties every `drawn` path on `didClose`, and nothing runs the sweep again.
+- Name what holds a swept file drawn, so the clear loop reaches the open file alone.
+- `Sweep` covers what `Over` reads, through `nameHoldsTheWords` and `schemaFaults`.
+- `Forgets` drops the path list alone, so an open buffer answers ahead of the disk.
+- `Paths` drops a parked file through `isDraft`, so a parked file draws nothing.
+- `./RUNME.sh check` exits 1 here, on faults standing outside this ask.
 
 # implement
 
