@@ -91,7 +91,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -107,6 +107,12 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 3260fe5072095b7970647e1dcd980ab8740e8116
     hash_after: 3260fe5072095b7970647e1dcd980ab8740e8116
+  - step: design/draft
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 3d95552732299a51787f22c4ea8eb5a03f9a8912
+    hash_after: 3d95552732299a51787f22c4ea8eb5a03f9a8912
+    returns: 1
+    why: the hand takes it back
 ---
 
 # Ask
