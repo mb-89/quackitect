@@ -90,12 +90,18 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box a5e189c39e1d · claude-code-remote
     hash_before: 09ca2410b204c55f5c502c780c0ecc03caffcc1b
     hash_after: 5b5cc69fb9db050d50b9809cb4b4de470f3e6f85
+  - step: design/review
+    hand: box a5e189c39e1d · claude-code-remote · helper-2
+    hash_before: 81a9b54a1f1379a9fe003f4b34e80cb0b96325c9
+    hash_after: 81a9b54a1f1379a9fe003f4b34e80cb0b96325c9
+    returns: 1
+    why: The runtime list names five things, and the private folder holds more kinds. Name the rule that places a kind neither list names.; `.se/review` holds a git worktree, a second checkout of this tree. Put it in the runtime folder. Otherwise the rows carry every tracked file twice.; `.se/undo` holds both halves of every file an apply writes. Put it in the runtime folder. Otherwise a word standing in a note alone comes back from the journal too.; `.se/bin` holds the built binaries. The walk reads and hashes each one on every pass. Put it in the runtime folder.; The `Grep` and `Glob` doors answer off the same rows. A row under the worktree sends a reader to the wrong copy.; The rest of the approach answers the ask. The two named folders and the module owning the names stand.; The path-relative skip is right. The walk today matches a folder on its base name alone.
 ---
 
 # Ask
@@ -161,6 +167,16 @@ note.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- The runtime list names five things, and the private folder holds more kinds. Name the rule that places a kind neither list names.
+- `.se/review` holds a git worktree, a second checkout of this tree. Put it in the runtime folder. Otherwise the rows carry every tracked file twice.
+- `.se/undo` holds both halves of every file an apply writes. Put it in the runtime folder. Otherwise a word standing in a note alone comes back from the journal too.
+- `.se/bin` holds the built binaries. The walk reads and hashes each one on every pass. Put it in the runtime folder.
+- The `Grep` and `Glob` doors answer off the same rows. A row under the worktree sends a reader to the wrong copy.
+- The rest of the approach answers the ask. The two named folders and the module owning the names stand.
+- The path-relative skip is right. The walk today matches a folder on its base name alone.
 
 # implement
 
