@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgent: true
-step: retro/write
+step: retro/cloud
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -137,6 +137,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box 4089f1b3b6bc · claude-code-remote
+    hash_before: 659e89f2ff47addc6b5b0051b6627f1b71b93bc0
+    hash_after: 659e89f2ff47addc6b5b0051b6627f1b71b93bc0
 ---
 
 # Ask
@@ -266,11 +270,31 @@ with the step:
 
 <!-- the form is list -->
 
+- [[spec/tickets/one-urgency-stands]]: urgency becomes one boolean mark, owned by `group.js`
+- [[spec/tickets/the-listing-opens-git-once]]: the listing asks git three times, whatever the remote holds
+- [[spec/tickets/the-queue-is-a-score]]: one decider orders the queue, and the config weighs its terms
+- [[spec/tickets/the-runtime-folder-holds-state]]: the index rebuilds off its own age, and reads the private half
+- [[spec/tickets/the-work-answer-lands]]: `branch answer` writes what git knows into one file
+- [[spec/tickets/the-work-tab-draws]]: the work tab draws every ticket, nested under its group
+- [[spec/tickets/the-tree-sorts-several-keys]]: the tree sorts on a list of keys
+- [[spec/tickets/a-preset-carries-its-sort]]: a preset carries a filter and a sort
+- [[spec/tickets/the-cell-fill-takes-marks]]: a fill over marks reaches the marked rows alone
+- [[spec/tickets/the-flags-draw-as-letters]]: one column draws the flags as letters
+- the log moves out of the runtime half, where the retro collects it
+- `branch test` runs a changed Go test beside the JavaScript
+- a fail runs its commands for the record, and none of them refuses it
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- the route holds each ticket to a green check, so nothing half-done lands
+- the write door names the rule it refuses, so a rewrite takes one pass
+- the group's own listing names the defect the split covers, on the first take
+- every ticket carries its own test, so a later hand reads what it holds
+- the ask of each child names its acceptance, so the work has an end
 
 ### badly
 
@@ -278,11 +302,25 @@ with the step:
 
 <!-- the form is list -->
 
+- the first `branch take` falls over, because the push door spawns `vale` off the PATH
+- the children name their group as a branch, so the engine passes their step untouched
+- the index binary stands older than its source, so the private half reads empty
+- the log stands inside the runtime half, so every retro before this reads no log
+- a hand holding a group takes no note, so the drain refuses the step asking for it
+- a fail runs the step's commands, so a step standing red stands unfailable
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
+
+- [[spec/tickets/group-key-takes-one-spelling]] holds the group key to one spelling
+- [[spec/tickets/runtime-half-takes-the-rest]] moves the rest of the engine's state
+- `install.sh` rebuilds `se-index` where its source stands newer, as the server does
+- `log.js` names the log outside the runtime half, and `folders.test.js` holds it there
+- `pull.js` runs a fail's commands for the record alone
+- the survey wants a road for a tool the install puts somewhere new
 
 ### thoughts
 
@@ -290,11 +328,25 @@ with the step:
 
 <!-- the form is text -->
 
+The route holds a step nothing passes on its own, and the tag is the way
+through. A hand holding a group takes no other ticket, and that group's retro
+asks the same hand to decide its notes. Nothing on the route names the tag, so
+the way through reads like a trick a hand has to know.
+
+- the settle step reads like a person's job, and it takes an answer from this hand
+- each refusal names its line, so a wrong sentence comes back before a reader meets it
+
+That last line is what lands the work.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact stands in one place: each chapter names its rule once, and the code points at it
+- every number carries a name: the weights stand in the config, and the caps in named constants
+- every header says what its file is for: the new files open with what they hold, and count nothing
 
 ## cloud
 
