@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/tests-green
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -151,6 +151,17 @@ record:
       - name: lint
         exit: 0
         said: The rules pass.
+  - step: implement/tests-green
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 443427ee3fe468668f330a4a3d9a937bd43d55c7
+    hash_after: 443427ee3fe468668f330a4a3d9a937bd43d55c7
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 8 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: 83 stand at warning, which the panel draws and check allows.
 group: the-warnings-feed-a-refactorer
 ---
 
@@ -387,11 +398,15 @@ drives the exit code.
 
 <!-- the form is command -->
 
+./RUNME.sh branch test
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
@@ -399,11 +414,41 @@ drives the exit code.
 
 <!-- the form is text -->
 
+A verdict hand keeps its pass while a sibling hand commits beside it. Both
+guards read the commits between the hold's tip and the branch tip, in place of
+the tip alone.
+
+| the guard | what it reads |
+|---|---|
+| `handFaults`, on a verdict leaf | it refuses where a commit in that range names this ticket |
+| `changedSince`, under the `read` field | it takes the files under this ticket's commits |
+
+`commitsFor` in `src/scripts/pull-writes.js` answers the split. `landed` commits
+as `<ticket>: <what>`, so the name before the first colon says whose commit it
+is, and what follows names children and successors.
+
+**What the working tree does.** A tree names no hand, and a sibling writes into
+the one this hand shares.
+
+| where the tip stands | what the span takes |
+|---|---|
+| at the hold's tip | this ticket's commits, and the tree |
+| past it, which says a sibling writes here | this ticket's commits alone |
+
+**What stands outside it.** A hand committing past the verbs writes its own
+subject, and the guard reads the subject alone. A log the git door fails to read
+answers `read: false`, which every caller takes as a move, so a failure refuses
+as it does today.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the two files the ask names, and one test file of its own
+- the git door has a fake, and the cases teach it every call the guards run
+- a comment beside `commitsFor` names the approach, and points at this ticket
 
 # verdict
 

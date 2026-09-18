@@ -6,7 +6,7 @@ urgency: now
 
 # Where it stands
 
-The group [[spec/tickets/the-warnings-feed-a-refactorer]] closes done, and the owner's rule lands beside it: a cloud box answers every question it meets, and hands none out.
+The group [[spec/tickets/the-warnings-feed-a-refactorer]] closes done. The owner's rule lands beside it: a cloud box answers every question it meets, and hands none out.
 
 | child | how it closes |
 |---|---|
