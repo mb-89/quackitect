@@ -51,3 +51,10 @@ A sweep of every file under `.se/log` turned this up. The line `the server answe
 | `remote-cancel` | 2 | the host cancelled the fetch as the turn ended, and the server was fine |
 
 The same sweep shows the watcher restarting the server five times in 70 seconds while one file took five writes. Each restart stands in the log at info, and the events landing in that window take the restart's gap.
+
+| what trunk carries | where it stands |
+|---|---|
+| the kept socket and the header wait, off two named spans | `src/doors/wire.js` |
+| both spans held against a real socket | `test/contract/wire.test.js` |
+
+The idle span stands past any gap a turn leaves between two events. A hand taking this ticket reads the diff and closes it, or names what it misses.
