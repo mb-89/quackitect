@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 step: verdict
 steps:
@@ -191,7 +191,12 @@ record:
       - name: check
         exit: 0
         said: 83 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box dd2a59294365 · claude-code-remote · helper-16
+    hash_before: 792cba36dd351cdbbcbc4332792e3d78e9afe4c7
+    hash_after: 792cba36dd351cdbbcbc4332792e3d78e9afe4c7
 group: the-warnings-feed-a-refactorer
+reason: done
 ---
 
 # Ask
@@ -515,10 +520,11 @@ function answering the split.
 - spec/design_input/the-agent-pulls-tickets.md
 - spec/design_output/pull.md
 - spec/guidance/review/reviewing.md
+- spec/schemas/design_input.schema.yaml
 - spec/tickets/the-verdict-guard-reads-tips.md
+- src/scripts/landed.js
 - src/scripts/pull-chapter.js
 - src/scripts/pull-writes.js
-- src/scripts/test-verb.js
 - test/level0/verdict-guard.test.js
 
 ## verdict
@@ -527,20 +533,19 @@ function answering the split.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- `spec/design_output/pull.md`, under The hand rule, still says a verdict hand-back refuses where the tip moves. Write what `handFaults` reads.
-- `spec/design_output/pull.md`, the `files` row, still says the field holds every file the branch changes. Write the span `changedSince` answers.
-- Both rows point at `commitsFor`, under `src/scripts/pull-writes.js`, which owns the split.
-
-What holds:
-
-- `handFaults` refuses this ticket's own commit, and takes a sibling's
-- the diff touches the files the ask names, a test file, and one prose line
-- `./RUNME.sh check` answers exit 0 on this commit
-- each rule the branch adds carries a case
-- a case feeds each rule something bad: this ticket's commit, and a failed log
-- `HANDOVER.md` carries no retro, and the `says` field carries what changes
+- The hand rule now reads the commits between the take and the tip, and refuses one naming this ticket.
+- The `files` row now says the span `changedSince` answers, and points at `commitsFor`.
+- `handFaults` takes a sibling's commit, and refuses one whose prefix names this ticket.
+- `changedSince` spans this ticket's commits, and rides the tree while the tip stands at the hold's.
+- A failed log answers `read` false, which every caller takes as a move. So the guard refuses, as it does today.
+- `landed` commits as `<ticket>: <what>`, so `ticketIn` reads the name the guard wants.
+- The diff touches the two files the ask names, the note, a test file, and one prose line.
+- Each rule the branch adds carries a case. One feeds it this ticket's commit, and one a failed log.
+- `./RUNME.sh check` answers exit 0, and `./RUNME.sh branch test` answers green.
+- `HANDOVER.md` carries a retro under What surprises me, and a row on this ticket.
+- `spec/design_input/the-agent-pulls-tickets.md` keeps the wording it stood on. A design input holds the owner's ask, which the design output refines.
 
 ## checked
 
@@ -548,7 +553,7 @@ What holds:
 
 <!-- the form is checklist -->
 
-- the code states the fact once, beside `commitsFor`, and each comment points here. The rows the findings name still state the fact it replaces.
+- `commitsFor` states the split once, and its comment names the approach. Each row of the note points at it in place of restating it.
 
 # Discussion
 
