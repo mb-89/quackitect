@@ -202,7 +202,11 @@ record:
     hand: box 596a811abe2e · claude-code-remote
     hash_before: 331a0181f577c85ff2848ac1cf3e29c622ade67f
     hash_after: 331a0181f577c85ff2848ac1cf3e29c622ade67f
-step: retro/cloud
+  - step: retro/cloud
+    hand: box 596a811abe2e · claude-code-remote
+    hash_before: 8e994690f988cfb00bc9ee371f39dbcb9f4510f3
+    hash_after: 8e994690f988cfb00bc9ee371f39dbcb9f4510f3
+step: children
 ---
 
 # Ask
@@ -334,9 +338,10 @@ The group's whole remaining work sits behind one person step. Every box the sche
 
 <!-- the form is list -->
 
+- the node registry, which answers a gateway error, so the box points the install at a mirror, at the install
+- the module proxy the index build reads, which answers the same, so the index stays unbuilt, at the install
 - `mcp__level0__patch` and `mcp__level0__replace`, which the guidance names for a many-line write, at the retro write
 - `check_answer`, which the guidance names over a long draft, at this answer
-- the install runs whole at the take, and the proxy refuses no host
 
 ### met
 
@@ -344,6 +349,7 @@ The group's whole remaining work sits behind one person step. Every box the sche
 
 <!-- the form is list -->
 
+- the install door, which holds the modules as a need, so one refusing host stops every verb
 - the person step on [[spec/tickets/the-pull-splits-by-topic]], which leaves the children step again
 - the voice rules, which hold a retro in the present tense, and which the lint answers clean
 - the write door, which a shell write walks past, so the lint alone carries the check
@@ -356,10 +362,10 @@ The group's whole remaining work sits behind one person step. Every box the sche
 
 - [[spec/tickets/the-pull-splits-by-topic]] waits at design/person-1, and its record holds the question the engine asks
 - the split of the pull and the work verb waits behind that person step
+- the mirror this box names stands in its own home folder, and the tree carries no pointer to it
 - this box mints no ticket, so none stands here without a group
 - the branch owes its handover at done, and this retro is what it carries
 - the group's discussion names what a person decides, each with the moment it shows
-
 
 # Discussion
 
