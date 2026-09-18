@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box a5e189c39e1d · claude-code-remote
@@ -102,6 +102,10 @@ record:
     hash_after: 81a9b54a1f1379a9fe003f4b34e80cb0b96325c9
     returns: 1
     why: The runtime list names five things, and the private folder holds more kinds. Name the rule that places a kind neither list names.; `.se/review` holds a git worktree, a second checkout of this tree. Put it in the runtime folder. Otherwise the rows carry every tracked file twice.; `.se/undo` holds both halves of every file an apply writes. Put it in the runtime folder. Otherwise a word standing in a note alone comes back from the journal too.; `.se/bin` holds the built binaries. The walk reads and hashes each one on every pass. Put it in the runtime folder.; The `Grep` and `Glob` doors answer off the same rows. A row under the worktree sends a reader to the wrong copy.; The rest of the approach answers the ask. The two named folders and the module owning the names stand.; The path-relative skip is right. The walk today matches a folder on its base name alone.
+  - step: design/draft
+    hand: box a5e189c39e1d · claude-code-remote
+    hash_before: 5c26710f455cf8656f6a01aa23ecda4454b0a5c5
+    hash_after: 5c26710f455cf8656f6a01aa23ecda4454b0a5c5
 ---
 
 # Ask
@@ -142,13 +146,25 @@ place. The folder a file stands in says which kind it is.
 One module owns the two names. Every writer takes its folder from there. A
 reader finds the rule in one place, and a later kind lands beside it.
 
-The runtime folder takes the files dying with the box, one to a line:
+One question places a file the three kinds leave open: does a reader ask after
+this file once the box dies? A yes puts it in the rest, and a no puts it in the
+runtime folder. The retro folder takes what a retro writes and reads back.
 
-- the index rows
-- the tools survey
-- the log
-- the hold
-- the box's own record
+So the runtime folder takes these, and a later one answering no joins them:
+
+| what | why it stands there |
+|---|---|
+| `.se/review` | a git worktree, so the walk reads every tracked file a second time |
+| `.se/undo` | both halves of every file an apply writes, so a word comes back off the journal |
+| `.se/bin` | the built binaries, which the walk reads and hashes on every pass |
+| `.se/index.db` | the rows themselves, which move under every question |
+| `.se/log` | the box's log |
+| `.se/hold` | the hold a step carries |
+| `.se/tools.json` | where each tool stands on this box |
+| `.se/box.json` | the box's own record |
+
+The worktree matters most. `Grep` and `Glob` answer off the same rows, so a row
+under it sends a reader to the wrong copy of a file.
 
 The rest keeps the notes, the handover and the private tickets. A reader asks
 after each of them.
