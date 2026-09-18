@@ -239,7 +239,7 @@ test("a plain biome path on Windows is refused", () => {
   const found = biomeOnWindows(
     fakeTree({
       [EDITOR_SETTINGS]: edited(EDITOR_SETTINGS, (said) => {
-        said["biome.lsp.bin"]["win32-x64"] = ".se/bin/biome";
+        said["biome.lsp.bin"]["win32-x64"] = ".se/run/bin/biome";
       }),
     }),
   );

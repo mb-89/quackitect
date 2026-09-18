@@ -3,11 +3,13 @@
 // a moved hash hands them again.
 // [[spec/design_output/pull#the-work-answer]]
 
+import { inRun } from "../../.claude/skills/level0/lib/folders.js";
+
 import { actionables, bindsHere } from "../../.claude/skills/level0/lib/guidance.js";
 import { hashOf } from "../../.claude/skills/level0/lib/schema.js";
 import { agentOf, BOX, handOf } from "./hand.js";
 
-export const HOLDS = ".se/hold";
+export const HOLDS = inRun("hold");
 export const GUIDANCE = "spec/guidance";
 const MARKDOWN = /\.md$/;
 const DRAFT = /^_/;

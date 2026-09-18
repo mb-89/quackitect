@@ -10,7 +10,7 @@ const { toastsOf } = require("./lib/states.js");
 const VIEW = "quackitect.sidebar";
 const HERE = "quackitect.here";
 const REST = "quackitect.rest";
-const SHOW = ".se/show-panel";
+const SHOW = ".se/run/show-panel";
 
 async function activate(context, given) {
   const door = given ?? require("./editor.js").editorDoor(context);

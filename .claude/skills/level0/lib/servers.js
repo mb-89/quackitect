@@ -3,6 +3,8 @@
 // breach as they type and the agent meets the same rule at the write.
 // [[spec/design_output/editor#what-the-editor-runs]]
 
+import { BIN } from "./tools.js";
+
 export const VALE_LS_VERSION = "0.5.1";
 export const VALE_LS_RELEASES = "https://github.com/vale-cli/vale-ls/releases/download";
 
@@ -37,10 +39,10 @@ export function namesTheBinaries(settings) {
   const biome = read["biome.lsp.bin"] ?? {};
   const paths = typeof biome === "string" ? [biome] : Object.values(biome);
   return {
-    vale: read["vale.valeCLI.path"] === ".se/bin/vale",
+    vale: read["vale.valeCLI.path"] === `${BIN}/vale`,
     valeConfig: read["vale.valeCLI.config"] === ".vale.ini",
     managesVale: read["vale.valeCLI.installVale"] === false,
-    biome: paths.length > 0 && paths.every((one) => one.startsWith(".se/bin/biome")),
+    biome: paths.length > 0 && paths.every((one) => one.startsWith(`${BIN}/biome`)),
     biomeConfig: read["biome.configurationPath"] === "spec/config/biome.json",
   };
 }

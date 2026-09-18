@@ -50,7 +50,18 @@ CREATE VIRTUAL TABLE IF NOT EXISTS line_text USING fts5 (path UNINDEXED, n UNIND
 const version = "2"
 
 var skipped = map[string]bool{
-	".git": true, ".se": true, "node_modules": true, ".claude-plugin": true,
+	".git": true, "node_modules": true, ".claude-plugin": true,
+}
+
+// [[spec/design_input/the-runtime-files-stand-apart]]
+const Runtime = ".se/run"
+
+func skips(root, abs string, info os.FileInfo) bool {
+	if skipped[info.Name()] {
+		return true
+	}
+	rel, ok := relOf(root, abs)
+	return ok && rel == Runtime
 }
 
 func Open(root, at string) (*sql.DB, error) {
@@ -131,7 +142,7 @@ func Reindex(db *sql.DB, root string) (int, error) {
 			return nil // a file that went while the walk ran is no fault of the walk
 		}
 		if info.IsDir() {
-			if skipped[info.Name()] {
+			if skips(root, abs, info) {
 				return filepath.SkipDir
 			}
 			return nil

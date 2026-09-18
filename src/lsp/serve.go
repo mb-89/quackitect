@@ -1,5 +1,5 @@
 // The resident server on a loopback port. It writes where it stands into
-// .se/lsp.json, the way the index door writes .se/index.json, so a second
+// the standing file, the way the index door writes its own, so a second
 // caller finds the first server and a stale file gives way.
 // [[spec/design_output/lsp#the-port-and-the-standing-file]]
 package main
@@ -49,7 +49,7 @@ type door struct {
 }
 
 func standingPath(root string) string {
-	return filepath.Join(root, ".se", "lsp.json")
+	return filepath.Join(root, ".se", "run", "lsp.json")
 }
 
 // [[spec/design_output/lsp#the-port-and-the-standing-file]]

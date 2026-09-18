@@ -99,7 +99,7 @@ test("a cloud box starts the server, and the call comes back before it stands", 
     assert.equal(reasonOf(said.exitCode)[0], "info");
     assert.equal(waitsFor(join(where, MARKER)), true, "the server ran on its own");
     assert.equal(
-      files.exists(join(where, ".se", "log")),
+      files.exists(join(where, ".se", "run", "log")),
       true,
       "the log folder stands for the server to write into",
     );

@@ -4,6 +4,8 @@
 // the branches, and this verb holds the tickets.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 
+import { inRun, PRIVATE } from "../../.claude/skills/level0/lib/folders.js";
+
 import { overLong } from "../../.claude/skills/level0/lib/names.js";
 import {
   entriesIn,
@@ -17,9 +19,9 @@ import { askFaults, askRefusal } from "./ask-lint.js";
 import { fieldOf, GROUP, withField, withoutField } from "./group.js";
 import { askRows, processAt } from "./process.js";
 
-export const NOTES = ".se/tickets";
-export const HOLD = ".se/hold.json";
-export const HOLDS = ".se/hold";
+export const NOTES = `${PRIVATE}/tickets`;
+export const HOLD = inRun("hold.json");
+export const HOLDS = inRun("hold");
 export const NOTE = "note";
 const TRAVELS = "spec/tickets";
 const SCHEMAS = "spec/schemas";

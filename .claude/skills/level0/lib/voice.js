@@ -3,8 +3,9 @@
 // takes rows and answers rows, so a test drives it over a fixture.
 // [[spec/funnel/a-paragraph-has-a-schema]]
 
-export const MEASURED = ".se/measure";
-export const LOGS = ".se/log";
+import { inRun } from "./folders.js";
+
+export const MEASURED = inRun("measure");
 export const SHORTEST = 25;
 export const DAYS = 7;
 export const ANSWER = "answer.md";

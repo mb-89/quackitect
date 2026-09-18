@@ -3,7 +3,7 @@
 // reads them on every platform and the door alone touches vscode.
 // [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
 
-const BIN = ".se/bin";
+const BIN = ".se/run/bin";
 const NAME = "se-lsp";
 const ID = "quackitect";
 

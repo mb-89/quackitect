@@ -9,7 +9,18 @@
 
 set -eu
 root=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
-bin="$root/.se/bin"
+bin="$root/.se/run/bin"
+
+# The runtime files moved under their own folder, and a box carrying the old
+# places would hand them to the index walk. [[spec/design_input/the-runtime-files-stand-apart]]
+mkdir -p "$root/.se/run"
+for one in bin log hold review undo measure copilot box.json session.json \
+  tools.json hold.json check.json index.db index.json lsp.json copilot-cloud \
+  show-panel; do
+  old="$root/.se/$one"
+  [ -d "$old" ] || [ -f "$old" ] || continue
+  mv "$old" "$root/.se/run/$one" 2>/dev/null || rm -rf "$old"
+done
 
 # Pinned, so every box builds the same tree. Vale ships a binary for each
 # platform, so nothing here compiles and no C toolchain is needed.
@@ -425,9 +436,9 @@ fi
 
 # The survey names where each tool stands, and every caller reads it in place
 # of guessing. It runs where anything landed, and where the file is absent.
-if [ -n "$missing" ] || [ ! -f "$root/.se/tools.json" ]; then
+if [ -n "$missing" ] || [ ! -f "$root/.se/run/tools.json" ]; then
   (cd "$root" && node src/scripts/cli.js tools >/dev/null) ||
-    say "  the survey wrote no .se/tools.json, so every caller guesses again." >&2
+    say "  the survey wrote no .se/run/tools.json, so every caller guesses again." >&2
 fi
 
 node "$root/src/scripts/copilot.js" setup auto

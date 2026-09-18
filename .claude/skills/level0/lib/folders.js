@@ -17,8 +17,6 @@ export function inRun(name) {
   return `${RUN}/${name}`;
 }
 
-// The runtime half answers on the path the root holds, because a folder named
-// run stands elsewhere in the tree and a skip on a name alone reaches it.
 // [[spec/design_input/the-runtime-files-stand-apart]]
 export function runs(path) {
   const said = String(path ?? "")

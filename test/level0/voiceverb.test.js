@@ -10,7 +10,7 @@ import { fakeProc } from "../../src/doors/fake/proc.js";
 import { voice } from "../../src/scripts/voice.js";
 
 const ROOT = "/tree";
-const BIN = "/tree/.se/bin/vale";
+const BIN = "/tree/.se/run/bin/vale";
 const TEN = "one two three four five six seven eight nine ten";
 
 const valeArgv = (folder) =>
@@ -82,7 +82,7 @@ test("a fixture transcript yields its answers as files", async () => {
   ].join("\n");
 
   const disk = fakeDisk({ [`${ROOT}/logs/sess.jsonl`]: rows, [BIN]: "" });
-  const proc = fakeProc({ [valeArgv(".se/measure")]: { stdout: "{}" } });
+  const proc = fakeProc({ [valeArgv(".se/run/measure")]: { stdout: "{}" } });
 
   const out = await said(() =>
     voice(
@@ -95,16 +95,16 @@ test("a fixture transcript yields its answers as files", async () => {
 
   assert.equal(out.code, 0);
   assert.equal(
-    disk.read(`${ROOT}/.se/measure/sess/001-answer.md`),
+    disk.read(`${ROOT}/.se/run/measure/sess/001-answer.md`),
     `${TEN} ${TEN} ${TEN}\n`,
     "the answer lands under a name the answer register reads",
   );
   assert.equal(
-    disk.exists(`${ROOT}/.se/measure/sess/002-answer.md`),
+    disk.exists(`${ROOT}/.se/run/measure/sess/002-answer.md`),
     false,
     "the sidechain and the user turn write nothing",
   );
-  assert.match(out.text, /^1 answer\(s\) under \.se\/measure\.$/m);
+  assert.match(out.text, /^1 answer\(s\) under \.se\/run\/measure\.$/m);
   assert.match(out.text, /^TOTAL\s+30\s+0\s+0\.0$/m);
 });
 
@@ -129,7 +129,7 @@ test("a fixture log ranks its rows in the order this case names", async () => {
     row("2026-09-11T00:00:00.000Z", { said: "this row names no rule" }),
   ].join("\n");
 
-  const disk = fakeDisk({ [`${ROOT}/.se/log/session.jsonl`]: rows });
+  const disk = fakeDisk({ [`${ROOT}/.se/run/log/session.jsonl`]: rows });
   const clock = fakeClock("2026-09-12T00:00:00.000Z");
 
   const out = await said(() =>
@@ -151,7 +151,7 @@ test("a wider day count reaches the row the week leaves out", async () => {
     rule: "VoiceVale.Passive",
     phrase: "old",
   });
-  const disk = fakeDisk({ [`${ROOT}/.se/log/old/one.jsonl`]: rows });
+  const disk = fakeDisk({ [`${ROOT}/.se/run/log/old/one.jsonl`]: rows });
   const clock = fakeClock("2026-09-12T00:00:00.000Z");
   const doors = { disk, clock, proc: fakeProc({}) };
 

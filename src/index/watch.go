@@ -16,7 +16,7 @@ func watches(root string, one *door) (*fsnotify.Watcher, error) {
 		return nil, err
 	}
 
-	if err := folders(root, eyes); err != nil {
+	if err := folders(root, root, eyes); err != nil {
 		eyes.Close()
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func watches(root string, one *door) (*fsnotify.Watcher, error) {
 				}
 				if said.Op&fsnotify.Create != 0 {
 					if info, err := os.Stat(said.Name); err == nil && info.IsDir() {
-						folders(said.Name, eyes)
+						folders(root, said.Name, eyes)
 					}
 				}
 				one.Touched()
@@ -44,12 +44,12 @@ func watches(root string, one *door) (*fsnotify.Watcher, error) {
 	return eyes, nil
 }
 
-func folders(from string, eyes *fsnotify.Watcher) error {
+func folders(root, from string, eyes *fsnotify.Watcher) error {
 	return filepath.Walk(from, func(abs string, info os.FileInfo, err error) error {
 		if err != nil || !info.IsDir() {
 			return nil
 		}
-		if skipped[info.Name()] {
+		if skips(root, abs, info) {
 			return filepath.SkipDir
 		}
 		return eyes.Add(abs)

@@ -17,7 +17,7 @@ func tree(t *testing.T) string {
 	write(t, root, "spec/two.md", "---\nkind: note\nid: two\n---\n\nThe second note names [[nobody]] at all.\n")
 	write(t, root, "src/plain.js", "// a line the search finds\nconst said = 1;\n")
 	write(t, root, ".se/run/skipped.md", "---\nid: skipped\n---\n\nThis never reaches the index.\n")
-	write(t, root, ".se/tickets/parked.md", "---\nid: parked\n---\n\nA private note the walk reads: marzipan.\n")
+	write(t, root, ".se/tickets/parked.md", "---\nid: parked\n---\n\nA word standing under the private folder alone: marzipan.\n")
 	return root
 }
 

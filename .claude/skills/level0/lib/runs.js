@@ -2,7 +2,9 @@
 // against, and `branch done` reads that stamp, where it once read a claim.
 // [[spec/design_output/work#the-battery-answers-first]]
 
-export const STAMP = ".se/check.json";
+import { inRun } from "./folders.js";
+
+export const STAMP = inRun("check.json");
 const SHORT_SHA = 8;
 
 export function shortOf(sha) {

@@ -292,11 +292,17 @@ What surprises me:
 
 <!-- the form is command -->
 
+./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: each one names a path under the private folder
+- every door the change reaches has a fake: the change moves constants, and each door keeps its own
+- a comment names the approach: every moved constant reads the module, whose header points at the design input
 
 ## tests-green
 

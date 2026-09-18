@@ -160,8 +160,8 @@ const (
 	ValeIni  = ".vale.ini"
 	Settings = ".vscode/settings.json"
 	Offered  = ".vscode/extensions.json"
-	ToolsAt  = ".se/tools.json"
-	Bin      = ".se/bin"
+	ToolsAt  = ".se/run/tools.json"
+	Bin      = ".se/run/bin"
 )
 
 // [[spec/design_output/editor#what-the-editor-runs]]

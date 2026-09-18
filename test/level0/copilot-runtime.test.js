@@ -13,15 +13,15 @@ function fixture() {
   const root = "/tree";
   const disk = fakeDisk({
     "/tree/spec/config/biome.json": "{}",
-    "/tree/.se/bin/vale": "",
-    "/tree/.se/bin/biome": "",
+    "/tree/.se/run/bin/vale": "",
+    "/tree/.se/run/bin/biome": "",
     "/tree/spec/guidance/voice.md":
       "# Actionables\n\n1. Write clearly.\n2. Keep it short.\n",
     "/tree/HANDOVER.md": "Do the work.",
   });
   const proc = fakeProc({
     "git rev-parse --abbrev-ref HEAD": { stdout: "work/example\n" },
-    "/tree/.se/bin/vale"(_argv, init) {
+    "/tree/.se/run/bin/vale"(_argv, init) {
       if (init.stdin?.includes("bad prose"))
         return {
           exitCode: 0,
@@ -38,7 +38,7 @@ function fixture() {
         };
       return { exitCode: 0, stdout: "{}", stderr: "" };
     },
-    "/tree/.se/bin/biome"(argv) {
+    "/tree/.se/run/bin/biome"(argv) {
       if (argv[1] === "format") return { stdout: "const value = 1;\n" };
       assert.equal(argv[1], "lint");
       return { stdout: '{"diagnostics":[]}' };
@@ -119,8 +119,8 @@ test("a session can write its local handover and other SE files", async () => {
   );
   it.disk.write("/tree/.se/HANDOVER.md", "Result and retro.");
   it.disk.write("/tree/HANDOVER.md", "Result and retro.");
-  assert.deepEqual(await handle(create(".se/copilot/state.json", "{}"), it), {});
-  assert.deepEqual(await handle(create(".se/bin/vale", "replacement"), it), {});
+  assert.deepEqual(await handle(create(".se/run/copilot/state.json", "{}"), it), {});
+  assert.deepEqual(await handle(create(".se/run/bin/vale", "replacement"), it), {});
   assert.match(
     (await handle(create(".se/HANDOVER.md", "bad prose"), it)).deny,
     /fewer words/,
@@ -321,9 +321,9 @@ test("a hold standing drops its step's note from the layer the runtime hands", a
     "/tree/spec/guidance/working.md",
     "# Actionables\n\n1. Answer first.\n",
   );
-  it.disk.write("/tree/.se/box.json", JSON.stringify({ id: "d462e994b4cef" }));
+  it.disk.write("/tree/.se/run/box.json", JSON.stringify({ id: "d462e994b4cef" }));
   it.disk.write(
-    "/tree/.se/hold/box-d462e994b4cef-claude-code.json",
+    "/tree/.se/run/hold/box-d462e994b4cef-claude-code.json",
     JSON.stringify({
       ticket: "a-child",
       step: "design/draft",

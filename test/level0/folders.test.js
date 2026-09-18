@@ -46,7 +46,6 @@ test("the runtime half answers on the path the root holds, not on a folder's bas
   assert.equal(runs(""), false);
 });
 
-// The eight the approach places in the runtime half, each read off its writer.
 // [[spec/tickets/the-runtime-files-stand-apart]]
 test("every runtime writer names its folder under the runtime half", () => {
   assert.deepEqual(

@@ -6,9 +6,9 @@
 // The port base of [[spec/design_output/vehicle#the-register-holds-the-port]], held again here because this hook imports nothing.
 const PORT = 6510;
 const POINTER = ".se/vehicle.json";
-const SESSION = ".se/log/session.jsonl";
+const SESSION = ".se/run/log/session.jsonl";
 // The hand's session file of [[spec/design_output/pull#the-hand-and-the-hold]], spelled again here because this hook imports nothing.
-const HAND_FILE = ".se/session.json";
+const HAND_FILE = ".se/run/session.json";
 const COMPACT = "session.compact";
 const LIMIT = 4_000_000;
 const SHORT = 4000;
@@ -33,8 +33,8 @@ export const START = [
   "if (!process.env.CLAUDE_CODE_REMOTE && !process.env.SE_CLOUD) process.exit(3);",
   "if (!existsSync(method)) process.exit(4);",
   "if (!existsSync(method + '/node_modules')) process.exit(6);",
-  "mkdirSync(here + '/.se/log', { recursive: true });",
-  "const out = openSync(here + '/.se/log/serve.log', 'a');",
+  "mkdirSync(here + '/.se/run/log', { recursive: true });",
+  "const out = openSync(here + '/.se/run/log/serve.log', 'a');",
   "const argv = [method + '/src/bridge/server.js', method];",
   "const born = spawn(process.execPath, argv, { cwd: method, detached: true, stdio: ['ignore', out, out], windowsHide: true });",
   "born.unref();",
