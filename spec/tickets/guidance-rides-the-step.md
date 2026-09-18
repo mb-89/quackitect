@@ -248,7 +248,11 @@ record:
     hand: box 7ba446c2fed1 · claude-code-remote
     hash_before: fddac54a3c627c535537dea9bb44a6ef1be06156
     hash_after: fddac54a3c627c535537dea9bb44a6ef1be06156
-step: retro/cloud
+  - step: retro/cloud
+    hand: box 7ba446c2fed1 · claude-code-remote
+    hash_before: 1f1613c87a1e3bdb397cdf2a0df85368f3aec4c6
+    hash_after: 1f1613c87a1e3bdb397cdf2a0df85368f3aec4c6
+step: children
 ---
 
 # Ask
@@ -408,8 +412,7 @@ The group's remaining work stands behind one person step, so this box spends its
 - the split of the pull and the work verb waits behind that person step
 - this box mints no ticket, so none stands here without a group
 - the branch owes its handover at done, and this retro is what it carries
-- the group's discussion names what a person decides, each with the moment it shows
-- the owner carries a notification naming that person step, so the decision reaches them off the branch
+- the owner carries a notification naming that person step, and the findings its question holds
 
 # Discussion
 
