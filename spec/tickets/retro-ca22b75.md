@@ -182,7 +182,7 @@ steps:
       - name: groups
         form: list
         says: one line per ticket, with its group and its urgency
-step: mine/tickets
+step: mine/worker
 process: [[spec/processes/retro]]
 process_hash: 61a2bb140f0b4632
 record:
@@ -238,6 +238,10 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: a07df9b295739da46d1f8e0de23a0183c466bb88
     hash_after: a07df9b295739da46d1f8e0de23a0183c466bb88
+  - step: mine/tickets
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: dea6b8b4ea7338a51a32621b3ea84bf69d47f1e4
+    hash_after: dea6b8b4ea7338a51a32621b3ea84bf69d47f1e4
 ---
 
 # Ask
@@ -422,19 +426,25 @@ So the improve step mints one ticket for the four lines the guidance wants, and 
 
 ### returns
 
-<!-- the steps that fail back or meet refused most, per process, with counts -->
+- 94 tickets close in this window: 78 done and 16 became. No ticket closes dropped.
+- the standard process returns most at implement/reflect, which a verdict sends back.
+- the group process returns at split, where the children fail back from the children step.
 
 <!-- the form is list -->
 
 ### people
 
-<!-- what the person steps ask, and how long each waits -->
+- 33 person steps stand across the closed tickets, and the record names a wait on each.
+- the question process opens this window, and it is the road a successor takes off a person step.
+- the longest wait is a whole night: five cloud boxes reach a person step and leave.
 
 <!-- the form is list -->
 
 ### skips
 
-<!-- what the conditions skip, and whether rightly -->
+The records carry 69 skips, and the condition is the cloud on almost all of them. A desk run skips sync and retro/cloud every time.
+
+That reads rightly: both steps name work a cloud box does. A desk hand skipping them loses nothing the tree wants.
 
 <!-- the form is text -->
 
