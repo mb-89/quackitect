@@ -92,12 +92,18 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box dd2a59294365 · claude-code-remote
     hash_before: e57e5cc551b18d6c44ea86dbfbc9e030cc3eca46
     hash_after: e57e5cc551b18d6c44ea86dbfbc9e030cc3eca46
+  - step: design/review
+    hand: box dd2a59294365 · claude-code-remote · helper-2
+    hash_before: 9f5de1e36173176d7bf67664279cadd59b1e4564
+    hash_after: 9f5de1e36173176d7bf67664279cadd59b1e4564
+    returns: 1
+    why: "`MagicNumber` and `Schema.Placeholder` read `warning` today, so the claim that every rule reads `error` fails.; Warnings stand today under `./RUNME.sh check`, so a push door refusing on one refuses every push.; The approach names `src/scripts/prepush.js` alone, and the session push door in `src/bridge/bash.js` stands unnamed.; The generated `level` line comes from `.claude/skills/level0/lib/paragraph.js` and `snippets.js`, which the approach leaves out.; `spec/schemas/paragraph.schema.yaml` holds layers, and the projection writes many rules a layer, so a field a rule needs a new key.; Rules under `VoiceVale`, `VoiceShape` and `VoiceScript` carry no `level` line today, so Vale reads them at its default.; The approach writes `lib/tree.js`, and the file stands at `.claude/skills/level0/lib/tree.js`.; A write the door refuses at `error` still records its warnings, so the record describes text no file holds.; `voiceDoor` stands last in `src/bridge/write.js`, so an earlier door's refusal records nothing."
 ---
 
 # Ask
@@ -181,6 +187,18 @@ Vale's `level` is the side for a Vale rule, so no second field stands beside it.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- `MagicNumber` and `Schema.Placeholder` read `warning` today, so the claim that every rule reads `error` fails.
+- Warnings stand today under `./RUNME.sh check`, so a push door refusing on one refuses every push.
+- The approach names `src/scripts/prepush.js` alone, and the session push door in `src/bridge/bash.js` stands unnamed.
+- The generated `level` line comes from `.claude/skills/level0/lib/paragraph.js` and `snippets.js`, which the approach leaves out.
+- `spec/schemas/paragraph.schema.yaml` holds layers, and the projection writes many rules a layer, so a field a rule needs a new key.
+- Rules under `VoiceVale`, `VoiceShape` and `VoiceScript` carry no `level` line today, so Vale reads them at its default.
+- The approach writes `lib/tree.js`, and the file stands at `.claude/skills/level0/lib/tree.js`.
+- A write the door refuses at `error` still records its warnings, so the record describes text no file holds.
+- `voiceDoor` stands last in `src/bridge/write.js`, so an earlier door's refusal records nothing.
 
 # implement
 
