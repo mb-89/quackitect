@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/tests-green
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -201,6 +201,17 @@ record:
     hash_after: e91cccb406ef117aa664d39972ac8e000e2912f0
     answered:
       - name: lint
+        exit: 0
+        said: 73 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 13684ade9066ca1d28d89be3935bda84229e6201
+    hash_after: 13684ade9066ca1d28d89be3935bda84229e6201
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 7 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: 73 stand at warning, which the panel draws and check allows.
 group: the-retro-runs
@@ -460,8 +471,21 @@ The binary fault is the same move one layer down. The disk door reads and writes
 | the verb itself | `src/scripts/retro-collect.js` |
 | the verb table, so the retro route reads the need | `src/scripts/pull-route.js` |
 | the dispatch beside the note drain | `src/scripts/retro.js` |
+| a copy carrying bytes, and the size a manifest names | `src/doors/disk.js` and its fake |
+| the one reader answering whether a hand holds a step | `src/scripts/guidance-hand.js` |
+| that reader in place of the ticket verb's own | `src/scripts/ticket.js` |
 
 The verb reads the disk through its door alone, so a case drives it in memory. It copies and removes nothing, and it writes the manifest last. A run that stops half way leaves a folder carrying no manifest, and the next run replaces that folder.
+
+The verdict sends the first cut back, and the six findings share one class. Each one writes beside something the tree owns already.
+
+| what the verdict names | what answers it |
+|---|---|
+| the hold path spelled again | the hold's own module owns it, and this imports it |
+| the hold read a way of its own | one reader answers it, and the ticket verb reads the same one |
+| a text door on an archive | the door grows a copy carrying bytes, held by its contract case |
+| a refused read swallowed | the manifest takes a line naming the refusal |
+| a torn folder written over | the verb clears it, because no manifest stands there |
 
 One case moves beside the change. `holdsVerb` reads `retro collect` as absent, and the verb table now names it, so that line reads the verb standing.
 
