@@ -407,6 +407,8 @@ The index walk drops the private folder from its skip list. It skips the runtime
 
 The installer moves a box's old places over once, and drops what already stands in the new one. Without it, a box built before this change hands the walk the binaries and the journal it skips today.
 
+A module that imports takes the name from the owner. A module that imports none of it carries the name with a comment naming the owner beside the copy. The `PrivateFolderOwned` rule refuses a spelling that names neither, so the next drift fails the check in place of passing green.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
@@ -414,8 +416,8 @@ The installer moves a box's old places over once, and drops what already stands 
 <!-- the form is checklist -->
 
 - the change touches no file the ask leaves out: each one names a path under the private folder
-- every door the change reaches has a fake: the change moves constants, and each door keeps its own
-- a comment names the approach: every moved constant reads the module, whose header points at the design input
+- every door the change reaches has a fake: the tree rule runs over a fake tree
+- a comment names the approach: every forced copy names the module owning it, beside the copy
 
 # verdict
 
