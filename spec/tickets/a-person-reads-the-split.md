@@ -105,26 +105,16 @@ The review hands that ticket back to its draft, and the draft reaches its escala
 # Discussion
 
 - [[spec/tickets/the-pull-splits-by-topic]] hands this over at `design/person-1`, which waits for a person.
-  - design/review failed back 2 times: | the question reviewing asks | the answer |
-  - |---|---|
-  - | does the approach answer the ask | yes for the two scripts, and the command line stands open |
-  - | is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |
-  - | what does `./RUNME.sh check` answer | 0, with the server standing |
-  - | does a retro stand in the handback | no, and `branch review` names it as the last fix the branch owes |
-  - | does every claim the approach makes carry a proof | yes, the lint and the check answer each one |
-  - TL
-  - DR:
-  - Every finding of the last round closes for the pull and the work verb.
-  - Each chapter the two tables name stands in the design output today.
-  - The command line keeps its modules in prose, and names a chapter for none of them.
-  - The file row counts the test files, and the table under it lists fewer.
-  - The findings, one a line:
-  - The command line's modules name no chapter. Name one a module, as the pull and work tables do.
-  - The file row writes a count of test files, and the table under it lists fewer.
-  - The voice asks for the command answering a count. Cut that number, and name `./RUNME.sh lint test/level0`.
-  - What the agent needs:
-  - | number | need | status |
-  - |---|---|---|
-  - | 1 | the draft names a chapter for each command line module | open |
-  - | 2 | the file row drops its count and names the lint | open |
-  - | 3 | the review hand reads the approach again | open |
+- The Ask above carries what that step asks, as a table a reader acts on.
+
+What the review answers about the approach it hands back:
+
+| the question reviewing asks | the answer |
+|---|---|
+| does the approach answer the ask | yes for the two scripts, and the command line stands open |
+| is what the diff touches beyond the ask trivial | yes, the commit writes that ticket alone |
+| what does `./RUNME.sh check` answer | 0, with the server standing |
+| does a retro stand in the handback | no, and `branch review` names it as the last fix |
+| does every claim carry a proof | yes, the lint and the check answer each one |
+
+- `branch unblock` writes that question as one list item a clause, because it cuts the `asks` field on the semicolon. So this chapter reads as a hand rewrites it. For the defect, see [[spec/tickets/the-unblock-keeps-its-shape]].
