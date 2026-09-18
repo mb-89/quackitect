@@ -182,7 +182,7 @@ steps:
       - name: groups
         form: list
         says: one line per ticket, with its group and its urgency
-step: mine/chapters
+step: mine/shell
 process: [[spec/processes/retro]]
 process_hash: 61a2bb140f0b4632
 record:
@@ -218,6 +218,10 @@ record:
     hand: the engine
     hash_before: 71391e3439684b2ebffba5c3803203c388a964bc
     hash_after: 71391e3439684b2ebffba5c3803203c388a964bc
+  - step: mine/chapters
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 9428f2eea28f893d4732edc57b1a3716d65cf4d5
+    hash_after: 9428f2eea28f893d4732edc57b1a3716d65cf4d5
 ---
 
 # Ask
@@ -284,19 +288,24 @@ the three branches land on trunk, and this reads the window they close
 
 ### themes
 
-<!-- one line per theme, with its count and the chapters it stands in -->
+- no chapter carries a reader's answer, because the readers step spawns no hand. Thirteen chapters stand unread.
+- the work sits in four chapters of thirteen. Chapters 8, 10 and 11 hold most of the prompts, the tools and the ticket moves.
+- five chapters hold no count at all, and they open the window. The log writes nothing a chapter counts there.
+- the last chapter covers this session, and it reads one prompt and no tool. The session runs hundreds.
 
 <!-- the form is list -->
 
 ### repeats
 
-<!-- each theme an earlier retro names already, with the link -->
+- no earlier retro reaches this step, so no theme repeats yet.
 
 <!-- the form is list -->
 
 ### thoughts
 
-<!-- what the readers' thoughts fields say together, as doubts and workarounds that repeat -->
+The chapters carry no thought, because the counts read no transcript. The median thought reads zero in every chapter, and that zero means nothing measured.
+
+So the chapter ask promises a reader the numbers before a word, and hands them a page of zeroes. A reader meeting that page reads past it.
 
 <!-- the form is text -->
 
