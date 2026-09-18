@@ -14,28 +14,52 @@ export function testVerb(it, argv) {
   const hand = handOf(it);
   const held = holdOf(it, hand);
   const since = sinceOf(it, held);
-  const files = named.length
-    ? named
-    : changedFiles(it, since).filter(
-        (path) => /(^|\/)test\/.*\.test\.js$/.test(path) || /\.test\.js$/.test(path),
-      );
+  const changed = named.length ? named : changedFiles(it, since);
+  const files = changed.filter((path) => /\.test\.js$/.test(path));
+  // A branch changing a Go test names its module, and the verb runs that too. [[spec/design_output/pull#the-test-verb]]
+  const modules = goModulesOf(changed);
 
-  if (!files.length) {
+  if (!files.length && !modules.length) {
     console.log(
       `missing, because the branch changes no test since ${since ? shortOf(since) : "the branch point"}`,
     );
     return 1;
   }
 
-  const ran = it.proc.run(
-    [it.node ?? "node", "--test", "--test-reporter=tap", ...files],
-    {
-      cwd: it.root,
-    },
-  );
-  const said = testSays(ran, files);
-  console.log(said);
-  return said.startsWith("green") ? 0 : 1;
+  const said = [];
+  if (files.length) {
+    const ran = it.proc.run(
+      [it.node ?? "node", "--test", "--test-reporter=tap", ...files],
+      { cwd: it.root },
+    );
+    said.push(testSays(ran, files));
+  }
+  for (const one of modules) {
+    said.push(goSays(it.proc.run(["go", "-C", one, "test", "./..."], { cwd: it.root }), one));
+  }
+
+  const bad = said.find((one) => !one.startsWith("green"));
+  console.log(bad ?? said.join("; "));
+  return bad ? 1 : 0;
+}
+
+// The module a changed Go test stands in, which is the folder holding its go.mod. [[spec/design_output/pull#the-test-verb]]
+export function goModulesOf(paths) {
+  const out = new Set();
+  for (const path of paths ?? []) {
+    const found = /^(src\/[^/]+)\/[^/]*_test\.go$/.exec(String(path));
+    if (found) out.add(found[1]);
+  }
+  return [...out];
+}
+
+// [[spec/design_output/pull#the-test-verb]]
+export function goSays(ran, where) {
+  const out = `${ran.stdout ?? ""}\n${ran.stderr ?? ""}`;
+  if (ran.exitCode === 0) return `green, ${where} passes`;
+  if (/^(---\s+)?FAIL/m.test(out)) return `assertion, a test of ${where} fails`;
+  const line = out.split("\n").find((row) => /[Ee]rror|cannot|undefined/.test(row));
+  return `build, because ${where} builds not: ${(line ?? "the run answers nothing").trim().slice(0, CUT_ERROR)}`;
 }
 
 function sinceOf(it, held) {

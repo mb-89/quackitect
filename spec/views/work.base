@@ -20,5 +20,8 @@ views:
       - queue
       - says
     nest: group
+    sort:
+      - key: person
+      - key: queue
     collapsed:
       - closed

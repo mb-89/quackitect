@@ -24,6 +24,7 @@ type View struct {
 	Collapsed []string
 	Filters   string
 	Opens     string
+	Sorts     []Sort
 }
 
 // [[spec/design_output/tree-view#a-base-file-says-it]]
@@ -74,7 +75,36 @@ func viewOf(at int, said, whole *yaml.Doc) (View, error) {
 		Collapsed: yaml.StringsOf(said.Get("collapsed")),
 		Filters:   filtersOf(said, whole),
 		Opens:     opensOf(whole),
+		Sorts:     sortsOf(said, whole),
 	}, nil
+}
+
+// The order a view opens in, as a list of keys or of maps naming a direction. [[spec/design_output/tree-view#a-sort-holds-several-keys]]
+func sortsOf(said, whole *yaml.Doc) []Sort {
+	for _, held := range []*yaml.Doc{said, whole} {
+		if held == nil {
+			continue
+		}
+		rows := yaml.Flat(held.Get("sort"))
+		if len(rows) == 0 {
+			continue
+		}
+		out := make([]Sort, 0, len(rows))
+		for _, each := range rows {
+			if one := yaml.AsDoc(each); one != nil {
+				out = append(out, Sort{
+					Key:  yaml.AsString(one.Get("key")),
+					Down: yaml.AsBool(one.Get("down")),
+				})
+				continue
+			}
+			if key := strings.TrimSpace(yaml.AsString(each)); key != "" {
+				out = append(out, Sort{Key: key})
+			}
+		}
+		return out
+	}
+	return nil
 }
 
 // [[spec/design_output/tree-view#a-base-file-says-it]]

@@ -111,6 +111,26 @@ A parent the filter empties of children carries no mark, because nothing stands
 under it. The filter reaches no row under a shut parent, because a shut
 parent draws no child at all.
 
+# A sort holds several keys
+
+The sort stands beside the filter, between the data and the view. It orders the
+items of one level and leaves the items themselves as they stand, so the
+nesting survives every order a person picks.
+
+| what a person does | what the sort does |
+|---|---|
+| presses a column head | puts that key at the end of the list |
+| presses the same head again | turns that key around |
+| presses it a third time | drops that key, and the ones beside it stand |
+| presses another head | adds that key under the first |
+
+A later key breaks the ties an earlier one leaves. Two values reading as
+numbers compare as numbers, and a row carrying no value for a key stands after
+the rows that carry one.
+
+A view opens on the order its base file names, under `sort`. The work view
+opens on the rows a person owns, then the place the queue gives.
+
 # A base file says it
 
 A view comes out of a file, in the base format the vaults write. So a new view

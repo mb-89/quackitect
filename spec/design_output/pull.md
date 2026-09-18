@@ -497,3 +497,8 @@ see count too.
 
 The run names the tap reporter. Node past version 23 answers a pipe with the
 spec reporter too, so the count reads the tap lines.
+
+The tests stand in two languages, and the verb runs both. A changed `*.test.js`
+joins the node run, and a changed `*_test.go` names the module under `src` that
+holds it, which the verb runs with `go test`. The answer reads green where
+every run does, and it names the first that does not.

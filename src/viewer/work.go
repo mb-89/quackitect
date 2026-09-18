@@ -64,7 +64,9 @@ func loadWork(path string) (*Tree, error) {
 		return nil, err
 	}
 	one := views[0]
-	return NewTree(one.Cols, items, one.Nests), nil
+	tree := NewTree(one.Cols, items, one.Nests)
+	tree.Sorted(one.Sorts)
+	return tree, nil
 }
 
 // [[spec/design_output/viewer#the-work-tab]]

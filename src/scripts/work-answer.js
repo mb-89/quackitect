@@ -6,7 +6,7 @@
 import { ANSWER } from "../../.claude/skills/level0/lib/folders.js";
 import { askOf, fieldOf, frontOf, GROUP, isGroup, OPEN, stepOf, urgent } from "./group.js";
 import { weighing } from "./pull-hand.js";
-import { leavesOf } from "./pull-route.js";
+import { leafOf, leavesOf } from "./pull-route.js";
 import { takeable } from "./pull.js";
 import { queued } from "./queue.js";
 import { staleClaim } from "./stand.js";
@@ -21,6 +21,7 @@ export function rowOfTicket(one, places) {
     progress: progressOf(one.text),
     group: fieldOf(one.text, GROUP),
     urgent: urgent(one.text),
+    person: personStep(one.text),
     says: firstLine(askOf(one.text)),
   };
   const place = places.get(one.name);
@@ -34,6 +35,12 @@ export function progressOf(text) {
   if (!leaves.length) return "";
   const at = leaves.findIndex((one) => one.path === stepOf(text));
   return `${at < 0 ? leaves.length : at + 1}/${leaves.length}`;
+}
+
+// A step a person owns leaves the agent's queue and stands first in the person's. [[spec/design_output/pull#the-queue-is-a-score]]
+export function personStep(text) {
+  const leaf = leafOf(frontOf(text), stepOf(text));
+  return String(leaf?.by ?? "") === "person" ? "person" : "";
 }
 
 // The last column takes what it fits, so the answer carries this much of a line. [[spec/design_output/work#one-verb-answers-git]]
@@ -89,6 +96,7 @@ export function answerOf(it, queue = false) {
         kind: one.brief ? "brief" : GROUP,
         step: one.ticket ? stepOf(one.ticket) : "",
         progress: one.ticket ? progressOf(one.ticket) : "",
+        person: one.ticket ? personStep(one.ticket) : "",
         says: firstLine(askOf(one.ticket || one.brief)),
         age,
         stale,

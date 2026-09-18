@@ -13,7 +13,7 @@ import {
   takeable,
   verdictIn,
 } from "../../src/scripts/pull.js";
-import { testSays } from "../../src/scripts/test-verb.js";
+import { goModulesOf, goSays, testSays } from "../../src/scripts/test-verb.js";
 import { ticket } from "../../src/scripts/ticket.js";
 import { work } from "../../src/scripts/work.js";
 import {
@@ -104,6 +104,32 @@ test("a leaf's chapter reads its fields by heading, past the comments and the en
     reason: "thin; and short",
   });
   assert.deepEqual(verdictIn(["maybe"]), { said: "" });
+});
+
+// The tests stand in two languages, and the verb runs both. [[spec/design_output/pull#the-test-verb]]
+test("a changed Go test names its module, and the verb says what that run answered", () => {
+  assert.deepEqual(
+    goModulesOf([
+      "src/viewer/work_test.go",
+      "src/viewer/tree.go",
+      "src/index/index_test.go",
+      "src/index/index_test.go",
+      "test/level0/one.test.js",
+      "spec/tickets/one.md",
+    ]),
+    ["src/viewer", "src/index"],
+  );
+  assert.deepEqual(goModulesOf([]), []);
+
+  assert.equal(goSays({ exitCode: 0 }, "src/viewer"), "green, src/viewer passes");
+  assert.match(
+    goSays({ exitCode: 1, stdout: "--- FAIL: TestOne\nFAIL\n" }, "src/viewer"),
+    /^assertion, a test of src\/viewer fails/,
+  );
+  assert.match(
+    goSays({ exitCode: 1, stderr: "./work.go:9:2: undefined: nothing\n" }, "src/viewer"),
+    /^build, because src\/viewer builds not: \.\/work\.go/,
+  );
 });
 
 // [[spec/design_output/pull#the-test-verb]]
