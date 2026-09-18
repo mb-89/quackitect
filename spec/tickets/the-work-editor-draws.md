@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 step: retro/cloud
 steps:
@@ -141,6 +141,11 @@ record:
     hand: box 4089f1b3b6bc · claude-code-remote
     hash_before: 659e89f2ff47addc6b5b0051b6627f1b71b93bc0
     hash_after: 659e89f2ff47addc6b5b0051b6627f1b71b93bc0
+  - step: retro/cloud
+    hand: box 4089f1b3b6bc · claude-code-remote
+    hash_before: 634be26ad109b722e8db3ca5044fcc344faf9d41
+    hash_after: 634be26ad109b722e8db3ca5044fcc344faf9d41
+reason: done
 ---
 
 # Ask
@@ -358,11 +363,21 @@ That last line is what lands the work.
 
 <!-- the form is list -->
 
+- the first install leaves the tools under the old private place, so `whereIs` finds none
+- `vale` stands off the PATH, so the first `branch take` falls at its push door
+- the index binary stands older than its source, and nothing on the box rebuilds it
+- a stale index daemon holds a broken database, and the door answers nothing until it goes
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
+
+- the fail cap inserts a settle step at the retro's drain, and this hand answers it
+- the write door refuses a heading past its cap, a long sentence, and the past tense
+- the write door refuses a shell write, so every change goes through Edit or Write
+- the trunk guard stands quiet, because the branch carries every commit on trunk
 
 ### left
 
@@ -370,6 +385,11 @@ That last line is what lands the work.
 
 <!-- the form is list -->
 
+- [[spec/tickets/group-key-takes-one-spelling]] stands open on trunk, naming no group
+- [[spec/tickets/runtime-half-takes-the-rest]] stands open on trunk, naming no group
+- no person step stands parked, and this branch carries no handover
+
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+- The log's move out of the runtime half lands under [[spec/tickets/the-work-tab-draws]]
+- The fail's own commands stop refusing it, because the drain asks for a step a fail unlocks
