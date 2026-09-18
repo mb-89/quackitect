@@ -472,11 +472,25 @@ export function withEngineReader(it, one) {
   return schema ? reRouted(one.text, schema, steps, "") : "";
 }
 
+// A count says two hands disagree, and another hand settles that, because a person waiting on a call the box owns costs a whole session. [[spec/design_output/pull#a-settle-step-goes-in]]
+export function withSettleStep(it, one, before, asks) {
+  const standing = stepsNamed(one, "settle");
+  const most = Number(it.splits);
+  if (most > 0 && standing >= most) return withPersonStep(it, one, before, asks);
+  return inserted(it, one, before, `settle-${standing + 1}`, {
+    does: "decides between the step and the findings, and writes why",
+    by: "anyone",
+    to: "engine",
+    asks,
+    evidence: [
+      { name: "answer", form: "text", says: "the decision, and why it stands" },
+    ],
+  });
+}
+
 // [[spec/design_output/pull#a-person-step-goes-in]]
 export function withPersonStep(it, one, before, asks, options) {
-  const front = frontOf(one.text);
-  const walk = walkOf(front);
-  const standing = walk.filter((held) => /^person(-\d+)?$/.test(held.name)).length;
+  const standing = stepsNamed(one, "person");
   const most = Number(it.splits);
   if (most > 0 && standing >= most) {
     console.error(
@@ -484,21 +498,7 @@ export function withPersonStep(it, one, before, asks, options) {
     );
     return { path: "" };
   }
-  const name = `person-${standing + 1}`;
-  const steps = structuredClone(front.steps ?? []);
-  const parts = before.split("/");
-  let list = steps;
-  for (const part of parts.slice(0, -1)) {
-    const phase = list.find((held) => String(held?.name) === part);
-    if (!phase) return { path: "" };
-    phase.steps = [phase.steps ?? []].flat();
-    list = phase.steps;
-  }
-  const at = list.findIndex((held) => String(held?.name) === parts.at(-1));
-  if (at < 0) return { path: "" };
-
-  const step = {
-    name,
+  return inserted(it, one, before, `person-${standing + 1}`, {
     does: "answers the question the engine asks",
     by: "person",
     to: "engine",
@@ -511,8 +511,29 @@ export function withPersonStep(it, one, before, asks, options) {
         ...(options ? { options } : {}),
       },
     ],
-  };
-  list.splice(at, 0, step);
+  });
+}
+
+// [[spec/design_output/pull#a-person-step-goes-in]]
+function stepsNamed(one, kind) {
+  const held = new RegExp(`^${kind}(-\\d+)?$`);
+  return walkOf(frontOf(one.text)).filter((step) => held.test(step.name)).length;
+}
+
+// [[spec/design_output/pull#a-person-step-goes-in]]
+function inserted(it, one, before, name, said) {
+  const steps = structuredClone(frontOf(one.text).steps ?? []);
+  const parts = before.split("/");
+  let list = steps;
+  for (const part of parts.slice(0, -1)) {
+    const phase = list.find((held) => String(held?.name) === part);
+    if (!phase) return { path: "" };
+    phase.steps = [phase.steps ?? []].flat();
+    list = phase.steps;
+  }
+  const at = list.findIndex((held) => String(held?.name) === parts.at(-1));
+  if (at < 0) return { path: "" };
+  list.splice(at, 0, { name, ...said });
 
   const path = [...parts.slice(0, -1), name].join("/");
   const schema = schemasHere(it).get("ticket");

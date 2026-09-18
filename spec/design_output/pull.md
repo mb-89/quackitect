@@ -337,8 +337,31 @@ A hand that cannot go on without a person runs `branch escalate <question>`,
 and `--options a,b,c` makes the answer a choice. The verb reads the hold
 and puts the person step before the held leaf through the same function.
 Then it drops the hold, commits by ticket and step, pushes, and hands out
-the next ticket. With no hold standing it refuses and names the pull. So the
-hand, the refusal count and the fail count insert through one mechanism.
+the next ticket. With no hold standing it refuses and names the pull. So a
+hand reaches the person step, and one mechanism inserts every kind.
+
+## A settle step goes in
+
+A count of returns says two agent hands disagree. It says nothing about who
+settles that, so the count inserts a step another agent takes:
+
+| the step | what it reads |
+|---|---|
+| `settle-<n>` | `by: anyone`, `to: engine`, the findings under `asks` |
+| the answer | the decision, and why it stands |
+
+`withSettleStep` puts it in through the same inserter the person step uses.
+Two counts reach it:
+
+- a step failing back, at `work.failsBeforePerson`
+- a hand-back meeting refused, at `work.refusalsBeforePerson`
+
+A ticket carrying `work.stepsBeforeSplit` settle steps hands the question to a
+person instead. So the agents settle first, and a person answers where they
+reach no answer.
+
+[[spec/rationales/cloud]] carries what a count costs where it reaches a person
+first.
 
 # A leaf comes back
 
