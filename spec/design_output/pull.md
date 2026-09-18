@@ -370,6 +370,11 @@ itself where none stands. A phase named there sends the ticket to its first
 leaf. At `work.failsBeforePerson` returns the pull inserts a person step
 before the target.
 
+A fail says the step works not, so its commands run for the record and refuse
+nothing. A step whose evidence stands red is exactly a step a hand fails, and
+the record carries what each command says. The fields of the chapter still have
+to stand, because a fail says why in them.
+
 ## A person step goes in
 
 `withPersonStep` puts a step named `person-<n>` before the target, `by:

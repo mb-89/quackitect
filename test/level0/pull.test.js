@@ -568,4 +568,30 @@ test("a verdict field decides, the flag is refused there, and a fail sends the t
   assert.match(said, /fails design\/review back to design\/draft/);
 });
 
+// A step whose evidence stands red is a step a hand fails. [[spec/design_output/pull#the-fail]]
+test("a fail runs the step's commands for the record, and none of them refuses it", () => {
+  const child = withPayload(
+    CHILD("open", "implement/tests-red"),
+    "implement/tests-red",
+    '{"tests": "node --test", "checked": "- the ask names them\\n- every door has a fake"}',
+  ).text;
+  const { it, disk } = doors(standing(child));
+  it.proc.teach(["sh", "-c", "node --test"], {
+    exitCode: 0,
+    stdout: "green, every test passes",
+  });
+  heard(() => work(ROOT, ["pull"], it));
+
+  const { code, said } = heard(() =>
+    work(ROOT, ["pull", "a-child", "--fail", "no test stands red, so the step reads wrong"], it),
+  );
+
+  assert.equal(code, 0, said);
+  const entry = recordIn(disk.read(at("spec/tickets/a-child.md"))).at(-1);
+  assert.equal(entry.returns, 1);
+  assert.equal(entry.why, "no test stands red, so the step reads wrong");
+  assert.equal(entry.answered[0].name, "tests");
+  assert.equal(entry.answered[0].exit, 0);
+});
+
 // [[spec/design_output/pull#a-person-step-goes-in]]
