@@ -86,9 +86,17 @@ export function pull(it, argv) {
   if (rest.includes("--judge")) return judgeMaterial(it, held, name);
   if (rest.includes("--drop")) return dropped(it, who);
   if (verdict.said === "back") return takeBack(it, who, name, verdict.reason);
-  // A name on trunk that is a group takes its branch, and any other name hands a ticket back. [[spec/design_output/pull#the-engine-takes-the-branch]]
+  // A name on trunk that is a group takes its branch. [[spec/design_output/pull#the-engine-takes-the-branch]]
   const named = onTrunk && name && !verdict.said ? namedGroup(it, name) : "";
-  if (!named && (verdict.said || name)) return handBack(it, who, name, verdict);
+  // A name with a leaf in hand hands that leaf back. A name with none asks for that ticket. [[spec/design_output/pull#the-hand-out]]
+  const asking = Boolean(name) && !named && !verdict.said && !held;
+  if (asking && it.binding === "queue") {
+    console.error(`${name} stands behind the queue, because this session binds to it.`);
+    console.error("Run ./RUNME.sh branch pull with no name, and take what it hands you.");
+    return 2;
+  }
+  who.wanted = asking ? name : "";
+  if (!named && (verdict.said || (name && held))) return handBack(it, who, name, verdict);
   if (held) return stillHeld(it, held);
   // [[spec/design_output/pull#the-engine-takes-the-branch]]
   if (onTrunk && it.take) {
