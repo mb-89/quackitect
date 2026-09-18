@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 step: implement/person-1
 steps:
@@ -184,6 +184,8 @@ record:
     returns: 2
     why: The four fixes the last verdict named land, and `./RUNME.sh check` answers 0.; `./RUNME.sh branch test` answers green, and `./RUNME.sh branch review` answers nothing to fix.; The walk covers the private folder, and a word in a private note comes back from a find.; The runtime half stands outside the rows, so the box record comes back from no find.; `PrivateFolderOwned` refuses an unowned spelling of the new folder, which I fed it and watched refuse.; The commit tracks no built binary, and the rule hiding it stands beside the language server's own.; `src/bridge/stop.js` reads the hold under the old folder, so `holdStands` answers false on every box.; `PrivateFolderOwned` passes a spelling of the old folder, which I fed it and watched pass.; No case holds `src/bridge/stop.js` against the hold folder `folders.js` owns.; No note under `spec/design_output` names either new folder, so the placement rule stands in code alone.; Every design note naming a moved file names its old place.; `spec/design_output/private.md` owns the private half, and its table still sends a reader to the old log.; `spec/guidance/working.md` sends every agent to the tools file at its old place.; `level0.js` and `level1.js` name the owner beside the session path, and no case holds them against `hand.js`.; `RETRO` stands exported and tested, and the branch writes under it nowhere.; No retro stands in the handover, and the group writes one at its own hand-back.; The rest of the branch serves the group's other children, and redesigns nothing this ask holds.; The fixes:; Take the hold path in `src/bridge/stop.js` from `folders.js`, and cover it with a case.; Make `PrivateFolderOwned` refuse a spelling of the old folder, so the next such reader fails.; Hold the session spellings in `level0.js` and `level1.js` against `hand.js` in a case.; Name the two folders and the placement rule in `spec/design_output/private.md`, and point the other notes there.; Point every note naming a moved file at its new place. A grep for the old folder over `spec` names them.; Fix `spec/guidance/working.md` first, because every agent reads it at its start.
 group: the-warnings-feed-a-refactorer
+reason: became
+successors: [the-private-split-reads-clean]
 ---
 
 # Ask
