@@ -36,6 +36,24 @@ The pull runs on trunk or on a work branch, and the agent runs the pull and
 no other verb to get work. A box on a branch takes the group's leaves around
 its tickets. What a box on trunk gets depends on where it runs.
 
+## A name asks for one
+
+A hand names a ticket on the pull, and the pull hands out that ticket's leaf.
+The binding decides whether the ask stands:
+
+| the binding | what a name gets |
+|---|---|
+| `queue` | a refusal, because the queue decides what a session takes |
+| `unbound` | that ticket's leaf, where the pools reach it |
+| `god` | that ticket's leaf, where the pools reach it |
+
+The pools are the reservation. A ticket naming a group stands in that group's
+branch, and a pull on trunk reads the free tickets alone. So a name reaches
+what the session already stands beside, and nothing another branch holds.
+
+A name means the hand-back where a leaf stands in hand already, and the hold
+is what tells the two apart.
+
 ## The engine takes the branch
 
 The agent pulls, and the engine decides whether a branch comes with it:

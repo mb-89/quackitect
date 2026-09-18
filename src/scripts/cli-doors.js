@@ -55,6 +55,8 @@ export async function doorsHere() {
     fails: await said.ask("work.failsBeforePerson"),
     refusals: await said.ask("work.refusalsBeforePerson"),
     splits: await said.ask("work.stepsBeforeSplit"),
+    // A name on the pull asks for one ticket, and the queue binding refuses the ask. [[spec/design_output/pull#the-hand-out]]
+    binding: await said.ask("engine.binding"),
     ...handDoors(process.env),
     node: process.execPath,
     join,
