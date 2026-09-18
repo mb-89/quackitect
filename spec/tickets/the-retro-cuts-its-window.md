@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -153,6 +153,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 383d0e55a4cee54ba36f68856e2704f18483f0da
+    hash_after: 383d0e55a4cee54ba36f68856e2704f18483f0da
+    answered:
+      - name: lint
+        exit: 0
+        said: 75 stand at warning, which the panel draws and check allows.
 group: the-retro-runs
 depends_on: ["the-retro-takes-the-box"]
 ---
@@ -339,13 +347,15 @@ The counts read off the log's own kinds. A row names a prompt, a shell line, a t
 
 ### lint
 
-<!-- the tree builds and lints -->
+    ./RUNME.sh lint
 
 <!-- the form is command -->
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change touches no file the ask leaves out. The window module and the one call inside collect.
+- every door the change reaches has a fake. The module reads the disk and git through their doors alone.
+- a comment names the approach the change implements. The span says the design fixes it, and no box moves it.
 
 <!-- the form is checklist -->
 

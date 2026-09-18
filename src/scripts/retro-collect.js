@@ -5,6 +5,7 @@
 
 import { holdsAnywhere } from "./guidance-hand.js";
 import { leavesOut } from "./retro-leaves.js";
+import { windowOut } from "./retro-window.js";
 
 const PRIVATE = ".se";
 const RETRO = "retro";
@@ -55,6 +56,8 @@ export function collect(it, name) {
 
   it.disk.makeDir(into);
   // Each leaf of the retro's own reading takes a file, named in the manifest beside the copies. [[spec/tickets/the-retro-lays-its-leaves]]
+  // The cut reads the log the copy lands, so it runs after the copy. [[spec/tickets/the-retro-cuts-its-window]]
+  rows.push(...windowOut(it, into, name, rows));
   rows.push(...leavesOut(it, into, rows));
   it.disk.write(
     it.join(into, MANIFEST),
