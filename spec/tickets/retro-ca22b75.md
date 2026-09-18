@@ -182,7 +182,7 @@ steps:
       - name: groups
         form: list
         says: one line per ticket, with its group and its urgency
-step: mine/unread
+step: mine/method
 process: [[spec/processes/retro]]
 process_hash: 61a2bb140f0b4632
 record:
@@ -254,6 +254,10 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 0aeab287fb637d29b03106372458c4fae3dbe5f2
     hash_after: 0aeab287fb637d29b03106372458c4fae3dbe5f2
+  - step: mine/unread
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: c1b2f9458f1f6910b0553b0bcc131996a028797b
+    hash_after: c1b2f9458f1f6910b0553b0bcc131996a028797b
 ---
 
 # Ask
@@ -533,7 +537,9 @@ The thought length reads zero in every chapter, so the curve carries one axis al
 
 ### unread
 
-<!-- every line of the manifest no leaf read, and why, so the next retro inherits no hidden gap -->
+The manifest holds 394 lines, and the log, the scripts, the private tickets and the window file each reach a leaf. The rest reaches none: the index and its two side files, the stamp, the health file, the lint and check output. Beside those stand the config, the copy record, two folders, seven temporary files, an archive and a standards document. Most of them belong under the runtime folder, and the move list leaves them out, so collect carries them every run.
+
+<!-- the form is text -->
 
 <!-- the form is text -->
 
