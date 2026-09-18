@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -182,6 +182,14 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 40f2215c83ed5ae25c3883c88ea6c2178fb4d940
     hash_after: 40f2215c83ed5ae25c3883c88ea6c2178fb4d940
+  - step: implement/change
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: dfa2ff60e0cdb20f14d9a827387e347e10467007
+    hash_after: dfa2ff60e0cdb20f14d9a827387e347e10467007
+    answered:
+      - name: lint
+        exit: 0
+        said: 75 stand at warning, which the panel draws and check allows.
 group: the-retro-runs
 depends_on: ["the-retro-takes-the-box"]
 ---
@@ -387,9 +395,9 @@ The drain is the sharper lesson. This ticket's own settle step names the field, 
 
 ### checked
 
-- the change touches no file the ask leaves out. The window module and the one call inside collect.
+- the change touches no file the ask leaves out. The window module, the note drain, and the one call inside collect.
 - every door the change reaches has a fake. The module reads the disk and git through their doors alone.
-- a comment names the approach the change implements. The span says the design fixes it, and no box moves it.
+- a comment names the approach the change implements. The drain says why a chapter stands outside it.
 
 <!-- the form is checklist -->
 
