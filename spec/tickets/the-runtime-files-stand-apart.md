@@ -2,6 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
+step: implement/person-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -41,6 +42,15 @@ steps:
           - name: seen
             form: text
             says: what you see, and what surprises you
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: "verdict failed back 2 times: The four fixes the last verdict named land, and `./RUNME.sh check` answers 0.; `./RUNME.sh branch test` answers green, and `./RUNME.sh branch review` answers nothing to fix.; The walk covers the private folder, and a word in a private note comes back from a find.; The runtime half stands outside the rows, so the box record comes back from no find.; `PrivateFolderOwned` refuses an unowned spelling of the new folder, which I fed it and watched refuse.; The commit tracks no built binary, and the rule hiding it stands beside the language server's own.; `src/bridge/stop.js` reads the hold under the old folder, so `holdStands` answers false on every box.; `PrivateFolderOwned` passes a spelling of the old folder, which I fed it and watched pass.; No case holds `src/bridge/stop.js` against the hold folder `folders.js` owns.; No note under `spec/design_output` names either new folder, so the placement rule stands in code alone.; Every design note naming a moved file names its old place.; `spec/design_output/private.md` owns the private half, and its table still sends a reader to the old log.; `spec/guidance/working.md` sends every agent to the tools file at its old place.; `level0.js` and `level1.js` name the owner beside the session path, and no case holds them against `hand.js`.; `RETRO` stands exported and tested, and the branch writes under it nowhere.; No retro stands in the handover, and the group writes one at its own hand-back.; The rest of the branch serves the group's other children, and redesigns nothing this ask holds.; The fixes:; Take the hold path in `src/bridge/stop.js` from `folders.js`, and cover it with a case.; Make `PrivateFolderOwned` refuse a spelling of the old folder, so the next such reader fails.; Hold the session spellings in `level0.js` and `level1.js` against `hand.js` in a case.; Name the two folders and the placement rule in `spec/design_output/private.md`, and point the other notes there.; Point every note naming a moved file at its new place. A grep for the old folder over `spec` names them.; Fix `spec/guidance/working.md` first, because every agent reads it at its start."
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
       - name: reflect
         does: names the class of error in the findings, and the fix for the class
         when: returned
@@ -89,8 +99,6 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-group: the-warnings-feed-a-refactorer
-step: verdict
 record:
   - step: design/draft
     hand: box a5e189c39e1d · claude-code-remote
@@ -169,6 +177,13 @@ record:
       - name: check
         exit: 0
         said: 79 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box dd2a59294365 · claude-code-remote · helper-14
+    hash_before: 6dbbd9552ae7dd42eb9ee3a1c6367b4373c9f861
+    hash_after: 6dbbd9552ae7dd42eb9ee3a1c6367b4373c9f861
+    returns: 2
+    why: The four fixes the last verdict named land, and `./RUNME.sh check` answers 0.; `./RUNME.sh branch test` answers green, and `./RUNME.sh branch review` answers nothing to fix.; The walk covers the private folder, and a word in a private note comes back from a find.; The runtime half stands outside the rows, so the box record comes back from no find.; `PrivateFolderOwned` refuses an unowned spelling of the new folder, which I fed it and watched refuse.; The commit tracks no built binary, and the rule hiding it stands beside the language server's own.; `src/bridge/stop.js` reads the hold under the old folder, so `holdStands` answers false on every box.; `PrivateFolderOwned` passes a spelling of the old folder, which I fed it and watched pass.; No case holds `src/bridge/stop.js` against the hold folder `folders.js` owns.; No note under `spec/design_output` names either new folder, so the placement rule stands in code alone.; Every design note naming a moved file names its old place.; `spec/design_output/private.md` owns the private half, and its table still sends a reader to the old log.; `spec/guidance/working.md` sends every agent to the tools file at its old place.; `level0.js` and `level1.js` name the owner beside the session path, and no case holds them against `hand.js`.; `RETRO` stands exported and tested, and the branch writes under it nowhere.; No retro stands in the handover, and the group writes one at its own hand-back.; The rest of the branch serves the group's other children, and redesigns nothing this ask holds.; The fixes:; Take the hold path in `src/bridge/stop.js` from `folders.js`, and cover it with a case.; Make `PrivateFolderOwned` refuse a spelling of the old folder, so the next such reader fails.; Hold the session spellings in `level0.js` and `level1.js` against `hand.js` in a case.; Name the two folders and the placement rule in `spec/design_output/private.md`, and point the other notes there.; Point every note naming a moved file at its new place. A grep for the old folder over `spec` names them.; Fix `spec/guidance/working.md` first, because every agent reads it at its start.
+group: the-warnings-feed-a-refactorer
 ---
 
 # Ask
@@ -266,7 +281,7 @@ pass
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+<!-- the same tests pass -->
 
 <!-- the form is command -->
 
@@ -310,9 +325,29 @@ What surprises me:
 
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out: the tests, the module the ask names, the index's tests
-- every door the change reaches has a fake: the cases read exported strings. The Go cases write under a temporary root.
-- a comment names the approach: the module's header and each test file's header point at the design input
+- the change touches no file the ask leaves out: each one names a path under the private folder
+- every door the change reaches has a fake: the tree rule runs over a fake tree
+- a comment names the approach: every forced copy names the module owning it, beside the copy
+
+## person-1
+
+<!-- answers the question the engine asks -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
+
+### checked
+
+<!-- one line per item of the checklist, on how you take it into account -->
+
+<!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: each one names a path under the private folder
+- every door the change reaches has a fake: the tree rule runs over a fake tree
+- a comment names the approach: every forced copy names the module owning it, beside the copy
 
 ## reflect
 
@@ -343,9 +378,9 @@ One finding stands outside the class: the change commit tracks a built binary. T
 
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out: each fix lands in a file already naming the private folder
-- every door the change reaches has a fake: the review and setup fixes run against the disk fake
-- a comment names the approach: each forced copy names the module owning the name beside it
+- the change touches no file the ask leaves out: each one names a path under the private folder
+- every door the change reaches has a fake: the tree rule runs over a fake tree
+- a comment names the approach: every forced copy names the module owning it, beside the copy
 
 ## change
 
@@ -368,17 +403,6 @@ One finding stands outside the class: the change commit tracks a built binary. T
 - the change touches no file the ask leaves out: each one names a path under the private folder
 - every door the change reaches has a fake: the tree rule runs over a fake tree
 - a comment names the approach: every forced copy names the module owning it, beside the copy
-
-The second pass answers the verdict:
-
-| finding | what it takes |
-|---|---|
-| the review verb and the cloud setup make the old folder | each makes the runtime folder it writes into |
-| the level1 hook writes the session file at the old path | it takes the new one, and names the owner beside it |
-| the commit tracks a built binary | the ignore rule takes it, beside the language server's own |
-| the Go files, the doors and the installer spell the folder | each names the owner, and the session door imports it |
-| a spelling drifts and passes green | `PrivateFolderOwned` refuses a spelling naming no owner |
-| no case covers the session file | the runtime writers case reads it |
 
 ## tests-green
 
@@ -445,13 +469,16 @@ A module that imports takes the name from the owner. A module that imports none 
 - .claude/skills/level0/lib/folders.js
 - .claude/skills/level0/lib/index.js
 - .claude/skills/level0/lib/log.js
+- .claude/skills/level0/lib/private.js
 - .claude/skills/level0/lib/review.js
 - .claude/skills/level0/lib/runs.js
 - .claude/skills/level0/lib/servers.js
 - .claude/skills/level0/lib/tools.js
+- .claude/skills/level0/lib/tree.js
 - .claude/skills/level0/lib/undo.js
 - .claude/skills/level0/lib/voice.js
 - .claude/skills/level1/hooks/level1.js
+    - .gitignore
 - .vale.ini
 - .vscode/settings.json
 - HANDOVER.md
@@ -459,22 +486,42 @@ A module that imports takes the name from the owner. A module that imports none 
 - spec/design_input/the-agent-pulls-tickets.md
 - spec/design_input/the-runtime-files-stand-apart.md
 - spec/design_input/the-warnings-feed-a-refactorer.md
+- spec/design_output/apply.md
+- spec/design_output/copilot.md
+- spec/design_output/editor.md
+- spec/design_output/extension.md
+- spec/design_output/index.md
+- spec/design_output/level0.md
+- spec/design_output/log.md
+- spec/design_output/private.md
 - spec/design_output/pull.md
+- spec/design_output/review.md
+- spec/design_output/stop.md
+- spec/design_output/tools.md
+- spec/design_output/tree.md
+- spec/design_output/viewer.md
+- spec/design_output/work.md
+- spec/guidance/cloud.md
 - spec/guidance/review/reviewing.md
+- spec/guidance/tickets.md
+- spec/guidance/working.md
 - spec/tickets/a-pointer-names-its-heading.md
 - spec/tickets/a-rule-carries-its-side.md
 - spec/tickets/a-write-meets-its-hash.md
 - spec/tickets/apply-lane-carries-a-hand.md
+- spec/tickets/one-function-answers-the-hand.md
 - spec/tickets/release-keeps-local-commits.md
 - spec/tickets/the-hook-spawns-a-refactorer.md
+- spec/tickets/the-one-answer-takes-shape.md
 - spec/tickets/the-panel-draws-every-file.md
 - spec/tickets/the-retro-runs.md
 - spec/tickets/the-rule-shares-one-slug.md
 - spec/tickets/the-runtime-files-stand-apart.md
 - spec/tickets/the-warnings-feed-a-refactorer.md
 - spec/vocabulary/terms.yml
+- src/bridge/config.js
 - src/bridge/server.js
-- src/doors/disk.js
+- src/bridge/stop.js
 - src/doors/session.js
 - src/extension/editor-files.js
 - src/extension/editor-process.js
@@ -483,7 +530,6 @@ A module that imports takes the name from the owner. A module that imports none 
 - src/extension/lib/lsp.js
 - src/index/door.go
 - src/index/grep_test.go
-- src/index/index
 - src/index/index.go
 - src/index/index_test.go
 - src/index/main.go
@@ -592,25 +638,32 @@ A module that imports takes the name from the owner. A module that imports none 
 
 fail
 
-- `src/scripts/review.js` makes `.se`, then writes the survey under the runtime folder. `branch review` dies there.
-- `copilot-setup.js` makes `.se`, then writes the cloud mark under the runtime folder. The same class of error.
-- `level1.js` writes the hand's session file at the old path, and its two readers read the new one.
-- The change commit tracks the built binary `src/index/index`. The walk reads and hashes it on every pass.
-- `RETRO` stands exported and tested, and the branch writes under it nowhere. The retro verb takes it up later.
-- `src/lsp/serve.go`, `src/lsp/tree.go` and `src/doors/session.js` spell the runtime folder, and point at no owner.
-- `test/level0/folders.test.js` holds no case over the session file, so that drift passes green.
-- `./RUNME.sh check` answers 0 in the tree. The review verb dies before the worktree check runs.
-- The handover carries a surprises chapter, and a retro chapter waits on the group.
-- The walk, the skip rule and the placement rule each carry a case asserting a refusal.
-- The installer's move of a box's old places carries no case.
-- The rest of the branch splits files by topic for other tickets, and redesigns what this ask holds nowhere.
+- The four fixes the last verdict named land, and `./RUNME.sh check` answers 0.
+- `./RUNME.sh branch test` answers green, and `./RUNME.sh branch review` answers nothing to fix.
+- The walk covers the private folder, and a word in a private note comes back from a find.
+- The runtime half stands outside the rows, so the box record comes back from no find.
+- `PrivateFolderOwned` refuses an unowned spelling of the new folder, which I fed it and watched refuse.
+- The commit tracks no built binary, and the rule hiding it stands beside the language server's own.
+- `src/bridge/stop.js` reads the hold under the old folder, so `holdStands` answers false on every box.
+- `PrivateFolderOwned` passes a spelling of the old folder, which I fed it and watched pass.
+- No case holds `src/bridge/stop.js` against the hold folder `folders.js` owns.
+- No note under `spec/design_output` names either new folder, so the placement rule stands in code alone.
+- Every design note naming a moved file names its old place.
+- `spec/design_output/private.md` owns the private half, and its table still sends a reader to the old log.
+- `spec/guidance/working.md` sends every agent to the tools file at its old place.
+- `level0.js` and `level1.js` name the owner beside the session path, and no case holds them against `hand.js`.
+- `RETRO` stands exported and tested, and the branch writes under it nowhere.
+- No retro stands in the handover, and the group writes one at its own hand-back.
+- The rest of the branch serves the group's other children, and redesigns nothing this ask holds.
 
 The fixes:
 
-- Make the runtime folder before each write into it, in `review.js` and in `copilot-setup.js`.
-- Bring the session path under the module's reach, and hold `level1.js` against it in a case.
-- Drop the built binary from git, and let the build write under the runtime bin.
-- Point `serve.go`, `tree.go`, `session.js` and `install.sh` at the module owning the name.
+- Take the hold path in `src/bridge/stop.js` from `folders.js`, and cover it with a case.
+- Make `PrivateFolderOwned` refuse a spelling of the old folder, so the next such reader fails.
+- Hold the session spellings in `level0.js` and `level1.js` against `hand.js` in a case.
+- Name the two folders and the placement rule in `spec/design_output/private.md`, and point the other notes there.
+- Point every note naming a moved file at its new place. A grep for the old folder over `spec` names them.
+- Fix `spec/guidance/working.md` first, because every agent reads it at its start.
 
 ## checked
 
@@ -618,7 +671,7 @@ The fixes:
 
 <!-- the form is checklist -->
 
-- one place holds each fact the change adds: `folders.js` owns the two names. Every JavaScript writer reads them off it. The Go and shell halves spell the folder again, and `index.go` alone points at the design input.
+- one place holds each fact the change adds: `folders.js` owns the two names. Every JavaScript writer reads them off it. The Go, the shell and the plugin copies name that owner beside the copy. No note carries the fact at all. The notes still carry the old places, so the prose copy is wrong.
 
 # Discussion
 
