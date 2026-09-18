@@ -19,6 +19,8 @@ function through(door) {
   door.append(join(at, "fresh.md"), "one\n");
   door.makeDir(under);
   door.write(join(under, "more.md"), "more\n");
+  // A copy carries bytes, and the size it answers is what a manifest names. [[spec/design_output/doors#a-fake-behaves]]
+  door.copy(file, join(at, "copy.md"));
 
   const said = {
     read: door.read(file),
@@ -26,6 +28,8 @@ function through(door) {
     exists: door.exists(file),
     folder: door.exists(under),
     missing: door.exists(join(at, "nothing.md")),
+    copied: door.read(join(at, "copy.md")),
+    size: door.size(file),
     list: door
       .list(at)
       .map((one) => `${one.name}:${one.kind}`)
@@ -44,7 +48,14 @@ test("the real door writes, reads back, lists and removes", () => {
   assert.equal(said.exists, true);
   assert.equal(said.folder, true);
   assert.equal(said.missing, false);
-  assert.deepEqual(said.list, ["deep:dir", "fresh.md:file", "notes.md:file"]);
+  assert.equal(said.copied, "# Notes\nmore\n", "a copy reads what the file reads");
+  assert.equal(said.size, said.read.length);
+  assert.deepEqual(said.list, [
+    "copy.md:file",
+    "deep:dir",
+    "fresh.md:file",
+    "notes.md:file",
+  ]);
   assert.equal(said.gone, false);
 });
 

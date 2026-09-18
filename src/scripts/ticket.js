@@ -15,11 +15,11 @@ import {
 import { TODO } from "../../.claude/skills/level0/lib/todo.js";
 import { askFaults, askRefusal } from "./ask-lint.js";
 import { fieldOf, GROUP, withField, withoutField } from "./group.js";
+import { holdsAnywhere } from "./guidance-hand.js";
 import { askRows, processAt } from "./process.js";
 
 export const NOTES = ".se/tickets";
-export const HOLD = ".se/hold.json";
-export const HOLDS = ".se/hold";
+export { HOLD, HOLDS } from "./guidance-hand.js";
 export const NOTE = "note";
 const TRAVELS = "spec/tickets";
 const SCHEMAS = "spec/schemas";
@@ -158,27 +158,7 @@ export function fromHold(route, hold) {
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 function holdOf(it) {
-  const folder = it.join(it.root, ...HOLDS.split("/"));
-  const held = it.disk.exists(folder)
-    ? it.disk
-        .list(folder)
-        .filter((one) => one.kind === "file" && one.name.endsWith(".json"))
-        .map((one) => it.join(folder, one.name))
-    : [];
-  for (const at of [...held, it.join(it.root, ...HOLD.split("/"))]) {
-    if (!it.disk.exists(at)) continue;
-    const hold = parsedJson(it.disk.read(at));
-    if (hold) return hold;
-  }
-  return null;
-}
-
-function parsedJson(text) {
-  try {
-    return JSON.parse(text);
-  } catch {
-    return null;
-  }
+  return holdsAnywhere(it)?.held ?? null;
 }
 
 // [[spec/design_output/pull#a-draft-opens]]

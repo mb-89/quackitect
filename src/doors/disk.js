@@ -4,6 +4,7 @@
 import {
   appendFileSync,
   chmodSync,
+  copyFileSync,
   existsSync,
   lstatSync,
   mkdirSync,
@@ -12,6 +13,7 @@ import {
   readFileSync,
   realpathSync,
   rmSync,
+  statSync,
   symlinkSync,
   unlinkSync,
   writeFileSync,
@@ -24,6 +26,9 @@ const RUNNABLE = 0o755;
 export function disk() {
   return {
     read: (path) => readFileSync(path, "utf8"),
+    // A copy carries bytes, because read and write carry text and an archive is no text. [[spec/design_output/doors#a-fake-behaves]]
+    copy: (from, to) => copyFileSync(from, to),
+    size: (path) => statSync(path).size,
     write: (path, text) => writeFileSync(path, text, { encoding: "utf8" }),
     append: (path, text) => appendFileSync(path, text, { encoding: "utf8" }),
     exists: (path) => existsSync(path),

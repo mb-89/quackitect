@@ -3,9 +3,10 @@
 // line it takes. The note drain stands in retro.js beside this file.
 // [[spec/design_input/the-agent-pulls-tickets]]
 
+import { holdsAnywhere } from "./guidance-hand.js";
+
 const PRIVATE = ".se";
 const RETRO = "retro";
-const HOLDS = "hold";
 // The two folders collect passes: the state a box keeps while it works, and its own copies. [[spec/tickets/the-retro-takes-the-box]]
 const SKIPS = ["runtime", RETRO];
 const MANIFEST = "manifest.jsonl";
@@ -23,11 +24,9 @@ export function collect(it, name) {
     return 2;
   }
 
-  const holding = holdsHere(it);
+  const holding = holdsAnywhere(it);
   if (holding) {
-    console.error(
-      `${holding} stands under ${PRIVATE}/${HOLDS}, and a hand holds a ticket.`,
-    );
+    console.error(`${holding.at} stands, and a hand holds a ticket while it works.`);
     console.error("Hand that step back, then run collect again.");
     return 1;
   }
@@ -41,6 +40,9 @@ export function collect(it, name) {
     console.error("Read that run, or collect for a retro of its own.");
     return 1;
   }
+
+  // A folder carrying no manifest holds a torn run, so nothing of it survives this one. [[spec/tickets/the-retro-takes-the-box]]
+  if (it.disk.exists(into)) it.disk.remove(into);
 
   const rows = copied(it, from, into, kept(it, from), PRIVATE);
   for (const one of OUTSIDE) {
@@ -58,14 +60,6 @@ export function collect(it, name) {
     `${PRIVATE}/${RETRO}/${name} holds the run, and its manifest names every line.`,
   );
   return 0;
-}
-
-// A hand mid-step writes files, and a copy of one of those tears. [[spec/tickets/the-retro-takes-the-box]]
-function holdsHere(it) {
-  const at = it.join(it.root, PRIVATE, HOLDS);
-  if (!it.disk.exists(at)) return "";
-  const rows = listed(it, at).filter((one) => one.kind === "file");
-  return rows.length ? rows[0].name : "";
 }
 
 // Every path under the private folder the two skips leave standing. [[spec/tickets/the-retro-takes-the-box]]
@@ -90,16 +84,16 @@ function copied(it, from, into, paths, source) {
   const rows = [];
   for (const path of paths) {
     const parts = path.split("/");
-    let text;
-    try {
-      text = it.disk.read(it.join(from, ...parts));
-    } catch {
-      continue;
-    }
     const holder = parts.slice(0, -1);
     it.disk.makeDir(holder.length ? it.join(into, ...holder) : into);
-    it.disk.write(it.join(into, ...parts), text);
-    rows.push({ path, size: text.length, from: source });
+    try {
+      // The copy carries bytes, because an archive under the private folder is no text. [[spec/tickets/the-retro-takes-the-box]]
+      it.disk.copy(it.join(from, ...parts), it.join(into, ...parts));
+      rows.push({ path, size: it.disk.size(it.join(from, ...parts)), from: source });
+    } catch (bad) {
+      // A file the copy refuses takes a line of its own, so the manifest names every path. [[spec/tickets/the-retro-takes-the-box]]
+      rows.push({ path, from: source, refused: String(bad?.message ?? bad) });
+    }
   }
   return rows;
 }

@@ -157,6 +157,32 @@ test("the manifest holds one line a path, with its size and where it comes from"
   );
 });
 
+// A file the copy refuses takes a line of its own, so the manifest names every path. [[spec/tickets/the-retro-takes-the-box]]
+test("a file the copy refuses takes a manifest line naming the refusal", () => {
+  const plain = doors();
+  const disk = {
+    ...plain.disk,
+    copy(from, to) {
+      if (String(from).includes("one.mjs")) throw new Error("EACCES");
+      return plain.disk.copy(from, to);
+    },
+  };
+  const it = { ...plain, disk };
+
+  heard(() => retro(ROOT, ["collect", TICKET], it));
+
+  const rows = disk
+    .read(inRetro("manifest.jsonl"))
+    .split("\n")
+    .filter(Boolean)
+    .map((row) => JSON.parse(row));
+  const said = rows.find((one) => String(one.path).endsWith("one.mjs"));
+
+  assert.ok(said, "the file it refuses takes a line");
+  assert.match(String(said.refused), /EACCES/);
+  assert.equal(said.size, undefined, "a line it refuses carries no size");
+});
+
 // [[spec/design_input/the-agent-pulls-tickets]]
 test("a second run refuses, and a run carrying no manifest goes again", () => {
   const it = doors();

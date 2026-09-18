@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -195,6 +195,14 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 097295bfd907fea78e696c0fbb6fcd57621959e3
     hash_after: 097295bfd907fea78e696c0fbb6fcd57621959e3
+  - step: implement/change
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: e91cccb406ef117aa664d39972ac8e000e2912f0
+    hash_after: e91cccb406ef117aa664d39972ac8e000e2912f0
+    answered:
+      - name: lint
+        exit: 0
+        said: 73 stand at warning, which the panel draws and check allows.
 group: the-retro-runs
 ---
 
@@ -421,9 +429,9 @@ The binary fault is the same move one layer down. The disk door reads and writes
 
 ### checked
 
-- the change touches no file the ask leaves out. One file lands, and the verb table and the need list each take a line.
-- every door the change reaches has a fake. The verb reads the disk through the door alone, and the cases drive the fake.
-- a comment names the approach the change implements. Each function points at the chapter ruling it.
+- the change touches no file the ask leaves out. The verdict sends it back for a text door on bytes. So the disk door, its fake and its contract case join the list.
+- every door the change reaches has a fake. The copy and the size land on the real door, the fake and the case together.
+- a comment names the approach the change implements. The door says why a copy stands beside a read.
 
 <!-- the form is checklist -->
 
