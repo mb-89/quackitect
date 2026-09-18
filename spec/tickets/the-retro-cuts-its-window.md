@@ -2,11 +2,20 @@
 kind: [[ticket]]
 state: open
 urgency: now
-depends_on: [the-retro-takes-the-box]
+step: design/settle-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: settle-1
+        does: decides between the step and the findings, and writes why
+        by: anyone
+        to: engine
+        asks: "design/review failed back 2 times: One gap stands, and the rest of the approach answers the ask.; | the gap | the fix |; |---|---|; | the route runs `notes` ahead of `readers`, so the drain meets every chapter open | name the field the drain reads a chapter by, and passes |; | the earlier finding | what closes it |; |---|---|; | a chapter reads as an open note | the folder stands named, and the gap above holds the rest |; | the cut reads the log alone | the times come off both sources, and a box naming no transcript folder cuts off the log |; | what answers the ask | where |; |---|---|; | the window opens at the last retro's close, or at the first commit | the opens row |; | a chapter is six hours, and a span holding no row stands nowhere | the cuts row |; | the counts carry every kind the ask names, and a missing source reads zero | the counts table |; | a chapter mints off the chapter route, with its window and counts written first | the mints row |; `./RUNME.sh check` exits 0 on this branch."
+        evidence:
+          - name: answer
+            form: text
+            says: the decision, and why it stands
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -90,8 +99,6 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-group: the-retro-runs
-step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -117,6 +124,14 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 8b8d7a25f687e2f549d9fb01f750e803dade1a08
     hash_after: 8b8d7a25f687e2f549d9fb01f750e803dade1a08
+  - step: design/review
+    hand: box d42624a67d18a8 · claude-code · helper-24
+    hash_before: 2d6ab7b0992eefb0891867cc00f3cf46de1ae73a
+    hash_after: 2d6ab7b0992eefb0891867cc00f3cf46de1ae73a
+    returns: 2
+    why: One gap stands, and the rest of the approach answers the ask.; | the gap | the fix |; |---|---|; | the route runs `notes` ahead of `readers`, so the drain meets every chapter open | name the field the drain reads a chapter by, and passes |; | the earlier finding | what closes it |; |---|---|; | a chapter reads as an open note | the folder stands named, and the gap above holds the rest |; | the cut reads the log alone | the times come off both sources, and a box naming no transcript folder cuts off the log |; | what answers the ask | where |; |---|---|; | the window opens at the last retro's close, or at the first commit | the opens row |; | a chapter is six hours, and a span holding no row stands nowhere | the cuts row |; | the counts carry every kind the ask names, and a missing source reads zero | the counts table |; | a chapter mints off the chapter route, with its window and counts written first | the mints row |; `./RUNME.sh check` exits 0 on this branch.
+group: the-retro-runs
+depends_on: ["the-retro-takes-the-box"]
 ---
 
 # Ask
@@ -143,6 +158,16 @@ One hand reads a window of any length. The reading thins as the window grows, an
 - `./RUNME.sh check` exits 0
 
 # design
+
+## settle-1
+
+<!-- decides between the step and the findings, and writes why -->
+
+### answer
+
+<!-- the decision, and why it stands -->
+
+<!-- the form is text -->
 
 ## draft
 
@@ -204,12 +229,16 @@ The span stands as a constant beside the verb, because the design fixes it and n
 
 fail
 
-Two gaps stand, and the rest of the approach answers the ask:
+One gap stands, and the rest of the approach answers the ask.
 
 | the gap | the fix |
 |---|---|
-| a chapter opens under `.se/tickets`, where `retro notes` reads it as an open note | name the folder a chapter stands in, and say how the drain passes it |
-| the cut reads the log alone | say how the transcripts' times reach the cut, which the design names beside the log |
+| the route runs `notes` ahead of `readers`, so the drain meets every chapter open | name the field the drain reads a chapter by, and passes |
+
+| the earlier finding | what closes it |
+|---|---|
+| a chapter reads as an open note | the folder stands named, and the gap above holds the rest |
+| the cut reads the log alone | the times come off both sources, and a box naming no transcript folder cuts off the log |
 
 | what answers the ask | where |
 |---|---|
@@ -230,7 +259,7 @@ Two gaps stand, and the rest of the approach answers the ask:
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+<!-- the same tests pass -->
 
 <!-- the form is command -->
 
