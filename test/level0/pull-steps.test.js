@@ -293,7 +293,8 @@ test("a need names a verb, and the box says which it holds", () => {
   assert.equal(holdsVerb("work test"), true);
   assert.equal(holdsVerb("branch pull"), true);
   assert.equal(holdsVerb("retro notes"), true);
-  assert.equal(holdsVerb("retro collect"), false);
+  assert.equal(holdsVerb("retro collect"), true);
+  assert.equal(holdsVerb("retro mine"), false);
   assert.equal(holdsVerb("deploy"), false);
   assert.equal(holdsVerb("ticket"), true);
 });

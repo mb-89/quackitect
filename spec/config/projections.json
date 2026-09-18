@@ -5,8 +5,17 @@
       "name": "the config commands",
       "shape": "config commands",
       "target": ".claude/commands",
+      "writes": ["se-config-*.md", "se-agent-control-*.md"],
       "from": "spec/config/level0.json",
       "schema": "spec/config/level0.schema.json",
+      "wrap": "frontmatter"
+    },
+    {
+      "name": "the retro command",
+      "shape": "retro command",
+      "target": ".claude/commands",
+      "writes": ["se-retro.md"],
+      "from": "spec/processes/retro.yaml",
       "wrap": "frontmatter"
     },
     {

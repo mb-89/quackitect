@@ -270,6 +270,22 @@ test("the owner of a path is the projection whose target holds it", () => {
   assert.equal(ownerOf([], ".claude/commands/se-config-judge-model.md"), undefined);
 });
 
+// Two entries share one folder, so each names the files it writes. [[spec/design_output/projection#the-write-door-refuses-one]]
+test("an entry naming what it writes owns those files, and its neighbour owns the rest", () => {
+  const config = { ...ENTRY, writes: ["se-config-*.md", "se-agent-control-*.md"] };
+  const retro = { ...ENTRY, name: "the retro command", writes: ["se-retro.md"] };
+  const entries = [config, retro];
+
+  assert.equal(ownerOf(entries, ".claude/commands/se-config-log-level-info.md"), config);
+  assert.equal(ownerOf(entries, ".claude/commands/se-agent-control-hold-off.md"), config);
+  assert.equal(ownerOf(entries, ".claude/commands/se-retro.md"), retro);
+  assert.equal(
+    ownerOf([ENTRY, retro], ".claude/commands/se-config-log-level-info.md"),
+    ENTRY,
+    "an entry naming none owns what no neighbour claims",
+  );
+});
+
 test("the refusal names the projection, the source, and the verb that mends it", () => {
   const said = refusedWrite(ENTRY, ".claude/commands/se-config-log-level-info.md");
   assert.match(said, /is projected, so nothing may write it by hand/);

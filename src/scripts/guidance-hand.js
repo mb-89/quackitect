@@ -8,6 +8,8 @@ import { hashOf } from "../../.claude/skills/level0/lib/schema.js";
 import { agentOf, BOX, handOf } from "./hand.js";
 
 export const HOLDS = ".se/hold";
+// The one file a hold stands in beside the folder, which an older box still writes. [[spec/design_output/pull#the-hand-and-the-hold]]
+export const HOLD = ".se/hold.json";
 export const GUIDANCE = "spec/guidance";
 const MARKDOWN = /\.md$/;
 const DRAFT = /^_/;
@@ -21,6 +23,23 @@ export function holdAt(it, hand) {
 export function holdOf(it, hand) {
   const at = holdAt(it, hand);
   return it.disk.exists(at) ? parsed(it.disk.read(at)) : null;
+}
+
+// Whether any hand holds a step on this box, out of the folder and the older file alike. [[spec/design_output/pull#the-hand-and-the-hold]]
+export function holdsAnywhere(it) {
+  const folder = it.join(it.root, ...HOLDS.split("/"));
+  const rows = it.disk.exists(folder)
+    ? it.disk
+        .list(folder)
+        .filter((one) => one.kind === "file" && one.name.endsWith(".json"))
+        .map((one) => it.join(folder, one.name))
+    : [];
+  for (const at of [...rows, it.join(it.root, ...HOLD.split("/"))]) {
+    if (!it.disk.exists(at)) continue;
+    const held = parsed(it.disk.read(at));
+    if (held) return { at, held };
+  }
+  return null;
 }
 
 export function parsed(text) {

@@ -6,10 +6,15 @@
 import { flatten, keysOf, LOCAL, TRACKED } from "./config.js";
 import { actionables, styled } from "./guidance.js";
 import { faultsOf, grouped, PARAGRAPH, rulesFrom, RULES } from "./paragraph.js";
+export { ownerOf } from "./projection-owner.js";
+import { folderOf, shown } from "./projection-owner.js";
 import { readYaml } from "./schema.js";
 import { pathsOf } from "./vocabulary.js";
 
 export const PROJECTIONS = "spec/config/projections.json";
+// [[spec/design_input/the-agent-pulls-tickets]]
+export const RETRO = "retro command";
+const RETRO_FILE = "se-retro.md";
 const WIDTH = 84;
 
 // [[spec/design_output/projection#the-first-target]]
@@ -86,6 +91,7 @@ export function writesOf(entry, texts) {
   const out = new Map();
   if (entry?.shape === PARAGRAPH) return schemaInto(entry, texts, rulesFrom);
   if (entry?.shape === STYLE) return styleFrom(entry, texts);
+  if (entry?.shape === RETRO) return retroFrom(entry);
   if (entry?.shape !== COMMANDS) return out;
 
   const said = flatten(parsed(texts.get(entry.from)));
@@ -110,6 +116,34 @@ export function writesOf(entry, texts) {
     put(commandsFor(widget.key, said.get(widget.key), declared(widget.key), entry, widget.path));
   }
   return out;
+}
+
+// One command mints a retro, because the route it mints from stands in one file. [[spec/design_input/the-agent-pulls-tickets]]
+function retroFrom(entry) {
+  const body = [
+    "!`./RUNME.sh retro new`",
+    "",
+    wrapped(
+      "The line above runs before this turn opens, so a retro stands open at its " +
+        "first leaf, and the answer above holds that leaf. Run `./RUNME.sh branch " +
+        "pull <name>` to read it again.",
+    ),
+    "",
+  ].join("\n");
+
+  const text =
+    entry?.wrap === "frontmatter"
+      ? [
+          "---",
+          `description: ${JSON.stringify("retro: mints a retro off its route, opens it, and hands out its first leaf.")}`,
+          "allowed-tools: Bash(./RUNME.sh retro:*)",
+          `generated: ${JSON.stringify(saysGenerated(entry.from))}`,
+          "---",
+          "",
+          body,
+        ].join("\n")
+      : body;
+  return new Map([[`${folderOf(entry.target)}/${RETRO_FILE}`, text]]);
 }
 
 // [[spec/design_output/projection#the-third-target]]
@@ -302,21 +336,6 @@ export function readAll(entries, disk, at = (path) => path) {
   return { wanted, standing, faults };
 }
 
-// [[spec/design_output/projection#the-write-door-refuses-one]]
-export function ownerOf(entries, path) {
-  const said = shown(path);
-  if (!said) return undefined;
-  return entries
-    .filter((entry) => under(said, folderOf(entry.target)))
-    .sort((a, b) => folderOf(b.target).length - folderOf(a.target).length)[0];
-}
-
-// [[spec/design_output/projection#the-write-door-refuses-one]]
-function under(said, target) {
-  if (!target) return false;
-  return said === target || said.startsWith(`${target}/`) || said.includes(`/${target}/`);
-}
-
 // [[spec/design_output/projection#check-refuses-a-stale-one]]
 export function staleIn(wanted, found) {
   const out = [];
@@ -345,17 +364,6 @@ export function refusedWrite(entry, path) {
 // [[spec/design_output/projection#each-file-says-so]]
 function wrapped(said, at = WIDTH) {
   return grouped(String(said).split(/\s+/).filter(Boolean), at).join("\n");
-}
-
-function folderOf(target) {
-  return shown(target).replace(/\/+$/, "");
-}
-
-function shown(path) {
-  return String(path ?? "")
-    .split("\\")
-    .join("/")
-    .replace(/^\.\//, "");
 }
 
 function parsed(text) {

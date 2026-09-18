@@ -37,11 +37,16 @@ so adding one is an edit to data and no program changes:
 | field | says |
 |---|---|
 | `name` | what a refusal and a log line call this projection |
-| `shape` | which relation the projector holds, and the tree holds three |
+| `shape` | which relation the projector holds, and the tree holds four |
 | `target` | the folder every file of this projection lands in |
+| `writes` | the globs this entry owns under that folder, where a neighbour shares it |
 | `from` | the declaration the files come from |
 | `schema` | the file saying the type of each key, and its options |
 | `wrap` | `frontmatter` writes the mark into a description, `none` writes none |
+
+Two entries share the command folder, so each one names what it writes. The
+owner lookup prefers the entry whose globs match the path, and an entry naming
+no `writes` owns whatever no neighbour claims.
 
 ## What comes from v4
 
