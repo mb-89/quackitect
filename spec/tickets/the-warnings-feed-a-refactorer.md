@@ -75,11 +75,19 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: sync
+step: split
 record:
   - step: sync
     hand: box a5e189c39e1d · claude-code-remote
     hash_before: 8da7e3bf8fb26d2e2159dd2529269e8b07af57a1
+  - step: sync
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: ca14d3ebef6ad6d884d1dc93144acbcf239c951f
+    hash_after: ca14d3ebef6ad6d884d1dc93144acbcf239c951f
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-warnings-feed-a-refactorer already carries every commit on main.
 ---
 
 # Ask
@@ -97,6 +105,8 @@ A rule a refactoring hand fixes becomes a warning in place of a refusal. One lis
 <!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
