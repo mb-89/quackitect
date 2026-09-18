@@ -91,7 +91,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -111,6 +111,17 @@ record:
     hand: box d42624a67d18a8 · claude-code · helper-24
     hash_before: f03adf352b9473f944a583dbcde10dbeb5dcf89c
     hash_after: f03adf352b9473f944a583dbcde10dbeb5dcf89c
+  - step: implement/tests-red
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 74d207944b7ebe1cc3b1f8da9b5249b66d78304d
+    hash_after: 74d207944b7ebe1cc3b1f8da9b5249b66d78304d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -220,19 +231,31 @@ Both gaps close, and the approach answers the ask.
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+    ./RUNME.sh branch test test/level0/retro-leaves.test.js
 
 <!-- the form is command -->
 
 ### seen
 
-<!-- what you see, and what surprises you -->
+Five cases stand, and each one fails on its own assertion.
 
-<!-- the form is text -->
+| the case | what it asks |
+|---|---|
+| a file a leaf | seven leaves take a file, and a window holding nothing leaves it empty |
+| the shell leaf | a job takes a row, with its count and one example |
+| the refusals leaf | a rule takes a row, with how often it fires |
+| the tickets leaf | a ticket closing in the window arrives as that commit leaves it |
+| the manifest | every leaf file takes a line, so the unread leaf finds them |
+
+What surprises me is how much the log already carries. The rows name a kind, a level and a line, so the shell and the refusals leaves read one file and no transcript.
+
+The takes off git reach the retro folder as rows, so no leaf runs git itself. A leaf then reads one file, and a reader repeats the reading without the tree beside them.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change touches no file the ask leaves out. One case file lands, and nothing else moves.
+- every door the change reaches has a fake. The cases drive the fake disk and the fake git, and reach no real door.
+- a comment names the approach the change implements. The header points at the retro chapter of the design input.
 
 <!-- the form is checklist -->
 
