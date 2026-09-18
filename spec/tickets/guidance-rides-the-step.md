@@ -179,7 +179,11 @@ record:
     hand: box 16e341806abd · claude-code-remote
     hash_before: 6fa5ff9d90aaa9bc4434b3304de075d96e5b94e4
     hash_after: 6fa5ff9d90aaa9bc4434b3304de075d96e5b94e4
-step: retro/cloud
+  - step: retro/cloud
+    hand: box 16e341806abd · claude-code-remote
+    hash_before: 4ee349562c2b0cdae3146844ca6e614442251560
+    hash_after: 4ee349562c2b0cdae3146844ca6e614442251560
+step: children
 ---
 
 # Ask
@@ -309,9 +313,8 @@ The group's whole remaining work sits behind one person step. Every box the sche
 
 <!-- the form is list -->
 
-- a judge answer naming the rule it reads, at each refusal over the tool
-- `mcp__level0__patch` and `mcp__level0__replace`, which the guidance names, at the retro write
-- a server at session start, because the setup brings no modules yet
+- `mcp__level0__patch` and `mcp__level0__replace`, which the guidance names for a many-line write, at the retro write
+- `check_answer`, which the guidance names over a long draft, at this answer
 - the install runs whole at the take, and the proxy refuses no host
 
 ### met
@@ -320,10 +323,9 @@ The group's whole remaining work sits behind one person step. Every box the sche
 
 <!-- the form is list -->
 
-- the judge, which refuses this retro over the tool at each hand-back
-- the voice rules, which hold a retro in the present tense and cap a list sentence
 - the person step on [[spec/tickets/the-pull-splits-by-topic]], which leaves the children step again
-- the write door, which takes the Edit route into a tracked file
+- the voice rules, which hold a retro in the present tense, and which the lint answers clean
+- the write door, which a shell write walks past, so the lint alone carries the check
 
 ### left
 
@@ -331,11 +333,12 @@ The group's whole remaining work sits behind one person step. Every box the sche
 
 <!-- the form is list -->
 
-- [[spec/tickets/the-pull-splits-by-topic]] waits at design/person-1, and its record holds the question
+- [[spec/tickets/the-pull-splits-by-topic]] waits at design/person-1, and its record holds the question the engine asks
 - the split of the pull and the work verb waits behind that person step
 - this box mints no ticket, so none stands here without a group
 - the branch owes its handover at done, and this retro is what it carries
 - the group's discussion names what a person decides, each with the moment it shows
+
 
 # Discussion
 
