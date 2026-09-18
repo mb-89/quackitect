@@ -3,7 +3,7 @@
 // whole tree into the problems panel.
 // [[spec/design_output/tree#the-rules-over-two-files]]
 
-import { MOVED } from "./folders.js";
+import { MOVED, PRIVATE, RETRO, RUN } from "./folders.js";
 import { overLong } from "./names.js";
 import { isDraft } from "./paths.js";
 import { carriesTheName, namesAPerson } from "./private.js";
@@ -25,9 +25,13 @@ const OWNER = "folders.js";
 const OWNED = /^(?:src|\.claude)\/.*\.(?:js|go|sh)$/;
 const A_TEST = /_test\.go$|\.test\.js$/;
 const MOVED_NAMES = MOVED.join("|").replace(/\./g, "\\.");
+// The two folder names come off folders.js, so a rename there carries here. [[spec/design_input/the-runtime-files-stand-apart]]
+const HALVES = [RUN, RETRO]
+  .map((one) => one.slice(`${PRIVATE}/`.length).replace(/\./g, "\\."))
+  .join("|");
 const SPELLS = [
-  /\.se\/(?:run|retro)\b/,
-  /"\.se"\s*,\s*"(?:run|retro)"/,
+  new RegExp(`\\.se\\/(?:${HALVES})\\b`),
+  new RegExp(`"\\.se"\\s*,\\s*"(?:${HALVES})"`),
   new RegExp(`\\.se\\/(?:${MOVED_NAMES})\\b`),
   new RegExp(`"\\.se"\\s*,\\s*"(?:${MOVED_NAMES})"`),
 ];

@@ -202,10 +202,10 @@ test("the hold reads back what the pull writes, and a box with no id mints one",
   const { it, disk } = doors(standing());
   it.root = ROOT;
   assert.equal(holdOf(it, HAND), null);
-  disk.remove(at(".se/run/box.json"));
+  disk.remove(at(".se/.runtime/box.json"));
   it.random = () => "fresh1";
   heard(() => work(ROOT, ["pull"], it));
-  assert.equal(JSON.parse(disk.read(at(".se/run/box.json"))).id, "fresh1");
+  assert.equal(JSON.parse(disk.read(at(".se/.runtime/box.json"))).id, "fresh1");
   assert.equal(holdOf(it, "box fresh1").ticket, "a-child");
 });
 

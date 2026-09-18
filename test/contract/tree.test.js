@@ -241,7 +241,7 @@ test("a plain biome path on Windows is refused", () => {
   const found = biomeOnWindows(
     fakeTree({
       [EDITOR_SETTINGS]: edited(EDITOR_SETTINGS, (said) => {
-        said["biome.lsp.bin"]["win32-x64"] = ".se/run/bin/biome";
+        said["biome.lsp.bin"]["win32-x64"] = ".se/.runtime/bin/biome";
       }),
     }),
   );
@@ -315,8 +315,8 @@ test("a file spelling the runtime folder without naming its owner is refused", (
   const found = privateFolderOwned(
     fakeTree(
       {
-        "src/scripts/stray.js": 'const at = "x";\nconst hold = ".se/run/hold";\n',
-        "src/index/split.go": 'const at = ".se", "run"\n',
+        "src/scripts/stray.js": 'const at = "x";\nconst hold = ".se/.runtime/hold";\n',
+        "src/index/split.go": 'const at = ".se", ".runtime"\n',
       },
       ["src/scripts/stray.js", "src/index/split.go"],
     ),
@@ -365,11 +365,11 @@ test("every forced copy of the session file says what the hand module says", () 
 test("a file naming the owner beside the copy passes, and a test file passes", () => {
   const owned = {
     "src/scripts/imports.js":
-      'import { inRun } from "../../.claude/skills/level0/lib/folders.js";\nconst hold = inRun("hold");\nconst said = ".se/run/hold";\n',
+      'import { inRun } from "../../.claude/skills/level0/lib/folders.js";\nconst hold = inRun("hold");\nconst said = ".se/.runtime/hold";\n',
     "src/extension/copy.js":
-      "// The folder folders.js owns, spelled again here.\nconst BIN = \".se/run/bin\";\n",
-    "test/level0/folders.test.js": 'const at = ".se/run/bin";\n',
-    ".claude/skills/level0/lib/folders.js": 'export const RUN = ".se/run";\n',
+      "// The folder folders.js owns, spelled again here.\nconst BIN = \".se/.runtime/bin\";\n",
+    "test/level0/folders.test.js": 'const at = ".se/.runtime/bin";\n',
+    ".claude/skills/level0/lib/folders.js": 'export const RUN = ".se/.runtime";\n',
   };
   assert.deepEqual(privateFolderOwned(fakeTree(owned, Object.keys(owned))), []);
   assert.deepEqual(privateFolderOwned(here), []);

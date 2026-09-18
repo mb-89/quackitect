@@ -20,7 +20,7 @@ steps:
         does: answers the question the engine asks
         by: person
         to: engine
-        asks: "design/review failed back 3 times: The owner's ruling closes every earlier finding. One gap stands, and a second beside it:; the log moves to `.se/runtime` [[spec/tickets/the-runtime-folder-holds-state]], and the skips row passes that folder; say how the log reaches the retro, because the rotates row prepares a file collect leaves standing; name the scratchpad, which [[spec/design_input/the-agent-pulls-tickets]] gives as the second source the `scripts` leaf reads; The rest answers the ask: the two skips, the manifest, the hold refusal, the transcripts, the second run.; `./RUNME.sh check` exits 0 on this branch."
+        asks: "design/review failed back 3 times: The owner's ruling closes every earlier finding. One gap stands, and a second beside it:; the log moves to `.se/.runtimetime` [[spec/tickets/the-runtime-folder-holds-state]], and the skips row passes that folder; say how the log reaches the retro, because the rotates row prepares a file collect leaves standing; name the scratchpad, which [[spec/design_input/the-agent-pulls-tickets]] gives as the second source the `scripts` leaf reads; The rest answers the ask: the two skips, the manifest, the hold refusal, the transcripts, the second run.; `./RUNME.sh check` exits 0 on this branch."
         evidence:
           - name: answer
             form: text
@@ -142,7 +142,7 @@ record:
     hash_before: ceb222f5e7e499abef1471ce06e4e2adf9706a3f
     hash_after: ceb222f5e7e499abef1471ce06e4e2adf9706a3f
     returns: 3
-    why: "The owner's ruling closes every earlier finding. One gap stands, and a second beside it:; the log moves to `.se/runtime` [[spec/tickets/the-runtime-folder-holds-state]], and the skips row passes that folder; say how the log reaches the retro, because the rotates row prepares a file collect leaves standing; name the scratchpad, which [[spec/design_input/the-agent-pulls-tickets]] gives as the second source the `scripts` leaf reads; The rest answers the ask: the two skips, the manifest, the hold refusal, the transcripts, the second run.; `./RUNME.sh check` exits 0 on this branch."
+    why: "The owner's ruling closes every earlier finding. One gap stands, and a second beside it:; the log moves to `.se/.runtimetime` [[spec/tickets/the-runtime-folder-holds-state]], and the skips row passes that folder; say how the log reaches the retro, because the rotates row prepares a file collect leaves standing; name the scratchpad, which [[spec/design_input/the-agent-pulls-tickets]] gives as the second source the `scripts` leaf reads; The rest answers the ask: the two skips, the manifest, the hold refusal, the transcripts, the second run.; `./RUNME.sh check` exits 0 on this branch."
   - step: design/person-2
     hand: box d42624a67d18a8 · claude-code · the owner says so
     hash_before: a1ce0cf0d6e9f8836af5c716406369d4ee4d963c

@@ -98,7 +98,7 @@ The order runs data first, then drawing, then the acts. Eleven tickets stand:
 | `the-work-answer-lands` | one verb writes what git knows, and the editor reads that file |
 | `the-work-tab-draws` | the base file, the columns, and the tree in the tab |
 | `the-flags-draw-as-letters` | one boolean key a flag, one lettered column |
-| `the-runtime-folder-holds-state` | `.se/runtime` takes the engine's state, and the index walks the rest |
+| `the-runtime-folder-holds-state` | `.se/.runtimetime` takes the engine's state, and the index walks the rest |
 | `the-tree-sorts-several-keys` | a sort of several keys, between the data and the view |
 | `one-urgency-stands` | the three urgency words become one mark |
 | `the-queue-is-a-score` | the queue orders by a polynomial the config weighs |

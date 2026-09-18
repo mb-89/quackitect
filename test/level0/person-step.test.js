@@ -95,7 +95,7 @@ function doors() {
   );
   const disk = fakeDisk({
     [at("spec/schemas/ticket.schema.yaml")]: SCHEMA,
-    [at(".se/run/box.json")]: JSON.stringify({ id: "d462e994b4cef" }),
+    [at(".se/.runtime/box.json")]: JSON.stringify({ id: "d462e994b4cef" }),
     [at("spec/tickets/one-group.md")]: GROUP,
     [at("spec/tickets/a-child.md")]: ASKS,
   });
@@ -155,7 +155,7 @@ test("a hand the owner sends takes a person's step, and the record names both", 
   assert.match(said, /a-child at design\/person-1/, "the hand the owner sends takes the step");
   assert.doesNotMatch(said, /waits for a person/);
 
-  const folder = join(ROOT, ".se", "run", "hold");
+  const folder = join(ROOT, ".se", ".runtime", "hold");
   const held = it.disk
     .list(folder)
     .map((one) => it.disk.read(join(folder, one.name)))

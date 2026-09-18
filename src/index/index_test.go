@@ -16,7 +16,7 @@ func tree(t *testing.T) string {
 	write(t, root, "spec/one.md", "---\nkind: note\nid: one\n---\n\nThe first note says [[two]] out loud.\n")
 	write(t, root, "spec/two.md", "---\nkind: note\nid: two\n---\n\nThe second note names [[nobody]] at all.\n")
 	write(t, root, "src/plain.js", "// a line the search finds\nconst said = 1;\n")
-	write(t, root, ".se/run/skipped.md", "---\nid: skipped\n---\n\nThis never reaches the index.\n")
+	write(t, root, ".se/.runtime/skipped.md", "---\nid: skipped\n---\n\nThis never reaches the index.\n")
 	write(t, root, ".se/tickets/parked.md", "---\nid: parked\n---\n\nA word standing under the private folder alone: marzipan.\n")
 	return root
 }
@@ -50,7 +50,7 @@ func TestTheWalkSkipsTheRuntimeHalfAndNothingElseUnderThePrivateFolder(t *testin
 	db := opened(t, root)
 
 	var count int
-	if err := db.QueryRow(`SELECT count(*) FROM file WHERE path LIKE '.se/run/%'`).Scan(&count); err != nil {
+	if err := db.QueryRow(`SELECT count(*) FROM file WHERE path LIKE '.se/.runtime/%'`).Scan(&count); err != nil {
 		t.Fatal(err)
 	}
 	if count != 0 {

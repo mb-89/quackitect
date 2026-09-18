@@ -36,10 +36,10 @@ its own state sits beside work a reader wants, so no rule reaches one without
 reaching the other. The index skips the whole folder today, and a reader loses
 the half worth reading.
 
-`.se/runtime` takes the engine's own state, and the rest of `.se` stays what a
+`.se/.runtimetime` takes the engine's own state, and the rest of `.se` stays what a
 reader reads:
 
-| what moves to `.se/runtime` | what it is |
+| what moves to `.se/.runtimetime` | what it is |
 |---|---|
 | `index.db`, `index.json` | the index, and where its door stands |
 | `log/` | the session log, the server log, and the rotations |
@@ -66,7 +66,7 @@ tree twice, so every row doubles and every search answers each line twice.
 `~/.se/vehicles` sits in the home of the box, outside this tree, so nothing
 here reaches it.
 
-The index then skips `.se/runtime` alone, and walks the rest. Two faults go
+The index then skips `.se/.runtimetime` alone, and walks the rest. Two faults go
 with that change:
 
 - The index walking `.se` reads its own database, and a write to it marks its
@@ -81,8 +81,8 @@ one sentence.
 The gain is a rule that reads. A folder named `runtime` says what it holds, and
 a reader needs no list to know what the index passes.
 
-- `.se/runtime` holds every file the table above names
-- the index skips `.se/runtime`, and walks the rest of `.se`
+- `.se/.runtimetime` holds every file the table above names
+- the index skips `.se/.runtimetime`, and walks the rest of `.se`
 - a write under `.se/tickets` marks the rows dirty, and a reader sees it
 - a write to the log sweeps nothing
 - `node --test "test/level0/*.test.js"` is green

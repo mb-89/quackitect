@@ -5,7 +5,7 @@
 
 export const PRIVATE = ".se";
 export const RETRO = `${PRIVATE}/retro`;
-export const RUN = `${PRIVATE}/run`;
+export const RUN = `${PRIVATE}/.runtime`;
 
 // The names the runtime half took, so a spelling of one straight under the private folder is a reader the move left behind. [[spec/design_output/private#three-kinds-stand-apart]]
 export const MOVED = [
@@ -30,6 +30,8 @@ export const MOVED = [
 export const HOLDS = `${RUN}/hold`;
 // The one file a hold stands in beside the folder, which an older box still writes. [[spec/design_output/pull#the-hand-and-the-hold]]
 export const HOLD = `${RUN}/hold.json`;
+// The log stands outside the runtime folder, because the retro collects it. [[spec/tickets/the-retro-takes-the-box]]
+export const LOG = `${PRIVATE}/log`;
 export const NOTES = `${PRIVATE}/notes`;
 export const TICKETS = `${PRIVATE}/tickets`;
 

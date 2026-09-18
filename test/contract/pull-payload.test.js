@@ -19,7 +19,7 @@ const ROOT = "/tree";
 const SHA = "b818c390c02737351bf1b73aba36a573d34d2ecc";
 const BRANCH = "work/one-group";
 const at = (path) => join(ROOT, ...path.split("/"));
-const HOLD = at(".se/run/hold/box-d462e994b4cef.json");
+const HOLD = at(".se/.runtime/hold/box-d462e994b4cef.json");
 const TICKET = at("spec/tickets/a-child.md");
 
 const GROUP = `---
@@ -104,7 +104,7 @@ function doors(more = {}) {
   );
   const disk = fakeDisk({
     [at("spec/schemas/ticket.schema.yaml")]: SCHEMA,
-    [at(".se/run/box.json")]: JSON.stringify({ id: "d462e994b4cef" }),
+    [at(".se/.runtime/box.json")]: JSON.stringify({ id: "d462e994b4cef" }),
     [at("spec/tickets/one-group.md")]: GROUP,
     [TICKET]: CHILD,
   });

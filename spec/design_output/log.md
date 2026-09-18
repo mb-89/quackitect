@@ -9,7 +9,7 @@ the shape of a line, who says what, and who reads it back.
 
 # What one line looks like
 
-One JSON object per line, in one file per session: `.se/run/log/session.jsonl`.
+One JSON object per line, in one file per session: `.se/log/session.jsonl`.
 The viewer reads it. For details, see [[spec/design_output/viewer]].
 
 | field | holds | on the row |
@@ -151,10 +151,10 @@ under that.
 
 # A session rotates its file
 
-At session start, the hook moves the last session's file into `.se/run/log/old`,
+At session start, the hook moves the last session's file into `.se/log/old`,
 named by the time of its first line, and starts `session.jsonl` empty:
 
-    .se/run/log/old/2026-09-08T14-22-51-a6f8c43b.jsonl
+    .se/log/old/2026-09-08T14-22-51-a6f8c43b.jsonl
 
 `$.fs` offers no move, so the hook writes the old text to its new name and then
 empties the session file. The log keeps every session, and the viewer shows the

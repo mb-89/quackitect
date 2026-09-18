@@ -184,7 +184,7 @@ a hole somebody walks through, so the name reaches a function alone.
 | `runs` | answers true when |
 |---|---|
 | `work-waiting` | a todo stands unfinished, or this branch stands at `held` |
-| `ticket-in-hand` | a hold stands under `.se/run/hold`, or an open private ticket stands |
+| `ticket-in-hand` | a hold stands under `.se/.runtime/hold`, or an open private ticket stands |
 | `group-in-hand` | this branch's group carries a take with no hand-back |
 | `queue-waits` | a desk bound to the queue stands on trunk, and `queueHolds` reads a free open ticket or a group at `now` |
 | `chat-is-new` | the session log holds one prompt row at most, the box is no cloud box, and the answer names no next step |

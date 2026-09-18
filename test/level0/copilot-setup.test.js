@@ -48,5 +48,5 @@ test("explicit cloud setup does not depend on local detection", () => {
   it.detect = () => false;
   assert.deepEqual(setup(it), []);
   assert.equal(setup(it, "cloud").length, 2);
-  assert.equal(it.disk.read("/tree/.se/run/copilot-cloud"), "cloud\n");
+  assert.equal(it.disk.read("/tree/.se/.runtime/copilot-cloud"), "cloud\n");
 });

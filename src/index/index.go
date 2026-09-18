@@ -54,7 +54,7 @@ var skipped = map[string]bool{
 }
 
 // The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because a Go module imports no JavaScript.
-const Runtime = ".se/run"
+const Runtime = ".se/.runtime"
 
 func skips(root, abs string, info os.FileInfo) bool {
 	if skipped[info.Name()] {

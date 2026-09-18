@@ -158,7 +158,7 @@ test("the copy carries the method and nothing private", () => {
   assert.equal(files.exists("/copy/.se/copy.json"), false);
 
   assert.equal(travels(".git"), false);
-  assert.equal(travels(".se/run/bin/vale"), false);
+  assert.equal(travels(".se/.runtime/bin/vale"), false);
   assert.equal(travels("src/parts/one.js"), true);
 });
 

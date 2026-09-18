@@ -12,7 +12,7 @@ import { askFaults } from "../../src/scripts/ask-lint.js";
 import { askLines, ticket } from "../../src/scripts/ticket.js";
 
 const ROOT = "/tree";
-const VALE = "/tree/.se/run/bin/vale";
+const VALE = "/tree/.se/.runtime/bin/vale";
 const AT = "spec/tickets/a-thing.md";
 const at = (path) => join(ROOT, ...path.split("/"));
 
