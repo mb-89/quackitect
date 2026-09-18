@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/tests-red
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -142,6 +142,17 @@ record:
     hand: box d42624a67d18a8 · claude-code · helper-30
     hash_before: 20061264589594e9b2306b820420ff4f8b34ab9f
     hash_after: 20061264589594e9b2306b820420ff4f8b34ab9f
+  - step: implement/tests-red
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 0156c24dcb95ee097f5db72208f207250ba28e26
+    hash_after: 0156c24dcb95ee097f5db72208f207250ba28e26
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 group: the-retro-runs
 depends_on: ["the-retro-takes-the-box"]
 ---
@@ -279,19 +290,30 @@ A parked note carries `process: [[spec/processes/note]]`, so the field tells the
 
 ### tests
 
-<!-- the same tests pass -->
+    ./RUNME.sh branch test test/level0/retro-window.test.js
 
 <!-- the form is command -->
 
 ### seen
 
-<!-- what you see, and what surprises you -->
+Four cases stand, and each one fails on its own assertion.
 
-<!-- the form is text -->
+| the case | what it asks |
+|---|---|
+| the cut | two spans hold rows, the span between them holds none, and two chapters stand |
+| the mint | a chapter carries the chapter route and names the retro as its group |
+| the counts | the window and the counts stand in the ask before anybody reads |
+| the first window | a tree with no closed retro opens at its first commit |
+
+What surprises me is how the empty span proves the rule. A window of a day holds four spans, and two of them hold rows, so two chapters stand and no reader meets an empty one.
+
+The counts read off the log's own kinds. A row names a prompt, a shell line, a tool call or a write, so one file answers every count the ask asks for.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change touches no file the ask leaves out. One case file lands, and nothing else moves.
+- every door the change reaches has a fake. The cases drive the fake disk, the fake git and the fake clock.
+- a comment names the approach the change implements. The fixture says why one span holds no rows.
 
 <!-- the form is checklist -->
 
