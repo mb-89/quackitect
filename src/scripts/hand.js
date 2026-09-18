@@ -48,8 +48,7 @@ export function handOf(it) {
   return parts.join(" · ");
 }
 
-// The box file stands under the work root, and the copy record under the method
-// root, so a stub names its own box. [[spec/design_output/vehicle#the-work-root-inherits]]
+// The box file stands under the work root, and the copy record under the method root, so a stub names its own box. [[spec/design_output/vehicle#the-work-root-inherits]]
 function boxOf(it) {
   for (const [root, path] of [
     [it.root, BOX],
