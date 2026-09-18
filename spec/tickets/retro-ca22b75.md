@@ -182,7 +182,7 @@ steps:
       - name: groups
         form: list
         says: one line per ticket, with its group and its urgency
-step: notes
+step: readers
 process: [[spec/processes/retro]]
 process_hash: 61a2bb140f0b4632
 record:
@@ -206,6 +206,14 @@ record:
       - name: rate
         exit: 0
         said: No retro mints an improvement yet, so this one scores nothing.
+  - step: notes
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 4d9fd763c30476a7d7d9ae3b47c1721fccc11973
+    hash_after: 4d9fd763c30476a7d7d9ae3b47c1721fccc11973
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
 ---
 
 # Ask
@@ -258,7 +266,7 @@ the three branches land on trunk, and this reads the window they close
 
 ## drained
 
-<!-- retro notes, which passes when the private folder is empty -->
+    ./RUNME.sh retro notes
 
 <!-- the form is command -->
 
