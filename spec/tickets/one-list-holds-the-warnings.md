@@ -36,7 +36,12 @@ steps:
 process: [[spec/processes/question]]
 process_hash: 1f3006ec4b044a89
 group: the-warnings-feed-a-refactorer
-step: answer
+step: do
+record:
+  - step: answer
+    hand: box dd2a59294365 · claude-code-remote · the owner says so
+    hash_before: bf011f342ad11c5363a262f4d214e13c22f4de41
+    hash_after: bf011f342ad11c5363a262f4d214e13c22f4de41
 ---
 
 # Ask
@@ -80,6 +85,36 @@ Two facts the reviews establish:
 <!-- the answer, which the step behind this one reads -->
 
 <!-- the form is text -->
+
+The one list is the check's own answer, and nothing writes a second one.
+
+| reader | what it takes |
+|---|---|
+| the panel | what the language server draws, which the check reads too |
+| the push door | `./RUNME.sh lint`, run over the files the push carries |
+| the refactoring hand | the same lint, run over the tree |
+
+**Why the check and no record.** A record a write fills holds what a write met, and the panel draws what the tree holds. Two sources drift the moment a hand edits a file outside a session. The check reads the tree, so every reader sees one thing.
+
+**What the push door reads.** The lint over the files the push carries. So the warnings standing today block no push, and a file this branch touches carries its own.
+
+| what a push carries | what the door does |
+|---|---|
+| a file with a warning the push adds | refuses, and names the file and the rule |
+| a file whose warnings all predate the branch point | passes |
+| no file the lint reads | passes |
+
+That answers the review's sharpest finding: a door reading the whole tree refuses every push the moment it lands.
+
+**What carries the side.** Every rule, at the place a reader edits it. The Vale rules gain a projected `level`, and the code rules keep the `severity` they stamp today.
+
+| what builds a finding | what changes |
+|---|---|
+| `spec/schemas/paragraph.schema.yaml`, through `paragraph.js` and `snippets.js` | a `rules` map holds a side a rule, and the projection writes it |
+| the hand-written rules under the three other folders | nothing, because each carries `level: error` already |
+| `lib/tree.js`, `size.js`, `ticket.js`, `schema.js` | nothing, because each stamps its own `severity` already |
+
+So the change is smaller than the ask reads. The side already stands almost everywhere, and the work is the projection's map and the two push doors.
 
 # do
 
