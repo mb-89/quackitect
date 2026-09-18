@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: design/draft
+step: design/review
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -124,6 +124,10 @@ record:
     hand: box d42624a67d18a8 · claude-code · the owner says so
     hash_before: 28011a9a0b2a4bd1951288fe25d94d2e17c784e0
     hash_after: 28011a9a0b2a4bd1951288fe25d94d2e17c784e0
+  - step: design/draft
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 364774fdc247f3c43e5a79d65f518880ad65696f
+    hash_after: 364774fdc247f3c43e5a79d65f518880ad65696f
 group: the-retro-runs
 ---
 
@@ -183,42 +187,28 @@ This ticket waits on [[spec/tickets/the-runtime-files-stand-apart]], which cuts 
 
 ### approach
 
-`retro collect` walks the private folder, copies what the deny list leaves standing into the retro's own folder, and writes a manifest beside it.
+`retro collect` copies the private folder into the retro's own folder, and writes a manifest beside it.
 
 | the step | what it does |
 |---|---|
 | refuses | a hold standing under the private folder stops the verb, because a hand mid-step writes files a copy tears |
 | rotates | the log's open file closes, so the copy holds whole lines |
-| walks | every path under the private folder, deepest first |
-| keeps | a path the deny list leaves standing |
-| copies | that path into the retro folder, at the same relative place |
+| copies | every path under the private folder, at the same relative place |
+| skips | the runtime folder, and the retro's own folder |
 | writes | one manifest line a path, with its size and where it comes from |
 
-The verb copies and removes nothing. A drain that deletes leaves a box with no record where the retro fails half way. The walk takes any order, because nothing moves.
+The owner rules the skip a folder and no list. A folder says what its files are for, so a reader tells the kinds apart by where they stand.
 
-| where the deny list stands | `retro.deny` under the config, with its type and its help in the schema |
+| the folder | why collect passes it |
 |---|---|
-| what it holds | a glob a line, read against the path relative to the private folder |
-| who adds to it | the owner, in the config, and a box through its own layer |
+| the runtime folder | it holds the state a box keeps while it works, which dies with the box |
+| the retro folder | it holds a copy already, and a copy of a copy doubles it |
 
-The default names every line, so a hand reads what it takes without guessing:
+Everything else comes across. A file of a kind nobody plans for lands in the retro that way. The `unread` leaf reads the manifest against what the other leaves read.
 
-| the glob | why it stands outside the take |
-|---|---|
-| `retro/**` | the retro's own folders, which a take of a take doubles |
-| `bin/**`, `lnav/**`, `*.pdf` | tools and reference, which no hand writes here |
-| `hold/**` | the hold a hand writes as it works |
-| `index.db*` | the index, which a copy tears while a writer holds it |
-| `tmp/**`, `undo/**` | scratch and the write journal, which the tree derives again |
-| `config.json`, `copy.json`, `box.json` | the box's own identity and its config layer |
-| `show-panel` | a flag the editor reads and drops |
-| `HANDOVER.md` | the brief, which git carries on the branch already |
+The verb copies and removes nothing. A drain that deletes leaves a box with no record where the retro fails half way. The order of the copies carries no meaning.
 
-The log archive stays inside the take. It carries the record of earlier runs, and a rule over binaries drops exactly what a retro reads.
-
-A deny list takes a file of a kind nobody plans for. The `unread` leaf reads the manifest against what every other leaf reads, so a file nobody reads stands as a finding.
-
-The transcripts stand outside the private folder, in the harness's own files. The verb reads their folder off the environment the harness sets, takes every session file, and names each in the manifest. The deny list covers the private folder alone.
+The transcripts stand outside the private folder, in the harness's own files. The verb reads their folder off the environment the harness sets. It copies every session file, and names each in the manifest.
 
 | what the folder reads | `.se/retro/<ticket>/` |
 |---|---|
