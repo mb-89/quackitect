@@ -256,7 +256,15 @@ record:
     hand: the engine
     hash_before: 9fda0f3308002977a473a06dba968ed4145759e8
     hash_after: 9fda0f3308002977a473a06dba968ed4145759e8
-step: retro/notes
+  - step: retro/notes
+    hand: box d5700e16c529 · claude-code-remote
+    hash_before: 06da480542025b35562a6e3d9c0b9b6fed88cae3
+    hash_after: 06da480542025b35562a6e3d9c0b9b6fed88cae3
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
+step: retro/write
 ---
 
 # Ask
