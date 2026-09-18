@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/tests-green
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -149,6 +149,17 @@ record:
     hash_after: 0375730202004712f98a85af9c0b5bf786bb7c3c
     answered:
       - name: lint
+        exit: 0
+        said: 75 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: fff6ff418428f1f1b372e0c2527d3372fd039d1c
+    hash_after: fff6ff418428f1f1b372e0c2527d3372fd039d1c
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 27 test(s) pass in 2 file(s)
+      - name: check
         exit: 0
         said: 75 stand at warning, which the panel draws and check allows.
 group: the-retro-runs
@@ -355,25 +366,44 @@ The owner lookup takes the harder half. An entry naming no `writes` owns its who
 
 ### tests
 
-<!-- the same tests pass -->
+    ./RUNME.sh branch test test/level0/retro-new.test.js test/level0/projection.test.js
 
 <!-- the form is command -->
 
 ### check
 
-<!-- the check is green on the commit -->
+    ./RUNME.sh check
 
 <!-- the form is command -->
 
 ### says
 
-<!-- what changes and why, for a reader who was not there -->
+`/se-retro` stands, and it runs `./RUNME.sh retro new` before the turn opens.
 
-<!-- the form is text -->
+| what lands | where |
+|---|---|
+| the verb, which mints, opens and hands out | `src/scripts/retro-new.js` |
+| the dispatch beside collect and the drain | `src/scripts/retro.js` |
+| the shape writing the one command file | the projector |
+| the entry naming the retro route as its source | `spec/config/projections.json` |
+| the two knobs, with their defaults | `spec/config/level0.json` and its schema |
+| the `writes` row, beside the other entry keys | `spec/design_output/projection` |
+
+The verb writes none of the pull's words again. It mints the note, opens it at the route's first leaf, and hands that leaf out through the pull itself.
+
+The owner lookup moves to a file of its own, because the projector stands past the file ceiling. Nothing outside it moves, because the projector reads the lookup out to every caller it holds.
+
+| what an entry names | what owns the file |
+|---|---|
+| `se-config-*.md` and `se-agent-control-*.md` | the config commands |
+| `se-retro.md` | the retro command |
+| nothing | whatever no neighbour claims |
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change touches no file the ask leaves out. The verb, its dispatch, the shape, the entry, the knobs, the design row and the projected files.
+- every door the change reaches has a fake. The cases drive the fake disk, the fake git and the fake clock.
+- a comment names the approach the change implements. The lookup's own file says why it stands apart.
 
 <!-- the form is checklist -->
 
