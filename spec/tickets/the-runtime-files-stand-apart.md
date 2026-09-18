@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box a5e189c39e1d · claude-code-remote
@@ -140,6 +140,12 @@ record:
       - name: check
         exit: 0
         said: 78 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box dd2a59294365 · claude-code-remote · helper-9
+    hash_before: f36c7a1f0a1ae5def21f886694b82109bf505d85
+    hash_after: f36c7a1f0a1ae5def21f886694b82109bf505d85
+    returns: 1
+    why: "`src/scripts/review.js` makes `.se`, then writes the survey under the runtime folder. `branch review` dies there.; `copilot-setup.js` makes `.se`, then writes the cloud mark under the runtime folder. The same class of error.; `level1.js` writes the hand's session file at the old path, and its two readers read the new one.; The change commit tracks the built binary `src/index/index`. The walk reads and hashes it on every pass.; `RETRO` stands exported and tested, and the branch writes under it nowhere. The retro verb takes it up later.; `src/lsp/serve.go`, `src/lsp/tree.go` and `src/doors/session.js` spell the runtime folder, and point at no owner.; `test/level0/folders.test.js` holds no case over the session file, so that drift passes green.; `./RUNME.sh check` answers 0 in the tree. The review verb dies before the worktree check runs.; The handover carries a surprises chapter, and a retro chapter waits on the group.; The walk, the skip rule and the placement rule each carry a case asserting a refusal.; The installer's move of a box's old places carries no case.; The rest of the branch splits files by topic for other tickets, and redesigns what this ask holds nowhere.; The fixes:; Make the runtime folder before each write into it, in `review.js` and in `copilot-setup.js`.; Bring the session path under the module's reach, and hold `level1.js` against it in a case.; Drop the built binary from git, and let the build write under the runtime bin.; Point `serve.go`, `tree.go`, `session.js` and `install.sh` at the module owning the name."
 ---
 
 # Ask
@@ -381,17 +387,185 @@ The installer moves a box's old places over once, and drops what already stands 
 
 <!-- the form is files -->
 
+- .claude/skills/level0/hooks/level0.js
+- .claude/skills/level0/lib/copilot-setup.js
+- .claude/skills/level0/lib/folders.js
+- .claude/skills/level0/lib/index.js
+- .claude/skills/level0/lib/log.js
+- .claude/skills/level0/lib/review.js
+- .claude/skills/level0/lib/runs.js
+- .claude/skills/level0/lib/servers.js
+- .claude/skills/level0/lib/tools.js
+- .claude/skills/level0/lib/undo.js
+- .claude/skills/level0/lib/voice.js
+- .claude/skills/level1/hooks/level1.js
+- .vale.ini
+- .vscode/settings.json
+- HANDOVER.md
+- spec/config/styles/VoiceParagraph/Vocabulary.yml
+- spec/design_input/the-agent-pulls-tickets.md
+- spec/design_input/the-runtime-files-stand-apart.md
+- spec/design_input/the-warnings-feed-a-refactorer.md
+- spec/design_output/pull.md
+- spec/guidance/review/reviewing.md
+- spec/tickets/a-pointer-names-its-heading.md
+- spec/tickets/a-rule-carries-its-side.md
+- spec/tickets/a-write-meets-its-hash.md
+- spec/tickets/apply-lane-carries-a-hand.md
+- spec/tickets/release-keeps-local-commits.md
+- spec/tickets/the-hook-spawns-a-refactorer.md
+- spec/tickets/the-panel-draws-every-file.md
+- spec/tickets/the-retro-runs.md
+- spec/tickets/the-rule-shares-one-slug.md
+- spec/tickets/the-runtime-files-stand-apart.md
+- spec/tickets/the-warnings-feed-a-refactorer.md
+- spec/vocabulary/terms.yml
+- src/bridge/server.js
+- src/doors/disk.js
+- src/doors/session.js
+- src/extension/editor-files.js
+- src/extension/editor-process.js
+- src/extension/editor.js
+- src/extension/extension.js
+- src/extension/lib/lsp.js
+- src/index/door.go
+- src/index/grep_test.go
+- src/index/index
+- src/index/index.go
+- src/index/index_test.go
+- src/index/main.go
+- src/index/watch.go
+- src/lsp/schema-body.go
+- src/lsp/schema.go
+- src/lsp/serve.go
+- src/lsp/tree.go
+- src/lsp/tree_test.go
+- src/scripts/cli-check.js
+- src/scripts/cli-doors.js
+- src/scripts/cli-read.js
+- src/scripts/cli.js
+- src/scripts/copilot.js
+- src/scripts/guidance-hand.js
+- src/scripts/hand.js
+- src/scripts/install.sh
+- src/scripts/pull-chapter.js
+- src/scripts/pull-hand.js
+- src/scripts/pull-route.js
+- src/scripts/pull-writes.js
+- src/scripts/pull.js
+- src/scripts/review.js
+- src/scripts/ticket.js
+- src/scripts/tools.js
+- src/scripts/tui.js
+- src/scripts/viewer.js
+- src/scripts/work-merge.js
+- src/scripts/work-stands.js
+- src/scripts/work.js
+- src/stub/.claude/skills/level0/hooks/bridgehead.js
+- test/contract/cloud-start.test.js
+- test/contract/pull-payload.test.js
+- test/contract/tree.test.js
+- test/level0/answer.test.js
+- test/level0/apply.test.js
+- test/level0/ask-lint.test.js
+- test/level0/bash.test.js
+- test/level0/bridgehead.test.js
+- test/level0/clicks.test.js
+- test/level0/code-door.test.js
+- test/level0/config.test.js
+- test/level0/copilot-dispatch.test.js
+- test/level0/copilot-runtime.test.js
+- test/level0/copilot-setup.test.js
+- test/level0/editor.test.js
+- test/level0/folders.test.js
+- test/level0/gesture.test.js
+- test/level0/group.test.js
+- test/level0/guidance-hand.test.js
+- test/level0/guidance.test.js
+- test/level0/hand.test.js
+- test/level0/hooks.test.js
+- test/level0/index.test.js
+- test/level0/layer.test.js
+- test/level0/level1.test.js
+- test/level0/log.test.js
+- test/level0/lsp.test.js
+- test/level0/names.test.js
+- test/level0/panel.test.js
+- test/level0/paths.test.js
+- test/level0/person-step.test.js
+- test/level0/prepush.test.js
+- test/level0/private.test.js
+- test/level0/process.test.js
+- test/level0/projection.test.js
+- test/level0/pull-doors.js
+- test/level0/pull-leaves.test.js
+- test/level0/pull-steps.test.js
+- test/level0/pull.test.js
+- test/level0/reload.test.js
+- test/level0/review.test.js
+- test/level0/schema-notes.js
+- test/level0/schema-route.test.js
+- test/level0/schema-slots.test.js
+- test/level0/schema-sweep.test.js
+- test/level0/schema.test.js
+- test/level0/serve.test.js
+- test/level0/session-layer.test.js
+- test/level0/sidebar.test.js
+- test/level0/states.test.js
+- test/level0/stop-door.test.js
+- test/level0/stop-hold.test.js
+- test/level0/stop.test.js
+- test/level0/stub.test.js
+- test/level0/ticket-verb.test.js
+- test/level0/ticket.test.js
+- test/level0/todo.test.js
+- test/level0/tools-door.test.js
+- test/level0/tools.test.js
+- test/level0/trunk.test.js
+- test/level0/unblock.test.js
+- test/level0/vehicle.test.js
+- test/level0/verbs.test.js
+- test/level0/viewer.test.js
+- test/level0/voiceverb.test.js
+- test/level0/work-doors.js
+- test/level0/work-group.test.js
+- test/level0/work.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+
+- `src/scripts/review.js` makes `.se`, then writes the survey under the runtime folder. `branch review` dies there.
+- `copilot-setup.js` makes `.se`, then writes the cloud mark under the runtime folder. The same class of error.
+- `level1.js` writes the hand's session file at the old path, and its two readers read the new one.
+- The change commit tracks the built binary `src/index/index`. The walk reads and hashes it on every pass.
+- `RETRO` stands exported and tested, and the branch writes under it nowhere. The retro verb takes it up later.
+- `src/lsp/serve.go`, `src/lsp/tree.go` and `src/doors/session.js` spell the runtime folder, and point at no owner.
+- `test/level0/folders.test.js` holds no case over the session file, so that drift passes green.
+- `./RUNME.sh check` answers 0 in the tree. The review verb dies before the worktree check runs.
+- The handover carries a surprises chapter, and a retro chapter waits on the group.
+- The walk, the skip rule and the placement rule each carry a case asserting a refusal.
+- The installer's move of a box's old places carries no case.
+- The rest of the branch splits files by topic for other tickets, and redesigns what this ask holds nowhere.
+
+The fixes:
+
+- Make the runtime folder before each write into it, in `review.js` and in `copilot-setup.js`.
+- Bring the session path under the module's reach, and hold `level1.js` against it in a case.
+- Drop the built binary from git, and let the build write under the runtime bin.
+- Point `serve.go`, `tree.go`, `session.js` and `install.sh` at the module owning the name.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- one place holds each fact the change adds: `folders.js` owns the two names. Every JavaScript writer reads them off it. The Go and shell halves spell the folder again, and `index.go` alone points at the design input.
 
 # Discussion
 
