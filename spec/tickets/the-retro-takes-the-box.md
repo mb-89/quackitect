@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: verdict
+step: implement/reflect
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -185,6 +185,12 @@ record:
       - name: check
         exit: 0
         said: 73 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box d42624a67d18a8 · claude-code · helper-15
+    hash_before: 2fe6b8362f1aaa782e7b813ae618d5fc39c41d9c
+    hash_after: 2fe6b8362f1aaa782e7b813ae618d5fc39c41d9c
+    returns: 1
+    why: "| the finding | the fix |; |---|---|; | the new file spells the hold path a fourth time | import `HOLDS` from `src/scripts/ticket.js` |; | collect reads the hold folder alone, and passes `.se/hold.json`, which `holdOf` reads | read the hold the way `ticket.js` reads it |; | collect takes any file in the hold folder as a hold, where `stop.js` takes a `.json` | filter the name the same way |; | the copy reads and writes text, so `.se/log.7z` lands corrupt, and `size` counts characters | copy the bytes, and count the bytes |; | `copied` drops a file whose read throws, and the manifest holds no line for it | write a line saying what the read refuses |; | a stale file from a torn run survives the second run, and the manifest names it nowhere | clear a folder carrying no manifest first |; | what else the diff carries | what it reads as |; |---|---|; | the hunks in `pull.js`, `hand.js` and their cases | the group's other tickets, reaching the retro's verb nowhere |; | `./RUNME.sh check` | exits 0 on this box |; | `./RUNME.sh branch review the-retro-runs` | answers 1 in its own checkout, on `test/level0/hooks.test.js`, which passes here |; The rest answers the ask and the approach: the two skips, the log, the two script sources, the manifest, the second run."
 group: the-retro-runs
 ---
 
@@ -455,17 +461,66 @@ No variable on this box names the scratchpad or the transcript folder. The verb 
 
 <!-- every file you read, one a line -->
 
+- src/scripts/retro-collect.js
+- src/scripts/retro.js
+- src/scripts/pull-route.js
+- src/scripts/pull.js
+- src/scripts/pull-hand.js
+- src/scripts/pull-writes.js
+- src/scripts/pull-chapter.js
+- src/scripts/hand.js
+- src/scripts/cli-doors.js
+- src/scripts/ticket.js
+- src/scripts/guidance-hand.js
+- src/bridge/stop.js
+- src/doors/disk.js
+- src/doors/log.js
+- test/level0/retro-collect.test.js
+- test/level0/pull-steps.test.js
+- test/level0/hand.test.js
+- test/level0/person-step.test.js
+- test/level0/pull-leaves.test.js
+- spec/design_input/the-agent-pulls-tickets.md
+- spec/design_output/pull.md
+- spec/tickets/the-retro-takes-the-box.md
+- spec/tickets/the-retro-runs.md
+- spec/tickets/the-retro-lays-its-leaves.md
+- spec/tickets/a-retro-mints-itself.md
+- spec/tickets/the-runtime-folder-holds-state.md
+
 <!-- the form is files -->
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
+fail
+
+| the finding | the fix |
+|---|---|
+| the new file spells the hold path a fourth time | import `HOLDS` from `src/scripts/ticket.js` |
+| collect reads the hold folder alone, and passes `.se/hold.json`, which `holdOf` reads | read the hold the way `ticket.js` reads it |
+| collect takes any file in the hold folder as a hold, where `stop.js` takes a `.json` | filter the name the same way |
+| the copy reads and writes text, so `.se/log.7z` lands corrupt, and `size` counts characters | copy the bytes, and count the bytes |
+| `copied` drops a file whose read throws, and the manifest holds no line for it | write a line saying what the read refuses |
+| a stale file from a torn run survives the second run, and the manifest names it nowhere | clear a folder carrying no manifest first |
+
+| what else the diff carries | what it reads as |
+|---|---|
+| the hunks in `pull.js`, `hand.js` and their cases | the group's other tickets, reaching the retro's verb nowhere |
+| `./RUNME.sh check` | exits 0 on this box |
+| `./RUNME.sh branch review the-retro-runs` | answers 1 in its own checkout, on `test/level0/hooks.test.js`, which passes here |
+
+The rest answers the ask and the approach: the two skips, the log, the two script sources, the manifest, the second run.
+
 <!-- the form is verdict -->
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
+
+- the hold path stands in the new file and in three others, so finding one asks for the import
+- every other comment points at the chapter or the ticket ruling it, and repeats no rule
 
 <!-- the form is checklist -->
 
