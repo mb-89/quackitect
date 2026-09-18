@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box a5e189c39e1d · claude-code-remote
@@ -106,6 +106,10 @@ record:
     hand: box a5e189c39e1d · claude-code-remote
     hash_before: 5c26710f455cf8656f6a01aa23ecda4454b0a5c5
     hash_after: 5c26710f455cf8656f6a01aa23ecda4454b0a5c5
+  - step: design/review
+    hand: box a5e189c39e1d · claude-code-remote · helper-8
+    hash_before: 8428ab77ad155b61fe810900a6db6445a9c38c9b
+    hash_after: 8428ab77ad155b61fe810900a6db6445a9c38c9b
 ---
 
 # Ask
@@ -184,15 +188,16 @@ note.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- The runtime list names five things, and the private folder holds more kinds. Name the rule that places a kind neither list names.
-- `.se/review` holds a git worktree, a second checkout of this tree. Put it in the runtime folder. Otherwise the rows carry every tracked file twice.
-- `.se/undo` holds both halves of every file an apply writes. Put it in the runtime folder. Otherwise a word standing in a note alone comes back from the journal too.
-- `.se/bin` holds the built binaries. The walk reads and hashes each one on every pass. Put it in the runtime folder.
-- The `Grep` and `Glob` doors answer off the same rows. A row under the worktree sends a reader to the wrong copy.
-- The rest of the approach answers the ask. The two named folders and the module owning the names stand.
-- The path-relative skip is right. The walk today matches a folder on its base name alone.
+- The placement rule stands, and it answers for a kind both lists leave out.
+- The runtime table names the worktree folder, the undo journal and the built binaries.
+- The worktree stands outside the walk, so the rows carry one row a path.
+- The undo journal stands outside the walk, so a word comes back off its note alone.
+- The walk today matches a folder on its base name, so the path-relative skip is right.
+- The `Grep` door answers out of the rows, which the approach reads right.
+- One skip map serves the walk and the watch, so one change covers the two.
+- The two named folders and the module owning the names answer the ask.
 
 # implement
 
