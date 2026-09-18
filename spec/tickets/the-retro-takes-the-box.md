@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 step: verdict
 steps:
@@ -214,7 +214,12 @@ record:
       - name: check
         exit: 0
         said: 73 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box d42624a67d18a8 · claude-code · helper-18
+    hash_before: 6cc323a60421321df6a3e556b8023053c1e580ce
+    hash_after: 6cc323a60421321df6a3e556b8023053c1e580ce
 group: the-retro-runs
+reason: done
 ---
 
 # Ask
@@ -512,32 +517,34 @@ No variable on this box names the scratchpad or the transcript folder. The verb 
 
 <!-- every file you read, one a line -->
 
+- src/doors/disk.js
+- src/doors/fake/disk.js
+- src/scripts/cli-doors.js
+- src/scripts/guidance-hand.js
+- src/scripts/hand.js
+- src/scripts/pull-chapter.js
+- src/scripts/pull-hand.js
+- src/scripts/pull-route.js
+- src/scripts/pull-writes.js
+- src/scripts/pull.js
 - src/scripts/retro-collect.js
 - src/scripts/retro.js
-- src/scripts/pull-route.js
-- src/scripts/pull.js
-- src/scripts/pull-hand.js
-- src/scripts/pull-writes.js
-- src/scripts/pull-chapter.js
-- src/scripts/hand.js
-- src/scripts/cli-doors.js
 - src/scripts/ticket.js
-- src/scripts/guidance-hand.js
 - src/bridge/stop.js
-- src/doors/disk.js
-- src/doors/log.js
-- test/level0/retro-collect.test.js
-- test/level0/pull-steps.test.js
+- test/contract/disk.test.js
 - test/level0/hand.test.js
 - test/level0/person-step.test.js
 - test/level0/pull-leaves.test.js
+- test/level0/pull-steps.test.js
+- test/level0/retro-collect.test.js
 - spec/design_input/the-agent-pulls-tickets.md
 - spec/design_output/pull.md
-- spec/tickets/the-retro-takes-the-box.md
-- spec/tickets/the-retro-runs.md
-- spec/tickets/the-retro-lays-its-leaves.md
 - spec/tickets/a-retro-mints-itself.md
+- spec/tickets/the-retro-lays-its-leaves.md
+- spec/tickets/the-retro-runs.md
+- spec/tickets/the-retro-takes-the-box.md
 - spec/tickets/the-runtime-folder-holds-state.md
+- .claude/skills/level0/lib/review.js
 
 <!-- the form is files -->
 
@@ -545,24 +552,35 @@ No variable on this box names the scratchpad or the transcript folder. The verb 
 
 <!-- pass or fail, findings one a line -->
 
-fail
+pass
 
-| the finding | the fix |
+| the finding the first cut names | what closes it |
 |---|---|
-| the new file spells the hold path a fourth time | import `HOLDS` from `src/scripts/ticket.js` |
-| collect reads the hold folder alone, and passes `.se/hold.json`, which `holdOf` reads | read the hold the way `ticket.js` reads it |
-| collect takes any file in the hold folder as a hold, where `stop.js` takes a `.json` | filter the name the same way |
-| the copy reads and writes text, so `.se/log.7z` lands corrupt, and `size` counts characters | copy the bytes, and count the bytes |
-| `copied` drops a file whose read throws, and the manifest holds no line for it | write a line saying what the read refuses |
-| a stale file from a torn run survives the second run, and the manifest names it nowhere | clear a folder carrying no manifest first |
+| the hold path spelled a fourth time | `guidance-hand.js` owns `HOLD` and `HOLDS`, and `ticket.js` re-exports both |
+| the hold read a way of its own | `holdsAnywhere` reads the folder and the older file, and `ticket.js` calls it |
+| any file in the hold folder taken as a hold | the same reader keeps the `.json` names alone |
+| a text door under the copy | `disk.copy` calls `copyFileSync`, and `size` calls `statSync` |
+| a refused read swallowed | the manifest takes a `refused` line, and a case drives it |
+| a stale file surviving a torn run | the verb removes a folder carrying no manifest |
 
-| what else the diff carries | what it reads as |
+| what I run | what it answers |
 |---|---|
-| the hunks in `pull.js`, `hand.js` and their cases | the group's other tickets, reaching the retro's verb nowhere |
-| `./RUNME.sh check` | exits 0 on this box |
-| `./RUNME.sh branch review the-retro-runs` | answers 1 in its own checkout, on `test/level0/hooks.test.js`, which passes here |
+| `./RUNME.sh check` | 0 |
+| `./RUNME.sh branch test test/level0/retro-collect.test.js` | green, 7 pass |
+| `./RUNME.sh branch test test/contract/disk.test.js` | green, 5 pass |
+| `./RUNME.sh branch test` | green, 24 pass |
+| `./RUNME.sh branch review the-retro-runs` | 1, on the handback, which this ticket leaves alone |
 
-The rest answers the ask and the approach: the two skips, the log, the two script sources, the manifest, the second run.
+The change answers the ask and the approach. The two skips, the log, the two script sources, the manifest, the hold refusal and the second run all stand. The hunks in `pull.js`, `hand.js`, `cli-doors.js` and their cases carry the group's other tickets, and reach this verb nowhere.
+
+| what a later hand tightens | why it waits |
+|---|---|
+| the torn-run case asserts the exit alone | a run keeping a stale file passes it today |
+| the contract case drives a text file | a copy through the text door passes it today |
+| `pull-route.js` spells `.se/hold` beside `guidance-hand.js` | that line stands on main already |
+| the approach's `rotates` row reaches the code nowhere | the append door writes whole lines, so a copy holds them |
+| the manifest's `path` reads off two bases | a reader joins `from` before it finds the copy |
+| the scratchpad and the transcripts reach the verb as empty doors | no variable on this box names either path |
 
 <!-- the form is verdict -->
 
@@ -570,8 +588,8 @@ The rest answers the ask and the approach: the two skips, the log, the two scrip
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
-- the hold path stands in the new file and in three others, so finding one asks for the import
-- every other comment points at the chapter or the ticket ruling it, and repeats no rule
+- the design input owns the two skips, and every other comment points at the chapter ruling it
+- the `SKIPS` comment restates that reason beside its link, which a later write cuts
 
 <!-- the form is checklist -->
 
