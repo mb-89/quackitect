@@ -119,6 +119,34 @@ step: design/draft
 
 <!-- the form is text -->
 
+Two named folders stand under the private folder. The rest of it keeps its
+place. The folder a file stands in says which kind it is.
+
+| kind | where it stands | who reads it |
+|---|---|---|
+| retro | `.se/retro` | the retro, as its own |
+| runtime | `.se/run` | the box that wrote it |
+| the rest | `.se` itself | the retro, and a question over the index |
+
+One module owns the two names. Every writer takes its folder from there. A
+reader finds the rule in one place, and a later kind lands beside it.
+
+The runtime folder takes the files dying with the box, one to a line:
+
+- the index rows
+- the tools survey
+- the log
+- the hold
+- the box's own record
+
+The rest keeps the notes, the handover and the private tickets. A reader asks
+after each of them.
+
+The index walk drops the private folder from its skip list. It skips the runtime
+folder in its place. A skip on a name alone reaches the wrong folder, so the
+walk reads the path under the root. The rows then answer a `find` over a private
+note.
+
 ## review
 
 <!-- reads the approach against the ask -->
