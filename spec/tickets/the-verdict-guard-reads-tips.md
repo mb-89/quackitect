@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: design/settle-1
+step: design/draft
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -120,6 +120,10 @@ record:
     hash_after: f06612771bcc7303a27924495f95ec84c101c52a
     returns: 2
     why: A subject carries other ticket names past its prefix. `childrenWaiting` writes `because <children> stand open`, and `became` writes its successor. A guard reading the whole subject refuses a parent's commit. Name the prefix before the colon as what the guard reads.; `changedSince` reads `git status --porcelain` too. A sibling hand writes into the tree this hand shares. Those files stand under no subject, so the span keeps them. Then `formFault` refuses the hand-back for leaving them out. Say what the `read` field does with a file no commit carries yet.
+  - step: design/settle-1
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 95b8552d6bd91c48a3cc832a4a02c69ead267651
+    hash_after: 95b8552d6bd91c48a3cc832a4a02c69ead267651
 group: the-warnings-feed-a-refactorer
 ---
 
@@ -160,6 +164,29 @@ The box then drops the hold, spawns a second hand, and pays the reading twice. T
 <!-- the decision, and why it stands -->
 
 <!-- the form is text -->
+
+Both findings stand, and the approach takes both.
+
+| the finding | what the approach takes |
+|---|---|
+| a subject carries other ticket names past its prefix | the guard reads the prefix before the first colon, and nothing past it |
+| a working-tree file stands under no subject | it enters the span where the hold's tip stands at the branch tip, and stands outside it where a sibling moves that tip |
+
+**Why the prefix.** `landed` writes `${one.name}: ${changes}`, so the name
+before the colon is the ticket the commit belongs to. What follows names
+children and successors, which belong to other tickets.
+
+**Why the tree turns on the tip.** A working tree names no hand. Two readings
+stand, and each costs something:
+
+| the reading | what it costs |
+|---|---|
+| the span keeps every tree file | a sibling's write refuses the reader, which is the bug the ask names |
+| the span drops the tree where a sibling moves the tip | a file this hand reads stands outside the `read` field |
+
+The first cost is the ask. The second costs a list one line, and the reader
+names what it reads either way. So the span reads the commits alone once a
+sibling stands on this box.
 
 ## draft
 
