@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: design/review
+step: implement/tests-red
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -138,6 +138,10 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 5125500c620f403e7cf116cc503a9514d2071fd7
     hash_after: 5125500c620f403e7cf116cc503a9514d2071fd7
+  - step: design/review
+    hand: box d42624a67d18a8 · claude-code · helper-30
+    hash_before: 20061264589594e9b2306b820420ff4f8b34ab9f
+    hash_after: 20061264589594e9b2306b820420ff4f8b34ab9f
 group: the-retro-runs
 depends_on: ["the-retro-takes-the-box"]
 ---
@@ -243,18 +247,15 @@ The span stands as a constant beside the verb, because the design fixes it and n
 
 <!-- pass or fail, with findings one a line -->
 
-fail
+pass
 
-One gap stands, and the rest of the approach answers the ask.
-
-| the gap | the fix |
-|---|---|
-| the route runs `notes` ahead of `readers`, so the drain meets every chapter open | name the field the drain reads a chapter by, and passes |
+The approach answers every line of the ask, and the standing finding closes.
 
 | the earlier finding | what closes it |
 |---|---|
-| a chapter reads as an open note | the folder stands named, and the gap above holds the rest |
-| the cut reads the log alone | the times come off both sources, and a box naming no transcript folder cuts off the log |
+| the drain meets a chapter as an open note | the draft names the `process` link, which the mint fills |
+| a chapter reads as an open note | the private tickets folder stands named |
+| the cut reads the log alone | the times come off both sources, and a bare box cuts off the log |
 
 | what answers the ask | where |
 |---|---|
@@ -262,6 +263,9 @@ One gap stands, and the rest of the approach answers the ask.
 | a chapter is six hours, and a span holding no row stands nowhere | the cuts row |
 | the counts carry every kind the ask names, and a missing source reads zero | the counts table |
 | a chapter mints off the chapter route, with its window and counts written first | the mints row |
+| a chapter names its retro under `group`, so `readers` finds its children | the mints row |
+
+A parked note carries `process: [[spec/processes/note]]`, so the field tells the two kinds apart.
 
 `./RUNME.sh check` exits 0 on this branch.
 
