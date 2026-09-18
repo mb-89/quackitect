@@ -372,7 +372,12 @@ export function handBack(it, who, name, verdict) {
     found.push(...formFaults(it, one, leaf, chapter, held));
     if (!found.length) found.push(...voiceFaults(it, one, leaf, chapter));
   }
-  const answered = found.length || becomes ? [] : commandsRun(it, leaf, chapter, found);
+  // A fail says the step did not work, so its commands run for the record and
+  // refuse nothing. A step whose evidence stands red is a step a hand fails.
+  // [[spec/design_output/pull#the-fail]]
+  const fails = verdict.said === "fail";
+  const answered =
+    found.length || becomes ? [] : commandsRun(it, leaf, chapter, fails ? [] : found);
   found.push(...handFaults(it, one, leaf, who.hand, held));
 
   if (found.length) return refused(it, who, one, leaf, held, found);

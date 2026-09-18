@@ -2,6 +2,7 @@
 kind: [[ticket]]
 state: open
 urgent: true
+step: retro/settle-1
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -31,6 +32,15 @@ steps:
     reads: [[spec/guidance/working]]
     to: retro
     steps:
+      - name: settle-1
+        does: decides between the step and the findings, and writes why
+        by: anyone
+        to: engine
+        asks: "retro/notes failed back 2 times: the notes stand undecided, so the drain answers them first"
+        evidence:
+          - name: answer
+            form: text
+            says: the decision, and why it stands
       - name: notes
         does: decides every private note on the box, and works what it mints into this group
         needs: ["retro"]
@@ -75,7 +85,6 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/notes
 record:
   - step: sync
     hand: box 4089f1b3b6bc · claude-code-remote
@@ -106,6 +115,16 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/notes
+    hand: box 4089f1b3b6bc · claude-code-remote
+    hash_before: 6c721042fe85a22567fdb846abb3b95950412e18
+    hash_after: 6c721042fe85a22567fdb846abb3b95950412e18
+    returns: 2
+    why: the notes stand undecided, so the drain answers them first
+    answered:
+      - name: drained
+        exit: 1
+        said: group-key-names-a-ticket
 ---
 
 # Ask
@@ -195,6 +214,16 @@ at a time, and reaches no row to change it.
 # children
 
 # retro
+
+## settle-1
+
+<!-- decides between the step and the findings, and writes why -->
+
+### answer
+
+<!-- the decision, and why it stands -->
+
+<!-- the form is text -->
 
 ## notes
 
