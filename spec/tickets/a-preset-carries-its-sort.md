@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 depends_on: [the-tree-sorts-several-keys, the-queue-is-a-score]
 steps:
@@ -29,6 +29,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-work-editor-draws
 step: do
+record:
+  - step: do
+    hand: box 4089f1b3b6bc · claude-code-remote
+    hash_before: 7ed105363fe66c62428bd6bf7fb2026c84c61b1e
+    hash_after: 7ed105363fe66c62428bd6bf7fb2026c84c61b1e
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/viewer passes
+      - name: check
+        exit: 0
+        said: 83 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -75,11 +88,15 @@ types, and the common questions take one press.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -87,12 +104,34 @@ types, and the common questions take one press.
 
 <!-- the form is text -->
 
+A preset is a filter this tree writes down, and it carries a sort beside it. A
+press puts both in, and the person changing either one keeps that change:
+
+| the preset | what it keeps | how it sorts |
+|---|---|---|
+| not done | every ticket the state leaves open | the board's own order |
+| queue | what the queue hands out | the queue place |
+| yours | the steps a person owns | the oldest first |
+| unsorted | the drafts, and the tickets naming no group | the oldest first |
+
+`spec/views/work.base` names them under `groups`, and `not done` stands in when
+the tab opens. The panel draws each as a button with the key that presses it,
+and a line a person types joins the presses.
+
+A slice is the same thing over one column's values, which `Slices` answers off
+the data, so it costs no line in the file.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
 
+- the change follows the ask: the presets carry their sorts, and a slice reads a column's values
+- the cleanup it reveals: the answer carries when a ticket came in, so the oldest sorts first
+- the presets stand in the base file, and the tab and the panel both read that one list
+
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+- The mouse stands off the filter panel, so a key under alt presses a button there
+- The ask names the oldest first, and the answer carries when a ticket came in under `--queue`

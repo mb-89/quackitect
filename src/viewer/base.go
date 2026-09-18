@@ -25,6 +25,7 @@ type View struct {
 	Filters   string
 	Opens     string
 	Sorts     []Sort
+	Presets   []Preset
 }
 
 // [[spec/design_output/tree-view#a-base-file-says-it]]
@@ -76,7 +77,35 @@ func viewOf(at int, said, whole *yaml.Doc) (View, error) {
 		Filters:   filtersOf(said, whole),
 		Opens:     opensOf(whole),
 		Sorts:     sortsOf(said, whole),
+		Presets:   presetsOf(said, whole),
 	}, nil
+}
+
+// A preset a file writes down stands under `groups`, with its filter and its sort. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+func presetsOf(said, whole *yaml.Doc) []Preset {
+	out := []Preset{}
+	for _, held := range []*yaml.Doc{whole, said} {
+		if held == nil {
+			continue
+		}
+		for _, each := range yaml.Flat(held.Get("groups")) {
+			one := yaml.AsDoc(each)
+			if one == nil {
+				continue
+			}
+			name := yaml.AsString(one.Get("name"))
+			if name == "" {
+				continue
+			}
+			out = append(out, Preset{
+				Name:    name,
+				Filters: filtersOf(one, nil),
+				Sorts:   sortsOf(one, nil),
+				Pressed: yaml.AsBool(one.Get("pressed")),
+			})
+		}
+	}
+	return out
 }
 
 // The order a view opens in, as a list of keys or of maps naming a direction. [[spec/design_output/tree-view#a-sort-holds-several-keys]]

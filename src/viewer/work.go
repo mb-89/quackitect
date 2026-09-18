@@ -6,8 +6,10 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -66,7 +68,44 @@ func loadWork(path string) (*Tree, error) {
 	one := views[0]
 	tree := NewTree(one.Cols, items, one.Nests)
 	tree.Sorted(one.Sorts)
+	// A preset pressed in the file stands pressed when the tab opens. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+	tree.Presets(one.Presets)
 	return tree, nil
+}
+
+// The buttons the filter panel draws, each with the key that presses it. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+func workPresets(m *model) []part {
+	if m.work == nil {
+		return nil
+	}
+	said := m.work.PresetList()
+	if len(said) == 0 {
+		return nil
+	}
+	names := make([]string, 0, len(said))
+	for at, one := range said {
+		name := fmt.Sprintf("alt+%d %s", at+1, one.Name)
+		if one.Pressed {
+			names = append(names, openStyle.Render("["+name+"]"))
+			continue
+		}
+		names = append(names, dimStyle.Render(" "+name+" "))
+	}
+	return []part{{}, {text: strings.Join(names, " "), drawn: true}}
+}
+
+// A number under alt presses the preset standing at that place. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+func pressPreset(m *model, name string) bool {
+	if m.work == nil || !strings.HasPrefix(name, "alt+") {
+		return false
+	}
+	at, err := strconv.Atoi(strings.TrimPrefix(name, "alt+"))
+	said := m.work.PresetList()
+	if err != nil || at < 1 || at > len(said) {
+		return false
+	}
+	m.work.Press(said[at-1].Name)
+	return true
 }
 
 // [[spec/design_output/viewer#the-work-tab]]

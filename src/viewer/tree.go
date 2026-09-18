@@ -27,17 +27,19 @@ type Column struct {
 
 // [[spec/design_output/tree-view#the-view-draws-a-tree]]
 type Tree struct {
-	Cols   []Column
-	Items  []Item
-	Nests  bool
-	Schema Schema
-	filter Filter
-	sorts  []Sort
-	edit   *Edit
-	shut   map[string]bool
-	flat   []twig
-	sel    int
-	top    int
+	Cols    []Column
+	Items   []Item
+	Nests   bool
+	Schema  Schema
+	filter  Filter
+	sorts   []Sort
+	presets []Preset
+	typed   string
+	edit    *Edit
+	shut    map[string]bool
+	flat    []twig
+	sel     int
+	top     int
 }
 
 type twig struct {

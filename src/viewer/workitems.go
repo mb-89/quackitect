@@ -22,6 +22,7 @@ type workTicket struct {
 	Group    string `json:"group"`
 	Urgent   bool   `json:"urgent"`
 	Person   string `json:"person"`
+	Stood    int    `json:"stood"`
 	Queue    int    `json:"queue"`
 	Says     string `json:"says"`
 }
@@ -67,6 +68,7 @@ func ReadWorkItems(text string) ([]Item, error) {
 			"group":    "",
 			"urgent":   "",
 			"person":   one.Person,
+			"stood":    "",
 			"says":     one.Says,
 		}, Kids: kids})
 	}
@@ -92,6 +94,7 @@ func itemOfTicket(one workTicket) Item {
 		"group":    one.Group,
 		"urgent":   mark,
 		"person":   one.Person,
+		"stood":    placeOf(one.Stood),
 		"says":     one.Says,
 	}}
 }

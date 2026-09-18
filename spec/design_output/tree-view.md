@@ -131,6 +131,24 @@ the rows that carry one.
 A view opens on the order its base file names, under `sort`. The work view
 opens on the rows a person owns, then the place the queue gives.
 
+# A preset carries its sort
+
+A preset is a filter a person writes down, and it carries a sort beside it. A
+press puts both in, and the person changing either one keeps that change.
+
+| what a press does | what stands after it |
+|---|---|
+| a press on a preset | its filter joins what already stands, and its sort goes in |
+| a press on another | both filters stand, so the rows narrow twice |
+| a press on one standing in | its filter goes, and the sort stays |
+| a line a person types | it joins the presses, and narrows with them |
+
+A preset stands under `groups` in the base file, with its `filters` and its
+`sort`. One the file marks `pressed` stands in when the view opens.
+
+A slice is the same thing over the values one column carries. A column answers
+the buttons, so a slice costs no line in the file and moves as the data does.
+
 # A base file says it
 
 A view comes out of a file, in the base format the vaults write. So a new view

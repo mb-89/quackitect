@@ -9,6 +9,26 @@ columnSize:
   urgent: 7
   progress: 9
   queue: 6
+groups:
+  - name: not done
+    pressed: true
+    filters:
+      - not state: closed
+  - name: queue
+    filters:
+      - queue: /./
+    sort:
+      - key: queue
+  - name: yours
+    filters:
+      - person: person
+    sort:
+      - key: stood
+  - name: unsorted
+    filters:
+      - "state: draft or not group: /./"
+    sort:
+      - key: stood
 views:
   - type: table
     name: every ticket
