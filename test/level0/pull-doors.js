@@ -51,6 +51,8 @@ export function doors(files, answers = {}, more = {}) {
     disk,
     git: said,
     join,
+    method: ROOT,
+    work: ROOT,
     clock: fakeClock(),
     agent: true,
     cloud: true,

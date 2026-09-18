@@ -9,6 +9,7 @@ import {
 } from "../../.claude/skills/level0/lib/folders.js";
 
 import { actionables, bindsHere } from "../../.claude/skills/level0/lib/guidance.js";
+import { inherits } from "../../.claude/skills/level0/lib/layer.js";
 import { hashOf } from "../../.claude/skills/level0/lib/schema.js";
 import { agentOf, BOX, handOf } from "./hand.js";
 
@@ -65,9 +66,10 @@ export function dropHold(it, hand) {
 }
 
 // [[spec/design_output/pull#what-a-hand-out-reads]]
+// A note the work root names again replaces the method's. [[spec/design_output/vehicle#the-work-root-inherits]]
 export function guidanceText(it, path) {
-  const at = it.join(it.root, ...`${path}.md`.split("/"));
-  return it.disk.exists(at) ? it.disk.read(at) : "";
+  const reads = inherits(it.disk, it.method ?? it.root, it.root);
+  return reads.exists(`${path}.md`) ? reads.read(`${path}.md`) : "";
 }
 
 // [[spec/design_output/pull#what-a-hand-out-reads]]
@@ -124,11 +126,11 @@ export function asOf(it, held) {
 }
 
 // The same answer for a road holding no doors of its own: a box standing nowhere answers an empty list, so a session start mints nothing. [[spec/design_output/level0#the-standing-layer]]
-export function heldReadsIn(disk, join, root, env = {}) {
+export function heldReadsIn(disk, join, root, env = {}, argv = []) {
   const it = { disk, join, root, env, agent: Boolean(agentOf(env)) };
   if (!disk.exists(join(root, ...BOX.split("/")))) return [];
   try {
-    return heldReads(it);
+    return heldReads(it, argv);
   } catch {
     return [];
   }

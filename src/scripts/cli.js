@@ -105,19 +105,19 @@ export const verbs = {
   },
   branch: {
     says: "work branches and groups: new, take, sync, done, list, merge, close, pull, test",
-    run: async () => work(root, rest, it),
+    run: async () => work(it.work, rest, it),
   },
   cloud: {
     says: "the cloud routine: trigger",
-    run: async () => cloud(root, rest, it),
+    run: async () => cloud(it.work, rest, it),
   },
   ticket: {
     says: "tickets that stay on this box: note, update, open, todo",
-    run: async () => ticket(root, rest, it),
+    run: async () => ticket(it.work, rest, it),
   },
   retro: {
     says: "the retro a group's route runs: notes",
-    run: async () => retro(root, rest, it),
+    run: async () => retro(it.work, rest, it),
   },
   mint: {
     says: "write a new note of a kind, in the shape its schema names",

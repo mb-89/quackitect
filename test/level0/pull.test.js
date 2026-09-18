@@ -217,7 +217,7 @@ test("the voice rules read the evidence at the hand-back, and an error refuses i
   const { it, disk } = doors(
     standing(filled(CHILD(), "### approach", "A long approach.")),
     {
-      [`${vale} --config=.vale.ini --path=spec/tickets/a-child.md --output=JSON --no-exit`]:
+      [`${vale} --config=${at(".vale.ini")} --path=spec/tickets/a-child.md --output=JSON --no-exit`]:
         { stdout: long },
     },
   );
@@ -433,7 +433,7 @@ test("the payload spans a fence, a porcelain row reads whole, and a files field 
   );
   const { it } = doors(standing(body, withField(GROUP_NOTE, "state", "closed")), {
     "git status --porcelain": { stdout: "M spec/tickets/a-child.md\n?? .vale.ini" },
-    [`${vale} --config=.vale.ini --path=spec/tickets/a-child.md --output=JSON --no-exit`]:
+    [`${vale} --config=${at(".vale.ini")} --path=spec/tickets/a-child.md --output=JSON --no-exit`]:
       (_argv, init) => {
         ranVale.push(init.stdin);
         return { stdout: "{}" };

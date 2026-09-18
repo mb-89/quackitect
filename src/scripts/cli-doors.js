@@ -36,21 +36,25 @@ export function configHere(files, pair) {
   });
 }
 
+// The verbs keep the files under the work root, and git runs there, because a stub is its own repository. [[spec/design_output/vehicle#the-work-root-inherits]]
 export async function doorsHere() {
   const outside = proc();
   const files = disk();
   const time = clock();
-  const said = configHere(files, rootsHere(files, process.env, root));
+  const roots = rootsHere(files, process.env, root);
+  const said = configHere(files, roots);
   return {
     proc: outside,
     disk: files,
     clock: time,
-    git: git(outside, root),
+    git: git(outside, roots.work),
     log: log(files, time, {
-      folder: join(root, LOG_FOLDER),
+      folder: join(roots.work, LOG_FOLDER),
       level: await said.ask("log.level"),
     }),
     config: said,
+    method: roots.method,
+    work: roots.work,
     words: await said.ask("names.words"),
     stale: await said.ask("work.staleAfter"),
     fails: await said.ask("work.failsBeforePerson"),

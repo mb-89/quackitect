@@ -11,7 +11,7 @@ import { newRetro } from "./retro-new.js";
 import { NOTES } from "./ticket.js";
 
 export function retro(root, argv, doors) {
-  const it = { root, ...doors };
+  const it = { root, method: root, work: root, ...doors };
   const what = argv[0];
   if (what === "notes") return notes(it);
   // [[spec/design_input/the-agent-pulls-tickets]]

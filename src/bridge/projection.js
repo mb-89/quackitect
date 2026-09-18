@@ -3,8 +3,7 @@
 // [[spec/design_output/projection#the-write-door-refuses-one]]
 
 import { dirname, join } from "node:path";
-
-const AFTER_TOOL = "classic.PostToolUse";
+import { inherits, rooted } from "../../.claude/skills/level0/lib/layer.js";
 import {
   alsoReads,
   entriesIn,
@@ -15,18 +14,22 @@ import {
   refusedWrite,
 } from "../../.claude/skills/level0/lib/projection.js";
 
+const AFTER_TOOL = "classic.PostToolUse";
+
 export function projectionsHere(disk, method) {
   const at = join(method, PROJECTIONS);
   return disk.exists(at) ? entriesIn(disk.read(at)) : [];
 }
 
-export function sourcesOf(entries, disk, method) {
+// The sources come off both roots, the work root's file first. [[spec/design_output/vehicle#the-work-root-inherits]]
+export function sourcesOf(entries, disk, method, work = method) {
+  const reads = inherits(disk, method, work);
   const out = new Set();
   for (const entry of entries) {
     const texts = new Map();
-    for (const path of readsIn(entry, disk, (path) => join(method, path))) {
+    for (const path of readsIn(entry, reads)) {
       out.add(path);
-      if (disk.exists(join(method, path))) texts.set(path, disk.read(join(method, path)));
+      if (reads.exists(path)) texts.set(path, reads.read(path));
     }
     for (const path of alsoReads(entry, texts)) out.add(path);
   }
@@ -50,10 +53,10 @@ export function marksStale(where, box) {
 }
 
 function changedSource(box) {
+  const reads = inherits(box.disk, box.method, box.work ?? box.method);
   let moved = "";
   for (const path of box.sources ?? []) {
-    const at = join(box.method, path);
-    const text = box.disk.exists(at) ? String(box.disk.read(at)) : "";
+    const text = reads.exists(path) ? String(reads.read(path)) : "";
     if (box.sourceTexts.get(path) !== text) {
       if (box.sourceTexts.has(path)) moved = moved || path;
       box.sourceTexts.set(path, text);
@@ -62,10 +65,12 @@ function changedSource(box) {
   return moved;
 }
 
+// Every target lands in the work root, because that is the tree a person opens. [[spec/design_output/vehicle#the-work-root-inherits]]
 export function freshens(box, event = "") {
+  const work = box.work ?? box.method;
   if (!box.projections) {
     box.projections = projectionsHere(box.disk, box.method);
-    box.sources = sourcesOf(box.projections, box.disk, box.method);
+    box.sources = sourcesOf(box.projections, box.disk, box.method, work);
     box.sourceTexts = new Map();
     box.restale = "a fresh box";
   }
@@ -73,8 +78,12 @@ export function freshens(box, event = "") {
   const moved = box.restale || changedSource(box);
   box.restale = "";
   if (!moved) return;
-  const at = (path) => join(box.method, path);
-  const { wanted, standing } = readAll(box.projections ?? [], box.disk, at);
+  const at = (path) => join(work, path);
+  const { wanted, standing } = readAll(
+    box.projections ?? [],
+    inherits(box.disk, box.method, work),
+    rooted(box.disk, work),
+  );
   let wrote = 0;
   for (const [path, text] of wanted) {
     if (standing.get(path) === text) continue;

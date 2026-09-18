@@ -15,6 +15,8 @@ import {
   standingLayer,
   styled,
 } from "../../.claude/skills/level0/lib/guidance.js";
+import { guidanceHere } from "../../src/bridge/guidance.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 const note = `---
 kind: [[guidance]]
@@ -166,4 +168,27 @@ test("a note flagged style true goes to the output style, and no flag keeps it i
     styled(note.replace('scope: ["everybody"]', 'scope: ["everybody"]\nstyle: false')),
     false,
   );
+});
+
+// [[spec/design_output/vehicle#the-work-root-inherits]]
+test("the standing layer joins the method's guidance with the work root's, file by file", () => {
+  const rule = (said) => `---\nkind: [[guidance]]\nscope: ["everybody"]\n---\n\n# Actionables\n\n1. ${said}\n`;
+  const disk = fakeDisk({
+    "/tools/spec/guidance/voice.md": rule("The vehicle's voice rule."),
+    "/tools/spec/guidance/working.md": rule("The vehicle's working rule."),
+    "/stub/spec/guidance/voice.md": rule("The stub's voice rule."),
+    "/stub/spec/guidance/house.md": rule("The house rule."),
+  });
+  const said = guidanceHere(disk, "/tools", "/stub", {}, true);
+
+  assert.match(said.standing, /The stub's voice rule/, "a note the work root names again replaces the vehicle's");
+  assert.ok(!said.standing.includes("The vehicle's voice rule"), "the replaced note stays out");
+  assert.match(said.standing, /The vehicle's working rule/, "a note the work root stays silent on comes down");
+  assert.match(said.standing, /The house rule/, "a note the work root alone holds joins the set");
+  assert.equal(said.notes, 3);
+  assert.equal(said.rules, 3);
+  assert.equal(said.sentence, canary({ rules: 3, notes: 3, stop: true }));
+
+  const alone = guidanceHere(disk, "/tools", "/tools", {}, true);
+  assert.equal(alone.notes, 2, "a tree driving itself reads its one root");
 });

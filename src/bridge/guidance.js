@@ -3,6 +3,8 @@
 // [[spec/design_output/level0#the-standing-layer]]
 
 import { join } from "node:path";
+import { inherits } from "../../.claude/skills/level0/lib/layer.js";
+import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import {
   bindsHere,
   canary,
@@ -28,14 +30,21 @@ const TOOTH = "stop.enabled";
 export const TOOLS_BLOCK = "level0-tools";
 const TOOLS_HEADING = "# What this box has";
 
-// [[spec/design_output/level0#the-standing-layer]]
-export function guidanceHere(disk, root, env = process.env, tooth = true, work = root) {
-  const notes = readNotes(disk, join(root, GUIDANCE));
+// The notes come off both roots, file by file, the work root's winning. [[spec/design_output/vehicle#the-work-root-inherits]]
+export function guidanceHere(
+  disk,
+  method,
+  work = method,
+  env = process.env,
+  tooth = true,
+  argv = [],
+) {
+  const notes = readNotes(inherits(disk, method, work), GUIDANCE);
   const wanted = new Set(notes.flatMap((one) => envOf(one.text)));
   const bound = Object.fromEntries([...wanted].map((name) => [name, env[name] ?? ""]));
   const here = notes.filter((one) => bindsHere(one.text, bound));
   // A note the held step hands over rides the step, so the layer hands it no second time. [[spec/design_output/level0#the-standing-layer]]
-  const read = heldReadsIn(disk, join, work, env);
+  const read = heldReadsIn(disk, join, work, env, argv);
   // [[spec/design_output/level0#the-style-carries-a-note]]
   const session = here.filter((one) => !styled(one.text));
   const counts = countsOf(carried(session, read));
@@ -48,16 +57,15 @@ export function guidanceHere(disk, root, env = process.env, tooth = true, work =
 }
 
 function readsGuidance(box) {
-  const tooth = asks(box, TOOTH) !== false;
-  return guidanceHere(box.disk, box.method, process.env, tooth, box.work || box.method);
+  return guidanceHere(box.disk, box.method, box.work, process.env, asks(box, TOOTH) !== false);
 }
 
-function readNotes(disk, folder) {
+function readNotes(reads, folder) {
   try {
-    return disk
+    return reads
       .list(folder)
-      .filter((one) => one.kind === "file" && one.name.endsWith(".md"))
-      .map((one) => ({ name: one.name, text: disk.read(join(folder, one.name)) }));
+      .filter((one) => one.kind === "file" && one.name.endsWith(".md") && !isDraft(one.name))
+      .map((one) => ({ name: one.name, text: reads.read(`${folder}/${one.name}`) }));
   } catch {
     return [];
   }

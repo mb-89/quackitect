@@ -125,7 +125,7 @@ function opensSession(e, box) {
   onSessionStart(e, box);
   box.schemas = schemasHere(box.disk, box.method);
   box.projections = projectionsHere(box.disk, box.method);
-  box.sources = sourcesOf(box.projections, box.disk, box.method);
+  box.sources = sourcesOf(box.projections, box.disk, box.method, box.work);
   box.restale = "the session start";
   warmIndex(box);
   box.registered = true;

@@ -308,29 +308,30 @@ function fileFor(entry, key, said, sentence, shown) {
 }
 
 // [[spec/design_output/projection#projecting-in-memory]]
-export function readAll(entries, disk, at = (path) => path) {
+// The sources read through the inheriting reader, and the targets stand in the work root alone. [[spec/design_output/vehicle#the-work-root-inherits]]
+export function readAll(entries, sources, targets = sources) {
   const wanted = new Map();
   const standing = new Map();
   const faults = [];
 
   for (const entry of entries) {
     const texts = new Map();
-    for (const path of readsIn(entry, disk, at)) {
-      if (disk.exists(at(path))) texts.set(path, disk.read(at(path)));
+    for (const path of readsIn(entry, sources)) {
+      if (sources.exists(path)) texts.set(path, sources.read(path));
     }
     // [[spec/funnel/a-paragraph-has-a-schema]]
     for (const path of alsoReads(entry, texts)) {
-      if (disk.exists(at(path))) texts.set(path, disk.read(at(path)));
+      if (sources.exists(path)) texts.set(path, sources.read(path));
     }
     for (const [path, text] of writesOf(entry, texts)) wanted.set(path, text);
     faults.push(...faultsIn(entry, texts));
 
     const folder = folderOf(entry.target);
     const end = HOLDS.get(entry.shape) ?? ".md";
-    if (!disk.exists(at(folder))) continue;
-    for (const one of disk.list(at(folder))) {
+    if (!targets.exists(folder)) continue;
+    for (const one of targets.list(folder)) {
       if (one.kind !== "file" || !one.name.endsWith(end)) continue;
-      standing.set(`${folder}/${one.name}`, disk.read(at(`${folder}/${one.name}`)));
+      standing.set(`${folder}/${one.name}`, targets.read(`${folder}/${one.name}`));
     }
   }
   return { wanted, standing, faults };

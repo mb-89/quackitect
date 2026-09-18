@@ -44,7 +44,7 @@ export function handDoors(env) {
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 export function handOf(it) {
-  const held = parsed(readIf(it, SESSION)) ?? {};
+  const held = parsed(readIf(it, it.root, SESSION)) ?? {};
   const agent = String(held.harness ?? "").trim() || agentOf(it.env);
   const parts = [`box ${boxOf(it)}`];
   if (held.id) parts.push(`session ${held.id}`);
@@ -54,9 +54,13 @@ export function handOf(it) {
   return parts.join(" · ");
 }
 
+// The box file stands under the work root, and the copy record under the method root, so a stub names its own box. [[spec/design_output/vehicle#the-work-root-inherits]]
 function boxOf(it) {
-  for (const path of [BOX, COPY]) {
-    const id = parsed(readIf(it, path))?.id;
+  for (const [root, path] of [
+    [it.root, BOX],
+    [it.method ?? it.root, COPY],
+  ]) {
+    const id = parsed(readIf(it, root, path))?.id;
     if (id) return id;
   }
   const id = it.random
@@ -67,8 +71,8 @@ function boxOf(it) {
   return id;
 }
 
-function readIf(it, path) {
-  const at = it.join(it.root, ...path.split("/"));
+function readIf(it, root, path) {
+  const at = it.join(root, ...path.split("/"));
   return it.disk.exists(at) ? it.disk.read(at) : "";
 }
 

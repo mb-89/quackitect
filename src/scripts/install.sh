@@ -20,9 +20,13 @@ for one in bin hold review undo measure copilot box.json session.json \
   tools.json hold.json check.json index.db index.json lsp.json copilot-cloud \
   show-panel; do
   old="$root/.se/$one"
+  new="$root/.se/run/$one"
   [ -d "$old" ] || [ -f "$old" ] || continue
+  # A name the runtime folder already holds keeps what it holds, because mv
+  # would nest the old folder inside the new one.
+  if [ -e "$new" ]; then continue; fi
   # A file a running process holds stays where it stands, and a later run moves it.
-  mv "$old" "$root/.se/run/$one" 2>/dev/null || true
+  mv "$old" "$new" 2>/dev/null || true
 done
 
 # Pinned, so every box builds the same tree. Vale ships a binary for each
@@ -216,7 +220,13 @@ compiler_here() {
 # step with the index above: that one is C and waits on a toolchain, and this
 # one builds beside it in under a second on every box.
 # [[spec/design_output/lsp#the-build-beside-the-index]]
-lsp_here() { [ -x "$bin/se-lsp${exe}" ]; }
+# A binary older than its own source lints against rules the tree no longer
+# carries, so a source newer than the binary asks for the build again.
+lsp_here() {
+  if [ ! -x "$bin/se-lsp${exe}" ]; then return 1; fi
+  newer=$(find "$root/src/lsp" -name '*.go' -newer "$bin/se-lsp${exe}" -print -quit 2>/dev/null || true)
+  [ -z "$newer" ]
+}
 
 get_lsp() {
   say "  building the language server"

@@ -70,7 +70,7 @@ import {
 export * from "./work-stands.js";
 
 export function work(root, argv, doors) {
-  const it = { root, ...doors };
+  const it = { root, method: root, work: root, ...doors };
   const what = argv[0];
   const name = argv[1];
   const doing = {
@@ -112,7 +112,7 @@ export function work(root, argv, doors) {
 
 // [[spec/design_output/work#the-routine-a-verb-names]]
 export function cloud(root, argv, doors) {
-  const it = { root, ...doors };
+  const it = { root, method: root, work: root, ...doors };
   if (argv[0] === "trigger") return trigger(it);
   console.log("Usage: ./RUNME.sh cloud <verb>\n");
   console.log("  trigger       the routine that works a branch, and what stands free");

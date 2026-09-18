@@ -2,6 +2,7 @@
 // the chapter a leaf owns, and the evidence weighed against the leaf's fields.
 // [[spec/design_output/pull#the-work-answer]]
 
+import { inherits } from "../../.claude/skills/level0/lib/layer.js";
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 import {
@@ -236,10 +237,10 @@ export function formFault(it, field, rows, where, one, held) {
   if (form === "link") {
     if (rows.length !== 1)
       return [`${where} holds ${rows.length} line(s), and a link is one.`];
+    // A link resolves in the work root first, then in the method root. [[spec/design_output/vehicle#the-work-root-inherits]]
     const said = bare(rows[0]);
-    const at = it.join(it.root, ...said.split("/"));
-    const note = it.join(it.root, ...`${said}.md`.split("/"));
-    return it.disk.exists(at) || it.disk.exists(note)
+    const reads = inherits(it.disk, it.method ?? it.root, it.root);
+    return reads.exists(said) || reads.exists(`${said}.md`)
       ? []
       : [`${where} names ${said}, which resolves nowhere.`];
   }
@@ -308,7 +309,7 @@ export function voiceFaults(it, one, leaf, chapter) {
     ran = it.proc.run(
       [
         it.vale,
-        `--config=${VALE_CONFIG}`,
+        `--config=${it.join(it.method ?? it.root, VALE_CONFIG)}`,
         `--path=${one.path}`,
         "--output=JSON",
         "--no-exit",

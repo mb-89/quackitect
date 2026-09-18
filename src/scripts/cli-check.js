@@ -5,14 +5,8 @@
 import { dirname, join, resolve, sep } from "node:path";
 import { CONFIG_DIR } from "../../.claude/skills/level0/lib/code.js";
 import { LOCAL, SCHEMA } from "../../.claude/skills/level0/lib/config.js";
-import {
-  bindsHere,
-  canary,
-  canaryText,
-  countsOf,
-  standingLayer,
-} from "../../.claude/skills/level0/lib/guidance.js";
-import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
+import { inherits, rooted } from "../../.claude/skills/level0/lib/layer.js";
+import { guidanceHere } from "../bridge/guidance.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 import { boxOf } from "../../.claude/skills/level0/lib/private.js";
 import {
@@ -60,7 +54,6 @@ import {
 } from "./cli-doors.js";
 import { namesIn, show, walk } from "./cli-read.js";
 import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
-import { heldReads } from "./guidance-hand.js";
 import { HOOKS } from "./precommit.js";
 import { writeSurvey } from "./tools.js";
 import { SHARED, SOURCE as VIEWER, viewerOf } from "./viewer.js";
@@ -245,8 +238,13 @@ export function projections() {
   return files.exists(at) ? entriesIn(files.read(at)) : [];
 }
 
+// A target lands in the work root, and a source reads off both. [[spec/design_output/vehicle#the-work-root-inherits]]
 export function under(path) {
-  return join(root, String(path).split("/").join(sep));
+  return join(it.work, String(path).split("/").join(sep));
+}
+
+function readsAll(entries) {
+  return readAll(entries, inherits(files, it.method, it.work), rooted(files, it.work));
 }
 
 // [[spec/design_output/projection#check-refuses-a-stale-one]]
@@ -257,7 +255,7 @@ export function projectionsHold() {
     return 0;
   }
 
-  const said = readAll(entries, files, under);
+  const said = readsAll(entries);
   if (said.faults.length) {
     for (const one of said.faults) console.error(one);
     console.error(
@@ -281,7 +279,7 @@ export function projectionsHold() {
 // [[spec/design_output/projection#who-projects-and-when]]
 export function project() {
   const entries = projections();
-  const { wanted, standing } = readAll(entries, files, under);
+  const { wanted, standing } = readsAll(entries);
 
   for (const [path, text] of wanted) {
     files.makeDir(dirname(under(path)));
@@ -402,18 +400,15 @@ export async function standing(argv = []) {
     console.error("There is no spec/guidance, so nothing is handed over.");
     return 2;
   }
-  const notes = namesIn(GUIDANCE, ".md")
-    .filter((name) => !isDraft(name))
-    .map((n) => ({ name: n, text: files.read(join(GUIDANCE, n)) }))
-    .filter(({ text }) => bindsHere(text, process.env));
-  const said = standingLayer(notes, heldReads({ ...it, root }, argv));
-  if (!said) {
+  const stop = (await settings.ask("stop.enabled")) !== false;
+  const said = guidanceHere(files, it.method, it.work, process.env, stop, argv);
+  if (!said.helper) {
     console.log("No guidance note carries an Actionables chapter.");
     return 0;
   }
-  console.log(
-    `${said}\n\n${canaryText(canary({ ...countsOf(notes), stop: (await settings.ask("stop.enabled")) !== false }))}`,
-  );
+  console.log(said.helper);
+  console.log("");
+  console.log(said.sentence);
   return 0;
 }
 
