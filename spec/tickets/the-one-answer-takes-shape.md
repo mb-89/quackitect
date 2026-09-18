@@ -36,7 +36,12 @@ steps:
 process: [[spec/processes/question]]
 process_hash: 1f3006ec4b044a89
 group: the-warnings-feed-a-refactorer
-step: answer
+step: do
+record:
+  - step: answer
+    hand: box dd2a59294365 · claude-code-remote · the owner says so
+    hash_before: 5034b47e9a02043f4fbb86c28f2f60cc06a1cc19
+    hash_after: 5034b47e9a02043f4fbb86c28f2f60cc06a1cc19
 ---
 
 # Ask
@@ -76,6 +81,32 @@ The reviews name the wall each way meets:
 <!-- the answer, which the step behind this one reads -->
 
 <!-- the form is text -->
+
+The function answers the leaf's `by` alone, and the door takes the answer the pull writes into the hold. So:
+
+- `writesHere(leaf, hand)` reads `by`, and lives in `.claude/skills/level0/lib/ticket.js`
+- the pull calls it at three sites, and each keeps the fields its caller reads
+- the write door reads the hold, which names the leaf and the hand that took it
+
+**Why the door reads the hold.** The door holds one file and one moment. `ownerSays` comes off the pull's command line, and `atRetro` reads every ticket in the group. A door working either out for itself reads what it cannot see, and the pull already knows both.
+
+| what the hold carries today | what it gains |
+|---|---|
+| the ticket, its path, the step, the hand | the leaf's `by`, and whether that hand writes there |
+
+So the door compares the write's chapter against the hold's step, and refuses a chapter the hold says this hand writes nowhere. A write with no hold standing meets no rule, which is the case a desk already lives with.
+
+**The three sites.** Each calls the one function, and each keeps what it answers today.
+
+| caller | where | what it keeps |
+|---|---|---|
+| `admits` | `src/scripts/pull-hand.js` | the `person` and `other` fields the hand-out reads |
+| `takeable` | the same file | the empty string for a ticket this hand works nowhere |
+| `handFaults` | `src/scripts/pull-chapter.js` | its own findings, with the `by` one off the function |
+
+`needs` and `excludes` stay where they stand, because one reads the box's verbs and the other reads the record.
+
+**What the leaf walk does.** `leafOf` moves beside the function, because a plugin imports nothing past its own root. Its name clashes with one in the plugin's voice module, so the moved one reads `leafAt`.
 
 # do
 
