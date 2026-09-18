@@ -91,7 +91,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -122,6 +122,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: f1f500f0fce809c20bf5e5a5f8e3ad482a9f8b9b
+    hash_after: f1f500f0fce809c20bf5e5a5f8e3ad482a9f8b9b
+    answered:
+      - name: lint
+        exit: 0
+        said: 75 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
@@ -281,13 +289,15 @@ The takes off git reach the retro folder as rows, so no leaf runs git itself. A 
 
 ### lint
 
-<!-- the tree builds and lints -->
+    ./RUNME.sh lint
 
 <!-- the form is command -->
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change touches no file the ask leaves out. The leaves module, the call inside collect, and the route's own collect step.
+- every door the change reaches has a fake. The module reads the disk and git through their doors, and the cases drive the fakes.
+- a comment names the approach the change implements. Each reader points at the chapter ruling it.
 
 <!-- the form is checklist -->
 

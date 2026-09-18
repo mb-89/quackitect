@@ -4,6 +4,7 @@
 // [[spec/design_input/the-agent-pulls-tickets]]
 
 import { holdsAnywhere } from "./guidance-hand.js";
+import { leavesOut } from "./retro-leaves.js";
 
 const PRIVATE = ".se";
 const RETRO = "retro";
@@ -53,6 +54,8 @@ export function collect(it, name) {
   }
 
   it.disk.makeDir(into);
+  // Each leaf of the retro's own reading takes a file, named in the manifest beside the copies. [[spec/tickets/the-retro-lays-its-leaves]]
+  rows.push(...leavesOut(it, into, rows));
   it.disk.write(
     it.join(into, MANIFEST),
     `${rows.map((one) => JSON.stringify(one)).join("\n")}\n`,

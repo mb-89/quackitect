@@ -41,7 +41,7 @@ const FILES = {
 const SAYS = {
   "git rev-parse HEAD": { stdout: "a1b2c3d4e5f6\n" },
   "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
-  [`git rev-list --max-parents=0 HEAD`]: { stdout: `${FIRST}\n` },
+  "git rev-list --max-parents=0 HEAD": { stdout: `${FIRST}\n` },
   [`git log --format=%H ${FIRST}..HEAD -- spec/tickets`]: { stdout: "cafe01\n" },
   "git show cafe01 --name-only --format=": { stdout: "spec/tickets/a-child.md\n" },
   "git show cafe01:spec/tickets/a-child.md": { stdout: CLOSED },

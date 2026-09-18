@@ -2,6 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
+step: field
 steps:
   - name: collect
     does: takes what it names under .se into the retro folder, cuts the window into chapters, mints a reader per chapter, and lays the rest out as files
@@ -183,8 +184,7 @@ steps:
         form: list
         says: one line per ticket, with its group and its urgency
 process: [[spec/processes/retro]]
-process_hash: 914c0c3b4ac15753
-step: field
+process_hash: 61a2bb140f0b4632
 record:
   - step: collect
     hand: box d42624a67d18a8 · claude-code
@@ -332,7 +332,7 @@ This is the first retro, so its window opens at the tree's first commit. No earl
 
 ### kept
 
-<!-- one line per term kept, with the note that defines it -->
+<!-- each script that becomes a check, a flag or a verb, with its home -->
 
 <!-- the form is list -->
 
@@ -360,7 +360,9 @@ This is the first retro, so its window opens at the tree's first commit. No earl
 
 ## tickets
 
-<!-- reads the records of the tickets that close in the window, which are the engine's entries on each and no log -->
+<!-- one link per ticket, with its class, its home, the plan, and what the next numbers show if it works -->
+
+<!-- the form is list -->
 
 ### returns
 
