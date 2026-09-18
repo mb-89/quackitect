@@ -1,0 +1,4 @@
+{
+  "description": "The pane, as one module: it opens at the session's start and draws the config tree in the body.",
+  "modules": ["./pane.js"]
+}
