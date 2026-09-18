@@ -198,7 +198,11 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
-step: retro/write
+  - step: retro/write
+    hand: box 596a811abe2e · claude-code-remote
+    hash_before: 331a0181f577c85ff2848ac1cf3e29c622ade67f
+    hash_after: 331a0181f577c85ff2848ac1cf3e29c622ade67f
+step: retro/cloud
 ---
 
 # Ask
@@ -264,6 +268,7 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is list -->
 
+- the install comes up on a mirror, because the node registry it reads answers a gateway error
 - the take hands this branch, its brief and its group in one answer
 - the children step leaves again, because [[spec/tickets/the-pull-splits-by-topic]] stands at its person step
 - the retro notes drain, because the private folder holds no note
@@ -275,10 +280,10 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is list -->
 
-- The take answers with the branch, the brief and the group together, so the first pull reads nothing around.
-- The pull names each field, its form and the exit it wants, so the notes leaf closes fast.
-- The record carries every earlier hand, so this box reads where the group stands.
-- The hold writes the guidance and its hash beside the step, so the notes ride the step.
+- The install names each tool on its own line as it fetches, so the failing one shows where it fails.
+- Vale and Biome come down from their release host, so the doors stand while the registry does not.
+- The pull hands the branch, the leaf and the guidance together, so a box landing on trunk reads nothing around.
+- The record carries every earlier hand, so this box reads the same skip every box before it writes.
 
 ### badly
 
@@ -286,10 +291,10 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is list -->
 
+- The node registry answers a gateway error, and the modules stand as a need, so the install stops. The take is its moment.
+- The module proxy answers the same error, so the index stays unbuilt and find and links read the files. The take is its moment.
 - The route hands the retro out again over a group whose every open step waits for a person. The take is its moment.
 - The retro fields hold a single window, so this write drops the last box's. This leaf is its moment.
-- The children step reads the same block and the record grows another skip line. The children hand is its moment.
-- The install downloads every tool again at the take, so the window pays for it before the first pull. The take is its moment.
 
 ### improve
 
@@ -297,10 +302,10 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is list -->
 
+- The install reads the registry a box names, so a mirror stands in where the default one refuses. Home: [[spec/design_output/tools]].
+- The index build reads the module proxy a box names, so a box behind a refusing one still builds. Home: [[spec/design_output/index]].
 - A group at children whose every open step waits for a person answers `wait`. Home: [[spec/design_output/pull]].
 - The retro a box writes stands under its own hand, so a later box writes beside it. Home: [[spec/design_output/work]].
-- The record folds a repeated skip under the line already carrying it, and names the hands beside it. Home: [[spec/design_output/work]].
-- The install skips a tool the box already holds. Home: [[spec/design_output/tools]].
 
 ### thoughts
 
@@ -308,10 +313,11 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is text -->
 
-The route reaches the retro because the children step cannot run, and the retro it reaches is the one the last box wrote.
+This box spends its first stretch on the install, because one host the install reads refuses it. The tree pins every binary it downloads and names the host in the script. So a box behind a refusing host has one road: it names another registry from outside the tree. That road leaves no trace the tree reads, so the next box walks it again.
 
 | what the box holds | what stands behind it |
 |---|---|
+| the install stops on a host that refuses | [[spec/design_output/tools]] owns what the tree fetches and from where |
 | the window buys a retro the last box already wrote | the pull hands the retro out where a child waits on a person |
 | the record reads as work, and the group stands still | [[spec/design_output/work]] owns what a hand writes down |
 
