@@ -8,6 +8,7 @@ import { collect } from "./retro-collect.js";
 
 const CHAPTER = "chapter";
 import { newRetro } from "./retro-new.js";
+import { score } from "./retro-score.js";
 import { NOTES } from "./ticket.js";
 
 export function retro(root, argv, doors) {
@@ -18,6 +19,8 @@ export function retro(root, argv, doors) {
   if (what === "collect") return collect(it, argv[1]);
   // [[spec/design_input/the-agent-pulls-tickets]]
   if (what === "new") return newRetro(it, argv);
+  // [[spec/design_input/the-agent-pulls-tickets]]
+  if (what === "score") return score(it);
   console.log("Usage: ./RUNME.sh retro <verb>\n");
   console.log(
     "  notes            the private notes still open on this box, and 0 when none stands",
@@ -27,6 +30,9 @@ export function retro(root, argv, doors) {
   );
   console.log(
     "  new              mints a retro off its route, opens it, and hands out its first leaf",
+  );
+  console.log(
+    "  score            the improvements earlier retros mint, and how many stay open",
   );
   return what ? 2 : 0;
 }

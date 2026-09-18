@@ -182,7 +182,7 @@ steps:
       - name: groups
         form: list
         says: one line per ticket, with its group and its urgency
-step: score
+step: notes
 process: [[spec/processes/retro]]
 process_hash: 61a2bb140f0b4632
 record:
@@ -198,6 +198,14 @@ record:
     hand: box d42624a67d18a8 · claude-code · the owner says so
     hash_before: dffce1bd11edfb45add20fbc27a5008c2c9e0c06
     hash_after: dffce1bd11edfb45add20fbc27a5008c2c9e0c06
+  - step: score
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: c6441dfde42fa76ce1f293bd6e5fa7280417e55f
+    hash_after: c6441dfde42fa76ce1f293bd6e5fa7280417e55f
+    answered:
+      - name: rate
+        exit: 0
+        said: No retro mints an improvement yet, so this one scores nothing.
 ---
 
 # Ask
@@ -232,13 +240,15 @@ the three branches land on trunk, and this reads the window they close
 
 ## scored
 
-<!-- one line per improvement, with what the numbers show and what that teaches -->
+- no earlier retro mints an improvement, so this window scores against nothing.
+- one earlier retro stands open at its field step, and it reads no window.
+- what that teaches: this retro is the first to reach the score step, so the baseline starts here.
 
 <!-- the form is list -->
 
 ## rate
 
-<!-- retro score, which prints how many stand in the tree -->
+    ./RUNME.sh retro score
 
 <!-- the form is command -->
 
