@@ -214,3 +214,5 @@ Read [[spec/design_input/the-agent-pulls-tickets]] first, the chapter The retro.
 - The owner rules the take a deny list. Collect takes every file under the private folder that the list leaves standing.
 - So that split matters here. The runtime half is what the deny list names, beside the retro's own folders.
 - The first window takes the tree's first commit, because no retro closes before it.
+- A review of the take names a gap the split leaves. The design takes material off git, and no child asks for it.
+- [[spec/tickets/the-retro-lays-its-leaves]] closes that gap, and it stands as a fourth child.
