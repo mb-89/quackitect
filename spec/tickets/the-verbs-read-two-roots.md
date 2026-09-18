@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 depends_on: [the-shim-resolves-the-vehicle]
 steps:
@@ -103,7 +103,15 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 0050996e725d5f2793aaad8f9ad8dcbf54cd45c0
+    hash_after: 0050996e725d5f2793aaad8f9ad8dcbf54cd45c0
+  - step: retro/cloud
+    skipped: true
+    why: the box runs off the cloud
 step: retro/write
+reason: done
 ---
 
 # Ask
@@ -158,31 +166,45 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 
 ### done
 
-<!-- what was done, one line a ticket or a thing -->
+- verbs-read-two-roots: the doors carry a method root and a work root, and git runs in the work root.
+- the guidance reads both roots file by file, and the work root's note wins.
+- a link a field names resolves in the work root first, then in the method root.
+- the projections write their targets under the work root, off the method's declaration.
+- vale reads its config off the method root, so a stub takes the rules whole.
 
 <!-- the form is list -->
 
 ### well
 
-<!-- what went well, and what made it go well -->
+- one reader, inherits, answers every two-root question, so each caller reads one line.
+- the roots cases drive a stub root and a method root, and each names which root answers.
+- the branch leaves the verbs alone, and changes the reader under them.
 
 <!-- the form is list -->
 
 ### badly
 
-<!-- what did not, each with its moment in the log or the transcript -->
+- the branch stands held for six hours, because the box holding it leaves with no hand-back.
+- the sync reads the pushed trunk, and the desk holds two merges past it. So the resolve runs twice.
+- trunk splits three files for the ceiling while this branch changes them in place.
+- a hand-resolved merge drops an import each time, and a case names the missing word.
 
 <!-- the form is list -->
 
 ### improve
 
-<!-- how each bad line stops happening, named by its home -->
+- work.js must free a branch whose hold outlives the stale window, so no branch waits on a box that leaves.
+- work.js sync must name the desk's trunk where it stands ahead of the pushed one.
+- pull.js must hand a file's split and its edit to one branch, so no two branches own one file.
+- the check answers each dropped import by name, which is the road that works here.
 
 <!-- the form is list -->
 
 ### thoughts
 
-<!-- what the thoughts say that the actions do not, off the transcript -->
+The merge reads as fourteen conflicts, and it is two. One branch splits files for the ceiling, and the other edits them whole.
+
+The resolve costs little once the deltas stand named. Reading the branch against its merge base answers what the conflict markers hide.
 
 <!-- the form is text -->
 
