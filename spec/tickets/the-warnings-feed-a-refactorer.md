@@ -75,7 +75,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box a5e189c39e1d · claude-code-remote
@@ -104,6 +104,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 3f191e95c85ea5150cb27faf0de841ef024863ea
+    hash_after: 3f191e95c85ea5150cb27faf0de841ef024863ea
 ---
 
 # Ask
@@ -178,11 +182,25 @@ A rule a refactoring hand fixes becomes a warning in place of a refusal. One lis
 
 <!-- the form is list -->
 
+- [[spec/tickets/the-runtime-files-stand-apart]]: the private folder splits, and every writer names its owner
+- [[spec/tickets/the-panel-draws-every-file]]: the server sweeps on its second message, and the panel draws every file
+- [[spec/tickets/a-rule-carries-its-side]]: its approach stands, and the list question leaves on a ticket
+- [[spec/tickets/the-hook-spawns-a-refactorer]]: its approach stands, and the spawn question leaves on a ticket
+- [[spec/tickets/one-function-answers-the-hand]]: its approach stands, and the reach question leaves on a ticket
+- `PrivateFolderOwned` joins the rules over two files, and refuses a reader the move leaves behind
+- four tickets stand minted outside this group, each carrying a question a person answers
+
 ### well
 
 <!-- what went well, and what made it go well -->
 
 <!-- the form is list -->
+
+- every review read the code before it wrote, so each finding named a file and a line
+- the runtime split's own verdict caught a live break in the stop hook's hold path
+- the tests-red step held its shape on a Go change, because the evidence ran the real tests
+- the unblock verb carried each question out whole, so no person step held the branch
+- the design notes followed the move in one pass, because a grep over the old names found them
 
 ### badly
 
@@ -190,11 +208,24 @@ A rule a refactoring hand fixes becomes a warning in place of a refusal. One lis
 
 <!-- the form is list -->
 
+- the first change commit tracked a built binary, which the verdict caught
+- the install sweep minted a second box record, and the hold read the first
+- a sibling commit cost one verdict hand its whole reading, at the runtime split's first verdict
+- three of four design drafts met a person step, each after two review returns
+- the unblock verb wrote a list line past its own cap, twice, and the check turned red on it
+- the note's own choice field wants a word the prose door refuses, at the retro's notes step
+
 ### improve
 
 <!-- how each bad line stops happening, named by its home -->
 
 <!-- the form is list -->
+
+- `.gitignore` names the index binary beside the language server's own, so the next build hides
+- the install sweep moves a box record in place of minting one, in `src/scripts/install.sh`
+- [[spec/tickets/the-verdict-guard-reads-tips]] carries the guard, so a sibling commit costs no reading
+- the unblock verb cuts a line to the cap as it copies, in `src/scripts/unblock.js`
+- the tense reader takes a choice field's value as a value, in `src/bridge/prose.js`
 
 ### thoughts
 
@@ -202,11 +233,24 @@ A rule a refactoring hand fixes becomes a warning in place of a refusal. One lis
 
 <!-- the form is text -->
 
+The person step is the load-bearing piece of this run, and it reads two ways:
+
+- a design a reader returns twice may want a decision a person owns
+- it may want a reader who knows the code better
+
+This box met the second case at least once. The first draft of the side ticket claimed every rule reads error, and two rules already read warning. A reader caught it, and the redraft carried the correction.
+
+So the wall the engine builds at two returns does two jobs. It parks a question a person owns, and it parks a draft a hand could fix with one more pass. Each of the four tickets this run leaves carries a real question, and a draft standing closer than the one before it.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every fact stands in one place: the folder names live in one module, and each note points at it
+- every number carries a name in one place: the moved names stand in the module. The installer names it beside its copy
+- every header says what its file is for: the new module and the new test file each open with one
 
 ## cloud
 
