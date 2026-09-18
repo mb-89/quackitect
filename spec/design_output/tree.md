@@ -28,7 +28,7 @@ Biome holds.
 | `NameHoldsTheWords` | every path git holds |
 | `NothingPrivateTravels` | every text file git holds, and the box it lints on |
 | `SurveyNamesInstalls` | `src/scripts/install.sh`, `lib/tools.js` |
-| `SurveyFindsNode` | `.se/tools.json`, the node running the sweep |
+| `SurveyFindsNode` | `.se/run/tools.json`, the node running the sweep |
 
 # Why lint prints them
 

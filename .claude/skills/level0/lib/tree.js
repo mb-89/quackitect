@@ -3,6 +3,7 @@
 // whole tree into the problems panel.
 // [[spec/design_output/tree#the-rules-over-two-files]]
 
+import { MOVED } from "./folders.js";
 import { overLong } from "./names.js";
 import { isDraft } from "./paths.js";
 import { carriesTheName, namesAPerson } from "./private.js";
@@ -23,7 +24,13 @@ export const FOLDERS = ".claude/skills/level0/lib/folders.js";
 const OWNER = "folders.js";
 const OWNED = /^(?:src|\.claude)\/.*\.(?:js|go|sh)$/;
 const A_TEST = /_test\.go$|\.test\.js$/;
-const SPELLS = [/\.se\/(?:run|retro)\b/, /"\.se",\s*"(?:run|retro)"/];
+const MOVED_NAMES = MOVED.join("|").replace(/\./g, "\\.");
+const SPELLS = [
+  /\.se\/(?:run|retro)\b/,
+  /"\.se"\s*,\s*"(?:run|retro)"/,
+  new RegExp(`\\.se\\/(?:${MOVED_NAMES})\\b`),
+  new RegExp(`"\\.se"\\s*,\\s*"(?:${MOVED_NAMES})"`),
+];
 const SOURCE = /^(?:src|\.claude)\/.*\.js$/;
 const TEXT = /\.(?:md|markdown|txt|ya?ml|json|js|ts|tsx|go|sh|ps1|ini|mod)$/i;
 const DELETES = /\bremove\(|\bunlink|\brm\b|\bprune\b/;

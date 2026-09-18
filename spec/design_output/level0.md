@@ -112,7 +112,7 @@ cloud guidance binds on. The operating system decides nothing here, because a
 person at a local box wants the button and a cloud box wants the server.
 
 The call comes back in milliseconds: the line backgrounds the server and sends
-its output to `.se/log/serve.log`, so a session start waits for nothing. The
+its output to `.se/run/log/serve.log`, so a session start waits for nothing. The
 server answers the next event in about a second. A first event landing before
 it stands reads no rules, and the log names the piece that misses.
 

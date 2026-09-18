@@ -41,6 +41,7 @@ import {
   VALE_INI,
 } from "../../.claude/skills/level0/lib/tree.js";
 import { boxOf } from "../../.claude/skills/level0/lib/private.js";
+import { SESSION } from "../../src/scripts/hand.js";
 import { disk } from "../../src/doors/disk.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
@@ -328,6 +329,37 @@ test("a file spelling the runtime folder without naming its owner is refused", (
       ["PrivateFolderOwned", "src/index/split.go", 1],
     ],
   );
+});
+
+// A reader the move left behind spells the old place, and that is the drift. [[spec/design_input/the-runtime-files-stand-apart]]
+test("a spelling of a name the runtime half took is refused where the old place stands", () => {
+  const stale = {
+    "src/bridge/left.js": 'const at = join(work, ".se", "hold");\n',
+    "src/scripts/old.js": 'const bin = ".se/bin";\nconst log = ".se/log";\n',
+  };
+  assert.deepEqual(
+    privateFolderOwned(fakeTree(stale, Object.keys(stale))).map((one) => [
+      one.file,
+      one.line,
+    ]),
+    [
+      ["src/bridge/left.js", 1],
+      ["src/scripts/old.js", 1],
+    ],
+  );
+
+  const kept = { "src/scripts/rest.js": 'const notes = ".se/notes";\n' };
+  assert.deepEqual(privateFolderOwned(fakeTree(kept, Object.keys(kept))), []);
+});
+
+// Two hooks import nothing, so each spells the session file the hand writes. [[spec/design_input/the-runtime-files-stand-apart]]
+test("every forced copy of the session file says what the hand module says", () => {
+  for (const path of [
+    ".claude/skills/level0/hooks/level0.js",
+    ".claude/skills/level1/hooks/level1.js",
+  ]) {
+    assert.match(here.read(path), new RegExp(`"${SESSION}"`), path);
+  }
 });
 
 test("a file naming the owner beside the copy passes, and a test file passes", () => {

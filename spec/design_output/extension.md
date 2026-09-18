@@ -557,7 +557,7 @@ the bar and raises no toast.
 
 ## RUNME opens the panel
 
-A bare RUNME writes `.se/show-panel` before it opens the editor. `activate`
+A bare RUNME writes `.se/run/show-panel` before it opens the editor. `activate`
 reads it, shows the quackitect panel, and empties it. So the panel opens for a
 person who starts from RUNME, and an ordinary start stays silent.
 
