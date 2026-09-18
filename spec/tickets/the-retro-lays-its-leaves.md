@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 depends_on: [the-retro-takes-the-box]
 steps:
@@ -170,6 +170,11 @@ record:
       - name: check
         exit: 0
         said: 75 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box d42624a67d18a8 · claude-code · helper-34
+    hash_before: b331fd609ae91ffce200aef042c1c12113621171
+    hash_after: b331fd609ae91ffce200aef042c1c12113621171
+reason: done
 ---
 
 # Ask
@@ -433,10 +438,12 @@ The route's collect step moves with the owner's ruling. It reads as the folders 
 - src/scripts/retro-collect.js
 - src/scripts/retro-leaves.js
 - src/scripts/retro-new.js
+- src/scripts/retro-window.js
 - src/scripts/retro.js
 - test/level0/projection.test.js
 - test/level0/retro-leaves.test.js
 - test/level0/retro-new.test.js
+- test/level0/retro-window.test.js
 
 <!-- the form is files -->
 
@@ -444,29 +451,33 @@ The route's collect step moves with the owner's ruling. It reads as the folders 
 
 <!-- pass or fail, findings one a line -->
 
-fail
+pass
 
-Three gaps stand, and the rest of the change answers the ask.
+Each gap the earlier verdict names closes, and the change answers the ask.
 
-| the gap | the fix |
+| the gap it names | what closes it |
 |---|---|
-| no case drives a merged group, so the `runs` filter fires nowhere and the file reads empty | give the fake git a closed group ticket, and read the `runs` file back |
-| the `method` leaf takes a row in the approach, and collect writes it no file | write the file, or say in the approach why that leaf takes none |
-| the file the `score` step reads lands as `retros`, and the ask asks for the leaf's name | name it for the leaf that reads it |
+| no case drives a merged group | a group ticket closes in the fake git, and a case reads its `runs` row |
+| the `method` leaf takes no file | `method` opens empty, and a case asserts the file |
+| the file reads `retros` | it reads `score`, which is the step reading it |
 
-| what answers the ask | where |
+| what the ask asks | where it stands |
 |---|---|
-| the takes off git land in the folder | `closedIn`, `mergedIn` and `standingRetros` in `src/scripts/retro-leaves.js` |
-| the manifest names each layout | the row each leaf file pushes, which the case reads back |
+| one file a leaf, named for the leaf | `leavesOut` in `src/scripts/retro-leaves.js` |
+| the takes off git land in the folder | `closedIn`, `mergedIn` and `standingRetros` |
+| the manifest names each one | the row each leaf file pushes, which the `unread` leaf reads |
 | the collect step reads as the folders it skips | `spec/processes/retro.yaml`, and the hash moves on the open retro |
-| a case reads the closed ticket back | the tickets leaf case, which finds the ticket as its commit leaves it |
+| a case drives a closed ticket and a merged group | the tickets case and the runs case, which read both files back |
 
 | what the reviewing guidance asks | what stands |
 |---|---|
-| the diff beyond the brief | the siblings' own work, which this branch carries alongside |
+| the branch does what the brief asks | every line of the ask lands |
+| the diff beyond the brief | the siblings' work on this shared branch, and one duplicate comment the earlier move leaves |
+| every rule carries a case that fires | six cases drive the leaves, each reading a file back |
+| a case feeds something bad | the empty window case, which asserts the empty file |
 | a retro handback | none stands, because this ticket runs at the desk |
 
-`./RUNME.sh check` exits 0 on this branch, and `node --test` passes over the two test files.
+`./RUNME.sh check` exits 0 on this branch, and the leaves cases answer green over six.
 
 <!-- the form is verdict -->
 
@@ -474,7 +485,7 @@ Three gaps stand, and the rest of the change answers the ask.
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
-- the leaves table stands once in the ticket, and the module's comments point at the design chapter
+- the leaves table stands once in the ticket, and each comment points at the design chapter
 
 <!-- the form is checklist -->
 
