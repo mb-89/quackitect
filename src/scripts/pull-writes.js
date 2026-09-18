@@ -208,16 +208,56 @@ export function tipOf(it) {
   return it.git.run(["rev-parse", "HEAD"], true).out;
 }
 
-// The commits between a hold's tip and the branch tip, split by the ticket each one names. [[spec/tickets/the-verdict-guard-reads-tips]]
-export function commitsFor(_it, _name, _since) {
-  return { read: false, own: [], other: [] };
+// The commits between a tip and the branch tip, split by the ticket each names. `landed` writes the ticket before the first colon, and what follows names children and successors. A log the door fails to read answers read false, which every caller takes as a move. [[spec/tickets/the-verdict-guard-reads-tips]]
+export function commitsFor(it, name, since) {
+  const said = since
+    ? it.git.run(["log", "--format=%H%x00%s", `${since}..HEAD`], true)
+    : { ok: false, out: "" };
+  if (!said.ok) return { read: false, own: [], other: [] };
+  const own = [];
+  const other = [];
+  for (const row of said.out.split("\n")) {
+    if (!row.trim()) continue;
+    const [sha, subject = ""] = row.split("\0");
+    (ticketIn(subject) === name ? own : other).push(sha.trim());
+  }
+  return { read: true, own, other };
+}
+
+// [[spec/tickets/the-verdict-guard-reads-tips]]
+function ticketIn(subject) {
+  const said = String(subject ?? "");
+  const at = said.indexOf(":");
+  return at < 0 ? "" : said.slice(0, at).trim();
 }
 
 // [[spec/design_output/pull#the-test-verb]]
 export function changedSince(it, one, held) {
   const first =
     recordIn(one.text).find((entry) => entry.hash_before)?.hash_before ?? held.hash;
-  return changedFiles(it, first);
+  const said = commitsFor(it, one.name, first);
+  if (!said.read) return changedFiles(it, first);
+  const out = new Set(said.own.flatMap((sha) => filesOf(it, sha)));
+  // A working tree names no hand, so it rides the span while the tip stands where the hold left it. [[spec/tickets/the-verdict-guard-reads-tips]]
+  if (!held.hash || tipOf(it) === held.hash) {
+    for (const path of treeFiles(it)) out.add(path);
+  }
+  return [...out].sort();
+}
+
+// [[spec/tickets/the-verdict-guard-reads-tips]]
+function filesOf(it, sha) {
+  const said = it.git.run(["show", "--format=", "--name-only", sha], true);
+  return said.ok ? said.out.split("\n").map((row) => row.trim()).filter(Boolean) : [];
+}
+
+// [[spec/design_output/pull#the-test-verb]]
+function treeFiles(it) {
+  const out = [];
+  for (const row of it.git.run(["status", "--porcelain"], true).out.split("\n")) {
+    if (row.trim()) out.push(changedIn(row));
+  }
+  return out;
 }
 
 export function changedFiles(it, since) {
@@ -229,9 +269,7 @@ export function changedFiles(it, since) {
       if (path.trim()) out.add(path.trim());
     }
   }
-  for (const row of it.git.run(["status", "--porcelain"], true).out.split("\n")) {
-    if (row.trim()) out.add(changedIn(row));
-  }
+  for (const path of treeFiles(it)) out.add(path);
   return [...out].sort();
 }
 

@@ -16,7 +16,7 @@ import { notesSaid, parsed } from "./guidance-hand.js";
 import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
 import { excludes, handRule } from "./pull-hand.js";
 import { ANSWERED, bare, CHECKED, COMMENT, CUT, FENCE, WORK } from "./pull-route.js";
-import { changedSince, tipOf } from "./pull-writes.js";
+import { changedSince, commitsFor, tipOf } from "./pull-writes.js";
 
 export function workAnswer(it, one, leaf) {
   const rows = [];
@@ -378,7 +378,9 @@ export function handFaults(it, one, leaf, hand, held) {
   if (other) out.push(`${leaf.path} ${other}.`);
   if (leaf.evidence.some((field) => field.form === "verdict") && !one.private) {
     const tip = tipOf(it);
-    if (held.hash && tip !== held.hash) {
+    // A sibling hand commits beside this reader, and that costs the reading nothing. A commit naming this ticket is this hand's own write, which the rule refuses. [[spec/tickets/the-verdict-guard-reads-tips]]
+    const said = held.hash && tip !== held.hash ? commitsFor(it, one.name, held.hash) : null;
+    if (said && (!said.read || said.own.length)) {
       out.push(
         `a verdict comes from a hand that leaves the tip where it stands, and ${shortOf(held.hash)} moved to ${shortOf(tip)}.`,
       );

@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -143,6 +143,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 5d9ad496ab7960f23c2f435c23dfd59445e6c2b4
+    hash_after: 5d9ad496ab7960f23c2f435c23dfd59445e6c2b4
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 group: the-warnings-feed-a-refactorer
 ---
 
@@ -357,11 +365,17 @@ drives the exit code.
 
 <!-- the form is command -->
 
+./RUNME.sh lint src/scripts/pull-writes.js src/scripts/pull-chapter.js
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the two files the ask names, and no other
+- the git door has a fake, and the cases teach it every call the guards run
+- a comment beside `commitsFor` names the approach, and points at this ticket
 
 ## tests-green
 
