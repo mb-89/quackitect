@@ -395,6 +395,17 @@ stands in the lint over the tree until a person reaches for the door.
 `src/scripts/ask-lint.js` holds the run, and a box with no Vale opens as it
 stands.
 
+## The blank lines stand
+
+`askLines` hands Vale the Ask with every blank line in it, and drops the
+placeholder comments alone. A blank line is what parts a paragraph from a
+table, so Vale reads the parts the writer means.
+
+Rows that drop the blanks run a table into the prose around it. Vale then reads
+the run as one paragraph, and the sentence rule counts the whole of it as one
+sentence. An Ask passing the lint over the tree comes back refused at the open,
+and the line it names holds no words at all.
+
 # The test verb
 
 `branch test` runs the tests the branch adds or changes since the ticket's

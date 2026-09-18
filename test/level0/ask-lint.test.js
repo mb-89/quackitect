@@ -9,7 +9,7 @@ import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { askFaults } from "../../src/scripts/ask-lint.js";
-import { ticket } from "../../src/scripts/ticket.js";
+import { askLines, ticket } from "../../src/scripts/ticket.js";
 
 const ROOT = "/tree";
 const VALE = "/tree/.se/bin/vale";
@@ -140,4 +140,36 @@ test("a warning leaves the open alone, and a box with no Vale opens as it stands
   const bare = box("{}");
   assert.deepEqual(askFaults({ ...bare.it, vale: "" }, AT, ["a line"]), []);
   assert.equal(bare.proc.ran.length, 0, "no Vale, no run");
+});
+
+// [[spec/design_output/pull#a-draft-opens]]
+test("the ask rows keep every blank line, and drop the placeholder comments", () => {
+  const own = [
+    "",
+    "A row carries one key a flag.",
+    "",
+    "<!-- gain, as text: what is gained -->",
+    "| the letter | the key |",
+    "|---|---|",
+    "| U | urgent |",
+    "",
+    "The keys stay ordinary keys.",
+  ];
+  assert.deepEqual(askLines({ own }), [
+    "",
+    "A row carries one key a flag.",
+    "",
+    "| the letter | the key |",
+    "|---|---|",
+    "| U | urgent |",
+    "",
+    "The keys stay ordinary keys.",
+  ]);
+});
+
+test("an ask of blanks alone holds nothing, and one line makes it hold", () => {
+  const holds = (own) => askLines({ own }).some((row) => row.trim());
+  assert.equal(holds(["", "  ", ""]), false);
+  assert.equal(holds(["", "<!-- gain -->", ""]), false);
+  assert.equal(holds(["", "A thing.", ""]), true);
 });
