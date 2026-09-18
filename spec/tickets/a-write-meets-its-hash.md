@@ -2,10 +2,20 @@
 kind: [[ticket]]
 state: open
 urgency: now
+step: design/person-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: "design/review failed back 2 times: The unstamped rule refuses `mcp__level0__patch` and `mcp__level0__replace` over a file the disk holds.; the apply lane calls `onWrite` with an event it builds itself, and that event carries no hand; so a batch edit reads as unstamped, and the door refuses the tree its own way to change many files; the batch reads each file at the call, so it stands stale nowhere. Pass it as a case the rule names; a batch that lands leaves the hand behind the disk, so stamp every file the batch writes; `mintsNote` refuses a path the disk holds, so the new file case already carries that lane; the door answers ahead of the write, and a write the engine drops leaves a stamp ahead of the disk; that next write refuses and asks for a read, which costs a read and loses nothing. Say so; every earlier finding stands answered, and the code bears out the claims on `hashText`, `refusal` and `codeDoor`"
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -89,8 +99,6 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-group: the-warnings-feed-a-refactorer
-step: design/review
 record:
   - step: design/draft
     hand: box a5e189c39e1d · claude-code-remote
@@ -106,6 +114,13 @@ record:
     hand: box a5e189c39e1d · claude-code-remote
     hash_before: 7270e19ac2b4d1c28e2997d11b82081459bbdd4c
     hash_after: 7270e19ac2b4d1c28e2997d11b82081459bbdd4c
+  - step: design/review
+    hand: box a5e189c39e1d · claude-code-remote · helper-6
+    hash_before: 28e3852a3af3fd5810d67c6c8ebb5b55909c35c6
+    hash_after: 28e3852a3af3fd5810d67c6c8ebb5b55909c35c6
+    returns: 2
+    why: The unstamped rule refuses `mcp__level0__patch` and `mcp__level0__replace` over a file the disk holds.; the apply lane calls `onWrite` with an event it builds itself, and that event carries no hand; so a batch edit reads as unstamped, and the door refuses the tree its own way to change many files; the batch reads each file at the call, so it stands stale nowhere. Pass it as a case the rule names; a batch that lands leaves the hand behind the disk, so stamp every file the batch writes; `mintsNote` refuses a path the disk holds, so the new file case already carries that lane; the door answers ahead of the write, and a write the engine drops leaves a stamp ahead of the disk; that next write refuses and asks for a read, which costs a read and loses nothing. Say so; every earlier finding stands answered, and the code bears out the claims on `hashText`, `refusal` and `codeDoor`
+group: the-warnings-feed-a-refactorer
 ---
 
 # Ask
@@ -121,6 +136,16 @@ Version three rules it in one line, under its file lane: a write lands only agai
 - `./RUNME.sh check` answers 0
 
 # design
+
+## person-1
+
+<!-- answers the question the engine asks -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
 
 ## draft
 
@@ -181,17 +206,16 @@ wording names the file and asks the hand to read it again.
 
 <!-- the form is verdict -->
 
-fail. The stamp table one box shares reads the same for every hand, so a stale write still lands.
+fail. The unstamped rule refuses `mcp__level0__patch` and `mcp__level0__replace` over a file the disk holds.
 
-- the shared table holds one stamp a path, so one hand writing refreshes the stamp the other hand reads
-- the second hand then agrees with the disk and lands its stale write, which is the loss the ask names
-- key the stamp by hand and by path, and name the token a hand carries. The bridge reads `e.agentId` alone
-- a path holding no stamp passes, so refuse an unstamped write where the disk holds the file
-- the door runs ahead of the write, so a stamp written there outlives a write `codeDoor` refuses
-- the formatter rewrites a `Write` inside `codeDoor`, so a stamp of the raw text refuses the next edit
-- `refusal` opens on the voice rules, so this door owes its own wording beside `refusedTicket` and `refusedPrivate`
-- the box holds the table in memory, and a server restart empties it. Say what the door does there
-- `hashText` serves the process hash in the schema lane, and the projection lane compares whole texts
+- the apply lane calls `onWrite` with an event it builds itself, and that event carries no hand
+- so a batch edit reads as unstamped, and the door refuses the tree its own way to change many files
+- the batch reads each file at the call, so it stands stale nowhere. Pass it as a case the rule names
+- a batch that lands leaves the hand behind the disk, so stamp every file the batch writes
+- `mintsNote` refuses a path the disk holds, so the new file case already carries that lane
+- the door answers ahead of the write, and a write the engine drops leaves a stamp ahead of the disk
+- that next write refuses and asks for a read, which costs a read and loses nothing. Say so
+- every earlier finding stands answered, and the code bears out the claims on `hashText`, `refusal` and `codeDoor`
 
 # implement
 
@@ -201,7 +225,7 @@ fail. The stamp table one box shares reads the same for every hand, so a stale w
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+<!-- the same tests pass -->
 
 <!-- the form is command -->
 
