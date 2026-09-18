@@ -90,7 +90,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 008a818f05e194cce9e1d41591390bf35caa5a4a
+    hash_after: 008a818f05e194cce9e1d41591390bf35caa5a4a
 ---
 
 # Ask
@@ -123,7 +128,33 @@ The record dies with the box. A retro then reads what a hand remembers, and the 
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+`retro collect` walks the private folder, copies what the deny list leaves standing into the retro's own folder, and writes a manifest beside it.
+
+| the step | what it does |
+|---|---|
+| refuses | a hold standing under the private folder stops the verb, because a hand mid-step writes files a copy tears |
+| rotates | the log's open file closes, so the copy holds whole lines |
+| walks | every path under the private folder, deepest first |
+| keeps | a path the deny list leaves standing |
+| copies | that path into the retro folder, at the same relative place |
+| writes | one manifest line a path, with its size and where it comes from |
+
+The verb copies and removes nothing. A drain that deletes leaves a box with no record where the retro fails half way, and the retro folder is the copy git keeps.
+
+| where the deny list stands | `retro.deny` under the config |
+|---|---|
+| what it holds | a glob a line, read against the path relative to the private folder |
+| what the default names | the retro's own folders, the runtime half, and the binaries |
+| who adds to it | the owner, in the config, and a box through its own layer |
+
+A deny list takes a file of a kind nobody plans for. The `unread` leaf reads the manifest against what every other leaf reads, so a file nobody reads stands as a finding.
+
+The transcripts stand outside the private folder, in the harness's own files. The verb takes them by their own path, and the manifest names them as it names the rest.
+
+| what the folder reads | `.se/retro/<ticket>/` |
+|---|---|
+| what stands inside | the copies, at their relative paths, and the manifest |
+| what a second run does | it refuses, because a folder standing there holds a run already |
 
 <!-- the form is text -->
 
