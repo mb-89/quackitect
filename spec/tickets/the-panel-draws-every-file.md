@@ -92,7 +92,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box dd2a59294365 · claude-code-remote
@@ -123,6 +123,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 9a15fb235ec143a0a6d5bb3e7a258cfd55dafd73
+    hash_after: 9a15fb235ec143a0a6d5bb3e7a258cfd55dafd73
+    answered:
+      - name: lint
+        exit: 0
+        said: 81 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
@@ -304,11 +312,17 @@ What surprises me:
 
 <!-- the form is command -->
 
+./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the server file alone, beside its new tests
+- every door the change reaches has a fake: the cases drive the server over a temporary root
+- a comment names the approach: the source constants and the sweep both point at this ticket
 
 ## tests-green
 
