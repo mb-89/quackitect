@@ -182,9 +182,18 @@ steps:
       - name: groups
         form: list
         says: one line per ticket, with its group and its urgency
-step: collect
+step: field
 process: [[spec/processes/retro]]
 process_hash: 61a2bb140f0b4632
+record:
+  - step: collect
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: ca22b75158abd573db00e1635f0bd8ea5b443cf4
+    hash_after: ae7c1c44baa2e22cfc64db923c45a890a5c7a48c
+    answered:
+      - name: run
+        exit: 0
+        said: .se/retro/retro-ca22b75 holds a whole run already, and this one changes nothing.
 ---
 
 # Ask
@@ -199,7 +208,7 @@ the three branches land on trunk, and this reads the window they close
 
 ## run
 
-<!-- retro collect, which refuses while another hand holds a ticket, and skips the runtime folder and its own -->
+    ./RUNME.sh retro collect retro-ca22b75
 
 <!-- the form is command -->
 
