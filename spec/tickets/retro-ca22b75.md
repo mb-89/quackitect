@@ -182,7 +182,7 @@ steps:
       - name: groups
         form: list
         says: one line per ticket, with its group and its urgency
-step: mine/memory
+step: mine/tickets
 process: [[spec/processes/retro]]
 process_hash: 61a2bb140f0b4632
 record:
@@ -234,6 +234,10 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: afc8263bbe84fa32a71c917f68fe6be336e5f421
     hash_after: afc8263bbe84fa32a71c917f68fe6be336e5f421
+  - step: mine/memory
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: a07df9b295739da46d1f8e0de23a0183c466bb88
+    hash_after: a07df9b295739da46d1f8e0de23a0183c466bb88
 ---
 
 # Ask
@@ -393,13 +397,22 @@ So the leaf reads the door's answer as the job. The tree lacks the command itsel
 
 ### moved
 
-<!-- one line per entry, with its home in the tree, or the reason it dies -->
+- code-has-a-size-ceiling: home is spec/guidance/code/code.md, and the ceiling stands in the check already.
+- a-rule-grandfathers-nothing: home is spec/guidance/working.md, and no line there says it yet.
+- answers-say-what-the-owner-does: home is spec/guidance/answering.md, beside the register the judge reads.
+- the-owner-says-put-it-down: home is spec/guidance/working.md, beside the rule on stopping.
+- a-report-ends-no-turn: spec/guidance/cloud.md names the report already, so the entry dies there.
+- the-hold-ends-a-turn: spec/guidance/guidance.md names the hold already, so the entry dies there.
+- run-the-tests-and-finish-cleanups: spec/guidance/code/testing.md carries it, so the entry dies there.
+- a-door-starts-with-a-talk: spec/guidance/code/code.md carries the door rule, and the talk wants a line.
 
 <!-- the form is list -->
 
 ### emptied
 
-<!-- the memory folder holds no entry that shapes behavior, because git carries none of it -->
+The folder still holds all eight entries, because four of them find a home the tree lacks a line for. A hand deleting them now loses the rule with the copy.
+
+So the improve step mints one ticket for the four lines the guidance wants, and the delete follows that ticket. This leaf hands the next retro a folder to check again.
 
 <!-- the form is text -->
 
