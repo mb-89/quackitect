@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 step: design/person-1
 steps:
@@ -122,6 +122,8 @@ record:
     why: "One answer leaves the stop door: `seen` takes the `spawn` branch and drops `result` beside it.; So the `continue` side hands back no block, and the turn ends where the rule holds it open.; `spawns` awaits `$.agent.spawn`, so the session waits on the hand the ask says costs no turns.; Name the door that starts the hand beside the stop door, since one answer carries both nowhere.; `onAgentSpawn` reads no kind, and the review spawn carries `subagentType` `general-purpose` too.; Name the field the refactoring spawn sets, so the refactor layer reaches that hand alone.; No code reads a note's `scope` today, so say that `guidanceHere` starts reading it.; `refactor.mostInARow` counts hands and `stop.mostInARow` counts turns, so name the new key apart.; `./RUNME.sh check` answers 1, on warnings standing across the tree before this branch.; The git source, the successor pointer and the note's `scope` answer the earlier findings.; The stop rule, the four keys, the flag and the file the hand takes answer the rest of the ask."
 group: the-warnings-feed-a-refactorer
 depends_on: ["a-rule-carries-its-side"]
+reason: became
+successors: [the-spawn-reaches-its-guidance]
 ---
 
 # Ask
