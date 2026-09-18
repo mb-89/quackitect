@@ -211,17 +211,49 @@ pass
 
 <!-- the form is command -->
 
+./RUNME.sh branch test
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The tests stand in a new file, `test/level0/folders.test.js`, and in the index's own Go tests. The module the tests import, `.claude/skills/level0/lib/folders.js`, holds the two names and the placement rule and reaches nothing. It stands now, because a test importing a module nobody wrote answers `build` where the step asks for `assertion`.
+
+| what the test drives | how it fails today |
+|---|---|
+| the writers of the worktree, the journal, the binaries, the survey, the log, the box record and the hold, each under the runtime half | each names a folder straight under the private one |
+| the hold folder, one path across the three modules spelling it | the three agree on the old path |
+| the walk, over a private note | the walk skips the private folder whole |
+| a `find` over a word standing in a private note alone | the rows carry no such note |
+| the glob, over the notes outside the runtime half | the private note reaches no row |
+
+These stand green already, and they hold the claim the change must keep:
+
+| what the test drives | why it passes today |
+|---|---|
+| the runtime half read off the path, not off a folder's base name | the module owns the rule |
+| the index binary, under the bin the survey names | one constant builds the other |
+| the private tickets, in the rest | a reader asks after them once the box dies |
+| the walk, outside the runtime half | the private folder covers it today |
+
+What surprises me:
+
+- `./RUNME.sh branch test` runs the JavaScript tests alone, so the Go half of the red answers through `go test` and lands in the check.
+- The Go tests want `CGO_ENABLED=1` and the `sqlite_fts5` tag, which `src/scripts/install.sh` carries for the build and no test command carries on its own.
+- The hold folder stands spelled in three modules, so the move touches each one. The tests hold the three against one path, so a later drift fails.
+- The glob test counts the notes the fixture writes, so the fixture and that count move together.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the tests, the module the ask names, and the index's own tests, and nothing else
+- every door the change reaches has a fake: the cases read exported strings and the Go cases write a tree under a temporary root, so no door runs
+- a comment names the approach the change implements: the module's header and each test file's header point at the design input
 
 ## reflect
 
