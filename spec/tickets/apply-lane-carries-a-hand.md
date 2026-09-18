@@ -88,19 +88,31 @@ on that ticket. [[spec/tickets/a-write-meets-its-hash]] carries the record.
 
 <!-- the form is text -->
 
-The lane stamps as it reads, so the rule holds over it and the callers change
-nothing.
+The engine keeps the mark in the hook, and the hand carries nothing. The owner
+rules that the hand knows nothing of this. It writes what it writes, and meets a
+refusal where the file moves.
+
+| step | who acts |
+|---|---|
+| content reaches the agent, through a read or through its own write landing | the door hashes the file and keeps it against that path |
+| the agent writes to that path | the door hashes the disk now |
+| the two agree | the write lands |
+| the two differ | the door refuses, and says to read the file again |
+
+Which read sets the mark is the whole of the mechanism. The door reads a file
+for itself on every edit, so a mark off that read compares against itself and
+buys nothing. The mark comes off the read reaching the agent.
+
+So the lane wants no change and no token:
 
 | way | why it stands aside |
 |---|---|
-| the lane carries the hand | two callers thread a token the event lacks, for a lane that reads each file at the call |
+| the lane carries the hand | two callers thread a token for a thing the hook answers alone |
 | the lane stands outside the rule | a batch then drops another hand's change, which is the loss the ask names |
 
-The lane reads each file at the moment it writes, so its read is the freshest
-one standing. Stamping there tells the truth about what it read.
-
-A wrong answer here refuses one batch edit, and the hand reads again. A later
-commit undoes it, so this box decides it.
+The lane reads each file at the moment it writes, so its read is both the
+agent's read and the freshest one standing. The door marks it there, the way it
+marks any other.
 
 # do
 

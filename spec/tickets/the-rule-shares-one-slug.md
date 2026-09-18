@@ -86,21 +86,34 @@ on that ticket. [[spec/tickets/a-pointer-names-its-heading]] carries the record.
 
 <!-- the form is text -->
 
-The rule carries its own slug in Go, with the reason beside it.
+One source owns the slug, and a projection writes it into both tool chains. The
+owner rules that two languages mean two tool chains, and that a rule reaching
+both belongs in one source projected into each. The tree projects that way
+already: `spec/schemas/paragraph.schema.yaml` writes the Vale rules, and
+`spec/config/projections.json` names every such pair.
 
 | way | why it stands aside |
 |---|---|
+| a copy in each language, held by a contract test | nothing owns the answer, and a drift waits for a test to catch it |
 | the checker asks the index | a call a note, and a second module in the rule's path |
-| one owner in Go | every reader in JavaScript then reaches a binary to slug a heading |
+| one owner in Go | every reader in JavaScript then runs a process to slug a heading |
 
-Voice rule 7 takes a copy a technical reason forces, where that reason stands
-beside it. A Go module imports no JavaScript, and that is the reason.
+Two shapes carry a projection, and this takes the second:
 
-So the Go slug names the four copies in its comment, and a contract test holds
-the five to one answer. A copy drifting then fails the check.
+| shape | what the source owns | what each language holds |
+|---|---|---|
+| the function projects | the body | generated code, in both languages |
+| the cases project | a table of heading and anchor pairs | its own function, driven by the shared table |
 
-A wrong answer here moves one function. A later commit undoes it, so this box
-decides it.
+Three lines carry the reasoning:
+
+- a slug is a handful of transformations, and a generated body ages badly where a language wants its own feature
+- a table of pairs is data, it projects cleanly, and a drift turns both suites red off one source
+- the check reads a stale projection already, so a drift fails there and no contract test stands in for it
+
+The ask gains one line beside this answer: the cases fail on a copy nobody drives
+from the table, and on a drift alike. Otherwise the next hand writes another
+copy and both suites stay green.
 
 # do
 
