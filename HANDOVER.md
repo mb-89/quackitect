@@ -6,17 +6,17 @@ urgency: now
 
 # Where it stands
 
-The group [[spec/tickets/the-warnings-feed-a-refactorer]] stands part way. The runtime split lands whole, and every other child waits on a design review or on a person.
+The group [[spec/tickets/the-warnings-feed-a-refactorer]] closes done, and its retro stands written on the ticket. Two children land whole, and the rest leave their questions on tickets a person answers.
 
-| child | step |
+| child | how it closes |
 |---|---|
-| [[spec/tickets/the-runtime-files-stand-apart]] | closed, and its successor carries the reading |
-| [[spec/tickets/a-rule-carries-its-side]] | closed, and its successor carries the question |
-| [[spec/tickets/one-function-answers-the-hand]] | closed, and its successor carries the question |
-| [[spec/tickets/the-hook-spawns-a-refactorer]] | closed, and its successor carries the question |
-| [[spec/tickets/the-panel-draws-every-file]] | implement/tests-red, its design stands |
-| [[spec/tickets/a-pointer-names-its-heading]] | closed, and a question carries it |
-| [[spec/tickets/a-write-meets-its-hash]] | closed, and a question carries it |
+| [[spec/tickets/the-runtime-files-stand-apart]] | its successor carries a third reading |
+| [[spec/tickets/the-panel-draws-every-file]] | done, and its verdict passes |
+| [[spec/tickets/a-rule-carries-its-side]] | its successor carries the question |
+| [[spec/tickets/one-function-answers-the-hand]] | its successor carries the question |
+| [[spec/tickets/the-hook-spawns-a-refactorer]] | its successor carries the question |
+| [[spec/tickets/a-pointer-names-its-heading]] | a question carries it |
+| [[spec/tickets/a-write-meets-its-hash]] | a question carries it |
 
 Every ticket below stands outside a group, waiting for a person at its first step:
 
@@ -26,6 +26,7 @@ Every ticket below stands outside a group, waiting for a person at its first ste
 | [[spec/tickets/one-list-holds-the-warnings]] | what the one list is, and what the push door reads |
 | [[spec/tickets/the-one-answer-takes-shape]] | how far the one hand answer reaches |
 | [[spec/tickets/the-spawn-reaches-its-guidance]] | which door starts the refactoring hand, and what reaches it |
+| [[spec/tickets/the-verdict-guard-reads-tips]] | the guard refusing a hand-back beside a sibling commit |
 | [[spec/tickets/the-rule-shares-one-slug]] | its answer stands written, and its step waits for a person |
 | [[spec/tickets/apply-lane-carries-a-hand]] | its answer stands written, and its step waits for a person |
 
@@ -35,11 +36,10 @@ Every ticket below stands outside a group, waiting for a person at its first ste
 
 | what | who does it |
 |---|---|
-| write the tests for the panel sweep, then make the change | the next hand |
+| run `./RUNME.sh branch merge the-warnings-feed-a-refactorer` from main | a hand on a desk |
 | move the person tickets off their first step, then work each `do` | a hand on a desk |
-| carry the retro, which this group writes at its own hand-back | the next hand |
 
-The panel ticket holds the group's last open work. Its design stands, and both reviews read it against the code.
+Nothing of this group waits on an agent. The group ticket carries the retro, which names what this box wants, what it meets and what it leaves.
 
 # What the runtime split changes
 
