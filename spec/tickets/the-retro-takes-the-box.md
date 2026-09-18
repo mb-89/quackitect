@@ -153,6 +153,22 @@ The record dies with the box. A retro then reads what a hand remembers, and the 
 
 ### answer
 
+The owner rules the whole question away. A runtime folder holds the state a box keeps while it works, and collect skips that folder.
+
+| what the owner says | what it settles |
+|---|---|
+| the index, the stamp, the health and the lint output stand in the runtime folder | the list of runtime files goes |
+| collect skips the runtime folder and the retro's own | the glob list goes, and the config knob with it |
+| a folder says what its files are for | a reader tells the kinds apart by where they stand |
+
+So three of the four questions fall away:
+
+- the order files copy in carries no meaning, because collect removes nothing
+- the handover needs no line of its own, because its folder decides it
+- a glob list reaches the config nowhere, because no glob list stands
+
+This ticket waits on [[spec/tickets/the-runtime-files-stand-apart]], which cuts that folder.
+
 <!-- the answer, which the step behind this one reads -->
 
 <!-- the form is text -->
