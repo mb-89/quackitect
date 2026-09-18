@@ -75,11 +75,15 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: split
+step: children
 record:
   - step: sync
     skipped: true
     why: the box runs off the cloud
+  - step: split
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 581614665675d9aeffd86b072b89bba30e8be6d4
+    hash_after: 581614665675d9aeffd86b072b89bba30e8be6d4
 ---
 
 # Ask
@@ -113,13 +117,17 @@ Read [[spec/design_input/the-agent-pulls-tickets]] first, the chapter The retro.
 
 ## children
 
-<!-- every child as a link, one a line, with its process -->
+- [[spec/tickets/the-retro-takes-the-box]], off [[spec/processes/standard]]
+- [[spec/tickets/the-retro-cuts-its-window]], off [[spec/processes/standard]]
+- [[spec/tickets/a-retro-mints-itself]], off [[spec/processes/standard]]
 
 <!-- the form is list -->
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- every child is small enough to review whole. Each one lands in a diff a reader reads at a sitting.
+- the children add up to the goal. The take, the cut and the mint are the whole of the verb.
+- a child that waits on another names it. The cut names the take under depends_on.
 
 <!-- the form is checklist -->
 
