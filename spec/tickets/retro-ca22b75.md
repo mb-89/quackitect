@@ -182,7 +182,7 @@ steps:
       - name: groups
         form: list
         says: one line per ticket, with its group and its urgency
-step: mine/method
+step: improve
 process: [[spec/processes/retro]]
 process_hash: 61a2bb140f0b4632
 record:
@@ -258,6 +258,10 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: c1b2f9458f1f6910b0553b0bcc131996a028797b
     hash_after: c1b2f9458f1f6910b0553b0bcc131996a028797b
+  - step: mine/method
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 772ea91ddf6815317813f140644c2b17ee85cb25
+    hash_after: 772ea91ddf6815317813f140644c2b17ee85cb25
 ---
 
 # Ask
@@ -549,13 +553,26 @@ The manifest holds 394 lines, and the log, the scripts, the private tickets and 
 
 ### earned
 
-<!-- one line per leaf, with what it earned and what it cost, and the readers' questions with no answer -->
+- collect earns the whole window for one command, and it costs three runs to get the log right.
+- the chapter cut earns thirteen readable spans, and five of them carry no count.
+- tickets and runs earn the most: 94 closures and 30 groups, read off git with no log.
+- shell and refusals earn nothing, because each reads a field the log shapes otherwise.
+- score earns a baseline, and it costs a verb the route names and the code lacks.
+- readers earns nothing, because no hand the engine spawns arrives, and the step passes anyway.
+- the readers ask thirteen questions, and every one stands with no answer.
 
 <!-- the form is list -->
 
 ### change
 
-<!-- what changes in the retro route or its verb, and why, each a ticket the improve step mints -->
+- the log row carries the command beside the refusal, so the shell leaf reads a job.
+- the log row carries a rule and a level on a refusal, so the refusals leaf counts one.
+- collect copies the transcripts, so a chapter reads a thought and the median means something.
+- the readers step refuses to pass while a chapter stands unread, because a pass there reads as done.
+- the retro verb gains score, which this run adds, and the route names it already.
+- the move list takes the index, the stamp, the health file and the outputs, so collect copies state nowhere.
+
+<!-- the form is list -->
 
 <!-- the form is list -->
 
