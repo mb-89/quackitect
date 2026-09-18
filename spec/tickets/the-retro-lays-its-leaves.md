@@ -91,7 +91,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -103,6 +103,10 @@ record:
     hash_after: dee2aea25f40ed5727268f1b7c2f502381ca8e81
     returns: 1
     why: Two gaps stand, and the rest of the approach answers the ask:; | the gap | the fix |; |---|---|; | the collect step of [[spec/processes/retro]] reads as a keep list today | write the deny list into that step, and move the hash with it |; | the earlier retros reach no file, and the `score` step reads them | name the file they land in, beside the leaves' own |; | what answers the ask | where |; |---|---|; | one file a leaf under the retro folder, named for the leaf | the leaves table |; | the nine leaves, with `chapters` and `worker` reading live | the leaves table and the two-leaf line |; | the three takes off git, with the tickets and their records | the git table |; | the manifest naming a layout beside a copy, which `unread` reads | the manifest line |; `./RUNME.sh check` exits 0 on this branch.
+  - step: design/draft
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: a31ca19ab697013c347bdfe3c3d7a4396cf2e4c6
+    hash_after: a31ca19ab697013c347bdfe3c3d7a4396cf2e4c6
 ---
 
 # Ask
@@ -146,6 +150,7 @@ Collect writes one file a leaf under the retro folder, holding what that leaf re
 | `runs` | the retro leaves of the groups merging in the window, off git |
 | `unread` | the manifest itself, which the leaf reads against the others |
 | `method` | this retro's own run, which the hand fills as it goes |
+| `score` | the earlier retros, so the step scoring them reads a file and no git |
 
 Three of the takes come off git and no box:
 
@@ -163,6 +168,15 @@ Collect names every file it lays out in the manifest, beside the copies. So the 
 |---|---|
 | what a row holds | one thing the leaf reads, as the leaf wants it |
 | what an empty file says | the window holds none of that thing, and the leaf says so |
+
+The route's own collect step reads as a keep list today. It says the verb takes what it names, and takes nothing it does not name. The owner rules the skip a folder, so that step's words move with this change.
+
+| what the step says today | what it says after |
+|---|---|
+| takes what it names under the private folder | copies the private folder past the folders it skips |
+| takes nothing it does not name | skips the runtime folder and the retro's own |
+
+The process hash moves with those words. No retro ticket stands open past this branch, so `./RUNME.sh ticket update` reaches the one open retro and takes the new route.
 
 <!-- the form is text -->
 
