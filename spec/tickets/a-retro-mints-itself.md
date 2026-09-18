@@ -90,7 +90,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: ed8bb2787df33550776b3a688995e52fb3272c23
+    hash_after: ed8bb2787df33550776b3a688995e52fb3272c23
 ---
 
 # Ask
@@ -122,7 +127,27 @@ A retro takes a hand-written ticket. The route on it drifts from the process fil
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+One sub-verb mints the ticket, and one projection writes the command that calls it.
+
+| what lands | where |
+|---|---|
+| `retro new`, a sub-verb beside `retro notes` | `src/scripts/retro.js` |
+| the shape writing one command file | `.claude/skills/level0/lib/projection.js` |
+| the entry naming that shape, its source and its target | `spec/config/projections.json` |
+| `retroReaders` and `retroCap`, with their defaults | `spec/config/level0.json` and its schema |
+
+`retro new` mints a ticket off the retro process, names it for the tip it stands on, writes the reason into its ask, and opens it. It prints what a pull prints, so the hand reads the first leaf without a second command.
+
+The ticket's name reads `retro-<short>`, off the commit the window ends at. A name holds five words, and two of them stand here. A hand naming its own takes `--as <name>`.
+
+| the field | what it takes |
+|---|---|
+| `why` | what calls for it, off `--why`, or the standing line where nobody says |
+| `state` | open, because the mint writes an ask a hand fills nowhere |
+
+The command file reads like a config command and runs `./RUNME.sh retro new` ahead of the turn. The projection owns it, so the write door refuses a hand editing it, and `./RUNME.sh check` names it stale where the shape moves.
+
+The two knobs stand in the config as numbers, beside the other work knobs. `retroReaders` caps the hands a collect spawns, and `retroCap` caps the tickets the improve step mints.
 
 <!-- the form is text -->
 
