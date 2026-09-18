@@ -1,4 +1,6 @@
+import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
 import { entryNamed, reRouted } from "../../.claude/skills/level0/lib/schema.js";
+import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 
 export { HELPER, SPAWN, spawnPrompt } from "./spawn.js";
@@ -200,7 +202,7 @@ export function spawnAnswer(other) {
 }
 
 // [[spec/design_output/pull#done-leaves-no-takeable-step]]
-export function takeable(it, one, all = []) {
+export function takeable(it, one, all = [], group = "") {
   const front = frontOf(one.text);
   if (String(front.state ?? "") !== OPEN) return "";
   // The offer waits on a dependency, so this waits on it too. [[spec/design_output/work#a-dependency-waits-for-trunk]]
@@ -208,8 +210,8 @@ export function takeable(it, one, all = []) {
   const path = String(front.step ?? "").trim() || (leavesOf(front)[0]?.path ?? "");
   const leaf = leafOf(front, path);
   if (!leaf) return "";
-  if (["person", "children", "helper"].includes(leaf.by)) return "";
-  if (leaf.by === "agent" && !it.agent) return "";
+  // [[spec/tickets/the-one-answer-takes-shape]]
+  if (!writesHere(leaf, handRule(it, front, all, group)).writes) return "";
   if (leaf.needs.some((need) => !holdsVerb(need))) return "";
   return leaf.path;
 }
@@ -379,25 +381,24 @@ export function childrenSay(all, name) {
 
 // [[spec/design_output/pull#the-hand-rule]]
 export function admits(it, who, one, leaf, all) {
-  if (leaf.by === "person" && it.agent && !it.ownerSays)
-    return { why: `waits for a person at ${leaf.path}`, person: leaf };
-  if (leaf.by === "agent" && !it.agent)
-    return { why: `waits for an agent at ${leaf.path}` };
-  if (leaf.by === "helper")
-    return { why: `waits for a hand the engine spawns at ${leaf.path}` };
-  if (
-    leaf.by === "retro" &&
-    String(one.front.todo) !== "true" &&
-    !atRetro(all, who.group)
-  ) {
-    return { why: `waits for a hand at a retro step, at ${leaf.path}` };
-  }
+  const said = writesHere(leaf, handRule(it, one.front, all, who.group));
+  if (!said.writes) return { why: said.why, ...(said.person ? { person: leaf } : {}) };
   const lacking = leaf.needs.filter((need) => !holdsVerb(need));
   if (lacking.length)
     return { why: `needs ${lacking.join(", ")}, which this box lacks` };
   const other = excludes(one.front, leaf, who.hand);
   if (other) return { why: other, other: leaf };
   return { leaf };
+}
+
+// The hand the one answer reads: who this is, and what the group stands at. [[spec/tickets/the-one-answer-takes-shape]]
+export function handRule(it, front, all, group) {
+  return {
+    agent: Boolean(it.agent),
+    ownerSays: Boolean(it.ownerSays),
+    cloud: inCloud(it.env ?? process.env),
+    atRetro: String(front?.todo) === "true" || atRetro(all ?? [], group),
+  };
 }
 
 export function atRetro(all, group) {
@@ -433,6 +434,8 @@ export function handed(it, who, one, leaf) {
     ticket: one.name,
     path: one.path,
     step: leaf.path,
+    // The write door reads what this hand works, in place of working it out again. [[spec/tickets/the-one-answer-takes-shape]]
+    by: leaf.by,
     group: who.group,
     hand: who.hand,
     hash,

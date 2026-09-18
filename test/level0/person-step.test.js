@@ -82,7 +82,7 @@ One piece of it.
 # Discussion
 `;
 
-function doors() {
+function doors(more = {}) {
   const said = fakeGit(
     {
       "git rev-parse --abbrev-ref HEAD": { stdout: `${BRANCH}\n` },
@@ -109,7 +109,10 @@ function doors() {
     clock: fakeClock(),
     agent: true,
     cloud: true,
+    // A case names its own environment, so the box running it changes no answer. [[spec/guidance/code/testing]]
+    env: {},
     node: "node",
+    ...more,
   };
 }
 
@@ -145,6 +148,17 @@ test("the pull names the mint, the open and the unblock where a person's step is
     "the answer hands the question out",
   );
   assert.match(said, /branch done/, "the answer lands the rest of the group");
+});
+
+// A cloud box answers every question it meets, so that step stands open to it. [[spec/guidance/cloud]]
+test("a cloud box takes the person's step, and the answer names no unblock", () => {
+  const { said } = heard(() =>
+    work(ROOT, ["pull"], doors({ env: { CLAUDE_CODE_REMOTE: "1" } })),
+  );
+
+  assert.match(said, /a-child at design\/person-1/);
+  assert.ok(!said.includes("waits for a person"));
+  assert.ok(!said.includes("branch unblock"));
 });
 
 // [[spec/design_output/pull#the-hand-rule]]

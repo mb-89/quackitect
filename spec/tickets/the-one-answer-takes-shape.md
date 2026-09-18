@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 steps:
   - name: answer
@@ -42,6 +42,18 @@ record:
     hand: box dd2a59294365 · claude-code-remote · the owner says so
     hash_before: 5034b47e9a02043f4fbb86c28f2f60cc06a1cc19
     hash_after: 5034b47e9a02043f4fbb86c28f2f60cc06a1cc19
+  - step: do
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 607cdcbc39d7ed8dda217ee578f5f64b2659183f
+    hash_after: 607cdcbc39d7ed8dda217ee578f5f64b2659183f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 33 test(s) pass in 3 file(s)
+      - name: check
+        exit: 0
+        said: 82 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -118,11 +130,15 @@ So the door compares the write's chapter against the hold's step, and refuses a 
 
 <!-- the form is command -->
 
+./RUNME.sh branch test
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
@@ -130,13 +146,55 @@ So the door compares the write's chapter against the hold's step, and refuses a 
 
 <!-- the form is text -->
 
+`writesHere(leaf, hand)` in `.claude/skills/level0/lib/ticket.js` answers whether a hand works a leaf. Three sites called their own copy of that rule, and they disagreed. Each now calls the one function:
+
+| caller | where |
+|---|---|
+| `admits` | `src/scripts/pull-hand.js` |
+| `takeable` | the same file |
+| `handFaults` | `src/scripts/pull-chapter.js` |
+
+**What the disagreements settle to.** The hand-out was right on each, so `takeable` moves to it.
+
+| leaf | what it answered | what it answers |
+|---|---|---|
+| a person's step, to a person | takeable refused it | the hand works there |
+| a children's step | the hand-out admitted it | no hand works there |
+| a retro step away from a retro | takeable offered it | no hand works there |
+
+`handRule` builds what the function reads, off four facts:
+
+- whether this hand is an agent
+- whether the owner sends it
+- whether the box runs in the cloud
+- whether the group stands at a retro
+
+**The hold carries the leaf.** The hold gains the leaf's `by`, so the write door reads what this hand works in place of walking the route again. The door holds one file and one moment, and `ownerSays` and `atRetro` stand outside both.
+
+**A case names its own environment.** The cloud test reads the box's variables, so a fixture leaving them out read the box running the suite. Each fake now carries `env`, and two cases drive the cloud rule by setting it.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
 
+- the change follows the answer, and the discussion says where it departs on the leaf walk
+- the cleanup the change reveals is in the change: the fixtures gained the environment they read
+- every fact stands in one place: `writesHere` owns the rule, and `inCloud` owns the cloud test
+
 # Discussion
+
+Where the change departs from the answer: the leaf walk stays where it stands.
+
+The answer's last line says `leafOf` moves beside the function and reads `leafAt`. Its own reason for the move was the door needing a resolved leaf. The rest of the answer then gives the door the hold, which already names the leaf. So the door walks no route, and the move buys nothing.
+
+| what the answer says | what the change does |
+|---|---|
+| `leafOf` moves into the plugin as `leafAt` | it stays in `src/scripts/pull-route.js` |
+| the door resolves the leaf | the door reads the hold, which the pull writes |
+
+Everything else follows the answer.
 
 - [[spec/tickets/one-function-answers-the-hand]] hands this over at `design/person-1`, which waits for a person.
   - design/review failed back 2 times: Say where the door reads `ownerSays`, because the flag stands on the pull's command line.

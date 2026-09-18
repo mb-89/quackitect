@@ -13,7 +13,8 @@ import {
 export { HELPER, SPAWN, spawnPrompt } from "./spawn.js";
 
 import { notesSaid, parsed } from "./guidance-hand.js";
-import { excludes } from "./pull-hand.js";
+import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
+import { excludes, handRule } from "./pull-hand.js";
 import { ANSWERED, bare, CHECKED, COMMENT, CUT, FENCE, WORK } from "./pull-route.js";
 import { changedSince, tipOf } from "./pull-writes.js";
 
@@ -369,7 +370,9 @@ export function commandsRun(it, leaf, chapter, found) {
 // [[spec/design_output/pull#the-hand-rule]]
 export function handFaults(it, one, leaf, hand, held) {
   const out = [];
-  if (leaf.by === "person" && it.agent && !it.ownerSays)
+  // [[spec/tickets/the-one-answer-takes-shape]]
+  const said = writesHere(leaf, handRule(it, one.front, [], ""));
+  if (!said.writes && said.person)
     out.push(`${leaf.path} is a person's step, and this hand is an agent.`);
   const other = excludes(one.front, leaf, hand);
   if (other) out.push(`${leaf.path} ${other}.`);
