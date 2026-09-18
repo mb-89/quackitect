@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 step: verdict
 steps:
@@ -242,8 +242,13 @@ record:
       - name: check
         exit: 0
         said: 75 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box d42624a67d18a8 · claude-code · helper-41
+    hash_before: 9646caf52cb1491d04cf020f0c23fa41138277b2
+    hash_after: 9646caf52cb1491d04cf020f0c23fa41138277b2
 group: the-retro-runs
 depends_on: ["the-retro-takes-the-box"]
+reason: done
 ---
 
 # Ask
@@ -575,20 +580,18 @@ One thing the cases teach me. A chapter the mint refuses stood nowhere and said 
 - spec/config/projections.json
 - spec/design_input/the-agent-pulls-tickets.md
 - spec/design_output/projection.md
+- spec/guidance/review/reviewing.md
 - spec/processes/retro.yaml
 - spec/tickets/a-retro-mints-itself.md
 - spec/tickets/retro-018ba26.md
 - spec/tickets/the-retro-cuts-its-window.md
 - spec/tickets/the-retro-lays-its-leaves.md
-- src/doors/fake/disk.js
-- src/scripts/group.js
 - src/scripts/pull-route.js
 - src/scripts/retro-collect.js
 - src/scripts/retro-leaves.js
 - src/scripts/retro-new.js
 - src/scripts/retro-window.js
 - src/scripts/retro.js
-- src/scripts/voice.js
 - test/level0/projection.test.js
 - test/level0/retro-leaves.test.js
 - test/level0/retro-new.test.js
@@ -600,42 +603,35 @@ One thing the cases teach me. A chapter the mint refuses stood nowhere and said 
 
 <!-- pass or fail, findings one a line -->
 
-fail
+pass
 
-The cut reads the copied log alone, and the rest of the findings close.
+The cut reads both sources, and every earlier finding closes.
 
-| the gap | the fix |
+| the gap the last verdict names | what closes it |
 |---|---|
-| a transcript row's manifest path opens at its file name, so `SOURCES` matches none | read a row by the `from` field the copy writes |
-| no case drives a transcript, so `thought: 0` passes over the log alone | seed a transcripts folder, and assert a thought lands in its chapter |
-| the chapter's ask names no source, which the approach calls for | name the sources the chapter reads, beside the counts |
-
-A run over a transcripts folder holding thought rows answers `thought: 0`, and the later rows reach no chapter.
-
-| the finding the last verdict names | what stands |
-|---|---|
-| three counts stand nowhere | `asked` writes the tickets, the notes and the median thought |
-| the refusals read one number | `byKind` names each rule with its own count |
-| the cut reads the log alone | `SOURCES` names both folders, and a transcript reaches it nowhere |
-| the drain meets a chapter as an open note | `isChapter` reads the process each note links, and a case drives it |
+| a transcript row matches by its path | `whereOf` reads the `from` field the copy writes |
+| no case drives a transcript | a fixture holds three thoughts, and the chapter answers 15 |
+| the chapter's ask names no source | the ask line names the copied log and the copied transcripts |
 
 | what answers the ask | where |
 |---|---|
-| the window opens at the last retro's close, or at the first commit | `openedAt` in `src/scripts/retro-window.js` |
-| a chapter is six hours holding rows, and an empty span stands nowhere | `cutInto`, and the case reading the chapter paths |
-| a chapter mints off the chapter route, under the private tickets folder | `minted`, and the case matching `process` and `group` |
-| a case drives a window with no retro behind it | the first-commit case, which reads `window.json` back |
-| the window takes a line the manifest names | the row `windowOut` pushes, which that case finds |
+| the window opens at the last retro's close, or at the first commit | `openedAt` |
+| a chapter is six hours holding rows, and an empty span stands nowhere | `cutInto` |
+| the counts carry every kind the ask names | `asked`, `byKind` and `median` |
+| a count with no source reads zero | `median`, which answers zero on an empty list |
+| a chapter mints off the chapter route, under the private tickets folder | `minted` |
+| a case drives a window with no retro behind it | the first-commit case, reading `window.json` |
+| the drain passes a chapter | `isChapter`, and the case answering zero open notes |
 
 | what the reviewing guidance asks | what stands |
 |---|---|
-| the branch does what the brief asks | the counts land, and the transcripts reach the cut nowhere |
-| the diff beyond the brief | the siblings' work, which this shared branch carries alongside |
-| every rule carries a case that fires | the cut, the mint, the counts, the drain and the first window |
-| a case feeds something bad | the empty span case, which asserts the third chapter stands nowhere |
+| the branch does what the brief asks | every line of the ask lands |
+| the diff beyond the brief | the siblings' work, which this shared branch carries |
+| every rule carries a case that fires | the cut, the mint, the counts, the drain, the first window |
+| a case feeds something bad | the empty span case, asserting the third chapter stands nowhere |
 | a retro handback | none stands, because this ticket runs at the desk |
 
-`./RUNME.sh check` exits 0 on this branch, and the window cases answer green.
+`./RUNME.sh check` exits 0, and the five window cases answer green.
 
 <!-- the form is verdict -->
 
@@ -643,7 +639,7 @@ A run over a transcripts folder holding thought rows answers `thought: 0`, and t
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
-- the span and the kinds stand once in the module, and the comments point at the design chapter
+- the span, the kinds and the sources stand once in the window module, and its comments point at the design
 
 <!-- the form is checklist -->
 
