@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 steps:
   - name: sync
@@ -103,6 +103,14 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: b08fc5e52a88b99a6b7b4ad8710f984c78aa53b7
+    hash_after: b08fc5e52a88b99a6b7b4ad8710f984c78aa53b7
+  - step: retro/cloud
+    skipped: true
+    why: the box runs off the cloud
+reason: done
 ---
 
 # Ask
@@ -170,37 +178,58 @@ Read [[spec/design_input/the-agent-pulls-tickets]] first, the chapter The retro.
 
 ### done
 
-<!-- what was done, one line a ticket or a thing -->
+- the-retro-takes-the-box: collect copies the private folder past the folders it skips, and writes a manifest.
+- the-retro-cuts-its-window: the window opens where the last retro closes, and cuts into chapters holding activity.
+- a-retro-mints-itself: retro new mints off the route, names the retro by the tip, and pulls it.
+- the leaves: collect lays one file a leaf, so a reader reads one file and runs nothing.
+- the note drain: every private note takes a decision, and the verb answers zero.
 
 <!-- the form is list -->
 
 ### well
 
-<!-- what went well, and what made it go well -->
+- the design names every take, leaf and count, so each child reads its ask off one chapter.
+- every door carries a fake, so each case drives a fake disk, git and clock.
+- the note drain forces a decision on each parked thought, and the classes fall out of it.
+- a ceiling refusal splits a file at the seam a reader already reads, and no case dies.
 
 <!-- the form is list -->
 
 ### badly
 
-<!-- what did not, each with its moment in the log or the transcript -->
+- collect refuses its own step at the first run, because the guard counts the retro's own hold.
+- the copy corrupts an archive, because collect moves bytes through the text read and write.
+- the cut reads no transcript, because the source match reads a path prefix and no field.
+- a minted retro carries an object where the ask goes, because a field named steps meets the route key.
+- a named pull mid-hold hands the leaf back, so a child passes with its findings open.
+- a hand-resolved merge leaves a handover on trunk, so a new branch reads as brief done.
 
 <!-- the form is list -->
 
 ### improve
 
-<!-- how each bad line stops happening, named by its home -->
+- retro-collect.js passes the hold whose ticket is the retro it collects for.
+- src/doors/disk.js carries copy and size, so an archive moves byte for byte.
+- retro-window.js resolves a row by the field naming where it comes from.
+- retro-window.js names the chapter field returns, so no ask field takes a route key's name.
+- pull.js must refuse a named pull from a hand holding a leaf, and name the hand-back.
+- work-merge.js must clear the handover on a hand-resolved merge, as the verb clears it otherwise.
 
 <!-- the form is list -->
 
 ### thoughts
 
-<!-- what the thoughts say that the actions do not, off the transcript -->
+The transcript reads as a hunt for one bug, and finds two sealed doors. The overnight loop looks like five boxes failing, and the reading shows one route with no road through it.
+
+The thoughts circle the vocabulary harder than the code. A made-up word costs a correction each time, and those corrections outnumber the logic errors.
 
 <!-- the form is text -->
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- every fact stands in one place. The counts stand in the chapter ask, and nowhere else.
+- every number carries a name in one place. The chapter span stands in retro-window.js, and no note repeats it.
+- every header says what its file is for. Each new module opens on its own job, and counts nothing.
 
 <!-- the form is checklist -->
 
