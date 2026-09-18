@@ -75,7 +75,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: children
+step: retro/notes
 record:
   - step: sync
     skipped: true
@@ -84,6 +84,10 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 581614665675d9aeffd86b072b89bba30e8be6d4
     hash_after: 581614665675d9aeffd86b072b89bba30e8be6d4
+  - step: children
+    hand: box d42624a67d18a8 · claude-code
+    skipped: true
+    why: the box leaves it while a-retro-mints-itself, the-retro-cuts-its-window, the-retro-lays-its-leaves, the-retro-takes-the-box stand open
 ---
 
 # Ask
