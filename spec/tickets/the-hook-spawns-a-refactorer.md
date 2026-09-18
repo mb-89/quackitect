@@ -92,7 +92,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 95e62b529fbf4630939a7c7126594dd40f959748
+    hash_after: 95e62b529fbf4630939a7c7126594dd40f959748
 ---
 
 # Ask
@@ -118,6 +123,63 @@ step: design/draft
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The tooth votes over rules a folder holds, and a mechanical rule names a check the hook resolves. So this adds:
+
+- one stop rule, under `spec/config/stop/level0.yml`
+- one check, beside `work-waiting` in `src/bridge/stop.js`
+- four config keys, under one `refactor` key
+- one guidance note, which the spawned hand alone reads
+
+**What the list is.** [[spec/tickets/one-list-holds-the-warnings]] decides the shape of the list this reads, and this approach names it `the list` throughout.
+
+| who reads it | what it takes |
+|---|---|
+| the check below | its length |
+| the hand below | its entries, grouped by file |
+
+Neither reads a path of its own, so the answer to that ticket lands in one place.
+
+**The stop rule.** One entry joins `spec/config/stop/level0.yml`:
+
+| field | what it reads |
+|---|---|
+| `id` | `warnings-stand-past-the-number` |
+| `side` | `continue`, so the turn holds open and the work carries on |
+| `decides` | `mechanical` |
+| `runs` | `warnings-standing`, resolved beside `work-waiting` in `src/bridge/stop.js` |
+| `says` | the line naming the count and the hand it spawns |
+
+The check answers true where the list runs past the number. The hook spawns the refactoring hand as the vote lands, and the session takes its next turn without waiting.
+
+**The four config keys.** They join `spec/config/level0.json`, and `spec/config/level0.schema.json` says what each does:
+
+| key | what it holds |
+|---|---|
+| `mostWarnings` | the entries the list holds before the rule fires |
+| `untouchedFor` | the age a file's last write carries before the hand takes it |
+| `parallel` | the flag, true by default |
+| `mostInARow` | the hands the session spawns one after another |
+
+**The flag.** `parallel` false switches the spawn off. The session then drains the list itself before it pushes. The push door it meets is the one [[spec/tickets/a-rule-carries-its-side]] writes.
+
+**Which file the hand takes.** The hand reads the list, groups its entries by file, and drops every file a write touched inside `untouchedFor`. It takes the oldest of the rest.
+
+| what keeps the hands off one file | how |
+|---|---|
+| the file the working session holds | that file's last write stands inside the window |
+| a file another hand took | its entries leave the list as that hand lands them |
+
+**The guidance the hand reads.** `spec/guidance/refactoring.md` stands as a guidance note, and its frontmatter carries `env: [SE_REFACTOR]`. `bindsHere` in `.claude/skills/level0/lib/guidance.js` binds a note by that field. So the standing layer hands the note to a session carrying the variable. The spawn sets it, and the working hand carries it nowhere.
+
+**The cases.**
+
+- the check answers false under the number, and true past it
+- the rule reads `continue`, so a turn meeting it holds open
+- the spawn fires once a vote, and stops at `mostInARow`
+- the flag false spawns nothing, and the session drains the list before it pushes
+- the hand walks past a file written inside the window, and takes the oldest beyond it
+- the standing layer hands the note to a session carrying the variable, and to no other
 
 ## review
 
