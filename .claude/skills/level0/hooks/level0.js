@@ -14,6 +14,8 @@ const LIMIT = 4_000_000;
 const SHORT = 4000;
 const TEXTS = 4;
 const STARTING = 10_000;
+// The code REASONS reads for a box carrying no node, which a refused spawn means. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+const NO_NODE = 5;
 let port = PORT;
 let root = "";
 let method = "";
@@ -23,20 +25,25 @@ let stepText = "";
 
 const url = () => `http://127.0.0.1:${port}/event`;
 
-// THE CLOUD STARTS ITS OWN SERVER. A cloud box carries nobody to press the sidebar button, so the bridgehead starts what the first event finds missing, and the shell reads the environment because this hook imports nothing. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+// THE CLOUD STARTS ITS OWN SERVER. A cloud box carries nobody to press the sidebar button, so the bridgehead starts what the first event finds missing. Node runs this, because a Windows box carries no shell and the guards read the same either way. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export const START = [
-  // biome-ignore lint/suspicious/noTemplateCurlyInString: level0: the shell reads these two variables, and this line is shell text
-  'test -n "${CLAUDE_CODE_REMOTE:-}${SE_CLOUD:-}" || exit 3',
-  'cd "$2" || exit 4',
-  'command -v node >/dev/null 2>&1 || exit 5',
-  "test -d node_modules || exit 6",
-  'mkdir -p "$1/.se/log"',
-  'nohup node src/bridge/server.js "$2" >> "$1/.se/log/serve.log" 2>&1 </dev/null &',
-  "exit 0",
+  "const { spawn } = require('node:child_process');",
+  "const { existsSync, mkdirSync, openSync } = require('node:fs');",
+  "const [here, method] = process.argv.slice(1);",
+  "if (!process.env.CLAUDE_CODE_REMOTE && !process.env.SE_CLOUD) process.exit(3);",
+  "if (!existsSync(method)) process.exit(4);",
+  "if (!existsSync(method + '/node_modules')) process.exit(6);",
+  "mkdirSync(here + '/.se/log', { recursive: true });",
+  "const out = openSync(here + '/.se/log/serve.log', 'a');",
+  "const argv = [method + '/src/bridge/server.js', method];",
+  "const born = spawn(process.execPath, argv, { cwd: method, detached: true, stdio: ['ignore', out, out], windowsHide: true });",
+  "born.unref();",
+  "process.exit(0);",
 ].join("\n");
 
 const REASONS = {
   0: ["info", "no server answered, so the bridgehead starts one"],
+  1: ["warn", "the start of the server fails"],
   3: ["", "a person starts the server here"],
   4: ["warn", "the method root is absent, so no server starts"],
   5: ["warn", "this box carries no node, so no server starts"],
@@ -227,13 +234,14 @@ async function starts($) {
   started = true;
   let ran;
   try {
-    ran = await $.process.run(["sh", "-c", START, "level0", root, method || root], {
+    ran = await $.process.run(["node", "-e", START, root, method || root], {
       timeoutMs: STARTING,
     });
   } catch (error) {
+    // Node itself refuses to start, so this box carries none. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
     await wrote($, {
       level: "warn",
-      said: "the start of the server fails",
+      said: reasonOf(NO_NODE)[1],
       event: "session.start",
       detail: String(error?.message ?? error),
     });

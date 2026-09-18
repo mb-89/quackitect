@@ -8,13 +8,14 @@ import {
   checkNote,
   entriesIn,
   entryNamed,
-  hashOf,
   readNote,
   reRouted,
 } from "../../.claude/skills/level0/lib/schema.js";
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { CONFIG as VALE_CONFIG, faultIn, fromJson } from "../../.claude/skills/level0/lib/vale.js";
+export { HELPER, SPAWN, spawnPrompt } from "./spawn.js";
+import { HELPER, SPAWN, spawnPrompt, unblockPrompt } from "./spawn.js";
 import { agentOf, BOX, handOf } from "./hand.js";
 import {
   CLOSED,
@@ -31,6 +32,7 @@ import {
   withField,
 } from "./group.js";
 import { NOTES, schemasHere } from "./ticket.js";
+import { asOf, dropHold, guidanceText, handsAgain, holdAt, holdOf, noteRows, notesSaid, parsed, readsOf, writeHold } from "./guidance-hand.js";
 import { landed, unlandedRows } from "./landed.js";
 import { changedIn } from "./work.js";
 export const HOLDS = ".se/hold";
@@ -47,35 +49,26 @@ const ANSWERED = /^\s*answered:/;
 const FENCE = /^\s*(```|~~~)/;
 
 // [[spec/design_output/pull#a-need-is-a-verb]]
+const BRANCH = [
+  "new",
+  "take",
+  "sync",
+  "done",
+  "release",
+  "merge",
+  "close",
+  "read",
+  "review",
+  "list",
+  "pull",
+  "guidance",
+  "test",
+];
+
+// [[spec/design_output/pull#a-need-is-a-verb]]
 export const VERBS = {
-  branch: [
-    "new",
-    "take",
-    "sync",
-    "done",
-    "release",
-    "merge",
-    "close",
-    "read",
-    "review",
-    "list",
-    "pull",
-    "test",
-  ],
-  work: [
-    "new",
-    "take",
-    "sync",
-    "done",
-    "release",
-    "merge",
-    "close",
-    "read",
-    "review",
-    "list",
-    "pull",
-    "test",
-  ],
+  branch: BRANCH,
+  work: BRANCH,
   ticket: ["note", "update", "open"],
   retro: ["notes"],
 };
@@ -91,33 +84,25 @@ export function holdsVerb(need, verbs = VERBS) {
 
 export { agentOf, BOX, handOf };
 
-// [[spec/design_output/pull#the-hand-and-the-hold]]
-export function holdAt(it, hand) {
-  const slug = String(hand).replace(/[^A-Za-z0-9]+/g, "-");
-  return it.join(it.root, ...`${HOLDS}/${slug}.json`.split("/"));
+export { holdAt, holdOf, parsed };
+
+// A second hand-out at one step hands the notes again on a refusal, a compaction or a moved hash alone. [[spec/design_output/pull#the-hand-and-the-hold]]
+function stillHeld(it, held) {
+  const now = readsOf(it, stepReads(it, held));
+  const why = handsAgain(held, now);
+  if (why) writeHold(it, held.hand, { ...held, reads: now });
+  say(REFUSED, [
+    `${held.ticket} stands in your hand at ${held.step}, and one hand holds one ticket.`,
+    `Hand it back: ./RUNME.sh branch pull ${held.ticket}${asOf(it, held) ? ` --as ${asOf(it, held)}` : ""} --pass, or --fail "why".`,
+    ...(why ? notesSaid(it, now.map((one) => one.name)) : ["", `Read them again with ./RUNME.sh branch guidance${asOf(it, held) ? ` --as ${asOf(it, held)}` : ""}.`]),
+  ]);
+  return 1;
 }
 
-export function holdOf(it, hand) {
-  const at = holdAt(it, hand);
-  return it.disk.exists(at) ? parsed(it.disk.read(at)) : null;
-}
-
-export function parsed(text) {
-  try {
-    return JSON.parse(text);
-  } catch {
-    return null;
-  }
-}
-
-function writeHold(it, hand, hold) {
-  it.disk.makeDir(it.join(it.root, ...HOLDS.split("/")));
-  it.disk.write(holdAt(it, hand), `${JSON.stringify(hold, null, 2)}\n`);
-}
-
-function dropHold(it, hand) {
-  const at = holdAt(it, hand);
-  if (it.disk.exists(at)) it.disk.remove(at);
+function stepReads(it, held) {
+  const at = it.join(it.root, ...String(held.path ?? "").split("/"));
+  if (!held.path || !it.disk.exists(at)) return (held.reads ?? []).map((one) => one.name);
+  return leafOf(frontOf(it.disk.read(at)), held.step)?.reads ?? [];
 }
 
 // [[spec/design_output/pull#a-leaf-inherits]]
@@ -206,13 +191,7 @@ export function pull(it, argv) {
   // A name on trunk that is a group takes its branch, and any other name hands a ticket back. [[spec/design_output/pull#the-engine-takes-the-branch]]
   const named = onTrunk && name && !verdict.said ? namedGroup(it, name) : "";
   if (!named && (verdict.said || name)) return handBack(it, who, name, verdict);
-  if (held) {
-    say(REFUSED, [
-      `${held.ticket} stands in your hand at ${held.step}, and one hand holds one ticket.`,
-      `Hand it back: ./RUNME.sh branch pull ${held.ticket} --pass, or --fail "why".`,
-    ]);
-    return 1;
-  }
+  if (held) return stillHeld(it, held);
   // [[spec/design_output/pull#the-engine-takes-the-branch]]
   if (onTrunk && it.take) {
     if (it.cloud && !named) return it.take();
@@ -387,17 +366,21 @@ function handOut(it, who) {
 
   const why = [];
   let other = null;
+  let person = null;
   for (const pool of pools) {
     for (const one of pool) {
       const said = offer(it, who, one, all);
       if (said.leaf) return handed(it, who, one, said.leaf);
       if (said.why) why.push(`${one.name} ${said.why}`);
+      if (said.person && !person) person = { name: one.name, leaf: said.person };
       if (said.other && !other) other = { one, leaf: said.other, why: said.why };
     }
     if (other && !who.oneStep) return spawnAnswer(other);
   }
 
   say(WAIT, why.length ? why : ["no ticket of this group stands open"]);
+  // A person's question leaves the branch, so the group lands. [[spec/design_output/work#a-person-step-leaves]]
+  if (person) console.log(`\n${unblockPrompt(person.name, person.leaf)}`);
   return 0;
 }
 
@@ -444,10 +427,6 @@ function urgentGroup(it) {
   return sorted(groups)[0]?.name ?? "";
 }
 
-// [[spec/design_output/pull#a-hand-of-its-own]]
-export const SPAWN = "spawn";
-export const HELPER = "helper";
-
 function spawnAnswer(other) {
   const helper = `${HELPER}-${entriesOf(other.one.front).length + 1}`;
   say(SPAWN, [
@@ -457,22 +436,6 @@ function spawnAnswer(other) {
   console.log("");
   console.log(spawnPrompt(other.one.name, other.leaf, helper));
   return 0;
-}
-
-// [[spec/design_output/pull#a-hand-of-its-own]]
-export function spawnPrompt(ticket, leaf, helper) {
-  const verdict = leaf.evidence.some((field) => field.form === "verdict");
-  const back = verdict
-    ? `./RUNME.sh branch pull ${ticket} --as ${helper}`
-    : `./RUNME.sh branch pull ${ticket} --as ${helper} --pass, or --fail "why"`;
-  return [
-    `You are a hand of your own on this box, named ${helper}, and you work one step of one ticket.`,
-    "",
-    `1. Run \`./RUNME.sh branch pull --as ${helper}\` from the root. It hands you ${ticket} at ${leaf.path}, with its fields and its guidance.`,
-    "2. Write the fields into the ticket where the answer says, under the headings it names, and change nothing else.",
-    `3. Run \`${back}\`. It checks the hand-back and answers done, or refused with what to fix.`,
-    "4. Answer with what the last pull said, word for word.",
-  ].join("\n");
 }
 
 // [[spec/design_output/pull#done-leaves-no-takeable-step]]
@@ -655,7 +618,7 @@ export function childrenSay(all, name) {
 // [[spec/design_output/pull#the-hand-rule]]
 function admits(it, who, one, leaf, all) {
   if (leaf.by === "person" && it.agent)
-    return { why: `waits for a person at ${leaf.path}` };
+    return { why: `waits for a person at ${leaf.path}`, person: leaf };
   if (leaf.by === "agent" && !it.agent)
     return { why: `waits for an agent at ${leaf.path}` };
   if (leaf.by === "helper")
@@ -698,10 +661,8 @@ function excludes(front, leaf, hand) {
 // [[spec/design_output/pull#the-work-answer]]
 function handed(it, who, one, leaf) {
   const hash = one.private ? "" : tipOf(it);
-  const reads = leaf.reads.map((path) => ({
-    name: path,
-    hash: hashOf(guidanceText(it, path)),
-  }));
+  const reads = readsOf(it, leaf.reads);
+  noteRows(it, leaf.path, reads);
   writeHold(it, who.hand, {
     ticket: one.name,
     path: one.path,
@@ -747,12 +708,7 @@ export function workAnswer(it, one, leaf) {
   }
   if (leaf.asks) rows.push("", `Asks: ${leaf.asks}`);
 
-  for (const path of leaf.reads) {
-    const items = actionables(guidanceText(it, path));
-    if (!items.length) continue;
-    rows.push("", `Reads ${path}:`);
-    for (const [i, item] of items.entries()) rows.push(`  ${i + 1}. ${item}`);
-  }
+  rows.push(...notesSaid(it, leaf.reads));
 
   rows.push("");
   if (leaf.evidence.some((field) => field.form === "verdict")) {
@@ -777,11 +733,6 @@ function askOf(text) {
         .join("\n")
         .trim()
     : "";
-}
-
-function guidanceText(it, path) {
-  const at = it.join(it.root, ...`${path}.md`.split("/"));
-  return it.disk.exists(at) ? it.disk.read(at) : "";
 }
 
 

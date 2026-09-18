@@ -2,13 +2,14 @@
 // [[spec/design_output/copilot#one-runtime]]
 
 import { CODE, formatText, lintText as lintCode } from "./code.js";
-import { actionables, bindsHere, standingLayer } from "./guidance.js";
+import { bindsHere, carried, countsOf, standingLayer } from "./guidance.js";
 import { mutations } from "./mutations.js";
 import { refusal } from "./refuse.js";
 import { landsOnTrunk } from "./trunk.js";
 import { lintText } from "./vale.js";
 import { readTools, whereIs } from "../../../../src/scripts/tools.js";
 import { statusOf } from "../../../../src/scripts/work.js";
+import { heldReadsIn } from "../../../../src/scripts/guidance-hand.js";
 import { candidateRun } from "./candidate-check.js";
 
 export const TOOL_WAIT = 4000;
@@ -94,12 +95,10 @@ export async function handle(event, it) {
         .sort((left, right) => left.name.localeCompare(right.name))
         .map((one) => ({ name: one.name, text: read(`spec/guidance/${one.name}`) }))
         .filter((one) => bindsHere(one.text, env));
-      const count = notes.reduce(
-        (total, one) => total + actionables(one.text).length,
-        0,
-      );
+      const handed = heldReadsIn(it.disk, it.join, it.root, env);
+      const count = countsOf(carried(notes, handed)).rules;
       if (!count) throw new Error("No numbered guidance reaches this session.");
-      state.guidance = standingLayer(notes);
+      state.guidance = standingLayer(notes, handed);
       state.count = count;
       state.ready = true;
       return {

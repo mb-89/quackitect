@@ -8,7 +8,7 @@ import { NOTES, privateNow } from "../../.claude/skills/level0/lib/private.js";
 import { refusedCommand, refusedDelta } from "../../.claude/skills/level0/lib/refuse.js";
 import { saysGreen, STAMP, stampOf } from "../../.claude/skills/level0/lib/runs.js";
 import { reaches, refusedTodo, taggedIn } from "../../.claude/skills/level0/lib/todo.js";
-import { landsOnTrunk, touchesGit, TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
+import { landsOnTrunk, refusedVersion, touchesGit, TRUNK, versionRefs } from "../../.claude/skills/level0/lib/trunk.js";
 import { WORK_BRANCH } from "../scripts/group.js";
 import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
@@ -19,7 +19,7 @@ const CLOUD = "---\nenv:\n  - CLAUDE_CODE_REMOTE\n  - SE_CLOUD\n---\n";
 
 export async function onBash(e, box) {
   const command = String(e?.command ?? "");
-  const checks = [commandRules, privateDelta, todoOnPush, trunkGuard];
+  const checks = [commandRules, privateDelta, todoOnPush, trunkGuard, versionGuard];
   for (const check of checks) {
     const found = await check(command, e, box);
     if (found) return { result: { deny: found } };
@@ -98,6 +98,14 @@ function todoOnPush(command, _e, box) {
   if (!found.length) return "";
   box.log.say("warn", "todo", `refused a push carrying ${found.length} note(s)`, { tool: "Bash", file: found[0] });
   return refusedTodo(found);
+}
+
+// [[spec/design_output/work#a-version-branch-stands]]
+function versionGuard(command, _e, box) {
+  const found = versionRefs(command);
+  if (!found.length) return "";
+  box.log.say("warn", "bash", `refused a ${found[0].how} of ${found[0].name}`, { tool: "Bash", detail: command });
+  return refusedVersion(found);
 }
 
 // [[spec/design_output/work#a-red-battery-pushes-nothing]]
