@@ -17,7 +17,6 @@ const WORK = "/stub";
 const GOOD = `---
 kind: [[ticket]]
 state: open
-urgency: soon
 step: do
 steps:
   - name: do
@@ -47,7 +46,7 @@ state: open
 
 # Ask
 
-A ticket with no urgency and no route.
+A ticket with no route.
 
 # Discussion
 `;
@@ -71,7 +70,7 @@ const write = (path, content) => ({ tool: "Write", file_path: path, content });
 test("a ticket under the stub breaking the vehicle's schema comes back refused", async () => {
   const said = await onWrite(write(join(WORK, "spec", "tickets", "bad.md"), BAD), box());
   assert.ok(said?.result?.deny, "the door refuses");
-  assert.match(said.result.deny, /urgency|steps/);
+  assert.match(said.result.deny, /steps/);
 });
 
 test("a ticket under the stub keeping the vehicle's schema passes, and the stub holds no schema", async () => {
@@ -87,5 +86,5 @@ test("the same bad ticket written into the vehicle's own tree is refused the sam
     work: METHOD,
     root: METHOD,
   });
-  assert.match(said?.result?.deny ?? "", /urgency|steps/);
+  assert.match(said?.result?.deny ?? "", /steps/);
 });

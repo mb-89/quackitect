@@ -35,6 +35,7 @@ import {
   heard,
   on,
   onBranch,
+  remoteSaying,
   ROOT,
   ranGit,
   SHA,
@@ -167,27 +168,30 @@ test("a second take meets a rejected push, and says so", () => {
 
 // [[spec/design_output/work#a-brief-drains-first]]
 test("take serves a brief before a group, and the group once no brief stands", () => {
-  const brief = "---\nstatus: todo\nurgency: whenever\n---\n\n# Do the thing\n";
-  const both = {
+  const brief = "---\nstatus: todo\n---\n\n# Do the thing\n";
+  const two = (said) => ({
     ...groupRemote(),
-    "git ls-remote --heads origin work/*": {
-      stdout: "aaa\trefs/heads/work/a-brief\nbbb\trefs/heads/work/one-group\n",
-    },
-    "git show origin/work/a-brief:HANDOVER.md": { stdout: brief },
-    "git show origin/work/a-brief:spec/tickets/a-brief.md": { exitCode: 1 },
-  };
+    ...remoteSaying(
+      [
+        { branch: "work/a-brief", tip: "aaa" },
+        { branch: "work/one-group", tip: "bbb" },
+      ],
+      {
+        "work/a-brief:HANDOVER.md": said,
+        [`work/one-group:${GROUP_AT}`]: GROUP_NOTE,
+      },
+    ),
+  });
+  const both = two(brief);
 
   const first = doorsSaying(both, { [HERE]: brief, ...HAND });
   assert.equal(heard(() => work(ROOT, ["take"], first.it)).code, 0);
   assert.ok(
     ranGit(first.outside).includes("git switch work/a-brief"),
-    "the brief goes first, whatever its urgency",
+    "the brief goes first, whatever its mark",
   );
 
-  const held = {
-    ...both,
-    "git show origin/work/a-brief:HANDOVER.md": { stdout: brief.replace(TODO, HELD) },
-  };
+  const held = two(brief.replace(TODO, HELD));
   const next = doorsSaying(held, { [on("one-group")]: GROUP_NOTE, ...HAND });
   assert.equal(heard(() => work(ROOT, ["take"], next.it)).code, 0);
   assert.ok(ranGit(next.outside).includes("git switch work/one-group"));
@@ -211,17 +215,18 @@ test("a group holds where the record says so, and stands free where it says noth
 // [[spec/design_output/work#a-row-per-group]]
 test("list names a group, a brief and a loose ticket, each as its own kind", () => {
   const loose = CHILD("one-group", "open").replace("group: one-group\n", "");
-  const { it } = doorsSaying({
-    ...groupRemote(
+  const { it } = doorsSaying(
+    groupRemote(
       withEntry(GROUP_NOTE, { step: "sync", hand: "box 3f9a", hash_before: "a1b2c3" }),
+      {
+        when: 1767225600,
+        objects: {
+          "origin/main:spec/tickets/a-loose-one.md": loose,
+          "origin/main:spec/tickets/one-group.md": GROUP_NOTE,
+        },
+      },
     ),
-    "git log -1 --format=%ct origin/work/one-group": { stdout: "1767225600\n" },
-    "git ls-tree -r --name-only origin/main spec/tickets/": {
-      stdout: "spec/tickets/a-loose-one.md\nspec/tickets/one-group.md\n",
-    },
-    "git show origin/main:spec/tickets/a-loose-one.md": { stdout: loose },
-    "git show origin/main:spec/tickets/one-group.md": { stdout: GROUP_NOTE },
-  });
+  );
   it.clock = fakeClock("2026-01-01T03:00:00.000Z");
 
   const { code, said } = heard(() => work(ROOT, ["list"], it));
@@ -234,23 +239,17 @@ test("list names a group, a brief and a loose ticket, each as its own kind", () 
 
 // [[spec/design_output/work#a-ticket-under-its-group]]
 test("a group row carries a row per ticket naming it, off the branch tip", () => {
-  const { it } = doorsSaying({
-    ...groupRemote(),
-    "git ls-tree -r --name-only origin/work/one-group spec/tickets/": {
-      stdout:
-        "spec/tickets/one-group.md\nspec/tickets/a-child.md\nspec/tickets/other-work.md\n",
-    },
-    "git show origin/work/one-group:spec/tickets/a-child.md": {
-      stdout: CHILD("one-group", "open").replace(
-        "urgency: soon",
-        "urgency: soon\nstep: do",
-      ),
-    },
-    "git show origin/work/one-group:spec/tickets/other-work.md": {
-      stdout: CHILD("another-group", "open"),
-    },
-    "git ls-tree -r --name-only origin/main spec/tickets/": { stdout: "" },
-  });
+  const { it } = doorsSaying(
+    groupRemote(GROUP_NOTE, {
+      objects: {
+        "work/one-group:spec/tickets/a-child.md": CHILD("one-group", "open").replace(
+          "group: one-group",
+          "group: one-group\nstep: do",
+        ),
+        "work/one-group:spec/tickets/other-work.md": CHILD("another-group", "open"),
+      },
+    }),
+  );
 
   const { code, said } = heard(() => work(ROOT, ["list"], it));
 
@@ -272,15 +271,12 @@ test("a group row carries a row per ticket naming it, off the branch tip", () =>
 // [[spec/design_output/work#a-ticket-under-its-group]]
 test("a brief carries no ticket row, and a child naming no step says its mark", () => {
   const brief = "---\nstatus: todo\n---\n\n# Do the thing\n";
-  const { it } = doorsSaying({
-    ...groupRemote(),
-    "git ls-remote --heads origin work/*": { stdout: "aaa\trefs/heads/work/a-brief\n" },
-    "git show origin/work/a-brief:HANDOVER.md": { stdout: brief },
-    "git ls-tree -r --name-only origin/work/a-brief spec/tickets/": {
-      stdout: "spec/tickets/a-child.md\n",
-    },
-    "git ls-tree -r --name-only origin/main spec/tickets/": { stdout: "" },
-  });
+  const { it } = doorsSaying(
+    remoteSaying([{ branch: "work/a-brief", tip: "aaa" }], {
+      "work/a-brief:HANDOVER.md": brief,
+      "work/a-brief:spec/tickets/a-child.md": CHILD("a-brief", "open"),
+    }),
+  );
 
   const { said } = heard(() => work(ROOT, ["list"], it));
 
@@ -306,10 +302,7 @@ test("a group held past staleAfter stands under yours, with its three answers", 
     hash_before: "a1b2c3",
   });
   const doors = (stale) => {
-    const said = doorsSaying({
-      ...groupRemote(took),
-      "git log -1 --format=%ct origin/work/one-group": { stdout: "1767225600\n" },
-    });
+    const said = doorsSaying(groupRemote(took, { when: 1767225600 }));
     said.it.clock = fakeClock("2026-01-01T03:00:00.000Z");
     said.it.stale = stale;
     return said.it;

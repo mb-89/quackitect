@@ -50,9 +50,9 @@ import {
   dirty,
   groupStanding,
   HELD,
-  mergedHere,
   noteOf,
   push,
+  readWork,
   setStatus,
   standingAll,
   standingIn,
@@ -61,7 +61,6 @@ import {
   sync,
   TODO,
   textAt,
-  ticketsOn,
   waitingOn,
   withContract,
   workBranchHere,
@@ -172,8 +171,10 @@ function newWork(it, name) {
 function take(it, name = "") {
   if (dirty(it)) return 2;
 
+  // A take acts on the remote, so it refreshes the refs first. [[spec/design_output/work#the-listing-reads-git-once]]
+  it.git.fetch();
   const stand = standOf(it);
-  const standing = standingAll(stand, mergedHere(it));
+  const standing = standingAll(stand);
   const open = stand.filter((one) => standing.get(one.branch) === TODO);
 
   if (!open.length) {
@@ -457,15 +458,16 @@ function read(it, name) {
 
 // [[spec/design_output/work#a-row-per-group]]
 function list(it, _name, argv) {
-  const stand = standOf(it);
-  const standing = standingAll(stand, mergedHere(it));
-  if ((argv ?? []).includes("--done")) return doneOnly(stand, standing);
+  const said = argv ?? [];
+  // The read stands off the network, and a flag asks for the refresh. [[spec/design_output/work#the-listing-reads-git-once]]
+  if (said.includes("--fetch")) it.git.fetch();
+  const read = readWork(it, true);
+  const stand = read.stand;
+  const standing = standingAll(stand);
+  if (said.includes("--done")) return doneOnly(stand, standing);
   const now = it.clock ? it.clock.now().getTime() : 0;
-  const rows = stand.flatMap((one) => [
-    rowOf(it, one, standing, now),
-    ...childRows(it, one),
-  ]);
-  const loose = looseRows(it);
+  const rows = stand.flatMap((one) => [rowOf(one, standing, now, it), ...childRows(one)]);
+  const loose = looseRows(read.loose);
 
   if (!rows.length && !loose.length) {
     console.log("No group and no loose ticket stands.");
@@ -489,7 +491,7 @@ function list(it, _name, argv) {
 }
 
 // [[spec/design_output/work#a-row-per-group]]
-function rowOf(it, one, standing, now) {
+function rowOf(one, standing, now, it) {
   const text = noteOf(one);
   const kind = one.brief ? "brief" : GROUP;
   const status = standing.get(one.branch) || "no status";
@@ -497,7 +499,7 @@ function rowOf(it, one, standing, now) {
   const why = waits.length ? `waits for ${waits.join(", ")}` : markOf(text);
   // [[spec/design_output/work#a-stale-group-is-yours]]
   const { age, stale } =
-    status === HELD ? staleClaim(it, one.branch, now) : { age: "", stale: false };
+    status === HELD ? staleClaim(one, now, it) : { age: "", stale: false };
 
   return {
     name: one.name,
@@ -508,9 +510,9 @@ function rowOf(it, one, standing, now) {
 }
 
 // [[spec/design_output/work#a-ticket-under-its-group]]
-function childRows(it, one) {
+function childRows(one) {
   if (!one.ticket) return [];
-  return ticketsOn(it, `origin/${one.branch}`)
+  return one.tickets
     .filter((child) => fieldOf(child.text, GROUP) === one.name)
     .map((child) => ({
       stale: false,
@@ -534,8 +536,8 @@ export function whyOf(text) {
 }
 
 // [[spec/design_output/work#a-row-per-group]]
-function looseRows(it) {
-  return ticketsOn(it, `origin/${TRUNK}`)
+function looseRows(loose) {
+  return loose
     .filter((one) => !fieldOf(one.text, GROUP) && !isGroup(one.text))
     .map((one) => ({
       stale: false,

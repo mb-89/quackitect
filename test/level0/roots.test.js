@@ -15,6 +15,7 @@ import { probeOf } from "../../src/scripts/serve.js";
 import { NOTES, ticket } from "../../src/scripts/ticket.js";
 import { work } from "../../src/scripts/work.js";
 import { NOTE_PROCESS, TICKET_SCHEMA as SCHEMA, TRIVIAL_PROCESS } from "./fixtures.js";
+import { remoteSaying } from "./work-doors.js";
 
 const METHOD = "/tools";
 const WORK = "/stub";
@@ -36,7 +37,7 @@ scope: ["everybody"]
 const GROUP = `---
 kind: [[ticket]]
 state: open
-urgency: soon
+urgent: true
 process: [[group]]
 step: children
 steps:
@@ -67,7 +68,7 @@ Two tickets that land as one.
 const CHILD = `---
 kind: [[ticket]]
 state: open
-urgency: now
+urgent: true
 step: design/draft
 steps:
   - name: design
@@ -117,7 +118,6 @@ One piece of it.
 const STALE = `---
 kind: [[ticket]]
 state: open
-urgency: soon
 step: do
 steps:
   - name: do
@@ -267,8 +267,9 @@ test("on trunk a cloud box takes the group, and the record lands in the ticket u
     {
       "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
       "git rev-list --count HEAD..origin/main": { stdout: "0\n" },
-      "git ls-remote --heads origin work/*": { stdout: `${SHA}\trefs/heads/${BRANCH}\n` },
-      [`git show origin/${BRANCH}:spec/tickets/one-group.md`]: { stdout: GROUP.replace("step: children\n", "") },
+      ...remoteSaying([{ branch: BRANCH, tip: SHA }], {
+        [`${BRANCH}:spec/tickets/one-group.md`]: GROUP.replace("step: children\n", ""),
+      }),
       "git branch -r --merged origin/main": { stdout: "" },
     },
   );

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: do
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-work-editor-draws
 step: do
+record:
+  - step: do
+    hand: box 4089f1b3b6bc · claude-code-remote
+    hash_before: 8323d3ce82404d7bedbdfed8dee91520f63f100e
+    hash_after: 8323d3ce82404d7bedbdfed8dee91520f63f100e
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 84 test(s) pass in 8 file(s)
+      - name: check
+        exit: 0
+        said: 87 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -71,11 +84,15 @@ hundred processes each time, and a person feels every one.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -83,11 +100,33 @@ hundred processes each time, and a person feels every one.
 
 <!-- the form is text -->
 
+`branch list` asks git three times, whatever stands on the remote. One
+`for-each-ref` answers every work branch, its tip, the time on that tip and
+whether trunk holds it. Two `cat-file --batch` runs answer the rest:
+
+| what went | what comes |
+|---|---|
+| a fetch and an `ls-remote` | one `for-each-ref`, off the refs this box holds |
+| a `git show` a brief, and one a group ticket | one batch, over every tip |
+| an `ls-tree` a branch, and a `git show` a ticket | one batch, over the names the trees carry |
+| a `git log -1` a held branch | the time the refs answer already |
+
+The fetch stands off the read path. `branch list --fetch` asks for it, and
+`take` and the trigger fetch on their own, because each acts on the remote.
+
+A tree carries its names beside bytes, so the batch reads raw and each payload
+turns back into text. `proc.run` takes `raw` for that, and the git door's
+`batch` is its one caller.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: the listing asks git three times, and the fetch moves behind a flag
+- the cleanup it reveals: the tip's time comes off the refs, so the age costs no process
+- the three reads stand in `readWork`, and every verb reading the remote points at it
 
 # Discussion
 

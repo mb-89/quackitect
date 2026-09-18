@@ -113,6 +113,22 @@ all:
 | a newest entry with `hash_before` and no `hash_after` | `held` |
 | `state: closed` on the ticket | `done` |
 
+# The listing reads git once
+
+`branch list` asks git three times, whatever stands on the remote:
+
+| the read | the process | what it answers |
+|---|---|---|
+| the refs | `for-each-ref` | every work branch, its tip, the time on that tip, and whether trunk holds it |
+| the paths | `cat-file --batch` | the ticket names each tip carries |
+| the contents | `cat-file --batch` | the brief and every ticket the paths name |
+
+The fetch stands off that path. `branch list --fetch` asks for it, and `take`
+and the routine's trigger fetch on their own, because each acts on the remote.
+
+A tree object carries a name as bytes, so the paths read raw. For details, see
+[[spec/design_output/doors#a-raw-run-keeps-bytes]].
+
 # A row per group
 
 `branch list` names one row per branch and one per loose ticket on trunk:

@@ -14,12 +14,12 @@ const said = (status, waits) =>
 const HOUR = 3600;
 const NOW = 1_800_000_000_000;
 
-// The git door answers one tip time, so the age reads from a number a case sets. [[spec/design_output/work#a-stale-group-is-yours]]
-const box = (secondsAgo, stale = "") => ({
-  stale,
-  git: {
-    run: () => ({ ok: true, out: String(Math.floor(NOW / 1000) - secondsAgo) }),
-  },
+// The read carries the tip's time, so the age reads off a number a case sets. [[spec/design_output/work#the-listing-reads-git-once]]
+const box = (stale = "") => ({ stale });
+const tip = (secondsAgo, more = {}) => ({
+  branch: "work/one",
+  when: Math.floor(NOW / 1000) - secondsAgo,
+  ...more,
 });
 
 test("freeNow names a branch at todo waiting on nobody, and no other", () => {
@@ -66,20 +66,20 @@ test("the span reads work.staleAfter, and STALE where the config says nothing", 
 
 // [[spec/design_output/work#a-stale-group-is-yours]]
 test("a claim younger than the span stands fresh, and an older one stands stale", () => {
-  assert.equal(staleClaim(box(HOUR, "12h"), "work/one", NOW).stale, false);
-  assert.equal(staleClaim(box(HOUR * 13, "12h"), "work/one", NOW).stale, true);
-  assert.equal(staleClaim(box(HOUR, "12h"), "work/one", NOW).age, "1h");
+  assert.equal(staleClaim(tip(HOUR), NOW, box("12h")).stale, false);
+  assert.equal(staleClaim(tip(HOUR * 13), NOW, box("12h")).stale, true);
+  assert.equal(staleClaim(tip(HOUR), NOW, box("12h")).age, "1h");
 });
 
 // A box that runs out of session hands nothing back, so the claim comes back on its own. [[spec/design_output/work#a-stale-group-is-yours]]
 test("the take passes over a fresh claim, and takes a stale one", () => {
-  const stand = [{ branch: "work/one", brief: said(HELD), ticket: "" }];
   const standing = new Map([["work/one", HELD]]);
+  const stood = (secondsAgo) => [tip(secondsAgo, { brief: said(HELD), ticket: "" })];
 
-  const fresh = freeIn(stand, standing, box(HOUR, "12h"), NOW);
+  const fresh = freeIn(stood(HOUR), standing, box("12h"), NOW);
   assert.deepEqual(fresh, [], "a box still holds it, so the take passes over");
 
-  const stale = freeIn(stand, standing, box(HOUR * 13, "12h"), NOW);
+  const stale = freeIn(stood(HOUR * 13), standing, box("12h"), NOW);
   assert.deepEqual(
     stale.map((one) => one.branch),
     ["work/one"],

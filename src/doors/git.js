@@ -20,6 +20,16 @@ export function git(proc, root) {
         .filter(Boolean)
         .map((row) => row.split("\t")[1].replace("refs/heads/", ""));
     },
+    // [[spec/design_output/work#the-listing-reads-git-once]]
+    batch: (asks) => {
+      if (!asks.length) return "";
+      const ran = proc.run(["git", "cat-file", "--batch"], {
+        cwd: root,
+        stdin: `${asks.join("\n")}\n`,
+        raw: true,
+      });
+      return ran.exitCode === 0 ? (ran.stdout ?? "") : "";
+    },
     show: (ref) => {
       const said = run(["show", ref], true);
       return said.ok ? said.out : "";

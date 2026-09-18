@@ -30,6 +30,7 @@ import {
   HERE,
   heard,
   onBranch,
+  remoteSaying,
   ROOT,
   ranGit,
   SHA,
@@ -180,17 +181,18 @@ test("done with no brief on the tree refuses, because the brief is what comes ba
 });
 
 test("list names every branch, its status and what it waits for", () => {
-  const { it } = doorsSaying({
-    "git ls-remote --heads origin work/*": {
-      stdout: "aaa\trefs/heads/work/one\nbbb\trefs/heads/work/two\n",
-    },
-    "git show origin/work/one:HANDOVER.md": {
-      stdout: "---\nstatus: held\nurgent: true\n---\n",
-    },
-    "git show origin/work/two:HANDOVER.md": {
-      stdout: "---\nstatus: todo\ndepends_on:\n  - one\n---\n",
-    },
-  });
+  const { it } = doorsSaying(
+    remoteSaying(
+      [
+        { branch: "work/one", tip: "aaa" },
+        { branch: "work/two", tip: "bbb" },
+      ],
+      {
+        "work/one:HANDOVER.md": "---\nstatus: held\nurgent: true\n---\n",
+        "work/two:HANDOVER.md": "---\nstatus: todo\ndepends_on:\n  - one\n---\n",
+      },
+    ),
+  );
 
   const { code, said } = heard(() => work(ROOT, ["list"], it));
 
@@ -200,13 +202,18 @@ test("list names every branch, its status and what it waits for", () => {
 });
 
 test("list --done names the branch standing at done, and no other", () => {
-  const { it } = doorsSaying({
-    "git ls-remote --heads origin work/*": {
-      stdout: "aaa\trefs/heads/work/one\nbbb\trefs/heads/work/two\n",
-    },
-    "git show origin/work/one:HANDOVER.md": { stdout: "---\nstatus: done\n---\n" },
-    "git show origin/work/two:HANDOVER.md": { stdout: "---\nstatus: todo\n---\n" },
-  });
+  const { it } = doorsSaying(
+    remoteSaying(
+      [
+        { branch: "work/one", tip: "aaa" },
+        { branch: "work/two", tip: "bbb" },
+      ],
+      {
+        "work/one:HANDOVER.md": "---\nstatus: done\n---\n",
+        "work/two:HANDOVER.md": "---\nstatus: todo\n---\n",
+      },
+    ),
+  );
 
   const { said } = heard(() => work(ROOT, ["list", "", "--done"], it));
 
@@ -218,13 +225,16 @@ test("take claims the urgent branch, holds it, and prints the brief", () => {
   const brief = "---\nstatus: todo\nurgent: true\n---\n\n# Do the thing\n";
   const { it, outside, disk } = doorsSaying(
     {
-      "git ls-remote --heads origin work/*": {
-        stdout: "aaa\trefs/heads/work/calm\nbbb\trefs/heads/work/urgent\n",
-      },
-      "git show origin/work/calm:HANDOVER.md": {
-        stdout: "---\nstatus: todo\n---\n",
-      },
-      "git show origin/work/urgent:HANDOVER.md": { stdout: brief },
+      ...remoteSaying(
+        [
+          { branch: "work/calm", tip: "aaa" },
+          { branch: "work/urgent", tip: "bbb" },
+        ],
+        {
+          "work/calm:HANDOVER.md": "---\nstatus: todo\n---\n",
+          "work/urgent:HANDOVER.md": brief,
+        },
+      ),
       "git rev-parse --abbrev-ref HEAD": { stdout: "work/urgent\n" },
       "git rev-list --count HEAD..origin/main": { stdout: "0\n" },
     },
@@ -241,15 +251,18 @@ test("take claims the urgent branch, holds it, and prints the brief", () => {
 });
 
 test("take leaves a branch waiting on another one alone", () => {
-  const { it, outside } = doorsSaying({
-    "git ls-remote --heads origin work/*": {
-      stdout: "aaa\trefs/heads/work/first\nbbb\trefs/heads/work/second\n",
-    },
-    "git show origin/work/first:HANDOVER.md": { stdout: "---\nstatus: held\n---\n" },
-    "git show origin/work/second:HANDOVER.md": {
-      stdout: "---\nstatus: todo\ndepends_on:\n  - first\n---\n",
-    },
-  });
+  const { it, outside } = doorsSaying(
+    remoteSaying(
+      [
+        { branch: "work/first", tip: "aaa" },
+        { branch: "work/second", tip: "bbb" },
+      ],
+      {
+        "work/first:HANDOVER.md": "---\nstatus: held\n---\n",
+        "work/second:HANDOVER.md": "---\nstatus: todo\ndepends_on:\n  - first\n---\n",
+      },
+    ),
+  );
 
   const { code, said } = heard(() => work(ROOT, ["take"], it));
 
@@ -289,10 +302,9 @@ test("the uncommitted check looks past a tagged ticket, and take carries on", ()
   const { it, outside } = doorsSaying(
     {
       "git status --porcelain": { stdout: " M spec/tickets/slow-lint.md" },
-      "git ls-remote --heads origin work/*": {
-        stdout: "aaa\trefs/heads/work/one\n",
-      },
-      "git show origin/work/one:HANDOVER.md": { stdout: brief },
+      ...remoteSaying([{ branch: "work/one", tip: "aaa" }], {
+        "work/one:HANDOVER.md": brief,
+      }),
       "git rev-parse --abbrev-ref HEAD": { stdout: "work/one\n" },
       "git rev-list --count HEAD..origin/main": { stdout: "0\n" },
     },
@@ -312,10 +324,9 @@ test("take puts every tagged file back, so the reset leaves the tag standing", (
   const { it, outside, disk } = doorsSaying(
     {
       "git status --porcelain": { stdout: " M spec/tickets/slow-lint.md" },
-      "git ls-remote --heads origin work/*": {
-        stdout: "aaa\trefs/heads/work/one\n",
-      },
-      "git show origin/work/one:HANDOVER.md": { stdout: brief },
+      ...remoteSaying([{ branch: "work/one", tip: "aaa" }], {
+        "work/one:HANDOVER.md": brief,
+      }),
       "git rev-parse --abbrev-ref HEAD": { stdout: "work/one\n" },
       "git rev-list --count HEAD..origin/main": { stdout: "0\n" },
     },
