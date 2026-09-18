@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: design/draft
+step: design/review
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -124,6 +124,10 @@ record:
     hand: box dd2a59294365 · claude-code-remote
     hash_before: 95b8552d6bd91c48a3cc832a4a02c69ead267651
     hash_after: 95b8552d6bd91c48a3cc832a4a02c69ead267651
+  - step: design/draft
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 4cf8b6e8a2082e2a3240ccf1e98e828d845298b9
+    hash_after: 4cf8b6e8a2082e2a3240ccf1e98e828d845298b9
 group: the-warnings-feed-a-refactorer
 ---
 
@@ -206,14 +210,24 @@ ticket in hand is this hand's.
 | `handFaults` | the hold's tip against the branch tip | the subjects between the two, refusing where one names this ticket |
 | `changedSince` | every file the span touches | the files under the commits naming this ticket, and the working tree |
 
-`landed` commits as `<ticket>: <what>`, so the subject is what says whose
-commit it is. One function answers it, beside `changedSince` in
+`landed` commits as `<ticket>: <what>`, so the name before the first colon says
+whose commit it is. What follows names children and successors, and the guard
+reads none of it. One function answers the prefix, beside `changedSince` in
 `src/scripts/pull-writes.js`, and both guards call it.
+
+The working tree names no hand, so it turns on the tip:
+
+| where the tip stands | what the span takes |
+|---|---|
+| at the hold's tip | the commits naming this ticket, and the working tree |
+| past it, which says a sibling writes here | the commits naming this ticket alone |
 
 | the finding | what answers it |
 |---|---|
 | a sibling's `add -A` sweeps this hand's write in | that commit carries the sibling's subject, so the range names this ticket nowhere |
-| the `read` field refuses on a sibling's files | those files stand under a subject this ticket names nowhere, so they leave the span |
+| the `read` field refuses on a sibling's commits | those files stand under a prefix this ticket names nowhere, so they leave the span |
+| the `read` field refuses on a sibling's tree write | the span drops the tree once a sibling moves the tip, as the settle step decides |
+| a subject naming a child or a successor | the guard reads the prefix, and nothing past it |
 | an empty range reads as a failed call | the git door answers `ok`, and a call that fails refuses, as today |
 | this hand's commit under another path | the subject names the ticket whatever path it carries |
 
@@ -229,6 +243,8 @@ names, and a hand off them stands outside this guard.
 - the git call fails, and the pull refuses
 - the `read` field names the files under this ticket's commits, and passes
 - a sibling's files stand outside that list, and the field passes without them
+- a subject naming a child past its prefix reads as this ticket's own commit
+- a sibling moves the tip, and a file standing in the tree alone leaves the span
 
 ## review
 
