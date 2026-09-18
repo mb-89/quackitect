@@ -49,7 +49,7 @@ func rootHere() (string, error) {
 }
 
 func serves(root string) int {
-	server, _, err := Serve(root, filepath.Join(root, ".se", "index.db"))
+	server, _, err := Serve(root, filepath.Join(root, Runtime, "index.db"))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "the index door did not stand:", err)
 		return 1

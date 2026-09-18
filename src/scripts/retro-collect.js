@@ -3,6 +3,7 @@
 // line it takes. The note drain stands in retro.js beside this file.
 // [[spec/design_input/the-agent-pulls-tickets]]
 
+import { RUN } from "../../.claude/skills/level0/lib/folders.js";
 import { holdsAnywhere } from "./guidance-hand.js";
 import { leavesOut } from "./retro-leaves.js";
 import { windowOut } from "./retro-window.js";
@@ -10,7 +11,7 @@ import { windowOut } from "./retro-window.js";
 const PRIVATE = ".se";
 const RETRO = "retro";
 // The two folders collect passes: the state a box keeps while it works, and its own copies. [[spec/tickets/the-retro-takes-the-box]]
-const SKIPS = ["runtime", RETRO];
+const SKIPS = [RUN.split("/").at(-1), RETRO];
 const MANIFEST = "manifest.jsonl";
 // The folders an outside source lands in, so a reader tells them from the rest. [[spec/tickets/the-retro-takes-the-box]]
 const OUTSIDE = [

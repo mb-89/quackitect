@@ -37,13 +37,13 @@ function disks(more = {}) {
 }
 
 const boxed = (disk) => {
-  disk.write(join(WORK, ".se/box.json"), JSON.stringify({ id: BOX }));
+  disk.write(join(WORK, ".se/run/box.json"), JSON.stringify({ id: BOX }));
   return disk;
 };
 
 const holding = (disk, reads) => {
   disk.write(
-    join(WORK, `.se/hold/${HAND.replace(/[^A-Za-z0-9]+/g, "-")}.json`),
+    join(WORK, `.se/run/hold/${HAND.replace(/[^A-Za-z0-9]+/g, "-")}.json`),
     `${JSON.stringify(hold(reads), null, 2)}\n`,
   );
   return disk;
@@ -79,7 +79,7 @@ test("no box file leaves the layer whole, and the reader mints none", () => {
   const said = guidanceHere(disk, METHOD, ENV, true, WORK);
 
   assert.match(said.standing, /Say what is\./);
-  assert.ok(!disk.exists(join(WORK, ".se/box.json")), "the reader mints no box");
+  assert.ok(!disk.exists(join(WORK, ".se/run/box.json")), "the reader mints no box");
 });
 
 // [[spec/design_output/level0#the-standing-layer]]

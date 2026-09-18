@@ -16,7 +16,7 @@ rule name at the door.
 | server | holds | arrives through |
 |---|---|---|
 | `vale-ls` | every rule in `spec/config/styles/VoiceVale` | the Vale extension, which downloads its own copy |
-| `biome lsp-proxy` | every Biome rule over JavaScript and JSON | `.se/bin/biome`, one subcommand |
+| `biome lsp-proxy` | every Biome rule over JavaScript and JSON | `.se/run/bin/biome`, one subcommand |
 
 `./RUNME.sh doctor` names both, and their versions.
 
@@ -34,7 +34,7 @@ relative to the workspace folder:
 
 | setting | value | why |
 |---|---|---|
-| `vale.valeCLI.path` | `.se/bin/vale` | vale-ls spawns Vale with the workspace folder as its working directory |
+| `vale.valeCLI.path` | `.se/run/bin/vale` | vale-ls spawns Vale with the workspace folder as its working directory |
 | `vale.valeCLI.config` | `.vale.ini` | the extension joins a relative path to the workspace root |
 | `vale.valeCLI.installVale` | `false` | the Vale the installer pins answers, so no second copy arrives |
 | `vale.enableSpellcheck` | `false` | spelling sits outside VoiceVale, so the panel matches the door |
@@ -44,7 +44,7 @@ relative to the workspace folder:
 
 `SettingsNameBinaries`, `EditorDrawsWriteRules`, `BiomeOnWindows` and
 `ExtensionsOnOffer` weigh both files and hold every row above, so the settings
-and `.se/bin` move together. `./RUNME.sh lint` runs them, so a drift lands in
+and `.se/run/bin` move together. `./RUNME.sh lint` runs them, so a drift lands in
 the problems panel of the editor they configure.
 For details, see [[spec/design_output/tree#the-rules-over-two-files]].
 
@@ -65,9 +65,9 @@ test holds both, because a guess costs a person one install that fails.
 
 The Vale extension downloads its own vale-ls into per-extension storage and
 checks a SHA-256. It reads `vale.valeCLI.path` for the Vale binary alone, so no
-setting points it at `.se/bin/vale-ls`.
+setting points it at `.se/run/bin/vale-ls`.
 
-So the copy in `.se/bin` serves two readers: `doctor`, and an editor that starts
+So the copy in `.se/run/bin` serves two readers: `doctor`, and an editor that starts
 a server binary by path. A download that fails costs one warning line, and
 `./RUNME.sh` goes on, because Vale and Biome carry the doors.
 
@@ -89,5 +89,5 @@ needs, links the sidebar, opens the editor here, and shows the quackitect panel.
 
 The PowerShell entry sets `SE_EDITOR_OPENS`, so `RUNME.sh` leaves the opening
 to it and the editor opens once. Before it opens, RUNME writes
-`.se/show-panel`. For details, see
+`.se/run/show-panel`. For details, see
 [[spec/design_output/extension#runme-opens-the-panel]].

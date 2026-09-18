@@ -4,7 +4,13 @@
 // prints the rows plain instead.
 // [[spec/design_output/viewer#the-verb-builds-it]]
 
-import { asRow, OLD, rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
+import {
+  asRow,
+  FOLDER as LOG_FOLDER,
+  OLD,
+  rowsOf,
+  SESSION,
+} from "../../.claude/skills/level0/lib/log.js";
 import { PORT } from "../bridge/window.js";
 
 export const TABS = ["log", "work"];
@@ -28,7 +34,7 @@ export async function openTui(it, argv) {
 
 // [[spec/design_output/viewer#a-second-launch-hands-over]]
 async function opens(it, exe, session, tab) {
-  it.disk.makeDir(it.join(it.root, ".se", "log"));
+  it.disk.makeDir(it.join(it.root, LOG_FOLDER));
   if (await told(tab || TABS[0])) {
     console.log(`A window already stands, and it opens the ${tab || TABS[0]} tab.`);
     return 0;

@@ -11,6 +11,7 @@ import {
   STOP,
 } from "../../.claude/skills/level0/lib/controls.js";
 import { CHECK } from "../../.claude/skills/level0/lib/answer.js";
+import { HOLDS, TICKETS } from "../../.claude/skills/level0/lib/folders.js";
 import { rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { ticketAt, WORK_BRANCH } from "../scripts/group.js";
@@ -203,7 +204,7 @@ function groupInHand(box) {
 
 function holdStands(box) {
   try {
-    return box.disk.list(join(box.work, ".se", "hold")).some((one) => one.name.endsWith(".json"));
+    return box.disk.list(join(box.work, HOLDS)).some((one) => one.name.endsWith(".json"));
   } catch {
     return false;
   }
@@ -211,7 +212,7 @@ function holdStands(box) {
 
 function privateStands(box) {
   try {
-    const folder = join(box.work, ".se", "tickets");
+    const folder = join(box.work, TICKETS);
     return box.disk
       .list(folder)
       .filter((one) => one.name.endsWith(".md"))

@@ -4,6 +4,12 @@
 // the branches, and this verb holds the tickets.
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 
+import {
+  HOLD as OWNED_HOLD,
+  HOLDS as OWNED_HOLDS,
+  TICKETS,
+} from "../../.claude/skills/level0/lib/folders.js";
+
 import { overLong } from "../../.claude/skills/level0/lib/names.js";
 import {
   entriesIn,
@@ -18,8 +24,9 @@ import { fieldOf, GROUP, withField, withoutField } from "./group.js";
 import { holdsAnywhere } from "./guidance-hand.js";
 import { askRows, processAt } from "./process.js";
 
-export const NOTES = ".se/tickets";
-export { HOLD, HOLDS } from "./guidance-hand.js";
+export const NOTES = TICKETS;
+export const HOLDS = OWNED_HOLDS;
+export const HOLD = OWNED_HOLD;
 export const NOTE = "note";
 const TRAVELS = "spec/tickets";
 const SCHEMAS = "spec/schemas";

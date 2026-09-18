@@ -230,8 +230,8 @@ test("a git add naming a path under .se refuses, with -f or without", () => {
   assert.deepEqual(addsIn("git add -f .se/notes/one.md"), [".se/notes/one.md"]);
   assert.deepEqual(addsIn("git add .se/notes/one.md"), [".se/notes/one.md"]);
   assert.deepEqual(addsIn("git add --force .se/HANDOVER.md"), [".se/HANDOVER.md"]);
-  assert.deepEqual(addsIn("cd x && git stage .se/log/session.jsonl"), [
-    ".se/log/session.jsonl",
+  assert.deepEqual(addsIn("cd x && git stage .se/run/log/session.jsonl"), [
+    ".se/run/log/session.jsonl",
   ]);
   assert.deepEqual(rules("git add -f .se/notes/one.md"), ["PrivateStaysHome"]);
 });

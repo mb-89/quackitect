@@ -3,6 +3,7 @@
 // model runs here.
 // [[spec/design_output/review#what-the-verb-gathers]]
 
+import { RUN } from "../../.claude/skills/level0/lib/folders.js";
 import {
   BRIEF,
   DIFF_CAP,
@@ -117,7 +118,7 @@ function checkOn(it, at) {
 
   const survey = it.join(it.root, TOOLS);
   if (it.disk.exists(survey)) {
-    it.disk.makeDir(it.join(where, ".se"));
+    it.disk.makeDir(it.join(where, RUN));
     it.disk.write(it.join(where, TOOLS), it.disk.read(survey));
   }
 

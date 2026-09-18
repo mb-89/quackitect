@@ -1,5 +1,5 @@
 // The survey, over a fake box. These cases assert what a caller reads out of
-// .se/tools.json, so a wrong path shows here first.
+// .se/run/tools.json, so a wrong path shows here first.
 // [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
@@ -20,12 +20,12 @@ import { fakeProc } from "../../src/doors/fake/proc.js";
 import { readTools, survey, whereIs, writeSurvey } from "../../src/scripts/tools.js";
 
 const ROOT = "/box";
-const BIN = `${ROOT}/.se/bin`;
+const BIN = `${ROOT}/.se/run/bin`;
 const UNIX = { PATH: "/usr/bin:/bin" };
 
 const boxWith = (paths) => fakeDisk(Object.fromEntries(paths.map((at) => [at, ""])));
 
-test("the survey names the path and the version of a tool in .se/bin", () => {
+test("the survey names the path and the version of a tool in .se/run/bin", () => {
   const files = boxWith([`${BIN}/vale`]);
   const outside = fakeProc({
     [`${BIN}/vale --version`]: { stdout: "vale version 3.20.0" },
@@ -36,7 +36,7 @@ test("the survey names the path and the version of a tool in .se/bin", () => {
   assert.deepEqual(found.vale, { path: `${BIN}/vale`, version: "3.20.0" });
 });
 
-test("the survey finds a tool on the path variable where .se/bin holds none", () => {
+test("the survey finds a tool on the path variable where .se/run/bin holds none", () => {
   const files = boxWith(["/usr/bin/git"]);
   const outside = fakeProc({
     "/usr/bin/git --version": { stdout: "git version 2.43.0" },
@@ -81,7 +81,7 @@ test("python answers to python3 first, and to python after it", () => {
   assert.deepEqual(found.python, { path: "/usr/bin/python", version: "3.12.1" });
 });
 
-test("the survey writes every wanted tool into .se/tools.json", () => {
+test("the survey writes every wanted tool into .se/run/tools.json", () => {
   const files = boxWith([`${BIN}/vale`]);
   const outside = fakeProc({ [`${BIN}/vale --version`]: { stdout: "3.20.0" } });
 
@@ -95,7 +95,7 @@ test("the survey writes every wanted tool into .se/tools.json", () => {
   assert.equal(pathOf(read, "vale"), `${BIN}/vale`);
 });
 
-test("the survey reaches .se/bin before any folder on the path variable", () => {
+test("the survey reaches .se/run/bin before any folder on the path variable", () => {
   const places = placesFor("vale", UNIX, BIN);
 
   assert.deepEqual(places, [`${BIN}/vale`, "/usr/bin/vale", "/bin/vale"]);
@@ -138,7 +138,7 @@ test("a caller takes the surveyed path, and the guess where none stands", () => 
 });
 
 test("a guess names the Windows binary and the plain one, and nothing else", () => {
-  assert.deepEqual(guesses("vale-ls"), [".se/bin/vale-ls.exe", ".se/bin/vale-ls"]);
+  assert.deepEqual(guesses("vale-ls"), [".se/run/bin/vale-ls.exe", ".se/run/bin/vale-ls"]);
 });
 
 test("a box with no survey file hands the caller an empty one", () => {

@@ -2,6 +2,8 @@
 // [[spec/design_output/copilot#setup-and-discovery]]
 
 import { dirname, join, relative } from "node:path";
+import { inRun } from "../../.claude/skills/level0/lib/folders.js";
+import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
 import { fileURLToPath } from "node:url";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
@@ -25,10 +27,10 @@ const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
 const outside = proc();
 const time = clock();
-const book = log(files, time, { folder: join(root, ".se/log") });
+const book = log(files, time, { folder: join(root, LOG_FOLDER) });
 const [mode, name] = process.argv.slice(2);
 const cloud =
-  files.exists(join(root, ".se/copilot-cloud")) ||
+  files.exists(join(root, inRun("copilot-cloud"))) ||
   Boolean(process.env.GITHUB_COPILOT_GIT_TOKEN && process.env.COPILOT_AGENT_PROMPT);
 const surface = cloud ? "cloud" : "vscode";
 let currentEvent = { surface, event: name, retry: false };

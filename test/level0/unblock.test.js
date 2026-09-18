@@ -142,7 +142,7 @@ const onBranch = (extra = {}) => ({
 function doors(files, answers = {}) {
   const said = fakeGit(onBranch(answers), ROOT);
   const disk = fakeDisk({
-    [at(".se/box.json")]: JSON.stringify({ id: "d462e994b4cef" }),
+    [at(".se/run/box.json")]: JSON.stringify({ id: "d462e994b4cef" }),
     ...files,
   });
   return {

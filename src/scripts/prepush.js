@@ -13,6 +13,12 @@ import {
   taggedIn,
 } from "../../.claude/skills/level0/lib/todo.js";
 import { refusedVersion, TRUNK, VERSION } from "../../.claude/skills/level0/lib/trunk.js";
+import { CONFIG, fromJson, PROSE } from "../../.claude/skills/level0/lib/vale.js";
+import {
+  refusedWarnings,
+  warningsOn,
+} from "../../.claude/skills/level0/lib/warnings.js";
+import { whereIs } from "./tools.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { proc } from "../doors/proc.js";
@@ -31,7 +37,7 @@ export function refsIn(text) {
     });
 }
 
-export function holds(refs, stampText, carried = () => []) {
+export function holds(refs, stampText, carried = () => [], warnings = () => []) {
   // [[spec/design_output/work#a-version-branch-stands]]
   const versions = refs
     .filter((one) => VERSION.test(String(one.remote ?? "").replace(/^refs\/heads\//, "")))
@@ -58,6 +64,13 @@ export function holds(refs, stampText, carried = () => []) {
   for (const one of refs) {
     const found = taggedIn(carried(one));
     if (found.length) return { code: 1, said: refusedTodo(found) };
+  }
+
+  // [[spec/tickets/one-list-holds-the-warnings]]
+  for (const one of refs) {
+    const names = carried(one).map((held) => String(held?.name ?? ""));
+    const found = warningsOn(warnings(names), names);
+    if (found.length) return { code: 1, said: refusedWarnings(found) };
   }
   return { code: 0, said: "" };
 }
@@ -95,12 +108,30 @@ export function carriedBy(repo) {
   };
 }
 
+// The lint over the names a push carries, read as rows. [[spec/tickets/one-list-holds-the-warnings]]
+export function lintedBy(outside, root, vale) {
+  return (names) => {
+    const read = names.filter((one) => PROSE.test(one));
+    if (!read.length || !vale) return [];
+    const ran = outside.run([vale, `--config=${CONFIG}`, "--output=JSON", "--no-exit", ...read], {
+      cwd: root,
+    });
+    return fromJson(ran.stdout);
+  };
+}
+
 async function main() {
   const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
   const files = disk();
+  const outside = proc();
   const at = join(root, STAMP);
   const stamp = files.exists(at) ? files.read(at) : "";
-  const said = holds(refsIn(files.read(STDIN)), stamp, carriedBy(git(proc(), root)));
+  const said = holds(
+    refsIn(files.read(STDIN)),
+    stamp,
+    carriedBy(git(outside, root)),
+    lintedBy(outside, root, whereIs(files, root, "vale")),
+  );
   if (said.code !== 0) console.error(said.said);
   return said.code;
 }

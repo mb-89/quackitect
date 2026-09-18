@@ -3,13 +3,17 @@
 // a moved hash hands them again.
 // [[spec/design_output/pull#the-work-answer]]
 
+import {
+  HOLD as OWNED_HOLD,
+  HOLDS as OWNED_HOLDS,
+} from "../../.claude/skills/level0/lib/folders.js";
+
 import { actionables, bindsHere } from "../../.claude/skills/level0/lib/guidance.js";
 import { hashOf } from "../../.claude/skills/level0/lib/schema.js";
 import { agentOf, BOX, handOf } from "./hand.js";
 
-export const HOLDS = ".se/hold";
-// The one file a hold stands in beside the folder, which an older box still writes. [[spec/design_output/pull#the-hand-and-the-hold]]
-export const HOLD = ".se/hold.json";
+export const HOLDS = OWNED_HOLDS;
+export const HOLD = OWNED_HOLD;
 export const GUIDANCE = "spec/guidance";
 const MARKDOWN = /\.md$/;
 const DRAFT = /^_/;

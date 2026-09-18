@@ -14,7 +14,7 @@ rationale: [[spec/rationales/working]]
 6. Put your work into the answer you already owe. *
 7. Name the assumption you take where the owner says to carry on, and take it.
 8. Put a script of your own under `.se/scripts`, which git ignores.
-9. Read `.se/tools.json` for the path of a tool, and run `./RUNME.sh tools` where that file is absent.
+9. Read `.se/run/tools.json` for the path of a tool, and run `./RUNME.sh tools` where that file is absent.
 10. Fix what you trip over where the fix is trivial. Where it runs deeper, write the finding down and leave the code alone. *
 11. Show a brief to the owner before it reaches the cloud, and push nothing they have yet to read. *
 12. Run `check_answer` over a draft answer past sixty words before you send it. A draft checked there meets the gate clean.

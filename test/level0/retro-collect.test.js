@@ -22,8 +22,8 @@ const FILES = {
   [at(".se/tickets/a-note.md")]: "---\nkind: [[ticket]]\nstate: open\n---\n",
   [at(".se/scripts/one.mjs")]: "// a script a hand writes\n",
   [at(".se/probe/compact.json")]: '{"kept":1}\n',
-  [at(".se/runtime/index.db")]: "rows",
-  [at(".se/runtime/hold/box-one.json")]: '{"ticket":"a-child"}\n',
+  [at(".se/run/index.db")]: "rows",
+  [at(".se/run/lsp.json")]: '{"port":1}\n',
   [at(".se/retro/older/manifest.jsonl")]: '{"path":"log"}\n',
   [`${SCRATCH}/two.mjs`]: "// a script beside the folder\n",
 };
@@ -67,7 +67,7 @@ function heard(run) {
 test("collect refuses while a hold stands under the private folder", () => {
   const it = doors({
     ...FILES,
-    [at(".se/hold/box-one-claude-code.json")]: '{"ticket":"a-child"}\n',
+    [at(".se/run/hold/box-one-claude-code.json")]: '{"ticket":"a-child"}\n',
   });
 
   const { code, said } = heard(() => retro(ROOT, ["collect", TICKET], it));
@@ -81,7 +81,7 @@ test("collect refuses while a hold stands under the private folder", () => {
 test("collect passes over the hold for the retro it collects for", () => {
   const it = doors({
     ...FILES,
-    [at(".se/hold/box-one-claude-code.json")]: `{"ticket":"${TICKET}"}\n`,
+    [at(".se/run/hold/box-one-claude-code.json")]: `{"ticket":"${TICKET}"}\n`,
   });
 
   const { code } = heard(() => retro(ROOT, ["collect", TICKET], it));
@@ -108,7 +108,7 @@ test("collect copies the private folder, and skips the runtime folder and its ow
     "a probe comes across",
   );
   assert.equal(
-    it.disk.exists(inRetro("runtime/index.db")),
+    it.disk.exists(inRetro("run/index.db")),
     false,
     "the runtime folder stays",
   );
@@ -164,7 +164,7 @@ test("the manifest holds one line a path, with its size and where it comes from"
   assert.equal(typeof said.size, "number");
   assert.match(String(said.from), /\.se/);
   assert.equal(
-    rows.some((one) => String(one.path).includes("runtime")),
+    rows.some((one) => String(one.path).startsWith("run/")),
     false,
     "a folder it skips takes no line",
   );

@@ -290,18 +290,18 @@ test("a press, a run and an edit each write a sidebar line naming what moved", a
     ],
   );
   const written = [...door.files.files.keys()].filter((one) =>
-    one.startsWith(".se/log/"),
+    one.startsWith(".se/run/log/"),
   );
-  assert.deepEqual(written, [".se/log/session.jsonl"]);
+  assert.deepEqual(written, [".se/run/log/session.jsonl"]);
   assert.equal(door.files.read(written[0]).trim().split("\n").length, 4);
 });
 
 test("a sidebar line lands after the lines the session holds, and keeps them", async () => {
   const held = `${JSON.stringify({ at: "x", level: "info", kind: "level0", said: "session start" })}\n`;
-  const door = doorOf({ ".se/log/session.jsonl": held });
+  const door = doorOf({ ".se/run/log/session.jsonl": held });
   await sidebarOf(door).took({ kind: "press", key: "stop.hold" });
   const rows = door.files
-    .read(".se/log/session.jsonl")
+    .read(".se/run/log/session.jsonl")
     .trim()
     .split("\n")
     .map((one) => JSON.parse(one));
@@ -315,7 +315,7 @@ test("a box writing at warn keeps the sidebar lines out of the log", async () =>
   const door = doorOf({ [LOCAL]: JSON.stringify({ log: { level: "warn" } }) });
   await sidebarOf(door).took({ kind: "press", key: "stop.hold" });
   assert.equal(
-    [...door.files.files.keys()].some((one) => one.startsWith(".se/log/")),
+    [...door.files.files.keys()].some((one) => one.startsWith(".se/run/log/")),
     false,
   );
 });
@@ -367,10 +367,10 @@ test("god mode stands in the status bar from the start, and a new hold toasts", 
 
 // [[spec/design_output/extension#runme-opens-the-panel]]
 test("a start RUNME marks reveals the panel once, and clears the mark", async () => {
-  const door = doorOf({ ".se/show-panel": "yes\n" });
+  const door = doorOf({ ".se/run/show-panel": "yes\n" });
   await activate({}, door);
   assert.equal(door.said.revealed, 1);
-  assert.equal(door.files.read(".se/show-panel"), "");
+  assert.equal(door.files.read(".se/run/show-panel"), "");
 
   await activate({}, door);
   assert.equal(door.said.revealed, 1, "the next start stays silent");

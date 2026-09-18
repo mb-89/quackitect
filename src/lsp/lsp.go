@@ -58,16 +58,22 @@ type diagnostic struct {
 	Message  string `json:"message"`
 }
 
+// A drawn path names who drew it, so each clear loop reaches its own. [[spec/tickets/the-panel-draws-every-file]]
+const (
+	bySweep = "sweep"
+	byOpen  = "open"
+)
+
 type server struct {
 	checker *Checker
 	out     io.Writer
 	guard   sync.Mutex
-	drawn   map[string]bool
+	drawn   map[string]string
 }
 
 // [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
 func Speaks(checker *Checker, in io.Reader, out io.Writer) error {
-	one := &server{checker: checker, out: out, drawn: map[string]bool{}}
+	one := &server{checker: checker, out: out, drawn: map[string]string{}}
 	reader := bufio.NewReader(in)
 	for {
 		said, err := reads(reader)
@@ -119,6 +125,8 @@ func (one *server) took(said message) bool {
 			"capabilities": map[string]any{"textDocumentSync": 1},
 			"serverInfo":   map[string]any{"name": "se-lsp", "version": Version},
 		})
+	case "initialized":
+		one.sweeps()
 	case "shutdown":
 		one.answers(said.ID, nil)
 	case "exit":
@@ -129,7 +137,7 @@ func (one *server) took(said message) bool {
 		where, _ := opened(said.Params)
 		if where != "" {
 			one.checker.Tree().Drops(relativeTo(one.checker.Tree().Root, where))
-			one.clears()
+			one.clears(byOpen)
 		}
 	default:
 		if len(said.ID) > 0 {
@@ -158,34 +166,58 @@ func (one *server) draws(where, text string) {
 	one.guard.Lock()
 	defer one.guard.Unlock()
 	for path, said := range found {
-		one.publishes(tree, path, said)
+		one.publishes(tree, path, said, byOpen)
 	}
-	for path := range one.drawn {
-		if _, still := found[path]; !still {
-			one.publishes(tree, path, nil)
+	for path, who := range one.drawn {
+		if _, still := found[path]; !still && who == byOpen {
+			one.publishes(tree, path, nil, byOpen)
 			delete(one.drawn, path)
 		}
 	}
 }
 
-func (one *server) clears() {
+// [[spec/tickets/the-panel-draws-every-file]]
+func (one *server) sweeps() {
+	tree := one.checker.Tree()
+	found := map[string][]Finding{}
+	for _, said := range one.checker.Sweep() {
+		found[said.File] = append(found[said.File], said)
+	}
+
+	one.guard.Lock()
+	defer one.guard.Unlock()
+	for path, said := range found {
+		one.publishes(tree, path, said, bySweep)
+	}
+	for path, who := range one.drawn {
+		if _, still := found[path]; !still && who == bySweep {
+			one.publishes(tree, path, nil, bySweep)
+			delete(one.drawn, path)
+		}
+	}
+}
+
+func (one *server) clears(who string) {
 	one.guard.Lock()
 	defer one.guard.Unlock()
 	tree := one.checker.Tree()
-	for path := range one.drawn {
-		one.publishes(tree, path, nil)
+	for path, drew := range one.drawn {
+		if drew != who {
+			continue
+		}
+		one.publishes(tree, path, nil, who)
+		delete(one.drawn, path)
 	}
-	one.drawn = map[string]bool{}
 }
 
-func (one *server) publishes(tree *Tree, path string, found []Finding) {
+func (one *server) publishes(tree *Tree, path string, found []Finding, who string) {
 	rows := yaml.SplitLines(tree.Read(path))
 	drawn := make([]diagnostic, 0, len(found))
 	for _, said := range found {
 		drawn = append(drawn, drawsAs(said, rows))
 	}
 	if len(found) > 0 {
-		one.drawn[path] = true
+		one.drawn[path] = who
 	}
 	one.says("textDocument/publishDiagnostics", map[string]any{
 		"uri":         uriOf(filepath.Join(tree.Root, filepath.FromSlash(path))),

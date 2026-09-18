@@ -166,9 +166,9 @@ signature check.
 ## The hand and the hold
 
 A hand is the box, the session on it, and the agent inside it where the
-harness names one. `.se/box.json` carries the box id, and the engine mints one
+harness names one. `.se/run/box.json` carries the box id, and the engine mints one
 where none stands. It takes the random source as an argument, so a test
-replays. `.se/session.json` carries the session id and the harness name, and
+replays. `.se/run/session.json` carries the session id and the harness name, and
 the plugin wrapper writes it at `session.start`. The pull reads the two files
 into one hand.
 
@@ -182,7 +182,7 @@ A helper the session spawns runs on the same box under the same session file,
 so it carries the session's hand. A `not` that excludes the session
 excludes the helper. The hold slugs the hand into its file name.
 
-The hold stands at `.se/hold/<hand>.json`. It names the ticket, its path, the
+The hold stands at `.se/run/hold/<hand>.json`. It names the ticket, its path, the
 step, the group, the take hash, and the guidance notes by name and hash. The
 pull refuses a second hand-out while a hold stands, and `branch pull --drop`
 drops the hold with the leaf where it stands. The stop hook reads the

@@ -11,7 +11,7 @@ export const ROOT = "/tree",
   SHA = "b818c390c02737351bf1b73aba36a573d34d2ecc";
 export const BRANCH = "work/one-group";
 export const HAND = "box d462e994b4cef";
-export const HOLD = join(ROOT, ".se/hold/box-d462e994b4cef.json");
+export const HOLD = join(ROOT, ".se/run/hold/box-d462e994b4cef.json");
 export const at = (path) => join(ROOT, ...path.split("/"));
 
 export function heard(what) {
@@ -41,7 +41,7 @@ export function doors(files, answers = {}, more = {}) {
   const said = fakeGit(onBranch(answers), ROOT);
   const disk = fakeDisk({
     [at("spec/schemas/ticket.schema.yaml")]: SCHEMA,
-    [at(".se/box.json")]: JSON.stringify({ id: "d462e994b4cef" }),
+    [at(".se/run/box.json")]: JSON.stringify({ id: "d462e994b4cef" }),
     [at("spec/guidance/voice.md")]:
       "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Say what is. *\n2. Put the bottom line first.\n",
     ...files,
