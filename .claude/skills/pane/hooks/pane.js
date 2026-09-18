@@ -13,10 +13,9 @@ const CONFIG = "config";
 const DRAWS = ["action", "toggle", "status", "count", "table", "process"];
 const LEAF = 24;
 const GAP = 3;
+const NARROW = 6;
 
-// The gesture, copied and not imported: a hooks module reaches nothing past
-// its own folder, and the editor holds the same rungs under src/extension.
-// [[spec/design_output/extension#a-gesture-picks-a-state]]
+// This pane holds its own copy of the gesture, because a hooks module reaches its own folder alone. The editor holds the same rungs under src/extension. [[spec/design_output/extension#a-gesture-picks-a-state]]
 const BURST = 800;
 const DEAD = 600;
 const FAR = 5;
@@ -97,7 +96,7 @@ function headOf($, Button, name) {
   });
 }
 
-// A mark at rest stands alone, and a mark away from it carries the value.
+// A mark at rest stands alone, and a mark away from it carries the value. [[spec/design_output/extension#a-mark-alone-says-it]]
 function labelOf(cell) {
   const mark = markOf(cell.icon);
   const value = cell.value === undefined ? "" : String(cell.value);
@@ -115,8 +114,7 @@ function markOf(at) {
     .join("");
 }
 
-// A toggle picks a rung and writes it. An action and a process carry a command
-// the editor runs, so the pane names it and the running comes next.
+// A toggle picks a rung and writes it. An action and a process carry a command the editor runs, so the pane names it. [[spec/design_output/extension#a-button-names-its-commands]]
 async function tapped($, cell) {
   if (!cell.options.length) {
     last = cell.runs ? `${cell.key} carries ${cell.runs}` : `${cell.key} draws alone`;
@@ -133,8 +131,7 @@ async function tapped($, cell) {
   return redraw($);
 }
 
-// The first press of a burst moves one rung, and the count the declaration
-// names reaches the far one.
+// The first press of a burst moves one rung, and the count the declaration names reaches the far one. [[spec/design_output/extension#a-gesture-picks-a-state]]
 async function gestured($, cell) {
   const at = await $.clock.now();
   const was = bursts.get(cell.key) ?? fresh();
@@ -175,7 +172,7 @@ function treeOf($, kit, sections) {
 function widthIn(sections) {
   let widest = 0;
   for (const one of sections) for (const each of one.rows) widest = Math.max(widest, each.leaf.length);
-  return Math.max(6, Math.min(widest + GAP, LEAF));
+  return Math.max(NARROW, Math.min(widest + GAP, LEAF));
 }
 
 function rowOf($, kit, each, wide) {
@@ -226,9 +223,7 @@ function redraw($) {
   } catch {}
 }
 
-// The local layer beats the tracked one, so a press writes there and the
-// tracked file stands as every box reads it.
-// [[spec/design_output/extension#the-view-holds-nothing]]
+// The local layer beats the tracked one, so a press writes there and the tracked file stands as every box reads it. [[spec/design_output/extension#the-view-holds-nothing]]
 async function wrote($, key, want) {
   const [name, leaf] = key.split(".");
   const said = await readJson($, LOCAL);
@@ -334,8 +329,7 @@ function treeIn(schema, tracked, local) {
   return out;
 }
 
-// A relative path in a hooks module answers the plugin's own folder, so the
-// tree's root leads every read and the pane draws the session's own config.
+// A relative path in a hooks module answers the plugin's own folder, so the tree's root leads every read. [[spec/design_output/extension#a-box-names-its-home]]
 async function readJson($, path) {
   try {
     return JSON.parse(await $.fs.read(await rooted($, path)));
