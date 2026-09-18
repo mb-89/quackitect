@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box a5e189c39e1d · claude-code-remote
@@ -150,6 +150,14 @@ record:
     hand: box dd2a59294365 · claude-code-remote
     hash_before: 9ed9a571455d046499ecbd86f0c56c5338f546a1
     hash_after: 9ed9a571455d046499ecbd86f0c56c5338f546a1
+  - step: implement/change
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 2f31173bf1ee8d4cfda3827f95aa36d2b5a85bba
+    hash_after: 324864c7ee28463668d4bf94f25f743549b09162
+    answered:
+      - name: lint
+        exit: 0
+        said: 79 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
