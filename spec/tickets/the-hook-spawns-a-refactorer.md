@@ -92,7 +92,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box dd2a59294365 · claude-code-remote
@@ -104,6 +104,10 @@ record:
     hash_after: 010c618d7665b207550853778c522bd67d994025
     returns: 1
     why: The spawned hand takes the helper layer, which the working box builds from its own `process.env`.; So the variable the spawn sets reaches that layer nowhere, and the note stands off the hand.; Name how the note reaches the spawned hand alone, where `onAgentSpawn` hands that layer over.; The resolver beside `work-waiting` answers a boolean alone, so the check spawns nothing.; Name the hook that returns the spawn, as the review tool returns one off a tool call.; The pointer for the push door names a ticket closed as `became`, so point at its successor.; `untouchedFor` names no source for a file's last write, so say whether git answers it.; The guidance note carries `env` alone, and its schema requires `scope` beside it.; `./RUNME.sh check` answers 1, on warnings standing across the tree before this branch.; The stop rule, the four keys and the flag answer the rest of the ask.
+  - step: design/draft
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 4d09f82c8554b7e92f5bd41adef39a3a96f34d0d
+    hash_after: 4d09f82c8554b7e92f5bd41adef39a3a96f34d0d
 ---
 
 # Ask
@@ -167,25 +171,48 @@ The check answers true where the list runs past the number. The hook spawns the 
 | `parallel` | the flag, true by default |
 | `mostInARow` | the hands the session spawns one after another |
 
-**The flag.** `parallel` false switches the spawn off. The session then drains the list itself before it pushes. The push door it meets is the one [[spec/tickets/a-rule-carries-its-side]] writes.
+**What returns the spawn.** The resolver beside `work-waiting` answers a boolean, so it spawns nothing. The stop door carries the spawn instead:
+
+| what | where |
+|---|---|
+| the check, answering the boolean the vote reads | the resolver in `src/bridge/stop.js` |
+| the answer carrying `spawn`, where that vote lands | the stop door in the same file |
+| the call on that answer | `spawns` in `.claude/skills/level0/hooks/level0.js` |
+
+`src/bridge/review.js` answers the same shape off a tool call, so the door follows a road the tree already walks.
+
+**The flag.** `parallel` false switches the spawn off. The session then drains the list itself before it pushes. The push door it meets is the one [[spec/tickets/one-list-holds-the-warnings]] settles.
 
 **Which file the hand takes.** The hand reads the list, groups its entries by file, and drops every file a write touched inside `untouchedFor`. It takes the oldest of the rest.
 
-| what keeps the hands off one file | how |
+| what it asks | who answers |
 |---|---|
-| the file the working session holds | that file's last write stands inside the window |
+| a file's last write | the git door, at `log -1 --format=%cI -- <path>` |
+| the file the working session holds | that same answer, standing inside the window |
 | a file another hand took | its entries leave the list as that hand lands them |
 
-**The guidance the hand reads.** `spec/guidance/refactoring.md` stands as a guidance note, and its frontmatter carries `env: [SE_REFACTOR]`. `bindsHere` in `.claude/skills/level0/lib/guidance.js` binds a note by that field. So the standing layer hands the note to a session carrying the variable. The spawn sets it, and the working hand carries it nowhere.
+**The guidance the hand reads.** `spec/guidance/refactoring.md` stands as a guidance note. Its schema wants a `scope`, so the note's scope names the refactoring hand, and the note carries no `env`.
+
+The layers stand in `guidanceHere`, under `src/bridge/guidance.js`. Two build off `here`, which filters by the working box's own variables. A note reaching the spawned hand alone reaches neither, so the function builds a third:
+
+| layer | what it holds | who takes it |
+|---|---|---|
+| `standing` | the session's own notes | the working hand |
+| `helper` | the same, for a hand the pull spawns | a helper |
+| `refactor` | the notes whose scope names the refactoring hand | the hand this rule spawns |
+
+`onAgentSpawn` reads the spawn's kind and hands the matching layer over. So the working hand reads the note nowhere, and the spawned hand reads it once.
 
 **The cases.**
 
 - the check answers false under the number, and true past it
 - the rule reads `continue`, so a turn meeting it holds open
+- the door answers a spawn where the vote lands, and none under the number
 - the spawn fires once a vote, and stops at `mostInARow`
 - the flag false spawns nothing, and the session drains the list before it pushes
 - the hand walks past a file written inside the window, and takes the oldest beyond it
-- the standing layer hands the note to a session carrying the variable, and to no other
+- the refactor layer holds the note, and the standing layer holds it nowhere
+- the spawn of that kind takes the refactor layer, and a helper takes its own
 
 ## review
 

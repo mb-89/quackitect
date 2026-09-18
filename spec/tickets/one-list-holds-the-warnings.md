@@ -111,7 +111,7 @@ Two facts the reviews establish:
 # Discussion
 
 - [[spec/tickets/a-rule-carries-its-side]] hands this over at `design/person-1`, which waits for a person.
-  - design/review failed back 2 times: Every rule under `VoiceScript`, `VoiceShape` and `VoiceVale` reads `level: error` today, so that work stands done.
+  - design/review failed back 2 times. Every rule under `VoiceScript`, `VoiceShape` and `VoiceVale` reads `level: error` today, so that work stands done.
   - The scope line says the Vale rules alone, and the table beside it names `tree.js` and the Go rules.
   - The gain asks for one list, and the record a write fills stands apart from the list the panel draws.
   - The push doors read that record alone, so every warning `./RUNME.sh check` names today passes them.
