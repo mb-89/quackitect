@@ -11,6 +11,7 @@ import {
   holdsVerb,
   withEngineReader,
   withPersonStep,
+  withSettleStep,
 } from "../../src/scripts/pull.js";
 import { work } from "../../src/scripts/work.js";
 import {
@@ -29,7 +30,7 @@ import {
   standing,
 } from "./pull-doors.js";
 
-test("a step failing back twice inserts a person step, and a third insertion asks for a split", () => {
+test("a step failing back twice inserts a settle step an agent takes", () => {
   const once = withEntry(CHILD("open", "design/review"), {
     step: "design/review",
     hand: "box other",
@@ -46,13 +47,51 @@ test("a step failing back twice inserts a person step, and a third insertion ask
 
   assert.equal(code, 0);
   const now = disk.read(at("spec/tickets/a-child.md"));
-  assert.equal(fieldOf(now, "step"), "design/person-1");
+  assert.equal(fieldOf(now, "step"), "design/settle-1");
   assert.match(
     now,
-    /- name: person-1\n\s+does: answers the question the engine asks\n\s+by: person\n\s+to: engine\n\s+asks: "design\/review failed back 2 times: still thin"/,
+    /- name: settle-1\n\s+does: decides between the step and the findings, and writes why\n\s+by: anyone\n\s+to: engine\n\s+asks: "design\/review failed back 2 times: still thin"/,
   );
-  const bare = now.replace("    to: engine\n", "");
+  assert.doesNotMatch(now, /by: person/, "a count of returns writes no person step");
+  assert.match(said, /waits for a hand at design\/settle-1/);
+});
+
+// A settle step past the split cap asks a person, because two hands that cannot agree need one. [[spec/design_output/pull#a-settle-step-goes-in]]
+test("settle steps past the split cap become a person step", () => {
+  const { it } = doors(standing(CHILD("open", "design/review")), {}, { fails: 2 });
+  const rooted = { ...it, root: ROOT, splits: 1 };
+  const one = { name: "a-child", text: CHILD("open", "design/review") };
+
+  assert.equal(
+    withSettleStep(rooted, one, "design/draft", "first").path,
+    "design/settle-1",
+  );
+  assert.equal(
+    withSettleStep(rooted, one, "design/draft", "second").path,
+    "design/person-1",
+    "the cap hands it to a person",
+  );
+});
+
+// [[spec/design_output/pull#a-person-step-goes-in]]
+test("a person step carries its reader, and a colon takes quotes", () => {
+  const once = withEntry(CHILD("open", "design/review"), {
+    step: "design/review",
+    hand: "box other",
+    hash_before: "aaaa",
+    hash_after: "aaaa",
+    returns: 1,
+    why: "thin",
+  });
+  const twice = filled(once, "### verdict", "fail\n- still thin");
+  const { it } = doors(standing(twice), {}, { fails: 2 });
   const rooted = { ...it, root: ROOT };
+  const held = { name: "a-child", text: CHILD("open", "design/review") };
+  withPersonStep(rooted, held, "design/draft", "a question");
+  const now = held.text;
+
+  assert.match(now, /- name: person-1\n\s+does: answers the question the engine asks\n\s+by: person\n\s+to: engine/);
+  const bare = now.replace("    to: engine\n", "");
   assert.match(
     withEngineReader(rooted, { text: bare }),
     /to: engine/,
@@ -95,15 +134,14 @@ test("a step failing back twice inserts a person step, and a third insertion ask
     "the hand-out repairs a bare colon",
   );
   assert.match(
-    now,
+    asked.text,
     /^## person-1\n\n<!-- answers the question the engine asks -->\n\n### answer/m,
   );
-  assert.match(said, /waits for a person at design\/person-1/);
 
-  const one = { name: "a-child", text: now };
   assert.equal(
-    withPersonStep({ ...it, splits: 1 }, one, "design/review", "again").path,
+    withPersonStep({ ...it, splits: 1 }, asked, "design/review", "again").path,
     "",
+    "a person step past the cap asks for a split",
   );
 });
 

@@ -36,7 +36,7 @@ import {
   namedGroup,
   ticketsHere,
   urgentGroup,
-  withPersonStep,
+  withSettleStep,
 } from "./pull-hand.js";
 import { leafOf, leavesOf, REFUSED, say, stillHeld, WAIT, WORK } from "./pull-route.js";
 import {
@@ -103,7 +103,8 @@ export function pull(it, argv) {
   if (!named && (verdict.said || (name && held))) return handBack(it, who, name, verdict);
   if (held) return stillHeld(it, held);
   // [[spec/design_output/pull#the-engine-takes-the-branch]]
-  if (onTrunk && it.take) {
+  // A hand asking for one ticket takes no branch, because the queue answers neither. [[spec/design_output/pull#the-hand-out]]
+  if (onTrunk && it.take && !asking) {
     if (it.cloud && !named) return it.take();
     const wanted = named || urgentGroup(it);
     if (wanted || it.ready?.()) return wanted ? it.take(wanted) : 0;
@@ -392,18 +393,18 @@ export function refused(it, who, one, leaf, held, found) {
   const count = Number(held.refused ?? 0) + 1;
   if (Number(it.refusals) > 0 && count >= Number(it.refusals)) {
     if (one.stood) one.text = one.stood;
-    const put = withPersonStep(
+    const put = withSettleStep(
       it,
       one,
       leaf.path,
       `the hand-back met refused ${count} times: ${found[0]}`,
     );
     const finding = put.path
-      ? landed(it, one, [`${leaf.path} goes to a person at ${put.path}`])
+      ? landed(it, one, [`${leaf.path} goes to a hand at ${put.path}`])
       : "";
     if (finding)
       found.push(
-        `the hook refuses the commit, so the person step lands not: ${finding}`,
+        `the hook refuses the commit, so the settle step lands not: ${finding}`,
       );
     if (put.path && !finding) {
       dropHold(it, who.hand);
@@ -411,7 +412,7 @@ export function refused(it, who, one, leaf, held, found) {
       say(REFUSED, [
         ...found,
         "",
-        `${count} refusals in a row, so ${put.path} now waits for a person.`,
+        `${count} refusals in a row, so ${put.path} now waits for a hand.`,
       ]);
       return 1;
     }
