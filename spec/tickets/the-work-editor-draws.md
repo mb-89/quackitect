@@ -77,11 +77,19 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: sync
+step: split
 record:
   - step: sync
     hand: box 4089f1b3b6bc · claude-code-remote
     hash_before: ca22b75158abd573db00e1635f0bd8ea5b443cf4
+  - step: sync
+    hand: box 4089f1b3b6bc · claude-code-remote
+    hash_before: b73859fb845d1fc76392b91bc8264f5427d41ab3
+    hash_after: b73859fb845d1fc76392b91bc8264f5427d41ab3
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-work-editor-draws already carries every commit on main.
 ---
 
 # Ask
@@ -134,6 +142,8 @@ at a time, and reaches no row to change it.
 <!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
