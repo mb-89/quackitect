@@ -68,6 +68,15 @@ export function guesses(name) {
   return [`${BIN}/${name}.exe`, `${BIN}/${name}`];
 }
 
+// The binaries whose `here` case asks find for a source newer than the binary. [[spec/design_output/index#the-compiler-it-needs]]
+export function rebuilt(text) {
+  const out = [];
+  for (const found of String(text ?? "").matchAll(/^(\w+)_here\(\)\s*\{([\s\S]*?)^\}/gm)) {
+    if (found[2].includes("-newer")) out.push(found[1]);
+  }
+  return out;
+}
+
 // [[spec/design_output/tools#what-the-survey-names]]
 export function installedTools(text) {
   const out = [];

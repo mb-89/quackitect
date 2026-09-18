@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: do
@@ -28,6 +28,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-work-editor-draws
 step: do
+record:
+  - step: do
+    hand: box 4089f1b3b6bc · claude-code-remote
+    hash_before: 89abb36ca16eae7d93d415a291f7d2b4aec7d97e
+    hash_after: 89abb36ca16eae7d93d415a291f7d2b4aec7d97e
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 20 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: 86 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -99,11 +112,15 @@ a reader needs no list to know what the index passes.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -111,11 +128,29 @@ a reader needs no list to know what the index passes.
 
 <!-- the form is text -->
 
+The runtime half already stands, under the name `run`. For details, see
+[[spec/tickets/the-runtime-files-stand-apart]]. What this ticket adds is what
+kept that split from showing:
+
+| what stood | what stands now |
+|---|---|
+| the index binary rebuilds off its own absence | it rebuilds where its source stands newer, the way the language server does |
+| a binary older than the split skipped the private folder whole | the walk reads the private folder, and skips the runtime half alone |
+| every log line woke the watch | the watch stands off the log, and the walk still reads it |
+
+The owner's ruling on the log holds, so the log stays beside the work a reader
+reads. The private half the engine has yet to give up waits on a note under the
+private tickets. A live hook and the editor both spell those names.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the ask: the runtime half stands, and the note names what waits
+- the cleanup it reveals: the index binary rebuilds off its own age, so a stale one stops lying
+- the folder's name stands in `folders.js`, and the index spells it beside its reason
 
 # Discussion
 
