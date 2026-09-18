@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 steps:
   - name: answer
@@ -42,6 +42,18 @@ record:
     hand: box dd2a59294365 · claude-code-remote · the owner says so
     hash_before: bf011f342ad11c5363a262f4d214e13c22f4de41
     hash_after: bf011f342ad11c5363a262f4d214e13c22f4de41
+  - step: do
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: d0ab2a80a51a60be1233ac23278a8381966dab88
+    hash_after: d0ab2a80a51a60be1233ac23278a8381966dab88
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 25 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: 82 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -126,11 +138,15 @@ So the change is smaller than the ask reads. The side already stands almost ever
 
 <!-- the form is command -->
 
+./RUNME.sh branch test
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
@@ -138,11 +154,42 @@ So the change is smaller than the ask reads. The side already stands almost ever
 
 <!-- the form is text -->
 
+The one list is the lint's own answer, and nothing writes a second one. So one thing feeds:
+
+- the problems panel, which the language server draws
+- both push doors, over the files a push carries
+- the refactoring hand, over the tree
+
+**A rule carries its side.** `spec/schemas/paragraph.schema.yaml` gains a `rules` map, keyed by the rule file the projection writes. A rule the map leaves out reads `error`, so every rule stands where it stands today.
+
+| what | where |
+|---|---|
+| the map | `spec/schemas/paragraph.schema.yaml`, beside the layers |
+| its type | `spec/schemas/paragraph.schema.schema.json` |
+| the one place that writes the line | `sideOf` in `.claude/skills/level0/lib/paragraph.js` |
+
+Each rule builder keeps writing its own `level` line, and `put` rewrites that line off the map. So one function owns the side, whichever builder makes the body.
+
+**Both push doors read the lint.** They read it over the files the push carries, so a warning standing elsewhere in the tree holds no push.
+
+| door | what it runs |
+|---|---|
+| `src/scripts/prepush.js` | the lint over the names the range carries, through `lintedBy` |
+| `src/bridge/bash.js` | the same, over the names no remote holds, through `warningsOnPush` |
+
+`.claude/skills/level0/lib/warnings.js` owns the filter and the refusal, so both doors say one thing. The refusal names each file, each rule, and the command that reads them.
+
+**Why the lint and no record.** A record a write fills holds what a write met, and the panel draws what the tree holds. The two drift the moment a hand edits a file outside a session. The lint reads the tree, so one answer serves every reader.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the answer: the lint is the one list, and both doors read what a push carries
+- the cleanup the change reveals is in the change: the three hand-written folders need none, each carrying its side
+- every fact stands in one place: the side's owner is `sideOf`, and the filter's owner is the warnings module
 
 # Discussion
 

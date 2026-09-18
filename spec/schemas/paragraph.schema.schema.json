@@ -14,6 +14,11 @@
       "unit": "refusals of one phrase in one session",
       "help": "The count past which a rule refusing the same phrase writes a warn row naming itself."
     },
+    "rules": {
+      "type": "object",
+      "additionalProperties": { "type": "string", "enum": ["error", "warning"] },
+      "help": "The side each rule's break stands on, keyed by its rule file without the extension. A rule this map leaves out reads error."
+    },
     "layers": {
       "type": "object",
       "required": [

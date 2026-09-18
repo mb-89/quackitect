@@ -8,6 +8,7 @@ import {
   faultsOf,
   PARAGRAPH,
   rulesFrom,
+  SIDES,
 } from "../../.claude/skills/level0/lib/paragraph.js";
 import {
   faultsIn,
@@ -214,6 +215,32 @@ test("the answer rule holds the opening list, and the prose rule holds none", ()
     },
   });
   assert.match(asked.get("ShapeAnswer.yml"), /has_prefix\(line, "\|"\)/);
+});
+
+// [[spec/tickets/one-list-holds-the-warnings]]
+test("a rule the map names carries that side, and every other rule reads error", () => {
+  const files = rulesFrom({ rules: { Sentence: "warning" } });
+
+  assert.match(files.get("Sentence.yml"), /^level: warning$/m);
+  assert.match(files.get("ListItem.yml"), /^level: error$/m);
+  assert.match(files.get("Characters.yml"), /^level: error$/m);
+});
+
+// [[spec/tickets/one-list-holds-the-warnings]]
+test("a side the map spells wrong reads error, so no rule loses its door", () => {
+  const files = rulesFrom({ rules: { Sentence: "maybe", ListItem: "" } });
+
+  assert.match(files.get("Sentence.yml"), /^level: error$/m);
+  assert.match(files.get("ListItem.yml"), /^level: error$/m);
+  assert.deepEqual(SIDES, ["error", "warning"]);
+});
+
+// [[spec/tickets/one-list-holds-the-warnings]]
+test("the tree's own schema names no side, so every rule it writes reads error", () => {
+  for (const [name, text] of drawn()) {
+    if (!name.endsWith(".yml")) continue;
+    assert.match(text, /^level: error$/m, name);
+  }
 });
 
 // [[spec/design_output/projection#the-list-opens-an-answer]]

@@ -151,7 +151,7 @@ export function rulesFrom(said, banner = "", lists = null) {
   const out = new Map();
   const layers = said?.layers ?? {};
   const answer = said?.registers?.answer ?? {};
-  const put = (name, body) => out.set(name, file(banner, body));
+  const put = (name, body) => out.set(name, file(banner, sided(said, name, body)));
 
   // [[spec/tickets/voice-rules-skip-the-record]]
   const prose = said?.frontmatter?.prose ?? [];
@@ -177,6 +177,21 @@ export function rulesFrom(said, banner = "", lists = null) {
   const words = wordsOf(lists);
   if (words.length) put("Vocabulary.yml", vocabularyRule(layer("vocabulary"), lists));
   return out;
+}
+
+// [[spec/tickets/one-list-holds-the-warnings]]
+export const SIDES = ["error", "warning"];
+const LEVEL = /^level: .*$/m;
+
+// [[spec/tickets/one-list-holds-the-warnings]]
+export function sideOf(said, name) {
+  const held = String(said?.rules?.[String(name).replace(/\.yml$/, "")] ?? "");
+  return SIDES.includes(held) ? held : "error";
+}
+
+// [[spec/tickets/one-list-holds-the-warnings]]
+function sided(said, name, body) {
+  return String(body).replace(LEVEL, `level: ${sideOf(said, name)}`);
 }
 
 function file(banner, body) {

@@ -14,6 +14,13 @@
 kind: paragraph
 misreads: 3
 
+# The side a rule's break stands on, keyed by the rule file the projection
+# writes. A rule this map leaves out reads error, so the write door refuses its
+# break and the push door names it nowhere. A rule reading warning lets the
+# write land, and the lint over the files a push carries names it.
+# [[spec/tickets/one-list-holds-the-warnings]]
+rules: {}
+
 # The frontmatter answers to its own schema, so these rules leave it alone. A
 # key below names a field a person writes prose into, and the rules read the
 # value of that field alone. Every other field is the engine's or the shape's,
