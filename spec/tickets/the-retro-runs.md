@@ -75,7 +75,11 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: sync
+step: split
+record:
+  - step: sync
+    skipped: true
+    why: the box runs off the cloud
 ---
 
 # Ask
