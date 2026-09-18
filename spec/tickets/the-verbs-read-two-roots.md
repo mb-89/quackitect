@@ -139,7 +139,7 @@ The design input [[spec/design_input/a-stub-takes-its-vehicle]] names this group
 
 ### drained
 
-<!-- retro notes, which passes when the private folder is empty -->
+    ./RUNME.sh retro notes
 
 <!-- the form is command -->
 
