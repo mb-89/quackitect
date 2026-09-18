@@ -96,6 +96,16 @@ record:
     hand: the engine
     hash_before: 58f4b6d1241c6e8ebc51d7a2e5d634bd23a8ee41
     hash_after: 58f4b6d1241c6e8ebc51d7a2e5d634bd23a8ee41
+  - step: retro/notes
+    hand: box 4089f1b3b6bc · claude-code-remote
+    hash_before: 48e590507007f45503a163b16d2cd47e1abb8081
+    hash_after: 48e590507007f45503a163b16d2cd47e1abb8081
+    returns: 1
+    why: the children stand open, so the retro reads nothing
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
 ---
 
 # Ask
@@ -195,6 +205,8 @@ at a time, and reaches no row to change it.
 <!-- retro notes, which passes when the private folder is empty -->
 
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
