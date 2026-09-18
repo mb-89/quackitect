@@ -90,7 +90,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box dd2a59294365 · claude-code-remote
@@ -102,6 +102,10 @@ record:
     hash_after: 425880b7dac0cbd15209f1c0c640a89a29f14f89
     returns: 1
     why: "`landed` stages `add -A`, so a sibling's hand-back commits the write this hand leaves in the tree. The range then touches the ticket in hand, and the approach refuses the case the ask passes. Say what the guard does with a hunk this hand wrote.; The verdict leaf takes `read` as form `files`, and `changedSince` spans the first `hash_before` to the tip. A sibling's commit puts its files in that span. Then `formFault` refuses the hand-back for leaving them out. Carry the approach to that guard too.; An empty range and a failed git call both answer no line. The approach gives the two opposite verdicts. Name the `ok` the git door answers as what tells them apart.; The approach refuses a range touching the ticket in hand alone. So this hand's commit under another path passes. The ask refuses this hand's own write, and names no path."
+  - step: design/draft
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 0b8adcd0d15827b6bd51c84bba35c2a9198ba457
+    hash_after: 0b8adcd0d15827b6bd51c84bba35c2a9198ba457
 ---
 
 # Ask
@@ -142,30 +146,37 @@ The box then drops the hold, spawns a second hand, and pays the reading twice. T
 
 <!-- the form is text -->
 
-The guard asks git what moved, in place of whether anything moved.
+Both guards read the commits, in place of the tip, and a commit naming the
+ticket in hand is this hand's.
 
-| what the guard reads today | what it reads |
+| guard | what it reads today | what it reads |
+|---|---|---|
+| `handFaults` | the hold's tip against the branch tip | the subjects between the two, refusing where one names this ticket |
+| `changedSince` | every file the span touches | the files under the commits naming this ticket, and the working tree |
+
+`landed` commits as `<ticket>: <what>`, so the subject is what says whose
+commit it is. One function answers it, beside `changedSince` in
+`src/scripts/pull-writes.js`, and both guards call it.
+
+| the finding | what answers it |
 |---|---|
-| the hold's tip against the branch tip | the files the commits between the two touch |
+| a sibling's `add -A` sweeps this hand's write in | that commit carries the sibling's subject, so the range names this ticket nowhere |
+| the `read` field refuses on a sibling's files | those files stand under a subject this ticket names nowhere, so they leave the span |
+| an empty range reads as a failed call | the git door answers `ok`, and a call that fails refuses, as today |
+| this hand's commit under another path | the subject names the ticket whatever path it carries |
 
-So a verdict hand-back refuses where that range touches the ticket in hand, and
-passes where a sibling's commit touches other files.
-
-| the question | the answer |
-|---|---|
-| why the ticket file | a reader writes its verdict there, and that write is what the rule guards |
-| what a sibling touches | its own ticket, and the files its change carries |
-| where the guard stands | `handFaults`, under `src/scripts/pull-chapter.js` |
-| what answers the range | the git door, at `log --format= --name-only <hold>..<tip>` |
-| what it costs | one git call a verdict hand-back, over a commit or two |
-| a range git reads nowhere | it answers as a move, which keeps today's refusal |
+**What stands outside it.** A hand committing past the verbs writes its own
+subject, and the guard reads the subject alone. The verbs are the road the ask
+names, and a hand off them stands outside this guard.
 
 **The cases.**
 
 - a sibling's commit moves the tip, and the pull takes the verdict
-- a commit touching the ticket in hand moves it, and the pull refuses
+- a commit naming this ticket moves it, and the pull refuses
 - the tip stands where the hold left it, and the pull takes the verdict
-- git answers nothing for the range, and the pull refuses
+- the git call fails, and the pull refuses
+- the `read` field names the files under this ticket's commits, and passes
+- a sibling's files stand outside that list, and the field passes without them
 
 ## review
 
