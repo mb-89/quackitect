@@ -88,7 +88,7 @@ func (t Tree) edits(one twig, col Column) bool {
 // [[spec/design_output/tree-view#the-name-column-nests]]
 func (t Tree) nameOf(one twig) string {
 	if !t.Nests {
-		return one.item.Name
+		return markedName(t, one)
 	}
 	mark := strings.Repeat(" ", markWide)
 	switch {
@@ -97,7 +97,15 @@ func (t Tree) nameOf(one twig) string {
 	case one.kids:
 		mark = "▾ "
 	}
-	return strings.Repeat(" ", one.depth*nestWide) + mark + one.item.Name
+	return strings.Repeat(" ", one.depth*nestWide) + mark + markedName(t, one)
+}
+
+// A marked row draws its mark, so a person reads what a fill reaches. [[spec/design_output/tree-view#a-fill-reaches-the-marks]]
+func markedName(t Tree, one twig) string {
+	if t.marks[one.at] {
+		return "● " + one.item.Name
+	}
+	return one.item.Name
 }
 
 // [[spec/design_output/tree-view#the-view-draws-a-tree]]

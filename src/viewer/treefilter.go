@@ -54,6 +54,10 @@ func (i Item) keys() []string {
 
 // [[spec/design_output/tree-view#a-parent-stands-for-it]]
 func (t *Tree) Narrow(f Filter) {
+	// A mark a person cannot see is a row a fill writes blind. [[spec/design_output/tree-view#a-fill-reaches-the-marks]]
+	if t.filter.Source != f.Source {
+		t.DropMarks()
+	}
 	t.filter = f
 	t.rebuild()
 }

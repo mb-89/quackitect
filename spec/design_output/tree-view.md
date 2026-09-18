@@ -212,6 +212,23 @@ item the tree holds stay one thing.
 The fill reaches every row the view holds at that moment, so a filter says how
 far it goes. A row the filter drops keeps the value it carries.
 
+## A fill reaches the marks
+
+A person marks rows, and a fill standing over marks reaches those rows alone.
+With no mark standing the fill reaches the view, so the plain fill stays what it
+is:
+
+| what a person does | what the view does |
+|---|---|
+| a press on a row | that row takes a mark, and a press again takes it off |
+| shift and a row | every row from the last mark to this one takes one |
+| a fill over marks | the value reaches the marked rows |
+| a change to the filter | every mark goes |
+
+A mark a person cannot see is a row a fill writes blind, so a narrowing drops
+them all. This is how a person moves work between groups: mark the rows, write
+`group` in the cell, and every marked row takes it.
+
 ## A schema refuses a value
 
 `Take` and `Fill` each answer the rows that keep the value they carry. So the

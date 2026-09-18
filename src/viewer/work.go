@@ -199,6 +199,18 @@ func (workTab) Keys(m *model) band {
 			}
 			return nil
 		}},
+		// [[spec/design_output/tree-view#a-fill-reaches-the-marks]]
+		{bind("m M", "mark a row, and M the run from the last mark", "m", "M"), func(m *model, name string) tea.Cmd {
+			if m.work == nil {
+				return nil
+			}
+			if name == "M" {
+				m.work.MarkRun()
+				return nil
+			}
+			m.work.Mark()
+			return nil
+		}},
 	}}
 }
 

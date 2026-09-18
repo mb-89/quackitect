@@ -101,11 +101,7 @@ func (t *Tree) Fill() []string {
 		return nil
 	}
 	said, key := t.edit.input.Value(), t.edit.key
-	where := make([]string, 0, len(t.flat))
-	for _, one := range t.flat {
-		where = append(where, one.at)
-	}
-	left := t.write(where, key, said)
+	left := t.write(t.fillWhere(), key, said)
 	t.edit = nil
 	t.rebuild()
 	return left

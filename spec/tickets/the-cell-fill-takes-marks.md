@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 depends_on: [the-work-tab-draws]
 steps:
@@ -29,6 +29,19 @@ process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 group: the-work-editor-draws
 step: do
+record:
+  - step: do
+    hand: box 4089f1b3b6bc · claude-code-remote
+    hash_before: 7f975f0553e6337cb2dfe71d07950dbb8bd409ac
+    hash_after: 7f975f0553e6337cb2dfe71d07950dbb8bd409ac
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/viewer passes
+      - name: check
+        exit: 0
+        said: 82 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -76,11 +89,15 @@ refusing a value is already said. [[spec/design_output/tree-view#a-schema-refuse
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -88,12 +105,35 @@ refusing a value is already said. [[spec/design_output/tree-view#a-schema-refuse
 
 <!-- the form is text -->
 
+A person marks rows, and a fill standing over marks reaches those rows alone.
+With no mark standing the fill reaches the view, so the plain fill stays what
+it is:
+
+| what a person does | what the view does |
+|---|---|
+| `m` on a row | that row takes a mark, and `m` again takes it off |
+| `M` on a row | every row from the last mark to this one takes one |
+| a fill over marks | the value reaches the marked rows |
+| a change to the filter | every mark goes |
+
+A marked row draws its mark, so a person reads what a fill reaches. A mark a
+person cannot see is a row a fill writes blind, so a narrowing drops them all.
+
+This is how a person moves work between groups: mark the rows, write `group` in
+the cell, and every marked row takes it.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
 
+- the change follows the ask: a fill reads the marks, and the filter takes them off
+- the cleanup it reveals: the fill asks one function for its rows, marked or not
+- the marks stand in `treemark.go`, and the fill and the drawing both read that one
+
+
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+- The mouse reaches a row of the work tree, and `m` and `M` carry the marks
+- An afternoon of edits lands in one press, because the fill reads every mark

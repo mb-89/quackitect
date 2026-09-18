@@ -35,6 +35,8 @@ type Tree struct {
 	sorts   []Sort
 	presets []Preset
 	typed   string
+	marks   map[string]bool
+	last    string
 	edit    *Edit
 	shut    map[string]bool
 	flat    []twig
