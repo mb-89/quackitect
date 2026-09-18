@@ -84,3 +84,4 @@ A box mints a successor `branch unblock` takes, and a test holds that road open.
 - This ticket names no group, so it stands in the pool on trunk.
 - [[spec/tickets/the-successor-names-a-person]] adds the refusal, and names the gap this ticket closes.
 - [[spec/tickets/a-person-reads-the-split]] is the first successor the new process carries.
+- `test/level0/person-step.test.js` covers the wait answer naming the route. The chapter under the design output, and a case over the route itself, stand open.

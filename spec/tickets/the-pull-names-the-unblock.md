@@ -252,3 +252,4 @@ A cloud box clears a person's wall itself, because the pull names the verb that 
 - The owner's call stands: a cloud box blocks on no person. The wall a box meets is what the pull says at that moment.
 - The retros on [[spec/tickets/guidance-rides-the-step]] name this finding once a box, each with its home.
 - `./RUNME.sh branch unblock` clears the wall today, and a box runs it by hand.
+- Trunk carries this change. `unblockPrompt` under `src/scripts/spawn.js` words it, the wait answer prints it, and `test/level0/person-step.test.js` covers it. A hand taking this ticket reads the diff and closes it, or names what it misses.

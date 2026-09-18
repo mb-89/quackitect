@@ -29,7 +29,7 @@ export function unblockPrompt(ticket, leaf) {
     `${ticket} stands at ${leaf.path}, and only a person answers it. Hand it out of this branch, and land the rest.`,
     "",
     "1. Pick a name of five words at most for the question it asks.",
-    "2. Run `./RUNME.sh mint ticket spec/tickets/<name>.md --process=person`, and write that question into its ask.",
+    "2. Run `./RUNME.sh mint ticket spec/tickets/<name>.md --process=question`, and write that question into its ask.",
     "3. Run `./RUNME.sh ticket open <name>`, so a hand can pull it.",
     `4. Run \`./RUNME.sh branch unblock ${ticket} <name>\`. It closes ${ticket} became that ticket, which stands outside this group.`,
     "5. Work every step this group has left, then run `./RUNME.sh branch done`.",

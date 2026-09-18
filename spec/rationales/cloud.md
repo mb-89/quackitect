@@ -80,7 +80,7 @@ process under `spec/processes` opened one, so every successor a hand could mint
 met a refusal. A box that followed the guidance to the letter got that refusal,
 released the branch, and the loop closed again.
 
-`spec/processes/person.yaml` is that route. A hand mints the successor off it,
+`spec/processes/question.yaml` is that route. A hand mints the successor off it,
 and the first step reads `by: person` with nobody assigning it. The pull says so
 too. Where a person's step is the only thing standing, the wait answer names the
 mint, the open and the unblock in order.

@@ -134,7 +134,7 @@ test("the pull names the mint, the open and the unblock where a person's step is
   assert.match(said, /a-child waits for a person at design\/person-1/);
   assert.match(
     said,
-    /--process=person/,
+    /--process=question/,
     "the answer names the route a successor takes",
   );
   assert.match(said, /ticket open <name>/, "the answer opens the successor");
@@ -151,6 +151,6 @@ test("the prompt names one route, and that route opens under a person", () => {
   const said = unblockPrompt("a-child", { path: "design/person-1" });
 
   assert.match(said, /a-child stands at design\/person-1/);
-  assert.equal(said.includes("--process=person"), true);
+  assert.equal(said.includes("--process=question"), true);
   assert.match(said, /Stop for no person\./);
 });
