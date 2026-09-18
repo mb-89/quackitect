@@ -90,7 +90,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 76b837882ffc68781c948011510418618edf8a09
+    hash_after: 76b837882ffc68781c948011510418618edf8a09
 ---
 
 # Ask
@@ -130,6 +135,24 @@ in its hands.
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+One function stands in `.claude/skills/level0/lib/ticket.js`, which the write door already imports:
+
+    writesHere(front, path, hand) -> { writes, why }
+
+It takes a ticket's frontmatter, a leaf path and a hand, and answers whether that hand writes there. The hand is the shape the pull already builds: `{ agent, ownerSays }`.
+
+The leaf's `by` comes from the walk, because a leaf takes the field off its nearest ancestor. That walk stands in `src/scripts/pull-route.js` today, and the door reaches no module under `src/scripts`. So the walk moves beside the function, and `pull-route.js` takes it from there. Its callers change nothing, because the module keeps its exports.
+
+| caller | where it calls | what it does with the answer |
+|---|---|---|
+| `admits` in `src/scripts/pull-hand.js` | at the hand-out | hands the leaf on, or names the wait |
+| `takeable` in `src/scripts/pull-hand.js` | while it picks a ticket | walks past a ticket this hand writes nowhere |
+| a new check in `src/bridge/write.js` | before a chapter lands | refuses the write, naming the leaf and its `by` |
+
+The door reads the ticket's `step` and `steps` for the schema check already. So it hands the same frontmatter in. The check runs on a write to a ticket alone, and the chapter the write lands under names the leaf.
+
+The refusal says the same words at both doors, because one function writes them. A hand meeting it at the write meets it before the work, in place of after.
 
 ## review
 
