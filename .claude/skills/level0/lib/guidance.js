@@ -4,6 +4,9 @@
 
 export const CHAPTERS = ["Motivation", "Actionables", "Discussion"];
 
+// The opening of a scope entry naming the hand it binds. [[spec/tickets/the-spawn-reaches-its-guidance]]
+const KIND = /^([a-z][a-z0-9-]*):\s/;
+
 const CANARY =
   /level0 holds this session: \d+ rules?, \d+ notes?, the stop hook (?:on|off)\./;
 
@@ -107,6 +110,42 @@ export function actionables(text) {
   }
   if (held) out.push(held);
   return out.map((one) => one.replace(/\s*\*$/, "").trim()).filter(Boolean);
+}
+
+// The entries of a note's scope, whether the frontmatter writes them inline or one to a line. [[spec/tickets/the-spawn-reaches-its-guidance]]
+export function scopesIn(text) {
+  const said = parse(text).front.scope;
+  if (!said) return [];
+  if (Array.isArray(said)) return said.map(bare).filter(Boolean);
+  const quoted = [...String(said).matchAll(/"([^"]*)"|'([^']*)'/g)].map((one) => one[1] ?? one[2]);
+  return (quoted.length ? quoted : [bare(said)]).filter(Boolean);
+}
+
+// A scope entry opening `<kind>:` binds the note to the hand of that kind, and a note naming no kind reaches every layer. [[spec/tickets/the-spawn-reaches-its-guidance]]
+export function kindsOf(text) {
+  const found = scopesIn(text)
+    .map((one) => KIND.exec(one)?.[1])
+    .filter(Boolean);
+  return [...new Set(found)];
+}
+
+// One layer a kind: the notes binding that kind, beside the notes binding none. [[spec/tickets/the-spawn-reaches-its-guidance]]
+export function layersOf(notes) {
+  const all = [notes ?? []].flat();
+  const free = all.filter((one) => !kindsOf(one.text).length);
+  const out = {};
+  for (const kind of new Set(all.flatMap((one) => kindsOf(one.text)))) {
+    const held = all.filter((one) => kindsOf(one.text).includes(kind));
+    out[kind] = standingLayer([...free, ...held]);
+  }
+  return out;
+}
+
+function bare(said) {
+  return String(said ?? "")
+    .trim()
+    .replace(/^["'[]+|["'\],]+$/g, "")
+    .trim();
 }
 
 // [[spec/design_output/level0#guidance-a-variable-switches-on]]

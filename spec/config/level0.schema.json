@@ -241,6 +241,34 @@
         }
       }
     },
+    "refactor": {
+      "comment": "The refactoring hand the stop door starts beside the vote, while the warnings stand past the number.",
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "parallel": {
+          "type": "boolean",
+          "help": "true starts the hand beside the work. false leaves the list to the session itself."
+        },
+        "mostWarnings": {
+          "type": "number",
+          "unit": "warnings",
+          "help": "The warnings the tree holds before the rule fires. 0 switches the rule off."
+        },
+        "mostAtOnce": {
+          "type": "number",
+          "unit": "hands",
+          "help": "The hands one session starts. 0 lifts the bound."
+        },
+        "untouchedFor": {
+          "type": "string",
+          "unit": "span, as 30m, 12h or 7d",
+          "help": "The span a file stands untouched before a hand takes it."
+        }
+      }
+    },
     "engine": {
       "comment": "Level one. Each key here names a widget nothing draws yet, because an engine has to answer it first. Marking a group is what draws one.",
       "type": "object",

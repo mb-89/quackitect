@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { guidanceHere } from "../../src/bridge/guidance.js";
+import { guidanceHere, layerHere } from "../../src/bridge/guidance.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { heldReadsIn } from "../../src/scripts/guidance-hand.js";
 
@@ -17,6 +17,9 @@ const VOICE =
   "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Say what is. *\n2. Put the bottom line first.\n";
 const WORKING =
   "---\nkind: [[guidance]]\n---\n\n# Actionables\n\n1. Answer the owner first. *\n";
+// A note whose scope names the hand it binds. [[spec/tickets/the-spawn-reaches-its-guidance]]
+const REFACTORING =
+  '---\nkind: [[guidance]]\nscope: ["refactor: the hand a session starts"]\n---\n\n# Actionables\n\n1. Take the one file your prompt names.\n';
 const ENV = { CLAUDECODE: "1" };
 
 const hold = (reads) => ({
@@ -100,6 +103,29 @@ test("a spawned helper carries the layer whole, because its own hold stands else
 
   assert.match(said.helper, /Say what is\./);
   assert.match(said.helper, /Answer the owner first\./);
+});
+
+// [[spec/tickets/the-spawn-reaches-its-guidance]]
+test("a note binding a kind stands off the session and the helper, and its own layer holds it", () => {
+  const disk = boxed(disks({ [join(METHOD, "spec/guidance/refactoring.md")]: REFACTORING }));
+
+  const said = guidanceHere(disk, METHOD, ENV, true, WORK);
+
+  assert.ok(!/Take the one file/.test(said.standing), "the working hand reads it nowhere");
+  assert.ok(!/Take the one file/.test(said.helper), "a helper reads it nowhere");
+  assert.match(said.layers.refactor, /Take the one file/);
+  assert.match(said.layers.refactor, /Say what is\./);
+  assert.equal(said.notes, 2, "the canary counts what the session holds");
+});
+
+// [[spec/tickets/the-spawn-reaches-its-guidance]]
+test("a spawn names its kind, and the layer of that kind reaches that hand alone", () => {
+  const guidance = { standing: "the session", helper: "a helper", layers: { refactor: "the hand" } };
+
+  assert.equal(layerHere(guidance, "refactor"), "the hand");
+  assert.equal(layerHere(guidance, ""), "a helper");
+  assert.equal(layerHere(guidance, "nobody"), "a helper");
+  assert.equal(layerHere({ standing: "the session" }, "refactor"), "the session");
 });
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]

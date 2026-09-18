@@ -19,9 +19,12 @@ export function stampOf(text) {
       ok: read.ok === true,
       clean: read.clean === true,
       at: String(read.at ?? ""),
+      // What the lint left standing at warning, which the refactoring rule reads. [[spec/tickets/the-spawn-reaches-its-guidance]]
+      warnings: Number(read.warnings ?? 0),
+      files: [read.files ?? []].flat().map(String).filter(Boolean),
     };
   } catch {
-    return { sha: "", ok: false, clean: false, at: "" };
+    return { sha: "", ok: false, clean: false, at: "", warnings: 0, files: [] };
   }
 }
 

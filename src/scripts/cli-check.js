@@ -28,6 +28,8 @@ import { TOOLS, WANTED } from "../../.claude/skills/level0/lib/tools.js";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { CONFIG, fromJson } from "../../.claude/skills/level0/lib/vale.js";
 import { POINTER, PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
+import { filesOn } from "../../.claude/skills/level0/lib/warnings.js";
+import { warningsStood } from "./cli-read.js";
 import {
   faultsIn as faultsInGrid,
   RULE as GRID,
@@ -348,12 +350,18 @@ export function portHere() {
 export function stamped(code) {
   const sha = it.git.run(["rev-parse", "HEAD"], true).out;
   const clean = !it.git.run(["status", "--porcelain"], true).out;
+  // The list the lint left, so a door reading the stamp counts the warnings without a lint of its own. [[spec/tickets/the-spawn-reaches-its-guidance]]
+  const stood = warningsStood();
+  const said = {
+    sha,
+    ok: code === 0,
+    clean,
+    at: it.clock.now().toISOString(),
+    warnings: stood.length,
+    files: filesOn(stood),
+  };
   files.makeDir(join(root, ".se"));
-  files.write(
-    join(root, STAMP),
-    `${JSON.stringify({ sha, ok: code === 0, clean, at: it.clock.now().toISOString() }, null, 2)}
-`,
-  );
+  files.write(join(root, STAMP), `${JSON.stringify(said, null, 2)}\n`);
   return code;
 }
 

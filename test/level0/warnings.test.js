@@ -5,8 +5,11 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
+  drains,
   filesOn,
   refusedWarnings,
+  standsPast,
+  takesFile,
   WARNING,
   warningsOn,
 } from "../../.claude/skills/level0/lib/warnings.js";
@@ -68,6 +71,34 @@ test("a push carrying a file at warning is refused, and one carrying none passes
   assert.match(holds(refsIn(toWork), "", carried, warned).said, /a\.md/);
   assert.deepEqual(holds(refsIn(toWork), "", carried, clean), { code: 0, said: "" });
   assert.deepEqual(holds(refsIn(toWork), "", carried), { code: 0, said: "" });
+});
+
+// [[spec/tickets/the-spawn-reaches-its-guidance]]
+test("the list stands past the number where the count runs over it", () => {
+  assert.equal(standsPast(26, 25), true);
+  assert.equal(standsPast(25, 25), false);
+  assert.equal(standsPast(99, 0), false);
+});
+
+// [[spec/tickets/the-spawn-reaches-its-guidance]]
+test("the hand takes the oldest file outside the window, and none inside it", () => {
+  const now = 1_800_000_000;
+  const week = 604_800;
+  const wrote = { "a.md": now - week * 2, "b.md": now - week * 3, "c.md": now - 60 };
+
+  assert.equal(takesFile(["a.md", "b.md", "c.md"], wrote, now, week), "b.md");
+  assert.equal(takesFile(["c.md"], wrote, now, week), "");
+  assert.equal(takesFile(["d.md"], wrote, now, week), "");
+  assert.equal(takesFile([], wrote, now, week), "");
+});
+
+// [[spec/tickets/the-spawn-reaches-its-guidance]]
+test("the prompt the hand reads names one file and the verbs over it", () => {
+  const said = drains("spec/guidance/voice.md");
+
+  assert.match(said, /spec\/guidance\/voice\.md/);
+  assert.match(said, /RUNME\.sh lint/);
+  assert.match(said, /RUNME\.sh fix/);
 });
 
 // A warning outside the files a push carries holds no push. [[spec/tickets/one-list-holds-the-warnings]]

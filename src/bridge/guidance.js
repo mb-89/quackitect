@@ -13,6 +13,8 @@ import {
   envOf,
   forHelper,
   HEARD,
+  kindsOf,
+  layersOf,
   OWES,
   standingLayer,
   styled,
@@ -36,12 +38,15 @@ export function guidanceHere(disk, root, env = process.env, tooth = true, work =
   const here = notes.filter((one) => bindsHere(one.text, bound));
   // A note the held step hands over rides the step, so the layer hands it no second time. [[spec/design_output/level0#the-standing-layer]]
   const read = heldReadsIn(disk, join, work, env);
+  // A note naming a kind stands off the working hand, and the layer of that kind holds it. [[spec/tickets/the-spawn-reaches-its-guidance]]
+  const free = here.filter((one) => !kindsOf(one.text).length);
   // [[spec/design_output/level0#the-style-carries-a-note]]
-  const session = here.filter((one) => !styled(one.text));
+  const session = free.filter((one) => !styled(one.text));
   const counts = countsOf(carried(session, read));
   return {
     standing: standingLayer(session, read),
-    helper: standingLayer(here),
+    helper: standingLayer(free),
+    layers: layersOf(here),
     ...counts,
     sentence: canary({ ...counts, stop: tooth }),
   };
@@ -192,10 +197,18 @@ export function onSessionCompact(e, box) {
 
 // [[spec/design_output/level0#the-helper-takes-the-guidance]]
 export function onAgentSpawn(e, box) {
-  const standing = box.guidance?.helper ?? box.guidance?.standing ?? "";
+  const kind = String(e?.kind ?? "");
+  const standing = layerHere(box.guidance, kind);
   if (!standing) return { pass: true };
-  box.log.say("info", "agent", `handed the guidance to ${e?.subagentType ?? "a helper"}`, {
+  box.log.say("info", "agent", `handed the ${kind || "helper"} layer to ${e?.subagentType ?? "a helper"}`, {
     detail: String(e?.description ?? ""),
   });
   return { event: { ...e, prompt: forHelper(standing, e?.prompt) } };
+}
+
+// The spawn names its kind, and the layer of that kind reaches that hand. A spawn naming none takes the helper layer. [[spec/tickets/the-spawn-reaches-its-guidance]]
+export function layerHere(guidance, kind) {
+  const held = guidance?.layers?.[String(kind ?? "")];
+  if (held) return held;
+  return guidance?.helper ?? guidance?.standing ?? "";
 }

@@ -19,6 +19,7 @@ import {
   fromJson,
   unreasoned,
 } from "../../.claude/skills/level0/lib/vale.js";
+import { WARNING } from "../../.claude/skills/level0/lib/warnings.js";
 import { withoutFalsePast } from "../bridge/tense.js";
 import { gridFaults, serverFaults, treeHere } from "./cli-check.js";
 import {
@@ -33,6 +34,13 @@ import {
   run,
   SHOWN,
 } from "./cli-doors.js";
+
+// What the last lint left standing at warning. The stamp takes it, and the stop door reads the stamp. [[spec/tickets/the-spawn-reaches-its-guidance]]
+let stood = [];
+
+export function warningsStood() {
+  return stood;
+}
 
 export function version() {
   try {
@@ -80,6 +88,7 @@ export function readThroughTheReader(found) {
 }
 
 export async function lint(where) {
+  stood = [];
   if (!files.exists(bin)) {
     console.error("Vale is missing. Run ./RUNME.sh once and it installs.");
     return 2;
@@ -177,7 +186,8 @@ export async function lint(where) {
   console.log(`${String(found.length).padStart(COL.count)}  in all`);
 
   // [[spec/design_output/schema#warning-now-and-error-later]]
-  const refused = found.filter((one) => one.severity !== "warning").length;
+  stood = found.filter((one) => one.severity === WARNING);
+  const refused = found.length - stood.length;
   if (refused) return 1;
   console.log("");
   console.log(

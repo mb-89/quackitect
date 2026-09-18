@@ -95,10 +95,20 @@ async function seen($, e, next) {
   }
   if (Array.isArray(answer.register)) await registers($, answer.register);
   if (answer.needs === "reply") return spoke($, e, next);
+  if (answer.spawn !== undefined && (answer.result !== undefined || answer.pass)) {
+    return besides($, answer, e, next);
+  }
   if (answer.spawn !== undefined) return spawns($, answer, next);
   if (answer.result !== undefined) return answer.result;
   if (answer.event !== undefined) return next(answer.event);
   if (answer.after !== undefined) return merged(await next(e), answer.after);
+  return next(e);
+}
+
+// A door answering a vote and a hand in one: the hand runs, and the vote stands as the answer. [[spec/tickets/the-spawn-reaches-its-guidance]]
+export async function besides($, answer, e, next) {
+  await spawns($, answer, next);
+  if (answer.result !== undefined) return answer.result;
   return next(e);
 }
 

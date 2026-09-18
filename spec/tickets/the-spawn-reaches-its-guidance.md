@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 steps:
   - name: answer
@@ -42,6 +42,18 @@ record:
     hand: box dd2a59294365 · claude-code-remote
     hash_before: 039f29da1acb76ddd82b6e95d5415fd2c916016a
     hash_after: 039f29da1acb76ddd82b6e95d5415fd2c916016a
+  - step: do
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 1b385ad2826d13c230b12e826efefee9ffd12882
+    hash_after: 1b385ad2826d13c230b12e826efefee9ffd12882
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 45 test(s) pass in 5 file(s)
+      - name: check
+        exit: 0
+        said: 83 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -126,11 +138,15 @@ The stop door starts the hand, the session waits on it, and the spawn carries it
 
 <!-- the form is command -->
 
+./RUNME.sh branch test
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
@@ -138,13 +154,63 @@ The stop door starts the hand, the session waits on it, and the spawn carries it
 
 <!-- the form is text -->
 
+The stop door starts a refactoring hand beside its vote, and that hand reads a
+note the working session reads nowhere.
+
+| what lands | where |
+|---|---|
+| the rule `warnings-stand-past-the-number` | `spec/config/stop/level0.yml` |
+| the check it names, and the hand the door starts | `src/bridge/stop.js` |
+| the answer carrying a vote and a spawn at once | `.claude/skills/level0/hooks/level0.js` |
+| the layer a kind takes | `src/bridge/guidance.js` |
+| the four keys under `refactor` | `spec/config/level0.json` |
+| the note that hand reads | `spec/guidance/refactoring.md` |
+
+**How the door counts.** `./RUNME.sh check` writes what the lint left standing
+into the stamp, and the door reads the stamp. So a turn's end counts the list
+and lints nothing.
+
+**How the hand picks its file.** The stamp names the files, and the git door
+answers each one's last write.
+
+| what `takesFile` reads | what it does |
+|---|---|
+| a file written inside `refactor.untouchedFor` | it stands past this hand |
+| the rest | the oldest goes |
+
+**How one answer carries both.** `seen` took the spawn branch and dropped the
+result beside it, so a door voting and spawning lost its vote. `besides` runs
+the hand and answers the vote.
+
+**How the note reaches that hand.** A scope entry opening `refactor:` binds its
+note to a hand of that kind. `guidanceHere` builds one layer a kind, the free
+notes ride every layer, and `onAgentSpawn` reads the spawn's `kind`.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
 
+- the change follows the answer, and the discussion says where it departs
+- the cleanup it reveals is in the change: the stamp gains the list the door reads
+- every fact stands in one place: `warnings.js` owns the list, and `guidance.js` owns the layers
+
 # Discussion
+
+Where the change departs from the answer: one answer carries the vote and the
+hand, in place of a second call.
+
+| what the answer says | what the change does |
+|---|---|
+| a second answer beside the vote starts the hand | the door answers `spawn` beside `result`, and `besides` runs both |
+
+The reason the answer gave for a second call was `seen` taking the `spawn`
+branch first and dropping `result`. `besides` fixes that branch, so the second
+call buys a round trip and nothing else.
+
+The list the door counts stands in the check stamp, which `./RUNME.sh check`
+now writes. A box whose check has yet to run counts nothing, and starts no hand.
 
 - [[spec/tickets/the-hook-spawns-a-refactorer]] hands this over at `design/person-1`, which waits for a person.
   - design/review failed back 2 times. One answer leaves the stop door: `seen` takes the `spawn` branch, dropping `result`.
