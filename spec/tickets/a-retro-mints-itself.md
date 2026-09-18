@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/tests-red
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -132,6 +132,17 @@ record:
     hand: box d42624a67d18a8 · claude-code · helper-24
     hash_before: 230cc6130a5a5149e96d6ba8ada96f55a6acc025
     hash_after: 230cc6130a5a5149e96d6ba8ada96f55a6acc025
+  - step: implement/tests-red
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 8fae8a2f84c19611ecac1e38f515326adc484bbe
+    hash_after: 8fae8a2f84c19611ecac1e38f515326adc484bbe
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 5 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 group: the-retro-runs
 depends_on: ["the-retro-takes-the-box"]
 ---
@@ -268,19 +279,31 @@ The caution stands answered: `new` is the row the verb list gains, and `collect`
 
 ### tests
 
-<!-- the same tests pass -->
+    ./RUNME.sh branch test test/level0/retro-new.test.js test/level0/projection.test.js
 
 <!-- the form is command -->
 
 ### seen
 
-<!-- what you see, and what surprises you -->
+Five cases stand, and each one fails on its own assertion.
 
-<!-- the form is text -->
+| the case | what it asks |
+|---|---|
+| the mint writes | a ticket off the retro route, named for the commit it stands on |
+| the mint opens | the ticket reads open, at the route's first leaf |
+| the mint takes words | the reason lands in the ask, and a hand names its own |
+| the mint refuses | a name a ticket holds already stops it, and nothing writes over |
+| the owner lookup | two entries share one folder, and each owns what it writes |
+
+What surprises me is how little the verb owes. The mint, the open and the pull each stand already, so the verb calls three things and prints none of their words.
+
+The owner lookup takes the harder half. An entry naming no `writes` owns its whole target, as every entry does today, so the key adds a road and closes none.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change touches no file the ask leaves out. One case file lands, and the projection cases take one more.
+- every door the change reaches has a fake. The cases drive the fake disk, the fake git and the fake clock.
+- a comment names the approach the change implements. Each header points at the chapter ruling it.
 
 <!-- the form is checklist -->
 
