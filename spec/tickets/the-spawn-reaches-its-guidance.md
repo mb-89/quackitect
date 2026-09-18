@@ -36,7 +36,12 @@ steps:
 process: [[spec/processes/question]]
 process_hash: 1f3006ec4b044a89
 group: the-warnings-feed-a-refactorer
-step: answer
+step: do
+record:
+  - step: answer
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: 039f29da1acb76ddd82b6e95d5415fd2c916016a
+    hash_after: 039f29da1acb76ddd82b6e95d5415fd2c916016a
 ---
 
 # Ask
@@ -82,6 +87,34 @@ One name clashes beside all this: `refactor.mostInARow` counts hands, and `stop.
 <!-- the answer, which the step behind this one reads -->
 
 <!-- the form is text -->
+
+The stop door starts the hand, the session waits on it, and the spawn carries its own kind. So:
+
+| the question | the answer |
+|---|---|
+| which door starts the hand | the stop door, through a second answer beside the vote |
+| what the session does while it runs | it waits, and the ask's "costs no turns" reads as costs no turn of its own |
+| what field a layer lands on | `kind`, which the spawn carries beside `subagentType` |
+| what the count takes for a name | `refactor.mostAtOnce`, which counts hands |
+
+**Why the stop door starts it.** `seen` takes the `spawn` branch before it reads `result`, so one answer carries one of the two.
+
+- the door answers the vote's block, and a second call starts the hand
+- the hook already runs two calls in a turn, so the road stands
+
+**Why the session waits.** `spawns` awaits the call, and unpicking that reaches past this ask. The gain the ask names holds anyway.
+
+| what the ask wants | what this gives |
+|---|---|
+| the cleaning costs the work no turns | the work spends no turn choosing what to clean, and none cleaning it |
+| the session carries on | it carries on the moment the hand lands, inside one turn |
+| the wait goes | a later ticket takes it off, where the owner wants it off |
+
+**Why a field and no kind guess.** `onAgentSpawn` reads the spawn, and the review spawn names `general-purpose` too. So the refactoring spawn sets `kind: "refactor"`, and the layer lands on that. A spawn naming no kind takes the helper layer, as today.
+
+**What reads a note's scope.** `guidanceHere` starts reading it, and builds one layer a kind. A note naming no scope reaches every layer, which is what the notes do today.
+
+**The count.** `stop.mostInARow` counts turns, so the new key reads `refactor.mostAtOnce` and counts hands. Two names, two things.
 
 # do
 
