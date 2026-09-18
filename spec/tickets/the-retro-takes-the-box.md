@@ -355,3 +355,7 @@ The earlier findings close, apart from the walk's order. These stand:
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- The owner answers `design/person-1` in the chat, and rules the runtime folder the skip.
+- The owner then tells this session to record that answer and run the hand-back.
+- So the record names an agent a person tells, and the words under it are the owner's own.
