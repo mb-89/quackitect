@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: design/settle-1
+step: design/draft
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -130,6 +130,10 @@ record:
     hash_after: 2d6ab7b0992eefb0891867cc00f3cf46de1ae73a
     returns: 2
     why: One gap stands, and the rest of the approach answers the ask.; | the gap | the fix |; |---|---|; | the route runs `notes` ahead of `readers`, so the drain meets every chapter open | name the field the drain reads a chapter by, and passes |; | the earlier finding | what closes it |; |---|---|; | a chapter reads as an open note | the folder stands named, and the gap above holds the rest |; | the cut reads the log alone | the times come off both sources, and a box naming no transcript folder cuts off the log |; | what answers the ask | where |; |---|---|; | the window opens at the last retro's close, or at the first commit | the opens row |; | a chapter is six hours, and a span holding no row stands nowhere | the cuts row |; | the counts carry every kind the ask names, and a missing source reads zero | the counts table |; | a chapter mints off the chapter route, with its window and counts written first | the mints row |; `./RUNME.sh check` exits 0 on this branch.
+  - step: design/settle-1
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: b5afe14aac6e19e0cd0474251e4d04e78733765c
+    hash_after: b5afe14aac6e19e0cd0474251e4d04e78733765c
 group: the-retro-runs
 depends_on: ["the-retro-takes-the-box"]
 ---
@@ -165,7 +169,15 @@ One hand reads a window of any length. The reading thins as the window grows, an
 
 ### answer
 
-<!-- the decision, and why it stands -->
+The finding stands. The draft says the drain passes a chapter by, and names nothing it reads to tell one.
+
+| what the drain reads today | what it reads after |
+|---|---|
+| every note under the private tickets folder whose state stands open | the same, past a note whose process is the chapter route |
+
+The field is the `process` link the mint writes. A chapter carries the chapter route, and a note a hand parks carries the note route. So the drain tells them apart by the one field the mint fills.
+
+A wrong answer here costs a commit inside this branch, so this hand settles it and hands nothing out.
 
 <!-- the form is text -->
 
