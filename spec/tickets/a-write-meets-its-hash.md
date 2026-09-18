@@ -90,12 +90,18 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box a5e189c39e1d · claude-code-remote
     hash_before: fbf290dec7c5a1237d581ad2f9425659877475b7
     hash_after: fbf290dec7c5a1237d581ad2f9425659877475b7
+  - step: design/review
+    hand: box a5e189c39e1d · claude-code-remote · helper-2
+    hash_before: 8e69a0d6b0cf5a9e2d1a753357dd32e722cf20b8
+    hash_after: 8e69a0d6b0cf5a9e2d1a753357dd32e722cf20b8
+    returns: 1
+    why: The stamp table one box shares reads the same for every hand, so a stale write still lands.; the shared table holds one stamp a path, so one hand writing refreshes the stamp the other hand reads; the second hand then agrees with the disk and lands its stale write, which is the loss the ask names; key the stamp by hand and by path, and name the token a hand carries. The bridge reads `e.agentId` alone; a path holding no stamp passes, so refuse an unstamped write where the disk holds the file; the door runs ahead of the write, so a stamp written there outlives a write `codeDoor` refuses; the formatter rewrites a `Write` inside `codeDoor`, so a stamp of the raw text refuses the next edit; `refusal` opens on the voice rules, so this door owes its own wording beside `refusedTicket` and `refusedPrivate`; the box holds the table in memory, and a server restart empties it. Say what the door does there; `hashText` serves the process hash in the schema lane, and the projection lane compares whole texts
 ---
 
 # Ask
@@ -151,6 +157,18 @@ server. So the session and the refactoring hand read one map of stamps.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail. The stamp table one box shares reads the same for every hand, so a stale write still lands.
+
+- the shared table holds one stamp a path, so one hand writing refreshes the stamp the other hand reads
+- the second hand then agrees with the disk and lands its stale write, which is the loss the ask names
+- key the stamp by hand and by path, and name the token a hand carries. The bridge reads `e.agentId` alone
+- a path holding no stamp passes, so refuse an unstamped write where the disk holds the file
+- the door runs ahead of the write, so a stamp written there outlives a write `codeDoor` refuses
+- the formatter rewrites a `Write` inside `codeDoor`, so a stamp of the raw text refuses the next edit
+- `refusal` opens on the voice rules, so this door owes its own wording beside `refusedTicket` and `refusedPrivate`
+- the box holds the table in memory, and a server restart empties it. Say what the door does there
+- `hashText` serves the process hash in the schema lane, and the projection lane compares whole texts
 
 # implement
 
