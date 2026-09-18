@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 depends_on:
   - a-rule-carries-its-side
 urgency: now
@@ -142,6 +142,11 @@ record:
       - name: check
         exit: 0
         said: 81 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box dd2a59294365 · claude-code-remote · helper-9
+    hash_before: 5c2fed67209bd93d384093a0c7f5612c7290a79c
+    hash_after: 5c2fed67209bd93d384093a0c7f5612c7290a79c
+reason: done
 ---
 
 # Ask
@@ -405,17 +410,74 @@ Two claims the change keeps carry a case each:
 
 <!-- the form is files -->
 
+- .claude/skills/level0/lib/stop.js
+- HANDOVER.md
+- spec/config/stop/level0.yml
+- spec/design_output/pull.md
+- spec/design_output/stop.md
+- spec/design_output/work.md
+- spec/guidance/cloud.md
+- spec/guidance/guidance.md
+- spec/guidance/working.md
+- spec/processes/retro.yaml
+- spec/rationales/cloud.md
+- spec/rationales/guidance.md
+- spec/rationales/working.md
+- spec/tickets/a-return-asks-another-hand.md
+- spec/tickets/one-list-holds-the-warnings.md
+- spec/tickets/retro-018ba26.md
+- spec/tickets/the-hook-spawns-a-refactorer.md
+- spec/tickets/the-panel-draws-every-file.md
+- spec/tickets/the-spawn-reaches-its-guidance.md
+- src/lsp/lsp.go
+- src/lsp/sweep_test.go
+- src/scripts/pull-hand.js
+- src/scripts/pull-writes.js
+- src/scripts/pull.js
+- src/scripts/work-stands.js
+- src/scripts/work.js
+- test/contract/pull-payload.test.js
+- test/contract/stop-rules.test.js
+- test/level0/pull-steps.test.js
+- test/level0/stop.test.js
+- test/level0/work.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- `./RUNME.sh check` exits 0, and the warnings stand where the panel draws them.
+- `./RUNME.sh branch test` answers green, and the Go tests under the server pass.
+- `./RUNME.sh branch review` answers nothing to fix.
+- `initialized` runs the sweep, groups each finding by file, and publishes one message a file.
+- I ran the new cases against the server before the change, and the sweep cases fail there.
+- The cases that passed already pass on both sides, and each pins a claim the change could drop.
+- A drawn path names its source, so each clear loop walks the paths it owns.
+- The open path always enters the found map, so a clean buffer clears its own drawing.
+- A parked file draws nothing, and a case holds that.
+- An open buffer answers ahead of the disk, and a case holds that.
+- The implement commits touch the server, its new tests and this ticket, and nothing else.
+- The rest of the window comes from trunk taken in, and from the group's other children.
+- Those hunks redesign nothing this ask holds.
+- No retro stands in the handover, which names it as what the next hand carries.
+
+The findings, which cost no return:
+
+- A swept file opened and then closed draws nothing after, and nothing sweeps it again.
+- So redraw the disk copy on a close, or run the sweep again there.
+- The server points at a heading `spec/design_output/lsp` lacks, which [[spec/tickets/a-pointer-names-its-heading]] owns.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every new fact stands in one place: the server file holds it, and its comments point at this ticket
 
 # Discussion
 
