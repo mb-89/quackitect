@@ -90,12 +90,18 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box dd2a59294365 · claude-code-remote
     hash_before: 76b837882ffc68781c948011510418618edf8a09
     hash_after: 76b837882ffc68781c948011510418618edf8a09
+  - step: design/review
+    hand: box dd2a59294365 · claude-code-remote · helper-2
+    hash_before: eac3bf933183e533094a696430e359148d343985
+    hash_after: eac3bf933183e533094a696430e359148d343985
+    returns: 1
+    why: "Say which refusals the function answers, because `admits` refuses on `by`, `needs` and `excludes`.; `takeable` walks past a `by: children` leaf and `admits` admits one, so name the one answer.; `admits` lets a `by: person` leaf through on `ownerSays`, and `takeable` walks past it.; `takeable` offers a `by: retro` leaf, and `admits` refuses it away from a retro.; Say how `writesHere` and `placesIn` divide the question, because both walk `steps` in one file.; Take the leaf `admits` resolves already, or say why the function walks the ticket again.; Name the file holding the case, and the refusal that case asserts.; The move's reason is that nothing imports past the plugin root. [[spec/design_output/level0#nothing-imports-past-the-plugin]]; `./RUNME.sh check` answers 0 on this commit."
 ---
 
 # Ask
@@ -163,6 +169,18 @@ The refusal says the same words at both doors, because one function writes them.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- Say which refusals the function answers, because `admits` refuses on `by`, `needs` and `excludes`.
+- `takeable` walks past a `by: children` leaf and `admits` admits one, so name the one answer.
+- `admits` lets a `by: person` leaf through on `ownerSays`, and `takeable` walks past it.
+- `takeable` offers a `by: retro` leaf, and `admits` refuses it away from a retro.
+- Say how `writesHere` and `placesIn` divide the question, because both walk `steps` in one file.
+- Take the leaf `admits` resolves already, or say why the function walks the ticket again.
+- Name the file holding the case, and the refusal that case asserts.
+- The move's reason is that nothing imports past the plugin root. [[spec/design_output/level0#nothing-imports-past-the-plugin]]
+- `./RUNME.sh check` answers 0 on this commit.
 
 # implement
 
