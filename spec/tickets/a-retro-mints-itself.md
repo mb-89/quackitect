@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: design/review
+step: implement/tests-red
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -128,6 +128,10 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 2d8a655bb8120166961261e9323b02e3a293deea
     hash_after: 2d8a655bb8120166961261e9323b02e3a293deea
+  - step: design/review
+    hand: box d42624a67d18a8 · claude-code · helper-24
+    hash_before: 230cc6130a5a5149e96d6ba8ada96f55a6acc025
+    hash_after: 230cc6130a5a5149e96d6ba8ada96f55a6acc025
 group: the-retro-runs
 depends_on: ["the-retro-takes-the-box"]
 ---
@@ -234,25 +238,23 @@ The two knobs stand in the config as numbers, beside the other work knobs. `retr
 
 <!-- pass or fail, with findings one a line -->
 
-fail
+pass
 
-Five of the six findings close, and two gaps stand:
+The draft closes both gaps, and the approach answers the ask.
 
-| the gap | the fix |
+| the gap the first round names | what closes it |
 |---|---|
-| the config glob names `se-config-*.md`, and `se-agent-control-*.md` finds no owner | name a glob covering every file that entry writes |
-| `writes` reaches the entry table nowhere | add its row to [[spec/design_output/projection]], which owns the keys |
+| `se-agent-control-*.md` finds no owner | the config entry owns that glob beside `se-config-*.md` |
+| `writes` reaches the entry table nowhere | its row lands in [[spec/design_output/projection]], which owns the keys |
 
-| the earlier finding | what closes it |
+| what the ask asks | what the approach answers |
 |---|---|
-| the entry names no source | the retro process is the source, and the banner names it |
-| two entries tie on one folder | an entry declares `writes`, and the lookup prefers the match |
-| `--as` carries a hand's name | the flag reads `--name` here |
-| the mint copies what a pull prints | `retro new` calls the mint and the pull, and prints nothing |
-| `retro collect` stands nowhere | the sibling lands it, and `depends_on` names that sibling |
-| the two knobs project two commands | the change carries both command files |
+| one command mints, opens and pulls | `retro new` calls the verb owning each of the four |
+| the two knobs stand with their defaults | `retroReaders` and `retroCap` land in the config and its schema |
+| the projection writes the command | the entry names the retro process as its source |
+| the tree stays clean | the change carries the three command files those keys project |
 
-One caution for the draft hand: the verb list carries `collect` already, so `new` is the row that lands there.
+The caution stands answered: `new` is the row the verb list gains, and `collect` stands there already.
 
 `./RUNME.sh check` exits 0 on this branch.
 
