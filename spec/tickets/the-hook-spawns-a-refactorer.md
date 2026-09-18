@@ -1,13 +1,21 @@
 ---
 kind: [[ticket]]
 state: open
-depends_on:
-  - a-rule-carries-its-side
 urgency: now
+step: design/person-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: "design/review failed back 2 times: One answer leaves the stop door: `seen` takes the `spawn` branch and drops `result` beside it.; So the `continue` side hands back no block, and the turn ends where the rule holds it open.; `spawns` awaits `$.agent.spawn`, so the session waits on the hand the ask says costs no turns.; Name the door that starts the hand beside the stop door, since one answer carries both nowhere.; `onAgentSpawn` reads no kind, and the review spawn carries `subagentType` `general-purpose` too.; Name the field the refactoring spawn sets, so the refactor layer reaches that hand alone.; No code reads a note's `scope` today, so say that `guidanceHere` starts reading it.; `refactor.mostInARow` counts hands and `stop.mostInARow` counts turns, so name the new key apart.; `./RUNME.sh check` answers 1, on warnings standing across the tree before this branch.; The git source, the successor pointer and the note's `scope` answer the earlier findings.; The stop rule, the four keys, the flag and the file the hand takes answer the rest of the ask."
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -91,8 +99,6 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-group: the-warnings-feed-a-refactorer
-step: design/review
 record:
   - step: design/draft
     hand: box dd2a59294365 · claude-code-remote
@@ -108,6 +114,14 @@ record:
     hand: box dd2a59294365 · claude-code-remote
     hash_before: 4d09f82c8554b7e92f5bd41adef39a3a96f34d0d
     hash_after: 4d09f82c8554b7e92f5bd41adef39a3a96f34d0d
+  - step: design/review
+    hand: box dd2a59294365 · claude-code-remote · helper-4
+    hash_before: a510cdadbcf9b88430fe5c0da35f069d30302d87
+    hash_after: a510cdadbcf9b88430fe5c0da35f069d30302d87
+    returns: 2
+    why: "One answer leaves the stop door: `seen` takes the `spawn` branch and drops `result` beside it.; So the `continue` side hands back no block, and the turn ends where the rule holds it open.; `spawns` awaits `$.agent.spawn`, so the session waits on the hand the ask says costs no turns.; Name the door that starts the hand beside the stop door, since one answer carries both nowhere.; `onAgentSpawn` reads no kind, and the review spawn carries `subagentType` `general-purpose` too.; Name the field the refactoring spawn sets, so the refactor layer reaches that hand alone.; No code reads a note's `scope` today, so say that `guidanceHere` starts reading it.; `refactor.mostInARow` counts hands and `stop.mostInARow` counts turns, so name the new key apart.; `./RUNME.sh check` answers 1, on warnings standing across the tree before this branch.; The git source, the successor pointer and the note's `scope` answer the earlier findings.; The stop rule, the four keys, the flag and the file the hand takes answer the rest of the ask."
+group: the-warnings-feed-a-refactorer
+depends_on: ["a-rule-carries-its-side"]
 ---
 
 # Ask
@@ -123,6 +137,16 @@ record:
 - `./RUNME.sh check` answers 0
 
 # design
+
+## person-1
+
+<!-- answers the question the engine asks -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
 
 ## draft
 
@@ -226,16 +250,17 @@ The layers stand in `guidanceHere`, under `src/bridge/guidance.js`. Two build of
 
 fail
 
-- The spawned hand takes the helper layer, which the working box builds from its own `process.env`.
-- So the variable the spawn sets reaches that layer nowhere, and the note stands off the hand.
-- Name how the note reaches the spawned hand alone, where `onAgentSpawn` hands that layer over.
-- The resolver beside `work-waiting` answers a boolean alone, so the check spawns nothing.
-- Name the hook that returns the spawn, as the review tool returns one off a tool call.
-- The pointer for the push door names a ticket closed as `became`, so point at its successor.
-- `untouchedFor` names no source for a file's last write, so say whether git answers it.
-- The guidance note carries `env` alone, and its schema requires `scope` beside it.
+- One answer leaves the stop door: `seen` takes the `spawn` branch and drops `result` beside it.
+- So the `continue` side hands back no block, and the turn ends where the rule holds it open.
+- `spawns` awaits `$.agent.spawn`, so the session waits on the hand the ask says costs no turns.
+- Name the door that starts the hand beside the stop door, since one answer carries both nowhere.
+- `onAgentSpawn` reads no kind, and the review spawn carries `subagentType` `general-purpose` too.
+- Name the field the refactoring spawn sets, so the refactor layer reaches that hand alone.
+- No code reads a note's `scope` today, so say that `guidanceHere` starts reading it.
+- `refactor.mostInARow` counts hands and `stop.mostInARow` counts turns, so name the new key apart.
 - `./RUNME.sh check` answers 1, on warnings standing across the tree before this branch.
-- The stop rule, the four keys and the flag answer the rest of the ask.
+- The git source, the successor pointer and the note's `scope` answer the earlier findings.
+- The stop rule, the four keys, the flag and the file the hand takes answer the rest of the ask.
 
 # implement
 
@@ -245,7 +270,7 @@ fail
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+<!-- the same tests pass -->
 
 <!-- the form is command -->
 
