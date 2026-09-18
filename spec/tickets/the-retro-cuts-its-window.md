@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -223,6 +223,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: b33dcd31ea6d677a73f0a647121cf0dfa3b66298
+    hash_after: b33dcd31ea6d677a73f0a647121cf0dfa3b66298
+    answered:
+      - name: lint
+        exit: 0
+        said: 75 stand at warning, which the panel draws and check allows.
 group: the-retro-runs
 depends_on: ["the-retro-takes-the-box"]
 ---

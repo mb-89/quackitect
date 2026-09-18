@@ -23,8 +23,10 @@ const RULE = /^([A-Za-z][\w.]*) /;
 const WRITE = "write";
 const THOUGHT = "thought";
 const HALF = 2;
-// The two folders a row's time comes off, inside the copy. [[spec/tickets/the-retro-cuts-its-window]]
-const SOURCES = ["log/", "transcripts/"];
+// The two sources a row's time comes off. A private row opens at its own folder, and an outside row opens at its file name, so the cut reads the field naming where it comes from. [[spec/tickets/the-retro-cuts-its-window]]
+const PRIVATE = ".se";
+const TRANSCRIPTS = "transcripts";
+const LOGS = "log/";
 
 // [[spec/design_input/the-agent-pulls-tickets]]
 export function windowOut(it, into, name, rows) {
@@ -140,6 +142,8 @@ function asked(span) {
   return [
     `The window runs from ${stamp(span.opens)} to ${stamp(span.shuts)}.`,
     "",
+    `The counts read the copied log and the copied transcripts, and no other source.`,
+    "",
     ...Object.entries(held).map(([key, count]) => `- ${key}: ${count}`),
     `- refusals: ${byKind(rules)}`,
     `- thought: ${median(thoughts)}`,
@@ -170,15 +174,25 @@ function stamp(ms) {
 function loggedIn(it, into, rows) {
   const out = [];
   for (const one of rows) {
-    if (!SOURCES.some((where) => String(one.path ?? "").startsWith(where))) continue;
-    for (const line of read(it, it.join(into, ...String(one.path).split("/"))).split(
-      "\n",
-    )) {
+    const where = whereOf(it, into, one);
+    if (!where) continue;
+    for (const line of read(it, where).split("\n")) {
       const held = parsed(line);
       if (held) out.push(held);
     }
   }
   return out;
+}
+
+// [[spec/tickets/the-retro-cuts-its-window]]
+function whereOf(it, into, one) {
+  const from = String(one.from ?? "");
+  const parts = String(one.path ?? "").split("/");
+  if (from === TRANSCRIPTS) return it.join(into, TRANSCRIPTS, ...parts);
+  if (from === PRIVATE && String(one.path ?? "").startsWith(LOGS)) {
+    return it.join(into, ...parts);
+  }
+  return "";
 }
 
 function tipOf(it) {

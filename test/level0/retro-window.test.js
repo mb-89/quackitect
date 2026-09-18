@@ -54,6 +54,14 @@ const SAYS = {
   "git rev-list --max-parents=0 HEAD": { stdout: `${FIRST}\n` },
 };
 
+const SCRATCH = "/said";
+// A transcript row carries its own time, and its path opens at its file name. [[spec/tickets/the-retro-cuts-its-window]]
+const TALK = [
+  '{"at":"2026-09-18T09:40:00.000Z","kind":"thought","said":"a short thought"}',
+  '{"at":"2026-09-18T09:45:00.000Z","kind":"thought","said":"a longer thought here"}',
+  '{"at":"2026-09-18T09:50:00.000Z","kind":"thought","said":"three"}',
+].join("\n");
+
 function doors(more = {}) {
   const said = fakeGit(SAYS, ROOT);
   return {
@@ -62,7 +70,9 @@ function doors(more = {}) {
       [at("spec/schemas/ticket.schema.yaml")]: SCHEMA,
       [at("spec/processes/chapter.yaml")]: CHAPTER,
       [at(".se/log/one.jsonl")]: `${LOG}\n`,
+      [`${SCRATCH}/talk.jsonl`]: `${TALK}\n`,
     }),
+    transcripts: SCRATCH,
     git: said,
     join,
     clock: fakeClock(),
@@ -124,7 +134,8 @@ test("a chapter carries its window and its counts in the ask", () => {
   assert.match(said, /notes: 1/);
   assert.match(said, /errors: 0/);
   assert.match(said, /refusals: Sentence 1/, "the ask names a refusal by its rule");
-  assert.match(said, /thought: 0/, "a box naming no transcript reads none");
+  assert.match(said, /the copied log and the copied transcripts/, "the ask names its sources");
+  assert.match(said, /thought: 15/, "the median of three thoughts");
 });
 
 // The drain decides what a hand parks, and a chapter closes at its own step. [[spec/tickets/the-retro-cuts-its-window]]
