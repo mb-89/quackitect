@@ -365,6 +365,54 @@ test("release puts a branch back to todo for somebody else", () => {
   assert.ok(ranGit(outside).includes("git push origin work/fix-lsp"));
 });
 
+// A branch move resets onto origin, so a commit origin lacks dies under it. [[spec/design_output/work#a-branch-moves-clean]]
+test("release refuses where the branch holds a commit origin lacks", () => {
+  const { it, outside, disk } = doorsSaying({
+    "git rev-parse --abbrev-ref HEAD": { stdout: "work/fix-lsp\n" },
+    "git show origin/work/fix-lsp:HANDOVER.md": { stdout: "---\nstatus: held\n---\n" },
+    "git rev-list --count origin/work/fix-lsp..work/fix-lsp": { stdout: "2\n" },
+  });
+
+  const { code, said } = heard(() => work(ROOT, ["release"], it));
+
+  assert.equal(code, 2);
+  assert.match(said, /holds 2 commit\(s\) origin lacks/);
+  assert.match(said, /git push origin work\/fix-lsp/);
+  assert.ok(
+    !ranGit(outside).some((one) => one.startsWith("git reset --hard")),
+    "the reset that drops them runs nowhere",
+  );
+  assert.equal(disk.exists(HERE), false, "the brief on the tree stays untouched");
+});
+
+// [[spec/design_output/work#a-branch-moves-clean]]
+test("take refuses where this box stands ahead of origin", () => {
+  const { it, outside } = doorsSaying({
+    "git rev-parse --abbrev-ref HEAD": { stdout: "work/fix-lsp\n" },
+    "git rev-list --count origin/work/fix-lsp..work/fix-lsp": { stdout: "1\n" },
+  });
+
+  const { code, said } = heard(() => work(ROOT, ["take"], it));
+
+  assert.equal(code, 2);
+  assert.match(said, /holds 1 commit\(s\) origin lacks/);
+  assert.ok(
+    !ranGit(outside).some((one) => one.startsWith("git reset --hard")),
+    "the reset that drops it runs nowhere",
+  );
+});
+
+// [[spec/design_output/work#a-branch-moves-clean]]
+test("a branch level with origin moves as before", () => {
+  const { it } = doorsSaying({
+    "git rev-parse --abbrev-ref HEAD": { stdout: "work/fix-lsp\n" },
+    "git show origin/work/fix-lsp:HANDOVER.md": { stdout: "---\nstatus: held\n---\n" },
+    "git rev-list --count origin/work/fix-lsp..work/fix-lsp": { stdout: "0\n" },
+  });
+
+  assert.equal(heard(() => work(ROOT, ["release"], it)).code, 0);
+});
+
 test("release refuses a branch already standing at done", () => {
   const { it, disk } = doorsSaying({
     "git rev-parse --abbrev-ref HEAD": { stdout: "work/fix-lsp\n" },

@@ -199,12 +199,29 @@ export function briefOf(it, branch) {
   return said.ok ? said.out : "";
 }
 
-// [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
-export function dirty(it) {
+// Work stands two ways, and a branch moves over neither. [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
+export function dirty(it, branch = "") {
   const left = standingIn(it).filter((one) => !one.parked);
-  if (!left.length) return false;
-  console.error("This tree carries uncommitted changes, so no branch may move.");
-  console.error("Commit them, or stash them, and run this again.");
+  if (left.length) {
+    console.error("This tree carries uncommitted changes, so no branch may move.");
+    console.error("Commit them, or stash them, and run this again.");
+    return true;
+  }
+  const here = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out.trim();
+  const walked = new Set([here, branch].filter((one) => one.startsWith(WORK_BRANCH)));
+  for (const one of walked) if (unpushed(it, one)) return true;
+  return false;
+}
+
+// A branch move resets onto origin, so a commit origin lacks dies under it unheard. [[spec/design_output/work#a-branch-moves-clean]]
+function unpushed(it, branch) {
+  const said = it.git.run(["rev-list", "--count", `origin/${branch}..${branch}`], true);
+  const count = said.ok ? said.out.trim() : "";
+  if (!count || count === "0") return false;
+  console.error(
+    `${branch} holds ${count} commit(s) origin lacks, so no branch may move.`,
+  );
+  console.error(`Run git push origin ${branch}, and run this again.`);
   return true;
 }
 

@@ -395,7 +395,7 @@ function batterySays(it) {
 function release(it, name) {
   const here = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
   const branch = name ? `${WORK_BRANCH}${name}` : workBranchHere(it, "release");
-  if (!branch || dirty(it)) return 2;
+  if (!branch || dirty(it, branch)) return 2;
   const brief = briefOf(it, branch);
   const named = ticketNamed(branch);
   const ticket = brief ? "" : textAt(it, `origin/${branch}`, ticketAt(named));
