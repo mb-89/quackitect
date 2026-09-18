@@ -92,7 +92,7 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-warnings-feed-a-refactorer
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box dd2a59294365 · claude-code-remote
@@ -129,6 +129,17 @@ record:
     hash_after: 9a15fb235ec143a0a6d5bb3e7a258cfd55dafd73
     answered:
       - name: lint
+        exit: 0
+        said: 81 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: bc5370e98975a7a8afdcedade21dc06bffe7ca40
+    hash_after: bc5370e98975a7a8afdcedade21dc06bffe7ca40
+    answered:
+      - name: tests
+        exit: 0
+        said: green, every test passes
+      - name: check
         exit: 0
         said: 81 stand at warning, which the panel draws and check allows.
 ---
@@ -334,11 +345,15 @@ What surprises me:
 
 <!-- the form is command -->
 
+    cd src/lsp && go test ./... 2>&1 | grep -c '^--- FAIL' | sed -e 's/^0$/green, every test passes/' -e 's/^[1-9].*/assertion, that many tests fail on their own assertion/'
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
@@ -346,11 +361,39 @@ What surprises me:
 
 <!-- the form is text -->
 
+The language server answered `initialized` nowhere, so the panel held the file in front of a person alone. It now runs the sweep on that notification, and publishes one message a file.
+
+| what the case does | how |
+|---|---|
+| walks every tracked file | `Sweep`, which the check verb already runs |
+| groups the findings | one entry a file, off the finding's own path |
+| draws each | `publishes`, the way an open file draws |
+
+The sweep stood already, and two other callers run it. This adds the case that calls it from the editor's own road.
+
+Two clear loops would have wiped that drawing. `draws` publishes nil for every drawn path its findings leave out, and `clears` empties every drawn path on a close. So a drawn path now names who drew it, and each loop walks its own:
+
+| source | who draws it | who clears it |
+|---|---|---|
+| the sweep | the `initialized` case | the next sweep |
+| an open file | `draws` | the loop in `draws`, and a close |
+
+A swept file keeps its findings while the editor stands. An open file's drawing clears the way it clears today.
+
+Two claims the change keeps carry a case each:
+
+- an open buffer answers ahead of the disk, because `Forgets` drops the path list alone
+- a parked file draws nothing, because `Paths` drops it through `isDraft`
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out: the server file alone, beside its new tests
+- every door the change reaches has a fake: the cases drive the server over a temporary root
+- a comment names the approach: the source constants and the sweep both point at this ticket
 
 # verdict
 
