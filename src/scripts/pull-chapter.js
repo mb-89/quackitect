@@ -379,8 +379,8 @@ export function handFaults(it, one, leaf, hand, held) {
   if (leaf.evidence.some((field) => field.form === "verdict") && !one.private) {
     const tip = tipOf(it);
     // A sibling hand commits beside this reader, and that costs the reading nothing. A commit naming this ticket is this hand's own write, which the rule refuses. [[spec/tickets/the-verdict-guard-reads-tips]]
-    const said = held.hash && tip !== held.hash ? commitsFor(it, one.name, held.hash) : null;
-    if (said && (!said.read || said.own.length)) {
+    const moved = held.hash && tip !== held.hash ? commitsFor(it, one.name, held.hash) : null;
+    if (moved && (!moved.read || moved.own.length)) {
       out.push(
         `a verdict comes from a hand that leaves the tip where it stands, and ${shortOf(held.hash)} moved to ${shortOf(tip)}.`,
       );

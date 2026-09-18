@@ -28,6 +28,17 @@ Every question this box hands out stands answered, under `--owner-says`, and fou
 | [[spec/tickets/the-spawn-reaches-its-guidance]] | the stop door starts the hand, and a note's scope builds its layer |
 | [[spec/tickets/the-verdict-guard-reads-tips]] | the guard reads the commits, in place of the tip |
 
+# What the verdict guard changes
+
+A verdict hand keeps its pass while a sibling hand commits beside it.
+
+| the guard | what it reads |
+|---|---|
+| `handFaults`, on a verdict leaf | it refuses where a commit since the take names this ticket |
+| `changedSince`, under the `read` field | it takes the files under this ticket's commits |
+
+`commitsFor`, in `src/scripts/pull-writes.js`, answers the split off the name `landed` writes before the first colon. The working tree rides the span while the tip stands at the hold's, because a tree names no hand.
+
 `./RUNME.sh check` answers 0 on this commit. The check asks the server, so run `./RUNME.sh serve` before it.
 
 # What the cloud rule changes
@@ -74,3 +85,6 @@ The check writes what the lint leaves standing into `.se/run/check.json`, so the
 - The write door refuses the attribution trailer a harness asks for, because the address is private. The commits carry none.
 - `refactor.parallel` stands false in this box's own config, so no hand starts while this branch works.
 - The stamp carries the warning list. So the panel, both push doors and the stop door read one thing.
+- A design review returning twice buys a settle step, which another agent hand takes. Three readings settled one approach here.
+- A verdict hand reads the note owning a rule the change moves. Two rows of `spec/design_output/pull.md` cost this ticket a round.
+- The fake process door keys its table on the whole argv, `git` and all. A key leaving it out answers an empty string.
