@@ -17,6 +17,16 @@ Where a commit undoes the mistake, the box decides and moves.
 |---|---|
 | rule five takes the cost test | `spec/guidance/working.md` |
 | chapter four argues it, and names where the earlier wording stands | `spec/rationales/working.md` |
+| `dirty` reads a commit origin lacks, beside the working tree | `src/scripts/work-stands.js` |
+| the chapter a branch moves clean | `spec/design_output/work.md` |
+
+The second pair answers a fault this session meets. `branch take` and
+`branch release` reset hard onto origin, and `dirty` reads the working tree
+alone. So a box committing its work moves it into the reset's path.
+
+A release on this branch takes two commits that way. Either reading refuses the
+move now, and each names its way out. A live release, one commit ahead, comes
+back refused.
 
 `./RUNME.sh check` answers 0 on this commit, and the suite answers green.
 
