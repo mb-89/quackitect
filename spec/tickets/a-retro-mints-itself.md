@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgency: now
-step: design/draft
+step: design/review
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -124,6 +124,10 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: 37ab51bd3baa40c4f2fa70c1989b2502440cdf86
     hash_after: b96685f67b77fc6bf566fb972ef7963c8810e803
+  - step: design/draft
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 2d8a655bb8120166961261e9323b02e3a293deea
+    hash_after: 2d8a655bb8120166961261e9323b02e3a293deea
 group: the-retro-runs
 depends_on: ["the-retro-takes-the-box"]
 ---
@@ -208,7 +212,15 @@ The ticket's name reads `retro-<short>`, off the commit the window ends at. A na
 | `why` | what calls for it, off `--why`, or the standing line where nobody says |
 | `state` | open, because `ticket open` runs inside the verb |
 
-The config-commands entry declares `se-config-*.md`, and the retro entry declares `se-retro.md`. A tie on the command folder reads one owner now, so the write door names the file a hand edits.
+An entry declares `writes`, a list of globs it owns under its target. The config-commands entry owns two families, because the widgets in the schema project their own:
+
+| the entry | what it writes |
+|---|---|
+| the config commands | `se-config-*.md` and `se-agent-control-*.md` |
+| the retro command | `se-retro.md` |
+| an entry declaring none | its whole target, as every entry does today |
+
+A tie on the command folder reads one owner now, so the write door names the file a hand edits. `writes` is a key an entry carries, and one place owns those keys. So its row lands in [[spec/design_output/projection]] beside the rest.
 
 The two knobs stand in the config as numbers, beside the other work knobs. `retroReaders` caps the hands a collect spawns, and `retroCap` caps the tickets the improve step mints.
 
