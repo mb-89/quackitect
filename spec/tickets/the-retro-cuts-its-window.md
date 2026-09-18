@@ -91,7 +91,12 @@ steps:
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 group: the-retro-runs
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box d42624a67d18a8 · claude-code
+    hash_before: 62e52ab6d57707898525a20853db2af6545e6e7f
+    hash_after: 62e52ab6d57707898525a20853db2af6545e6e7f
 ---
 
 # Ask
@@ -125,7 +130,36 @@ One hand reads a window of any length. The reading thins as the window grows, an
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+Collect cuts the window after it copies, because the cut reads the log it copies.
+
+| the step | what it does |
+|---|---|
+| opens the window | the newest closed retro's last hash, or the tree's first commit |
+| reads the times | every log row under the retro folder carries the moment it lands |
+| cuts | six hours a chapter, and a span holding no row stands nowhere |
+| counts | one row a chapter, off the kinds the log writes |
+| mints | one private ticket a chapter, off the chapter route, naming the retro |
+
+The window opens where the last retro closes. The verb reads the closed retro tickets, takes the newest, and reads the last hash its record holds. A tree with no closed retro opens at its first commit, because nothing stands before it.
+
+| what the count reads | where it comes from |
+|---|---|
+| the prompts, the tool calls and the shell commands | the kind each log row carries |
+| the refusals, by rule | the rows a door writes when it turns a write away |
+| the tickets a hand moves, and the notes it writes | the same rows, by the verb that writes them |
+| the errors | the level each row carries |
+| the median length of a thought | the transcripts, which stand empty on a box naming none |
+
+A count with no source reads zero, and the chapter's ask says so. A reader then knows the silence is the box's and no hand's.
+
+Each chapter lands as a private ticket under the private folder, off the chapter route. It names the retro under `group`, so the retro's `readers` step finds its children. Its ask carries the window and the counts, written before anybody reads a word.
+
+| what the chapter's name reads | `<retro>-chapter-<n>` |
+|---|---|
+| where it stands | the private folder, because a chapter dies with the box |
+| what opens it | the mint, and the retro's own `readers` step hands it out |
+
+The span stands as a constant beside the verb, because the design fixes it and no box moves it.
 
 <!-- the form is text -->
 
