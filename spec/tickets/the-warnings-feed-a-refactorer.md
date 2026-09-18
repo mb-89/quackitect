@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 steps:
   - name: sync
@@ -108,6 +108,11 @@ record:
     hand: box dd2a59294365 · claude-code-remote
     hash_before: 3f191e95c85ea5150cb27faf0de841ef024863ea
     hash_after: 3f191e95c85ea5150cb27faf0de841ef024863ea
+  - step: retro/cloud
+    hand: box dd2a59294365 · claude-code-remote
+    hash_before: ddd998f8b29bdddcd252559d5eb7ae0ba8de226c
+    hash_after: ddd998f8b29bdddcd252559d5eb7ae0ba8de226c
+reason: done
 ---
 
 # Ask
@@ -262,17 +267,35 @@ So the wall the engine builds at two returns does two jobs. It parks a question 
 
 <!-- the form is list -->
 
+- `./RUNME.sh branch test` reads JavaScript alone, so a Go change answers its evidence through `go test`
+- a Go test wants `CGO_ENABLED=1` and the `sqlite_fts5` tag, which no test verb carries
+- the pull binds to the queue, so a hand naming a ticket meets a refusal
+- the box carried every tool it needed, and the proxy refused no host
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- the trunk guard held, so `branch merge` waits for a hand on a desk
+- the write door refused a shell write into a tracked file, at every scripted edit while the server stood
+- the verdict guard refused one hand-back, because a sibling commit moved the tip under its hold
+- the prose door refused a pipeline standing as a paragraph, so the evidence command stands indented
+- the sync took trunk in twice, and neither pass carried a conflict
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- [[spec/tickets/the-private-split-reads-clean]]: whether the split stands done, or a third reading finds more
+- [[spec/tickets/one-list-holds-the-warnings]]: what the one list is, and what the push door reads
+- [[spec/tickets/the-one-answer-takes-shape]]: how far the one hand answer reaches
+- [[spec/tickets/the-spawn-reaches-its-guidance]]: which door starts the refactoring hand
+- [[spec/tickets/the-verdict-guard-reads-tips]]: the guard the retro's note becomes
+- `HANDOVER.md` names each of them, and says the group's own retro stands written
 
 # Discussion
 
