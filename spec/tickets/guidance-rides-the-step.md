@@ -244,7 +244,11 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
-step: retro/write
+  - step: retro/write
+    hand: box 7ba446c2fed1 · claude-code-remote
+    hash_before: fddac54a3c627c535537dea9bb44a6ef1be06156
+    hash_after: fddac54a3c627c535537dea9bb44a6ef1be06156
+step: retro/cloud
 ---
 
 # Ask
@@ -312,10 +316,10 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 - the install comes up whole, and every tool it names comes down
 - the take hands this branch, its brief and its group in one answer
-- the children step leaves again, because [[spec/tickets/the-pull-splits-by-topic]] stands at its person step
+- the pull skips the children step, because [[spec/tickets/the-pull-splits-by-topic]] stands at its person step
 - the retro notes drain, because the private folder holds no note
 - this retro stands over this box's window
-- the owner hears the person step, because the schedule carries a notification out
+- the person step's question reaches the owner, because the schedule carries a notification out
 
 ### well
 
@@ -324,7 +328,8 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 <!-- the form is list -->
 
 - The install comes up clean, so every door, the index and the language server stand from the first verb.
-- The pull names the leaf, its fields, its file and its guidance in one answer. The hand reads nothing around it.
+- The pull skips the children step itself, and hands the leaf behind it. The hand reads nothing around it.
+- The person step carries its question whole under `asks`, so the notification names what the owner decides on.
 - The record carries every earlier hand, so this box reads the same skip every box before it writes.
 - The design names what the children step does with an open child, so the skip surprises no hand. [[spec/design_output/pull]]
 
@@ -337,6 +342,7 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 - The route hands the retro out again over a group whose every open step waits for a person. The take is its moment.
 - The retro fields hold a single window, so this write drops the last box's. This leaf is its moment.
 - The branch grows a commit a box writes with no work behind it. Each take is its moment.
+- The person step's question carries findings a hand closes, beside the decision a person owns. Its `asks` field is its moment.
 
 ### improve
 
@@ -347,6 +353,7 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 - A group at children whose every open step waits for a person answers `wait`. Home: [[spec/design_output/pull]].
 - The retro a box writes stands under its own hand, so a later box writes beside it. Home: [[spec/design_output/work]].
 - The person step a group waits on reaches its owner where the schedule starts the box. Home: [[spec/design_output/pull]].
+- The person step the fail cap inserts asks what a person decides, and leaves the findings to a hand. Home: [[spec/design_output/pull]].
 
 ### thoughts
 
@@ -354,15 +361,19 @@ The pull hands a leaf out already, and this branch hands the guidance with it. T
 
 <!-- the form is text -->
 
-The group's remaining work stands behind one person step. Every box the schedule starts walks the same leaves, and writes the same window over the last. The retro the box before this one writes names that already, and names its home. So the finding waits on a decision the owner makes.
+The group's remaining work stands behind one person step, so this box spends its answer on the owner. Reading that step's question shows a second thing:
+
+- The fail cap inserts a person step where a review fails back.
+- So the question it asks carries the review's own findings.
+- Those findings name a chapter to write, a count to cut and a lint to name.
+- A hand closes each, and the decision a person owns stands beside them.
 
 | what this box holds | what stands behind it |
 |---|---|
 | the children step skips while a child stands open | [[spec/design_output/pull]] owns what the children step does |
 | the window buys a retro the last box already writes | [[spec/design_output/work]] owns what a hand writes down |
 | the group's own work waits on a person | [[spec/tickets/the-pull-splits-by-topic]] holds the question it asks |
-
-So this box spends its walk on the route and its answer on the owner, because the decision the loop waits on stands with them.
+| the question mixes a decision with findings | [[spec/design_output/pull]] owns what the fail cap writes |
 
 ## cloud
 
