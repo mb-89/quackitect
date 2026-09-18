@@ -2,10 +2,20 @@
 kind: [[ticket]]
 state: open
 urgency: now
+step: design/person-1
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
     steps:
+      - name: person-1
+        does: answers the question the engine asks
+        by: person
+        to: engine
+        asks: "design/review failed back 2 times: Say where the door reads `ownerSays`, because the flag stands on the pull's command line.; Say where the door reads `atRetro`, because that answer reads every ticket in the group.; `handFaults` holds the `by: person` rule inline, and the caller table leaves that site out.; `schemaDoor` stands unexported, so say which exported function the case drives.; The named case file drives `wholeAfter` alone, and the ticket cases stand beside `ticketFaults`.; The move takes `walkOf` too, because `leafOf` calls it.; `entriesIn` stands inside the plugin already, so the move leaves it where it stands.; `leafOf` names another function in the plugin's voice module, so name the moved one apart.; `./RUNME.sh check` answers 0 on this commit."
+        evidence:
+          - name: answer
+            form: text
+            says: the answer, which the step behind this one reads
       - name: draft
         does: writes the approach the ask calls for
         from: anyone
@@ -89,8 +99,6 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-group: the-warnings-feed-a-refactorer
-step: design/review
 record:
   - step: design/draft
     hand: box dd2a59294365 · claude-code-remote
@@ -106,6 +114,13 @@ record:
     hand: box dd2a59294365 · claude-code-remote
     hash_before: 3318e1a9080119aa8973f42f85c83e6b3fdfc999
     hash_after: 3318e1a9080119aa8973f42f85c83e6b3fdfc999
+  - step: design/review
+    hand: box dd2a59294365 · claude-code-remote · helper-4
+    hash_before: 8e34af931df94d49d840a1f754ac7e6107a5c6aa
+    hash_after: 8e34af931df94d49d840a1f754ac7e6107a5c6aa
+    returns: 2
+    why: "Say where the door reads `ownerSays`, because the flag stands on the pull's command line.; Say where the door reads `atRetro`, because that answer reads every ticket in the group.; `handFaults` holds the `by: person` rule inline, and the caller table leaves that site out.; `schemaDoor` stands unexported, so say which exported function the case drives.; The named case file drives `wholeAfter` alone, and the ticket cases stand beside `ticketFaults`.; The move takes `walkOf` too, because `leafOf` calls it.; `entriesIn` stands inside the plugin already, so the move leaves it where it stands.; `leafOf` names another function in the plugin's voice module, so name the moved one apart.; `./RUNME.sh check` answers 0 on this commit."
+group: the-warnings-feed-a-refactorer
 ---
 
 # Ask
@@ -135,6 +150,16 @@ in its hands.
 - `./RUNME.sh check` answers 0
 
 # design
+
+## person-1
+
+<!-- answers the question the engine asks -->
+
+### answer
+
+<!-- the answer, which the step behind this one reads -->
+
+<!-- the form is text -->
 
 ## draft
 
@@ -206,14 +231,14 @@ The refusal says the same words at both doors, because one function writes them.
 
 fail
 
-- Say which refusals the function answers, because `admits` refuses on `by`, `needs` and `excludes`.
-- `takeable` walks past a `by: children` leaf and `admits` admits one, so name the one answer.
-- `admits` lets a `by: person` leaf through on `ownerSays`, and `takeable` walks past it.
-- `takeable` offers a `by: retro` leaf, and `admits` refuses it away from a retro.
-- Say how `writesHere` and `placesIn` divide the question, because both walk `steps` in one file.
-- Take the leaf `admits` resolves already, or say why the function walks the ticket again.
-- Name the file holding the case, and the refusal that case asserts.
-- The move's reason is that nothing imports past the plugin root. [[spec/design_output/level0#nothing-imports-past-the-plugin]]
+- Say where the door reads `ownerSays`, because the flag stands on the pull's command line.
+- Say where the door reads `atRetro`, because that answer reads every ticket in the group.
+- `handFaults` holds the `by: person` rule inline, and the caller table leaves that site out.
+- `schemaDoor` stands unexported, so say which exported function the case drives.
+- The named case file drives `wholeAfter` alone, and the ticket cases stand beside `ticketFaults`.
+- The move takes `walkOf` too, because `leafOf` calls it.
+- `entriesIn` stands inside the plugin already, so the move leaves it where it stands.
+- `leafOf` names another function in the plugin's voice module, so name the moved one apart.
 - `./RUNME.sh check` answers 0 on this commit.
 
 # implement
@@ -224,7 +249,7 @@ fail
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
+<!-- the same tests pass -->
 
 <!-- the form is command -->
 
