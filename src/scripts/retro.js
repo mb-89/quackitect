@@ -3,6 +3,9 @@
 // before it leaves. The retro's own route lands on a later branch.
 // [[spec/design_output/pull#a-need-is-a-verb]]
 
+import { chapters } from "../engine/retro/chapters.js";
+import { matrix } from "../engine/retro/matrix.js";
+import { timeline } from "../engine/retro/timeline.js";
 import { fieldOf, NOTE_END, ticketNamed } from "./group.js";
 import { collect } from "./retro-collect.js";
 import { newRetro } from "./retro-new.js";
@@ -15,6 +18,11 @@ export function retro(root, argv, doors) {
   if (what === "notes") return notes(it);
   // [[spec/design_input/the-agent-pulls-tickets]]
   if (what === "collect") return collect(it, argv[1], argv.includes("--again"));
+  // [[spec/guidance/retro/chapter]]
+  if (what === "timeline") return timeline(it, argv[1]);
+  if (what === "chapters") return chapters(it, argv[1]);
+  // [[spec/guidance/retro/read]]
+  if (what === "matrix") return matrix(it, argv[1]);
   // [[spec/design_input/the-agent-pulls-tickets]]
   if (what === "new") return newRetro(it, argv);
   // [[spec/design_input/the-agent-pulls-tickets]]
@@ -29,6 +37,11 @@ export function retro(root, argv, doors) {
   console.log(
     "  new              mints a retro off its route, opens it, and hands out its first leaf",
   );
+  console.log(
+    "  timeline <retro> the hours holding work, per source, with the idle stretches between",
+  );
+  console.log("  chapters <retro> checks the cuts, and hands every chapter its lines");
+  console.log("  matrix <retro>   draws the report: ten rows, a column a chapter");
   console.log(
     "  score            the improvements earlier retros mint, and how many stay open",
   );

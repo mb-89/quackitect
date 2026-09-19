@@ -52,6 +52,18 @@ test("two real doors append to the one session file, and keep each other's lines
   it.files.remove(it.folder);
 });
 
+// [[spec/design_output/log#every-writer-appends]]
+test("a writer whose folder a collect drains makes it again, and keeps writing", async () => {
+  const it = real();
+  await it.door.say("info", "work", "before the drain");
+  it.files.remove(it.folder);
+
+  await it.door.say("info", "work", "after the drain");
+
+  assert.match(it.files.read(it.door.path), /after the drain/);
+  it.files.remove(it.folder);
+});
+
 test("the fake answers what the real door answers", async () => {
   const it = real();
   const said = await through(it.door, it.files, it.folder);

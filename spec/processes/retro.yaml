@@ -27,3 +27,26 @@ steps:
         form: command
         expects: 0
         says: retro collect, which leaves the private folder holding .runtime and .retro alone
+  - name: chapter
+    does: cuts the window into chapters of about six hours, and the engine hands every chapter its lines
+    by: anyone
+    input: collect
+    needs: ["retro"]
+    reads: [[spec/guidance/retro/chapter]]
+    evidence:
+      - name: chapters
+        form: command
+        expects: 0
+        says: retro chapters, which refuses a gap or an overlap between two chapters
+  - name: read
+    does: one reader a chapter answers the five starfish questions and the five improvements, and the engine draws the matrix
+    by: anyone
+    to: owner
+    input: chapter
+    needs: ["retro"]
+    reads: [[[spec/guidance/retro/read]], [[spec/guidance/retro/signals]]]
+    evidence:
+      - name: matrix
+        form: command
+        expects: 0
+        says: retro matrix, which refuses a chapter standing without its findings

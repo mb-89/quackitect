@@ -246,3 +246,5 @@ terms:
   - {word: vscode, defines: "[[spec/design_output/extension]]"}
   - {word: wink-nlp, defines: "[[spec/design_output/level0#the-tense-reader]]"}
   - {word: adjective, defines: "[[spec/design_output/level0#the-tense-reader]]"}
+  - {word: starfish, defines: "[[spec/guidance/retro/read]]"}
+  - {word: mechanize, defines: "[[spec/guidance/retro/read]]"}

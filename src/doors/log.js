@@ -32,7 +32,14 @@ export function log(disk, clock, init = {}) {
       await disk.makeDir(folder);
       made = true;
     }
-    await disk.append(path, `${JSON.stringify(row)}\n`);
+    const line = `${JSON.stringify(row)}\n`;
+    try {
+      await disk.append(path, line);
+    } catch {
+      // A retro's collect drains the folder under a running writer, so the writer makes it again. [[spec/design_output/log#every-writer-appends]]
+      await disk.makeDir(folder);
+      await disk.append(path, line);
+    }
     return row;
   };
 
