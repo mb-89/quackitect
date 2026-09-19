@@ -89,7 +89,12 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: d25806695a0da7af29c9e5bc9f2d245bb0a673d7
+    hash_after: d25806695a0da7af29c9e5bc9f2d245bb0a673d7
 ---
 
 # Ask
@@ -111,9 +116,36 @@ The agent reports green while the owner's panel draws a screen full of findings.
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+One sweep answers the panel and the check, and a case holds the two counts equal.
 
-<!-- the form is text -->
+`findingsOver` already stands as that sweep, and both callers reach it. They
+hand it different doors, so one tree answers two lists:
+
+| the caller | the root it hands | the tools it names |
+|---|---|---|
+| `lint` in `cli-read.js` | the work root | the paths the install writes |
+| `findingsFor` in `findings.js` | the vehicle root | `whereIs` over the tools file |
+
+On a stub those two roots name different trees, so the panel reads the vehicle
+while the check reads the work. So one function answers the door set, and both
+callers take it.
+
+| what changes | how |
+|---|---|
+| `src/bridge/findings.js` | answers the door set both callers hand `findingsOver` |
+| `src/scripts/cli-read.js` | takes that answer, and names no root of its own |
+| `test/level0/findings.test.js` | takes the case under this table |
+| `spec/guidance/working.md` | takes the rule under that |
+| [[spec/design_output/lsp]] | says one door set answers both readers |
+
+The case sweeps every tracked file the way the panel does. It drives
+`findingsOver` under each caller's doors over one tree, and asserts one count.
+Where the two part it names the file each side holds alone, so a reader opens
+that file.
+
+The rule reads: read a claim of done in the owner's own view before you make
+it. It lands in the Actionables of `spec/guidance/working`, beside the rules on
+what a session owes the owner.
 
 ## review
 
