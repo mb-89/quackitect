@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -106,6 +106,10 @@ record:
     hand: box b99ea8ab11a8 · claude-code-remote
     hash_before: 142ebe3ef48ccec6aeae2fa7acd8d880c5e9c50a
     hash_after: 142ebe3ef48ccec6aeae2fa7acd8d880c5e9c50a
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-4
+    hash_before: 6ca52d0acd8478c8db2a9f9d64921b368bd25c3b
+    hash_after: 6ca52d0acd8478c8db2a9f9d64921b368bd25c3b
 ---
 
 # Ask
@@ -164,14 +168,9 @@ What this box does with the refs standing orphaned: it leaves them. `branches` r
 <!-- pass or fail, with findings one a line -->
 <!-- the form is verdict -->
 
-fail
+pass
 
-- `standingAll` stands in `src/scripts/work-stands.js`, and `src/scripts/work.js` imports it
-- `branches` stands in that same file, so the standing and the list read one place
-- `movedOnTrunk` stands unexported in `src/scripts/work-merge.js`, so name what carries its read across
-- `take` stands in `src/scripts/work.js`, so the row reading `the same file` names two files
-- the counts of refs and of standing words drop, because `git merge-base` answers them [[spec/guidance/voice]]
-- the owner's row stands on a cloud branch, so say what this box does with those refs [[spec/guidance/cloud]]
+- the take reads `refsHere`, and the closing paragraph names `branches`, which no caller uses
 
 # implement
 
