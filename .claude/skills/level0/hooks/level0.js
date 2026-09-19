@@ -26,6 +26,9 @@ let method = "";
 let saidDown = false;
 let started = false;
 let stepText = "";
+// What the start road answered where it stood down, so the first prompt says the cage is missing. [[spec/design_output/level0#a-session-says-its-cage]]
+let cage = null;
+export const CAGE_BLOCK = "level0-cage";
 
 const url = () => `http://127.0.0.1:${port}/event`;
 
@@ -65,6 +68,21 @@ export function reasonOf(code) {
   return REASONS[Number(code)] ?? ["warn", `the start answers ${code}, which nobody names`];
 }
 
+// The one block a session outside the cage reads, because the agent inside it is the one reader who cannot see the fault. [[spec/design_output/level0#a-session-says-its-cage]]
+export function cageText(code, detail) {
+  return [
+    "LEVEL ZERO STANDS DOWN ON THIS BOX. No rule, no brief, no write door and no",
+    `stop hook reaches this session. The start road answers ${code}, and that`,
+    `code says: ${reasonOf(code)[1]}.`,
+    String(detail ?? "").trim() ? `The road itself says: ${String(detail).trim()}` : "",
+    "Open your first answer with one line saying level zero stands down here, and",
+    "what this box lacks. Then run ./RUNME.sh, which installs it, and start the",
+    "server with ./RUNME.sh serve.",
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
 // [[spec/design_output/pull#a-hand-of-its-own]]
 export function spawnTagOf(held) {
   const id = String(held?.id ?? "").trim();
@@ -100,6 +118,12 @@ async function seen($, e, next) {
   const answer = await ask($, event, e, next);
   if (!answer) {
     if (event === "session.start") await starts($);
+    // The server answers nothing, so the bridgehead says the cage stands down where a reader stands. [[spec/design_output/level0#a-session-says-its-cage]]
+    if (event === "prompt.context" && cage) {
+      return merged(await next(e), {
+        blocks: [{ name: CAGE_BLOCK, text: cageText(cage.code, cage.detail) }],
+      });
+    }
     return next(e);
   }
   if (Array.isArray(answer.register)) await registers($, answer.register);

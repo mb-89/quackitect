@@ -20,7 +20,7 @@ import {
   styled,
 } from "../../.claude/skills/level0/lib/guidance.js";
 import { inherits } from "../../.claude/skills/level0/lib/layer.js";
-import { rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
+import { rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { toolLines, WANTED } from "../../.claude/skills/level0/lib/tools.js";
 import { heldReadsIn } from "../scripts/guidance-hand.js";
@@ -125,7 +125,7 @@ function afterARestart(box) {
 function paidInLog(box) {
   let rows = [];
   try {
-    rows = rowsOf(String(box.disk.read(join(box.work, SESSION))));
+    rows = rowsIn(String(box.disk.read(join(box.work, SESSION))));
   } catch {
     return false;
   }

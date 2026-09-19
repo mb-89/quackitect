@@ -13,7 +13,7 @@ import {
 import { CHECK } from "../../.claude/skills/level0/lib/answer.js";
 import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
 import { HOLDS, TICKETS } from "../../.claude/skills/level0/lib/folders.js";
-import { rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
+import { rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { stampOf, STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { drains, standsPast, takesFile } from "../../.claude/skills/level0/lib/warnings.js";
@@ -304,7 +304,7 @@ function chatIsNew(box) {
 
 function promptsIn(box) {
   try {
-    return rowsOf(String(box.disk.read(join(box.work, SESSION)))).filter(
+    return rowsIn(String(box.disk.read(join(box.work, SESSION)))).filter(
       (one) => one.kind === "prompt",
     ).length;
   } catch {

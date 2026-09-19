@@ -107,6 +107,14 @@ test("a compaction takes the payment off, so the line pays once more", () => {
   assert.equal(owes(it), false);
 });
 
+// Two writers appending at once tear one line, and the read back stands on the rest. [[spec/design_output/level0#the-debt-survives-a-restart]]
+test("a torn line in the log leaves the payment readable", () => {
+  const log = asLines([paidRow()]).replace(/\n$/, `\n${"\0".repeat(8)}\n`);
+  const it = box();
+  it.disk = fakeDisk({ [join(ROOT, SESSION)]: log });
+  assert.equal(owes(it), false);
+});
+
 test("the line draws highlighted in the wording that owes it and the wording that pays it", () => {
   const drawn = highlighted(LINE);
   for (const said of [OWES.warns(LINE), OWES.denies(LINE), canaryText(LINE)]) {
