@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -106,6 +106,12 @@ record:
     hand: box b99ea8ab11a8 · claude-code-remote
     hash_before: 9e40a26457e2993b848dcd0d239c13e1ee4f9819
     hash_after: 9e40a26457e2993b848dcd0d239c13e1ee4f9819
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-4
+    hash_before: 87ba6fe294419f8415350cf9ef6bdb83fea7fd5f
+    hash_after: 87ba6fe294419f8415350cf9ef6bdb83fea7fd5f
+    returns: 2
+    why: "`writes: true` on a helper leaf hands it to this session, because `handOut` returns `handed` first; say where the spawn fires: `admits` answers `other` today off `excludes` alone; `handRule` gains no field, so the gate cannot tell the helper under `--as` from the session; name the two places `the-spawn-takes-a-step` names: `admits`, and `admits` under `--as`; the count stands in a step chapter of that closed ticket, which a `Discussion` line leaves standing"
 ---
 
 # Ask
@@ -170,13 +176,11 @@ The case off a harness reads the shell's own answer, and the case carrying one r
 
 fail
 
-- `takeable` stands in `src/scripts/pull-hand.js`, and `src/scripts/pull.js` re-exports it
-- the gate naming `helper` beside `person` and `children` stands in `writesHere`
-- that function stands under `.claude/skills/level0/lib/ticket.js`, so the change lands there
-- in that function the agent line stands above the helper line, so name it above
-- the gate reads the box off the hand `handRule` builds, so name the field it gains there
-- `the-spawn-takes-a-step` stands closed, and a hand writes under `Discussion` alone there [[spec/guidance/tickets]]
-- that line drops its count, because a command answers it [[spec/guidance/voice]]
+- `writes: true` on a helper leaf hands it to this session, because `handOut` returns `handed` first
+- say where the spawn fires: `admits` answers `other` today off `excludes` alone
+- `handRule` gains no field, so the gate cannot tell the helper under `--as` from the session
+- name the two places `the-spawn-takes-a-step` names: `admits`, and `admits` under `--as`
+- the count stands in a step chapter of that closed ticket, which a `Discussion` line leaves standing
 
 # implement
 
