@@ -36,7 +36,12 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/question]]
 process_hash: 1f3006ec4b044a89
-step: answer
+step: do
+record:
+  - step: answer
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: fb291f12846afeb900313fdd3e11e001296a4859
+    hash_after: fb291f12846afeb900313fdd3e11e001296a4859
 ---
 
 # Ask
@@ -85,9 +90,34 @@ on that ticket. [[spec/tickets/a-write-meets-its-hash]] carries the record.
 
 ## answer
 
-<!-- the answer, which the step behind this one reads -->
+The lane stamps as it reads, and the rule holds over it.
 
-<!-- the form is text -->
+`readsFiles` reads every file off the disk inside the call that writes it, so a
+batch stands stale nowhere. The rule refuses a hand carrying no stamp, and the
+lane earns one by that read.
+
+| where the lane stands | what it stamps |
+|---|---|
+| the read it makes at the call | the text the disk holds, under the hand |
+| the write it lands | the text it wrote, under the same hand |
+
+The second row keeps the hand current behind its own batch. A lane stamping the
+read alone would meet its next write against a disk it moved itself.
+
+What the other two ways cost:
+
+- the lane carrying the hand threads a token through two callers, and buys what the read gives already
+- the lane standing outside the rule lands a batch over whatever the disk holds
+
+A write the engine drops after the door passes it leaves the stamp ahead of the
+disk. The next write refuses and asks for a read. That costs a read and loses
+nothing, because the unstamped rule already asks for one.
+
+What this call weighs, on a box nobody sits beside:
+
+- the read at the call is what makes this way sound, and `readsFiles` carries it today
+- the stamp keys on the hand and the path, as [[spec/tickets/a-write-meets-its-hash]] drafts it
+- the owner rules at the merge, and the tree loses nothing by taking this way first
 
 The engine keeps the mark in the hook, and the hand carries nothing. The owner
 rules that the hand knows nothing of this. It writes what it writes, and meets a
