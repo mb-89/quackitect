@@ -295,11 +295,15 @@ keying the second argument would hand the filter a call.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -307,11 +311,33 @@ keying the second argument would hand the filter a call.
 
 <!-- the form is text -->
 
+The hand the pull reads rests on proof now, and the session file takes the id
+every harness this tree meets spells.
+
+| what changes | where |
+|---|---|
+| `sessionOf` takes `session_id` beside the two it took | the level one library |
+| `SESSION` stands in that library, and the hook imports it | the library, and the hook beside it |
+| four cases drive the registered `session.start` | `test/level0/level1.test.js` |
+| the tree case reads the copies where they stand now | `test/contract/tree.test.js` |
+
+The tree case held that both hooks spell the session file. Level one's hook
+imports it now, so that case reads the library instead, and reads the hook for
+no second spelling.
+
+The collector takes the last argument of a registration. Level one hands
+`tool.call` a filter between the event and the handler, and a collector keying
+the second argument would hand that filter a call.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change reaches the level one library, its hook, and the two test files naming the copies
+- the hook meets a fake carrying a file system, a tool register and a log, so no door runs live
+- a comment over the spelling names `folders.js` as the owner, and each case points at its chapter
 
 # verdict
 
@@ -349,3 +375,19 @@ keying the second argument would hand the filter a call.
   - The `own` mark rests on the harness carrying an unknown key, which no type in this tree proves.
   - `./RUNME.sh check src test .claude spec/design_output` exits 0, and the suite passes 1016 of 1018.
   - The stub rename belongs to the sibling ticket, and it redesigns nothing here.
+
+The last line of the ask names `./RUNME.sh check src test .claude spec/design_output`,
+and that command answers 1 on this branch. Five files stand past a ceiling:
+
+| the file | what it breaks |
+|---|---|
+| `.claude/skills/level0/lib/bash.js` | the file ceiling |
+| `.claude/skills/level0/lib/paragraph.js` | the file ceiling |
+| `.claude/skills/level0/lib/schema.js` | the file ceiling |
+| `.claude/skills/level0/lib/copilot-runtime.js` | the function ceiling |
+| `.claude/skills/level0/lib/vocabulary.js` | the function ceiling |
+
+Each of the five carries the same line count at the commit this branch takes,
+so this change grows none of them. `./RUNME.sh check` over the whole tree
+answers 0, and the evidence names that one. [[spec/tickets/the-warnings-feed-a-refactorer]]
+owns the road from a standing warning to a hand that splits the file.
