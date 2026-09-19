@@ -90,12 +90,18 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
     hash_before: adec70e31a69ba47cfa791dad14052d89937c8a5
     hash_after: adec70e31a69ba47cfa791dad14052d89937c8a5
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-20
+    hash_before: 33d5ccdadcd43fdec697d400b391e98d615b7e3d
+    hash_after: 33d5ccdadcd43fdec697d400b391e98d615b7e3d
+    returns: 1
+    why: The case the approach adds stands already in `test/level0/person-step.test.js`, at its first test.; That case seeds a group at `children` with one open child, on branch `work/one-group`.; So the objection naming a free ticket reads wrong, because `pull.js` takes the group off the branch name.; Name what the standing case lacks, or drop the case from the plan.; The `wait` row in `spec/design_output/pull.md` carries no pointer, so that change holds.
 ---
 
 # Ask
@@ -160,8 +166,15 @@ The objection: the plain case already reads the same lines. It reads them off a 
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+
+- The case the approach adds stands already in `test/level0/person-step.test.js`, at its first test.
+- That case seeds a group at `children` with one open child, on branch `work/one-group`.
+- So the objection naming a free ticket reads wrong, because `pull.js` takes the group off the branch name.
+- Name what the standing case lacks, or drop the case from the plan.
+- The `wait` row in `spec/design_output/pull.md` carries no pointer, so that change holds.
 
 # implement
 
