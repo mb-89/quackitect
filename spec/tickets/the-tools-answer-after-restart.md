@@ -89,7 +89,12 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: f095174f8c061828b09ab9b0e4eb3c5452105eca
+    hash_after: f095174f8c061828b09ab9b0e4eb3c5452105eca
 ---
 
 # Ask
@@ -112,6 +117,57 @@ a hand writes a script where a dead tool stands, and the guidance points at noth
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+- one reader filling a box that a restart hands over bare
+- the specs built off that reader, so a registration carries what it names
+- cases driving such a box, the way a restart hands one over
+
+**What stands.** `opensSession` fills the box at `session.start`, and a restart
+builds a new box with none of it. The harness sends one `session.start` a
+session, and the session runs on past a restart.
+
+| what `opensSession` fills | who reads it | what a fresh box holds |
+|---|---|---|
+| `box.schemas` | the mint spec, and the mint itself | nothing |
+| `box.tools` | the block naming what this box has | nothing |
+| `box.projections`, `box.sources` | the write door | the door fills them itself |
+| the warm index | the search tools | a cold index |
+
+**The fault.** `SPECS` in `src/bridge/tools.js` builds the mint spec off
+`box.schemas`. A fresh box gives it no kinds, so the spec registers an empty
+list of them and no call satisfies it. The description then names the folder
+and lists nothing after it.
+
+The registration itself goes out. `decide` answers `register` where
+`box.registered` stands false, and a fresh box stands false. So the tools come
+back named, and the mint comes back empty.
+
+**The change.** One reader fills what the session start fills, and every road
+into the box runs it first.
+
+| what changes | where |
+|---|---|
+| a reader filling the schemas, the tools and the projections | `src/bridge/server.js` |
+| `opensSession` calls it, in place of the lines it holds | the same file |
+| `decide` calls it where the box holds none of them | the same file |
+| `specsOf` runs after it, so a registration carries the kinds | the same file |
+
+The reader reads the way `guidanceOf` does: it fills a field once and answers
+it after. The warm index stays out of it, because a cold index answers and
+warms itself.
+
+**The cases.** Each drives a box holding no session start, the way a restart
+hands one over.
+
+- the mint spec names every kind the schemas hold
+- the patch tool and the check tool stand in the same registration
+- a second event registers nothing, because the first one did
+- the block naming what this box has reaches the session
+
+**What this leaves.** A tool call landing inside the restart window meets no
+server, and the bridgehead passes it through. That window belongs to
+[[spec/tickets/the-bridge-says-it-falls]], which says the fall out loud. This
+ticket covers the events after the server stands again.
 
 ## review
 
