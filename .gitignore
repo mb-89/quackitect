@@ -26,3 +26,7 @@ src/lsp/lsp
 src/lsp/lsp.exe
 src/yaml/yaml
 src/yaml/yaml.exe
+
+# The install script writes this from spec/config/brand/icon.svg, which the
+# vehicle owns. [[spec/tickets/the-brand-names-the-plugin]]
+src/extension/icon.svg

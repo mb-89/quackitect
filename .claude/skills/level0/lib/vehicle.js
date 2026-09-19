@@ -140,9 +140,43 @@ export const SETTINGS = ".claude/settings.json";
 export const KEEP = ".gitkeep";
 export const STUB_FOLDERS = ["project/spec/tickets", "project/spec/guidance", "project/src"];
 
+// [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 export function brandOf(method) {
   const parts = slashed(method).replace(/\/+$/, "").split("/");
-  return parts[parts.length - 1] ?? "";
+  const last = parts[parts.length - 1] ?? "";
+  return last
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+// [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+export function brandedJson(text, brand) {
+  const held = parsed(text);
+  if (!held || typeof held !== "object" || Array.isArray(held)) return String(text);
+  const out = { ...held };
+  if (out.owner && typeof out.owner === "object") {
+    out.owner = { ...out.owner, name: brand };
+    out.name = brand;
+  }
+  if (out.author && typeof out.author === "object") {
+    out.author = { ...out.author, name: brand };
+  }
+  return `${JSON.stringify(out, null, 2)}\n`;
+}
+
+// [[spec/design_output/level0#a-stub-names-its-vehicle]]
+export function shimSettings(text, vehicle, brand) {
+  const held = parsed(text);
+  const out = held && typeof held === "object" && !Array.isArray(held) ? { ...held } : {};
+  out.extraKnownMarketplaces = {
+    ...(out.extraKnownMarketplaces ?? {}),
+    [brand]: { source: { source: "directory", path: vehicle } },
+  };
+  const id = `level0@${brand}`;
+  const standing = Array.isArray(out.enabledPlugins) ? out.enabledPlugins : [];
+  out.enabledPlugins = standing.includes(id) ? standing : [...standing, id];
+  return `${JSON.stringify(out, null, 2)}\n`;
 }
 
 export function upstreamOf(remote, named) {

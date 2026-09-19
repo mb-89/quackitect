@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgent: true
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -154,6 +154,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: cc4c08e6ce89e901253a013c251b13c6ed35a72d
+    hash_after: cc4c08e6ce89e901253a013c251b13c6ed35a72d
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -345,15 +353,13 @@ that half. `test/contract` holds what a shell does.
 
 ### lint
 
-<!-- the tree builds and lints -->
-
-<!-- the form is command -->
+    ./RUNME.sh lint src/scripts/brand.js .claude/skills/level0/lib/vehicle.js src/scripts/install.sh src/stub/RUNME.sh spec/design_output/vehicle.md
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change touches no file the ask leaves out. The library, one script, the install script, the shim, the icon and the note the code points at.
+- every door the change reaches has a fake. The two new names stand pure, and `brand.js` takes the disk door as an argument.
+- a comment names the approach the change implements. Each one points at [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]].
 
 ## tests-green
 
