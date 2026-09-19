@@ -287,11 +287,15 @@ Findings, each one a fix for the hand at implement:
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/styles.test.js test/contract/vale-paths.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -299,11 +303,34 @@ Findings, each one a fix for the hand at implement:
 
 <!-- the form is text -->
 
+The styles both roots hold assemble into one folder, and the vale door reads the
+config standing there:
+
+| what lands | where |
+|---|---|
+| the assembly | `assemble` in `src/scripts/styles.js` |
+| the styles and the config it writes | `.se/vale` under the work root |
+| the rewrite of the styles key | `stylesIn` in `.claude/skills/level0/lib/vale.js` |
+| the config a caller hands in | `lintText`, which reads its constant otherwise |
+| the door taking both roots | `src/doors/vale.js`, which the server hands the pair |
+
+- A tree driving itself assembles nothing, and the door reads the method's own config.
+- The assembly answers every lint, and writes again where a source reads newer than the config.
+- The door runs Vale in the work root, so a config section matching a path reads the file in hand.
+
+The command line and the editor keep reading the method's config, so a rule the
+project alone holds stays silent there. The review names that, and the ask holds
+the door alone.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the assembly, the lint's config, the door, the server wiring it, the cases, and the chapter
+- the disk door and the process door each carry a fake, and the unit cases take them
+- each module and each case carries the pointer at the chapter under the vehicle note
 
 # verdict
 
