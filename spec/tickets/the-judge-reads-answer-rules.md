@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/person-1
+step: design/draft
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -120,6 +120,10 @@ record:
     hash_after: 8ca072d847c565e5fadaea8b05ec7454957981e4
     returns: 2
     why: Name the note beside the number in a label. A leaf reads several notes, and the material flattens them. So chapter numbering hands the classify call two labels under one number, and a refusal names two rules.
+  - step: design/person-1
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 9183b66a38b54f46c165b7d3c1c38c787ebdeb8b
+    hash_after: 9183b66a38b54f46c165b7d3c1c38c787ebdeb8b
 ---
 
 # Ask
@@ -144,9 +148,30 @@ Today the judge answers breaks over every hand-back on a cloud box. One run met 
 
 ### answer
 
-<!-- the answer, which the step behind this one reads -->
+A label names the note and the number, so one label reaches one rule.
 
-<!-- the form is text -->
+`notesSaid` opens a run per note and numbers from one inside it. So a leaf
+reading two notes hands the judge two rules under each number. The label
+carries the note's name with it, and each label then reaches one rule.
+
+| what the leaf reads | the labels it hands the judge |
+|---|---|
+| `spec/guidance/voice` | `voice-1` up to the last rule the note carries |
+| `spec/guidance/code/code` | `code-code-1` and its siblings |
+| a leaf whose rules all carry the mark | `follows` alone |
+
+The label is the note's path under `spec/guidance`, with each slash as a
+hyphen, then a hyphen and the rule's number in that note. `follows` stands
+beside them, and a label outside the set reads as `follows`.
+
+A refusal reads the label back to the note it names, so it says the note, the
+number and the rule's own line. A reader then opens one place.
+
+What this call weighs, on a box nobody sits beside:
+
+- the numbering inside a note stands as it stands, so the hand-out changes none of it
+- two notes share a last segment, so the label carries the whole path under the folder
+- the owner rules at the merge, and a shorter label costs a rename of one function
 
 ## draft
 
