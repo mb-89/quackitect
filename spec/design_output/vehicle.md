@@ -77,6 +77,25 @@ changes, and `./RUNME.sh config` says which layer answers a key.
 A projection declaration joins the same way where it is JSON. Its targets land
 in the work root, because that is the tree a person opens.
 
+## The styles assemble once
+
+A project writes a rule of its own, and the method's rules keep standing over
+it. Both roots hold their styles under `spec/config/styles`, and `assemble` in
+`src/scripts/styles.js` writes the pair into one folder:
+
+| what the assembly writes | where it stands |
+|---|---|
+| the styles both roots hold | `.se/vale/styles` under the work root |
+| the config naming that folder | `.se/vale/.vale.ini` beside it |
+
+The method's files land first, and a name the work root holds again replaces
+one. The config comes from the work root where it holds one, and from the
+method otherwise. The vale door hands that config to Vale, and a tree driving
+itself hands its own.
+
+The private folder stands off git, so nobody edits what the assembly writes.
+The assembly runs again where a style file reads newer than the derived config.
+
 ## A vehicle stands alone
 
 A vehicle carries the whole method and answers for itself. It reaches back to

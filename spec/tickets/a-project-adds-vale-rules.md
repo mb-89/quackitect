@@ -197,17 +197,28 @@ Findings, each one a fix for the hand at implement:
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/styles.test.js test/contract/vale-paths.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- every case fails on its own assertion, and the one for a tree driving itself passes
+- the stub answers the method's config and makes the folder, so a missing module fails nothing
+- the vale door finds Vale through the tools file under the method root, which surprises the hand
+- so the case over two folders on disk writes that file first, or the door reads no rule
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the module the approach names, its cases, and the design chapter naming both
+- the disk door carries every write, and the unit cases take its fake
+- each case and the module carry the pointer at the chapter the approach names
 
 ## reflect
 
