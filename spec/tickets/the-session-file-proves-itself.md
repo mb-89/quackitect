@@ -265,11 +265,17 @@ keying the second argument would hand the filter a call.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change reaches the level one library, its hook, and the tree case naming the copies
+- the hook meets a fake carrying a file system, a tool register and a log, so no door runs live
+- a comment over the spelling names `folders.js` as the owner, and the approach it implements
 
 ## tests-green
 
