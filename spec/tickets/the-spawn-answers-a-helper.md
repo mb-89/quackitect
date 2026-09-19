@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: design
@@ -160,6 +160,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-13
+    hash_before: 9e6d1da4a7cc7484a5f0391ed5e3e0cdf9a26c2d
+    hash_after: 9e6d1da4a7cc7484a5f0391ed5e3e0cdf9a26c2d
+reason: done
 ---
 
 # Ask
@@ -342,20 +347,34 @@ Two standing cases parked a child on `by: helper` to hold a group still. That pa
 ## read
 
 <!-- every file you read, one a line -->
-
 <!-- the form is files -->
+
+- .claude/skills/level0/lib/ticket.js
+- spec/design_output/pull.md
+- spec/guidance/tickets.md
+- spec/tickets/the-spawn-answers-a-helper.md
+- spec/tickets/the-spawn-takes-a-step.md
+- spec/tickets/the-unblock-keeps-its-shape.md
+- src/scripts/pull-chapter.js
+- src/scripts/pull-hand.js
+- src/scripts/pull.js
+- src/scripts/spawn.js
+- test/level0/pull-steps.test.js
+- test/level0/pull.test.js
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the two roads stand once, in the pull note, and every comment points there by link
 
 # Discussion
 
