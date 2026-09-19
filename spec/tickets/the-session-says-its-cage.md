@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: do
@@ -28,6 +28,19 @@ group: the-bridge-keeps-transport
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 step: do
+record:
+  - step: do
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 654afc861adf427224bf179c19436ca55b8479a0
+    hash_after: 1d1c883e7258a3070597a22de7bc1f307f1a678a
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 16 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
