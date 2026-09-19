@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-rules-hold-themselves
 urgent: true
 steps:
@@ -12,6 +12,12 @@ steps:
         form: text
         says: what you change, and what surprises you
 step: do
+record:
+  - step: do
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: c60c4dbc702ad6588e4b1c83508bf6c0e9aa3f14
+    hash_after: 5dd7383765ded67c1ac93e0c8abc7460632a0ab2
+reason: done
 ---
 
 # Ask
