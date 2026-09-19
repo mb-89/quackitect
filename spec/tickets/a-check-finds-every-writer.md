@@ -397,6 +397,10 @@ The name rules take a contract file of their own, because the file they stood
 in sits at its ceiling. The writers the tighter escape names each take a comment
 line, and no name moves.
 
+The reader takes the lists in hand, so a loop of bare names answers for the
+names it moves. `spec/design_output/tree.md` gains the rule's row, and
+`spec/design_output/private.md` says the escape binds to the line.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
