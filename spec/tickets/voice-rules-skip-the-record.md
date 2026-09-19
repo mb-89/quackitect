@@ -74,4 +74,12 @@ The queue handed `work/the-hand-carries-a-step` to the desk, and `branch review`
 
 The branch stands `done` on its own record, and its box left the check red. So the box met the same wall, and a cloud box carries nobody to ask.
 
+A field of form `files` meets the same wall, and no record writes it:
+
+- a hand writes one path a line, and `Sentence` reads the block as one sentence
+- Vale cuts a path at each mark, so a handful of paths runs past the ceiling
+- [[spec/tickets/the-take-skips-an-orphan]] carries a `read` chapter standing red on this
+
+So the road this ticket picks covers a hand's own list of paths too.
+
 The owner picks the road, because the first two cost a rule this tree already wants over a person's prose. Until then the branch waits, and the reviewer reads this note.

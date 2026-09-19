@@ -137,13 +137,14 @@ notes hold.
 
 # The listing reads git once
 
-`branch list` asks git three times, whatever stands on the remote:
+`branch list` reads git in four asks, whatever stands on the remote:
 
 | the read | the process | what it answers |
 |---|---|---|
 | the refs | `for-each-ref` | every work branch, its tip, the time on that tip, and whether trunk holds it |
 | the paths | `cat-file --batch` | the ticket names each tip carries |
 | the contents | `cat-file --batch` | the brief and every ticket the paths name |
+| the base | `merge-base`, once a branch | what trunk and that branch share |
 
 The fetch stands off that path. `branch list --fetch` asks for it, and `take`
 and the routine's trigger fetch on their own, because each acts on the remote.
@@ -151,8 +152,8 @@ and the routine's trigger fetch on their own, because each acts on the remote.
 A tree object carries a name as bytes, so the paths read raw. For details, see
 [[spec/design_output/doors#a-raw-run-keeps-bytes]].
 
-A fourth read asks `merge-base` what trunk and each branch share. git answers
-red where they share none, which is what a rewrite of trunk leaves behind:
+git answers the base red where trunk and a branch share none, which is what a
+rewrite of trunk leaves behind:
 
 | what git answers | the standing | what follows |
 |---|---|---|
@@ -170,7 +171,7 @@ reads the same base, so one read answers both.
 |---|---|
 | the name | the branch, or the ticket's file name |
 | the kind | `group`, `brief` or `ticket` |
-| the status | `todo`, `held`, `done` or `merged` |
+| the status | `todo`, `held`, `done`, `merged` or `orphan` |
 | the why | the mark, or what it waits for |
 | the age | the age of the tip, on a held branch |
 

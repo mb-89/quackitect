@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -146,6 +146,10 @@ record:
     hash_after: 33f5704f21869c55e3f64dd9e3ceb4ebcb051d51
     returns: 1
     why: the status column in `spec/design_output/work.md` names four words, and the listing prints `orphan`; that chapter says `branch list` asks git three times, and `refsHere` adds a read a branch
+  - step: implement/reflect
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 6220161619c07f3563535c2fec26e9a0b571838a
+    hash_after: 6220161619c07f3563535c2fec26e9a0b571838a
 ---
 
 # Ask
@@ -246,14 +250,22 @@ What surprises: the write door answers a file ceiling where these cases go in be
 ### class
 
 <!-- the class of error the findings describe, and the fix for the class -->
-
 <!-- the form is text -->
+
+The class: a change adds a value to a set, and a note somewhere else teaches that set. The note then reads stale, and a reader acts on the old set.
+
+Both findings are that. `orphan` joins the status words, and the base read joins the listing's asks. The status table and the listing's opening line each teach one of those sets.
+
+The fix for the class: `./RUNME.sh find` names every note teaching that set, and the change carries each. A count in prose is the same fault one step on, so the line names the reads and counts none.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the fix touches the two notes the findings name, and nothing else
+- the notes carry no door, so no fake stands here
+- the reads table and the status table each say what the code now answers
 
 ## change
 
