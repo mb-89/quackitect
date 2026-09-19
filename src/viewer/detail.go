@@ -27,18 +27,20 @@ func pairsOf(all []Record, at int) []Record {
 	case "prompt":
 		var out []Record
 		answered := false
+		mine := true
 		for next := at + 1; next < len(all); next++ {
 			switch all[next].Kind {
 			case "prompt":
 				answered = true
+				mine = false
 			case "answer":
 				if !answered {
 					out = append(out, all[next])
 					answered = true
 				}
-			// A note the session parks inside the turn shows under the prompt holding it. [[spec/design_output/viewer#the-details]]
+			// Every note between this prompt and the next one shows under it, ahead of the answer and after it. [[spec/design_output/viewer#the-details]]
 			case "note":
-				if !answered {
+				if mine {
 					out = append(out, all[next])
 				}
 			case "reply":

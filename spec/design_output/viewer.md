@@ -211,7 +211,11 @@ stands as an `unparsed` row holding its raw text.
 - A reply wears green, in heavy type on its kind.
 - A warning wears amber text, and an error red.
 - Every other kind wears its own colour, out of `kindColours` in `colour.go`.
+- A note wears its own colour, on its kind and on its text.
 - A tool row wears the colour of its tool, out of `toolColours`.
+
+A kind the said column colours reads its number off `kindColours`. So the two
+columns of one row wear one colour, and the number stands in one place.
 
 A name both tables leave out takes a spare colour by a hash of the name. So it
 wears the same colour every time. A test holds every colour in the two tables
@@ -228,6 +232,13 @@ writer adds, then the whole text. `text` stands where the writer adds one, and
 A prompt shows the reply ending its turn, and a reply shows every prompt since
 the reply before it. A person adding a prompt mid-turn gets one reply for all of
 them. For details, see [[spec/design_output/log#a-reply-beside-its-prompt]].
+
+A note stands with the prompt holding it:
+
+| the row | what stands under it |
+|---|---|
+| a prompt | every note between it and the prompt after it, ahead of its answer and after it |
+| a note | the prompt above it, the way an answer does |
 
 A long line wraps at the pane's width. A field's value wraps under itself, and a
 word wider than the pane breaks where it stands.

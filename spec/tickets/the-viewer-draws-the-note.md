@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -139,6 +139,14 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: b8c7600d6b902efc37f37d1136646bc338ea48b6
     hash_after: b8c7600d6b902efc37f37d1136646bc338ea48b6
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 6e760ecdf43498182402da11fe02275ba5675a0f
+    hash_after: 6e760ecdf43498182402da11fe02275ba5675a0f
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -275,13 +283,13 @@ and the case holds a shape carrying no answer, so the two read green together.
 
 ### lint
 
-    ./RUNME.sh lint src/viewer/colour.go src/viewer/detail.go
+    ./RUNME.sh lint src/viewer/colour.go src/viewer/detail.go spec/design_output/viewer.md
 
 ### checked
 
-- the change touches no file the ask leaves out. `colour.go` and `detail.go` carry it, and the ask names both.
+- the change touches no file the ask leaves out. `colour.go`, `detail.go` and the note both hunks point at.
 - every door the change reaches has a fake. The change reaches no door, and reads rows the caller hands it.
-- a comment names the approach the change implements. Each hunk carries the design output section it holds.
+- a comment names the approach the change implements. Each hunk carries its chapter, and each chapter takes the rule.
 
 ## tests-green
 

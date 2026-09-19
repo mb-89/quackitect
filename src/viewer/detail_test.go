@@ -274,6 +274,32 @@ func TestAPromptShowsTheNoteItCarriesAndTheNoteShowsItsPrompt(t *testing.T) {
 	}
 }
 
+// A note after the answer stands with the prompt too, up to the prompt after it. [[spec/design_output/viewer#the-details]]
+func TestAPromptShowsTheNotesOnBothSidesOfItsAnswer(t *testing.T) {
+	t.Parallel()
+	all := []Record{
+		row(1, "prompt", "are you bound?"),
+		row(2, "note", "ahead of the answer"),
+		row(3, "answer", "bound to the queue"),
+		row(4, "note", "after the answer"),
+		row(5, "prompt", "and now?"),
+		row(6, "note", "under the second prompt"),
+		row(7, "reply", "yes, bound"),
+	}
+	said := details(all, 0)
+	for _, want := range []string{"ahead of the answer", "after the answer"} {
+		if !strings.Contains(said, want) {
+			t.Fatalf("the prompt carries %q, and its details read:\n%s", want, said)
+		}
+	}
+	if strings.Contains(said, "under the second prompt") {
+		t.Fatalf("a note under the prompt after it stays there, and the details read:\n%s", said)
+	}
+	if got := details(all, 3); !strings.Contains(got, "are you bound?") {
+		t.Fatalf("the note after the answer shows the prompt above it, and reads:\n%s", got)
+	}
+}
+
 func TestAWrapLinesUpUnderAValueACharacterWiderThanAByte(t *testing.T) {
 	t.Parallel()
 	said := "  1…9        open the tab at that place and the next one too"
