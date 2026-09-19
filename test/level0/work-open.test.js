@@ -15,6 +15,7 @@ import {
   ranGit,
   remoteSaying,
   ROOT,
+  SHA,
 } from "./work-doors.js";
 
 // [[spec/design_output/work#the-listing-reads-git-once]]
@@ -49,13 +50,17 @@ test("branch open pushes a group off trunk, and says where it stands", () => {
   const { it, outside } = doorsSaying({
     ...remoteSaying([]),
     [`git show origin/main:${GROUP_AT}`]: { stdout: GROUP_NOTE },
+    "git rev-parse origin/main^{tree}": { stdout: "t0t0\n" },
+    "git commit-tree t0t0 -p origin/main -m work/one-group opens": {
+      stdout: `${SHA}\n`,
+    },
   });
 
   const { code, said } = heard(() => work(ROOT, ["open", "one-group"], it));
 
   assert.equal(code, 0);
   assert.ok(
-    ranGit(outside).includes("git push origin origin/main:refs/heads/work/one-group"),
+    ranGit(outside).includes(`git push origin ${SHA}:refs/heads/work/one-group`),
   );
   assert.match(said, /work\/one-group stands at todo/);
 });
