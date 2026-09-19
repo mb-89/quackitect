@@ -94,7 +94,9 @@ method otherwise. The vale door hands that config to Vale, and a tree driving
 itself hands its own.
 
 The private folder stands off git, so nobody edits what the assembly writes.
-The assembly runs again where a style file reads newer than the derived config.
+The assembly writes again where a source reads newer than the derived config.
+It writes again too where the names the roots hold differ from the copies
+standing there, so a rule a root drops refuses no write.
 
 ## A vehicle stands alone
 
