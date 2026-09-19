@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -127,6 +127,17 @@ record:
     hash_after: 9229e2c930757d573e3d24e86f6e13fe0ea818c6
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 7d7eb11fbb54652110f86afa7fd1c1659108f022
+    hash_after: 7d7eb11fbb54652110f86afa7fd1c1659108f022
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 33 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -274,26 +285,41 @@ What surprises: the fake disk wants the brief at the root, because the take read
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/work.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`branch take` hands `dirty` the branch it picks, before `onBranch` switches onto that branch and resets it hard onto origin.
+
+| the road | what it hands the guard | what stood before |
+|---|---|---|
+| `branch release` | the branch it names | the same |
+| `branch take` | the branch it picks | the branch the box stands on |
+
+So a commit the box holds on the branch a take lands on meets the read that names it. The refusal names the count and the push, because `unpushed` already words both.
+
+The read stands written in `src/scripts/work-stands.js`, and this change carries the branch to it. [[spec/design_output/work#a-branch-moves-clean]] carries the table.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the take and the chapter teaching the guard, which the ask names
+- the case drives `doorsSaying`, so git and the disk stand fake
+- the comment names the reset it guards, and points at [[spec/design_output/work#a-branch-moves-clean]]
 
 # verdict
 
