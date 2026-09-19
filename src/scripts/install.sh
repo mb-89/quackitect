@@ -38,6 +38,14 @@ for one in bin hold review undo measure copilot box.json session.json \
   mv "$old" "$new" 2>/dev/null || true
 done
 
+# The register stands in the home folder, under the same runtime half. A box
+# carrying it straight under .se hands the reader nothing, so this moves it.
+if [ -n "${HOME:-}" ] && [ -f "$HOME/.se/registry.json" ] &&
+  [ ! -f "$HOME/.se/.runtime/registry.json" ]; then
+  mkdir -p "$HOME/.se/.runtime"
+  mv "$HOME/.se/registry.json" "$HOME/.se/.runtime/registry.json" 2>/dev/null || true
+fi
+
 # The log is history and no runtime state, and it answers to .se/.log, a dot
 # folder a running session writes while the retro holds the rest. Every older
 # spelling of the folder comes home.

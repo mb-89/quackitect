@@ -18,6 +18,7 @@ import {
   resolves,
   travels,
 } from "../../.claude/skills/level0/lib/vehicle.js";
+import { RUN } from "../../.claude/skills/level0/lib/folders.js";
 import { homeIn } from "./editor.js";
 
 // [[spec/design_output/vehicle#a-marker-names-the-root]]
@@ -56,7 +57,7 @@ export function registerDirs(env) {
   const said = env.SE_REGISTRY;
   if (said) return said.split(process.platform === "win32" ? ";" : ":").filter(Boolean);
   const home = homeIn(env);
-  return home ? [join(home, ".se")] : [];
+  return home ? [join(home, ...RUN.split("/"))] : [];
 }
 
 export function readRegister(files, env) {

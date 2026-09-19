@@ -22,6 +22,7 @@ export const MOVED = [
   "lsp.json",
   "measure",
   "project.json",
+  "registry.json",
   "review",
   "session.json",
   "show-panel",
