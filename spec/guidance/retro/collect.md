@@ -6,7 +6,7 @@ rationale: [[spec/rationales/collecting]]
 
 # Actionables
 
-1. Run `./RUNME.sh retro collect <retro>` after the feedback step, on a green battery with no warning, while no other hand holds a ticket. *
+1. Run `./RUNME.sh retro collect <retro>` after feedback, on a green battery with no warning and no other hold. *
 2. Read the input folder and nothing else, because an input you go looking for is a fault in the verb. *
 3. Read the count it prints for each source, because a short answer reads like a whole one. *
 4. Expect `.se` to hold dot folders alone, and fix the writer of anything else standing there. *
