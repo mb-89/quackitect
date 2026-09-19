@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgent: true
-step: implement/tests-green
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -160,6 +160,17 @@ record:
     hash_after: cc4c08e6ce89e901253a013c251b13c6ed35a72d
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: c7560d1f227ed2b87a8024de4ff0d8a222d70428
+    hash_after: c7560d1f227ed2b87a8024de4ff0d8a222d70428
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 8 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -367,27 +378,44 @@ that half. `test/contract` holds what a shell does.
 
 ### tests
 
-<!-- the same tests pass -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test test/level0/brand.test.js
 
 ### check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ### says
 
-<!-- what changes and why, for a reader who was not there -->
+A vehicle stamps its folder name on the marketplace, and every `mcp__level0`
+tool keeps the name it carries.
+[[spec/design_output/vehicle#the-brand-a-vehicle-stamps]] holds the rule.
 
-<!-- the form is text -->
+| where | what it does |
+|---|---|
+| `brandOf` | slugs the folder name, so a dot and a space reach a marketplace |
+| `brandedJson` | takes the brand to an owner, an author, and a name beside an owner |
+| `shimSettings` | names the vehicle a marketplace, and adds `level0@<brand>` to what stands |
+| `src/scripts/brand.js` | runs the first two over the two files, and writes the icon |
+| `src/scripts/install.sh` | calls it, ahead of every verb |
+| `src/stub/RUNME.sh` | calls the third, into the settings file git ignores |
+
+The icon moves to `spec/config/brand/icon.svg`, and git ignores the path
+`src/extension/package.json` names. So a vehicle draws one mark, and the
+install script carries it where the extension reads it.
+
+The slug changes what `vehicle.json` records for a folder carrying a dot. The
+shim builds its clone path off that same name, so the two stay in step and the
+lookup stands.
+
+In this tree the brand answers the name the marketplace already holds, so the
+stamp writes nothing. A vehicle under another folder name takes it on the
+first run.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change touches no file the ask leaves out. The library, one script, the install script, the shim, the icon and the note.
+- every door the change reaches has a fake. `brand.js` takes the disk door as an argument, and the two new names stand pure.
+- a comment names the approach the change implements. Each one points at the chapter holding the rule.
 
 # verdict
 
