@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -194,6 +194,10 @@ record:
     hash_after: 7502d1da85f7d887a766d0345bee888c9c9db52b
     returns: 2
     why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | yes, the three done_when lines land |; | is what the diff touches beyond the ask trivial | yes, the server hunk moves two imports |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does a retro stand in the handback | no, and `branch review` names it at the branch's close |; | does every rule the change adds carry a case | the gate does, and the check list takes none |; | does a case feed the rule something bad | the pull cases do, and the contract case holds nothing |; TL;DR:; Four of the five needs land, and the gate now stands above the branch-take.; A cloud box on trunk at `god` reads the wait, and the take stands untouched.; Three cases drive `pull` over the fakes, so the first done_when line lands.; `queueWaits` reads `BINDING`, and the pull's named-ticket refusal reads `QUEUE`.; The contract case's name promises a guard its assertions leave out.; The findings, one a line:; The contract case says every shipped check stands in one list or the other.; Its first loop asks whether `standsDown` answers a boolean, which holds for any string.; A shipped name outside both lists meets that loop, and the case passes green.; `EVERY` in `test/level0/binding.test.js` stands as a copy, and this round moves its comment alone.; So need 3 of the last round stands open, and a check joining the rules lands in neither list.; The fix: hold the shipped names against the list the stop door answers.; What reads true against the tree, one a line:; The gate stands above the branch-take, under the hand-back and the hold, in `src/scripts/pull.js`.; A cloud box on trunk at `god` answers wait, and reaches the take nowhere.; The same box at `queue` reaches the take, so the gate closes that road alone.; The config library owns `BINDING`, `QUEUE` and `GOD`, and four files read them there.; `./RUNME.sh check` answers 0, and `branch test` answers green over the two case files.; `./RUNME.sh branch review` names the retro alone, and the branch's close writes it.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the contract case refuses a shipped check landing in neither list | open |; | 2 | the verdict hand reads the branch again | open |"
+  - step: implement/reflect
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: f98005142aa54834a8d493257834f24e220b6ed5
+    hash_after: f98005142aa54834a8d493257834f24e220b6ed5
 ---
 
 # Ask
@@ -358,23 +362,27 @@ drives that half over a fake box.
 
 ### class
 
-Three classes stand under the findings.
+One class stands under this round's finding.
 
-| the class | the findings it carries | the fix for the class |
+| the class | the finding it carries | the fix for the class |
 |---|---|---|
-| a gate lands below a road it closes | the cloud take at `god` | the gate stands above every road the pull takes, under the hand-back and the hold |
-| a case drives the pure name, and the caller stands untested | the pull's wait | the case drives `pull` itself, over the fakes `pull-doors.js` builds |
-| a list a case reads stands copied, and its owner stands elsewhere | the check names | the case reads the names off the stop rules, which own them |
+| an assertion reads a shape, where the claim reads a set | the contract case over the shipped names | the door answers which names it knows, and the case holds the shipped names against that |
 
-The first class is the one that costs a person. A gate under a road lets that
-road answer first, so the value a person sets reaches the case and leaves the
-box alone. The order of the roads is what the gate has to read.
+The case its title promises refuses a shipped name the door answers nowhere.
+The assertion it carries reads the type of an answer, which any string wins. So
+the title and the assertion part, and the green tells a reader nothing.
 
-The second class is what lets the first stand. A case over `handsOut` reads
-the answer, and a case over `pull` reads the road. The ask names the second.
+The door knows its names in a chain of comparisons, so nothing outside it can
+ask what the chain holds. A table keyed by the name answers both: the door
+reads it, and a case asks it what stands in it.
 
-The two bare keys are a word, not a class. `queueWaits` and the pull's refusal
-each spell a value the same file exports, so each reads the name beside it.
+The three classes of the round before stand answered, and the rounds hold them.
+
+### checked
+
+- the change touches no file the ask leaves out. The stop door and the two case files.
+- every door the change reaches has a fake. The contract case drives the shipped rules, which is what a contract case is for.
+- a comment names the approach the change implements. Each site points at the chapter owning the binding.
 
 ### checked
 
