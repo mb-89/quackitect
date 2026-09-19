@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -135,6 +135,10 @@ record:
     hand: box fa49097ce66c · claude-code-remote
     hash_before: aed23308eeead385ca1a2b5658c9bf516c3b05dd
     hash_after: 138d13c749a4d9a7b6558d59d354e40d48e22c53
+  - step: design/review
+    hand: box fa49097ce66c · claude-code-remote · helper-8
+    hash_before: 76c008c93c03d22993769c568928a52575d323f4
+    hash_after: 76c008c93c03d22993769c568928a52575d323f4
 ---
 
 # Ask
@@ -331,46 +335,45 @@ door, the stop door, the answer door and the rest.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- Every file under `src/scripts` takes a row now, and two moves carry a cost the plan leaves open.
-- The swap move breaks two Go replace lines, where the plan names one change alone.
-- `src/index/go.mod` and `src/lsp/go.mod` each read `replace quackitect/swap => ../swap`.
-- Add a row sending both to `../engine/swap`, because the check runs those two modules.
-- `queue.js` imports `entriesOf` from `src/scripts/pull-writes.js`, which the plan keeps in the scripts folder.
-- The engine row of the import table says the doors alone, so say where `entriesOf` lands.
-- One more reader of `src/scripts/tools.js` stands outside `src`, so correct the reader row.
-- `.claude/skills/level0/lib/copilot-runtime.js` imports it by relative path, and that path follows the move.
-- Six notes under `spec/design_output` name a moving file by path, so say the notes follow.
-- `tools.md`, `work.md` and `viewer.md` name three of them.
-- `pull.md`, `review.md` and `level0.md` name the rest.
-- `go-tests.js` serves `branch test` too, where `test-verb.js` imports `goEnvOf`.
-- `landed.js` serves `branch unblock` too, where `unblock.js` imports it.
-- `hand.js` keeps every caller inside `src/scripts`, so say what sends it to the engine.
+- Every claim in the draft matches the code, and each file under `src/scripts` takes a row.
+- An implementer reads the rule, the moves, the cut and the renames, and follows each.
+- The plan says a note follows a moving path, and the test files stand open.
+- Run `grep -rl` over `test/` for the moving paths to read how many imports the moves reach.
+- Add a line sending a test with its module, because the check reads those imports.
+- `src/engine/tools.js` shares its name with `src/bridge/tools.js`, so two files carry one name.
 
 **What holds.**
 
 - `./RUNME.sh branch review the-bridge-keeps-transport` exits 0, the check passes, and a retro stands absent.
-- The draft commits touch the ticket file alone, which leaves code and tests to implement.
-- `status.js` and `tense.js` import node and wink alone, so those two rename whole.
-- `src/doors/biome.js` and `src/doors/vale.js` import `readTools` from the scripts folder.
-- `src/bridge/guidance.js` and `src/bridge/findings.js` import it as well.
-- `viewer.js` reaches the `tui` verb through `tuiDoors`, which `cli-check.js` exports.
+- The commits since the last close touch the ticket file alone, which leaves code to implement.
+- `src/index/go.mod` and `src/lsp/go.mod` each read `replace quackitect/swap => ../swap`.
+- `src/index/main.go` and `src/lsp/main.go` import the module name, which the folder move keeps.
+- `src/scripts/pull-writes.js` exports `entriesOf`, and `queue.js` imports it from there.
+- `.claude/skills/level0/lib/copilot-runtime.js` imports `readTools` and `whereIs` by relative path.
+- Six notes under `spec/design_output` name a moving path, and the table names each one.
+- `src/bridge/projection.js` exports the five the cut table names.
+- `ownerDoor` reads `box.projections`, and `marksStale` reads `box.sources`, as the caller column says.
+- `freshens` runs inside `decide`, and `opensSession` fills both fields at the session start.
 - `goModulesIn` lists dirs one level under `src`, and `goModulesOf` matches a test path by regex.
-- `goModulesOf` reads path strings alone, and it stands in `src/scripts/test-verb.js`.
-- `src/bridge/write.js` runs `ownerDoor` as a check and `marksStale` after a write.
-- `freshens` runs inside `decide`, and `opensSession` fills the projections and the sources fields.
-- `group.js` reaches `src/bridge/bash.js` and `src/bridge/stop.js`, so the engine suits it.
+- `status.js` and `tense.js` import node and wink alone, so those two rename whole.
+- `group.js` and `tools.js` import the level0 doors alone, which suits the engine rule.
+- `src/bridge/bash.js` and `src/bridge/stop.js` import `group.js` from outside the scripts folder.
+- `src/doors/biome.js` and `src/doors/vale.js` import `readTools` from that folder as well.
+- `src/bridge/guidance.js` and `src/bridge/findings.js` reach `tools.js` the same way.
 - `cli.js` wires a verb for each file in the stay table, so that row holds.
+- Each rename target takes a name of its own across the scripts folder.
 - The draft names the open second line of the ask, and leaves the door cut to a later ticket.
 
 **What the last verdict asks.**
 
-- The draft answers the finding naming `graph.js`, `probe.js`, `stub.js` and `ticket.js`.
-- The draft answers the finding naming `tui.js`, `vehicle.js` and `voice.js`.
-- The draft answers the row for a file carrying the name of its own verb.
-- The draft answers the finding giving `tools.js` a row under the engine table.
-- The stay table drops its count, so that finding closes.
+- The draft answers the two Go replace lines, with a row sending each to `../engine/swap`.
+- The draft answers where `entriesOf` lands: `pull-writes.js` holds its prefix and stays.
+- The draft answers the copilot reader of `tools.js`, whose relative path follows the move.
+- The draft answers the six notes, naming each one in a table.
+- The draft answers the second verb of `go-tests.js` and of `landed.js`.
+- The draft answers `hand.js`: it takes the `pull-` prefix and keeps its folder.
 
 # implement
 
