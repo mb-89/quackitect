@@ -5,6 +5,8 @@ package main
 
 import "strings"
 
+const openFence = "---\n"
+
 type linkAt struct {
 	key    string
 	target string
@@ -13,16 +15,17 @@ type linkAt struct {
 
 func frontOf(text string) (map[string]string, string) {
 	said := strings.ReplaceAll(text, "\r\n", "\n")
-	if !strings.HasPrefix(said, "---\n") {
+	if !strings.HasPrefix(said, openFence) {
 		return map[string]string{}, said
 	}
-	end := strings.Index(said[4:], "\n---")
+	start := len(openFence)
+	end := strings.Index(said[start:], "\n---")
 	if end < 0 {
 		return map[string]string{}, said
 	}
 
-	head := said[4 : 4+end]
-	body := said[4+end:]
+	head := said[start : start+end]
+	body := said[start+end:]
 	if cut := strings.Index(body, "\n"); cut >= 0 {
 		if rest := strings.Index(body[cut+1:], "\n"); rest >= 0 {
 			body = body[cut+1+rest+1:]
