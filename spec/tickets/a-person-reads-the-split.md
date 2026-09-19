@@ -36,7 +36,12 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/question]]
 process_hash: 1f3006ec4b044a89
-step: answer
+step: do
+record:
+  - step: answer
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 6cdfc9c02d00d6ee857ae042cf10c4df84f22c27
+    hash_after: 6cdfc9c02d00d6ee857ae042cf10c4df84f22c27
 ---
 
 # Ask
@@ -74,6 +79,29 @@ The review hands that ticket back to its draft, and the draft reaches its escala
 <!-- the answer, which the step behind this one reads -->
 
 <!-- the form is text -->
+
+The approach stands, and the split it names has landed. The header a module
+owes stays open.
+
+| what the ask asks | what the tree answers |
+|---|---|
+| `./RUNME.sh lint src/scripts` names no `FileCeiling` | it names none |
+| `./RUNME.sh lint test/level0` names no `FileCeiling` | it names none |
+| `./RUNME.sh check` exits 0 | it exits 0, with the server standing |
+| every module the split mints heads with what it is for | `pull-hand.js`, `pull-route.js` and `work-merge.js` open on an import |
+
+So the `do` step writes a header on each module the table names, in the shape
+[[spec/guidance/code]] asks for.
+
+The findings the review names reach a draft that closed `became`. The tree
+carries the approach now, and the tree is what a reader acts on. So the `do`
+step leaves that draft where it stands.
+
+What this call weighs, on a box nobody sits beside:
+
+- the split landed elsewhere, so this answer reads the tree
+- a closed ticket's draft is history, and a reader reaches the tree instead
+- the header work stands whichever way the owner rules on the draft at the merge
 
 # do
 
