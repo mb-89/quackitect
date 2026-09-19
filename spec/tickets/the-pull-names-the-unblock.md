@@ -90,7 +90,12 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: adec70e31a69ba47cfa791dad14052d89937c8a5
+    hash_after: adec70e31a69ba47cfa791dad14052d89937c8a5
 ---
 
 # Ask
@@ -128,8 +133,25 @@ A cloud box clears a person's wall itself, because the pull names the verb that 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The wait answer already names the unblock road, so this ticket lands the table row and the case a group shapes.
+
+| what stands | where |
+|---|---|
+| the prompt naming the mint, the open, the unblock and the done | `unblockPrompt` in `src/scripts/spawn.js` |
+| the pull printing it where a person's step is all that stands | `handOut` in `src/scripts/pull-hand.js` |
+| a case reading that prompt off a plain pull | `test/level0/person-step.test.js` |
+
+What changes:
+
+- the `wait` row of the answers table points at [[spec/design_output/work#a-person-step-leaves]]
+- a case drives a group at `children` whose one open child waits at a person's step
+- that case reads `branch unblock` out of the answer
+
+The row carries a link, because the prompt keeps its own words in one place.
+
+The objection: the plain case already reads the same lines. It reads them off a free ticket, and the ask names the group shape, where the group's own leaf competes for the same answer.
 
 ## review
 
