@@ -25,6 +25,8 @@ Read this note again on any of three signs:
 
 Collect moves folders, and a move takes the file a working hand reads. One run while somebody was mid-task deleted what they were reading. So the verb refuses while another hold stands, and passes the hold of its own retro.
 
+A retro reading a red battery reads what broke today and no pattern, and a warning is a fault somebody left standing. So collect opens on a stamp green at this commit, with no warning, as a push does.
+
 ## 2. One folder holds all
 
 The retro before this one read its numbers off a copied log, and opened no transcript. The command line carried no door naming where the transcripts stood.
@@ -45,9 +47,11 @@ A short answer reads like a whole one. v3 lost a whole session to a log that rot
 
 So collect prints the count for each source, and the owner reads it against what they saw happen.
 
-## 4. Two folders stay
+## 4. Dot folders stay
 
 Collect moves everything past the dot folders, a move and no copy. So the next retro starts empty, and nothing counts twice. A folder under a dot name is one the owner keeps out of every retro.
+
+The log is the one dot folder collect drains. A running session writes it through the whole retro, so its dot keeps the private folder empty meanwhile.
 
 A third thing standing after a collect is a writer putting a file where it does not belong. The collect names it and answers one.
 

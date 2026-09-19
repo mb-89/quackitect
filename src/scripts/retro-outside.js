@@ -5,6 +5,8 @@
 // [[spec/guidance/retro/collect]]
 
 const MEMORY = "memory";
+// A repository's own store and a package folder carry no record of the work, and git keeps its objects read-only. [[spec/guidance/retro/collect]]
+const STORES = [".git", "node_modules"];
 // Where the harness keeps each source, under home or under temp. [[spec/guidance/retro/collect]]
 const SOURCES = [
   { kind: "transcripts", base: "home", under: [".claude", "projects"] },
@@ -58,7 +60,7 @@ export function outsideInto(it, into, since) {
 
 function copyTree(it, from, to, since, out, skips) {
   for (const one of listed(it, from)) {
-    if (skips.includes(one.name)) continue;
+    if (skips.includes(one.name) || STORES.includes(one.name)) continue;
     const was = it.join(from, one.name);
     const now = it.join(to, one.name);
     if (one.kind === "dir") {

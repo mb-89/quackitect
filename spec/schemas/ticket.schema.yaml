@@ -285,4 +285,6 @@ body:
       required: true
       position: last
       x-written: anyone
+      # A discussion nobody opens is a whole ticket, so its comment stands at no warning.
+      x-fills: false
       description: what anybody adds, at any time, on this ticket

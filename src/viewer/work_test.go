@@ -47,7 +47,7 @@ func workTree(t *testing.T) string {
 	}
 	writeAt(t, root, workBaseAt, string(base))
 	writeAt(t, root, workAnswerAt, workAnswerSaid)
-	writeAt(t, root, ".se/log/session.jsonl", "")
+	writeAt(t, root, ".se/.log/session.jsonl", "")
 	return root
 }
 
@@ -93,7 +93,7 @@ func TestAGroupCarriesItsTicketsAndALooseOneStandsAtTheLeft(t *testing.T) {
 func TestTheTabReadsTheBaseFileAndTheAnswerOffTheLogsOwnPath(t *testing.T) {
 	t.Parallel()
 	root := workTree(t)
-	tree, err := loadWork(filepath.Join(root, ".se", "log", "session.jsonl"))
+	tree, err := loadWork(filepath.Join(root, ".se", ".log", "session.jsonl"))
 	if err != nil {
 		t.Fatalf("the tab reads its two files, and answered %v", err)
 	}
@@ -112,7 +112,7 @@ func TestTheTabReadsTheBaseFileAndTheAnswerOffTheLogsOwnPath(t *testing.T) {
 func TestTheFilterReadsATicketsKeysInTheLogsOwnLanguage(t *testing.T) {
 	t.Parallel()
 	root := workTree(t)
-	tree, err := loadWork(filepath.Join(root, ".se", "log", "session.jsonl"))
+	tree, err := loadWork(filepath.Join(root, ".se", ".log", "session.jsonl"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -137,7 +137,7 @@ func TestTheFilterReadsATicketsKeysInTheLogsOwnLanguage(t *testing.T) {
 func TestTheWindowDrawsEveryTicketNestedUnderItsGroup(t *testing.T) {
 	t.Parallel()
 	root := workTree(t)
-	path := filepath.Join(root, ".se", "log", "session.jsonl")
+	path := filepath.Join(root, ".se", ".log", "session.jsonl")
 	tree, err := loadWork(path)
 	if err != nil {
 		t.Fatal(err)
@@ -158,7 +158,7 @@ func TestTheWindowDrawsEveryTicketNestedUnderItsGroup(t *testing.T) {
 func TestAWriteToTheAnswerHandsTheTabItsTreeAgain(t *testing.T) {
 	t.Parallel()
 	root := workTree(t)
-	path := filepath.Join(root, ".se", "log", "session.jsonl")
+	path := filepath.Join(root, ".se", ".log", "session.jsonl")
 
 	first, ok := workCmd(path, time.Time{})().(workMsg)
 	if !ok || first.same || first.tree == nil {
@@ -182,11 +182,11 @@ func TestAWriteToTheAnswerHandsTheTabItsTreeAgain(t *testing.T) {
 func TestATabMeetingNoAnswerSaysSoAndDrawsNothingElse(t *testing.T) {
 	t.Parallel()
 	root := t.TempDir()
-	writeAt(t, root, ".se/log/session.jsonl", "")
-	if _, err := loadWork(filepath.Join(root, ".se", "log", "session.jsonl")); err == nil {
+	writeAt(t, root, ".se/.log/session.jsonl", "")
+	if _, err := loadWork(filepath.Join(root, ".se", ".log", "session.jsonl")); err == nil {
 		t.Fatal("a tree carrying neither file answers why")
 	}
-	if !workStamp(filepath.Join(root, ".se", "log", "session.jsonl")).IsZero() {
+	if !workStamp(filepath.Join(root, ".se", ".log", "session.jsonl")).IsZero() {
 		t.Fatal("an answer standing nowhere carries no time")
 	}
 }

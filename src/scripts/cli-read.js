@@ -79,6 +79,9 @@ export function readThroughTheReader(found) {
   return kept;
 }
 
+// What the last lint heard, which the stamp reads beside the exit. [[spec/guidance/retro/collect]]
+export const heard = { warned: false };
+
 export async function lint(where) {
   if (!files.exists(bin)) {
     console.error("Vale is missing. Run ./RUNME.sh once and it installs.");
@@ -152,6 +155,8 @@ export async function lint(where) {
   }
 
   const ms = it.clock.now().getTime() - began;
+  // A warning passes the check and still holds a retro shut, so the stamp carries whether one stands. [[spec/guidance/retro/collect]]
+  heard.warned = found.length > 0;
   if (!found.length) {
     await it.log.say("info", "vale", `the rules pass over ${where.join(" ")}`, { ms });
     console.log("The rules pass.");

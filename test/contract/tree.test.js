@@ -335,7 +335,7 @@ test("a file spelling the runtime folder without naming its owner is refused", (
 test("a spelling of a name the runtime half took is refused where the old place stands", () => {
   const stale = {
     "src/bridge/left.js": 'const at = join(work, ".se", "hold");\n',
-    "src/scripts/old.js": 'const bin = ".se/bin";\nconst log = ".se/log";\n',
+    "src/scripts/old.js": 'const bin = ".se/bin";\nconst log = ".se/.log";\n',
   };
   assert.deepEqual(
     privateFolderOwned(fakeTree(stale, Object.keys(stale))).map((one) => [

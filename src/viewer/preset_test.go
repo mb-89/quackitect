@@ -108,7 +108,7 @@ func TestAColumnsValuesDrawAsSlicesWithNoLineInTheFile(t *testing.T) {
 func TestABaseFileNamesThePresetsUnderGroups(t *testing.T) {
 	t.Parallel()
 	root := workTree(t)
-	tree, err := loadWork(strings.Join([]string{root, ".se", "log", "session.jsonl"}, "/"))
+	tree, err := loadWork(strings.Join([]string{root, ".se", ".log", "session.jsonl"}, "/"))
 	if err != nil {
 		t.Fatal(err)
 	}

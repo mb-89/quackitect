@@ -208,6 +208,10 @@ func placeholderFaults(text string, schema *yaml.Doc, where string) []Finding {
 		if rule == nil {
 			continue
 		}
+		// A chapter the schema marks x-fills false stays at its comment with no warning. [[spec/design_output/schema#a-placeholder-stands-at-warning]]
+		if fills, set := rule.Get("x-fills").(bool); set && !fills {
+			continue
+		}
 		if said := yaml.AsString(rule.Get("description")); said != "" {
 			named[yaml.AsString(rule.Get("header"))] = fmt.Sprintf("<!-- %s -->", said)
 		}

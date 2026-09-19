@@ -38,12 +38,13 @@ for one in bin hold review undo measure copilot box.json session.json \
   mv "$old" "$new" 2>/dev/null || true
 done
 
-# A box an earlier run moves the log on carries it back, because the log is
-# history and no runtime state. Both older spellings of the folder come home.
-for one in "$root/.se/run/log" "$root/.se/runtime/log" "$root/.se/.runtime/log"; do
+# The log is history and no runtime state, and it answers to .se/.log, a dot
+# folder a running session writes while the retro holds the rest. Every older
+# spelling of the folder comes home.
+for one in "$root/.se/log" "$root/.se/run/log" "$root/.se/runtime/log" "$root/.se/.runtime/log"; do
   if [ -d "$one" ]; then
-    mkdir -p "$root/.se/log"
-    cp -rn "$one/." "$root/.se/log/" 2>/dev/null || true
+    mkdir -p "$root/.se/.log"
+    cp -rn "$one/." "$root/.se/.log/" 2>/dev/null || true
     rm -rf "$one" 2>/dev/null || true
   fi
 done

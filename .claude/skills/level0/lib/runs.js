@@ -18,10 +18,12 @@ export function stampOf(text) {
       sha: String(read.sha ?? ""),
       ok: read.ok === true,
       clean: read.clean === true,
+      // A stamp from before the field reads as warned, so an old check opens no retro. [[spec/guidance/retro/collect]]
+      warned: read.warned !== false,
       at: String(read.at ?? ""),
     };
   } catch {
-    return { sha: "", ok: false, clean: false, at: "" };
+    return { sha: "", ok: false, clean: false, warned: true, at: "" };
   }
 }
 

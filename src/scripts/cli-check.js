@@ -6,7 +6,6 @@ import { dirname, join, resolve, sep } from "node:path";
 import { CONFIG_DIR } from "../../.claude/skills/level0/lib/code.js";
 import { LOCAL, SCHEMA } from "../../.claude/skills/level0/lib/config.js";
 import { inherits, rooted } from "../../.claude/skills/level0/lib/layer.js";
-import { guidanceHere } from "../bridge/guidance.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 import { boxOf } from "../../.claude/skills/level0/lib/private.js";
 import {
@@ -22,6 +21,7 @@ import { TOOLS, WANTED } from "../../.claude/skills/level0/lib/tools.js";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { CONFIG, fromJson } from "../../.claude/skills/level0/lib/vale.js";
 import { POINTER, PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
+import { guidanceHere } from "../bridge/guidance.js";
 import {
   faultsIn as faultsInGrid,
   RULE as GRID,
@@ -52,7 +52,7 @@ import {
   STYLES,
   settings,
 } from "./cli-doors.js";
-import { namesIn, show, walk } from "./cli-read.js";
+import { heard, namesIn, show, walk } from "./cli-read.js";
 import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
 import { HOOKS } from "./precommit.js";
 import { writeSurvey } from "./tools.js";
@@ -349,7 +349,7 @@ export function stamped(code) {
   files.makeDir(join(root, ".se"));
   files.write(
     join(root, STAMP),
-    `${JSON.stringify({ sha, ok: code === 0, clean, at: it.clock.now().toISOString() }, null, 2)}
+    `${JSON.stringify({ sha, ok: code === 0, clean, warned: heard.warned, at: it.clock.now().toISOString() }, null, 2)}
 `,
   );
   return code;

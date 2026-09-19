@@ -34,8 +34,8 @@ export const MOVED = [
 export const HOLDS = `${RUN}/hold`;
 // The one file a hold stands in beside the folder, which an older box still writes. [[spec/design_output/pull#the-hand-and-the-hold]]
 export const HOLD = `${RUN}/hold.json`;
-// The log stands outside the runtime folder, because the retro collects it. [[spec/tickets/the-retro-takes-the-box]]
-export const LOG = `${PRIVATE}/log`;
+// The log stands outside the runtime folder, because the retro collects it. Its dot keeps the private folder empty while a session writes it through a retro. [[spec/guidance/retro/collect]]
+export const LOG = `${PRIVATE}/.log`;
 export const NOTES = `${PRIVATE}/notes`;
 export const TICKETS = `${PRIVATE}/tickets`;
 // The work answer is regenerated state, so it stands in the runtime folder. [[spec/design_output/work#one-verb-answers-git]]

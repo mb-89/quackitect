@@ -40,7 +40,7 @@ test("the runtime half answers on the path the root holds, not on a folder's bas
   assert.equal(runs("./.se/.runtime/hold/one.json"), true);
   assert.equal(runs(".se\\.runtime\\hold"), true);
   // The log is history, so it stands outside the half a session clears. [[spec/tickets/the-retro-takes-the-box]]
-  assert.equal(runs(".se/log/session.jsonl"), false);
+  assert.equal(runs(".se/.log/session.jsonl"), false);
   assert.equal(runs("src/scripts/run"), false);
   assert.equal(runs("src/run/one.js"), false);
   assert.equal(runs(PRIVATE), false);
@@ -80,7 +80,7 @@ test("every runtime writer stands inside the half the skip reads", () => {
 
 // The retro's collect skips the runtime half whole, and a retro reads the log. [[spec/tickets/the-runtime-folder-holds-state]]
 test("the log stands outside the half the retro skips", () => {
-  assert.equal(LOG, `${PRIVATE}/log`);
+  assert.equal(LOG, `${PRIVATE}/.log`);
   assert.equal(runs(LOG), false);
 });
 

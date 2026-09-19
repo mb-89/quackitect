@@ -22,11 +22,17 @@ const home = (path) => join(HOME, ...path.split("/"));
 const temp = (path) => join(TEMP, ...path.split("/"));
 
 const FILES = {
-  [at(".se/log/one.jsonl")]: '{"said":"a line"}\n',
+  [at(".se/.log/one.jsonl")]: '{"said":"a line"}\n',
   [at(".se/tickets/a-note.md")]: "---\nkind: [[ticket]]\nstate: open\n---\n",
   [at(".se/scripts/one.mjs")]: "// a script a hand writes\n",
   [at(".se/check.out")]: "an old output\n",
   [at(".se/.runtime/index.db")]: "rows",
+  [at(".se/.runtime/check.json")]: JSON.stringify({
+    sha: "abc123",
+    ok: true,
+    clean: true,
+    warned: false,
+  }),
   [at(".se/.doc/standard.pdf")]: "a document the owner keeps",
   [home(`.claude/projects/${SLUG}/session.jsonl`)]: '{"type":"user"}\n',
   [home(`.claude/projects/${SLUG}/session/subagents/one.jsonl`)]:
@@ -35,6 +41,7 @@ const FILES = {
   [home(`.claude/projects/${SLUG}-scratchpad-stub/stub.jsonl`)]: '{"type":"user"}\n',
   [home(".claude/projects/another-tree/theirs.jsonl")]: '{"type":"user"}\n',
   [temp(`claude/${SLUG}/session/scratchpad/probe.mjs`)]: "// a probe\n",
+  [temp(`claude/${SLUG}/session/scratchpad/stub/.git/objects/ab/cd`)]: "an object",
 };
 
 function doors(files = FILES, more = {}) {
@@ -44,9 +51,30 @@ function doors(files = FILES, more = {}) {
     clock: fakeClock("2026-09-19T12:00:00.000Z"),
     home: HOME,
     temp: TEMP,
+    git: { run: () => ({ ok: true, out: "abc123" }) },
     ...more,
   };
 }
+
+// A retro opens on a battery green at this commit, with no warning standing. [[spec/guidance/retro/collect]]
+test("collect refuses a battery holding a warning, and one that ran against another commit", () => {
+  for (const stamp of [
+    { sha: "abc123", ok: true, clean: true, warned: true },
+    { sha: "old999", ok: true, clean: true, warned: false },
+    { sha: "abc123", ok: true, clean: true },
+  ]) {
+    const it = doors({
+      ...FILES,
+      [at(".se/.runtime/check.json")]: JSON.stringify(stamp),
+    });
+
+    const { code, said } = heard(() => retro(ROOT, ["collect", RETRO], it));
+
+    assert.equal(code, 1);
+    assert.match(said, /A retro opens on a green battery with no warning/);
+    assert.equal(it.disk.exists(at(".se/.log/one.jsonl")), true, "nothing moves");
+  }
+});
 
 function heard(run) {
   const rows = [];
@@ -87,7 +115,7 @@ test("collect refuses while another hand holds a ticket, and moves nothing", () 
   assert.equal(code, 1);
   assert.match(said, /a hand holds a ticket/);
   assert.equal(
-    it.disk.exists(at(".se/log/one.jsonl")),
+    it.disk.exists(at(".se/.log/one.jsonl")),
     true,
     "the log stays where it stands",
   );
@@ -118,7 +146,7 @@ test("collect moves everything past the dot folders, and leaves the runtime fold
   assert.equal(it.disk.exists(input("scripts/one.mjs")), true);
   assert.equal(it.disk.exists(input("check.out")), true, "a loose file moves too");
   assert.equal(
-    it.disk.exists(at(".se/log")),
+    it.disk.exists(at(".se/.log")),
     false,
     "a move leaves nothing where it stood",
   );
@@ -160,6 +188,11 @@ test("collect copies the transcripts, the memory and the scratchpads of this tre
     true,
   );
   assert.equal(it.disk.exists(input("transcripts/another-tree/theirs.jsonl")), false);
+  assert.equal(
+    it.disk.exists(input(`scratch/${SLUG}/session/scratchpad/stub/.git`)),
+    false,
+    "a repository's own store stays out",
+  );
   assert.equal(
     it.disk.exists(home(`.claude/projects/${SLUG}/session.jsonl`)),
     true,
@@ -206,7 +239,7 @@ test("the manifest names every file with its size and source, and the verb print
   assert.match(said, /transcripts\s+3 file\(s\)/);
   const record = JSON.parse(it.disk.read(at(`.se/.retro/${RETRO}/collected.json`)));
   assert.equal(record.at, "2026-09-19T12:00:00.000Z");
-  assert.equal(record.counts[".se"], 4);
+  assert.equal(record.counts, undefined, "a count derives off the manifest");
 });
 
 // The last retro's collect opens the window, and the memory is standing state. [[spec/guidance/retro/collect]]
@@ -286,5 +319,32 @@ test("a move the disk refuses takes a manifest line, and the verb answers one na
   assert.equal(
     manifestOf(it).some((one) => one.refused === "EBUSY"),
     true,
+  );
+});
+
+// An editor watching a folder refuses its rename, and its files still move. [[spec/guidance/retro/collect]]
+test("a folder the disk refuses to move whole moves file by file, and leaves nothing", () => {
+  const plain = doors({ ...FILES, [at(".se/tmp/ste/words.txt")]: "one\n" });
+  const disk = {
+    ...plain.disk,
+    move(from, to) {
+      if (String(from).split("\\").join("/").endsWith(".se/tmp")) {
+        const err = new Error("watched");
+        err.code = "EPERM";
+        throw err;
+      }
+      return plain.disk.move(from, to);
+    },
+  };
+  const it = { ...plain, disk };
+
+  const { code } = heard(() => retro(ROOT, ["collect", RETRO], it));
+
+  assert.equal(code, 0);
+  assert.equal(it.disk.read(input("tmp/ste/words.txt")), "one\n");
+  assert.equal(it.disk.exists(at(".se/tmp")), false);
+  assert.equal(
+    manifestOf(it).some((one) => one.refused),
+    false,
   );
 });

@@ -47,6 +47,7 @@ func opened(t *testing.T, root string) *sql.DB {
 
 func TestTheWalkSkipsTheRuntimeHalfAndNothingElseUnderThePrivateFolder(t *testing.T) {
 	root := tree(t)
+	write(t, root, ".se/.retro/one/input/log/a.jsonl", "{}\n")
 	db := opened(t, root)
 
 	var count int
@@ -55,6 +56,13 @@ func TestTheWalkSkipsTheRuntimeHalfAndNothingElseUnderThePrivateFolder(t *testin
 	}
 	if count != 0 {
 		t.Fatalf("the walk reached the runtime half: %d file(s)", count)
+	}
+
+	if err := db.QueryRow(`SELECT count(*) FROM file WHERE path LIKE '.se/.retro/%'`).Scan(&count); err != nil {
+		t.Fatal(err)
+	}
+	if count != 0 {
+		t.Fatalf("the walk reached the retro half: %d file(s)", count)
 	}
 
 	if err := db.QueryRow(
@@ -69,10 +77,10 @@ func TestTheWalkSkipsTheRuntimeHalfAndNothingElseUnderThePrivateFolder(t *testin
 // The log grows a line a door call, so no watch stands on it. [[spec/design_output/index#the-watcher-keeps-it-warm]]
 func TestTheWatchStandsOffTheLogAndTheWalkStillReadsIt(t *testing.T) {
 	root := tree(t)
-	write(t, root, ".se/log/session.jsonl", "{\"said\":\"a line a door call\"}\n")
+	write(t, root, ".se/.log/session.jsonl", "{\"said\":\"a line a door call\"}\n")
 	db := opened(t, root)
 
-	if !logs(root, filepath.Join(root, ".se", "log")) {
+	if !logs(root, filepath.Join(root, ".se", ".log")) {
 		t.Fatal("the watch stands on the log, so every line sweeps the tree")
 	}
 	if logs(root, filepath.Join(root, ".se", "tickets")) {
@@ -81,7 +89,7 @@ func TestTheWatchStandsOffTheLogAndTheWalkStillReadsIt(t *testing.T) {
 
 	var count int
 	if err := db.QueryRow(
-		`SELECT count(*) FROM file WHERE path = '.se/log/session.jsonl'`).Scan(&count); err != nil {
+		`SELECT count(*) FROM file WHERE path = '.se/.log/session.jsonl'`).Scan(&count); err != nil {
 		t.Fatal(err)
 	}
 	if count != 1 {

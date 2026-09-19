@@ -94,7 +94,7 @@ async function started(files, outside, options) {
 
 function rows(files) {
   return files
-    .read(`${STUB}/.se/log/session.jsonl`)
+    .read(`${STUB}/.se/.log/session.jsonl`)
     .trim()
     .split("\n")
     .map((one) => JSON.parse(one));
