@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -141,6 +141,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: e3c0c5d7d301c98b1f67750dac55e4515a4d8f08
+    hash_after: e3c0c5d7d301c98b1f67750dac55e4515a4d8f08
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -260,14 +268,18 @@ What surprises: the ask reads the park as the fault, and the park is the half th
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the ask names the gate, the spawn and the cases, and two standing cases in `pull-steps.test.js` moved off `by: helper`
+- the cases drive `doors`, so git, the disk and the clock stand fake
+- each hunk carries a comment pointing at [[spec/design_output/pull#a-hand-of-its-own]]
 
 ## tests-green
 

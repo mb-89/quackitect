@@ -339,8 +339,7 @@ test("a step that excludes the only hand answers spawn, with the helper's name a
   assert.equal(takeable(it, { text: CHILD("closed", "design/review") }), "");
 });
 
-// A leaf wanting a helper reaches the hand the engine spawns, and parks where no
-// session spawns one. [[spec/tickets/the-spawn-answers-a-helper]]
+// A leaf wanting a helper reaches the hand the engine spawns, and parks where the shell moves nothing. [[spec/design_output/pull#a-hand-of-its-own]]
 const WANTS_HELPER = CHILD("open", "design/draft").replace(
   "      - name: draft\n",
   "      - name: draft\n        by: helper\n",
@@ -394,7 +393,11 @@ test("a hand under --as takes the leaf wanting a helper", () => {
 
   assert.equal(code, 0);
   assert.match(said, /^work {2}a-child at design\/draft/m);
-  assert.equal(disk.exists(HOLD), true, "the spawned hand holds the leaf");
+  const holds = disk.list(at(".se/.runtime/hold")).map((one) => one.name);
+  assert.ok(
+    holds.some((one) => one.includes("helper-1")),
+    "the spawned hand holds the leaf",
+  );
 });
 
 // [[spec/design_output/pull#a-hand-of-its-own]]

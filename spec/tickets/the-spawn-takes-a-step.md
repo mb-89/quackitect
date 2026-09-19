@@ -320,3 +320,4 @@ fail
 
 - this ticket splits off [[spec/tickets/step-changes-hands]], which waited at a person step. The branch behind it closes, and the branches waiting on it move.
 - the rule to hold: a role is a property of a step, and no agent holds one for life
+- the count of commands under `## approach` reads stale. `spawnPrompt` in `src/scripts/spawn.js` answers it, and a reader counts there. The chapter keeps its number, because the ticket door admits a hand's write to this chapter alone. [[spec/tickets/the-spawn-answers-a-helper]]

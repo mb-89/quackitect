@@ -18,7 +18,9 @@ export function writesHere(leaf, hand = {}) {
   if (by === "person" && hand.agent && !hand.ownerSays && !hand.cloud)
     return no(`waits for a person at ${at}`, { person: true });
   if (by === "agent" && !hand.agent) return no(`waits for an agent at ${at}`);
-  if (by === "helper") return no(`waits for a hand the engine spawns at ${at}`);
+  // The hand the engine spawns takes it, and the caller says whether this hand is that one. [[spec/design_output/pull#a-hand-of-its-own]]
+  if (by === "helper" && !hand.helper)
+    return no(`waits for a hand the engine spawns at ${at}`);
   if (by === "children") return no(`waits for its own children at ${at}`);
   if (by === "retro" && !hand.atRetro) return no(`waits for a hand at a retro step, at ${at}`);
   return { writes: true, why: "" };

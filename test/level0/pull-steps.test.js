@@ -367,11 +367,10 @@ test("a leaf needing a verb the box lacks answers wait, with the reason", () => 
 
 // [[spec/tickets/the-group-leaves-at-todo]]
 test("a group whose open children all wait stands at children, and hands no retro out", () => {
-  // A cloud box works a person's step, so this child parks on a hand the engine spawns. [[spec/guidance/cloud]]
-  const parked = CHILD("open", "design/review").replace(
-    "        not: draft\n",
-    "        by: helper\n",
-  );
+  // A cloud box works a person's step, so this child parks on a verb the box lacks. [[spec/design_output/pull#a-need-is-a-verb]]
+  const parked = CHILD("open", "design/review")
+    .replace("        not: draft\n", "")
+    .replace("  - name: design\n", '  - name: design\n    needs: ["deploy now"]\n');
   const { it, disk } = doors(
     standing(parked, withField(GROUP_NOTE, "step", "children")),
     {
@@ -390,7 +389,7 @@ test("a group whose open children all wait stands at children, and hands no retr
 
   assert.equal(code, 0);
   assert.match(said, /^wait/m, "the pull answers wait");
-  assert.match(said, /a-child waits for a hand the engine spawns at design\/review/);
+  assert.match(said, /a-child needs deploy now, which this box lacks/);
   assert.doesNotMatch(said, /retro/, "and no retro leaf comes out");
   const now = disk.read(at("spec/tickets/one-group.md"));
   assert.equal(fieldOf(now, "step"), "children", "the group stands where it stood");
@@ -439,10 +438,9 @@ test("the group's last leaf returns to children while a child stands open, and c
     why: "the box leaves it while a-child stand open",
   });
   const parked = withEntry(
-    CHILD("open", "design/review").replace(
-      "        not: draft\n",
-      "        by: helper\n",
-    ),
+    CHILD("open", "design/review")
+      .replace("        not: draft\n", "")
+      .replace("  - name: design\n", '  - name: design\n    needs: ["deploy now"]\n'),
     {
       step: "design/draft",
       hand: HAND,
@@ -460,7 +458,7 @@ test("the group's last leaf returns to children while a child stands open, and c
   assert.equal(fieldOf(stays, "step"), "children");
   assert.match(
     back.said,
-    /^ {2}a-child waits for a hand the engine spawns at design\/review/m,
+    /^ {2}a-child needs deploy now, which this box lacks/m,
     "the box leaves once, and waits the second time",
   );
 

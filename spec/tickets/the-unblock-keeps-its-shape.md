@@ -87,11 +87,9 @@ A person reads the question in the shape its author gives it.
 <!-- what changes and why, for a reader who was not there -->
 <!-- the form is text -->
 
-`asked` cuts a question on a semicolon whitespace follows, so `TL;DR` stays whole. A question of several lines lands as its own block under the list, so a table keeps its rows.
+`asked` cuts a question on a semicolon whitespace follows, so `TL;DR` stays whole. A question of several lines lands as its own block, so a table keeps its rows.
 
-The frontmatter holds one line a key, so a question carries its own lines as an escape, and `asked` writes them back. A reader of the successor then reads the question as its author wrote it.
-
-[[spec/design_output/work#a-person-step-leaves]] carries that, and a case drives both shapes.
+[[spec/design_output/work#a-person-step-leaves]] carries both shapes, and a case in `test/level0/unblock.test.js` drives each.
 
 ## checked
 
