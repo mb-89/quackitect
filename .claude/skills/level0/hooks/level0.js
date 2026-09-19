@@ -14,7 +14,10 @@ const COMPACT = "session.compact";
 const LIMIT = 4_000_000;
 const SHORT = 4000;
 const TEXTS = 4;
-const STARTING = 10_000;
+// The span the start road takes. An install on a fresh clone runs past a spawn, and the road reaches this only where no server answers. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+const STARTING = 180_000;
+// The skip list of [[spec/design_output/level0#the-setup-writes-the-flag]], spelled again here because this hook imports nothing.
+const INSTALL_SKIP = "editor-link editor-extensions editor-client go index se-lsp";
 // The code REASONS reads for a box carrying no node, which a refused spawn means. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 const NO_NODE = 5;
 let port = PORT;
@@ -26,20 +29,25 @@ let stepText = "";
 
 const url = () => `http://127.0.0.1:${port}/event`;
 
-// THE CLOUD STARTS ITS OWN SERVER. A cloud box carries nobody to press the sidebar button, so the bridgehead starts what the first event finds missing. Node runs this, because a Windows box carries no shell and the guards read the same either way. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+// THE CLOUD STARTS ITS OWN SERVER, AND BRINGS WHAT THE SERVER NEEDS. A cloud box carries nobody to press the sidebar button, so the bridgehead starts what the first event finds missing. A fresh clone replaces the tree the setup installed into, so the road installs again where the modules stand nowhere. Node runs this, because a Windows box carries no shell and the guards read the same either way. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export const START = [
-  "const { spawn } = require('node:child_process');",
+  "const { spawn, spawnSync } = require('node:child_process');",
   "const { existsSync, mkdirSync, openSync } = require('node:fs');",
-  "const [here, method] = process.argv.slice(1);",
+  "const [here, method, skip] = process.argv.slice(1);",
   "if (!process.env.CLAUDE_CODE_REMOTE && !process.env.SE_CLOUD) process.exit(3);",
   "if (!existsSync(method)) process.exit(4);",
-  "if (!existsSync(method + '/node_modules')) process.exit(6);",
   "mkdirSync(here + '/.se/.log', { recursive: true });",
   "const out = openSync(here + '/.se/.log/serve.log', 'a');",
+  "const brought = !existsSync(method + '/node_modules');",
+  "if (brought) {",
+  "  const env = Object.assign({}, process.env, { SE_INSTALL_SKIP: skip || '' });",
+  "  spawnSync('sh', [method + '/src/scripts/install.sh'], { cwd: method, env, stdio: ['ignore', out, out] });",
+  "}",
+  "if (!existsSync(method + '/node_modules')) process.exit(6);",
   "const argv = [method + '/src/bridge/server.js', method];",
   "const born = spawn(process.execPath, argv, { cwd: method, detached: true, stdio: ['ignore', out, out], windowsHide: true });",
   "born.unref();",
-  "process.exit(0);",
+  "process.exit(brought ? 7 : 0);",
 ].join("\n");
 
 const REASONS = {
@@ -48,7 +56,8 @@ const REASONS = {
   3: ["", "a person starts the server here"],
   4: ["warn", "the method root is absent, so no server starts"],
   5: ["warn", "this box carries no node, so no server starts"],
-  6: ["warn", "the setup brings no modules, so no server starts"],
+  6: ["warn", "the install brings no modules, so no server starts"],
+  7: ["info", "the modules stand nowhere, so the bridgehead installs them and starts one"],
 };
 
 // [[spec/design_output/level0#the-bridgehead-starts-it-too]]
@@ -245,9 +254,10 @@ async function starts($) {
   started = true;
   let ran;
   try {
-    ran = await $.process.run(["node", "-e", START, root, method || root], {
-      timeoutMs: STARTING,
-    });
+    ran = await $.process.run(
+      ["node", "-e", START, root, method || root, INSTALL_SKIP],
+      { timeoutMs: STARTING },
+    );
   } catch (error) {
     // Node itself refuses to start, so this box carries none. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
     await wrote($, {

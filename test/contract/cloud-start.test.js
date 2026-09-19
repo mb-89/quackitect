@@ -16,22 +16,29 @@ const LOCAL = { CLAUDE_CODE_REMOTE: "", SE_CLOUD: "" };
 const CLOUD = { CLAUDE_CODE_REMOTE: "true", SE_CLOUD: "" };
 const SERVER =
   "require('fs').writeFileSync(process.argv[2] + '/started.txt', 'up')\n";
+// An install standing in for the real one: it brings the folder the road looks for, in the method root the road runs it from. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+const INSTALL = "mkdir -p node_modules\n";
+const SKIP = "index se-lsp";
 const WAITS = 40;
 
 const nodeHere = () =>
   proc().run(["node", "-e", "process.exit(0)"], { timeoutMs: 5000 }).exitCode === 0;
 
 function runs(where, env) {
-  return proc().run(["node", "-e", START, where, where], {
+  return proc().run(["node", "-e", START, where, where, SKIP], {
     env,
-    timeoutMs: 10_000,
+    timeoutMs: 30_000,
   });
 }
 
-function tree(modules) {
+function tree(modules, install = false) {
   const where = files.tempDir("level0-start-");
   files.makeDir(join(where, "src", "bridge"));
   files.write(join(where, "src", "bridge", "server.js"), SERVER);
+  if (install) {
+    files.makeDir(join(where, "src", "scripts"));
+    files.write(join(where, "src", "scripts", "install.sh"), INSTALL);
+  }
   if (modules) files.makeDir(join(where, "node_modules"));
   return where;
 }
@@ -70,7 +77,7 @@ test("a box outside the cloud starts nothing, because a person stands beside it"
   }
 });
 
-test("a cloud box whose setup installed no modules says so and starts nothing", () => {
+test("a cloud box whose install brings no modules says so and starts nothing", () => {
   const where = tree(false);
   try {
     const said = runs(where, CLOUD);
@@ -78,8 +85,28 @@ test("a cloud box whose setup installed no modules says so and starts nothing", 
     const [level, why] = reasonOf(said.exitCode);
     assert.equal(level, "warn");
     assert.match(why, /modules/);
+    assert.equal(files.exists(join(where, MARKER)), false, "no server stands");
   } finally {
     files.remove(where);
+  }
+});
+
+test("a fresh clone carrying no modules installs them, then starts the server", {
+  skip: nodeHere() ? false : "this box carries no node on the PATH",
+}, () => {
+  const where = tree(false, true);
+  try {
+    const said = runs(where, CLOUD);
+    assert.equal(said.exitCode, 7);
+    assert.equal(reasonOf(said.exitCode)[0], "info");
+    assert.equal(
+      files.exists(join(where, "node_modules")),
+      true,
+      "the install brought the modules the server imports",
+    );
+    assert.equal(waitsFor(join(where, MARKER)), true, "and the server ran after it");
+  } finally {
+    gone(where);
   }
 });
 

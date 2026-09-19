@@ -104,20 +104,33 @@ node. The shell reads the environment itself and answers a code:
 | 3 | no cloud variable, so a person starts it | nothing |
 | 4 | the method root stands nowhere | one `warn` line |
 | 5 | the box carries no node | one `warn` line |
-| 6 | the setup brings no modules | one `warn` line |
+| 6 | the install brings no modules | one `warn` line |
+| 7 | the road installs the modules, then starts the server | one `info` line |
 | 0 | the server starts behind the session | one `info` line |
 
 `CLAUDE_CODE_REMOTE` and `SE_CLOUD` say a box is a cloud box, the same pair the
 cloud guidance binds on. The operating system decides nothing here, because a
 person at a local box wants the button and a cloud box wants the server.
 
-The call comes back in milliseconds: the line backgrounds the server and sends
-its output to `.se/.log/serve.log`, so a session start waits for nothing. The
-server answers the next event in about a second. A first event landing before
-it stands reads no rules, and the log names the piece that misses.
+The call comes back in milliseconds where the modules stand. The line
+backgrounds the server and sends its output to `.se/.log/serve.log`, so a
+session start waits for nothing. The server answers the next event in about a
+second. A first event landing before it stands reads no rules, and the log
+names the piece that misses.
 
-The bridgehead installs nothing. The setup installs, and a box whose setup runs
-nowhere says so on the line the table above names.
+The road brings the modules where they stand nowhere. A cloud box clones the
+repository fresh when the container starts. The half of the setup writing into
+the tree goes with the old one:
+
+| what the setup writes | where it lands | what the clone does |
+|---|---|---|
+| the trust flag and the mode | the home of the box | leaves them standing |
+| the modules and the installed binaries | the tree | replaces the tree |
+
+So the road runs `src/scripts/install.sh` itself, under the skip list the setup
+names, and answers `7` where it does. That install waits, because a session
+holding no cage reads no rule at all. A session start pays it once, and on a
+box whose first event finds no server alone.
 
 ## A fix reaches the session
 
