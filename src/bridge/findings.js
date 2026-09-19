@@ -25,9 +25,9 @@ import {
   RULE as GRID,
   lineOf,
 } from "../extension/lib/grid.js";
-import { readTools, whereIs } from "../scripts/tools.js";
+import { readTools, whereIs } from "../engine/tools.js";
 import { asks } from "./config.js";
-import { withoutFalsePast } from "./tense.js";
+import { withoutFalsePast } from "../engine/tense.js";
 
 // The folders no rule reads: the private folder, the packages, git, and a draft under an underscore. [[spec/design_output/tree#the-reader]]
 export const PARKED = [

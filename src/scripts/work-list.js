@@ -3,8 +3,8 @@
 // move a branch stand in work.js beside this file.
 // [[spec/design_output/work#a-row-per-group]]
 
-import { fieldOf, GROUP, isGroup, OPEN, stepOf, URGENT, urgent } from "./group.js";
-import { staleClaim } from "./stand.js";
+import { fieldOf, GROUP, isGroup, OPEN, stepOf, URGENT, urgent } from "../engine/group.js";
+import { staleClaim } from "./work-free.js";
 import { answerOf } from "./work-answer.js";
 import {
   COL,

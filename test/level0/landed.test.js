@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { landed, unlandedRows } from "../../src/scripts/landed.js";
+import { landed, unlandedRows } from "../../src/scripts/pull-landed.js";
 
 const AT = "/tree/spec/tickets/a-child.md";
 const WROTE = "---\nstate: open\n---\n\n# Ask\n\nA thing.\n";

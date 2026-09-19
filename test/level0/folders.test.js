@@ -19,7 +19,7 @@ import { WORKTREE } from "../../.claude/skills/level0/lib/review.js";
 import { BIN, TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import { FOLDER as UNDO } from "../../.claude/skills/level0/lib/undo.js";
 import { HOLDS as GUIDANCE_HOLDS } from "../../src/scripts/guidance-hand.js";
-import { BOX, SESSION } from "../../src/scripts/hand.js";
+import { BOX, SESSION } from "../../src/scripts/pull-hand-of.js";
 import { HOLDS as ROUTE_HOLDS } from "../../src/scripts/pull-route.js";
 import { HOLDS, NOTES } from "../../src/scripts/ticket.js";
 

@@ -41,7 +41,7 @@ import {
 } from "../../.claude/skills/level0/lib/tree.js";
 import { EDITOR_VALE_INI } from "../../.claude/skills/level0/lib/servers.js";
 import { boxOf } from "../../.claude/skills/level0/lib/private.js";
-import { SESSION } from "../../src/scripts/hand.js";
+import { SESSION } from "../../src/scripts/pull-hand-of.js";
 import { disk } from "../../src/doors/disk.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";

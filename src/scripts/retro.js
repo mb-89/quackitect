@@ -9,7 +9,7 @@ import { effect } from "../engine/retro/effect.js";
 import { matrix } from "../engine/retro/matrix.js";
 import { mint } from "../engine/retro/mint.js";
 import { timeline } from "../engine/retro/timeline.js";
-import { fieldOf, NOTE_END, ticketNamed } from "./group.js";
+import { fieldOf, NOTE_END, ticketNamed } from "../engine/group.js";
 import { collect } from "./retro-collect.js";
 import { newRetro } from "./retro-new.js";
 import { score } from "./retro-score.js";

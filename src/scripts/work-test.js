@@ -4,8 +4,8 @@
 
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
-import { goEnvOf } from "./go-tests.js";
-import { recordIn } from "./group.js";
+import { goEnvOf } from "./cli-go.js";
+import { recordIn } from "../engine/group.js";
 import { changedFiles, handOf, holdOf } from "./pull.js";
 
 const CUT_ERROR = 160;
@@ -18,7 +18,7 @@ export function testVerb(it, argv) {
   const changed = named.length ? named : changedFiles(it, since);
   const files = changed.filter((path) => /\.test\.js$/.test(path));
   // A branch changing a Go test names its module, and the verb runs that too. [[spec/design_output/pull#the-test-verb]]
-  const modules = goModulesOf(changed);
+  const modules = goModulesOf(changed, it);
 
   if (!files.length && !modules.length) {
     console.log(
@@ -52,14 +52,27 @@ export function testVerb(it, argv) {
   return bad ? 1 : 0;
 }
 
-// The module a changed Go test stands in, which is the folder holding its go.mod. [[spec/design_output/pull#the-test-verb]]
-export function goModulesOf(paths) {
+// A changed test names the module holding it, which is the nearest folder above it carrying a go.mod. A handle reads that folder, because a module stands any depth under src. [[spec/design_output/pull#the-test-verb]]
+export function goModulesOf(paths, it) {
   const out = new Set();
   for (const path of paths ?? []) {
-    const found = /^(src\/[^/]+)\/[^/]*_test\.go$/.exec(String(path));
-    if (found) out.add(found[1]);
+    const said = String(path);
+    if (!/^src\/.*_test\.go$/.test(said)) continue;
+    const found = moduleOver(said, it);
+    if (found) out.add(found);
   }
   return [...out];
+}
+
+// The folders above a path, nearest first, down to the one under src. [[spec/tickets/an-engine-takes-bridge-work]]
+function moduleOver(path, it) {
+  const parts = path.split("/").slice(0, -1);
+  while (parts.length > 1) {
+    const folder = parts.join("/");
+    if (!it?.disk || it.disk.exists(it.join(it.root, ...parts, "go.mod"))) return folder;
+    parts.pop();
+  }
+  return "";
 }
 
 // [[spec/design_output/pull#the-test-verb]]

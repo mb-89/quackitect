@@ -1,40 +1,13 @@
-// The projection: the files the tree writes off its sources, the owner door
-// over a target, and the read after a tool ran that projects when a text moved.
+// The projection doors: the owner door over a target, and the read after a
+// tool ran that projects when a text moved. The reading stands in the engine.
 // [[spec/design_output/projection#the-write-door-refuses-one]]
 
 import { dirname, join } from "node:path";
 import { inherits, rooted } from "../../.claude/skills/level0/lib/layer.js";
-import {
-  alsoReads,
-  entriesIn,
-  ownerOf,
-  PROJECTIONS,
-  readAll,
-  readsIn,
-  refusedWrite,
-} from "../../.claude/skills/level0/lib/projection.js";
+import { ownerOf, readAll, refusedWrite } from "../../.claude/skills/level0/lib/projection.js";
+import { projectionsHere, sourcesOf } from "../engine/projection.js";
 
 const AFTER_TOOL = "classic.PostToolUse";
-
-export function projectionsHere(disk, method) {
-  const at = join(method, PROJECTIONS);
-  return disk.exists(at) ? entriesIn(disk.read(at)) : [];
-}
-
-// The sources come off both roots, the work root's file first. [[spec/design_output/vehicle#the-work-root-inherits]]
-export function sourcesOf(entries, disk, method, work = method) {
-  const reads = inherits(disk, method, work);
-  const out = new Set();
-  for (const entry of entries) {
-    const texts = new Map();
-    for (const path of readsIn(entry, reads)) {
-      out.add(path);
-      if (reads.exists(path)) texts.set(path, reads.read(path));
-    }
-    for (const path of alsoReads(entry, texts)) out.add(path);
-  }
-  return out;
-}
 
 // [[spec/design_output/projection#the-write-door-refuses-one]]
 export function ownerDoor(e, _writing, where, box) {

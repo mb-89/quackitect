@@ -36,7 +36,8 @@ import {
   onTurnSaid,
   owesCanary,
 } from "./guidance.js";
-import { freshens, projectionsHere, sourcesOf } from "./projection.js";
+import { projectionsHere, sourcesOf } from "../engine/projection.js";
+import { freshens } from "./projection.js";
 import { movedCode } from "./reload.js";
 import { SPECS as reportSpecs, TOOLS as reportTools } from "./report.js";
 import {

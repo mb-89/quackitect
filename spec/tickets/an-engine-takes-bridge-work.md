@@ -463,11 +463,17 @@ takes the module off the folder holding `go.mod`.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change reaches the folders and the files the approach names, and the notes naming them
+- the two Go module readers meet the fake disk, so the cases walk no tree
+- a comment over each reader points at this ticket, which carries the approach
 
 ## tests-green
 

@@ -6,8 +6,8 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { goModulesIn } from "../../src/scripts/go-tests.js";
-import { goModulesOf } from "../../src/scripts/test-verb.js";
+import { goModulesIn } from "../../src/scripts/cli-go.js";
+import { goModulesOf } from "../../src/scripts/work-test.js";
 
 const ROOT = "/tree";
 const MOD = "module quackitect/one\n";

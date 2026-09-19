@@ -23,7 +23,7 @@ import {
   withContract,
   work,
 } from "../../src/scripts/work.js";
-import { urgent } from "../../src/scripts/group.js";
+import { urgent } from "../../src/engine/group.js";
 import {
   doorsSaying,
   green,

@@ -1247,7 +1247,7 @@ stands behind Vale's finding with one general veto:
 | its -s or -ing form, `skips`, `standing` | present on its face, and the finding falls |
 | another form, `wrote`, `did`, `failed` | past, and the finding stands |
 
-`src/bridge/tense.js` reads the line the finding stands in through wink-nlp,
+`src/engine/tense.js` reads the line the finding stands in through wink-nlp,
 which hands a lemma a token. Two more vetoes ride the same reader, in
 `src/bridge/prose.js`. The three doors reading prose call that one entry: the
 write door, the draft check and the commit message. A `vale` line at debug

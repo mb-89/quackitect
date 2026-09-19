@@ -50,10 +50,10 @@ import {
 } from "./cli-doors.js";
 import { namesIn, show, walk, warningsStood } from "./cli-read.js";
 import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
-import { goEnvOf, goModulesIn } from "./go-tests.js";
+import { goEnvOf, goModulesIn } from "./cli-go.js";
 import { HOOKS } from "./precommit.js";
-import { writeSurvey } from "./tools.js";
-import { viewerOf } from "./viewer.js";
+import { writeSurvey } from "../engine/tools.js";
+import { viewerOf } from "./tui-build.js";
 
 export function serverFaults(where) {
   if (!files.exists(lsp)) return null;

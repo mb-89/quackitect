@@ -4,7 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { fieldOf, withField } from "../../src/scripts/group.js";
+import { fieldOf, withField } from "../../src/engine/group.js";
 import { withPayload } from "../../src/scripts/pull.js";
 import { pulling } from "../../src/scripts/work.js";
 import {

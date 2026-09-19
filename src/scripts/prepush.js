@@ -18,7 +18,7 @@ import {
   refusedWarnings,
   warningsOn,
 } from "../../.claude/skills/level0/lib/warnings.js";
-import { whereIs } from "./tools.js";
+import { whereIs } from "../engine/tools.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { proc } from "../doors/proc.js";

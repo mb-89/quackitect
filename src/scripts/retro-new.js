@@ -4,7 +4,7 @@
 // [[spec/design_input/the-agent-pulls-tickets]]
 
 import { mintedNote } from "../../.claude/skills/level0/lib/schema.js";
-import { firstLeaf } from "./group.js";
+import { firstLeaf } from "../engine/group.js";
 import { askRows, processAt } from "./process.js";
 import { pull } from "./pull.js";
 import { fromHold, schemasHere } from "./ticket.js";

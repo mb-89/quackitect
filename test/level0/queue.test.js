@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
-import { frontOf } from "../../src/scripts/group.js";
+import { frontOf } from "../../src/engine/group.js";
 import {
   chainUnder,
   daysStood,
@@ -14,7 +14,7 @@ import {
   scoreOf,
   stoodIn,
   waitsUnder,
-} from "../../src/scripts/queue.js";
+} from "../../src/scripts/pull-queue.js";
 
 const WEIGHTS = { block: 10, day: 1, fail: 5 };
 const NOW = "2026-01-11T00:00:00.000Z";

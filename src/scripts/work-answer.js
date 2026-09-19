@@ -15,11 +15,11 @@ import {
   OPEN,
   stepOf,
   urgent,
-} from "./group.js";
+} from "../engine/group.js";
 import { leafOf, leavesOf } from "./pull-route.js";
 import { takeable } from "./pull.js";
-import { queued, stoodHere } from "./queue.js";
-import { staleClaim } from "./stand.js";
+import { queued, stoodHere } from "./pull-queue.js";
+import { staleClaim } from "./work-free.js";
 import { readWork, standingAll } from "./work-stands.js";
 
 // [[spec/design_output/work#one-verb-answers-git]]

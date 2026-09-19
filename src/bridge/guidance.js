@@ -24,7 +24,7 @@ import { rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { toolLines, WANTED } from "../../.claude/skills/level0/lib/tools.js";
 import { heldReadsIn } from "../scripts/guidance-hand.js";
-import { readTools, writeSurvey } from "../scripts/tools.js";
+import { readTools, writeSurvey } from "../engine/tools.js";
 import { asks } from "./config.js";
 import { deadIndexLine } from "./search.js";
 

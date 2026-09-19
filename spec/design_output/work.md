@@ -5,7 +5,7 @@ kind: [[design_output]]
 # Scope
 
 `src/scripts/work.js` holds every verb over a work branch, and
-`src/scripts/group.js` holds what a group's ticket reads and writes. This note
+`src/engine/group.js` holds what a group's ticket reads and writes. This note
 covers the branch, the group on it, the brief that drains, and the round trip.
 
 # What a work branch is
@@ -96,7 +96,7 @@ and the frontmatter then reads as broken. Vale reads no line of such a file,
 and the lint over the tree exits one. The ticket door refuses the hand that
 repairs it, because the record is the engine's.
 
-So `quoted` in `src/scripts/group.js` wraps a value in double quotes where
+So `quoted` in `src/engine/group.js` wraps a value in double quotes where
 it carries any of these, and escapes the backslash and the quote inside:
 
 | what | why a reader trips |

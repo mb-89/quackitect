@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
-import { quoted, recordIn, withEntry } from "../../src/scripts/group.js";
+import { quoted, recordIn, withEntry } from "../../src/engine/group.js";
 
 const NOTE = "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\nA thing.\n";
 
