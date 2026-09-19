@@ -89,7 +89,12 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 258c594894a140c023429cb14b35509ce9f17ed6
+    hash_after: 258c594894a140c023429cb14b35509ce9f17ed6
 ---
 
 # Ask
@@ -112,8 +117,33 @@ Every write to a long file meets a refusal, and hands squeeze lines to get past 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`./RUNME.sh split <file>` cuts by range into targets, and the journal that already stands takes it back.
+
+| the flag | what it takes |
+|---|---|
+| `<file>` | the file the cut reads |
+| `--to <path> --lines <from>-<to>` | one target and the range it takes, named again for each target |
+| `--dry` | the cuts it would write, and no write |
+
+| what the verb needs | what stands |
+|---|---|
+| the ceiling and the faults | `sizeFaults` and `FILE_RULE`, under `.claude/skills/level0/lib/size.js` |
+| the undo | the journal under `.claude/skills/level0/lib/undo.js`, which `apply` writes |
+| the ticket | `./RUNME.sh mint ticket <path> --process=trivial` |
+
+The verb writes every target and the rest of the source through the journal, so one `undo` puts the whole cut back.
+
+The refusal that mints:
+
+- the write door reads `grows`, so a file past the ceiling takes a cut and refuses a growth
+- the refusal on such a file mints a split ticket off `trivial`, and names it in the refusal
+- the ticket's ask names the file, what the lint says, and the topics the cut follows
+
+`./RUNME.sh lint src/scripts` names no `FileCeiling` today, so the verb guards the next file. The cases drive the cut over text in memory, and drive the refusal into the mint.
+
+[[spec/design_output/level0#the-size-ceiling]] takes the verb and the mint.
 
 ## review
 
