@@ -292,26 +292,39 @@ export function pluginHolds() {
   return 0;
 }
 
-// [[spec/design_output/level0#the-bridgehead-and-the-server]]
-export async function serverHolds() {
-  const said = await serverSays();
-  if (said.ok) {
-    console.log(`The server stands at ${said.where}.`);
-    return 0;
+// What the probe found, and whether the check carries on past it. A box running no server reads every rule, and a server standing and failing its health call is red. [[spec/design_output/level0#the-check-reads-the-server]]
+export function serverRead(said) {
+  if (said?.ok) return { code: 0, line: `The server stands at ${said.where}.` };
+  if (said?.answers) {
+    return {
+      code: 1,
+      red: true,
+      line: `The server at ${said.where} fails its health call: ${said.why}`,
+    };
   }
-  console.error(`No server answers at ${said.where}: ${said.why}`);
-  console.error("Start it with ./RUNME.sh serve, or the hook button in the sidebar.");
-  return 1;
+  return {
+    code: 0,
+    line: `No server answers at ${said?.where}, so the rules run without one. Start it with ./RUNME.sh serve, or the hook button in the sidebar.`,
+  };
 }
 
-export async function serverSays() {
+// [[spec/design_output/level0#the-check-reads-the-server]]
+export async function serverHolds(get = fetch) {
+  const read = serverRead(await serverSays(get));
+  if (read.red) console.error(read.line);
+  else console.log(read.line);
+  return read.code;
+}
+
+// The answer of the probe: whether a server answers at all, and what it says of itself where it does. [[spec/design_output/level0#the-check-reads-the-server]]
+export async function serverSays(get = fetch) {
   const where = `http://127.0.0.1:${portHere()}/health`;
   try {
-    const answer = await fetch(where, { signal: AbortSignal.timeout(HEALTH_WAIT) });
+    const answer = await get(where, { signal: AbortSignal.timeout(HEALTH_WAIT) });
     const body = await answer.json();
-    return { ok: Boolean(body?.ok), where, why: String(body?.dead ?? "") };
+    return { answers: true, ok: Boolean(body?.ok), where, why: String(body?.dead ?? "") };
   } catch (bad) {
-    return { ok: false, where, why: bad?.message ?? String(bad) };
+    return { answers: false, ok: false, where, why: bad?.message ?? String(bad) };
   }
 }
 

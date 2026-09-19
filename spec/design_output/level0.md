@@ -150,6 +150,26 @@ at `fatal`. So the log names why the server falls, and the next start reads
 as a fresh one. A kill from outside the process writes nothing, so a log
 ending on no `fatal` line names a kill.
 
+## The check reads the server
+
+`./RUNME.sh check` probes the health call and carries on. A box out of a fresh
+clone runs no server, and the rules over the tree hold there all the same. So
+the probe says what it meets, and leaves the battery running.
+
+| what the probe meets | what the check says | what it answers |
+|---|---|---|
+| a server answering well | the server stands, and where | green |
+| a server answering ill | the health call it fails, and why | red |
+| no server at all | no server answers, and how to start one | green |
+
+A server standing and failing its own health call is the one red here.
+Something runs there, and it names itself broken. `serverRead` in
+`src/scripts/cli-check.js` reads the three apart, and `serverSays` takes the
+fetch as a door, so a test drives each one.
+
+`./RUNME.sh doctor` names the server still. That verb is where a reader asks
+after what this box has.
+
 # The harness surface
 
 Every line here comes from running it against client 2.1.263. The
