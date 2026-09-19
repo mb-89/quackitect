@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -155,6 +155,10 @@ record:
     hash_after: 51d669cf35a73d099191cb7b77c37f5e73ec1358
     returns: 1
     why: "| finding | fix |; |---|---|; | `spec/design_output/tree.md` tables the rules over two files, and the new rule stands outside it | Add its row, and name the two files it weighs |; | `spec/design_output/private.md` carries the older escape, so a reader takes an import as cover | Say the escape binds to the line, and to the comment run above it |; | `loopNames` reads the loop header for the private folder, so a loop of bare names carries no marker and passes | Mark a loop whose names meet a list, whatever its header spells |; | The red case over a loop naming no list moves to a header spelling that folder | Restore the bare case once the rule holds it |; the branch answers both lines of the ask, and the tighter escape catches the seven writers; `./RUNME.sh check` answers 0 on this tip; `./RUNME.sh branch review` says the check passes, and the route hands this ticket to a retro; every file the branch touches stands inside the ask, and the moved cases redesign nothing; each rule carries a case, and my probe refuses a stale spelling standing under an import; my probe adds a loop of bare names to the installer text, and the rule answers nothing"
+  - step: implement/reflect
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 7307cc2a649ff414952502faa9014f16bc2ebc3d
+    hash_after: 06b712a6c130111ce43f61eb3bab11f0cb9a9113
 ---
 
 # Ask
