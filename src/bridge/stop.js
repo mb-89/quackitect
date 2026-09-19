@@ -17,6 +17,11 @@ import { rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { stampOf, STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { drains, standsPast, takesFile } from "../../.claude/skills/level0/lib/warnings.js";
+import {
+  BINDING,
+  GOD,
+  QUEUE,
+} from "../../.claude/skills/level0/lib/config.js";
 import { spanOf, ticketAt, WORK_BRANCH } from "../scripts/group.js";
 import { heldGroup, openPrivate, queueHolds } from "../../.claude/skills/level0/lib/ticket.js";
 import {
@@ -37,9 +42,6 @@ import { REPORT_CALL } from "./report.js";
 
 const ENABLED = "stop.enabled";
 const MOST = "stop.mostInARow";
-// [[spec/design_output/config#the-engine-controls]]
-export const BINDING = "engine.binding";
-export const GOD = "god";
 // The refactoring hand this door starts. [[spec/tickets/the-spawn-reaches-its-guidance]]
 const REFACTOR = {
   on: "refactor.parallel",
@@ -332,7 +334,7 @@ function promptsIn(box) {
 // A desk bound to the queue on trunk has work while a free ticket stands, so a stop on completion waits. [[spec/design_output/stop#the-mechanical-checks]]
 function queueWaits(box) {
   if (inCloud(box.env ?? process.env)) return false;
-  if (asks(box, "engine.binding") !== "queue") return false;
+  if (asks(box, BINDING) !== QUEUE) return false;
   if (branchOf(box) !== "main") return false;
   const texts = readFolder(box.disk, join(box.work, "spec", "tickets"), ".md").map((one) => one.text);
   return queueHolds(texts);

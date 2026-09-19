@@ -6,11 +6,14 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import * as stop from "../../src/bridge/stop.js";
 import * as route from "../../src/scripts/pull-route.js";
+import { probeOf, startOf } from "../../src/scripts/serve.js";
+import { pulling } from "../../src/scripts/work.js";
+import { doors, heard, ROOT, standing } from "./pull-doors.js";
 
 const { handsOut } = route;
 const { ENGINE_CHECKS, standsDown } = stop;
 
-// Every check the stop door answers. [[spec/design_output/stop#the-mechanical-checks]]
+// The shipped rules own these names, and a contract case holds the list against them. [[spec/design_output/stop#the-mechanical-checks]]
 const EVERY = [
   "stop-hook-off",
   "owner-holds",
@@ -24,6 +27,8 @@ const EVERY = [
   "a-person-sits-here",
   "warnings-standing",
 ];
+
+const onTrunk = { "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } };
 
 // [[spec/design_output/config#the-engine-controls]]
 test("the plain pull hands work out at the queue alone", () => {
@@ -67,7 +72,7 @@ test("every other check holds at god, because it reads something else", () => {
   }
 });
 
-test("the list names the four, and the stop door answers each of them", () => {
+test("the list names the four, and the stop rules name each of them", () => {
   assert.deepEqual([...(ENGINE_CHECKS ?? [])].sort(), [
     "group-in-hand",
     "ticket-in-hand",
@@ -75,4 +80,38 @@ test("the list names the four, and the stop door answers each of them", () => {
     "work-waiting",
   ]);
   for (const name of ENGINE_CHECKS ?? []) assert.ok(EVERY.includes(name), name);
+});
+
+test("the gate answers every name this list holds, and the gate names fewer", () => {
+  assert.ok(EVERY.length > (ENGINE_CHECKS ?? []).length, "the door answers more than the gate");
+  for (const name of EVERY) assert.equal(typeof standsDown(name, "queue"), "boolean", name);
+});
+
+// The pull hands out at the queue alone, on every road. [[spec/design_output/config#the-engine-controls]]
+test("a cloud box on trunk takes no branch at god, and says what binds it", () => {
+  const { it } = doors(standing(), onTrunk, { cloud: true, binding: "god" });
+  const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
+  assert.equal(code, 0);
+  assert.match(said, /binds to god/);
+  assert.ok(!said.includes("branch stands at todo"), "the take stands untouched");
+});
+
+test("a cloud box on trunk reaches the take at the queue", () => {
+  const held = doors(standing(), onTrunk, { cloud: true, binding: "queue" });
+  for (const [argv, code] of [
+    [probeOf("node", 6510), 1],
+    [startOf(ROOT), 0],
+  ])
+    held.outside.proc.teach(argv, { exitCode: code });
+  const { said } = heard(() => pulling(ROOT, ["pull"], held.it));
+  assert.ok(!said.includes("binds to"), said);
+  assert.match(said, /branch stands at todo|took|holds it/);
+});
+
+test("a pull at unbound hands nothing out, and names the road back", () => {
+  const { it } = doors(standing(), onTrunk, { cloud: true, binding: "unbound" });
+  const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
+  assert.equal(code, 0);
+  assert.match(said, /binds to unbound/);
+  assert.match(said, /Name a ticket/);
 });

@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -169,6 +169,14 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 275d1d48fe6242f0e64e59270eacbc987157f277
     hash_after: 275d1d48fe6242f0e64e59270eacbc987157f277
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 85f659911a4382348a7b742aab40e9b46d53adb4
+    hash_after: 85f659911a4382348a7b742aab40e9b46d53adb4
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -363,12 +371,12 @@ each spell a value the same file exports, so each reads the name beside it.
 
 ### lint
 
-    ./RUNME.sh lint src/bridge/stop.js src/bridge/server.js src/scripts/pull.js src/scripts/pull-route.js test/level0/binding.test.js
+    ./RUNME.sh lint src/scripts/pull.js src/scripts/pull-route.js src/bridge/stop.js src/bridge/server.js .claude/skills/level0/lib/config.js test/level0/binding.test.js test/contract/stop-rules.test.js
 
 ### checked
 
-- the change touches no file the ask leaves out. The pull, its route, the stop door, the server's import and the cases.
-- every door the change reaches has a fake. The two new names stand pure, and the stop door reads the config through `asks` as it did.
+- the change touches no file the ask leaves out. The pull, its route, the stop door, the config library and the cases.
+- every door the change reaches has a fake. The pull cases drive the fakes `pull-doors.js` builds, and the shipped rules meet a contract case.
 - a comment names the approach the change implements. Each site points at [[spec/design_output/config#the-engine-controls]].
 
 ## tests-green

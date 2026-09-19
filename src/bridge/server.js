@@ -5,6 +5,7 @@
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
+import { BINDING, GOD } from "../../.claude/skills/level0/lib/config.js";
 import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 import { PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 import { biome } from "../doors/biome.js";
@@ -48,9 +49,7 @@ import {
 } from "./review.js";
 import { answersFromIndex, FIND, findSpec, runsFind, warmIndex } from "./search.js";
 import {
-  BINDING,
   dropsHold,
-  GOD,
   holdsCall,
   onRefactorAnswered,
   onStop,

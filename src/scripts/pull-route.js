@@ -3,6 +3,7 @@
 // stand here beside it.
 // [[spec/design_output/pull#what-a-hand-out-reads]]
 
+import { QUEUE } from "../../.claude/skills/level0/lib/config.js";
 import { HOLDS as OWNED_HOLDS } from "../../.claude/skills/level0/lib/folders.js";
 
 import { entriesIn } from "../../.claude/skills/level0/lib/schema.js";
@@ -23,7 +24,6 @@ import {
 import { agentOf, BOX, handOf, roleOf } from "./hand.js";
 
 export const HOLDS = OWNED_HOLDS;
-export const QUEUE = "queue";
 export const WORK = "work";
 export const REFUSED = "refused";
 export const WAIT = "wait";
@@ -70,6 +70,8 @@ export const VERBS = {
     "mint",
   ],
 };
+
+export { QUEUE };
 
 // [[spec/design_output/config#the-engine-controls]]
 export function handsOut(binding) {

@@ -44,6 +44,7 @@ import {
   handsOut,
   leafOf,
   leavesOf,
+  QUEUE,
   REFUSED,
   say,
   stillHeld,
@@ -105,7 +106,7 @@ export function pull(it, argv) {
   const named = onTrunk && name && !verdict.said ? namedGroup(it, name) : "";
   // A name with a leaf in hand hands that leaf back. A name with none asks for that ticket. [[spec/design_output/pull#the-hand-out]]
   const asking = Boolean(name) && !named && !verdict.said && !held;
-  if (asking && it.binding === "queue") {
+  if (asking && it.binding === QUEUE) {
     console.error(`${name} stands behind the queue, because this session binds to it.`);
     console.error("Run ./RUNME.sh ticket pull with no name, and take what it hands you.");
     return 2;
@@ -113,6 +114,14 @@ export function pull(it, argv) {
   who.wanted = asking ? name : "";
   if (!named && (verdict.said || (name && held))) return handBack(it, who, name, verdict);
   if (held) return stillHeld(it, held);
+  // The plain pull hands out at the queue alone, and this gate stands above every road it closes. [[spec/design_output/config#the-engine-controls]]
+  if (!asking && !handsOut(it.binding)) {
+    say(WAIT, [
+      `this session binds to ${it.binding}, so the pull hands nothing out.`,
+      `Name a ticket to take one, or set engine.binding to ${QUEUE}.`,
+    ]);
+    return 0;
+  }
   // [[spec/design_output/pull#the-engine-takes-the-branch]]
   // A hand asking for one ticket takes no branch, because the queue answers neither. [[spec/design_output/pull#the-hand-out]]
   if (onTrunk && it.take && !asking) {
@@ -122,14 +131,6 @@ export function pull(it, argv) {
   }
   if (!fetched(it, branch)) return 1;
   if (group && closedGroup(it, group)) return groupDone(group);
-  // The plain pull hands out at the queue alone. [[spec/design_output/config#the-engine-controls]]
-  if (!asking && !handsOut(it.binding)) {
-    say(WAIT, [
-      `this session binds to ${it.binding}, so the pull hands nothing out.`,
-      "Name a ticket to take one, or set engine.binding to queue.",
-    ]);
-    return 0;
-  }
   return handOut(it, who);
 }
 
