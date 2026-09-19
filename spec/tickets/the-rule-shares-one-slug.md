@@ -36,7 +36,12 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/question]]
 process_hash: 1f3006ec4b044a89
-step: answer
+step: do
+record:
+  - step: answer
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: cfaf0627d9824c0a31ebcd50d63e961895f83819
+    hash_after: cfaf0627d9824c0a31ebcd50d63e961895f83819
 ---
 
 # Ask
@@ -115,6 +120,25 @@ Three lines carry the reasoning:
 The ask gains one line beside this answer: the cases fail on a copy nobody drives
 from the table, and on a drift alike. Otherwise the next hand writes another
 copy and both suites stay green.
+
+The four places hold two rules, and the table drives one of them:
+
+| where it stands | what it slugs |
+|---|---|
+| `slugOf` in `.claude/skills/level0/lib/schema.js` | a heading and a field key, for the schema door |
+| the slug in `test/contract/vocabulary.test.js` | a heading, for the anchor a pointer names |
+| `slug` in `.claude/skills/level0/lib/projection.js` | a config group, into a folder stem |
+| `commandsOf` in `src/extension/lib/panel.js` | a config group, into a command name |
+
+So the table drives the first pair and the Go rule, and the second pair stands
+outside it. A config group holds no quote, and a heading does.
+
+What this hand weighs, and what it assumes:
+
+- a markdown renderer writes the anchor, so the rule drops a quote before it dashes the rest
+- the tree writes `the-owners-prompt-comes-first` today, and the contract test holds that rule
+- `slugOf` answers `the-owner-s-prompt-comes-first` there, so it takes the drop and reads one key
+- no schema header and no field key holds a quote, so the schema door reads what it read before
 
 # do
 
