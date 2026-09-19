@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -102,6 +102,10 @@ record:
     hash_after: 30d9aa356a8b5e42a2101d829acdbb0eb82661c9
     returns: 1
     why: "`standingAll` stands in `src/scripts/work-stands.js`, and `src/scripts/work.js` imports it; `branches` stands in that same file, so the standing and the list read one place; `movedOnTrunk` stands unexported in `src/scripts/work-merge.js`, so name what carries its read across; `take` stands in `src/scripts/work.js`, so the row reading `the same file` names two files; the counts of refs and of standing words drop, because `git merge-base` answers them [[spec/guidance/voice]]; the owner's row stands on a cloud branch, so say what this box does with those refs [[spec/guidance/cloud]]"
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 142ebe3ef48ccec6aeae2fa7acd8d880c5e9c50a
+    hash_after: 142ebe3ef48ccec6aeae2fa7acd8d880c5e9c50a
 ---
 
 # Ask
@@ -128,37 +132,28 @@ A rewrite of trunk leaves five refs sharing no ancestor with it. The take picks 
 
 One question answers it: does the branch share an ancestor with trunk?
 
-`git merge-base origin/main origin/<branch>` answers 0 where one stands, and non-zero where none does. `movedOnTrunk` in `src/scripts/work.js` already asks git that question, so the verbs read one shape.
+`git merge-base origin/main origin/<branch>` answers 0 where one stands. `movedOnTrunk` in `src/scripts/work-merge.js` already asks git that, and it stands unexported today.
 
 | what changes | where |
 |---|---|
-| the standing reads `orphan` | `standingAll` in `src/scripts/work.js` |
-| the take passes over it, and names it | `take` in the same file |
-| the row marks it | the list's row builder |
-| the case drives one orphan and one branch | `test/level0/work.test.js` |
+| a read naming an orphan, exported | `src/scripts/work-merge.js` |
+| the standing reads `orphan` | `standingAll` in `src/scripts/work-stands.js` |
+| the listing marks it | `refsHere` in that same file |
+| the take passes over it, and names it | `take` in `src/scripts/work.js` |
+| the case drives one orphan beside one branch | `test/level0/work.test.js` |
 
-**The standing.** `standingAll` maps a branch to one of four words today. An orphan reads ahead of all four, because a branch no sync reaches takes no work whatever its brief says:
+The standing:
 
 | what git answers | the standing |
 |---|---|
-| `merge-base` non-zero | `orphan` |
-| anything else | the four words it reads today |
+| `merge-base` fails | `orphan` |
+| anything else | the words it reads today |
 
-**The take.** `take` walks the branches at `todo` and picks the first. An orphan stands outside `todo` once the standing names it, so the take passes it over. The take then says which branches it skipped, and why, so a box reads the reason.
+`take` walks the branches at `todo` and picks the first. An orphan reads `orphan` in place of `todo`, so the take passes it over and says which it skipped.
 
-**The case.** `fakeGit` answers a command by name, so a case answers `merge-base` non-zero for one branch and 0 for another. The take then answers the second, and the said names the first as skipped.
+`fakeGit` answers a command by name, so the case answers `merge-base` red for one branch and green for another. The take answers the second, and the said names the first.
 
-**The count.** Seven refs stand orphaned today, and `git merge-base origin/main <ref>` answers which:
-
-| the refs | what they are |
-|---|---|
-| `v1`, `v2`, `v3`, `v4` | four trunks this tree stood on before |
-| `group/level0`, `group/voice` | two group branches off an older trunk |
-| `se/claims` | one branch off an older trunk |
-
-The ask reads five, and it names none under `work/`. `branches` reads `work/*` alone, so the take reaches none of these seven today. The guard holds for the next rewrite, where a `work/` branch falls the same way.
-
-So the owner's row stands on its own: these seven wait for a person to close them or cut them again.
+What this box does with the refs standing orphaned: it leaves them. `branches` reads `work/*` alone, so the take reaches none of them, and the guard covers the next rewrite. A person who wants one gone runs git.
 
 ## review
 
