@@ -1,5 +1,6 @@
-// The block a session outside the cage reads: the bridgehead says the start
-// road stood down, and a box whose server answers says nothing of its own.
+// The start road the bridgehead runs: node carries every guard, a desk box
+// stays quiet, and a session outside the cage reads one block saying so.
+// [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 // [[spec/design_output/level0#a-session-says-its-cage]]
 
 import assert from "node:assert/strict";
@@ -18,8 +19,10 @@ async function hookHere() {
 // The harness the bridgehead reaches: a wire, a file system and a process. [[spec/design_output/doors#a-fake-behaves]]
 function harness({ answers = false, exitCode = 0, stderr = "" } = {}) {
   const wrote = new Map();
+  const ran = [];
   return {
     wrote,
+    ran,
     $: {
       http: {
         fetch: async () => {
@@ -34,7 +37,12 @@ function harness({ answers = false, exitCode = 0, stderr = "" } = {}) {
         },
         write: async (path, text) => void wrote.set(path, text),
       },
-      process: { run: async () => ({ exitCode, stderr }) },
+      process: {
+        run: async (argv) => {
+          ran.push(argv);
+          return { exitCode, stderr };
+        },
+      },
     },
   };
 }
@@ -54,6 +62,46 @@ async function opensThen(hook, box, e) {
   await runs("session.start", { cwd: HERE });
   return runs("prompt.context", e ?? {});
 }
+
+// A Windows box carries no shell on the host's path, so every guard runs in node. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+test("the start road runs node, and reaches no shell to read its guards", async () => {
+  const hook = await hookHere();
+  const box = harness({ exitCode: 3 });
+  await opensThen(hook, box);
+
+  assert.equal(box.ran.length, 1, "the road runs once");
+  assert.equal(box.ran[0][0], "node", "and node carries it");
+  assert.equal(box.ran[0][1], "-e", "off the script the hook holds");
+  assert.equal(
+    /^(sh|bash|cmd|powershell)$/.test(box.ran[0][0]),
+    false,
+    "no shell stands between the hook and the guards",
+  );
+});
+
+test("the script reads every guard the shell read, and puts node behind it", async () => {
+  const hook = await hookHere();
+  const box = harness({ exitCode: 3 });
+  await opensThen(hook, box);
+  const script = box.ran[0][2];
+
+  assert.match(script, /CLAUDE_CODE_REMOTE/, "the cloud variables");
+  assert.match(script, /SE_CLOUD/);
+  assert.match(script, /existsSync\(method\)/, "the method root");
+  assert.match(script, /node_modules/, "the modules");
+  assert.match(script, /detached: true/, "and the server stands behind it");
+});
+
+test("a desk box reads no line off the start road, because a person starts it there", async () => {
+  const hook = await hookHere();
+  const box = harness({ exitCode: 3 });
+  await opensThen(hook, box);
+
+  const rows = [...box.wrote.values()].join("\n");
+  assert.doesNotMatch(rows, /the start of the server fails/, "the road fails nowhere");
+  assert.doesNotMatch(rows, /a person starts the server here/, "and says nothing");
+  assert.match(rows, /the server answers nothing/, "the log names the down server alone");
+});
 
 test("a box whose start road stands down says so in the first prompt", async () => {
   const hook = await hookHere();

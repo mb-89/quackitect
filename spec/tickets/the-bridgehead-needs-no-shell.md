@@ -47,6 +47,33 @@ Done is a bridgehead reaching the same answers with no shell:
 
 <!-- the form is text -->
 
+Trunk carries the change the ask names, and this step adds the cases holding
+it at the hook.
+
+| what the ask asks for | what stands |
+|---|---|
+| the two cloud variables read off the environment | `process.env` in the start script, exiting 3 |
+| the method root stated | `existsSync(method)`, exiting 4 |
+| node run, and its answer read | the hook's catch, reading a refused spawn as code 5 |
+| `node_modules` stated | `existsSync`, exiting 6 |
+| node put behind it, with the log as its output | `spawn` detached, the log file on both streams |
+
+`starts()` runs `["node", "-e", START, ...]`, so no shell stands between the
+hook and any guard.
+
+**What surprises.** `test/contract/cloud-start.test.js` drives the script and
+reads its codes, and nothing read what the hook spawns. A hand putting `sh`
+back in `starts()` would leave that file green.
+
+- `test/level0/start-road.test.js` reads the argv the hook spawns
+- the same file reads every guard standing inside the script
+- it holds the cases over the block a session outside the cage reads
+
+**The one shell left.** The install road this group adds runs the tree's own
+installer, which is a shell script. It stands past the cloud guard, so a box
+reaching it is a cloud box carrying `sh`. Every guard above it runs in node,
+and the comment beside the line says so.
+
 # Discussion
 
 The owner reads `the start of the server fails` in the session log, and asks for the note and the fix later.

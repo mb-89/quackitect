@@ -42,6 +42,7 @@ export const START = [
   "mkdirSync(here + '/.se/.log', { recursive: true });",
   "const out = openSync(here + '/.se/.log/serve.log', 'a');",
   "const brought = !existsSync(method + '/node_modules');",
+  // The one shell this road reaches, and it stands past the cloud guard, because the installer is a shell script and a cloud box carries sh. Every guard above runs in node. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
   "if (brought) {",
   "  const env = Object.assign({}, process.env, { SE_INSTALL_SKIP: skip || '' });",
   "  spawnSync('sh', [method + '/src/scripts/install.sh'], { cwd: method, env, stdio: ['ignore', out, out] });",
