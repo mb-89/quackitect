@@ -36,17 +36,22 @@ An aside about another's mechanism ages where nobody looks. A hand changing that
 mechanism reads the notes it owns, and reads no note that mentioned it in
 passing. So the aside stands wrong, and the hand who wrote it moved on.
 
-## 3. No assertion from memory
+## 3. No assertion from recall
 
-A claim from memory reads right to the hand writing it. This tree refused two
-such claims in one session, and one grep answered each. So the cost of checking
-stands under the cost of a review.
+A claim from recall reads right to the hand writing it. A store the hand reads
+is a source, and this check leaves it alone. This tree refused two such claims
+in one session, and one grep answered each. So the cost of checking stands under
+the cost of a review.
 
 ## 4. No number in prose
 
 A number lands stale. One draft wrote the count of files naming a tool, and the
 draft's own file joined that list as it landed. A command stays true, and a
 rationale holds the number an argument needs.
+
+A date fixing a source is the one number that holds. The author and the year are
+what let a reader find the source and check the claim on it. For details, see
+[[spec/rationales/arguing]].
 
 ## 5. It stands nowhere already
 
