@@ -68,6 +68,7 @@ func linksIn(front map[string]string, body string) []linkAt {
 }
 
 // bracketed answers what stands inside every [[ ]] of a line. A link naming an
+// angle-bracketed placeholder, like [[<name>]], counts as no link.
 func bracketed(said string) []string {
 	out := []string{}
 	rest := said
