@@ -742,6 +742,31 @@ The probe after a compaction pays nothing. It reads the canary through
 `heardCanary` on a session holding the line already, so a second debt stays
 shut.
 
+## The debt survives a restart
+
+A restart is ordinary. `reload.js` restarts the server where the code under its
+roots moves, so a session working on level zero's own code meets it often. The
+box dies with the process, and the harness session runs on. A debt held in the
+box alone comes back at every restart, and the gate then asks a session that
+says the line already.
+
+So the debt stands in the session log, which rotates at a session start. The
+marks it reads are there already: the paid line `onTurnSaid` writes, and the
+compaction line `onSessionCompact` writes.
+
+| the last mark in the log | what the box reads back |
+|---|---|
+| the paid line | the debt stands clear, and the gate stays quiet |
+| the compaction line | the debt stands, and the gate asks again |
+| neither | the debt stands, and the gate asks again |
+
+`afterARestart` in `src/bridge/guidance.js` builds the session a restart takes,
+and `sessionHere` is the one place calling it. A session opening on
+this box reaches `onSessionStart` instead, which writes the state fresh.
+
+A compaction opens the debt again and takes the payment off with it, so the
+line lands once more after one.
+
 ## The line lands once
 
 A turn holds open while the agent works. A debt clearing at the turn's end
