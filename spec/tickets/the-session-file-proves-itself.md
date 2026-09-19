@@ -87,6 +87,7 @@ steps:
       - name: verdict
         form: verdict
         says: pass or fail, findings one a line
+group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 step: design/review

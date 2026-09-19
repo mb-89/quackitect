@@ -86,6 +86,7 @@ steps:
       - name: verdict
         form: verdict
         says: pass or fail, findings one a line
+group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
 step: design/review

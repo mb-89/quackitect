@@ -26,7 +26,7 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
-group: work/the-window-grows-tabs
+group: the-tree-names-its-things
 ---
 
 # Ask

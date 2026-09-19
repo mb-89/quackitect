@@ -33,6 +33,7 @@ steps:
       - name: says
         form: text
         says: what changes and why, for a reader who was not there
+group: the-rules-hold-themselves
 process: [[spec/processes/question]]
 process_hash: 1f3006ec4b044a89
 step: answer

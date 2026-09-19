@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
+group: the-bridge-keeps-transport
 steps:
   - name: do
     does: makes the change the ask names

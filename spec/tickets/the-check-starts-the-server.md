@@ -24,6 +24,7 @@ steps:
       - name: says
         form: text
         says: what changes and why, for a reader who was not there
+group: the-bridge-keeps-transport
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 ---

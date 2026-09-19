@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
 state: draft
+group: the-rules-hold-themselves
 urgent: true
 steps:
   - name: do
