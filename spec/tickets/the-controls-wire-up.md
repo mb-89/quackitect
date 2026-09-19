@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -204,6 +204,17 @@ record:
     hash_after: 28425da421f1da0c1c1999e74b22a01957123187
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 28284b744b8937e3fd9452adfd45e7db5024daf0
+    hash_after: 28284b744b8937e3fd9452adfd45e7db5024daf0
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 14 test(s) pass in 2 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -436,7 +447,9 @@ sets changes what a session takes and what holds its turn open.
 | the pull | answers wait at `unbound` and at `god`, and names the binding it reads |
 | `ENGINE_CHECKS` in `stop.js` | names the checks reading the engine's own work |
 | `standsDown` | answers whether one of those steps aside, which `god` alone makes it do |
-| `ranHere` | asks that first, so the four take one gate |
+| `CHECKS` in `stop.js` | holds every check the door answers, one a key |
+| `knowsCheck` | answers whether the door holds a name, so a case can ask |
+| `ranHere` | asks the gate first, then reads the table |
 
 The gate reads `god` alone, so the `unbound` column stands as it stood. A
 session at `unbound` keeps every check it had, and takes a named ticket with
@@ -451,10 +464,15 @@ The verdict found three things, and this round answers each:
 |---|---|
 | the gate stands under the branch-take, so a cloud pull on trunk hands out at `god` | the gate stands above the take, under the hand-back and the hold |
 | a case drives the pure name, and the pull's own road stands untested | three cases drive `pull` over the fakes `pull-doors.js` builds |
-| the cases copy the names the stop rules own | a contract case reads the shipped rules and holds the gate against them |
+| the cases copy the names the stop rules own | a contract case reads the shipped rules and asks the door for each |
 
 A case drives a cloud box on trunk at `god`, which is the road that carried the
 fault. It reads the wait, and reads that the take stands untouched.
+
+The round after that found the contract case reading a type, where its title
+promises a set. So the door holds its checks in a table, `knowsCheck` answers
+what stands in it, and the case asks that of every shipped name. It asks the
+same of a name nobody wrote, and reads false.
 
 ### checked
 
