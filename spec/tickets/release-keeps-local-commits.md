@@ -272,3 +272,16 @@ The objection: a box skipping the push now stalls at every verb. It stalls where
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+The draft under `design/draft` is wrong on what stands today, and the review
+reads this beside it:
+
+- `unpushed` in `src/scripts/work-stands.js` already counts what origin lacks
+- `dirty` calls it, and it names the count and the push
+- `release` passes the branch it moves to `dirty`, so that road holds
+- `take` passes no branch, so it reads the branch the box stands on
+- `onBranch` then resets the branch the take lands on, which nothing read
+
+So the gap is the take's target branch. The read stands written, and the change
+carries it to `onBranch` in place of writing a second one.
+

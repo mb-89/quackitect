@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -105,6 +105,12 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: d4031266a00984eae5060e8b6e705fc13b51a12f
     hash_after: d4031266a00984eae5060e8b6e705fc13b51a12f
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 837693c39c5df41b995f41bcdad0ef2969ae78b7
+    hash_after: 837693c39c5df41b995f41bcdad0ef2969ae78b7
+    returns: 2
+    why: "`spec/design_output/private.md` names the root file twice, and the notes table leaves it out; `spec/design_output/schema.md` says the schema governs both files, so that note answers too; `spec/design_output/review.md` names the root file in its own table, which the draft leaves out; `BRIEF` also stands in `src/scripts/work-merge.js` and `src/scripts/work-stands.js`; the language server tests under `src/lsp` drive the root file as a governed path; the counts and the how-many column drop, because a grep answers them, and one reads stale [[spec/guidance/voice]]"
 ---
 
 # Ask
@@ -196,23 +202,16 @@ The constant and its readers go last: `BRIEF` in the work verbs, the review verb
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
-
 <!-- the form is verdict -->
 
 fail
 
-- The table holds. Each row names a verb, the code behind it, and what stands after, and the rows read true against `src/scripts/work.js`.
-- The redraft answers one finding of the last round and leaves five. The prose under the table reads as it read before.
-- The six chapters of the work design output stand unnamed. The last round asked for each, and what stands in its place.
-- The redraft points its details at `A brief drains first`. The last round named that chapter as one the change takes away.
-- The cloud guidance stands unanswered. Actionable 10 sends a box's result into `HANDOVER.md`, and no row says what a box writes instead.
-- The handover schema stands unanswered. It governs the root brief, and it says one kind covers two paths.
-- The box handover stands unanswered. `copilot-runtime.js` reads `.se/HANDOVER.md` and `HANDOVER.md` in one loop, and the redraft says the brief is one file.
-- An implementer reading this cuts both paths. Say that `.se/HANDOVER.md` stays, and say it where the copilot row stands.
-- The copilot row carries one line for seven references across two modules. `copilot-dispatch.js` holds three, and `copilot-runtime.js` holds four.
-- Two of those seven sit inside a prompt this tree writes for a person to read. Say what that prompt says after.
-- The first row of `done_when` decides nothing. `./RUNME.sh branch list` names every branch a group today, and 8 groups stand with no brief among them.
-- The evidence field carries the two comments mint writes, above the table. Cut them, so the field reads as what a hand wrote.
+- `spec/design_output/private.md` names the root file twice, and the notes table leaves it out
+- `spec/design_output/schema.md` says the schema governs both files, so that note answers too
+- `spec/design_output/review.md` names the root file in its own table, which the draft leaves out
+- `BRIEF` also stands in `src/scripts/work-merge.js` and `src/scripts/work-stands.js`
+- the language server tests under `src/lsp` drive the root file as a governed path
+- the counts and the how-many column drop, because a grep answers them, and one reads stale [[spec/guidance/voice]]
 
 # implement
 
