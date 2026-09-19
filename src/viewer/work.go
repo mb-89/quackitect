@@ -18,7 +18,7 @@ import (
 )
 
 // The work answer of [[spec/design_output/work#one-verb-answers-git]], owned by .claude/skills/level0/lib/folders.js and spelled again here because a Go module imports no JavaScript.
-const workAnswerAt = ".se/work.json"
+const workAnswerAt = ".se/.runtime/work.json"
 
 // [[spec/design_output/tree-view#a-base-file-says-it]]
 const workBaseAt = "spec/views/work.base"

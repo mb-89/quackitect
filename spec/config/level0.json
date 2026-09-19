@@ -1,5 +1,5 @@
 {
-  "comment": "The controls for level zero, and the defaults every box starts from. spec/config/level0.schema.json says the type of each one and what it does, the environment beats this file, and .se/config.json beats both. Ask ./RUNME.sh config which layer answers.",
+  "comment": "The controls for level zero, and the defaults every box starts from. spec/config/level0.schema.json says the type of each one and what it does, the environment beats this file, and .se/.runtime/config.json beats both. Ask ./RUNME.sh config which layer answers.",
   "stop": {
     "comment": "The tooth. The rules it votes over live in spec/config/stop.",
     "enabled": true,

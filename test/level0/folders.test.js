@@ -25,7 +25,7 @@ import { HOLDS, NOTES } from "../../src/scripts/ticket.js";
 
 test("the module names the retro folder and the runtime folder, both under the private one", () => {
   assert.equal(PRIVATE, ".se");
-  assert.equal(RETRO, `${PRIVATE}/retro`);
+  assert.equal(RETRO, `${PRIVATE}/.retro`);
   assert.equal(RUN, `${PRIVATE}/.runtime`);
 });
 

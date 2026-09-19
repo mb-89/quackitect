@@ -27,7 +27,7 @@ mkdir -p "$root/.se/.runtime"
 # The log stays out of the move, because the retro collects it.
 for one in bin hold review undo measure copilot box.json session.json \
   tools.json hold.json check.json index.db index.json lsp.json copilot-cloud \
-  show-panel; do
+  show-panel config.json copy.json project.json work.json; do
   old="$root/.se/$one"
   new="$root/.se/.runtime/$one"
   [ -d "$old" ] || [ -f "$old" ] || continue

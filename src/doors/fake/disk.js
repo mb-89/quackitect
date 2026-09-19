@@ -8,6 +8,9 @@ export function fakeDisk(seed = {}) {
   const folders = new Set();
   const links = new Map();
   const runs = new Set();
+  // The fake's clock ticks once a write, so a later write reads as newer. [[spec/guidance/retro/collect]]
+  const times = new Map();
+  let tick = 0;
   let made = 0;
 
   // [[spec/design_output/extension#a-link-pointing-nowhere]]
@@ -19,6 +22,7 @@ export function fakeDisk(seed = {}) {
 
   return {
     files,
+    times,
     link(target, path) {
       if (files.has(norm(path)) || folders.has(norm(path)) || links.has(norm(path))) {
         const err = new Error(`file already exists: ${path}`);
@@ -46,7 +50,10 @@ export function fakeDisk(seed = {}) {
       }
       return said;
     },
-    write: (path, text) => void files.set(norm(path), String(text)),
+    write(path, text) {
+      files.set(norm(path), String(text));
+      times.set(norm(path), ++tick);
+    },
     // [[spec/design_output/doors#a-fake-behaves]]
     copy(from, to) {
       files.set(norm(to), this.read(from));
@@ -54,7 +61,34 @@ export function fakeDisk(seed = {}) {
     size(path) {
       return String(this.read(path)).length;
     },
-    append: (path, text) => void files.set(norm(path), `${files.get(norm(path)) ?? ""}${text}`),
+    modified(path) {
+      this.read(path);
+      return times.get(norm(path)) ?? 0;
+    },
+    move(from, to) {
+      const was = norm(from);
+      const now = norm(to);
+      if (!exists(was)) {
+        const err = new Error(`no such file: ${from}`);
+        err.code = "ENOENT";
+        throw err;
+      }
+      for (const key of [...files.keys()]) {
+        if (key !== was && !key.startsWith(`${was}/`)) continue;
+        files.set(`${now}${key.slice(was.length)}`, files.get(key));
+        times.set(`${now}${key.slice(was.length)}`, times.get(key) ?? 0);
+        files.delete(key);
+      }
+      for (const key of [...folders]) {
+        if (key !== was && !key.startsWith(`${was}/`)) continue;
+        folders.add(`${now}${key.slice(was.length)}`);
+        folders.delete(key);
+      }
+    },
+    append(path, text) {
+      files.set(norm(path), `${files.get(norm(path)) ?? ""}${text}`);
+      times.set(norm(path), ++tick);
+    },
     exists: (path) => exists(norm(path)),
     remove(path) {
       const at = norm(path);

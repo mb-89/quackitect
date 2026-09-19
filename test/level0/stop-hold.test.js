@@ -20,7 +20,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 
 const ROOT = "/tree";
 const AT = join(ROOT, "spec", "config", "level0.json");
-const LOCAL = join(ROOT, ".se", "config.json");
+const LOCAL = join(ROOT, ".se", ".runtime", "config.json");
 
 function box(hold) {
   const said = [];

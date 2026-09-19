@@ -33,7 +33,7 @@ and every writer takes its folder from there.
 
 | kind | where it stands | who reads it |
 |---|---|---|
-| retro | `.se/retro` | the retro, as its own |
+| retro | `.se/.retro` | the retro, as its own |
 | runtime | `.se/.runtime` | the box holding it |
 | the rest | `.se` itself | the retro, and a question over the index |
 

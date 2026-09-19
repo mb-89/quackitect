@@ -34,7 +34,7 @@ function vehicle() {
     "/tools/RUNME.sh": "run me",
     "/tools/package.json": '{"version":"0.1.0"}',
     "/tools/.claude/settings.json": SETTINGS,
-    "/tools/.se/copy.json": '{"id":"abc123","made":"2026-01-01T00:00:00.000Z"}',
+    "/tools/.se/.runtime/copy.json": '{"id":"abc123","made":"2026-01-01T00:00:00.000Z"}',
     "/tools/src/scripts/cli.js": "the verbs",
     "/tools/src/stub/RUNME.sh": "the shim",
     [`/tools/src/stub/${PLUGIN}/.claude-plugin/plugin.json`]: '{"name":"level0"}',

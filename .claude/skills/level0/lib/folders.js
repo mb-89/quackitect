@@ -4,7 +4,7 @@
 // [[spec/design_input/the-runtime-files-stand-apart]]
 
 export const PRIVATE = ".se";
-export const RETRO = `${PRIVATE}/retro`;
+export const RETRO = `${PRIVATE}/.retro`;
 export const RUN = `${PRIVATE}/.runtime`;
 
 // The names the runtime half took, so a spelling of one straight under the private folder is a reader the move left behind. [[spec/design_output/private#three-kinds-stand-apart]]
@@ -12,6 +12,8 @@ export const MOVED = [
   "bin",
   "box.json",
   "check.json",
+  "config.json",
+  "copy.json",
   "copilot",
   "copilot-cloud",
   "hold",
@@ -19,11 +21,13 @@ export const MOVED = [
   "index.json",
   "lsp.json",
   "measure",
+  "project.json",
   "review",
   "session.json",
   "show-panel",
   "tools.json",
   "undo",
+  "work.json",
 ];
 
 // [[spec/design_input/the-runtime-files-stand-apart]]
@@ -34,8 +38,8 @@ export const HOLD = `${RUN}/hold.json`;
 export const LOG = `${PRIVATE}/log`;
 export const NOTES = `${PRIVATE}/notes`;
 export const TICKETS = `${PRIVATE}/tickets`;
-// The work answer stands beside the work a reader reads, so the index walks it. [[spec/design_output/work#one-verb-answers-git]]
-export const ANSWER = `${PRIVATE}/work.json`;
+// The work answer is regenerated state, so it stands in the runtime folder. [[spec/design_output/work#one-verb-answers-git]]
+export const ANSWER = `${RUN}/work.json`;
 
 // [[spec/design_input/the-runtime-files-stand-apart]]
 export function inRetro(name) {

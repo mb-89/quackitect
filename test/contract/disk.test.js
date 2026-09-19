@@ -21,6 +21,10 @@ function through(door) {
   door.write(join(under, "more.md"), "more\n");
   // A copy carries bytes, and the size it answers is what a manifest names. [[spec/design_output/doors#a-fake-behaves]]
   door.copy(file, join(at, "copy.md"));
+  // A move carries a folder whole and leaves nothing where it stood. [[spec/guidance/retro/collect]]
+  door.makeDir(join(at, "box"));
+  door.write(join(at, "box", "one.md"), "one\n");
+  door.move(join(at, "box"), join(under, "box"));
 
   const said = {
     read: door.read(file),
@@ -30,6 +34,9 @@ function through(door) {
     missing: door.exists(join(at, "nothing.md")),
     copied: door.read(join(at, "copy.md")),
     size: door.size(file),
+    moved: door.read(join(under, "box", "one.md")),
+    left: door.exists(join(at, "box")),
+    newer: door.modified(join(at, "fresh.md")) >= door.modified(file),
     list: door
       .list(at)
       .map((one) => `${one.name}:${one.kind}`)
@@ -50,6 +57,9 @@ test("the real door writes, reads back, lists and removes", () => {
   assert.equal(said.missing, false);
   assert.equal(said.copied, "# Notes\nmore\n", "a copy reads what the file reads");
   assert.equal(said.size, said.read.length);
+  assert.equal(said.moved, "one\n", "a moved folder reads what it held");
+  assert.equal(said.left, false, "a move leaves nothing where it stood");
+  assert.equal(said.newer, true, "a later write reads as no older");
   assert.deepEqual(said.list, [
     "copy.md:file",
     "deep:dir",

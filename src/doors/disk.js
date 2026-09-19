@@ -12,6 +12,7 @@ import {
   readdirSync,
   readFileSync,
   realpathSync,
+  renameSync,
   rmSync,
   statSync,
   symlinkSync,
@@ -29,6 +30,9 @@ export function disk() {
     // A copy carries bytes, because read and write carry text and an archive is no text. [[spec/design_output/doors#a-fake-behaves]]
     copy: (from, to) => copyFileSync(from, to),
     size: (path) => statSync(path).size,
+    // A move keeps the bytes and leaves nothing behind, where a copy doubles the file. [[spec/guidance/retro/collect]]
+    move: (from, to) => renameSync(from, to),
+    modified: (path) => statSync(path).mtimeMs,
     write: (path, text) => writeFileSync(path, text, { encoding: "utf8" }),
     append: (path, text) => appendFileSync(path, text, { encoding: "utf8" }),
     exists: (path) => existsSync(path),

@@ -45,7 +45,7 @@ const TRACKED = JSON.stringify({
 const FILES: Record<string, string> = {
   [`${ROOT}/spec/config/level0.schema.json`]: SCHEMA,
   [`${ROOT}/spec/config/level0.json`]: TRACKED,
-  [`${ROOT}/.se/config.json`]: "{}",
+  [`${ROOT}/.se/.runtime/config.json`]: "{}",
 };
 
 const SITE = {
@@ -110,7 +110,7 @@ test("one press on a toggle moves one rung and the mark carries it", async ($, o
   console.log(said);
   expect(said).toContain("[✋🤖finish]");
   expect(said).toContain("stop.hold is finish");
-  expect(JSON.parse(FILES[`${ROOT}/.se/config.json`])).toMatchObject({ stop: { hold: "finish" } });
+  expect(JSON.parse(FILES[`${ROOT}/.se/.runtime/config.json`])).toMatchObject({ stop: { hold: "finish" } });
 });
 
 test("the count the declaration names reaches the far rung", async ($, on) => {
@@ -123,7 +123,7 @@ test("the count the declaration names reaches the far rung", async ($, on) => {
   const said = drawing(await $.ui.render(SITE as never));
   console.log(said);
   expect(said).toContain("[✋🤖stop]");
-  expect(JSON.parse(FILES[`${ROOT}/.se/config.json`])).toMatchObject({ stop: { hold: "stop" } });
+  expect(JSON.parse(FILES[`${ROOT}/.se/.runtime/config.json`])).toMatchObject({ stop: { hold: "stop" } });
 });
 
 test("an action names the command it carries, and the tree opens under a press", async ($, on) => {

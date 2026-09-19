@@ -344,7 +344,7 @@ The hook counts the turns it carries one after another.
 
 The hook asks the resolver for `stop.mostInARow` and `stop.enabled` at each
 turn end, and `atTurnEnd` takes the cap as an argument. So the tooth carries no
-number of its own, and a write to `.se/config.json` reaches the next turn. For
+number of its own, and a write to `.se/.runtime/config.json` reaches the next turn. For
 details, see [[spec/design_output/config#a-caller-hands-it-in]].
 
 The tooth is on for a desk session as well as a cloud one. The discussion rule

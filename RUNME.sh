@@ -11,8 +11,8 @@ sh "$here/src/scripts/install.sh"
 
 # [[spec/design_output/editor#one-command-opens-the-editor]]
 if [ "$#" -eq 0 ]; then
-  mkdir -p "$here/.se"
-  printf 'show\n' > "$here/.se/show-panel"
+  mkdir -p "$here/.se/.runtime"
+  printf 'show\n' > "$here/.se/.runtime/show-panel"
   [ -n "${SE_EDITOR_OPENS:-}" ] && exit 0
   if command -v code >/dev/null 2>&1; then
     code "$here"

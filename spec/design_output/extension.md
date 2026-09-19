@@ -119,7 +119,7 @@ two-way watching carries.
 
 ## A click writes the file
 
-The sidebar writes `.se/config.json` and that file alone. A row under the
+The sidebar writes `.se/.runtime/config.json` and that file alone. A row under the
 tracked file shows the team's value. Typing there writes an override, so the
 tracked file stays as the team holds it.
 
@@ -370,7 +370,7 @@ disk.
 # What level zero holds
 
 Three controls work with no engine, because the stop table and the standing
-block already read `.se/config.json`:
+block already read `.se/.runtime/config.json`:
 
 | control | how it lands |
 |---|---|

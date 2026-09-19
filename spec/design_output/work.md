@@ -76,7 +76,7 @@ before the ticket system finish under the verbs they carry.
         hash_before: a1b2c3
 
 `step` is the leaf the group stands on, `hand` names the box out of
-`.se/copy.json`, and `hash_before` is the branch tip at the claim. The push decides:
+`.se/.runtime/copy.json`, and `hash_before` is the branch tip at the claim. The push decides:
 two boxes reaching for one group means one of them meets a rejected push and
 takes the next.
 

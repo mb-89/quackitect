@@ -3,11 +3,12 @@
 // file says every type, and a written text lands as its own kind.
 // [[spec/design_output/config#the-three-layers]]
 
+import { RUN } from "./folders.js";
 import { deeply } from "./layer.js";
 
 export const TRACKED = "spec/config/level0.json";
 export const SCHEMA = "spec/config/level0.schema.json";
-export const LOCAL = ".se/config.json";
+export const LOCAL = `${RUN}/config.json`;
 export const FOLDER = ".se";
 export const PREFIX = "SE_";
 

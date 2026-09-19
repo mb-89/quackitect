@@ -12,7 +12,8 @@ import (
 
 const (
 	Tracked = "spec/config/level0.json"
-	Local   = ".se/config.json"
+	// The local layer, owned by .claude/skills/level0/lib/folders.js and spelled again here because a Go module imports no JavaScript. [[spec/design_output/config#the-three-layers]]
+	Local   = ".se/.runtime/config.json"
 	WordsAt = "names.words"
 	WordsIn = "SE_NAMES_WORDS"
 )

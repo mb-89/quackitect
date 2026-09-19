@@ -16,7 +16,7 @@ import {
   ROOT,
 } from "./work-doors.js";
 
-const ANSWER_AT = join(ROOT, ".se", "work.json");
+const ANSWER_AT = join(ROOT, ".se", ".runtime", "work.json");
 const LOOSE = CHILD("one-group", "open").replace("group: one-group\n", "");
 
 const doors = (files = {}) => {

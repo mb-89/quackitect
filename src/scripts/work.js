@@ -18,7 +18,6 @@ import {
   CLOSED,
   fieldOf,
   frontOf,
-  GROUP,
   heldIn,
   isGroup,
   OPEN,
@@ -27,7 +26,6 @@ import {
   ticketAt,
   ticketNamed,
   urgent,
-  URGENT,
   WORK_BRANCH,
   withEntry,
   withField,
@@ -35,18 +33,26 @@ import {
   withoutField,
 } from "./group.js";
 import { guidance } from "./guidance-verb.js";
-import { escalate, handOf, leafOf, pull, roleOf, stepPathOf, takeable } from "./pull.js";
+import {
+  escalate,
+  handOf,
+  leafOf,
+  pull,
+  roleOf,
+  stepPathOf,
+  takeable,
+} from "./pull.js";
 import { readyToMerge, review } from "./review.js";
 import { serving } from "./serve.js";
-import { freeIn, staleClaim, trigger } from "./stand.js";
+import { freeIn, trigger } from "./stand.js";
 import { testVerb } from "./test-verb.js";
 import { unblock } from "./unblock.js";
-import { answer, answerOf } from "./work-answer.js";
+import { answer } from "./work-answer.js";
+import { list } from "./work-list.js";
 import { close, merge } from "./work-merge.js";
 import {
   BRIEF,
   briefOf,
-  COL,
   childrenHere,
   DONE,
   dirty,
@@ -54,7 +60,6 @@ import {
   HELD,
   noteOf,
   push,
-  readWork,
   setStatus,
   standingAll,
   standingIn,
@@ -222,7 +227,9 @@ function take(it, name = "") {
   // A box with nothing at a step it can take leaves the group at todo, before it writes a line. [[spec/tickets/the-group-leaves-at-todo]]
   const stands = standsOpen(it, one.name, it.join(it.root, ticketAt(one.name)));
   if (stands.open.length && !stands.busy.length) {
-    console.log(`${one.branch} stays at ${TODO}, because every open step waits for a person.`);
+    console.log(
+      `${one.branch} stays at ${TODO}, because every open step waits for a person.`,
+    );
     for (const child of stands.open) console.log(`  ${waitsAt(child)}`);
     console.log(`Answer it, then run ./RUNME.sh branch take again.`);
     return 0;
@@ -302,7 +309,10 @@ function claimGroup(it, one) {
 
   // A tracked file holds the role, and git holds who. [[spec/design_output/pull#the-hand-rule]]
   const role = roleOf(hand);
-  it.disk.write(path, withEntry(was, { step: stepOf(was), hand: role, hash_before: before }));
+  it.disk.write(
+    path,
+    withEntry(was, { step: stepOf(was), hand: role, hash_before: before }),
+  );
   it.git.run(["add", at], true);
   it.git.run(["commit", "-m", `${one.branch}: ${role} takes it`], true);
   if (!it.git.run(["push", "origin", one.branch]).ok) {
@@ -497,130 +507,4 @@ function read(it, name) {
   return 0;
 }
 
-// [[spec/design_output/work#a-row-per-group]]
-function list(it, _name, argv) {
-  const said = argv ?? [];
-  // The read stands off the network, and a flag asks for the refresh. [[spec/design_output/work#the-listing-reads-git-once]]
-  if (said.includes("--fetch")) it.git.fetch();
-  // [[spec/design_output/pull#the-queue-is-a-score]]
-  if (said.includes("--queue")) return queueOnly(it);
-  const read = readWork(it, true);
-  const stand = read.stand;
-  const standing = standingAll(stand);
-  if (said.includes("--done")) return doneOnly(stand, standing);
-  const now = it.clock ? it.clock.now().getTime() : 0;
-  const rows = stand.flatMap((one) => [rowOf(one, standing, now, it), ...childRows(one)]);
-  const loose = looseRows(read.loose);
-
-  if (!rows.length && !loose.length) {
-    console.log("No group and no loose ticket stands.");
-    return 0;
-  }
-
-  // [[spec/design_output/work#a-stale-group-is-yours]]
-  const stale = rows.filter((row) => row.stale);
-  if (stale.length) {
-    console.log("Yours");
-    for (const row of stale) {
-      console.log(`  ${row.said}`);
-      console.log(
-        `    ${row.name} held ${row.age}. Release it, take it over, or close it.`,
-      );
-    }
-    console.log("");
-  }
-  for (const row of [...rows, ...loose]) console.log(row.said);
-  return 0;
-}
-
-// [[spec/design_output/work#a-row-per-group]]
-function rowOf(one, standing, now, it) {
-  const text = noteOf(one);
-  const kind = one.brief ? "brief" : GROUP;
-  const status = standing.get(one.branch) || "no status";
-  const waits = waitingOn(text, standing);
-  const why = waits.length ? `waits for ${waits.join(", ")}` : markOf(text);
-  // [[spec/design_output/work#a-stale-group-is-yours]]
-  const { age, stale } =
-    status === HELD ? staleClaim(one, now, it) : { age: "", stale: false };
-
-  return {
-    name: one.name,
-    age,
-    stale,
-    said: `${one.branch.padEnd(COL.branch)} ${kind.padEnd(COL.kind)} ${status.padEnd(COL.status)} ${why.padEnd(COL.why)} ${age}`,
-  };
-}
-
-// [[spec/design_output/work#a-ticket-under-its-group]]
-function childRows(one) {
-  if (!one.ticket) return [];
-  return one.tickets
-    .filter((child) => fieldOf(child.text, GROUP) === one.name)
-    .map((child) => ({
-      stale: false,
-      said: `  ${child.name.padEnd(COL.child)} ticket ${stateOf(child.text).padEnd(COL.status)} ${whyOf(child.text)}`,
-    }));
-}
-
-// [[spec/design_output/work#a-ticket-under-its-group]]
-function stateOf(text) {
-  return fieldOf(text, "state") || OPEN;
-}
-
-// The order the pull hands out, off the one answer a board reads too. [[spec/design_output/work#one-verb-answers-git]]
-function queueOnly(it) {
-  const said = answerOf(it, true);
-  const held = new Map();
-  for (const one of [
-    ...said.branches,
-    ...said.branches.flatMap((row) => row.tickets),
-    ...said.loose,
-  ]) {
-    if (typeof one.queue === "number" && !held.has(one.name)) held.set(one.name, one);
-  }
-  const rows = [...held.values()].sort((a, b) => a.queue - b.queue);
-  if (!rows.length) {
-    console.log("No ticket stands in the queue.");
-    return 0;
-  }
-  for (const one of rows) {
-    const place = String(one.queue).padStart(COL.kind);
-    console.log(`${place}  ${one.name.padEnd(COL.branch)} ${one.step}`);
-  }
-  return 0;
-}
-
-// The why column carries the mark where nothing waits. [[spec/design_output/work#a-row-per-group]]
-function markOf(text) {
-  return urgent(text) ? URGENT : "";
-}
-
-// [[spec/design_output/work#a-ticket-under-its-group]]
-export function whyOf(text) {
-  return stepOf(text) || markOf(text);
-}
-
-// [[spec/design_output/work#a-row-per-group]]
-function looseRows(loose) {
-  return loose
-    .filter((one) => !fieldOf(one.text, GROUP) && !isGroup(one.text))
-    .map((one) => ({
-      stale: false,
-      said: `${one.name.padEnd(COL.branch)} ticket ${(fieldOf(one.text, "state") || OPEN).padEnd(COL.status)} ${markOf(one.text)}`,
-    }));
-}
-
-// [[spec/design_output/work#a-merged-branch-goes]]
-
-function doneOnly(stand, standing) {
-  const ready = stand.filter((one) => standing.get(one.branch) === DONE);
-  if (!ready.length) {
-    console.log(`No branch stands at ${DONE}.`);
-    return 0;
-  }
-  for (const one of ready) {
-    console.log(`${one.branch.padEnd(COL.branch)} ./RUNME.sh branch read ${one.name}`);
-  }
-  return 0;
-}
+export { whyOf } from "./work-list.js";

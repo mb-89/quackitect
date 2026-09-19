@@ -11,6 +11,7 @@ import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
+import { homeIn } from "./editor.js";
 import { handDoors } from "./hand.js";
 import { readTools, whereIs } from "./tools.js";
 import { rootsHere } from "./vehicle.js";
@@ -72,6 +73,9 @@ export async function doorsHere() {
     binding: await said.ask("engine.binding"),
     ...handDoors(process.env),
     node: process.execPath,
+    // The retro's collect reads the transcripts and the memory under home, and the scratchpads under temp. [[spec/guidance/retro/collect]]
+    home: homeIn(process.env),
+    temp: process.env.TEMP || process.env.TMP || process.env.TMPDIR || "",
     join,
   };
 }

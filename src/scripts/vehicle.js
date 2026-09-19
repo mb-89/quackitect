@@ -2,7 +2,7 @@
 // door writes, and a project keeps the identity of whatever drives it.
 // [[spec/design_output/vehicle#three-things-a-copy-needs]]
 
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import {
   attaches,
   COPY,
@@ -40,7 +40,7 @@ export function copyHere(files, time, method) {
   const at = join(method, COPY);
   const said = copyOf(readIf(files, at), idOf(time), time.stamp());
   if (said.made) {
-    files.makeDir(join(method, ".se"));
+    files.makeDir(dirname(at));
     files.write(at, `${JSON.stringify(said.record, null, 2)}\n`);
   }
   return said.record.id;
@@ -85,7 +85,7 @@ export function registerCopy(files, env, entry) {
 
 // [[spec/design_output/vehicle#a-project-names-its-driver]]
 export function attach(files, time, work, id) {
-  files.makeDir(join(work, ".se"));
+  files.makeDir(dirname(join(work, PROJECT)));
   files.write(
     join(work, PROJECT),
     `${JSON.stringify(attaches(id, time.stamp()), null, 2)}\n`,

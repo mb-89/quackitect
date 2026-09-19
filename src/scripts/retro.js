@@ -5,8 +5,6 @@
 
 import { fieldOf, NOTE_END, ticketNamed } from "./group.js";
 import { collect } from "./retro-collect.js";
-
-const CHAPTER = "chapter";
 import { newRetro } from "./retro-new.js";
 import { score } from "./retro-score.js";
 import { NOTES } from "./ticket.js";
@@ -37,11 +35,6 @@ export function retro(root, argv, doors) {
   return what ? 2 : 0;
 }
 
-// The mint writes the route a note carries, and that field tells a chapter from a parked note. [[spec/tickets/the-retro-cuts-its-window]]
-function isChapter(text) {
-  return fieldOf(text, "process").split("/").pop().replace(/\]\]$/, "") === CHAPTER;
-}
-
 // [[spec/design_output/pull#a-need-is-a-verb]]
 function notes(it) {
   const at = it.join(it.root, ...NOTES.split("/"));
@@ -54,8 +47,6 @@ function notes(it) {
           text: it.disk.read(it.join(at, one.name)),
         }))
         .filter((one) => fieldOf(one.text, "state") !== "closed")
-        // A chapter closes at the readers step, so the drain decides none of them. [[spec/tickets/the-retro-cuts-its-window]]
-        .filter((one) => !isChapter(one.text))
     : [];
   if (!open.length) {
     console.log(`${NOTES} holds no open note, so the box leaves nothing behind.`);

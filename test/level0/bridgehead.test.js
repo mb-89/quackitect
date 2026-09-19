@@ -46,7 +46,7 @@ function attachInto(files) {
     const work = argv[1].replace(/^SE_WORK_ROOT=/, "");
     const vehicle = argv[3].replace(/\/RUNME\.sh$/, "");
     files.write(
-      `${work}/.se/project.json`,
+      `${work}/.se/.runtime/project.json`,
       JSON.stringify({ driver: "abc123", since: "now" }),
     );
     files.write(
@@ -163,7 +163,7 @@ test("a cloud box with an empty register clones the upstream from vehicle.json, 
   assert.equal(argvs.length, 4);
 
   assert.equal(
-    JSON.parse(files.read(`${STUB}/.se/project.json`)).driver,
+    JSON.parse(files.read(`${STUB}/.se/.runtime/project.json`)).driver,
     "abc123",
     "the driver names the vehicle",
   );
@@ -252,7 +252,7 @@ test("a clone that fails stops the road, and the log names the step and its last
   );
   const { $, context } = await started(files, outside);
   assert.equal(outside.ran.length, 2, "the clone is the last command");
-  assert.equal(files.exists(`${STUB}/.se/project.json`), false, "no driver");
+  assert.equal(files.exists(`${STUB}/.se/.runtime/project.json`), false, "no driver");
   const line = rows(files).at(-1);
   assert.equal(line.level, "warn");
   assert.equal(line.step, "clone");
