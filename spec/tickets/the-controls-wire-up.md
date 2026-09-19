@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -146,6 +146,17 @@ record:
     hash_after: de52afb1977d624b54f06728b1220d24d8921b95
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 51c04672c2119ea8019fb6d1a36549550defe2f3
+    hash_after: 51c04672c2119ea8019fb6d1a36549550defe2f3
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -342,27 +353,41 @@ drives that half over a fake box.
 
 ### tests
 
-<!-- the same tests pass -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test test/level0/binding.test.js
 
 ### check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ### says
 
-<!-- what changes and why, for a reader who was not there -->
+`engine.binding` reaches the pull and the stop hook, so the value a person
+sets changes what a session takes and what holds its turn open.
+[[spec/design_output/config#the-engine-controls]] owns what each value means.
 
-<!-- the form is text -->
+| where | what it does |
+|---|---|
+| `handsOut` in `pull-route.js` | answers whether the plain pull hands work out, which the queue alone does |
+| the pull | answers wait at `unbound` and at `god`, and names the binding it reads |
+| `ENGINE_CHECKS` in `stop.js` | names the checks reading the engine's own work |
+| `standsDown` | answers whether one of those steps aside, which `god` alone makes it do |
+| `ranHere` | asks that first, so the four take one gate |
+
+The gate reads `god` alone, so the `unbound` column stands as it stood. A
+session at `unbound` keeps every check it had, and takes a named ticket with
+`pull <ticket>`.
+
+The stop door owns the two names the server read before, and the server imports
+them. So one place holds each, and the door reading the binding names it.
+
+A case holds the list against every name the door answers. A check joining the
+door lands in one list or the other, and the gate reaches it.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change touches no file the ask leaves out. The pull, its route, the stop door, the server's import and the cases.
+- every door the change reaches has a fake. The two new names stand pure, and the stop door reads the config through `asks` as it did.
+- a comment names the approach the change implements. Each site points at the chapter owning the binding.
 
 # verdict
 
