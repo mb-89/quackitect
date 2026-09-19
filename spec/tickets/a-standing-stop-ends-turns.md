@@ -309,11 +309,15 @@ queue rule at 80 stands quiet, because the fake tree carries no free ticket.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -321,11 +325,31 @@ queue rule at 80 stands quiet, because the fake tree carries no free ticket.
 
 <!-- the form is text -->
 
+A hold standing anywhere in a turn ends that turn, so the order the two events
+arrive in decides nothing.
+
+| what changes | what it does |
+|---|---|
+| `dropsHold` leaves a mark naming the hold it drops | the vote reads the hold after the drop |
+| `holdHere` answers the hold the owner holds, or that mark | one reader, and the vote takes it |
+| `sawPrompt` clears the mark | a hold stays one turn long |
+| `dropsHold` skips a helper | a helper's turn end reaches neither the hold nor the mark |
+
+The guard on the helper comes out of the review. Every door beside this one
+skips a helper already, and this one lacked that line.
+
+The chapter The hold outlives its drop carries what the change adds, and the
+two doors point at it.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change reaches the stop door, its cases, and the chapter owning the hold
+- the cases drive the door over the fake disk and the fake process the fixture holds
+- each new line points at the chapter carrying the approach, and no fact stands twice
 
 # verdict
 
