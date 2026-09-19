@@ -120,7 +120,8 @@ export function commitIn(command) {
       const file = flagValue(arg, args[i + 1], ["-F", "--file"]);
       if (!file.found) continue;
       const body = bodiesIn(one, bodies)[0];
-      if (file.value === "-" && body !== undefined) return { form: "message", text: body };
+      if (file.value === "-" && body !== undefined)
+        return { form: "message", text: body };
       return { form: "file", file: file.value };
     }
     if (said.length) return { form: "message", text: said.join("\n\n") };
@@ -397,7 +398,8 @@ function writesInScript(body) {
   const out = new Map();
   for (const line of lines.filter((one) => WRITES.some((two) => two.test(one)))) {
     const here = pathsIn(line).filter(reaches).map(clean);
-    for (const path of here.length ? here : all) out.set(path, { path, how: "a heredoc" });
+    for (const path of here.length ? here : all)
+      out.set(path, { path, how: "a heredoc" });
   }
   return [...out.values()];
 }
@@ -510,7 +512,10 @@ export function tokensOf(text) {
 function wordsIn(segment) {
   const said = segment.filter((one) => !one.op).map((one) => one.text);
   let at = 0;
-  while (at < said.length && (/^[A-Za-z_][A-Za-z0-9_]*=/.test(said[at]) || PASSES.has(baseName(said[at])))) {
+  while (
+    at < said.length &&
+    (/^[A-Za-z_][A-Za-z0-9_]*=/.test(said[at]) || PASSES.has(baseName(said[at])))
+  ) {
     at++;
   }
   return said.slice(at);
@@ -532,7 +537,8 @@ function afterGit(words) {
 function flagValue(arg, next, flags) {
   for (const flag of flags) {
     if (arg === flag) return { found: true, value: next ?? "", took: true };
-    if (arg.startsWith(`${flag}=`)) return { found: true, value: arg.slice(flag.length + 1) };
+    if (arg.startsWith(`${flag}=`))
+      return { found: true, value: arg.slice(flag.length + 1) };
     if (flag.length === 2 && /^-[A-Za-z]+$/.test(arg) && arg !== flag) {
       const letter = flag[1];
       if (!arg.includes(letter)) continue;
@@ -566,9 +572,17 @@ function narrowed(args) {
 
 function wholeSuite(args) {
   const bare = args.filter((one) => !one.startsWith("-"));
-  const took = bare[0] === "run" && bare[1] === "test" ? 2 : bare[0] === "test" || bare[0] === "t" ? 1 : 0;
+  const took =
+    bare[0] === "run" && bare[1] === "test"
+      ? 2
+      : bare[0] === "test" || bare[0] === "t"
+        ? 1
+        : 0;
   if (!took) return { whole: false, rest: [] };
-  return { whole: true, rest: args.filter((one) => !bare.slice(0, took).includes(one)) };
+  return {
+    whole: true,
+    rest: args.filter((one) => !bare.slice(0, took).includes(one)),
+  };
 }
 
 function row(command, rule, said, message) {

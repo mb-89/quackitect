@@ -2,7 +2,13 @@
 // branch, and reads what it says back under a token.
 // [[spec/design_output/review#the-tool-the-session-calls]]
 
-import { CALLED, readerAsks, readerSays, report, reviewSpec } from "../../.claude/skills/level0/lib/review.js";
+import {
+  CALLED,
+  readerAsks,
+  readerSays,
+  report,
+  reviewSpec,
+} from "../../.claude/skills/level0/lib/review.js";
 
 const GATHERING = 300000;
 const HEX = 16;
@@ -15,14 +21,26 @@ async function reviewsBranch(e, box) {
   const name = String(e?.branch ?? "").trim();
   if (!name) return { result: { result: "review_branch takes one branch name." } };
 
-  const ran = box.proc.run([process.execPath, `${box.method}/src/scripts/cli.js`, "branch", "review", name, "--json"], {
-    cwd: box.work,
-    timeoutMs: GATHERING,
-  });
+  const ran = box.proc.run(
+    [
+      process.execPath,
+      `${box.method}/src/scripts/cli.js`,
+      "branch",
+      "review",
+      name,
+      "--json",
+    ],
+    {
+      cwd: box.work,
+      timeoutMs: GATHERING,
+    },
+  );
   const material = materialOf(ran.stdout);
   if (!material) {
     const why = String(ran.stderr ?? "").trim() || String(ran.stdout ?? "").trim();
-    box.log.say("warn", "review", `the verb gathered nothing for ${name}`, { detail: why });
+    box.log.say("warn", "review", `the verb gathered nothing for ${name}`, {
+      detail: why,
+    });
     return { result: { result: `${name}: the verb gathered nothing.\n\n${why}` } };
   }
 
@@ -42,7 +60,8 @@ async function reviewsBranch(e, box) {
 // [[spec/design_output/review#what-the-report-looks-like]]
 export function onAgentAnswered(e, box) {
   const material = box.reviews?.get(String(e?.token ?? ""));
-  if (!material) return { result: { result: "the reader answered a review nobody asked for" } };
+  if (!material)
+    return { result: { result: "the reader answered a review nobody asked for" } };
   box.reviews.delete(String(e.token));
   const read = e?.deny
     ? { fix: 0, unread: `the spawn is refused: ${e.deny}` }
@@ -57,7 +76,9 @@ export function onAgentAnswered(e, box) {
 }
 
 function materialOf(stdout) {
-  for (const line of String(stdout ?? "").split(/\r?\n/).reverse()) {
+  for (const line of String(stdout ?? "")
+    .split(/\r?\n/)
+    .reverse()) {
     if (!line.startsWith("{")) continue;
     try {
       const read = JSON.parse(line);

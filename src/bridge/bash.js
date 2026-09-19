@@ -2,15 +2,37 @@
 // over a command line runs here before the command does.
 // [[spec/design_output/bash#what-the-door-reads]]
 
-import { commitIn, findings, skipsTheHook, verbLine, withoutTrailers } from "../../.claude/skills/level0/lib/bash.js";
+import {
+  commitIn,
+  findings,
+  skipsTheHook,
+  verbLine,
+  withoutTrailers,
+} from "../../.claude/skills/level0/lib/bash.js";
 import { bindsHere } from "../../.claude/skills/level0/lib/guidance.js";
 import { NOTES, privateNow } from "../../.claude/skills/level0/lib/private.js";
-import { refusedCommand, refusedDelta } from "../../.claude/skills/level0/lib/refuse.js";
-import { saysGreen, STAMP, stampOf } from "../../.claude/skills/level0/lib/runs.js";
-import { reaches, refusedTodo, taggedIn } from "../../.claude/skills/level0/lib/todo.js";
-import { landsOnTrunk, refusedVersion, touchesGit, TRUNK, versionRefs } from "../../.claude/skills/level0/lib/trunk.js";
+import {
+  refusedCommand,
+  refusedDelta,
+} from "../../.claude/skills/level0/lib/refuse.js";
+import { STAMP, saysGreen, stampOf } from "../../.claude/skills/level0/lib/runs.js";
+import {
+  reaches,
+  refusedTodo,
+  taggedIn,
+} from "../../.claude/skills/level0/lib/todo.js";
+import {
+  landsOnTrunk,
+  refusedVersion,
+  TRUNK,
+  touchesGit,
+  versionRefs,
+} from "../../.claude/skills/level0/lib/trunk.js";
 import { PROSE } from "../../.claude/skills/level0/lib/vale.js";
-import { refusedWarnings, warningsOn } from "../../.claude/skills/level0/lib/warnings.js";
+import {
+  refusedWarnings,
+  warningsOn,
+} from "../../.claude/skills/level0/lib/warnings.js";
 import { WORK_BRANCH } from "../scripts/group.js";
 import { asks } from "./config.js";
 import { readsProse } from "./prose.js";
@@ -47,7 +69,10 @@ async function commandRules(command, _e, box) {
   const found = findings(command, asks(box, "names.words"), { cloud: onACloud() });
   found.push(...(await commitVoice(command, box)));
   if (!onACloud() && skipsTheHook(command)) {
-    box.log.say("warn", "private", "a commit steps past the hook", { tool: "Bash", detail: command });
+    box.log.say("warn", "private", "a commit steps past the hook", {
+      tool: "Bash",
+      detail: command,
+    });
   }
   if (!found.length) return "";
   box.log.say("warn", "bash", `refused ${found.length} rule(s) in a command`, {
@@ -96,7 +121,14 @@ async function privateDelta(command, _e, box) {
 // [[spec/design_input/the-agent-pulls-tickets#the-to-do-flag]]
 function todoOnPush(command, _e, box) {
   if (!touchesGit(command).pushes) return "";
-  const names = git(box, ["log", "--format=", "--name-only", "HEAD", "--not", "--remotes"])
+  const names = git(box, [
+    "log",
+    "--format=",
+    "--name-only",
+    "HEAD",
+    "--not",
+    "--remotes",
+  ])
     .split("\n")
     .map((row) => row.trim())
     .filter(reaches);
@@ -105,7 +137,10 @@ function todoOnPush(command, _e, box) {
     .filter((one) => one.text);
   const found = taggedIn(carried);
   if (!found.length) return "";
-  box.log.say("warn", "todo", `refused a push carrying ${found.length} note(s)`, { tool: "Bash", file: found[0] });
+  box.log.say("warn", "todo", `refused a push carrying ${found.length} note(s)`, {
+    tool: "Bash",
+    file: found[0],
+  });
   return refusedTodo(found);
 }
 
@@ -138,7 +173,10 @@ async function lintedHere(box, names) {
     const whole = textAt(box, name);
     if (!whole) continue;
     const said = await box.vale.lint(whole, name);
-    if (said.ran) found.push(...readsProse(box, whole, said.found).map((one) => ({ ...one, file: name })));
+    if (said.ran)
+      found.push(
+        ...readsProse(box, whole, said.found).map((one) => ({ ...one, file: name })),
+      );
   }
   return found;
 }
@@ -155,18 +193,28 @@ function textAt(box, name) {
 function versionGuard(command, _e, box) {
   const found = versionRefs(command);
   if (!found.length) return "";
-  box.log.say("warn", "bash", `refused a ${found[0].how} of ${found[0].name}`, { tool: "Bash", detail: command });
+  box.log.say("warn", "bash", `refused a ${found[0].how} of ${found[0].name}`, {
+    tool: "Bash",
+    detail: command,
+  });
   return refusedVersion(found);
 }
 
 // [[spec/design_output/work#a-red-battery-pushes-nothing]]
 function trunkGuard(command, _e, box) {
-  const how = landsOnTrunk(command, git(box, ["rev-parse", "--abbrev-ref", "HEAD"]), TRUNK);
+  const how = landsOnTrunk(
+    command,
+    git(box, ["rev-parse", "--abbrev-ref", "HEAD"]),
+    TRUNK,
+  );
   if (!how) return "";
   if (how === "push") {
     const battery = batteryHere(box);
     if (!battery.green) {
-      box.log.say("warn", "bash", `refused a push to ${TRUNK} on a red battery`, { tool: "Bash", detail: battery.says });
+      box.log.say("warn", "bash", `refused a push to ${TRUNK} on a red battery`, {
+        tool: "Bash",
+        detail: battery.says,
+      });
       return [
         `${TRUNK} takes a green battery, and ${battery.says}.`,
         "",
@@ -177,11 +225,16 @@ function trunkGuard(command, _e, box) {
   }
   if (!onACloud()) return "";
   if (!takesABranch(box)) return "";
-  box.log.say("warn", "bash", `refused a ${how} landing on ${TRUNK}`, { tool: "Bash", detail: command });
+  box.log.say("warn", "bash", `refused a ${how} landing on ${TRUNK}`, {
+    tool: "Bash",
+    detail: command,
+  });
   return [
     `A cloud box holding a work branch hands it back, and ${TRUNK} stays shut here.`,
     "",
-    how === "commit" ? `You stand on ${TRUNK}, so this commit would land there.` : `This pushes ${TRUNK}, and the branch in hand goes back to the queue instead.`,
+    how === "commit"
+      ? `You stand on ${TRUNK}, so this commit would land there.`
+      : `This pushes ${TRUNK}, and the branch in hand goes back to the queue instead.`,
     "",
     "Run `./RUNME.sh ticket pull`, which takes a branch for a cloud box and moves you onto it.",
     "Push that branch, run `branch done`, and a box off the cloud takes it into trunk.",
@@ -227,12 +280,18 @@ function notesIn(box) {
     return box.disk
       .list(`${box.work}/${NOTES}`)
       .filter((one) => one.kind === "file" && one.name.endsWith(".md"))
-      .map((one) => ({ name: `${NOTES}/${one.name}`, text: box.disk.read(`${box.work}/${NOTES}/${one.name}`) }));
+      .map((one) => ({
+        name: `${NOTES}/${one.name}`,
+        text: box.disk.read(`${box.work}/${NOTES}/${one.name}`),
+      }));
   } catch {
     return [];
   }
 }
 
 function onACloud() {
-  return bindsHere(CLOUD, { CLAUDE_CODE_REMOTE: process.env.CLAUDE_CODE_REMOTE ?? "", SE_CLOUD: process.env.SE_CLOUD ?? "" });
+  return bindsHere(CLOUD, {
+    CLAUDE_CODE_REMOTE: process.env.CLAUDE_CODE_REMOTE ?? "",
+    SE_CLOUD: process.env.SE_CLOUD ?? "",
+  });
 }

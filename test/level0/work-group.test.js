@@ -19,9 +19,9 @@ import {
   DONE,
   groupStanding,
   HELD,
+  pulling,
   TODO,
   whyOf,
-  pulling,
   work,
 } from "../../src/scripts/work.js";
 import {
@@ -36,9 +36,9 @@ import {
   heard,
   on,
   onBranch,
-  remoteSaying,
   ROOT,
   ranGit,
+  remoteSaying,
   SHA,
 } from "./work-doors.js";
 

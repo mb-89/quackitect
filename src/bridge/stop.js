@@ -3,6 +3,8 @@
 // [[spec/design_output/stop#the-vote]]
 
 import { join } from "node:path";
+import { CHECK } from "../../.claude/skills/level0/lib/answer.js";
+import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
 import {
   controlBlock,
   FINISH,
@@ -10,15 +12,10 @@ import {
   OFF,
   STOP,
 } from "../../.claude/skills/level0/lib/controls.js";
-import { CHECK } from "../../.claude/skills/level0/lib/answer.js";
-import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
 import { HOLDS, TICKETS } from "../../.claude/skills/level0/lib/folders.js";
 import { rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
-import { stampOf, STAMP } from "../../.claude/skills/level0/lib/runs.js";
-import { drains, standsPast, takesFile } from "../../.claude/skills/level0/lib/warnings.js";
-import { spanOf, ticketAt, WORK_BRANCH } from "../scripts/group.js";
-import { heldGroup, openPrivate, queueHolds } from "../../.claude/skills/level0/lib/ticket.js";
+import { STAMP, stampOf } from "../../.claude/skills/level0/lib/runs.js";
 import {
   decide,
   detail,
@@ -31,6 +28,17 @@ import {
   todos,
   toothOf,
 } from "../../.claude/skills/level0/lib/stop.js";
+import {
+  heldGroup,
+  openPrivate,
+  queueHolds,
+} from "../../.claude/skills/level0/lib/ticket.js";
+import {
+  drains,
+  standsPast,
+  takesFile,
+} from "../../.claude/skills/level0/lib/warnings.js";
+import { spanOf, ticketAt, WORK_BRANCH } from "../scripts/group.js";
 import { holdsTurn } from "./answer.js";
 import { asks, writes } from "./config.js";
 import { REPORT_CALL } from "./report.js";
@@ -76,10 +84,17 @@ export function holdsCall(e, box) {
   box.held = hold;
   const tool = String(e?.tool ?? "");
   if (hold === STOP && !ENDS_TURN.has(tool)) {
-    box.log.say("debug", "hold", `the owner holds stop, and ${tool || "the call"} is refused`, { tool });
+    box.log.say(
+      "debug",
+      "hold",
+      `the owner holds stop, and ${tool || "the call"} is refused`,
+      { tool },
+    );
     return { result: { deny: refusedByHold(tool) } };
   }
-  box.log.say("debug", "hold", `the owner holds ${hold}, and the block rides`, { tool });
+  box.log.say("debug", "hold", `the owner holds ${hold}, and the block rides`, {
+    tool,
+  });
   return { after: { context: [controlBlock({ hold })] } };
 }
 
@@ -170,7 +185,11 @@ export function onStop(e, box) {
   const hand = refactorHand(box);
   const answer = said.ends ? { ...PASS } : { result: { block: prompts } };
   if (!hand) return answer;
-  return { ...answer, spawn: hand, back: { event: REFACTOR_ANSWERED, file: hand.file } };
+  return {
+    ...answer,
+    spawn: hand,
+    back: { event: REFACTOR_ANSWERED, file: hand.file },
+  };
 }
 
 // Whether a hand still wants to go: the flag on, the list past the number, and this session's count unspent. The vote reads this, because a rule reading the list alone holds every turn open on a tree carrying warnings. [[spec/tickets/the-spawn-reaches-its-guidance]]
@@ -186,19 +205,40 @@ export function refactorHand(box) {
   if (!handWanted(box)) return null;
   const stamp = stampHere(box);
   const now = Math.floor(box.clock.now().getTime() / MS);
-  const file = takesFile(stamp.files, wroteIn(box, stamp.files), now, spanOf(asks(box, REFACTOR.untouched)));
+  const file = takesFile(
+    stamp.files,
+    wroteIn(box, stamp.files),
+    now,
+    spanOf(asks(box, REFACTOR.untouched)),
+  );
   if (!file) return null;
   box.refactors = (box.refactors ?? 0) + 1;
-  box.log.say("info", "refactor", `a hand takes ${file}, of ${stamp.warnings} standing`, { file });
-  return { prompt: drains(file), description: `drain the warnings in ${file}`, subagentType: HELPER, kind: KIND, file };
+  box.log.say(
+    "info",
+    "refactor",
+    `a hand takes ${file}, of ${stamp.warnings} standing`,
+    { file },
+  );
+  return {
+    prompt: drains(file),
+    description: `drain the warnings in ${file}`,
+    subagentType: HELPER,
+    kind: KIND,
+    file,
+  };
 }
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]
 export function onRefactorAnswered(e, box) {
   const said = String(e?.deny ?? "") || (e?.isError ? String(e?.text ?? "") : "");
-  box.log.say(said ? "warn" : "info", "refactor", `the hand leaves ${e?.file ?? "a file"}`, {
-    detail: said || String(e?.text ?? "").slice(0, SAID),
-  });
+  box.log.say(
+    said ? "warn" : "info",
+    "refactor",
+    `the hand leaves ${e?.file ?? "a file"}`,
+    {
+      detail: said || String(e?.text ?? "").slice(0, SAID),
+    },
+  );
   return { result: { result: "the refactoring hand answered" } };
 }
 
@@ -207,7 +247,9 @@ function wroteIn(box, names) {
   const out = {};
   for (const name of names ?? []) {
     try {
-      const said = box.proc.run(["git", "log", "-1", "--format=%ct", "--", name], { cwd: box.work });
+      const said = box.proc.run(["git", "log", "-1", "--format=%ct", "--", name], {
+        cwd: box.work,
+      });
       out[name] = Number(String(said.stdout ?? "").trim()) || 0;
     } catch {
       out[name] = 0;
@@ -257,7 +299,8 @@ function ranHere(name, held) {
   if (name === "group-in-hand") return groupInHand(held.box);
   if (name === "ticket-in-hand") return holdStands(held.box) || privateStands(held.box);
   if (name === "queue-waits") return queueWaits(held.box);
-  if (name === "no-stop-line") return !stopReasons(rulesOf(held.box)).some((one) => one.id === held.claimed);
+  if (name === "no-stop-line")
+    return !stopReasons(rulesOf(held.box)).some((one) => one.id === held.claimed);
   // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud]]
   if (name === "a-person-sits-here") return !inCloud(held.box.env ?? process.env);
   // [[spec/tickets/the-spawn-reaches-its-guidance]]
@@ -270,7 +313,9 @@ function groupInHand(box) {
   const branch = branchOf(box);
   if (!branch.startsWith(WORK_BRANCH)) return false;
   try {
-    return heldGroup(String(box.disk.read(join(box.work, ticketAt(branch.slice(WORK_BRANCH.length))))));
+    return heldGroup(
+      String(box.disk.read(join(box.work, ticketAt(branch.slice(WORK_BRANCH.length))))),
+    );
   } catch {
     return false;
   }
@@ -278,7 +323,9 @@ function groupInHand(box) {
 
 function holdStands(box) {
   try {
-    return box.disk.list(join(box.work, HOLDS)).some((one) => one.name.endsWith(".json"));
+    return box.disk
+      .list(join(box.work, HOLDS))
+      .some((one) => one.name.endsWith(".json"));
   } catch {
     return false;
   }
@@ -317,13 +364,18 @@ function queueWaits(box) {
   if (inCloud(box.env ?? process.env)) return false;
   if (asks(box, "engine.binding") !== "queue") return false;
   if (branchOf(box) !== "main") return false;
-  const texts = readFolder(box.disk, join(box.work, "spec", "tickets"), ".md").map((one) => one.text);
+  const texts = readFolder(box.disk, join(box.work, "spec", "tickets"), ".md").map(
+    (one) => one.text,
+  );
   return queueHolds(texts);
 }
 
 function branchOf(box) {
   try {
-    return String(box.proc.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], { cwd: box.work }).stdout ?? "").trim();
+    return String(
+      box.proc.run(["git", "rev-parse", "--abbrev-ref", "HEAD"], { cwd: box.work })
+        .stdout ?? "",
+    ).trim();
   } catch {
     return "";
   }

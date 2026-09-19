@@ -19,20 +19,31 @@ export function pathsOf(said) {
     const held = layer[key];
     return typeof held === "string" && held.trim() ? held.trim() : fallback;
   };
-  return { core: one("core", CORE), terms: one("terms", TERMS), swaps: one("swaps", SWAPS) };
+  return {
+    core: one("core", CORE),
+    terms: one("terms", TERMS),
+    swaps: one("swaps", SWAPS),
+  };
 }
 
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 export function coreOf(said) {
   return rowsOf(said?.words)
-    .map((one) => ({ word: lower(one.word), pos: String(one.pos ?? "").trim(), from: lower(one.from) }))
+    .map((one) => ({
+      word: lower(one.word),
+      pos: String(one.pos ?? "").trim(),
+      from: lower(one.from),
+    }))
     .filter((one) => WORD.test(one.word));
 }
 
 // [[spec/design_output/vocabulary#the-vocabulary-is-three-lists]]
 export function termsOf(said) {
   return rowsOf(said?.terms)
-    .map((one) => ({ word: lower(one.word), defines: String(one.defines ?? "").trim() }))
+    .map((one) => ({
+      word: lower(one.word),
+      defines: String(one.defines ?? "").trim(),
+    }))
     .filter((one) => WORD.test(one.word));
 }
 
@@ -68,7 +79,9 @@ export function swapsOf(lists) {
 }
 
 function rowsOf(said) {
-  return (Array.isArray(said) ? said : []).filter((one) => one && typeof one === "object");
+  return (Array.isArray(said) ? said : []).filter(
+    (one) => one && typeof one === "object",
+  );
 }
 
 function lower(said) {

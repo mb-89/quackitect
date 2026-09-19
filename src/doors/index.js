@@ -24,7 +24,12 @@ export function index(disk, proc, clock, method, work = method) {
 
   const run = (argv, timeoutMs) => {
     const binary = at();
-    if (!binary) return { exitCode: NO_BINARY, stdout: "", stderr: `no ${BIN} stands on this box` };
+    if (!binary)
+      return {
+        exitCode: NO_BINARY,
+        stdout: "",
+        stderr: `no ${BIN} stands on this box`,
+      };
     try {
       return proc.run([binary, ...argv], { cwd: work, timeoutMs });
     } catch (error) {
@@ -33,7 +38,10 @@ export function index(disk, proc, clock, method, work = method) {
   };
 
   const failed = (ran, what) => {
-    dead = ran.exitCode === NO_BINARY ? ran.stderr : `${BIN} ${what} answers ${ran.exitCode}`;
+    dead =
+      ran.exitCode === NO_BINARY
+        ? ran.stderr
+        : `${BIN} ${what} answers ${ran.exitCode}`;
     return null;
   };
 
@@ -54,8 +62,16 @@ export function index(disk, proc, clock, method, work = method) {
       if (now - warmedAt < REWARM) return { warmed: false, dead };
       warmedAt = now;
       const first = run(["standing"], WARMING);
-      const ran = first.exitCode === 0 || first.exitCode === NO_BINARY ? first : run(["standing"], WARMING);
-      dead = ran.exitCode === 0 ? "" : ran.exitCode === NO_BINARY ? ran.stderr : `${BIN} standing answers ${ran.exitCode}`;
+      const ran =
+        first.exitCode === 0 || first.exitCode === NO_BINARY
+          ? first
+          : run(["standing"], WARMING);
+      dead =
+        ran.exitCode === 0
+          ? ""
+          : ran.exitCode === NO_BINARY
+            ? ran.stderr
+            : `${BIN} standing answers ${ran.exitCode}`;
       return { warmed: true, dead };
     },
   };

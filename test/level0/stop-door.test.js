@@ -172,7 +172,11 @@ test("the vote holds the turn open while a hand wants to go, and lets it end aft
   const done = { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" };
 
   assert.match(onStop(done, it.box).result.block, /warnings stand past the number/);
-  assert.deepEqual(onStop(done, it.box), { pass: true }, "the count spends, and the turn ends");
+  assert.deepEqual(
+    onStop(done, it.box),
+    { pass: true },
+    "the count spends, and the turn ends",
+  );
 
   const off = box(stamped(9, ["old.md"]), { ...REFACTOR, parallel: false });
   assert.deepEqual(onStop(done, off.box), { pass: true }, "the flag off holds no turn");
@@ -181,7 +185,10 @@ test("the vote holds the turn open while a hand wants to go, and lets it end aft
 // [[spec/tickets/the-spawn-reaches-its-guidance]]
 test("a list under the number starts no hand, and the vote reads the stamp", () => {
   const it = box(stamped(1, ["old.md"]));
-  const said = onStop({ last_assistant_message: "Done.\n\nstop: the-work-stands-complete" }, it.box);
+  const said = onStop(
+    { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" },
+    it.box,
+  );
 
   assert.deepEqual(said, { pass: true });
 });

@@ -284,7 +284,9 @@ function kindsIn(tree, holds) {
 
 // [[spec/design_output/schema#a-folder-names-its-kind]]
 export function governorOf(schemas, path) {
-  const where = String(path ?? "").split("\\").join("/");
+  const where = String(path ?? "")
+    .split("\\")
+    .join("/");
   for (const schema of schemas?.values?.() ?? []) {
     for (const glob of [schema.governs ?? []].flat()) {
       if (matches(glob, where)) return schema;
@@ -515,7 +517,12 @@ function refersFaults(key, value, rule, held, at, line) {
     }
     if (rule["x-leaf"] && !found.leaf) {
       out.push(
-        fault(key, held.where, line, `${key} names a leaf, and ${found.path} holds steps.`),
+        fault(
+          key,
+          held.where,
+          line,
+          `${key} names a leaf, and ${found.path} holds steps.`,
+        ),
       );
     }
     if (earlier && holder && walk.indexOf(found) >= walk.indexOf(holder)) {
@@ -540,7 +547,8 @@ function fieldBefore(walk, holder, said, rule) {
   const until = walk.indexOf(holder);
   return walk.some(
     (one, at) =>
-      at < until && [one.said?.[list] ?? []].flat().some((field) => field?.name === said),
+      at < until &&
+      [one.said?.[list] ?? []].flat().some((field) => field?.name === said),
   );
 }
 
@@ -637,7 +645,8 @@ function feedsIt(walk, holder, at, token) {
   if (step && walk.indexOf(step) < at) return true;
   return walk.some(
     (one, i) =>
-      i < at && [one.said?.evidence ?? []].flat().some((field) => field?.name === token),
+      i < at &&
+      [one.said?.evidence ?? []].flat().some((field) => field?.name === token),
   );
 }
 
@@ -735,12 +744,17 @@ function bodyFaults(note, spec, kind, where) {
     nested ? one.level >= level : levels.has(one.level),
   );
   const top = standing.filter((one) => one.level === level);
-  const named = new Map(wanted.map((one) => [`${one.level ?? level} ${one.header}`, one]));
+  const named = new Map(
+    wanted.map((one) => [`${one.level ?? level} ${one.header}`, one]),
+  );
   const out = [];
 
   for (const one of wanted) {
     const at = one.level ?? level;
-    if (!one.required || standing.some((held) => held.header === one.header && held.level === at))
+    if (
+      !one.required ||
+      standing.some((held) => held.header === one.header && held.level === at)
+    )
       continue;
     out.push(fault(one.header, where, 1, `A ${kind} carries a ${one.header} chapter.`));
   }
@@ -799,7 +813,8 @@ function chaptersOf(list, level, rule, listed = false) {
       form: String(one.form ?? ""),
       "x-fills": Boolean(one.form),
     });
-    const asks = listed || [one.checklist ?? []].flat().some((it) => String(it ?? "").trim());
+    const asks =
+      listed || [one.checklist ?? []].flat().some((it) => String(it ?? "").trim());
     let leaf = true;
     for (const value of Object.values(one)) {
       if (!Array.isArray(value)) continue;
@@ -814,7 +829,8 @@ function chaptersOf(list, level, rule, listed = false) {
         header: CHECKED,
         level: level + 1,
         required: false,
-        description: "one line per item of the checklist, on how you take it into account",
+        description:
+          "one line per item of the checklist, on how you take it into account",
         form: "checklist",
         "x-fills": true,
       });
@@ -1078,7 +1094,9 @@ export function refusedNote(where, kind, found) {
   return [
     `The ${kind} schema refuses this write to ${where}.`,
     "",
-    ...found.map((one) => `  ${where}:${one.line}:${one.column}  ${one.rule}\n    ${one.message}`),
+    ...found.map(
+      (one) => `  ${where}:${one.line}:${one.column}  ${one.rule}\n    ${one.message}`,
+    ),
     "",
     `Run ./RUNME.sh mint ${kind} <path> for the shape it names, or park a draft as _name.md.`,
   ].join("\n");
@@ -1137,14 +1155,20 @@ export function mintNote(schema, fields) {
 // [[spec/design_output/schema#the-render-follows-the-tree]]
 function frontRows(key, rule, given, front) {
   const said = given.get(slugOf(key));
-  const bare = said === undefined || (typeof said !== "object" && String(said).trim() === "");
+  const bare =
+    said === undefined || (typeof said !== "object" && String(said).trim() === "");
 
   if (rule?.const !== undefined) {
     front[key] = rule.const;
     return [`${key}: ${minted(rule)}`];
   }
   const value = bare ? rule?.default : said;
-  if (value !== undefined && value !== null && typeof value === "object" && !Array.isArray(value)) {
+  if (
+    value !== undefined &&
+    value !== null &&
+    typeof value === "object" &&
+    !Array.isArray(value)
+  ) {
     front[key] = value;
     return [`${key}:`, ...yamlRows(value, 2)];
   }
@@ -1167,7 +1191,9 @@ export function reRouted(text, schema, route, hash) {
   if (hash) front.process_hash = hash;
 
   const level = schema?.body?.headingLevel ?? 1;
-  const held = new Map(note.sections.map((one) => [`${one.level} ${one.header}`, one.own]));
+  const held = new Map(
+    note.sections.map((one) => [`${one.level} ${one.header}`, one.own]),
+  );
   const rows = ["---", ...frontRowsHeld(front, schema), "---", ""];
 
   for (const one of chaptersWanted(schema?.body?.sections ?? [], front, level)) {
@@ -1209,7 +1235,9 @@ function yamlRows(value, pad) {
       if (!one || typeof one !== "object" || Array.isArray(one)) {
         return [`${gap}- ${flatOf(one)}`];
       }
-      const rows = Object.entries(one).flatMap(([key, said]) => keyRows(key, said, pad + 2));
+      const rows = Object.entries(one).flatMap(([key, said]) =>
+        keyRows(key, said, pad + 2),
+      );
       return [`${gap}- ${rows[0].trim()}`, ...rows.slice(1)];
     });
   }
@@ -1274,7 +1302,8 @@ export function fieldsIn(argv, schema) {
   for (const key of Object.keys(schema?.frontmatter?.properties ?? {})) {
     named.set(slugOf(key), key);
   }
-  for (const one of schema?.body?.sections ?? []) named.set(slugOf(one.header), one.header);
+  for (const one of schema?.body?.sections ?? [])
+    named.set(slugOf(one.header), one.header);
 
   const fields = {};
   for (const arg of argv ?? []) {
@@ -1420,5 +1449,7 @@ function typeOf(value) {
 
 function show(said) {
   const flat = Array.isArray(said) ? said.join(", ") : String(said ?? "");
-  return flat.length > SHOWN ? `${flat.slice(0, SHOWN - ELLIPSIS.length)}${ELLIPSIS}` : flat;
+  return flat.length > SHOWN
+    ? `${flat.slice(0, SHOWN - ELLIPSIS.length)}${ELLIPSIS}`
+    : flat;
 }

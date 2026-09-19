@@ -139,7 +139,9 @@ test("both doors refuse a file nobody wrote", () => {
 });
 
 // [[spec/design_output/vehicle#a-vehicle-stands-alone]]
-test("a file made runnable runs", { skip: process.platform === "win32" && "Windows keeps no run bit" }, () => {
+test("a file made runnable runs", {
+  skip: process.platform === "win32" && "Windows keeps no run bit",
+}, () => {
   const files = disk();
   const where = files.tempDir("disk-");
   try {

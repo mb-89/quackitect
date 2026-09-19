@@ -9,7 +9,12 @@ const KIND_WIDTH = 6;
 const INDENT = STAMP.to - STAMP.from + 1;
 
 function newestIn(names) {
-  return [...(names ?? [])].filter((one) => one.endsWith(".jsonl")).sort().pop() ?? "";
+  return (
+    [...(names ?? [])]
+      .filter((one) => one.endsWith(".jsonl"))
+      .sort()
+      .pop() ?? ""
+  );
 }
 
 function rowsIn(text) {

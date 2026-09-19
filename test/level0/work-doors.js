@@ -18,7 +18,11 @@ export function doorsSaying(answers, files = {}) {
   const said = fakeGit(answers, ROOT);
   const disk = fakeDisk(files);
   // A case names its own environment, so the box running it changes no answer. [[spec/guidance/code/testing]]
-  return { it: { proc: said.proc, disk, git: said, join, env: {} }, outside: said, disk };
+  return {
+    it: { proc: said.proc, disk, git: said, join, env: {} },
+    outside: said,
+    disk,
+  };
 }
 
 export function heard(what) {

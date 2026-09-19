@@ -16,8 +16,8 @@ import {
   stepOf,
   urgent,
 } from "./group.js";
-import { leafOf, leavesOf } from "./pull-route.js";
 import { takeable } from "./pull.js";
+import { leafOf, leavesOf } from "./pull-route.js";
 import { queued, stoodHere } from "./queue.js";
 import { staleClaim } from "./stand.js";
 import { readWork, standingAll } from "./work-stands.js";

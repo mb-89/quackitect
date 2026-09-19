@@ -12,12 +12,21 @@ export const WANTED = [
   { name: "vale", asks: ["--version"], for: "the prose rules" },
   { name: "biome", asks: ["--version"], for: "formatting and linting the JavaScript" },
   { name: "vale-ls", asks: ["--version"], for: "the prose rules inside an editor" },
-  { name: "se-lsp", asks: ["--version"], for: "the note shape and the names inside an editor" },
+  {
+    name: "se-lsp",
+    asks: ["--version"],
+    for: "the note shape and the names inside an editor",
+  },
   { name: "go", asks: ["version"], for: "building the index and the viewer" },
   { name: "git", asks: ["--version"], for: "history and diffs" },
   { name: "claude", asks: ["--version"], for: "a session of its own, and the probe" },
   { name: "sh", asks: [], for: "a shell script" },
-  { name: "python", asks: ["--version"], calls: ["python3", "python"], for: "a helper script" },
+  {
+    name: "python",
+    asks: ["--version"],
+    calls: ["python3", "python"],
+    for: "a helper script",
+  },
 ];
 
 export function callsOf(one) {
@@ -71,7 +80,9 @@ export function guesses(name) {
 // The binaries whose `here` case asks find for a source newer than the binary. [[spec/design_output/index#the-compiler-it-needs]]
 export function rebuilt(text) {
   const out = [];
-  for (const found of String(text ?? "").matchAll(/^(\w+)_here\(\)\s*\{([\s\S]*?)^\}/gm)) {
+  for (const found of String(text ?? "").matchAll(
+    /^(\w+)_here\(\)\s*\{([\s\S]*?)^\}/gm,
+  )) {
     if (found[2].includes("-newer")) out.push(found[1]);
   }
   return out;

@@ -133,7 +133,10 @@ export function stopSpec(rules) {
       type: "object",
       properties: {
         reason,
-        next: { type: "string", description: "What the owner does next, in one sentence." },
+        next: {
+          type: "string",
+          description: "What the owner does next, in one sentence.",
+        },
       },
       required: ["reason", "next"],
     },
@@ -147,17 +150,29 @@ export function stopAnswer(rules, reason, decision) {
     const ids = stopReasons(rules)
       .map((one) => one.id)
       .join(", ");
-    return { known, ends: false, result: `${reason} names no reason this tree holds. The ids: ${ids}.` };
+    return {
+      known,
+      ends: false,
+      result: `${reason} names no reason this tree holds. The ids: ${ids}.`,
+    };
   }
   if (decision.ends) {
     const why = decision.stop?.says ?? "";
     return {
       known,
       ends: true,
-      result: `The stop stands. ${why} Write the words Ending my turn, and nothing more.`.replace(/\s+/g, " "),
+      result:
+        `The stop stands. ${why} Write the words Ending my turn, and nothing more.`.replace(
+          /\s+/g,
+          " ",
+        ),
     };
   }
-  return { known, ends: false, result: `The stop falls. ${decision.go?.says ?? ""}`.trim() };
+  return {
+    known,
+    ends: false,
+    result: `The stop falls. ${decision.go?.says ?? ""}`.trim(),
+  };
 }
 
 // [[spec/design_output/stop#what-the-re-prompt-says]]
@@ -222,13 +237,21 @@ export function toothOf() {
 }
 
 // An answer names a next step where a paragraph after the tables opens on the agent's own next act. [[spec/design_output/stop#the-chat-is-new]]
-const NEXT = /^(?:next\b|then i\b|i (?:start|begin|read|run|pull|take|look|check|open|write|fix|merge|work|list|review)\b|i'll\b|i will\b)/i;
+const NEXT =
+  /^(?:next\b|then i\b|i (?:start|begin|read|run|pull|take|look|check|open|write|fix|merge|work|list|review)\b|i'll\b|i will\b)/i;
 
 export function namesNext(text) {
   const paragraphs = String(text ?? "")
     .split(/\r?\n\s*\r?\n/)
     .map((one) => one.trim())
-    .filter((one) => one && !one.startsWith("|") && !one.startsWith("#") && !/^stop:/i.test(one) && !/^level0 holds this session/.test(one));
+    .filter(
+      (one) =>
+        one &&
+        !one.startsWith("|") &&
+        !one.startsWith("#") &&
+        !/^stop:/i.test(one) &&
+        !/^level0 holds this session/.test(one),
+    );
   return paragraphs.some((one) =>
     one
       .split(/(?<=[.!?])\s+/)
@@ -253,7 +276,6 @@ export function todos() {
       if (call?.tool === ENDED && DONE.includes(String(call.status ?? ""))) ended += 1;
     },
 
-    standing: () =>
-      list ? list.some((one) => !DONE.includes(one)) : made > ended,
+    standing: () => (list ? list.some((one) => !DONE.includes(one)) : made > ended),
   };
 }

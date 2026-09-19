@@ -5,7 +5,11 @@
 import { join } from "node:path";
 import { CODE } from "../../.claude/skills/level0/lib/code.js";
 import { isDraft, relativeTo } from "../../.claude/skills/level0/lib/paths.js";
-import { carriedFrom, NOTES, refusedPrivate } from "../../.claude/skills/level0/lib/private.js";
+import {
+  carriedFrom,
+  NOTES,
+  refusedPrivate,
+} from "../../.claude/skills/level0/lib/private.js";
 import { refusal } from "../../.claude/skills/level0/lib/refuse.js";
 import {
   checkNote,
@@ -43,14 +47,18 @@ export async function onWrite(e, box) {
   }
   marksStale(where, box);
   // [[spec/design_output/level0#the-formatter-applies-itself]]
-  if (CODE.test(writing.path)) return codeDoor(e, writing, where, wholeAfter(e, writing, box.disk), box);
+  if (CODE.test(writing.path))
+    return codeDoor(e, writing, where, wholeAfter(e, writing, box.disk), box);
   return PASS;
 }
 
 // [[spec/design_output/private#the-door-reads-the-notes]]
 function privateDoor(e, writing, where, box) {
   if (where.startsWith(".se/")) return "";
-  const carried = carriedFrom(writing.text, readFolder(box.disk, join(box.root, NOTES), ".md"));
+  const carried = carriedFrom(
+    writing.text,
+    readFolder(box.disk, join(box.root, NOTES), ".md"),
+  );
   if (!carried) return "";
   box.log.say("warn", "private", `refused a ${carried.how} out of ${carried.note}`, {
     file: where,
@@ -70,21 +78,35 @@ function schemaDoor(e, writing, where, box) {
   const governor = governorOf(schemas, where);
   const stranger = governor ? strangerFault(whole, governor, where) : null;
   if (stranger) {
-    box.log.say("warn", "schema", `refused a stranger in ${where}`, { file: where, rule: stranger.rule, tool: String(e.tool) });
+    box.log.say("warn", "schema", `refused a stranger in ${where}`, {
+      file: where,
+      rule: stranger.rule,
+      tool: String(e.tool),
+    });
     return refusedKind(where, governor, stranger);
   }
 
   const schema = schemas.get(kind);
   const found = schema ? checkNote(whole, schema, where, schemas) : [];
   if (found.length) {
-    box.log.say("warn", "schema", `refused ${found.length} line(s) in ${where}`, { file: where, rule: found[0]?.rule, tool: String(e.tool) });
+    box.log.say("warn", "schema", `refused ${found.length} line(s) in ${where}`, {
+      file: where,
+      rule: found[0]?.rule,
+      tool: String(e.tool),
+    });
     return refusedNote(where, kind, found);
   }
 
   // [[spec/design_output/schema#the-three-places]]
-  const held = schema ? ticketFaults(textAt(box.disk, writing.path), whole, schema, where) : [];
+  const held = schema
+    ? ticketFaults(textAt(box.disk, writing.path), whole, schema, where)
+    : [];
   if (held.length) {
-    box.log.say("warn", "ticket", `refused ${held.length} line(s) in ${where}`, { file: where, rule: held[0]?.rule, tool: String(e.tool) });
+    box.log.say("warn", "ticket", `refused ${held.length} line(s) in ${where}`, {
+      file: where,
+      rule: held[0]?.rule,
+      tool: String(e.tool),
+    });
     return refusedTicket(where, kind, held);
   }
   return "";
@@ -112,7 +134,10 @@ function asWrite(e) {
   if (e.tool === "Write") return { path, text: String(e.content ?? "") };
   if (e.tool === "Edit") return { path, text: String(e.new_string ?? "") };
   if (e.tool === "MultiEdit" && Array.isArray(e.edits)) {
-    return { path, text: e.edits.map((one) => String(one?.new_string ?? "")).join("\n") };
+    return {
+      path,
+      text: e.edits.map((one) => String(one?.new_string ?? "")).join("\n"),
+    };
   }
   return undefined;
 }
@@ -145,7 +170,9 @@ function readFolder(disk, folder, end) {
   try {
     return disk
       .list(folder)
-      .filter((one) => one.kind === "file" && one.name.endsWith(end) && !isDraft(one.name))
+      .filter(
+        (one) => one.kind === "file" && one.name.endsWith(end) && !isDraft(one.name),
+      )
       .map((one) => ({ name: one.name, text: disk.read(join(folder, one.name)) }));
   } catch {
     return [];

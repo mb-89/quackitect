@@ -7,13 +7,13 @@ export { HELPER, SPAWN, spawnPrompt } from "./spawn.js";
 
 import {
   CLOSED,
+  dependsOn,
   fieldOf,
   frontOf,
   GROUP,
   isGroup,
   NOTE_END,
   OPEN,
-  dependsOn,
   TICKETS,
   ticketNamed,
   urgent,

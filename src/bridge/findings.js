@@ -47,7 +47,9 @@ export const FROM = { vale: "vale", biome: "biome", tree: "tree" };
 // Answers every finding over the paths named, and the fault that stops Vale reading. [[spec/design_output/lsp]]
 export async function findingsOver(it, asked) {
   // A path the disk no longer holds carries no finding, so no source reads it. [[spec/design_output/level0#a-crash-writes-its-error]]
-  const where = asked.filter((one) => one === WHOLE || it.disk.exists(it.join(it.root, one)));
+  const where = asked.filter(
+    (one) => one === WHOLE || it.disk.exists(it.join(it.root, one)),
+  );
   if (!where.length) return { found: [], fault: "" };
   const ran = await it.proc.start(
     [it.vale, `--config=${CONFIG}`, "--output=JSON", "--no-exit", OURS, ...where],

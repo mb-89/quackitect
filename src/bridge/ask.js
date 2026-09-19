@@ -19,8 +19,12 @@ export function asksForUpdate(e, box) {
     tool: String(e?.tool ?? ""),
   });
   const chapters = wanted === FULL ? statusShape(box.disk, box.method) : [];
-  const block = [controlBlock({ wanted }), chapters.length ? statusAsks(chapters) : ""].filter(Boolean).join("\n\n");
-  demands(box, `The owner asks for a ${wanted} update`, block, () => dropsAsk(box, wanted));
+  const block = [controlBlock({ wanted }), chapters.length ? statusAsks(chapters) : ""]
+    .filter(Boolean)
+    .join("\n\n");
+  demands(box, `The owner asks for a ${wanted} update`, block, () =>
+    dropsAsk(box, wanted),
+  );
   if (chapters.length) box.demand.fits = (text) => statusLacks(text, chapters);
 }
 
@@ -29,7 +33,11 @@ export function dropsAsk(box, wanted) {
   const stands = String(asks(box, ASK) ?? QUIET);
   if (stands === QUIET) return { pass: true };
   if (stands !== wanted) {
-    box.log.say("debug", "config", `the ask stood at ${wanted}, and ${stands} stands pressed since`);
+    box.log.say(
+      "debug",
+      "config",
+      `the ask stood at ${wanted}, and ${stands} stands pressed since`,
+    );
     return { pass: true };
   }
   writes(box, ASK, QUIET);

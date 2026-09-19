@@ -21,15 +21,26 @@ export function readsCompaction(rows) {
   const read = { reads: context.length, answer: UNPROVEN, why: "" };
 
   if (at < 0) {
-    return { ...read, why: "no line says a compaction runs, so the road stands unproven" };
+    return {
+      ...read,
+      why: "no line says a compaction runs, so the road stands unproven",
+    };
   }
   if (!context.some((one) => one.reason === "re-read")) {
-    return { ...read, answer: DROPS, why: "the compaction brings the layer back no second time" };
+    return {
+      ...read,
+      answer: DROPS,
+      why: "the compaction brings the layer back no second time",
+    };
   }
 
   const heard = said.slice(at).find((one) => SAYINGS.has(one.said));
   if (!heard) {
-    return { ...read, answer: DROPS, why: "no answer after the compaction carries a canary" };
+    return {
+      ...read,
+      answer: DROPS,
+      why: "no answer after the compaction carries a canary",
+    };
   }
   if (heard.said === HEARD.same) {
     return { ...read, answer: SURVIVES, why: heard.said };
@@ -66,7 +77,9 @@ function compaction(root, it, client) {
   const read = readsCompaction(rows);
   for (const one of rows) {
     if (one.kind === "context" || one.kind === "compact") {
-      console.log(`  ${one.kind.padEnd(KIND_WIDTH)} ${one.reason ?? one.trigger ?? ""} ${one.said}`);
+      console.log(
+        `  ${one.kind.padEnd(KIND_WIDTH)} ${one.reason ?? one.trigger ?? ""} ${one.said}`,
+      );
     }
   }
   console.log(`\n${read.answer}: ${read.why}`);

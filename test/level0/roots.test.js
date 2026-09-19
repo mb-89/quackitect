@@ -200,12 +200,23 @@ function roots(files = {}, answers = {}, more = {}) {
 
 test("ticket note writes under the work root, off the note process under the method root", () => {
   const { it, disk } = roots();
-  const ran = heard(() => ticket(WORK, ["note", "slow-lint", "The", "lint", "drags."], it));
+  const ran = heard(() =>
+    ticket(WORK, ["note", "slow-lint", "The", "lint", "drags."], it),
+  );
 
   assert.equal(ran.code, 0, ran.said);
-  assert.ok(disk.exists(w(`${NOTES}/slow-lint.md`)), "the note stands under the work root");
-  assert.ok(!disk.exists(m(`${NOTES}/slow-lint.md`)), "and nothing lands in the method root");
-  assert.match(disk.read(w(`${NOTES}/slow-lint.md`)), /^process: \[\[spec\/processes\/note\]\]$/m);
+  assert.ok(
+    disk.exists(w(`${NOTES}/slow-lint.md`)),
+    "the note stands under the work root",
+  );
+  assert.ok(
+    !disk.exists(m(`${NOTES}/slow-lint.md`)),
+    "and nothing lands in the method root",
+  );
+  assert.match(
+    disk.read(w(`${NOTES}/slow-lint.md`)),
+    /^process: \[\[spec\/processes\/note\]\]$/m,
+  );
 });
 
 test("ticket update reads the route off the method root, and writes the ticket under the work root", () => {
@@ -214,13 +225,20 @@ test("ticket update reads the route off the method root, and writes the ticket u
 
   assert.equal(ran.code, 0, ran.said);
   const text = disk.read(w("spec/tickets/small.md"));
-  assert.match(text, new RegExp(`^process_hash: ${processHash(TRIVIAL_PROCESS)}$`, "m"));
-  assert.ok(!disk.exists(m("spec/tickets/small.md")), "the method root keeps no ticket of the stub's");
+  assert.match(
+    text,
+    new RegExp(`^process_hash: ${processHash(TRIVIAL_PROCESS)}$`, "m"),
+  );
+  assert.ok(
+    !disk.exists(m("spec/tickets/small.md")),
+    "the method root keeps no ticket of the stub's",
+  );
 });
 
 test("retro notes reads the private notes under the work root", () => {
   const { it } = roots({
-    [w(`${NOTES}/a-doubt.md`)]: "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\nA doubt.\n",
+    [w(`${NOTES}/a-doubt.md`)]:
+      "---\nkind: [[ticket]]\nstate: open\n---\n\n# Ask\n\nA doubt.\n",
   });
   const ran = heard(() => retro(WORK, ["notes"], it));
   assert.equal(ran.code, 1);
@@ -237,9 +255,17 @@ test("the pull hands out the work root's ticket, and the guidance reads the stub
 
   assert.equal(code, 0, said);
   assert.match(said, /^work {2}a-child at design\/draft/m, "the stub's child comes");
-  assert.match(said, /The stub's voice rule/, "the work root's note replaces the vehicle's");
+  assert.match(
+    said,
+    /The stub's voice rule/,
+    "the work root's note replaces the vehicle's",
+  );
   assert.ok(!said.includes("The vehicle's voice rule"), "the replaced note stays out");
-  assert.match(said, /The vehicle's working rule/, "a note the work root lacks comes down");
+  assert.match(
+    said,
+    /The vehicle's working rule/,
+    "a note the work root lacks comes down",
+  );
 });
 
 // [[spec/design_output/pull#the-fields-hold-their-forms]]
@@ -251,7 +277,9 @@ test("a link a field names resolves in the work root first, then in the method r
   heard(() => pulling(WORK, ["pull"], it));
   disk.write(
     w("spec/tickets/a-child.md"),
-    disk.read(w("spec/tickets/a-child.md")).replace("<!-- the note -->", "[[spec/guidance/working]]"),
+    disk
+      .read(w("spec/tickets/a-child.md"))
+      .replace("<!-- the note -->", "[[spec/guidance/working]]"),
   );
 
   const { code, said } = heard(() => pulling(WORK, ["pull", "a-child", "--pass"], it));
@@ -277,7 +305,11 @@ test("on trunk a cloud box takes the group, and the record lands in the ticket u
 
   assert.equal(code, 0, said);
   assert.match(said, /holds it|took/);
-  assert.match(disk.read(w("spec/tickets/one-group.md")), /hash_before:/, "the take writes the record");
+  assert.match(
+    disk.read(w("spec/tickets/one-group.md")),
+    /hash_before:/,
+    "the take writes the record",
+  );
   assert.ok(
     git.ran.every((one) => one.init?.cwd === WORK),
     "every git command runs at the work root, because a stub is its own repository",

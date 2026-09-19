@@ -3,16 +3,8 @@
 // nothing, so the claim goes stale and the branch comes back to the queue.
 // [[spec/design_output/work#a-stale-group-is-yours]]
 
-import { aged, spanOf, STALE } from "./group.js";
-import {
-  MS,
-  noteOf,
-  ROUTINE,
-  standingAll,
-  standOf,
-  TODO,
-  waitingOn,
-} from "./work.js";
+import { aged, STALE, spanOf } from "./group.js";
+import { MS, noteOf, ROUTINE, standingAll, standOf, TODO, waitingOn } from "./work.js";
 
 // The read carries the tip's own time, so the age costs no process. [[spec/design_output/work#the-listing-reads-git-once]]
 export function tipAge(one, now) {
@@ -38,7 +30,9 @@ export function staleClaim(one, now, it) {
 // A branch stands free where nobody claims it, and where the claim on it goes stale. [[spec/design_output/work#a-stale-group-is-yours]]
 export function freeIn(stand, standing, it = null, now = 0) {
   return stand
-    .filter((one) => standing.get(one.branch) === TODO || staleHere(it, now, one, standing))
+    .filter(
+      (one) => standing.get(one.branch) === TODO || staleHere(it, now, one, standing),
+    )
     .filter((one) => !waitingOn(noteOf(one), standing).length);
 }
 

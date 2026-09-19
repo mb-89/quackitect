@@ -112,14 +112,12 @@ test("a fixture log ranks its rows in the order this case names", async () => {
   const row = (at, more) =>
     JSON.stringify({ at, level: "warn", kind: "write", ...more });
   const rows = [
-    ...new Array(3)
-      .fill(0)
-      .map(() =>
-        row("2026-09-11T00:00:00.000Z", {
-          rule: "VoiceVale.PastTense",
-          phrase: "bold",
-        }),
-      ),
+    ...new Array(3).fill(0).map(() =>
+      row("2026-09-11T00:00:00.000Z", {
+        rule: "VoiceVale.PastTense",
+        phrase: "bold",
+      }),
+    ),
     ...new Array(2)
       .fill(0)
       .map(() =>

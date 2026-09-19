@@ -5,8 +5,10 @@
 
 import { flatten, keysOf, LOCAL, TRACKED } from "./config.js";
 import { actionables, styled } from "./guidance.js";
-import { faultsOf, grouped, PARAGRAPH, rulesFrom, RULES } from "./paragraph.js";
+import { faultsOf, grouped, PARAGRAPH, RULES, rulesFrom } from "./paragraph.js";
+
 export { ownerOf } from "./projection-owner.js";
+
 import { folderOf, shown } from "./projection-owner.js";
 import { readYaml } from "./schema.js";
 import { pathsOf } from "./vocabulary.js";
@@ -76,7 +78,9 @@ export function alsoReads(entry, texts) {
   if (entry?.shape !== PARAGRAPH) return [];
   const source = texts?.get(entry.from);
   if (source === undefined) return [];
-  return Object.values(pathsOf(readYaml(source))).filter((path) => path && !texts.has(path));
+  return Object.values(pathsOf(readYaml(source))).filter(
+    (path) => path && !texts.has(path),
+  );
 }
 
 // [[spec/funnel/a-paragraph-has-a-schema]]
@@ -113,7 +117,15 @@ export function writesOf(entry, texts) {
   }
   // [[spec/design_output/projection#a-widget-takes-its-path]]
   for (const widget of widgetsIn(raw)) {
-    put(commandsFor(widget.key, said.get(widget.key), declared(widget.key), entry, widget.path));
+    put(
+      commandsFor(
+        widget.key,
+        said.get(widget.key),
+        declared(widget.key),
+        entry,
+        widget.path,
+      ),
+    );
   }
   return out;
 }
@@ -227,14 +239,20 @@ export function widgetsIn(schema) {
   const out = [];
   for (const [section, said] of Object.entries(schema?.properties ?? {})) {
     for (const [leaf, one] of Object.entries(said?.properties ?? {})) {
-      if (!one?.group || !SETS.includes(one.widget) || !Array.isArray(one.enum)) continue;
+      if (!one?.group || !SETS.includes(one.widget) || !Array.isArray(one.enum))
+        continue;
       out.push({ key: `${section}.${leaf}`, section, leaf, group: String(one.group) });
     }
   }
   return out.map((one) => {
-    const shared = out.filter((each) => each.group === one.group && each.leaf === one.leaf);
+    const shared = out.filter(
+      (each) => each.group === one.group && each.leaf === one.leaf,
+    );
     const tail = shared.length > 1 ? [one.section, one.leaf] : [one.leaf];
-    return { ...one, path: { stem: [slug(one.group), ...tail], label: [one.group, ...tail] } };
+    return {
+      ...one,
+      path: { stem: [slug(one.group), ...tail], label: [one.group, ...tail] },
+    };
   });
 }
 

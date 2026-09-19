@@ -30,7 +30,9 @@ export function scripted(message, lines) {
 // [[spec/design_output/projection#what-stands-outside-a-layer]]
 export function prelude(wanted, blanks = true, prose = []) {
   const held = new Map([...HELPERS, ["frontless", frontless(prose)]]);
-  const names = blanks ? ["blanked", "frontless", "plain", ...wanted] : ["frontless", ...wanted];
+  const names = blanks
+    ? ["blanked", "frontless", "plain", ...wanted]
+    : ["frontless", ...wanted];
   return [
     'text := import("text")',
     "",
@@ -208,5 +210,7 @@ export function pattern(said) {
 
 // [[spec/design_output/projection#the-grammar-rules]]
 export function left(layer) {
-  return (layer?.exceptions ?? []).map((one) => String(one?.word ?? one)).filter(Boolean);
+  return (layer?.exceptions ?? [])
+    .map((one) => String(one?.word ?? one))
+    .filter(Boolean);
 }

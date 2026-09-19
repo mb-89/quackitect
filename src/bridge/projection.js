@@ -94,5 +94,7 @@ export function freshens(box, event = "") {
   for (const path of standing.keys()) {
     if (!wanted.has(path)) box.disk.remove(at(path));
   }
-  box.log.say("info", "project", `${moved} moved, so ${wrote} file(s) follow`, { file: moved });
+  box.log.say("info", "project", `${moved} moved, so ${wrote} file(s) follow`, {
+    file: moved,
+  });
 }

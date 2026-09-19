@@ -53,7 +53,9 @@ const REASONS = {
 
 // [[spec/design_output/level0#the-bridgehead-starts-it-too]]
 export function reasonOf(code) {
-  return REASONS[Number(code)] ?? ["warn", `the start answers ${code}, which nobody names`];
+  return (
+    REASONS[Number(code)] ?? ["warn", `the start answers ${code}, which nobody names`]
+  );
 }
 
 // [[spec/design_output/pull#a-hand-of-its-own]]
@@ -146,7 +148,8 @@ async function ask($, event, e, next) {
   } catch {
     body = JSON.stringify({ event, e: String(e), root });
   }
-  if (event === COMPACT || body.length > LIMIT) body = JSON.stringify({ event, e: slim(e), origin: next?.origin ?? null, root });
+  if (event === COMPACT || body.length > LIMIT)
+    body = JSON.stringify({ event, e: slim(e), origin: next?.origin ?? null, root });
   try {
     const said = await $.http.fetch(url(), {
       method: "POST",
@@ -171,7 +174,12 @@ async function* streams($, e, next) {
     stepText += textOf(chunk);
     yield chunk;
   }
-  await ask($, "turn.said", { turnId: e?.turnId, index: e?.index, kinds, text: stepText }, next);
+  await ask(
+    $,
+    "turn.said",
+    { turnId: e?.turnId, index: e?.index, kinds, text: stepText },
+    next,
+  );
 }
 
 async function lastTexts($) {
@@ -194,7 +202,12 @@ function textOf(chunk) {
 async function spoke($, e, next) {
   const texts = await lastTexts($);
   const text = stepText || texts.at(-1) || "";
-  const answer = await ask($, "agent.spoke", { tool: e?.tool, agentId: e?.agentId, text, texts }, next);
+  const answer = await ask(
+    $,
+    "agent.spoke",
+    { tool: e?.tool, agentId: e?.agentId, text, texts },
+    next,
+  );
   if (!answer) return next(e);
   if (answer.result !== undefined) return answer.result;
   if (answer.after !== undefined) return merged(await next(e), answer.after);
@@ -222,8 +235,10 @@ async function registers($, specs) {
 function merged(said, after) {
   const out = said && typeof said === "object" ? { ...said } : {};
   for (const [key, value] of Object.entries(after ?? {})) {
-    if (Array.isArray(value) && Array.isArray(out[key])) out[key] = [...out[key], ...value];
-    else if (typeof value === "string" && typeof out[key] === "string" && out[key]) out[key] = `${out[key]}\n\n${value}`;
+    if (Array.isArray(value) && Array.isArray(out[key]))
+      out[key] = [...out[key], ...value];
+    else if (typeof value === "string" && typeof out[key] === "string" && out[key])
+      out[key] = `${out[key]}\n\n${value}`;
     else out[key] = value;
   }
   return out;

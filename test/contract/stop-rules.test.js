@@ -4,8 +4,8 @@
 
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 import { pool } from "../../.claude/skills/level0/lib/stop.js";
 import { disk } from "../../src/doors/disk.js";
 

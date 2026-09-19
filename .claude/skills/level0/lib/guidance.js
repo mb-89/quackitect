@@ -117,7 +117,9 @@ export function scopesIn(text) {
   const said = parse(text).front.scope;
   if (!said) return [];
   if (Array.isArray(said)) return said.map(bare).filter(Boolean);
-  const quoted = [...String(said).matchAll(/"([^"]*)"|'([^']*)'/g)].map((one) => one[1] ?? one[2]);
+  const quoted = [...String(said).matchAll(/"([^"]*)"|'([^']*)'/g)].map(
+    (one) => one[1] ?? one[2],
+  );
   return (quoted.length ? quoted : [bare(said)]).filter(Boolean);
 }
 

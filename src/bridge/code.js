@@ -36,7 +36,8 @@ export async function codeDoor(e, writing, where, whole, box) {
     });
     return { result: { deny: refusal(where, found) } };
   }
-  if (e.tool === "Write" && text !== writing.text) return { event: { ...e, content: text } };
+  if (e.tool === "Write" && text !== writing.text)
+    return { event: { ...e, content: text } };
   return { pass: true };
 }
 

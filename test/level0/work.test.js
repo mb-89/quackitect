@@ -8,6 +8,7 @@ import { test } from "node:test";
 import { STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
+import { urgent } from "../../src/scripts/group.js";
 import {
   CONTRACT_HEADING,
   changedIn,
@@ -23,16 +24,15 @@ import {
   withContract,
   work,
 } from "../../src/scripts/work.js";
-import { urgent } from "../../src/scripts/group.js";
 import {
   doorsSaying,
   green,
   HERE,
   heard,
   onBranch,
-  remoteSaying,
   ROOT,
   ranGit,
+  remoteSaying,
   SHA,
 } from "./work-doors.js";
 

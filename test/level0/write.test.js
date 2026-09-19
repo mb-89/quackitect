@@ -6,9 +6,9 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
+import { onWrite } from "../../src/bridge/write.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
-import { onWrite } from "../../src/bridge/write.js";
 import { TICKET_SCHEMA as SCHEMA } from "./fixtures.js";
 
 const METHOD = "/tools";
@@ -53,7 +53,10 @@ A ticket with no route.
 
 // The box the server keeps per work root, with the doors this test needs. [[spec/design_output/level0#the-bridgehead-and-the-server]]
 function box(files = {}) {
-  const files_ = fakeDisk({ [join(METHOD, "spec", "schemas", "ticket.schema.yaml")]: SCHEMA, ...files });
+  const files_ = fakeDisk({
+    [join(METHOD, "spec", "schemas", "ticket.schema.yaml")]: SCHEMA,
+    ...files,
+  });
   return {
     method: METHOD,
     work: WORK,
@@ -68,14 +71,20 @@ function box(files = {}) {
 const write = (path, content) => ({ tool: "Write", file_path: path, content });
 
 test("a ticket under the stub breaking the vehicle's schema comes back refused", async () => {
-  const said = await onWrite(write(join(WORK, "spec", "tickets", "bad.md"), BAD), box());
+  const said = await onWrite(
+    write(join(WORK, "spec", "tickets", "bad.md"), BAD),
+    box(),
+  );
   assert.ok(said?.result?.deny, "the door refuses");
   assert.match(said.result.deny, /steps/);
 });
 
 test("a ticket under the stub keeping the vehicle's schema passes, and the stub holds no schema", async () => {
   const it = box();
-  assert.ok(!it.disk.exists(join(WORK, "spec", "schemas")), "the stub carries no schema of its own");
+  assert.ok(
+    !it.disk.exists(join(WORK, "spec", "schemas")),
+    "the stub carries no schema of its own",
+  );
   const said = await onWrite(write(join(WORK, "spec", "tickets", "good.md"), GOOD), it);
   assert.deepEqual(said, { pass: true });
 });

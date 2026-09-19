@@ -155,7 +155,9 @@ export function readWork(it, trunk = false) {
 
   const asks = [
     ...refs.map((one) => `${one.tip}:${BRIEF}`),
-    ...where.flatMap((one) => paths.get(one).map((name) => `${one}:${TICKETS}/${name}`)),
+    ...where.flatMap((one) =>
+      paths.get(one).map((name) => `${one}:${TICKETS}/${name}`),
+    ),
   ];
   const read = framed(it.git.batch(asks), asks);
   const held = (ask) => asText(read.get(ask) ?? "");

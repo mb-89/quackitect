@@ -17,9 +17,11 @@ import {
   TRACKED,
   varOf,
 } from "../../.claude/skills/level0/lib/config.js";
+import { boxOf } from "../../.claude/skills/level0/lib/private.js";
 import {
   EDITOR_EXTENSIONS,
   EDITOR_SETTINGS,
+  EDITOR_VALE_INI,
 } from "../../.claude/skills/level0/lib/servers.js";
 import { pool } from "../../.claude/skills/level0/lib/stop.js";
 import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
@@ -31,17 +33,14 @@ import {
   nameHoldsTheWords,
   noLogDeleted,
   nothingPrivateTravels,
+  privateFolderOwned,
   settingsNameBinaries,
   stopFolderIsData,
-  privateFolderOwned,
   surveyFindsNode,
   surveyNamesInstalls,
   treeFaults,
   treeOf,
 } from "../../.claude/skills/level0/lib/tree.js";
-import { EDITOR_VALE_INI } from "../../.claude/skills/level0/lib/servers.js";
-import { boxOf } from "../../.claude/skills/level0/lib/private.js";
-import { SESSION } from "../../src/scripts/hand.js";
 import { disk } from "../../src/doors/disk.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
@@ -50,6 +49,7 @@ import { proc } from "../../src/doors/proc.js";
 import { faultsIn as gridFaults } from "../../src/extension/lib/grid.js";
 import { commandsOf } from "../../src/extension/lib/panel.js";
 import { drawnIn, entriesIn } from "../../src/extension/lib/widgets.js";
+import { SESSION } from "../../src/scripts/hand.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
@@ -157,12 +157,17 @@ test("a git name and a git address off this box are refused too", () => {
 
   assert.deepEqual(
     found.map((one) => one.message.replace(/, and git.*/, "")),
-    ["This line carries the git name on this box", "This line carries the git address on this box"],
+    [
+      "This line carries the git name on this box",
+      "This line carries the git address on this box",
+    ],
   );
 });
 
 test("a box naming nobody reads clean, and so does this tree", () => {
-  const seed = { "spec/funnel/one.md": "A cloud box writes under /home/user, as root.\n" };
+  const seed = {
+    "spec/funnel/one.md": "A cloud box writes under /home/user, as root.\n",
+  };
   const box = { user: "root", home: "/home/user", name: "Claude", email: "" };
   assert.deepEqual(
     nothingPrivateTravels(fakeTree(seed, ["spec/funnel/one.md"], NODE, box)),
@@ -380,7 +385,7 @@ test("a file naming the owner beside the copy passes, and a test file passes", (
     "src/scripts/imports.js":
       'import { inRun } from "../../.claude/skills/level0/lib/folders.js";\nconst hold = inRun("hold");\nconst said = ".se/.runtime/hold";\n',
     "src/extension/copy.js":
-      "// The folder folders.js owns, spelled again here.\nconst BIN = \".se/.runtime/bin\";\n",
+      '// The folder folders.js owns, spelled again here.\nconst BIN = ".se/.runtime/bin";\n',
     "test/level0/folders.test.js": 'const at = ".se/.runtime/bin";\n',
     ".claude/skills/level0/lib/folders.js": 'export const RUN = ".se/.runtime";\n',
   };
@@ -491,9 +496,14 @@ test("every widget writing a key names one the declaration carries", () => {
 
 // [[spec/design_output/extension#a-button-names-its-commands]]
 test("every slash command a button's hover names stands in .claude/commands", () => {
-  const standing = new Set(files.list(join(root, ".claude", "commands")).map((one) => one.name));
+  const standing = new Set(
+    files.list(join(root, ".claude", "commands")).map((one) => one.name),
+  );
   const named = drawnIn(read(SCHEMA)).flatMap((one) => commandsOf(one));
-  assert.ok(named.includes("/se-agent-control-hold-stop"), "the hold button names its far end");
+  assert.ok(
+    named.includes("/se-agent-control-hold-stop"),
+    "the hold button names its far end",
+  );
   for (const one of named) {
     assert.ok(standing.has(`${one.slice(1)}.md`), `${one} stands as a command`);
   }
@@ -512,7 +522,10 @@ test("npm reaches the extension and the tense reader, and nothing else at the ro
   }
 
   const bare = read("package.json");
-  assert.deepEqual(Object.keys(bare.dependencies ?? {}).sort(), ["wink-eng-lite-web-model", "wink-nlp"]);
+  assert.deepEqual(Object.keys(bare.dependencies ?? {}).sort(), [
+    "wink-eng-lite-web-model",
+    "wink-nlp",
+  ]);
   assert.equal(bare.devDependencies, undefined);
 });
 
@@ -523,7 +536,8 @@ test("the extension imports the editor, its own folder, and what it declares", (
   assert.ok(paths.length > 5, "the extension carries its modules");
 
   const declared = Object.keys(read("src/extension/package.json").dependencies ?? {});
-  const named = (said) => declared.some((one) => said === one || said.startsWith(`${one}/`));
+  const named = (said) =>
+    declared.some((one) => said === one || said.startsWith(`${one}/`));
 
   for (const path of paths) {
     const text = files.read(join(root, path));

@@ -12,8 +12,8 @@ import {
   doorsSaying,
   GROUP_AT,
   GROUP_NOTE,
-  remoteSaying,
   ROOT,
+  remoteSaying,
 } from "./work-doors.js";
 
 const ANSWER_AT = join(ROOT, ".se", ".runtime", "work.json");
@@ -71,7 +71,11 @@ test("the flag writes the queue place, and no flag writes none", () => {
     ...said.branches.flatMap((one) => one.tickets).map((one) => one.queue),
     ...said.loose.map((one) => one.queue),
   ].sort();
-  assert.deepEqual(places, [1, 2, 3], "the group's row takes a place beside its tickets");
+  assert.deepEqual(
+    places,
+    [1, 2, 3],
+    "the group's row takes a place beside its tickets",
+  );
 });
 
 // [[spec/design_output/work#one-verb-answers-git]]

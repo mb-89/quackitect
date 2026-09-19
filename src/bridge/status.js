@@ -32,7 +32,9 @@ export function statusAsks(chapters) {
 }
 
 export function statusLacks(text, chapters) {
-  const lacking = chapters.filter((one) => !carries(text, one.name)).map((one) => one.name);
+  const lacking = chapters
+    .filter((one) => !carries(text, one.name))
+    .map((one) => one.name);
   if (!lacking.length) return "";
   return `The status update lacks ${lacking.join(", ")}. Write every chapter as a heading with text under it.`;
 }

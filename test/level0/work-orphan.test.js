@@ -6,7 +6,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { work } from "../../src/scripts/work.js";
-import { doorsSaying, HERE, heard, ranGit, remoteSaying, ROOT } from "./work-doors.js";
+import { doorsSaying, HERE, heard, ROOT, ranGit, remoteSaying } from "./work-doors.js";
 
 // [[spec/design_output/work#the-listing-reads-git-once]]
 const ORPHANED = (brief) => ({
@@ -17,7 +17,10 @@ const ORPHANED = (brief) => ({
     ],
     {
       // The orphan stands urgent, so the take reaches for it first and the skip shows. [[spec/design_output/work#the-listing-reads-git-once]]
-      "work/orphan:HANDOVER.md": brief.replace("status: todo", "status: todo\nurgent: true"),
+      "work/orphan:HANDOVER.md": brief.replace(
+        "status: todo",
+        "status: todo\nurgent: true",
+      ),
       "work/fine:HANDOVER.md": brief,
     },
   ),

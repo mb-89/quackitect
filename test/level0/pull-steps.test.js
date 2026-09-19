@@ -355,9 +355,7 @@ test("a leaf needing a verb the box lacks answers wait, with the reason", () => 
     "  - name: design\n",
     '  - name: design\n    needs: ["deploy now"]\n',
   );
-  const { it } = doors(
-    standing(child, withField(GROUP_NOTE, "step", "children")),
-  );
+  const { it } = doors(standing(child, withField(GROUP_NOTE, "step", "children")));
 
   const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
 
@@ -536,7 +534,11 @@ A thing to look at.
     withField(GROUP_NOTE, "state", "closed"),
   );
   const shut = heard(() => pulling(ROOT, ["pull"], later.it));
-  assert.match(shut.said, /^done/, "a closed group's branch hands its breakdown nothing");
+  assert.match(
+    shut.said,
+    /^done/,
+    "a closed group's branch hands its breakdown nothing",
+  );
 
   const trunk = doors(
     standing(

@@ -59,7 +59,9 @@ export function retro(root, argv, doors) {
   console.log(
     "  classes <retro>  counts each class's rate, and refuses a finding with no disposition",
   );
-  console.log("  mint <retro>     mints one ticket a class standing open, and opens each draft");
+  console.log(
+    "  mint <retro>     mints one ticket a class standing open, and opens each draft",
+  );
   console.log(
     "  score            the improvements earlier retros mint, and how many stay open",
   );

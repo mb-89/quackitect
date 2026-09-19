@@ -35,7 +35,9 @@ export function review(it, name, argv) {
   const trunk = refFor(it, TRUNK) ?? TRUNK;
   const first = firstCommit(it, trunk, ref);
   if (!first) {
-    console.error(`${ref} carries no commit beyond ${trunk}, so there is nothing to read.`);
+    console.error(
+      `${ref} carries no commit beyond ${trunk}, so there is nothing to read.`,
+    );
     return 1;
   }
 
@@ -52,7 +54,9 @@ export function review(it, name, argv) {
 export function readyToMerge(it) {
   const stand = standOf(it);
   const standing = standingAll(stand);
-  const done = stand.filter((one) => standing.get(one.branch) === DONE).map((one) => one.branch);
+  const done = stand
+    .filter((one) => standing.get(one.branch) === DONE)
+    .map((one) => one.branch);
   if (!done.length) return false;
   const name = done[0].replace(/^work\//, "");
   console.log(`work  ${done[0]} stands done, so the desk takes it in:`);

@@ -153,7 +153,10 @@ test("a changed Go test names its module, and the verb says what that run answer
     /^assertion, a test of src\/viewer fails/,
   );
   assert.match(
-    goSays({ exitCode: 1, stderr: "./work.go:9:2: undefined: nothing\n" }, "src/viewer"),
+    goSays(
+      { exitCode: 1, stderr: "./work.go:9:2: undefined: nothing\n" },
+      "src/viewer",
+    ),
     /^build, because src\/viewer builds not: \.\/work\.go/,
   );
 });
@@ -323,5 +326,8 @@ test("a closed group hands no leaf out on its branch, and sends the box back to 
   assert.match(said, /one-group stands closed/);
   assert.match(said, /branch done, then \.\/RUNME\.sh ticket pull from main/);
   assert.ok(!disk.exists(HOLD), "no leaf stands in hand");
-  assert.equal(fieldOf(disk.read(at("spec/tickets/a-child.md")), "step"), "design/draft");
+  assert.equal(
+    fieldOf(disk.read(at("spec/tickets/a-child.md")), "step"),
+    "design/draft",
+  );
 });

@@ -41,8 +41,14 @@ export function patchSpec() {
             required: ["file"],
           },
         },
-        on: { type: "string", description: "what this change is for, which undo takes back" },
-        preview: { type: "boolean", description: "answer what would land and write nothing" },
+        on: {
+          type: "string",
+          description: "what this change is for, which undo takes back",
+        },
+        preview: {
+          type: "boolean",
+          description: "answer what would land and write nothing",
+        },
       },
       required: ["ops"],
     },
@@ -141,12 +147,18 @@ function oneOp(one, text, absent, at) {
   const made = String(one.new ?? "");
 
   if (kind === "create") {
-    if (!absent) return { why: `${at}: create over a file that stands. Use an exact edit, or op write` };
+    if (!absent)
+      return {
+        why: `${at}: create over a file that stands. Use an exact edit, or op write`,
+      };
     if (!made) return { why: `${at}: create with no content` };
     return { text: made, hits: 1 };
   }
   if (kind === "write") {
-    if (!made) return { why: `${at}: write with no content. To empty a file, say so with an exact edit` };
+    if (!made)
+      return {
+        why: `${at}: write with no content. To empty a file, say so with an exact edit`,
+      };
     return { text: made, hits: 1 };
   }
   if (absent) return { why: `${at}: no file stands here. Use op create` };
@@ -155,7 +167,9 @@ function oneOp(one, text, absent, at) {
   if (kind === "prepend") return { text: made + text, hits: 1 };
   if (kind === "regex") return byPattern(one, text, at);
   if (kind === "exact") return byText(one, text, made, at);
-  return { why: `${at}: no op called ${kind}. The ops are ${OPS.filter(Boolean).join(", ")}` };
+  return {
+    why: `${at}: no op called ${kind}. The ops are ${OPS.filter(Boolean).join(", ")}`,
+  };
 }
 
 function byText(one, text, made, at) {
@@ -164,12 +178,17 @@ function byText(one, text, made, at) {
 
   const found = countOf(text, old);
   if (found === 0) {
-    return { why: `${at}: the text stands nowhere in the file. Read it and copy the bytes exactly` };
+    return {
+      why: `${at}: the text stands nowhere in the file. Read it and copy the bytes exactly`,
+    };
   }
   if (found > 1 && one.replace_all !== true) {
-    return { why: `${at}: the text stands ${found} times. Widen it, or say replace_all` };
+    return {
+      why: `${at}: the text stands ${found} times. Widen it, or say replace_all`,
+    };
   }
-  if (one.replace_all === true) return { text: text.split(old).join(made), hits: found };
+  if (one.replace_all === true)
+    return { text: text.split(old).join(made), hits: found };
   return { text: text.replace(old, made), hits: 1 };
 }
 
@@ -191,7 +210,9 @@ function byPattern(one, text, at) {
 
   const wanted = one.expect_count;
   if (wanted !== undefined && Number(wanted) !== hits) {
-    return { why: `${at}: the pattern matches ${hits} times, and expect_count says ${wanted}` };
+    return {
+      why: `${at}: the pattern matches ${hits} times, and expect_count says ${wanted}`,
+    };
   }
   return { text: text.replace(shape, String(one.replacement ?? "")), hits };
 }

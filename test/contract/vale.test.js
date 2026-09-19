@@ -137,15 +137,18 @@ const inRegister = async (text, where) => {
 };
 
 // [[spec/funnel/a-paragraph-has-a-schema]]
-ifVale("the requirement register takes shall and should, and no other does", async () => {
-  const binds = "- The door shall refuse the write, and it should name the rule.\n";
-  assert.deepEqual(await inRegister(binds, "spec/design_input/one.md"), []);
+ifVale(
+  "the requirement register takes shall and should, and no other does",
+  async () => {
+    const binds = "- The door shall refuse the write, and it should name the rule.\n";
+    assert.deepEqual(await inRegister(binds, "spec/design_input/one.md"), []);
 
-  for (const where of ["notes.md", "spec/design_output/one.md"]) {
-    const found = await inRegister(binds, where);
-    assert.ok(found.includes("Modal"), `${where} refuses shall and should`);
-  }
-});
+    for (const where of ["notes.md", "spec/design_output/one.md"]) {
+      const found = await inRegister(binds, where);
+      assert.ok(found.includes("Modal"), `${where} refuses shall and should`);
+    }
+  },
+);
 
 ifVale("the register outside the set stands refused inside it too", async () => {
   const loose = "- The door may refuse the write, and it would say why.\n";
@@ -159,17 +162,20 @@ const SECRETS = ["/home", "fnordwick", "secrets"].join("/");
 const CALLED = ["+49 30", "1234 5678"].join(" ");
 
 // [[spec/design_output/private#the-shapes]]
-ifVale("the shapes rule refuses an address, a number, a date and a home path", async () => {
-  for (const said of [
-    "Reach the owner at somebody@example.com when the box stalls.",
-    `Call ${CALLED} about it, and say what stalls.`,
-    "Measured on 2026-09-10 against client 2.1.267, on a cloud box.",
-    `The probe writes under ${SECRETS} and reads it back.`,
-    "A box answers C:\\Users\\fnordwick\\Desktop as the home folder there.",
-  ]) {
-    assert.ok((await ruled(said)).includes("Private"), said);
-  }
-});
+ifVale(
+  "the shapes rule refuses an address, a number, a date and a home path",
+  async () => {
+    for (const said of [
+      "Reach the owner at somebody@example.com when the box stalls.",
+      `Call ${CALLED} about it, and say what stalls.`,
+      "Measured on 2026-09-10 against client 2.1.267, on a cloud box.",
+      `The probe writes under ${SECRETS} and reads it back.`,
+      "A box answers C:\\Users\\fnordwick\\Desktop as the home folder there.",
+    ]) {
+      assert.ok((await ruled(said)).includes("Private"), said);
+    }
+  },
+);
 
 ifVale("a nobody user, a version and an example pass the shapes rule", async () => {
   for (const said of [
@@ -198,19 +204,22 @@ ifVale("a word the list swaps is refused, and the refusal names the swap", async
 });
 
 // [[spec/funnel/a-paragraph-has-a-schema]]
-ifVale("the words this tree writes pass, and so does what stands outside a layer", async () => {
-  for (const said of [
-    "The door refuses a write, and the writer reads the refusal.",
-    "A run of doors reads the rules, and the rules stand in one folder.",
-    "The tree writes `flibbertigibbet` in a code span, so the rule reads past it.",
-    "A path like spec/vocabulary/words.yml stands outside the layer.",
-    "The owner reads [[spec/funnel/a-paragraph-has-a-schema]] first.",
-    "A capital past the first word names Flibbertigibbet, so it stands.",
-    "The door reads 2048 bytes and the rule passes over a digit.",
-  ]) {
-    assert.deepEqual(await saidOf(said, "Vocabulary"), [], said);
-  }
-});
+ifVale(
+  "the words this tree writes pass, and so does what stands outside a layer",
+  async () => {
+    for (const said of [
+      "The door refuses a write, and the writer reads the refusal.",
+      "A run of doors reads the rules, and the rules stand in one folder.",
+      "The tree writes `flibbertigibbet` in a code span, so the rule reads past it.",
+      "A path like spec/vocabulary/words.yml stands outside the layer.",
+      "The owner reads [[spec/funnel/a-paragraph-has-a-schema]] first.",
+      "A capital past the first word names Flibbertigibbet, so it stands.",
+      "The door reads 2048 bytes and the rule passes over a digit.",
+    ]) {
+      assert.deepEqual(await saidOf(said, "Vocabulary"), [], said);
+    }
+  },
+);
 
 // [[spec/funnel/a-paragraph-has-a-schema]]
 ifVale("a plural, a past form and an -ing form of a listed word stand", async () => {
@@ -232,20 +241,26 @@ test("the shapes rule and the commit door pass one list of nobody users", () => 
 });
 
 // [[spec/design_output/config#the-magic-numbers-take-names]]
-ifVale("a digit in a design note's prose is refused, and a version, a unit and a table pass", async () => {
-  const note = "spec/design_output/probe.md";
-  const bare = "The verb exits 0 on survives.\n";
-  assert.ok((await inRegister(bare, note)).includes("DigitInProse"));
-  const quiet = [
-    "Measured against client 2.1.267, a poll every 250 ms stands, and x86 ships.",
-    "",
-    "| what | count |",
-    "|---|---|",
-    "| events | 186 |",
-    "",
-    "1. The verb exits `0` on survives.",
-    "",
-  ].join("\n");
-  assert.deepEqual((await inRegister(quiet, note)).filter((one) => one === "DigitInProse"), []);
-  assert.ok(!(await inRegister(bare, "notes.md")).includes("DigitInProse"));
-});
+ifVale(
+  "a digit in a design note's prose is refused, and a version, a unit and a table pass",
+  async () => {
+    const note = "spec/design_output/probe.md";
+    const bare = "The verb exits 0 on survives.\n";
+    assert.ok((await inRegister(bare, note)).includes("DigitInProse"));
+    const quiet = [
+      "Measured against client 2.1.267, a poll every 250 ms stands, and x86 ships.",
+      "",
+      "| what | count |",
+      "|---|---|",
+      "| events | 186 |",
+      "",
+      "1. The verb exits `0` on survives.",
+      "",
+    ].join("\n");
+    assert.deepEqual(
+      (await inRegister(quiet, note)).filter((one) => one === "DigitInProse"),
+      [],
+    );
+    assert.ok(!(await inRegister(bare, "notes.md")).includes("DigitInProse"));
+  },
+);

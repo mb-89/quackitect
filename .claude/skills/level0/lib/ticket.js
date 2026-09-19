@@ -22,7 +22,8 @@ export function writesHere(leaf, hand = {}) {
   if (by === "helper" && !hand.helper)
     return no(`waits for a hand the engine spawns at ${at}`);
   if (by === "children") return no(`waits for its own children at ${at}`);
-  if (by === "retro" && !hand.atRetro) return no(`waits for a hand at a retro step, at ${at}`);
+  if (by === "retro" && !hand.atRetro)
+    return no(`waits for a hand at a retro step, at ${at}`);
   return { writes: true, why: "" };
 }
 
@@ -45,7 +46,9 @@ export function queueHolds(texts) {
     if (String(front.group ?? "").trim()) return false;
     const walk = entriesIn(front.steps, "steps");
     const step = String(front.step ?? "").trim();
-    const leaf = step ? walk.find((one) => one.path === step) : walk.find((one) => !one.said?.steps);
+    const leaf = step
+      ? walk.find((one) => one.path === step)
+      : walk.find((one) => !one.said?.steps);
     if (!leaf) return false;
     return !["person", "children", "helper"].includes(String(leaf.said?.by ?? ""));
   });
@@ -102,7 +105,9 @@ function leafRow(one) {
   }
   const parts = [`The hand is \`${one.hand ?? "nobody"}\``];
   if (one.hash_before || one.hash_after) {
-    parts.push(`the branch runs \`${one.hash_before ?? ""}\` to \`${one.hash_after ?? ""}\``);
+    parts.push(
+      `the branch runs \`${one.hash_before ?? ""}\` to \`${one.hash_after ?? ""}\``,
+    );
   }
   parts.push(`this leaf returns ${one.returns ?? 0}`);
   return `${parts.join(", and ")}.`;
@@ -163,7 +168,9 @@ function placeFaults(old, note, schema, where) {
   if (!places.size) return [];
 
   // [[spec/design_output/schema#the-three-places]]
-  const held = new Map(old.sections.map((one, i) => [nthKey(old.sections, i), one.own.join("\n")]));
+  const held = new Map(
+    old.sections.map((one, i) => [nthKey(old.sections, i), one.own.join("\n")]),
+  );
   const out = [];
 
   for (const [i, one] of note.sections.entries()) {
@@ -206,7 +213,9 @@ function fieldsHeld(front, level) {
   const walk = entriesIn(front.steps, "steps");
   // A ticket with no step stands at its first leaf, the way the pull reads it. [[spec/design_output/schema#the-three-places]]
   const step = String(front.step ?? "").trim();
-  const holder = step ? walk.find((one) => one.path === step) : walk.find((one) => one.leaf);
+  const holder = step
+    ? walk.find((one) => one.path === step)
+    : walk.find((one) => one.leaf);
   if (!holder) return [];
 
   const deep = level + holder.path.split("/").length;
@@ -217,8 +226,14 @@ function fieldsHeld(front, level) {
   }
   // [[spec/design_output/pull#the-fields-hold-their-forms]]
   const parts = holder.path.split("/");
-  const chain = parts.map((_, i) => walk.find((one) => one.path === parts.slice(0, i + 1).join("/")));
-  if (chain.some((one) => [one?.said?.checklist ?? []].flat().some((it) => String(it ?? "").trim()))) {
+  const chain = parts.map((_, i) =>
+    walk.find((one) => one.path === parts.slice(0, i + 1).join("/")),
+  );
+  if (
+    chain.some((one) =>
+      [one?.said?.checklist ?? []].flat().some((it) => String(it ?? "").trim()),
+    )
+  ) {
     out.push([`${deep} ${CHECKED}`, `${CHECKED}, under ${holder.path}`]);
   }
   return out;

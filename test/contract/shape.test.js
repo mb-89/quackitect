@@ -77,7 +77,7 @@ ifVale("a stop rule missing a field, or naming no side, is refused", async () =>
 const PATH_RULE = "VoiceScript.NoPathInScript";
 
 ifVale("an interpolated path in a shell script is refused", async () => {
-  const bad = '#!/usr/bin/env sh\nnode -e "require(\'$root/lib.js\')"\n';
+  const bad = "#!/usr/bin/env sh\nnode -e \"require('$root/lib.js')\"\n";
   assert.ok((await ruled(bad, SHELL)).includes(PATH_RULE));
 
   const good = '#!/usr/bin/env sh\ncd "$root" && node -e "require(\'./lib.js\')"\n';
@@ -85,15 +85,15 @@ ifVale("an interpolated path in a shell script is refused", async () => {
 });
 
 ifVale("an interpolated path in a PowerShell script is refused", async () => {
-  const bad = 'node --input-type=module -e "import \'$root/lib.js\'"\n';
+  const bad = "node --input-type=module -e \"import '$root/lib.js'\"\n";
   assert.ok((await ruled(bad, POWERSHELL)).includes(PATH_RULE));
 
-  const good = 'node --input-type=module -e "import \'./lib.js\'"\n';
+  const good = "node --input-type=module -e \"import './lib.js'\"\n";
   assert.ok(!(await ruled(good, POWERSHELL)).includes(PATH_RULE));
 });
 
 ifVale("a commented path, and a plain copy, pass the script rule", async () => {
-  const commented = '# node -e "require(\'$root/lib.js\')"\n';
+  const commented = "# node -e \"require('$root/lib.js')\"\n";
   assert.ok(!(await ruled(commented, SHELL)).includes(PATH_RULE));
 
   const copied = 'cp "$tmp/$name" "$bin/vale"\n';
@@ -101,7 +101,10 @@ ifVale("a commented path, and a plain copy, pass the script rule", async () => {
 });
 
 ifVale("no prose rule reaches a shell script", async () => {
-  const said = await ruled('#!/usr/bin/env sh\n# The tree was installed here.\n', SHELL);
+  const said = await ruled(
+    "#!/usr/bin/env sh\n# The tree was installed here.\n",
+    SHELL,
+  );
   assert.deepEqual(
     said.filter((one) => one.startsWith("VoiceVale.")),
     [],

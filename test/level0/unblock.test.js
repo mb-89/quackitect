@@ -238,7 +238,11 @@ test("a question carrying a table lands as that table, and TL;DR stays whole", (
   const successor = disk.read(at("spec/tickets/a-successor.md"));
   assert.match(successor, /^\| road \| cost \|$/m, "the table keeps its own line");
   assert.match(successor, /^\| one \| two \|$/m, "every row keeps its own line");
-  assert.match(successor, /TL;DR pick a road/, "the word carrying a semicolon stays whole");
+  assert.match(
+    successor,
+    /TL;DR pick a road/,
+    "the word carrying a semicolon stays whole",
+  );
   assert.doesNotMatch(successor, /^\s+- DR/m, "no cut falls inside that word");
 });
 

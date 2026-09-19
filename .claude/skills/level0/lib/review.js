@@ -27,7 +27,8 @@ export function retroOnTicket(text) {
   if (start < 0) return false;
   for (const line of lines.slice(start + 1)) {
     if (/^#\s+/.test(line)) return false;
-    if (/^#{2,6}\s+/.test(line) || /^\s*<!--.*-->\s*$/.test(line) || !line.trim()) continue;
+    if (/^#{2,6}\s+/.test(line) || /^\s*<!--.*-->\s*$/.test(line) || !line.trim())
+      continue;
     return true;
   }
   return false;

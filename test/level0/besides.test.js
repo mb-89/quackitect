@@ -31,7 +31,11 @@ test("the hand runs, and the vote stands as the answer", async () => {
   const it = session();
   const said = await besides(
     it.$,
-    { result: { block: "carry on" }, spawn: HAND, back: { event: "refactor.answered", file: "old.md" } },
+    {
+      result: { block: "carry on" },
+      spawn: HAND,
+      back: { event: "refactor.answered", file: "old.md" },
+    },
     {},
     () => ({ pass: true }),
   );
@@ -46,7 +50,9 @@ test("the hand runs, and the vote stands as the answer", async () => {
 test("an answer holding the turn open runs the hand and passes the event on", async () => {
   const it = session();
   const e = { last_assistant_message: "text" };
-  const said = await besides(it.$, { pass: true, spawn: HAND }, e, (one) => ({ saw: one }));
+  const said = await besides(it.$, { pass: true, spawn: HAND }, e, (one) => ({
+    saw: one,
+  }));
 
   assert.deepEqual(said, { saw: e });
   assert.deepEqual(it.spawned, [HAND]);
@@ -57,7 +63,12 @@ test("a refused spawn leaves the vote whole", async () => {
   it.$.agent.spawn = () => {
     throw new Error("no hand here");
   };
-  const said = await besides(it.$, { result: { block: "carry on" }, spawn: HAND }, {}, () => ({}));
+  const said = await besides(
+    it.$,
+    { result: { block: "carry on" }, spawn: HAND },
+    {},
+    () => ({}),
+  );
 
   assert.deepEqual(said, { block: "carry on" });
   assert.equal(it.posted[0].e.deny, "no hand here");

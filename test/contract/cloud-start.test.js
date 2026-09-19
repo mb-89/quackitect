@@ -14,8 +14,7 @@ const files = disk();
 const MARKER = "started.txt";
 const LOCAL = { CLAUDE_CODE_REMOTE: "", SE_CLOUD: "" };
 const CLOUD = { CLAUDE_CODE_REMOTE: "true", SE_CLOUD: "" };
-const SERVER =
-  "require('fs').writeFileSync(process.argv[2] + '/started.txt', 'up')\n";
+const SERVER = "require('fs').writeFileSync(process.argv[2] + '/started.txt', 'up')\n";
 const WAITS = 40;
 
 const nodeHere = () =>

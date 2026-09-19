@@ -241,7 +241,12 @@ export function changedSince(it, one, held) {
 // [[spec/tickets/the-verdict-guard-reads-tips]]
 function filesOf(it, sha) {
   const said = it.git.run(["show", "--format=", "--name-only", sha], true);
-  return said.ok ? said.out.split("\n").map((row) => row.trim()).filter(Boolean) : [];
+  return said.ok
+    ? said.out
+        .split("\n")
+        .map((row) => row.trim())
+        .filter(Boolean)
+    : [];
 }
 
 // [[spec/design_output/pull#the-test-verb]]

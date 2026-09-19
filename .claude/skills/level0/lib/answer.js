@@ -119,7 +119,8 @@ function noteRows(box) {
     if (!line.trim()) continue;
     try {
       const row = JSON.parse(line);
-      if (String(row?.kind ?? "") === "note") out.push(String(row.text ?? row.said ?? ""));
+      if (String(row?.kind ?? "") === "note")
+        out.push(String(row.text ?? row.said ?? ""));
     } catch {}
   }
   return out;
@@ -127,8 +128,13 @@ function noteRows(box) {
 
 // A log door built on a root answers the whole path already, and one built on none answers the path under it. [[spec/design_output/level0#a-note-answers-its-prompt]]
 function joinIn(box) {
-  const path = String(box.log?.path ?? "").split("\\").join("/") || SESSION;
-  const root = String(box.work ?? "").split("\\").join("/");
+  const path =
+    String(box.log?.path ?? "")
+      .split("\\")
+      .join("/") || SESSION;
+  const root = String(box.work ?? "")
+    .split("\\")
+    .join("/");
   if (!root || path.startsWith(root) || /^([A-Za-z]:)?\//.test(path)) return path;
   return `${root}/${path}`;
 }
@@ -234,15 +240,36 @@ export function needsFaults(spoken, stopped) {
   const shape = `Close it with the heading ${NEEDS_HEADING} and a table headed No., question and proposed answer.`;
 
   if (end < 0 || !block.every((row) => row.startsWith("|"))) {
-    return [at(Math.max(start, 0) + 1, block[0] ?? "", `This answer ends on a stop with no table above it. ${shape}`)];
+    return [
+      at(
+        Math.max(start, 0) + 1,
+        block[0] ?? "",
+        `This answer ends on a stop with no table above it. ${shape}`,
+      ),
+    ];
   }
   if (!new RegExp(`^#{1,6}\\s+${NEEDS_HEADING}\\s*$`, "i").test(heading)) {
-    return [at(start + 1, block[0], `The table above the stop stands under no heading ${NEEDS_HEADING}. ${shape}`)];
+    return [
+      at(
+        start + 1,
+        block[0],
+        `The table above the stop stands under no heading ${NEEDS_HEADING}. ${shape}`,
+      ),
+    ];
   }
 
   const heads = cellsOf(block[0]).map((cell) => cell.toLowerCase());
-  if (NEEDS_HEADS.some((want, i) => heads[i] !== want) || heads.length !== NEEDS_HEADS.length) {
-    return [at(start + 1, block[0], `The needs table reads ${heads.join(", ") || "nothing"}. ${shape}`)];
+  if (
+    NEEDS_HEADS.some((want, i) => heads[i] !== want) ||
+    heads.length !== NEEDS_HEADS.length
+  ) {
+    return [
+      at(
+        start + 1,
+        block[0],
+        `The needs table reads ${heads.join(", ") || "nothing"}. ${shape}`,
+      ),
+    ];
   }
 
   const found = [];
@@ -251,18 +278,42 @@ export function needsFaults(spoken, stopped) {
     .slice(1)
     .filter((one) => !ruled(one.row));
   if (!body.length) {
-    return [at(start + 1, block[0], "The needs table holds no row. Write one, and where nothing waits, say so in it.")];
+    return [
+      at(
+        start + 1,
+        block[0],
+        "The needs table holds no row. Write one, and where nothing waits, say so in it.",
+      ),
+    ];
   }
   body.forEach((one, i) => {
     const cells = cellsOf(one.row);
     if (cells[0] !== String(i + 1)) {
-      found.push(at(one.line, one.row, `Row ${i + 1} of the needs table carries the number ${cells[0] || "nothing"}. Number the rows 1, 2, 3 in order.`));
+      found.push(
+        at(
+          one.line,
+          one.row,
+          `Row ${i + 1} of the needs table carries the number ${cells[0] || "nothing"}. Number the rows 1, 2, 3 in order.`,
+        ),
+      );
     }
     for (const cell of cells.slice(1)) {
       if (cell.includes("`")) {
-        found.push(at(one.line, cell, "A needs table cell holds no code. Put the detail above the table."));
+        found.push(
+          at(
+            one.line,
+            cell,
+            "A needs table cell holds no code. Put the detail above the table.",
+          ),
+        );
       } else if (wordsIn(cell) > CELL_WORDS) {
-        found.push(at(one.line, cell, `A needs table cell holds ${CELL_WORDS} words, and this one holds ${wordsIn(cell)}. Put the detail above the table.`));
+        found.push(
+          at(
+            one.line,
+            cell,
+            `A needs table cell holds ${CELL_WORDS} words, and this one holds ${wordsIn(cell)}. Put the detail above the table.`,
+          ),
+        );
       }
     }
   });
@@ -290,7 +341,10 @@ export function lengthFaults(text, most) {
       line: 1,
       column: 1,
       rule: LENGTH,
-      said: String(text ?? "").trim().split(/\r?\n/)[0] ?? "",
+      said:
+        String(text ?? "")
+          .trim()
+          .split(/\r?\n/)[0] ?? "",
       message: `An answer holds ${cap} words outside its code and tables, and this one holds ${count}. Cut it to ${cap}.`,
     },
   ];

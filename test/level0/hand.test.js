@@ -20,7 +20,10 @@ function box(files = {}, more = {}) {
   return {
     root: ROOT,
     join,
-    disk: fakeDisk({ [at(".se/.runtime/box.json")]: JSON.stringify({ id: ID }), ...files }),
+    disk: fakeDisk({
+      [at(".se/.runtime/box.json")]: JSON.stringify({ id: ID }),
+      ...files,
+    }),
     git: fakeGit({ [AUTHOR]: { stdout: "Ada\n" } }, ROOT),
     clock: fakeClock(),
     ...more,
@@ -50,7 +53,11 @@ test("the box file alone off a harness names the git author, and the record take
   const it = box({}, { agent: false, env: {} });
   assert.equal(handOf(it), "person Ada");
   assert.equal(roleOf(handOf(it)), "person", "a tracked file holds no person's name");
-  assert.equal(roleOf(`box ${ID}`), `box ${ID}`, "and a box's hand stands as it stands");
+  assert.equal(
+    roleOf(`box ${ID}`),
+    `box ${ID}`,
+    "and a box's hand stands as it stands",
+  );
 
   const bare = box({}, { agent: false, env: {}, git: fakeGit({}, ROOT) });
   assert.equal(handOf(bare), "person", "a box naming no author reads the role alone");

@@ -119,8 +119,14 @@ test("a session can write its local handover and other SE files", async () => {
   );
   it.disk.write("/tree/.se/HANDOVER.md", "Result and retro.");
   it.disk.write("/tree/HANDOVER.md", "Result and retro.");
-  assert.deepEqual(await handle(create(".se/.runtime/copilot/state.json", "{}"), it), {});
-  assert.deepEqual(await handle(create(".se/.runtime/bin/vale", "replacement"), it), {});
+  assert.deepEqual(
+    await handle(create(".se/.runtime/copilot/state.json", "{}"), it),
+    {},
+  );
+  assert.deepEqual(
+    await handle(create(".se/.runtime/bin/vale", "replacement"), it),
+    {},
+  );
   assert.match(
     (await handle(create(".se/HANDOVER.md", "bad prose"), it)).deny,
     /fewer words/,

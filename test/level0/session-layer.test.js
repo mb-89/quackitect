@@ -82,7 +82,10 @@ test("no box file leaves the layer whole, and the reader mints none", () => {
   const said = guidanceHere(disk, METHOD, WORK, ENV, true);
 
   assert.match(said.standing, /Say what is\./);
-  assert.ok(!disk.exists(join(WORK, ".se/.runtime/box.json")), "the reader mints no box");
+  assert.ok(
+    !disk.exists(join(WORK, ".se/.runtime/box.json")),
+    "the reader mints no box",
+  );
 });
 
 // [[spec/design_output/level0#the-standing-layer]]
@@ -107,11 +110,16 @@ test("a spawned helper carries the layer whole, because its own hold stands else
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]
 test("a note binding a kind stands off the session and the helper, and its own layer holds it", () => {
-  const disk = boxed(disks({ [join(METHOD, "spec/guidance/code/refactoring.md")]: REFACTORING }));
+  const disk = boxed(
+    disks({ [join(METHOD, "spec/guidance/code/refactoring.md")]: REFACTORING }),
+  );
 
   const said = guidanceHere(disk, METHOD, WORK, ENV, true);
 
-  assert.ok(!/Take the one file/.test(said.standing), "the working hand reads it nowhere");
+  assert.ok(
+    !/Take the one file/.test(said.standing),
+    "the working hand reads it nowhere",
+  );
   assert.ok(!/Take the one file/.test(said.helper), "a helper reads it nowhere");
   assert.match(said.layers.refactor, /Take the one file/);
   assert.match(said.layers.refactor, /Say what is\./);
@@ -120,7 +128,11 @@ test("a note binding a kind stands off the session and the helper, and its own l
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]
 test("a spawn names its kind, and the layer of that kind reaches that hand alone", () => {
-  const guidance = { standing: "the session", helper: "a helper", layers: { refactor: "the hand" } };
+  const guidance = {
+    standing: "the session",
+    helper: "a helper",
+    layers: { refactor: "the hand" },
+  };
 
   assert.equal(layerHere(guidance, "refactor"), "the hand");
   assert.equal(layerHere(guidance, ""), "a helper");

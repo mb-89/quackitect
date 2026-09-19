@@ -93,7 +93,9 @@ function textsSince(e, seen) {
 }
 
 function head(text) {
-  return String(text ?? "").replace(/\s+/g, " ").slice(0, SAID);
+  return String(text ?? "")
+    .replace(/\s+/g, " ")
+    .slice(0, SAID);
 }
 
 export function pays(box, text) {
@@ -136,5 +138,7 @@ export function holdsTurn(e, box) {
   const lacks = demand?.fits ? demand.fits(text) : "";
   if (!lacks) return { pass: true };
   box.log.say("info", "stop", `the turn holds: ${lacks}`, { detail: demand.why });
-  return { result: { block: `${lacks} ${demand.why}, and the turn ends when it stands.` } };
+  return {
+    result: { block: `${lacks} ${demand.why}, and the turn ends when it stands.` },
+  };
 }

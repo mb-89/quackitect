@@ -64,7 +64,8 @@ export function queued(list, all, it = {}) {
     score: scoreOf(one, waits, it.stood, it.weights, now),
   }));
   scored.sort(
-    (a, b) => b.mark - a.mark || b.score - a.score || a.one.name.localeCompare(b.one.name),
+    (a, b) =>
+      b.mark - a.mark || b.score - a.score || a.one.name.localeCompare(b.one.name),
   );
   return scored.map((held) => held.one);
 }

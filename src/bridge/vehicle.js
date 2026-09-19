@@ -19,7 +19,12 @@ export function vehicleOf(disk, env, time, work) {
   const pointed = pointerOf(readIf(disk, join(work, POINTER)));
   if (pointed) return { ...pointed, itself: false, made: false };
   if (!isVehicle(disk, work)) return null;
-  return { method: work, port: registeredPort(disk, env, time, work), itself: true, made: false };
+  return {
+    method: work,
+    port: registeredPort(disk, env, time, work),
+    itself: true,
+    made: false,
+  };
 }
 
 export function makesProject(disk, env, time, work, vehicle) {
@@ -30,12 +35,17 @@ export function makesProject(disk, env, time, work, vehicle) {
     disk.write(to, disk.read(join(vehicle, HOOK, rel)));
   }
   disk.makeDir(join(work, POINTER, ".."));
-  disk.write(join(work, POINTER), `${JSON.stringify({ method: vehicle, port }, null, 2)}\n`);
+  disk.write(
+    join(work, POINTER),
+    `${JSON.stringify({ method: vehicle, port }, null, 2)}\n`,
+  );
   return { method: vehicle, port, itself: false, made: true };
 }
 
 export function settles(disk, env, time, work, vehicle) {
-  return vehicleOf(disk, env, time, work) ?? makesProject(disk, env, time, work, vehicle);
+  return (
+    vehicleOf(disk, env, time, work) ?? makesProject(disk, env, time, work, vehicle)
+  );
 }
 
 // [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
@@ -45,7 +55,10 @@ export function attachTo(disk, env, time, work, vehicle) {
 }
 
 export function isVehicle(disk, folder) {
-  return disk.exists(join(folder, MARKER)) && disk.exists(join(folder, "src", "bridge", "server.js"));
+  return (
+    disk.exists(join(folder, MARKER)) &&
+    disk.exists(join(folder, "src", "bridge", "server.js"))
+  );
 }
 
 export function registeredPort(disk, env, time, method) {
@@ -53,7 +66,10 @@ export function registeredPort(disk, env, time, method) {
   const known = portOf(held, method);
   if (known) return known;
   const id = copyHere(disk, time, method);
-  const entry = withPort(held, entryOf(id, versionOf(disk, method), method, time.stamp()));
+  const entry = withPort(
+    held,
+    entryOf(id, versionOf(disk, method), method, time.stamp()),
+  );
   registerCopy(disk, env, entry);
   return entry.port;
 }

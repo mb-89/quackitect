@@ -69,7 +69,10 @@ test("an answer lands under a numbered name the answer register reads", () => {
   const files = answerFiles("one-session", ["first", "second"]);
   assert.deepEqual(
     files.map((one) => one.path),
-    [`.se/.runtime/measure/one-session/001-${ANSWER}`, `.se/.runtime/measure/one-session/002-${ANSWER}`],
+    [
+      `.se/.runtime/measure/one-session/001-${ANSWER}`,
+      `.se/.runtime/measure/one-session/002-${ANSWER}`,
+    ],
   );
   assert.ok(files[0].path.endsWith(ANSWER), "so .vale.ini reads it as an answer");
   assert.equal(files[0].text, "first\n");

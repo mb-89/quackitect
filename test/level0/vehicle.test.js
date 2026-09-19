@@ -38,7 +38,8 @@ function tree(extra = {}) {
     "/tools/RUNME.sh": "run me",
     "/tools/spec/guidance/voice.md": "# Actionables\n\n1. Say it plain.",
     "/tools/.git/HEAD": "ref: main",
-    "/tools/.se/.runtime/copy.json": '{"id":"abc123","made":"2026-01-01T00:00:00.000Z"}',
+    "/tools/.se/.runtime/copy.json":
+      '{"id":"abc123","made":"2026-01-01T00:00:00.000Z"}',
     ...extra,
   });
 }
@@ -46,9 +47,15 @@ function tree(extra = {}) {
 // [[spec/design_output/vehicle#the-register-holds-the-port]]
 test("a Windows root in either case is one copy, so the register keeps one entry and one port", () => {
   assert.equal(same("C:\\work\\tree", "c:/work/tree/"), true);
-  assert.equal(same("/home/user/Tree", "/home/user/tree"), false, "a POSIX path keeps its case");
+  assert.equal(
+    same("/home/user/Tree", "/home/user/tree"),
+    false,
+    "a POSIX path keeps its case",
+  );
 
-  const upper = JSON.stringify([{ id: "one", method_root: "C:\\work\\tree", port: 6510 }]);
+  const upper = JSON.stringify([
+    { id: "one", method_root: "C:\\work\\tree", port: 6510 },
+  ]);
   const kept = registers(upper, { id: "two", method_root: "c:\\work\\tree" });
   assert.deepEqual(
     kept.map((one) => one.id),
@@ -89,7 +96,10 @@ test("a root is found by the marker it carries", () => {
 test("a project names its driver, and forgets it", () => {
   const files = tree();
   attach(files, fakeClock(), "/work", "abc123");
-  assert.equal(drivenOf(files.read("/work/.se/.runtime/project.json")).driver, "abc123");
+  assert.equal(
+    drivenOf(files.read("/work/.se/.runtime/project.json")).driver,
+    "abc123",
+  );
 
   detach(files, "/work");
   assert.equal(files.exists("/work/.se/.runtime/project.json"), false);

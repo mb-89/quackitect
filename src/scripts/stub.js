@@ -8,10 +8,10 @@ import {
   KEEP,
   LINK,
   linkOf,
-  same,
   SETTINGS,
-  settingsOf,
   STUB_FOLDERS,
+  same,
+  settingsOf,
   stubFiles,
   TEMPLATE,
   upstreamOf,
@@ -20,7 +20,8 @@ import { copyHere } from "./vehicle.js";
 
 // [[spec/design_output/vehicle#the-record-names-the-vehicle]]
 export function stubInto(files, git, time, method, dest, said = {}) {
-  if (same(dest, method)) return { ok: false, why: "a stub lands beside its vehicle, elsewhere" };
+  if (same(dest, method))
+    return { ok: false, why: "a stub lands beside its vehicle, elsewhere" };
 
   const remote = git.run(["remote", "get-url", "origin"], true);
   const upstream = upstreamOf(remote.ok ? remote.out : "", said.upstream);
@@ -47,7 +48,10 @@ export function stubInto(files, git, time, method, dest, said = {}) {
   }
   files.write(join(dest, LINK), asJson(record));
   files.makeDir(dirname(join(dest, SETTINGS)));
-  files.write(join(dest, SETTINGS), asJson(settingsOf(readIf(files, join(method, SETTINGS)))));
+  files.write(
+    join(dest, SETTINGS),
+    asJson(settingsOf(readIf(files, join(method, SETTINGS)))),
+  );
   for (const rel of template) {
     const at = join(dest, rel);
     files.makeDir(dirname(at));

@@ -9,8 +9,7 @@ const NAME_BYTES = 20;
 const SIZE_AT = 2;
 
 // The format names three fields every git answers, because `ahead-behind` wants a git past 2.41 and a box carrying an older one answers the whole read with a fatal. [[spec/design_output/work#the-listing-reads-git-once]]
-export const REF_FORMAT =
-  "%(refname:short) %(objectname) %(committerdate:unix)";
+export const REF_FORMAT = "%(refname:short) %(objectname) %(committerdate:unix)";
 
 // A ref stands merged where the caller's set names it, and the set comes off `branch --merged`. [[spec/design_output/work#the-listing-reads-git-once]]
 export function refsIn(said, merged = new Set()) {

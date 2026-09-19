@@ -3,7 +3,16 @@
 // free to close. So a person answers on their own time, and the branch lands.
 // [[spec/design_output/work#a-person-step-leaves]]
 
-import { CLOSED, fieldOf, frontOf, GROUP, OPEN, stepOf, ticketAt, withField } from "./group.js";
+import {
+  CLOSED,
+  fieldOf,
+  frontOf,
+  GROUP,
+  OPEN,
+  stepOf,
+  ticketAt,
+  withField,
+} from "./group.js";
 import { landed } from "./landed.js";
 import { leafOf, stepPathOf } from "./pull.js";
 
@@ -22,8 +31,12 @@ export function unblock(it, name, argv) {
 
   // A cloud box answers what it meets and hands nothing out, so this verb is a desk's. [[spec/guidance/cloud]]
   if (it.cloud) {
-    console.error("A cloud box hands no question out. Answer it, and carry the branch to done.");
-    console.error(`Take the step: ./RUNME.sh ticket pull ${name}, and write the answer under it.`);
+    console.error(
+      "A cloud box hands no question out. Answer it, and carry the branch to done.",
+    );
+    console.error(
+      `Take the step: ./RUNME.sh ticket pull ${name}, and write the answer under it.`,
+    );
     return 2;
   }
 
@@ -35,7 +48,9 @@ export function unblock(it, name, argv) {
   const successor = noteAt(it, nextName);
   if (successor.why) {
     console.error(`${nextName} stands nowhere yet.`);
-    console.error(`Mint it first: ./RUNME.sh mint ticket ${ticketAt(nextName)} --process=<name>.`);
+    console.error(
+      `Mint it first: ./RUNME.sh mint ticket ${ticketAt(nextName)} --process=<name>.`,
+    );
     return 2;
   }
 
@@ -66,7 +81,9 @@ export function unblock(it, name, argv) {
   }
 
   console.log(`${name} closes became ${nextName}, which stands outside ${group}.`);
-  console.log(`${nextName} carries the question ${leaf.path} asks, and waits for a person.`);
+  console.log(
+    `${nextName} carries the question ${leaf.path} asks, and waits for a person.`,
+  );
   console.log("Work what is left of this group, then run ./RUNME.sh branch done.");
   return 0;
 }
@@ -98,7 +115,8 @@ function refuses(child, successor, group, nextName) {
 // A successor carries a person's question, so its first step waits for a person. A step under any other `by` hands that question to an agent, and the wall stands again one ticket along. [[spec/design_output/work#a-person-step-leaves]]
 function admits(successor, nextName) {
   const opens = openLeaf(successor.front);
-  if (!opens) return `${nextName} names no step, and a successor opens at one waiting for a person.`;
+  if (!opens)
+    return `${nextName} names no step, and a successor opens at one waiting for a person.`;
   if (opens.by === "person") return "";
   const by = opens.by || "anyone";
   return `${nextName} opens at ${opens.path} under by: ${by}, and a successor waits for a person.`;
@@ -114,7 +132,8 @@ function openLeaf(front) {
 function withQuestion(text, from, leaf) {
   const rows = questionRows(from, leaf);
   const said = String(text ?? "");
-  if (!said.includes(DISCUSSION)) return `${said.trimEnd()}\n\n${DISCUSSION}\n\n${rows}\n`;
+  if (!said.includes(DISCUSSION))
+    return `${said.trimEnd()}\n\n${DISCUSSION}\n\n${rows}\n`;
   const [head, ...rest] = said.split(DISCUSSION);
   const tail = rest.join(DISCUSSION).replace(NOTHING, "").trimEnd();
   return `${head}${DISCUSSION}\n${tail ? `${tail}\n` : "\n"}${rows}\n`;

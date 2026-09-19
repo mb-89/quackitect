@@ -140,7 +140,9 @@ const LOUD = ["new", "open", "take", "done", "release", "merge", "close", "unblo
 // A group reaches the cloud as a branch of its own, pushed off trunk, so no hand runs git for it. [[spec/design_output/work#a-group-is-a-ticket]]
 function openGroup(it, name) {
   if (!name) {
-    console.error("branch open needs a group: ./RUNME.sh branch open the-window-grows-tabs");
+    console.error(
+      "branch open needs a group: ./RUNME.sh branch open the-window-grows-tabs",
+    );
     return 2;
   }
   const at = ticketAt(name);
@@ -166,7 +168,9 @@ function openGroup(it, name) {
   }
   const mark = markOff(it, branch);
   if (!mark) {
-    console.error(`The commit that opens ${branch} came back refused, so nothing is pushed.`);
+    console.error(
+      `The commit that opens ${branch} came back refused, so nothing is pushed.`,
+    );
     return 1;
   }
   if (!it.git.run(["push", "origin", `${mark}:refs/heads/${branch}`]).ok) {

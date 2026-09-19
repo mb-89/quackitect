@@ -37,8 +37,12 @@ export async function voice(root, argv, it, bin) {
 
   console.log("Usage: ./RUNME.sh voice <verb>\n");
   console.log("  measure <folder>           score every markdown file under a folder");
-  console.log(`  measure ${TRANSCRIPTS} <f>  pull the answers out of the transcripts first`);
-  console.log("  refused [days]             rank what the doors turn away, seven by default");
+  console.log(
+    `  measure ${TRANSCRIPTS} <f>  pull the answers out of the transcripts first`,
+  );
+  console.log(
+    "  refused [days]             rank what the doors turn away, seven by default",
+  );
   return what ? 2 : 0;
 }
 

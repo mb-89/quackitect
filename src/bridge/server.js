@@ -239,7 +239,12 @@ export function serve(method, port = PORT_BASE, say = console.log) {
     if (request.method === "GET" && String(request.url).startsWith(FINDINGS)) {
       findingsFor(own, request.url).then(
         (said) => answer(response, OK, said),
-        (error) => answer(response, OK, { ok: false, found: [], fault: String(error?.message ?? error) }),
+        (error) =>
+          answer(response, OK, {
+            ok: false,
+            found: [],
+            fault: String(error?.message ?? error),
+          }),
       );
       return;
     }
@@ -350,7 +355,9 @@ export async function takesOver(port, ask = fetch, wait = pause) {
   const at = `http://127.0.0.1:${port}`;
   const stands = async () => {
     try {
-      const said = await ask(`${at}/health`, { signal: AbortSignal.timeout(TAKEOVER_PROBE) });
+      const said = await ask(`${at}/health`, {
+        signal: AbortSignal.timeout(TAKEOVER_PROBE),
+      });
       return Boolean((await said.json())?.ok);
     } catch {
       return false;
@@ -358,7 +365,10 @@ export async function takesOver(port, ask = fetch, wait = pause) {
   };
   if (!(await stands())) return false;
   try {
-    await ask(`${at}/stop`, { method: "POST", signal: AbortSignal.timeout(TAKEOVER_PROBE) });
+    await ask(`${at}/stop`, {
+      method: "POST",
+      signal: AbortSignal.timeout(TAKEOVER_PROBE),
+    });
   } catch {}
   for (let tries = 0; tries < TAKEOVER_TRIES; tries++) {
     await wait(TAKEOVER_PAUSE);

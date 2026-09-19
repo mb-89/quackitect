@@ -1,16 +1,16 @@
 // Copilot's level zero, with every outside operation supplied by doors.
 // [[spec/design_output/copilot#one-runtime]]
 
+import { heldReadsIn } from "../../../../src/scripts/guidance-hand.js";
+import { readTools, whereIs } from "../../../../src/scripts/tools.js";
+import { statusOf } from "../../../../src/scripts/work.js";
+import { candidateRun } from "./candidate-check.js";
 import { CODE, formatText, lintText as lintCode } from "./code.js";
 import { bindsHere, carried, countsOf, standingLayer } from "./guidance.js";
 import { mutations } from "./mutations.js";
 import { refusal } from "./refuse.js";
 import { landsOnTrunk } from "./trunk.js";
 import { lintText } from "./vale.js";
-import { readTools, whereIs } from "../../../../src/scripts/tools.js";
-import { statusOf } from "../../../../src/scripts/work.js";
-import { heldReadsIn } from "../../../../src/scripts/guidance-hand.js";
-import { candidateRun } from "./candidate-check.js";
 
 export const TOOL_WAIT = 4000;
 const FILES_A_CALL = 8;
@@ -32,7 +32,11 @@ export async function handle(event, it) {
     const cloud = event.surface === "cloud";
     const read = (name) => it.disk.read(it.session.path(name));
     const run = (argv, options = {}) =>
-      it.proc.run(argv, { ...options, cwd: options.cwd ?? it.root, timeoutMs: TOOL_WAIT });
+      it.proc.run(argv, {
+        ...options,
+        cwd: options.cwd ?? it.root,
+        timeoutMs: TOOL_WAIT,
+      });
     const checker = candidateRun(it, run);
     const branch = () => {
       const result = run(["git", "rev-parse", "--abbrev-ref", "HEAD"]);

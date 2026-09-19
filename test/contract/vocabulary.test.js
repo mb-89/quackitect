@@ -5,10 +5,9 @@
 
 import assert from "node:assert/strict";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import { test } from "node:test";
+import { fileURLToPath } from "node:url";
 import { readYaml } from "../../.claude/skills/level0/lib/schema.js";
-import { disk } from "../../src/doors/disk.js";
 import {
   CORE,
   coreOf,
@@ -19,6 +18,7 @@ import {
   undefinedTerms,
   wordsOf,
 } from "../../.claude/skills/level0/lib/vocabulary.js";
+import { disk } from "../../src/doors/disk.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();

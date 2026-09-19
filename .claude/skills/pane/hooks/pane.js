@@ -78,7 +78,13 @@ function gridOf($, kit, one) {
   );
   return [
     head,
-    Box({ key: `grid:${one.name}`, flexDirection: "row", flexWrap: "wrap", gap: 1, children: marks }),
+    Box({
+      key: `grid:${one.name}`,
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 1,
+      children: marks,
+    }),
   ];
 }
 
@@ -144,7 +150,8 @@ async function gestured($, cell) {
 
   const options = cell.options.map((one) => String(one));
   const far = Number(cell.gesture ?? FAR);
-  if (state.count === 1) return String(cell.value) === options[0] ? options[1] : options[0];
+  if (state.count === 1)
+    return String(cell.value) === options[0] ? options[1] : options[0];
   if (state.count === far && options.length > 2) {
     bursts.set(cell.key, { ...fresh(), deadUntil: at + DEAD });
     return options[2];
@@ -164,7 +171,15 @@ function treeOf($, kit, sections) {
   const wide = widthIn(sections);
   const under = [];
   for (const one of sections) {
-    under.push(Button({ key: `leafgroup:${one.name}`, label: `  ${one.name}`, plain: true, dimColor: true, onPress: () => {} }));
+    under.push(
+      Button({
+        key: `leafgroup:${one.name}`,
+        label: `  ${one.name}`,
+        plain: true,
+        dimColor: true,
+        onPress: () => {},
+      }),
+    );
     for (const each of one.rows) under.push(rowOf($, kit, each, wide));
   }
   return [head, Box({ key: "tree", flexDirection: "column", children: under })];
@@ -172,7 +187,8 @@ function treeOf($, kit, sections) {
 
 function widthIn(sections) {
   let widest = 0;
-  for (const one of sections) for (const each of one.rows) widest = Math.max(widest, each.leaf.length);
+  for (const one of sections)
+    for (const each of one.rows) widest = Math.max(widest, each.leaf.length);
   return Math.max(NARROW, Math.min(widest + GAP, LEAF));
 }
 
@@ -210,11 +226,15 @@ function footOf(kit, groups) {
   for (const one of groups) {
     for (const cell of one.cells) {
       if (!cell.options.length || cell.value === undefined) continue;
-      if (String(cell.value) !== String(cell.rest)) away.push(`${cell.key} is ${cell.value}`);
+      if (String(cell.value) !== String(cell.rest))
+        away.push(`${cell.key} is ${cell.value}`);
     }
   }
   const lines = [Text({ dimColor: true, wrap: "truncate-end", children: last })];
-  if (away.length) lines.push(Text({ color: "yellow", wrap: "truncate-end", children: away.join(", ") }));
+  if (away.length)
+    lines.push(
+      Text({ color: "yellow", wrap: "truncate-end", children: away.join(", ") }),
+    );
   return Box({ key: "foot", flexDirection: "column", marginTop: 1, children: lines });
 }
 
@@ -246,7 +266,10 @@ async function sectionsIn($) {
     readJson($, LOCAL),
   ]);
   const values = valuesIn(tracked, local);
-  return { groups: widgetsIn(schema, values), sections: treeIn(schema, tracked, local) };
+  return {
+    groups: widgetsIn(schema, values),
+    sections: treeIn(schema, tracked, local),
+  };
 }
 
 // [[spec/design_output/extension#the-tree-holds-config-alone]]
@@ -256,7 +279,12 @@ function widgetsIn(schema, values) {
     if (!one.group || !DRAWS.includes(one.widget)) continue;
     const at = values.get(one.key);
     const cells = out.get(one.group) ?? [];
-    cells.push({ ...one, value: at?.value, layer: at?.layer ?? "", rest: one.options[0] });
+    cells.push({
+      ...one,
+      value: at?.value,
+      layer: at?.layer ?? "",
+      rest: one.options[0],
+    });
     out.set(one.group, cells);
   }
   return [...out].map(([name, cells]) => ({
@@ -311,7 +339,13 @@ function treeIn(schema, tracked, local) {
   const known = new Map(entriesIn(schema).map((one) => [one.key, one.options]));
   const out = [];
   for (const [name, block] of Object.entries(tracked)) {
-    if (name === SAID || MACHINERY.includes(name) || !block || typeof block !== "object") continue;
+    if (
+      name === SAID ||
+      MACHINERY.includes(name) ||
+      !block ||
+      typeof block !== "object"
+    )
+      continue;
     const under = [];
     for (const [leaf, value] of Object.entries(block)) {
       if (leaf === SAID) continue;

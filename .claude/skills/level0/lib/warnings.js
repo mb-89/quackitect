@@ -51,7 +51,9 @@ export function drains(file) {
 // [[spec/tickets/one-list-holds-the-warnings]]
 export function refusedWarnings(found) {
   const files = filesOn(found);
-  const rules = [...new Set(found.map((one) => String(one?.rule ?? "")))].filter(Boolean);
+  const rules = [...new Set(found.map((one) => String(one?.rule ?? "")))].filter(
+    Boolean,
+  );
   return [
     "A file this push carries stands at warning, and nothing leaves the box while one stands.",
     "",
