@@ -8,6 +8,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { test } from "node:test";
 import { readYaml } from "../../.claude/skills/level0/lib/schema.js";
+import { CASES, slugOf } from "../../.claude/skills/level0/lib/slug.js";
 import { disk } from "../../src/doors/disk.js";
 import {
   CORE,
@@ -24,12 +25,14 @@ const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
 const read = (path) => readYaml(files.read(join(root, path)));
 
-const slug = (heading) =>
-  heading
-    .toLowerCase()
-    .replace(/[`']/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+// The slug stands in one place, and this file drives that one. [[spec/design_output/vocabulary#the-slug-reads-one-source]]
+test("the slug answers every case the source holds", () => {
+  const said = read(CASES);
+  assert.ok(said.cases?.length, `${CASES} holds no case`);
+  for (const one of said.cases) {
+    assert.equal(slugOf(one.heading), one.anchor, one.heading);
+  }
+});
 
 function noteAt(link) {
   const [path, anchor] = link.replace(/^\[\[|\]\]$/g, "").split("#");
@@ -55,7 +58,7 @@ test("every term names a note that stands, and a chapter that stands in it", () 
     }
     if (!note.anchor || !note.text) continue;
     const headings = note.text.split("\n").filter((line) => /^#{1,6} /.test(line));
-    if (!headings.some((line) => slug(line.replace(/^#+ /, "")) === note.anchor)) {
+    if (!headings.some((line) => slugOf(line.replace(/^#+ /, "")) === note.anchor)) {
       broken.push(`${one.word}: no chapter ${note.anchor} in ${one.defines}`);
     }
   }
