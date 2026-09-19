@@ -89,7 +89,12 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 8db360a439c2b09c473fbbed07d6c3197c77eae5
+    hash_after: 8db360a439c2b09c473fbbed07d6c3197c77eae5
 ---
 
 # Ask
@@ -114,6 +119,56 @@ A dead hook writes a failure on every event, and the session runs blind to it.
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+- one reader collecting every hook address the settings name
+- one probe a hook, beside the probe the server already takes
+- one row a hook in the doctor, and the third line of the ask off this tree
+
+**What stands.** `doctor` in `src/scripts/cli-check.js` prints a row a thing,
+and `serverLine` probes the one address it knows. Nothing there reads a
+settings file, and nothing probes a hook.
+
+| what the doctor names today | where it comes from |
+|---|---|
+| every tool the survey found | `.se/.runtime/tools.json` |
+| the editor, the sidebar, the commit hook | the tree |
+| the server | one health call |
+
+**The reader.** A settings file holds its hooks under one key, and an address
+there stands as a string. The reader walks the three files the client reads,
+takes every string under `hooks` that parses as a URL, and keeps where it came
+from.
+
+| the file | who writes it | does git track it |
+|---|---|---|
+| `.claude/settings.json` | this tree | yes |
+| `.claude/settings.local.json` | the box | no |
+| the settings under the home of the box | the box | no |
+
+**The probe.** Each address takes the same shape the server probe takes: one
+call, a short wait, and an answer read as a row.
+
+| what the probe meets | the row |
+|---|---|
+| an answer | `stands at <the address>` |
+| nothing, inside the wait | a `warn` row naming the address and the file |
+| an address no reader parses | a `warn` row naming the string |
+
+The wait stands in one place beside the server's own, so a slow box moves both
+together. A file standing nowhere reads as no hooks, and the doctor says
+nothing of it.
+
+**The cases.** Each drives the reader and the probe over fakes.
+
+- the reader takes an address out of each of the three files
+- the reader passes a settings file holding no hooks
+- the probe answers a row a hook, over a fake wire
+- a hook answering nothing reads as a warn row naming its file
+
+**The third line.** The ask names an entry at a port in
+`.claude/settings.local.json`. That file stands in `.gitignore`, and nothing in
+this tree reads or writes it. So a hand on the box it belongs to takes that
+line, and the doctor is what shows them the entry.
 
 ## review
 
