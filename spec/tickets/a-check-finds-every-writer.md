@@ -89,12 +89,18 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: d5cad7b0b53bba4c053c4347c98c64a59d2ca992
     hash_after: d5cad7b0b53bba4c053c4347c98c64a59d2ca992
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-2
+    hash_before: 77a2321a2621d949a9a8996d54e9f2ecd5ce30b5
+    hash_after: 77a2321a2621d949a9a8996d54e9f2ecd5ce30b5
+    returns: 1
+    why: "| finding | fix |; |---|---|; | The rule excuses a whole file where one line names `folders.js` | Bind the escape to the line beside the copy |; | The approach pins the installer alone, so every other writer keeps the escape | Hold the whole class the ask names |; | The approach adds no rule, so the fault stands in the battery alone | Put the rule in `tree.js`, beside the ones over the same names |; | `tools.js` reads the installer already, for `surveyNamesInstalls` | Pull the loop through a function beside `installedTools` |; | The case reads the installer off disk, so no bad list reaches it | Feed that function a fake installer text |; | The case carries the two apart names by hand, as a third list | Let `folders.js` own the pair, so one list stands |; | The installer holds two more lists of old spellings | Cover the folder rename loop and the log loop |; A probe over `privateFolderOwned` passes a file importing `folders.js` and; spelling `.se/bin`, so a writer the ask names stands green today. Run; `git ls-files '*.js' '*.go' '*.sh' | xargs grep -l folders.js` for the writers; the escape covers."
 ---
 
 # Ask
@@ -147,6 +153,23 @@ same names, and reads both files through the disk door.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+| finding | fix |
+|---|---|
+| The rule excuses a whole file where one line names `folders.js` | Bind the escape to the line beside the copy |
+| The approach pins the installer alone, so every other writer keeps the escape | Hold the whole class the ask names |
+| The approach adds no rule, so the fault stands in the battery alone | Put the rule in `tree.js`, beside the ones over the same names |
+| `tools.js` reads the installer already, for `surveyNamesInstalls` | Pull the loop through a function beside `installedTools` |
+| The case reads the installer off disk, so no bad list reaches it | Feed that function a fake installer text |
+| The case carries the two apart names by hand, as a third list | Let `folders.js` own the pair, so one list stands |
+| The installer holds two more lists of old spellings | Cover the folder rename loop and the log loop |
+
+A probe over `privateFolderOwned` passes a file importing `folders.js` and
+spelling `.se/bin`, so a writer the ask names stands green today. Run
+`git ls-files '*.js' '*.go' '*.sh' | xargs grep -l folders.js` for the writers
+the escape covers.
 
 # implement
 
