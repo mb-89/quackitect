@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: now
 group: the-person-step-holds
 step: verdict
@@ -130,6 +130,11 @@ record:
       - name: check
         exit: 0
         said: 87 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box ca870d4f20f4 · claude-code-remote · helper-7
+    hash_before: 79e0723394b981f8ea959830435d67509961bf50
+    hash_after: 79e0723394b981f8ea959830435d67509961bf50
+reason: done
 ---
 
 # Ask
@@ -332,17 +337,57 @@ The walk writes no skip any more. Its guard read the hand writing the last skip,
 
 <!-- every file you read, one a line -->
 
+- .claude/commands/se-config-work-failsBeforeWait.md
+- .claude/commands/se-config-work-refusalsBeforeFail.md
+- .claude/commands/se-config-work-refusalsBeforePerson.md
+- .claude/skills/level0/lib/schema.js
+- .claude/skills/level1/hooks/level1.js
+- spec/config/level0.json
+- spec/config/level0.schema.json
+- spec/design_output/pull.md
+- spec/design_output/work.md
+- spec/guidance/review/reviewing.md
+- spec/tickets/a-person-reads-the-pull.md
+- spec/tickets/escalate-inserts-a-person-step.md
+- spec/tickets/person-step-refuses-an-agent.md
+- spec/tickets/refusal-cap-inserts-no-person.md
+- spec/tickets/the-group-leaves-at-todo.md
+- src/scripts/cli-doors.js
+- src/scripts/group.js
+- src/scripts/pull-chapter.js
+- src/scripts/pull-hand.js
+- src/scripts/pull-route.js
+- src/scripts/pull-writes.js
+- src/scripts/pull.js
+- src/scripts/work.js
+- test/contract/pull-payload.test.js
+- test/level0/pull-leaves.test.js
+- test/level0/pull-steps.test.js
+- test/level0/work-group.test.js
+
 <!-- the form is files -->
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
+pass
+
+- Each of the three pieces the ask names lands, and a test holds its new answer.
+- `./RUNME.sh check` answers exit 0, and `./RUNME.sh branch test` runs green.
+- Every file the diff touches serves the ask, and each stays inside what it asks.
+- `work.js` imports `frontOf` from `group.js` a second time, so fold it into the block above.
+- `waitsAt` repeats the current-step line `pull-hand.js` and `unblock.js` carry, and one place owns it.
+- A test wants the take claiming a group whose open child carries a step a hand takes.
+- `branch review` names one fix: the handback wants the retro the group's last leaf writes.
+
 <!-- the form is verdict -->
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
+
+- `standsOpen` and the two notes each own their fact, and the verdict names the line `waitsAt` repeats.
 
 <!-- the form is checklist -->
 
