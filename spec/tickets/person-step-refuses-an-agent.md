@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-person-step-holds
-step: design/review
+step: implement/tests-red
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -97,6 +97,10 @@ record:
     hand: box ca870d4f20f4 · claude-code-remote
     hash_before: 1bbe6425e3ec1e220543c75c1b4f98d7b954c541
     hash_after: 1bbe6425e3ec1e220543c75c1b4f98d7b954c541
+  - step: design/review
+    hand: box ca870d4f20f4 · claude-code-remote · helper-2
+    hash_before: 003a26300982a422dc0386133689d824f5667990
+    hash_after: 003a26300982a422dc0386133689d824f5667990
 ---
 
 # Ask
@@ -152,7 +156,16 @@ So the hold takes the name and the record takes the role. The review leaf reads 
 
 ### verdict
 
-<!-- pass or fail, with findings one a line -->
+pass
+
+- the split answers the ask: the hold, which git ignores, takes the name, and the record takes the role
+- the voice rule and the hand-rule chapter decide that already, so the call needs no person
+- `handOf` feeds the hold's file name and the record's hand alike, so name where the name enters
+- the ask names `src/scripts/pull.js`, and the refusal stands in `handFaults` under `src/scripts/pull-chapter.js`
+- the `work` group in the config schema carries the other counts alone, so add `personSigns` with its help line
+- the git door answers `lastAuthor`, so add the signature read beside it and let a fake process fake it
+- the refusal on a `by: person` step stands today, so the first bullet asks for a test
+- a person's name in the hand changes the hold's file name, so say what a standing hold does
 
 <!-- the form is verdict -->
 
