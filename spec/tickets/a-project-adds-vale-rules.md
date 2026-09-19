@@ -362,6 +362,7 @@ config standing there:
 - A tree driving itself assembles nothing, and the door reads the method's own config.
 - The assembly answers every lint, and writes again where a source reads newer than the config.
 - The door runs Vale in the work root, so a config section matching a path reads the file in hand.
+- A name a root drops turns the copy over, so a rule nobody holds refuses no write.
 
 The command line and the editor keep reading the method's config, so a rule the
 project alone holds stays silent there. The review names that, and the ask holds
