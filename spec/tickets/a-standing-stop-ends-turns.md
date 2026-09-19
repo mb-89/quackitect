@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -129,6 +129,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box fa49097ce66c · claude-code-remote · helper-2
+    hash_before: 35797ce1ca117c9c433cda80e3f178cc6e980bba
+    hash_after: 9e2dd2589222470446e54b1648745d9bc4d6fb78
+reason: done
 ---
 
 # Ask
@@ -372,17 +377,49 @@ two doors point at it.
 
 <!-- the form is files -->
 
+    spec/tickets/a-standing-stop-ends-turns.md
+    spec/guidance/review/reviewing.md
+    spec/design_output/stop.md
+    src/bridge/stop.js
+    src/bridge/server.js
+    test/level0/stop-door.test.js
+    test/level0/stop-hold.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- the first bullet lands: `holdHere` reads the mark the drop leaves, and the turn ends
+- the second bullet lands: four cases in `stop-door.test.js` cover a hold meeting a standing stop
+- either arrival order reaches `stop` through `holdHere`, so the race stops deciding the vote
+- `sawPrompt` clears the mark, so a hold stays one turn long
+- the fourth case clears the mark and reads the block, so a bad input meets a refusal
+- `spec/design_output/stop.md` gains one chapter, which the design review asks for
+- `node --test` over the two stop files answers 20 of 20 green
+- the record holds `./RUNME.sh check` at exit 0, and `branch review` reads it passing
+- `./RUNME.sh check` here exits 1 on a Vale timeout over a style file outside this diff
+- the handback carries no retro, and this step routes there next
+- the `agentId` guard in `dropsHold` carries no case, and one belongs beside the helper case
+- the helper sentence stands in the chapter and again in the `dropsHold` comment
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- each fact the change adds lands once, and a note beside it names the chapter owning it
+
+| the fact | where it stands | the note beside it |
+|---|---|---|
+| the mark the drop leaves | the chapter The hold outlives its drop | `dropsHold` points at that anchor |
+| the reader the vote takes | the same chapter | `holdHere` and `onStop` point at the same anchor |
+| the prompt clearing the mark | the same chapter | `sawPrompt` carries the pointer beside the tooth |
+| the helper guard | the same chapter | the `dropsHold` comment repeats the sentence |
 
 # Discussion
 
