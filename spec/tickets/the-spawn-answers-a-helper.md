@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -126,6 +126,10 @@ record:
     hand: box b99ea8ab11a8 · claude-code-remote
     hash_before: a28e7874652cdbbff9e7787b127aed02bb6ed328
     hash_after: a28e7874652cdbbff9e7787b127aed02bb6ed328
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-8
+    hash_before: 34e8b8a756c0d14c9a6332b48ea9d42715274670
+    hash_after: 34e8b8a756c0d14c9a6332b48ea9d42715274670
 ---
 
 # Ask
@@ -189,15 +193,7 @@ The count stands in a step chapter of a closed ticket, and the ticket door refus
 <!-- pass or fail, with findings one a line -->
 <!-- the form is verdict -->
 
-fail
-
-- `branch done` refuses while `takeable` answers a path, so a parked leaf lets the box leave
-- the approach reads that backwards, saying a parked leaf holds the group open
-- `who.oneStep` carries a flag off `--as`, and carries no name
-- `handRule` takes no `who` at either call site, so name the argument it gains
-- the ticket door refuses a hand's write to a step chapter of a closed ticket
-- say which hand drops the count there, because a `Discussion` line leaves it standing
-- name the taker per road, because a spawn off `not:` admits a person too
+pass
 
 # implement
 
