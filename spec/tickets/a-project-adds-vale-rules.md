@@ -90,12 +90,16 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: 5178b2a8949b7d702d95a4febc5b96653082e82f
     hash_after: 5178b2a8949b7d702d95a4febc5b96653082e82f
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-2
+    hash_before: a5c6a3bb4feb4f281bc915d95226a3bf16b9a9ff
+    hash_after: a5c6a3bb4feb4f281bc915d95226a3bf16b9a9ff
 ---
 
 # Ask
@@ -165,6 +169,21 @@ Four cases hold it:
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+- The approach answers each line of the ask, and names the file every part lands in.
+- The derived folder stands under `.se`, which git ignores, so nobody edits it.
+- The case list feeds a bad write and asserts a refusal, over two roots.
+
+Findings, each one a fix for the hand at implement:
+
+- Name the folder the work root holds its own styles in, and the config it holds beside them.
+- `lintText` reads the config name from a constant, so a path handed in asks for a change there.
+- Name the root the door runs Vale in, because a config section matches a path.
+- The editor config and the command line read the method's styles, so a project rule stays silent there.
+- `copilot-runtime.js` calls the lint outside the door, so the assembled config misses that road.
+- The assembly runs once a box, so an edit to a style file after it stands unread.
 
 # implement
 
