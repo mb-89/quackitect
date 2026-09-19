@@ -163,6 +163,34 @@ at `fatal`. So the log names why the server falls, and the next start reads
 as a fresh one. A kill from outside the process writes nothing, so a log
 ending on no `fatal` line names a kill.
 
+## A session says its cage
+
+A session whose server stays down reads like one whose server stands. The agent
+inside it reads no rule and writes past every door, and it says nothing about
+either. An agent outside the cage is the one reader who cannot see the fault.
+
+So the bridgehead says it where a reader stands. The start road stands down at
+a `warn` code, and the first `prompt.context` the server answers nothing for
+carries one block, `level0-cage`:
+
+| what the block names | why a reader wants it |
+|---|---|
+| the code the start road answers | it says which piece is missing |
+| what that code means | a reader takes it without the table |
+| what the road itself says | the error under the code |
+| `./RUNME.sh`, then `./RUNME.sh serve` | what a person runs to fix it |
+
+`cageText` in `hooks/level0.js` builds the block. The hook holds that code until
+a server answers. The block asks the agent to open its first answer with one
+line saying level zero stands down. A person then tells two sessions apart at a
+glance.
+
+A box whose server stands reaches none of this. The answer of the server clears
+what the road holds, so a session reading the rules reads the canary alone.
+
+A code carrying no `warn` carries no block either. `3` says a person starts the
+server at this box, and a person standing there reads the sidebar.
+
 ## The check reads the server
 
 `./RUNME.sh check` probes the health call and carries on. A box out of a fresh

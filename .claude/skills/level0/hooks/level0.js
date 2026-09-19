@@ -188,6 +188,8 @@ async function ask($, event, e, next) {
     });
     if (!said.ok) throw new Error(`status ${said.status}`);
     saidDown = false;
+    // The server answers, so the cage stands and no block says it is missing. [[spec/design_output/level0#a-session-says-its-cage]]
+    cage = null;
     return JSON.parse(said.text || "{}");
   } catch (error) {
     await down($, event, error);
@@ -284,23 +286,23 @@ async function starts($) {
     );
   } catch (error) {
     // Node itself refuses to start, so this box carries none. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
+    const detail = String(error?.message ?? error);
+    cage = { code: NO_NODE, detail };
     await wrote($, {
       level: "warn",
       said: reasonOf(NO_NODE)[1],
       event: "session.start",
-      detail: String(error?.message ?? error),
+      detail,
     });
     return;
   }
   const code = Number(ran?.exitCode ?? 1);
   const [level, said] = reasonOf(code);
   if (!level) return;
-  await wrote($, {
-    level,
-    said,
-    event: "session.start",
-    detail: String(ran?.stderr ?? "").trim() || `exit ${code}`,
-  });
+  const detail = String(ran?.stderr ?? "").trim() || `exit ${code}`;
+  // A warning says the road stood down, so the first prompt carries the cage block. An info says a server starts, and the session reads the rules off it. [[spec/design_output/level0#a-session-says-its-cage]]
+  if (level === "warn") cage = { code, detail };
+  await wrote($, { level, said, event: "session.start", detail });
 }
 
 // One row into the session log, written by the bridgehead itself, because the log door stands behind the server the row is about. [[spec/design_output/level0#the-bridgehead-starts-it-too]]
