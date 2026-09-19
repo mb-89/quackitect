@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 group: the-person-step-holds
 step: verdict
@@ -131,6 +131,11 @@ record:
       - name: check
         exit: 0
         said: 87 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box ca870d4f20f4 · claude-code-remote · helper-7
+    hash_before: 94d33e9246c0766e02004115505bb13bdcfd05e3
+    hash_after: 94d33e9246c0766e02004115505bb13bdcfd05e3
+reason: done
 ---
 
 # Ask
@@ -328,17 +333,56 @@ The ask's third bullet retires here. [[spec/tickets/refusal-cap-inserts-no-perso
 
 <!-- every file you read, one a line -->
 
+src/scripts/pull.js
+src/scripts/pull-hand.js
+src/scripts/pull-route.js
+src/scripts/pull-writes.js
+src/scripts/work.js
+src/scripts/branch-usage.js
+src/scripts/landed.js
+src/scripts/guidance-hand.js
+src/scripts/hand.js
+src/scripts/cli-doors.js
+src/scripts/unblock.js
+test/level0/pull-steps.test.js
+test/level0/pull-leaves.test.js
+test/level0/work-group.test.js
+test/contract/pull-payload.test.js
+spec/design_output/pull.md
+spec/design_output/work.md
+spec/config/level0.json
+spec/config/level0.schema.json
+.claude/commands/se-config-work-failsBeforeWait.md
+.claude/commands/se-config-work-refusalsBeforeFail.md
+.claude/commands/se-config-work-refusalsBeforePerson.md
+spec/tickets/escalate-inserts-a-person-step.md
+spec/tickets/person-step-refuses-an-agent.md
+spec/tickets/refusal-cap-inserts-no-person.md
+spec/tickets/the-group-leaves-at-todo.md
+
 <!-- the form is files -->
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
+pass
+
+- `escalate` reads `handOf` where the other verbs read `handHere`, so a `--as` hand finds no hold.
+- `ESCALATES` holds `--options` alone, so `--as helper-7` drops its name into the question.
+- The push refusal says to run `branch escalate` again, which puts a second person step in.
+- A run with no question answers exit 2, and no test drives that line.
+- `withPersonStep` answers an empty path where the target stands nowhere, and `escalate` exits 1 in silence.
+- `./RUNME.sh branch review` answers check passes, and names the retro absent from the handback.
+- The ask's third bullet retires here, and [[spec/design_output/pull#a-count-inserts-no-step]] owns that ruling.
+
 <!-- the form is verdict -->
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
+
+- The design output chapter owns the verb, and each hunk carries one link to it.
 
 <!-- the form is checklist -->
 
