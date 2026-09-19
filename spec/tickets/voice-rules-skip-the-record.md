@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
 group: the-rules-hold-themselves
 urgent: true
 steps:
@@ -11,6 +11,7 @@ steps:
       - name: change
         form: text
         says: what you change, and what surprises you
+step: do
 ---
 
 # Ask
