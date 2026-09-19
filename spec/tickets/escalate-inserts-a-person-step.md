@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-person-step-holds
-step: implement/tests-red
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -101,6 +101,17 @@ record:
     hand: box ca870d4f20f4 · claude-code-remote · helper-2
     hash_before: 28e4aaa68a8dff1d6cbf41d55ca95c2ec6758098
     hash_after: 28e4aaa68a8dff1d6cbf41d55ca95c2ec6758098
+  - step: implement/tests-red
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: f7b961379060c6e31bca5edc5f2885ccb1380c74
+    hash_after: f7b961379060c6e31bca5edc5f2885ccb1380c74
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -173,19 +184,37 @@ pass
 
 ### tests
 
-<!-- the same tests pass -->
+    ./RUNME.sh branch test
 
 <!-- the form is command -->
 
 ### seen
 
-<!-- what you see, and what surprises you -->
+Three tests stand red on the verb the ask names, and each fails because no verb answers `branch escalate` yet.
+
+| the test | what it claims |
+|---|---|
+| `branch escalate` inserts a person step before the held leaf | the step lands, `step` points at it, the hold drops, one commit and one push follow |
+| `branch escalate --options` writes a choice answer | the answer takes the `choice` form and carries the words |
+| `branch escalate` with no hold standing refuses | the answer reads refused, and names the pull |
+
+A fourth test stands green beside them. It holds the split cap, which `withPersonStep` already refuses at.
+
+The ask's third bullet surprises a reader, and the review leaf names it first.
+
+- the bullet asks the refusal count to insert a person step
+- [[spec/tickets/refusal-cap-inserts-no-person]] closes done on this branch, and rules that road out
+- [[spec/design_output/pull#a-count-inserts-no-step]] owns the ruling, so the bullet retires here
+
+The review leaf also names two files the ask's table leaves out. The verb list stands in `pull-route.js` and the dispatch map in `work.js`, so a new verb touches both.
 
 <!-- the form is text -->
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the ask names one file, and the verb list and the dispatch stand beside it
+- the cases drive the fake doors beside them, and the change adds no door
+- each test points at the design output chapter holding the approach
 
 <!-- the form is checklist -->
 
