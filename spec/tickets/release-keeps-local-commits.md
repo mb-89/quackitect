@@ -90,7 +90,12 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 23fe31171590fa06fff96b972a1b421916f132cd
+    hash_after: 23fe31171590fa06fff96b972a1b421916f132cd
 ---
 
 # Ask
@@ -129,8 +134,24 @@ stands free. This box lost two commits that way inside one session.
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`onBranch` counts the commits origin lacks before it resets, and refuses where the count stands past zero.
+
+| where | what changes |
+|---|---|
+| `onBranch` in `src/scripts/work.js` | after the switch and before the reset, it reads `rev-list --count origin/<branch>..HEAD` |
+| the answer | names the count and names the push, and the verb returns 1 |
+| the callers | `branch take` and `branch release` both reach it, so both refuse |
+
+Two reads settle the shape:
+
+- the count reads after the switch, because the reset drops commits on the branch it lands on
+- a missing `origin/<branch>` leaves the count unreadable, and the verb carries on, because that switch leaves nothing ahead
+
+The test drives a fake git whose `rev-list` answers past zero, and runs `branch take`. It asserts the refusal names the count, and that the reset stays unrun.
+
+The objection: a box skipping the push now stalls at every verb. It stalls where it would lose the work instead, and the answer names the push clearing it.
 
 ## review
 
