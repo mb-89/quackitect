@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-step: design/draft
+step: design/review
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -124,6 +124,10 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 9183b66a38b54f46c165b7d3c1c38c787ebdeb8b
     hash_after: 9183b66a38b54f46c165b7d3c1c38c787ebdeb8b
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: f675c71cc3f09695a133b1712807d5f8478b298a
+    hash_after: f675c71cc3f09695a133b1712807d5f8478b298a
 ---
 
 # Ask
@@ -187,10 +191,10 @@ What this call weighs, on a box nobody sits beside:
 |---|---|
 | the guidance schema | takes a second mark beside `detailMarker`, as `answerMarker: "^"` |
 | the guidance library | strips the mark in `actionables`, and answers `forEvidence` |
-| the material in the pull | reads the rules through `forEvidence`, each with its chapter number |
-| the wrapper under level one | asks by number, and names the rule it hears |
+| the material in the pull | reads the rules through `forEvidence`, each with its label |
+| the wrapper under level one | asks by label, and names the note and the rule it hears |
 | the voice note | marks its two answer rules with a trailing `^` |
-| [[spec/design_output/pull#the-checks]] | says the judge answers a number, and what each answer does |
+| [[spec/design_output/pull#the-checks]] | says the judge answers a label, and what each answer does |
 
 A rule that describes an answer ends in `^`, the way a rule wanting argument
 ends in `*`. `actionables` strips both, so every reader of the chapter reads
@@ -199,11 +203,21 @@ the rule whole and the output style shows no mark. A second reader,
 chapter. So a refusal naming rule 15 names line 15 of the note, and the
 hand-out's numbering stays the one numbering.
 
-The judge then names what it finds. The classify call takes the labels
-`follows` and one number per rule it hands over. A number answers the first
-rule the evidence breaks, and the refusal names that number with the rule's
-own line. A label outside the set reads as `follows`, because a judge naming
-nothing refuses nothing.
+A label names the note beside that number, because a leaf reads several notes
+and `notesSaid` numbers from one inside each. The label is the note's path
+under `spec/guidance`, with each slash as a hyphen, then a hyphen and the
+number:
+
+| the note a leaf reads | the labels it hands the judge |
+|---|---|
+| `spec/guidance/voice` | `voice-1` up to the last rule the note carries |
+| `spec/guidance/code/code` | `code-code-1` and its siblings |
+
+The judge then names what it finds. The classify call takes `follows` and one
+label per rule it hands over. A label answers the first rule the evidence
+breaks. The refusal reads that label back to its note, naming the note, the
+number and the rule's own line. A label outside the set reads as `follows`,
+because a judge naming nothing refuses nothing.
 
 A leaf whose rules all carry the mark hands the judge an empty list. The judge
 stands silent there, as it does today where the reads name no note. So the
