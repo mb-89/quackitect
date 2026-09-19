@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -116,6 +116,12 @@ record:
     hand: box b99ea8ab11a8 · claude-code-remote
     hash_before: 76c3a09858d563f7a73aaa99fe1d87e8dec15d98
     hash_after: 76c3a09858d563f7a73aaa99fe1d87e8dec15d98
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-6
+    hash_before: dffe1e5723e27b0b4f697ee5871a543751d8c390
+    hash_after: dffe1e5723e27b0b4f697ee5871a543751d8c390
+    returns: 3
+    why: "`branch done` refuses while `takeable` answers a path, so a parked leaf lets the box leave; the approach reads that backwards, saying a parked leaf holds the group open; `who.oneStep` carries a flag off `--as`, and carries no name; `handRule` takes no `who` at either call site, so name the argument it gains; the ticket door refuses a hand's write to a step chapter of a closed ticket; say which hand drops the count there, because a `Discussion` line leaves it standing; name the taker per road, because a spawn off `not:` admits a person too"
 ---
 
 # Ask
@@ -180,11 +186,13 @@ The count in that closed ticket drops from its own chapter, because `spawnPrompt
 
 fail
 
-- `writes: true` on a helper leaf hands it to this session, because `handOut` returns `handed` first
-- say where the spawn fires: `admits` answers `other` today off `excludes` alone
-- `handRule` gains no field, so the gate cannot tell the helper under `--as` from the session
-- name the two places `the-spawn-takes-a-step` names: `admits`, and `admits` under `--as`
-- the count stands in a step chapter of that closed ticket, which a `Discussion` line leaves standing
+- `branch done` refuses while `takeable` answers a path, so a parked leaf lets the box leave
+- the approach reads that backwards, saying a parked leaf holds the group open
+- `who.oneStep` carries a flag off `--as`, and carries no name
+- `handRule` takes no `who` at either call site, so name the argument it gains
+- the ticket door refuses a hand's write to a step chapter of a closed ticket
+- say which hand drops the count there, because a `Discussion` line leaves it standing
+- name the taker per road, because a spawn off `not:` admits a person too
 
 # implement
 
