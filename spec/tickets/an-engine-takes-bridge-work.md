@@ -242,12 +242,27 @@ the same prefix.
 | `group.js` | a group, read off its ticket |
 | `queue.js` | the score weighing a ticket against the rest |
 | `hand.js` | the hand a step stands in |
+| `tools.js` | where every tool stands on this box |
 
-Each of those three reads the tree for every caller. `group.js` reaches the
-bridge as well, through the command door and the stop door, so a script folder
-is the wrong home for it.
+Each of those reads the tree for every caller. `group.js` reaches the bridge
+through the command door and the stop door. `tools.js` reaches the two linter
+doors and two doors of the bridge. So a script folder is the wrong home for
+either.
 
-Five files stay where they are, because each one runs outside a verb:
+A file carrying the name of its own verb stays where it stands, and its name
+says its topic already:
+
+| what stays | the verb it is |
+|---|---|
+| `graph.js` | `graph` |
+| `probe.js` | `probe` |
+| `stub.js` | `stub` |
+| `ticket.js` | `ticket` |
+| `tui.js` | `tui` |
+| `vehicle.js` | `vehicle` |
+| `voice.js` | `voice` |
+
+These stay as well, because each one runs outside the verb table:
 
 | what stays | who runs it |
 |---|---|
