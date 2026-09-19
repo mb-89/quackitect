@@ -33,7 +33,7 @@ import {
   withoutField,
 } from "./group.js";
 import { guidance } from "./guidance-verb.js";
-import { handOf, leafOf, pull, stepPathOf, takeable } from "./pull.js";
+import { escalate, handOf, leafOf, pull, stepPathOf, takeable } from "./pull.js";
 import { readyToMerge, review } from "./review.js";
 import { serving } from "./serve.js";
 import { freeIn, staleClaim, trigger } from "./stand.js";
@@ -95,6 +95,8 @@ export function work(root, argv, doors) {
         },
         argv,
       ),
+    // [[spec/design_output/pull#a-person-step-goes-in]]
+    escalate: (it, _name, argv) => escalate(it, argv),
     // [[spec/design_output/pull#the-work-answer]]
     guidance: (it, _name, argv) => guidance(it, (argv ?? []).slice(1), process.env),
     // [[spec/design_output/work#a-person-step-leaves]]

@@ -43,6 +43,7 @@ export const BRANCH = [
   "review",
   "list",
   "pull",
+  "escalate",
   "guidance",
   "test",
 ];

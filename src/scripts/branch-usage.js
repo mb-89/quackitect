@@ -49,6 +49,7 @@ export const USAGE = [
   "  merge <name>  take a done branch into main",
   "  close [name]  delete a branch already inside main, or every one",
   "  pull [ticket] take the next leaf of this group, or hand one back with --pass, --fail, --became",
+  "  escalate <question> [--options a,b,c] put a person step before the leaf in hand",
   "  guidance [note] the notes the held step reads, or the one note you name",
   "  unblock <t> <successor> close a ticket waiting on a person, and hand it to its successor",
   "  test [file]   run the tests the branch changes since the take: green, assertion, build or missing",

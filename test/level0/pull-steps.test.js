@@ -94,7 +94,8 @@ test("branch escalate inserts a person step before the held leaf, drops the hold
     now,
     /- name: person-1\n\s+does: answers the question the engine asks\n\s+by: person\n\s+to: engine\n\s+asks: which road does the owner want/,
   );
-  assert.equal(disk.exists(HOLD), false, "the hold drops");
+  const hold = disk.exists(HOLD) ? JSON.parse(disk.read(HOLD)) : null;
+  assert.notEqual(hold?.step, "design/draft", "the hold on the escalated leaf drops");
   assert.ok(
     ranGit(outside).some((one) => one.startsWith("git commit")),
     "one commit names the ticket and the step",

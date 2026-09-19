@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-person-step-holds
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -112,6 +112,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: 05d641fd589c62be16ddef21b97dc38d2e2ce9eb
+    hash_after: 05d641fd589c62be16ddef21b97dc38d2e2ce9eb
+    answered:
+      - name: lint
+        exit: 0
+        said: 87 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
@@ -240,13 +248,15 @@ The review leaf also names two files the ask's table leaves out. The verb list s
 
 ### lint
 
-<!-- the tree builds and lints -->
+    ./RUNME.sh lint
 
 <!-- the form is command -->
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the verb lands in the file the ask names, and its list and dispatch stand where the review leaf says
+- the cases drive the fake doors beside them, and the change adds no door
+- the verb carries one line pointing at the design output chapter holding the approach
 
 <!-- the form is checklist -->
 
