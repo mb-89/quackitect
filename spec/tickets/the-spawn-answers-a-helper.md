@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -112,6 +112,10 @@ record:
     hash_after: 87ba6fe294419f8415350cf9ef6bdb83fea7fd5f
     returns: 2
     why: "`writes: true` on a helper leaf hands it to this session, because `handOut` returns `handed` first; say where the spawn fires: `admits` answers `other` today off `excludes` alone; `handRule` gains no field, so the gate cannot tell the helper under `--as` from the session; name the two places `the-spawn-takes-a-step` names: `admits`, and `admits` under `--as`; the count stands in a step chapter of that closed ticket, which a `Discussion` line leaves standing"
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 76c3a09858d563f7a73aaa99fe1d87e8dec15d98
+    hash_after: 76c3a09858d563f7a73aaa99fe1d87e8dec15d98
 ---
 
 # Ask
@@ -137,33 +141,33 @@ A leaf `by: helper` parks today. The spawn answer passes it, a hand under `--as`
 
 ### approach
 
-The helper line gates on the box the way the agent line above it gates, and `hand.agent` already carries the box.
+The gate reads one field, and each caller answers it for the road it stands on. The draft before this one reads wrong: `hand.agent` alone hands the leaf to the session, and no spawn fires.
 
 | the answer | where it lands |
 |---|---|
 | the gate | `writesHere`, under `.claude/skills/level0/lib/ticket.js` |
+| the field | `handRule` in `src/scripts/pull-hand.js` |
+| the spawn | `admits` in that same file |
 | the taker | the spawn row of [[spec/design_output/pull#a-hand-of-its-own]] |
 | the case | `test/level0/pull.test.js` |
-| the count | the `Discussion` of [[spec/tickets/the-spawn-takes-a-step]] |
+| the count | the chapter of [[spec/tickets/the-spawn-takes-a-step]] naming it |
 
-The gate reads one field, and `handRule` in `src/scripts/pull-hand.js` fills it:
+The gate line reads `by: helper` and asks one question: does this hand take a helper leaf?
 
-| the box | what a leaf under `by: helper` reads |
-|---|---|
-| carrying a harness | takeable, because the session spawns the hand |
-| off a harness | parked, because the shell moves nothing |
+| the caller | what fills the field | why |
+|---|---|---|
+| `admits`, the pull's hand-out | the `--as` name, which `who.oneStep` carries | the spawned hand takes it, and no other |
+| `takeable`, which `branch done` reads | the harness on the box | the session spawns that hand, so the group closes |
 
-`branch done` then holds the group open where a spawn stands, and closes it where the box carries a harness.
+So a helper leaf parks for the session, and `admits` answers `other` where the box carries a harness. `handOut` then prints the spawn prompt, as it does for a leaf the `not:` rule excludes.
 
-Three answers follow:
-
+- a box off a harness reads the leaf as parked, so `branch done` holds the group open
 - the spawn row names the helper alone, because a leaf under `by: helper` admits one taker
-- two cases drive one group whose only open leaf reads `by: helper`, one box a side
-- the count goes under `Discussion` on a closed ticket, and names `spawnPrompt` as what answers it
+- [[spec/tickets/the-spawn-takes-a-step]] names `admits` and `admits` under `--as`, and both answer here
 
-The case off a harness reads the shell's own answer, and the case carrying one reads `spawn` with the helper name and the prompt.
+The cases drive one group whose only open leaf reads `by: helper`. A box off a harness reads the shell's own answer. A box carrying one reads `spawn`, the helper name and the prompt. A pull under `--as` takes the leaf.
 
-[[spec/guidance/tickets]] holds the rule that a hand writes under `Discussion` alone on a ticket it holds no step of.
+The count in that closed ticket drops from its own chapter, because `spawnPrompt` answers it. A record carrying a stale number costs a reader a check. A `Discussion` line names the correction beside it.
 
 ## review
 
