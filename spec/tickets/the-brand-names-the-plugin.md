@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgent: true
-step: implement/tests-green
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -189,6 +189,17 @@ record:
     hash_after: 61b065a4427705d71d6b9a401193d1170e9d266a
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: b5b7e53c091c3b4d3c7166e61aa117b30ae2185d
+    hash_after: b5b7e53c091c3b4d3c7166e61aa117b30ae2185d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 12 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -441,15 +452,27 @@ The slug changes what `vehicle.json` records for a folder carrying a dot. The
 shim builds its clone path off that same name, so the two stay in step and the
 lookup stands.
 
+The verdict found three things, and this round answers each:
+
+| the finding | what answers it |
+|---|---|
+| an empty brand reaches the record, the shim and the settings | `stubInto` refuses it where the brand enters the record, and `emptyBrand` holds the one wording |
+| the refusal stands under a main block, so no case fires it | a case drives `stubInto` over a vehicle whose folder slugs to nothing |
+| `stamps` takes the disk door, and no case hands it a fake | three cases drive it off `fakeDisk`, over the two files and the icon |
+
 In this tree the brand answers the name the marketplace already holds, so the
 stamp writes nothing. A vehicle under another folder name takes it on the
 first run.
 
+A folder name outside `a-z0-9` slugs to nothing, so a vehicle standing in one
+reaches no marketplace. The refusal names that folder and asks for a rename,
+which is what the design calls for.
+
 ### checked
 
-- the change touches no file the ask leaves out. The library, one script, the install script, the shim, the icon and the note.
-- every door the change reaches has a fake. `brand.js` takes the disk door as an argument, and the two new names stand pure.
-- a comment names the approach the change implements. Each one points at the chapter holding the rule.
+- the change touches no file the ask leaves out. The library, `stub.js`, `brand.js`, the install script, the shim, the icon, the cases and the note.
+- every door the change reaches has a fake. A case drives `stamps` off `src/doors/fake/disk.js`, and the refusal off the disk and the git fakes.
+- a comment names the approach the change implements. Every site points at the chapter, but the shim, which points at the anchor it lands in.
 
 # verdict
 
