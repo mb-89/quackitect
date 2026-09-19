@@ -52,6 +52,10 @@ function doors(classes) {
         return { exitCode: 0 };
       },
     "node src/scripts/cli.js ticket open the-land-verb-lands": { exitCode: 0 },
+    "node src/scripts/cli.js mint ticket spec/tickets/a-second-ticket.md --process=standard": {
+      exitCode: 2,
+      stderr: "the ask names a word outside the vocabulary",
+    },
   });
   return { disk, proc, join, root: ROOT };
 }
@@ -88,6 +92,23 @@ test("an open class mints one ticket with its ask, and a fixed class mints none"
   const ticket = it.disk.read(TICKET);
   assert.match(ticket, /# Ask\n\na commit lands in one call/);
   assert.match(ticket, /- \.\/RUNME\.sh land answers 0 over a clean tree/);
+  assert.deepEqual(JSON.parse(it.disk.read(at("classes.json"))).classes[0].tickets, [
+    "the-land-verb-lands",
+  ]);
+});
+
+// [[spec/guidance/retro/verify]]
+test("a ticket that mints keeps its name where a later one refuses", () => {
+  const second = {
+    ...CLASS,
+    id: "k3",
+    ticket: { ...CLASS.ticket, name: "a-second-ticket" },
+  };
+  const it = doors([CLASS, second]);
+
+  const { code } = heard(() => retro(ROOT, ["mint", RETRO], it));
+
+  assert.equal(code, 1, "the second ticket meets no fake, so the verb refuses");
   assert.deepEqual(JSON.parse(it.disk.read(at("classes.json"))).classes[0].tickets, [
     "the-land-verb-lands",
   ]);

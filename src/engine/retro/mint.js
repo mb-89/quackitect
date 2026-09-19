@@ -98,6 +98,8 @@ export function mint(it, name) {
     }
     one.tickets = [one.ticket.name];
     made += 1;
+    // The record lands after each ticket, so a refusal past here leaves the tickets it made named. [[spec/guidance/retro/verify]]
+    it.disk.write(at, `${JSON.stringify(record, null, 2)}\n`);
     console.log(`${one.id}  ${path}`);
   }
   it.disk.write(at, `${JSON.stringify(record, null, 2)}\n`);
