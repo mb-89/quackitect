@@ -100,6 +100,16 @@ record:
     hand: box b99ea8ab11a8 · claude-code-remote · helper-2
     hash_before: 4aa828834db0bf2c6100e02af8049a6186484955
     hash_after: 4aa828834db0bf2c6100e02af8049a6186484955
+  - step: implement/tests-red
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 6ba9334c8708ed9ab0628caa5fd31bfdf2a8261d
+    hash_after: 6ba9334c8708ed9ab0628caa5fd31bfdf2a8261d
+    returns: 1
+    why: the ask's premise stands reversed, so no test goes red and no hunk lands
+    answered:
+      - name: tests
+        exit: 0
+        said: "# duration_ms 12403.173382"
 ---
 
 # Ask
@@ -188,20 +198,29 @@ pass
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh test test/level0/pull-steps.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Every done_when of this ask stands answered or stale. `test/level0/pull-steps.test.js` pins that a count inserts no step. The same file pins that a person step past the split cap asks for a split.
+
+So no test goes red here. A red test asserts a count the tree removes. [[spec/design_output/pull#a-count-inserts-no-step]] carries the ruling.
+
+What surprises: the route carries no road for a ticket whose ask another group answers. The fail writes the reason into the record, and the merge is where a person reads the call.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the ask names one file under `src`, and this leaf writes nothing there
+- the standing cases drive `doors`, so git and the disk stand fake there
+- the record carries why no hunk lands, in place of a comment on untouched code
 
 ## reflect
 
