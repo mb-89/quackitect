@@ -13,11 +13,52 @@ export function reportOf(name, columns, later = {}) {
     "",
     ...bottomLine(later.record, later.rates),
     ...effectOf(later.effect),
-    ...promotionsOf(later.record),
+    ...listOf(
+      "Promotions",
+      later.record?.promotions,
+      ["what", "from", "to"],
+      "No promotion stands.",
+    ),
+    ...listOf(
+      "New checklist items",
+      later.record?.checklist,
+      ["item", "why"],
+      "The checklist takes no new item.",
+    ),
+    ...listOf(
+      "Limits",
+      later.record?.limits,
+      ["what", "why"],
+      "The retro names no limit.",
+    ),
+    ...drainedOf(later.record),
     ...matrixOf(columns),
     ...detailsOf(columns, later.record),
     "",
   ].join("\n");
+}
+
+// A section holding one table, or its line for none. [[spec/guidance/retro/classify]]
+function listOf(title, list, fields, none) {
+  const out = [`## ${title}`, ""];
+  if (!list?.length) return [...out, none, ""];
+  out.push(`| ${fields.join(" | ")} |`, `|${fields.map(() => "---").join("|")}|`);
+  for (const one of list)
+    out.push(`| ${fields.map((field) => one[field]).join(" | ")} |`);
+  return [...out, ""];
+}
+
+// Where every collected note and memory goes. [[spec/guidance/retro/classify]]
+function drainedOf(record) {
+  const drained = Object.entries(record?.dispositions ?? {}).filter(([id]) =>
+    /^(note|memory):/.test(id),
+  );
+  const out = ["## Notes and memory", ""];
+  if (!drained.length)
+    return [...out, "No note or memory carries a disposition yet.", ""];
+  out.push("| item | goes |", "|---|---|");
+  for (const [id, said] of drained.sort()) out.push(`| ${id} | ${said} |`);
+  return [...out, ""];
 }
 
 // The class fixes, a table per category, each ranked by its rate. [[spec/guidance/retro/classify]]
@@ -68,16 +109,6 @@ function effectOf(effect) {
       `| ${one.id} · ${one.class} | ${one.fix} | ${one.before.rate} | ${one.now.rate} | ${one.verdict} |`,
     );
   }
-  return [...out, ""];
-}
-
-// What moves up the ladder: a script to the official scripts or the engine, a sentence to a check. [[spec/guidance/retro/classify]]
-function promotionsOf(record) {
-  const out = ["## Promotions", ""];
-  if (!record?.promotions?.length) return [...out, "No promotion stands.", ""];
-  out.push("| what | from | to |", "|---|---|---|");
-  for (const one of record.promotions)
-    out.push(`| ${one.what} | ${one.from} | ${one.to} |`);
   return [...out, ""];
 }
 

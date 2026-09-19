@@ -7,6 +7,8 @@ import { CUTS, cutsOf } from "./chapters.js";
 export const FINDINGS = "findings";
 // The column the owner's field feedback fills, beside the chapters. [[spec/guidance/retro/read]]
 export const FEEDBACK = "feedback";
+// The file prefix of an auditor's column. [[spec/guidance/retro/audit]]
+export const AUDIT = "audit-";
 // The five starfish questions, then the improvements, one row each. [[spec/guidance/retro/read]]
 export const QUESTIONS = ["start", "stop", "keep", "more", "less"];
 // The improvements, which are also the categories a class fix falls in. A new one here reaches the report unchanged. [[spec/guidance/retro/classify]]
@@ -53,6 +55,19 @@ export function columnsOf(it, home) {
   const wanted = cuts.map((one) => ({ id: one.id, title: one.title }));
   if (it.disk.exists(it.join(home, FINDINGS, `${FEEDBACK}.md`))) {
     wanted.push({ id: FEEDBACK, title: "field feedback" });
+  }
+  // An auditor's column stands beside the chapters, one a checklist group. [[spec/guidance/retro/audit]]
+  const folder = it.join(home, FINDINGS);
+  const audits = it.disk.exists(folder)
+    ? it.disk
+        .list(folder)
+        .map((one) => one.name)
+        .filter((one) => one.startsWith(AUDIT) && one.endsWith(".md"))
+        .sort()
+    : [];
+  for (const one of audits) {
+    const id = one.replace(/\.md$/, "");
+    wanted.push({ id, title: `the checklist, ${id.slice(AUDIT.length)}` });
   }
   const faults = [];
   const columns = wanted.map((one) => {

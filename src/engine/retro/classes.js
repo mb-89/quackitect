@@ -1,40 +1,89 @@
 // The retro's class fixes: the classes a hand writes, checked, counted and
-// held against every finding, which each carry a disposition.
+// held against every finding, note and memory, which each carry a disposition.
 // [[spec/guidance/retro/classify]]
 
 import { CUTS } from "./chapters.js";
 import { CATEGORIES, columnsOf, itemsOf } from "./findings.js";
-import { countsOver, homeOf } from "./timeline.js";
+import { countsOver, homeOf, INPUT } from "./timeline.js";
 
 export const CLASSES = "classes.json";
 export const RATES = "rates.json";
 export const SOURCES = ["log", "transcripts", "all"];
-// A disposition dropping a finding opens on this, and a reason follows. [[spec/guidance/retro/classify]]
-export const DROPPED = "dropped:";
+// A disposition that joins no class opens on one of these, and a reason or a place follows. [[spec/guidance/retro/classify]]
+export const KINDS = ["dropped:", "done:", "ticket:"];
+// The input folders whose every file carries a disposition too: the collected notes and the memory. [[spec/guidance/retro/classify]]
+const DRAINED = [
+  { folder: "tickets", prefix: "note" },
+  { folder: "memory", prefix: "memory" },
+];
+const INDEX = "MEMORY.md";
 const PLACES = 2;
 
-// The hand's record, read: the classes, the dispositions and the promotions. [[spec/guidance/retro/classify]]
+// The hand's record, read. [[spec/guidance/retro/classify]]
 export function recordOf(text) {
   try {
     const read = JSON.parse(text);
+    const list = (key) => (Array.isArray(read?.[key]) ? read[key] : []);
     return {
-      classes: Array.isArray(read?.classes) ? read.classes : [],
+      classes: list("classes"),
       dispositions:
         read?.dispositions && typeof read.dispositions === "object"
           ? read.dispositions
           : {},
-      promotions: Array.isArray(read?.promotions) ? read.promotions : [],
+      promotions: list("promotions"),
+      limits: list("limits"),
+      checklist: list("checklist"),
     };
   } catch {
     return null;
   }
 }
 
-// Every fault of a record held against the findings: a class short a field, a finding with no disposition, a disposition naming nothing. [[spec/guidance/retro/classify]]
+// Every collected note and memory, by id, so each one answers where it goes. [[spec/guidance/retro/classify]]
+export function drainedOf(it, home) {
+  const out = [];
+  for (const one of DRAINED) {
+    const at = it.join(home, INPUT, one.folder);
+    if (!it.disk.exists(at)) continue;
+    for (const entry of it.disk.list(at)) {
+      if (entry.kind !== "file" || !entry.name.endsWith(".md") || entry.name === INDEX)
+        continue;
+      out.push({ id: `${one.prefix}:${entry.name.replace(/\.md$/, "")}` });
+    }
+  }
+  return out;
+}
+
+// Every fault of a record held against the items: a class short a field, an item with no disposition, a disposition naming nothing. [[spec/guidance/retro/classify]]
 export function faultsOf(record, items) {
-  const faults = [];
+  const faults = [...classFaults(record.classes)];
   const ids = new Set(record.classes.map((one) => String(one?.id ?? "")));
-  for (const one of record.classes) {
+  const known = new Set(items.map((one) => one.id));
+  for (const one of items) {
+    if (!(one.id in record.dispositions))
+      faults.push(`${one.id} carries no disposition`);
+  }
+  for (const [id, said] of Object.entries(record.dispositions)) {
+    if (!known.has(id))
+      faults.push(`a disposition names ${id}, and no item carries that id`);
+    const text = String(said ?? "");
+    const kind = KINDS.find((one) => text.startsWith(one));
+    const reasoned = kind && text.slice(kind.length).trim();
+    if (!reasoned && !ids.has(text)) {
+      faults.push(
+        `${id} names ${text || "nothing"}, which is no class and no ${KINDS.join(" or ")} with its reason`,
+      );
+    }
+  }
+  faults.push(...listFaults("promotion", record.promotions, ["what", "from", "to"]));
+  faults.push(...listFaults("limit", record.limits, ["what", "why"]));
+  faults.push(...listFaults("checklist item", record.checklist, ["item", "why"]));
+  return faults;
+}
+
+function classFaults(classes) {
+  const faults = [];
+  for (const one of classes) {
     for (const field of ["id", "category", "class", "defect", "fix"]) {
       if (!String(one?.[field] ?? "").trim())
         faults.push(`a class carries no ${field}: ${one?.id ?? "?"}`);
@@ -46,25 +95,15 @@ export function faultsOf(record, items) {
     if (!patternOf(one?.measure?.pattern))
       faults.push(`${one?.id} carries no pattern that compiles`);
   }
-  const known = new Set(items.map((one) => one.id));
-  for (const one of items) {
-    if (!(one.id in record.dispositions))
-      faults.push(`${one.id} carries no disposition`);
-  }
-  for (const [id, said] of Object.entries(record.dispositions)) {
-    if (!known.has(id))
-      faults.push(`a disposition names ${id}, and no finding carries that id`);
-    const text = String(said ?? "");
-    const dropped = text.startsWith(DROPPED) && text.slice(DROPPED.length).trim();
-    if (!dropped && !ids.has(text))
-      faults.push(
-        `${id} names ${text || "nothing"}, which is no class and no reason to drop`,
-      );
-  }
-  record.promotions.forEach((one, at) => {
-    for (const field of ["what", "from", "to"]) {
+  return faults;
+}
+
+function listFaults(name, list, fields) {
+  const faults = [];
+  list.forEach((one, at) => {
+    for (const field of fields) {
       if (!String(one?.[field] ?? "").trim())
-        faults.push(`promotion ${at + 1} carries no ${field}`);
+        faults.push(`${name} ${at + 1} carries no ${field}`);
     }
   });
   return faults;
@@ -114,7 +153,8 @@ export function classes(it, name) {
     return 1;
   }
   const { columns, faults: missing } = columnsOf(it, home);
-  const faults = [...missing, ...faultsOf(record, itemsOf(columns))];
+  const items = [...itemsOf(columns), ...drainedOf(it, home)];
+  const faults = [...missing, ...faultsOf(record, items)];
   if (faults.length) {
     for (const one of faults) console.error(one);
     return 1;
@@ -128,7 +168,7 @@ export function classes(it, name) {
     );
   }
   console.log(
-    `${rates.hours} active hour(s), and every finding carries a disposition.`,
+    `${rates.hours} active hour(s), and every finding, note and memory carries a disposition.`,
   );
   return 0;
 }

@@ -101,7 +101,64 @@ test("classes refuse a finding with no disposition, and a disposition naming not
 
   assert.equal(code, 1);
   assert.match(said, /c1\.keep\.1 carries no disposition/);
-  assert.match(said, /c1\.stop\.1 names k9, which is no class and no reason to drop/);
+  assert.match(
+    said,
+    /c1\.stop\.1 names k9, which is no class and no dropped: or done: or ticket: with its reason/,
+  );
+});
+
+test("every collected note and memory answers where it goes, and the report lists them with the checklist and the limits", () => {
+  const files = tree(FIRST, WHOLE, {
+    [at(FIRST, "input/tickets/a-parked-thought.md")]: "---\nkind: [[ticket]]\n---\n",
+    [at(FIRST, "input/memory/MEMORY.md")]: "- an index line\n",
+    [at(FIRST, "input/memory/a-rule.md")]: "a remembered rule\n",
+  });
+  const missing = heard(() => retro(ROOT, ["classes", FIRST], doors(files)));
+  assert.equal(missing.code, 1);
+  assert.match(missing.said, /note:a-parked-thought carries no disposition/);
+  assert.match(missing.said, /memory:a-rule carries no disposition/);
+  assert.doesNotMatch(missing.said, /memory:MEMORY/);
+
+  const record = {
+    ...WHOLE,
+    dispositions: {
+      ...WHOLE.dispositions,
+      "note:a-parked-thought": "done: the land verb carries it",
+      "memory:a-rule": "ticket: the-rule-moves-home",
+    },
+    checklist: [
+      {
+        item: "Does every change reach the running system?",
+        why: "three classes share it",
+      },
+    ],
+    limits: [{ what: "the thinking", why: "the transcripts keep it empty" }],
+  };
+  const it = doors({ ...files, [at(FIRST, "classes.json")]: JSON.stringify(record) });
+  assert.equal(heard(() => retro(ROOT, ["classes", FIRST], it)).code, 0);
+  heard(() => retro(ROOT, ["matrix", FIRST], it));
+  const report = it.disk.read(at(FIRST, "report.md"));
+  assert.match(report, /\| note:a-parked-thought \| done: the land verb carries it \|/);
+  assert.match(
+    report,
+    /## New checklist items[\s\S]*Does every change reach the running system\?/,
+  );
+  assert.match(
+    report,
+    /## Limits[\s\S]*\| the thinking \| the transcripts keep it empty \|/,
+  );
+});
+
+test("an auditor's column joins the matrix beside the chapters", () => {
+  const it = doors(
+    tree(FIRST, WHOLE, {
+      [at(FIRST, "findings/audit-code.md")]: findings({
+        stop: ["a header retells its pointer"],
+      }),
+    }),
+  );
+  const { said } = heard(() => retro(ROOT, ["classes", FIRST], it));
+  assert.match(said, /audit-code\.stop\.1 carries no disposition/);
 });
 
 test("classes count each pattern per active hour, and the report opens on them", () => {

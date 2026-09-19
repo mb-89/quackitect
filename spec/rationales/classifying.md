@@ -45,8 +45,40 @@ The rate is a count of pattern matches per active hour of work. The engine
 computes it and checks the dispositions, so a hand writes the judgment and
 the engine does the arithmetic.
 
-## 9. One ticket per class
+## 9. Tickets after the reading
 
 An improvement written only into a report is one nobody schedules. So each
 class gets one ticket, small enough for a stranger to act on. The class names
-its ticket, so the next retro finds it.
+its ticket, so the next retro finds it. The tickets come after the owner reads
+the report, because the owner holds the half the record lacks.
+
+## 10. Notes and memory drain too
+
+A note left open becomes history, and the next retro weighs it as work
+again. The memory holds rules a single box keeps, where no other hand reads
+them. So each one leaves with a disposition, and the engine refuses a retro
+leaving one behind.
+
+## 11. Check before judging
+
+The third version sampled its twelve smallest open notes and found most of
+them shipped, some days earlier. A note is a claim about the tree, and the
+tree answers in seconds.
+
+## 12. Planned already
+
+A retro minting a ticket the queue holds already splits one fix into two
+tickets, and their conditions drift apart. Naming the standing ticket keeps
+one.
+
+## 13. What the retro reads nowhere
+
+A retro silent about what it skips reads like one that covers everything,
+and the next inherits the gap. This retro found the thinking empty in every
+transcript, and said so.
+
+## 14. One level up
+
+A class names one defect. A checklist item names the question that catches a
+family of defects, before the next one of its kind forms. So each retro asks
+what its classes share, and the checklist grows by that question.

@@ -17,3 +17,5 @@ rationale: [[spec/rationales/signals]]
 9. Rank by what repeats, because one shape three times is a property of the machinery. *
 10. Name the cheapest change that stops a pattern: a check, a refusal, a gate, a prefill, then a sentence. *
 11. Record what goes well too, and name the practice behind it. *
+12. Read every failed review on its own, and name the shape of the mistake beneath it. *
+13. Name a tool nobody calls, and a tool a hand calls and then corrects. *

@@ -72,3 +72,16 @@ a reader who remembers it, so it comes last.
 
 A retro asking only for faults loses the practice worth keeping. Naming what
 made a chapter go well keeps the next retro from trading that practice away.
+
+## 12. Each failed review alone
+
+The third version read every failed review on its own. Five failures in one
+record turned out one shape in five forms: a cheap proxy passing for the real
+thing. Read in a batch, the shapes hide, and read one at a time, the repeat
+shows.
+
+## 13. Tools unused or corrected
+
+A tool nobody calls is one the hand misses or doubts. A tool called and then
+corrected answers the wrong question. Both point at the tool, and neither
+shows in a count of what the hand did.

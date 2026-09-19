@@ -38,10 +38,32 @@ steps:
         form: command
         expects: 0
         says: retro effect, which answers each earlier class with its rate before and now
+  - name: audit
+    does: auditors walk the checklist over what the window lands, and write a findings column each
+    by: anyone
+    input: effect
+    needs: ["retro"]
+    reads: [[spec/guidance/retro/audit]]
+    checklist:
+      - the code the window lands follows [[spec/guidance/code/code]]
+      - every change lands with a test that fails before it and passes after, as [[spec/guidance/code/testing]] asks
+      - every note the window writes holds the shape [[spec/guidance/guidance]] asks
+      - the work follows [[spec/guidance/working]], a turn at a time
+      - a change reaches every place holding the same thing, each writer, each copy and each name
+      - the running system carries the change, rebuilt, restarted or reloaded
+      - every claim to the owner rests on a check against what the owner sees
+      - every mechanical step runs through a verb, and no hand repeats it
+      - every piece of work lands in the place owning its topic
+      - every experiment stands decided, kept or taken out
+      - every refusal teaches the hand, and no hand retries it blind
+    evidence:
+      - name: audits
+        form: list
+        says: every audit findings file this step writes, one a line
   - name: chapter
     does: cuts the window into chapters of about six hours, and the engine hands every chapter its lines
     by: anyone
-    input: effect
+    input: audit
     needs: ["retro"]
     reads: [[spec/guidance/retro/chapter]]
     evidence:
