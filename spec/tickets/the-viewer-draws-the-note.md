@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -135,6 +135,10 @@ record:
     hash_after: 65d363e253d59a99631dcbb4fbacfb7f102c4d36
     returns: 1
     why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | the colour lands, and the note the design output owes stands open |; | is what the diff touches beyond the ask trivial | yes, the hunks reach two files the ask names |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does every rule the change adds carry a case | for the colour, yes. For a note after an answer, no |; | does a case feed the rule something bad | yes, the colour case reads a note against four other kinds |; TL;DR:; The three hunks answer the three cases, and the copy of the answer's number goes.; `./RUNME.sh check` answers 0, and the viewer's own tests pass.; The design output takes none of this change, and the code points at two of its chapters.; A note standing after an answer reaches no prompt, and no case reads that shape.; The findings, one a line:; `spec/design_output/viewer.md` takes none of this change, and the code points at two chapters.; The Colours chapter names no note line, and the approach's own table asks for one.; The details chapter says a prompt shows the reply, and says nothing of its notes.; `pairsOf` drops a note standing after the answer, because `answered` turns true there.; The approach gives a prompt every note between it and its reply, so that note belongs there.; The third case holds a prompt, a note, a reply and a prompt, and reads no answer.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the Colours chapter names the note line the approach promises | open |; | 2 | the details chapter says a prompt shows the notes it carries | open |; | 3 | `pairsOf` takes a note after the answer, with a case reading that shape | open |; | 4 | the verdict hand reads every hunk again | open |"
+  - step: implement/reflect
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: b8c7600d6b902efc37f37d1136646bc338ea48b6
+    hash_after: b8c7600d6b902efc37f37d1136646bc338ea48b6
 ---
 
 # Ask
@@ -244,15 +248,26 @@ The third case reads the details. `pairsOf` walks forward from a prompt and take
 
 ### class
 
-<!-- the class of error the findings describe, and the fix for the class -->
+Two classes stand under the findings.
 
-<!-- the form is text -->
+| the class | the findings it carries | the fix for the class |
+|---|---|---|
+| a hunk points at a chapter, and the chapter takes none of the change | the Colours chapter, the details chapter | a hunk naming a chapter carries that chapter's line in the same change |
+| a case reads the code, and the approach reads wider | `pairsOf`, and the third case | write the case off the approach's words, then make the code answer it |
+
+The first class is the one the verdict checklist names. A comment pointing at a
+chapter tells a reader the chapter holds the rule. Where the chapter holds an
+older rule, the pointer costs a read and hands back the wrong answer.
+
+The second class hides behind a green case. The approach gives a prompt every
+note between it and its reply. The code gives it the notes ahead of the answer,
+and the case holds a shape carrying no answer, so the two read green together.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change touches no file the ask leaves out. The fix reaches `detail.go`, its cases, and the note both hunks point at.
+- every door the change reaches has a fake. The fix reaches no door, and the cases read rows the caller hands them.
+- a comment names the approach the change implements. Each hunk keeps the chapter it points at, and that chapter takes the rule.
 
 ## change
 
