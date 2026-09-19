@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgent: true
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -183,6 +183,14 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 3c0b30d94533c5eee09e9de3501bf62da203a93f
     hash_after: 3c0b30d94533c5eee09e9de3501bf62da203a93f
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 61b065a4427705d71d6b9a401193d1170e9d266a
+    hash_after: 61b065a4427705d71d6b9a401193d1170e9d266a
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -390,13 +398,13 @@ The comments take the chapter, so the line reads true.
 
 ### lint
 
-    ./RUNME.sh lint src/scripts/brand.js .claude/skills/level0/lib/vehicle.js src/scripts/install.sh src/stub/RUNME.sh spec/design_output/vehicle.md
+    ./RUNME.sh lint src/scripts/brand.js src/scripts/stub.js .claude/skills/level0/lib/vehicle.js src/scripts/install.sh test/level0/brand.test.js spec/design_output/vehicle.md
 
 ### checked
 
-- the change touches no file the ask leaves out. The library, one script, the install script, the shim, the icon and the note the code points at.
-- every door the change reaches has a fake. The two new names stand pure, and `brand.js` takes the disk door as an argument.
-- a comment names the approach the change implements. Each one points at [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]].
+- the change touches no file the ask leaves out. The library, `stub.js`, `brand.js`, the install script, the shim, the icon, the cases and the note.
+- every door the change reaches has a fake. A case drives `stamps` off `src/doors/fake/disk.js`, and the refusal off the disk and the git fakes.
+- a comment names the approach the change implements. Every site points at [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]], but the shim, which points at the level0 anchor it lands in.
 
 ## tests-green
 

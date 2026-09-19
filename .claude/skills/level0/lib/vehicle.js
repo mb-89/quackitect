@@ -151,6 +151,13 @@ export function brandOf(method) {
 }
 
 // [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+export function emptyBrand(method) {
+  const parts = slashed(method).replace(/\/+$/, "").split("/");
+  const last = parts[parts.length - 1] ?? "";
+  return `${last} carries no letter and no digit, so it slugs to an empty brand. Rename the folder to one a marketplace takes, or move the vehicle into one.`;
+}
+
+// [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 export function brandedJson(text, brand) {
   const held = parsed(text);
   if (!held || typeof held !== "object" || Array.isArray(held)) return String(text);

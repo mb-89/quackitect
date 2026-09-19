@@ -5,6 +5,7 @@
 import { dirname, join } from "node:path";
 import {
   brandOf,
+  emptyBrand,
   KEEP,
   LINK,
   linkOf,
@@ -31,10 +32,14 @@ export function stubInto(files, git, time, method, dest, said = {}) {
     };
   }
 
+  // The brand enters the record here, so an empty one stops here. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+  const brand = brandOf(method);
+  if (!brand) return { ok: false, why: emptyBrand(method) };
+
   const template = walk(files, join(method, TEMPLATE));
   const record = linkOf(
     copyHere(files, time, method),
-    brandOf(method),
+    brand,
     upstream,
     versionOf(files, method),
     time.stamp(),

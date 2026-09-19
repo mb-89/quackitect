@@ -2,11 +2,15 @@
 // The brand a vehicle stamps on itself. The install script runs this ahead of
 // every verb, so the marketplace name, its owner and the plugin's author each
 // answer the folder the tree stands in.
-// [[spec/tickets/the-brand-names-the-plugin]]
+// [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { brandOf, brandedJson } from "../../.claude/skills/level0/lib/vehicle.js";
+import {
+  brandOf,
+  brandedJson,
+  emptyBrand,
+} from "../../.claude/skills/level0/lib/vehicle.js";
 import { disk } from "../doors/disk.js";
 
 export const MARKETPLACE = ".claude-plugin/marketplace.json";
@@ -14,7 +18,7 @@ export const PLUGIN = ".claude/skills/level0/.claude-plugin/plugin.json";
 export const ICON_SOURCE = "spec/config/brand/icon.svg";
 export const ICON_TARGET = "src/extension/icon.svg";
 
-// [[spec/tickets/the-brand-names-the-plugin]]
+// [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 export function stamps(files, root, brand) {
   const done = [];
   for (const rel of [MARKETPLACE, PLUGIN]) {
@@ -49,7 +53,7 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
   const root = join(dirname(fileURLToPath(import.meta.url)), "..", "..");
   const brand = brandOf(root);
   if (!brand) {
-    console.error(`${root} slugs to an empty brand, so nothing takes a name.`);
+    console.error(emptyBrand(root));
     process.exit(1);
   }
   for (const one of stamps(disk(), root, brand)) console.log(`  ${one} reads ${brand}`);
