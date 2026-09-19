@@ -20,6 +20,13 @@ export function unblock(it, name, argv) {
     return 2;
   }
 
+  // A cloud box answers what it meets and hands nothing out, so this verb is a desk's. [[spec/guidance/cloud]]
+  if (it.cloud) {
+    console.error("A cloud box hands no question out. Answer it, and carry the branch to done.");
+    console.error(`Take the step: ./RUNME.sh branch pull ${name}, and write the answer under it.`);
+    return 2;
+  }
+
   const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out.trim();
   const group = branch.replace(/^work\//, "");
 

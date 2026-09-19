@@ -7,9 +7,17 @@ import { BIN as INDEX_BIN } from "../../.claude/skills/level0/lib/index.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
 import { schemaFaults } from "../../.claude/skills/level0/lib/schema.js";
 import { treeFaults } from "../../.claude/skills/level0/lib/tree.js";
+import { WARNING } from "../../.claude/skills/level0/lib/warnings.js";
 import { findingsOver, readThrough, showOf, walkOver } from "../bridge/findings.js";
 import { serverFaults, treeHere } from "./cli-check.js";
 import { bin, biome, COL, files, it, outside, root, SHOWN } from "./cli-doors.js";
+
+// What the last lint left standing at warning. The stamp takes it, and the stop door reads the stamp. [[spec/tickets/the-spawn-reaches-its-guidance]]
+let stood = [];
+
+export function warningsStood() {
+  return stood;
+}
 
 export function version() {
   try {
@@ -37,10 +45,8 @@ export function readThroughTheReader(found) {
   return readThrough({ disk: files, join, root }, found);
 }
 
-// What the last lint heard, which the stamp reads beside the exit. [[spec/guidance/retro/collect]]
-export const heard = { warned: false };
-
 export async function lint(where) {
+  stood = [];
   if (!files.exists(bin)) {
     console.error("Vale is missing. Run ./RUNME.sh once and it installs.");
     return 2;
@@ -83,8 +89,6 @@ export async function lint(where) {
   }
 
   const ms = it.clock.now().getTime() - began;
-  // A warning passes the check and still holds a retro shut, so the stamp carries whether one stands. [[spec/guidance/retro/collect]]
-  heard.warned = found.length > 0;
   if (!found.length) {
     await it.log.say("info", "vale", `the rules pass over ${where.join(" ")}`, { ms });
     console.log("The rules pass.");
@@ -110,7 +114,8 @@ export async function lint(where) {
   console.log(`${String(found.length).padStart(COL.count)}  in all`);
 
   // [[spec/design_output/schema#warning-now-and-error-later]]
-  const refused = found.filter((one) => one.severity !== "warning").length;
+  stood = found.filter((one) => one.severity === WARNING);
+  const refused = found.length - stood.length;
   if (refused) return 1;
   console.log("");
   console.log(

@@ -56,6 +56,8 @@ export function doors(files, answers = {}, more = {}) {
     clock: fakeClock(),
     agent: true,
     cloud: true,
+    // A case names its own environment, so the box running it changes no answer. [[spec/guidance/code/testing]]
+    env: {},
     node: "node",
     ...more,
   };

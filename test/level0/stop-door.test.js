@@ -33,8 +33,16 @@ const RULES = `
   side: stop
   priority: 45
   decides: claimed
+  yields: true
   asks: Does the work stand complete?
   says: The work stands complete, so this turn ends.
+
+- id: warnings-stand-past-the-number
+  side: continue
+  priority: 10
+  decides: mechanical
+  runs: warnings-standing
+  says: The warnings stand past the number, and a hand drains them beside you.
 
 - id: the-tooth-is-out
   side: continue
@@ -44,14 +52,19 @@ const RULES = `
   says: The stop hook stands off.
 `;
 
-const CONFIG = JSON.stringify({
-  stop: { enabled: true, mostInARow: 3, hold: "off" },
-  engine: { binding: "queue" },
-});
+// [[spec/tickets/the-spawn-reaches-its-guidance]]
+const REFACTOR = { parallel: true, mostWarnings: 2, mostAtOnce: 1, untouchedFor: "7d" };
 
-function box(files = {}) {
+const NOW = 1_800_000_000;
+const WEEK = 604_800;
+
+function box(files = {}, refactor = REFACTOR) {
   const disk = fakeDisk({
-    [at("spec/config/level0.json")]: CONFIG,
+    [at("spec/config/level0.json")]: JSON.stringify({
+      stop: { enabled: true, mostInARow: 3, hold: "off" },
+      engine: { binding: "queue" },
+      refactor,
+    }),
     [at("spec/config/stop/level0.yml")]: RULES,
     ...files,
   });
@@ -63,9 +76,28 @@ function box(files = {}) {
       work: ROOT,
       method: ROOT,
       env: {},
-      proc: fakeProc({ "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } }),
+      clock: { now: () => new Date(NOW * 1000) },
+      proc: fakeProc({
+        "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
+        "git log -1 --format=%ct -- old.md": { stdout: `${NOW - WEEK * 2}\n` },
+        "git log -1 --format=%ct -- new.md": { stdout: `${NOW - 60}\n` },
+      }),
       log: { say: (...row) => said.push(row) },
     },
+  };
+}
+
+// The stamp the check leaves, which the refactoring rule reads. [[spec/tickets/the-spawn-reaches-its-guidance]]
+function stamped(warnings, names) {
+  return {
+    [at(".se/.runtime/check.json")]: JSON.stringify({
+      sha: "a1",
+      ok: true,
+      clean: true,
+      at: "2026-01-01T00:00:00Z",
+      warnings,
+      files: names,
+    }),
   };
 }
 
@@ -108,6 +140,50 @@ test("a turn with no stop line holds, and the block names the reasons", () => {
     /names no stop reason/,
     "the log carries what prompts after",
   );
+});
+
+// [[spec/tickets/the-spawn-reaches-its-guidance]]
+test("the door answers the vote and the hand together, and the hand takes the file outside the window", () => {
+  const it = box(stamped(9, ["old.md", "new.md"]));
+  const said = onStop({ last_assistant_message: "Some text and no stop." }, it.box);
+
+  assert.match(said.result.block, /names no stop reason/);
+  assert.equal(said.spawn.kind, "refactor");
+  assert.equal(said.spawn.file, "old.md");
+  assert.match(said.spawn.prompt, /old\.md/);
+  assert.equal(said.back.event, "refactor.answered");
+});
+
+// [[spec/tickets/the-spawn-reaches-its-guidance]]
+test("the hand goes once a session, and the flag off starts none", () => {
+  const it = box(stamped(9, ["old.md"]));
+  const turn = { last_assistant_message: "Some text and no stop." };
+
+  assert.equal(onStop(turn, it.box).spawn.file, "old.md");
+  assert.equal(onStop(turn, it.box).spawn, undefined, "the count bounds the session");
+
+  const off = box(stamped(9, ["old.md"]), { ...REFACTOR, parallel: false });
+  assert.equal(onStop(turn, off.box).spawn, undefined);
+});
+
+// A rule reading the list alone holds every turn open on a tree carrying warnings. [[spec/tickets/the-spawn-reaches-its-guidance]]
+test("the vote holds the turn open while a hand wants to go, and lets it end after", () => {
+  const it = box(stamped(9, ["old.md"]));
+  const done = { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" };
+
+  assert.match(onStop(done, it.box).result.block, /warnings stand past the number/);
+  assert.deepEqual(onStop(done, it.box), { pass: true }, "the count spends, and the turn ends");
+
+  const off = box(stamped(9, ["old.md"]), { ...REFACTOR, parallel: false });
+  assert.deepEqual(onStop(done, off.box), { pass: true }, "the flag off holds no turn");
+});
+
+// [[spec/tickets/the-spawn-reaches-its-guidance]]
+test("a list under the number starts no hand, and the vote reads the stamp", () => {
+  const it = box(stamped(1, ["old.md"]));
+  const said = onStop({ last_assistant_message: "Done.\n\nstop: the-work-stands-complete" }, it.box);
+
+  assert.deepEqual(said, { pass: true });
 });
 
 test("the queue holds a stop on completion while a free ticket stands", () => {

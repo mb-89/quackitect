@@ -401,7 +401,7 @@ test("done leaves a group open where a ticket in it stands open, and names it", 
     [on("one-group")]: withField(took, "step", "children"),
     [on("a-child")]: CHILD("one-group", "open").replace(
       "    does: makes",
-      "    by: person\n    does: makes",
+      "    by: helper\n    does: makes",
     ),
     [on("elsewhere")]: CHILD("another-group", "open"),
     ...green,

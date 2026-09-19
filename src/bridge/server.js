@@ -27,7 +27,9 @@ import { asks } from "./config.js";
 import {
   dropsHold,
   holdsCall,
+  onRefactorAnswered,
   onStop,
+  REFACTOR_ANSWERED,
   sawCall,
   sawPrompt,
   SPECS as stopSpecs,
@@ -75,6 +77,7 @@ const DOORS = {
   "tool.describe": onDescribe,
   "tool.call": onToolCall,
   [ANSWERED]: onAgentAnswered,
+  [REFACTOR_ANSWERED]: onRefactorAnswered,
 };
 
 const TOOLS = {

@@ -13,11 +13,12 @@ import {
 
 export { HELPER, SPAWN, spawnPrompt } from "./spawn.js";
 
+import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
 import { notesSaid, parsed } from "./guidance-hand.js";
 import { PERSON, roleOf } from "./hand.js";
-import { excludes } from "./pull-hand.js";
+import { excludes, handRule } from "./pull-hand.js";
 import { ANSWERED, bare, CHECKED, COMMENT, CUT, FENCE, WORK } from "./pull-route.js";
-import { changedSince, tipOf } from "./pull-writes.js";
+import { changedSince, commitsFor, tipOf } from "./pull-writes.js";
 
 // A shell answers this where it finds no command, which a backtick or a fence around the line earns. [[spec/design_output/pull#the-fields-hold-their-forms]]
 const NO_COMMAND = 127;
@@ -381,14 +382,19 @@ export function commandsRun(it, leaf, chapter, found) {
 // [[spec/design_output/pull#the-hand-rule]]
 export function handFaults(it, one, leaf, hand, held) {
   const out = [];
-  if (leaf.by === "person" && it.agent && !it.ownerSays)
+  // [[spec/tickets/the-one-answer-takes-shape]]
+  const said = writesHere(leaf, handRule(it, one.front, [], ""));
+  if (!said.writes && said.person)
     out.push(`${leaf.path} is a person's step, and this hand is an agent.`);
   out.push(...signFaults(it, one, hand));
   const other = excludes(one.front, leaf, hand);
   if (other) out.push(`${leaf.path} ${other}.`);
   if (leaf.evidence.some((field) => field.form === "verdict") && !one.private) {
     const tip = tipOf(it);
-    if (held.hash && tip !== held.hash) {
+    // A sibling hand commits beside this reader, and that costs the reading nothing. A commit naming this ticket is this hand's own write, which the rule refuses. [[spec/tickets/the-verdict-guard-reads-tips]]
+    const moved =
+      held.hash && tip !== held.hash ? commitsFor(it, one.name, held.hash) : null;
+    if (moved && (!moved.read || moved.own.length)) {
       out.push(
         `a verdict comes from a hand that leaves the tip where it stands, and ${shortOf(held.hash)} moved to ${shortOf(tip)}.`,
       );

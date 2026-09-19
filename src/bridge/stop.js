@@ -11,10 +11,13 @@ import {
   STOP,
 } from "../../.claude/skills/level0/lib/controls.js";
 import { CHECK } from "../../.claude/skills/level0/lib/answer.js";
+import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
 import { HOLDS, TICKETS } from "../../.claude/skills/level0/lib/folders.js";
 import { rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
-import { ticketAt, WORK_BRANCH } from "../scripts/group.js";
+import { stampOf, STAMP } from "../../.claude/skills/level0/lib/runs.js";
+import { drains, standsPast, takesFile } from "../../.claude/skills/level0/lib/warnings.js";
+import { spanOf, ticketAt, WORK_BRANCH } from "../scripts/group.js";
 import { heldGroup, openPrivate, queueHolds } from "../../.claude/skills/level0/lib/ticket.js";
 import {
   decide,
@@ -34,7 +37,19 @@ import { REPORT_CALL } from "./report.js";
 
 const ENABLED = "stop.enabled";
 const MOST = "stop.mostInARow";
+// The refactoring hand this door starts. [[spec/tickets/the-spawn-reaches-its-guidance]]
+const REFACTOR = {
+  on: "refactor.parallel",
+  most: "refactor.mostWarnings",
+  atOnce: "refactor.mostAtOnce",
+  untouched: "refactor.untouchedFor",
+};
+export const KIND = "refactor";
+export const REFACTOR_ANSWERED = "refactor.answered";
 const BREAK = "SE_BREAK_ON_STOP";
+const HELPER = "general-purpose";
+const MS = 1000;
+const SAID = 200;
 const LINE = /^stop:\s*([a-z0-9-]+)\s*$/i;
 const PASS = { pass: true };
 
@@ -151,8 +166,63 @@ export function onStop(e, box) {
     debugger;
     box.log.say("debug", "stop", "the debugger read the stop", paused);
   }
-  if (said.ends) return PASS;
-  return { result: { block: prompts } };
+  // The vote and the hand ride one answer, so the turn's block stands and the cleaning starts beside it. [[spec/tickets/the-spawn-reaches-its-guidance]]
+  const hand = refactorHand(box);
+  const answer = said.ends ? { ...PASS } : { result: { block: prompts } };
+  if (!hand) return answer;
+  return { ...answer, spawn: hand, back: { event: REFACTOR_ANSWERED, file: hand.file } };
+}
+
+// Whether a hand still wants to go: the flag on, the list past the number, and this session's count unspent. The vote reads this, because a rule reading the list alone holds every turn open on a tree carrying warnings. [[spec/tickets/the-spawn-reaches-its-guidance]]
+export function handWanted(box) {
+  if (asks(box, REFACTOR.on) === false) return false;
+  if (!standsPast(stampHere(box).warnings, asks(box, REFACTOR.most))) return false;
+  const most = Number(asks(box, REFACTOR.atOnce) ?? 0);
+  return !(most > 0 && (box.refactors ?? 0) >= most);
+}
+
+// The hand the rule starts: the file it takes, and the count it spends. [[spec/tickets/the-spawn-reaches-its-guidance]]
+export function refactorHand(box) {
+  if (!handWanted(box)) return null;
+  const stamp = stampHere(box);
+  const now = Math.floor(box.clock.now().getTime() / MS);
+  const file = takesFile(stamp.files, wroteIn(box, stamp.files), now, spanOf(asks(box, REFACTOR.untouched)));
+  if (!file) return null;
+  box.refactors = (box.refactors ?? 0) + 1;
+  box.log.say("info", "refactor", `a hand takes ${file}, of ${stamp.warnings} standing`, { file });
+  return { prompt: drains(file), description: `drain the warnings in ${file}`, subagentType: HELPER, kind: KIND, file };
+}
+
+// [[spec/tickets/the-spawn-reaches-its-guidance]]
+export function onRefactorAnswered(e, box) {
+  const said = String(e?.deny ?? "") || (e?.isError ? String(e?.text ?? "") : "");
+  box.log.say(said ? "warn" : "info", "refactor", `the hand leaves ${e?.file ?? "a file"}`, {
+    detail: said || String(e?.text ?? "").slice(0, SAID),
+  });
+  return { result: { result: "the refactoring hand answered" } };
+}
+
+// The git door answers a file's last write, in the seconds the window reads. [[spec/tickets/the-spawn-reaches-its-guidance]]
+function wroteIn(box, names) {
+  const out = {};
+  for (const name of names ?? []) {
+    try {
+      const said = box.proc.run(["git", "log", "-1", "--format=%ct", "--", name], { cwd: box.work });
+      out[name] = Number(String(said.stdout ?? "").trim()) || 0;
+    } catch {
+      out[name] = 0;
+    }
+  }
+  return out;
+}
+
+// [[spec/tickets/the-spawn-reaches-its-guidance]]
+function stampHere(box) {
+  try {
+    return stampOf(String(box.disk.read(join(box.work, STAMP))));
+  } catch {
+    return stampOf("");
+  }
 }
 
 function endsWhy(said) {
@@ -188,6 +258,10 @@ function ranHere(name, held) {
   if (name === "ticket-in-hand") return holdStands(held.box) || privateStands(held.box);
   if (name === "queue-waits") return queueWaits(held.box);
   if (name === "no-stop-line") return !stopReasons(rulesOf(held.box)).some((one) => one.id === held.claimed);
+  // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud]]
+  if (name === "a-person-sits-here") return !inCloud(held.box.env ?? process.env);
+  // [[spec/tickets/the-spawn-reaches-its-guidance]]
+  if (name === "warnings-standing") return handWanted(held.box);
   return undefined;
 }
 
@@ -224,8 +298,7 @@ function privateStands(box) {
 
 // THE CHAT IS NEW WHILE NOBODY HAS SAID WHAT TO DO IN IT. The session log holds one prompt row a turn and rotates at a session start, so the count survives a restart of the server and starts again with the next chat, and a cloud box carrying nobody to ask reads false. [[spec/design_output/stop#the-chat-is-new]]
 function chatIsNew(box) {
-  const env = box.env ?? process.env;
-  if (env.CLAUDE_CODE_REMOTE || env.SE_CLOUD) return false;
+  if (inCloud(box.env ?? process.env)) return false;
   return promptsIn(box) <= 1;
 }
 
@@ -241,8 +314,7 @@ function promptsIn(box) {
 
 // A desk bound to the queue on trunk has work while a free ticket stands, so a stop on completion waits. [[spec/design_output/stop#the-mechanical-checks]]
 function queueWaits(box) {
-  const env = box.env ?? process.env;
-  if (env.CLAUDE_CODE_REMOTE || env.SE_CLOUD) return false;
+  if (inCloud(box.env ?? process.env)) return false;
   if (asks(box, "engine.binding") !== "queue") return false;
   if (branchOf(box) !== "main") return false;
   const texts = readFolder(box.disk, join(box.work, "spec", "tickets"), ".md").map((one) => one.text);

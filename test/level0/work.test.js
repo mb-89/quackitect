@@ -40,11 +40,11 @@ test("every brief carries the contract, and adding it twice changes nothing", ()
   const once = withContract("# A brief\n\nDo the thing.\n");
   assert.ok(once.includes(CONTRACT_HEADING), "the contract lands");
   assert.ok(once.includes("./RUNME.sh branch done"), "it names how to finish");
-  // [[spec/design_output/work#a-box-hands-the-person-out]]
+  // [[spec/guidance/cloud]]
   assert.ok(once.includes("Stop for no person"), "it refuses the wait");
   assert.ok(
-    once.includes("branch\n   unblock <ticket> <successor>"),
-    "it names how to hand one out",
+    once.includes("step under `by: person` as your own"),
+    "it names who answers a person's step",
   );
   assert.equal(withContract(once), once, "a second pass changes nothing");
 });

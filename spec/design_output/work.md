@@ -218,9 +218,10 @@ its branch.
 
 # A person step leaves
 
-A step whose `by` reads `person` stops no cloud box. `branch unblock <ticket>
-<successor>` takes the ticket standing at that step and hands its rest to a
-ticket outside the group:
+A step whose `by` reads `person` stops no cloud box, which answers it and moves
+on. A desk hands one out instead: `branch unblock <ticket> <successor>` takes
+the ticket standing at that step and hands its rest to a ticket outside the
+group:
 
 | what it reads | what it writes |
 |---|---|
@@ -231,14 +232,15 @@ So `branch done` meets no open child, the group closes, and one push carries the
 successor with it. The person answers on a ticket of their own, and every step
 behind them runs on.
 
-The verb refuses three things:
+The verb refuses four things:
 
+- a hand standing on a cloud box, which answers the step itself
 - a ticket standing where a hand can take it
 - a successor standing inside the group it frees
 - a successor nobody holds yet
 
-The box mints that last one with `./RUNME.sh mint ticket`, and writes what
-stands open into its ask.
+A desk mints that last one with `./RUNME.sh mint ticket`, and writes what stands
+open into its ask. [[spec/guidance/cloud]] says why the cloud road differs.
 
 # Two handovers
 

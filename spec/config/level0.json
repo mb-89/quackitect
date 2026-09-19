@@ -19,6 +19,13 @@
     "dayScore": 1,
     "failScore": 5
   },
+  "refactor": {
+    "comment": "The hand the stop door starts while the warnings stand past the number. spec/guidance/refactoring.md says what that hand does.",
+    "parallel": true,
+    "mostWarnings": 25,
+    "mostAtOnce": 1,
+    "untouchedFor": "7d"
+  },
   "engine": {
     "comment": "The engine level one brings. spec/design_output/config.md, chapter The engine controls, says what each value means.",
     "binding": "queue"

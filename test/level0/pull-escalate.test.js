@@ -19,8 +19,9 @@ import {
   standing,
 } from "./pull-doors.js";
 
+// A desk hands the question to a person, and a cloud box answers it itself. [[spec/guidance/cloud]]
 test("branch escalate inserts a person step before the held leaf, drops the hold and pushes", () => {
-  const { it, disk, outside } = doors(standing());
+  const { it, disk, outside } = doors(standing(), {}, { cloud: false });
   heard(() => work(ROOT, ["pull"], it));
   assert.equal(JSON.parse(disk.read(HOLD)).step, "design/draft");
 

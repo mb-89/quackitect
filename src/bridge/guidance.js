@@ -3,25 +3,27 @@
 // [[spec/design_output/level0#the-standing-layer]]
 
 import { join } from "node:path";
-import { inherits } from "../../.claude/skills/level0/lib/layer.js";
-import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import {
   bindsHere,
   canary,
-  carried,
   canaryIn,
   canaryText,
+  carried,
   countsOf,
   envOf,
   forHelper,
   HEARD,
+  kindsOf,
+  layersOf,
   OWES,
   standingLayer,
   styled,
 } from "../../.claude/skills/level0/lib/guidance.js";
+import { inherits } from "../../.claude/skills/level0/lib/layer.js";
+import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { toolLines, WANTED } from "../../.claude/skills/level0/lib/tools.js";
-import { readTools, writeSurvey } from "../scripts/tools.js";
 import { heldReadsIn } from "../scripts/guidance-hand.js";
+import { readTools, writeSurvey } from "../scripts/tools.js";
 import { asks } from "./config.js";
 import { deadIndexLine } from "./search.js";
 
@@ -45,26 +47,37 @@ export function guidanceHere(
   const here = notes.filter((one) => bindsHere(one.text, bound));
   // A note the held step hands over rides the step, so the layer hands it no second time. [[spec/design_output/level0#the-standing-layer]]
   const read = heldReadsIn(disk, join, work, env, argv);
+  // A note naming a kind stands off the working hand, and the layer of that kind holds it. [[spec/tickets/the-spawn-reaches-its-guidance]]
+  const free = here.filter((one) => !kindsOf(one.text).length);
   // [[spec/design_output/level0#the-style-carries-a-note]]
-  const session = here.filter((one) => !styled(one.text));
+  const session = free.filter((one) => !styled(one.text));
   const counts = countsOf(carried(session, read));
   return {
     standing: standingLayer(session, read),
-    helper: standingLayer(here),
+    helper: standingLayer(free),
+    layers: layersOf(here),
     ...counts,
     sentence: canary({ ...counts, stop: tooth }),
   };
 }
 
 function readsGuidance(box) {
-  return guidanceHere(box.disk, box.method, box.work, process.env, asks(box, TOOTH) !== false);
+  return guidanceHere(
+    box.disk,
+    box.method,
+    box.work,
+    process.env,
+    asks(box, TOOTH) !== false,
+  );
 }
 
 function readNotes(reads, folder) {
   try {
     return reads
       .list(folder)
-      .filter((one) => one.kind === "file" && one.name.endsWith(".md") && !isDraft(one.name))
+      .filter(
+        (one) => one.kind === "file" && one.name.endsWith(".md") && !isDraft(one.name),
+      )
       .map((one) => ({ name: one.name, text: reads.read(`${folder}/${one.name}`) }));
   } catch {
     return [];
@@ -116,7 +129,11 @@ function blocksOf(held, dead, tools) {
 function surveyHere(box) {
   const found = readTools(box.disk, box.work);
   if (Object.keys(found).length) return found;
-  return writeSurvey({ disk: box.disk, proc: box.proc }, box.work, box.env ?? process.env);
+  return writeSurvey(
+    { disk: box.disk, proc: box.proc },
+    box.work,
+    box.env ?? process.env,
+  );
 }
 
 function toolsText(box) {
@@ -169,7 +186,9 @@ export function onTurnComplete(e, box) {
     const sentence = guidanceOf(box).sentence;
     session.firstTurn = false;
     session.owes = true;
-    box.log.say("warn", "level0", HEARD[canaryIn(e.answer, sentence).found], { detail: sentence });
+    box.log.say("warn", "level0", HEARD[canaryIn(e.answer, sentence).found], {
+      detail: sentence,
+    });
   }
   return { pass: true };
 }
@@ -200,10 +219,23 @@ export function onSessionCompact(e, box) {
 
 // [[spec/design_output/level0#the-helper-takes-the-guidance]]
 export function onAgentSpawn(e, box) {
-  const standing = box.guidance?.helper ?? box.guidance?.standing ?? "";
+  const kind = String(e?.kind ?? "");
+  const standing = layerHere(box.guidance, kind);
   if (!standing) return { pass: true };
-  box.log.say("info", "agent", `handed the guidance to ${e?.subagentType ?? "a helper"}`, {
-    detail: String(e?.description ?? ""),
-  });
+  box.log.say(
+    "info",
+    "agent",
+    `handed the ${kind || "helper"} layer to ${e?.subagentType ?? "a helper"}`,
+    {
+      detail: String(e?.description ?? ""),
+    },
+  );
   return { event: { ...e, prompt: forHelper(standing, e?.prompt) } };
+}
+
+// The spawn names its kind, and the layer of that kind reaches that hand. A spawn naming none takes the helper layer. [[spec/tickets/the-spawn-reaches-its-guidance]]
+export function layerHere(guidance, kind) {
+  const held = guidance?.layers?.[String(kind ?? "")];
+  if (held) return held;
+  return guidance?.helper ?? guidance?.standing ?? "";
 }

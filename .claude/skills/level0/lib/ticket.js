@@ -8,6 +8,22 @@ export const SEVERITY = "error";
 export const HAND = "hand";
 export const ANSWERED = "answered:";
 
+// Whether a hand works a leaf, answered once so the pull and the write door agree by construction. [[spec/tickets/the-one-answer-takes-shape]]
+export function writesHere(leaf, hand = {}) {
+  const by = String(leaf?.by ?? "anyone");
+  const at = String(leaf?.path ?? "");
+  const no = (why, more = {}) => ({ writes: false, why, ...more });
+
+  // A cloud box answers every question it meets, so a person's step stands open to it. [[spec/guidance/cloud]]
+  if (by === "person" && hand.agent && !hand.ownerSays && !hand.cloud)
+    return no(`waits for a person at ${at}`, { person: true });
+  if (by === "agent" && !hand.agent) return no(`waits for an agent at ${at}`);
+  if (by === "helper") return no(`waits for a hand the engine spawns at ${at}`);
+  if (by === "children") return no(`waits for its own children at ${at}`);
+  if (by === "retro" && !hand.atRetro) return no(`waits for a hand at a retro step, at ${at}`);
+  return { writes: true, why: "" };
+}
+
 // [[spec/design_output/pull#the-private-queue]]
 export function openPrivate(text) {
   const front = readNote(String(text ?? "")).front.said ?? {};

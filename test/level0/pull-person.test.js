@@ -17,18 +17,25 @@ test("an agent hand-back on a person's step comes back refused, and names the st
   const leaf = { by: "person", path: "design/person-1", evidence: [] };
   const one = { front: {}, private: false };
 
-  assert.deepEqual(handFaults({ ...it, agent: true }, one, leaf, "box one", {}), [
+  const desk = { ...it, cloud: false };
+  assert.deepEqual(handFaults({ ...desk, agent: true }, one, leaf, "box one", {}), [
     "design/person-1 is a person's step, and this hand is an agent.",
   ]);
   assert.deepEqual(
-    handFaults({ ...it, agent: false }, one, leaf, "person Ada", {}),
+    handFaults({ ...desk, agent: false }, one, leaf, "person Ada", {}),
     [],
     "a person's hand answers it",
   );
   assert.deepEqual(
-    handFaults({ ...it, agent: true, ownerSays: true }, one, leaf, "box one", {}),
+    handFaults({ ...desk, agent: true, ownerSays: true }, one, leaf, "box one", {}),
     [],
     "and the owner sends an agent in",
+  );
+  // A cloud box answers every question it meets. [[spec/guidance/cloud]]
+  assert.deepEqual(
+    handFaults({ ...it, agent: true, cloud: true }, one, leaf, "box one", {}),
+    [],
+    "a cloud box answers it",
   );
 });
 

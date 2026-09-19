@@ -138,7 +138,7 @@ holds no open note.
 
 | the route says | the pull admits |
 |---|---|
-| `by: person` | a hand off a harness. An agent waits, or takes it under `--owner-says` |
+| `by: person` | a hand off a harness, a hand on a cloud box, or one under `--owner-says`. An agent at a desk waits |
 | `by: agent` | a hand on a harness |
 | `by: helper` | nobody yet, until the spawn lands |
 | `by: retro` | a hand while its group stands at a retro step, or a note with the tag |
@@ -148,7 +148,10 @@ holds no open note.
 An agent is a hand whose environment names a harness. The command line reads
 that off `CLAUDECODE`, `CLAUDE_CODE_REMOTE` or `SE_CLOUD`. A verdict comes from
 a hand that leaves the tip where it stands. So a hand-back on a verdict leaf
-refuses where the tip differs from the take.
+reads the commits between the take and the tip, and refuses where one names
+this ticket. A sibling hand's commit costs the reading nothing. `commitsFor`,
+under `src/scripts/pull-writes.js`, answers that split off the name `landed`
+writes before the first colon.
 
 | what the flag says | what the record holds |
 |---|---|
@@ -309,7 +312,7 @@ nests, and each field is the heading one level under it. A comment, an
 | `text`, `list`, `checklist` | one line at least |
 | `command` | exactly one line |
 | `link` | one line, resolving to a file or a note in the tree |
-| `files` | every file the branch changes since the first take stands in it |
+| `files` | the files under this ticket's commits since the first take, and the working tree while the tip stands at the hold's. `commitsFor` answers whose commit is whose |
 | `choice` | one line, among the options |
 | `verdict` | opens with `pass` or `fail`, and a fail carries a finding |
 | `checked` | one line per item of the checklist, where the leaf or a phase above carries one |
@@ -387,6 +390,9 @@ to stand, because a fail says why in them.
 person`, `to: engine`, with the question under `asks` and one `answer`
 field. It points `step` at the inserted row and leaves the state at `open`,
 so the ticket is a person's to pull.
+
+- a desk writes `by: person` there
+- a cloud box writes `by: anyone`, because it answers every question this branch meets, as [[spec/guidance/cloud]] says
 
 The engine reads the answer, so the slot check finds a reader. A
 hand-out repairs a standing person step that names no reader. The route

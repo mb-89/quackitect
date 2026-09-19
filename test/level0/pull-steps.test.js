@@ -68,7 +68,10 @@ test("a hand-back meeting the refusal cap fails the leaf back, carrying the find
   assert.equal(fieldOf(now, "step"), "design/draft");
   assert.doesNotMatch(now, /name: settle/, "the cap inserts no step");
   assert.doesNotMatch(now, /by: person/);
-  assert.match(now, /why: "the hand-back met refused 1 times: .*approach under design\/draft holds no text/);
+  assert.match(
+    now,
+    /why: "the hand-back met refused 1 times: .*approach under design\/draft holds no text/,
+  );
   assert.match(said, /1 refusals in a row, so design\/draft goes back\./);
   assert.equal(
     JSON.parse(disk.read(HOLD)).step,
@@ -88,13 +91,24 @@ test("a person step carries its reader, and a colon takes quotes", () => {
     why: "thin",
   });
   const twice = filled(once, "### verdict", "fail\n- still thin");
-  const { it } = doors(standing(twice), {}, { fails: 2 });
+  const { it } = doors(standing(twice), {}, { fails: 2, cloud: false });
   const rooted = { ...it, root: ROOT };
   const held = { name: "a-child", text: CHILD("open", "design/review") };
   withPersonStep(rooted, held, "design/draft", "a question");
   const now = held.text;
 
-  assert.match(now, /- name: person-1\n\s+does: answers the question the engine asks\n\s+by: person\n\s+to: engine/);
+  assert.match(
+    now,
+    /- name: person-1\n\s+does: answers the question the engine asks\n\s+by: person\n\s+to: engine/,
+  );
+
+  // A cloud box answers its own questions, so the step it inserts waits for nobody. [[spec/guidance/cloud]]
+  const cloudHeld = { name: "a-child", text: CHILD("open", "design/review") };
+  withPersonStep({ ...rooted, cloud: true }, cloudHeld, "design/draft", "a question");
+  assert.match(
+    cloudHeld.text,
+    /- name: person-1\n\s+does: answers the question the engine asks\n\s+by: anyone/,
+  );
   const bare = now.replace("    to: engine\n", "");
   assert.match(
     withEngineReader(rooted, { text: bare }),
@@ -351,10 +365,11 @@ test("a leaf needing a verb the box lacks answers wait, with the reason", () => 
 });
 
 // [[spec/tickets/the-group-leaves-at-todo]]
-test("a group whose open children all wait for a person stands at children, and hands no retro out", () => {
+test("a group whose open children all wait stands at children, and hands no retro out", () => {
+  // A cloud box works a person's step, so this child parks on a hand the engine spawns. [[spec/guidance/cloud]]
   const parked = CHILD("open", "design/review").replace(
     "        not: draft\n",
-    "        by: person\n",
+    "        by: helper\n",
   );
   const { it, disk } = doors(
     standing(parked, withField(GROUP_NOTE, "step", "children")),
@@ -374,12 +389,13 @@ test("a group whose open children all wait for a person stands at children, and 
 
   assert.equal(code, 0);
   assert.match(said, /^wait/m, "the pull answers wait");
-  assert.match(said, /a-child waits for a person at design\/review/);
+  assert.match(said, /a-child waits for a hand the engine spawns at design\/review/);
   assert.doesNotMatch(said, /retro/, "and no retro leaf comes out");
   const now = disk.read(at("spec/tickets/one-group.md"));
   assert.equal(fieldOf(now, "step"), "children", "the group stands where it stood");
   assert.equal(
-    recordIn(now).filter((one) => String(one.step) === "children" && one.skipped).length,
+    recordIn(now).filter((one) => String(one.step) === "children" && one.skipped)
+      .length,
     0,
     "the box writes no skip",
   );
@@ -424,7 +440,7 @@ test("the group's last leaf returns to children while a child stands open, and c
   const parked = withEntry(
     CHILD("open", "design/review").replace(
       "        not: draft\n",
-      "        by: person\n",
+      "        by: helper\n",
     ),
     {
       step: "design/draft",
@@ -443,7 +459,7 @@ test("the group's last leaf returns to children while a child stands open, and c
   assert.equal(fieldOf(stays, "step"), "children");
   assert.match(
     back.said,
-    /^ {2}a-child waits for a person at design\/review/m,
+    /^ {2}a-child waits for a hand the engine spawns at design\/review/m,
     "the box leaves once, and waits the second time",
   );
 

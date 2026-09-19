@@ -31,7 +31,7 @@ const FILES = {
     sha: "abc123",
     ok: true,
     clean: true,
-    warned: false,
+    warnings: 0,
   }),
   [at(".se/.doc/standard.pdf")]: "a document the owner keeps",
   [home(`.claude/projects/${SLUG}/session.jsonl`)]: '{"type":"user"}\n',
@@ -59,8 +59,8 @@ function doors(files = FILES, more = {}) {
 // A retro opens on a battery green at this commit, with no warning standing. [[spec/guidance/retro/collect]]
 test("collect refuses a battery holding a warning, and one that ran against another commit", () => {
   for (const stamp of [
-    { sha: "abc123", ok: true, clean: true, warned: true },
-    { sha: "old999", ok: true, clean: true, warned: false },
+    { sha: "abc123", ok: true, clean: true, warnings: 3 },
+    { sha: "old999", ok: true, clean: true, warnings: 0 },
     { sha: "abc123", ok: true, clean: true },
   ]) {
     const it = doors({

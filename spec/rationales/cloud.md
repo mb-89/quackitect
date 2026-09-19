@@ -62,69 +62,60 @@ to collect it, because nothing survives the session.
 ## 6. A person blocks no branch
 
 A cloud box runs while nobody sits beside it. So a step whose `by` reads `person`
-waits the whole session, and the branch waits with it. Every step
-behind that one waits too, though an agent could take them.
+waits the whole session, and the branch waits with it. Every step behind that
+one waits too, though an agent could take them.
 
 One group showed the cost: three children, one of them parked at a person step,
 and the box released the branch having finished nothing. The next box took the
 same branch, met the same step, and released it again.
 
-The person's work is real, and dropping it is the other failure. So it moves to
-a ticket of its own, outside the group, carrying the question and what stands
-open. The group then closes, the branch merges, and the ticket is the reminder.
+Two wordings then tried to sort the questions a box may hand out from the ones
+it owes an answer:
 
-| a wrong answer | who owns it |
+| the wording | why it failed |
 |---|---|
-| a later commit undoes it | the box |
-| it spends, sends or opens a door | the owner |
-| it loses work nobody rebuilds | the owner |
-| it stands outside the brief | the owner |
+| what only a person can answer | a person can answer anything |
+| what a wrong answer costs past a commit | a box read it as a question about authority |
 
-That table is the second wording. The first asked what only a person could
-answer, and it failed, because a person can answer anything.
-
-A box read it as a question about authority, and handed out calls it owned:
-
-- where a slug lives, with four copies standing already
-- which of two sound designs to take on the apply lane
-
-Two children of one group left that way in a single session. Neither question
-carried a wrong answer costing more than a commit.
+Under the second, one box handed out calls it owned. Where a slug lives, with
+four copies standing already. Which of two sound designs to take. Two children
+of one group left that way in a session, and later five out of one branch.
 
 The engine made it worse. `withPersonStep` stamped `by: person` on a count of
 returns, so two disagreements between agent hands minted a question for a human.
 
-The stamp said `person`, and the rule then said a step a person owns waits. The
-box obeyed the stamp over the test. So the fix stands in three places:
+So the sorting goes, and the rule reads whole: a cloud box answers every
+question this branch meets. The mechanics follow it.
 
-- the guidance asks the blast radius, which a reader decides
-- the stop rule carries `yields`, so a claim loses to a check that fires
-- the count asks another agent hand, and a person answers past the split cap
+| what a cloud box meets | what happens |
+|---|---|
+| a step under `by: person` | `writesHere` lets this hand work it |
+| a review returning twice | the inserted step reads `by: anyone` |
+| `branch unblock` | the verb refuses, and names the pull instead |
+| a claim that a wrong answer outlives the branch | the rule wants a person sitting here, and none does |
 
-A claim reads the agent, and a check reads the tree. So the agent's own reading
-of its own work stops ending a turn while work stands.
+## 7. Why the merge reviews
 
-## 7. The route a successor takes
+A question handed out of a cloud box buys nothing a merge does not buy later,
+and costs the branch its whole session. The owner reads the change at the merge
+either way.
 
-`branch unblock` reads the successor's first step and demands `by: person`. No
-process under `spec/processes` opened one, so every successor a hand could mint
-met a refusal. A box that followed the guidance to the letter got that refusal,
-released the branch, and the loop closed again.
+So the box decides and writes what it weighs beside the answer. The hand at the
+merge then judges the call with the code in front of it.
 
-`spec/processes/question.yaml` is that route. A hand mints the successor off it,
-and the first step reads `by: person` with nobody assigning it. The pull says so
-too. Where a person's step is the only thing standing, the wait answer names the
-mint, the open and the unblock in order.
+| what costs what | the price |
+|---|---|
+| a wrong call the merge catches | one review |
+| a branch parked on a question | the session parking it, and every session meeting it again |
 
 ## 8. What a leaving branch owes
 
-A branch that merges half-done is honest only if what it left stands written
-somewhere a person reads. The successor ticket is that record, and `reason:
-became` with `successors` is the link back.
+A branch merges whole. What the box decides stands written where the merge
+reads it: the answer under the step, and the assumptions beside it.
 
 The alternative is a branch held open until a person answers. That blocks the
 tickets depending on it, and a dependency reads a closed ticket, not a finished
-one. So closing is what frees the chain.
+one. So finishing is what frees the chain.
 
 ## 9. The check greens first
 

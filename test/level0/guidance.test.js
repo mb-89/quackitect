@@ -11,7 +11,10 @@ import {
   canaryIn,
   countsOf,
   envOf,
+  kindsOf,
+  layersOf,
   parse,
+  scopesIn,
   standingLayer,
   styled,
 } from "../../.claude/skills/level0/lib/guidance.js";
@@ -37,6 +40,17 @@ Why this note exists.
 ## 2. The second rule
 
 Because of a thing that happened.
+`;
+
+// A note binding one kind of hand, which the layer of that kind holds. [[spec/tickets/the-spawn-reaches-its-guidance]]
+const kinded = `---
+kind: [[guidance]]
+scope: ["refactor: the hand a session starts"]
+---
+
+# Actionables
+
+1. Take the one file your prompt names.
 `;
 
 test("a note parses into its three chapters", () => {
@@ -154,6 +168,36 @@ test("an answer saying nothing comes back absent", () => {
     found: "none",
     said: "",
   });
+});
+
+// [[spec/tickets/the-spawn-reaches-its-guidance]]
+test("a scope reads its entries, inline or one to a line", () => {
+  assert.deepEqual(scopesIn(note), ["everybody"]);
+  assert.deepEqual(scopesIn('---\nkind: [[guidance]]\nscope:\n  - "one"\n  - two\n---\n'), [
+    "one",
+    "two",
+  ]);
+  assert.deepEqual(scopesIn("---\nkind: [[guidance]]\n---\n"), []);
+});
+
+// [[spec/tickets/the-spawn-reaches-its-guidance]]
+test("a scope entry opening on a kind binds that kind, and a plain entry binds none", () => {
+  assert.deepEqual(kindsOf(kinded), ["refactor"]);
+  assert.deepEqual(kindsOf(note), []);
+});
+
+// [[spec/tickets/the-spawn-reaches-its-guidance]]
+test("the layer of a kind holds its note beside the free ones, and the free layer holds it nowhere", () => {
+  const notes = [
+    { name: "voice.md", text: note },
+    { name: "refactoring.md", text: kinded },
+  ];
+  const said = layersOf(notes);
+
+  assert.deepEqual(Object.keys(said), ["refactor"]);
+  assert.match(said.refactor, /voice/);
+  assert.match(said.refactor, /refactoring/);
+  assert.equal(standingLayer(notes.filter((one) => !kindsOf(one.text).length)).includes("refactoring"), false);
 });
 
 // [[spec/design_output/level0#the-style-carries-a-note]]
