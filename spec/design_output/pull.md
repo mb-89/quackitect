@@ -301,9 +301,9 @@ against the first word of the last line. A miss is a finding.
 
 ## The hand-back refused
 
-A refusal keeps the hold and counts on it. At `work.refusalsBeforePerson`
-refusals the pull inserts a person step carrying the first finding, and the
-ticket waits for a person.
+A refusal keeps the hold and counts on it. At `work.refusalsBeforeFail`
+refusals the pull fails the leaf back, carrying the count and the first
+finding as the reason. So the fail road below answers from there on.
 
 # The pass
 
@@ -343,8 +343,8 @@ refused commit writes no record. `src/scripts/landed.js` holds the landing.
 `--fail "why"` writes an entry with the reason and `returns`, one past the
 most this step carries. It sets `step` to the row's `on_fail`, or to the leaf
 itself where none stands. A phase named there sends the ticket to its first
-leaf. At `work.failsBeforePerson` returns the pull inserts a person step
-before the target.
+leaf. At `work.failsBeforeWait` returns the pull drops the hold and answers
+`wait`, so the target stands open for the hand that takes it next.
 
 ## A person step goes in
 
@@ -366,25 +366,19 @@ Then it drops the hold, commits by ticket and step, pushes, and hands out
 the next ticket. With no hold standing it refuses and names the pull. So a
 hand reaches the person step, and one mechanism inserts every kind.
 
-## A settle step goes in
+## A count inserts no step
 
-A count of returns says two agent hands disagree. It says nothing about who
-settles that, so the count inserts a step another agent takes:
+The escalation verb is the one road a step goes in by, so a count inserts
+none. The owner rules that a step a box writes waits for a person the box
+cannot reach. Two counts stand, and each answers on its own road:
 
-| the step | what it reads |
+| the count | what the pull does |
 |---|---|
-| `settle-<n>` | `by: anyone`, `to: engine`, the findings under `asks` |
-| the answer | the decision, and why it stands |
+| `work.refusalsBeforeFail` | fails the leaf back, carrying the count and the first finding |
+| `work.failsBeforeWait` | drops the hold and answers `wait` |
 
-`withSettleStep` puts it in through the same inserter the person step uses.
-Two counts reach it:
-
-- a step failing back, at `work.failsBeforePerson`
-- a hand-back meeting refused, at `work.refusalsBeforePerson`
-
-A ticket carrying `work.stepsBeforeSplit` settle steps hands the question to a
-person instead. So the agents settle first, and a person answers where they
-reach no answer.
+So a hand reaching no answer leaves the leaf open, and the next hand takes it
+where it stands.
 
 [[spec/rationales/cloud]] carries what a count costs where it reaches a person
 first.

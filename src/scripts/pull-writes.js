@@ -9,14 +9,8 @@ export { HELPER, SPAWN, spawnPrompt } from "./spawn.js";
 import { CLOSED, frontOf, OPEN, recordIn, withEntry, withField } from "./group.js";
 import { dropHold } from "./guidance-hand.js";
 import { landed, unlandedRows } from "./landed.js";
-import {
-  childrenSay,
-  handOut,
-  holdsHere,
-  ticketsHere,
-  withSettleStep,
-} from "./pull-hand.js";
-import { DONE, REFUSED, say, WORK, walkOf } from "./pull-route.js";
+import { childrenSay, handOut, holdsHere, ticketsHere } from "./pull-hand.js";
+import { DONE, REFUSED, say, WAIT, WORK, walkOf } from "./pull-route.js";
 import { changedIn } from "./work.js";
 
 export function passed(it, who, one, leaf, held, answered) {
@@ -90,17 +84,6 @@ export function failed(it, who, one, leaf, held, reason, answered) {
   const changes = [`fails ${leaf.path} back to ${back}`];
   one.text = withField(withField(text, "step", back), "state", OPEN);
 
-  const most = Number(it.fails);
-  if (most > 0 && returns >= most) {
-    const put = withSettleStep(
-      it,
-      one,
-      back,
-      `${leaf.path} failed back ${returns} times: ${reason}`,
-    );
-    if (put.path) changes.push(`${back} waits for a hand at ${put.path}`);
-  }
-
   const finding = landed(it, one, changes);
   if (finding) return unlanded(one, leaf, finding);
   dropHold(it, who.hand);
@@ -109,6 +92,15 @@ export function failed(it, who, one, leaf, held, reason, answered) {
       `${who.branch} moves under this hand-back, and one rebase fell short. The hand-back stands here, so push ${who.branch} and pull again.`,
     ]);
     return 1;
+  }
+  // Past the cap the hold drops and the answer waits, because a leaf going round writes a step a box inserts and nobody answers. [[spec/design_output/pull#the-fail]]
+  const most = Number(it.fails);
+  if (most > 0 && returns >= most) {
+    say(WAIT, [
+      `${one.name} ${changes.join(", ")}, and ${leaf.path} fails back ${returns} times.`,
+      `The hold drops here, so ${back} stands open for the hand that takes it next.`,
+    ]);
+    return 0;
   }
   return onward(it, who, [`${one.name} ${changes.join(", ")}.`]);
 }

@@ -31,13 +31,7 @@ import {
   voiceFaults,
   withPayload,
 } from "./pull-chapter.js";
-import {
-  handOut,
-  namedGroup,
-  ticketsHere,
-  urgentGroup,
-  withSettleStep,
-} from "./pull-hand.js";
+import { handOut, namedGroup, ticketsHere, urgentGroup } from "./pull-hand.js";
 import { leafOf, leavesOf, REFUSED, say, stillHeld, WAIT, WORK } from "./pull-route.js";
 import {
   became,
@@ -391,31 +385,19 @@ export function handBack(it, who, name, verdict) {
 // [[spec/design_output/pull#the-hand-back-refused]]
 export function refused(it, who, one, leaf, held, found) {
   const count = Number(held.refused ?? 0) + 1;
+  // The cap sends the leaf back with the findings, because a step a box inserts waits for a person nobody sends. [[spec/design_output/pull#the-hand-back-refused]]
   if (Number(it.refusals) > 0 && count >= Number(it.refusals)) {
     if (one.stood) one.text = one.stood;
-    const put = withSettleStep(
+    say(REFUSED, [...found, "", `${count} refusals in a row, so ${leaf.path} goes back.`]);
+    return failed(
       it,
+      who,
       one,
-      leaf.path,
+      leaf,
+      held,
       `the hand-back met refused ${count} times: ${found[0]}`,
+      [],
     );
-    const finding = put.path
-      ? landed(it, one, [`${leaf.path} goes to a hand at ${put.path}`])
-      : "";
-    if (finding)
-      found.push(
-        `the hook refuses the commit, so the settle step lands not: ${finding}`,
-      );
-    if (put.path && !finding) {
-      dropHold(it, who.hand);
-      if (!one.private) pushed(it, who.branch);
-      say(REFUSED, [
-        ...found,
-        "",
-        `${count} refusals in a row, so ${put.path} now waits for a hand.`,
-      ]);
-      return 1;
-    }
   }
   writeHold(it, who.hand, {
     ...held,

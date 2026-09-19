@@ -482,22 +482,6 @@ export function withEngineReader(it, one) {
   return schema ? reRouted(one.text, schema, steps, "") : "";
 }
 
-// A count says two hands disagree, and another hand settles that, because a person waiting on a call the box owns costs a whole session. [[spec/design_output/pull#a-settle-step-goes-in]]
-export function withSettleStep(it, one, before, asks) {
-  const standing = stepsNamed(one, "settle");
-  const most = Number(it.splits);
-  if (most > 0 && standing >= most) return withPersonStep(it, one, before, asks);
-  return inserted(it, one, before, `settle-${standing + 1}`, {
-    does: "decides between the step and the findings, and writes why",
-    by: "anyone",
-    to: "engine",
-    asks,
-    evidence: [
-      { name: "answer", form: "text", says: "the decision, and why it stands" },
-    ],
-  });
-}
-
 // [[spec/design_output/pull#a-person-step-goes-in]]
 export function withPersonStep(it, one, before, asks, options) {
   const standing = stepsNamed(one, "person");
