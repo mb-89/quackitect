@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -175,6 +175,17 @@ record:
     hash_after: 85f659911a4382348a7b742aab40e9b46d53adb4
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 20710d84cd6fb8b25aac0cbe4c8a1289ce79358d
+    hash_after: 20710d84cd6fb8b25aac0cbe4c8a1289ce79358d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 14 test(s) pass in 2 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -385,7 +396,7 @@ each spell a value the same file exports, so each reads the name beside it.
 
 ### tests
 
-    ./RUNME.sh branch test test/level0/binding.test.js
+    ./RUNME.sh branch test test/level0/binding.test.js test/contract/stop-rules.test.js
 
 ### check
 
@@ -409,16 +420,24 @@ The gate reads `god` alone, so the `unbound` column stands as it stood. A
 session at `unbound` keeps every check it had, and takes a named ticket with
 `pull <ticket>`.
 
-The stop door owns the two names the server read before, and the server imports
-them. So one place holds each, and the door reading the binding names it.
+The config library owns the key and its two values, and the pull, the stop door
+and the server each read them there. So the bare spellings go.
 
-A case holds the list against every name the door answers. A check joining the
-door lands in one list or the other, and the gate reaches it.
+The verdict found three things, and this round answers each:
+
+| the finding | what answers it |
+|---|---|
+| the gate stands under the branch-take, so a cloud pull on trunk hands out at `god` | the gate stands above the take, under the hand-back and the hold |
+| a case drives the pure name, and the pull's own road stands untested | three cases drive `pull` over the fakes `pull-doors.js` builds |
+| the cases copy the names the stop rules own | a contract case reads the shipped rules and holds the gate against them |
+
+A case drives a cloud box on trunk at `god`, which is the road that carried the
+fault. It reads the wait, and reads that the take stands untouched.
 
 ### checked
 
-- the change touches no file the ask leaves out. The pull, its route, the stop door, the server's import and the cases.
-- every door the change reaches has a fake. The two new names stand pure, and the stop door reads the config through `asks` as it did.
+- the change touches no file the ask leaves out. The pull, its route, the stop door, the config library and the cases.
+- every door the change reaches has a fake. The pull cases drive the fakes `pull-doors.js` builds, and the shipped rules meet a contract case.
 - a comment names the approach the change implements. Each site points at the chapter owning the binding.
 
 # verdict
