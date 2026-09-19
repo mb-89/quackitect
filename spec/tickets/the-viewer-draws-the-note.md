@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -129,6 +129,12 @@ record:
       - name: check
         exit: 0
         said: 65 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 65d363e253d59a99631dcbb4fbacfb7f102c4d36
+    hash_after: 65d363e253d59a99631dcbb4fbacfb7f102c4d36
+    returns: 1
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | the colour lands, and the note the design output owes stands open |; | is what the diff touches beyond the ask trivial | yes, the hunks reach two files the ask names |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does every rule the change adds carry a case | for the colour, yes. For a note after an answer, no |; | does a case feed the rule something bad | yes, the colour case reads a note against four other kinds |; TL;DR:; The three hunks answer the three cases, and the copy of the answer's number goes.; `./RUNME.sh check` answers 0, and the viewer's own tests pass.; The design output takes none of this change, and the code points at two of its chapters.; A note standing after an answer reaches no prompt, and no case reads that shape.; The findings, one a line:; `spec/design_output/viewer.md` takes none of this change, and the code points at two chapters.; The Colours chapter names no note line, and the approach's own table asks for one.; The details chapter says a prompt shows the reply, and says nothing of its notes.; `pairsOf` drops a note standing after the answer, because `answered` turns true there.; The approach gives a prompt every note between it and its reply, so that note belongs there.; The third case holds a prompt, a note, a reply and a prompt, and reads no answer.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the Colours chapter names the note line the approach promises | open |; | 2 | the details chapter says a prompt shows the notes it carries | open |; | 3 | `pairsOf` takes a note after the answer, with a case reading that shape | open |; | 4 | the verdict hand reads every hunk again | open |"
 ---
 
 # Ask
@@ -304,21 +310,53 @@ The first hunk changes no colour a person sees. `kindStyle` falls through to a h
 
 ## read
 
-<!-- every file you read, one a line -->
-
-<!-- the form is files -->
+- src/viewer/colour.go
+- src/viewer/detail.go
+- src/viewer/detail_test.go
+- spec/design_output/viewer.md
+- spec/tickets/the-viewer-draws-the-note.md
 
 ## verdict
 
-<!-- pass or fail, findings one a line -->
+fail
 
-<!-- the form is verdict -->
+| the question reviewing asks | the answer |
+|---|---|
+| does the branch do what the ask asks | the colour lands, and the note the design output owes stands open |
+| is what the diff touches beyond the ask trivial | yes, the hunks reach two files the ask names |
+| what does `./RUNME.sh check` answer | 0, with the server standing |
+| does every rule the change adds carry a case | for the colour, yes. For a note after an answer, no |
+| does a case feed the rule something bad | yes, the colour case reads a note against four other kinds |
+
+TL;DR:
+
+- The three hunks answer the three cases, and the copy of the answer's number goes.
+- `./RUNME.sh check` answers 0, and the viewer's own tests pass.
+- The design output takes none of this change, and the code points at two of its chapters.
+- A note standing after an answer reaches no prompt, and no case reads that shape.
+
+The findings, one a line:
+
+- `spec/design_output/viewer.md` takes none of this change, and the code points at two chapters.
+- The Colours chapter names no note line, and the approach's own table asks for one.
+- The details chapter says a prompt shows the reply, and says nothing of its notes.
+- `pairsOf` drops a note standing after the answer, because `answered` turns true there.
+- The approach gives a prompt every note between it and its reply, so that note belongs there.
+- The third case holds a prompt, a note, a reply and a prompt, and reads no answer.
+
+What the agent needs:
+
+| number | need | status |
+|---|---|---|
+| 1 | the Colours chapter names the note line the approach promises | open |
+| 2 | the details chapter says a prompt shows the notes it carries | open |
+| 3 | `pairsOf` takes a note after the answer, with a case reading that shape | open |
+| 4 | the verdict hand reads every hunk again | open |
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- every fact the change adds stands in one place. The colour stands in the kind list alone, and `saidStyle` reads it there.
+- the detail rule stands in `pairsOf` alone, and the note the code points at carries none of it.
 
 # Discussion
 
