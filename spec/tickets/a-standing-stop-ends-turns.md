@@ -203,17 +203,44 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Four cases stand in `test/level0/stop-door.test.js`, and two of them fail on
+their own assertion.
+
+| the case | what it reads |
+|---|---|
+| a hold standing at the stop | the turn ends, which holds today |
+| a hold the turn's end drops | the turn ends, and it holds open instead |
+| a hold at finish the turn's end drops | the same, at the weaker strength |
+| a prompt after the drop | the turn holds open, which holds today |
+
+The first and the last pass green, so they guard the fix from reaching past
+what the ask names. The two in the middle carry the fault.
+
+**What surprises.** The fixture of that file pins the hold at `off`, and its
+rules name no owner rule. So the two rules the hold fires stand nowhere in it,
+and a case over a hold needs both written in. A reader taking the fixture as
+the whole stop door reads a door with no owner in it.
+
+The turn holding open reads `the last line names no stop reason` at 50. The
+queue rule at 80 stands quiet, because the fake tree carries no free ticket.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases stand in the one file the ask names, and nothing else changes
+- the box reaches its disk and its process through the fakes the fixture holds
+- a comment over each case points at this ticket, which carries the approach
 
 ## reflect
 
