@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: now
 group: the-person-step-holds
-step: design/review
+step: implement/tests-red
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -96,6 +96,10 @@ record:
     hand: box ca870d4f20f4 · claude-code-remote
     hash_before: 271271b79d41303b58ad35b68c77ca31e683bdd2
     hash_after: 271271b79d41303b58ad35b68c77ca31e683bdd2
+  - step: design/review
+    hand: box ca870d4f20f4 · claude-code-remote · helper-2
+    hash_before: 2cdd6affeee3f1eea84d410f9afc99fe69246c07
+    hash_after: 2cdd6affeee3f1eea84d410f9afc99fe69246c07
 ---
 
 # Ask
@@ -154,6 +158,14 @@ The judge reads every field of the chapter today, and the schema calls some of t
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
+
+pass
+
+- Name the exit code the take answers, and the branch the box stands on after it stops.
+- Say whether the take reads the next free branch, or stops on the first one.
+- The takeable answer over children stands in `advanced` and `leaves`, so name the one place owning it.
+- Say that a children leaf passes where every child closes, so the retro still comes out.
+- Say why the form filter lands in the engine, where the leaf names each field's form.
 
 <!-- the form is verdict -->
 
