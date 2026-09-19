@@ -1,3 +1,7 @@
+// Which tickets stand, which of them a hand takes, and who takes which leaf.
+// The offer, the hold, and the rules a hand meets on its way to one.
+// [[spec/design_output/pull#the-hand-out]]
+
 import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
 import { entryNamed, reRouted } from "../../.claude/skills/level0/lib/schema.js";
 import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";

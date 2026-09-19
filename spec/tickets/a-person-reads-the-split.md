@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: answer
@@ -42,6 +42,18 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 6cdfc9c02d00d6ee857ae042cf10c4df84f22c27
     hash_after: 6cdfc9c02d00d6ee857ae042cf10c4df84f22c27
+  - step: do
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: b80b1b52be3096cdd3a32d9402a53223e6a22c68
+    hash_after: b80b1b52be3096cdd3a32d9402a53223e6a22c68
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 64 test(s) pass in 3 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -109,27 +121,27 @@ What this call weighs, on a box nobody sits beside:
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test test/level0/pull.test.js test/level0/pull-steps.test.js test/level0/work.test.js
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
+`pull-hand.js`, `pull-route.js` and `work-merge.js` open on a header saying
+what the file holds, and pointing at the chapter that explains it. Every other
+module the split minted already opened on one, so this brings the three that
+stood apart into line with them.
 
-<!-- the form is text -->
+The header is the whole change. The modules keep every export and every line of
+behaviour they carried, so the tests covering them answer as they did.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change follows the answer: the answer names those modules, and the change writes a header on each
+- the cleanup it reveals: none, because a header touches nothing the module does
+- the header says what the file is for, and points at the chapter holding the rest
 
 # Discussion
 

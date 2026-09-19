@@ -1,3 +1,8 @@
+// The route a ticket walks: its steps, the leaf it stands at, and what that
+// leaf inherits from the steps above it. The names and the verbs a route reads
+// stand here beside it.
+// [[spec/design_output/pull#what-a-hand-out-reads]]
+
 import { HOLDS as OWNED_HOLDS } from "../../.claude/skills/level0/lib/folders.js";
 
 import { entriesIn } from "../../.claude/skills/level0/lib/schema.js";
