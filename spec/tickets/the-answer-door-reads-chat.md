@@ -113,6 +113,48 @@ the door refuses the calls that carry the work, after the answer stands
 
 <!-- the form is text -->
 
+- the road stands already, and nothing holds it
+- the cases the ask names go in `test/level0/answer-door.test.js`
+- the chapter naming the two places changes with them
+
+**What stands.** `onMessageDisplay` in `src/bridge/answer.js` reads the text
+the chat shows and pays the demand with it. The server wires it at
+`classic.MessageDisplay`, and the bridgehead posts every event.
+
+| the road | what pays | what covers it |
+|---|---|---|
+| the report tool | `pays` | a case in `answer-door.test.js` |
+| the bridgehead's texts | `onAgentSpoke` | a case in the same file |
+| the chat | `onMessageDisplay` | nothing |
+
+**Measured here.** This box shows the text reaching the server before the call
+under it. One pair off `.se/.log/session.jsonl`: the display lands at
+`22:45:48.097`, and the call after it at `22:45:48.975`.
+
+**The change.** Three cases, and one chapter.
+
+| what changes | where |
+|---|---|
+| a case pays the demand off a displayed text | `test/level0/answer-door.test.js` |
+| a case reads no refusal on the call after it | the same file |
+| a case leaves a demand standing where the text is empty | the same file |
+| the chapter says the chat pays, and the report writes the log | the reply line chapter |
+
+The chapter reads today as though the agent owes both. A chat answer pays, and
+the report stays the way the log takes the same text. So the wording of the
+door changes with it, in `SAYS` and in the refusal.
+
+**What the cases will show.** Two things the road does that nobody decided.
+
+- any displayed text pays, so one word pays as well as an answer
+- the score of an answer stands in the other door, which reads a draft
+- a harness sending no display event leaves the report road, as it works today
+
+**What this leaves.** The first of those two wants a ruling: a text under a
+length pays nothing, or every text pays and the score door alone judges. The
+ask says an answer in the chat pays at once, so the cases take that reading.
+The review decides it.
+
 ## review
 
 <!-- reads the approach against the ask -->
