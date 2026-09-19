@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-bridge-keeps-transport
 steps:
   - name: do
@@ -11,6 +11,12 @@ steps:
         form: text
         says: what you change, and what surprises you
 step: do
+record:
+  - step: do
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 7f9f99c5f2f6278841306db7691728f7d8aedb1a
+    hash_after: 7122700bfea429f841a4b8705b7a5a10d356daaf
+reason: done
 ---
 
 # Ask
