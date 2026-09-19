@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgent: true
-step: design/draft
+step: design/review
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -135,6 +135,10 @@ record:
     hash_after: 5bdb114d4b7957217d9b5838a641170df02bb9a2
     returns: 3
     why: "Three faults stand: one from the last review, and two the redraft brings.; The four asked answers stand: the marketplace name, the zero cost, the icon path, the dotted folder.; The count drift goes, and the draft names `grep -rl mcp__level0` alone.; The anchor stands, and `spec/design_output/level0.md` measures the tools keeping `level0`.; The marketplace rows read true. `RUNME.sh` runs `install.sh` ahead of `cli.js`.; The `brandOf` row reads true. `stub.js` hands it to `linkOf`, which writes the `vehicle.json` name.; The brand folder carries one reader now, and the lint reads the ticket clean.; The enabled id row stands open. `stub.js` writes `.claude/settings.json` through `settingsOf`.; No file in this tree writes `enabledPlugins`. Name the hand that writes the id, or cut the row.; The icon write reaches no vehicle. Git tracks `src/extension/icon.svg`, so every copy carries it.; So `spec/config/brand/icon.svg` reaches nothing. Say which hand reads it.; `plugin.json` carries `author.name`, which reads the folder name. Give it a row in the table."
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 902089cf410d50427be4e46c4a3cc31d196fdfc7
+    hash_after: 902089cf410d50427be4e46c4a3cc31d196fdfc7
 ---
 
 # Ask
@@ -179,49 +183,55 @@ The owner rules on the voice besides. A reader wants what they act on, and a mec
 
 ### approach
 
-The brand reaches the marketplace name, and every other name stands.
+The brand reaches the marketplace name, and the plugin name stands.
 
-[[spec/design_output/level0#a-stub-names-its-vehicle]] measured this road. A
+[[spec/design_output/level0#a-stub-names-its-vehicle]] measures this road. A
 stub names the vehicle's folder as a marketplace, enables `level0@<brand>`, and
 the tools keep the name `level0`. So the marketplace name is the name parting
-two vehicles under one client, and the brand reaches it alone.
+two vehicles under one client, and the brand reaches it.
 
 | the name | what it reads after | who writes it |
 |---|---|---|
-| `.claude-plugin/marketplace.json` name | the brand | the install script, ahead of every verb |
-| `.claude-plugin/marketplace.json` owner name | the brand | the install script, ahead of every verb |
-| the plugin name under `.claude/skills/level0` | `level0` | nobody, and it stands |
-| the stub's enabled id | `level0@<brand>` | `stub.js`, where a hand makes a stub |
+| the marketplace name | the brand | the install script |
+| the marketplace owner name | the brand | the install script |
+| the plugin's author name | the brand | the install script |
+| the plugin name | `level0` | nobody, and it stands |
+| the stub's enabled id | `level0@<brand>` | the shim |
 
-RUNME calls the install script before it calls the command line, so the
-marketplace name answers the folder before a session reads it. A shell script
-imports nothing, so the install script hands the edit to a node script beside
-it.
+RUNME calls the install script before it calls the command line, so those names
+answer the folder before a session reads them. A shell script imports nothing,
+so the install script hands the edit to a node script beside it.
 
-Git tracks the marketplace file, so the write shows in the tree it lands on:
+Git tracks the marketplace file and the plugin file alike. It shows the write
+where the folder name and the standing name part. In this tree they agree, and
+a vehicle under another folder name takes the stamp on its first run.
 
-| the tree | what the write shows |
+The shim resolves the vehicle on every stub command, and `vehicle.json` hands
+it the brand. So the shim writes the marketplace and the enabled id where the
+path belongs:
+
+| the file | what the shim writes into it |
 |---|---|
-| this one | nothing, because the folder name and the standing name agree |
-| a vehicle under another folder name | the stamp, on its first run, which that vehicle commits |
+| `.claude/settings.local.json` | the vehicle's folder under `extraKnownMarketplaces`, and `level0@<brand>` under `enabledPlugins` |
+
+That file stands outside git, because the vehicle's path differs per box.
 
 The cost for the tool names is nothing, and every file naming a tool stands as
 it is. `grep -rl mcp__level0` answers which files those are. A draft stamping
 the brand on the plugin name moves every one, and buys a parting the
 marketplace already gives.
 
-The icon stands at `spec/config/brand/icon.svg`. `spec/config` holds what a
-tool reads off the tree, and the install script reads the brand folder.
+The icon stands at `spec/config/brand/icon.svg`, and a vehicle draws its own
+there. `spec/config` holds what a tool reads off the tree, and the install
+script reads the brand folder.
 
-| the file | who writes it |
+| the file | who owns it |
 |---|---|
-| `spec/config/brand/icon.svg` | the vehicle's own hand, as the mark it ships |
-| `src/extension/icon.svg` | the install script, where that file stands absent |
+| `spec/config/brand/icon.svg` | the vehicle, which draws the mark it wears |
+| `src/extension/icon.svg` | the install script, which writes it on every run, and git ignores it |
 
-`src/extension/package.json` names `src/extension/icon.svg`. Where that file
-stands, the install script leaves it. So a fresh vehicle draws the mark this
-tree ships. A vehicle redrawing its icon keeps its own, and nothing holds the
-two in step. The drift is what a vehicle wants.
+So one icon stands, and a vehicle changing it changes what the extension wears.
+Two vehicles wear two marks, and nothing holds those two in step.
 
 `brandOf` answers the vehicle's folder name, and a marketplace name takes no
 dot. So `brandOf` slugs what it reads. It lowers the case, turns each run of
@@ -236,7 +246,7 @@ characters outside `a-z0-9` into a hyphen, and cuts a hyphen off each end.
 
 A folder slugging to an empty name fails the stub, and the refusal names the
 folder it read. `stub.js` hands `brandOf` to `linkOf`, which writes the
-`vehicle.json` name, so the slug reaches that record too.
+`vehicle.json` name, so the shim reads the slug there.
 
 ## review
 
