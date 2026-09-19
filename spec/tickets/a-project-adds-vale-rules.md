@@ -90,7 +90,12 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 5178b2a8949b7d702d95a4febc5b96653082e82f
+    hash_after: 5178b2a8949b7d702d95a4febc5b96653082e82f
 ---
 
 # Ask
@@ -123,6 +128,33 @@ The write door reads one styles folder, the method's. A project wanting a word o
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The styles both roots hold assemble into one folder under the work root, and the
+vale door reads the config standing there.
+
+| what | where it stands |
+|---|---|
+| the assembly | `assemble` in `src/scripts/styles.js` |
+| the styles it writes | `.se/vale/styles` under the work root |
+| the config it writes | `.se/vale/.vale.ini`, whose `StylesPath` names that folder |
+| the rewrite of that key | `stylesIn` in `.claude/skills/level0/lib/vale.js` |
+| the door reading it | `src/doors/vale.js`, which takes both roots |
+
+- The method's style files come down first, and the work root's stand over them by name. The unit is the file. [[spec/design_output/vehicle#the-work-root-inherits]]
+- The config comes from the work root where it holds one, and from the method otherwise.
+- A tree driving itself assembles nothing, and the door reads the method's own config.
+- The assembly runs on the first lint a box takes, so a box that lints nothing writes nothing.
+- The door hands the config to `lintText`, which carries the flag already.
+
+`.se` stands off git, so nobody edits what the assembly writes, and a project
+adds a word of its own without forking the method.
+
+Four cases hold it:
+
+- a fake disk over two roots, on the file the work root replaces
+- a fake disk over two roots, on the name the work root alone holds
+- a contract case on disk, where the project's own rule refuses a write there
+- a contract case on disk, where the method driving itself refuses nothing
 
 ## review
 
