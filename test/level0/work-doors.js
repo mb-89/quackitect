@@ -104,16 +104,21 @@ const TREE_AT = `:${TICKETS}`;
 // The three reads a listing runs, and an object stands under `<branch>:<path>`. [[spec/design_output/work#the-listing-reads-git-once]]
 export function remoteSaying(refs, objects = {}) {
   const rows = refs
-    .map(
-      (one) =>
-        `origin/${one.branch} ${one.tip} ${one.when ?? 0} ${one.merged ? 0 : 1} 0`,
-    )
+    .map((one) => `origin/${one.branch} ${one.tip} ${one.when ?? 0}`)
+    .join("\n");
+  const landed = refs
+    .filter((one) => one.merged)
+    .map((one) => `  origin/${one.branch}`)
     .join("\n");
   const named = new Map(refs.map((one) => [one.tip, one.branch]));
   return {
     [`git for-each-ref --format=${REF_FORMAT} refs/remotes/origin/work/`]: {
       stdout: rows ? `${rows}\n` : "",
     },
+    "git branch -r --merged origin/main": {
+      stdout: landed ? `  origin/main\n${landed}\n` : "  origin/main\n",
+    },
+    "git branch -r --points-at origin/main": { stdout: "  origin/main\n" },
     "git cat-file --batch": (_argv, init) => ({
       stdout: batchSaying(init.stdin, objects, named),
     }),

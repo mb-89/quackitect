@@ -39,6 +39,7 @@ export function contractRows(said, trunk, brief) {
 export const USAGE = [
   "Usage: ./RUNME.sh branch <verb>\n",
   "  new <name>    cut work/<name> from main with the brief, and push",
+  "  open <group>  push work/<group> off main for a group ticket, so the cloud finds it",
   "  take          take the next branch marked todo, and print its brief",
   "  sync          take main into this branch before you start",
   "  done          mark this branch done, commit and push",

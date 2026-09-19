@@ -100,10 +100,19 @@ export function standingOf(briefs, merged = new Set()) {
 }
 
 export function mergedHere(it) {
+  const fresh = branchesIn(it, ["branch", "-r", "--points-at", `origin/${TRUNK}`]);
   return new Set(
-    it.git
-      .run(["branch", "-r", "--merged", `origin/${TRUNK}`], true)
-      .out.split("\n")
+    [...branchesIn(it, ["branch", "-r", "--merged", `origin/${TRUNK}`])].filter(
+      (row) => !fresh.has(row),
+    ),
+  );
+}
+
+// A branch standing at trunk's tip carries no work, so the close leaves it alone. [[spec/design_output/work#a-merged-branch-closes]]
+function branchesIn(it, argv) {
+  return new Set(
+    String(it.git.run(argv, true).out ?? "")
+      .split("\n")
       .map((row) => row.trim().replace("origin/", ""))
       .filter((row) => MINE.test(row)),
   );
@@ -122,7 +131,7 @@ export function refsHere(it) {
     ["for-each-ref", `--format=${REF_FORMAT}`, `refs/remotes/origin/${WORK_BRANCH}`],
     true,
   );
-  return said.ok ? refsIn(said.out) : [];
+  return said.ok ? refsIn(said.out, mergedHere(it)) : [];
 }
 
 // The refs, then the paths, then the contents. [[spec/design_output/work#the-listing-reads-git-once]]

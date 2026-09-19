@@ -81,6 +81,7 @@ export function work(root, argv, doors) {
   const name = argv[1];
   const doing = {
     new: newWork,
+    open: openGroup,
     take,
     sync,
     done: finish,
@@ -133,7 +134,44 @@ export function cloud(root, argv, doors) {
   return argv[0] ? 2 : 0;
 }
 
-const LOUD = ["new", "take", "done", "release", "merge", "close", "unblock"];
+const LOUD = ["new", "open", "take", "done", "release", "merge", "close", "unblock"];
+
+// A group reaches the cloud as a branch of its own, pushed off trunk, so no hand runs git for it. [[spec/design_output/work#a-group-is-a-ticket]]
+function openGroup(it, name) {
+  if (!name) {
+    console.error("branch open needs a group: ./RUNME.sh branch open the-window-grows-tabs");
+    return 2;
+  }
+  const at = ticketAt(name);
+  const text = textAt(it, `origin/${TRUNK}`, at);
+  if (!text) {
+    console.error(`${TRUNK} carries no ${at}, so push the group first.`);
+    return 2;
+  }
+  if (!isGroup(text)) {
+    console.error(`${at} names no group process, so a branch carries nothing.`);
+    return 2;
+  }
+  if (fieldOf(text, "state") === CLOSED) {
+    console.error(`${at} stands closed, and a closed group opens no branch.`);
+    return 2;
+  }
+
+  const branch = `work/${name}`;
+  it.git.fetch();
+  if (standOf(it).some((one) => one.branch === branch)) {
+    console.log(`${branch} already stands in the cloud, carrying ${at}.`);
+    return 0;
+  }
+  if (!it.git.run(["push", "origin", `origin/${TRUNK}:refs/heads/${branch}`]).ok) {
+    console.error(refusedPush(branch));
+    return 1;
+  }
+
+  console.log(`${branch} stands at ${TODO} in the cloud, carrying ${at}.`);
+  console.log("Run ./RUNME.sh cloud trigger to fire a box at it.");
+  return 0;
+}
 
 // [[spec/design_output/log#which-door-says-what]]
 function tell(it, what, code) {

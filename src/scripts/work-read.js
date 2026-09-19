@@ -8,23 +8,24 @@ const NAME_BYTES = 20;
 // A batch header reads `<name> <kind> <size>`, so the size stands here. [[spec/design_output/work#the-listing-reads-git-once]]
 const SIZE_AT = 2;
 
-// [[spec/design_output/work#the-listing-reads-git-once]]
+// The format names three fields every git answers, because `ahead-behind` wants a git past 2.41 and a box carrying an older one answers the whole read with a fatal. [[spec/design_output/work#the-listing-reads-git-once]]
 export const REF_FORMAT =
-  "%(refname:short) %(objectname) %(committerdate:unix) %(ahead-behind:origin/main)";
+  "%(refname:short) %(objectname) %(committerdate:unix)";
 
-// A ref stands merged where it runs ahead of trunk by nothing. [[spec/design_output/work#the-listing-reads-git-once]]
-export function refsIn(said) {
+// A ref stands merged where the caller's set names it, and the set comes off `branch --merged`. [[spec/design_output/work#the-listing-reads-git-once]]
+export function refsIn(said, merged = new Set()) {
   return String(said ?? "")
     .split("\n")
     .map((row) => row.trim())
     .filter(Boolean)
     .map((row) => {
-      const [ref, tip, when, ahead] = row.split(/\s+/);
+      const [ref, tip, when] = row.split(/\s+/);
+      const branch = String(ref).replace(/^origin\//, "");
       return {
-        branch: String(ref).replace(/^origin\//, ""),
+        branch,
         tip: String(tip ?? ""),
         when: Number(when) || 0,
-        merged: ahead === "0",
+        merged: merged.has(branch),
       };
     })
     .filter((one) => one.tip);
