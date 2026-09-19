@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -102,6 +102,10 @@ record:
     hash_after: 119f8bdf3bea22d58e547e8736641de1b7085fc2
     returns: 1
     why: "`unpushed` in `src/scripts/work-stands.js` counts what origin lacks, and names the count and the push.; `dirty` calls `unpushed` over the branch it takes, so the read the approach proposes stands.; `release` in `src/scripts/work.js` passes its branch to `dirty`, so that road refuses today.; `take` in `src/scripts/work.js` calls `dirty(it)` with no branch, so it reads the branch the box stands on.; The gap is the take's target branch, so carry `one.branch` to `dirty` before `onBranch` resets it.; A second count inside `onBranch` splits one rule over two places.; The approach returns 1 where `dirty` returns 2, so one refusal carries two exits."
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 1fd4f737de92a16fc1b7573faa84266a7e4fd042
+    hash_after: 1fd4f737de92a16fc1b7573faa84266a7e4fd042
 ---
 
 # Ask
@@ -142,22 +146,25 @@ stands free. This box lost two commits that way inside one session.
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 <!-- the form is text -->
 
-`onBranch` counts the commits origin lacks before it resets, and refuses where the count stands past zero.
+`take` reads the branch it picks before `onBranch` resets it, and the read answering that stands already.
 
-| where | what changes |
+| what stands | where |
 |---|---|
-| `onBranch` in `src/scripts/work.js` | after the switch and before the reset, it reads `rev-list --count origin/<branch>..HEAD` |
-| the answer | names the count and names the push, and the verb returns 1 |
-| the callers | `branch take` and `branch release` both reach it, so both refuse |
+| the count of what origin lacks | `unpushed` in `src/scripts/work-stands.js` |
+| the caller walking a branch | `dirty`, in that same file |
+| the road already guarded | `release`, which hands `dirty` the branch it moves |
 
-Two reads settle the shape:
+`take` calls `dirty(it)` with no branch, so it reads the branch the box stands on. Then `onBranch` resets the branch the take lands on, which nothing reads.
 
-- the count reads after the switch, because the reset drops commits on the branch it lands on
-- a missing `origin/<branch>` leaves the count unreadable, and the verb carries on, because that switch leaves nothing ahead
+The change is one call:
 
-The test drives a fake git whose `rev-list` answers past zero, and runs `branch take`. It asserts the refusal names the count, and that the reset stays unrun.
+- `take` hands `dirty` the branch it picks, before the line reaching `onBranch`
+- the refusal stays `unpushed`'s own, so the count and the push read as on the release road
+- the verb answers 2, the exit `dirty` already answers
 
-The objection: a box skipping the push now stalls at every verb. It stalls where it would lose the work instead, and the answer names the push clearing it.
+The test drives a fake git answering `rev-list --count` past zero for the branch the take picks. It asserts the refusal names that branch, and that no switch runs.
+
+The objection: a second `dirty` call costs a read a take. It reads one branch through one command, and it stands where the reset would drop the work.
 
 ## review
 
