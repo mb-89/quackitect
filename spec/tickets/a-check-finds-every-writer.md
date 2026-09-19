@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -111,6 +111,10 @@ record:
     hash_after: c3756b0376560316d2cb3b172f31d00f6e4b1861
     returns: 2
     why: "| finding | fix |; |---|---|; | The tighter escape refuses copies standing across the tree today | Name each file it catches, and say what each one takes |; | `run`, `runtime` and `log` stand in no list the rule reads | Give each loop its own list in `folders.js`, beside `MOVED` |; | One reader answers the names of three loops that differ | Let the reader answer each loop apart, so each rule reads one list |; | The new rule over the installer carries no name | Name it beside the rules in `tree.js`, and link its note |; The redraft answers the reader, the fake text, and the two names standing apart.; `./RUNME.sh check` answers 0 on this tip, so every copy the tighter escape; catches turns the tree red at the same commit. Run; `git grep -n '\\.se/\\.runtime\\|\\.se/\\.retro' -- src .claude` for the copies, and; read each against the line above it."
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 2b12c0ece0908790066771bd981e593945273ed8
+    hash_after: 2b12c0ece0908790066771bd981e593945273ed8
 ---
 
 # Ask
@@ -134,29 +138,41 @@ runtime files land beside the private folder again after each move
 
 <!-- the form is text -->
 
-The escape covers a whole file today, and the installer's lists stand outside
-every rule. Both answers land in the module owning the names:
+The escape covers a whole file today, so a writer importing the owner spells
+what it likes. Four pieces answer the ask:
 
 | what changes | where it stands | what it does |
 |---|---|---|
-| the escape | `privateFolderOwned` in `.claude/skills/level0/lib/tree.js` | a spelling passes where the line itself or the one above names the owner |
-| the installer's lists | a rule beside it, in the same module | each name a loop moves stands in `MOVED`, and each name there has a mover |
-| the reader of a loop | `movedNames(text)` beside `installedTools` in the level zero tools module | it answers the names a loop carries, out of a text |
-| the names standing apart | `APART` in `.claude/skills/level0/lib/folders.js` | it names each one, with the reason beside it |
+| the escape | `privateFolderOwned` in `.claude/skills/level0/lib/tree.js` | a spelling passes where its own line, or the comment run above it, names the owner |
+| the rule over the installer | `installerHoldsTheNames` beside it | each loop carries the list its marker names, and each list has its loop |
+| the reader | `loopNames(text)` beside `installedTools` in the level zero tools module | it answers each loop under the name its marker gives, out of a text |
+| the three lists | `MOVED`, `RENAMED` and `LOGGED` in `.claude/skills/level0/lib/folders.js` | each one holds the names of one loop |
 
-The readings:
+The installer names its own lists:
 
-- the escape reads the line under the spelling and the one above it, the way an exemption names its reason
-- the installer carries three loops: the folder rename, the names the half takes, and the log
-- the reader takes a text, so a case hands it a bad list and reads the refusal
-- `APART` holds `hold.json` and `registry.json`, so the rule and the case read one list
+- a comment above each loop names the list in `folders.js` holding those names
+- `MOVED` holds the names the runtime half takes, and `RENAMED` the older folder names
+- `LOGGED` holds the older places of the log, which stands outside the half
+- `APART` holds `hold.json` and `registry.json`, each with its reason beside it
+- a loop carrying no marker comes back refused, so a fourth loop meets the rule too
+
+The tighter escape draws on the copies standing in these writers today:
+
+- `.claude/skills/level0/hooks/level0.js`, the hook a session starts
+- `.claude/skills/level0/lib/vehicle.js`, which the pointer stands in
+- `src/index/index.go`, `src/lsp/bridge.go`, `src/lsp/serve.go` and `src/lsp/tree.go`, which import no JavaScript
+- `src/scripts/install.sh` and `src/stub/RUNME.sh`, which a shell runs
+
+Each one takes the same line: a comment naming `folders.js` as the owner, above
+the spelling. So the change adds a line to each writer, and moves no name.
 
 The cases:
 
 - a file importing the owner and spelling a stale path elsewhere comes back refused
-- a file naming the owner in the line above the spelling passes
-- a loop missing a name the rule holds comes back refused
-- a loop holding a name no rule holds comes back refused
+- a file naming the owner in the comment above the spelling passes
+- a loop missing a name its list holds comes back refused
+- a loop holding a name its list lacks comes back refused
+- a loop carrying no marker comes back refused
 
 The rule cases stand in `test/contract/tree.test.js`, beside the rules over the
 same names. The reader's cases stand in `test/level0/tools.test.js`, beside the
