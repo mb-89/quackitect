@@ -75,7 +75,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box ca870d4f20f4 · claude-code-remote
@@ -104,6 +104,10 @@ record:
       - name: drained
         exit: 0
         said: .se/tickets holds no open note, so the box leaves nothing behind.
+  - step: retro/write
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: 83d0a9a5e853ee962a9a87e0fcc9dbdb5d8f10ec
+    hash_after: 83d0a9a5e853ee962a9a87e0fcc9dbdb5d8f10ec
 ---
 
 # Ask
@@ -162,37 +166,44 @@ The pull inserts a person step where a leaf fails or meets refusals past the cap
 
 ### done
 
-<!-- what was done, one line a ticket or a thing -->
-
-<!-- the form is list -->
+- [[spec/tickets/a-person-reads-the-pull]]: the take names why a push comes back, and a parked step reads its question
+- [[spec/tickets/refusal-cap-inserts-no-person]]: both caps take new names, and each answers on its own road
+- [[spec/tickets/the-group-leaves-at-todo]]: a group whose open children all wait stands still, and the judge reads no command
+- [[spec/tickets/escalate-inserts-a-person-step]]: `branch escalate` lands, and the vocabulary takes its name
+- [[spec/tickets/person-step-refuses-an-agent]]: the hand carries the git author, and `work.personSigns` reads the tip
 
 ### well
 
-<!-- what went well, and what made it go well -->
-
-<!-- the form is list -->
+- the route drove the whole group, and each leaf named its fields and its guidance
+- the verdict leaves caught two faults a hand of its own would have shipped
+- the write door named the rule and the line each time, so a rewrite took one try
+- the design output stood ahead of the code, so a draft read as a link to it
 
 ### badly
 
-<!-- what did not, each with its moment in the log or the transcript -->
-
-<!-- the form is list -->
+- the first take crashed, because the private folder moved and the push door hunted the old place
+- the index answered nothing, because a stale copy of its database stood beside the live one
+- a verdict's `read` field came back as bare lines, which the sentence rule read as one sentence
+- the turn held open on every hold another hand took, and each hold cost a round
 
 ### improve
 
-<!-- how each bad line stops happening, named by its home -->
-
-<!-- the form is list -->
+- the survey feeds the push door, so `whereIs` in `src/scripts/prepush.js` reads it like every caller
+- [[spec/tickets/the-runtime-folder-holds-state]] owns the folder move, and the index binary writes the old path
+- the work answer names the shape a `files` field takes, beside the shape a command field takes
+- the stop hook reads the holds this session's own hand owns, and leaves another hand's alone
 
 ### thoughts
 
-<!-- what the thoughts say that the actions do not, off the transcript -->
+A route with a `not` rule on its review and verdict steps makes a group slow on one box. Each such leaf wants a hand of its own, and the box waits while that hand reads. The waiting is the cost of the rule, and the rule is what caught the two faults.
 
-<!-- the form is text -->
+The write door taught faster than the guidance did. A rule a reader meets as a refusal, with the line beside it, lands in one round. The same rule inside a list of fifteen lands in none.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- each fact the retro adds stands in one line, and the tickets carry the detail
+- the retro writes no count, and the commands the tickets name answer each one
+- the files the change touched carry headers already, and this note adds none
 
 <!-- the form is checklist -->
 
