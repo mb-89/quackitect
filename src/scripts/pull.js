@@ -475,7 +475,10 @@ export function handBack(it, who, name, verdict) {
     found.push(...formFaults(it, one, leaf, chapter, held));
     if (!found.length) found.push(...voiceFaults(it, one, leaf, chapter));
   }
-  const answered = found.length || becomes ? [] : commandsRun(it, leaf, chapter, found);
+  // A fail runs its commands for the record, and none of them refuses it. [[spec/design_output/pull#the-fail]]
+  const fails = verdict.said === "fail";
+  const answered =
+    found.length || becomes ? [] : commandsRun(it, leaf, chapter, fails ? [] : found);
   found.push(...handFaults(it, one, leaf, who.hand, held));
 
   if (found.length) return refused(it, who, one, leaf, held, found);

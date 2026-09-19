@@ -90,7 +90,6 @@ function note(it, name, argv) {
     path,
     fields: {
       state: "open",
-      urgency: "whenever",
       ...(parks ? { [TODO]: true } : {}),
       process: held.link,
       process_hash: held.hash,

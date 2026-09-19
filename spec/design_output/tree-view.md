@@ -111,6 +111,64 @@ A parent the filter empties of children carries no mark, because nothing stands
 under it. The filter reaches no row under a shut parent, because a shut
 parent draws no child at all.
 
+# A sort holds several keys
+
+The sort stands beside the filter, between the data and the view. It orders the
+items of one level and leaves the items themselves as they stand, so the
+nesting survives every order a person picks.
+
+| what a person does | what the sort does |
+|---|---|
+| presses a column head | puts that key at the end of the list |
+| presses the same head again | turns that key around |
+| presses it a third time | drops that key, and the ones beside it stand |
+| presses another head | adds that key under the first |
+
+A later key breaks the ties an earlier one leaves. Two values reading as
+numbers compare as numbers, and a row carrying no value for a key stands after
+the rows that carry one.
+
+A view opens on the order its base file names, under `sort`. The work view
+opens on the rows a person owns, then the place the queue gives.
+
+# A flag draws a letter
+
+A row carries one boolean key a flag, and one column draws them as letters. A
+letter stands lit where its key reads true, and dim where it reads false:
+
+| the letter | the key it reads |
+|---|---|
+| U | the ticket carries the urgent mark |
+| Y | a person owns the step it stands on |
+| W | a hand holds it |
+| B | it waits on a ticket still open |
+| T | a hand parks it for the next pull |
+
+The letters hold fixed places, so nothing shifts as one lights. The keys stay
+ordinary keys, so a person filters on `urgent: true`, and `not urgent: true`
+keeps the rest.
+
+A letter and its key stand under `flags` in the base file. So a new flag costs
+one line there, because the key already stands.
+
+# A preset carries its sort
+
+A preset is a filter a person writes down, and it carries a sort beside it. A
+press puts both in, and the person changing either one keeps that change.
+
+| what a press does | what stands after it |
+|---|---|
+| a press on a preset | its filter joins what already stands, and its sort goes in |
+| a press on another | both filters stand, so the rows narrow twice |
+| a press on one standing in | its filter goes, and the sort stays |
+| a line a person types | it joins the presses, and narrows with them |
+
+A preset stands under `groups` in the base file, with its `filters` and its
+`sort`. One the file marks `pressed` stands in when the view opens.
+
+A slice is the same thing over the values one column carries. A column answers
+the buttons, so a slice costs no line in the file and moves as the data does.
+
 # A base file says it
 
 A view comes out of a file, in the base format the vaults write. So a new view
@@ -173,6 +231,23 @@ item the tree holds stay one thing.
 
 The fill reaches every row the view holds at that moment, so a filter says how
 far it goes. A row the filter drops keeps the value it carries.
+
+## A fill reaches the marks
+
+A person marks rows, and a fill standing over marks reaches those rows alone.
+With no mark standing the fill reaches the view, so the plain fill stays what it
+is:
+
+| what a person does | what the view does |
+|---|---|
+| a press on a row | that row takes a mark, and a press again takes it off |
+| shift and a row | every row from the last mark to this one takes one |
+| a fill over marks | the value reaches the marked rows |
+| a change to the filter | every mark goes |
+
+A mark a person cannot see is a row a fill writes blind, so a narrowing drops
+them all. This is how a person moves work between groups: mark the rows, write
+`group` in the cell, and every marked row takes it.
 
 ## A schema refuses a value
 

@@ -209,7 +209,7 @@ test("an edit to a field the verbs own is refused, and the line points at it", (
 
 // [[spec/design_output/schema#the-verbs-own-their-fields]]
 test("a field no rule marks stands, so a person's fields reach no door", () => {
-  assert.deepEqual(weighed(open.replace("urgency: now", "urgency: soon")), []);
+  assert.deepEqual(weighed(open.replace("urgent: true", "urgent: false")), []);
 });
 
 // [[spec/design_output/schema#the-three-places]]
@@ -335,9 +335,9 @@ test("the refusal names the finding and the three places", () => {
 });
 
 // [[spec/design_output/stop#the-mechanical-checks]]
-test("the queue holds work where a free open ticket has a leaf a hand takes, or a group reads now", () => {
+test("the queue holds work where a free open ticket has a leaf a hand takes, or a group carries the mark", () => {
   const free = (state, by = "anyone", more = "") =>
-    `---\nkind: [[ticket]]\nstate: ${state}\nurgency: soon\n${more}steps:\n  - name: do\n    by: ${by}\n---\n\n# Ask\n\nA thing.\n`;
+    `---\nkind: [[ticket]]\nstate: ${state}\n${more}steps:\n  - name: do\n    by: ${by}\n---\n\n# Ask\n\nA thing.\n`;
   assert.equal(queueHolds([free("open")]), true, "an open free ticket");
   assert.equal(queueHolds([free("draft")]), false, "a draft waits for its open");
   assert.equal(queueHolds([free("closed")]), false, "a closed one is done");
@@ -351,9 +351,9 @@ test("the queue holds work where a free open ticket has a leaf a hand takes, or 
     false,
     "a child rides its group",
   );
-  const group = (urgency) =>
-    `---\nkind: [[ticket]]\nstate: open\nurgency: ${urgency}\nprocess: [[spec/processes/group]]\nsteps:\n  - name: split\n---\n\n# Ask\n\nA group.\n`;
-  assert.equal(queueHolds([group("soon")]), false, "a group at soon is the cloud's");
-  assert.equal(queueHolds([group("now")]), true, "a group at now is the desk's");
+  const group = (mark) =>
+    `---\nkind: [[ticket]]\nstate: open\n${mark}process: [[spec/processes/group]]\nsteps:\n  - name: split\n---\n\n# Ask\n\nA group.\n`;
+  assert.equal(queueHolds([group("")]), false, "an unmarked group is the cloud's");
+  assert.equal(queueHolds([group("urgent: true\n")]), true, "a marked group is the desk's");
   assert.equal(queueHolds([]), false);
 });

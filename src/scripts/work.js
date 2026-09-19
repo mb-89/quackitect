@@ -26,6 +26,8 @@ import {
   TICKETS,
   ticketAt,
   ticketNamed,
+  urgent,
+  URGENT,
   WORK_BRANCH,
   withEntry,
   withField,
@@ -39,6 +41,7 @@ import { serving } from "./serve.js";
 import { freeIn, staleClaim, trigger } from "./stand.js";
 import { testVerb } from "./test-verb.js";
 import { unblock } from "./unblock.js";
+import { answer, answerOf } from "./work-answer.js";
 import { close, merge } from "./work-merge.js";
 import {
   BRIEF,
@@ -49,9 +52,9 @@ import {
   dirty,
   groupStanding,
   HELD,
-  mergedHere,
   noteOf,
   push,
+  readWork,
   setStatus,
   standingAll,
   standingIn,
@@ -60,9 +63,6 @@ import {
   sync,
   TODO,
   textAt,
-  ticketsOn,
-  URGENCY,
-  urgencyOf,
   waitingOn,
   withContract,
   workBranchHere,
@@ -85,6 +85,8 @@ export function work(root, argv, doors) {
     read,
     review,
     list,
+    // [[spec/design_output/work#one-verb-answers-git]]
+    answer: (it, _name, argv) => answer(it, (argv ?? []).slice(1)),
     // [[spec/design_output/pull#the-hand-out]]
     pull: (it, _name, argv) =>
       pull(
@@ -175,8 +177,10 @@ function newWork(it, name) {
 function take(it, name = "") {
   if (dirty(it)) return 2;
 
+  // A take acts on the remote, so it refreshes the refs first. [[spec/design_output/work#the-listing-reads-git-once]]
+  it.git.fetch();
   const stand = standOf(it);
-  const standing = standingAll(stand, mergedHere(it));
+  const standing = standingAll(stand);
   const open = stand.filter((one) => standing.get(one.branch) === TODO);
 
   if (!open.length) {
@@ -208,7 +212,7 @@ function take(it, name = "") {
   const wanted = held.length ? held : free;
   wanted.sort(
     (a, b) =>
-      URGENCY.indexOf(urgencyOf(noteOf(a))) - URGENCY.indexOf(urgencyOf(noteOf(b))) ||
+      Number(urgent(noteOf(b))) - Number(urgent(noteOf(a))) ||
       a.branch.localeCompare(b.branch),
   );
 
@@ -495,15 +499,18 @@ function read(it, name) {
 
 // [[spec/design_output/work#a-row-per-group]]
 function list(it, _name, argv) {
-  const stand = standOf(it);
-  const standing = standingAll(stand, mergedHere(it));
-  if ((argv ?? []).includes("--done")) return doneOnly(stand, standing);
+  const said = argv ?? [];
+  // The read stands off the network, and a flag asks for the refresh. [[spec/design_output/work#the-listing-reads-git-once]]
+  if (said.includes("--fetch")) it.git.fetch();
+  // [[spec/design_output/pull#the-queue-is-a-score]]
+  if (said.includes("--queue")) return queueOnly(it);
+  const read = readWork(it, true);
+  const stand = read.stand;
+  const standing = standingAll(stand);
+  if (said.includes("--done")) return doneOnly(stand, standing);
   const now = it.clock ? it.clock.now().getTime() : 0;
-  const rows = stand.flatMap((one) => [
-    rowOf(it, one, standing, now),
-    ...childRows(it, one),
-  ]);
-  const loose = looseRows(it);
+  const rows = stand.flatMap((one) => [rowOf(one, standing, now, it), ...childRows(one)]);
+  const loose = looseRows(read.loose);
 
   if (!rows.length && !loose.length) {
     console.log("No group and no loose ticket stands.");
@@ -527,15 +534,15 @@ function list(it, _name, argv) {
 }
 
 // [[spec/design_output/work#a-row-per-group]]
-function rowOf(it, one, standing, now) {
+function rowOf(one, standing, now, it) {
   const text = noteOf(one);
   const kind = one.brief ? "brief" : GROUP;
   const status = standing.get(one.branch) || "no status";
   const waits = waitingOn(text, standing);
-  const why = waits.length ? `waits for ${waits.join(", ")}` : urgencyOf(text);
+  const why = waits.length ? `waits for ${waits.join(", ")}` : markOf(text);
   // [[spec/design_output/work#a-stale-group-is-yours]]
   const { age, stale } =
-    status === HELD ? staleClaim(it, one.branch, now) : { age: "", stale: false };
+    status === HELD ? staleClaim(one, now, it) : { age: "", stale: false };
 
   return {
     name: one.name,
@@ -546,9 +553,9 @@ function rowOf(it, one, standing, now) {
 }
 
 // [[spec/design_output/work#a-ticket-under-its-group]]
-function childRows(it, one) {
+function childRows(one) {
   if (!one.ticket) return [];
-  return ticketsOn(it, `origin/${one.branch}`)
+  return one.tickets
     .filter((child) => fieldOf(child.text, GROUP) === one.name)
     .map((child) => ({
       stale: false,
@@ -561,18 +568,46 @@ function stateOf(text) {
   return fieldOf(text, "state") || OPEN;
 }
 
+// The order the pull hands out, off the one answer a board reads too. [[spec/design_output/work#one-verb-answers-git]]
+function queueOnly(it) {
+  const said = answerOf(it, true);
+  const held = new Map();
+  for (const one of [
+    ...said.branches,
+    ...said.branches.flatMap((row) => row.tickets),
+    ...said.loose,
+  ]) {
+    if (typeof one.queue === "number" && !held.has(one.name)) held.set(one.name, one);
+  }
+  const rows = [...held.values()].sort((a, b) => a.queue - b.queue);
+  if (!rows.length) {
+    console.log("No ticket stands in the queue.");
+    return 0;
+  }
+  for (const one of rows) {
+    const place = String(one.queue).padStart(COL.kind);
+    console.log(`${place}  ${one.name.padEnd(COL.branch)} ${one.step}`);
+  }
+  return 0;
+}
+
+// The why column carries the mark where nothing waits. [[spec/design_output/work#a-row-per-group]]
+function markOf(text) {
+  return urgent(text) ? URGENT : "";
+}
+
 // [[spec/design_output/work#a-ticket-under-its-group]]
 export function whyOf(text) {
-  return stepOf(text) || urgencyOf(text);
+  return stepOf(text) || markOf(text);
 }
 
 // [[spec/design_output/work#a-row-per-group]]
-function looseRows(it) {
-  return ticketsOn(it, `origin/${TRUNK}`)
+function looseRows(loose) {
+  return loose
     .filter((one) => !fieldOf(one.text, GROUP) && !isGroup(one.text))
     .map((one) => ({
       stale: false,
-      said: `${one.name.padEnd(COL.branch)} ticket ${(fieldOf(one.text, "state") || OPEN).padEnd(COL.status)} ${urgencyOf(one.text)}`,
+      said: `${one.name.padEnd(COL.branch)} ticket ${(fieldOf(one.text, "state") || OPEN).padEnd(COL.status)} ${markOf(one.text)}`,
     }));
 }
 

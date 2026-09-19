@@ -78,8 +78,8 @@ test("every runtime writer stands inside the half the skip reads", () => {
   }
 });
 
-// The owner rules the log history, and no state a session clears. [[spec/tickets/the-retro-takes-the-box]]
-test("the log stands outside the runtime half, because the retro collects it", () => {
+// The retro's collect skips the runtime half whole, and a retro reads the log. [[spec/tickets/the-runtime-folder-holds-state]]
+test("the log stands outside the half the retro skips", () => {
   assert.equal(LOG, `${PRIVATE}/log`);
   assert.equal(runs(LOG), false);
 });

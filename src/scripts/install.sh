@@ -253,7 +253,13 @@ get_lsp() {
   lsp_here
 }
 
-index_here() { [ -x "$bin/se-index${exe}" ]; }
+# A binary older than its own source walks by rules the tree no longer carries,
+# so a source newer than the binary asks for the build again.
+index_here() {
+  if [ ! -x "$bin/se-index${exe}" ]; then return 1; fi
+  newer=$(find "$root/src/index" -name '*.go' -newer "$bin/se-index${exe}" -print -quit 2>/dev/null || true)
+  [ -z "$newer" ]
+}
 
 # [[spec/design_output/index#the-compiler-it-needs]]
 get_zig() {

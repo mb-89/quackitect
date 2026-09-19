@@ -1,7 +1,6 @@
 ---
 kind: [[ticket]]
 state: closed
-urgency: soon
 group: the-person-step-holds
 steps:
   - name: do

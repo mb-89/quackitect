@@ -1,7 +1,6 @@
 ---
 kind: [[ticket]]
 state: open
-urgency: soon
 step: design/person-1
 steps:
   - name: design

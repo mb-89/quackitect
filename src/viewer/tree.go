@@ -27,16 +27,22 @@ type Column struct {
 
 // [[spec/design_output/tree-view#the-view-draws-a-tree]]
 type Tree struct {
-	Cols   []Column
-	Items  []Item
-	Nests  bool
-	Schema Schema
-	filter Filter
-	edit   *Edit
-	shut   map[string]bool
-	flat   []twig
-	sel    int
-	top    int
+	Cols    []Column
+	Items   []Item
+	Nests   bool
+	Schema  Schema
+	filter  Filter
+	sorts   []Sort
+	presets []Preset
+	flags   []Flag
+	typed   string
+	marks   map[string]bool
+	last    string
+	edit    *Edit
+	shut    map[string]bool
+	flat    []twig
+	sel     int
+	top     int
 }
 
 type twig struct {
@@ -60,8 +66,10 @@ func (t *Tree) rebuild() {
 	t.sel = max(0, min(t.sel, len(t.flat)-1))
 }
 
+// The sort orders one level, and the place a row keeps is its own. [[spec/design_output/tree-view#a-sort-holds-several-keys]]
 func (t *Tree) walk(items []Item, depth int, above string) {
-	for at, one := range items {
+	for _, at := range t.order(items) {
+		one := items[at]
 		here := strconv.Itoa(at)
 		if above != "" {
 			here = above + "/" + here

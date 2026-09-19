@@ -10,6 +10,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { probeOf, startOf } from "../../src/scripts/serve.js";
 import { work } from "../../src/scripts/work.js";
+import { remoteSaying } from "./work-doors.js";
 
 const ROOT = "/tree";
 const BRIEF =
@@ -32,10 +33,9 @@ function doors(cloud) {
     {
       "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
       "git rev-parse HEAD": { stdout: "b818c390c02737351bf1b73aba36a573d34d2ecc\n" },
-      "git ls-remote --heads origin work/*": {
-        stdout: "aaa\trefs/heads/work/one-done\n",
-      },
-      "git show origin/work/one-done:HANDOVER.md": { stdout: BRIEF },
+      ...remoteSaying([{ branch: "work/one-done", tip: "aaa" }], {
+        "work/one-done:HANDOVER.md": BRIEF,
+      }),
       "git rev-list --count HEAD..origin/main": { stdout: "0\n" },
       "git status --porcelain": { stdout: "" },
     },

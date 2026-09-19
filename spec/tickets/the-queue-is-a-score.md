@@ -1,7 +1,8 @@
 ---
 kind: [[ticket]]
-state: open
-urgency: now
+state: closed
+urgent: true
+depends_on: [one-urgency-stands]
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,8 +27,21 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
-group: work/the-work-editor-draws
+group: the-work-editor-draws
 step: do
+record:
+  - step: do
+    hand: box 4089f1b3b6bc · claude-code-remote
+    hash_before: 2c522005ef9f26d36b5a0b0bdc83208de6d9cdba
+    hash_after: 2c522005ef9f26d36b5a0b0bdc83208de6d9cdba
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 5 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: 86 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -88,11 +102,15 @@ The gain is a queue that says what to do next, and says why.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -100,12 +118,32 @@ The gain is a queue that says what to do next, and says why.
 
 <!-- the form is text -->
 
+One decider orders the queue, and `branch list --queue` writes that order. The
+mark stands over the score. The score sums what waits under a ticket, how long
+it stands and how often a hand-back comes back refused:
+
+| what the term reads | where its weight stands |
+|---|---|
+| the chain of tickets waiting under this one | `work.blockScore` |
+| the days since the ticket came in | `work.dayScore` |
+| the record entries carrying `returns` | `work.failScore` |
+
+`src/scripts/queue.js` holds the decider, and `handOut` and `branch list
+--queue` both read it. The ages come off one `git log` over the ticket folder,
+so the walk costs one process a pull.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
 
+- the change follows the ask: the score reads every term, and the config holds each weight
+- the cleanup it reveals: the dependency read moves to `group.js`, so one place owns it
+- the decider stands in `queue.js`, and the pull and the listing both point at it
+
 # Discussion
 
-<!-- what anybody adds, at any time, on this ticket -->
+- The ask puts the flag on the verb writing the work answer, which stands open still
+- `branch list --queue` carries the flag meanwhile, off the same decider
+- [[spec/tickets/the-work-answer-lands]] moves it onto that verb when it lands

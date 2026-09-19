@@ -107,7 +107,7 @@ function minted(it, retro, n, span) {
     path,
     fields: {
       state: "open",
-      urgency: "now",
+      urgent: true,
       group: retro,
       process: held.link,
       process_hash: held.hash,

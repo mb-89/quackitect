@@ -1,7 +1,6 @@
 ---
 kind: [[ticket]]
 state: closed
-urgency: whenever
 step: do
 steps:
   - name: do

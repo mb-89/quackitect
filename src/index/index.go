@@ -56,12 +56,21 @@ var skipped = map[string]bool{
 // The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because a Go module imports no JavaScript.
 const Runtime = ".se/.runtime"
 
+// The log grows a line a door call, so a watch on it sweeps the tree for nothing. [[spec/design_output/index#the-watcher-keeps-it-warm]]
+const Log = ".se/log"
+
 func skips(root, abs string, info os.FileInfo) bool {
 	if skipped[info.Name()] {
 		return true
 	}
 	rel, ok := relOf(root, abs)
 	return ok && rel == Runtime
+}
+
+// [[spec/design_output/index#the-watcher-keeps-it-warm]]
+func logs(root, abs string) bool {
+	rel, ok := relOf(root, abs)
+	return ok && rel == Log
 }
 
 func Open(root, at string) (*sql.DB, error) {

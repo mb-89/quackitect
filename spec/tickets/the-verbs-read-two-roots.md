@@ -1,7 +1,6 @@
 ---
 kind: [[ticket]]
 state: closed
-urgency: soon
 depends_on: [the-shim-resolves-the-vehicle]
 steps:
   - name: sync

@@ -28,6 +28,16 @@ Vale holds the line: `DoorsOnly` refuses a `node:` import, a `Date.now`, a
 `new Date()` and a `Math.random` anywhere but `src/doors`. The modules reaching
 nothing pass, and `spec/config/styles/VoiceVale/DoorsOnly.yml` names them.
 
+# A raw run keeps bytes
+
+`proc.run` answers text. A caller passing `raw` gets a character a byte, so a
+length the program declares matches what the string holds.
+
+A caller reading a git object out of a batch needs that. The object carries a
+size in bytes, and a name beside bytes no reader reads as text. Such a caller
+turns each payload back into text itself, and a caller wanting text passes
+nothing.
+
 # A door standing on another
 
 Git runs a program, and the log writes a file, so each takes the door beneath it

@@ -1,7 +1,6 @@
 ---
 kind: [[ticket]]
 state: closed
-urgency: whenever
 step: design/person-1
 steps:
   - name: design

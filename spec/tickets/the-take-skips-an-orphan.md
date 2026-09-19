@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: open
-urgency: now
+urgent: true
 steps:
   - name: design
     reads: [[spec/guidance/voice]]

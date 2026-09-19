@@ -14,7 +14,7 @@ import {
 } from "../../.claude/skills/level0/lib/review.js";
 import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
-import { DONE, mergedHere, standingAll, standOf } from "./work.js";
+import { DONE, standingAll, standOf } from "./work.js";
 
 const LOUD = 5;
 
@@ -51,7 +51,7 @@ export function review(it, name, argv) {
 // A done branch is work of the desk, and the pull hands it out as the review, the merge and the close. [[spec/design_output/review#the-queue-takes-done-branches]]
 export function readyToMerge(it) {
   const stand = standOf(it);
-  const standing = standingAll(stand, mergedHere(it));
+  const standing = standingAll(stand);
   const done = stand.filter((one) => standing.get(one.branch) === DONE).map((one) => one.branch);
   if (!done.length) return false;
   const name = done[0].replace(/^work\//, "");

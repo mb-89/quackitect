@@ -7,7 +7,7 @@
 const LINK = "vehicle.json";
 const ASKING = 10000;
 const POINTER = ".se/vehicle.json";
-// The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because this hook imports nothing.
+// The log of [[spec/design_input/the-runtime-files-stand-apart]], which stands outside the runtime half because the retro collects it. It is owned by log.js and spelled again here because this hook imports nothing.
 const SESSION = ".se/log/session.jsonl";
 const REGISTER = ".se/registry.json";
 const PORT = 6510;

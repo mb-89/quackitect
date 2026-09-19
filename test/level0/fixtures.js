@@ -10,7 +10,7 @@ governs:
 frontmatter:
   type: object
   additionalProperties: false
-  required: [kind, state, urgency, steps]
+  required: [kind, state, steps]
   properties:
     kind:
       const: ticket
@@ -23,9 +23,9 @@ frontmatter:
     reason:
       enum: [done, dropped, became]
       description: how the work stopped
-    urgency:
-      enum: [now, soon, whenever]
-      description: which ticket the pull hands out first
+    urgent:
+      type: boolean
+      description: whether the pull hands this out first
     step:
       type: string
       x-names: steps

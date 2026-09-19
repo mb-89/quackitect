@@ -197,6 +197,30 @@ under. A checklist on the leaf or a phase above it adds the `checked` field,
 one line per item. Then come the actionables of every note the leaf reads,
 and the line that hands it back.
 
+# The queue is a score
+
+One decider orders the queue, and every column naming an order reads that one
+answer. The mark stands over the score, and the score orders everything under
+it:
+
+| the term | what it does | its weight |
+|---|---|---|
+| the mark | puts a ticket over every unmarked one | none, because it overrides |
+| what waits under it | raises it, down the whole chain | `work.blockScore` |
+| how long it stands | raises it, so nothing sits forever | `work.dayScore` |
+| how often a hand-back comes back refused | raises it | `work.failScore` |
+
+The walk reaches the whole chain, so a ticket blocking one that blocks ten
+counts eleven. A ticket waiting on one still open leaves the queue before the
+score reads it, and the board draws it anyway.
+
+The weights stand in `spec/config/level0.json`, beside `failsBeforePerson`, so
+tuning the queue costs an edit. `branch list --queue` writes the order the pull
+hands out, and the column a board draws reads that answer.
+
+A ticket's age comes off one `git log` over the folder holding the tickets, so
+the cost stands beside the pull, once a pull.
+
 # A hand of its own
 
 A step under `not` excludes the hand the record names on the step it names,
@@ -352,6 +376,11 @@ itself where none stands. A phase named there sends the ticket to its first
 leaf. At `work.failsBeforeWait` returns the pull drops the hold and answers
 `wait`, so the target stands open for the hand that takes it next.
 
+A fail says the step works not, so its commands run for the record and refuse
+nothing. A step whose evidence stands red is exactly a step a hand fails, and
+the record carries what each command says. The fields of the chapter still have
+to stand, because a fail says why in them.
+
 ## A person step goes in
 
 `withPersonStep` puts a step named `person-<n>` before the target, `by:
@@ -473,3 +502,8 @@ see count too.
 
 The run names the tap reporter. Node past version 23 answers a pipe with the
 spec reporter too, so the count reads the tap lines.
+
+The tests stand in two languages, and the verb runs both. A changed `*.test.js`
+joins the node run, and a changed `*_test.go` names the module under `src` that
+holds it, which the verb runs with `go test`. The answer reads green where
+every run does, and it names the first that does not.

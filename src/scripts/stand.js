@@ -5,7 +5,6 @@
 
 import { aged, spanOf, STALE } from "./group.js";
 import {
-  mergedHere,
   MS,
   noteOf,
   ROUTINE,
@@ -15,11 +14,10 @@ import {
   waitingOn,
 } from "./work.js";
 
-// [[spec/design_output/work#a-stale-group-is-yours]]
-export function tipAge(it, branch, now) {
-  const said = it.git.run(["log", "-1", "--format=%ct", `origin/${branch}`], true);
-  if (!now || !said.ok || !said.out) return -1;
-  return Math.max(0, Math.floor(now / MS) - Number(said.out));
+// The read carries the tip's own time, so the age costs no process. [[spec/design_output/work#the-listing-reads-git-once]]
+export function tipAge(one, now) {
+  if (!now || !one?.when) return -1;
+  return Math.max(0, Math.floor(now / MS) - Number(one.when));
 }
 
 // The span a claim goes stale past. `work.staleAfter` names it, and STALE stands where it says nothing. [[spec/design_output/work#a-stale-group-is-yours]]
@@ -28,8 +26,8 @@ export function staleSpan(it) {
 }
 
 // Whether the claim on this branch stands older than the span. The list draws this, and the take reads it. [[spec/design_output/work#a-stale-group-is-yours]]
-export function staleClaim(it, branch, now) {
-  const held = tipAge(it, branch, now);
+export function staleClaim(one, now, it) {
+  const held = tipAge(one, now);
   return {
     held,
     age: held < 0 ? "" : aged(held),
@@ -40,32 +38,34 @@ export function staleClaim(it, branch, now) {
 // A branch stands free where nobody claims it, and where the claim on it goes stale. [[spec/design_output/work#a-stale-group-is-yours]]
 export function freeIn(stand, standing, it = null, now = 0) {
   return stand
-    .filter(
-      (one) =>
-        standing.get(one.branch) === TODO || staleHere(it, now, one.branch, standing),
-    )
+    .filter((one) => standing.get(one.branch) === TODO || staleHere(it, now, one, standing))
     .filter((one) => !waitingOn(noteOf(one), standing).length);
 }
 
 // [[spec/design_output/work#a-stale-group-is-yours]]
-function staleHere(it, now, branch, standing) {
-  if (!it || !now || standing.get(branch) !== "held") return false;
-  return staleClaim(it, branch, now).stale;
+function staleHere(it, now, one, standing) {
+  if (!it || !now || standing.get(one.branch) !== "held") return false;
+  return staleClaim(one, now, it).stale;
 }
 
 // [[spec/design_output/work#the-routine-a-verb-names]]
 export function freeNow(briefs, merged = new Set()) {
-  const stand = [...briefs].map(([branch, brief]) => ({ branch, brief, ticket: "" }));
-  return freeIn(stand, standingAll(stand, merged)).map((one) => one.branch);
+  const stand = [...briefs].map(([branch, brief]) => ({
+    branch,
+    brief,
+    ticket: "",
+    merged: merged.has(branch),
+  }));
+  return freeIn(stand, standingAll(stand)).map((one) => one.branch);
 }
 
 // [[spec/design_output/work#the-routine-a-verb-names]]
 export function trigger(it) {
+  // The trigger reads the remote, so it refreshes the refs first. [[spec/design_output/work#the-listing-reads-git-once]]
+  it.git.fetch();
   const stand = standOf(it);
   const now = it.clock ? it.clock.now().getTime() : 0;
-  const free = freeIn(stand, standingAll(stand, mergedHere(it)), it, now).map(
-    (one) => one.branch,
-  );
+  const free = freeIn(stand, standingAll(stand), it, now).map((one) => one.branch);
 
   console.log(
     `${ROUTINE.name} runs ./RUNME.sh branch pull on a cloud box, and the engine takes a branch there.`,

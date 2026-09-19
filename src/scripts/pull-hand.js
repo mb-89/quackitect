@@ -11,8 +11,10 @@ import {
   isGroup,
   NOTE_END,
   OPEN,
+  dependsOn,
   TICKETS,
   ticketNamed,
+  urgent,
   withEntry,
   withField,
 } from "./group.js";
@@ -32,6 +34,7 @@ import {
   walkOf,
 } from "./pull-route.js";
 import { entriesOf, pushed, returnsOf, shut, target, tipOf } from "./pull-writes.js";
+import { queued, stoodHere } from "./queue.js";
 import { HELPER, SPAWN, spawnPrompt, unblockPrompt } from "./spawn.js";
 import { NOTES, schemasHere } from "./ticket.js";
 
@@ -77,19 +80,14 @@ export function childrenOf(all, group) {
   return all.filter((one) => names.has(one.name));
 }
 
-export const URGENCY = ["now", "soon", "whenever"];
-
-export function sorted(list) {
-  return [...list].sort(
-    (a, b) =>
-      URGENCY.indexOf(urgency(a.text)) - URGENCY.indexOf(urgency(b.text)) ||
-      a.name.localeCompare(b.name),
-  );
+// The score orders the queue, and the terms a weighing carries answer it. [[spec/design_output/pull#the-queue-is-a-score]]
+export function weighing(it, all) {
+  return { clock: it.clock, weights: it.weights, stood: stoodHere(it), all };
 }
 
-export function urgency(text) {
-  const said = fieldOf(text, "urgency");
-  return URGENCY.includes(said) ? said : "soon";
+// [[spec/design_output/pull#the-queue-is-a-score]]
+export function sorted(list, at = {}) {
+  return queued(list, at.all ?? list, at);
 }
 
 // [[spec/design_output/pull#what-a-hand-out-reads]]
@@ -102,15 +100,16 @@ export function handOut(it, who) {
   const privates = all.filter(
     (one) => one.private && String(one.front.todo) !== "true",
   );
+  const at = weighing(it, all);
   // [[spec/design_output/pull#the-engine-takes-the-branch]]
   const pools = who.group
     ? [
         tagged,
-        sorted(childrenOf(all, who.group)),
+        sorted(childrenOf(all, who.group), at),
         groupTicket ? [groupTicket] : [],
-        sorted(privates),
+        sorted(privates, at),
       ]
-    : [tagged, sorted(freeIn(all)), sorted(privates)];
+    : [tagged, sorted(freeIn(all), at), sorted(privates, at)];
   if (!who.group) cutForGroups(it, all);
   // A name on the pull asks for one ticket, so the pools carry that one alone. [[spec/design_output/pull#the-hand-out]]
   const asked = who.wanted
@@ -172,21 +171,22 @@ export function cutForGroups(it, all) {
   }
 }
 
-// A desk takes a group on two roads alone: the owner names it, or its urgency reads now. [[spec/design_output/pull#the-engine-takes-the-branch]]
+// A desk takes a group on two roads alone: the owner names it, or it carries the mark. [[spec/design_output/pull#the-engine-takes-the-branch]]
 export function namedGroup(it, name) {
   const one = ticketsHere(it).find((held) => !held.private && held.name === name);
   return one && isGroup(one.text) ? name : "";
 }
 
 export function urgentGroup(it) {
-  const groups = ticketsHere(it).filter(
+  const all = ticketsHere(it);
+  const groups = all.filter(
     (one) =>
       !one.private &&
       isGroup(one.text) &&
       fieldOf(one.text, "state") === OPEN &&
-      urgency(one.text) === "now",
+      urgent(one.text),
   );
-  return sorted(groups)[0]?.name ?? "";
+  return groups.length ? (sorted(groups, weighing(it, all))[0]?.name ?? "") : "";
 }
 
 export function spawnAnswer(other) {
@@ -233,19 +233,7 @@ export function offer(it, who, one, all) {
   return admits(it, who, one, moved.leaf, all);
 }
 
-export function dependsOn(front) {
-  return [front?.depends_on ?? []]
-    .flat()
-    .flatMap((one) => String(one).split(","))
-    .map((one) =>
-      one
-        .trim()
-        .replace(/^\[|\]$/g, "")
-        .replace(/^["']|["']$/g, "")
-        .trim(),
-    )
-    .filter(Boolean);
-}
+export { dependsOn } from "./group.js";
 
 // [[spec/design_output/pull#children-before-their-group]]
 export function closedHere(it, all, dep) {

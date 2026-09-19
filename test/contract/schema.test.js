@@ -135,7 +135,6 @@ test("the mint copies every process onto a ticket the checker passes", () => {
     const said = readYaml(here.read(path));
     const made = mintNote(ticket, {
       state: "open",
-      urgency: "soon",
       process: path.replace(/\.yaml$/, ""),
       process_hash: processHash(said),
       steps: said.steps,

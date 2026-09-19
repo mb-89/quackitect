@@ -24,6 +24,15 @@ type View struct {
 	Collapsed []string
 	Filters   string
 	Opens     string
+	Sorts     []Sort
+	Presets   []Preset
+	Flags     []Flag
+}
+
+// A boolean key and the letter standing for it in the flags column. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+type Flag struct {
+	Letter string
+	Key    string
 }
 
 // [[spec/design_output/tree-view#a-base-file-says-it]]
@@ -74,7 +83,93 @@ func viewOf(at int, said, whole *yaml.Doc) (View, error) {
 		Collapsed: yaml.StringsOf(said.Get("collapsed")),
 		Filters:   filtersOf(said, whole),
 		Opens:     opensOf(whole),
+		Sorts:     sortsOf(said, whole),
+		Presets:   presetsOf(said, whole),
+		Flags:     flagsIn(said, whole),
 	}, nil
+}
+
+// The letters the flags column draws, in the fixed places the file names. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+func flagsIn(said, whole *yaml.Doc) []Flag {
+	for _, held := range []*yaml.Doc{said, whole} {
+		if held == nil {
+			continue
+		}
+		rows := yaml.Flat(held.Get("flags"))
+		out := make([]Flag, 0, len(rows))
+		for _, each := range rows {
+			one := yaml.AsDoc(each)
+			if one == nil {
+				continue
+			}
+			letter := yaml.AsString(one.Get("letter"))
+			key := yaml.AsString(one.Get("key"))
+			if letter == "" || key == "" {
+				continue
+			}
+			out = append(out, Flag{Letter: letter, Key: key})
+		}
+		// A view naming none falls through to the file, which names them once. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+		if len(out) > 0 {
+			return out
+		}
+	}
+	return nil
+}
+
+// A preset a file writes down stands under `groups`, with its filter and its sort. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+func presetsOf(said, whole *yaml.Doc) []Preset {
+	out := []Preset{}
+	for _, held := range []*yaml.Doc{whole, said} {
+		if held == nil {
+			continue
+		}
+		for _, each := range yaml.Flat(held.Get("groups")) {
+			one := yaml.AsDoc(each)
+			if one == nil {
+				continue
+			}
+			name := yaml.AsString(one.Get("name"))
+			if name == "" {
+				continue
+			}
+			out = append(out, Preset{
+				Name:    name,
+				Filters: filtersOf(one, nil),
+				Sorts:   sortsOf(one, nil),
+				Pressed: yaml.AsBool(one.Get("pressed")),
+			})
+		}
+	}
+	return out
+}
+
+// The order a view opens in, as a list of keys or of maps naming a direction. [[spec/design_output/tree-view#a-sort-holds-several-keys]]
+func sortsOf(said, whole *yaml.Doc) []Sort {
+	for _, held := range []*yaml.Doc{said, whole} {
+		if held == nil {
+			continue
+		}
+		rows := yaml.Flat(held.Get("sort"))
+		out := make([]Sort, 0, len(rows))
+		for _, each := range rows {
+			if one := yaml.AsDoc(each); one != nil {
+				out = append(out, Sort{
+					Key:  yaml.AsString(one.Get("key")),
+					Down: yaml.AsBool(one.Get("down")),
+				})
+				continue
+			}
+			if key := strings.TrimSpace(yaml.AsString(each)); key != "" {
+				out = append(out, Sort{Key: key})
+			}
+		}
+		// A view naming no order falls through to the file. [[spec/design_output/tree-view#a-sort-holds-several-keys]]
+		if len(out) > 0 {
+			return out
+		}
+	}
+	return nil
 }
 
 // [[spec/design_output/tree-view#a-base-file-says-it]]

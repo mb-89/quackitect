@@ -57,6 +57,17 @@ test("the real door hands a named variable to the program, and keeps the rest", 
   assert.equal(said.stdout, "quack:true");
 });
 
+// [[spec/design_output/doors#a-raw-run-keeps-bytes]]
+test("a raw run answers a character a byte, and an ordinary run answers text", () => {
+  const writes = [
+    process.execPath,
+    "-e",
+    "process.stdout.write(Buffer.from([0xc3, 0xa4]))",
+  ];
+  assert.equal(proc().run(writes, { raw: true }).stdout.length, 2);
+  assert.equal(proc().run(writes).stdout, "ä");
+});
+
 test("the real door hands standard input to the program", () => {
   const said = proc().run(
     [process.execPath, "-e", "process.stdin.pipe(process.stdout)"],

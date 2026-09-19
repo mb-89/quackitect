@@ -15,7 +15,8 @@ export function proc() {
         cwd: init.cwd,
         env: init.env ? { ...process.env, ...init.env } : undefined,
         input: init.inherit ? undefined : (init.stdin ?? ""),
-        encoding: "utf8",
+        // [[spec/design_output/doors#a-raw-run-keeps-bytes]]
+        encoding: init.raw ? "latin1" : "utf8",
         shell: false,
         timeout: init.timeoutMs,
         maxBuffer: BUFFER,

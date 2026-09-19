@@ -10,6 +10,7 @@ import { fakeGit } from "../../src/doors/fake/git.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 import { git } from "../../src/doors/git.js";
 import { proc } from "../../src/doors/proc.js";
+import { asText, framed, namesIn } from "../../src/scripts/work-read.js";
 
 const WHO = "Duck Tester";
 
@@ -63,6 +64,36 @@ test("the fake answers what the real door answers", () => {
   const { at, door } = repoHere(files);
   try {
     assert.deepEqual(answers(fakeGit(taught, at)), answers(door));
+  } finally {
+    files.remove(at);
+  }
+});
+
+// [[spec/design_output/work#the-listing-reads-git-once]]
+test("the batch answers every object asked for, and says missing where none stands", () => {
+  const files = disk();
+  const { at, door } = repoHere(files);
+  try {
+    const said = framed(door.batch(["HEAD:notes.md", "HEAD:nothing.md"]), [
+      "HEAD:notes.md",
+      "HEAD:nothing.md",
+    ]);
+    assert.equal(asText(said.get("HEAD:notes.md")), "# Notes\n");
+    assert.equal(said.get("HEAD:nothing.md"), "");
+    assert.equal(door.batch([]), "");
+  } finally {
+    files.remove(at);
+  }
+});
+
+// A tree stands under the ask, and its names come off the bytes. [[spec/design_output/work#the-listing-reads-git-once]]
+test("the batch answers a tree, and the names read off it", () => {
+  const files = disk();
+  const { at, door } = repoHere(files);
+  try {
+    const ask = "HEAD:";
+    const said = framed(door.batch([ask]), [ask]);
+    assert.deepEqual(namesIn(said.get(ask)), ["notes.md"]);
   } finally {
     files.remove(at);
   }

@@ -41,7 +41,7 @@ export function newRetro(it, argv) {
     path,
     fields: {
       state: "open",
-      urgency: "now",
+      urgent: true,
       process: held.link,
       process_hash: held.hash,
       steps: route,

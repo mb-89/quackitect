@@ -1,7 +1,6 @@
 ---
 kind: [[ticket]]
 state: closed
-urgency: soon
 steps:
   - name: do
     does: makes the change, with the test that covers it

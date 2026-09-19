@@ -85,6 +85,10 @@ The watch is what holds the rows level with the tree. It watches every folder
 the walk covers, and a write anywhere marks the rows dirty. One sweep answers a
 burst, so a build touching a thousand files costs one walk.
 
+The log is the one folder the watch stands off. It grows a line a door call, so
+a watch on it sweeps the tree for nothing. The walk still reads it, and the next
+sweep carries what it holds.
+
 A box where no watch stands still answers, out of the walk the door makes on
 the way up.
 

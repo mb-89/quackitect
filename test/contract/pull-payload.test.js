@@ -25,7 +25,6 @@ const TICKET = at("spec/tickets/a-child.md");
 const GROUP = `---
 kind: [[ticket]]
 state: closed
-urgency: soon
 process: [[group]]
 steps:
   - name: split
@@ -50,7 +49,7 @@ Two tickets that land as one.
 const CHILD = `---
 kind: [[ticket]]
 state: open
-urgency: now
+urgent: true
 step: implement/tests-red
 steps:
   - name: implement
