@@ -279,11 +279,17 @@ queue rule at 80 stands quiet, because the fake tree carries no free ticket.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change reaches the stop door and the chapter owning the hold, and the ask names both
+- the cases drive the door over the fake disk and the fake process the fixture holds
+- each case and each new line points at the ticket or the chapter carrying the approach
 
 ## tests-green
 

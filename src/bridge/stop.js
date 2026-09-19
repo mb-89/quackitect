@@ -93,14 +93,24 @@ export function refusedByHold(tool) {
   ].join(" ");
 }
 
-// The hold ends the turn it lands in, so the turn's end puts it back. [[spec/design_output/stop#the-hold]]
-export function dropsHold(_e, box) {
+// The hold ends the turn it lands in, so the turn's end puts it back. A helper's turn end touches neither, the way every door beside this one skips one. [[spec/design_output/stop#the-hold]]
+export function dropsHold(e, box) {
+  if (e?.agentId) return { pass: true };
   const hold = String(asks(box, HOLD) ?? OFF);
   box.held = "";
   if (hold !== FINISH && hold !== STOP) return { pass: true };
+  // The mark the vote reads, so a hold dropped here still ends the turn it stood in. [[spec/design_output/stop#the-hold-outlives-its-drop]]
+  box.stood = hold;
   writes(box, HOLD, OFF);
   box.log.say("debug", "config", `the hold stood at ${hold}, and drops to ${OFF}`);
   return { pass: true };
+}
+
+// The hold that stands over this turn: the one the owner holds now, or the one the turn's end dropped. [[spec/design_output/stop#the-hold-outlives-its-drop]]
+export function holdHere(box) {
+  const hold = String(asks(box, HOLD) ?? OFF);
+  if (hold === FINISH || hold === STOP) return hold;
+  return String(box.stood ?? OFF);
 }
 
 export function sawCall(e, box) {
@@ -109,9 +119,10 @@ export function sawCall(e, box) {
   todosOf(box).sawCall(e);
 }
 
-// A prompt from outside this plugin opens a turn, and the tooth counts them. [[spec/design_output/stop#the-tooth-holds-its-state]]
+// A prompt from outside this plugin opens a turn, and the tooth counts them. A hold is one turn long, so the mark of the turn before drops here. [[spec/design_output/stop#the-tooth-holds-its-state]]
 export function sawPrompt(e, box) {
   if (e?.agentId) return;
+  box.stood = "";
   toothOf_(box).sawPrompt(Boolean(e?.mine));
 }
 
@@ -146,7 +157,8 @@ export function onStop(e, box) {
   const text = String(e?.last_assistant_message ?? "");
   const claimed = box.claim ?? lastLineReason(text);
   box.claim = null;
-  const hold = String(asks(box, HOLD) ?? OFF);
+  // The hold that stood over this turn, so the order the two events arrive in decides nothing. [[spec/design_output/stop#the-hold-outlives-its-drop]]
+  const hold = holdHere(box);
   const off = asks(box, ENABLED) === false;
   const decision = decide(rules, {
     claimed,
