@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: design
@@ -166,6 +166,11 @@ record:
     hash_after: 044f2741deaa29c7ad145621017631cbfae45546
     returns: 2
     why: the hand takes it back
+  - step: verdict
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-9
+    hash_before: e736b98a262f33028b22adb5ac3b8901547dc716
+    hash_after: e736b98a262f33028b22adb5ac3b8901547dc716
+reason: done
 ---
 
 # Ask
@@ -359,30 +364,152 @@ The refs standing orphaned on this remote stay standing. `git ls-remote --heads 
 <!-- every file you read, one a line -->
 <!-- the form is files -->
 
-spec/tickets/the-take-skips-an-orphan.md
-spec/tickets/the-spawn-takes-a-step.md
-spec/design_output/work.md
-src/scripts/work-stands.js
-src/scripts/work.js
-src/scripts/work-merge.js
-test/level0/work-orphan.test.js
+- .claude/skills/level0/hooks/level0.js
+- .claude/skills/level0/lib/answer.js
+- .claude/skills/level0/lib/apply.js
+- .claude/skills/level0/lib/bash.js
+- .claude/skills/level0/lib/config.js
+- .claude/skills/level0/lib/copilot-runtime.js
+- .claude/skills/level0/lib/guidance.js
+- .claude/skills/level0/lib/index.js
+- .claude/skills/level0/lib/layer.js
+- .claude/skills/level0/lib/log.js
+- .claude/skills/level0/lib/paragraph.js
+- .claude/skills/level0/lib/private.js
+- .claude/skills/level0/lib/projection.js
+- .claude/skills/level0/lib/refuse.js
+- .claude/skills/level0/lib/review.js
+- .claude/skills/level0/lib/schema.js
+- .claude/skills/level0/lib/snippets.js
+- .claude/skills/level0/lib/stop.js
+- .claude/skills/level0/lib/ticket.js
+- .claude/skills/level0/lib/tools.js
+- .claude/skills/level0/lib/tree.js
+- .claude/skills/level0/lib/trunk.js
+- .claude/skills/level0/lib/undo.js
+- .claude/skills/level0/lib/vehicle.js
+- .claude/skills/level0/lib/vocabulary.js
+- .claude/skills/level0/lib/voice.js
+- .claude/skills/level0/lib/warnings.js
+- .claude/skills/pane/hooks/pane.js
+- spec/design_output/work.md
+- spec/tickets/the-spawn-takes-a-step.md
+- spec/tickets/the-take-skips-an-orphan.md
+- spec/tickets/voice-rules-skip-the-record.md
+- src/bridge/answer.js
+- src/bridge/apply.js
+- src/bridge/ask.js
+- src/bridge/bash.js
+- src/bridge/code.js
+- src/bridge/findings.js
+- src/bridge/projection.js
+- src/bridge/review.js
+- src/bridge/search.js
+- src/bridge/server.js
+- src/bridge/status.js
+- src/bridge/stop.js
+- src/bridge/tools.js
+- src/bridge/vehicle.js
+- src/bridge/write.js
+- src/doors/fake/bridgehead.js
+- src/doors/git.js
+- src/doors/index.js
+- src/doors/log.js
+- src/doors/session.js
+- src/extension/lib/rows.js
+- src/extension/sidebar.js
+- src/extension/webview/clicks.js
+- src/scripts/copilot.js
+- src/scripts/editor.js
+- src/scripts/group.js
+- src/scripts/hand.js
+- src/scripts/prepush.js
+- src/scripts/probe.js
+- src/scripts/pull-hand.js
+- src/scripts/pull-writes.js
+- src/scripts/pull.js
+- src/scripts/queue.js
+- src/scripts/retro.js
+- src/scripts/review.js
+- src/scripts/stand.js
+- src/scripts/stub.js
+- src/scripts/ticket.js
+- src/scripts/tools.js
+- src/scripts/unblock.js
+- src/scripts/vehicle.js
+- src/scripts/viewer.js
+- src/scripts/voice.js
+- src/scripts/work-answer.js
+- src/scripts/work-merge.js
+- src/scripts/work-read.js
+- src/scripts/work-stands.js
+- src/scripts/work.js
+- src/stub/.claude/skills/level0/hooks/bridgehead.js
+- test/contract/biome.test.js
+- test/contract/candidate-check.test.js
+- test/contract/cloud-start.test.js
+- test/contract/compact.test.js
+- test/contract/disk.test.js
+- test/contract/index.test.js
+- test/contract/pull-payload.test.js
+- test/contract/schema.test.js
+- test/contract/shape.test.js
+- test/contract/stop-rules.test.js
+- test/contract/stub.test.js
+- test/contract/ticket.test.js
+- test/contract/tree.test.js
+- test/contract/vale.test.js
+- test/contract/vehicle.test.js
+- test/contract/vocabulary.test.js
+- test/contract/wire.test.js
+- test/level0/besides.test.js
+- test/level0/bridgehead.test.js
+- test/level0/copilot-runtime.test.js
+- test/level0/fixtures.js
+- test/level0/guidance.test.js
+- test/level0/hand.test.js
+- test/level0/layer.test.js
+- test/level0/panel.test.js
+- test/level0/person-step.test.js
+- test/level0/projection.test.js
+- test/level0/pull-leaves.test.js
+- test/level0/pull-steps.test.js
+- test/level0/retro-mint.test.js
+- test/level0/roots.test.js
+- test/level0/serve.test.js
+- test/level0/session-layer.test.js
+- test/level0/stop-door.test.js
+- test/level0/stub.test.js
+- test/level0/ticket.test.js
+- test/level0/tools.test.js
+- test/level0/unblock.test.js
+- test/level0/vehicle.test.js
+- test/level0/verbs.test.js
+- test/level0/voiceverb.test.js
+- test/level0/warnings.test.js
+- test/level0/work-answer.test.js
+- test/level0/work-doors.js
+- test/level0/work-group.test.js
+- test/level0/work-open.test.js
+- test/level0/work-orphan.test.js
+- test/level0/work.test.js
+- test/level0/write.test.js
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 <!-- the form is verdict -->
 
-fail
-
-- the status column in `spec/design_output/work.md` names four words, and the listing prints `orphan`
-- that chapter says `branch list` asks git three times, and `refsHere` adds a read a branch
+pass
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the code comments point at [[spec/design_output/work#the-listing-reads-git-once]], and the status table there misses `orphan`
+- the status words and the four reads stand in [[spec/design_output/work#the-listing-reads-git-once]], and each hunk points at it
+- `baseOnTrunk` stands in one place, and the listing and the merge read it
+- the sweep under this ticket's name reads as a formatter pass, and it moves no behaviour
 
 # Discussion
 
