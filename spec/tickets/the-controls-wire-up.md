@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -105,6 +105,12 @@ record:
     hand: box d42624a67d18a8 · claude-code
     hash_before: c44525874ec9225cb01b2e144e6b54a3c9d3e579
     hash_after: c44525874ec9225cb01b2e144e6b54a3c9d3e579
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: b4b4cf28dbcd31b637409aee8dac8f2debfb4c19
+    hash_after: b4b4cf28dbcd31b637409aee8dac8f2debfb4c19
+    returns: 2
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | for the binding, yes. The autonomy half stands cut, and the Ask still asks for it |; | is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does every rule the approach adds carry a case | for the pull at `unbound`, yes. For the three stop rows, no |; | does every claim carry a proof | yes but one, and the `queue` row reads other than the tree |; TL;DR:; The autonomy cut holds. `grep -rn autonomy src .claude spec` answers nothing, so the draft matches the tree.; The stop table reads true. `queueWaits` reads `engine.binding`, and the three rows above it read none.; The anchor stands. `spec/design_output/config` carries The engine controls.; One row of the binding table reads other than the tree, and two things the approach adds carry no case.; The findings, one a line:; The `queue` row's `pull <ticket>` column reads other than the tree. `pull.js` refuses a named ticket there.; Its own comment says so, and [[spec/design_output/pull#the-hand-out]] carries the rule.; So the row says what the draft leaves standing, or the draft says that road moves too.; The Ask carries the autonomy table and its done_when line, and the approach cuts that half.; Cut both from the Ask, or write the owner's word on the drop into the Discussion.; The three stop rows standing down at `god` carry no case. Name one, beside the pull at `unbound`.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the `queue` row reads the tree, or names the road it moves | open |; | 2 | the Ask drops the autonomy half, or the Discussion carries its word | open |; | 3 | the done_when names a case for the three stop rows at `god` | open |; | 4 | the review hand reads the approach again | open |"
 ---
 
 # Ask
@@ -178,19 +184,38 @@ read no binding.
 
 fail
 
-- The binding table holds. The three values each get a row, and the `pull <ticket>` column reads true against the ask.
-- Three notes read `engine.autonomy` three ways, and the draft picks one without naming the other two.
-- The schema's own `help` reads "How far the session goes on its own". That says nothing about what a session mints.
-- `spec/design_output/extension.md` line 98 reads "finish your own token", "start new tokens", "ideation".
-- The ask and the draft read it as notes, a group ticket and a loose ticket. An implementer following the draft writes code the extension note refuses.
-- Name which of the three stands, and say what the other two become.
-- `god` stands undefined. The draft gives it the row `queue` takes, so three values carry two behaviours.
-- `src/bridge/stop.js` line 244 reads `engine.binding` against `queue` alone, so `god` already falls outside the queue rule there.
-- So the draft's pull and the standing stop rule read `god` two ways. Say which one moves.
-- The draft says the mint refuses a kind the autonomy leaves out, and names no file. The verb stands at `src/scripts/cli.js` line 225.
-- `engine.autonomy` has no reader today, and `grep -rn autonomy --include=*.js src .claude` answers that.
-- The evidence field carries the two comments mint writes, above the table. Cut them, so the field reads as what a hand wrote.
-- The anchor holds. `The hand-out` stands at line 33 of the pull design output.
+| the question reviewing asks | the answer |
+|---|---|
+| does the approach answer the ask | for the binding, yes. The autonomy half stands cut, and the Ask still asks for it |
+| is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |
+| what does `./RUNME.sh check` answer | 0, with the server standing |
+| does every rule the approach adds carry a case | for the pull at `unbound`, yes. For the three stop rows, no |
+| does every claim carry a proof | yes but one, and the `queue` row reads other than the tree |
+
+TL;DR:
+
+- The autonomy cut holds. `grep -rn autonomy src .claude spec` answers nothing, so the draft matches the tree.
+- The stop table reads true. `queueWaits` reads `engine.binding`, and the three rows above it read none.
+- The anchor stands. `spec/design_output/config` carries The engine controls.
+- One row of the binding table reads other than the tree, and two things the approach adds carry no case.
+
+The findings, one a line:
+
+- The `queue` row's `pull <ticket>` column reads other than the tree. `pull.js` refuses a named ticket there.
+- Its own comment says so, and [[spec/design_output/pull#the-hand-out]] carries the rule.
+- So the row says what the draft leaves standing, or the draft says that road moves too.
+- The Ask carries the autonomy table and its done_when line, and the approach cuts that half.
+- Cut both from the Ask, or write the owner's word on the drop into the Discussion.
+- The three stop rows standing down at `god` carry no case. Name one, beside the pull at `unbound`.
+
+What the agent needs:
+
+| number | need | status |
+|---|---|---|
+| 1 | the `queue` row reads the tree, or names the road it moves | open |
+| 2 | the Ask drops the autonomy half, or the Discussion carries its word | open |
+| 3 | the done_when names a case for the three stop rows at `god` | open |
+| 4 | the review hand reads the approach again | open |
 
 # implement
 
