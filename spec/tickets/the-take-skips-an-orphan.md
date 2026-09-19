@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/reflect
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -150,6 +150,12 @@ record:
     hand: box b99ea8ab11a8 · claude-code-remote
     hash_before: 6220161619c07f3563535c2fec26e9a0b571838a
     hash_after: 6220161619c07f3563535c2fec26e9a0b571838a
+  - step: implement/reflect
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 3e44bedbb2826eb5e83e5728b869442a6cad00fe
+    hash_after: 3e44bedbb2826eb5e83e5728b869442a6cad00fe
+    returns: 1
+    why: the hand takes it back
 ---
 
 # Ask
