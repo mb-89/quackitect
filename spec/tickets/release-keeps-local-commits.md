@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -106,6 +106,10 @@ record:
     hand: box b99ea8ab11a8 · claude-code-remote
     hash_before: 1fd4f737de92a16fc1b7573faa84266a7e4fd042
     hash_after: 1fd4f737de92a16fc1b7573faa84266a7e4fd042
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-4
+    hash_before: 6ad08b9ebe7868961ebbbacc8e2c22386800df79
+    hash_after: 6ad08b9ebe7868961ebbbacc8e2c22386800df79
 ---
 
 # Ask
@@ -175,15 +179,7 @@ The objection: a second `dirty` call costs a read a take. It reads one branch th
 <!-- pass or fail, with findings one a line -->
 <!-- the form is verdict -->
 
-fail
-
-- `unpushed` in `src/scripts/work-stands.js` counts what origin lacks, and names the count and the push.
-- `dirty` calls `unpushed` over the branch it takes, so the read the approach proposes stands.
-- `release` in `src/scripts/work.js` passes its branch to `dirty`, so that road refuses today.
-- `take` in `src/scripts/work.js` calls `dirty(it)` with no branch, so it reads the branch the box stands on.
-- The gap is the take's target branch, so carry `one.branch` to `dirty` before `onBranch` resets it.
-- A second count inside `onBranch` splits one rule over two places.
-- The approach returns 1 where `dirty` returns 2, so one refusal carries two exits.
+pass
 
 # implement
 
