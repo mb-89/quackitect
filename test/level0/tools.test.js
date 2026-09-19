@@ -229,7 +229,7 @@ test("the reader answers each loop under the list its marker names", () => {
     "  mv $one $new",
     "done",
     "",
-    "for one in a b; do",
+    'for one in "$root/.se/old"; do',
     "  echo $one",
     "done",
     "",

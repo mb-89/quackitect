@@ -9,7 +9,12 @@
 
 set -eu
 root=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
-bin="$root/.se/.runtime/bin"
+# The runtime folder .claude/skills/level0/lib/folders.js owns, spelled here and
+# nowhere else in this script, because a shell script imports nothing.
+run="$root/.se/.runtime"
+# The same folder folders.js owns, in the home tree, where the register stands.
+home_run="${HOME:-}/.se/.runtime"
+bin="$run/bin"
 
 # The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned
 # by folders.js and spelled again here because a shell script imports nothing. A
@@ -17,19 +22,21 @@ bin="$root/.se/.runtime/bin"
 
 # The folder answers to .runtime, so a box carrying an older name renames it
 # first, before anything below creates the new one beside it.
+# folders.js owns these names as RENAMED.
 for one in "$root/.se/run" "$root/.se/runtime"; do
-  if [ -d "$one" ] && [ ! -d "$root/.se/.runtime" ]; then
-    mv "$one" "$root/.se/.runtime" 2>/dev/null || true
+  if [ -d "$one" ] && [ ! -d "$run" ]; then
+    mv "$one" "$run" 2>/dev/null || true
   fi
 done
 
-mkdir -p "$root/.se/.runtime"
+mkdir -p "$run"
 # The log stays out of the move, because the retro collects it.
+# folders.js owns these names as MOVED.
 for one in bin hold review undo measure copilot box.json session.json \
   tools.json hold.json check.json index.db index.json lsp.json copilot-cloud \
   show-panel config.json copy.json project.json work.json vehicle.json; do
   old="$root/.se/$one"
-  new="$root/.se/.runtime/$one"
+  new="$run/$one"
   [ -d "$old" ] || [ -f "$old" ] || continue
   # A name the runtime folder already holds keeps what it holds, because mv
   # would nest the old folder inside the new one.
@@ -39,16 +46,19 @@ for one in bin hold review undo measure copilot box.json session.json \
 done
 
 # The register stands in the home folder, under the same runtime half. A box
-# carrying it straight under .se hands the reader nothing, so this moves it.
+# carrying it straight under .se hands the reader nothing, so this moves it. The
+# old place stands here on purpose, and folders.js owns the name either side.
 if [ -n "${HOME:-}" ] && [ -f "$HOME/.se/registry.json" ] &&
-  [ ! -f "$HOME/.se/.runtime/registry.json" ]; then
-  mkdir -p "$HOME/.se/.runtime"
-  mv "$HOME/.se/registry.json" "$HOME/.se/.runtime/registry.json" 2>/dev/null || true
+  [ ! -f "$home_run/registry.json" ]; then
+  mkdir -p "$home_run"
+  # The old place folders.js leaves behind, which this line takes out of the way.
+  mv "$HOME/.se/registry.json" "$home_run/registry.json" 2>/dev/null || true
 fi
 
 # The log is history and no runtime state, and it answers to .se/.log, a dot
 # folder a running session writes while the retro holds the rest. Every older
 # spelling of the folder comes home.
+# folders.js owns these names as LOGGED.
 for one in "$root/.se/log" "$root/.se/run/log" "$root/.se/runtime/log" "$root/.se/.runtime/log"; do
   if [ -d "$one" ]; then
     mkdir -p "$root/.se/.log"
@@ -498,9 +508,9 @@ fi
 
 # The survey names where each tool stands, and every caller reads it in place
 # of guessing. It runs where anything landed, and where the file is absent.
-if [ -n "$missing" ] || [ ! -f "$root/.se/.runtime/tools.json" ]; then
+if [ -n "$missing" ] || [ ! -f "$run/tools.json" ]; then
   (cd "$root" && node src/scripts/cli.js tools >/dev/null) ||
-    say "  the survey wrote no .se/.runtime/tools.json, so every caller guesses again." >&2
+    say "  the survey wrote no tools.json under $run, so every caller guesses again." >&2
 fi
 
 node "$root/src/scripts/copilot.js" setup auto

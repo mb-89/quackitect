@@ -283,11 +283,17 @@ on this tip, so each of the seven turns the tree red at the same commit.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the lists, the reader, the two rules, the installer, the writers the rule names, and the cases
+- the disk door and the git door carry every reading, and the fake tree answers both in the cases
+- each rule, each list and each copy carries the pointer at the note the ask names
 
 ## tests-green
 

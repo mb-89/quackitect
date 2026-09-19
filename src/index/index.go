@@ -58,7 +58,7 @@ var skipped = map[string]bool{
 // The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because a Go module imports no JavaScript.
 const Runtime = ".se/.runtime"
 
-// The retro half holds each retro's input, an archive of transcripts a walk reads for nothing. [[spec/guidance/retro/collect]]
+// The retro half holds each retro's input, an archive of transcripts a walk reads for nothing. folders.js owns the name, spelled again here because a Go module imports no JavaScript. [[spec/guidance/retro/collect]]
 const Retro = ".se/.retro"
 
 // The log grows a line a door call, so a watch on it sweeps the tree for nothing. [[spec/design_output/index#the-watcher-keeps-it-warm]]

@@ -87,9 +87,53 @@ export function installedTools(text) {
   return out;
 }
 
+const LOOP = /^\s*for\s+\w+\s+in\s+(.*)$/;
+const MARK = /folders\.js\s+owns\s+these\s+names\s+as\s+([A-Z_]+)/;
+const PRIVATE_PATH = /\.se\//;
+
 // The installer names the list each loop carries, so one change reaches the rule and the shell alike. [[spec/design_input/the-runtime-files-stand-apart]]
 export function loopNames(text) {
-  return { unmarked: [] };
+  const lines = String(text ?? "").split(/\r?\n/);
+  const out = { unmarked: [] };
+  for (let at = 0; at < lines.length; at++) {
+    const found = LOOP.exec(lines[at]);
+    if (!found) continue;
+    const names = namesIn(lines, at, found[1]);
+    const mark = markAbove(lines, at);
+    if (!mark) {
+      // A loop reaching the private folder names the list it moves, and every other loop stands outside this. [[spec/design_input/the-runtime-files-stand-apart]]
+      if (PRIVATE_PATH.test(found[1])) out.unmarked.push(at + 1);
+      continue;
+    }
+    out[mark] = [...(out[mark] ?? []), ...names];
+  }
+  return out;
+}
+
+// A marker stands in the comment run above its loop. [[spec/design_input/the-runtime-files-stand-apart]]
+function markAbove(lines, at) {
+  for (let up = at - 1; up >= 0 && /^\s*#/.test(lines[up]); up--) {
+    const found = MARK.exec(lines[up]);
+    if (found) return found[1];
+  }
+  return "";
+}
+
+// A loop carries over on a trailing mark, and each word reads as its name under the private folder. [[spec/design_input/the-runtime-files-stand-apart]]
+function namesIn(lines, at, first) {
+  let said = first;
+  for (let down = at; said.trimEnd().endsWith("\\"); down++) {
+    said = `${said.trimEnd().slice(0, -1)} ${lines[down + 1] ?? ""}`;
+  }
+  return said.split(";")[0].split(/\s+/).map(bare).filter(Boolean);
+}
+
+function bare(word) {
+  return String(word)
+    .replace(/["']/g, "")
+    .replace(/\$\{?\w+\}?\//g, "")
+    .replace(/^\.se\//, "")
+    .trim();
 }
 
 // [[spec/design_output/tools#the-session-reads-the-survey]]

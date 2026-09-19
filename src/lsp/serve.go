@@ -50,6 +50,7 @@ type door struct {
 
 // The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because a Go module imports no JavaScript.
 func standingPath(root string) string {
+	// The runtime folder folders.js owns, spelled again here because a Go module imports no JavaScript. [[spec/design_input/the-runtime-files-stand-apart]]
 	return filepath.Join(root, ".se", ".runtime", "lsp.json")
 }
 
