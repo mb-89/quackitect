@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-person-step-holds
-step: design/review
+step: implement/tests-red
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -97,6 +97,10 @@ record:
     hand: box ca870d4f20f4 · claude-code-remote
     hash_before: 0fddd7795268d137fafe613adb9ccc2caff0edb2
     hash_after: 0fddd7795268d137fafe613adb9ccc2caff0edb2
+  - step: design/review
+    hand: box ca870d4f20f4 · claude-code-remote · helper-2
+    hash_before: 28e4aaa68a8dff1d6cbf41d55ca95c2ec6758098
+    hash_after: 28e4aaa68a8dff1d6cbf41d55ca95c2ec6758098
 ---
 
 # Ask
@@ -151,6 +155,15 @@ The verb stands beside the other verbs the branch carries, and it reads the hold
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+- The refusal count inserts no step. For details, see [[spec/design_output/pull#a-count-inserts-no-step]].
+- So drop the count row from the table, and say that the ask's third bullet retires there.
+- The verb list stands in `src/scripts/pull-route.js`, and the dispatch in `src/scripts/work.js`. Name both.
+- Say which exit the verb answers where the split cap refuses the insertion.
+- `withPersonStep` writes `options` under the answer field. Say whether the verb writes the step's `options` too.
+- Name the exit and the line a run without a hold answers.
 
 # implement
 
