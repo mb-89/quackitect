@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 group: the-person-step-holds
 step: verdict
@@ -160,6 +160,11 @@ record:
       - name: check
         exit: 0
         said: 87 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box ca870d4f20f4 · claude-code-remote · helper-11
+    hash_before: 10b4cc078427b2d99af3b1b40cba8277f9328c9a
+    hash_after: 10b4cc078427b2d99af3b1b40cba8277f9328c9a
+reason: done
 ---
 
 # Ask
@@ -392,6 +397,7 @@ A test drives `--back` off a harness, which is the road the suite left open.
 - test/level0/hand.test.js
 - test/level0/pull-person.test.js
 - .claude/commands/se-config-work-failsBeforeWait.md
+- .claude/commands/se-config-work-failsBeforePerson.md
 - .claude/commands/se-config-work-refusalsBeforeFail.md
 - .claude/commands/se-config-work-refusalsBeforePerson.md
 - spec/config/styles/VoiceParagraph/Vocabulary.yml
@@ -419,25 +425,30 @@ A test drives `--back` off a harness, which is the road the suite left open.
 
 ## verdict
 
-fail
+pass
 
-- `takeBack` weighs the record's role against the named hand, so a person's `--back` comes back refused
-- the fix stands in `src/scripts/pull.js`, where the hand-back check wants `roleOf(who.hand)`
-- the write one line under that check already takes `roleOf`, so the read alone trails it
-- the suite drives `--back` on a box hand alone, and runs green over this break
-- the three pieces of the ask otherwise land: the refusal, the git author name, the signing door
-- `signFaults` names the tip and takes `G` and `U`, which the hand-rule chapter owns
-- `signFaults` lets a private ticket by, and the tests drive the tracked path alone
-- `excludes` reads a hand as its role, which keeps the `not` rule on the record's words
-- the two generated command files follow the config key, and the schema carries its help line
+- the reflect chapter names the class: a reader of `hand` reads a live hand as its role first
+- `takeBack` reads `roleOf(who.hand)` now, so a person's `--back` lands, and its refusal names the role
+- `takeBack` writes the role into the record, and its commit line names the role too
+- the new case drives `--back` off a harness, where the record holds `person` and the hand holds a name
+- `excludes` and the three record writes take `roleOf`, so every reader of `hand` weighs a role
+- the sibling ticket drops the one reader left in `advanced`, so the class closes across the tree
+- the three pieces of the ask land: the refusal, the git author name, the signing door
+- `handOf` answers `person <name>` through the git door, and a box naming no author answers the role
+- `signFaults` refuses an unsigned tip and names it, and lets `G` and `U` by
+- `signFaults` lets an agent's hand and a private ticket by, which the hand-rule chapter says
+- `work.personSigns` reads false where nothing names it, so a tree keeps the door it has
+- the schema carries the key's help line, and the two generated command files take it
+- `takeBack` meets no signing door, so a person takes a leaf back on an unsigned tip. Later work
 - the files past this ask come from the sibling tickets on this branch, and each stands under its own
-- `./RUNME.sh check` exits green on this tip
+- `./RUNME.sh check` exits 0 on this tip, and `./RUNME.sh branch test` answers green
+- `./RUNME.sh branch review` names the check green and the retro absent from the handback
 
 <!-- the form is verdict -->
 
 ## checked
 
-- the hand-rule chapter owns the signing rule, and each new function points at it. The schema holds the key's help line, which the generated commands take.
+- the hand-rule chapter owns the signing rule and the role split, and each new function points at it. The schema holds the key's help line, which the generated commands take. The code adds one fact of its own, `SIGNED`, and a line beside it points at that chapter.
 
 <!-- the form is checklist -->
 
