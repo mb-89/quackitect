@@ -413,6 +413,30 @@ test("take refuses where this box stands ahead of origin", () => {
   );
 });
 
+// The take resets the branch it lands on, so it reads that one too. [[spec/design_output/work#a-branch-moves-clean]]
+test("take refuses where the branch it picks holds a commit origin lacks", () => {
+  const brief = "---\nstatus: todo\n---\n\n# Do the thing\n";
+  const { it, outside } = doorsSaying(
+    {
+      ...remoteSaying([{ branch: "work/one", tip: "aaa" }], {
+        "work/one:HANDOVER.md": brief,
+      }),
+      "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" },
+      "git rev-list --count origin/work/one..work/one": { stdout: "3\n" },
+    },
+    { [HERE]: brief },
+  );
+
+  const { code, said } = heard(() => work(ROOT, ["take"], it));
+
+  assert.equal(code, 2);
+  assert.match(said, /work\/one holds 3 commit\(s\) origin lacks/);
+  assert.ok(
+    !ranGit(outside).some((one) => one.startsWith("git reset --hard")),
+    "the reset that drops them runs nowhere",
+  );
+});
+
 // [[spec/design_output/work#a-branch-moves-clean]]
 test("a branch level with origin moves as before", () => {
   const { it } = doorsSaying({

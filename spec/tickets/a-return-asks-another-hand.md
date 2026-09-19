@@ -115,7 +115,7 @@ record:
     hash_before: 493db840ce5612a7c2cd3edd01e2fcc3a9304d7b
     hash_after: 493db840ce5612a7c2cd3edd01e2fcc3a9304d7b
 reason: became
-successors: [a-route-closes-an-answered-ask]
+successors: [a-route-closes-answered-asks]
 ---
 
 # Ask
@@ -215,7 +215,10 @@ pass
 
 Every done_when of this ask stands answered or stale. `test/level0/pull-steps.test.js` pins that a count inserts no step. The same file pins that a person step past the split cap asks for a split.
 
-So no test goes red here. A red test asserts a count the tree removes. [[spec/design_output/pull#a-count-inserts-no-step]] carries the ruling.
+So no test goes red here:
+
+- a red test asserts a count the tree removes
+- [[spec/design_output/pull#a-count-inserts-no-step]] carries the ruling
 
 What surprises: the route carries no road for a ticket whose ask another group answers. The fail writes the reason into the record, and the merge is where a person reads the call.
 

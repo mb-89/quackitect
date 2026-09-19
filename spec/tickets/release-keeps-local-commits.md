@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -110,6 +110,17 @@ record:
     hand: box b99ea8ab11a8 · claude-code-remote · helper-4
     hash_before: 6ad08b9ebe7868961ebbbacc8e2c22386800df79
     hash_after: 6ad08b9ebe7868961ebbbacc8e2c22386800df79
+  - step: implement/tests-red
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 5f05230281b37e783e6cfea9e787bce67ef59f22
+    hash_after: 5f05230281b37e783e6cfea9e787bce67ef59f22
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 1 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -190,20 +201,27 @@ pass
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/work.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The take reaches `onBranch` and resets the branch it picks, so the case names the count and the reset that drops the work.
+
+What surprises: the fake disk wants the brief at the root, because the take reads it after the reset. So the case carries one, and the refusal lands before that read.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the case stands in `test/level0/work.test.js`, beside the twin over the release road
+- the case drives `doorsSaying`, so git and the disk stand fake
+- the comment names the reset the take runs, and points at [[spec/design_output/work#a-branch-moves-clean]]
 
 ## reflect
 
