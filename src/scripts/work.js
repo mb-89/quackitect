@@ -17,6 +17,7 @@ import {
   askOf,
   CLOSED,
   fieldOf,
+  frontOf,
   GROUP,
   heldIn,
   isGroup,
@@ -32,8 +33,7 @@ import {
   withoutField,
 } from "./group.js";
 import { guidance } from "./guidance-verb.js";
-import { frontOf } from "./group.js";
-import { handOf, leafOf, leavesOf, pull, takeable } from "./pull.js";
+import { handOf, leafOf, pull, stepPathOf, takeable } from "./pull.js";
 import { readyToMerge, review } from "./review.js";
 import { serving } from "./serve.js";
 import { freeIn, staleClaim, trigger } from "./stand.js";
@@ -227,7 +227,7 @@ function take(it, name = "") {
 // The step a child stands at, and the hand it waits for, so the take names what to answer. [[spec/tickets/the-group-leaves-at-todo]]
 function waitsAt(one) {
   const front = frontOf(one.text);
-  const path = String(front.step ?? "").trim() || (leavesOf(front)[0]?.path ?? "");
+  const path = stepPathOf(front);
   const leaf = leafOf(front, path);
   if (!leaf) return `${one.name} stands at ${path || "no step"}`;
   return `${one.name} waits for a ${leaf.by} at ${leaf.path}`;

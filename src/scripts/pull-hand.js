@@ -24,9 +24,9 @@ import {
   ENGINE,
   holdsVerb,
   leafOf,
-  leavesOf,
   MOST_MOVES,
   say,
+  stepPathOf,
   WAIT,
   walkOf,
 } from "./pull-route.js";
@@ -205,7 +205,7 @@ export function takeable(it, one, all = []) {
   if (String(front.state ?? "") !== OPEN) return "";
   // The offer waits on a dependency, so this waits on it too. [[spec/design_output/work#a-dependency-waits-for-trunk]]
   if (dependsOn(front).some((dep) => !closedHere(it, all, dep))) return "";
-  const path = String(front.step ?? "").trim() || (leavesOf(front)[0]?.path ?? "");
+  const path = stepPathOf(front);
   const leaf = leafOf(front, path);
   if (!leaf) return "";
   if (["person", "children", "helper"].includes(leaf.by)) return "";
@@ -259,7 +259,7 @@ export function closedHere(it, all, dep) {
 export function advanced(it, one, all) {
   let text = one.text;
   let front = one.front;
-  let path = String(front.step ?? "").trim() || (leavesOf(front)[0]?.path ?? "");
+  let path = stepPathOf(front);
   let moved = false;
   const changes = [];
 

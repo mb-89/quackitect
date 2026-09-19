@@ -103,6 +103,11 @@ export function leavesOf(front) {
   return walkOf(front).filter((one) => one.leaf);
 }
 
+// The step a ticket stands at, which is its `step` field or the first leaf of its route. [[spec/design_output/pull#what-a-hand-out-reads]]
+export function stepPathOf(front) {
+  return String(front?.step ?? "").trim() || (leavesOf(front)[0]?.path ?? "");
+}
+
 // [[spec/design_output/pull#a-leaf-inherits]]
 export function leafOf(front, path) {
   const walk = walkOf(front);
