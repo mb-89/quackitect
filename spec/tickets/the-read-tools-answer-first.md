@@ -89,7 +89,12 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: aea57a0ab08f3573035259dcb4b2268fc10b3981
+    hash_after: aea57a0ab08f3573035259dcb4b2268fc10b3981
 ---
 
 # Ask
@@ -110,8 +115,31 @@ hundreds of shell reads stand where one verb answers
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+The plugin registers every read tool at session start, and the first call brings the server up.
+
+| what stands today | what it costs |
+|---|---|
+| the specs ride the server's answer to `session.start` | a box whose server answers nothing carries no read tool all session |
+| `starts` runs after that answer falls | the start lands, and the registration stands already past |
+| the start reads `node_modules`, and a fresh box carries none | the setup answers 6, and the hand falls to the shell |
+
+| what changes | where |
+|---|---|
+| the specs stand under the skill folder, so the plugin reads them with no server | `.claude/skills/level0/lib` |
+| the bridge reads those same specs | `src/bridge/search.js` and `src/bridge/apply.js` |
+| `register` names them at session start, whatever the server answers | the plugin's `register` |
+| a handler meeting no server starts one, waits on its health, and calls again | the plugin's tool road |
+| the start installs where the modules stand absent | `START` in the plugin |
+
+So a hand calls `find` on its first turn, and that call pays for the server.
+
+- the plugin imports nothing past its own folder, so the specs move and the bridge points at them
+- the answer's `register` list still stands, so a server carrying a newer spec still names it
+- the cases drive each tool with no server standing, and read the answer
+
+[[spec/design_output/level0#the-bridgehead-starts-it-too]] takes the order.
 
 ## review
 
