@@ -89,7 +89,12 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 09b61b89224ccd5cfb4f8a8d943b8d3e9b1ee1d1
+    hash_after: 09b61b89224ccd5cfb4f8a8d943b8d3e9b1ee1d1
 ---
 
 # Ask
@@ -112,8 +117,26 @@ Every note costs three or four refusals at the write door, and a table loses row
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`check_prose` runs the write door's own read over a draft, and answers every finding at once.
+
+| what it takes | what it answers |
+|---|---|
+| `path`, so the rules read the kind the path names | every finding, one a line, through `refusal` |
+| `text`, the whole file as the write would land it | nothing on disk |
+
+The tool registers beside `check_answer`, which `.claude/skills/level0/lib/answer.js` names. The read it runs is the one the write door runs over a mutation, so a clean draft passes that door on its first write.
+
+The ask's third row stands already:
+
+- `mutations` answers the whole file text a write lands, and the door reads that
+- so a table row reads with its header, and an edit reads with the lines around it
+- the refusal names the file and the line, which a whole-file read answers
+
+The cases drive a clean draft to an empty list, and a draft carrying a long sentence to the finding naming it.
+
+[[spec/design_output/level0#the-gate-reads-the-answer]] takes the tool beside the answer gate.
 
 ## review
 
