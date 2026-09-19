@@ -110,8 +110,8 @@ test("classes refuse a finding with no disposition, and a disposition naming not
 test("every collected note and memory answers where it goes, and the report lists them with the checklist and the limits", () => {
   const files = tree(FIRST, WHOLE, {
     [at(FIRST, "input/tickets/a-parked-thought.md")]: "---\nkind: [[ticket]]\n---\n",
-    [at(FIRST, "input/memory/MEMORY.md")]: "- an index line\n",
-    [at(FIRST, "input/memory/a-rule.md")]: "a remembered rule\n",
+    [at(FIRST, "input/memory/the-project/MEMORY.md")]: "- an index line\n",
+    [at(FIRST, "input/memory/the-project/a-rule.md")]: "a remembered rule\n",
   });
   const missing = heard(() => retro(ROOT, ["classes", FIRST], doors(files)));
   assert.equal(missing.code, 1);

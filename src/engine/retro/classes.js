@@ -42,15 +42,17 @@ export function recordOf(text) {
 // Every collected note and memory, by id, so each one answers where it goes. [[spec/guidance/retro/classify]]
 export function drainedOf(it, home) {
   const out = [];
-  for (const one of DRAINED) {
-    const at = it.join(home, INPUT, one.folder);
-    if (!it.disk.exists(at)) continue;
+  // Collect nests the memory under the project's folder name, so the walk reaches every level. [[spec/guidance/retro/classify]]
+  const walk = (at, prefix) => {
+    if (!it.disk.exists(at)) return;
     for (const entry of it.disk.list(at)) {
-      if (entry.kind !== "file" || !entry.name.endsWith(".md") || entry.name === INDEX)
-        continue;
-      out.push({ id: `${one.prefix}:${entry.name.replace(/\.md$/, "")}` });
+      if (entry.kind === "dir") walk(it.join(at, entry.name), prefix);
+      else if (entry.name.endsWith(".md") && entry.name !== INDEX) {
+        out.push({ id: `${prefix}:${entry.name.replace(/\.md$/, "")}` });
+      }
     }
-  }
+  };
+  for (const one of DRAINED) walk(it.join(home, INPUT, one.folder), one.prefix);
   return out;
 }
 
