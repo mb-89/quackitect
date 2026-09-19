@@ -146,7 +146,9 @@ export function escalate(it, argv) {
     ]);
     return 2;
   }
-  const hand = handOf(it);
+  // A helper reaches its own hold, so the hand reads the way the pull writes it. [[spec/design_output/pull#a-hand-of-its-own]]
+  const as = flagValue(rest, "--as");
+  const hand = as ? `${handOf(it)} · ${as}` : handOf(it);
   const held = holdOf(it, hand);
   if (!held) {
     say(REFUSED, [
@@ -170,7 +172,10 @@ export function escalate(it, argv) {
   one.front = frontOf(one.text);
 
   const put = withPersonStep(it, one, held.step, question, options);
-  if (!put.path) return 1;
+  if (!put.path) {
+    say(REFUSED, [`${held.step} takes no person step, and ${one.name} stands as it stood.`]);
+    return 1;
+  }
 
   const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
   const finding = landed(it, one, [`${held.step} waits for a person at ${put.path}`]);
@@ -179,9 +184,11 @@ export function escalate(it, argv) {
     return 1;
   }
   dropHold(it, hand);
+  // The step stands in the record by now, so the branch is what a hand pushes. [[spec/design_output/pull#the-rejected-push]]
   if (!one.private && !pushed(it, branch)) {
     say(REFUSED, [
-      `${branch} moves under this, so push ${branch} and run branch escalate again.`,
+      `${put.path} stands on this box, and ${branch} moves under it.`,
+      `Push ${branch}, then run ./RUNME.sh branch pull.`,
     ]);
     return 1;
   }
@@ -211,7 +218,7 @@ export function askedIn(rest) {
   return out.join(" ").trim();
 }
 
-export const ESCALATES = ["--options"];
+export const ESCALATES = ["--options", "--as"];
 
 export function wordsIn(said) {
   const out = String(said ?? "")

@@ -333,32 +333,32 @@ The ask's third bullet retires here. [[spec/tickets/refusal-cap-inserts-no-perso
 
 <!-- every file you read, one a line -->
 
-src/scripts/pull.js
-src/scripts/pull-hand.js
-src/scripts/pull-route.js
-src/scripts/pull-writes.js
-src/scripts/work.js
-src/scripts/branch-usage.js
-src/scripts/landed.js
-src/scripts/guidance-hand.js
-src/scripts/hand.js
-src/scripts/cli-doors.js
-src/scripts/unblock.js
-test/level0/pull-steps.test.js
-test/level0/pull-leaves.test.js
-test/level0/work-group.test.js
-test/contract/pull-payload.test.js
-spec/design_output/pull.md
-spec/design_output/work.md
-spec/config/level0.json
-spec/config/level0.schema.json
-.claude/commands/se-config-work-failsBeforeWait.md
-.claude/commands/se-config-work-refusalsBeforeFail.md
-.claude/commands/se-config-work-refusalsBeforePerson.md
-spec/tickets/escalate-inserts-a-person-step.md
-spec/tickets/person-step-refuses-an-agent.md
-spec/tickets/refusal-cap-inserts-no-person.md
-spec/tickets/the-group-leaves-at-todo.md
+- .claude/commands/se-config-work-failsBeforeWait.md
+- .claude/commands/se-config-work-refusalsBeforeFail.md
+- .claude/commands/se-config-work-refusalsBeforePerson.md
+- spec/config/level0.json
+- spec/config/level0.schema.json
+- spec/design_output/pull.md
+- spec/design_output/work.md
+- spec/tickets/escalate-inserts-a-person-step.md
+- spec/tickets/person-step-refuses-an-agent.md
+- spec/tickets/refusal-cap-inserts-no-person.md
+- spec/tickets/the-group-leaves-at-todo.md
+- src/scripts/branch-usage.js
+- src/scripts/cli-doors.js
+- src/scripts/guidance-hand.js
+- src/scripts/hand.js
+- src/scripts/landed.js
+- src/scripts/pull-hand.js
+- src/scripts/pull-route.js
+- src/scripts/pull-writes.js
+- src/scripts/pull.js
+- src/scripts/unblock.js
+- src/scripts/work.js
+- test/contract/pull-payload.test.js
+- test/level0/pull-leaves.test.js
+- test/level0/pull-steps.test.js
+- test/level0/work-group.test.js
 
 <!-- the form is files -->
 
