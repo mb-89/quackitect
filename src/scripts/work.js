@@ -163,7 +163,12 @@ function openGroup(it, name) {
     console.log(`${branch} already stands in the cloud, carrying ${at}.`);
     return 0;
   }
-  if (!it.git.run(["push", "origin", `origin/${TRUNK}:refs/heads/${branch}`]).ok) {
+  const mark = markOff(it, branch);
+  if (!mark) {
+    console.error(`The commit that opens ${branch} came back refused, so nothing is pushed.`);
+    return 1;
+  }
+  if (!it.git.run(["push", "origin", `${mark}:refs/heads/${branch}`]).ok) {
     console.error(refusedPush(branch));
     return 1;
   }
@@ -171,6 +176,17 @@ function openGroup(it, name) {
   console.log(`${branch} stands at ${TODO} in the cloud, carrying ${at}.`);
   console.log("Run ./RUNME.sh cloud trigger to fire a box at it.");
   return 0;
+}
+
+// The branch opens on a commit of its own, off trunk's tree, because a branch standing where trunk stands reads merged once trunk moves, and the queue then hides it. [[spec/design_output/work#a-merged-branch-closes]]
+function markOff(it, branch) {
+  const tree = it.git.run(["rev-parse", `origin/${TRUNK}^{tree}`], true);
+  if (!tree.ok || !tree.out) return "";
+  const said = it.git.run(
+    ["commit-tree", tree.out, "-p", `origin/${TRUNK}`, "-m", `${branch} opens`],
+    true,
+  );
+  return said.ok ? said.out.trim() : "";
 }
 
 // [[spec/design_output/log#which-door-says-what]]
