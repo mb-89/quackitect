@@ -248,7 +248,7 @@ frontmatter:
 
     group:
       type: string
-      description: the branch this ticket lands on, which a person writes
+      description: the group ticket this one lands in, by its own name, which a person writes
 
     parent:
       type: string
