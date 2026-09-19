@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: now
 group: the-person-step-holds
-step: implement/tests-red
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -100,6 +100,17 @@ record:
     hand: box ca870d4f20f4 · claude-code-remote · helper-2
     hash_before: 2cdd6affeee3f1eea84d410f9afc99fe69246c07
     hash_after: 2cdd6affeee3f1eea84d410f9afc99fe69246c07
+  - step: implement/tests-red
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: a6017d47dba552d7ad0b1509ef721df64a0a14c8
+    hash_after: a6017d47dba552d7ad0b1509ef721df64a0a14c8
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -177,19 +188,36 @@ pass
 
 ### tests
 
-<!-- the same tests pass -->
+    ./RUNME.sh branch test
 
 <!-- the form is command -->
 
 ### seen
 
-<!-- what you see, and what surprises you -->
+Three tests stand red, one a piece of the ask, and each fails on the claim its name makes.
+
+| the test | where | what it meets today |
+|---|---|---|
+| a group whose open children all wait for a person stands at children | `test/level0/pull-steps.test.js` | the pull answers work at the retro leaf |
+| take leaves such a group at todo | `test/level0/work-group.test.js` | the take switches, writes the record, commits and pushes |
+| the judge's material leaves a command field out | `test/level0/pull-leaves.test.js` | the evidence carries the command line |
+
+Two things surprise a reader here.
+
+- the wait answer names the person step today, so the first test asserts words the pull already writes
+- the group's own record carries the skip, so the first test reads the record as well as the step
+
+The review leaf asks where the takeable answer over children stands. Today `advanced` and `leaves` each work it out. The change step puts it in one place, and both callers read it there.
+
+The same leaf asks why the form filter lands in the engine. The leaf names the form of each field, and the engine is the side reading the leaf.
 
 <!-- the form is text -->
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the tests reach the pull, the take and the judge's material, which the ask names
+- the cases drive the fake doors beside them, so every door the change reaches has a fake
+- each test names the claim it makes and points at the ticket owning the reason
 
 <!-- the form is checklist -->
 

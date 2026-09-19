@@ -222,6 +222,20 @@ test("the judge's material is the leaf's evidence and the rules its reads name, 
   );
 });
 
+// [[spec/tickets/the-group-leaves-at-todo]]
+test("the judge's material leaves a command field out, so a chapter of commands hands over nothing", () => {
+  const { it } = doors(
+    standing(filled(CHILD("open", "implement/change"), "### lint", "./RUNME.sh check")),
+  );
+  heard(() => work(ROOT, ["pull"], it));
+
+  const { code, said } = heard(() => work(ROOT, ["pull", "a-child", "--judge"], it));
+
+  assert.equal(code, 0);
+  assert.equal(JSON.parse(said).step, "implement/change");
+  assert.equal(JSON.parse(said).evidence, "", "a command field is no prose");
+});
+
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 test("the hold reads back what the pull writes, and a box with no id mints one", () => {
   const { it, disk } = doors(standing());

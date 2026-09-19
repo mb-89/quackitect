@@ -350,6 +350,41 @@ test("a leaf needing a verb the box lacks answers wait, with the reason", () => 
   assert.match(said, /^wait\n {2}a-child needs deploy now, which this box lacks/);
 });
 
+// [[spec/tickets/the-group-leaves-at-todo]]
+test("a group whose open children all wait for a person stands at children, and hands no retro out", () => {
+  const parked = CHILD("open", "design/review").replace(
+    "        not: draft\n",
+    "        by: person\n",
+  );
+  const { it, disk } = doors(
+    standing(parked, withField(GROUP_NOTE, "step", "children")),
+    {
+      sh: { exitCode: 0, stdout: "" },
+    },
+  );
+  const held = withEntry(parked, {
+    step: "design/draft",
+    hand: HAND,
+    hash_before: SHA,
+    hash_after: SHA,
+  });
+  disk.write(at("spec/tickets/a-child.md"), held);
+
+  const { code, said } = heard(() => work(ROOT, ["pull"], it));
+
+  assert.equal(code, 0);
+  assert.match(said, /^wait/m, "the pull answers wait");
+  assert.match(said, /a-child waits for a person at design\/review/);
+  assert.doesNotMatch(said, /retro/, "and no retro leaf comes out");
+  const now = disk.read(at("spec/tickets/one-group.md"));
+  assert.equal(fieldOf(now, "step"), "children", "the group stands where it stood");
+  assert.equal(
+    recordIn(now).filter((one) => String(one.step) === "children" && one.skipped).length,
+    0,
+    "the box writes no skip",
+  );
+});
+
 // [[spec/design_output/pull#children-before-their-group]]
 test("the group's children step derives from its tickets, and the box leaves it while a child waits", () => {
   const parked = CHILD("open", "design/review").replace(

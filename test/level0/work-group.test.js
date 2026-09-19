@@ -132,6 +132,32 @@ test("a desk's pull on trunk takes a group at urgency now, and leaves one at soo
   );
 });
 
+// [[spec/tickets/the-group-leaves-at-todo]]
+test("take leaves a group whose open children all wait for a person at todo, and writes no line", () => {
+  const parked = CHILD("one-group", "open").replace(
+    "    does: makes the change the ask names\n",
+    "    does: makes the change the ask names\n    by: person\n",
+  );
+  const { it, outside } = doorsSaying(groupRemote(), {
+    [on("one-group")]: withField(GROUP_NOTE, "step", "children"),
+    [on("a-child")]: parked,
+    ...HAND,
+  });
+
+  const { code, said } = heard(() => work(ROOT, ["take"], { ...it, agent: true }));
+
+  assert.equal(code, 0);
+  assert.match(said, /a-child waits for a person at do/);
+  assert.ok(
+    !ranGit(outside).some((one) => one.startsWith("git commit")),
+    "the take writes no line",
+  );
+  assert.ok(
+    !ranGit(outside).includes("git push origin work/one-group"),
+    "and pushes nothing, so the group stands at todo",
+  );
+});
+
 // [[spec/design_output/pull#the-engine-takes-the-branch]]
 test("branch take with a name takes that branch alone, and refuses a name nobody frees", () => {
   const { it, outside } = doorsSaying(
