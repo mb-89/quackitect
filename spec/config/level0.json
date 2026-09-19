@@ -20,7 +20,7 @@
     "failScore": 5
   },
   "refactor": {
-    "comment": "The hand the stop door starts while the warnings stand past the number. spec/guidance/refactoring.md says what that hand does.",
+    "comment": "The hand the stop door starts while the warnings stand past the number. spec/guidance/code/refactoring.md says what that hand does.",
     "parallel": true,
     "mostWarnings": 25,
     "mostAtOnce": 1,

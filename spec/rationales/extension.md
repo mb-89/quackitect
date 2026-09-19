@@ -11,10 +11,10 @@ carries the mechanism alone.
 
 ## 1. The fields join the schema
 
-The brief puts the widget fields in `spec/config/level0.json`, beside the
-value. That file holds values alone, and `flatten` reads every object under a
-section as more keys. A `group` beside a value flattened to `stop.hold.group`,
-and the resolver answered that as a key of its own.
+The brief puts the widget fields in `spec/config/level0.json`, beside the value.
+That file holds values alone, and `flatten` reads every object under a section
+as more keys. A `group` beside a value flattened to `stop.hold.group`, and the
+resolver answered that as a key of its own.
 
 The branch before this one split the declaration in two:
 
@@ -53,8 +53,8 @@ Three readings stood open:
 
 The third reading is the one in the code. It leaves every number deciding
 something. It matches what v3 asks of the gesture, where a move a person should
-mean takes more than a flick. `test/level0/gesture.test.js` holds both edges,
-so a later reader who disagrees moves one case and sees what breaks.
+mean takes more than a flick. `test/level0/gesture.test.js` holds both edges, so
+a later reader who disagrees moves one case and sees what breaks.
 
 ## 3. The extension carries no module
 

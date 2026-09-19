@@ -107,7 +107,7 @@ test("a spawned helper carries the layer whole, because its own hold stands else
 
 // [[spec/tickets/the-spawn-reaches-its-guidance]]
 test("a note binding a kind stands off the session and the helper, and its own layer holds it", () => {
-  const disk = boxed(disks({ [join(METHOD, "spec/guidance/refactoring.md")]: REFACTORING }));
+  const disk = boxed(disks({ [join(METHOD, "spec/guidance/code/refactoring.md")]: REFACTORING }));
 
   const said = guidanceHere(disk, METHOD, WORK, ENV, true);
 

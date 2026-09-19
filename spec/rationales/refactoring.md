@@ -1,11 +1,9 @@
 ---
 kind: [[rationale]]
-explains: [[spec/guidance/refactoring]]
+explains: [[spec/guidance/code/refactoring]]
 ---
 
 # Why
-
-<!-- the argument, and what it measures -->
 
 A warning stands where a rule names a line and the door lets the write through.
 Nobody owns that line afterwards, so the count climbs and the push door holds

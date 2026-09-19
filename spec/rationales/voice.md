@@ -8,13 +8,13 @@ explains: [[spec/guidance/voice]]
 Agents tend to write filler. The audience are non-native speakers whose patience
 runs short, so the prose stays short and the vocabulary stays settled.
 
-Vale holds the mechanical rules in [[spec/config/styles/VoiceVale]]. What
-stays in the guidance needs a person or a model.
+Vale holds the mechanical rules in [[spec/config/styles/VoiceVale]]. What stays
+in the guidance needs a person or a model.
 
 ## 1. Say what is
 
-A sentence saying what a thing is not leaves the reader to guess what it is.
-The list of what a thing is not has no end.
+A sentence saying what a thing is not leaves the reader to guess what it is. The
+list of what a thing is not has no end.
 
 A reader who meets a paragraph of absences finishes it with nothing to act on.
 Two halves cost twice the words of one, and the second half teaches nothing.
@@ -48,17 +48,18 @@ drift apart with nothing to catch them. A link keeps one answer.
 A reader meeting the same sentence twice reads neither, and the copies drift
 apart the moment somebody corrects one of them.
 
-A constant repeated in prose is the same fault. The paragraph states the rule and
-the config file holds the number.
+A constant repeated in prose is the same fault. The paragraph states the rule
+and the config file holds the number.
 
 ## 8. Counts
 
-A count holds on the day somebody writes it and rots after, and nothing tells the
-reader which day that was. So the prose names the command and the reader runs it.
+A count holds on the day somebody writes it and rots after, and nothing tells
+the reader which day that was. So the prose names the command and the reader
+runs it.
 
-A count of a list needs no time to go wrong. A sentence saying four regions above
-a list of six hands the reader two answers, and the list is the one that cannot
-drift.
+A count of a list needs no time to go wrong. A sentence saying four regions
+above a list of six hands the reader two answers, and the list is the one that
+cannot drift.
 
 ## 10. Parallel things
 

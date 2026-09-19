@@ -41,8 +41,11 @@ export function guidanceHere(
   tooth = true,
   argv = [],
 ) {
-  const notes = readNotes(inherits(disk, method, work), GUIDANCE);
-  const wanted = new Set(notes.flatMap((one) => envOf(one.text)));
+  const reads = inherits(disk, method, work);
+  const notes = readNotes(reads, GUIDANCE);
+  // A note binding a kind stands beside its topic in a folder below, and its layer reaches down for it. [[spec/tickets/the-spawn-reaches-its-guidance]]
+  const kinded = readBelow(reads, GUIDANCE).filter((one) => kindsOf(one.text).length);
+  const wanted = new Set([...notes, ...kinded].flatMap((one) => envOf(one.text)));
   const bound = Object.fromEntries([...wanted].map((name) => [name, env[name] ?? ""]));
   const here = notes.filter((one) => bindsHere(one.text, bound));
   // A note the held step hands over rides the step, so the layer hands it no second time. [[spec/design_output/level0#the-standing-layer]]
@@ -55,7 +58,7 @@ export function guidanceHere(
   return {
     standing: standingLayer(session, read),
     helper: standingLayer(free),
-    layers: layersOf(here),
+    layers: layersOf([...here, ...kinded.filter((one) => bindsHere(one.text, bound))]),
     ...counts,
     sentence: canary({ ...counts, stop: tooth }),
   };
@@ -82,6 +85,23 @@ function readNotes(reads, folder) {
   } catch {
     return [];
   }
+}
+
+// Every note in the folders under this one, each named by its path below it. [[spec/tickets/the-spawn-reaches-its-guidance]]
+function readBelow(reads, folder) {
+  let dirs = [];
+  try {
+    dirs = reads.list(folder).filter((one) => one.kind === "dir");
+  } catch {
+    return [];
+  }
+  return dirs.flatMap((one) => {
+    const at = `${folder}/${one.name}`;
+    return [...readNotes(reads, at), ...readBelow(reads, at)].map((note) => ({
+      ...note,
+      name: `${one.name}/${note.name}`,
+    }));
+  });
 }
 
 // [[spec/design_output/level0#the-canary-owes-a-debt]]

@@ -5,8 +5,8 @@ explains: [[spec/design_output/vehicle]]
 
 # Why
 
-v3 could record which copy drove a project, and resolving one always failed.
-It wrote a path. The path went stale the first time either tree moved, and the
+v3 could record which copy drove a project, and resolving one always failed. It
+wrote a path. The path went stale the first time either tree moved, and the
 record then named a folder holding something else.
 
 v4 answered with three parts:

@@ -15,8 +15,8 @@ it is there carries information the code cannot, and that information outlives
 the line it sits beside.
 
 So the why moves somewhere a reader looks for a decision, and the code keeps a
-pointer to it. The pointer breaks loudly when the section goes, and a stale comment
-keeps quiet.
+pointer to it. The pointer breaks loudly when the section goes, and a stale
+comment keeps quiet.
 
 ## 3. Design output
 

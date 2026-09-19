@@ -42,8 +42,8 @@ beside the one somebody did. The reviewer then reads both to find the one.
 
 ## 5. Onto your own branch
 
-A box starts on trunk and moves off it in its first command. So the window for
-a commit landing in the wrong place is the minute before that, which is when an
+A box starts on trunk and moves off it in its first command. So the window for a
+commit landing in the wrong place is the minute before that, which is when an
 agent knows least.
 
 Level zero refuses two things on a cloud box:
@@ -61,9 +61,9 @@ to collect it, because nothing survives the session.
 
 ## 6. A person blocks no branch
 
-A cloud box runs while nobody sits beside it. So a step whose `by` reads `person`
-waits the whole session, and the branch waits with it. Every step behind that
-one waits too, though an agent could take them.
+A cloud box runs while nobody sits beside it. So a step whose `by` reads
+`person` waits the whole session, and the branch waits with it. Every step
+behind that one waits too, though an agent could take them.
 
 One group showed the cost: three children, one of them parked at a person step,
 and the box released the branch having finished nothing. The next box took the
@@ -110,8 +110,8 @@ merge then judges the call with the code in front of it.
 
 ## 8. What a leaving branch owes
 
-A branch merges whole. What the box decides stands written where the merge
-reads it: the answer under the step, and the assumptions beside it.
+A branch merges whole. What the box decides stands written where the merge reads
+it: the answer under the step, and the assumptions beside it.
 
 The alternative is a branch held open until a person answers. That blocks the
 tickets depending on it, and a dependency reads a closed ticket, not a finished
@@ -119,9 +119,9 @@ one. So finishing is what frees the chain.
 
 ## 9. The check greens first
 
-A box read the check red, named the four lines a verb wrote, and left them. Three
-of the four stood on the branch before that box took it. The reading went: a
-fault another hand wrote belongs to that hand.
+A box read the check red, named the four lines a verb wrote, and left them.
+Three of the four stood on the branch before that box took it. The reading went:
+a fault another hand wrote belongs to that hand.
 
 That reading costs the tree twice:
 
@@ -147,8 +147,8 @@ draws the edge of the brief and says nothing about the session. Rule 7 says
 `work done` is last of these steps, and says nothing about the session either.
 
 A branch listing also goes stale inside a session. `work list` reads origin at
-the moment of the call, and an hour of work later another session has moved
-what it named. So run it again before naming a status out loud.
+the moment of the call, and an hour of work later another session has moved what
+it named. So run it again before naming a status out loud.
 
 ## 12. Saying the commit
 

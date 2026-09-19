@@ -47,8 +47,8 @@ v3's patch applied a CRLF or LF mismatch in the file's own endings, and named
 the correction on the result. v4 went the other way and stayed byte-exact,
 because the edit says which bytes to replace.
 
-The owner chose v4's answer for v5, working on Windows, where the question
-bites hardest. A silent correction is a write nobody asked for.
+The owner chose v4's answer for v5, working on Windows, where the question bites
+hardest. A silent correction is a write nobody asked for.
 
 ## 4. Preview became optional
 

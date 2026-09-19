@@ -28,32 +28,29 @@ Read this note again on any of three signs:
 
 ## 1. The brief is the claim
 
-A branch makes one claim: it does what its brief asks. A diff shows what
-changed and says nothing about that claim.
+A branch makes one claim: it does what its brief asks. A diff shows what changed
+and says nothing about that claim.
 
-So the first question weighs the two together, and it names what goes missing.
-A program reading the diff alone answers neither half.
+So the first question weighs the two together, and it names what goes missing. A
+program reading the diff alone answers neither half.
 
 ## 2. The trivial fix goes in
 
 `spec/guidance/working.md` rule nine sends a trivial fix in and a deeper one to
 a finding. A file outside the brief is then no fault by itself.
 
-The reader asks whether the extra is trivial, and stops there. The next
-question decides the rest.
+The reader asks whether the extra is trivial, and stops there. The next question
+decides the rest.
 
 ## 5. A rule firing on nothing
 
 A rule firing on nothing looks alive. This tree met that twice in two days.
 
-- A Vale rule carrying a runtime error wrote `E201` to standard error and
-  nothing to standard output. The linter read empty output and answered "The
-  rules pass", with every rule off.
-- A merge left `$` read bare in the hooks module, which the engine refuses.
-  `check` showed nothing, because nothing ran `claude plugin validate`.
+- A Vale rule carrying a runtime error wrote `E201` to standard error and nothing to standard output. The linter read empty output and answered "The rules pass", with every rule off.
+- A merge left `$` read bare in the hooks module, which the engine refuses. `check` showed nothing, because nothing ran `claude plugin validate`.
 
-Both faults passed a test asserting a rule exists. So the reader asks for a
-test on every rule a branch adds.
+Both faults passed a test asserting a rule exists. So the reader asks for a test
+on every rule a branch adds.
 
 ## 6. What the test feeds in
 
@@ -66,8 +63,8 @@ refusal is the one piece of evidence that a rule holds.
 ## 7. A diversion costs the brief
 
 The fault in a file outside the brief is a diversion, a redesign of something
-the brief leaves alone. Telling that apart from a trivial fix takes a reading
-of the diff.
+the brief leaves alone. Telling that apart from a trivial fix takes a reading of
+the diff.
 
 A model answers it. A count of touched files answers something else.
 

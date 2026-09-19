@@ -28,9 +28,9 @@ and it is one reader at a time.
 So the argument sits one link away. A reader who accepts the rule pays nothing
 for it, and a reader who wants to fight it knows where to go.
 
-Naming one folder for the past also makes the tense rule enforceable. Every other
-folder refuses it, and a linter decides that. The schema proposed a `Motivation`
-chapter here as well, and three things in the tree sent it back:
+Naming one folder for the past also makes the tense rule enforceable. Every
+other folder refuses it, and a linter decides that. The schema proposed a
+`Motivation` chapter here as well, and three things in the tree sent it back:
 
 | what said so | what it said |
 |---|---|
@@ -59,7 +59,8 @@ Another box reads that and acts on something untrue there. It also goes stale
 the moment somebody writes it. A file in the tree carrying last week's state is
 the drift every other rule here works to prevent.
 
-So the local one lives under `.se`, which git ignores and which stays on one box.
+So the local one lives under `.se`, which git ignores and which stays on one
+box.
 
 A work branch wants the other thing:
 

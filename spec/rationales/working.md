@@ -5,8 +5,8 @@ explains: [[spec/guidance/working]]
 
 # Why
 
-The owner's word moves the session, and the work in flight yields to it. The
-two faults below are one rule read from two ends.
+The owner's word moves the session, and the work in flight yields to it. The two
+faults below are one rule read from two ends.
 
 | the fault | what it costs |
 |---|---|
@@ -70,8 +70,8 @@ on the `v4` branch holds it:
 The second names the move a stop stands in for. A concern is a note, and a note
 survives the turn. An argument inside the turn reaches nobody.
 
-Version three split the question into two dials, and `deliverable/machines`
-on the `v3` branch holds both:
+Version three split the question into two dials, and `deliverable/machines` on
+the `v3` branch holds both:
 
 | the dial | what it answers |
 |---|---|
@@ -100,8 +100,8 @@ nobody asked for. So it becomes a finding, and the code stands.
 
 ## 10. The owner reads a brief
 
-A brief leaving for the cloud becomes the whole job of a session nobody
-watches. One wrong line in it spends a box.
+A brief leaving for the cloud becomes the whole job of a session nobody watches.
+One wrong line in it spends a box.
 
 So the owner reads a brief before it lands. That costs one reading, and it buys
 back every session the brief would misdirect.

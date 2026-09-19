@@ -22,6 +22,6 @@ hash, the frontmatter and every line already.
 
 ## 3. The files stay the truth
 
-An index that answers as the truth is a second truth, and two truths drift. So
-a reader meeting a stale index or none reads the files. The index earns its
-place by answering faster, and it holds no authority beyond that.
+An index that answers as the truth is a second truth, and two truths drift. So a
+reader meeting a stale index or none reads the files. The index earns its place
+by answering faster, and it holds no authority beyond that.
