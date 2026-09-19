@@ -49,9 +49,20 @@ export function handOf(it) {
   const parts = [`box ${boxOf(it)}`];
   if (held.id) parts.push(`session ${held.id}`);
   if (agent) parts.push(agent);
-  // The record names the role, and git names who. [[spec/guidance/voice]]
-  if (parts.length === 1 && !it.agent) return PERSON;
+  // The hold git ignores carries who, and the record carries the role. [[spec/design_output/pull#the-hand-rule]]
+  if (parts.length === 1 && !it.agent) return named(PERSON, it.git?.authorName?.() ?? "");
   return parts.join(" · ");
+}
+
+// A tracked file holds no person's name, so the record takes the role off the hand. [[spec/design_output/pull#the-hand-rule]]
+export function roleOf(hand) {
+  const said = String(hand ?? "").trim();
+  return said === PERSON || said.startsWith(`${PERSON} `) ? PERSON : said;
+}
+
+function named(role, who) {
+  const said = String(who ?? "").trim();
+  return said ? `${role} ${said}` : role;
 }
 
 // The box file stands under the work root, and the copy record under the method root, so a stub names its own box. [[spec/design_output/vehicle#the-work-root-inherits]]

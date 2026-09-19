@@ -239,6 +239,10 @@
           "unit": "steps",
           "help": "The person steps a ticket carries before the pull refuses another and asks for a split."
         },
+        "personSigns": {
+          "type": "boolean",
+          "help": "The stronger door on a person's hand. Switched on, a person's hand-back on a tracked ticket meets a signed tip."
+        },
         "retroReaders": {
           "type": "number",
           "unit": "hands",

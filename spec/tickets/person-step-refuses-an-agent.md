@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-person-step-holds
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -112,6 +112,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: 28479a0da6406e15c59d4b9c600a9d1c5d03ba86
+    hash_after: 28479a0da6406e15c59d4b9c600a9d1c5d03ba86
+    answered:
+      - name: lint
+        exit: 0
+        said: 87 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
@@ -243,13 +251,15 @@ A person's name enters through `handOf`, which feeds the hold's file name and th
 
 ### lint
 
-<!-- the tree builds and lints -->
+    ./RUNME.sh lint
 
 <!-- the form is command -->
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change reaches the hand, the hand-back and the config, which the ask and the review leaf name
+- the git door grows two reads, and the fake process beside it answers both
+- each new function carries one line pointing at the hand-rule chapter
 
 <!-- the form is checklist -->
 

@@ -14,6 +14,7 @@ import {
 export { HELPER, SPAWN, spawnPrompt } from "./spawn.js";
 
 import { notesSaid, parsed } from "./guidance-hand.js";
+import { PERSON, roleOf } from "./hand.js";
 import { excludes } from "./pull-hand.js";
 import { ANSWERED, bare, CHECKED, COMMENT, CUT, FENCE, WORK } from "./pull-route.js";
 import { changedSince, tipOf } from "./pull-writes.js";
@@ -382,6 +383,7 @@ export function handFaults(it, one, leaf, hand, held) {
   const out = [];
   if (leaf.by === "person" && it.agent && !it.ownerSays)
     out.push(`${leaf.path} is a person's step, and this hand is an agent.`);
+  out.push(...signFaults(it, one, hand));
   const other = excludes(one.front, leaf, hand);
   if (other) out.push(`${leaf.path} ${other}.`);
   if (leaf.evidence.some((field) => field.form === "verdict") && !one.private) {
@@ -394,5 +396,19 @@ export function handFaults(it, one, leaf, hand, held) {
   }
   return out;
 }
+
+// The stronger door on a person's hand, which a tracked ticket meets where the config switches it on. [[spec/design_output/pull#the-hand-rule]]
+export function signFaults(it, one, hand) {
+  if (!it.personSigns || one.private || roleOf(hand) !== PERSON) return [];
+  const tip = tipOf(it);
+  const said = it.git.signatureOf ? it.git.signatureOf("HEAD") : "";
+  if (SIGNED.includes(said.trim())) return [];
+  return [
+    `a person's hand-back meets a signed tip, and ${shortOf(tip)} answers ${said.trim() || "no signature"}.`,
+  ];
+}
+
+// What `git log --format=%G?` answers over a good signature, and over one it trusts no key for. [[spec/design_output/pull#the-hand-rule]]
+export const SIGNED = ["G", "U"];
 
 // [[spec/design_output/pull#the-pass]]

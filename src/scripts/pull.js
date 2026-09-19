@@ -20,7 +20,7 @@ import {
   withField,
 } from "./group.js";
 import { dropHold, guidanceText, holdOf, writeHold } from "./guidance-hand.js";
-import { handOf, SAYS } from "./hand.js";
+import { handOf, roleOf, SAYS } from "./hand.js";
 import { landed } from "./landed.js";
 import {
   chapterOf,
@@ -344,7 +344,7 @@ export function takeBack(it, who, name, path) {
   const tip = one.private ? "" : tipOf(it);
   const text = withEntry(one.text, {
     step: path,
-    hand: who.hand,
+    hand: roleOf(who.hand),
     hash_before: tip,
     hash_after: tip,
     returns: returnsOf(one.front, path) + 1,

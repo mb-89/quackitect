@@ -8,6 +8,7 @@ export { HELPER, SPAWN, spawnPrompt } from "./spawn.js";
 
 import { CLOSED, frontOf, OPEN, recordIn, withEntry, withField } from "./group.js";
 import { dropHold } from "./guidance-hand.js";
+import { roleOf } from "./hand.js";
 import { landed, unlandedRows } from "./landed.js";
 import { childrenSay, handOut, holdsHere, ticketsHere } from "./pull-hand.js";
 import { DONE, REFUSED, say, WAIT, WORK, walkOf } from "./pull-route.js";
@@ -17,7 +18,7 @@ export function passed(it, who, one, leaf, held, answered) {
   const tip = one.private ? "" : tipOf(it);
   let text = withEntry(one.text, {
     step: leaf.path,
-    hand: who.hand,
+    hand: roleOf(who.hand),
     hash_before: held.hash,
     hash_after: tip,
     answered,
@@ -74,7 +75,7 @@ export function failed(it, who, one, leaf, held, reason, answered) {
   const returns = returnsOf(one.front, leaf.path) + 1;
   const text = withEntry(one.text, {
     step: leaf.path,
-    hand: who.hand,
+    hand: roleOf(who.hand),
     hash_before: held.hash,
     hash_after: one.private ? "" : tipOf(it),
     returns,
@@ -138,7 +139,7 @@ export function became(it, who, one, leaf, held, successor, answered) {
   }
   const text = withEntry(one.text, {
     step: leaf.path,
-    hand: who.hand,
+    hand: roleOf(who.hand),
     hash_before: held.hash,
     hash_after: one.private ? "" : tipOf(it),
     answered,

@@ -33,7 +33,7 @@ import {
   withoutField,
 } from "./group.js";
 import { guidance } from "./guidance-verb.js";
-import { escalate, handOf, leafOf, pull, stepPathOf, takeable } from "./pull.js";
+import { escalate, handOf, leafOf, pull, roleOf, stepPathOf, takeable } from "./pull.js";
 import { readyToMerge, review } from "./review.js";
 import { serving } from "./serve.js";
 import { freeIn, staleClaim, trigger } from "./stand.js";
@@ -296,9 +296,11 @@ function claimGroup(it, one) {
   const hand = handOf(it);
   const before = it.git.run(["rev-parse", "HEAD"], true).out;
 
-  it.disk.write(path, withEntry(was, { step: stepOf(was), hand, hash_before: before }));
+  // A tracked file holds the role, and git holds who. [[spec/design_output/pull#the-hand-rule]]
+  const role = roleOf(hand);
+  it.disk.write(path, withEntry(was, { step: stepOf(was), hand: role, hash_before: before }));
   it.git.run(["add", at], true);
-  it.git.run(["commit", "-m", `${one.branch}: ${hand} takes it`], true);
+  it.git.run(["commit", "-m", `${one.branch}: ${role} takes it`], true);
   if (!it.git.run(["push", "origin", one.branch]).ok) {
     console.error(refusedPush(one.branch));
     return 1;

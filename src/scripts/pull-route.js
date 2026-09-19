@@ -15,7 +15,7 @@ import {
   readsOf,
   writeHold,
 } from "./guidance-hand.js";
-import { agentOf, BOX, handOf } from "./hand.js";
+import { agentOf, BOX, handOf, roleOf } from "./hand.js";
 
 export const HOLDS = OWNED_HOLDS;
 export const WORK = "work";
@@ -65,7 +65,7 @@ export function holdsVerb(need, verbs = VERBS) {
   return !sub || verbs[verb].includes(sub);
 }
 
-export { agentOf, BOX, handOf, holdAt, holdOf, parsed };
+export { agentOf, BOX, handOf, holdAt, holdOf, parsed, roleOf };
 
 // A second hand-out at one step hands the notes again on a refusal, a compaction or a moved hash alone. [[spec/design_output/pull#the-hand-and-the-hold]]
 export function stillHeld(it, held) {

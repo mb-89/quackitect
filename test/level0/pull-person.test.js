@@ -65,7 +65,7 @@ test("personSigns refuses a person's hand-back on an unsigned tip, and names the
 
   assert.equal(code, 1);
   assert.match(said, /^refused/m);
-  assert.match(said, /signature/);
+  assert.match(said, /a person's hand-back meets a signed tip/);
   assert.match(said, /b818c39/, "the refusal names the tip");
 });
 

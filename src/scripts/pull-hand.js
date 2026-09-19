@@ -17,6 +17,7 @@ import {
   withField,
 } from "./group.js";
 import { noteRows, readsOf, writeHold } from "./guidance-hand.js";
+import { roleOf } from "./hand.js";
 import { landed } from "./landed.js";
 import { workAnswer } from "./pull-chapter.js";
 import {
@@ -407,7 +408,8 @@ export function excludes(front, leaf, hand) {
     (one) => paths.has(String(one.step)) && !one.skipped,
   );
   if (!wrote.length) return "";
-  if (wrote.some((one) => String(one.hand ?? "") === hand)) {
+  // The record holds the role, so the rule reads the hand as its role too. [[spec/design_output/pull#the-hand-rule]]
+  if (wrote.some((one) => String(one.hand ?? "") === roleOf(hand))) {
     return `waits for a hand other than ${hand}, which wrote ${named.path}`;
   }
   return "";

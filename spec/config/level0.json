@@ -12,6 +12,7 @@
     "failsBeforeWait": 2,
     "refusalsBeforeFail": 5,
     "stepsBeforeSplit": 3,
+    "personSigns": false,
     "retroReaders": 4,
     "retroCap": 8
   },
