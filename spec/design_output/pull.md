@@ -6,8 +6,8 @@ refines:
 
 # Scope
 
-`src/scripts/pull.js` holds the pull and the test verb, under `./RUNME.sh
-branch`. This note covers the hand-out, the hand-back with its checks,
+`src/scripts/pull.js` holds the pull, under `./RUNME.sh ticket`, and the test
+verb, under `./RUNME.sh branch`. This note covers the hand-out, the hand-back with its checks,
 and the answers. It covers the record, the hold per hand, and what the
 stop hook reads off the hold. The verbs around the branch stand in
 [[spec/design_output/work]].
@@ -100,6 +100,15 @@ A ticket offers where it stands `open` and every `depends_on` stands `closed`
 here or on trunk. Its current leaf then admits this hand or it stays. The
 first leaf that admits a hand goes out, so a child at an agent step comes
 before the group's own leaves.
+
+## A closed group hands nothing
+
+A pull on a work branch whose group stands closed hands no leaf out. It
+answers `done`, and sends the box to `branch done` and a pull from trunk. A
+hand-back still lands, so a leaf in hand closes where it stands.
+
+A box staying past the close works tickets nobody expects on that branch, and
+they merge unread. For the run behind this, see [[spec/rationales/pull]].
 
 ## Children before their group
 

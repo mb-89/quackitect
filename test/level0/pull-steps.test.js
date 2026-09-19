@@ -9,6 +9,7 @@ import { fieldOf, recordIn, withEntry, withField } from "../../src/scripts/group
 import {
   childrenSay,
   holdsVerb,
+  pull,
   withEngineReader,
   withPersonStep,
 } from "../../src/scripts/pull.js";
@@ -239,7 +240,7 @@ test("a hand-back the record answers gets the recorded answer, and a stale take 
     hash_after: SHA,
   });
   const { it, disk } = doors(
-    standing(answered, withField(GROUP_NOTE, "state", "closed")),
+    standing(answered, withField(GROUP_NOTE, "step", "children")),
   );
   disk.write(
     HOLD,
@@ -355,7 +356,7 @@ test("a leaf needing a verb the box lacks answers wait, with the reason", () => 
     '  - name: design\n    needs: ["deploy now"]\n',
   );
   const { it } = doors(
-    standing(child, GROUP_NOTE.replace("state: open", "state: closed")),
+    standing(child, withField(GROUP_NOTE, "step", "children")),
   );
 
   const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
@@ -536,7 +537,23 @@ A thing to look at.
     at("spec/tickets/one-group.md"),
     withField(GROUP_NOTE, "state", "closed"),
   );
-  const { said } = heard(() => pulling(ROOT, ["pull"], later.it));
+  const shut = heard(() => pulling(ROOT, ["pull"], later.it));
+  assert.match(shut.said, /^done/, "a closed group's branch hands its breakdown nothing");
+
+  const trunk = doors(
+    standing(
+      CHILD("closed", "implement/change", "reason: done\n"),
+      withField(GROUP_NOTE, "state", "closed"),
+      {
+        [at(".se/tickets/a-note.md")]: note(false),
+        [at(".se/tickets/a-piece.md")]: note(false, "trivial"),
+      },
+    ),
+    { "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } },
+  );
+  // The pull with no take behind it, so trunk hands its pools out. [[spec/design_output/pull#a-closed-group-hands-nothing]]
+  const bare = { root: ROOT, method: ROOT, work: ROOT, ...trunk.it };
+  const { said } = heard(() => pull(bare, ["pull"]));
   assert.match(said, /^work {2}a-piece at decide/);
   assert.doesNotMatch(said, /a-note/, "a note waits for a retro hand");
 });

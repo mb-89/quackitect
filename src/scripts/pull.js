@@ -11,6 +11,7 @@ import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 export { HELPER, SPAWN, spawnPrompt } from "./spawn.js";
 
 import {
+  CLOSED,
   fieldOf,
   frontOf,
   OPEN,
@@ -38,7 +39,16 @@ import {
   urgentGroup,
   withPersonStep,
 } from "./pull-hand.js";
-import { leafOf, leavesOf, REFUSED, say, stillHeld, WAIT, WORK } from "./pull-route.js";
+import {
+  DONE,
+  leafOf,
+  leavesOf,
+  REFUSED,
+  say,
+  stillHeld,
+  WAIT,
+  WORK,
+} from "./pull-route.js";
 import {
   became,
   entriesOf,
@@ -110,7 +120,23 @@ export function pull(it, argv) {
     if (wanted || it.ready?.()) return wanted ? it.take(wanted) : 0;
   }
   if (!fetched(it, branch)) return 1;
+  if (group && closedGroup(it, group)) return groupDone(group);
   return handOut(it, who);
+}
+
+// [[spec/design_output/pull#a-closed-group-takes-no-more-work]]
+function closedGroup(it, group) {
+  const one = ticketsHere(it).find((held) => !held.private && held.name === group);
+  return Boolean(one) && fieldOf(one.text, "state") === CLOSED;
+}
+
+// [[spec/design_output/pull#a-closed-group-takes-no-more-work]]
+function groupDone(group) {
+  say(DONE, [
+    `${group} stands closed, so work/${group} takes no more work.`,
+    `Run ./RUNME.sh branch done, then ./RUNME.sh ticket pull from ${TRUNK}.`,
+  ]);
+  return 0;
 }
 
 // [[spec/design_output/pull#a-hand-of-its-own]]

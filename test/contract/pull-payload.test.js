@@ -24,7 +24,7 @@ const TICKET = at("spec/tickets/a-child.md");
 
 const GROUP = `---
 kind: [[ticket]]
-state: closed
+state: open
 process: [[group]]
 steps:
   - name: split

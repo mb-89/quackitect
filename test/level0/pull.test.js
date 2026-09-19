@@ -243,7 +243,7 @@ test("a hand takes a leaf it passed back, and another hand's leaf stays", () => 
     hash_after: SHA,
   });
   const { it, disk, outside } = doors(
-    standing(passed, withField(GROUP_NOTE, "state", "closed")),
+    standing(passed, withField(GROUP_NOTE, "step", "children")),
   );
 
   const { code, said } = heard(() =>
@@ -274,7 +274,7 @@ test("a hand takes a leaf it passed back, and another hand's leaf stays", () => 
 // [[spec/design_output/pull#the-pass]]
 test("a pass writes the record, moves the step, commits by ticket and step, pushes, and hands out the next", () => {
   const { it, disk, outside } = doors(
-    standing(CHILD(), withField(GROUP_NOTE, "state", "closed")),
+    standing(CHILD(), withField(GROUP_NOTE, "step", "children")),
   );
   heard(() => pulling(ROOT, ["pull"], it));
   disk.write(
@@ -314,7 +314,7 @@ test("a step that excludes the only hand answers spawn, with the helper's name a
     hash_before: SHA,
     hash_after: SHA,
   });
-  const { it, disk } = doors(standing(took, withField(GROUP_NOTE, "state", "closed")));
+  const { it, disk } = doors(standing(took, withField(GROUP_NOTE, "step", "children")));
 
   const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
 

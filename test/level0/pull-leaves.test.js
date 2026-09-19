@@ -24,6 +24,7 @@ import {
   filled,
   GROUP_NOTE,
   HAND,
+  HOLD,
   heard,
   ROOT,
   standing,
@@ -308,4 +309,19 @@ test("takeable waits on an open dependency, so the pull and branch done name the
     "design/draft",
     "a closed dependency frees it",
   );
+});
+
+// [[spec/design_output/pull#a-closed-group-hands-nothing]]
+test("a closed group hands no leaf out on its branch, and sends the box back to trunk", () => {
+  const shut = GROUP_NOTE.replace("state: open", "state: closed");
+  const { it, disk } = doors(standing(CHILD(), shut));
+
+  const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
+
+  assert.equal(code, 0);
+  assert.match(said, /^done/);
+  assert.match(said, /one-group stands closed/);
+  assert.match(said, /branch done, then \.\/RUNME\.sh ticket pull from main/);
+  assert.ok(!disk.exists(HOLD), "no leaf stands in hand");
+  assert.equal(fieldOf(disk.read(at("spec/tickets/a-child.md")), "step"), "design/draft");
 });

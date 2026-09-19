@@ -21,7 +21,7 @@ import {
 // [[spec/design_output/pull#the-fields-ride-the-payload]]
 test("the fields ride the payload, and the engine writes them under their headings before it checks", () => {
   const { it, disk } = doors(
-    standing(CHILD(), withField(GROUP_NOTE, "state", "closed")),
+    standing(CHILD(), withField(GROUP_NOTE, "step", "children")),
   );
   heard(() => pulling(ROOT, ["pull"], it));
 
@@ -88,7 +88,7 @@ test("the payload spans a fence, a porcelain row reads whole, and a files field 
     "# Discussion\n",
     "# verdict\n\n## read\n\n## verdict\n\n# Discussion\n",
   );
-  const { it } = doors(standing(body, withField(GROUP_NOTE, "state", "closed")), {
+  const { it } = doors(standing(body, withField(GROUP_NOTE, "step", "children")), {
     "git status --porcelain": { stdout: "M spec/tickets/a-child.md\n?? .vale.ini" },
     [`${vale} --config=${at(".vale.ini")} --path=spec/tickets/a-child.md --output=JSON --no-exit`]:
       (_argv, init) => {
