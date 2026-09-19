@@ -7,6 +7,7 @@ import { BIN as INDEX_BIN } from "../../.claude/skills/level0/lib/index.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
 import { schemaFaults } from "../../.claude/skills/level0/lib/schema.js";
 import { treeFaults } from "../../.claude/skills/level0/lib/tree.js";
+import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
 import { WARNING } from "../../.claude/skills/level0/lib/warnings.js";
 import { findingsOver, readThrough, showOf, walkOver } from "../bridge/findings.js";
 import { serverFaults, treeHere } from "./cli-check.js";
@@ -119,9 +120,9 @@ export async function lint(where) {
   if (refused) return 1;
   console.log("");
   console.log(
-    `${found.length} stand at warning, which the panel draws and check allows.`,
+    `${found.length} stand at warning. A commit lands over them, and check answers red, so no push reaches ${TRUNK}.`,
   );
-  return 0;
+  return 1;
 }
 
 // [[spec/design_output/tree#the-tree-handed-in]]

@@ -603,7 +603,7 @@ comment counts none.
 | who reads it | what it does |
 |---|---|
 | the code door | refuses a write that grows past a ceiling, and names the function or the file and its lines |
-| `./RUNME.sh check` | names what stands past a ceiling as a warning, so the panel draws it and the check allows it |
+| `./RUNME.sh check` | names what stands past a ceiling as a warning, so the panel draws it and the check answers red |
 
 The door reads the text before and after the write. A file already past its
 ceiling takes a cut and refuses a growth. So the tree's debt shrinks with every

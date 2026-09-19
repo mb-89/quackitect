@@ -338,10 +338,11 @@ a value equal to what `mint` writes is the one thing it names. A field taking a
 
 # Warning now and error later
 
-A departure from the shape stands at `SEVERITY`, which reads `error`, and
-`./RUNME.sh check` turns red on it. A placeholder stands at `LEFT`, which reads
-`warning`: the panel draws it, and check stays green. So a minted note lands
-and the tree stays passable while a session fills it in.
+A departure from the shape stands at `SEVERITY`, which reads `error`. A
+placeholder stands at `LEFT`, which reads `warning`. Both show in the panel,
+and `./RUNME.sh check` answers red on either, so no push reaches trunk while
+one stands. The commit door reads no rule, so a minted note still commits
+while a session fills it in.
 
 # The underscore parks a draft
 

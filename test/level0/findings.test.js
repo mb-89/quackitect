@@ -46,3 +46,11 @@ test("Vale reading nothing is the fault, and the list stays empty", async () => 
   assert.equal(got.fault, "no config");
   assert.deepEqual(got.found, []);
 });
+
+// [[spec/design_output/level0#a-crash-writes-its-error]]
+test("a path the disk no longer holds reads as no finding, and throws nothing", async () => {
+  const got = await findingsOver(doors(), ["HANDOVER.md"]);
+
+  assert.equal(got.fault, "");
+  assert.deepEqual(got.found, []);
+});

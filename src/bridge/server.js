@@ -234,7 +234,10 @@ export function serve(method, port = PORT_BASE, say = console.log) {
   const onRequest = (request, response) => {
     // The problems panel reads the battery's findings here, so a rule reaches the editor off one list. [[spec/design_output/lsp]]
     if (request.method === "GET" && String(request.url).startsWith(FINDINGS)) {
-      findingsFor(own, request.url).then((said) => answer(response, OK, said));
+      findingsFor(own, request.url).then(
+        (said) => answer(response, OK, said),
+        (error) => answer(response, OK, { ok: false, found: [], fault: String(error?.message ?? error) }),
+      );
       return;
     }
     if (request.method === "POST" && request.url === "/stop") {
