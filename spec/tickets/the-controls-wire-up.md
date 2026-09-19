@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -165,6 +165,10 @@ record:
     hash_after: 626a33cbc0d7c0291ce442496afc630af45c4474
     returns: 1
     why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | the desk roads land, and a cloud pull on trunk hands out at `god` |; | is what the diff touches beyond the ask trivial | yes, the server hunk moves two names and drops a copy |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does a retro stand in the handback | no, and `branch review` names it at the branch's close |; | does every rule the change adds carry a case | the two pure names do, and the pull's own gate takes none |; | does a case feed the rule something bad | a case outside the tree does, and the tree holds none |; TL;DR:; The pull answers wait at `unbound` on a work branch and on trunk, with a free ticket standing.; `ENGINE_CHECKS` names the four the design output's table names, `warnings-standing` among them.; So the open need the design review carried forward lands.; `ranHere` asks the gate on its first line, so the four stand down at `god` alone.; The server reads `BINDING` and `GOD` off the stop door, so one place holds each.; A cloud pull on trunk takes a branch at `god`, because the branch-take stands above the gate.; No case drives `pull` itself, so the first done_when line stands open.; The findings, one a line:; The gate sits under the branch-take, and a cloud box on trunk reaches the take first.; A case driving `pull` at `god` on trunk reads a branch take, in place of the wait.; So the engine hands a cloud box work where the ask says it stands aside.; The done_when asks for a case where the plain pull answers wait, and `handsOut` takes that line.; `test/level0/pull-doors.js` drives `pull` over fakes already, and the box it builds takes `binding`.; The cases copy the check names, which `spec/config/stop/level0.yml` and its level1 file own.; So a check joining the door lands in neither list, and the last case passes green.; `queueWaits` spells the key bare, beside the `BINDING` the same file now exports.; The pull's named-ticket refusal spells `queue` bare, beside the `QUEUE` its route now exports.; What reads true against the tree, one a line:; `engine.binding` reaches the pull through `it.binding`, which the command line's box carries.; The `unbound` column of the stop table holds, because the gate reads `god` alone.; The `god` row of the config chapter holds, because `letsThrough` lets the stop block through.; `standsDown` answers false for every other check the stop rules name.; `./RUNME.sh check` answers 0, and every case in the tree passes.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the gate stands above the branch-take, so a cloud pull on trunk waits at `god` | open |; | 2 | a case drives `pull` at `unbound` and at `god`, over the pull's own fakes | open |; | 3 | the cases read the check names off the stop rules, in place of a copy | open |; | 4 | `queueWaits` reads `BINDING`, and the pull's refusal reads `QUEUE` | open |; | 5 | the verdict hand reads the branch again | open |"
+  - step: implement/reflect
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 275d1d48fe6242f0e64e59270eacbc987157f277
+    hash_after: 275d1d48fe6242f0e64e59270eacbc987157f277
 ---
 
 # Ask
@@ -329,15 +333,29 @@ drives that half over a fake box.
 
 ### class
 
-<!-- the class of error the findings describe, and the fix for the class -->
+Three classes stand under the findings.
 
-<!-- the form is text -->
+| the class | the findings it carries | the fix for the class |
+|---|---|---|
+| a gate lands below a road it closes | the cloud take at `god` | the gate stands above every road the pull takes, under the hand-back and the hold |
+| a case drives the pure name, and the caller stands untested | the pull's wait | the case drives `pull` itself, over the fakes `pull-doors.js` builds |
+| a list a case reads stands copied, and its owner stands elsewhere | the check names | the case reads the names off the stop rules, which own them |
+
+The first class is the one that costs a person. A gate under a road lets that
+road answer first, so the value a person sets reaches the case and leaves the
+box alone. The order of the roads is what the gate has to read.
+
+The second class is what lets the first stand. A case over `handsOut` reads
+the answer, and a case over `pull` reads the road. The ask names the second.
+
+The two bare keys are a word, not a class. `queueWaits` and the pull's refusal
+each spell a value the same file exports, so each reads the name beside it.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change touches no file the ask leaves out. The pull, its route, the stop door and the cases.
+- every door the change reaches has a fake. The pull case drives the fakes `test/level0/pull-doors.js` builds.
+- a comment names the approach the change implements. Each site points at the chapter owning the binding.
 
 ## change
 
