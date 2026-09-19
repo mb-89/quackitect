@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-person-step-holds
-step: implement/tests-green
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -118,6 +118,17 @@ record:
     hash_after: 05d641fd589c62be16ddef21b97dc38d2e2ce9eb
     answered:
       - name: lint
+        exit: 0
+        said: 87 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: 752ea879514d77efac881b2c03b0d00f06f6a81e
+    hash_after: 752ea879514d77efac881b2c03b0d00f06f6a81e
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 54 test(s) pass in 4 file(s)
+      - name: check
         exit: 0
         said: 87 stand at warning, which the panel draws and check allows.
 ---
@@ -266,25 +277,46 @@ The review leaf also names two files the ask's table leaves out. The verb list s
 
 ### tests
 
-<!-- the same tests pass -->
+    ./RUNME.sh branch test
 
 <!-- the form is command -->
 
 ### check
 
-<!-- the check is green on the commit -->
+    ./RUNME.sh check
 
 <!-- the form is command -->
 
 ### says
 
-<!-- what changes and why, for a reader who was not there -->
+A hand reaching no answer without a person now says so, and `branch escalate <question>` is the one road a step goes in by.
+
+| what the verb reads | what it writes |
+|---|---|
+| the hold the pull writes | a `person-<n>` step before the held leaf, with the question under `asks` |
+| `--options a,b,c` | the answer's `choice` form, carrying the words |
+| nothing in hand | a refusal naming the pull |
+
+The verb reads the hold, puts the step in through `withPersonStep`, and points `step` at it. Then it drops the hold, commits by ticket and step, pushes, and hands out the next ticket.
+
+The review leaf asks four things, and each one answers here.
+
+| what it asks | what stands |
+|---|---|
+| the exit where the split cap refuses | one, and the inserter's own line says to split the ticket |
+| the exit and the line with no hold standing | one, and the line names `./RUNME.sh branch pull` |
+| whether the verb writes the step's own options | it writes them under the answer field alone |
+| the verb list and the dispatch | `BRANCH` in `pull-route.js`, and the map in `work.js` |
+
+The ask's third bullet retires here. [[spec/tickets/refusal-cap-inserts-no-person]] closes done on this branch, and [[spec/design_output/pull#a-count-inserts-no-step]] owns the ruling. So a count inserts no step, and this change writes none.
 
 <!-- the form is text -->
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the verb lands in the file the ask names, and its list and dispatch stand where the review leaf says
+- the cases drive the fake doors beside them, and the change adds no door
+- the verb carries one line pointing at the design output chapter holding the approach
 
 <!-- the form is checklist -->
 
