@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -121,6 +121,10 @@ record:
     hash_after: f14236bf90d974af82833d98b3b8243886900b9f
     returns: 3
     why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | for the pull, yes. The stop half names its rows short |; | is what the diff touches beyond the ask trivial | yes, the draft commit writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 |; | does a retro stand in the handback | no, and the retro stands at the branch's close |; | does every rule the approach adds carry a case | yes, the done_when carries a line for each |; | does every claim read true | yes but one, and the gate sentence reads other than its table |; TL;DR:; The three needs of the last round land. The `queue` row, the Ask and the done_when each read true now.; The `queue` row matches `pull.js`, which refuses a named ticket there and names the queue.; The autonomy half stands out of the Ask, and the Discussion carries the call for the owner.; `engine.autonomy` reaches the schema, the config and the code nowhere, so the cut holds.; The gate sentence under the stop table reads other than the table above it.; The findings, one a line:; The gate `queueWaits` carries reads `queue`, so it stands down at `unbound` too.; A check taking that gate stands down at `unbound`, and the table above it reads refuses.; Write the gate as a read of `god`, so the `unbound` column holds.; The stop table leaves `no-stop-line` and `warnings-standing` out, and each holds a turn open.; Say what each does at `god`, because [[spec/design_output/config#the-engine-controls]] puts nothing in its refuses column.; The word mechanical takes in the owner's hold and `stop-hook-off`, which the sentence leaves standing.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the gate sentence reads `god`, so the `unbound` column holds | open |; | 2 | the stop half says what `no-stop-line` and `warnings-standing` do at `god` | open |; | 3 | the sentence names the rows that move, beside the word mechanical | open |; | 4 | the review hand reads the approach again | open |"
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 452ca25609f3dc46820eea09ea8e58a520a5dc4a
+    hash_after: 452ca25609f3dc46820eea09ea8e58a520a5dc4a
 ---
 
 # Ask
@@ -176,12 +180,29 @@ The stop hook stands half done already, and the table says which half:
 | `queue-waits` | refuses | stands down | stands down |
 
 `queueWaits` reads the binding against `queue` today, so the last row holds.
-The three rows above it read the binding nowhere, so `god` refuses a stop the
-way `queue` does. Each of the three takes the same gate `queueWaits` carries.
+The three rows above it read the binding nowhere. Each takes a gate of its own,
+a read of `god`, so the `unbound` column stands as the table says.
 
-`god` is the engine standing aside, so every mechanical check stands down there.
-That leaves `stop-hook-off` and the owner's hold, which answer to a person and
-read no binding.
+`god` is the engine standing aside, so a check reading the engine's own work
+stands down there. These do, and the done_when carries a case for each:
+
+| the check | what it reads |
+|---|---|
+| `ticket-in-hand` | a hold, or an open private ticket |
+| `group-in-hand` | a take with no hand-back |
+| `work-waiting` | a todo, or a branch at `held` |
+| `warnings-standing` | a refactorer wanting a hand |
+
+Every other check reads something else, so the binding leaves it standing:
+
+| the check | what it reads |
+|---|---|
+| `stop-hook-off` | `stop.enabled`, which a person sets |
+| `owner-holds`, `owner-finishes` | the owner's hold |
+| `chat-is-new` | the session log, on the opening turn |
+| `no-stop-line` | the claim against the rules a stop names |
+| `a-person-sits-here` | the box |
+| `queue-waits` | the binding already, as its row above says |
 
 ## review
 
