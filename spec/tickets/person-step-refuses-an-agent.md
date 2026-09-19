@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-person-step-holds
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -141,6 +141,14 @@ record:
     hand: box ca870d4f20f4 · claude-code-remote
     hash_before: 039fa8b84ef95bcc0dc6c9c064756c65a8c68c61
     hash_after: 039fa8b84ef95bcc0dc6c9c064756c65a8c68c61
+  - step: implement/change
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: a73c80b056e5f0656388d6d1f630baee25ef331d
+    hash_after: a73c80b056e5f0656388d6d1f630baee25ef331d
+    answered:
+      - name: lint
+        exit: 0
+        said: 87 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
@@ -290,9 +298,9 @@ Two readers weigh that field against a live hand. `excludes` takes the role alre
 
 ### checked
 
-- the change reaches the hand, the hand-back and the config, which the ask and the review leaf name
+- the change reaches the hand, the hand-back, the take-back and the config, which the ask names
 - the git door grows two reads, and the fake process beside it answers both
-- each new function carries one line pointing at the hand-rule chapter
+- each new function and each changed reader carries a line pointing at the hand-rule chapter
 
 <!-- the form is checklist -->
 
