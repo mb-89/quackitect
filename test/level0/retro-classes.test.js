@@ -175,7 +175,7 @@ test("classes count each pattern per active hour, and the report opens on them",
   assert.match(report, /### mechanize/);
   assert.match(
     report,
-    /\| k1 · commit messages meet the voice rules late \|.*\| 1 \| the-commit-lints-first \| 1 \|/,
+    /\| k1 · commit messages meet the voice rules late \|.*\| 1 \| the verify step stands open \| the-commit-lints-first \| 1 \|/,
   );
   assert.match(report, /\| the log reader script \| \.se\/scripts \| a log verb \|/);
   assert.match(report, /- `c1\.keep\.1` the tests → dropped: a practice/);
