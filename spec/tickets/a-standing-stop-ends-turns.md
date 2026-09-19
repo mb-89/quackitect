@@ -89,7 +89,12 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: ceeca8c80a8f205e61c7a4b6ecb98423be92406d
+    hash_after: ceeca8c80a8f205e61c7a4b6ecb98423be92406d
 ---
 
 # Ask
@@ -112,6 +117,52 @@ the stop hook reopens the turn again and again while work waits
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+- one change in the stop door
+- one case in the file the ask names
+
+**What stands.** The hold lives in the config. `holdsCall` reads it at every
+call, and `dropsHold` writes it back to `off` at the turn's end. `onStop` reads
+that same key to vote.
+
+| the door | when it runs | what it does with the hold |
+|---|---|---|
+| `holdsCall` | every tool call | reads it, and marks the box |
+| `dropsHold` | `turn.complete` | writes `off` |
+| `onStop` | `classic.Stop` | reads it, and votes |
+
+**The fault.** The two rules ending a turn for the owner read the hold `onStop`
+sees. A `turn.complete` reaching the server first leaves that read at `off`.
+Both rules lose there, `work-waiting` wins, and the turn reopens over the
+standing work. `box.held` carries the same value, and the same handler clears
+it, so it helps nothing.
+
+**The change.** A hold standing anywhere in a turn ends that turn, whatever
+order the two events arrive in.
+
+| what changes | where |
+|---|---|
+| `dropsHold` leaves a mark naming the hold it drops | `src/bridge/stop.js` |
+| `sawPrompt` clears that mark, because a prompt opens a turn | the same file |
+| `onStop` reads the config, then the mark | the same file |
+
+The mark is one field on the box, beside `box.held` and `box.claim`. It lives
+as long as the counts the tooth holds, and a restart drops it the same way.
+
+**The case.** `test/level0/stop-door.test.js` drives `onStop` over a fake box
+already. The new case drops the hold first, the way the turn's end does, and
+reads the turn ending with nothing after it.
+
+| the case | what it reads |
+|---|---|
+| a hold at `stop`, dropped before the stop | the turn ends, and no block prompts |
+| a hold at `stop`, and the stop first | the turn ends, as it does today |
+| no hold, and work waiting | the turn holds, as it does today |
+
+**What this leaves.** The order the two events arrive in stands unmeasured
+here. This box logs neither one, because its turns run long and its server
+stands down at the session start. The change makes that order stop mattering,
+so the measurement costs nothing to skip.
 
 ## review
 
