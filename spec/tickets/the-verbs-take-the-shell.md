@@ -195,3 +195,31 @@ work runs through the engine.
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+A cloud box worked this branch and hands it back. The handover stands here, and no tracked `HANDOVER.md` lands. A brief on a group branch makes the listing read it as a brief branch, and `standingAll` then masks the group's own standing.
+
+| the child | where it stands |
+|---|---|
+| [[spec/tickets/the-unblock-keeps-its-shape]] | closed done |
+| [[spec/tickets/the-spawn-answers-a-helper]] | closed done |
+| [[spec/tickets/the-take-skips-an-orphan]] | closed done |
+| [[spec/tickets/release-keeps-local-commits]] | closed done |
+| [[spec/tickets/a-return-asks-another-hand]] | closed became, on the successor below |
+| the seven others | open, each with its approach written, each at `design/review` |
+
+Every open child carries a drafted approach. The next box spawns one hand a child, and the route runs on from there.
+
+What this box met:
+
+- the write door refuses a shell write, so every field rides `ticket pull --fields`
+- a field of form `files` trips `Sentence` as bare lines, and takes markdown list items
+- the ticket door refuses a hand's fix to a field it passes, and `ticket pull --back` is the road
+- `./RUNME.sh check` wants the server, which `./RUNME.sh serve` starts
+
+What this box leaves for a person:
+
+- [[spec/tickets/a-route-closes-answered-asks]] stands minted and open, naming no group
+- the refs sharing no ancestor with trunk stay standing, because the take passes over them
+- a private note under the box names a take-back sweeping a sibling's work into one commit
+
+The read tools stood absent until the server came up, which [[spec/tickets/the-read-tools-answer-first]] names. So the early reads ran through the shell, which is the fault this group opens on.
