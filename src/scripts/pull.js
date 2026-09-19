@@ -335,23 +335,25 @@ export function takeBack(it, who, name, path) {
   const wrote = entriesOf(one.front)
     .filter((entry) => String(entry.step) === path && !entry.skipped)
     .at(-1);
-  if (!wrote || String(wrote.hand ?? "") !== who.hand) {
+  // The record holds the role, so the read of it takes the role too. [[spec/design_output/pull#the-hand-rule]]
+  const role = roleOf(who.hand);
+  if (!wrote || String(wrote.hand ?? "") !== role) {
     say(REFUSED, [
-      `${path} carries no hand-back by ${who.hand}, so it is another hand's or nobody's.`,
+      `${path} carries no hand-back by ${role}, so it is another hand's or nobody's.`,
     ]);
     return 1;
   }
   const tip = one.private ? "" : tipOf(it);
   const text = withEntry(one.text, {
     step: path,
-    hand: roleOf(who.hand),
+    hand: role,
     hash_before: tip,
     hash_after: tip,
     returns: returnsOf(one.front, path) + 1,
     why: "the hand takes it back",
   });
   one.text = withField(withField(text, "step", path), "state", OPEN);
-  landed(it, one, [`${who.hand} takes ${path} back`]);
+  landed(it, one, [`${role} takes ${path} back`]);
   if (!one.private && !pushed(it, who.branch)) {
     say(REFUSED, [
       `${who.branch} moves under this take-back, and one rebase fell short. Pull again.`,

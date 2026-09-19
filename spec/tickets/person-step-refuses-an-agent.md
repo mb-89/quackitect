@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-person-step-holds
-step: implement/reflect
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -137,6 +137,10 @@ record:
     hash_after: 4b66a69fdb7666c9d4c08dc90ff8524648914ffb
     returns: 1
     why: "`takeBack` weighs the record's role against the named hand, so a person's `--back` comes back refused; the fix stands in `src/scripts/pull.js`, where the hand-back check wants `roleOf(who.hand)`; the write one line under that check already takes `roleOf`, so the read alone trails it; the suite drives `--back` on a box hand alone, and runs green over this break; the three pieces of the ask otherwise land: the refusal, the git author name, the signing door; `signFaults` names the tip and takes `G` and `U`, which the hand-rule chapter owns; `signFaults` lets a private ticket by, and the tests drive the tracked path alone; `excludes` reads a hand as its role, which keeps the `not` rule on the record's words; the two generated command files follow the config key, and the schema carries its help line; the files past this ask come from the sibling tickets on this branch, and each stands under its own; `./RUNME.sh check` exits green on this tip"
+  - step: implement/reflect
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: 039fa8b84ef95bcc0dc6c9c064756c65a8c68c61
+    hash_after: 039fa8b84ef95bcc0dc6c9c064756c65a8c68c61
 ---
 
 # Ask
@@ -252,13 +256,25 @@ A person's name enters through `handOf`, which feeds the hold's file name and th
 
 ### class
 
-<!-- the class of error the findings describe, and the fix for the class -->
+The change narrowed what a record holds, and a reader of that field trails behind.
+
+| the field | what it held | what it holds now |
+|---|---|---|
+| a record entry's `hand` | the whole hand, name and all | the role, which `roleOf` takes off the hand |
+
+Two readers weigh that field against a live hand. `excludes` takes the role already, and `takeBack` weighs the whole hand, so a person's `--back` comes back refused. The fix for the class is one rule: a reader of `hand` reads a live hand as its role first.
+
+- `takeBack` takes `roleOf(who.hand)`, and its refusal and its commit name the role
+- the hold keeps the whole hand, because git ignores it and `asOf` reads the name off it
+- a test drives `--back` off a harness, which is the road the suite left open
 
 <!-- the form is text -->
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the fix reaches the reader the finding names, and the ticket's own files beside it
+- the case drives the fake git the other cases drive, and the change adds no door
+- the reader carries one line pointing at the hand-rule chapter, which owns the split
 
 <!-- the form is checklist -->
 

@@ -53,6 +53,27 @@ test("a hand off a harness carries the git author name, and the record writes th
   );
 });
 
+// [[spec/design_output/pull#a-leaf-comes-back]]
+test("a person takes a leaf back, because the record's role answers their hand", () => {
+  const { it, disk } = doors(
+    standing(filled(CHILD(), "### approach", "The approach.")),
+    AUTHOR,
+    PERSON,
+  );
+  heard(() => work(ROOT, ["pull"], it));
+  heard(() => work(ROOT, ["pull", "a-child", "--pass"], it));
+
+  const { code, said } = heard(() =>
+    work(ROOT, ["pull", "a-child", "--back", "design/draft"], it),
+  );
+
+  assert.equal(code, 0, said);
+  assert.match(said, /a-child stands at design\/draft again/);
+  const now = disk.read(at("spec/tickets/a-child.md"));
+  assert.equal(recordIn(now).at(-1).why, "the hand takes it back");
+  assert.equal(recordIn(now).at(-1).hand, "person", "and it writes the role");
+});
+
 test("personSigns refuses a person's hand-back on an unsigned tip, and names the tip", () => {
   const { it } = doors(
     standing(filled(CHILD(), "### approach", "The approach.")),
