@@ -90,12 +90,18 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
     hash_before: 6895aca948d260403eb59cc9325a61c45499a508
     hash_after: 6895aca948d260403eb59cc9325a61c45499a508
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 60a78552c6259007bde5c3aec1e0241840908d7c
+    hash_after: 60a78552c6259007bde5c3aec1e0241840908d7c
+    returns: 1
+    why: "`takeable` stands in `src/scripts/pull-hand.js`, and `src/scripts/pull.js` re-exports it; the gate naming `helper` beside `person` and `children` stands in `writesHere`; that function stands under `.claude/skills/level0/lib/ticket.js`, so the change lands there; in that function the agent line stands above the helper line, so name it above; the gate reads the box off the hand `handRule` builds, so name the field it gains there; `the-spawn-takes-a-step` stands closed, and a hand writes under `Discussion` alone there [[spec/guidance/tickets]]; that line drops its count, because a command answers it [[spec/guidance/voice]]"
 ---
 
 # Ask
@@ -157,8 +163,17 @@ A helper leaf gates on the box, the way an agent step gates, and the helper is i
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+
+- `takeable` stands in `src/scripts/pull-hand.js`, and `src/scripts/pull.js` re-exports it
+- the gate naming `helper` beside `person` and `children` stands in `writesHere`
+- that function stands under `.claude/skills/level0/lib/ticket.js`, so the change lands there
+- in that function the agent line stands above the helper line, so name it above
+- the gate reads the box off the hand `handRule` builds, so name the field it gains there
+- `the-spawn-takes-a-step` stands closed, and a hand writes under `Discussion` alone there [[spec/guidance/tickets]]
+- that line drops its count, because a command answers it [[spec/guidance/voice]]
 
 # implement
 
