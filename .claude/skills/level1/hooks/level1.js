@@ -9,20 +9,21 @@ import {
   judgeRefusal,
   LABELS,
   PULL_CALL,
-  pullArgv,
   pullSpec,
   sessionOf,
   spawnPromptIn,
 } from "../lib/pull.js";
 
 const CLI = ["node", "src/scripts/cli.js"];
+// The verb and the flag src/scripts/pull-tool.js reads, fixed while the argv behind them moves. [[spec/design_output/pull#the-hand-out]]
+const PULL = ["ticket", "pull"];
+const TOOL = "--tool";
 // The hand's session file of [[spec/design_output/pull#the-hand-and-the-hold]], whose folder folders.js owns, spelled again here because a plugin imports nothing past its own folder.
 const SESSION = ".se/.runtime/session.json";
 const CONFIG = "spec/config/level0.json";
 const RUNNING = 600000;
 const JUDGE = "--judge";
 const SPAWNS = 3;
-const JUDGED_ARGS = 3;
 
 export function register(on, _options) {
   on("session.start", async ($, e, next) => {
@@ -33,19 +34,18 @@ export function register(on, _options) {
   });
 
   on("tool.call", { tool: PULL_CALL }, async ($, e, _next) => {
-    const argv = pullArgv(e);
-    if (argv.length > 2) {
-      const said = await judged($, argv);
+    if (String(e?.ticket ?? "").trim()) {
+      const said = await judged($, e);
       if (said) return { result: said };
     }
-    let answer = await pulled($, argv);
+    let answer = await pulled($, e);
     // [[spec/design_output/pull#a-hand-of-its-own]]
     for (let round = 0; round < SPAWNS; round++) {
       const prompt = spawnPromptIn(answer);
       if (!prompt) break;
       const said = await spawned($, prompt);
       if (said) return { result: `${answer}\n\n${said}` };
-      answer = await pulled($, ["ticket", "pull"]);
+      answer = await pulled($, {});
     }
     return { result: answer };
   });
@@ -53,7 +53,11 @@ export function register(on, _options) {
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 async function wrote($, held) {
-  if (!held.id) return says($, "the session start names no session id, so the hand stands at the box");
+  if (!held.id)
+    return says(
+      $,
+      "the session start names no session id, so the hand stands at the box",
+    );
   try {
     await $.fs.write(SESSION, `${JSON.stringify(held, null, 2)}\n`);
   } catch (bad) {
@@ -67,8 +71,13 @@ function says($, line) {
   } catch {}
 }
 
-async function pulled($, argv) {
-  const ran = await $.process.run([...CLI, ...argv], { timeoutMs: RUNNING });
+// The hook hands the raw input over, and the CLI reads it into an argv, so the hook holds no verb that goes stale. [[spec/design_output/pull#the-hand-out]]
+function toolCall(e) {
+  return [...CLI, ...PULL, TOOL, JSON.stringify(e ?? {})];
+}
+
+async function pulled($, e) {
+  const ran = await $.process.run(toolCall(e), { timeoutMs: RUNNING });
   return `${ran.stdout ?? ""}${ran.stderr ?? ""}`.trim() || `exit ${ran.exitCode}`;
 }
 
@@ -91,14 +100,12 @@ async function spawned($, prompt) {
 }
 
 // [[spec/design_output/pull#the-checks]]
-async function judged($, argv) {
+async function judged($, e) {
   const settings = await readJson($, CONFIG);
   const judge = settings?.judge ?? {};
   if (judge.enabled === false) return "";
 
-  const ran = await $.process.run([...CLI, ...argv.slice(0, JUDGED_ARGS), JUDGE], {
-    timeoutMs: RUNNING,
-  });
+  const ran = await $.process.run([...toolCall(e), JUDGE], { timeoutMs: RUNNING });
   const material = parsed(ran.stdout);
   if (!material?.rules?.length || !String(material.evidence ?? "").trim()) return "";
 
@@ -110,7 +117,9 @@ async function judged($, argv) {
   } catch {
     return "";
   }
-  return said === BREAKS ? judgeRefusal(`the judge answers ${said} over ${material.step}`) : "";
+  return said === BREAKS
+    ? judgeRefusal(`the judge answers ${said} over ${material.step}`)
+    : "";
 }
 
 function parsed(text) {

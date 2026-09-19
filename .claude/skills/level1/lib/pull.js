@@ -1,6 +1,6 @@
-// The pull tool's pure half. The argv the tool hands the shell verb, and the
-// question the judge asks over a hand-back, so a test reads both with no
-// harness standing.
+// The pull tool's pure half. The spec the tool registers, and the question
+// the judge asks over a hand-back, so a test reads both with no harness
+// standing. The CLI reads the tool's input into an argv, in pull-tool.js.
 // [[spec/design_output/pull#the-checks]]
 
 export const PULL_TOOL = "pull";
@@ -42,22 +42,6 @@ export function pullSpec() {
   };
 }
 
-// [[spec/design_output/pull#the-hand-out]]
-export function pullArgv(said = {}) {
-  const out = ["ticket", "pull"];
-  const ticket = String(said.ticket ?? "").trim();
-  const verdict = String(said.verdict ?? "").trim();
-  if (ticket) out.push(ticket);
-  if (verdict === "pass") out.push("--pass");
-  if (verdict === "fail" || verdict === "became") {
-    out.push(`--${verdict}`, String(said.reason ?? "").trim());
-  }
-  if (said.fields && typeof said.fields === "object") {
-    out.push("--fields", JSON.stringify(said.fields));
-  }
-  return out;
-}
-
 // [[spec/design_output/pull#the-checks]]
 export function judgeAsk(evidence, rules) {
   const listed = (rules ?? []).map((one, i) => `${i + 1}. ${one}`).join("\n");
@@ -79,7 +63,12 @@ export function spawnPromptIn(answer) {
   const rows = String(answer ?? "").split("\n");
   if (rows[0]?.trim() !== "spawn") return "";
   const blank = rows.indexOf("");
-  return blank < 0 ? "" : rows.slice(blank + 1).join("\n").trim();
+  return blank < 0
+    ? ""
+    : rows
+        .slice(blank + 1)
+        .join("\n")
+        .trim();
 }
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]

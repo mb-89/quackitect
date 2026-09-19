@@ -8,10 +8,10 @@ import {
   judgeAsk,
   judgeRefusal,
   PULL_CALL,
-  pullArgv,
   pullSpec,
   spawnPromptIn,
 } from "../../.claude/skills/level1/lib/pull.js";
+import { pullArgvOf } from "../../src/scripts/pull-tool.js";
 
 // [[spec/design_output/pull#a-hand-of-its-own]]
 test("the wrapper reads the prompt out of a spawn answer, and nothing out of any other", () => {
@@ -26,29 +26,42 @@ test("the wrapper reads the prompt out of a spawn answer, and nothing out of any
 });
 
 // [[spec/design_output/pull#the-hand-out]]
-test("the tool hands the shell verb the same words a person types", () => {
-  assert.deepEqual(pullArgv({}), ["ticket", "pull"]);
-  assert.deepEqual(pullArgv({ ticket: "a-child", verdict: "pass" }), [
-    "ticket",
+test("the tool's input reads into the same words a person types", () => {
+  const tool = (said, ...more) =>
+    pullArgvOf(["pull", "--tool", JSON.stringify(said), ...more]);
+  assert.deepEqual(tool({}), ["pull"]);
+  assert.deepEqual(tool({ ticket: "a-child", verdict: "pass" }), [
     "pull",
     "a-child",
     "--pass",
   ]);
-  assert.deepEqual(pullArgv({ ticket: "a-child", verdict: "fail", reason: "thin" }), [
-    "ticket",
+  assert.deepEqual(tool({ ticket: "a-child", verdict: "fail", reason: "thin" }), [
     "pull",
     "a-child",
     "--fail",
     "thin",
   ]);
+  assert.deepEqual(tool({ ticket: "a-child", verdict: "became", reason: "a-group" }), [
+    "pull",
+    "a-child",
+    "--became",
+    "a-group",
+  ]);
   assert.deepEqual(
-    pullArgv({ ticket: "a-child", verdict: "became", reason: "a-group" }),
-    ["ticket", "pull", "a-child", "--became", "a-group"],
+    tool({ ticket: "a-child", verdict: "pass", fields: { approach: "x" } }),
+    ["pull", "a-child", "--pass", "--fields", '{"approach":"x"}'],
   );
-  assert.deepEqual(
-    pullArgv({ ticket: "a-child", verdict: "pass", fields: { approach: "x" } }),
-    ["ticket", "pull", "a-child", "--pass", "--fields", '{"approach":"x"}'],
-  );
+  assert.deepEqual(tool({ ticket: "a-child", verdict: "pass" }, "--judge"), [
+    "pull",
+    "a-child",
+    "--judge",
+  ]);
+  assert.deepEqual(pullArgvOf(["pull", "a-child", "--pass"]), [
+    "pull",
+    "a-child",
+    "--pass",
+  ]);
+  assert.deepEqual(pullArgvOf(["pull", "--tool", "not json"]), ["pull"]);
   assert.equal(PULL_CALL, "mcp__level1__pull");
   assert.equal(pullSpec().name, "pull");
   assert.deepEqual(pullSpec().inputSchema.properties.verdict.enum, [

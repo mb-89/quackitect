@@ -46,6 +46,7 @@ import { asksIndex, lint, version } from "./cli-read.js";
 import { graphIn } from "./graph.js";
 import { probe } from "./probe.js";
 import { withRoute } from "./process.js";
+import { pullArgvOf } from "./pull-tool.js";
 import { retro } from "./retro.js";
 import { stubInto } from "./stub.js";
 import { ticket } from "./ticket.js";
@@ -115,7 +116,9 @@ export const verbs = {
     says: "tickets: pull, note, update, open, todo",
     // You pull a ticket, and the engine takes the branch it stands on. [[spec/design_output/pull#the-hand-out]]
     run: async () =>
-      rest[0] === "pull" ? pulling(it.work, rest, it) : ticket(it.work, rest, it),
+      rest[0] === "pull"
+        ? pulling(it.work, pullArgvOf(rest), it)
+        : ticket(it.work, rest, it),
   },
   retro: {
     says: "the retro a group's route runs: notes",
