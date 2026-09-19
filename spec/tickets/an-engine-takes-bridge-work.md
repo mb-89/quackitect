@@ -387,17 +387,44 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Five cases stand in `test/level0/go-modules.test.js`, over the two readers the
+swap move forces. Two fail on their own assertion.
+
+| the case | what it reads |
+|---|---|
+| a module straight under `src` | the list holds it, which holds today |
+| a module a folder below `src` | the list holds it, and the list stands empty of it |
+| a folder holding no module | the list passes it, which holds today |
+| a changed test under a nested module | the folder holding `go.mod`, and the read answers none |
+| a changed test outside every module | none, which holds today |
+
+The three passing cases guard the readers from a fix reaching past the ask.
+
+**What surprises.** `goModulesOf` reads path strings and takes no handle, so
+the two readers answer off different sources. One walks the disk, and one
+matches a regular expression. A module moving one level down breaks the second
+quietly, because a regular expression matching nothing answers an empty list.
+
+The cases give `goModulesOf` the handle beside the paths, so a later reader
+takes the module off the folder holding `go.mod`.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases reach one new test file, and the ask names no file for them
+- the readers meet the fake disk, so no case walks the tree
+- a comment over each case points at this ticket, which carries the approach
 
 ## reflect
 
