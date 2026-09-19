@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,19 @@ group: the-rules-hold-themselves
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 step: do
+record:
+  - step: do
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 182abee8cb0ae6f730bde557b9216882e24cb961
+    hash_after: 92090275f8e628975f7be490a0c5df35ffa49374
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 20 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
