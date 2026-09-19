@@ -151,6 +151,17 @@ and the routine's trigger fetch on their own, because each acts on the remote.
 A tree object carries a name as bytes, so the paths read raw. For details, see
 [[spec/design_output/doors#a-raw-run-keeps-bytes]].
 
+A fourth read asks `merge-base` what trunk and each branch share. git answers
+red where they share none, which is what a rewrite of trunk leaves behind:
+
+| what git answers | the standing | what follows |
+|---|---|---|
+| a commit | the words below | the branch keeps the standing its note says |
+| red | `orphan` | the listing marks it, and `take` passes over it and says so |
+
+A branch at `orphan` reaches no sync, so a box takes it and stalls. The merge
+reads the same base, so one read answers both.
+
 # A row per group
 
 `branch list` names one row per branch and one per loose ticket on trunk:

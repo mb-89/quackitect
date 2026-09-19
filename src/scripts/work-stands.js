@@ -27,6 +27,8 @@ export const MS = 1000;
 export const MINE = /^(work|claude)\//;
 export const TODO = "todo";
 export const HELD = "held";
+// A branch sharing no ancestor with trunk reaches no sync, so no box takes it. [[spec/design_output/work#the-listing-reads-git-once]]
+export const ORPHAN = "orphan";
 
 // [[spec/design_output/work#the-routine-a-verb-names]]
 export const ROUTINE = { name: "do_work", id: "trig_01EenLoDAB3NdmANnRM9mSh6" };
@@ -131,7 +133,17 @@ export function refsHere(it) {
     ["for-each-ref", `--format=${REF_FORMAT}`, `refs/remotes/origin/${WORK_BRANCH}`],
     true,
   );
-  return said.ok ? refsIn(said.out, mergedHere(it)) : [];
+  if (!said.ok) return [];
+  return refsIn(said.out, mergedHere(it)).map((one) => ({
+    ...one,
+    orphan: !baseOnTrunk(it, one.branch).shares,
+  }));
+}
+
+// The commit trunk and a branch share. git answers red where they share none, which is what a rewrite of trunk leaves behind. [[spec/design_output/work#the-listing-reads-git-once]]
+export function baseOnTrunk(it, branch) {
+  const said = it.git.run(["merge-base", `origin/${TRUNK}`, `origin/${branch}`], true);
+  return { shares: said.ok, base: said.ok ? said.out.trim() : "" };
 }
 
 // The refs, then the paths, then the contents. [[spec/design_output/work#the-listing-reads-git-once]]
@@ -198,7 +210,13 @@ export function standingAll(stand) {
   return new Map(
     stand.map((one) => [
       one.branch,
-      one.merged ? MERGED : one.brief ? statusOf(one.brief) : groupStanding(one.ticket),
+      one.orphan
+        ? ORPHAN
+        : one.merged
+          ? MERGED
+          : one.brief
+            ? statusOf(one.brief)
+            : groupStanding(one.ticket),
     ]),
   );
 }

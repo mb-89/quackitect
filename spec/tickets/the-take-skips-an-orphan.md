@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -121,6 +121,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 9022b52413ccacaee9582f0b281154e30df9c40b
+    hash_after: 9022b52413ccacaee9582f0b281154e30df9c40b
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -237,14 +245,18 @@ What surprises: the write door answers a file ceiling where these cases go in be
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the listing, the standing, the take and the merge's own read of the base
+- the cases drive `doorsSaying`, so git and the disk stand fake
+- each hunk carries a comment pointing at [[spec/design_output/work#the-listing-reads-git-once]]
 
 ## tests-green
 

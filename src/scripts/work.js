@@ -59,6 +59,7 @@ import {
   groupStanding,
   HELD,
   noteOf,
+  ORPHAN,
   push,
   setStatus,
   standingAll,
@@ -245,6 +246,10 @@ function take(it, name = "") {
   const stand = standOf(it);
   const standing = standingAll(stand);
   const open = stand.filter((one) => standing.get(one.branch) === TODO);
+  // A branch sharing no ancestor with trunk reaches no sync, so the take says which it passes over. [[spec/design_output/work#the-listing-reads-git-once]]
+  for (const one of stand.filter((held) => standing.get(held.branch) === ORPHAN)) {
+    console.log(`${one.branch} shares no ancestor with trunk, so this take skips it.`);
+  }
 
   if (!open.length) {
     console.log(`No work branch stands at ${TODO}. Nothing to take.`);
