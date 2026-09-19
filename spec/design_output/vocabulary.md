@@ -65,8 +65,8 @@ cases. So a drift turns a suite red where it stands.
 
 # A swap wins
 
-A swap wins over every list, so a word the tree refuses for good stands in the
-swaps list with its replacement. The writer meets that replacement until the
+A swap wins over every list, so a word the tree refuses for good stands in
+`swaps.yml` with its replacement. The writer meets that replacement until the
 prose takes it.
 
 # The retro moves a term

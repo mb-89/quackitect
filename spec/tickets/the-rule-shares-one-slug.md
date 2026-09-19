@@ -218,4 +218,5 @@ rule of its own. They stand as they are, and the answer's table says why.
 - The answer names a projection writing the cases into each tool chain. This change stops at the source both read.
 - A projected copy adds a shape and a stale check, and both suites read the tree already. So a drift fails in a suite.
 - The Go rule reads `spec/config/slug.yaml` the same way when it lands, and it carries its copy of the function.
-- The write door refuses a write to a design output whose other lines the tree lint passes. `.se/tickets` holds the note.
+- A first reading blames the write door for refusing lines nobody touches. The cause stands in this change instead.
+- A lone code mark in a draft leaves an odd count, and the spans under it pair wrong. `.se/tickets` holds the note.

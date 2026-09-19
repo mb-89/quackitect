@@ -68,6 +68,18 @@ Two things surprised me:
 
 The reading proves both halves. The rules refuse a `does` field holding seven code spans, and they leave a `hand` field holding seven alone.
 
+The guard stands, and nothing holds it there. So this hand adds the case, and no rule moves:
+
+| what lands | where |
+|---|---|
+| a record's `why` holding five code spans, which draws nothing | `test/contract/paragraph.test.js` |
+| the same line under `does`, which draws the refusal | the same case |
+| the line naming the exception a reader meets | [[spec/design_output/projection#what-stands-outside-a-layer]] |
+
+What surprises this hand: the two notes the ask names lint clean on this commit,
+and the four lines it lists draw nothing. The road the owner picks stands in the
+tree already, so the work here is the program holding it.
+
 # Discussion
 
 The queue handed `work/the-hand-carries-a-step` to the desk, and `branch review` named one thing to fix. That one thing is this.
