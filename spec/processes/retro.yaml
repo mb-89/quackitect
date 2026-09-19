@@ -8,7 +8,7 @@ ask:
 steps:
   - name: feedback
     does: takes the owner's field feedback one point at a time, and writes each confirmed point as a private note
-    by: owner
+    by: person
     needs: ["ticket note"]
     reads: [[spec/guidance/retro/feedback]]
     evidence:
@@ -19,6 +19,7 @@ steps:
     does: moves everything the private folder holds past its dot folders into the retro's input folder, and copies the transcripts, the memory and the scratchpads beside it
     by: anyone
     to: owner
+    input: feedback
     needs: ["retro"]
     reads: [[spec/guidance/retro/collect]]
     evidence:
