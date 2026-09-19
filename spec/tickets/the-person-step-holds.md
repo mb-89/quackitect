@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 steps:
   - name: sync
@@ -108,6 +108,11 @@ record:
     hand: box ca870d4f20f4 · claude-code-remote
     hash_before: 83d0a9a5e853ee962a9a87e0fcc9dbdb5d8f10ec
     hash_after: 83d0a9a5e853ee962a9a87e0fcc9dbdb5d8f10ec
+  - step: retro/cloud
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: 581272f828a8f712b54990f625319afcc06fdda1
+    hash_after: 581272f828a8f712b54990f625319afcc06fdda1
+reason: done
 ---
 
 # Ask
@@ -213,19 +218,24 @@ The write door taught faster than the guidance did. A rule a reader meets as a r
 
 ### lacked
 
-<!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
-
-<!-- the form is list -->
+- the push door found no `vale` at the first take, because the install wrote the folder's old name
+- the index binary answered `file is not a database`, because a stale copy stood at the old name
+- the check refused until a server answered, and the box started one by hand
 
 ### met
 
-<!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
-
-<!-- the form is list -->
+- the push door, at the take, which left the branch claimed on the box and unpushed on origin
+- the write door, on a shell heredoc into a tracked file, and on the word `escalate`
+- the commit door, on that same word in a commit message
+- the file ceiling, on `work.js` and on `test/level0/pull-steps.test.js`, which split by topic
+- the `not` rule on every review and verdict leaf, which took a hand of its own
 
 ### left
 
-<!-- every person step parked, every ticket minted with no group, and what the handover says -->
+- no person step stands parked on this branch, and every child closes done
+- the group's own retro steps close here, and `branch done` is what follows
+- `branch review` names the retro as the one thing the handover lacks, which this leaf writes
+- the improve lines name their homes, and a hand mints a ticket for each the owner wants
 
 <!-- the form is list -->
 
