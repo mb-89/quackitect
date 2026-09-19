@@ -89,7 +89,12 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 8c3cbf655d1c012f211fad758ea0f0b857d74fde
+    hash_after: 8c3cbf655d1c012f211fad758ea0f0b857d74fde
 ---
 
 # Ask
@@ -114,6 +119,32 @@ A hand writes past the voice rules by putting the write in a script file.
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The door reads the command line today, and a script hides the write behind a
+file name. So the door reads the file the line names:
+
+| what the line carries | what the door reads |
+|---|---|
+| a redirection, an editor in place, a copy | the path on the line, as it reads one now |
+| a runner and a script, such as `node` and a path | the script's own text, off the disk door |
+| a copy out of the scratchpad | the target path, which the same reading answers |
+
+The pieces, in `.claude/skills/level0/lib/bash.js` beside `writesAPath`:
+
+- `scriptsIn(command)` answers the paths a runner takes as its script, one a line
+- `writesIn(text)` answers the tracked paths a script's text writes, off the same parse
+- the door hands each script's text to that reading, so one rule answers both roads
+- a script writing under `.se` or the scratchpad passes, because the rule reads the target
+
+The refusal names `mcp__level0__patch` and `mcp__level0__replace` as the road,
+the way the line rule names them now. So a hand meets one message, whichever
+road it takes.
+
+The cases stand in `test/level0/bash.test.js`, over a fake disk:
+
+- a script writing a tracked path refuses
+- a script writing under the private folder passes
+- a copy out of the scratchpad into a tracked path refuses
 
 ## review
 
