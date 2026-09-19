@@ -8,7 +8,8 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
-import { onWrite } from "../../src/bridge/write.js";
+import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
+import { marksSeen, onWrite } from "../../src/bridge/write.js";
 import { TICKET_SCHEMA as SCHEMA } from "./fixtures.js";
 
 const METHOD = "/tools";
@@ -78,6 +79,36 @@ test("a ticket under the stub keeping the vehicle's schema passes, and the stub 
   assert.ok(!it.disk.exists(join(WORK, "spec", "schemas")), "the stub carries no schema of its own");
   const said = await onWrite(write(join(WORK, "spec", "tickets", "good.md"), GOOD), it);
   assert.deepEqual(said, { pass: true });
+});
+
+// [[spec/design_output/level0#a-write-meets-its-mark]]
+test("a write over a standing file this hand has read none of comes back refused", async () => {
+  const at = join(WORK, "spec", "tickets", "good.md");
+  const said = await onWrite(write(at, GOOD), box({ [at]: GOOD }));
+  assert.match(said?.result?.deny ?? "", /has read none of it/);
+});
+
+test("a read marks the file, and the write over it lands", async () => {
+  const at = join(WORK, "spec", "tickets", "good.md");
+  const it = box({ [at]: GOOD });
+  marksSeen(it, relativeTo(it.root, at), GOOD);
+  assert.deepEqual(await onWrite(write(at, GOOD), it), { pass: true });
+});
+
+test("a file moving after the read refuses the write that follows", async () => {
+  const at = join(WORK, "spec", "tickets", "good.md");
+  const it = box({ [at]: GOOD });
+  marksSeen(it, relativeTo(it.root, at), `${GOOD}\n`);
+  const said = await onWrite(write(at, GOOD), it);
+  assert.match(said?.result?.deny ?? "", /moved on the disk after you read it/);
+});
+
+test("a write landing marks what it leaves, so the next write over it lands", async () => {
+  const at = join(WORK, "spec", "tickets", "born.md");
+  const it = box();
+  assert.deepEqual(await onWrite(write(at, GOOD), it), { pass: true });
+  it.disk.write(at, GOOD);
+  assert.deepEqual(await onWrite(write(at, GOOD), it), { pass: true });
 });
 
 test("the same bad ticket written into the vehicle's own tree is refused the same way", async () => {

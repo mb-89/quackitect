@@ -5,6 +5,7 @@
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
+import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 import { PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 import { biome } from "../doors/biome.js";
 import { clock } from "../doors/clock.js";
@@ -59,7 +60,7 @@ import {
 } from "./stop.js";
 import { TOOLS as handTools, SPECS as toolSpecs } from "./tools.js";
 import { registeredPort } from "./vehicle.js";
-import { onWrite, schemasHere } from "./write.js";
+import { marksSeen, onWrite, schemasHere } from "./write.js";
 
 const OK = 200;
 const NOT_FOUND = 404;
@@ -91,6 +92,7 @@ const DOORS = {
 const TOOLS = {
   Grep: answersFromIndex,
   Glob: answersFromIndex,
+  Read: onRead,
   Write: onWrite,
   Edit: onWrite,
   MultiEdit: onWrite,
@@ -124,6 +126,18 @@ function specsOf(box) {
 }
 
 function pass() {
+  return PASS;
+}
+
+// A read hands the agent the text, so the mark comes off it. [[spec/design_output/level0#a-write-meets-its-mark]]
+function onRead(e, box) {
+  const path = String(e?.file_path ?? "");
+  if (!path) return PASS;
+  try {
+    marksSeen(box, relativeTo(box.root, path), String(box.disk.read(path)));
+  } catch {
+    // [[spec/design_output/level0#a-write-meets-its-mark]]
+  }
   return PASS;
 }
 

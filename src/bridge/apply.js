@@ -6,7 +6,7 @@ import { join } from "node:path";
 import { applied, filesIn, PATCH, patchSpec, REPLACE, replaceSpec } from "../../.claude/skills/level0/lib/apply.js";
 import { relativeTo } from "../../.claude/skills/level0/lib/paths.js";
 import { FOLDER as UNDONE, journalOf, nameOf, newestOn, restores, UNDO, undoSpec } from "../../.claude/skills/level0/lib/undo.js";
-import { onWrite } from "./write.js";
+import { marksOf, marksSeen, onWrite } from "./write.js";
 
 export const SPECS = () => [patchSpec(), replaceSpec(), undoSpec()];
 export const TOOLS = {
@@ -39,9 +39,14 @@ async function replaces(e, box) {
 
 async function lands(e, took, box) {
   if (!took.ok) return { result: { result: took.why } };
+  // A preview moves no disk, so the marks it meets stand as they stood. [[spec/design_output/level0#a-write-meets-its-mark]]
+  const held = e.preview === true ? new Map(marksOf(box)) : null;
   const refused = await checked(took, box);
   if (refused) return { result: { result: refused } };
-  if (e.preview === true) return { result: { result: wouldLand(took) } };
+  if (e.preview === true) {
+    box.marks = held;
+    return { result: { result: wouldLand(took) } };
+  }
   return { result: { result: writes(took, String(e.on ?? ""), box) } };
 }
 
@@ -111,6 +116,8 @@ async function undoes(e, box) {
   const done = [];
   for (const one of put.writes) {
     box.disk.write(join(box.root, inTheTree(box.root, one.file)), one.text);
+    // The undo hands the agent what it put back. [[spec/design_output/level0#a-write-meets-its-mark]]
+    marksSeen(box, inTheTree(box.root, one.file), one.text);
     done.push(`  put back ${one.file}`);
   }
   for (const path of put.removes) {
@@ -152,6 +159,7 @@ function sweeps(e, box) {
 }
 
 // [[spec/design_output/apply#bytes-in-bytes-out]]
+// [[spec/design_output/level0#a-write-meets-its-mark]]
 function readsFiles(box, paths) {
   const held = {};
   for (const path of paths) {
@@ -161,7 +169,9 @@ function readsFiles(box, paths) {
       continue;
     }
     try {
-      held[path] = { exists: true, text: String(box.disk.read(join(box.root, at))) };
+      const text = String(box.disk.read(join(box.root, at)));
+      held[path] = { exists: true, text };
+      marksSeen(box, at, text);
     } catch {
       held[path] = { exists: false };
     }

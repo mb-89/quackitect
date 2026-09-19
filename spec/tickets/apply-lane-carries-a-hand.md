@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: answer
@@ -42,6 +42,18 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: fb291f12846afeb900313fdd3e11e001296a4859
     hash_after: fb291f12846afeb900313fdd3e11e001296a4859
+  - step: do
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 8f5088077a7db1d61437ef5e1a63ec60b14e30b5
+    hash_after: 8f5088077a7db1d61437ef5e1a63ec60b14e30b5
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 26 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -151,27 +163,40 @@ marks any other.
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test
 
 ## check
 
-<!-- the check is green on the commit -->
-
-<!-- the form is command -->
+    ./RUNME.sh check
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
+The write door keeps a mark against each path, and a write meets it. A read
+sets the mark, a write over a disk the mark disagrees with comes back refused,
+and the refusal asks for a read. So one hand writing a file drops nothing
+another hand put there.
 
-<!-- the form is text -->
+| where | what it does |
+|---|---|
+| `lib/marks.js` | hashes a text, answers whether a mark agrees, and writes the refusal |
+| the `Read` tool | sets the mark, because that read reaches the agent |
+| the write door | meets the mark first, and sets it again on what the write leaves |
+| the batch lane | sets the mark at the read it makes inside the call that writes |
+| the undo | sets the mark on each file it puts back |
+
+The lane takes no token, which is what the answer rules. It reads every file
+inside the call that writes it, so that read is the agent's own and the door
+marks it there. A preview keeps the marks it meets, because it moves no disk.
+
+A path the disk holds nowhere writes with no mark, so a new file lands as it
+did. The door answers ahead of the write, so a dropped write leaves the mark
+ahead of the disk. The next write over that path asks for a read.
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change follows the answer: the lane takes no token, and the mark comes off the read reaching the agent
+- the cleanup it reveals: none, and the door order stands as it stood
+- the mechanism stands in one chapter, and every file touching it points there
 
 # Discussion
 
@@ -185,3 +210,4 @@ marks any other.
   - the door answers ahead of the write, and a write the engine drops leaves a stamp ahead of the disk
   - that next write refuses and asks for a read, which costs a read and loses nothing. Say so
   - every earlier finding stands answered, and the code bears out the claims on `hashText`, `refusal` and `codeDoor`
+- The `answer` chapter opens on a second wording of the owner's ruling. A box wrote it ahead of reading the chapter whole. The two agree, and the owner cuts the first at the merge.
