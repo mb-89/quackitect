@@ -134,11 +134,11 @@ func (one *server) showsAll(tree *Tree) {
 	}
 }
 
-// An open file leaves Vale and Biome to their own servers, which draw it as it is typed. [[spec/design_output/lsp]]
+// An open file leaves Biome to its own server, which draws it as it is typed. Vale stays here, because the battery's list carries the tense reader's veto. [[spec/design_output/lsp]]
 func (one *server) shows(tree *Tree, path string) {
 	said := append([]Finding{}, one.panel.own[path]...)
 	for _, extra := range one.panel.extra[path] {
-		if one.panel.open[path] && (extra.Source == fromVale || extra.Source == fromBiome) {
+		if one.panel.open[path] && extra.Source == fromBiome {
 			continue
 		}
 		said = append(said, extra)

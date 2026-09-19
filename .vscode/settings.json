@@ -4,6 +4,7 @@
   "vale.valeCLI.config": ".vale.ini",
   "vale.valeCLI.minAlertLevel": "inherited",
   "vale.valeCLI.lintOnChange": true,
+  "vale.valeCLI.filter": ".Name == \"none\"",
   "vale.enableSpellcheck": false,
   "biome.lsp.bin": {
     "linux-x64": ".se/.runtime/bin/biome",
