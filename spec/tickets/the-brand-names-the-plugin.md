@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgent: true
-step: design/review
+step: implement/tests-red
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -139,6 +139,10 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 902089cf410d50427be4e46c4a3cc31d196fdfc7
     hash_after: 902089cf410d50427be4e46c4a3cc31d196fdfc7
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-9
+    hash_before: bfcfe3ac7fe5b0c0f61cfb5376e5daa0344806b6
+    hash_after: bfcfe3ac7fe5b0c0f61cfb5376e5daa0344806b6
 ---
 
 # Ask
@@ -254,20 +258,19 @@ folder it read. `stub.js` hands `brandOf` to `linkOf`, which writes the
 
 ### verdict
 
-fail
+pass
 
-- Three faults stand: one from the last review, and two the redraft brings.
+- The three faults of the last review close, and the design goes to the implement.
 - The four asked answers stand: the marketplace name, the zero cost, the icon path, the dotted folder.
-- The count drift goes, and the draft names `grep -rl mcp__level0` alone.
-- The anchor stands, and `spec/design_output/level0.md` measures the tools keeping `level0`.
+- The enabled id row names the shim, and the cited anchor carries the same write.
+- The shim reads the brand off `vehicle.json`, which `stub.js` writes through `brandOf` and `linkOf`.
+- The icon row stands. `src/extension/package.json` names `icon.svg`, so the install write feeds the sidebar.
+- The author row stands. `plugin.json` carries `author.name`, reading the folder name today.
 - The marketplace rows read true. `RUNME.sh` runs `install.sh` ahead of `cli.js`.
-- The `brandOf` row reads true. `stub.js` hands it to `linkOf`, which writes the `vehicle.json` name.
-- The brand folder carries one reader now, and the lint reads the ticket clean.
-- The enabled id row stands open. `stub.js` writes `.claude/settings.json` through `settingsOf`.
-- No file in this tree writes `enabledPlugins`. Name the hand that writes the id, or cut the row.
-- The icon write reaches no vehicle. Git tracks `src/extension/icon.svg`, so every copy carries it.
-- So `spec/config/brand/icon.svg` reaches nothing. Say which hand reads it.
-- `plugin.json` carries `author.name`, which reads the folder name. Give it a row in the table.
+- The anchor stands, and `spec/design_output/level0.md` measures the tools keeping `level0`.
+- The slug table follows its own rule, and the bridgehead builds the clone path off that name.
+- The settings block restates the anchor beside it. The implement holds one wording, at the anchor.
+- The lint reads the ticket clean.
 
 # implement
 
