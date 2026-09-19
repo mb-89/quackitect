@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -140,6 +140,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-9
+    hash_before: 33f5704f21869c55e3f64dd9e3ceb4ebcb051d51
+    hash_after: 33f5704f21869c55e3f64dd9e3ceb4ebcb051d51
+    returns: 1
+    why: the status column in `spec/design_output/work.md` names four words, and the listing prints `orphan`; that chapter says `branch list` asks git three times, and `refsHere` adds a read a branch
 ---
 
 # Ask
@@ -320,20 +326,32 @@ The refs standing orphaned on this remote stay standing. `git ls-remote --heads 
 ## read
 
 <!-- every file you read, one a line -->
-
 <!-- the form is files -->
+
+spec/tickets/the-take-skips-an-orphan.md
+spec/tickets/the-spawn-takes-a-step.md
+spec/design_output/work.md
+src/scripts/work-stands.js
+src/scripts/work.js
+src/scripts/work-merge.js
+test/level0/work-orphan.test.js
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+
+- the status column in `spec/design_output/work.md` names four words, and the listing prints `orphan`
+- that chapter says `branch list` asks git three times, and `refsHere` adds a read a branch
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the code comments point at [[spec/design_output/work#the-listing-reads-git-once]], and the status table there misses `orphan`
 
 # Discussion
 
