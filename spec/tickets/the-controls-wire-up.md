@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -125,6 +125,10 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 452ca25609f3dc46820eea09ea8e58a520a5dc4a
     hash_after: 452ca25609f3dc46820eea09ea8e58a520a5dc4a
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-8
+    hash_before: 40cc13de664b780fe5cdfe80aff576c91d14b820
+    hash_after: 40cc13de664b780fe5cdfe80aff576c91d14b820
 ---
 
 # Ask
@@ -210,42 +214,38 @@ Every other check reads something else, so the binding leaves it standing:
 
 ### verdict
 
-fail
+pass
 
 | the question reviewing asks | the answer |
 |---|---|
-| does the approach answer the ask | for the pull, yes. The stop half names its rows short |
-| is what the diff touches beyond the ask trivial | yes, the draft commit writes this ticket alone |
+| does the approach answer the ask | yes, the pull half and the stop half each land |
+| is what the diff touches beyond the ask trivial | yes, the draft commits write this ticket alone |
 | what does `./RUNME.sh check` answer | 0 |
-| does a retro stand in the handback | no, and the retro stands at the branch's close |
+| does a retro stand in the handback | no, and `branch review` names it at the branch's close |
 | does every rule the approach adds carry a case | yes, the done_when carries a line for each |
-| does every claim read true | yes but one, and the gate sentence reads other than its table |
+| does every claim read true | yes, against `stop.js`, `pull.js` and the config chapter |
 
 TL;DR:
 
-- The three needs of the last round land. The `queue` row, the Ask and the done_when each read true now.
-- The `queue` row matches `pull.js`, which refuses a named ticket there and names the queue.
-- The autonomy half stands out of the Ask, and the Discussion carries the call for the owner.
-- `engine.autonomy` reaches the schema, the config and the code nowhere, so the cut holds.
-- The gate sentence under the stop table reads other than the table above it.
+- The three needs of the last round land, so this design output goes to implement.
+- The gate reads `god`, so the `unbound` column of the stop table holds.
+- The word mechanical stands cut, and two tables carry what it said.
+- The two tables between them name every check `ranHere` holds.
+- Each row's reading matches the function `ranHere` calls for that check.
 
 The findings, one a line:
 
-- The gate `queueWaits` carries reads `queue`, so it stands down at `unbound` too.
-- A check taking that gate stands down at `unbound`, and the table above it reads refuses.
-- Write the gate as a read of `god`, so the `unbound` column holds.
-- The stop table leaves `no-stop-line` and `warnings-standing` out, and each holds a turn open.
-- Say what each does at `god`, because [[spec/design_output/config#the-engine-controls]] puts nothing in its refuses column.
-- The word mechanical takes in the owner's hold and `stop-hook-off`, which the sentence leaves standing.
+- The column table leaves `warnings-standing` out, and the table under it names that check standing down.
+- The implement step takes its gate list from the table naming what stands down at `god`.
+- The `queue` row matches `pull.js`, which refuses a named ticket there and names the queue.
+- The box the command line builds carries `binding` already, so the pull reads one field of `it`.
 
 What the agent needs:
 
 | number | need | status |
 |---|---|---|
-| 1 | the gate sentence reads `god`, so the `unbound` column holds | open |
-| 2 | the stop half says what `no-stop-line` and `warnings-standing` do at `god` | open |
-| 3 | the sentence names the rows that move, beside the word mechanical | open |
-| 4 | the review hand reads the approach again | open |
+| 1 | the implement step gates `warnings-standing` beside the other checks standing down | open |
+| 2 | the branch's close writes the retro | open |
 
 # implement
 
