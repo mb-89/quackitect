@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgent: true
-step: verdict
+step: implement/reflect
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -173,6 +173,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-14
+    hash_before: 208019661194d2b0e9ac259c59b5cf9b52563f1b
+    hash_after: 208019661194d2b0e9ac259c59b5cf9b52563f1b
+    returns: 1
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the ask asks | the four answers stand, and the code carries each one |; | is what the diff touches beyond the ask trivial | yes, every hunk lands in a file the ask names |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does a retro stand in the handback | no, `HANDOVER.md` leaves this ticket at `design/review` |; | does every rule the change adds carry a case | the three pure names, yes. `stamps` and the refusal, no |; | does a case feed the rule something bad | `shimSettings` takes a broken file. The empty brand meets no case |; TL;DR:; The stamp writes nothing in this tree, and every `mcp__level0` tool keeps its name.; `./RUNME.sh check` answers 0, and the eight cases pass.; The icon lands. Git ignores the path `src/extension/package.json` names, and the install script writes it.; A folder name outside `a-z0-9` slugs to an empty brand, and three hands take it.; `stamps` reaches the disk door, and no case hands it a fake.; The findings, one a line:; `brandOf` answers an empty string for a folder name outside `a-z0-9`.; `stub.js` hands that string to `linkOf`, so `vehicle.json` records an empty name.; The shim reads that name, and its clone path drops the folder it looks for.; `shimSettings` then keys a marketplace on the empty string, and enables `level0@`.; The draft says an empty name fails the stub. `brand.js` alone refuses it.; That refusal stands under the main block, so a case reaches it nowhere.; `stamps` takes the disk door as an argument, and `src/doors/fake/disk.js` drives it nowhere.; So no case reads the two branded files, and no case reads the icon write.; The comments point at this ticket in four files, where the `checked` line names one chapter.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | an empty brand refuses where `stub.js` writes the record | open |; | 2 | a case feeds a folder name outside `a-z0-9` to that refusal | open |; | 3 | a case drives `stamps` off `src/doors/fake/disk.js` | open |; | 4 | the `checked` line of implement/change names where each comment points | open |; | 5 | the verdict hand reads every hunk again | open |"
 ---
 
 # Ask
@@ -423,21 +429,73 @@ first run.
 
 ## read
 
-<!-- every file you read, one a line -->
-
-<!-- the form is files -->
+- .claude-plugin/marketplace.json
+- .claude/skills/level0/.claude-plugin/plugin.json
+- .claude/skills/level0/lib/vehicle.js
+    - .gitignore
+- HANDOVER.md
+- RUNME.sh
+    - spec/config/brand/icon.svg
+- spec/design_output/vehicle.md
+- spec/guidance/code/testing.md
+- spec/guidance/review/reviewing.md
+- spec/tickets/the-brand-names-the-plugin.md
+- src/doors/disk.js
+- src/extension/package.json
+- src/scripts/brand.js
+- src/scripts/install.sh
+- src/scripts/stub.js
+- src/stub/RUNME.sh
+- test/contract/install.test.js
+- test/contract/sidebar.test.js
+- test/level0/brand.test.js
 
 ## verdict
 
-<!-- pass or fail, findings one a line -->
+fail
 
-<!-- the form is verdict -->
+| the question reviewing asks | the answer |
+|---|---|
+| does the branch do what the ask asks | the four answers stand, and the code carries each one |
+| is what the diff touches beyond the ask trivial | yes, every hunk lands in a file the ask names |
+| what does `./RUNME.sh check` answer | 0, with the server standing |
+| does a retro stand in the handback | no, `HANDOVER.md` leaves this ticket at `design/review` |
+| does every rule the change adds carry a case | the three pure names, yes. `stamps` and the refusal, no |
+| does a case feed the rule something bad | `shimSettings` takes a broken file. The empty brand meets no case |
+
+TL;DR:
+
+- The stamp writes nothing in this tree, and every `mcp__level0` tool keeps its name.
+- `./RUNME.sh check` answers 0, and the eight cases pass.
+- The icon lands. Git ignores the path `src/extension/package.json` names, and the install script writes it.
+- A folder name outside `a-z0-9` slugs to an empty brand, and three hands take it.
+- `stamps` reaches the disk door, and no case hands it a fake.
+
+The findings, one a line:
+
+- `brandOf` answers an empty string for a folder name outside `a-z0-9`.
+- `stub.js` hands that string to `linkOf`, so `vehicle.json` records an empty name.
+- The shim reads that name, and its clone path drops the folder it looks for.
+- `shimSettings` then keys a marketplace on the empty string, and enables `level0@`.
+- The draft says an empty name fails the stub. `brand.js` alone refuses it.
+- That refusal stands under the main block, so a case reaches it nowhere.
+- `stamps` takes the disk door as an argument, and `src/doors/fake/disk.js` drives it nowhere.
+- So no case reads the two branded files, and no case reads the icon write.
+- The comments point at this ticket in four files, where the `checked` line names one chapter.
+
+What the agent needs:
+
+| number | need | status |
+|---|---|---|
+| 1 | an empty brand refuses where `stub.js` writes the record | open |
+| 2 | a case feeds a folder name outside `a-z0-9` to that refusal | open |
+| 3 | a case drives `stamps` off `src/doors/fake/disk.js` | open |
+| 4 | the `checked` line of implement/change names where each comment points | open |
+| 5 | the verdict hand reads every hunk again | open |
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- every fact the change adds stands in one place. The chapter owns the slug rule, and six code sites point at a note or this ticket. The icon pair stands in `brand.js`, and the chapter names it once.
 
 # Discussion
 
