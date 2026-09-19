@@ -27,15 +27,15 @@ test("the wrapper reads the prompt out of a spawn answer, and nothing out of any
 
 // [[spec/design_output/pull#the-hand-out]]
 test("the tool hands the shell verb the same words a person types", () => {
-  assert.deepEqual(pullArgv({}), ["branch", "pull"]);
+  assert.deepEqual(pullArgv({}), ["ticket", "pull"]);
   assert.deepEqual(pullArgv({ ticket: "a-child", verdict: "pass" }), [
-    "branch",
+    "ticket",
     "pull",
     "a-child",
     "--pass",
   ]);
   assert.deepEqual(pullArgv({ ticket: "a-child", verdict: "fail", reason: "thin" }), [
-    "branch",
+    "ticket",
     "pull",
     "a-child",
     "--fail",
@@ -43,11 +43,11 @@ test("the tool hands the shell verb the same words a person types", () => {
   ]);
   assert.deepEqual(
     pullArgv({ ticket: "a-child", verdict: "became", reason: "a-group" }),
-    ["branch", "pull", "a-child", "--became", "a-group"],
+    ["ticket", "pull", "a-child", "--became", "a-group"],
   );
   assert.deepEqual(
     pullArgv({ ticket: "a-child", verdict: "pass", fields: { approach: "x" } }),
-    ["branch", "pull", "a-child", "--pass", "--fields", '{"approach":"x"}'],
+    ["ticket", "pull", "a-child", "--pass", "--fields", '{"approach":"x"}'],
   );
   assert.equal(PULL_CALL, "mcp__level1__pull");
   assert.equal(pullSpec().name, "pull");

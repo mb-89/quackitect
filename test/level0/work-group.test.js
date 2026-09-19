@@ -21,6 +21,7 @@ import {
   HELD,
   TODO,
   whyOf,
+  pulling,
   work,
 } from "../../src/scripts/work.js";
 import {
@@ -73,7 +74,7 @@ test("a pull on trunk takes a group for a cloud box, the way branch take does", 
   ])
     outside.proc.teach(argv, { exitCode: code });
   const { code, said } = heard(() =>
-    work(ROOT, ["pull"], { ...it, cloud: true, agent: true }),
+    pulling(ROOT, ["pull"], { ...it, cloud: true, agent: true }),
   );
   assert.equal(code, 0);
   assert.match(
@@ -96,7 +97,7 @@ test("a desk's pull on trunk takes a marked group, and leaves an unmarked one to
     { ...groupRemote(), "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } },
     { [on("one-group")]: GROUP_NOTE, ...HAND },
   );
-  const took = heard(() => work(ROOT, ["pull"], { ...urgent.it, cloud: false }));
+  const took = heard(() => pulling(ROOT, ["pull"], { ...urgent.it, cloud: false }));
   assert.equal(took.code, 0, took.said);
   assert.ok(
     ranGit(urgent.outside).includes("git switch work/one-group"),
@@ -108,7 +109,7 @@ test("a desk's pull on trunk takes a marked group, and leaves an unmarked one to
     { ...groupRemote(soon), "git rev-parse --abbrev-ref HEAD": { stdout: "main\n" } },
     { [on("one-group")]: soon, ...HAND },
   );
-  const left = heard(() => work(ROOT, ["pull"], { ...calm.it, cloud: false }));
+  const left = heard(() => pulling(ROOT, ["pull"], { ...calm.it, cloud: false }));
   assert.equal(left.code, 0, left.said);
   assert.ok(
     !ranGit(calm.outside).includes("git switch work/one-group"),
@@ -124,7 +125,7 @@ test("a desk's pull on trunk takes a marked group, and leaves an unmarked one to
     { [on("one-group")]: soon, ...HAND },
   );
   const asked = heard(() =>
-    work(ROOT, ["pull", "one-group"], { ...named.it, cloud: false }),
+    pulling(ROOT, ["pull", "one-group"], { ...named.it, cloud: false }),
   );
   assert.equal(asked.code, 0, asked.said);
   assert.ok(
@@ -386,7 +387,7 @@ test("done refuses while a ticket of the group stands at a step a hand can take"
 
   assert.equal(code, 1);
   assert.match(said, /a-child stands at do, and a hand can take it/);
-  assert.match(said, /branch pull/);
+  assert.match(said, /ticket pull/);
   assert.equal(recordIn(disk.read(on("one-group"))).at(-1).hash_after, undefined);
   assert.ok(!ranGit(outside).some((one) => one.startsWith("git push")));
 });

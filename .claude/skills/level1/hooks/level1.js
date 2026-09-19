@@ -45,7 +45,7 @@ export function register(on, _options) {
       if (!prompt) break;
       const said = await spawned($, prompt);
       if (said) return { result: `${answer}\n\n${said}` };
-      answer = await pulled($, ["branch", "pull"]);
+      answer = await pulled($, ["ticket", "pull"]);
     }
     return { result: answer };
   });

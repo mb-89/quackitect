@@ -9,7 +9,7 @@ rationale: [[spec/rationales/cloud]]
 
 # Actionables
 
-1. Run `./RUNME.sh branch pull` first where you start on `main`. The branch you start on carries no work. *
+1. Run `./RUNME.sh ticket pull` first where you start on `main`. The branch you start on carries no work. *
 2. Read the brief level zero hands you on a `work/` branch. Level zero deletes the copy it reads. *
 3. Take `main` in first, with `./RUNME.sh branch sync`. A late conflict costs the work standing behind it. *
 4. Work the branch you hold, and stop at its edge. A change nobody wants buries the one somebody wants. *

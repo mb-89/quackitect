@@ -179,7 +179,7 @@ test("unblock refuses a cloud box, and names the pull instead", () => {
 
   assert.equal(code, 2);
   assert.match(said, /hands no question out/);
-  assert.match(said, /branch pull a-child/);
+  assert.match(said, /ticket pull a-child/);
   assert.equal(fieldOf(disk.read(at("spec/tickets/a-child.md")), "state"), "open");
 });
 

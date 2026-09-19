@@ -13,18 +13,18 @@
   decides: mechanical
   runs: queue-waits
   firm: true
-  says: The queue holds work for this box, so run ./RUNME.sh branch pull and carry on.
+  says: The queue holds work for this box, so run ./RUNME.sh ticket pull and carry on.
 
 - id: the-group-stands-in-hand
   side: continue
   priority: 82
   decides: mechanical
   runs: group-in-hand
-  says: This box holds a group, so run ./RUNME.sh branch pull, spawn the hand a spawn answer names, and run branch done once the pull answers wait.
+  says: This box holds a group, so run ./RUNME.sh ticket pull, spawn the hand a spawn answer names, and run branch done once the pull answers wait.
 
 - id: a-ticket-stands-in-hand
   side: continue
   priority: 81
   decides: mechanical
   runs: ticket-in-hand
-  says: A ticket stands in your hand, so work its step and hand it back with ./RUNME.sh branch pull.
+  says: A ticket stands in your hand, so work its step and hand it back with ./RUNME.sh ticket pull.

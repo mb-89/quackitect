@@ -57,11 +57,11 @@ export function workAnswer(it, one, leaf) {
   rows.push("");
   if (leaf.evidence.some((field) => field.form === "verdict")) {
     rows.push(
-      `Hand it back with ./RUNME.sh branch pull ${one.name}, and the verdict field decides.`,
+      `Hand it back with ./RUNME.sh ticket pull ${one.name}, and the verdict field decides.`,
     );
   } else {
     rows.push(
-      `Hand it back: ./RUNME.sh branch pull ${one.name} --pass, or --fail "why", or --became <ticket>.`,
+      `Hand it back: ./RUNME.sh ticket pull ${one.name} --pass, or --fail "why", or --became <ticket>.`,
     );
   }
   return rows.join("\n");

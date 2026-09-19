@@ -16,7 +16,7 @@ import {
 } from "../../src/scripts/pull.js";
 import { goModulesOf, goSays, testSays } from "../../src/scripts/test-verb.js";
 import { ticket } from "../../src/scripts/ticket.js";
-import { work } from "../../src/scripts/work.js";
+import { pulling, work } from "../../src/scripts/work.js";
 import {
   at,
   CHILD,
@@ -35,16 +35,16 @@ test("became closes the ticket with its successor, reads no field of the leaf, a
       [at("spec/tickets/a-successor.md")]: CHILD("draft", ""),
     }),
   );
-  heard(() => work(ROOT, ["pull"], it));
+  heard(() => pulling(ROOT, ["pull"], it));
 
   const missing = heard(() =>
-    work(ROOT, ["pull", "a-child", "--became", "nobody"], it),
+    pulling(ROOT, ["pull", "a-child", "--became", "nobody"], it),
   );
   assert.equal(missing.code, 1);
   assert.match(missing.said, /nobody stands nowhere yet/);
 
   const { code } = heard(() =>
-    work(ROOT, ["pull", "a-child", "--became", "a-successor"], it),
+    pulling(ROOT, ["pull", "a-child", "--became", "a-successor"], it),
   );
   assert.equal(code, 0);
   const now = disk.read(at("spec/tickets/a-child.md"));
@@ -230,9 +230,9 @@ test("ticket open turns a draft with an ask into an open ticket at its first lea
 // [[spec/design_output/pull#the-checks]]
 test("the judge's material is the leaf's evidence and the rules its reads name, as JSON", () => {
   const { it } = doors(standing(filled(CHILD(), "### approach", "The approach.")));
-  heard(() => work(ROOT, ["pull"], it));
+  heard(() => pulling(ROOT, ["pull"], it));
 
-  const { code, said } = heard(() => work(ROOT, ["pull", "a-child", "--judge"], it));
+  const { code, said } = heard(() => pulling(ROOT, ["pull", "a-child", "--judge"], it));
 
   assert.equal(code, 0);
   assert.deepEqual(JSON.parse(said), {
@@ -243,7 +243,7 @@ test("the judge's material is the leaf's evidence and the rules its reads name, 
   });
   const none = doors(standing());
   assert.equal(
-    heard(() => work(ROOT, ["pull", "a-child", "--judge"], none.it)).said,
+    heard(() => pulling(ROOT, ["pull", "a-child", "--judge"], none.it)).said,
     "null",
   );
 });
@@ -253,9 +253,9 @@ test("the judge's material leaves a command field out, so a chapter of commands 
   const { it } = doors(
     standing(filled(CHILD("open", "implement/change"), "### lint", "./RUNME.sh check")),
   );
-  heard(() => work(ROOT, ["pull"], it));
+  heard(() => pulling(ROOT, ["pull"], it));
 
-  const { code, said } = heard(() => work(ROOT, ["pull", "a-child", "--judge"], it));
+  const { code, said } = heard(() => pulling(ROOT, ["pull", "a-child", "--judge"], it));
 
   assert.equal(code, 0);
   assert.equal(JSON.parse(said).step, "implement/change");
@@ -269,7 +269,7 @@ test("the hold reads back what the pull writes, and a box with no id mints one",
   assert.equal(holdOf(it, HAND), null);
   disk.remove(at(".se/.runtime/box.json"));
   it.random = () => "fresh1";
-  heard(() => work(ROOT, ["pull"], it));
+  heard(() => pulling(ROOT, ["pull"], it));
   assert.equal(JSON.parse(disk.read(at(".se/.runtime/box.json"))).id, "fresh1");
   assert.equal(holdOf(it, "box fresh1").ticket, "a-child");
 });
@@ -277,16 +277,16 @@ test("the hold reads back what the pull writes, and a box with no id mints one",
 // [[spec/design_output/pull#the-hand-out]]
 test("a name with nothing in hand asks for that ticket, and a name nobody writes says so", () => {
   const here = doors(standing());
-  const mine = heard(() => work(ROOT, ["pull", "a-child"], here.it));
+  const mine = heard(() => pulling(ROOT, ["pull", "a-child"], here.it));
   assert.match(mine.said, /a-child at design\/draft/, "the name hands that ticket out");
 
   const away = doors(standing());
-  const none = heard(() => work(ROOT, ["pull", "nobody-writes-this"], away.it));
+  const none = heard(() => pulling(ROOT, ["pull", "nobody-writes-this"], away.it));
   assert.match(none.said, /nobody-writes-this stands nowhere here/);
   assert.doesNotMatch(none.said, /a-child/, "a name asks for one ticket alone");
 
   const bound = doors(standing(), {}, { binding: "queue" });
-  const shut = heard(() => work(ROOT, ["pull", "a-child"], bound.it));
+  const shut = heard(() => pulling(ROOT, ["pull", "a-child"], bound.it));
   assert.equal(shut.code, 2);
   assert.match(shut.said, /a-child stands behind the queue/);
 });

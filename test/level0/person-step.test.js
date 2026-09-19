@@ -11,7 +11,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { onward } from "../../src/scripts/pull-writes.js";
 import { unblockPrompt } from "../../src/scripts/spawn.js";
-import { work } from "../../src/scripts/work.js";
+import { pulling } from "../../src/scripts/work.js";
 import { SCHEMA } from "./pull-schema.js";
 
 const ROOT = "/tree";
@@ -133,7 +133,7 @@ function heard(run) {
 
 // The road out of the branch is a desk's, so this case sits at one. [[spec/design_output/work#a-person-step-leaves]]
 test("the pull names the mint, the open and the unblock where a person's step is all that stands", () => {
-  const { said } = heard(() => work(ROOT, ["pull"], doors({ cloud: false })));
+  const { said } = heard(() => pulling(ROOT, ["pull"], doors({ cloud: false })));
 
   assert.match(said, /a-child waits for a person at design\/person-1/);
   assert.match(
@@ -153,7 +153,7 @@ test("the pull names the mint, the open and the unblock where a person's step is
 // A cloud box answers every question it meets, so that step stands open to it. [[spec/guidance/cloud]]
 test("a cloud box takes the person's step, and the answer names no unblock", () => {
   const { said } = heard(() =>
-    work(ROOT, ["pull"], doors({ cloud: undefined, env: { CLAUDE_CODE_REMOTE: "1" } })),
+    pulling(ROOT, ["pull"], doors({ cloud: undefined, env: { CLAUDE_CODE_REMOTE: "1" } })),
   );
 
   assert.match(said, /a-child at design\/person-1/);
@@ -164,7 +164,7 @@ test("a cloud box takes the person's step, and the answer names no unblock", () 
 // [[spec/design_output/pull#the-hand-rule]]
 test("a hand the owner sends takes a person's step, and the record names both", () => {
   const it = doors();
-  const { said } = heard(() => work(ROOT, ["pull", "--owner-says"], it));
+  const { said } = heard(() => pulling(ROOT, ["pull", "--owner-says"], it));
 
   assert.match(said, /a-child at design\/person-1/, "the hand the owner sends takes the step");
   assert.doesNotMatch(said, /waits for a person/);

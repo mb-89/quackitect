@@ -44,7 +44,7 @@ export function pullSpec() {
 
 // [[spec/design_output/pull#the-hand-out]]
 export function pullArgv(said = {}) {
-  const out = ["branch", "pull"];
+  const out = ["ticket", "pull"];
   const ticket = String(said.ticket ?? "").trim();
   const verdict = String(said.verdict ?? "").trim();
   if (ticket) out.push(ticket);

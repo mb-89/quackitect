@@ -92,16 +92,6 @@ export function work(root, argv, doors) {
     list,
     // [[spec/design_output/work#one-verb-answers-git]]
     answer: (it, _name, argv) => answer(it, (argv ?? []).slice(1)),
-    // [[spec/design_output/pull#the-hand-out]]
-    pull: (it, _name, argv) =>
-      pull(
-        {
-          ...it,
-          take: (group) => serving(it, take(it, group)),
-          ready: () => readyToMerge(it),
-        },
-        argv,
-      ),
     // [[spec/design_output/pull#a-person-step-goes-in]]
     escalate: (it, _name, argv) => escalate(it, argv),
     // [[spec/design_output/pull#the-work-answer]]
@@ -120,6 +110,20 @@ export function work(root, argv, doors) {
   return doing[what](it, name, argv);
 }
 
+// The pull a ticket verb answers: the next leaf of the group, or a hand back. [[spec/design_output/pull#the-hand-out]]
+export function pulling(root, argv, doors) {
+  const it = { root, method: root, work: root, ...doors };
+  const code = pull(
+    {
+      ...it,
+      take: (group) => serving(it, take(it, group)),
+      ready: () => readyToMerge(it),
+    },
+    argv,
+  );
+  return tell(it, "pull", code);
+}
+
 // [[spec/design_output/work#the-routine-a-verb-names]]
 export function cloud(root, argv, doors) {
   const it = { root, method: root, work: root, ...doors };
@@ -129,7 +133,7 @@ export function cloud(root, argv, doors) {
   return argv[0] ? 2 : 0;
 }
 
-const LOUD = ["new", "take", "done", "release", "merge", "close", "pull", "unblock"];
+const LOUD = ["new", "take", "done", "release", "merge", "close", "unblock"];
 
 // [[spec/design_output/log#which-door-says-what]]
 function tell(it, what, code) {
@@ -404,7 +408,7 @@ function leaves(it, branch, at, path, says) {
       console.error(`${one.name} stands at ${one.step}, and a hand can take it.`);
     }
     console.error(
-      "Run ./RUNME.sh branch pull, and spawn the hand a spawn answer names.",
+      "Run ./RUNME.sh ticket pull, and spawn the hand a spawn answer names.",
     );
     console.error(
       "branch done leaves a group only when every open step waits for a person.",

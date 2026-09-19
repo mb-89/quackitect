@@ -19,7 +19,7 @@ export function guidance(it, argv = [], env = {}) {
   const held = holdOf(it, handHere(it, argv));
   if (!held) {
     console.error("Nothing stands in your hand, so no step names a note.");
-    console.error("Run ./RUNME.sh branch pull to take a leaf, or name a note.");
+    console.error("Run ./RUNME.sh ticket pull to take a leaf, or name a note.");
     return 1;
   }
   const step = (held.reads ?? []).map((one) => one.name);

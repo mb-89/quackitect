@@ -42,7 +42,6 @@ export const BRANCH = [
   "read",
   "review",
   "list",
-  "pull",
   "escalate",
   "guidance",
   "test",
@@ -52,7 +51,7 @@ export const BRANCH = [
 export const VERBS = {
   branch: BRANCH,
   work: BRANCH,
-  ticket: ["note", "update", "open"],
+  ticket: ["pull", "note", "update", "open"],
   retro: ["notes", "collect", "new"],
 };
 
@@ -74,7 +73,7 @@ export function stillHeld(it, held) {
   if (why) writeHold(it, held.hand, { ...held, reads: now });
   say(REFUSED, [
     `${held.ticket} stands in your hand at ${held.step}, and one hand holds one ticket.`,
-    `Hand it back: ./RUNME.sh branch pull ${held.ticket}${asOf(it, held) ? ` --as ${asOf(it, held)}` : ""} --pass, or --fail "why".`,
+    `Hand it back: ./RUNME.sh ticket pull ${held.ticket}${asOf(it, held) ? ` --as ${asOf(it, held)}` : ""} --pass, or --fail "why".`,
     ...(why
       ? notesSaid(
           it,

@@ -68,7 +68,7 @@ export function trigger(it) {
   const free = freeIn(stand, standingAll(stand), it, now).map((one) => one.branch);
 
   console.log(
-    `${ROUTINE.name} runs ./RUNME.sh branch pull on a cloud box, and the engine takes a branch there.`,
+    `${ROUTINE.name} runs ./RUNME.sh ticket pull on a cloud box, and the engine takes a branch there.`,
   );
   console.log("Fire it with the RemoteTrigger tool, once for every box you want:\n");
   console.log(`    action=run  trigger_id=${ROUTINE.id}\n`);

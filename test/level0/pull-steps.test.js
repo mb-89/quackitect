@@ -12,7 +12,7 @@ import {
   withEngineReader,
   withPersonStep,
 } from "../../src/scripts/pull.js";
-import { work } from "../../src/scripts/work.js";
+import { pulling } from "../../src/scripts/work.js";
 import {
   at,
   BRANCH,
@@ -41,9 +41,9 @@ test("a step failing back past the cap drops the hold, answers wait, and writes 
   });
   const twice = filled(once, "### verdict", "fail\n- still thin");
   const { it, disk } = doors(standing(twice), {}, { fails: 2 });
-  heard(() => work(ROOT, ["pull"], it));
+  heard(() => pulling(ROOT, ["pull"], it));
 
-  const { code, said } = heard(() => work(ROOT, ["pull", "a-child"], it));
+  const { code, said } = heard(() => pulling(ROOT, ["pull", "a-child"], it));
 
   assert.equal(code, 0);
   const now = disk.read(at("spec/tickets/a-child.md"));
@@ -59,9 +59,9 @@ test("a step failing back past the cap drops the hold, answers wait, and writes 
 // [[spec/design_output/pull#the-hand-back-refused]]
 test("a hand-back meeting the refusal cap fails the leaf back, carrying the finding", () => {
   const { it, disk } = doors(standing(), {}, { refusals: 1 });
-  heard(() => work(ROOT, ["pull"], it));
+  heard(() => pulling(ROOT, ["pull"], it));
 
-  const { code, said } = heard(() => work(ROOT, ["pull", "a-child", "--pass"], it));
+  const { code, said } = heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], it));
 
   assert.equal(code, 0);
   const now = disk.read(at("spec/tickets/a-child.md"));
@@ -174,9 +174,9 @@ test("a leaf under when returned is skipped on the way forward, with the reason 
   const { it, disk } = doors(standing(ready), {
     sh: { exitCode: 1, stdout: "assertion, 1 test(s) fail on their own assertion\n" },
   });
-  heard(() => work(ROOT, ["pull"], it));
+  heard(() => pulling(ROOT, ["pull"], it));
 
-  const { code, said } = heard(() => work(ROOT, ["pull", "a-child", "--pass"], it));
+  const { code, said } = heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], it));
 
   assert.equal(code, 1, "the checked field is short, so the hand-back is refused");
   assert.match(
@@ -190,7 +190,7 @@ test("a leaf under when returned is skipped on the way forward, with the reason 
     "node --test test/x.test.js\n\n### checked\n\n- it touches the two files\n- the proc fake stands",
   );
   disk.write(at("spec/tickets/a-child.md"), checked);
-  const passed = heard(() => work(ROOT, ["pull", "a-child", "--pass"], it));
+  const passed = heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], it));
   assert.equal(passed.code, 0);
   const now = disk.read(at("spec/tickets/a-child.md"));
   assert.equal(fieldOf(now, "step"), "implement/change");
@@ -219,9 +219,9 @@ test("a command answering the wrong word or exit refuses the hand-back, and the 
   const { it } = doors(standing(ready), {
     sh: { exitCode: 0, stdout: "green, 3 test(s) pass\n" },
   });
-  heard(() => work(ROOT, ["pull"], it));
+  heard(() => pulling(ROOT, ["pull"], it));
 
-  const { code, said } = heard(() => work(ROOT, ["pull", "a-child", "--pass"], it));
+  const { code, said } = heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], it));
 
   assert.equal(code, 1);
   assert.match(
@@ -252,7 +252,7 @@ test("a hand-back the record answers gets the recorded answer, and a stale take 
     }),
   );
 
-  const twice = heard(() => work(ROOT, ["pull", "a-child", "--pass"], it));
+  const twice = heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], it));
   assert.match(twice.said, /answered already, and the record holds it/);
   assert.equal(disk.exists(HOLD), false);
 
@@ -270,7 +270,7 @@ test("a hand-back the record answers gets the recorded answer, and a stale take 
     }),
   );
   const { code, said } = heard(() =>
-    work(ROOT, ["pull", "a-child", "--pass"], stale.it),
+    pulling(ROOT, ["pull", "a-child", "--pass"], stale.it),
   );
   assert.equal(code, 1);
   assert.match(said, /the take hash 0000 trails work\/one-group, so the hold drops/);
@@ -283,8 +283,8 @@ test("a rejected push fetches, rebases the commit, tries once more, and then ans
   const once = doors(standing(filled(CHILD(), "### approach", "The approach.")), {
     [`git push origin ${BRANCH}`]: () => ({ exitCode: pushes++ ? 0 : 1 }),
   });
-  heard(() => work(ROOT, ["pull"], once.it));
-  const { code } = heard(() => work(ROOT, ["pull", "a-child", "--pass"], once.it));
+  heard(() => pulling(ROOT, ["pull"], once.it));
+  const { code } = heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], once.it));
   assert.equal(code, 0);
   const ran = ranGit(once.outside);
   assert.ok(ran.includes(`git rebase origin/${BRANCH}`));
@@ -294,8 +294,8 @@ test("a rejected push fetches, rebases the commit, tries once more, and then ans
     [`git push origin ${BRANCH}`]: { exitCode: 1 },
     [`git rebase origin/${BRANCH}`]: { exitCode: 1 },
   });
-  heard(() => work(ROOT, ["pull"], stuck.it));
-  const refused = heard(() => work(ROOT, ["pull", "a-child", "--pass"], stuck.it));
+  heard(() => pulling(ROOT, ["pull"], stuck.it));
+  const refused = heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], stuck.it));
   assert.equal(refused.code, 1);
   assert.match(refused.said, /moves under this hand-back/);
   assert.ok(ranGit(stuck.outside).includes("git rebase --abort"));
@@ -310,7 +310,7 @@ test("a rejected push fetches, rebases the commit, tries once more, and then ans
 // [[spec/design_output/pull#a-need-is-a-verb]]
 test("a need names a verb, and the box says which it holds", () => {
   assert.equal(holdsVerb("work test"), true);
-  assert.equal(holdsVerb("branch pull"), true);
+  assert.equal(holdsVerb("ticket pull"), true);
   assert.equal(holdsVerb("retro notes"), true);
   assert.equal(holdsVerb("retro collect"), true);
   assert.equal(holdsVerb("retro mine"), false);
@@ -337,7 +337,7 @@ test("a child waits for an open dependency, and the group's own dependencies are
     }),
   );
 
-  const { said } = heard(() => work(ROOT, ["pull"], it));
+  const { said } = heard(() => pulling(ROOT, ["pull"], it));
 
   assert.match(
     said,
@@ -358,7 +358,7 @@ test("a leaf needing a verb the box lacks answers wait, with the reason", () => 
     standing(child, GROUP_NOTE.replace("state: open", "state: closed")),
   );
 
-  const { code, said } = heard(() => work(ROOT, ["pull"], it));
+  const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
 
   assert.equal(code, 0);
   assert.match(said, /^wait\n {2}a-child needs deploy now, which this box lacks/);
@@ -385,7 +385,7 @@ test("a group whose open children all wait stands at children, and hands no retr
   });
   disk.write(at("spec/tickets/a-child.md"), held);
 
-  const { code, said } = heard(() => work(ROOT, ["pull"], it));
+  const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
 
   assert.equal(code, 0);
   assert.match(said, /^wait/m, "the pull answers wait");
@@ -405,7 +405,7 @@ test("a group whose open children all wait stands at children, and hands no retr
 test("every child closed passes the children step by the engine, and a dropped child fails it back", () => {
   const shut = CHILD("closed", "implement/change", "reason: done\n");
   const done = doors(standing(shut, withField(GROUP_NOTE, "step", "children")));
-  heard(() => work(ROOT, ["pull"], done.it));
+  heard(() => pulling(ROOT, ["pull"], done.it));
   const passed = done.disk.read(at("spec/tickets/one-group.md"));
   assert.equal(recordIn(passed).at(-1).step, "children");
   assert.equal(recordIn(passed).at(-1).hand, "the engine");
@@ -413,7 +413,7 @@ test("every child closed passes the children step by the engine, and a dropped c
 
   const dropped = CHILD("closed", "design/draft", "reason: dropped\n");
   const back = doors(standing(dropped, withField(GROUP_NOTE, "step", "children")));
-  const { said } = heard(() => work(ROOT, ["pull"], back.it));
+  const { said } = heard(() => pulling(ROOT, ["pull"], back.it));
   assert.equal(
     fieldOf(back.disk.read(at("spec/tickets/one-group.md")), "step"),
     "split",
@@ -450,9 +450,9 @@ test("the group's last leaf returns to children while a child stands open, and c
     },
   );
   const open = doors(standing(parked, filled(last, "### lacked", "- nothing")));
-  heard(() => work(ROOT, ["pull"], open.it));
+  heard(() => pulling(ROOT, ["pull"], open.it));
   assert.equal(JSON.parse(open.disk.read(HOLD)).step, "retro/cloud");
-  const back = heard(() => work(ROOT, ["pull", "one-group", "--pass"], open.it));
+  const back = heard(() => pulling(ROOT, ["pull", "one-group", "--pass"], open.it));
   assert.equal(back.code, 0, back.said);
   const stays = open.disk.read(at("spec/tickets/one-group.md"));
   assert.equal(fieldOf(stays, "state"), "open");
@@ -469,8 +469,8 @@ test("the group's last leaf returns to children while a child stands open, and c
       filled(last, "### lacked", "- nothing"),
     ),
   );
-  heard(() => work(ROOT, ["pull"], shut.it));
-  heard(() => work(ROOT, ["pull", "one-group", "--pass"], shut.it));
+  heard(() => pulling(ROOT, ["pull"], shut.it));
+  heard(() => pulling(ROOT, ["pull", "one-group", "--pass"], shut.it));
   const closed = shut.disk.read(at("spec/tickets/one-group.md"));
   assert.equal(fieldOf(closed, "state"), "closed");
   assert.equal(fieldOf(closed, "reason"), "done");
@@ -506,7 +506,7 @@ A thing to look at.
   const first = doors(
     standing(CHILD(), GROUP_NOTE, { [at(".se/tickets/parked.md")]: note(true) }),
   );
-  const tagged = heard(() => work(ROOT, ["pull"], first.it));
+  const tagged = heard(() => pulling(ROOT, ["pull"], first.it));
   assert.match(tagged.said, /^work {2}parked at decide/);
   assert.equal(
     JSON.parse(first.disk.read(HOLD)).hash,
@@ -524,7 +524,7 @@ A thing to look at.
       },
     ),
   );
-  heard(() => work(ROOT, ["pull"], later.it));
+  heard(() => pulling(ROOT, ["pull"], later.it));
   const hold = JSON.parse(later.disk.read(HOLD));
   assert.equal(
     hold.ticket,
@@ -536,7 +536,7 @@ A thing to look at.
     at("spec/tickets/one-group.md"),
     withField(GROUP_NOTE, "state", "closed"),
   );
-  const { said } = heard(() => work(ROOT, ["pull"], later.it));
+  const { said } = heard(() => pulling(ROOT, ["pull"], later.it));
   assert.match(said, /^work {2}a-piece at decide/);
   assert.doesNotMatch(said, /a-note/, "a note waits for a retro hand");
 });

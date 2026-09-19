@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { fieldOf } from "../../src/scripts/group.js";
 import { withPersonStep } from "../../src/scripts/pull.js";
-import { work } from "../../src/scripts/work.js";
+import { pulling, work } from "../../src/scripts/work.js";
 import {
   at,
   BRANCH,
@@ -22,7 +22,7 @@ import {
 // A desk hands the question to a person, and a cloud box answers it itself. [[spec/guidance/cloud]]
 test("branch escalate inserts a person step before the held leaf, drops the hold and pushes", () => {
   const { it, disk, outside } = doors(standing(), {}, { cloud: false });
-  heard(() => work(ROOT, ["pull"], it));
+  heard(() => pulling(ROOT, ["pull"], it));
   assert.equal(JSON.parse(disk.read(HOLD)).step, "design/draft");
 
   const { code, said } = heard(() =>
@@ -47,7 +47,7 @@ test("branch escalate inserts a person step before the held leaf, drops the hold
 
 test("branch escalate with options writes a choice answer carrying the words", () => {
   const { it, disk } = doors(standing());
-  heard(() => work(ROOT, ["pull"], it));
+  heard(() => pulling(ROOT, ["pull"], it));
 
   const { code, said } = heard(() =>
     work(ROOT, ["escalate", "which road", "--options", "left,right"], it),
@@ -63,7 +63,7 @@ test("branch escalate with options writes a choice answer carrying the words", (
 // [[spec/design_output/pull#a-hand-of-its-own]]
 test("branch escalate under --as reads that hand's hold, and keeps the name out of the question", () => {
   const { it, disk } = doors(standing());
-  heard(() => work(ROOT, ["pull", "--as", "helper-2"], it));
+  heard(() => pulling(ROOT, ["pull", "--as", "helper-2"], it));
 
   const { code, said } = heard(() =>
     work(ROOT, ["escalate", "which road", "--as", "helper-2"], it),
@@ -77,7 +77,7 @@ test("branch escalate under --as reads that hand's hold, and keeps the name out 
 
 test("branch escalate with no question refuses, and says what it takes", () => {
   const { it } = doors(standing());
-  heard(() => work(ROOT, ["pull"], it));
+  heard(() => pulling(ROOT, ["pull"], it));
 
   const { code, said } = heard(() => work(ROOT, ["escalate"], it));
 
@@ -93,7 +93,7 @@ test("branch escalate with no hold standing refuses, and names the pull", () => 
 
   assert.equal(code, 1);
   assert.match(said, /^refused/m);
-  assert.match(said, /branch pull/);
+  assert.match(said, /ticket pull/);
 });
 
 test("a ticket at the split cap refuses another person step, and asks for a split", () => {

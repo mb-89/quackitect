@@ -14,7 +14,7 @@ stop hook reads off the hold. The verbs around the branch stand in
 
 # The answers
 
-`branch pull` answers one word, first on its own line, with the detail under
+`ticket pull` answers one word, first on its own line, with the detail under
 it:
 
 | answer | when | the hand does |
@@ -25,7 +25,7 @@ it:
 | `spawn` | the only open step excludes this hand, with a helper's name and its prompt | spawns that hand, and pulls again once it answers |
 | `done` | a hand under `--as` hands its one step back | stops, because a one-step hand takes no next leaf |
 
-The hand-out is `branch pull`. The hand-back is `branch pull <ticket>` with a
+The hand-out is `ticket pull`. The hand-back is `ticket pull <ticket>` with a
 verdict: `--pass`, `--fail "why"` or `--became <ticket>`. A leaf holding a
 `verdict` field takes the verdict from the field, and the pull refuses the flag
 there.
@@ -72,8 +72,8 @@ A desk takes a group on two roads alone, and both run through the pull:
 
 | road | the desk types | the engine does |
 |---|---|---|
-| the owner names it | `branch pull <group>` | `take(group)`, which switches onto that branch alone |
-| its urgency reads `now` | `branch pull` | takes the first such group, by name order |
+| the owner names it | `ticket pull <group>` | `take(group)`, which switches onto that branch alone |
+| its urgency reads `now` | `ticket pull` | takes the first such group, by name order |
 
 `branch take` stays a verb the engine and a person run, and a name after it
 picks one branch. No hand runs it by itself. A free ticket carrying the `todo`
@@ -188,7 +188,7 @@ excludes the helper. The hold slugs the hand into its file name.
 
 The hold stands at `.se/.runtime/hold/<hand>.json`. It names the ticket, its path, the
 step, the group, the take hash, and the guidance notes by name and hash. The
-pull refuses a second hand-out while a hold stands, and `branch pull --drop`
+pull refuses a second hand-out while a hold stands, and `ticket pull --drop`
 drops the hold with the leaf where it stands. The stop hook reads the
 folder, so a turn ending with a hold standing carries on.
 
@@ -289,7 +289,7 @@ Every check but the judge runs in the shell, so a person's hand-back meets them 
 
 The wrapper under `.claude/skills/level1` imports nothing past its own folder,
 because the plugin validator refuses an import that leaves it. So the shell
-hands it the material: `branch pull <ticket> --judge` prints the leaf's
+hands it the material: `ticket pull <ticket> --judge` prints the leaf's
 evidence and the rules its reads name, as JSON. The wrapper asks the model
 once over that, and a `breaks` answers `refused` before the shell runs. The
 judge run carries the `--fields` payload of the hand-back. The material lays
@@ -426,7 +426,7 @@ first.
 
 # A leaf comes back
 
-`branch pull <ticket> --back <leaf>` puts a leaf back into the hand that
+`ticket pull <ticket> --back <leaf>` puts a leaf back into the hand that
 holds its record entry. The record names this hand on that leaf, or the pull
 refuses, so nobody takes another hand's work back. The pull writes a return with the
 reason, sets `step` to the leaf, commits, pushes and hands the leaf out again.

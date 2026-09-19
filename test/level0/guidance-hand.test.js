@@ -12,7 +12,7 @@ import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { fakeLog } from "../../src/doors/fake/log.js";
 import { heldReads } from "../../src/scripts/guidance-hand.js";
-import { work } from "../../src/scripts/work.js";
+import { pulling, work } from "../../src/scripts/work.js";
 import { SCHEMA } from "./pull-schema.js";
 
 const ROOT = "/tree",
@@ -149,7 +149,7 @@ const putHold = (disk, hold) => disk.write(HOLD, `${JSON.stringify(hold, null, 2
 test("the hand-out writes one log row per note it hands over, naming the note and its hash", async () => {
   const { it, disk } = doors(standing());
 
-  const { code } = await heard(() => work(ROOT, ["pull"], it));
+  const { code } = await heard(() => pulling(ROOT, ["pull"], it));
 
   assert.equal(code, 0);
   const rows = it.log.lines().filter((one) => one.note);
@@ -162,7 +162,7 @@ test("the hand-out writes one log row per note it hands over, naming the note an
 // [[spec/design_output/pull#the-work-answer]]
 test("branch guidance answers the held step's notes and the always-on ones", async () => {
   const { it } = doors(standing());
-  await heard(() => work(ROOT, ["pull"], it));
+  await heard(() => pulling(ROOT, ["pull"], it));
 
   const { code, said } = await heard(() => work(ROOT, ["guidance"], it));
 
@@ -176,7 +176,7 @@ test("branch guidance answers the held step's notes and the always-on ones", asy
 // [[spec/design_output/pull#the-work-answer]]
 test("branch guidance names one note and answers that note alone", async () => {
   const { it } = doors(standing());
-  await heard(() => work(ROOT, ["pull"], it));
+  await heard(() => pulling(ROOT, ["pull"], it));
 
   const { code, said } = await heard(() =>
     work(ROOT, ["guidance", "spec/guidance/voice"], it),
@@ -194,15 +194,15 @@ test("branch guidance with no hold standing says so, and names the pull", async 
   const { code, said } = await heard(() => work(ROOT, ["guidance"], it));
 
   assert.equal(code, 1);
-  assert.match(said, /branch pull/);
+  assert.match(said, /ticket pull/);
 });
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 test("a second hand-out at one step says the short line, and hands no note again", async () => {
   const { it } = doors(standing());
-  await heard(() => work(ROOT, ["pull"], it));
+  await heard(() => pulling(ROOT, ["pull"], it));
 
-  const { code, said } = await heard(() => work(ROOT, ["pull"], it));
+  const { code, said } = await heard(() => pulling(ROOT, ["pull"], it));
 
   assert.equal(code, 1);
   assert.match(said, /branch guidance/);
@@ -212,10 +212,10 @@ test("a second hand-out at one step says the short line, and hands no note again
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 test("a refusal standing on the hold hands the notes again", async () => {
   const { it, disk } = doors(standing());
-  await heard(() => work(ROOT, ["pull"], it));
+  await heard(() => pulling(ROOT, ["pull"], it));
   putHold(disk, { ...holdIn(disk), refused: 1 });
 
-  const { said } = await heard(() => work(ROOT, ["pull"], it));
+  const { said } = await heard(() => pulling(ROOT, ["pull"], it));
 
   assert.match(said, /Say what is\./);
 });
@@ -223,10 +223,10 @@ test("a refusal standing on the hold hands the notes again", async () => {
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 test("a compaction, which empties the hold's reads, hands the notes again", async () => {
   const { it, disk } = doors(standing());
-  await heard(() => work(ROOT, ["pull"], it));
+  await heard(() => pulling(ROOT, ["pull"], it));
   putHold(disk, { ...holdIn(disk), reads: [] });
 
-  const { said } = await heard(() => work(ROOT, ["pull"], it));
+  const { said } = await heard(() => pulling(ROOT, ["pull"], it));
 
   assert.match(said, /Say what is\./);
 });
@@ -234,11 +234,11 @@ test("a compaction, which empties the hold's reads, hands the notes again", asyn
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 test("a note whose hash moved hands again, and the row says the hash moved", async () => {
   const { it, disk } = doors(standing());
-  await heard(() => work(ROOT, ["pull"], it));
+  await heard(() => pulling(ROOT, ["pull"], it));
   const hold = holdIn(disk);
   putHold(disk, { ...hold, reads: [{ ...hold.reads[0], hash: "0000000000000000" }] });
 
-  const { said } = await heard(() => work(ROOT, ["pull"], it));
+  const { said } = await heard(() => pulling(ROOT, ["pull"], it));
 
   assert.match(said, /Say what is\./);
 });
@@ -259,7 +259,7 @@ test("a note a step reads leaves the standing layer, and the rest of the layer s
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 test("the verb reads the hand --as names, and answers that hand's notes", async () => {
   const { it } = doors(standing());
-  await heard(() => work(ROOT, ["pull", "--as", "helper-2"], it));
+  await heard(() => pulling(ROOT, ["pull", "--as", "helper-2"], it));
 
   const { code, said } = await heard(() =>
     work(ROOT, ["guidance", "--as", "helper-2"], it),
@@ -272,7 +272,7 @@ test("the verb reads the hand --as names, and answers that hand's notes", async 
 // [[spec/design_output/pull#the-work-answer]]
 test("a name reaching no note refuses, and says what it looked for", async () => {
   const { it } = doors(standing());
-  await heard(() => work(ROOT, ["pull"], it));
+  await heard(() => pulling(ROOT, ["pull"], it));
 
   const { code, said } = await heard(() =>
     work(ROOT, ["guidance", "spec/guidance/nowhere"], it),
@@ -285,7 +285,7 @@ test("a name reaching no note refuses, and says what it looked for", async () =>
 // [[spec/design_output/level0#the-standing-layer]]
 test("the standing verb drops the note the hand --as names already reads", async () => {
   const { it } = doors(standing());
-  await heard(() => work(ROOT, ["pull", "--as", "helper-2"], it));
+  await heard(() => pulling(ROOT, ["pull", "--as", "helper-2"], it));
   const notes = [
     { name: "voice.md", text: VOICE },
     { name: "working.md", text: WORKING },

@@ -20,7 +20,7 @@ const RULES = `
   decides: mechanical
   runs: queue-waits
   firm: true
-  says: The queue holds work for this box, so run ./RUNME.sh branch pull and carry on.
+  says: The queue holds work for this box, so run ./RUNME.sh ticket pull and carry on.
 
 - id: the-last-line-names-no-stop
   side: continue

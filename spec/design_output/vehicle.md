@@ -255,7 +255,7 @@ the run's log. It takes three things:
 
 - a stub repo
 - an environment carrying the trust setup the level zero chapter names
-- a routine whose prompt is `./RUNME.sh branch pull`
+- a routine whose prompt is `./RUNME.sh ticket pull`
 
 Nothing on a desk stands in for it.
 

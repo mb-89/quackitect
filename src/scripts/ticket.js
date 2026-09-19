@@ -1,4 +1,5 @@
-// Tickets that stay on this box. note writes a private ticket off the note
+// Tickets. pull lives in the work verb's pulling, and the command line routes
+// it there. note writes a private ticket off the note
 // process and carries on, and update copies a changed process onto a ticket
 // while the leaves it already reached keep what they hold. The work verb holds
 // the branches, and this verb holds the tickets.
@@ -38,6 +39,9 @@ export function ticket(root, argv, doors) {
   const doing = { note, update, open, todo };
   if (!doing[what]) {
     console.log("Usage: ./RUNME.sh ticket <verb>\n");
+    console.log(
+      "  pull [ticket]       take the next leaf of this group, or hand one back with --pass, --fail, --became",
+    );
     console.log(
       "  note <name> <line>  write a private ticket off the note process, and carry on",
     );

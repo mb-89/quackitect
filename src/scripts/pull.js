@@ -70,10 +70,10 @@ export function pull(it, argv) {
   const onTrunk = branch === TRUNK;
   if (!onTrunk && !branch.startsWith("work/")) {
     console.error(
-      `branch pull runs on ${TRUNK} or a work branch, and this is ${branch}.`,
+      `ticket pull runs on ${TRUNK} or a work branch, and this is ${branch}.`,
     );
     console.error(
-      `Run ./RUNME.sh branch pull from ${TRUNK}, which hands out work there.`,
+      `Run ./RUNME.sh ticket pull from ${TRUNK}, which hands out work there.`,
     );
     return 2;
   }
@@ -96,7 +96,7 @@ export function pull(it, argv) {
   const asking = Boolean(name) && !named && !verdict.said && !held;
   if (asking && it.binding === "queue") {
     console.error(`${name} stands behind the queue, because this session binds to it.`);
-    console.error("Run ./RUNME.sh branch pull with no name, and take what it hands you.");
+    console.error("Run ./RUNME.sh ticket pull with no name, and take what it hands you.");
     return 2;
   }
   who.wanted = asking ? name : "";
@@ -153,7 +153,7 @@ export function escalate(it, argv) {
   if (!held) {
     say(REFUSED, [
       "nothing stands in your hand, so no leaf takes a person step.",
-      "Run ./RUNME.sh branch pull to take a leaf, then run this again.",
+      "Run ./RUNME.sh ticket pull to take a leaf, then run this again.",
     ]);
     return 1;
   }
@@ -188,7 +188,7 @@ export function escalate(it, argv) {
   if (!one.private && !pushed(it, branch)) {
     say(REFUSED, [
       `${put.path} stands on this box, and ${branch} moves under it.`,
-      `Push ${branch}, then run ./RUNME.sh branch pull.`,
+      `Push ${branch}, then run ./RUNME.sh ticket pull.`,
     ]);
     return 1;
   }
@@ -317,7 +317,7 @@ export function takeBack(it, who, name, path) {
   }
   if (!name) {
     say(REFUSED, [
-      "--back names the ticket and the leaf: branch pull <ticket> --back <leaf>",
+      "--back names the ticket and the leaf: ticket pull <ticket> --back <leaf>",
     ]);
     return 1;
   }
@@ -369,7 +369,7 @@ export function handBack(it, who, name, verdict) {
   const held = who.held;
   if (!held) {
     say(REFUSED, [
-      "nothing stands in your hand. Run ./RUNME.sh branch pull to take a leaf.",
+      "nothing stands in your hand. Run ./RUNME.sh ticket pull to take a leaf.",
     ]);
     return 1;
   }

@@ -59,7 +59,7 @@ import {
   rootsHere,
 } from "./vehicle.js";
 import { voice } from "./voice.js";
-import { cloud, work } from "./work.js";
+import { cloud, pulling, work } from "./work.js";
 
 export const verbs = {
   check: {
@@ -104,7 +104,7 @@ export const verbs = {
     run: async () => readConfig(rest),
   },
   branch: {
-    says: "work branches and groups: new, take, sync, done, list, merge, close, pull, test",
+    says: "work branches and groups: new, take, sync, done, list, merge, close, test",
     run: async () => work(it.work, rest, it),
   },
   cloud: {
@@ -112,8 +112,10 @@ export const verbs = {
     run: async () => cloud(it.work, rest, it),
   },
   ticket: {
-    says: "tickets that stay on this box: note, update, open, todo",
-    run: async () => ticket(it.work, rest, it),
+    says: "tickets: pull, note, update, open, todo",
+    // You pull a ticket, and the engine takes the branch it stands on. [[spec/design_output/pull#the-hand-out]]
+    run: async () =>
+      rest[0] === "pull" ? pulling(it.work, rest, it) : ticket(it.work, rest, it),
   },
   retro: {
     says: "the retro a group's route runs: notes",

@@ -9,7 +9,7 @@ import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
 import { probeOf, startOf } from "../../src/scripts/serve.js";
-import { work } from "../../src/scripts/work.js";
+import { pulling } from "../../src/scripts/work.js";
 import { remoteSaying } from "./work-doors.js";
 
 const ROOT = "/tree";
@@ -63,7 +63,7 @@ function doors(cloud) {
 
 test("a desk's pull on trunk hands out a done branch as the review, the merge and the close", () => {
   const { it, outside } = doors(false);
-  const { code, said } = heard(() => work(ROOT, ["pull"], it));
+  const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
   assert.equal(code, 0, said);
   assert.match(said, /^work {2}work\/one-done stands done/m);
   assert.match(said, /branch review one-done/);
@@ -77,6 +77,6 @@ test("a desk's pull on trunk hands out a done branch as the review, the merge an
 
 test("a cloud box's pull takes a branch and names no done one", () => {
   const { it } = doors(true);
-  const { said } = heard(() => work(ROOT, ["pull"], it));
+  const { said } = heard(() => pulling(ROOT, ["pull"], it));
   assert.ok(!said.includes("stands done"), "the done branch is the desk's");
 });

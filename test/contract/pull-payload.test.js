@@ -11,7 +11,7 @@ import { disk as realDisk } from "../../src/doors/disk.js";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { work } from "../../src/scripts/work.js";
+import { pulling } from "../../src/scripts/work.js";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SCHEMA = realDisk().read(join(HERE, "..", "..", "spec", "schemas", "ticket.schema.yaml"));
@@ -118,7 +118,7 @@ function doors(more = {}) {
     node: "node",
     ...more,
   };
-  heard(() => work(ROOT, ["pull"], it));
+  heard(() => pulling(ROOT, ["pull"], it));
   return { it, disk };
 }
 
@@ -129,7 +129,7 @@ test("a refused payload leaves the ticket as it stood, and rides the hold to the
   const stood = disk.read(TICKET);
 
   const refused = heard(() =>
-    work(ROOT, ["pull", "a-child", "--pass", "--fields", SHORT], it),
+    pulling(ROOT, ["pull", "a-child", "--pass", "--fields", SHORT], it),
   );
   assert.equal(refused.code, 1);
   assert.match(refused.said, /checked under implement\/tests-red holds 1 line/);
@@ -140,7 +140,7 @@ test("a refused payload leaves the ticket as it stood, and rides the hold to the
     "the payload rides the hold",
   );
 
-  const again = heard(() => work(ROOT, ["pull", "a-child", "--pass"], it));
+  const again = heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], it));
   assert.equal(again.code, 1, "the hold's payload meets the same checks");
   assert.match(again.said, /checked under implement\/tests-red holds 1 line/);
   assert.equal(disk.read(TICKET), stood);
@@ -149,7 +149,7 @@ test("a refused payload leaves the ticket as it stood, and rides the hold to the
 test("a ticket with no step field hands back at its first leaf, so the hold reads as fresh", () => {
   const { it, disk } = doors();
   disk.write(TICKET, CHILD.replace("step: implement/tests-red\n", ""));
-  const said = heard(() => work(ROOT, ["pull", "a-child", "--pass", "--fields", SHORT], it));
+  const said = heard(() => pulling(ROOT, ["pull", "a-child", "--pass", "--fields", SHORT], it));
   assert.ok(!said.said.includes("stands at no step now"), "a missing step is the first leaf");
   assert.match(said.said, /checked under implement\/tests-red holds 1 line/, "the checks read the payload");
 });
@@ -157,7 +157,7 @@ test("a ticket with no step field hands back at its first leaf, so the hold read
 test("a refusal at the cap fails the ticket back as it stood, and the refused payload reaches no disk", () => {
   const { it, disk } = doors({ refusals: 1 });
   const capped = heard(() =>
-    work(ROOT, ["pull", "a-child", "--pass", "--fields", SHORT], it),
+    pulling(ROOT, ["pull", "a-child", "--pass", "--fields", SHORT], it),
   );
   assert.match(capped.said, /1 refusals in a row/);
   const landed = disk.read(TICKET);

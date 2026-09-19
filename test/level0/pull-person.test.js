@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { test } from "node:test";
 import { recordIn } from "../../src/scripts/group.js";
 import { handFaults, handOf } from "../../src/scripts/pull.js";
-import { work } from "../../src/scripts/work.js";
+import { pulling } from "../../src/scripts/work.js";
 import { at, CHILD, doors, filled, heard, ROOT, standing } from "./pull-doors.js";
 
 const PERSON = { agent: false, cloud: false, env: {} };
@@ -48,8 +48,8 @@ test("a hand off a harness carries the git author name, and the record writes th
 
   assert.equal(handOf({ ...it, root: ROOT }), "person Ada");
 
-  heard(() => work(ROOT, ["pull"], it));
-  const { code, said } = heard(() => work(ROOT, ["pull", "a-child", "--pass"], it));
+  heard(() => pulling(ROOT, ["pull"], it));
+  const { code, said } = heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], it));
 
   assert.equal(code, 0, said);
   const now = disk.read(at("spec/tickets/a-child.md"));
@@ -67,11 +67,11 @@ test("a person takes a leaf back, because the record's role answers their hand",
     AUTHOR,
     PERSON,
   );
-  heard(() => work(ROOT, ["pull"], it));
-  heard(() => work(ROOT, ["pull", "a-child", "--pass"], it));
+  heard(() => pulling(ROOT, ["pull"], it));
+  heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], it));
 
   const { code, said } = heard(() =>
-    work(ROOT, ["pull", "a-child", "--back", "design/draft"], it),
+    pulling(ROOT, ["pull", "a-child", "--back", "design/draft"], it),
   );
 
   assert.equal(code, 0, said);
@@ -87,9 +87,9 @@ test("personSigns refuses a person's hand-back on an unsigned tip, and names the
     { ...AUTHOR, "git log -1 --format=%G? HEAD": { stdout: "N\n" } },
     { ...PERSON, personSigns: true },
   );
-  heard(() => work(ROOT, ["pull"], it));
+  heard(() => pulling(ROOT, ["pull"], it));
 
-  const { code, said } = heard(() => work(ROOT, ["pull", "a-child", "--pass"], it));
+  const { code, said } = heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], it));
 
   assert.equal(code, 1);
   assert.match(said, /^refused/m);
@@ -103,8 +103,8 @@ test("personSigns lets a signed tip through, and an agent's hand-back reads no s
     { ...AUTHOR, "git log -1 --format=%G? HEAD": { stdout: "U\n" } },
     { ...PERSON, personSigns: true },
   );
-  heard(() => work(ROOT, ["pull"], signed.it));
-  const good = heard(() => work(ROOT, ["pull", "a-child", "--pass"], signed.it));
+  heard(() => pulling(ROOT, ["pull"], signed.it));
+  const good = heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], signed.it));
   assert.equal(good.code, 0, good.said);
 
   const robot = doors(
@@ -112,7 +112,7 @@ test("personSigns lets a signed tip through, and an agent's hand-back reads no s
     { "git log -1 --format=%G? HEAD": { stdout: "N\n" } },
     { personSigns: true },
   );
-  heard(() => work(ROOT, ["pull"], robot.it));
-  const passed = heard(() => work(ROOT, ["pull", "a-child", "--pass"], robot.it));
+  heard(() => pulling(ROOT, ["pull"], robot.it));
+  const passed = heard(() => pulling(ROOT, ["pull", "a-child", "--pass"], robot.it));
   assert.equal(passed.code, 0, passed.said);
 });

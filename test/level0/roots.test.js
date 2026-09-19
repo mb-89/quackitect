@@ -13,7 +13,7 @@ import { fakeGit } from "../../src/doors/fake/git.js";
 import { retro } from "../../src/scripts/retro.js";
 import { probeOf } from "../../src/scripts/serve.js";
 import { NOTES, ticket } from "../../src/scripts/ticket.js";
-import { work } from "../../src/scripts/work.js";
+import { pulling } from "../../src/scripts/work.js";
 import { NOTE_PROCESS, TICKET_SCHEMA as SCHEMA, TRIVIAL_PROCESS } from "./fixtures.js";
 import { remoteSaying } from "./work-doors.js";
 
@@ -233,7 +233,7 @@ test("the pull hands out the work root's ticket, and the guidance reads the stub
     [w("spec/tickets/one-group.md")]: GROUP,
     [w("spec/tickets/a-child.md")]: CHILD,
   });
-  const { code, said } = heard(() => work(WORK, ["pull"], it));
+  const { code, said } = heard(() => pulling(WORK, ["pull"], it));
 
   assert.equal(code, 0, said);
   assert.match(said, /^work {2}a-child at design\/draft/m, "the stub's child comes");
@@ -248,13 +248,13 @@ test("a link a field names resolves in the work root first, then in the method r
     [w("spec/tickets/one-group.md")]: GROUP,
     [w("spec/tickets/a-child.md")]: CHILD,
   });
-  heard(() => work(WORK, ["pull"], it));
+  heard(() => pulling(WORK, ["pull"], it));
   disk.write(
     w("spec/tickets/a-child.md"),
     disk.read(w("spec/tickets/a-child.md")).replace("<!-- the note -->", "[[spec/guidance/working]]"),
   );
 
-  const { code, said } = heard(() => work(WORK, ["pull", "a-child", "--pass"], it));
+  const { code, said } = heard(() => pulling(WORK, ["pull", "a-child", "--pass"], it));
   assert.equal(code, 0, said);
   assert.match(said, /a-child passes design\/draft/);
   assert.match(disk.read(w("spec/tickets/a-child.md")), /^step: design\/review$/m);
@@ -273,7 +273,7 @@ test("on trunk a cloud box takes the group, and the record lands in the ticket u
       "git branch -r --merged origin/main": { stdout: "" },
     },
   );
-  const { code, said } = heard(() => work(WORK, ["pull"], it));
+  const { code, said } = heard(() => pulling(WORK, ["pull"], it));
 
   assert.equal(code, 0, said);
   assert.match(said, /holds it|took/);
