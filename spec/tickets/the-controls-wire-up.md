@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -129,6 +129,17 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote · helper-8
     hash_before: 40cc13de664b780fe5cdfe80aff576c91d14b820
     hash_after: 40cc13de664b780fe5cdfe80aff576c91d14b820
+  - step: implement/tests-red
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 747588d9afcfe8642682d40dc27bcc42add7a389
+    hash_after: 747588d9afcfe8642682d40dc27bcc42add7a389
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 6 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -255,19 +266,35 @@ What the agent needs:
 
 ### tests
 
-<!-- the tests you write fail on their own assertion -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test test/level0/binding.test.js
 
 ### seen
 
-<!-- what you see, and what surprises you -->
+`test/level0/binding.test.js` drives two names the doors call, and each case
+fails on its own assertion:
 
-<!-- the form is text -->
+| the case | what it reads today |
+|---|---|
+| the plain pull hands work out at the queue alone | `handsOut` stands undefined |
+| a binding the config leaves unsaid hands work out | the same |
+| the checks reading the engine's own work stand down at god | `standsDown` stands undefined |
+| those same checks hold at the queue and at unbound | the same |
+| every other check holds at god, because it reads something else | the same |
+| the list names the four, and the stop door answers each of them | `ENGINE_CHECKS` stands undefined |
+
+The last case is the one the review's open need asks for. It holds the list
+against every name the stop door answers. So a check joining the door lands in
+one list or the other, and the gate reaches `warnings-standing` beside the rest.
+
+Both names stand pure, so a case reaches neither disk nor clock. The stop
+door's own wiring reads the config through `asks`, and `stop-door.test.js`
+drives that half over a fake box.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change touches no file the ask leaves out. One case file joins, and it drives the pull's route and the stop door.
+- every door the change reaches has a fake. The cases reach no door, and read a string the caller hands them.
+- a comment names the approach the change implements. Each case points at the chapter owning the binding.
 
 <!-- the form is checklist -->
 
