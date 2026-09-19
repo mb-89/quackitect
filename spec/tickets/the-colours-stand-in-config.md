@@ -89,12 +89,18 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
     hash_before: ed0af70d163e60af84f6268f93ad4cbfca22d075
     hash_after: ed0af70d163e60af84f6268f93ad4cbfca22d075
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 0a4ec85b0a388eb3f34006feba035e885ac46729
+    hash_after: 0a4ec85b0a388eb3f34006feba035e885ac46729
+    returns: 1
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | yes, and it names the road it takes and why |; | is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does every rule the approach adds carry a case | yes, the case drives the projection and reads the Go |; | does every claim carry a proof | yes but one, and the shape count reads other than the tree |; TL;DR:; The road holds. A projection keeps the binary whole, and `spec/config/styles/VoiceParagraph` stands as the pattern.; The write door guards a target already. `ownerDoor` refuses a write to any target `projections.json` names.; The folder call holds. `styles` carries the Vale styles, and a name of its own suits the colours.; The shape count reads other than the tree, and the target's name sits one letter from a standing file.; The findings, one a line:; `projection.js` holds four shapes today, and `retro command` is the one the draft leaves out.; So the colour shape joins as the fifth. Name all four, or name the command answering the count.; `src/viewer/colours.go` stands one letter from `src/viewer/colour.go`, in one package.; Give the target a name a reader parts from the reader beside it, such as `colourvalues.go`.; [[spec/tickets/a-rename-reaches-every-note]] moves `src/viewer` under another name. Name which lands first.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the shape count reads the tree, or names the command answering it | open |; | 2 | the generated target takes a name a reader parts from `colour.go` | open |; | 3 | the draft names which of the two folder tickets lands first | open |; | 4 | the review hand reads the approach again | open |"
 ---
 
 # Ask
@@ -170,9 +176,39 @@ So the numbers stand in one file, and the reading stands in another. `grep -c` o
 
 ### verdict
 
-<!-- pass or fail, with findings one a line -->
+fail
 
-<!-- the form is verdict -->
+| the question reviewing asks | the answer |
+|---|---|
+| does the approach answer the ask | yes, and it names the road it takes and why |
+| is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |
+| what does `./RUNME.sh check` answer | 0, with the server standing |
+| does every rule the approach adds carry a case | yes, the case drives the projection and reads the Go |
+| does every claim carry a proof | yes but one, and the shape count reads other than the tree |
+
+TL;DR:
+
+- The road holds. A projection keeps the binary whole, and `spec/config/styles/VoiceParagraph` stands as the pattern.
+- The write door guards a target already. `ownerDoor` refuses a write to any target `projections.json` names.
+- The folder call holds. `styles` carries the Vale styles, and a name of its own suits the colours.
+- The shape count reads other than the tree, and the target's name sits one letter from a standing file.
+
+The findings, one a line:
+
+- `projection.js` holds four shapes today, and `retro command` is the one the draft leaves out.
+- So the colour shape joins as the fifth. Name all four, or name the command answering the count.
+- `src/viewer/colours.go` stands one letter from `src/viewer/colour.go`, in one package.
+- Give the target a name a reader parts from the reader beside it, such as `colourvalues.go`.
+- [[spec/tickets/a-rename-reaches-every-note]] moves `src/viewer` under another name. Name which lands first.
+
+What the agent needs:
+
+| number | need | status |
+|---|---|---|
+| 1 | the shape count reads the tree, or names the command answering it | open |
+| 2 | the generated target takes a name a reader parts from `colour.go` | open |
+| 3 | the draft names which of the two folder tickets lands first | open |
+| 4 | the review hand reads the approach again | open |
 
 # implement
 
