@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 step: verdict
 steps:
@@ -202,6 +202,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-18
+    hash_before: 49c66860730e53557b83e0febed4ccc321d09495
+    hash_after: 49c66860730e53557b83e0febed4ccc321d09495
+reason: done
 ---
 
 # Ask
@@ -485,68 +490,58 @@ which is what the design calls for.
 - .claude/skills/level0/lib/vehicle.js
     - .gitignore
 - HANDOVER.md
-- RUNME.sh
     - spec/config/brand/icon.svg
+- spec/config/level0.json
 - spec/design_output/vehicle.md
-- spec/guidance/code/testing.md
+- spec/guidance/code/code.md
 - spec/guidance/review/reviewing.md
 - spec/tickets/the-brand-names-the-plugin.md
-- src/doors/disk.js
-- src/extension/package.json
+- src/doors/fake/disk.js
 - src/scripts/brand.js
 - src/scripts/install.sh
 - src/scripts/stub.js
 - src/stub/RUNME.sh
-- test/contract/install.test.js
-- test/contract/sidebar.test.js
 - test/level0/brand.test.js
 
 ## verdict
 
-fail
+pass
 
 | the question reviewing asks | the answer |
 |---|---|
-| does the branch do what the ask asks | the four answers stand, and the code carries each one |
+| does the branch do what the ask asks | the asked answers stand, and the last verdict's findings close |
 | is what the diff touches beyond the ask trivial | yes, every hunk lands in a file the ask names |
 | what does `./RUNME.sh check` answer | 0, with the server standing |
 | does a retro stand in the handback | no, `HANDOVER.md` leaves this ticket at `design/review` |
-| does every rule the change adds carry a case | the three pure names, yes. `stamps` and the refusal, no |
-| does a case feed the rule something bad | `shimSettings` takes a broken file. The empty brand meets no case |
+| does every rule the change adds carry a case | yes, the refusal and `stamps` each take one |
+| does a case feed the rule something bad | yes, a folder of dots meets `stubInto` |
 
 TL;DR:
 
+- `stubInto` reads the brand ahead of its first write, and refuses an empty one.
+- `emptyBrand` holds the one wording, and `brand.js` prints the same line.
+- A case drives that refusal over a folder of dots, and reads that the stub writes nothing.
+- A case drives `stamps` off `src/doors/fake/disk.js`, over both branded files and the icon.
+- `./RUNME.sh check` answers 0, and `./RUNME.sh branch test test/level0/brand.test.js` answers green.
 - The stamp writes nothing in this tree, and every `mcp__level0` tool keeps its name.
-- `./RUNME.sh check` answers 0, and the eight cases pass.
-- The icon lands. Git ignores the path `src/extension/package.json` names, and the install script writes it.
-- A folder name outside `a-z0-9` slugs to an empty brand, and three hands take it.
-- `stamps` reaches the disk door, and no case hands it a fake.
 
-The findings, one a line:
+The findings of the last verdict close, one a line:
 
-- `brandOf` answers an empty string for a folder name outside `a-z0-9`.
-- `stub.js` hands that string to `linkOf`, so `vehicle.json` records an empty name.
-- The shim reads that name, and its clone path drops the folder it looks for.
-- `shimSettings` then keys a marketplace on the empty string, and enables `level0@`.
-- The draft says an empty name fails the stub. `brand.js` alone refuses it.
-- That refusal stands under the main block, so a case reaches it nowhere.
-- `stamps` takes the disk door as an argument, and `src/doors/fake/disk.js` drives it nowhere.
-- So no case reads the two branded files, and no case reads the icon write.
-- The comments point at this ticket in four files, where the `checked` line names one chapter.
+- The empty brand stops at `stubInto`, so the record, the shim and the settings read a brand that stands.
+- The refusal stands in a pure name, and a case fires it off the disk and the git fakes.
+- `stamps` takes the fake disk, and a case reads the marketplace, the plugin and the icon it writes.
 
-What the agent needs:
+What reads other than the tree, one a line:
 
-| number | need | status |
-|---|---|---|
-| 1 | an empty brand refuses where `stub.js` writes the record | open |
-| 2 | a case feeds a folder name outside `a-z0-9` to that refusal | open |
-| 3 | a case drives `stamps` off `src/doors/fake/disk.js` | open |
-| 4 | the `checked` line of implement/change names where each comment points | open |
-| 5 | the verdict hand reads every hunk again | open |
+- The `checked` line of implement/change says every site points at the chapter, but the shim.
+- Cases in `test/level0/brand.test.js` point at this ticket, and the tree allows that elsewhere.
+- `emptyBrand` repeats the lines `brandOf` holds for the last segment of a path.
+
+Each stands small, and one edit at the merge takes it.
 
 ## checked
 
-- every fact the change adds stands in one place. The chapter owns the slug rule, and six code sites point at a note or this ticket. The icon pair stands in `brand.js`, and the chapter names it once.
+- every fact the change adds stands in one place. The chapter owns the slug rule, and each site points at it or at this ticket. The refusal wording stands in `emptyBrand`, which `stub.js` and `brand.js` both read. `brandOf` and `emptyBrand` each cut the last segment of a path.
 
 # Discussion
 
