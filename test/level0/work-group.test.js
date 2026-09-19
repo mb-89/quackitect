@@ -153,7 +153,7 @@ test("branch take with a name takes that branch alone, and refuses a name nobody
 });
 
 // [[spec/design_output/work#the-take-writes-the-record]]
-test("a second take meets a rejected push, and says so", () => {
+test("a take meeting a rejected push names both roads, and claims no race", () => {
   const { it } = doorsSaying(
     { ...groupRemote(), "git push origin work/one-group": { exitCode: 1 } },
     { [on("one-group")]: GROUP_NOTE, ...HAND },
@@ -162,7 +162,9 @@ test("a second take meets a rejected push, and says so", () => {
   const { code, said } = heard(() => work(ROOT, ["take"], it));
 
   assert.equal(code, 1);
-  assert.match(said, /Somebody took this group first/);
+  assert.match(said, /The push of work\/one-group came back refused/);
+  assert.match(said, /Somebody taking it first is one road/);
+  assert.match(said, /a push door turning it away is another/);
 });
 
 // [[spec/design_output/work#a-brief-drains-first]]

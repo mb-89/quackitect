@@ -243,7 +243,7 @@ function parkedFiles(it) {
 function claimBrief(it, branch) {
   const brief = it.disk.read(it.join(it.root, BRIEF));
   if (!push(it, branch, setStatus(brief, HELD), HELD)) {
-    console.error("Somebody took this branch first. Run branch take again.");
+    console.error(refusedPush(branch));
     return 1;
   }
 
@@ -258,6 +258,15 @@ function claimBrief(it, branch) {
   return 0;
 }
 
+// The take names why the push came back, because a race is one road and a door turning it away is another, and a reader clears each one differently. [[spec/design_output/work#the-take-writes-the-record]]
+function refusedPush(branch) {
+  return [
+    `The push of ${branch} came back refused, so the take stands undone.`,
+    "Somebody taking it first is one road, and a push door turning it away is another.",
+    "The lines above say which. Clear it, then run branch take again.",
+  ].join("\n");
+}
+
 // [[spec/design_output/work#the-take-writes-the-record]]
 function claimGroup(it, one) {
   const at = ticketAt(one.name);
@@ -270,7 +279,7 @@ function claimGroup(it, one) {
   it.git.run(["add", at], true);
   it.git.run(["commit", "-m", `${one.branch}: ${hand} takes it`], true);
   if (!it.git.run(["push", "origin", one.branch]).ok) {
-    console.error("Somebody took this group first. Run branch take again.");
+    console.error(refusedPush(one.branch));
     return 1;
   }
 

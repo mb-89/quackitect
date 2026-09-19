@@ -135,7 +135,8 @@ test("a person step carries its reader, and a colon takes quotes", () => {
   );
   assert.match(
     asked.text,
-    /^## person-1\n\n<!-- answers the question the engine asks -->\n\n### answer/m,
+    /^## person-1\n\n<!-- the hand-back met refused: breaks Sentence at line 2: too long -->\n\n### answer/m,
+    "the chapter reads the question, so the ticket alone says what the step waits on",
   );
 
   assert.equal(

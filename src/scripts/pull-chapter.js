@@ -18,6 +18,9 @@ import { excludes } from "./pull-hand.js";
 import { ANSWERED, bare, CHECKED, COMMENT, CUT, FENCE, WORK } from "./pull-route.js";
 import { changedSince, tipOf } from "./pull-writes.js";
 
+// A shell answers this where it finds no command, which a backtick or a fence around the line earns. [[spec/design_output/pull#the-fields-hold-their-forms]]
+const NO_COMMAND = 127;
+
 export function workAnswer(it, one, leaf) {
   const rows = [];
   const phase = leaf.parent ? ` under ${leaf.parent}` : "";
@@ -346,6 +349,13 @@ export function commandsRun(it, leaf, chapter, found) {
     const rows = `${ran.stdout ?? ""}`.trim().split("\n").filter(Boolean);
     const last = rows.at(-1) ?? "";
     out.push({ name: field.name, exit: ran.exitCode, said: last.slice(0, CUT.said) });
+    // The shape is what a reader acts on here, because the box stopped at the name and left the command alone. [[spec/design_output/pull#the-fields-hold-their-forms]]
+    if (ran.exitCode === NO_COMMAND) {
+      found.push(
+        `${field.name} under ${leaf.path} runs ${line}, and the box finds no such command. A command field holds one bare line, indented four spaces.`,
+      );
+      continue;
+    }
     const want = field.expects;
     if (want === undefined || want === null || want === "") continue;
     const asNumber = Number(want);

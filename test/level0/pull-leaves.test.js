@@ -8,6 +8,7 @@ import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 import { fieldOf } from "../../src/scripts/group.js";
 import {
   chapterOf,
+  commandsRun,
   holdOf,
   leafOf,
   takeable,
@@ -104,6 +105,30 @@ test("a leaf's chapter reads its fields by heading, past the comments and the en
     reason: "thin; and short",
   });
   assert.deepEqual(verdictIn(["maybe"]), { said: "" });
+});
+
+// [[spec/design_output/pull#the-fields-hold-their-forms]]
+test("a command line the box finds nothing for comes back naming the shape a command field takes", () => {
+  const it = {
+    root: ROOT,
+    proc: { run: () => ({ exitCode: 127, stdout: "", stderr: "" }) },
+  };
+  const leaf = {
+    path: "do",
+    evidence: [{ name: "check", form: "command", expects: 0 }],
+  };
+  const chapter = {
+    stands: true,
+    own: [],
+    fields: new Map([["check", ["`./RUNME.sh check`"]]]),
+  };
+  const found = [];
+  const ran = commandsRun(it, leaf, chapter, found);
+
+  assert.deepEqual(found, [
+    "check under do runs `./RUNME.sh check`, and the box finds no such command. A command field holds one bare line, indented four spaces.",
+  ]);
+  assert.deepEqual(ran, [{ name: "check", exit: 127, said: "" }]);
 });
 
 // [[spec/design_output/pull#the-test-verb]]
