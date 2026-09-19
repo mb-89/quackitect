@@ -211,10 +211,13 @@ so.
 |---|---|
 | `goModulesIn` walks a folder below `src` too | the battery finds a module either way |
 | `goModulesOf` takes a disk handle beside the paths | it reads the folder holding `go.mod` |
-| a case drives both over a module one level down | the fault stays fixed |
+| the replace line of `src/index/go.mod` | it reads `../engine/swap` |
+| the replace line of `src/lsp/go.mod` | it reads the same |
+| a case drives both readers over a module one level down | the fault stays fixed |
 
 `goModulesOf` reads path strings alone today, so the plan threads it the handle
-its caller already holds.
+its caller already holds. Two modules name swap under `replace`, and the check
+runs both, so the move carries those two lines with it.
 
 **The command line.** The third line of the ask names every file under
 `src/scripts`. Five groups there carry a topic in the name, and each serves one
@@ -241,23 +244,45 @@ that verb's prefix, and a file the whole tree reads goes to the engine.
 | `review.js` | `branch review` | `work-review.js` |
 | `unblock.js` | `branch unblock` | `work-unblock.js` |
 | `stand.js` | `branch list` | `work-free.js` |
-| `go-tests.js` | `check` | `cli-go.js` |
+| `go-tests.js` | `check`, and `branch test` | `cli-go.js` |
 | `viewer.js` | `tui` | `tui-build.js` |
 
 `work-stands.js` stands already, so `stand.js` takes a name of its own under
-the same prefix.
+the same prefix. Two of these serve a second verb as well: `test-verb.js`
+imports `goEnvOf`, and `unblock.js` imports what `landed.js` exports. Each
+prefix names the verb its first reader runs.
 
-| what goes to the engine | what it answers |
+**What follows a move.** A note naming a moving file by its path moves with it.
+
+| the note | what it names |
 |---|---|
-| `group.js` | a group, read off its ticket |
-| `queue.js` | the score weighing a ticket against the rest |
-| `hand.js` | the hand a step stands in |
-| `tools.js` | where every tool stands on this box |
+| `tools.md` | the survey, and where a tool stands |
+| `work.md` | the branch verb's own files |
+| `level0.md` | the bridge files the moves reach |
+| `pull.md`, `review.md`, `viewer.md` | the rest of the moving names |
 
-Each of those reads the tree for every caller. `group.js` reaches the bridge
-through the command door and the stop door. `tools.js` reaches the two linter
-doors and two doors of the bridge. So a script folder is the wrong home for
-either.
+The links checker reads a path that resolves nowhere, so the check answers red
+where a note stays behind.
+
+| what goes to the engine | what reads it outside the scripts folder |
+|---|---|
+| `group.js` | the command door, and the stop door |
+| `tools.js` | the two linter doors, two doors of the bridge, and the copilot library |
+
+A reader outside `src/scripts` is what sends a file to the engine. The copilot
+library reaches `tools.js` by a relative path, and that path follows the move.
+
+`queue.js` and `hand.js` keep every reader inside `src/scripts`, so each takes
+a prefix in place of a move:
+
+| what takes a prefix | the verb it serves | its name |
+|---|---|---|
+| `queue.js` | `ticket pull` | `pull-queue.js` |
+| `hand.js` | `ticket pull` | `pull-hand-of.js` |
+
+`queue.js` imports `entriesOf` from `pull-writes.js`, which stays in the
+scripts folder. A move would drag that file and the seven it reads, so the
+prefix holds the engine rule and the import alike.
 
 A file carrying the name of its own verb stays where it stands, and its name
 says its topic already:
