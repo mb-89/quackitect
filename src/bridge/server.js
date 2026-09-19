@@ -3,8 +3,9 @@
 // [[spec/design_output/level0#the-bridgehead-and-the-server]]
 
 import { join } from "node:path";
-import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
 import { fileURLToPath } from "node:url";
+import { FOLDER as LOG_FOLDER } from "../../.claude/skills/level0/lib/log.js";
+import { PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 import { biome } from "../doors/biome.js";
 import { clock } from "../doors/clock.js";
 import { disk } from "../doors/disk.js";
@@ -23,22 +24,8 @@ import {
 } from "./answer.js";
 import { SPECS as applySpecs, TOOLS as applyTools } from "./apply.js";
 import { asksForUpdate } from "./ask.js";
-import { asks } from "./config.js";
-import {
-  dropsHold,
-  holdsCall,
-  onRefactorAnswered,
-  onStop,
-  REFACTOR_ANSWERED,
-  sawCall,
-  sawPrompt,
-  SPECS as stopSpecs,
-  TOOLS as stopTools,
-} from "./stop.js";
 import { onBash, onDescribe } from "./bash.js";
-import { SPECS as reportSpecs, TOOLS as reportTools } from "./report.js";
-import { ANSWERED, onAgentAnswered, SPECS as reviewSpecs, TOOLS as reviewTools } from "./review.js";
-import { SPECS as toolSpecs, TOOLS as handTools } from "./tools.js";
+import { asks } from "./config.js";
 import { FINDINGS, findingsFor } from "./findings.js";
 import {
   onAgentSpawn,
@@ -51,10 +38,28 @@ import {
 } from "./guidance.js";
 import { freshens, projectionsHere, sourcesOf } from "./projection.js";
 import { movedCode } from "./reload.js";
+import { SPECS as reportSpecs, TOOLS as reportTools } from "./report.js";
+import {
+  ANSWERED,
+  onAgentAnswered,
+  SPECS as reviewSpecs,
+  TOOLS as reviewTools,
+} from "./review.js";
 import { answersFromIndex, FIND, findSpec, runsFind, warmIndex } from "./search.js";
+import {
+  dropsHold,
+  holdsCall,
+  onRefactorAnswered,
+  onStop,
+  REFACTOR_ANSWERED,
+  sawCall,
+  sawPrompt,
+  SPECS as stopSpecs,
+  TOOLS as stopTools,
+} from "./stop.js";
+import { TOOLS as handTools, SPECS as toolSpecs } from "./tools.js";
 import { registeredPort } from "./vehicle.js";
 import { onWrite, schemasHere } from "./write.js";
-import { PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 
 const OK = 200;
 const NOT_FOUND = 404;
@@ -105,7 +110,14 @@ export async function decide(said, box) {
 }
 
 function specsOf(box) {
-  return [findSpec(), ...applySpecs(), ...toolSpecs(box), ...reviewSpecs(), ...stopSpecs(box), ...reportSpecs()];
+  return [
+    findSpec(),
+    ...applySpecs(),
+    ...toolSpecs(box),
+    ...reviewSpecs(),
+    ...stopSpecs(box),
+    ...reportSpecs(),
+  ];
 }
 
 function pass() {
@@ -116,12 +128,23 @@ function pass() {
 function letsThrough(answer, said, box) {
   if (asks(box, BINDING) !== GOD) return answer;
   const { needs, result, ...rest } = answer ?? {};
-  const held = needs ? "the hold" : result?.deny !== undefined ? "the refusal" : result?.block !== undefined ? "the block" : "";
+  const held = needs
+    ? "the hold"
+    : result?.deny !== undefined
+      ? "the refusal"
+      : result?.block !== undefined
+        ? "the block"
+        : "";
   if (!held) return answer;
-  box.log.say("info", "god", `god mode lets ${held} of ${said?.e?.tool ?? said?.event ?? ""} through`, {
-    tool: String(said?.e?.tool ?? ""),
-    detail: String(result?.deny ?? result?.block ?? needs).replace(/\s+/g, " "),
-  });
+  box.log.say(
+    "info",
+    "god",
+    `god mode lets ${held} of ${said?.e?.tool ?? said?.event ?? ""} through`,
+    {
+      tool: String(said?.e?.tool ?? ""),
+      detail: String(result?.deny ?? result?.block ?? needs).replace(/\s+/g, " "),
+    },
+  );
   return { ...rest, pass: true };
 }
 
@@ -176,7 +199,8 @@ export function boxOf(method, work = method, doors = {}) {
     index: doors.index ?? index(files, outside, time, method, work),
     vale: doors.vale ?? vale(files, outside, method),
     biome: doors.biome ?? biome(files, outside, method),
-    log: doors.log ?? log(files, time, { folder: join(work, LOG_FOLDER), level: "debug" }),
+    log:
+      doors.log ?? log(files, time, { folder: join(work, LOG_FOLDER), level: "debug" }),
   };
 }
 
@@ -225,7 +249,12 @@ export function serve(method, port = PORT_BASE, say = console.log) {
     }
     if (request.method !== "POST" || request.url !== "/event") {
       const ok = request.url === "/health";
-      answer(response, ok ? OK : NOT_FOUND, { ok, port, method, dead: own.index.dead() });
+      answer(response, ok ? OK : NOT_FOUND, {
+        ok,
+        port,
+        method,
+        dead: own.index.dead(),
+      });
       return;
     }
     readBody(request, async (body) => {
@@ -237,19 +266,42 @@ export function serve(method, port = PORT_BASE, say = console.log) {
       // [[spec/design_output/level0#a-fix-reaches-the-session]]
       const moved = movedCode(own, String(said?.event ?? ""));
       if (moved) {
-        await own.log.say("info", "bridge", `${moved} moved, so the server restarts`, { file: moved });
+        await own.log.say("info", "bridge", `${moved} moved, so the server restarts`, {
+          file: moved,
+        });
         setTimeout(restart, SOON);
       }
     });
   };
 
   const server = wire().listen(port, onRequest, async () => {
-    await own.log.say("info", "bridge", `the server stands at ${where}`, { root: method });
+    await own.log.say("info", "bridge", `the server stands at ${where}`, {
+      root: method,
+    });
     say(`the server stands at ${where}, from ${method}`);
   });
   process.on("SIGINT", stop);
   process.on("SIGTERM", stop);
+  // [[spec/design_output/level0#a-crash-writes-its-error]]
+  const crash = (error) => crashed(own, where, error);
+  process.on("uncaughtException", crash);
+  process.on("unhandledRejection", crash);
   return server;
+}
+
+// A crash writes its error last, so the log says why the server falls. [[spec/design_output/level0#a-crash-writes-its-error]]
+export async function crashed(own, where, error, exit = process.exit) {
+  try {
+    await own.log.say(
+      "fatal",
+      "bridge",
+      `the server falls at ${where}: ${error?.message ?? error}`,
+      {
+        stack: String(error?.stack ?? ""),
+      },
+    );
+  } catch {}
+  exit(1);
 }
 
 function readBody(request, then) {
@@ -276,7 +328,10 @@ function answer(response, status, said) {
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const args = process.argv.slice(2);
   const at = args.indexOf("--port");
-  const method = args.find((one) => !one.startsWith("--") && args[args.indexOf(one) - 1] !== "--port") ?? process.cwd();
+  const method =
+    args.find(
+      (one) => !one.startsWith("--") && args[args.indexOf(one) - 1] !== "--port",
+    ) ?? process.cwd();
   const port =
     Number(at >= 0 ? args[at + 1] : process.env.SE_BRIDGE_PORT) ||
     registeredPort(disk(), process.env, clock(), method);

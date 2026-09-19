@@ -128,6 +128,14 @@ every tool run. A file that differs restarts the server through the road the
 `/restart` request takes, and the log names the file. The next event lands on
 the new code, and the session goes on as above.
 
+## A crash writes its error
+
+An exception nobody catches, and a rejection nobody handles, both end the
+server. Before it exits, the server writes the error and its stack to the log
+at `fatal`. So the log names why the server falls, and the next start reads
+as a fresh one. A kill from outside the process writes nothing, so a log
+ending on no `fatal` line names a kill.
+
 # The harness surface
 
 Every line here comes from running it against client 2.1.263. The
