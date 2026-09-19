@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-person-step-holds
-step: implement/tests-green
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -147,6 +147,17 @@ record:
     hash_after: a73c80b056e5f0656388d6d1f630baee25ef331d
     answered:
       - name: lint
+        exit: 0
+        said: 87 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: 9a5ce98f3bd4b91f4b7afbb90365e27eef11b3d8
+    hash_after: 9a5ce98f3bd4b91f4b7afbb90365e27eef11b3d8
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 71 test(s) pass in 7 file(s)
+      - name: check
         exit: 0
         said: 87 stand at warning, which the panel draws and check allows.
 ---
@@ -338,6 +349,15 @@ The git door grows two reads, `authorName` and `signatureOf`, and the fake proce
 - an agent's hand-back reads no signature, and a private ticket reads none
 
 The review leaf asks two things the change answers. The name enters at `handOf` and stops at `roleOf`, so the hold alone carries it. A hold standing from before carries the old file name, and the next pull writes one under the new name.
+
+The verdict leaf sends one finding back, and the reflect leaf names its class.
+
+| the reader | what it weighed | what it weighs now |
+|---|---|---|
+| `excludes`, on the `not` rule | the role already | the role |
+| `takeBack`, on `--back` | the whole hand, so a person met a refusal | the role, and its refusal and commit name the role |
+
+A test drives `--back` off a harness, which is the road the suite left open.
 
 <!-- the form is text -->
 
