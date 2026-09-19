@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: 75a12d571cbebf0c8ff62882a658e60ce6702e0e
     returns: 1
     why: "The four moves and the swap cost hold, and two claims under them miss the code.; Name `ownerDoor` and `marksStale` beside `freshens`, because `src/bridge/write.js` runs all three off a write event.; Say where those two land, so the engine keeps the rule the draft sets.; Answer the third line of the ask: name the files moving out of `src/scripts`.; The draft names the `cli-` and `pull-` groups alone.; The `retro-`, `work-` and `guidance-` groups share that shape, so name each one too.; Sort `queue.js`, `group.js` and `landed.js`, which each answer a question about the tree.; Each of those three stands outside the verb table in `cli.js`.; Give `goModulesOf` a disk handle in the plan, because it takes path strings alone today.; **What holds.**; `./RUNME.sh check` exits 0 on this branch.; `goModulesIn` and `goModulesOf` each stop one level under `src`, so the swap move drops the module.; `status.js` and `tense.js` export readers alone, which matches the engine rule.; The draft names the open second line of the ask, and leaves the door cut to a later ticket.; The draft commit touches the ticket file alone.; A retro stands absent from the handback, which suits a ticket at design review.; `./RUNME.sh branch review` reports a 1 from a Vale timeout, which this box causes."
+  - step: design/draft
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 8782253b9cb47ebe4b53d397e020f3507b149a2e
+    hash_after: c32f9c806e0f8e5fb69f49ee9a353f6ba4cb3fae
 ---
 
 # Ask
