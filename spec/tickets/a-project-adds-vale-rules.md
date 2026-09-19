@@ -90,7 +90,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -100,6 +100,17 @@ record:
     hand: box 5387e4f82b24 · claude-code-remote · helper-2
     hash_before: a5c6a3bb4feb4f281bc915d95226a3bf16b9a9ff
     hash_after: a5c6a3bb4feb4f281bc915d95226a3bf16b9a9ff
+  - step: implement/tests-red
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: c91177aed6464e1ba80d92eab2b7288b931b354a
+    hash_after: 64c81d61c7b299077d72ec232384845dcca535fe
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 6 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
