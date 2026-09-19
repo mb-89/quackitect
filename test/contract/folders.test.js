@@ -151,7 +151,7 @@ test("a loop standing apart from its list is refused, and this tree passes", () 
     "a name the loop holds and no list does",
   );
 
-  const bare = over('for one in "$root/.se/run"; do\n  mv "$one" "$new"\ndone\n');
+  const bare = over('for one in bin hold; do\n  mv "$one" "$new"\ndone\n');
   assert.ok(
     bare.some((one) => /names no list/.test(one.message)),
     "a loop naming no list",

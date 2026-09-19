@@ -292,11 +292,30 @@ on this tip, so each of the seven turns the tree red at the same commit.
 
 <!-- the form is text -->
 
+Two classes stand in the findings:
+
+| the class | the fix |
+|---|---|
+| a case moves to the code where the two disagree | the code moves, and a case moves only where the approach moves |
+| a rule lands, and the note tabling the rules stands unchanged | the change writes the row beside the rule |
+
+The first class carries the hole: the reader asks the loop header for the
+private folder, and a loop of bare names answers nothing. So the reader takes
+the lists in hand, and a loop whose names meet one reads as marked or refused.
+The case over a loop of bare names comes back with it.
+
+The second class carries the two notes: one tables the rules over two files, and
+one names the escape. Each takes its line in this change.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the fix touches the reader, its cases, and the two notes naming the rules
+- the disk door and the git door carry the reading, and the fake tree answers them
+- the reader's comment names the note the lists stand in
 
 ## change
 

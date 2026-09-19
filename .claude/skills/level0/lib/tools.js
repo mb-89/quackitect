@@ -92,7 +92,7 @@ const MARK = /folders\.js\s+owns\s+these\s+names\s+as\s+([A-Z_]+)/;
 const PRIVATE_PATH = /\.se\//;
 
 // The installer names the list each loop carries, so one change reaches the rule and the shell alike. [[spec/design_input/the-runtime-files-stand-apart]]
-export function loopNames(text) {
+export function loopNames(text, lists = {}) {
   const lines = String(text ?? "").split(/\r?\n/);
   const out = { unmarked: [] };
   for (let at = 0; at < lines.length; at++) {
@@ -101,13 +101,20 @@ export function loopNames(text) {
     const names = namesIn(lines, at, found[1]);
     const mark = markAbove(lines, at);
     if (!mark) {
-      // A loop reaching the private folder names the list it moves, and every other loop stands outside this. [[spec/design_input/the-runtime-files-stand-apart]]
-      if (PRIVATE_PATH.test(found[1])) out.unmarked.push(at + 1);
+      // A loop reaching the private folder or moving a name a list holds names that list, and every other loop stands outside this. [[spec/design_input/the-runtime-files-stand-apart]]
+      if (PRIVATE_PATH.test(found[1]) || meets(names, lists)) out.unmarked.push(at + 1);
       continue;
     }
     out[mark] = [...(out[mark] ?? []), ...names];
   }
   return out;
+}
+
+// A name any list holds marks the loop moving it, whatever its header spells. [[spec/design_input/the-runtime-files-stand-apart]]
+function meets(names, lists) {
+  return Object.values(lists ?? {}).some((list) =>
+    names.some((one) => [list].flat().includes(one)),
+  );
 }
 
 // A marker stands in the comment run above its loop. [[spec/design_input/the-runtime-files-stand-apart]]

@@ -387,14 +387,15 @@ function comments(line) {
 export function installerHoldsTheNames(tree) {
   const rule = "InstallerHoldsTheNames";
   const out = [];
-  const said = loopNames(tree.paths().includes(INSTALL) ? tree.read(INSTALL) : "");
+  const lists = { MOVED, RENAMED, LOGGED };
+  const said = loopNames(tree.paths().includes(INSTALL) ? tree.read(INSTALL) : "", lists);
 
   for (const line of said.unmarked) {
     out.push(
       fault(rule, INSTALL, `This loop names no list ${FOLDERS} holds. Name one above it.`, line),
     );
   }
-  for (const [name, list] of Object.entries({ MOVED, RENAMED, LOGGED })) {
+  for (const [name, list] of Object.entries(lists)) {
     out.push(...standingApart(rule, name, list, said[name]));
   }
   return out;
