@@ -90,12 +90,18 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
     hash_before: 372edf2ccc0e7222883028c2a1b2b2ebeebf03c2
     hash_after: 372edf2ccc0e7222883028c2a1b2b2ebeebf03c2
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 30d9aa356a8b5e42a2101d829acdbb0eb82661c9
+    hash_after: 30d9aa356a8b5e42a2101d829acdbb0eb82661c9
+    returns: 1
+    why: "`standingAll` stands in `src/scripts/work-stands.js`, and `src/scripts/work.js` imports it; `branches` stands in that same file, so the standing and the list read one place; `movedOnTrunk` stands unexported in `src/scripts/work-merge.js`, so name what carries its read across; `take` stands in `src/scripts/work.js`, so the row reading `the same file` names two files; the counts of refs and of standing words drop, because `git merge-base` answers them [[spec/guidance/voice]]; the owner's row stands on a cloud branch, so say what this box does with those refs [[spec/guidance/cloud]]"
 ---
 
 # Ask
@@ -161,8 +167,16 @@ So the owner's row stands on its own: these seven wait for a person to close the
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
-
 <!-- the form is verdict -->
+
+fail
+
+- `standingAll` stands in `src/scripts/work-stands.js`, and `src/scripts/work.js` imports it
+- `branches` stands in that same file, so the standing and the list read one place
+- `movedOnTrunk` stands unexported in `src/scripts/work-merge.js`, so name what carries its read across
+- `take` stands in `src/scripts/work.js`, so the row reading `the same file` names two files
+- the counts of refs and of standing words drop, because `git merge-base` answers them [[spec/guidance/voice]]
+- the owner's row stands on a cloud branch, so say what this box does with those refs [[spec/guidance/cloud]]
 
 # implement
 
