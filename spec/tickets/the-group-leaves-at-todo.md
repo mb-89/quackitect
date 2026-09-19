@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: now
 group: the-person-step-holds
-step: implement/tests-green
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -117,6 +117,17 @@ record:
     hash_after: 3fc8e42576fb8130afb5dd490267a7ada656017a
     answered:
       - name: lint
+        exit: 0
+        said: 87 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: c769e9fea473b0c4f4c1987c5dbede45379ca2b2
+    hash_after: c769e9fea473b0c4f4c1987c5dbede45379ca2b2
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 50 test(s) pass in 4 file(s)
+      - name: check
         exit: 0
         said: 87 stand at warning, which the panel draws and check allows.
 ---
@@ -269,25 +280,47 @@ The same leaf asks why the form filter lands in the engine. The leaf names the f
 
 ### tests
 
-<!-- the same tests pass -->
+    ./RUNME.sh branch test
 
 <!-- the form is command -->
 
 ### check
 
-<!-- the check is green on the commit -->
+    ./RUNME.sh check
 
 <!-- the form is command -->
 
 ### says
 
-<!-- what changes and why, for a reader who was not there -->
+A box with nothing at a step it can take now leaves the group where it stands, and says which person step waits.
+
+| the edit | where | what a reader meets |
+|---|---|---|
+| a `children` leaf with an open child returns the wait | `advanced` | the group holds its step, and no retro leaf comes out |
+| the take reads the group before it writes | `take` | the take answers zero, on the branch, with the group at `todo` |
+| the judge's material drops a command field and an empty heading | `judgeMaterial` | a chapter of commands hands the wrapper nothing |
+
+`standsOpen` is the one place answering what a hand can take across a group. The take and `branch done` both read it, so the two verbs answer the same line.
+
+The review leaf asks five things, and each one answers here.
+
+| what it asks | what stands |
+|---|---|
+| the take's exit code and the branch | zero, and the box stands on the branch it switched to |
+| the next free branch, or a stop | a stop, which is the ask's word, so a cloud box halts there |
+| the one place owning the takeable answer | `standsOpen` |
+| a children leaf where every child closes | it passes by the engine, so the retro still comes out |
+| the form filter in the engine | the leaf names each field's form, and the wrapper imports nothing past its own folder |
+
+The walk writes no skip any more. Its guard read the hand writing the last skip, so a fresh box wrote another. The retro then came out over an empty window, box after box.
 
 <!-- the form is text -->
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change reaches the pull, the take and the judge's material, and the notes owning their facts
+- the cases beside the change drive fake doors, and the change adds no door
+- each new function carries one line naming this ticket, which holds the approach
 
 <!-- the form is checklist -->
 
