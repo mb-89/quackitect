@@ -89,7 +89,12 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 57005e0893d436fc164ecbaafdff228c38b608bb
+    hash_after: 57005e0893d436fc164ecbaafdff228c38b608bb
 ---
 
 # Ask
@@ -114,6 +119,26 @@ Section numbers drift from rule numbers, history sits outside the rationales, an
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+Three findings land, and each one goes where its reading belongs:
+
+| the finding | where it lands | what it reads |
+|---|---|---|
+| `History` | the paragraph schema, projected into Vale | a marker list, off over `spec/rationales` |
+| `StarNeedsSection` | a rule in `.claude/skills/level0/lib/tree.js` | a guidance note, and the rationale its frontmatter names |
+| `RuleNamesItsFailure` | the same module | a rule line, and the failure standing beside the instruction |
+
+The readings:
+
+- a starred rule takes its number, and the rationale wants a section opening on that number
+- the marker list stands beside the words the tree refuses, so one source holds both
+- a rule line reads as two sentences: what the reader does, and what breaks without it
+- the star rule and the failure rule read a pair of files, so they stand where the tree rules stand
+
+Rule twelve is the one the failure rule holds, so it stays in the note. Each
+finding lands at warning, and the implement step names every place it draws.
+The notes take the second sentence where it stands missing, and each rule turns
+to error in the change leaving the tree clean.
 
 ## review
 
