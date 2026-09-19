@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -102,6 +102,10 @@ record:
     hash_after: 60a78552c6259007bde5c3aec1e0241840908d7c
     returns: 1
     why: "`takeable` stands in `src/scripts/pull-hand.js`, and `src/scripts/pull.js` re-exports it; the gate naming `helper` beside `person` and `children` stands in `writesHere`; that function stands under `.claude/skills/level0/lib/ticket.js`, so the change lands there; in that function the agent line stands above the helper line, so name it above; the gate reads the box off the hand `handRule` builds, so name the field it gains there; `the-spawn-takes-a-step` stands closed, and a hand writes under `Discussion` alone there [[spec/guidance/tickets]]; that line drops its count, because a command answers it [[spec/guidance/voice]]"
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 9e40a26457e2993b848dcd0d239c13e1ee4f9819
+    hash_after: 9e40a26457e2993b848dcd0d239c13e1ee4f9819
 ---
 
 # Ask
@@ -127,34 +131,33 @@ A leaf `by: helper` parks today. The spawn answer passes it, a hand under `--as`
 
 ### approach
 
-A helper leaf gates on the box, the way an agent step gates, and the helper is its one taker.
+The helper line gates on the box the way the agent line above it gates, and `hand.agent` already carries the box.
 
-| the finding | where it lands |
+| the answer | where it lands |
 |---|---|
-| the gate | `takeable` in `src/scripts/pull.js` |
+| the gate | `writesHere`, under `.claude/skills/level0/lib/ticket.js` |
 | the taker | the spawn row of [[spec/design_output/pull#a-hand-of-its-own]] |
 | the case | `test/level0/pull.test.js` |
-| the count | [[spec/tickets/the-spawn-takes-a-step]], which reads three |
+| the count | the `Discussion` of [[spec/tickets/the-spawn-takes-a-step]] |
 
-**The gate.** `takeable` parks a helper leaf on every box, because it names `helper` beside `person` and `children`. An agent step reads one line below it, and that line gates on the box. The helper leaf moves to that shape:
+The gate reads one field, and `handRule` in `src/scripts/pull-hand.js` fills it:
 
-| the box | what the leaf reads |
+| the box | what a leaf under `by: helper` reads |
 |---|---|
 | carrying a harness | takeable, because the session spawns the hand |
 | off a harness | parked, because the shell moves nothing |
 
-`branch done` then holds the group open where a spawn stands, and closes it where none does. That is the wall the ask names, with one side answering on each box.
+`branch done` then holds the group open where a spawn stands, and closes it where the box carries a harness.
 
-**The taker.** The design row reads "parked for a person or a spawned hand". A leaf under `by: helper` admits one taker, so the row names the helper alone. `takeable` already refuses a person there, and the row now says the same.
+Three answers follow:
 
-**The case.** The ask's third row wants the shell answer proven. Two cases in `pull.test.js` drive one group whose only open leaf reads `by: helper`:
+- the spawn row names the helper alone, because a leaf under `by: helper` admits one taker
+- two cases drive one group whose only open leaf reads `by: helper`, one box a side
+- the count goes under `Discussion` on a closed ticket, and names `spawnPrompt` as what answers it
 
-| the box the case builds | what it reads |
-|---|---|
-| carrying no harness | the shell's own answer, which moves nothing |
-| carrying a harness | `spawn`, the helper name, and the prompt |
+The case off a harness reads the shell's own answer, and the case carrying one reads `spawn` with the helper name and the prompt.
 
-**The count.** The prompt `spawnPrompt` writes carries four steps, and two of them carry a command. `the-spawn-takes-a-step` reads three. That note takes the correction, and names `spawnPrompt` as what answers it.
+[[spec/guidance/tickets]] holds the rule that a hand writes under `Discussion` alone on a ticket it holds no step of.
 
 ## review
 
