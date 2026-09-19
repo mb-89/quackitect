@@ -89,7 +89,12 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 27b0904e1fc84e945c95bddb1f312515280534dd
+    hash_after: 27b0904e1fc84e945c95bddb1f312515280534dd
 ---
 
 # Ask
@@ -112,6 +117,57 @@ doors pass quietly for minutes, and the check finds it later
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+- one line to the chat where the server stops answering
+- one case over the bridgehead's fall road
+- one case over the doctor's line, which reads right already
+
+**What stands.** `down` in `hooks/level0.js` writes one `warn` row to the
+session log and carries on. `saidDown` holds it to one row a fall, and the
+answer of a server clears that flag. So a second fall says so again.
+
+| who learns of a fall | how |
+|---|---|
+| the session log | one `warn` row |
+| `./RUNME.sh doctor` | `none at <the health call>`, when a person asks |
+| a person watching | the row, once they open that file |
+
+**The gap.** A row in a file nobody opens reaches nobody. The doors then pass
+quietly, and the check finds the fall minutes later.
+
+[[spec/tickets/the-session-says-its-cage]] carries the same shape at another
+moment. That one covers a server standing down at the session start, and this
+one covers a server falling under a running session.
+
+**The change.** `down` says it where a person stands, beside the row it writes.
+
+| what changes | where |
+|---|---|
+| `down` writes one line through the harness log | `hooks/level0.js` |
+| the line names the health call and the two commands | the same file |
+| a helper wraps that write, because a harness carrying no such door throws | the same file |
+
+The hook reaches the person through `$.ui.log`, the way the level one hook
+says its own lines. A harness offering no `$.ui` leaves the row in the session
+log, and nothing throws.
+
+**The cases.** Each goes over a fake harness, so no door runs live.
+
+| the case | what it reads |
+|---|---|
+| the server answers nothing | one chat line naming the health call |
+| the server answers nothing twice | one line, because `saidDown` holds it |
+| the server answers, then falls | a second line, because the answer clears the flag |
+| a harness carrying no `$.ui` | the row alone, and no throw |
+
+**The doctor.** The second line of the ask reads as met. `serverLine` answers
+`none at <the health call>` where nothing answers, and `doctor` prints it under
+`server`. The case holds that wording, so a later change says so.
+
+**What this leaves.** A fall between two calls of one turn reaches the person
+at the next call, and no sooner. The bridgehead speaks where an event reaches
+it, so a quiet stretch stays quiet. A watcher polling the health call is its
+own ticket, and this one mints none.
 
 ## review
 
