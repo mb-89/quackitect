@@ -75,7 +75,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: split
+step: children
 record:
   - step: sync
     hand: box ca870d4f20f4 · claude-code-remote
@@ -88,6 +88,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-person-step-holds already carries every commit on main.
+  - step: split
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: c319945fc8d3681b5fcd41bfd7bcdfd244668049
+    hash_after: c319945fc8d3681b5fcd41bfd7bcdfd244668049
 ---
 
 # Ask
@@ -110,13 +114,19 @@ The pull inserts a person step where a leaf fails or meets refusals past the cap
 
 ## children
 
-<!-- every child as a link, one a line, with its process -->
+- [[spec/tickets/a-person-reads-the-pull]], on [[spec/processes/trivial]]
+- [[spec/tickets/escalate-inserts-a-person-step]], on [[standard]]
+- [[spec/tickets/person-step-refuses-an-agent]], on [[standard]]
+- [[spec/tickets/refusal-cap-inserts-no-person]], on [[spec/processes/trivial]]
+- [[spec/tickets/the-group-leaves-at-todo]], on [[standard]]
 
 <!-- the form is list -->
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- each child carries one ask a reader takes whole, and the two smallest ride the trivial route
+- the five cover the person step, the caps, the group's leaving and the words a person meets
+- `escalate-inserts-a-person-step` names its one dependency, and the others wait on nothing
 
 <!-- the form is checklist -->
 
