@@ -89,7 +89,12 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 5dfb13d2512cf94223b9febb353210abd4b5ae9e
+    hash_after: 5dfb13d2512cf94223b9febb353210abd4b5ae9e
 ---
 
 # Ask
@@ -111,9 +116,41 @@ The level one and pane plugins stand on after their question settles, and hands 
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+An experiment carries a `decide` step from its first day, and the retro holds
+on it. So the two standing plugins leave by that road.
 
-<!-- the form is text -->
+| what changes | how |
+|---|---|
+| `spec/processes/experiment.yaml` | a route whose last step is `decide` |
+| the retro's route | holds while an experiment ticket stands open |
+| `.claude/skills/level1` | leaves, under a ticket of that process |
+| `.claude/skills/pane` | the same |
+| [[spec/design_output/work]] | says what an experiment is, and what each decision does |
+
+The route, one step a row:
+
+| the step | who takes it | what it answers |
+|---|---|---|
+| ask | anyone | the question the trial answers, and what decides it |
+| run | anyone | what the trial does, and what it shows |
+| decide | person | keep, drop or grow, with the reason under it |
+
+What each decision does:
+
+| the decision | what follows |
+|---|---|
+| keep | the code moves into the tree, and the folder under `.claude/skills` goes |
+| drop | the code leaves, and the ticket closes on the reason |
+| grow | a ticket of its own carries it, and the experiment closes `became` |
+
+The retro's hold reads the way `retro notes` reads the private folder. It asks
+for every open ticket of the experiment process, and answers the names it
+finds. A retro closing over an open trial leaves the tree carrying that trial.
+
+The two removals reach past the folders. `cli-doors.js` names the level one
+path, `spec/config/stop/level1.yml` holds its stop rules, and the design
+outputs name both plugins. `./RUNME.sh links` answers every note reaching them,
+so the removal reaches each one.
 
 ## review
 
