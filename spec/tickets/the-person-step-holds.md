@@ -75,7 +75,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/notes
+step: retro/write
 record:
   - step: sync
     hand: box ca870d4f20f4 · claude-code-remote
@@ -96,6 +96,14 @@ record:
     hand: the engine
     hash_before: 5a5b8c3993d18a9c5b8bba7f20a8ba24e5327279
     hash_after: 5a5b8c3993d18a9c5b8bba7f20a8ba24e5327279
+  - step: retro/notes
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: 65d6ca66515f930892b325b3517ea6354fdbb713
+    hash_after: 65d6ca66515f930892b325b3517ea6354fdbb713
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
 ---
 
 # Ask
@@ -144,7 +152,7 @@ The pull inserts a person step where a leaf fails or meets refusals past the cap
 
 ### drained
 
-<!-- retro notes, which passes when the private folder is empty -->
+    ./RUNME.sh retro notes
 
 <!-- the form is command -->
 
