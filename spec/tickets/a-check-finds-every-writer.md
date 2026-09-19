@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: 77a2321a2621d949a9a8996d54e9f2ecd5ce30b5
     returns: 1
     why: "| finding | fix |; |---|---|; | The rule excuses a whole file where one line names `folders.js` | Bind the escape to the line beside the copy |; | The approach pins the installer alone, so every other writer keeps the escape | Hold the whole class the ask names |; | The approach adds no rule, so the fault stands in the battery alone | Put the rule in `tree.js`, beside the ones over the same names |; | `tools.js` reads the installer already, for `surveyNamesInstalls` | Pull the loop through a function beside `installedTools` |; | The case reads the installer off disk, so no bad list reaches it | Feed that function a fake installer text |; | The case carries the two apart names by hand, as a third list | Let `folders.js` own the pair, so one list stands |; | The installer holds two more lists of old spellings | Cover the folder rename loop and the log loop |; A probe over `privateFolderOwned` passes a file importing `folders.js` and; spelling `.se/bin`, so a writer the ask names stands green today. Run; `git ls-files '*.js' '*.go' '*.sh' | xargs grep -l folders.js` for the writers; the escape covers."
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 4d3782295a0da08ca888f90cd3028e42eeed41da
+    hash_after: 4d3782295a0da08ca888f90cd3028e42eeed41da
 ---
 
 # Ask
@@ -124,25 +128,33 @@ runtime files land beside the private folder again after each move
 
 <!-- the form is text -->
 
-The check refuses a stale spelling in a source file already, and one list stands
-outside that rule: the installer's.
+The escape covers a whole file today, and the installer's lists stand outside
+every rule. Both answers land in the module owning the names:
 
-| what holds a name | where it stands | what reads it |
+| what changes | where it stands | what it does |
 |---|---|---|
-| the names the runtime half takes | `MOVED` in `.claude/skills/level0/lib/folders.js` | the spelling rule in `.claude/skills/level0/lib/tree.js` |
-| the move a box meets on its next run | the loop in `src/scripts/install.sh` | a shell, which imports nothing |
+| the escape | `privateFolderOwned` in `.claude/skills/level0/lib/tree.js` | a spelling passes where the line itself or the one above names the owner |
+| the installer's lists | a rule beside it, in the same module | each name a loop moves stands in `MOVED`, and each name there has a mover |
+| the reader of a loop | `movedNames(text)` beside `installedTools` in the level zero tools module | it answers the names a loop carries, out of a text |
+| the names standing apart | `APART` in `.claude/skills/level0/lib/folders.js` | it names each one, with the reason beside it |
 
-So a case reads the installer off disk, pulls the names out of its loop, and
-holds the pair equal. A name landing in one list alone turns it red, which is
-the change reaching every writer at once.
+The readings:
 
-Two names stand apart, and the case names why:
+- the escape reads the line under the spelling and the one above it, the way an exemption names its reason
+- the installer carries three loops: the folder rename, the names the half takes, and the log
+- the reader takes a text, so a case hands it a bad list and reads the refusal
+- `APART` holds `hold.json` and `registry.json`, so the rule and the case read one list
 
-- `hold.json` rides the `hold` entry, because the rule reads a word bound after the name
-- `registry.json` moves in the home folder, under a block of its own
+The cases:
 
-The case stands in `test/contract/tree.test.js`, beside the rules holding the
-same names, and reads both files through the disk door.
+- a file importing the owner and spelling a stale path elsewhere comes back refused
+- a file naming the owner in the line above the spelling passes
+- a loop missing a name the rule holds comes back refused
+- a loop holding a name no rule holds comes back refused
+
+The rule cases stand in `test/contract/tree.test.js`, beside the rules over the
+same names. The reader's cases stand in `test/level0/tools.test.js`, beside the
+survey it reads with.
 
 ## review
 
