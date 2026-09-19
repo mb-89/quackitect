@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-person-step-holds
-step: design/draft
+step: design/review
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -92,6 +92,11 @@ steps:
 process: [[standard]]
 process_hash: d1fd9cd113889f29
 depends_on: ["the-hand-carries-the-session"]
+record:
+  - step: design/draft
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: 0fddd7795268d137fafe613adb9ccc2caff0edb2
+    hash_after: 0fddd7795268d137fafe613adb9ccc2caff0edb2
 ---
 
 # Ask
@@ -118,7 +123,22 @@ A hand that cannot go on without a person has no verb to say so. A ticket that f
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+The design output carries the approach, and this change adds the verb a hand reaches it by. For details, see [[spec/design_output/pull#a-person-step-goes-in]].
+
+| the piece | where it stands |
+|---|---|
+| the inserter, which puts a `person-<n>` step before a target with the question under `asks` | `withPersonStep`, standing |
+| the choice answer, which options turn on | `withPersonStep`, standing, and this change hands it the words |
+| the count that inserts a step where hand-backs meet refused in a row | the hand-back, standing |
+| the split refusal past the cap a ticket carries | `withPersonStep`, standing |
+| `branch escalate <question>`, which a hand runs | this change |
+
+The verb stands beside the other verbs the branch carries, and it reads the hold the pull writes.
+
+- it puts the step before the held leaf through the inserter, and points `step` at it
+- `--options a,b,c` makes the answer a `choice`, and the inserter writes the words under it
+- it drops the hold, commits by ticket and step, pushes, and hands out the next ticket
+- a run with no hold standing comes back refused, naming the pull
 
 <!-- the form is text -->
 
