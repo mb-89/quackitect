@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -99,6 +99,17 @@ record:
     hand: box fa49097ce66c · claude-code-remote · helper-2
     hash_before: f972da3163683c379b9ee4ff74d44613060a0318
     hash_after: f972da3163683c379b9ee4ff74d44613060a0318
+  - step: implement/tests-red
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: b7fe463450e8349d3d00baa742b3a2b067355dd2
+    hash_after: 5e6cae67261ab664ac0c1007bd890ea764f0be7f
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
