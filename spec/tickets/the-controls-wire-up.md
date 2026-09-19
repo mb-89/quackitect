@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -115,6 +115,12 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 281eb05784b3d6187c319ff32ad5b7c2cfbc9f93
     hash_after: 281eb05784b3d6187c319ff32ad5b7c2cfbc9f93
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-6
+    hash_before: f14236bf90d974af82833d98b3b8243886900b9f
+    hash_after: f14236bf90d974af82833d98b3b8243886900b9f
+    returns: 3
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | for the pull, yes. The stop half names its rows short |; | is what the diff touches beyond the ask trivial | yes, the draft commit writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 |; | does a retro stand in the handback | no, and the retro stands at the branch's close |; | does every rule the approach adds carry a case | yes, the done_when carries a line for each |; | does every claim read true | yes but one, and the gate sentence reads other than its table |; TL;DR:; The three needs of the last round land. The `queue` row, the Ask and the done_when each read true now.; The `queue` row matches `pull.js`, which refuses a named ticket there and names the queue.; The autonomy half stands out of the Ask, and the Discussion carries the call for the owner.; `engine.autonomy` reaches the schema, the config and the code nowhere, so the cut holds.; The gate sentence under the stop table reads other than the table above it.; The findings, one a line:; The gate `queueWaits` carries reads `queue`, so it stands down at `unbound` too.; A check taking that gate stands down at `unbound`, and the table above it reads refuses.; Write the gate as a read of `god`, so the `unbound` column holds.; The stop table leaves `no-stop-line` and `warnings-standing` out, and each holds a turn open.; Say what each does at `god`, because [[spec/design_output/config#the-engine-controls]] puts nothing in its refuses column.; The word mechanical takes in the owner's hold and `stop-hook-off`, which the sentence leaves standing.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the gate sentence reads `god`, so the `unbound` column holds | open |; | 2 | the stop half says what `no-stop-line` and `warnings-standing` do at `god` | open |; | 3 | the sentence names the rows that move, beside the word mechanical | open |; | 4 | the review hand reads the approach again | open |"
 ---
 
 # Ask
@@ -187,35 +193,37 @@ fail
 
 | the question reviewing asks | the answer |
 |---|---|
-| does the approach answer the ask | for the binding, yes. The autonomy half stands cut, and the Ask still asks for it |
-| is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |
-| what does `./RUNME.sh check` answer | 0, with the server standing |
-| does every rule the approach adds carry a case | for the pull at `unbound`, yes. For the three stop rows, no |
-| does every claim carry a proof | yes but one, and the `queue` row reads other than the tree |
+| does the approach answer the ask | for the pull, yes. The stop half names its rows short |
+| is what the diff touches beyond the ask trivial | yes, the draft commit writes this ticket alone |
+| what does `./RUNME.sh check` answer | 0 |
+| does a retro stand in the handback | no, and the retro stands at the branch's close |
+| does every rule the approach adds carry a case | yes, the done_when carries a line for each |
+| does every claim read true | yes but one, and the gate sentence reads other than its table |
 
 TL;DR:
 
-- The autonomy cut holds. `grep -rn autonomy src .claude spec` answers nothing, so the draft matches the tree.
-- The stop table reads true. `queueWaits` reads `engine.binding`, and the three rows above it read none.
-- The anchor stands. `spec/design_output/config` carries The engine controls.
-- One row of the binding table reads other than the tree, and two things the approach adds carry no case.
+- The three needs of the last round land. The `queue` row, the Ask and the done_when each read true now.
+- The `queue` row matches `pull.js`, which refuses a named ticket there and names the queue.
+- The autonomy half stands out of the Ask, and the Discussion carries the call for the owner.
+- `engine.autonomy` reaches the schema, the config and the code nowhere, so the cut holds.
+- The gate sentence under the stop table reads other than the table above it.
 
 The findings, one a line:
 
-- The `queue` row's `pull <ticket>` column reads other than the tree. `pull.js` refuses a named ticket there.
-- Its own comment says so, and [[spec/design_output/pull#the-hand-out]] carries the rule.
-- So the row says what the draft leaves standing, or the draft says that road moves too.
-- The Ask carries the autonomy table and its done_when line, and the approach cuts that half.
-- Cut both from the Ask, or write the owner's word on the drop into the Discussion.
-- The three stop rows standing down at `god` carry no case. Name one, beside the pull at `unbound`.
+- The gate `queueWaits` carries reads `queue`, so it stands down at `unbound` too.
+- A check taking that gate stands down at `unbound`, and the table above it reads refuses.
+- Write the gate as a read of `god`, so the `unbound` column holds.
+- The stop table leaves `no-stop-line` and `warnings-standing` out, and each holds a turn open.
+- Say what each does at `god`, because [[spec/design_output/config#the-engine-controls]] puts nothing in its refuses column.
+- The word mechanical takes in the owner's hold and `stop-hook-off`, which the sentence leaves standing.
 
 What the agent needs:
 
 | number | need | status |
 |---|---|---|
-| 1 | the `queue` row reads the tree, or names the road it moves | open |
-| 2 | the Ask drops the autonomy half, or the Discussion carries its word | open |
-| 3 | the done_when names a case for the three stop rows at `god` | open |
+| 1 | the gate sentence reads `god`, so the `unbound` column holds | open |
+| 2 | the stop half says what `no-stop-line` and `warnings-standing` do at `god` | open |
+| 3 | the sentence names the rows that move, beside the word mechanical | open |
 | 4 | the review hand reads the approach again | open |
 
 # implement
