@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -115,6 +115,10 @@ record:
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: 2b12c0ece0908790066771bd981e593945273ed8
     hash_after: 2b12c0ece0908790066771bd981e593945273ed8
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-6
+    hash_before: d584c290b090ead197a2330cf2abbafa8baab789
+    hash_after: d584c290b090ead197a2330cf2abbafa8baab789
 ---
 
 # Ask
@@ -188,21 +192,24 @@ survey it reads with.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
 | finding | fix |
 |---|---|
-| The tighter escape refuses copies standing across the tree today | Name each file it catches, and say what each one takes |
-| `run`, `runtime` and `log` stand in no list the rule reads | Give each loop its own list in `folders.js`, beside `MOVED` |
-| One reader answers the names of three loops that differ | Let the reader answer each loop apart, so each rule reads one list |
-| The new rule over the installer carries no name | Name it beside the rules in `tree.js`, and link its note |
+| The writer list holds `src/stub/RUNME.sh`, which names the owner already | Drop it, and keep the seven the escape catches |
+| The installer takes a comment at each of its spellings | Say the installer takes several, and every other writer one |
+| `APART` gives each name a reason, so the rule excuses it both ways | Say which side each name stands apart on |
+| The rule over the installer carries no note link | Link its note beside it in `tree.js` |
 
-The redraft answers the reader, the fake text, and the two names standing apart.
+The approach answers the ask, and names the pieces, the lists, the rule, the
+cases and the writers. Each finding above lands inside the implement step.
 
-`./RUNME.sh check` answers 0 on this tip, so every copy the tighter escape
-catches turns the tree red at the same commit. Run
-`git grep -n '\.se/\.runtime\|\.se/\.retro' -- src .claude` for the copies, and
-read each against the line above it.
+A probe over the tighter escape reads every tracked `.js`, `.go` and `.sh` file
+under `src` and `.claude`. It catches `.claude/skills/level0/hooks/level0.js`,
+`.claude/skills/level0/lib/vehicle.js`, `src/index/index.go`,
+`src/lsp/bridge.go`, `src/lsp/serve.go`, `src/lsp/tree.go` and
+`src/scripts/install.sh`, which the draft names. `./RUNME.sh check` answers 0
+on this tip, so each of the seven turns the tree red at the same commit.
 
 # implement
 
