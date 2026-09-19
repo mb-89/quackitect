@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -149,6 +149,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 5387e4f82b24 · claude-code-remote · helper-11
+    hash_before: 51d669cf35a73d099191cb7b77c37f5e73ec1358
+    hash_after: 51d669cf35a73d099191cb7b77c37f5e73ec1358
+    returns: 1
+    why: "| finding | fix |; |---|---|; | `spec/design_output/tree.md` tables the rules over two files, and the new rule stands outside it | Add its row, and name the two files it weighs |; | `spec/design_output/private.md` carries the older escape, so a reader takes an import as cover | Say the escape binds to the line, and to the comment run above it |; | `loopNames` reads the loop header for the private folder, so a loop of bare names carries no marker and passes | Mark a loop whose names meet a list, whatever its header spells |; | The red case over a loop naming no list moves to a header spelling that folder | Restore the bare case once the rule holds it |; the branch answers both lines of the ask, and the tighter escape catches the seven writers; `./RUNME.sh check` answers 0 on this tip; `./RUNME.sh branch review` says the check passes, and the route hands this ticket to a retro; every file the branch touches stands inside the ask, and the moved cases redesign nothing; each rule carries a case, and my probe refuses a stale spelling standing under an import; my probe adds a loop of bare names to the installer text, and the rule answers nothing"
 ---
 
 # Ask
@@ -380,17 +386,55 @@ line, and no name moves.
 
 <!-- the form is files -->
 
+- .claude/skills/level0/hooks/level0.js
+- .claude/skills/level0/lib/folders.js
+- .claude/skills/level0/lib/tools.js
+- .claude/skills/level0/lib/tree.js
+- .claude/skills/level0/lib/vehicle.js
+- spec/tickets/a-check-finds-every-writer.md
+- src/index/index.go
+- src/lsp/bridge.go
+- src/lsp/serve.go
+- src/lsp/tree.go
+- src/scripts/install.sh
+- test/contract/folders.test.js
+- test/contract/tree.test.js
+- test/level0/tools.test.js
+- spec/guidance/review/reviewing.md
+- spec/design_output/tree.md
+- spec/design_output/private.md
+- spec/design_input/the-runtime-files-stand-apart.md
+- src/scripts/pull-chapter.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+
+| finding | fix |
+|---|---|
+| `spec/design_output/tree.md` tables the rules over two files, and the new rule stands outside it | Add its row, and name the two files it weighs |
+| `spec/design_output/private.md` carries the older escape, so a reader takes an import as cover | Say the escape binds to the line, and to the comment run above it |
+| `loopNames` reads the loop header for the private folder, so a loop of bare names carries no marker and passes | Mark a loop whose names meet a list, whatever its header spells |
+| The red case over a loop naming no list moves to a header spelling that folder | Restore the bare case once the rule holds it |
+
+- the branch answers both lines of the ask, and the tighter escape catches the seven writers
+- `./RUNME.sh check` answers 0 on this tip
+- `./RUNME.sh branch review` says the check passes, and the route hands this ticket to a retro
+- every file the branch touches stands inside the ask, and the moved cases redesign nothing
+- each rule carries a case, and my probe refuses a stale spelling standing under an import
+- my probe adds a loop of bare names to the installer text, and the rule answers nothing
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the lists stand in `folders.js` alone, and the rule holds the installer copy against them. The notes over the rules carry neither the new rule nor the tighter escape.
 
 # Discussion
 
