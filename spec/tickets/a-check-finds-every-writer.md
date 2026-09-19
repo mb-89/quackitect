@@ -313,11 +313,15 @@ on this tip, so each of the seven turns the tree red at the same commit.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/folders.test.js test/level0/tools.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -325,11 +329,35 @@ on this tip, so each of the seven turns the tree red at the same commit.
 
 <!-- the form is text -->
 
+A moved name reaches every writer, because the escape binds to the line and the
+installer answers to the same lists:
+
+| what lands | where |
+|---|---|
+| the line-bound escape | `privateFolderOwned` in `.claude/skills/level0/lib/tree.js` |
+| the rule over the installer | `installerHoldsTheNames` beside it |
+| the reader of a marked loop | `loopNames` in the level zero tools module |
+| the lists and the names apart | `RENAMED`, `LOGGED` and `APART` in `folders.js` |
+| the cases | `test/contract/folders.test.js` and `test/level0/tools.test.js` |
+
+- a spelling passes where its own line, or the comment run above it, names the owner
+- a loop reaching the private folder names its list in a comment, and the rule holds the pair
+- `APART` names the side each odd name misses, so one list answers both readings
+- the installer spells the folder once, in a variable every other line reads
+
+The name rules take a contract file of their own, because the file they stood
+in sits at its ceiling. The writers the tighter escape names each take a comment
+line, and no name moves.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the lists, the reader, the two rules, the installer, the writers the rule names, and the cases
+- the disk door and the git door carry every reading, and the fake tree answers both in the cases
+- each rule, each list and each copy carries the pointer at the note the ask names
 
 # verdict
 
