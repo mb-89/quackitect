@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -145,6 +145,17 @@ record:
     hash_after: 6e760ecdf43498182402da11fe02275ba5675a0f
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 672b604740c9ec6a6339d3a59c77360bc9612c96
+    hash_after: 672b604740c9ec6a6339d3a59c77360bc9612c96
+    answered:
+      - name: tests
+        exit: 0
+        said: green
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -313,7 +324,15 @@ Three hunks carry the change, and each answers one case:
 |---|---|
 | the kind list | takes `note` at 181, the shade the hash picked before |
 | `saidStyle` | reads the kind list for a note and an answer alike |
-| `pairsOf` | gives a prompt the notes standing inside its turn, and gives a note the prompt above it |
+| `pairsOf` | gives a prompt every note up to the prompt after it, and gives a note the prompt above it |
+
+The verdict found three things, and this round answers each:
+
+| the finding | what answers it |
+|---|---|
+| the note the two hunks point at takes none of the change | the Colours chapter names the note line, and the details chapter carries a table a row reads |
+| `pairsOf` drops a note standing after the answer | a flag of its own marks the prompt's run, and `answered` keeps the answer alone |
+| no case reads that shape | a fourth case holds a note each side of the answer, and one under the prompt after it |
 
 The second hunk takes a copy out. `saidStyle` wrote the answer's number a second time, and the two agreed by hand. Both read the kind list now, so the number stands in one place.
 
