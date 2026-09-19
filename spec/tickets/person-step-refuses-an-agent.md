@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-person-step-holds
-step: implement/tests-green
+step: verdict
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -118,6 +118,17 @@ record:
     hash_after: 28479a0da6406e15c59d4b9c600a9d1c5d03ba86
     answered:
       - name: lint
+        exit: 0
+        said: 87 stand at warning, which the panel draws and check allows.
+  - step: implement/tests-green
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: 618c76742cda61122552b3b33bf5701d37af3134
+    hash_after: 618c76742cda61122552b3b33bf5701d37af3134
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 70 test(s) pass in 7 file(s)
+      - name: check
         exit: 0
         said: 87 stand at warning, which the panel draws and check allows.
 ---
@@ -269,25 +280,42 @@ A person's name enters through `handOf`, which feeds the hold's file name and th
 
 ### tests
 
-<!-- the same tests pass -->
+    ./RUNME.sh branch test
 
 <!-- the form is command -->
 
 ### check
 
-<!-- the check is green on the commit -->
+    ./RUNME.sh check
 
 <!-- the form is command -->
 
 ### says
 
-<!-- what changes and why, for a reader who was not there -->
+A person's hand carries who, and the record carries the role. A config key puts a signed tip in front of a person's hand-back.
+
+| the piece | where it lands |
+|---|---|
+| the hand off a harness | `handOf` reads the git author through the door, and answers `person <name>` |
+| the record | `roleOf` takes the name off, so every record write and the take's commit hold the role |
+| the `not` rule | it reads a hand as its role, because the record holds roles |
+| the signing door | `signFaults` reads the tip's signature where `work.personSigns` switches it on |
+
+The git door grows two reads, `authorName` and `signatureOf`, and the fake process answers both.
+
+- a box naming no author answers the role alone, so a tree with no git name keeps what it has
+- `G` and `U` pass, which is a good signature and a good one under a key nobody trusts
+- an agent's hand-back reads no signature, and a private ticket reads none
+
+The review leaf asks two things the change answers. The name enters at `handOf` and stops at `roleOf`, so the hold alone carries it. A hold standing from before carries the old file name, and the next pull writes one under the new name.
 
 <!-- the form is text -->
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change reaches the hand, the hand-back and the config, which the ask and the review leaf name
+- the git door grows two reads, and the fake process beside it answers both
+- each new function carries one line pointing at the hand-rule chapter
 
 <!-- the form is checklist -->
 
