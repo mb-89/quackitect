@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8
@@ -111,6 +111,10 @@ record:
     hash_after: b4b4cf28dbcd31b637409aee8dac8f2debfb4c19
     returns: 2
     why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | for the binding, yes. The autonomy half stands cut, and the Ask still asks for it |; | is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does every rule the approach adds carry a case | for the pull at `unbound`, yes. For the three stop rows, no |; | does every claim carry a proof | yes but one, and the `queue` row reads other than the tree |; TL;DR:; The autonomy cut holds. `grep -rn autonomy src .claude spec` answers nothing, so the draft matches the tree.; The stop table reads true. `queueWaits` reads `engine.binding`, and the three rows above it read none.; The anchor stands. `spec/design_output/config` carries The engine controls.; One row of the binding table reads other than the tree, and two things the approach adds carry no case.; The findings, one a line:; The `queue` row's `pull <ticket>` column reads other than the tree. `pull.js` refuses a named ticket there.; Its own comment says so, and [[spec/design_output/pull#the-hand-out]] carries the rule.; So the row says what the draft leaves standing, or the draft says that road moves too.; The Ask carries the autonomy table and its done_when line, and the approach cuts that half.; Cut both from the Ask, or write the owner's word on the drop into the Discussion.; The three stop rows standing down at `god` carry no case. Name one, beside the pull at `unbound`.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the `queue` row reads the tree, or names the road it moves | open |; | 2 | the Ask drops the autonomy half, or the Discussion carries its word | open |; | 3 | the done_when names a case for the three stop rows at `god` | open |; | 4 | the review hand reads the approach again | open |"
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 281eb05784b3d6187c319ff32ad5b7c2cfbc9f93
+    hash_after: 281eb05784b3d6187c319ff32ad5b7c2cfbc9f93
 ---
 
 # Ask
@@ -119,18 +123,12 @@ record:
 <!-- breaks, as text: what breaks if it is never done -->
 <!-- done_when, as list: one line each, decidable, naming the command that decides it -->
 
-The two engine controls the schema holds reach the pull. At `unbound` the binding hands out nothing, and `pull <ticket>` takes a named one. The autonomy decides what a session mints:
+`engine.binding` reaches the pull. At `unbound` and at `god` the plain pull hands out nothing, and `pull <ticket>` takes a named one.
 
-| value | mints |
-|---|---|
-| `finish` | notes alone |
-| `start` | into its own group |
-| `ideation` | loose tickets, which ride the group's branch on a cloud box |
+Today the pull reads the binding for the queue alone. A person sets `unbound`, and the box keeps pulling.
 
-Today the schema promises two knobs, and the pull reads the binding for the queue alone. A person sets `unbound`, and the box keeps pulling.
-
-- `./RUNME.sh branch test` passes a case where the pull at `unbound` answers wait
-- `./RUNME.sh branch test` passes a case per autonomy value on what the mint allows
+- `./RUNME.sh branch test` passes a case where the plain pull at `unbound` answers wait
+- `./RUNME.sh branch test` passes a case per stop check that stands down at `god`
 - `./RUNME.sh check` answers 0
 
 # design
@@ -141,23 +139,26 @@ Today the schema promises two knobs, and the pull reads the binding for the queu
 
 ### approach
 
-This ticket carries `engine.binding` alone. The owner drops `engine.autonomy`, and the schema declares it no longer, so the second half of the ask stands closed.
+This ticket carries `engine.binding` alone. `engine.autonomy` stands nowhere in the schema, the config or the code, and the Ask now asks for the binding alone.
 
 [[spec/design_output/config#the-engine-controls]] owns what each binding value means. This draft names where the code reads it, and restates none of it.
 
 | control | who reads it today | who reads it after |
 |---|---|---|
-| `engine.binding` | the stop hook, for the queue rule | the pull's hand-out too |
+| `engine.binding` | the stop hook, for the queue rule, and the pull, for a named ticket | the pull's plain hand-out too |
 
 The box the command line builds asks the config for each control, beside the
-words and the counts it asks for already. So the pull and the mint each read
-one field of `it`, and the config door stays the one reader of the file.
+words and the counts it asks for already. So the pull reads one field of `it`,
+and the config door stays the one reader of the file.
 
 | binding | the plain pull | `pull <ticket>` |
 |---|---|---|
-| `queue` | hands out the next leaf | hands out that ticket |
+| `queue` | hands out the next leaf | refuses, and names the queue |
 | `unbound` | answers wait, and names the binding | hands out that ticket |
 | `god` | answers wait, and names the binding | hands out that ticket |
+
+The `queue` row stands as `pull.js` writes it today, and this ticket leaves that
+road alone. The two rows under it are what it lands.
 
 The stop hook stands half done already, and the table says which half:
 
@@ -325,6 +326,6 @@ What the agent needs:
 
 # Discussion
 
-The binding half of this ticket stands ready. The autonomy half waits on one answer: which of the three readings the tree keeps.
+The binding half of this ticket stands ready. A cloud box cut the autonomy half out of the Ask. `engine.autonomy` reaches no schema, no config and no code, and three notes read it three ways. A ticket of its own takes it where the owner wants it back, with one reading named. The owner reads this call at the merge.
 
 A session runs under `engine.binding` at `queue` today, and the stop rule hands it work while a free ticket stands. So the `unbound` row of the draft is the one a person reaches for, and it is the row the draft gets right.
