@@ -20,7 +20,7 @@ Biome holds.
 | the rule | the two things it weighs |
 |---|---|
 | `SettingsNameBinaries` | `.vscode/settings.json`, `src/scripts/install.sh` |
-| `EditorDrawsWriteRules` | `.vscode/settings.json`, `.vale.ini` |
+| `EditorDrawsWriteRules` | `.vscode/settings.json`, `spec/config/editor.vale.ini` |
 | `BiomeOnWindows` | `.vscode/settings.json`, the platform map inside it |
 | `ExtensionsOnOffer` | `.vscode/extensions.json`, `.vscode/settings.json` |
 | `StopFolderIsData` | `spec/config/stop`, `lib/stop.js` |

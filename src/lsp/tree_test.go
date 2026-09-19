@@ -7,7 +7,7 @@ import (
 
 const goodSettings = `{
   "vale.valeCLI.path": ".se/.runtime/bin/vale",
-  "vale.valeCLI.config": ".vale.ini",
+  "vale.valeCLI.config": "spec/config/editor.vale.ini",
   "vale.valeCLI.installVale": false,
   "vale.valeCLI.minAlertLevel": "inherited",
   "vale.valeCLI.lintOnChange": true,
@@ -29,11 +29,12 @@ const goodInstall = `here() {
 func wholeTree(t *testing.T, over map[string]string) *Tree {
 	t.Helper()
 	files := map[string]string{
-		Settings: goodSettings,
-		Offered:  `{"recommendations": ["chrischinchilla.vale-vscode", "biomejs.biome"]}`,
-		Install:  goodInstall,
-		ValeIni:  "MinAlertLevel = suggestion\n",
-		ToolsAt:  `{"node": {"version": "1.2.3"}}`,
+		Settings:  goodSettings,
+		Offered:   `{"recommendations": ["chrischinchilla.vale-vscode", "biomejs.biome"]}`,
+		Install:   goodInstall,
+		ValeIni:   "MinAlertLevel = suggestion\n",
+		EditorIni: "StylesPath = styles\nMinAlertLevel = suggestion\n",
+		ToolsAt:   `{"node": {"version": "1.2.3"}}`,
 	}
 	for name, text := range over {
 		files[name] = text
@@ -81,6 +82,17 @@ func TestTheEditorDrawsTheWriteRules(t *testing.T) {
 	})
 	one := onlyOne(t, editorDrawsWriteRules(tree), "EditorDrawsWriteRules")
 	if !strings.Contains(one.Message, "minAlertLevel to inherited") {
+		t.Errorf("the message reads %q", one.Message)
+	}
+}
+
+// [[spec/design_output/lsp#the-panel-reads-the-battery]]
+func TestTheEditorsValeTurnsOnNoStyle(t *testing.T) {
+	tree := wholeTree(t, map[string]string{
+		EditorIni: "StylesPath = styles\n[*.md]\nBasedOnStyles = VoiceParagraph\n",
+	})
+	one := onlyOne(t, editorDrawsWriteRules(tree), "EditorDrawsWriteRules")
+	if !strings.Contains(one.Message, "turns on a style") {
 		t.Errorf("the message reads %q", one.Message)
 	}
 }

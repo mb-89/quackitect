@@ -38,8 +38,8 @@ import {
   surveyNamesInstalls,
   treeFaults,
   treeOf,
-  VALE_INI,
 } from "../../.claude/skills/level0/lib/tree.js";
+import { EDITOR_VALE_INI } from "../../.claude/skills/level0/lib/servers.js";
 import { boxOf } from "../../.claude/skills/level0/lib/private.js";
 import { SESSION } from "../../src/scripts/hand.js";
 import { disk } from "../../src/doors/disk.js";
@@ -218,7 +218,7 @@ test("a settings file drawing at its own level is refused", () => {
       [EDITOR_SETTINGS]: edited(EDITOR_SETTINGS, (said) => {
         said["vale.valeCLI.minAlertLevel"] = "warning";
       }),
-      [VALE_INI]: text(VALE_INI),
+      [EDITOR_VALE_INI]: text(EDITOR_VALE_INI),
     }),
   );
 
@@ -226,6 +226,19 @@ test("a settings file drawing at its own level is refused", () => {
   assert.equal(found[0].rule, "EditorDrawsWriteRules");
   assert.match(found[0].message, /inherited/);
   assert.deepEqual(editorDrawsWriteRules(here), []);
+});
+
+// [[spec/design_output/lsp#the-panel-reads-the-battery]]
+test("an editor config turning on a style is refused, because the panel reads the battery", () => {
+  const found = editorDrawsWriteRules(
+    fakeTree({
+      [EDITOR_SETTINGS]: text(EDITOR_SETTINGS),
+      [EDITOR_VALE_INI]: `${text(EDITOR_VALE_INI)}[*.md]\nBasedOnStyles = VoiceParagraph\n`,
+    }),
+  );
+
+  assert.equal(found.length, 1);
+  assert.match(found[0].message, /turns on a style/);
 });
 
 test("a settings file naming a config nobody wrote is refused", () => {

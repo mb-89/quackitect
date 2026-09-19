@@ -33,6 +33,9 @@ export const EDITOR_EXTENSIONS = ".vscode/extensions.json";
 
 export const EXTENSIONS = ["chrischinchilla.vale-vscode", "biomejs.biome"];
 
+// The config the Vale extension reads, which turns on no style, so the panel draws Vale off the battery's list. [[spec/design_output/lsp#the-panel-reads-the-battery]]
+export const EDITOR_VALE_INI = "spec/config/editor.vale.ini";
+
 // [[spec/design_output/editor#what-the-tracked-settings-say]]
 export function namesTheBinaries(settings) {
   const read = settings ?? {};
@@ -40,7 +43,7 @@ export function namesTheBinaries(settings) {
   const paths = typeof biome === "string" ? [biome] : Object.values(biome);
   return {
     vale: read["vale.valeCLI.path"] === `${BIN}/vale`,
-    valeConfig: read["vale.valeCLI.config"] === ".vale.ini",
+    valeConfig: read["vale.valeCLI.config"] === EDITOR_VALE_INI,
     managesVale: read["vale.valeCLI.installVale"] === false,
     biome: paths.length > 0 && paths.every((one) => one.startsWith(`${BIN}/biome`)),
     biomeConfig: read["biome.configurationPath"] === "spec/config/biome.json",

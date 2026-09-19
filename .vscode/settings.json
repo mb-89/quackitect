@@ -1,10 +1,9 @@
 {
   "vale.valeCLI.installVale": false,
   "vale.valeCLI.path": ".se/.runtime/bin/vale",
-  "vale.valeCLI.config": ".vale.ini",
+  "vale.valeCLI.config": "spec/config/editor.vale.ini",
   "vale.valeCLI.minAlertLevel": "inherited",
   "vale.valeCLI.lintOnChange": true,
-  "vale.valeCLI.filter": ".Name == \"none\"",
   "vale.enableSpellcheck": false,
   "biome.lsp.bin": {
     "linux-x64": ".se/.runtime/bin/biome",

@@ -7,6 +7,7 @@ package main
 import (
 	"path/filepath"
 	"strings"
+	"time"
 
 	"quackitect/yaml"
 )
@@ -50,15 +51,22 @@ func (one *server) sweeps() {
 	one.panel.own = own
 	one.showsAll(tree)
 	one.guard.Unlock()
-	go one.asksBridge(nil)
+	go one.asksUntilAnswered()
+}
+
+// The whole tree's list waits for a bridge, so the ask repeats until one answers, and the panel fills with every file's findings. [[spec/design_output/lsp#the-panel-reads-the-battery]]
+func (one *server) asksUntilAnswered() {
+	for !one.asksBridge(nil) {
+		time.Sleep(bridgeRetry)
+	}
 }
 
 // [[spec/design_output/lsp]]
-func (one *server) asksBridge(paths []string) {
+func (one *server) asksBridge(paths []string) bool {
 	tree := one.checker.Tree()
 	found, ok := bridgeFindings(tree.Root, paths)
 	if !ok {
-		return
+		return false
 	}
 	got := grouped(found)
 	one.guard.Lock()
@@ -66,12 +74,13 @@ func (one *server) asksBridge(paths []string) {
 	if len(paths) == 0 {
 		one.panel.extra = got
 		one.showsAll(tree)
-		return
+		return true
 	}
 	for _, path := range paths {
 		one.panel.extra[path] = got[path]
 		one.shows(tree, path)
 	}
+	return true
 }
 
 // An open, a change or a save redraws that file, and a save asks the bridge again for it. [[spec/design_output/lsp]]

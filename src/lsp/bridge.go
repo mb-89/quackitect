@@ -21,9 +21,11 @@ const (
 	portBase      = 6510
 	// A sweep over the whole tree runs Vale over every note, so the wait stands long. [[spec/design_output/lsp]]
 	bridgeWait = 3 * time.Minute
+	// The pause between two asks while no bridge answers yet, so the panel fills once one stands. [[spec/design_output/lsp#the-panel-reads-the-battery]]
+	bridgeRetry = 5 * time.Second
 )
 
-// The source a finding comes from, so an open file leaves Vale and Biome to their own servers. [[spec/design_output/lsp]]
+// The source a finding comes from, so an open file leaves Biome to its own server. [[spec/design_output/lsp]]
 const (
 	fromVale  = "vale"
 	fromBiome = "biome"

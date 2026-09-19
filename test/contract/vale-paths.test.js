@@ -43,10 +43,9 @@ ifVale("a rationale reads the same by its absolute path as by its relative one",
   assert.equal(linesOf([join(root, DESIGN)]), linesOf([DESIGN]));
 });
 
-ifVale("the filter the workspace hands the Vale extension passes no rule", () => {
+ifVale("the config the workspace hands the Vale extension draws nothing", () => {
   const settings = JSON.parse(files.read(join(root, ".vscode/settings.json")));
-  const filter = settings["vale.valeCLI.filter"];
-  assert.ok(filter, "the workspace names a filter");
+  const config = settings["vale.valeCLI.config"];
   assert.ok(linesOf([DESIGN]) > 0, "the file carries a raw finding to hide");
-  assert.equal(linesOf([`--filter=${filter}`, DESIGN]), 0);
+  assert.equal(linesOf([`--config=${join(root, config)}`, join(root, DESIGN)]), 0);
 });

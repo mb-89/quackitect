@@ -10,7 +10,7 @@ import { SOURCE, STAMP, viewerOf } from "../../src/scripts/viewer.js";
 
 const ROOT = "/box";
 const EXE = `${ROOT}/.se/.runtime/bin/logview`;
-const BUILD = `go build -o ${EXE} .`;
+const BUILD = `go build -o ${EXE}.new .`;
 
 const source = () =>
   fakeDisk({
@@ -34,6 +34,17 @@ test("a box with no binary builds one in the viewer's folder and stamps its sour
   assert.equal(proc.ran.length, 1);
   assert.equal(proc.ran[0].init.cwd, `${ROOT}/${SOURCE}`);
   assert.match(disk.read(`${ROOT}/${STAMP}`), /^[0-9a-f]{16}\n$/);
+});
+
+// [[spec/design_output/viewer#the-verb-builds-it]]
+test("a build lands beside the running binary, and the old one steps aside by rename", () => {
+  const disk = source();
+  disk.write(EXE, "old binary");
+  const proc = goWrites(disk);
+  assert.deepEqual(viewerOf({ disk, proc, root: ROOT }), { exe: EXE, why: "" });
+  assert.equal(disk.read(EXE), "binary");
+  assert.equal(disk.read(`${EXE}.old`), "old binary");
+  assert.equal(disk.exists(`${EXE}.new`), false);
 });
 
 test("an unchanged source runs the binary it has and builds nothing", () => {
@@ -104,7 +115,7 @@ test("a box with no go answers no viewer and names the missing program", () => {
 test("a Windows box builds logview.exe", () => {
   const disk = source();
   const proc = fakeProc({
-    [`go build -o ${EXE}.exe .`]: (argv) => {
+    [`go build -o ${EXE}.exe.new .`]: (argv) => {
       disk.write(argv[3], "binary");
       return { exitCode: 0 };
     },

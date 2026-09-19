@@ -10,8 +10,10 @@ import {
   entryOf,
   onlyCopy,
   pairOf,
+  portOf,
   registers,
   resolves,
+  same,
   travels,
 } from "../../.claude/skills/level0/lib/vehicle.js";
 import { attachTo } from "../../src/bridge/vehicle.js";
@@ -40,6 +42,21 @@ function tree(extra = {}) {
     ...extra,
   });
 }
+
+// [[spec/design_output/vehicle#the-register-holds-the-port]]
+test("a Windows root in either case is one copy, so the register keeps one entry and one port", () => {
+  assert.equal(same("C:\\work\\tree", "c:/work/tree/"), true);
+  assert.equal(same("/home/user/Tree", "/home/user/tree"), false, "a POSIX path keeps its case");
+
+  const upper = JSON.stringify([{ id: "one", method_root: "C:\\work\\tree", port: 6510 }]);
+  const kept = registers(upper, { id: "two", method_root: "c:\\work\\tree" });
+  assert.deepEqual(
+    kept.map((one) => one.id),
+    ["two"],
+    "the lower-case spelling replaces the upper-case one",
+  );
+  assert.equal(portOf(JSON.parse(upper), "c:\\work\\tree"), 6510);
+});
 
 test("a copy keeps the identity it holds, and makes one where it holds none", () => {
   const held = copyOf('{"id":"abc123"}', "fresh", "now");

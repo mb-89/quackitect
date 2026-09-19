@@ -4,7 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { crashed } from "../../src/bridge/server.js";
+import { crashed, takesOver } from "../../src/bridge/server.js";
 
 test("a crash writes its error and stack at fatal, then exits with one", async () => {
   const rows = [];
@@ -47,4 +47,34 @@ test("a log that throws still lets the process exit", async () => {
   });
 
   assert.equal(code, 1);
+});
+
+// [[spec/design_output/level0#a-start-takes-the-port]]
+test("a bridge standing on the port stops, and the start takes the port", async () => {
+  const asked = [];
+  let up = true;
+  const ask = async (url, init) => {
+    asked.push(`${init?.method ?? "GET"} ${url}`);
+    if (url.endsWith("/stop")) up = false;
+    if (!up) throw new Error("refused");
+    return { json: async () => ({ ok: true }) };
+  };
+
+  assert.equal(await takesOver(6510, ask, async () => {}), true);
+  assert.deepEqual(asked, [
+    "GET http://127.0.0.1:6510/health",
+    "POST http://127.0.0.1:6510/stop",
+    "GET http://127.0.0.1:6510/health",
+  ]);
+});
+
+test("a free port takes no stop", async () => {
+  const asked = [];
+  const ask = async (url) => {
+    asked.push(url);
+    throw new Error("refused");
+  };
+
+  assert.equal(await takesOver(6510, ask, async () => {}), false);
+  assert.equal(asked.length, 1);
 });

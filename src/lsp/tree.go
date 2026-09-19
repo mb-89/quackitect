@@ -156,10 +156,12 @@ func (one *Tree) Forgets() {
 }
 
 const (
-	Install  = "src/scripts/install.sh"
-	ValeIni  = ".vale.ini"
-	Settings = ".vscode/settings.json"
-	Offered  = ".vscode/extensions.json"
+	Install = "src/scripts/install.sh"
+	ValeIni = ".vale.ini"
+	// The config the Vale extension reads, which turns on no style. [[spec/design_output/lsp#the-panel-reads-the-battery]]
+	EditorIni = "spec/config/editor.vale.ini"
+	Settings  = ".vscode/settings.json"
+	Offered   = ".vscode/extensions.json"
 	// The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because a Go module imports no JavaScript.
 	ToolsAt = ".se/.runtime/tools.json"
 	Bin     = ".se/.runtime/bin"
@@ -227,8 +229,8 @@ func namesTheBinaries(said map[string]any) []binaryCheck {
 	return []binaryCheck{
 		{"vale.valeCLI.path", "The editor runs " + Bin + "/vale, which " + Install + " writes.",
 			asText(said["vale.valeCLI.path"]) == Bin+"/vale"},
-		{"vale.valeCLI.config", "The editor reads " + ValeIni + " at the root.",
-			asText(said["vale.valeCLI.config"]) == ValeIni},
+		{"vale.valeCLI.config", "The editor reads " + EditorIni + ", which turns on no style, so the panel draws Vale off the battery.",
+			asText(said["vale.valeCLI.config"]) == EditorIni},
 		{"vale.valeCLI.installVale", Install + " pins Vale, so the extension installs none of its own.",
 			said["vale.valeCLI.installVale"] == false},
 		{"biome.lsp.bin", "The editor runs " + Bin + "/biome, which " + Install + " writes.", named},
@@ -258,9 +260,13 @@ func editorDrawsWriteRules(tree *Tree) []Finding {
 			names = "nothing"
 		}
 		return append(out, fault(rule, Settings, lineOf(text, "vale.valeCLI.config"),
-			"vale.valeCLI.config names "+names+", and the write door reads "+ValeIni+"."))
+			"vale.valeCLI.config names "+names+", and the editor reads "+EditorIni+"."))
 	}
 
+	if basedOnStyles.MatchString(ini) {
+		out = append(out, fault(rule, Settings, lineOf(text, "vale.valeCLI.config"),
+			where+" turns on a style, so the editor draws raw Vale beside the battery's list."))
+	}
 	level := valeLevel(ini)
 	if asText(said["vale.valeCLI.minAlertLevel"]) != "inherited" {
 		drawn := level

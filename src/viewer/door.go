@@ -16,9 +16,9 @@ import (
 	"time"
 )
 
-// The port the window holds, one above the bridge's, and the wait a call takes. [[spec/design_output/viewer#a-second-launch-hands-over]]
+// The port the window holds, one below the bridge's, where the register hands out none, and the wait a call takes. [[spec/design_output/viewer#a-second-launch-hands-over]]
 const (
-	windowPort = 6511
+	windowPort = 6509
 	callWait   = 500 * time.Millisecond
 )
 

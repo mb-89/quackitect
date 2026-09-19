@@ -64,6 +64,9 @@ import { onWrite, schemasHere } from "./write.js";
 const OK = 200;
 const NOT_FOUND = 404;
 const SOON = 20;
+const TAKEOVER_PROBE = 2000;
+const TAKEOVER_PAUSE = 100;
+const TAKEOVER_TRIES = 50;
 const PASS = { pass: true };
 const GOD = "god";
 const BINDING = "engine.binding";
@@ -338,5 +341,32 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   const port =
     Number(at >= 0 ? args[at + 1] : process.env.SE_BRIDGE_PORT) ||
     registeredPort(disk(), process.env, clock(), method);
+  await takesOver(port);
   serve(method, port);
+}
+
+// A bridge already standing on the port stops, and this one takes the port, so a press of the hook always lands. [[spec/design_output/level0#a-start-takes-the-port]]
+export async function takesOver(port, ask = fetch, wait = pause) {
+  const at = `http://127.0.0.1:${port}`;
+  const stands = async () => {
+    try {
+      const said = await ask(`${at}/health`, { signal: AbortSignal.timeout(TAKEOVER_PROBE) });
+      return Boolean((await said.json())?.ok);
+    } catch {
+      return false;
+    }
+  };
+  if (!(await stands())) return false;
+  try {
+    await ask(`${at}/stop`, { method: "POST", signal: AbortSignal.timeout(TAKEOVER_PROBE) });
+  } catch {}
+  for (let tries = 0; tries < TAKEOVER_TRIES; tries++) {
+    await wait(TAKEOVER_PAUSE);
+    if (!(await stands())) return true;
+  }
+  return true;
+}
+
+function pause(ms) {
+  return new Promise((done) => setTimeout(done, ms));
 }

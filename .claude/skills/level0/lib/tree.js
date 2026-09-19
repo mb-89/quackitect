@@ -12,6 +12,7 @@ import {
   EDITOR_SETTINGS,
   EXTENSIONS,
   namesTheBinaries,
+  EDITOR_VALE_INI,
 } from "./servers.js";
 import { decide, pool, RULES as STOP } from "./stop.js";
 import { BIN, installedTools, TOOLS, WANTED } from "./tools.js";
@@ -49,7 +50,10 @@ const LATER = {
 
 const BINARIES = {
   vale: ["vale.valeCLI.path", `The editor runs ${BIN}/vale, which ${INSTALL} writes.`],
-  valeConfig: ["vale.valeCLI.config", `The editor reads ${VALE_INI} at the root.`],
+  valeConfig: [
+    "vale.valeCLI.config",
+    `The editor reads ${EDITOR_VALE_INI}, which turns on no style, so the panel draws Vale off the battery.`,
+  ],
   managesVale: [
     "vale.valeCLI.installVale",
     `${INSTALL} pins Vale, so the extension installs none of its own.`,
@@ -150,13 +154,24 @@ export function editorDrawsWriteRules(tree) {
       fault(
         rule,
         EDITOR_SETTINGS,
-        `vale.valeCLI.config names ${where || "nothing"}, and the write door reads ${VALE_INI}.`,
+        `vale.valeCLI.config names ${where || "nothing"}, and the editor reads ${EDITOR_VALE_INI}.`,
         lineOf(text, "vale.valeCLI.config"),
       ),
     );
     return out;
   }
 
+  // The editor's Vale turns on no style, so raw Vale draws nothing beside the battery's list. [[spec/design_output/lsp#the-panel-reads-the-battery]]
+  if (/^\s*BasedOnStyles/m.test(ini)) {
+    out.push(
+      fault(
+        rule,
+        EDITOR_SETTINGS,
+        `${where} turns on a style, so the editor draws raw Vale beside the battery's list.`,
+        lineOf(text, "vale.valeCLI.config"),
+      ),
+    );
+  }
   const level = /^\s*MinAlertLevel\s*=\s*(\S+)/m.exec(ini)?.[1] ?? "";
   if (said["vale.valeCLI.minAlertLevel"] !== "inherited") {
     out.push(

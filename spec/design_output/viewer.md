@@ -271,7 +271,7 @@ draws the window once and prints it. A reader with no terminal sees the same win
 | what stands | what the verb does |
 |---|---|
 | a binary, and a source matching its stamp | runs the binary |
-| no binary, or a source moving on | runs `go build`, then the binary |
+| no binary, or a source moving on | runs `go build` into `logview.new`, swaps it in by rename, then runs the binary |
 | a build failing over an old binary | says why, and runs the old one |
 | no Go and no binary | prints the session as plain rows |
 
@@ -323,8 +323,8 @@ where it is.
 
 # A second launch hands over
 
-The window holds a port of its own, one above the bridge's, so one window stands
-at a time:
+The window holds a port of its own, one below the bridge's, where the register
+hands out none. So one window stands at a time:
 
 | what the launch meets | what it does |
 |---|---|

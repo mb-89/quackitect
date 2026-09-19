@@ -34,7 +34,7 @@ export function attaches(id, at) {
 export function registers(read, entry) {
   const held = Array.isArray(parsed(read)) ? parsed(read) : [];
   const kept = held.filter(
-    (one) => one?.id !== entry.id && one?.method_root !== entry.method_root,
+    (one) => one?.id !== entry.id && !same(one?.method_root ?? "", entry.method_root),
   );
   return [...kept, entry];
 }
@@ -109,9 +109,17 @@ export function pairOf(method, work) {
   return { ...held, itself: same(held.method, held.work) };
 }
 
+// A Windows path reads the same in any case, because the editor hands its drive letter in lower case and a shell in upper. [[spec/design_output/vehicle#the-register-holds-the-port]]
 export function same(one, other) {
-  return slashed(one).replace(/\/+$/, "") === slashed(other).replace(/\/+$/, "");
+  return rooted(one) === rooted(other);
 }
+
+function rooted(said) {
+  const path = slashed(said).replace(/\/+$/, "");
+  return DRIVE.test(path) ? path.toLowerCase() : path;
+}
+
+const DRIVE = /^[A-Za-z]:\//;
 
 function slashed(said) {
   return String(said ?? "").split("\\").join("/");

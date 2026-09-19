@@ -22,11 +22,12 @@ func checkerAt(root string) *Checker {
 
 // [[spec/design_output/tree#the-rules-over-two-files]]
 var readers = map[string][]func(*Tree) []Finding{
-	Settings: {settingsNameBinaries, editorDrawsWriteRules, biomeOnWindows, extensionsOnOffer},
-	Install:  {settingsNameBinaries, surveyNamesInstalls},
-	ValeIni:  {editorDrawsWriteRules},
-	Offered:  {extensionsOnOffer},
-	ToolsAt:  {surveyFindsNode},
+	Settings:  {settingsNameBinaries, editorDrawsWriteRules, biomeOnWindows, extensionsOnOffer},
+	Install:   {settingsNameBinaries, surveyNamesInstalls},
+	ValeIni:   {editorDrawsWriteRules},
+	EditorIni: {editorDrawsWriteRules},
+	Offered:   {extensionsOnOffer},
+	ToolsAt:   {surveyFindsNode},
 }
 
 // [[spec/design_output/lsp#one-checker-every-front-asks]]

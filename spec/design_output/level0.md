@@ -128,6 +128,20 @@ every tool run. A file that differs restarts the server through the road the
 `/restart` request takes, and the log names the file. The next event lands on
 the new code, and the session goes on as above.
 
+## A start takes the port
+
+A server starting asks its port for `/health` first. Where a bridge answers,
+the new server asks it to stop, waits for the port to free, and listens. So a
+press of the hook lands over any bridge standing before it:
+
+- a server from an old window
+- a server a script starts
+- a server from before a restart
+
+A port a foreign process holds answers no `/health`, so the listen fails and
+the crash line names the port. The log viewer holds a port of its own below
+`PORT_BASE`, and the register hands out ports from `PORT_BASE` up.
+
 ## A crash writes its error
 
 An exception nobody catches, and a rejection nobody handles, both end the
