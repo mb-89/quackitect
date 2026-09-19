@@ -89,7 +89,12 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 1e5d89a75f884bc7be7d77ad4f31f9c887d8af1d
+    hash_after: 1e5d89a75f884bc7be7d77ad4f31f9c887d8af1d
 ---
 
 # Ask
@@ -111,9 +116,39 @@ The agent builds ahead of the owner, and craft questions and settled ones take t
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+The escalate verb grades the question, and a craft one goes back to its drafter.
 
-<!-- the form is text -->
+The notes under `spec/design_input` settle what the tree is for. A question
+those notes answer is craft, and the drafter answers it by reading. A question
+they leave open is design, and the owner answers that.
+
+| the question | who answers it | how it goes |
+|---|---|---|
+| design: what the tree is for, and what the owner wants of it | the owner | a person step, as `escalate` writes one today |
+| craft: which road the code takes inside what the design settles | the drafter | the leaf fails back to its drafter, carrying the question |
+
+| what changes | how |
+|---|---|
+| `escalate` in `pull.js` | takes `--craft`, which fails the leaf back to its drafter with the question as the reason |
+| `withPersonStep` in `pull-hand.js` | stands as it stands, and a design question alone reaches it |
+| `spec/guidance/working.md` | takes the drafter's rule under these tables |
+| `spec/guidance/review/reviewing.md` | takes the reviewer's rule beside it |
+| `test/level0/pull-escalate.test.js` | takes the case under those |
+| [[spec/design_output/pull#a-person-step-goes-in]] | says what each grade does |
+
+The drafter's rule reads in two halves. Read `spec/design_input` before you
+offer the owner a choice. Ask the owner the design question before you build on
+an answer of your own.
+
+The reviewer's rule reads: grade each question a return names as design or
+craft, and hand the craft ones back to the drafter.
+
+The case drives `escalate` under `--craft` over a leaf whose route holds a
+drafter. It asserts three things:
+
+- the ticket stands at that drafter
+- the record carries the question as its reason
+- the route takes on no person step
 
 ## review
 
