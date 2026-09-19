@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -105,6 +105,12 @@ record:
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: 4d3782295a0da08ca888f90cd3028e42eeed41da
     hash_after: 4d3782295a0da08ca888f90cd3028e42eeed41da
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-4
+    hash_before: c3756b0376560316d2cb3b172f31d00f6e4b1861
+    hash_after: c3756b0376560316d2cb3b172f31d00f6e4b1861
+    returns: 2
+    why: "| finding | fix |; |---|---|; | The tighter escape refuses copies standing across the tree today | Name each file it catches, and say what each one takes |; | `run`, `runtime` and `log` stand in no list the rule reads | Give each loop its own list in `folders.js`, beside `MOVED` |; | One reader answers the names of three loops that differ | Let the reader answer each loop apart, so each rule reads one list |; | The new rule over the installer carries no name | Name it beside the rules in `tree.js`, and link its note |; The redraft answers the reader, the fake text, and the two names standing apart.; `./RUNME.sh check` answers 0 on this tip, so every copy the tighter escape; catches turns the tree red at the same commit. Run; `git grep -n '\\.se/\\.runtime\\|\\.se/\\.retro' -- src .claude` for the copies, and; read each against the line above it."
 ---
 
 # Ask
@@ -170,18 +176,17 @@ fail
 
 | finding | fix |
 |---|---|
-| The rule excuses a whole file where one line names `folders.js` | Bind the escape to the line beside the copy |
-| The approach pins the installer alone, so every other writer keeps the escape | Hold the whole class the ask names |
-| The approach adds no rule, so the fault stands in the battery alone | Put the rule in `tree.js`, beside the ones over the same names |
-| `tools.js` reads the installer already, for `surveyNamesInstalls` | Pull the loop through a function beside `installedTools` |
-| The case reads the installer off disk, so no bad list reaches it | Feed that function a fake installer text |
-| The case carries the two apart names by hand, as a third list | Let `folders.js` own the pair, so one list stands |
-| The installer holds two more lists of old spellings | Cover the folder rename loop and the log loop |
+| The tighter escape refuses copies standing across the tree today | Name each file it catches, and say what each one takes |
+| `run`, `runtime` and `log` stand in no list the rule reads | Give each loop its own list in `folders.js`, beside `MOVED` |
+| One reader answers the names of three loops that differ | Let the reader answer each loop apart, so each rule reads one list |
+| The new rule over the installer carries no name | Name it beside the rules in `tree.js`, and link its note |
 
-A probe over `privateFolderOwned` passes a file importing `folders.js` and
-spelling `.se/bin`, so a writer the ask names stands green today. Run
-`git ls-files '*.js' '*.go' '*.sh' | xargs grep -l folders.js` for the writers
-the escape covers.
+The redraft answers the reader, the fake text, and the two names standing apart.
+
+`./RUNME.sh check` answers 0 on this tip, so every copy the tighter escape
+catches turns the tree red at the same commit. Run
+`git grep -n '\.se/\.runtime\|\.se/\.retro' -- src .claude` for the copies, and
+read each against the line above it.
 
 # implement
 
