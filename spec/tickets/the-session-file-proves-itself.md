@@ -192,17 +192,41 @@ pass
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Three of the four new cases fail on their own assertion, each for the reason
+the approach names.
+
+| the case | what it reads |
+|---|---|
+| the library owns the spelling | `lib.SESSION` stands undefined |
+| the id every harness spells | `session_id` reads empty |
+| the registered start writes the file | nothing lands under the name the library gives |
+| an event naming no session | it passes, because that road stands already |
+
+The fourth surprises. The hook says the hand stands at the box for an event
+naming nothing, and that road holds today with no change under it. So the ask's
+second line asks for a case over a road standing right.
+
+The collector takes the last argument of a registration, because level one
+hands `tool.call` a filter between the event and the handler. A collector
+keying the second argument would hand the filter a call.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases stand in `test/level0/level1.test.js`, and the change touches no file the ask leaves out
+- the harness the hook reaches stands as a fake carrying a file system, a tool register and a log
+- a comment over each case points at the chapter the approach implements
 
 ## reflect
 
