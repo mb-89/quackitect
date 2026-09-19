@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgent: true
-step: design/review
+step: design/draft
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -129,6 +129,12 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 19e5c998e3245e7941be1a1cda89ecbdd85e16d6
     hash_after: 19e5c998e3245e7941be1a1cda89ecbdd85e16d6
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-7
+    hash_before: 5bdb114d4b7957217d9b5838a641170df02bb9a2
+    hash_after: 5bdb114d4b7957217d9b5838a641170df02bb9a2
+    returns: 3
+    why: "Three faults stand: one from the last review, and two the redraft brings.; The four asked answers stand: the marketplace name, the zero cost, the icon path, the dotted folder.; The count drift goes, and the draft names `grep -rl mcp__level0` alone.; The anchor stands, and `spec/design_output/level0.md` measures the tools keeping `level0`.; The marketplace rows read true. `RUNME.sh` runs `install.sh` ahead of `cli.js`.; The `brandOf` row reads true. `stub.js` hands it to `linkOf`, which writes the `vehicle.json` name.; The brand folder carries one reader now, and the lint reads the ticket clean.; The enabled id row stands open. `stub.js` writes `.claude/settings.json` through `settingsOf`.; No file in this tree writes `enabledPlugins`. Name the hand that writes the id, or cut the row.; The icon write reaches no vehicle. Git tracks `src/extension/icon.svg`, so every copy carries it.; So `spec/config/brand/icon.svg` reaches nothing. Say which hand reads it.; `plugin.json` carries `author.name`, which reads the folder name. Give it a row in the table."
 ---
 
 # Ask
@@ -240,18 +246,18 @@ folder it read. `stub.js` hands `brandOf` to `linkOf`, which writes the
 
 fail
 
-- Two findings of the last review stand open, and two new faults join them.
-- The count drift goes. The draft names `grep -rl mcp__level0` and carries a count nowhere.
-- The reader rows read true. `stop.js` reads `spec/config/stop`, and `vale.js` reads `spec/config/styles`.
-- The shape claim reads true. `projection.js` holds `COMMANDS`, `PARAGRAPH` and `STYLE`.
+- Three faults stand: one from the last review, and two the redraft brings.
+- The four asked answers stand: the marketplace name, the zero cost, the icon path, the dotted folder.
+- The count drift goes, and the draft names `grep -rl mcp__level0` alone.
+- The anchor stands, and `spec/design_output/level0.md` measures the tools keeping `level0`.
+- The marketplace rows read true. `RUNME.sh` runs `install.sh` ahead of `cli.js`.
 - The `brandOf` row reads true. `stub.js` hands it to `linkOf`, which writes the `vehicle.json` name.
-- The anchor stands, the slug table follows its own rule, and the lint reads the ticket clean.
-- One reader a folder reads other than the tree. `cli.js` reads three folders under `spec/config/styles`.
-- A projection writes `spec/config/styles/VoiceParagraph`, so ground the brand folder on another reason.
-- The marketplace hand stays unnamed. Say who writes `.claude-plugin/marketplace.json`, and when it runs.
-- `stub.js` writes the stub's own files, so the reader lands on the wrong hand.
-- The brand folder's reader carries two names, the build and the install script. Use one.
-- The copy road lets `src/extension/icon.svg` drift. Name what holds it in step with its source.
+- The brand folder carries one reader now, and the lint reads the ticket clean.
+- The enabled id row stands open. `stub.js` writes `.claude/settings.json` through `settingsOf`.
+- No file in this tree writes `enabledPlugins`. Name the hand that writes the id, or cut the row.
+- The icon write reaches no vehicle. Git tracks `src/extension/icon.svg`, so every copy carries it.
+- So `spec/config/brand/icon.svg` reaches nothing. Say which hand reads it.
+- `plugin.json` carries `author.name`, which reads the folder name. Give it a row in the table.
 
 # implement
 
