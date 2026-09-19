@@ -100,6 +100,8 @@ those, and the engine takes the work the bridge does past transport.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch sync
+
 # split
 
 <!-- mints the children, or assigns standing tickets, each naming this group -->
