@@ -40,6 +40,27 @@ Done is a server whose `keepAliveTimeout` runs past the window the hook idles in
 
 <!-- the form is text -->
 
+Trunk carries the change and the case, so this step changes no line and reads
+the diff against the ask.
+
+| what the ask asks for | where it stands |
+|---|---|
+| a `keepAliveTimeout` past the window the hook idles in | `IDLE` in `src/doors/wire.js` |
+| the header wait above it, which node wants | `HEADERS`, set off `IDLE` and a spare |
+| the two set where the server listens | `wire().listen`, which `serve` calls |
+| a test holding the number | `test/contract/wire.test.js` |
+
+The case reads the two off the listening server, and reads the header wait
+standing above the idle one. So a hand lowering either meets a red case.
+
+**What surprises.** Nothing in the bridge sets a timeout of its own, and the
+one place holding both stands behind the door. The server reaches the socket
+through `wire` alone, so the numbers move in one file.
+
+The three causes the Discussion sorts stay sorted. `the server answers nothing
+at` now stands for a server that is down, and the other two causes carry their
+own tickets.
+
 # Discussion
 
 A sweep of every file under `.se/log` turned this up. The line `the server answers nothing at http://127.0.0.1:6510/event` stands six times across the logs, and carries three causes:
