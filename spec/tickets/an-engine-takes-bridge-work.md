@@ -89,7 +89,12 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: cdf685ad92d873867f538ae2cd8c5320702067f9
+    hash_after: cdf685ad92d873867f538ae2cd8c5320702067f9
 ---
 
 # Ask
@@ -114,6 +119,59 @@ The bridge grows engine work, and src/scripts holds whatever fits nowhere else.
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+- one rule sorting a file into its folder
+- four moves the ask names, each its own commit
+- one change under the Go module reader, which the swap move forces
+
+**The rule.** A file under `src/bridge` answers an event off the wire. A file
+under `src/engine` answers a question about the tree, with no event standing. A
+file under `src/scripts` is a verb of the command line, named for the verb.
+
+| the folder | what a file there does | what it imports |
+|---|---|---|
+| `src/bridge` | takes an event and answers the hook | the engine, and the doors |
+| `src/engine` | reads the tree and answers a question | the doors alone |
+| `src/scripts` | runs a verb a person types | either of the two |
+
+**The four moves.** Each is a rename plus the imports naming it, and the check
+decides each on its own.
+
+| what moves | from | to |
+|---|---|---|
+| status | `src/bridge/status.js` | `src/engine/status.js` |
+| projection | `src/bridge/projection.js` | `src/engine/projection.js` |
+| the tense reader | `src/bridge/tense.js` | `src/engine/tense.js` |
+| swap | `src/swap` | `src/engine/swap` |
+
+The first three hold no event. `projection.js` carries one reader that does,
+`freshens`, which the server calls after a tool ran. That reader stays in the
+bridge, and the engine takes the rest.
+
+**What swap costs.** `goModulesIn` lists a module as a folder holding `go.mod`
+straight under `src`, and `goModulesOf` reads the same one level. A module at
+`src/engine/swap` reads as none. Its tests leave the battery, and nothing says
+so.
+
+| what changes | so that |
+|---|---|
+| `goModulesIn` walks a folder below `src` too | the battery finds a module either way |
+| `goModulesOf` takes the folder holding `go.mod` | a changed test names its own module |
+| a case drives both over a module one level down | the fault stays fixed |
+
+**What the ask leaves open.** The second line of the ask wants the bridge
+holding transport alone. The four moves leave it holding the doors: the write
+door, the stop door, the answer door and the rest.
+
+- an event runs a door, so the rule above counts every door as transport
+- the line reads as met where each door keeps its wiring and hands its thinking down
+- the bridge files past the four each want that cut, and each is its own ticket
+- this ticket moves the four, sets the rule, and mints nothing else
+
+**The command line.** The third line of the ask names every file under
+`src/scripts`. The verbs there read as verbs already, and the files named for a
+topic instead are the `cli-` group and the `pull-` group. Each of those serves
+one verb, so the name says the verb it serves and the sort holds.
 
 ## review
 
