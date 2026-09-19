@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -115,6 +115,12 @@ record:
     hand: box fa49097ce66c · claude-code-remote
     hash_before: f42ec376c5f0a1d33c5f0257736add0597a3a8bb
     hash_after: 0b9bf9d00059a57c9b38deb8dbb3c5a98f385a08
+  - step: design/review
+    hand: box fa49097ce66c · claude-code-remote · helper-6
+    hash_before: 0439d8a2e5376cfee54543ee5908a77188d99fe5
+    hash_after: 0439d8a2e5376cfee54543ee5908a77188d99fe5
+    returns: 3
+    why: The rule, the four moves, the projection cut and the swap cost hold, and the third ask line stands open.; Eight files under `src/scripts` stand outside the five groups and outside every table.; Name `graph.js`, `probe.js`, `stub.js` and `ticket.js` there.; Name `tools.js`, `tui.js`, `vehicle.js` and `voice.js` there too.; Add a row saying a file named for its own verb stands, which sorts seven of the eight.; Give `tools.js` a row of its own, because four files outside the folder read it.; `src/doors/biome.js` and `src/doors/vale.js` read it, as `src/bridge/guidance.js` and `src/bridge/findings.js` do.; That shape matches `group.js`, which the draft sends to the engine for the same reason.; The stay table says five files and lists eight across six rows, so correct the count.; **What holds.**; `./RUNME.sh check` exits 0 on this branch, and `./RUNME.sh branch review` exits 0.; `status.js` and `tense.js` export readers alone, which matches the engine rule.; `src/swap` holds a `go.mod`, and `goModulesIn` lists dirs one level under `src`.; `goModulesOf` matches a test path by regex one level down, so the swap move drops the module.; `src/bridge/write.js` runs `ownerDoor` as a check and `marksStale` after a write.; `ownerDoor` reads `box.projections`, and `marksStale` reads `box.sources`, as the cut table says.; `freshens` runs inside `decide`, and `opensSession` fills those two fields at the session start.; `group.js` reaches `src/bridge/bash.js` and `src/bridge/stop.js`, so the engine suits it.; `work-stands.js` stands, so `stand.js` takes a name of its own under that prefix.; `guidance-verb.js` serves `branch guidance`, which `src/scripts/work.js` wires as a branch row.; The draft names the open second line of the ask, and leaves the door cut to a later ticket.; The draft commits touch the ticket file alone, which leaves rules and tests to implement.; A retro stands absent from the handback, which suits a ticket at design review.; **What the last verdict asks.**; The draft answers the `guidance-` row, which now names `branch guidance` and its wiring.; The draft answers the caller column of the projection cut table, and the code matches it.; The draft answers the finding sorting `hand.js`, `stand.js` and `spawn.js`.; The draft answers the finding sorting `unblock.js`, `editor.js`, `process.js` and `trust.js`.; The draft answers the folder taking `queue.js`, `group.js` and `landed.js`.; The third ask line stands open for the eight files above, which two rows close.
 ---
 
 # Ask
@@ -273,36 +279,40 @@ door, the stop door, the answer door and the rest.
 
 fail
 
-- The rule, the four moves, the projection cut and the swap cost hold, and three claims miss the code.
-- `guidance-` serves `branch guidance`, which `src/scripts/work.js` wires as a row of the branch verb.
-- Correct that row, because the group table names `standing` today.
-- `freshens` and the session start call `projectionsHere` and `sourcesOf`.
-- `ownerDoor` and `marksStale` read the `box.projections` and `box.sources` fields alone.
-- Correct the caller column of the projection cut table to match those two lines.
-- `hand.js`, `stand.js` and `trust.js` stand outside the five groups and the verb table.
-- `spawn.js`, `unblock.js`, `editor.js` and `process.js` stand outside both as well.
-- Sort each of those, because the third ask line covers every file under `src/scripts`.
-- Name the folder taking `queue.js`, `group.js` and `landed.js`, which the mover table leaves open.
+- The rule, the four moves, the projection cut and the swap cost hold, and the third ask line stands open.
+- Eight files under `src/scripts` stand outside the five groups and outside every table.
+- Name `graph.js`, `probe.js`, `stub.js` and `ticket.js` there.
+- Name `tools.js`, `tui.js`, `vehicle.js` and `voice.js` there too.
+- Add a row saying a file named for its own verb stands, which sorts seven of the eight.
+- Give `tools.js` a row of its own, because four files outside the folder read it.
+- `src/doors/biome.js` and `src/doors/vale.js` read it, as `src/bridge/guidance.js` and `src/bridge/findings.js` do.
+- That shape matches `group.js`, which the draft sends to the engine for the same reason.
+- The stay table says five files and lists eight across six rows, so correct the count.
 
 **What holds.**
 
-- `./RUNME.sh check` exits 0 on this branch, and `./RUNME.sh branch review` exits 0 with the check passing.
+- `./RUNME.sh check` exits 0 on this branch, and `./RUNME.sh branch review` exits 0.
 - `status.js` and `tense.js` export readers alone, which matches the engine rule.
-- `goModulesIn` lists dirs one level under `src`, and `goModulesOf` matches one level by regex.
-- `src/bridge/write.js` runs `ownerDoor` as a check and `marksStale` after a write, as the cut table says.
-- `src/bridge/server.js` runs `freshens` inside `decide`, so the bridge keeps it.
+- `src/swap` holds a `go.mod`, and `goModulesIn` lists dirs one level under `src`.
+- `goModulesOf` matches a test path by regex one level down, so the swap move drops the module.
+- `src/bridge/write.js` runs `ownerDoor` as a check and `marksStale` after a write.
+- `ownerDoor` reads `box.projections`, and `marksStale` reads `box.sources`, as the cut table says.
+- `freshens` runs inside `decide`, and `opensSession` fills those two fields at the session start.
+- `group.js` reaches `src/bridge/bash.js` and `src/bridge/stop.js`, so the engine suits it.
+- `work-stands.js` stands, so `stand.js` takes a name of its own under that prefix.
+- `guidance-verb.js` serves `branch guidance`, which `src/scripts/work.js` wires as a branch row.
 - The draft names the open second line of the ask, and leaves the door cut to a later ticket.
-- The two draft commits touch the ticket file alone, which leaves rules and tests to implement.
+- The draft commits touch the ticket file alone, which leaves rules and tests to implement.
 - A retro stands absent from the handback, which suits a ticket at design review.
 
 **What the last verdict asks.**
 
-- The draft answers the finding on `ownerDoor`, `marksStale` and `freshens`.
-- The draft answers where those two land: both stay in the bridge.
-- The draft answers the finding naming the `retro-`, `work-` and `guidance-` groups.
-- The draft answers the finding sorting `queue.js`, `group.js` and `landed.js`.
-- The draft answers the finding giving `goModulesOf` a disk handle.
-- The third ask line stands open, because the draft reaches three files of many.
+- The draft answers the `guidance-` row, which now names `branch guidance` and its wiring.
+- The draft answers the caller column of the projection cut table, and the code matches it.
+- The draft answers the finding sorting `hand.js`, `stand.js` and `spawn.js`.
+- The draft answers the finding sorting `unblock.js`, `editor.js`, `process.js` and `trust.js`.
+- The draft answers the folder taking `queue.js`, `group.js` and `landed.js`.
+- The third ask line stands open for the eight files above, which two rows close.
 
 # implement
 
