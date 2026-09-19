@@ -17,6 +17,8 @@ type Finding struct {
 	Column   int    `json:"column"`
 	Message  string `json:"message"`
 	Severity string `json:"severity"`
+	// The front a finding comes from, where the bridge hands it over. [[spec/design_output/lsp]]
+	Source string `json:"source,omitempty"`
 }
 
 func fault(rule, file string, line int, message string) Finding {

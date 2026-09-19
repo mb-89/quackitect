@@ -179,7 +179,6 @@ func fieldFaults(key string, value any, rule *yaml.Doc, kind, where string, line
 	return out
 }
 
-
 // [[spec/design_output/schema#a-placeholder-stands-at-warning]]
 func placeholderFaults(text string, schema *yaml.Doc, where string) []Finding {
 	rows := yaml.SplitLines(text)

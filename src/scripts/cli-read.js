@@ -2,37 +2,14 @@
 // asks for, and the walk over a folder.
 // [[spec/design_output/tree#the-reader]]
 
-import { join, relative, sep } from "node:path";
-import {
-  CONFIG_DIR,
-  fromJson as codeRows,
-} from "../../.claude/skills/level0/lib/code.js";
-import { codeFaults } from "../../.claude/skills/level0/lib/magic.js";
-import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
+import { join } from "node:path";
+import { BIN as INDEX_BIN } from "../../.claude/skills/level0/lib/index.js";
 import { line as asLine } from "../../.claude/skills/level0/lib/refuse.js";
 import { schemaFaults } from "../../.claude/skills/level0/lib/schema.js";
-import { SIZED } from "../../.claude/skills/level0/lib/size.js";
-import { stopFolderIsData, treeFaults } from "../../.claude/skills/level0/lib/tree.js";
-import {
-  CONFIG,
-  faultIn,
-  fromJson,
-  unreasoned,
-} from "../../.claude/skills/level0/lib/vale.js";
-import { withoutFalsePast } from "../bridge/tense.js";
-import { gridFaults, serverFaults, treeHere } from "./cli-check.js";
-import {
-  bin,
-  biome,
-  COL,
-  files,
-  it,
-  OURS,
-  outside,
-  root,
-  run,
-  SHOWN,
-} from "./cli-doors.js";
+import { treeFaults } from "../../.claude/skills/level0/lib/tree.js";
+import { findingsOver, readThrough, showOf, walkOver } from "../bridge/findings.js";
+import { serverFaults, treeHere } from "./cli-check.js";
+import { bin, biome, COL, files, it, outside, root, SHOWN } from "./cli-doors.js";
 
 export function version() {
   try {
@@ -44,12 +21,7 @@ export function version() {
 
 // [[spec/design_output/index#the-door-owns-the-database]]
 export function asksIndex(argv) {
-  const at = join(
-    root,
-    ".se",
-    "bin",
-    `se-index${process.platform === "win32" ? ".exe" : ""}`,
-  );
+  const at = join(root, `${INDEX_BIN}${process.platform === "win32" ? ".exe" : ""}`);
   if (!files.exists(at)) {
     console.error("The index stands unbuilt here, so nothing answers.");
     console.error("Run ./RUNME.sh once, which builds it where a C compiler stands.");
@@ -62,21 +34,7 @@ export function asksIndex(argv) {
 
 // [[spec/design_output/level0#the-tense-reader]]
 export function readThroughTheReader(found) {
-  const byFile = new Map();
-  for (const one of found) {
-    const list = byFile.get(one.file) ?? [];
-    list.push(one);
-    byFile.set(one.file, list);
-  }
-  const kept = [];
-  for (const [file, list] of byFile) {
-    let text = "";
-    try {
-      text = files.read(join(root, file));
-    } catch {}
-    kept.push(...withoutFalsePast(text, list));
-  }
-  return kept;
+  return readThrough({ disk: files, join, root }, found);
 }
 
 // What the last lint heard, which the stamp reads beside the exit. [[spec/guidance/retro/collect]]
@@ -89,69 +47,39 @@ export async function lint(where) {
   }
   const began = it.clock.now().getTime();
 
-  const ran = await run([
-    bin,
-    `--config=${CONFIG}`,
-    "--output=JSON",
-    "--no-exit",
-    OURS,
-    ...where,
-  ]);
-  const fault =
-    faultIn(ran.stdout) || (ran.exitCode !== 0 && !ran.stdout ? ran.stderr.trim() : "");
-  if (fault) {
-    console.error(fault);
+  // [[spec/design_output/lsp]]
+  const got = findingsOver(
+    {
+      disk: files,
+      proc: outside,
+      join,
+      root,
+      vale: bin,
+      biome: files.exists(biome) ? biome : "",
+      // The check names what stands past a ceiling as a warning, and the write door refuses the growth. [[spec/design_output/level0#the-size-ceiling]]
+      ceilings: {
+        function: await it.config.ask("code.functionLines"),
+        file: await it.config.ask("code.fileLines"),
+      },
+    },
+    where,
+  );
+  if (got.fault) {
+    console.error(got.fault);
     console.error("Vale read no file, so every rule it holds stands unchecked.");
     return 1;
   }
-  const found = readThroughTheReader(fromJson(ran.stdout));
-
-  for (const file of walk(where)) {
-    for (const one of unreasoned(files.read(file))) {
-      found.push({ ...one, file: show(file) });
-    }
-  }
-
-  // The check names what stands past a ceiling as a warning, and the write door refuses the growth. [[spec/design_output/level0#the-size-ceiling]]
-  const ceilings = {
-    function: await it.config.ask("code.functionLines"),
-    file: await it.config.ask("code.fileLines"),
-  };
-  for (const file of walk(where, SIZED)) {
-    found.push(...codeFaults(files.read(file), show(file), ceilings));
-  }
+  const found = got.found;
 
   // [[spec/design_output/lsp#one-checker-every-front-asks]]
   const said = serverFaults(where);
   if (said) found.push(...said);
 
   // [[spec/design_output/tree#when-the-sweep-runs]]
-  if (where.includes(".")) {
+  if (where.includes(".") && !said) {
     const tree = treeHere();
-    if (said) {
-      // [[spec/design_output/lsp#one-checker-every-front-asks]]
-      found.push(...stopFolderIsData(tree));
-    } else {
-      found.push(...treeFaults(tree));
-      found.push(...schemaFaults(tree));
-    }
-  }
-
-  found.push(...gridFaults(where));
-
-  if (files.exists(biome)) {
-    const code = outside.run(
-      [
-        biome,
-        "lint",
-        `--config-path=${CONFIG_DIR}`,
-        "--reporter=json",
-        "--max-diagnostics=none",
-        ...where,
-      ],
-      { cwd: root },
-    );
-    found.push(...codeRows(code.stdout, where[0]).filter((one) => !isDraft(one.file)));
+    found.push(...treeFaults(tree).filter((one) => one.rule !== "StopFolderIsData"));
+    found.push(...schemaFaults(tree));
   }
 
   const ms = it.clock.now().getTime() - began;
@@ -201,30 +129,10 @@ export function namesIn(at, end) {
     .map((one) => one.name);
 }
 
-export function walk(where, wanted = /\.(md|markdown|txt)$/i) {
-  const out = [];
-  const SKIP = new Set([".git", "node_modules", ".se", ".claude", ".claude-plugin"]);
-  const into = (path) => {
-    for (const entry of files.list(path)) {
-      if (SKIP.has(entry.name) || isDraft(entry.name)) continue;
-      const under = join(path, entry.name);
-      if (entry.kind === "dir") into(under);
-      else if (wanted.test(entry.name)) out.push(under);
-    }
-  };
-  for (const one of where) {
-    const path = join(root, one);
-    try {
-      into(path);
-    } catch {
-      if (wanted.test(path)) out.push(path);
-    }
-  }
-  return out;
+export function walk(where, wanted) {
+  return walkOver({ disk: files, join, root }, where, wanted);
 }
 
 export function show(file) {
-  const path = String(file);
-  const from = path.includes(root) ? relative(root, path) : path;
-  return from.split(sep).join("/");
+  return showOf({ root }, file);
 }

@@ -4,7 +4,7 @@
 
 import { dirname, join, resolve, sep } from "node:path";
 import { CONFIG_DIR } from "../../.claude/skills/level0/lib/code.js";
-import { LOCAL, SCHEMA } from "../../.claude/skills/level0/lib/config.js";
+import { LOCAL } from "../../.claude/skills/level0/lib/config.js";
 import { inherits, rooted } from "../../.claude/skills/level0/lib/layer.js";
 import { validatePlugin } from "../../.claude/skills/level0/lib/plugin-check.js";
 import { boxOf } from "../../.claude/skills/level0/lib/private.js";
@@ -22,11 +22,6 @@ import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
 import { CONFIG, fromJson } from "../../.claude/skills/level0/lib/vale.js";
 import { POINTER, PORT_BASE } from "../../.claude/skills/level0/lib/vehicle.js";
 import { guidanceHere } from "../bridge/guidance.js";
-import {
-  faultsIn as faultsInGrid,
-  RULE as GRID,
-  lineOf,
-} from "../extension/lib/grid.js";
 import {
   bin,
   biome,
@@ -79,23 +74,6 @@ export function treeHere() {
     node: process.version.replace(/^v/, ""),
     box: boxOf(process.env, it.git),
   });
-}
-
-// [[spec/design_output/extension#the-grid-check]]
-export function gridFaults(where) {
-  const at = join(root, SCHEMA);
-  const reaches = where.some((one) => SCHEMA.startsWith(show(join(root, one))));
-  if (!reaches || !files.exists(at)) return [];
-
-  const text = files.read(at);
-  return faultsInGrid(JSON.parse(text)).map((one) => ({
-    file: SCHEMA,
-    rule: GRID,
-    line: lineOf(text, one.key),
-    column: 1,
-    message: one.why,
-    severity: "error",
-  }));
 }
 
 // The server runs as its own node process, so the debugger attaches to it and a restart loses the session nothing. [[spec/design_output/level0#the-bridgehead-and-the-server]]

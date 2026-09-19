@@ -100,11 +100,8 @@ export const PLUGIN = join(".claude", "skills", "level0");
 export const LEVEL1 = join(".claude", "skills", "level1");
 export const CONTRACT = join(root, "test", "contract");
 export const settings = it.config;
-export const PARKED = [
-  "{.se,node_modules,.git,.claude/types,.claude/worktrees}/**",
-  "**/_*",
-];
-export const OURS = `--glob=!{${PARKED.join(",")}}`;
+// The glob the rules read past, owned by the findings every front reads. [[spec/design_output/lsp]]
+export { OURS, PARKED } from "../bridge/findings.js";
 export const TESTS = "test/level0/*.test.js";
 export const CONTRACT_TESTS = "test/contract/*.test.js";
 export const ROUNDS = 5;

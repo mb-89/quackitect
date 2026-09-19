@@ -47,6 +47,7 @@ func (one *Checker) Over(path string) []Finding {
 	for _, rule := range readers[where] {
 		out = append(out, rule(one.tree)...)
 	}
+	out = append(out, syntaxFaults(one.tree, where)...)
 	return sorted(out)
 }
 
@@ -54,6 +55,7 @@ func (one *Checker) Over(path string) []Finding {
 func (one *Checker) Sweep() []Finding {
 	one.tree.Forgets()
 	out := append(treeFaults(one.tree), schemaFaults(one.tree)...)
+	out = append(out, syntaxSweep(one.tree)...)
 	return sorted(out)
 }
 
