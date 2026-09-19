@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -130,6 +130,17 @@ record:
     hand: box b99ea8ab11a8 · claude-code-remote · helper-8
     hash_before: 34e8b8a756c0d14c9a6332b48ea9d42715274670
     hash_after: 34e8b8a756c0d14c9a6332b48ea9d42715274670
+  - step: implement/tests-red
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 02f87cca866e6dc072b076e7acfe23b7d0635e54
+    hash_after: 02f87cca866e6dc072b076e7acfe23b7d0635e54
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -204,20 +215,27 @@ pass
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/pull.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The spawn case and the `--as` case stand red. The parking case stands green already, because `writesHere` refuses a helper leaf on every box.
+
+What surprises: the ask reads the park as the fault, and the park is the half that holds. The fault stands on the other side, where a harness box parks the leaf too and the group holds open.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the cases stand in `test/level0/pull.test.js`, which the ask's last row names
+- the cases drive `doors` in `pull-doors.js`, so git and the disk stand fake
+- a comment over the fixture names this ticket, and every case points at it
 
 ## reflect
 

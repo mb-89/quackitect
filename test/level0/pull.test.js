@@ -339,6 +339,64 @@ test("a step that excludes the only hand answers spawn, with the helper's name a
   assert.equal(takeable(it, { text: CHILD("closed", "design/review") }), "");
 });
 
+// A leaf wanting a helper reaches the hand the engine spawns, and parks where no
+// session spawns one. [[spec/tickets/the-spawn-answers-a-helper]]
+const WANTS_HELPER = CHILD("open", "design/draft").replace(
+  "      - name: draft\n",
+  "      - name: draft\n        by: helper\n",
+);
+
+// [[spec/tickets/the-spawn-answers-a-helper]]
+test("a leaf wanting a helper answers spawn on a box carrying a harness", () => {
+  const { it, disk } = doors(
+    standing(WANTS_HELPER, withField(GROUP_NOTE, "step", "children")),
+  );
+
+  const { code, said } = heard(() => pulling(ROOT, ["pull"], it));
+
+  assert.equal(code, 0);
+  assert.match(said, /^spawn\n {2}a-child at design\/draft/m);
+  assert.match(said, /named helper-1, and you work one step of one ticket/);
+  assert.equal(disk.exists(HOLD), false, "the spawn answer holds nothing");
+  assert.equal(
+    takeable(it, { text: WANTS_HELPER }),
+    "design/draft",
+    "the session spawns the hand, so branch done holds the group",
+  );
+});
+
+// [[spec/tickets/the-spawn-answers-a-helper]]
+test("a leaf wanting a helper parks on a box off a harness, and the box leaves", () => {
+  const { it } = doors(
+    standing(WANTS_HELPER, withField(GROUP_NOTE, "step", "children")),
+    {},
+    { agent: false },
+  );
+
+  const { said } = heard(() => pulling(ROOT, ["pull"], it));
+
+  assert.doesNotMatch(said, /^spawn/m, "the shell moves nothing, so no spawn fires");
+  assert.match(said, /waits for a hand the engine spawns/);
+  assert.equal(
+    takeable(it, { text: WANTS_HELPER }),
+    "",
+    "the leaf parks, so branch done leaves the group open",
+  );
+});
+
+// [[spec/tickets/the-spawn-answers-a-helper]]
+test("a hand under --as takes the leaf wanting a helper", () => {
+  const { it, disk } = doors(
+    standing(WANTS_HELPER, withField(GROUP_NOTE, "step", "children")),
+  );
+
+  const { code, said } = heard(() => pulling(ROOT, ["pull", "--as", "helper-1"], it));
+
+  assert.equal(code, 0);
+  assert.match(said, /^work {2}a-child at design\/draft/m);
+  assert.equal(disk.exists(HOLD), true, "the spawned hand holds the leaf");
+});
+
 // [[spec/design_output/pull#a-hand-of-its-own]]
 test("the spawn comes before the group's own leaves, and the box leaves children past no takeable child", () => {
   const took = withEntry(CHILD("open", "design/review"), {
