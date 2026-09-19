@@ -90,12 +90,16 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
     hash_before: 9a7324a8827986146b4246ec34746fc9cb12397d
     hash_after: 9a7324a8827986146b4246ec34746fc9cb12397d
+  - step: design/review
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: f4fd2c1f5187daf0a0448a116d9f113e1cfcf8d4
+    hash_after: f4fd2c1f5187daf0a0448a116d9f113e1cfcf8d4
 ---
 
 # Ask
@@ -161,6 +165,20 @@ A third case drives each of the three spellings, so a harness spelling the id an
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+- the three changes each land in one place, and together they answer every line of the ask
+- the third spelling reads right, because `copilot.js` takes the `session_id` that `sessionOf` misses
+- the approach names `.se/session.json`, and the modules spell `.se/.runtime/session.json`
+- the table counts `src/scripts/hand.js` a copy, and it composes the path off `inRun` instead
+- so one spelling goes, and the comment the approach asks for belongs on the level zero hook
+- the cited collector keys one handler an event
+- level one registers `tool.call` with a filter between the event and the handler
+- the new case reads the last argument, or it hands the filter a call
+- the fake `$` carries a tool register and a ui log beside `fs`
+- level one's session start registers the pull tool before it writes the file
+- the approach names `test/level0/` and no file, and `test/level0/level1.test.js` stands there
 
 # implement
 
