@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -178,6 +178,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 5387e4f82b24 · claude-code-remote · helper-15
+    hash_before: ffc15e4dc2fc1314c6ab343963ab6278a5bfd52e
+    hash_after: ffc15e4dc2fc1314c6ab343963ab6278a5bfd52e
+reason: done
 ---
 
 # Ask
@@ -432,25 +437,14 @@ names it moves. `spec/design_output/tree.md` gains the rule's row, and
 
 <!-- the form is files -->
 
-- .claude/skills/level0/hooks/level0.js
+- spec/guidance/review/reviewing.md
+- spec/tickets/a-check-finds-every-writer.md
 - .claude/skills/level0/lib/folders.js
 - .claude/skills/level0/lib/tools.js
 - .claude/skills/level0/lib/tree.js
-- .claude/skills/level0/lib/vehicle.js
-- spec/tickets/a-check-finds-every-writer.md
-- src/index/index.go
-- src/lsp/bridge.go
-- src/lsp/serve.go
-- src/lsp/tree.go
-- src/scripts/install.sh
-- test/contract/folders.test.js
-- test/contract/tree.test.js
-- test/level0/tools.test.js
-- spec/guidance/review/reviewing.md
-- spec/design_output/tree.md
 - spec/design_output/private.md
-- spec/design_input/the-runtime-files-stand-apart.md
-- src/scripts/pull-chapter.js
+- spec/design_output/tree.md
+- test/contract/folders.test.js
 
 ## verdict
 
@@ -458,21 +452,23 @@ names it moves. `spec/design_output/tree.md` gains the rule's row, and
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-| finding | fix |
+| earlier finding | what answers it |
 |---|---|
-| `spec/design_output/tree.md` tables the rules over two files, and the new rule stands outside it | Add its row, and name the two files it weighs |
-| `spec/design_output/private.md` carries the older escape, so a reader takes an import as cover | Say the escape binds to the line, and to the comment run above it |
-| `loopNames` reads the loop header for the private folder, so a loop of bare names carries no marker and passes | Mark a loop whose names meet a list, whatever its header spells |
-| The red case over a loop naming no list moves to a header spelling that folder | Restore the bare case once the rule holds it |
+| the new rule stands outside the table in `spec/design_output/tree.md` | the row lands, naming the installer and `lib/folders.js` |
+| `spec/design_output/private.md` carries the older escape | three lines bind the escape to the line and the comment run |
+| `loopNames` passes a loop of bare names | `meets` marks a loop whose names meet a list, whatever the header spells |
+| the red case moves off the bare names | the case reads `for one in bin hold` again |
 
-- the branch answers both lines of the ask, and the tighter escape catches the seven writers
-- `./RUNME.sh check` answers 0 on this tip
-- `./RUNME.sh branch review` says the check passes, and the route hands this ticket to a retro
-- every file the branch touches stands inside the ask, and the moved cases redesign nothing
-- each rule carries a case, and my probe refuses a stale spelling standing under an import
-- my probe adds a loop of bare names to the installer text, and the rule answers nothing
+- my probe feeds the rule a loop of bare `MOVED` names, and the rule refuses it
+- my probe feeds it a loop of bare `LOGGED` names, and the rule refuses it
+- my probe feeds it a loop of names no list holds, and the rule lets it stand
+- my probe spells a stale path under an import of the owner, and the escape refuses the line
+- `./RUNME.sh check` answers 0 on this tip, and the two case files answer green
+- `./RUNME.sh branch review` says the check passes, and marks the handback retro absent
+- the route hands this ticket to a retro, so that retro stands after this verdict
+- every file the ticket commits touch stands inside the ask, and the moved cases redesign nothing
 
 ## checked
 
@@ -480,7 +476,7 @@ fail
 
 <!-- the form is checklist -->
 
-- the lists stand in `folders.js` alone, and the rule holds the installer copy against them. The notes over the rules carry neither the new rule nor the tighter escape.
+- the lists stand in `folders.js` alone, and the two notes name the rules and copy no name
 
 # Discussion
 
