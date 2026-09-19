@@ -89,7 +89,12 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: d5cad7b0b53bba4c053c4347c98c64a59d2ca992
+    hash_after: d5cad7b0b53bba4c053c4347c98c64a59d2ca992
 ---
 
 # Ask
@@ -112,6 +117,26 @@ runtime files land beside the private folder again after each move
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The check refuses a stale spelling in a source file already, and one list stands
+outside that rule: the installer's.
+
+| what holds a name | where it stands | what reads it |
+|---|---|---|
+| the names the runtime half takes | `MOVED` in `.claude/skills/level0/lib/folders.js` | the spelling rule in `.claude/skills/level0/lib/tree.js` |
+| the move a box meets on its next run | the loop in `src/scripts/install.sh` | a shell, which imports nothing |
+
+So a case reads the installer off disk, pulls the names out of its loop, and
+holds the pair equal. A name landing in one list alone turns it red, which is
+the change reaching every writer at once.
+
+Two names stand apart, and the case names why:
+
+- `hold.json` rides the `hold` entry, because the rule reads a word bound after the name
+- `registry.json` moves in the home folder, under a block of its own
+
+The case stands in `test/contract/tree.test.js`, beside the rules holding the
+same names, and reads both files through the disk door.
 
 ## review
 
