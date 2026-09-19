@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -127,6 +127,17 @@ record:
     hash_after: 9022b52413ccacaee9582f0b281154e30df9c40b
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 9a6e5b32b39a4ffcb623c2524aec7fa2789927c6
+    hash_after: 9a6e5b32b39a4ffcb623c2524aec7fa2789927c6
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 2 test(s) pass in 1 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -265,26 +276,42 @@ What surprises: the write door answers a file ceiling where these cases go in be
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/work-orphan.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+The listing asks `merge-base` what trunk and each branch share. git answers red where they share none, and that branch stands at `orphan`.
+
+| the verb | what it does with an orphan |
+|---|---|
+| `branch list` | marks the row, so a reader sees why no box takes it |
+| `branch take` | passes over it, and says which branch it skips |
+| `branch merge` | reads the same base, so one read answers both |
+
+A branch sharing no ancestor with trunk reaches no sync. A box taking one stalls on unrelated histories and spends its session there.
+
+The refs standing orphaned on this remote stay standing. `git ls-remote --heads origin` names them, and each stands outside `work/`, which the listing reads. So the take reaches none of them, and this guard covers the next rewrite of trunk. A hand wanting one gone runs git.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the listing, the standing, the take and the merge's own read of the base
+- the cases drive `doorsSaying`, so git and the disk stand fake
+- each hunk carries a comment pointing at [[spec/design_output/work#the-listing-reads-git-once]]
 
 # verdict
 
