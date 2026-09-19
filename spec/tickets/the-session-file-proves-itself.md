@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: design
@@ -130,6 +130,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box fa49097ce66c · claude-code-remote · helper-7
+    hash_before: d2ab2206f3f4920fbde04c7f49bdef905f54d606
+    hash_after: d2ab2206f3f4920fbde04c7f49bdef905f54d606
+reason: done
 ---
 
 # Ask
@@ -360,17 +365,50 @@ the second argument would hand that filter a call.
 
 <!-- the form is files -->
 
+    spec/tickets/the-session-file-proves-itself.md
+    spec/guidance/review/reviewing.md
+    .claude/skills/level1/hooks/level1.js
+    .claude/skills/level1/lib/pull.js
+    .claude/skills/level0/hooks/level0.js
+    src/scripts/hand.js
+    test/level0/level1.test.js
+    test/level0/hand.test.js
+    test/contract/tree.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- four cases drive the registered `session.start` over a fake `$.fs`, and read the file back
+- one case carries an event naming a session, and one carries an event naming none
+- the no-session case asserts an empty fake and the box line, so a bad event meets a refusal
+- `sessionOf` takes `session_id`, the third spelling `.claude/skills/level0/lib/copilot.js` reads
+- the hook imports `SESSION` from the library beside it, so one copy stands
+- `test/contract/tree.test.js` pins each copy against `src/scripts/hand.js`, and refuses a second spelling in the hook
+- the collector keys the last argument, so level one's `tool.call` handler takes the call
+- the diff touches five files, and the ask names each one or the move forces it
+- `./RUNME.sh check` over the tree exits 0, and `node --test` over both touched files answers 40 of 40
+- the ask's scoped check exits 1 on five warnings, and that line alone goes missing
+- the five files stand outside this diff, and [[spec/tickets/the-warnings-feed-a-refactorer]] owns their split
+- the handback carries no retro
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- each fact lands once, and a note beside it points at the file owning the name
+
+| the fact | where it stands | the note beside it |
+|---|---|---|
+| the session file path | `.claude/skills/level1/lib/pull.js` | names `folders.js` as the owner, and the plugin boundary forcing the copy |
+| the third spelling | `sessionOf`, the same file | names the copilot library taking `session_id` |
+| the copies the tree allows | `test/contract/tree.test.js` | reads `SESSION` off `src/scripts/hand.js`, the owner in the tree |
 
 # Discussion
 
