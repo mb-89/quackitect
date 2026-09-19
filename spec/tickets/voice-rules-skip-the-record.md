@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: draft
-urgency: now
+urgent: true
 steps:
   - name: do
     does: makes the change the ask names

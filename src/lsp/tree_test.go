@@ -6,13 +6,13 @@ import (
 )
 
 const goodSettings = `{
-  "vale.valeCLI.path": ".se/run/bin/vale",
+  "vale.valeCLI.path": ".se/.runtime/bin/vale",
   "vale.valeCLI.config": ".vale.ini",
   "vale.valeCLI.installVale": false,
   "vale.valeCLI.minAlertLevel": "inherited",
   "vale.valeCLI.lintOnChange": true,
   "vale.enableSpellcheck": false,
-  "biome.lsp.bin": { "linux-x64": ".se/run/bin/biome", "win32-x64": ".se/run/bin/biome.exe" },
+  "biome.lsp.bin": { "linux-x64": ".se/.runtime/bin/biome", "win32-x64": ".se/.runtime/bin/biome.exe" },
   "biome.configurationPath": "spec/config/biome.json"
 }
 `
@@ -51,7 +51,7 @@ func TestACleanTreePasses(t *testing.T) {
 
 func TestSettingsNameTheBinaries(t *testing.T) {
 	tree := wholeTree(t, map[string]string{
-		Settings: strings.Replace(goodSettings, `".se/run/bin/vale"`, `"vale"`, 1),
+		Settings: strings.Replace(goodSettings, `".se/.runtime/bin/vale"`, `"vale"`, 1),
 	})
 	one := onlyOne(t, settingsNameBinaries(tree), "SettingsNameBinaries")
 	if !strings.Contains(one.Message, "vale.valeCLI.path names something else") {
@@ -87,10 +87,10 @@ func TestTheEditorDrawsTheWriteRules(t *testing.T) {
 
 func TestBiomeRunsTheWindowsBinary(t *testing.T) {
 	tree := wholeTree(t, map[string]string{
-		Settings: strings.Replace(goodSettings, `"win32-x64": ".se/run/bin/biome.exe"`, `"win32-x64": ".se/run/bin/biome"`, 1),
+		Settings: strings.Replace(goodSettings, `"win32-x64": ".se/.runtime/bin/biome.exe"`, `"win32-x64": ".se/.runtime/bin/biome"`, 1),
 	})
 	one := onlyOne(t, biomeOnWindows(tree), "BiomeOnWindows")
-	if !strings.Contains(one.Message, "installs .se/run/bin/biome.exe there") {
+	if !strings.Contains(one.Message, "installs .se/.runtime/bin/biome.exe there") {
 		t.Errorf("the message reads %q", one.Message)
 	}
 }

@@ -23,8 +23,8 @@ two roots, and a copy that knows which project it drives.
 
 | what | where it lives |
 |---|---|
-| a copy carries an identity | `.se/copy.json` in the method tree |
-| a project names the copy driving it | `.se/project.json` in the work tree |
+| a copy carries an identity | `.se/.runtime/copy.json` in the method tree |
+| a project names the copy driving it | `.se/.runtime/project.json` in the work tree |
 | a register turns an identity into a place | `~/.se/registry.json` |
 
 A path alone does none of this. It goes stale the moment either tree moves,
@@ -165,7 +165,7 @@ says what the verb puts into each.
 
 | field | reads off |
 |---|---|
-| `vehicle` | the identity in `.se/copy.json`, made where it stands unmade |
+| `vehicle` | the identity in `.se/.runtime/copy.json`, made where it stands unmade |
 | `name` | the folder the vehicle stands in, which is the brand |
 | `upstream` | `git remote get-url origin` in the vehicle, or what `--upstream` names |
 | `version` | the vehicle's `package.json` |
@@ -222,7 +222,7 @@ start it takes one road, in this order:
 
 The attach is one command: `env SE_WORK_ROOT=<stub> sh <vehicle>/RUNME.sh
 vehicle attach`. The RUNME installs first. The verb then reads `SE_WORK_ROOT`
-as the work root and writes the driver into `.se/project.json`. Then it
+as the work root and writes the driver into `.se/.runtime/project.json`. Then it
 settles the stub the way the sidebar's hook button does:
 
 | the verb writes | where |

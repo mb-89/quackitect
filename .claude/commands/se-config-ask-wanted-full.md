@@ -7,5 +7,6 @@ generated: "GENERATED. Edit the source named below, not this file. It is written
 !`./RUNME.sh config ask.wanted full`
 
 The line above runs before this turn opens, so `ask.wanted` reads `full` from here
-on. Run `./RUNME.sh config` to read which layer answers a key: `.se/config.json`
-beats the environment, and the environment beats `spec/config/level0.json`.
+on. Run `./RUNME.sh config` to read which layer answers a key:
+`.se/.runtime/config.json` beats the environment, and the environment beats
+`spec/config/level0.json`.

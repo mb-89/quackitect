@@ -17,7 +17,7 @@ import {
   askOf,
   CLOSED,
   fieldOf,
-  GROUP,
+  frontOf,
   heldIn,
   isGroup,
   OPEN,
@@ -25,6 +25,7 @@ import {
   TICKETS,
   ticketAt,
   ticketNamed,
+  urgent,
   WORK_BRANCH,
   withEntry,
   withField,
@@ -32,23 +33,31 @@ import {
   withoutField,
 } from "./group.js";
 import { guidance } from "./guidance-verb.js";
-import { handOf, pull, takeable } from "./pull.js";
+import {
+  escalate,
+  handOf,
+  leafOf,
+  pull,
+  roleOf,
+  stepPathOf,
+  takeable,
+} from "./pull.js";
 import { readyToMerge, review } from "./review.js";
 import { serving } from "./serve.js";
-import { freeIn, staleClaim, trigger } from "./stand.js";
+import { freeIn, trigger } from "./stand.js";
 import { testVerb } from "./test-verb.js";
 import { unblock } from "./unblock.js";
+import { answer } from "./work-answer.js";
+import { list } from "./work-list.js";
 import { close, merge } from "./work-merge.js";
 import {
   BRIEF,
   briefOf,
-  COL,
   childrenHere,
   DONE,
   dirty,
   groupStanding,
   HELD,
-  mergedHere,
   noteOf,
   push,
   setStatus,
@@ -59,9 +68,6 @@ import {
   sync,
   TODO,
   textAt,
-  ticketsOn,
-  URGENCY,
-  urgencyOf,
   waitingOn,
   withContract,
   workBranchHere,
@@ -70,7 +76,7 @@ import {
 export * from "./work-stands.js";
 
 export function work(root, argv, doors) {
-  const it = { root, ...doors };
+  const it = { root, method: root, work: root, ...doors };
   const what = argv[0];
   const name = argv[1];
   const doing = {
@@ -84,6 +90,8 @@ export function work(root, argv, doors) {
     read,
     review,
     list,
+    // [[spec/design_output/work#one-verb-answers-git]]
+    answer: (it, _name, argv) => answer(it, (argv ?? []).slice(1)),
     // [[spec/design_output/pull#the-hand-out]]
     pull: (it, _name, argv) =>
       pull(
@@ -94,6 +102,8 @@ export function work(root, argv, doors) {
         },
         argv,
       ),
+    // [[spec/design_output/pull#a-person-step-goes-in]]
+    escalate: (it, _name, argv) => escalate(it, argv),
     // [[spec/design_output/pull#the-work-answer]]
     guidance: (it, _name, argv) => guidance(it, (argv ?? []).slice(1), process.env),
     // [[spec/design_output/work#a-person-step-leaves]]
@@ -112,7 +122,7 @@ export function work(root, argv, doors) {
 
 // [[spec/design_output/work#the-routine-a-verb-names]]
 export function cloud(root, argv, doors) {
-  const it = { root, ...doors };
+  const it = { root, method: root, work: root, ...doors };
   if (argv[0] === "trigger") return trigger(it);
   console.log("Usage: ./RUNME.sh cloud <verb>\n");
   console.log("  trigger       the routine that works a branch, and what stands free");
@@ -172,8 +182,10 @@ function newWork(it, name) {
 function take(it, name = "") {
   if (dirty(it)) return 2;
 
+  // A take acts on the remote, so it refreshes the refs first. [[spec/design_output/work#the-listing-reads-git-once]]
+  it.git.fetch();
   const stand = standOf(it);
-  const standing = standingAll(stand, mergedHere(it));
+  const standing = standingAll(stand);
   const open = stand.filter((one) => standing.get(one.branch) === TODO);
 
   if (!open.length) {
@@ -205,13 +217,33 @@ function take(it, name = "") {
   const wanted = held.length ? held : free;
   wanted.sort(
     (a, b) =>
-      URGENCY.indexOf(urgencyOf(noteOf(a))) - URGENCY.indexOf(urgencyOf(noteOf(b))) ||
+      Number(urgent(noteOf(b))) - Number(urgent(noteOf(a))) ||
       a.branch.localeCompare(b.branch),
   );
 
   const one = wanted[0];
   if (!onBranch(it, one.branch)) return 1;
-  return one.brief ? claimBrief(it, one.branch) : claimGroup(it, one);
+  if (one.brief) return claimBrief(it, one.branch);
+  // A box with nothing at a step it can take leaves the group at todo, before it writes a line. [[spec/tickets/the-group-leaves-at-todo]]
+  const stands = standsOpen(it, one.name, it.join(it.root, ticketAt(one.name)));
+  if (stands.open.length && !stands.busy.length) {
+    console.log(
+      `${one.branch} stays at ${TODO}, because every open step waits for a person.`,
+    );
+    for (const child of stands.open) console.log(`  ${waitsAt(child)}`);
+    console.log(`Answer it, then run ./RUNME.sh branch take again.`);
+    return 0;
+  }
+  return claimGroup(it, one);
+}
+
+// The step a child stands at, and the hand it waits for, so the take names what to answer. [[spec/tickets/the-group-leaves-at-todo]]
+function waitsAt(one) {
+  const front = frontOf(one.text);
+  const path = stepPathOf(front);
+  const leaf = leafOf(front, path);
+  if (!leaf) return `${one.name} stands at ${path || "no step"}`;
+  return `${one.name} waits for a ${leaf.by} at ${leaf.path}`;
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
@@ -243,7 +275,7 @@ function parkedFiles(it) {
 function claimBrief(it, branch) {
   const brief = it.disk.read(it.join(it.root, BRIEF));
   if (!push(it, branch, setStatus(brief, HELD), HELD)) {
-    console.error("Somebody took this branch first. Run branch take again.");
+    console.error(refusedPush(branch));
     return 1;
   }
 
@@ -258,6 +290,15 @@ function claimBrief(it, branch) {
   return 0;
 }
 
+// The take names why the push came back, because a race is one road and a door turning it away is another, and a reader clears each one differently. [[spec/design_output/work#the-take-writes-the-record]]
+function refusedPush(branch) {
+  return [
+    `The push of ${branch} came back refused, so the take stands undone.`,
+    "Somebody taking it first is one road, and a push door turning it away is another.",
+    "The lines above say which. Clear it, then run branch take again.",
+  ].join("\n");
+}
+
 // [[spec/design_output/work#the-take-writes-the-record]]
 function claimGroup(it, one) {
   const at = ticketAt(one.name);
@@ -266,11 +307,16 @@ function claimGroup(it, one) {
   const hand = handOf(it);
   const before = it.git.run(["rev-parse", "HEAD"], true).out;
 
-  it.disk.write(path, withEntry(was, { step: stepOf(was), hand, hash_before: before }));
+  // A tracked file holds the role, and git holds who. [[spec/design_output/pull#the-hand-rule]]
+  const role = roleOf(hand);
+  it.disk.write(
+    path,
+    withEntry(was, { step: stepOf(was), hand: role, hash_before: before }),
+  );
   it.git.run(["add", at], true);
-  it.git.run(["commit", "-m", `${one.branch}: ${hand} takes it`], true);
+  it.git.run(["commit", "-m", `${one.branch}: ${role} takes it`], true);
   if (!it.git.run(["push", "origin", one.branch]).ok) {
-    console.error("Somebody took this group first. Run branch take again.");
+    console.error(refusedPush(one.branch));
     return 1;
   }
 
@@ -336,17 +382,23 @@ function ready(it, branch) {
   return { code: 0, says: said.says };
 }
 
-// [[spec/design_output/work#a-box-leaves]]
-function leaves(it, branch, at, path, says) {
-  const name = branch.replace(/^work\//, "");
-  const after = it.git.run(["rev-parse", "HEAD"], true).out;
+// One place answers what a hand can take across a group, so the take and the leave read the same line. [[spec/design_output/work#a-box-leaves]]
+export function standsOpen(it, name, path) {
   const children = childrenHere(it, name);
   const open = children.filter((one) => fieldOf(one.text, "state") !== CLOSED);
-
   // A closed sibling frees the one waiting on it, so takeable reads them all. [[spec/design_output/pull#done-leaves-no-takeable-step]]
   const busy = [...open, { name, text: it.disk.read(path) }]
     .map((one) => ({ name: one.name, step: takeable(it, one, children) }))
     .filter((one) => one.step);
+  return { children, open, busy };
+}
+
+// [[spec/design_output/work#a-box-leaves]]
+function leaves(it, branch, at, path, says) {
+  const name = branch.replace(/^work\//, "");
+  const after = it.git.run(["rev-parse", "HEAD"], true).out;
+  const { open, busy } = standsOpen(it, name, path);
+
   if (busy.length) {
     for (const one of busy) {
       console.error(`${one.name} stands at ${one.step}, and a hand can take it.`);
@@ -455,99 +507,4 @@ function read(it, name) {
   return 0;
 }
 
-// [[spec/design_output/work#a-row-per-group]]
-function list(it, _name, argv) {
-  const stand = standOf(it);
-  const standing = standingAll(stand, mergedHere(it));
-  if ((argv ?? []).includes("--done")) return doneOnly(stand, standing);
-  const now = it.clock ? it.clock.now().getTime() : 0;
-  const rows = stand.flatMap((one) => [
-    rowOf(it, one, standing, now),
-    ...childRows(it, one),
-  ]);
-  const loose = looseRows(it);
-
-  if (!rows.length && !loose.length) {
-    console.log("No group and no loose ticket stands.");
-    return 0;
-  }
-
-  // [[spec/design_output/work#a-stale-group-is-yours]]
-  const stale = rows.filter((row) => row.stale);
-  if (stale.length) {
-    console.log("Yours");
-    for (const row of stale) {
-      console.log(`  ${row.said}`);
-      console.log(
-        `    ${row.name} held ${row.age}. Release it, take it over, or close it.`,
-      );
-    }
-    console.log("");
-  }
-  for (const row of [...rows, ...loose]) console.log(row.said);
-  return 0;
-}
-
-// [[spec/design_output/work#a-row-per-group]]
-function rowOf(it, one, standing, now) {
-  const text = noteOf(one);
-  const kind = one.brief ? "brief" : GROUP;
-  const status = standing.get(one.branch) || "no status";
-  const waits = waitingOn(text, standing);
-  const why = waits.length ? `waits for ${waits.join(", ")}` : urgencyOf(text);
-  // [[spec/design_output/work#a-stale-group-is-yours]]
-  const { age, stale } =
-    status === HELD ? staleClaim(it, one.branch, now) : { age: "", stale: false };
-
-  return {
-    name: one.name,
-    age,
-    stale,
-    said: `${one.branch.padEnd(COL.branch)} ${kind.padEnd(COL.kind)} ${status.padEnd(COL.status)} ${why.padEnd(COL.why)} ${age}`,
-  };
-}
-
-// [[spec/design_output/work#a-ticket-under-its-group]]
-function childRows(it, one) {
-  if (!one.ticket) return [];
-  return ticketsOn(it, `origin/${one.branch}`)
-    .filter((child) => fieldOf(child.text, GROUP) === one.name)
-    .map((child) => ({
-      stale: false,
-      said: `  ${child.name.padEnd(COL.child)} ticket ${stateOf(child.text).padEnd(COL.status)} ${whyOf(child.text)}`,
-    }));
-}
-
-// [[spec/design_output/work#a-ticket-under-its-group]]
-function stateOf(text) {
-  return fieldOf(text, "state") || OPEN;
-}
-
-// [[spec/design_output/work#a-ticket-under-its-group]]
-export function whyOf(text) {
-  return stepOf(text) || urgencyOf(text);
-}
-
-// [[spec/design_output/work#a-row-per-group]]
-function looseRows(it) {
-  return ticketsOn(it, `origin/${TRUNK}`)
-    .filter((one) => !fieldOf(one.text, GROUP) && !isGroup(one.text))
-    .map((one) => ({
-      stale: false,
-      said: `${one.name.padEnd(COL.branch)} ticket ${(fieldOf(one.text, "state") || OPEN).padEnd(COL.status)} ${urgencyOf(one.text)}`,
-    }));
-}
-
-// [[spec/design_output/work#a-merged-branch-goes]]
-
-function doneOnly(stand, standing) {
-  const ready = stand.filter((one) => standing.get(one.branch) === DONE);
-  if (!ready.length) {
-    console.log(`No branch stands at ${DONE}.`);
-    return 0;
-  }
-  for (const one of ready) {
-    console.log(`${one.branch.padEnd(COL.branch)} ./RUNME.sh branch read ${one.name}`);
-  }
-  return 0;
-}
+export { whyOf } from "./work-list.js";

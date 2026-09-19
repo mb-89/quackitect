@@ -1,7 +1,6 @@
 ---
 kind: [[ticket]]
 state: closed
-urgency: soon
 group: the-hand-carries-a-step
 step: do
 steps:

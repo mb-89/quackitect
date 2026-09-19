@@ -32,13 +32,14 @@ export function openPrivate(text) {
   return process !== "note" && !process.endsWith("/note");
 }
 
-// The queue holds work for a desk where a free open ticket has a leaf a hand takes, or a group reads now. [[spec/design_output/stop#the-mechanical-checks]]
+// The queue holds work for a desk where a free open ticket has a leaf a hand takes, or a group carries the mark. [[spec/design_output/stop#the-mechanical-checks]]
 export function queueHolds(texts) {
   return (texts ?? []).some((text) => {
     const front = readNote(String(text ?? "")).front.said ?? {};
     if (String(front.state ?? "") !== "open") return false;
     const process = String(front.process ?? "").replace(/^\[\[|\]\]$/g, "");
-    if (process === "group" || process.endsWith("/group")) return String(front.urgency ?? "") === "now";
+    if (process === "group" || process.endsWith("/group"))
+      return String(front.urgent ?? "") === "true";
     if (String(front.group ?? "").trim()) return false;
     const walk = entriesIn(front.steps, "steps");
     const step = String(front.step ?? "").trim();

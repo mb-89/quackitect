@@ -795,7 +795,7 @@ function chaptersOf(list, level, rule, listed = false) {
       header,
       level,
       required: true,
-      description: sayOf(one),
+      description: askedOf(one) || sayOf(one),
       form: String(one.form ?? ""),
       "x-fills": Boolean(one.form),
     });
@@ -824,6 +824,14 @@ function chaptersOf(list, level, rule, listed = false) {
 }
 
 export const CHECKED = "checked";
+
+// A step the engine parks carries its question in `asks`, and the chapter under it reads that question, so the ticket alone says what the step waits on. [[spec/design_output/pull#a-person-step-goes-in]]
+function askedOf(one) {
+  return String(one?.asks ?? "")
+    .replace(/\s+/g, " ")
+    .replace(/--+>/g, "->")
+    .trim();
+}
 
 // [[spec/design_output/schema#the-render-follows-the-tree]]
 function sayOf(one) {

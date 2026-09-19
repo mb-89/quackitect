@@ -4,7 +4,7 @@
 // [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
 
 // The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because the extension bundles alone.
-const BIN = ".se/run/bin";
+const BIN = ".se/.runtime/bin";
 const NAME = "se-lsp";
 const ID = "quackitect";
 

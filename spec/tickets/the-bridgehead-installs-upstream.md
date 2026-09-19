@@ -1,7 +1,6 @@
 ---
 kind: [[ticket]]
 state: closed
-urgency: soon
 depends_on: [the-bridgehead-imports-its-vehicle, the-stub-takes-shape]
 steps:
   - name: sync

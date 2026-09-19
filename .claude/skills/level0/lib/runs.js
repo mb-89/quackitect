@@ -18,13 +18,23 @@ export function stampOf(text) {
       sha: String(read.sha ?? ""),
       ok: read.ok === true,
       clean: read.clean === true,
+      // A stamp naming no count reads as warned, so an old check opens no retro. [[spec/guidance/retro/collect]]
+      warned: read.warnings === undefined || Number(read.warnings) > 0,
       at: String(read.at ?? ""),
       // What the lint left standing at warning, which the refactoring rule reads. [[spec/tickets/the-spawn-reaches-its-guidance]]
       warnings: Number(read.warnings ?? 0),
       files: [read.files ?? []].flat().map(String).filter(Boolean),
     };
   } catch {
-    return { sha: "", ok: false, clean: false, at: "", warnings: 0, files: [] };
+    return {
+      sha: "",
+      ok: false,
+      clean: false,
+      warned: true,
+      at: "",
+      warnings: 0,
+      files: [],
+    };
   }
 }
 

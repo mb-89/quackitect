@@ -3,9 +3,9 @@
 // door, the sidebar.
 // [[spec/design_output/log#what-one-line-looks-like]]
 
-import { inRun } from "./folders.js";
+import { LOG } from "./folders.js";
 
-export const FOLDER = inRun("log");
+export const FOLDER = LOG;
 export const SESSION = `${FOLDER}/session.jsonl`;
 export const OLD = `${FOLDER}/old`;
 export const LOG_TOOL = "log";

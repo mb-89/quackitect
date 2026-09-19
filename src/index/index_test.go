@@ -16,7 +16,7 @@ func tree(t *testing.T) string {
 	write(t, root, "spec/one.md", "---\nkind: note\nid: one\n---\n\nThe first note says [[two]] out loud.\n")
 	write(t, root, "spec/two.md", "---\nkind: note\nid: two\n---\n\nThe second note names [[nobody]] at all.\n")
 	write(t, root, "src/plain.js", "// a line the search finds\nconst said = 1;\n")
-	write(t, root, ".se/run/skipped.md", "---\nid: skipped\n---\n\nThis never reaches the index.\n")
+	write(t, root, ".se/.runtime/skipped.md", "---\nid: skipped\n---\n\nThis never reaches the index.\n")
 	write(t, root, ".se/tickets/parked.md", "---\nid: parked\n---\n\nA word standing under the private folder alone: marzipan.\n")
 	return root
 }
@@ -47,14 +47,22 @@ func opened(t *testing.T, root string) *sql.DB {
 
 func TestTheWalkSkipsTheRuntimeHalfAndNothingElseUnderThePrivateFolder(t *testing.T) {
 	root := tree(t)
+	write(t, root, ".se/.retro/one/input/log/a.jsonl", "{}\n")
 	db := opened(t, root)
 
 	var count int
-	if err := db.QueryRow(`SELECT count(*) FROM file WHERE path LIKE '.se/run/%'`).Scan(&count); err != nil {
+	if err := db.QueryRow(`SELECT count(*) FROM file WHERE path LIKE '.se/.runtime/%'`).Scan(&count); err != nil {
 		t.Fatal(err)
 	}
 	if count != 0 {
 		t.Fatalf("the walk reached the runtime half: %d file(s)", count)
+	}
+
+	if err := db.QueryRow(`SELECT count(*) FROM file WHERE path LIKE '.se/.retro/%'`).Scan(&count); err != nil {
+		t.Fatal(err)
+	}
+	if count != 0 {
+		t.Fatalf("the walk reached the retro half: %d file(s)", count)
 	}
 
 	if err := db.QueryRow(
@@ -63,6 +71,29 @@ func TestTheWalkSkipsTheRuntimeHalfAndNothingElseUnderThePrivateFolder(t *testin
 	}
 	if count != 1 {
 		t.Fatalf("the walk answers %d row(s) for the private note", count)
+	}
+}
+
+// The log grows a line a door call, so no watch stands on it. [[spec/design_output/index#the-watcher-keeps-it-warm]]
+func TestTheWatchStandsOffTheLogAndTheWalkStillReadsIt(t *testing.T) {
+	root := tree(t)
+	write(t, root, ".se/.log/session.jsonl", "{\"said\":\"a line a door call\"}\n")
+	db := opened(t, root)
+
+	if !logs(root, filepath.Join(root, ".se", ".log")) {
+		t.Fatal("the watch stands on the log, so every line sweeps the tree")
+	}
+	if logs(root, filepath.Join(root, ".se", "tickets")) {
+		t.Fatal("the watch stands off the tickets, so a write there reaches nobody")
+	}
+
+	var count int
+	if err := db.QueryRow(
+		`SELECT count(*) FROM file WHERE path = '.se/.log/session.jsonl'`).Scan(&count); err != nil {
+		t.Fatal(err)
+	}
+	if count != 1 {
+		t.Fatalf("the walk answers %d row(s) for the log", count)
 	}
 }
 

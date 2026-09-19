@@ -202,7 +202,7 @@ test("a hand-back with a field empty answers refused, keeps the hold, and counts
 
 // [[spec/design_output/pull#the-pass]]
 test("the voice rules read the evidence at the hand-back, and an error refuses it", () => {
-  const vale = "/tree/.se/run/bin/vale";
+  const vale = "/tree/.se/.runtime/bin/vale";
   const long = JSON.stringify({
     "stdin.md": [
       {
@@ -217,7 +217,7 @@ test("the voice rules read the evidence at the hand-back, and an error refuses i
   const { it, disk } = doors(
     standing(filled(CHILD(), "### approach", "A long approach.")),
     {
-      [`${vale} --config=.vale.ini --path=spec/tickets/a-child.md --output=JSON --no-exit`]:
+      [`${vale} --config=${at(".vale.ini")} --path=spec/tickets/a-child.md --output=JSON --no-exit`]:
         { stdout: long },
     },
   );
@@ -424,7 +424,7 @@ test("the payload spans a fence, a porcelain row reads whole, and a files field 
     "the fence goes with the old text",
   );
 
-  const vale = "/tree/.se/run/bin/vale";
+  const vale = "/tree/.se/.runtime/bin/vale";
   const ranVale = [];
   const route = CHILD("open", "verdict").replace(
     "group: one-group\n",
@@ -436,7 +436,7 @@ test("the payload spans a fence, a porcelain row reads whole, and a files field 
   );
   const { it } = doors(standing(body, withField(GROUP_NOTE, "state", "closed")), {
     "git status --porcelain": { stdout: "M spec/tickets/a-child.md\n?? .vale.ini" },
-    [`${vale} --config=.vale.ini --path=spec/tickets/a-child.md --output=JSON --no-exit`]:
+    [`${vale} --config=${at(".vale.ini")} --path=spec/tickets/a-child.md --output=JSON --no-exit`]:
       (_argv, init) => {
         ranVale.push(init.stdin);
         return { stdout: "{}" };
@@ -502,7 +502,7 @@ test("a hand under --as works one step under its own name, and the pull answers 
     hash_after: SHA,
   });
   const { it, disk } = doors(standing(took));
-  const helper = join(ROOT, ".se/run/hold/box-d462e994b4cef-helper-2.json");
+  const helper = join(ROOT, ".se/.runtime/hold/box-d462e994b4cef-helper-2.json");
 
   const out = heard(() => work(ROOT, ["pull", "--as", "helper-2"], it));
   assert.equal(out.code, 0);
@@ -569,6 +569,32 @@ test("a verdict field decides, the flag is refused there, and a fail sends the t
   assert.equal(entry.returns, 1);
   assert.equal(entry.why, "the approach names no test");
   assert.match(said, /fails design\/review back to design\/draft/);
+});
+
+// A step whose evidence stands red is a step a hand fails. [[spec/design_output/pull#the-fail]]
+test("a fail runs the step's commands for the record, and none of them refuses it", () => {
+  const child = withPayload(
+    CHILD("open", "implement/tests-red"),
+    "implement/tests-red",
+    '{"tests": "node --test", "checked": "- the ask names them\\n- every door has a fake"}',
+  ).text;
+  const { it, disk } = doors(standing(child));
+  it.proc.teach(["sh", "-c", "node --test"], {
+    exitCode: 0,
+    stdout: "green, every test passes",
+  });
+  heard(() => work(ROOT, ["pull"], it));
+
+  const { code, said } = heard(() =>
+    work(ROOT, ["pull", "a-child", "--fail", "no test stands red, so the step reads wrong"], it),
+  );
+
+  assert.equal(code, 0, said);
+  const entry = recordIn(disk.read(at("spec/tickets/a-child.md"))).at(-1);
+  assert.equal(entry.returns, 1);
+  assert.equal(entry.why, "no test stands red, so the step reads wrong");
+  assert.equal(entry.answered[0].name, "tests");
+  assert.equal(entry.answered[0].exit, 0);
 });
 
 // [[spec/design_output/pull#a-person-step-goes-in]]

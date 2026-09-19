@@ -8,5 +8,5 @@ generated: "GENERATED. Edit the source named below, not this file. It is written
 
 The line above runs before this turn opens, so `refactor.parallel` reads `true` from
 here on. Run `./RUNME.sh config` to read which layer answers a key:
-`.se/config.json` beats the environment, and the environment beats
+`.se/.runtime/config.json` beats the environment, and the environment beats
 `spec/config/level0.json`.

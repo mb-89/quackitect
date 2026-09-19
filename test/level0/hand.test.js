@@ -9,7 +9,7 @@ import { test } from "node:test";
 import { fakeClock } from "../../src/doors/fake/clock.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { handOf, holdAt } from "../../src/scripts/pull.js";
+import { handOf, holdAt, roleOf } from "../../src/scripts/pull.js";
 
 const ROOT = "/tree";
 const ID = "d462e994b4cef";
@@ -20,14 +20,14 @@ function box(files = {}, more = {}) {
   return {
     root: ROOT,
     join,
-    disk: fakeDisk({ [at(".se/run/box.json")]: JSON.stringify({ id: ID }), ...files }),
+    disk: fakeDisk({ [at(".se/.runtime/box.json")]: JSON.stringify({ id: ID }), ...files }),
     git: fakeGit({ [AUTHOR]: { stdout: "Ada\n" } }, ROOT),
     clock: fakeClock(),
     ...more,
   };
 }
 
-const session = (held) => ({ [at(".se/run/session.json")]: JSON.stringify(held) });
+const session = (held) => ({ [at(".se/.runtime/session.json")]: JSON.stringify(held) });
 
 test("the hand names the box, the session on it and the agent inside it", () => {
   const it = box(session({ id: "s7", harness: "claude-code" }), { agent: true });
@@ -45,9 +45,15 @@ test("the box file alone on a harness names the agent off the environment", () =
 });
 
 // A tracked file holds no person's name, and git carries who wrote the commit. [[spec/guidance/voice]]
-test("the box file alone off a harness names the role, and no person", () => {
+// [[spec/design_output/pull#the-hand-rule]]
+test("the box file alone off a harness names the git author, and the record takes the role", () => {
   const it = box({}, { agent: false, env: {} });
-  assert.equal(handOf(it), "person");
+  assert.equal(handOf(it), "person Ada");
+  assert.equal(roleOf(handOf(it)), "person", "a tracked file holds no person's name");
+  assert.equal(roleOf(`box ${ID}`), `box ${ID}`, "and a box's hand stands as it stands");
+
+  const bare = box({}, { agent: false, env: {}, git: fakeGit({}, ROOT) });
+  assert.equal(handOf(bare), "person", "a box naming no author reads the role alone");
 });
 
 test("a helper's hold takes a file name of its own, beside the session's", () => {

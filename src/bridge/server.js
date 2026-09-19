@@ -39,6 +39,7 @@ import { onBash, onDescribe } from "./bash.js";
 import { SPECS as reportSpecs, TOOLS as reportTools } from "./report.js";
 import { ANSWERED, onAgentAnswered, SPECS as reviewSpecs, TOOLS as reviewTools } from "./review.js";
 import { SPECS as toolSpecs, TOOLS as handTools } from "./tools.js";
+import { FINDINGS, findingsFor } from "./findings.js";
 import {
   onAgentSpawn,
   onPromptContext,
@@ -128,7 +129,7 @@ function opensSession(e, box) {
   onSessionStart(e, box);
   box.schemas = schemasHere(box.disk, box.method);
   box.projections = projectionsHere(box.disk, box.method);
-  box.sources = sourcesOf(box.projections, box.disk, box.method);
+  box.sources = sourcesOf(box.projections, box.disk, box.method, box.work);
   box.restale = "the session start";
   warmIndex(box);
   box.registered = true;
@@ -207,6 +208,11 @@ export function serve(method, port = PORT_BASE, say = console.log) {
   };
 
   const onRequest = (request, response) => {
+    // The problems panel reads the battery's findings here, so a rule reaches the editor off one list. [[spec/design_output/lsp]]
+    if (request.method === "GET" && String(request.url).startsWith(FINDINGS)) {
+      answer(response, OK, findingsFor(own, request.url));
+      return;
+    }
     if (request.method === "POST" && request.url === "/stop") {
       answer(response, OK, { ok: true });
       setTimeout(stop, SOON);

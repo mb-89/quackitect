@@ -1,5 +1,5 @@
 // The local file, read and written as text. A click lands as one key in
-// .se/config.json, and the shape it lands in is the shape the tracked file
+// the local layer .claude/skills/level0/lib/folders.js places, and the shape it lands in is the shape the tracked file
 // holds, so the resolver reads it back with no special case.
 // [[spec/design_output/extension#a-click-writes-the-file]]
 

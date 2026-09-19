@@ -29,7 +29,7 @@ it grants no special file access and imposes no write restriction.
 
 # State between processes
 
-Store records under `.se/run/copilot`, keyed by a hash of the session ID.
+Store records under `.se/.runtime/copilot`, keyed by a hash of the session ID.
 A directory lock serializes updates. An atomic rename publishes each record.
 Save a claimed handover before deleting its original. A claim outlives a crash.
 
@@ -98,7 +98,7 @@ Never pass the dispatcher's credentials to the worker to bypass that policy.
 # Recover a dispatch
 
 Keep the claimed branch after a failure. Resolve sync conflicts and rerun
-dispatch there. Inspect `.se/run/copilot` if a process exits before recording the
+dispatch there. Inspect `.se/.runtime/copilot` if a process exits before recording the
 claim. Do not release a branch while its worker can still push to it.
 
 After a successful request, switch this checkout to main to dispatch another.

@@ -11,6 +11,7 @@ import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
+import { homeIn } from "./editor.js";
 import { handDoors } from "./hand.js";
 import { readTools, whereIs } from "./tools.js";
 import { rootsHere } from "./vehicle.js";
@@ -36,30 +37,45 @@ export function configHere(files, pair) {
   });
 }
 
+// The verbs keep the files under the work root, and git runs there, because a stub is its own repository. [[spec/design_output/vehicle#the-work-root-inherits]]
 export async function doorsHere() {
   const outside = proc();
   const files = disk();
   const time = clock();
-  const said = configHere(files, rootsHere(files, process.env, root));
+  const roots = rootsHere(files, process.env, root);
+  const said = configHere(files, roots);
   return {
     proc: outside,
     disk: files,
     clock: time,
-    git: git(outside, root),
+    git: git(outside, roots.work),
     log: log(files, time, {
-      folder: join(root, LOG_FOLDER),
+      folder: join(roots.work, LOG_FOLDER),
       level: await said.ask("log.level"),
     }),
     config: said,
+    method: roots.method,
+    work: roots.work,
     words: await said.ask("names.words"),
     stale: await said.ask("work.staleAfter"),
-    fails: await said.ask("work.failsBeforePerson"),
-    refusals: await said.ask("work.refusalsBeforePerson"),
+    fails: await said.ask("work.failsBeforeWait"),
+    refusals: await said.ask("work.refusalsBeforeFail"),
     splits: await said.ask("work.stepsBeforeSplit"),
+    // [[spec/design_output/pull#the-hand-rule]]
+    personSigns: await said.ask("work.personSigns"),
+    // [[spec/design_output/pull#the-queue-is-a-score]]
+    weights: {
+      block: await said.ask("work.blockScore"),
+      day: await said.ask("work.dayScore"),
+      fail: await said.ask("work.failScore"),
+    },
     // A name on the pull asks for one ticket, and the queue binding refuses the ask. [[spec/design_output/pull#the-hand-out]]
     binding: await said.ask("engine.binding"),
     ...handDoors(process.env),
     node: process.execPath,
+    // The retro's collect reads the transcripts and the memory under home, and the scratchpads under temp. [[spec/guidance/retro/collect]]
+    home: homeIn(process.env),
+    temp: process.env.TEMP || process.env.TMP || process.env.TMPDIR || "",
     join,
   };
 }
@@ -84,11 +100,8 @@ export const PLUGIN = join(".claude", "skills", "level0");
 export const LEVEL1 = join(".claude", "skills", "level1");
 export const CONTRACT = join(root, "test", "contract");
 export const settings = it.config;
-export const PARKED = [
-  "{.se,node_modules,.git,.claude/types,.claude/worktrees}/**",
-  "**/_*",
-];
-export const OURS = `--glob=!{${PARKED.join(",")}}`;
+// The glob the rules read past, owned by the findings every front reads. [[spec/design_output/lsp]]
+export { OURS, PARKED } from "../bridge/findings.js";
 export const TESTS = "test/level0/*.test.js";
 export const CONTRACT_TESTS = "test/contract/*.test.js";
 export const ROUNDS = 5;

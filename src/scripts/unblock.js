@@ -5,7 +5,7 @@
 
 import { CLOSED, fieldOf, frontOf, GROUP, OPEN, stepOf, ticketAt, withField } from "./group.js";
 import { landed } from "./landed.js";
-import { leafOf, leavesOf } from "./pull.js";
+import { leafOf, stepPathOf } from "./pull.js";
 
 const DISCUSSION = "# Discussion";
 // What mint leaves in an empty chapter, in either spelling. A hand writing under Discussion drops it, so the chapter reads as what a hand wrote. [[spec/design_output/work#a-person-step-leaves]]
@@ -106,7 +106,7 @@ function admits(successor, nextName) {
 
 // [[spec/design_output/work#a-person-step-leaves]]
 function openLeaf(front) {
-  const path = String(front.step ?? "").trim() || (leavesOf(front)[0]?.path ?? "");
+  const path = stepPathOf(front);
   return path ? leafOf(front, path) : null;
 }
 

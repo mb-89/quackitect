@@ -90,7 +90,7 @@ function box(files = {}, refactor = REFACTOR) {
 // The stamp the check leaves, which the refactoring rule reads. [[spec/tickets/the-spawn-reaches-its-guidance]]
 function stamped(warnings, names) {
   return {
-    [at(".se/run/check.json")]: JSON.stringify({
+    [at(".se/.runtime/check.json")]: JSON.stringify({
       sha: "a1",
       ok: true,
       clean: true,

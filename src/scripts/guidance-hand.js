@@ -3,13 +3,18 @@
 // a moved hash hands them again.
 // [[spec/design_output/pull#the-work-answer]]
 
-import { HOLDS as OWNED_HOLDS } from "../../.claude/skills/level0/lib/folders.js";
+import {
+  HOLD as OWNED_HOLD,
+  HOLDS as OWNED_HOLDS,
+} from "../../.claude/skills/level0/lib/folders.js";
 
 import { actionables, bindsHere } from "../../.claude/skills/level0/lib/guidance.js";
+import { inherits } from "../../.claude/skills/level0/lib/layer.js";
 import { hashOf } from "../../.claude/skills/level0/lib/schema.js";
 import { agentOf, BOX, handOf } from "./hand.js";
 
 export const HOLDS = OWNED_HOLDS;
+export const HOLD = OWNED_HOLD;
 export const GUIDANCE = "spec/guidance";
 const MARKDOWN = /\.md$/;
 const DRAFT = /^_/;
@@ -23,6 +28,23 @@ export function holdAt(it, hand) {
 export function holdOf(it, hand) {
   const at = holdAt(it, hand);
   return it.disk.exists(at) ? parsed(it.disk.read(at)) : null;
+}
+
+// Whether any hand holds a step on this box, out of the folder and the older file alike. [[spec/design_output/pull#the-hand-and-the-hold]]
+export function holdsAnywhere(it) {
+  const folder = it.join(it.root, ...HOLDS.split("/"));
+  const rows = it.disk.exists(folder)
+    ? it.disk
+        .list(folder)
+        .filter((one) => one.kind === "file" && one.name.endsWith(".json"))
+        .map((one) => it.join(folder, one.name))
+    : [];
+  for (const at of [...rows, it.join(it.root, ...HOLD.split("/"))]) {
+    if (!it.disk.exists(at)) continue;
+    const held = parsed(it.disk.read(at));
+    if (held) return { at, held };
+  }
+  return null;
 }
 
 export function parsed(text) {
@@ -44,9 +66,10 @@ export function dropHold(it, hand) {
 }
 
 // [[spec/design_output/pull#what-a-hand-out-reads]]
+// A note the work root names again replaces the method's. [[spec/design_output/vehicle#the-work-root-inherits]]
 export function guidanceText(it, path) {
-  const at = it.join(it.root, ...`${path}.md`.split("/"));
-  return it.disk.exists(at) ? it.disk.read(at) : "";
+  const reads = inherits(it.disk, it.method ?? it.root, it.root);
+  return reads.exists(`${path}.md`) ? reads.read(`${path}.md`) : "";
 }
 
 // [[spec/design_output/pull#what-a-hand-out-reads]]
@@ -103,11 +126,11 @@ export function asOf(it, held) {
 }
 
 // The same answer for a road holding no doors of its own: a box standing nowhere answers an empty list, so a session start mints nothing. [[spec/design_output/level0#the-standing-layer]]
-export function heldReadsIn(disk, join, root, env = {}) {
+export function heldReadsIn(disk, join, root, env = {}, argv = []) {
   const it = { disk, join, root, env, agent: Boolean(agentOf(env)) };
   if (!disk.exists(join(root, ...BOX.split("/")))) return [];
   try {
-    return heldReads(it);
+    return heldReads(it, argv);
   } catch {
     return [];
   }

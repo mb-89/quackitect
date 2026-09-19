@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: closed
 depends_on:
   - a-rule-carries-its-side
-urgency: now
+urgent: true
 steps:
   - name: design
     reads: [[spec/guidance/voice]]

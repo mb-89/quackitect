@@ -1,5 +1,5 @@
 // The survey, over a fake box. These cases assert what a caller reads out of
-// .se/run/tools.json, so a wrong path shows here first.
+// .se/.runtime/tools.json, so a wrong path shows here first.
 // [[spec/guidance/code/testing]]
 
 import assert from "node:assert/strict";
@@ -8,6 +8,7 @@ import {
   guesses,
   installedTools,
   pathOf,
+  rebuilt,
   placesFor,
   surveyOf,
   TOOLS,
@@ -20,12 +21,12 @@ import { fakeProc } from "../../src/doors/fake/proc.js";
 import { readTools, survey, whereIs, writeSurvey } from "../../src/scripts/tools.js";
 
 const ROOT = "/box";
-const BIN = `${ROOT}/.se/run/bin`;
+const BIN = `${ROOT}/.se/.runtime/bin`;
 const UNIX = { PATH: "/usr/bin:/bin" };
 
 const boxWith = (paths) => fakeDisk(Object.fromEntries(paths.map((at) => [at, ""])));
 
-test("the survey names the path and the version of a tool in .se/run/bin", () => {
+test("the survey names the path and the version of a tool in .se/.runtime/bin", () => {
   const files = boxWith([`${BIN}/vale`]);
   const outside = fakeProc({
     [`${BIN}/vale --version`]: { stdout: "vale version 3.20.0" },
@@ -36,7 +37,7 @@ test("the survey names the path and the version of a tool in .se/run/bin", () =>
   assert.deepEqual(found.vale, { path: `${BIN}/vale`, version: "3.20.0" });
 });
 
-test("the survey finds a tool on the path variable where .se/run/bin holds none", () => {
+test("the survey finds a tool on the path variable where .se/.runtime/bin holds none", () => {
   const files = boxWith(["/usr/bin/git"]);
   const outside = fakeProc({
     "/usr/bin/git --version": { stdout: "git version 2.43.0" },
@@ -81,7 +82,7 @@ test("python answers to python3 first, and to python after it", () => {
   assert.deepEqual(found.python, { path: "/usr/bin/python", version: "3.12.1" });
 });
 
-test("the survey writes every wanted tool into .se/run/tools.json", () => {
+test("the survey writes every wanted tool into .se/.runtime/tools.json", () => {
   const files = boxWith([`${BIN}/vale`]);
   const outside = fakeProc({ [`${BIN}/vale --version`]: { stdout: "3.20.0" } });
 
@@ -95,7 +96,7 @@ test("the survey writes every wanted tool into .se/run/tools.json", () => {
   assert.equal(pathOf(read, "vale"), `${BIN}/vale`);
 });
 
-test("the survey reaches .se/run/bin before any folder on the path variable", () => {
+test("the survey reaches .se/.runtime/bin before any folder on the path variable", () => {
   const places = placesFor("vale", UNIX, BIN);
 
   assert.deepEqual(places, [`${BIN}/vale`, "/usr/bin/vale", "/bin/vale"]);
@@ -138,7 +139,7 @@ test("a caller takes the surveyed path, and the guess where none stands", () => 
 });
 
 test("a guess names the Windows binary and the plain one, and nothing else", () => {
-  assert.deepEqual(guesses("vale-ls"), [".se/run/bin/vale-ls.exe", ".se/run/bin/vale-ls"]);
+  assert.deepEqual(guesses("vale-ls"), [".se/.runtime/bin/vale-ls.exe", ".se/.runtime/bin/vale-ls"]);
 });
 
 test("a box with no survey file hands the caller an empty one", () => {
@@ -158,6 +159,20 @@ test("the rule reads the tools the install script installs, and no link", () => 
   ].join("\n");
 
   assert.deepEqual(installedTools(said), ["node", "vale", "go"]);
+});
+
+// A binary older than its own source runs by rules the tree no longer carries. [[spec/design_output/index#the-compiler-it-needs]]
+test("a here case asking find for a newer source names the binary that rebuilds", () => {
+  const said = [
+    "lsp_here() {",
+    '  newer=$(find "$root/src/lsp" -name \'*.go\' -newer "$bin/se-lsp" -print -quit)',
+    "}",
+    "vale_here() {",
+    '  [ -x "$bin/vale" ]',
+    "}",
+  ].join("\n");
+
+  assert.deepEqual(rebuilt(said), ["lsp"]);
 });
 
 test("every wanted tool says when to reach for it", () => {

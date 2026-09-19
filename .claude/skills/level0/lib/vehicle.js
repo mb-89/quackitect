@@ -3,8 +3,10 @@
 // identity into a place, so either tree moves and the pair still holds.
 // [[spec/design_output/vehicle#three-things-a-copy-needs]]
 
-export const COPY = ".se/copy.json";
-export const PROJECT = ".se/project.json";
+import { RUN } from "./folders.js";
+
+export const COPY = `${RUN}/copy.json`;
+export const PROJECT = `${RUN}/project.json`;
 export const REGISTER = "registry.json";
 export const MARKER = ".claude/skills/level0/.claude-plugin/plugin.json";
 

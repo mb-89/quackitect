@@ -23,7 +23,7 @@ line and a key each stand there, and git carries none of them.
 |---|---|---|
 | a raw note | `.se/notes`, one file per note | the write door, the commit door, and a later level |
 | a handover for the next session on this box | `.se/HANDOVER.md` | a person, and the session after this one |
-| the log | `.se/run/log` | `./RUNME.sh tui` |
+| the log | `.se/.log` | `./RUNME.sh tui` |
 
 ## Three kinds stand apart
 
@@ -33,8 +33,8 @@ and every writer takes its folder from there.
 
 | kind | where it stands | who reads it |
 |---|---|---|
-| retro | `.se/retro` | the retro, as its own |
-| runtime | `.se/run` | the box holding it |
+| retro | `.se/.retro` | the retro, as its own |
+| runtime | `.se/.runtime` | the box holding it |
 | the rest | `.se` itself | the retro, and a question over the index |
 
 One question places a file: does a reader ask after it once the box dies? A yes

@@ -2,7 +2,6 @@
 kind: [[ticket]]
 state: closed
 reason: became
-urgency: soon
 step: design/person-1
 steps:
   - name: design

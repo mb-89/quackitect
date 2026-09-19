@@ -8,12 +8,13 @@ import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 import { fieldOf } from "../../src/scripts/group.js";
 import {
   chapterOf,
+  commandsRun,
   holdOf,
   leafOf,
   takeable,
   verdictIn,
 } from "../../src/scripts/pull.js";
-import { testSays } from "../../src/scripts/test-verb.js";
+import { goModulesOf, goSays, testSays } from "../../src/scripts/test-verb.js";
 import { ticket } from "../../src/scripts/ticket.js";
 import { work } from "../../src/scripts/work.js";
 import {
@@ -104,6 +105,56 @@ test("a leaf's chapter reads its fields by heading, past the comments and the en
     reason: "thin; and short",
   });
   assert.deepEqual(verdictIn(["maybe"]), { said: "" });
+});
+
+// [[spec/design_output/pull#the-fields-hold-their-forms]]
+test("a command line the box finds nothing for comes back naming the shape a command field takes", () => {
+  const it = {
+    root: ROOT,
+    proc: { run: () => ({ exitCode: 127, stdout: "", stderr: "" }) },
+  };
+  const leaf = {
+    path: "do",
+    evidence: [{ name: "check", form: "command", expects: 0 }],
+  };
+  const chapter = {
+    stands: true,
+    own: [],
+    fields: new Map([["check", ["`./RUNME.sh check`"]]]),
+  };
+  const found = [];
+  const ran = commandsRun(it, leaf, chapter, found);
+
+  assert.deepEqual(found, [
+    "check under do runs `./RUNME.sh check`, and the box finds no such command. A command field holds one bare line, indented four spaces.",
+  ]);
+  assert.deepEqual(ran, [{ name: "check", exit: 127, said: "" }]);
+});
+
+// The tests stand in two languages, and the verb runs both. [[spec/design_output/pull#the-test-verb]]
+test("a changed Go test names its module, and the verb says what that run answered", () => {
+  assert.deepEqual(
+    goModulesOf([
+      "src/viewer/work_test.go",
+      "src/viewer/tree.go",
+      "src/index/index_test.go",
+      "src/index/index_test.go",
+      "test/level0/one.test.js",
+      "spec/tickets/one.md",
+    ]),
+    ["src/viewer", "src/index"],
+  );
+  assert.deepEqual(goModulesOf([]), []);
+
+  assert.equal(goSays({ exitCode: 0 }, "src/viewer"), "green, src/viewer passes");
+  assert.match(
+    goSays({ exitCode: 1, stdout: "--- FAIL: TestOne\nFAIL\n" }, "src/viewer"),
+    /^assertion, a test of src\/viewer fails/,
+  );
+  assert.match(
+    goSays({ exitCode: 1, stderr: "./work.go:9:2: undefined: nothing\n" }, "src/viewer"),
+    /^build, because src\/viewer builds not: \.\/work\.go/,
+  );
 });
 
 // [[spec/design_output/pull#the-test-verb]]
@@ -197,15 +248,29 @@ test("the judge's material is the leaf's evidence and the rules its reads name, 
   );
 });
 
+// [[spec/tickets/the-group-leaves-at-todo]]
+test("the judge's material leaves a command field out, so a chapter of commands hands over nothing", () => {
+  const { it } = doors(
+    standing(filled(CHILD("open", "implement/change"), "### lint", "./RUNME.sh check")),
+  );
+  heard(() => work(ROOT, ["pull"], it));
+
+  const { code, said } = heard(() => work(ROOT, ["pull", "a-child", "--judge"], it));
+
+  assert.equal(code, 0);
+  assert.equal(JSON.parse(said).step, "implement/change");
+  assert.equal(JSON.parse(said).evidence, "", "a command field is no prose");
+});
+
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 test("the hold reads back what the pull writes, and a box with no id mints one", () => {
   const { it, disk } = doors(standing());
   it.root = ROOT;
   assert.equal(holdOf(it, HAND), null);
-  disk.remove(at(".se/run/box.json"));
+  disk.remove(at(".se/.runtime/box.json"));
   it.random = () => "fresh1";
   heard(() => work(ROOT, ["pull"], it));
-  assert.equal(JSON.parse(disk.read(at(".se/run/box.json"))).id, "fresh1");
+  assert.equal(JSON.parse(disk.read(at(".se/.runtime/box.json"))).id, "fresh1");
   assert.equal(holdOf(it, "box fresh1").ticket, "a-child");
 });
 

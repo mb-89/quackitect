@@ -61,6 +61,11 @@ func (m *model) press(x, y int) {
 	if m.overPane(x) {
 		return
 	}
+	// A press on the work tab reaches its tree, which holds its own order. [[spec/design_output/tree-view#a-sort-holds-several-keys]]
+	if m.onWork() {
+		m.pressWork(x, y)
+		return
+	}
 	if y == namesRow {
 		m.sortOn(columnAt(x, m.listWidth()))
 		return
@@ -68,6 +73,25 @@ func (m *model) press(x, y int) {
 	at := m.top + y - firstRow()
 	if y >= firstRow() && at >= 0 && at < len(m.view) {
 		m.moveTo(at)
+	}
+}
+
+// Whether the tab the window stands on draws the work tree. [[spec/design_output/viewer#the-work-tab]]
+func (m model) onWork() bool {
+	return m.work != nil && m.open >= 0 && m.open < len(m.tabs) &&
+		m.tabs[m.open].Name() == "work"
+}
+
+// [[spec/design_output/tree-view#a-sort-holds-several-keys]]
+func (m *model) pressWork(x, y int) {
+	if y == namesRow {
+		m.work.SortOn(m.work.ColumnAt(x, m.listWidth()))
+		m.loadPane()
+		return
+	}
+	if y >= firstRow() {
+		m.work.MoveToRow(y - firstRow())
+		m.loadPane()
 	}
 }
 

@@ -2,6 +2,7 @@
 // the chapter a leaf owns, and the evidence weighed against the leaf's fields.
 // [[spec/design_output/pull#the-work-answer]]
 
+import { inherits } from "../../.claude/skills/level0/lib/layer.js";
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 import {
@@ -12,11 +13,15 @@ import {
 
 export { HELPER, SPAWN, spawnPrompt } from "./spawn.js";
 
-import { notesSaid, parsed } from "./guidance-hand.js";
 import { writesHere } from "../../.claude/skills/level0/lib/ticket.js";
+import { notesSaid, parsed } from "./guidance-hand.js";
+import { PERSON, roleOf } from "./hand.js";
 import { excludes, handRule } from "./pull-hand.js";
 import { ANSWERED, bare, CHECKED, COMMENT, CUT, FENCE, WORK } from "./pull-route.js";
 import { changedSince, commitsFor, tipOf } from "./pull-writes.js";
+
+// A shell answers this where it finds no command, which a backtick or a fence around the line earns. [[spec/design_output/pull#the-fields-hold-their-forms]]
+const NO_COMMAND = 127;
 
 export function workAnswer(it, one, leaf) {
   const rows = [];
@@ -237,10 +242,10 @@ export function formFault(it, field, rows, where, one, held) {
   if (form === "link") {
     if (rows.length !== 1)
       return [`${where} holds ${rows.length} line(s), and a link is one.`];
+    // A link resolves in the work root first, then in the method root. [[spec/design_output/vehicle#the-work-root-inherits]]
     const said = bare(rows[0]);
-    const at = it.join(it.root, ...said.split("/"));
-    const note = it.join(it.root, ...`${said}.md`.split("/"));
-    return it.disk.exists(at) || it.disk.exists(note)
+    const reads = inherits(it.disk, it.method ?? it.root, it.root);
+    return reads.exists(said) || reads.exists(`${said}.md`)
       ? []
       : [`${where} names ${said}, which resolves nowhere.`];
   }
@@ -309,7 +314,7 @@ export function voiceFaults(it, one, leaf, chapter) {
     ran = it.proc.run(
       [
         it.vale,
-        `--config=${VALE_CONFIG}`,
+        `--config=${it.join(it.method ?? it.root, VALE_CONFIG)}`,
         `--path=${one.path}`,
         "--output=JSON",
         "--no-exit",
@@ -346,6 +351,13 @@ export function commandsRun(it, leaf, chapter, found) {
     const rows = `${ran.stdout ?? ""}`.trim().split("\n").filter(Boolean);
     const last = rows.at(-1) ?? "";
     out.push({ name: field.name, exit: ran.exitCode, said: last.slice(0, CUT.said) });
+    // The shape is what a reader acts on here, because the box stopped at the name and left the command alone. [[spec/design_output/pull#the-fields-hold-their-forms]]
+    if (ran.exitCode === NO_COMMAND) {
+      found.push(
+        `${field.name} under ${leaf.path} runs ${line}, and the box finds no such command. A command field holds one bare line, indented four spaces.`,
+      );
+      continue;
+    }
     const want = field.expects;
     if (want === undefined || want === null || want === "") continue;
     const asNumber = Number(want);
@@ -374,12 +386,14 @@ export function handFaults(it, one, leaf, hand, held) {
   const said = writesHere(leaf, handRule(it, one.front, [], ""));
   if (!said.writes && said.person)
     out.push(`${leaf.path} is a person's step, and this hand is an agent.`);
+  out.push(...signFaults(it, one, hand));
   const other = excludes(one.front, leaf, hand);
   if (other) out.push(`${leaf.path} ${other}.`);
   if (leaf.evidence.some((field) => field.form === "verdict") && !one.private) {
     const tip = tipOf(it);
     // A sibling hand commits beside this reader, and that costs the reading nothing. A commit naming this ticket is this hand's own write, which the rule refuses. [[spec/tickets/the-verdict-guard-reads-tips]]
-    const moved = held.hash && tip !== held.hash ? commitsFor(it, one.name, held.hash) : null;
+    const moved =
+      held.hash && tip !== held.hash ? commitsFor(it, one.name, held.hash) : null;
     if (moved && (!moved.read || moved.own.length)) {
       out.push(
         `a verdict comes from a hand that leaves the tip where it stands, and ${shortOf(held.hash)} moved to ${shortOf(tip)}.`,
@@ -388,5 +402,19 @@ export function handFaults(it, one, leaf, hand, held) {
   }
   return out;
 }
+
+// The stronger door on a person's hand, which a tracked ticket meets where the config switches it on. [[spec/design_output/pull#the-hand-rule]]
+export function signFaults(it, one, hand) {
+  if (!it.personSigns || one.private || roleOf(hand) !== PERSON) return [];
+  const tip = tipOf(it);
+  const said = it.git.signatureOf ? it.git.signatureOf("HEAD") : "";
+  if (SIGNED.includes(said.trim())) return [];
+  return [
+    `a person's hand-back meets a signed tip, and ${shortOf(tip)} answers ${said.trim() || "no signature"}.`,
+  ];
+}
+
+// What `git log --format=%G?` answers over a good signature, and over one it trusts no key for. [[spec/design_output/pull#the-hand-rule]]
+export const SIGNED = ["G", "U"];
 
 // [[spec/design_output/pull#the-pass]]

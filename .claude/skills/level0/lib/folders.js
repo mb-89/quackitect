@@ -4,33 +4,42 @@
 // [[spec/design_input/the-runtime-files-stand-apart]]
 
 export const PRIVATE = ".se";
-export const RETRO = `${PRIVATE}/retro`;
-export const RUN = `${PRIVATE}/run`;
+export const RETRO = `${PRIVATE}/.retro`;
+export const RUN = `${PRIVATE}/.runtime`;
 
 // The names the runtime half took, so a spelling of one straight under the private folder is a reader the move left behind. [[spec/design_output/private#three-kinds-stand-apart]]
 export const MOVED = [
   "bin",
   "box.json",
   "check.json",
+  "config.json",
+  "copy.json",
   "copilot",
   "copilot-cloud",
   "hold",
   "index.db",
   "index.json",
-  "log",
   "lsp.json",
   "measure",
+  "project.json",
   "review",
   "session.json",
   "show-panel",
   "tools.json",
   "undo",
+  "work.json",
 ];
 
 // [[spec/design_input/the-runtime-files-stand-apart]]
 export const HOLDS = `${RUN}/hold`;
+// The one file a hold stands in beside the folder, which an older box still writes. [[spec/design_output/pull#the-hand-and-the-hold]]
+export const HOLD = `${RUN}/hold.json`;
+// The log stands outside the runtime folder, because the retro collects it. Its dot keeps the private folder empty while a session writes it through a retro. [[spec/guidance/retro/collect]]
+export const LOG = `${PRIVATE}/.log`;
 export const NOTES = `${PRIVATE}/notes`;
 export const TICKETS = `${PRIVATE}/tickets`;
+// The work answer is regenerated state, so it stands in the runtime folder. [[spec/design_output/work#one-verb-answers-git]]
+export const ANSWER = `${RUN}/work.json`;
 
 // [[spec/design_input/the-runtime-files-stand-apart]]
 export function inRetro(name) {

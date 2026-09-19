@@ -15,7 +15,7 @@ stay the truth, and the walk builds every row out of them. A reader meeting a
 stale index or none reads the files, which is what every reader here does. The
 header of each file under `src/index` says which piece it holds.
 
-It lives at `.se/run/index.db`, which stays on the box it stands on. The version
+It lives at `.se/.runtime/index.db`, which stays on the box it stands on. The version
 and the root ride in a `meta` row, and either one disagreeing drops the file
 whole. The tree fills it again in seconds, and a half-migrated index answers
 out of a shape two writers disagree about.
@@ -46,7 +46,7 @@ without either one blocking.
 One process owns the file, keeps the tree and the rows in step, and answers
 every question. One writer stands for any number of readers. It listens on
 loopback on a port the machine picks, and writes where it stands into
-`.se/run/index.json`.
+`.se/.runtime/index.json`.
 
     { "port": 53124, "pid": 8123, "root": "/home/user/quackitect" }
 
@@ -84,6 +84,10 @@ picks the index up on the first question after the build lands.
 The watch is what holds the rows level with the tree. It watches every folder
 the walk covers, and a write anywhere marks the rows dirty. One sweep answers a
 burst, so a build touching a thousand files costs one walk.
+
+The log is the one folder the watch stands off. It grows a line a door call, so
+a watch on it sweeps the tree for nothing. The walk still reads it, and the next
+sweep carries what it holds.
 
 A box where no watch stands still answers, out of the walk the door makes on
 the way up.
@@ -145,7 +149,7 @@ about which side answers. So a session searches this tree hundreds of
 times and walks the disk none of them.
 
 The hook reaches the door the way every caller reaches it, through the binary
-in `.se/run/bin`. A generic `call` verb carries the question as JSON, so the hook
+in `.se/.runtime/bin`. A generic `call` verb carries the question as JSON, so the hook
 holds no second copy of the protocol. The session's start puts the door up
 without waiting, which leaves the first question warm.
 
@@ -235,7 +239,7 @@ than a walk. So a build needs a C compiler, and this tree takes them in order:
 
 | what stands | what the build uses |
 |---|---|
-| the pinned Zig in `.se/run/bin/zig` | `CC=<zig> cc` |
+| the pinned Zig in `.se/.runtime/bin/zig` | `CC=<zig> cc` |
 | a working `cc`, `gcc` or `clang` | that one |
 | neither | the installer downloads the pinned Zig, and builds with it |
 

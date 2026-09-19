@@ -5,8 +5,8 @@
 // [[spec/design_input/the-agent-pulls-tickets#processes-are-routes]]
 
 import {
+  HOLD as OWNED_HOLD,
   HOLDS as OWNED_HOLDS,
-  inRun,
   TICKETS,
 } from "../../.claude/skills/level0/lib/folders.js";
 
@@ -21,17 +21,18 @@ import {
 import { TODO } from "../../.claude/skills/level0/lib/todo.js";
 import { askFaults, askRefusal } from "./ask-lint.js";
 import { fieldOf, GROUP, withField, withoutField } from "./group.js";
+import { holdsAnywhere } from "./guidance-hand.js";
 import { askRows, processAt } from "./process.js";
 
 export const NOTES = TICKETS;
 export const HOLDS = OWNED_HOLDS;
-export const HOLD = inRun("hold.json");
+export const HOLD = OWNED_HOLD;
 export const NOTE = "note";
 const TRAVELS = "spec/tickets";
 const SCHEMAS = "spec/schemas";
 
 export function ticket(root, argv, doors) {
-  const it = { root, ...doors };
+  const it = { root, method: root, work: root, ...doors };
   const what = argv[0];
   const name = argv[1];
   const doing = { note, update, open, todo };
@@ -78,7 +79,7 @@ function note(it, name, argv) {
     return 2;
   }
 
-  const held = processAt(it.disk, it.root, it.join, NOTE);
+  const held = processAt(it.disk, it.method, it.join, NOTE);
   if (held.why) {
     console.error(held.why);
     return 1;
@@ -89,7 +90,6 @@ function note(it, name, argv) {
     path,
     fields: {
       state: "open",
-      urgency: "whenever",
       ...(parks ? { [TODO]: true } : {}),
       process: held.link,
       process_hash: held.hash,
@@ -164,27 +164,7 @@ export function fromHold(route, hold) {
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 function holdOf(it) {
-  const folder = it.join(it.root, ...HOLDS.split("/"));
-  const held = it.disk.exists(folder)
-    ? it.disk
-        .list(folder)
-        .filter((one) => one.kind === "file" && one.name.endsWith(".json"))
-        .map((one) => it.join(folder, one.name))
-    : [];
-  for (const at of [...held, it.join(it.root, ...HOLD.split("/"))]) {
-    if (!it.disk.exists(at)) continue;
-    const hold = parsedJson(it.disk.read(at));
-    if (hold) return hold;
-  }
-  return null;
-}
-
-function parsedJson(text) {
-  try {
-    return JSON.parse(text);
-  } catch {
-    return null;
-  }
+  return holdsAnywhere(it)?.held ?? null;
 }
 
 // [[spec/design_output/pull#a-draft-opens]]
@@ -237,7 +217,7 @@ function update(it, name, argv) {
   const text = it.disk.read(at.path);
   const front = readNote(text).front.said ?? {};
   const asked = (argv ?? []).map((one) => /^--process=(.+)$/.exec(one)).find(Boolean);
-  const held = processAt(it.disk, it.root, it.join, asked ? asked[1] : front.process);
+  const held = processAt(it.disk, it.method, it.join, asked ? asked[1] : front.process);
   if (held.why) {
     console.error(held.why);
     return 2;
@@ -321,7 +301,7 @@ function firstLeafOf(route) {
 }
 
 export function schemasHere(it) {
-  const at = it.join(it.root, ...SCHEMAS.split("/"));
+  const at = it.join(it.method ?? it.root, ...SCHEMAS.split("/"));
   if (!it.disk.exists(at)) return new Map();
   return schemasFrom(
     it.disk

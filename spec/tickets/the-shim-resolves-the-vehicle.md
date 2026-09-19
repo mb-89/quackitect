@@ -1,7 +1,6 @@
 ---
 kind: [[ticket]]
 state: closed
-urgency: soon
 depends_on: [the-stub-takes-shape]
 steps:
   - name: sync

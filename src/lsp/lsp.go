@@ -5,8 +5,6 @@
 package main
 
 import (
-	"quackitect/yaml"
-
 	"bufio"
 	"encoding/json"
 	"fmt"
@@ -58,22 +56,16 @@ type diagnostic struct {
 	Message  string `json:"message"`
 }
 
-// A drawn path names who drew it, so each clear loop reaches its own. [[spec/tickets/the-panel-draws-every-file]]
-const (
-	bySweep = "sweep"
-	byOpen  = "open"
-)
-
 type server struct {
 	checker *Checker
 	out     io.Writer
 	guard   sync.Mutex
-	drawn   map[string]string
+	panel   *panel
 }
 
 // [[spec/design_output/lsp#the-editor-speaks-over-stdio]]
 func Speaks(checker *Checker, in io.Reader, out io.Writer) error {
-	one := &server{checker: checker, out: out, drawn: map[string]string{}}
+	one := &server{checker: checker, out: out, panel: newPanel()}
 	reader := bufio.NewReader(in)
 	for {
 		said, err := reads(reader)
@@ -132,97 +124,17 @@ func (one *server) took(said message) bool {
 	case "exit":
 		return true
 	case "textDocument/didOpen", "textDocument/didChange", "textDocument/didSave":
-		one.draws(opened(said.Params))
+		where, text := opened(said.Params)
+		one.draws(where, text, said.Method)
 	case "textDocument/didClose":
 		where, _ := opened(said.Params)
-		if where != "" {
-			one.checker.Tree().Drops(relativeTo(one.checker.Tree().Root, where))
-			one.clears(byOpen)
-		}
+		one.closes(where)
 	default:
 		if len(said.ID) > 0 {
 			one.fails(said.ID, "no method called "+said.Method)
 		}
 	}
 	return false
-}
-
-func (one *server) draws(where, text string) {
-	if where == "" {
-		return
-	}
-	tree := one.checker.Tree()
-	at := relativeTo(tree.Root, where)
-	if text != "" {
-		tree.Holds(at, text)
-	}
-
-	found := map[string][]Finding{}
-	for _, said := range one.checker.Over(at) {
-		found[said.File] = append(found[said.File], said)
-	}
-	found[at] = found[at] // an yaml.Empty list clears the panel for the open file
-
-	one.guard.Lock()
-	defer one.guard.Unlock()
-	for path, said := range found {
-		one.publishes(tree, path, said, byOpen)
-	}
-	for path, who := range one.drawn {
-		if _, still := found[path]; !still && who == byOpen {
-			one.publishes(tree, path, nil, byOpen)
-			delete(one.drawn, path)
-		}
-	}
-}
-
-// [[spec/tickets/the-panel-draws-every-file]]
-func (one *server) sweeps() {
-	tree := one.checker.Tree()
-	found := map[string][]Finding{}
-	for _, said := range one.checker.Sweep() {
-		found[said.File] = append(found[said.File], said)
-	}
-
-	one.guard.Lock()
-	defer one.guard.Unlock()
-	for path, said := range found {
-		one.publishes(tree, path, said, bySweep)
-	}
-	for path, who := range one.drawn {
-		if _, still := found[path]; !still && who == bySweep {
-			one.publishes(tree, path, nil, bySweep)
-			delete(one.drawn, path)
-		}
-	}
-}
-
-func (one *server) clears(who string) {
-	one.guard.Lock()
-	defer one.guard.Unlock()
-	tree := one.checker.Tree()
-	for path, drew := range one.drawn {
-		if drew != who {
-			continue
-		}
-		one.publishes(tree, path, nil, who)
-		delete(one.drawn, path)
-	}
-}
-
-func (one *server) publishes(tree *Tree, path string, found []Finding, who string) {
-	rows := yaml.SplitLines(tree.Read(path))
-	drawn := make([]diagnostic, 0, len(found))
-	for _, said := range found {
-		drawn = append(drawn, drawsAs(said, rows))
-	}
-	if len(found) > 0 {
-		one.drawn[path] = who
-	}
-	one.says("textDocument/publishDiagnostics", map[string]any{
-		"uri":         uriOf(filepath.Join(tree.Root, filepath.FromSlash(path))),
-		"diagnostics": drawn,
-	})
 }
 
 // [[spec/design_output/lsp#a-finding-draws-as-a-diagnostic]]
@@ -248,7 +160,7 @@ func drawsAs(said Finding, rows []string) diagnostic {
 		Range:    span{Start: position{Line: line, Character: column}, End: position{Line: line, Character: end}},
 		Severity: severity,
 		Code:     said.Rule,
-		Source:   "se-lsp",
+		Source:   sourceOf(said),
 		Message:  said.Message,
 	}
 }
@@ -338,3 +250,11 @@ var _ = os.Stdout
 type errorOf string
 
 func (one errorOf) Error() string { return string(one) }
+
+// A finding the bridge hands over names the front it comes from, and the rest are this server's. [[spec/design_output/lsp]]
+func sourceOf(said Finding) string {
+	if said.Source == "" {
+		return "se-lsp"
+	}
+	return "se-lsp " + said.Source
+}

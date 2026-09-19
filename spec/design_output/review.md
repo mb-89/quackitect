@@ -68,7 +68,7 @@ alone. `rev-list` keeps two dots, because it counts the branch's own commits.
 
 # A worktree runs the check
 
-`git worktree add --detach .se/run/review/<branch>` opens the branch beside the
+`git worktree add --detach .se/.runtime/review/<branch>` opens the branch beside the
 tree the caller stands in. So a review costs the caller no checkout, and it
 reads a branch a person already checks out somewhere else.
 
@@ -76,9 +76,9 @@ Three things follow from where that worktree lands:
 
 | the thing | what the verb does |
 |---|---|
-| the worktree carries no `.se/run/bin` | copies `.se/run/tools.json` in, whose paths name this box's binaries |
+| the worktree carries no `.se/.runtime/bin` | copies `.se/.runtime/tools.json` in, whose paths name this box's binaries |
 | `RUNME.sh` downloads every tool | runs `node src/scripts/cli.js check`, leaving the install script out |
-| the check stamps `.se/run/check.json` | lets it land in the worktree, so the caller's own stamp stands |
+| the check stamps `.se/.runtime/check.json` | lets it land in the worktree, so the caller's own stamp stands |
 
 `.se` is git ignored, so the worktree lands where nothing tracks it, and
 removing the worktree takes the whole of it away.

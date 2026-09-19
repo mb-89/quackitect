@@ -1,7 +1,6 @@
 ---
 kind: [[ticket]]
 state: closed
-urgency: soon
 steps:
   - name: design
     reads: [[spec/guidance/voice]]

@@ -20,6 +20,16 @@ export function git(proc, root) {
         .filter(Boolean)
         .map((row) => row.split("\t")[1].replace("refs/heads/", ""));
     },
+    // [[spec/design_output/work#the-listing-reads-git-once]]
+    batch: (asks) => {
+      if (!asks.length) return "";
+      const ran = proc.run(["git", "cat-file", "--batch"], {
+        cwd: root,
+        stdin: `${asks.join("\n")}\n`,
+        raw: true,
+      });
+      return ran.exitCode === 0 ? (ran.stdout ?? "") : "";
+    },
     show: (ref) => {
       const said = run(["show", ref], true);
       return said.ok ? said.out : "";
@@ -28,6 +38,9 @@ export function git(proc, root) {
       const said = run(["log", "-1", "--format=%an", ref], true);
       return said.ok ? said.out : "";
     },
+    authorName: () => run(["config", "user.name"], true).out,
+    // [[spec/design_output/pull#the-hand-rule]]
+    signatureOf: (ref) => run(["log", "-1", "--format=%G?", ref], true).out,
     countBetween: (from, to) =>
       run(["rev-list", "--count", `${from}..${to}`], true).out,
     switchTo: (branch, quiet) => run(["switch", branch], quiet),

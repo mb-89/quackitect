@@ -44,7 +44,7 @@ const good = mintNote(ticket);
 const routed = `---
 kind: [[ticket]]
 state: open
-urgency: now
+urgent: true
 step: implement/change
 steps:
   - name: design

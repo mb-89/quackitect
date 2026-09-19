@@ -110,13 +110,14 @@ derives it at every hand-out:
 | the children say | the pull does |
 |---|---|
 | one closes `dropped` | writes a return on the step, and sends the group to its `on_fail` |
-| one stands open | writes `skipped` with the reason, and hands the group's next leaf out |
+| one stands open | waits, and names the child it waits for |
 | every one closes `done` or `became` | writes a pass by `the engine`, and moves on |
 
-The group's last leaf then checks the children again. One still open sends
-the step back to `children` and leaves the group open. So `branch done` names
-the child, and the group returns to the beat once a person answers on the
-branch.
+A group at `children` hands no leaf out while a child stands open. So a box
+with nothing at a step it can take writes no retro. The wait names the person
+step each child holds, and `branch done` leaves the group at `todo`. A child
+reopening past the `children` step sends the group's last leaf back there,
+which leaves the group open the same way.
 
 ## A condition skips a leaf
 
@@ -169,9 +170,9 @@ signature check.
 ## The hand and the hold
 
 A hand is the box, the session on it, and the agent inside it where the
-harness names one. `.se/run/box.json` carries the box id, and the engine mints one
+harness names one. `.se/.runtime/box.json` carries the box id, and the engine mints one
 where none stands. It takes the random source as an argument, so a test
-replays. `.se/run/session.json` carries the session id and the harness name, and
+replays. `.se/.runtime/session.json` carries the session id and the harness name, and
 the plugin wrapper writes it at `session.start`. The pull reads the two files
 into one hand.
 
@@ -185,7 +186,7 @@ A helper the session spawns runs on the same box under the same session file,
 so it carries the session's hand. A `not` that excludes the session
 excludes the helper. The hold slugs the hand into its file name.
 
-The hold stands at `.se/run/hold/<hand>.json`. It names the ticket, its path, the
+The hold stands at `.se/.runtime/hold/<hand>.json`. It names the ticket, its path, the
 step, the group, the take hash, and the guidance notes by name and hash. The
 pull refuses a second hand-out while a hold stands, and `branch pull --drop`
 drops the hold with the leaf where it stands. The stop hook reads the
@@ -198,6 +199,30 @@ form, its `expects` and what it says. It names the heading depth to write
 under. A checklist on the leaf or a phase above it adds the `checked` field,
 one line per item. Then come the actionables of every note the leaf reads,
 and the line that hands it back.
+
+# The queue is a score
+
+One decider orders the queue, and every column naming an order reads that one
+answer. The mark stands over the score, and the score orders everything under
+it:
+
+| the term | what it does | its weight |
+|---|---|---|
+| the mark | puts a ticket over every unmarked one | none, because it overrides |
+| what waits under it | raises it, down the whole chain | `work.blockScore` |
+| how long it stands | raises it, so nothing sits forever | `work.dayScore` |
+| how often a hand-back comes back refused | raises it | `work.failScore` |
+
+The walk reaches the whole chain, so a ticket blocking one that blocks ten
+counts eleven. A ticket waiting on one still open leaves the queue before the
+score reads it, and the board draws it anyway.
+
+The weights stand in `spec/config/level0.json`, beside `failsBeforePerson`, so
+tuning the queue costs an edit. `branch list --queue` writes the order the pull
+hands out, and the column a board draws reads that answer.
+
+A ticket's age comes off one `git log` over the folder holding the tickets, so
+the cost stands beside the pull, once a pull.
 
 # A hand of its own
 
@@ -271,6 +296,11 @@ judge run carries the `--fields` payload of the hand-back. The material lays
 the payload over the ticket before it reads the evidence, so the judge reads
 what the hand writes.
 
+The evidence holds the prose fields alone. The leaf names the form of each
+field it asks for. So the material leaves out a field whose form reads
+`command`, and a heading carrying no line. A chapter of commands hands the
+wrapper nothing, and the wrapper then skips the judge.
+
 ## The fields hold their forms
 
 `chapterOf` reads the leaf's chapter by walking the headings as the route
@@ -304,9 +334,9 @@ against the first word of the last line. A miss is a finding.
 
 ## The hand-back refused
 
-A refusal keeps the hold and counts on it. At `work.refusalsBeforePerson`
-refusals the pull inserts a person step carrying the first finding, and the
-ticket waits for a person.
+A refusal keeps the hold and counts on it. At `work.refusalsBeforeFail`
+refusals the pull fails the leaf back, carrying the count and the first
+finding as the reason. So the fail road below answers from there on.
 
 # The pass
 
@@ -346,8 +376,13 @@ refused commit writes no record. `src/scripts/landed.js` holds the landing.
 `--fail "why"` writes an entry with the reason and `returns`, one past the
 most this step carries. It sets `step` to the row's `on_fail`, or to the leaf
 itself where none stands. A phase named there sends the ticket to its first
-leaf. At `work.failsBeforePerson` returns the pull inserts a person step
-before the target.
+leaf. At `work.failsBeforeWait` returns the pull drops the hold and answers
+`wait`, so the target stands open for the hand that takes it next.
+
+A fail says the step works not, so its commands run for the record and refuse
+nothing. A step whose evidence stands red is exactly a step a hand fails, and
+the record carries what each command says. The fields of the chapter still have
+to stand, because a fail says why in them.
 
 ## A person step goes in
 
@@ -372,25 +407,19 @@ Then it drops the hold, commits by ticket and step, pushes, and hands out
 the next ticket. With no hold standing it refuses and names the pull. So a
 hand reaches the person step, and one mechanism inserts every kind.
 
-## A settle step goes in
+## A count inserts no step
 
-A count of returns says two agent hands disagree. It says nothing about who
-settles that, so the count inserts a step another agent takes:
+The escalation verb is the one road a step goes in by, so a count inserts
+none. The owner rules that a step a box writes waits for a person the box
+cannot reach. Two counts stand, and each answers on its own road:
 
-| the step | what it reads |
+| the count | what the pull does |
 |---|---|
-| `settle-<n>` | `by: anyone`, `to: engine`, the findings under `asks` |
-| the answer | the decision, and why it stands |
+| `work.refusalsBeforeFail` | fails the leaf back, carrying the count and the first finding |
+| `work.failsBeforeWait` | drops the hold and answers `wait` |
 
-`withSettleStep` puts it in through the same inserter the person step uses.
-Two counts reach it:
-
-- a step failing back, at `work.failsBeforePerson`
-- a hand-back meeting refused, at `work.refusalsBeforePerson`
-
-A ticket carrying `work.stepsBeforeSplit` settle steps hands the question to a
-person instead. So the agents settle first, and a person answers where they
-reach no answer.
+So a hand reaching no answer leaves the leaf open, and the next hand takes it
+where it stands.
 
 [[spec/rationales/cloud]] carries what a count costs where it reaches a person
 first.
@@ -479,3 +508,8 @@ see count too.
 
 The run names the tap reporter. Node past version 23 answers a pipe with the
 spec reporter too, so the count reads the tap lines.
+
+The tests stand in two languages, and the verb runs both. A changed `*.test.js`
+joins the node run, and a changed `*_test.go` names the module under `src` that
+holds it, which the verb runs with `go test`. The answer reads green where
+every run does, and it names the first that does not.

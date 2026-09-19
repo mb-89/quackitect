@@ -15,7 +15,7 @@ import {
   readsOf,
   writeHold,
 } from "./guidance-hand.js";
-import { agentOf, BOX, handOf } from "./hand.js";
+import { agentOf, BOX, handOf, roleOf } from "./hand.js";
 
 export const HOLDS = OWNED_HOLDS;
 export const WORK = "work";
@@ -43,6 +43,7 @@ export const BRANCH = [
   "review",
   "list",
   "pull",
+  "escalate",
   "guidance",
   "test",
 ];
@@ -52,7 +53,7 @@ export const VERBS = {
   branch: BRANCH,
   work: BRANCH,
   ticket: ["note", "update", "open"],
-  retro: ["notes"],
+  retro: ["notes", "collect", "new"],
 };
 
 // [[spec/design_output/pull#a-need-is-a-verb]]
@@ -64,7 +65,7 @@ export function holdsVerb(need, verbs = VERBS) {
   return !sub || verbs[verb].includes(sub);
 }
 
-export { agentOf, BOX, handOf, holdAt, holdOf, parsed };
+export { agentOf, BOX, handOf, holdAt, holdOf, parsed, roleOf };
 
 // A second hand-out at one step hands the notes again on a refusal, a compaction or a moved hash alone. [[spec/design_output/pull#the-hand-and-the-hold]]
 export function stillHeld(it, held) {
@@ -101,6 +102,11 @@ export function walkOf(front) {
 
 export function leavesOf(front) {
   return walkOf(front).filter((one) => one.leaf);
+}
+
+// The step a ticket stands at, which is its `step` field or the first leaf of its route. [[spec/design_output/pull#what-a-hand-out-reads]]
+export function stepPathOf(front) {
+  return String(front?.step ?? "").trim() || (leavesOf(front)[0]?.path ?? "");
 }
 
 // [[spec/design_output/pull#a-leaf-inherits]]

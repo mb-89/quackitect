@@ -6,7 +6,8 @@
 const PANE = "quackitect";
 const SCHEMA = "spec/config/level0.schema.json";
 const TRACKED = "spec/config/level0.json";
-const LOCAL = ".se/config.json";
+// The local layer, owned by .claude/skills/level0/lib/folders.js and spelled again here because this hook imports nothing. [[spec/design_output/config#the-three-layers]]
+const LOCAL = ".se/.runtime/config.json";
 const SAID = "comment";
 const MACHINERY = ["session"];
 const CONFIG = "config";

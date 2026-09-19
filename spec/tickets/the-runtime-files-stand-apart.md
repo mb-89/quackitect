@@ -1,7 +1,7 @@
 ---
 kind: [[ticket]]
 state: closed
-urgency: now
+urgent: true
 step: implement/person-1
 steps:
   - name: design
@@ -220,7 +220,7 @@ place. The folder a file stands in says which kind it is.
 | kind | where it stands | who reads it |
 |---|---|---|
 | retro | `.se/retro` | the retro, as its own |
-| runtime | `.se/run` | the box that wrote it |
+| runtime | `.se/.runtime` | the box that wrote it |
 | the rest | `.se` itself | the retro, and a question over the index |
 
 One module owns the two names. Every writer takes its folder from there. A

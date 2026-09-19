@@ -19,13 +19,12 @@ const ROOT = "/tree";
 const SHA = "b818c390c02737351bf1b73aba36a573d34d2ecc";
 const BRANCH = "work/one-group";
 const at = (path) => join(ROOT, ...path.split("/"));
-const HOLD = at(".se/run/hold/box-d462e994b4cef.json");
+const HOLD = at(".se/.runtime/hold/box-d462e994b4cef.json");
 const TICKET = at("spec/tickets/a-child.md");
 
 const GROUP = `---
 kind: [[ticket]]
 state: closed
-urgency: soon
 process: [[group]]
 steps:
   - name: split
@@ -50,7 +49,7 @@ Two tickets that land as one.
 const CHILD = `---
 kind: [[ticket]]
 state: open
-urgency: now
+urgent: true
 step: implement/tests-red
 steps:
   - name: implement
@@ -104,7 +103,7 @@ function doors(more = {}) {
   );
   const disk = fakeDisk({
     [at("spec/schemas/ticket.schema.yaml")]: SCHEMA,
-    [at(".se/run/box.json")]: JSON.stringify({ id: "d462e994b4cef" }),
+    [at(".se/.runtime/box.json")]: JSON.stringify({ id: "d462e994b4cef" }),
     [at("spec/tickets/one-group.md")]: GROUP,
     [TICKET]: CHILD,
   });
@@ -155,15 +154,15 @@ test("a ticket with no step field hands back at its first leaf, so the hold read
   assert.match(said.said, /checked under implement\/tests-red holds 1 line/, "the checks read the payload");
 });
 
-test("a refusal at the cap inserts the settle step on the ticket as it stood, and the refused payload reaches no disk", () => {
+test("a refusal at the cap fails the ticket back as it stood, and the refused payload reaches no disk", () => {
   const { it, disk } = doors({ refusals: 1 });
-  const settle = heard(() =>
+  const capped = heard(() =>
     work(ROOT, ["pull", "a-child", "--pass", "--fields", SHORT], it),
   );
-  assert.equal(settle.code, 1);
-  assert.match(settle.said, /waits for a hand/);
+  assert.match(capped.said, /1 refusals in a row/);
   const landed = disk.read(TICKET);
   assert.ok(!/^- one$/m.test(landed), "the refused payload reaches no disk");
   assert.ok(!landed.includes("node --test"));
-  assert.match(landed, /settle-1/, "and the settle step stands");
+  assert.ok(!landed.includes("name: settle"), "and the cap inserts no step");
+  assert.match(landed, /why: "the hand-back met refused 1 times/, "the reason rides the record");
 });

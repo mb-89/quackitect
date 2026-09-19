@@ -76,9 +76,14 @@ before the ticket system finish under the verbs they carry.
         hash_before: a1b2c3
 
 `step` is the leaf the group stands on, `hand` names the box out of
-`.se/copy.json`, and `hash_before` is the branch tip at the claim. The push decides:
+`.se/.runtime/copy.json`, and `hash_before` is the branch tip at the claim. The push decides:
 two boxes reaching for one group means one of them meets a rejected push and
 takes the next.
+
+The take reads the group before it writes that entry, through the same line
+`branch done` reads. A group whose open children hold no step a hand can take
+stays at `todo`, and the take names the step each child waits at. So a cloud
+box stops here, on the branch, and the record keeps the shape it holds.
 
 The hand names the box and no person, because the ticket travels and
 `spec/guidance/private` binds what a tracked file carries. [[spec/guidance]]
@@ -113,6 +118,39 @@ all:
 | a newest entry with `hash_before` and no `hash_after` | `held` |
 | `state: closed` on the ticket | `done` |
 
+# One verb answers git
+
+`branch answer` writes what git knows into one file, and a board, a terminal and
+the pull all read that one answer:
+
+| the key | what it carries |
+|---|---|
+| `branches` | every work branch, its tip, the time on it, its status and its kind |
+| `branches[].tickets` | the tickets on that branch, each with its state and its step |
+| `loose` | the tickets on trunk naming no group |
+| `queue` on a ticket | the place the pull hands it out, which `--queue` writes |
+
+The file stands beside the work a reader reads, so the index walks it and a
+write wakes a reader. The engine's own state stays in the runtime half, which
+the index skips. A reader meeting no file says so, and the board draws what the
+notes hold.
+
+# The listing reads git once
+
+`branch list` asks git three times, whatever stands on the remote:
+
+| the read | the process | what it answers |
+|---|---|---|
+| the refs | `for-each-ref` | every work branch, its tip, the time on that tip, and whether trunk holds it |
+| the paths | `cat-file --batch` | the ticket names each tip carries |
+| the contents | `cat-file --batch` | the brief and every ticket the paths name |
+
+The fetch stands off that path. `branch list --fetch` asks for it, and `take`
+and the routine's trigger fetch on their own, because each acts on the remote.
+
+A tree object carries a name as bytes, so the paths read raw. For details, see
+[[spec/design_output/doors#a-raw-run-keeps-bytes]].
+
 # A row per group
 
 `branch list` names one row per branch and one per loose ticket on trunk:
@@ -122,7 +160,7 @@ all:
 | the name | the branch, or the ticket's file name |
 | the kind | `group`, `brief` or `ticket` |
 | the status | `todo`, `held`, `done` or `merged` |
-| the why | the urgency, or what it waits for |
+| the why | the mark, or what it waits for |
 | the age | the age of the tip, on a held branch |
 
 A loose ticket is one on trunk naming no group, which is backlog a person has
@@ -140,7 +178,7 @@ and the held ones together, and runs no `git show` by hand:
 | the name | the ticket's file name |
 | the kind | `ticket` |
 | the status | `open` or `closed` |
-| the why | the step it stands at, or its urgency where it names no step |
+| the why | the step it stands at, or its mark where it names no step |
 
 A brief carries no such row, because a brief names no tickets.
 
@@ -341,11 +379,11 @@ which session it is.
 `branch take` and `branch done` reach git inside the command line, so the door sees
 the verb and leaves the plumbing alone.
 
-# Urgency, and what waits
+# The mark, and what waits
 
 The frontmatter carries two more fields, and `branch take` reads both:
 
-    urgency: now
+    urgent: true
     depends_on:
       - doors-and-fakes
 
@@ -353,8 +391,8 @@ A flow list on one line, `depends_on: [a, b]`, says the same as the block
 list, with or without quotes around a name.
 
 `take` drops every branch waiting on one still at `todo`, `held` or `done`,
-then sorts the rest by urgency: `now`, `soon`, `whenever`. A branch naming no
-urgency reads as `soon`.
+then puts the marked branches first. A branch carrying no mark stands under
+them, in the order the score sets. [[spec/tickets/the-queue-is-a-score]]
 
 ## A dependency waits for trunk
 
@@ -367,14 +405,12 @@ itself in order, and each link starts from the one before it.
 `take` merges trunk in. A dependent taken before its dependency lands starts
 from a trunk carrying none of that work. It then builds that work a second time.
 
-`branch list` shows what each branch waits for, in place of its urgency.
-`setStatus` writes `urgency: soon` onto a brief carrying none, so every brief it
-mints holds to its schema. [[spec/schemas]]
+`branch list` shows what each branch waits for, in place of its mark.
 
 # The battery answers first
 
 `branch done` reads a stamp before it claims anything. `./RUNME.sh check` writes
-`.se/run/check.json` on every run, naming the commit it stands on:
+`.se/.runtime/check.json` on every run, naming the commit it stands on:
 
     { "sha": "...", "ok": true, "clean": true, "at": "..." }
 

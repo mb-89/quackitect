@@ -13,12 +13,15 @@ import {
   isGroup,
   NOTE_END,
   OPEN,
+  dependsOn,
   TICKETS,
   ticketNamed,
+  urgent,
   withEntry,
   withField,
 } from "./group.js";
 import { noteRows, readsOf, writeHold } from "./guidance-hand.js";
+import { roleOf } from "./hand.js";
 import { landed } from "./landed.js";
 import { workAnswer } from "./pull-chapter.js";
 import {
@@ -26,13 +29,14 @@ import {
   ENGINE,
   holdsVerb,
   leafOf,
-  leavesOf,
   MOST_MOVES,
   say,
+  stepPathOf,
   WAIT,
   walkOf,
 } from "./pull-route.js";
 import { entriesOf, pushed, returnsOf, shut, target, tipOf } from "./pull-writes.js";
+import { queued, stoodHere } from "./queue.js";
 import { HELPER, SPAWN, spawnPrompt, unblockPrompt } from "./spawn.js";
 import { NOTES, schemasHere } from "./ticket.js";
 
@@ -78,19 +82,14 @@ export function childrenOf(all, group) {
   return all.filter((one) => names.has(one.name));
 }
 
-export const URGENCY = ["now", "soon", "whenever"];
-
-export function sorted(list) {
-  return [...list].sort(
-    (a, b) =>
-      URGENCY.indexOf(urgency(a.text)) - URGENCY.indexOf(urgency(b.text)) ||
-      a.name.localeCompare(b.name),
-  );
+// The score orders the queue, and the terms a weighing carries answer it. [[spec/design_output/pull#the-queue-is-a-score]]
+export function weighing(it, all) {
+  return { clock: it.clock, weights: it.weights, stood: stoodHere(it), all };
 }
 
-export function urgency(text) {
-  const said = fieldOf(text, "urgency");
-  return URGENCY.includes(said) ? said : "soon";
+// [[spec/design_output/pull#the-queue-is-a-score]]
+export function sorted(list, at = {}) {
+  return queued(list, at.all ?? list, at);
 }
 
 // [[spec/design_output/pull#what-a-hand-out-reads]]
@@ -103,15 +102,16 @@ export function handOut(it, who) {
   const privates = all.filter(
     (one) => one.private && String(one.front.todo) !== "true",
   );
+  const at = weighing(it, all);
   // [[spec/design_output/pull#the-engine-takes-the-branch]]
   const pools = who.group
     ? [
         tagged,
-        sorted(childrenOf(all, who.group)),
+        sorted(childrenOf(all, who.group), at),
         groupTicket ? [groupTicket] : [],
-        sorted(privates),
+        sorted(privates, at),
       ]
-    : [tagged, sorted(freeIn(all)), sorted(privates)];
+    : [tagged, sorted(freeIn(all), at), sorted(privates, at)];
   if (!who.group) cutForGroups(it, all);
   // A name on the pull asks for one ticket, so the pools carry that one alone. [[spec/design_output/pull#the-hand-out]]
   const asked = who.wanted
@@ -173,21 +173,22 @@ export function cutForGroups(it, all) {
   }
 }
 
-// A desk takes a group on two roads alone: the owner names it, or its urgency reads now. [[spec/design_output/pull#the-engine-takes-the-branch]]
+// A desk takes a group on two roads alone: the owner names it, or it carries the mark. [[spec/design_output/pull#the-engine-takes-the-branch]]
 export function namedGroup(it, name) {
   const one = ticketsHere(it).find((held) => !held.private && held.name === name);
   return one && isGroup(one.text) ? name : "";
 }
 
 export function urgentGroup(it) {
-  const groups = ticketsHere(it).filter(
+  const all = ticketsHere(it);
+  const groups = all.filter(
     (one) =>
       !one.private &&
       isGroup(one.text) &&
       fieldOf(one.text, "state") === OPEN &&
-      urgency(one.text) === "now",
+      urgent(one.text),
   );
-  return sorted(groups)[0]?.name ?? "";
+  return groups.length ? (sorted(groups, weighing(it, all))[0]?.name ?? "") : "";
 }
 
 export function spawnAnswer(other) {
@@ -207,7 +208,7 @@ export function takeable(it, one, all = [], group = "") {
   if (String(front.state ?? "") !== OPEN) return "";
   // The offer waits on a dependency, so this waits on it too. [[spec/design_output/work#a-dependency-waits-for-trunk]]
   if (dependsOn(front).some((dep) => !closedHere(it, all, dep))) return "";
-  const path = String(front.step ?? "").trim() || (leavesOf(front)[0]?.path ?? "");
+  const path = stepPathOf(front);
   const leaf = leafOf(front, path);
   if (!leaf) return "";
   // [[spec/tickets/the-one-answer-takes-shape]]
@@ -228,25 +229,13 @@ export function offer(it, who, one, all) {
       : dependsOn(one.front).filter((dep) => !closedHere(it, all, dep));
   if (open.length) return { why: `waits for ${open.join(", ")}` };
 
-  const moved = advanced(it, who, one, all);
+  const moved = advanced(it, one, all);
   if (moved.why) return { why: moved.why };
   if (!moved.leaf) return {};
   return admits(it, who, one, moved.leaf, all);
 }
 
-export function dependsOn(front) {
-  return [front?.depends_on ?? []]
-    .flat()
-    .flatMap((one) => String(one).split(","))
-    .map((one) =>
-      one
-        .trim()
-        .replace(/^\[|\]$/g, "")
-        .replace(/^["']|["']$/g, "")
-        .trim(),
-    )
-    .filter(Boolean);
-}
+export { dependsOn } from "./group.js";
 
 // [[spec/design_output/pull#children-before-their-group]]
 export function closedHere(it, all, dep) {
@@ -258,10 +247,10 @@ export function closedHere(it, all, dep) {
 }
 
 // [[spec/design_output/pull#a-condition-skips-a-leaf]]
-export function advanced(it, who, one, all) {
+export function advanced(it, one, all) {
   let text = one.text;
   let front = one.front;
-  let path = String(front.step ?? "").trim() || (leavesOf(front)[0]?.path ?? "");
+  let path = stepPathOf(front);
   let moved = false;
   const changes = [];
 
@@ -298,19 +287,8 @@ export function advanced(it, who, one, all) {
         });
         if (busy.length)
           return { why: `waits for ${busy.join(", ")}, which a hand can take` };
-        const left = entriesOf(front)
-          .filter((entry) => String(entry.step) === leaf.path)
-          .at(-1);
-        const again = left?.skipped && String(left.hand ?? "") === who.hand;
-        if (!leaf.leaves[leaf.at + 1] || again)
-          return { why: `waits for ${said.open.join(", ")}` };
-        text = withEntry(text, {
-          step: leaf.path,
-          hand: who.hand,
-          skipped: true,
-          why: `the box leaves it while ${said.open.join(", ")} stand open`,
-        });
-        changes.push(`leaves ${leaf.path}`);
+        // Every open child waits for a person, so the group stands here and hands no retro out. [[spec/tickets/the-group-leaves-at-todo]]
+        return { why: `waits for ${said.open.join(", ")}` };
       } else {
         text = withEntry(text, {
           step: leaf.path,
@@ -419,7 +397,8 @@ export function excludes(front, leaf, hand) {
     (one) => paths.has(String(one.step)) && !one.skipped,
   );
   if (!wrote.length) return "";
-  if (wrote.some((one) => String(one.hand ?? "") === hand)) {
+  // The record holds the role, so the rule reads the hand as its role too. [[spec/design_output/pull#the-hand-rule]]
+  if (wrote.some((one) => String(one.hand ?? "") === roleOf(hand))) {
     return `waits for a hand other than ${hand}, which wrote ${named.path}`;
   }
   return "";
@@ -483,22 +462,6 @@ export function withEngineReader(it, one) {
   }
   const schema = schemasHere(it).get("ticket");
   return schema ? reRouted(one.text, schema, steps, "") : "";
-}
-
-// A count says two hands disagree, and another hand settles that, because a person waiting on a call the box owns costs a whole session. [[spec/design_output/pull#a-settle-step-goes-in]]
-export function withSettleStep(it, one, before, asks) {
-  const standing = stepsNamed(one, "settle");
-  const most = Number(it.splits);
-  if (most > 0 && standing >= most) return withPersonStep(it, one, before, asks);
-  return inserted(it, one, before, `settle-${standing + 1}`, {
-    does: "decides between the step and the findings, and writes why",
-    by: "anyone",
-    to: "engine",
-    asks,
-    evidence: [
-      { name: "answer", form: "text", says: "the decision, and why it stands" },
-    ],
-  });
 }
 
 // [[spec/design_output/pull#a-person-step-goes-in]]

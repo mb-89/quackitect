@@ -161,8 +161,8 @@ const (
 	Settings = ".vscode/settings.json"
 	Offered  = ".vscode/extensions.json"
 	// The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned by folders.js and spelled again here because a Go module imports no JavaScript.
-	ToolsAt = ".se/run/tools.json"
-	Bin     = ".se/run/bin"
+	ToolsAt = ".se/.runtime/tools.json"
+	Bin     = ".se/.runtime/bin"
 )
 
 // [[spec/design_output/editor#what-the-editor-runs]]

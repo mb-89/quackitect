@@ -40,13 +40,13 @@ function disks(more = {}) {
 }
 
 const boxed = (disk) => {
-  disk.write(join(WORK, ".se/run/box.json"), JSON.stringify({ id: BOX }));
+  disk.write(join(WORK, ".se/.runtime/box.json"), JSON.stringify({ id: BOX }));
   return disk;
 };
 
 const holding = (disk, reads) => {
   disk.write(
-    join(WORK, `.se/run/hold/${HAND.replace(/[^A-Za-z0-9]+/g, "-")}.json`),
+    join(WORK, `.se/.runtime/hold/${HAND.replace(/[^A-Za-z0-9]+/g, "-")}.json`),
     `${JSON.stringify(hold(reads), null, 2)}\n`,
   );
   return disk;
@@ -56,7 +56,7 @@ const holding = (disk, reads) => {
 test("a hold standing drops the note its step reads from the layer a session opens with", () => {
   const disk = holding(boxed(disks()), [{ name: "spec/guidance/voice", hash: "aa" }]);
 
-  const said = guidanceHere(disk, METHOD, ENV, true, WORK);
+  const said = guidanceHere(disk, METHOD, WORK, ENV, true);
 
   assert.ok(
     !/Say what is\./.test(said.standing),
@@ -69,7 +69,7 @@ test("a hold standing drops the note its step reads from the layer a session ope
 test("no hold standing leaves the layer whole", () => {
   const disk = boxed(disks());
 
-  const said = guidanceHere(disk, METHOD, ENV, true, WORK);
+  const said = guidanceHere(disk, METHOD, WORK, ENV, true);
 
   assert.match(said.standing, /Say what is\./);
   assert.match(said.standing, /Answer the owner first\./);
@@ -79,17 +79,17 @@ test("no hold standing leaves the layer whole", () => {
 test("no box file leaves the layer whole, and the reader mints none", () => {
   const disk = disks();
 
-  const said = guidanceHere(disk, METHOD, ENV, true, WORK);
+  const said = guidanceHere(disk, METHOD, WORK, ENV, true);
 
   assert.match(said.standing, /Say what is\./);
-  assert.ok(!disk.exists(join(WORK, ".se/run/box.json")), "the reader mints no box");
+  assert.ok(!disk.exists(join(WORK, ".se/.runtime/box.json")), "the reader mints no box");
 });
 
 // [[spec/design_output/level0#the-standing-layer]]
 test("the counts read the notes the layer carries, so the sentence reads true", () => {
   const disk = holding(boxed(disks()), [{ name: "spec/guidance/voice", hash: "aa" }]);
 
-  const said = guidanceHere(disk, METHOD, ENV, true, WORK);
+  const said = guidanceHere(disk, METHOD, WORK, ENV, true);
 
   assert.equal(said.notes, 1);
   assert.equal(said.rules, 1);
@@ -99,7 +99,7 @@ test("the counts read the notes the layer carries, so the sentence reads true", 
 test("a spawned helper carries the layer whole, because its own hold stands elsewhere", () => {
   const disk = holding(boxed(disks()), [{ name: "spec/guidance/voice", hash: "aa" }]);
 
-  const said = guidanceHere(disk, METHOD, ENV, true, WORK);
+  const said = guidanceHere(disk, METHOD, WORK, ENV, true);
 
   assert.match(said.helper, /Say what is\./);
   assert.match(said.helper, /Answer the owner first\./);
@@ -109,7 +109,7 @@ test("a spawned helper carries the layer whole, because its own hold stands else
 test("a note binding a kind stands off the session and the helper, and its own layer holds it", () => {
   const disk = boxed(disks({ [join(METHOD, "spec/guidance/refactoring.md")]: REFACTORING }));
 
-  const said = guidanceHere(disk, METHOD, ENV, true, WORK);
+  const said = guidanceHere(disk, METHOD, WORK, ENV, true);
 
   assert.ok(!/Take the one file/.test(said.standing), "the working hand reads it nowhere");
   assert.ok(!/Take the one file/.test(said.helper), "a helper reads it nowhere");

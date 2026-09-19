@@ -64,6 +64,10 @@ type model struct {
 	w, h      int
 	tailer    *tailer
 	err       error
+	// [[spec/design_output/viewer#the-work-tab]]
+	work    *Tree
+	workWhy string
+	workAt  time.Time
 }
 
 func newModel(path string, zone *time.Location) model {
@@ -86,7 +90,10 @@ func newModel(path string, zone *time.Location) model {
 	}
 }
 
-func (m model) Init() tea.Cmd { return m.tailer.cmd() }
+// [[spec/design_output/viewer#the-work-tab]]
+func (m model) Init() tea.Cmd {
+	return tea.Batch(m.tailer.cmd(), workCmd(m.path, time.Time{}))
+}
 
 // [[spec/design_output/viewer#the-window-is-a-split]]
 func (m model) body() int { return max(2, m.h-headWide-footWide) }
@@ -111,6 +118,10 @@ func (m model) at() int {
 
 // [[spec/design_output/viewer#the-filter-holds-the-selection]]
 func (m *model) rebuild() {
+	// One language narrows every tab, and the tree joins the line with its presses. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+	if m.work != nil {
+		m.work.Filtering(m.filter.Source)
+	}
 	m.view = m.view[:0]
 	for index, r := range m.all {
 		if Rank(r.Level) >= Rank(m.floor) && m.filter.Match(r) {
@@ -202,6 +213,10 @@ func (m *model) loadPane() {
 		if m.filterBad != "" {
 			parts = append(parts, part{style: levelStyle("error"), text: m.filterBad})
 		}
+		// [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+		if m.onWork() {
+			parts = append(parts, workPresets(m)...)
+		}
 		parts = append(parts, part{}, part{text: FilterHelp})
 	default:
 		parts = m.tabs[m.open].Detail(m, m.box.Width)
@@ -242,6 +257,18 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.rebuild()
 		m.loadPane()
 		return m, m.tailer.cmd()
+
+	// [[spec/design_output/viewer#the-work-tab]]
+	case workMsg:
+		if !msg.same {
+			m.work, m.workWhy = msg.tree, msg.why
+			if m.work != nil {
+				m.work.Filtering(m.filter.Source)
+			}
+			m.loadPane()
+		}
+		m.workAt = msg.at
+		return m, workCmd(m.path, m.workAt)
 
 	case tea.KeyMsg:
 		if m.pane == paneFilter {
@@ -285,6 +312,12 @@ func (m model) typing(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		return m, nil
 	case "alt+F", "alt+q":
 		m.quick(msg.String())
+		return m, nil
+	// [[spec/design_output/tree-view#a-preset-carries-its-sort]]
+	case "alt+1", "alt+2", "alt+3", "alt+4", "alt+5", "alt+6", "alt+7", "alt+8", "alt+9":
+		if pressPreset(&m, msg.String()) {
+			m.loadPane()
+		}
 		return m, nil
 	case "alt+l":
 		m.raiseFloor()

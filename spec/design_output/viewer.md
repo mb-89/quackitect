@@ -14,7 +14,7 @@ carries a strip of tabs, the open tab on the left, one pane on the right and a
 footer of status marks. The log is the first tab.
 
 It is a Go program on Bubble Tea, in `src/viewer`. It reads
-`.se/run/log/session.jsonl`, the one file every writer appends to. For details,
+`.se/.log/session.jsonl`, the one file every writer appends to. For details,
 see [[spec/design_output/log#every-writer-appends]].
 
 # The keys
@@ -265,8 +265,8 @@ draws the window once and prints it. A reader with no terminal sees the same win
 
 # The verb builds it
 
-`./RUNME.sh tui` builds the viewer into `.se/run/bin/logview`, and runs it over
-`.se/run/log/session.jsonl`. `viewerOf` in `src/scripts/viewer.js` decides:
+`./RUNME.sh tui` builds the viewer into `.se/.runtime/bin/logview`, and runs it over
+`.se/.log/session.jsonl`. `viewerOf` in `src/scripts/viewer.js` decides:
 
 | what stands | what the verb does |
 |---|---|
@@ -276,7 +276,7 @@ draws the window once and prints it. A reader with no terminal sees the same win
 | no Go and no binary | prints the session as plain rows |
 
 The stamp is a hash of the `.go`, `go.mod` and `go.sum` files, and a test file
-stays out of it. It stands in `.se/run/bin/.logview-source`. The hash only has to
+stays out of it. It stands in `.se/.runtime/bin/.logview-source`. The hash only has to
 tell one source from the next, so it is a plain two-lane hash in the module and
 imports nothing.
 

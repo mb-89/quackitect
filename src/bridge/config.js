@@ -3,9 +3,7 @@
 // [[spec/design_output/config#the-three-layers]]
 
 import { join } from "node:path";
-
-const TRACKED = "spec/config/level0.json";
-const LOCAL = ".se/config.json";
+import { LOCAL, TRACKED } from "../../.claude/skills/level0/lib/config.js";
 
 export function asks(box, key) {
   const [section, leaf] = String(key).split(".");

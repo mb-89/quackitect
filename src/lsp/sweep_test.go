@@ -109,8 +109,8 @@ func TestAnOpenAfterTheSweepKeepsEverySweptFileDrawn(t *testing.T) {
 	}
 }
 
-// [[spec/tickets/the-panel-draws-every-file]]
-func TestACloseClearsItsOwnFileAndKeepsTheSweptOnes(t *testing.T) {
+// The panel draws every problem, so a closed file keeps what its disk still carries. [[spec/design_output/lsp]]
+func TestACloseRedrawsItsOwnFileOffTheDiskAndKeepsTheSweptOnes(t *testing.T) {
 	tree := sweptTree(t, map[string]string{"spec/tickets/one.md": departing})
 	kept := uriOf(filepath.Join(tree.Root, "HANDOVER.md"))
 	opens := uriOf(filepath.Join(tree.Root, "spec", "tickets", "one.md"))
@@ -125,8 +125,8 @@ func TestACloseClearsItsOwnFileAndKeepsTheSweptOnes(t *testing.T) {
 	if said[kept] != 1 {
 		t.Fatalf("the close leaves the swept file drawing %d finding(s)", said[kept])
 	}
-	if said[opens] != 0 {
-		t.Fatalf("the close leaves its own file drawing %d finding(s)", said[opens])
+	if said[opens] == 0 {
+		t.Fatal("the close clears a file whose disk still carries a problem")
 	}
 }
 

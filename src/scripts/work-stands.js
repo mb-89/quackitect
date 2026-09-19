@@ -18,6 +18,7 @@ import {
   ticketNamed,
   WORK_BRANCH,
 } from "./group.js";
+import { asText, framed, namesIn, REF_FORMAT, refsIn } from "./work-read.js";
 
 export const BRIEF = "HANDOVER.md";
 export const COL = { branch: 34, child: 32, kind: 6, status: 6, why: 24 };
@@ -37,14 +38,6 @@ export function statusOf(text) {
   if (!front) return "";
   const said = /^status:\s*(\S+)\s*$/m.exec(front[1]);
   return said ? said[1].toLowerCase() : "";
-}
-
-export const URGENCY = ["now", "soon", "whenever"];
-
-// [[spec/design_output/work#urgency-and-what-waits]]
-export function urgencyOf(text) {
-  const said = frontField(text, "urgency").toLowerCase();
-  return URGENCY.includes(said) ? said : "soon";
 }
 
 export function dependsOn(text) {
@@ -71,7 +64,7 @@ export function dependsOn(text) {
   return out.map(named).filter(Boolean);
 }
 
-// [[spec/design_output/work#urgency-and-what-waits]]
+// [[spec/design_output/work#the-mark-and-what-waits]]
 export function named(said) {
   return String(said)
     .trim()
@@ -123,27 +116,80 @@ export function groupStanding(text) {
   return heldIn(text) ? HELD : TODO;
 }
 
+// [[spec/design_output/work#the-listing-reads-git-once]]
+export function refsHere(it) {
+  const said = it.git.run(
+    ["for-each-ref", `--format=${REF_FORMAT}`, `refs/remotes/origin/${WORK_BRANCH}`],
+    true,
+  );
+  return said.ok ? refsIn(said.out) : [];
+}
+
+// The refs, then the paths, then the contents. [[spec/design_output/work#the-listing-reads-git-once]]
+export function readWork(it, trunk = false) {
+  const refs = refsHere(it);
+  const where = refs.map((one) => one.tip);
+  if (trunk) where.push(`origin/${TRUNK}`);
+  const paths = pathsIn(it, where);
+
+  const asks = [
+    ...refs.map((one) => `${one.tip}:${BRIEF}`),
+    ...where.flatMap((one) => paths.get(one).map((name) => `${one}:${TICKETS}/${name}`)),
+  ];
+  const read = framed(it.git.batch(asks), asks);
+  const held = (ask) => asText(read.get(ask) ?? "");
+  const ticketsAt = (one) =>
+    paths.get(one).map((name) => ({
+      path: `${TICKETS}/${name}`,
+      name: ticketNamed(name),
+      text: held(`${one}:${TICKETS}/${name}`),
+    }));
+
+  return {
+    stand: refs.map((one) => standing(one, held, ticketsAt)),
+    loose: trunk ? ticketsAt(`origin/${TRUNK}`) : [],
+  };
+}
+
+// [[spec/design_output/work#the-listing-reads-git-once]]
+function pathsIn(it, where) {
+  const asks = where.map((one) => `${one}:${TICKETS}`);
+  const trees = framed(it.git.batch(asks), asks);
+  return new Map(
+    where.map((one) => [
+      one,
+      namesIn(trees.get(`${one}:${TICKETS}`) ?? "").filter((name) =>
+        name.endsWith(NOTE_END),
+      ),
+    ]),
+  );
+}
+
+// [[spec/design_output/work#a-brief-drains-first]]
+function standing(one, held, ticketsAt) {
+  const name = one.branch.replace(WORK_BRANCH, "");
+  const brief = held(`${one.tip}:${BRIEF}`);
+  const ticket = brief ? "" : held(`${one.tip}:${ticketAt(name)}`);
+  return {
+    ...one,
+    name,
+    brief,
+    ticket: isGroup(ticket) ? ticket : "",
+    tickets: ticketsAt(one.tip),
+  };
+}
+
 // [[spec/design_output/work#a-group-is-a-ticket]]
 export function standOf(it) {
-  return branches(it).map((branch) => {
-    // [[spec/design_output/work#a-brief-drains-first]]
-    const name = branch.replace(/^work\//, "");
-    const brief = briefOf(it, branch);
-    const ticket = brief ? "" : textAt(it, `origin/${branch}`, ticketAt(name));
-    return { branch, name, brief, ticket: isGroup(ticket) ? ticket : "" };
-  });
+  return readWork(it).stand;
 }
 
 // [[spec/design_output/work#held-derives-from-the-record]]
-export function standingAll(stand, merged) {
+export function standingAll(stand) {
   return new Map(
     stand.map((one) => [
       one.branch,
-      merged.has(one.branch)
-        ? MERGED
-        : one.brief
-          ? statusOf(one.brief)
-          : groupStanding(one.ticket),
+      one.merged ? MERGED : one.brief ? statusOf(one.brief) : groupStanding(one.ticket),
     ]),
   );
 }

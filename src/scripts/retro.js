@@ -4,19 +4,35 @@
 // [[spec/design_output/pull#a-need-is-a-verb]]
 
 import { fieldOf, NOTE_END, ticketNamed } from "./group.js";
+import { collect } from "./retro-collect.js";
+import { newRetro } from "./retro-new.js";
+import { score } from "./retro-score.js";
 import { NOTES } from "./ticket.js";
 
 export function retro(root, argv, doors) {
-  const it = { root, ...doors };
+  const it = { root, method: root, work: root, ...doors };
   const what = argv[0];
-  if (what !== "notes") {
-    console.log("Usage: ./RUNME.sh retro <verb>\n");
-    console.log(
-      "  notes         the private notes still open on this box, and 0 when none stands",
-    );
-    return what ? 2 : 0;
-  }
-  return notes(it);
+  if (what === "notes") return notes(it);
+  // [[spec/design_input/the-agent-pulls-tickets]]
+  if (what === "collect") return collect(it, argv[1]);
+  // [[spec/design_input/the-agent-pulls-tickets]]
+  if (what === "new") return newRetro(it, argv);
+  // [[spec/design_input/the-agent-pulls-tickets]]
+  if (what === "score") return score(it);
+  console.log("Usage: ./RUNME.sh retro <verb>\n");
+  console.log(
+    "  notes            the private notes still open on this box, and 0 when none stands",
+  );
+  console.log(
+    "  collect <ticket> copies this box into the retro's folder, and writes its manifest",
+  );
+  console.log(
+    "  new              mints a retro off its route, opens it, and hands out its first leaf",
+  );
+  console.log(
+    "  score            the improvements earlier retros mint, and how many stay open",
+  );
+  return what ? 2 : 0;
 }
 
 // [[spec/design_output/pull#a-need-is-a-verb]]

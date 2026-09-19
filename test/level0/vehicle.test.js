@@ -36,7 +36,7 @@ function tree(extra = {}) {
     "/tools/RUNME.sh": "run me",
     "/tools/spec/guidance/voice.md": "# Actionables\n\n1. Say it plain.",
     "/tools/.git/HEAD": "ref: main",
-    "/tools/.se/copy.json": '{"id":"abc123","made":"2026-01-01T00:00:00.000Z"}',
+    "/tools/.se/.runtime/copy.json": '{"id":"abc123","made":"2026-01-01T00:00:00.000Z"}',
     ...extra,
   });
 }
@@ -55,8 +55,8 @@ test("the identity lives in the method tree", () => {
   const files = tree();
   assert.equal(copyHere(files, fakeClock(), "/tools"), "abc123");
 
-  const bare = tree({ "/tools/.se/copy.json": undefined });
-  bare.remove("/tools/.se/copy.json");
+  const bare = tree({ "/tools/.se/.runtime/copy.json": undefined });
+  bare.remove("/tools/.se/.runtime/copy.json");
   const made = copyHere(bare, fakeClock(), "/tools");
   assert.ok(made);
   assert.equal(copyHere(bare, fakeClock(), "/tools"), made);
@@ -72,10 +72,10 @@ test("a root is found by the marker it carries", () => {
 test("a project names its driver, and forgets it", () => {
   const files = tree();
   attach(files, fakeClock(), "/work", "abc123");
-  assert.equal(drivenOf(files.read("/work/.se/project.json")).driver, "abc123");
+  assert.equal(drivenOf(files.read("/work/.se/.runtime/project.json")).driver, "abc123");
 
   detach(files, "/work");
-  assert.equal(files.exists("/work/.se/project.json"), false);
+  assert.equal(files.exists("/work/.se/.runtime/project.json"), false);
   assert.equal(attaches("x", "t").driver, "x");
 });
 
@@ -155,10 +155,10 @@ test("the copy carries the method and nothing private", () => {
   assert.equal(files.exists(`/copy/${MARKER}`), true);
   assert.equal(files.exists("/copy/spec/guidance/voice.md"), true);
   assert.equal(files.exists("/copy/.git/HEAD"), false);
-  assert.equal(files.exists("/copy/.se/copy.json"), false);
+  assert.equal(files.exists("/copy/.se/.runtime/copy.json"), false);
 
   assert.equal(travels(".git"), false);
-  assert.equal(travels(".se/run/bin/vale"), false);
+  assert.equal(travels(".se/.runtime/bin/vale"), false);
   assert.equal(travels("src/parts/one.js"), true);
 });
 
@@ -189,7 +189,7 @@ test("attach writes the driver, the register entry with its port, the pointer an
   assert.equal(said.method, "/tools");
   assert.equal(said.port, 6510);
   assert.equal(
-    drivenOf(files.read("/stub/.se/project.json")).driver,
+    drivenOf(files.read("/stub/.se/.runtime/project.json")).driver,
     "abc123",
     "the driver",
   );

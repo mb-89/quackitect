@@ -64,7 +64,7 @@ hands the rest to the same manifest `patch` runs.
 
 ## The journal holds both halves
 
-`.se/run/undo/<time>.json` holds every file this apply touches: `was`, the text
+`.se/.runtime/undo/<time>.json` holds every file this apply touches: `was`, the text
 before, `made`, the text after, and a flag where the apply brings a file into
 being.
 

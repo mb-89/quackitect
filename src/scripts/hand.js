@@ -45,19 +45,34 @@ export function handDoors(env) {
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 export function handOf(it) {
-  const held = parsed(readIf(it, SESSION)) ?? {};
+  const held = parsed(readIf(it, it.root, SESSION)) ?? {};
   const agent = String(held.harness ?? "").trim() || agentOf(it.env);
   const parts = [`box ${boxOf(it)}`];
   if (held.id) parts.push(`session ${held.id}`);
   if (agent) parts.push(agent);
-  // The record names the role, and git names who. [[spec/guidance/voice]]
-  if (parts.length === 1 && !it.agent) return PERSON;
+  // The hold git ignores carries who, and the record carries the role. [[spec/design_output/pull#the-hand-rule]]
+  if (parts.length === 1 && !it.agent) return named(PERSON, it.git?.authorName?.() ?? "");
   return parts.join(" · ");
 }
 
+// A tracked file holds no person's name, so the record takes the role off the hand. [[spec/design_output/pull#the-hand-rule]]
+export function roleOf(hand) {
+  const said = String(hand ?? "").trim();
+  return said === PERSON || said.startsWith(`${PERSON} `) ? PERSON : said;
+}
+
+function named(role, who) {
+  const said = String(who ?? "").trim();
+  return said ? `${role} ${said}` : role;
+}
+
+// The box file stands under the work root, and the copy record under the method root, so a stub names its own box. [[spec/design_output/vehicle#the-work-root-inherits]]
 function boxOf(it) {
-  for (const path of [BOX, COPY]) {
-    const id = parsed(readIf(it, path))?.id;
+  for (const [root, path] of [
+    [it.root, BOX],
+    [it.method ?? it.root, COPY],
+  ]) {
+    const id = parsed(readIf(it, root, path))?.id;
     if (id) return id;
   }
   const id = it.random
@@ -68,8 +83,8 @@ function boxOf(it) {
   return id;
 }
 
-function readIf(it, path) {
-  const at = it.join(it.root, ...path.split("/"));
+function readIf(it, root, path) {
+  const at = it.join(root, ...path.split("/"));
   return it.disk.exists(at) ? it.disk.read(at) : "";
 }
 

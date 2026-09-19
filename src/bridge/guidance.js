@@ -6,9 +6,9 @@ import { join } from "node:path";
 import {
   bindsHere,
   canary,
-  carried,
   canaryIn,
   canaryText,
+  carried,
   countsOf,
   envOf,
   forHelper,
@@ -19,9 +19,11 @@ import {
   standingLayer,
   styled,
 } from "../../.claude/skills/level0/lib/guidance.js";
+import { inherits } from "../../.claude/skills/level0/lib/layer.js";
+import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { toolLines, WANTED } from "../../.claude/skills/level0/lib/tools.js";
-import { readTools, writeSurvey } from "../scripts/tools.js";
 import { heldReadsIn } from "../scripts/guidance-hand.js";
+import { readTools, writeSurvey } from "../scripts/tools.js";
 import { asks } from "./config.js";
 import { deadIndexLine } from "./search.js";
 
@@ -30,14 +32,21 @@ const TOOTH = "stop.enabled";
 export const TOOLS_BLOCK = "level0-tools";
 const TOOLS_HEADING = "# What this box has";
 
-// [[spec/design_output/level0#the-standing-layer]]
-export function guidanceHere(disk, root, env = process.env, tooth = true, work = root) {
-  const notes = readNotes(disk, join(root, GUIDANCE));
+// The notes come off both roots, file by file, the work root's winning. [[spec/design_output/vehicle#the-work-root-inherits]]
+export function guidanceHere(
+  disk,
+  method,
+  work = method,
+  env = process.env,
+  tooth = true,
+  argv = [],
+) {
+  const notes = readNotes(inherits(disk, method, work), GUIDANCE);
   const wanted = new Set(notes.flatMap((one) => envOf(one.text)));
   const bound = Object.fromEntries([...wanted].map((name) => [name, env[name] ?? ""]));
   const here = notes.filter((one) => bindsHere(one.text, bound));
   // A note the held step hands over rides the step, so the layer hands it no second time. [[spec/design_output/level0#the-standing-layer]]
-  const read = heldReadsIn(disk, join, work, env);
+  const read = heldReadsIn(disk, join, work, env, argv);
   // A note naming a kind stands off the working hand, and the layer of that kind holds it. [[spec/tickets/the-spawn-reaches-its-guidance]]
   const free = here.filter((one) => !kindsOf(one.text).length);
   // [[spec/design_output/level0#the-style-carries-a-note]]
@@ -53,16 +62,23 @@ export function guidanceHere(disk, root, env = process.env, tooth = true, work =
 }
 
 function readsGuidance(box) {
-  const tooth = asks(box, TOOTH) !== false;
-  return guidanceHere(box.disk, box.method, process.env, tooth, box.work || box.method);
+  return guidanceHere(
+    box.disk,
+    box.method,
+    box.work,
+    process.env,
+    asks(box, TOOTH) !== false,
+  );
 }
 
-function readNotes(disk, folder) {
+function readNotes(reads, folder) {
   try {
-    return disk
+    return reads
       .list(folder)
-      .filter((one) => one.kind === "file" && one.name.endsWith(".md"))
-      .map((one) => ({ name: one.name, text: disk.read(join(folder, one.name)) }));
+      .filter(
+        (one) => one.kind === "file" && one.name.endsWith(".md") && !isDraft(one.name),
+      )
+      .map((one) => ({ name: one.name, text: reads.read(`${folder}/${one.name}`) }));
   } catch {
     return [];
   }
@@ -113,7 +129,11 @@ function blocksOf(held, dead, tools) {
 function surveyHere(box) {
   const found = readTools(box.disk, box.work);
   if (Object.keys(found).length) return found;
-  return writeSurvey({ disk: box.disk, proc: box.proc }, box.work, box.env ?? process.env);
+  return writeSurvey(
+    { disk: box.disk, proc: box.proc },
+    box.work,
+    box.env ?? process.env,
+  );
 }
 
 function toolsText(box) {
@@ -166,7 +186,9 @@ export function onTurnComplete(e, box) {
     const sentence = guidanceOf(box).sentence;
     session.firstTurn = false;
     session.owes = true;
-    box.log.say("warn", "level0", HEARD[canaryIn(e.answer, sentence).found], { detail: sentence });
+    box.log.say("warn", "level0", HEARD[canaryIn(e.answer, sentence).found], {
+      detail: sentence,
+    });
   }
   return { pass: true };
 }
@@ -200,9 +222,14 @@ export function onAgentSpawn(e, box) {
   const kind = String(e?.kind ?? "");
   const standing = layerHere(box.guidance, kind);
   if (!standing) return { pass: true };
-  box.log.say("info", "agent", `handed the ${kind || "helper"} layer to ${e?.subagentType ?? "a helper"}`, {
-    detail: String(e?.description ?? ""),
-  });
+  box.log.say(
+    "info",
+    "agent",
+    `handed the ${kind || "helper"} layer to ${e?.subagentType ?? "a helper"}`,
+    {
+      detail: String(e?.description ?? ""),
+    },
+  );
   return { event: { ...e, prompt: forHelper(standing, e?.prompt) } };
 }
 

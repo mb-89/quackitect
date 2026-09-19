@@ -23,7 +23,7 @@ reads for the life of its process, so one number stands in three places.
 |---|---|---|
 | `spec/config/level0.json` | the team, tracked in git | once, at the first ask |
 | the environment | whoever launches the box | once, at the first ask |
-| `.se/config.json` | `./RUNME.sh config`, per box, git ignores it | on every ask |
+| `.se/.runtime/config.json` | `./RUNME.sh config`, per box, git ignores it | on every ask |
 
 A later layer beats an earlier one, so the per-box file beats the environment
 and the environment beats the tracked file.
@@ -133,7 +133,7 @@ mid-session reaches the turn after it.
 `./RUNME.sh config` prints every key, its value, and the layer answering it:
 
     stop.enabled           true      spec/config/level0.json
-    stop.hold              finish    .se/config.json
+    stop.hold              finish    .se/.runtime/config.json
     stop.mostInARow        3         spec/config/level0.json
     log.level              warn      SE_LOG_LEVEL
 
@@ -143,7 +143,7 @@ key prints that row alone.
 
 ## The verb writes one layer
 
-`./RUNME.sh config <key> <value>` writes `.se/config.json`, making `.se` where
+`./RUNME.sh config <key> <value>` writes `.se/.runtime/config.json`, making `.se` where
 that folder stands missing. A command line hands over text, so the verb reads
 the type out of the schema and coerces to it. `stop.mostInARow 5` lands as the
 number `5`, which keeps `"5" > 3` a bug nobody files.

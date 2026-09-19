@@ -9,18 +9,44 @@
 
 set -eu
 root=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
-bin="$root/.se/run/bin"
+bin="$root/.se/.runtime/bin"
 
 # The runtime folder of [[spec/design_input/the-runtime-files-stand-apart]], owned
 # by folders.js and spelled again here because a shell script imports nothing. A
 # box carrying the old places hands them to the index walk, so this moves them.
-mkdir -p "$root/.se/run"
-for one in bin log hold review undo measure copilot box.json session.json \
+
+# The folder answers to .runtime, so a box carrying an older name renames it
+# first, before anything below creates the new one beside it.
+for one in "$root/.se/run" "$root/.se/runtime"; do
+  if [ -d "$one" ] && [ ! -d "$root/.se/.runtime" ]; then
+    mv "$one" "$root/.se/.runtime" 2>/dev/null || true
+  fi
+done
+
+mkdir -p "$root/.se/.runtime"
+# The log stays out of the move, because the retro collects it.
+for one in bin hold review undo measure copilot box.json session.json \
   tools.json hold.json check.json index.db index.json lsp.json copilot-cloud \
-  show-panel; do
+  show-panel config.json copy.json project.json work.json; do
   old="$root/.se/$one"
+  new="$root/.se/.runtime/$one"
   [ -d "$old" ] || [ -f "$old" ] || continue
-  mv "$old" "$root/.se/run/$one" 2>/dev/null || rm -rf "$old"
+  # A name the runtime folder already holds keeps what it holds, because mv
+  # would nest the old folder inside the new one.
+  if [ -e "$new" ]; then continue; fi
+  # A file a running process holds stays where it stands, and a later run moves it.
+  mv "$old" "$new" 2>/dev/null || true
+done
+
+# The log is history and no runtime state, and it answers to .se/.log, a dot
+# folder a running session writes while the retro holds the rest. Every older
+# spelling of the folder comes home.
+for one in "$root/.se/log" "$root/.se/run/log" "$root/.se/runtime/log" "$root/.se/.runtime/log"; do
+  if [ -d "$one" ]; then
+    mkdir -p "$root/.se/.log"
+    cp -rn "$one/." "$root/.se/.log/" 2>/dev/null || true
+    rm -rf "$one" 2>/dev/null || true
+  fi
 done
 
 # Pinned, so every box builds the same tree. Vale ships a binary for each
@@ -214,7 +240,13 @@ compiler_here() {
 # step with the index above: that one is C and waits on a toolchain, and this
 # one builds beside it in under a second on every box.
 # [[spec/design_output/lsp#the-build-beside-the-index]]
-lsp_here() { [ -x "$bin/se-lsp${exe}" ]; }
+# A binary older than its own source lints against rules the tree no longer
+# carries, so a source newer than the binary asks for the build again.
+lsp_here() {
+  if [ ! -x "$bin/se-lsp${exe}" ]; then return 1; fi
+  newer=$(find "$root/src/lsp" -name '*.go' -newer "$bin/se-lsp${exe}" -print -quit 2>/dev/null || true)
+  [ -z "$newer" ]
+}
 
 get_lsp() {
   say "  building the language server"
@@ -222,7 +254,13 @@ get_lsp() {
   lsp_here
 }
 
-index_here() { [ -x "$bin/se-index${exe}" ]; }
+# A binary older than its own source walks by rules the tree no longer carries,
+# so a source newer than the binary asks for the build again.
+index_here() {
+  if [ ! -x "$bin/se-index${exe}" ]; then return 1; fi
+  newer=$(find "$root/src/index" -name '*.go' -newer "$bin/se-index${exe}" -print -quit 2>/dev/null || true)
+  [ -z "$newer" ]
+}
 
 # [[spec/design_output/index#the-compiler-it-needs]]
 get_zig() {
@@ -437,9 +475,9 @@ fi
 
 # The survey names where each tool stands, and every caller reads it in place
 # of guessing. It runs where anything landed, and where the file is absent.
-if [ -n "$missing" ] || [ ! -f "$root/.se/run/tools.json" ]; then
+if [ -n "$missing" ] || [ ! -f "$root/.se/.runtime/tools.json" ]; then
   (cd "$root" && node src/scripts/cli.js tools >/dev/null) ||
-    say "  the survey wrote no .se/run/tools.json, so every caller guesses again." >&2
+    say "  the survey wrote no .se/.runtime/tools.json, so every caller guesses again." >&2
 fi
 
 node "$root/src/scripts/copilot.js" setup auto
