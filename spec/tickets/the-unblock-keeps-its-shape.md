@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: do
@@ -28,6 +28,19 @@ group: the-verbs-take-the-shell
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 step: do
+record:
+  - step: do
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 4fe5202d16014c94338044a0ca59d59165625b39
+    hash_after: 4fe5202d16014c94338044a0ca59d59165625b39
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 11 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -58,26 +71,36 @@ A person reads the question in the shape its author gives it.
 ## tests
 
 <!-- the tests that cover the change, or the check where it touches no code -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/unblock.test.js
 
 ## check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ## says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+`asked` cuts a question on a semicolon whitespace follows, so `TL;DR` stays whole. A question of several lines lands as its own block under the list, so a table keeps its rows.
+
+The frontmatter holds one line a key, so a question carries its own lines as an escape, and `asked` writes them back. A reader of the successor then reads the question as its author wrote it.
+
+[[spec/design_output/work#a-person-step-leaves]] carries that, and a case drives both shapes.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change follows the ask: the cut keeps `TL;DR` whole, and a table lands as a table
+- the cleanup it reveals is the escape the frontmatter forces, and that stands in the change
+- the fact stands in [[spec/design_output/work#a-person-step-leaves]], and the code points at it
 
 # Discussion
 

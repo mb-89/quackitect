@@ -112,10 +112,7 @@ function openLeaf(front) {
 
 // Discussion is the one chapter a hand writes on a ticket it holds no step of. [[spec/design_output/work#a-person-step-leaves]]
 function withQuestion(text, from, leaf) {
-  const rows = [
-    `- [[spec/tickets/${from}]] hands this over at \`${leaf.path}\`, which waits for a person.`,
-    ...asked(leaf.asks).map((one) => `  - ${one}`),
-  ].join("\n");
+  const rows = questionRows(from, leaf);
   const said = String(text ?? "");
   if (!said.includes(DISCUSSION)) return `${said.trimEnd()}\n\n${DISCUSSION}\n\n${rows}\n`;
   const [head, ...rest] = said.split(DISCUSSION);
@@ -123,9 +120,24 @@ function withQuestion(text, from, leaf) {
   return `${head}${DISCUSSION}\n${tail ? `${tail}\n` : "\n"}${rows}\n`;
 }
 
+// A person reads the question in the shape its author gives it, so a question running over lines lands as its own block and keeps its table. [[spec/design_output/work#a-person-step-leaves]]
+function questionRows(from, leaf) {
+  const items = [
+    `- [[spec/tickets/${from}]] hands this over at \`${leaf.path}\`, which waits for a person.`,
+  ];
+  const blocks = [];
+  for (const one of asked(leaf.asks)) {
+    if (one.includes("\n")) blocks.push(one);
+    else items.push(`  - ${one}`);
+  }
+  return [items.join("\n"), ...blocks].join("\n\n");
+}
+
+// The frontmatter holds one line a key, so a question carrying lines rides them as an escape. The cut falls on a semicolon whitespace follows, so a word carrying one stays whole. [[spec/design_output/work#a-person-step-leaves]]
 function asked(asks) {
   return String(asks ?? "")
-    .split(";")
+    .replace(/\\n/g, "\n")
+    .split(/;\s/)
     .map((one) => one.trim())
     .filter(Boolean);
 }

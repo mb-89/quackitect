@@ -216,6 +216,45 @@ test("the successor carries the question the person step asks, and the ticket it
   assert.doesNotMatch(successor, /Nothing stands here yet/, "the empty line goes");
 });
 
+// A person reads the question in the shape its author gives it. [[spec/tickets/the-unblock-keeps-its-shape]]
+const ASKING = (asks) =>
+  CHILD().replace(
+    '        asks: "the verdict failed back 2 times: no test drives the hook"\n',
+    asks,
+  );
+
+// [[spec/tickets/the-unblock-keeps-its-shape]]
+test("a question carrying a table lands as that table, and TL;DR stays whole", () => {
+  const { it, disk } = doors(
+    standing(
+      ASKING(
+        "        asks: TL;DR pick a road\\n\\n| road | cost |\\n| --- | --- |\\n| one | two |\n",
+      ),
+    ),
+  );
+
+  heard(() => work(ROOT, ["unblock", "a-child", "a-successor"], it));
+
+  const successor = disk.read(at("spec/tickets/a-successor.md"));
+  assert.match(successor, /^\| road \| cost \|$/m, "the table keeps its own line");
+  assert.match(successor, /^\| one \| two \|$/m, "every row keeps its own line");
+  assert.match(successor, /TL;DR pick a road/, "the word carrying a semicolon stays whole");
+  assert.doesNotMatch(successor, /^\s+- DR/m, "no cut falls inside that word");
+});
+
+// [[spec/tickets/the-unblock-keeps-its-shape]]
+test("two questions land one list item each", () => {
+  const { it, disk } = doors(
+    standing(ASKING('        asks: "the first road; the second road"\n')),
+  );
+
+  heard(() => work(ROOT, ["unblock", "a-child", "a-successor"], it));
+
+  const successor = disk.read(at("spec/tickets/a-successor.md"));
+  assert.match(successor, /^ {2}- the first road$/m);
+  assert.match(successor, /^ {2}- the second road$/m);
+});
+
 // A successor minted off trivial opens under by: anyone, so the pull hands a person's question to an agent. [[spec/design_output/work#a-person-step-leaves]]
 test("unblock refuses a successor whose first step admits an agent", () => {
   for (const [by, shown] of [

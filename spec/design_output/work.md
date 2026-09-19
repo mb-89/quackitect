@@ -228,6 +228,17 @@ group:
 | the ticket stands open, in this group, at a step `by: person` | the ticket closes `state: closed`, `reason: became`, `successors: [<name>]` |
 | the successor stands open and names no group | the question that step asks, under the successor's `Discussion`, beside the ticket it comes from |
 
+A question rides the frontmatter on one line, so it carries its own lines as
+`\n`. The unblock writes them back under `Discussion`:
+
+| the question | how it lands |
+|---|---|
+| one line | a list item under the bullet |
+| several lines | its own block, so a table stays a table |
+
+A semicolon whitespace follows cuts one question from the next. So a word
+carrying a semicolon stays whole.
+
 So `branch done` meets no open child, the group closes, and one push carries the
 successor with it. The person answers on a ticket of their own, and every step
 behind them runs on.
