@@ -89,7 +89,12 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: f3207481318c868ec4e9cd220a99279670c51544
+    hash_after: f3207481318c868ec4e9cd220a99279670c51544
 ---
 
 # Ask
@@ -114,6 +119,29 @@ Code reads the environment and runs commands in place, and a test of it touches 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+One rule file holds both languages, because Vale reads the code of each:
+
+| what grows | where it stands |
+|---|---|
+| the environment read | `spec/config/styles/VoiceVale/DoorsOnly.yml`, beside the imports it refuses |
+| the roots it passes | the same file, naming each place building a box or an `it` |
+| the Go reading | the same file, over an import of `os` and `os/exec` outside the door file |
+
+The readings:
+
+- the rule draws on `process.env`, `process.argv` and `process.platform` in a file outside the list
+- a root builds the hand every other module takes, so it reads the environment once and hands it down
+- the Go rule reads an import line, so a package taking a door keeps its own file naming the outside
+- `src/lsp` gains that door file, and the packages reading the disk take it
+
+The two reads the ask names take the value off the hand:
+
+- `src/scripts/pull-hand.js` takes `it.env`, and the read of the process goes
+- `src/bridge/stop.js` takes `box.env`, and the break mark rides the box beside it
+
+`./RUNME.sh lint src` names every read left, and the implement step moves each
+one or adds its file to the list with the reason beside it.
 
 ## review
 
