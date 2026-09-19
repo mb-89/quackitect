@@ -75,13 +75,14 @@ function bottomLine(record, rates) {
     out.push(
       `### ${category}`,
       "",
-      "| class | defect | fix | rate an hour | tickets | findings |",
-      "|---|---|---|---|---|---|",
+      "| class | defect | fix | rate an hour | stands | tickets | findings |",
+      "|---|---|---|---|---|---|---|",
     );
     for (const one of mine) {
       const tickets = (one.tickets ?? []).join(", ") || NONE;
+      const status = String(one.status ?? "").trim() || "the verify step stands open";
       out.push(
-        `| ${one.id} · ${one.class} | ${one.defect} | ${one.fix} | ${rates.classes[one.id].rate} | ${tickets} | ${held(one.id)} |`,
+        `| ${one.id} · ${one.class} | ${one.defect} | ${one.fix} | ${rates.classes[one.id].rate} | ${status} | ${tickets} | ${held(one.id)} |`,
       );
     }
     out.push("");

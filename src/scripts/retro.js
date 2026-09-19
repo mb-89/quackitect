@@ -7,6 +7,7 @@ import { chapters } from "../engine/retro/chapters.js";
 import { classes } from "../engine/retro/classes.js";
 import { effect } from "../engine/retro/effect.js";
 import { matrix } from "../engine/retro/matrix.js";
+import { mint } from "../engine/retro/mint.js";
 import { timeline } from "../engine/retro/timeline.js";
 import { fieldOf, NOTE_END, ticketNamed } from "./group.js";
 import { collect } from "./retro-collect.js";
@@ -29,6 +30,8 @@ export function retro(root, argv, doors) {
   if (what === "effect") return effect(it, argv[1]);
   // [[spec/guidance/retro/classify]]
   if (what === "classes") return classes(it, argv[1]);
+  // [[spec/guidance/retro/verify]]
+  if (what === "mint") return mint(it, argv[1]);
   // [[spec/design_input/the-agent-pulls-tickets]]
   if (what === "new") return newRetro(it, argv);
   // [[spec/design_input/the-agent-pulls-tickets]]
@@ -56,6 +59,7 @@ export function retro(root, argv, doors) {
   console.log(
     "  classes <retro>  counts each class's rate, and refuses a finding with no disposition",
   );
+  console.log("  mint <retro>     mints one ticket a class standing open, and opens each draft");
   console.log(
     "  score            the improvements earlier retros mint, and how many stay open",
   );

@@ -85,7 +85,6 @@ steps:
   - name: classify
     does: collapses the findings into class fixes with a rate each, gives every finding a disposition, and names every promotion
     by: anyone
-    to: owner
     input: read
     needs: ["retro"]
     reads: [[spec/guidance/retro/classify]]
@@ -94,3 +93,15 @@ steps:
         form: command
         expects: 0
         says: retro classes, which counts each rate and refuses a finding with no disposition
+  - name: verify
+    does: reads every class against the tree as it stands, closes the ones the tree answers already, and mints a ticket a class standing open
+    by: anyone
+    to: owner
+    input: classify
+    needs: ["retro"]
+    reads: [[spec/guidance/retro/verify]]
+    evidence:
+      - name: minted
+        form: command
+        expects: 0
+        says: retro mint, which refuses a class carrying no status and mints the rest
