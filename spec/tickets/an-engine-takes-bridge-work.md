@@ -138,7 +138,8 @@ The bridge grows engine work, and src/scripts holds whatever fits nowhere else.
 
 - one rule sorting a file into its folder
 - four moves the ask names, and one of them cuts a file in two
-- three scripts moving out, and a change the swap move forces
+- every file under `src/scripts` sorted, by a prefix or by a move
+- one change the swap move forces under the Go module reader
 
 **The rule.** A file under `src/bridge` answers an event off the wire. A file
 under `src/engine` answers a question about the tree, with no event standing. A
@@ -165,13 +166,16 @@ the verb.
 **The projection cuts in two.** Three of its exports run off an event, and the
 rule holds each of the three in the bridge.
 
-| the export | who calls it | where it lands |
+| the export | what reaches it | where it lands |
 |---|---|---|
 | `ownerDoor` | the write door, as one of its checks | the bridge |
 | `marksStale` | the write door, after a write | the bridge |
 | `freshens` | `decide`, on every event | the bridge |
-| `projectionsHere` | the three above, and the session start | the engine |
-| `sourcesOf` | the same | the engine |
+| `projectionsHere` | `freshens`, and `opensSession` | the engine |
+| `sourcesOf` | the same two | the engine |
+
+`ownerDoor` and `marksStale` read the fields `freshens` fills, so the two
+readers reach them through the box.
 
 So `src/bridge/projection.js` keeps the three and imports the two, and
 `src/engine/projection.js` holds the reading. A reader wanting the whole
@@ -193,25 +197,56 @@ so.
 its caller already holds.
 
 **The command line.** The third line of the ask names every file under
-`src/scripts`. Five groups there carry a topic in the name, and each group
-serves one verb, so each name already says its verb.
+`src/scripts`. Five groups there carry a topic in the name, and each serves one
+verb already.
 
 | the group | the verb it serves |
 |---|---|
-| `cli-` | the command line itself |
+| `cli-` | the command line itself, and `check` |
 | `pull-` | `ticket pull` |
 | `retro-` | `retro` |
 | `work-` | `branch` |
-| `guidance-` | `standing` |
+| `guidance-` | `branch guidance`, which `work.js` wires |
 
-Three files stand outside the verb table and answer a question about the tree,
-so those three move out:
+Every other file there sorts one of two ways. A file serving one verb takes
+that verb's prefix, and a file the whole tree reads goes to the engine.
 
-| what moves | what it answers |
+| what takes a prefix | the verb it serves | its name |
+|---|---|---|
+| `ask-lint.js` | `ticket open` | `ticket-ask-lint.js` |
+| `spawn.js` | `ticket pull` | `pull-spawn.js` |
+| `landed.js` | `ticket pull` | `pull-landed.js` |
+| `branch-usage.js` | `branch` | `work-usage.js` |
+| `test-verb.js` | `branch test` | `work-test.js` |
+| `review.js` | `branch review` | `work-review.js` |
+| `unblock.js` | `branch unblock` | `work-unblock.js` |
+| `stand.js` | `branch list` | `work-free.js` |
+| `go-tests.js` | `check` | `cli-go.js` |
+| `viewer.js` | `tui` | `tui-build.js` |
+
+`work-stands.js` stands already, so `stand.js` takes a name of its own under
+the same prefix.
+
+| what goes to the engine | what it answers |
 |---|---|
-| `queue.js` | the score weighing a ticket against the rest |
 | `group.js` | a group, read off its ticket |
-| `landed.js` | what a hand-back puts on disk |
+| `queue.js` | the score weighing a ticket against the rest |
+| `hand.js` | the hand a step stands in |
+
+Each of those three reads the tree for every caller. `group.js` reaches the
+bridge as well, through the command door and the stop door, so a script folder
+is the wrong home for it.
+
+Five files stay where they are, because each one runs outside a verb:
+
+| what stays | who runs it |
+|---|---|
+| `precommit.js`, `prepush.js` | git, at the commit and the push |
+| `trust.js`, `install.sh` | the setup, before a session starts |
+| `copilot.js` | a cloud box, as its entry point |
+| `editor.js` | the install, and the doctor |
+| `serve.js` | the bridgehead, and the `serve` verb |
+| `process.js` | `mint`, which `cli.js` wires |
 
 **What the ask leaves open.** The second line of the ask wants the bridge
 holding transport alone. The moves above leave it holding the doors: the write
