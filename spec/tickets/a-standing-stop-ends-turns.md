@@ -89,12 +89,16 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
     hash_before: ceeca8c80a8f205e61c7a4b6ecb98423be92406d
     hash_after: ceeca8c80a8f205e61c7a4b6ecb98423be92406d
+  - step: design/review
+    hand: box fa49097ce66c · claude-code-remote · helper-2
+    hash_before: f972da3163683c379b9ee4ff74d44613060a0318
+    hash_after: f972da3163683c379b9ee4ff74d44613060a0318
 ---
 
 # Ask
@@ -173,6 +177,19 @@ so the measurement costs nothing to skip.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+- The fault reads true: `dropsHold` fires at `turn.complete`, and the vote runs later at `classic.Stop`.
+- The rules at 85 and 84 read the hold `onStop` reads, and `work-still-stands` at 80 wins under `off`.
+- The mark on the box matches the tooth's lifetime, so one reload drops both together.
+- The approach holds to the two files the ask names, and each of its three cases reads one thing.
+- `dropsHold` skips the `agentId` guard its neighbours carry, so a helper's turn end marks the box.
+- Say whether the mark guards on `agentId`, and settle it in the change.
+- Say how the case reaches a standing hold, because the fixture in `stop-door.test.js` pins `hold` to `off`.
+- The hold cases live in `stop-hold.test.js`, whose fixture drives `dropsHold` and `sawPrompt` today.
+- Add a line for the mark to the chapter The hold, under [[spec/design_output/stop#the-hold]].
+- `./RUNME.sh check` answers 1 here, over a Vale timeout on a style file.
+- `./RUNME.sh branch review` answers 0, reads check passing, and names a retro as the one fix standing.
 
 # implement
 
