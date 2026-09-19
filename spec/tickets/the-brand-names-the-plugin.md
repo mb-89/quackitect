@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgent: true
-step: implement/tests-red
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -143,6 +143,17 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote · helper-9
     hash_before: bfcfe3ac7fe5b0c0f61cfb5376e5daa0344806b6
     hash_after: bfcfe3ac7fe5b0c0f61cfb5376e5daa0344806b6
+  - step: implement/tests-red
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: a0b3f6e35ac3951e5ae556c8198f977ea491cec2
+    hash_after: a0b3f6e35ac3951e5ae556c8198f977ea491cec2
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 8 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -280,21 +291,37 @@ pass
 
 ### tests
 
-<!-- the same tests pass -->
-
-<!-- the form is command -->
+    ./RUNME.sh branch test test/level0/brand.test.js
 
 ### seen
 
-<!-- what you see, and what surprises you -->
+`test/level0/brand.test.js` drives the three things the approach lands, and
+each case fails on its own assertion:
 
-<!-- the form is text -->
+| the case | what it reads today |
+|---|---|
+| a folder name answers the slug a marketplace takes | `brandOf` answers `my.app` where the slug reads `my-app` |
+| a folder carrying no letter and no digit answers an empty brand | it answers the dots it reads |
+| the brand reaches the marketplace name and its owner | `brandedJson` stands undefined |
+| the brand reaches the plugin's author and leaves the plugin name alone | the same |
+| a file the brand reaches nowhere comes back as it stands | the same |
+| the shim names the vehicle a marketplace, and enables the brand's plugin | `shimSettings` stands undefined |
+| the shim keeps every key the settings already hold | the same |
+| settings the disk holds in no readable shape answer a fresh pair | the same |
+
+The dotted folder surprises me. `brandOf` answers `...` for a folder of dots,
+and a marketplace under that name reaches no plugin. So the empty answer wants
+a refusal beside it, which `stub.js` carries at the one place the brand lands.
+
+The two new names stand pure, so a case reaches neither disk nor clock. The
+install script and the shim read a file and write one, and the shell carries
+that half. `test/contract` holds what a shell does.
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- the change touches no file the ask leaves out. One case file joins, and it drives the library the ask names.
+- every door the change reaches has a fake. The cases reach no door, and read a string the caller hands them.
+- a comment names the approach the change implements. Each case points at this ticket.
 
 ## reflect
 
