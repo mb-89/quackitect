@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-person-step-holds
-step: design/draft
+step: design/review
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -92,6 +92,11 @@ steps:
 process: [[standard]]
 process_hash: d1fd9cd113889f29
 depends_on: ["the-hand-carries-the-session"]
+record:
+  - step: design/draft
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: 1bbe6425e3ec1e220543c75c1b4f98d7b954c541
+    hash_after: 1bbe6425e3ec1e220543c75c1b4f98d7b954c541
 ---
 
 # Ask
@@ -115,7 +120,29 @@ A step whose `by` is `person` waits for a person. Today nothing stops an agent f
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+The design output carries the approach, and this change adds the signing door. For details, see [[spec/design_output/pull#the-hand-rule]].
+
+| the piece | where it stands |
+|---|---|
+| the refusal on a `by: person` step where the environment names a harness | `handFaults`, standing |
+| the hand a box off a harness reads | `handOf`, standing, and it answers the role alone |
+| `work.personSigns` | this change, in the config and the hand-back |
+
+The signing door reads the tip through the git door.
+
+- the key reads false where nothing names it, so a tree keeps the door it has
+- switched on, a person's hand-back on a tracked ticket reads the tip's signature
+- `good` and `untrusted-good` pass, and another word comes back refused, naming the tip
+- an agent's hand-back reads no signature, and a private ticket reads none
+
+The second piece of the ask wants a person's git author name in the hand. The hand-rule chapter says both, and the two halves land in different places.
+
+| where the name can stand | what the rule says |
+|---|---|
+| the hold, which git ignores | the chapter writes the name there |
+| the record, which git tracks | the chapter writes the role alone, and the voice rule holds a tracked file to it |
+
+So the hold takes the name and the record takes the role. The review leaf reads whether that answers the ask, because a person owns the call.
 
 <!-- the form is text -->
 
