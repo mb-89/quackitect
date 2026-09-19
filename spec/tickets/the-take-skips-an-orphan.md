@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -156,6 +156,10 @@ record:
     hash_after: 3e44bedbb2826eb5e83e5728b869442a6cad00fe
     returns: 1
     why: the hand takes it back
+  - step: implement/reflect
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 53aac64f96deaea0ce11886987e924f6d9cbd825
+    hash_after: 53aac64f96deaea0ce11886987e924f6d9cbd825
 ---
 
 # Ask
@@ -260,7 +264,10 @@ What surprises: the write door answers a file ceiling where these cases go in be
 
 The class: a change adds a value to a set, and a note somewhere else teaches that set. The note then reads stale, and a reader acts on the old set.
 
-Both findings are that. `orphan` joins the status words, and the base read joins the listing's asks. The status table and the listing's opening line each teach one of those sets.
+Both findings are that:
+
+- `orphan` joins the status words, and the status table teaches that set
+- the base read joins the listing's asks, and the chapter's opening line teaches it
 
 The fix for the class: `./RUNME.sh find` names every note teaching that set, and the change carries each. A count in prose is the same fault one step on, so the line names the reads and counts none.
 
