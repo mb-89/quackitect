@@ -52,7 +52,7 @@ export const VERBS = {
   branch: BRANCH,
   work: BRANCH,
   ticket: ["pull", "note", "update", "open"],
-  retro: ["notes", "collect", "new", "timeline", "chapters", "matrix"],
+  retro: ["notes", "collect", "new", "timeline", "chapters", "matrix", "effect", "classes"],
 };
 
 // [[spec/design_output/pull#a-need-is-a-verb]]

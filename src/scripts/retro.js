@@ -4,6 +4,8 @@
 // [[spec/design_output/pull#a-need-is-a-verb]]
 
 import { chapters } from "../engine/retro/chapters.js";
+import { classes } from "../engine/retro/classes.js";
+import { effect } from "../engine/retro/effect.js";
 import { matrix } from "../engine/retro/matrix.js";
 import { timeline } from "../engine/retro/timeline.js";
 import { fieldOf, NOTE_END, ticketNamed } from "./group.js";
@@ -23,6 +25,10 @@ export function retro(root, argv, doors) {
   if (what === "chapters") return chapters(it, argv[1]);
   // [[spec/guidance/retro/read]]
   if (what === "matrix") return matrix(it, argv[1]);
+  // [[spec/guidance/retro/effect]]
+  if (what === "effect") return effect(it, argv[1]);
+  // [[spec/guidance/retro/classify]]
+  if (what === "classes") return classes(it, argv[1]);
   // [[spec/design_input/the-agent-pulls-tickets]]
   if (what === "new") return newRetro(it, argv);
   // [[spec/design_input/the-agent-pulls-tickets]]
@@ -41,7 +47,15 @@ export function retro(root, argv, doors) {
     "  timeline <retro> the hours holding work, per source, with the idle stretches between",
   );
   console.log("  chapters <retro> checks the cuts, and hands every chapter its lines");
-  console.log("  matrix <retro>   draws the report: ten rows, a column a chapter");
+  console.log(
+    "  matrix <retro>   draws the report: the class fixes first, then the matrix",
+  );
+  console.log(
+    "  effect <retro>   counts the last retro's class patterns over this input",
+  );
+  console.log(
+    "  classes <retro>  counts each class's rate, and refuses a finding with no disposition",
+  );
   console.log(
     "  score            the improvements earlier retros mint, and how many stay open",
   );

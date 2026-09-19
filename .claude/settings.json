@@ -19,5 +19,7 @@
     ]
   },
   "skipAutoPermissionPrompt": true,
+  "$thinking": "THE RETRO READS THE THINKING, SO THE TRANSCRIPT KEEPS IT. By default the client writes each thinking block empty, with its signature alone, so a retro reader finds no doubt and no dropped plan. This asks for the summaries, and the transcript keeps them. See spec/guidance/retro/signals.",
+  "showThinkingSummaries": true,
   "outputStyle": "level0"
 }

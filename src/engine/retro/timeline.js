@@ -104,6 +104,26 @@ export function timeline(it, name) {
   return 0;
 }
 
+// Each measure's matches over the input, and the active hours they fall in, read in one pass. A measure names its source, log or transcripts, or all. [[spec/guidance/retro/classify]]
+export function countsOver(it, name, measures) {
+  const input = it.join(homeOf(it, name), INPUT);
+  const counts = Object.fromEntries(measures.map((one) => [one.id, 0]));
+  const hours = new Set();
+  for (const source of TIMED) {
+    const reading = measures.filter(
+      (one) => one.source === "all" || one.source === source.top,
+    );
+    for (const path of walk(it, input, source.top)) {
+      for (const line of it.disk.read(it.join(input, ...path.split("/"))).split("\n")) {
+        const when = Date.parse(source.field.exec(line)?.[1] ?? "");
+        if (Number.isFinite(when)) hours.add(Math.floor(when / HOUR));
+        for (const one of reading) if (one.pattern.test(line)) counts[one.id] += 1;
+      }
+    }
+  }
+  return { counts, hours: hours.size };
+}
+
 function walk(it, input, top) {
   const out = [];
   const into = (rel) => {

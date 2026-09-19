@@ -6,7 +6,8 @@ import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
-import { findingsOf, ROWS, reportOf } from "../../src/engine/retro/matrix.js";
+import { findingsOf, ROWS } from "../../src/engine/retro/findings.js";
+import { reportOf } from "../../src/engine/retro/report.js";
 import { retro } from "../../src/scripts/retro.js";
 
 const ROOT = "/tree";

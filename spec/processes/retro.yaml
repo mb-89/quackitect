@@ -27,10 +27,21 @@ steps:
         form: command
         expects: 0
         says: retro collect, which leaves the private folder holding .runtime and .retro alone
+  - name: effect
+    does: counts the last retro's class patterns over this input, and says per class whether its failure still occurs and at what rate
+    by: anyone
+    input: collect
+    needs: ["retro"]
+    reads: [[spec/guidance/retro/effect]]
+    evidence:
+      - name: effect
+        form: command
+        expects: 0
+        says: retro effect, which answers each earlier class with its rate before and now
   - name: chapter
     does: cuts the window into chapters of about six hours, and the engine hands every chapter its lines
     by: anyone
-    input: collect
+    input: effect
     needs: ["retro"]
     reads: [[spec/guidance/retro/chapter]]
     evidence:
@@ -41,7 +52,6 @@ steps:
   - name: read
     does: one reader a chapter answers the five starfish questions and the five improvements, and the engine draws the matrix
     by: anyone
-    to: owner
     input: chapter
     needs: ["retro"]
     reads: [[[spec/guidance/retro/read]], [[spec/guidance/retro/signals]]]
@@ -50,3 +60,15 @@ steps:
         form: command
         expects: 0
         says: retro matrix, which refuses a chapter standing without its findings
+  - name: classify
+    does: collapses the findings into class fixes with a rate each, gives every finding a disposition, and names every promotion
+    by: anyone
+    to: owner
+    input: read
+    needs: ["retro"]
+    reads: [[spec/guidance/retro/classify]]
+    evidence:
+      - name: classes
+        form: command
+        expects: 0
+        says: retro classes, which counts each rate and refuses a finding with no disposition
