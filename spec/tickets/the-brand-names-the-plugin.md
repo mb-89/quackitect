@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgent: true
-step: design/draft
+step: design/review
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -125,6 +125,10 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 9ec37964b86bf4ab2bcbee86f06a646ed2388179
     hash_after: 9ec37964b86bf4ab2bcbee86f06a646ed2388179
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 19e5c998e3245e7941be1a1cda89ecbdd85e16d6
+    hash_after: 19e5c998e3245e7941be1a1cda89ecbdd85e16d6
 ---
 
 # Ask
@@ -169,40 +173,53 @@ The owner rules on the voice besides. A reader wants what they act on, and a mec
 
 ### approach
 
-The brand reaches the marketplace and leaves the plugin name alone.
+The brand reaches the marketplace name, and every other name stands.
 
-[[spec/design_output/level0#a-stub-names-its-vehicle]] already measured this road. A stub names the vehicle's folder as a marketplace, enables `level0@<brand>`, and the tools keep the name `level0`. So the brand parts two vehicles at the marketplace, and the plugin name carries no weight it already carries.
+[[spec/design_output/level0#a-stub-names-its-vehicle]] measured this road. A
+stub names the vehicle's folder as a marketplace, enables `level0@<brand>`, and
+the tools keep the name `level0`. So the marketplace name is the name parting
+two vehicles under one client, and the brand reaches it alone.
 
-| the name | what it reads after | who writes it today |
+| the name | what it reads after | who writes it |
 |---|---|---|
-| `marketplace.json` name | the brand | nobody, and the file carries a literal |
-| `marketplace.json` owner name | the brand | nobody, and the file carries a literal |
-| `plugin.json` author name | the brand | nobody, and the file carries a literal |
-| `plugin.json` name | `level0` | nobody, and it stands |
-| the enabled id | `level0@<brand>` | nobody, and this ticket writes it |
+| `.claude-plugin/marketplace.json` name | the brand | the install script, ahead of every verb |
+| `.claude-plugin/marketplace.json` owner name | the brand | the install script, ahead of every verb |
+| the plugin name under `.claude/skills/level0` | `level0` | nobody, and it stands |
+| the stub's enabled id | `level0@<brand>` | `stub.js`, where a hand makes a stub |
 
-`brandOf` in the vehicle library answers the folder name, and `stub.js` writes it into the vehicle record alone. So the change takes that one answer to the four rows above it, and the third column reads a hand where it reads nobody today.
+RUNME calls the install script before it calls the command line, so the
+marketplace name answers the folder before a session reads it. A shell script
+imports nothing, so the install script hands the edit to a node script beside
+it.
 
-The cost for the tool names is nothing, and every file naming a tool stands as it is. `grep -rl mcp__level0` answers which, and a draft stamping the brand on the plugin name moves every one. It buys a parting the marketplace already gives.
+Git tracks the marketplace file, so the write shows in the tree it lands on:
 
-The icon stands at `spec/config/brand/icon.svg`. Each folder under `spec/config` answers to one reader, and the brand takes a folder of its own:
-
-| the folder | the reader |
+| the tree | what the write shows |
 |---|---|
-| `stop` | `stop.js` |
-| `styles` | `vale.js` |
-| `brand` | the build, which carries the icon to the extension |
+| this one | nothing, because the folder name and the standing name agree |
+| a vehicle under another folder name | the stamp, on its first run, which that vehicle commits |
 
-`src/extension/icon.svg` stands as a tracked file today, and `package.json` names it. Two roads carry the brand's icon there:
+The cost for the tool names is nothing, and every file naming a tool stands as
+it is. `grep -rl mcp__level0` answers which files those are. A draft stamping
+the brand on the plugin name moves every one, and buys a parting the
+marketplace already gives.
 
-| the road | what it costs |
+The icon stands at `spec/config/brand/icon.svg`. `spec/config` holds what a
+tool reads off the tree, and the install script reads the brand folder.
+
+| the file | who writes it |
 |---|---|
-| the build copies the file | one line in the install script, and the target stays tracked |
-| a projection writes it | a fourth shape in `projection.js`, which handles three and copies no image |
+| `spec/config/brand/icon.svg` | the vehicle's own hand, as the mark it ships |
+| `src/extension/icon.svg` | the install script, where that file stands absent |
 
-The first road takes this ticket, because the second asks for a shape the projection lacks.
+`src/extension/package.json` names `src/extension/icon.svg`. Where that file
+stands, the install script leaves it. So a fresh vehicle draws the mark this
+tree ships. A vehicle redrawing its icon keeps its own, and nothing holds the
+two in step. The drift is what a vehicle wants.
 
-`brandOf` answers the folder name whole, so a folder carrying a dot answers a name carrying a dot. A marketplace name takes no dot, so `brandOf` slugs what it answers:
+`brandOf` answers the vehicle's folder name, and a marketplace name takes no
+dot. So `brandOf` slugs what it reads. It lowers the case, turns each run of
+characters outside `a-z0-9` into a hyphen, and cuts a hyphen off each end.
 
 | the folder | what `brandOf` answers |
 |---|---|
@@ -211,7 +228,9 @@ The first road takes this ticket, because the second asks for a shape the projec
 | `Acme Tools` | `acme-tools` |
 | `.hidden` | `hidden` |
 
-The rule is one line: lower the case, turn every run of characters outside `a-z0-9` into one hyphen, and cut a hyphen off each end. A folder answering an empty name fails the stub, and says which folder it read.
+A folder slugging to an empty name fails the stub, and the refusal names the
+folder it read. `stub.js` hands `brandOf` to `linkOf`, which writes the
+`vehicle.json` name, so the slug reaches that record too.
 
 ## review
 
