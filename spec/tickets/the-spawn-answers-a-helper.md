@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -147,6 +147,17 @@ record:
     hash_after: e3c0c5d7d301c98b1f67750dac55e4515a4d8f08
     answered:
       - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 186c4acb81cc069f61eaa079368593b7ced07446
+    hash_after: 186c4acb81cc069f61eaa079368593b7ced07446
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 24 test(s) pass in 2 file(s)
+      - name: check
         exit: 0
         said: The rules pass.
 ---
@@ -288,26 +299,41 @@ What surprises: the ask reads the park as the fault, and the park is the half th
 ### tests
 
 <!-- the same tests pass -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/pull.test.js test/level0/level1.test.js
 
 ### check
 
 <!-- the check is green on the commit -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
-
 <!-- the form is text -->
+
+A leaf under `by: helper` asks one question of the hand: does this hand take a helper leaf? The gate stands in `writesHere`, and `handRule` carries the answer in as an argument.
+
+| the road | what it hands in | what follows |
+|---|---|---|
+| the hand-out, through `admits` | the hand under `--as` | the spawned hand takes the leaf, and the session reads `spawn` |
+| the leave, through `takeable` | the harness on the box | `branch done` holds a harness box, and leaves one off it |
+
+So a box carrying a harness spawns the hand and closes the group behind it. A box off a harness parks the leaf and leaves the group open for the next box.
+
+Two standing cases parked a child on `by: helper` to hold a group still. That park now answers `spawn`, so both cases park on a verb the box lacks, which holds each case's own subject.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the ask names the gate, the spawn and the cases, and two standing cases moved off `by: helper`
+- the cases drive `doors`, so git, the disk and the clock stand fake
+- each hunk carries a comment pointing at [[spec/design_output/pull#a-hand-of-its-own]]
 
 # verdict
 
