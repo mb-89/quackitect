@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 group: the-person-step-holds
 steps:
@@ -27,6 +27,19 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 568f402efe3adab7
+record:
+  - step: do
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: c04d4927859ef560adfd2e70716472216229dddc
+    hash_after: c04d4927859ef560adfd2e70716472216229dddc
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 17 test(s) pass in 2 file(s)
+      - name: check
+        exit: 0
+        said: 87 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -39,25 +52,40 @@ The pull inserts no person step. A hand-back that meets the refusal cap fails th
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
+    ./RUNME.sh branch test
 
 <!-- the form is command -->
 
 ## check
 
-<!-- the check is green on the commit -->
+    ./RUNME.sh check
 
 <!-- the form is command -->
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
+The pull inserts no step of its own. Each count now answers on its own road, and the escalation verb is the one road a step goes in by.
+
+| the count, renamed | what the pull did | what it does now |
+|---|---|---|
+| `work.refusalsBeforeFail` | inserted a settle step before the held leaf | fails the leaf back, carrying the count and the first finding |
+| `work.failsBeforeWait` | inserted a settle step before the target | drops the hold and answers `wait` |
+
+The settle step went in where two hands disagreed. Past the split cap it turned into a person step, which on a box waits for a person nobody sends.
+
+- the fail-back puts the leaf in front of the next hand, with the reason in the record
+- the wait leaves the target open, so another hand takes it where it stands
+- `withPersonStep` stays, because the escalation verb the design output names is its one caller
+
+The design output owns these facts. The chapters The fail, The hand-back refused and A count inserts no step read the new roads. The config schema carries the new keys with their help, and the projection writes the commands off it.
 
 <!-- the form is text -->
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the ask names the caps, the insertions and the tests, and the change touches those and the notes owning them
+- the settle inserter is the cleanup the change reveals, and it goes in the change, because nothing calls it now
+- each renamed key stands in the config schema, and the design output points at it
 
 <!-- the form is checklist -->
 

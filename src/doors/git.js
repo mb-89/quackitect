@@ -28,6 +28,9 @@ export function git(proc, root) {
       const said = run(["log", "-1", "--format=%an", ref], true);
       return said.ok ? said.out : "";
     },
+    authorName: () => run(["config", "user.name"], true).out,
+    // [[spec/design_output/pull#the-hand-rule]]
+    signatureOf: (ref) => run(["log", "-1", "--format=%G?", ref], true).out,
     countBetween: (from, to) =>
       run(["rev-list", "--count", `${from}..${to}`], true).out,
     switchTo: (branch, quiet) => run(["switch", branch], quiet),

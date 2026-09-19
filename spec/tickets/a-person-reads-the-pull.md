@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgency: soon
 group: the-person-step-holds
 steps:
@@ -27,6 +27,19 @@ steps:
         says: what changes and why, for a reader who was not there
 process: [[spec/processes/trivial]]
 process_hash: 568f402efe3adab7
+record:
+  - step: do
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: 790afc889ec01a03be6c24d8955737401001649f
+    hash_after: 790afc889ec01a03be6c24d8955737401001649f
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 45 test(s) pass in 3 file(s)
+      - name: check
+        exit: 0
+        said: 87 stand at warning, which the panel draws and check allows.
+reason: done
 ---
 
 # Ask
@@ -44,28 +57,48 @@ A person reads the pull as the owner meets it in a live session: the take, the h
 
 ## tests
 
-<!-- the tests that cover the change, or the check where it touches no code -->
+    ./RUNME.sh branch test
 
 <!-- the form is command -->
 
 ## check
 
-<!-- the check is green on the commit -->
+    ./RUNME.sh check
 
 <!-- the form is command -->
 
 ## says
 
-<!-- what changes and why, for a reader who was not there -->
+A reader meeting the pull now reads why, in the three places the trips named.
+
+| the trip | what stands now |
+|---|---|
+| the take blamed a race for every rejected push | the refusal names both roads, and points at the lines the push door wrote |
+| a parked person step held its question in the frontmatter | the chapter under the step reads the question |
+| a command field the shell found nothing for came back as an exit code | the refusal names the shape a command field takes |
+
+The take's push comes back refused on two roads. Another hand pushes first, or a door turns the push away. The old words named the race alone, so a reader cleared the wrong thing.
+
+A step the engine parks carries its question in `asks`. The chapter under it read the line the route writes for every such step, so a reader opening the ticket met no question.
+
+The engine hands each command field to a shell. A line wrapped in a code span sends that shell hunting for a command of that name.
+
+- the shell answers the code saying it found none
+- the refusal names the shape a command field takes, bare and indented
+- the next line the reader writes runs
 
 <!-- the form is text -->
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the ask names the words a person meets, and each change lands in one of the places it names
+- the change reveals no cleanup beside it, so none rides along
+- each fact stands in the code writing it, and this ticket points at the change
 
 <!-- the form is checklist -->
 
 # Discussion
 
-Nothing stands here yet.
+- the take said somebody took the group first, and the push had come back off a door. The change names both roads.
+- a parked person step read as the line every such step carries, and its question stood in the frontmatter alone. The change puts the question in the chapter.
+- a command field written as a code span came back as an exit code the reader had to look up. The change names the shape a command field takes.

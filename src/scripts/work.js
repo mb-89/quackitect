@@ -17,6 +17,7 @@ import {
   askOf,
   CLOSED,
   fieldOf,
+  frontOf,
   GROUP,
   heldIn,
   isGroup,
@@ -32,7 +33,7 @@ import {
   withoutField,
 } from "./group.js";
 import { guidance } from "./guidance-verb.js";
-import { handOf, pull, takeable } from "./pull.js";
+import { escalate, handOf, leafOf, pull, roleOf, stepPathOf, takeable } from "./pull.js";
 import { readyToMerge, review } from "./review.js";
 import { serving } from "./serve.js";
 import { freeIn, staleClaim, trigger } from "./stand.js";
@@ -94,6 +95,8 @@ export function work(root, argv, doors) {
         },
         argv,
       ),
+    // [[spec/design_output/pull#a-person-step-goes-in]]
+    escalate: (it, _name, argv) => escalate(it, argv),
     // [[spec/design_output/pull#the-work-answer]]
     guidance: (it, _name, argv) => guidance(it, (argv ?? []).slice(1), process.env),
     // [[spec/design_output/work#a-person-step-leaves]]
@@ -211,7 +214,25 @@ function take(it, name = "") {
 
   const one = wanted[0];
   if (!onBranch(it, one.branch)) return 1;
-  return one.brief ? claimBrief(it, one.branch) : claimGroup(it, one);
+  if (one.brief) return claimBrief(it, one.branch);
+  // A box with nothing at a step it can take leaves the group at todo, before it writes a line. [[spec/tickets/the-group-leaves-at-todo]]
+  const stands = standsOpen(it, one.name, it.join(it.root, ticketAt(one.name)));
+  if (stands.open.length && !stands.busy.length) {
+    console.log(`${one.branch} stays at ${TODO}, because every open step waits for a person.`);
+    for (const child of stands.open) console.log(`  ${waitsAt(child)}`);
+    console.log(`Answer it, then run ./RUNME.sh branch take again.`);
+    return 0;
+  }
+  return claimGroup(it, one);
+}
+
+// The step a child stands at, and the hand it waits for, so the take names what to answer. [[spec/tickets/the-group-leaves-at-todo]]
+function waitsAt(one) {
+  const front = frontOf(one.text);
+  const path = stepPathOf(front);
+  const leaf = leafOf(front, path);
+  if (!leaf) return `${one.name} stands at ${path || "no step"}`;
+  return `${one.name} waits for a ${leaf.by} at ${leaf.path}`;
 }
 
 // [[spec/design_input/the-agent-pulls-tickets#the-tag-survives-the-verbs]]
@@ -243,7 +264,7 @@ function parkedFiles(it) {
 function claimBrief(it, branch) {
   const brief = it.disk.read(it.join(it.root, BRIEF));
   if (!push(it, branch, setStatus(brief, HELD), HELD)) {
-    console.error("Somebody took this branch first. Run branch take again.");
+    console.error(refusedPush(branch));
     return 1;
   }
 
@@ -258,6 +279,15 @@ function claimBrief(it, branch) {
   return 0;
 }
 
+// The take names why the push came back, because a race is one road and a door turning it away is another, and a reader clears each one differently. [[spec/design_output/work#the-take-writes-the-record]]
+function refusedPush(branch) {
+  return [
+    `The push of ${branch} came back refused, so the take stands undone.`,
+    "Somebody taking it first is one road, and a push door turning it away is another.",
+    "The lines above say which. Clear it, then run branch take again.",
+  ].join("\n");
+}
+
 // [[spec/design_output/work#the-take-writes-the-record]]
 function claimGroup(it, one) {
   const at = ticketAt(one.name);
@@ -266,11 +296,13 @@ function claimGroup(it, one) {
   const hand = handOf(it);
   const before = it.git.run(["rev-parse", "HEAD"], true).out;
 
-  it.disk.write(path, withEntry(was, { step: stepOf(was), hand, hash_before: before }));
+  // A tracked file holds the role, and git holds who. [[spec/design_output/pull#the-hand-rule]]
+  const role = roleOf(hand);
+  it.disk.write(path, withEntry(was, { step: stepOf(was), hand: role, hash_before: before }));
   it.git.run(["add", at], true);
-  it.git.run(["commit", "-m", `${one.branch}: ${hand} takes it`], true);
+  it.git.run(["commit", "-m", `${one.branch}: ${role} takes it`], true);
   if (!it.git.run(["push", "origin", one.branch]).ok) {
-    console.error("Somebody took this group first. Run branch take again.");
+    console.error(refusedPush(one.branch));
     return 1;
   }
 
@@ -336,17 +368,23 @@ function ready(it, branch) {
   return { code: 0, says: said.says };
 }
 
-// [[spec/design_output/work#a-box-leaves]]
-function leaves(it, branch, at, path, says) {
-  const name = branch.replace(/^work\//, "");
-  const after = it.git.run(["rev-parse", "HEAD"], true).out;
+// One place answers what a hand can take across a group, so the take and the leave read the same line. [[spec/design_output/work#a-box-leaves]]
+export function standsOpen(it, name, path) {
   const children = childrenHere(it, name);
   const open = children.filter((one) => fieldOf(one.text, "state") !== CLOSED);
-
   // A closed sibling frees the one waiting on it, so takeable reads them all. [[spec/design_output/pull#done-leaves-no-takeable-step]]
   const busy = [...open, { name, text: it.disk.read(path) }]
     .map((one) => ({ name: one.name, step: takeable(it, one, children) }))
     .filter((one) => one.step);
+  return { children, open, busy };
+}
+
+// [[spec/design_output/work#a-box-leaves]]
+function leaves(it, branch, at, path, says) {
+  const name = branch.replace(/^work\//, "");
+  const after = it.git.run(["rev-parse", "HEAD"], true).out;
+  const { open, busy } = standsOpen(it, name, path);
+
   if (busy.length) {
     for (const one of busy) {
       console.error(`${one.name} stands at ${one.step}, and a hand can take it.`);

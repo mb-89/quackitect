@@ -9,9 +9,10 @@
   "work": {
     "comment": "The knobs the work verbs read. For a stale group, see spec/design_output/work.md.",
     "staleAfter": "12h",
-    "failsBeforePerson": 2,
-    "refusalsBeforePerson": 5,
+    "failsBeforeWait": 2,
+    "refusalsBeforeFail": 5,
     "stepsBeforeSplit": 3,
+    "personSigns": false,
     "retroReaders": 4,
     "retroCap": 8
   },

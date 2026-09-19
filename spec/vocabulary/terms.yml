@@ -44,6 +44,7 @@ terms:
   - {word: draft, defines: "[[spec/design_output/level0#the-tool-reads-a-draft]]"}
   - {word: editor, defines: "[[spec/design_output/editor]]"}
   - {word: engine, defines: "[[spec/design_input/the-agent-pulls-tickets#three-rules-hold-level-one]]"}
+  - {word: escalate, defines: "[[spec/design_output/pull#a-person-step-goes-in]]"}
   - {word: evidence, defines: "[[spec/schemas/ticket.schema]]"}
   - {word: extension, defines: "[[spec/design_output/extension]]"}
   - {word: fake, defines: "[[spec/design_output/doors]]"}

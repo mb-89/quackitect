@@ -11,7 +11,6 @@ import {
   holdsVerb,
   withEngineReader,
   withPersonStep,
-  withSettleStep,
 } from "../../src/scripts/pull.js";
 import { work } from "../../src/scripts/work.js";
 import {
@@ -30,7 +29,8 @@ import {
   standing,
 } from "./pull-doors.js";
 
-test("a step failing back twice inserts a settle step an agent takes", () => {
+// [[spec/design_output/pull#the-fail]]
+test("a step failing back past the cap drops the hold, answers wait, and writes no step", () => {
   const once = withEntry(CHILD("open", "design/review"), {
     step: "design/review",
     hand: "box other",
@@ -47,29 +47,33 @@ test("a step failing back twice inserts a settle step an agent takes", () => {
 
   assert.equal(code, 0);
   const now = disk.read(at("spec/tickets/a-child.md"));
-  assert.equal(fieldOf(now, "step"), "design/settle-1");
-  assert.match(
-    now,
-    /- name: settle-1\n\s+does: decides between the step and the findings, and writes why\n\s+by: anyone\n\s+to: engine\n\s+asks: "design\/review failed back 2 times: still thin"/,
-  );
+  assert.equal(fieldOf(now, "step"), "design/draft");
   assert.doesNotMatch(now, /by: person/, "a count of returns writes no person step");
-  assert.match(said, /waits for a hand at design\/settle-1/);
+  assert.doesNotMatch(now, /name: settle/, "and no settle step either");
+  assert.match(said, /^wait/m);
+  assert.match(said, /fails design\/review back to design\/draft/);
+  assert.match(said, /The hold drops here/);
+  assert.equal(disk.exists(HOLD), false, "the hold drops");
 });
 
-// A settle step past the split cap asks a person, because two hands that cannot agree need one. [[spec/design_output/pull#a-settle-step-goes-in]]
-test("settle steps past the split cap become a person step", () => {
-  const { it } = doors(standing(CHILD("open", "design/review")), {}, { fails: 2 });
-  const rooted = { ...it, root: ROOT, splits: 1 };
-  const one = { name: "a-child", text: CHILD("open", "design/review") };
+// [[spec/design_output/pull#the-hand-back-refused]]
+test("a hand-back meeting the refusal cap fails the leaf back, carrying the finding", () => {
+  const { it, disk } = doors(standing(), {}, { refusals: 1 });
+  heard(() => work(ROOT, ["pull"], it));
 
+  const { code, said } = heard(() => work(ROOT, ["pull", "a-child", "--pass"], it));
+
+  assert.equal(code, 0);
+  const now = disk.read(at("spec/tickets/a-child.md"));
+  assert.equal(fieldOf(now, "step"), "design/draft");
+  assert.doesNotMatch(now, /name: settle/, "the cap inserts no step");
+  assert.doesNotMatch(now, /by: person/);
+  assert.match(now, /why: "the hand-back met refused 1 times: .*approach under design\/draft holds no text/);
+  assert.match(said, /1 refusals in a row, so design\/draft goes back\./);
   assert.equal(
-    withSettleStep(rooted, one, "design/draft", "first").path,
-    "design/settle-1",
-  );
-  assert.equal(
-    withSettleStep(rooted, one, "design/draft", "second").path,
-    "design/person-1",
-    "the cap hands it to a person",
+    JSON.parse(disk.read(HOLD)).step,
+    "design/draft",
+    "the fail-back hands the leaf out again, and the count starts over",
   );
 });
 
@@ -135,7 +139,8 @@ test("a person step carries its reader, and a colon takes quotes", () => {
   );
   assert.match(
     asked.text,
-    /^## person-1\n\n<!-- answers the question the engine asks -->\n\n### answer/m,
+    /^## person-1\n\n<!-- the hand-back met refused: breaks Sentence at line 2: too long -->\n\n### answer/m,
+    "the chapter reads the question, so the ticket alone says what the step waits on",
   );
 
   assert.equal(
@@ -345,8 +350,8 @@ test("a leaf needing a verb the box lacks answers wait, with the reason", () => 
   assert.match(said, /^wait\n {2}a-child needs deploy now, which this box lacks/);
 });
 
-// [[spec/design_output/pull#children-before-their-group]]
-test("the group's children step derives from its tickets, and the box leaves it while a child waits", () => {
+// [[spec/tickets/the-group-leaves-at-todo]]
+test("a group whose open children all wait for a person stands at children, and hands no retro out", () => {
   const parked = CHILD("open", "design/review").replace(
     "        not: draft\n",
     "        by: person\n",
@@ -368,15 +373,16 @@ test("the group's children step derives from its tickets, and the box leaves it 
   const { code, said } = heard(() => work(ROOT, ["pull"], it));
 
   assert.equal(code, 0);
-  assert.match(said, /^work {2}one-group at retro\/notes/);
+  assert.match(said, /^wait/m, "the pull answers wait");
+  assert.match(said, /a-child waits for a person at design\/review/);
+  assert.doesNotMatch(said, /retro/, "and no retro leaf comes out");
   const now = disk.read(at("spec/tickets/one-group.md"));
-  assert.equal(fieldOf(now, "step"), "retro/notes");
-  assert.deepEqual(recordIn(now).at(-1), {
-    step: "children",
-    hand: HAND,
-    skipped: true,
-    why: "the box leaves it while a-child stand open",
-  });
+  assert.equal(fieldOf(now, "step"), "children", "the group stands where it stood");
+  assert.equal(
+    recordIn(now).filter((one) => String(one.step) === "children" && one.skipped).length,
+    0,
+    "the box writes no skip",
+  );
 });
 
 // [[spec/design_output/pull#children-before-their-group]]

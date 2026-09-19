@@ -8,6 +8,7 @@ import { readNote } from "../../.claude/skills/level0/lib/schema.js";
 import { fieldOf } from "../../src/scripts/group.js";
 import {
   chapterOf,
+  commandsRun,
   holdOf,
   leafOf,
   takeable,
@@ -106,6 +107,30 @@ test("a leaf's chapter reads its fields by heading, past the comments and the en
   assert.deepEqual(verdictIn(["maybe"]), { said: "" });
 });
 
+// [[spec/design_output/pull#the-fields-hold-their-forms]]
+test("a command line the box finds nothing for comes back naming the shape a command field takes", () => {
+  const it = {
+    root: ROOT,
+    proc: { run: () => ({ exitCode: 127, stdout: "", stderr: "" }) },
+  };
+  const leaf = {
+    path: "do",
+    evidence: [{ name: "check", form: "command", expects: 0 }],
+  };
+  const chapter = {
+    stands: true,
+    own: [],
+    fields: new Map([["check", ["`./RUNME.sh check`"]]]),
+  };
+  const found = [];
+  const ran = commandsRun(it, leaf, chapter, found);
+
+  assert.deepEqual(found, [
+    "check under do runs `./RUNME.sh check`, and the box finds no such command. A command field holds one bare line, indented four spaces.",
+  ]);
+  assert.deepEqual(ran, [{ name: "check", exit: 127, said: "" }]);
+});
+
 // [[spec/design_output/pull#the-test-verb]]
 test("the test verb answers green, assertion, build or missing over the tests the branch changes", () => {
   const pass = { exitCode: 0, stdout: "# tests 3\n# pass 3\n# fail 0\n" };
@@ -195,6 +220,20 @@ test("the judge's material is the leaf's evidence and the rules its reads name, 
     heard(() => work(ROOT, ["pull", "a-child", "--judge"], none.it)).said,
     "null",
   );
+});
+
+// [[spec/tickets/the-group-leaves-at-todo]]
+test("the judge's material leaves a command field out, so a chapter of commands hands over nothing", () => {
+  const { it } = doors(
+    standing(filled(CHILD("open", "implement/change"), "### lint", "./RUNME.sh check")),
+  );
+  heard(() => work(ROOT, ["pull"], it));
+
+  const { code, said } = heard(() => work(ROOT, ["pull", "a-child", "--judge"], it));
+
+  assert.equal(code, 0);
+  assert.equal(JSON.parse(said).step, "implement/change");
+  assert.equal(JSON.parse(said).evidence, "", "a command field is no prose");
 });
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]

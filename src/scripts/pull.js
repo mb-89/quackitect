@@ -20,7 +20,7 @@ import {
   withField,
 } from "./group.js";
 import { dropHold, guidanceText, holdOf, writeHold } from "./guidance-hand.js";
-import { handOf, SAYS } from "./hand.js";
+import { handOf, roleOf, SAYS } from "./hand.js";
 import { landed } from "./landed.js";
 import {
   chapterOf,
@@ -36,7 +36,7 @@ import {
   namedGroup,
   ticketsHere,
   urgentGroup,
-  withSettleStep,
+  withPersonStep,
 } from "./pull-hand.js";
 import { leafOf, leavesOf, REFUSED, say, stillHeld, WAIT, WORK } from "./pull-route.js";
 import {
@@ -135,6 +135,99 @@ export function flagValue(rest, flag) {
   return inline ? inline.slice(flag.length + 1).trim() : "";
 }
 
+// The one road a step goes in by, so a hand reaching no answer without a person says so. [[spec/design_output/pull#a-person-step-goes-in]]
+export function escalate(it, argv) {
+  const rest = (argv ?? []).slice(1);
+  const options = wordsIn(flagValue(rest, "--options"));
+  const question = askedIn(rest);
+  if (!question) {
+    say(REFUSED, [
+      "branch escalate takes the question a person answers, as its words.",
+    ]);
+    return 2;
+  }
+  // A helper reaches its own hold, so the hand reads the way the pull writes it. [[spec/design_output/pull#a-hand-of-its-own]]
+  const as = flagValue(rest, "--as");
+  const hand = as ? `${handOf(it)} · ${as}` : handOf(it);
+  const held = holdOf(it, hand);
+  if (!held) {
+    say(REFUSED, [
+      "nothing stands in your hand, so no leaf takes a person step.",
+      "Run ./RUNME.sh branch pull to take a leaf, then run this again.",
+    ]);
+    return 1;
+  }
+  const at = it.join(it.root, ...held.path.split("/"));
+  if (!it.disk.exists(at)) {
+    say(REFUSED, [`${held.path} stands nowhere, so nothing takes a person step.`]);
+    return 1;
+  }
+  const one = {
+    name: held.ticket,
+    path: held.path,
+    at,
+    private: held.path.startsWith(NOTES),
+  };
+  one.text = it.disk.read(at);
+  one.front = frontOf(one.text);
+
+  const put = withPersonStep(it, one, held.step, question, options);
+  if (!put.path) {
+    say(REFUSED, [`${held.step} takes no person step, and ${one.name} stands as it stood.`]);
+    return 1;
+  }
+
+  const branch = it.git.run(["rev-parse", "--abbrev-ref", "HEAD"], true).out;
+  const finding = landed(it, one, [`${held.step} waits for a person at ${put.path}`]);
+  if (finding) {
+    say(REFUSED, ["the hook refuses the commit, so the person step lands not:", finding]);
+    return 1;
+  }
+  dropHold(it, hand);
+  // The step stands in the record by now, so the branch is what a hand pushes. [[spec/design_output/pull#the-rejected-push]]
+  if (!one.private && !pushed(it, branch)) {
+    say(REFUSED, [
+      `${put.path} stands on this box, and ${branch} moves under it.`,
+      `Push ${branch}, then run ./RUNME.sh branch pull.`,
+    ]);
+    return 1;
+  }
+  const who = {
+    hand,
+    plainHand: hand,
+    branch,
+    group: branch.replace(/^work\//, ""),
+    held: null,
+  };
+  return onward(it, who, [
+    `${one.name} at ${held.step} waits for a person at ${put.path}.`,
+  ]);
+}
+
+// The question is every word the flags leave, so a hand writes it with no quotes. [[spec/design_output/pull#a-person-step-goes-in]]
+export function askedIn(rest) {
+  const out = [];
+  for (let i = 0; i < rest.length; i++) {
+    const one = rest[i];
+    if (one.startsWith("--")) {
+      if (ESCALATES.includes(one)) i++;
+      continue;
+    }
+    out.push(one);
+  }
+  return out.join(" ").trim();
+}
+
+export const ESCALATES = ["--options", "--as"];
+
+export function wordsIn(said) {
+  const out = String(said ?? "")
+    .split(",")
+    .map((one) => one.trim())
+    .filter(Boolean);
+  return out.length ? out : undefined;
+}
+
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 export function dropped(it, who) {
   if (!who.held) {
@@ -162,9 +255,17 @@ export function judgeMaterial(it, held, name) {
   const text = it.disk.read(at);
   const leaf = leafOf(frontOf(text), held.step);
   const chapter = chapterOf(text, held.step);
+  // The judge reads prose, and the leaf names which fields hold a line a shell runs. [[spec/tickets/the-group-leaves-at-todo]]
+  const commands = new Set(
+    (leaf?.evidence ?? [])
+      .filter((field) => String(field.form) === "command")
+      .map((field) => String(field.name)),
+  );
   const evidence = [
     ...chapter.own,
-    ...[...chapter.fields].flatMap(([field, rows]) => [`${field}:`, ...rows]),
+    ...[...chapter.fields]
+      .filter(([field, rows]) => rows.length && !commands.has(field))
+      .flatMap(([field, rows]) => [`${field}:`, ...rows]),
   ].join("\n");
   const rules = (leaf?.reads ?? []).flatMap((path) =>
     actionables(guidanceText(it, path)),
@@ -234,23 +335,25 @@ export function takeBack(it, who, name, path) {
   const wrote = entriesOf(one.front)
     .filter((entry) => String(entry.step) === path && !entry.skipped)
     .at(-1);
-  if (!wrote || String(wrote.hand ?? "") !== who.hand) {
+  // The record holds the role, so the read of it takes the role too. [[spec/design_output/pull#the-hand-rule]]
+  const role = roleOf(who.hand);
+  if (!wrote || String(wrote.hand ?? "") !== role) {
     say(REFUSED, [
-      `${path} carries no hand-back by ${who.hand}, so it is another hand's or nobody's.`,
+      `${path} carries no hand-back by ${role}, so it is another hand's or nobody's.`,
     ]);
     return 1;
   }
   const tip = one.private ? "" : tipOf(it);
   const text = withEntry(one.text, {
     step: path,
-    hand: who.hand,
+    hand: role,
     hash_before: tip,
     hash_after: tip,
     returns: returnsOf(one.front, path) + 1,
     why: "the hand takes it back",
   });
   one.text = withField(withField(text, "step", path), "state", OPEN);
-  landed(it, one, [`${who.hand} takes ${path} back`]);
+  landed(it, one, [`${role} takes ${path} back`]);
   if (!one.private && !pushed(it, who.branch)) {
     say(REFUSED, [
       `${who.branch} moves under this take-back, and one rebase fell short. Pull again.`,
@@ -391,31 +494,19 @@ export function handBack(it, who, name, verdict) {
 // [[spec/design_output/pull#the-hand-back-refused]]
 export function refused(it, who, one, leaf, held, found) {
   const count = Number(held.refused ?? 0) + 1;
+  // The cap sends the leaf back with the findings, because a step a box inserts waits for a person nobody sends. [[spec/design_output/pull#the-hand-back-refused]]
   if (Number(it.refusals) > 0 && count >= Number(it.refusals)) {
     if (one.stood) one.text = one.stood;
-    const put = withSettleStep(
+    say(REFUSED, [...found, "", `${count} refusals in a row, so ${leaf.path} goes back.`]);
+    return failed(
       it,
+      who,
       one,
-      leaf.path,
+      leaf,
+      held,
       `the hand-back met refused ${count} times: ${found[0]}`,
+      [],
     );
-    const finding = put.path
-      ? landed(it, one, [`${leaf.path} goes to a hand at ${put.path}`])
-      : "";
-    if (finding)
-      found.push(
-        `the hook refuses the commit, so the settle step lands not: ${finding}`,
-      );
-    if (put.path && !finding) {
-      dropHold(it, who.hand);
-      if (!one.private) pushed(it, who.branch);
-      say(REFUSED, [
-        ...found,
-        "",
-        `${count} refusals in a row, so ${put.path} now waits for a hand.`,
-      ]);
-      return 1;
-    }
   }
   writeHold(it, who.hand, {
     ...held,

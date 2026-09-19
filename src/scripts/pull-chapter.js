@@ -14,9 +14,13 @@ import {
 export { HELPER, SPAWN, spawnPrompt } from "./spawn.js";
 
 import { notesSaid, parsed } from "./guidance-hand.js";
+import { PERSON, roleOf } from "./hand.js";
 import { excludes } from "./pull-hand.js";
 import { ANSWERED, bare, CHECKED, COMMENT, CUT, FENCE, WORK } from "./pull-route.js";
 import { changedSince, tipOf } from "./pull-writes.js";
+
+// A shell answers this where it finds no command, which a backtick or a fence around the line earns. [[spec/design_output/pull#the-fields-hold-their-forms]]
+const NO_COMMAND = 127;
 
 export function workAnswer(it, one, leaf) {
   const rows = [];
@@ -346,6 +350,13 @@ export function commandsRun(it, leaf, chapter, found) {
     const rows = `${ran.stdout ?? ""}`.trim().split("\n").filter(Boolean);
     const last = rows.at(-1) ?? "";
     out.push({ name: field.name, exit: ran.exitCode, said: last.slice(0, CUT.said) });
+    // The shape is what a reader acts on here, because the box stopped at the name and left the command alone. [[spec/design_output/pull#the-fields-hold-their-forms]]
+    if (ran.exitCode === NO_COMMAND) {
+      found.push(
+        `${field.name} under ${leaf.path} runs ${line}, and the box finds no such command. A command field holds one bare line, indented four spaces.`,
+      );
+      continue;
+    }
     const want = field.expects;
     if (want === undefined || want === null || want === "") continue;
     const asNumber = Number(want);
@@ -372,6 +383,7 @@ export function handFaults(it, one, leaf, hand, held) {
   const out = [];
   if (leaf.by === "person" && it.agent && !it.ownerSays)
     out.push(`${leaf.path} is a person's step, and this hand is an agent.`);
+  out.push(...signFaults(it, one, hand));
   const other = excludes(one.front, leaf, hand);
   if (other) out.push(`${leaf.path} ${other}.`);
   if (leaf.evidence.some((field) => field.form === "verdict") && !one.private) {
@@ -384,5 +396,19 @@ export function handFaults(it, one, leaf, hand, held) {
   }
   return out;
 }
+
+// The stronger door on a person's hand, which a tracked ticket meets where the config switches it on. [[spec/design_output/pull#the-hand-rule]]
+export function signFaults(it, one, hand) {
+  if (!it.personSigns || one.private || roleOf(hand) !== PERSON) return [];
+  const tip = tipOf(it);
+  const said = it.git.signatureOf ? it.git.signatureOf("HEAD") : "";
+  if (SIGNED.includes(said.trim())) return [];
+  return [
+    `a person's hand-back meets a signed tip, and ${shortOf(tip)} answers ${said.trim() || "no signature"}.`,
+  ];
+}
+
+// What `git log --format=%G?` answers over a good signature, and over one it trusts no key for. [[spec/design_output/pull#the-hand-rule]]
+export const SIGNED = ["G", "U"];
 
 // [[spec/design_output/pull#the-pass]]

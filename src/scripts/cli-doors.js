@@ -57,9 +57,11 @@ export async function doorsHere() {
     work: roots.work,
     words: await said.ask("names.words"),
     stale: await said.ask("work.staleAfter"),
-    fails: await said.ask("work.failsBeforePerson"),
-    refusals: await said.ask("work.refusalsBeforePerson"),
+    fails: await said.ask("work.failsBeforeWait"),
+    refusals: await said.ask("work.refusalsBeforeFail"),
     splits: await said.ask("work.stepsBeforeSplit"),
+    // [[spec/design_output/pull#the-hand-rule]]
+    personSigns: await said.ask("work.personSigns"),
     // A name on the pull asks for one ticket, and the queue binding refuses the ask. [[spec/design_output/pull#the-hand-out]]
     binding: await said.ask("engine.binding"),
     ...handDoors(process.env),

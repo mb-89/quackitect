@@ -155,15 +155,15 @@ test("a ticket with no step field hands back at its first leaf, so the hold read
   assert.match(said.said, /checked under implement\/tests-red holds 1 line/, "the checks read the payload");
 });
 
-test("a refusal at the cap inserts the settle step on the ticket as it stood, and the refused payload reaches no disk", () => {
+test("a refusal at the cap fails the ticket back as it stood, and the refused payload reaches no disk", () => {
   const { it, disk } = doors({ refusals: 1 });
-  const settle = heard(() =>
+  const capped = heard(() =>
     work(ROOT, ["pull", "a-child", "--pass", "--fields", SHORT], it),
   );
-  assert.equal(settle.code, 1);
-  assert.match(settle.said, /waits for a hand/);
+  assert.match(capped.said, /1 refusals in a row/);
   const landed = disk.read(TICKET);
   assert.ok(!/^- one$/m.test(landed), "the refused payload reaches no disk");
   assert.ok(!landed.includes("node --test"));
-  assert.match(landed, /settle-1/, "and the settle step stands");
+  assert.ok(!landed.includes("name: settle"), "and the cap inserts no step");
+  assert.match(landed, /why: "the hand-back met refused 1 times/, "the reason rides the record");
 });

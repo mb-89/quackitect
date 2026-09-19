@@ -17,6 +17,7 @@ import {
   withField,
 } from "./group.js";
 import { noteRows, readsOf, writeHold } from "./guidance-hand.js";
+import { roleOf } from "./hand.js";
 import { landed } from "./landed.js";
 import { workAnswer } from "./pull-chapter.js";
 import {
@@ -24,9 +25,9 @@ import {
   ENGINE,
   holdsVerb,
   leafOf,
-  leavesOf,
   MOST_MOVES,
   say,
+  stepPathOf,
   WAIT,
   walkOf,
 } from "./pull-route.js";
@@ -205,7 +206,7 @@ export function takeable(it, one, all = []) {
   if (String(front.state ?? "") !== OPEN) return "";
   // The offer waits on a dependency, so this waits on it too. [[spec/design_output/work#a-dependency-waits-for-trunk]]
   if (dependsOn(front).some((dep) => !closedHere(it, all, dep))) return "";
-  const path = String(front.step ?? "").trim() || (leavesOf(front)[0]?.path ?? "");
+  const path = stepPathOf(front);
   const leaf = leafOf(front, path);
   if (!leaf) return "";
   if (["person", "children", "helper"].includes(leaf.by)) return "";
@@ -226,7 +227,7 @@ export function offer(it, who, one, all) {
       : dependsOn(one.front).filter((dep) => !closedHere(it, all, dep));
   if (open.length) return { why: `waits for ${open.join(", ")}` };
 
-  const moved = advanced(it, who, one, all);
+  const moved = advanced(it, one, all);
   if (moved.why) return { why: moved.why };
   if (!moved.leaf) return {};
   return admits(it, who, one, moved.leaf, all);
@@ -256,10 +257,10 @@ export function closedHere(it, all, dep) {
 }
 
 // [[spec/design_output/pull#a-condition-skips-a-leaf]]
-export function advanced(it, who, one, all) {
+export function advanced(it, one, all) {
   let text = one.text;
   let front = one.front;
-  let path = String(front.step ?? "").trim() || (leavesOf(front)[0]?.path ?? "");
+  let path = stepPathOf(front);
   let moved = false;
   const changes = [];
 
@@ -296,19 +297,8 @@ export function advanced(it, who, one, all) {
         });
         if (busy.length)
           return { why: `waits for ${busy.join(", ")}, which a hand can take` };
-        const left = entriesOf(front)
-          .filter((entry) => String(entry.step) === leaf.path)
-          .at(-1);
-        const again = left?.skipped && String(left.hand ?? "") === who.hand;
-        if (!leaf.leaves[leaf.at + 1] || again)
-          return { why: `waits for ${said.open.join(", ")}` };
-        text = withEntry(text, {
-          step: leaf.path,
-          hand: who.hand,
-          skipped: true,
-          why: `the box leaves it while ${said.open.join(", ")} stand open`,
-        });
-        changes.push(`leaves ${leaf.path}`);
+        // Every open child waits for a person, so the group stands here and hands no retro out. [[spec/tickets/the-group-leaves-at-todo]]
+        return { why: `waits for ${said.open.join(", ")}` };
       } else {
         text = withEntry(text, {
           step: leaf.path,
@@ -418,7 +408,8 @@ export function excludes(front, leaf, hand) {
     (one) => paths.has(String(one.step)) && !one.skipped,
   );
   if (!wrote.length) return "";
-  if (wrote.some((one) => String(one.hand ?? "") === hand)) {
+  // The record holds the role, so the rule reads the hand as its role too. [[spec/design_output/pull#the-hand-rule]]
+  if (wrote.some((one) => String(one.hand ?? "") === roleOf(hand))) {
     return `waits for a hand other than ${hand}, which wrote ${named.path}`;
   }
   return "";
@@ -480,22 +471,6 @@ export function withEngineReader(it, one) {
   }
   const schema = schemasHere(it).get("ticket");
   return schema ? reRouted(one.text, schema, steps, "") : "";
-}
-
-// A count says two hands disagree, and another hand settles that, because a person waiting on a call the box owns costs a whole session. [[spec/design_output/pull#a-settle-step-goes-in]]
-export function withSettleStep(it, one, before, asks) {
-  const standing = stepsNamed(one, "settle");
-  const most = Number(it.splits);
-  if (most > 0 && standing >= most) return withPersonStep(it, one, before, asks);
-  return inserted(it, one, before, `settle-${standing + 1}`, {
-    does: "decides between the step and the findings, and writes why",
-    by: "anyone",
-    to: "engine",
-    asks,
-    evidence: [
-      { name: "answer", form: "text", says: "the decision, and why it stands" },
-    ],
-  });
 }
 
 // [[spec/design_output/pull#a-person-step-goes-in]]
