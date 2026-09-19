@@ -90,7 +90,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -136,6 +136,10 @@ record:
     hash_after: b53b04f6550658bb806e2af38f60c201b5116a19
     returns: 1
     why: "The branch answers the ask: the assembly lands, and the door reads the config it writes.; The diff touches the files the approach names, and the chapter under the vehicle note.; `./RUNME.sh check` answers `exit 0` on `b53b04f6`.; Every rule the branch adds carries a case, and the contract case asserts a refusal.; The retro stands absent from the handback.; Findings, each one a fix for the hand at implement:; A style file a root drops stays in the derived folder, so a rule nobody holds keeps refusing.; `newer` reads the time each source standing now holds, so a file going missing moves nothing.; Write the names the assembly reads beside the config, and assemble again where that list moves.; Add a case dropping a file from a fake root, and assert the copy goes.; The answer gate, the findings road and the copilot road read the method's config. A project rule stays silent there."
+  - step: implement/reflect
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: e8e4268d78a0493a00a310446516e6507dffc8e8
+    hash_after: e8e4268d78a0493a00a310446516e6507dffc8e8
 ---
 
 # Ask
@@ -266,11 +270,27 @@ Findings, each one a fix for the hand at implement:
 
 <!-- the form is text -->
 
+The class: the assembly reads the sources standing now, and reads nothing of
+what it wrote.
+
+| what the assembly asks | what answers it |
+|---|---|
+| does a source read newer than the config | the time each source holds |
+| do the two sets of names differ | the walk over the derived folder, beside the walk over the roots |
+
+A name added, changed or dropped turns the copy over. The derived folder is the
+record of what the assembly writes, so the reading takes no second file. A case
+drops a file from a fake root, assembles again, and asserts the copy goes.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the fix touches the assembly and its cases, and the ask leaves neither out
+- the disk door carries the walk, and the fake answers it in the unit cases
+- the comment beside the reading names the chapter under the vehicle note
 
 ## change
 
