@@ -80,7 +80,7 @@ test("the take runs the line the bridgehead runs, and no copy of it", () => {
 test("the port reads off the pointer, and stands at the base without one", () => {
   const pointed = box(
     { probe: 1 },
-    { [join(ROOT, ".se", "vehicle.json")]: '{"method":"/tree","port":6512}' },
+    { [join(ROOT, ".se", ".runtime", "vehicle.json")]: '{"method":"/tree","port":6512}' },
   );
   assert.equal(portIn(pointed.it), 6512);
   assert.equal(portIn(box({ probe: 1 }).it), 6510);

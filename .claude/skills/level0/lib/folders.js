@@ -27,6 +27,7 @@ export const MOVED = [
   "show-panel",
   "tools.json",
   "undo",
+  "vehicle.json",
   "work.json",
 ];
 

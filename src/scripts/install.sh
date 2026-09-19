@@ -27,7 +27,7 @@ mkdir -p "$root/.se/.runtime"
 # The log stays out of the move, because the retro collects it.
 for one in bin hold review undo measure copilot box.json session.json \
   tools.json hold.json check.json index.db index.json lsp.json copilot-cloud \
-  show-panel config.json copy.json project.json work.json; do
+  show-panel config.json copy.json project.json work.json vehicle.json; do
   old="$root/.se/$one"
   new="$root/.se/.runtime/$one"
   [ -d "$old" ] || [ -f "$old" ] || continue
@@ -248,9 +248,23 @@ lsp_here() {
   [ -z "$newer" ]
 }
 
+# A running server holds its binary open, and Windows refuses a write over it
+# and allows a rename. So a build lands beside the binary and swaps in, the old
+# one steps aside until the next install clears it, and a server running it
+# ends itself once it sees the swap, so its caller starts the new one.
+swap_in() {
+  # Go on Windows leaves the binary it replaces as a tilde backup, so both go.
+  rm -f "$2.old" "$2~" 2>/dev/null || true
+  if [ -f "$2" ]; then
+    mv -f "$2" "$2.old" 2>/dev/null || { rm -f "$1"; return 1; }
+  fi
+  mv -f "$1" "$2"
+}
+
 get_lsp() {
   say "  building the language server"
-  (cd "$root/src/lsp" && CGO_ENABLED=0 go build -o "$bin/se-lsp${exe}" .) || return 1
+  (cd "$root/src/lsp" && CGO_ENABLED=0 go build -o "$bin/se-lsp${exe}.new" .) || return 1
+  swap_in "$bin/se-lsp${exe}.new" "$bin/se-lsp${exe}" || return 1
   lsp_here
 }
 
@@ -299,7 +313,8 @@ get_index() {
   }
   say "  building the index with $cc"
   (cd "$root/src/index" && CC="$cc" CGO_ENABLED=1 GOFLAGS=-tags=sqlite_fts5 \
-    go build -o "$bin/se-index${exe}" .) || return 1
+    go build -o "$bin/se-index${exe}.new" .) || return 1
+  swap_in "$bin/se-index${exe}.new" "$bin/se-index${exe}" || return 1
   index_here
 }
 

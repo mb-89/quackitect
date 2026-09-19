@@ -15,6 +15,8 @@ import (
 	"strconv"
 	"syscall"
 	"time"
+
+	"quackitect/swap"
 )
 
 func main() {
@@ -49,7 +51,7 @@ func rootHere() (string, error) {
 }
 
 func serves(root string) int {
-	server, _, err := Serve(root, filepath.Join(root, Runtime, "index.db"))
+	stop, _, err := Serve(root, filepath.Join(root, Runtime, "index.db"))
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "the index door did not stand:", err)
 		return 1
@@ -58,8 +60,9 @@ func serves(root string) int {
 
 	said := make(chan os.Signal, 1)
 	signal.Notify(said, os.Interrupt, syscall.SIGTERM)
+	swap.Watches(func() { said <- os.Interrupt })
 	<-said
-	server.Close()
+	stop()
 	return 0
 }
 

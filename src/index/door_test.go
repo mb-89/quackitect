@@ -11,11 +11,11 @@ import (
 
 func TestTheDoorAnswersEveryQuestionAVerbAsks(t *testing.T) {
 	root := tree(t)
-	server, listen, err := Serve(root, filepath.Join(t.TempDir(), "index.db"))
+	stop, listen, err := Serve(root, filepath.Join(t.TempDir(), "index.db"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer server.Close()
+	defer stop()
 	_ = listen
 
 	standing, err := standingOf(root)
@@ -46,11 +46,11 @@ func TestTheDoorAnswersEveryQuestionAVerbAsks(t *testing.T) {
 
 func TestAMethodNobodyNamedComesBackNamed(t *testing.T) {
 	root := tree(t)
-	server, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"))
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer server.Close()
+	defer stop()
 
 	standing, err := standingOf(root)
 	if err != nil {
@@ -68,11 +68,11 @@ func TestAMethodNobodyNamedComesBackNamed(t *testing.T) {
 // [[spec/design_output/index#the-watcher-keeps-it-warm]]
 func TestAWriteUnderTheTreeReachesTheIndex(t *testing.T) {
 	root := tree(t)
-	server, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"))
+	stop, _, err := Serve(root, filepath.Join(t.TempDir(), "index.db"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer server.Close()
+	defer stop()
 
 	standing, err := standingOf(root)
 	if err != nil {

@@ -54,7 +54,7 @@ export async function lint(where) {
   const began = it.clock.now().getTime();
 
   // [[spec/design_output/lsp]]
-  const got = findingsOver(
+  const got = await findingsOver(
     {
       disk: files,
       proc: outside,

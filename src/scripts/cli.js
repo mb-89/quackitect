@@ -16,6 +16,7 @@ import {
   doctor,
   doorsHold,
   fix,
+  goHolds,
   listRules,
   pluginHolds,
   project,
@@ -28,7 +29,6 @@ import {
   treeHere,
   tuiDoors,
   under,
-  viewerHolds,
 } from "./cli-check.js";
 import {
   atRoot,
@@ -67,7 +67,7 @@ export const verbs = {
     run: async (w) =>
       stamped(
         test() ||
-          viewerHolds() ||
+          goHolds() ||
           doorsHold() ||
           projectionsHold() ||
           pluginHolds() ||

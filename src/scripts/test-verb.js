@@ -4,6 +4,7 @@
 
 import { shortOf } from "../../.claude/skills/level0/lib/runs.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
+import { goEnvOf } from "./go-tests.js";
 import { recordIn } from "./group.js";
 import { changedFiles, handOf, holdOf } from "./pull.js";
 
@@ -35,7 +36,15 @@ export function testVerb(it, argv) {
     said.push(testSays(ran, files));
   }
   for (const one of modules) {
-    said.push(goSays(it.proc.run(["go", "-C", one, "test", "./..."], { cwd: it.root }), one));
+    said.push(
+      goSays(
+        it.proc.run(["go", "-C", one, "test", "./..."], {
+          cwd: it.root,
+          env: goEnvOf(it),
+        }),
+        one,
+      ),
+    );
   }
 
   const bad = said.find((one) => !one.startsWith("green"));

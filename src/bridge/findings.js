@@ -4,7 +4,7 @@
 // and the battery read one list. The server restarts when this code moves.
 // [[spec/design_output/lsp]]
 
-import { join, relative, sep } from "node:path";
+import { join } from "node:path";
 import {
   CONFIG_DIR,
   fromJson as codeRows,
@@ -45,8 +45,8 @@ export const FINDINGS = "/findings";
 export const FROM = { vale: "vale", biome: "biome", tree: "tree" };
 
 // Answers every finding over the paths named, and the fault that stops Vale reading. [[spec/design_output/lsp]]
-export function findingsOver(it, where) {
-  const ran = it.proc.run(
+export async function findingsOver(it, where) {
+  const ran = await it.proc.start(
     [it.vale, `--config=${CONFIG}`, "--output=JSON", "--no-exit", OURS, ...where],
     { cwd: it.root },
   );
@@ -74,15 +74,16 @@ export function findingsOver(it, where) {
     found.push(...stopFolderIsData(tree).map((one) => from(one, FROM.tree)));
   }
   found.push(...gridOver(it, where).map((one) => from(one, FROM.tree)));
-  if (it.biome) found.push(...biomeOver(it, where).map((one) => from(one, FROM.biome)));
+  if (it.biome)
+    found.push(...(await biomeOver(it, where)).map((one) => from(one, FROM.biome)));
   return { found, fault: "" };
 }
 
 // The server's answer to GET /findings, over the paths the query names or the whole tree. [[spec/design_output/lsp]]
-export function findingsFor(box, url) {
+export async function findingsFor(box, url) {
   const asked = new URL(String(url), "http://here").searchParams.getAll("path");
   const known = readTools(box.disk, box.method);
-  const got = findingsOver(
+  const got = await findingsOver(
     {
       disk: box.disk,
       proc: box.proc,
@@ -126,10 +127,12 @@ export function walkOver(it, where, wanted = PROSE) {
   return out;
 }
 
+// A path reads relative to the root in forward slashes, whichever slash either one arrives in. [[spec/design_output/tree#the-reader]]
 export function showOf(it, file) {
-  const path = String(file);
-  const said = path.includes(it.root) ? relative(it.root, path) : path;
-  return said.split(sep).join("/");
+  const path = String(file).split("\\").join("/");
+  const root = String(it.root).split("\\").join("/").replace(/\/+$/, "");
+  if (path === root) return "";
+  return path.startsWith(`${root}/`) ? path.slice(root.length + 1) : path;
 }
 
 // [[spec/design_output/level0#the-tense-reader]]
@@ -167,8 +170,8 @@ function gridOver(it, where) {
   }));
 }
 
-function biomeOver(it, where) {
-  const code = it.proc.run(
+async function biomeOver(it, where) {
+  const code = await it.proc.start(
     [
       it.biome,
       "lint",

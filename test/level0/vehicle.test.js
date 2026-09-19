@@ -194,7 +194,7 @@ test("attach writes the driver, the register entry with its port, the pointer an
     "the driver",
   );
   assert.deepEqual(
-    JSON.parse(files.read("/stub/.se/vehicle.json")),
+    JSON.parse(files.read("/stub/.se/.runtime/vehicle.json")),
     { method: "/tools", port: 6510 },
     "the pointer",
   );

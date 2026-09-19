@@ -12,3 +12,7 @@ require (
 )
 
 require golang.org/x/sys v0.13.0 // indirect
+
+require quackitect/swap v0.0.0
+
+replace quackitect/swap => ../swap

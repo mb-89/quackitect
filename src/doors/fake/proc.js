@@ -9,6 +9,10 @@ export function fakeProc(answers = {}) {
   return {
     ran,
     teach: (argv, said) => void table.set(key(argv), said),
+    // The fake answers a start the way it answers a run, on the next tick. [[spec/design_output/lsp]]
+    async start(argv, init = {}) {
+      return this.run(argv, init);
+    },
     run(argv, init = {}) {
       ran.push({ argv: [...argv], init });
       const said = table.get(key(argv)) ?? table.get(argv[0]);

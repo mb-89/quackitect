@@ -244,7 +244,7 @@ slow(
       assert.ok(files.exists(join(cloned, "RUNME.sh")), `the upstream stands at ${cloned}: ${logged.join(" ")}`);
       const driver = JSON.parse(files.read(join(dest, ".se", "project.json"))).driver;
       assert.equal(driver, copyHere(files, clock(), cloned), "the driver is the clone's identity");
-      const pointer = JSON.parse(files.read(join(dest, ".se", "vehicle.json")));
+      const pointer = JSON.parse(files.read(join(dest, ".se", ".runtime", "vehicle.json")));
       assert.equal(pointer.method, cloned, "the pointer names the clone");
       assert.ok(pointer.port >= 6510, "the pointer carries a port");
       assert.equal(

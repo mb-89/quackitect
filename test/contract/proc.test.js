@@ -35,6 +35,21 @@ test("the fake answers what the real door answers", () => {
   assert.deepEqual(fake, real);
 });
 
+// A start answers what a run answers, with the event loop free meanwhile. [[spec/design_output/lsp]]
+test("a start answers what a run answers, in the real door and the fake alike", async () => {
+  const started = async (door) =>
+    [await door.start(SAYS), await door.start(FAILS)].map(shaped);
+  const real = await started(proc());
+  assert.deepEqual(real, answers(proc()));
+  const fake = await started(
+    fakeProc({
+      [SAYS.join(" ")]: { stdout: "quack" },
+      [FAILS.join(" ")]: { exitCode: 3 },
+    }),
+  );
+  assert.deepEqual(fake, real);
+});
+
 test("the fake refuses a command nobody taught it", () => {
   assert.throws(() => fakeProc().run(["git", "status"]), /never taught/);
 });

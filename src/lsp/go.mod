@@ -6,6 +6,11 @@ module quackitect/lsp
 
 go 1.24
 
-require quackitect/yaml v0.0.0
+require (
+	quackitect/swap v0.0.0
+	quackitect/yaml v0.0.0
+)
+
+replace quackitect/swap => ../swap
 
 replace quackitect/yaml => ../yaml

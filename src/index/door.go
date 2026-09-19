@@ -52,7 +52,7 @@ func standingPath(root string) string {
 	return filepath.Join(root, Runtime, "index.json")
 }
 
-func Serve(root, at string) (*http.Server, net.Listener, error) {
+func Serve(root, at string) (func(), net.Listener, error) {
 	db, err := Open(root, at)
 	if err != nil {
 		return nil, nil, err
@@ -78,7 +78,15 @@ func Serve(root, at string) (*http.Server, net.Listener, error) {
 	if err == nil {
 		one.eyes = eyes
 	}
-	return server, listen, one.stands(listen)
+	// The stop lets go of the database and the watch too, so a test's folder clears on Windows. [[spec/design_output/index#the-door-owns-the-database]]
+	stop := func() {
+		server.Close()
+		if one.eyes != nil {
+			one.eyes.Close()
+		}
+		one.db.Close()
+	}
+	return stop, listen, one.stands(listen)
 }
 
 func (one *door) stands(listen net.Listener) error {

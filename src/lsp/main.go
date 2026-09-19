@@ -15,6 +15,8 @@ import (
 	"path/filepath"
 	"syscall"
 	"time"
+
+	"quackitect/swap"
 )
 
 const (
@@ -74,6 +76,11 @@ func rootHere() (string, error) {
 func speaks(root string) int {
 	out := bufio.NewWriter(os.Stdout)
 	defer out.Flush()
+	// The editor starts the server again once it ends, so a swapped binary ends it. [[spec/design_output/lsp]]
+	swap.Watches(func() {
+		out.Flush()
+		os.Exit(0)
+	})
 	if err := Speaks(checkerAt(root), os.Stdin, out); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return 1
@@ -91,6 +98,7 @@ func serves(root string) int {
 
 	said := make(chan os.Signal, 1)
 	signal.Notify(said, os.Interrupt, syscall.SIGTERM)
+	swap.Watches(func() { said <- os.Interrupt })
 	<-said
 	server.Close()
 	return 0

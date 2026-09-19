@@ -5,7 +5,7 @@
 
 // The port base of [[spec/design_output/vehicle#the-register-holds-the-port]], held again here because this hook imports nothing.
 const PORT = 6510;
-const POINTER = ".se/vehicle.json";
+const POINTER = ".se/.runtime/vehicle.json";
 // The log of [[spec/design_input/the-runtime-files-stand-apart]], which stands outside the runtime half because the retro collects it. It is owned by log.js and spelled again here because this hook imports nothing.
 const SESSION = ".se/.log/session.jsonl";
 // The hand's session file of [[spec/design_output/pull#the-hand-and-the-hold]], under the runtime folder folders.js owns and spelled again here because this hook imports nothing.

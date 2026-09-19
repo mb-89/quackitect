@@ -58,7 +58,7 @@ export function resolves(list, driver) {
 
 // [[spec/design_output/vehicle#the-register-holds-the-port]]
 export const PORT_BASE = 6510;
-export const POINTER = ".se/vehicle.json";
+export const POINTER = ".se/.runtime/vehicle.json";
 
 export function portOf(list, method) {
   for (const one of list ?? []) {

@@ -29,7 +29,7 @@ export function makesProject(disk, env, time, work, vehicle) {
     disk.makeDir(join(to, ".."));
     disk.write(to, disk.read(join(vehicle, HOOK, rel)));
   }
-  disk.makeDir(join(work, ".se"));
+  disk.makeDir(join(work, POINTER, ".."));
   disk.write(join(work, POINTER), `${JSON.stringify({ method: vehicle, port }, null, 2)}\n`);
   return { method: vehicle, port, itself: false, made: true };
 }

@@ -50,9 +50,10 @@ import {
 } from "./cli-doors.js";
 import { namesIn, show, walk, warningsStood } from "./cli-read.js";
 import { homeIn, linkedAt, manifestPath, registered } from "./editor.js";
+import { goEnvOf, goModulesIn } from "./go-tests.js";
 import { HOOKS } from "./precommit.js";
 import { writeSurvey } from "./tools.js";
-import { SHARED, SOURCE as VIEWER, viewerOf } from "./viewer.js";
+import { viewerOf } from "./viewer.js";
 
 export function serverFaults(where) {
   if (!files.exists(lsp)) return null;
@@ -101,20 +102,21 @@ export function viewerHere() {
   });
 }
 
-// [[spec/design_output/viewer#the-check-runs-its-tests]]
-export function viewerHolds() {
-  const folders = [VIEWER];
-  for (let at = 1; at < SHARED.length; at += 2) folders.push(SHARED[at]);
+// Every Go module's tests run in the battery, the index's through the pinned Zig. [[spec/design_output/index#the-compiler-it-needs]]
+export function goHolds() {
+  const at = { disk: files, join, root };
+  const env = goEnvOf(at);
   let worst = 0;
-  for (const folder of folders) {
+  for (const folder of goModulesIn(at)) {
     let ran;
     try {
       ran = outside.run([go, "test", "./..."], {
         cwd: join(root, folder),
+        env,
         inherit: true,
       });
     } catch {
-      console.log("go stands nowhere, so the viewer's tests go unrun here.");
+      console.log("go stands nowhere, so the Go tests go unrun here.");
       return 0;
     }
     worst = worst || ran.exitCode;

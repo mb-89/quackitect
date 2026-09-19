@@ -6,7 +6,8 @@
 
 const LINK = "vehicle.json";
 const ASKING = 10000;
-const POINTER = ".se/vehicle.json";
+// The pointer in the runtime folder folders.js owns, spelled again here because this hook imports nothing. [[spec/design_output/vehicle#the-bridgehead-installs-the-upstream]]
+const POINTER = ".se/.runtime/vehicle.json";
 // The log of [[spec/design_input/the-runtime-files-stand-apart]], which stands outside the runtime half because the retro collects it. It is owned by log.js and spelled again here because this hook imports nothing.
 const SESSION = ".se/.log/session.jsonl";
 const REGISTER = ".se/registry.json";

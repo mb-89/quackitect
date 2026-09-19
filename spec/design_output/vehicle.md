@@ -118,7 +118,7 @@ it blocks. A vehicle with none takes the lowest free one from `PORT_BASE` in
 `lib/vehicle.js` up on its first start. So two vehicles on one box stand on two ports, and a project
 reaches the right one.
 
-A project points at its vehicle in `.se/vehicle.json`: the method root and
+A project points at its vehicle in `.se/.runtime/vehicle.json`: the method root and
 the port. A folder with no pointer that carries the marker and the server is
 a vehicle, and points at itself. A folder with neither becomes a project on
 the first press of the hook. It gets the one hook under `.claude/skills/level0`
@@ -215,7 +215,7 @@ start it takes one road, in this order:
 
 | the stub holds | the bridgehead does |
 |---|---|
-| the pointer `.se/vehicle.json` | nothing. The hook the attach writes carries the session. |
+| the pointer `.se/.runtime/vehicle.json` | nothing. The hook the attach writes carries the session. |
 | a vehicle on one of the three roads | attaches to it |
 | no vehicle, and a record naming an upstream | clones the upstream into `~/.se/vehicles/<name>`, then attaches |
 | no vehicle, and a record naming no upstream | stops, and the log names the clone |
@@ -228,7 +228,7 @@ settles the stub the way the sidebar's hook button does:
 | the verb writes | where |
 |---|---|
 | the register entry with its port | `~/.se/registry.json` |
-| the pointer | `.se/vehicle.json` in the stub |
+| the pointer | `.se/.runtime/vehicle.json` in the stub |
 | the vehicle's hook and its two manifests | `.claude/skills/level0` in the stub |
 
 So the bridgehead rewrites the plugin folder beside its own. The client loads
