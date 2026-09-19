@@ -76,6 +76,10 @@ urgent: true
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
 step: sync
+record:
+  - step: sync
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 04daa845a3e299ef70695d3bd3948778fea5ff48
 ---
 
 # Ask
