@@ -75,11 +75,19 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: sync
+step: split
 record:
   - step: sync
     hand: box ca870d4f20f4 · claude-code-remote
     hash_before: ca22b75158abd573db00e1635f0bd8ea5b443cf4
+  - step: sync
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: 7be10ccbc18e3a191e1e22d82ee93e6776b4abc3
+    hash_after: 7be10ccbc18e3a191e1e22d82ee93e6776b4abc3
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-person-step-holds already carries every commit on main.
 ---
 
 # Ask
@@ -92,7 +100,7 @@ The pull inserts a person step where a leaf fails or meets refusals past the cap
 
 ## sync
 
-<!-- branch sync, so the branch carries trunk -->
+    ./RUNME.sh branch sync
 
 <!-- the form is command -->
 
