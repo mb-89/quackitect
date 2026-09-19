@@ -90,12 +90,16 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
     hash_before: 2346bfb7671515923bd92ed5f63ac859dc7ac4db
     hash_after: 2346bfb7671515923bd92ed5f63ac859dc7ac4db
+  - step: design/review
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-2
+    hash_before: 4aa828834db0bf2c6100e02af8049a6186484955
+    hash_after: 4aa828834db0bf2c6100e02af8049a6186484955
 ---
 
 # Ask
@@ -171,8 +175,9 @@ What the ticket lands: nothing under `src`. `test/level0/pull-steps.test.js` pin
 ### verdict
 
 <!-- pass or fail, with findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
 
 # implement
 
