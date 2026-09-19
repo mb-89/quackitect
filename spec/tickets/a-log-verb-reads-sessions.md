@@ -89,7 +89,12 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: e5c9abde2eab783b0474065d8ad16b1685f9e9c1
+    hash_after: e5c9abde2eab783b0474065d8ad16b1685f9e9c1
 ---
 
 # Ask
@@ -112,8 +117,34 @@ Each reading costs a fresh inline script, and the same filter goes in again and 
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`./RUNME.sh log` reads the session log through the lib that writes it, and the filters compose.
+
+| the flag | what it reads |
+|---|---|
+| `--since <span>` | the lines stamped inside the span, such as `10m` or `2h` |
+| `--level <name>` | the lines at that level and above, through `writes` |
+| `--kind <name>` | the lines of that kind |
+| `--last <count>` | the last lines, after every filter above |
+
+`src/scripts/log-verb.js` holds the verb, and `src/scripts/cli.js` names it beside the others. The lib under `.claude/skills/level0/lib/log.js` already answers each piece:
+
+| what the verb needs | what the lib names |
+|---|---|
+| the file, and the rotated ones | `SESSION` and `OLD` |
+| the lines out of the text | `rowsOf` |
+| the level ladder | `writes` and `rank` |
+| the row a reader sees | `asRow` |
+| the span a rotated file covers | `timeOf` |
+
+So the verb reads doors and composes, and it writes no shape of its own.
+
+- a hand asking which kind fills the log runs `./RUNME.sh log --kind hook --last 20`
+- `install.sh` writes a line where it installs one, so a warm box answers with none
+- the cases drive each filter over rows in memory, because the lib takes text and answers rows
+
+[[spec/design_output/log]] takes a chapter naming the verb and its flags.
 
 ## review
 
