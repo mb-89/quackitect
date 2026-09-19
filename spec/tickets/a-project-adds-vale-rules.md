@@ -90,7 +90,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -130,6 +130,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 5387e4f82b24 · claude-code-remote · helper-7
+    hash_before: b53b04f6550658bb806e2af38f60c201b5116a19
+    hash_after: b53b04f6550658bb806e2af38f60c201b5116a19
+    returns: 1
+    why: "The branch answers the ask: the assembly lands, and the door reads the config it writes.; The diff touches the files the approach names, and the chapter under the vehicle note.; `./RUNME.sh check` answers `exit 0` on `b53b04f6`.; Every rule the branch adds carries a case, and the contract case asserts a refusal.; The retro stands absent from the handback.; Findings, each one a fix for the hand at implement:; A style file a root drops stays in the derived folder, so a rule nobody holds keeps refusing.; `newer` reads the time each source standing now holds, so a file going missing moves nothing.; Write the names the assembly reads beside the config, and assemble again where that list moves.; Add a case dropping a file from a fake root, and assert the copy goes.; The answer gate, the findings road and the copilot road read the method's config. A project rule stays silent there."
 ---
 
 # Ask
@@ -353,17 +359,51 @@ the door alone.
 
 <!-- the form is files -->
 
+    - .claude/skills/level0/lib/copilot-runtime.js
+    - .claude/skills/level0/lib/vale.js
+    - .vale.ini
+    - spec/design_output/vehicle.md
+    - spec/guidance/review/reviewing.md
+    - spec/tickets/a-project-adds-vale-rules.md
+    - spec/vocabulary/terms.yml
+    - src/bridge/server.js
+    - src/doors/disk.js
+    - src/doors/fake/disk.js
+    - src/doors/vale.js
+    - src/scripts/copilot.js
+    - src/scripts/styles.js
+    - test/contract/vale-paths.test.js
+    - test/level0/styles.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+fail
+
+- The branch answers the ask: the assembly lands, and the door reads the config it writes.
+- The diff touches the files the approach names, and the chapter under the vehicle note.
+- `./RUNME.sh check` answers `exit 0` on `b53b04f6`.
+- Every rule the branch adds carries a case, and the contract case asserts a refusal.
+- The retro stands absent from the handback.
+
+Findings, each one a fix for the hand at implement:
+
+- A style file a root drops stays in the derived folder, so a rule nobody holds keeps refusing.
+- `newer` reads the time each source standing now holds, so a file going missing moves nothing.
+- Write the names the assembly reads beside the config, and assemble again where that list moves.
+- Add a case dropping a file from a fake root, and assert the copy goes.
+- The answer gate, the findings road and the copilot road read the method's config. A project rule stays silent there.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The chapter under the vehicle note owns the assembly, and every module and case points at it. It names `spec/config/styles` again, and [[spec/design_output/level0]] holds that fact already.
 
 # Discussion
 
