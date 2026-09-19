@@ -6,6 +6,15 @@ ask:
     form: text
     says: what calls for it, as notes standing open, an iteration ending, or the owner asking
 steps:
+  - name: feedback
+    does: takes the owner's field feedback one point at a time, and writes each confirmed point as a private note
+    by: owner
+    needs: ["ticket note"]
+    reads: [[spec/guidance/retro/feedback]]
+    evidence:
+      - name: notes
+        form: list
+        says: every private note this step writes, one a line
   - name: collect
     does: moves everything the private folder holds past its dot folders into the retro's input folder, and copies the transcripts, the memory and the scratchpads beside it
     by: anyone
