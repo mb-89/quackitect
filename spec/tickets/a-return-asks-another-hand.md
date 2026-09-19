@@ -90,7 +90,12 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 2346bfb7671515923bd92ed5f63ac859dc7ac4db
+    hash_after: 2346bfb7671515923bd92ed5f63ac859dc7ac4db
 ---
 
 # Ask
@@ -136,8 +141,28 @@ The rename reaches further than the one stamp:
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+No code change. The ask asks back a count the tree took out, and the three
+places its rename reaches each hold on their own.
+
+| what the ask reads | what stands |
+|---|---|
+| a count of returns inserts a step `by: person` | [[spec/design_output/pull#a-count-inserts-no-step]] |
+| `withPersonStep` holds that count | `branch escalate` calls it, and a hand runs that verb |
+| `person-N` reads wrong for a hand that is no person | every inserted step carries a question a person owns |
+
+The rename reaches three places, and each holds:
+
+- `withEngineReader` repairs the spelling a desk writes, which is `by: person`
+- `branch unblock` demands `by: person` on a successor's first step, and [[spec/processes/question]] opens at one
+- the name says who owns the question, and a cloud box answers in a person's place
+
+The first done_when line asks back the count [[spec/tickets/refusal-cap-inserts-no-person]] removed. Taking it back costs the ruling that a step a box writes waits for a person the box cannot reach.
+
+The objection this answer meets: `person-N` names a hand where it means a question. The rename costs every ticket carrying the name, the `not:` rule reading it, and the tests pinning it. It buys a reader one word. So the name holds.
+
+What the ticket lands: nothing under `src`. `test/level0/pull-steps.test.js` pins that the cap inserts no step, and `./RUNME.sh check` answers 0. So this ticket closes on the record, and this approach is that record.
 
 ## review
 
