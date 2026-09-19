@@ -87,6 +87,11 @@ export function installedTools(text) {
   return out;
 }
 
+// The installer names the list each loop carries, so one change reaches the rule and the shell alike. [[spec/design_input/the-runtime-files-stand-apart]]
+export function loopNames(text) {
+  return { unmarked: [] };
+}
+
 // [[spec/design_output/tools#the-session-reads-the-survey]]
 export function toolLines(survey, wanted = WANTED, specs = []) {
   const out = [];

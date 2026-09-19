@@ -223,17 +223,28 @@ on this tip, so each of the seven turns the tree red at the same commit.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/folders.test.js test/level0/tools.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- the escape passes a spelling under an import today, so the case naming that line fails
+- the reader and the installer rule answer nothing yet, so each case fails on its own assertion
+- the name rules take a contract file of their own, because `test/contract/tree.test.js` stands at its ceiling
+- what surprises the hand: the installer spells the half in several blocks, and each one takes its own line
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the names module, the reader, the rules, the installer, the writers it catches, and the cases
+- the disk door and the git door carry the reading, and the fake tree answers both in the cases
+- each rule and each list carries the pointer at the note the ask names
 
 ## reflect
 

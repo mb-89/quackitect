@@ -33,7 +33,6 @@ import {
   nothingPrivateTravels,
   settingsNameBinaries,
   stopFolderIsData,
-  privateFolderOwned,
   surveyFindsNode,
   surveyNamesInstalls,
   treeFaults,
@@ -323,48 +322,6 @@ test("a line deleting a log file is refused", () => {
   assert.deepEqual(noLogDeleted(here), []);
 });
 
-// [[spec/design_input/the-runtime-files-stand-apart]]
-test("a file spelling the runtime folder without naming its owner is refused", () => {
-  const found = privateFolderOwned(
-    fakeTree(
-      {
-        "src/scripts/stray.js": 'const at = "x";\nconst hold = ".se/.runtime/hold";\n',
-        "src/index/split.go": 'const at = ".se", ".runtime"\n',
-      },
-      ["src/scripts/stray.js", "src/index/split.go"],
-    ),
-  );
-
-  assert.deepEqual(
-    found.map((one) => [one.rule, one.file, one.line]),
-    [
-      ["PrivateFolderOwned", "src/scripts/stray.js", 2],
-      ["PrivateFolderOwned", "src/index/split.go", 1],
-    ],
-  );
-});
-
-// A reader the move left behind spells the old place, and that is the drift. [[spec/design_input/the-runtime-files-stand-apart]]
-test("a spelling of a name the runtime half took is refused where the old place stands", () => {
-  const stale = {
-    "src/bridge/left.js": 'const at = join(work, ".se", "hold");\n',
-    "src/scripts/old.js": 'const bin = ".se/bin";\nconst log = ".se/.log";\n',
-  };
-  assert.deepEqual(
-    privateFolderOwned(fakeTree(stale, Object.keys(stale))).map((one) => [
-      one.file,
-      one.line,
-    ]),
-    [
-      ["src/bridge/left.js", 1],
-      ["src/scripts/old.js", 1],
-    ],
-  );
-
-  const kept = { "src/scripts/rest.js": 'const notes = ".se/notes";\n' };
-  assert.deepEqual(privateFolderOwned(fakeTree(kept, Object.keys(kept))), []);
-});
-
 // Two hooks import nothing, so each spells the session file the hand writes. [[spec/design_input/the-runtime-files-stand-apart]]
 test("every forced copy of the session file says what the hand module says", () => {
   for (const path of [
@@ -373,19 +330,6 @@ test("every forced copy of the session file says what the hand module says", () 
   ]) {
     assert.match(here.read(path), new RegExp(`"${SESSION}"`), path);
   }
-});
-
-test("a file naming the owner beside the copy passes, and a test file passes", () => {
-  const owned = {
-    "src/scripts/imports.js":
-      'import { inRun } from "../../.claude/skills/level0/lib/folders.js";\nconst hold = inRun("hold");\nconst said = ".se/.runtime/hold";\n',
-    "src/extension/copy.js":
-      "// The folder folders.js owns, spelled again here.\nconst BIN = \".se/.runtime/bin\";\n",
-    "test/level0/folders.test.js": 'const at = ".se/.runtime/bin";\n',
-    ".claude/skills/level0/lib/folders.js": 'export const RUN = ".se/.runtime";\n',
-  };
-  assert.deepEqual(privateFolderOwned(fakeTree(owned, Object.keys(owned))), []);
-  assert.deepEqual(privateFolderOwned(here), []);
 });
 
 // [[spec/design_output/level0#a-name-meets-the-cap]]

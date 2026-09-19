@@ -367,6 +367,11 @@ export function privateFolderOwned(tree) {
   return out;
 }
 
+// The installer moves a name the spelling rule holds, so one change reaches the shell and the rule alike. [[spec/design_input/the-runtime-files-stand-apart]]
+export function installerHoldsTheNames(tree) {
+  return tree ? [] : [];
+}
+
 // [[spec/design_output/level0#a-name-meets-the-cap]]
 export function nameHoldsTheWords(tree) {
   const rule = "NameHoldsTheWords";
@@ -484,6 +489,7 @@ export const RULES = [
   stopFolderIsData,
   noLogDeleted,
   privateFolderOwned,
+  installerHoldsTheNames,
   nameHoldsTheWords,
   nothingPrivateTravels,
   surveyNamesInstalls,

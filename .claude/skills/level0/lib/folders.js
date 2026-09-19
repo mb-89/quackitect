@@ -32,6 +32,18 @@ export const MOVED = [
   "work.json",
 ];
 
+// The older names of the runtime folder, which the installer renames before anything else. [[spec/design_input/the-runtime-files-stand-apart]]
+export const RENAMED = ["run", "runtime"];
+
+// The older places of the log, which stands outside the half because the retro collects it. [[spec/design_input/the-runtime-files-stand-apart]]
+export const LOGGED = ["log", "run/log", "runtime/log", ".runtime/log"];
+
+// A name one side holds alone, with the side missing it and the reason. [[spec/design_input/the-runtime-files-stand-apart]]
+export const APART = {
+  "hold.json": { side: "rule", why: "the hold folder beside it carries the spelling" },
+  "registry.json": { side: "loop", why: "the home register moves in a block of its own" },
+};
+
 // [[spec/design_input/the-runtime-files-stand-apart]]
 export const HOLDS = `${RUN}/hold`;
 // The one file a hold stands in beside the folder, which an older box still writes. [[spec/design_output/pull#the-hand-and-the-hold]]

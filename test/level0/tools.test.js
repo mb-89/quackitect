@@ -7,6 +7,7 @@ import { test } from "node:test";
 import {
   guesses,
   installedTools,
+  loopNames,
   pathOf,
   rebuilt,
   placesFor,
@@ -212,4 +213,31 @@ test("a registered tool's line is the first sentence of its description", () => 
     "- `mcp__level0__find`: Finds the lines carrying the words.",
     "- `mcp__level0__mint_note`: Writes a note under its schema.",
   ]);
+});
+
+// The installer names the list each loop carries, so a rule reads the pair. [[spec/design_input/the-runtime-files-stand-apart]]
+test("the reader answers each loop under the list its marker names", () => {
+  const text = [
+    "# folders.js owns these names as RENAMED.",
+    'for one in "$root/.se/run" "$root/.se/runtime"; do',
+    "  mv $one $new",
+    "done",
+    "",
+    "# folders.js owns these names as MOVED.",
+    "for one in bin hold \\",
+    "  box.json; do",
+    "  mv $one $new",
+    "done",
+    "",
+    "for one in a b; do",
+    "  echo $one",
+    "done",
+    "",
+  ].join("\n");
+
+  const said = loopNames(text);
+
+  assert.deepEqual(said.RENAMED, ["run", "runtime"], "a path reads as its name");
+  assert.deepEqual(said.MOVED, ["bin", "hold", "box.json"], "a line carries over");
+  assert.deepEqual(said.unmarked, [12], "a loop naming no list comes back by its line");
 });
