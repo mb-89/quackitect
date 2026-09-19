@@ -89,7 +89,12 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: f47aad74858bba92290ad23b86b03f90612c29ee
+    hash_after: f47aad74858bba92290ad23b86b03f90612c29ee
 ---
 
 # Ask
@@ -114,6 +119,28 @@ Code lands with the test behind it or missing, and the live session finds the br
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+Three programs stand, one for each line the ask names:
+
+| what holds it | where it lands | what it reads |
+|---|---|---|
+| the commit door | `src/scripts/precommit.js` | the branch against trunk: a change under `src` wants a test in that delta |
+| a tree rule | `.claude/skills/level0/lib/tree.js` | every module under `src/bridge`, against the paths the tests import |
+| a fake's own guard | `src/doors/fake` | a call the fake lacks, which throws in place of answering nothing |
+
+The readings:
+
+- the delta spans the branch, so a test landing in an earlier commit counts as beside it
+- the rule reads a source file as a tracked `.js` under `src`, outside the fakes and outside a projection target
+- the import rule reads a test naming the module by path, so a door nobody drives comes back named
+- `behaves(fake, name)` wraps each fake in one place, and every door's fake takes it there
+
+A change carrying no test names why on one line of the commit message, and the
+door reads that line. So the record holds the exception, and a reader meets it
+where the change stands.
+
+Rule five of [[spec/guidance/code/testing]] is the rule these hold. So that line
+points at the check, and no reader holds the rule in memory.
 
 ## review
 
