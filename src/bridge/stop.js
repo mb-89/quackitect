@@ -265,23 +265,33 @@ export function standsDown(name, binding) {
   return String(binding) === GOD && ENGINE_CHECKS.includes(name);
 }
 
+// Every check this door answers, one a key. [[spec/design_output/stop#the-mechanical-checks]]
+const CHECKS = {
+  "stop-hook-off": (held) => held.off,
+  "owner-holds": (held) => held.hold === STOP,
+  "owner-finishes": (held) => held.hold === FINISH,
+  // An answer naming a next step takes no free stop, so the turn holds open where the agent says what it does next. [[spec/design_output/stop#the-chat-is-new]]
+  "chat-is-new": (held) => chatIsNew(held.box) && !namesNext(held.text),
+  "work-waiting": (held) => todosOf(held.box).standing(),
+  "group-in-hand": (held) => groupInHand(held.box),
+  "ticket-in-hand": (held) => holdStands(held.box) || privateStands(held.box),
+  "queue-waits": (held) => queueWaits(held.box),
+  "no-stop-line": (held) =>
+    !stopReasons(rulesOf(held.box)).some((one) => one.id === held.claimed),
+  // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud]]
+  "a-person-sits-here": (held) => !inCloud(held.box.env ?? process.env),
+  // [[spec/tickets/the-spawn-reaches-its-guidance]]
+  "warnings-standing": (held) => handWanted(held.box),
+};
+
+// [[spec/design_output/stop#the-mechanical-checks]]
+export function knowsCheck(name) {
+  return Object.hasOwn(CHECKS, String(name));
+}
+
 function ranHere(name, held) {
   if (standsDown(name, asks(held.box, BINDING))) return false;
-  if (name === "stop-hook-off") return held.off;
-  if (name === "owner-holds") return held.hold === STOP;
-  if (name === "owner-finishes") return held.hold === FINISH;
-  // An answer naming a next step takes no free stop, so the turn holds open where the agent says what it does next. [[spec/design_output/stop#the-chat-is-new]]
-  if (name === "chat-is-new") return chatIsNew(held.box) && !namesNext(held.text);
-  if (name === "work-waiting") return todosOf(held.box).standing();
-  if (name === "group-in-hand") return groupInHand(held.box);
-  if (name === "ticket-in-hand") return holdStands(held.box) || privateStands(held.box);
-  if (name === "queue-waits") return queueWaits(held.box);
-  if (name === "no-stop-line") return !stopReasons(rulesOf(held.box)).some((one) => one.id === held.claimed);
-  // A stop that ends a turn to ask somebody needs somebody sitting here. [[spec/guidance/cloud]]
-  if (name === "a-person-sits-here") return !inCloud(held.box.env ?? process.env);
-  // [[spec/tickets/the-spawn-reaches-its-guidance]]
-  if (name === "warnings-standing") return handWanted(held.box);
-  return undefined;
+  return CHECKS[name]?.(held);
 }
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]

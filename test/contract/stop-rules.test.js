@@ -7,7 +7,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { test } from "node:test";
 import { pool } from "../../.claude/skills/level0/lib/stop.js";
-import { ENGINE_CHECKS, standsDown } from "../../src/bridge/stop.js";
+import { ENGINE_CHECKS, knowsCheck, standsDown } from "../../src/bridge/stop.js";
 import { disk } from "../../src/doors/disk.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -41,20 +41,22 @@ test("the stop rule asks the blast radius, and the person test goes", () => {
   assert.match(said?.asks ?? "", /wrong answer/, "the question asks the cost");
 });
 
-// [[spec/design_output/config#the-engine-controls]]
-test("every check the shipped rules name stands in one list or the other", () => {
+// [[spec/design_output/stop#the-mechanical-checks]]
+test("the door answers every check the shipped rules name, and the gate names four", () => {
   const where = join(root, "spec", "config", "stop");
   const shipped = files
     .list(where)
     .filter((one) => one.name.endsWith(".yml"))
     .flatMap((one) => pool([{ name: one.name, text: files.read(join(where, one.name)) }]).rules)
     .map((one) => one.runs)
-    .filter(Boolean);
+    .filter((one) => one && one !== "never");
   assert.ok(shipped.length, "the rules name a check");
   for (const name of new Set(shipped)) {
-    assert.equal(typeof standsDown(name, "god"), "boolean", name);
+    assert.ok(knowsCheck(name), `the stop door answers ${name}`);
   }
+  assert.equal(knowsCheck("a-check-nobody-wrote"), false, "a name the door answers nowhere");
   for (const name of ENGINE_CHECKS) {
     assert.ok(shipped.includes(name), `${name} stands in the shipped rules`);
+    assert.equal(standsDown(name, "god"), true, name);
   }
 });
