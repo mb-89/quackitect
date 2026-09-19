@@ -48,7 +48,9 @@ import {
 } from "./review.js";
 import { answersFromIndex, FIND, findSpec, runsFind, warmIndex } from "./search.js";
 import {
+  BINDING,
   dropsHold,
+  GOD,
   holdsCall,
   onRefactorAnswered,
   onStop,
@@ -69,8 +71,6 @@ const TAKEOVER_PROBE = 2000;
 const TAKEOVER_PAUSE = 100;
 const TAKEOVER_TRIES = 50;
 const PASS = { pass: true };
-const GOD = "god";
-const BINDING = "engine.binding";
 
 const DOORS = {
   "session.start": opensSession,

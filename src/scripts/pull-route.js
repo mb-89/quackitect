@@ -23,6 +23,7 @@ import {
 import { agentOf, BOX, handOf, roleOf } from "./hand.js";
 
 export const HOLDS = OWNED_HOLDS;
+export const QUEUE = "queue";
 export const WORK = "work";
 export const REFUSED = "refused";
 export const WAIT = "wait";
@@ -69,6 +70,11 @@ export const VERBS = {
     "mint",
   ],
 };
+
+// [[spec/design_output/config#the-engine-controls]]
+export function handsOut(binding) {
+  return (String(binding ?? "").trim() || QUEUE) === QUEUE;
+}
 
 // [[spec/design_output/pull#a-need-is-a-verb]]
 export function holdsVerb(need, verbs = VERBS) {

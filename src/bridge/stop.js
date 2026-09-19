@@ -37,6 +37,9 @@ import { REPORT_CALL } from "./report.js";
 
 const ENABLED = "stop.enabled";
 const MOST = "stop.mostInARow";
+// [[spec/design_output/config#the-engine-controls]]
+export const BINDING = "engine.binding";
+export const GOD = "god";
 // The refactoring hand this door starts. [[spec/tickets/the-spawn-reaches-its-guidance]]
 const REFACTOR = {
   on: "refactor.parallel",
@@ -247,7 +250,21 @@ function lastLineReason(text) {
   return found ? found[1] : "";
 }
 
+// The checks reading the engine's own work. [[spec/design_output/config#the-engine-controls]]
+export const ENGINE_CHECKS = [
+  "ticket-in-hand",
+  "group-in-hand",
+  "work-waiting",
+  "warnings-standing",
+];
+
+// [[spec/design_output/config#the-engine-controls]]
+export function standsDown(name, binding) {
+  return String(binding) === GOD && ENGINE_CHECKS.includes(name);
+}
+
 function ranHere(name, held) {
+  if (standsDown(name, asks(held.box, BINDING))) return false;
   if (name === "stop-hook-off") return held.off;
   if (name === "owner-holds") return held.hold === STOP;
   if (name === "owner-finishes") return held.hold === FINISH;

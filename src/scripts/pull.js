@@ -41,6 +41,7 @@ import {
 } from "./pull-hand.js";
 import {
   DONE,
+  handsOut,
   leafOf,
   leavesOf,
   REFUSED,
@@ -121,6 +122,14 @@ export function pull(it, argv) {
   }
   if (!fetched(it, branch)) return 1;
   if (group && closedGroup(it, group)) return groupDone(group);
+  // The plain pull hands out at the queue alone. [[spec/design_output/config#the-engine-controls]]
+  if (!asking && !handsOut(it.binding)) {
+    say(WAIT, [
+      `this session binds to ${it.binding}, so the pull hands nothing out.`,
+      "Name a ticket to take one, or set engine.binding to queue.",
+    ]);
+    return 0;
+  }
   return handOut(it, who);
 }
 

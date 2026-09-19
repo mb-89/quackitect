@@ -10,7 +10,7 @@ import * as route from "../../src/scripts/pull-route.js";
 const { handsOut } = route;
 const { ENGINE_CHECKS, standsDown } = stop;
 
-// Every check the stop door answers, so a new one joins one list or the other.
+// Every check the stop door answers. [[spec/design_output/stop#the-mechanical-checks]]
 const EVERY = [
   "stop-hook-off",
   "owner-holds",
