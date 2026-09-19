@@ -200,7 +200,7 @@ export function boxOf(method, work = method, doors = {}) {
     clock: time,
     proc: outside,
     index: doors.index ?? index(files, outside, time, method, work),
-    vale: doors.vale ?? vale(files, outside, method),
+    vale: doors.vale ?? vale(files, outside, method, work),
     biome: doors.biome ?? biome(files, outside, method),
     log:
       doors.log ?? log(files, time, { folder: join(work, LOG_FOLDER), level: "debug" }),

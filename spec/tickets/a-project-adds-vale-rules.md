@@ -257,11 +257,17 @@ Findings, each one a fix for the hand at implement:
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the assembly, the config rewrite, the vale door, the server wiring it, and the cases
+- the disk door and the process door carry every reach, and the unit cases take their fakes
+- each module carries the pointer at the chapter under the vehicle note
 
 ## tests-green
 
