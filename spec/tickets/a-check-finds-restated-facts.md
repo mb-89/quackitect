@@ -89,7 +89,12 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: e2e77e89159f57d7cf228ad1a44cbd910c6959ea
+    hash_after: e2e77e89159f57d7cf228ad1a44cbd910c6959ea
 ---
 
 # Ask
@@ -114,6 +119,31 @@ A sentence counts its own table, a header retells its pointer, and the copies dr
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+One measure answers the three: the longest run of words two places share.
+
+| the finding | what it reads | what it draws on |
+|---|---|---|
+| `RestatedTable` | a paragraph touching a table, against the cells of that table | a shared run |
+| `RestatedPointer` | a heading, against the heading its pointer names | a shared run |
+| `RestatedRule` | a rule line, against every rule line of another guidance note | a longer shared run |
+
+The pieces:
+
+- `sharedRun(a, b)` in a module of its own answers the longest run two texts share
+- `restatedFaults(tree, bounds)` walks the notes and hands each pair to that one function
+- the lint calls it beside `treeFaults` in `src/scripts/cli-read.js`, so the verb names every place
+- each bound takes a name under `spec/config/level0.json`, so a reader moves it and touches no code
+
+The reader:
+
+- a pointer resolves through the slug the vocabulary note names, so it reads the heading a reader clicks
+- a code span, a link and a fence blank first, the way every script rule blanks them
+- a table row reads as cells, so a sentence matching one cell draws and a table matching itself draws nothing
+
+The rule lands at warning, and the implement step lists what it names over the
+tree. The ticket cleaning those places turns it to error. So this one leaves no
+fault standing behind a green check.
 
 ## review
 
