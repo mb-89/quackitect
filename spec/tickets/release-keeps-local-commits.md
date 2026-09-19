@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: design
@@ -140,6 +140,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box b99ea8ab11a8 · claude-code-remote · helper-9
+    hash_before: 90ce726ff840ce56a4c0908bae82303a70d31d48
+    hash_after: 90ce726ff840ce56a4c0908bae82303a70d31d48
+reason: done
 ---
 
 # Ask
@@ -328,20 +333,38 @@ The read stands written in `src/scripts/work-stands.js`, and this change carries
 ## read
 
 <!-- every file you read, one a line -->
-
 <!-- the form is files -->
+
+- spec/design_output/work.md
+- spec/tickets/a-return-asks-another-hand.md
+- spec/tickets/a-route-closes-answered-asks.md
+- spec/tickets/release-keeps-local-commits.md
+- src/scripts/work.js
+- src/scripts/work-stands.js
+- src/scripts/work-merge.js
+- test/level0/work.test.js
 
 ## verdict
 
 <!-- pass or fail, findings one a line -->
-
 <!-- the form is verdict -->
+
+pass
+
+- `take` hands `dirty` the branch it picks, and `release` hands the branch it names
+- both callers of `onBranch` stand behind that guard, so the reset keeps the work
+- a scratch copy dropping the guard line turns the new case red
+- the case asserts the exit, the count, the branch and the reset that runs nowhere
+- `./RUNME.sh check` answers 0
+- the ticket rename outside the ask cuts a name to the cap, and moves one pointer
+- the retro stands absent from the handback, and `branch done` writes it
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the count stands in `unpushed` alone, and [[spec/design_output/work#a-branch-moves-clean]] carries the verb table
 
 # Discussion
 
