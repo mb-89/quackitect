@@ -21,7 +21,7 @@ const DRAINED_INTO = "log";
 const SOURCE_WIDTH = 12;
 
 // [[spec/guidance/retro/collect]]
-export function collect(it, name) {
+export function collect(it, name, again = false) {
   if (!name) {
     console.error("retro collect names the retro it collects for:");
     console.error("  ./RUNME.sh retro collect <retro>");
@@ -39,7 +39,7 @@ export function collect(it, name) {
   const home = it.join(it.root, ...RETRO.split("/"), name);
   const into = it.join(home, INPUT);
   // A step names this verb as its evidence, and a gate runs that evidence again. So a second run answers what the first recorded, because the live session writes its log again the moment collect ends. [[spec/guidance/retro/collect]]
-  if (it.disk.exists(it.join(into, MANIFEST))) {
+  if (!again && it.disk.exists(it.join(into, MANIFEST))) {
     const record = parsed(read(it, it.join(home, COLLECTED)));
     // A count derives off the manifest, so no record carries one. [[spec/guidance/retro/collect]]
     const refusals = read(it, it.join(into, MANIFEST))
@@ -65,7 +65,8 @@ export function collect(it, name) {
   }
 
   // A torn run holds files it moves, so the next run carries on where it stops, and deletes nothing. [[spec/guidance/retro/collect]]
-  const since = sinceLast(it, name);
+  // A second pass takes what arrives past this retro's own collect, and merges it into the same input. [[spec/guidance/retro/collect]]
+  const since = again ? ownAt(it, home) || sinceLast(it, name) : sinceLast(it, name);
   it.disk.makeDir(into);
   const moved = movedInto(it, into);
   const outside = outsideInto(it, into, since);
@@ -97,7 +98,10 @@ function movedInto(it, into) {
     const was = it.join(from, one.name);
     const now = it.join(into, one.name === DRAINED ? DRAINED_INTO : one.name);
     try {
-      it.disk.move(was, now);
+      // A folder the input holds already takes the new files beside the old ones. [[spec/guidance/retro/collect]]
+      if (one.kind === "dir" && it.disk.exists(now))
+        throw Object.assign(new Error("stands"), { code: "EEXIST" });
+      it.disk.move(was, freeName(it, now));
     } catch (error) {
       // A folder an editor watches refuses the rename, and its files still move one at a time. [[spec/guidance/retro/collect]]
       if (
@@ -125,7 +129,7 @@ function fileByFile(it, was, now, path, out) {
     }
     try {
       it.disk.makeDir(now);
-      it.disk.move(from, to);
+      it.disk.move(from, freeName(it, to));
     } catch (error) {
       out.refused.push({ path: `${path}/${one.name}`, refused: reasonOf(error) });
       whole = false;
@@ -142,6 +146,24 @@ function batteryOf(it) {
   if (!said.green) return said;
   if (stamp.warned) return { green: false, says: "a warning stands in the check" };
   return said;
+}
+
+// A name the input holds already takes a number before its extension, so a second pass overwrites nothing. [[spec/guidance/retro/collect]]
+function freeName(it, at) {
+  if (!it.disk.exists(at)) return at;
+  const dot = at.lastIndexOf(".");
+  const cut =
+    dot > Math.max(at.lastIndexOf("/"), at.lastIndexOf("\\")) ? dot : at.length;
+  for (let n = 2; ; n++) {
+    const next = `${at.slice(0, cut)}.${n}${at.slice(cut)}`;
+    if (!it.disk.exists(next)) return next;
+  }
+}
+
+// When this retro's own collect ran, which opens the window of a second pass. [[spec/guidance/retro/collect]]
+function ownAt(it, home) {
+  const when = Date.parse(String(parsed(read(it, it.join(home, COLLECTED)))?.at ?? ""));
+  return Number.isFinite(when) ? when : 0;
 }
 
 function reasonOf(error) {

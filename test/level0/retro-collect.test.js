@@ -295,6 +295,25 @@ test("a second run answers the first, and a torn run carries on", () => {
   assert.equal(it.disk.exists(input("late.md")), true, "what stands since moves too");
 });
 
+// A second pass merges what arrives since, and overwrites nothing. [[spec/guidance/retro/collect]]
+test("a second pass merges what arrives since into the same input, and keeps both logs", () => {
+  const it = doors();
+  heard(() => retro(ROOT, ["collect", RETRO], it));
+
+  it.disk.write(at(".se/.log/one.jsonl"), '{"said":"a later line"}\n');
+  it.disk.write(at(".se/tickets/a-later-note.md"), "---\nkind: [[ticket]]\n---\n");
+  it.disk.write(at(".se/config.json"), "{}\n");
+  const again = heard(() => retro(ROOT, ["collect", RETRO, "--again"], it));
+
+  assert.equal(again.code, 0, again.said);
+  assert.equal(it.disk.read(input("log/one.jsonl")), '{"said":"a line"}\n');
+  assert.equal(it.disk.read(input("log/one.2.jsonl")), '{"said":"a later line"}\n');
+  assert.equal(it.disk.exists(input("tickets/a-note.md")), true);
+  assert.equal(it.disk.exists(input("tickets/a-later-note.md")), true);
+  assert.equal(it.disk.exists(input("config.json")), true);
+  assert.equal(it.disk.exists(at(".se/config.json")), false);
+});
+
 // A file the disk holds takes a line of its own, and the verb names what stays. [[spec/guidance/retro/collect]]
 test("a move the disk refuses takes a manifest line, and the verb answers one naming what stays", () => {
   const plain = doors();

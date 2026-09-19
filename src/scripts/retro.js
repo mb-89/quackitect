@@ -14,7 +14,7 @@ export function retro(root, argv, doors) {
   const what = argv[0];
   if (what === "notes") return notes(it);
   // [[spec/design_input/the-agent-pulls-tickets]]
-  if (what === "collect") return collect(it, argv[1]);
+  if (what === "collect") return collect(it, argv[1], argv.includes("--again"));
   // [[spec/design_input/the-agent-pulls-tickets]]
   if (what === "new") return newRetro(it, argv);
   // [[spec/design_input/the-agent-pulls-tickets]]
@@ -24,7 +24,7 @@ export function retro(root, argv, doors) {
     "  notes            the private notes still open on this box, and 0 when none stands",
   );
   console.log(
-    "  collect <ticket> copies this box into the retro's folder, and writes its manifest",
+    "  collect <ticket> copies this box into the retro's folder, and writes its manifest; --again merges what arrived since",
   );
   console.log(
     "  new              mints a retro off its route, opens it, and hands out its first leaf",
