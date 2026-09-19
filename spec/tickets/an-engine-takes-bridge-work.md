@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -111,6 +111,10 @@ record:
     hash_after: dde7a5fa787dfe812b8bf52673a72657f58866a6
     returns: 2
     why: "The rule, the four moves, the projection cut and the swap cost hold, and three claims miss the code.; `guidance-` serves `branch guidance`, which `src/scripts/work.js` wires as a row of the branch verb.; Correct that row, because the group table names `standing` today.; `freshens` and the session start call `projectionsHere` and `sourcesOf`.; `ownerDoor` and `marksStale` read the `box.projections` and `box.sources` fields alone.; Correct the caller column of the projection cut table to match those two lines.; `hand.js`, `stand.js` and `trust.js` stand outside the five groups and the verb table.; `spawn.js`, `unblock.js`, `editor.js` and `process.js` stand outside both as well.; Sort each of those, because the third ask line covers every file under `src/scripts`.; Name the folder taking `queue.js`, `group.js` and `landed.js`, which the mover table leaves open.; **What holds.**; `./RUNME.sh check` exits 0 on this branch, and `./RUNME.sh branch review` exits 0 with the check passing.; `status.js` and `tense.js` export readers alone, which matches the engine rule.; `goModulesIn` lists dirs one level under `src`, and `goModulesOf` matches one level by regex.; `src/bridge/write.js` runs `ownerDoor` as a check and `marksStale` after a write, as the cut table says.; `src/bridge/server.js` runs `freshens` inside `decide`, so the bridge keeps it.; The draft names the open second line of the ask, and leaves the door cut to a later ticket.; The two draft commits touch the ticket file alone, which leaves rules and tests to implement.; A retro stands absent from the handback, which suits a ticket at design review.; **What the last verdict asks.**; The draft answers the finding on `ownerDoor`, `marksStale` and `freshens`.; The draft answers where those two land: both stay in the bridge.; The draft answers the finding naming the `retro-`, `work-` and `guidance-` groups.; The draft answers the finding sorting `queue.js`, `group.js` and `landed.js`.; The draft answers the finding giving `goModulesOf` a disk handle.; The third ask line stands open, because the draft reaches three files of many."
+  - step: design/draft
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: f42ec376c5f0a1d33c5f0257736add0597a3a8bb
+    hash_after: 0b9bf9d00059a57c9b38deb8dbb3c5a98f385a08
 ---
 
 # Ask
