@@ -493,11 +493,15 @@ takes the module off the folder holding `go.mod`.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -505,11 +509,36 @@ takes the module off the folder holding `go.mod`.
 
 <!-- the form is text -->
 
+A file stands in the folder its work belongs to, so a reader looks in one
+place for it.
+
+| the folder | what it holds now |
+|---|---|
+| `src/engine` | the status shape, the tense reader, the swap module, the projection's readers, the group reader, the tool survey |
+| `src/bridge` | the doors, and the three projection exports an event runs |
+| `src/scripts` | a file a verb serves, and its name says the verb |
+
+The projection cuts in two. `ownerDoor`, `marksStale` and `freshens` stay in
+the bridge, and each reads the fields a session start fills. The two readers
+filling them stand under the engine.
+
+The swap move carries three things with it. The two modules naming swap under
+`replace` point at `../engine/swap`. `goModulesIn` walks a folder below `src`,
+and `goModulesOf` takes a handle and reads the folder holding `go.mod`.
+
+`reload.js` watches `src/engine`, so a fix there restarts the server the way a
+fix in the bridge does. The branch test answers `green, src/engine/swap
+passes`, which reads the two module readers end to end.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change reaches the folders and files the approach names, and the notes naming their paths
+- the two Go module readers meet the fake disk, so the cases walk no tree
+- a comment over each reader points at this ticket, and each moved file keeps its own header
 
 # verdict
 
