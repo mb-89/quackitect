@@ -89,7 +89,12 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 110e6960d7e56b40cc1b1106e1432715bd5bd0f3
+    hash_after: 135d102b2930583c69c9220e94820e065701c0ce
 ---
 
 # Ask
