@@ -2,7 +2,7 @@
 kind: [[ticket]]
 state: open
 urgent: true
-step: design/person-1
+step: design/draft
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -121,6 +121,10 @@ record:
     hash_after: a5eaededdfba7305152b8bec5f240d31067e48d8
     returns: 2
     why: Two findings of the last review stand open, and two new faults join them.; The count drift goes. The draft names `grep -rl mcp__level0` and carries a count nowhere.; The reader rows read true. `stop.js` reads `spec/config/stop`, and `vale.js` reads `spec/config/styles`.; The shape claim reads true. `projection.js` holds `COMMANDS`, `PARAGRAPH` and `STYLE`.; The `brandOf` row reads true. `stub.js` hands it to `linkOf`, which writes the `vehicle.json` name.; The anchor stands, the slug table follows its own rule, and the lint reads the ticket clean.; One reader a folder reads other than the tree. `cli.js` reads three folders under `spec/config/styles`.; A projection writes `spec/config/styles/VoiceParagraph`, so ground the brand folder on another reason.; The marketplace hand stays unnamed. Say who writes `.claude-plugin/marketplace.json`, and when it runs.; `stub.js` writes the stub's own files, so the reader lands on the wrong hand.; The brand folder's reader carries two names, the build and the install script. Use one.; The copy road lets `src/extension/icon.svg` drift. Name what holds it in step with its source.
+  - step: design/person-1
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 9ec37964b86bf4ab2bcbee86f06a646ed2388179
+    hash_after: 9ec37964b86bf4ab2bcbee86f06a646ed2388179
 ---
 
 # Ask
