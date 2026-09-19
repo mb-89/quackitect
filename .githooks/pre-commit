@@ -1,7 +1,5 @@
 #!/usr/bin/env sh
-# The commit door for a person in a terminal. Git runs it, and the same check
-# the Bash door calls reads the same delta. install.sh points core.hooksPath
-# here, and doctor names the path it finds.
+# The commit door for a person in a terminal.
 # [[spec/design_output/private#two-doors-one-check]]
 set -eu
 here=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
