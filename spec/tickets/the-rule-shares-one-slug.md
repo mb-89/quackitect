@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: answer
@@ -42,6 +42,18 @@ record:
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: cfaf0627d9824c0a31ebcd50d63e961895f83819
     hash_after: cfaf0627d9824c0a31ebcd50d63e961895f83819
+  - step: do
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 31496d7f45e2841cce2c963fce15efd9e6402d3c
+    hash_after: 0527dbe1850d334ad9e96831d7f58b2c2cdf0239
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 4 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -150,11 +162,15 @@ What this hand weighs, and what it assumes:
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/vocabulary.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -162,11 +178,33 @@ What this hand weighs, and what it assumes:
 
 <!-- the form is text -->
 
+The slug takes a module of its own, and one source holds the cases it answers:
+
+| what moves | where it lands |
+|---|---|
+| the function | `.claude/skills/level0/lib/slug.js`, which the schema reader imports |
+| the cases | `spec/config/slug.yaml` |
+| the case driving the function over them | `test/contract/vocabulary.test.js` |
+| the chapter naming the moves | [[spec/design_output/vocabulary#the-slug-reads-one-source]] |
+
+The two shapes disagree on a quote. The schema reader answers
+`the-owner-s-prompt-comes-first`, and every pointer in the tree names
+`the-owners-prompt-comes-first`. The one that stands drops the quote, so the
+function takes that move. No schema header and no field key holds a quote, so
+the schema door reads what it read before.
+
+The other two places slug a config group into a name a person types, which is a
+rule of its own. They stand as they are, and the answer's table says why.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change follows the answer on one source, and the discussion says where it departs
+- the cleanup it reveals: the two shapes fold into one, and a note carries what the door refuses
+- each fact stands once: the cases own the rule, and the chapter names the moves
 
 # Discussion
 
@@ -177,3 +215,7 @@ What this hand weighs, and what it assumes:
   - The list names [[spec/design_input/a-stub-takes-its-vehicle]], whose heading `The stub's files` answers the anchor its pointer names.
   - Drop that note, because the slug that stands resolves it. Ten notes stay.
   - The check answers 0 on this commit.
+- The answer names a projection writing the cases into each tool chain. This change stops at the source both read.
+- A projected copy adds a shape and a stale check, and both suites read the tree already. So a drift fails in a suite.
+- The Go rule reads `spec/config/slug.yaml` the same way when it lands, and it carries its copy of the function.
+- The write door refuses a write to a design output whose other lines the tree lint passes. `.se/tickets` holds the note.
