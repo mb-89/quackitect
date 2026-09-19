@@ -89,7 +89,12 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 1cc2ba86c7674ef65392e0200cc8a6314772a7d7
+    hash_after: 1cc2ba86c7674ef65392e0200cc8a6314772a7d7
 ---
 
 # Ask
@@ -112,8 +117,26 @@ Each commit costs three rounds at the door, and every push on main meets a stale
 ### approach
 
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
-
 <!-- the form is text -->
+
+`./RUNME.sh commit` reads the message through the voice rules, lands it, runs the check, and pushes on green.
+
+| the step | what it runs | what it answers on red |
+|---|---|---|
+| the message | the prose rules `.claude/skills/level0/lib/vale.js` names | every finding at once, and no commit |
+| the commit | `landed` in `src/scripts/landed.js`, which stages and commits | what the pre-commit door says |
+| the check | `./RUNME.sh check`, which writes the stamp `runs.js` names | the check's own findings, and no push |
+| the push | git, which the pre-push door reads | what that door says |
+
+So the push door reads the stamp this run wrote, and a stale stamp stops no clean commit.
+
+- the message runs through the read a note runs through, so one wording holds both
+- nothing stages before the message reads clean, so a refused message leaves the tree standing
+- `landed` puts the file back where the pre-commit door refuses, so a refusal lands nothing
+
+The cases drive a message the rules refuse to the findings with no commit, and a clean one through to the push.
+
+[[spec/design_output/work#the-battery-answers-first]] takes the verb beside the door it feeds.
 
 ## review
 
