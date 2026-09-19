@@ -49,6 +49,8 @@ CREATE VIRTUAL TABLE IF NOT EXISTS line_text USING fts5 (path UNINDEXED, n UNIND
 
 const version = "2"
 
+const textSniffBytes = 8000
+
 var skipped = map[string]bool{
 	".git": true, "node_modules": true, ".claude-plugin": true,
 }
@@ -231,8 +233,8 @@ func lines(tx *sql.Tx, rel, text string) error {
 }
 
 func isText(b []byte) bool {
-	if len(b) > 8000 {
-		b = b[:8000]
+	if len(b) > textSniffBytes {
+		b = b[:textSniffBytes]
 	}
 	for _, one := range b {
 		if one == 0 {

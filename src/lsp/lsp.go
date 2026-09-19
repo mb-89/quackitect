@@ -22,6 +22,7 @@ const (
 	severityError   = 1
 	severityWarning = 2
 	driveColon      = 2
+	methodNotFound  = -32601
 )
 
 type message struct {
@@ -170,7 +171,7 @@ func (one *server) answers(id json.RawMessage, result any) {
 }
 
 func (one *server) fails(id json.RawMessage, why string) {
-	one.writes(message{JSONRPC: "2.0", ID: id, Error: &rpcError{Code: -32601, Message: why}})
+	one.writes(message{JSONRPC: "2.0", ID: id, Error: &rpcError{Code: methodNotFound, Message: why}})
 }
 
 func (one *server) says(method string, params any) {

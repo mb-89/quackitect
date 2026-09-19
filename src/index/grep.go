@@ -9,6 +9,11 @@ import (
 	"strings"
 )
 
+const (
+	grepFileLimit = 200
+	globPathLimit = 500
+)
+
 type GrepAsk struct {
 	Pattern     string `json:"pattern"`
 	Path        string `json:"path"`
@@ -70,7 +75,7 @@ func Grep(db *sql.DB, ask GrepAsk) (GrepSaid, error) {
 
 	limit := ask.Limit
 	if limit <= 0 {
-		limit = 200
+		limit = grepFileLimit
 	}
 	skipped := 0
 	for rows.Next() {
@@ -190,7 +195,7 @@ func Glob(db *sql.DB, ask GlobAsk) (GlobSaid, error) {
 
 	limit := ask.Limit
 	if limit <= 0 {
-		limit = 500
+		limit = globPathLimit
 	}
 	for rows.Next() {
 		var path string

@@ -15,6 +15,11 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+const (
+	leastFrameWidth  = 20
+	leastFrameHeight = 3
+)
+
 func main() {
 	frame := flag.Bool("frame", false, "draw the window once, print it, and exit")
 	size := flag.String("size", "120x40", "with --frame: the window, as WxH")
@@ -135,11 +140,11 @@ func ParseSize(said string) (int, int, error) {
 		return 0, 0, fmt.Errorf("a size reads WxH, as in 120x40: %q", said)
 	}
 	w, err := strconv.Atoi(strings.TrimSpace(wide))
-	if err != nil || w < 20 {
+	if err != nil || w < leastFrameWidth {
 		return 0, 0, fmt.Errorf("the width is a number of 20 or more: %q", wide)
 	}
 	h, err := strconv.Atoi(strings.TrimSpace(high))
-	if err != nil || h < 3 {
+	if err != nil || h < leastFrameHeight {
 		return 0, 0, fmt.Errorf("the height is a number of 3 or more: %q", high)
 	}
 	return w, h, nil

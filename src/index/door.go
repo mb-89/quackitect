@@ -19,6 +19,13 @@ import (
 	"github.com/fsnotify/fsnotify"
 )
 
+const (
+	headerReadTimeout = 5 * time.Second
+	burstSettleDelay  = 200 * time.Millisecond
+	decimalBase       = 10
+	stopGraceDelay    = 100 * time.Millisecond
+)
+
 type Standing struct {
 	Port  int    `json:"port"`
 	Pid   int    `json:"pid"`
@@ -69,7 +76,7 @@ func Serve(root, at string) (func(), net.Listener, error) {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", one.took)
-	server := &http.Server{Handler: mux, ReadHeaderTimeout: 5 * time.Second}
+	server := &http.Server{Handler: mux, ReadHeaderTimeout: headerReadTimeout}
 
 	go one.sweeps()
 	go server.Serve(listen)
@@ -115,7 +122,7 @@ func (one *door) Touched() {
 
 func (one *door) sweeps() {
 	for range one.dirty {
-		time.Sleep(200 * time.Millisecond) // the rest of a burst lands in this
+		time.Sleep(burstSettleDelay)
 		one.guard.Lock()
 		one.settles()
 		one.guard.Unlock()
@@ -205,12 +212,12 @@ func stampHere() string {
 	if err != nil {
 		return ""
 	}
-	return said.ModTime().UTC().Format(time.RFC3339Nano) + ":" + strconv.FormatInt(said.Size(), 10)
+	return said.ModTime().UTC().Format(time.RFC3339Nano) + ":" + strconv.FormatInt(said.Size(), decimalBase)
 }
 
 // [[spec/design_output/index#a-door-comes-back]]
 func stopsSoon(root string) {
-	time.Sleep(100 * time.Millisecond)
+	time.Sleep(stopGraceDelay)
 	os.Remove(standingPath(root))
 	os.Exit(0)
 }

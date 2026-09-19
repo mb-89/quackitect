@@ -19,6 +19,14 @@ import (
 	"quackitect/swap"
 )
 
+const (
+	reachTries         = 3
+	postTimeout        = 30 * time.Second
+	callArgsWithParams = 3
+	startPolls         = 300
+	startPollPause     = 100 * time.Millisecond
+)
+
 func main() {
 	argv := os.Args[1:]
 	if len(argv) == 0 {
@@ -88,7 +96,7 @@ func asks(root string, argv []string) int {
 
 // [[spec/design_output/index#a-door-comes-back]]
 func reaches(root string, argv []string) (answer, error) {
-	for try := 0; try < 3; try++ {
+	for try := 0; try < reachTries; try++ {
 		standing, err := standingOf(root)
 		if err == nil && stands(standing, root) {
 			said, err := posts(standing, argv)
@@ -138,7 +146,7 @@ func posts(standing Standing, argv []string) (answer, error) {
 		return answer{}, err
 	}
 
-	client := &http.Client{Timeout: 30 * time.Second}
+	client := &http.Client{Timeout: postTimeout}
 	said, err := client.Post(
 		fmt.Sprintf("http://127.0.0.1:%d/", standing.Port), "application/json", bytes.NewReader(body))
 	if err != nil {
@@ -155,7 +163,7 @@ func asked(argv []string) (string, json.RawMessage) {
 		if len(argv) < 2 {
 			return "", json.RawMessage("{}")
 		}
-		if len(argv) < 3 {
+		if len(argv) < callArgsWithParams {
 			return argv[1], json.RawMessage("{}")
 		}
 		return argv[1], json.RawMessage(argv[2])
@@ -198,11 +206,11 @@ func starts(root string) error {
 	}
 	go one.Wait()
 
-	for waited := 0; waited < 300; waited++ {
+	for waited := 0; waited < startPolls; waited++ {
 		if _, err := standingOf(root); err == nil {
 			return nil
 		}
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(startPollPause)
 	}
 	return errorOf("the door took longer than thirty seconds to stand")
 }

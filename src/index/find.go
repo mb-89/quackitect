@@ -8,6 +8,13 @@ import (
 	"strings"
 )
 
+const (
+	findLimit      = 50
+	notesLimit     = 20
+	noteNameWeight = 10.0
+	noteBodyWeight = 1.0
+)
+
 type Hit struct {
 	Path  string  `json:"path"`
 	Line  int     `json:"line"`
@@ -27,7 +34,7 @@ func Find(db *sql.DB, words string, limit int) ([]Hit, error) {
 		return []Hit{}, nil
 	}
 	if limit <= 0 {
-		limit = 50
+		limit = findLimit
 	}
 
 	rows, err := db.Query(
@@ -55,12 +62,12 @@ func Notes(db *sql.DB, words string, limit int) ([]Hit, error) {
 		return []Hit{}, nil
 	}
 	if limit <= 0 {
-		limit = 20
+		limit = notesLimit
 	}
 
 	rows, err := db.Query(
-		`SELECT path, 0, id, -bm25(note_text, 10.0, 1.0) FROM note_text
-		 WHERE note_text MATCH ? ORDER BY rank LIMIT ?`, words, limit)
+		`SELECT path, 0, id, -bm25(note_text, 0, ?, ?) AS score FROM note_text
+		 WHERE note_text MATCH ? ORDER BY score DESC LIMIT ?`, noteNameWeight, noteBodyWeight, words, limit)
 	if err != nil {
 		return nil, err
 	}

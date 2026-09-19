@@ -6,8 +6,13 @@ package main
 
 import "strings"
 
+const (
+	leastWrapWidth = 8
+	leastHangRoom  = 8
+)
+
 func Wrap(said string, width int) string {
-	width = max(width, 8)
+	width = max(width, leastWrapWidth)
 	var out []string
 	for _, line := range strings.Split(said, "\n") {
 		out = append(out, wrapLine(line, width, hang(line))...)
@@ -31,7 +36,7 @@ func wrapLine(line string, width int, indent string) []string {
 	if len([]rune(line)) <= width {
 		return []string{line}
 	}
-	if len(indent) > width-8 {
+	if len(indent) > width-leastHangRoom {
 		indent = ""
 	}
 	var out []string

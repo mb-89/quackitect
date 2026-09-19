@@ -28,6 +28,13 @@ const (
 	headWide  = 2
 	footWide  = 2
 	namesWide = 1
+	lineGaps  = 3
+
+	firstPaneWidth  = 40
+	firstPaneHeight = 10
+	leastPaneWidth  = 10
+	leastInputWidth = 10
+	listExtraShare  = 10
 	// [[spec/design_output/viewer#one-key-filters-the-line]]
 	talkFilter = "kind: /^(prompt|reply)$/"
 )
@@ -84,7 +91,7 @@ func newModel(path string, zone *time.Location) model {
 		follow: true,
 		floor:  "info",
 		sortAt: sortNone,
-		box:    viewport.New(40, 10),
+		box:    viewport.New(firstPaneWidth, firstPaneHeight),
 		input:  input,
 		tailer: newTailer(path),
 	}
@@ -104,7 +111,7 @@ func (m model) listWidth() int {
 	if m.pane == paneShut {
 		return m.w
 	}
-	return m.w/2 + m.w/10
+	return m.w/2 + m.w/listExtraShare
 }
 
 func (m model) at() int {
@@ -175,9 +182,9 @@ func (m *model) moveTo(p int) {
 }
 
 func (m *model) resize() {
-	m.box.Width = max(10, m.w-m.listWidth()-2)
+	m.box.Width = max(leastPaneWidth, m.w-m.listWidth()-2)
 	m.box.Height = m.body()
-	m.input.Width = max(10, m.box.Width-len(m.input.Prompt)-2)
+	m.input.Width = max(leastInputWidth, m.box.Width-len(m.input.Prompt)-2)
 	m.shown = ""
 	at := m.box.YOffset
 	m.loadPane()
@@ -461,7 +468,7 @@ func (m model) renderRow(r Record, selected bool, w int) string {
 	if level == "" {
 		level = "info"
 	}
-	room := max(1, w-2-stampWide-levelWide-kindWide-3)
+	room := max(1, w-2-stampWide-levelWide-kindWide-lineGaps)
 	stamp := pad(r.Stamp(m.zone), stampWide)
 	said := pad(cut(oneLine(r.Said), room), room)
 

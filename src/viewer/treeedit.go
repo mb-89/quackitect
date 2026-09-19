@@ -16,6 +16,8 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+const leastEditWidth = 4
+
 // [[spec/design_output/tree-view#the-completion-knows-the-field]]
 type Schema interface {
 	Takes(key string) []string
@@ -40,7 +42,7 @@ func (t *Tree) Open(col int) bool {
 	was := valueOf(held.item, key)
 	line := textinput.New()
 	line.Prompt = ""
-	line.Width = max(4, roomFor(t.Cols[col]))
+	line.Width = max(leastEditWidth, roomFor(t.Cols[col]))
 	line.Cursor.SetMode(cursor.CursorStatic)
 	line.SetValue(was)
 	line.CursorEnd()

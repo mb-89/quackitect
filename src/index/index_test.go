@@ -110,6 +110,22 @@ func TestAWordStandingInAPrivateNoteAloneComesBackFromAFind(t *testing.T) {
 	}
 }
 
+// [[spec/design_output/index#the-rank-is-bm25]]
+func TestANoteNamingTheWordOutranksOneSayingItInItsBody(t *testing.T) {
+	root := t.TempDir()
+	write(t, root, "spec/said.md", "---\nid: said\n---\n\nquince quince quince quince, a body full of it.\n")
+	write(t, root, "spec/quince.md", "---\nid: quince\n---\n\nA note about something else.\n")
+	db := opened(t, root)
+
+	rows, err := Notes(db, "quince", 10)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(rows) != 2 || rows[0].Path != "spec/quince.md" {
+		t.Fatalf("the name ranks under the body: %+v", rows)
+	}
+}
+
 func TestANoteCarriesItsFrontmatter(t *testing.T) {
 	root := tree(t)
 	db := opened(t, root)
