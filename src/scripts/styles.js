@@ -23,7 +23,7 @@ export function assemble(files, pair) {
   }));
   const configs = [join(pair.method, CONFIG), join(pair.work, CONFIG)];
   // A hand editing a rule reads the edit on the next lint, and waits for no restart. [[spec/design_output/vehicle#the-styles-assemble-once]]
-  if (!newer(files, held, configs, at)) return { config, wrote: 0 };
+  if (!moved(files, held, configs, { at, into })) return { config, wrote: 0 };
 
   files.remove(into);
   let wrote = 0;
@@ -46,19 +46,25 @@ function copied(files, from, into, name) {
   return 1;
 }
 
-// The assembly stands where every source reads older than what it wrote. [[spec/design_output/vehicle#the-styles-assemble-once]]
-function newer(files, held, configs, at) {
-  const stood = modifiedOf(files, at);
+// The derived folder is the record of what the assembly writes, so a name added, changed or dropped turns the copy over. [[spec/design_output/vehicle#the-styles-assemble-once]]
+function moved(files, held, configs, where) {
+  const stood = modifiedOf(files, where.at);
   if (!stood) return true;
-  for (const one of configs) {
-    if (modifiedOf(files, one) > stood) return true;
-  }
+  if (configs.some((one) => modifiedOf(files, one) > stood)) return true;
+  if (!same(held, walked(files, join(where.into, HERE)))) return true;
   for (const one of held) {
     for (const name of one.names) {
       if (modifiedOf(files, join(one.from, ...name.split("/"))) > stood) return true;
     }
   }
   return false;
+}
+
+// A source going away moves no time, so the two sets of names answer the drop. [[spec/design_output/vehicle#the-styles-assemble-once]]
+function same(held, written) {
+  const wanted = new Set(held.flatMap((one) => one.names));
+  const stands = new Set(written);
+  return wanted.size === stands.size && [...wanted].every((one) => stands.has(one));
 }
 
 function walked(files, from) {

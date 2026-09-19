@@ -89,6 +89,24 @@ test("a tree driving itself assembles nothing, and reads its own config", () => 
   assert.equal(files.exists(at(METHOD, INTO)), false, "the assembly writes nothing");
 });
 
+// A rule nobody holds refuses no write, so the copy goes where its source goes. [[spec/design_output/vehicle#the-styles-assemble-once]]
+test("a file a root drops goes from the folder the assembly writes", () => {
+  const files = tree({
+    [at(WORK, `${STYLES}/VoiceProject/Ours.yml`)]: "the project's rule",
+  });
+  assemble(files, PAIR);
+
+  files.remove(at(WORK, `${STYLES}/VoiceProject/Ours.yml`));
+  const said = assemble(files, PAIR);
+
+  assert.equal(
+    files.exists(at(WORK, `${INTO}/styles/VoiceProject/Ours.yml`)),
+    false,
+    "the copy goes with its source",
+  );
+  assert.equal(said.wrote, 2, "what stands writes again");
+});
+
 // A hand editing a rule reads the edit on the next lint, and waits for no restart. [[spec/design_output/vehicle#the-styles-assemble-once]]
 test("a style file written after the assembly lands on the next call", () => {
   const files = tree();
