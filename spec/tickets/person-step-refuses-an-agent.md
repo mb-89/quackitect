@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-person-step-holds
-step: implement/tests-red
+step: implement/change
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -101,6 +101,17 @@ record:
     hand: box ca870d4f20f4 · claude-code-remote · helper-2
     hash_before: 003a26300982a422dc0386133689d824f5667990
     hash_after: 003a26300982a422dc0386133689d824f5667990
+  - step: implement/tests-red
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: 513c776461ea73093e2d823dd7f8ca3ffc3165b1
+    hash_after: 513c776461ea73093e2d823dd7f8ca3ffc3165b1
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -177,19 +188,36 @@ pass
 
 ### tests
 
-<!-- the same tests pass -->
+    ./RUNME.sh branch test
 
 <!-- the form is command -->
 
 ### seen
 
-<!-- what you see, and what surprises you -->
+Four tests stand in `test/level0/pull-person.test.js`, and two of them run red.
+
+| the test | where it stands |
+|---|---|
+| an agent hand-back on a person's step names the step | green, because `handFaults` already refuses it |
+| a hand off a harness carries the git author name | red, because `handOf` answers the role alone |
+| `work.personSigns` refuses an unsigned tip | red, because no key and no signature read stand |
+| a signed tip passes, and an agent reads no signature | green, and it turns real once the door lands |
+
+The first bullet of the ask surprises a reader, and the review leaf names it.
+
+- the refusal stands today, so this leaf writes its test and the change writes no code for it
+- the hand-out stops an agent before the hand-back, so the test drives `handFaults` where the pull reaches it nowhere
+- the refusal sits in `handFaults` under `pull-chapter.js`, and the ask's table names `pull.js`
+
+A person's name enters through `handOf`, which feeds the hold's file name and the record's hand alike. So the change splits the two, and the record takes a role the name comes off.
 
 <!-- the form is text -->
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the ask names one file, and the refusal and the signature read stand where the review leaf says
+- the cases drive the fake git beside them, and the signature read lands on that door
+- each test names the claim it makes, and the file points at the hand-rule chapter
 
 <!-- the form is checklist -->
 
