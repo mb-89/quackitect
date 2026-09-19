@@ -89,7 +89,12 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 564e3972dc6f22df3e7e66a00bc755f63d2342f7
+    hash_after: 564e3972dc6f22df3e7e66a00bc755f63d2342f7
 ---
 
 # Ask
@@ -111,9 +116,46 @@ The viewer, the stub and the tree keep names from an older shape, and each renam
 
 ### approach
 
-<!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
+One verb renames, and the two standing names ride it. So the verb carries its
+own proof, and the next rename costs one command.
 
-<!-- the form is text -->
+| what changes | how |
+|---|---|
+| `./RUNME.sh rename <from> <to>` | moves a path, and rewrites every reach the index answers |
+| `src/index` | answers the reaches of a path, beside the note links it answers today |
+| `src/viewer` | becomes `src/tui`, with a package per tab under it |
+| `stub.js` | writes the project's own name where it writes `project` today |
+| [[spec/design_output/tree]] | says what the verb reaches, and what it leaves alone |
+
+The verb works in three moves:
+
+| the move | what it does |
+|---|---|
+| read | asks the index every file reaching the old name |
+| write | moves the path, then rewrites each reach the read answers |
+| prove | runs `./RUNME.sh links`, which names no stale pointer |
+
+The index holds the reaches already. `src/index/door.go` answers `links` and
+`dangling` over a note, and a path takes the same road. So the verb asks one
+door, and no sweep of its own stands beside it.
+
+Go binds a package to a folder, so a folder per tab parts one package into
+several. A name crossing a folder edge takes a capital, and the rest stay
+lowercase inside their tab. That cost buys a reader who opens one tab.
+
+| the folder | what it holds |
+|---|---|
+| `src/tui` | the frame, the keys, the help and the footer |
+| `src/tui/log` | the log tab |
+| `src/tui/work` | the work tab |
+| `src/tui/tree` | the tree view every tab after the log draws |
+
+`stubInto` writes its folders under a literal `project` today. Each takes the
+stub folder's own name instead, so a reader opening a stub reads the project
+it names.
+
+The verb lands first, and the two renames run through it. A rename a hand makes
+by sweep proves nothing about the verb.
 
 ## review
 
