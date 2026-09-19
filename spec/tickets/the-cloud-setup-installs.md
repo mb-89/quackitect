@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 depends_on:
   - the-runtime-folder-holds-state
@@ -30,6 +30,19 @@ group: the-bridge-keeps-transport
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 step: do
+record:
+  - step: do
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 5513cd94dc5d37835ea9872cbc5db023abc3259d
+    hash_after: df65bbd03b6089066c35af762101367271c4aec5
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 6 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
