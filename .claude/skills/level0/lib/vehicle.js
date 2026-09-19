@@ -141,10 +141,14 @@ export const KEEP = ".gitkeep";
 export const STUB_FOLDERS = ["project/spec/tickets", "project/spec/guidance", "project/src"];
 
 // [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
-export function brandOf(method) {
+export function folderOf(method) {
   const parts = slashed(method).replace(/\/+$/, "").split("/");
-  const last = parts[parts.length - 1] ?? "";
-  return last
+  return parts[parts.length - 1] ?? "";
+}
+
+// [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+export function brandOf(method) {
+  return folderOf(method)
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
@@ -152,9 +156,7 @@ export function brandOf(method) {
 
 // [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 export function emptyBrand(method) {
-  const parts = slashed(method).replace(/\/+$/, "").split("/");
-  const last = parts[parts.length - 1] ?? "";
-  return `${last} carries no letter and no digit, so it slugs to an empty brand. Rename the folder to one a marketplace takes, or move the vehicle into one.`;
+  return `${folderOf(method)} carries no letter and no digit, so it slugs to an empty brand. Rename the folder to one a marketplace takes, or move the vehicle into one.`;
 }
 
 // [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
