@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 urgent: true
 steps:
   - name: design
@@ -159,6 +159,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 5387e4f82b24 · claude-code-remote · helper-11
+    hash_before: ed8a2c902f778f8db5bfa383930f30159a08e4ab
+    hash_after: ed8a2c902f778f8db5bfa383930f30159a08e4ab
+reason: done
 ---
 
 # Ask
@@ -401,16 +406,15 @@ the door alone.
 
     - .claude/skills/level0/lib/copilot-runtime.js
     - .claude/skills/level0/lib/vale.js
-    - .vale.ini
     - spec/design_output/vehicle.md
     - spec/guidance/review/reviewing.md
     - spec/tickets/a-project-adds-vale-rules.md
-    - spec/vocabulary/terms.yml
     - src/bridge/server.js
-    - src/doors/disk.js
-    - src/doors/fake/disk.js
     - src/doors/vale.js
+    - src/scripts/cli-check.js
     - src/scripts/copilot.js
+    - src/scripts/pull-chapter.js
+    - src/scripts/pull-writes.js
     - src/scripts/styles.js
     - test/contract/vale-paths.test.js
     - test/level0/styles.test.js
@@ -421,21 +425,20 @@ the door alone.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
 - The branch answers the ask: the assembly lands, and the door reads the config it writes.
+- A file a root drops leaves the derived folder, so the last finding meets its fix.
+- The two sets of names answer the drop, and a case over a fake root asserts it.
 - The diff touches the files the approach names, and the chapter under the vehicle note.
-- `./RUNME.sh check` answers `exit 0` on `b53b04f6`.
+- `./RUNME.sh check` answers `exit 0` on `ed8a2c90`.
 - Every rule the branch adds carries a case, and the contract case asserts a refusal.
 - The retro stands absent from the handback.
 
-Findings, each one a fix for the hand at implement:
+Two lines for the retro, and neither one holds the ask open:
 
-- A style file a root drops stays in the derived folder, so a rule nobody holds keeps refusing.
-- `newer` reads the time each source standing now holds, so a file going missing moves nothing.
-- Write the names the assembly reads beside the config, and assemble again where that list moves.
-- Add a case dropping a file from a fake root, and assert the copy goes.
-- The answer gate, the findings road and the copilot road read the method's config. A project rule stays silent there.
+- The copilot hook lints with the method's config, so a project rule stays silent there.
+- The chapter names the time test alone, and the comment beside the code names the drop.
 
 ## checked
 
@@ -443,7 +446,7 @@ Findings, each one a fix for the hand at implement:
 
 <!-- the form is checklist -->
 
-- The chapter under the vehicle note owns the assembly, and every module and case points at it. It names `spec/config/styles` again, and [[spec/design_output/level0]] holds that fact already.
+- The chapter under the vehicle note owns the assembly, and every module and case points at it. No fact the change adds stands twice in prose.
 
 # Discussion
 
