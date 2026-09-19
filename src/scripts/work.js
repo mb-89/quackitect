@@ -289,6 +289,8 @@ function take(it, name = "") {
   );
 
   const one = wanted[0];
+  // The reset under onBranch lands on the branch this take picks, so that branch meets the same read as the one the box stands on. [[spec/design_output/work#a-branch-moves-clean]]
+  if (dirty(it, one.branch)) return 2;
   if (!onBranch(it, one.branch)) return 1;
   if (one.brief) return claimBrief(it, one.branch);
   // A box with nothing at a step it can take leaves the group at todo, before it writes a line. [[spec/tickets/the-group-leaves-at-todo]]

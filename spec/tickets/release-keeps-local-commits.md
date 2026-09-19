@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -121,6 +121,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: 9229e2c930757d573e3d24e86f6e13fe0ea818c6
+    hash_after: 9229e2c930757d573e3d24e86f6e13fe0ea818c6
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -246,14 +254,18 @@ What surprises: the fake disk wants the brief at the root, because the take read
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh lint
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches the take and the chapter teaching the guard, which the ask names
+- the case drives `doorsSaying`, so git and the disk stand fake
+- the comment names the reset it guards, and points at [[spec/design_output/work#a-branch-moves-clean]]
 
 ## tests-green
 

@@ -341,6 +341,15 @@ box committing its work moves it into the reset's path.
 The guard reads a `work/` branch alone. Trunk takes a merge a desk pushes later,
 and `onBranch` resets no trunk.
 
+| the verb | what it hands the guard |
+|---|---|
+| `branch release` | the branch it names |
+| `branch take` | the branch it picks, once the sort names one |
+
+So each verb reads the branch the reset lands on, beside the branch the box
+stands on. The take reads twice, because it learns which branch it lands on
+after the first reading.
+
 # Trunk comes in first
 
 `branch sync` merges `origin/main` into the branch. `branch take` runs it, so a
