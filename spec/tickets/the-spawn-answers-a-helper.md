@@ -90,7 +90,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -122,6 +122,10 @@ record:
     hash_after: dffe1e5723e27b0b4f697ee5871a543751d8c390
     returns: 3
     why: "`branch done` refuses while `takeable` answers a path, so a parked leaf lets the box leave; the approach reads that backwards, saying a parked leaf holds the group open; `who.oneStep` carries a flag off `--as`, and carries no name; `handRule` takes no `who` at either call site, so name the argument it gains; the ticket door refuses a hand's write to a step chapter of a closed ticket; say which hand drops the count there, because a `Discussion` line leaves it standing; name the taker per road, because a spawn off `not:` admits a person too"
+  - step: design/draft
+    hand: box b99ea8ab11a8 · claude-code-remote
+    hash_before: a28e7874652cdbbff9e7787b127aed02bb6ed328
+    hash_after: a28e7874652cdbbff9e7787b127aed02bb6ed328
 ---
 
 # Ask
@@ -147,33 +151,34 @@ A leaf `by: helper` parks today. The spawn answer passes it, a hand under `--as`
 
 ### approach
 
-The gate reads one field, and each caller answers it for the road it stands on. The draft before this one reads wrong: `hand.agent` alone hands the leaf to the session, and no spawn fires.
+The gate reads one field, and each caller answers it for the road it stands on.
 
 | the answer | where it lands |
 |---|---|
 | the gate | `writesHere`, under `.claude/skills/level0/lib/ticket.js` |
-| the field | `handRule` in `src/scripts/pull-hand.js` |
+| the field | `handRule` in `src/scripts/pull-hand.js`, which gains an argument for it |
 | the spawn | `admits` in that same file |
-| the taker | the spawn row of [[spec/design_output/pull#a-hand-of-its-own]] |
+| the taker, per road | the spawn row of [[spec/design_output/pull#a-hand-of-its-own]] |
 | the case | `test/level0/pull.test.js` |
-| the count | the chapter of [[spec/tickets/the-spawn-takes-a-step]] naming it |
+| the count | the `Discussion` of [[spec/tickets/the-spawn-takes-a-step]] |
 
-The gate line reads `by: helper` and asks one question: does this hand take a helper leaf?
+The gate line reads `by: helper` and asks one question: does this hand take a helper leaf? `handRule` takes that answer as an argument, because neither call site reads it off `it`.
 
-| the caller | what fills the field | why |
+| the caller | what it hands in | what the box then does |
 |---|---|---|
-| `admits`, the pull's hand-out | the `--as` name, which `who.oneStep` carries | the spawned hand takes it, and no other |
-| `takeable`, which `branch done` reads | the harness on the box | the session spawns that hand, so the group closes |
+| `admits`, the pull's hand-out | the flag `who.oneStep` carries off `--as` | the spawned hand takes the leaf, and the session reads the spawn answer |
+| `takeable`, which `standsOpen` reads | the harness on the box | `branch done` refuses on a harness box, and leaves on one off it |
 
-So a helper leaf parks for the session, and `admits` answers `other` where the box carries a harness. `handOut` then prints the spawn prompt, as it does for a leaf the `not:` rule excludes.
+So a box carrying a harness holds the group until the helper lands, and a box off one leaves the group open behind it.
 
-- a box off a harness reads the leaf as parked, so `branch done` holds the group open
-- the spawn row names the helper alone, because a leaf under `by: helper` admits one taker
-- [[spec/tickets/the-spawn-takes-a-step]] names `admits` and `admits` under `--as`, and both answer here
+- `admits` answers `other` for a helper leaf on a harness box, so `handOut` prints the spawn prompt
+- the spawn row names a helper as the taker of a leaf under `by: helper`
+- the same row names a person or a helper for a leaf the `not:` rule excludes
+- the cases drive a group whose only open leaf reads `by: helper`, one box a side
 
-The cases drive one group whose only open leaf reads `by: helper`. A box off a harness reads the shell's own answer. A box carrying one reads `spawn`, the helper name and the prompt. A pull under `--as` takes the leaf.
+A box off a harness reads the shell's own answer. A box carrying one reads `spawn`, the helper name and the prompt. A pull under `--as` takes the leaf.
 
-The count in that closed ticket drops from its own chapter, because `spawnPrompt` answers it. A record carrying a stale number costs a reader a check. A `Discussion` line names the correction beside it.
+The count stands in a step chapter of a closed ticket, and the ticket door refuses a hand's write there. So the `Discussion` line carries the correction, and names `spawnPrompt` as what answers the count. A reader of that chapter alone still reads the stale number, which is what the door costs.
 
 ## review
 
