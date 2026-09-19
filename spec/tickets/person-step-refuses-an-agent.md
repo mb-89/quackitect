@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: soon
 group: the-person-step-holds
-step: verdict
+step: implement/reflect
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -131,6 +131,12 @@ record:
       - name: check
         exit: 0
         said: 87 stand at warning, which the panel draws and check allows.
+  - step: verdict
+    hand: box ca870d4f20f4 · claude-code-remote · helper-7
+    hash_before: 4b66a69fdb7666c9d4c08dc90ff8524648914ffb
+    hash_after: 4b66a69fdb7666c9d4c08dc90ff8524648914ffb
+    returns: 1
+    why: "`takeBack` weighs the record's role against the named hand, so a person's `--back` comes back refused; the fix stands in `src/scripts/pull.js`, where the hand-back check wants `roleOf(who.hand)`; the write one line under that check already takes `roleOf`, so the read alone trails it; the suite drives `--back` on a box hand alone, and runs green over this break; the three pieces of the ask otherwise land: the refusal, the git author name, the signing door; `signFaults` names the tip and takes `G` and `U`, which the hand-rule chapter owns; `signFaults` lets a private ticket by, and the tests drive the tracked path alone; `excludes` reads a hand as its role, which keeps the `not` rule on the record's words; the two generated command files follow the config key, and the schema carries its help line; the files past this ask come from the sibling tickets on this branch, and each stands under its own; `./RUNME.sh check` exits green on this tip"
 ---
 
 # Ask
@@ -325,19 +331,69 @@ The review leaf asks two things the change answers. The name enters at `handOf` 
 
 ## read
 
-<!-- every file you read, one a line -->
+- .claude/commands/se-config-work-personSigns-false.md
+- .claude/commands/se-config-work-personSigns-true.md
+- spec/config/level0.json
+- spec/config/level0.schema.json
+- spec/tickets/person-step-refuses-an-agent.md
+- src/doors/git.js
+- src/scripts/cli-doors.js
+- src/scripts/hand.js
+- src/scripts/pull-chapter.js
+- src/scripts/pull-hand.js
+- src/scripts/pull-route.js
+- src/scripts/pull-writes.js
+- src/scripts/pull.js
+- src/scripts/work.js
+- test/level0/hand.test.js
+- test/level0/pull-person.test.js
+- .claude/commands/se-config-work-failsBeforeWait.md
+- .claude/commands/se-config-work-refusalsBeforeFail.md
+- .claude/commands/se-config-work-refusalsBeforePerson.md
+- spec/config/styles/VoiceParagraph/Vocabulary.yml
+- spec/design_output/work.md
+- spec/tickets/escalate-inserts-a-person-step.md
+- spec/tickets/refusal-cap-inserts-no-person.md
+- spec/tickets/the-group-leaves-at-todo.md
+- spec/vocabulary/terms.yml
+- src/scripts/branch-usage.js
+- src/scripts/unblock.js
+- test/contract/pull-payload.test.js
+- test/level0/pull-escalate.test.js
+- test/level0/pull-leaves.test.js
+- test/level0/pull-steps.test.js
+- test/level0/work-group.test.js
+- spec/design_output/pull.md
+- src/doors/fake/git.js
+- src/scripts/group.js
+- src/scripts/guidance-hand.js
+- src/scripts/test-verb.js
+- test/level0/pull-doors.js
+- test/level0/pull.test.js
 
 <!-- the form is files -->
 
 ## verdict
 
-<!-- pass or fail, findings one a line -->
+fail
+
+- `takeBack` weighs the record's role against the named hand, so a person's `--back` comes back refused
+- the fix stands in `src/scripts/pull.js`, where the hand-back check wants `roleOf(who.hand)`
+- the write one line under that check already takes `roleOf`, so the read alone trails it
+- the suite drives `--back` on a box hand alone, and runs green over this break
+- the three pieces of the ask otherwise land: the refusal, the git author name, the signing door
+- `signFaults` names the tip and takes `G` and `U`, which the hand-rule chapter owns
+- `signFaults` lets a private ticket by, and the tests drive the tracked path alone
+- `excludes` reads a hand as its role, which keeps the `not` rule on the record's words
+- the two generated command files follow the config key, and the schema carries its help line
+- the files past this ask come from the sibling tickets on this branch, and each stands under its own
+- `./RUNME.sh check` exits green on this tip
 
 <!-- the form is verdict -->
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the hand-rule chapter owns the signing rule, and each new function points at it. The schema holds the key's help line, which the generated commands take.
 
 <!-- the form is checklist -->
 
