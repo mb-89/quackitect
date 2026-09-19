@@ -80,6 +80,11 @@ before the ticket system finish under the verbs they carry.
 two boxes reaching for one group means one of them meets a rejected push and
 takes the next.
 
+The take reads the group before it writes that entry, through the same line
+`branch done` reads. A group whose open children hold no step a hand can take
+stays at `todo`, and the take names the step each child waits at. So a cloud
+box stops here, on the branch, and the record keeps the shape it holds.
+
 The hand names the box and no person, because the ticket travels and
 `spec/guidance/private` binds what a tracked file carries. [[spec/guidance]]
 

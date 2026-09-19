@@ -3,7 +3,7 @@ kind: [[ticket]]
 state: open
 urgency: now
 group: the-person-step-holds
-step: implement/change
+step: implement/tests-green
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -111,6 +111,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box ca870d4f20f4 · claude-code-remote
+    hash_before: 3fc8e42576fb8130afb5dd490267a7ada656017a
+    hash_after: 3fc8e42576fb8130afb5dd490267a7ada656017a
+    answered:
+      - name: lint
+        exit: 0
+        said: 87 stand at warning, which the panel draws and check allows.
 ---
 
 # Ask
@@ -243,13 +251,15 @@ The same leaf asks why the form filter lands in the engine. The leaf names the f
 
 ### lint
 
-<!-- the tree builds and lints -->
+    ./RUNME.sh lint
 
 <!-- the form is command -->
 
 ### checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
+- the change reaches the pull, the take and the judge's material, and the notes owning their facts
+- the cases beside the change drive fake doors, and the change adds no door
+- each new function carries one line naming this ticket, which holds the approach
 
 <!-- the form is checklist -->
 

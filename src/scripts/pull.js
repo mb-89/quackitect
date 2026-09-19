@@ -156,9 +156,17 @@ export function judgeMaterial(it, held, name) {
   const text = it.disk.read(at);
   const leaf = leafOf(frontOf(text), held.step);
   const chapter = chapterOf(text, held.step);
+  // The judge reads prose, and the leaf names which fields hold a line a shell runs. [[spec/tickets/the-group-leaves-at-todo]]
+  const commands = new Set(
+    (leaf?.evidence ?? [])
+      .filter((field) => String(field.form) === "command")
+      .map((field) => String(field.name)),
+  );
   const evidence = [
     ...chapter.own,
-    ...[...chapter.fields].flatMap(([field, rows]) => [`${field}:`, ...rows]),
+    ...[...chapter.fields]
+      .filter(([field, rows]) => rows.length && !commands.has(field))
+      .flatMap(([field, rows]) => [`${field}:`, ...rows]),
   ].join("\n");
   const rules = (leaf?.reads ?? []).flatMap((path) =>
     actionables(guidanceText(it, path)),

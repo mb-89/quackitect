@@ -226,7 +226,7 @@ export function offer(it, who, one, all) {
       : dependsOn(one.front).filter((dep) => !closedHere(it, all, dep));
   if (open.length) return { why: `waits for ${open.join(", ")}` };
 
-  const moved = advanced(it, who, one, all);
+  const moved = advanced(it, one, all);
   if (moved.why) return { why: moved.why };
   if (!moved.leaf) return {};
   return admits(it, who, one, moved.leaf, all);
@@ -256,7 +256,7 @@ export function closedHere(it, all, dep) {
 }
 
 // [[spec/design_output/pull#a-condition-skips-a-leaf]]
-export function advanced(it, who, one, all) {
+export function advanced(it, one, all) {
   let text = one.text;
   let front = one.front;
   let path = String(front.step ?? "").trim() || (leavesOf(front)[0]?.path ?? "");
@@ -296,19 +296,8 @@ export function advanced(it, who, one, all) {
         });
         if (busy.length)
           return { why: `waits for ${busy.join(", ")}, which a hand can take` };
-        const left = entriesOf(front)
-          .filter((entry) => String(entry.step) === leaf.path)
-          .at(-1);
-        const again = left?.skipped && String(left.hand ?? "") === who.hand;
-        if (!leaf.leaves[leaf.at + 1] || again)
-          return { why: `waits for ${said.open.join(", ")}` };
-        text = withEntry(text, {
-          step: leaf.path,
-          hand: who.hand,
-          skipped: true,
-          why: `the box leaves it while ${said.open.join(", ")} stand open`,
-        });
-        changes.push(`leaves ${leaf.path}`);
+        // Every open child waits for a person, so the group stands here and hands no retro out. [[spec/tickets/the-group-leaves-at-todo]]
+        return { why: `waits for ${said.open.join(", ")}` };
       } else {
         text = withEntry(text, {
           step: leaf.path,

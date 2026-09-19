@@ -110,13 +110,14 @@ derives it at every hand-out:
 | the children say | the pull does |
 |---|---|
 | one closes `dropped` | writes a return on the step, and sends the group to its `on_fail` |
-| one stands open | writes `skipped` with the reason, and hands the group's next leaf out |
+| one stands open | waits, and names the child it waits for |
 | every one closes `done` or `became` | writes a pass by `the engine`, and moves on |
 
-The group's last leaf then checks the children again. One still open sends
-the step back to `children` and leaves the group open. So `branch done` names
-the child, and the group returns to the beat once a person answers on the
-branch.
+A group at `children` hands no leaf out while a child stands open. So a box
+with nothing at a step it can take writes no retro. The wait names the person
+step each child holds, and `branch done` leaves the group at `todo`. A child
+reopening past the `children` step sends the group's last leaf back there,
+which leaves the group open the same way.
 
 ## A condition skips a leaf
 
@@ -267,6 +268,11 @@ once over that, and a `breaks` answers `refused` before the shell runs. The
 judge run carries the `--fields` payload of the hand-back. The material lays
 the payload over the ticket before it reads the evidence, so the judge reads
 what the hand writes.
+
+The evidence holds the prose fields alone. The leaf names the form of each
+field it asks for. So the material leaves out a field whose form reads
+`command`, and a heading carrying no line. A chapter of commands hands the
+wrapper nothing, and the wrapper then skips the judge.
 
 ## The fields hold their forms
 

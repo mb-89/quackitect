@@ -386,40 +386,6 @@ test("a group whose open children all wait for a person stands at children, and 
 });
 
 // [[spec/design_output/pull#children-before-their-group]]
-test("the group's children step derives from its tickets, and the box leaves it while a child waits", () => {
-  const parked = CHILD("open", "design/review").replace(
-    "        not: draft\n",
-    "        by: person\n",
-  );
-  const { it, disk } = doors(
-    standing(parked, withField(GROUP_NOTE, "step", "children")),
-    {
-      sh: { exitCode: 0, stdout: "" },
-    },
-  );
-  const held = withEntry(parked, {
-    step: "design/draft",
-    hand: HAND,
-    hash_before: SHA,
-    hash_after: SHA,
-  });
-  disk.write(at("spec/tickets/a-child.md"), held);
-
-  const { code, said } = heard(() => work(ROOT, ["pull"], it));
-
-  assert.equal(code, 0);
-  assert.match(said, /^work {2}one-group at retro\/notes/);
-  const now = disk.read(at("spec/tickets/one-group.md"));
-  assert.equal(fieldOf(now, "step"), "retro/notes");
-  assert.deepEqual(recordIn(now).at(-1), {
-    step: "children",
-    hand: HAND,
-    skipped: true,
-    why: "the box leaves it while a-child stand open",
-  });
-});
-
-// [[spec/design_output/pull#children-before-their-group]]
 test("every child closed passes the children step by the engine, and a dropped child fails it back", () => {
   const shut = CHILD("closed", "implement/change", "reason: done\n");
   const done = doors(standing(shut, withField(GROUP_NOTE, "step", "children")));
