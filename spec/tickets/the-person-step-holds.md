@@ -80,6 +80,7 @@ record:
   - step: sync
     hand: box ca870d4f20f4 · claude-code-remote
     hash_before: ca22b75158abd573db00e1635f0bd8ea5b443cf4
+    hash_after: de80d05e3377cbeeeb752ccca8de75de96199be6
   - step: sync
     hand: box ca870d4f20f4 · claude-code-remote
     hash_before: 7be10ccbc18e3a191e1e22d82ee93e6776b4abc3
