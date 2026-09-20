@@ -89,7 +89,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: b13f91a700d1a75a30488b4049afbed27769dcef
+    hash_after: b13f91a700d1a75a30488b4049afbed27769dcef
 ---
 
 # Ask
@@ -120,6 +125,20 @@ it stands outside that branch's hunks.
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The stop door reads the `unknown` list the vote answers already, and writes one
+warn line a name.
+
+| the piece | what changes |
+|---|---|
+| `onStop` in `src/bridge/stop.js` | after the vote, writes `warn` under `stop` for each distinct name in `unknown`, naming the check and the rule file |
+| `decide` in the hook's `lib/stop.js` | stays as it is, because it carries the names out today |
+| the case | drives the door over the fake box with a rule whose `runs` names nothing, and asserts one warn line stands in the log |
+| the design output | stays as it is, because the sentence promising the line stands there already |
+
+The line stands in the log and nowhere in the block the door answers, because
+the owner reads the log for a rule at fault, and the agent reads the block for
+what to do next.
 
 ## review
 
