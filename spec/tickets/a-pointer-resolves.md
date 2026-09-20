@@ -89,7 +89,12 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
+record:
+  - step: design/draft
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: 066dd6d0948f12034dc3619fe1158243afcc856b
+    hash_after: 066dd6d0948f12034dc3619fe1158243afcc856b
 ---
 
 # Ask
@@ -121,6 +126,24 @@ the gate reaching every pointer waits here.
 <!-- the approach here where it takes minutes, or a link to the design output where it takes a note -->
 
 <!-- the form is text -->
+
+The gate is one tree rule of the language server, so the check, the panel and
+`se-lsp check` read it alike.
+
+| the question | the answer |
+|---|---|
+| where the gate stands | a tree rule in `src/lsp`, beside the restated rule, which reads anchors already |
+| what it reads | every path git holds: a note's frontmatter past `kind` and its body, and a comment line of any other text file |
+| what it skips | a code span, a fenced block, an indented block, and a target carrying `<` or `>` |
+| how a path resolves | the way the index resolves one: the exact path, then `.md`, `.yaml` and `.yml`, then a note's id, then a folder |
+| how a chapter resolves | the slug of a heading of the note, as `headingNamed` reads it |
+| what it answers | one error a dead pointer, naming the file and the line, so the check refuses it |
+| what the tree fixes | every pointer standing dead today, repointed at the chapter that moved or the note that renamed |
+
+The rule reads a comment line alone in a code file, because a pointer in a
+string literal is a fixture a test writes, and the tree holds such fixtures
+already. The design output for the server takes a chapter on this rule, and
+the table of tree rules takes a row.
 
 ## review
 
