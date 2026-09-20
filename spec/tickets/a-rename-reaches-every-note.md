@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -129,6 +129,17 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote · helper-8
     hash_before: 0643feab029aa69a514a65475935acd8cfeb18e0
     hash_after: 0643feab029aa69a514a65475935acd8cfeb18e0
+  - step: implement/tests-red
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: d6ffbc036ca58aea7fe97ec5e6ddc5e72c2409a4
+    hash_after: d6ffbc036ca58aea7fe97ec5e6ddc5e72c2409a4
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -235,20 +246,36 @@ The findings, one a line:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/rename.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The command answers assertion, and each case fails on its own assertion.
+
+| the case | what it holds open |
+|---|---|
+| a reach is a line naming the old name | `reachesIn` stands nowhere |
+| a rewrite leaves a longer word alone | `renamedText` stands nowhere |
+| the move carries the folder and rewrites each reach | `renaming` stands nowhere |
+| a name standing nowhere answers a fault | the same |
+
+The module has to stand before the cases read as assertions. A named import of a name nobody wrote breaks the whole file, and the door reads build over that. So the module ships with its header alone, and each case asks its name is a function first.
+
+The second case carries the part that surprises me. A rewrite over the bare word `viewer` reaches a word holding it, and a tree full of prose holds many. So the case feeds `view` against a text naming `viewer`, and asserts the text stands. The word edge is the rule the verb turns on.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. One case file, the module's header, and this ticket.
+- every door the change reaches has a fake. Each case drives the fake disk, and the move case hands its own git door.
+- a comment names the approach the change implements. The module's header names what a reach is, and each case points at this ticket.
 
 ## reflect
 
