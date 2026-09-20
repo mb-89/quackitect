@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: 9ba66489302a66beb6191050d36b1eb605d31e44
     returns: 1
     why: "the mint says nothing about a second refusal, so one file past the ceiling takes a ticket each time; say which hand runs the mint: the door itself, or the hand the refusal names; the journal's writer reads as a verb. Name `src/bridge/apply.js`, the batch edit behind the patch and replace tools; the flags table stands here and in the level0 note. Say which of the two owns it; the ask names `./RUNME.sh test`, and the approach names no case file the cut and the mint land in; `sizeFaults`, `FILE_RULE`, `journalOf` and the `trivial` process all stand, and the ceiling chapter takes the verb; `./RUNME.sh lint src test` answers clean, so the verb guards the next file and cuts none today"
+  - step: design/draft
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 3d23fed7b1fbe96664ed331b1035f7dd38f599bb
+    hash_after: 3d23fed7b1fbe96664ed331b1035f7dd38f599bb
 ---
 
 # Ask
@@ -136,7 +140,8 @@ Every write to a long file meets a refusal, and hands squeeze lines to get past 
 | what the verb needs | what stands |
 |---|---|
 | the ceiling and the faults | `sizeFaults` and `FILE_RULE`, under `.claude/skills/level0/lib/size.js` |
-| the undo | the journal under `.claude/skills/level0/lib/undo.js`, which `apply` writes |
+| the undo | the journal under `.claude/skills/level0/lib/undo.js` |
+| the journal's writer | `src/bridge/apply.js`, the batch edit behind the patch and replace tools |
 | the ticket | `./RUNME.sh mint ticket <path> --process=trivial` |
 
 The verb writes every target and the rest of the source through the journal, so one `undo` puts the whole cut back.
@@ -144,12 +149,19 @@ The verb writes every target and the rest of the source through the journal, so 
 The refusal that mints:
 
 - the write door reads `grows`, so a file past the ceiling takes a cut and refuses a growth
-- the refusal on such a file mints a split ticket off `trivial`, and names it in the refusal
-- the ticket's ask names the file, what the lint says, and the topics the cut follows
+- the door itself mints, off `trivial`, and the refusal names the ticket it writes
+- it reads `spec/tickets` first, and mints where no open split ticket names that file
+- a second refusal on the same file names the standing ticket, and writes none
+- the ask names the file, what the lint says, and the topics the cut follows
 
-`./RUNME.sh lint src/scripts` names no `FileCeiling` today, so the verb guards the next file. The cases drive the cut over text in memory, and drive the refusal into the mint.
+Where each thing stands after:
 
-[[spec/design_output/level0#the-size-ceiling]] takes the verb and the mint.
+- `spec/design_output/level0.md` owns the flags table, under `The size ceiling`
+- this approach's copy is the draft that chapter takes, and no second copy lands
+- `test/level0/split.test.js` holds the cases: each flag, the undo, and the mint
+- a case feeds the door a file past the ceiling twice, and asserts one ticket
+
+`./RUNME.sh lint src test` answers clean today, so the verb guards the next file and cuts none.
 
 ## review
 
