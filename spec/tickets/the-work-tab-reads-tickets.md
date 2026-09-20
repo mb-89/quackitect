@@ -218,11 +218,11 @@ between groups wants the `group` column, so the base file gained it. The
 mark keys stand in for the editor a mark carries open, which the tree view
 note still names as waiting.
 
-- every fact stands once: the rows, the road and the door rule each stand in their own note
+### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
-- every fact stands once: the rows in the index note, the road in the TUI note, the door rule in the schema note
+- every fact stands once: the rows, the road and the door rule each stand in their own note
 - every number carries a name: the waits stand as named constants in `door.go` and `workindex.go`
 - every header says what its file is for: each new Go file opens on what it holds, and counts nothing
 
@@ -234,19 +234,24 @@ note still names as waiting.
 
 <!-- a tool, a host the proxy refused, a right the platform refused, an install, each with its moment -->
 
-<!-- the form is list -->
+- nothing: every tool stood, the proxy refused no host, and the build of the index ran on this box
 
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
-<!-- the form is list -->
+- a conflict at sync: the installer's list of moved files, where trunk and this branch each changed a name
+- a test that fails on the box alone: three contract cases over the plugin manifests, red on every fresh clone
+- the commit hook: a code change with no test beside it, answered with two cases over the usage and the listing
+- the push hook: twelve tense findings in three notes, and a list item over its words, each reworded
 
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
-<!-- the form is list -->
+- no person step stands parked, and no ticket stands minted with no group
+- the tree view note still names the editor reading a field's type as waiting, and no ticket carries it
+- the handover says the branch stands done at its tip, and a person reads the merge
 
 # Discussion
 
