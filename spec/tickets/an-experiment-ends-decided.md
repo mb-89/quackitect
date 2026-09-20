@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -115,6 +115,10 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 2ecf956449605a50c5ab70bc696e6f1b10f14700
     hash_after: 2ecf956449605a50c5ab70bc696e6f1b10f14700
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-6
+    hash_before: 6821c12e0e2ce4b4cbdd6d5855e255a1283d8e30
+    hash_after: 6821c12e0e2ce4b4cbdd6d5855e255a1283d8e30
 ---
 
 # Ask
@@ -196,24 +200,25 @@ The pane's own case file leaves with the folder, because the widgets it drives s
 
 ### verdict
 
-fail
+pass
 
 | the question reviewing asks | the answer |
 |---|---|
-| does the approach answer the ask | no, the move lands two files level zero already holds |
+| does the approach answer the ask | yes, each line of the ask meets a row |
 | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |
 | what does `./RUNME.sh check` answer | 0 on this commit |
 | does a retro stand in the handback | no, `./RUNME.sh branch review` reads it absent |
 | does every rule the approach adds carry a test | yes, the hold names a case each side |
-| what grade do the findings take | design, each one decides what the approach does |
+| what grade do the findings take | design, and none stands open |
 
-The seven findings of the last round all land. Three stand open.
+The three findings of the last round all land. None stands open.
 
 Findings, one a line:
 
-- Say how `hooks/hooks.json` merges, because level zero holds a file of that name.
-- Say how `.claude-plugin/plugin.json` merges, because level zero holds a file of that name.
-- Add `spec/design_output/pull.md` to what changes, because it names the folder the wrapper leaves.
+- The hook manifest merges by name: level zero's module list takes the second module.
+- The plugin manifest merges by name: level zero keeps its own, and its description says what rides there.
+- The pull note joins what changes, and it names the folder the wrapper leaves.
+- Each landing file stands free: the hook module and the library meet no name level zero holds.
 
 # implement
 
