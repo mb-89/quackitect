@@ -3,10 +3,14 @@
 // [[spec/design_output/work#the-battery-answers-first]]
 
 import assert from "node:assert/strict";
+import { join } from "node:path";
 import test from "node:test";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeProc } from "../../src/doors/fake/proc.js";
 import {
   carriedBy,
   holds,
+  lintedBy,
   namesIn,
   rangeOf,
   refsIn,
@@ -109,4 +113,32 @@ test("carriedBy reads every note the range names, and passes a file git lost", (
   const out = carriedBy(repo)({ sha: SHA, was: WAS });
   assert.deepEqual(out, [{ name: "spec/tickets/slow-lint.md", text: TAGGED }]);
   assert.deepEqual(repo.runs[0], ["log", "--format=", "--name-only", `${WAS}..${SHA}`]);
+});
+
+// The door reads what the check reads, so a word the tense reader clears holds no push. [[spec/tickets/one-list-holds-the-warnings]]
+test("the lint over the pushed files drops a false past tense, and keeps a real one", () => {
+  const root = "/tree";
+  const files = fakeDisk({
+    [join(root, "notes.md")]: "Somebody wrote the note.\nThe verb buys one place.\n",
+  });
+  const row = (line, said) => ({
+    Check: "VoiceParagraph.PastTense",
+    Line: line,
+    Span: [1, 5],
+    Match: said,
+    Message: `Write the present tense: '${said}'.`,
+    Severity: "warning",
+  });
+  const vale = "/tree/.se/.runtime/bin/vale";
+  const outside = fakeProc({
+    [`${vale} --config=.vale.ini --output=JSON --no-exit notes.md`]: {
+      stdout: JSON.stringify({ "notes.md": [row(1, "wrote"), row(2, "buys")] }),
+    },
+  });
+  const found = lintedBy(files, outside, root, vale)(["notes.md", "a.js"]);
+  assert.deepEqual(
+    found.map((one) => [one.file, one.line, one.rule, one.severity]),
+    [["notes.md", 1, "PastTense", "warning"]],
+  );
+  assert.deepEqual(lintedBy(files, outside, root, "")(["notes.md"]), []);
 });

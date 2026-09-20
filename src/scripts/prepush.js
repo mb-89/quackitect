@@ -22,6 +22,7 @@ import {
   refusedWarnings,
   warningsOn,
 } from "../../.claude/skills/level0/lib/warnings.js";
+import { readThrough } from "../bridge/findings.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { proc } from "../doors/proc.js";
@@ -114,8 +115,8 @@ export function carriedBy(repo) {
   };
 }
 
-// The lint over the names a push carries, read as rows. [[spec/tickets/one-list-holds-the-warnings]]
-export function lintedBy(outside, root, vale) {
+// The lint over the names a push carries, read as rows through the tense reader, so the door reads what the check reads. [[spec/tickets/one-list-holds-the-warnings]]
+export function lintedBy(files, outside, root, vale) {
   return (names) => {
     const read = names.filter((one) => PROSE.test(one));
     if (!read.length || !vale) return [];
@@ -125,7 +126,7 @@ export function lintedBy(outside, root, vale) {
         cwd: root,
       },
     );
-    return fromJson(ran.stdout);
+    return readThrough({ disk: files, join, root }, fromJson(ran.stdout));
   };
 }
 
@@ -139,7 +140,7 @@ async function main() {
     refsIn(files.read(STDIN)),
     stamp,
     carriedBy(git(outside, root)),
-    lintedBy(outside, root, whereIs(files, root, "vale")),
+    lintedBy(files, outside, root, whereIs(files, root, "vale")),
   );
   if (said.code !== 0) console.error(said.said);
   return said.code;
