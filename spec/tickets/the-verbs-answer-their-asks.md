@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: sync
     does: takes trunk into the branch, so the box works on the latest
@@ -107,6 +107,11 @@ record:
     hand: box fb2b49fba485 · claude-code-remote
     hash_before: 65fab3e004bd3155784cdc8c36481f1e22ae6e49
     hash_after: 65fab3e004bd3155784cdc8c36481f1e22ae6e49
+  - step: retro/cloud
+    hand: box fb2b49fba485 · claude-code-remote
+    hash_before: a64b73dfe52e606d215a3b07f8b8349f4a1cd1bc
+    hash_after: a64b73dfe52e606d215a3b07f8b8349f4a1cd1bc
+reason: done
 ---
 
 # Ask
@@ -245,17 +250,30 @@ the place in the pull's answer, and a todo in a file off git.
 
 <!-- the form is list -->
 
+- no tool: the install at the take put up every tool the check names
+- no host: the proxy refused nothing the install or the push asked for
+- no right: the platform refused no call
+
 ### met
 
 <!-- the trunk guard, a conflict at sync, the cap, a hook, a test that fails on the box alone -->
 
 <!-- the form is list -->
 
+- the commit hook once, at the first child's hand-back, where the changed test imported neither module it drove
+- no conflict at sync: the branch carried every commit on main at the take
+- no cap: the refusals stopped at two on one leaf, and no leaf failed back
+- no test that fails on the box alone: the check ran green on each hand-back
+
 ### left
 
 <!-- every person step parked, every ticket minted with no group, and what the handover says -->
 
 <!-- the form is list -->
+
+- no person step parked: the box decided the third child's close itself
+- no ticket minted: the improve lines stand in the retro, and none runs deeper than a line
+- the handover: `branch done` sets the standing, and the merge reads the discussion under [[spec/tickets/the-index-answers-the-queue]] for the road the design refuses
 
 # Discussion
 
