@@ -46,7 +46,7 @@ export const USAGE = [
   "  release       put this branch, or the one you name, back to todo",
   "  read <name>   print what stands on work/<name>",
   "  review <name> gather what a reader needs, and answer the report",
-  "  list [--done|--queue|--fetch] the branches, the done ones, the pull's order, or the refs again",
+  "  list [--all|--done|--queue|--fetch] what stands open, everything, the done ones, the pull's order, or the refs again",
   "  answer [--queue] write what git knows into one file a reader opens, with the order or without",
   "  merge <name>  take a done branch into main",
   "  close [name]  delete a branch already inside main, or every one",
