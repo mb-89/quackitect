@@ -88,6 +88,7 @@ test("the ask opens every so many calls, answers the tool, and drops its third q
   assert.equal(it.box.calls, 0, "the count starts over at an answer");
   plan({ add: [{ title: "one" }, { title: "two" }] }, it.box);
   assert.equal(asksForPlan(it.box, 20), true);
+  assert.match(it.box.grace.why, /^You work on the door\. /, "the ask reminds of the work in hand");
   assert.doesNotMatch(
     it.box.grace.why,
     /add/,

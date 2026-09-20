@@ -28,12 +28,17 @@ type workPlaces struct {
 	queue map[string]string
 	cloud map[string]bool
 	todo  map[string]bool
+	// The rows this box takes: every placed row past the cloud's, which the strip counts behind the tab's name. [[spec/design_output/tui#the-work-tab]]
+	takeable int
 	// The plan's own todos, which the index holds nowhere, so the tab adds them as rows. [[spec/design_output/stop#the-plan]]
 	rows []answerRow
 }
 
 // The kind a sentence todo carries, which draws with no link. [[spec/design_output/stop#the-plan]]
 const kindTodo = "todo"
+
+// The place of a row the cloud holds, which src/scripts/pull-outline.js owns and a Go module spells again. [[spec/design_output/pull#the-queue-is-an-outline]]
+const cloudPlace = "∞"
 
 type placesMsg struct {
 	places workPlaces
@@ -63,12 +68,16 @@ func placesIn(said []byte) (workPlaces, error) {
 	out := workPlaces{queue: map[string]string{}, cloud: map[string]bool{}, todo: map[string]bool{}}
 	for _, one := range answer.Branches {
 		// A branch row stands for its group, and a merged one stands for a group off the cloud. [[spec/design_output/work#a-row-per-group]]
+		// A group's tickets inherit its cloud, because the branch carries them all. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
 		if !one.Merged {
 			out.cloud[one.Name] = true
 		}
 		out.place(one)
 		for _, child := range one.Tickets {
 			out.place(child)
+			if !one.Merged {
+				out.cloud[child.Name] = true
+			}
 		}
 	}
 	for _, one := range answer.Loose {
@@ -77,6 +86,7 @@ func placesIn(said []byte) (workPlaces, error) {
 			out.rows = append(out.rows, one)
 		}
 	}
+	out.takeable = out.countTakeable()
 	return out, nil
 }
 
@@ -86,6 +96,17 @@ func (p workPlaces) place(one answerRow) {
 		p.queue[one.Name] = one.Queue
 	}
 	p.todo[one.Name] = one.Todo
+}
+
+// The rows this box takes: placed, and off the cloud. [[spec/design_output/tui#the-work-tab]]
+func (p workPlaces) countTakeable() int {
+	n := 0
+	for _, place := range p.queue {
+		if place != cloudPlace {
+			n++
+		}
+	}
+	return n
 }
 
 // The places laid over the tree's items, so the queue column and the cloud letter read them. [[spec/design_output/tui#the-work-tab]]

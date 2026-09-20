@@ -11,12 +11,20 @@ flags:
     tones:
       open: good
       draft: bad
+  - key: route
+    value: true
+    tones:
+      note: note
+      trivial: trivial
+      standard: standard
+      group: group
+      question: question
+      retro: retro
   - letter: U
     key: urgent
     tone: bad
   - letter: C
     key: cloud
-    tone: good
   - letter: T
     key: todo
     tone: bad

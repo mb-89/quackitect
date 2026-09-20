@@ -34,6 +34,14 @@ func TestTheAnswerReadsAsPlacesAndTheGroupsOnACloud(t *testing.T) {
 	if _, held := said.queue["unplaced"]; held {
 		t.Fatal("a row the pull places nowhere carries no place")
 	}
+	// The count reads the placed rows past the cloud's. [[spec/design_output/tui#the-work-tab]]
+	if said.takeable != 3 {
+		t.Fatalf("three rows stand up for taking, and the count reads %d", said.takeable)
+	}
+	cloud, _ := placesIn([]byte(`{"branches":[{"name":"held-group","queue":"∞","tickets":[{"name":"its-child","queue":"∞"}]}],"loose":[{"name":"free","queue":"1"}]}`))
+	if cloud.takeable != 1 {
+		t.Fatalf("the cloud's rows count nowhere, and the count reads %d", cloud.takeable)
+	}
 	// A merged branch stands for a group off the cloud, so it lights no letter. [[spec/design_output/work#a-row-per-group]]
 	if !said.cloud["one-group"] || said.cloud["gone-group"] {
 		t.Fatalf("a group holding a branch stands on the cloud, and the flags read %v", said.cloud)
@@ -54,12 +62,17 @@ func TestThePlacesLandOverTheTreeAndALaterTreeTakesThemAgain(t *testing.T) {
 	if !strings.Contains(rows, "one-group") || m.work.Items[0].Keys[queueKey] != "2" {
 		t.Fatalf("the group carries its place, and the rows read:\n%s", rows)
 	}
+	// The strip counts the rows this box takes behind the tab's name. [[spec/design_output/tui#the-work-tab]]
+	if !strings.Contains(m.renderStrip(), "work (3)") {
+		t.Fatalf("the strip counts the takeable rows, and reads %q", m.renderStrip())
+	}
 	// A person's row carries a negative place, so the queue sort puts it first. [[spec/design_output/pull#the-queue-is-an-outline]]
 	if said := namesOf(m.work); strings.Join(said, " ") != "a-loose-one one-group a-child" {
 		t.Fatalf("the person's row stands first, then the group and its ticket, and the rows read %v", said)
 	}
-	if m.work.Items[0].Keys[cloudKey] != "true" || m.work.Items[0].Kids[0].Keys[cloudKey] != "false" {
-		t.Fatal("the group lights the cloud letter, and its ticket lights none")
+	// A group's tickets inherit its cloud, because the branch carries them all. [[spec/design_output/tree-view#a-flag-draws-a-letter]]
+	if m.work.Items[0].Keys[cloudKey] != "true" || m.work.Items[0].Kids[0].Keys[cloudKey] != "true" {
+		t.Fatal("the group lights the cloud letter, and its ticket inherits it")
 	}
 	if !strings.Contains(m.work.Letters(m.work.Items[0]), "C") {
 		t.Fatalf("the base file draws the cloud letter, and the letters read %q", m.work.Letters(m.work.Items[0]))

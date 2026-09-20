@@ -243,6 +243,7 @@ every reader draws as it stands.
 |---|---|
 | a step a person owns, and a draft | negative, and the most pressing counts lowest, so `-2` stands over `-1` |
 | a ticket a hand holds, or the one the plan names as the work in hand | `0`, so the queue shows what stands in hand and no letter says it |
+| a group on a standing cloud branch, and its tickets | `∞`, because the cloud takes it and this box cannot |
 | a step an agent takes now | counts up from `1` |
 | an open step the pull holds back: one waiting on a dependency, one another hand holds | counts on after the agent's |
 | a group | one number, where its best member stands |

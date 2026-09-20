@@ -157,9 +157,11 @@ export function asksForPlan(box, calls) {
   ];
   if (!(most > 0 && plan.todos.length >= most))
     questions.push("which todos do you add, each with its place");
+  // The ask names the work in hand first, so it reminds as it asks. [[spec/design_output/stop#the-plan]]
+  const held = plan.working ? `You work on ${plan.working}. ` : "";
   return wants(box, {
     id: PLAN,
-    why: `The engine asks: ${questions.join("; ")}.`,
+    why: `${held}The engine asks: ${questions.join("; ")}.`,
     react: `call ${PLAN_CALL} with the answers`,
     calls: asks(box, GRACE),
     tool: PLAN_CALL,

@@ -155,8 +155,9 @@ its marks:
 | the letter | the key it reads | its tone |
 |---|---|---|
 | the state's first | the state, as its value | good on `open`, bad on `draft`, plain on `closed` |
+| the route's first | the route, as its value: N for a note, T trivial, S standard, G group | the route's own, off the `flags` map |
 | U | the ticket carries the urgent mark | bad |
-| C | the group holds a branch on the cloud | good |
+| C | the group holds a branch on the cloud, and its tickets inherit it | plain, because the cloud is neither good nor bad |
 | T | a todo forces its place, which [[spec/design_output/pull#a-todo-forces-a-place]] reads | bad |
 
 The letters hold fixed places, so nothing shifts as one lights. The keys stay

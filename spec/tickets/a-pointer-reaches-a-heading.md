@@ -1,6 +1,7 @@
 ---
 kind: [[ticket]]
-state: draft
+state: open
+group: misc
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -88,6 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
+step: design/draft
 ---
 
 # Ask
