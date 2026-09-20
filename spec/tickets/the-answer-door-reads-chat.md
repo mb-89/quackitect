@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: 90b2ac3bd6d3198cef6225c150eacb7367f2c25a
     returns: 1
     why: the table claims a case covers `onAgentSpoke`, and the tree holds none, so that row reads false; the change table leaves out `src/bridge/answer.js`, which the prose changes at `SAYS` and the refusal; a `SAYS` rewrite breaks the standing case asserting the report line, and the plan names no fix; the reply line chapter alone changes, and the paragraph under "What the door reads" keeps the opposite rule; the refusal quoted under "What the refusal says" drifts from `SAYS` today, and the plan skips it; the cited log pair stands outside the log this box keeps, though the ordering it claims holds; "Two things the road does" opens a list of three bullets; the three cases the plan names run against the door as written, so the shape holds; `./RUNME.sh check` answers 0 on this branch, and the handback carries no retro
+  - step: design/draft
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 8957836c819b43e2d46ab96990d693e7a73faa42
+    hash_after: 47f361632d2a55e801ee9d972611fcdf97d64e6c
 ---
 
 # Ask
