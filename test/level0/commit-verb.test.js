@@ -88,18 +88,34 @@ test("a clean message lands, runs the check, and pushes on green", async () => {
 });
 
 // [[spec/design_output/work#the-battery-answers-first]]
-test("a red check holds the push back, and the commit stands", async () => {
+test("a red check holds the push back, and names what the check refuses", async () => {
   const { it, git } = doors();
+  // The check writes its faults to the error stream, and its last passing line to the other. [[spec/design_output/work#one-verb-feeds-that-stamp]]
   git.proc.teach([it.node, join(ROOT, "src", "scripts", "cli.js"), "check"], {
     exitCode: 1,
-    stdout: "1 stand at warning.\n",
+    stdout: "The server stands at http://127.0.0.1:6510/health.\n",
+    stderr: "src/a.js:1:1: Passive: Write in the active voice.\n",
   });
 
   const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
 
   assert.equal(code, 1);
   assert.match(said, /no push reaches origin/);
+  assert.match(said, /Passive: Write in the active voice/, "the fault reaches the reader");
   assert.ok(!ranGit(git).some((one) => one.startsWith("git push")));
+});
+
+// [[spec/design_output/work#one-verb-feeds-that-stamp]]
+test("a staging the door refuses names what git says, and commits nothing", async () => {
+  const { it, git } = doors([], {
+    "git add -A": { exitCode: 1, stderr: "the index stands locked" },
+  });
+
+  const { code, said } = await heard(() => commitVerb(it, [CLEAN]));
+
+  assert.equal(code, 1);
+  assert.match(said, /the index stands locked/);
+  assert.ok(!ranGit(git).some((one) => one.startsWith("git commit")));
 });
 
 // [[spec/design_output/pull#the-refused-commit]]
@@ -112,7 +128,7 @@ test("a commit the door refuses lands nothing, and the staging comes back", asyn
 
   assert.equal(code, 1);
   assert.match(said, /nothing lands/);
-  assert.match(said, /the hook refuses it/);
+  assert.match(said, /the hook refuses it/, "the door's own line reaches the reader");
   assert.ok(ranGit(git).includes("git reset -q"), "the staging comes back");
 });
 

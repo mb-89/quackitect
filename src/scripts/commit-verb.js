@@ -27,15 +27,17 @@ export async function commitVerb(it, argv) {
 
 // Nothing stages before the message reads clean, so a refused message leaves the tree standing. [[spec/design_output/work#the-battery-answers-first]]
 function landsAndPushes(it, argv, message) {
-  if (!it.git.run(["add", "-A"], true).ok) {
-    console.error("git staged nothing, so the commit stands undone.");
+  const staged = it.git.run(["add", "-A"], true);
+  if (!staged.ok) {
+    console.error("The staging comes back refused, so the commit stands undone:");
+    console.error(saidBy(staged));
     return 1;
   }
   const made = it.git.run(["commit", "-m", message], true);
   if (!made.ok) {
     it.git.run(["reset", "-q"], true);
-    console.error("The commit door refuses this commit, so nothing lands:");
-    console.error(made.err || made.out || "the commit answers nothing");
+    console.error("The commit comes back refused, so nothing lands:");
+    console.error(saidBy(made));
     return 1;
   }
 
@@ -45,12 +47,8 @@ function landsAndPushes(it, argv, message) {
   );
   if (ran.exitCode !== 0) {
     console.error("The check answers red on this commit, so no push reaches origin.");
-    console.error(
-      String(ran.stdout ?? "")
-        .trim()
-        .split("\n")
-        .at(-1) ?? "",
-    );
+    // The check writes its faults to the error stream, so one stream names the wrong line. [[spec/design_output/work#one-verb-feeds-that-stamp]]
+    console.error(saidBy(ran) || "the check answers nothing");
     return 1;
   }
   console.log("The commit lands, and the check answers green on it.");
@@ -63,4 +61,12 @@ function landsAndPushes(it, argv, message) {
   }
   console.log(`${branch} stands pushed.`);
   return 0;
+}
+
+// A run answers on two streams, and a read of one alone names the wrong line. [[spec/design_output/work#one-verb-feeds-that-stamp]]
+function saidBy(ran) {
+  return [ran?.err, ran?.stderr, ran?.out, ran?.stdout]
+    .map((one) => String(one ?? "").trim())
+    .filter(Boolean)
+    .join("\n");
 }
