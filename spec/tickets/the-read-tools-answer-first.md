@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: 703fa45aa005c5361748df70aea64f032c5045fd
     returns: 1
     why: "the hook's header says it imports nothing, three times, and it re-spells constants for that reason; say what that invariant becomes, because specs under `lib` make the hook import; say what happens to the constants the hook spells again today, which that invariant forces; the third row carries a bare number. `REASONS` in the hook names code 6, so point there; the specs' new home carries no file name. `findSpec` stands in `src/bridge/search.js`, and `SPECS` in `src/bridge/apply.js`; the ask asks for a case per tool, and the approach names no case file; what holds: `START`, `register` and `REASONS` all stand in the hook, and the chapter takes the order"
+  - step: design/draft
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 2c02125ca5f0d2fc6378e8cbe65fe33b57dee72e
+    hash_after: 2c02125ca5f0d2fc6378e8cbe65fe33b57dee72e
 ---
 
 # Ask
@@ -129,23 +133,32 @@ The plugin registers every read tool at session start, and the first call brings
 |---|---|
 | the specs ride the server's answer to `session.start` | a box whose server answers nothing carries no read tool all session |
 | `starts` runs after that answer falls | the start lands, and the registration stands already past |
-| the start reads `node_modules`, and a fresh box carries none | the setup answers 6, and the hand falls to the shell |
+| the start reads `node_modules`, and a fresh box carries none | `REASONS` in the hook names that code, and the hand falls to the shell |
 
 | what changes | where |
 |---|---|
-| the specs stand under the skill folder, so the plugin reads them with no server | `.claude/skills/level0/lib` |
+| the specs move under the skill folder | `.claude/skills/level0/lib/specs.js` |
 | the bridge reads those same specs | `src/bridge/search.js` and `src/bridge/apply.js` |
 | `register` names them at session start, whatever the server answers | the plugin's `register` |
 | a handler meeting no server starts one, waits on its health, and calls again | the plugin's tool road |
 | the start installs where the modules stand absent | `START` in the plugin |
 
+`findSpec` stands in `src/bridge/search.js` today, and `SPECS` in `src/bridge/apply.js`. Each moves to the file above, and both bridge modules point there.
+
+What the hook's invariant becomes:
+
+- the hook imports nothing outside `.claude/skills/level0`, and the plugin ships that folder whole
+- the port, the log path and the hand's file each come from their owner
+- a file under `lib` failing to load blocks the hook, which is what this buys the registration
+
 So a hand calls `find` on its first turn, and that call pays for the server.
 
-- the plugin imports nothing past its own folder, so the specs move and the bridge points at them
-- the answer's `register` list still stands, so a server carrying a newer spec still names it
-- the cases drive each tool with no server standing, and read the answer
+Where each thing stands after:
 
-[[spec/design_output/level0#the-bridgehead-starts-it-too]] takes the order.
+- `test/level0/bridgehead.test.js` holds the cases, one a tool, with no server standing
+- one case drives a load failure under `lib`, and reads what the hook answers
+- the answer's `register` list stands, so a server carrying a newer spec still names it
+- [[spec/design_output/level0#the-bridgehead-starts-it-too]] takes the order
 
 ## review
 
