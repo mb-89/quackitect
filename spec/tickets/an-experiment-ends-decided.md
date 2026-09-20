@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -184,6 +184,10 @@ record:
     hash_after: 915a6fd70328c9b18ab2e3faaa7a18be19c3acbe
     returns: 2
     why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the brief asks | yes, the folders leave and the hold runs |; | is what the diff touches beyond the brief trivial | yes, the check and the doors drop a dead name |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does a retro stand in the handback | no, the handover names it as waiting |; | does every rule the branch adds carry a test | yes, the verb refuses, and a case reads the step |; | what grade do the findings take | craft, the approach and the note disagree on one fact |; I drove `retro audit` over a tree carrying an open trial, and it refused and named; the trial. The findings of the last round land. The approach still says what this; branch stopped doing, so a reader at the merge meets two answers to one question.; Findings, one a line:; The approach row says each folder leaves under a ticket of the experiment process, and neither does.; Take that row to what [[spec/design_output/work#an-experiment-decides]] says, that this ticket closes both.; The `says` chapter counts the closed tickets naming the old folder, and `git grep skills/level1` answers more.; Name that command in place of the count, because a count in prose goes stale."
+  - step: implement/reflect
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: ce63fe7347241e179abae028a740ee80d1b4efd3
+    hash_after: ce63fe7347241e179abae028a740ee80d1b4efd3
 ---
 
 # Ask
@@ -333,28 +337,27 @@ That surprises me. The two holds of the retro look alike from the route, and the
 <!-- the class of error the findings describe, and the fix for the class -->
 <!-- the form is text -->
 
-One class carries the findings: a rule written where the engine reads a name.
+One class carries both findings: a closed field holds a fact the work moves past.
 
-| what the round wrote | what the engine does with it | what it holds |
+| the field | what it says | what stands |
 |---|---|---|
-| `needs: ["retro audit"]` | asks whether this box holds the verb | nothing of the tree's state |
-| a note pointing at `hooks/level1.js` | reads a name, and resolves it nowhere | nothing |
-| an approach row naming a ticket a trial takes | reads as prose | nothing, until a hand mints one |
+| the approach, under design | each folder leaves under a ticket of the experiment process | this one ticket closes both |
+| the `says` chapter, under tests-green | a count of the closed tickets naming the old folder | a command answers that count |
 
-The first row is the fault the ask names. `holdsVerb` in `src/scripts/pull-route.js` splits a need and asks the table of verbs. So a need answers whether a box can run a thing, and the run itself waits for evidence.
+A field of a closed step is the record of its round, and the ticket door holds it there. So a correction reaches a reader two ways: the note owning the fact, and the Discussion chapter a hand writes at any time.
 
-The fix for the class is running what a rule claims. A hold is evidence, and evidence runs. The audit step takes `retro audit` as a command expecting 0, the way its `effect` step takes its own verb. So the step holds over an open trial, and a case drives the step through the pull.
+The fix for the class is writing the correction where a reader of this ticket meets it. The Discussion takes one line per field, each naming what the field says and what stands. [[spec/design_output/work#an-experiment-decides]] already owns the first fact, so the line points there.
 
-The other rows ride the same shape. A name a hand writes stands until a reader resolves it. This round resolves each one. The notes take the module's landing name, and the two decided trials take their reason where a reader finds it.
+The second finding is the voice rule about a count. A count in prose goes stale, and a command answers it fresh. So the Discussion names `git grep skills/level1` in place of the number, and the line says what the command answers.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The retro's route, the notes naming the moved module, the design input's twin, and the case file.
-- every door the change reaches has a fake. The step's case drives the pull doors, and the verb's cases hand their own disk.
-- a comment names the approach the change implements. The step's evidence says what the verb answers, and the note says what a decided trial leaves.
+- the change touches no file the ask leaves out. This ticket's Discussion chapter alone.
+- every door the change reaches has a fake. The change reaches no door, because it writes prose into a ticket.
+- a comment names the approach the change implements. Each line names the field it corrects and the place owning the fact.
 
 ## change
 
