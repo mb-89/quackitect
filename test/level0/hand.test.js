@@ -69,7 +69,7 @@ test("a helper's hold takes a file name of its own, beside the session's", () =>
 
 // [[spec/design_output/pull#the-hand-and-the-hold]]
 test("the wrapper's lib builds the session file its hook writes at session.start", async () => {
-  const lib = await import("../../.claude/skills/level1/lib/pull.js");
+  const lib = await import("../../.claude/skills/level0/lib/pull.js");
   assert.equal(
     typeof lib.sessionOf,
     "function",

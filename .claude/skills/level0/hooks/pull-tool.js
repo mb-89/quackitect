@@ -1,8 +1,10 @@
-// Level one's hook module: the pull as a tool. A shell verb reaches no model
-// and no agent, and the hook process reaches both, so the judge and the spawn
-// run here.
+// The plugin's one hook module: the bridgehead, then the pull as a tool. A
+// shell verb reaches no model and no agent, and the hook process reaches both,
+// so the judge and the spawn run here.
 // [[spec/design_output/pull#the-checks]]
 
+// One plugin takes one module, so this one calls the bridgehead's register. It imports nothing, which is why the call runs this way. [[spec/design_output/work#an-experiment-decides]]
+import { register as bridgehead } from "./level0.js";
 import {
   judgeAsk,
   judgeLabels,
@@ -25,7 +27,8 @@ const RUNNING = 600000;
 const JUDGE = "--judge";
 const SPAWNS = 3;
 
-export function register(on, _options) {
+export function register(on, options) {
+  bridgehead(on, options);
   on("session.start", async ($, e, next) => {
     await $.tool.register(pullSpec());
     // [[spec/design_output/pull#the-hand-and-the-hold]]

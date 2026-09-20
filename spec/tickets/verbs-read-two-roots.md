@@ -376,8 +376,8 @@ A stub lints under the vehicle's rules, so the config comes off the method root.
     .claude/skills/level0/lib/undo.js
     .claude/skills/level0/lib/vocabulary.js
     .claude/skills/level0/lib/voice.js
-    .claude/skills/level1/hooks/level1.js
-    .claude/skills/level1/lib/pull.js
+    .claude/skills/level0/hooks/level1.js
+    .claude/skills/level0/lib/pull.js
     .gitignore
     .vale.ini
     spec/config/biome.json

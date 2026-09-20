@@ -97,7 +97,6 @@ export const lsp = whereIs(files, root, "se-lsp", known);
 export const GUIDANCE = join(root, "spec", "guidance");
 export const DOORS = join(root, "src", "doors");
 export const PLUGIN = join(".claude", "skills", "level0");
-export const LEVEL1 = join(".claude", "skills", "level1");
 export const CONTRACT = join(root, "test", "contract");
 export const settings = it.config;
 // The glob the rules read past, owned by the findings every front reads. [[spec/design_output/lsp]]

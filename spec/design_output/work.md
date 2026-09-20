@@ -485,6 +485,26 @@ number stands above zero. Push trunk first, and the merge outlives the branch.
 `close <name> --force` deletes a branch standing outside trunk, which drops the
 work on it.
 
+# An experiment decides
+
+A trial stands under a folder of its own while its question is open, and it
+carries a ticket of `spec/processes/experiment` from its first day. That route
+runs `run`, then `decide`, which a person takes:
+
+| the decision | what follows |
+|---|---|
+| keep | the code moves into the tree, and the folder under `.claude/skills` goes |
+| drop | the code leaves, and the ticket closes on the reason |
+| grow | a ticket of its own carries it, and the experiment closes `became` |
+
+`retro audit` answers the trials standing open, and the retro's `audit` step
+names it as a need. So a retro closing over an open trial leaves the tree
+carrying that trial, and the step holds until each one decides.
+
+The audit's checklist carries the same rule for a hand to read, and points at
+the verb. The verb owns the rule, because a hand reading a list misses what a
+walk of the tickets answers.
+
 # A box off a branch
 
 A routine run starts on a branch the platform names, such as

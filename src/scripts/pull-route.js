@@ -60,6 +60,8 @@ export const VERBS = {
   ticket: ["pull", "note", "update", "open"],
   retro: [
     "notes",
+    // [[spec/design_output/work#an-experiment-decides]]
+    "audit",
     "collect",
     "new",
     "timeline",

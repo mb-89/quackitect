@@ -351,8 +351,8 @@ splice stands as a term under spec/vocabulary/terms.yml, so the hand-back passes
     - .claude/skills/level0/lib/ticket.js
     - .claude/skills/level0/lib/todo.js
     - .claude/skills/level0/lib/vocabulary.js
-    - .claude/skills/level1/hooks/level1.js
-    - .claude/skills/level1/lib/pull.js
+    - .claude/skills/level0/hooks/level1.js
+    - .claude/skills/level0/lib/pull.js
     - .vale.ini
     - spec/config/level0.json
     - spec/config/level0.schema.json

@@ -42,7 +42,7 @@ steps:
     does: auditors walk the checklist over what the window lands, and write a findings column each
     by: anyone
     input: effect
-    needs: ["retro"]
+    needs: ["retro", "retro audit"]
     reads: [[spec/guidance/retro/audit]]
     checklist:
       - the code the window lands follows [[spec/guidance/code/code]]
@@ -54,7 +54,7 @@ steps:
       - every claim to the owner rests on a check against what the owner sees
       - every mechanical step runs through a verb, and no hand repeats it
       - every piece of work lands in the place owning its topic
-      - every experiment stands decided, kept or taken out
+      - every experiment stands decided, which `retro audit` answers
       - every refusal teaches the hand, and no hand retries it blind
     evidence:
       - name: audits

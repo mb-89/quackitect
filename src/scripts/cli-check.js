@@ -35,7 +35,6 @@ import {
   HEALTH_WAIT,
   it,
   known,
-  LEVEL1,
   lsp,
   OURS,
   outside,
@@ -291,7 +290,8 @@ export function project() {
 // [[spec/design_output/schema#the-fields-a-caller-names]]
 
 export function pluginHolds() {
-  for (const plugin of [PLUGIN, LEVEL1]) {
+  // One plugin stands, because the wrapper's trial ends kept. [[spec/design_output/work#an-experiment-decides]]
+  for (const plugin of [PLUGIN]) {
     const ran = validatePlugin(outside.run, plugin, root);
     if (ran.exitCode === 0) continue;
     if (!ran.stdout && !ran.stderr) {

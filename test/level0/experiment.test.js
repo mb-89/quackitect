@@ -1,6 +1,6 @@
 // The retro's hold on an open trial. An experiment ends on a decision, so a
 // retro closing over one leaves the tree carrying it.
-// [[spec/design_output/work#an-experiment-ends-decided]]
+// [[spec/design_output/work#an-experiment-decides]]
 
 import assert from "node:assert/strict";
 import { join } from "node:path";

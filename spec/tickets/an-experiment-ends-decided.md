@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -130,6 +130,14 @@ record:
   - step: implement/reflect
     skipped: true
     why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: e785ec62a95f97f67c05f72a73b11b3a45f587d3
+    hash_after: e785ec62a95f97f67c05f72a73b11b3a45f587d3
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -293,14 +301,18 @@ That surprises me. The two holds of the retro look alike from the route, and the
 ### lint
 
 <!-- the tree builds and lints -->
-
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The process, the retro's route and verb, the two folders, and every file reaching them.
+- every door the change reaches has a fake. The audit's cases hand the retro their own disk and log.
+- a comment names the approach the change implements. The one module says why it calls the bridgehead, and the note names each decision.
 
 ## tests-green
 

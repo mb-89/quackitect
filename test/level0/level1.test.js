@@ -10,9 +10,9 @@ import {
   PULL_CALL,
   pullSpec,
   spawnPromptIn,
-} from "../../.claude/skills/level1/lib/pull.js";
+} from "../../.claude/skills/level0/lib/pull.js";
 // The whole module, so a name the wrapper answers nowhere yet fails an assertion. [[spec/tickets/the-judge-reads-answer-rules]]
-import * as level1 from "../../.claude/skills/level1/lib/pull.js";
+import * as level1 from "../../.claude/skills/level0/lib/pull.js";
 import { pullArgvOf } from "../../src/scripts/pull-tool.js";
 
 // The rules a leaf hands the judge, each label naming one rule. [[spec/tickets/the-judge-reads-answer-rules]]

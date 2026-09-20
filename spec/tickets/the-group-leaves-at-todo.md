@@ -341,7 +341,7 @@ The walk writes no skip any more. Its guard read the hand writing the last skip,
 - .claude/commands/se-config-work-refusalsBeforeFail.md
 - .claude/commands/se-config-work-refusalsBeforePerson.md
 - .claude/skills/level0/lib/schema.js
-- .claude/skills/level1/hooks/level1.js
+- .claude/skills/level0/hooks/level1.js
 - spec/config/level0.json
 - spec/config/level0.schema.json
 - spec/design_output/pull.md

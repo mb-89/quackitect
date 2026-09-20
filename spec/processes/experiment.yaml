@@ -1,0 +1,29 @@
+# A trial the tree carries while its question stands open.
+# [[spec/design_output/work#an-experiment-decides]]
+for: a trial the tree runs under a folder of its own, which ends on a decision
+ask:
+  - name: question
+    form: text
+    says: the question the trial answers, and what decides it
+steps:
+  - name: run
+    does: builds the trial and says what it shows
+    by: anyone
+    reads: [[spec/guidance/working]]
+    evidence:
+      - name: shows
+        form: text
+        says: what the trial does, and what running it shows
+  - name: decide
+    does: keeps the trial, drops it, or grows it into a ticket of its own
+    by: person
+    to: owner
+    input: run
+    evidence:
+      - name: decision
+        form: choice
+        options: [keep, drop, grow]
+        says: keep moves the code into the tree, drop takes it out, grow mints a ticket
+      - name: why
+        form: text
+        says: the reason under the decision, for a reader who was not there

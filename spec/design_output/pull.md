@@ -296,7 +296,7 @@ rules refuse reaches no branch.
 
 Every check but the judge runs in the shell, so a person's hand-back meets them too.
 
-The wrapper under `.claude/skills/level1` imports nothing past its own folder,
+The wrapper under `.claude/skills/level0` imports nothing past its own folder,
 because the plugin validator refuses an import that leaves it. So the shell
 hands it the material: `ticket pull <ticket> --judge` prints the leaf's
 evidence and the rules its reads name, as JSON. The wrapper asks the model
