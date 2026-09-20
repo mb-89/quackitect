@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -165,6 +165,10 @@ record:
     hash_after: 04dbb822b8d8378dbb680b7cb3925e7044c6aa52
     returns: 1
     why: "`restatedOver` reads the whole tree once per path, so a folder costs the notes under it squared.; `se-lsp check spec` runs past two minutes here, and `se-lsp check .` answers in under two.; So `./RUNME.sh lint spec`, the verb the ask names, crawls where the sweep stays quick.; One note costs half a second, and the binary at the branch point answers it at once.; The fix: read the tree once inside `checks`, key the findings by file, hand each `Over` its own.; `spec/design_output/tree-view.md` renames a chapter, and two pointers still name the old anchor.; `src/viewer/treedraw.go` and `src/viewer/tree_test.go` carry that dead anchor at the tip.; The working tree holds the fix for those two, uncommitted. Commit it, or the tip stays broken.; `restatedHere` claims the layers the resolver reads, and skips the environment `wordsHere` reads.; A tree missing the `restated` block leaves both bounds at nothing, so every pointer draws. Floor them.; What holds, so the fixes stay small:; `./RUNME.sh check` answers 0 on a quiet box, and the handover carries a retro.; Vale gives up on a rule where hands run beside each other, which the handover names already.; The handover names the dead anchor as a retro finding, with the fix for the class.; The rules fire live: a note retelling the chapter its pointer names draws `RestatedPointer`.; Each Go case feeds the rule a bad pair and a good one, and each answers right.; The sweep draws nothing over the tree, so the three places the branch names take their fix.; Each bound stands in one place, and `spec/config/level0.schema.json` types the pair.; `RestatedTable` stands off over tickets alone, where a line weighs its table on purpose."
+  - step: implement/reflect
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: bacd8e31d6f622af3b33d7c6b09458e15c146ead
+    hash_after: bacd8e31d6f622af3b33d7c6b09458e15c146ead
 ---
 
 # Ask
@@ -301,11 +305,32 @@ pass
 
 <!-- the form is text -->
 
+The findings name two classes, and each one stands wherever a rule reads a pair
+of files.
+
+| the class | the fault here | the fix for the class |
+|---|---|---|
+| a whole-tree pass answers one path | `restatedOver` reads every note, keeps one file's findings, and the front calls it per path | the front runs the pass once, keys the findings by file, and hands each `Over` its own |
+| a bound reads config with no floor | a tree missing the `restated` block leaves both at zero, so every pair draws | the reader floors each bound, and the layers stand beside the ones `wordsHere` reads |
+
+The first class costs the verb the ask names: `se-lsp check spec` runs past two
+minutes, and the sweep over the same notes answers in under two seconds. A rule
+whose cost reads the tree belongs in the sweep, or behind a pass the front runs
+once.
+
+The second class turns a rule hardest on the tree carrying no config. A bound
+reading zero passes every comparison, so a missing block draws a fault on every
+pointer. So each bound floors at the value the shipped config names.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the fix touches the checker, its front and the config reader, which the ask already names
+- the change reaches the disk through the tree the checker holds, and no door of its own
+- each piece carries the pointer at the chapter tabling the rules over two files
 
 ## change
 
