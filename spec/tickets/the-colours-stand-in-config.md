@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -115,6 +115,12 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 56322670ee42c5ff24f37be947fd8fecbf3a6a44
     hash_after: 56322670ee42c5ff24f37be947fd8fecbf3a6a44
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: c671e415aa7f9f0d63b7098084ff17fb80ab8099
+    hash_after: c671e415aa7f9f0d63b7098084ff17fb80ab8099
+    returns: 1
+    why: the hand takes it back
 ---
 
 # Ask
