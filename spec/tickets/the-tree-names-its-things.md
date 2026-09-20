@@ -75,7 +75,7 @@ steps:
 urgent: true
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/notes
+step: retro/write
 record:
   - step: sync
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -96,6 +96,14 @@ record:
     hand: the engine
     hash_before: 4cad7c3fb37478956a53d2b935c942ad59052e17
     hash_after: 4cad7c3fb37478956a53d2b935c942ad59052e17
+  - step: retro/notes
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 0b29c87b3d8b509ec6e8ec5eb2416995b612661e
+    hash_after: 0b29c87b3d8b509ec6e8ec5eb2416995b612661e
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
 ---
 
 # Ask
@@ -167,8 +175,9 @@ answers one of those, across the notes, the editor and the viewer.
 ### drained
 
 <!-- retro notes, which passes when the private folder is empty -->
-
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
