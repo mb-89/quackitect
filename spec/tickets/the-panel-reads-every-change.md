@@ -130,7 +130,7 @@ The problems panel behaves as any language's does. Every file's findings stand o
 <!-- the form is checklist -->
 
 - every child is small enough to review whole. Each child stands on the trivial route, with one leaf and one commit.
-- the children add up to the goal. The rows on open and off the disk stand from the earlier panel group, one child takes the move, and one the change as typed.
+- the children add up to the goal. The earlier panel group holds the rows on open and off the disk. One child takes the move, and one the change as typed.
 - a child that waits on another names it under depends_on. Neither waits on the other, and neither names one.
 
 # children
