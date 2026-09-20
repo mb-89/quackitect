@@ -356,11 +356,15 @@ the change the ask asks for.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -368,11 +372,32 @@ the change the ask asks for.
 
 <!-- the form is text -->
 
+An answer in the chat pays the owner's prompt, and the words of the door say
+so now. The road pays already. `onMessageDisplay` reads the text off
+`classic.MessageDisplay`, for a text between two calls as much as for the
+first of a turn.
+
+| what changes | so that |
+|---|---|
+| the door's `SAYS` names the chat as paying | an agent reads what its answer buys |
+| the prompt door's `SAYS` says the same | the two refusals read alike |
+| What the door reads carries the display road | the chapter stops saying a text between calls pays nothing |
+| The reply line splits the two roads | the chat pays, and the report writes the log |
+| What the refusal says quotes the words standing | the chapter and the constant read together |
+
+Three cases hold that road where nothing held it. The report stays: it carries
+the same text into the log, where a retro reads it, and it pays the demand as
+the chat does.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change reaches the two refusals, their two cases, and the three chapters the approach names
+- the door meets a fake box carrying a log alone, so the cases run no door live
+- each new line points at this ticket or at the chapter owning what it says
 
 # verdict
 
