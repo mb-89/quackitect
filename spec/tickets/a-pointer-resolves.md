@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-notes-point-true
 steps:
   - name: design
@@ -187,6 +187,11 @@ record:
       - name: check
         exit: 0
         said: 36 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box 1670436ae0bb · claude-code-remote · helper-15
+    hash_before: 140d314665e60b528e09d411cd74e8ea6c71d317
+    hash_after: 140d314665e60b528e09d411cd74e8ea6c71d317
+reason: done
 ---
 
 # Ask
@@ -421,45 +426,44 @@ its own case.
 
 - spec/guidance/review/reviewing.md
 - spec/tickets/a-pointer-resolves.md
+- spec/vocabulary/terms.yml
 - src/lsp/pointer.go
 - src/lsp/pointer_test.go
 - src/lsp/fixture_test.go
-- src/lsp/finding.go
 - src/lsp/check.go
+- src/lsp/finding.go
+- src/lsp/tree.go
 - src/lsp/main.go
 - src/lsp/serve.go
-- src/lsp/tree.go
-- src/lsp/restated.go
+- src/lsp/watch_test.go
 - src/bridge/findings.js
 - spec/design_output/lsp.md
 - spec/design_output/tree.md
-- spec/design_output/schema.md
-- spec/config/biome.json
+- spec/design_output/level0.md
+- spec/design_output/log.md
 - spec/guidance/voice.md
 - spec/schemas/guidance.schema.yaml
 - spec/schemas/paragraph.schema.yaml
 - spec/processes/retro.yaml
-- spec/processes/standard.yaml
 - spec/config/styles/VoiceShape/VocabularyEntry.yml
-- .claude/skills/level0/lib/tested.js
-- test/level0/tested.test.js
-- spec/tickets/the-unknown-runs-stays-quiet.md
-- spec/tickets/the-window-splits-by-tab.md
 - .claude/output-styles/level0.md
-- .claude/skills/level0/lib/answer.js
+- .claude/skills/level0/lib/tested.js
 - .claude/skills/level0/lib/refuse.js
+- test/level0/tested.test.js
+- src/scripts/cli.js
+- src/scripts/cli-check.js
+- .gitignore
+- .claude/skills/level0/lib/answer.js
 - .claude/skills/level0/lib/stop.js
 - spec/design_output/extension.md
-- spec/design_output/level0.md
-- spec/design_output/log.md
 - spec/tickets/a-log-verb-reads-sessions.md
 - spec/tickets/a-step-changes-hands.md
+- spec/tickets/the-unknown-runs-stays-quiet.md
+- spec/tickets/the-window-splits-by-tab.md
 - src/bridge/bash.js
 - src/bridge/stop.js
-- src/scripts/cli-check.js
 - src/scripts/cli-doors.js
 - src/scripts/cli-read.js
-- src/scripts/cli.js
 - src/scripts/guidance-hand.js
 - src/scripts/pull-route.js
 - src/scripts/pull.js
@@ -481,18 +485,20 @@ its own case.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- The rule, its six cases, the row in `Rules`, the per-file check and the repointed tree do what the ask calls for.
-- Each fix the last round named landed: both files format clean under `spec/config/biome.json`, the Finding chapter is gone and `finding.go` points at the tree note, the row names `src/lsp/pointer.go`, and the rule reads a yaml value opening on a bracket, with a case.
-- Fed the tree a pointer at a chapter nobody wrote, and `./RUNME.sh lint` answers 1 with one `EveryPointerResolves` error naming the file and the line.
-- `./RUNME.sh check` on the branch answers 0, with 28 warnings: 22 in this ticket, 3 in the server note's new chapters, 3 in other tickets that stood before.
-- `./RUNME.sh branch review` answers check 1 on the untracked `plugin.json` the review worktree lacks, the same box fault as last round.
+- The rule, its six cases, the rules list in `check.go`, the per-file check and the repointed tree do what the ask calls for.
+- Each fix the last round named landed. The rule reads a yaml file whole, and a case feeds it a checklist item.
+- The two shapes stand in angle brackets, `sorted` has its line in the tree note, and `Rules` holds one name a row.
+- Fed a copy of the tree a dead pointer on line 48 of `retro.yaml`, and `./RUNME.sh lint` answers 1 naming the line.
+- `./RUNME.sh branch test src/lsp/pointer_test.go` answers green.
+- `./RUNME.sh check` on the branch answers 0, with 36 warnings: 31 in this ticket, 2 in the server note, 3 in other tickets.
+- `./RUNME.sh branch review` answers check 1 on the ignored `plugin.json` the review worktree lacks. That is the box, and the branch's own check answers 0.
 - No retro stands in the handback.
-- Craft: `spec/processes/retro.yaml` lines 48 to 51 and 59 write a pointer in a checklist item, a value opening on a word, and the rule reads past them. Fed line 48 a dead pointer, and `lint` answers 0. The reflect step named the fix for this class, and it landed on the `reads` shape alone. Read every yaml line outside a bracket guard, and write the two shapes in angle brackets: `[[wiki]]` in `paragraph.schema.yaml` line 68 and `[[the note]]` in `VocabularyEntry.yml` line 74.
-- Trivial: `sorted` in `finding.go` points at `tree#what-a-rule-answers`, which says nothing of the order it puts findings in. One line there names the order.
-- Trivial: `Rules` in `tree.go` writes two names on one line, where every other row holds one.
-- Trivial: `level0.md` drops its pointer at `a-step-carries-the-answer` where `log.md` repoints the same target at `a-step-arrives-late`. Every other repoint lands on the chapter that moved or the note that renamed.
+- `gofmt` names no file in `src/lsp`.
+- This round's three commits touch the rule, its cases, the checker, two notes, two yaml shapes and this ticket. Nothing stands beyond the ask.
+- The pointer `level0.md` dropped named its own chapter, so the drop stands.
+- Every other hunk on the branch repoints one line at the chapter that moved or the note that renamed.
 - The design drafts of the two other tickets on the branch are their own commits, outside this ticket's hunks.
 
 ## checked
@@ -501,7 +507,7 @@ fail
 
 <!-- the form is checklist -->
 
-- every fact the change adds stands in one place, and a note points at the file instead of repeating it. The Finding shape now stands in the tree note alone, and every new chapter owns its facts. The order `sorted` gives stands nowhere, and the trivial line above names it.
+- every fact the change adds stands in one place, and a note points at the file instead of repeating it. The rule's chapter holds what it reads and what it skips, and the code and the cases point at it. The order `sorted` gives stands in the tree note alone.
 
 # Discussion
 
