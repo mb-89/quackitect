@@ -12,8 +12,8 @@ import {
   stepOf,
   URGENT,
   urgent,
-} from "./group.js";
-import { staleClaim } from "./stand.js";
+} from "../engine/group.js";
+import { staleClaim } from "./work-free.js";
 import { answerOf } from "./work-answer.js";
 import {
   COL,

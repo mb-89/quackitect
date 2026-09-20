@@ -13,11 +13,11 @@ import {
 import { CHECK } from "../../.claude/skills/level0/lib/answer.js";
 import { inCloud } from "../../.claude/skills/level0/lib/cloud.js";
 import { HOLDS, TICKETS } from "../../.claude/skills/level0/lib/folders.js";
-import { rowsOf, SESSION } from "../../.claude/skills/level0/lib/log.js";
+import { rowsIn, SESSION } from "../../.claude/skills/level0/lib/log.js";
 import { isDraft } from "../../.claude/skills/level0/lib/paths.js";
 import { stampOf, STAMP } from "../../.claude/skills/level0/lib/runs.js";
 import { drains, standsPast, takesFile } from "../../.claude/skills/level0/lib/warnings.js";
-import { spanOf, ticketAt, WORK_BRANCH } from "../scripts/group.js";
+import { spanOf, ticketAt, WORK_BRANCH } from "../engine/group.js";
 import { heldGroup, openPrivate, queueHolds } from "../../.claude/skills/level0/lib/ticket.js";
 import {
   decide,
@@ -93,14 +93,24 @@ export function refusedByHold(tool) {
   ].join(" ");
 }
 
-// The hold ends the turn it lands in, so the turn's end puts it back. [[spec/design_output/stop#the-hold]]
-export function dropsHold(_e, box) {
+// The hold ends the turn it lands in, so the turn's end puts it back. A helper's turn end touches neither, the way every door beside this one skips one. [[spec/design_output/stop#the-hold]]
+export function dropsHold(e, box) {
+  if (e?.agentId) return { pass: true };
   const hold = String(asks(box, HOLD) ?? OFF);
   box.held = "";
   if (hold !== FINISH && hold !== STOP) return { pass: true };
+  // The mark the vote reads, so a hold dropped here still ends the turn it stood in. [[spec/design_output/stop#the-hold-outlives-its-drop]]
+  box.stood = hold;
   writes(box, HOLD, OFF);
   box.log.say("debug", "config", `the hold stood at ${hold}, and drops to ${OFF}`);
   return { pass: true };
+}
+
+// The hold that stands over this turn: the one the owner holds now, or the one the turn's end dropped. [[spec/design_output/stop#the-hold-outlives-its-drop]]
+export function holdHere(box) {
+  const hold = String(asks(box, HOLD) ?? OFF);
+  if (hold === FINISH || hold === STOP) return hold;
+  return String(box.stood ?? OFF);
 }
 
 export function sawCall(e, box) {
@@ -109,9 +119,10 @@ export function sawCall(e, box) {
   todosOf(box).sawCall(e);
 }
 
-// A prompt from outside this plugin opens a turn, and the tooth counts them. [[spec/design_output/stop#the-tooth-holds-its-state]]
+// A prompt from outside this plugin opens a turn, and the tooth counts them. A hold is one turn long, so the mark of the turn before drops here. [[spec/design_output/stop#the-tooth-holds-its-state]]
 export function sawPrompt(e, box) {
   if (e?.agentId) return;
+  box.stood = "";
   toothOf_(box).sawPrompt(Boolean(e?.mine));
 }
 
@@ -146,7 +157,8 @@ export function onStop(e, box) {
   const text = String(e?.last_assistant_message ?? "");
   const claimed = box.claim ?? lastLineReason(text);
   box.claim = null;
-  const hold = String(asks(box, HOLD) ?? OFF);
+  // The hold that stood over this turn, so the order the two events arrive in decides nothing. [[spec/design_output/stop#the-hold-outlives-its-drop]]
+  const hold = holdHere(box);
   const off = asks(box, ENABLED) === false;
   const decision = decide(rules, {
     claimed,
@@ -304,7 +316,7 @@ function chatIsNew(box) {
 
 function promptsIn(box) {
   try {
-    return rowsOf(String(box.disk.read(join(box.work, SESSION)))).filter(
+    return rowsIn(String(box.disk.read(join(box.work, SESSION)))).filter(
       (one) => one.kind === "prompt",
     ).length;
   } catch {

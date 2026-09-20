@@ -97,6 +97,8 @@ test("the refusal quotes the rule it holds", () => {
     /Write the answer in\nthe chat, as text: what you understood and what you do next\. Then work\./,
   );
   assert.doesNotMatch(SAYS, /Call mcp__level0__log/);
+  // The chat is a road of its own now, so the words say what it buys. [[spec/tickets/the-answer-door-reads-chat]]
+  assert.match(SAYS, /The chat pays this door the moment it shows that answer\./);
 });
 
 // [[spec/design_output/level0#the-score-is-a-rate]]

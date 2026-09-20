@@ -5,6 +5,8 @@
 
 export const PULL_TOOL = "pull";
 export const PULL_CALL = `mcp__level1__${PULL_TOOL}`;
+// The hand's session file, which the hook beside this library writes. folders.js owns the name, and a plugin imports nothing past its own folder, so level one spells it here and the hook imports it. [[spec/design_output/pull#the-hand-and-the-hold]]
+export const SESSION = ".se/.runtime/session.json";
 export const LABELS = ["follows", "breaks"];
 export const BREAKS = "breaks";
 
@@ -71,10 +73,10 @@ export function spawnPromptIn(answer) {
         .trim();
 }
 
-// [[spec/design_output/pull#the-hand-and-the-hold]]
+// Every spelling of the id this tree meets, the copilot library's `session_id` among them. [[spec/design_output/pull#the-hand-and-the-hold]]
 export function sessionOf(e) {
   return {
-    id: String(e?.session?.id ?? e?.sessionId ?? "").trim(),
+    id: String(e?.session?.id ?? e?.sessionId ?? e?.session_id ?? "").trim(),
     harness: String(e?.harness ?? e?.client ?? "").trim(),
   };
 }

@@ -6,7 +6,7 @@
 import assert from "node:assert/strict";
 import { join } from "node:path";
 import { test } from "node:test";
-import { onStop } from "../../src/bridge/stop.js";
+import { dropsHold, onStop, sawPrompt } from "../../src/bridge/stop.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeProc } from "../../src/doors/fake/proc.js";
 
@@ -195,4 +195,73 @@ test("the queue holds a stop on completion while a free ticket stands", () => {
     it.box,
   );
   assert.match(said.result.block, /The queue holds work for this box/);
+});
+
+// The two rules the owner's hold fires, which the fixture above leaves out. [[spec/design_output/stop#the-hold]]
+const HOLD_RULES = `
+- id: the-owner-holds-this-session
+  side: stop
+  priority: 85
+  decides: mechanical
+  runs: owner-holds
+  says: The owner holds this session at stop, so this turn ends here.
+
+- id: the-owner-asks-to-finish
+  side: stop
+  priority: 84
+  decides: mechanical
+  runs: owner-finishes
+  says: The owner holds this session at finish, so this turn ends with the piece in hand.
+${RULES}`;
+
+// A box whose owner holds the session, over the two rules that hold fires. [[spec/design_output/stop#the-hold]]
+function heldBox(hold) {
+  return box({
+    [at("spec/config/level0.json")]: JSON.stringify({
+      stop: { enabled: true, mostInARow: 3, hold },
+      engine: { binding: "queue" },
+      refactor: REFACTOR,
+    }),
+    [at("spec/config/stop/level0.yml")]: HOLD_RULES,
+  });
+}
+
+const ENDS = { last_assistant_message: "The work stands where it is." };
+
+// [[spec/tickets/a-standing-stop-ends-turns]]
+test("a hold standing at the stop ends the turn", () => {
+  const it = heldBox("stop");
+  assert.deepEqual(onStop(ENDS, it.box), { pass: true });
+  assert.match(it.said[0][2], /the turn ends/);
+});
+
+// [[spec/tickets/a-standing-stop-ends-turns]]
+test("a hold the turn's end drops still ends that turn", () => {
+  const it = heldBox("stop");
+  dropsHold({}, it.box);
+  assert.deepEqual(
+    onStop(ENDS, it.box),
+    { pass: true },
+    "the hold stood in this turn, so the turn ends over the standing work",
+  );
+});
+
+// [[spec/tickets/a-standing-stop-ends-turns]]
+test("a hold at finish the turn's end drops still ends that turn", () => {
+  const it = heldBox("finish");
+  dropsHold({}, it.box);
+  assert.deepEqual(onStop(ENDS, it.box), { pass: true });
+});
+
+// [[spec/tickets/a-standing-stop-ends-turns]]
+test("a prompt opens a turn, so the hold of the turn before ends nothing", () => {
+  const it = heldBox("stop");
+  dropsHold({}, it.box);
+  sawPrompt({}, it.box);
+  const said = onStop(ENDS, it.box);
+  assert.match(
+    said.result.block,
+    /names no stop reason/,
+    "the next turn holds open on its own reasons",
+  );
 });

@@ -10,6 +10,7 @@ import {
   LABELS,
   PULL_CALL,
   pullSpec,
+  SESSION,
   sessionOf,
   spawnPromptIn,
 } from "../lib/pull.js";
@@ -18,8 +19,6 @@ const CLI = ["node", "src/scripts/cli.js"];
 // The verb and the flag src/scripts/pull-tool.js reads, fixed while the argv behind them moves. [[spec/design_output/pull#the-hand-out]]
 const PULL = ["ticket", "pull"];
 const TOOL = "--tool";
-// The hand's session file of [[spec/design_output/pull#the-hand-and-the-hold]], whose folder folders.js owns, spelled again here because a plugin imports nothing past its own folder.
-const SESSION = ".se/.runtime/session.json";
 const CONFIG = "spec/config/level0.json";
 const RUNNING = 600000;
 const JUDGE = "--judge";

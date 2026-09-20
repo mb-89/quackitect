@@ -3,7 +3,7 @@
 // answer, and every column naming an order reads the same one.
 // [[spec/design_output/pull#the-queue-is-a-score]]
 
-import { dependsOn, spanOf, TICKETS, urgent } from "./group.js";
+import { dependsOn, spanOf, TICKETS, urgent } from "../engine/group.js";
 import { entriesOf } from "./pull-writes.js";
 
 // A second reads as this many of what a clock answers. [[spec/design_output/pull#the-queue-is-a-score]]

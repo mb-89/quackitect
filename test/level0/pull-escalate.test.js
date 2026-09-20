@@ -4,7 +4,7 @@
 
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { fieldOf } from "../../src/scripts/group.js";
+import { fieldOf } from "../../src/engine/group.js";
 import { withPersonStep } from "../../src/scripts/pull.js";
 import { pulling, work } from "../../src/scripts/work.js";
 import {

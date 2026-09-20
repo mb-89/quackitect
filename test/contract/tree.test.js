@@ -41,7 +41,7 @@ import {
 } from "../../.claude/skills/level0/lib/tree.js";
 import { EDITOR_VALE_INI } from "../../.claude/skills/level0/lib/servers.js";
 import { boxOf } from "../../.claude/skills/level0/lib/private.js";
-import { SESSION } from "../../src/scripts/hand.js";
+import { SESSION } from "../../src/scripts/pull-hand-of.js";
 import { disk } from "../../src/doors/disk.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
@@ -365,14 +365,19 @@ test("a spelling of a name the runtime half took is refused where the old place 
   assert.deepEqual(privateFolderOwned(fakeTree(kept, Object.keys(kept))), []);
 });
 
-// Two hooks import nothing, so each spells the session file the hand writes. [[spec/design_input/the-runtime-files-stand-apart]]
+// A plugin imports nothing past its own folder, so each plugin spells the session file the hand writes once. Level one spells it in the library its hook imports. [[spec/design_input/the-runtime-files-stand-apart]]
 test("every forced copy of the session file says what the hand module says", () => {
   for (const path of [
     ".claude/skills/level0/hooks/level0.js",
-    ".claude/skills/level1/hooks/level1.js",
+    ".claude/skills/level1/lib/pull.js",
   ]) {
     assert.match(here.read(path), new RegExp(`"${SESSION}"`), path);
   }
+  assert.doesNotMatch(
+    here.read(".claude/skills/level1/hooks/level1.js"),
+    new RegExp(`"${SESSION}"`),
+    "the hook imports the path from the library beside it",
+  );
 });
 
 test("a file naming the owner beside the copy passes, and a test file passes", () => {

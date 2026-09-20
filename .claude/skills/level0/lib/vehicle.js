@@ -137,6 +137,8 @@ function parsed(read) {
 export const LINK = "vehicle.json";
 export const TEMPLATE = "src/stub";
 export const SETTINGS = ".claude/settings.json";
+// The file the box writes beside the tree's own, which git leaves alone. [[spec/design_output/level0#the-doctor-probes-every-hook]]
+export const SETTINGS_LOCAL = ".claude/settings.local.json";
 export const KEEP = ".gitkeep";
 export const STUB_FOLDERS = ["project/spec/tickets", "project/spec/guidance", "project/src"];
 

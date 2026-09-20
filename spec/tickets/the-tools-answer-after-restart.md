@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -89,7 +89,61 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: verdict
+record:
+  - step: design/draft
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: f095174f8c061828b09ab9b0e4eb3c5452105eca
+    hash_after: f095174f8c061828b09ab9b0e4eb3c5452105eca
+  - step: design/review
+    hand: box fa49097ce66c · claude-code-remote · helper-2
+    hash_before: 4950ae0fa9291bb147c2ee8a94b23ef5e46c5516
+    hash_after: 4950ae0fa9291bb147c2ee8a94b23ef5e46c5516
+    returns: 1
+    why: the reader sits in the registration branch of `decide`, which runs after the door. Seat it beside `freshens`.; the call meeting the restarted server reads an empty box under that order, which is the fault the ask names.; the four cases cover the registration and the context block. A case driving `tool.call` on a fresh box goes missing.; the reader refills the projections that `freshens` fills already on a fresh box. Leave that fill where it stands.; `box.tools` comes from `surveyHere`, which `src/bridge/guidance.js` exports nowhere. The change table names one file alone.; `decide` sets `box.specs` nowhere, and `toolsText` reads `box.specs ?? []`. Name that assignment in the change.; the mint throws on a fresh box, because `mintedNote` calls `schemas.get(kind)` over nothing. The draft names the empty enum alone.; `{ register }` registers on any event, by the answer table in `spec/design_output/level0.md`. The road for the patch tool holds.; the scope call holds. The window with no server standing belongs to [[spec/tickets/the-bridge-says-it-falls]].; the table on what a fresh box holds matches the tree. The write door fills `box.schemas` itself, and earns a row.; the draft touches the ticket file alone, so the diff stands inside the brief.
+  - step: design/draft
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 0ca55c2c641de362c0dc0b682ebffbe56842183e
+    hash_after: 0ca55c2c641de362c0dc0b682ebffbe56842183e
+  - step: design/review
+    hand: box fa49097ce66c · claude-code-remote · helper-4
+    hash_before: 9c6d407f5dee5b289df025a62cc96d518cc2fa0d
+    hash_after: 9c6d407f5dee5b289df025a62cc96d518cc2fa0d
+  - step: implement/tests-red
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 4a93940562e7a57640eaebd34255ab96d0f9f349
+    hash_after: 4a93940562e7a57640eaebd34255ab96d0f9f349
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 4 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 30fee4007c7a91108d5bafc6c3a2ffd28f19920e
+    hash_after: 30fee4007c7a91108d5bafc6c3a2ffd28f19920e
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 49a0cdd5b2c68ff8a83e75856ca14e493d661f4d
+    hash_after: 49a0cdd5b2c68ff8a83e75856ca14e493d661f4d
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 415 test(s) pass in 38 file(s); green, src/engine/swap passes
+      - name: check
+        exit: 0
+        said: The rules pass.
+  - step: verdict
+    hand: box fa49097ce66c · claude-code-remote · helper-9
+    hash_before: 0748e10f79eecd29bd3ef520ebba817465fd1cdf
+    hash_after: 0748e10f79eecd29bd3ef520ebba817465fd1cdf
+reason: done
 ---
 
 # Ask
@@ -113,6 +167,62 @@ a hand writes a script where a dead tool stands, and the guidance points at noth
 
 <!-- the form is text -->
 
+- one reader filling the fields a session start fills, run where the box holds none
+- `decide` runs it beside `freshens`, so the door and the registration read a full box
+- cases driving a fresh box, the way a restart hands one over
+
+**What stands.** `opensSession` fills the box at `session.start`, and a restart
+builds a new box with none of it. The harness sends one `session.start` a
+session, and the session runs on past a restart.
+
+| what a session start fills | who reads it | what a fresh box holds |
+|---|---|---|
+| `box.schemas` | the mint spec, the mint, the write door | nothing, and the write door fills it itself |
+| `box.tools` | the block naming what this box has | nothing |
+| `box.specs` | the same block | nothing |
+| `box.projections`, `box.sources` | the write door | nothing, and `freshens` fills them itself |
+| the warm index | the search tools | a cold index |
+
+**The fault.** `SPECS` in `src/bridge/tools.js` builds the mint spec off
+`box.schemas`. A fresh box gives it no kinds, so the spec registers an empty
+list of them and no call satisfies it. `mintedNote` then throws on
+`schemas.get`, and the tool call answers an error.
+
+The registration itself goes out. `decide` answers `register` where
+`box.registered` stands false, and a fresh box stands false. The answer table
+in [[spec/design_output/level0]] takes `register` on any event, so the road
+holds. The tools come back named, and the mint comes back empty.
+
+**The change.** One reader fills what a fresh box lacks, and `decide` runs it
+ahead of the door.
+
+| what changes | where |
+|---|---|
+| a reader filling `box.schemas`, `box.tools` and `box.specs` | `src/bridge/server.js` |
+| `decide` calls it beside `freshens`, ahead of the door | the same file |
+| `opensSession` calls it in place of the lines it holds | the same file |
+| `surveyHere` leaves the module, so the reader reads the survey | `src/bridge/guidance.js` |
+
+The reader reads the way `guidanceOf` does: it fills a field once and answers
+it after. `box.specs` takes `specsOf(box)` there, so the block naming what this
+box has reads a full list. The projections stay with `freshens`, which fills
+them on a fresh box already. The warm index stays out, because a cold index
+answers and warms itself.
+
+**The cases.** Each drives a box holding no session start, the way a restart
+hands one over.
+
+- a `tool.call` on a fresh box registers the patch tool and the check tool
+- the mint spec names every kind the schemas hold
+- the mint tool answers a refusal on a fresh box, in place of throwing
+- a second event registers nothing, because the first one registers
+- the block naming what this box has reaches the session
+
+**What this leaves.** A tool call landing inside the restart window meets no
+server, and the bridgehead passes it through. That window belongs to
+[[spec/tickets/the-bridge-says-it-falls]], which says the fall out loud. This
+ticket covers the events after the server stands again.
+
 ## review
 
 <!-- reads the approach against the ask -->
@@ -122,6 +232,19 @@ a hand writes a script where a dead tool stands, and the guidance points at noth
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+- the reader sits beside `freshens` in `decide`, ahead of the door. A restarted box fills before the first event.
+- the fault reads true. `SPECS` hands `mintSpec` an empty `box.schemas`, and the kind enum registers empty. `mintedNote` then throws on `schemas.get`.
+- the change table names `src/bridge/guidance.js`, where `surveyHere` stands unexported. It names the `box.specs` fill that `toolsText` reads.
+- the projections stay with `freshens`, which fills them on a fresh box itself.
+- the cases drive a `tool.call` on a fresh box, which the ask asks for. The mint case covers the throw.
+- the scope call holds. The window with no server standing belongs to [[spec/tickets/the-bridge-says-it-falls]].
+- `./RUNME.sh check` exits 0 on this branch. The retro stands absent, which a branch mid-ticket calls for.
+- the draft touches the ticket file alone, so the diff stands inside the brief.
+- for implement: `decide` builds `specsOf(box)` again in its registration branch. Answer `box.specs` there instead.
+- for implement: the mint refuses an unknown kind, and writes a known one, once the schemas stand.
 
 # implement
 
@@ -135,17 +258,46 @@ a hand writes a script where a dead tool stands, and the guidance points at noth
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+The verb answers `assertion`, and most cases fail on their own assertion.
+
+| what the case asks | what a fresh box answers |
+|---|---|
+| the mint spec names every kind the schemas hold | an empty list of kinds |
+| the mint answers a refusal on an unknown kind | a `TypeError` off `schemas.get` |
+| the registration hands back the box's own list | a second list, built inside `decide` |
+| the tools block names the survey and the mint | no block, because the survey stands nowhere |
+
+Two cases pass on the tree as it stands. A tool call on a fresh box registers
+the patch tool and the check tool, and a second event registers nothing. That
+matches the review's reading: the registration road holds, and what rides it
+comes back empty.
+
+**What surprises me.** The fake bridgehead under `src/doors/fake` drops the
+register where the answer carries an `after` field. A canary debt puts one
+there on the first tool call, so a case driving the fake reads no registration
+at all. The cases call `decide` straight, and the fake stays as it stands.
+
+The box the cases build comes from `boxOf`, which takes every door as an
+argument. So the disk, the clock, the process, the log and the index all stand
+as fakes, and the case touches memory alone.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `test/level0/restart-box.test.js` alone, which the ask's second line calls for
+- the box comes from `boxOf` with a fake disk, clock, process, log and index
+- the head comment names the approach, and each helper carries the line saying what it builds
 
 ## reflect
 
@@ -173,11 +325,17 @@ a hand writes a script where a dead tool stands, and the guidance points at noth
 
 <!-- the form is command -->
 
+    ./RUNME.sh check
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `server.js`, `guidance.js`, the level zero chapter and the cases
+- the cases build the box off `boxOf`, and every door it takes stands as a fake
+- the chapter at [[spec/design_output/level0#a-restart-fills-the-box]] holds the approach, and `fillsBox` points at it
 
 ## tests-green
 
@@ -189,11 +347,15 @@ a hand writes a script where a dead tool stands, and the guidance points at noth
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -201,11 +363,35 @@ a hand writes a script where a dead tool stands, and the guidance points at noth
 
 <!-- the form is text -->
 
+The server restarts under a running session, and the box it builds carries none
+of what the session start fills. `fillsBox` fills the schemas, the survey and
+the specs, and `decide` runs it ahead of the door.
+
+| what lands | where |
+|---|---|
+| `fillsBox`, and the two calls into it | `src/bridge/server.js` |
+| `surveyHere` leaves the module | `src/bridge/guidance.js` |
+| the chapter saying why | [[spec/design_output/level0#a-restart-fills-the-box]] |
+| the cases | `test/level0/restart-box.test.js` |
+
+The mint is what this buys. `mintSpec` reads the kinds off `box.schemas`, and a
+fresh box holds none. So the kind list registers empty, and `mintedNote` throws
+on `schemas.get`. The tools block reads `box.tools` and `box.specs` the same
+way, and a fresh box leaves it short.
+
+The registration answers `box.specs` now, so `decide` builds the list once. A
+session start passes `again`, because the tree moves under a box that stands.
+The projections stay with `freshens`, which fills them on a fresh box already.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches `server.js`, `guidance.js`, the level zero chapter and the cases
+- the cases build the box off `boxOf`, and every door it takes stands as a fake
+- `fillsBox` carries the line saying what it fills, and points at its chapter
 
 # verdict
 
@@ -217,17 +403,53 @@ a hand writes a script where a dead tool stands, and the guidance points at noth
 
 <!-- the form is files -->
 
+- spec/config/projections.json
+- spec/design_output/level0.md
+- spec/guidance/code/code.md
+- spec/guidance/review/reviewing.md
+- spec/tickets/the-doctor-probes-every-hook.md
+- spec/tickets/the-tools-answer-after-restart.md
+- src/bridge/guidance.js
+- src/bridge/projection.js
+- src/bridge/server.js
+- src/bridge/tools.js
+- src/bridge/write.js
+- src/engine/projection.js
+- test/level0/restart-box.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- line one lands: `fillsBox` fills `box.schemas`, `box.tools` and `box.specs`. The mint spec names the kinds now.
+- line two lands: `test/level0/restart-box.test.js` drives six cases on a box carrying no session start.
+- two of those cases drive a `tool.call` straight, the way the ask's second line asks.
+- the fault reads true: 4 of the 6 cases fail on `30fee400`, and all 6 pass on `0748e10f`
+- the mint case feeds the kind `nothing` and reads back a refusal, in place of a `TypeError`
+- a mutant dropping the survey fill turns case six red, 1 against 5
+- a mutant handing the registration `specsOf(box)` again turns case five red, 1 against 5
+- `./RUNME.sh check` answers 0 on `0748e10f`, 1296 cases green and 2 skipped
+- `./RUNME.sh branch review` reads the retro as absent from the handback, which a branch mid-group calls for
+- the order holds: `fillsBox` runs ahead of `freshens`, and no projection target sits under `spec/schemas`
+- the fields the table leaves out fill themselves, because `guidanceOf`, `sessionHere` and `freshens` each fill one
+- `fillsBox` reaches every event now, `engine.create` among them, and each guard holds the fill to once
+- the ten findings of design/review land, the two it leaves for implement among them
+- the diff reaches five files, and every one serves the two lines of the ask
+- minor: the comment on `fillsBox` carries four sentences, and one stands word for word in its chapter. Cut the three the chapter owns. [[spec/guidance/code/code]]
+- minor: `schemaDoor` in `src/bridge/write.js` fills `box.schemas` the same way, and this branch adds no third
+- minor: case one passes without the change too, so it guards the road in place of proving the fix
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the chapter at [[spec/design_output/level0#a-restart-fills-the-box]] owns the approach, and `fillsBox` points at it. The fill itself stands once, because `fillsBox` calls `schemasHere`, `surveyHere` and `specsOf` where they stand. The one repeat is the comment's third sentence, which the finding above names.
 
 # Discussion
 

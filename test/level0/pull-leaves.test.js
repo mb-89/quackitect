@@ -5,7 +5,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { readNote } from "../../.claude/skills/level0/lib/schema.js";
-import { fieldOf } from "../../src/scripts/group.js";
+import { fieldOf } from "../../src/engine/group.js";
 import {
   chapterOf,
   commandsRun,
@@ -14,7 +14,7 @@ import {
   takeable,
   verdictIn,
 } from "../../src/scripts/pull.js";
-import { goModulesOf, goSays, testSays } from "../../src/scripts/test-verb.js";
+import { goModulesOf, goSays, testSays } from "../../src/scripts/work-test.js";
 import { ticket } from "../../src/scripts/ticket.js";
 import { pulling, work } from "../../src/scripts/work.js";
 import {

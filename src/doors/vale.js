@@ -3,7 +3,7 @@
 // [[spec/design_output/level0#the-write-door]]
 
 import { lintText } from "../../.claude/skills/level0/lib/vale.js";
-import { readTools, whereIs } from "../scripts/tools.js";
+import { readTools, whereIs } from "../engine/tools.js";
 
 export function vale(disk, proc, root) {
   const found = whereIs(disk, root, "vale", readTools(disk, root));

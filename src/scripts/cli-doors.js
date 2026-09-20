@@ -12,8 +12,8 @@ import { git } from "../doors/git.js";
 import { log } from "../doors/log.js";
 import { proc } from "../doors/proc.js";
 import { homeIn } from "./editor.js";
-import { handDoors } from "./hand.js";
-import { readTools, whereIs } from "./tools.js";
+import { handDoors } from "./pull-hand-of.js";
+import { readTools, whereIs } from "../engine/tools.js";
 import { rootsHere } from "./vehicle.js";
 
 export const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));

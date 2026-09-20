@@ -7,7 +7,7 @@ import { mutations } from "./mutations.js";
 import { refusal } from "./refuse.js";
 import { landsOnTrunk } from "./trunk.js";
 import { lintText } from "./vale.js";
-import { readTools, whereIs } from "../../../../src/scripts/tools.js";
+import { readTools, whereIs } from "../../../../src/engine/tools.js";
 import { statusOf } from "../../../../src/scripts/work.js";
 import { heldReadsIn } from "../../../../src/scripts/guidance-hand.js";
 import { candidateRun } from "./candidate-check.js";

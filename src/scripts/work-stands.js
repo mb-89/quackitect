@@ -5,7 +5,7 @@
 
 import { isTagged, reaches } from "../../.claude/skills/level0/lib/todo.js";
 import { TRUNK } from "../../.claude/skills/level0/lib/trunk.js";
-import { CONTRACT_HEADING, contractRows } from "./branch-usage.js";
+import { CONTRACT_HEADING, contractRows } from "./work-usage.js";
 import {
   CLOSED,
   fieldOf,
@@ -17,7 +17,7 @@ import {
   ticketAt,
   ticketNamed,
   WORK_BRANCH,
-} from "./group.js";
+} from "../engine/group.js";
 import { asText, framed, namesIn, REF_FORMAT, refsIn } from "./work-read.js";
 
 export const BRIEF = "HANDOVER.md";

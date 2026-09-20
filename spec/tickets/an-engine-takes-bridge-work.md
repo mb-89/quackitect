@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -89,7 +89,91 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: verdict
+record:
+  - step: design/draft
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: cdf685ad92d873867f538ae2cd8c5320702067f9
+    hash_after: cdf685ad92d873867f538ae2cd8c5320702067f9
+  - step: design/review
+    hand: box fa49097ce66c · claude-code-remote · helper-4
+    hash_before: 75a12d571cbebf0c8ff62882a658e60ce6702e0e
+    hash_after: 75a12d571cbebf0c8ff62882a658e60ce6702e0e
+    returns: 1
+    why: "The four moves and the swap cost hold, and two claims under them miss the code.; Name `ownerDoor` and `marksStale` beside `freshens`, because `src/bridge/write.js` runs all three off a write event.; Say where those two land, so the engine keeps the rule the draft sets.; Answer the third line of the ask: name the files moving out of `src/scripts`.; The draft names the `cli-` and `pull-` groups alone.; The `retro-`, `work-` and `guidance-` groups share that shape, so name each one too.; Sort `queue.js`, `group.js` and `landed.js`, which each answer a question about the tree.; Each of those three stands outside the verb table in `cli.js`.; Give `goModulesOf` a disk handle in the plan, because it takes path strings alone today.; **What holds.**; `./RUNME.sh check` exits 0 on this branch.; `goModulesIn` and `goModulesOf` each stop one level under `src`, so the swap move drops the module.; `status.js` and `tense.js` export readers alone, which matches the engine rule.; The draft names the open second line of the ask, and leaves the door cut to a later ticket.; The draft commit touches the ticket file alone.; A retro stands absent from the handback, which suits a ticket at design review.; `./RUNME.sh branch review` reports a 1 from a Vale timeout, which this box causes."
+  - step: design/draft
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 8782253b9cb47ebe4b53d397e020f3507b149a2e
+    hash_after: c32f9c806e0f8e5fb69f49ee9a353f6ba4cb3fae
+  - step: design/review
+    hand: box fa49097ce66c · claude-code-remote · helper-5
+    hash_before: dde7a5fa787dfe812b8bf52673a72657f58866a6
+    hash_after: dde7a5fa787dfe812b8bf52673a72657f58866a6
+    returns: 2
+    why: "The rule, the four moves, the projection cut and the swap cost hold, and three claims miss the code.; `guidance-` serves `branch guidance`, which `src/scripts/work.js` wires as a row of the branch verb.; Correct that row, because the group table names `standing` today.; `freshens` and the session start call `projectionsHere` and `sourcesOf`.; `ownerDoor` and `marksStale` read the `box.projections` and `box.sources` fields alone.; Correct the caller column of the projection cut table to match those two lines.; `hand.js`, `stand.js` and `trust.js` stand outside the five groups and the verb table.; `spawn.js`, `unblock.js`, `editor.js` and `process.js` stand outside both as well.; Sort each of those, because the third ask line covers every file under `src/scripts`.; Name the folder taking `queue.js`, `group.js` and `landed.js`, which the mover table leaves open.; **What holds.**; `./RUNME.sh check` exits 0 on this branch, and `./RUNME.sh branch review` exits 0 with the check passing.; `status.js` and `tense.js` export readers alone, which matches the engine rule.; `goModulesIn` lists dirs one level under `src`, and `goModulesOf` matches one level by regex.; `src/bridge/write.js` runs `ownerDoor` as a check and `marksStale` after a write, as the cut table says.; `src/bridge/server.js` runs `freshens` inside `decide`, so the bridge keeps it.; The draft names the open second line of the ask, and leaves the door cut to a later ticket.; The two draft commits touch the ticket file alone, which leaves rules and tests to implement.; A retro stands absent from the handback, which suits a ticket at design review.; **What the last verdict asks.**; The draft answers the finding on `ownerDoor`, `marksStale` and `freshens`.; The draft answers where those two land: both stay in the bridge.; The draft answers the finding naming the `retro-`, `work-` and `guidance-` groups.; The draft answers the finding sorting `queue.js`, `group.js` and `landed.js`.; The draft answers the finding giving `goModulesOf` a disk handle.; The third ask line stands open, because the draft reaches three files of many."
+  - step: design/draft
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: f42ec376c5f0a1d33c5f0257736add0597a3a8bb
+    hash_after: 0b9bf9d00059a57c9b38deb8dbb3c5a98f385a08
+  - step: design/review
+    hand: box fa49097ce66c · claude-code-remote · helper-6
+    hash_before: 0439d8a2e5376cfee54543ee5908a77188d99fe5
+    hash_after: 0439d8a2e5376cfee54543ee5908a77188d99fe5
+    returns: 3
+    why: The rule, the four moves, the projection cut and the swap cost hold, and the third ask line stands open.; Eight files under `src/scripts` stand outside the five groups and outside every table.; Name `graph.js`, `probe.js`, `stub.js` and `ticket.js` there.; Name `tools.js`, `tui.js`, `vehicle.js` and `voice.js` there too.; Add a row saying a file named for its own verb stands, which sorts seven of the eight.; Give `tools.js` a row of its own, because four files outside the folder read it.; `src/doors/biome.js` and `src/doors/vale.js` read it, as `src/bridge/guidance.js` and `src/bridge/findings.js` do.; That shape matches `group.js`, which the draft sends to the engine for the same reason.; The stay table says five files and lists eight across six rows, so correct the count.; **What holds.**; `./RUNME.sh check` exits 0 on this branch, and `./RUNME.sh branch review` exits 0.; `status.js` and `tense.js` export readers alone, which matches the engine rule.; `src/swap` holds a `go.mod`, and `goModulesIn` lists dirs one level under `src`.; `goModulesOf` matches a test path by regex one level down, so the swap move drops the module.; `src/bridge/write.js` runs `ownerDoor` as a check and `marksStale` after a write.; `ownerDoor` reads `box.projections`, and `marksStale` reads `box.sources`, as the cut table says.; `freshens` runs inside `decide`, and `opensSession` fills those two fields at the session start.; `group.js` reaches `src/bridge/bash.js` and `src/bridge/stop.js`, so the engine suits it.; `work-stands.js` stands, so `stand.js` takes a name of its own under that prefix.; `guidance-verb.js` serves `branch guidance`, which `src/scripts/work.js` wires as a branch row.; The draft names the open second line of the ask, and leaves the door cut to a later ticket.; The draft commits touch the ticket file alone, which leaves rules and tests to implement.; A retro stands absent from the handback, which suits a ticket at design review.; **What the last verdict asks.**; The draft answers the `guidance-` row, which now names `branch guidance` and its wiring.; The draft answers the caller column of the projection cut table, and the code matches it.; The draft answers the finding sorting `hand.js`, `stand.js` and `spawn.js`.; The draft answers the finding sorting `unblock.js`, `editor.js`, `process.js` and `trust.js`.; The draft answers the folder taking `queue.js`, `group.js` and `landed.js`.; The third ask line stands open for the eight files above, which two rows close.
+  - step: design/draft
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 052a8991676f2ca7ac4b787f6f81b380d2b2a07d
+    hash_after: 052a8991676f2ca7ac4b787f6f81b380d2b2a07d
+  - step: design/review
+    hand: box fa49097ce66c · claude-code-remote · helper-7
+    hash_before: 87ebe6d5fab943ccc05cf073f9e54db31ec93aa7
+    hash_after: 87ebe6d5fab943ccc05cf073f9e54db31ec93aa7
+    returns: 4
+    why: Every file under `src/scripts` takes a row now, and two moves carry a cost the plan leaves open.; The swap move breaks two Go replace lines, where the plan names one change alone.; `src/index/go.mod` and `src/lsp/go.mod` each read `replace quackitect/swap => ../swap`.; Add a row sending both to `../engine/swap`, because the check runs those two modules.; `queue.js` imports `entriesOf` from `src/scripts/pull-writes.js`, which the plan keeps in the scripts folder.; The engine row of the import table says the doors alone, so say where `entriesOf` lands.; One more reader of `src/scripts/tools.js` stands outside `src`, so correct the reader row.; `.claude/skills/level0/lib/copilot-runtime.js` imports it by relative path, and that path follows the move.; Six notes under `spec/design_output` name a moving file by path, so say the notes follow.; `tools.md`, `work.md` and `viewer.md` name three of them.; `pull.md`, `review.md` and `level0.md` name the rest.; `go-tests.js` serves `branch test` too, where `test-verb.js` imports `goEnvOf`.; `landed.js` serves `branch unblock` too, where `unblock.js` imports it.; `hand.js` keeps every caller inside `src/scripts`, so say what sends it to the engine.; **What holds.**; `./RUNME.sh branch review the-bridge-keeps-transport` exits 0, the check passes, and a retro stands absent.; The draft commits touch the ticket file alone, which leaves code and tests to implement.; `status.js` and `tense.js` import node and wink alone, so those two rename whole.; `src/doors/biome.js` and `src/doors/vale.js` import `readTools` from the scripts folder.; `src/bridge/guidance.js` and `src/bridge/findings.js` import it as well.; `viewer.js` reaches the `tui` verb through `tuiDoors`, which `cli-check.js` exports.; `goModulesIn` lists dirs one level under `src`, and `goModulesOf` matches a test path by regex.; `goModulesOf` reads path strings alone, and it stands in `src/scripts/test-verb.js`.; `src/bridge/write.js` runs `ownerDoor` as a check and `marksStale` after a write.; `freshens` runs inside `decide`, and `opensSession` fills the projections and the sources fields.; `group.js` reaches `src/bridge/bash.js` and `src/bridge/stop.js`, so the engine suits it.; `cli.js` wires a verb for each file in the stay table, so that row holds.; The draft names the open second line of the ask, and leaves the door cut to a later ticket.; **What the last verdict asks.**; The draft answers the finding naming `graph.js`, `probe.js`, `stub.js` and `ticket.js`.; The draft answers the finding naming `tui.js`, `vehicle.js` and `voice.js`.; The draft answers the row for a file carrying the name of its own verb.; The draft answers the finding giving `tools.js` a row under the engine table.; The stay table drops its count, so that finding closes.
+  - step: design/draft
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: aed23308eeead385ca1a2b5658c9bf516c3b05dd
+    hash_after: 138d13c749a4d9a7b6558d59d354e40d48e22c53
+  - step: design/review
+    hand: box fa49097ce66c · claude-code-remote · helper-8
+    hash_before: 76c008c93c03d22993769c568928a52575d323f4
+    hash_after: 76c008c93c03d22993769c568928a52575d323f4
+  - step: implement/tests-red
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 056ba432a37e6571b64760856c4296254287a5dc
+    hash_after: 48191b90716fc83e85f618c4158060e8ff6a68c0
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 2 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 218c77c131c4c4e397eec7f08ae4defa1861159c
+    hash_after: 717062f79f6cf605a2bd45d5da7931937f8fb6d7
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: d27ac1ae5386c8de34cd17ea6f9a0208cf4a6f24
+    hash_after: de282ec795e8afe15f1fd569e163271a23f21692
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 345 test(s) pass in 33 file(s); green, src/engine/swap passes
+      - name: check
+        exit: 0
+        said: The rules pass.
+  - step: verdict
+    hand: box fa49097ce66c · claude-code-remote · helper-9
+    hash_before: 6c84e8f22521d6abf8140bb44a12c7b4c6021196
+    hash_after: 6c84e8f22521d6abf8140bb44a12c7b4c6021196
+reason: done
 ---
 
 # Ask
@@ -115,6 +199,167 @@ The bridge grows engine work, and src/scripts holds whatever fits nowhere else.
 
 <!-- the form is text -->
 
+- one rule sorting a file into its folder
+- four moves the ask names, and one of them cuts a file in two
+- every file under `src/scripts` sorted, by a prefix or by a move
+- one change the swap move forces under the Go module reader
+
+**The rule.** A file under `src/bridge` answers an event off the wire. A file
+under `src/engine` answers a question about the tree, with no event standing. A
+file under `src/scripts` serves one verb of the command line, and its name says
+the verb.
+
+| the folder | what a file there does | what it imports |
+|---|---|---|
+| `src/bridge` | takes an event and answers the hook | the engine, and the doors |
+| `src/engine` | reads the tree and answers a question | the doors alone |
+| `src/scripts` | serves a verb a person types | either of the two |
+
+**The four moves.** Each lands as its own commit, and the check decides each.
+
+| what moves | from | to |
+|---|---|---|
+| status | `src/bridge/status.js` | `src/engine/status.js` |
+| the tense reader | `src/bridge/tense.js` | `src/engine/tense.js` |
+| swap | `src/swap` | `src/engine/swap` |
+| the projection's readers | `src/bridge/projection.js` | `src/engine/projection.js` |
+
+`status.js` and `tense.js` export readers alone, so those two rename whole.
+
+**The projection cuts in two.** Three of its exports run off an event, and the
+rule holds each of the three in the bridge.
+
+| the export | what reaches it | where it lands |
+|---|---|---|
+| `ownerDoor` | the write door, as one of its checks | the bridge |
+| `marksStale` | the write door, after a write | the bridge |
+| `freshens` | `decide`, on every event | the bridge |
+| `projectionsHere` | `freshens`, and `opensSession` | the engine |
+| `sourcesOf` | the same two | the engine |
+
+`ownerDoor` and `marksStale` read the fields `freshens` fills, so the two
+readers reach them through the box.
+
+So `src/bridge/projection.js` keeps the three and imports the two, and
+`src/engine/projection.js` holds the reading. A reader wanting the whole
+projection in one folder reads a door answering an event, which the rule puts
+in the bridge.
+
+**What swap costs.** `goModulesIn` lists a module as a folder holding `go.mod`
+straight under `src`, and `goModulesOf` reads the same one level. A module at
+`src/engine/swap` reads as none. Its tests leave the battery, and nothing says
+so.
+
+| what changes | so that |
+|---|---|
+| `goModulesIn` walks a folder below `src` too | the battery finds a module either way |
+| `goModulesOf` takes a disk handle beside the paths | it reads the folder holding `go.mod` |
+| the replace line of `src/index/go.mod` | it reads `../engine/swap` |
+| the replace line of `src/lsp/go.mod` | it reads the same |
+| a case drives both readers over a module one level down | the fault stays fixed |
+
+`goModulesOf` reads path strings alone today, so the plan threads it the handle
+its caller already holds. Two modules name swap under `replace`, and the check
+runs both, so the move carries those two lines with it.
+
+**The command line.** The third line of the ask names every file under
+`src/scripts`. Five groups there carry a topic in the name, and each serves one
+verb already.
+
+| the group | the verb it serves |
+|---|---|
+| `cli-` | the command line itself, and `check` |
+| `pull-` | `ticket pull` |
+| `retro-` | `retro` |
+| `work-` | `branch` |
+| `guidance-` | `branch guidance`, which `work.js` wires |
+
+Every other file there sorts one of two ways. A file serving one verb takes
+that verb's prefix, and a file the whole tree reads goes to the engine.
+
+| what takes a prefix | the verb it serves | its name |
+|---|---|---|
+| `ask-lint.js` | `ticket open` | `ticket-ask-lint.js` |
+| `spawn.js` | `ticket pull` | `pull-spawn.js` |
+| `landed.js` | `ticket pull` | `pull-landed.js` |
+| `branch-usage.js` | `branch` | `work-usage.js` |
+| `test-verb.js` | `branch test` | `work-test.js` |
+| `review.js` | `branch review` | `work-review.js` |
+| `unblock.js` | `branch unblock` | `work-unblock.js` |
+| `stand.js` | `branch list` | `work-free.js` |
+| `go-tests.js` | `check`, and `branch test` | `cli-go.js` |
+| `viewer.js` | `tui` | `tui-build.js` |
+
+`work-stands.js` stands already, so `stand.js` takes a name of its own under
+the same prefix. Two of these serve a second verb as well: `test-verb.js`
+imports `goEnvOf`, and `unblock.js` imports what `landed.js` exports. Each
+prefix names the verb its first reader runs.
+
+**What follows a move.** A note naming a moving file by its path moves with it.
+
+| the note | what it names |
+|---|---|
+| `tools.md` | the survey, and where a tool stands |
+| `work.md` | the branch verb's own files |
+| `level0.md` | the bridge files the moves reach |
+| `pull.md`, `review.md`, `viewer.md` | the rest of the moving names |
+
+The links checker reads a path that resolves nowhere, so the check answers red
+where a note stays behind.
+
+| what goes to the engine | what reads it outside the scripts folder |
+|---|---|
+| `group.js` | the command door, and the stop door |
+| `tools.js` | the two linter doors, two doors of the bridge, and the copilot library |
+
+A reader outside `src/scripts` is what sends a file to the engine. The copilot
+library reaches `tools.js` by a relative path, and that path follows the move.
+
+`queue.js` and `hand.js` keep every reader inside `src/scripts`, so each takes
+a prefix in place of a move:
+
+| what takes a prefix | the verb it serves | its name |
+|---|---|---|
+| `queue.js` | `ticket pull` | `pull-queue.js` |
+| `hand.js` | `ticket pull` | `pull-hand-of.js` |
+
+`queue.js` imports `entriesOf` from `pull-writes.js`, which stays in the
+scripts folder. A move would drag that file and the seven it reads, so the
+prefix holds the engine rule and the import alike.
+
+A file carrying the name of its own verb stays where it stands, and its name
+says its topic already:
+
+| what stays | the verb it is |
+|---|---|
+| `graph.js` | `graph` |
+| `probe.js` | `probe` |
+| `stub.js` | `stub` |
+| `ticket.js` | `ticket` |
+| `tui.js` | `tui` |
+| `vehicle.js` | `vehicle` |
+| `voice.js` | `voice` |
+
+These stay as well, because each one runs outside the verb table:
+
+| what stays | who runs it |
+|---|---|
+| `precommit.js`, `prepush.js` | git, at the commit and the push |
+| `trust.js`, `install.sh` | the setup, before a session starts |
+| `copilot.js` | a cloud box, as its entry point |
+| `editor.js` | the install, and the doctor |
+| `serve.js` | the bridgehead, and the `serve` verb |
+| `process.js` | `mint`, which `cli.js` wires |
+
+**What the ask leaves open.** The second line of the ask wants the bridge
+holding transport alone. The moves above leave it holding the doors: the write
+door, the stop door, the answer door and the rest.
+
+- an event runs a door, so the rule above counts every door as transport
+- the line reads as met where each door keeps its wiring and hands its thinking down
+- the bridge files past these each want that cut, the way the projection takes one
+- this ticket moves what the first and third lines name, and mints nothing else
+
 ## review
 
 <!-- reads the approach against the ask -->
@@ -124,6 +369,46 @@ The bridge grows engine work, and src/scripts holds whatever fits nowhere else.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+- Every claim in the draft matches the code, and each file under `src/scripts` takes a row.
+- An implementer reads the rule, the moves, the cut and the renames, and follows each.
+- The plan says a note follows a moving path, and the test files stand open.
+- Run `grep -rl` over `test/` for the moving paths to read how many imports the moves reach.
+- Add a line sending a test with its module, because the check reads those imports.
+- `src/engine/tools.js` shares its name with `src/bridge/tools.js`, so two files carry one name.
+
+**What holds.**
+
+- `./RUNME.sh branch review the-bridge-keeps-transport` exits 0, the check passes, and a retro stands absent.
+- The commits since the last close touch the ticket file alone, which leaves code to implement.
+- `src/index/go.mod` and `src/lsp/go.mod` each read `replace quackitect/swap => ../swap`.
+- `src/index/main.go` and `src/lsp/main.go` import the module name, which the folder move keeps.
+- `src/scripts/pull-writes.js` exports `entriesOf`, and `queue.js` imports it from there.
+- `.claude/skills/level0/lib/copilot-runtime.js` imports `readTools` and `whereIs` by relative path.
+- Six notes under `spec/design_output` name a moving path, and the table names each one.
+- `src/bridge/projection.js` exports the five the cut table names.
+- `ownerDoor` reads `box.projections`, and `marksStale` reads `box.sources`, as the caller column says.
+- `freshens` runs inside `decide`, and `opensSession` fills both fields at the session start.
+- `goModulesIn` lists dirs one level under `src`, and `goModulesOf` matches a test path by regex.
+- `status.js` and `tense.js` import node and wink alone, so those two rename whole.
+- `group.js` and `tools.js` import the level0 doors alone, which suits the engine rule.
+- `src/bridge/bash.js` and `src/bridge/stop.js` import `group.js` from outside the scripts folder.
+- `src/doors/biome.js` and `src/doors/vale.js` import `readTools` from that folder as well.
+- `src/bridge/guidance.js` and `src/bridge/findings.js` reach `tools.js` the same way.
+- `cli.js` wires a verb for each file in the stay table, so that row holds.
+- Each rename target takes a name of its own across the scripts folder.
+- The draft names the open second line of the ask, and leaves the door cut to a later ticket.
+
+**What the last verdict asks.**
+
+- The draft answers the two Go replace lines, with a row sending each to `../engine/swap`.
+- The draft answers where `entriesOf` lands: `pull-writes.js` holds its prefix and stays.
+- The draft answers the copilot reader of `tools.js`, whose relative path follows the move.
+- The draft answers the six notes, naming each one in a table.
+- The draft answers the second verb of `go-tests.js` and of `landed.js`.
+- The draft answers `hand.js`: it takes the `pull-` prefix and keeps its folder.
 
 # implement
 
@@ -137,17 +422,44 @@ The bridge grows engine work, and src/scripts holds whatever fits nowhere else.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+Five cases stand in `test/level0/go-modules.test.js`, over the two readers the
+swap move forces. Two fail on their own assertion.
+
+| the case | what it reads |
+|---|---|
+| a module straight under `src` | the list holds it, which holds today |
+| a module a folder below `src` | the list holds it, and the list stands empty of it |
+| a folder holding no module | the list passes it, which holds today |
+| a changed test under a nested module | the folder holding `go.mod`, and the read answers none |
+| a changed test outside every module | none, which holds today |
+
+The three passing cases guard the readers from a fix reaching past the ask.
+
+**What surprises.** `goModulesOf` reads path strings and takes no handle, so
+the two readers answer off different sources. One walks the disk, and one
+matches a regular expression. A module moving one level down breaks the second
+quietly, because a regular expression matching nothing answers an empty list.
+
+The cases give `goModulesOf` the handle beside the paths, so a later reader
+takes the module off the folder holding `go.mod`.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases reach one new test file, and the ask names no file for them
+- the readers meet the fake disk, so no case walks the tree
+- a comment over each case points at this ticket, which carries the approach
 
 ## reflect
 
@@ -175,11 +487,17 @@ The bridge grows engine work, and src/scripts holds whatever fits nowhere else.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change reaches the folders and the files the approach names, and the notes naming them
+- the two Go module readers meet the fake disk, so the cases walk no tree
+- a comment over each reader points at this ticket, which carries the approach
 
 ## tests-green
 
@@ -191,11 +509,15 @@ The bridge grows engine work, and src/scripts holds whatever fits nowhere else.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -203,11 +525,36 @@ The bridge grows engine work, and src/scripts holds whatever fits nowhere else.
 
 <!-- the form is text -->
 
+A file stands in the folder its work belongs to, so a reader looks in one
+place for it.
+
+| the folder | what it holds now |
+|---|---|
+| `src/engine` | the status shape, the tense reader, the swap module, the projection's readers, the group reader, the tool survey |
+| `src/bridge` | the doors, and the three projection exports an event runs |
+| `src/scripts` | a file a verb serves, and its name says the verb |
+
+The projection cuts in two. `ownerDoor`, `marksStale` and `freshens` stay in
+the bridge, and each reads the fields a session start fills. The two readers
+filling them stand under the engine.
+
+The swap move carries three things with it. The two modules naming swap under
+`replace` point at `../engine/swap`. `goModulesIn` walks a folder below `src`,
+and `goModulesOf` takes a handle and reads the folder holding `go.mod`.
+
+`reload.js` watches `src/engine`, so a fix there restarts the server the way a
+fix in the bridge does. The branch test answers `green, src/engine/swap
+passes`, which reads the two module readers end to end.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change reaches the folders and files the approach names, and the notes naming their paths
+- the two Go module readers meet the fake disk, so the cases walk no tree
+- a comment over each reader points at this ticket, and each moved file keeps its own header
 
 # verdict
 
@@ -219,17 +566,151 @@ The bridge grows engine work, and src/scripts holds whatever fits nowhere else.
 
 <!-- the form is files -->
 
+- .claude/skills/level0/lib/copilot-runtime.js
+- spec/design_output/level0.md
+- spec/design_output/pull.md
+- spec/design_output/review.md
+- spec/design_output/tools.md
+- spec/design_output/viewer.md
+- spec/design_output/work.md
+- spec/tickets/an-engine-takes-bridge-work.md
+- src/bridge/ask.js
+- src/bridge/bash.js
+- src/bridge/findings.js
+- src/bridge/guidance.js
+- src/bridge/projection.js
+- src/bridge/prose.js
+- src/bridge/reload.js
+- src/bridge/server.js
+- src/bridge/status.js
+- src/bridge/stop.js
+- src/bridge/tense.js
+- src/doors/biome.js
+- src/doors/vale.js
+- src/engine/group.js
+- src/engine/projection.js
+- src/engine/status.js
+- src/engine/swap/go.mod
+- src/engine/swap/swap.go
+- src/engine/swap/swap_test.go
+- src/engine/tense.js
+- src/engine/tools.js
+- src/index/go.mod
+- src/lsp/go.mod
+- src/scripts/ask-lint.js
+- src/scripts/branch-usage.js
+- src/scripts/cli-check.js
+- src/scripts/cli-doors.js
+- src/scripts/cli-go.js
+- src/scripts/cli.js
+- src/scripts/go-tests.js
+- src/scripts/group.js
+- src/scripts/guidance-hand.js
+- src/scripts/hand.js
+- src/scripts/landed.js
+- src/scripts/prepush.js
+- src/scripts/pull-chapter.js
+- src/scripts/pull-hand-of.js
+- src/scripts/pull-hand.js
+- src/scripts/pull-landed.js
+- src/scripts/pull-queue.js
+- src/scripts/pull-route.js
+- src/scripts/pull-spawn.js
+- src/scripts/pull-writes.js
+- src/scripts/pull.js
+- src/scripts/queue.js
+- src/scripts/retro-new.js
+- src/scripts/retro-score.js
+- src/scripts/retro.js
+- src/scripts/review.js
+- src/scripts/spawn.js
+- src/scripts/stand.js
+- src/scripts/test-verb.js
+- src/scripts/ticket-ask-lint.js
+- src/scripts/ticket.js
+- src/scripts/tools.js
+- src/scripts/tui-build.js
+- src/scripts/unblock.js
+- src/scripts/viewer.js
+- src/scripts/work-answer.js
+- src/scripts/work-free.js
+- src/scripts/work-list.js
+- src/scripts/work-merge.js
+- src/scripts/work-review.js
+- src/scripts/work-stands.js
+- src/scripts/work-test.js
+- src/scripts/work-unblock.js
+- src/scripts/work-usage.js
+- src/scripts/work.js
+- src/swap/go.mod
+- src/swap/swap.go
+- src/swap/swap_test.go
+- test/contract/biome.test.js
+- test/contract/candidate-check.test.js
+- test/contract/compact.test.js
+- test/contract/paragraph.test.js
+- test/contract/schema.test.js
+- test/contract/shape.test.js
+- test/contract/tree.test.js
+- test/contract/vale-fix.test.js
+- test/contract/vale-paths.test.js
+- test/contract/vale.test.js
+- test/level0/ask-lint.test.js
+- test/level0/folders.test.js
+- test/level0/go-modules.test.js
+- test/level0/group.test.js
+- test/level0/landed.test.js
+- test/level0/person-step.test.js
+- test/level0/pull-escalate.test.js
+- test/level0/pull-fields.test.js
+- test/level0/pull-leaves.test.js
+- test/level0/pull-person.test.js
+- test/level0/pull-steps.test.js
+- test/level0/pull.test.js
+- test/level0/queue.test.js
+- test/level0/quoted.test.js
+- test/level0/review.test.js
+- test/level0/stand.test.js
+- test/level0/tools.test.js
+- test/level0/unblock.test.js
+- test/level0/viewer.test.js
+- test/level0/work-doors.js
+- test/level0/work-group.test.js
+- test/level0/work.test.js
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- The four moves land, and `src/engine` holds status, tense, the projection readers, swap, group and tools.
+- `src/bridge/projection.js` keeps `ownerDoor`, `marksStale` and `freshens`, and imports the two readers.
+- `src/index/go.mod` and `src/lsp/go.mod` each name `../engine/swap`.
+- `goModulesIn` walks any depth under `src`, and answers the five modules this tree holds.
+- `goModulesOf` takes the handle, and answers `src/engine/swap` for a test standing there.
+- `test/level0/go-modules.test.js` drives both readers over a fake disk in five cases.
+- Two cases assert a refusal: a folder holding no module, and a test outside every module.
+- `./RUNME.sh check` exits 0, and the Go run names `quackitect/swap` among five modules.
+- Every file under `src/scripts` carries a group prefix, its own verb name, or a setup role.
+- The six notes naming a moving path follow the move, and a grep over the tree finds none stale.
+- A retro stands absent from the handback, which suits a ticket at verdict.
+- `reload.js` takes `src/engine`, and `test/level0/reload.test.js` names that root nowhere.
+- Add a reload case over a file under `src/engine`, so that entry carries a test.
+- The folder rule stands in this ticket alone, and no note under `spec/design_output` carries it.
+- `src/engine/tools.js` shares a name with `src/bridge/tools.js`, as the old layout shares one too.
+- `modulesUnder` walks `src/extension/node_modules`, which costs little here and grows with that folder.
+- The says field reads `src/scripts` as a verb's folder, and eight files there stand outside that table.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- The notes point at a path and repeat no fact, and the folder rule stands in this ticket alone.
 
 # Discussion
 

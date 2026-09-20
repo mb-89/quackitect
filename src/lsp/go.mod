@@ -11,6 +11,6 @@ require (
 	quackitect/yaml v0.0.0
 )
 
-replace quackitect/swap => ../swap
+replace quackitect/swap => ../engine/swap
 
 replace quackitect/yaml => ../yaml

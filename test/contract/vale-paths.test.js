@@ -9,7 +9,7 @@ import { skip, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
-import { readTools, whereIs } from "../../src/scripts/tools.js";
+import { readTools, whereIs } from "../../src/engine/tools.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();

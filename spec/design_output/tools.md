@@ -4,7 +4,7 @@ kind: [[design_output]]
 
 # Scope
 
-`src/scripts/tools.js` asks this box where every tool stands. This note covers
+`src/engine/tools.js` asks this box where every tool stands. This note covers
 the survey it writes, who reads it, and where a session puts a script.
 
 # What the survey writes

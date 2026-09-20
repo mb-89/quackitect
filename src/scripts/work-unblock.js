@@ -3,8 +3,8 @@
 // free to close. So a person answers on their own time, and the branch lands.
 // [[spec/design_output/work#a-person-step-leaves]]
 
-import { CLOSED, fieldOf, frontOf, GROUP, OPEN, stepOf, ticketAt, withField } from "./group.js";
-import { landed } from "./landed.js";
+import { CLOSED, fieldOf, frontOf, GROUP, OPEN, stepOf, ticketAt, withField } from "../engine/group.js";
+import { landed } from "./pull-landed.js";
 import { leafOf, stepPathOf } from "./pull.js";
 
 const DISCUSSION = "# Discussion";

@@ -109,6 +109,30 @@ So a hold is one turn long. It ends the turn it lands in, the turn's end puts
 it back to `off`, and it reaches no later turn. A prompt writes no hold,
 because the press is the owner's word and the prompt carries its own.
 
+## The hold outlives its drop
+
+Two events end a turn, and they arrive in either order:
+
+| the event | the door | what it does with the hold |
+|---|---|---|
+| `turn.complete` | `dropsHold` | writes it back to `off` |
+| `classic.Stop` | `onStop` | reads it, and the vote runs |
+
+A drop landing first leaves the vote reading `off`. The two rules ending a turn
+for the owner lose there, a continue rule wins, and the turn reopens over work
+the owner puts down.
+
+So the drop leaves a mark. `holdHere` reads the hold the owner holds now, or
+that mark. A hold standing anywhere in a turn ends that turn.
+
+| what clears the mark | why |
+|---|---|
+| a prompt from outside this plugin | a hold is one turn long, and a prompt opens the next |
+| a reload of the module | the mark shares the lifetime of the tooth's counts |
+
+A helper's turn end reaches neither the hold nor the mark, the way every door
+beside this one skips a helper.
+
 ## The two lines stand apart
 
 The canary opens an answer and the stop line closes it. Each door reads its own

@@ -20,7 +20,7 @@ import {
 import { TOOLS } from "../../.claude/skills/level0/lib/tools.js";
 import { fakeDisk } from "../../src/doors/fake/disk.js";
 import { fakeGit } from "../../src/doors/fake/git.js";
-import { whatFailed } from "../../src/scripts/review.js";
+import { whatFailed } from "../../src/scripts/work-review.js";
 import { work } from "../../src/scripts/work.js";
 
 const ROOT = "/tree";
@@ -220,7 +220,7 @@ test("the report names the branch, every answer and the count", () => {
     { branch: BRANCH, check: { ok: true, code: 0 }, retro: true },
     {
       brief: "done, and nothing beyond it",
-      beyond: "src/scripts/tools.js, a one-line fix, trivial",
+      beyond: "src/engine/tools.js, a one-line fix, trivial",
       tests: "2 rules added, 1 carries no test:\nStopRule fires on nothing",
       fix: 2,
     },
