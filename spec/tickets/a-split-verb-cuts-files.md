@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -119,6 +119,17 @@ record:
     hand: box 099c2ec7708d · claude-code-remote · helper-6
     hash_before: 36ee3423bfe8ec7c11b64c6ea095f9af1d9bc905
     hash_after: 36ee3423bfe8ec7c11b64c6ea095f9af1d9bc905
+  - step: implement/tests-red
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 30f525827f4e3999043b9a6c8c101d06911b2dab
+    hash_after: 30f525827f4e3999043b9a6c8c101d06911b2dab
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 6 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -228,20 +239,33 @@ pass
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test test/level0/split.test.js
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+Six cases go red on their own assertions. `cutsIn` answers an empty list, and `splitText` answers the text whole, so each case reads back a shape its own claim refuses.
+
+What surprises:
+
+- the ranges carry three refusals of their own, before any file opens
+- a range reading backwards, a range starting at zero and a range past the file each want a line
+- two ranges reaching one line want a refusal too, which the cut alone can see
+
+The verb's own file and the door's mint both wait on this pair. Each takes a case once the cut answers, because a fake disk and a fake git stand behind them.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the cases land in `test/level0/split.test.js`, which the approach names
+- the cut and the ranges take text and arguments, so no door stands behind them
+- the header of `src/scripts/split-cut.js` points at the chapter the approach names
 
 ## reflect
 
