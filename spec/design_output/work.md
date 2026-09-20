@@ -143,7 +143,7 @@ and the routine's trigger fetch on their own, because each acts on the remote.
 A tree object carries a name as bytes, so the paths read raw. For details, see
 [[spec/design_output/doors#a-raw-run-keeps-bytes]].
 
-git answers the base red where trunk and a branch share none, which is what a
+git fails on the base where trunk and a branch share none, which is what a
 rewrite of trunk leaves behind:
 
 | what git answers | the standing | what follows |
@@ -171,7 +171,7 @@ responsible for it.
 
 ## A ticket under its group
 
-A group row carries a row per ticket naming it, indented under it, read off the
+A group row carries a row per ticket naming it, indented under it, taken off the
 branch tip `list` already fetches. So a reader on trunk sees the loose tickets
 and the held ones together, and runs no `git show` by hand:
 
@@ -257,7 +257,7 @@ open into its ask. [[spec/guidance/cloud]] says why the cloud road differs.
 A successor stands on [[spec/processes/question]], and the verb takes it because
 that route opens at a step waiting for a person:
 
-| the step it opens at | what it buys |
+| the step it opens at | what it gives |
 |---|---|
 | `answer`, under `by: person` | the person answers on their own time |
 | `do`, under `by: anyone` | the hand behind the answer carries it out |
@@ -479,7 +479,7 @@ What the run leaves behind:
 - the push door reads the stamp this run writes, so no stale stamp stops a clean commit
 - `--no-push` leaves the branch where it stands
 
-The message read stands with the bash door, which reads the same rules over a
+The reading of the message stands with the bash door, which reads the same rules over a
 `git commit` a hand types. For details, see
 [[spec/design_output/bash#a-commit-message-meets-voice]].
 
