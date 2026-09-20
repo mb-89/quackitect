@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -115,6 +115,10 @@ record:
     hand: box fa49097ce66c · claude-code-remote
     hash_before: de19c56112d536e49ae506441c524c4c8ccf1993
     hash_after: 7b95a88b002539244f003de1862a742db68d6656
+  - step: design/review
+    hand: box fa49097ce66c · claude-code-remote · helper-12
+    hash_before: 77088ba3b0cfda96050dd92ed8dd4421be89f424
+    hash_after: 77088ba3b0cfda96050dd92ed8dd4421be89f424
 ---
 
 # Ask
@@ -220,19 +224,20 @@ The review decides it.
 
 <!-- the form is verdict -->
 
-fail
+pass
 
-- the tree holds two `SAYS`, and the plan names the one under `src/bridge/answer.js` alone
-- the chapter "What the refusal says" quotes the `SAYS` of `.claude/skills/level0/lib/answer.js` today
-- a standing case in `test/level0/answer.test.js` asserts that second `SAYS`, and the plan skips it
-- the draft writes a count, and the log carries 44 rows today, so the count drifts
-- 35 of those 44 rows follow a call, so "every one of them" overstates the log
-- the ordering holds on 33 rows, where a displayed text stands between two calls
-- answers the earlier findings on the `onAgentSpoke` row, the change table, and the `SAYS` case
-- answers the earlier findings on both chapters, the refusal quote, and the log this box keeps
-- answers the earlier finding on the bullet count, now three bullets under "Three things the road does"
 - the three cases the plan names run against the door as written, so the shape holds
-- `./RUNME.sh check` answers 0 on this branch, and the branch review reads the retro as absent
+- `onMessageDisplay` pays off a displayed text, and `src/bridge/server.js` wires it at `classic.MessageDisplay`
+- the road table reads true: a case covers `pays` alone, and both event doors stand bare
+- the change table names both `SAYS`, both cases over them, and the three chapters
+- `test/level0/answer.test.js` asserts the lib's `SAYS` wording, and the plan carries a row for it
+- every display row in the log carries its text under `delta`, and most stand between two calls
+- every finding of the verdict before this one takes an answer in the draft
+- the ruling the draft leaves open: every text pays, and the score door judges the length
+- the quote under What the refusal says drifts from the lib's `SAYS`, so the rewrite takes its new words
+- the lead reads Two chapters, and the table under it names three
+- "the rest open a turn" overstates, because a few rows follow a call and close a turn
+- the branch review reads check as passing, and reads the retro as absent
 
 # implement
 
