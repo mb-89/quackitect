@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: implement/tests-red
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -135,6 +135,10 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: ab5ba40b770e73b6e889d0685e20f88be572088c
     hash_after: ab5ba40b770e73b6e889d0685e20f88be572088c
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-10
+    hash_before: c06b292de36c32338384bc47487bb5b2a7f2cfb5
+    hash_after: c06b292de36c32338384bc47487bb5b2a7f2cfb5
 ---
 
 # Ask
@@ -220,40 +224,38 @@ Each file keeps what it decides. `kindStyle`, `levelStyle`, `saidStyle` and the 
 
 ### verdict
 
-fail
+pass
 
 | the question reviewing asks | the answer |
 |---|---|
-| does the approach answer the ask | in part, and the first line of `done_when` goes missing |
+| does the approach answer the ask | yes, and the first line of `done_when` wants a word for this road |
 | is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |
 | what does `./RUNME.sh check` answer | 0, with the server standing |
 | does every rule the approach adds carry a case | yes, a case a layer over a fixture root and a case over the shipped file |
-| does every claim carry a proof | one fails, the grep the draft cites over `src/viewer` |
+| does every claim carry a proof | yes, and each file the draft cites reads as it says |
 
 TL;DR:
 
-- The road holds. The redraft takes the reader the owner rules for, and lands the values under `spec/config/styles`.
-- The move stops at `colour.go`. A colour number stands outside it, so the grep the draft cites answers other than 0.
-- The notes naming what moves get no line in the draft.
+- The road holds, and the earlier findings close.
+- The table of what moves names every file `grep -rln 'lipgloss.Color(' src/viewer` answers.
+- The lines standing open go to the implement step, and none of them moves the road.
 
 The findings, one a line:
 
-- `src/viewer/ui.go` wears the selected row's background, and `src/viewer/tabs.go` wears the open tab.
-- `grep -rc` over `src/viewer` reads those files, so the first line of `done_when` fails.
-- The table of what moves names `colour.go` alone. Name both files there, or say why each colour stands in Go.
-- `src/viewer/detail_test.go` asserts the prompt's colour by number. Say whether that case reads the config or holds a fixture.
-- `spec/design_output/viewer#colours` points the reader at `kindColours` in `colour.go`. Name the line the move rewrites.
-- `spec/design_output/level0.md` gives `spec/config/styles` to Vale. A JSON file there wants that line to name the other kind.
-- The earlier findings close: the reader road, the folder the ruling names, and the shared reader riding `SHARED`.
+- The first line of `done_when` names a generated file. This road generates none. Say which command over `src/viewer` answers that line, and what a case's fixture number does to it.
+- The module answers a colour out of a named file, and `names.words` out of the three layers. Say whether a local layer sets a colour. The ask puts a colour where every other value stands.
+- [[spec/design_output/viewer#colours]] names `toolColours` on a line of its own. The change rewrites that line beside the `kindColours` one.
+- `src/lsp/go.mod` requires local modules today, so `src/config` joins them there.
+- The earlier findings close. The table names every file holding a colour. The standing case reads a fixture root, and the draft names both notes.
 
 What the agent needs:
 
 | number | need | status |
 |---|---|---|
-| 1 | the table of what moves names every file under `src/viewer` holding a colour | open |
-| 2 | the draft says what the standing case asserting a colour by number reads | open |
-| 3 | the draft names the notes the move rewrites | open |
-| 4 | the review hand reads the approach again | open |
+| 1 | the implement step names the command answering the first line of `done_when` | open |
+| 2 | the implement step says whether a local layer sets a colour | open |
+| 3 | the change rewrites the `toolColours` line beside the `kindColours` one | open |
+| 4 | the ticket carries on to implement | open |
 
 # implement
 
