@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -168,6 +168,11 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 099c2ec7708d · claude-code-remote · helper-13
+    hash_before: cf2b021061907fd102d0467ec605bdb52e78615c
+    hash_after: cf2b021061907fd102d0467ec605bdb52e78615c
+reason: done
 ---
 
 # Ask
@@ -402,13 +407,12 @@ What the run leaves behind:
 - spec/tickets/the-commit-verb-lints-messages.md
 - spec/tickets/the-verbs-take-the-shell.md
 - spec/design_output/work.md
+- spec/design_output/pull.md
 - src/bridge/bash.js
 - src/scripts/commit-verb.js
 - src/scripts/cli.js
 - src/scripts/cli-check.js
-- src/scripts/cli-doors.js
 - src/doors/git.js
-- src/doors/vale.js
 - src/doors/fake/git.js
 - test/level0/commit-verb.test.js
 - RUNME.sh
@@ -418,31 +422,31 @@ What the run leaves behind:
 <!-- pass or fail, findings one a line -->
 <!-- the form is verdict -->
 
-fail
+pass
 
-- `commit-verb.js` prints the check's last `stdout` line on red, and the check writes faults to `stderr`
-- a red check under the fakes names the server line as its reason, and the fault reaches nobody
-- fix: print the check's `stderr` beside its `stdout`, so a red check names itself
-- `commit-verb.test.js` teaches the red case a fault on `stdout`, which agrees with the code
-- fix: teach that case `stderr`, and assert the verb prints what the check refuses
-- `## One verb feeds that stamp` lands mid-chapter, so two stamp paragraphs fall under it
-- fix: move that heading under the paragraph naming the two push doors
-- every header points at `#the-battery-answers-first`, so the new chapter takes no inbound link
-- a failing `git add -A` answers "git staged nothing", which names the wrong fault
-- a clean tree answers "The commit door refuses this commit", and git says nothing stands to commit
-- holds: the verb refuses a live bad message, names three findings at once, and stages nothing
-- holds: `./RUNME.sh check` answers exit 0 on 86465d81
-- holds: five cases pass over fake doors, and `fakeGit` drives the real git door
-- holds: `messageFaults` keeps the path, the trailer strip and the findings read in one place
-- holds: `branch review` answers "retro absent from the handback", so no retro stands there
-- holds: the diff touches the verb, the verbs map, the shared read, the cases and two notes
+- every bullet of the ask holds: the read, the findings, the check and the push
+- `saidBy` joins the error stream and the standard stream, so each step names what its run answers
+- the red-check case teaches `stderr` a fault, and asserts the verb prints what the check refuses
+- a mutant reading one stream alone turns both cases red, so each case bites
+- a new case drives a refused `git add -A`, and asserts no commit follows it
+- the refused-commit case asserts `git reset -q`, so the staging comes back
+- `## One verb feeds that stamp` stands below the paragraph naming the two push doors
+- the verb and its cases point at `#one-verb-feeds-that-stamp`, so the new chapter takes inbound links
+- a live bad message answers exit 2, names every finding at once, and stages nothing
+- `./RUNME.sh check` answers exit 0 on cf2b0210, and the tree stands clean after the live run
+- `./RUNME.sh test` runs every case of `commit-verb.test.js` green
+- `messageFaults` holds the path, the trailer strip and the findings read for both callers
+- the diff touches the verb, the verbs map, the shared read, the door bundle, the cases and two notes
+- note: the verb runs `node cli.js check`, which skips the install step `./RUNME.sh check` runs
+- note: a message opening with two dashes reads as a flag, so the verb answers usage
+- note: `branch review` answers "retro absent from the handback", which the group's merge wants
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- `messageFaults` owns the message read, and the chapter points at the bash note for the rules
+- `#one-verb-feeds-that-stamp` owns the verb's steps, and that chapter points at the bash note for the rules
 
 # Discussion
 
