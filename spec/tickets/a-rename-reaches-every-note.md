@@ -89,12 +89,18 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 564e3972dc6f22df3e7e66a00bc755f63d2342f7
     hash_after: 564e3972dc6f22df3e7e66a00bc755f63d2342f7
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-2
+    hash_before: c9fae140c4344a7f632bcef7824225fcd9f99743
+    hash_after: c9fae140c4344a7f632bcef7824225fcd9f99743
+    returns: 1
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | no, the read move and the prove move miss a path reach |; | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 on this commit, with the server standing |; | does the verb the approach adds carry a proof | no, the prove move rests on `links` alone |; | does every claim carry a proof | no, three rows read false against the code |; TL;DR:; The index link table holds a note link alone, so a path reach stands outside it.; `./RUNME.sh links` answers the note links resolving to nothing, so a stale import passes green.; The literal `project` stands in the vehicle library, which the approach's table leaves out.; `spec/design_output/tree` owns the rules weighing two files, so the verb wants another owner.; The findings, one a line:; `linksIn` in `src/index/front.go` records a note link, and the link table holds those alone.; So the read move asks `grep` beside `links`, and the approach names the two.; `./RUNME.sh links` answers `dangling`, which names a note link resolving to nothing.; So the prove move runs `./RUNME.sh check` too, as the ask's last bullet asks.; `STUB_FOLDERS` holds the literal `project` in `.claude/skills/level0/lib/vehicle.js`.; `stubInto` reads that constant, so the rename reaches a file the table leaves out.; `spec/design_output/index` owns the questions the index answers, and the verb asks one.; `spec/design_output/viewer` carries the old name, and every note link naming it rides along.; The folder table matches the two tabs `src/viewer/ui.go` builds, the log and the work."
 ---
 
 # Ask
@@ -163,9 +169,34 @@ by sweep proves nothing about the verb.
 
 ### verdict
 
-<!-- pass or fail, with findings one a line -->
+fail
 
-<!-- the form is verdict -->
+| the question reviewing asks | the answer |
+|---|---|
+| does the approach answer the ask | no, the read move and the prove move miss a path reach |
+| is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |
+| what does `./RUNME.sh check` answer | 0 on this commit, with the server standing |
+| does the verb the approach adds carry a proof | no, the prove move rests on `links` alone |
+| does every claim carry a proof | no, three rows read false against the code |
+
+TL;DR:
+
+- The index link table holds a note link alone, so a path reach stands outside it.
+- `./RUNME.sh links` answers the note links resolving to nothing, so a stale import passes green.
+- The literal `project` stands in the vehicle library, which the approach's table leaves out.
+- `spec/design_output/tree` owns the rules weighing two files, so the verb wants another owner.
+
+The findings, one a line:
+
+- `linksIn` in `src/index/front.go` records a note link, and the link table holds those alone.
+- So the read move asks `grep` beside `links`, and the approach names the two.
+- `./RUNME.sh links` answers `dangling`, which names a note link resolving to nothing.
+- So the prove move runs `./RUNME.sh check` too, as the ask's last bullet asks.
+- `STUB_FOLDERS` holds the literal `project` in `.claude/skills/level0/lib/vehicle.js`.
+- `stubInto` reads that constant, so the rename reaches a file the table leaves out.
+- `spec/design_output/index` owns the questions the index answers, and the verb asks one.
+- `spec/design_output/viewer` carries the old name, and every note link naming it rides along.
+- The folder table matches the two tabs `src/viewer/ui.go` builds, the log and the work.
 
 # implement
 
