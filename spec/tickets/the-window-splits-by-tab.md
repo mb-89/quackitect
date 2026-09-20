@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -218,6 +218,14 @@ record:
     hand: box 1670436ae0bb · claude-code-remote
     hash_before: 9b07f77b47d0f22daadd9198d1593d96fecafaf5
     hash_after: 9b07f77b47d0f22daadd9198d1593d96fecafaf5
+  - step: implement/change
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: d9d78fce6efa8f43f43c5cf9786d1449dcf425be
+    hash_after: d9d78fce6efa8f43f43c5cf9786d1449dcf425be
+    answered:
+      - name: lint
+        exit: 0
+        said: 84 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
 ---
 
 # Ask
