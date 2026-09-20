@@ -25,7 +25,7 @@ two roots, and a copy that knows which project it drives.
 |---|---|
 | a copy carries an identity | `.se/.runtime/copy.json` in the method tree |
 | a project names the copy driving it | `.se/.runtime/project.json` in the work tree |
-| a register turns an identity into a place | `~/.se/registry.json` |
+| a register turns an identity into a place | `~/.se/.runtime/registry.json` |
 
 A path alone does none of this. It goes stale the moment either tree moves,
 and the pair then names a place that holds something else.
@@ -77,6 +77,27 @@ changes, and `./RUNME.sh config` says which layer answers a key.
 A projection declaration joins the same way where it is JSON. Its targets land
 in the work root, because that is the tree a person opens.
 
+## The styles assemble once
+
+A project writes a rule of its own, and the method's rules keep standing over
+it. Both roots hold their styles under `spec/config/styles`, and `assemble` in
+`src/scripts/styles.js` writes the pair into one folder:
+
+| what the assembly writes | where it stands |
+|---|---|
+| the styles both roots hold | `.se/vale/styles` under the work root |
+| the config naming that folder | `.se/vale/.vale.ini` beside it |
+
+The method's files land first, and a name the work root holds again replaces
+one. The config comes from the work root where it holds one, and from the
+method otherwise. The vale door hands that config to Vale, and a tree driving
+itself hands its own.
+
+The private folder stands off git, so nobody edits what the assembly writes.
+The assembly writes again where a source reads newer than the derived config.
+It writes again too where the names the roots hold differ from the copies
+standing there, so a rule a root drops refuses no write.
+
 ## A vehicle stands alone
 
 A vehicle carries the whole method and answers for itself. It reaches back to
@@ -107,9 +128,11 @@ about this machine: the copy stands somewhere else.
 
 ## The register places an identity
 
-Every copy writes itself into `~/.se/registry.json`, or into each folder
-`SE_REGISTRY` names. The reader drops an entry whose method root holds no
-marker. A folder that holds something else now answers about that something.
+Every copy writes itself into `~/.se/.runtime/registry.json`, or into each folder
+`SE_REGISTRY` names, which holds the file straight. The reader drops an entry
+whose method root holds no marker. A folder that holds something else now
+answers about that something. A box carrying the register straight under the
+private folder meets the move in `src/scripts/install.sh`.
 
 ## The register holds the port
 
@@ -260,7 +283,7 @@ settles the stub the way the sidebar's hook button does:
 
 | the verb writes | where |
 |---|---|
-| the register entry with its port | `~/.se/registry.json` |
+| the register entry with its port | `~/.se/.runtime/registry.json` |
 | the pointer | `.se/.runtime/vehicle.json` in the stub |
 | the vehicle's hook and its two manifests | `.claude/skills/level0` in the stub |
 

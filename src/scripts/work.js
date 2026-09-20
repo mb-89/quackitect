@@ -96,7 +96,7 @@ export function work(root, argv, doors) {
     // [[spec/design_output/pull#a-person-step-goes-in]]
     escalate: (it, _name, argv) => escalate(it, argv),
     // [[spec/design_output/pull#the-work-answer]]
-    guidance: (it, _name, argv) => guidance(it, (argv ?? []).slice(1), process.env),
+    guidance: (it, _name, argv) => guidance(it, (argv ?? []).slice(1), it.env ?? {}),
     // [[spec/design_output/work#a-person-step-leaves]]
     unblock,
     test: (it, _name, argv) => testVerb(it, argv),

@@ -207,6 +207,47 @@ ifVale(
   },
 );
 
+// The engine writes a record's `why`, and a hand rewording it writes over the record. So the rules read past it, and a person's own field keeps them. [[spec/design_output/projection#what-stands-outside-a-layer]]
+ifVale("the rules read past the engine's field, and hold a person's own", async () => {
+  const note = (key) =>
+    [
+      "---",
+      "kind: [[ticket]]",
+      "record:",
+      "  - step: implement/change",
+      `    ${key}: The hand reads \`one.js\`, \`two.js\`, \`three.js\`, \`four.js\` and \`five.js\`.`,
+      "---",
+      "",
+      "# Ask",
+      "",
+      "A line of prose.",
+      "",
+    ].join("\n");
+
+  const where = "spec/tickets/a-name.md";
+  await passes("CodeSpans", note("why"), where);
+  await passes("Characters", note("asks"), where);
+  await refuses("CodeSpans", note("does"), where);
+});
+
+// A sentence restating the table beside it drifts from that table. [[spec/design_output/lsp#a-second-copy-draws]]
+ifVale("a paragraph restating the table beside it is refused", async () => {
+  const table = ["", "| what stands | what it does |", "|---|---|"].join("\n");
+  const said = (lead, cell) => `${lead}\n${table}\n| ${cell} | it names the line |\n`;
+
+  await refuses(
+    "RestatedTable",
+    said(
+      "A door refuses a write breaking a rule, and the table says so.",
+      "a door refuses a write breaking a rule",
+    ),
+  );
+  await passes(
+    "RestatedTable",
+    said("The door names what it reads.", "a door refuses a write breaking a rule"),
+  );
+});
+
 // [[spec/design_output/projection#the-grammar-rules]]
 ifVale(
   "the past tense is refused, and a word the schema leaves standing passes",

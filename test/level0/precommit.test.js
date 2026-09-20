@@ -37,6 +37,7 @@ function box(seed = {}, said = {}) {
     git: fakeGit({
       "git config user.name": { stdout: said.name ?? "" },
       "git config user.email": { stdout: said.email ?? "" },
+      "git rev-parse -q --verify MERGE_HEAD": { exitCode: said.merging ? 0 : 1 },
     }),
     env: said.env ?? {},
     join: (...parts) => parts.join("/"),
@@ -91,6 +92,72 @@ test("the script reads every note under the folder, and none where it stands emp
     [".se/notes/one.md", ".se/notes/two.txt"],
   );
   assert.deepEqual(notesOf(box()), []);
+});
+
+// A change and its test land together, and the door reads the pair. [[spec/design_output/tree#the-rules-over-two-files]]
+test("a code change with no test beside it refuses at this door too", async () => {
+  const code = [
+    "diff --git a/src/bridge/one.js b/src/bridge/one.js",
+    "+++ b/src/bridge/one.js",
+    "@@ -0,0 +1 @@",
+    "+export const one = 1;",
+    "",
+  ].join("\n");
+
+  const said = await holds(box(), code);
+  assert.equal(said.code, 1);
+  assert.match(said.said, /no test beside it/);
+});
+
+// A merge carries other commits' code, and each met the door with its own test. [[spec/design_output/tree#the-rules-over-two-files]]
+test("a merge commit passes the test door, because its code landed with tests already", async () => {
+  const code = [
+    "diff --git a/src/bridge/one.js b/src/bridge/one.js",
+    "+++ b/src/bridge/one.js",
+    "@@ -0,0 +1 @@",
+    "+export const one = 1;",
+    "",
+  ].join("\n");
+
+  const said = await holds(box({}, { merging: true }), code);
+  assert.deepEqual(said, { code: 0, said: "" });
+});
+
+test("a test file standing nowhere leaves the change refused", async () => {
+  const code = [
+    "diff --git a/src/bridge/one.js b/src/bridge/one.js",
+    "+++ b/src/bridge/one.js",
+    "@@ -0,0 +1 @@",
+    "+export const one = 1;",
+    "diff --git a/test/level0/other.test.js b/test/level0/other.test.js",
+    "+++ b/test/level0/other.test.js",
+    "@@ -0,0 +1 @@",
+    "+assert.equal(two, 2);",
+    "",
+  ].join("\n");
+
+  const said = await holds(box(), code);
+  assert.equal(said.code, 1);
+  assert.match(said.said, /src\/bridge\/one\.js/);
+});
+
+test("a test standing already carries the change, because the door reads it", async () => {
+  const code = [
+    "diff --git a/src/bridge/one.js b/src/bridge/one.js",
+    "+++ b/src/bridge/one.js",
+    "@@ -0,0 +1 @@",
+    "+export const one = 1;",
+    "diff --git a/test/level0/other.test.js b/test/level0/other.test.js",
+    "+++ b/test/level0/other.test.js",
+    "@@ -0,0 +1 @@",
+    "+assert.equal(one, 1);",
+    "",
+  ].join("\n");
+  const here = box({
+    "/tree/test/level0/other.test.js": "import { one } from '../../src/bridge/one.js';\n",
+  });
+
+  assert.equal((await holds(here, code)).code, 0);
 });
 
 test("a delta lifting six words out of a note answers one", async () => {

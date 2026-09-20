@@ -63,6 +63,9 @@ import {
 import { voice } from "./voice.js";
 import { cloud, pulling, work } from "./work.js";
 
+// The root reads the platform once, and the register road takes it off the hand. [[spec/design_output/doors#a-door-reads-the-outside]]
+const WINDOWS = process.platform === "win32";
+
 export const verbs = {
   check: {
     says: "the tests, the doors, the server, then the rules over the tree",
@@ -218,7 +221,7 @@ export function theVehicle(argv) {
     return 0;
   }
   if (said === "attach") {
-    const settled = attachTo(files, env, it.clock, pair.work, pair.method);
+    const settled = attachTo(files, env, it.clock, pair.work, pair.method, WINDOWS);
     console.log(
       `${pair.work} names ${made.id} as the copy driving it, at port ${settled.port}.`,
     );
@@ -230,7 +233,7 @@ export function theVehicle(argv) {
     return 0;
   }
   if (said === "register") {
-    const wrote = registerCopy(files, env, made.entry);
+    const wrote = registerCopy(files, env, made.entry, WINDOWS);
     console.log(
       wrote ? `${made.id} stands in the register.` : "no register takes a write here.",
     );
@@ -240,7 +243,7 @@ export function theVehicle(argv) {
   console.log(`method  ${pair.method}`);
   console.log(`work    ${pair.work}`);
   console.log(`copy    ${made.id}${pair.itself ? "  (this tree drives itself)" : ""}`);
-  for (const one of readRegister(files, env)) {
+  for (const one of readRegister(files, env, WINDOWS)) {
     console.log(`  ${one.id}  ${one.version}  ${one.method_root}`);
   }
   return 0;

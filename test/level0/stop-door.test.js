@@ -101,6 +101,22 @@ function stamped(warnings, names) {
   };
 }
 
+// A cloud box reads its own map, so the queue rule stands off without any read outside. [[spec/design_output/doors#a-door-reads-the-outside]]
+test("the queue rule reads the cloud off the box's own environment", () => {
+  const free =
+    "---\nkind: [[ticket]]\nstate: open\nurgency: soon\nsteps:\n  - name: do\n---\n\n# Ask\n\nA thing.\n";
+  const done = { last_assistant_message: "Done.\n\nstop: the-work-stands-complete" };
+
+  const here = box({ [at("spec/tickets/a-free.md")]: free });
+  here.box.env = { CLAUDE_CODE_REMOTE: "true" };
+  const said = onStop(done, here.box);
+  assert.deepEqual(said, { pass: true }, "a cloud box reads no queue");
+
+  const desk = box({ [at("spec/tickets/a-free.md")]: free });
+  const held = onStop(done, desk.box);
+  assert.match(held.result.block, /The queue holds work for this box/);
+});
+
 test("a standing stop line ends the turn, and nothing prompts after it", () => {
   const it = box();
   const said = onStop(

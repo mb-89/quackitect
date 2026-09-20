@@ -17,6 +17,7 @@ import (
 // The route and the port, owned by src/bridge/findings.js, .claude/skills/level0/lib/vehicle.js and the runtime folder of folders.js, and spelled again here because a Go module imports no JavaScript. [[spec/design_output/lsp]]
 const (
 	findingsRoute = "/findings"
+	// The runtime folder folders.js owns, spelled again here because a Go module imports no JavaScript. [[spec/design_input/the-runtime-files-stand-apart]]
 	pointerAt     = ".se/.runtime/vehicle.json"
 	portBase      = 6510
 	// A sweep over the whole tree runs Vale over every note, so the wait stands long. [[spec/design_output/lsp]]

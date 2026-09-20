@@ -223,7 +223,7 @@ and writes one `warn` line.
 A rule deciding `claimed` names a check too, and then both halves answer before
 it fires. The agent claims the reason, the check says the moment stands, and a
 claim outside that moment fires nothing. `fires` in `lib/stop.js` holds it, and
-a claimed rule naming no check fires on the claim alone, as before.
+a claimed rule naming no check fires on the claim alone.
 
 ## A check beats a claim
 

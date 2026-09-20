@@ -45,6 +45,24 @@ rule reads a paragraph one word at a time.
 2. Where a swap names the word, the refusal hands the writer the core word.
 3. Where none does, the refusal names `terms.yml` and the note it wants.
 
+# The slug reads one source
+
+A term names a note and a chapter in it, and the slug turns that heading into
+the anchor the term carries. `spec/config/slug.yaml` holds the cases the slug
+answers, and each tool chain drives its own function off them. The moves run in
+this order:
+
+- `'` drops, and so does the mark a code span opens with
+- the rest lowers
+- every other run turns into one dash
+- a dash at each end goes
+
+The one this tree writes in JavaScript stands in
+`.claude/skills/level0/lib/slug.js`, and the cases in
+`test/contract/vocabulary.test.js` drive it. A tool chain importing none of that
+carries a copy of the function, with its reason beside it, and drives the same
+cases. So a drift turns a suite red where it stands.
+
 # A swap wins
 
 A swap wins over every list, so a word the tree refuses for good stands in

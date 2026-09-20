@@ -18,6 +18,7 @@ import {
   resolves,
   travels,
 } from "../../.claude/skills/level0/lib/vehicle.js";
+import { RUN } from "../../.claude/skills/level0/lib/folders.js";
 import { homeIn } from "./editor.js";
 
 // [[spec/design_output/vehicle#a-marker-names-the-root]]
@@ -52,16 +53,16 @@ function idOf(time) {
 }
 
 // [[spec/design_output/vehicle#the-register-places-an-identity]]
-export function registerDirs(env) {
+export function registerDirs(env, windows = false) {
   const said = env.SE_REGISTRY;
-  if (said) return said.split(process.platform === "win32" ? ";" : ":").filter(Boolean);
+  if (said) return said.split(windows ? ";" : ":").filter(Boolean);
   const home = homeIn(env);
-  return home ? [join(home, ".se")] : [];
+  return home ? [join(home, ...RUN.split("/"))] : [];
 }
 
-export function readRegister(files, env) {
+export function readRegister(files, env, windows = false) {
   const out = [];
-  for (const dir of registerDirs(env)) {
+  for (const dir of registerDirs(env, windows)) {
     const said = readIf(files, join(dir, REGISTER));
     for (const one of parsedList(said)) {
       if (one?.method_root && files.exists(join(one.method_root, MARKER))) out.push(one);
@@ -70,9 +71,9 @@ export function readRegister(files, env) {
   return out;
 }
 
-export function registerCopy(files, env, entry) {
+export function registerCopy(files, env, entry, windows = false) {
   let wrote = false;
-  for (const dir of registerDirs(env)) {
+  for (const dir of registerDirs(env, windows)) {
     const at = join(dir, REGISTER);
     try {
       files.makeDir(dir);

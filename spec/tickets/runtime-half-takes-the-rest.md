@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -27,6 +27,19 @@ group: the-rules-hold-themselves
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 step: do
+record:
+  - step: do
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 3a0872e8c727be74152dc3e22a604c734cd1c398
+    hash_after: 8bf1d5d51de1ac8df60c6c8f3639b6b24c49aefc
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 29 test(s) pass in 3 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+reason: done
 ---
 
 # Ask
@@ -68,11 +81,15 @@ whichever place it meets first.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/level0/vehicle.test.js test/level0/bridgehead.test.js test/contract/stub.test.js
+
 ## check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ## says
 
@@ -80,12 +97,36 @@ whichever place it meets first.
 
 <!-- the form is text -->
 
+The register is the one name the ask lists that still stands outside the runtime
+half, and it moves:
+
+| what changes | where |
+|---|---|
+| the default register folder | `registerDirs` in `src/scripts/vehicle.js` |
+| the name the spelling rule holds | `MOVED` in `.claude/skills/level0/lib/folders.js` |
+| the stub's own spelling, each beside the owner it names | the stub's bridgehead hook and its RUNME |
+| the move a box carrying the old place meets | `src/scripts/install.sh` |
+
+A folder `SE_REGISTRY` names holds the file straight, because a person names
+that folder and the runtime half is the private folder's own shape. The home
+register takes the half, and the note says both.
+
+The other names the ask lists stand under the runtime half already. The rule in
+`.claude/skills/level0/lib/tree.js` now reads the register beside them, so a
+reader spelling the old place comes back refused.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
 
+- the change follows the ask: the register moves, the install carries a box across, and the note says so
+- the cleanup it reveals: the stub's shell copy names the file owning the folder, which the rule asks for
+- each fact stands once: `folders.js` owns the name, and a copy names that file beside it
+
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+- The ask names a file the extension and the language server read. Each reads `config.json` and the pointer, which stand under the runtime half already.

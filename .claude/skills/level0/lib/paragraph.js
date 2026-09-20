@@ -17,6 +17,7 @@ import {
   swapped,
   WIDTH,
 } from "./snippets.js";
+import { codeSpans, restatedTable } from "./paragraph-rules.js";
 import { vocabularyRule, wordsOf } from "./vocabulary.js";
 
 export const PARAGRAPH = "paragraph rules";
@@ -167,6 +168,7 @@ export function rulesFrom(said, banner = "", lists = null) {
   put("Sentence.yml", sentence(layer("sentence")));
   put("ListItem.yml", listItem(layer("sentence")));
   put("CodeSpans.yml", codeSpans(layer("sentence")));
+  put("RestatedTable.yml", restatedTable(layer("restated")));
   for (const [name, body] of grammar(layers.grammar ?? {})) put(name, body);
 
   // [[spec/design_output/projection#a-layer-writes-two-files]]
@@ -470,40 +472,6 @@ function listItem(layer) {
   ]);
 }
 
-// [[spec/design_output/projection#a-layer-writes-two-files]]
-function codeSpans(layer) {
-  const most = Number(layer.codeSpans);
-
-  return scripted(`A sentence holds ${most} code spans.`, [
-    ...prelude(["rows"], true, layer.prose),
-    FRONT,
-    "fenced := false",
-    "",
-    "for row in rows(said) {",
-    "  trimmed := text.trim_space(row.said)",
-    '  if text.has_prefix(trimmed, "```") {',
-    "    fenced = !fenced",
-    "    continue",
-    "  }",
-    "  if fenced { continue }",
-    '  if text.has_prefix(trimmed, "|") { continue }',
-    '  if text.has_prefix(trimmed, "#") { continue }',
-    '  if text.has_prefix(trimmed, ">") { continue }',
-    "",
-    "  for part in text.re_split(`[.!?]+(?:\\s|$)`, row.said, -1) {",
-    '    seen := text.re_find("`[^`]*`", part, -1)',
-    "    if is_undefined(seen) { continue }",
-    `    if len(seen) > ${most} {`,
-    "      matches = append(matches, {",
-    "        begin: row.begin,",
-    "        end: row.end,",
-    `        message: "A sentence holds ${most} code spans, and this one holds " + string(len(seen)) + ". Carry the rest as a list or a table."`,
-    "      })",
-    "    }",
-    "  }",
-    "}",
-  ]);
-}
 
 
 

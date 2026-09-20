@@ -380,19 +380,6 @@ test("every forced copy of the session file says what the hand module says", () 
   );
 });
 
-test("a file naming the owner beside the copy passes, and a test file passes", () => {
-  const owned = {
-    "src/scripts/imports.js":
-      'import { inRun } from "../../.claude/skills/level0/lib/folders.js";\nconst hold = inRun("hold");\nconst said = ".se/.runtime/hold";\n',
-    "src/extension/copy.js":
-      "// The folder folders.js owns, spelled again here.\nconst BIN = \".se/.runtime/bin\";\n",
-    "test/level0/folders.test.js": 'const at = ".se/.runtime/bin";\n',
-    ".claude/skills/level0/lib/folders.js": 'export const RUN = ".se/.runtime";\n',
-  };
-  assert.deepEqual(privateFolderOwned(fakeTree(owned, Object.keys(owned))), []);
-  assert.deepEqual(privateFolderOwned(here), []);
-});
-
 // [[spec/design_output/level0#a-name-meets-the-cap]]
 test("a tracked name past the cap is refused", () => {
   const long = Array.from({ length: words + 1 }, (_, i) => `word${i}`).join("-");

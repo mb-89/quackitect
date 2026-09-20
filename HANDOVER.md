@@ -5,95 +5,98 @@ status: done
 
 # Where it stands
 
-The branch closes every child of its group, and the remote holds each commit.
-`./RUNME.sh check` answers 0 with the server standing.
+The branch closes the tickets below, out of the group
+`the-rules-hold-themselves`. The tip stands green: `./RUNME.sh check` answers 0,
+and `branch review` says nothing waits.
 
-| the group's step | how it stands |
+| ticket | what lands |
 |---|---|
-| sync, split, children | each passes, and every child closes |
-| retro/notes | every private note closes, so `./RUNME.sh retro notes` answers 0 |
-| retro/write | the retro stands under `## write` in the group's ticket |
-| retro/cloud | this file, and the chapter beside it |
+| `the-question-process-gets-tests` | a contract case holds the successor road open |
+| `the-rule-shares-one-slug` | one module owns the slug, and a source holds its cases |
+| `voice-rules-skip-the-record` | a case holds the guard over the fields the engine writes |
+| `group-key-takes-one-spelling` | the ticket door refuses a group named as a branch |
+| `runtime-half-takes-the-rest` | the register stands under the runtime half |
+| `a-project-adds-vale-rules` | the styles of both roots assemble, and the vale door reads them |
+| `a-check-finds-every-writer` | the escape binds to the line, and the installer meets its lists |
+| `a-check-finds-restated-facts` | three rules find one fact written in two places, and one pass answers every path |
+| `a-lint-holds-note-rules` | the check reads a marked rule against the rationale it links |
+| `the-check-holds-test-first` | both doors refuse a code change standing with no test |
+| `the-door-reads-script-writes` | the shell door reads a script it runs, and refuses the writes inside |
+| `the-door-rule-reads-env` | a rule holds the environment, the arguments and the platform inside a door |
 
-# What this box closes
-
-| the ticket | what it lands |
-|---|---|
-| a-base-file-says-it | the tree view reads its columns off the base file |
-| a-cell-takes-an-edit | a person edits a value inside a tree cell |
-| a-claim-meets-the-view | a claim of done meets the owner's own screen |
-| a-person-reads-the-split | the header three modules owe |
-| a-question-reaches-its-owner | a design question reaches the owner before the build |
-| a-rename-reaches-every-note | `./RUNME.sh rename` moves a name and rewrites every reach |
-| an-experiment-ends-decided | a trial runs a route ending on a decision |
-| apply-lane-carries-a-hand | the write door keeps a mark against each path |
-| the-brand-names-the-plugin | a vehicle stamps its folder name on the marketplace |
-| the-colours-stand-in-config | the window's colours stand in one config file |
-| the-controls-wire-up | the binding reaches the pull and the stop hook |
-| the-help-reads-the-cursor | the help reads the keys the cursor stands on |
-| the-judge-reads-answer-rules | the judge names the rule an answer breaks |
-| the-tree-draws-its-columns | each tab past the log draws rows with a shape |
-| the-tree-takes-a-filter | a person narrows a long tree by typing |
-| the-viewer-draws-the-note | a note row draws under the prompt it answers |
-| the-window-grows-a-frame | the window holds a frame of tabs |
-
-Each of these reaches past the branch through a chapter of its own:
-
-| the feature | what a reader opens |
-|---|---|
-| the write door's mark | [[spec/design_output/level0#a-write-meets-its-mark]] |
-| the brand a vehicle stamps | [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]] |
-| the engine binding | [[spec/design_output/config#the-engine-controls]] |
-| the rename verb | [[spec/design_output/index#a-rename-reaches-a-name]] |
-| the window's colours | [[spec/design_output/tui#colours]] |
-| the experiment route | [[spec/design_output/work#an-experiment-decides]] |
-| the judge's labels | [[spec/design_output/pull#the-judge-answers-a-label]] |
-
-# The retro
-
-[[spec/tickets/the-tree-names-its-things]] carries it under `## write`, with
-what goes well, what goes badly, and the home each fix takes. The lines under
-`## cloud` say what this box lacks, meets and leaves.
-
-# The scripts this box leaves
-
-| the script | what it probes |
-|---|---|
-| `.se/scripts/binding-probe.test.js` | the engine binding over each road the pull closes |
-| `.se/scripts/text-reach.mjs` | the tracked files the rename verb's reader leaves out |
-| `.se/scripts/two-fronts-probe.mjs` | the one guard the check and the bridge share |
-
-Git ignores that folder, so a reader takes those off this box alone.
+Each one carries its evidence on its ticket. A hand other than the one making
+the change passes every verdict.
 
 # What waits
 
-| the thing | what the next reader does |
+The group closes, and its retro stands written on the ticket. Nothing of this
+group waits.
+
+## The asks this branch opens
+
+The work under this branch mints seven asks. Each stands at `draft`, outside any
+group, and waits for a pull:
+
+| ticket | what it asks |
 |---|---|
-| [[spec/tickets/the-window-splits-by-tab]] | takes it, and it carries no group |
-| [[spec/tickets/a-pointer-resolves]] | takes it, and it carries no group |
-| [[spec/tickets/the-unknown-runs-stays-quiet]] | takes it, and it carries no group |
-| `./RUNME.sh branch done` | this box runs it last, and the next box reads the status |
+| `a-rule-names-its-failure` | a guidance rule says the failure it guards, beside itself |
+| `a-door-holds-file-calls` | every Go package names its file reading in one file |
+| `a-door-holds-three-reads` | the door rule reaches the pid, the version and the exec path |
+| `a-pointer-reaches-a-heading` | a check reads a pointer's slug against the note it names |
+| `a-lone-mark-pairs-wrong` | the script rules pair the marks of a line, and of no other |
+| `every-road-reads-one-config` | every road reading a config calls the assembly |
+| `one-door-joins-a-path` | one place joins a path, and every caller asks it |
 
-# What this box rules
+## The queue binds one hand
 
-[[spec/guidance/cloud]] rule 7 takes a `by: person` step as this box's own, and
-the merge is where the owner reads each call.
+The queue binds a session to the ticket it hands out. So a named pull answers
+that the ticket stands behind the queue, and the spawn prompt opens with a
+nameless pull for that reason. [[src/scripts/pull.js]]
 
-| the ticket | the call |
+| what a box does | what it gets |
 |---|---|
-| a-person-reads-the-split | the split stands in the tree, and the header on three modules stays open |
-| the-judge-reads-answer-rules | a judge label names the note and the number, so one label reaches one rule |
-| the-controls-wire-up | the autonomy half leaves the Ask, because it reaches no schema and no code |
-| the-brand-names-the-plugin | the folder name stamps the brand, so one name answers every copy |
+| spawns four hands at once | all four take the same leaf, and three drop their hold |
+| runs four hands at once | Vale gives up on a rule at two seconds, and the lint calls every voice rule unchecked |
+| spawns one hand at a time | the hand takes the leaf the queue hands it |
 
-# What this box meets
+## The findings the retro reads
 
-| the thing | what it answers |
+The retro decides every private note, and five become the tickets above. The
+notes stand here too, because the private folder dies with this box.
+
+The first: a lone code mark in prose leaves an odd count of that mark in the
+file. The script rules pair the marks in the order they stand. So every span
+under that line pairs wrong, and the rules draw a character fault and a word
+fault on lines a hand leaves alone. The fault stands far below the cause, and
+the message names neither the cause nor the road.
+
+The second: the vale door reads the config the assembly writes, and three other
+roads read the method's config. They are the answer gate, the findings road and
+the copilot road. So a rule a project alone holds refuses a write and passes the
+lint. Each road takes the pair of roots and calls the assembly, the way the door
+does.
+
+| the third finding | what it says |
 |---|---|
-| a shell write to a tracked file | `ShellWritesNothing` refuses a heredoc, and Read with Edit carries it |
-| a review step | it wants a hand apart from the drafting one, so each takes a spawn |
-| a field of a step the round holds nowhere | the ticket door refuses it, and names the field |
-| `--back` | it commits the working tree, so a red case takes a `git checkout` to stand |
-| a `needs` row naming a verb | it asks whether the box holds that verb, so a hold takes command evidence |
-| a private note behind the group leaf | `ticket todo` lifts it, and the plain pull hands it out |
-| a compaction | it cuts the window, and the summary carries the work on |
+| what happens | a heading rename leaves every pointer at its old slug reaching nothing |
+| where | a chapter of `spec/design_output/tree-view.md`, and two comments under `src/viewer` |
+| what the check says | nothing, on either comment |
+| the fix for the class | a check reads a pointer's own slug against the headings of the note it names |
+
+The last three notes stand against the code, and the door work under this branch
+finds each one:
+
+| note | what it says |
+|---|---|
+| `a-door-holds-three-reads` | three roots read the pid, the version and the exec path past the door rule |
+| `path-join-stands-twice` | one place joins a path through the door, and another writes the slash itself |
+| a write lands on a free file | the write tool takes a whole file, and a hand reading it as free loses the text |
+
+The write class wants the fix beside it. A hand reads a file before it writes
+one, and reaches for the patch road where the file stands already.
+
+## What this box leaves behind
+
+- the scripts under the private folder are probes, and none of them is worth keeping
+- the kept tag `kept/vale-styles-first-cut` stands read, and the assembly lands off the ask
+- each review hand names its findings on the ticket, and the record carries every one

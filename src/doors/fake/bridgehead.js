@@ -5,6 +5,7 @@
 // [[spec/design_output/doors#the-bridgehead-stands-under-hooks]]
 
 import { decide } from "../../bridge/server.js";
+import { behaves } from "./behaves.js";
 
 export function fakeBridgehead(box) {
   const raised = [];
@@ -25,5 +26,5 @@ export function fakeBridgehead(box) {
       return { next: e, register: answer.register };
     },
   };
-  return it;
+  return behaves(it, "bridgehead");
 }

@@ -9,6 +9,8 @@ import { skip, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { disk } from "../../src/doors/disk.js";
 import { proc } from "../../src/doors/proc.js";
+import { vale } from "../../src/doors/vale.js";
+import { assemble } from "../../src/scripts/styles.js";
 import { readTools, whereIs } from "../../src/engine/tools.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
@@ -44,6 +46,60 @@ test("every section of the config naming a folder opens on a double star", () =>
 ifVale("a rationale reads the same by its absolute path as by its relative one", () => {
   assert.equal(linesOf([join(root, RATIONALE)]), linesOf([RATIONALE]));
   assert.equal(linesOf([join(root, DESIGN)]), linesOf([DESIGN]));
+});
+
+const STYLES = "spec/config/styles";
+const INI = [
+  "StylesPath = spec/config/styles",
+  "MinAlertLevel = suggestion",
+  "",
+  "[*.{md,markdown,txt}]",
+  "BasedOnStyles = Ours",
+  "",
+].join("\n");
+
+const ruleOf = (word) =>
+  ["extends: existence", `message: "${word} stands refused here"`, "level: error", "tokens:", `  - ${word}`, ""].join("\n");
+
+const wrote = (at, text) => {
+  files.makeDir(dirname(at));
+  files.write(at, text);
+};
+
+const rooted = (where, rel) => join(where, ...rel.split("/"));
+
+// A project writes a rule of its own, and the method's rules keep standing over it. [[spec/design_output/vehicle#the-styles-assemble-once]]
+ifVale("a rule the work root alone holds refuses a write there, and none in the method", async () => {
+  const where = files.tempDir("two-roots-");
+  const method = join(where, "tools");
+  const work = join(where, "project");
+  wrote(rooted(method, ".se/.runtime/tools.json"), JSON.stringify({ vale: { path: bin } }));
+  wrote(rooted(method, ".vale.ini"), INI);
+  wrote(rooted(method, `${STYLES}/Ours/Method.yml`), ruleOf("flibbertigibbet"));
+  wrote(rooted(work, `${STYLES}/Ours/Project.yml`), ruleOf("duckweed"));
+
+  const said = assemble(files, { method, work, itself: false });
+  assert.equal(said.config, ".se/vale/.vale.ini", "the door reads the config the assembly writes");
+
+  const door = vale(files, outside, method, work);
+  const inProject = await door.lint("The duckweed stands here.\n", "notes.md");
+  assert.ok(inProject.ran, `vale ran: ${inProject.why}`);
+  assert.deepEqual(
+    inProject.found.map((one) => one.rule),
+    ["Ours.Project"],
+    "the project's own rule refuses the write",
+  );
+
+  const both = await door.lint("The flibbertigibbet stands here.\n", "notes.md");
+  assert.deepEqual(
+    both.found.map((one) => one.rule),
+    ["Ours.Method"],
+    "the method's rule keeps standing over the project",
+  );
+
+  const alone = vale(files, outside, method, method);
+  const inMethod = await alone.lint("The duckweed stands here.\n", "notes.md");
+  assert.deepEqual(inMethod.found, [], "the project's rule refuses nothing in the method");
 });
 
 ifVale("the config the workspace hands the Vale extension draws nothing", () => {

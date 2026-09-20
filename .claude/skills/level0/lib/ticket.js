@@ -7,6 +7,10 @@ import { CHECKED, entriesIn, readNote } from "./schema.js";
 export const SEVERITY = "error";
 export const HAND = "hand";
 export const ANSWERED = "answered:";
+export const GROUP = "group";
+
+// The branch a group lands on carries the group's name under this. [[spec/design_output/work#a-group-is-a-ticket]]
+const BRANCH = "work/";
 
 // Whether a hand works a leaf, answered once so the pull and the write door agree by construction. [[spec/tickets/the-one-answer-takes-shape]]
 export function writesHere(leaf, hand = {}) {
@@ -64,12 +68,27 @@ export function heldGroup(text) {
 export function ticketFaults(was, now, schema, where) {
   const note = readNote(now);
   const old = readNote(was);
-  if (!old.front.stands) return engineFaults(note, schema, where);
+  if (!old.front.stands) return [...engineFaults(note, schema, where), ...groupFaults(note, where)];
 
   return [
     ...verbFaults(old, note, schema, where),
     ...placeFaults(old, note, schema, where),
     ...engineFaults(note, schema, where),
+    ...groupFaults(note, where),
+  ];
+}
+
+// A group is a ticket, and its own name is the spelling the pull reads. A child naming the branch instead stands outside every group, and its group closes over it. [[spec/design_output/work#a-group-is-a-ticket]]
+function groupFaults(note, where) {
+  const said = String(note.front.said?.[GROUP] ?? "").trim();
+  if (!said.startsWith(BRANCH)) return [];
+  return [
+    fault(
+      GROUP,
+      where,
+      note.front.lines?.[GROUP] ?? 1,
+      `${GROUP} names the group's own ticket, so write ${said.slice(BRANCH.length)} in place of ${said}.`,
+    ),
   ];
 }
 

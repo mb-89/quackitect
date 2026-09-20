@@ -32,7 +32,7 @@ func (t Tree) widths(w int) []int {
 	return out
 }
 
-// [[spec/design_output/tree-view#the-columns-stand-still]]
+// [[spec/design_output/tree-view#a-tab-joins-the-two]]
 func (t Tree) Header(w int) string {
 	wide := t.widths(w)
 	cells := make([]string, 0, len(t.Cols))

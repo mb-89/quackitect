@@ -378,7 +378,7 @@ export function handRule(it, front, all, group) {
   return {
     agent: Boolean(it.agent),
     ownerSays: Boolean(it.ownerSays),
-    cloud: Boolean(it.cloud ?? inCloud(it.env ?? process.env)),
+    cloud: Boolean(it.cloud ?? inCloud(it.env ?? {})),
     atRetro: String(front?.todo) === "true" || atRetro(all ?? [], group),
   };
 }

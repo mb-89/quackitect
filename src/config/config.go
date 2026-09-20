@@ -14,7 +14,7 @@ import (
 // The two files the layers stand in, the local one owned by .claude/skills/level0/lib/folders.js and spelled again here because a Go module imports no JavaScript. [[spec/design_output/config#the-three-layers]]
 const (
 	Tracked = "spec/config/level0.json"
-	Local   = ".se/.runtime/config.json"
+	Local   = ".se/.runtime/config.json" // .claude/skills/level0/lib/folders.js owns this name
 )
 
 // [[spec/design_output/config#the-go-reader]]

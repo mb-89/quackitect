@@ -15,11 +15,25 @@ const (
 	Local   = config.Local
 	WordsAt = "names.words"
 	WordsIn = "SE_NAMES_WORDS"
+	// The block holding the two runs the restated rules refuse. [[spec/design_output/config#the-resolver-holds-the-layers]]
+	Restated  = "restated"
+	PointerIn = "SE_RESTATED_POINTER"
+	RuleIn    = "SE_RESTATED_RULE"
 )
 
 // The shared reader answers the key, and this one turns what it answers into a count. [[spec/design_output/config#the-go-reader]]
 func wordsHere(root string) int {
-	said, held := config.Value(root, WordsAt)
+	return countAt(root, WordsAt)
+}
+
+// The runs the restated rules refuse, read off the same layers as the words. [[spec/design_output/config#the-resolver-holds-the-layers]]
+func restatedHere(root string) (int, int) {
+	return countAt(root, "restated.pointer"), countAt(root, "restated.rule")
+}
+
+// A count the shared reader answers, or zero where the key stands nowhere. [[spec/design_output/config#the-go-reader]]
+func countAt(root, key string) int {
+	said, held := config.Value(root, key)
 	if !held {
 		return 0
 	}

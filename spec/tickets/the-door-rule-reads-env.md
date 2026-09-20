@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: design
     reads: [[spec/guidance/voice]]
@@ -89,7 +89,121 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: verdict
+record:
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: f3207481318c868ec4e9cd220a99279670c51544
+    hash_after: f3207481318c868ec4e9cd220a99279670c51544
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-2
+    hash_before: ec36534a027da40fa81b8f4c0ad64c97f1d49a6b
+    hash_after: ec36534a027da40fa81b8f4c0ad64c97f1d49a6b
+    returns: 1
+    why: The approach puts the pass list in `DoorsOnly.yml`. A rule there reads the; raw text of a file alone, so a list of roots in the rule file stands unread.; `.vale.ini` owns that fact already, in the sections standing the rule off; `src/doors` and the editor files. Put the roots there.; The approach gives `src/lsp` a door file and names no section standing the; Go reading off it. Name it, beside the sections `.vale.ini` already holds.; The approach hands the reads outside the two the ask names to the implement; step. The ask asks for a clean `./RUNME.sh lint src`, so say which of them; move behind a door and which take the value off the hand. A read of; `process.platform` that builds a path is the case the criterion leaves open.; The rest holds. `DoorsOnly.yml` stands, and `.vale.ini` runs it over `.go`; beside `.js`. The hand `src/scripts/cli-doors.js` builds carries `env`, so; the two reads the ask names take `it.env` and `box.env` as written.
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: e0e917c2bfbf38d110d363a6555b197e0cecb84a
+    hash_after: e0e917c2bfbf38d110d363a6555b197e0cecb84a
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-4
+    hash_before: f5090a0e166b1a0fc90025362269192edd6a80de
+    hash_after: f5090a0e166b1a0fc90025362269192edd6a80de
+    returns: 2
+    why: The Go section names `src/lsp/doors.go`, and that file stands nowhere.; `src/viewer` and `src/index` each call theirs `door.go`. Take that name.; The Go reading reaches `src/viewer`, `src/index` and `src/swap` too. The; approach names a section for none of the three. Each package imports `os` in; several files at once. So one door file a package leaves the rule refusing; every other file of it. Say which file of each package names the outside, and; how the rest of the package reaches it.; `src/extension/extension.js` reads the platform. `.vale.ini` stands off; `editor*.js` alone, and the extension reaches no door under `src/doors`. Put; it in the pass list, beside the editor files.; `src/scripts/editor.js` reads the environment on its entry line, and; `cli*.js` misses it. Put it in one of the two tables.; The three findings of the round before stand answered. The pass list moves to; `.vale.ini`, the Go section carries a name, and the module table says what; each read takes. `process.platform` riding down from a root holds.; `src/extension/node_modules` stays out of reach, because the index skips it.
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 818cfead149a26113864a5ab5364bf3869f6718a
+    hash_after: 818cfead149a26113864a5ab5364bf3869f6718a
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-6
+    hash_before: 20cfcd837167a7ac5f8e681655f60bddb2c27a26
+    hash_after: 20cfcd837167a7ac5f8e681655f60bddb2c27a26
+    returns: 3
+    why: "`src/index/main.go` imports `os/exec` to spawn the resident, and; `src/index/door.go` imports none. The table says nothing moves for; `src/index`, and the pass list stands `door.go` off alone, so the rule; refuses `main.go`. Say whether the spawn moves into `door.go` or `main.go`; joins the pass list.; The first table draws the Go rule over an import of `os` or `os/exec`, and; the closing paragraph holds it to `os/exec`. The hand implementing reads two; rules. Write the scope once.; `src/scripts/trust.js` and `src/scripts/copilot.js` read `process.argv` on; their entry lines, the way `precommit.js` and `prepush.js` do. The module; table hands each `it.env` alone, so the rule refuses those lines. Put each in; one of the two tables.; `src/scripts/copilot.js` and `src/scripts/vehicle.js` read; `process.platform`, and the platform sentence names `cli-read.js` alone.; `cli-check.js` builds `windows` onto the hand, so say whether the two take; that off the hand or stand off as roots.; `.vale.ini` stands the stub's bridgehead off already, and `**/src/stub/**`; opens a second section over the same file. Grow the section standing, and; open no second.; The findings of the round before stand answered. The Go section takes; `door.go`, `src/viewer` and `src/swap` import no `os/exec`, and; `src/extension/*.js` and `src/scripts/editor.js` reach the pass list. The; file calls ride `a-door-holds-the-go-file-calls`, which stands in the tree."
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 122656e2eac3e79371dc42494e4ebdedb902ce07
+    hash_after: 122656e2eac3e79371dc42494e4ebdedb902ce07
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-8
+    hash_before: 1a72525f2a423fd2eac0a7bce64a80d7346b3ed7
+    hash_after: 1a72525f2a423fd2eac0a7bce64a80d7346b3ed7
+    returns: 4
+    why: "`src/scripts/vehicle.js` carries no `it`: `registerDirs` and `readRegister`; open on `(files, env)`, and `cli.js`, `cli-doors.js` and; `src/bridge/vehicle.js` call them that way. The `windows` `cli-check.js`; builds rides the viewer's hand alone, and vehicle sees none of it. Say which; caller carries the platform in, or stand the file off as a root.; The pass list opens `**/src/extension/*.js`, and `.vale.ini` stands; `**/src/extension/editor*.js` off already, so two sections cover the editor; files. Grow the section standing, the way the stub's row reads now.; The rule draws on `process.env`, `process.argv` and `process.platform`, and; `src/scripts/vehicle.js` reads `process.pid` outside a door. Name what the; scope leaves to a later ticket, beside the three reads it takes.; The findings of the round before stand answered. The spawn in; `src/index/main.go` moves into `src/index/door.go`. The Go scope reads; `os/exec` in the table and the paragraph alike. `trust.js` and `copilot.js`; reach the pass list, and the stub's bridgehead keeps its one section."
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: feea15d7cece4654886fa5fd6d5ee41d40af4e1b
+    hash_after: feea15d7cece4654886fa5fd6d5ee41d40af4e1b
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-10
+    hash_before: f125f932c65b5d0ee3d991432e55358de934e553
+    hash_after: f125f932c65b5d0ee3d991432e55358de934e553
+    returns: 5
+    why: The tests read the environment, and the pass list names none of them.; `test/contract/*.js` reads `process.env` and `process.platform`, and; `test/level0/*.js` sets `process.env` around a case. The `check` verb runs; `lint` over the whole tree, so the rule turns the check red. Say which of the; two folders stands off, and which takes the value off a hand.; A section stands a file off `DoorsOnly` whole, and that rule refuses a `node:`; import outside the doors today. So every root the pass list gains gives that; refusal up beside the environment read. Say whether a rule file of its own; carries the reading, or the roots give the import guard up.; The Go table names `src/lsp`, `src/index`, `src/viewer` and `src/swap`, and; `src/yaml` stands outside it. Name that package beside the four, with what; moves for it.; `src/scripts/cli-check.js` reads `process.version`, and; `src/scripts/cli-doors.js` reads `process.execPath`. The pass list covers both; files, so name the two reads beside `process.pid`, where the scope hands a; read to the later ticket.; The findings of the round before stand answered. `src/scripts/vehicle.js`; takes a `windows` argument off its callers, the extension grows the section; standing, and `process.pid` rides a private note to the retro.
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: ccfad8d001cd53c38c97829d2d2ff223592e15e9
+    hash_after: ccfad8d001cd53c38c97829d2d2ff223592e15e9
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-12
+    hash_before: b019a68360313d52fe5a179df5944e307a411490
+    hash_after: 9ce24c777acc53fc86f136ddb7f8eda7dd555dd2
+    returns: 6
+    why: The new rule joins `VoiceVale`, and the section over `*.md` names it nowhere.; `DoorsOnly` stands off there because a note writes `process.env` in its prose,; and a ticket in the tree does today. `[formats]` reads a `.yml` as markdown; too, so the rule file meets its own tokens. Name the line the markdown; section takes.; The sections standing `DoorsOnly` off today name the new rule nowhere:; `src/doors/*.js`, their fakes, the hooks module and the stub's bridgehead.; `src/doors/proc.js` reads `process.env`, so `./RUNME.sh lint src` comes back; red on a door. Say that each section takes a line for the new rule beside the; one it holds.; Growing the section over `editor*.js` to `*.js` gives the `node:` import guard; up for `src/extension/extension.js` and `src/extension/sidebar.js`. The; approach opens a rule file of its own so a pass keeps that guard. Open the; wider glob under the new rule alone, and leave `DoorsOnly` where it stands.; `src/bridge/review.js` reads `process.execPath` as well, and the table naming; the reads a later ticket carries stands `src/scripts/cli-doors.js` alone.; Name the second file beside it.; The findings of the round before stand answered. The test folders reach the; pass list, and the reading takes a rule file of its own. `src/yaml` stands in; the Go table, and the later ticket carries `process.version` and; `process.execPath` beside `process.pid`.
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 71af5c91b66d1eb075e83ecb2ddf2f7b2b9d5c87
+    hash_after: 810049a7e3c941e3e665254614868ac96cd6f7e1
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-14
+    hash_before: d3e1a6f8d0a35afaef0ab3d20ce0187cfbc10a3a
+    hash_after: d3e1a6f8d0a35afaef0ab3d20ce0187cfbc10a3a
+    returns: 7
+    why: "`.vale.ini` stands `[**/test/level0/*.js]` today, holding `FakeDoorsInTest =; YES`, and the table of sections the file gains names it as new. Grow the; section standing, the way the stub's bridgehead reads now. Leave; `**/test/contract/*.js` as the one section that row opens.; The module table writes `work.js` and `vehicle.js` bare, and every other row; and the platform table below write the whole path. Write one spelling of a; file name.; The findings of the round before stand answered. The markdown section takes a; line, and every section standing `DoorsOnly` off names the new rule. The; extension opens a section of its own under the new rule alone, and; `src/bridge/review.js` stands beside `src/scripts/cli*.js` in the later table.; The coverage reads complete otherwise. Every read of `process.env`,; `process.argv` and `process.platform` outside `src/doors` lands on the pass; list or in the module table. Every Go file importing `os/exec` sits in; `src/lsp` or `src/index`, the two packages the Go table moves.; `./RUNME.sh lint src` answers zero today, and the draft's diff touches this; ticket alone."
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 0638763fbc79d062896625ae91411fb31b8ad01b
+    hash_after: 67ca5dfbdb080e0fd873f4d6b1769600d816f1ba
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-16
+    hash_before: 92a37e4384279a272b0566985001860b643a7256
+    hash_after: 92a37e4384279a272b0566985001860b643a7256
+  - step: implement/tests-red
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: b5180f9f1fb66467ba8275bfb3a767ba4c6ef85c
+    hash_after: c5f82403cf1ee5262aeec28cb155f2de9d1c447d
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, 3 test(s) fail on their own assertion
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
+  - step: implement/change
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: d44ef3a19b7e61882c835a33ff1445493982e62d
+    hash_after: e5fcf588f8f1c6161677a2db858ed3b23d8710e0
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
+  - step: implement/tests-green
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 954f53b940f559471792fefec0990c8f9f594188
+    hash_after: 2bea113504e931f0cc27ee14022942b75a4a5c41
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 9 test(s) pass in 1 file(s)
+      - name: check
+        exit: 0
+        said: The rules pass.
+  - step: verdict
+    hand: box 5387e4f82b24 · claude-code-remote · helper-21
+    hash_before: 08254b211f1d0c3df706dd0d39dbf98afb15c3cb
+    hash_after: 770c5622a63efde37130c770fd84870748d9ae39
+reason: done
 ---
 
 # Ask
@@ -115,6 +229,107 @@ Code reads the environment and runs commands in place, and a test of it touches 
 
 <!-- the form is text -->
 
+One rule file grows the reading, and the lint config says where it stands off:
+
+| what stands | where |
+|---|---|
+| the environment read, and the Go import of `os/exec` | `spec/config/styles/VoiceVale/OutsideInDoors.yml`, a rule of its own |
+| the places standing off | `.vale.ini`, in a section for each, the way the fakes stand off today |
+
+The reading takes a rule file of its own, because a section standing a file off
+`DoorsOnly` gives up its import guard as well. A root reads the environment and
+imports no door, so the two rules want two switches.
+
+A rule under `spec/config/styles` reads one buffer and no path, so the pass list
+belongs where every other path rule stands. Vale skips its own styles folder, so
+the rule file meets none of its own tokens.
+
+The readings:
+
+- the rule draws on `process.env`, `process.argv` and `process.platform` outside `src/doors`
+- a root builds the hand every other module takes, so it reads the environment once
+- the Go rule reads an import line, so one file of a package names the outside
+
+A section `.vale.ini` holds today grows to name the new rule. A door reads the
+environment, and a fake stands in for a door. A hooks module runs where no door
+reaches, and a case drives a door:
+
+| the section standing today | why the new rule stands off there too |
+|---|---|
+| `**/src/doors/*.js` | `src/doors/proc.js` hands a child the environment it holds |
+| `**/src/doors/fake/*.js` | a fake stands in for a door, and takes the same road |
+| `**/.claude/skills/level0/hooks/*.js` | the hooks module reads the environment on its entry line |
+| `**/src/stub/.claude/skills/level0/hooks/*.js` | the stub copies that module out of the template |
+| `**/test/level0/*.js` | a case reads the environment to drive a door, and sets one around itself |
+| `[*.{md,markdown,txt}]` | a note names the read in prose, and two tickets do today |
+
+The sections `.vale.ini` gains, each naming the new rule alone:
+
+| the section | why it stands off |
+|---|---|
+| `**/test/contract/*.js` | a case reads the environment to drive a door, and sets one around itself |
+| `**/src/scripts/cli*.js` | the command roots build the `it` every verb takes |
+| `**/src/scripts/precommit.js`, `**/src/scripts/prepush.js` | each is a hook a person's git runs, and it builds its own |
+| `**/src/scripts/trust.js`, `**/src/scripts/copilot.js` | each opens on its own line of arguments, the way a hook does |
+| `**/src/scripts/editor.js` | the editor's own root, which reads the environment on its entry line |
+| `**/src/bridge/server.js` | the server root builds the box each door reads |
+| `**/src/extension/*.js` | the extension loads as CommonJS, so its own files are its door layer |
+| `**/src/*/door.go` | each Go package names the outside in that one file |
+
+The extension takes a section of its own, because the section standing
+`editor*.js` off gives up the `node:` import guard where it grows. The new
+section names the new rule alone, so that guard holds over
+`src/extension/extension.js` and `src/extension/sidebar.js`.
+
+Every other module takes the value off the hand. The implement step moves them,
+and the two the ask names open the list:
+
+| the module | what it takes |
+|---|---|
+| `src/scripts/pull-hand.js` | `it.env`, and the read of the process goes |
+| `src/bridge/stop.js` | `box.env`, and the break mark rides the box beside it |
+| `src/scripts/work.js` | `it.env`, off the hand the root builds |
+| `src/scripts/vehicle.js` | `windows`, beside the `env` its callers hand it today |
+| `src/bridge/bash.js`, `src/bridge/guidance.js` | `box.env`, off the box the server builds |
+
+`process.platform` reads the same way. `cli-check.js` builds `windows` onto the
+hand already, so a module past a root takes it there. The stub's bridgehead
+stands off in `.vale.ini` today, so no section opens over it twice.
+
+| what reads the platform | what it takes |
+|---|---|
+| `src/scripts/cli-read.js`, `src/scripts/copilot.js` | each stands off as a root |
+| `src/scripts/vehicle.js` | a `windows` argument, because it takes `(files, env)` and no hand |
+
+So `./RUNME.sh lint src` answers clean, and the rule names every read a later
+hand writes.
+
+The rule reads the three the ask names, and three more reads stand outside it:
+
+| the read | where it stands | what a grown rule meets |
+|---|---|---|
+| `process.pid` | `src/scripts/vehicle.js` | a module past a root |
+| `process.execPath` | `src/bridge/review.js` | a module past a root |
+| `process.version`, `process.execPath` | `src/scripts/cli*.js` | a root the list passes already |
+
+A private note carries the reads, and the retro decides whether the rule grows
+to meet them. The doors and the editor files read the exec path too, and the
+sections above pass all three.
+
+The Go rule reads an import of `os/exec`, which runs a command. Each package
+names that import in its `door.go`, and `src/index` holds one today.
+
+| the package | what moves |
+|---|---|
+| `src/lsp` | the command running of four files, into a `door.go` of its own |
+| `src/index` | the spawn of the resident in `main.go`, into the `door.go` standing there |
+| `src/viewer`, `src/swap`, `src/yaml` | nothing, because none of the three runs a command |
+
+The `os` import, which reads a file, stands in a file of nearly every Go
+package. `./RUNME.sh lint src` answers how many, and a rule over it asks for a
+door in each. So this ticket holds the rule to `os/exec`, and
+`a-door-holds-file-calls` carries the rest.
+
 ## review
 
 <!-- reads the approach against the ask -->
@@ -124,6 +339,29 @@ Code reads the environment and runs commands in place, and a test of it touches 
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+pass
+
+- The findings of the round before stand answered. `**/test/level0/*.js` moves
+  into the table of sections growing, and the module table writes each file's
+  whole path.
+- Every read of `process.env`, `process.argv` and `process.platform` outside
+  `src/doors` lands on the pass list or in the module table. `git ls-files
+  '*.js' | xargs grep -lE 'process\.(env|argv|platform)'` answers the list, and
+  every name on it sits in one of the two.
+- Every Go file importing `os/exec` sits in `src/lsp` or `src/index`, which
+  `grep -rl os/exec --include=*.go src` answers. The section over
+  `**/src/*/door.go` stands both packages off, and `src/viewer`, `src/swap` and
+  `src/yaml` import none.
+- The rule file stands under `StylesPath`, which Vale skips, so it meets none of
+  its own tokens. The markdown section takes the new rule, and `grep -rl` over
+  `*.md` names the tickets writing those tokens in prose.
+- `./RUNME.sh lint src` answers zero today, `./RUNME.sh branch review
+  the-rules-hold-themselves` finds nothing to fix, and the draft's diff touches
+  this ticket alone.
+- The table of sections growing writes `[*.{md,markdown,txt}]` in brackets and
+  every other row of that column bare. Write one spelling of a section, where
+  the implement step copies the list into `.vale.ini`.
 
 # implement
 
@@ -137,17 +375,40 @@ Code reads the environment and runs commands in place, and a test of it touches 
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/outside-in-doors.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
-<!-- the form is text -->
+Three cases come back red on their own assertion, and each names the rule the
+tree lacks:
+
+| the case coming back red | what it claims |
+|---|---|
+| the rule refuses a module past a root reading the environment | the rule draws on the three reads |
+| the rule refuses a Go file importing the command package | the rule draws on the Go import |
+| the rule stands in a file of its own | `.vale.ini` names it, and one section a path holds it once |
+
+`test/contract/outside-in-doors.test.js` drives the real Vale, because a rule
+asserted against a stub is a rule nobody runs. The path handed in picks the
+section, so one case a path stands every row of the approach's tables. Two
+things surprise me:
+
+- Vale answers a bare rule name, so a case reading `VoiceVale.DoorsOnly` matches nothing
+- the guard reads the raw line, so a fixture holding an import draws a fault on the case
+
+The second costs a lint round, and the fixture splits the text in two. The six
+green cases are green today, because a rule standing nowhere refuses nothing.
+Each holds its claim once the rule lands.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
-<!-- the form is checklist -->
+- the change touches no file the ask leaves out: one test file lands, and the ticket beside it
+- every door the change reaches has a fake: the case drives the real Vale, so it stands under `test/contract`
+- a comment names the approach the change implements: the head and two comments point at the doors note
 
 ## reflect
 
@@ -175,11 +436,15 @@ Code reads the environment and runs commands in place, and a test of it touches 
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint src
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
-<!-- the form is checklist -->
+- the change touches no file the ask leaves out: the rule file, the config, the modules the tables name
+- every door the change reaches has a fake: the trunk case hands its box an `env` of its own
+- a comment names the approach the change implements: each new comment points at the doors chapter
 
 ## tests-green
 
@@ -191,23 +456,46 @@ Code reads the environment and runs commands in place, and a test of it touches 
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/outside-in-doors.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
 
+    ./RUNME.sh check
+
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
 
-<!-- the form is text -->
+A module reading the environment in place takes the box it runs on into every
+case of it. So a rule refuses that read, and the value rides the hand a root
+builds:
+
+| what lands | where |
+|---|---|
+| `OutsideInDoors`, over the three reads and the Go command import | `spec/config/styles/VoiceVale/OutsideInDoors.yml` |
+| a section for each root, the doors and the cases | `.vale.ini` |
+| `env` on the box the bridge builds | `src/bridge/server.js` |
+| the one file of each Go package running a command | `src/lsp/door.go`, `src/index/door.go` |
+
+The rule takes a file of its own, because a section standing a file off
+`DoorsOnly` gives up its `node:` import guard as well. So the extension keeps
+that guard and passes the platform read.
+
+The platform rides down as a `windows` argument, from the root reading it to
+the register list splitting on it. The editor files join the copies the
+test-first rule passes, because each loads under the editor's own runtime.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
-<!-- the form is checklist -->
+- the change touches no file the ask leaves out: the rule file, the config, the modules the tables name
+- every door the change reaches has a fake: each case hands its box an `env` map of its own
+- a comment names the approach the change implements: each new comment points at the doors chapter
 
 # verdict
 
@@ -219,17 +507,84 @@ Code reads the environment and runs commands in place, and a test of it touches 
 
 <!-- the form is files -->
 
+    .vale.ini
+    spec/config/styles/VoiceVale/OutsideInDoors.yml
+    spec/design_output/doors.md
+    .claude/skills/level0/lib/tested.js
+    src/bridge/bash.js
+    src/bridge/guidance.js
+    src/bridge/server.js
+    src/bridge/stop.js
+    src/bridge/vehicle.js
+    src/extension/editor-process.js
+    src/index/door.go
+    src/index/main.go
+    src/lsp/check.go
+    src/lsp/door.go
+    src/lsp/main.go
+    src/lsp/private.go
+    src/lsp/tree.go
+    src/scripts/cli.js
+    src/scripts/cli-doors.js
+    src/scripts/hand.js
+    src/scripts/pull-hand.js
+    src/scripts/vehicle.js
+    src/scripts/work.js
+    test/contract/outside-in-doors.test.js
+    test/level0/outside-hand.test.js
+    test/level0/stop-door.test.js
+    test/level0/tested.test.js
+    test/level0/trunk-door.test.js
+    spec/tickets/the-door-rule-reads-env.md
+    spec/tickets/a-door-holds-file-calls.md
+    spec/tickets/a-door-holds-the-go-file-calls.md
+    HANDOVER.md
+
 ## verdict
 
 <!-- pass or fail, findings one a line -->
 
 <!-- the form is verdict -->
 
+pass
+
+- The ask's first criterion lands. The rule refuses `process.env`,
+  `process.argv` and `process.platform` outside a door, and `.vale.ini` alone
+  names what stands off.
+- The third lands. `pull-hand.js` takes `it.env`, `stop.js` takes `box.env`,
+  and the hand `cli-doors.js` builds carries the map both read.
+- The fourth lands. `./RUNME.sh lint src` answers 0 on the commit this branch
+  stands on, and that commit matches origin.
+- The second lands by half. The Go rule reads `os/exec`, and the file calls
+  ride the draft ticket `a-door-holds-file-calls`, the split design/review
+  passed.
+- `./RUNME.sh check` answers 0 on that commit, and `./RUNME.sh branch review
+  the-rules-hold-themselves` finds nothing to fix.
+- The rule carries a case feeding it a bad line a read, which asserts the
+  refusal by name through the real Vale. No case skips, so Vale ran.
+- One code file stands outside the approach's tables. `tested.js` grows the
+  no-case list by the editor files, and a case in `tested.test.js` holds it. It
+  redesigns nothing.
+- The branch renames the minted ask to `a-door-holds-file-calls`, so the name
+  meets the word cap two contract cases read. The rename carries no other
+  change.
+- A retro stands in `HANDOVER.md`, under the chapter the findings reach, and
+  `a-door-holds-three-reads` carries the reads the rule leaves out.
+- The pid read stands on `a-door-holds-the-pid` and on
+  `a-door-holds-three-reads` alike, under the private folder. The retro drops
+  one.
+- `[*.{js,ts,tsx,go}]` writes `DoorsOnly = YES` and leaves the new rule to the
+  style default. The case over `src/bridge/stop.js` proves it fires either way.
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- one place owns each fact the change adds, and a note points at the file. The
+  tokens stand in `OutsideInDoors.yml`, and the pass list in `.vale.ini`. The
+  doors chapter points at both, and copies neither.
 
 # Discussion
 

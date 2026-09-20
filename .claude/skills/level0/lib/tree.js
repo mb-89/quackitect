@@ -3,7 +3,7 @@
 // whole tree into the problems panel.
 // [[spec/design_output/tree#the-rules-over-two-files]]
 
-import { MOVED, PRIVATE, RETRO, RUN } from "./folders.js";
+import { APART, LOGGED, MOVED, PRIVATE, RENAMED, RETRO, RUN } from "./folders.js";
 import { overLong } from "./names.js";
 import { isDraft } from "./paths.js";
 import { carriesTheName, namesAPerson } from "./private.js";
@@ -15,7 +15,8 @@ import {
   EDITOR_VALE_INI,
 } from "./servers.js";
 import { decide, pool, RULES as STOP } from "./stop.js";
-import { BIN, installedTools, TOOLS, WANTED } from "./tools.js";
+import { everyModuleTested } from "./tested.js";
+import { BIN, installedTools, loopNames, TOOLS, WANTED } from "./tools.js";
 
 export const INSTALL = "src/scripts/install.sh";
 export const VALE_INI = ".vale.ini";
@@ -39,7 +40,7 @@ const SPELLS = [
 const SOURCE = /^(?:src|\.claude)\/.*\.js$/;
 const TEXT = /\.(?:md|markdown|txt|ya?ml|json|js|ts|tsx|go|sh|ps1|ini|mod)$/i;
 const DELETES = /\bremove\(|\bunlink|\brm\b|\bprune\b/;
-const LOGGED = /log/i;
+const LOG_LINE = /log/i;
 
 const LATER = {
   name: "level1.yml",
@@ -330,7 +331,7 @@ export function noLogDeleted(tree) {
   for (const path of tree.paths().filter((one) => SOURCE.test(one))) {
     const lines = tree.read(path).split(/\r?\n/);
     for (let i = 0; i < lines.length; i++) {
-      if (!DELETES.test(lines[i]) || !LOGGED.test(lines[i])) continue;
+      if (!DELETES.test(lines[i]) || !LOG_LINE.test(lines[i])) continue;
       out.push(
         fault(
           rule,
@@ -353,16 +354,65 @@ export function privateFolderOwned(tree) {
     .filter((one) => OWNED.test(one) && !A_TEST.test(one) && one !== FOLDERS);
   for (const path of mine) {
     const lines = tree.read(path).split(/\r?\n/);
-    const at = lines.findIndex((one) => SPELLS.some((what) => what.test(one)));
-    if (at < 0 || lines.some((one) => one.includes(OWNER))) continue;
+    for (let at = 0; at < lines.length; at++) {
+      if (!SPELLS.some((what) => what.test(lines[at]))) continue;
+      if (namesOwner(lines, at)) continue;
+      out.push(
+        fault(
+          rule,
+          path,
+          `This line spells a folder ${FOLDERS} owns. Take the name from there, or name that file in a comment beside the copy.`,
+          at + 1,
+        ),
+      );
+    }
+  }
+  return out;
+}
+
+// A copy names the owner on its own line, or in the comment run above it, so an import excuses no other line. [[spec/design_input/the-runtime-files-stand-apart]]
+function namesOwner(lines, at) {
+  if (String(lines[at]).includes(OWNER)) return true;
+  for (let up = at - 1; up >= 0 && comments(lines[up]); up--) {
+    if (lines[up].includes(OWNER)) return true;
+  }
+  return false;
+}
+
+function comments(line) {
+  const said = String(line ?? "").trim();
+  return said.startsWith("//") || said.startsWith("#") || said.startsWith("*");
+}
+
+// The installer moves a name the spelling rule holds, so one change reaches the shell and the rule alike. [[spec/design_input/the-runtime-files-stand-apart]]
+export function installerHoldsTheNames(tree) {
+  const rule = "InstallerHoldsTheNames";
+  const out = [];
+  const lists = { MOVED, RENAMED, LOGGED };
+  const said = loopNames(tree.paths().includes(INSTALL) ? tree.read(INSTALL) : "", lists);
+
+  for (const line of said.unmarked) {
     out.push(
-      fault(
-        rule,
-        path,
-        `This line spells a folder ${FOLDERS} owns. Take the name from there, or name that file in a comment beside the copy.`,
-        at + 1,
-      ),
+      fault(rule, INSTALL, `This loop names no list ${FOLDERS} holds. Name one above it.`, line),
     );
+  }
+  for (const [name, list] of Object.entries(lists)) {
+    out.push(...standingApart(rule, name, list, said[name]));
+  }
+  return out;
+}
+
+// A name one side holds alone stands refused, unless APART names that side with its reason. [[spec/design_input/the-runtime-files-stand-apart]]
+function standingApart(rule, name, list, loop) {
+  if (!loop) return [fault(rule, INSTALL, `${name} stands in ${FOLDERS}, and no loop here moves it.`)];
+  const out = [];
+  for (const one of list) {
+    if (loop.includes(one) || APART[one]?.side === "loop") continue;
+    out.push(fault(rule, INSTALL, `${name} holds ${one}, and this installer moves it nowhere.`));
+  }
+  for (const one of loop) {
+    if (list.includes(one) || APART[one]?.side === "rule") continue;
+    out.push(fault(rule, INSTALL, `This installer moves ${one}, and ${name} holds it nowhere.`));
   }
   return out;
 }
@@ -477,6 +527,7 @@ export function surveyFindsNode(tree) {
 }
 
 export const RULES = [
+  everyModuleTested,
   settingsNameBinaries,
   editorDrawsWriteRules,
   biomeOnWindows,
@@ -484,6 +535,7 @@ export const RULES = [
   stopFolderIsData,
   noLogDeleted,
   privateFolderOwned,
+  installerHoldsTheNames,
   nameHoldsTheWords,
   nothingPrivateTravels,
   surveyNamesInstalls,

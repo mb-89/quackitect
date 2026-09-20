@@ -252,7 +252,9 @@ slow(
         files.read(join(cloned, ".claude", "skills", "level0", "hooks", "level0.js")),
         "the hook is the clone's",
       );
-      const entry = JSON.parse(files.read(join(home, ".se", "registry.json"))).find(
+      const entry = JSON.parse(
+        files.read(join(home, ".se", ".runtime", "registry.json")),
+      ).find(
         (one) => one.method_root === cloned,
       );
       assert.equal(entry.port, pointer.port, "the register holds the clone at the pointer's port");

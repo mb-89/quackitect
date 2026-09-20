@@ -10,7 +10,8 @@ const ASKING = 10000;
 const POINTER = ".se/.runtime/vehicle.json";
 // The log of [[spec/design_input/the-runtime-files-stand-apart]], which stands outside the runtime half because the retro collects it. It is owned by log.js and spelled again here because this hook imports nothing.
 const SESSION = ".se/.log/session.jsonl";
-const REGISTER = ".se/registry.json";
+// The register in the runtime folder folders.js owns, spelled again here because this hook imports nothing. [[spec/design_output/vehicle#the-register-places-an-identity]]
+const REGISTER = ".se/.runtime/registry.json";
 const PORT = 6510;
 const CLONE_WAIT = 600000;
 const ATTACH_WAIT = 1800000;

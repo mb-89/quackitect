@@ -20,7 +20,9 @@ registered() {
   [ -n "$id" ] || return 0
   old_ifs=$IFS
   IFS=';'
-  for dir in ${SE_REGISTRY:-$HOME/.se}; do
+  # The runtime folder .claude/skills/level0/lib/folders.js owns, spelled again
+  # here because a stub carries no vehicle and a shell script imports nothing.
+  for dir in ${SE_REGISTRY:-$HOME/.se/.runtime}; do
     IFS=$old_ifs
     file="$dir/registry.json"
     [ -f "$file" ] || continue

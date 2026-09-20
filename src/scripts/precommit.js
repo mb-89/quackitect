@@ -11,6 +11,8 @@ import {
   privateNow,
 } from "../../.claude/skills/level0/lib/private.js";
 import { refusedDelta } from "../../.claude/skills/level0/lib/refuse.js";
+import { fileText } from "../../.claude/skills/level0/lib/scripted.js";
+import { refusedTest, untestedIn } from "../../.claude/skills/level0/lib/tested.js";
 import { disk } from "../doors/disk.js";
 import { git } from "../doors/git.js";
 import { proc } from "../doors/proc.js";
@@ -24,8 +26,18 @@ export async function holds(it, delta) {
     box: () => boxOf(it),
     notes: () => notesOf(it),
   });
-  if (!found.length) return { code: 0, said: "" };
-  return { code: 1, said: refusedDelta(found) };
+  if (found.length) return { code: 1, said: refusedDelta(found) };
+
+  // A merge carries other commits' code, and each of those met the door with its own test. [[spec/design_output/tree#the-rules-over-two-files]]
+  if (merging(it)) return { code: 0, said: "" };
+  const missing = untestedIn(delta, (path) => fileText(it.disk, it.root, path));
+  if (missing.length) return { code: 1, said: refusedTest(missing) };
+  return { code: 0, said: "" };
+}
+
+// Git holds a merge in progress under MERGE_HEAD, in the git folder of a worktree too, so git answers where it stands. [[spec/design_output/tree#the-rules-over-two-files]]
+export function merging(it) {
+  return Boolean(it.git?.run(["rev-parse", "-q", "--verify", "MERGE_HEAD"], true).ok);
 }
 
 // [[spec/design_output/private#the-box-names-the-owner]]

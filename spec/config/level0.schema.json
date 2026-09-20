@@ -270,6 +270,25 @@
         }
       }
     },
+    "restated": {
+      "comment": "The runs the restated rules refuse, where one place says again what another holds.",
+      "type": "object",
+      "properties": {
+        "comment": {
+          "type": "string"
+        },
+        "pointer": {
+          "type": "number",
+          "unit": "words",
+          "help": "The run a heading shares with the heading its pointer names before the rule draws."
+        },
+        "rule": {
+          "type": "number",
+          "unit": "words",
+          "help": "The run two rule lines of two guidance notes share before the rule draws."
+        }
+      }
+    },
     "refactor": {
       "comment": "The refactoring hand the stop door starts beside the vote, while the warnings stand past the number.",
       "type": "object",

@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 group: the-rules-hold-themselves
 urgent: true
 steps:
@@ -12,6 +12,12 @@ steps:
         form: text
         says: what you change, and what surprises you
 step: do
+record:
+  - step: do
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: c60c4dbc702ad6588e4b1c83508bf6c0e9aa3f14
+    hash_after: 5dd7383765ded67c1ac93e0c8abc7460632a0ab2
+reason: done
 ---
 
 # Ask
@@ -67,6 +73,18 @@ Two things surprised me:
 | `scope` left the list, because a YAML sequence carries brackets into a raw line | sixteen guidance notes read red until it went |
 
 The reading proves both halves. The rules refuse a `does` field holding seven code spans, and they leave a `hand` field holding seven alone.
+
+The guard stands, and nothing holds it there. So this hand adds the case, and no rule moves:
+
+| what lands | where |
+|---|---|
+| a record's `why` holding five code spans, which draws nothing | `test/contract/paragraph.test.js` |
+| the same line under `does`, which draws the refusal | the same case |
+| the line naming the exception a reader meets | [[spec/design_output/projection#what-stands-outside-a-layer]] |
+
+What surprises this hand: the two notes the ask names lint clean on this commit,
+and the four lines it lists draw nothing. The road the owner picks stands in the
+tree already, so the work here is the program holding it.
 
 # Discussion
 

@@ -6,6 +6,15 @@ export const CONFIG = ".vale.ini";
 
 export const PROSE = /\.(md|markdown|txt)$/i;
 
+const STYLES_PATH = /^[ \t]*StylesPath[ \t]*=.*$/m;
+
+// The config the assembly writes names the styles standing beside it, so Vale reads the pair as one. [[spec/design_output/vehicle#the-styles-assemble-once]]
+export function stylesIn(text, at) {
+  const said = String(text ?? "");
+  const line = `StylesPath = ${at}`;
+  return STYLES_PATH.test(said) ? said.replace(STYLES_PATH, line) : `${line}\n${said}`;
+}
+
 const MARKER = /<!--\s*vale\s+([A-Za-z0-9_.-]+)\s*=\s*(NO|off)\s*-->/i;
 
 // [[spec/design_output/projection#the-second-target]]
@@ -13,11 +22,11 @@ const PROSE_STYLE = /^Voice(Vale|Paragraph)\./;
 const REASON = /<!--\s*because:\s*(.+?)\s*-->/i;
 
 export async function lintText(text, where, options = {}) {
-  const { run, bin, cwd } = options;
+  const { run, bin, cwd, config } = options;
   if (!bin) return { ran: false, why: "no vale stands here", found: [] };
   const argv = [
     bin,
-    `--config=${CONFIG}`,
+    `--config=${config || CONFIG}`,
     `--path=${where || "stdin.md"}`,
     "--output=JSON",
     "--no-exit",

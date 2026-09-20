@@ -3,10 +3,11 @@
 // [[spec/design_output/doors#a-door-standing-on-another]]
 
 import { log } from "../log.js";
+import { behaves } from "./behaves.js";
 import { fakeClock } from "./clock.js";
 import { fakeDisk } from "./disk.js";
 
 export function fakeLog(clock = fakeClock(), init = {}) {
   const files = fakeDisk();
-  return { ...log(files, clock, init), files, clock };
+  return behaves({ ...log(files, clock, init), files, clock }, "log");
 }

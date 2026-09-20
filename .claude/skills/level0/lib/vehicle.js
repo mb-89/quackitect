@@ -58,6 +58,7 @@ export function resolves(list, driver) {
 
 // [[spec/design_output/vehicle#the-register-holds-the-port]]
 export const PORT_BASE = 6510;
+// The runtime folder folders.js owns, spelled again here because that module stands beside this one. [[spec/design_input/the-runtime-files-stand-apart]]
 export const POINTER = ".se/.runtime/vehicle.json";
 
 export function portOf(list, method) {

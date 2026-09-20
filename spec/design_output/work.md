@@ -242,6 +242,24 @@ The verb refuses four things:
 A desk mints that last one with `./RUNME.sh mint ticket`, and writes what stands
 open into its ask. [[spec/guidance/cloud]] says why the cloud road differs.
 
+## A successor stands on question
+
+A successor stands on [[spec/processes/question]], and the verb takes it because
+that route opens at a step waiting for a person:
+
+| the step it opens at | what it buys |
+|---|---|
+| `answer`, under `by: person` | the person answers on their own time |
+| `do`, under `by: anyone` | the hand behind the answer carries it out |
+
+A route opening where an agent can work hands the question back to an agent, and
+the verb refuses it. So a desk mints the successor off this route:
+
+    ./RUNME.sh mint ticket spec/tickets/<name>.md --process=question
+
+`test/contract/process.test.js` reads that route off disk and holds it open, and
+`test/level0/unblock.test.js` mints off it and runs the verb.
+
 # Two handovers
 
 | file | tracked | who reads it | where it can stand |

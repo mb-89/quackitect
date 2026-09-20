@@ -1,10 +1,12 @@
 // Session records in memory, with exclusive handover claims.
 // [[spec/design_output/copilot#state-between-processes]]
 
+import { behaves } from "./behaves.js";
+
 export function fakeSession(root) {
   const records = new Map();
   const claims = new Map();
-  return {
+  return behaves({
     records,
     path(name) {
       if (name.includes("..")) throw new Error("Path outside this tree.");
@@ -25,5 +27,5 @@ export function fakeSession(root) {
       save();
       return result;
     },
-  };
+  }, "session");
 }
