@@ -74,11 +74,19 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: sync
+step: split
 record:
   - step: sync
     hand: box fb2b49fba485 · claude-code-remote
     hash_before: 86fe91a008f596271800e368de50fca72c4aeb70
+  - step: sync
+    hand: box fb2b49fba485 · claude-code-remote
+    hash_before: b0a97eb8c14e0fe4a231ab03da87f346f9cc89ec
+    hash_after: b0a97eb8c14e0fe4a231ab03da87f346f9cc89ec
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-verbs-answer-their-asks already carries every commit on main.
 ---
 
 # Ask
@@ -94,6 +102,8 @@ Three verbs answer what their asks name. a-route-closes-answered-asks closes a t
 <!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
