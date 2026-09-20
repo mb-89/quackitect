@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -135,6 +135,12 @@ record:
     hand: box 1670436ae0bb · claude-code-remote
     hash_before: 935807cac5a667f7827b7ee1e31480c0634114c4
     hash_after: 08e9649baa3c438e1673ce0ff0267efd322122d2
+  - step: design/review
+    hand: box 1670436ae0bb · claude-code-remote · helper-10
+    hash_before: 3b09d524f83dcf41323782005d2d1d8a4bee70b0
+    hash_after: 3b09d524f83dcf41323782005d2d1d8a4bee70b0
+    returns: 5
+    why: "design: The log tab reads the draw package's styles and cuts, the work tab reads the tree and the draw package, and the window reads the palette and the filter language, so the log row, the work row and the window row each name every package they import."
 ---
 
 # Ask
@@ -217,12 +223,7 @@ change under any of them rebuilds the viewer.
 
 fail
 
-- design: The palette in `colour.go` reads `quackitect/config`, and the base reader in `base.go` reads `quackitect/yaml`, so the draw row and the tree row each name the shared module the package imports.
-- design: The frame's pane draws the filter pane in `filterpane.go` and the help in `help.go`, so the chapter's frame row takes them.
-- craft: `startIndex` in `door.go` reads the index binary the work tab names, so it parts from the door to the work tab before the door moves to the frame.
-- craft: `Placed` in `workplaces.go` is a method of the tree reading the work tab's keys, so it becomes a function of the work tab over a tree, the way the place chord's reads do.
-- craft: The window tests read the frame's own fields and methods, `pane`, `box`, `input` and `renderMarks` among them, and the approach says what a tab exports alone, so it says what the frame exports to the root's tests.
-- craft: The approach lists what the draw package, the frame and the log tab take after the chapter's rows take it, so the approach points at the chapter alone.
+- design: The log tab reads the draw package's styles and cuts, the work tab reads the tree and the draw package, and the window reads the palette and the filter language, so the log row, the work row and the window row each name every package they import.
 
 # implement
 
