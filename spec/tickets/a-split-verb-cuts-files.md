@@ -89,7 +89,7 @@ steps:
 group: the-verbs-take-the-shell
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -178,6 +178,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 099c2ec7708d · claude-code-remote · helper-15
+    hash_before: e96b5bb7e4ca88e3294e5440b80a91a98c8e6d31
+    hash_after: e96b5bb7e4ca88e3294e5440b80a91a98c8e6d31
+    returns: 2
+    why: "`noteFor` reads the basename alone, so `src/bridge/code.js` and `src/doors/code.js` name one note; the second long file takes `names this cut already`, so its own cut parks nowhere; this tree holds many basenames twice, and no case feeds `noteFor` two paths of one name; fix: carry a folder word into the name, inside the five the name rule allows; `wrote` writes the journal entry, then throws ENOENT where a target's folder stands nowhere; the run answers a stack, and the reflect chapter asks for a line; `src/bridge/apply.js` answers a line on that same throw, so the journal's owner stands as the model; fix: make the target's folder, or refuse the range with the line the verb says; `--to` over a standing file replaces it whole, and the journal alone carries it back; the command line cuts a scratch file into two targets, and `mcp__level0__undo` takes the whole cut back; the ranges refuse a backwards range, a zero start, a reach past the end and an overlap; `--dry` names the cuts and writes nothing; `splitVerb` reads `rest` whole, so the source stands where the caller names it; the note parks through `./RUNME.sh ticket note`, off git, and `test/contract/split-note.test.js` drives it for real; `splitTicket` reads the exit, so a refused run answers `stands unwritten`; `test/level0/code-door.test.js` drives the door's branch both ways, and `fakeProc` throws on an untaught command; the journal names `on` as the run, and `mcp__level0__undo` takes the newest entry back; `export { join }` stands gone from `src/scripts/split-verb.js`; `./RUNME.sh check` exits 0, `./RUNME.sh lint src/scripts` exits 0, and `./RUNME.sh test` passes; the diff holds the verb, the cut, the note, the door, the chapter and three case files; every hunk serves the ask, and one chapter stands beside the code; the handback's retro chapter stands empty, which `./RUNME.sh branch review` names"
 ---
 
 # Ask
@@ -430,26 +436,28 @@ The verdict round found every fault behind a fake agreeing with the code. `test/
 <!-- every file you read, one a line -->
 <!-- the form is files -->
 
-- spec/tickets/a-split-verb-cuts-files.md
+- .claude/skills/level0/lib/folders.js
+- .claude/skills/level0/lib/review.js
+- .claude/skills/level0/lib/undo.js
+- RUNME.sh
 - spec/design_output/level0.md
-- spec/processes/trivial.yaml
-- spec/schemas/ticket.schema.yaml
-- src/bridge/code.js
-- src/bridge/split-ticket.js
+- spec/tickets/a-split-verb-cuts-files.md
+- spec/tickets/the-verbs-take-the-shell.md
 - src/bridge/apply.js
-- src/bridge/write.js
+- src/bridge/code.js
 - src/bridge/server.js
-- src/scripts/cli.js
+- src/bridge/split-ticket.js
+- src/doors/disk.js
+- src/doors/fake/proc.js
 - src/scripts/cli-check.js
+- src/scripts/cli.js
+- src/scripts/review.js
 - src/scripts/split-cut.js
 - src/scripts/split-verb.js
-- src/scripts/log-verb.js
-- src/doors/fake/proc.js
-- test/level0/split.test.js
+- src/scripts/ticket.js
+- test/contract/split-note.test.js
 - test/level0/code-door.test.js
-- .claude/skills/level0/lib/undo.js
-- .claude/skills/level0/lib/folders.js
-- .claude/skills/level0/lib/schema.js
+- test/level0/split.test.js
 
 ## verdict
 
@@ -458,27 +466,35 @@ The verdict round found every fault behind a fake agreeing with the code. `test/
 
 fail
 
-- the verb reads a target as its source: `splitVerb` slices `argv`, and `rest` carries no verb name
-- so `./RUNME.sh split <file>` cuts the file `--to` names, and the ask's first bullet stands unmet
-- the mint the door runs comes back refused: `gain names no field of a ticket note`
-- `trivial` asks `gain`, `breaks` and `done_when` under the ask, and the mint takes frontmatter fields alone
-- `splitTicket` reads a refused mint as silence, so a live refusal names no ticket
-- `ticketFor` builds `.se/tickets/split-<name>.md`, and the chapter names `spec/tickets/split-<name>.md`
-- the design review's note for implement stands unanswered: `splitTicket` reads existence, so a closed ticket blocks the mint
-- the approach names an open ticket, and the code reads any file standing at that path
-- `fakeProc` answers every argv the same, so the mint case asserts a call the real mint refuses
-- no case drives `codeDoor` past the file ceiling with a `proc` door, so the new branch fires under no test
-- the journal names `on` as `split`, and the approach names `on` as the session the write runs under
-- the retro stands absent from the handback, which `./RUNME.sh branch review` names
-- `./RUNME.sh check` exits 0, and `./RUNME.sh lint src/scripts` exits 0
-- `export { join }` at the foot of `src/scripts/split-verb.js` reaches nobody
+- `noteFor` reads the basename alone, so `src/bridge/code.js` and `src/doors/code.js` name one note
+- the second long file takes `names this cut already`, so its own cut parks nowhere
+- this tree holds many basenames twice, and no case feeds `noteFor` two paths of one name
+- fix: carry a folder word into the name, inside the five the name rule allows
+- `wrote` writes the journal entry, then throws ENOENT where a target's folder stands nowhere
+- the run answers a stack, and the reflect chapter asks for a line
+- `src/bridge/apply.js` answers a line on that same throw, so the journal's owner stands as the model
+- fix: make the target's folder, or refuse the range with the line the verb says
+- `--to` over a standing file replaces it whole, and the journal alone carries it back
+- the command line cuts a scratch file into two targets, and `mcp__level0__undo` takes the whole cut back
+- the ranges refuse a backwards range, a zero start, a reach past the end and an overlap
+- `--dry` names the cuts and writes nothing
+- `splitVerb` reads `rest` whole, so the source stands where the caller names it
+- the note parks through `./RUNME.sh ticket note`, off git, and `test/contract/split-note.test.js` drives it for real
+- `splitTicket` reads the exit, so a refused run answers `stands unwritten`
+- `test/level0/code-door.test.js` drives the door's branch both ways, and `fakeProc` throws on an untaught command
+- the journal names `on` as the run, and `mcp__level0__undo` takes the newest entry back
+- `export { join }` stands gone from `src/scripts/split-verb.js`
+- `./RUNME.sh check` exits 0, `./RUNME.sh lint src/scripts` exits 0, and `./RUNME.sh test` passes
+- the diff holds the verb, the cut, the note, the door, the chapter and three case files
+- every hunk serves the ask, and one chapter stands beside the code
+- the handback's retro chapter stands empty, which `./RUNME.sh branch review` names
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the chapter owns the flags, and `USAGE` repeats them. The ticket's path stands twice, and the two disagree
+- the chapter owns the flags table, and `USAGE` says beside it why the terminal holds one line. The note folder stands in `folders.js` alone, and the chapter names a path nowhere
 
 # Discussion
 
