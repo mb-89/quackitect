@@ -75,7 +75,7 @@ steps:
 urgent: true
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/write
+step: retro/cloud
 record:
   - step: sync
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -118,6 +118,10 @@ record:
     hash_after: bce7705f84049d607eea031888a40ee92103d709
     returns: 1
     why: the hand takes it back
+  - step: retro/write
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 5015d560a894d19850f31e7e740d0179fce12b5c
+    hash_after: 5015d560a894d19850f31e7e740d0179fce12b5c
 reason: done
 ---
 
@@ -267,7 +271,10 @@ answers one of those, across the notes, the editor and the viewer.
 
 The engine teaches faster than a note does. A refused write names its rule and its line, so a round reads the rule by breaking it. The cost of the lesson is the round.
 
-Two habits carry most of the returns here. One reads a field as closed from memory, where the door answers it on the spot. The other writes a hold as a name the engine takes for a word, so nothing runs.
+| the habit under most returns | what the door answers |
+|---|---|
+| reading a field as closed from memory | the leaf the front matter names opens every field of that step |
+| writing a hold as a name | a `needs` row asks, and command evidence runs |
 
 The retro's route asks for a reading of the box. This box works its own group, so the reading comes off the hand that writes the hunks. A later branch owns the retro's own route.
 
