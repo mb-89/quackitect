@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-red
+step: implement/change
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -139,6 +139,17 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote · helper-10
     hash_before: c06b292de36c32338384bc47487bb5b2a7f2cfb5
     hash_after: c06b292de36c32338384bc47487bb5b2a7f2cfb5
+  - step: implement/tests-red
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 142a47c993c15f94e6bb9769150351cab025b866
+    hash_after: 142a47c993c15f94e6bb9769150351cab025b866
+    answered:
+      - name: tests
+        exit: 1
+        said: assertion, a test of src/config fails
+  - step: implement/reflect
+    skipped: true
+    why: the ticket arrives here by no on_fail
 ---
 
 # Ask
@@ -266,20 +277,42 @@ What the agent needs:
 ### tests
 
 <!-- the tests you write fail on their own assertion -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch test src/config/config_test.go src/viewer/colour_test.go
 
 ### seen
 
 <!-- what you see, and what surprises you -->
-
 <!-- the form is text -->
+
+The command answers assertion, and the cases fail on their own assertion.
+
+| the case | what it holds open |
+|---|---|
+| an environment name reads off the key | `EnvOf` answers the empty string |
+| a value reads the tracked layer | `Value` answers nothing |
+| the environment beats the tracked layer | the same |
+| the local layer beats the environment | the same |
+| a key nobody writes answers nothing | this one passes, because nothing answers everything |
+| a map reads the file the caller names | `Map` answers nothing |
+| the shipped file holds a colour for every kind | the file stands nowhere |
+| no colour number stands in the window's own code | `colour.go`, `tabs.go` and `ui.go` each hold one |
+
+Go refuses a package calling a name nobody wrote, and the door reads build over that. So `src/config` ships the reader's names answering nothing, and each case asserts against them. That surprises me: a red case in Go wants the shape to stand first, where a red case in the other half wants it absent.
+
+The review left three findings for this step. The second asks whether a local layer sets a colour. The case naming the file answers no: it writes a colour into both layers, and reads the named file.
+
+The first finding asks what answers the line about the window's own code. The case walking the folder answers it, and skips the cases so a fixture number costs nothing.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
-
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The new module, its case file, one case file under the window, and this ticket.
+- every door the change reaches has a fake. Each case writes its own fixture root, and reads nothing the tree ships but the colours file.
+- a comment names the approach the change implements. Each file carries a line pointing at this ticket, and the case names the line of done_when it answers.
 
 ## reflect
 
