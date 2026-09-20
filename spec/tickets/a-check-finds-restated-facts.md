@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -169,6 +169,14 @@ record:
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: bacd8e31d6f622af3b33d7c6b09458e15c146ead
     hash_after: bacd8e31d6f622af3b33d7c6b09458e15c146ead
+  - step: implement/change
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 3478a04d54be7bca9420583464dc7491470e8279
+    hash_after: 051dd515796b92efca2dee8c4f833f5f2d9d245d
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
