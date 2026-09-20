@@ -184,7 +184,7 @@ func TestTheFooterCarriesTheFloorAndAFunnelAtFixedPlaces(t *testing.T) {
 	m := window(5)
 	lines := strings.Split(m.View(), "\n")
 	if len(lines) != frame.HeadWide+frame.NamesWide+m.Rows()+frame.FootWide {
-		t.Fatalf("the window stands frame.HeadWide, the tab and frame.FootWide high, and drew %d lines", len(lines))
+		t.Fatalf("the window stands the head, the tab and the foot high, and drew %d lines", len(lines))
 	}
 	rule, marks := lines[len(lines)-2], lines[len(lines)-1]
 	if !strings.Contains(rule, "────") {

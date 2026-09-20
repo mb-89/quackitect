@@ -61,10 +61,10 @@ func TestAPressOnTheStripOpensTheTabUnderItAndTheHelpAtItsRightEnd(t *testing.T)
 	t.Parallel()
 	m := window(5)
 	if n := m.TabAt(3); n != 1 {
-		t.Fatalf("the log tab stands under column 3, and tabAt answers %d", n)
+		t.Fatalf("the log tab stands under column 3, and TabAt answers %d", n)
 	}
 	if n := m.TabAt(90); n != 0 {
-		t.Fatalf("no tab stands under column 90, and tabAt answers %d", n)
+		t.Fatalf("no tab stands under column 90, and TabAt answers %d", n)
 	}
 	m = click(m, m.W-2, frame.StripRow)
 	if m.Pane != frame.PaneHelp {

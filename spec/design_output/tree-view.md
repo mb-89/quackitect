@@ -68,7 +68,7 @@ says it again.
 
 The key under `nest` in the base file says how a child finds its parent. A row
 whose value under that key names another row's name stands under it, at any
-depth. A row naming a parent nobody holds stands at the left. `workitems.go`
+depth. A row naming a parent nobody holds stands at the left. `src/tui/work/workitems.go`
 builds that tree off the rows the index answers, and a branch informs a row's
 standing and nothing more.
 
@@ -186,7 +186,7 @@ like one a person types, and the sort takes hold with it.
 | a line a person types | it is the whole filter, and a preset is one way to write it |
 
 A preset stands under `groups` in the base file, with its `filters` and its
-`sort`. One the file marks `pressed` opens the line when the view opens. So a
+`sort`. One the file marks `Pressed` opens the line when the view opens. So a
 person reads the filter that narrows the rows, and clears it in the pane. A
 preset carrying a sort and no filter keeps every row, so an empty line is
 that view. The pane and its presets are the window's, and every tab offers
@@ -202,7 +202,7 @@ the buttons, so a slice costs no line in the file and moves as the data does.
 
 A value this tree resolves draws as a link, and a click opens what it names.
 The terminal takes the link as the escape every terminal reads, and the
-editor's own terminal opens a file address in the editor. `link.go` writes the
+editor's own terminal opens a file address in the editor. `src/tui/draw/link.go` writes the
 escape.
 
 | the value | what the link opens |

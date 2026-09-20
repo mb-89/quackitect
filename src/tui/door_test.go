@@ -25,7 +25,7 @@ func TestTheDoorTakesATabAndHandsItToTheWindow(t *testing.T) {
 	msg := <-took
 	one, made := msg.(frame.TabMsg)
 	if !made || one.Name != "work" {
-		t.Fatalf("the door puts a tabMsg into the window, and it put %#v", msg)
+		t.Fatalf("the door puts a TabMsg into the window, and it put %#v", msg)
 	}
 }
 
@@ -55,7 +55,7 @@ func TestTheWindowNamesItsTabsAndAnswersZeroForAnyOther(t *testing.T) {
 	m := window(1)
 	for name, want := range map[string]int{"log": 1, "work": 2, "nothing": 0, "": 0} {
 		if got := m.TabNamed(name); got != want {
-			t.Fatalf("tab %q stands at %d, and tabNamed answers %d", name, want, got)
+			t.Fatalf("tab %q stands at %d, and TabNamed answers %d", name, want, got)
 		}
 	}
 }
@@ -66,7 +66,7 @@ func TestATabMsgOpensThatTabAndAnUnknownOneLeavesTheOpenTab(t *testing.T) {
 	next, _ := m.Update(frame.TabMsg{Name: "work"})
 	m = next.(frame.Model)
 	if m.Open != 1 {
-		t.Fatalf("a tabMsg opens the work tab, and tab %d stands open", m.Open)
+		t.Fatalf("a TabMsg opens the work tab, and tab %d stands open", m.Open)
 	}
 	next, _ = m.Update(frame.TabMsg{Name: "nothing"})
 	if next.(frame.Model).Open != 1 {

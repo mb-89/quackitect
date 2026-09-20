@@ -55,7 +55,7 @@ func TestTheColumnAPressLandsOnAndTheOneItMisses(t *testing.T) {
 		{0, log.SortNone},
 	} {
 		if got := log.ColumnAt(one.x, w); got != one.want {
-			t.Fatalf("case %d: column %d stands under x %d, and columnAt answers %d", at, one.want, one.x, got)
+			t.Fatalf("case %d: column %d stands under x %d, and ColumnAt answers %d", at, one.want, one.x, got)
 		}
 	}
 }

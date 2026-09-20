@@ -101,7 +101,6 @@ func TestAValueFlagWearsATonePerValue(t *testing.T) {
 	if said := tree.States(tree.Items[1])[0]; said.Tone != "" || said.Letter != "C" {
 		t.Fatalf("a closed state wears the plain tone, and reads %v", said)
 	}
-
 }
 
 // The keys stay ordinary keys, so the filter needs no new word. [[spec/design_output/tree-view#a-flag-draws-a-letter]]

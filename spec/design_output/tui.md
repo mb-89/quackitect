@@ -24,7 +24,7 @@ one tab reads them all. These packages part it, and every import runs down:
 
 | the package | what it holds | what it imports |
 |---|---|---|
-| `src/tui/draw` | `cut`, `pad`, `oneLine`, `Wrap`, the gutter, the filter language, the link, the palette and the styles | `quackitect/config`, for the palette |
+| `src/tui/draw` | `Cut`, `Pad`, `OneLine`, `Wrap`, the gutter, the filter language, the link, the palette and the styles | `quackitect/config`, for the palette |
 | `src/tui/tree` | the tree, the rows it draws and the base file | `src/tui/draw`, and `quackitect/yaml` for the base file |
 | `src/tui/frame` | `Model`, the `Tab` interface, the parts a pane renders, the keys, the mouse, the strip, the filter pane, the help, the footer and the window's door | the draw and the tree packages |
 | `src/tui/log` | the log tab: its records, its tailer, its columns, its details and the said style | the frame and the draw packages |
@@ -158,10 +158,10 @@ says which bands it adds, so the keys follow the tab a person opens.
 
 | what | where it stands | what it holds |
 |---|---|---|
-| `act` | `keys.go` | a `key.Binding`, and what the key does |
-| `band` | `keys.go` | a name, and a run of acts |
-| `bands()` | `keys.go` | the three, out of the window and the open tab |
-| `key()` | `keys.go` | the press, over the same three bands |
+| `Act` | `src/tui/frame/keys.go` | a `key.Binding`, and what the key does |
+| `Band` | `src/tui/frame/keys.go` | a name, and a run of acts |
+| `Bands()` | `src/tui/frame/keys.go` | the three, out of the window and the open tab |
+| `Key()` | `src/tui/frame/keys.go` | the press, over the same three bands |
 
 So a key nobody registers reaches the help nowhere and works nowhere.
 
@@ -170,7 +170,7 @@ sentence wraps under itself the way a detail does. `FullHelpView` of the help
 bubble draws a group in columns, and it drops a group wider than the width it
 takes. The pane is half a window wide, so the window draws the bands itself.
 
-`help.go` holds what no key says: the columns, the colours, the floor, the
+`src/tui/frame/help.go` holds what no key says: the columns, the colours, the floor, the
 details and how the filter reads. It stands under the bands.
 
 # The filter pane takes letters
@@ -210,7 +210,7 @@ rows names none. For what a press does, see
 # The filter language
 
 The language is KQL, the one Kibana uses, plus Lucene's `/pattern/`.
-`filter.go` reads it, ported from v4.
+`src/tui/draw/filter.go` reads it, ported from v4.
 
 - A bare word searches the level, the kind or tool, `said`, `text` and every field.
 - `name: value` searches one column, and a writer names any field the line carries.
@@ -268,7 +268,7 @@ stands as an `unparsed` row holding its raw text.
 
 A person sets every one of those numbers in `spec/config/styles/colours.json`,
 and the window reads the file once at start. The file stands under the folder
-the Vale styles share, and `loadColours` in `colour.go` holds what it reads.
+the Vale styles share, and `LoadColours` in `src/tui/draw/colour.go` holds what it reads.
 
 | the map the file holds | what wears it |
 |---|---|
@@ -379,9 +379,9 @@ place reading where an event lands:
 | the wheel over the list | the log, three rows a notch |
 | the wheel over the open pane | the pane's own scroll |
 
-`mouse.go` reads the geometry the window already holds, so a moving split
-carries the mouse with it. `firstRow()` names the row the list opens on, out of
-`headWide` and `namesWide`, and `overPane` reads `listWidth()`.
+`src/tui/frame/mouse.go` reads the geometry the window already holds, so a moving split
+carries the mouse with it. `FirstRow()` names the row the list opens on, out of
+`HeadWide` and `NamesWide`, and `OverPane` reads `ListWidth()`.
 
 `--mouse=false` leaves the mouse to the terminal. A window holding the mouse
 takes the terminal's own text selection. So the switch stands for a person who
@@ -415,7 +415,7 @@ The name links to its note. The state leads the flags as its first letter.
 
 The queue is an outline the pull owns, and git holds the branches. So the
 tab runs the verb behind each tree the index hands over, and lays its answer
-over the rows. `workplaces.go` holds that road, and a verb answering nothing
+over the rows. `src/tui/work/workplaces.go` holds that road, and a verb answering nothing
 leaves the last places standing. The tab opens on the queue: the rows
 holding a place, sorted by it. So a person's rows stand first, and a closed
 ticket stands off it. For the places, see
@@ -430,7 +430,7 @@ ticket stands off it. For the places, see
 Nothing off the body draws there, because the name in the table opens the
 note.
 
-`workindex.go` holds the road to the door, and `workitems.go` turns the rows
+`src/tui/work/workindex.go` holds the road to the door, and `src/tui/work/workitems.go` turns the rows
 into items. A box with no door and no binary draws the reason in the tab, and
 asks again after a pause. So a build landing later reaches the tab with no
 restart.
@@ -440,7 +440,7 @@ restart.
 A person edits a ticket where they read it, and each field a person sets has
 a key of its own. The write lands in the ticket's front. The index sees it
 and hands the tab its tree again, so the row reads what the note now says.
-`workedit.go` and `workplace.go` hold it.
+`src/tui/work/workedit.go` and `src/tui/work/workplace.go` hold it.
 
 | key | what it does |
 |---|---|
@@ -475,7 +475,7 @@ across, so a redraw moves nothing under a person's hands.
 
 `./RUNME.sh tui work` opens the window on that tab, and `--tab work` says the
 same. `TABS` in `src/scripts/tui.js` names which words stand, and the window
-answers `tabNamed` for the same words. A word no tab carries leaves the open tab
+answers `TabNamed` for the same words. A word no tab carries leaves the open tab
 where it is.
 
 # A second launch hands over

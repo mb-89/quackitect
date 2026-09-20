@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -214,6 +214,10 @@ record:
     hash_after: c3541d47a18991b705513541cc01a1f4d07dd37c
     returns: 2
     why: "design: The help table in `spec/design_output/tui.md` names `act`, `band`, `bands()` and `key()`, and the split gave each a capital.; design: `spec/design_output/tui.md` names `loadColours`, `overPane`, `firstRow` and `listWidth`, and the split gave each a capital.; design: `spec/design_output/tui.md` names `headWide` and `namesWide` under The mouse reaches the window, and the split gave each a capital.; design: The chapter's draw row names `cut`, `pad` and `oneLine`, and the split gave each a capital.; craft: `src/tui/tree/treeflag_test.go` keeps the blank line before the closing brace of `TestAValueFlagWearsATonePerValue`, which the last round named.; craft: `src/tui/frame_test.go` says `frame.HeadWide` and `frame.FootWide` to a reader, the way the last round's finding on that file read.; craft: `src/tui/door_test.go` says `tabMsg` and `tabNamed` to a reader, and the split gave each a capital.; craft: `src/tui/mouse_test.go` says `tabAt` and `src/tui/sort_test.go` says `columnAt`, and the split gave each a capital.; The branch does what the ask calls for: `src/tui/main.go` is the root's one file past the cases, each tab stands under its folder, and every import runs down.; The last round's three design findings have their answer: the two notes point at `src/tui/frame` and `src/tui/tree`, and name `OpenDoor`, `TabMsg` and `TellPort`.; `go build ./...`, `go vet ./...` and `go test ./...` under `src/tui` answer 0, and `gofmt -l .` answers nothing.; `./RUNME.sh check` answers 0 on the branch, with 81 warnings standing, and the ones in this ticket's files stand in the ticket's own record.; `./RUNME.sh branch review` reads check as 1, because its worktree lacks `.claude/skills/level0/.claude-plugin/plugin.json`, and the tree itself answers 0.; No retro stands in the handback, and the verdict step hands the ticket to one.; The layout case refuses a package importing what its row leaves out, and the root case refuses a tab file at the root.; The stamp case runs the build again on a move under a package, and leaves the binary standing on a moved case file.; The widths, the wheel step, the floor width, the no-sort mark, the poll and the ticket schema each stand in one place now, and the cases read them there.; Beyond the ask, the diff touches `.vale.ini` alone, and that section reaches a door file under a package."
+  - step: implement/reflect
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: 9b07f77b47d0f22daadd9198d1593d96fecafaf5
+    hash_after: 9b07f77b47d0f22daadd9198d1593d96fecafaf5
 ---
 
 # Ask
@@ -358,16 +362,18 @@ under an alias.
 
 <!-- the form is text -->
 
-The findings fall in three classes, and each names a fix.
+The third round names one class, and it is the first round's first class
+again: a rename that left its readers behind. The last round repointed the
+notes at the moved files and left the names inside them, and the case
+messages, as they stood.
 
 | the class | the finding | the fix |
 |---|---|---|
-| a move that left its readers behind | three chapters named files and functions where they stood before the split | search the notes for every path and name the move touches, and repoint them |
-| a rename that reached prose | the case messages said the package's names to a reader, and one filter key took a capital | rename a name in code alone, and read every string a rename touches |
-| a rule broken to make a build pass | the cases spelled numbers the constants hold, two packages each held the poll, a helper stood twice, and a type stayed private behind a public function | export the name a reader outside the package reads, and put a thing shared by two packages in the one they both import |
+| a rename that left its readers behind | the notes and the case messages named the window's things by their old names | list every name the split touched, and search the notes and the cases for each one before the hand-back, in code spans and in strings alike |
 
-The blank line the moved case left is the first class in small: a cut leaves
-a hole where it stood.
+The search this round ran names every file of the window by its package path
+in the two notes, and every renamed name the notes and the case messages
+carry. The blank line the moved case left is gone.
 
 ### checked
 
