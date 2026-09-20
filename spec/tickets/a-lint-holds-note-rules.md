@@ -291,17 +291,32 @@ What the implement step carries, one a line:
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/vale.test.js
+
 ### seen
 
 <!-- what you see, and what surprises you -->
 
 <!-- the form is text -->
 
+- the Vale case asks for `History`, and the style folder holds no such rule yet
+- `src/lsp/marked_test.go` drives `checkNoteIn`, which passes the tree to the schema reading
+- that function stands as a pass through today, so the marked case draws nothing and fails
+- the three quiet cases pass already, because a reader passing over `matches` draws nothing
+
+What surprises the hand: the Go side and the JavaScript side each hold a reader
+named `underFaults`, and both pass over `matches`. So the write door keeps its
+reading, and the checker takes the pair.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the cases touch the Vale contract test and a new Go file, which the ask names
+- the Go case writes its own tree through `fixture`, and the Vale case drives the real binary
+- each case carries the pointer at the chapter saying what a pair rule reads
 
 ## reflect
 
