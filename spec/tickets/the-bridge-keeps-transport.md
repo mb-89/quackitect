@@ -75,7 +75,7 @@ steps:
 urgent: true
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: split
+step: children
 record:
   - step: sync
     hand: box fa49097ce66c · claude-code-remote
@@ -88,6 +88,10 @@ record:
       - name: sync
         exit: 0
         said: work/the-bridge-keeps-transport already carries every commit on main.
+  - step: split
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: eece86491dd64d1b9e71bf59dfcd2f041561440f
+    hash_after: eece86491dd64d1b9e71bf59dfcd2f041561440f
 ---
 
 # Ask
@@ -120,11 +124,30 @@ those, and the engine takes the work the bridge does past transport.
 
 <!-- the form is list -->
 
+- [[spec/tickets/a-standing-stop-ends-turns]], standard
+- [[spec/tickets/the-canary-pays-once]], standard
+- [[spec/tickets/the-canary-survives-a-restart]], trivial
+- [[spec/tickets/the-answer-door-reads-chat]], standard
+- [[spec/tickets/the-session-file-proves-itself]], standard
+- [[spec/tickets/the-session-says-its-cage]], trivial
+- [[spec/tickets/the-bridgehead-needs-no-shell]], trivial
+- [[spec/tickets/the-cloud-setup-installs]], trivial
+- [[spec/tickets/the-check-starts-the-server]], trivial
+- [[spec/tickets/the-server-holds-its-socket]], trivial
+- [[spec/tickets/the-bridge-says-it-falls]], standard
+- [[spec/tickets/the-doctor-probes-every-hook]], standard
+- [[spec/tickets/the-tools-answer-after-restart]], standard
+- [[spec/tickets/an-engine-takes-bridge-work]], standard
+
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- every child carries one ask, and each one reviews whole under its own verdict
+- the ask names a fault a line, and a child answers each one
+- no child waits on another, so `depends_on` stands empty on every one
 
 # children
 
