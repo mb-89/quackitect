@@ -408,8 +408,22 @@ The import rule asks for the import and no bare path, because a path inside a
 string reads as prose. Every module of the server now carries a test naming it,
 and the nine that stood without one take the cases this change writes.
 
-The two notes take their line: the tree note tables the new rule, and the doors
-note says what the guard does. `./RUNME.sh lint` answers what either rule finds.
+| what the notes take | where |
+|---|---|
+| the row naming the new rule | the table of rules over two files |
+| the line saying what the guard does | the chapter on a fake behaving |
+
+The second round answers the verdict:
+
+| the finding | what lands |
+|---|---|
+| no fake took the guard | the clock, the git and the log fakes take it, and a case drives the clock |
+| rule five named no program | the rule names the commit door and the tree rule holding it |
+| one stray test carried every change | each change wants the test naming it, by file name or by import |
+| a write dropped two standing cases | `tools-door.test.js` stands as it stood, and the hand tools take their own file |
+
+The disk and the process fakes answer through a closure, so the three taking the
+guard today are the ones returning a plain map.
 
 ### checked
 
