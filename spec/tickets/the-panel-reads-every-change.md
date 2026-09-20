@@ -74,11 +74,19 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: sync
+step: split
 record:
   - step: sync
     hand: box 5fb6c1c050cd · claude-code-remote
     hash_before: b35e12062695c317b92be59f8c8df268f5a58a08
+  - step: sync
+    hand: box 5fb6c1c050cd · claude-code-remote
+    hash_before: 31a244dd6facab427b23c8d4f5f188a5370fcb90
+    hash_after: 819ddb23080d8dcf5cd8cc71e03e1040135f12d9
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-panel-reads-every-change took 4 commit(s) from main.
 ---
 
 # Ask
@@ -95,6 +103,8 @@ The problems panel behaves as any language's does. Every file's findings stand o
 <!-- branch sync, so the branch carries trunk -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh branch sync
 
 # split
 
