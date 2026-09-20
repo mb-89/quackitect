@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box d42624a67d18a8 · claude-code
@@ -125,6 +125,12 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: 719143ebec1cb91b4e0d44002d7f38028385ed3b
     hash_after: 719143ebec1cb91b4e0d44002d7f38028385ed3b
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-8
+    hash_before: 252583fa2270dab17d966fcad45135065be0f228
+    hash_after: 252583fa2270dab17d966fcad45135065be0f228
+    returns: 3
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | in part, and the first line of `done_when` goes missing |; | is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |; | what does `./RUNME.sh check` answer | 0, with the server standing |; | does every rule the approach adds carry a case | yes, a case a layer over a fixture root and a case over the shipped file |; | does every claim carry a proof | one fails, the grep the draft cites over `src/viewer` |; TL;DR:; The road holds. The redraft takes the reader the owner rules for, and lands the values under `spec/config/styles`.; The move stops at `colour.go`. A colour number stands outside it, so the grep the draft cites answers other than 0.; The notes naming what moves get no line in the draft.; The findings, one a line:; `src/viewer/ui.go` wears the selected row's background, and `src/viewer/tabs.go` wears the open tab.; `grep -rc` over `src/viewer` reads those files, so the first line of `done_when` fails.; The table of what moves names `colour.go` alone. Name both files there, or say why each colour stands in Go.; `src/viewer/detail_test.go` asserts the prompt's colour by number. Say whether that case reads the config or holds a fixture.; `spec/design_output/viewer#colours` points the reader at `kindColours` in `colour.go`. Name the line the move rewrites.; `spec/design_output/level0.md` gives `spec/config/styles` to Vale. A JSON file there wants that line to name the other kind.; The earlier findings close: the reader road, the folder the ruling names, and the shared reader riding `SHARED`.; What the agent needs:; | number | need | status |; |---|---|---|; | 1 | the table of what moves names every file under `src/viewer` holding a colour | open |; | 2 | the draft says what the standing case asserting a colour by number reads | open |; | 3 | the draft names the notes the move rewrites | open |; | 4 | the review hand reads the approach again | open |"
 ---
 
 # Ask
@@ -203,34 +209,35 @@ fail
 
 | the question reviewing asks | the answer |
 |---|---|
-| does the approach answer the ask | no, it takes the road the owner rules against under `Discussion` |
+| does the approach answer the ask | in part, and the first line of `done_when` goes missing |
 | is what the diff touches beyond the ask trivial | yes, the commit writes this ticket alone |
 | what does `./RUNME.sh check` answer | 0, with the server standing |
-| does every rule the approach adds carry a case | the case it names covers the projection, which the ruling drops |
-| does every claim carry a proof | yes, and the earlier findings land |
+| does every rule the approach adds carry a case | yes, a case a layer over a fixture root and a case over the shipped file |
+| does every claim carry a proof | one fails, the grep the draft cites over `src/viewer` |
 
 TL;DR:
 
-- The owner rules twice under `Discussion`. The redraft answers neither ruling.
-- The tree bears the owner out. Each file carrying that reads as the ruling says.
-- The three earlier findings close. A redraft keeps what they fixed.
+- The road holds. The redraft takes the reader the owner rules for, and lands the values under `spec/config/styles`.
+- The move stops at `colour.go`. A colour number stands outside it, so the grep the draft cites answers other than 0.
+- The notes naming what moves get no line in the draft.
 
 The findings, one a line:
 
-- The draft projects a Go file. The owner rules the reader asks the config for a key.
-- `src/lsp/config.go` reads the three layers for a key. So a Go program reading config stands.
-- `SHARED` in `src/scripts/viewer.js` carries `quackitect/yaml` across programs. So a shared reader rides standing machinery.
-- The draft puts the values beside `level0.json`. The owner rules they stand under `spec/config/styles`.
-- `spec/config/projections.json` names one target under `spec/config/styles`. So a file beside it stands free.
-- The redraft names the command answering the shape count. It names `src/viewer/palette.go`, and it names this ticket first.
+- `src/viewer/ui.go` wears the selected row's background, and `src/viewer/tabs.go` wears the open tab.
+- `grep -rc` over `src/viewer` reads those files, so the first line of `done_when` fails.
+- The table of what moves names `colour.go` alone. Name both files there, or say why each colour stands in Go.
+- `src/viewer/detail_test.go` asserts the prompt's colour by number. Say whether that case reads the config or holds a fixture.
+- `spec/design_output/viewer#colours` points the reader at `kindColours` in `colour.go`. Name the line the move rewrites.
+- `spec/design_output/level0.md` gives `spec/config/styles` to Vale. A JSON file there wants that line to name the other kind.
+- The earlier findings close: the reader road, the folder the ruling names, and the shared reader riding `SHARED`.
 
 What the agent needs:
 
 | number | need | status |
 |---|---|---|
-| 1 | the draft takes the reader road the owner rules for | open |
-| 2 | the values land under `spec/config/styles` | open |
-| 3 | the draft names where the shared reader stands, and the key the viewer asks it for | open |
+| 1 | the table of what moves names every file under `src/viewer` holding a colour | open |
+| 2 | the draft says what the standing case asserting a colour by number reads | open |
+| 3 | the draft names the notes the move rewrites | open |
 | 4 | the review hand reads the approach again | open |
 
 # implement
