@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -207,6 +207,12 @@ record:
       - name: check
         exit: 0
         said: The rules pass.
+  - step: verdict
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-17
+    hash_before: 962f344e022d606cddffaa38b8d6b4be687ad25b
+    hash_after: 962f344e022d606cddffaa38b8d6b4be687ad25b
+    returns: 3
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the branch do what the brief asks | yes, the folders leave and the hold runs |; | is what the diff touches beyond the brief trivial | yes, this round writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does a retro stand in the handback | no, the branch's close writes it |; | does every rule the branch adds carry a test | yes, I drove the verb over an open trial and it refused |; | what grade do the findings take | craft, a field of this ticket holds a count that reads false |; I drove `retro audit` over a tree carrying an open trial, and it named the trial; and refused. The Discussion answers the approach row, which stands under a step; no round after it reopens. The `says` chapter stands otherwise: this round held; `implement/tests-green` and wrote its other fields, so that chapter takes the; fix where a reader meets the count.; Findings, one a line:; The `says` chapter writes a count of the closed tickets naming the old folder.; `git grep skills/level1 -- spec/tickets` names a ticket the count leaves out, so it reads false.; This round answers `implement/tests-green` again, so the hand writes that chapter.; Name the command there in place of the count, and leave the Discussion row standing."
 ---
 
 # Ask
@@ -458,6 +464,7 @@ Three closed tickets still name the old folder in their own record of what stood
 - .claude/skills/level0/hooks/hooks.json
 - .claude/skills/level0/hooks/pull-tool.js
 - .claude/skills/level0/lib/pull.js
+- .claude/skills/level0/lib/ticket.js
 - .claude/skills/level1/.claude-plugin/plugin.json
 - .claude/skills/level1/hooks/hooks.json
 - .claude/skills/level1/hooks/level1.js
@@ -488,6 +495,7 @@ Three closed tickets still name the old folder in their own record of what stood
 - src/scripts/cli-doors.js
 - src/scripts/pull-chapter.js
 - src/scripts/pull-route.js
+- src/scripts/pull-writes.js
 - src/scripts/retro.js
 - test/contract/experiment.test.js
 - test/contract/tree.test.js
@@ -506,29 +514,31 @@ fail
 | the question reviewing asks | the answer |
 |---|---|
 | does the branch do what the brief asks | yes, the folders leave and the hold runs |
-| is what the diff touches beyond the brief trivial | yes, the check and the doors drop a dead name |
+| is what the diff touches beyond the brief trivial | yes, this round writes this ticket alone |
 | what does `./RUNME.sh check` answer | 0 on this commit |
-| does a retro stand in the handback | no, the handover names it as waiting |
-| does every rule the branch adds carry a test | yes, the verb refuses, and a case reads the step |
-| what grade do the findings take | craft, the approach and the note disagree on one fact |
+| does a retro stand in the handback | no, the branch's close writes it |
+| does every rule the branch adds carry a test | yes, I drove the verb over an open trial and it refused |
+| what grade do the findings take | craft, a field of this ticket holds a count that reads false |
 
-I drove `retro audit` over a tree carrying an open trial, and it refused and named
-the trial. The findings of the last round land. The approach still says what this
-branch stopped doing, so a reader at the merge meets two answers to one question.
+I drove `retro audit` over a tree carrying an open trial, and it named the trial
+and refused. The Discussion answers the approach row, which stands under a step
+no round after it reopens. The `says` chapter stands otherwise: this round held
+`implement/tests-green` and wrote its other fields, so that chapter takes the
+fix where a reader meets the count.
 
 Findings, one a line:
 
-- The approach row says each folder leaves under a ticket of the experiment process, and neither does.
-- Take that row to what [[spec/design_output/work#an-experiment-decides]] says, that this ticket closes both.
-- The `says` chapter counts the closed tickets naming the old folder, and `git grep skills/level1` answers more.
-- Name that command in place of the count, because a count in prose goes stale.
+- The `says` chapter writes a count of the closed tickets naming the old folder.
+- `git grep skills/level1 -- spec/tickets` names a ticket the count leaves out, so it reads false.
+- This round answers `implement/tests-green` again, so the hand writes that chapter.
+- Name the command there in place of the count, and leave the Discussion row standing.
 
 ## checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- every fact the change adds stands in one place. [[spec/design_output/work#an-experiment-decides]] owns the decision and the hold, and the route, the verb and the cases point at it. The approach repeats where the two decisions land, and it says the opposite, which the first finding names.
+- every fact the change adds stands in one place. [[spec/design_output/work#an-experiment-decides]] owns the decision and the hold. The route, the verb and the cases point there, and the Discussion takes the approach row there. The `says` chapter keeps a count of its own, which the findings name.
 
 # Discussion
 
