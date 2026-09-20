@@ -75,7 +75,7 @@ steps:
 urgent: true
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: sync
+step: split
 record:
   - step: sync
     hand: box b99ea8ab11a8 · claude-code-remote
@@ -84,6 +84,14 @@ record:
   - step: sync
     hand: box 099c2ec7708d · claude-code-remote
     hash_before: e2e31c933cd4f59e7fc75f72928e624a86017c3c
+  - step: sync
+    hand: box 099c2ec7708d · claude-code-remote
+    hash_before: 45e1297b9fbf04a0f207f99cc5bd6bcc2ae28ebb
+    hash_after: 45e1297b9fbf04a0f207f99cc5bd6bcc2ae28ebb
+    answered:
+      - name: sync
+        exit: 0
+        said: work/the-verbs-take-the-shell already carries every commit on main.
 ---
 
 # Ask
@@ -101,8 +109,9 @@ work runs through the engine.
 ## sync
 
 <!-- branch sync, so the branch carries trunk -->
-
 <!-- the form is command -->
+
+./RUNME.sh branch sync
 
 # split
 
