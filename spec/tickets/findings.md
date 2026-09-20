@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: split
+step: children
 record:
   - step: sync
     hand: box a05106ef44c2 · claude-code-remote
@@ -87,6 +87,10 @@ record:
       - name: sync
         exit: 0
         said: work/findings already carries every commit on main.
+  - step: split
+    hand: box a05106ef44c2 · claude-code-remote
+    hash_before: 4dc96e9e6d1cd2dbe5f3398edaf77b02b7a0885c
+    hash_after: 4dc96e9e6d1cd2dbe5f3398edaf77b02b7a0885c
 ---
 
 # Ask
@@ -107,15 +111,16 @@ The findings the desk parked as private notes, each a defect an agent fixes with
 
 ## children
 
-<!-- every child as a link, one a line, with its process -->
-
-<!-- the form is list -->
+- [[spec/tickets/a-test-importing-cli-exits]], on the trivial process
+- [[spec/tickets/the-battery-flickers-under-load]], on the trivial process
+- [[spec/tickets/the-respawn-answers-no-server]], on the trivial process
+- [[spec/tickets/the-stop-line-loops-forever]], on the trivial process
 
 ## checked
 
-<!-- one line per item of the checklist, on how you take it into account -->
-
-<!-- the form is checklist -->
+- every child is small enough to review whole: each is one trivial ticket with one step and one commit
+- the children add up to the goal: each parked note stands as one child, and no finding stands outside them
+- a child that waits on another names it under depends_on: none waits on another, so none names one
 
 # children
 
