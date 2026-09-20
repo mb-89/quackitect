@@ -148,13 +148,14 @@ the chat shows and pays the demand with it. The server wires it at
 | the bridgehead's texts | `onAgentSpoke` | nothing |
 | the chat | `onMessageDisplay` | nothing |
 
-**Measured here.** `.se/.log/session.jsonl` on this box carries 43 rows for
-`classic.MessageDisplay`, and every one of them lands after a tool call of the
-same turn. Each carries the text under `delta`.
+**Measured here.** `.se/.log/session.jsonl` on this box carries a row for
+`classic.MessageDisplay` each time the chat shows a text, and each row holds
+that text under `delta`. Most of those rows stand between two calls of one
+turn, and the rest open a turn.
 
 So the client posts the event for a text between two calls, and the door reads
-it there. A reader wanting the count again runs the log through `rowsIn` and
-counts the event.
+it there. A reader counts the rows by running the log through `rowsIn` and
+reading the event of each.
 
 **The chapters.** Two chapters carry the old reading, and the measurement above
 overturns one line of each.
@@ -163,7 +164,19 @@ overturns one line of each.
 |---|---|---|
 | What the door reads | the first text of a turn pays, and a text between calls pays nothing | every displayed text pays, because the client posts each one |
 | The reply line | the agent writes the chat and calls the report | the chat pays, and the report writes the log |
-| What the refusal says | a refusal the code left behind | the refusal `SAYS` builds today |
+| What the refusal says | the wording of the lib's own refusal | the same wording, with the chat paying |
+
+**Two exports carry the name `SAYS`.** A change reaching one leaves the other
+standing, so the plan names each with its reader.
+
+| where `SAYS` stands | what it is | who reads it |
+|---|---|---|
+| `src/bridge/answer.js` | the words the door's refusal opens with | `onAgentSpoke` |
+| `.claude/skills/level0/lib/answer.js` | the constant the owner's prompt door holds | a case in `test/level0/answer.test.js` |
+
+The chapter What the refusal says quotes the lib's constant, and that constant
+carries the chapter's own link. So the chapter and the constant change
+together, and the case asserting its words changes with them.
 
 **The change.** The cases, the door's wording, and the chapters.
 
@@ -172,13 +185,15 @@ overturns one line of each.
 | a case pays the demand off a text shown between two calls | `test/level0/answer-door.test.js` |
 | a case reads no refusal on the call after it | the same file |
 | a case leaves the demand standing where the text is empty | the same file |
-| `SAYS` and the refusal say the chat pays | `src/bridge/answer.js` |
-| the standing case over `SAYS` reads the new words | `answer-door.test.js` |
+| the door's `SAYS` and its refusal say the chat pays | `src/bridge/answer.js` |
+| the prompt door's `SAYS` says the same | `.claude/skills/level0/lib/answer.js` |
+| the case over the door's `SAYS` reads the new words | `answer-door.test.js` |
+| the case over the prompt door's `SAYS` reads the same | `test/level0/answer.test.js` |
 | the three chapters above | `spec/design_output/level0.md` |
 
-The standing case asserts the words `mcp__level0__report with the same text`.
-`SAYS` keeps the report beside the chat, so that case changes with the wording
-and holds the same claim.
+The case in `answer-door.test.js` asserts the words `mcp__level0__report with
+the same text`. Each `SAYS` keeps the report beside the chat, so both cases
+change with the wording and hold the same claim.
 
 **What the cases show.** Three things the road does that nobody decides.
 
