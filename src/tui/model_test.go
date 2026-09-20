@@ -16,13 +16,9 @@ import (
 	"quackitect/tui/log"
 )
 
+// A row the way the log writes one, read through the parser the tab reads with. [[spec/design_output/log#what-one-line-looks-like]]
 func row(at int, door, said string) log.Record {
-	return log.Record{
-		At:    time.Date(2026, 9, 11, 15, 0, at, 0, time.UTC),
-		Level: "info",
-		Kind:  door,
-		Said:  said,
-	}
+	return log.ParseRecord(fmt.Sprintf(`{"at":"2026-09-11T15:00:%02dZ","level":"info","kind":%q,"said":%q}`, at, door, said))
 }
 
 func window(n int) frame.Model {

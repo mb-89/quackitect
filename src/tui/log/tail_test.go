@@ -6,14 +6,21 @@ package log
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
-const (
-	one   = `{"at":"2026-09-11T15:00:01Z","level":"info","kind":"level0","said":"session start"}` + "\n"
-	two   = `{"at":"2026-09-11T15:00:02Z","level":"info","kind":"prompt","said":"hi"}` + "\n"
-	three = `{"at":"2026-09-11T15:00:03Z","level":"info","kind":"reply","said":"hello"}` + "\n"
-)
+// The three lines every case here builds from, which the window's frame case reads too. [[spec/design_output/tui#one-frame]]
+var one, two, three = fixtureLines()
+
+func fixtureLines() (string, string, string) {
+	read, err := os.ReadFile(filepath.Join("..", "testdata", "session.jsonl"))
+	if err != nil {
+		panic(err)
+	}
+	lines := strings.SplitAfter(string(read), "\n")
+	return lines[0], lines[1], lines[2]
+}
 
 func put(t *testing.T, path, text string) {
 	t.Helper()

@@ -5,6 +5,11 @@
 package main
 
 import (
+	"os"
+	"path/filepath"
+	"testing"
+
+	"quackitect/tui/draw"
 	"quackitect/tui/frame"
 	"quackitect/tui/tree"
 	"quackitect/tui/work"
@@ -20,4 +25,10 @@ func namesOf(t *tree.Tree) []string {
 		out = append(out, t.Selected().Name)
 	}
 	return out
+}
+
+// The window reads the colours at start, and a case run stands in for that start. [[spec/tickets/the-colours-stand-in-config]]
+func TestMain(m *testing.M) {
+	draw.LoadColours(filepath.Join("..", ".."))
+	os.Exit(m.Run())
 }

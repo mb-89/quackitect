@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -272,6 +272,10 @@ record:
     hash_after: abb2945380632aadf70620f27e1c1f3205fc5fab
     returns: 4
     why: "craft: The root package and the tree package load no palette in their cases, and `src/tui/colour_test.go` loaded it for the one package with `TestMain`, so every colour assertion there passes on bare text.; craft: A probe in a copy of the module fed those cases a palette check, and each failed: the funnel's red in `src/tui/frame_test.go` and `src/tui/model_test.go`, the sorted column's bar in `src/tui/sort_test.go`, the lit column head in `src/tui/workedit_test.go`, and the tone in `src/tui/tree/treeflag_test.go` each assert nothing.; craft: `src/tui/frame_root_test.go` and `src/tui/log/tail_test.go` each spell the three fixture lines and `put`, and `src/tui/model_test.go` and `src/tui/log/detail_test.go` each spell `row`, so one fixture stands in two packages.; The branch does what the ask calls for: `src/tui/main.go` is the root's one file past the cases, each tab stands under its folder, and every import runs down.; The last round's findings have their answer: the note spells `pressed`, the two cases read `frame.WheelStep` and `work.QueueKey`, and one import order stands in every file.; `go build ./...`, `go vet ./...` and `go test ./...` under `src/tui` answer 0, and `gofmt -l .` answers nothing.; `./RUNME.sh check` answers 0 on the branch, with 82 warnings standing, and the ones in this ticket's files stand in the ticket's own record.; `./RUNME.sh branch review the-notes-point-true` reads check as 1, because its worktree lacks `.claude/skills/level0/.claude-plugin/plugin.json`, and the tree itself answers 0.; No retro stands in the handback, and the verdict step hands the ticket to one.; The layout case refuses a log file importing the work package, and the root case refuses a work file at the root, each fed one in a copy of the module.; The stamp case runs the build again on a move under a package, and leaves the binary standing on a moved case file.; Beyond the ask, the diff touches `.vale.ini` alone, and that section reaches a door file under a package."
+  - step: implement/reflect
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: 39ab1380477e27197783bd6b1ec6d0a59aa9b739
+    hash_after: 39ab1380477e27197783bd6b1ec6d0a59aa9b739
 ---
 
 # Ask
@@ -416,14 +420,12 @@ under an alias.
 
 <!-- the form is text -->
 
-The fourth round names three classes, each one of the earlier rounds' in
-small.
+The fifth round names two classes.
 
 | the class | the finding | the fix |
 |---|---|---|
-| a rename that reached a data key | the tree-view note said the base file marks a preset with a capital, and the file spells the key small | a search for a renamed name reads what each hit is: a name in code, or a key in a file |
-| a value spelled where a name holds it | a wheel step and a sort key stood as a bare number and a bare string in two cases | search the cases for every constant the split exported, and read each one through its name |
-| two orders for one thing | the module's own imports stood first in some files and last in others | one order in every file: the standard library, the outside modules, then this module's packages |
+| a start the cases lost in the move | the one package loaded the palette once for every case, and the split left the root and the tree with no such start, so a colour assertion read bare text | every package holding a colour assertion loads the palette in its own start, and a probe feeding a case no palette turns it red |
+| a fixture copied across a package line | the three log lines and the row builder each stood in two packages | one data file under the window holds the lines, and both packages read it. The root builds a row through the parser, and the log through the struct, so the two builders share no text |
 
 ### checked
 
