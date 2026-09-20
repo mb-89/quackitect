@@ -385,11 +385,15 @@ reading, and the checker takes the pair.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/vale.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+    ./RUNME.sh check
 
 ### says
 
@@ -397,11 +401,37 @@ reading, and the checker takes the pair.
 
 <!-- the form is text -->
 
+A note sets rules, and the check now reads the notes holding them:
+
+- `src/lsp/marked.go` reads `matches` in a schema, and draws where a marked rule opens no chapter
+- `checkNoteIn` takes the tree, and `noteFaults` hands it down from every front
+- `checkNote` stands as it reads, so the write door keeps its one buffer
+- `spec/config/styles/VoiceVale/History.yml` refuses the eight words telling what stood before
+- `.vale.ini` switches that rule off over the rationales and the tickets, which argue and record
+
+The rationales carried their chapter numbers from an older rule list, so nine
+marked rules stood with no chapter. The numbers now read the rules they argue:
+
+| the rationale | what moves |
+|---|---|
+| `cloud` | two chapters swap places, three renumber, and two open |
+| `tickets` | three chapters renumber, and three open |
+| `working` | three chapters renumber, and one opens |
+| `code` | one chapter opens |
+
+Rule twelve of `spec/guidance/guidance.md` leaves, with chapter 12 of its
+rationale. Most marked rules stand as one sentence, so a check over them asks
+for a rewrite of each, and `a-rule-names-its-failure` carries that work.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the checker, the style folder, the lint config, the notes and the new ticket
+- the Go reading takes the tree the checker holds, and the fixture writes one of its own
+- each piece carries the pointer at the chapter saying what a pair rule reads
 
 # verdict
 
