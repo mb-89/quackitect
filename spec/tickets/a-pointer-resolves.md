@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/tests-green
+step: verdict
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -118,6 +118,17 @@ record:
       - name: lint
         exit: 0
         said: 21 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: implement/tests-green
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: 1e124189231be00716984a6a080641967aa64194
+    hash_after: 1e124189231be00716984a6a080641967aa64194
+    answered:
+      - name: tests
+        exit: 0
+        said: green, src/lsp passes
+      - name: check
+        exit: 0
+        said: 23 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
 ---
 
 # Ask
@@ -281,11 +292,15 @@ string a test writes each do.
 
 <!-- the form is command -->
 
+./RUNME.sh branch test src/lsp/pointer_test.go
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
+
+./RUNME.sh check
 
 ### says
 
@@ -293,11 +308,29 @@ string a test writes each do.
 
 <!-- the form is text -->
 
+The language server gains one tree rule, and the tree loses every dead pointer.
+
+| the change | why |
+|---|---|
+| `EveryPointerResolves` in `src/lsp/pointer.go`, in the sweep and over one file | a pointer landing nowhere reads as a live link, so the check refuses it and the panel draws it |
+| five chapters in the server's note | the code pointed at chapters the note lost, and the pointers named what the code does |
+| a row in the tree rules table | the rule stands in one place, and the table names every tree rule |
+| the pointers the rule named, repointed | each one names the chapter that moved, the note that renamed, or the guidance that moved a folder down |
+| a placeholder in angle brackets in the voice rule and the guidance schema | a bare word in brackets reads as a pointer, and the shape in angle brackets reads as a shape |
+| the commit door passes a hunk adding comment lines alone | the repoints change no code, and the door asked each of eight files for a test |
+
+The rule reads a comment alone in a code file, because a pointer in a string is
+a fixture a test writes. The door's change carries its own case.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The commit door's reading of a comment-only hunk stands outside the ask, and the hand-back met it on the first commit, so the fix rides here with its case.
+- every door the change reaches has a fake. The rule reads the tree handed in, and the door's case feeds it a delta in memory.
+- a comment names the approach the change implements. The rule, its cases and the door's new lines each point at the chapter owning them.
 
 # verdict
 
