@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -121,6 +121,10 @@ record:
     hash_after: 23efc7e9d7a176caa842d11f4d8684e1be2a36e2
     returns: 3
     why: "| the finding | what to do |; |---|---|; | `spec/rationales/code/refactoring` names no file in the tree | Write `spec/rationales/refactoring`, and leave `spec/rationales/code` to the note it explains |; | The chapter-past-a-star table stops at the guidance notes | Add `spec/rationales/apply` 1 to 4, `extension` 1 to 5, `index` 1 to 3 and `vehicle` 1 to 2, whose notes mark no item at all |; | `spec/rationales/pull` carries no `explains` | Say what the star check answers where that key stands absent |; | `checkNote` takes a text and the schemas, and the write door hands it one buffer | Say where `underFaults` reads the note `explains` names, because its callers hold no tree |; | `spec/rationales/guidance` opens chapter 12 for the rule that leaves | Say whether that chapter goes with rule twelve |; Answered from the last round, one a line:; the star check reads from the marked rule to its chapter, and a chapter past a star passes; `History.yml` lists its markers, and they read present tense past `PastTense`; rule twelve leaves the note, and `RuleNamesItsFailure` leaves with it; the word list and the stop folder take `VoiceShape` alone, so the marker rule stands off both; the marker drift stands named, one file to a marker; `./RUNME.sh check` answers 0 on this branch, and the drift tables read as the tree stands, past the one path above."
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 9ae0159039ceca0a985e799b78d911d580486ef4
+    hash_after: 9ae0159039ceca0a985e799b78d911d580486ef4
 ---
 
 # Ask
@@ -150,8 +154,18 @@ Two checks land, each with the owner already standing for its reading:
 
 | the check | where it lands | what it reads |
 |---|---|---|
-| a starred rule wants its chapter | `underFaults` in `.claude/skills/level0/lib/schema.js` | the guidance note, and the rationale its frontmatter names |
+| a starred rule wants its chapter | `underFaults` in `src/lsp/schema-body.go` | the rationale, and the note its `explains` names |
 | a history marker stands off the rationales | `spec/config/styles/VoiceVale/History.yml` | one buffer, with `.vale.ini` switching it off over `spec/rationales` |
+
+The star check reads two notes, so it stands where the tree stands. The Go
+checker holds that tree, and every front asks it for a named path.
+[[spec/design_output/lsp#a-second-copy-draws]] says how a rule reading a pair
+lands there.
+
+| the reader | what it holds | what it does with `matches` |
+|---|---|---|
+| `underFaults` in `src/lsp/schema-body.go` | the tree, through the checker | reads the note `explains` names, and draws |
+| `underFaults` in `.claude/skills/level0/lib/schema.js` | the buffer the write door hands it | passes over it, as it passes over every reading past one file |
 
 `spec/schemas/rationale.schema.yaml` already declares the first check, as
 `matches: explains` under `subsections`. The schema checker reads `numbered` and
@@ -180,10 +194,18 @@ nothing.
 | the rationale | the chapter standing past a star |
 |---|---|
 | `spec/rationales/cloud` | 12 |
-| `spec/rationales/code/refactoring` | 1, 2, 3 |
+| `spec/rationales/refactoring` | 1, 2, 3 |
 | `spec/rationales/voice` | 7 |
 | `spec/rationales/working` | 9 |
 | `spec/rationales/tickets` | 1 |
+| `spec/rationales/apply` | 1 to 4 |
+| `spec/rationales/extension` | 1 to 5 |
+| `spec/rationales/index` | 1 to 3 |
+| `spec/rationales/vehicle` | 1 to 2 |
+
+The last four explain a design output marking no item at all, so every chapter
+of theirs stands. A rationale carrying no `explains` reads nothing against
+anything, and `spec/rationales/pull` is the one standing so today.
 
 `History.yml` refuses the words placing a claim in a tree that stands no more:
 
@@ -213,8 +235,13 @@ check over them asks for a rewrite of each. That stands far past this ask.
 | a rewrite of most starred rules | a ticket of its own, with the check |
 | the note holding a rule a check holds | this ticket, by rule twelve leaving |
 
-So rule twelve goes from `spec/guidance/guidance.md`. The rule leaving takes
-`RuleNamesItsFailure` with it, so this change writes two rules and no third.
+So rule twelve goes from `spec/guidance/guidance.md`, and chapter 12 of
+`spec/rationales/guidance.md` goes with it, because that chapter argues that
+rule alone. Both stand last in their note, so nothing renumbers. The new ticket
+carries the rule, the chapter and the rewrites the check wants.
+
+The rule leaving takes `RuleNamesItsFailure` with it, so this change writes two
+rules and no third.
 Each new rule opens at error, because the drift it names goes in the same
 change.
 
