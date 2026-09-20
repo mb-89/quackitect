@@ -461,6 +461,11 @@ number. A tree carrying none draws nothing, which is the quiet side to fail on.
 and what the bounds do. Every piece of the set points there, so a reader
 following a pointer lands on the chapter describing it.
 
+The third round carries that last step through the two comments the rules reach
+from outside the code: the `restated` block of `spec/config/level0.json`, and
+the `restated` layer of `spec/schemas/paragraph.schema.yaml`. Each one names the
+chapter owning it.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
