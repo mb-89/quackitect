@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/change
+step: implement/tests-green
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -188,6 +188,14 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: ce63fe7347241e179abae028a740ee80d1b4efd3
     hash_after: ce63fe7347241e179abae028a740ee80d1b4efd3
+  - step: implement/change
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 7fae72ad8502863f658394bb39e0a1ab8e0e65e0
+    hash_after: 7fae72ad8502863f658394bb39e0a1ab8e0e65e0
+    answered:
+      - name: lint
+        exit: 0
+        said: The rules pass.
 ---
 
 # Ask
@@ -375,9 +383,9 @@ The second finding is the voice rule about a count. A count in prose goes stale,
 <!-- one line per item of the checklist, on how you take it into account -->
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The retro's route, the notes naming the moved module, the design input's twin, and one case file.
-- every door the change reaches has a fake. The verb's cases hand their own disk, and the route cases read the tree under test/contract.
-- a comment names the approach the change implements. The step's evidence says what the verb answers, and the note says what a decided trial leaves.
+- the change touches no file the ask leaves out. This ticket's Discussion chapter alone.
+- every door the change reaches has a fake. The change reaches no door, because it writes prose into a ticket.
+- a comment names the approach the change implements. Each row names the field it corrects and the place owning the fact.
 
 ## tests-green
 
@@ -514,3 +522,14 @@ Findings, one a line:
 # Discussion
 
 <!-- what anybody adds, at any time, on this ticket -->
+
+Two closed fields of this ticket hold a fact the work moved past. The door keeps
+a closed field as the record of its round, so the correction stands here.
+
+| the field | what it says | what stands |
+|---|---|---|
+| the approach, under design | each folder leaves under a ticket of the experiment process | this one ticket closes both, as [[spec/design_output/work#an-experiment-decides]] says |
+| the `says` chapter, under tests-green | a count of the closed tickets naming the old folder | `git grep skills/level1 -- spec/tickets` answers it |
+
+A closed ticket names a folder as it stood in its own round, so each of those
+rows stays. The live half of the tree names the folder nowhere.
