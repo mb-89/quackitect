@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: ec36534a027da40fa81b8f4c0ad64c97f1d49a6b
     returns: 1
     why: The approach puts the pass list in `DoorsOnly.yml`. A rule there reads the; raw text of a file alone, so a list of roots in the rule file stands unread.; `.vale.ini` owns that fact already, in the sections standing the rule off; `src/doors` and the editor files. Put the roots there.; The approach gives `src/lsp` a door file and names no section standing the; Go reading off it. Name it, beside the sections `.vale.ini` already holds.; The approach hands the reads outside the two the ask names to the implement; step. The ask asks for a clean `./RUNME.sh lint src`, so say which of them; move behind a door and which take the value off the hand. A read of; `process.platform` that builds a path is the case the criterion leaves open.; The rest holds. `DoorsOnly.yml` stands, and `.vale.ini` runs it over `.go`; beside `.js`. The hand `src/scripts/cli-doors.js` builds carries `env`, so; the two reads the ask names take `it.env` and `box.env` as written.
+  - step: design/draft
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: e0e917c2bfbf38d110d363a6555b197e0cecb84a
+    hash_after: e0e917c2bfbf38d110d363a6555b197e0cecb84a
 ---
 
 # Ask
@@ -126,28 +130,45 @@ Code reads the environment and runs commands in place, and a test of it touches 
 
 <!-- the form is text -->
 
-One rule file holds both languages, because Vale reads the code of each:
+One rule file grows the reading, and the lint config says where it stands off:
 
 | what grows | where it stands |
 |---|---|
 | the environment read | `spec/config/styles/VoiceVale/DoorsOnly.yml`, beside the imports it refuses |
-| the roots it passes | the same file, naming each place building a box or an `it` |
-| the Go reading | the same file, over an import of `os` and `os/exec` outside the door file |
+| the Go reading | the same file, over an import of `os` or `os/exec` |
+| the places standing off | `.vale.ini`, in a section for each, the way the fakes stand off today |
+
+A rule under `spec/config/styles` reads one buffer and no path, so the pass list
+belongs where every other path rule stands. `.vale.ini` already holds a section
+for the doors, their fakes, the editor and the hooks modules.
 
 The readings:
 
-- the rule draws on `process.env`, `process.argv` and `process.platform` in a file outside the list
-- a root builds the hand every other module takes, so it reads the environment once and hands it down
-- the Go rule reads an import line, so a package taking a door keeps its own file naming the outside
-- `src/lsp` gains that door file, and the packages reading the disk take it
+- the rule draws on `process.env`, `process.argv` and `process.platform` outside `src/doors`
+- a root builds the hand every other module takes, so it reads the environment once
+- the Go rule reads an import line, so one file of a package names the outside
 
-The two reads the ask names take the value off the hand:
+| the section `.vale.ini` gains | why it stands off |
+|---|---|
+| `**/src/scripts/cli*.js` | the command roots build the `it` every verb takes |
+| `**/src/scripts/precommit.js`, `**/src/scripts/prepush.js` | each is a hook a person's git runs, and it builds its own |
+| `**/src/bridge/server.js` | the server root builds the box each door reads |
+| `**/src/stub/**` | the template rides out as a copy, and the vehicle owns it |
+| `**/src/lsp/doors.go` | the Go door file names the outside for its package |
 
-- `src/scripts/pull-hand.js` takes `it.env`, and the read of the process goes
-- `src/bridge/stop.js` takes `box.env`, and the break mark rides the box beside it
+Every other module takes the value off the hand. The implement step moves them,
+and the two the ask names open the list:
 
-`./RUNME.sh lint src` names every read left, and the implement step moves each
-one or adds its file to the list with the reason beside it.
+| the module | what it takes |
+|---|---|
+| `src/scripts/pull-hand.js` | `it.env`, and the read of the process goes |
+| `src/bridge/stop.js` | `box.env`, and the break mark rides the box beside it |
+| `work.js`, `trust.js`, `copilot.js`, `vehicle.js` | `it.env`, off the hand the root builds |
+| `src/bridge/bash.js`, `src/bridge/guidance.js` | `box.env`, off the box the server builds |
+
+`process.platform` reads the same way: a root reads it once and hands it down,
+and `src/scripts/cli-read.js` stands off as a root. So `./RUNME.sh lint src`
+answers clean, and the rule names every read a later hand writes.
 
 ## review
 
