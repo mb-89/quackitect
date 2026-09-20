@@ -33,6 +33,19 @@ func TestEveryPointerResolvesRefusesANoteNobodyWrote(t *testing.T) {
 	}
 }
 
+// A reads line of a process file is a pointer a reader follows, and a value opening on a word is prose. [[spec/design_output/lsp#every-pointer-resolves]]
+func TestEveryPointerResolvesReadsAProcessFileWhole(t *testing.T) {
+	tree := fixture(t, map[string]string{
+		"spec/guidance/voice.md":       "# Actionables\n",
+		"spec/processes/standard.yaml": "steps:\n  - name: design\n    reads: [[[spec/guidance/voice]], [[spec/guidance/voice]]]\n  - name: implement\n    reads: [[spec/guidance/code/testing]]\n    says: a link, [[wiki]] or [text](target)\n",
+	})
+
+	found := onlyOne(t, everyPointerResolves(tree), EveryPointerResolves)
+	if found.File != "spec/processes/standard.yaml" || found.Line != 5 {
+		t.Fatalf("the finding names the reads line, and it answers %+v", found)
+	}
+}
+
 // A comment in a code file carries a pointer the way a note does, and the rule reads it there. [[spec/design_output/lsp#every-pointer-resolves]]
 func TestEveryPointerResolvesReadsACommentInCode(t *testing.T) {
 	tree := fixture(t, map[string]string{

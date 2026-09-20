@@ -15,10 +15,12 @@ import (
 const EveryPointerResolves = "EveryPointerResolves"
 
 var (
-	bracketsAt = regexp.MustCompile(`\[\[([^\]]*)\]\]`)
+	bracketsAt = regexp.MustCompile(`\[\[([^\[\]]*)\]\]`)
 	// Where a comment opens in a line of code, which is the one place a pointer stands in code. [[spec/design_output/lsp#every-pointer-resolves]]
 	commentAt = regexp.MustCompile(`(^|\s)(//|#|\*|/\*|<!--)`)
 	indentAt  = regexp.MustCompile(`^(\t|    )`)
+	// A yaml value opening on a bracket, which is a pointer a reader follows, where a value opening on a word is prose or a script. [[spec/design_output/lsp#every-pointer-resolves]]
+	valueAt = regexp.MustCompile(`^\s*(-\s+)?([A-Za-z_][\w-]*\s*:\s+)?"?\[`)
 )
 
 // The endings a pointer leaves off, in the order the index tries them. [[spec/design_output/index#a-note-and-its-links]]
@@ -101,10 +103,11 @@ type pointerAtLine struct {
 	line   int
 }
 
-// The pointers a file writes as pointers: a note's frontmatter past its kind, its body outside a quoted shape, and the comments of any other file. [[spec/design_output/lsp#every-pointer-resolves]]
+// The pointers a file writes as pointers: a note's frontmatter past its kind, its body outside a quoted shape, a yaml file's bracketed values, and the comments of any other file. [[spec/design_output/lsp#every-pointer-resolves]]
 func pointersIn(path string, rows []string) []pointerAtLine {
 	out := []pointerAtLine{}
 	note := strings.HasSuffix(path, ".md")
+	data := strings.HasSuffix(path, ".yaml") || strings.HasSuffix(path, ".yml")
 	front := note && len(rows) > 0 && strings.TrimSpace(rows[0]) == "---"
 	fenced := false
 	for i, row := range rows {
@@ -128,6 +131,7 @@ func pointersIn(path string, rows []string) []pointerAtLine {
 			continue
 		case note:
 			said = spanAt.ReplaceAllString(row, "")
+		case data && valueAt.MatchString(row):
 		default:
 			at := commentAt.FindStringIndex(row)
 			if at == nil {

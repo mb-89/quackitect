@@ -148,22 +148,6 @@ read in the present, so they pass it and carry the history anyway.
 The rationales argue a change, so `.vale.ini` switches this rule off there, the
 way it switches the past tense off.
 
-# One shape every door prints
-
-`Finding` in `src/lsp/finding.go` is the one shape a check answers, and the
-command line, the write door and the editor read it and nothing else:
-
-| the field | what it holds |
-|---|---|
-| `file` | the path, relative to the root, in forward slashes |
-| `rule` | the rule's name, which the editor draws as the code |
-| `line` and `column` | where it stands, counted from one |
-| `message` | what a person reads under the line |
-| `severity` | `error`, which holds a push, or `warning`, which the hand drains |
-| `source` | the front it comes from, where the bridge hands one over |
-
-`sorted` puts every list in one order: the file, the line, then the rule.
-
 # The editor speaks over stdio
 
 The extension starts `se-lsp` over the language server protocol, on the binary
@@ -224,6 +208,7 @@ refuses it, and the panel draws it under the line.
 |---|---|
 | a note's frontmatter | every key but `kind`, which names a taxonomy and no file |
 | a note's body | every line outside a code span, a fenced block and an indented block |
+| a yaml file | a value opening on a bracket, because a `reads` line there is a pointer a reader follows, and a value opening on a word is prose or a script |
 | any other text file | the comment on a line, from where it opens |
 
 A target carrying `<` or `>` is a shape a document spells out, and reads as no
@@ -231,7 +216,9 @@ pointer.
 
 A pointer resolves the way the index resolves a link, and then one step
 further. The file is the exact path, the path with `.md`, `.yaml` or `.yml` on
-the end, a note's id, or a folder, in that order. A chapter after `#` names a
+the end, a note's id, or a folder, in that order. The index tries `.md`
+alone, and a ticket names its process with the ending off, so this rule tries
+the two a process file wears. A chapter after `#` names a
 heading of that note by its slug. A chapter of a file holding no headings
 resolves nowhere. For the slug, see [[spec/design_output/vocabulary#the-slug-reads-one-source]].
 

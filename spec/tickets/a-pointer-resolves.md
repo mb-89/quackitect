@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -135,6 +135,10 @@ record:
     hash_after: 1fedd6676ad31afb25a895f91f751c0779142fc0
     returns: 1
     why: "The rule, its five cases, the row in `Rules` and the per-file check do what the ask calls for.; The chapter-nobody-wrote case feeds the rule a dead pointer and asserts one error naming the file and the line.; `./RUNME.sh check` on the branch answers 0, with 23 warnings, all in this ticket.; `./RUNME.sh branch review` answers check 1 on an untracked `plugin.json` the review worktree lacks. That is the box, and the branch's own check answers 0.; No retro stands in the handback.; Craft: `lib/tested.js` and `test/level0/tested.test.js` stand whole in tabs. `spec/config/biome.json` says space, and `biome format` refuses both. Format them back, so the hunk shows the one function it adds.; Craft: `lsp#one-shape-every-door-prints` writes the Finding shape a third time, after `tree#what-a-rule-answers` and `schema#a-finding-names-the-section`. Point at one of them.; Craft: `tree#the-rules-over-two-files` says its rules live in `lib/tree.js`, and the new row names a Go rule. One line says the server holds this one.; Design: a `reads:` line of a process file writes a pointer a reader follows, and the rule reads a comment alone outside a note. A dead pointer there passes the check. The approach scoped it so and the review passed it, so this goes to design and not to the drafter.; The rule tries `.yaml` and `.yml` where the index tries `.md` alone. The sound-pointers case covers a process file, and the chapter names the endings without the reason. Trivial.; The sentence split in `the-unknown-runs-stays-quiet.md` stands outside the ask and redesigns nothing."
+  - step: implement/reflect
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: a433a20afb61d067537feda423acfbbe5429f95c
+    hash_after: a433a20afb61d067537feda423acfbbe5429f95c
 ---
 
 # Ask
@@ -260,11 +264,27 @@ string a test writes each do.
 
 <!-- the form is text -->
 
+The findings fall in three classes, and each names a fix.
+
+| the class | the finding | the fix |
+|---|---|---|
+| a tool run outside its config | the formatter rewrote two files whole to tabs | run every tool the way the check runs it, through the tree's own config, so a hunk shows the one thing it adds |
+| a fact written where one stands | the Finding shape stood a third time, and the table row named no home for a Go rule | search for the owner before writing a chapter, and point at it |
+| a scope drawn by file ending | a pointer in a process file's `reads` line went unread | draw the scope by the shape a pointer takes where it stands: a bracketed value in yaml, a comment in code |
+
+The endings the rule tries now carry their reason in the chapter, and the
+sentence split in the other ticket stands, because it fixes a line this hand
+wrote.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The fixes stay in the rule, its cases, the two notes and the two files the formatter rewrote.
+- every door the change reaches has a fake. The new case feeds the rule a process file in its own fixture root.
+- a comment names the approach the change implements. The yaml reading carries a line pointing at the chapter.
 
 ## change
 
@@ -284,7 +304,7 @@ string a test writes each do.
 
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The rule and its cases, the registry and the per-file check, the server's note, the tree rules table, and the files whose pointers stood dead.
+- the change touches no file the ask leaves out. The rule and its cases, the registry and the per-file check, the server's note, the tree rules table, the commit door and its case, and the files whose pointers stood dead.
 - every door the change reaches has a fake. The rule reads the tree handed in, and each case writes its own fixture root.
 - a comment names the approach the change implements. The rule and each case point at the chapter the server's note now carries.
 
@@ -319,14 +339,16 @@ The language server gains one tree rule, and the tree loses every dead pointer.
 | the change | why |
 |---|---|
 | `EveryPointerResolves` in `src/lsp/pointer.go`, in the sweep and over one file | a pointer landing nowhere reads as a live link, so the check refuses it and the panel draws it |
-| five chapters in the server's note | the code pointed at chapters the note lost, and the pointers named what the code does |
+| four chapters in the server's note | the code pointed at chapters the note lost, and the pointers named what the code does. The Finding shape points at the tree note, which holds it |
 | a row in the tree rules table | the rule stands in one place, and the table names every tree rule |
 | the pointers the rule named, repointed | each one names the chapter that moved, the note that renamed, or the guidance that moved a folder down |
 | a placeholder in angle brackets in the voice rule and the guidance schema | a bare word in brackets reads as a pointer, and the shape in angle brackets reads as a shape |
 | the commit door passes a hunk adding comment lines alone | the repoints change no code, and the door asked each of eight files for a test |
 
 The rule reads a comment alone in a code file, because a pointer in a string is
-a fixture a test writes. The door's change carries its own case.
+a fixture a test writes. In a yaml file it reads a value opening on a bracket,
+because a `reads` line is a pointer a reader follows. The door's change carries
+its own case.
 
 ### checked
 
