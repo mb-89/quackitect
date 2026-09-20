@@ -145,26 +145,49 @@ quietly, and the check finds the fall minutes later.
 moment. That one covers a server standing down at the session start, and this
 one covers a server falling under a running session.
 
+**The session start says nothing.** `seen` posts every event to the server
+first, and runs the start road under a `session.start` the server answers
+nothing for. So that one event answers nothing on a healthy cloud box, by
+design.
+
+| the event | what the silence means |
+|---|---|
+| `session.start` | the start road stands ready to run, and the server starts under it |
+| every other event | the bridge falls, or stands down |
+
+A chat line at the session start reads false on every healthy cloud start. So
+the line skips that event, and [[spec/tickets/the-session-says-its-cage]]
+carries the moment with its own block.
+
 **The change.** `down` says it where a person stands, beside the row it writes.
 
 | what changes | where |
 |---|---|
 | `down` writes one line through the harness log | `hooks/level0.js` |
+| that line skips `session.start`, which the start road follows | the same file |
 | the line names the health call and the two commands | the same file |
 | a helper wraps that write, because a harness carrying no such door throws | the same file |
+| the row of the answer table naming one `warn` line | the bridgehead chapter |
+| the paragraph naming the first event's silence | the start road chapter |
 
 The hook reaches the person through `$.ui.log`, the way the level one hook
 says its own lines. A harness offering no `$.ui` leaves the row in the session
 log, and nothing throws.
 
+**What `saidDown` holds.** It takes the answer of the session-log write today,
+so a box whose log write fails repeats the chat line at every event. The flag
+moves off that answer, and a failing row leaves the chat line paid.
+
 **The cases.** Each goes over a fake harness, so no door runs live.
 
 | the case | what it reads |
 |---|---|
-| the server answers nothing | one chat line naming the health call |
+| the server answers nothing at `session.start` | the row alone, and no chat line |
+| the server answers nothing at a later event | one chat line naming the health call |
 | the server answers nothing twice | one line, because `saidDown` holds it |
 | the server answers, then falls | a second line, because the answer clears the flag |
 | a harness carrying no `$.ui` | the row alone, and no throw |
+| a session-log write that fails | one chat line, because the flag stands off that answer |
 
 **The doctor.** The second line of the ask reads as met. `serverLine` answers
 `none at <the health call>` where nothing answers, and `doctor` prints it under
