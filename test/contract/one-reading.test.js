@@ -47,16 +47,17 @@ test("the guard hands nothing where no binary stands, and the path where one doe
 });
 
 // The line of done_when asking for a sweep the way the panel does. [[spec/tickets/a-claim-meets-the-view]]
-test("each front's own route answers one list over the whole tree", async () => {
+test("each front's own route answers one list over one file", async () => {
   assert.equal(typeof findings.linesNamed, "function", "the reader answers linesNamed");
   assert.equal(typeof reading.readingFor, "function", "the command line answers readingFor");
 
-  // The two sweeps run one after the other, because two Vale runs over one tree collide. One folder proves the contract, where the whole tree costs the battery a minute under load. [[spec/tickets/a-claim-meets-the-view]]
-  const folder = "spec/guidance";
-  const drawn = await findings.findingsFor(boxOf(root), `${findings.FINDINGS}?path=${folder}`);
-  const printed = await reading.readingFor([folder]);
+  // One file proves the contract, and the language server reads it once for both fronts, because a sweep over a folder costs the battery seconds and proves no more. [[spec/tickets/one-reading-proves-one-file]]
+  const file = "spec/guidance/working.md";
+  const served = serverFaults([file]) ?? [];
+  const drawn = await findings.findingsFor(boxOf(root), `${findings.FINDINGS}?path=${file}`);
+  const printed = await reading.readingFor([file], served);
 
-  const panel = findings.linesNamed([...drawn.found, ...(serverFaults([folder]) ?? [])]);
+  const panel = findings.linesNamed([...drawn.found, ...served]);
   const check = findings.linesNamed(printed.found);
 
   const alone = (one, other) => one.filter((row) => !other.includes(row));

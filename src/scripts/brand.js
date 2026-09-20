@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // The brand a vehicle stamps on itself. The install script runs this ahead of
-// every verb, so the marketplace name, its owner and the plugin's author each
-// answer the folder the tree stands in.
+// every verb, so both manifests and the icon come out of the brand folder with
+// the marketplace name, its owner and the plugin's author answering the folder
+// the tree stands in.
 // [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 
 import { dirname, join } from "node:path";
@@ -13,30 +14,29 @@ import {
 } from "../../.claude/skills/level0/lib/vehicle.js";
 import { disk } from "../doors/disk.js";
 
+export const BRAND = "spec/config/brand";
 export const MARKETPLACE = ".claude-plugin/marketplace.json";
 export const PLUGIN = ".claude/skills/level0/.claude-plugin/plugin.json";
-export const ICON_SOURCE = "spec/config/brand/icon.svg";
+export const ICON_SOURCE = `${BRAND}/icon.svg`;
 export const ICON_TARGET = "src/extension/icon.svg";
 
-// [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+// Each target reads its source in the brand folder, so a clone carrying no target gets one. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 export function stamps(files, root, brand) {
   const done = [];
-  for (const rel of [MARKETPLACE, PLUGIN]) {
-    const at = join(root, ...rel.split("/"));
-    const was = readIf(files, at);
-    if (was === null) continue;
-    const made = brandedJson(was, brand);
-    if (made === was) continue;
-    files.write(at, made);
-    done.push(rel);
-  }
-  const from = join(root, ...ICON_SOURCE.split("/"));
-  const to = join(root, ...ICON_TARGET.split("/"));
-  const icon = readIf(files, from);
-  if (icon !== null && icon !== readIf(files, to)) {
+  const targets = [
+    [MARKETPLACE, `${BRAND}/marketplace.json`, (text) => brandedJson(text, brand)],
+    [PLUGIN, `${BRAND}/plugin.json`, (text) => brandedJson(text, brand)],
+    [ICON_TARGET, ICON_SOURCE, (text) => text],
+  ];
+  for (const [rel, source, branded] of targets) {
+    const held = readIf(files, join(root, ...source.split("/")));
+    if (held === null) continue;
+    const to = join(root, ...rel.split("/"));
+    const made = branded(held);
+    if (made === readIf(files, to)) continue;
     files.makeDir(dirname(to));
-    files.write(to, icon);
-    done.push(ICON_TARGET);
+    files.write(to, made);
+    done.push(rel);
   }
   return done;
 }

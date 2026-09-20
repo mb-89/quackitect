@@ -31,7 +31,7 @@ src/yaml/yaml.exe
 # vehicle owns. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 src/extension/icon.svg
 
-# The install script stamps the brand into both manifests on every box, so
-# nobody authors them and git holds neither. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
+# The install script writes both manifests from spec/config/brand on every
+# box, with the brand stamped in, so git holds neither. [[spec/design_output/vehicle#the-brand-a-vehicle-stamps]]
 .claude-plugin/marketplace.json
 .claude/skills/level0/.claude-plugin/plugin.json

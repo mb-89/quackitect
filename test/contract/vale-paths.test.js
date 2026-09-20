@@ -58,8 +58,7 @@ test("every section of the config naming a folder opens on a double star", () =>
 });
 
 ifVale("a rationale reads the same by its absolute path as by its relative one", () => {
-  sameLines([join(root, RATIONALE)], [RATIONALE]);
-  sameLines([join(root, DESIGN)], [DESIGN]);
+  sameLines([join(root, RATIONALE), join(root, DESIGN)], [RATIONALE, DESIGN]);
 });
 
 const STYLES = "spec/config/styles";

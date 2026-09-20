@@ -226,10 +226,19 @@ a marketplace, so its `name` and its owner's name take the brand. A file
 carrying an `author` is a plugin, so its author takes the brand and its own
 name stands. A file carrying neither comes back as it stands.
 
-The extension's icon reads the brand folder. `spec/config/brand/icon.svg` is
-the mark a vehicle draws, and the install script writes it to the path
-`src/extension/package.json` names. Git ignores that target, so one icon
-stands. Two vehicles wear two marks, and nothing holds those two in step.
+Every target reads a source in the brand folder, `spec/config/brand`, and git
+ignores the targets alone:
+
+| source | target |
+|---|---|
+| `marketplace.json` | `.claude-plugin/marketplace.json` |
+| `plugin.json` | `.claude/skills/level0/.claude-plugin/plugin.json` |
+| `icon.svg` | the path `src/extension/package.json` names |
+
+So a fresh clone carries no target, and the stamp writes each one on the first
+run. A target reading the brand already stays as it is. The icon is the mark a
+vehicle draws, and two vehicles wear two marks, and nothing holds those two in
+step.
 
 ## Two roads to the vehicle
 

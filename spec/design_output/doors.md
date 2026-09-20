@@ -118,3 +118,24 @@ without a contract test. `check` runs it after the tests, before the rules.
 Other contract tests stand there too, because they drive a real thing as well.
 `vale.test.js` runs the rules through Vale itself, and `tree.test.js` reads the
 files this tree tracks.
+
+# A rule test spawns once
+
+A rule asserted against a stub is a rule nobody runs, so a case proving a
+rule reaches Vale. A case spawning the binary a line costs the battery a
+minute under load, and a red under that load names no cause. So one helper,
+`test/contract/ruled.js`, is the one place a rule test reaches Vale:
+
+| what a file does | what the helper does |
+|---|---|
+| declares each case with its texts at the top | writes every text under the path it names, each in a folder of its own |
+| reads the findings a text by key inside the case | runs Vale once over the folder, on the first case |
+| asks for the fixer | runs the fixer twice more over the folder, and reads each text back after each round |
+
+So a file spawns Vale once, or three times where it proves the fixer, and a
+case proves its rule off findings in memory. A text declared inside a case
+comes after that run, so the helper runs again for it.
+
+The helper reads the config's own sections too, with Vale's glob, where a star
+spans a slash. So a case proving a path stands off a rule reads the section
+that switches it off, and spawns nothing.

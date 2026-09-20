@@ -54,7 +54,8 @@ export function readThroughTheReader(found) {
 }
 
 // The command line's own reading, which `lint` prints and a case counts. [[spec/design_output/lsp#one-checker-every-front-asks]]
-export async function readingFor(where) {
+// The server's list comes in where a caller holds one already, so one reading of the server serves both fronts. [[spec/design_output/lsp#one-checker-every-front-asks]]
+export async function readingFor(where, served = serverFaults(where)) {
   // [[spec/design_output/lsp]]
   const got = await findingsOver(
     {
@@ -76,7 +77,7 @@ export async function readingFor(where) {
   const found = got.found;
 
   // [[spec/design_output/lsp#one-checker-every-front-asks]]
-  const said = serverFaults(where);
+  const said = served;
   if (said) found.push(...said);
 
   // [[spec/design_output/tree#when-the-sweep-runs]]

@@ -5,7 +5,7 @@
 
 import assert from "node:assert/strict";
 import { dirname } from "node:path";
-import { skip, test } from "node:test";
+import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import {
   allSchemasIn,
@@ -23,18 +23,16 @@ import {
   schemasIn,
 } from "../../.claude/skills/level0/lib/schema.js";
 import { treeOf } from "../../.claude/skills/level0/lib/tree.js";
-import { lintText } from "../../.claude/skills/level0/lib/vale.js";
 import { disk } from "../../src/doors/disk.js";
 import { git } from "../../src/doors/git.js";
 import { proc } from "../../src/doors/proc.js";
 import { PROCESSES } from "../../src/scripts/process.js";
-import { readTools, whereIs } from "../../src/engine/tools.js";
+import { at, rulesIn } from "./ruled.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
 const outside = proc();
-const bin = whereIs(files, root, "vale", readTools(files, root));
-const ifVale = files.exists(bin) ? test : skip;
+const { proves } = rulesIn(root);
 
 const here = treeOf({
   disk: files,
@@ -44,15 +42,6 @@ const here = treeOf({
   node: "",
 });
 const schemas = schemasIn(here);
-
-const run = async (argv, init = {}) =>
-  outside.run(argv, { ...init, cwd: init.cwd ?? root });
-
-const ruled = async (text, where) => {
-  const said = await lintText(text, where, { bin, run });
-  assert.ok(said.ran, `vale ran: ${said.why}`);
-  return said.found.map((one) => one.rule);
-};
 
 const PAST =
   "---\nkind: [[guidance]]\n---\n\n# Nothing\n\nThe tree was installed here.\n";
@@ -165,10 +154,17 @@ test("the guidance notes this tree ships hold the shape guidance names", () => {
 });
 
 // [[spec/design_output/schema#the-underscore-parks-a-draft]]
-ifVale("a draft parked under an underscore breaks no rule vale holds", async () => {
-  assert.deepEqual(await ruled(PAST, "spec/guidance/_probe.md"), []);
-  assert.ok(
-    (await ruled(PAST, "spec/guidance/probe.md")).length,
-    "the same text, named without the underscore, meets the rules",
-  );
-});
+proves(
+  "a draft parked under an underscore breaks no rule the styles hold",
+  {
+    parked: at(PAST, "spec/guidance/_probe.md"),
+    named: at(PAST, "spec/guidance/probe.md"),
+  },
+  (said) => {
+    assert.deepEqual(said.rules("parked"), []);
+    assert.ok(
+      said.rules("named").length,
+      "the same text, named without the underscore, meets the rules",
+    );
+  },
+);

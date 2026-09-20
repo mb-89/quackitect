@@ -1,5 +1,7 @@
-// The voice rules, through the real Vale. A rule asserted against a stub is a
-// rule nobody has run, so these cases spawn the binary and stand here.
+// The Vale door, and the voice rules through the real Vale. One case drives
+// the door against the binary and holds the fake to the same answer. The rule
+// cases read their findings off the one run the helper makes for this file,
+// because a rule asserted against a stub is a rule nobody has run.
 // [[spec/design_output/doors#one-contract-test-per-door]]
 
 import assert from "node:assert/strict";
@@ -7,237 +9,242 @@ import { dirname, join } from "node:path";
 import { skip, test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { NOBODY } from "../../.claude/skills/level0/lib/private.js";
-import { lintText } from "../../.claude/skills/level0/lib/vale.js";
-import { withoutFalsePast } from "../../src/engine/tense.js";
 import { disk } from "../../src/doors/disk.js";
+import { fakeDisk } from "../../src/doors/fake/disk.js";
+import { fakeProc } from "../../src/doors/fake/proc.js";
 import { proc } from "../../src/doors/proc.js";
-import { readTools, whereIs } from "../../src/engine/tools.js";
+import { vale } from "../../src/doors/vale.js";
+import { at, NOTE, rulesIn } from "./ruled.js";
 
 const root = dirname(dirname(dirname(fileURLToPath(import.meta.url))));
 const files = disk();
 const outside = proc();
-const bin = whereIs(files, root, "vale", readTools(files, root));
-const ifVale = files.exists(bin) ? test : skip;
+const { proves, stands } = rulesIn(root);
+const ifVale = stands ? test : skip;
 
-const run = async (argv, init = {}) =>
-  outside.run(argv, { ...init, cwd: init.cwd ?? root });
-
-const ruled = async (text) => {
-  const said = await lintText(text, "notes.md", { run, bin });
-  assert.ok(said.ran, `vale ran: ${said.why}`);
-  return withoutFalsePast(text, said.found).map((f) => f.rule);
-};
-
-// [[spec/funnel/a-paragraph-has-a-schema]]
-const saidOf = async (text, rule) => {
-  const said = await lintText(text, "notes.md", { run, bin });
-  assert.ok(said.ran, `vale ran: ${said.why}`);
-  return said.found.filter((one) => one.rule === rule).map((one) => one.message);
-};
-
+// The real run teaches the fake, so the door answers the same through both. [[spec/design_output/doors#one-contract-test-per-door]]
 ifVale(
-  "a shouted lead is refused and an acronym inside a sentence passes",
+  "the door stands where the binary is, reads a text under its path, and the fake answers the same",
   async () => {
-    assert.ok(
-      (await ruled("THIS IS THE SHOUTED PART, and it follows.")).includes(
-        "ShoutedLead",
-      ),
+    const taught = {};
+    const recording = {
+      run: (argv, init) => {
+        const said = outside.run(argv, init);
+        taught[argv.join(" ")] = said;
+        return said;
+      },
+    };
+    const door = vale(files, recording, root);
+    assert.equal(door.stands(), true);
+
+    const text = "THIS IS THE SHOUTED PART, and it follows.\n";
+    const said = await door.lint(text, NOTE);
+    assert.equal(said.ran, true, said.why);
+    assert.deepEqual(
+      said.found.map((one) => one.rule),
+      ["ShoutedLead"],
     );
-    assert.ok(
-      !(await ruled("The engine reads SQLite and answers JSON.")).includes(
-        "ShoutedLead",
-      ),
-    );
+
+    const twin = vale(files, fakeProc(taught), root);
+    assert.deepEqual(await twin.lint(text, NOTE), said);
   },
 );
 
-ifVale("antithesis is refused", async () => {
-  assert.ok((await ruled("It is a door rather than a window.")).includes("Antithesis"));
+test("a box with no binary reads no rule, and says so", async () => {
+  const door = vale(fakeDisk(), fakeProc(), "/tree");
+  assert.equal(door.stands(), false);
+  assert.deepEqual(await door.lint("A line.\n", NOTE), {
+    ran: false,
+    why: "no vale stands here",
+    found: [],
+  });
+});
+
+proves(
+  "a shouted lead is refused and an acronym inside a sentence passes",
+  {
+    shouted: "THIS IS THE SHOUTED PART, and it follows.",
+    acronym: "The engine reads SQLite and answers JSON.",
+  },
+  (said) => {
+    assert.ok(said.rules("shouted").includes("ShoutedLead"));
+    assert.ok(!said.rules("acronym").includes("ShoutedLead"));
+  },
+);
+
+proves("antithesis is refused", { it: "It is a door rather than a window." }, (said) => {
+  assert.ok(said.rules("it").includes("Antithesis"));
 });
 
 // A marker places a claim in a tree that stands no more, and the rationales own that telling. [[spec/design_output/lsp#a-marker-carries-old-news]]
-ifVale("a history marker is refused and the standing claim passes", async () => {
-  assert.ok((await ruled("The door used to read the config.")).includes("History"));
-  assert.ok((await ruled("The door previously names the file.")).includes("History"));
-  assert.ok(!(await ruled("The door reads the config.")).includes("History"));
-});
-
-ifVale("the passive is refused and the active passes", async () => {
-  assert.ok((await ruled("The file was written by the engine.")).includes("Passive"));
-  assert.ok(!(await ruled("The engine writes the file.")).includes("Passive"));
-});
-
-ifVale("a paragraph over six sentences is refused and six pass", async () => {
-  const said = (n) =>
-    Array.from({ length: n }, (_, i) => `Sentence number ${i} stands here.`).join(" ");
-  assert.ok((await ruled(said(7))).includes("Paragraph"));
-  assert.ok(!(await ruled(said(6))).includes("Paragraph"));
-});
-
-ifVale("a sentence over the word limit is refused", async () => {
-  const long = `The engine ${"and the reader ".repeat(12)}meet here.`;
-  assert.ok((await ruled(long)).includes("Sentence"));
-});
-
-ifVale("the past tense is refused, and the words this tree means pass", async () => {
-  assert.ok(
-    (await ruled("Somebody wrote the note and finished the work.")).includes(
-      "PastTense",
-    ),
-    "a real past tense fires",
-  );
-
-  const quiet = async (text) => {
-    const found = await ruled(text);
-    assert.ok(!found.includes("PastTense"), `${text} answers ${found.join(", ")}`);
-  };
-
-  await quiet("The gate answers red where a test skips a case.");
-  await quiet("The verb buys one place, and a reader read what he held.");
-  await quiet("The rule holds its bound, and a numbered note stands.");
-  await quiet("A settled question waits, and a complicated one waits longer.");
-  await quiet("A rule the table switched off leaves a refused write behind.");
-});
-
-ifVale("a table and a list are not paragraphs", async () => {
-  assert.deepEqual(await ruled("| a | b |\n| - | - |\n"), []);
-  assert.deepEqual(await ruled("- one\n- two\n"), []);
-});
-
-ifVale("fenced code carries none of these rules", async () => {
-  assert.deepEqual(
-    await ruled("```\nTHIS IS SHOUTED CODE, and it is left alone.\n```\n"),
-    [],
-  );
-});
-
-ifVale("a contraction and a Latin short form are refused", async () => {
-  const said = await ruled("The engine doesn't stop, e.g. here.");
-  assert.ok(said.includes("Contraction"));
-  assert.ok(said.includes("Latin"));
-});
-
-const answered = async (text) => {
-  const said = await lintText(text, "answer.md", { run, bin });
-  assert.ok(said.ran, `vale ran: ${said.why}`);
-  return said.found.map((f) => f.rule);
-};
-
-ifVale(
-  "a heading opens a fresh prose budget, and a third paragraph breaks it",
-  async () => {
-    const two = "- The bottom line.\n\n# One\n\nA paragraph.\n\nA second paragraph.\n";
-    assert.ok(!(await answered(two)).includes("ShapeAnswer"));
-
-    const across = `${two}\n# Two\n\nA paragraph.\n\nA second paragraph.\n`;
-    assert.ok(!(await answered(across)).includes("ShapeAnswer"));
-
-    const three = `${two}\nA third paragraph.\n`;
-    assert.ok((await answered(three)).includes("ShapeAnswer"));
+proves(
+  "a history marker is refused and the standing claim passes",
+  {
+    usedTo: "The door used to read the config.",
+    previously: "The door previously names the file.",
+    standing: "The door reads the config.",
+  },
+  (said) => {
+    assert.ok(said.rules("usedTo").includes("History"));
+    assert.ok(said.rules("previously").includes("History"));
+    assert.ok(!said.rules("standing").includes("History"));
   },
 );
 
-const inRegister = async (text, where) => {
-  const said = await lintText(text, where, { run, bin });
-  assert.ok(said.ran, `vale ran: ${said.why}`);
-  return said.found.map((f) => f.rule);
-};
+proves(
+  "the passive is refused and the active passes",
+  {
+    passive: "The file was written by the engine.",
+    active: "The engine writes the file.",
+  },
+  (said) => {
+    assert.ok(said.rules("passive").includes("Passive"));
+    assert.ok(!said.rules("active").includes("Passive"));
+  },
+);
+
+proves(
+  "a table and a list are not paragraphs",
+  { table: "| a | b |\n| - | - |\n", list: "- one\n- two\n" },
+  (said) => {
+    assert.deepEqual(said.rules("table"), []);
+    assert.deepEqual(said.rules("list"), []);
+  },
+);
+
+proves(
+  "fenced code carries none of these rules",
+  { fenced: "```\nTHIS IS SHOUTED CODE, and it is left alone.\n```\n" },
+  (said) => {
+    assert.deepEqual(said.rules("fenced"), []);
+  },
+);
+
+const BINDS = "- The door shall refuse the write, and it should name the rule.\n";
+const INPUT = "spec/design_input/one.md";
 
 // [[spec/funnel/a-paragraph-has-a-schema]]
-ifVale(
+proves(
   "the requirement register takes shall and should, and no other does",
-  async () => {
-    const binds = "- The door shall refuse the write, and it should name the rule.\n";
-    assert.deepEqual(await inRegister(binds, "spec/design_input/one.md"), []);
-
-    for (const where of ["notes.md", "spec/design_output/one.md"]) {
-      const found = await inRegister(binds, where);
-      assert.ok(found.includes("Modal"), `${where} refuses shall and should`);
-    }
+  {
+    input: at(BINDS, INPUT),
+    note: BINDS,
+    output: at(BINDS, "spec/design_output/one.md"),
+  },
+  (said) => {
+    assert.deepEqual(said.rules("input"), []);
+    for (const key of ["note", "output"])
+      assert.ok(said.rules(key).includes("Modal"), `${key} refuses shall and should`);
   },
 );
 
-ifVale("the register outside the set stands refused inside it too", async () => {
-  const loose = "- The door may refuse the write, and it would say why.\n";
-  const found = await inRegister(loose, "spec/design_input/one.md");
-  assert.ok(found.includes("ModalRequirement"));
-  assert.ok(!found.includes("Modal"), "one modal rule reads a path, and one alone");
-});
+proves(
+  "the register outside the set stands refused inside it too",
+  { loose: at("- The door may refuse the write, and it would say why.\n", INPUT) },
+  (said) => {
+    assert.ok(said.rules("loose").includes("ModalRequirement"));
+    assert.ok(
+      !said.rules("loose").includes("Modal"),
+      "one modal rule reads a path, and one alone",
+    );
+  },
+);
 
 // [[spec/design_output/private#a-fixture-carries-no-shape]]
 const SECRETS = ["/home", "fnordwick", "secrets"].join("/");
 const CALLED = ["+49 30", "1234 5678"].join(" ");
 
 // [[spec/design_output/private#the-shapes]]
-ifVale(
+proves(
   "the shapes rule refuses an address, a number, a date and a home path",
-  async () => {
-    for (const said of [
-      "Reach the owner at somebody@example.com when the box stalls.",
-      `Call ${CALLED} about it, and say what stalls.`,
-      "Measured on 2026-09-10 against client 2.1.267, on a cloud box.",
-      `The probe writes under ${SECRETS} and reads it back.`,
-      "A box answers C:\\Users\\fnordwick\\Desktop as the home folder there.",
-    ]) {
-      assert.ok((await ruled(said)).includes("Private"), said);
-    }
+  [
+    "Reach the owner at somebody@example.com when the box stalls.",
+    `Call ${CALLED} about it, and say what stalls.`,
+    "Measured on 2026-09-10 against client 2.1.267, on a cloud box.",
+    `The probe writes under ${SECRETS} and reads it back.`,
+    "A box answers C:\\Users\\fnordwick\\Desktop as the home folder there.",
+  ],
+  (said) => {
+    for (const key of [0, 1, 2, 3, 4])
+      assert.ok(said.rules(key).includes("Private"), said.text(key));
   },
 );
 
-ifVale("a nobody user, a version and an example pass the shapes rule", async () => {
-  for (const said of [
+proves(
+  "a nobody user, a version and an example pass the shapes rule",
+  [
     "A cloud box writes under /home/user, and a fixture writes /Users/one.",
     "A runner writes under /home/runner, and an agent under /home/claude.",
     "Client 2.1.267 stands the same way, and the number 1024 passes.",
     `    the indented example: 2026-09-08 and ${SECRETS}\n`,
-  ]) {
-    assert.ok(!(await ruled(said)).includes("Private"), said);
-  }
-});
-
-// [[spec/funnel/a-paragraph-has-a-schema]]
-ifVale("a word the list leaves out is refused, and the refusal names it", async () => {
-  const said = await saidOf("The door refuses a flibbertigibbet.", "Vocabulary");
-  assert.equal(said.length, 1);
-  assert.match(said[0], /^flibbertigibbet stands outside the words this tree writes/);
-  assert.match(said[0], /terms\.yml/);
-});
-
-// [[spec/funnel/a-paragraph-has-a-schema]]
-ifVale("a word the list swaps is refused, and the refusal names the swap", async () => {
-  assert.deepEqual(await saidOf("The door utilize the list.", "Vocabulary"), [
-    "utilize stands outside the words this tree writes. Write use instead.",
-  ]);
-});
-
-// [[spec/funnel/a-paragraph-has-a-schema]]
-ifVale(
-  "the words this tree writes pass, and so does what stands outside a layer",
-  async () => {
-    for (const said of [
-      "The door refuses a write, and the writer reads the refusal.",
-      "A run of doors reads the rules, and the rules stand in one folder.",
-      "The tree writes `flibbertigibbet` in a code span, so the rule reads past it.",
-      "A path like spec/vocabulary/words.yml stands outside the layer.",
-      "The owner reads [[spec/funnel/a-paragraph-has-a-schema]] first.",
-      "A capital past the first word names Flibbertigibbet, so it stands.",
-      "The door reads 2048 bytes and the rule passes over a digit.",
-    ]) {
-      assert.deepEqual(await saidOf(said, "Vocabulary"), [], said);
-    }
+  ],
+  (said) => {
+    for (const key of [0, 1, 2, 3])
+      assert.ok(!said.rules(key).includes("Private"), said.text(key));
   },
 );
 
 // [[spec/funnel/a-paragraph-has-a-schema]]
-ifVale("a plural, a past form and an -ing form of a listed word stand", async () => {
-  for (const said of [
+const saidOf = (said, key, rule) =>
+  said
+    .found(key)
+    .filter((one) => one.rule === rule)
+    .map((one) => one.message);
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+proves(
+  "a word the list leaves out is refused, and the refusal names it",
+  { it: "The door refuses a flibbertigibbet." },
+  (said) => {
+    const found = saidOf(said, "it", "Vocabulary");
+    assert.equal(found.length, 1);
+    assert.match(found[0], /^flibbertigibbet stands outside the words this tree writes/);
+    assert.match(found[0], /terms\.yml/);
+  },
+);
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+proves(
+  "a word the list swaps is refused, and the refusal names the swap",
+  { it: "The door utilize the list." },
+  (said) => {
+    assert.deepEqual(saidOf(said, "it", "Vocabulary"), [
+      "utilize stands outside the words this tree writes. Write use instead.",
+    ]);
+  },
+);
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+proves(
+  "the words this tree writes pass, and so does what stands outside a layer",
+  [
+    "The door refuses a write, and the writer reads the refusal.",
+    "A run of doors reads the rules, and the rules stand in one folder.",
+    "The tree writes `flibbertigibbet` in a code span, so the rule reads past it.",
+    "A path like spec/vocabulary/words.yml stands outside the layer.",
+    "The owner reads [[spec/funnel/a-paragraph-has-a-schema]] first.",
+    "A capital past the first word names Flibbertigibbet, so it stands.",
+    "The door reads 2048 bytes and the rule passes over a digit.",
+  ],
+  (said) => {
+    for (const key of [0, 1, 2, 3, 4, 5, 6])
+      assert.deepEqual(saidOf(said, key, "Vocabulary"), [], said.text(key));
+  },
+);
+
+// [[spec/funnel/a-paragraph-has-a-schema]]
+proves(
+  "a plural, a past form and an -ing form of a listed word stand",
+  [
     "The door refuses a write, and the doors refused it.",
     "The door is refusing a write, and the writer stands waiting.",
     "The rules carry the tries a session tried.",
-  ]) {
-    assert.deepEqual(await saidOf(said, "Vocabulary"), [], said);
-  }
-});
+  ],
+  (said) => {
+    for (const key of [0, 1, 2])
+      assert.deepEqual(saidOf(said, key, "Vocabulary"), [], said.text(key));
+  },
+);
 
 test("the shapes rule and the commit door pass one list of nobody users", () => {
   const rule = files.read(join(root, "spec/config/styles/VoiceVale/Private.yml"));
@@ -247,27 +254,35 @@ test("the shapes rule and the commit door pass one list of nobody users", () => 
   assert.deepEqual(names.sort(), [...NOBODY].sort());
 });
 
+const DESIGN = "spec/design_output/probe.md";
+const BARE = "The verb exits 0 on survives.\n";
+
 // [[spec/design_output/config#the-magic-numbers-take-names]]
-ifVale(
+proves(
   "a digit in a design note's prose is refused, and a version, a unit and a table pass",
-  async () => {
-    const note = "spec/design_output/probe.md";
-    const bare = "The verb exits 0 on survives.\n";
-    assert.ok((await inRegister(bare, note)).includes("DigitInProse"));
-    const quiet = [
-      "Measured against client 2.1.267, a poll every 250 ms stands, and x86 ships.",
-      "",
-      "| what | count |",
-      "|---|---|",
-      "| events | 186 |",
-      "",
-      "1. The verb exits `0` on survives.",
-      "",
-    ].join("\n");
+  {
+    bare: at(BARE, DESIGN),
+    quiet: at(
+      [
+        "Measured against client 2.1.267, a poll every 250 ms stands, and x86 ships.",
+        "",
+        "| what | count |",
+        "|---|---|",
+        "| events | 186 |",
+        "",
+        "1. The verb exits `0` on survives.",
+        "",
+      ].join("\n"),
+      DESIGN,
+    ),
+    note: BARE,
+  },
+  (said) => {
+    assert.ok(said.rules("bare").includes("DigitInProse"));
     assert.deepEqual(
-      (await inRegister(quiet, note)).filter((one) => one === "DigitInProse"),
+      said.rules("quiet").filter((one) => one === "DigitInProse"),
       [],
     );
-    assert.ok(!(await inRegister(bare, "notes.md")).includes("DigitInProse"));
+    assert.ok(!said.rules("note").includes("DigitInProse"));
   },
 );
