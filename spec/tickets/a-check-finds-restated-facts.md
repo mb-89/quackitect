@@ -89,12 +89,18 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
     hash_before: e2e77e89159f57d7cf228ad1a44cbd910c6959ea
     hash_after: e2e77e89159f57d7cf228ad1a44cbd910c6959ea
+  - step: design/review
+    hand: box 5387e4f82b24 · claude-code-remote · helper-2
+    hash_before: 6a13ae8d7f28100b1d965bdbe2a123cb63564677
+    hash_after: 6a13ae8d7f28100b1d965bdbe2a123cb63564677
+    returns: 1
+    why: "The call site sits where a named path skips it. [[spec/design_output/tree#when-the-sweep-runs]]; `./RUNME.sh lint spec` runs Vale alone, and the ask wants that verb to name every place.; Name the file holding `restatedFaults`, because `tree.js` stands near the ceiling `code.fileLines` sets.; Name each bound's key, and its entry in `spec/config/level0.schema.json`, which every control takes.; The script rule blanks inside the projection, so name the JavaScript this rule blanks with.; Say which reading Vale keeps, because a paragraph against its own table reads one buffer."
 ---
 
 # Ask
@@ -154,6 +160,15 @@ fault standing behind a green check.
 <!-- pass or fail, with findings one a line -->
 
 <!-- the form is verdict -->
+
+fail
+
+- The call site sits where a named path skips it. [[spec/design_output/tree#when-the-sweep-runs]]
+- `./RUNME.sh lint spec` runs Vale alone, and the ask wants that verb to name every place.
+- Name the file holding `restatedFaults`, because `tree.js` stands near the ceiling `code.fileLines` sets.
+- Name each bound's key, and its entry in `spec/config/level0.schema.json`, which every control takes.
+- The script rule blanks inside the projection, so name the JavaScript this rule blanks with.
+- Say which reading Vale keeps, because a paragraph against its own table reads one buffer.
 
 # implement
 
