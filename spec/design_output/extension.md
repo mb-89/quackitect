@@ -407,8 +407,8 @@ answer as the widget falling back to rest.
 | `short` | any reply |
 | `full` | a reply in the shape of `spec/config/status.yaml` |
 
-A reply written as chat text between calls reaches no hook until the turn
-ends, so the tool is the road. For details, see
+The tool carries the reply into the log, and the chat carries it to the owner.
+Each road pays the ask on its own. For details, see
 [[spec/design_output/level0#what-the-door-reads]].
 
 The shape stands in `spec/config/status.yaml`: each chapter a heading with text

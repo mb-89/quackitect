@@ -974,8 +974,8 @@ delivery receipts, so a door reading it bites the wrong turn.
 
 The refusal opens with the demand. The rest is the rule in its own words, and
 a refusal quoting the rule teaches it better than a refusal naming it. `SAYS`
-in `.claude/skills/level0/lib/answer.js` holds these words, and a case over it
-keeps the two together.
+in `.claude/skills/level0/lib/answer.js` holds these words, and a case there
+asserts each line of them.
 
 ## Where it must not bite
 
