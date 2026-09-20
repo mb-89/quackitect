@@ -13,3 +13,10 @@ rationale: [[spec/rationales/collecting]]
 5. Write a file a session throws away under `.se/.runtime`, and the log under `.se/.log`. *
 6. Name every refused line of the manifest, and move that file by hand before the next step.
 7. Add `--again` where notes land after a collect, and the verb merges the new files into the same input.
+
+# Examples
+
+| the rule | do | do not |
+|---|---|---|
+| 2 | the input folder alone | a source from outside it |
+| 4 | the writer fixed where a stray file stands | the stray file moved by hand |

@@ -17,3 +17,10 @@ rationale: [[spec/rationales/reviewing]]
 9. Hand the report back as a list of fixes, and merge once every fix lands. *
 10. Run `./RUNME.sh branch review <name>` to gather all of this from git.
 11. Grade each question a return names as design or craft, and hand a craft one back to the drafter.
+
+# Examples
+
+| the rule | do | do not |
+|---|---|---|
+| 5 | a rule and the test that fires it | a rule with no test |
+| 6 | a bad note, and an assert on the refusal | a test asserting nothing |

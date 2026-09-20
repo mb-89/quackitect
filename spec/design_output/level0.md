@@ -908,6 +908,15 @@ handover and the canary arrive.
 The system prompt's sections stay free for guidance that depends on where the
 work stands.
 
+## The examples ride the rules
+
+A guidance note's `Examples` table follows its rules into every block the
+rules reach. That is the standing layer, a helper's prompt, a kind's layer and
+the output style. `rulesOf` in `lib/guidance.js` writes the numbered rules and
+the table under them, so every reader carries one shape. The canary counts the
+rules alone, because a row shows a rule and adds none.
+[[spec/guidance/guidance]]
+
 ## The style carries a note
 
 The client sends an output style with every request and reminds the model of

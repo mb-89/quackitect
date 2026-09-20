@@ -19,3 +19,11 @@ style: true
 10. Check that two scales share an axis before you map one onto the other. *
 11. Say what makes a claim wrong, beside the claim. *
 12. Cut the opening praise, the apology and the closing offer. Answer, and stop. *
+
+# Examples
+
+| the rule | do | do not |
+|---|---|---|
+| 2 | unchecked, and the log line backs it | a claim stated as fact from memory |
+| 10 | both counts over the same span, then the compare | a rate against a total |
+| 12 | the answer, then the stop | great question, sorry, let me know |

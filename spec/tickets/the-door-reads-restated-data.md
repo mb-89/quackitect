@@ -1,6 +1,6 @@
 ---
 kind: [[ticket]]
-state: open
+state: closed
 steps:
   - name: do
     does: makes the change, with the test that covers it
@@ -26,6 +26,19 @@ steps:
 process: [[spec/processes/trivial]]
 process_hash: 05e53b89dab63152
 step: do
+record:
+  - step: do
+    hand: box d63b7e1e39f90 · claude-code
+    hash_before: bc30bd9fa93047321a473e0020ada096bad75233
+    hash_after: e9a8fb3bf92fce873418b299835b4fc60b381488
+    answered:
+      - name: tests
+        exit: 0
+        said: green, 52 test(s) pass in 3 file(s)
+      - name: check
+        exit: 0
+        said: 189 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+reason: done
 ---
 
 # Ask
@@ -38,15 +51,11 @@ The write door refuses prose that says again what the structured data beside it 
 
 ## tests
 
-```
-node --test test/level0/ticket.test.js test/level0/write.test.js test/contract/vale.test.js
-```
+./RUNME.sh branch test test/level0/ticket.test.js test/level0/write.test.js test/contract/vale.test.js
 
 ## check
 
-```
 ./RUNME.sh check
-```
 
 ## says
 

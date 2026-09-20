@@ -22,3 +22,17 @@ style: true
 13. Open an answer with a table of the questions the prompt asks, then the TL;DR list. `^`
 14. Close an answer ending on a stop call with the numbered table What the agent needs. `^`
 15. Write a core word, or a term a note defines. Add a term with its note, and add no jargon. [[spec/vocabulary/terms.yml]]
+
+# Examples
+
+| the rule | do | do not |
+|---|---|---|
+| 1 | the door refuses a write past the cap | the door does not take everything |
+| 6 | run the verb, then read its last line | the history of why the verb exists |
+| 7 | a note states a number once, and every other note links to it | two notes each carrying the same rule in their own words |
+| 7 | a pointer at the note owning the mechanism | an aside explaining a door another note owns |
+| 7 | | a rule restated in a design note beside its link |
+| 8 | the lint verb counts the warnings | the tree holds forty warnings |
+| 9 | the list stands, and the sentence above it says what the reader does with it | a sentence before a list saying how many items the list holds |
+| 9 | the group's ask says what the group adds up to | a group's ask naming its members or their count |
+| 9 | | a sentence saying two notes link where the link stands |

@@ -57,6 +57,13 @@ body:
         order: strict
         description: one chapter per marked item
 
+    - header: Examples
+      required: false
+      table:
+        heads: [the rule, do, do not]
+        namesOf: Actionables
+      description: rows naming a rule each
+
     - header: What stands open
       position: last
       required: true
@@ -90,6 +97,15 @@ Why it stands.
 # What stands open
 
 Nothing waits.
+`;
+
+export const shown = `# Examples
+
+| the rule | do | do not |
+|---|---|---|
+| 1 | do the first thing | leave it |
+| 2 | do the second thing | leave it |
+
 `;
 
 export const found = (text) => checkNote(text, SCHEMA, NOTE);

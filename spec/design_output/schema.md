@@ -178,6 +178,7 @@ These keywords answer a finding today:
 | `list`, `ordered` | prose where a numbered list belongs |
 | `maxItems` | one item past the cap |
 | `subsections` | a chapter opening with no number, or numbers running back |
+| `table` | a chapter holding no table, other heads, or a row naming no item of the list it follows |
 | `x-one-per` | a chapter missing for a step, or a chapter naming no step |
 | `x-names` | a value naming no entry of the list it points at |
 | `x-earlier` | a value naming an entry at or after its own |
@@ -274,9 +275,25 @@ note it names:
 | one heading per chapter | `body.sections[].header` |
 | the description under each, as a comment | `description` |
 | one item, where a chapter holds a list | `list`, `ordered` |
+| the head row and one row, where a chapter holds a table | `table` |
 
 The checker passes every note mint writes, and a contract test asserts that
 over every kind a schema describes.
+
+# A chapter holds a table
+
+A chapter naming `table` holds one, and `lib/schema-table.js` reads it:
+
+| the key | what the checker asks |
+|---|---|
+| `heads` | the first row carries these cells, in this order |
+| `namesOf` | each row opens with the number of an item of the chapter it names, and the numbers run up |
+
+The guidance schema puts an `Examples` table under the rules this way. A rule
+takes the rows the tree sees it fail, so one rule takes several and another
+none. A row naming a rule the note lacks comes back at the write door. The
+projection carries the table under the rules. For details, see
+[[spec/design_output/level0#the-examples-ride-the-rules]].
 
 # The render follows the tree
 

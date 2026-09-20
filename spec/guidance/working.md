@@ -21,3 +21,14 @@ rationale: [[spec/rationales/working]]
 13. Change many lines or files with `mcp__level0__patch` and `mcp__level0__replace`, and one spot with Edit.
 14. One place owns a thing, and every other place points at it. Search for the owner before you write, and where one stands, write the pointer. This holds over a note, a number, a rule, a name and a line of code alike. *
 15. Assert nothing about a thing you leave alone. A reader wants what they act on. So cut the aside describing another's mechanism, and point at the note owning it. *
+
+# Examples
+
+| the rule | do | do not |
+|---|---|---|
+| 1 | a line of text, then the tool call | three tool calls, then the answer |
+| 3 | the step you name, in the same turn | a turn ending on a step named as next |
+| 5 | a stop where a discussion opens | a stop to ask whether to run the tests |
+| 7 | the assumption named, then the work goes on | a design built with no read of the design input |
+| 14 | a pointer at the note owning the number | the number copied into a second note |
+| 15 | a pointer at the note owning the mechanism | an aside explaining a door you leave untouched |

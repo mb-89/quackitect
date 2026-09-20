@@ -24,3 +24,13 @@ rationale: [[spec/rationales/cloud]]
 13. Run `./RUNME.sh branch done` last, and stop at the push. It sets the standing the next box reads.
 14. Work one branch a session, and leave the next branch to the next session. A second branch buries the first in one review. *
 15. Say which commit you stand on, and whether it matches origin. This box reports itself current while somebody pushes past it. *
+
+# Examples
+
+| the rule | do | do not |
+|---|---|---|
+| 5 | a commit and a push per finished thing | a day's work in the working tree |
+| 9 | the branch at done, then the push | a branch standing mid-step |
+| 11 | the check green, whoever breaks it | a hand-back on a red check |
+| 14 | one branch, then the session ends | a second branch after the first |
+| 15 | the commit and whether origin matches | current, naming no commit |

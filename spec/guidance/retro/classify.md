@@ -20,3 +20,11 @@ rationale: [[spec/rationales/classifying]]
 12. Name a fix a ticket plans already by that ticket, and mint no second one. *
 13. Name what this retro reads nowhere, and why, under limits. *
 14. Ask one level above the classes which question catches a whole family, and add it to the checklist. *
+
+# Examples
+
+| the rule | do | do not |
+|---|---|---|
+| 9 | a ticket per class, after the owner reads | a mint before the owner reads |
+| 11 | a search of the tree before the judgment | a judgment from the note's text alone |
+| 12 | the name of the standing ticket | a second ticket for the same fix |

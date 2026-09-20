@@ -272,7 +272,7 @@ the folder of notes and writes one file:
 | `from` | a folder, and the reads list every note at its top |
 | the flag | `style` in the note's frontmatter, and `guidance.schema.yaml` admits it |
 | the file | `level0.md`, with the name, a description and `keep-coding-instructions: true` |
-| the body | the Actionables of every note carrying the flag, under a heading naming the note |
+| the body | the Actionables of every note carrying the flag, under a heading naming the note, and its Examples table under them |
 
 `.claude/settings.json` selects the style by name, so every clone reads it.
 The session's standing block drops a note carrying the flag, because the
