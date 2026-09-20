@@ -57,6 +57,9 @@ door in this tree already answers:
 `line()` in `lib/refuse.js` prints one. `pathInScript` in `lib/scripts.js`
 answers the same shape.
 
+`sorted` in `src/lsp/finding.go` puts every list in one order: the file, the
+line, then the rule.
+
 A finding names a file that stands on disk, so the panel opens it. A rule with
 no line to point at answers the first line. A rule that finds the key at fault
 answers the line holding it.

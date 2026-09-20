@@ -33,16 +33,16 @@ func TestEveryPointerResolvesRefusesANoteNobodyWrote(t *testing.T) {
 	}
 }
 
-// A reads line of a process file is a pointer a reader follows, and a value opening on a word is prose. [[spec/design_output/lsp#every-pointer-resolves]]
+// A pointer in a process file is one a reader follows, on a reads line or in a checklist item alike. [[spec/design_output/lsp#every-pointer-resolves]]
 func TestEveryPointerResolvesReadsAProcessFileWhole(t *testing.T) {
 	tree := fixture(t, map[string]string{
 		"spec/guidance/voice.md":       "# Actionables\n",
-		"spec/processes/standard.yaml": "steps:\n  - name: design\n    reads: [[[spec/guidance/voice]], [[spec/guidance/voice]]]\n  - name: implement\n    reads: [[spec/guidance/code/testing]]\n    says: a link, [[wiki]] or [text](target)\n",
+		"spec/processes/standard.yaml": "steps:\n  - name: design\n    reads: [[[spec/guidance/voice]], [[spec/guidance/voice]]]\n  - name: implement\n    reads: [[spec/guidance/code/testing]]\n    says: a link, [[<wiki>]] or [text](target)\n    checklist:\n      - the code follows [[spec/guidance/code/code]]\n",
 	})
 
-	found := onlyOne(t, everyPointerResolves(tree), EveryPointerResolves)
-	if found.File != "spec/processes/standard.yaml" || found.Line != 5 {
-		t.Fatalf("the finding names the reads line, and it answers %+v", found)
+	found := everyPointerResolves(tree)
+	if len(found) != 2 || found[0].Line != 5 || found[1].Line != 8 {
+		t.Fatalf("the findings name the reads line and the checklist item, and they answer %+v", found)
 	}
 }
 
@@ -83,7 +83,8 @@ func TestEveryPointerResolvesSkipsAQuotedShape(t *testing.T) {
 			"Write `[[spec/nowhere]]` in a span, or [[<name>]] as a placeholder.\n\n" +
 			"```\n[[spec/nowhere#in-a-fence]]\n```\n\n" +
 			"    kind: [[nowhere-indented]]\n",
-		"src/one.js": "const at = \"[[spec/nowhere#in-a-string]]\";\n",
+		"src/one.js":          "const at = \"[[spec/nowhere#in-a-string]]\";\n",
+		"spec/config/one.yml": "    if text.contains(t, \"[[\") && text.contains(t, \"]]\") { return true }\n",
 	})
 
 	if found := everyPointerResolves(tree); len(found) != 0 {

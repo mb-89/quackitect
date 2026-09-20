@@ -79,6 +79,29 @@ func (one *Checker) restatedAll() []Finding {
 	})
 }
 
+// Every rule over the whole tree, which the sweep runs. [[spec/design_output/tree#what-a-rule-answers]]
+var Rules = []func(*Tree) []Finding{
+	settingsNameBinaries,
+	editorDrawsWriteRules,
+	biomeOnWindows,
+	extensionsOnOffer,
+	noLogDeleted,
+	nameHoldsTheWords,
+	nothingPrivateTravels,
+	surveyNamesInstalls,
+	surveyFindsNode,
+	everyPointerResolves,
+}
+
+// [[spec/design_output/tree#what-a-rule-answers]]
+func treeFaults(tree *Tree) []Finding {
+	out := []Finding{}
+	for _, rule := range Rules {
+		out = append(out, rule(tree)...)
+	}
+	return out
+}
+
 // [[spec/design_output/lsp#one-checker-every-front-asks]]
 func (one *Checker) Sweep() []Finding {
 	one.tree.Forgets()

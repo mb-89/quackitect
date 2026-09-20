@@ -208,11 +208,11 @@ refuses it, and the panel draws it under the line.
 |---|---|
 | a note's frontmatter | every key but `kind`, which names a taxonomy and no file |
 | a note's body | every line outside a code span, a fenced block and an indented block |
-| a yaml file | a value opening on a bracket, because a `reads` line there is a pointer a reader follows, and a value opening on a word is prose or a script |
+| a yaml file | every line outside a code span, because a `reads` line and a checklist item there are pointers a reader follows |
 | any other text file | the comment on a line, from where it opens |
 
-A target carrying `<` or `>` is a shape a document spells out, and reads as no
-pointer.
+A target carrying `<` or `>` is a shape a document spells out, and one carrying
+a quote or a bracket is a script guarding the shape. Neither reads as a pointer.
 
 A pointer resolves the way the index resolves a link, and then one step
 further. The file is the exact path, the path with `.md`, `.yaml` or `.yml` on

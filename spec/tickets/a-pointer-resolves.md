@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -164,6 +164,10 @@ record:
     hash_after: c6321ec33d2686ccbed6ad875304888878d1ead2
     returns: 2
     why: "The rule, its six cases, the row in `Rules`, the per-file check and the repointed tree do what the ask calls for.; Each fix the last round named landed: both files format clean under `spec/config/biome.json`, the Finding chapter is gone and `finding.go` points at the tree note, the row names `src/lsp/pointer.go`, and the rule reads a yaml value opening on a bracket, with a case.; Fed the tree a pointer at a chapter nobody wrote, and `./RUNME.sh lint` answers 1 with one `EveryPointerResolves` error naming the file and the line.; `./RUNME.sh check` on the branch answers 0, with 28 warnings: 22 in this ticket, 3 in the server note's new chapters, 3 in other tickets that stood before.; `./RUNME.sh branch review` answers check 1 on the untracked `plugin.json` the review worktree lacks, the same box fault as last round.; No retro stands in the handback.; Craft: `spec/processes/retro.yaml` lines 48 to 51 and 59 write a pointer in a checklist item, a value opening on a word, and the rule reads past them. Fed line 48 a dead pointer, and `lint` answers 0. The reflect step named the fix for this class, and it landed on the `reads` shape alone. Read every yaml line outside a bracket guard, and write the two shapes in angle brackets: `[[wiki]]` in `paragraph.schema.yaml` line 68 and `[[the note]]` in `VocabularyEntry.yml` line 74.; Trivial: `sorted` in `finding.go` points at `tree#what-a-rule-answers`, which says nothing of the order it puts findings in. One line there names the order.; Trivial: `Rules` in `tree.go` writes two names on one line, where every other row holds one.; Trivial: `level0.md` drops its pointer at `a-step-carries-the-answer` where `log.md` repoints the same target at `a-step-arrives-late`. Every other repoint lands on the chapter that moved or the note that renamed.; The design drafts of the two other tickets on the branch are their own commits, outside this ticket's hunks."
+  - step: implement/reflect
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: 2e9002e7866abdcc125a64f37baaa620aeeea64f
+    hash_after: 2e9002e7866abdcc125a64f37baaa620aeeea64f
 ---
 
 # Ask
@@ -289,17 +293,18 @@ string a test writes each do.
 
 <!-- the form is text -->
 
-The findings fall in three classes, and each names a fix.
+The second round names one class, and the first round's classes again in
+small.
 
 | the class | the finding | the fix |
 |---|---|---|
-| a tool run outside its config | the formatter rewrote two files whole to tabs | run every tool the way the check runs it, through the tree's own config, so a hunk shows the one thing it adds |
-| a fact written where one stands | the Finding shape stood a third time, and the table row named no home for a Go rule | search for the owner before writing a chapter, and point at it |
-| a scope drawn by file ending | a pointer in a process file's `reads` line went unread | draw the scope by the shape a pointer takes where it stands: a bracketed value in yaml, a comment in code |
+| a fix landed on the case at hand, and not on the class | the yaml reading took a `reads` line and read past a checklist item | read every yaml line, and guard the shape by what a script writes inside the brackets: a quote or a bracket |
+| a fact said nowhere | the order `sorted` puts findings in stood in no note | one line in the tree note names it |
+| a fix bending a shape to fit a number | two rule names on one line held the file under its ceiling | the rules list moves to the checker's file, where the sweep runs it |
 
-The endings the rule tries now carry their reason in the chapter, and the
-sentence split in the other ticket stands, because it fixes a line this hand
-wrote.
+The pointer the level zero note dropped stays dropped. It pointed the chapter at
+itself, and the restated rule draws a chapter retelling the one its pointer
+names.
 
 ### checked
 
@@ -307,9 +312,9 @@ wrote.
 
 <!-- the form is checklist -->
 
-- the change touches no file the ask leaves out. The fixes stay in the rule, its cases, the two notes and the two files the formatter rewrote.
-- every door the change reaches has a fake. The new case feeds the rule a process file in its own fixture root.
-- a comment names the approach the change implements. The yaml reading carries a line pointing at the chapter.
+- the change touches no file the ask leaves out. The fixes stay in the rule, its cases, the checker, the two notes, and the two yaml files whose shapes now stand in angle brackets.
+- every door the change reaches has a fake. The process case feeds the rule a checklist item and a guarded script line in its own fixture root.
+- a comment names the approach the change implements. The guard carries a line pointing at the chapter.
 
 ## change
 
@@ -371,8 +376,8 @@ The language server gains one tree rule, and the tree loses every dead pointer.
 | the commit door passes a hunk adding comment lines alone | the repoints change no code, and the door asked each of eight files for a test |
 
 The rule reads a comment alone in a code file, because a pointer in a string is
-a fixture a test writes. In a yaml file it reads a value opening on a bracket,
-because a `reads` line is a pointer a reader follows. The door's change carries
+a fixture a test writes. In a yaml file it reads every line, because a `reads`
+line and a checklist item are pointers a reader follows. The door's change carries
 its own case.
 
 ### checked
