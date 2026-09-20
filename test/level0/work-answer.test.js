@@ -144,6 +144,19 @@ test("a closed ticket on trunk stands off the queue, whatever a merged branch sa
   assert.equal(gone.tickets[0].queue, UNPLACED, "and so does its ticket");
   assert.equal(said.branches.find((one) => one.name === "one-group").queue, "1");
   assert.equal(said.loose.some((one) => one.name === "its-child" && one.queue !== UNPLACED), false, "the stale copy places nothing");
+  // A merged branch speaks for no ticket, so one trunk holds nowhere takes no place at all. [[spec/design_output/pull#the-queue-is-an-outline]]
+  const orphan = answerOf({
+    ...doorsSaying(
+      remoteSaying([{ branch: "work/gone-group", tip: "bbb", when: 1767225600, merged: true }], {
+        "work/gone-group:spec/tickets/gone-group.md": GROUP_NOTE,
+        "work/gone-group:spec/tickets/its-child.md": CHILD("gone-group", "open"),
+      }),
+    ).it,
+    root: ROOT,
+    clock: fakeClock("2026-01-01T03:00:00.000Z"),
+  });
+  assert.equal("queue" in orphan.branches[0], false, "the merged group takes no place");
+  assert.equal("queue" in orphan.branches[0].tickets[0], false, "and its open copy of a ticket takes none");
   const { said: listed } = heard(() => work(ROOT, ["list", "", "--queue"], it));
   assert.equal(listed.includes("gone-group"), false, "the listing leaves the unplaced out");
 });

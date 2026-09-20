@@ -75,16 +75,11 @@ export function firstLine(said) {
   return (row ?? "").slice(0, SAYS_CUT);
 }
 
-// Every ticket the answer names, each once. A standing branch speaks for its own group and its tickets, trunk for the rest, and a merged branch for nothing trunk holds. [[spec/design_output/work#one-reading-answers-git]]
+// Every ticket the answer names, each once. A standing branch speaks for its own group and its tickets, trunk for the rest, and a merged branch for nothing, because trunk holds what it brings in. [[spec/design_output/work#one-reading-answers-git]]
 export function ticketsIn(read) {
   const out = new Map();
   const standing = read.stand.filter((held) => !held.merged);
-  const landed = read.stand.filter((held) => held.merged);
-  for (const one of [
-    ...standing.flatMap((held) => ownTickets(held)),
-    ...read.loose,
-    ...landed.flatMap((held) => held.tickets),
-  ]) {
+  for (const one of [...standing.flatMap((held) => ownTickets(held)), ...read.loose]) {
     if (!out.has(one.name)) out.set(one.name, { ...one, front: frontOf(one.text) });
   }
   return [...out.values()];
