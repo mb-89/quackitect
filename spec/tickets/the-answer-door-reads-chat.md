@@ -89,7 +89,7 @@ steps:
 group: the-bridge-keeps-transport
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box fa49097ce66c · claude-code-remote
@@ -155,6 +155,10 @@ record:
     hash_after: 819395e3d10d39bf1cfe94e5213fd1e8f9f85991
     returns: 1
     why: "the header of `src/bridge/report.js` holds the claim this branch overturns, that a chat text waits for turn end; `spec/design_output/extension.md` line 410 holds the same claim, and links to the chapter now saying the opposite; an ask under `ask.wanted` takes a fitting chat text too, so that chapter's rule about the tool reads false; the chapter What the refusal says quotes the lib `SAYS` in full, and the case holds the constant alone; so the chapter's claim that a case keeps the two together overstates what the tree holds; the three display cases run green before the change, and the wording case alone carries red; `onMessageDisplay` pays off `delta`, and `src/bridge/server.js` wires it at `classic.MessageDisplay`; the blank-text case feeds the door an empty delta and asserts the refusal `{ needs: \"reply\" }`; the change reaches the six files the design table names, and each hunk answers a row of it; `./RUNME.sh check` answers 0 on this branch; the branch review reads the retro as absent"
+  - step: implement/reflect
+    hand: box fa49097ce66c · claude-code-remote
+    hash_before: 2d0ad4645f7df3cfd620a34afa13eb043f57407e
+    hash_after: a331621d1eb7aefa7db46b8663b0c3190eba7cfa
 ---
 
 # Ask
