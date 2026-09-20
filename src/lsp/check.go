@@ -43,7 +43,7 @@ func (one *Checker) Over(path string) []Finding {
 
 	out := []Finding{}
 	if strings.HasSuffix(where, ".md") {
-		out = append(out, noteFaults(schemasIn(one.tree), where, one.tree.Read(where))...)
+		out = append(out, noteFaults(one.tree, schemasIn(one.tree), where, one.tree.Read(where))...)
 	}
 	if part := overLong(where, one.tree.Words); part != "" {
 		out = append(out, fault("NameHoldsTheWords", where, 1,

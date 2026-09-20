@@ -222,7 +222,7 @@ func TestAStrangerKindMeetsTheGovernor(t *testing.T) {
 		"HANDOVER.md":                       "---\nkind: [[rationale]]\n---\n\n# Why\n",
 	})
 	schemas := schemasIn(tree)
-	found := noteFaults(schemas, "HANDOVER.md", tree.Read("HANDOVER.md"))
+	found := noteFaults(tree, schemas, "HANDOVER.md", tree.Read("HANDOVER.md"))
 	one := onlyOne(t, found, "Schema.Kind")
 	if !strings.Contains(one.Message, "reads as a rationale") {
 		t.Errorf("the message reads %q", one.Message)
@@ -234,7 +234,7 @@ func TestAKindWithNoSchemaRefuses(t *testing.T) {
 		"spec/schemas/handover.schema.yaml": handoverSchema,
 		"spec/one.md":                       "---\nkind: [[stranger]]\n---\n\n# Why\n",
 	})
-	found := noteFaults(schemasIn(tree), "spec/one.md", tree.Read("spec/one.md"))
+	found := noteFaults(tree, schemasIn(tree), "spec/one.md", tree.Read("spec/one.md"))
 	one := onlyOne(t, found, "Schema.Kind")
 	if !strings.Contains(one.Message, "names no schema") {
 		t.Errorf("the message reads %q", one.Message)

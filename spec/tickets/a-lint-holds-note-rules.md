@@ -355,11 +355,17 @@ reading, and the checker takes the pair.
 
 <!-- the form is command -->
 
+    ./RUNME.sh lint
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches the checker, the style folder, the lint config and the notes the drift stands in
+- the Go reading takes the tree the checker holds, and the fixture writes one of its own
+- each piece carries the pointer at the chapter saying what a pair rule reads
 
 ## tests-green
 

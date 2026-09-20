@@ -94,7 +94,7 @@ the way up.
 
 ## The questions it answers
 
-Each one is a walk the tree used to take:
+Each one is a walk the tree takes in one call:
 
 | verb | asks |
 |---|---|
