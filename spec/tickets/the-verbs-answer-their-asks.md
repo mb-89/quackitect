@@ -74,7 +74,7 @@ steps:
             says: every person step parked, every ticket minted with no group, and what the handover says
 process: [[spec/processes/group]]
 process_hash: 3c35c048932fd579
-step: retro/notes
+step: retro/write
 record:
   - step: sync
     hand: box fb2b49fba485 · claude-code-remote
@@ -95,6 +95,14 @@ record:
     hand: the engine
     hash_before: 89f68d1d5533707508d8937d04e7447903ee489e
     hash_after: 89f68d1d5533707508d8937d04e7447903ee489e
+  - step: retro/notes
+    hand: box fb2b49fba485 · claude-code-remote
+    hash_before: 317a6cdcc5de58af8bd5d72885deec4453dc65a0
+    hash_after: 317a6cdcc5de58af8bd5d72885deec4453dc65a0
+    answered:
+      - name: drained
+        exit: 0
+        said: .se/tickets holds no open note, so the box leaves nothing behind.
 ---
 
 # Ask
@@ -150,6 +158,8 @@ Three verbs answer what their asks name. a-route-closes-answered-asks closes a t
 <!-- retro notes, which passes when the private folder is empty -->
 
 <!-- the form is command -->
+
+./RUNME.sh retro notes
 
 ## write
 
