@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -105,6 +105,12 @@ record:
     hand: box 0eb9ad6feedf · claude-code-remote
     hash_before: f040bbc750f7329f8e73dffa9d88432da60abf0c
     hash_after: f040bbc750f7329f8e73dffa9d88432da60abf0c
+  - step: design/review
+    hand: box 0eb9ad6feedf · claude-code-remote · helper-4
+    hash_before: f3164a73dff9ad0b71e3b0cc4267f8b1525d576a
+    hash_after: f3164a73dff9ad0b71e3b0cc4267f8b1525d576a
+    returns: 2
+    why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | no, the folder table meets an import loop Go refuses |; | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 on this commit |; | does a retro stand in the handback | no, `./RUNME.sh branch review` reads it absent |; | does the verb the approach adds carry a proof | no, the prove move reads an exit that stays 0 |; | does every claim carry a proof | yes, each row reads true against the code |; | what grade do the findings take | design, because each one moves the approach |; TL;DR:; A tab method takes `*model`, so a tab package and the frame reach each other.; `./RUNME.sh links` exits 0 over the rows it answers, so a stale pointer rides along.; `spec/design_output/viewer` carries the old name, and the two renames leave it standing.; The findings, one a line:; `tab` in `src/viewer/tabs.go` passes `*model` into every method but `Name`.; `src/viewer/ui.go` holds `model`, so a tab package reaches back into the frame.; `newModel` builds `[]tab{logTab{}, workTab{}}`, so the frame reaches each tab package.; Both reaches standing shuts an import loop, and the Go build refuses it.; So the approach says where `model` lands, and the folder table stands on that.; `./RUNME.sh links` calls `dangling`, and exits 0 over every row it answers.; So the prove move reads the rows naming the old name, and asserts none stands.; The ask asks a name to say what the thing is, and that note names the viewer.; So the rename list holds `spec/design_output/viewer` beside the folder and the stub.; The read move, the write move and the stub rows each read true against the code."
 ---
 
 # Ask
@@ -170,30 +176,32 @@ fail
 
 | the question reviewing asks | the answer |
 |---|---|
-| does the approach answer the ask | no, the read move and the prove move miss a path reach |
+| does the approach answer the ask | no, the folder table meets an import loop Go refuses |
 | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |
-| what does `./RUNME.sh check` answer | 0 on this commit, with the server standing |
-| does the verb the approach adds carry a proof | no, the prove move rests on `links` alone |
-| does every claim carry a proof | no, three rows read false against the code |
+| what does `./RUNME.sh check` answer | 0 on this commit |
+| does a retro stand in the handback | no, `./RUNME.sh branch review` reads it absent |
+| does the verb the approach adds carry a proof | no, the prove move reads an exit that stays 0 |
+| does every claim carry a proof | yes, each row reads true against the code |
+| what grade do the findings take | design, because each one moves the approach |
 
 TL;DR:
 
-- The index link table holds a note link alone, so a path reach stands outside it.
-- `./RUNME.sh links` answers the note links resolving to nothing, so a stale import passes green.
-- The literal `project` stands in the vehicle library, which the approach's table leaves out.
-- `spec/design_output/tree` owns the rules weighing two files, so the verb wants another owner.
+- A tab method takes `*model`, so a tab package and the frame reach each other.
+- `./RUNME.sh links` exits 0 over the rows it answers, so a stale pointer rides along.
+- `spec/design_output/viewer` carries the old name, and the two renames leave it standing.
 
 The findings, one a line:
 
-- `linksIn` in `src/index/front.go` records a note link, and the link table holds those alone.
-- So the read move asks `grep` beside `links`, and the approach names the two.
-- `./RUNME.sh links` answers `dangling`, which names a note link resolving to nothing.
-- So the prove move runs `./RUNME.sh check` too, as the ask's last bullet asks.
-- `STUB_FOLDERS` holds the literal `project` in `.claude/skills/level0/lib/vehicle.js`.
-- `stubInto` reads that constant, so the rename reaches a file the table leaves out.
-- `spec/design_output/index` owns the questions the index answers, and the verb asks one.
-- `spec/design_output/viewer` carries the old name, and every note link naming it rides along.
-- The folder table matches the two tabs `src/viewer/ui.go` builds, the log and the work.
+- `tab` in `src/viewer/tabs.go` passes `*model` into every method but `Name`.
+- `src/viewer/ui.go` holds `model`, so a tab package reaches back into the frame.
+- `newModel` builds `[]tab{logTab{}, workTab{}}`, so the frame reaches each tab package.
+- Both reaches standing shuts an import loop, and the Go build refuses it.
+- So the approach says where `model` lands, and the folder table stands on that.
+- `./RUNME.sh links` calls `dangling`, and exits 0 over every row it answers.
+- So the prove move reads the rows naming the old name, and asserts none stands.
+- The ask asks a name to say what the thing is, and that note names the viewer.
+- So the rename list holds `spec/design_output/viewer` beside the folder and the stub.
+- The read move, the write move and the stub rows each read true against the code.
 
 # implement
 
