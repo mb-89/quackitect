@@ -89,7 +89,7 @@ steps:
 group: the-tree-names-its-things
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 0eb9ad6feedf · claude-code-remote
@@ -101,6 +101,10 @@ record:
     hash_after: 12daafca92339622360654afc74b1cc19f9c11c9
     returns: 1
     why: "| the question reviewing asks | the answer |; |---|---|; | does the approach answer the ask | partly, the rule and the sweep hold, the table of doors does not |; | is what the draft touches beyond the ask trivial | yes, the draft writes this ticket alone |; | what does `./RUNME.sh check` answer | 0 on this commit, with the server standing |; | does every rule the approach adds carry a case | yes, one case drives the sweep under both door sets |; | does every claim carry a proof | no, the root row and the tools row read against the code |; TL;DR:; The rule and the sweep stand as drafted.; The table of doors names what parts the two callers wrong, and leaves out what bites.; Redraw that table off the code, and say how the case reaches the count the check prints.; The findings, one a line:; Both callers hand the method root, so neither one reads a tree the other leaves alone.; `lint` takes its root from `cli-doors`, and `findingsFor` takes `box.method`.; `rootsHere` reads the method root off the marker above that module, so no caller hands the work root.; The tools row reads against the code, because `cli-doors` names each tool through `whereIs` over the same survey.; The parting that stands is the Biome guard. `lint` hands an empty path where no binary stands.; `findingsFor` hands the bare name there, so the panel runs a Biome the check skips.; `lint` also adds `serverFaults` past the sweep, and the tree and schema readers where the server binary is missing.; A case asserting one count over one door set turns red there. Say which side owns each of those three.; The case drives two door sets over a fake tree, and reads nothing the check prints.; The ask wants the case red where its count differs from the check's. Say how the case reaches that count."
+  - step: design/draft
+    hand: box 0eb9ad6feedf · claude-code-remote
+    hash_before: 3326ed8aab7dff8859dd685e7a4a324431996eed
+    hash_after: 3326ed8aab7dff8859dd685e7a4a324431996eed
 ---
 
 # Ask
@@ -122,36 +126,32 @@ The agent reports green while the owner's panel draws a screen full of findings.
 
 ### approach
 
-One sweep answers the panel and the check, and a case holds the two counts equal.
+One reading answers the panel and the check, and a case holds their counts equal.
 
-`findingsOver` already stands as that sweep, and both callers reach it. They
-hand it different doors, so one tree answers two lists:
+`findingsOver` in `src/bridge/findings.js` stands as the shared sweep, and both callers reach it. Three things part what each caller ends with:
 
-| the caller | the root it hands | the tools it names |
+| what parts them | `lint` in `cli-read.js` | `findingsFor` in `findings.js` |
 |---|---|---|
-| `lint` in `cli-read.js` | the work root | the paths the install writes |
-| `findingsFor` in `findings.js` | the vehicle root | `whereIs` over the tools file |
+| the Biome guard | hands the empty string where no binary stands | hands the name `whereIs` answers, standing or not |
+| the server's own findings | adds what `serverFaults` answers | adds none |
+| the tree rules and the schema rules | adds both over a whole sweep | adds none |
 
-On a stub those two roots name different trees, so the panel reads the vehicle
-while the check reads the work. So one function answers the door set, and both
-callers take it.
+The roots agree, and the earlier draft read them apart. `root` in `cli-doors.js` and `box.method` both name the tree the module stands in. The tools agree too, because each caller reads the same survey file.
 
 | what changes | how |
 |---|---|
-| `src/bridge/findings.js` | answers the door set both callers hand `findingsOver` |
-| `src/scripts/cli-read.js` | takes that answer, and names no root of its own |
-| `test/level0/findings.test.js` | takes the case under this table |
+| `src/bridge/findings.js` | answers `readingOf`, which runs the sweep and then the readers its doors name |
+| `src/scripts/cli-read.js` | takes `readingOf`, and prints what it answers |
+| `src/bridge/server.js` | the box takes a git door, which the tree reader wants |
+| `test/contract/one-reading.test.js` | takes the case under this table |
 | `spec/guidance/working.md` | takes the rule under that |
-| [[spec/design_output/lsp]] | says one door set answers both readers |
+| [[spec/design_output/lsp#one-checker-every-front-asks]] | says one reading answers both fronts |
 
-The case sweeps every tracked file the way the panel does. It drives
-`findingsOver` under each caller's doors over one tree, and asserts one count.
-Where the two part it names the file each side holds alone, so a reader opens
-that file.
+**The doors.** `readingOf` takes its readers from the caller, so `findings.js` reaches no command line door. The Biome guard moves into it, so one rule answers both fronts.
 
-The rule reads: read a claim of done in the owner's own view before you make
-it. It lands in the Actionables of `spec/guidance/working`, beside the rules on
-what a session owes the owner.
+**The case.** It stands under `test/contract`, because it drives the real tools over the real tree. It asks the panel's reader and the check's reader for the whole tree, and asserts one count. Where the two part it names the file each side holds alone. `./RUNME.sh check` runs it in the battery, so a claim of green carries the count the owner's panel draws.
+
+**The rule.** It reads: read a claim of done in the owner's own view before you make it. It lands in the Actionables of `spec/guidance/working`, beside the rules on what a session owes the owner.
 
 ## review
 
