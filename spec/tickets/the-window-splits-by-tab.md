@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/draft
+step: design/review
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -141,6 +141,10 @@ record:
     hash_after: 3b09d524f83dcf41323782005d2d1d8a4bee70b0
     returns: 5
     why: "design: The log tab reads the draw package's styles and cuts, the work tab reads the tree and the draw package, and the window reads the palette and the filter language, so the log row, the work row and the window row each name every package they import."
+  - step: design/draft
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: 9c52e77ae070fb00c2457ed080e9b3f0dfa0bcca
+    hash_after: 23137b471c2d6c72667d5c9e8c2e5bdf4c67380c
 ---
 
 # Ask
