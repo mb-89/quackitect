@@ -89,7 +89,7 @@ steps:
 group: the-rules-hold-themselves
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 5387e4f82b24 · claude-code-remote
@@ -155,6 +155,10 @@ record:
     hash_after: 26f0498e80ca965c2042c0fa839470a3d6fc76bb
     returns: 1
     why: "`bash.js` owns `SHELLS`, `READERS` and `BREAKS`. `scripted.js` carries a; second copy of each. Export the three beside `insideOf`, and import them.; `baseName` and `clean` each stand under one name in both modules. The two; `clean` read apart. The door's turns a backslash into a slash, and the script; reading strips a quote. Keep one of each.; `OUTSIDE` restates a slice of `FREE`, and the slice drifts already. The; reading takes `node $TMPDIR/edit.mjs`. It passes `node ${TMPDIR}/edit.mjs`; and `node $TMP/edit.mjs`. `reaches` answers false on all three spellings. Ask; `reaches` for the script path, or export `FREE` and read it.; `BREAKS` in `scripted.js` carries a newline entry. `tokensOf` hands a newline; back as `;`. Drop the entry.; What I check:; `./RUNME.sh check` answers 0 on the commit this branch stands on. That commit; matches origin.; The ask lands on every bullet. A runner and a shell each name their script.; The copy out of the scratchpad refuses over `cp` and `mv`. The refusal names; `mcp__level0__patch` and `mcp__level0__replace`. The check carries both cases.; Each new case feeds the door a script writing a tracked path, and asserts the; refusal. `trunk-door.test.js` drives the same road over the disk.; `tested.js` and `precommit.js` stand outside the ask. The reading still wants; a test in the same delta. It answers the import standing above the hunk. So; it fixes the rule and keeps its shape.; `tokens.js` carries `tokensOf` out of a file at its line ceiling. `bash.js`; re-exports the name, so every caller stands as it reads.; A package script passes the reading, because `RUNNERS` stands outside; `scriptsIn`. `package.json` meets the rules where it stands, so the road; stays narrow.; The route sends this ticket to a retro after this step. That retro stands; ahead of the handback."
+  - step: implement/reflect
+    hand: box 5387e4f82b24 · claude-code-remote
+    hash_before: 4f341bbebc97d34b448d319b717869b92dc9cfc5
+    hash_after: 4f341bbebc97d34b448d319b717869b92dc9cfc5
 ---
 
 # Ask
@@ -340,11 +344,33 @@ door calls it.
 
 <!-- the form is text -->
 
+The finding names one class: a second copy of a thing standing already. The new
+module writes its own word sets, its own helpers and its own list of the paths
+no rule reads.
+
+| what stands twice | the fix |
+|---|---|
+| `SHELLS`, `READERS`, `BREAKS` | the splitter module holds them, and both readers take them there |
+| `baseName`, `clean` | the same module holds each, and the door takes them there |
+| `OUTSIDE`, a slice of `FREE` | the reading asks `reaches`, which answers false on a path no rule reads |
+
+The third fix carries the drift the finding measures: `$TMPDIR` in braces and
+`$TMP` both read as free to `reaches`, and the copy answered for one spelling
+alone. So the copy goes, and one reader answers every spelling.
+
+The class is the one this branch checks for elsewhere. A rule finding a second
+copy of a fact stands in `src/lsp/restated.go`, and a hand still writes one in
+code, where no rule reads it yet.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the fixes touch the door, the splitter and the script reading, and no file past them
+- the disk stands behind the reader a case hands in, so the cases touch memory alone
+- each piece carries the pointer at the chapter tabling what the door refuses
 
 ## change
 
