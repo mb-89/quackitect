@@ -26,6 +26,11 @@ A view carries three things: the columns, the items and whether it nests.
 The view keeps the items as they stand. What a person collapses lives in the
 view, and the flattening reads it, so the data stays as it is.
 
+A gutter stands before every row, the way the log's does. The selected row
+wears the bar in the gutter and the background under every cell. So a person
+reads where they stand the same way in every view, and the mouse reads a
+column past the gutter.
+
 ## An item carries its keys
 
 An item holds its values under the keys a column names. So one view draws

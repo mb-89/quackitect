@@ -137,7 +137,8 @@ export async function lint(where) {
   console.log(
     `${found.length} stand at warning. A commit and a push land over them, and the refactoring hand drains them past ${TRUNK}'s check.`,
   );
-  return 1;
+  // A warning turns nothing red, because the hand drains it and the doors let it land. [[spec/design_output/config#the-engine-controls]]
+  return 0;
 }
 
 // [[spec/design_output/tree#the-tree-handed-in]]

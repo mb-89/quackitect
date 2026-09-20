@@ -203,7 +203,10 @@ async function onToolCall(e, box) {
   sawCall(e, box);
   asksForUpdate(e, box);
   // The engine's three questions come round every so many of the agent's own calls. [[spec/design_output/stop#the-plan]]
-  if (!e?.agentId) asksForPlan(box, (box.calls = (box.calls ?? 0) + 1));
+  if (!e?.agentId) {
+    box.calls = (box.calls ?? 0) + 1;
+    asksForPlan(box, box.calls);
+  }
   // The engine's own ask meets the call after the owner's hold and before the answer door. [[spec/design_output/stop#the-grace]]
   const held = letsThrough(
     holdsCall(e, box) ?? holdsGrace(e, box, ENDS_TURN) ?? holdsForAnswer(e, box),

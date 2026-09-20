@@ -53,6 +53,16 @@ test("a tool call on a fresh box registers the patch tool and the check tool", a
   assert.ok(specNamed(said.register, "plan"), "the plan tool");
 });
 
+// The server counts the agent's own calls, so the plan's ask comes round on them and on no helper's. [[spec/design_output/stop#the-plan]]
+test("a call counts once on the box, and a helper's counts nowhere", async () => {
+  const box = restarted();
+  await reads(box);
+  await reads(box);
+  assert.equal(box.calls, 2);
+  await decide({ event: "tool.call", e: { tool: "Read", agentId: "a1" } }, box);
+  assert.equal(box.calls, 2, "a helper's call counts nowhere");
+});
+
 // The engine's ask meets every call through the server, so a spent grace refuses a read and lets the stop call through. [[spec/design_output/stop#the-grace]]
 test("a spent grace refuses a call through the server, and the stop call passes it", async () => {
   const box = restarted();

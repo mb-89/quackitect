@@ -102,8 +102,9 @@ func under(left, right string) bool {
 
 // The column the screen column x stands on, and the empty name past the last. [[spec/design_output/tree-view#a-sort-holds-several-keys]]
 func (t Tree) ColumnAt(x, w int) string {
-	wide := t.widths(w)
-	at := 0
+	// The gutter stands before the first column, the way the log's does. [[spec/design_output/tree-view#the-view-draws-a-tree]]
+	wide := t.widths(w - gutterWide)
+	at := gutterWide
 	for i, one := range t.Cols {
 		if x >= at && x < at+wide[i] {
 			return one.Key

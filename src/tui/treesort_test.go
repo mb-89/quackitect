@@ -126,10 +126,14 @@ func TestTheNestingSurvivesTheOrderAndTheItemsStayAsTheyStand(t *testing.T) {
 func TestAPressOnAColumnHeadNamesTheKeyUnderIt(t *testing.T) {
 	t.Parallel()
 	tree := NewTree(sortCols(), sortItems(), false)
-	if said := tree.ColumnAt(0, 40); said != "name" {
+	// The gutter stands before the first column, and a press on it names none. [[spec/design_output/tree-view#the-view-draws-a-tree]]
+	if said := tree.ColumnAt(0, 40); said != "" {
+		t.Fatalf("the gutter names no column, and it reads %q", said)
+	}
+	if said := tree.ColumnAt(gutterWide, 40); said != "name" {
 		t.Fatalf("the first column reads name, and it reads %q", said)
 	}
-	if said := tree.ColumnAt(11, 40); said != "state" {
+	if said := tree.ColumnAt(gutterWide+11, 40); said != "state" {
 		t.Fatalf("the second column reads state, and it reads %q", said)
 	}
 	if said := tree.ColumnAt(400, 40); said != "" {

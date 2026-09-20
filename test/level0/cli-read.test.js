@@ -14,4 +14,5 @@ test("the warnings stand as a list, empty before any lint, and the version reads
     "the warnings stand as an empty list before any lint",
   );
   assert.equal(typeof version(), "string");
+  assert.notEqual(version(), "", "the version names something, or the fallback");
 });

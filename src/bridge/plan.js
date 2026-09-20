@@ -1,9 +1,7 @@
 // The plan door. Where a model keeps a private todo list, this tree keeps it
 // in the queue: a todo is a title and a detail line in a runtime file, placed
 // like a ticket. Every so many calls the engine asks three things over the
-// grace: what you work on now, which todos you finished, and which you add.
-// One call answers all three. A sentence here is the light road, and a note
-// or a ticket stays the road for anything that travels.
+// grace, and one call answers all three.
 // [[spec/design_output/stop#the-plan]]
 
 import { join } from "node:path";

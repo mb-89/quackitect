@@ -54,11 +54,12 @@ func TestAPressOnTheMarkClosesTheGroupAndOpensItAgain(t *testing.T) {
 	if m.work.Len() != 3 {
 		t.Fatalf("the group opens with its ticket under it, and %d rows stand", m.work.Len())
 	}
-	m = click(m, 0, firstRow())
+	// The mark stands past the gutter, the way every column does. [[spec/design_output/tree-view#the-view-draws-a-tree]]
+	m = click(m, gutterWide, firstRow())
 	if m.work.Len() != 2 || m.work.At() != 0 {
 		t.Fatalf("a press on the mark closes the group, and %d rows stand", m.work.Len())
 	}
-	m = click(m, 1, firstRow())
+	m = click(m, gutterWide+1, firstRow())
 	if m.work.Len() != 3 {
 		t.Fatalf("a press on the mark again opens it, and %d rows stand", m.work.Len())
 	}
@@ -66,8 +67,11 @@ func TestAPressOnTheMarkClosesTheGroupAndOpensItAgain(t *testing.T) {
 	if m.work.Len() != 3 {
 		t.Fatalf("a press on the name selects and toggles nothing, and %d rows stand", m.work.Len())
 	}
-	if m.work.OnMark(0) != true || m.work.OnMark(2) {
-		t.Fatal("the mark takes the first two columns of a group's row")
+	if m.work.OnMark(0) || !m.work.OnMark(gutterWide) || m.work.OnMark(gutterWide+markWide) {
+		t.Fatal("the mark takes the two columns past the gutter on a group's row")
+	}
+	if rows := m.work.Rows(120, 2); !strings.Contains(rows, "▌") {
+		t.Fatalf("the selected row wears the bar in the gutter, and the rows read %q", rows)
 	}
 }
 

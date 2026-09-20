@@ -187,12 +187,13 @@ holds the door.
 | every `plan.everyCalls` calls, the engine asks | what answers it |
 |---|---|
 | what you work on now, by title or ticket name | the plan names it, and the queue draws it held |
-| which todos you finished | they leave the queue |
+| which todos you finish | they leave the queue |
 | which todos you add, each at its place | they land, up to `plan.mostOpen` open ones |
 
-The ask rides the grace. The answer rides the `plan` call today, and the
-next step lets it ride the agent's next message and level zero's own calls,
-because a built-in tool refuses a field its schema names nowhere.
+The ask rides the grace, and the answer rides the `plan` call today. The
+next step lets it ride the agent's next message and level zero's own calls.
+A built-in tool refuses a field its schema names nowhere, so the answer
+rides no such call.
 
 # The vote
 

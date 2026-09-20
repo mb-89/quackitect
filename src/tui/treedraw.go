@@ -34,7 +34,7 @@ func (t Tree) widths(w int) []int {
 
 // [[spec/design_output/tree-view#a-tab-joins-the-two]]
 func (t Tree) Header(w int) string {
-	wide := t.widths(w)
+	wide := t.widths(w - gutterWide)
 	cells := make([]string, 0, len(t.Cols))
 	for at, one := range t.Cols {
 		cell := pad(cut(one.Name, wide[at]), wide[at])
@@ -44,12 +44,12 @@ func (t Tree) Header(w int) string {
 		}
 		cells = append(cells, cell)
 	}
-	return headStyle.Render(cut(strings.Join(cells, " "), w))
+	return headStyle.Render(strings.Repeat(" ", gutterWide)) + headStyle.Render(cut(strings.Join(cells, " "), w-gutterWide))
 }
 
 // [[spec/design_output/tree-view#the-view-draws-a-tree]]
 func (t Tree) Rows(w, rows int) string {
-	wide := t.widths(w)
+	wide := t.widths(w - gutterWide)
 	lines := make([]string, 0, rows)
 	if len(t.flat) == 0 {
 		lines = append(lines, dimStyle.Render(cut("no item stands here", w)))
@@ -64,8 +64,12 @@ func (t Tree) Rows(w, rows int) string {
 	return lipgloss.NewStyle().Width(w).Render(strings.Join(lines, "\n"))
 }
 
-// Each cell wears its own style, so the letters keep their colours and the name its link on a selected row. [[spec/design_output/tree-view#the-name-column-nests]]
+// The selected row wears the bar in the gutter and the background under every cell, the way the log's row does, and each cell keeps its own colour and the name its link. [[spec/design_output/tree-view#the-view-draws-a-tree]]
 func (t Tree) row(one twig, selected bool, wide []int) string {
+	gutter := strings.Repeat(" ", gutterWide)
+	if selected {
+		gutter = barStyle.Render("▌") + " "
+	}
 	cells := make([]string, 0, len(t.Cols))
 	for at, col := range t.Cols {
 		switch {
@@ -80,13 +84,13 @@ func (t Tree) row(one twig, selected bool, wide []int) string {
 			cells = append(cells, styled(pad(cut(one.item.Keys[col.Key], wide[at]), wide[at]), selected))
 		}
 	}
-	return strings.Join(cells, styled(" ", selected))
+	return gutter + strings.Join(cells, styled(" ", selected))
 }
 
-// A selected cell wears the bar, and any other stands plain. [[spec/design_output/tree-view#the-view-draws-a-tree]]
+// A selected cell wears the background the log's row wears, and any other stands plain. [[spec/design_output/tree-view#the-view-draws-a-tree]]
 func styled(said string, selected bool) string {
 	if selected {
-		return barStyle.Render(said)
+		return lipgloss.NewStyle().Background(rowSelected).Render(said)
 	}
 	return said
 }
@@ -108,7 +112,11 @@ func (t Tree) lettersCell(one Item, wide int, selected bool) string {
 		if at >= wide {
 			break
 		}
-		said = append(said, flagStyle(held).Render(held.Letter))
+		style := flagStyle(held)
+		if selected {
+			style = style.Background(rowSelected)
+		}
+		said = append(said, style.Render(held.Letter))
 	}
 	return strings.Join(said, "") + styled(strings.Repeat(" ", max(0, wide-len(said))), selected)
 }
@@ -149,7 +157,7 @@ func (t Tree) OnMark(x int) bool {
 	if held == nil || !held.kids || !t.Nests {
 		return false
 	}
-	from := held.depth * nestWide
+	from := gutterWide + held.depth*nestWide
 	return x >= from && x < from+markWide
 }
 
