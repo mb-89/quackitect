@@ -440,23 +440,46 @@ Each holds its claim once the rule lands.
 
 <!-- the form is command -->
 
+    ./RUNME.sh branch test test/contract/outside-in-doors.test.js
+
 ### check
 
 <!-- the check is green on the commit -->
 
 <!-- the form is command -->
 
+    ./RUNME.sh check
+
 ### says
 
 <!-- what changes and why, for a reader who was not there -->
 
-<!-- the form is text -->
+A module reading the environment in place takes the box it runs on into every
+case of it. So a rule refuses that read, and the value rides the hand a root
+builds:
+
+| what lands | where |
+|---|---|
+| `OutsideInDoors`, over the three reads and the Go command import | `spec/config/styles/VoiceVale/OutsideInDoors.yml` |
+| a section for each root, the doors and the cases | `.vale.ini` |
+| `env` on the box the bridge builds | `src/bridge/server.js` |
+| the one file of each Go package running a command | `src/lsp/door.go`, `src/index/door.go` |
+
+The rule takes a file of its own, because a section standing a file off
+`DoorsOnly` gives up its `node:` import guard as well. So the extension keeps
+that guard and passes the platform read.
+
+The platform rides down as a `windows` argument, from the root reading it to
+the register list splitting on it. The editor files join the copies the
+test-first rule passes, because each loads under the editor's own runtime.
 
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
-<!-- the form is checklist -->
+- the change touches no file the ask leaves out: the rule file, the config, the modules the tables name
+- every door the change reaches has a fake: each case hands its box an `env` map of its own
+- a comment names the approach the change implements: each new comment points at the doors chapter
 
 # verdict
 
