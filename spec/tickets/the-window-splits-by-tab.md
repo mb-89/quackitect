@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: design/review
+step: design/draft
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -115,6 +115,12 @@ record:
     hand: box 1670436ae0bb · claude-code-remote
     hash_before: 84bdba8a528c2eb061bb48711c943b3436a1b1e8
     hash_after: 84bdba8a528c2eb061bb48711c943b3436a1b1e8
+  - step: design/review
+    hand: box 1670436ae0bb · claude-code-remote · helper-6
+    hash_before: fa22bf73f57952e01f4d3b570c835e33a7da10e1
+    hash_after: fa22bf73f57952e01f4d3b570c835e33a7da10e1
+    returns: 3
+    why: "design: The chapter's draw row reads `cut`, `pad`, `narrow`, the palette and the styles, and the approach's row reads `oneLine`, `Wrap`, `gutterWide`, the filter language and the link beside them, so the two tables say two lists; the chapter's row takes the approach's list, and the approach points at the chapter alone.; craft: The window tests read the model's fields, `sel`, `view`, `all` and `work` among them, and the model moves to the frame, so the approach says what the tests in the root package read them through.; craft: `typing` raises the floor on `alt+l` under the filter pane, so the approach says how a tab's key reaches the tab while the pane takes letters."
 ---
 
 # Ask
@@ -194,11 +200,9 @@ change under any of them rebuilds the viewer.
 
 fail
 
-- design: The chapter names what `src/tui/draw` holds, and the approach adds the filter language and the link there, so the chapter's row takes them and the approach points at the chapter alone.
-- design: The filter pane lights a pressed preset off the work tree's sorts in `presses`, so the tab interface grows the method the pane reads a pressed preset through.
-- craft: The pane and the help read `part` and `renderParts` in `detail.go`, so those part to the frame before the details move to the log tab.
-- craft: The build stamp lists the files standing directly under the folders `foldersOf` names, so the approach says the stamp changes to walk the packages.
-- craft: `gutterWide` in `sort.go` is read by the tree's draw and sort, so it parts to the draw package before the columns move to the log tab.
+- design: The chapter's draw row reads `cut`, `pad`, `narrow`, the palette and the styles, and the approach's row reads `oneLine`, `Wrap`, `gutterWide`, the filter language and the link beside them, so the two tables say two lists; the chapter's row takes the approach's list, and the approach points at the chapter alone.
+- craft: The window tests read the model's fields, `sel`, `view`, `all` and `work` among them, and the model moves to the frame, so the approach says what the tests in the root package read them through.
+- craft: `typing` raises the floor on `alt+l` under the filter pane, so the approach says how a tab's key reaches the tab while the pane takes letters.
 
 # implement
 
