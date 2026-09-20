@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: implement/reflect
+step: implement/change
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -185,6 +185,10 @@ record:
     hash_after: fd5cb8f86fb2e0ba24d37025b7133fcf3e9efc65
     returns: 1
     why: "design: `spec/design_output/tui.md` names `src/tui/mouse.go` under The mouse reaches the window, and the file stands under `src/tui/frame` now.; design: `spec/design_output/tui.md` names `src/tui/door.go`, `openDoor`, `tabMsg` and `tellPort` under A second launch hands over, and the split moved the file and gave each name a capital.; design: `spec/design_output/tree-view.md` names `src/tui/tree.go` and `src/tui/treedraw.go` under Scope, and both stand under `src/tui/tree` now.; craft: `src/tui/sort_test.go`, `src/tui/mouse_test.go` and `src/tui/model_test.go` spell the column widths, the wheel step, the floor width and the no-sort mark as bare numbers, where `stampWide`, `levelWide`, `kindWide`, `wheelStep`, `floorWide` and `sortNone` hold them.; craft: `poll` stands in `src/tui/log/tail.go` and again in `src/tui/work/work.go`, and the one package held it once.; craft: `logTab` in `src/tui/main.go` and `theLog` in `src/tui/window_test.go` read the same tab the same way.; craft: the rename reached the case messages, so `src/tui/frame_test.go` and `src/tui/panes_test.go` say \"frame.Band\" and \"frame.Preset\" to a reader, and `src/tui/log/detail_test.go` writes the filter key as `Text:`.; craft: `SchemaOf` and `TicketRules` in `src/tui/work/workedit.go` answer `ticketSchema`, a type the package keeps to itself.; craft: `src/tui/tree/treeflag_test.go` keeps a blank line where the moved case stood.; The branch does what the ask calls for: `ls src/tui/*.go` names the window's own files, each tab stands under a folder of its own, and every import in the chapter's table runs down.; `go build ./...` and `go test ./...` under `src/tui` answer 0, and `go vet ./...` and `gofmt -l .` answer nothing.; `./RUNME.sh check` answers 0 on the branch, with 64 warnings standing and none of them this ticket's.; `./RUNME.sh branch review` reads check as 1, because its worktree lacks `.claude/skills/level0/.claude-plugin/plugin.json`, which git leaves out, and the tree itself answers 0.; No retro stands in the handback, and the verdict step hands the ticket to one.; The layout case refuses a package importing what its row leaves out: a file under `src/tui/log` importing `src/tui/work` fails it by name.; The stamp case runs the build again on a move under a package, and leaves the binary standing on a moved case file.; Beyond the ask, the diff touches `.vale.ini` alone, and that section reaches a door file under a package."
+  - step: implement/reflect
+    hand: box 1670436ae0bb · claude-code-remote
+    hash_before: 6781eb271bb3460317c33e75e513901565ad1c67
+    hash_after: 6781eb271bb3460317c33e75e513901565ad1c67
 ---
 
 # Ask
@@ -329,11 +333,26 @@ under an alias.
 
 <!-- the form is text -->
 
+The findings fall in three classes, and each names a fix.
+
+| the class | the finding | the fix |
+|---|---|---|
+| a move that left its readers behind | three chapters named files and functions where they stood before the split | search the notes for every path and name the move touches, and repoint them |
+| a rename that reached prose | the case messages said the package's names to a reader, and one filter key took a capital | rename a name in code alone, and read every string a rename touches |
+| a rule broken to make a build pass | the cases spelled numbers the constants hold, two packages each held the poll, a helper stood twice, and a type stayed private behind a public function | export the name a reader outside the package reads, and put a thing shared by two packages in the one they both import |
+
+The blank line the moved case left is the first class in small: a cut leaves
+a hole where it stood.
+
 ### checked
 
 <!-- one line per item of the checklist, on how you take it into account -->
 
 <!-- the form is checklist -->
+
+- the change touches no file the ask leaves out. The fixes stay in the window's packages, the cases, and the two notes naming the moved files.
+- every door the change reaches has a fake. The fixes reach no door.
+- a comment names the approach the change implements. The poll and the exported names each carry a line pointing at their chapter.
 
 ## change
 
@@ -398,7 +417,10 @@ runs down. A reader opens one folder to read one tab.
 
 The tests move with the code they drive. The tree's, the draw package's and
 the log's cases stand in their packages, and the window's cases stay at the
-root and reach a tab through the model.
+root and reach a tab through the model. The second round repoints the notes
+at the moved files, exports the widths, the wheel step, the floor width, the
+no-sort mark and the ticket schema the cases read, and puts the poll in the
+frame, which both tabs import.
 
 ### checked
 

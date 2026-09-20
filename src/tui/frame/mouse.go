@@ -15,7 +15,7 @@ import (
 const (
 	StripRow  = 0
 	NamesRow  = HeadWide
-	wheelStep = 3
+	WheelStep = 3
 )
 
 // The first row a list line stands on, under the strip, the rule and the names. [[spec/design_output/tui#the-window-is-a-split]]
@@ -25,9 +25,9 @@ func FirstRow() int { return HeadWide + NamesWide }
 func (m Model) Mouse(msg tea.MouseMsg) (tea.Model, tea.Cmd) {
 	switch msg.Button {
 	case tea.MouseButtonWheelUp:
-		m.wheel(msg.X, -wheelStep)
+		m.wheel(msg.X, -WheelStep)
 	case tea.MouseButtonWheelDown:
-		m.wheel(msg.X, wheelStep)
+		m.wheel(msg.X, WheelStep)
 	case tea.MouseButtonLeft:
 		if msg.Action == tea.MouseActionPress {
 			m.press(msg.X, msg.Y)

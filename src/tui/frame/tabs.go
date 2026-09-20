@@ -7,6 +7,8 @@
 package frame
 
 import (
+	"time"
+
 	"fmt"
 	"strings"
 
@@ -19,6 +21,9 @@ import (
 
 // [[spec/design_output/tui#a-number-opens-a-tab]]
 const MostTabs = 9
+
+// The span a tab waits before it asks its source again, where the source answers nothing. [[spec/design_output/tui#how-a-line-arrives]]
+const Poll = 250 * time.Millisecond
 
 // The strip's right end, which the key draws and a press reaches. [[spec/design_output/tui#the-header-holds-the-tabs]]
 const HelpKey = "alt+? help "

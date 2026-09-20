@@ -4,7 +4,7 @@ kind: [[design_output]]
 
 # Scope
 
-`src/tui/tree.go` and `src/tui/treedraw.go` hold the view drawing a tree
+`src/tui/tree/tree.go` and `src/tui/tree/treedraw.go` hold the view drawing a tree
 and a table at once. This note covers the items, the columns, the nesting and
 what the view draws. Every tab drawing rows with a shape takes this one view.
 [[spec/design_input/the-tree-view-editor]]

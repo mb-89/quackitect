@@ -6,6 +6,8 @@
 package log
 
 import (
+	"quackitect/tui/frame"
+
 	"bytes"
 	"os"
 	"path/filepath"
@@ -15,8 +17,6 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/fsnotify/fsnotify"
 )
-
-const poll = 250 * time.Millisecond
 
 type LinesMsg struct {
 	Recs      []Record
@@ -100,7 +100,7 @@ func (t *tailer) cmd() tea.Cmd {
 	return func() tea.Msg {
 		select {
 		case <-t.wake:
-		case <-time.After(poll):
+		case <-time.After(frame.Poll):
 		}
 		recs, restarted, err := t.Read()
 		if err != nil {

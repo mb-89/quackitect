@@ -19,9 +19,9 @@ import (
 )
 
 const (
-	stampWide = 8
-	levelWide = 5
-	kindWide  = 10
+	StampWide = 8
+	LevelWide = 5
+	KindWide  = 10
 	lineGaps  = 3
 	// [[spec/design_output/tui#one-key-filters-the-line]]
 	PromptsFilter = "kind: /^(prompt|reply)$/"
@@ -46,7 +46,7 @@ type Tab struct {
 
 // The tab over the log at that path, following it from its first line. [[spec/design_output/tui#how-a-line-arrives]]
 func New(path string, zone *time.Location) *Tab {
-	return &Tab{Path: path, Zone: zone, Sel: -1, Follow: true, Floor: "info", SortAt: sortNone, Tailer: newTailer(path)}
+	return &Tab{Path: path, Zone: zone, Sel: -1, Follow: true, Floor: "info", SortAt: SortNone, Tailer: newTailer(path)}
 }
 
 func (*Tab) Name() string { return "log" }
@@ -303,8 +303,8 @@ func (t *Tab) renderRow(r Record, selected bool, w int) string {
 	if level == "" {
 		level = "info"
 	}
-	room := max(1, w-2-stampWide-levelWide-kindWide-lineGaps)
-	stamp := draw.Pad(r.Stamp(t.Zone), stampWide)
+	room := max(1, w-2-StampWide-LevelWide-KindWide-lineGaps)
+	stamp := draw.Pad(r.Stamp(t.Zone), StampWide)
 	said := draw.Pad(draw.Cut(draw.OneLine(r.Said), room), room)
 
 	mark := func(style lipgloss.Style) lipgloss.Style {
@@ -316,8 +316,8 @@ func (t *Tab) renderRow(r Record, selected bool, w int) string {
 	gap := mark(lipgloss.NewStyle()).Render(" ")
 	return gutter + strings.Join([]string{
 		mark(draw.Dim).Render(stamp),
-		mark(draw.LevelStyle(r.Level)).Render(draw.Pad(level, levelWide)),
-		mark(draw.KindStyle(r.Label())).Render(draw.Pad(r.Label(), kindWide)),
+		mark(draw.LevelStyle(r.Level)).Render(draw.Pad(level, LevelWide)),
+		mark(draw.KindStyle(r.Label())).Render(draw.Pad(r.Label(), KindWide)),
 		mark(saidStyle(r)).Render(said),
 	}, gap)
 }

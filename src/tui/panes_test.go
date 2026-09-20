@@ -68,7 +68,7 @@ func TestEachTabKeepsAFilterLineOfItsOwn(t *testing.T) {
 	// The queue is a pressed preset, so the funnel stands red, and a sort of a person's own lets go of it. [[spec/design_output/tree-view#a-preset-carries-its-sort]]
 	work := press(m, "2")
 	if !work.Tabs[work.Open].Narrowed(&work) || work.Pressed() == nil || work.Pressed().Name != "queue" {
-		t.Fatal("the work tab opens narrowed by the queue frame.Preset")
+		t.Fatal("the work tab opens narrowed by the queue preset")
 	}
 	if !strings.Contains(frame.RenderParts(work.PresetParts(), 80), "alt+1  queue") {
 		t.Fatal("the pressed queue row stands in the pane")
@@ -76,14 +76,14 @@ func TestEachTabKeepsAFilterLineOfItsOwn(t *testing.T) {
 	work.Input.SetValue("")
 	work.Narrow("")
 	if work.Tabs[work.Open].Narrowed(&work) || work.Pressed() != nil {
-		t.Fatal("a cleared line lets go of the queue frame.Preset, and the funnel stands grey")
+		t.Fatal("a cleared line lets go of the queue preset, and the funnel stands grey")
 	}
 	m = alt(press(m, "2"), '2')
 	if m.SourceOf(1) != "queue: /^0$/" {
-		t.Fatalf("alt+2 writes the in-hand frame.Preset, and the work's line reads %q", m.SourceOf(1))
+		t.Fatalf("alt+2 writes the in-hand preset, and the work's line reads %q", m.SourceOf(1))
 	}
 	m = press(alt(press(m, "1"), 'f'), "l", "i", "n", "e", " ", "2")
-	if theLog(m).Filter.Empty() || m.SourceOf(0) != "line 2" {
+	if logTab(m).Filter.Empty() || m.SourceOf(0) != "line 2" {
 		t.Fatalf("the log's line narrows the log, and it reads %q", m.SourceOf(0))
 	}
 	// A digit types into the line under the filter pane, so the strip is the road to the other tab. [[spec/design_output/tui#a-number-opens-a-tab]]
@@ -95,7 +95,7 @@ func TestEachTabKeepsAFilterLineOfItsOwn(t *testing.T) {
 	if m.Input.Value() != "queue: /^0$/" {
 		t.Fatalf("the work tab's line comes up on the switch, and the line reads %q", m.Input.Value())
 	}
-	if theLog(m).Filter.Empty() {
+	if logTab(m).Filter.Empty() {
 		t.Fatal("the log keeps its own filter while the work tab stands open")
 	}
 	// One placeholder stands for every tab, because the strip names the tab. [[spec/design_output/tui#the-filter-pane-takes-letters]]
@@ -108,26 +108,26 @@ func TestEachTabKeepsAFilterLineOfItsOwn(t *testing.T) {
 func TestAPresetWritesItsFilterIntoTheLineAndAgainClearsIt(t *testing.T) {
 	t.Parallel()
 	m := alt(window(3), 'q')
-	if m.Input.Value() != log.PromptsFilter || theLog(m).Filter.Empty() {
+	if m.Input.Value() != log.PromptsFilter || logTab(m).Filter.Empty() {
 		t.Fatalf("alt+q writes the prompts and replies into the line, and it reads %q", m.Input.Value())
 	}
 	m = alt(m, 'q')
-	if m.Input.Value() != "" || !theLog(m).Filter.Empty() {
+	if m.Input.Value() != "" || !logTab(m).Filter.Empty() {
 		t.Fatalf("alt+q again clears the line, and it reads %q", m.Input.Value())
 	}
 	m = alt(press(workWindow(t, 3), "2"), '2')
 	if m.Input.Value() != "queue: /^0$/" {
-		t.Fatalf("alt+2 writes the second frame.Preset's filter, and the line reads %q", m.Input.Value())
+		t.Fatalf("alt+2 writes the second preset's filter, and the line reads %q", m.Input.Value())
 	}
 	pane := frame.RenderParts(alt(m, 'f').PresetParts(), 80)
 	for _, want := range []string{"alt+1  queue", "alt+2  in hand", "alt+3  recently done", "alt+4  urgent"} {
 		if !strings.Contains(pane, want) {
-			t.Fatalf("the pane names each frame.Preset with its key and name, and reads:\n%s", pane)
+			t.Fatalf("the pane names each preset with its key and name, and reads:\n%s", pane)
 		}
 	}
 	// The filter stays off the row, because it runs long. [[spec/design_output/tui#the-filter-pane-takes-letters]]
 	if strings.Contains(pane, "queue: /^0$/") {
-		t.Fatalf("the pane draws no filter beside a frame.Preset, and reads:\n%s", pane)
+		t.Fatalf("the pane draws no filter beside a preset, and reads:\n%s", pane)
 	}
 }
 
@@ -141,7 +141,7 @@ func TestAPressOnAPresetRowPressesItAndARowStillSelectsUnderThePane(t *testing.T
 		t.Fatalf("a press on the second row writes its filter and narrows the tab, and the line reads %q", m.Input.Value())
 	}
 	if m.PresetAt(0) != nil || m.PresetAt(1) != nil {
-		t.Fatal("the line and the blank under it hold no frame.Preset")
+		t.Fatal("the line and the blank under it hold no preset")
 	}
 	m = alt(m, '2')
 	m = click(m, 4, frame.FirstRow()+1)
@@ -150,8 +150,8 @@ func TestAPressOnAPresetRowPressesItAndARowStillSelectsUnderThePane(t *testing.T
 	}
 	log := alt(window(5), 'f')
 	log = click(log, 10, frame.FirstRow()+2)
-	if theLog(log).At() != 2 || log.Pane != frame.PaneFilter {
-		t.Fatalf("a press on a log row selects it under the pane, and the cursor stands at %d", theLog(log).At())
+	if logTab(log).At() != 2 || log.Pane != frame.PaneFilter {
+		t.Fatalf("a press on a log row selects it under the pane, and the cursor stands at %d", logTab(log).At())
 	}
 }
 

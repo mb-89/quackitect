@@ -173,7 +173,7 @@ func TestTheFilterReadsKQL(t *testing.T) {
 		"-kind:tool":            "1 2",
 		`said: "breaks a rule"`: "1",
 		"detail: doors*":        "1",
-		"Text: /say\\s+so/":     "2",
+		"text: /say\\s+so/":     "2",
 		"details: say":          "2",
 		"nosuchfield: x":        "",
 		"(tool or vale) warn":   "1",

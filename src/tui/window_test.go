@@ -6,14 +6,11 @@ package main
 
 import (
 	"quackitect/tui/frame"
-	"quackitect/tui/log"
 	"quackitect/tui/tree"
 	"quackitect/tui/work"
 )
 
 func theWork(m frame.Model) *work.Tab { return m.Tabs[1].(*work.Tab) }
-
-func theLog(m frame.Model) *log.Tab { return m.Tabs[0].(*log.Tab) }
 
 // Every row's name in the order the tree draws them. [[spec/design_output/tree-view#a-sort-holds-several-keys]]
 func namesOf(t *tree.Tree) []string {

@@ -34,34 +34,34 @@ const (
 )
 
 // What the ticket schema says of each front field. [[spec/design_output/schema#the-verbs-own-their-fields]]
-type ticketSchema struct {
+type TicketSchema struct {
 	takes map[string][]string
 	owned map[string]bool
 }
 
 // [[spec/design_output/tree-view#the-completion-knows-the-field]]
-func (s ticketSchema) Takes(key string) []string { return s.takes[key] }
+func (s TicketSchema) Takes(key string) []string { return s.takes[key] }
 
 // Whether the field stands in the front at all, so a column the index derives refuses an edit. [[spec/design_output/tui#the-work-tab-takes-edits]]
-func (s ticketSchema) Knows(key string) bool {
+func (s TicketSchema) Knows(key string) bool {
 	_, held := s.takes[key]
 	return held
 }
 
 // Whether the verbs own the field, which the door refuses a hand. [[spec/design_output/schema#the-verbs-own-their-fields]]
-func (s ticketSchema) Owned(key string) bool { return s.owned[key] }
+func (s TicketSchema) Owned(key string) bool { return s.owned[key] }
 
 // [[spec/design_output/schema#the-verbs-own-their-fields]]
-func readTicketSchema(root string) (ticketSchema, error) {
+func readTicketSchema(root string) (TicketSchema, error) {
 	text, err := os.ReadFile(filepath.Join(root, filepath.FromSlash(TicketSchemaAt)))
 	if err != nil {
-		return ticketSchema{}, err
+		return TicketSchema{}, err
 	}
 	return SchemaOf(string(text)), nil
 }
 
-func SchemaOf(text string) ticketSchema {
-	out := ticketSchema{takes: map[string][]string{}, owned: map[string]bool{}}
+func SchemaOf(text string) TicketSchema {
+	out := TicketSchema{takes: map[string][]string{}, owned: map[string]bool{}}
 	front := yaml.AsDoc(yaml.AsDoc(yaml.Read(text)).Get("frontmatter"))
 	if front == nil {
 		return out
@@ -84,7 +84,7 @@ func SchemaOf(text string) ticketSchema {
 }
 
 // Why the tab refuses to open an edit on a key, and nothing where it opens. [[spec/design_output/tui#the-work-tab-takes-edits]]
-func (s ticketSchema) Refuses(key string) string {
+func (s TicketSchema) Refuses(key string) string {
 	switch {
 	case s.Owned(key):
 		return fmt.Sprintf("%s is the verbs' to write, and the door refuses the edit.", key)
@@ -115,11 +115,11 @@ func (t *Tab) OpenEdit() {
 }
 
 // [[spec/design_output/schema#the-verbs-own-their-fields]]
-func (t *Tab) TicketRules() ticketSchema {
+func (t *Tab) TicketRules() TicketSchema {
 	if t.rules == nil {
 		said, err := readTicketSchema(Root(t.Path))
 		if err != nil {
-			said = ticketSchema{takes: map[string][]string{}, owned: map[string]bool{}}
+			said = TicketSchema{takes: map[string][]string{}, owned: map[string]bool{}}
 		}
 		t.rules = &said
 	}

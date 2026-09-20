@@ -98,7 +98,7 @@ func TestTheStripNamesEveryTabAndTheHelpKeyAboveARule(t *testing.T) {
 func TestANumberOpensTheTabAtThatPlaceAndAnyOtherLeavesTheOpenOne(t *testing.T) {
 	t.Parallel()
 	m := window(3)
-	m.Tabs = []frame.Tab{theLog(m), stubTab{}}
+	m.Tabs = []frame.Tab{logTab(m), stubTab{}}
 	m = press(m, "2")
 	if m.Open != 1 {
 		t.Fatalf("2 opens the second tab, and tab %d stands open", m.Open)
@@ -124,7 +124,7 @@ func TestANumberOpensTheTabAtThatPlaceAndAnyOtherLeavesTheOpenOne(t *testing.T) 
 func TestTheHelpNamesThreeBandsOutOfTheRegisteredKeys(t *testing.T) {
 	t.Parallel()
 	m := window(3)
-	m.Tabs = []frame.Tab{theLog(m), stubTab{}}
+	m.Tabs = []frame.Tab{logTab(m), stubTab{}}
 	drawn := frame.RenderParts(m.HelpParts(60), 60)
 	for _, want := range []string{"GLOBAL", "1…9", "open the tab at that place", "THE LOG"} {
 		if !strings.Contains(drawn, want) {
@@ -132,21 +132,21 @@ func TestTheHelpNamesThreeBandsOutOfTheRegisteredKeys(t *testing.T) {
 		}
 	}
 	if strings.Index(drawn, "GLOBAL") > strings.Index(drawn, "THE LOG") {
-		t.Fatalf("the global frame.Band stands first, and the help reads:\n%s", drawn)
+		t.Fatalf("the global band stands first, and the help reads:\n%s", drawn)
 	}
 	// The presets stand in the filter pane alone. [[spec/design_output/tui#one-key-filters-the-line]]
 	if strings.Contains(drawn, "PRESETS") || strings.Contains(drawn, "prompts and replies") {
-		t.Fatalf("the help names no frame.Preset, and reads:\n%s", drawn)
+		t.Fatalf("the help names no preset, and reads:\n%s", drawn)
 	}
 	work := press(m, "2")
 	drawn = frame.RenderParts(work.HelpParts(60), 60)
 	for _, want := range []string{"THE WORK", "read the row", "THE TICKET", "open the note"} {
 		if !strings.Contains(drawn, want) {
-			t.Fatalf("the open tab's frame.Band names %q, and the help reads:\n%s", want, drawn)
+			t.Fatalf("the open tab's band names %q, and the help reads:\n%s", want, drawn)
 		}
 	}
 	if strings.Contains(drawn, "THE LOG") {
-		t.Fatalf("the shut tab's frame.Band goes, and the help reads:\n%s", drawn)
+		t.Fatalf("the shut tab's band goes, and the help reads:\n%s", drawn)
 	}
 }
 
@@ -157,12 +157,12 @@ func TestTheSelectionBandGoesWhileNothingStandsSelected(t *testing.T) {
 	// The row's preset stands in the filter pane, and an empty log offers none. [[spec/design_output/tui#one-key-filters-the-line]]
 	drawn := frame.RenderParts(m.PresetParts(), 60)
 	if strings.Contains(drawn, "this row's kind") {
-		t.Fatalf("an empty log selects nothing and offers no row frame.Preset, and the pane reads:\n%s", drawn)
+		t.Fatalf("an empty log selects nothing and offers no row preset, and the pane reads:\n%s", drawn)
 	}
 	m = arrive(m, row(1, "tool", "line 1"))
 	drawn = frame.RenderParts(m.PresetParts(), 60)
 	if !strings.Contains(drawn, "this row's kind") {
-		t.Fatalf("a selected row offers its kind as a frame.Preset, and the pane reads:\n%s", drawn)
+		t.Fatalf("a selected row offers its kind as a preset, and the pane reads:\n%s", drawn)
 	}
 }
 
@@ -173,7 +173,7 @@ func TestAKeyNobodyRegistersDoesNothing(t *testing.T) {
 	if press(m, "?").Pane != frame.PaneShut {
 		t.Fatal("the question mark alone registers nowhere, and opens nothing")
 	}
-	if theLog(press(m, "x")).Sel != theLog(m).Sel {
+	if logTab(press(m, "x")).Sel != logTab(m).Sel {
 		t.Fatal("a key nobody registers moves nothing")
 	}
 }

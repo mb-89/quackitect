@@ -16,7 +16,7 @@ import (
 	"strings"
 )
 
-const sortNone = -1
+const SortNone = -1
 
 // A column of the log: what it is called, how wide it stands, and what it sorts on. [[spec/design_output/tui#the-columns-stand-still]]
 type column struct {
@@ -27,13 +27,13 @@ type column struct {
 
 // The last column takes what room is left, so its width reads 0. [[spec/design_output/tui#the-columns-stand-still]]
 var logColumns = []column{
-	{"time", stampWide, func(m *Tab, r Record) string { return r.At.UTC().Format("20060102150405.000000000") }},
-	{"level", levelWide, func(_ *Tab, r Record) string { return fmt.Sprintf("%02d", Rank(r.Level)) }},
-	{"kind", kindWide, func(_ *Tab, r Record) string { return r.Label() }},
+	{"time", StampWide, func(m *Tab, r Record) string { return r.At.UTC().Format("20060102150405.000000000") }},
+	{"level", LevelWide, func(_ *Tab, r Record) string { return fmt.Sprintf("%02d", Rank(r.Level)) }},
+	{"kind", KindWide, func(_ *Tab, r Record) string { return r.Label() }},
 	{"said", 0, func(_ *Tab, r Record) string { return strings.ToLower(draw.OneLine(r.Said)) }},
 }
 
-// The column the screen column x stands on, and sortNone where it stands past the last name. [[spec/design_output/tui#the-columns-stand-still]]
+// The column the screen column x stands on, and SortNone where it stands past the last name. [[spec/design_output/tui#the-columns-stand-still]]
 func ColumnAt(x, w int) int {
 	at := draw.GutterWide
 	for i, one := range logColumns {
@@ -46,20 +46,20 @@ func ColumnAt(x, w int) int {
 		}
 		at += wide + 1
 	}
-	return sortNone
+	return SortNone
 }
 
 // A press on a column sorts by it, presses again to flip, and a third puts the arrival order back. [[spec/design_output/tui#the-columns-stand-still]]
 func (m *Tab) SortOn(f *frame.Model, at int) {
 	switch {
-	case at == sortNone:
+	case at == SortNone:
 		return
 	case m.SortAt != at:
 		m.SortAt, m.SortDown = at, false
 	case !m.SortDown:
 		m.SortDown = true
 	default:
-		m.SortAt, m.SortDown = sortNone, false
+		m.SortAt, m.SortDown = SortNone, false
 	}
 	m.Rebuild(f.Rows())
 	f.LoadPane()

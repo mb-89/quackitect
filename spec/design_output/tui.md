@@ -119,7 +119,7 @@ The left side holds the open tab, and the right side holds one pane: the
 details, the help or the filter. The key opening one closes it, and the details
 are the resting state. A shut pane gives the whole width to the tab.
 
-`tab` in `tabs.go` is what a tab carries: its name, the left side it draws,
+`Tab` in `src/tui/frame/tabs.go` is what a tab carries: its name, the left side it draws,
 what the details hold, and whether a filter holds in it. So a tab after the log
 is a type and no change to the frame.
 
@@ -366,7 +366,7 @@ rule.
 
 # The mouse reaches the window
 
-The window asks the terminal for the mouse, and `src/tui/mouse.go` is the one
+The window asks the terminal for the mouse, and `src/tui/frame/mouse.go` is the one
 place reading where an event lands:
 
 | the event | what it reaches |
@@ -488,9 +488,9 @@ hands out none. So one window stands at a time:
 | the port free | opens the door, and draws the window |
 | the port held | hands its tab to the window standing, says so, and ends |
 
-`src/tui/door.go` holds both directions in one shape. `openDoor` takes a
-`POST /tab` carrying `{"tab":"work"}` and puts a `tabMsg` into the window, and
-`tellPort` sends that same shape to a port. So the window reads a tab from
+`src/tui/frame/door.go` holds both directions in one shape. `OpenDoor` takes a
+`POST /tab` carrying `{"tab":"work"}` and puts a `TabMsg` into the window, and
+`TellPort` sends that same shape to a port. So the window reads a tab from
 another process, and reaches another port with the words it takes.
 
 The verb calls the door first. `told` in `src/scripts/tui.js` posts the tab, and

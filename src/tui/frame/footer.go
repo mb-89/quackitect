@@ -15,7 +15,7 @@ import (
 
 // [[spec/design_output/tui#the-footer-carries-status]]
 const (
-	floorWide = 4
+	FloorWide = 4
 	sortWide  = 7
 )
 
@@ -41,6 +41,6 @@ func (m Model) RenderMarks() string {
 	}
 	said, floor := m.Tabs[0].Marks(&m)
 	order := draw.Dim.Render(draw.Pad(said, sortWide))
-	level := draw.LevelStyle(floor).Render(draw.Pad(strings.ToUpper(floor), floorWide))
+	level := draw.LevelStyle(floor).Render(draw.Pad(strings.ToUpper(floor), FloorWide))
 	return order + " " + funnel + " " + level
 }

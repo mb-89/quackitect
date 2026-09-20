@@ -25,9 +25,6 @@ import (
 // [[spec/design_output/tree-view#a-base-file-says-it]]
 const BaseAt = "spec/views/work.base"
 
-// The pause a dead index costs before the next ask, so it spins nothing. [[spec/design_output/tui#the-work-tab]]
-const poll = 250 * time.Millisecond
-
 // The keys the details draw as fields, in this order, and the rest they leave to the flags and the text. [[spec/design_output/tui#the-work-tab]]
 var detailKeys = []string{"step", "group", "standing", "route", QueueKey}
 
@@ -39,7 +36,7 @@ type Tab struct {
 	Tick int64
 	// [[spec/design_output/tui#the-work-tab-takes-edits]]
 	Notice string
-	rules  *ticketSchema
+	rules  *TicketSchema
 	// The places the verb answers last, laid over each tree the index hands over. [[spec/design_output/tui#the-work-tab]]
 	Places *Places
 	// The place chord stands open, and the next key closes it. [[spec/design_output/tui#the-work-tab-takes-edits]]
@@ -195,7 +192,7 @@ func Cmd(path string, was int64) tea.Cmd {
 		said, err := askIndex(root, "changes", map[string]any{"since": was})
 		if err != nil {
 			// A door answering nowhere costs a pause before the next ask, so a dead index spins nothing. [[spec/design_output/tui#the-work-tab]]
-			time.Sleep(poll)
+			time.Sleep(frame.Poll)
 			return Msg{Why: err.Error(), Tick: was}
 		}
 		var at struct {
