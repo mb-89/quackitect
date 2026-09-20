@@ -89,7 +89,7 @@ steps:
         says: pass or fail, findings one a line
 process: [[spec/processes/standard]]
 process_hash: 838dd6d003506639
-step: verdict
+step: implement/reflect
 record:
   - step: design/draft
     hand: box 1670436ae0bb · claude-code-remote
@@ -158,6 +158,12 @@ record:
       - name: check
         exit: 0
         said: 28 stand at warning. A commit and a push land over them, and the refactoring hand drains them past main's check.
+  - step: verdict
+    hand: box 1670436ae0bb · claude-code-remote · helper-11
+    hash_before: c6321ec33d2686ccbed6ad875304888878d1ead2
+    hash_after: c6321ec33d2686ccbed6ad875304888878d1ead2
+    returns: 2
+    why: "The rule, its six cases, the row in `Rules`, the per-file check and the repointed tree do what the ask calls for.; Each fix the last round named landed: both files format clean under `spec/config/biome.json`, the Finding chapter is gone and `finding.go` points at the tree note, the row names `src/lsp/pointer.go`, and the rule reads a yaml value opening on a bracket, with a case.; Fed the tree a pointer at a chapter nobody wrote, and `./RUNME.sh lint` answers 1 with one `EveryPointerResolves` error naming the file and the line.; `./RUNME.sh check` on the branch answers 0, with 28 warnings: 22 in this ticket, 3 in the server note's new chapters, 3 in other tickets that stood before.; `./RUNME.sh branch review` answers check 1 on the untracked `plugin.json` the review worktree lacks, the same box fault as last round.; No retro stands in the handback.; Craft: `spec/processes/retro.yaml` lines 48 to 51 and 59 write a pointer in a checklist item, a value opening on a word, and the rule reads past them. Fed line 48 a dead pointer, and `lint` answers 0. The reflect step named the fix for this class, and it landed on the `reads` shape alone. Read every yaml line outside a bracket guard, and write the two shapes in angle brackets: `[[wiki]]` in `paragraph.schema.yaml` line 68 and `[[the note]]` in `VocabularyEntry.yml` line 74.; Trivial: `sorted` in `finding.go` points at `tree#what-a-rule-answers`, which says nothing of the order it puts findings in. One line there names the order.; Trivial: `Rules` in `tree.go` writes two names on one line, where every other row holds one.; Trivial: `level0.md` drops its pointer at `a-step-carries-the-answer` where `log.md` repoints the same target at `a-step-arrives-late`. Every other repoint lands on the chapter that moved or the note that renamed.; The design drafts of the two other tickets on the branch are their own commits, outside this ticket's hunks."
 ---
 
 # Ask
@@ -393,50 +399,43 @@ its own case.
 - spec/tickets/a-pointer-resolves.md
 - src/lsp/pointer.go
 - src/lsp/pointer_test.go
+- src/lsp/fixture_test.go
+- src/lsp/finding.go
 - src/lsp/check.go
 - src/lsp/main.go
 - src/lsp/serve.go
 - src/lsp/tree.go
 - src/lsp/restated.go
-- src/lsp/note.go
-- src/lsp/fixture_test.go
-- src/index/index.go
+- src/bridge/findings.js
 - spec/design_output/lsp.md
 - spec/design_output/tree.md
 - spec/design_output/schema.md
-- spec/design_output/index.md
-- spec/design_output/editor.md
-- spec/design_output/work.md
-- spec/design_output/pull.md
-- spec/design_output/level0.md
-- spec/design_output/log.md
-- spec/design_output/extension.md
-- spec/design_input/the-agent-pulls-tickets.md
+- spec/config/biome.json
 - spec/guidance/voice.md
 - spec/schemas/guidance.schema.yaml
 - spec/schemas/paragraph.schema.yaml
 - spec/processes/retro.yaml
-- spec/config/biome.json
-- .claude/output-styles/level0.md
+- spec/processes/standard.yaml
+- spec/config/styles/VoiceShape/VocabularyEntry.yml
 - .claude/skills/level0/lib/tested.js
+- test/level0/tested.test.js
+- spec/tickets/the-unknown-runs-stays-quiet.md
+- spec/tickets/the-window-splits-by-tab.md
+- .claude/output-styles/level0.md
 - .claude/skills/level0/lib/answer.js
 - .claude/skills/level0/lib/refuse.js
 - .claude/skills/level0/lib/stop.js
-- test/level0/tested.test.js
-- test/level0/stop.test.js
-- test/level0/pull-leaves.test.js
-- test/level0/projection.test.js
-- test/level0/states.test.js
-- test/level0/viewer.test.js
-- test/level0/window-door.test.js
-- test/contract/cli-verbs.test.js
+- spec/design_output/extension.md
+- spec/design_output/level0.md
+- spec/design_output/log.md
+- spec/tickets/a-log-verb-reads-sessions.md
+- spec/tickets/a-step-changes-hands.md
 - src/bridge/bash.js
-- src/bridge/findings.js
 - src/bridge/stop.js
-- src/scripts/cli.js
 - src/scripts/cli-check.js
 - src/scripts/cli-doors.js
 - src/scripts/cli-read.js
+- src/scripts/cli.js
 - src/scripts/guidance-hand.js
 - src/scripts/pull-route.js
 - src/scripts/pull.js
@@ -444,9 +443,13 @@ its own case.
 - src/scripts/work.js
 - src/tui/help.go
 - src/tui/tree_test.go
-- spec/tickets/a-log-verb-reads-sessions.md
-- spec/tickets/a-step-changes-hands.md
-- spec/tickets/the-unknown-runs-stays-quiet.md
+- test/contract/cli-verbs.test.js
+- test/level0/projection.test.js
+- test/level0/pull-leaves.test.js
+- test/level0/states.test.js
+- test/level0/stop.test.js
+- test/level0/viewer.test.js
+- test/level0/window-door.test.js
 
 ## verdict
 
@@ -456,17 +459,17 @@ its own case.
 
 fail
 
-- The rule, its five cases, the row in `Rules` and the per-file check do what the ask calls for.
-- The chapter-nobody-wrote case feeds the rule a dead pointer and asserts one error naming the file and the line.
-- `./RUNME.sh check` on the branch answers 0, with 23 warnings, all in this ticket.
-- `./RUNME.sh branch review` answers check 1 on an untracked `plugin.json` the review worktree lacks. That is the box, and the branch's own check answers 0.
+- The rule, its six cases, the row in `Rules`, the per-file check and the repointed tree do what the ask calls for.
+- Each fix the last round named landed: both files format clean under `spec/config/biome.json`, the Finding chapter is gone and `finding.go` points at the tree note, the row names `src/lsp/pointer.go`, and the rule reads a yaml value opening on a bracket, with a case.
+- Fed the tree a pointer at a chapter nobody wrote, and `./RUNME.sh lint` answers 1 with one `EveryPointerResolves` error naming the file and the line.
+- `./RUNME.sh check` on the branch answers 0, with 28 warnings: 22 in this ticket, 3 in the server note's new chapters, 3 in other tickets that stood before.
+- `./RUNME.sh branch review` answers check 1 on the untracked `plugin.json` the review worktree lacks, the same box fault as last round.
 - No retro stands in the handback.
-- Craft: `lib/tested.js` and `test/level0/tested.test.js` stand whole in tabs. `spec/config/biome.json` says space, and `biome format` refuses both. Format them back, so the hunk shows the one function it adds.
-- Craft: `lsp#one-shape-every-door-prints` writes the Finding shape a third time, after `tree#what-a-rule-answers` and `schema#a-finding-names-the-section`. Point at one of them.
-- Craft: `tree#the-rules-over-two-files` says its rules live in `lib/tree.js`, and the new row names a Go rule. One line says the server holds this one.
-- Design: a `reads:` line of a process file writes a pointer a reader follows, and the rule reads a comment alone outside a note. A dead pointer there passes the check. The approach scoped it so and the review passed it, so this goes to design and not to the drafter.
-- The rule tries `.yaml` and `.yml` where the index tries `.md` alone. The sound-pointers case covers a process file, and the chapter names the endings without the reason. Trivial.
-- The sentence split in `the-unknown-runs-stays-quiet.md` stands outside the ask and redesigns nothing.
+- Craft: `spec/processes/retro.yaml` lines 48 to 51 and 59 write a pointer in a checklist item, a value opening on a word, and the rule reads past them. Fed line 48 a dead pointer, and `lint` answers 0. The reflect step named the fix for this class, and it landed on the `reads` shape alone. Read every yaml line outside a bracket guard, and write the two shapes in angle brackets: `[[wiki]]` in `paragraph.schema.yaml` line 68 and `[[the note]]` in `VocabularyEntry.yml` line 74.
+- Trivial: `sorted` in `finding.go` points at `tree#what-a-rule-answers`, which says nothing of the order it puts findings in. One line there names the order.
+- Trivial: `Rules` in `tree.go` writes two names on one line, where every other row holds one.
+- Trivial: `level0.md` drops its pointer at `a-step-carries-the-answer` where `log.md` repoints the same target at `a-step-arrives-late`. Every other repoint lands on the chapter that moved or the note that renamed.
+- The design drafts of the two other tickets on the branch are their own commits, outside this ticket's hunks.
 
 ## checked
 
@@ -474,7 +477,7 @@ fail
 
 <!-- the form is checklist -->
 
-- every fact the change adds stands in one place, and a note points at the file instead of repeating it. Four of the five new chapters own their facts, and every repoint lands on a chapter that stands. The Finding table repeats two notes, and the fix above names it.
+- every fact the change adds stands in one place, and a note points at the file instead of repeating it. The Finding shape now stands in the tree note alone, and every new chapter owns its facts. The order `sorted` gives stands nowhere, and the trivial line above names it.
 
 # Discussion
 
