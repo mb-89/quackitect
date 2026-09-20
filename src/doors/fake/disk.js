@@ -1,6 +1,8 @@
 // A filesystem in memory. It behaves: what a test writes, it reads back.
 // [[spec/design_output/doors#a-fake-behaves]]
 
+import { behaves } from "./behaves.js";
+
 const HOPS = 8;
 
 export function fakeDisk(seed = {}) {
@@ -20,7 +22,7 @@ export function fakeDisk(seed = {}) {
     return [...files.keys(), ...folders].some((one) => one.startsWith(`${at}/`));
   }
 
-  return {
+  return behaves({
     files,
     times,
     link(target, path) {
@@ -122,7 +124,7 @@ export function fakeDisk(seed = {}) {
       }
       return [...seen].map(([name, kind]) => ({ name, kind }));
     },
-  };
+  }, "disk");
 }
 
 function norm(path) {

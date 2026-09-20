@@ -8,32 +8,41 @@ const FAKE = /^src\/doors\/fake\//;
 const TEST = /^test\/.*\.js$/;
 const SERVER = /^src\/bridge\/[^/]+\.js$/;
 
-// [[spec/design_output/tree#the-rules-over-two-files]]
-export function filesIn(delta) {
-  const out = [];
+// Each file answers off its own hunk, so one file's line reads for no other. [[spec/design_output/tree#the-rules-over-two-files]]
+export function hunksIn(delta) {
+  const out = new Map();
+  let file = "";
   for (const line of String(delta ?? "").split(/\r?\n/)) {
-    if (!line.startsWith(AT)) continue;
-    const said = line.slice(AT.length).trim();
-    if (said && said !== "/dev/null" && !out.includes(said)) out.push(said);
+    if (line.startsWith(AT)) {
+      file = line.slice(AT.length).trim();
+      if (file && file !== "/dev/null" && !out.has(file)) out.set(file, []);
+      continue;
+    }
+    if (!file || !line.startsWith("+") || line.startsWith("+++")) continue;
+    out.get(file)?.push(line.slice(1));
   }
   return out;
 }
 
+export function filesIn(delta) {
+  return [...hunksIn(delta).keys()];
+}
+
 // A test of its own for each file, so one stray case carries no other. [[spec/design_output/tree#the-rules-over-two-files]]
 export function untestedIn(delta) {
-  const files = filesIn(delta);
+  const hunks = hunksIn(delta);
+  const files = [...hunks.keys()];
   const tests = files.filter((one) => TEST.test(one));
-  const said = String(delta ?? "");
   return files
     .filter((one) => SOURCE.test(one) && !FAKE.test(one))
-    .filter((one) => !tests.some((test) => names(test, one, said)));
+    .filter((one) => !tests.some((test) => names(test, one, hunks.get(test) ?? [])));
 }
 
 // A test names the file it drives by its import, or by the name it carries. [[spec/design_output/tree#the-rules-over-two-files]]
-function names(test, path, delta) {
+function names(test, path, added) {
   const one = path.split("/").pop().replace(/\.js$/, "");
   const said = test.split("/").pop().replace(/\.test\.js$/, "");
-  return said === one || said.startsWith(`${one}-`) || importsIt(delta, path);
+  return said === one || said.startsWith(`${one}-`) || importsIt(added.join("\n"), path);
 }
 
 // [[spec/design_output/tree#the-rules-over-two-files]]

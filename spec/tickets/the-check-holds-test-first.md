@@ -394,8 +394,8 @@ and each test answers for itself.
 
 <!-- the form is checklist -->
 
-- this round touches the fakes, the delta reading, the testing note and the two test files
-- each fake takes the guard, so a call it lacks throws with the door's name
+- this round touches the four remaining fakes, the delta reading and its case
+- every fake under `src/doors/fake` takes the guard, so a call it lacks throws
 - each piece carries the pointer at the chapter saying what it reads
 
 ## tests-green

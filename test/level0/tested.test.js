@@ -103,3 +103,23 @@ test("a change wants the test naming it, and a stray case carries none", () => {
   const named = delta("src/bridge/one.js", "test/level0/one.test.js");
   assert.deepEqual(untestedIn(named), []);
 });
+
+test("the import counts off the test's own hunk, and off no other file's", () => {
+  const said = [
+    "diff --git a/src/bridge/one.js b/src/bridge/one.js",
+    "+++ b/src/bridge/one.js",
+    "@@ -0,0 +1 @@",
+    "+export const one = 1;",
+    "diff --git a/src/bridge/two.js b/src/bridge/two.js",
+    "+++ b/src/bridge/two.js",
+    "@@ -0,0 +1 @@",
+    "+import { one } from './one.js';",
+    "diff --git a/test/level0/other.test.js b/test/level0/other.test.js",
+    "+++ b/test/level0/other.test.js",
+    "@@ -0,0 +1 @@",
+    "+import { two } from '../../src/bridge/two.js';",
+    "",
+  ].join("\n");
+
+  assert.deepEqual(untestedIn(said), ["src/bridge/one.js"]);
+});
